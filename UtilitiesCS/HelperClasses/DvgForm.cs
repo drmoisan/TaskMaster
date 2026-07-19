@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -18,7 +19,7 @@ namespace UtilitiesCS
             InitializeComponent();
         }
 
-        private void DgvForm_ResizeEnd(object sender, EventArgs e)
+        private void DgvForm_ResizeEnd(object? sender, EventArgs e)
         {
             Debug.WriteLine($"Size is {this.Size.ToString()}");
         }

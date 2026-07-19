@@ -166,24 +166,24 @@ evidence path is used. The delegation prompt supplied only canonical `evidence/`
 
 ### Phase 5 — Batch 5 COM P-Invoke and Form Special Cases
 
-- [ ] [P5-T1] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/ShellUtilities.cs` and annotate `GetFileIcon` to `Icon?` plus P/Invoke marshaled-struct string fields to reach zero CS86xx
+- [x] [P5-T1] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/ShellUtilities.cs` and annotate `GetFileIcon` to `Icon?` plus P/Invoke marshaled-struct string fields to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P5-T8).
-- [ ] [P5-T2] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/ShellUtilitiesStatic.cs` and annotate `GetFileIcon` return `Icon?` (matching the existing XML doc) and SHGetFileInfo/ShellExecute marshaled string fields to reach zero CS86xx
+- [x] [P5-T2] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/ShellUtilitiesStatic.cs` and annotate `GetFileIcon` return `Icon?` (matching the existing XML doc) and SHGetFileInfo/ShellExecute marshaled string fields to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P5-T8).
-- [ ] [P5-T3] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/SysImageListHelper.cs` and annotate the two mutually-exclusive `listView`/`treeView` fields nullable, the collection-getter properties, and the `GetImageIndex` dereferences to reach zero CS86xx
+- [x] [P5-T3] Add `#nullable enable` to `UtilitiesCS/HelperClasses/FileSystem/SysImageListHelper.cs` and annotate the two mutually-exclusive `listView`/`treeView` fields nullable, the collection-getter properties, and the `GetImageIndex` dereferences to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P5-T8).
-- [ ] [P5-T4] Add `#nullable enable` to `UtilitiesCS/HelperClasses/WipUnfinished/ComStreamWrapper.cs` and apply annotation-only edits (`out STATSTG stat`; fields non-null in ctor) to reach zero CS86xx
+- [x] [P5-T4] Add `#nullable enable` to `UtilitiesCS/HelperClasses/WipUnfinished/ComStreamWrapper.cs` and apply annotation-only edits (`out STATSTG stat`; fields non-null in ctor) to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P5-T8).
-- [ ] [P5-T5] Add `#nullable enable` to the hand-written partial `UtilitiesCS/HelperClasses/DvgForm.cs` and annotate the event handler `object? sender` to reach zero CS86xx
+- [x] [P5-T5] Add `#nullable enable` to the hand-written partial `UtilitiesCS/HelperClasses/DvgForm.cs` and annotate the event handler `object? sender` to reach zero CS86xx
   - Acceptance: file carries the pragma; only the `object sender` -> `object? sender` annotation change; zero CS86xx (verified in P5-T8).
-- [ ] [P5-T6] Confirm `UtilitiesCS/HelperClasses/DvgForm.Designer.cs` is left NON-opted-in (no `#nullable enable` pragma, no hand-edit) and record the epic-scope conflict to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/other/maintainer-flags.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P5-T6] Confirm `UtilitiesCS/HelperClasses/DvgForm.Designer.cs` is left NON-opted-in (no `#nullable enable` pragma, no hand-edit) and record the epic-scope conflict to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/other/maintainer-flags.<yyyy-MM-ddTHH-mm>.md`
   - Acceptance: `DvgForm.Designer.cs` is byte-unchanged (no pragma, `InitializeComponent`/generated members untouched); artifact records the default exception (Designer file stays oblivious per the "do not touch Designer files" convention) and the maintainer-decision fallback (annotate only `private IContainer? components = null;` if all 43 files must be opted-in), with `Timestamp:`.
-- [ ] [P5-T7] Run CSharpier over the Batch 5 hand-written files (`FileSystem/ShellUtilities.cs`, `FileSystem/ShellUtilitiesStatic.cs`, `FileSystem/SysImageListHelper.cs`, `WipUnfinished/ComStreamWrapper.cs`, `DvgForm.cs`) and confirm no residual formatting diff; do NOT run CSharpier against `DvgForm.Designer.cs`
+- [x] [P5-T7] Run CSharpier over the Batch 5 hand-written files (`FileSystem/ShellUtilities.cs`, `FileSystem/ShellUtilitiesStatic.cs`, `FileSystem/SysImageListHelper.cs`, `WipUnfinished/ComStreamWrapper.cs`, `DvgForm.cs`) and confirm no residual formatting diff; do NOT run CSharpier against `DvgForm.Designer.cs`
   - Acceptance: `csharpier --check .` exits 0 for the touched files; `DvgForm.Designer.cs` unchanged.
-- [ ] [P5-T8] Run the pragma-only nullable build and record Batch 5 verification to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/qa-gates/batch5-nullable-build.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P5-T8] Run the pragma-only nullable build and record Batch 5 verification to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/qa-gates/batch5-nullable-build.<yyyy-MM-ddTHH-mm>.md`
   - Command: `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx for the 5 opted-in Batch 5 files, that `DvgForm.Designer.cs` produces no CS86xx (oblivious, does not cross-block `DvgForm.cs`), and NO new diagnostics elsewhere.
-- [ ] [P5-T9] Run the Batch 5 UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/regression-testing/batch5-tests.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P5-T9] Run the Batch 5 UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/regression-testing/batch5-tests.<yyyy-MM-ddTHH-mm>.md`
   - Command: `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /TestCaseFilter:"FullyQualifiedName~ShellUtilities|FullyQualifiedName~SysImageListHelper|FullyQualifiedName~ComStreamWrapper|FullyQualifiedName~DvgForm"`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; all Batch 5 tests green and behavior-identical.
 
