@@ -33,7 +33,7 @@ features:
   - issue_num: 368
     feature_folder: utilitiescs-nullable-svgcontrol
     depends_on: []
-  - issue_num: 9007
+  - issue_num: 365
     feature_folder: utilitiescs-nullable-outlook-folder-store
     depends_on: [utilitiescs-nullable-extensions, utilitiescs-nullable-helperclasses]
   - issue_num: 371
@@ -42,7 +42,7 @@ features:
   - issue_num: 370
     feature_folder: utilitiescs-nullable-email-parsing
     depends_on: [utilitiescs-nullable-extensions]
-  - issue_num: 9010
+  - issue_num: 372
     feature_folder: utilitiescs-nullable-email-classifier
     depends_on: [utilitiescs-nullable-extensions]
   - issue_num: 9011
