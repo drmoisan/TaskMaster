@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -40,7 +41,7 @@ namespace UtilitiesCS.EmailIntelligence
         private SpamBayes()
             : base() { }
 
-        public static async Task<SpamBayes> CreateAsync(
+        public static async Task<SpamBayes?> CreateAsync(
             IApplicationGlobals globals,
             bool initialize = true,
             Enums.NotFoundEnum treatment = Enums.NotFoundEnum.Skip,
@@ -90,7 +91,7 @@ namespace UtilitiesCS.EmailIntelligence
             return engine;
         }
 
-        public async Task<SpamBayes> InitAsync()
+        public async Task<SpamBayes?> InitAsync()
         {
             Globals.ThrowIfNull();
 
@@ -310,14 +311,18 @@ namespace UtilitiesCS.EmailIntelligence
             get => _globals;
             protected set => _globals = value;
         }
-        private IApplicationGlobals _globals;
+
+        // Set by constructor/CreateAsync or a builder; not tracked as ctor init by the compiler.
+        private IApplicationGlobals _globals = null!;
 
         public BayesianClassifierGroup ClassifierGroup
         {
             get => _classifierGroup;
             set => _classifierGroup = value;
         }
-        private BayesianClassifierGroup _classifierGroup;
+
+        // Assigned by InitAsync; null until activated (IsActivated reflects that at runtime).
+        private BayesianClassifierGroup _classifierGroup = null!;
 
         public static readonly HashSet<string> ClassNames = ["Spam", "Ham"];
         public static readonly string GroupName = "Spam";
@@ -417,7 +422,7 @@ namespace UtilitiesCS.EmailIntelligence
         //    return ce;
         //}
 
-        public static async Task<IConditionalEngine<MailItemHelper>> CreateEngineAsync(
+        public static async Task<IConditionalEngine<MailItemHelper>?> CreateEngineAsync(
             IApplicationGlobals globals
         )
         {
@@ -439,7 +444,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         public string Message => $"{nameof(SpamBayes)} is null. Skipping actions";
 
-        public MailItemHelper TypedItem { get; set; }
+        public MailItemHelper TypedItem { get; set; } = null!;
 
         #endregion IConditionalEngine Implementation
     }

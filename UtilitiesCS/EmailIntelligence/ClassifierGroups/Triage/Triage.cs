@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -46,7 +47,7 @@ namespace UtilitiesCS.EmailIntelligence
             return this;
         }
 
-        public static async Task<Triage> CreateAsync(
+        public static async Task<Triage?> CreateAsync(
             IApplicationGlobals globals,
             bool initialize = true,
             Enums.NotFoundEnum treatment = Enums.NotFoundEnum.Skip,
@@ -211,7 +212,7 @@ namespace UtilitiesCS.EmailIntelligence
             return await Task.Run(CreateClassifier, token);
         }
 
-        private Func<object, string, Task> _callbackAsync;
+        private Func<object, string, Task> _callbackAsync = null!;
 
         #region Properties
 
@@ -220,14 +221,14 @@ namespace UtilitiesCS.EmailIntelligence
             get => _classifierGroup;
             set => _classifierGroup = value;
         }
-        private BayesianClassifierGroup _classifierGroup;
+        private BayesianClassifierGroup _classifierGroup = null!;
 
         public ISmartSerializableConfig Config => ClassifierGroup.Config;
 
         //internal ScDictionary<string, BayesianClassifierGroup> Manager { get; }
         internal CancellationToken Token { get; }
 
-        protected internal IApplicationGlobals Globals { get; protected set; }
+        protected internal IApplicationGlobals Globals { get; protected set; } = null!;
 
         /// <summary>
         /// Async Delegate Function that extracts an array of string tokens from an object
@@ -237,7 +238,12 @@ namespace UtilitiesCS.EmailIntelligence
             get => _tokenizeAsync;
             set => _tokenizeAsync = value;
         }
-        private Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> _tokenizeAsync;
+        private Func<
+            object,
+            IApplicationGlobals,
+            CancellationToken,
+            Task<string[]>
+        > _tokenizeAsync = null!;
 
         public Func<object, string, Task> CallbackAsync
         {
@@ -249,7 +255,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         #region IConditionalEngine
 
-        public static async Task<IConditionalEngine<MailItemHelper>> CreateEngineAsync(
+        public static async Task<IConditionalEngine<MailItemHelper>?> CreateEngineAsync(
             IApplicationGlobals globals
         )
         {
@@ -258,7 +264,7 @@ namespace UtilitiesCS.EmailIntelligence
         }
 
         public Func<MailItemHelper, Task> AsyncAction =>
-            (item) => Engine is not null ? ((Triage)Engine).TestAsync(item) : null;
+            (item) => Engine is not null ? ((Triage)Engine).TestAsync(item) : null!;
 
         public Func<object, Task<bool>> AsyncCondition =>
             (item) =>
@@ -277,7 +283,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         public string Message => $"{EngineName} is null. Skipping actions";
 
-        public MailItemHelper TypedItem { get; set; }
+        public MailItemHelper TypedItem { get; set; } = null!;
 
         public void Serialize() => ClassifierGroup.Serialize();
 
@@ -318,7 +324,7 @@ namespace UtilitiesCS.EmailIntelligence
                         var mostLikely = predictions.FirstOrDefault().Class;
                         if (CallbackAsync is not null)
                         {
-                            await CallbackAsync(item, mostLikely);
+                            await CallbackAsync(item, mostLikely!);
                         }
                     },
                     token
@@ -411,7 +417,7 @@ namespace UtilitiesCS.EmailIntelligence
             var predictions = await ClassifierGroup.ClassifyAsync(helper.Tokens, token);
             var predictedClass =
                 predictions.Count() == 0 ? UnknownClassMarker : predictions.First().Class;
-            await TestActionAsync(helper, predictedClass, token);
+            await TestActionAsync(helper, predictedClass!, token);
         }
 
         public async Task TestAsync(MailItem mailItem, CancellationToken cancel = default)
@@ -425,7 +431,7 @@ namespace UtilitiesCS.EmailIntelligence
             var predictions = await ClassifierGroup.ClassifyAsync(tokens, cancel);
             var predictedClass =
                 predictions.Count() == 0 ? UnknownClassMarker : predictions.First().Class;
-            await TestActionAsync(mailItem, predictedClass, cancel);
+            await TestActionAsync(mailItem, predictedClass!, cancel);
         }
 
         public async Task TestActionAsync(
