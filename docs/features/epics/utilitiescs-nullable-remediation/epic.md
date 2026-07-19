@@ -48,7 +48,7 @@ features:
   - issue_num: 374
     feature_folder: utilitiescs-nullable-dialogs-misc
     depends_on: [utilitiescs-nullable-extensions, utilitiescs-nullable-helperclasses]
-  - issue_num: 9013
+  - issue_num: 375
     feature_folder: utilitiescs-nullable-residuals
     depends_on:
       - utilitiescs-nullable-extensions
@@ -239,6 +239,30 @@ consumption.
 
 These exclusions carry no CS86xx debt under the per-file pragma enforcement design; leaving them
 non-opted-in does not cross-block and does not diminish the epic's definition of done.
+
+### residuals (#375) execution-time findings (recorded for epic-orchestrator)
+
+The prepared `utilitiescs-nullable-residuals` child (issue #375, plan `plan.2026-07-18T23-13.md`,
+13 phases, C3/opus, `require_model_routing` ok, `PREFLIGHT: ALL CLEAR`) refined the residual set
+during preparation. epic-orchestrator must carry these findings into atomic execution:
+
+- **Effective opt-in set is 37 files, not the 44 estimate.** `PeopleScoDictionaryNewBackup.cs` is
+  a dead, uncompiled duplicate flagged for maintainer exclude/delete (not opted in), and 6
+  `OlFolderTools` Designer-generated files are left null-oblivious (no pragma), consistent with the
+  epic-wide Designer-file exclusion. The 44-file DoD inventory count is unchanged; the effective
+  remediation set is narrowed to 37 by these two maintainer-flagged exclusions.
+- **Undeclared-but-harmless dependency edge on `reusabletypes` (#366, Wave 0).** The residuals set
+  consumes a `reusabletypes` contract not declared in the manifest `depends_on`. It is harmless:
+  `reusabletypes` is Wave 0 and is prepared/fanned in, so the annotated contract is available
+  before residuals executes in Wave 1. Flagged, not added as a manifest edge (adding it would not
+  change the wave layering; residuals is already Wave 1).
+- **Three pre-existing >500-line files flagged, not split.** The residual set contains three files
+  exceeding the 500-line general-code-change limit. They are pre-existing and are annotated in
+  place without splitting (splitting would be a refactor, out of scope for null-annotation-only
+  remediation). Flagged for the maintainer.
+- **Maintainer decisions surfaced in `spec.md`:** `MSDemoConv.cs`, the `To Depricate/*` tree, and
+  `MailResolution_ToRemove` are surfaced as maintainer decisions (candidate deletions / deprecated
+  code) in the residuals `spec.md` rather than silently remediated.
 
 ### dialogs-misc (#374) flags retained
 
