@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,7 +42,7 @@ namespace UtilitiesCS.Threading
             Entries.Enqueue(action);
         }
 
-        private static ConcurrentQueue<Action> _entries;
+        private static ConcurrentQueue<Action>? _entries;
         private static ConcurrentQueue<Action> Entries
         {
             get

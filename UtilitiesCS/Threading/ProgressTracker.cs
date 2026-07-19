@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace UtilitiesCS
             _cancelSource = tokenSource;
         }
 
-        public ProgressTracker(CancellationTokenSource tokenSource, Screen screen)
+        public ProgressTracker(CancellationTokenSource tokenSource, Screen? screen)
         {
             _cancelSource = tokenSource;
             _screen = screen;
@@ -72,21 +73,21 @@ namespace UtilitiesCS
         //    _parent = new ParentProgress<(int Value, string JobName)>(parent, allocation, startingAt);
         //}
 
-        protected string _jobName;
+        protected string _jobName = null!; // set before use via Increment/Report; JobName tuple contract is non-null
         private bool _isRoot = false;
         private ParentProgress<(int Value, string JobName)> _parent;
         private ThreadSafeSingleShotGuard _pvIsDisposed = new ThreadSafeSingleShotGuard();
-        private CancellationTokenSource _cancelSource;
-        private Screen _screen;
+        private CancellationTokenSource? _cancelSource;
+        private Screen? _screen;
 
         internal Dispatcher UiDispatcher
         {
             get => _uiDispatcher;
             set => _uiDispatcher = value;
         }
-        private Dispatcher _uiDispatcher;
+        private Dispatcher _uiDispatcher = null!; // set in Initialize() before any dispatch
 
-        private ProgressViewer _progressViewer;
+        private ProgressViewer _progressViewer = null!; // set in Initialize()/child ctor before use
         public ProgressViewer ProgressViewer
         {
             get => _progressViewer;
@@ -198,7 +199,8 @@ namespace UtilitiesCS
                 if (_isRoot && parentProgress == 100)
                 {
                     if (_progressViewer.InvokeRequired)
-                        await _progressViewer.UiDispatcher.InvokeAsync(() =>
+                        // Root viewer's UiDispatcher is assigned in Initialize() before Report runs.
+                        await _progressViewer.UiDispatcher!.InvokeAsync(() =>
                         {
                             if (!_progressViewer.IsDisposed)
                             {

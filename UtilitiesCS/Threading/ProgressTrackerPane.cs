@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Diagnostics;
 using System.Threading;
 using UtilitiesCS.EmailIntelligence.TaskPane;
@@ -18,7 +19,8 @@ namespace UtilitiesCS
 
             var rootProgress = new Progress<(int value, string jobName)>(tup =>
             {
-                _progressViewer.Bar.Value = tup.value;
+                // _progressViewer was assigned in the synchronous Dispatcher.Invoke above.
+                _progressViewer!.Bar.Value = tup.value;
                 _progressViewer.JobName.Text = tup.jobName;
                 _progressViewer.Refresh();
             });
@@ -27,8 +29,9 @@ namespace UtilitiesCS
             this.Report(0, "Initializing");
             _isRoot = true;
 
-            if (_progressViewer.InvokeRequired)
-                _progressViewer.Invoke(() => _progressViewer.Show());
+            // _progressViewer was assigned in the synchronous Dispatcher.Invoke above.
+            if (_progressViewer!.InvokeRequired)
+                _progressViewer.Invoke(() => _progressViewer!.Show());
             else
                 _progressViewer.Show();
         }
@@ -44,13 +47,13 @@ namespace UtilitiesCS
             _progressViewer = parent.ProgressViewer;
         }
 
-        protected string _jobName;
+        protected string _jobName = null!; // JobName contract is non-null; set before use
         private bool _isRoot = false;
         private bool _root100 = false;
         private ParentProgress<(int Value, string JobName)> _parent;
 
-        private ProgressPane _progressViewer;
-        public ProgressPane ProgressViewer
+        private ProgressPane? _progressViewer;
+        public ProgressPane? ProgressViewer
         {
             get => _progressViewer;
             protected set => _progressViewer = value;
@@ -102,7 +105,8 @@ namespace UtilitiesCS
 
         internal void ChangeBarColor(System.Drawing.Color color)
         {
-            SafeAction(() => _progressViewer.Bar.BackColor = color);
+            // SafeAction guards _progressViewer for null/disposed before running the action.
+            SafeAction(() => _progressViewer!.Bar.BackColor = color);
         }
 
         internal void SafeAction(Action action)
