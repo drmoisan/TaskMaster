@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -21,7 +22,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 
         #region Serialization
 
-        public virtual T Deserialize<T>(string fileNameSeed, string fileNameSuffix = "")
+        public virtual T? Deserialize<T>(string fileNameSeed, string fileNameSuffix = "")
         {
             var jsonSettings = new JsonSerializerSettings()
             {
@@ -57,7 +58,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             }
         }
 
-        public virtual async Task<T> DeserializeAsync<T>(
+        public virtual async Task<T?> DeserializeAsync<T>(
             string fileNameSeed,
             string fileNameSuffix = ""
         )
@@ -95,7 +96,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             }
         }
 
-        public virtual async Task<T> DeserializeAsync<T>(
+        public virtual async Task<T?> DeserializeAsync<T>(
             ProgressTrackerPane progress,
             string fileNameSeed,
             string fileNameSuffix = "",
@@ -105,7 +106,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             JsonSerializerSettings jsonSettings = GetJsonSettings();
             FilePathHelper disk = GetDisk(fileNameSeed, fileNameSuffix, fileExtension);
 
-            T item = default;
+            T? item = default;
 
             if (FileExists(disk.FilePath))
             {
@@ -184,7 +185,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             }
             else
             {
-                return null;
+                // Pre-existing behavior: returns null when AppData is unavailable. null! keeps the
+                // non-null return type consumed by callers that dereference disk without a guard.
+                return null!;
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms.DataVisualization.Charting;
 using Newtonsoft.Json;
@@ -7,24 +8,24 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 {
     public record TestOutcome()
     {
-        public string Actual { get; set; }
-        public string Predicted { get; set; }
+        public string Actual { get; set; } = null!;
+        public string Predicted { get; set; } = null!;
         public int SourceIndex { get; set; }
     }
 
     public record VerboseTestOutcome()
     {
-        public string Actual { get; set; }
-        public string Predicted { get; set; }
-        public MinedMailInfo Source { get; set; }
+        public string Actual { get; set; } = null!;
+        public string Predicted { get; set; } = null!;
+        public MinedMailInfo Source { get; set; } = null!;
         public int SourceIndex { get; set; }
-        public (string Token, double TokenProbability)[] Drivers { get; set; }
+        public (string Token, double TokenProbability)[] Drivers { get; set; } = null!;
         public double Probability { get; set; }
     }
 
     public record ClassCounts()
     {
-        public string Class { get; set; }
+        public string Class { get; set; } = null!;
         public int TP { get; set; }
         public int FP { get; set; }
         public int FN { get; set; }
@@ -33,7 +34,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 
     public class VerboseClassCounts()
     {
-        public string Class { get; set; }
+        public string Class { get; set; } = null!;
         public int TP { get; set; }
         public int FP { get; set; }
         public int FN { get; set; }
@@ -41,7 +42,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
         public int Errors { get; set; }
 
         [JsonIgnore]
-        public Dictionary<VerboseTestOutcome, string> VerboseOutcomes { get; set; }
+        public Dictionary<VerboseTestOutcome, string>? VerboseOutcomes { get; set; }
 
         [JsonProperty]
         private IEnumerable<KeyValuePair<VerboseTestOutcome, string>> VerboseOutcomesJson
@@ -53,7 +54,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 
     //public record VerboseClassCounts()
     //{
-    //    public string Class { get; set; }
+    //    public string Class { get; set; } = null!;
     //    public int TPCount { get; set; }
     //    public int FPCount { get; set; }
     //    public int FNCount { get; set; }
@@ -66,7 +67,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 
     public record TestScores()
     {
-        public string Class { get; set; }
+        public string Class { get; set; } = null!;
         public int TP { get; set; }
         public int FP { get; set; }
         public int FN { get; set; }
@@ -78,7 +79,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 
     //public record VerboseTestScores()
     //{
-    //    public string Class { get; set; }
+    //    public string Class { get; set; } = null!;
     //    public int TP { get; set; }
     //    public int FP { get; set; }
     //    public int FN { get; set; }
@@ -94,7 +95,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 
     public class VerboseTestScores
     {
-        public string Class { get; set; }
+        public string Class { get; set; } = null!;
         public int TP { get; set; }
         public int FP { get; set; }
         public int FN { get; set; }
@@ -105,7 +106,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
         public double F1 { get; set; }
 
         [JsonIgnore]
-        public Dictionary<VerboseTestOutcome, string> VerboseOutcomes { get; set; }
+        public Dictionary<VerboseTestOutcome, string>? VerboseOutcomes { get; set; }
 
         [JsonProperty]
         private IEnumerable<KeyValuePair<VerboseTestOutcome, string>> VerboseOutcomesJson
@@ -117,17 +118,17 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 
     public record GroupedTestOutcome()
     {
-        public string Actual { get; set; }
-        public string Predicted { get; set; }
+        public string Actual { get; set; } = null!;
+        public string Predicted { get; set; } = null!;
         public int Count { get; set; }
     }
 
     public record VerboseGroupedTestOutcome()
     {
-        public string Actual { get; set; }
-        public string Predicted { get; set; }
+        public string Actual { get; set; } = null!;
+        public string Predicted { get; set; } = null!;
         public int Count { get; set; }
-        public VerboseTestOutcome[] Details { get; set; }
+        public VerboseTestOutcome[] Details { get; set; } = null!;
     }
 
     public class ClassificationErrors
@@ -154,10 +155,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             F1 = f1;
         }
 
-        public string Class { get; set; }
+        public string Class { get; set; } = null!;
 
         [JsonIgnore]
-        public Dictionary<VerboseTestOutcome, string> VerboseOutcomes { get; set; }
+        public Dictionary<VerboseTestOutcome, string>? VerboseOutcomes { get; set; }
 
         [JsonProperty]
         private IEnumerable<KeyValuePair<VerboseTestOutcome, string>> VerboseOutcomesJson
@@ -191,8 +192,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 
     public record ThresholdMetrics()
     {
-        public Series Precision { get; set; }
-        public Series Recall { get; set; }
-        public Series F1 { get; set; }
+        public Series Precision { get; set; } = null!;
+        public Series Recall { get; set; } = null!;
+        public Series F1 { get; set; } = null!;
     }
 }
