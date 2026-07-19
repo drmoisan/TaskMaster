@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using System.Text;
@@ -9,8 +10,8 @@ namespace SDILReader
     {
         // Fields
         private OpCode code;
-        private object operand;
-        private byte[] operandData;
+        private object? operand;
+        private byte[]? operandData;
         private int offset;
 
         // Properties
@@ -20,13 +21,13 @@ namespace SDILReader
             set { code = value; }
         }
 
-        public object Operand
+        public object? Operand
         {
             get { return operand; }
             set { operand = value; }
         }
 
-        public byte[] OperandData
+        public byte[]? OperandData
         {
             get { return operandData; }
             set { operandData = value; }
@@ -58,7 +59,7 @@ namespace SDILReader
                             " "
                             + ILGlobals.ProcessSpecialTypes(fOperand.FieldType.ToString())
                             + " "
-                            + ILGlobals.ProcessSpecialTypes(fOperand.ReflectedType.ToString())
+                            + ILGlobals.ProcessSpecialTypes(fOperand.ReflectedType!.ToString())
                             + "::"
                             + fOperand.Name
                             + "";
@@ -74,7 +75,7 @@ namespace SDILReader
                             result +=
                                 ILGlobals.ProcessSpecialTypes(mOperand.ReturnType.ToString())
                                 + " "
-                                + ILGlobals.ProcessSpecialTypes(mOperand.ReflectedType.ToString())
+                                + ILGlobals.ProcessSpecialTypes(mOperand.ReflectedType!.ToString())
                                 + "::"
                                 + mOperand.Name
                                 + "()";
@@ -91,7 +92,7 @@ namespace SDILReader
                                 result +=
                                     "void "
                                     + ILGlobals.ProcessSpecialTypes(
-                                        mOperand.ReflectedType.ToString()
+                                        mOperand.ReflectedType!.ToString()
                                     )
                                     + "::"
                                     + mOperand.Name

@@ -1,5 +1,7 @@
 # Atomic Executor Memory Index
 
+- [Nullable epic: pragma gate + analyzer restore](project_nullable_epic_pragma_gate_and_analyzer_restore.md) — per-file #nullable children: exact solution TWAE gate is blocked by pre-existing SVGControl CS0649 + UtilitiesCS CS0618/CS0168; use scoped `UtilitiesCS.csproj TWAE /p:WarningsNotAsErrors=CS0649%3BCS0618%3BCS0168`; restore mismatched analyzer pkgs (csproj 3.0.101 vs packages.config 3.0.123) into packages/ first
+
 - [#349 breadcrumb WebView2 gotchas](project_349_breadcrumb_webview2_gotchas.md) — retyped Designer field breaks reflection-injected tests (inject a router instead); aggregate async d__ classes for >=90% proofs; QuickFiler.Test is Newtonsoft-free
 
 - [VS18 build/test toolchain paths](project_vs18_build_toolchain_paths.md) — build with VS **18** full-framework msbuild.exe (not Core .dotnet-sdk, which dies on binary resx MSB3822); nuget.exe restore; MSYS_NO_PATHCONV; csharpier v1 subcommands; dotnet-coverage needs `--` separator

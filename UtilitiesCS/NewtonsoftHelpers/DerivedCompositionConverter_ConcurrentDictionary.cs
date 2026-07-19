@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +14,14 @@ namespace UtilitiesCS.NewtonsoftHelpers
     public class DerivedCompositionConverter_ConcurrentDictionary<TDerived, TKey, TValue>
         where TDerived : ConcurrentDictionary<TKey, TValue>
     {
-        public ConcurrentDictionary<TKey, TValue> ConcurrentDictionary { get; set; }
-        public object RemainingObject { get; set; }
-        public Dictionary<string, object> AdditionalFields { get; private set; }
-        public Dictionary<string, object> AdditionalProperties { get; private set; }
+        // These are populated by ToComposition/ToCompositionOld before the derived-conversion
+        // members read them; annotated null! to preserve the existing non-null contract without
+        // adding guards on every consumer. The additional-* dictionaries hold reflection values,
+        // which can legitimately be null, so their value type is widened to object?.
+        public ConcurrentDictionary<TKey, TValue> ConcurrentDictionary { get; set; } = null!;
+        public object RemainingObject { get; set; } = null!;
+        public Dictionary<string, object?> AdditionalFields { get; private set; } = null!;
+        public Dictionary<string, object?> AdditionalProperties { get; private set; } = null!;
 
         public DerivedCompositionConverter_ConcurrentDictionary() { }
 
@@ -64,7 +69,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
         public TDerived ToDerivedOld()
         {
             // Create an instance using reflection
-            var derivedInstance = (TDerived)Activator.CreateInstance(typeof(TDerived), true);
+            var derivedInstance = (TDerived)Activator.CreateInstance(typeof(TDerived), true)!;
 
             // Copy dictionary entries
             foreach (var kvp in ConcurrentDictionary)
@@ -165,13 +170,13 @@ namespace UtilitiesCS.NewtonsoftHelpers
                 }
             }
 
-            return typeBuilder.CreateTypeInfo().AsType();
+            return typeBuilder.CreateTypeInfo()!.AsType();
         }
 
         public object ConvertToNewClassInstance(TDerived derivedInstance)
         {
             var newClassType = EmitNewClass();
-            var newClassInstance = Activator.CreateInstance(newClassType);
+            var newClassInstance = Activator.CreateInstance(newClassType)!;
 
             var derivedType = typeof(TDerived);
             var baseType = typeof(ConcurrentDictionary<TKey, TValue>);

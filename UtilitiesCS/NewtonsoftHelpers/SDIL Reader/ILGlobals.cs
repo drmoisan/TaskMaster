@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -110,9 +111,12 @@ namespace SDILReader
     {
         public static Dictionary<int, object> Cache = new Dictionary<int, object>();
 
-        public static OpCode[] multiByteOpCodes;
-        public static OpCode[] singleByteOpCodes;
-        public static Module[] modules = null;
+        // Invariant: these are populated by LoadOpCodes() before any read of the tables;
+        // annotated null! (rather than nullable) to preserve the non-null contract that
+        // consumers (e.g. MethodBodyReader) already rely on. Behavior unchanged.
+        public static OpCode[] multiByteOpCodes = null!;
+        public static OpCode[] singleByteOpCodes = null!;
+        public static Module[]? modules = null;
 
         public static void LoadOpCodes()
         {
@@ -124,7 +128,9 @@ namespace SDILReader
                 FieldInfo info1 = infoArray1[num1];
                 if (info1.FieldType == typeof(OpCode))
                 {
-                    OpCode code1 = (OpCode)info1.GetValue(null);
+                    // Guarded by FieldType == typeof(OpCode) above, so the unbox is safe;
+                    // ! preserves behavior against the nullable GetValue return.
+                    OpCode code1 = (OpCode)info1.GetValue(null)!;
                     ushort num2 = (ushort)code1.Value;
                     if (num2 < 0x100)
                     {

@@ -85,11 +85,11 @@ that have not yet opted in.
 
 ## Acceptance Criteria
 
-- [ ] Every `.cs` file under `UtilitiesCS/NewtonsoftHelpers/` that emits CS86xx carries
+- [x] Every `.cs` file under `UtilitiesCS/NewtonsoftHelpers/` that emits CS86xx carries
   `#nullable enable` and compiles with zero nullable diagnostics under the per-file pragma with
   `TreatWarningsAsErrors`.
-- [ ] No project-level `<Nullable>` element is introduced in `UtilitiesCS.csproj`.
-- [ ] No behavior change; existing tests still pass; no coverage regression on changed lines.
+- [x] No project-level `<Nullable>` element is introduced in `UtilitiesCS.csproj`.
+- [x] No behavior change; existing tests still pass; no coverage regression on changed lines.
 
 ## Non-Goals
 
