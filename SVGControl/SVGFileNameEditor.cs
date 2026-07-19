@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -12,8 +13,8 @@ namespace SVGControl
         private string _currentValue = string.Empty;
         private string _absoluteFilepath = string.Empty;
         private string _fileName = string.Empty;
-        private string _appPath;
-        private OpenFileDialog _ofd;
+        private string _appPath = string.Empty;
+        private OpenFileDialog? _ofd;
 
         public SvgFileNameEditor()
         {

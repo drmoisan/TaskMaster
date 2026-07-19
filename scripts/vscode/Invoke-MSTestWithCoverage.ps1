@@ -130,13 +130,13 @@ if (-not (Get-Command 'dotnet-coverage' -ErrorAction SilentlyContinue)) {
     throw "dotnet-coverage not found. Install it with: dotnet tool install --global dotnet-coverage"
 }
 
-$testAssemblies = Get-ChildItem -Path $resolvedSearchRoot -Recurse -Filter '*.Test.dll' |
+$testAssemblies = @(Get-ChildItem -Path $resolvedSearchRoot -Recurse -Filter '*.Test.dll' |
     Where-Object {
         $_.FullName -match "\\bin\\$Configuration\\" -and
         $_.FullName -notmatch '\\obj\\' -and
         $_.FullName -notmatch '\\ref\\'
     } |
-        Select-Object -ExpandProperty FullName
+        Select-Object -ExpandProperty FullName)
 
 if (-not $testAssemblies -or $testAssemblies.Count -eq 0) {
     throw "No test assemblies found under '$resolvedSearchRoot' for configuration '$Configuration'. Build first."
