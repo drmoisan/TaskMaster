@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using UtilitiesCS.Dialogs;
 
+#nullable enable
+
 namespace UtilitiesCS
 {
     public class ActionButton
@@ -91,10 +93,10 @@ namespace UtilitiesCS
             Button = MakeButton(buttonText, buttonImage, dialogResult);
         }
 
-        private string _name;
-        private Button _button;
+        private string? _name;
+        private Button? _button;
         private Button _template = new DelegateButtonTemplate().Button1; //.Clone();
-        private Action _action;
+        private Action? _action;
 
         public static ActionButton FromButton(
             Button button,
@@ -112,13 +114,13 @@ namespace UtilitiesCS
 
         public string Name
         {
-            get => _name;
+            get => _name!;
             set => _name = value;
         }
 
         public Button Button
         {
-            get => _button;
+            get => _button!;
             set
             {
                 if (_button != null)
@@ -130,7 +132,7 @@ namespace UtilitiesCS
 
         public Action Delegate
         {
-            get => _action;
+            get => _action!;
             set => _action = value;
         }
 
@@ -180,7 +182,7 @@ namespace UtilitiesCS
 
         internal void Button_Click(object sender, EventArgs e)
         {
-            _action.DynamicInvoke();
+            _action!.DynamicInvoke();
         }
     }
 }
