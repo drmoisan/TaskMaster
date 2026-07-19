@@ -77,11 +77,11 @@ Test-assembly resolution rule: the `UtilitiesCS.Test` assembly resolves at execu
 
 ### Phase 4 — Batch 3 Recipient Cluster
 
-- [ ] [P4-T1] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Recipient/RecipientInfo.cs`; resolve the parameterless-ctor CS8618 on `_name`/`_address`/`_html` using the #371 ItemInfo/EmailDetails field-nullability pattern (`string?` fields/props, since `Equals`/`GetHashCode` use `?? ""`).
+- [x] [P4-T1] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Recipient/RecipientInfo.cs`; resolve the parameterless-ctor CS8618 on `_name`/`_address`/`_html` using the #371 ItemInfo/EmailDetails field-nullability pattern (`string?` fields/props, since `Equals`/`GetHashCode` use `?? ""`).
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; annotation matches the #371 pattern; no behavior change.
-- [ ] [P4-T2] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Recipient/RecipientStatic.cs` (773 lines, pre-existing 500-line breach — FLAG, do NOT split); annotate `GetGlobalAddressList` to `AddressList?`, `ExtractNameFromAddress` to `(string?, string?, string?)`, the `AddressEntry` overload of `ToResolvedRecipient` to `Recipient?`, `SegmentStopWatch? sw = null`, and `string? address = null`; treat `IsNullOrEmpty` as non-refining on net481 and use justified `!` where a value is guaranteed non-null.
+- [x] [P4-T2] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Recipient/RecipientStatic.cs` (773 lines, pre-existing 500-line breach — FLAG, do NOT split); annotate `GetGlobalAddressList` to `AddressList?`, `ExtractNameFromAddress` to `(string?, string?, string?)`, the `AddressEntry` overload of `ToResolvedRecipient` to `Recipient?`, `SegmentStopWatch? sw = null`, and `string? address = null`; treat `IsNullOrEmpty` as non-refining on net481 and use justified `!` where a value is guaranteed non-null.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; no split performed; the 500-line breach is recorded as pre-existing in `spec.md` and not worsened in a status-changing way (AC8); no new runtime guard.
-- [ ] [P4-T3] Run the pragma-only rebuild and record Batch 3 verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/batch3-pragma-verify.<timestamp>.md`.
+- [x] [P4-T3] Run the pragma-only rebuild and record Batch 3 verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/batch3-pragma-verify.<timestamp>.md`.
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx across the Recipient pair.
 
 ### Phase 5 — Batch 4 OneDrive Helpers
