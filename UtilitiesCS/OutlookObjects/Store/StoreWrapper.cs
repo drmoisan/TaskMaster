@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -34,7 +35,7 @@ namespace UtilitiesCS.OutlookObjects.Store
             var initStopwatch = Stopwatch.StartNew();
 
             var storeDisplayNameStopwatch = Stopwatch.StartNew();
-            DisplayName = InnerStore.DisplayName;
+            DisplayName = InnerStore!.DisplayName;
             logger.Debug(
                 $"[Startup timing] Init '{DisplayName ?? "<null>"}' DisplayName: {storeDisplayNameStopwatch.ElapsedMilliseconds} ms"
             );
@@ -44,7 +45,7 @@ namespace UtilitiesCS.OutlookObjects.Store
             // unreadable StoreID is fail-safe (leaves the default) rather than throwing during startup.
             try
             {
-                StoreId = InnerStore.StoreID;
+                StoreId = InnerStore!.StoreID;
             }
             catch (System.Exception e)
             {
@@ -61,17 +62,17 @@ namespace UtilitiesCS.OutlookObjects.Store
             using (CurrentStoreContext.Begin(DisplayName))
             {
                 var rootFolderStopwatch = Stopwatch.StartNew();
-                RootFolder = InnerStore.GetRootFolder() as Outlook.Folder;
+                RootFolder = InnerStore!.GetRootFolder() as Outlook.Folder;
                 logger.Debug(
                     $"[Startup timing] Init '{DisplayName ?? "<null>"}' GetRootFolder: {rootFolderStopwatch.ElapsedMilliseconds} ms"
                 );
 
-                var exchangeStoreType = InnerStore.ExchangeStoreType;
+                var exchangeStoreType = InnerStore!.ExchangeStoreType;
                 if (exchangeStoreType != Outlook.OlExchangeStoreType.olExchangePublicFolder)
                 {
                     var inboxStopwatch = Stopwatch.StartNew();
                     Inbox =
-                        InnerStore.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox)
+                        InnerStore!.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox)
                         as Outlook.Folder;
                     logger.Debug(
                         $"[Startup timing] Init '{DisplayName ?? "<null>"}' GetDefaultFolder(Inbox): {inboxStopwatch.ElapsedMilliseconds} ms"
@@ -149,7 +150,7 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         #region Store Properties
 
-        public string DisplayName { get; set; }
+        public string? DisplayName { get; set; }
 
         /// <summary>
         /// The store's Outlook StoreID, captured during <see cref="Init"/> (issue #328). Persisted so
@@ -158,24 +159,24 @@ namespace UtilitiesCS.OutlookObjects.Store
         /// this key deserializes to the default.
         /// </summary>
         [JsonProperty]
-        public string StoreId { get; set; }
+        public string? StoreId { get; set; }
 
         [JsonIgnore]
-        public Outlook.Store InnerStore { get; internal set; }
+        public Outlook.Store? InnerStore { get; internal set; }
 
         [JsonIgnore]
-        public Outlook.Folder Inbox { get; internal set; }
+        public Outlook.Folder? Inbox { get; internal set; }
 
         [JsonIgnore]
-        public Outlook.Folder RootFolder { get; internal set; }
+        public Outlook.Folder? RootFolder { get; internal set; }
 
         [JsonIgnore]
-        public string UserEmailAddress { get; internal set; }
+        public string? UserEmailAddress { get; internal set; }
 
         [JsonIgnore]
-        public List<AddressEntry> GlobalAddressBook { get; internal set; }
+        public List<AddressEntry>? GlobalAddressBook { get; internal set; }
 
-        internal string GetSmtpAddressFromStore()
+        internal string? GetSmtpAddressFromStore()
         {
             try
             {
