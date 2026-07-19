@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 
 namespace UtilitiesCS
@@ -30,9 +31,9 @@ namespace UtilitiesCS
             string searchString,
             object objItem,
             bool reloadCTFStagingFiles = true,
-            List<string> emailSearchRoots = null,
+            List<string>? emailSearchRoots = null,
             bool recalcSuggestions = false,
-            IEnumerable<(string root, string excludedFolder, bool excludeChildren)> exclusions =
+            IEnumerable<(string root, string excludedFolder, bool excludeChildren)>? exclusions =
                 null
         );
     }

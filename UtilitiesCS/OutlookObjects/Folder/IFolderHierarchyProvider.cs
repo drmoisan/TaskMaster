@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,7 +57,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// The matching <see cref="FolderTreeNodeKey"/>, or <c>null</c> when no matching node exists.
         /// Identity is by key, so duplicate segment names at different depths are distinguished.
         /// </returns>
-        Task<FolderTreeNodeKey> ResolveLeafKeyAsync(
+        Task<FolderTreeNodeKey?> ResolveLeafKeyAsync(
             string folderPath,
             CancellationToken cancellationToken
         );
