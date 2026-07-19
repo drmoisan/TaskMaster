@@ -1,0 +1,5 @@
+# Coverage cobertura XML artifacts are large (~10MB each, whole-assembly instrumentation).
+# The required numeric coverage evidence is recorded in the corresponding .md summaries.
+# XMLs are generated at their named paths during execution and retained locally for the
+# P12-T5 changed-line delta, but excluded from git to avoid branch bloat.
+*.cobertura.xml
