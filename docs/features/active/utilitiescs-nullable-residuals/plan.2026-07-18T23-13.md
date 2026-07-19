@@ -30,25 +30,25 @@ Test-assembly resolution rule: the `UtilitiesCS.Test` assembly resolves at execu
 
 ### Phase 1 — Batch 0 Verify-Only Pragma Opt-In
 
-- [ ] [P1-T1] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/IntelligenceFilters.cs` and annotate to zero CS86xx.
+- [x] [P1-T1] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/IntelligenceFilters.cs` and annotate to zero CS86xx.
   - Acceptance: file carries `#nullable enable`; the pragma-only rebuild reports zero CS86xx for this file (expected verify-only clean).
-- [ ] [P1-T2] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/Evaluation/EvaluationResult.cs` and annotate to zero CS86xx.
+- [x] [P1-T2] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/Evaluation/EvaluationResult.cs` and annotate to zero CS86xx.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx for this file.
-- [ ] [P1-T3] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Fields/MAPIFields.cs` and annotate to zero CS86xx.
+- [x] [P1-T3] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Fields/MAPIFields.cs` and annotate to zero CS86xx.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx for this file.
-- [ ] [P1-T4] Add `#nullable enable` to the EmailIntelligence-root `UtilitiesCS/EmailIntelligence/FolderConverter.cs` (NOT `UtilitiesCS/OutlookObjects/Folder/FolderConverter.cs`, which is out of scope for this child) and annotate to zero CS86xx.
+- [x] [P1-T4] Add `#nullable enable` to the EmailIntelligence-root `UtilitiesCS/EmailIntelligence/FolderConverter.cs` (NOT `UtilitiesCS/OutlookObjects/Folder/FolderConverter.cs`, which is out of scope for this child) and annotate to zero CS86xx.
   - Acceptance: only the EmailIntelligence-root file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx for this file.
-- [ ] [P1-T5] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FilterOlFolders/IFilterOlFoldersViewer.cs` and annotate to zero CS86xx.
+- [x] [P1-T5] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FilterOlFolders/IFilterOlFoldersViewer.cs` and annotate to zero CS86xx.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx for this file.
-- [ ] [P1-T6] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FolderRemap/IFolderRemapViewer.cs` and annotate to zero CS86xx.
+- [x] [P1-T6] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FolderRemap/IFolderRemapViewer.cs` and annotate to zero CS86xx.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx for this file.
-- [ ] [P1-T7] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/OlFolderHelper/SmithWaterman.cs` (376 lines; under 500) and annotate to zero CS86xx.
+- [x] [P1-T7] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/OlFolderHelper/SmithWaterman.cs` (376 lines; under 500) and annotate to zero CS86xx.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx for this file (expected clean or 0–2 minor).
-- [ ] [P1-T8] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FilterOlFolders/OSFolder.cs` and annotate to zero CS86xx.
+- [x] [P1-T8] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FilterOlFolders/OSFolder.cs` and annotate to zero CS86xx.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx for this file.
-- [ ] [P1-T9] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Filter DASL/DASLFilterParser.cs` and annotate to zero CS86xx; if the consumed `ReusableTypeClasses.TreeNode<string>.Value` is non-null (undeclared #366 edge, oblivious), no annotation is required, otherwise change the affected return to `string?` only.
+- [x] [P1-T9] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Filter DASL/DASLFilterParser.cs` and annotate to zero CS86xx; if the consumed `ReusableTypeClasses.TreeNode<string>.Value` is non-null (undeclared #366 edge, oblivious), no annotation is required, otherwise change the affected return to `string?` only.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx for this file; no new runtime guard added.
-- [ ] [P1-T10] Run the pragma-only rebuild `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true` and record Batch 0 verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/batch0-pragma-verify.<timestamp>.md`.
+- [x] [P1-T10] Run the pragma-only rebuild `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true` and record Batch 0 verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/batch0-pragma-verify.<timestamp>.md`.
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx across the nine Batch 0 opted-in files.
 
 ### Phase 2 — Batch 1 Small Static COM Helpers
