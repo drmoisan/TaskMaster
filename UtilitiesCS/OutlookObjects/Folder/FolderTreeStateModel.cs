@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 
 namespace UtilitiesCS
@@ -12,7 +13,7 @@ namespace UtilitiesCS
     public class FolderTreeStateModel
     {
         private readonly IReadOnlyList<TreeNode<FolderNodeViewModel>> _roots;
-        private TreeNode<FolderNodeViewModel> _highlighted;
+        private TreeNode<FolderNodeViewModel>? _highlighted;
 
         /// <summary>
         /// Creates a state model over the given root forest (typically from
@@ -25,7 +26,7 @@ namespace UtilitiesCS
         }
 
         /// <summary>The currently highlighted node, or <c>null</c> when nothing is highlighted (INV3).</summary>
-        public TreeNode<FolderNodeViewModel> Highlighted => _highlighted;
+        public TreeNode<FolderNodeViewModel>? Highlighted => _highlighted;
 
         /// <summary>Expands <paramref name="node"/> when it has children; a no-op for a leaf (INV1).</summary>
         public void Expand(TreeNode<FolderNodeViewModel> node)

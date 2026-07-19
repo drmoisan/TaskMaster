@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,16 +13,16 @@ namespace UtilitiesCS.OutlookObjects.Folder
     public sealed class FolderTreeSnapshotBuilder
     {
         private readonly IOutlookFolderHierarchyReader _reader;
-        private readonly IDeadlineClock _deadlineClock;
-        private readonly IDispatcherYield _dispatcherYield;
+        private readonly IDeadlineClock? _deadlineClock;
+        private readonly IDispatcherYield? _dispatcherYield;
 
         public FolderTreeSnapshotBuilder(IOutlookFolderHierarchyReader reader)
             : this(reader, null, null) { }
 
         public FolderTreeSnapshotBuilder(
             IOutlookFolderHierarchyReader reader,
-            IDeadlineClock deadlineClock,
-            IDispatcherYield dispatcherYield
+            IDeadlineClock? deadlineClock,
+            IDispatcherYield? dispatcherYield
         )
         {
             _reader = reader ?? throw new ArgumentNullException(nameof(reader));

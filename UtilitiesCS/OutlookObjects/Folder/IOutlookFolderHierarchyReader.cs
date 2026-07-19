@@ -13,8 +13,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
     {
         Task<IReadOnlyList<FolderTreeSnapshotNode>> ReadFoldersAsync(
             FolderTreeRequest request,
-            IDeadlineClock deadlineClock,
-            IDispatcherYield dispatcherYield,
+            IDeadlineClock? deadlineClock,
+            IDispatcherYield? dispatcherYield,
             CancellationToken cancellationToken
         );
     }
