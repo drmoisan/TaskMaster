@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -11,7 +12,8 @@ namespace UtilitiesCS.HelperClasses
     public class DebugTextLogger : StreamWriter
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+            // Standard log4net logger declaration: non-null in a static field initializer.
+            System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType!
         );
 
         public DebugTextLogger()

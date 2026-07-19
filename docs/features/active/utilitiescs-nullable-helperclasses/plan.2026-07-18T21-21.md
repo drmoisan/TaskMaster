@@ -103,20 +103,20 @@ evidence path is used. The delegation prompt supplied only canonical `evidence/`
 
 ### Phase 2 — Batch 2 Logging
 
-- [ ] [P2-T1] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Logging/DebugTextLogger.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P2-T1] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Logging/DebugTextLogger.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P2-T6).
-- [ ] [P2-T2] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Logging/DebugTextWriter.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P2-T2] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Logging/DebugTextWriter.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P2-T6).
-- [ ] [P2-T3] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Logging/VerboseLogger.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P2-T3] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Logging/VerboseLogger.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P2-T6).
-- [ ] [P2-T4] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Logging/TraceUtility.cs` and settle its cross-module extension-method return-nullability contracts (`GetMyMethodNames`, `GetMyTraceString`, `GetCallerMethod`, `GetAssembly`) with real guards/nullable annotations (`MethodBase?`, `DeclaringType`, `StackFrame.GetMethod()`, lazy `_projectNames`) to reach zero CS86xx
+- [x] [P2-T4] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Logging/TraceUtility.cs` and settle its cross-module extension-method return-nullability contracts (`GetMyMethodNames`, `GetMyTraceString`, `GetCallerMethod`, `GetAssembly`) with real guards/nullable annotations (`MethodBase?`, `DeclaringType`, `StackFrame.GetMethod()`, lazy `_projectNames`) to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; public extension-method signatures remain behavior-compatible; zero CS86xx (verified in P2-T6).
-- [ ] [P2-T5] Run CSharpier over the Batch 2 files (`Logging/DebugTextLogger.cs`, `Logging/DebugTextWriter.cs`, `Logging/VerboseLogger.cs`, `Logging/TraceUtility.cs`) and confirm no residual formatting diff
+- [x] [P2-T5] Run CSharpier over the Batch 2 files (`Logging/DebugTextLogger.cs`, `Logging/DebugTextWriter.cs`, `Logging/VerboseLogger.cs`, `Logging/TraceUtility.cs`) and confirm no residual formatting diff
   - Acceptance: `csharpier --check .` exits 0 for the touched files.
-- [ ] [P2-T6] Run the pragma-only nullable build and record Batch 2 verification to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/qa-gates/batch2-nullable-build.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P2-T6] Run the pragma-only nullable build and record Batch 2 verification to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/qa-gates/batch2-nullable-build.<yyyy-MM-ddTHH-mm>.md`
   - Command: `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx for the 4 opted-in Batch 2 files and NO new diagnostics elsewhere.
-- [ ] [P2-T7] Run the Batch 2 UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/regression-testing/batch2-tests.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P2-T7] Run the Batch 2 UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/regression-testing/batch2-tests.<yyyy-MM-ddTHH-mm>.md`
   - Command: `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /TestCaseFilter:"FullyQualifiedName~DebugTextLogger|FullyQualifiedName~VerboseLogger|FullyQualifiedName~TraceUtility"`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; all Batch 2 tests green and behavior-identical.
 
