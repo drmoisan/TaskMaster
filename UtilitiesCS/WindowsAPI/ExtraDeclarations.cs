@@ -7,6 +7,8 @@ using global::System.Runtime.InteropServices;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using winmdroot = global::Windows.Win32;
 
+#nullable enable
+
 namespace Windows.Win32
 {
     /// <content>

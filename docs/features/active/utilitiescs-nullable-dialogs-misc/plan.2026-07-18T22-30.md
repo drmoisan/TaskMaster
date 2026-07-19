@@ -172,13 +172,13 @@
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` with pass/fail counts confirming no test regression against the Phase 0 baseline (AC3).
 
 ### Phase 6 — Misc Verify-Only Batch (ExtraDeclarations, AssemblyInfo)
-- [ ] [P6-T1] Add a `#nullable enable` pragma to each of the 2 misc files: `UtilitiesCS/WindowsAPI/ExtraDeclarations.cs`, `UtilitiesCS/Properties/AssemblyInfo.cs`
+- [x] [P6-T1] Add a `#nullable enable` pragma to each of the 2 misc files: `UtilitiesCS/WindowsAPI/ExtraDeclarations.cs`, `UtilitiesCS/Properties/AssemblyInfo.cs`
   - Acceptance: each of the 2 named files contains a `#nullable enable` pragma; no `<Nullable>` element added to the csproj (AC1, AC2).
-- [ ] [P6-T2] Verify both misc files reach zero CS86xx under the pragma with no annotation edits (research confirms `ExtraDeclarations.cs` is entirely commented out and `AssemblyInfo.cs` contains only assembly-level attributes); if either file unexpectedly emits a CS86xx diagnostic, resolve it as annotation-only per the Scope Invariants rather than deferring it
+- [x] [P6-T2] Verify both misc files reach zero CS86xx under the pragma with no annotation edits (research confirms `ExtraDeclarations.cs` is entirely commented out and `AssemblyInfo.cs` contains only assembly-level attributes); if either file unexpectedly emits a CS86xx diagnostic, resolve it as annotation-only per the Scope Invariants rather than deferring it
   - Acceptance: both files compile with zero CS86xx under the pragma; if no diagnostic was emitted, no source line beyond the pragma is changed in either file; no post-condition attribute added; annotation/null-safety only (AC3).
-- [ ] [P6-T3] Run `dotnet tool run csharpier .` then the pragma-gate rebuild `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true` and record the result at `docs/features/active/utilitiescs-nullable-dialogs-misc/evidence/qa-gates/batch-misc-nullable-gate.md`
+- [x] [P6-T3] Run `dotnet tool run csharpier .` then the pragma-gate rebuild `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true` and record the result at `docs/features/active/utilitiescs-nullable-dialogs-misc/evidence/qa-gates/batch-misc-nullable-gate.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` showing zero CS86xx for the 2 misc files (AC1); if CSharpier changes any file, rerun the rebuild before recording the artifact.
-- [ ] [P6-T4] Run the UtilitiesCS test suite with coverage via `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-dialogs-misc/evidence/regression-testing/batch-misc-coverage.cobertura.xml` and record the result at `docs/features/active/utilitiescs-nullable-dialogs-misc/evidence/regression-testing/batch-misc-tests.md`
+- [x] [P6-T4] Run the UtilitiesCS test suite with coverage via `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-dialogs-misc/evidence/regression-testing/batch-misc-coverage.cobertura.xml` and record the result at `docs/features/active/utilitiescs-nullable-dialogs-misc/evidence/regression-testing/batch-misc-tests.md`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` with pass/fail counts confirming no test regression against the Phase 0 baseline (AC3).
 
 ### Phase 7 — Final QC Full Toolchain and Acceptance Verification
