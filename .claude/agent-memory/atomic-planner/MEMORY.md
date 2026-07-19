@@ -17,3 +17,4 @@
 - [#351 QuickFiler breadcrumb plan seams](project_351_quickfiler_breadcrumb_plan_seams.md) — JSON code in UtilitiesCS only (QuickFiler lacks Newtonsoft); P2-T1 blocked-if-9101-absent; evidence/repro/ rejected; coordinator pattern
 - [Invoke-MSTestWithCoverage.ps1 canonical coverage runner](reference_invoke_mstest_with_coverage_script.md) — full-suite *.Test.dll → Cobertura XML via dotnet-coverage+vstest /InIsolation; cite for baseline/final-QC coverage tasks
 - [Coverage threshold conflict: CLAUDE.md vs general-unit-test.md](project_coverage_threshold_conflict_claude_md_vs_general_unit_test.md) — 80/90 vs uniform 85/75 no-tier-floor; unresolved as of 2026-07-18; flag to user, don't silently pick
+- [#349 breadcrumb plan seams](project_349_efcviewer_breadcrumb_plan_seams.md) — P0-T6 halt-gate on 9101 provider; evidence/repro/ authorized; EfcViewer3 mechanical swap only; Newtonsoft in UtilitiesCS only
