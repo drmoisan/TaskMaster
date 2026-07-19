@@ -80,24 +80,24 @@ the epic manifest's declared `depends_on: [extensions, helperclasses]` edge for 
 
 ## Acceptance Criteria
 
-- [ ] AC1: Every one of the 14 in-scope files (12 `Dialogs/` remediation targets +
+- [x] AC1: Every one of the 14 in-scope files (12 `Dialogs/` remediation targets +
   `ExtraDeclarations.cs` + `AssemblyInfo.cs`) carries `#nullable enable` and compiles with zero
   nullable diagnostics under the per-file pragma with `TreatWarningsAsErrors`, so that the
   repaired gate can enforce this cluster without a global `/p:Nullable=enable` flag.
-- [ ] AC2: No project-level or solution-level `<Nullable>` element is introduced into
+- [x] AC2: No project-level or solution-level `<Nullable>` element is introduced into
   `UtilitiesCS.csproj`, so that the per-file opt-in architecture required by the epic is
   preserved.
-- [ ] AC3: No behavior change to dialog display, button-wrapper, or MyBox logic; existing
+- [x] AC3: No behavior change to dialog display, button-wrapper, or MyBox logic; existing
   `UtilitiesCS.Test/Dialogs/` tests still pass, so that the remediation is verifiably
   annotation-only.
-- [ ] AC4: No coverage regression on changed lines, so that the annotation work does not
+- [x] AC4: No coverage regression on changed lines, so that the annotation work does not
   introduce untested executable paths (for example new runtime null guards).
-- [ ] AC5: Public signatures of the remediated types remain behavior-compatible; nullability
+- [x] AC5: Public signatures of the remediated types remain behavior-compatible; nullability
   annotations reflect actual null behavior and are consistent with the consumed
   `WinFormsExtensions.Clone<T>()` contract from `utilitiescs-nullable-extensions` (#363), so that
   this cluster's contracts do not propagate an incorrect null-state assumption to any other
   cluster or to the Wave-2 capstone.
-- [ ] AC6: Non-remediated files (the 4 Designer-generated files and every other file outside
+- [x] AC6: Non-remediated files (the 4 Designer-generated files and every other file outside
   this cluster) remain non-opted-in and are not cross-blocked; the change is independently
   mergeable under the per-file pragma architecture, so that this feature can merge without
   waiting on any other Wave-1/Wave-2 sibling beyond the confirmed #363 Batch D ordering
