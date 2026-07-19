@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,7 +56,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
         protected int _totalEmailCount;
 
-        public IApplicationGlobals Globals { get; set; }
+        // Injected after construction; null! preserves the non-null posture at the hot-path
+        // call sites (Tokenize/TokenizeAsync) without a per-call guard.
+        public IApplicationGlobals Globals { get; set; } = null!;
 
         [JsonIgnore]
         public Func<object, IApplicationGlobals, IEnumerable<string>> Tokenize

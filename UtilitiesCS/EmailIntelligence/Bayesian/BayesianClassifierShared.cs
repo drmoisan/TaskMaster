@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -243,14 +244,21 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             get => _parent;
             internal set => _parent = value;
         }
-        protected BayesianClassifierGroup _parent;
+
+        // Set via the Parent property (which the compiler does not track as field init) or by
+        // deserialization; the parameterless and single-tag constructors leave it unset
+        // (pre-existing). null! preserves the non-null posture without a hot-path guard.
+        protected BayesianClassifierGroup _parent = null!;
 
         public string Tag
         {
             get => _tag;
             set => _tag = value;
         }
-        private string _tag;
+
+        // Assigned by every functional constructor and by deserialization; the parameterless
+        // constructor leaves it unset (pre-existing). null! preserves the non-null posture.
+        private string _tag = null!;
 
         #endregion public properties
 
@@ -781,14 +789,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             public string[] Words = words;
         }
 
-        public (double, List<(string word, double prob)>) Chi2SpamProb(
+        public (double, List<(string word, double prob)>?) Chi2SpamProb(
             WordStream wordStream,
             bool evidence
         ) => Chi2SpamProb(wordStream.Words, evidence);
 
         public double Chi2SpamProb(WordStream wordStream) => Chi2SpamProb(wordStream, false).Item1;
 
-        public (double, List<(string word, double prob)>) Chi2SpamProb(
+        public (double, List<(string word, double prob)>?) Chi2SpamProb(
             IDictionary<string, int> tokenFrequency,
             bool evidence
         ) => Chi2SpamProb([.. tokenFrequency.Keys], evidence);
@@ -807,7 +815,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         /// <param name="wordStream"></param>
         /// <param name="evidence"></param>
         /// <returns></returns>
-        public (double, List<(string word, double prob)>) Chi2SpamProb(
+        public (double, List<(string word, double prob)>?) Chi2SpamProb(
             string[] tokens,
             bool evidence
         )
@@ -908,10 +916,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         //public List<(double prob, string word, WordInfo record)> GetClues(WordStream wordStream) => GetClues([.. wordStream.Words]);
         //public List<(double prob, string word, WordInfo record)> GetClues(IDictionary<string, int> tokenFrequency) => GetClues([.. tokenFrequency.Keys]);
 
-        public List<(double prob, string word, WordInfo record)> GetClues(HashSet<string> tokenSet)
+        public List<(double prob, string word, WordInfo? record)> GetClues(HashSet<string> tokenSet)
         {
             var mindist = Knobs.MinDist;
-            var clues = new List<(double distance, double prob, string word, WordInfo record)>();
+            var clues = new List<(double distance, double prob, string word, WordInfo? record)>();
             var push = clues.Add;
             foreach (string token in tokenSet)
             {
@@ -930,11 +938,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return selectedClues;
         }
 
-        public (double distance, double prob, string word, WordInfo record) GetWordDistance(
+        public (double distance, double prob, string word, WordInfo? record) GetWordDistance(
             string word
         )
         {
-            WordInfo record = GetWordInfo(word);
+            WordInfo? record = GetWordInfo(word);
             double prob;
             if (record is null)
             {
@@ -949,7 +957,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return (distance, prob, word, record);
         }
 
-        public WordInfo GetWordInfo(string word)
+        public WordInfo? GetWordInfo(string word)
         {
             int m = _match.TokenFrequency.TryGetValue(word, out int bCount) ? bCount : 0;
             int nm = Parent.SharedTokenBase.TokenFrequency.TryGetValue(word, out int gCount)
