@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
 {
     public class FolderWrapperNameAndParentNameComparer : IEqualityComparer<TreeNode<FolderWrapper>>
     {
-        public bool Equals(TreeNode<FolderWrapper> x, TreeNode<FolderWrapper> y)
+        public bool Equals(TreeNode<FolderWrapper>? x, TreeNode<FolderWrapper>? y)
         {
             if (ReferenceEquals(x, y))
                 return true;

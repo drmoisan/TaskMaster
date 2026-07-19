@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,11 +9,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
 {
     public class FolderWrapperNodeComparer : IEqualityComparer<TreeNode<FolderWrapper>>
     {
-        public bool Equals(TreeNode<FolderWrapper> x, TreeNode<FolderWrapper> y)
+        public bool Equals(TreeNode<FolderWrapper>? x, TreeNode<FolderWrapper>? y)
         {
             if (ReferenceEquals(x, y))
                 return true;
-            if (x?.Value is null || y?.Value is null)
+            if (x is null || x.Value is null || y is null || y.Value is null)
                 return false;
 
             // Compare FolderWrapper values using the FolderWrapperNameCountSizeComparer
@@ -22,11 +23,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
             // Compare parents using FolderWrapperNameAndParentNameComparer
             var parentsEqual = false;
-            if (x?.Parent?.Value is null && y?.Parent?.Value is null)
+            if (x.Parent?.Value is null && y.Parent?.Value is null)
             {
                 parentsEqual = true; // Both have no parent
             }
-            else if (x?.Parent is null || y?.Parent is null)
+            else if (x.Parent is null || y.Parent is null)
             {
                 parentsEqual = false; // One has a parent, the other does not
             }
@@ -49,7 +50,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             {
                 var xChildren = x.Children.Select(c => c.Value).ToList();
                 var yChildren = y.Children.Select(c => c.Value).ToList();
-                return xChildren.Intersect(yChildren, comparer).Count() == x.Children.Count; // Compare children using the FolderWrapperNameCountSizeComparer
+                return xChildren.Intersect(yChildren, comparer).Count() == xChildren.Count; // Compare children using the FolderWrapperNameCountSizeComparer
             }
         }
 

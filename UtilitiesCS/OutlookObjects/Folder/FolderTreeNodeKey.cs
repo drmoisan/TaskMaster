@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 
 namespace UtilitiesCS.OutlookObjects.Folder
@@ -20,7 +21,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         public string FolderPath { get; }
 
-        public bool Equals(FolderTreeNodeKey other)
+        public bool Equals(FolderTreeNodeKey? other)
         {
             if (ReferenceEquals(null, other))
             {
@@ -37,7 +38,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 && string.Equals(FolderPath, other.FolderPath, StringComparison.OrdinalIgnoreCase);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as FolderTreeNodeKey);
         }
