@@ -156,7 +156,7 @@ namespace UtilitiesCS
             int topNfolderKeys
         )
         {
-            EmailIntelligence.Bayesian.Prediction<string>[] predictions = null;
+            EmailIntelligence.Bayesian.Prediction<string>[]? predictions = null;
 
             if (topNfolderKeys > 0)
             {
@@ -201,11 +201,11 @@ namespace UtilitiesCS
 
         public bool AddArray(object foldersObject, int topN)
         {
-            string[] folders = foldersObject as string[];
+            string[]? folders = foldersObject as string[];
             return AddArray(folders, topN);
         }
 
-        public bool AddArray(string[] folders, int topN)
+        public bool AddArray(string[]? folders, int topN)
         {
             if ((folders is null) || (folders[0] == "Error"))
             {
