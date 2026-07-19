@@ -1,5 +1,6 @@
 # Atomic Executor Memory Index
 
+- [Sibling-worktree shared-tooling hazard](project_sibling_worktree_shared_tooling_hazard.md) — a concurrent agent in a DIFFERENT worktree crashes your testhost + clobbers /tmp logs via shared global vstest/dotnet-coverage; use session scratchpad for logs, poll for a quiet machine before test runs, trust bash `$?` not log counts, never kill/commit others' processes/memory files
 - [#364 nullable-gate pre-existing blockers](project_364_nullable_gate_preexisting_blockers.md) — full-solution pragma-only TWAE gate fails at baseline (vendored SVGControl CS0649 + non-HelperClasses CS0618/CS0168); verify CS86xx via isolated UtilitiesCS build w/ BuildProjectReferences=false; analyzer-version drift needs nuget-install into packages/; coverage script single-assembly StrictMode bug
 
 - [Nullable per-file pragma gate mechanics](project_nullable_pragma_gate_mechanics.md) — solution-wide TWAE aborts on vendored SVGControl CS0649; verify via isolated `UtilitiesCS.csproj -t:Rebuild -p:Platform=AnyCPU -p:BuildProjectReferences=false` + grep CS86xx=0
