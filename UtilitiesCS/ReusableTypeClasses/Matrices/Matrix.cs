@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +15,8 @@ namespace UtilitiesCS.ReusableTypeClasses.Matrices
     public class Matrix<T> : IDisposable
         where T : struct, IComparable<T>
     {
-        private T[,] __array2d;
+        // Nullable: empty/disposed matrix leaves the backing array null (IsEmpty tests null).
+        private T[,]? __array2d;
         public int Width { get; set; }
         public int Height { get; set; }
         public bool IsEmpty

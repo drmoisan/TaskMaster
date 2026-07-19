@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 
 namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Bag
 {

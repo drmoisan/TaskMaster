@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -21,7 +23,9 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
 
         #region CollectionChanged Implementation
 
-        public event EventHandler<LockingObservableLinkedListChangedEventArgs<T>> CollectionChanged;
+        public event EventHandler<
+            LockingObservableLinkedListChangedEventArgs<T>
+        >? CollectionChanged;
 
         protected virtual void OnCollectionChanged(
             LockingObservableLinkedListChangedEventArgs<T> changeAction
@@ -46,8 +50,8 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
 
         protected void OnCollectionChanged(
             NotifyCollectionChangedAction action,
-            LockingObservableLinkedListNode<T> newNode,
-            LockingObservableLinkedListNode<T> oldNode
+            LockingObservableLinkedListNode<T>? newNode,
+            LockingObservableLinkedListNode<T>? oldNode
         )
         {
             OnCollectionChanged(
@@ -57,11 +61,11 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
 
         protected void OnCollectionChanged(
             NotifyCollectionChangedAction action,
-            LockingObservableLinkedListNode<T> node
+            LockingObservableLinkedListNode<T>? node
         )
         {
-            LockingObservableLinkedListNode<T> newNode = default;
-            LockingObservableLinkedListNode<T> oldNode = default;
+            LockingObservableLinkedListNode<T>? newNode = default;
+            LockingObservableLinkedListNode<T>? oldNode = default;
             switch (action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -80,7 +84,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
 
         #region Wrapper Methods for LockingLinkedList
 
-        public new LockingObservableLinkedListNode<T> First
+        public new LockingObservableLinkedListNode<T>? First
         {
             get
             {
@@ -90,7 +94,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
                 }
             }
         }
-        public new LockingObservableLinkedListNode<T> Last
+        public new LockingObservableLinkedListNode<T>? Last
         {
             get
             {
@@ -120,7 +124,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
             }
             else
             {
-                base.Remove(node.innerNode);
+                base.Remove(node.innerNode!);
                 base.AddFirst(item);
                 OnCollectionChanged(NotifyCollectionChangedAction.Move, this.First, node);
             }
@@ -143,7 +147,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
             }
             else
             {
-                base.Remove(node.innerNode);
+                base.Remove(node.innerNode!);
                 base.AddFirst(item);
                 OnCollectionChanged(NotifyCollectionChangedAction.Move, this.First, node);
             }
@@ -157,13 +161,13 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
 
         public void AddBefore(LockingObservableLinkedListNode<T> node, T item)
         {
-            base.AddBefore(node.innerNode, item);
+            base.AddBefore(node.innerNode!, item);
             OnCollectionChanged(NotifyCollectionChangedAction.Add, node.Previous, node);
         }
 
         public void AddAfter(LockingObservableLinkedListNode<T> node, T item)
         {
-            base.AddAfter(node.innerNode, item);
+            base.AddAfter(node.innerNode!, item);
             OnCollectionChanged(NotifyCollectionChangedAction.Add, node.Next, node);
         }
 
@@ -173,17 +177,17 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
             OnCollectionChanged(NotifyCollectionChangedAction.Reset, null);
         }
 
-        public new LockingObservableLinkedListNode<T> Find(T value)
+        public new LockingObservableLinkedListNode<T>? Find(T value)
         {
             return ToLocking(base.Find(value));
         }
 
-        public new LockingObservableLinkedListNode<T> Find(Predicate<T> predicate)
+        public new LockingObservableLinkedListNode<T>? Find(Predicate<T> predicate)
         {
             return ToLocking(base.Find(predicate));
         }
 
-        public new LockingObservableLinkedListNode<T> FindLast(T value)
+        public new LockingObservableLinkedListNode<T>? FindLast(T value)
         {
             return ToLocking(base.FindLast(value));
         }
@@ -193,7 +197,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
             LockingObservableLinkedListNode<T> target
         )
         {
-            base.MoveBefore(node.innerNode, target.innerNode);
+            base.MoveBefore(node.innerNode!, target.innerNode!);
             OnCollectionChanged(NotifyCollectionChangedAction.Move, target, node);
         }
 
@@ -202,19 +206,19 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
             LockingObservableLinkedListNode<T> target
         )
         {
-            base.MoveAfter(node.innerNode, target.innerNode);
+            base.MoveAfter(node.innerNode!, target.innerNode!);
             OnCollectionChanged(NotifyCollectionChangedAction.Move, target, node);
         }
 
         public void MoveUp(LockingObservableLinkedListNode<T> node)
         {
-            base.MoveUp(node.innerNode);
+            base.MoveUp(node.innerNode!);
             OnCollectionChanged(NotifyCollectionChangedAction.Move, node.Previous, node);
         }
 
         public void MoveDown(LockingObservableLinkedListNode<T> node)
         {
-            base.MoveDown(node.innerNode);
+            base.MoveDown(node.innerNode!);
             OnCollectionChanged(NotifyCollectionChangedAction.Move, node.Next, node);
         }
 
@@ -229,7 +233,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
 
         public void Remove(LockingObservableLinkedListNode<T> node)
         {
-            base.Remove(node.innerNode);
+            base.Remove(node.innerNode!);
             OnCollectionChanged(NotifyCollectionChangedAction.Remove, node);
         }
 
@@ -268,7 +272,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
             }
         }
 
-        public new T TakeFirst()
+        public new T? TakeFirst()
         {
             var node = First;
             if (node is null)
@@ -294,12 +298,13 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
             var values = new T[n];
             for (int i = 0; i < n; i++)
             {
-                values[i] = TakeFirst();
+                // Count-guarded above, so each TakeFirst yields a present element.
+                values[i] = TakeFirst()!;
             }
             return values;
         }
 
-        public new T[] TryTakeFirst(int n)
+        public new T[]? TryTakeFirst(int n)
         {
             if (n < 1)
             {
@@ -315,13 +320,13 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
 
             for (int i = 0; i < n; i++)
             {
-                values[i] = TakeFirst();
+                values[i] = TakeFirst()!;
             }
 
             return values;
         }
 
-        public new T TakeLast()
+        public new T? TakeLast()
         {
             var node = Last;
             if (node is null)
@@ -340,12 +345,12 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
             var values = new T[n];
             for (int i = n - 1; i >= 0; i--)
             {
-                values[i] = TakeLast();
+                values[i] = TakeLast()!;
             }
             return values;
         }
 
-        public T[] TryTakeLast(int n)
+        public T[]? TryTakeLast(int n)
         {
             if (n < 1)
             {
@@ -359,7 +364,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
             var values = new T[n];
             for (int i = n - 1; i >= 0; i--)
             {
-                values[i] = TakeLast();
+                values[i] = TakeLast()!;
             }
             return values;
         }
@@ -466,17 +471,18 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
                 {
                     return new KeyValuePair<
                         LockingObservableLinkedListNode<T>,
-                        HashSet<ILockingLinkedListObserver<T>>
+                        HashSet<ILockingLinkedListObserver<T>>?
                     >(key, new HashSet<ILockingLinkedListObserver<T>>(observers));
                 }
+                // Sentinel null value for keys with no removed observer set; filtered out below.
                 return new KeyValuePair<
                     LockingObservableLinkedListNode<T>,
-                    HashSet<ILockingLinkedListObserver<T>>
+                    HashSet<ILockingLinkedListObserver<T>>?
                 >(key, null);
             });
             return removed
                 .Where(pair => pair.Value != null)
-                .ToDictionary(pair => pair.Key, pair => pair.Value);
+                .ToDictionary(pair => pair.Key, pair => pair.Value!);
         }
 
         public Dictionary<
@@ -505,7 +511,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
                 ICollection<ILockingLinkedListObserver<T>>
             >();
 
-        private LockingObservableLinkedListNode<T> ToLocking(LockingLinkedListNode<T> node)
+        private LockingObservableLinkedListNode<T>? ToLocking(LockingLinkedListNode<T>? node)
         {
             if (node is null)
             {

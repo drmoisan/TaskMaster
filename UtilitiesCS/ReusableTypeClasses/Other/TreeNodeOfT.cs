@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -19,14 +21,17 @@ namespace UtilitiesCS
 
         #region Public Properties
 
-        private TreeNode<T> _parent;
-        public TreeNode<T> Parent
+        // Nullable: the root node has no parent (null); Depth/ancestor walks test Parent is null.
+        private TreeNode<T>? _parent;
+        public TreeNode<T>? Parent
         {
             get => _parent;
             set => _parent = value;
         }
 
-        private T _value;
+        // Backing field default-initialized (both constructors overwrite it); default! satisfies
+        // the unconstrained-generic non-null field rule without a behavior change.
+        private T _value = default!;
         public T Value
         {
             get => _value;
@@ -113,7 +118,7 @@ namespace UtilitiesCS
             return nodes.Concat(Children.SelectMany(x => x.Descendents(true)));
         }
 
-        public TreeNode<T> FirstAncestor(Func<T, bool> condition)
+        public TreeNode<T>? FirstAncestor(Func<T, bool> condition)
         {
             if (Parent is null)
                 return default;
@@ -122,7 +127,7 @@ namespace UtilitiesCS
             return Parent.FirstAncestor(condition);
         }
 
-        public object FindByDelegate(Func<T, string, bool> comparator, string StringToCompare)
+        public object? FindByDelegate(Func<T, string, bool> comparator, string StringToCompare)
         {
             foreach (var node in Children)
             {
@@ -134,7 +139,7 @@ namespace UtilitiesCS
             return null;
         }
 
-        public object FindByDelegate(Func<T, T, bool> comparator, T T2)
+        public object? FindByDelegate(Func<T, T, bool> comparator, T T2)
         {
             foreach (var node in Children)
             {
@@ -146,7 +151,7 @@ namespace UtilitiesCS
             return null;
         }
 
-        public TreeNode<T> FindSequentialNode<U>(Func<T, U, bool> comparator, Queue<U> sequence)
+        public TreeNode<T>? FindSequentialNode<U>(Func<T, U, bool> comparator, Queue<U> sequence)
         {
             comparator.ThrowIfNull();
             var first = sequence.ThrowIfNullOrEmpty().Dequeue();
@@ -159,7 +164,7 @@ namespace UtilitiesCS
             return node;
         }
 
-        public TreeNode<T> FindNode(Func<T, bool> comparator, bool descendByLevel = false)
+        public TreeNode<T>? FindNode(Func<T, bool> comparator, bool descendByLevel = false)
         {
             if (!descendByLevel)
             {
@@ -191,7 +196,7 @@ namespace UtilitiesCS
             return leaves.Where(x => x.Depth == maxDepth).ToArray();
         }
 
-        public TreeNode<T>[] GetNextLevel(TreeNode<T>[] nodes)
+        public TreeNode<T>[]? GetNextLevel(TreeNode<T>[]? nodes)
         {
             if (nodes is null)
             {
@@ -203,7 +208,7 @@ namespace UtilitiesCS
                 .ToArray();
         }
 
-        public TreeNode<T>[] GetPreviousLevel(TreeNode<T>[] nodes)
+        public TreeNode<T>[]? GetPreviousLevel(TreeNode<T>[]? nodes)
         {
             if (nodes is null)
             {
@@ -211,7 +216,9 @@ namespace UtilitiesCS
             }
             return nodes
                 .Where(x => x.Parent is not null)
-                .Select(x => x.Parent)
+                // Parent is non-null here (filtered by the preceding Where); ! matches the
+                // non-nullable element type of the returned array.
+                .Select(x => x.Parent!)
                 .Distinct()
                 .ToArray();
         }
@@ -309,7 +316,8 @@ namespace UtilitiesCS
                 do
                 {
                     nodes.ForEach(node => action(node));
-                    nodes = GetNextLevel(nodes);
+                    // Non-null input to GetNextLevel yields a non-null array (null only for null input).
+                    nodes = GetNextLevel(nodes)!;
                 } while (nodes.Length > 0);
             }
             else
@@ -321,7 +329,8 @@ namespace UtilitiesCS
                 while (depth >= initialDepth)
                 {
                     nodes.ForEach(node => action(node));
-                    nodes = GetPreviousLevel(nodes);
+                    // Non-null input to GetPreviousLevel yields a non-null array.
+                    nodes = GetPreviousLevel(nodes)!;
                     depth = nodes.FirstOrDefault()?.Depth ?? -1;
                 }
             }

@@ -1,4 +1,6 @@
-﻿using System.Collections.Specialized;
+﻿#nullable enable
+
+using System.Collections.Specialized;
 
 namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary
 {
@@ -23,8 +25,10 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary
         }
 
         public NotifyCollectionChangedAction Action { get; }
-        public TKey Key { get; }
-        public TValue NewValue { get; }
-        public TValue OldValue { get; }
+
+        // Nullable: the action-only constructor leaves these at default (null for reference types).
+        public TKey? Key { get; }
+        public TValue? NewValue { get; }
+        public TValue? OldValue { get; }
     }
 }

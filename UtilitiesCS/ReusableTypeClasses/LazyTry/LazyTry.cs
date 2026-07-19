@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -20,7 +22,9 @@ namespace UtilitiesCS
                 }
                 catch (global::System.Exception)
                 {
-                    return default(T);
+                    // LazyTry contract: on factory failure the lazy value falls back to
+                    // default(T) (null sentinel for reference T); ! satisfies the Func<T> factory.
+                    return default(T)!;
                 }
             }) { }
 
@@ -37,7 +41,9 @@ namespace UtilitiesCS
                     }
                     catch (global::System.Exception)
                     {
-                        return default(T);
+                        // LazyTry contract: on factory failure the lazy value falls back to
+                        // default(T) (null sentinel for reference T); ! satisfies the Func<T> factory.
+                        return default(T)!;
                     }
                 },
                 isThreadSafe
@@ -53,7 +59,9 @@ namespace UtilitiesCS
                     }
                     catch (global::System.Exception)
                     {
-                        return default(T);
+                        // LazyTry contract: on factory failure the lazy value falls back to
+                        // default(T) (null sentinel for reference T); ! satisfies the Func<T> factory.
+                        return default(T)!;
                     }
                 },
                 mode
