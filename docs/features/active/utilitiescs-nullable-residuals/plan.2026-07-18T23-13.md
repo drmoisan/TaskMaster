@@ -53,17 +53,17 @@ Test-assembly resolution rule: the `UtilitiesCS.Test` assembly resolves at execu
 
 ### Phase 2 — Batch 1 Small Static COM Helpers
 
-- [ ] [P2-T1] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Calendar/Calendar.cs`; change `FindCalendar` local `Folder foundCalendar = null` to `Folder? foundCalendar = null` and return type to `Folder?`.
+- [x] [P2-T1] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Calendar/Calendar.cs`; change `FindCalendar` local `Folder foundCalendar = null` to `Folder? foundCalendar = null` and return type to `Folder?`.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; no new runtime guard.
-- [ ] [P2-T2] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Category/CreateCategory.cs`; change `Category objCategory = null` to `Category? objCategory = null` and the return to `Category?`.
+- [x] [P2-T2] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Category/CreateCategory.cs`; change `Category objCategory = null` to `Category? objCategory = null` and the return to `Category?`.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; no new runtime guard.
-- [ ] [P2-T3] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Com/ComType.cs`; change `GetTypeName` return to `string?` (already `return null`).
+- [x] [P2-T3] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Com/ComType.cs`; change `GetTypeName` return to `string?` (already `return null`).
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; public contract change is additive nullability only.
-- [ ] [P2-T4] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Explorer/ExplorerActions.cs`; change `GetCurrentItem` and `Readable` returns to `object?`.
+- [x] [P2-T4] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Explorer/ExplorerActions.cs`; change `GetCurrentItem` and `Readable` returns to `object?`.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; no new runtime guard.
-- [ ] [P2-T5] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/MailResolution.cs` (root file; class `MailResolution_ToRemove`); change `MailItem OlMail = null` to `MailItem? OlMail = null` and the return to `MailItem?`. Do NOT annotate or edit `UtilitiesCS/OutlookObjects/MailItem/MailResolution.cs` (belongs to #371).
+- [x] [P2-T5] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/MailResolution.cs` (root file; class `MailResolution_ToRemove`); change `MailItem OlMail = null` to `MailItem? OlMail = null` and the return to `MailItem?`. Do NOT annotate or edit `UtilitiesCS/OutlookObjects/MailItem/MailResolution.cs` (belongs to #371).
   - Acceptance: only the root `MailResolution.cs` carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; the `_ToRemove` type is remediated in place (its deletion-candidate status remains a maintainer flag in `spec.md`, not resolved here).
-- [ ] [P2-T6] Run the pragma-only rebuild and record Batch 1 verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/batch1-pragma-verify.<timestamp>.md`.
+- [x] [P2-T6] Run the pragma-only rebuild and record Batch 1 verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/batch1-pragma-verify.<timestamp>.md`.
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx across the five Batch 1 files.
 
 ### Phase 3 — Batch 2 Outlook Readiness Gate Pair
