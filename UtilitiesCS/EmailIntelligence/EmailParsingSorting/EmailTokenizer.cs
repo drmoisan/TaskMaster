@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -160,7 +161,7 @@ namespace UtilitiesCS.EmailIntelligence
             // especially significant in this context.  Experiment showed a small
             // but real benefit to keeping case intact in this specific context.
 
-            MatchCollection matches = default;
+            MatchCollection? matches = default;
             if (msg.Subject is not null)
             {
                 try
@@ -241,7 +242,7 @@ namespace UtilitiesCS.EmailIntelligence
             // eliminates the bad case where the message was sent to a single
             // individual.
 
-            IEnumerable<string> all_addrs = null;
+            IEnumerable<string>? all_addrs = null;
 
             if (SpamBayesOptions.summarize_email_prefixes)
             {
@@ -377,7 +378,7 @@ namespace UtilitiesCS.EmailIntelligence
             if (SpamBayesOptions.crack_images)
             {
                 var engine_name = "Tesseract";
-                var (texts, tokens) = crack_images(engine_name, parts);
+                var (texts, tokens) = crack_images!(engine_name, parts);
                 foreach (var t in tokens)
                     yield return t;
                 foreach (var t in this.tokenize_text(texts))
@@ -538,7 +539,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         internal IEnumerable<string> tokenize_word(
             string word,
-            Func<string, int> _len = null,
+            Func<string, int>? _len = null,
             int maxword = SpamBayesOptions.skip_max_word_size
         )
         {
@@ -595,11 +596,11 @@ namespace UtilitiesCS.EmailIntelligence
             }
         }
 
-        internal Func<string, List<object>, (string texts, HashSet<string> tokens)> crack_images;
+        internal Func<string, List<object>, (string texts, HashSet<string> tokens)>? crack_images;
 
         internal static List<CharsetCodebase> charsetCodebases = JsonExtensions.Deserialize<
             List<CharsetCodebase>
-        >(Properties.Resources.charset_lookup);
+        >(Properties.Resources.charset_lookup)!;
 
         /// <summary>
         /// Original code used MIME headers to extract certain information.
@@ -722,8 +723,8 @@ namespace UtilitiesCS.EmailIntelligence
     {
         public CharsetCodebase() { }
 
-        public string Name;
+        public string? Name;
         public long Codepage;
-        public string Charset;
+        public string? Charset;
     }
 }
