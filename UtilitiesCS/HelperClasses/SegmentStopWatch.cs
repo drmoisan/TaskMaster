@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -12,7 +13,9 @@ namespace UtilitiesCS.HelperClasses
     public class SegmentStopWatch : Stopwatch
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+            // Standard log4net logger declaration: in a static field initializer
+            // GetCurrentMethod() and its DeclaringType are always non-null.
+            System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType!
         );
 
         public SegmentStopWatch()
@@ -62,7 +65,9 @@ namespace UtilitiesCS.HelperClasses
             }
         }
 
-        public Stack<(string ActionName, TimeSpan Duration)> GroupByActionName(bool inplace = false)
+        public Stack<(string ActionName, TimeSpan Duration)>? GroupByActionName(
+            bool inplace = false
+        )
         {
             var grouped = _durations
                 .Reverse()

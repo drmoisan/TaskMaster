@@ -78,26 +78,26 @@ evidence path is used. The delegation prompt supplied only canonical `evidence/`
 
 ### Phase 1 — Batch 1 Root Pure and Simple Helpers
 
-- [ ] [P1-T1] Add `#nullable enable` to `UtilitiesCS/HelperClasses/BinaryFlags/GenericBitwise.cs` and apply annotation-only null-safety edits (prefer removing redundant `= null` field initializers reassigned in the ctor) so the file emits zero CS86xx under the pragma
+- [x] [P1-T1] Add `#nullable enable` to `UtilitiesCS/HelperClasses/BinaryFlags/GenericBitwise.cs` and apply annotation-only null-safety edits (prefer removing redundant `= null` field initializers reassigned in the ctor) so the file emits zero CS86xx under the pragma
   - Acceptance: file carries the pragma; no behavior change; zero CS86xx for this file under the pragma-only build (verified in P1-T9).
-- [ ] [P1-T2] Add `#nullable enable` to `UtilitiesCS/HelperClasses/MergeSortImplementations.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P1-T2] Add `#nullable enable` to `UtilitiesCS/HelperClasses/MergeSortImplementations.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P1-T9).
-- [ ] [P1-T3] Add `#nullable enable` to `UtilitiesCS/HelperClasses/ObjectSize.cs` and annotate reflection `GetValue` results as nullable (`object?`) with real guards to reach zero CS86xx
+- [x] [P1-T3] Add `#nullable enable` to `UtilitiesCS/HelperClasses/ObjectSize.cs` and annotate reflection `GetValue` results as nullable (`object?`) with real guards to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P1-T9).
-- [ ] [P1-T4] Add `#nullable enable` to `UtilitiesCS/HelperClasses/ParamArray.cs` and annotate the genuinely-optional `_args` field nullable (fixing CS8618 and the `AnyNull()` dereference) to reach zero CS86xx
+- [x] [P1-T4] Add `#nullable enable` to `UtilitiesCS/HelperClasses/ParamArray.cs` and annotate the genuinely-optional `_args` field nullable (fixing CS8618 and the `AnyNull()` dereference) to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P1-T9).
-- [ ] [P1-T5] Add `#nullable enable` to `UtilitiesCS/HelperClasses/SimpleRegex.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P1-T5] Add `#nullable enable` to `UtilitiesCS/HelperClasses/SimpleRegex.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P1-T9).
-- [ ] [P1-T6] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Tokenizer.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P1-T6] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Tokenizer.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P1-T9).
-- [ ] [P1-T7] Add `#nullable enable` to `UtilitiesCS/HelperClasses/SegmentStopWatch.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P1-T7] Add `#nullable enable` to `UtilitiesCS/HelperClasses/SegmentStopWatch.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P1-T9).
-- [ ] [P1-T8] Run CSharpier over the Batch 1 files (`UtilitiesCS/HelperClasses/BinaryFlags/GenericBitwise.cs`, `MergeSortImplementations.cs`, `ObjectSize.cs`, `ParamArray.cs`, `SimpleRegex.cs`, `Tokenizer.cs`, `SegmentStopWatch.cs`) with `dotnet tool run csharpier .` and confirm no residual formatting diff
+- [x] [P1-T8] Run CSharpier over the Batch 1 files (`UtilitiesCS/HelperClasses/BinaryFlags/GenericBitwise.cs`, `MergeSortImplementations.cs`, `ObjectSize.cs`, `ParamArray.cs`, `SimpleRegex.cs`, `Tokenizer.cs`, `SegmentStopWatch.cs`) with `dotnet tool run csharpier .` and confirm no residual formatting diff
   - Acceptance: `csharpier --check .` exits 0 for the touched files.
-- [ ] [P1-T9] Run the pragma-only nullable build and record Batch 1 verification to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/qa-gates/batch1-nullable-build.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P1-T9] Run the pragma-only nullable build and record Batch 1 verification to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/qa-gates/batch1-nullable-build.<yyyy-MM-ddTHH-mm>.md`
   - Command: `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx for the 7 opted-in Batch 1 files and NO new diagnostics elsewhere (build result matches the P0-T4 baseline).
-- [ ] [P1-T10] Run the Batch 1 UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/regression-testing/batch1-tests.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P1-T10] Run the Batch 1 UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/regression-testing/batch1-tests.<yyyy-MM-ddTHH-mm>.md`
   - Command: `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /TestCaseFilter:"FullyQualifiedName~GenericBitwise|FullyQualifiedName~MergeSort|FullyQualifiedName~ObjectSize|FullyQualifiedName~ParamArray|FullyQualifiedName~SimpleRegex|FullyQualifiedName~Tokenizer|FullyQualifiedName~SegmentStopWatch"`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` with passed/failed counts; all Batch 1 tests green and behavior-identical (no assertions added, removed, or weakened).
 
