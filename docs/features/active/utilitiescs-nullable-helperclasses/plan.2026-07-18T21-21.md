@@ -122,20 +122,20 @@ evidence path is used. The delegation prompt supplied only canonical `evidence/`
 
 ### Phase 3 — Batch 3 Cloning and Reflection
 
-- [ ] [P3-T1] Add `#nullable enable` to `UtilitiesCS/HelperClasses/CloningFunctions/DeepCompare.cs` and annotate `PropertyInfo.GetValue` results and the `List<(string, object?, object?)>` element contract with guards to reach zero CS86xx
+- [x] [P3-T1] Add `#nullable enable` to `UtilitiesCS/HelperClasses/CloningFunctions/DeepCompare.cs` and annotate `PropertyInfo.GetValue` results and the `List<(string, object?, object?)>` element contract with guards to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P3-T6).
-- [ ] [P3-T2] Add `#nullable enable` to `UtilitiesCS/HelperClasses/CloningFunctions/ObjectCopier.cs` and make the deliberate `Clone<T>` nullable-return contract decision (`T?` for the `return default` null-source path and `(T?)formatter.Deserialize(...)`) to reach zero CS86xx
+- [x] [P3-T2] Add `#nullable enable` to `UtilitiesCS/HelperClasses/CloningFunctions/ObjectCopier.cs` and make the deliberate `Clone<T>` nullable-return contract decision (`T?` for the `return default` null-source path and `(T?)formatter.Deserialize(...)`) to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; the `Clone<T>` return-nullability decision is recorded as a deliberate downstream contract; zero CS86xx (verified in P3-T6).
-- [ ] [P3-T3] Add `#nullable enable` to `UtilitiesCS/HelperClasses/CloningFunctions/DispatchUtility.cs` and annotate COM-interop null surfaces (`GetType` returning `Type?` when `!throwIfNotFound`, `Invoke` returning `object?`, `out`/`ref` params, `!` on documented post-call COM reads with `// why`) to reach zero CS86xx
+- [x] [P3-T3] Add `#nullable enable` to `UtilitiesCS/HelperClasses/CloningFunctions/DispatchUtility.cs` and annotate COM-interop null surfaces (`GetType` returning `Type?` when `!throwIfNotFound`, `Invoke` returning `object?`, `out`/`ref` params, `!` on documented post-call COM reads with `// why`) to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; public `GetType`/`Invoke` nullability reflects actual behavior; zero CS86xx (verified in P3-T6).
-- [ ] [P3-T4] Add `#nullable enable` to `UtilitiesCS/HelperClasses/ReflectionHelper.cs` and annotate nullable reflection locals (`Type? = type.BaseType`, `ex.Types` as `Type?[]`) with guards, consuming the TraceUtility contracts settled in Batch 2, to reach zero CS86xx
+- [x] [P3-T4] Add `#nullable enable` to `UtilitiesCS/HelperClasses/ReflectionHelper.cs` and annotate nullable reflection locals (`Type? = type.BaseType`, `ex.Types` as `Type?[]`) with guards, consuming the TraceUtility contracts settled in Batch 2, to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P3-T6).
-- [ ] [P3-T5] Run CSharpier over the Batch 3 files (`CloningFunctions/DeepCompare.cs`, `CloningFunctions/ObjectCopier.cs`, `CloningFunctions/DispatchUtility.cs`, `ReflectionHelper.cs`) and confirm no residual formatting diff
+- [x] [P3-T5] Run CSharpier over the Batch 3 files (`CloningFunctions/DeepCompare.cs`, `CloningFunctions/ObjectCopier.cs`, `CloningFunctions/DispatchUtility.cs`, `ReflectionHelper.cs`) and confirm no residual formatting diff
   - Acceptance: `csharpier --check .` exits 0 for the touched files.
-- [ ] [P3-T6] Run the pragma-only nullable build and record Batch 3 verification to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/qa-gates/batch3-nullable-build.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P3-T6] Run the pragma-only nullable build and record Batch 3 verification to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/qa-gates/batch3-nullable-build.<yyyy-MM-ddTHH-mm>.md`
   - Command: `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx for the 4 opted-in Batch 3 files and NO new diagnostics elsewhere.
-- [ ] [P3-T7] Run the Batch 3 UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/regression-testing/batch3-tests.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P3-T7] Run the Batch 3 UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/regression-testing/batch3-tests.<yyyy-MM-ddTHH-mm>.md`
   - Command: `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /TestCaseFilter:"FullyQualifiedName~DeepCompare|FullyQualifiedName~ObjectCopier|FullyQualifiedName~DispatchUtility|FullyQualifiedName~ReflectionHelper"`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; all Batch 3 tests green and behavior-identical.
 

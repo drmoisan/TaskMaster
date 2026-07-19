@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -34,7 +35,8 @@ namespace UtilitiesCS.HelperClasses
                 }
                 catch (ReflectionTypeLoadException ex)
                 {
-                    // Handle the exception if some types cannot be loaded
+                    // Handle the exception if some types cannot be loaded. ex.Types is Type?[];
+                    // filter out the nulls, then project to non-null Type for AddRange.
                     var types = ex
                         .Types.Where(t =>
                             t != null
@@ -42,7 +44,8 @@ namespace UtilitiesCS.HelperClasses
                             && IsMyAssembly(t.Assembly)
                             && !IsAnonymousOrLambdaType(t)
                         )
-                        .Where(t => !t.IsNestedPrivate)
+                        .Where(t => !t!.IsNestedPrivate)
+                        .Select(t => t!)
                         .ToList();
                     allClasses.AddRange(types);
                 }
@@ -53,7 +56,8 @@ namespace UtilitiesCS.HelperClasses
 
         private static bool IsMyAssembly(Assembly assembly)
         {
-            return TraceUtility.ProjectNames.Contains(assembly.GetName().Name);
+            // AssemblyName.Name is non-null for a loaded assembly.
+            return TraceUtility.ProjectNames.Contains(assembly.GetName().Name!);
         }
 
         private static bool IsAnonymousOrLambdaType(Type type)
@@ -76,7 +80,7 @@ namespace UtilitiesCS.HelperClasses
             return types.ToList();
         }
 
-        private static void CollectTypes(object obj, HashSet<Type> types, HashSet<object> visited)
+        private static void CollectTypes(object? obj, HashSet<Type> types, HashSet<object> visited)
         {
             if (obj == null || visited.Contains(obj))
                 return;
@@ -123,17 +127,18 @@ namespace UtilitiesCS.HelperClasses
         public static List<FieldInfo> GetAllFields(this Type type)
         {
             var fields = new List<FieldInfo>();
-            while (type != null)
+            Type? current = type;
+            while (current != null)
             {
                 fields.AddRange(
-                    type.GetFields(
+                    current.GetFields(
                         BindingFlags.Instance
                             | BindingFlags.NonPublic
                             | BindingFlags.Public
                             | BindingFlags.DeclaredOnly
                     )
                 );
-                type = type.BaseType;
+                current = current.BaseType;
             }
             return fields;
         }
@@ -141,17 +146,18 @@ namespace UtilitiesCS.HelperClasses
         public static List<FieldInfo> GetAllDerivedFields(this Type type, Type baseType)
         {
             var fields = new List<FieldInfo>();
-            while (type != null && type != baseType)
+            Type? current = type;
+            while (current != null && current != baseType)
             {
                 fields.AddRange(
-                    type.GetFields(
+                    current.GetFields(
                         BindingFlags.Instance
                             | BindingFlags.NonPublic
                             | BindingFlags.Public
                             | BindingFlags.DeclaredOnly
                     )
                 );
-                type = type.BaseType;
+                current = current.BaseType;
             }
             return fields;
         }
