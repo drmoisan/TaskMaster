@@ -1,5 +1,6 @@
 # Atomic Executor Memory Index
 
+- [Timed-out MSTest leaves detached runner](project_timedout_mstest_leaves_detached_runner.md) — a timed-out Invoke-MSTestWithCoverage bash call leaves a detached pwsh runner respawning testhosts; second run contends over user.config (ConfigurationErrorsException in unrelated TaskTree/ToDoModel) and hangs — kill the pwsh runner too, verify 0, then rerun with >=8min timeout
 - [Nullable per-file pragma gate mechanics](project_nullable_pragma_gate_mechanics.md) — solution-wide TWAE aborts on vendored SVGControl CS0649; verify via isolated `UtilitiesCS.csproj -t:Rebuild -p:Platform=AnyCPU -p:BuildProjectReferences=false` + grep CS86xx=0
 - [Analyzer version skew on fresh worktree](project_analyzer_version_skew_fresh_worktree.md) — first analyzer build fails CS0006 (Meziantou 3.0.101/Sonar 10.27/BannedApi 3.3.4 missing); nuget install old versions into gitignored packages/, don't edit 16 csproj
 - [Nullable remediation annotation patterns](project_nullable_remediation_annotation_patterns.md) — net481 no post-condition attrs; EmailRecord struct `= default!`; `.ToString()!` for string cells; IsNullOrEmpty overload gotcha; `x!.M()` for defensive-flow-state
