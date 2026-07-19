@@ -39,7 +39,7 @@ features:
   - issue_num: 9008
     feature_folder: utilitiescs-nullable-outlook-mailitem-item
     depends_on: [utilitiescs-nullable-extensions, utilitiescs-nullable-helperclasses]
-  - issue_num: 9009
+  - issue_num: 370
     feature_folder: utilitiescs-nullable-email-parsing
     depends_on: [utilitiescs-nullable-extensions]
   - issue_num: 9010
