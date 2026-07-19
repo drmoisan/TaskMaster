@@ -1,0 +1,229 @@
+{
+  "objective": "WAVE-2 CAPSTONE preparation for the utilitiescs-nullable-remediation epic: finalize the CI nullable-gate enforcement to per-file #nullable enable opt-in (drop global /p:Nullable=enable), flag the .claude/rules/csharp.md conflict, evaluate the optional project-level Nullable flip, and consolidate epic-wide maintainer-decision items. Preparation only (promotion, research, feature docs, atomic planning, preflight clearance).",
+  "route_id": "preparation",
+  "path_selected": "large",
+  "change_budget_estimate": "~3 production/config files (CI workflow YAML gate step, optional csproj Nullable elements out-of-scope by default) plus feature documents. Large/full-feature path per epic manifest; capstone banded C2.",
+  "epic_context": {
+    "epic": "utilitiescs-nullable-remediation",
+    "epic_home": "docs/features/epics/utilitiescs-nullable-remediation/epic.md",
+    "integration_branch": "epic/utilitiescs-nullable-remediation-integration",
+    "integration_base_sha": "dd17719abf95f13c534f94c64415980458e6bae9",
+    "wave": 2,
+    "manifest_placeholder_issue_num": 9012,
+    "branch": "feature/utilitiescs-nullable-ci-capstone"
+  },
+  "promotion-type": "feature",
+  "short-name": "utilitiescs-nullable-ci-capstone",
+  "relativeFile": "docs/features/potential/2026-07-18-utilitiescs-nullable-ci-capstone.md",
+  "long-name": "2026-07-18-utilitiescs-nullable-ci-capstone",
+  "issue-num": 376,
+  "feature-folder": "docs/features/active/utilitiescs-nullable-ci-capstone",
+  "plan-path": "docs/features/active/utilitiescs-nullable-ci-capstone/plan.2026-07-19T04-25.md",
+  "work-mode": "full-feature",
+  "model_budget": {
+    "fable_policy": "disabled"
+  },
+  "completed_steps": [
+    "S3_promotion",
+    "S2_research",
+    "S2b_feature_documents",
+    "S4_atomic_planning"
+  ],
+  "next_step": "S5_atomic_execution",
+  "last_updated": "2026-07-19T04:45:00Z",
+  "step5_status": "verified",
+  "step6_status": "verified",
+  "step7_status": "verified",
+  "step8_status": "not-applicable",
+  "step9_status": "not-applicable",
+  "step10_status": "not-applicable",
+  "preparation_termination": {
+    "route_id": "preparation",
+    "terminates_at": "S5_atomic_execution",
+    "requires_ci_gate": false,
+    "requires_pr_gate": false,
+    "completion_assertion": "none",
+    "out_of_scope": [
+      "atomic_execution",
+      "pr_authoring",
+      "ci_monitoring"
+    ],
+    "plan_preflight_status": "PREFLIGHT: ALL CLEAR",
+    "note": "Preparation-mode child of epic utilitiescs-nullable-remediation. Atomic execution, PR authoring, and CI monitoring are performed later by epic-orchestrator. Report promoted issue number 376 to epic-planner for manifest back-fill of placeholder 9012."
+  },
+  "step_status_legend": {
+    "step5_status": "research (task-researcher)",
+    "step6_status": "feature documents (spec.md, user-story.md)",
+    "step7_status": "atomic planning + preflight (atomic-planner / atomic-executor)",
+    "step8_status": "atomic execution — OUT OF SCOPE for preparation route (epic-orchestrator later)",
+    "step9_status": "feature review — OUT OF SCOPE for preparation route",
+    "step10_status": "PR authoring + CI monitoring — OUT OF SCOPE for preparation route"
+  },
+  "blocked_reason": "none",
+  "delegation_receipts": {
+    "promotion": {
+      "potential_entry": {
+        "ok": true,
+        "tool": "new_potential_entry",
+        "workspace_root": "C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-ac3a98310ffd36d6d",
+        "summary": "Created a new potential entry for 'utilitiescs-nullable-ci-capstone'.",
+        "artifacts": [
+          "C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-ac3a98310ffd36d6d/docs/features/potential/2026-07-18-utilitiescs-nullable-ci-capstone.md"
+        ]
+      },
+      "issue": {
+        "ok": true,
+        "tool": "potential_to_issue",
+        "workspace_root": "C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-ac3a98310ffd36d6d",
+        "summary": "Promoted 'utilitiescs-nullable-ci-capstone' as a feature workflow in full-feature mode.",
+        "artifacts": [
+          "https://github.com/drmoisan/TaskMaster/issues/376"
+        ],
+        "destination_path": "C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-ac3a98310ffd36d6d/docs/features/potential/promoted/2026-07-18-utilitiescs-nullable-ci-capstone.md"
+      },
+      "feature_folder": {
+        "ok": true,
+        "tool": "new_active_feature_folder",
+        "workspace_root": "C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-ac3a98310ffd36d6d",
+        "summary": "Created a new active feature feature folder for 'utilitiescs-nullable-ci-capstone'.",
+        "artifacts": [
+          "C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-ac3a98310ffd36d6d/docs/features/active/2026-07-18-utilitiescs-nullable-ci-capstone-376/issue.md"
+        ],
+        "destination_path": "C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-ac3a98310ffd36d6d/docs/features/active/2026-07-18-utilitiescs-nullable-ci-capstone-376",
+        "renamed_to": "docs/features/active/utilitiescs-nullable-ci-capstone"
+      }
+    }
+  },
+  "phase_delegation_receipts": [
+    {
+      "agent_name": "task-researcher",
+      "phase": "research",
+      "model": "sonnet",
+      "status": "verified",
+      "artifact_paths": [
+        "docs/features/active/utilitiescs-nullable-ci-capstone/research/2026-07-19T00-30-ci-capstone-research.md"
+      ],
+      "summary": "Researched (a) CI gate finalization (drop /p:Nullable=enable, single-line diff), (b) genuine-enforcement verification method + candidate files, (c) csharp.md conflict lines + flagging precedent, (d) optional project-level flip NOT currently feasible, (e) consolidated maintainer-decision inventory, (f) ci-workflows rules applicability. Key precondition: only 25 UtilitiesCS + 3 SVGControl files currently carry #nullable enable; the twelve children are prepared but not executed on this branch, so candidate/feasibility must be re-verified at execution time.",
+      "completed_at": "2026-07-19T04:10:00Z"
+    },
+    {
+      "agent_name": "prd-feature",
+      "phase": "feature_docs",
+      "model": "sonnet",
+      "status": "verified",
+      "artifact_paths": [
+        "docs/features/active/utilitiescs-nullable-ci-capstone/spec.md",
+        "docs/features/active/utilitiescs-nullable-ci-capstone/user-story.md"
+      ],
+      "summary": "Authored full-feature spec.md (AC1-AC7 mapped, Maintainer Decision Summary table, AC4 rules-conflict detail, AC5 optional-flip detail, Toolchain Note) and user-story.md from the maintainer/CI-owner perspective. No production/workflow/csproj/.claude/rules file modified.",
+      "completed_at": "2026-07-19T04:25:00Z"
+    },
+    {
+      "agent_name": "atomic-planner",
+      "phase": "atomic_planning",
+      "model": "sonnet",
+      "status": "verified",
+      "artifact_paths": [
+        "docs/features/active/utilitiescs-nullable-ci-capstone/plan.2026-07-19T04-25.md"
+      ],
+      "summary": "Authored full-feature atomic plan: Phase 0 policy reads + 4 C# baselines; Phase 1 ci.yml gate-step edit (drop /p:Nullable=enable); Phase 2 genuine-enforcement verification (re-grep candidates, [expect-fail] opted-in defect, non-opted-in pass, reverts, clean-tree); Phase 3 AC4/AC5/AC6 documentation verification; Phase 4 modified-workflow-needs-green-run recording; Phase 5 final QC + AC7 coverage-delta. MCP plan validator PASSED.",
+      "completed_at": "2026-07-19T04:35:00Z"
+    },
+    {
+      "agent_name": "atomic-executor",
+      "phase": "preflight",
+      "model": "sonnet",
+      "status": "verified",
+      "artifact_paths": [
+        "docs/features/active/utilitiescs-nullable-ci-capstone/plan.2026-07-19T04-25.md"
+      ],
+      "summary": "Preflight (DIRECTIVE: PREFLIGHT VALIDATION ONLY). Pass 1 returned REVISIONS REQUIRED (csharpier v0 vs pinned v1.2.6 subcommand syntax in P0-T6/P5-T1); orchestrator applied the verbatim deltas (dotnet csharpier check . / dotnet csharpier format .) in place. Pass 2 returned PREFLIGHT: ALL CLEAR with no regressions.",
+      "completed_at": "2026-07-19T04:45:00Z"
+    }
+  ],
+  "plan_validation": {
+    "mcp_plan_validator": "PASS",
+    "validator_command": "mcp__drm-copilot__validate_orchestration_artifacts artifact_type=plan artifact_path=docs/features/active/utilitiescs-nullable-ci-capstone/plan.2026-07-19T04-25.md",
+    "atomic_executor_preflight": "PREFLIGHT: ALL CLEAR",
+    "preflight_iterations": 2,
+    "validated_at": "2026-07-19T04:45:00Z"
+  },
+  "model_routing_preflight": {
+    "status": "pass",
+    "checked_at": "2026-07-19T03:59:33Z",
+    "validator_command": "mcp__drm-copilot__validate_orchestration_artifacts artifact_type=orchestrator-state require_model_routing=true",
+    "output_summary": "Zero agent delegations recorded at first-delegation preflight; require_model_routing gate imposes no requirement. Complexity assessments and routing receipts pre-recorded for the four preparation phases."
+  },
+  "complexity_assessments": [
+    {
+      "phase": "research",
+      "band": "C2",
+      "floor": "C1",
+      "signals_present": ["single_file_localized_edit"],
+      "rationale": "Research into the CI nullable-gate enforcement change and consolidation of already-documented epic maintainer-decision items; localized CI/config scope, no floor signal present. Manifest bands the capstone C2.",
+      "assessed_at": "2026-07-19T03:59:33Z"
+    },
+    {
+      "phase": "feature_docs",
+      "band": "C2",
+      "floor": "C1",
+      "signals_present": ["single_file_localized_edit"],
+      "rationale": "Authoring spec.md and user-story.md for a localized CI-gate finalization; no cross-module code contract change, no floor signal. Capstone banded C2.",
+      "assessed_at": "2026-07-19T03:59:33Z"
+    },
+    {
+      "phase": "atomic_planning",
+      "band": "C2",
+      "floor": "C1",
+      "signals_present": ["single_file_localized_edit"],
+      "rationale": "Atomic plan for a ~3-file CI-gate finalization with genuine-enforcement verification; localized workflow-step edit, no floor signal. Capstone banded C2.",
+      "assessed_at": "2026-07-19T03:59:33Z"
+    },
+    {
+      "phase": "preflight",
+      "band": "C2",
+      "floor": "C1",
+      "signals_present": ["single_file_localized_edit"],
+      "rationale": "Atomic-executor preflight validation of the capstone plan; localized scope, no floor signal. Capstone banded C2.",
+      "assessed_at": "2026-07-19T03:59:33Z"
+    }
+  ],
+  "model_routing_receipts": [
+    {
+      "agent": "task-researcher",
+      "phase": "research",
+      "complexity_band": "C2",
+      "fable_policy": "disabled",
+      "table_model": "sonnet",
+      "clamped_from": null,
+      "model": "sonnet"
+    },
+    {
+      "agent": "prd-feature",
+      "phase": "feature_docs",
+      "complexity_band": "C2",
+      "fable_policy": "disabled",
+      "table_model": "sonnet",
+      "clamped_from": null,
+      "model": "sonnet"
+    },
+    {
+      "agent": "atomic-planner",
+      "phase": "atomic_planning",
+      "complexity_band": "C2",
+      "fable_policy": "disabled",
+      "table_model": "sonnet",
+      "clamped_from": null,
+      "model": "sonnet"
+    },
+    {
+      "agent": "atomic-executor",
+      "phase": "preflight",
+      "complexity_band": "C2",
+      "fable_policy": "disabled",
+      "table_model": "sonnet",
+      "clamped_from": null,
+      "model": "sonnet"
+    }
+  ]
+}
