@@ -68,11 +68,11 @@ Test-assembly resolution rule: the `UtilitiesCS.Test` assembly resolves at execu
 
 ### Phase 3 — Batch 2 Outlook Readiness Gate Pair
 
-- [ ] [P3-T1] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/IOutlookReadinessGate.cs` and change the interface member to `IsReady(Store? store)` to match the documented "a null store returns false" contract.
+- [x] [P3-T1] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/IOutlookReadinessGate.cs` and change the interface member to `IsReady(Store? store)` to match the documented "a null store returns false" contract.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; signature change is additive nullability only.
-- [ ] [P3-T2] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/OutlookReadinessGate.cs` and co-annotate `IsReady(Store? store)` to match the interface; preserve the existing `store?.` guard and the `_app ?? throw` non-null invariant unchanged.
+- [x] [P3-T2] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/OutlookReadinessGate.cs` and co-annotate `IsReady(Store? store)` to match the interface; preserve the existing `store?.` guard and the `_app ?? throw` non-null invariant unchanged.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; no new runtime guard; interface and implementation signatures agree.
-- [ ] [P3-T3] Run the pragma-only rebuild and record Batch 2 verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/batch2-pragma-verify.<timestamp>.md`.
+- [x] [P3-T3] Run the pragma-only rebuild and record Batch 2 verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/batch2-pragma-verify.<timestamp>.md`.
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx across the interface+impl pair.
 
 ### Phase 4 — Batch 3 Recipient Cluster
