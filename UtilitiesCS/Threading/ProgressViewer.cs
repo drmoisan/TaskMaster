@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -23,8 +24,8 @@ namespace UtilitiesCS
             this.ButtonCancel.Enabled = false;
         }
 
-        private System.Windows.Threading.Dispatcher _dispatcher;
-        public System.Windows.Threading.Dispatcher UiDispatcher
+        private System.Windows.Threading.Dispatcher? _dispatcher;
+        public System.Windows.Threading.Dispatcher? UiDispatcher
         {
             get => _dispatcher;
             set => _dispatcher = value;
@@ -49,8 +50,8 @@ namespace UtilitiesCS
             set => _uiThreadNumber = value;
         }
 
-        private CancellationTokenSource _cancelSource;
-        public CancellationTokenSource CancelSource
+        private CancellationTokenSource? _cancelSource;
+        public CancellationTokenSource? CancelSource
         {
             get => _cancelSource;
             set => _cancelSource = value;
@@ -64,7 +65,10 @@ namespace UtilitiesCS
 
         private void CancelButton_Click(object sender, EventArgs e)
         {
-            _cancelSource.Cancel();
+            // Invariant: ButtonCancel is enabled only after SetCancellationTokenSource assigns
+            // _cancelSource, so a click here implies _cancelSource is non-null (preserves the prior
+            // NRE-if-null behavior).
+            _cancelSource!.Cancel();
             this.Close();
         }
 

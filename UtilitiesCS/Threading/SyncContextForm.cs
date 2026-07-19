@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -22,9 +23,11 @@ namespace QuickFiler.Viewers
 
         public System.Drawing.SizeF FormAutoScaleFactor { get; private set; }
 
-        public SynchronizationContext UiSyncContext { get; private set; }
+        // Set in CaptureUiVariables() (invoked during UI init before UiThread.Initialize consumes
+        // them), not in the ctor; = null! preserves the existing non-null consumption contract.
+        public SynchronizationContext UiSyncContext { get; private set; } = null!;
 
-        public Dispatcher UiDispatcher { get; private set; }
+        public Dispatcher UiDispatcher { get; private set; } = null!;
 
         public int UiThreadId { get; private set; }
 

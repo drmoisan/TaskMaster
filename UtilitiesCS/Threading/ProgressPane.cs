@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -21,8 +22,8 @@ namespace UtilitiesCS.EmailIntelligence.TaskPane
             this.ButtonCancel.Enabled = false;
         }
 
-        private System.Windows.Threading.Dispatcher _dispatcher;
-        public System.Windows.Threading.Dispatcher UiDispatcher
+        private System.Windows.Threading.Dispatcher? _dispatcher;
+        public System.Windows.Threading.Dispatcher? UiDispatcher
         {
             get => _dispatcher;
             set => _dispatcher = value;
@@ -40,7 +41,7 @@ namespace UtilitiesCS.EmailIntelligence.TaskPane
             get => _uiScheduler;
         }
 
-        private CancellationTokenSource _tokenSource;
+        private CancellationTokenSource? _tokenSource;
 
         public void SetCancellationTokenSource(CancellationTokenSource tokenSource)
         {
@@ -50,7 +51,10 @@ namespace UtilitiesCS.EmailIntelligence.TaskPane
 
         private void CancelButton_Click(object sender, EventArgs e)
         {
-            _tokenSource.Cancel();
+            // Invariant: ButtonCancel is enabled only after SetCancellationTokenSource assigns
+            // _tokenSource, so a click here implies _tokenSource is non-null (preserves the prior
+            // NRE-if-null behavior).
+            _tokenSource!.Cancel();
             this.Dispose();
         }
     }

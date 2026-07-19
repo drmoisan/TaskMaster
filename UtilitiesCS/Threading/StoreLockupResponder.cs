@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Reflection;
 using log4net;
@@ -59,8 +60,8 @@ namespace UtilitiesCS.Threading
         public StoreLockupResponder(
             IStoreDisableService disableService,
             IUiDispatcher dispatcher,
-            StoreLockupNotifier notify = null,
-            Action<string> logSink = null
+            StoreLockupNotifier? notify = null,
+            Action<string>? logSink = null
         )
         {
             _disableService =
@@ -146,8 +147,10 @@ namespace UtilitiesCS.Threading
 
             // Notify (fire-and-forget) on the UI thread. Never Invoke, never modal.
             _dispatcher.BeginInvoke(() =>
+                // displayName is guaranteed non-null here by the IsNullOrWhiteSpace guard above
+                // (net481 IsNullOrWhiteSpace does not refine null-state, so an explicit ! is needed).
                 _notify(
-                    displayName,
+                    displayName!,
                     () => _disableService.DisableSessionOnly(identity),
                     () => _disableService.DisableForFutureSessions(identity),
                     () => _ = _disableService.ReenableAsync(identity)

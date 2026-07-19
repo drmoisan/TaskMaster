@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 
 namespace UtilitiesCS.Threading
@@ -23,7 +24,7 @@ namespace UtilitiesCS.Threading
         /// The identity of the store being processed at the moment of confirmation, or
         /// <see langword="null"/> when no per-store context was active ("no context").
         /// </param>
-        public LockupAttribution(TimeSpan stallDuration, string storeIdentity)
+        public LockupAttribution(TimeSpan stallDuration, string? storeIdentity)
         {
             StallDuration = stallDuration;
             StoreIdentity = storeIdentity;
@@ -36,7 +37,7 @@ namespace UtilitiesCS.Threading
         /// The identity of the store being processed at confirmation, or <see langword="null"/>
         /// when no per-store context was active.
         /// </summary>
-        public string StoreIdentity { get; }
+        public string? StoreIdentity { get; }
     }
 
     /// <summary>
