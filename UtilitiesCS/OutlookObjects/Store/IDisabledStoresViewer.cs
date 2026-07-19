@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using System.Windows.Forms;
 using UtilitiesCS.Interfaces.IWinForm;
@@ -25,6 +26,6 @@ namespace UtilitiesCS.OutlookObjects.Store
         void BindRows(IList<DisabledStoreRow> rows);
 
         /// <summary>Forwards a grid cell-content click to the controller's click handler.</summary>
-        void Dgv_CellContentClick(object sender, DataGridViewCellEventArgs e);
+        void Dgv_CellContentClick(object? sender, DataGridViewCellEventArgs e);
     }
 }
