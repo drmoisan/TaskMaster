@@ -108,17 +108,17 @@ Test-assembly resolution rule: the `UtilitiesCS.Test` assembly resolves at execu
 
 ### Phase 7 — Batch 6 OlFolderTools FilterOlFolders
 
-- [ ] [P7-T1] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FilterOlFolders/FolderInfoViewer.cs` (hand-written partial half) and annotate only its own declared fields (`?`/`= null!`); do not annotate Designer-declared controls.
+- [x] [P7-T1] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FilterOlFolders/FolderInfoViewer.cs` (hand-written partial half) and annotate only its own declared fields (`?`/`= null!`); do not annotate Designer-declared controls.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; no Designer-declared control annotated.
-- [ ] [P7-T2] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FilterOlFolders/OSBrowser.cs` (hand-written partial half); annotate own fields (`?`/`= null!`) consistent with the #364 `HelperClasses.FileSystem` contracts it consumes.
+- [x] [P7-T2] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FilterOlFolders/OSBrowser.cs` (hand-written partial half); annotate own fields (`?`/`= null!`) consistent with the #364 `HelperClasses.FileSystem` contracts it consumes.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; no Designer-declared control annotated.
-- [ ] [P7-T3] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FilterOlFolders/FilterOlFoldersViewer.cs` (hand-written partial half); annotate `_controller` to `FilterOlFoldersController?` with `_controller!` at the post-`SetController` invariant site, or `= null!`.
+- [x] [P7-T3] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FilterOlFolders/FilterOlFoldersViewer.cs` (hand-written partial half); annotate `_controller` to `FilterOlFoldersController?` with `_controller!` at the post-`SetController` invariant site, or `= null!`.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; no Designer-declared control annotated.
-- [ ] [P7-T4] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FilterOlFolders/FilterOlFoldersController.cs` (343 lines, under 500); annotate `_folderTreeView` to `FolderTreeCompatibilityView?` (already null-checked) and `PutCheckedState` to `?` or `= null!`.
+- [x] [P7-T4] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FilterOlFolders/FilterOlFoldersController.cs` (343 lines, under 500); annotate `_folderTreeView` to `FolderTreeCompatibilityView?` (already null-checked) and `PutCheckedState` to `?` or `= null!`.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; existing `if(_folderTreeView==null)`/`?.Dispose()` guards preserved.
-- [ ] [P7-T5] Verify the four FilterOlFolders `*.Designer.cs` files (`FilterOlFoldersViewer.Designer.cs`, `FolderInfoViewer.Designer.cs`, `OSBrowser.Designer.cs`, `OSFolder.Designer.cs`) receive NO `#nullable enable` pragma and remain oblivious.
+- [x] [P7-T5] Verify the four FilterOlFolders `*.Designer.cs` files (`FilterOlFoldersViewer.Designer.cs`, `FolderInfoViewer.Designer.cs`, `OSBrowser.Designer.cs`, `OSFolder.Designer.cs`) receive NO `#nullable enable` pragma and remain oblivious.
   - Acceptance: `git diff` shows no pragma added to any `*.Designer.cs` under `FilterOlFolders/`; these files are unmodified (AC3).
-- [ ] [P7-T6] Run the pragma-only rebuild and record Batch 6 verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/batch6-pragma-verify.<timestamp>.md`.
+- [x] [P7-T6] Run the pragma-only rebuild and record Batch 6 verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/batch6-pragma-verify.<timestamp>.md`.
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx across the four hand-written FilterOlFolders files while the Designer halves stay oblivious and non-cross-blocking.
 
 ### Phase 8 — Batch 7 OlFolderTools FolderRemap

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -24,8 +25,8 @@ namespace UtilitiesCS.EmailIntelligence.OlFolderTools.FilterOlFolders
             InitializeComponent();
         }
 
-        internal FolderTree FolderTree { get; set; }
-        private FolderTreeCompatibilityView _folderTreeView;
+        internal FolderTree FolderTree { get; set; } = null!;
+        private FolderTreeCompatibilityView? _folderTreeView;
 
         public void SetFolderTree(FolderTree folderTree)
         {
