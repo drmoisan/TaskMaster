@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+#nullable enable
+
 namespace UtilitiesCS
 {
     public partial class FolderNotFoundViewer : Form
@@ -17,7 +19,7 @@ namespace UtilitiesCS
             InitializeComponent();
         }
 
-        public string FolderAction { get; set; }
+        public string? FolderAction { get; set; }
 
         public string FolderName
         {

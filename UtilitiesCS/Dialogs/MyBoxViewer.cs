@@ -8,12 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+#nullable enable
+
 namespace UtilitiesCS
 {
     public partial class MyBoxViewer : Form
     {
         private bool ableToRemoveStandard = true;
-        private readonly Dictionary<string, Delegate> _map;
+        private readonly Dictionary<string, Delegate>? _map;
 
         public MyBoxViewer()
         {
@@ -33,16 +35,16 @@ namespace UtilitiesCS
 
         private void Button1_Click(object sender, EventArgs e)
         {
-            string key = _map.Keys.ToList()[0];
+            string key = _map!.Keys.ToList()[0];
             var result = _map[key].DynamicInvoke();
-            this.DialogResult = (DialogResult)result;
+            this.DialogResult = (DialogResult)result!;
         }
 
         private void Button2_Click(object sender, EventArgs e)
         {
-            string key = _map.Keys.ToList()[1];
+            string key = _map!.Keys.ToList()[1];
             var result = _map[key].DynamicInvoke();
-            this.DialogResult = (DialogResult)result;
+            this.DialogResult = (DialogResult)result!;
         }
 
         public void RemoveStandardButtons()

@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+#nullable enable
+
 namespace UtilitiesCS.Dialogs
 {
     public partial class DelegateButtonTemplate : Form
