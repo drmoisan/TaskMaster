@@ -28,7 +28,7 @@ namespace UtilitiesCS
             return view.GetTable();
         }
 
-        public static async Task<Outlook.Table?> GetTableInViewAsync(
+        public static async Task<Outlook.Table> GetTableInViewAsync(
             this Explorer activeExplorer,
             CancellationToken token,
             int counter,
@@ -112,7 +112,9 @@ namespace UtilitiesCS
                 }
             }
 
-            return table;
+            // GetTableInViewAsync's public contract is non-null (callers dereference the result);
+            // the null-on-cancellation/timeout path is a pre-existing latent condition.
+            return table!;
         }
 
         public static async Task<object?> TryGetTableAsync(

@@ -13,7 +13,7 @@ namespace UtilitiesCS
 {
     public static partial class OlTableExtensions
     {
-        public static (object[,]? data, Dictionary<string, int>? columnInfo) ETL(
+        public static (object[,] data, Dictionary<string, int> columnInfo) ETL(
             this Outlook.Table table,
             Dictionary<string, Func<object, string>>? objectConverters = null,
             ProgressTracker? progress = null
@@ -22,7 +22,9 @@ namespace UtilitiesCS
             if (table is null)
             {
                 logger.Error($"Parameter {nameof(table)} is null");
-                return (null, null);
+                // ETL's public tuple contract is non-null; the (null, null) error path is a
+                // pre-existing latent condition callers already assume away.
+                return (null!, null!);
             }
 
             var etlStopwatch = Stopwatch.StartNew();
@@ -58,10 +60,10 @@ namespace UtilitiesCS
                 "ETL complete | ETL over table snapshots",
                 $"rowCount={rowCount}; columnCount={columnDictionary.Count}; elapsedMs={etlStopwatch.ElapsedMilliseconds}"
             );
-            return (data, columnDictionary);
+            return (data!, columnDictionary);
         }
 
-        public static async Task<(object[,]? data, Dictionary<string, int>? columnInfo)> EtlAsync(
+        public static async Task<(object[,] data, Dictionary<string, int> columnInfo)> EtlAsync(
             this Outlook.Table table,
             CancellationToken token,
             CancellationTokenSource tokenSource,
@@ -124,7 +126,7 @@ namespace UtilitiesCS
                 "EtlAsync complete | ETL over table snapshots",
                 $"rowCount={rowCount}; columnCount={columnDictionary.Count}; elapsedMs={etlStopwatch.ElapsedMilliseconds}"
             );
-            return (data, columnDictionary);
+            return (data!, columnDictionary);
         }
 
         public static async Task<(
@@ -192,10 +194,10 @@ namespace UtilitiesCS
         public static async Task<(
             IAsyncEnumerable<Row> rows,
             Dictionary<string, int> columnDictionary,
-            Dictionary<string, Func<object, string>>? objectConverters,
+            Dictionary<string, Func<object, string>> objectConverters,
             IOrderedEnumerable<int> binIndices,
-            IEnumerable<string>? objFields,
-            IEnumerable<int>? objIndices
+            IEnumerable<string> objFields,
+            IEnumerable<int> objIndices
         )> EtlPrepAsync(
             this Outlook.Table table,
             CancellationToken cancel,
@@ -208,7 +210,7 @@ namespace UtilitiesCS
                 GetObjectFields(objectConverters, columnDictionary)
             );
             var rows = await Task.Run(() => table.GetRows().ToAsyncEnumerable(), cancel);
-            return (rows, columnDictionary, objectConverters, binIndices, objFields, objIndices);
+            return (rows, columnDictionary, objectConverters!, binIndices, objFields!, objIndices!);
         }
 
         public static IAsyncEnumerable<object[]> EtlByRowAsync(
