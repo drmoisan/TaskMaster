@@ -1,5 +1,6 @@
 # Atomic Executor Memory Index
 
+- [#371 OutlookObjects nullable lessons](project_371_outlookobjects_nullable_lessons.md) — public-signature nullable change regresses OTHER nullable-enabled files in same assembly (DfDeedle) — check TOTAL UtilitiesCS CS86xx per batch, keep public tuples non-null w/ ! at null sites; lazy-field CS8618→Lazy<T>?; ToLazy has class constraint; _item=null! for GetOrLoad ref-match; ForEach commented-but-resolves (grep gate=flag not block)
 - [#364 nullable-gate pre-existing blockers](project_364_nullable_gate_preexisting_blockers.md) — full-solution pragma-only TWAE gate fails at baseline (vendored SVGControl CS0649 + non-HelperClasses CS0618/CS0168); verify CS86xx via isolated UtilitiesCS build w/ BuildProjectReferences=false; analyzer-version drift needs nuget-install into packages/; coverage script single-assembly StrictMode bug
 
 - [Nullable per-file pragma gate mechanics](project_nullable_pragma_gate_mechanics.md) — solution-wide TWAE aborts on vendored SVGControl CS0649; verify via isolated `UtilitiesCS.csproj -t:Rebuild -p:Platform=AnyCPU -p:BuildProjectReferences=false` + grep CS86xx=0
