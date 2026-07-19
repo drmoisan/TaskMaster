@@ -123,17 +123,17 @@ Test-assembly resolution rule: the `UtilitiesCS.Test` assembly resolves at execu
 
 ### Phase 8 — Batch 7 OlFolderTools FolderRemap
 
-- [ ] [P8-T1] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FolderRemap/FolderSelector.cs`; set `OlFolderRemap? _selection = null` and change `Selection`/`SelectFolder` to `OlFolderRemap?` (matches controller `is null` checks).
+- [x] [P8-T1] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FolderRemap/FolderSelector.cs`; set `OlFolderRemap? _selection = null` and change `Selection`/`SelectFolder` to `OlFolderRemap?` (matches controller `is null` checks).
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; no Designer-declared control annotated.
-- [ ] [P8-T2] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FolderRemap/FolderRemapViewer.cs` (hand-written partial half) and annotate own fields (`?`/`= null!`).
+- [x] [P8-T2] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FolderRemap/FolderRemapViewer.cs` (hand-written partial half) and annotate own fields (`?`/`= null!`).
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; no Designer-declared control annotated.
-- [ ] [P8-T3] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FolderRemap/FolderRemapTree.cs` (264 lines); set `_roots = null!`, annotate `PropertyChanged` events `?`, `_mappedTo` to `OlFolderRemap?`, and the nested `OlFolderRemap` ctor-unset fields to `= null!`; keep `_batchNotifier` initializer.
+- [x] [P8-T3] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FolderRemap/FolderRemapTree.cs` (264 lines); set `_roots = null!`, annotate `PropertyChanged` events `?`, `_mappedTo` to `OlFolderRemap?`, and the nested `OlFolderRemap` ctor-unset fields to `= null!`; keep `_batchNotifier` initializer.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; no new runtime guard.
-- [ ] [P8-T4] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FolderRemap/FolderRemapController.cs` (283 lines); set `_mappings2 = null!` (set via setter in ctor), annotate `PropertyChanged` `?`, and align `SelectFolder` consumption with `OlFolderRemap?`.
+- [x] [P8-T4] Add `#nullable enable` to `UtilitiesCS/EmailIntelligence/OlFolderTools/FolderRemap/FolderRemapController.cs` (283 lines); set `_mappings2 = null!` (set via setter in ctor), annotate `PropertyChanged` `?`, and align `SelectFolder` consumption with `OlFolderRemap?`.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; existing `is null` checks preserved.
-- [ ] [P8-T5] Verify the two FolderRemap `*.Designer.cs` files (`FolderRemapViewer.Designer.cs`, `FolderSelector.Designer.cs`) receive NO `#nullable enable` pragma and remain oblivious.
+- [x] [P8-T5] Verify the two FolderRemap `*.Designer.cs` files (`FolderRemapViewer.Designer.cs`, `FolderSelector.Designer.cs`) receive NO `#nullable enable` pragma and remain oblivious.
   - Acceptance: `git diff` shows no pragma added to any `*.Designer.cs` under `FolderRemap/`; these files are unmodified (AC3).
-- [ ] [P8-T6] Run the pragma-only rebuild and record Batch 7 verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/batch7-pragma-verify.<timestamp>.md`.
+- [x] [P8-T6] Run the pragma-only rebuild and record Batch 7 verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/batch7-pragma-verify.<timestamp>.md`.
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx across the four hand-written FolderRemap files while the Designer halves stay oblivious.
 
 ### Phase 9 — Batch 8 Large COM Helpers (500-Line FLAG Batch)
