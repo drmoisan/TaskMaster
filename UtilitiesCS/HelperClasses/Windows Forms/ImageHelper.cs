@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace UtilitiesCS.Windows_Forms
 {
     public static class ImageHelper
     {
-        public static ImageCodecInfo GetEncoder(ImageFormat format)
+        public static ImageCodecInfo? GetEncoder(ImageFormat format)
         {
             var codecs = ImageCodecInfo.GetImageDecoders();
             foreach (var codec in codecs)

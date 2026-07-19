@@ -189,26 +189,26 @@ evidence path is used. The delegation prompt supplied only canonical `evidence/`
 
 ### Phase 6 — Batch 6 Windows Forms
 
-- [ ] [P6-T1] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Windows Forms/ControlPosition.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P6-T1] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Windows Forms/ControlPosition.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P6-T9).
-- [ ] [P6-T2] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Windows Forms/ControlResizer.cs` and annotate the `ControlInfo` non-null `string` fields (CS8618) and `ctl.Parent` re-access without altering the existing catch behavior to reach zero CS86xx
+- [x] [P6-T2] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Windows Forms/ControlResizer.cs` and annotate the `ControlInfo` non-null `string` fields (CS8618) and `ctl.Parent` re-access without altering the existing catch behavior to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P6-T9).
-- [ ] [P6-T3] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Windows Forms/ImageHelper.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P6-T3] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Windows Forms/ImageHelper.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P6-T9).
-- [ ] [P6-T4] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Windows Forms/MouseDownFilter.cs` and annotate `event EventHandler? FormClicked` and remove the redundant `form = null` init reassigned in the ctor to reach zero CS86xx
+- [x] [P6-T4] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Windows Forms/MouseDownFilter.cs` and annotate `event EventHandler? FormClicked` and remove the redundant `form = null` init reassigned in the ctor to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P6-T9).
-- [ ] [P6-T5] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Windows Forms/OlvExtension.cs` and apply annotation-only edits to reach zero CS86xx
+- [x] [P6-T5] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Windows Forms/OlvExtension.cs` and apply annotation-only edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P6-T9).
-- [ ] [P6-T6] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Windows Forms/ScreenHelper.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P6-T6] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Windows Forms/ScreenHelper.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P6-T9).
-- [ ] [P6-T7] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Windows Forms/TableLayoutHelper.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P6-T7] Add `#nullable enable` to `UtilitiesCS/HelperClasses/Windows Forms/TableLayoutHelper.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P6-T9).
-- [ ] [P6-T8] Run CSharpier over the Batch 6 files under `UtilitiesCS/HelperClasses/Windows Forms/` (`ControlPosition.cs`, `ControlResizer.cs`, `ImageHelper.cs`, `MouseDownFilter.cs`, `OlvExtension.cs`, `ScreenHelper.cs`, `TableLayoutHelper.cs`) and confirm no residual formatting diff
+- [x] [P6-T8] Run CSharpier over the Batch 6 files under `UtilitiesCS/HelperClasses/Windows Forms/` (`ControlPosition.cs`, `ControlResizer.cs`, `ImageHelper.cs`, `MouseDownFilter.cs`, `OlvExtension.cs`, `ScreenHelper.cs`, `TableLayoutHelper.cs`) and confirm no residual formatting diff
   - Acceptance: `csharpier --check .` exits 0 for the touched files.
-- [ ] [P6-T9] Run the pragma-only nullable build and record Batch 6 verification to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/qa-gates/batch6-nullable-build.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P6-T9] Run the pragma-only nullable build and record Batch 6 verification to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/qa-gates/batch6-nullable-build.<yyyy-MM-ddTHH-mm>.md`
   - Command: `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx for the 7 opted-in Batch 6 files and NO new diagnostics elsewhere.
-- [ ] [P6-T10] Run the Batch 6 UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/regression-testing/batch6-tests.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P6-T10] Run the Batch 6 UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-helperclasses/evidence/regression-testing/batch6-tests.<yyyy-MM-ddTHH-mm>.md`
   - Command: `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /TestCaseFilter:"FullyQualifiedName~ControlResizer|FullyQualifiedName~ControlPosition|FullyQualifiedName~ImageHelper|FullyQualifiedName~MouseDownFilter|FullyQualifiedName~OlvExtension|FullyQualifiedName~ScreenHelper|FullyQualifiedName~TableLayoutHelper"`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`; all Batch 6 tests green and behavior-identical.
 
