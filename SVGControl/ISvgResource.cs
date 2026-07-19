@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -10,8 +11,8 @@ namespace SVGControl
     [TypeConverter(typeof(SvgResourceConverter))]
     public interface ISvgResource
     {
-        string Name { get; }
-        byte[] Data { get; }
+        string? Name { get; }
+        byte[]? Data { get; }
     }
 
     public class SvgResource : ISvgResource
@@ -24,7 +25,7 @@ namespace SVGControl
             Data = data;
         }
 
-        public string Name { get; set; }
-        public byte[] Data { get; set; }
+        public string? Name { get; set; }
+        public byte[]? Data { get; set; }
     }
 }

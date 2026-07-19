@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -23,17 +24,18 @@ namespace UtilitiesCS
         public override IApplicationGlobals ReadJson(
             JsonReader reader,
             Type objectType,
-            IApplicationGlobals existingValue,
+            IApplicationGlobals? existingValue,
             bool hasExistingValue,
             JsonSerializer serializer
         )
         {
+            // Deliberate non-null return: the body always returns the ctor-injected _globals.
             return _globals;
         }
 
         public override void WriteJson(
             JsonWriter writer,
-            IApplicationGlobals value,
+            IApplicationGlobals? value,
             JsonSerializer serializer
         )
         {
