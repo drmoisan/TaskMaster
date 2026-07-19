@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -9,7 +10,10 @@ namespace UtilitiesCS.NewtonsoftHelpers
 {
     public class AllInclusiveBinder
     {
-        public Assembly[] GetAssemblies()
+        // Deliberate contract decision: this is an unused stub whose body returns null,
+        // so the return type is annotated Assembly[]? to reflect the actual null behavior
+        // (plain class, no ISerializationBinder constraint to satisfy).
+        public Assembly[]? GetAssemblies()
         {
             //var dataAssembly = typeof(AnClassInDataLayer).Assembly;
             //var businessAssembly = typeof(ACLassInBusinessLayer).Assembly;
