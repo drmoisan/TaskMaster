@@ -1,5 +1,7 @@
 # Atomic Executor Memory Index
 
+- [#364 nullable-gate pre-existing blockers](project_364_nullable_gate_preexisting_blockers.md) — full-solution pragma-only TWAE gate fails at baseline (vendored SVGControl CS0649 + non-HelperClasses CS0618/CS0168); verify CS86xx via isolated UtilitiesCS build w/ BuildProjectReferences=false; analyzer-version drift needs nuget-install into packages/; coverage script single-assembly StrictMode bug
+
 - [#349 breadcrumb WebView2 gotchas](project_349_breadcrumb_webview2_gotchas.md) — retyped Designer field breaks reflection-injected tests (inject a router instead); aggregate async d__ classes for >=90% proofs; QuickFiler.Test is Newtonsoft-free
 
 - [VS18 build/test toolchain paths](project_vs18_build_toolchain_paths.md) — build with VS **18** full-framework msbuild.exe (not Core .dotnet-sdk, which dies on binary resx MSB3822); nuget.exe restore; MSYS_NO_PATHCONV; csharpier v1 subcommands; dotnet-coverage needs `--` separator
