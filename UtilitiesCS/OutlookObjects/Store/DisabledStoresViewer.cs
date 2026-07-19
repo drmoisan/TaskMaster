@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
@@ -43,7 +44,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         }
 
         /// <summary>Forwards a grid cell-content click to the controller.</summary>
-        public void Dgv_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        public void Dgv_CellContentClick(object? sender, DataGridViewCellEventArgs e)
         {
             Controller?.Dgv_CellContentClick(sender, e);
         }

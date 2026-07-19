@@ -150,7 +150,7 @@ namespace UtilitiesCS.OutlookObjects.Store
             Viewer.Close();
         }
 
-        public void DisplayName_SelectedValueChanged(object sender, EventArgs e)
+        public void DisplayName_SelectedValueChanged(object? sender, EventArgs e)
         {
             if (AnyChanges())
             {
@@ -175,7 +175,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         /// mutated and persisted in the save path (<see cref="AnyChanges"/>/<see cref="SaveChanges"/>)
         /// based on the checkbox's current state, so no business logic lives in this forwarder.
         /// </summary>
-        public void ExcludeStore_CheckedChanged(object sender, EventArgs e) { }
+        public void ExcludeStore_CheckedChanged(object? sender, EventArgs e) { }
 
         public void ArchiveFS_Click()
         {
