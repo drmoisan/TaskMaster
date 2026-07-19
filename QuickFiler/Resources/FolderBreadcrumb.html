@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<!--
+  QuickFiler breadcrumb page (#351). Self-contained: inline CSS + JS, no external fetches, no
+  third-party libraries (G1/G2). Rendering is driven entirely by 'render' bridge messages from the
+  host (Phase 3 JSON protocol) over window.chrome.webview; interactions post messages back.
+  The percentage cell CSS below is the FR-5 fix selected by the P1-T2 analysis.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Folder Breadcrumb</title>
+<style>
+  :root {
+    --bc-back: #ffffff;
+    --bc-fore: #1b1b1b;
+    --bc-sel-back: #cce4f7;
+    --bc-sel-fore: #1b1b1b;
+    --bc-arrow: #767676;
+    --bc-affordance: #0060b0;
+    --bc-pct: #444444;
+    --bc-sub-back: #f4f4f4;
+  }
+  :root[data-theme="dark"] {
+    --bc-back: #1e1e1e;
+    --bc-fore: #e6e6e6;
+    --bc-sel-back: #264f78;
+    --bc-sel-fore: #ffffff;
+    --bc-arrow: #9d9d9d;
+    --bc-affordance: #6cb6ff;
+    --bc-pct: #c8c8c8;
+    --bc-sub-back: #2a2a2a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      --bc-back: #1e1e1e;
+      --bc-fore: #e6e6e6;
+      --bc-sel-back: #264f78;
+      --bc-sel-fore: #ffffff;
+      --bc-arrow: #9d9d9d;
+      --bc-affordance: #6cb6ff;
+      --bc-pct: #c8c8c8;
+      --bc-sub-back: #2a2a2a;
+    }
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bc-back);
+    color: var(--bc-fore);
+    font-family: "Segoe UI", sans-serif;
+    font-size: 13px;
+    overflow-x: hidden;
+  }
+  #list { outline: none; }
+  .row {
+    display: flex;
+    align-items: center;
+    padding: 2px 4px;
+    cursor: default;
+    white-space: nowrap;
+  }
+  .row.selected { background: var(--bc-sel-back); color: var(--bc-sel-fore); }
+  /* Segment container: truncates long chains instead of pushing the percentage out (FR-5). */
+  .crumbs {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .seg { flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .seg.trunc { flex: 0 10 auto; min-width: 2ch; }
+  .arrow { flex: 0 0 auto; padding: 0 3px; color: var(--bc-arrow); }
+  .aff {
+    flex: 0 0 auto;
+    padding: 0 4px;
+    color: var(--bc-affordance);
+    font-weight: bold;
+    cursor: pointer;
+  }
+  /* Percentage cell: can never be compressed or overlapped (FR-5 CSS fix, P1-T2 analysis). */
+  .pct {
+    flex: 0 0 auto;
+    margin-left: auto;
+    flex-shrink: 0;
+    min-width: 5ch;
+    text-align: right;
+    color: var(--bc-pct);
+  }
+  .row.selected .pct { color: var(--bc-sel-fore); }
+  .subs { background: var(--bc-sub-back); }
+  .sub {
+    display: flex;
+    align-items: center;
+    padding: 1px 4px 1px 24px;
+    cursor: default;
+    white-space: nowrap;
+  }
+  .sub.selected { background: var(--bc-sel-back); color: var(--bc-sel-fore); }
+</style>
+</head>
+<body>
+<div id="list" tabindex="0"></div>
+<script>
+"use strict";
+(function () {
+  var list = document.getElementById("list");
+  var state = { rows: [], selectedRowIndex: -1, selectedSubfolderIndex: -1 };
+
+  function post(msg) {
+    if (window.chrome && window.chrome.webview) {
+      window.chrome.webview.postMessage(msg);
+    }
+  }
+
+  function selectedRow() {
+    return state.rows.find(function (r) { return r.selected; }) || null;
+  }
+
+  function rowHasOpenAffordance(row) {
+    return row.cells.some(function (c) { return c.kind === "plus"; });
+  }
+
+  function makeCell(row, cell) {
+    var el;
+    if (cell.kind === "segment") {
+      el = document.createElement("span");
+      el.className = cell.truncationEligible ? "seg trunc" : "seg";
+      el.textContent = cell.text;
+      el.title = cell.text;
+      el.addEventListener("dblclick", function (ev) {
+        ev.stopPropagation();
+        post({ type: "segmentDoubleClick", rowIndex: row.rowIndex, segmentIndex: cell.segmentIndex });
+      });
+    } else if (cell.kind === "arrow") {
+      el = document.createElement("span");
+      el.className = "arrow";
+      el.textContent = "→";
+    } else {
+      el = document.createElement("span");
+      el.className = "aff";
+      el.textContent = cell.kind === "plus" ? "+" : "−";
+      el.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        post({ type: "affordanceToggle", rowIndex: row.rowIndex });
+      });
+    }
+    return el;
+  }
+
+  function makeRow(row) {
+    var rowEl = document.createElement("div");
+    rowEl.className = row.selected && state.selectedSubfolderIndex < 0 ? "row selected" : "row";
+    var crumbs = document.createElement("div");
+    crumbs.className = "crumbs";
+    row.cells.forEach(function (cell) { crumbs.appendChild(makeCell(row, cell)); });
+    rowEl.appendChild(crumbs);
+    var pct = document.createElement("span");
+    pct.className = "pct";
+    pct.textContent = row.percentText;
+    rowEl.appendChild(pct);
+    rowEl.addEventListener("click", function () {
+      post({ type: "selectionChange", rowIndex: row.rowIndex });
+    });
+    return rowEl;
+  }
+
+  function makeSubfolders(row) {
+    var subs = document.createElement("div");
+    subs.className = "subs";
+    row.subfolders.forEach(function (sub, i) {
+      var subEl = document.createElement("div");
+      subEl.className =
+        row.selected && state.selectedSubfolderIndex === i ? "sub selected" : "sub";
+      var name = document.createElement("span");
+      name.className = "seg";
+      name.textContent = sub.displayName;
+      name.title = sub.folderPath;
+      subEl.appendChild(name);
+      subEl.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        post({ type: "selectionChange", rowIndex: row.rowIndex, subfolderIndex: i });
+      });
+      subs.appendChild(subEl);
+    });
+    return subs;
+  }
+
+  function render() {
+    list.textContent = "";
+    state.rows.forEach(function (row) {
+      list.appendChild(makeRow(row));
+      if (row.leafExpanded && row.subfolders.length > 0) {
+        list.appendChild(makeSubfolders(row));
+      }
+    });
+  }
+
+  function onArrow(direction) {
+    var row = selectedRow();
+    var canRight =
+      row !== null && (row.collapsed || (!row.leafExpanded && rowHasOpenAffordance(row)));
+    var canLeft = row !== null && row.leafExpanded;
+    var can = direction === "right" ? canRight : canLeft;
+    // FR-6: an arrow the breadcrumb cannot consume is reported so the host can run the legacy
+    // fall-through behavior (Right -> Pop Out/Enumerate dialog; Left -> close/collapse).
+    post(can ? { type: "arrowKey", direction: direction } : { type: "unhandledArrow", direction: direction });
+  }
+
+  list.addEventListener("keydown", function (ev) {
+    if (ev.key === "ArrowRight") { ev.preventDefault(); onArrow("right"); }
+    else if (ev.key === "ArrowLeft") { ev.preventDefault(); onArrow("left"); }
+  });
+
+  window.addEventListener("focus", function () { list.focus(); });
+
+  if (window.chrome && window.chrome.webview) {
+    window.chrome.webview.addEventListener("message", function (ev) {
+      var msg = ev.data;
+      if (!msg || typeof msg.type !== "string") { return; }
+      if (msg.type === "render") {
+        state.rows = msg.rows || [];
+        var sel = selectedRow();
+        state.selectedRowIndex = sel ? sel.rowIndex : -1;
+        render();
+      } else if (msg.type === "themeChange") {
+        document.documentElement.setAttribute(
+          "data-theme",
+          msg.theme === "dark" ? "dark" : "light"
+        );
+      } else if (msg.type === "selectionChange") {
+        state.selectedSubfolderIndex =
+          typeof msg.subfolderIndex === "number" ? msg.subfolderIndex : -1;
+      }
+      // subfolderResponse payloads are folded into the accompanying render message; error
+      // messages are surfaced host-side and intentionally not rendered in the page.
+    });
+  }
+})();
+</script>
+</body>
+</html>

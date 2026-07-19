@@ -77,10 +77,19 @@ chain; the PreToolUse hook `.claude/hooks/enforce-epic-invocation-origin.ps1` de
 
 ## Prepared-Epic Execution (epic-planner Handoff)
 
-When the epic was prepared by `epic-planner` (the integration branch already exists and
-`docs/features/epics/<epic-slug>/epic-kickoff.md` is present), each child feature folder already
-contains its issue, research, `spec.md`, `user-story.md`, an approved atomic plan, and a
-recorded preflight clearance. In that case:
+When the epic was prepared by `epic-planner`, the integration branch
+`epic/<epic-slug>-integration` already exists and carries the committed kickoff artifact and
+every prepared child feature folder. Because `epic-plan` commits those outputs to the integration
+branch (worked in a separate integration worktree), do not assume they are present in the invoking
+worktree: establish their presence by fetching and reading from the integration branch rather than
+gating on a local checkout. Run `git fetch origin epic/<epic-slug>-integration`, then read
+`docs/features/epics/<epic-slug>/epic-kickoff.md` from that ref — for example
+`git show origin/epic/<epic-slug>-integration:docs/features/epics/<epic-slug>/epic-kickoff.md`, or
+test existence with
+`git cat-file -e epic/<epic-slug>-integration:docs/features/epics/<epic-slug>/epic-kickoff.md` —
+without checking the integration branch out into the invoking worktree. Once the integration branch
+is fetched, each child feature folder on it already contains its issue, research, `spec.md`,
+`user-story.md`, an approved atomic plan, and a recorded preflight clearance. In that case:
 
 1. Do not recreate the integration branch; fetch and reuse it.
 2. Each child `Agent(orchestrator)` delegation prompt cites the child's committed `plan-path`

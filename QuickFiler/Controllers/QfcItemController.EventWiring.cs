@@ -45,8 +45,9 @@ namespace QuickFiler.Controllers
                         _kbdHandler.KeyboardHandler_KeyDownAsync
                     );
                 },
-                //new List<Control> { _itemViewer.CboFolders, _itemViewer.TxtboxSearch, _itemViewer.TopicThread });
-                new List<Control> { ((ItemViewer)_itemViewer).CboFolders } // concrete-bound seam (P2-T4): control-host path, runs on real ItemViewer during init
+                // #351: the breadcrumb WebView2 replaced CboFolders; keep it excluded from the
+                // blanket key wiring exactly as the ComboBox was (its keys route via the bridge).
+                new List<Control> { ((ItemViewer)_itemViewer).L0vhBreadcrumb_WebView2 } // concrete-bound seam (P2-T4): control-host path, runs on real ItemViewer during init
             );
 
             foreach (var btn in Buttons)
@@ -80,7 +81,8 @@ namespace QuickFiler.Controllers
             _itemViewer.FolderKeyDown += new System.Windows.Forms.KeyEventHandler(
                 _kbdHandler.CboFolders_KeyDownAsync
             );
-            //_itemViewer.CboFolders.KeyDown += new System.Windows.Forms.KeyEventHandler(_kbdHandler.CboFolders_KeyDown);
+            // #351: FolderSelectionChanged is now raised by the breadcrumb bridge coordinator
+            // (synthetic .NET event) instead of the removed ComboBox; the wiring is unchanged.
             _itemViewer.FolderSelectionChanged += this.CboFolders_SelectedIndexChanged;
             _itemViewer.WebViewInitializationCompleted +=
                 WebView2Control_CoreWebView2InitializationCompleted;

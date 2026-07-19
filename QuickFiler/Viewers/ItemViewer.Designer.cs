@@ -30,6 +30,7 @@ namespace QuickFiler
         /// </summary>
         private void InitializeComponent()
         {
+            Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties1 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
             Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties coreWebView2CreationProperties2 = new Microsoft.Web.WebView2.WinForms.CoreWebView2CreationProperties();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ItemViewer));
             SVGControl.SvgResource svgResource7 = new SVGControl.SvgResource();
@@ -42,7 +43,7 @@ namespace QuickFiler
             this._moveOptionsStrip = new System.Windows.Forms.MenuStrip();
             this._moveOptionsMenu = new System.Windows.Forms.ToolStripMenuItem();
             this._lblAcSearch = new System.Windows.Forms.Label();
-            this._cboFolders = new System.Windows.Forms.ComboBox();
+            this._l0vhBreadcrumb_WebView2 = new Microsoft.Web.WebView2.WinForms.WebView2();
             this._lblSearch = new System.Windows.Forms.Label();
             this._txtboxSearch = new System.Windows.Forms.TextBox();
             this._l0v2h2_WebView2 = new Microsoft.Web.WebView2.WinForms.WebView2();
@@ -86,6 +87,7 @@ namespace QuickFiler
             this._l0vh_Tlp.SuspendLayout();
             this._moveOptionsStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._l0v2h2_WebView2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this._l0vhBreadcrumb_WebView2)).BeginInit();
             this._l1h0L2hv3h_TlpBodyToggle.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._topicThread)).BeginInit();
             this._l1h1L2v1h3Panel.SuspendLayout();
@@ -111,7 +113,7 @@ namespace QuickFiler
             this._l0vh_Tlp.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 325F));
             this._l0vh_Tlp.Controls.Add(this._moveOptionsStrip, 12, 0);
             this._l0vh_Tlp.Controls.Add(this._lblAcSearch, 11, 2);
-            this._l0vh_Tlp.Controls.Add(this._cboFolders, 13, 4);
+            this._l0vh_Tlp.Controls.Add(this._l0vhBreadcrumb_WebView2, 13, 4);
             this._l0vh_Tlp.Controls.Add(this._lblSearch, 12, 2);
             this._l0vh_Tlp.Controls.Add(this._txtboxSearch, 13, 2);
             this._l0vh_Tlp.Controls.Add(this._l0v2h2_WebView2, 1, 5);
@@ -185,23 +187,26 @@ namespace QuickFiler
             this._lblAcSearch.Size = new System.Drawing.Size(20, 19);
             this._lblAcSearch.TabIndex = 10;
             this._lblAcSearch.Text = "S";
-            // 
-            // CboFolders
-            // 
-            this._l0vh_Tlp.SetColumnSpan(this._cboFolders, 2);
-            this._cboFolders.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._cboFolders.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
-            this._cboFolders.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this._cboFolders.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this._cboFolders.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.CboFolders_DrawItem);
-            this._cboFolders.MouseDown += new System.Windows.Forms.MouseEventHandler(this.CboFolders_MouseDown);
-            this._cboFolders.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this._cboFolders.FormattingEnabled = true;
-            this._cboFolders.Location = new System.Drawing.Point(807, 64);
-            this._cboFolders.Margin = new System.Windows.Forms.Padding(0, 4, 0, 0);
-            this._cboFolders.Name = "CboFolders";
-            this._cboFolders.Size = new System.Drawing.Size(391, 25);
-            this._cboFolders.TabIndex = 42;
+            //
+            // L0vhBreadcrumb_WebView2
+            //
+            this._l0vhBreadcrumb_WebView2.AllowExternalDrop = true;
+            this._l0vh_Tlp.SetColumnSpan(this._l0vhBreadcrumb_WebView2, 2);
+            coreWebView2CreationProperties1.AdditionalBrowserArguments = null;
+            coreWebView2CreationProperties1.BrowserExecutableFolder = null;
+            coreWebView2CreationProperties1.IsInPrivateModeEnabled = null;
+            coreWebView2CreationProperties1.Language = null;
+            coreWebView2CreationProperties1.ProfileName = null;
+            coreWebView2CreationProperties1.UserDataFolder = null;
+            this._l0vhBreadcrumb_WebView2.CreationProperties = coreWebView2CreationProperties1;
+            this._l0vhBreadcrumb_WebView2.DefaultBackgroundColor = System.Drawing.Color.Transparent;
+            this._l0vhBreadcrumb_WebView2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._l0vhBreadcrumb_WebView2.Location = new System.Drawing.Point(807, 64);
+            this._l0vhBreadcrumb_WebView2.Margin = new System.Windows.Forms.Padding(0, 4, 0, 0);
+            this._l0vhBreadcrumb_WebView2.Name = "L0vhBreadcrumb_WebView2";
+            this._l0vhBreadcrumb_WebView2.Size = new System.Drawing.Size(391, 25);
+            this._l0vhBreadcrumb_WebView2.TabIndex = 42;
+            this._l0vhBreadcrumb_WebView2.ZoomFactor = 1D;
             // 
             // LblSearch
             // 
@@ -6159,6 +6164,7 @@ namespace QuickFiler
             this._moveOptionsStrip.ResumeLayout(false);
             this._moveOptionsStrip.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._l0v2h2_WebView2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this._l0vhBreadcrumb_WebView2)).EndInit();
             this._l1h0L2hv3h_TlpBodyToggle.ResumeLayout(false);
             this._l1h0L2hv3h_TlpBodyToggle.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._topicThread)).EndInit();
@@ -6205,7 +6211,7 @@ namespace QuickFiler
         internal System.Windows.Forms.Label _lblAcFwd;
         internal ButtonSVG _btnReply;
         internal ButtonSVG _btnReplyAll;
-        internal System.Windows.Forms.ComboBox _cboFolders;
+        internal Microsoft.Web.WebView2.WinForms.WebView2 _l0vhBreadcrumb_WebView2;
         internal System.Windows.Forms.TextBox _txtboxSearch;
         internal System.Windows.Forms.MenuStrip _moveOptionsStrip;
         internal System.Windows.Forms.ToolStripMenuItem _moveOptionsMenu;

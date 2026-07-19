@@ -1,5 +1,7 @@
 # Atomic Executor Memory Index
 
+- [#349 breadcrumb WebView2 gotchas](project_349_breadcrumb_webview2_gotchas.md) — retyped Designer field breaks reflection-injected tests (inject a router instead); aggregate async d__ classes for >=90% proofs; QuickFiler.Test is Newtonsoft-free
+
 - [VS18 build/test toolchain paths](project_vs18_build_toolchain_paths.md) — build with VS **18** full-framework msbuild.exe (not Core .dotnet-sdk, which dies on binary resx MSB3822); nuget.exe restore; MSYS_NO_PATHCONV; csharpier v1 subcommands; dotnet-coverage needs `--` separator
 - [C# canonical coverage artifact conversion](project_csharp_canonical_coverage_artifact_conversion.md) — hook reads artifacts/csharp/coverage.xml as JaCoCo; convert feature Cobertura (dedup lines, per-package counters); first-party aggregate under-counts <85% because uninstrumented assemblies show 0% — defer repo-wide to PR CI per policy-audit §5.4, don't cherry-pick
 
@@ -46,3 +48,4 @@
 - [Changed-line coverage: Cobertura hits vs MS-coverage partial](project_changed_line_coverage_cobertura_vs_mscoverage_partial.md) — null-guard throw-expression lines show "partially covered" in Microsoft.CodeCoverage.Console XML (per-branch) but hits=1 in dotnet-coverage Cobertura (per-hit); use Cobertura per-line data for >=90% changed-line coverage proofs on new null-guards
 - [#328 Rebuild-threading breaks OlObjectsProxy](project_328_rebuild_threading_olobjectsproxy_conflict.md) — threading Parent.Ol.StoresWrapper into AppToDoObjects.Rebuild (#328 P2-T6) fails LoadProjInfoAsync_Rebuilds test; its OlObjectsProxy double stubs only get_App; fix = return null for get_StoresWrapper; add AppToDoObjectsTestDoubles.cs to scope-lock
 - [Swordfish-removal epic: incidental vendored-coverage side effect](project_swordfish_removal_epic_incidental_coverage_sideeffect.md) — deleting a ScoXxx wrapper drops incidental UtilitiesSwordfish/Collections coverage as measured by UtilitiesCS.Test; non-blocking (UtilitiesSwordfish.Test still covers it), expect this on F1/F2/F4/F5 too
+- [TaskVisualization #298 ScoCollection + live-bridge exemptions](project_taskvis_scocollection_and_livebridge_exemptions.md) — ScoCollection<T> forces a Swordfish ProjectReference on test assemblies (Serialize no-ops at empty FilePath); a controller's default-factory live-form bridge must be method-level exempt even under a "never exempt" plan directive
