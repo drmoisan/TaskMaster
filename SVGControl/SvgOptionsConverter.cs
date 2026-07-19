@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -20,7 +21,7 @@ namespace SVGControl
         {
             if (destinationType == typeof(string))
             {
-                SvgImageSelector image = value as SvgImageSelector;
+                SvgImageSelector? image = value as SvgImageSelector;
                 if (image != null)
                 {
                     if (image.AboluteImagePath != null)

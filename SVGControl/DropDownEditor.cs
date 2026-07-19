@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Design;
@@ -18,7 +19,7 @@ namespace SVGControl
     // used by the property grid to display item in edit mode
     public class DropDownEditor : UITypeEditor
     {
-        private IWindowsFormsEditorService _editorService;
+        private IWindowsFormsEditorService? _editorService;
 
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
         {
@@ -32,10 +33,12 @@ namespace SVGControl
             object value
         )
         {
-            IDesignerHost host = provider.GetService(typeof(IDesignerHost)) as IDesignerHost;
+            // Null-forgiving preserves the pre-existing NRE-on-null behavior at
+            // host.RootComponentClassName if the service is unavailable.
+            IDesignerHost host = (provider.GetService(typeof(IDesignerHost)) as IDesignerHost)!;
             string typName = host.RootComponentClassName;
             Type typ = host.GetType(typName);
-            Assembly asm = null;
+            Assembly? asm = null;
             if (typ == null)
             {
                 MessageBox.Show("Please build project before attempting to set this property");

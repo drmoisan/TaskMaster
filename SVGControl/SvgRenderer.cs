@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -31,7 +32,7 @@ namespace SVGControl
         private static int _resolverInstalled;
 
         [ThreadStatic]
-        private static HashSet<string> _resolving;
+        private static HashSet<string>? _resolving;
 
         static SvgRenderer()
         {
@@ -41,7 +42,7 @@ namespace SVGControl
             }
         }
 
-        private static System.Reflection.Assembly ResolveByNameAndKey(
+        private static System.Reflection.Assembly? ResolveByNameAndKey(
             object sender,
             ResolveEventArgs args
         )
@@ -103,7 +104,7 @@ namespace SVGControl
             return null;
         }
 
-        private static bool PublicKeyTokensEqual(byte[] a, byte[] b)
+        private static bool PublicKeyTokensEqual(byte[]? a, byte[]? b)
         {
             if (a == null || b == null)
             {
@@ -125,7 +126,10 @@ namespace SVGControl
 
         public SvgRenderer(byte[] doc, Size size, AutoSize autoSize)
         {
-            _doc = GetSvgDocument(doc);
+            // GetSvgDocument is annotated SvgDocument? because it swallows load failures and
+            // returns null; this call site preserves pre-existing behavior (assume success and
+            // let a genuine failure surface as an NRE from Draw(), as it always has).
+            _doc = GetSvgDocument(doc)!;
             _original = _doc.Draw().Size;
             _margin = new Padding(0);
             Size = CalcInnerSize(size, _margin);
@@ -134,7 +138,8 @@ namespace SVGControl
 
         public SvgRenderer(byte[] doc, Size size, Padding margin, AutoSize autoSize)
         {
-            _doc = GetSvgDocument(doc);
+            // See the other byte[]-doc constructor above for the rationale on the `!`.
+            _doc = GetSvgDocument(doc)!;
             _original = _doc.Draw().Size;
             _margin = margin;
             Size = CalcInnerSize(size, _margin);
@@ -171,7 +176,7 @@ namespace SVGControl
         private Size _outer;
         private Size _original;
         private Padding _margin;
-        private SvgDocument _doc;
+        private SvgDocument? _doc;
         private AutoSize _autoSize;
         private Size _size;
 
@@ -215,7 +220,7 @@ namespace SVGControl
         }
 
         [NotifyParentProperty(true)]
-        public SvgDocument Document
+        public SvgDocument? Document
         {
             get => _doc;
             set
@@ -223,7 +228,10 @@ namespace SVGControl
                 _doc = value;
                 if (value != null)
                 {
-                    _original = _doc.Draw().Size;
+                    // _doc == value here (just assigned above); the null-forgiving operator
+                    // reflects the guard on `value` that the compiler cannot see through the
+                    // field assignment.
+                    _original = _doc!.Draw().Size;
                 }
                 NotifyPropertyChanged();
             }
@@ -236,7 +244,7 @@ namespace SVGControl
             return new Size(innerWidth, innerHeight);
         }
 
-        public Bitmap Render()
+        public Bitmap? Render()
         {
             if (_doc == null)
             {
@@ -273,8 +281,10 @@ namespace SVGControl
 
         private void AddMargins(int widthCurrent, int heightCurrent)
         {
+            // _doc is expected to be set by the time this (currently unreferenced) helper runs;
+            // preserves the pre-existing implicit non-null assumption in this method.
             var group = new SvgGroup();
-            _doc.Children.Add(group);
+            _doc!.Children.Add(group);
             group.Children.Add(
                 new SvgRectangle
                 {
@@ -317,7 +327,7 @@ namespace SVGControl
             return proportions;
         }
 
-        public static SvgDocument GetSvgDocument(byte[] file)
+        public static SvgDocument? GetSvgDocument(byte[] file)
         {
             Stream stream = new MemoryStream(file);
             try
@@ -332,7 +342,7 @@ namespace SVGControl
 
         #region EventHandlers
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {

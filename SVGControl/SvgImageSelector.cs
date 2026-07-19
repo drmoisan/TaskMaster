@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -52,13 +53,13 @@ namespace SVGControl
         }
 
         //private SvgDocument _doc;
-        private string _relativeImagePath;
-        private string _absoluteImagePath;
+        private string? _relativeImagePath;
+        private string? _absoluteImagePath;
         private bool _saveRendering = false;
         private bool _useDefaultImage = false;
         private SvgRenderer _renderer;
 
-        internal String AboluteImagePath
+        internal String? AboluteImagePath
         {
             get { return _absoluteImagePath; }
         }
@@ -77,7 +78,14 @@ namespace SVGControl
                 }
                 else
                 {
-                    return _relativeImagePath;
+                    // The `set` accessor below is currently entirely commented out (a
+                    // functional no-op), so _relativeImagePath is never actually assigned by
+                    // this class today. The null-forgiving operator preserves the pre-existing
+                    // behavior of returning whatever _relativeImagePath currently holds
+                    // (including null) rather than introducing a `?? "(none)"` or other
+                    // fallback, which would change the observable return value on this path.
+                    // See docs/features/active/utilitiescs-nullable-svgcontrol/evidence/other/imagepath-judgment-call-decision.md.
+                    return _relativeImagePath!;
                 }
             }
             set
@@ -102,10 +110,10 @@ namespace SVGControl
             }
         }
 
-        private ISvgResource _svgResource = null;
+        private ISvgResource? _svgResource = null;
 
         [Editor(typeof(DropDownEditor), typeof(UITypeEditor))]
-        public ISvgResource ResourceName
+        public ISvgResource? ResourceName
         {
             get => _svgResource;
             set
@@ -127,7 +135,12 @@ namespace SVGControl
                     else
                     {
                         _svgResource = value;
-                        _renderer.Document = SvgRenderer.GetSvgDocument(value.Data);
+                        // value.Data is nullable (ISvgResource.Data); GetSvgDocument's `file`
+                        // parameter is not, preserving the pre-existing behavior of passing
+                        // whatever Data currently holds through unchanged (a genuinely-null
+                        // Data would fail downstream exactly as it did before nullable
+                        // annotations were introduced).
+                        _renderer.Document = SvgRenderer.GetSvgDocument(value.Data!);
                     }
                     NotifyPropertyChanged("ResourceName");
                 }
@@ -165,7 +178,7 @@ namespace SVGControl
             set => _renderer.Margin = value;
         }
 
-        public Bitmap Render() => _renderer.Render();
+        public Bitmap? Render() => _renderer.Render();
 
         public bool UseDefaultImage
         {
@@ -210,7 +223,9 @@ namespace SVGControl
                         // Saves the Image via a FileStream created by the OpenFile method.
                         using FileStream fs = (System.IO.FileStream)saveFileDialog1.OpenFile();
                         {
-                            Image image = Render();
+                            // The outer guard already confirms _renderer.Document != null, so
+                            // Render() cannot return null here; preserves pre-existing behavior.
+                            Image image = Render()!;
                             // Saves the Image in the appropriate ImageFormat based upon the
                             // File type selected in the dialog box.
                             // NOTE that the FilterIndex property is one-based.
@@ -288,7 +303,7 @@ namespace SVGControl
 
         #region EventHandlers
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         private void Renderer_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {

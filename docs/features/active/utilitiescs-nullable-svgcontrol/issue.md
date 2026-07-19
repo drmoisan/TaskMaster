@@ -61,16 +61,16 @@ behavior-compatible.
 
 ## Acceptance Criteria
 
-- [ ] AC1: Every hand-authored `.cs` file in `SVGControl/` that emits CS86xx carries
+- [x] AC1: Every hand-authored `.cs` file in `SVGControl/` that emits CS86xx carries
   `#nullable enable` and compiles with zero nullable diagnostics under the per-file pragma with
   `TreatWarningsAsErrors`.
-- [ ] AC2: No project-level `<Nullable>` element is introduced into `SVGControl.csproj`, and no
+- [x] AC2: No project-level `<Nullable>` element is introduced into `SVGControl.csproj`, and no
   `<Nullable>` element is introduced at the solution level.
-- [ ] AC3: No behavior change; existing tests still pass.
-- [ ] AC4: No coverage regression on changed lines.
-- [ ] AC5: Public signatures of the remediated control, parser, and converter types remain
+- [x] AC3: No behavior change; existing tests still pass.
+- [x] AC4: No coverage regression on changed lines.
+- [x] AC5: Public signatures of the remediated control, parser, and converter types remain
   behavior-compatible; nullability annotations reflect actual null behavior.
-- [ ] AC6: WinForms `*.Designer.cs` and generated `Properties/Resources.Designer.cs` files remain
+- [x] AC6: WinForms `*.Designer.cs` and generated `Properties/Resources.Designer.cs` files remain
   consistent with the pragma build; any edit to them is mechanical and behavior-preserving.
 
 ## Constraints & Risks
