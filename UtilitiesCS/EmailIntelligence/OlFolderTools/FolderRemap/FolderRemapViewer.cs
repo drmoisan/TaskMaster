@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -24,7 +25,7 @@ namespace UtilitiesCS.EmailIntelligence.FolderRemap
         TreeListView IFolderRemapViewer.TlvOriginal => TlvOriginal;
         FastObjectListView IFolderRemapViewer.OlvMap => OlvMap;
 
-        private FolderRemapController _controller;
+        private FolderRemapController _controller = null!;
 
         public void SetController(FolderRemapController controller)
         {

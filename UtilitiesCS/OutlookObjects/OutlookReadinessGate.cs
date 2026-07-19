@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Runtime.InteropServices;
 using Microsoft.Office.Interop.Outlook;
@@ -79,7 +80,7 @@ namespace UtilitiesCS
         /// the parameterless <see cref="IsReady()"/> pattern exactly, scoped to a specific store;
         /// the folder reference is never retained, so no extra COM object lifetime is created.
         /// </summary>
-        public bool IsReady(Store store)
+        public bool IsReady(Store? store)
         {
             try
             {

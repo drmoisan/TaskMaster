@@ -1,3 +1,4 @@
+#nullable enable
 using System.Runtime.InteropServices;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
@@ -38,7 +39,7 @@ namespace UtilitiesCS
         /// same transient-HRESULT classification (<see cref="IsTransientError"/>).
         /// </summary>
         /// <param name="store">The store to probe. A null store returns <c>false</c>.</param>
-        bool IsReady(Outlook.Store store);
+        bool IsReady(Outlook.Store? store);
 
         /// <summary>
         /// Returns <c>true</c> only for the known transient "not-ready" COM HRESULTs that

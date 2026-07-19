@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -62,7 +63,7 @@ namespace UtilitiesCS.EmailIntelligence
         {
             get;
             protected set;
-        }
+        } = null!;
 
         /// <summary>
         /// The most recent per-resource timing breakdown rendered by
@@ -71,7 +72,7 @@ namespace UtilitiesCS.EmailIntelligence
         /// <see langword="null"/> until <see cref="ReadConfigurationAsync"/> has run once.
         /// Consumed only within the assembly and its test assembly via InternalsVisibleTo.
         /// </summary>
-        internal string LastResourceTimingBreakdown { get; private set; }
+        internal string? LastResourceTimingBreakdown { get; private set; }
 
         internal virtual async Task<
             ConcurrentDictionary<string, SmartSerializableLoader>
@@ -118,7 +119,7 @@ namespace UtilitiesCS.EmailIntelligence
                         logger.Error(
                             $"Error in {nameof(ReadConfigurationAsync)}. Loader for {kvp.Key} is null"
                         );
-                        return new KeyValuePair<string, SmartSerializableLoader>(kvp.Key, null);
+                        return new KeyValuePair<string, SmartSerializableLoader>(kvp.Key, null!);
                     }
                     if (loader.T is not null)
                     {
@@ -239,7 +240,7 @@ namespace UtilitiesCS.EmailIntelligence
         }
 
         internal virtual Task<SmartSerializableLoader> DeserializeLoaderAsync(
-            string serializedLoader
+            string? serializedLoader
         )
         {
             return SmartSerializableLoader.DeserializeAsync(Globals, serializedLoader);

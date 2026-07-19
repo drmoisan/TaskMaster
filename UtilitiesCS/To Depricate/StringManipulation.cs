@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using UtilitiesCS;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -53,10 +54,10 @@ namespace UtilitiesCS
         private IApplicationGlobals _globals;
         private IFilterOlFoldersViewer _viewer;
         private IOutlookFolderTreeService _folderTreeService;
-        private FolderTreeCompatibilityView _folderTreeView;
+        private FolderTreeCompatibilityView? _folderTreeView;
         private bool _disposed;
 
-        internal FolderTreeCompatibilityView FolderTreeView => _folderTreeView;
+        internal FolderTreeCompatibilityView FolderTreeView => _folderTreeView!;
 
         #region Event Handlers
 
@@ -66,7 +67,7 @@ namespace UtilitiesCS
         {
             _viewer.Close();
 
-            var selected = _folderTreeView
+            var selected = _folderTreeView!
                 .Roots.SelectMany(x => x.FlattenIf(info => info.Selected))
                 .Select(info => info.RelativePath);
 
@@ -175,7 +176,7 @@ namespace UtilitiesCS
         //    }
         //};
 
-        internal CheckStatePutterDelegate PutCheckedState;
+        internal CheckStatePutterDelegate PutCheckedState = null!;
 
         internal CheckState PutCheckedStateMethodFiltered(object rowObject, CheckState newValue) =>
             PutCheckedStateMethod(rowObject, newValue, _viewer.TlvFiltered);

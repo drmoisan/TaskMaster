@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Data.OleDb;
 using System.Diagnostics;
@@ -17,7 +18,7 @@ namespace UtilitiesCS.OutlookExtensions
 {
     public static class UserDefinedFields
     {
-        internal static object SafeGetPropertyAccessorValue(
+        internal static object? SafeGetPropertyAccessorValue(
             PropertyAccessor accessor,
             string schema
         )
@@ -56,15 +57,17 @@ namespace UtilitiesCS.OutlookExtensions
         public static UserProperty GetUdf(this MailItem item, string fieldName) =>
             item.UserProperties.Find(fieldName);
 
-        public static string GetUdfString(this MailItem item, string fieldName) =>
+        public static string? GetUdfString(this MailItem item, string fieldName) =>
             item.GetUdf(fieldName).GetUdfString();
 
-        public static string GetUdfString(this IOutlookItem item, string fieldName) =>
+        public static string? GetUdfString(this IOutlookItem item, string fieldName) =>
             item.GetUdf(fieldName).GetUdfString();
 
-        public static string GetUdfString(this UserProperty property)
+        public static string? GetUdfString(this UserProperty property)
         {
-            object value = property.GetUdfValue(OlUserPropertyType.olText, true);
+            // GetUdfValue with olText always returns a non-null object ("" fallback or a non-null
+            // property value), so the null-forgiving operator reflects that guaranteed invariant.
+            object value = property.GetUdfValue(OlUserPropertyType.olText, true)!;
             if (value.IsArray<string>())
             {
                 return string.Join(", ", (string[])value);
@@ -75,7 +78,7 @@ namespace UtilitiesCS.OutlookExtensions
             }
         }
 
-        public static T GetUdfValue<T>(this UserProperty property, bool flatten = true)
+        public static T? GetUdfValue<T>(this UserProperty property, bool flatten = true)
         {
             if ((property is null) || (property.Value is null))
                 return default(T);
@@ -87,7 +90,7 @@ namespace UtilitiesCS.OutlookExtensions
             return (T)result;
         }
 
-        public static object GetUdfValue(
+        public static object? GetUdfValue(
             this UserProperty property,
             OlUserPropertyType olFieldType = OlUserPropertyType.olText,
             bool flatten = true
@@ -95,7 +98,7 @@ namespace UtilitiesCS.OutlookExtensions
         {
             if ((property != null) && (property.Value != null))
             {
-                object result = property.Value;
+                object result = property!.Value!;
                 if (result.IsArray())
                 {
                     result = (object)result.FlattenArrayTree<string>();
@@ -119,7 +122,7 @@ namespace UtilitiesCS.OutlookExtensions
             }
         }
 
-        public static object GetUdfValue(
+        public static object? GetUdfValue(
             this IOutlookItem item,
             string fieldName,
             OlUserPropertyType olFieldType = OlUserPropertyType.olText,
@@ -130,7 +133,7 @@ namespace UtilitiesCS.OutlookExtensions
             return property.GetUdfValue(olFieldType, flatten);
         }
 
-        public static T GetUdfValue<T>(
+        public static T? GetUdfValue<T>(
             this IOutlookItem item,
             string fieldName,
             OlUserPropertyType olFieldType = OlUserPropertyType.olText,
@@ -148,7 +151,7 @@ namespace UtilitiesCS.OutlookExtensions
         /// <param name="accessor"></param>
         /// <param name="schema"></param>
         /// <returns>Value from Field or null</returns>
-        public static object TryGetProperty(this PropertyAccessor accessor, string schema)
+        public static object? TryGetProperty(this PropertyAccessor accessor, string schema)
         {
             try
             {
@@ -168,7 +171,7 @@ namespace UtilitiesCS.OutlookExtensions
         /// <param name="accessor"></param>
         /// <param name="schema">Schema of the property to access</param>
         /// <returns>Typed value from the field or default value if the property does not exist or is not of the specified type</returns>
-        public static T TryGetProperty<T>(this PropertyAccessor accessor, string schema)
+        public static T? TryGetProperty<T>(this PropertyAccessor accessor, string schema)
         {
             try
             {
@@ -214,7 +217,7 @@ namespace UtilitiesCS.OutlookExtensions
         /// <returns>true if exists. false if it does not exist</returns>
         public static bool UdfExists(this IOutlookItem item, string fieldName)
         {
-            UserProperty objProperty = null;
+            UserProperty? objProperty = null;
             try
             {
                 objProperty = item.UserProperties.Find(fieldName);
@@ -312,7 +315,7 @@ namespace UtilitiesCS.OutlookExtensions
             var oPA = olItem.PropertyAccessor;
             var arrErrors = oPA.SetProperties(schemasNames, values);
             var errors = arrErrors as object[];
-            if (!errors.IsNullOrEmpty())
+            if (!errors!.IsNullOrEmpty())
             {
                 //logger.Debug($"Errors in setting properties: {string.Join(", ", errors)}");
             }
@@ -528,14 +531,14 @@ namespace UtilitiesCS.OutlookExtensions
         }
 
         [Obsolete("Use GetUdfString with OutlookItem instead")]
-        public static string GetUdfString(this object item, string fieldName)
+        public static string? GetUdfString(this object item, string fieldName)
         {
             UserProperty property = item.GetUdf(fieldName);
             return property.GetUdfString();
         }
 
         [Obsolete("Use GetUdfValue with OutlookItem instead")]
-        public static object GetUdfValue(
+        public static object? GetUdfValue(
             this object item,
             string fieldName,
             OlUserPropertyType olFieldType = OlUserPropertyType.olText,
