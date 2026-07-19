@@ -194,18 +194,18 @@ kinds, so no `EVIDENCE_LOCATION_OVERRIDE_REJECTED` substitution is required.
 
 ### Phase 6 — Batch F ItemInfo and EmailDetails
 
-- [ ] [P6-T1] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/MailItem/ItemInfo.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P6-T1] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/MailItem/ItemInfo.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P6-T5).
-- [ ] [P6-T2] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/MailItem/EmailDetails.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P6-T2] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/MailItem/EmailDetails.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P6-T5).
-- [ ] [P6-T3] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/MailItem/EmailDetailsWrapper.cs` and mirror `EmailDetails.cs`'s Batch F nullable decisions in the thin `IEmailDetailsWrapper` delegator to reach zero CS86xx
+- [x] [P6-T3] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/MailItem/EmailDetailsWrapper.cs` and mirror `EmailDetails.cs`'s Batch F nullable decisions in the thin `IEmailDetailsWrapper` delegator to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; the `IEmailDetailsWrapper` seam over the static `EmailDetails` extension methods is preserved exactly; zero CS86xx (verified in P6-T5).
-- [ ] [P6-T4] Run CSharpier over the Batch F files (`MailItem/ItemInfo.cs`, `MailItem/EmailDetails.cs`, `MailItem/EmailDetailsWrapper.cs`) and confirm no residual formatting diff
+- [x] [P6-T4] Run CSharpier over the Batch F files (`MailItem/ItemInfo.cs`, `MailItem/EmailDetails.cs`, `MailItem/EmailDetailsWrapper.cs`) and confirm no residual formatting diff
   - Acceptance: `csharpier --check .` exits 0 for the touched files.
-- [ ] [P6-T5] Run the pragma-only nullable build and record Batch F verification to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/qa-gates/batch-f-nullable-build.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P6-T5] Run the pragma-only nullable build and record Batch F verification to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/qa-gates/batch-f-nullable-build.<yyyy-MM-ddTHH-mm>.md`
   - Command: `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx for the 3 opted-in Batch F files and NO new diagnostics elsewhere.
-- [ ] [P6-T6] Run the Batch F UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/regression-testing/batch-f-tests.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P6-T6] Run the Batch F UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/regression-testing/batch-f-tests.<yyyy-MM-ddTHH-mm>.md`
   - Command: `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /TestCaseFilter:"FullyQualifiedName~ItemInfo|FullyQualifiedName~EmailDetails"`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` with passed/failed counts; `ItemInfoTests.cs`, legacy `ItemInfo_Tests.cs`, `EmailDetailsTests.cs`, `EmailDetailsWrapperTests.cs` all green and behavior-identical.
 

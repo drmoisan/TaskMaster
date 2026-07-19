@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -29,7 +30,7 @@ namespace UtilitiesCS
         public static string[] Details(
             this MailItem OlMail,
             string emailRootFolder,
-            IScoDictionaryNew<string, string> dictRemap = null
+            IScoDictionaryNew<string, string>? dictRemap = null
         )
         {
             string[] strAry;
@@ -68,7 +69,7 @@ namespace UtilitiesCS
 
         public static string[] Details(
             this MailItemHelper helper,
-            IScoDictionaryNew<string, string> dictRemap = null
+            IScoDictionaryNew<string, string>? dictRemap = null
         )
         {
             string[] strAry;
@@ -305,7 +306,7 @@ namespace UtilitiesCS
         private static string GetEmailFolderPath(
             this MailItem OlMail,
             string emailRootFolder,
-            IScoDictionaryNew<string, string> dictRemap
+            IScoDictionaryNew<string, string>? dictRemap
         )
         {
             Folder OlParent = (Folder)OlMail.Parent;
