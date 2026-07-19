@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,14 +16,14 @@ namespace UtilitiesCS
     {
         public static DataFrame GetInfoDf(this Conversation conversation)
         {
-            Outlook.Table table = conversation.GetInfoTable();
+            Outlook.Table table = conversation.GetInfoTable()!;
             (object[,] data, Dictionary<string, int> columnInfo) = table.ETL();
             var df = data.ToDataFrame(columnInfo.Keys.ToArray());
             df.Display();
             return df;
         }
 
-        public static Table GetInfoTable(this Conversation conversation)
+        public static Table? GetInfoTable(this Conversation conversation)
         {
             Outlook.Table table = conversation.GetTable();
             if (table != null)
@@ -66,8 +67,8 @@ namespace UtilitiesCS
             return data.ToDataFrame(columnInfo.Keys.ToArray());
         }
 
-        public static async Task<DataFrame> GetDataFrameAsync(
-            this Outlook.Conversation conversation,
+        public static async Task<DataFrame?> GetDataFrameAsync(
+            this Outlook.Conversation? conversation,
             CancellationToken token
         )
         {
@@ -107,16 +108,16 @@ namespace UtilitiesCS
             return data.ToDataFrame(columnInfo.Keys.ToArray());
         }
 
-        public static Table GetConversationTable(this Conversation conversation)
+        public static Table GetConversationTable(this Conversation? conversation)
         {
-            Outlook.Table table = conversation.GetTable();
+            Outlook.Table table = conversation!.GetTable();
             table.RemoveColumns(["EntryID"]);
             ConversationColumnSchemas.ForEach(schema => table.Columns.Add(schema));
             return table;
         }
 
-        public static Outlook.Table GetTable(
-            this Outlook.Conversation conversation,
+        public static Outlook.Table? GetTable(
+            this Outlook.Conversation? conversation,
             bool WithFolder,
             bool WithStore
         )
@@ -219,7 +220,7 @@ namespace UtilitiesCS
             return rowString;
         }
 
-        public static Outlook.Conversation GetConversation(this object ObjItem)
+        public static Outlook.Conversation? GetConversation(this object? ObjItem)
         {
             if (ObjItem == null)
             {

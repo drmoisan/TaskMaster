@@ -238,22 +238,22 @@ kinds, so no `EVIDENCE_LOCATION_OVERRIDE_REJECTED` substitution is required.
 
 ### Phase 8 — Batch H ConvHelper Partial-Class Group
 
-- [ ] [P8-T1] Verify the upstream #363 `IEnumerableExtensions.ForEach` contract has landed in `UtilitiesCS/Extensions/IEnumerableExtensions.cs` before annotating this batch
+- [x] [P8-T1] Verify the upstream #363 `IEnumerableExtensions.ForEach` contract has landed in `UtilitiesCS/Extensions/IEnumerableExtensions.cs` before annotating this batch
   - Command: `grep -n "ForEach" UtilitiesCS/Extensions/IEnumerableExtensions.cs`
   - Acceptance: grep output confirms the method exists; if not landed, this task is BLOCKED and must be re-run before proceeding to P8-T4.
-- [ ] [P8-T2] Verify the upstream #364 `PrettyPrint.PrettyText` contract has landed in `UtilitiesCS/HelperClasses/PrettyPrint.cs` before annotating this batch
+- [x] [P8-T2] Verify the upstream #364 `PrettyPrint.PrettyText` contract has landed in `UtilitiesCS/HelperClasses/PrettyPrint.cs` before annotating this batch
   - Command: `grep -n "PrettyText" UtilitiesCS/HelperClasses/PrettyPrint.cs`
   - Acceptance: grep output confirms the method exists; if not landed, this task is BLOCKED (this cluster cannot be fully verified CS86xx-clean until all eight #364 batches are merged upstream, per spec Constraints & Risks) and must be re-run before proceeding to P8-T3/P8-T4.
-- [ ] [P8-T3] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Conversation/ConversationHelper.cs` and annotate `GetMailItemList`, `ConversationCt`, `GetConversationDf`/`GetConversationDfAsync` overloads, `FilterConversation`, and the shared `private static LogConversationTiming` helper's `string details = null` parameter to reach zero CS86xx
+- [x] [P8-T3] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Conversation/ConversationHelper.cs` and annotate `GetMailItemList`, `ConversationCt`, `GetConversationDf`/`GetConversationDfAsync` overloads, `FilterConversation`, and the shared `private static LogConversationTiming` helper's `string details = null` parameter to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified as one unit with `.Formatting.cs` in P8-T6).
-- [ ] [P8-T4] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Conversation/ConversationHelper.Formatting.cs` and consume `LogConversationTiming`'s Batch H nullable-parameter contract and `IEnumerableExtensions.ForEach`/`PrettyPrint.PrettyText` consistently, annotating `GetInfoDf`/`GetInfoTable`, `GetDataFrame`/`GetDataFrameAsync`, `GetConversationTable`, and `PadOrTrunc`/`JoinFixedWidth`/`GetConversation`/`ResolveType`, to reach zero CS86xx
+- [x] [P8-T4] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Conversation/ConversationHelper.Formatting.cs` and consume `LogConversationTiming`'s Batch H nullable-parameter contract and `IEnumerableExtensions.ForEach`/`PrettyPrint.PrettyText` consistently, annotating `GetInfoDf`/`GetInfoTable`, `GetDataFrame`/`GetDataFrameAsync`, `GetConversationTable`, and `PadOrTrunc`/`JoinFixedWidth`/`GetConversation`/`ResolveType`, to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; cross-file call to `LogConversationTiming` uses a consistent nullable parameter annotation; zero CS86xx (verified as one unit in P8-T6).
-- [ ] [P8-T5] Run CSharpier over the Batch H files (`Conversation/ConversationHelper.cs`, `Conversation/ConversationHelper.Formatting.cs`) and confirm no residual formatting diff
+- [x] [P8-T5] Run CSharpier over the Batch H files (`Conversation/ConversationHelper.cs`, `Conversation/ConversationHelper.Formatting.cs`) and confirm no residual formatting diff
   - Acceptance: `csharpier --check .` exits 0 for the touched files.
-- [ ] [P8-T6] Run the pragma-only nullable build and record Batch H verification to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/qa-gates/batch-h-nullable-build.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P8-T6] Run the pragma-only nullable build and record Batch H verification to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/qa-gates/batch-h-nullable-build.<yyyy-MM-ddTHH-mm>.md`
   - Command: `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx across both `ConvHelper` partial-class files as one unit and NO new diagnostics elsewhere.
-- [ ] [P8-T7] Run the Batch H UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/regression-testing/batch-h-tests.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P8-T7] Run the Batch H UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/regression-testing/batch-h-tests.<yyyy-MM-ddTHH-mm>.md`
   - Command: `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /TestCaseFilter:"FullyQualifiedName~ConversationHelper"`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` with passed/failed counts; `ConversationHelperAsyncTests.cs`, `ConversationHelperTests.cs`, `ConversationHelper_ExtendedTests.cs` all green and behavior-identical.
 
