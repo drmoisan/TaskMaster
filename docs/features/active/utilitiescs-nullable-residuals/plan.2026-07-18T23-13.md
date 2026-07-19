@@ -86,11 +86,11 @@ Test-assembly resolution rule: the `UtilitiesCS.Test` assembly resolves at execu
 
 ### Phase 5 — Batch 4 OneDrive Helpers
 
-- [ ] [P5-T1] Add `#nullable enable` to `UtilitiesCS/OneDriveHelpers/AngleSharpParsedEmailBody.cs`; annotate `Html` to `string?`, `Links`/`FilteredLinks` to `IEnumerable<(string,string)>?`, `FilterLinksByDomain` return to the corresponding `...?`, and set the setter-assigned `_parser` to `= null!` (or annotate); preserve the `Links ??=` guard.
+- [x] [P5-T1] Add `#nullable enable` to `UtilitiesCS/OneDriveHelpers/AngleSharpParsedEmailBody.cs`; annotate `Html` to `string?`, `Links`/`FilteredLinks` to `IEnumerable<(string,string)>?`, `FilterLinksByDomain` return to the corresponding `...?`, and set the setter-assigned `_parser` to `= null!` (or annotate); preserve the `Links ??=` guard.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; no new runtime guard.
-- [ ] [P5-T2] Add `#nullable enable` to `UtilitiesCS/OneDriveHelpers/OneDriveDownloader.cs`; change `TryGetUrlStreamAsync` and `TryGetFileStreamWriter` returns to `Task<Stream?>` (callers already null-check); set `_client`/`_clientGetAsync` to `= null!` (behavior-preserving); add NO null handling around `response.IsSuccessStatusCode` or the returned stream because `TimeOutTask.RunWithTimeout` returns non-null `Task<TResult>` (#369) and `StreamExtensions.TryCopyToAsyncWithTimeout` returns `Task<bool>` (#363); preserve the existing `?.Dispose()`.
+- [x] [P5-T2] Add `#nullable enable` to `UtilitiesCS/OneDriveHelpers/OneDriveDownloader.cs`; change `TryGetUrlStreamAsync` and `TryGetFileStreamWriter` returns to `Task<Stream?>` (callers already null-check); set `_client`/`_clientGetAsync` to `= null!` (behavior-preserving); add NO null handling around `response.IsSuccessStatusCode` or the returned stream because `TimeOutTask.RunWithTimeout` returns non-null `Task<TResult>` (#369) and `StreamExtensions.TryCopyToAsyncWithTimeout` returns `Task<bool>` (#363); preserve the existing `?.Dispose()`.
   - Acceptance: file carries `#nullable enable`; pragma-only rebuild reports zero CS86xx; annotations are consistent with the pinned #363/#369 return types (AC5); no new runtime guard.
-- [ ] [P5-T3] Run the pragma-only rebuild and record Batch 4 verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/batch4-pragma-verify.<timestamp>.md`.
+- [x] [P5-T3] Run the pragma-only rebuild and record Batch 4 verification to `docs/features/active/utilitiescs-nullable-residuals/evidence/other/batch4-pragma-verify.<timestamp>.md`.
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx across the two OneDrive files.
 
 ### Phase 6 — Batch 5 EmailIntelligence Data Types

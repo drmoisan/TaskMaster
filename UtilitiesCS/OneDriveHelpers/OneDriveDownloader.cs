@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,21 +24,21 @@ namespace UtilitiesCS.OneDriveHelpers
             ClientGetAsync = Client.GetAsync;
         }
 
-        protected HttpClient _client;
+        protected HttpClient _client = null!;
         public virtual HttpClient Client
         {
             get => _client;
             protected set => _client = value;
         }
 
-        protected Func<string, CancellationToken, Task<HttpResponseMessage>> _clientGetAsync;
+        protected Func<string, CancellationToken, Task<HttpResponseMessage>> _clientGetAsync = null!;
         public virtual Func<string, CancellationToken, Task<HttpResponseMessage>> ClientGetAsync
         {
             get => _clientGetAsync;
             protected set => _clientGetAsync = value;
         }
 
-        public async Task<Stream> TryGetUrlStreamAsync(
+        public async Task<Stream?> TryGetUrlStreamAsync(
             string url,
             int timeoutMs,
             CancellationToken cancel
@@ -79,7 +80,7 @@ namespace UtilitiesCS.OneDriveHelpers
             contentStream?.Dispose();
         }
 
-        public virtual async Task<Stream> TryGetFileStreamWriter(
+        public virtual async Task<Stream?> TryGetFileStreamWriter(
             string destinationPath,
             int timeoutMs,
             CancellationToken cancel

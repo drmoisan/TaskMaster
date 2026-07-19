@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -27,14 +28,14 @@ namespace UtilitiesCS.OneDriveHelpers
             _document = new Lazy<IHtmlDocument>(() => Parser.ParseDocument(html));
         }
 
-        private string _html;
-        public string Html
+        private string? _html;
+        public string? Html
         {
             get => _html;
             set => _html = value;
         }
 
-        private HtmlParser _parser;
+        private HtmlParser _parser = null!;
         public HtmlParser Parser
         {
             get => _parser;
@@ -48,15 +49,15 @@ namespace UtilitiesCS.OneDriveHelpers
             protected set => _document = value.ToLazy();
         }
 
-        private IEnumerable<(string, string)> _links;
-        public virtual IEnumerable<(string, string)> Links
+        private IEnumerable<(string, string)>? _links;
+        public virtual IEnumerable<(string, string)>? Links
         {
             get => _links;
             protected set => _links = value;
         }
 
-        private IEnumerable<(string, string)> _filteredLinks;
-        public IEnumerable<(string, string)> FilteredLinks
+        private IEnumerable<(string, string)>? _filteredLinks;
+        public IEnumerable<(string, string)>? FilteredLinks
         {
             get => _filteredLinks;
             protected set => _filteredLinks = value;
@@ -72,7 +73,7 @@ namespace UtilitiesCS.OneDriveHelpers
             return this;
         }
 
-        public AngleSharpParsedEmailBody FilterLinksByDomain(string domain)
+        public AngleSharpParsedEmailBody? FilterLinksByDomain(string domain)
         {
             Links ??= ExtractLinks().Links;
             if (Links is null)
