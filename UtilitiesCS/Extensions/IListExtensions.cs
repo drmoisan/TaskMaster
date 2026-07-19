@@ -8,6 +8,8 @@ using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS
 {
+#nullable enable
+
     public static class IListExtensions
     {
         public static void AddRange<T>(this IList<T> list, IEnumerable<T> items)
@@ -27,7 +29,7 @@ namespace UtilitiesCS
             }
         }
 
-        public static bool TryAddRange<T>(this IList<T> list, IEnumerable<T> items)
+        public static bool TryAddRange<T>(this IList<T>? list, IEnumerable<T>? items)
         {
             if (list is null || items is null)
             {
@@ -75,7 +77,7 @@ namespace UtilitiesCS
             return list.FindIndex(match) != -1;
         }
 
-        public static T Find<T>(this IList<T> list, Predicate<T> match)
+        public static T? Find<T>(this IList<T> list, Predicate<T> match)
         {
             var index = list.FindIndex(0, list.Count, match);
             if (index == -1)
@@ -89,8 +91,8 @@ namespace UtilitiesCS
         }
 
         public static (int DifferenceCount, IList<T> OnlyThis, IList<T> OnlyOther) CompareTo<T>(
-            this IList<T> list,
-            IList<T> other
+            this IList<T>? list,
+            IList<T>? other
         )
         {
             if (list is null)
@@ -232,7 +234,7 @@ namespace UtilitiesCS
             return max;
         }
 
-        public static bool TryFindMax<T>(this IList<T> list, Func<T, T, T> selector, out T max)
+        public static bool TryFindMax<T>(this IList<T> list, Func<T, T, T> selector, out T? max)
         {
             max = default;
             if (list.IsNullOrEmpty() || selector is null)
@@ -251,12 +253,12 @@ namespace UtilitiesCS
             return true;
         }
 
-        public static bool IsNullOrEmpty(this IList<string> list) =>
+        public static bool IsNullOrEmpty(this IList<string>? list) =>
             list is null || list.Count == 0;
 
         public static (IList<T> Unique, IList<T> Duplicates) Split<T>(
-            this IList<T> list,
-            IEqualityComparer<T> comparer
+            this IList<T>? list,
+            IEqualityComparer<T>? comparer
         )
         {
             if (list == null)

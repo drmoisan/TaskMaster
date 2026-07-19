@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,11 @@ namespace UtilitiesCS.NewtonsoftHelpers
         where TDerived : ScDictionary<TKey, TValue>
     {
         public ConcurrentDictionary<TKey, TValue> ConcurrentDictionary { get; set; }
-        public object RemainingObject { get; set; }
+
+        // [JsonProperty] deserialization target; annotated null! to preserve the non-null
+        // contract consumers rely on (the code guards it with RemainingObject.ThrowIfNull()
+        // before use). Behavior unchanged.
+        public object RemainingObject { get; set; } = null!;
 
         public WrapperScDictionary()
         {
@@ -317,7 +322,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
         )
         {
             //Type[] method_arguments = null;
-            Type[] type_arguments = null;
+            Type[]? type_arguments = null;
             var oldSetMethod = property.GetSetMethod();
             if (oldSetMethod == null)
             {
@@ -345,7 +350,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
             {
                 if (instruction.OpCode == OpCodes.Ldfld || instruction.OpCode == OpCodes.Stfld)
                 {
-                    var bf = (FieldInfo)instruction.Operand;
+                    var bf = (FieldInfo)instruction.Operand!;
                     //FieldBuilder fieldBuilder;
                     if (!backingFields.TryGetValue(bf.Name, out var fieldBuilder))
                     {
@@ -357,7 +362,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
                 }
                 else if (instruction.OpCode == OpCodes.Callvirt)
                 {
-                    var method = (MethodInfo)instruction.Operand;
+                    var method = (MethodInfo)instruction.Operand!;
                     setIl.Emit(instruction.OpCode, method);
                 }
                 else if (instruction.Operand is not null)
@@ -382,7 +387,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
         )
         {
             //Type[] method_arguments = null;
-            Type[] type_arguments = null;
+            Type[]? type_arguments = null;
             var oldGetMethod = property.GetGetMethod();
             if (oldGetMethod == null)
             {
@@ -410,7 +415,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
             {
                 if (instruction.OpCode == OpCodes.Ldfld || instruction.OpCode == OpCodes.Stfld)
                 {
-                    var bf = (FieldInfo)instruction.Operand;
+                    var bf = (FieldInfo)instruction.Operand!;
                     //FieldBuilder fieldBuilder;
                     if (!backingFields.TryGetValue(bf.Name, out var fieldBuilder))
                     {
@@ -422,7 +427,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
                 }
                 else if (instruction.OpCode == OpCodes.Callvirt)
                 {
-                    var method = (MethodInfo)instruction.Operand;
+                    var method = (MethodInfo)instruction.Operand!;
                     getIl.Emit(instruction.OpCode, method);
                 }
                 else if (instruction.Operand is not null)

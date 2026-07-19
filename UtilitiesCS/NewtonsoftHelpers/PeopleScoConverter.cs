@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.IO;
 using System.Runtime;
 using System.Text;
@@ -12,10 +13,12 @@ namespace ToDoModel.Data_Model.People
     {
         public PeopleScoConverter() { }
 
-        public override PeopleScoDictionaryNew ReadJson(
+        // Registered cross-module contract: ReadJson returns PeopleScoDictionaryNew?
+        // (body is wrapper?.ToDerived()).
+        public override PeopleScoDictionaryNew? ReadJson(
             JsonReader reader,
             Type typeToConvert,
-            PeopleScoDictionaryNew existingValue,
+            PeopleScoDictionaryNew? existingValue,
             bool hasExistingValue,
             JsonSerializer serializer
         )
@@ -28,11 +31,13 @@ namespace ToDoModel.Data_Model.People
 
         public override void WriteJson(
             JsonWriter writer,
-            PeopleScoDictionaryNew value,
+            PeopleScoDictionaryNew? value,
             JsonSerializer serializer
         )
         {
-            var wrapper = new WrapperPeopleScoDictionaryNew().ToComposition(value);
+            // value! preserves behavior: WriteJson receives a non-null value for a registered
+            // converter; ToComposition requires a non-null instance.
+            var wrapper = new WrapperPeopleScoDictionaryNew().ToComposition(value!);
             serializer.Serialize(writer, wrapper);
         }
 

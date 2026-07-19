@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
+#nullable enable
+
     public static class ArrayExtensions
     {
         #region conversion and slicing extensions
@@ -27,7 +29,10 @@ namespace UtilitiesCS
                     }
                     else
                     {
-                        stringArray[i, j] = array[i, j].ToString();
+                        // Element is non-null in this branch (checked above); array
+                        // indexers are not flow-tracked, so the null-forgiving operators
+                        // preserve the original string[,] assignment behavior.
+                        stringArray[i, j] = array[i, j]!.ToString()!;
                     }
                 }
             }
@@ -40,7 +45,10 @@ namespace UtilitiesCS
             string[] stringArray = new string[rowCount];
             for (int i = 0; i < rowCount; i++)
             {
-                stringArray[i] = array[i].ToString();
+                // Preserves the original behavior (NRE on a null element); array indexers
+                // are not flow-tracked, so the null-forgiving operators keep the string[]
+                // assignment contract intact.
+                stringArray[i] = array[i]!.ToString()!;
             }
             return stringArray;
         }
@@ -60,7 +68,10 @@ namespace UtilitiesCS
                     }
                     else
                     {
-                        stringArray[i, j] = array[i, j].ToString();
+                        // Element is non-null in this branch (checked above); array
+                        // indexers are not flow-tracked, so the null-forgiving operators
+                        // preserve the original string[,] assignment behavior.
+                        stringArray[i, j] = array[i, j]!.ToString()!;
                     }
                 }
             }
@@ -79,7 +90,10 @@ namespace UtilitiesCS
                 }
                 else
                 {
-                    stringArray[i] = array[i].ToString();
+                    // Preserves the original behavior (NRE on a null element); array indexers
+                    // are not flow-tracked, so the null-forgiving operators keep the string[]
+                    // assignment contract intact.
+                    stringArray[i] = array[i]!.ToString()!;
                 }
             }
             return stringArray;
@@ -302,14 +316,15 @@ namespace UtilitiesCS
 
         public static T[] FlattenArrayTree<T>(this object node)
         {
-            return FlattenArrayTree<T>(node, true).ToArray();
+            // strict:true guarantees the internal overload returns a non-null List<T>.
+            return FlattenArrayTree<T>(node, true)!.ToArray();
         }
 
-        public static T[] TryFlattenArrayTree<T>(this object node)
+        public static T[]? TryFlattenArrayTree<T>(this object node)
         {
             try
             {
-                return FlattenArrayTree<T>(node, false).ToArray();
+                return FlattenArrayTree<T>(node, false)!.ToArray();
             }
             catch (Exception)
             {
@@ -317,7 +332,7 @@ namespace UtilitiesCS
             }
         }
 
-        internal static List<T> FlattenArrayTree<T>(this object node, bool strict)
+        internal static List<T>? FlattenArrayTree<T>(this object node, bool strict)
         {
             if (strict || node.IsArray() || node is T)
             {
@@ -364,7 +379,9 @@ namespace UtilitiesCS
                 }
                 else
                 {
-                    result.Add(default(T));
+                    // Mirrors the non-strict null-substitution semantics of the tree walk;
+                    // the null-forgiving operator keeps the List<T> element contract intact.
+                    result.Add(default(T)!);
                 }
             }
         }

@@ -10,6 +10,8 @@ using Microsoft.Data.Analysis;
 
 namespace UtilitiesCS
 {
+#nullable enable
+
     public static class DfMLNet
     {
         public static DataFrame ToDataFrame(this object[,] data, string[] columnNames)
@@ -32,7 +34,7 @@ namespace UtilitiesCS
 
         public static DataFrameColumn GetDfColumn(string columnName, object[] columnData)
         {
-            object T = GetFirstNonNull(columnData);
+            object? T = GetFirstNonNull(columnData);
             if (T is string)
             {
                 return new StringDataFrameColumn(
@@ -154,7 +156,7 @@ namespace UtilitiesCS
             }
         }
 
-        internal static object GetFirstNonNull(object[] columnData)
+        internal static object? GetFirstNonNull(object[]? columnData)
         {
             if ((columnData is null) || (columnData.Length == 0))
             {

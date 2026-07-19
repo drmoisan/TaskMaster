@@ -12,11 +12,13 @@ using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS
 {
+#nullable enable
+
     public static class DictionaryExtensions
     {
         public static bool ContentEquals<TKey, TValue>(
-            this Dictionary<TKey, TValue> dictionary,
-            Dictionary<TKey, TValue> otherDictionary
+            this Dictionary<TKey, TValue>? dictionary,
+            Dictionary<TKey, TValue>? otherDictionary
         )
         {
             return (otherDictionary ?? new Dictionary<TKey, TValue>())
@@ -182,7 +184,7 @@ namespace UtilitiesCS
             TKey key,
             Func<TKey, TValue, bool> removeCondition,
             Func<TKey, TValue, TValue> updateValueFactory,
-            out TValue value
+            out TValue? value
         )
         {
             while (dictionary.TryGetValue(key, out value))

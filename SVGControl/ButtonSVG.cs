@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -52,7 +53,7 @@ namespace SVGControl
             //this.Image = ImageSVG.Render();
         }
 
-        public static byte[] ObjectToByteArray(Object obj)
+        public static byte[] ObjectToByteArray(object? obj)
         {
             BinaryFormatter bf = new BinaryFormatter();
             using (var ms = new MemoryStream())
@@ -73,7 +74,7 @@ namespace SVGControl
             //ImageSVG.ResourceNames = names;
         }
 
-        private static string GetStringForValue(object value)
+        private static string GetStringForValue(object? value)
         {
             if (value == null)
                 return "null";

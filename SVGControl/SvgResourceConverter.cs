@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -32,7 +33,10 @@ namespace SVGControl
                 else
                 {
                     ISvgResource resource = (ISvgResource)value;
-                    return resource.Name;
+                    // ISvgResource.Name is nullable (SvgResource's parameterless constructor
+                    // never assigns it); this preserves the pre-existing behavior of returning
+                    // whatever Name currently holds, including null, without a new fallback.
+                    return resource.Name!;
                 }
             }
             return "(none)";

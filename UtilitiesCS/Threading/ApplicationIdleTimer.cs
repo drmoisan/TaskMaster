@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -27,8 +28,8 @@ namespace UtilitiesCS.Threading
         #region Static Members and Events
 
         // private singleton
-        private static ApplicationIdleTimer instance = null;
-        private SynchronizationContext syncContext;
+        private static ApplicationIdleTimer instance = null!; // set in the static ctor before any access
+        private SynchronizationContext? syncContext;
 
         // Notes:
         // Could have utilized the System.Timers.ElapsedEventArgs, but that
@@ -85,12 +86,12 @@ namespace UtilitiesCS.Threading
         /// Hook into the ApplicationIdle event to monitor inactivity.
         /// It will fire AT MOST once per second.
         /// </summary>
-        public static event ApplicationIdleEventHandler ApplicationIdle;
+        public static event ApplicationIdleEventHandler? ApplicationIdle;
         #endregion
 
         #region Private Members
         // Timer used to guarentee perodic updates.
-        private System.Timers.Timer _timer;
+        private System.Timers.Timer _timer = null!; // set in StartTimer(), called from the ctor
 
         // Tracks idle state
         private bool isIdle;
@@ -255,23 +256,23 @@ namespace UtilitiesCS.Threading
             }
         }
 
-        private Delegate FindTriggeringEventHandler(object sender, EventArgs e)
+        private Delegate? FindTriggeringEventHandler(object sender, EventArgs e)
         {
-            EventInfo idleEventInfo = typeof(System.Windows.Forms.Application).GetEvent(
+            EventInfo? idleEventInfo = typeof(System.Windows.Forms.Application).GetEvent(
                 "Idle",
                 BindingFlags.Static | BindingFlags.Public
             );
             if (idleEventInfo == null)
                 return null;
 
-            FieldInfo eventField = typeof(System.Windows.Forms.Application).GetField(
+            FieldInfo? eventField = typeof(System.Windows.Forms.Application).GetField(
                 "Idle",
                 BindingFlags.Static | BindingFlags.NonPublic
             );
             if (eventField == null)
                 return null;
 
-            object eventFieldValue = eventField.GetValue(null);
+            object? eventFieldValue = eventField.GetValue(null);
             if (eventFieldValue is MulticastDelegate eventDelegate)
             {
                 foreach (Delegate handler in eventDelegate.GetInvocationList())

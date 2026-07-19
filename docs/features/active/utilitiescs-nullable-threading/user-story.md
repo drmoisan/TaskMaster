@@ -91,26 +91,26 @@ and merged on its own while non-opted-in files stay oblivious and non-cross-bloc
 
 ## Acceptance Criteria
 
-- [ ] Every `.cs` file under `UtilitiesCS/Threading/` that emits CS86xx carries a
+- [x] Every `.cs` file under `UtilitiesCS/Threading/` that emits CS86xx carries a
   `#nullable enable` pragma and compiles with zero nullable (CS86xx) diagnostics under the
   per-file pragma with `/p:TreatWarningsAsErrors=true`.
-- [ ] No project-level or solution-level `<Nullable>` element is introduced; `UtilitiesCS.csproj`
+- [x] No project-level or solution-level `<Nullable>` element is introduced; `UtilitiesCS.csproj`
   retains none.
-- [ ] Changes are annotation/null-safety only: no behavior change, no API/signature semantics
+- [x] Changes are annotation/null-safety only: no behavior change, no API/signature semantics
   change, and no change to locking, ordering, scheduling, single-shot-guard, `SynchronizationContext`,
   or store-lockup-watchdog concurrency semantics.
-- [ ] All existing MSTest tests for UtilitiesCS still pass and are behavior-identical; no coverage
+- [x] All existing MSTest tests for UtilitiesCS still pass and are behavior-identical; no coverage
   regression on changed lines.
-- [ ] The full C# toolchain (csharpier -> analyzer/codestyle build -> type-check build -> vstest
+- [x] The full C# toolchain (csharpier -> analyzer/codestyle build -> type-check build -> vstest
   with coverage) passes on the final pass, using the pragma-only type-check command
   (`/t:Rebuild /p:TreatWarningsAsErrors=true`, without `/p:Nullable=enable`) for this child.
-- [ ] `StoreLockupResponder` null-branch behavior is preserved exactly: the no-context,
+- [x] `StoreLockupResponder` null-branch behavior is preserved exactly: the no-context,
   unresolved-sentinel, `<Stores-enumeration>`, and already-disabled branches are unchanged in order
   and content; the identity chain is annotated around them.
-- [ ] WinForms Designer files (`*.Designer.cs`) and the 4 `.resx` resources are not hand-edited and
+- [x] WinForms Designer files (`*.Designer.cs`) and the 4 `.resx` resources are not hand-edited and
   are left non-opted-in (oblivious); hand-written form partials annotate only their own declared
   fields.
-- [ ] The `TimeOutTask.cs` 500-line pre-existing violation is flagged (not fixed) in the feature
+- [x] The `TimeOutTask.cs` 500-line pre-existing violation is flagged (not fixed) in the feature
   docs; any annotation-induced breach of `ApplicationIdleTimer.cs` / `AsyncMultiTasker.cs` past 500
   lines is flagged rather than resolved by splitting.
 

@@ -8,9 +8,11 @@ using Newtonsoft.Json;
 
 namespace UtilitiesCS.Extensions
 {
+#nullable enable
+
     public static class JsonExtensions
     {
-        public static T Deserialize<T>(byte[] data)
+        public static T? Deserialize<T>(byte[] data)
             where T : class
         {
             using (var stream = new MemoryStream(data))

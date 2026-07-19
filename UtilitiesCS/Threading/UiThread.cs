@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -17,8 +18,8 @@ namespace UtilitiesCS
     {
         public static void Init(
             bool monitorUiThread = false,
-            Action<LockupAttribution> onLockupDetected = null,
-            TimeProvider timeProvider = null,
+            Action<LockupAttribution>? onLockupDetected = null,
+            TimeProvider? timeProvider = null,
             int lockupAttributionThresholdMs = 5000
         )
         {
@@ -39,8 +40,8 @@ namespace UtilitiesCS
         }
 
         private static bool _monitorUiThread;
-        private static Action<LockupAttribution> _onLockupDetected;
-        private static TimeProvider _monitorTimeProvider;
+        private static Action<LockupAttribution>? _onLockupDetected;
+        private static TimeProvider? _monitorTimeProvider;
         private static int _lockupAttributionThresholdMs = 5000;
         private static ThreadSafeSingleShotGuard _loaded = new ThreadSafeSingleShotGuard();
 
@@ -77,7 +78,7 @@ namespace UtilitiesCS
             _syncContextForm.Hide();
         }
 
-        private static SyncContextForm _syncContextForm;
+        private static SyncContextForm? _syncContextForm;
 
         #region UI Thread Synchronization
 
@@ -87,7 +88,7 @@ namespace UtilitiesCS
 
             private readonly SynchronizationContext _context;
 
-            public SynchronizationContextAwaiter(SynchronizationContext context)
+            public SynchronizationContextAwaiter(SynchronizationContext? context)
             {
                 if (context is null)
                 {
@@ -117,11 +118,12 @@ namespace UtilitiesCS
                 {
                     Init();
                 }
-                return _uiSyncContext;
+                // Init() populates _uiSyncContext before returning.
+                return _uiSyncContext!;
             }
             private set => _uiSyncContext = value;
         }
-        private static SynchronizationContext _uiSyncContext;
+        private static SynchronizationContext? _uiSyncContext;
 
         public static int UiThreadId
         {
@@ -135,13 +137,12 @@ namespace UtilitiesCS
             get => _dispatcher;
             private set => _dispatcher = value;
         }
-        private static Dispatcher _dispatcher;
-
+        private static Dispatcher _dispatcher = null!; // set in Initialize() before any access
         #endregion UI Thread Synchronization
 
         #region Other UI Methods and Properties
 
-        private static ThreadMonitor _threadMonitor;
+        private static ThreadMonitor? _threadMonitor;
 
         public static System.Drawing.SizeF AutoScaleFactor
         {

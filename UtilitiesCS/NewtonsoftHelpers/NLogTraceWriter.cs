@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,7 +10,9 @@ using Newtonsoft.Json.Serialization;
 public class NLogTraceWriter : ITraceWriter
 {
     private static readonly log4net.ILog _logger = log4net.LogManager.GetLogger(
-        System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        // ! preserves behavior: GetCurrentMethod() is non-null in this static initializer
+        // and its DeclaringType is the enclosing type.
+        System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType!
     );
 
     internal virtual ILog Logger => _logger;
@@ -28,7 +31,7 @@ public class NLogTraceWriter : ITraceWriter
         set => _messageFilter = value;
     }
 
-    public void Trace(TraceLevel level, string message, Exception ex)
+    public void Trace(TraceLevel level, string message, Exception? ex)
     {
         if (!MessageFilter.Select(message.Contains).Aggregate((a, b) => a | b))
         {
@@ -37,7 +40,7 @@ public class NLogTraceWriter : ITraceWriter
         }
     }
 
-    private Action<string, Exception> GetLogFunction(TraceLevel level)
+    private Action<string, Exception?>? GetLogFunction(TraceLevel level)
     {
         switch (level)
         {

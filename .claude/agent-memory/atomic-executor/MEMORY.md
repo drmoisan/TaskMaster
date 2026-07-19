@@ -2,6 +2,10 @@
 
 - [#364 nullable-gate pre-existing blockers](project_364_nullable_gate_preexisting_blockers.md) — full-solution pragma-only TWAE gate fails at baseline (vendored SVGControl CS0649 + non-HelperClasses CS0618/CS0168); verify CS86xx via isolated UtilitiesCS build w/ BuildProjectReferences=false; analyzer-version drift needs nuget-install into packages/; coverage script single-assembly StrictMode bug
 
+- [Nullable per-file pragma gate mechanics](project_nullable_pragma_gate_mechanics.md) — solution-wide TWAE aborts on vendored SVGControl CS0649; verify via isolated `UtilitiesCS.csproj -t:Rebuild -p:Platform=AnyCPU -p:BuildProjectReferences=false` + grep CS86xx=0
+- [Analyzer version skew on fresh worktree](project_analyzer_version_skew_fresh_worktree.md) — first analyzer build fails CS0006 (Meziantou 3.0.101/Sonar 10.27/BannedApi 3.3.4 missing); nuget install old versions into gitignored packages/, don't edit 16 csproj
+- [Nullable remediation annotation patterns](project_nullable_remediation_annotation_patterns.md) — net481 no post-condition attrs; EmailRecord struct `= default!`; `.ToString()!` for string cells; IsNullOrEmpty overload gotcha; `x!.M()` for defensive-flow-state
+- [Nullable epic: pragma gate + analyzer restore](project_nullable_epic_pragma_gate_and_analyzer_restore.md) — per-file #nullable children: exact solution TWAE gate is blocked by pre-existing SVGControl CS0649 + UtilitiesCS CS0618/CS0168; use scoped `UtilitiesCS.csproj TWAE /p:WarningsNotAsErrors=CS0649%3BCS0618%3BCS0168`; restore mismatched analyzer pkgs (csproj 3.0.101 vs packages.config 3.0.123) into packages/ first
 - [#349 breadcrumb WebView2 gotchas](project_349_breadcrumb_webview2_gotchas.md) — retyped Designer field breaks reflection-injected tests (inject a router instead); aggregate async d__ classes for >=90% proofs; QuickFiler.Test is Newtonsoft-free
 
 - [VS18 build/test toolchain paths](project_vs18_build_toolchain_paths.md) — build with VS **18** full-framework msbuild.exe (not Core .dotnet-sdk, which dies on binary resx MSB3822); nuget.exe restore; MSYS_NO_PATHCONV; csharpier v1 subcommands; dotnet-coverage needs `--` separator

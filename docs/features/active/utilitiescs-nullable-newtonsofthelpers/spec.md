@@ -240,37 +240,37 @@ Additional constraints and risks:
 
 ## Definition of Done
 
-- [ ] Every `.cs` file under `UtilitiesCS/NewtonsoftHelpers/` that emits CS86xx carries a
+- [x] Every `.cs` file under `UtilitiesCS/NewtonsoftHelpers/` that emits CS86xx carries a
   `#nullable enable` pragma and compiles with zero nullable (CS86xx) diagnostics under the
   per-file pragma with `/p:TreatWarningsAsErrors=true`.
-- [ ] No project-level or solution-level `<Nullable>` element is introduced; `UtilitiesCS.csproj`
+- [x] No project-level or solution-level `<Nullable>` element is introduced; `UtilitiesCS.csproj`
   retains none.
-- [ ] Changes are annotation/null-safety only: no behavior change, no API/signature semantics
+- [x] Changes are annotation/null-safety only: no behavior change, no API/signature semantics
   change, no refactor beyond nullable annotation.
-- [ ] Framework-override signatures (`JsonConverter<T>`/`JsonConverter`, `ISerializationBinder`,
+- [x] Framework-override signatures (`JsonConverter<T>`/`JsonConverter`, `ISerializationBinder`,
   `ITraceWriter`) are MATCHED to the Newtonsoft.Json 13.0.4 nullability: nullable positions
   (`existingValue`, `value`, converter `ReadJson` returns, `BindToType` `assemblyName`, `BindToName`
   `out string?` params, `Trace` `Exception? ex`) are annotated nullable; non-null positions
   (`serializer`, `reader`, `writer`, `objectType`, `serializedType`, `typeName`, `message`) stay
   non-null.
-- [ ] All existing MSTest tests for UtilitiesCS still pass; no coverage regression on changed
+- [x] All existing MSTest tests for UtilitiesCS still pass; no coverage regression on changed
   lines.
-- [ ] The full C# toolchain (csharpier -> analyzer/codestyle build -> nullable/
+- [x] The full C# toolchain (csharpier -> analyzer/codestyle build -> nullable/
   TreatWarningsAsErrors build -> vstest with coverage) passes on the final pass, using the
   pragma-only type-check command (`/t:Rebuild /p:TreatWarningsAsErrors=true`, without
   `/p:Nullable=enable`) for this child.
-- [ ] The three wrapper 500-line pre-existing violations (`WrapperScoDictionary.cs` ~645,
+- [x] The three wrapper 500-line pre-existing violations (`WrapperScoDictionary.cs` ~645,
   `WrapperPeopleScoDictionaryNew.cs` ~607, `WrapperScDictionary.cs` ~520) are flagged (not fixed)
   in the feature docs; the files are not split.
-- [ ] The duplicate `PeopleScoConverter` is confirmed (which copy is live) before the in-scope
+- [x] The duplicate `PeopleScoConverter` is confirmed (which copy is live) before the in-scope
   file's `ReadJson` return contract is finalized; only the `NewtonsoftHelpers/` copy is annotated.
-- [ ] `NLogTraceWriter.cs` is annotated in place with its GLOBAL namespace unchanged.
-- [ ] `NonRecursiveConverter.cs` has its pragma normalized to the top of the file and is confirmed
+- [x] `NLogTraceWriter.cs` is annotated in place with its GLOBAL namespace unchanged.
+- [x] `NonRecursiveConverter.cs` has its pragma normalized to the top of the file and is confirmed
   at zero CS86xx.
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] Existing MSTest suite for UtilitiesCS still passes post-annotation.
-- [ ] No coverage regression on changed lines.
-- [ ] Nullable gate passes for the opted-in files using the pragma-only build
+- [x] Existing MSTest suite for UtilitiesCS still passes post-annotation.
+- [x] No coverage regression on changed lines.
+- [x] Nullable gate passes for the opted-in files using the pragma-only build
   (`/t:Rebuild /p:TreatWarningsAsErrors=true`, without `/p:Nullable=enable`).

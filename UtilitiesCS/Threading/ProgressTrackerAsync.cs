@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,7 +22,7 @@ namespace UtilitiesCS.Threading
             _cancelSource = tokenSource;
         }
 
-        public ProgressTrackerAsync(CancellationTokenSource tokenSource, Screen screen)
+        public ProgressTrackerAsync(CancellationTokenSource tokenSource, Screen? screen)
         {
             _cancelSource = tokenSource;
             _screen = screen;
@@ -57,22 +58,22 @@ namespace UtilitiesCS.Threading
 
         #region Private Fields
 
-        private CancellationTokenSource _cancelSource;
-        private Screen _screen;
+        private CancellationTokenSource? _cancelSource;
+        private Screen? _screen;
         //private bool _isRoot = false;
 
         #endregion Private Fields
 
         #region Public Properties
 
-        private ProgressViewer _progressViewer;
+        private ProgressViewer _progressViewer = null!; // set in InitializeAsync() before use
         public ProgressViewer ProgressViewer
         {
             get => _progressViewer;
             set => _progressViewer = value;
         }
 
-        protected string _jobName;
+        protected string _jobName = null!; // JobName contract is non-null; set before use
         internal string JobName
         {
             get => _jobName;
@@ -82,7 +83,7 @@ namespace UtilitiesCS.Threading
         //private double _progress;
         //internal double Progress { get => _progress; }
 
-        protected Dispatcher _uiDispatcher;
+        protected Dispatcher _uiDispatcher = null!; // set in InitializeAsync() before any dispatch
         internal Dispatcher UiDispatcher
         {
             get => _uiDispatcher;

@@ -4,6 +4,8 @@ using System.Drawing.Drawing2D;
 
 namespace UtilitiesCS.Extensions
 {
+#nullable enable
+
     public static class ImageExtensions
     {
         public static Dictionary<Color, int> GenerateHistogram(this Bitmap image)
@@ -53,7 +55,10 @@ namespace UtilitiesCS.Extensions
         public static byte[] ToByte(this Bitmap image)
         {
             ImageConverter converter = new();
-            return (byte[])converter.ConvertTo(image, typeof(byte[]));
+            // TypeConverter.ConvertTo is annotated as returning a nullable object; the
+            // null-forgiving operator preserves the original non-null byte[] contract
+            // (ImageConverter always yields a byte[] for a valid Bitmap) without a new guard.
+            return (byte[])converter.ConvertTo(image, typeof(byte[]))!;
         }
     }
 }

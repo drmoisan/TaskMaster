@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -29,17 +30,17 @@ namespace UtilitiesCS.Threading
         private static readonly ILog Log = LogManager.GetLogger(
             MethodBase.GetCurrentMethod().DeclaringType
         );
-        private readonly Thread thread;
+        private readonly Thread? thread;
         private readonly int pollingFrequency;
         private readonly int delayThreshold;
         private readonly int stackTraceIterations;
         private readonly TimeProvider _timeProvider;
         private readonly LockupStallDecider _decider;
-        private readonly Action<LockupAttribution> _onLockupDetected;
+        private readonly Action<LockupAttribution>? _onLockupDetected;
 
         private DateTimeOffset _lastResponsiveUtc;
         private bool _lockupReported;
-        private ITimer _pollTimer;
+        private ITimer? _pollTimer;
 
         /// <summary>
         /// Creates a thread monitor.
@@ -61,13 +62,13 @@ namespace UtilitiesCS.Threading
         /// exactly once per stall episode when the attribution threshold is crossed. May be null.
         /// </param>
         public ThreadMonitor(
-            Thread thread,
+            Thread? thread,
             int pollingFrequency = 500,
             int delayThreshold = 100,
             int stackTraceIterations = 4,
-            TimeProvider timeProvider = null,
+            TimeProvider? timeProvider = null,
             int lockupAttributionThresholdMs = 5000,
-            Action<LockupAttribution> onLockupDetected = null
+            Action<LockupAttribution>? onLockupDetected = null
         )
         {
             this.thread = thread;
@@ -117,7 +118,8 @@ namespace UtilitiesCS.Threading
                 // path; Debug-level only.
                 if (!completed)
                 {
-                    var stackTrace = GetStackTrace(thread);
+                    // thread is non-null on this production diagnostic path (null only on the test seam).
+                    var stackTrace = GetStackTrace(thread!);
                     Log.Debug($"StackTrace of UI Thread: {stackTrace}");
                     Debug.WriteLine($"StackTrace of UI Thread: {stackTrace}");
                 }
@@ -141,7 +143,8 @@ namespace UtilitiesCS.Threading
                 UiThread.UiSyncContext.Send((x) => dispatcher = Dispatcher.CurrentDispatcher, null);
             }
 
-            var task = dispatcher.InvokeAsync(() => { });
+            // dispatcher is assigned via the Send above when FromThread returned null; behavior-preserving.
+            var task = dispatcher!.InvokeAsync(() => { });
 
             for (var i = 0; i < stackTraceIterations; i++)
             {
@@ -152,7 +155,8 @@ namespace UtilitiesCS.Threading
                 }
 
                 Debug.WriteLine(
-                    $"{(i + 1) * delayThreshold}ms Delay on thread {thread.Name} ({task.Status})"
+                    // thread is non-null on this production ping path (null only on the test seam path).
+                    $"{(i + 1) * delayThreshold}ms Delay on thread {thread!.Name} ({task.Status})"
                 );
             }
 
@@ -195,9 +199,9 @@ namespace UtilitiesCS.Threading
 
 #pragma warning disable 0618
         [ExcludeFromCodeCoverage]
-        private StackTrace GetStackTrace(Thread targetThread)
+        private StackTrace? GetStackTrace(Thread targetThread)
         {
-            StackTrace stackTrace = null;
+            StackTrace? stackTrace = null;
             var ready = new ManualResetEventSlim();
 
             new Thread(() =>
