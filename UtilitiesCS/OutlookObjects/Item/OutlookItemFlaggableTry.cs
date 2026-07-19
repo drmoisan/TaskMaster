@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,10 +39,10 @@ namespace UtilitiesCS.OutlookExtensions
             get => TryGet(() => OlItem.TaskStartDate);
             set => TrySet((x) => OlItem.TaskStartDate = x, value);
         }
-        public string TaskSubject
+        public string? TaskSubject
         {
             get => TryGet(() => OlItem.TaskSubject);
-            set => TrySet((x) => OlItem.TaskSubject = x, value);
+            set => TrySet<string?>((x) => OlItem.TaskSubject = x, value);
         }
         public int TotalWork
         {
@@ -57,7 +58,7 @@ namespace UtilitiesCS.OutlookExtensions
 
         DateTime IOutlookItem.TaskStartDate => TryGet(() => OlItem.TaskStartDate);
 
-        public string GetUdfString(string fieldName) =>
+        public string? GetUdfString(string fieldName) =>
             TryCall(() => OlItem.GetUdfString(fieldName));
     }
 }

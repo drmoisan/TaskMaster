@@ -23,3 +23,32 @@ plan and spec scope, flagged for future work rather than fixed in this annotatio
   nullable analysis by design.
 - Recommended follow-up: open a separate issue to evaluate replacing the `dynamic` access with a
   typed `IOutlookItem`/reflection-wrapper path if stronger null guarantees are later required.
+
+## Flag 2 (P4-T2): `OutlookItem.cs` exceeds the 500-line file-size limit (pre-existing)
+
+- File: `UtilitiesCS/OutlookObjects/Item/OutlookItem.cs`.
+- Condition: the file was already 503 lines before this remediation, exceeding the repo 500-line
+  file-size limit. This is a pre-existing condition, not introduced by #371.
+- Effect of this remediation: annotation-only work (the `#nullable enable` pragma line plus `?`/`!`
+  annotations) adds ONE line, moving the file to 504 lines — further over 500, not under it.
+- Decision: FLAGGED, NOT FIXED. Splitting `OutlookItem.cs` into multiple files would be a refactor,
+  which is out of scope for this annotation-only child (and would itself be a partial-class-group
+  change requiring its own review). The file is left intact at 504 lines.
+- Recommended follow-up: open a separate issue to split `OutlookItem.cs` (e.g., separating the
+  predefined-property surface from the reflection-helper internals) to bring it under the 500-line
+  limit.
+
+## Note: `OutlookItem`-family unconstrained-generic `T?` contract (deliberate, not a defect)
+
+- The `OutlookItem`/`OutlookItemExtensions`/`OutlookItemTry`/`OutlookItemTryGet`/`OutlookItemFlaggableTry`
+  reflection-wrapper family uses `TryGet<T>`/`TryCall<T>`/`GetPropertyValueIfExists<T>` helpers that
+  return `default(T)` on a swallowed exception. These were given an explicit unconstrained `T?`
+  return/`out T?` contract (per spec and research Section 7). This propagates to the try/catch-
+  swallowing decorators' reference-type public members, which are annotated nullable to reflect that
+  they genuinely can return `default(T)`/null on failure. Value-type members are unaffected
+  (unconstrained `T?` is a no-op for value types at runtime). The decorator seams
+  (`OutlookItemTry`/`OutlookItemTryGet`/`OutlookItemFlaggableTry` over `IOutlookItem`/
+  `IOutlookItemFlaggable`) are preserved exactly; the out-of-scope interfaces remain oblivious and
+  are not cross-blocked. `ItemType`/`_type`/`_item` reflection derefs that require a constructed
+  wrapper use a justified `!` (preserving the original NRE-caught-by-surrounding-try behavior);
+  error-log-string derefs use `?.` (defensive, avoids a secondary crash during error logging).

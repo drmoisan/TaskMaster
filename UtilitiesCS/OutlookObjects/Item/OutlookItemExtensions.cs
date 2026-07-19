@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -130,7 +131,7 @@ namespace UtilitiesCS.OutlookExtensions
 
         #region Helper Methods
 
-        internal static T TryGet<T>(Func<T> getter)
+        internal static T? TryGet<T>(Func<T> getter)
         {
             try
             {
@@ -160,7 +161,7 @@ namespace UtilitiesCS.OutlookExtensions
             catch (SystemException) { }
         }
 
-        internal static T TryCall<T>(Func<T> func)
+        internal static T? TryCall<T>(Func<T> func)
         {
             try
             {
@@ -172,7 +173,7 @@ namespace UtilitiesCS.OutlookExtensions
             }
         }
 
-        internal static object TryGetPropertyValue<T>(
+        internal static object? TryGetPropertyValue<T>(
             this OutlookItem item,
             string propertyName,
             string propertyNameAlt,
@@ -210,11 +211,11 @@ namespace UtilitiesCS.OutlookExtensions
             }
         }
 
-        internal static PropertyInfo TryGetPropertyInfo(this OutlookItem item, string propertyName)
+        internal static PropertyInfo? TryGetPropertyInfo(this OutlookItem item, string propertyName)
         {
             try
             {
-                return item.ItemType.GetProperty(propertyName);
+                return item.ItemType!.GetProperty(propertyName);
             }
             catch (SystemException e)
             {
@@ -227,17 +228,17 @@ namespace UtilitiesCS.OutlookExtensions
             }
         }
 
-        internal static object TryGetPropertyValue(
+        internal static object? TryGetPropertyValue(
             this OutlookItem item,
             string propertyName,
             string propertyNameAlt
         ) => TryGetPropertyValue(item, propertyName) ?? TryGetPropertyValue(item, propertyNameAlt);
 
-        internal static object TryGetPropertyValue(this OutlookItem item, string propertyName)
+        internal static object? TryGetPropertyValue(this OutlookItem item, string propertyName)
         {
             try
             {
-                return item.ItemType.InvokeMember(
+                return item.ItemType!.InvokeMember(
                     propertyName,
                     BindingFlags.Public | BindingFlags.GetField | BindingFlags.GetProperty,
                     null,
@@ -321,12 +322,12 @@ namespace UtilitiesCS.OutlookExtensions
         internal static bool TrySetPropertyValue(
             this OutlookItem item,
             string propertyName,
-            object propertyValue
+            object? propertyValue
         )
         {
             try
             {
-                item.ItemType.InvokeMember(
+                item.ItemType!.InvokeMember(
                     propertyName,
                     BindingFlags.Public | BindingFlags.SetField | BindingFlags.SetProperty,
                     null,
@@ -339,7 +340,7 @@ namespace UtilitiesCS.OutlookExtensions
             {
                 var propertyInfo =
                     item.TryGetPropertyInfo(propertyName)
-                    ?? throw new MissingMemberException(item.ItemType.Name, propertyName);
+                    ?? throw new MissingMemberException(item.ItemType!.Name, propertyName);
                 try
                 {
                     propertyInfo.SetValue(item.InnerObject, propertyValue);
@@ -358,12 +359,12 @@ namespace UtilitiesCS.OutlookExtensions
             }
         }
 
-        internal static object TryCallMethod(this OutlookItem item, string methodName)
+        internal static object? TryCallMethod(this OutlookItem item, string methodName)
         {
             try
             {
                 // An invalid property name exception is propagated to client
-                return item.ItemType.InvokeMember(
+                return item.ItemType!.InvokeMember(
                     methodName,
                     BindingFlags.Public | BindingFlags.InvokeMethod,
                     null,
@@ -383,7 +384,7 @@ namespace UtilitiesCS.OutlookExtensions
             }
         }
 
-        internal static object TryCallMethod(
+        internal static object? TryCallMethod(
             this OutlookItem item,
             string methodName,
             object[] args
@@ -392,7 +393,7 @@ namespace UtilitiesCS.OutlookExtensions
             try
             {
                 // An invalid property name exception is propagated to client
-                return item.ItemType.InvokeMember(
+                return item.ItemType!.InvokeMember(
                     methodName,
                     BindingFlags.Public | BindingFlags.InvokeMethod,
                     null,
