@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,7 +10,7 @@ namespace UtilitiesCS
 {
     public static class ExplorerActions
     {
-        public static object GetCurrentItem(Application OlApp)
+        public static object? GetCurrentItem(Application OlApp)
         {
             if (OlApp == null)
             {
@@ -29,7 +30,7 @@ namespace UtilitiesCS
             }
         }
 
-        internal static object Readable(object item)
+        internal static object? Readable(object item)
         {
             if ((item is MailItem) && ((MailItem)item).IsMailUnReadable())
             {

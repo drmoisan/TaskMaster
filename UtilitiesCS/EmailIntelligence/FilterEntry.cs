@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -43,7 +44,7 @@ namespace UtilitiesCS
             set => _name = value;
         }
 
-        private string _description;
+        private string _description = null!;
         public string Description
         {
             get => _description;

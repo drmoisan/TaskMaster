@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 
 namespace UtilitiesCS
@@ -28,11 +29,11 @@ namespace UtilitiesCS
         {
             EmailConversationID = emailConversationID;
             FolderCount = folderCount;
-            EmailFolders = emailFolder;
-            EmailCounts = emailConversationCount;
+            _emailFolders = emailFolder;
+            _emailCounts = emailConversationCount;
         }
 
-        private string _emailConversationID;
+        private string? _emailConversationID;
         private int _folderCount;
         private List<string> _emailFolders;
         private List<int> _emailCounts;
@@ -44,7 +45,7 @@ namespace UtilitiesCS
             set => _maxFoldersPerConv = value;
         }
 
-        public string EmailConversationID
+        public string? EmailConversationID
         {
             get => _emailConversationID;
             set => _emailConversationID = value;

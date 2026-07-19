@@ -269,30 +269,30 @@ blockers. They are recorded here explicitly and are NOT silently resolved by thi
 
 ## Acceptance Criteria
 
-- [ ] AC1: Every compiled in-scope hand-written file carries a `#nullable enable` pragma and
+- [x] AC1: Every compiled in-scope hand-written file carries a `#nullable enable` pragma and
   compiles with zero nullable (CS86xx) diagnostics under the pragma-only build
   `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU"
   /p:TreatWarningsAsErrors=true`.
-- [ ] AC2: No project-level or solution-level `<Nullable>` element is introduced;
+- [x] AC2: No project-level or solution-level `<Nullable>` element is introduced;
   `UtilitiesCS.csproj` retains none. Verification uses the pragma-only command with no global
   `/p:Nullable=enable`.
-- [ ] AC3: The 6 `*.Designer.cs` files under `OlFolderTools` are left oblivious (no pragma) and
+- [x] AC3: The 6 `*.Designer.cs` files under `OlFolderTools` are left oblivious (no pragma) and
   are not cross-blocked; hand-written partial halves annotate only their own declared fields, never
   Designer-declared controls.
-- [ ] AC4: No behavior change — no new types, no post-condition attributes, no `record`/`record
+- [x] AC4: No behavior change — no new types, no post-condition attributes, no `record`/`record
   struct`/`init`, existing guards preserved, and no new runtime guard beyond what reaching zero
   CS86xx strictly requires.
-- [ ] AC5: Annotations are consistent with the upstream extensions/helperclasses/threading
+- [x] AC5: Annotations are consistent with the upstream extensions/helperclasses/threading
   annotated signatures — in particular `TimeOutTask.RunWithTimeout` returns non-null
   `Task<TResult>`, `StreamExtensions.TryCopyToAsyncWithTimeout` returns `Task<bool>`, and
   `IsNullOrEmpty(this string?)` is treated as non-refining on net481.
-- [ ] AC6: A clean baseline `vstest.console.exe` test run for `UtilitiesCS.Test` (pass/fail counts
+- [x] AC6: A clean baseline `vstest.console.exe` test run for `UtilitiesCS.Test` (pass/fail counts
   and coverage) is captured before edits, per the evidence-and-timestamp-conventions skill; after
   remediation there are no test regressions and no coverage regression on changed lines attributable
   to this child.
-- [ ] AC7: The six Maintainer Decisions and Flags above are recorded in this spec and not silently
+- [x] AC7: The six Maintainer Decisions and Flags above are recorded in this spec and not silently
   resolved.
-- [ ] AC8: No in-scope file exceeds 500 lines as a result of edits; the three pre-existing
+- [x] AC8: No in-scope file exceeds 500 lines as a result of edits; the three pre-existing
   >500-line files (`MeetingItemHelper.cs`, `RecipientStatic.cs`, `UserDefinedFields.cs`) are
   flagged, not split, and are not worsened past their pre-existing breach in a status-changing way.
 

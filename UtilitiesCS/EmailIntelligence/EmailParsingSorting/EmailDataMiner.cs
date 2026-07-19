@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -24,7 +25,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         private IApplicationGlobals _globals;
-        private SegmentStopWatch _sw = default;
+
+        // Never reassigned anywhere across the 4 EmailDataMiner partial files after this
+        // `= default` (null) inline initializer; annotated nullable to reflect that, with
+        // justified `!` at each of the 9 consumption sites in EmailDataMiner.FolderExtraction.cs.
+        private SegmentStopWatch? _sw = default;
         internal const int MaxObjectSize = 1000000000;
 
         #endregion Constructors and private fields
@@ -32,7 +37,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         #region ETL - Extract, Transform, Load For Data Mining
 
         [ExcludeFromCodeCoverage]
-        public async Task<ScBag<MinedMailInfo>> MineEmails()
+        public async Task<ScBag<MinedMailInfo>?> MineEmails()
         {
             if (SynchronizationContext.Current is null)
             {
