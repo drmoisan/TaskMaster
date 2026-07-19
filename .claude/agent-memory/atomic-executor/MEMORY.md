@@ -1,5 +1,6 @@
 # Atomic Executor Memory Index
 
+- [Sibling-worktree shared-tooling hazard](project_sibling_worktree_shared_tooling_hazard.md) — a concurrent agent in a DIFFERENT worktree crashes your testhost + clobbers /tmp logs via shared global vstest/dotnet-coverage; use session scratchpad for logs, poll for a quiet machine before test runs, trust bash `$?` not log counts, never kill/commit others' processes/memory files
 - [#375 residuals nullable gotchas](project_375_residuals_nullable_gotchas.md) — CS8644 inherited-interface mismatch from oblivious #366 base fixed with a `#nullable disable` island on the class-declaration line (not `!`); full-solution Rebuild cleans SVGControl.dll → isolated gate CS0006, re-run no-TWAE Build first; MeetingItemHelper Lazy<T> classes: bulk `= null!` + `(...)!` getters/lambdas beats widening the API (Python utf-8-sig for CRLF+BOM files)
 - [#364 nullable-gate pre-existing blockers](project_364_nullable_gate_preexisting_blockers.md) — full-solution pragma-only TWAE gate fails at baseline (vendored SVGControl CS0649 + non-HelperClasses CS0618/CS0168); verify CS86xx via isolated UtilitiesCS build w/ BuildProjectReferences=false; analyzer-version drift needs nuget-install into packages/; coverage script single-assembly StrictMode bug
 
