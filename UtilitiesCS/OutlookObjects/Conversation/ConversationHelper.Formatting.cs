@@ -17,8 +17,8 @@ namespace UtilitiesCS
         public static DataFrame GetInfoDf(this Conversation conversation)
         {
             Outlook.Table table = conversation.GetInfoTable()!;
-            (object[,] data, Dictionary<string, int> columnInfo) = table.ETL();
-            var df = data.ToDataFrame(columnInfo.Keys.ToArray());
+            (object[,]? data, Dictionary<string, int>? columnInfo) = table.ETL();
+            var df = data!.ToDataFrame(columnInfo!.Keys.ToArray());
             df.Display();
             return df;
         }
@@ -63,8 +63,8 @@ namespace UtilitiesCS
         public static DataFrame GetDataFrame(this Outlook.Conversation conversation)
         {
             Table table = conversation.GetConversationTable();
-            (object[,] data, Dictionary<string, int> columnInfo) = table.ETL();
-            return data.ToDataFrame(columnInfo.Keys.ToArray());
+            (object[,]? data, Dictionary<string, int>? columnInfo) = table.ETL();
+            return data!.ToDataFrame(columnInfo!.Keys.ToArray());
         }
 
         public static async Task<DataFrame?> GetDataFrameAsync(
@@ -94,18 +94,19 @@ namespace UtilitiesCS
                 "GetDataFrameAsync conversation-table creation complete | conversation-table creation",
                 $"timeoutMs=1000; retryCount=3; elapsedMs={tableStopwatch.ElapsedMilliseconds}"
             );
-            (object[,] data, Dictionary<string, int> columnInfo) = await TimeOutTask.RunWithTimeout(
-                () => conversationTableSnapshot.ETL(),
-                token,
-                1000,
-                3,
-                false
-            );
+            (object[,]? data, Dictionary<string, int>? columnInfo) =
+                await TimeOutTask.RunWithTimeout(
+                    () => conversationTableSnapshot.ETL(),
+                    token,
+                    1000,
+                    3,
+                    false
+                );
             LogConversationTiming(
                 "GetDataFrameAsync snapshot handoff complete | snapshot handoff",
-                $"rowCount={data.GetLength(0)}; columnCount={data.GetLength(1)}; elapsedMs={tableStopwatch.ElapsedMilliseconds}"
+                $"rowCount={data!.GetLength(0)}; columnCount={data.GetLength(1)}; elapsedMs={tableStopwatch.ElapsedMilliseconds}"
             );
-            return data.ToDataFrame(columnInfo.Keys.ToArray());
+            return data!.ToDataFrame(columnInfo!.Keys.ToArray());
         }
 
         public static Table GetConversationTable(this Conversation? conversation)

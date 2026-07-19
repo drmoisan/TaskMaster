@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,10 +13,10 @@ namespace UtilitiesCS
 {
     public static partial class OlTableExtensions
     {
-        public static (object[,] data, Dictionary<string, int> columnInfo) ETL(
+        public static (object[,]? data, Dictionary<string, int>? columnInfo) ETL(
             this Outlook.Table table,
-            Dictionary<string, Func<object, string>> objectConverters = null,
-            ProgressTracker progress = null
+            Dictionary<string, Func<object, string>>? objectConverters = null,
+            ProgressTracker? progress = null
         )
         {
             if (table is null)
@@ -28,7 +29,7 @@ namespace UtilitiesCS
             LogTableTiming("ETL start | ETL over table snapshots");
 
             var columnDictionary = table.GetColumnDictionary();
-            object[,] data = null;
+            object[,]? data = null;
 
             table.MoveToStart();
             var rowCount = table.GetRowCount();
@@ -60,13 +61,13 @@ namespace UtilitiesCS
             return (data, columnDictionary);
         }
 
-        public static async Task<(object[,] data, Dictionary<string, int> columnInfo)> EtlAsync(
+        public static async Task<(object[,]? data, Dictionary<string, int>? columnInfo)> EtlAsync(
             this Outlook.Table table,
             CancellationToken token,
             CancellationTokenSource tokenSource,
             int counter,
-            ProgressTracker progress,
-            Dictionary<string, Func<object, string>> objectConverters = null
+            ProgressTracker? progress,
+            Dictionary<string, Func<object, string>>? objectConverters = null
         )
         {
             token.ThrowIfCancellationRequested();
@@ -77,7 +78,7 @@ namespace UtilitiesCS
             var rowCount = table.GetRowCount();
             int milliseconds = 250 * rowCount;
             var attempts = 3;
-            object[,] data = null;
+            object[,]? data = null;
             var columnDictionary = table.GetColumnDictionary();
 
             table.MoveToStart();
@@ -126,13 +127,16 @@ namespace UtilitiesCS
             return (data, columnDictionary);
         }
 
-        public static async Task<(object[,] data, Dictionary<string, int> columnInfo)> EtlAsyncOld(
+        public static async Task<(
+            object[,]? data,
+            Dictionary<string, int>? columnInfo
+        )> EtlAsyncOld(
             this Outlook.Table table,
             CancellationToken token,
             CancellationTokenSource tokenSource,
             int counter,
-            ProgressTracker progress,
-            Dictionary<string, Func<object, string>> objectConverters = null
+            ProgressTracker? progress,
+            Dictionary<string, Func<object, string>>? objectConverters = null
         )
         {
             token.ThrowIfCancellationRequested();
@@ -140,8 +144,8 @@ namespace UtilitiesCS
             var rowCount = table.GetRowCount();
             int milliseconds = 250 * rowCount;
             var attempts = 3;
-            object[,] data = null;
-            Dictionary<string, int> columnInfo = null;
+            object[,]? data = null;
+            Dictionary<string, int>? columnInfo = null;
 
             try
             {
@@ -164,7 +168,7 @@ namespace UtilitiesCS
 
         private static async Task<IAsyncEnumerable<object[]>> EtlByRowAsync(
             Table table,
-            Dictionary<string, Func<object, string>> objectConverters,
+            Dictionary<string, Func<object, string>>? objectConverters,
             Dictionary<string, int> columnDictionary,
             CancellationToken token
         )
@@ -188,14 +192,14 @@ namespace UtilitiesCS
         public static async Task<(
             IAsyncEnumerable<Row> rows,
             Dictionary<string, int> columnDictionary,
-            Dictionary<string, Func<object, string>> objectConverters,
+            Dictionary<string, Func<object, string>>? objectConverters,
             IOrderedEnumerable<int> binIndices,
-            IEnumerable<string> objFields,
-            IEnumerable<int> objIndices
+            IEnumerable<string>? objFields,
+            IEnumerable<int>? objIndices
         )> EtlPrepAsync(
             this Outlook.Table table,
             CancellationToken cancel,
-            Dictionary<string, Func<object, string>> objectConverters = null
+            Dictionary<string, Func<object, string>>? objectConverters = null
         )
         {
             var columnDictionary = await Task.Run(table.GetColumnDictionary);
@@ -209,10 +213,10 @@ namespace UtilitiesCS
 
         public static IAsyncEnumerable<object[]> EtlByRowAsync(
             this IAsyncEnumerable<Row> rows,
-            Dictionary<string, Func<object, string>> objectConverters,
+            Dictionary<string, Func<object, string>>? objectConverters,
             IOrderedEnumerable<int> binIndices,
-            IEnumerable<string> objFields,
-            IEnumerable<int> objIndices
+            IEnumerable<string>? objFields,
+            IEnumerable<int>? objIndices
         )
         {
             return rows.Select(rows =>
@@ -222,12 +226,12 @@ namespace UtilitiesCS
 
         private static async Task<object[,]> EtlByRowAsync(
             Table table,
-            Dictionary<string, Func<object, string>> objectConverters,
+            Dictionary<string, Func<object, string>>? objectConverters,
             Dictionary<string, int> columnDictionary,
             CancellationToken token,
             int timeout,
             int attempts,
-            ProgressTracker progress = null
+            ProgressTracker? progress = null
         )
         {
             token.ThrowIfCancellationRequested();
@@ -258,9 +262,9 @@ namespace UtilitiesCS
 
         private static object[,] EtlByRow(
             Table table,
-            Dictionary<string, Func<object, string>> objectConverters,
+            Dictionary<string, Func<object, string>>? objectConverters,
             Dictionary<string, int> columnDictionary,
-            ProgressTracker progress = null
+            ProgressTracker? progress = null
         )
         {
             (var binFields, var binIndices) = GetBinFields(columnDictionary);
@@ -280,11 +284,11 @@ namespace UtilitiesCS
 
         private static object[][] EtlByRow(
             this Row[] rows,
-            Dictionary<string, Func<object, string>> objectConverters,
+            Dictionary<string, Func<object, string>>? objectConverters,
             IOrderedEnumerable<int> binIndices,
-            IEnumerable<string> objFields,
-            IEnumerable<int> objIndices,
-            ProgressTracker progress
+            IEnumerable<string>? objFields,
+            IEnumerable<int>? objIndices,
+            ProgressTracker? progress
         )
         {
             int completed = 0;
@@ -295,7 +299,7 @@ namespace UtilitiesCS
                 query = query.AsParallel();
             }
             var query2 = query.Select(i =>
-                EtlRow(ref completed, rows[i], objectConverters, binIndices, objFields, objIndices)
+                EtlRow(ref completed, rows![i], objectConverters, binIndices, objFields, objIndices)
             );
 
             object[][] jagged;
@@ -338,7 +342,7 @@ namespace UtilitiesCS
             return (binFields, binIndices);
         }
 
-        private static Row[] CastToRowArray(this Table table, ProgressTracker progress)
+        private static Row[] CastToRowArray(this Table table, ProgressTracker? progress)
         {
             var rowExtractionStopwatch = Stopwatch.StartNew();
             LogTableTiming(
@@ -384,8 +388,8 @@ namespace UtilitiesCS
             return rows;
         }
 
-        private static (IEnumerable<string>, IEnumerable<int>) GetObjectFields(
-            Dictionary<string, Func<object, string>> objectConverters,
+        private static (IEnumerable<string>?, IEnumerable<int>?) GetObjectFields(
+            Dictionary<string, Func<object, string>>? objectConverters,
             Dictionary<string, int> columnDictionary
         )
         {
@@ -403,11 +407,11 @@ namespace UtilitiesCS
         private static void EtlRow(
             ref object[,] data,
             Outlook.Row row,
-            Dictionary<string, Func<object, string>> objectConverters,
+            Dictionary<string, Func<object, string>>? objectConverters,
             Dictionary<string, int> columnDictionary,
             IOrderedEnumerable<int> binIndices,
-            IEnumerable<string> objFields,
-            IEnumerable<int> objIndices,
+            IEnumerable<string>? objFields,
+            IEnumerable<int>? objIndices,
             int rowNumber
         )
         {
@@ -434,10 +438,10 @@ namespace UtilitiesCS
         private static object[] EtlRow(
             ref int rowsCompleted,
             Outlook.Row row,
-            Dictionary<string, Func<object, string>> objectConverters,
+            Dictionary<string, Func<object, string>>? objectConverters,
             IOrderedEnumerable<int> binIndices,
-            IEnumerable<string> objFields,
-            IEnumerable<int> objIndices
+            IEnumerable<string>? objFields,
+            IEnumerable<int>? objIndices
         )
         {
             var objectRow = EtlRow(row, objectConverters, binIndices, objFields, objIndices);
@@ -447,10 +451,10 @@ namespace UtilitiesCS
 
         private static object[] EtlRow(
             Outlook.Row row,
-            Dictionary<string, Func<object, string>> objectConverters,
+            Dictionary<string, Func<object, string>>? objectConverters,
             IOrderedEnumerable<int> binIndices,
-            IEnumerable<string> objFields,
-            IEnumerable<int> objIndices
+            IEnumerable<string>? objFields,
+            IEnumerable<int>? objIndices
         )
         {
             object[] rawValues = (object[])row.GetValues();
