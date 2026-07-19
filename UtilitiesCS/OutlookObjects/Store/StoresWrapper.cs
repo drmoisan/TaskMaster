@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -186,7 +187,7 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         private IEnumerable<Outlook.Store> GetFilteredStores()
         {
-            return Globals
+            return Globals!
                 .Ol.NamespaceMAPI.Stores.Cast<Outlook.Store>()
                 .Where(ShouldIncludeStoreInstrumented);
         }
@@ -202,7 +203,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         // or gated after diagnosis.
         private bool ShouldIncludeStoreInstrumented(Outlook.Store store)
         {
-            string displayName = null;
+            string? displayName = null;
             try
             {
                 displayName = store.DisplayName;
@@ -212,7 +213,7 @@ namespace UtilitiesCS.OutlookObjects.Store
             // why: issue #328. Read the StoreID (guarded, fail-open) alongside the other primitive
             // reads and pass it plus the configured ExcludedStoreIds into Decide so the filter path
             // that drives GetFilteredStores()/MaterializeFilteredStores() applies the StoreID branch.
-            string storeId = null;
+            string? storeId = null;
             try
             {
                 storeId = store.StoreID;
@@ -224,7 +225,7 @@ namespace UtilitiesCS.OutlookObjects.Store
                 store.ExchangeStoreType == OlExchangeStoreType.olExchangePublicFolder;
             exchangeStoreTypeStopwatch.Stop();
 
-            string filePath = null;
+            string? filePath = null;
             var filePathStopwatch = Stopwatch.StartNew();
             try
             {
@@ -272,7 +273,7 @@ namespace UtilitiesCS.OutlookObjects.Store
             // first. The StoreID read is guarded (try/catch) mirroring the FilePath guard below; an
             // unreadable StoreID leaves storeId null so the store is never excluded on this basis
             // (fail-open).
-            string storeId = null;
+            string? storeId = null;
             try
             {
                 storeId = store.StoreID;
@@ -311,7 +312,7 @@ namespace UtilitiesCS.OutlookObjects.Store
                 return false;
             }
 
-            string filePath = null;
+            string? filePath = null;
             try
             {
                 filePath = store.FilePath;
@@ -323,7 +324,7 @@ namespace UtilitiesCS.OutlookObjects.Store
                 && !string.IsNullOrWhiteSpace(filePath)
                 && GwsoFilePathContains.Any(x =>
                     !string.IsNullOrWhiteSpace(x)
-                    && filePath.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
+                    && filePath!.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
                 )
             )
             {
@@ -335,7 +336,7 @@ namespace UtilitiesCS.OutlookObjects.Store
                 && !string.IsNullOrWhiteSpace(filePath)
                 && ExcludedStoreFilePathContains.Any(x =>
                     !string.IsNullOrWhiteSpace(x)
-                    && filePath.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
+                    && filePath!.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
                 )
             )
             {
@@ -356,10 +357,10 @@ namespace UtilitiesCS.OutlookObjects.Store
         #endregion ctor
 
         [JsonProperty]
-        internal IApplicationGlobals Globals { get; set; }
+        internal IApplicationGlobals? Globals { get; set; }
 
         [JsonProperty]
-        public List<StoreWrapper> Stores { get; set; }
+        public List<StoreWrapper>? Stores { get; set; }
 
         [JsonProperty]
         public bool ExcludePublicFolderStores { get; set; } = true;
