@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -37,7 +38,7 @@ namespace UtilitiesCS
             return $"threadId={Thread.CurrentThread.ManagedThreadId}; syncContext={DescribeSynchronizationContext(SynchronizationContext.Current)}";
         }
 
-        private static void LogConversationTiming(string phase, string details = null)
+        private static void LogConversationTiming(string phase, string? details = null)
         {
             var detailSegment = string.IsNullOrWhiteSpace(details) ? string.Empty : $" | {details}";
             var phaseLabel = phase.StartsWith("[Conversation timing]", StringComparison.Ordinal)
@@ -46,9 +47,9 @@ namespace UtilitiesCS
             logger.Debug($"{phaseLabel} | {BuildConversationTimingContext()}{detailSegment}");
         }
 
-        internal static object SafeResolveConversationItem(
-            object namespaceRef,
-            Func<object, string, string, object> resolver
+        internal static object? SafeResolveConversationItem(
+            object? namespaceRef,
+            Func<object, string, string, object>? resolver
         )
         {
             if (namespaceRef is null || resolver is null)
@@ -179,14 +180,14 @@ namespace UtilitiesCS
                 //Outlook.Table table = ObjItem
                 //                      .GetConversation()
                 //                      .GetTable(true, false);
-                DataFrame df = conv.GetDataFrame();
+                DataFrame? df = conv.GetDataFrame();
                 if (df is null)
                 {
                     return 0;
                 }
 
                 Debug.WriteLine(df.PrettyText());
-                string folderName = null;
+                string? folderName = null;
                 if (SameFolder)
                 {
                     folderName =
@@ -201,7 +202,7 @@ namespace UtilitiesCS
             return 0;
         }
 
-        public static DataFrame GetConversationDf(this object ObjItem)
+        public static DataFrame? GetConversationDf(this object ObjItem)
         {
             if (ObjItem is MailItem)
             {
@@ -212,13 +213,13 @@ namespace UtilitiesCS
         }
 
         //PERFORMANCE: Add async version of GetConversationDf
-        public static DataFrame GetConversationDf(this Conversation conversation)
+        public static DataFrame? GetConversationDf(this Conversation? conversation)
         {
             if (conversation != null)
             {
                 bool retry = true;
                 int retryCount = 0;
-                DataFrame df = null;
+                DataFrame? df = null;
                 while (retry)
                 {
                     try
@@ -238,7 +239,7 @@ namespace UtilitiesCS
             return null;
         }
 
-        public static async Task<DataFrame> GetConversationDfAsync(
+        public static async Task<DataFrame?> GetConversationDfAsync(
             this MailItem mailItem,
             CancellationToken token
         )
@@ -274,7 +275,7 @@ namespace UtilitiesCS
             return df;
         }
 
-        public static async Task<DataFrame> GetConversationDfAsync(
+        public static async Task<DataFrame?> GetConversationDfAsync(
             this MailItem mailItem,
             CancellationToken token,
             int timeout,
@@ -297,7 +298,7 @@ namespace UtilitiesCS
                 timeoutCancellation.Token
             );
 
-            DataFrame df = null;
+            DataFrame? df = null;
 
             try
             {
@@ -351,16 +352,16 @@ namespace UtilitiesCS
             return df;
         }
 
-        public static DataFrame GetConversationDf(this MailItem mailItem)
+        public static DataFrame? GetConversationDf(this MailItem mailItem)
         {
             Outlook.Conversation conv = mailItem.GetConversation();
             return conv.GetConversationDf();
         }
 
         //PERFORMANCE: Add async version of FilterConversation
-        public static DataFrame FilterConversation(
-            this DataFrame df,
-            string foldername,
+        public static DataFrame? FilterConversation(
+            this DataFrame? df,
+            string? foldername,
             bool SameFolder,
             bool MailOnly
         )
@@ -372,7 +373,7 @@ namespace UtilitiesCS
                 {
                     if (columnNames.Contains("Folder Name"))
                     {
-                        df = df.Filter(df["Folder Name"].ElementwiseEquals<string>(foldername));
+                        df = df.Filter(df["Folder Name"].ElementwiseEquals<string>(foldername!));
                     }
                 }
                 if (MailOnly)

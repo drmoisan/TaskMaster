@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -35,7 +36,7 @@ namespace UtilitiesCS
             return $"threadId={Thread.CurrentThread.ManagedThreadId}; syncContext={DescribeSynchronizationContext(SynchronizationContext.Current)}";
         }
 
-        private static void LogTableTiming(string phase, string details = null)
+        private static void LogTableTiming(string phase, string? details = null)
         {
             var detailSegment = string.IsNullOrWhiteSpace(details) ? string.Empty : $" | {details}";
             var phaseLabel = phase.StartsWith("[Table timing]", StringComparison.Ordinal)
@@ -64,7 +65,7 @@ namespace UtilitiesCS
             return result;
         }
 
-        internal static T RunTableRetry<T>(Func<T> action, int maxAttempts)
+        internal static T? RunTableRetry<T>(Func<T> action, int maxAttempts)
         {
             var tries = Math.Max(1, maxAttempts);
             for (var i = 0; i < tries; i++)
@@ -250,7 +251,7 @@ namespace UtilitiesCS
             var columnCount = columnDictionary.Count;
             //EnumerateTable(table);
             table.MoveToStart();
-            object[,] data = null;
+            object[,]? data = null;
 
             if (columnDictionary.ContainsKey("Store"))
             {

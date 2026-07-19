@@ -94,18 +94,18 @@ refactors, no API redesign.
 
 ## Acceptance Criteria
 
-- [ ] AC1: Every `.cs` file under
+- [x] AC1: Every `.cs` file under
   `UtilitiesCS/OutlookObjects/{MailItem,Item,Conversation,Attachment,Table}` that emits CS86xx
   carries `#nullable enable` and compiles with zero nullable diagnostics under the per-file
   pragma with `/p:TreatWarningsAsErrors=true`.
-- [ ] AC2: No project-level or solution-level `<Nullable>` element is introduced;
+- [x] AC2: No project-level or solution-level `<Nullable>` element is introduced;
   `UtilitiesCS.csproj` retains none.
-- [ ] AC3: No behavior change; existing MSTest tests for UtilitiesCS still pass.
-- [ ] AC4: No coverage regression on changed lines.
-- [ ] AC5: Public signatures of remediated members remain behavior-compatible; nullability
+- [x] AC3: No behavior change; existing MSTest tests for UtilitiesCS still pass.
+- [x] AC4: No coverage regression on changed lines.
+- [x] AC5: Public signatures of remediated members remain behavior-compatible; nullability
   annotations reflect actual null behavior and correctly consume the upstream #363/#364
   contracts.
-- [ ] AC6: Outlook Interop event-handler classes that directly depend on
+- [x] AC6: Outlook Interop event-handler classes that directly depend on
   `Microsoft.Office.Interop.Outlook` types without an injectable seam are annotated for
   null-safety but respect the repo COM/VSTO coverage exemption (no new tests forced around
   COM-bound code).

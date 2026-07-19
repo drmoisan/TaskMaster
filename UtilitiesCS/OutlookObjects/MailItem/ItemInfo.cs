@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Drawing;
 using System.Linq;
 using Microsoft.Office.Interop.Outlook;
@@ -44,36 +45,36 @@ namespace UtilitiesCS.EmailIntelligence
             UnRead = itemInfo.UnRead;
         }
 
-        public string Actionable { get; set; }
-        public IAttachment[] AttachmentsInfo { get; set; }
-        public string Body { get; set; }
-        public string Categories { get; set; }
-        public string ConversationID { get; set; }
-        public string EmailPrefixToStrip { get; set; }
-        public string EntryId { get; set; }
-        public string StoreId { get; set; }
+        public string? Actionable { get; set; }
+        public IAttachment[]? AttachmentsInfo { get; set; }
+        public string? Body { get; set; }
+        public string? Categories { get; set; }
+        public string? ConversationID { get; set; }
+        public string? EmailPrefixToStrip { get; set; }
+        public string? EntryId { get; set; }
+        public string? StoreId { get; set; }
         public int Size { get; set; }
-        public string FolderName { get; set; }
-        public IFolderWrapper FolderInfo { get; set; }
-        public string Html { get; set; }
-        public string HTMLBody { get; set; }
+        public string? FolderName { get; set; }
+        public IFolderWrapper? FolderInfo { get; set; }
+        public string? Html { get; set; }
+        public string? HTMLBody { get; set; }
         public int InternetCodepage { get; set; }
         public bool IsTaskFlagSet { get; set; }
-        public SegmentStopWatch Sw { get; set; }
+        public SegmentStopWatch? Sw { get; set; }
 
         public IItemInfo.PlainTextOptionsEnum PlainTextOptions { get; set; }
-        public IRecipientInfo Sender { get; set; }
-        public IRecipientInfo[] CcRecipients { get; set; }
-        public IRecipientInfo[] ToRecipients { get; set; }
+        public IRecipientInfo? Sender { get; set; }
+        public IRecipientInfo[]? CcRecipients { get; set; }
+        public IRecipientInfo[]? ToRecipients { get; set; }
 
         public DateTime SentDate { get; set; }
-        public string SentOn { get; set; }
-        public string Subject { get; set; }
-        public string[] Tokens { get; set; }
-        public string Triage { get; set; }
+        public string? SentOn { get; set; }
+        public string? Subject { get; set; }
+        public string[]? Tokens { get; set; }
+        public string? Triage { get; set; }
         public bool UnRead { get; set; }
 
-        public bool Equals(IItemInfo other)
+        public bool Equals(IItemInfo? other)
         {
             if (other is null)
             {
@@ -92,7 +93,7 @@ namespace UtilitiesCS.EmailIntelligence
                     return false;
                 if (Body != other.Body)
                     return false;
-                if (!Sender.Equals(other.Sender))
+                if (!Sender!.Equals(other.Sender))
                     return false;
                 if (!RecipientsEquivalent(CcRecipients, other.CcRecipients))
                     return false;
@@ -108,12 +109,12 @@ namespace UtilitiesCS.EmailIntelligence
             //return Size.GetHashCode() + SentDate.GetHashCode() * 31 +
             return (Subject ?? "").GetHashCode() * 31 * 31
                 + (Body ?? "").GetHashCode() * 31 * 31 * 31
-                + Sender.GetHashCode() * 31 * 31 * 31 * 31
+                + Sender!.GetHashCode() * 31 * 31 * 31 * 31
                 + GetRecipientsHashCode(CcRecipients) * 31 * 31 * 31 * 31 * 31
                 + GetRecipientsHashCode(ToRecipients) * 31 * 31 * 31 * 31 * 31 * 31;
         }
 
-        internal bool RecipientsEquivalent(IRecipientInfo[] source, IRecipientInfo[] other)
+        internal bool RecipientsEquivalent(IRecipientInfo[]? source, IRecipientInfo[]? other)
         {
             if (source == null && other == null)
                 return true;
@@ -126,7 +127,7 @@ namespace UtilitiesCS.EmailIntelligence
             return true;
         }
 
-        internal int GetRecipientsHashCode(IRecipientInfo[] recipients)
+        internal int GetRecipientsHashCode(IRecipientInfo[]? recipients)
         {
             if (recipients == null || recipients.Length == 0)
                 return 0;

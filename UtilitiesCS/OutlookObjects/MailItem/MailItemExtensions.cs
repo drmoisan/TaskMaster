@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -14,16 +15,16 @@ namespace UtilitiesCS.OutlookExtensions
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
         );
 
-        public static byte[] ToMIME(this Microsoft.Office.Interop.Outlook.MailItem mailItem)
+        public static byte[]? ToMIME(this Microsoft.Office.Interop.Outlook.MailItem mailItem)
         {
-            byte[] mimeContent =
+            byte[]? mimeContent =
                 mailItem.PropertyAccessor.GetProperty(
                     "http://schemas.microsoft.com/mapi/proptag/0x10130102"
                 ) as byte[];
             return mimeContent;
         }
 
-        public static async Task<object> TryMoveAsync(
+        public static async Task<object?> TryMoveAsync(
             this Outlook.MailItem mailItem,
             Outlook.Folder folder,
             int retries = 0

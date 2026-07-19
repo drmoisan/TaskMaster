@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -29,7 +30,7 @@ namespace UtilitiesCS
         public static string[] Details(
             this MailItem OlMail,
             string emailRootFolder,
-            IScoDictionaryNew<string, string> dictRemap = null
+            IScoDictionaryNew<string, string>? dictRemap = null
         )
         {
             string[] strAry;
@@ -68,7 +69,7 @@ namespace UtilitiesCS
 
         public static string[] Details(
             this MailItemHelper helper,
-            IScoDictionaryNew<string, string> dictRemap = null
+            IScoDictionaryNew<string, string>? dictRemap = null
         )
         {
             string[] strAry;
@@ -81,21 +82,21 @@ namespace UtilitiesCS
             strAry[1] = helper.Triage;
             if (
                 dictRemap is not null
-                && dictRemap.TryGetValue(helper.FolderInfo.RelativePath, out string folderPath)
+                && dictRemap.TryGetValue(helper.FolderInfo!.RelativePath, out string folderPath)
             )
             {
                 strAry[2] = folderPath;
             }
             else
             {
-                strAry[2] = helper.FolderInfo.RelativePath;
+                strAry[2] = helper.FolderInfo!.RelativePath;
             }
             strAry[3] = helper.SentOn; //OlMail.SentOn.ToString(@"yyyy-MM-dd\Th:mm:ss\+\0\0\:\0\0");
 
             //var recipients = OlMail.GetRecipients();
             strAry[5] = string.Join("; ", helper.ToRecipients.Select(x => x.Address));
             strAry[6] = string.Join("; ", helper.CcRecipients.Select(x => x.Address));
-            strAry[4] = helper.Sender.Address;
+            strAry[4] = helper.Sender!.Address;
             strAry[7] = helper.Subject;
             strAry[8] = helper.Body;
             int idx = strAry[4]?.LastIndexOf("@") ?? -1;
@@ -305,7 +306,7 @@ namespace UtilitiesCS
         private static string GetEmailFolderPath(
             this MailItem OlMail,
             string emailRootFolder,
-            IScoDictionaryNew<string, string> dictRemap
+            IScoDictionaryNew<string, string>? dictRemap
         )
         {
             Folder OlParent = (Folder)OlMail.Parent;

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Linq;
 using Microsoft.Office.Interop.Outlook;
@@ -64,7 +65,7 @@ namespace UtilitiesCS
 
         #region IEquatable<ItemInfo> Implementation
 
-        public bool Equals(IItemInfo other)
+        public bool Equals(IItemInfo? other)
         {
             if (other is null)
             {

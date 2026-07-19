@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -31,53 +32,53 @@ namespace UtilitiesCS.OutlookExtensions
 
         #region Predefined Properties
 
-        public Outlook.Actions Actions => TryGet(() => _olItem.Actions);
+        public Outlook.Actions? Actions => TryGet(() => _olItem.Actions);
 
-        public Outlook.Application Application => TryGet(() => _olItem.Application);
+        public Outlook.Application? Application => TryGet(() => _olItem.Application);
 
-        public Outlook.Attachments Attachments => TryGet(() => _olItem.Attachments);
+        public Outlook.Attachments? Attachments => TryGet(() => _olItem.Attachments);
 
-        public string BillingInformation
+        public string? BillingInformation
         {
             get => TryGet(() => _olItem.BillingInformation);
-            set => TrySet<string>((x) => _olItem.BillingInformation = x, value);
+            set => TrySet<string?>((x) => _olItem.BillingInformation = x, value);
         }
 
-        public string Body
+        public string? Body
         {
             get => TryGet(() => _olItem.Body);
-            set => TrySet<string>((x) => _olItem.Body = x, value);
+            set => TrySet<string?>((x) => _olItem.Body = x, value);
         }
 
-        public string Categories
+        public string? Categories
         {
             get => TryGet(() => _olItem.Categories);
-            set => TrySet<string>((x) => _olItem.Categories = x, value);
+            set => TrySet<string?>((x) => _olItem.Categories = x, value);
         }
 
-        public string Companies
+        public string? Companies
         {
             get => TryGet(() => _olItem.Companies);
-            set => TrySet<string>((x) => _olItem.Companies = x, value);
+            set => TrySet<string?>((x) => _olItem.Companies = x, value);
         }
 
         public Outlook.OlObjectClass OlObjectClass => TryGet(() => _olItem.Class);
 
-        public string ConversationIndex => TryGet(() => _olItem.ConversationIndex);
+        public string? ConversationIndex => TryGet(() => _olItem.ConversationIndex);
 
-        public string ConversationTopic => TryGet(() => _olItem.ConversationTopic);
+        public string? ConversationTopic => TryGet(() => _olItem.ConversationTopic);
 
         public System.DateTime CreationTime => TryGet(() => _olItem.CreationTime);
 
         public Outlook.OlDownloadState DownloadState => TryGet(() => _olItem.DownloadState);
 
-        public string EntryID => TryGet(() => _olItem.EntryID);
+        public string? EntryID => TryGet(() => _olItem.EntryID);
 
-        public Outlook.FormDescription FormDescription => TryGet(() => _olItem.FormDescription);
+        public Outlook.FormDescription? FormDescription => TryGet(() => _olItem.FormDescription);
 
-        public Object InnerObject => TryGet(() => _olItem.InnerObject);
+        public Object? InnerObject => TryGet(() => _olItem.InnerObject);
 
-        public Outlook.Inspector GetInspector => TryGet(() => _olItem.Inspector);
+        public Outlook.Inspector? GetInspector => TryGet(() => _olItem.Inspector);
 
         public Outlook.OlImportance Importance
         {
@@ -87,11 +88,11 @@ namespace UtilitiesCS.OutlookExtensions
 
         public bool IsConflict => TryGet(() => _olItem.IsConflict);
 
-        public Outlook.ItemProperties ItemProperties => TryGet(() => _olItem.ItemProperties);
+        public Outlook.ItemProperties? ItemProperties => TryGet(() => _olItem.ItemProperties);
 
         public System.DateTime LastModificationTime => TryGet(() => _olItem.LastModificationTime);
 
-        public Outlook.Links Links => TryGet(() => _olItem.Links);
+        public Outlook.Links? Links => TryGet(() => _olItem.Links);
 
         public Outlook.OlRemoteStatus MarkForDownload
         {
@@ -99,30 +100,30 @@ namespace UtilitiesCS.OutlookExtensions
             set => TrySet((x) => _olItem.MarkForDownload = x, value);
         }
 
-        public string MessageClass
+        public string? MessageClass
         {
             get => TryGet(() => _olItem.MessageClass);
-            set => TrySet((x) => _olItem.MessageClass = x, value);
+            set => TrySet<string?>((x) => _olItem.MessageClass = x, value);
         }
 
-        public string Mileage
+        public string? Mileage
         {
             get => TryGet(() => _olItem.Mileage);
-            set => TrySet((x) => _olItem.Mileage = x, value);
+            set => TrySet<string?>((x) => _olItem.Mileage = x, value);
         }
 
-        public object Move(Outlook.Folder DestinationFolder) =>
+        public object? Move(Outlook.Folder DestinationFolder) =>
             TryGet(() => _olItem.Move(DestinationFolder));
 
         public OlItemType OlItemType => TryGet(_olItem.GetOlItemType);
 
         public long OutlookInternalVersion => TryGet(() => _olItem.OutlookInternalVersion);
 
-        public string OutlookVersion => TryGet(() => _olItem.OutlookVersion);
+        public string? OutlookVersion => TryGet(() => _olItem.OutlookVersion);
 
-        public Outlook.Folder Parent => TryGet(() => _olItem.Parent);
+        public Outlook.Folder? Parent => TryGet(() => _olItem.Parent);
 
-        public Outlook.PropertyAccessor PropertyAccessor => TryGet(() => _olItem.PropertyAccessor);
+        public Outlook.PropertyAccessor? PropertyAccessor => TryGet(() => _olItem.PropertyAccessor);
 
         public bool Saved => TryGet(() => _olItem.Saved);
 
@@ -132,17 +133,17 @@ namespace UtilitiesCS.OutlookExtensions
             set => TrySet((x) => _olItem.Sensitivity = x, value);
         }
 
-        public Outlook.NameSpace Session => TryGet(() => _olItem.Session);
+        public Outlook.NameSpace? Session => TryGet(() => _olItem.Session);
 
         public int Size => TryGet(() => _olItem.Size);
 
-        public string Subject
+        public string? Subject
         {
             get => TryGet(() => _olItem.Subject);
-            set => TrySet((x) => _olItem.Subject = x, value);
+            set => TrySet<string?>((x) => _olItem.Subject = x, value);
         }
 
-        public string SenderName =>
+        public string? SenderName =>
             TryGet(() => ((Outlook.Recipient)_olItem.GetPropertyValue<Recipient>("Sender")).Name);
 
         public bool UnRead
@@ -151,15 +152,15 @@ namespace UtilitiesCS.OutlookExtensions
             set => TrySet((x) => _olItem.UnRead = x, value);
         }
 
-        public Outlook.UserProperties UserProperties => TryGet(() => _olItem.UserProperties);
+        public Outlook.UserProperties? UserProperties => TryGet(() => _olItem.UserProperties);
 
-        public object[] Args => TryGet(() => _olItem.Args);
+        public object[]? Args => TryGet(() => _olItem.Args);
 
         public OlObjectClass Class => TryGet(() => _olItem.Class);
 
-        public Inspector Inspector => TryGet(() => _olItem.Inspector);
+        public Inspector? Inspector => TryGet(() => _olItem.Inspector);
 
-        public Type ItemType => TryGet(() => _olItem.ItemType);
+        public Type? ItemType => TryGet(() => _olItem.ItemType);
 
         public bool NoAging
         {
@@ -181,7 +182,7 @@ namespace UtilitiesCS.OutlookExtensions
         public void Close(Outlook.OlInspectorClose SaveMode) =>
             TryCall(() => _olItem.Close(SaveMode));
 
-        public object Copy() => TryCall(() => _olItem.Copy());
+        public object? Copy() => TryCall(() => _olItem.Copy());
 
         public void Display() => TryCall(() => _olItem.Display());
 
@@ -200,7 +201,7 @@ namespace UtilitiesCS.OutlookExtensions
 
         #region Private Helper Functions
 
-        internal T TryGet<T>(Func<T> getter)
+        internal T? TryGet<T>(Func<T> getter)
         {
             try
             {
@@ -230,7 +231,7 @@ namespace UtilitiesCS.OutlookExtensions
             catch (SystemException) { }
         }
 
-        internal T TryCall<T>(Func<T> func)
+        internal T? TryCall<T>(Func<T> func)
         {
             try
             {
@@ -242,7 +243,7 @@ namespace UtilitiesCS.OutlookExtensions
             }
         }
 
-        public T GetPropertyValue<T>(string propertyName) =>
+        public T? GetPropertyValue<T>(string propertyName) =>
             TryGet(() => _olItem.GetPropertyValue<T>(propertyName));
 
         #endregion
