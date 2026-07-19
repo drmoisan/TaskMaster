@@ -220,13 +220,13 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         #region Configurable Properties
 
-        public FolderMinimalWrapper ArchiveRoot { get; set; } = new();
+        public FolderMinimalWrapper? ArchiveRoot { get; set; } = new();
 
-        public FilePathHelper ArchiveFsRoot { get; set; } = new();
+        public FilePathHelper? ArchiveFsRoot { get; set; } = new();
 
-        public FolderMinimalWrapper JunkPotential { get; set; } = new();
+        public FolderMinimalWrapper? JunkPotential { get; set; } = new();
 
-        public FolderMinimalWrapper JunkCertain { get; set; } = new();
+        public FolderMinimalWrapper? JunkCertain { get; set; } = new();
 
         #endregion Configurable Properties
     }

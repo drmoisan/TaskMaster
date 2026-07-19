@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         private StoreLaunchReadiness(
             StoreLaunchReadinessState state,
             StoresWrapper model,
-            IList<string> displayNames
+            IList<string?> displayNames
         )
         {
             State = state;
@@ -44,7 +45,7 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         internal StoresWrapper Model { get; }
 
-        internal IList<string> DisplayNames { get; }
+        internal IList<string?> DisplayNames { get; }
 
         internal static StoreLaunchReadiness NotReady(StoreLaunchReadinessState state)
         {
@@ -59,7 +60,7 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         internal static StoreLaunchReadiness Ready(
             StoresWrapper model,
-            IList<string> displayNames
+            IList<string?> displayNames
         ) => new(StoreLaunchReadinessState.Ready, model, displayNames);
     }
 
@@ -81,17 +82,17 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         internal IApplicationGlobals Globals { get; set; }
 
-        public IStoreWrapperViewer Viewer { get; internal set; }
+        public IStoreWrapperViewer Viewer { get; internal set; } = null!;
 
-        public StoresWrapper Model { get; internal set; }
+        public StoresWrapper Model { get; internal set; } = null!;
 
-        public StoreWrapper Current { get; internal set; }
+        public StoreWrapper Current { get; internal set; } = null!;
 
-        internal FolderMinimalWrapper ArchiveOutlook { get; set; }
-        internal FilePathHelper ArchiveFS { get; set; }
-        internal FolderMinimalWrapper JunkEmail { get; set; }
-        internal FolderMinimalWrapper JunkPotential { get; set; }
-        internal Func<string, (string, string)> FsConverter { get; set; }
+        internal FolderMinimalWrapper? ArchiveOutlook { get; set; }
+        internal FilePathHelper? ArchiveFS { get; set; }
+        internal FolderMinimalWrapper? JunkEmail { get; set; }
+        internal FolderMinimalWrapper? JunkPotential { get; set; }
+        internal Func<string, (string, string)> FsConverter { get; set; } = null!;
 
         /// <summary>
         /// Determines whether the store-wrapper model has finished loading and is safe to
@@ -164,8 +165,8 @@ namespace UtilitiesCS.OutlookObjects.Store
                     SaveChanges();
                 }
             }
-            var displayName = Viewer.DisplayName.SelectedValue.ToString();
-            Current = Model.Stores.Find(store => store.DisplayName == displayName);
+            var displayName = Viewer.DisplayName.SelectedValue?.ToString();
+            Current = Model.Stores!.Find(store => store.DisplayName == displayName);
             PopulateWithCurrent();
         }
 
@@ -190,7 +191,7 @@ namespace UtilitiesCS.OutlookObjects.Store
             }
             else
             {
-                ArchiveFS.FolderPath = folderPath;
+                ArchiveFS!.FolderPath = folderPath!;
                 Viewer.ArchiveFS.Text = GetRelativeFsPath();
             }
         }
@@ -378,7 +379,7 @@ namespace UtilitiesCS.OutlookObjects.Store
             {
                 if (existing is null)
                 {
-                    Model.ExcludedStoreIds.Add(storeId);
+                    Model.ExcludedStoreIds.Add(storeId!);
                 }
             }
             else if (existing is not null)
@@ -416,7 +417,7 @@ namespace UtilitiesCS.OutlookObjects.Store
             applyMethod.Invoke(olObjects, [JunkEmail?.RelativePath, JunkPotential?.RelativePath]);
         }
 
-        internal virtual FolderMinimalWrapper SelectFolder()
+        internal virtual FolderMinimalWrapper? SelectFolder()
         {
             try
             {
@@ -425,7 +426,7 @@ namespace UtilitiesCS.OutlookObjects.Store
                 {
                     return null;
                 }
-                return new FolderMinimalWrapper(folder, Current.RootFolder);
+                return new FolderMinimalWrapper(folder, Current.RootFolder!);
             }
             catch (Exception e)
             {
@@ -435,7 +436,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         }
 
         [ExcludeFromCodeCoverage]
-        internal string SelectFsFolder()
+        internal string? SelectFsFolder()
         {
             using (FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog())
             {
