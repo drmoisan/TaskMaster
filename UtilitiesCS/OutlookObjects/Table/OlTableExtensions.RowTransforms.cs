@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace UtilitiesCS
             IOrderedEnumerable<int> binIndices,
             int rowNumber,
             Dictionary<int, string> binStrings,
-            IEnumerable<int> objIndices,
+            IEnumerable<int>? objIndices,
             Dictionary<int, string> objStrings,
             object[] rawValues
         )
@@ -40,7 +41,7 @@ namespace UtilitiesCS
             this object[] rawValues,
             IOrderedEnumerable<int> binIndices,
             Dictionary<int, string> binStrings,
-            IEnumerable<int> objIndices,
+            IEnumerable<int>? objIndices,
             Dictionary<int, string> objStrings
         )
         {
@@ -70,9 +71,9 @@ namespace UtilitiesCS
 
         internal static Dictionary<int, string> ConvertObjectColumnsToString(
             Outlook.Row row,
-            IEnumerable<int> objIndices,
-            IEnumerable<string> objFields,
-            Dictionary<string, Func<object, string>> objectConverters
+            IEnumerable<int>? objIndices,
+            IEnumerable<string>? objFields,
+            Dictionary<string, Func<object, string>>? objectConverters
         )
         {
             var objStrings = new Dictionary<int, string>();

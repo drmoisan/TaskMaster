@@ -250,44 +250,44 @@ source. Runtime data transformations and invariants are unchanged by design.
 
 ## Definition of Done
 
-- [ ] Acceptance criteria documented and mapped to tests or demos
-- [ ] Behavior matches acceptance criteria in all documented environments
-- [ ] Tests updated/added (unit/integration as applicable)
-- [ ] Edge cases and error handling covered by tests
-- [ ] Docs updated (README, docs/features/active/... links)
-- [ ] Telemetry/logging added or updated (if applicable)
-- [ ] Toolchain pass completed (format -> lint -> type-check -> test)
+- [x] Acceptance criteria documented and mapped to tests or demos
+- [x] Behavior matches acceptance criteria in all documented environments
+- [x] Tests updated/added (unit/integration as applicable)
+- [x] Edge cases and error handling covered by tests
+- [x] Docs updated (README, docs/features/active/... links)
+- [x] Telemetry/logging added or updated (if applicable)
+- [x] Toolchain pass completed (format -> lint -> type-check -> test)
 
 Acceptance criteria (from `issue.md`, mapped here for traceability):
 
-- [ ] AC1: Every `.cs` file under
+- [x] AC1: Every `.cs` file under
   `UtilitiesCS/OutlookObjects/{MailItem,Item,Conversation,Attachment,Table}` that emits CS86xx
   carries `#nullable enable` and compiles with zero nullable diagnostics under the per-file
   pragma with `/p:TreatWarningsAsErrors=true`.
-- [ ] AC2: No project-level or solution-level `<Nullable>` element is introduced;
+- [x] AC2: No project-level or solution-level `<Nullable>` element is introduced;
   `UtilitiesCS.csproj` retains none.
-- [ ] AC3: No behavior change; existing MSTest tests for UtilitiesCS still pass.
-- [ ] AC4: No coverage regression on changed lines.
-- [ ] AC5: Public signatures of remediated members remain behavior-compatible; nullability
+- [x] AC3: No behavior change; existing MSTest tests for UtilitiesCS still pass.
+- [x] AC4: No coverage regression on changed lines.
+- [x] AC5: Public signatures of remediated members remain behavior-compatible; nullability
   annotations reflect actual null behavior and correctly consume the upstream #363/#364
   contracts.
-- [ ] AC6: Outlook Interop event-handler classes that directly depend on
+- [x] AC6: Outlook Interop event-handler classes that directly depend on
   `Microsoft.Office.Interop.Outlook` types without an injectable seam are annotated for
   null-safety but respect the repo COM/VSTO coverage exemption (no new tests forced around
   COM-bound code).
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] Existing `UtilitiesCS.Test/OutlookObjects/` suite continues to pass with no behavior
+- [x] Existing `UtilitiesCS.Test/OutlookObjects/` suite continues to pass with no behavior
   change (both current-layout and legacy-named duplicate test files identified in research
   Section 8 must stay green).
-- [ ] Changed-line coverage does not regress relative to baseline (prefer annotation and
+- [x] Changed-line coverage does not regress relative to baseline (prefer annotation and
   justified `!` over new runtime guards to avoid introducing uncovered executable lines).
-- [ ] The pragma-driven nullable gate
+- [x] The pragma-driven nullable gate
   (`msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU"
   /p:TreatWarningsAsErrors=true`) produces zero CS86xx for the remediated files, without
   `/p:Nullable=enable` globally.
-- [ ] No new tests are forced around COM-bound members lacking an injectable seam (e.g.,
+- [x] No new tests are forced around COM-bound members lacking an injectable seam (e.g.,
   `OutlookItem.GetPropertyValue<T>`'s `InvokeMember` path); `CidImageResolver.cs` remains held to
   normal, non-exempt coverage expectations.
 

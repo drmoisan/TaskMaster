@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Text.RegularExpressions;
 
@@ -104,7 +105,6 @@ style='color:black'>"
 <p class=MsoNormal><o:p>&nbsp;</o:p></p>";
         }
 
-#nullable enable
         private string? _emailHeader = null;
         internal string EmailHeader
         {
@@ -140,8 +140,6 @@ style='color:black'>"
                 return _emailHeader;
             }
         }
-
-#nullable disable
 
         internal string DarkModeHeader
         {

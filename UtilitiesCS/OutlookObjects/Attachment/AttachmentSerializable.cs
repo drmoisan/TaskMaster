@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -71,20 +72,20 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
             // Custom Properties
             ImageBytesOnly = imageBytesOnly;
             _a = a;
-            _data = new Lazy<byte[]>(() => GetBytes(_a));
+            _data = new Lazy<byte[]?>(() => GetBytes(_a!));
             _isImage = new Lazy<bool>(IsAnImage);
         }
 
-        private Attachment _a;
+        private Attachment? _a;
 
         #endregion Constructors
 
         #region Serialized Custom Properties
 
-        public string FileExtension { get; set; }
-        public string FilenameSeed { get; set; }
+        public string? FileExtension { get; set; }
+        public string? FilenameSeed { get; set; }
 
-        private Lazy<bool> _isImage;
+        private Lazy<bool>? _isImage;
         public bool IsImage
         {
             get
@@ -105,11 +106,14 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
             set => _isImage = value.ToLazyValue();
         }
 
-        private Lazy<byte[]> _data;
-        public byte[] AttachmentData
+        private Lazy<byte[]?>? _data;
+        public byte[]? AttachmentData
         {
             get => _data?.Value;
-            set => _data = value?.ToLazy();
+            // GetBytes can legitimately return null, so the lazy value type is byte[]?; ToLazy has a
+            // `where T : class` constraint that byte[]? cannot satisfy, so the lazy is built directly
+            // here. Behavior is identical to the previous value?.ToLazy(): null stays null.
+            set => _data = value is null ? null : new Lazy<byte[]?>(() => value);
         }
 
         #endregion Serialized Custom Properties
@@ -118,11 +122,11 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
 
         public OlAttachmentBlockLevel BlockLevel { get; set; }
         public OlObjectClass Class { get; set; }
-        public string ContentId { get; set; }
-        public string DisplayName { get; set; }
-        public string FileName { get; set; }
+        public string? ContentId { get; set; }
+        public string? DisplayName { get; set; }
+        public string? FileName { get; set; }
         public int Index { get; set; }
-        public string PathName { get; set; }
+        public string? PathName { get; set; }
         public int Position { get; set; }
         public int Size { get; set; }
         public OlAttachmentType Type { get; set; }
@@ -131,9 +135,9 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
 
         #region Helper Methods
 
-        internal byte[] GetBytes(Attachment attachment)
+        internal byte[]? GetBytes(Attachment attachment)
         {
-            byte[] bytes = null;
+            byte[]? bytes = null;
 
             if (!IsImage & ImageBytesOnly)
             {
@@ -159,7 +163,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
             return bytes;
         }
 
-        internal bool TryFromSaveAsLoad(Attachment attachment, out byte[] bytes)
+        internal bool TryFromSaveAsLoad(Attachment attachment, out byte[]? bytes)
         {
             bytes = null;
             var tempFolderPath = Environment.GetFolderPath(
@@ -180,7 +184,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
             return bytes is not null;
         }
 
-        internal bool TryFromAccessor(Attachment attachment, out byte[] bytes)
+        internal bool TryFromAccessor(Attachment attachment, out byte[]? bytes)
         {
             const string PR_ATTACH_DATA_BIN =
                 "http://schemas.microsoft.com/mapi/proptag/0x37010102";
@@ -197,7 +201,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
             return true;
         }
 
-        internal bool TryFromContentIdAccessor(Attachment attachment, out string contentId)
+        internal bool TryFromContentIdAccessor(Attachment attachment, out string? contentId)
         {
             const string PR_ATTACH_CONTENT_ID =
                 "http://schemas.microsoft.com/mapi/proptag/0x3712001F";
@@ -242,19 +246,19 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsing
 
         [JsonIgnore]
         [field: NonSerialized]
-        public Application Application { get; set; }
+        public Application? Application { get; set; }
 
         [JsonIgnore]
         [field: NonSerialized]
-        public object Parent { get; }
+        public object? Parent { get; }
 
         [JsonIgnore]
         [field: NonSerialized]
-        public PropertyAccessor PropertyAccessor { get; }
+        public PropertyAccessor? PropertyAccessor { get; }
 
         [JsonIgnore]
         [field: NonSerialized]
-        public NameSpace Session { get; set; }
+        public NameSpace? Session { get; set; }
 
         [JsonIgnore]
         [field: NonSerialized]

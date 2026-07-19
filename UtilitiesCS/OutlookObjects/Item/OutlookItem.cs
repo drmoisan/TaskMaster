@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -17,10 +18,10 @@ namespace UtilitiesCS
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
         );
 
-        protected object _item; // the wrapped Outlook item
-        protected Type _type; // type for the Outlook item
-        protected object[] _args; // dummy argument array
-        protected System.Type _typeOlObjectClass;
+        protected object? _item; // the wrapped Outlook item
+        protected Type? _type; // type for the Outlook item
+        protected object[] _args = new object[] { }; // dummy argument array
+        protected System.Type? _typeOlObjectClass;
 
         #region OutlookItem Constants
 
@@ -84,11 +85,11 @@ namespace UtilitiesCS
 
         #region Internal Properties
 
-        internal object Item
+        internal object? Item
         {
             get => _item;
         }
-        public Type ItemType
+        public Type? ItemType
         {
             get => _type;
         }
@@ -173,7 +174,7 @@ namespace UtilitiesCS
         public Outlook.FormDescription FormDescription =>
             this.GetPropertyValue<Outlook.FormDescription>(olFormDescription);
 
-        public object InnerObject => this._item;
+        public object? InnerObject => this._item;
 
         public Outlook.Inspector Inspector =>
             this.GetPropertyValue<Outlook.Inspector>(olGetInspector);
@@ -292,12 +293,12 @@ namespace UtilitiesCS
 
         #region Internal Helper Functions
 
-        internal virtual T GetPropertyValueIfExists<T>(string propertyName)
+        internal virtual T? GetPropertyValueIfExists<T>(string propertyName)
         {
             var propertyInfo = TryGetPropertyInfo(propertyName);
             try
             {
-                return (T)(propertyInfo?.GetValue(_item) ?? default(T));
+                return (T?)(propertyInfo?.GetValue(_item) ?? default(T));
             }
             catch (SystemException e)
             {
@@ -310,17 +311,17 @@ namespace UtilitiesCS
             }
         }
 
-        internal virtual PropertyInfo TryGetPropertyInfo(string propertyName)
+        internal virtual PropertyInfo? TryGetPropertyInfo(string propertyName)
         {
             try
             {
-                return _type.GetProperty(propertyName);
+                return _type!.GetProperty(propertyName);
             }
             catch (SystemException e)
             {
                 logger.Debug(
                     $"{nameof(OutlookItem)}.{nameof(TryGetPropertyInfo)} threw an "
-                        + $"exception for property [{propertyName}] of item type [{ItemType.Name}]. {e.Message}",
+                        + $"exception for property [{propertyName}] of item type [{ItemType?.Name}]. {e.Message}",
                     e
                 );
                 return null;
@@ -375,7 +376,7 @@ namespace UtilitiesCS
             try
             {
                 // For COM objects, use InvokeMember for late binding
-                var value = ItemType.InvokeMember(
+                var value = ItemType!.InvokeMember(
                     propertyName,
                     BindingFlags.Public
                         | BindingFlags.Instance
@@ -390,7 +391,7 @@ namespace UtilitiesCS
             catch (MissingMemberException)
             {
                 // Property does not exist
-                throw new MissingMemberException(ItemType.Name, propertyName);
+                throw new MissingMemberException(ItemType!.Name, propertyName);
             }
             catch (TargetInvocationException ex)
             {
@@ -416,7 +417,7 @@ namespace UtilitiesCS
         {
             try
             {
-                ItemType.InvokeMember(
+                ItemType!.InvokeMember(
                     propertyName,
                     BindingFlags.Public
                         | BindingFlags.Instance
@@ -431,7 +432,7 @@ namespace UtilitiesCS
             {
                 var propertyInfo =
                     TryGetPropertyInfo(propertyName)
-                    ?? throw new MissingMemberException(ItemType.Name, propertyName);
+                    ?? throw new MissingMemberException(ItemType!.Name, propertyName);
                 try
                 {
                     propertyInfo.SetValue(_item, propertyValue);
@@ -452,7 +453,7 @@ namespace UtilitiesCS
         {
             try
             {
-                var obj = _type.InvokeMember(
+                var obj = _type!.InvokeMember(
                     methodName,
                     BindingFlags.Public | BindingFlags.InvokeMethod,
                     null,
@@ -465,7 +466,7 @@ namespace UtilitiesCS
             {
                 try
                 {
-                    var methodInfo = _type.GetMethod(methodName).ThrowIfNull();
+                    var methodInfo = _type!.GetMethod(methodName).ThrowIfNull();
                     return methodInfo.Invoke(_item, _args);
                 }
                 catch (Exception)
@@ -480,7 +481,7 @@ namespace UtilitiesCS
             try
             {
                 // An invalid property name exception is propagated to client
-                return _type.InvokeMember(
+                return _type!.InvokeMember(
                     methodName,
                     BindingFlags.Public | BindingFlags.InvokeMethod,
                     null,

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -67,7 +68,7 @@ namespace UtilitiesCS.OutlookExtensions
                     else
                     {
                         complete =
-                            (OlFlagStatus)this.TryGetPropertyValue(_olFlagStatus)
+                            (OlFlagStatus)this.TryGetPropertyValue(_olFlagStatus)!
                             == OlFlagStatus.olFlagComplete;
                     }
                     return complete;
@@ -111,7 +112,7 @@ namespace UtilitiesCS.OutlookExtensions
         {
             get
             {
-                object dueDate;
+                object? dueDate;
                 if (_olType == OlItemType.olTaskItem)
                 {
                     dueDate = OutlookItemExtensions.TryGetPropertyValue(this, _olDueDate);
@@ -218,7 +219,7 @@ namespace UtilitiesCS.OutlookExtensions
         {
             get
             {
-                object startDate = null;
+                object? startDate = null;
                 if (_olType == OlItemType.olTaskItem)
                 {
                     startDate = this.TryGetPropertyValue(_olStartDate, _olCreationTime);
@@ -299,7 +300,7 @@ namespace UtilitiesCS.OutlookExtensions
         {
             get
             {
-                object work;
+                object? work;
                 if (_olType == OlItemType.olTaskItem)
                 {
                     work = OutlookItemExtensions.TryGetPropertyValue(this, _olTotalWork);
@@ -310,7 +311,7 @@ namespace UtilitiesCS.OutlookExtensions
                 }
                 try
                 {
-                    return (int)work;
+                    return (int)work!;
                 }
                 catch (System.Exception)
                 {
