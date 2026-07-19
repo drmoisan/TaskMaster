@@ -1,3 +1,4 @@
+#nullable enable
 using System.IO;
 using Newtonsoft.Json;
 using UtilitiesCS.EmailIntelligence.Bayesian;

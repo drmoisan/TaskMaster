@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -33,7 +34,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
 
         #region Folder predictor seam (LCPPN, flag-gated)
 
-        private LcppnFolderPredictorConfig _folderPredictorConfig;
+        private LcppnFolderPredictorConfig? _folderPredictorConfig;
 
         /// <summary>
         /// Configuration that controls the Folder predictor seam. When not explicitly set, it is
@@ -118,7 +119,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
 
         #region Build Classifiers
 
-        public virtual async Task<ConcurrentObservableCollection<MinedMailInfo>> LoadStaging()
+        public virtual async Task<ConcurrentObservableCollection<MinedMailInfo>?> LoadStaging()
         {
             _mailInfoCollection = await Task.Run(() =>
             {
@@ -138,7 +139,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
             return _mailInfoCollection;
         }
 
-        protected ConcurrentObservableCollection<MinedMailInfo> _mailInfoCollection;
+        protected ConcurrentObservableCollection<MinedMailInfo>? _mailInfoCollection;
 
         public virtual async Task<BayesianClassifierGroup> GetOrCreateClassifierGroupAsync(
             MinedMailInfo[] collection

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -71,7 +72,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
 
         #region Testing Sizing and Serialization Methods
 
-        internal virtual T Deserialize<T>(string fileNameSeed, string fileNameSuffix = "")
+        internal virtual T? Deserialize<T>(string fileNameSeed, string fileNameSuffix = "")
         {
             var jsonSettings = new JsonSerializerSettings()
             {
@@ -106,7 +107,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             }
         }
 
-        internal virtual async Task<T> DeserializeAsync<T>(
+        internal virtual async Task<T?> DeserializeAsync<T>(
             string fileNameSeed,
             string fileNameSuffix = ""
         )
@@ -326,7 +327,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         }
 
         [ExcludeFromCodeCoverage]
-        internal virtual (T Object, long Size) TryLoadObjectAndGetMemorySize<T>(
+        internal virtual (T? Object, long Size) TryLoadObjectAndGetMemorySize<T>(
             Func<T> loader,
             int copiesToLoad = 1
         )
@@ -414,7 +415,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         {
             try
             {
-                T obj = await DeserializeAsync<T>(fileNameSeed, fileNameSuffix);
+                T? obj = await DeserializeAsync<T>(fileNameSeed, fileNameSuffix);
                 if (obj != null)
                     return true;
                 else

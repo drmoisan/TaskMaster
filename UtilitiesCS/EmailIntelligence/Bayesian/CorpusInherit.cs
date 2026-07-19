@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -56,8 +57,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         #region Public Properties and Methods
 
-        private string _id;
-        public string Id
+        private string? _id;
+        public string? Id
         {
             get => _id;
             set => _id = value;
@@ -152,7 +153,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         internal static CorpusInherit Deserialize(FilePathHelper disk, bool askUserOnError)
         {
-            CorpusInherit dictionary = null;
+            CorpusInherit? dictionary = null;
             bool writeDictionary = false;
             DialogResult response = DialogResult.Ignore;
 
@@ -189,14 +190,18 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             if (writeDictionary)
             {
-                dictionary.Serialize();
+                // Reached only from the catch paths, where dictionary was assigned by
+                // CreateEmpty (which returns non-null or throws); never null here.
+                dictionary!.Serialize();
             }
-            return dictionary;
+            // All reaching paths leave dictionary non-null: the success path throws when
+            // DeserializeJson returns null, and each catch path assigns CreateEmpty (non-null) or throws.
+            return dictionary!;
         }
 
-        protected static CorpusInherit DeserializeJson(FilePathHelper disk)
+        protected static CorpusInherit? DeserializeJson(FilePathHelper disk)
         {
-            CorpusInherit collection;
+            CorpusInherit? collection;
             var settings = new JsonSerializerSettings();
             settings.TypeNameHandling = TypeNameHandling.Auto;
             settings.Formatting = Formatting.Indented;
@@ -279,7 +284,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         private ThreadSafeSingleShotGuard _serializationRequested = new();
-        private TimerWrapper _timer;
+        private TimerWrapper? _timer;
 
         protected void RequestSerialization(string filePath)
         {

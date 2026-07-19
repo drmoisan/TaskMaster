@@ -151,15 +151,15 @@ golden, property, and characterization tests remain unchanged.
 
 ## Acceptance Criteria
 
-- [ ] AC1: Every in-scope `.cs` file under `UtilitiesCS/EmailIntelligence/Bayesian`,
+- [x] AC1: Every in-scope `.cs` file under `UtilitiesCS/EmailIntelligence/Bayesian`,
   `.../ClassifierGroups`, and `.../Flags` that emits CS86xx carries `#nullable enable` and
   compiles with zero nullable diagnostics under the per-file pragma with
   `TreatWarningsAsErrors`.
-- [ ] AC2: No project-level `<Nullable>` element is introduced into `UtilitiesCS.csproj`.
-- [ ] AC3: No behavior change; no change to any classifier scoring or model path; existing
+- [x] AC2: No project-level `<Nullable>` element is introduced into `UtilitiesCS.csproj`.
+- [x] AC3: No behavior change; no change to any classifier scoring or model path; existing
   tests (including golden/property tests) still pass unchanged.
-- [ ] AC4: No coverage regression on changed lines.
-- [ ] AC5: Public signatures of remediated members remain behavior-compatible; nullability
+- [x] AC4: No coverage regression on changed lines.
+- [x] AC5: Public signatures of remediated members remain behavior-compatible; nullability
   annotations reflect actual null behavior and honor the upstream #363 extension contracts.
 
 ## Non-Goals

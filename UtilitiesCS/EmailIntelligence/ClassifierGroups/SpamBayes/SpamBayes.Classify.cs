@@ -1,3 +1,4 @@
+#nullable enable
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
@@ -15,12 +16,14 @@ namespace UtilitiesCS.EmailIntelligence
             {
                 return;
             }
+            // TokenizeAsync/CalculateProbabilityAsync are assigned in InitAsync alongside ClassifierGroup;
+            // reaching this loop means the engine is activated, so the delegates are non-null.
             foreach (object item in selection)
             {
                 if (item is MailItem mailItem)
                 {
-                    var tokens = await TokenizeAsync(mailItem);
-                    var probability = await CalculateProbabilityAsync(tokens);
+                    var tokens = await TokenizeAsync!(mailItem);
+                    var probability = await CalculateProbabilityAsync!(tokens);
                     await TestActionAsync(mailItem, probability);
                 }
             }
@@ -28,7 +31,8 @@ namespace UtilitiesCS.EmailIntelligence
 
         public async Task TestAsync(IItemInfo helper)
         {
-            var probability = await CalculateProbabilityAsync(helper.Tokens);
+            // CalculateProbabilityAsync is assigned in InitAsync; callers invoke Test after activation.
+            var probability = await CalculateProbabilityAsync!(helper.Tokens);
             await TestActionAsync(helper, probability);
         }
 
@@ -36,8 +40,9 @@ namespace UtilitiesCS.EmailIntelligence
         {
             if (item is MailItem mailItem)
             {
-                var tokens = await TokenizeAsync(mailItem);
-                var probability = await CalculateProbabilityAsync(tokens);
+                // Tokenize/CalculateProbability delegates are assigned in InitAsync; invoked post-activation.
+                var tokens = await TokenizeAsync!(mailItem);
+                var probability = await CalculateProbabilityAsync!(tokens);
                 await TestActionAsync(mailItem, probability);
             }
             else
@@ -96,7 +101,8 @@ namespace UtilitiesCS.EmailIntelligence
 
         public async Task TrainCallbackAsync(object item, bool isSpam)
         {
-            MailItem mailItem = item as MailItem;
+            // TrainCallbackAsync is only invoked with MailItem items (pre-existing assumption).
+            MailItem mailItem = (item as MailItem)!;
             await Task.Run(async () =>
             {
                 if (isSpam)

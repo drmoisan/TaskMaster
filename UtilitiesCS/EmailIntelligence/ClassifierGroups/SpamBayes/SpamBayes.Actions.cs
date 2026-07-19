@@ -1,3 +1,4 @@
+#nullable enable
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
@@ -26,7 +27,7 @@ namespace UtilitiesCS.EmailIntelligence
         {
             lock (helper.Item)
             {
-                Folder destination = GetDestinationFolder(helper.Item, isSpam);
+                Folder? destination = GetDestinationFolder(helper.Item, isSpam);
                 if (destination is not null)
                 {
                     var moved = helper.Item.Move(destination);
@@ -40,12 +41,12 @@ namespace UtilitiesCS.EmailIntelligence
 
         internal void MoveSpamOrHam(MailItem mailItem, bool? isSpam)
         {
-            Folder destination = GetDestinationFolder(mailItem, isSpam);
+            Folder? destination = GetDestinationFolder(mailItem, isSpam);
             if (destination is not null)
                 mailItem.Move(destination);
         }
 
-        internal Folder GetDestinationFolder(MailItem mailItem, bool? isSpam)
+        internal Folder? GetDestinationFolder(MailItem mailItem, bool? isSpam)
         {
             if (mailItem is null)
             {

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -141,7 +142,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     continue;
                 }
 
-                predictor.Train(relativePath, mail.Tokens ?? Array.Empty<string>(), 1);
+                // Reached only when relativePath (derived from mail) is non-empty, so mail is non-null.
+                predictor.Train(relativePath!, mail!.Tokens ?? Array.Empty<string>(), 1);
             }
 
             return predictor;
