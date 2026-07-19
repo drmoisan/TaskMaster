@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -64,7 +65,7 @@ namespace UtilitiesCS
         [Obsolete]
         public static Dictionary<Details, string> ExtractSummary(MailItem item)
         {
-            MailItem OlMail = MailResolution.TryResolveMailItem(item);
+            MailItem? OlMail = MailResolution.TryResolveMailItem(item);
             if (OlMail == null)
             {
                 return new Dictionary<Details, string>()

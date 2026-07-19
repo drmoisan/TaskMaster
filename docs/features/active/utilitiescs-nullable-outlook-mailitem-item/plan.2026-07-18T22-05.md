@@ -128,24 +128,24 @@ kinds, so no `EVIDENCE_LOCATION_OVERRIDE_REJECTED` substitution is required.
 
 ### Phase 3 — Batch C Small COM-Bound Leaves
 
-- [ ] [P3-T1] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/MailItem/MailResolution.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P3-T1] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/MailItem/MailResolution.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P3-T7).
-- [ ] [P3-T2] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/MailItem/MailItemExtensions.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P3-T2] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/MailItem/MailItemExtensions.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P3-T7).
-- [ ] [P3-T3] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Item/OlItemPseudoInterface.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P3-T3] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Item/OlItemPseudoInterface.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P3-T7).
-- [ ] [P3-T4] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Item/OlItemSummary.cs` and apply annotation-only null-safety edits to reach zero CS86xx
+- [x] [P3-T4] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Item/OlItemSummary.cs` and apply annotation-only null-safety edits to reach zero CS86xx
   - Acceptance: file carries the pragma; annotation-only; zero CS86xx (verified in P3-T7).
-- [ ] [P3-T5] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Table/OlToDoTable.cs` and apply annotation-only null-safety edits to reach zero CS86xx, leaving the `dynamic item = itemObj;` line in `EnsureItemValues` unconverted
+- [x] [P3-T5] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Table/OlToDoTable.cs` and apply annotation-only null-safety edits to reach zero CS86xx, leaving the `dynamic item = itemObj;` line in `EnsureItemValues` unconverted
   - Acceptance: file carries the pragma; annotation-only; the `dynamic item` line is byte-unchanged; zero CS86xx (verified in P3-T7).
-- [ ] [P3-T6] Record the `dynamic item` nullable-flow-analysis hazard flag to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/other/maintainer-flags.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P3-T6] Record the `dynamic item` nullable-flow-analysis hazard flag to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/other/maintainer-flags.<yyyy-MM-ddTHH-mm>.md`
   - Acceptance: artifact records that `dynamic item = itemObj;` in `OlToDoTable.EnsureItemValues` is invisible to nullable-flow analysis and was flagged, not fixed (converting to a typed access pattern would be a behavior-risk refactor, out of scope), with `Timestamp:`.
-- [ ] [P3-T7] Run CSharpier over the Batch C files (`MailItem/MailResolution.cs`, `MailItem/MailItemExtensions.cs`, `Item/OlItemPseudoInterface.cs`, `Item/OlItemSummary.cs`, `Table/OlToDoTable.cs`) and confirm no residual formatting diff
+- [x] [P3-T7] Run CSharpier over the Batch C files (`MailItem/MailResolution.cs`, `MailItem/MailItemExtensions.cs`, `Item/OlItemPseudoInterface.cs`, `Item/OlItemSummary.cs`, `Table/OlToDoTable.cs`) and confirm no residual formatting diff
   - Acceptance: `csharpier --check .` exits 0 for the touched files.
-- [ ] [P3-T8] Run the pragma-only nullable build and record Batch C verification to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/qa-gates/batch-c-nullable-build.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P3-T8] Run the pragma-only nullable build and record Batch C verification to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/qa-gates/batch-c-nullable-build.<yyyy-MM-ddTHH-mm>.md`
   - Command: `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx for the 5 opted-in Batch C files and NO new diagnostics elsewhere.
-- [ ] [P3-T9] Run the Batch C UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/regression-testing/batch-c-tests.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P3-T9] Run the Batch C UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/regression-testing/batch-c-tests.<yyyy-MM-ddTHH-mm>.md`
   - Command: `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /TestCaseFilter:"FullyQualifiedName~MailResolution|FullyQualifiedName~MailItemExtensions|FullyQualifiedName~OlItemPseudoInterface|FullyQualifiedName~OlItemSummary|FullyQualifiedName~OlToDoTable"`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` with passed/failed counts; `OlItemPseudoInterfaceTests.cs`/`OlItemPseudoInterface_Tests.cs`, `OlItemSummaryTests.cs`, `MailResolutionTests.cs`, `OlToDoTableTests.cs`/`OlToDoTable_Tests.cs` all green and behavior-identical.
 

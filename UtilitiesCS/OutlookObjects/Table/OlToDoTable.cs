@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.OutlookObjects.Fields;
 using Outlook = Microsoft.Office.Interop.Outlook;
@@ -7,9 +8,9 @@ namespace UtilitiesCS.OutlookExtensions
 {
     public static class OlToDoTable
     {
-        public static Outlook.Table GetToDoTable(this Outlook.Store store)
+        public static Outlook.Table? GetToDoTable(this Outlook.Store store)
         {
-            MAPIFolder folder = null;
+            MAPIFolder? folder = null;
             try
             {
                 folder = store.GetDefaultFolder(OlDefaultFolders.olFolderToDo);
@@ -42,7 +43,7 @@ namespace UtilitiesCS.OutlookExtensions
             try
             {
                 var userDefinedProperties = folder.UserDefinedProperties;
-                UserDefinedProperty field = null;
+                UserDefinedProperty? field = null;
 
                 try
                 {
@@ -71,14 +72,14 @@ namespace UtilitiesCS.OutlookExtensions
 
         private static void EnsureItemValues(MAPIFolder folder)
         {
-            Items items = null;
+            Items? items = null;
             try
             {
                 items = folder.Items;
                 int itemCount = items.Count;
                 for (int i = 1; i <= itemCount; i++)
                 {
-                    object itemObj = null;
+                    object? itemObj = null;
                     try
                     {
                         itemObj = items[i];
@@ -89,14 +90,14 @@ namespace UtilitiesCS.OutlookExtensions
 
                         dynamic item = itemObj;
                         PropertyAccessor accessor = item.PropertyAccessor;
-                        string entryId = item.EntryID as string;
+                        string? entryId = item.EntryID as string;
 
                         if (string.IsNullOrWhiteSpace(entryId))
                         {
                             continue;
                         }
 
-                        string value = null;
+                        string? value = null;
                         try
                         {
                             value = accessor.GetProperty(MAPIFields.Schemas.ToDoID) as string;
