@@ -100,16 +100,16 @@ kinds, so no `EVIDENCE_LOCATION_OVERRIDE_REJECTED` substitution is required.
 
 ### Phase 1 — Batch A Dead-Code Confirm-Clean
 
-- [ ] [P1-T1] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/MailItem/CaptureEmailAddressesModule2.cs` (entire body already commented out; no live-code changes possible)
+- [x] [P1-T1] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/MailItem/CaptureEmailAddressesModule2.cs` (entire body already commented out; no live-code changes possible)
   - Acceptance: file carries the pragma as its sole change; zero CS86xx (verified in P1-T4).
-- [ ] [P1-T2] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Item/ItemComparer.cs` (entire body already commented out; no live-code changes possible)
+- [x] [P1-T2] Add `#nullable enable` to `UtilitiesCS/OutlookObjects/Item/ItemComparer.cs` (entire body already commented out; no live-code changes possible)
   - Acceptance: file carries the pragma as its sole change; zero CS86xx (verified in P1-T4).
-- [ ] [P1-T3] Run CSharpier over the Batch A files (`MailItem/CaptureEmailAddressesModule2.cs`, `Item/ItemComparer.cs`) with `dotnet tool run csharpier .` and confirm no residual formatting diff
+- [x] [P1-T3] Run CSharpier over the Batch A files (`MailItem/CaptureEmailAddressesModule2.cs`, `Item/ItemComparer.cs`) with `dotnet tool run csharpier .` and confirm no residual formatting diff
   - Acceptance: `csharpier --check .` exits 0 for the touched files.
-- [ ] [P1-T4] Run the pragma-only nullable build and record Batch A verification to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/qa-gates/batch-a-nullable-build.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P1-T4] Run the pragma-only nullable build and record Batch A verification to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/qa-gates/batch-a-nullable-build.<yyyy-MM-ddTHH-mm>.md`
   - Command: `msbuild TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` confirming zero CS86xx for the 2 opted-in Batch A files and NO new diagnostics elsewhere.
-- [ ] [P1-T5] Run the Batch A UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/regression-testing/batch-a-tests.<yyyy-MM-ddTHH-mm>.md`
+- [x] [P1-T5] Run the Batch A UtilitiesCS tests and record results to `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/regression-testing/batch-a-tests.<yyyy-MM-ddTHH-mm>.md`
   - Command: `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage /TestCaseFilter:"FullyQualifiedName~CaptureEmailAddressesModule2"`
   - Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` with passed/failed counts; `CaptureEmailAddressesModule2Tests.cs` green and behavior-identical (no test exists for `ItemComparer.cs`, consistent with it being dead code).
 
