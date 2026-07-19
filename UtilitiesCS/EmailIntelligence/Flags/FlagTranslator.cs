@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -34,28 +35,28 @@ namespace UtilitiesCS
             set => identifier = value;
         }
 
-        private Func<bool, string> _getStrFunc;
+        private Func<bool, string> _getStrFunc = null!;
         public Func<bool, string> GetStrFunc
         {
             get => _getStrFunc;
             set => _getStrFunc = value;
         }
 
-        private Action<bool, string> _setStrFunc;
+        private Action<bool, string> _setStrFunc = null!;
         public Action<bool, string> SetStrFunc
         {
             get => _setStrFunc;
             set => _setStrFunc = value;
         }
 
-        private Func<bool, ObservableCollection<string>> _getListFunc;
+        private Func<bool, ObservableCollection<string>> _getListFunc = null!;
         public Func<bool, ObservableCollection<string>> GetListFunc
         {
             get => _getListFunc;
             set => _getListFunc = value;
         }
 
-        private Action<bool, ObservableCollection<string>> _setListFunc;
+        private Action<bool, ObservableCollection<string>> _setListFunc = null!;
         public Action<bool, ObservableCollection<string>> SetListFunc
         {
             get => _setListFunc;

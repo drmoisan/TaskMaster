@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -99,7 +100,7 @@ namespace UtilitiesCS
             return includePrefix ? _context.WithPrefix : _context.NoPrefix;
         }
 
-        public void SetContext(bool includePrefix = false, string value = default)
+        public void SetContext(bool includePrefix = false, string? value = default)
         {
             _context.List = SplitToList(value, ",", _context.Prefix);
         }
@@ -109,8 +110,8 @@ namespace UtilitiesCS
 
         public void SetContextList(
             bool IncludePrefix = false,
-            ObservableCollection<string> value = default
-        ) => _context.List = value;
+            ObservableCollection<string>? value = default
+        ) => _context.List = value!;
 
         #endregion
 
@@ -131,7 +132,7 @@ namespace UtilitiesCS
             return includePrefix ? _projects.WithPrefix : _projects.NoPrefix;
         }
 
-        public void SetProjects(bool includePrefix = false, string value = default)
+        public void SetProjects(bool includePrefix = false, string? value = default)
         {
             _projects.List = SplitToList(value, ",", _projects.Prefix);
         }
@@ -141,8 +142,8 @@ namespace UtilitiesCS
 
         public void SetProjectList(
             bool IncludePrefix = false,
-            ObservableCollection<string> value = default
-        ) => _projects.List = value;
+            ObservableCollection<string>? value = default
+        ) => _projects.List = value!;
 
         #endregion
 
@@ -163,7 +164,7 @@ namespace UtilitiesCS
             return includePrefix ? _program.WithPrefix : _program.NoPrefix;
         }
 
-        public void SetProgram(bool includePrefix = false, string value = default)
+        public void SetProgram(bool includePrefix = false, string? value = default)
         {
             _program.List = SplitToList(value, ",", _program.Prefix);
         }
@@ -173,8 +174,8 @@ namespace UtilitiesCS
 
         public void SetProgramList(
             bool IncludePrefix = false,
-            ObservableCollection<string> value = default
-        ) => _program.List = value;
+            ObservableCollection<string>? value = default
+        ) => _program.List = value!;
 
         #endregion Program
 
@@ -195,7 +196,7 @@ namespace UtilitiesCS
             return IncludePrefix ? _topics.WithPrefix : _topics.NoPrefix;
         }
 
-        public void SetTopics(bool includePrefix = false, string value = default)
+        public void SetTopics(bool includePrefix = false, string? value = default)
         {
             _topics.List = SplitToList(value, ",", _topics.Prefix);
         }
@@ -205,8 +206,8 @@ namespace UtilitiesCS
 
         public void SetTopicList(
             bool IncludePrefix = false,
-            ObservableCollection<string> value = default
-        ) => _topics.List = value;
+            ObservableCollection<string>? value = default
+        ) => _topics.List = value!;
 
         #endregion Topics
 
@@ -225,7 +226,7 @@ namespace UtilitiesCS
         public string GetPeople(bool IncludePrefix = false) =>
             IncludePrefix ? _people.WithPrefix : _people.NoPrefix;
 
-        public void SetPeople(bool IncludePrefix = false, string value = default) =>
+        public void SetPeople(bool IncludePrefix = false, string? value = default) =>
             _people.List = SplitToList(value, ",", _people.Prefix);
 
         public ObservableCollection<string> GetPeopleList(bool IncludePrefix = false) =>
@@ -233,11 +234,11 @@ namespace UtilitiesCS
 
         public void SetPeopleList(
             bool IncludePrefix = false,
-            ObservableCollection<string> value = default
-        ) => _people.List = value;
+            ObservableCollection<string>? value = default
+        ) => _people.List = value!;
         //{
         //    if (IncludePrefix) { _people.ListWithPrefix = value; }
-        //    else { _people.List = value; }
+        //    else { _people.List = value!; }
         //}
 
         #endregion People
@@ -252,7 +253,7 @@ namespace UtilitiesCS
             return includePrefix ? _kb.WithPrefix : _kb.NoPrefix;
         }
 
-        public void SetKb(bool includePrefix = false, string value = default)
+        public void SetKb(bool includePrefix = false, string? value = default)
         {
             _kb.List = SplitToList(value, ",", _kb.Prefix);
         }
@@ -262,8 +263,8 @@ namespace UtilitiesCS
 
         public void SetKbList(
             bool IncludePrefix = false,
-            ObservableCollection<string> value = default
-        ) => _kb.List = value;
+            ObservableCollection<string>? value = default
+        ) => _kb.List = value!;
 
         #endregion Kanban
 
@@ -313,7 +314,7 @@ namespace UtilitiesCS
 
         //protected bool updated;
 
-        public FlagConsolidator Combined { get; protected set; }
+        public FlagConsolidator Combined { get; protected set; } = null!;
 
         #region commented out
         ///// <summary>
@@ -353,13 +354,13 @@ namespace UtilitiesCS
             add { }
             remove { }
         }
-        public event NotifyCollectionChangedEventHandler PeopleChanged;
-        public event NotifyCollectionChangedEventHandler ProjectsChanged;
-        public event NotifyCollectionChangedEventHandler ProgramChanged;
-        public event NotifyCollectionChangedEventHandler TopicsChanged;
-        public event NotifyCollectionChangedEventHandler ContextChanged;
-        public event NotifyCollectionChangedEventHandler KbChanged;
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event NotifyCollectionChangedEventHandler? PeopleChanged;
+        public event NotifyCollectionChangedEventHandler? ProjectsChanged;
+        public event NotifyCollectionChangedEventHandler? ProgramChanged;
+        public event NotifyCollectionChangedEventHandler? TopicsChanged;
+        public event NotifyCollectionChangedEventHandler? ContextChanged;
+        public event NotifyCollectionChangedEventHandler? KbChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         private void People_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -508,7 +509,7 @@ namespace UtilitiesCS
             string charWC = "*"
         )
         {
-            string AddWildcardsRet = default;
+            string? AddWildcardsRet = default;
 
             string strTemp;
             strTemp = sourceString;
@@ -522,7 +523,7 @@ namespace UtilitiesCS
         }
 
         private ObservableCollection<string> SplitToList(
-            string MainString,
+            string? MainString,
             string Delimiter,
             string ReplaceString = "XXXXX"
         )
