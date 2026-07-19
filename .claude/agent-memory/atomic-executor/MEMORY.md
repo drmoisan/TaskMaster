@@ -1,5 +1,6 @@
 # Atomic Executor Memory Index
 
+- [#372 email-classifier nullable patterns](project_372_email_classifier_nullable_patterns.md) — engine props set post-ctor=`null!`; factory returns `T?`; Prediction.Class T? cascade=`.Class!`; net481 IsNullOrEmpty no-narrow; `(await Deserialize())!` not `await Deserialize()!`; DTO `= null!` adds a coverage line; measured 30 emitting (not epic ~18)
 - [Timed-out MSTest leaves detached runner](project_timedout_mstest_leaves_detached_runner.md) — a timed-out Invoke-MSTestWithCoverage bash call leaves a detached pwsh runner respawning testhosts; second run contends over user.config (ConfigurationErrorsException in unrelated TaskTree/ToDoModel) and hangs — kill the pwsh runner too, verify 0, then rerun with >=8min timeout
 - [Nullable per-file pragma gate mechanics](project_nullable_pragma_gate_mechanics.md) — solution-wide TWAE aborts on vendored SVGControl CS0649; verify via isolated `UtilitiesCS.csproj -t:Rebuild -p:Platform=AnyCPU -p:BuildProjectReferences=false` + grep CS86xx=0
 - [Analyzer version skew on fresh worktree](project_analyzer_version_skew_fresh_worktree.md) — first analyzer build fails CS0006 (Meziantou 3.0.101/Sonar 10.27/BannedApi 3.3.4 missing); nuget install old versions into gitignored packages/, don't edit 16 csproj
