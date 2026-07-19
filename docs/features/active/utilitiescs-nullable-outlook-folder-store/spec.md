@@ -264,23 +264,23 @@ List notable constraints (performance, compatibility, scope) or risks.
 
 Acceptance criteria (from `issue.md`, mapped here for traceability):
 
-- [ ] AC1: Every `.cs` file under `UtilitiesCS/OutlookObjects/Folder/` and
+- [x] AC1: Every `.cs` file under `UtilitiesCS/OutlookObjects/Folder/` and
   `UtilitiesCS/OutlookObjects/Store/` that emits CS86xx carries `#nullable enable` and compiles
   with zero nullable diagnostics under the per-file pragma with `TreatWarningsAsErrors`.
-- [ ] AC2: No project-level `<Nullable>` element is introduced into `UtilitiesCS.csproj`; no
+- [x] AC2: No project-level `<Nullable>` element is introduced into `UtilitiesCS.csproj`; no
   `/p:Nullable=enable` global flag is used in verification.
-- [ ] AC3: No behavior change; the existing `UtilitiesCS.Test` suite covering this cluster still
+- [x] AC3: No behavior change; the existing `UtilitiesCS.Test` suite covering this cluster still
   passes.
-- [ ] AC4: No coverage regression on changed lines; COM-bound coverage-exempt files are
+- [x] AC4: No coverage regression on changed lines; COM-bound coverage-exempt files are
   annotated without new tests, per the CLAUDE.md coverage exemption.
-- [ ] AC5: Public signatures of the remediated Folder and Store types remain
+- [x] AC5: Public signatures of the remediated Folder and Store types remain
   behavior-compatible; nullability annotations reflect actual null behavior so they are safe
   contracts for downstream epic consumers.
-- [ ] AC6: No `System.Diagnostics.CodeAnalysis` nullable post-condition attribute
+- [x] AC6: No `System.Diagnostics.CodeAnalysis` nullable post-condition attribute
   (`[NotNullWhen]`, `[MaybeNullWhen]`, `[NotNullIfNotNull]`, `[MaybeNull]`, `[AllowNull]`,
   `[DisallowNull]`, `[DoesNotReturn]`, `[MemberNotNull]`) is added, and no `record`,
   `record struct`, or `init` accessor is introduced anywhere in this cluster.
-- [ ] AC7: Each partial-class group (`FolderPredictor.cs` +
+- [x] AC7: Each partial-class group (`FolderPredictor.cs` +
   `FolderPredictor.IFolderSearchHandler.cs`; `StoresWrapper.cs` +
   `StoresWrapper.Filtering.cs`) is remediated in the same commit/batch with a consistent
   nullable shape for shared members.
