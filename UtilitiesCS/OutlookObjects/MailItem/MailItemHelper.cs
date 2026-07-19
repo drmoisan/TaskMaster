@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -65,7 +66,7 @@ namespace UtilitiesCS //QuickFiler
             return $"threadId={Thread.CurrentThread.ManagedThreadId}; syncContext={DescribeSynchronizationContext(SynchronizationContext.Current)}";
         }
 
-        private static void LogMailItemTiming(string phase, string details = null)
+        private static void LogMailItemTiming(string phase, string? details = null)
         {
             var detailSegment = string.IsNullOrWhiteSpace(details) ? string.Empty : $" | {details}";
             var phaseLabel = phase.StartsWith("[MailItem timing]", StringComparison.Ordinal)
@@ -99,7 +100,7 @@ namespace UtilitiesCS //QuickFiler
             _actionable = new(() => _item.GetActionTaken(), true);
             _body = new(() => CompressPlainText(_item.Body, EmailPrefixToStrip), true);
             _conversationID = new(() => _item.ConversationID, true);
-            _emailPrefixToStrip = new(() => Globals.Ol.EmailPrefixToStrip, true);
+            _emailPrefixToStrip = new(() => Globals!.Ol.EmailPrefixToStrip, true);
             _storeId = new(() => ((Folder)_item.Parent).StoreID, true);
             _folderName = new(() => ((Folder)_item.Parent).Name, true);
             _folderInfo = new(() =>
@@ -111,11 +112,11 @@ namespace UtilitiesCS //QuickFiler
             _htmlBody = new(() => _item.HTMLBody, true);
             _html = new(() => GetHtml(HTMLBody), true);
             _isTaskFlagSet = new(() => _item.FlagStatus == OlFlagStatus.olFlagMarked);
-            _olRecipients = new(() => _item.Recipients?.Cast<Recipient>().ToArray(), true);
+            _olRecipients = new(() => _item.Recipients.Cast<Recipient>().ToArray(), true);
             _ccRecipients = new(
                 () =>
                     OlRecipients
-                        ?.Where(x => x.Type == (int)OlMailRecipientType.olCC)
+                        .Where(x => x.Type == (int)OlMailRecipientType.olCC)
                         .Select(x => x.GetInfo())
                         .ToArray(),
                 true
@@ -123,7 +124,7 @@ namespace UtilitiesCS //QuickFiler
             _toRecipients = new(
                 () =>
                     OlRecipients
-                        ?.Where(x => x.Type == (int)OlMailRecipientType.olTo)
+                        .Where(x => x.Type == (int)OlMailRecipientType.olTo)
                         .Select(x => x.GetInfo())
                         .ToArray(),
                 true
@@ -159,9 +160,7 @@ namespace UtilitiesCS //QuickFiler
                         .ToArray(),
                 true
             );
-            _attachmentsInfo = new(() =>
-                AttachmentsHelper?.Select(x => x.AttachmentInfo)?.ToArray()
-            );
+            _attachmentsInfo = new(() => AttachmentsHelper.Select(x => x.AttachmentInfo).ToArray());
             _internetCodepage = new(() => _item.InternetCodepage, true);
         }
 
@@ -173,15 +172,15 @@ namespace UtilitiesCS //QuickFiler
             _conversationID = string.Empty.ToLazy();
             _emailPrefixToStrip = string.Empty.ToLazy();
             _entryId = string.Empty.ToLazy();
-            _globals = new Lazy<IApplicationGlobals>(() => null, true);
+            _globals = null;
             _storeId = string.Empty.ToLazy();
-            _folderInfo = new Lazy<IFolderWrapper>(() => null, true);
+            _folderInfo = null;
             _folderName = string.Empty.ToLazy();
             _sentOn = string.Empty.ToLazy();
             _subject = string.Empty.ToLazy();
             _senderHtml = string.Empty.ToLazy();
             _senderName = string.Empty.ToLazy();
-            _sender = new Lazy<IRecipientInfo>(() => null, true);
+            _sender = null;
             _size = 0.ToLazyValue();
             _olRecipients = Array.Empty<Recipient>().ToLazyTry();
             _ccRecipientsHtml = string.Empty.ToLazy();
@@ -243,13 +242,13 @@ namespace UtilitiesCS //QuickFiler
         private readonly ThreadSafeSingleShotGuard _loadNotStarted = new();
 
         //private bool _completedLoadingPriority;
-        public SegmentStopWatch Sw { get; set; }
+        public SegmentStopWatch? Sw { get; set; }
 
         #endregion
 
         #region INotifyPropertyChanged
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {

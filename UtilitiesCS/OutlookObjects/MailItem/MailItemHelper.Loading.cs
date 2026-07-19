@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -25,9 +26,9 @@ namespace UtilitiesCS
             info.ResolveMail(appGlobals.Ol.NamespaceMAPI, strict: true);
             info.InitLazyFields(appGlobals);
             info.LoadPriorityForce();
-            info.FolderInfo.OlRoot = ResolveFolderRoot(
+            info.FolderInfo!.OlRoot = ResolveFolderRoot(
                 appGlobals,
-                info.FolderInfo.OlFolder.FolderPath
+                info.FolderInfo!.OlFolder.FolderPath
             );
             return info;
         }
@@ -64,7 +65,7 @@ namespace UtilitiesCS
             );
             await Task.Run(LoadPriorityForce, _token);
 
-            FolderInfo.OlRoot = ResolveFolderRoot(Globals, FolderInfo.OlFolder.FolderPath);
+            FolderInfo!.OlRoot = ResolveFolderRoot(Globals!, FolderInfo!.OlFolder.FolderPath);
 
             _token.ThrowIfCancellationRequested();
             await Task.Run(
@@ -100,9 +101,9 @@ namespace UtilitiesCS
             token.ThrowIfCancellationRequested();
             info.InitLazyFields(appGlobals);
 
-            info.FolderInfo.OlRoot = ResolveFolderRoot(
+            info.FolderInfo!.OlRoot = ResolveFolderRoot(
                 appGlobals,
-                info.FolderInfo.OlFolder.FolderPath
+                info.FolderInfo!.OlFolder.FolderPath
             );
 
             token.ThrowIfCancellationRequested();
@@ -165,18 +166,18 @@ namespace UtilitiesCS
             return Task.FromResult(info);
         }
 
-        public MailItem ResolveMail(Outlook.NameSpace olNs, bool strict = false)
+        public MailItem? ResolveMail(Outlook.NameSpace olNs, bool strict = false)
         {
             return Initializer.GetOrLoad(
                 ref _item,
                 () => (MailItem)olNs.GetItemFromID(EntryId, StoreId),
                 strict,
-                _entryId,
-                _storeId
+                _entryId!,
+                _storeId!
             );
         }
 
-        public async Task<MailItem> ResolveMailAsync(
+        public async Task<MailItem?> ResolveMailAsync(
             Outlook.NameSpace olNs,
             CancellationToken token,
             bool background
@@ -188,7 +189,7 @@ namespace UtilitiesCS
         public void LoadPriorityForce()
         {
             Item.ThrowIfNull();
-            _ = new object[]
+            _ = new object?[]
             {
                 EntryId,
                 Sender,
@@ -209,7 +210,7 @@ namespace UtilitiesCS
 
         internal void MaterializeTokenizationDependencies()
         {
-            _ = new object[]
+            _ = new object?[]
             {
                 InternetCodepage,
                 Subject,
@@ -235,7 +236,7 @@ namespace UtilitiesCS
             InitLazyFields(globals);
 
             LoadPriorityForce();
-            FolderInfo.OlRoot = olRoot;
+            FolderInfo!.OlRoot = olRoot;
             LoadRecipientsForce();
             if (Html is not null) { }
             if (loadTokens)

@@ -32,7 +32,7 @@ namespace UtilitiesCS
         /// <param name="attachments">The mail item's attachments to index.</param>
         /// <returns>A case-insensitive, read-only map keyed by <c>Content-Id</c>.</returns>
         public static IReadOnlyDictionary<string, IAttachment> BuildContentIdMap(
-            IReadOnlyCollection<IAttachment> attachments
+            IReadOnlyCollection<IAttachment>? attachments
         )
         {
             var map = new Dictionary<string, IAttachment>(StringComparer.OrdinalIgnoreCase);
@@ -66,7 +66,7 @@ namespace UtilitiesCS
         /// <returns>The HTML body with matched <c>cid:</c> references rewritten.</returns>
         public static string RewriteCidReferences(
             string html,
-            IReadOnlyCollection<IAttachment> attachments,
+            IReadOnlyCollection<IAttachment>? attachments,
             string virtualHost
         )
         {
