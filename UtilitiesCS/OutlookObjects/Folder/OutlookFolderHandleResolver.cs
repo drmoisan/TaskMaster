@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Diagnostics.CodeAnalysis;
 using Outlook = Microsoft.Office.Interop.Outlook;
@@ -31,11 +32,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 );
             }
 
-            return folder;
+            return folder!;
         }
 
         [ExcludeFromCodeCoverage]
-        public bool TryResolve(FolderTreeSnapshotNode node, out object folder)
+        public bool TryResolve(FolderTreeSnapshotNode? node, out object? folder)
         {
             if (node == null)
             {

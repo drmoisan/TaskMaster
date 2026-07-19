@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -34,7 +35,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         /// — a public property cannot expose an internal type (CS0053). Nothing outside the
         /// assembly consumes it; the ribbon entry point uses only the public <see cref="Launch"/>.
         /// </summary>
-        internal IDisabledStoresViewer Viewer { get; set; }
+        internal IDisabledStoresViewer? Viewer { get; set; }
 
         /// <summary>The authoritative row list bound to the grid for display.</summary>
         internal List<DisabledStoreRow> Rows { get; set; } = new();
@@ -74,7 +75,7 @@ namespace UtilitiesCS.OutlookObjects.Store
             }
 
             Rows = rows;
-            Viewer.BindRows(Rows);
+            Viewer!.BindRows(Rows);
         }
 
         /// <summary>
@@ -82,7 +83,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         /// columns, or out-of-range indices; otherwise resolves the clicked row from
         /// <see cref="Rows"/> by <c>e.RowIndex</c> and starts the reenable path.
         /// </summary>
-        public void Dgv_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        public void Dgv_CellContentClick(object? sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0)
             {

@@ -1,3 +1,4 @@
+#nullable enable
 namespace UtilitiesCS.OutlookObjects.Folder
 {
     /// <summary>

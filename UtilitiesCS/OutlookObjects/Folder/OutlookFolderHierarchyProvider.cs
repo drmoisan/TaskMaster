@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +49,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         }
 
         /// <inheritdoc />
-        public async Task<FolderTreeNodeKey> ResolveLeafKeyAsync(
+        public async Task<FolderTreeNodeKey?> ResolveLeafKeyAsync(
             string folderPath,
             CancellationToken cancellationToken
         )

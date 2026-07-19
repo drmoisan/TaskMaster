@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,7 +11,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
     /// </summary>
     public sealed class FolderTreeRequest
     {
-        public FolderTreeRequest(IEnumerable<string> storeIds, bool allowStaleSnapshot)
+        public FolderTreeRequest(IEnumerable<string>? storeIds, bool allowStaleSnapshot)
         {
             StoreIds = new ReadOnlyCollection<string>(
                 (storeIds ?? Enumerable.Empty<string>())

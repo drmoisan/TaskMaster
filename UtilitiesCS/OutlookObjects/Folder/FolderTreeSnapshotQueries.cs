@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
     {
         public static IReadOnlyList<FolderTreeSnapshotNode> GetSelectedNodes(
             FolderTreeSnapshot snapshot,
-            FolderTreeSelectionOverlay selectionOverlay
+            FolderTreeSelectionOverlay? selectionOverlay
         )
         {
             if (snapshot == null)
@@ -23,7 +24,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             return snapshot.NodesByKey.Values.Where(overlay.IsSelected).ToArray();
         }
 
-        public static FolderTreeSnapshotNode GetArchiveRoot(
+        public static FolderTreeSnapshotNode? GetArchiveRoot(
             FolderTreeSnapshot snapshot,
             string storeId,
             string relativePath
@@ -47,7 +48,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         public static IReadOnlyList<string> EnumerateRelativePaths(
             FolderTreeSnapshot snapshot,
-            string storeId = null
+            string? storeId = null
         )
         {
             if (snapshot == null)
@@ -107,7 +108,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// <exception cref="ArgumentNullException"><paramref name="snapshot"/> is null.</exception>
         public static IReadOnlyList<FolderTreeSnapshotNode> GetAncestorChain(
             FolderTreeSnapshot snapshot,
-            FolderTreeNodeKey leafKey
+            FolderTreeNodeKey? leafKey
         )
         {
             if (snapshot == null)
@@ -165,7 +166,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             while (stack.Count > 0)
             {
                 var key = stack.Pop();
-                if (!snapshot.TryGetNode(key, out var node))
+                if (!snapshot.TryGetNode(key, out var node) || node is null)
                 {
                     continue;
                 }

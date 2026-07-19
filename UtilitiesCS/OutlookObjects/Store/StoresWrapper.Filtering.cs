@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,8 +23,8 @@ namespace UtilitiesCS.OutlookObjects.Store
             bool excludePublicFolderStores,
             bool excludeGwsoStores,
             bool isDisabled,
-            string storeId = null,
-            IReadOnlyCollection<string> excludedStoreIds = null
+            string? storeId = null,
+            IReadOnlyCollection<string>? excludedStoreIds = null
         )
         {
             // why: issue #328. StoreID exclusion is the most authoritative rule and is evaluated
@@ -63,7 +64,7 @@ namespace UtilitiesCS.OutlookObjects.Store
                 return false;
             }
 
-            string filePath = null;
+            string? filePath = null;
             try
             {
                 filePath = store.FilePath;
@@ -75,7 +76,7 @@ namespace UtilitiesCS.OutlookObjects.Store
                 && !string.IsNullOrWhiteSpace(filePath)
                 && gwsoFilePathContains.Any(x =>
                     !string.IsNullOrWhiteSpace(x)
-                    && filePath.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
+                    && filePath!.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
                 )
             )
             {
@@ -87,7 +88,7 @@ namespace UtilitiesCS.OutlookObjects.Store
                 && !string.IsNullOrWhiteSpace(filePath)
                 && excludedStoreFilePathContains.Any(x =>
                     !string.IsNullOrWhiteSpace(x)
-                    && filePath.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
+                    && filePath!.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
                 )
             )
             {

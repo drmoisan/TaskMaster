@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -62,14 +63,14 @@ namespace UtilitiesCS.OutlookObjects.Store
         /// <param name="isDisabled">Whether the store is in a disabled scope (issue #261). Checked last, after the four existing exclusion rules and immediately before the included result.</param>
         /// <returns>A tuple of the include decision and the matched rule.</returns>
         public static (bool Included, StoreFilterRule Rule) Decide(
-            string storeId,
-            IReadOnlyCollection<string> excludedStoreIds,
+            string? storeId,
+            IReadOnlyCollection<string>? excludedStoreIds,
             bool isPublicFolder,
-            string displayName,
-            string filePath,
-            IList<string> excludedStoreNameContains,
-            IList<string> excludedStoreFilePathContains,
-            IList<string> gwsoFilePathContains,
+            string? displayName,
+            string? filePath,
+            IList<string>? excludedStoreNameContains,
+            IList<string>? excludedStoreFilePathContains,
+            IList<string>? gwsoFilePathContains,
             bool excludePublicFolderStores,
             bool excludeGwsoStores,
             bool isDisabled
@@ -113,7 +114,7 @@ namespace UtilitiesCS.OutlookObjects.Store
                 && gwsoFilePathContains is not null
                 && gwsoFilePathContains.Any(x =>
                     !string.IsNullOrWhiteSpace(x)
-                    && filePath.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
+                    && filePath!.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
                 )
             )
             {
@@ -125,7 +126,7 @@ namespace UtilitiesCS.OutlookObjects.Store
                 && !string.IsNullOrWhiteSpace(filePath)
                 && excludedStoreFilePathContains.Any(x =>
                     !string.IsNullOrWhiteSpace(x)
-                    && filePath.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
+                    && filePath!.IndexOf(x, StringComparison.OrdinalIgnoreCase) >= 0
                 )
             )
             {
@@ -153,7 +154,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         /// <param name="rule">The rule that produced the decision.</param>
         /// <returns>A single-line, log-ready string.</returns>
         public static string FormatLine(
-            string displayName,
+            string? displayName,
             double exchangeStoreTypeMs,
             double filePathMs,
             bool included,

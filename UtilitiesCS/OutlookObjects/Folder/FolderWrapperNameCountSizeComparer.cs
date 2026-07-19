@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
     // Equality comparer for FolderWrapper based on Name and ItemCount
     public class FolderWrapperNameCountSizeComparer : IEqualityComparer<FolderWrapper>
     {
-        public bool Equals(FolderWrapper x, FolderWrapper y)
+        public bool Equals(FolderWrapper? x, FolderWrapper? y)
         {
             if (ReferenceEquals(x, y))
                 return true;

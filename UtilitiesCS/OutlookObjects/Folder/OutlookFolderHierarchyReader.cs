@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -43,9 +44,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         [ExcludeFromCodeCoverage]
         public async Task<IReadOnlyList<FolderTreeSnapshotNode>> ReadFoldersAsync(
-            FolderTreeRequest request,
-            IDeadlineClock deadlineClock,
-            IDispatcherYield dispatcherYield,
+            FolderTreeRequest? request,
+            IDeadlineClock? deadlineClock,
+            IDispatcherYield? dispatcherYield,
             CancellationToken cancellationToken
         )
         {
@@ -61,7 +62,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         [ExcludeFromCodeCoverage]
         public IReadOnlyList<OutlookFolderHierarchyRecord> ReadRecords(
-            FolderTreeRequest request,
+            FolderTreeRequest? request,
             CancellationToken cancellationToken
         )
         {
@@ -72,9 +73,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         [ExcludeFromCodeCoverage]
         public async Task<IReadOnlyList<OutlookFolderHierarchyRecord>> ReadRecordsAsync(
-            FolderTreeRequest request,
-            IDeadlineClock deadlineClock,
-            IDispatcherYield dispatcherYield,
+            FolderTreeRequest? request,
+            IDeadlineClock? deadlineClock,
+            IDispatcherYield? dispatcherYield,
             CancellationToken cancellationToken
         )
         {
@@ -120,8 +121,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
             IOutlookFolderAdapter root,
             string storeId,
             ICollection<OutlookFolderHierarchyRecord> records,
-            IDeadlineClock deadlineClock,
-            IDispatcherYield dispatcherYield,
+            IDeadlineClock? deadlineClock,
+            IDispatcherYield? dispatcherYield,
             CancellationToken cancellationToken
         )
         {
@@ -163,8 +164,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
         }
 
         private static async Task YieldIfNeededAsync(
-            IDeadlineClock deadlineClock,
-            IDispatcherYield dispatcherYield,
+            IDeadlineClock? deadlineClock,
+            IDispatcherYield? dispatcherYield,
             CancellationToken cancellationToken
         )
         {
@@ -217,7 +218,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         {
             string StoreId { get; }
             bool ShouldInclude(StoresWrapper storesWrapper);
-            IOutlookFolderAdapter GetRootFolder();
+            IOutlookFolderAdapter? GetRootFolder();
         }
 
         internal interface IOutlookFolderAdapter
@@ -245,7 +246,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 return storesWrapper.ShouldIncludeStore(_store);
             }
 
-            public IOutlookFolderAdapter GetRootFolder()
+            public IOutlookFolderAdapter? GetRootFolder()
             {
                 return _store.GetRootFolder() is Outlook.MAPIFolder folder
                     ? new OutlookFolderAdapter(folder)

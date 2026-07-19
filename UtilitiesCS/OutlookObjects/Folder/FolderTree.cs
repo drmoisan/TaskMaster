@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -50,7 +51,7 @@ namespace UtilitiesCS
         public FolderTree(MAPIFolder olRoot, IList<string> selections)
         {
             var root = RootFromFolder(olRoot);
-            root.Traverse(node => node.Selected = selections.Contains(node.RelativePath));
+            root.Traverse(node => node.Selected = selections.Contains(node.RelativePath!));
             _roots = new List<TreeNode<FolderWrapper>>() { root };
             WireNotifications();
         }
@@ -68,7 +69,7 @@ namespace UtilitiesCS
 
                 root.Traverse(node =>
                 {
-                    node.Selected = selections.Contains(node.RelativePath);
+                    node.Selected = selections.Contains(node.RelativePath!);
                     rt += increment;
                     traverseProgress.Report(rt);
                 });
@@ -186,7 +187,7 @@ namespace UtilitiesCS
             return root;
         }
 
-        private List<TreeNode<FolderWrapper>> _roots;
+        private List<TreeNode<FolderWrapper>> _roots = new();
         public List<TreeNode<FolderWrapper>> Roots
         {
             get => _roots;
@@ -194,7 +195,7 @@ namespace UtilitiesCS
 
         private void InitializeChildren(TreeNode<FolderWrapper> node, MAPIFolder olRoot)
         {
-            node.Value.OlFolder.Folders.Cast<MAPIFolder>()
+            node.Value.OlFolder!.Folders.Cast<MAPIFolder>()
                 .ForEach(child =>
                 {
                     var childNode = node.AddChild(new FolderWrapper(child, olRoot));
@@ -210,7 +211,7 @@ namespace UtilitiesCS
             ref int runningTotal
         )
         {
-            var children = node.Value.OlFolder.Folders.Cast<MAPIFolder>().ToArray();
+            var children = node.Value.OlFolder!.Folders.Cast<MAPIFolder>().ToArray();
             var count = children.Count();
 
             if (count > 0)
@@ -407,7 +408,7 @@ namespace UtilitiesCS
 
         private TimedBatchAction _batchNotifier = new(TimeSpan.FromMilliseconds(50));
 
-        private void Child_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void Child_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             _batchNotifier.RequestAction(() => PropertyChanged?.Invoke(sender, e));
         }
@@ -417,7 +418,7 @@ namespace UtilitiesCS
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         #endregion INotifyPropertyChanged
     }

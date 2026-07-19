@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Windows.Forms;
 
 namespace UtilitiesCS.OutlookObjects.Store
@@ -24,46 +25,46 @@ namespace UtilitiesCS.OutlookObjects.Store
             Controller = controller;
         }
 
-        public StoreWrapperController Controller { get; set; }
+        public StoreWrapperController? Controller { get; set; }
 
         #region Events
 
-        public void ButtonOk_Click(object sender, EventArgs e)
+        public void ButtonOk_Click(object? sender, EventArgs e)
         {
             Controller?.ButtonOk_Click();
         }
 
-        public void ButtonCancel_Click(object sender, EventArgs e)
+        public void ButtonCancel_Click(object? sender, EventArgs e)
         {
             Controller?.ButtonCancel_Click();
         }
 
-        public void DisplayName_SelectedValueChanged(object sender, EventArgs e)
+        public void DisplayName_SelectedValueChanged(object? sender, EventArgs e)
         {
             Controller?.DisplayName_SelectedValueChanged(sender, e);
         }
 
-        public void ExcludeStore_CheckedChanged(object sender, EventArgs e)
+        public void ExcludeStore_CheckedChanged(object? sender, EventArgs e)
         {
             Controller?.ExcludeStore_CheckedChanged(sender, e);
         }
 
-        public void ArchiveFS_Click(object sender, EventArgs e)
+        public void ArchiveFS_Click(object? sender, EventArgs e)
         {
             Controller?.ArchiveFS_Click();
         }
 
-        public void ArchiveOutlook_Click(object sender, EventArgs e)
+        public void ArchiveOutlook_Click(object? sender, EventArgs e)
         {
             Controller?.ArchiveOutlook_Click();
         }
 
-        public void JunkEmail_Click(object sender, EventArgs e)
+        public void JunkEmail_Click(object? sender, EventArgs e)
         {
             Controller?.JunkEmail_Click();
         }
 
-        public void JunkPotential_Click(object sender, EventArgs e)
+        public void JunkPotential_Click(object? sender, EventArgs e)
         {
             Controller?.JunkPotential_Click();
         }

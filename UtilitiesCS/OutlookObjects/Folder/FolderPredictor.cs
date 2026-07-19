@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,6 +25,11 @@ namespace UtilitiesCS
         public FolderPredictor(Outlook.Application olApp)
         {
             _olApp = olApp;
+            // Navigation-only ctor: _globals is populated by the globals-providing ctors and by Init*;
+            // this overload only exposes GetFolder(folderpath, olApp). Callers that need globals-dependent
+            // members must use a globals-providing ctor (pre-existing contract). _suggestions defaults via
+            // its field initializer.
+            _globals = null!;
         }
 
         public FolderPredictor(IApplicationGlobals AppGlobals)
@@ -147,7 +153,7 @@ namespace UtilitiesCS
         private IApplicationGlobals _globals;
 
         private Outlook.Application _olApp;
-        private Regex _regex;
+        private Regex? _regex;
 
         //private string _searchString;
 
@@ -179,7 +185,7 @@ namespace UtilitiesCS
         internal virtual string PromptForFolderName(
             string prompt,
             string title,
-            string defaultValue = null
+            string? defaultValue = null
         )
         {
             return defaultValue is null
@@ -206,7 +212,7 @@ namespace UtilitiesCS
 
         #region Public Properties
 
-        private List<string> _folderList;
+        private List<string>? _folderList;
         public string[] FolderArray
         {
             get
@@ -251,7 +257,10 @@ namespace UtilitiesCS
             }
         }
 
-        private FolderScorer _suggestions;
+        // Set via a globals-providing ctor / Init*; null! documents the navigation-only ctor path
+        // where Suggestions is not populated (pre-existing contract). The public property stays
+        // non-null to satisfy IFolderSearchHandler.Suggestions.
+        private FolderScorer _suggestions = null!;
         public FolderScorer Suggestions
         {
             get => _suggestions;
@@ -284,9 +293,9 @@ namespace UtilitiesCS
             string searchString,
             object objItem,
             bool reloadCTFStagingFiles = true,
-            List<string> emailSearchRoots = null,
+            List<string>? emailSearchRoots = null,
             bool recalcSuggestions = false,
-            IEnumerable<(string root, string excludedFolder, bool excludeChildren)> exclusions =
+            IEnumerable<(string root, string excludedFolder, bool excludeChildren)>? exclusions =
                 null
         )
         {
@@ -355,9 +364,9 @@ namespace UtilitiesCS
             string searchString,
             object objItem,
             bool reloadCTFStagingFiles = true,
-            List<string> emailSearchRoots = null,
+            List<string>? emailSearchRoots = null,
             bool recalcSuggestions = false,
-            IEnumerable<(string root, string excludedFolder, bool excludeChildren)> exclusions =
+            IEnumerable<(string root, string excludedFolder, bool excludeChildren)>? exclusions =
                 null
         )
         {
@@ -409,7 +418,7 @@ namespace UtilitiesCS
         /// <param name="olApp">Handle on the <seealso cref="Outlook.Application"/></param>
         /// <returns>The <seealso cref="Folder"/> represented by the <seealso cref="Folder"/>.FolderPath
         /// or <c>null</c> if not found</returns>
-        public Folder GetFolder(string folderpath, Outlook.Application olApp)
+        public Folder? GetFolder(string folderpath, Outlook.Application olApp)
         {
             if (folderpath.Substring(0, 2) == @"\\")
             {
@@ -444,7 +453,7 @@ namespace UtilitiesCS
         /// <returns>The <seealso cref="Folder"/> represented by the <seealso cref="Folder"/>.FolderPath
         /// or <c>null</c> if not found</returns>
         /// <exception cref="ArgumentException"><paramref name="folderpath"/> should be rooted </exception>
-        public Folder GetFolder(string folderpath)
+        public Folder? GetFolder(string folderpath)
         {
             // Check that folderpath is rooted
             var root = _globals.Ol.Root.FolderPath;
@@ -470,7 +479,7 @@ namespace UtilitiesCS
         /// <returns>The <seealso cref="Folder"/> represented by the <seealso cref="Folder"/>.FolderPath
         /// or <c>null</c> if not found</returns>
         /// <exception cref="ArgumentException"><paramref name="folderpath"/> should be rooted </exception>
-        public Folder GetFolder(string folderpath, bool throwEx)
+        public Folder? GetFolder(string folderpath, bool throwEx)
         {
             // Check that folderpath is rooted
             var root = _globals.Ol.Root.FolderPath;
@@ -510,7 +519,7 @@ namespace UtilitiesCS
         /// <param name="children"><seealso cref="Folders"/> collection to search</param>
         /// <param name="childName">Name of the <seealso cref="Folder"/> to match</param>
         /// <returns>The <seealso cref="Folder"/> if found or <c>null</c></returns>
-        public Folder GetFolder(Folders children, string childName)
+        public Folder? GetFolder(Folders children, string childName)
         {
             var folderLevelNames = children.Cast<MAPIFolder>().Select(x => x.Name).ToList();
             if (folderLevelNames.Contains(childName))
@@ -532,9 +541,9 @@ namespace UtilitiesCS
         /// <param name="parent">The parent Outlook.<seealso cref="Folder"/> under which the
         /// new Outlook.<seealso cref="Folder"/> will be created</param>
         /// <returns>The name of the new Outlook.<seealso cref="Folder"/> to create</returns>
-        public string InputFoldername(Folder parent) //Internal
+        public string? InputFoldername(Folder parent) //Internal
         {
-            string name = "";
+            string? name = "";
             while (name is not null && name == "")
             {
                 name = PromptForFolderName(
@@ -576,10 +585,10 @@ namespace UtilitiesCS
         /// <param name="parent"><inheritdoc cref="InputFoldername(Folder)"/></param>
         /// <param name="token">Cancellation token</param>
         /// <returns>A task with the name of the new Outlook.<seealso cref="Folder"/> to create</returns>
-        public async Task<string> InputFoldernameAsync(Folder parent, CancellationToken token) //Internal
+        public async Task<string?> InputFoldernameAsync(Folder parent, CancellationToken token) //Internal
         {
             token.ThrowIfCancellationRequested();
-            string name = "";
+            string? name = "";
             while (name is not null && name == "")
             {
                 await EnterUiContextAsync();
@@ -665,7 +674,7 @@ namespace UtilitiesCS
         /// <param name="olAncestor">Fully rooted Outlook.<seealso cref="Folder"/>.FolderPath of Ancestor <seealso cref="Folder"/></param>
         /// <param name="fsAncestor">Fully qualified File System path</param>
         /// <returns>The created Outlook.<seealso cref="Folder"/></returns>
-        public MAPIFolder CreateFolder(
+        public MAPIFolder? CreateFolder(
             string parentBranchPath,
             string olAncestor,
             string fsAncestor
@@ -696,7 +705,7 @@ namespace UtilitiesCS
             }
 
             // Get the new folder name from the user
-            string newFolderName = InputFoldername(parentFolder);
+            string? newFolderName = InputFoldername(parentFolder);
             if (newFolderName is null)
             {
                 return null;
@@ -724,7 +733,7 @@ namespace UtilitiesCS
         /// <param name="fsAncestor"><inheritdoc cref="CreateFolder(string, string, string)"/></param>
         /// <param name="token">Cancellation token</param>
         /// <returns>A Task of the created Outlook.<seealso cref="MAPIFolder"/> returned as object</returns>
-        public async Task<object> CreateFolderAsync(
+        public async Task<object?> CreateFolderAsync(
             string parentBranchPath,
             string olAncestor,
             string fsAncestor,
@@ -750,7 +759,7 @@ namespace UtilitiesCS
             }
 
             // Get the new folder name from the user
-            string newFolderName = await InputFoldernameAsync(parentFolder, token);
+            string? newFolderName = await InputFoldernameAsync(parentFolder, token);
             if (newFolderName is null)
             {
                 return null;
@@ -787,8 +796,8 @@ namespace UtilitiesCS
             if (matchingFolders is not null && matchingFolders.Count > 0)
             {
                 matchingFolders = matchingFolders.OrderBy(x => x).ToList();
-                _folderList.Add("======= SEARCH RESULTS =======");
-                _folderList.AddRange(matchingFolders);
+                _folderList!.Add("======= SEARCH RESULTS =======");
+                _folderList!.AddRange(matchingFolders);
             }
         }
 
@@ -864,7 +873,7 @@ namespace UtilitiesCS
             {
                 (_regex, _) = SimpleRegex.MakeRegex(searchString);
 
-                var folders = GetFolder(strEmailFolderPath).Folders;
+                var folders = GetFolder(strEmailFolderPath)!.Folders;
                 LoopFolders(folders, ref matchingFolders, strEmailFolderPath, true, exclusions);
             }
 
@@ -905,7 +914,7 @@ namespace UtilitiesCS
                 {
                     var relevantPath = GetOlSubpath(f.FolderPath, olAncestor, includeChildren);
 
-                    if (_regex.IsMatch(relevantPath))
+                    if (_regex!.IsMatch(relevantPath))
                     {
                         matchingFolders.Add(folderStem);
                     }

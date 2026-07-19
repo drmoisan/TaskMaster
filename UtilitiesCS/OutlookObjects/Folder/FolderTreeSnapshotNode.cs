@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,10 +16,10 @@ namespace UtilitiesCS.OutlookObjects.Folder
             string displayName,
             string storeId,
             string entryId,
-            FolderTreeNodeKey parentKey,
+            FolderTreeNodeKey? parentKey,
             string folderPath,
             string relativePath,
-            IEnumerable<FolderTreeNodeKey> childKeys,
+            IEnumerable<FolderTreeNodeKey>? childKeys,
             bool isStale,
             string staleReason
         )
@@ -45,7 +46,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         public string EntryId { get; }
 
-        public FolderTreeNodeKey ParentKey { get; }
+        public FolderTreeNodeKey? ParentKey { get; }
 
         public string FolderPath { get; }
 

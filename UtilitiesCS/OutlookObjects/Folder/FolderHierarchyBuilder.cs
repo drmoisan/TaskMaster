@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using System.Linq;
 
@@ -23,7 +24,7 @@ namespace UtilitiesCS
         /// </summary>
         /// <param name="rows">The ordered rows from the predictor.</param>
         /// <returns>The forest of root nodes, preserving input order.</returns>
-        public IReadOnlyList<TreeNode<FolderNodeViewModel>> Build(IReadOnlyList<FolderRow> rows)
+        public IReadOnlyList<TreeNode<FolderNodeViewModel>> Build(IReadOnlyList<FolderRow>? rows)
         {
             var roots = new List<TreeNode<FolderNodeViewModel>>();
             if (rows == null)
@@ -66,8 +67,8 @@ namespace UtilitiesCS
         {
             var segments = score.FolderPath.Split('\\');
             List<TreeNode<FolderNodeViewModel>> currentLevel = roots;
-            TreeNode<FolderNodeViewModel> currentNode = null;
-            string cumulative = null;
+            TreeNode<FolderNodeViewModel>? currentNode = null;
+            string? cumulative = null;
 
             for (int i = 0; i < segments.Length; i++)
             {

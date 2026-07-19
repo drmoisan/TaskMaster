@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Globalization;
 
@@ -22,7 +23,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         /// <param name="stallDuration">How long the UI thread was unresponsive.</param>
         /// <param name="autoDisabled">Whether the store was auto-disabled for this session.</param>
         /// <returns>A single-line, log-ready string.</returns>
-        public static string FormatLine(string identity, TimeSpan stallDuration, bool autoDisabled)
+        public static string FormatLine(string? identity, TimeSpan stallDuration, bool autoDisabled)
         {
             var name = string.IsNullOrEmpty(identity) ? "<null>" : identity;
             return string.Format(

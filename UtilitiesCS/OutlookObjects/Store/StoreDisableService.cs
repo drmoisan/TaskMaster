@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         /// </summary>
         /// <param name="globals">The application aggregate; the store model is read from it lazily per call.</param>
         /// <param name="rehook">The rehook collaborator; defaults to a no-op when null.</param>
-        public StoreDisableService(IApplicationGlobals globals, IStoreRehookService rehook = null)
+        public StoreDisableService(IApplicationGlobals globals, IStoreRehookService? rehook = null)
         {
             _globals = globals;
             _rehook = rehook ?? new NoOpStoreRehookService();
@@ -35,7 +36,7 @@ namespace UtilitiesCS.OutlookObjects.Store
         /// be constructed before the async store-load phase populates the model. Returns null when
         /// the aggregate, its Outlook objects, or the store model are not yet available.
         /// </summary>
-        private StoresWrapper GetModelOrNull() => _globals?.Ol?.StoresWrapper;
+        private StoresWrapper? GetModelOrNull() => _globals?.Ol?.StoresWrapper;
 
         /// <summary>
         /// Throws <see cref="ArgumentException"/> when the identity is unresolved (equals the

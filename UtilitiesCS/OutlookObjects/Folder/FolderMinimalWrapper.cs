@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -31,28 +32,28 @@ namespace UtilitiesCS.OutlookObjects.Folder
         }
 
         [JsonIgnore]
-        internal Outlook.Folder OlRoot { get; set; }
+        internal Outlook.Folder? OlRoot { get; set; }
 
         [JsonIgnore]
-        public Outlook.Folder OlFolder { get; set; }
+        public Outlook.Folder? OlFolder { get; set; }
 
         [JsonProperty]
-        public string Name
+        public string? Name
         {
             get => _lazyName?.Value;
-            private set => _lazyName = value?.ToLazy();
+            private set => _lazyName = new Lazy<string?>(() => value);
         }
-        private Lazy<string> _lazyName;
+        private Lazy<string?>? _lazyName;
 
         [JsonProperty]
-        public string RelativePath
+        public string? RelativePath
         {
             get => _lazyRelativePath?.Value;
-            set => _lazyRelativePath = value?.ToLazy();
+            set => _lazyRelativePath = new Lazy<string?>(() => value);
         }
-        private Lazy<string> _lazyRelativePath;
+        private Lazy<string?>? _lazyRelativePath;
 
-        internal virtual string ToRelativePath()
+        internal virtual string? ToRelativePath()
         {
             if (OlRoot is null || OlFolder is null)
             {
@@ -84,7 +85,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             }
         }
 
-        internal virtual void RestoreFromRelativePath(Outlook.Folder olRoot)
+        internal virtual void RestoreFromRelativePath(Outlook.Folder? olRoot)
         {
             if (olRoot is null || string.IsNullOrEmpty(RelativePath))
             {
@@ -94,7 +95,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 return;
             }
 
-            var pathParts = RelativePath
+            // RelativePath is non-null here: the IsNullOrEmpty guard above returned early on null/empty.
+            var pathParts = RelativePath!
                 .Split(['\\'], StringSplitOptions.RemoveEmptyEntries)
                 .ToList();
 
@@ -105,7 +107,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
                     var rp = RelativePath;
                     while (rp.StartsWith("\\\\"))
                     {
-                        if (olRoot.Parent is Outlook.Folder)
+                        // olRoot is non-null on entry (guarded above) and each branch below reassigns
+                        // it from a live COM walk; the original null-oblivious traversal assumed non-null.
+                        if (olRoot!.Parent is Outlook.Folder)
                         {
                             olRoot = olRoot.Parent as Outlook.Folder;
                         }
@@ -115,7 +119,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                                 ns.Stores.Cast<Outlook.Store>()
                                     .FirstOrDefault(store =>
                                         store.GetRootFolder().FolderPath == $"\\\\{pathParts[0]}"
-                                    )
+                                    )!
                                     .GetRootFolder() as Outlook.Folder;
                             pathParts.RemoveAt(0);
                         }
@@ -138,12 +142,13 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
                 OlRoot = olRoot;
 
-                Outlook.Folder currentFolder = olRoot;
+                Outlook.Folder? currentFolder = olRoot;
 
                 foreach (var part in pathParts)
                 {
                     //currentFolder.Folders.Cast<Outlook.Folder>().ForEach(f => logger.Debug($"Folder: {f.Name}"));
-                    currentFolder = currentFolder
+                    // currentFolder is non-null here: the loop returns below when a lookup yields null.
+                    currentFolder = currentFolder!
                         .Folders.Cast<Outlook.Folder>()
                         .FirstOrDefault(f =>
                             f.Name.Equals(part, StringComparison.OrdinalIgnoreCase)
@@ -176,8 +181,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         public void ResetLazy()
         {
-            _lazyRelativePath = new Lazy<string>(ToRelativePath);
-            _lazyName = new Lazy<string>(() => OlFolder?.Name);
+            _lazyRelativePath = new Lazy<string?>(ToRelativePath);
+            _lazyName = new Lazy<string?>(() => OlFolder?.Name);
         }
     }
 }

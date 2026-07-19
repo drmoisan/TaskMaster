@@ -1,3 +1,4 @@
+#nullable enable
 namespace UtilitiesCS.OutlookObjects.Store
 {
     /// <summary>
@@ -12,10 +13,10 @@ namespace UtilitiesCS.OutlookObjects.Store
         public StoreIdentity Identity { get; set; }
 
         /// <summary>The display text for the store (from the entry's identity).</summary>
-        public string DisplayName { get; set; }
+        public string DisplayName { get; set; } = string.Empty;
 
         /// <summary>Human-readable scope text ("Session Only" or "Future Sessions").</summary>
-        public string ScopeLabel { get; set; }
+        public string ScopeLabel { get; set; } = string.Empty;
 
         /// <summary>
         /// True when the store is disabled for future sessions; drives the visual distinction

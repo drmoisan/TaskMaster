@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,10 +25,10 @@ namespace UtilitiesCS.OutlookObjects.Folder
         private readonly FolderTreeSnapshotBuilder _builder;
         private readonly IOutlookFolderNotificationSink _notificationSink;
         private readonly object _gate = new object();
-        private FolderTreeSnapshot _snapshot;
-        private Task<FolderTreeSnapshot> _inFlightSnapshot;
-        private Task<FolderTreeSnapshot> _scheduledRefresh;
-        private FolderTreeRequest _pendingRefreshRequest;
+        private FolderTreeSnapshot? _snapshot;
+        private Task<FolderTreeSnapshot>? _inFlightSnapshot;
+        private Task<FolderTreeSnapshot>? _scheduledRefresh;
+        private FolderTreeRequest? _pendingRefreshRequest;
 
         public OutlookFolderTreeService(
             FolderTreeSnapshotBuilder builder,
@@ -42,7 +43,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             _notificationSink.Start();
         }
 
-        public event EventHandler<FolderTreeSnapshotChangedEventArgs> SnapshotChanged;
+        public event EventHandler<FolderTreeSnapshotChangedEventArgs>? SnapshotChanged;
 
         public OutlookFolderTreeServiceState State { get; private set; }
 
@@ -93,7 +94,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         }
 
         private async Task<FolderTreeSnapshot> BuildAndPublishAsync(
-            FolderTreeRequest request,
+            FolderTreeRequest? request,
             CancellationToken cancellationToken
         )
         {
@@ -192,9 +193,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
         }
 
         private static FolderTreeSnapshot CreatePublishedSnapshot(
-            FolderTreeSnapshot currentSnapshot,
+            FolderTreeSnapshot? currentSnapshot,
             FolderTreeSnapshot refreshedSnapshot,
-            FolderTreeRequest request
+            FolderTreeRequest? request
         )
         {
             if (
@@ -205,7 +206,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 || !currentSnapshot.CoversAllStores
             )
             {
-                return refreshedSnapshot;
+                return refreshedSnapshot!;
             }
 
             var refreshedStores = new HashSet<string>(
@@ -236,8 +237,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
         }
 
         private static FolderTreeRequest MergeRefreshRequests(
-            FolderTreeRequest currentRequest,
-            FolderTreeRequest incomingRequest
+            FolderTreeRequest? currentRequest,
+            FolderTreeRequest? incomingRequest
         )
         {
             if (incomingRequest == null || incomingRequest.IsAllStores)
