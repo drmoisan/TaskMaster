@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,11 +23,11 @@ namespace UtilitiesCS
             _encoder = ScoDictionaryNew<string, int>.Static.Deserialize(filename, folderpath);
         }
 
-        private string _filename;
-        private string _folderpath;
-        private IScoDictionaryNew<string, int> _encoder;
-        private IScoDictionaryNew<int, string> _decoder;
-        private SubjectMapSco _subjectMap;
+        private string? _filename;
+        private string? _folderpath;
+        private IScoDictionaryNew<string, int>? _encoder;
+        private IScoDictionaryNew<int, string>? _decoder;
+        private SubjectMapSco? _subjectMap;
         private Regex _tokenizerRegex = Tokenizer.GetRegex(new char[] { '&' }.AsTokenPattern());
 
         public IScoDictionaryNew<int, string> Decoder
@@ -38,8 +39,8 @@ namespace UtilitiesCS
                     if (_encoder is null)
                     {
                         _encoder = ScoDictionaryNew<string, int>.Static.Deserialize(
-                            _filename,
-                            _folderpath
+                            _filename!,
+                            _folderpath!
                         );
                     }
                     // _decoder = new SCODictionary<int, string>(_encoder.ToDictionary().Select(x => new KeyValuePair<int, string>(x.Value, x.Key)).ToDictionary());
@@ -85,7 +86,7 @@ namespace UtilitiesCS
                         }
                     }
                 }
-                return _decoder;
+                return _decoder!;
             }
         }
         public IScoDictionaryNew<string, int> Encoder
@@ -94,8 +95,8 @@ namespace UtilitiesCS
             {
                 if (_encoder is null)
                     _encoder = ScoDictionaryNew<string, int>.Static.Deserialize(
-                        _filename,
-                        _folderpath
+                        _filename!,
+                        _folderpath!
                     );
                 return _encoder;
             }
@@ -116,7 +117,7 @@ namespace UtilitiesCS
         {
             var words = map.ToList()
                 .Select(x =>
-                    string.Concat(x.EmailSubject, " ", x.Folderpath.Split("\\").Last())
+                    string.Concat(x.EmailSubject, " ", x.Folderpath!.Split("\\").Last())
                         .Tokenize(_tokenizerRegex)
                 )
                 .SelectMany(x => x)
@@ -125,7 +126,7 @@ namespace UtilitiesCS
                 .ToDictionary(x => x.input, x => x.index);
 
             _encoder = new ScoDictionaryNew<string, int>(words);
-            _encoder.Config.Disk = new FilePathHelper(_filename, _folderpath);
+            _encoder.Config.Disk = new FilePathHelper(_filename!, _folderpath!);
 
             _encoder.Serialize();
             _decoder = new ScoDictionaryNew<int, string>(
@@ -171,7 +172,7 @@ namespace UtilitiesCS
             }
             if (changed)
             {
-                _encoder.Serialize();
+                _encoder!.Serialize();
             }
         }
 
@@ -187,7 +188,7 @@ namespace UtilitiesCS
 
         public int[] Encode(string text)
         {
-            return text.Tokenize().Select(x => _encoder[x]).ToArray();
+            return text.Tokenize().Select(x => _encoder![x]).ToArray();
         }
 
         public string Decode(int[] encodedWords)

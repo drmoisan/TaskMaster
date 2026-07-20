@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,7 +21,9 @@ namespace UtilitiesCS.HelperClasses.TimedActions
     public class TimedQueueOfActions<T>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+            // GetCurrentMethod() is non-null for a running static initializer, and its DeclaringType
+            // is this generic type; both ! reflect the guaranteed non-null log4net logger identity.
+            System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType!
         );
 
         /// <summary>
@@ -59,17 +63,21 @@ namespace UtilitiesCS.HelperClasses.TimedActions
             get => _config;
             private set => _config = value;
         }
-        private Configuration _config;
+
+        // Always assigned by every constructor via the Config setter; the compiler cannot prove
+        // definite assignment through a manual property setter, so null! records the invariant.
+        private Configuration _config = null!;
 
         /// <summary>
         /// Delegate to perform a batch of <seealso cref="Action"/>s to an <see cref="IEnumerable{T}">IEnumerable&lt;T&gt;</see>
         /// </summary>
-        public Action<IEnumerable<T>> BatchActions
+        // Nullable: the parameterless constructor leaves this unset; StartTimer throws if still null.
+        public Action<IEnumerable<T>>? BatchActions
         {
             get => _batchActions;
             set => _batchActions = value;
         }
-        private Action<IEnumerable<T>> _batchActions;
+        private Action<IEnumerable<T>>? _batchActions;
 
         /// <summary>
         /// Queue of items to be written to disk
@@ -81,8 +89,8 @@ namespace UtilitiesCS.HelperClasses.TimedActions
         }
         private BlockingCollection<T> _queue = new(new ConcurrentQueue<T>());
 
-        private ITimerWrapper _timer;
-        internal ITimerWrapper Timer
+        private ITimerWrapper? _timer;
+        internal ITimerWrapper? Timer
         {
             get => _timer;
             set => _timer = value;
@@ -207,7 +215,8 @@ namespace UtilitiesCS.HelperClasses.TimedActions
 
             if (items.Any())
             {
-                BatchActions(items);
+                // Timer only starts via StartTimer, which throws unless BatchActions is set.
+                BatchActions!(items);
             }
             else
             {
@@ -361,7 +370,7 @@ namespace UtilitiesCS.HelperClasses.TimedActions
             /// <summary>
             /// When the <see cref="WriteInterval"/> is changed, the <see cref="PropertyChanged"/> event is raised
             /// </summary>
-            public event PropertyChangedEventHandler PropertyChanged;
+            public event PropertyChangedEventHandler? PropertyChanged;
         }
 
         #endregion

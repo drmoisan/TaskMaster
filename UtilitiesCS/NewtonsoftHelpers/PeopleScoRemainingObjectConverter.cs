@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -11,10 +12,10 @@ namespace ToDoModel.Data_Model.People
             return objectType == typeof(object);
         }
 
-        public override object ReadJson(
+        public override object? ReadJson(
             JsonReader reader,
             Type objectType,
-            object existingValue,
+            object? existingValue,
             JsonSerializer serializer
         )
         {
@@ -22,7 +23,7 @@ namespace ToDoModel.Data_Model.People
             return jObject.ToObject<PeopleScoRemainingObject>(serializer);
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             serializer.Serialize(writer, value);
         }

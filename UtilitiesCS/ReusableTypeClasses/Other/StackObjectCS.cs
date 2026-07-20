@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -97,7 +99,7 @@ namespace UtilitiesCS
             }
         }
 
-        public bool TryPeek(out T result)
+        public bool TryPeek(out T? result)
         {
             try
             {
@@ -111,7 +113,7 @@ namespace UtilitiesCS
             }
         }
 
-        public bool TryPeek(out T result, int index)
+        public bool TryPeek(out T? result, int index)
         {
             try
             {
@@ -125,7 +127,7 @@ namespace UtilitiesCS
             }
         }
 
-        public bool TryPop(out T result)
+        public bool TryPop(out T? result)
         {
             try
             {
@@ -140,7 +142,7 @@ namespace UtilitiesCS
             }
         }
 
-        public bool TryPop(out T result, int index)
+        public bool TryPop(out T? result, int index)
         {
             try
             {

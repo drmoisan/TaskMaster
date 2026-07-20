@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -37,7 +38,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
             CgUtilities = new(Globals);
         }
 
-        public async Task<CategoryClassifierGroup> InitAsync(string groupName)
+        public async Task<CategoryClassifierGroup?> InitAsync(string groupName)
         {
             Globals.ThrowIfNull();
 
@@ -54,7 +55,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
             }
         }
 
-        public static async Task<CategoryClassifierGroup> CreateEngineAsync(
+        public static async Task<CategoryClassifierGroup?> CreateEngineAsync(
             IApplicationGlobals globals,
             string categoryGroup,
             CancellationToken token = default
@@ -68,9 +69,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
 
         #endregion ctor
 
-        internal IApplicationGlobals Globals { get; private set; }
+        internal IApplicationGlobals Globals { get; private set; } = null!;
 
-        internal ClassifierGroupUtilities CgUtilities;
+        internal ClassifierGroupUtilities CgUtilities = null!;
 
         #region Build Category Classifier
 
@@ -101,7 +102,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
                 List<string> prefixList = ["Context", "Project"];
                 foreach (var prefixLu in prefixList)
                 {
-                    var prefix = Globals.TD.PrefixList.Find(x => x.Key == prefixLu);
+                    var prefix = Globals.TD.PrefixList.Find(x => x.Key == prefixLu)!;
                     // Remove the existing Category Classifier
                     Globals.AF.Manager.TryRemove(prefix.Key, out _);
 
@@ -126,7 +127,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
                         .InitializeAsync(
                             childPpkg.CancelSource,
                             childPpkg.Cancel,
-                            childPpkg.ProgressTrackerPane.SpawnChild(),
+                            childPpkg.ProgressTrackerPane!.SpawnChild(),
                             childPpkg.StopWatch
                         )
                         .ConfigureAwait(false);
@@ -143,8 +144,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
                             )
                         )
                         {
-                            classifierGroup.Config =
-                                loader.Config.DeepCopy() as NewSmartSerializableConfig;
+                            classifierGroup.Config = (
+                                loader.Config.DeepCopy() as NewSmartSerializableConfig
+                            )!;
                             classifierGroup.Serialize();
 
                             Globals.AF.Manager[prefix.Key] = classifierGroup.ToAsyncLazy();
@@ -178,9 +180,16 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
             var ppkg = await ProgressPackage
                 .CreateAsTuplePaneAsync(progressTrackerPane: Globals.AF.ProgressTracker)
                 .ConfigureAwait(false);
-            var sw = ppkg.StopWatch;
+            var sw = ppkg.StopWatch!;
             Globals.AF.ProgressPane.Visible = true;
+            // CreateAsTuplePaneAsync's tuple has all-nullable fields by declaration, but this
+            // method's own return type declares the same fields non-nullable; the fields are
+            // always populated by ProgressPackage.InitializeAsync's own defaulting logic.
+            // Suppressing narrowly preserves the exact pre-existing behavior (no behavior
+            // change per AC7) rather than restructuring the tuple shape.
+#pragma warning disable CS8619
             return (ppkg, sw);
+#pragma warning restore CS8619
         }
 
         private async Task<BayesianClassifierGroup> LoadClassifierGroup(
@@ -219,7 +228,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
             IPrefix prefix
         )
         {
-            ppkg.ProgressTrackerPane.Report(
+            ppkg.ProgressTrackerPane!.Report(
                 20,
                 $"Building {prefix.Key} Classifier -> Creating Classifier Group"
             );
@@ -267,7 +276,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
         }
 
         private static InvalidOperationException CreateMissingStagingDataException(
-            string folderPath = null
+            string? folderPath = null
         )
         {
             var builder = new StringBuilder(
@@ -316,21 +325,27 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
 
             var groups = exploded.GroupBy(x => x.GroupingKey);
 
-            var sw = ppkg.StopWatch;
+            var sw = ppkg.StopWatch!;
 
             bool success = false;
             try
             {
+                // The grouping key's runtime non-nullness is not tracked through GroupBy's
+                // nullability inference (see the identical pattern and rationale in
+                // ActionableClassifierGroup.BuildClassifiersAsync); suppressing narrowly
+                // preserves the exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS8620
                 await AsyncMultiTasker.AsyncMultiTaskChunker(
                     groups,
                     async (group) =>
                     {
                         await BuildClassifierAsync(group, classifierGroup, ppkg.Cancel);
                     },
-                    ppkg.ProgressTrackerPane,
+                    ppkg.ProgressTrackerPane!,
                     "Building Classifiers",
                     ppkg.Cancel
                 );
+#pragma warning restore CS8620
                 sw.LogDuration("Build Classifiers");
                 sw.WriteToLog(clear: false);
                 success = true;
@@ -348,7 +363,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
             {
                 return new List<MinedMailInfo> { m };
             }
-            var categories = new FlagParser([.. m.Categories.Split(separator: ',', trim: true)])
+            var categories = new FlagParser([.. m.Categories!.Split(separator: ',', trim: true)])
                 .Combined.AsListWithPrefix.Where(x => x.Contains(prefix.Value))
                 .ToList();
 
@@ -386,13 +401,13 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
         #region Public Properties
 
 
-        public BayesianClassifierGroup ClassifierGroup { get; set; }
+        public BayesianClassifierGroup ClassifierGroup { get; set; } = null!;
 
         public bool IsActivated => ClassifierGroup is not null;
 
         public double ProbabilityThreshold { get; set; } = 0.8;
 
-        public Func<IEnumerable<string>, MailItemHelper, Task> CategorySetter { get; set; }
+        public Func<IEnumerable<string>, MailItemHelper, Task> CategorySetter { get; set; } = null!;
 
         public async Task TestAsync(MailItemHelper helper)
         {
@@ -408,7 +423,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
             var results = await ClassifierGroup.ClassifyAsync(helper.Tokens, default);
             var filtered = results
                 .Where(x => x.Probability > ProbabilityThreshold)
-                .Select(x => x.Class)
+                .Select(x => x.Class!)
                 .ToArray();
             return filtered;
         }
@@ -419,7 +434,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
             // var results2 = results.ToList();
             var filtered = results
                 .Where(x => x.Probability > ProbabilityThreshold)
-                .Select(x => x.Class)
+                .Select(x => x.Class!)
                 .ToArray();
             return filtered;
         }
@@ -446,7 +461,8 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
             (item) =>
                 (Engine is not null && CategorySetter is not null)
                     ? ((CategoryClassifierGroup)Engine).TestAsync(item)
-                    : null;
+                    // Preserves the pre-existing null-Task return; null! keeps the non-null delegate type.
+                    : null!;
 
         //public Func<MailItemHelper, Task> AsyncAction { get; set; }
 
@@ -496,7 +512,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
         {
             var type = olItem.TryGet().OlItemType(out var typeVal)
                 ? $"{typeVal}"
-                : $"{olItem.InnerObject.GetType()}";
+                : $"{olItem.InnerObject!.GetType()}";
             var created = olItem.TryGet().CreationTime(out var result)
                 ? $" created on {result:g}"
                 : "";
@@ -512,11 +528,11 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
         public Func<IApplicationGlobals, Task> EngineInitializer =>
             async (globals) => await Task.CompletedTask;
 
-        public string EngineName { get; internal set; }
+        public string EngineName { get; internal set; } = null!;
 
         public string Message => $"{nameof(CategoryClassifierGroup)} is null. Skipping actions";
 
-        public MailItemHelper TypedItem { get; set; }
+        public MailItemHelper TypedItem { get; set; } = null!;
 
         #endregion IConditionalEngine Implementation
     }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -15,8 +17,9 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary
     public class ConcurrentObservableDictionary<TKey, TValue>
         : ConcurrentDictionary<TKey, TValue>,
             IConcurrentObservableDictionary<TKey, TValue>
+        where TKey : notnull
     {
-        public event EventHandler<DictionaryChangedEventArgs<TKey, TValue>> CollectionChanged;
+        public event EventHandler<DictionaryChangedEventArgs<TKey, TValue>>? CollectionChanged;
 
         protected virtual void OnCollectionChanged(
             DictionaryChangedEventArgs<TKey, TValue> changeAction
@@ -29,7 +32,8 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary
 
             if (
                 changeAction.Action != NotifyCollectionChangedAction.Reset
-                && _observers.TryGetValue(changeAction.Key, out var observers)
+                // A non-Reset change always carries a non-null Key (set by the value-bearing ctor).
+                && _observers.TryGetValue(changeAction.Key!, out var observers)
             )
             {
                 tasks.AddRange(observers.Select(o => Task.Run(() => o.OnEventOccur(changeAction))));
@@ -41,8 +45,8 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary
         protected void OnCollectionChanged(
             NotifyCollectionChangedAction action,
             TKey key,
-            TValue newValue,
-            TValue oldValue
+            TValue? newValue,
+            TValue? oldValue
         )
         {
             OnCollectionChanged(
@@ -56,8 +60,8 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary
             TValue value
         )
         {
-            var newValue = default(TValue);
-            var oldValue = default(TValue);
+            TValue? newValue = default;
+            TValue? oldValue = default;
             switch (action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -133,7 +137,8 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary
                 }
             );
 
-            if (isUpdated && !value.Equals(oldValue))
+            // value is the added/updated result; preserve the original non-null dereference.
+            if (isUpdated && !value!.Equals(oldValue))
             {
                 OnCollectionChanged(NotifyCollectionChangedAction.Replace, key, value, oldValue);
             }
@@ -165,7 +170,8 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary
                 }
             );
 
-            if (isUpdated && !value.Equals(oldValue))
+            // value is the added/updated result; preserve the original non-null dereference.
+            if (isUpdated && !value!.Equals(oldValue))
             {
                 OnCollectionChanged(NotifyCollectionChangedAction.Replace, key, value, oldValue);
             }
@@ -337,19 +343,20 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary
             {
                 if (_observers.ContainsKey(key) && _observers.TryRemove(key, out var observers))
                 {
-                    return new KeyValuePair<TKey, HashSet<IDictionaryObserver<TKey, TValue>>>(
+                    return new KeyValuePair<TKey, HashSet<IDictionaryObserver<TKey, TValue>>?>(
                         key,
                         new HashSet<IDictionaryObserver<TKey, TValue>>(observers)
                     );
                 }
-                return new KeyValuePair<TKey, HashSet<IDictionaryObserver<TKey, TValue>>>(
+                return new KeyValuePair<TKey, HashSet<IDictionaryObserver<TKey, TValue>>?>(
                     key,
                     null
                 );
             });
             return removed
                 .Where(pair => pair.Value != null)
-                .ToDictionary(pair => pair.Key, pair => pair.Value);
+                // Values are filtered non-null above, so the ! reflects the guaranteed presence.
+                .ToDictionary(pair => pair.Key, pair => pair.Value!);
         }
 
         public Dictionary<TKey, HashSet<IDictionaryObserver<TKey, TValue>>> RemoveAllObservers()

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,19 +29,19 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             // Set async condition
         }
 
-        public new async Task<ActionableClassifierGroup> InitAsync(string groupName)
+        public new async Task<ActionableClassifierGroup?> InitAsync(string groupName)
         {
             var result = await base.InitAsync(groupName);
             if (result is not null)
             {
                 result.AsyncAction = (item) =>
-                    (Engine as ActionableClassifierGroup)?.TestAsync(item);
+                    ((Engine as ActionableClassifierGroup)?.TestAsync(item))!;
                 result.AsyncCondition = (item) => Task.Run(() => Condition(item));
             }
             return result;
         }
 
-        public static new async Task<ActionableClassifierGroup> CreateEngineAsync(
+        public static new async Task<ActionableClassifierGroup?> CreateEngineAsync(
             IApplicationGlobals globals,
             string categoryGroup,
             CancellationToken token = default
@@ -72,11 +73,19 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 return false;
             }
 
-            var sw = ppkg.StopWatch;
+            var sw = ppkg.StopWatch!;
 
             bool success = false;
             try
             {
+                // The .Where(x => x.Actionable is not null) filter above guarantees a non-null
+                // grouping key at runtime, but LINQ's GroupBy key-selector nullability inference
+                // does not propagate that guarantee into the closed generic type, so `group`'s
+                // key remains annotated `string?` here while BuildClassifierAsync's base-class
+                // signature expects `IGrouping<string, MinedMailInfo>`. Suppressing narrowly
+                // preserves the exact pre-existing runtime behavior (no behavior change per AC7)
+                // rather than widening the shared base-class signature.
+#pragma warning disable CS8620
                 await AsyncMultiTasker.AsyncMultiTaskChunker(
                     groups,
                     async (group) =>
@@ -88,10 +97,11 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                             minimumCountPerToken
                         );
                     },
-                    ppkg.ProgressTrackerPane,
+                    ppkg.ProgressTrackerPane!,
                     "Building Classifiers",
                     ppkg.Cancel
                 );
+#pragma warning restore CS8620
                 sw.LogDuration("Build Classifiers");
                 sw.WriteToLog(clear: false);
                 success = true;
@@ -112,7 +122,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             var results = await ClassifierGroup.ClassifyAsync(helper.Tokens, default);
             var filtered = results
                 .Where(x => x.Probability > ProbabilityThreshold)
-                .Select(x => x.Class)
+                .Select(x => x.Class!)
                 .Where(x => x != "None")
                 .ToArray();
             return filtered;
@@ -124,10 +134,10 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             // var results2 = results.ToList();
             var filtered = results
                 ?.Where(x => x.Probability > ProbabilityThreshold)
-                .Select(x => x.Class)
+                .Select(x => x.Class!)
                 .Where(x => x != "None")
                 .ToArray();
-            return filtered;
+            return filtered!;
         }
 
         public override async Task TestAsync(MailItemHelper helper)

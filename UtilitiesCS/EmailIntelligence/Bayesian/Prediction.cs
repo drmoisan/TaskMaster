@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,8 +17,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             _probability = probability;
         }
 
-        private T _class;
-        public T Class
+        private T? _class;
+        public T? Class
         {
             get => _class;
             set => _class = value;
@@ -30,7 +31,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             set => _probability = value;
         }
 
-        public int CompareTo(Prediction<T> other)
+        public int CompareTo(Prediction<T>? other)
         {
             if (other is null)
             {

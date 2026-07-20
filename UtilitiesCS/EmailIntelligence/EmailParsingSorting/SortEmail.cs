@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -32,7 +33,7 @@ namespace UtilitiesCS
             bool QuickLoad = false,
             bool WholeConversation = true,
             string strSeed = "",
-            object objItem = null
+            object? objItem = null
         )
         {
             throw new NotImplementedException();
@@ -133,15 +134,15 @@ namespace UtilitiesCS
 
             // Resolve the paths for the emails
             ResolvePaths(
-                (Folder)mailHelpers.FirstOrDefault().FolderInfo.OlFolder,
+                (Folder)mailHelpers.FirstOrDefault()!.FolderInfo!.OlFolder!,
                 destinationOlStem,
                 appGlobals,
                 olAncestor,
                 fsAncestorEquivalent,
                 out string destinationOlPath,
                 out string saveFsPath,
-                out string deleteFsPath,
-                out Folder destinationFolder
+                out string? deleteFsPath,
+                out Folder? destinationFolder
             );
 
             // Exit if the destination folder cannot be resolved
@@ -227,10 +228,15 @@ namespace UtilitiesCS
             if (saveAttachments || savePictures)
             {
                 var attachments = mailHelper.AttachmentsHelper.ToAsyncEnumerable();
+                // ForEachAsync is obsolete (CS0618); see the rationale in EmailFiler's
+                // ProcessMailHelperAsync-adjacent fix. Suppressing narrowly preserves the
+                // exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
                 await attachments.ForEachAsync(async x =>
                 {
                     await x.SaveAttachmentAsync(saveFsPath);
                 });
+#pragma warning restore CS0618
 
                 // Delete the original attachments if removePreviousFsFiles is true
                 var toDelete = attachments.Where(x => !x.FilePathDelete.IsNullOrEmpty());
@@ -262,7 +268,7 @@ namespace UtilitiesCS
 
             // Move the email to the destination folder
 
-            MailItem mailItemNew = null;
+            MailItem? mailItemNew = null;
             MailItem mailItemOriginal = mailHelper.Item;
 
             try
@@ -325,7 +331,7 @@ namespace UtilitiesCS
                 fsAncestorEquivalent,
                 out string destinationOlPath,
                 out string saveFsPath,
-                out string deleteFsPath
+                out string? deleteFsPath
             );
 
             foreach (var mailItem in mailItems)
@@ -348,14 +354,19 @@ namespace UtilitiesCS
                     );
                     // Save to the file system
                     //await foreach (var attachment in attachments) { await attachment.SaveAttachmentAsync(); }
+                    // ForEachAsync is obsolete (CS0618); see the rationale in EmailFiler's
+                    // ProcessMailHelperAsync-adjacent fix. Suppressing narrowly preserves the
+                    // exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
                     await attachments.ForEachAsync(async x => await x.SaveAttachmentAsync());
+#pragma warning restore CS0618
                     //attachments.ForEach(x => x.SaveAttachment());
 
                     // Delete the original attachments if removePreviousFsFiles is true
                     var toDelete = attachments.Where(x => !x.FilePathDelete.IsNullOrEmpty());
                     await foreach (var attachment in toDelete)
                     {
-                        await Task.Run(() => File.Delete(attachment.FilePathDelete));
+                        await Task.Run(() => File.Delete(attachment.FilePathDelete!));
                     }
                 }
 
@@ -368,7 +379,7 @@ namespace UtilitiesCS
                 appGlobals.AF.SubjectMap.Add(mailItem.Subject, destinationOlStem);
 
                 // Move the email to the destination folder
-                Folder olDestination = null;
+                Folder? olDestination = null;
                 try
                 {
                     var folderHandler = new FolderPredictor(appGlobals);
@@ -389,7 +400,7 @@ namespace UtilitiesCS
                     //logger.Debug($"Folder with path {destinationOlPath} could not be resolved");
                 }
 
-                MailItem mailItemTemp = null;
+                MailItem? mailItemTemp = null;
 
                 try
                 {
@@ -413,10 +424,10 @@ namespace UtilitiesCS
                 }
 
                 // Add the email to the Undo Stack
-                PushToUndoStack(mailItem, mailItemTemp, appGlobals);
+                PushToUndoStack(mailItem, mailItemTemp!, appGlobals);
 
                 // Capture the move details in the log
-                await Task.Run(() => CaptureMoveDetails(mailItem, mailItemTemp, appGlobals))
+                await Task.Run(() => CaptureMoveDetails(mailItem, mailItemTemp!, appGlobals))
                     .ConfigureAwait(false);
             }
 
@@ -469,7 +480,7 @@ namespace UtilitiesCS
                 fsAncestorEquivalent,
                 out string destinationOlPath,
                 out string saveFsPath,
-                out string deleteFsPath
+                out string? deleteFsPath
             );
 
             foreach (var mailItem in mailItems)
@@ -583,7 +594,7 @@ namespace UtilitiesCS
                         );
                         (
                             await new OlFolderClassifierGroup(globals).GetFolderPredictorAsync()
-                        ).UnTrain(helper.FolderInfo.RelativePath, helper.Tokens, 1);
+                        ).UnTrain(helper.FolderInfo!.RelativePath, helper.Tokens!, 1);
                         movedStack[i].UndoMove();
                         movedStack.Pop(i);
                     }
@@ -626,7 +637,7 @@ namespace UtilitiesCS
         internal static IEnumerable<AttachmentHelper> GetAttachmentsInfo(
             MailItem mailItem,
             string saveFsPath,
-            string deleteFsPath,
+            string? deleteFsPath,
             bool saveAttachments,
             bool savePictures
         )
@@ -634,7 +645,7 @@ namespace UtilitiesCS
             var attachments = mailItem
                 .Attachments.Cast<Attachment>()
                 .Where(x => x.Type != OlAttachmentType.olOLE)
-                .Select(x => new AttachmentHelper(x, mailItem.SentOn, saveFsPath, deleteFsPath));
+                .Select(x => new AttachmentHelper(x, mailItem.SentOn, saveFsPath, deleteFsPath!));
             if (!saveAttachments)
             {
                 attachments = attachments.Where(x => x.AttachmentInfo.IsImage);
@@ -651,19 +662,30 @@ namespace UtilitiesCS
         internal static IAsyncEnumerable<AttachmentHelper> GetAttachmentsInfoAsync(
             MailItem mailItem,
             string saveFsPath,
-            string deleteFsPath,
+            string? deleteFsPath,
             bool saveAttachments,
             bool savePictures
         )
         {
             //TraceUtility.LogMethodCall(mailItem, saveFsPath, deleteFsPath, saveAttachments, savePictures);
+            // SelectAwait is obsolete (CS0618) per the framework's migration guidance ("Use
+            // Select ... overloads of Select"), but the replacement overload requires adding a
+            // CancellationToken parameter to the lambda. Suppressing narrowly preserves the
+            // exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
             var attachments = mailItem
                 .Attachments.Cast<Attachment>()
                 .Where(x => x.Type != OlAttachmentType.olOLE)
                 .ToAsyncEnumerable()
                 .SelectAwait(async x =>
-                    await AttachmentHelper.CreateAsync(x, mailItem.SentOn, saveFsPath, deleteFsPath)
+                    await AttachmentHelper.CreateAsync(
+                        x,
+                        mailItem.SentOn,
+                        saveFsPath,
+                        deleteFsPath!
+                    )
                 );
+#pragma warning restore CS0618
             if (!saveAttachments)
             {
                 attachments = attachments.Where(x => x.AttachmentInfo.IsImage);
@@ -983,7 +1005,7 @@ namespace UtilitiesCS
             string fsAncestorEquivalent,
             out string destinationOlPath,
             out string saveFsPath,
-            out string deleteFsPath
+            out string? deleteFsPath
         )
         {
             //TraceUtility.LogMethodCall(mailItems, destinationOlStem, appGlobals, olAncestor, fsAncestorEquivalent);
@@ -1018,8 +1040,8 @@ namespace UtilitiesCS
             string fsAncestorEquivalent,
             out string destinationOlPath,
             out string saveFsPath,
-            out string deleteFsPath,
-            out Folder destinationFolder
+            out string? deleteFsPath,
+            out Folder? destinationFolder
         )
         {
             //TraceUtility.LogMethodCall(currentFolder, destinationOlStem, appGlobals, olAncestor, fsAncestorEquivalent);
@@ -1251,7 +1273,7 @@ namespace UtilitiesCS
                                         $"Email Subject: {mailItem.Subject} \n Rename file: {strAtmtPath}",
                                         "Input Dialog",
                                         DefaultResponse: strAtmtName[0]
-                                    );
+                                    )!;
                                     if (string.IsNullOrEmpty(strAtmtName[0]))
                                     {
                                         if (
@@ -1354,8 +1376,8 @@ namespace UtilitiesCS
             string strFileLocation
         )
         {
-            string[] strOutput = null;
-            string[,] strAryOutput;
+            string[]? strOutput = null;
+            string[,]? strAryOutput;
             if (File.Exists(Path.Combine(strFileName, strFileLocation)))
             {
                 strAryOutput = new string[14, 2];
@@ -1375,14 +1397,14 @@ namespace UtilitiesCS
                 strAryOutput[13, 1] = "FlaggedAsTask";
 
                 SanitizeArray(strAryOutput, ref strOutput);
-                FileIO2.WriteTextFile(strFileName, strOutput, folderpath: strFileLocation);
+                FileIO2.WriteTextFile(strFileName, strOutput!, folderpath: strFileLocation);
             }
             strOutput = null;
             strAryOutput = null;
         }
 
         [ExcludeFromCodeCoverage]
-        private static void SanitizeArray(string[,] strAryOutput, ref string[] strOutput)
+        private static void SanitizeArray(string[,]? strAryOutput, ref string[]? strOutput)
         {
             if (strAryOutput == null)
             {
@@ -1392,7 +1414,7 @@ namespace UtilitiesCS
             {
                 for (int j = 0; j < strAryOutput.GetLength(0); j++)
                 {
-                    strOutput[j] = string.Join(
+                    strOutput![j] = string.Join(
                         "\t",
                         strAryOutput
                             .SliceRow(j)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,7 +17,9 @@ namespace UtilitiesCS
             FileSystemFolders = fileSystemFolders;
         }
 
-        protected IFileSystemFolderPaths _fileSystemFolders;
+        // null! preserves the non-null contract: the public ctor sets this from its required
+        // (non-null) dependency; the protected parameterless ctor exists for subclassing/testing.
+        protected IFileSystemFolderPaths _fileSystemFolders = null!;
         internal virtual IFileSystemFolderPaths FileSystemFolders
         {
             get => _fileSystemFolders;
@@ -26,7 +29,7 @@ namespace UtilitiesCS
         public override FilePathHelper ReadJson(
             JsonReader reader,
             Type objectType,
-            FilePathHelper existingValue,
+            FilePathHelper? existingValue,
             bool hasExistingValue,
             JsonSerializer serializer
         )
@@ -38,7 +41,7 @@ namespace UtilitiesCS
             return new FilePathHelper(fileName, folderPath);
         }
 
-        internal string ExtractFolderPath(Dictionary<string, string> info)
+        internal string? ExtractFolderPath(Dictionary<string, string> info)
         {
             if (!info.TryGetValue("SpecialFolderName", out string folderName))
             {
@@ -139,9 +142,8 @@ namespace UtilitiesCS
         {
             var message =
                 $"{nameof(FilePathHelperConverter)}.{nameof(ReadJson)} encountered a problem";
-            if (reader is JsonTextReader)
+            if (reader is JsonTextReader textReader)
             {
-                var textReader = reader as JsonTextReader;
                 message += $" on line {textReader.LineNumber} ({reader.Path}).";
             }
             return message;
@@ -194,16 +196,18 @@ namespace UtilitiesCS
 
         public override void WriteJson(
             JsonWriter writer,
-            FilePathHelper value,
+            FilePathHelper? value,
             JsonSerializer serializer
         )
         {
-            var (name, relativePath) = GetSerializablePath(value.FolderPath);
+            // value! preserves behavior: Newtonsoft invokes WriteJson with a non-null value for
+            // a registered converter.
+            var (name, relativePath) = GetSerializablePath(value!.FolderPath);
 
             writer.WriteStartObject();
 
             writer.WritePropertyName("FileName");
-            writer.WriteValue(value.FileName);
+            writer.WriteValue(value!.FileName);
 
             writer.WritePropertyName("RelativePath");
             writer.WriteValue(relativePath);

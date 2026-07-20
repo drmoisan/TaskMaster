@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using Outlook = Microsoft.Office.Interop.Outlook;
 

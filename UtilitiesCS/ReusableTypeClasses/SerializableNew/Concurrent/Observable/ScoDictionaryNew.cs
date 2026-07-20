@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -21,6 +23,7 @@ namespace UtilitiesCS.ReusableTypeClasses
     public class ScoDictionaryNew<TKey, TValue>
         : ConcurrentObservableDictionary<TKey, TValue>, /*ISmartSerializable<ScoDictionaryNew<TKey, TValue>>,*/
             IScoDictionaryNew<TKey, TValue>
+        where TKey : notnull
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
@@ -104,7 +107,9 @@ namespace UtilitiesCS.ReusableTypeClasses
         }
 
         [JsonProperty]
-        protected virtual SmartSerializable<ScoDictionaryNew<TKey, TValue>> ism { get; set; }
+        // set in every constructor (directly or via InitIsm); null! satisfies the non-null contract
+        protected virtual SmartSerializable<ScoDictionaryNew<TKey, TValue>> ism { get; set; } =
+            null!;
 
         public void Serialize() => ism.Serialize();
 
@@ -171,11 +176,12 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         #endregion ISmartSerializable
 
-        public string Name { get; set; }
+        // set by deserialization
+        public string Name { get; set; } = null!;
 
         #region INotifyPropertyChanged
 
-        private void Config_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void Config_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             PropertyChanged?.Invoke(this, e);
         }
@@ -187,7 +193,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         #endregion INotifyPropertyChanged
 

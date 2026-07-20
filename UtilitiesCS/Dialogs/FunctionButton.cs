@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+#nullable enable
+
 namespace UtilitiesCS.Dialogs
 {
     public class FunctionButton<T>
@@ -189,10 +191,10 @@ namespace UtilitiesCS.Dialogs
             ButtonClickedAsync = function;
         }
 
-        private string _name;
-        private Button _button;
+        private string? _name;
+        private Button? _button;
         private Button _template = new DelegateButtonTemplate().Button1; //.Clone();
-        private Func<T> _function;
+        private Func<T>? _function;
 
         public static FunctionButton<T> FromButton(
             Button button,
@@ -210,13 +212,13 @@ namespace UtilitiesCS.Dialogs
 
         public string Name
         {
-            get => _name;
+            get => _name!;
             set => _name = value;
         }
 
         public Button Button
         {
-            get => _button;
+            get => _button!;
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
@@ -247,7 +249,7 @@ namespace UtilitiesCS.Dialogs
 
         public Func<T> Delegate
         {
-            get => _function;
+            get => _function!;
             set => _function = value;
         }
 
@@ -295,10 +297,10 @@ namespace UtilitiesCS.Dialogs
             button.TextImageRelation = TextImageRelation.ImageBeforeText;
         }
 
-        private Func<T> _buttonClicked;
+        private Func<T>? _buttonClicked;
         public Func<T> ButtonClicked
         {
-            get => _buttonClicked;
+            get => _buttonClicked!;
             [MethodImpl(MethodImplOptions.Synchronized)]
             set
             {
@@ -314,10 +316,10 @@ namespace UtilitiesCS.Dialogs
             }
         }
 
-        private Func<Task<T>> _buttonClickedAsync;
+        private Func<Task<T>>? _buttonClickedAsync;
         public Func<Task<T>> ButtonClickedAsync
         {
-            get => _buttonClickedAsync;
+            get => _buttonClickedAsync!;
             set
             {
                 if (_buttonClickedAsync is not null && _button is not null)
@@ -332,7 +334,7 @@ namespace UtilitiesCS.Dialogs
             }
         }
 
-        public T Value { get; internal set; }
+        public T? Value { get; internal set; }
 
         internal void Button_Click(object sender, EventArgs e)
         {

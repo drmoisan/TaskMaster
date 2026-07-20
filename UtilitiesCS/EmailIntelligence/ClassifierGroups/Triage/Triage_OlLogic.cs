@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -51,14 +52,14 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         {
             try
             {
-                Explorer explorer = Parent?.Globals?.Ol?.App?.ActiveExplorer();
+                Explorer? explorer = Parent?.Globals?.Ol?.App?.ActiveExplorer();
                 if (explorer is null)
                 {
                     logger.Debug("Could not grab handle on Explorer");
                     return;
                 }
 
-                View view = explorer.CurrentView as View;
+                View? view = explorer.CurrentView as View;
                 if (view is null)
                 {
                     logger.Debug("Could not grab handle on View");
@@ -119,7 +120,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             }
         }
 
-        public TreeNode<string> StripFilter(Regex regex, TreeNode<string> tree)
+        public TreeNode<string>? StripFilter(Regex regex, TreeNode<string> tree)
         {
             foreach (var child in tree.Children)
             {
@@ -140,7 +141,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                         if (parent.ChildCount == 1)
                         {
                             var brother = parent.Children.First();
-                            grandParent.Parent.RemoveChild(parent);
+                            grandParent.Parent!.RemoveChild(parent);
                             parent.Parent = null;
                             grandParent.AddChild(brother);
                             brother.Parent = grandParent;
@@ -215,7 +216,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             {
                 var helper = await MailItemHelper.FromMailItemAsync(
                     mailItem,
-                    Parent.Globals,
+                    Parent!.Globals,
                     token,
                     false
                 );
@@ -233,7 +234,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 }
             }
 
-            Parent.ClassifierGroup.Serialize();
+            Parent!.ClassifierGroup.Serialize();
         }
 
         public async Task UnTrainSelectionAsync(CancellationToken token = default)
@@ -254,7 +255,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             {
                 var helper = await MailItemHelper.FromMailItemAsync(
                     mailItem,
-                    Parent.Globals,
+                    Parent!.Globals,
                     token,
                     false
                 );
@@ -263,7 +264,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 helper.Item.DeleteUdf("Triage");
             }
 
-            Parent.ClassifierGroup.Serialize();
+            Parent!.ClassifierGroup.Serialize();
         }
     }
 }

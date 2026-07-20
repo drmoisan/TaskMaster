@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -75,7 +76,10 @@ namespace UtilitiesCS.Windows_Forms
 
         internal static bool TryGetScreen(this Point point, out Screen screen, out int screenNumber)
         {
-            screen = default;
+            // net481 has no public MaybeNullWhenAttribute; the caller either checks the bool
+            // result (true => screen set) or (in the existing false-path callers) passes the
+            // value into methods that null-guard it. `default!` preserves the prior behavior.
+            screen = default!;
             screenNumber = -1;
 
             screenNumber = Screen.AllScreens.FindIndex(screen => screen.Bounds.Contains(point));

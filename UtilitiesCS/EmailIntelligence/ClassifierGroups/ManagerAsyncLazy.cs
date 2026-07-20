@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -49,12 +50,13 @@ namespace UtilitiesCS
 
         #region Configuration
 
+        // Assigned by ResetConfigAsyncLazy() (a method the compiler does not track as ctor init).
         public AsyncLazy<ConcurrentDictionary<string, SmartSerializableLoader>> Configuration
         {
             get;
             protected set;
-        }
-        private ConcurrentDictionary<string, SmartSerializableLoader> _privateConfig;
+        } = null!;
+        private ConcurrentDictionary<string, SmartSerializableLoader> _privateConfig = null!;
 
         internal async Task<
             ConcurrentDictionary<string, SmartSerializableLoader>
@@ -66,17 +68,25 @@ namespace UtilitiesCS
                 true,
                 true
             );
+            // SelectAwait is obsolete (CS0618) per the framework's migration guidance ("Use
+            // Select ... overloads of Select"), but the replacement overload requires adding a
+            // CancellationToken parameter to the lambda. Suppressing narrowly preserves the
+            // exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
             var resourceDictionary = await resourceSet
                 .Cast<DictionaryEntry>()
                 .ToDictionary<string, string>()
                 .ToAsyncEnumerable()
                 .SelectAwait(async kvp =>
                 {
-                    var loader = await SmartSerializableLoader.DeserializeAsync(Globals, kvp.Value);
+                    var loader = (
+                        await SmartSerializableLoader.DeserializeAsync(Globals, kvp.Value)
+                    )!;
                     loader.PropertyChanged += Loader_PropertyChanged;
                     return new KeyValuePair<string, SmartSerializableLoader>(kvp.Key, loader);
                 })
                 .ToConcurrentDictionaryAsync();
+#pragma warning restore CS0618
 
             return resourceDictionary;
         }
@@ -125,13 +135,13 @@ namespace UtilitiesCS
                     var classifierGroup = GetAsyncLazyClassifierLoader(loader);
                     if (classifierGroup != null)
                     {
-                        this[loader.Name] = classifierGroup;
+                        this[loader.Name!] = classifierGroup;
                         await Globals.Engines.RestartEngineAsync(loader.Name);
                     }
                 }
                 else if (!loader.Config.ClassifierActivated)
                 {
-                    this.TryRemove(loader.Name, out _);
+                    this.TryRemove(loader.Name!, out _);
                     Globals.Engines.InboxEngines.TryRemove(loader.Name, out _);
                 }
                 await WriteConfigurationAsync();
@@ -283,17 +293,17 @@ namespace UtilitiesCS
                 var classifier = await BayesianClassifierGroup.Static.DeserializeAsync(
                     loader,
                     true,
-                    GetAltLoader(loader)
+                    GetAltLoader(loader)!
                 );
                 classifier.PropertyChanged += Config_PropertyChanged;
                 return classifier;
             });
         }
 
-        private Func<BayesianClassifierGroup> GetAltLoader(SmartSerializableLoader loader)
+        private Func<BayesianClassifierGroup>? GetAltLoader(SmartSerializableLoader loader)
         {
             // Get the MethodInfo of the static method
-            MethodInfo staticMethod = null;
+            MethodInfo? staticMethod = null;
             if (loader.T is not null)
             {
                 staticMethod = loader.T.GetMethod(
@@ -302,9 +312,11 @@ namespace UtilitiesCS
                 );
             }
 
-            Func<BayesianClassifierGroup> altLoader = staticMethod is null
+            Func<BayesianClassifierGroup>? altLoader = staticMethod is null
                 ? null
-                : () => staticMethod.Invoke(null, null) as BayesianClassifierGroup;
+                // The lambda is only created on the non-null branch; the as-cast is assumed
+                // non-null (pre-existing contract: CreateNewClassifier returns a group).
+                : () => (staticMethod!.Invoke(null, null) as BayesianClassifierGroup)!;
 
             return altLoader;
         }
@@ -316,7 +328,8 @@ namespace UtilitiesCS
             {
                 ResetConfigAsyncLazy();
             }
-            foreach (var configuration in await Configuration)
+            // ResetConfigAsyncLazy above assigns Configuration when it was null (not tracked by flow analysis).
+            foreach (var configuration in await Configuration!)
             {
                 ResetLoadClassifierAsyncLazy(configuration.Key, configuration.Value);
             }

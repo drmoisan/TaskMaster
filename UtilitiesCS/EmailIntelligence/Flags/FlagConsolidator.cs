@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -27,7 +28,7 @@ namespace UtilitiesCS.EmailIntelligence.Flags
             get => Refreshable(_asListWithPrefix);
             set => _asListWithPrefix.ToLazy();
         }
-        protected Lazy<IList<string>> _asListWithPrefix;
+        protected Lazy<IList<string>> _asListWithPrefix = null!;
 
         internal virtual void ResetLazyListWithPrefix()
         {
@@ -39,7 +40,7 @@ namespace UtilitiesCS.EmailIntelligence.Flags
             get => Refreshable(_asListNoPrefix);
             set => _asListNoPrefix = value.ToLazy();
         }
-        protected Lazy<IList<string>> _asListNoPrefix;
+        protected Lazy<IList<string>> _asListNoPrefix = null!;
 
         internal virtual void ResetLazyListNoPrefix()
         {
@@ -51,7 +52,7 @@ namespace UtilitiesCS.EmailIntelligence.Flags
             get => Refreshable(_asStringWithPrefix);
             set => _asStringWithPrefix = value.ToLazy();
         }
-        protected Lazy<string> _asStringWithPrefix;
+        protected Lazy<string> _asStringWithPrefix = null!;
 
         internal virtual void ResetStringWithPrefix()
         {
@@ -63,7 +64,7 @@ namespace UtilitiesCS.EmailIntelligence.Flags
             get => Refreshable(_asStringNoPrefix);
             set => _asStringNoPrefix = value.ToLazy();
         }
-        protected Lazy<string> _asStringNoPrefix;
+        protected Lazy<string> _asStringNoPrefix = null!;
 
         internal virtual void ResetStringNoPrefix()
         {

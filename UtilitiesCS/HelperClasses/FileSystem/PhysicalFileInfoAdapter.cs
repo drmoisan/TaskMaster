@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.IO;
 using System.Runtime.Serialization;
@@ -96,9 +97,15 @@ namespace UtilitiesCS.HelperClasses.FileSystem
 
         public string Name => _fileInfo.Name;
 
-        public IDirectoryInfo Directory => new DirectoryInfoWrapper(_fileInfo.Directory);
+        // Behavior-preserving `!`: at a filesystem root FileInfo.Directory is null and the
+        // DirectoryInfoWrapper ctor throws ArgumentNullException, exactly as before annotation.
+        // The wrapped IDirectoryInfo interface is out of scope (oblivious), so `!` preserves the
+        // latent root-throws behavior rather than changing the contract. FLAGGED (evidence/other).
+        public IDirectoryInfo Directory => new DirectoryInfoWrapper(_fileInfo.Directory!);
 
-        public string DirectoryName => _fileInfo.DirectoryName;
+        // Behavior-preserving `!`: FileInfo.DirectoryName is null only at a root; returning it as
+        // the non-null interface contract preserves the current behavior. FLAGGED.
+        public string DirectoryName => _fileInfo.DirectoryName!;
 
         public bool IsReadOnly
         {

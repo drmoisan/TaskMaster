@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace UtilitiesCS
             //var assembliesAndMethods = Enumerable.Range(0, sf.FrameCount).Select(i => (sf.GetFrame(i).GetMethod().DeclaringType.Assembly.GetName().Name, sf.GetFrame(i).GetMethod().Name)).ToArray();
 
             int frameLevel = 0;
-            MethodBase method;
+            MethodBase? method;
             try
             {
                 method = GetFirstMethodOfMine(sf, ref frameLevel);
@@ -39,7 +40,7 @@ namespace UtilitiesCS
                 methodName = $"{GetClassName(method)}.{method.Name}";
             }
 
-            MethodBase methodCalledBy;
+            MethodBase? methodCalledBy;
             try
             {
                 methodCalledBy = GetFirstMethodOfMine(sf, ref frameLevel);
@@ -55,11 +56,12 @@ namespace UtilitiesCS
                 methodCalledBy = null;
             }
 
-            var methodCaller = $"{GetClassName(methodCalledBy)}.{methodCalledBy.Name}()" ?? "";
+            // Behavior-preserving `!`: a null resolved method throws here, as before annotation.
+            var methodCaller = $"{GetClassName(methodCalledBy!)}.{methodCalledBy!.Name}()" ?? "";
 
             // Exclude out parameters
             var methodParamsExcludingOut = methodParameters?.Where(p => !p.IsOut).ToArray();
-            if (methodParamsExcludingOut.Length == callingMethodParamValues.Length)
+            if (methodParamsExcludingOut!.Length == callingMethodParamValues.Length)
             {
                 List<string> parameterList = new List<string>();
                 foreach (var parameter in methodParamsExcludingOut)
@@ -76,7 +78,7 @@ namespace UtilitiesCS
             else
             {
                 logger.Info(
-                    $"TRACE\t{methodCaller} -> {method.Name}(/* Please update to pass in all parameters */)"
+                    $"TRACE\t{methodCaller} -> {method!.Name}(/* Please update to pass in all parameters */)"
                 );
             }
         }
@@ -104,7 +106,8 @@ namespace UtilitiesCS
                 : $"{GetClassName(methodCalledBy)}.{methodCalledBy.Name}";
 
             var paramString = method.GetParameterString(callingMethodParamValues);
-            return $"TRACE\t{methodCaller} -> {method.Name}({paramString})";
+            // Behavior-preserving `!`: a null resolved method throws here, as before annotation.
+            return $"TRACE\t{methodCaller} -> {method!.Name}({paramString})";
         }
 
         [Conditional("TRACE")]
@@ -122,7 +125,8 @@ namespace UtilitiesCS
             var paramString = lastMethod is null
                 ? "method not resolved"
                 : lastMethod.GetParameterString(callingMethodParamValues);
-            var lastName = $"{GetClassName(lastMethod)}.{lastMethod.Name}({paramString})";
+            // Behavior-preserving `!`: a null last method throws here, as before annotation.
+            var lastName = $"{GetClassName(lastMethod!)}.{lastMethod!.Name}({paramString})";
             var methodNames = methods
                 .Select(m => $"{GetClassName(m)}.{m.Name}({GetParameterNames(m)})")
                 .ToList();
@@ -140,7 +144,8 @@ namespace UtilitiesCS
             var paramString = lastMethod is null
                 ? "method not resolved"
                 : lastMethod.GetParameterString(callingMethodParamValues);
-            var lastName = $"{GetClassName(lastMethod)}.{lastMethod.Name}({paramString})";
+            // Behavior-preserving `!`: a null last method throws here, as before annotation.
+            var lastName = $"{GetClassName(lastMethod!)}.{lastMethod!.Name}({paramString})";
             var methodNames = methods
                 .Select(m => $"{GetClassName(m)}.{m.Name}({GetParameterNames(m)})")
                 .ToList();
@@ -150,11 +155,11 @@ namespace UtilitiesCS
 
         private static string GetParameterNames(this MethodBase method)
         {
-            var methodParameters = method?.GetParameters();
+            var methodParameters = method.GetParameters();
             return string.Join(", ", methodParameters.Select(p => $"{p.Name}"));
         }
 
-        private static T Pop<T>(this List<T> list)
+        private static T? Pop<T>(this List<T> list)
         {
             if (list.IsNullOrEmpty())
             {
@@ -166,15 +171,16 @@ namespace UtilitiesCS
         }
 
         private static string GetParameterString(
-            this MethodBase method,
+            this MethodBase? method,
             params object[] callingMethodParamValues
         )
         {
             var methodParameters = method?.GetParameters();
 
-            // Exclude out parameters
+            // Exclude out parameters. Behavior-preserving `!`: a null method/parameter set
+            // throws on the .Length access below, exactly as before annotation.
             var methodParamsExcludingOut = methodParameters?.Where(p => !p.IsOut).ToArray();
-            if (methodParamsExcludingOut.Length == callingMethodParamValues.Length)
+            if (methodParamsExcludingOut!.Length == callingMethodParamValues.Length)
             {
                 List<string> parameterList = new List<string>();
                 foreach (var parameter in methodParamsExcludingOut)
@@ -192,29 +198,32 @@ namespace UtilitiesCS
             }
         }
 
-        public static ParameterInfo[] GetCallerParameters(this StackTrace st) =>
+        public static ParameterInfo[]? GetCallerParameters(this StackTrace st) =>
             st.GetCallerMethod()?.GetParameters();
 
-        public static ParameterInfo[] GetCallerParameters(this StackTrace st, ref int frameLevel) =>
-            st.GetCallerMethod(ref frameLevel)?.GetParameters();
+        public static ParameterInfo[]? GetCallerParameters(
+            this StackTrace st,
+            ref int frameLevel
+        ) => st.GetCallerMethod(ref frameLevel)?.GetParameters();
 
-        public static MethodBase GetCallerMethod(this StackTrace st)
+        public static MethodBase? GetCallerMethod(this StackTrace st)
         {
             int frameLevel = 1;
             return GetCallerMethod(st, ref frameLevel);
         }
 
-        public static MethodBase GetCallerMethod(this StackTrace st, ref int frameLevel)
+        public static MethodBase? GetCallerMethod(this StackTrace st, ref int frameLevel)
         {
             var nextLevel = frameLevel + 1;
-            MethodBase methodCalledBy = null;
+            MethodBase? methodCalledBy = null;
             try
             {
                 methodCalledBy = GetFirstMethodOfMine(st, ref frameLevel);
                 if (methodCalledBy is null)
                 {
                     frameLevel = nextLevel;
-                    methodCalledBy = st.GetFrame(frameLevel).GetMethod();
+                    // Behavior-preserving: an out-of-range frame throws here (caught below), as before.
+                    methodCalledBy = st.GetFrame(frameLevel)!.GetMethod();
                 }
             }
             catch (Exception)
@@ -312,9 +321,9 @@ namespace UtilitiesCS
             return trace.GetMyFrames().Select(f => f.Method).ToList();
         }
 
-        private static MethodBase GetFirstMethodOfMine(StackTrace trace, ref int i)
+        private static MethodBase? GetFirstMethodOfMine(StackTrace trace, ref int i)
         {
-            MethodBase methodCalledBy = null;
+            MethodBase? methodCalledBy = null;
             bool repeat = true;
             do
             {
@@ -327,22 +336,24 @@ namespace UtilitiesCS
                     }
                     else
                     {
-                        var m = trace.GetFrame(i).GetMethod();
+                        // Behavior-preserving `!`: within FrameCount the frame/method and their
+                        // reflection metadata are assumed non-null; any null throws and is caught below.
+                        var m = trace.GetFrame(i)!.GetMethod();
                         string assemblyName;
 
-                        if (m.IsStatic)
+                        if (m!.IsStatic)
                         {
-                            assemblyName = m.Module.Assembly.GetName().Name;
+                            assemblyName = m.Module.Assembly.GetName().Name!;
                         }
                         else
                         {
-                            assemblyName = m.DeclaringType.Assembly.GetName().Name;
+                            assemblyName = m.DeclaringType!.Assembly.GetName().Name!;
                         }
 
                         if (ProjectNames.Contains(assemblyName))
                         {
-                            methodCalledBy = trace.GetFrame(i).GetMethod();
-                            if (methodCalledBy.Name == "MoveNext")
+                            methodCalledBy = trace.GetFrame(i)!.GetMethod();
+                            if (methodCalledBy!.Name == "MoveNext")
                             {
                                 methodCalledBy = null;
                             }
@@ -363,10 +374,11 @@ namespace UtilitiesCS
         }
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+            // Standard log4net logger declaration: non-null in a static field initializer.
+            System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType!
         );
 
-        private static List<string> _projectNames;
+        private static List<string>? _projectNames;
         internal static List<string> ProjectNames
         {
             get

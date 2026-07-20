@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -13,13 +14,15 @@ namespace UtilitiesCS.NewtonsoftHelpers
 {
     public class ScDictionaryConverter<TDerived, TKey, TValue> : JsonConverter<TDerived>
         where TDerived : ScDictionary<TKey, TValue>
+        where TKey : notnull
     {
         public ScDictionaryConverter() { }
 
-        public override TDerived ReadJson(
+        // Registered cross-module contract: ReadJson returns TDerived? (body is wrapper?.ToDerived()).
+        public override TDerived? ReadJson(
             JsonReader reader,
             Type typeToConvert,
-            TDerived existingValue,
+            TDerived? existingValue,
             bool hasExistingValue,
             JsonSerializer serializer
         )
@@ -30,9 +33,15 @@ namespace UtilitiesCS.NewtonsoftHelpers
             return wrapper?.ToDerived();
         }
 
-        public override void WriteJson(JsonWriter writer, TDerived value, JsonSerializer serializer)
+        public override void WriteJson(
+            JsonWriter writer,
+            TDerived? value,
+            JsonSerializer serializer
+        )
         {
-            var wrapper = new WrapperScDictionary<TDerived, TKey, TValue>().ToComposition(value);
+            // value! preserves behavior: Newtonsoft invokes WriteJson with a non-null value for
+            // a registered converter; ToComposition requires a non-null instance.
+            var wrapper = new WrapperScDictionary<TDerived, TKey, TValue>().ToComposition(value!);
             serializer.Serialize(writer, wrapper);
         }
     }

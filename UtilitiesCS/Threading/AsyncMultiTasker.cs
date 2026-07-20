@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -25,7 +26,7 @@ namespace UtilitiesCS.Threading
             IProgress<(int Value, string JobName)> progress,
             string messagePrefix,
             CancellationToken cancel,
-            Func<TimeSpan, ITimerWrapper> timerFactory = null
+            Func<TimeSpan, ITimerWrapper>? timerFactory = null
         )
         {
             timerFactory ??= interval => new TimerWrapper(interval);
@@ -99,7 +100,8 @@ namespace UtilitiesCS.Threading
                 await Task.WhenAll(tasks);
 
                 timer.StopTimer();
-                result.ForEach(x => sw.MergeDurations(((IItemInfo)x).Sw.Durations));
+                // x is a non-null result element added by func above; cast target is unconstrained TOut.
+                result.ForEach(x => sw.MergeDurations(((IItemInfo)x!).Sw.Durations));
                 sw.WriteToLog();
 
                 return result;
@@ -131,7 +133,7 @@ namespace UtilitiesCS.Threading
             IProgress<(int Value, string JobName)> progress,
             string messagePrefix,
             CancellationToken cancel,
-            Func<TimeSpan, ITimerWrapper> timerFactory = null
+            Func<TimeSpan, ITimerWrapper>? timerFactory = null
         )
         {
             timerFactory ??= interval => new TimerWrapper(interval);
@@ -179,7 +181,7 @@ namespace UtilitiesCS.Threading
                 );
             }
 
-            ITimerWrapper timer = null;
+            ITimerWrapper? timer = null;
             await Task.Run(() =>
             {
                 timer = timerFactory(TimeSpan.FromSeconds(1));
@@ -210,15 +212,17 @@ namespace UtilitiesCS.Threading
             catch (System.Exception e)
             {
                 logger.Error($"{e.Message}", e);
-                timer.StopTimer();
-                timer.Dispose();
+                // timer! preserves the current NRE-if-unassigned behavior (do not swallow with timer?.).
+                timer!.StopTimer();
+                timer!.Dispose();
                 throw;
             }
             finally
             {
                 progress.Report((100, "Operation Complete"));
-                timer.StopTimer();
-                timer.Dispose();
+                // timer! preserves the current NRE-if-unassigned behavior (do not swallow with timer?.).
+                timer!.StopTimer();
+                timer!.Dispose();
             }
         }
 
@@ -228,7 +232,7 @@ namespace UtilitiesCS.Threading
             IProgress<(int Value, string JobName)> progress,
             string messagePrefix,
             CancellationToken cancel,
-            Func<TimeSpan, ITimerWrapper> timerFactory = null
+            Func<TimeSpan, ITimerWrapper>? timerFactory = null
         )
         {
             timerFactory ??= interval => new TimerWrapper(interval);
@@ -323,7 +327,7 @@ namespace UtilitiesCS.Threading
             IProgress<(int Value, string JobName)> progress,
             string messagePrefix,
             CancellationToken cancel,
-            Func<TimeSpan, ITimerWrapper> timerFactory = null
+            Func<TimeSpan, ITimerWrapper>? timerFactory = null
         )
         {
             timerFactory ??= interval => new TimerWrapper(interval);

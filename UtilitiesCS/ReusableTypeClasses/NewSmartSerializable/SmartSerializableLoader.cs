@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -59,7 +60,9 @@ namespace UtilitiesCS.ReusableTypeClasses
             get => _globals;
             set => _globals = value;
         }
-        private IApplicationGlobals _globals;
+
+        // set by deserialization / the parameterized ctor
+        private IApplicationGlobals _globals = null!;
 
         public Type T
         {
@@ -70,7 +73,9 @@ namespace UtilitiesCS.ReusableTypeClasses
                 Notify();
             }
         }
-        private Type _t;
+
+        // set by deserialization / the T setter before use
+        private Type _t = null!;
 
         private JsonSerializerSettings GetSettings()
         {
@@ -82,7 +87,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             return settings;
         }
 
-        public static async Task<SmartSerializableLoader> DeserializeAsync(
+        public static async Task<SmartSerializableLoader?> DeserializeAsync(
             IApplicationGlobals globals,
             string jsonObject,
             CancellationToken cancel = default
@@ -117,7 +122,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
-        public static async Task<SmartSerializableLoader> DeserializeAsync(
+        public static async Task<SmartSerializableLoader?> DeserializeAsync(
             IApplicationGlobals globals,
             byte[] binary,
             CancellationToken cancel = default
@@ -152,7 +157,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
-        internal SmartSerializableLoader DeserializeConfig(byte[] binary)
+        internal SmartSerializableLoader? DeserializeConfig(byte[] binary)
         {
             var jsonObject = TryConvertBinaryToJson(binary);
             if (jsonObject.IsNullOrEmpty())
@@ -161,14 +166,15 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
             else
             {
-                return DeserializeConfig(jsonObject);
+                // jsonObject is non-null here: IsNullOrEmpty returned false above.
+                return DeserializeConfig(jsonObject!);
             }
         }
 
-        private SmartSerializableLoader DeserializeConfig(string jsonObject)
+        private SmartSerializableLoader? DeserializeConfig(string jsonObject)
         {
             var settings = GetSettings();
-            SmartSerializableLoader instance = null;
+            SmartSerializableLoader? instance = null;
             try
             {
                 instance = JsonConvert.DeserializeObject<SmartSerializableLoader>(
@@ -182,13 +188,15 @@ namespace UtilitiesCS.ReusableTypeClasses
                 return null;
             }
 
-            instance.Globals = Globals;
+            // Preserve prior behavior: a null deserialization result dereferences here (NRE),
+            // exactly as before the annotation; the ! documents the pre-existing assumption.
+            instance!.Globals = Globals;
             instance.ResetLazy();
             instance.Config.ActivateMostRecent();
             return instance;
         }
 
-        internal string TryConvertBinaryToJson(byte[] binary)
+        internal string? TryConvertBinaryToJson(byte[] binary)
         {
             try
             {

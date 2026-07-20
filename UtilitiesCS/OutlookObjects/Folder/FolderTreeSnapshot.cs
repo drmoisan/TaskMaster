@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,9 +24,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
             : this(rootKeys, nodes, null) { }
 
         public FolderTreeSnapshot(
-            IEnumerable<FolderTreeNodeKey> rootKeys,
-            IEnumerable<FolderTreeSnapshotNode> nodes,
-            FolderTreeRequest request
+            IEnumerable<FolderTreeNodeKey>? rootKeys,
+            IEnumerable<FolderTreeSnapshotNode>? nodes,
+            FolderTreeRequest? request
         )
         {
             RootKeys = new ReadOnlyCollection<FolderTreeNodeKey>(
@@ -35,7 +36,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
             CoveredStoreIds = new ReadOnlyCollection<string>(
                 CoversAllStores
                     ? Array.Empty<string>()
-                    : request
+                    // CoversAllStores is false here, which per its definition above implies request is non-null.
+                    : request!
                         .StoreIds.Where(id => !string.IsNullOrWhiteSpace(id))
                         .Distinct(StringComparer.OrdinalIgnoreCase)
                         .ToArray()
@@ -67,7 +69,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         public IReadOnlyDictionary<FolderTreeNodeKey, FolderTreeSnapshotNode> NodesByKey =>
             _nodesByKey;
 
-        public bool Covers(FolderTreeRequest request)
+        public bool Covers(FolderTreeRequest? request)
         {
             if (request == null || request.IsAllStores)
             {
@@ -80,7 +82,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 );
         }
 
-        public bool TryGetNode(FolderTreeNodeKey key, out FolderTreeSnapshotNode node)
+        public bool TryGetNode(FolderTreeNodeKey? key, out FolderTreeSnapshotNode? node)
         {
             if (key == null)
             {
@@ -91,19 +93,20 @@ namespace UtilitiesCS.OutlookObjects.Folder
             return _nodesByKey.TryGetValue(key, out node);
         }
 
-        public IReadOnlyList<FolderTreeSnapshotNode> GetNodesForStore(string storeId)
+        public IReadOnlyList<FolderTreeSnapshotNode> GetNodesForStore(string? storeId)
         {
             if (string.IsNullOrWhiteSpace(storeId))
             {
                 return Array.Empty<FolderTreeSnapshotNode>();
             }
 
-            return _nodesByStore.TryGetValue(storeId, out var nodes)
+            // storeId is non-null here: the IsNullOrWhiteSpace guard above returned early on null.
+            return _nodesByStore.TryGetValue(storeId!, out var nodes)
                 ? nodes
                 : Array.Empty<FolderTreeSnapshotNode>();
         }
 
-        public FolderTreeSnapshotNode FindByPath(string storeId, string folderPath)
+        public FolderTreeSnapshotNode? FindByPath(string storeId, string folderPath)
         {
             if (string.IsNullOrWhiteSpace(folderPath))
             {
@@ -118,7 +121,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         public IReadOnlyList<FolderTreeSnapshotNode> GetChildren(FolderTreeNodeKey parentKey)
         {
-            if (!TryGetNode(parentKey, out var parent))
+            if (!TryGetNode(parentKey, out var parent) || parent is null)
             {
                 return Array.Empty<FolderTreeSnapshotNode>();
             }

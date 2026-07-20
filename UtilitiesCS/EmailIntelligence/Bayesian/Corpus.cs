@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -91,7 +92,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             get => _tokenFrequency;
             protected set => _tokenFrequency = value;
         }
-        protected ConcurrentDictionary<string, int> _tokenFrequency;
+
+        // Non-null in normal use; two legacy concurrency-level constructors leave it unset
+        // (pre-existing behavior, preserved). null! keeps the analyzer's non-null posture
+        // without changing runtime state (the field already defaulted to null).
+        protected ConcurrentDictionary<string, int> _tokenFrequency = null!;
 
         public int TokenCount
         {
@@ -176,7 +181,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public object Clone()
         {
-            var result = this.MemberwiseClone() as Corpus;
+            // MemberwiseClone on a Corpus instance always yields a Corpus, so the as-cast never returns null.
+            var result = (this.MemberwiseClone() as Corpus)!;
             var tokenFrequency = this.TokenFrequency ?? new ConcurrentDictionary<string, int>();
             result.TokenFrequency = new ConcurrentDictionary<string, int>(tokenFrequency);
             return result;
@@ -188,7 +194,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public static Corpus operator +(Corpus c1, Corpus c2)
         {
-            var result = c1.Clone() as Corpus;
+            // Clone() always returns a Corpus, so the as-cast never returns null.
+            var result = (c1.Clone() as Corpus)!;
 
             foreach (var kvp in c2.TokenFrequency)
             {
@@ -205,13 +212,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             Corpus c1,
             Corpus c2,
             CancellationToken token,
-            SegmentStopWatch sw = null
+            SegmentStopWatch? sw = null
         )
         {
             sw ??= new SegmentStopWatch().Start();
             sw.LogDuration("SubtractAsync Start");
 
-            var result = c1.Clone() as Corpus;
+            // Clone() always returns a Corpus, so the as-cast never returns null.
+            var result = (c1.Clone() as Corpus)!;
             sw.LogDuration("clone universe");
 
             var processors = Math.Max(Environment.ProcessorCount - 2, 1);
@@ -252,7 +260,8 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public static Corpus operator -(Corpus c1, Corpus c2)
         {
-            var result = c1.Clone() as Corpus;
+            // Clone() always returns a Corpus, so the as-cast never returns null.
+            var result = (c1.Clone() as Corpus)!;
             foreach (var kvp in c2.TokenFrequency)
             {
                 if (result.TokenFrequency.TryGetValue(kvp.Key, out int count))
@@ -277,8 +286,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             int minCt
         )
         {
-            var result = all.Clone() as Corpus;
-            var matchClone = match.Clone() as Corpus;
+            // Clone() always returns a Corpus, so the as-casts never return null.
+            var result = (all.Clone() as Corpus)!;
+            var matchClone = (match.Clone() as Corpus)!;
 
             result.TokenFrequency = new ConcurrentDictionary<string, int>(
                 result.TokenFrequency.Where(x => x.Value * negTokenWt >= minCt)

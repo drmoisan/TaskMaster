@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -57,24 +58,26 @@ namespace UtilitiesCS
 
         #region Public Properties and Methods
 
-        private IList<Category> _olCategories;
+        private IList<Category> _olCategories = null!;
         public IList<Category> OlCategories
         {
             get => _olCategories;
             set => _olCategories = value;
         }
 
-        private IList<Category> _olCategorySelection;
+        private IList<Category> _olCategorySelection = null!;
         public IList<Category> OlCategorySelection
         {
             get => Initializer.GetOrLoad(ref _olCategorySelection, SelectionToOlCategories);
             private set => _olCategorySelection = value;
         }
 
+        // Body can yield null (OlCategories null); the ! preserves the pre-existing non-null return
+        // type consumed by the GetOrLoad ref-field seam, without changing runtime behavior.
         public IList<Category> SelectionToOlCategories() =>
-            OlCategories?.Where(c => CategoryNames.Contains(c.Name))?.ToList();
+            OlCategories?.Where(c => CategoryNames.Contains(c.Name))?.ToList()!;
 
-        private string _categoryNames;
+        private string _categoryNames = null!;
         public string CategoryNames
         {
             get => _categoryNames;
@@ -85,17 +88,17 @@ namespace UtilitiesCS
             }
         }
 
-        internal FlagParser _flags;
+        internal FlagParser _flags = null!;
         public FlagParser Flags
         {
             get => _flags;
             private set => _flags = value;
         }
 
-        private FlagTranslator _people;
+        private FlagTranslator _people = null!;
         public FlagTranslator People
         {
-            get => Initializer.GetOrLoad(ref _people, () => LoadPeople(), false, Flags);
+            get => Initializer.GetOrLoad(ref _people, () => LoadPeople(), false, Flags)!;
             private set => _people = value;
         }
 
@@ -104,10 +107,10 @@ namespace UtilitiesCS
 
         private async Task LoadPeopleAsync() => await Task.Run(() => _people = LoadPeople());
 
-        private FlagTranslator _projects;
+        private FlagTranslator _projects = null!;
         public FlagTranslator Projects
         {
-            get => Initializer.GetOrLoad(ref _projects, LoadProjects, false, Flags);
+            get => Initializer.GetOrLoad(ref _projects, LoadProjects, false, Flags)!;
             private set => _projects = value;
         }
 
@@ -116,10 +119,10 @@ namespace UtilitiesCS
 
         private async Task LoadProjectAsync() => await Task.Run(() => _projects = LoadProjects());
 
-        private FlagTranslator _context;
+        private FlagTranslator _context = null!;
         public FlagTranslator Context
         {
-            get => Initializer.GetOrLoad(ref _context, LoadContext, false, Flags);
+            get => Initializer.GetOrLoad(ref _context, LoadContext, false, Flags)!;
             private set => _context = value;
         }
 
@@ -128,10 +131,10 @@ namespace UtilitiesCS
 
         private async Task LoadContextAsync() => await Task.Run(() => _context = LoadContext());
 
-        private FlagTranslator _topic;
+        private FlagTranslator _topic = null!;
         public FlagTranslator Topics
         {
-            get => Initializer.GetOrLoad(ref _topic, LoadTopic, false, Flags);
+            get => Initializer.GetOrLoad(ref _topic, LoadTopic, false, Flags)!;
             private set => _topic = value;
         }
 
@@ -140,11 +143,11 @@ namespace UtilitiesCS
 
         private async Task LoadTopicAsync() => await Task.Run(() => _topic = LoadTopic());
 
-        private FlagTranslator _kb;
+        private FlagTranslator _kb = null!;
 
         public FlagTranslator KB
         {
-            get => Initializer.GetOrLoad(ref _kb, LoadKB, false, Flags);
+            get => Initializer.GetOrLoad(ref _kb, LoadKB, false, Flags)!;
             private set => _kb = value;
         }
 
@@ -189,7 +192,7 @@ namespace UtilitiesCS
         #region Batch Refresh
 
         private ThreadSafeSingleShotGuard _batchRefreshRequested = new();
-        private TimerWrapper _timer;
+        private TimerWrapper _timer = null!;
 
         private void RequestBatchRefresh()
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
     {
         protected internal sealed class MoveMailResult
         {
-            public MoveMailResult(MailItem original, MailItem moved)
+            public MoveMailResult(MailItem original, MailItem? moved)
             {
                 Original = original;
                 Moved = moved;
@@ -31,7 +32,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 
             public MailItem Original { get; }
 
-            public MailItem Moved { get; }
+            public MailItem? Moved { get; }
         }
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
@@ -56,21 +57,25 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 
         #region Public Properties
 
-        private EmailFilerConfig _config;
+        // Config/Globals/MailHelpers are required dependencies validated via ThrowIfNull /
+        // ThrowIfNullOrEmpty in ValidateParameters() before real use; the backing field is
+        // seeded with a justified `default!` (rather than widening the public property to `?`)
+        // so the many existing unguarded dereferences throughout this class remain unchanged.
+        private EmailFilerConfig _config = default!;
         public EmailFilerConfig Config
         {
             get => _config;
             set => _config = value;
         }
 
-        private IApplicationGlobals _globals;
+        private IApplicationGlobals _globals = default!;
         internal IApplicationGlobals Globals
         {
             get => _globals;
             set => _globals = value;
         }
 
-        private IList<MailItemHelper> _mailHelpers;
+        private IList<MailItemHelper> _mailHelpers = default!;
         public IList<MailItemHelper> MailHelpers
         {
             get => _mailHelpers;
@@ -92,7 +97,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             try
             {
                 Config.ResolvePaths();
-                Config.Globals.Ol.App.ActiveExplorer().CurrentFolder = Config.DestinationOlFolder;
+                Config.Globals!.Ol.App.ActiveExplorer().CurrentFolder = Config.DestinationOlFolder;
             }
             catch (System.Exception ex)
             {
@@ -105,7 +110,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         {
             //TraceUtility.LogMethodCall();
             Config.ResolvePaths();
-            await Task.Run(() => OpenFileSystemFolder(Config.SaveFsPath));
+            await Task.Run(() => OpenFileSystemFolder(Config.SaveFsPath!));
         }
 
         internal void OpenFileSystemFolder(string folderPath)
@@ -125,7 +130,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             //TraceUtility.LogMethodCall(mailHelpers);
             mailHelpers.ThrowIfNullOrEmpty(nameof(mailHelpers));
             MailHelpers = mailHelpers;
-            ResolvePaths((Folder)MailHelpers.FirstOrDefault().FolderInfo.OlFolder);
+            ResolvePaths((Folder)MailHelpers.FirstOrDefault()!.FolderInfo!.OlFolder!);
             return await SortAsync();
         }
 
@@ -152,7 +157,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             // Save the message
             if (Config.SaveMsg)
             {
-                await SaveMessageAsMsgAsync(mailHelper.Item, Config.SaveFsPath);
+                await SaveMessageAsMsgAsync(mailHelper.Item, Config.SaveFsPath!);
             }
 
             // Save the attachments and pictures
@@ -265,15 +270,22 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
                     attachments = attachments.Where(x => x.AttachmentInfo.IsImage);
                 }
 
+                // ForEachAsync is obsolete (CS0618) per the framework's migration guidance
+                // ("Use the language support for async foreach instead"), but replacing it
+                // with `await foreach` here is a control-flow change to a production async
+                // method, not an annotation-only edit. Suppressing narrowly preserves the
+                // exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
                 await attachments.ForEachAsync(async x =>
                 {
                     await SaveAttachmentAsync(x).ConfigureAwait(false);
                 });
+#pragma warning restore CS0618
 
                 var toDelete = attachments.Where(x => !x.FilePathDelete.IsNullOrEmpty());
                 await foreach (var attachment in toDelete)
                 {
-                    await Task.Run(() => DeleteFile(attachment.FilePathDelete))
+                    await Task.Run(() => DeleteFile(attachment.FilePathDelete!))
                         .ConfigureAwait(false);
                 }
             }
@@ -305,7 +317,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         //    });
         //}
 
-        public virtual async Task<(MailItem Original, MailItem Moved)> TryMoveMailItemHelperAsync(
+        public virtual async Task<(MailItem Original, MailItem? Moved)> TryMoveMailItemHelperAsync(
             MailItemHelper mailHelper
         )
         {
@@ -322,10 +334,10 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
                     catch (System.Exception e)
                     {
                         logger.Error(
-                            $"Error moving email {mailHelper.Subject} to {Config.DestinationOlFolder.FolderPath}\n{e.Message}",
+                            $"Error moving email {mailHelper.Subject} to {Config.DestinationOlFolder!.FolderPath}\n{e.Message}",
                             e
                         );
-                        return (original, null);
+                        return (original, (MailItem?)null);
                     }
                 }
             });
@@ -358,7 +370,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         {
             Config.ThrowIfNull(nameof(Config));
             MailHelpers.ThrowIfNullOrEmpty(nameof(MailHelpers));
-            Globals ??= Config.Globals;
+            Globals ??= Config.Globals!;
             Globals.ThrowIfNull(nameof(Globals));
         }
 
@@ -430,7 +442,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 
         protected internal virtual Task SaveAttachmentAsync(AttachmentHelper attachment)
         {
-            return attachment.SaveAttachmentAsync(Config.SaveFsPath);
+            return attachment.SaveAttachmentAsync(Config.SaveFsPath!);
         }
 
         protected internal virtual void DeleteFile(string filePath)

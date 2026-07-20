@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Threading.Tasks;
 using log4net.Repository.Hierarchy;
 using UtilitiesCS.Extensions;
@@ -25,15 +26,17 @@ namespace UtilitiesCS
             Message = message.ThrowIfNull();
         }
 
-        public Func<object, Task<bool>> AsyncCondition { get; set; }
-        public Func<T, Task> AsyncAction { get; set; }
-        public string Message { get; set; }
-        public object Engine { get; set; }
-        public Func<IApplicationGlobals, Task> EngineInitializer { get; set; }
-        public string EngineName { get; set; }
-        public T TypedItem { get; set; }
-        public ISmartSerializableConfig Config { get; set; }
-        public System.Action SerializationEngine { get; set; }
+        // Populated by the functional constructor or by a builder; the parameterless constructor
+        // (deserialization) leaves them unset. null! preserves the non-null posture used by callers.
+        public Func<object, Task<bool>> AsyncCondition { get; set; } = null!;
+        public Func<T, Task> AsyncAction { get; set; } = null!;
+        public string Message { get; set; } = null!;
+        public object Engine { get; set; } = null!;
+        public Func<IApplicationGlobals, Task> EngineInitializer { get; set; } = null!;
+        public string EngineName { get; set; } = null!;
+        public T TypedItem { get; set; } = default!;
+        public ISmartSerializableConfig Config { get; set; } = null!;
+        public System.Action SerializationEngine { get; set; } = null!;
 
         public void Serialize()
         {

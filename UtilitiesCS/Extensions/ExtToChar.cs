@@ -3,6 +3,8 @@ using Microsoft.VisualBasic;
 
 namespace UtilitiesCS
 {
+#nullable enable
+
     public static class ExtToChar
     {
         //public static char ToChar(this Keys key)

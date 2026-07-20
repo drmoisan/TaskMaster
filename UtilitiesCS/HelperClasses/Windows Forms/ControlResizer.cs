@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 // -------------------------------------------------------------------------------
 // Resizer
@@ -33,8 +34,8 @@ namespace UtilitiesCS
         // ----------------------------------------------------------
         private struct ControlInfo
         {
-            public string name;
-            public string parentName;
+            public string? name;
+            public string? parentName;
             public double leftOffsetPercent;
             public double topOffsetPercent;
             public double heightPercent;

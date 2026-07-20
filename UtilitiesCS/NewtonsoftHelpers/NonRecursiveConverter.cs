@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using Newtonsoft.Json;
 
 /// <summary>
@@ -24,9 +25,8 @@ public abstract class NonRecursiveConverter<TConverter> : JsonConverter
     /// <inheritdoc/>
     public override bool CanWrite => !s_writing;
 
-#nullable enable
     /// <inheritdoc/>
-    public override sealed object? ReadJson(
+    public sealed override object? ReadJson(
         JsonReader reader,
         Type objectType,
         object? existingValue,

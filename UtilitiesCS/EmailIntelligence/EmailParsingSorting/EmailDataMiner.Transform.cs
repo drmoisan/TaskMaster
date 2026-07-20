@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -40,7 +41,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             _globals.AF.ProgressPane.Visible = true;
             var message =
                 $"Transforming from {typeof(FolderWrapper[][]).Name} to {typeof(IItemInfo[])}";
-            progress.Report(0, message);
+            progress!.Report(0, message);
 
             if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
             {
@@ -123,7 +124,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             if (count == 0)
             {
                 progress.Report(100);
-                return default;
+                return default!;
             }
 
             var cBag = await AsyncMultiTasker.AsyncMultiTaskChunker(
@@ -160,9 +161,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             await mailInfo.TokenizeAsync();
             var serializable = mailInfo.ToSerializableObject();
             serializable.Sw = mailInfo.Sw;
-            serializable.Sw.LogDuration("ToSerializableObject");
+            serializable.Sw!.LogDuration("ToSerializableObject");
 
-            foreach (var attachment in serializable.AttachmentsInfo)
+            foreach (var attachment in serializable.AttachmentsInfo!)
             {
                 if (!attachment.IsImage)
                 {
@@ -197,7 +198,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 .ConfigureAwait(false);
             _globals.AF.ProgressPane.Visible = true;
             var message = $"Transforming from {typeof(Tin).Name} to {typeof(Tout)}";
-            progress.Report(0, message);
+            progress!.Report(0, message);
 
             var tInName = FolderConverter.SanitizeFilename(typeof(Tin).Name);
             var tOutName = FolderConverter.SanitizeFilename(typeof(Tout).Name);
@@ -242,12 +243,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     }
                 }
 
-                Tin obj = await serializer
-                    .DeserializeAsync<Tin>(
-                        progress.SpawnChild(completedPerChunk),
-                        $"{tInName}_{i:0000}"
-                    )
-                    .ConfigureAwait(false);
+                Tin obj = (
+                    await serializer
+                        .DeserializeAsync<Tin>(
+                            progress.SpawnChild(completedPerChunk),
+                            $"{tInName}_{i:0000}"
+                        )
+                        .ConfigureAwait(false)
+                )!;
                 Tout result = await transformer(obj);
                 //if (count == 1)
                 //    SerializeAndSave(result, tOutName);
@@ -263,9 +266,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
         public async Task<MinedMailInfo[]> ToMinedMail(IItemInfo[] items)
         {
-            return await Task.Run(() =>
-                items?.Select(item => new MinedMailInfo(item))?.ToArray() ?? null
-            );
+            return (
+                await Task.Run(() =>
+                    items?.Select(item => new MinedMailInfo(item))?.ToArray() ?? null
+                )
+            )!;
         }
 
         public async Task<MinedMailInfo[]> FilterExcluded(MinedMailInfo[] items)
@@ -273,7 +278,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return await Task.Run(() =>
                 items
                     .Where(x =>
-                        !_globals.TD.FilteredFolderScraping.ContainsKey(x.FolderInfo.RelativePath)
+                        !_globals.TD.FilteredFolderScraping.ContainsKey(x.FolderInfo!.RelativePath)
                     )
                     .ToArray()
             );
@@ -285,10 +290,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 foreach (var item in items)
                 {
-                    if (_globals.TD.FolderRemap.ContainsKey(item.FolderInfo.RelativePath))
+                    if (_globals.TD.FolderRemap.ContainsKey(item.FolderInfo!.RelativePath))
                     {
-                        item.FolderInfo.RelativePath = _globals.TD.FolderRemap[
-                            item.FolderInfo.RelativePath
+                        item.FolderInfo!.RelativePath = _globals.TD.FolderRemap[
+                            item.FolderInfo!.RelativePath
                         ];
                     }
                 }
@@ -317,7 +322,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 .ConfigureAwait(false);
             _globals.AF.ProgressPane.Visible = true;
             var message = $"Transforming from {typeof(Tin).Name} to {typeof(Tout)}";
-            progress.Report(0, message);
+            progress!.Report(0, message);
 
             var tInName = FolderConverter.SanitizeFilename(typeof(Tin).Name);
             var tOutName = FolderConverter.SanitizeFilename(typeof(Tout).Name);
@@ -325,7 +330,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             List<Tin> list = [];
             for (int i = 0; i < count; i++)
             {
-                Tin obj = await Task.Run(() => Deserialize<Tin>($"{tInName}_{i:0000}"));
+                Tin? obj = await Task.Run(() => Deserialize<Tin>($"{tInName}_{i:0000}"));
                 if (obj is not null)
                 {
                     list.Add(obj);
@@ -355,7 +360,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             CancellationToken token
         )
         {
-            var mailItems = QueryMailItems(folders.Select(x => x.OlFolder)).ToArray();
+            var mailItems = QueryMailItems(folders.Select(x => x.OlFolder!)).ToArray();
 
             var count = mailItems.Count();
             if (count == 0)
@@ -400,7 +405,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 fileName = tName;
             }
-            T result = await EmailDataMiner.DeserializeAsync<T>(folderPath, fileName);
+            T result = (await EmailDataMiner.DeserializeAsync<T>(folderPath, fileName))!;
 
             return result;
         }

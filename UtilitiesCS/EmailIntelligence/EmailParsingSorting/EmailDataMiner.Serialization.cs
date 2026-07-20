@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -14,7 +15,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
     {
         #region Testing Sizing and Serialization Methods
 
-        internal virtual T Deserialize<T>(string fileNameSeed, string fileNameSuffix = "")
+        internal virtual T? Deserialize<T>(string fileNameSeed, string fileNameSuffix = "")
         {
             if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
             {
@@ -33,7 +34,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             );
         }
 
-        internal static T DeserializeFromFolder<T>(
+        internal static T? DeserializeFromFolder<T>(
             string folderPath,
             string fileNameSeed,
             string fileNameSuffix,
@@ -62,7 +63,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             return default(T);
         }
 
-        internal static async Task<T> DeserializeAsync<T>(
+        internal static async Task<T?> DeserializeAsync<T>(
             string folderPath,
             string fileNameSeed,
             string fileNameSuffix = ""
@@ -77,7 +78,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             );
         }
 
-        internal static async Task<T> DeserializeAsync<T>(
+        internal static async Task<T?> DeserializeAsync<T>(
             string folderPath,
             string fileNameSeed,
             string fileNameSuffix,
@@ -168,7 +169,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             using (var writer = createTextWriter(disk.FilePath))
             {
                 serializer.Serialize(writer, obj);
-                disk.FileName = null;
+                disk.FileName = null!;
             }
         }
 
@@ -186,7 +187,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 serializer.Serialize(sw, obj);
                 sw.Close();
-                disk.FileName = null;
+                disk.FileName = null!;
             }
         }
 
@@ -265,7 +266,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             SerializeFsSave(mailInfo, "MailItemInfo", serializer, disk);
 
             var (minedInfo, sizeMinedInfo1) = TryLoadObjectAndGetMemorySize(() =>
-                new MinedMailInfo(mailInfo)
+                new MinedMailInfo(mailInfo!)
             );
             var sizeMinedInfo2 = 0; // ObjectSize(minedInfo);
             LogSizeComparison(
@@ -278,7 +279,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             SerializeFsSave(minedInfo, "MinedMailInfo", serializer, disk);
         }
 
-        internal virtual (T Object, long Size) TryLoadObjectAndGetMemorySize<T>(
+        internal virtual (T? Object, long Size) TryLoadObjectAndGetMemorySize<T>(
             Func<T> loader,
             int copiesToLoad = 1
         )
@@ -354,9 +355,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 serializer.Serialize(sw, chunk);
                 sw.Close();
-                disk.FileName = null;
+                disk.FileName = null!;
             }
-            disk.FileName = null;
+            disk.FileName = null!;
         }
 
         public virtual async Task<bool> ValidateJson<T>(
@@ -371,7 +372,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     return false;
                 }
                 var folderPath = Path.Combine(folderRoot, "Bayesian");
-                T obj = await DeserializeForValidation<T>(folderPath, fileNameSeed, fileNameSuffix);
+                T? obj = await DeserializeForValidation<T>(
+                    folderPath,
+                    fileNameSeed,
+                    fileNameSuffix
+                );
                 if (obj != null)
                     return true;
                 else
@@ -390,7 +395,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             }
         }
 
-        internal virtual Task<T> DeserializeForValidation<T>(
+        internal virtual Task<T?> DeserializeForValidation<T>(
             string folderPath,
             string fileNameSeed,
             string fileNameSuffix = ""

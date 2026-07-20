@@ -1,4 +1,6 @@
-﻿using System.Collections.Specialized;
+﻿#nullable enable
+
+using System.Collections.Specialized;
 
 namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Bag
 {
@@ -17,7 +19,9 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Bag
         }
 
         public NotifyCollectionChangedAction Action { get; }
-        public T NewValue { get; }
-        public T OldValue { get; }
+
+        // Nullable: the action-only constructor leaves these at default(T) (null for reference T).
+        public T? NewValue { get; }
+        public T? OldValue { get; }
     }
 }

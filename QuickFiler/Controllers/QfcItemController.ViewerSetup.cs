@@ -212,6 +212,12 @@ namespace QuickFiler.Controllers
             await itemViewer.UiSyncContext;
             var controls = itemViewer.GetAllChildren();
 
+            // SelectAwait (System.Linq.Async) is obsolete (CS0618) per the framework's migration
+            // guidance ("Use Select... the SelectAwait functionality now exists as overloads of
+            // Select"), but migrating to the new overload signature is a call-shape change to
+            // production code, not an annotation-only edit. Suppressing narrowly preserves the
+            // exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
             _listTipsDetails = await _itemViewer
                 .TipsLabels.ToAsyncEnumerable()
                 .SelectAwait(x => QfcTipsDetails.CreateAsync(x, _itemViewer.UiSyncContext, Token))
@@ -221,6 +227,7 @@ namespace QuickFiler.Controllers
                 .ExpandedTipsLabels.ToAsyncEnumerable()
                 .SelectAwait(x => QfcTipsDetails.CreateAsync(x, _itemViewer.UiSyncContext, Token))
                 .ToListAsync();
+#pragma warning restore CS0618
 
             _listTipsDetails.ForEach(x =>
             {

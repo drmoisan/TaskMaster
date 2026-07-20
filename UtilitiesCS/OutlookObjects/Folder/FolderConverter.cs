@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
@@ -25,7 +26,7 @@ namespace UtilitiesCS
             Dictionary<string, Func<Task<string>>>,
             string
         > AlternativeFolderSelectionDialog { get; set; } =
-            (message, title, icon, options) => MyBox.ShowDialog(message, title, icon, options);
+            (message, title, icon, options) => MyBox.ShowDialog(message, title, icon, options)!;
 
         internal static Func<
             string,
@@ -33,7 +34,7 @@ namespace UtilitiesCS
             string,
             string
         > AlternativeFolderInputDialog { get; set; } =
-            (prompt, title, defaultValue) => InputBox.ShowDialog(prompt, title, defaultValue);
+            (prompt, title, defaultValue) => InputBox.ShowDialog(prompt, title, defaultValue)!;
 
         private static char[] IllegalFolderCharacters
         {
@@ -186,7 +187,7 @@ namespace UtilitiesCS
             return olFolderBranch.FolderPath.ToFsFolderpath(olAncestor, fsAncestorEquivalent);
         }
 
-        public static string ToFsFolderpath(
+        public static string? ToFsFolderpath(
             this Folder olFolderBranch,
             IApplicationGlobals appGlobals
         )
@@ -204,7 +205,7 @@ namespace UtilitiesCS
             }
         }
 
-        public static string ToFsFolderpath(
+        public static string? ToFsFolderpath(
             this MAPIFolder olFolderBranch,
             IApplicationGlobals appGlobals
         )

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -59,8 +60,8 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             set => _destinationOlStem = value;
         }
 
-        private string _destinationOlPath;
-        public string DestinationOlPath
+        private string? _destinationOlPath;
+        public string? DestinationOlPath
         {
             get => _destinationOlPath;
             set => _destinationOlPath = value;
@@ -87,8 +88,8 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             set => _removePreviousFsFiles = value;
         }
 
-        private IApplicationGlobals _globals;
-        public IApplicationGlobals Globals
+        private IApplicationGlobals? _globals;
+        public IApplicationGlobals? Globals
         {
             get => _globals;
             set => _globals = value;
@@ -101,43 +102,43 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             set => _olAncestor = value;
         }
 
-        private string _fsAncestorEquivalent;
-        public string FsAncestorEquivalent
+        private string? _fsAncestorEquivalent;
+        public string? FsAncestorEquivalent
         {
             get => _fsAncestorEquivalent;
             set => _fsAncestorEquivalent = value;
         }
 
-        private string _saveFsPath;
-        public string SaveFsPath
+        private string? _saveFsPath;
+        public string? SaveFsPath
         {
             get => _saveFsPath;
             set => _saveFsPath = value;
         }
 
-        private string _deleteFsPath;
-        public string DeleteFsPath
+        private string? _deleteFsPath;
+        public string? DeleteFsPath
         {
             get => _deleteFsPath;
             set => _deleteFsPath = value;
         }
 
-        private Folder _originFolder;
-        public Folder OriginFolder
+        private Folder? _originFolder;
+        public Folder? OriginFolder
         {
             get => _originFolder;
             set => _originFolder = value;
         }
 
-        private string _originOlStem;
-        public string OriginOlStem
+        private string? _originOlStem;
+        public string? OriginOlStem
         {
             get => _originOlStem;
             set => _originOlStem = value;
         }
 
-        private Folder _destinationOlFolder;
-        public Folder DestinationOlFolder
+        private Folder? _destinationOlFolder;
+        public Folder? DestinationOlFolder
         {
             get => _destinationOlFolder;
             set => _destinationOlFolder = value;
@@ -166,7 +167,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             currentFolder.ThrowIfNull();
 
             if (
-                (currentFolder.FolderPath != Globals.Ol.InboxPath)
+                (currentFolder.FolderPath != Globals!.Ol.InboxPath)
                 && (currentFolder.FolderPath.Contains(OlAncestor))
                 && (currentFolder.FolderPath != OlAncestor)
             )
@@ -184,10 +185,10 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             //TraceUtility.LogMethodCall(currentFolder, DestinationOlStem, Globals, OlAncestor, FsAncestorEquivalent);
 
             DestinationOlPath = $"{OlAncestor}\\{DestinationOlStem}";
-            SaveFsPath = DestinationOlPath.ToFsFolderpath(OlAncestor, FsAncestorEquivalent);
+            SaveFsPath = DestinationOlPath.ToFsFolderpath(OlAncestor, FsAncestorEquivalent!);
             DeleteAndUnTrain = IsDeleteRelevant(currentFolder);
             DeleteFsPath = DeleteAndUnTrain
-                ? currentFolder.ToFsFolderpath(OlAncestor, FsAncestorEquivalent)
+                ? currentFolder.ToFsFolderpath(OlAncestor, FsAncestorEquivalent!)
                 : null;
             DestinationOlFolder = TryResolveDestinationFolder();
             OriginFolder = currentFolder;
@@ -200,17 +201,17 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             //TraceUtility.LogMethodCall(DestinationOlStem, Globals, OlAncestor, FsAncestorEquivalent);
 
             DestinationOlPath = $"{OlAncestor}\\{DestinationOlStem}";
-            SaveFsPath = DestinationOlPath.ToFsFolderpath(OlAncestor, FsAncestorEquivalent);
+            SaveFsPath = DestinationOlPath.ToFsFolderpath(OlAncestor, FsAncestorEquivalent!);
             DestinationOlFolder = TryResolveDestinationFolder();
         }
 
-        public Folder TryResolveDestinationFolder()
+        public Folder? TryResolveDestinationFolder()
         {
             try
             {
-                var destinationOlFolder = new FolderPredictor(Globals).GetFolder(
-                    DestinationOlPath,
-                    Globals.Ol.App
+                var destinationOlFolder = new FolderPredictor(Globals!).GetFolder(
+                    DestinationOlPath!,
+                    Globals!.Ol.App
                 );
                 if (destinationOlFolder is null)
                 {

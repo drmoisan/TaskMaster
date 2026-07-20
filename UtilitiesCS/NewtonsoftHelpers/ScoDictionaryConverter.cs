@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.IO;
 using System.Runtime;
 using System.Text;
@@ -10,13 +11,15 @@ namespace UtilitiesCS.NewtonsoftHelpers.Sco
 {
     public class ScoDictionaryConverter<TDerived, TKey, TValue> : JsonConverter<TDerived>
         where TDerived : ScoDictionaryNew<TKey, TValue>
+        where TKey : notnull
     {
         public ScoDictionaryConverter() { }
 
-        public override TDerived ReadJson(
+        // Registered cross-module contract: ReadJson returns TDerived? (body is wrapper?.ToDerived()).
+        public override TDerived? ReadJson(
             JsonReader reader,
             Type typeToConvert,
-            TDerived existingValue,
+            TDerived? existingValue,
             bool hasExistingValue,
             JsonSerializer serializer
         )
@@ -27,9 +30,15 @@ namespace UtilitiesCS.NewtonsoftHelpers.Sco
             return wrapper?.ToDerived();
         }
 
-        public override void WriteJson(JsonWriter writer, TDerived value, JsonSerializer serializer)
+        public override void WriteJson(
+            JsonWriter writer,
+            TDerived? value,
+            JsonSerializer serializer
+        )
         {
-            var wrapper = new WrapperScoDictionary<TDerived, TKey, TValue>().ToComposition(value);
+            // value! preserves behavior: WriteJson receives a non-null value for a registered
+            // converter; ToComposition requires a non-null instance.
+            var wrapper = new WrapperScoDictionary<TDerived, TKey, TValue>().ToComposition(value!);
             serializer.Serialize(writer, wrapper);
         }
 
@@ -47,10 +56,10 @@ namespace UtilitiesCS.NewtonsoftHelpers.Sco
             //return objectType.IsGenericType && (objectType.GetGenericTypeDefinition() == typeof(ScoDictionaryNew<,>) || objectType.GetGenericTypeDefinition() == typeof(WrapperScoDictionary<,,>));
         }
 
-        public override object ReadJson(
+        public override object? ReadJson(
             JsonReader reader,
             Type objectType,
-            object existingValue,
+            object? existingValue,
             JsonSerializer serializer
         )
         {
@@ -65,9 +74,10 @@ namespace UtilitiesCS.NewtonsoftHelpers.Sco
             return wrapperType.GetMethod("ToDerived", [])?.Invoke(wrapper, null);
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
-            Type valueType = value.GetType();
+            // value! preserves behavior: WriteJson receives a non-null value for a registered converter.
+            Type valueType = value!.GetType();
             Type[] genericArguments = valueType.GetScoDictionaryNewGenerics();
             //Type[] genericArguments = valueType.GetGenericArguments();
             Type wrapperType = typeof(WrapperScoDictionary<,,>).MakeGenericType(

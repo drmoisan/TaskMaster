@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -155,7 +156,7 @@ namespace UtilitiesCS
             int topNfolderKeys
         )
         {
-            EmailIntelligence.Bayesian.Prediction<string>[] predictions = null;
+            EmailIntelligence.Bayesian.Prediction<string>[]? predictions = null;
 
             if (topNfolderKeys > 0)
             {
@@ -174,7 +175,7 @@ namespace UtilitiesCS
             foreach (var prediction in predictions)
             {
                 long score = (long)Math.Round(prediction.Probability * 1000, 0);
-                AddSuggestion(prediction.Class, score);
+                AddSuggestion(prediction.Class!, score);
             }
         }
 
@@ -200,11 +201,11 @@ namespace UtilitiesCS
 
         public bool AddArray(object foldersObject, int topN)
         {
-            string[] folders = foldersObject as string[];
+            string[]? folders = foldersObject as string[];
             return AddArray(folders, topN);
         }
 
-        public bool AddArray(string[] folders, int topN)
+        public bool AddArray(string[]? folders, int topN)
         {
             if ((folders is null) || (folders[0] == "Error"))
             {
@@ -319,7 +320,7 @@ namespace UtilitiesCS
                             Math.Pow(score, _globals.AF.LngConvCtPwr)
                                 * _globals.AF.Conversation_Weight
                         );
-                    AddSuggestion(match.EmailFolder, score);
+                    AddSuggestion(match.EmailFolder!, score);
                 }
             }
         }
@@ -425,10 +426,10 @@ namespace UtilitiesCS
                 .Select(entry =>
                 {
                     int subjScore = SmithWaterman.CalculateScore(
-                        entry.SubjectEncoded,
-                        entry.SubjectWordLengths,
-                        target.SubjectEncoded,
-                        target.SubjectWordLengths,
+                        entry.SubjectEncoded!,
+                        entry.SubjectWordLengths!,
+                        target.SubjectEncoded!,
+                        target.SubjectWordLengths!,
                         matchScore,
                         mismatchScore,
                         gapPenalty
@@ -446,10 +447,10 @@ namespace UtilitiesCS
                     (folderpath, grouping) =>
                         new FolderScoring
                         {
-                            FolderPath = folderpath,
-                            FolderName = grouping.Select(x => x.Foldername).First(),
-                            FolderEncoding = grouping.Select(x => x.FolderEncoded).First(),
-                            FolderWordLengths = grouping.Select(x => x.FolderWordLengths).First(),
+                            FolderPath = folderpath!,
+                            FolderName = grouping.Select(x => x.Foldername).First()!,
+                            FolderEncoding = grouping.Select(x => x.FolderEncoded).First()!,
+                            FolderWordLengths = grouping.Select(x => x.FolderWordLengths).First()!,
                             Score = grouping.Select(x => x.Score).Sum(),
                         }
                 );
@@ -476,10 +477,10 @@ namespace UtilitiesCS
                     (folderpath, grouping) =>
                         new FolderScoring
                         {
-                            FolderPath = folderpath,
-                            FolderName = grouping.Select(x => x.Foldername).First(),
-                            FolderEncoding = grouping.Select(x => x.FolderEncoded).First(),
-                            FolderWordLengths = grouping.Select(x => x.FolderWordLengths).First(),
+                            FolderPath = folderpath!,
+                            FolderName = grouping.Select(x => x.Foldername).First()!,
+                            FolderEncoding = grouping.Select(x => x.FolderEncoded).First()!,
+                            FolderWordLengths = grouping.Select(x => x.FolderWordLengths).First()!,
                             Score = 0,
                         }
                 )
@@ -488,8 +489,8 @@ namespace UtilitiesCS
                     int fldrScore = SmithWaterman.CalculateScore(
                         entry.FolderEncoding,
                         entry.FolderWordLengths,
-                        target.SubjectEncoded,
-                        target.SubjectWordLengths,
+                        target.SubjectEncoded!,
+                        target.SubjectWordLengths!,
                         matchScore,
                         mismatchScore,
                         gapPenalty
@@ -544,15 +545,15 @@ namespace UtilitiesCS
                     //var thresh = entry.Folderpath == "Reference\\HR - Personal - Offers LOIs Expats" ? (int)Math.Round(Math.Pow(threshhold / entry.EmailSubjectCount, 1/convCtPwr),0): -1;
                     var thresh = -1;
                     int subjScore = SmithWaterman.CalculateScore(
-                        entry.SubjectEncoded,
-                        entry.SubjectWordLengths,
-                        target.SubjectEncoded,
-                        target.SubjectWordLengths,
+                        entry.SubjectEncoded!,
+                        entry.SubjectWordLengths!,
+                        target.SubjectEncoded!,
+                        target.SubjectWordLengths!,
                         matchScore,
                         mismatchScore,
                         gapPenalty,
-                        entry.EmailSubject,
-                        target.EmailSubject,
+                        entry.EmailSubject!,
+                        target.EmailSubject!,
                         thresh
                     );
                     int subjScoreWt = (int)
@@ -567,10 +568,10 @@ namespace UtilitiesCS
                     (folderpath, grouping) =>
                         new FolderScoring
                         {
-                            FolderPath = folderpath,
-                            FolderName = grouping.Select(x => x.Foldername).First(),
-                            FolderEncoding = grouping.Select(x => x.FolderEncoded).First(),
-                            FolderWordLengths = grouping.Select(x => x.FolderWordLengths).First(),
+                            FolderPath = folderpath!,
+                            FolderName = grouping.Select(x => x.Foldername).First()!,
+                            FolderEncoding = grouping.Select(x => x.FolderEncoded).First()!,
+                            FolderWordLengths = grouping.Select(x => x.FolderWordLengths).First()!,
                             Score = grouping.Select(x => x.Score).Sum(),
                         }
                 );
@@ -597,10 +598,10 @@ namespace UtilitiesCS
                     (folderpath, grouping) =>
                         new FolderScoring
                         {
-                            FolderPath = folderpath,
-                            FolderName = grouping.Select(x => x.Foldername).First(),
-                            FolderEncoding = grouping.Select(x => x.FolderEncoded).First(),
-                            FolderWordLengths = grouping.Select(x => x.FolderWordLengths).First(),
+                            FolderPath = folderpath!,
+                            FolderName = grouping.Select(x => x.Foldername).First()!,
+                            FolderEncoding = grouping.Select(x => x.FolderEncoded).First()!,
+                            FolderWordLengths = grouping.Select(x => x.FolderWordLengths).First()!,
                             Score = 0,
                         }
                 )
@@ -611,13 +612,13 @@ namespace UtilitiesCS
                     int fldrScore = SmithWaterman.CalculateScore(
                         entry.FolderEncoding,
                         entry.FolderWordLengths,
-                        target.SubjectEncoded,
-                        target.SubjectWordLengths,
+                        target.SubjectEncoded!,
+                        target.SubjectWordLengths!,
                         matchScore,
                         mismatchScore,
                         gapPenalty,
                         entry.FolderName,
-                        target.EmailSubject,
+                        target.EmailSubject!,
                         thresh
                     );
                     entry.Score = (int)(fldrScore * fldrScore);

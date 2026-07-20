@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
@@ -10,7 +11,9 @@ namespace UtilitiesCS.EmailIntelligence
     public partial class SpamBayes
     {
         public Func<MailItemHelper, Task> AsyncAction =>
-            (item) => Engine is not null ? ((SpamBayes)Engine).TestAsync(item) : null;
+            // Preserves the pre-existing null-Task return when Engine is unset; null! keeps the
+            // non-null delegate return type without changing behavior.
+            (item) => Engine is not null ? ((SpamBayes)Engine).TestAsync(item) : null!;
 
         public Func<object, Task<bool>> AsyncCondition =>
             (item) => Task.Run(() => ConditionLog(item));
@@ -86,7 +89,7 @@ namespace UtilitiesCS.EmailIntelligence
         {
             var type = olItem.TryGet().OlItemType(out var typeVal)
                 ? $"{typeVal}"
-                : $"{olItem.InnerObject.GetType()}";
+                : $"{olItem.InnerObject!.GetType()}";
             var created = olItem.TryGet().CreationTime(out var result)
                 ? $" created on {result:g}"
                 : "";

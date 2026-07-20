@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,9 +12,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
     public interface IOutlookFolderHierarchyReader
     {
         Task<IReadOnlyList<FolderTreeSnapshotNode>> ReadFoldersAsync(
-            FolderTreeRequest request,
-            IDeadlineClock deadlineClock,
-            IDispatcherYield dispatcherYield,
+            FolderTreeRequest? request,
+            IDeadlineClock? deadlineClock,
+            IDispatcherYield? dispatcherYield,
             CancellationToken cancellationToken
         );
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -6,9 +7,9 @@ namespace UtilitiesCS
 {
     public class MouseDownFilter : IMessageFilter
     {
-        public event EventHandler FormClicked;
+        public event EventHandler? FormClicked;
         private readonly int WM_LBUTTONDOWN = 0x201;
-        private readonly Form form = null;
+        private readonly Form form;
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         static extern bool IsChild(IntPtr hWndParent, IntPtr hWnd);

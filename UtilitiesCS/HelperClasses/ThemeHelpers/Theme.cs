@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -59,8 +60,8 @@ namespace UtilitiesCS
             Color cboFoldersForeColor,
             Color defaultBackColor,
             Color defaultForeColor,
-            IUiDispatcher uiDispatcher = null,
-            Action<string> breadcrumbThemeNotifier = null
+            IUiDispatcher? uiDispatcher = null,
+            Action<string>? breadcrumbThemeNotifier = null
         )
         {
             _uiDispatcher = uiDispatcher ?? new WpfUiDispatcher();
@@ -109,27 +110,33 @@ namespace UtilitiesCS
             _defaultForeColor = defaultForeColor;
         }
 
-        private Label _lblItemNumber;
-        private Label _lblSender;
-        private Label _lblSubject;
-        private IList<TableLayoutPanel> _tableLayoutPanels;
-        private IList<Button> _buttons;
-        private IList<System.ComponentModel.Component> _menuItems;
-        private MenuStrip _menuStrip;
-        private IList<IQfcTipsDetails> _tipsDetailsLabels;
-        IList<IQfcTipsDetails> _tipsExpanded;
-        private TextBox _textboxSearch;
-        private TextBox _textboxBody;
+        // These reference-type fields are initialized by the primary (full-parameter) constructor.
+        // The parameterless and (name, controlGroups) constructors intentionally leave them unset;
+        // the rendering methods that read them are only invoked on themes built via the full ctor.
+        // `= null!` preserves that existing runtime contract without adding behavior.
+        private Label _lblItemNumber = null!;
+        private Label _lblSender = null!;
+        private Label _lblSubject = null!;
+        private IList<TableLayoutPanel> _tableLayoutPanels = null!;
+        private IList<Button> _buttons = null!;
+        private IList<System.ComponentModel.Component> _menuItems = null!;
+        private MenuStrip _menuStrip = null!;
+        private IList<IQfcTipsDetails> _tipsDetailsLabels = null!;
+        IList<IQfcTipsDetails> _tipsExpanded = null!;
+        private TextBox _textboxSearch = null!;
+        private TextBox _textboxBody = null!;
 
         // #351: the QuickFiler folder control is a WebView2-hosted breadcrumb; theming reaches it
         // via PreferredColorScheme plus a themeChange bridge message (see Theme.Rendering.cs).
-        private Microsoft.Web.WebView2.WinForms.WebView2 _breadcrumbWebView2;
-        private Action<string> _breadcrumbThemeNotifier;
-        private FastObjectListView _topicThread;
-        private Microsoft.Web.WebView2.WinForms.WebView2 _webView2;
-        private Control _viewer;
-        private Func<bool> MailRead;
-        private IUiDispatcher _uiDispatcher;
+        private Microsoft.Web.WebView2.WinForms.WebView2 _breadcrumbWebView2 = null!;
+
+        // Genuinely optional (defaults to null); rendering guards it with `?.Invoke`.
+        private Action<string>? _breadcrumbThemeNotifier;
+        private FastObjectListView _topicThread = null!;
+        private Microsoft.Web.WebView2.WinForms.WebView2 _webView2 = null!;
+        private Control _viewer = null!;
+        private Func<bool> MailRead = null!;
+        private IUiDispatcher _uiDispatcher = null!;
 
         public Theme() { }
 
@@ -162,7 +169,7 @@ namespace UtilitiesCS
             set => _navForeColor = value;
         }
 
-        private Action<Enums.ToggleState> _htmlConverter;
+        private Action<Enums.ToggleState> _htmlConverter = null!;
         public Action<Enums.ToggleState> HtmlConverter
         {
             get => _htmlConverter;
@@ -323,14 +330,14 @@ namespace UtilitiesCS
             set => _web2ViewScheme = value;
         }
 
-        private string _name;
+        private string _name = null!;
         public string Name
         {
             get => _name;
             set => _name = value;
         }
 
-        private Dictionary<string, ThemeControlGroup> _controlGroups;
+        private Dictionary<string, ThemeControlGroup> _controlGroups = null!;
         public Dictionary<string, ThemeControlGroup> ControlGroups
         {
             get => _controlGroups;

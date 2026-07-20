@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,7 +17,7 @@ namespace UtilitiesCS
     {
         public static Outlook.Table GetTableInView(this Explorer activeExplorer)
         {
-            Outlook.TableView view = activeExplorer.CurrentView as Outlook.TableView;
+            Outlook.TableView? view = activeExplorer.CurrentView as Outlook.TableView;
             if (view is null)
             {
                 throw new InvalidOperationException(
@@ -32,7 +33,7 @@ namespace UtilitiesCS
             CancellationToken token,
             int counter,
             int timeoutMs = 2000,
-            Func<int, CancellationTokenSource> timeoutSourceFactory = null
+            Func<int, CancellationTokenSource>? timeoutSourceFactory = null
         )
         {
             var acquisitionStopwatch = Stopwatch.StartNew();
@@ -40,8 +41,8 @@ namespace UtilitiesCS
                 "[Table timing] GetTableInViewAsync table acquisition start | table acquisition",
                 $"retryCount={counter}"
             );
-            Outlook.Table table = null;
-            Outlook.TableView view = activeExplorer.CurrentView as Outlook.TableView;
+            Outlook.Table? table = null;
+            Outlook.TableView? view = activeExplorer.CurrentView as Outlook.TableView;
             if (view is null)
             {
                 throw new InvalidOperationException(
@@ -111,10 +112,12 @@ namespace UtilitiesCS
                 }
             }
 
-            return table;
+            // GetTableInViewAsync's public contract is non-null (callers dereference the result);
+            // the null-on-cancellation/timeout path is a pre-existing latent condition.
+            return table!;
         }
 
-        public static async Task<object> TryGetTableAsync(
+        public static async Task<object?> TryGetTableAsync(
             this Store store,
             OlDefaultFolders folderEnum,
             string[] removeColumns,
@@ -127,7 +130,7 @@ namespace UtilitiesCS
             {
                 throw new ArgumentNullException(nameof(store));
             }
-            MAPIFolder folder = null;
+            MAPIFolder? folder = null;
             try
             {
                 folder = store.GetDefaultFolder(folderEnum);
@@ -153,7 +156,7 @@ namespace UtilitiesCS
             {
                 throw new ArgumentNullException(nameof(store));
             }
-            MAPIFolder folder = null;
+            MAPIFolder? folder = null;
             try
             {
                 folder = store.GetDefaultFolder(folderEnum);
@@ -166,7 +169,7 @@ namespace UtilitiesCS
             return await folder.GetTableAsync(removeColumns, addColumns, cancel, maxAttempts);
         }
 
-        public static Outlook.Table GetTable(
+        public static Outlook.Table? GetTable(
             this Store store,
             OlDefaultFolders folderEnum,
             string[] removeColumns,
@@ -177,7 +180,7 @@ namespace UtilitiesCS
             {
                 throw new ArgumentNullException(nameof(store));
             }
-            MAPIFolder folder = null;
+            MAPIFolder? folder = null;
             try
             {
                 folder = store.GetDefaultFolder(folderEnum);
@@ -189,7 +192,7 @@ namespace UtilitiesCS
             return folder.GetTable(removeColumns: removeColumns, addColumns: addColumns);
         }
 
-        public static async Task<object> TryGetTableAsync(
+        public static async Task<object?> TryGetTableAsync(
             this MAPIFolder folder,
             string[] removeColumns,
             string[] addColumns,
@@ -260,7 +263,7 @@ namespace UtilitiesCS
             return table;
         }
 
-        public static async Task<object> TryGetTableAsync(
+        public static async Task<object?> TryGetTableAsync(
             this Conversation conversation,
             string[] removeColumns,
             string[] addColumns,

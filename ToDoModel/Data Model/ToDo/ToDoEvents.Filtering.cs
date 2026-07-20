@@ -82,9 +82,20 @@ namespace ToDoModel
         public static async Task RefreshToDoIdSplitsAsync(IApplicationGlobals globals)
         {
             var itemsAsyncEnum = GetAsyncEnumerableOfToDoItemsInView(globals);
+            // ForEachAwaitAsync is obsolete (CS0618) per the framework's migration guidance
+            // ("Use the language support for async foreach instead"), but replacing it with
+            // `await foreach` here is a control-flow change to a production async method, not
+            // an annotation-only edit. Suppressing narrowly preserves the exact pre-existing
+            // behavior (no behavior change per AC7). This diagnostic surfaced only via the
+            // capstone's solution-wide P2-T17 gate (ToDoModel.csproj is outside this plan's two
+            // declared Phase 2 scope trees, UtilitiesCS/EmailIntelligence/** and
+            // UtilitiesCS/OutlookObjects/Folder/**) — flagged for the orchestrator in this
+            // plan's final report.
+#pragma warning disable CS0618
             await itemsAsyncEnum.ForEachAwaitAsync(async item =>
                 await Task.Run(() => TrySplitToDoID(item))
             );
+#pragma warning restore CS0618
         }
 
         private static void TrySplitToDoID(object item)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -143,9 +144,13 @@ namespace UtilitiesCS
         }
 
         private GroupTypeEnum _groupType;
-        private IList<Control> _controls;
-        private IList<object> _objects;
-        private Action<IList<object>, Color, Color> ObjectSetter;
+
+        // Reference-type fields are populated by the constructor matching each GroupTypeEnum; the
+        // ApplyTheme*/event handlers read only the fields for that group type. `= null!` preserves
+        // this existing per-group-type contract without behavior change.
+        private IList<Control> _controls = null!;
+        private IList<object> _objects = null!;
+        private Action<IList<object>, Color, Color> ObjectSetter = null!;
         private Color _foreColor;
         private Color _backColor;
         private Color _hoverColor;
@@ -155,17 +160,17 @@ namespace UtilitiesCS
         private Color _backColorMain;
         private Color _foreColorAlt;
         private Color _backColorAlt;
-        private Microsoft.Web.WebView2.WinForms.WebView2 _webView2;
+        private Microsoft.Web.WebView2.WinForms.WebView2 _webView2 = null!;
         Microsoft.Web.WebView2.Core.CoreWebView2PreferredColorScheme _web2ViewScheme;
-        Action<Enums.ToggleState> _htmlConverter;
+        Action<Enums.ToggleState> _htmlConverter = null!;
         Enums.ToggleState _htmlDark;
-        private Func<bool> IsAlt;
-        private Func<object, bool> IsAltHover;
+        private Func<bool> IsAlt = null!;
+        private Func<object, bool> IsAltHover = null!;
 
         #endregion Private Variables
 
 
-        private string _groupName;
+        private string _groupName = null!;
         public string GroupName
         {
             get => _groupName;
@@ -294,18 +299,18 @@ namespace UtilitiesCS
 
         #region Event Wiring and Handlers
 
-        private void Control_MouseEnter(object sender, EventArgs e) =>
-            ((Control)sender).BackColor = _hoverColor;
+        private void Control_MouseEnter(object? sender, EventArgs e) =>
+            ((Control)sender!).BackColor = _hoverColor;
 
-        private void Control_MouseLeave(object sender, EventArgs e)
+        private void Control_MouseLeave(object? sender, EventArgs e)
         {
-            if (IsAltHover(sender))
+            if (IsAltHover(sender!))
             {
-                ((Control)sender).BackColor = _backColorAlt;
+                ((Control)sender!).BackColor = _backColorAlt;
             }
             else
             {
-                ((Control)sender).BackColor = _backColorMain;
+                ((Control)sender!).BackColor = _backColorMain;
             }
         }
 

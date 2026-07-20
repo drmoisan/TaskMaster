@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -12,9 +13,14 @@ namespace SDILReader
     /// </summary>
     public class MethodBodyReader
     {
-        public List<SDILReader.ILInstruction> instructions = null;
-        protected byte[] il = null;
-        private MethodInfo mi = null;
+        public List<SDILReader.ILInstruction>? instructions = null;
+
+        // Invariant: il is assigned from the method body in the constructor before
+        // ConstructInstructions / the Read* helpers dereference it; annotated null!
+        // (rather than nullable) to preserve that non-null contract without adding a
+        // guard on every il[position++] access. Behavior unchanged.
+        protected byte[] il = null!;
+        private MethodInfo? mi = null;
 
         #region il read methods
         private int ReadInt16(byte[] _il, ref int position)
@@ -156,8 +162,8 @@ namespace SDILReader
 
                         instruction.Operand = module.ResolveType(
                             metadataToken,
-                            this.mi.DeclaringType.GetGenericArguments(),
-                            this.mi.GetGenericArguments()
+                            this.mi!.DeclaringType!.GetGenericArguments(),
+                            this.mi!.GetGenericArguments()
                         );
                         break;
                     case OperandType.InlineI:
@@ -235,7 +241,7 @@ namespace SDILReader
             }
         }
 
-        public object GetRefferencedOperand(Module module, int metadataToken)
+        public object? GetRefferencedOperand(Module module, int metadataToken)
         {
             AssemblyName[] assemblyNames = module.Assembly.GetReferencedAssemblies();
             for (int i = 0; i < assemblyNames.Length; i++)
@@ -283,7 +289,9 @@ namespace SDILReader
             this.mi = mi;
             if (mi.GetMethodBody() != null)
             {
-                il = mi.GetMethodBody().GetILAsByteArray();
+                // Guarded above; ! preserves behavior against the nullable
+                // GetMethodBody()/GetILAsByteArray() returns.
+                il = mi.GetMethodBody()!.GetILAsByteArray()!;
                 ConstructInstructions(mi.Module);
             }
         }

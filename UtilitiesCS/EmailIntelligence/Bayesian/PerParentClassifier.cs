@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,7 +60,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         public PerParentClassifier(
             double shrinkageLambda,
             int minColdStartExamples,
-            BayesianClassifierGroup group = null
+            BayesianClassifierGroup? group = null
         )
         {
             ValidateInvariants(shrinkageLambda, minColdStartExamples);

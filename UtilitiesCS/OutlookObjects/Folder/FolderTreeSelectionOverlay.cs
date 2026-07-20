@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,7 +13,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
     {
         private readonly HashSet<string> _selectedRelativePaths;
 
-        public FolderTreeSelectionOverlay(IEnumerable<string> selectedRelativePaths)
+        public FolderTreeSelectionOverlay(IEnumerable<string>? selectedRelativePaths)
         {
             _selectedRelativePaths = new HashSet<string>(
                 selectedRelativePaths ?? Enumerable.Empty<string>(),
@@ -23,7 +24,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         public IReadOnlyCollection<string> SelectedRelativePaths =>
             new ReadOnlyCollection<string>(_selectedRelativePaths.ToArray());
 
-        public bool IsSelected(FolderTreeSnapshotNode node)
+        public bool IsSelected(FolderTreeSnapshotNode? node)
         {
             if (node == null)
             {

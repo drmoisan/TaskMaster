@@ -412,6 +412,12 @@ namespace QuickFiler.Controllers
 
             try
             {
+                // ForEachAwaitWithCancellationAsync (System.Linq.Async) is obsolete (CS0618) per
+                // the framework's migration guidance ("Use the language support for async foreach
+                // instead"), but replacing it with `await foreach` here is a control-flow change
+                // to a production async method, not an annotation-only edit. Suppressing narrowly
+                // preserves the exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
                 await _frame
                     .GetRowsAs<IEmailSortInfo>()
                     .Values.ToAsyncEnumerable()
@@ -432,6 +438,7 @@ namespace QuickFiler.Controllers
                             ),
                         token
                     );
+#pragma warning restore CS0618
                 return true;
             }
             catch (TaskCanceledException)

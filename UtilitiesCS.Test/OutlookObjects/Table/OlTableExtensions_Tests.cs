@@ -664,6 +664,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
         [TestMethod]
         public void GetTable_Store_NullStore_ThrowsArgumentNullException()
         {
+            // This file has no project-level <Nullable> and no whole-file #nullable pragma; this
+            // pre-existing `?` cast annotation needs an explicit annotations context to avoid
+            // CS8632. Scoping narrowly to annotations-only avoids introducing new CS86xx
+            // diagnostics elsewhere in this file (no behavior change per AC7).
+#nullable enable annotations
             System.Action act = () =>
                 OlTableExtensions.GetTable(
                     (Outlook.Store?)null,
@@ -671,6 +676,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
                     new[] { "col" },
                     new[] { "col2" }
                 );
+#nullable restore annotations
             act.Should().Throw<ArgumentNullException>();
         }
 
@@ -1688,9 +1694,16 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             public CapturingProgressTracker()
                 : base(new CancellationTokenSource()) { }
 
+            // This file has no project-level <Nullable> and no whole-file #nullable pragma; the
+            // pre-existing `?` annotations on these two properties need an explicit annotations
+            // context to avoid CS8632. Scoping narrowly to annotations-only avoids introducing
+            // new CS86xx diagnostics elsewhere in this file (no behavior change per AC7).
+#nullable enable annotations
             public int? LastValue { get; private set; }
 
             public string? LastJobName { get; private set; }
+
+#nullable restore annotations
 
             public override void Report((int Value, string JobName) report)
             {
@@ -1702,11 +1715,17 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
         private static ProgressTracker CreateReportingTracker() =>
             new ProgressTracker(new CapturingProgressTracker(), allocation: 100, startingAt: 0);
 
+        // This file has no project-level <Nullable> and no whole-file #nullable pragma; these
+        // pre-existing `?` annotations need an explicit annotations context to avoid CS8632.
+        // Scoping narrowly to annotations-only avoids introducing new CS86xx diagnostics
+        // elsewhere in this file (no behavior change per AC7).
+#nullable enable annotations
         private static Mock<Outlook.Row> CreateRowMock(
             object[] values,
             IDictionary<int, string>? binaryStrings = null,
             IDictionary<int, object>? indexedValues = null
         )
+#nullable restore annotations
         {
             var mockRow = new Mock<Outlook.Row>();
             mockRow.Setup(r => r.GetValues()).Returns(values);
@@ -1730,6 +1749,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             return mockRow;
         }
 
+        // This file has no project-level <Nullable> and no whole-file #nullable pragma; this
+        // pre-existing `?` annotation needs an explicit annotations context to avoid CS8632.
+        // Scoping narrowly to annotations-only avoids introducing new CS86xx diagnostics
+        // elsewhere in this file (no behavior change per AC7).
+#nullable enable annotations
         private static (
             Mock<Outlook.Table> Table,
             Mock<Outlook.Columns> Columns
@@ -1738,6 +1762,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             object[,]? array = null,
             params Mock<Outlook.Row>[] rows
         )
+#nullable restore annotations
         {
             var mockTable = new Mock<Outlook.Table>();
             var mockColumns = new Mock<Outlook.Columns>();
@@ -1796,11 +1821,17 @@ namespace UtilitiesCS.Test.OutlookObjects.Table
             return await ((Task<T>)task);
         }
 
+        // This file has no project-level <Nullable> and no whole-file #nullable pragma; this
+        // pre-existing `?` return-type annotation needs an explicit annotations context to
+        // avoid CS8632. Scoping narrowly to annotations-only avoids introducing new CS86xx
+        // diagnostics elsewhere in this file (no behavior change per AC7).
+#nullable enable annotations
         private static async Task<object?> InvokeAsyncResult(
             string methodName,
             Type[] parameterTypes,
             params object[] args
         )
+#nullable restore annotations
         {
             var method = typeof(OlTableExtensions).GetMethod(
                 methodName,

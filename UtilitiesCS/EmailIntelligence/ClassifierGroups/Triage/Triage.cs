@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -46,7 +47,7 @@ namespace UtilitiesCS.EmailIntelligence
             return this;
         }
 
-        public static async Task<Triage> CreateAsync(
+        public static async Task<Triage?> CreateAsync(
             IApplicationGlobals globals,
             bool initialize = true,
             Enums.NotFoundEnum treatment = Enums.NotFoundEnum.Skip,
@@ -211,7 +212,7 @@ namespace UtilitiesCS.EmailIntelligence
             return await Task.Run(CreateClassifier, token);
         }
 
-        private Func<object, string, Task> _callbackAsync;
+        private Func<object, string, Task> _callbackAsync = null!;
 
         #region Properties
 
@@ -220,14 +221,14 @@ namespace UtilitiesCS.EmailIntelligence
             get => _classifierGroup;
             set => _classifierGroup = value;
         }
-        private BayesianClassifierGroup _classifierGroup;
+        private BayesianClassifierGroup _classifierGroup = null!;
 
         public ISmartSerializableConfig Config => ClassifierGroup.Config;
 
         //internal ScDictionary<string, BayesianClassifierGroup> Manager { get; }
         internal CancellationToken Token { get; }
 
-        protected internal IApplicationGlobals Globals { get; protected set; }
+        protected internal IApplicationGlobals Globals { get; protected set; } = null!;
 
         /// <summary>
         /// Async Delegate Function that extracts an array of string tokens from an object
@@ -237,7 +238,12 @@ namespace UtilitiesCS.EmailIntelligence
             get => _tokenizeAsync;
             set => _tokenizeAsync = value;
         }
-        private Func<object, IApplicationGlobals, CancellationToken, Task<string[]>> _tokenizeAsync;
+        private Func<
+            object,
+            IApplicationGlobals,
+            CancellationToken,
+            Task<string[]>
+        > _tokenizeAsync = null!;
 
         public Func<object, string, Task> CallbackAsync
         {
@@ -249,7 +255,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         #region IConditionalEngine
 
-        public static async Task<IConditionalEngine<MailItemHelper>> CreateEngineAsync(
+        public static async Task<IConditionalEngine<MailItemHelper>?> CreateEngineAsync(
             IApplicationGlobals globals
         )
         {
@@ -258,7 +264,7 @@ namespace UtilitiesCS.EmailIntelligence
         }
 
         public Func<MailItemHelper, Task> AsyncAction =>
-            (item) => Engine is not null ? ((Triage)Engine).TestAsync(item) : null;
+            (item) => Engine is not null ? ((Triage)Engine).TestAsync(item) : null!;
 
         public Func<object, Task<bool>> AsyncCondition =>
             (item) =>
@@ -277,7 +283,7 @@ namespace UtilitiesCS.EmailIntelligence
 
         public string Message => $"{EngineName} is null. Skipping actions";
 
-        public MailItemHelper TypedItem { get; set; }
+        public MailItemHelper TypedItem { get; set; } = null!;
 
         public void Serialize() => ClassifierGroup.Serialize();
 
@@ -307,6 +313,12 @@ namespace UtilitiesCS.EmailIntelligence
 
         public async Task ClassifyAsync(Selection selection, CancellationToken token = default)
         {
+            // ForEachAwaitWithCancellationAsync is obsolete (CS0618) per the framework's
+            // migration guidance ("Use the language support for async foreach instead"), but
+            // replacing it with `await foreach` here is a control-flow change to a production
+            // async method, not an annotation-only edit. Suppressing narrowly preserves the
+            // exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
             await selection
                 .Cast<object>()
                 .Where(x => x is MailItem)
@@ -318,11 +330,12 @@ namespace UtilitiesCS.EmailIntelligence
                         var mostLikely = predictions.FirstOrDefault().Class;
                         if (CallbackAsync is not null)
                         {
-                            await CallbackAsync(item, mostLikely);
+                            await CallbackAsync(item, mostLikely!);
                         }
                     },
                     token
                 );
+#pragma warning restore CS0618
         }
 
         public async Task TrainAsync(
@@ -331,6 +344,10 @@ namespace UtilitiesCS.EmailIntelligence
             CancellationToken token = default
         )
         {
+            // ForEachAwaitWithCancellationAsync is obsolete (CS0618); see the rationale in
+            // ClassifyAsync above. Suppressing narrowly preserves the exact pre-existing
+            // behavior (no behavior change per AC7).
+#pragma warning disable CS0618
             await selection
                 .Cast<object>()
                 .Where(x => x is MailItem)
@@ -340,6 +357,7 @@ namespace UtilitiesCS.EmailIntelligence
                     (item, token) => TrainAsync(item, triageId),
                     token
                 );
+#pragma warning restore CS0618
 
             ClassifierGroup.Serialize();
         }
@@ -390,6 +408,10 @@ namespace UtilitiesCS.EmailIntelligence
                 return;
             }
 
+            // SelectAwaitWithCancellation/ForEachAwaitWithCancellationAsync are obsolete
+            // (CS0618); see the rationale in ClassifyAsync above. Suppressing narrowly
+            // preserves the exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
             await selection
                 .Cast<object>()
                 .ToAsyncEnumerable()
@@ -404,6 +426,7 @@ namespace UtilitiesCS.EmailIntelligence
                     }
                 )
                 .ForEachAwaitWithCancellationAsync(TestAsync, token);
+#pragma warning restore CS0618
         }
 
         public async Task TestAsync(MailItemHelper helper, CancellationToken token = default)
@@ -411,7 +434,7 @@ namespace UtilitiesCS.EmailIntelligence
             var predictions = await ClassifierGroup.ClassifyAsync(helper.Tokens, token);
             var predictedClass =
                 predictions.Count() == 0 ? UnknownClassMarker : predictions.First().Class;
-            await TestActionAsync(helper, predictedClass, token);
+            await TestActionAsync(helper, predictedClass!, token);
         }
 
         public async Task TestAsync(MailItem mailItem, CancellationToken cancel = default)
@@ -425,7 +448,7 @@ namespace UtilitiesCS.EmailIntelligence
             var predictions = await ClassifierGroup.ClassifyAsync(tokens, cancel);
             var predictedClass =
                 predictions.Count() == 0 ? UnknownClassMarker : predictions.First().Class;
-            await TestActionAsync(mailItem, predictedClass, cancel);
+            await TestActionAsync(mailItem, predictedClass!, cancel);
         }
 
         public async Task TestActionAsync(

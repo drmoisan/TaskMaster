@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using Microsoft.Office.Interop.Outlook;
 
@@ -6,7 +7,7 @@ namespace UtilitiesCS
 {
     public static class FolderNavigator
     {
-        public static Folder GetOutlookFolder(string FolderPath, Application OlApp)
+        public static Folder? GetOutlookFolder(string FolderPath, Application OlApp)
         {
             Folder TestFolder;
             string[] FoldersArray;
@@ -39,12 +40,12 @@ namespace UtilitiesCS
 
         public static string[] OlFolderlist_GetAll(IOlObjects OlObjects)
         {
-            string[] OlFolderlist_GetAllRet = default;
+            string[]? OlFolderlist_GetAllRet = default;
 
             var resultList = new List<string>();
             Folder fldrEmailRoot;
 
-            fldrEmailRoot = GetOutlookFolder(OlObjects.ArchiveRootPath, OlObjects.App);
+            fldrEmailRoot = GetOutlookFolder(OlObjects.ArchiveRootPath, OlObjects.App)!;
             var argChildren = fldrEmailRoot.Folders;
             string argRootPath = fldrEmailRoot.FolderPath;
             OlFolder_GetDescendants(ref resultList, ref argChildren, ref argRootPath);

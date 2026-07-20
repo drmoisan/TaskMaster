@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         public string[] Details(
             MailItem olMail,
             string emailRootFolder,
-            IScoDictionaryNew<string, string> dictRemap = null
+            IScoDictionaryNew<string, string>? dictRemap = null
         ) => olMail.Details(emailRootFolder, dictRemap);
 
         public string GetActionTaken(MailItem OlMail) => OlMail.GetActionTaken();
@@ -33,7 +34,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         public IEnumerable<RecipientInfo> GetInfo(IEnumerable<Recipient> recipients) =>
             recipients.GetInfo();
 
-        public RecipientInfo GetInfo(Recipient recipient, SegmentStopWatch sw = null) =>
+        public RecipientInfo GetInfo(Recipient recipient, SegmentStopWatch? sw = null) =>
             recipient.GetInfo(sw);
 
         public IEnumerable<Recipient> GetToRecipients(MailItem olMail) => olMail.GetToRecipients();

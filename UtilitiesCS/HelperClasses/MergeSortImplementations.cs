@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Deedle.Internal;
@@ -24,7 +25,7 @@ namespace UtilitiesCS
         /// <br/>
         /// <seealso cref="IList{T}"/> - when <c>InPlace</c> is <c>false</c>
         /// </returns>
-        public static IList<T> MergeSort<T>(
+        public static IList<T>? MergeSort<T>(
             this IList<T> list,
             Comparison<T> comparison,
             bool inplace

@@ -1,3 +1,4 @@
+#nullable enable
 namespace UtilitiesCS.OutlookObjects.Folder
 {
     /// <summary>
@@ -8,6 +9,6 @@ namespace UtilitiesCS.OutlookObjects.Folder
     {
         object Resolve(FolderTreeSnapshotNode node);
 
-        bool TryResolve(FolderTreeSnapshotNode node, out object folder);
+        bool TryResolve(FolderTreeSnapshotNode? node, out object? folder);
     }
 }

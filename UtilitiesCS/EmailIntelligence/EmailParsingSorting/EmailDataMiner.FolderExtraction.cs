@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -34,7 +35,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         [ExcludeFromCodeCoverage]
-        internal virtual FolderTree GetOlFolderTree(ProgressTracker progress)
+        internal virtual FolderTree GetOlFolderTree(ProgressTracker? progress)
         {
             var snapshot = GetOlFolderSnapshotAsync(progress).GetAwaiter().GetResult();
             var selectionOverlay = new FolderTreeSelectionOverlay(
@@ -49,7 +50,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             var folders = tree
                 .Roots.SelectMany(root => root.FlattenIf(node => !node.Selected))
-                .Select(x => x.OlFolder);
+                .Select(x => x.OlFolder!);
             return folders;
         }
 
@@ -73,14 +74,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         }
 
         internal virtual async Task<FolderTreeSnapshot> GetOlFolderSnapshotAsync(
-            ProgressTracker progress = null
+            ProgressTracker? progress = null
         )
         {
             progress?.Report(0, "Getting cached folders");
             var archiveRoot = _globals.Ol.ArchiveRoot;
             var request = string.IsNullOrWhiteSpace(archiveRoot?.StoreID)
                 ? FolderTreeRequest.AllStores(allowStaleSnapshot: true)
-                : FolderTreeRequest.ForStore(archiveRoot.StoreID, allowStaleSnapshot: true);
+                : FolderTreeRequest.ForStore(archiveRoot!.StoreID, allowStaleSnapshot: true);
             var snapshot = await _globals
                 .Ol.FolderTreeService.GetSnapshotAsync(request, CancellationToken.None)
                 .ConfigureAwait(false);
@@ -127,9 +128,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             var (tokenSource, cancel, progress, sw) = await ProgressPackage.CreateAsTupleAsync();
             //screen: _globals.Ol.GetExplorerScreen());
-            FolderWrapper[] folders = null;
+            FolderWrapper[]? folders = null;
 
-            progress.Report(0, "Getting Folders");
+            progress!.Report(0, "Getting Folders");
             var snapshot = await GetOlFolderSnapshotAsync(progress).ConfigureAwait(false);
             folders = QueryOlFolderInfo(snapshot).ToArray();
             var count = folders.Count();
@@ -160,7 +161,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             var folderRecords = folders
                 .Scan(
-                    new FolderStruct(default(FolderWrapper), 0L, 0L, 0),
+                    new FolderStruct(default(FolderWrapper)!, 0L, 0L, 0),
                     (current, next) =>
                         new FolderStruct
                         {
@@ -225,7 +226,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             );
             foreach (var folder in folders)
             {
-                if (!handles.TryGetValue(folder.RelativePath, out var node))
+                if (!handles.TryGetValue(folder.RelativePath!, out var node))
                 {
                     logger.Warn(
                         $"Failed to resolve folder handle for {folder.Name}. Terminating and rebuilding."
@@ -265,7 +266,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             var handles = tree.Roots.SelectMany(root => root.Flatten()).ToList();
             int last = -1;
-            FolderWrapper handle = null;
+            FolderWrapper? handle = null;
 
             foreach (var folder in folders)
             {
@@ -309,7 +310,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         internal async Task<FolderWrapper[][]> ExtractOlFolderChunks(bool reload = false)
         {
             // Grab selected OlFolderInfo objects from a OlFolderTree, flatten to an array, and initialize
-            FolderWrapper[] folders = null;
+            FolderWrapper[]? folders = null;
             if (!reload)
             {
                 folders = Deserialize<FolderWrapper[]>("StagingFolderRecords");
@@ -317,7 +318,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             if (!reload && folders is not null && await TryResolveMapiHandles(folders))
             {
+                // ForEachAwaitAsync is obsolete (CS0618) per the framework's migration
+                // guidance ("Use the language support for async foreach instead"), but
+                // replacing it with `await foreach` here is a control-flow change to a
+                // production async method, not an annotation-only edit. Suppressing narrowly
+                // preserves the exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
                 await folders.ToAsyncEnumerable().ForEachAwaitAsync(x => x.LoadLazyAsync()); //.Select(x => x.LoadLazyAsync());
+#pragma warning restore CS0618
             }
             else
             {
@@ -394,7 +402,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var mailTuples = folders
                 .Select(folderInfo => (folderInfo.OlFolder, folderInfo))
                 .SelectMany(tup =>
-                    tup.OlFolder.Items.Cast<object>()
+                    tup.OlFolder!.Items.Cast<object>()
                         .Where(obj => obj is MailItem)
                         .Cast<MailItem>()
                         .Select(mail => (mail, tup.folderInfo))
@@ -420,10 +428,10 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         )
         {
             var prelimCount = folders.Select(folder => folder.Items.Count).Sum();
-            _sw.LogDuration("Get Preliminary Count");
+            _sw!.LogDuration("Get Preliminary Count");
 
             var mailList = mailItems.ToList(prelimCount, progress);
-            _sw.LogDuration("Load MailItems");
+            _sw!.LogDuration("Load MailItems");
 
             return mailList;
         }
@@ -446,15 +454,15 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         internal IEnumerable<MailItem> ScrapeEmailsCore()
         {
             var snapshot = GetOlFolderSnapshotAsync().GetAwaiter().GetResult();
-            _sw.LogDuration(nameof(GetOlFolderSnapshotAsync));
+            _sw!.LogDuration(nameof(GetOlFolderSnapshotAsync));
 
             var folders = QueryOlFolders(snapshot);
-            _sw.LogDuration(nameof(QueryOlFolders));
+            _sw!.LogDuration(nameof(QueryOlFolders));
 
             var mailItemsQuery = QueryMailItems(folders);
-            _sw.LogDuration(nameof(QueryMailItems));
+            _sw!.LogDuration(nameof(QueryMailItems));
 
-            _sw.WriteToLog(clear: false);
+            _sw!.WriteToLog(clear: false);
             return mailItemsQuery;
         }
 
@@ -462,15 +470,15 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             progress.Report(0, "Building Outlook Folder Tree");
             var snapshot = GetOlFolderSnapshotAsync(progress).GetAwaiter().GetResult();
-            _sw.LogDuration(nameof(GetOlFolderSnapshotAsync));
+            _sw!.LogDuration(nameof(GetOlFolderSnapshotAsync));
 
             var folders = QueryOlFolders(snapshot);
-            _sw.LogDuration(nameof(QueryOlFolders));
+            _sw!.LogDuration(nameof(QueryOlFolders));
 
             var mailItemsQuery = QueryMailItems(folders);
-            _sw.LogDuration(nameof(QueryMailItems));
+            _sw!.LogDuration(nameof(QueryMailItems));
 
-            _sw.WriteToLog(clear: false);
+            _sw!.WriteToLog(clear: false);
             return mailItemsQuery;
         }
 

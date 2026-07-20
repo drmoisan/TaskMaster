@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +10,7 @@ namespace UtilitiesCS
 {
     public class ObserverHelper<T> : IObserver<T>
     {
-        private IDisposable _unsubscriber;
+        private IDisposable? _unsubscriber;
         private string _instanceName;
         private Action<T> _action;
 
@@ -26,7 +28,9 @@ namespace UtilitiesCS
                 _unsubscriber = provider.Subscribe(this);
         }
 
-        public virtual void Unsubscribe() => _unsubscriber.Dispose();
+        // Unsubscribe is only valid after a successful Subscribe assigned _unsubscriber; the
+        // null-forgiving operator preserves the original throw-on-misuse behavior (no new guard).
+        public virtual void Unsubscribe() => _unsubscriber!.Dispose();
 
         public void OnCompleted() => this.Unsubscribe();
 

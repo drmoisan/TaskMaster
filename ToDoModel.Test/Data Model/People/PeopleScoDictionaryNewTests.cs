@@ -19,9 +19,6 @@ namespace ToDoModel.Tests.Data_Model.People
     public class PeopleScoDictionaryNewTests
     {
         private Mock<IApplicationGlobals> _mockGlobals;
-        private Mock<Outlook.Application> mockApplication;
-        private Mock<IPrefix> _mockPrefix;
-        private PeopleScoDictionaryNew _peopleScoDictionaryNew;
 
         [TestInitialize]
         public void Setup()

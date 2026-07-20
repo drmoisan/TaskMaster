@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -12,7 +13,7 @@ namespace UtilitiesCS
     {
         public static class TypeInformation
         {
-            public static string GetTypeName(object comObject)
+            public static string? GetTypeName(object comObject)
             {
                 var dispatch = comObject as IDispatch;
 

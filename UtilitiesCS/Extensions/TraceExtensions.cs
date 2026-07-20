@@ -5,18 +5,22 @@ using System.Reflection;
 
 namespace UtilitiesCS.Extensions
 {
+#nullable enable
+
     public static class TraceExtensions
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+            System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType!
         );
 
-        public static MethodBase GetCallerByName(this StackTrace sf, string methodName)
+        public static MethodBase? GetCallerByName(this StackTrace sf, string? methodName)
         {
-            if (methodName.IsNullOrEmpty() || methodName == "MoveNext")
+            // Use the BCL null/empty test directly: with a nullable string the extension
+            // `IsNullOrEmpty()` binds to the IEnumerable<char> overload, which rejects null.
+            if (string.IsNullOrEmpty(methodName) || methodName == "MoveNext")
                 return null;
 
-            MethodBase caller = null;
+            MethodBase? caller = null;
             bool repeat = true;
             int i = 0;
             do
@@ -49,7 +53,7 @@ namespace UtilitiesCS.Extensions
             return caller;
         }
 
-        public static string TryGetParameterName(this MethodBase method, int index)
+        public static string? TryGetParameterName(this MethodBase method, int index)
         {
             try
             {
@@ -68,7 +72,7 @@ namespace UtilitiesCS.Extensions
             }
         }
 
-        public static string GetParameterName(this MethodBase method, int index)
+        public static string? GetParameterName(this MethodBase method, int index)
         {
             if (method is null)
             {
@@ -100,7 +104,7 @@ namespace UtilitiesCS.Extensions
             return method.GetParameters()[index].Name;
         }
 
-        public static string[] GetParameterNames(this MethodBase method)
+        public static string?[] GetParameterNames(this MethodBase method)
         {
             return method.GetParameters().Select(x => x.Name).ToArray();
         }

@@ -224,12 +224,18 @@ namespace TaskMaster.Test.AppGlobals
 
         private sealed class TestableApplicationGlobals : ApplicationGlobals
         {
+            // This file has no project-level <Nullable> and no whole-file #nullable pragma; the
+            // pre-existing `?` annotations below need an explicit annotations context to avoid
+            // CS8632. Scoping narrowly to annotations-only avoids introducing new CS86xx
+            // diagnostics elsewhere in this file (no behavior change per AC7).
+#nullable enable annotations
             private readonly IList<string>? _visitedStages;
 
             public TestableApplicationGlobals(
                 OutlookApplication application,
                 IList<string>? visitedStages = null
             )
+#nullable restore annotations
                 : base(application, false)
             {
                 _visitedStages = visitedStages;

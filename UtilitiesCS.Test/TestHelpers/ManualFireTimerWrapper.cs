@@ -21,7 +21,14 @@ namespace UtilitiesCS.Test.TestHelpers
         private bool _disposed;
 
         /// <summary>Raised synchronously by <see cref="FireElapsed"/>.</summary>
+        // This file has no project-level <Nullable> and no whole-file #nullable pragma; this
+        // pre-existing `?` annotation needs an explicit annotations context to avoid CS8632.
+        // Scoping narrowly to annotations-only avoids introducing new CS86xx diagnostics
+        // elsewhere in this file (no behavior change per AC7).
+#nullable enable annotations
         public event EventHandler<TimeElapsedEventArgs>? Elapsed;
+
+#nullable restore annotations
 
         /// <summary>True after <see cref="StartTimer"/> and before <see cref="StopTimer"/>.</summary>
         public bool Started { get; private set; }

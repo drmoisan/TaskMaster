@@ -20,13 +20,15 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace UtilitiesCS
 {
+#nullable enable
+
     public static partial class DfDeedle
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+            System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType!
         );
 
-        private static string DescribeSynchronizationContext(SynchronizationContext syncContext)
+        private static string DescribeSynchronizationContext(SynchronizationContext? syncContext)
         {
             return syncContext?.GetType().FullName ?? "null";
         }
@@ -36,7 +38,7 @@ namespace UtilitiesCS
             return $"threadId={Thread.CurrentThread.ManagedThreadId}; syncContext={DescribeSynchronizationContext(SynchronizationContext.Current)}";
         }
 
-        private static void LogDfTiming(string phase, string details = null)
+        private static void LogDfTiming(string phase, string? details = null)
         {
             var detailSegment = string.IsNullOrWhiteSpace(details) ? string.Empty : $" | {details}";
             var phaseLabel = phase.StartsWith("[Df timing]", StringComparison.Ordinal)
@@ -157,7 +159,9 @@ namespace UtilitiesCS
             );
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(AddQfcColumnsAsync)} ...");
-            await AddQfcColumnsAsync(table, currentFolder, token, 0);
+            // currentFolder is the live Explorer's CurrentFolder (non-null); the defensive
+            // ?.Name in the preceding log line set its flow state to maybe-null.
+            await AddQfcColumnsAsync(table, currentFolder!, token, 0);
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(OlTableExtensions.EtlAsync)} ...");
             var etlStopwatch = Stopwatch.StartNew();
@@ -253,12 +257,15 @@ namespace UtilitiesCS
                 StoreId = storeId;
             }
 
-            public string EntryId = default;
-            public string MessageClass = default;
+            // `= default!` keeps EmailRecord a plain struct (no record/init, which fail CS0518
+            // on net481) while satisfying the non-null string field contract; the parameterless
+            // ctor path is only used by Deedle's record reflection, which overwrites these fields.
+            public string EntryId = default!;
+            public string MessageClass = default!;
             public DateTime SentOn = default;
-            public string ConversationId = default;
-            public string Triage = default;
-            public string StoreId = default;
+            public string ConversationId = default!;
+            public string Triage = default!;
+            public string StoreId = default!;
         }
 
         private static string AcceptableTriage(string triage)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,15 +23,19 @@ namespace ToDoModel.Data_Model.People
     public class WrapperPeopleScoDictionaryNew //<TDerived, TKey, TValue> where TDerived : PeopleScoDictionaryNew
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+            // ! preserves behavior: GetCurrentMethod() is non-null in this static
+            // initializer and its DeclaringType is the enclosing type.
+            System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType!
         );
 
         [JsonProperty("CoDictionary")]
         public ScoDictionaryNew<string, string> CoDictionary { get; set; }
 
+        // [JsonProperty] deserialization target; annotated null! to preserve the non-null
+        // contract consumers rely on (guarded with RemainingObject.ThrowIfNull() before use).
         [JsonProperty("RemainingObject")]
         [JsonConverter(typeof(PeopleScoRemainingObjectConverter))]
-        public object RemainingObject { get; set; }
+        public object RemainingObject { get; set; } = null!;
 
         public WrapperPeopleScoDictionaryNew()
         {
@@ -384,14 +389,16 @@ namespace ToDoModel.Data_Model.People
             return setPropMthdBldr;
         }
 
-        private MethodBuilder ModifySetMethod(
+        // Per-file behavior preserved: this wrapper's ModifySetMethod returns null when the
+        // property has no setter (nullable return).
+        private MethodBuilder? ModifySetMethod(
             TypeBuilder tb,
             PropertyInfo property,
             ref Dictionary<string, FieldBuilder> backingFields
         )
         {
             //Type[] method_arguments = null;
-            Type[] type_arguments = null;
+            Type[]? type_arguments = null;
             var oldSetMethod = property.GetSetMethod(true);
             if (oldSetMethod == null)
             {
@@ -419,7 +426,7 @@ namespace ToDoModel.Data_Model.People
             {
                 if (instruction.OpCode == OpCodes.Ldfld || instruction.OpCode == OpCodes.Stfld)
                 {
-                    var bf = (FieldInfo)instruction.Operand;
+                    var bf = (FieldInfo)instruction.Operand!;
                     //FieldBuilder fieldBuilder;
                     if (!backingFields.TryGetValue(bf.Name, out var fieldBuilder))
                     {
@@ -432,7 +439,7 @@ namespace ToDoModel.Data_Model.People
                 }
                 else if (instruction.OpCode == OpCodes.Callvirt)
                 {
-                    var method = (MethodInfo)instruction.Operand;
+                    var method = (MethodInfo)instruction.Operand!;
                     setIl.Emit(instruction.OpCode, method);
                 }
                 else if (instruction.Operand is not null)
@@ -457,7 +464,7 @@ namespace ToDoModel.Data_Model.People
         )
         {
             //Type[] method_arguments = null;
-            Type[] type_arguments = null;
+            Type[]? type_arguments = null;
             var oldGetMethod = property.GetGetMethod(true);
             if (oldGetMethod == null)
             {
@@ -485,7 +492,7 @@ namespace ToDoModel.Data_Model.People
             {
                 if (instruction.OpCode == OpCodes.Ldfld || instruction.OpCode == OpCodes.Stfld)
                 {
-                    var bf = (FieldInfo)instruction.Operand;
+                    var bf = (FieldInfo)instruction.Operand!;
                     //FieldBuilder fieldBuilder;
                     if (!backingFields.TryGetValue(bf.Name, out var fieldBuilder))
                     {
@@ -498,7 +505,7 @@ namespace ToDoModel.Data_Model.People
                 }
                 else if (instruction.OpCode == OpCodes.Callvirt)
                 {
-                    var method = (MethodInfo)instruction.Operand;
+                    var method = (MethodInfo)instruction.Operand!;
                     getIl.Emit(instruction.OpCode, method);
                 }
                 else if (instruction.Operand is not null)
@@ -595,12 +602,14 @@ namespace ToDoModel.Data_Model.People
 
     public class PeopleScoRemainingObject
     {
+        // Deserialization targets; null! preserves the non-null contract these are
+        // (de)serialized into. Behavior unchanged.
         [JsonProperty]
-        internal IApplicationGlobals Globals { get; set; }
+        internal IApplicationGlobals Globals { get; set; } = null!;
 
         [JsonProperty]
-        public NewSmartSerializableConfig Config { get; set; }
+        public NewSmartSerializableConfig Config { get; set; } = null!;
 
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
     }
 }

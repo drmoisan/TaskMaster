@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -21,7 +22,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
 
         #region Serialization
 
-        public virtual T Deserialize<T>(string fileNameSeed, string fileNameSuffix = "")
+        public virtual T? Deserialize<T>(string fileNameSeed, string fileNameSuffix = "")
         {
             var jsonSettings = new JsonSerializerSettings()
             {
@@ -57,7 +58,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             }
         }
 
-        public virtual async Task<T> DeserializeAsync<T>(
+        public virtual async Task<T?> DeserializeAsync<T>(
             string fileNameSeed,
             string fileNameSuffix = ""
         )
@@ -95,7 +96,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             }
         }
 
-        public virtual async Task<T> DeserializeAsync<T>(
+        public virtual async Task<T?> DeserializeAsync<T>(
             ProgressTrackerPane progress,
             string fileNameSeed,
             string fileNameSuffix = "",
@@ -105,7 +106,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             JsonSerializerSettings jsonSettings = GetJsonSettings();
             FilePathHelper disk = GetDisk(fileNameSeed, fileNameSuffix, fileExtension);
 
-            T item = default;
+            T? item = default;
 
             if (FileExists(disk.FilePath))
             {
@@ -184,7 +185,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             }
             else
             {
-                return null;
+                // Pre-existing behavior: returns null when AppData is unavailable. null! keeps the
+                // non-null return type consumed by callers that dereference disk without a guard.
+                return null!;
             }
         }
 
@@ -308,6 +311,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
         {
             using (var sourceStream = CreateTextWriteStream(filePath))
             {
+                // ForEachAwaitAsync is obsolete (CS0618) per the framework's migration guidance
+                // ("Use the language support for async foreach instead"), but replacing it with
+                // `await foreach` here is a control-flow change to a production async I/O method,
+                // not an annotation-only edit. Suppressing narrowly preserves the exact
+                // pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
                 await texts
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(async text =>
@@ -315,6 +324,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
                         byte[] encodedText = Encoding.Unicode.GetBytes(text + Environment.NewLine);
                         await sourceStream.WriteAsync(encodedText, 0, encodedText.Length);
                     });
+#pragma warning restore CS0618
             }
             ;
         }
@@ -342,7 +352,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             using (StreamWriter sw = File.CreateText(disk.FilePath))
             {
                 serializer.Serialize(sw, obj);
-                disk.FileName = null;
+                disk.FileName = null!;
             }
         }
 

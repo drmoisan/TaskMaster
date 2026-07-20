@@ -44,7 +44,14 @@ namespace TaskMaster
             var tcs = new TaskCompletionSource<bool>(
                 TaskCreationOptions.RunContinuationsAsynchronously
             );
+            // This file has no project-level <Nullable> element and no whole-file #nullable
+            // pragma; this pre-existing `?` annotation on a self-referencing local (assigned to
+            // itself inside its own closure below) needs an explicit annotations context to
+            // avoid CS8632. Scoping narrowly to annotations-only avoids introducing new CS86xx
+            // diagnostics elsewhere in this file (no behavior change per AC7).
+#nullable enable annotations
             Timer? timer = null;
+#nullable restore annotations
             timer = new Timer(
                 _ =>
                 {

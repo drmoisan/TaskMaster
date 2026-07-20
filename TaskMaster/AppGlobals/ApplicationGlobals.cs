@@ -248,7 +248,14 @@ namespace TaskMaster
         // are overwritten at each phase boundary by BeginPhaseGcCapture. The current-phase marker
         // is read by each heartbeat tick so each [ui-heartbeat] line is attributed to the phase
         // whose body/await is in flight (issue #211, Phase 3.2).
+        // This file has no project-level <Nullable> element and no whole-file #nullable pragma;
+        // this pre-existing `?` annotation ("Null in the flag-off/test seams" per the comment
+        // above) needs an explicit annotations context to avoid CS8632. Scoping narrowly to
+        // annotations-only avoids introducing new CS86xx diagnostics elsewhere in this file (no
+        // behavior change per AC7).
+#nullable enable annotations
         private System.Windows.Threading.DispatcherTimer? _startupHeartbeat;
+#nullable restore annotations
         private string _currentStartupPhase = string.Empty;
         private int _phaseGcGen0Before;
         private int _phaseGcGen1Before;

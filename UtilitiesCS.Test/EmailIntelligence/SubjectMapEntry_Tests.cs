@@ -241,7 +241,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
             entry.Encode(encoder.Object, regex);
             entry.Encode(encoder.Object);
             var encodedTokens = entry.Encode(encoder.Object, new[] { "alpha", "beta" });
-            Action nullTokenEncodingAct = () => entry.Encode(encoder.Object, tokens: null);
+            // null! deliberately passed to exercise the method's null-handling guard clause; the
+            // null-forgiving operator documents the intentional null without changing the
+            // runtime value (no behavior change per AC7).
+            Action nullTokenEncodingAct = () => entry.Encode(encoder.Object, tokens: null!);
 
             // Assert
             entry.FolderEncoded.Should().Equal(31);

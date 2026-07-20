@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -10,10 +11,10 @@ namespace UtilitiesCS.HelperClasses
     public class GenericBitwise<TFlagEnum>
         where TFlagEnum : Enum
     {
-        private readonly Func<TFlagEnum, TFlagEnum, TFlagEnum> _and = null;
-        private readonly Func<TFlagEnum, TFlagEnum> _not = null;
-        private readonly Func<TFlagEnum, TFlagEnum, TFlagEnum> _or = null;
-        private readonly Func<TFlagEnum, TFlagEnum, TFlagEnum> _xor = null;
+        private readonly Func<TFlagEnum, TFlagEnum, TFlagEnum> _and;
+        private readonly Func<TFlagEnum, TFlagEnum> _not;
+        private readonly Func<TFlagEnum, TFlagEnum, TFlagEnum> _or;
+        private readonly Func<TFlagEnum, TFlagEnum, TFlagEnum> _xor;
 
         public GenericBitwise()
         {

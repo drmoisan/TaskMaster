@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +23,7 @@ namespace UtilitiesCS.HelperClasses
 
         internal TimedBatchAction(
             TimeSpan frequency,
-            System.Action action,
+            System.Action? action,
             Func<TimeSpan, ITimerWrapper> timerFactory
         )
         {
@@ -35,12 +37,13 @@ namespace UtilitiesCS.HelperClasses
             Interlocked.CompareExchange(ref _action, action, null);
         }
 
-        private System.Action _action;
+        // Nullable: constructed null (parameterless ctor) until SetAction/RequestAction assigns it.
+        private System.Action? _action;
 
         private TimeSpan _frequency;
         private readonly Func<TimeSpan, ITimerWrapper> _timerFactory;
         private ThreadSafeSingleShotGuard _actionRequested = new();
-        private ITimerWrapper _timer;
+        private ITimerWrapper? _timer;
 
         public void ResetTimer()
         {

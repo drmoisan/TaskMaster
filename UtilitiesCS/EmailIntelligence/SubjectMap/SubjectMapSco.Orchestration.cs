@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -29,7 +30,7 @@ namespace UtilitiesCS
                 .NodesByKey.Values.Where(node => !excluded.Contains(node.RelativePath))
                 .Select(node => (Node: node, Folder: ResolveFolder(resolver, node)))
                 .Where(tuple => tuple.Folder != null)
-                .Select(tuple => (tuple.Folder, tuple.Node.RelativePath));
+                .Select(tuple => (tuple.Folder!, tuple.Node.RelativePath));
         }
 
         internal virtual FolderTreeSnapshot GetFolderTreeSnapshot(IApplicationGlobals appGlobals)
@@ -37,7 +38,7 @@ namespace UtilitiesCS
             var archiveRoot = appGlobals.Ol.ArchiveRoot;
             var request = string.IsNullOrWhiteSpace(archiveRoot?.StoreID)
                 ? FolderTreeRequest.AllStores(allowStaleSnapshot: true)
-                : FolderTreeRequest.ForStore(archiveRoot.StoreID, allowStaleSnapshot: true);
+                : FolderTreeRequest.ForStore(archiveRoot!.StoreID, allowStaleSnapshot: true);
             var snapshot = appGlobals
                 .Ol.FolderTreeService.GetSnapshotAsync(request, CancellationToken.None)
                 .GetAwaiter()
@@ -58,7 +59,7 @@ namespace UtilitiesCS
             return new OutlookFolderHandleResolver(appGlobals.Ol.NamespaceMAPI);
         }
 
-        private static MAPIFolder ResolveFolder(
+        private static MAPIFolder? ResolveFolder(
             IFolderHandleResolver resolver,
             FolderTreeSnapshotNode node
         )
@@ -87,7 +88,7 @@ namespace UtilitiesCS
         internal List<T> Consume<T>(IEnumerable<T> enumerable, int count, ProgressTracker progress)
         {
             int completed = 0;
-            List<T> list = null;
+            List<T>? list = null;
             progress.Report(0, $"Consuming {0:N0} of {count:N0}");
 
             using (
@@ -260,12 +261,12 @@ namespace UtilitiesCS
             RepopulateSubjectMapEntries(appGlobals, progress, folders, mailItems);
         }
 
-        internal List<SummaryMetric> summaryMetrics;
+        internal List<SummaryMetric>? summaryMetrics;
 
         internal class SummaryMetric
         {
-            public string FolderName;
-            public string FolderPath;
+            public string? FolderName;
+            public string? FolderPath;
             public int SubjectCount;
             public int EmailCount;
         }

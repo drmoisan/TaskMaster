@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -50,7 +51,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         /// <typeparam name="T">The type of the multiclass engine.</typeparam>
         /// <param name="groupName">The name of the group.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the initialized engine.</returns>
-        public async Task<T> InitAsync(string groupName)
+        public async Task<T?> InitAsync(string groupName)
         {
             Globals.ThrowIfNull();
 
@@ -78,7 +79,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         /// <param name="categoryGroup">The category group name.</param>
         /// <param name="token">The cancellation token.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains the created engine.</returns>
-        public static async Task<T> CreateEngineAsync(
+        public static async Task<T?> CreateEngineAsync(
             IApplicationGlobals globals,
             string categoryGroup,
             CancellationToken token = default
@@ -94,12 +95,12 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         /// <summary>
         /// Gets or sets the application globals.
         /// </summary>
-        internal IApplicationGlobals Globals { get; private set; }
+        internal IApplicationGlobals Globals { get; private set; } = null!;
 
         /// <summary>
         /// Gets the classifier group utilities.
         /// </summary>
-        internal ClassifierGroupUtilities CgUtilities;
+        internal ClassifierGroupUtilities CgUtilities = null!;
 
         #region Build Category Classifier
 
@@ -118,8 +119,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             // Set up Progress Tracking
             var (ppkg, sw) = await SetupProgressTracking();
 
-            // Load the staging data
-            MinedMailInfo[] collection = await LoadStagingData(ppkg, sw);
+            // Load the staging data. LoadStagingData may return null (AppData missing); the
+            // pre-existing code treats the result as non-null at the LoadClassifierGroup call below.
+            MinedMailInfo[] collection = (await LoadStagingData(ppkg, sw))!;
             var allocation = (100 - ppkg.ProgressTrackerPane.Progress);
 
             // Remove the existing Category Classifier
@@ -147,7 +149,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 .InitializeAsync(
                     childPpkg.CancelSource,
                     childPpkg.Cancel,
-                    childPpkg.ProgressTrackerPane.SpawnChild(),
+                    childPpkg.ProgressTrackerPane!.SpawnChild(),
                     childPpkg.StopWatch
                 )
                 .ConfigureAwait(false);
@@ -167,7 +169,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                     (await Globals.AF.Manager.Configuration).TryGetValue(EngineName, out var loader)
                 )
                 {
-                    classifierGroup.Config = loader.Config.DeepCopy() as NewSmartSerializableConfig;
+                    classifierGroup.Config = (
+                        loader.Config.DeepCopy() as NewSmartSerializableConfig
+                    )!;
                     classifierGroup.Serialize();
 
                     Globals.AF.Manager[EngineName] = classifierGroup.ToAsyncLazy();
@@ -245,9 +249,16 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             var ppkg = await ProgressPackage
                 .CreateAsTuplePaneAsync(progressTrackerPane: Globals.AF.ProgressTracker)
                 .ConfigureAwait(false);
-            var sw = ppkg.StopWatch;
+            var sw = ppkg.StopWatch!;
             Globals.AF.ProgressPane.Visible = true;
+            // CreateAsTuplePaneAsync's tuple has all-nullable fields by declaration, but this
+            // method's own return type declares the same fields non-nullable; the fields are
+            // always populated by ProgressPackage.InitializeAsync's own defaulting logic.
+            // Suppressing narrowly preserves the exact pre-existing behavior (no behavior
+            // change per AC7) rather than restructuring the tuple shape.
+#pragma warning disable CS8619
             return (ppkg, sw);
+#pragma warning restore CS8619
         }
 
         private async Task<BayesianClassifierGroup> LoadClassifierGroup(
@@ -287,7 +298,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             int minimumCountPerToken = 0
         )
         {
-            ppkg.ProgressTrackerPane.Report(
+            ppkg.ProgressTrackerPane!.Report(
                 20,
                 $"Building {groupName} Classifier -> Creating Classifier Group"
             );
@@ -301,7 +312,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             return classifierGroup;
         }
 
-        private async Task<MinedMailInfo[]> LoadStagingData(
+        private async Task<MinedMailInfo[]?> LoadStagingData(
             (
                 CancellationTokenSource CancelSource,
                 CancellationToken Cancel,
@@ -338,7 +349,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         /// <summary>
         /// Gets or sets the classifier group.
         /// </summary>
-        public BayesianClassifierGroup ClassifierGroup { get; set; }
+        public BayesianClassifierGroup ClassifierGroup { get; set; } = null!;
 
         /// <summary>
         /// Gets a <seealso cref="bool"/> value indicating whether the engine is activated.
@@ -379,12 +390,12 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         /// <summary>
         /// Delegate that represents the asynchronous action that runs when a condition is met
         /// </summary>
-        public Func<MailItemHelper, Task> AsyncAction { get; internal set; }
+        public Func<MailItemHelper, Task> AsyncAction { get; internal set; } = null!;
 
         /// <summary>
         /// Delegate representing the asynchronous condition that must be true to run the engine.
         /// </summary>
-        public Func<object, Task<bool>> AsyncCondition { get; internal set; }
+        public Func<object, Task<bool>> AsyncCondition { get; internal set; } = null!;
 
         /// <summary>
         /// Determines whether the specified item meets the condition and logs details about the result
@@ -413,7 +424,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         {
             var type = olItem.TryGet().OlItemType(out var typeVal)
                 ? $"{typeVal}"
-                : $"{olItem.InnerObject.GetType()}";
+                : $"{olItem.InnerObject!.GetType()}";
             var created = olItem.TryGet().CreationTime(out var result)
                 ? $" created on {result:g}"
                 : "";
@@ -439,7 +450,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         /// <summary>
         /// Property from the <seealso cref="IConditionalEngine{}"/> interface that represents the name of the engine
         /// </summary>
-        public string EngineName { get; internal set; }
+        public string EngineName { get; internal set; } = null!;
 
         /// <summary>
         /// Property from the <seealso cref="IConditionalEngine{}"/> interface that represents the message that is
@@ -451,7 +462,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         /// <summary>
         /// Gets or sets the typed mail item helper.
         /// </summary>
-        public MailItemHelper TypedItem { get; set; }
+        public MailItemHelper TypedItem { get; set; } = null!;
 
         #endregion IConditionalEngine Implementation
     }

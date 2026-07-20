@@ -1,3 +1,4 @@
+#nullable enable
 using System.Threading;
 
 namespace UtilitiesCS.OutlookObjects.Store

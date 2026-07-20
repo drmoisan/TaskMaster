@@ -1,3 +1,4 @@
+#nullable enable
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 
@@ -76,7 +77,8 @@ namespace UtilitiesCS
                 if (menuItem is ToolStripMenuItem)
                 {
                     var item = menuItem as ToolStripMenuItem;
-                    item.BackColor = ButtonBackColor;
+                    // Behavior-preserving `!`: guarded by the `is` check above.
+                    item!.BackColor = ButtonBackColor;
                     //item.ForeColor = ButtonForeColor;
                 }
             }

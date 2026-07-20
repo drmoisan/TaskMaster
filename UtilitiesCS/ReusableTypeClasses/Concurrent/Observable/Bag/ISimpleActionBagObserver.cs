@@ -1,4 +1,6 @@
-﻿namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Bag
+﻿#nullable enable
+
+namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Bag
 {
     internal interface ISimpleActionBagObserver<T>
     {

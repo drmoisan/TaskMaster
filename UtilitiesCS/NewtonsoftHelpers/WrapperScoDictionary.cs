@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,12 +19,15 @@ namespace UtilitiesCS.NewtonsoftHelpers
 {
     public class WrapperScoDictionary<TDerived, TKey, TValue>
         where TDerived : ScoDictionaryNew<TKey, TValue>
+        where TKey : notnull
     {
         [JsonProperty("CoDictionary")]
         public ConcurrentObservableDictionary<TKey, TValue> CoDictionary { get; set; }
 
+        // [JsonProperty] deserialization target; annotated null! to preserve the non-null
+        // contract consumers rely on (guarded with RemainingObject.ThrowIfNull() before use).
         [JsonProperty("RemainingObject")]
-        public object RemainingObject { get; set; }
+        public object RemainingObject { get; set; } = null!;
 
         public WrapperScoDictionary()
         {
@@ -166,7 +170,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
         // pplkey deserialization) but breaks full-graph equivalence checks against a default Config.
         // For each empty disk (no FileName) on a freshly reconstructed Config, restore the
         // default empty-string FilePath so reconstructed-but-empty disks match default disks.
-        private static void NormalizeEmptyDiskFilePaths(NewSmartSerializableConfig config)
+        private static void NormalizeEmptyDiskFilePaths(NewSmartSerializableConfig? config)
         {
             if (config is null)
             {
@@ -433,14 +437,16 @@ namespace UtilitiesCS.NewtonsoftHelpers
             return setPropMthdBldr;
         }
 
-        private MethodBuilder ModifySetMethod(
+        // Per-file behavior preserved: this wrapper's ModifySetMethod returns null when the
+        // property has no setter (nullable return), unlike WrapperScDictionary which throws.
+        private MethodBuilder? ModifySetMethod(
             TypeBuilder tb,
             PropertyInfo property,
             ref Dictionary<string, FieldBuilder> backingFields
         )
         {
             //Type[] method_arguments = null;
-            Type[] type_arguments = null;
+            Type[]? type_arguments = null;
             var oldSetMethod = property.GetSetMethod(true);
             if (oldSetMethod == null)
             {
@@ -468,7 +474,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
             {
                 if (instruction.OpCode == OpCodes.Ldfld || instruction.OpCode == OpCodes.Stfld)
                 {
-                    var bf = (FieldInfo)instruction.Operand;
+                    var bf = (FieldInfo)instruction.Operand!;
                     //FieldBuilder fieldBuilder;
                     if (!backingFields.TryGetValue(bf.Name, out var fieldBuilder))
                     {
@@ -481,7 +487,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
                 }
                 else if (instruction.OpCode == OpCodes.Callvirt)
                 {
-                    var method = (MethodInfo)instruction.Operand;
+                    var method = (MethodInfo)instruction.Operand!;
                     setIl.Emit(instruction.OpCode, method);
                 }
                 else if (instruction.Operand is not null)
@@ -506,7 +512,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
         )
         {
             //Type[] method_arguments = null;
-            Type[] type_arguments = null;
+            Type[]? type_arguments = null;
             var oldGetMethod = property.GetGetMethod(true);
             if (oldGetMethod == null)
             {
@@ -534,7 +540,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
             {
                 if (instruction.OpCode == OpCodes.Ldfld || instruction.OpCode == OpCodes.Stfld)
                 {
-                    var bf = (FieldInfo)instruction.Operand;
+                    var bf = (FieldInfo)instruction.Operand!;
                     //FieldBuilder fieldBuilder;
                     if (!backingFields.TryGetValue(bf.Name, out var fieldBuilder))
                     {
@@ -547,7 +553,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
                 }
                 else if (instruction.OpCode == OpCodes.Callvirt)
                 {
-                    var method = (MethodInfo)instruction.Operand;
+                    var method = (MethodInfo)instruction.Operand!;
                     getIl.Emit(instruction.OpCode, method);
                 }
                 else if (instruction.Operand is not null)

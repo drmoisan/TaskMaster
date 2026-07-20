@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -25,9 +26,11 @@ namespace UtilitiesCS.NewtonsoftHelpers
             set => _messageFilter = value;
         }
 
-        public Action<string, Exception> Log { get; set; }
+        // Deliberate public contract: the log delegate is optional (may be unset) and its
+        // exception argument is nullable, matching ITraceWriter.Trace(..., Exception? ex).
+        public Action<string, Exception?>? Log { get; set; }
 
-        public void Trace(TraceLevel level, string message, Exception ex)
+        public void Trace(TraceLevel level, string message, Exception? ex)
         {
             if (!MessageFilter.Select(message.Contains).Aggregate((a, b) => a | b))
             {

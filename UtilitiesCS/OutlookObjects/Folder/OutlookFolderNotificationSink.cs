@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -82,12 +83,12 @@ namespace UtilitiesCS.OutlookObjects.Folder
             }
         }
 
-        public event EventHandler<FolderTreeSnapshotChangedEventArgs> FolderAdded;
-        public event EventHandler<FolderTreeSnapshotChangedEventArgs> FolderRemoved;
-        public event EventHandler<FolderTreeSnapshotChangedEventArgs> FolderChanged;
-        public event EventHandler<FolderTreeSnapshotChangedEventArgs> StoreAdded;
-        public event EventHandler<FolderTreeSnapshotChangedEventArgs> StoreRemoved;
-        public event EventHandler<FolderTreeSnapshotChangedEventArgs> Disposed;
+        public event EventHandler<FolderTreeSnapshotChangedEventArgs>? FolderAdded;
+        public event EventHandler<FolderTreeSnapshotChangedEventArgs>? FolderRemoved;
+        public event EventHandler<FolderTreeSnapshotChangedEventArgs>? FolderChanged;
+        public event EventHandler<FolderTreeSnapshotChangedEventArgs>? StoreAdded;
+        public event EventHandler<FolderTreeSnapshotChangedEventArgs>? StoreRemoved;
+        public event EventHandler<FolderTreeSnapshotChangedEventArgs>? Disposed;
 
         [ExcludeFromCodeCoverage]
         public void Start()
@@ -327,7 +328,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         internal sealed class FolderTreeNotification : EventArgs
         {
-            public FolderTreeNotification(FolderTreeRefreshReason reason, string storeId)
+            public FolderTreeNotification(FolderTreeRefreshReason reason, string? storeId)
             {
                 Reason = reason;
                 StoreId = storeId ?? string.Empty;
@@ -402,7 +403,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         private sealed class StoresNotificationSubscription : IOutlookFolderNotificationSubscription
         {
             private readonly Outlook.Stores _stores;
-            private EventHandler<FolderTreeNotification> _handler;
+            private EventHandler<FolderTreeNotification>? _handler;
 
             public StoresNotificationSubscription(Outlook.Stores stores)
             {
@@ -446,7 +447,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         {
             private readonly Outlook.Folders _folders;
             private readonly string _storeId;
-            private EventHandler<FolderTreeNotification> _handler;
+            private EventHandler<FolderTreeNotification>? _handler;
 
             public FoldersNotificationSubscription(Outlook.Folders folders, string storeId)
             {

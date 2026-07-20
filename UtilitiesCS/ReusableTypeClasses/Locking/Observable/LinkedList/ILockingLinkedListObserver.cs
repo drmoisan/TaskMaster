@@ -1,4 +1,6 @@
-﻿using UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList;
+﻿#nullable enable
+
+using UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList;
 
 namespace ConcurrentObservableCollection.ConcurrentObservableDictionary
 {

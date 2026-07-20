@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -21,7 +22,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
             Snapshot = snapshot ?? throw new ArgumentNullException(nameof(snapshot));
             SelectionOverlay =
                 selectionOverlay ?? new FolderTreeSelectionOverlay(Array.Empty<string>());
-            Roots = Snapshot.RootKeys.Select(CreateNode).Where(node => node != null).ToList();
+            Roots = Snapshot
+                .RootKeys.Select(CreateNode)
+                .Where(node => node != null)
+                .Select(node => node!)
+                .ToList();
         }
 
         public FolderTreeSnapshot Snapshot { get; }
@@ -48,9 +53,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
             _disposed = true;
         }
 
-        private TreeNode<FolderWrapper> CreateNode(FolderTreeNodeKey key)
+        private TreeNode<FolderWrapper>? CreateNode(FolderTreeNodeKey key)
         {
-            if (!Snapshot.TryGetNode(key, out var snapshotNode))
+            if (!Snapshot.TryGetNode(key, out var snapshotNode) || snapshotNode is null)
             {
                 return null;
             }
@@ -70,7 +75,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 var child in snapshotNode.ChildKeys.Select(CreateNode).Where(node => node != null)
             )
             {
-                treeNode.AddChild(child);
+                treeNode.AddChild(child!);
             }
 
             return treeNode;

@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
+#nullable enable
+
     public static class DrawingExtensions
     {
         public static PointF Multiply(this PointF pt, Size sz)

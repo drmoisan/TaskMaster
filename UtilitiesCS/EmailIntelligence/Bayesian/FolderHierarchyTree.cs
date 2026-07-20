@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +39,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         /// Comparer for node keys and child segments. Defaults to <see cref="StringComparer.Ordinal"/>
         /// when null.
         /// </param>
-        public FolderHierarchyTree(StringComparer comparer = null)
+        public FolderHierarchyTree(StringComparer? comparer = null)
         {
             _comparer = comparer ?? StringComparer.Ordinal;
             _children = new Dictionary<string, ChildSet>(_comparer);
@@ -55,7 +56,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="relativePaths"/> is null.</exception>
         public static FolderHierarchyTree Build(
             IEnumerable<string> relativePaths,
-            StringComparer comparer = null
+            StringComparer? comparer = null
         )
         {
             if (relativePaths is null)
@@ -139,7 +140,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         /// </summary>
         /// <param name="nodeKey">The full node key (empty string for the root).</param>
         /// <returns>The node snapshot, or null when absent.</returns>
-        public FolderHierarchyNode GetNode(string nodeKey)
+        public FolderHierarchyNode? GetNode(string nodeKey)
         {
             if (nodeKey is null || !_children.TryGetValue(nodeKey, out var set))
             {

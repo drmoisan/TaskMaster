@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,7 +14,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         public FolderTreeSnapshotChangedEventArgs(
             FolderTreeSnapshot snapshot,
             FolderTreeRefreshReason reason,
-            IEnumerable<string> affectedStoreIds
+            IEnumerable<string>? affectedStoreIds
         )
         {
             Snapshot = snapshot ?? throw new ArgumentNullException(nameof(snapshot));
