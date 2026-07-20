@@ -53,16 +53,16 @@ clean opted-in build remain non-opted-in and must not be cross-blocked.
 
 ## Acceptance Criteria
 
-- [ ] AC1: Every `.cs` file under `UtilitiesCS/ReusableTypeClasses/` that emits CS86xx carries
+- [x] AC1: Every `.cs` file under `UtilitiesCS/ReusableTypeClasses/` that emits CS86xx carries
   `#nullable enable` and compiles with zero nullable diagnostics under the per-file pragma with
   `TreatWarningsAsErrors`.
-- [ ] AC2: No project-level `<Nullable>` element is introduced into `UtilitiesCS.csproj`.
-- [ ] AC3: No behavior change; existing tests still pass.
-- [ ] AC4: No coverage regression on changed lines.
-- [ ] AC5: Public signatures of the remediated reusable types remain behavior-compatible;
+- [x] AC2: No project-level `<Nullable>` element is introduced into `UtilitiesCS.csproj`.
+- [x] AC3: No behavior change; existing tests still pass.
+- [x] AC4: No coverage regression on changed lines.
+- [x] AC5: Public signatures of the remediated reusable types remain behavior-compatible;
   nullability annotations reflect actual null behavior so they are safe contracts for downstream
   epic consumers.
-- [ ] AC6: Non-opted-in files elsewhere in the repository are not cross-blocked by this change.
+- [x] AC6: Non-opted-in files elsewhere in the repository are not cross-blocked by this change.
 
 ## Constraints & Risks
 

@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,7 +20,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         public LockingLinkedList(IEnumerable<T> collection)
             : base(collection) { }
 
-        public new LockingLinkedListNode<T> First
+        public new LockingLinkedListNode<T>? First
         {
             get
             {
@@ -28,7 +30,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                 }
             }
         }
-        public new LockingLinkedListNode<T> Last
+        public new LockingLinkedListNode<T>? Last
         {
             get
             {
@@ -92,7 +94,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         {
             lock (this)
             {
-                base.AddBefore(node.innerNode, item);
+                base.AddBefore(node.innerNode!, item);
             }
         }
 
@@ -100,7 +102,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         {
             lock (this)
             {
-                base.AddAfter(node.innerNode, item);
+                base.AddAfter(node.innerNode!, item);
             }
         }
 
@@ -149,7 +151,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
-        public new LockingLinkedListNode<T> Find(T value)
+        public new LockingLinkedListNode<T>? Find(T value)
         {
             lock (this)
             {
@@ -157,7 +159,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
-        public LockingLinkedListNode<T> Find(Predicate<T> predicate)
+        public LockingLinkedListNode<T>? Find(Predicate<T> predicate)
         {
             lock (this)
             {
@@ -172,7 +174,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
-        public new LockingLinkedListNode<T> FindLast(T value)
+        public new LockingLinkedListNode<T>? FindLast(T value)
         {
             lock (this)
             {
@@ -198,8 +200,8 @@ namespace UtilitiesCS.ReusableTypeClasses
                 {
                     throw new InvalidOperationException("Target destination is not in this list.");
                 }
-                base.Remove(itemToMove.innerNode);
-                base.AddAfter(target.innerNode, itemToMove.Value);
+                base.Remove(itemToMove.innerNode!);
+                base.AddAfter(target.innerNode!, itemToMove.Value);
             }
         }
 
@@ -221,8 +223,8 @@ namespace UtilitiesCS.ReusableTypeClasses
                 {
                     throw new InvalidOperationException("Target destination is not in this list.");
                 }
-                base.Remove(itemToMove.innerNode);
-                base.AddBefore(target.innerNode, itemToMove.Value);
+                base.Remove(itemToMove.innerNode!);
+                base.AddBefore(target.innerNode!, itemToMove.Value);
             }
         }
 
@@ -241,8 +243,8 @@ namespace UtilitiesCS.ReusableTypeClasses
                     return;
                 }
 
-                base.Remove(itemToMove.innerNode);
-                base.AddBefore(target.innerNode, itemToMove.Value);
+                base.Remove(itemToMove.innerNode!);
+                base.AddBefore(target.innerNode!, itemToMove.Value);
             }
         }
 
@@ -261,8 +263,8 @@ namespace UtilitiesCS.ReusableTypeClasses
                     return;
                 }
 
-                base.Remove(itemToMove.innerNode);
-                base.AddAfter(target.innerNode, itemToMove.Value);
+                base.Remove(itemToMove.innerNode!);
+                base.AddAfter(target.innerNode!, itemToMove.Value);
             }
         }
 
@@ -303,7 +305,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         {
             lock (this)
             {
-                base.Remove(node.innerNode);
+                base.Remove(node.innerNode!);
             }
         }
 
@@ -344,11 +346,12 @@ namespace UtilitiesCS.ReusableTypeClasses
             {
                 var node = base.First;
                 base.RemoveFirst();
-                return node.Value;
+                // RemoveFirst throws on an empty list, so node is non-null when reached.
+                return node!.Value;
             }
         }
 
-        public T TryTakeFirst()
+        public T? TryTakeFirst()
         {
             lock (this)
             {
@@ -362,7 +365,7 @@ namespace UtilitiesCS.ReusableTypeClasses
                     {
                         var node = base.First;
                         base.RemoveFirst();
-                        return node.Value;
+                        return node!.Value;
                     }
                     catch (Exception)
                     {
@@ -386,14 +389,14 @@ namespace UtilitiesCS.ReusableTypeClasses
                 var nodes = new T[n];
                 for (int i = 0; i < n; i++)
                 {
-                    nodes[i] = base.First.Value;
+                    nodes[i] = base.First!.Value;
                     base.RemoveFirst();
                 }
                 return nodes;
             }
         }
 
-        public T[] TryTakeFirst(int n)
+        public T[]? TryTakeFirst(int n)
         {
             lock (this)
             {
@@ -412,7 +415,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
                 for (int i = 0; i < n; i++)
                 {
-                    nodes[i] = base.First.Value;
+                    nodes[i] = base.First!.Value;
                     base.RemoveFirst();
                 }
 
@@ -426,7 +429,8 @@ namespace UtilitiesCS.ReusableTypeClasses
             {
                 var node = base.Last;
                 base.RemoveLast();
-                return node.Value;
+                // RemoveLast throws on an empty list, so node is non-null when reached.
+                return node!.Value;
             }
         }
 
@@ -437,14 +441,14 @@ namespace UtilitiesCS.ReusableTypeClasses
                 var nodes = new T[n];
                 for (int i = n - 1; i >= 0; i--)
                 {
-                    nodes[i] = base.Last.Value;
+                    nodes[i] = base.Last!.Value;
                     base.RemoveLast();
                 }
                 return nodes;
             }
         }
 
-        private LockingLinkedListNode<T> ToLocking(LinkedListNode<T> node)
+        private LockingLinkedListNode<T>? ToLocking(LinkedListNode<T>? node)
         {
             if (node is null)
             {

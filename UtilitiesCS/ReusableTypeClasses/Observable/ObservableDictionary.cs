@@ -1,3 +1,5 @@
+#nullable enable
+
 ///* Copyright (c) 2007, Dr. WPF
 // * All rights reserved.
 // *

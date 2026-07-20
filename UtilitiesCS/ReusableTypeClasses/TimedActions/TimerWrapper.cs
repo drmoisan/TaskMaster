@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -118,7 +120,7 @@ namespace UtilitiesCS.HelperClasses
         private readonly IInnerTimer timer;
         private bool disposed = false;
 
-        public event EventHandler<TimeElapsedEventArgs> Elapsed;
+        public event EventHandler<TimeElapsedEventArgs>? Elapsed;
 
         public bool AutoReset
         {

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+
+using System.Collections.Generic;
 using UtilitiesCS.Extensions;
 
 namespace UtilitiesCS.ReusableTypeClasses
@@ -7,15 +9,17 @@ namespace UtilitiesCS.ReusableTypeClasses
     {
         #region internal properties
 
-        internal LockingLinkedList<T> list;
+        // Nullable node-graph links: a value-constructed or invalidated node has no list/inner node,
+        // and next/prev are the null-terminated ends of the list.
+        internal LockingLinkedList<T>? list;
 
-        internal LockingLinkedListNode<T> next;
+        internal LockingLinkedListNode<T>? next;
 
-        internal LockingLinkedListNode<T> prev;
+        internal LockingLinkedListNode<T>? prev;
 
         internal T item;
 
-        internal LinkedListNode<T> innerNode;
+        internal LinkedListNode<T>? innerNode;
 
         #endregion internal properties
 
@@ -23,14 +27,14 @@ namespace UtilitiesCS.ReusableTypeClasses
         /// Gets a reference to the <see cref="LockingObservableLinkedList{T}"/>
         /// that contains the <see cref="LockingObservableLinkedListNode{T}"/>.
         /// </summary>
-        public LockingLinkedList<T> List => list;
+        public LockingLinkedList<T>? List => list;
 
         /// <summary>
         /// Gets a reference to the next node in the <see cref="LockingObservableLinkedListNode{T}"/>,
         /// or null if the current node is the last element
         /// of the <see cref="LockingObservableLinkedListNode{T}"/>.
         /// </summary>
-        public LockingLinkedListNode<T> Next
+        public LockingLinkedListNode<T>? Next
         {
             get
             {
@@ -51,7 +55,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         /// or null if the current node is the first element
         /// of the <see cref="LockingObservableLinkedListNode{T}"/>.
         /// </summary>
-        public LockingLinkedListNode<T> Previous
+        public LockingLinkedListNode<T>? Previous
         {
             get
             {
@@ -86,7 +90,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             item = value;
         }
 
-        internal LockingLinkedListNode(LockingLinkedList<T> list, LinkedListNode<T> node)
+        internal LockingLinkedListNode(LockingLinkedList<T>? list, LinkedListNode<T> node)
         {
             this.list = list;
             item = node.Value;
@@ -95,22 +99,24 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         public void MoveAfter(LockingLinkedListNode<T> node)
         {
-            this.list.MoveAfter(this, node);
+            // Move operations require the node to belong to a list; ! preserves the original
+            // throw-on-detached-node behavior.
+            this.list!.MoveAfter(this, node);
         }
 
         public void MoveBefore(LockingLinkedListNode<T> node)
         {
-            this.list.MoveBefore(this, node);
+            this.list!.MoveBefore(this, node);
         }
 
         public void MoveUp()
         {
-            this.list.MoveUp(this);
+            this.list!.MoveUp(this);
         }
 
         public void MoveDown()
         {
-            this.list.MoveDown(this);
+            this.list!.MoveDown(this);
         }
 
         internal void Invalidate()

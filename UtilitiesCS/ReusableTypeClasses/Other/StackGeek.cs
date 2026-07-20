@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,9 +18,9 @@ namespace UtilitiesCS
         /* A Doubly Linked List Node */
         public class DLLNode
         {
-            public DLLNode prev;
+            public DLLNode? prev;
             public int data;
-            public DLLNode next;
+            public DLLNode? next;
 
             public DLLNode(int d)
             {
@@ -36,8 +38,8 @@ namespace UtilitiesCS
         nodes */
         public class myStack
         {
-            public DLLNode head;
-            public DLLNode mid;
+            public DLLNode? head;
+            public DLLNode? mid;
             public int count;
         }
 
@@ -74,11 +76,11 @@ namespace UtilitiesCS
             }
             else
             {
-                ms.head.prev = new_DLLNode;
+                ms.head!.prev = new_DLLNode;
 
                 // Update mid if ms->count is odd
                 if ((ms.count % 2) != 0)
-                    ms.mid = ms.mid.prev;
+                    ms.mid = ms.mid!.prev;
             }
 
             /* move head to point to the new DLLNode */
@@ -95,7 +97,8 @@ namespace UtilitiesCS
                 return -1;
             }
 
-            DLLNode head = ms.head;
+            // count > 0 (checked above) guarantees head is non-null in this sample algorithm.
+            DLLNode head = ms.head!;
             int item = head.data;
             ms.head = head.next;
 
@@ -111,7 +114,7 @@ namespace UtilitiesCS
             // in the stack, i,e move down
             // the mid pointer.
             if (ms.count % 2 == 0)
-                ms.mid = ms.mid.next;
+                ms.mid = ms.mid!.next;
 
             return item;
         }
@@ -124,7 +127,7 @@ namespace UtilitiesCS
                 Console.WriteLine("Stack is empty now");
                 return -1;
             }
-            return ms.mid.data;
+            return ms.mid!.data;
         }
 
         void deleteMiddle(myStack ms)
@@ -145,23 +148,24 @@ namespace UtilitiesCS
 
             ms.count -= 1;
 
-            if (ms.mid.next != null)
+            // count > 1 here guarantees mid is non-null in this sample algorithm.
+            if (ms.mid!.next != null)
             {
-                ms.mid.next.prev = ms.mid.prev;
+                ms.mid.next.prev = ms.mid!.prev;
             }
 
-            if (ms.mid.prev != null)
+            if (ms.mid!.prev != null)
             {
-                ms.mid.prev.next = ms.mid.next;
+                ms.mid.prev.next = ms.mid!.next;
             }
 
             if (ms.count % 2 != 0)
             {
-                ms.mid = ms.mid.next;
+                ms.mid = ms.mid!.next;
             }
             else
             {
-                ms.mid = ms.mid.prev;
+                ms.mid = ms.mid!.prev;
             }
         }
 

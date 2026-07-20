@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -46,7 +48,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection
         public bool Exists(Predicate<T> match) => IListExtensions.Exists(this, match);
 
         /// <summary>Returns the first element matching <paramref name="match"/> or <c>default</c>.</summary>
-        public T Find(Predicate<T> match) => IListExtensions.Find(this, match);
+        public T? Find(Predicate<T> match) => IListExtensions.Find(this, match);
 
         /// <summary>Returns the index of the first element matching <paramref name="match"/> or <c>-1</c>.</summary>
         public int FindIndex(Predicate<T> match) => IListExtensions.FindIndex(this, match);
@@ -81,7 +83,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection
         }
 
         /// <summary>Replaces the current contents with <paramref name="value"/> (null clears).</summary>
-        public void FromList(IList<T> value)
+        public void FromList(IList<T>? value)
         {
             Clear();
             if (value is null)
@@ -150,7 +152,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection
 
         private sealed class Unsubscriber : IDisposable
         {
-            private Action _dispose;
+            private Action? _dispose;
 
             public Unsubscriber(Action dispose)
             {

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+
+using System.Collections.Generic;
 using UtilitiesCS.ReusableTypeClasses;
 
 namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
@@ -7,15 +9,17 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
     {
         #region internal properties
 
-        internal LockingObservableLinkedList<T> list;
+        // Nullable node-graph links: a value-constructed or invalidated node has no list/inner node,
+        // and next/prev are the null-terminated ends of the list.
+        internal LockingObservableLinkedList<T>? list;
 
-        internal LockingObservableLinkedListNode<T> next;
+        internal LockingObservableLinkedListNode<T>? next;
 
-        internal LockingObservableLinkedListNode<T> prev;
+        internal LockingObservableLinkedListNode<T>? prev;
 
         internal T item;
 
-        internal LockingLinkedListNode<T> innerNode;
+        internal LockingLinkedListNode<T>? innerNode;
 
         #endregion internal properties
 
@@ -23,14 +27,14 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
         /// Gets a reference to the <see cref="LockingObservableLinkedList{T}"/>
         /// that contains the <see cref="LockingObservableLinkedListNode{T}"/>.
         /// </summary>
-        public LockingObservableLinkedList<T> List => list;
+        public LockingObservableLinkedList<T>? List => list;
 
         /// <summary>
         /// Gets a reference to the next node in the <see cref="LockingObservableLinkedListNode{T}"/>,
         /// or null if the current node is the last element
         /// of the <see cref="LockingObservableLinkedListNode{T}"/>.
         /// </summary>
-        public LockingObservableLinkedListNode<T> Next
+        public LockingObservableLinkedListNode<T>? Next
         {
             get
             {
@@ -51,7 +55,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
         /// or null if the current node is the first element
         /// of the <see cref="LockingObservableLinkedListNode{T}"/>.
         /// </summary>
-        public LockingObservableLinkedListNode<T> Previous
+        public LockingObservableLinkedListNode<T>? Previous
         {
             get
             {
@@ -87,7 +91,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
         }
 
         internal LockingObservableLinkedListNode(
-            LockingObservableLinkedList<T> list,
+            LockingObservableLinkedList<T>? list,
             LockingLinkedListNode<T> node
         )
         {
@@ -98,22 +102,24 @@ namespace UtilitiesCS.ReusableTypeClasses.Locking.Observable.LinkedList
 
         public void MoveBefore(LockingObservableLinkedListNode<T> node)
         {
-            this.list.MoveBefore(this, node);
+            // Move operations require the node to belong to a list; ! preserves the original
+            // throw-on-detached-node behavior.
+            this.list!.MoveBefore(this, node);
         }
 
         public void MoveAfter(LockingObservableLinkedListNode<T> node)
         {
-            this.list.MoveAfter(this, node);
+            this.list!.MoveAfter(this, node);
         }
 
         public void MoveUp()
         {
-            this.list.MoveUp(this);
+            this.list!.MoveUp(this);
         }
 
         public void MoveDown()
         {
-            this.list.MoveDown(this);
+            this.list!.MoveDown(this);
         }
 
         internal void Invalidate()

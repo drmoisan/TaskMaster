@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -170,7 +172,10 @@ namespace UtilitiesCS.ReusableTypeClasses
                 File.ReadAllText(disk.FilePath),
                 settings
             );
-            collection.JsonSettings = settings;
+            // why: preserve prior behavior — a null deserialization result throws NRE here, which the
+            // caller's catch converts into the CreateEmpty recovery path; the ! keeps the non-null
+            // ScBag<T> return contract the caller relies on (AC5, no signature change).
+            collection!.JsonSettings = settings;
             return collection;
         }
 
@@ -221,13 +226,17 @@ namespace UtilitiesCS.ReusableTypeClasses
         public void ActivateLocalDisk()
         {
             _disk = _localDisk;
-            _jsonSettings = _localJsonSettings;
+            // why: activation presumes LocalJsonSettings was configured by the caller; the ! preserves
+            // the prior behavior of copying it verbatim into the active settings.
+            _jsonSettings = _localJsonSettings!;
         }
 
         public void ActivateNetDisk()
         {
             _disk = _netDisk;
-            _jsonSettings = _netJsonSettings;
+            // why: activation presumes NetJsonSettings was configured by the caller; the ! preserves
+            // the prior behavior of copying it verbatim into the active settings.
+            _jsonSettings = _netJsonSettings!;
         }
 
         public void Serialize()
@@ -255,20 +264,20 @@ namespace UtilitiesCS.ReusableTypeClasses
         private JsonSerializerSettings _jsonSettings = GetDefaultSettings();
 
         [JsonIgnore]
-        public JsonSerializerSettings NetJsonSettings
+        public JsonSerializerSettings? NetJsonSettings
         {
             get => _netJsonSettings;
             set => _netJsonSettings = value;
         }
-        private JsonSerializerSettings _netJsonSettings;
+        private JsonSerializerSettings? _netJsonSettings;
 
         [JsonIgnore]
-        public JsonSerializerSettings LocalJsonSettings
+        public JsonSerializerSettings? LocalJsonSettings
         {
             get => _localJsonSettings;
             set => _localJsonSettings = value;
         }
-        private JsonSerializerSettings _localJsonSettings;
+        private JsonSerializerSettings? _localJsonSettings;
 
         public static JsonSerializerSettings GetDefaultSettings()
         {
@@ -307,7 +316,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         }
 
         private ThreadSafeSingleShotGuard _serializationRequested = new();
-        private TimerWrapper _timer;
+        private TimerWrapper? _timer;
 
         protected void RequestSerialization(string filePath)
         {

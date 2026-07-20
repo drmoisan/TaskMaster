@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.IO;
 using System.Text;
@@ -20,7 +22,9 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection
     public partial class ConcurrentObservableCollection<T>
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
-            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+            // GetCurrentMethod() is non-null for a running static initializer, and its DeclaringType
+            // is this generic type; both ! reflect the guaranteed non-null log4net logger identity.
+            System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType!
         );
 
         internal static IConcurrentObservableCollectionFileSystem FileSystem { get; set; } =
@@ -74,13 +78,13 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection
         /// <summary>Delegate used to load a backup list when primary deserialization fails.</summary>
         public delegate System.Collections.Generic.IList<T> AltListLoader(string filePath);
 
-        private string _backupFilepath;
+        private string? _backupFilepath;
 
         #endregion File Constructors
 
         #region Deserialize helpers
 
-        private ConcurrentObservableCollection<T> DeserializeJson(FilePathHelper disk)
+        private ConcurrentObservableCollection<T>? DeserializeJson(FilePathHelper disk)
         {
             var settings = new JsonSerializerSettings();
             settings.TypeNameHandling = TypeNameHandling.Auto;
@@ -91,7 +95,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection
             );
         }
 
-        private ConcurrentObservableCollection<T> DeserializeJson(byte[] file)
+        private ConcurrentObservableCollection<T>? DeserializeJson(byte[] file)
         {
             var settings = new JsonSerializerSettings();
             settings.TypeNameHandling = TypeNameHandling.Auto;
@@ -230,7 +234,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection
         }
 
         private UtilitiesCS.Threading.ThreadSafeSingleShotGuard _serializationRequested = new();
-        private TimerWrapper _timer;
+        private TimerWrapper? _timer;
 
         private void RequestSerialization(string filePath)
         {
@@ -267,7 +271,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection
 
         internal void Deserialize(FilePathHelper disk, bool askUserOnError)
         {
-            ConcurrentObservableCollection<T> collection = null;
+            ConcurrentObservableCollection<T>? collection = null;
             bool writeCollection = false;
             DialogResult response = DialogResult.Ignore;
 
@@ -328,7 +332,7 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Collection
             bool askUserOnError
         )
         {
-            ConcurrentObservableCollection<T> collection = null;
+            ConcurrentObservableCollection<T>? collection = null;
             bool writeCollection = false;
             DialogResult response = DialogResult.Ignore;
 

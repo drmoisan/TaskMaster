@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -38,7 +39,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             Config = new NewSmartSerializableConfig();
         }
 
-        protected T _parent;
+        protected T? _parent;
         private Func<string, string> _readAllText = File.ReadAllText;
         protected Func<string, string> ReadAllText
         {
@@ -82,11 +83,11 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         #endregion SerializationConfig
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         #region INotifyPropertyChanged
 
-        private void Config_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void Config_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             //var properties = string.Join(",",e.PropertyName.Split(',').Select(name => $"{typeof(T).Name}.{name}"));
             //var properties = $"{typeof(T).Name},{e.PropertyName}";
@@ -101,7 +102,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         #endregion INotifyPropertyChanged
 
@@ -127,7 +128,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             DialogResult response,
             FilePathHelper disk,
             JsonSerializerSettings settings,
-            Func<T> altLoader
+            Func<T>? altLoader
         )
         {
             if (response == DialogResult.Yes)
@@ -196,7 +197,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             return Deserialize(disk, askUserOnError, settings);
         }
 
-        public T TryDeserialize<U>(SmartSerializable<U> loader)
+        public T? TryDeserialize<U>(SmartSerializable<U> loader)
             where U : class, ISmartSerializable<U>, new()
         {
             try
@@ -217,12 +218,13 @@ namespace UtilitiesCS.ReusableTypeClasses
             {
                 var disk = loader.ThrowIfNull().Config.ThrowIfNull().Disk.ThrowIfNull();
                 var settings = loader.Config.JsonSettings.ThrowIfNull();
-                T instance = DeserializeJson(loader.Config.Disk, loader.Config.JsonSettings);
+                T? instance = DeserializeJson(loader.Config.Disk, loader.Config.JsonSettings);
                 if (instance is not null)
                 {
                     instance.Config.CopyFrom(loader.Config, true);
                 }
-                return instance;
+                // Interface contract is non-null; conform while preserving runtime behavior.
+                return instance!;
             }
             catch (ArgumentNullException e)
             {
@@ -231,14 +233,14 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
-        public T Deserialize<U>(ISmartSerializable<U> loader)
+        public T? Deserialize<U>(ISmartSerializable<U> loader)
             where U : class, ISmartSerializable<U>, new()
         {
             try
             {
                 var disk = loader.ThrowIfNull().Config.ThrowIfNull().Disk.ThrowIfNull();
                 var settings = loader.Config.JsonSettings.ThrowIfNull();
-                T instance = DeserializeJson(loader.Config.Disk, loader.Config.JsonSettings);
+                T? instance = DeserializeJson(loader.Config.Disk, loader.Config.JsonSettings);
                 if (instance is not null)
                 {
                     instance.Config.CopyFrom(loader.Config, true);
@@ -252,14 +254,18 @@ namespace UtilitiesCS.ReusableTypeClasses
             }
         }
 
-        public T Deserialize<U>(SmartSerializable<U> loader, bool askUserOnError, Func<T> altLoader)
+        public T Deserialize<U>(
+            SmartSerializable<U> loader,
+            bool askUserOnError,
+            Func<T>? altLoader
+        )
             where U : class, ISmartSerializable<U>, new()
         {
             //Func<T> altLoader = null;
             var disk = loader.ThrowIfNull().Config.ThrowIfNull().Disk.ThrowIfNull();
             var settings = loader.Config.JsonSettings.ThrowIfNull();
             bool writeInstance = false;
-            T instance = default;
+            T? instance = default;
 
             try
             {
@@ -291,14 +297,16 @@ namespace UtilitiesCS.ReusableTypeClasses
                 instance = CreateEmpty(response, disk, settings, altLoader);
                 writeInstance = true;
             }
-            instance.Config.CopyFrom(loader.Config, true);
+            // Non-null by construction: the try assigns a non-null instance or throws, and both
+            // catch paths assign a non-null CreateEmpty result, so instance is set before use.
+            instance!.Config.CopyFrom(loader.Config, true);
 
             if (writeInstance)
             {
-                instance.Serialize();
+                instance!.Serialize();
             }
 
-            return instance;
+            return instance!;
         }
 
         protected T Deserialize(
@@ -308,7 +316,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         )
         {
             bool writeInstance = false;
-            T instance;
+            T? instance = default;
             DialogResult response;
 
             try
@@ -342,19 +350,23 @@ namespace UtilitiesCS.ReusableTypeClasses
                 writeInstance = true;
             }
 
-            instance.Config.Disk.FilePath = disk.FilePath;
+            // Non-null by construction: the try assigns a non-null instance or throws, and both
+            // catch paths assign a non-null CreateEmpty result, so instance is set before use.
+            instance!.Config.Disk.FilePath = disk.FilePath;
 
             if (writeInstance)
             {
-                instance.Serialize();
+                instance!.Serialize();
             }
-            return instance;
+            return instance!;
         }
 
         public async Task<T> DeserializeAsync<U>(SmartSerializable<U> config)
             where U : class, ISmartSerializable<U>, new()
         {
-            return await Task.Run(() => Deserialize(config));
+            // Deserialize can yield null, but the ISmartSerializable<T> contract is non-null; the !
+            // conforms to the interface signature without changing runtime behavior.
+            return (await Task.Run(() => Deserialize(config)))!;
         }
 
         public async Task<T> DeserializeAsync<U>(SmartSerializable<U> config, bool askUserOnError)
@@ -373,9 +385,9 @@ namespace UtilitiesCS.ReusableTypeClasses
             return await Task.Run(() => Deserialize(config, askUserOnError, altLoader));
         }
 
-        protected T DeserializeJson(FilePathHelper disk, JsonSerializerSettings settings)
+        protected T? DeserializeJson(FilePathHelper disk, JsonSerializerSettings settings)
         {
-            T instance = null;
+            T? instance = null;
             if (!DiskExists(disk))
             {
                 return instance;
@@ -397,7 +409,7 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         public T DeserializeObject(string json, JsonSerializerSettings settings)
         {
-            T instance = null;
+            T? instance = null;
             try
             {
                 instance = JsonConvert.DeserializeObject<T>(json, settings);
@@ -410,10 +422,14 @@ namespace UtilitiesCS.ReusableTypeClasses
             {
                 instance.Config.JsonSettings = settings.DeepCopy();
             }
-            return instance;
+            // why: ISmartSerializable<T>.DeserializeObject (null-oblivious, out of this child's
+            // scope) declares a T return; matching that oblivious contract preserves the existing
+            // public signature (AC5). The value can be null on deserialization failure, which the
+            // oblivious interface already permits callers to handle.
+            return instance!;
         }
 
-        protected T DeserializeJson(FilePathHelper disk)
+        protected T? DeserializeJson(FilePathHelper disk)
         {
             var settings = GetDefaultSettings();
             return DeserializeJson(disk, settings);
@@ -510,7 +526,8 @@ namespace UtilitiesCS.ReusableTypeClasses
 
             if (Config.JsonSettings.TypeNameHandling == TypeNameHandling.Auto)
             {
-                serializer.Serialize(sw, _parent, _parent.GetType());
+                // Serialization requires a linked parent; public entry points guard via ThrowIfNull.
+                serializer.Serialize(sw, _parent, _parent!.GetType());
             }
             else
             {
@@ -519,7 +536,7 @@ namespace UtilitiesCS.ReusableTypeClasses
         }
 
         private ThreadSafeSingleShotGuard _serializationRequested = new();
-        private ITimerWrapper _timer;
+        private ITimerWrapper? _timer;
 
         /// <summary>
         /// Factory used to create the deferred-serialization timer. Defaults to a real
@@ -562,13 +579,13 @@ namespace UtilitiesCS.ReusableTypeClasses
                 JsonSerializerSettings settings
             ) => GetInstance().Deserialize(fileName, folderPath, askUserOnError, settings);
 
-            public static T Deserialize<U>(SmartSerializable<U> config)
+            public static T? Deserialize<U>(SmartSerializable<U> config)
                 where U : class, ISmartSerializable<U>, new() => GetInstance().Deserialize(config);
 
-            public static T DeseriealizeObject(string json, JsonSerializerSettings settings) =>
+            public static T? DeseriealizeObject(string json, JsonSerializerSettings settings) =>
                 GetInstance().DeserializeObject(json, settings);
 
-            public static async Task<T> DeserializeAsync<U>(SmartSerializable<U> config)
+            public static async Task<T?> DeserializeAsync<U>(SmartSerializable<U> config)
                 where U : class, ISmartSerializable<U>, new() =>
                 await GetInstance().DeserializeAsync(config);
 

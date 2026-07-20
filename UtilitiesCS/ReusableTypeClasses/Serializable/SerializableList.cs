@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -95,14 +97,17 @@ namespace UtilitiesCS
         internal static ISerializableListFileSystem FileSystem { get; set; } =
             new SerializableListFileSystem();
         internal static ISerializableListPrompt Prompt { get; set; } = new SerializableListPrompt();
-        private IList<T> _innerList;
-        private IEnumerable<T> _lazyLoader;
+
+        // lazily materialized by ensureList()/Deserialize(); null! satisfies the non-null contract
+        private IList<T> _innerList = null!;
+        private IEnumerable<T>? _lazyLoader;
         private string _backupFilepath = "";
 
         internal void ensureList()
         {
             if (_innerList == null)
-                _innerList = new List<T>(_lazyLoader);
+                // reached only when constructed via the IEnumerable ctor, which sets _lazyLoader
+                _innerList = new List<T>(_lazyLoader!);
         }
 
         #region IList<T> Members
@@ -216,7 +221,7 @@ namespace UtilitiesCS
         private string _filename = "";
         private string _folderpath = "";
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
@@ -396,9 +401,11 @@ namespace UtilitiesCS
 
             try
             {
+                // why: Newtonsoft can return null; the ! preserves the prior behavior (a null result
+                // flows through and the finally/backup path recovers), keeping IList<T> non-null.
                 _innerList = JsonConvert.DeserializeObject<List<T>>(
                     fileSystem.ReadAllText(filepath)
-                );
+                )!;
             }
             catch (FileNotFoundException e)
             {
@@ -497,10 +504,12 @@ namespace UtilitiesCS
                 var settings = new JsonSerializerSettings();
                 settings.TypeNameHandling = TypeNameHandling.Auto;
                 settings.Formatting = Formatting.Indented;
+                // why: Newtonsoft can return null; the ! keeps IList<T> non-null while the explicit
+                // runtime null check below still throws FileFormatException on a null result.
                 _innerList = JsonConvert.DeserializeObject<List<T>>(
                     fileSystem.ReadAllText(filepath),
                     settings
-                );
+                )!;
                 if (_innerList is null)
                 {
                     throw new FileFormatException("File could not be deserialized correctly");

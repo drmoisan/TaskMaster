@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +23,7 @@ namespace UtilitiesCS.HelperClasses
 
         internal TimedAsyncTask(
             TimeSpan frequency,
-            Func<Task> action,
+            Func<Task>? action,
             Func<TimeSpan, ITimerWrapper> createTimer
         )
         {
@@ -35,12 +37,13 @@ namespace UtilitiesCS.HelperClasses
             Interlocked.CompareExchange(ref _action, action, null);
         }
 
-        private Func<Task> _action;
+        // Nullable: constructed null (parameterless ctor) until SetAction/RequestTask assigns it.
+        private Func<Task>? _action;
         private readonly Func<TimeSpan, ITimerWrapper> _createTimer = CreateTimer;
 
         private TimeSpan _frequency;
         private ThreadSafeSingleShotGuard _taskRequested = new();
-        private ITimerWrapper _timer = null;
+        private ITimerWrapper? _timer = null;
 
         public void ResetTimer()
         {

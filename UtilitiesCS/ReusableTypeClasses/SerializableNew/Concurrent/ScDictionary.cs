@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,6 +20,7 @@ namespace UtilitiesCS.ReusableTypeClasses
     public class ScDictionary<TKey, TValue>
         : ConcurrentDictionary<TKey, TValue>,
             ISmartSerializable<ScDictionary<TKey, TValue>>
+        where TKey : notnull
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
@@ -173,11 +176,12 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         #endregion ISmartSerializable
 
-        public string Name { get; set; }
+        // set by deserialization
+        public string Name { get; set; } = null!;
 
         #region INotifyPropertyChanged
 
-        private void Config_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void Config_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             PropertyChanged?.Invoke(this, e);
         }
@@ -189,7 +193,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         #endregion INotifyPropertyChanged
 

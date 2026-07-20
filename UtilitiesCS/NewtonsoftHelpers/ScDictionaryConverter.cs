@@ -14,6 +14,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
 {
     public class ScDictionaryConverter<TDerived, TKey, TValue> : JsonConverter<TDerived>
         where TDerived : ScDictionary<TKey, TValue>
+        where TKey : notnull
     {
         public ScDictionaryConverter() { }
 

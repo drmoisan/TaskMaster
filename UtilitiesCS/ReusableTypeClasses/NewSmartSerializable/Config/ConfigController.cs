@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -76,10 +77,16 @@ namespace UtilitiesCS.ReusableTypeClasses.NewSmartSerializable.Config
         #region Properties
         internal ISmartSerializableConfig ConfigCopy { get; set; }
         internal ISmartSerializableConfig Config { get; set; }
-        internal ConfigViewer Viewer { get; set; }
+
+        // set by Init() before the viewer is shown or any event fires
+        internal ConfigViewer Viewer { get; set; } = null!;
         internal IApplicationGlobals Globals { get; set; }
-        internal FilePathHelperConverter FilePathConverter { get; set; }
-        internal List<string> SpecialFolderList { get; set; }
+
+        // set by Init() before use
+        internal FilePathHelperConverter FilePathConverter { get; set; } = null!;
+
+        // set by Init() before use
+        internal List<string> SpecialFolderList { get; set; } = null!;
         #endregion Properties
 
         #region Events
