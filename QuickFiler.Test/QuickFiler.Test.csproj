@@ -212,8 +212,8 @@
     <Reference Include="Microsoft.Extensions.Primitives, Version=10.0.0.10, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.Primitives.10.0.10\lib\net462\Microsoft.Extensions.Primitives.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Extensions.TimeProvider.Testing, Version=9.10.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.TimeProvider.Testing.9.10.0\lib\net462\Microsoft.Extensions.TimeProvider.Testing.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.TimeProvider.Testing, Version=10.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.TimeProvider.Testing.10.8.0\lib\net462\Microsoft.Extensions.TimeProvider.Testing.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Identity.Client, Version=4.86.1.0, Culture=neutral, PublicKeyToken=0a613f4dd989e8ae, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Identity.Client.4.86.1\lib\net472\Microsoft.Identity.Client.dll</HintPath>
@@ -287,11 +287,11 @@
     <Reference Include="OpenTelemetry.Extensions.Hosting, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTelemetry.Extensions.Hosting.1.17.0\lib\net462\OpenTelemetry.Extensions.Hosting.dll</HintPath>
     </Reference>
-    <Reference Include="OpenTelemetry.PersistentStorage.Abstractions, Version=1.1.0.1067, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTelemetry.PersistentStorage.Abstractions.1.1.0\lib\net462\OpenTelemetry.PersistentStorage.Abstractions.dll</HintPath>
+    <Reference Include="OpenTelemetry.PersistentStorage.Abstractions, Version=1.1.1.1228, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenTelemetry.PersistentStorage.Abstractions.1.1.1\lib\net462\OpenTelemetry.PersistentStorage.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="OpenTelemetry.PersistentStorage.FileSystem, Version=1.1.0.1067, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTelemetry.PersistentStorage.FileSystem.1.1.0\lib\net462\OpenTelemetry.PersistentStorage.FileSystem.dll</HintPath>
+    <Reference Include="OpenTelemetry.PersistentStorage.FileSystem, Version=1.1.1.1228, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenTelemetry.PersistentStorage.FileSystem.1.1.1\lib\net462\OpenTelemetry.PersistentStorage.FileSystem.dll</HintPath>
     </Reference>
     <Reference Include="stdole, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System" />
