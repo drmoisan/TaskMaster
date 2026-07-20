@@ -172,3 +172,51 @@ plan tasks [P6-T3] (apply to both #367 files + `ConcurrentObservableDictionary`)
 [P9-T10] (both one-line additive constraints expected in the AC5 diff review). It is also recorded in
 the child checkpoint `epic_decisions` and `human_interaction` blocks, and is documented in the
 constraint-propagation commit message and the PR #380 body per the epic documentation requirement.
+
+## Epic-layer resolution — OPTION A-PRIME EXTENDED TO A THIRD FILE (2026-07-20T00:20 escalation, authorized)
+
+Timestamp: 2026-07-20T01-10
+
+During [P8-T2] the ratified `where TKey : notnull` was applied to the fourth ratified base
+`ScDictionary<TKey, TValue>` (`UtilitiesCS/ReusableTypeClasses/SerializableNew/Concurrent/ScDictionary.cs`).
+The isolated pragma-gate rebuild then surfaced CS8714 at
+`UtilitiesCS/NewtonsoftHelpers/WrapperScDictionary.cs(18,38)` — a THIRD #367-owned NewtonsoftHelpers
+consumer distinct from the two files already covered by the two-file waiver above.
+`WrapperScDictionary<TDerived, TKey, TValue>` declares `where TDerived : ScDictionary<TKey, TValue>`
+with an unconstrained `TKey` under `#nullable enable`, so it independently fails the `notnull`
+constraint once `ScDictionary` is constrained. The child orchestrator HALTED per the two-file
+waiver's third-consumer re-escalation clause and did NOT widen the waiver unilaterally.
+
+The epic layer (which owns cross-child boundaries) AUTHORIZED extending the waiver to this THIRD
+#367-owned file — Option A-prime (A'):
+
+3. `UtilitiesCS/NewtonsoftHelpers/WrapperScDictionary.cs` — add `where TKey : notnull` to
+   `public class WrapperScDictionary<TDerived, TKey, TValue>` (declaration at line 18). Clears the
+   CS8714 at line 18,38.
+
+THREE-FILE WAIVER TOTAL (one `where TKey : notnull` line each, nothing else):
+1. `UtilitiesCS/NewtonsoftHelpers/WrapperScoDictionary.cs`  [applied in Batch 6]
+2. `UtilitiesCS/NewtonsoftHelpers/ScoDictionaryConverter.cs` [applied in Batch 6]
+3. `UtilitiesCS/NewtonsoftHelpers/WrapperScDictionary.cs`   [applied under A' in Batch 8 constraint completion]
+
+No other #367-owned (or any other cross-child) file may be modified under this waiver. If a FOURTH
+cross-child consumer surfaces, STOP and re-escalate to the epic layer; do NOT widen the waiver
+unilaterally.
+
+### Factual correction — ScoDictionaryStatic is non-generic (plan-wording deviation)
+
+`ScoDictionaryStatic` is a NON-GENERIC `static class` of `Type` extension methods with no `TKey`
+type parameter. The [P6-T2] ratification's "four generic bases" wording is mechanically inaccurate
+for this file: the `where TKey : notnull` constraint is INAPPLICABLE there (nothing to constrain;
+0/0 diagnostics regardless). NET EFFECT: the ratified constraint applies to the THREE truly generic
+bases — `ConcurrentObservableDictionary`, `ScoDictionaryNew`, and `ScDictionary` — plus their three
+wrapper/converter consumers listed above. `ScBag` (`ConcurrentBag<T>`-based) and
+`ConcurrentObservableBag` are correctly left unconstrained. This plan-wording deviation is documented
+here and in the PR #380 body rather than failing final QC on the literal "four bases" plan text; the
+[P9-T9] verification confirms the constraint on the three truly generic bases and on the three
+NewtonsoftHelpers waiver consumers.
+
+This resolution supersedes the two-file waiver above only by adding the third file; the two-file
+enactment remains in force. It is enacted in the revised plan tasks [P8-T2], [P9-T9], and [P9-T10],
+recorded in the child checkpoint `epic_decisions` and `human_interaction` blocks, and documented in
+the constraint-propagation commit message and the PR #380 body.
