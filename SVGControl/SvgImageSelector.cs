@@ -53,8 +53,16 @@ namespace SVGControl
         }
 
         //private SvgDocument _doc;
+        // The `ImagePath` property's `set` accessor body below is entirely commented out (a
+        // pre-existing, already-documented dead no-op judgment call — see
+        // docs/features/active/utilitiescs-nullable-svgcontrol/evidence/other/imagepath-judgment-call-decision.md),
+        // so neither field below is ever assigned on any live path. CS0649 is suppressed here
+        // rather than resurrecting the dead setter logic, which is out of scope (no behavior
+        // change per AC7).
+#pragma warning disable CS0649
         private string? _relativeImagePath;
         private string? _absoluteImagePath;
+#pragma warning restore CS0649
         private bool _saveRendering = false;
         private bool _useDefaultImage = false;
         private SvgRenderer _renderer;

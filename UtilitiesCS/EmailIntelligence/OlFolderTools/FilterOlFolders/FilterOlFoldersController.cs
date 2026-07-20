@@ -69,7 +69,7 @@ namespace UtilitiesCS
 
             var selected = _folderTreeView!
                 .Roots.SelectMany(x => x.FlattenIf(info => info.Selected))
-                .Select(info => info.RelativePath);
+                .Select(info => info.RelativePath!);
 
             // remove any keys that are no longer selected
             _globals
@@ -238,7 +238,7 @@ namespace UtilitiesCS
             var storeId = _globals.Ol.ArchiveRoot?.StoreID;
             return string.IsNullOrWhiteSpace(storeId)
                 ? FolderTreeRequest.AllStores(allowStaleSnapshot: true)
-                : FolderTreeRequest.ForStore(storeId, allowStaleSnapshot: true);
+                : FolderTreeRequest.ForStore(storeId!, allowStaleSnapshot: true);
         }
 
         private FolderTreeCompatibilityView CreateCompatibilityView(FolderTreeSnapshot snapshot)

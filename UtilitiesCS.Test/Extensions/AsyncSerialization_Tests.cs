@@ -158,12 +158,16 @@ namespace UtilitiesCS.Test.Extensions
             cancellationSource.Cancel();
 
             // Act
+            // null! deliberately passed: CopyToAsync's `progress` parameter is defensively
+            // null-checked in its own body (`if (null != progress)`), so passing null is a
+            // supported, pre-existing runtime path; the null-forgiving operator documents the
+            // intentional null without changing behavior (no behavior change per AC7).
             Func<Task> act = async () =>
                 await source.CopyToAsync(
                     sourceLength: source.Length,
                     destination,
                     bufferSize: 2,
-                    progress: null,
+                    progress: null!,
                     cancellationSource.Token
                 );
 

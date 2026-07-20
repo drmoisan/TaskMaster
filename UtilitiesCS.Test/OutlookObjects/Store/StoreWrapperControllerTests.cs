@@ -168,7 +168,13 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
 
             public Task LoadAsync() => Task.CompletedTask;
 
+            // Required by IOlObjects : INotifyPropertyChanged; this stub never raises it (no
+            // test needs the notification), so CS0067 fires. Deleting it is not possible (the
+            // interface requires it); suppressing narrowly preserves the exact pre-existing
+            // behavior (no behavior change per AC7).
+#pragma warning disable CS0067
             public event PropertyChangedEventHandler PropertyChanged;
+#pragma warning restore CS0067
 
             protected static OutlookFolder CreateFolder(string folderPath)
             {

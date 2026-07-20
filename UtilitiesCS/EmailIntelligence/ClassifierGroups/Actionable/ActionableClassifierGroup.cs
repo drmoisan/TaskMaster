@@ -73,11 +73,19 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 return false;
             }
 
-            var sw = ppkg.StopWatch;
+            var sw = ppkg.StopWatch!;
 
             bool success = false;
             try
             {
+                // The .Where(x => x.Actionable is not null) filter above guarantees a non-null
+                // grouping key at runtime, but LINQ's GroupBy key-selector nullability inference
+                // does not propagate that guarantee into the closed generic type, so `group`'s
+                // key remains annotated `string?` here while BuildClassifierAsync's base-class
+                // signature expects `IGrouping<string, MinedMailInfo>`. Suppressing narrowly
+                // preserves the exact pre-existing runtime behavior (no behavior change per AC7)
+                // rather than widening the shared base-class signature.
+#pragma warning disable CS8620
                 await AsyncMultiTasker.AsyncMultiTaskChunker(
                     groups,
                     async (group) =>
@@ -89,10 +97,11 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                             minimumCountPerToken
                         );
                     },
-                    ppkg.ProgressTrackerPane,
+                    ppkg.ProgressTrackerPane!,
                     "Building Classifiers",
                     ppkg.Cancel
                 );
+#pragma warning restore CS8620
                 sw.LogDuration("Build Classifiers");
                 sw.WriteToLog(clear: false);
                 success = true;

@@ -313,6 +313,12 @@ namespace UtilitiesCS.EmailIntelligence
 
         public async Task ClassifyAsync(Selection selection, CancellationToken token = default)
         {
+            // ForEachAwaitWithCancellationAsync is obsolete (CS0618) per the framework's
+            // migration guidance ("Use the language support for async foreach instead"), but
+            // replacing it with `await foreach` here is a control-flow change to a production
+            // async method, not an annotation-only edit. Suppressing narrowly preserves the
+            // exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
             await selection
                 .Cast<object>()
                 .Where(x => x is MailItem)
@@ -329,6 +335,7 @@ namespace UtilitiesCS.EmailIntelligence
                     },
                     token
                 );
+#pragma warning restore CS0618
         }
 
         public async Task TrainAsync(
@@ -337,6 +344,10 @@ namespace UtilitiesCS.EmailIntelligence
             CancellationToken token = default
         )
         {
+            // ForEachAwaitWithCancellationAsync is obsolete (CS0618); see the rationale in
+            // ClassifyAsync above. Suppressing narrowly preserves the exact pre-existing
+            // behavior (no behavior change per AC7).
+#pragma warning disable CS0618
             await selection
                 .Cast<object>()
                 .Where(x => x is MailItem)
@@ -346,6 +357,7 @@ namespace UtilitiesCS.EmailIntelligence
                     (item, token) => TrainAsync(item, triageId),
                     token
                 );
+#pragma warning restore CS0618
 
             ClassifierGroup.Serialize();
         }
@@ -396,6 +408,10 @@ namespace UtilitiesCS.EmailIntelligence
                 return;
             }
 
+            // SelectAwaitWithCancellation/ForEachAwaitWithCancellationAsync are obsolete
+            // (CS0618); see the rationale in ClassifyAsync above. Suppressing narrowly
+            // preserves the exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
             await selection
                 .Cast<object>()
                 .ToAsyncEnumerable()
@@ -410,6 +426,7 @@ namespace UtilitiesCS.EmailIntelligence
                     }
                 )
                 .ForEachAwaitWithCancellationAsync(TestAsync, token);
+#pragma warning restore CS0618
         }
 
         public async Task TestAsync(MailItemHelper helper, CancellationToken token = default)

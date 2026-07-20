@@ -200,7 +200,15 @@ namespace TaskVisualization
         {
             if (_viewer.InvokeRequired)
             {
+                // Fire-and-forget re-marshal onto the UI thread via the synchronous
+                // Control.Invoke API. This is a pre-existing recursive UI-thread-marshal
+                // pattern; adding `await` here would change the WinForms message-pump
+                // re-entrancy behavior (a real behavior change forbidden by AC7). The
+                // pragma bracket suppresses CS4014 without altering the fire-and-forget
+                // semantics.
+#pragma warning disable CS4014
                 _viewer.Invoke((System.Action)(() => OK_Action()));
+#pragma warning restore CS4014
                 return;
             }
             if (AnyCategorySelected)

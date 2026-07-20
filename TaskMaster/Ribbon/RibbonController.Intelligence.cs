@@ -395,10 +395,17 @@ namespace TaskMaster
             var selection = Globals.Ol.App.ActiveExplorer().Selection;
             if (selection is not null && selection.Count > 0)
             {
+                // ForEachAwaitAsync (System.Linq.Async) is obsolete (CS0618) per the framework's
+                // migration guidance ("Use the language support for async foreach instead"), but
+                // replacing it with `await foreach` here is a control-flow change to a production
+                // async method, not an annotation-only edit. Suppressing narrowly preserves the
+                // exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
                 await selection
                     .Cast<object>()
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(Globals.Events.ProcessMailItemAsync);
+#pragma warning restore CS0618
             }
         }
     }

@@ -278,6 +278,13 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             CancellationToken cancel
         )
         {
+            // SelectAwait is obsolete (CS0618) per the framework's migration guidance ("Use
+            // Select ... overloads of Select"), but the replacement overload requires adding a
+            // CancellationToken parameter to the lambda and changes the async-iteration
+            // signature. Suppressing narrowly here preserves the exact pre-existing behavior
+            // (no behavior change per AC7) rather than migrating a public call site's async
+            // enumeration semantics as part of an annotation-only remediation pass.
+#pragma warning disable CS0618
             var results = Classifiers
                 .ToAsyncEnumerable()
                 .SelectAwait(
@@ -290,6 +297,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 //await classifier.Value.GetMatchProbabilityAsync(tokenIncidence, cancel)))
                 .Where(x => x.Probability >= MinimumProbability)
                 .OrderByDescending(prediction => prediction.Probability);
+#pragma warning restore CS0618
             return results;
         }
 

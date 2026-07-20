@@ -75,7 +75,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 var child in snapshotNode.ChildKeys.Select(CreateNode).Where(node => node != null)
             )
             {
-                treeNode.AddChild(child);
+                treeNode.AddChild(child!);
             }
 
             return treeNode;

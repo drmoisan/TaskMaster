@@ -265,7 +265,15 @@ namespace TaskMaster
 
             public bool IsReady() => _inner.IsReady(_store);
 
-            public bool IsReady(Outlook.Store store) => _inner.IsReady(store);
+            // This file has no project-level <Nullable> element and no whole-file #nullable
+            // pragma; IOutlookReadinessGate.IsReady(Store? store) declares a nullable parameter,
+            // so this implementation's parameter must match to avoid CS8767. Scoping narrowly to
+            // annotations-only avoids introducing new CS86xx diagnostics elsewhere in this file
+            // (no behavior change per AC7 — the body passes the parameter through unchanged).
+#nullable enable annotations
+            public bool IsReady(Outlook.Store? store) => _inner.IsReady(store);
+
+#nullable restore annotations
 
             public bool IsTransientError(COMException e) => _inner.IsTransientError(e);
         }

@@ -124,7 +124,7 @@ namespace UtilitiesCS.EmailIntelligence.Evaluation
                 }
 
                 leaves.Add(trueLeaf!);
-                var predicted = PredictTop(predictor, example!.Tokens);
+                var predicted = PredictTop(predictor, example!.Tokens!);
 
                 if (predicted is null)
                 {

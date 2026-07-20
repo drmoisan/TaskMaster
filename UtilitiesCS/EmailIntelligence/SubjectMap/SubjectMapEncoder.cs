@@ -39,8 +39,8 @@ namespace UtilitiesCS
                     if (_encoder is null)
                     {
                         _encoder = ScoDictionaryNew<string, int>.Static.Deserialize(
-                            _filename,
-                            _folderpath
+                            _filename!,
+                            _folderpath!
                         );
                     }
                     // _decoder = new SCODictionary<int, string>(_encoder.ToDictionary().Select(x => new KeyValuePair<int, string>(x.Value, x.Key)).ToDictionary());
@@ -95,8 +95,8 @@ namespace UtilitiesCS
             {
                 if (_encoder is null)
                     _encoder = ScoDictionaryNew<string, int>.Static.Deserialize(
-                        _filename,
-                        _folderpath
+                        _filename!,
+                        _folderpath!
                     );
                 return _encoder;
             }
@@ -126,7 +126,7 @@ namespace UtilitiesCS
                 .ToDictionary(x => x.input, x => x.index);
 
             _encoder = new ScoDictionaryNew<string, int>(words);
-            _encoder.Config.Disk = new FilePathHelper(_filename, _folderpath);
+            _encoder.Config.Disk = new FilePathHelper(_filename!, _folderpath!);
 
             _encoder.Serialize();
             _decoder = new ScoDictionaryNew<int, string>(

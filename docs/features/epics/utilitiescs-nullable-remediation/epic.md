@@ -191,6 +191,35 @@ Wave assignment uses longest-path layering (`wave = 0` when `depends_on` is empt
 | --- | --- | --- | --- | --- |
 | utilitiescs-nullable-ci-capstone | CI nullable-gate finalization + rules-conflict flag + optional project-level Nullable | all twelve remediation children | ~3 | C2 |
 
+### Capstone scope addendum (2026-07-19)
+
+The `~3 est. files` figure above was set before any of the twelve Wave-0/Wave-1 children had
+merged, when the CI nullable-gate finalization was believed to be a workflow-YAML-only change.
+Once the capstone's child orchestrator branched from the fully-fanned-in integration tip
+(`bfcdb394`) and re-ran the pragma-driven gate for the first time (`ci.yml` never triggers on the
+integration branch, so this measurement had never previously been taken), it found the gate does
+not pass cleanly:
+
+- **SVGControl/SvgImageSelector.cs CS0649** (`_relativeImagePath`, `_absoluteImagePath` never
+  assigned; `ImagePath` setter body is dead/commented out per #368's already-documented
+  judgment call) blocks the `/t:Rebuild` dependency chain outright.
+- **UtilitiesCS nullable fan-in debt**: 296 CS86xx-range diagnostics plus 28 CS0618 and 2 CS0168
+  across 62 already-`#nullable enable`-opted-in files under `UtilitiesCS/EmailIntelligence/**`
+  and `UtilitiesCS/OutlookObjects/Folder/**` — none of the twelve per-cluster-locked children
+  could remediate this under their own scope locks, since it is cross-child annotation
+  propagation, not any single child's own files.
+
+This was decided directly at the child-orchestrator delegation for issue #376 (this capstone's
+own child orchestrator, 2026-07-19 session), not as a pre-existing line item recorded elsewhere
+in this manifest: the capstone's scope is expanded from `~3 est. files` to include this build-debt
+remediation (annotation-only / narrow-pragma-only, no behavior change) as a mandatory prerequisite
+for the CI gate finalization to be genuinely testable at all. The corresponding `spec.md`
+"Scope reconciliation (2026-07-19)" section in
+`docs/features/active/utilitiescs-nullable-ci-capstone/spec.md` records the full rationale and
+measurement detail. The `complexity` column above (`C2`) is retained as-is for this addendum;
+this capstone's own `orchestrator-state.json` checkpoint records the child orchestrator's
+complexity-band assessment for the expanded atomic planning/execution phases.
+
 ## Residual-Scope Decision (2026-07-18)
 
 The `dialogs-misc` child (issue #374) was the designated Wave-1 catch-all, but narrowed its

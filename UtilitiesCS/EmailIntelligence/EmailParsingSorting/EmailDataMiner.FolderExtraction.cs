@@ -50,7 +50,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
         {
             var folders = tree
                 .Roots.SelectMany(root => root.FlattenIf(node => !node.Selected))
-                .Select(x => x.OlFolder);
+                .Select(x => x.OlFolder!);
             return folders;
         }
 
@@ -130,7 +130,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             //screen: _globals.Ol.GetExplorerScreen());
             FolderWrapper[]? folders = null;
 
-            progress.Report(0, "Getting Folders");
+            progress!.Report(0, "Getting Folders");
             var snapshot = await GetOlFolderSnapshotAsync(progress).ConfigureAwait(false);
             folders = QueryOlFolderInfo(snapshot).ToArray();
             var count = folders.Count();
@@ -226,7 +226,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             );
             foreach (var folder in folders)
             {
-                if (!handles.TryGetValue(folder.RelativePath, out var node))
+                if (!handles.TryGetValue(folder.RelativePath!, out var node))
                 {
                     logger.Warn(
                         $"Failed to resolve folder handle for {folder.Name}. Terminating and rebuilding."
@@ -318,7 +318,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
             if (!reload && folders is not null && await TryResolveMapiHandles(folders))
             {
+                // ForEachAwaitAsync is obsolete (CS0618) per the framework's migration
+                // guidance ("Use the language support for async foreach instead"), but
+                // replacing it with `await foreach` here is a control-flow change to a
+                // production async method, not an annotation-only edit. Suppressing narrowly
+                // preserves the exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
                 await folders.ToAsyncEnumerable().ForEachAwaitAsync(x => x.LoadLazyAsync()); //.Select(x => x.LoadLazyAsync());
+#pragma warning restore CS0618
             }
             else
             {
@@ -395,7 +402,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             var mailTuples = folders
                 .Select(folderInfo => (folderInfo.OlFolder, folderInfo))
                 .SelectMany(tup =>
-                    tup.OlFolder.Items.Cast<object>()
+                    tup.OlFolder!.Items.Cast<object>()
                         .Where(obj => obj is MailItem)
                         .Cast<MailItem>()
                         .Select(mail => (mail, tup.folderInfo))

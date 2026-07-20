@@ -68,7 +68,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 null
             );
 
-            ppkg.ProgressTrackerPane.Report(0, "Building Folder Classifier");
+            ppkg.ProgressTrackerPane!.Report(0, "Building Folder Classifier");
             var (train, test) = await SplitAndSave(collection, 0.75, ppkg.SpawnChild(10));
 
             var classifierGroup = await BuildClassifierAsync(dataMiner, ppkg.SpawnChild(20), train);
@@ -117,7 +117,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 null
             );
 
-            ppkg.ProgressTrackerPane.Report(0, "Building Folder Classifier");
+            ppkg.ProgressTrackerPane!.Report(0, "Building Folder Classifier");
             var (train, test) = await SplitAndSave(collection, 0.75, ppkg.SpawnChild(10));
 
             var classifierGroup = await BuildClassifierAsync(dataMiner, ppkg.SpawnChild(20), train);
@@ -165,21 +165,21 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             );
 
             var testScores = await Serialization.DeserializeAsync<TestScores[]>(
-                ppkg.ProgressTrackerPane,
+                ppkg.ProgressTrackerPane!,
                 "TestScores"
             );
 
-            ppkg.ProgressTrackerPane.Report(0, "Getting Confusion Outcomes and Counts");
+            ppkg.ProgressTrackerPane!.Report(0, "Getting Confusion Outcomes and Counts");
             TestOutcome[] confusedOutcomes = testOutcomes
                 .Where(x => x.Actual != x.Predicted)
                 .ToArray();
             GroupedTestOutcome[] confusedCounts = GroupOutcomes(confusedOutcomes);
 
-            ppkg.ProgressTrackerPane.Increment(10, "Extracting Confusion Drivers");
+            ppkg.ProgressTrackerPane!.Increment(10, "Extracting Confusion Drivers");
             ClassificationErrors[] errors = await DiagnosePoorPerformanceAsync(
                 testSource,
                 classifierGroup,
-                ppkg.SpawnChild(100 - (int)ppkg.ProgressTrackerPane.Progress),
+                ppkg.SpawnChild(100 - (int)ppkg.ProgressTrackerPane!.Progress),
                 confusedOutcomes,
                 testScores!
             );
@@ -197,7 +197,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             MinedMailInfo[] train
         )
         {
-            ppkg.ProgressTrackerPane.Increment(
+            ppkg.ProgressTrackerPane!.Increment(
                 0,
                 "Building Folder Classifier -> Create Classifier Group"
             );
@@ -239,7 +239,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             _globals.AF.ProgressPane.Visible = true;
 
             var ppkg2 = ppkg?.SpawnChild(70);
-            ppkg2?.ProgressTrackerPane.Report(0, "Testing Classifiers");
+            ppkg2?.ProgressTrackerPane!.Report(0, "Testing Classifiers");
             TestOutcome[]? testOutcomes = null;
             int completed = 0;
             int count = test.Count();
@@ -259,9 +259,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                             .Select(x => new TestOutcome
                             {
                                 SourceIndex = x.Index,
-                                Actual = x.MinedMail.FolderInfo.RelativePath,
+                                Actual = x.MinedMail.FolderInfo!.RelativePath,
                                 Predicted = classifierGroup
-                                    .Classify(x.MinedMail.Tokens.GroupAndCount())
+                                    .Classify(x.MinedMail.Tokens!.GroupAndCount())
                                     .First()
                                     .Class!,
                             })
@@ -296,7 +296,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                             ref remainingSeconds,
                             ref elapsedSeconds
                         );
-                        ppkg2.ProgressTrackerPane.Report(
+                        ppkg2!.ProgressTrackerPane!.Report(
                             (
                                 (int)(((double)completed / count) * 100),
                                 $"Testing Classifiers -> {msg}"
@@ -314,7 +314,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
                 await Serialization.SerializeAndSaveAsync(
                     testOutcomes,
-                    ppkg!.ProgressTrackerPane.SpawnChild(30),
+                    ppkg!.ProgressTrackerPane!.SpawnChild(30),
                     testOutcomes!.GetType().Name
                 )!;
             }
@@ -327,7 +327,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 timer!.StopTimer();
                 timer!.Dispose();
-                ppkg!.ProgressTrackerPane.Report(100);
+                ppkg!.ProgressTrackerPane!.Report(100);
                 _globals.AF.ProgressPane.Visible = paneState;
             }
 
@@ -344,7 +344,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             _globals.AF.ProgressPane.Visible = true;
 
             var ppkg2 = ppkg?.SpawnChild(70);
-            ppkg2?.ProgressTrackerPane.Report(0, "Testing Classifiers");
+            ppkg2?.ProgressTrackerPane!.Report(0, "Testing Classifiers");
             VerboseTestOutcome[]? verboseTestOutcomes = null;
             var cores = Environment.ProcessorCount;
 
@@ -371,9 +371,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                                     Outcome: new TestOutcome
                                     {
                                         SourceIndex = x.Index,
-                                        Actual = x.MinedMail.FolderInfo.RelativePath,
+                                        Actual = x.MinedMail.FolderInfo!.RelativePath,
                                         Predicted = classifierGroup
-                                            .Classify(x.MinedMail.Tokens.GroupAndCount())
+                                            .Classify(x.MinedMail.Tokens!.GroupAndCount())
                                             .First()
                                             .Class!,
                                     }
@@ -389,7 +389,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                             .Select(x =>
                             {
                                 var classifier = classifierGroup.Classifiers[x.Outcome.Predicted];
-                                var tokens = x.Source.Tokens.GroupAndCount();
+                                var tokens = x.Source.Tokens!.GroupAndCount();
                                 var drivers = classifier.GetProbabilityDrivers(tokens);
                                 var detail = new VerboseTestOutcome()
                                 {
@@ -418,7 +418,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     {
                         var msg = GetProgressMessage(completed, count, sw);
                         //var msg = AdjustProgressTimer(completed, count, sw, ref secondsPerItem, ref remainingSeconds, ref elapsedSeconds);
-                        ppkg2.ProgressTrackerPane.Report(
+                        ppkg2!.ProgressTrackerPane!.Report(
                             (double)completed / count * 100,
                             $"Testing Classifiers -> {msg}"
                         );
@@ -434,7 +434,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
                 await Serialization.SerializeAndSaveAsync(
                     verboseTestOutcomes,
-                    ppkg!.ProgressTrackerPane.SpawnChild(15),
+                    ppkg!.ProgressTrackerPane!.SpawnChild(15),
                     verboseTestOutcomes!.GetType().Name
                 )!;
 
@@ -461,7 +461,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 timer!.StopTimer();
                 timer!.Dispose();
-                ppkg!.ProgressTrackerPane.Report(100);
+                ppkg!.ProgressTrackerPane!.Report(100);
                 _globals.AF.ProgressPane.Visible = paneState;
             }
 
@@ -488,7 +488,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 ref secondsPerItem,
                 ref remainingSeconds
             );
-            ppkg.ProgressTrackerPane.Report(
+            ppkg.ProgressTrackerPane!.Report(
                 ((int)(((double)completed / count) * 100), $"Testing Classifiers -> {msg}")
             );
             elapsedSeconds = sw.Elapsed.TotalSeconds;
@@ -908,7 +908,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                             (outcome) =>
                             {
                                 var source = testSource[outcome.SourceIndex];
-                                var tokens = source.Tokens.GroupAndCount();
+                                var tokens = source.Tokens!.GroupAndCount();
                                 var prediction = outcome.Predicted;
                                 BayesianClassifierShared? classifier = null;
 
@@ -938,7 +938,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                                 var drivers = classifier.GetProbabilityDrivers(tokens);
                                 var detail = new VerboseTestOutcome()
                                 {
-                                    Actual = source.FolderInfo.RelativePath,
+                                    Actual = source.FolderInfo!.RelativePath,
                                     Predicted = prediction,
                                     Probability = drivers.Probability,
                                     Drivers = drivers.Item2,
@@ -955,7 +955,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                                     ref remainingSeconds
                                 );
 
-                                ppkg.ProgressTrackerPane.Report(
+                                ppkg.ProgressTrackerPane!.Report(
                                     (int)(100 * complete / (double)numberConfused),
                                     $"Extracting Confusion Drivers: {msg}"
                                 );
@@ -989,7 +989,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     (outcome) =>
                     {
                         var source = testSource[outcome.SourceIndex];
-                        var tokens = source.Tokens.GroupAndCount();
+                        var tokens = source.Tokens!.GroupAndCount();
                         var prediction = outcome.Predicted;
                         BayesianClassifierShared? classifier = null;
 
@@ -1019,7 +1019,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                         var drivers = classifier.GetProbabilityDrivers(tokens);
                         var detail = new VerboseTestOutcome()
                         {
-                            Actual = source.FolderInfo.RelativePath,
+                            Actual = source.FolderInfo!.RelativePath,
                             Predicted = prediction,
                             Probability = drivers.Probability,
                             Drivers = drivers.Item2,
@@ -1104,7 +1104,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
 
                     Interlocked.Increment(ref complete);
 
-                    ppkg2.ProgressTrackerPane.Report(
+                    ppkg2.ProgressTrackerPane!.Report(
                         (int)(100 * complete / (double)numberConfused),
                         $"Extracting Confusion Drivers: {GetProgressMessage(complete, numberConfused, sw)}"
                     );
@@ -1117,11 +1117,11 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 await Serialization.SerializeAndSaveAsync(
                     classificationErrors,
-                    ppkg!.ProgressTrackerPane.SpawnChild(30),
+                    ppkg!.ProgressTrackerPane!.SpawnChild(30),
                     "ClassificationErrors[]"
                 );
             }
-            ppkg!.ProgressTrackerPane.Report(100);
+            ppkg!.ProgressTrackerPane!.Report(100);
 
             return classificationErrors;
         }
@@ -1351,7 +1351,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             ppkg ??= await new ProgressPackage().InitializeAsync(
                 progressTrackerPane: _globals.AF.ProgressTracker
             );
-            ppkg.ProgressTrackerPane.Report(0, "Reloading Data If Necessary");
+            ppkg.ProgressTrackerPane!.Report(0, "Reloading Data If Necessary");
 
             testOutcomes ??= await Serialization.DeserializeAsync<TestOutcome[]>(
                 ppkg.ProgressTrackerPane,
@@ -1403,7 +1403,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             ppkg ??= await new ProgressPackage().InitializeAsync(
                 progressTrackerPane: _globals.AF.ProgressTracker
             );
-            ppkg.ProgressTrackerPane.Report(0, "Reloading Data If Necessary");
+            ppkg.ProgressTrackerPane!.Report(0, "Reloading Data If Necessary");
 
             dataMiner ??= new OlFolderClassifierGroup(Globals);
 
@@ -1413,7 +1413,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             )!;
             // Post-load the serialized corpus is expected non-null (pre-existing contract).
             var folderPaths = collection!
-                .Select(x => x.FolderInfo.RelativePath)
+                .Select(x => x.FolderInfo!.RelativePath)
                 .OrderBy(x => x)
                 .Distinct()
                 .ToList();
@@ -1522,7 +1522,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             ProgressPackage ppkg
         )
         {
-            ppkg.ProgressTrackerPane.Report(
+            ppkg.ProgressTrackerPane!.Report(
                 0,
                 "Building Folder Classifier -> Split Into Train / Test"
             );

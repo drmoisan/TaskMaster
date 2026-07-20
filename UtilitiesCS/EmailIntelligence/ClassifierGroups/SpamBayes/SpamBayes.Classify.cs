@@ -80,7 +80,7 @@ namespace UtilitiesCS.EmailIntelligence
         {
             return email as MailItem is null
                 ? []
-                : new MailItemHelper(email as MailItem, Globals)
+                : new MailItemHelper((email as MailItem)!, Globals)
                     .LoadAll(Globals, Globals.Ol.Inbox, true)
                     .Tokens;
         }
@@ -91,7 +91,7 @@ namespace UtilitiesCS.EmailIntelligence
                 ? []
                 : (
                     await MailItemHelper.FromMailItemAsync(
-                        email as MailItem,
+                        (email as MailItem)!,
                         Globals,
                         default,
                         true

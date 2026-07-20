@@ -402,12 +402,18 @@ namespace TaskMaster.Test.OutlookObjects.Store
                 ).GetTransparentProxy();
         }
 
+        // This file has no project-level <Nullable> and no whole-file #nullable pragma; this
+        // pre-existing `?` annotation needs an explicit annotations context to avoid CS8632.
+        // Scoping narrowly to annotations-only avoids introducing new CS86xx diagnostics
+        // elsewhere in this file (no behavior change per AC7).
+#nullable enable annotations
         private static Outlook.Store CreateStoreProxy(
             string displayName,
             Outlook.Folder? rootFolder = null,
             Outlook.OlExchangeStoreType exchangeStoreType =
                 Outlook.OlExchangeStoreType.olPrimaryExchangeMailbox
         )
+#nullable restore annotations
         {
             var resolvedRootFolder = rootFolder ?? CreateFolderProxy($"\\{displayName}");
 

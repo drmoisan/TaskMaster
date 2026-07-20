@@ -116,10 +116,17 @@ namespace QuickFiler
         // through the field. The concrete ItemViewer satisfies all four via its UserControl base.
         // They are declared on the interface (not resolved by a concrete cast) so InvokeRequired-guarded
         // routing stays mockable for the dispatch-routing unit tests.
+        // CS0108 (member hides an inherited ISynchronizeInvoke/IControl member) is suppressed
+        // narrowly here: these four members are a deliberate, pre-existing re-declaration for
+        // mockability, and adding the `new` keyword or otherwise restructuring the interface
+        // hierarchy is an actual API-shape change, not an annotation-only fix (out of scope per
+        // AC7 no-behavior-change).
+#pragma warning disable CS0108
         bool InvokeRequired { get; }
         object Invoke(System.Delegate method);
         System.IAsyncResult BeginInvoke(System.Delegate method);
         int Height { get; }
+#pragma warning restore CS0108
 
         void RemoveControlsColsRightOf(Control furthestRight);
     }

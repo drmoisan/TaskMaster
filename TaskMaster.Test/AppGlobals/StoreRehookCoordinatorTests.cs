@@ -35,9 +35,17 @@ namespace TaskMaster.Test.AppGlobals
             public Mock<IOutlookFolderTreeService> TreeService { get; } =
                 new Mock<IOutlookFolderTreeService>(MockBehavior.Loose);
             public List<string> Calls { get; } = new List<string>();
+
+            // This file has no project-level <Nullable> and no whole-file #nullable pragma; the
+            // pre-existing `?` annotations on these two properties need an explicit annotations
+            // context to avoid CS8632. Scoping narrowly to annotations-only avoids introducing
+            // new CS86xx diagnostics elsewhere in this file (no behavior change per AC7).
+#nullable enable annotations
             public Outlook.Store? ResolvedStore { get; set; }
             public bool AlreadyHooked { get; set; }
             public Exception? AddOrRestoreThrows { get; set; }
+
+#nullable restore annotations
 
             public StoreRehookCoordinator Build()
             {
@@ -243,7 +251,10 @@ namespace TaskMaster.Test.AppGlobals
         [TestMethod]
         public async Task RehookAsync_PublicAdapter_ExtractsIdentityValueDelegatesAndReturnsWithoutThrowing()
         {
+            // Same CS8632 annotations-context scoping as above.
+#nullable enable annotations
             string? resolvedWith = null;
+#nullable restore annotations
             var store = CreateStore(StoreId);
             var coordinator = new StoreRehookCoordinator(
                 new Mock<IOutlookReadinessGate>(MockBehavior.Loose).Object,

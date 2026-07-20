@@ -371,7 +371,13 @@ namespace UtilitiesCS.Test
             var priorContext = SynchronizationContext.Current;
             SynchronizationContext.SetSynchronizationContext(context);
 
+            // This file has no project-level <Nullable> and no whole-file #nullable pragma;
+            // this pre-existing `?` annotation needs an explicit annotations context to avoid
+            // CS8632. Scoping narrowly to annotations-only avoids introducing new CS86xx
+            // diagnostics elsewhere in this file (no behavior change per AC7).
+#nullable enable annotations
             ProgressViewer? viewer = null;
+#nullable restore annotations
 
             try
             {
@@ -407,7 +413,10 @@ namespace UtilitiesCS.Test
         {
             using var cts = new CancellationTokenSource();
             var tracker = new ProgressTracker(cts, Screen.PrimaryScreen);
+            // Same CS8632 annotations-context scoping as elsewhere in this file.
+#nullable enable annotations
             ProgressViewer? shownViewer = null;
+#nullable restore annotations
             var previousContext = SynchronizationContext.Current;
             var dispatcherField = typeof(UiThread).GetField(
                 "_dispatcher",
@@ -472,7 +481,10 @@ namespace UtilitiesCS.Test
             var priorContext = SynchronizationContext.Current;
             SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
 
+            // Same CS8632 annotations-context scoping as elsewhere in this file.
+#nullable enable annotations
             ProgressViewer? viewer = null;
+#nullable restore annotations
 
             try
             {

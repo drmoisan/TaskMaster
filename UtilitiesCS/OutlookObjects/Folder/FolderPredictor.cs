@@ -158,7 +158,7 @@ namespace UtilitiesCS
         //private string _searchString;
 
         internal static Func<string, string, string> PromptForFolderNameDialog { get; set; } =
-            (prompt, title) => InputBox.ShowDialog(prompt, title);
+            (prompt, title) => InputBox.ShowDialog(prompt, title)!;
 
         internal static Func<
             string,
@@ -166,7 +166,7 @@ namespace UtilitiesCS
             string,
             string
         > PromptForFolderNameWithDefaultDialog { get; set; } =
-            (prompt, title, defaultValue) => InputBox.ShowDialog(prompt, title, defaultValue);
+            (prompt, title, defaultValue) => InputBox.ShowDialog(prompt, title, defaultValue)!;
 
         internal static Action<string> ShowPromptMessageAction { get; set; } =
             message => MessageBox.Show(message);

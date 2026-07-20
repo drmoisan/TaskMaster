@@ -19,7 +19,6 @@ namespace UtilitiesCS
             bool blExcludeFlagged = true
         )
         {
-            MailItem OlMail;
             //List<string> emailAddressList;
             IList<string> peopleList = new List<string>();
             string strMissing = "";
@@ -27,7 +26,7 @@ namespace UtilitiesCS
 
             var recipients = helper.ToRecipients.ToList();
             recipients.AddRange(helper.CcRecipients);
-            recipients.Add(helper.Sender);
+            recipients.Add(helper.Sender!);
             var emailAddressList = recipients.Select(x => x.Address).ToList();
 
             for (int i = emailAddressList.Count - 1; i >= 0; i -= 1)

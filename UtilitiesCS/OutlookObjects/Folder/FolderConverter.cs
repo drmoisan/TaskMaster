@@ -26,7 +26,7 @@ namespace UtilitiesCS
             Dictionary<string, Func<Task<string>>>,
             string
         > AlternativeFolderSelectionDialog { get; set; } =
-            (message, title, icon, options) => MyBox.ShowDialog(message, title, icon, options);
+            (message, title, icon, options) => MyBox.ShowDialog(message, title, icon, options)!;
 
         internal static Func<
             string,
@@ -34,7 +34,7 @@ namespace UtilitiesCS
             string,
             string
         > AlternativeFolderInputDialog { get; set; } =
-            (prompt, title, defaultValue) => InputBox.ShowDialog(prompt, title, defaultValue);
+            (prompt, title, defaultValue) => InputBox.ShowDialog(prompt, title, defaultValue)!;
 
         private static char[] IllegalFolderCharacters
         {
