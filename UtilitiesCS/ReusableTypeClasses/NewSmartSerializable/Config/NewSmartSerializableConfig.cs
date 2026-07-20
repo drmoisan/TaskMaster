@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -89,7 +90,9 @@ namespace UtilitiesCS.ReusableTypeClasses
                 Notify();
             }
         }
-        protected Lazy<JsonSerializerSettings> _jsonSettings;
+
+        // initialized via ResetLazy() in every constructor
+        protected Lazy<JsonSerializerSettings> _jsonSettings = null!;
 
         [JsonIgnore]
         public JsonSerializerSettings NetJsonSettings
@@ -101,7 +104,9 @@ namespace UtilitiesCS.ReusableTypeClasses
                 Notify();
             }
         }
-        protected Lazy<JsonSerializerSettings> _netJsonSettings;
+
+        // initialized via ResetLazy() in every constructor
+        protected Lazy<JsonSerializerSettings> _netJsonSettings = null!;
 
         [JsonIgnore]
         public JsonSerializerSettings LocalJsonSettings
@@ -113,7 +118,9 @@ namespace UtilitiesCS.ReusableTypeClasses
                 Notify();
             }
         }
-        protected Lazy<JsonSerializerSettings> _localJsonSettings;
+
+        // initialized via ResetLazy() in every constructor
+        protected Lazy<JsonSerializerSettings> _localJsonSettings = null!;
 
         public ISmartSerializableConfig.ActiveDiskEnum ActiveDisk
         {
@@ -271,7 +278,7 @@ namespace UtilitiesCS.ReusableTypeClasses
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         #endregion INotifyPropertyChanged
     }

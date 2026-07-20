@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +17,8 @@ namespace UtilitiesCS.ReusableTypeClasses
 
         public bool IsSmartSerializable<T>(T instance)
         {
-            return IsSmartSerializable(instance.GetType());
+            // Caller passes a non-null instance to type-test; GetType requires it.
+            return IsSmartSerializable(instance!.GetType());
         }
 
         public bool IsSmartSerializable(Type type)
@@ -49,14 +51,14 @@ namespace UtilitiesCS.ReusableTypeClasses
             where T : class, ISmartSerializable<T>, new() =>
             GetInstance<T>().Deserialize(fileName, folderPath, askUserOnError, settings);
 
-        public T Deserialize<T, U>(SmartSerializable<U> config)
+        public T? Deserialize<T, U>(SmartSerializable<U> config)
             where T : class, ISmartSerializable<T>, new()
             where U : class, ISmartSerializable<U>, new() => GetInstance<T>().Deserialize(config);
 
-        public T DeserializeObject<T>(string json, JsonSerializerSettings settings)
+        public T? DeserializeObject<T>(string json, JsonSerializerSettings settings)
             where T : class
         {
-            T instance = default;
+            T? instance = default;
             try
             {
                 instance = JsonConvert.DeserializeObject<T>(json, settings);
