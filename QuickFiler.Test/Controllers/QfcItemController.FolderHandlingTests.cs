@@ -14,10 +14,7 @@ using UtilitiesCS;
 
 namespace QuickFiler.Controllers.Tests
 {
-    /// <summary>
-    /// Folder-handling cluster tests (research §5.2). Covers the pure static folder-selection seam
-    /// PopulateAndSelectFolder edge cases and the AssignFolderComboBox guard behavior.
-    /// </summary>
+    /// <summary>Folder-handling cluster tests (research §5.2): PopulateAndSelectFolder seam edge cases and AssignFolderComboBox guard behavior.</summary>
     [TestClass]
     public class QfcItemController_FolderHandlingTests
     {
@@ -89,12 +86,23 @@ namespace QuickFiler.Controllers.Tests
             }
         }
 
-        /// <summary>
-        /// Builds a <see cref="FolderPredictor"/> with a known <c>FolderArray</c> without touching
-        /// Outlook COM. The single-arg <c>FolderPredictor(Outlook.Application)</c> constructor performs
-        /// no COM work; seeding the private <c>_folderList</c> backing field makes the lazy
-        /// <c>FolderArray</c> getter return that list directly.
-        /// </summary>
+        [TestMethod]
+        public void PopulateAndSelectFolder_SingleItemNoPredeterminedMatch_SelectsIndexZeroWithoutThrowing()
+        {
+            // Single suggestion, no predetermined match: bounds-safe fallback selects index 0 (#392).
+            var folders = new[] { @"\\A\only" };
+            using (var comboBox = new ComboBox())
+            {
+                Action act = () =>
+                    QfcItemController.PopulateAndSelectFolder(comboBox, folders, null);
+
+                act.Should().NotThrow<ArgumentOutOfRangeException>();
+                comboBox.SelectedIndex.Should().Be(0);
+                (comboBox.SelectedItem as string).Should().Be(@"\\A\only");
+            }
+        }
+
+        /// <summary>Builds a <see cref="FolderPredictor"/> with a known <c>FolderArray</c> by seeding the private <c>_folderList</c> field, without touching Outlook COM.</summary>
         private static FolderPredictor BuildFolderHandlerWithArray(params string[] folders)
         {
             var ctor = typeof(FolderPredictor)
@@ -461,13 +469,7 @@ namespace QuickFiler.Controllers.Tests
             var mock = new Mock<IItemViewer>();
             mock.SetupGet(v => v.InvokeRequired).Returns(false);
             var controller = new FolderController();
-            typeof(QfcItemController)
-                .GetField(
-                    "_itemViewer",
-                    System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance
-                )
-                .SetValue(controller, mock.Object);
+            SetPrivate(controller, "_itemViewer", mock.Object);
 
             // Act
             controller.AssignFolderComboBox();
@@ -475,6 +477,24 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             mock.Verify(v => v.SetFolderItems(It.IsAny<string[]>()), Times.Never());
             mock.Verify(v => v.SetFolderSelectedIndex(It.IsAny<int>()), Times.Never());
+        }
+
+        [TestMethod]
+        public void AssignFolderComboBox_WhenSingleSuggestionNoPredeterminedMatch_SelectsIndexZero()
+        {
+            // Single suggestion, no predetermined match: viewer selects index 0, not 1 (#392).
+            var mock = new Mock<IItemViewer>();
+            mock.SetupGet(v => v.InvokeRequired).Returns(false);
+            mock.Setup(v => v.GetSelectedFolder()).Returns(@"\\A\only");
+            var controller = new FolderController();
+            SetPrivate(controller, "_itemViewer", mock.Object);
+            SetPrivate(controller, "_folderHandler", BuildFolderHandlerWithArray(@"\\A\only"));
+
+            controller.AssignFolderComboBox();
+
+            mock.Verify(v => v.SetFolderSelectedIndex(0), Times.Once());
+            mock.Verify(v => v.SetFolderSelectedIndex(1), Times.Never());
+            controller.SelectedFolder.Should().Be(@"\\A\only");
         }
     }
 }
