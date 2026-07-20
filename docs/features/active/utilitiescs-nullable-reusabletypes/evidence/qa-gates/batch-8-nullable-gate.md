@@ -1,99 +1,83 @@
 # Batch 8 — Nullable Pragma Gate (P8-T2 / P8-T3)
 
-Timestamp: 2026-07-19T24-30
+Timestamp: 2026-07-19T22-03
+
+Supersedes the prior 2026-07-19T24-30 STOP-state record. The epic layer subsequently
+ratified the FOUR-file cross-child waiver (Option A''), clearing the STOP. This record
+captures the result AFTER the three deferred constraint lines were applied.
 
 ## Commands
 
-1. `csharpier check .` — EXIT_CODE 0 (Checked 1406 files; clean, no reformatting needed for the
-   7 Batch 8 files; the annotations are already csharpier-compliant).
+1. `dotnet tool run csharpier format .` — EXIT_CODE 0 (formatted 1406 files; the three
+   Batch-8 constraint edits were the only source-diff changes, no unrelated churn — verified
+   via `git diff --stat`).
 2. Pragma gate (isolated-compile methodology per P0-T5 / Batch-6 / Batch-7):
    `msbuild UtilitiesCS/UtilitiesCS.csproj /t:Rebuild /p:Configuration=Debug /p:Platform=AnyCPU /p:TreatWarningsAsErrors=true /p:BuildProjectReferences=false`
-   (WITHOUT `/p:Nullable=enable`; `MSYS_NO_PATHCONV=1` to keep git-bash from mangling the `/p:` switches;
-   VS18 full-framework msbuild.exe).
+   (WITHOUT `/p:Nullable=enable`; `MSYS_NO_PATHCONV=1`; VS18 full-framework msbuild.exe).
 
-EXIT_CODE: 1 (whole-assembly build; nonzero is caused entirely by the same PRE-EXISTING,
-out-of-scope non-nullable warnings-as-errors documented at baseline P0-T5, decomposed below).
+EXIT_CODE: 1 (whole-assembly build; the nonzero exit is caused entirely by (a) PRE-EXISTING,
+out-of-scope non-nullable warnings-as-errors documented at baseline P0-T5, and (b) cross-child
+fan-in CS86xx from sibling-owned nullable-enabled files under `UtilitiesCS/EmailIntelligence/**`
+and `UtilitiesCS/OutlookObjects/**` — NOT #366 cluster files. Decomposed below.)
 
-## Output Summary (current tree state)
+## Output Summary — #366 opted-in cluster (OPERATIVE gate)
 
 Batch 8 (7 files: `SerializableList`, `ScBag`, `ScoDictionaryStatic`, `ScoDictionaryNew`,
-`SloLinkedList`, `SloStack`, `ScDictionary`) cluster diagnostics in the current tree:
-- CS86xx (nullable) count attributable to the 7 Batch 8 files: 0 (AC1 for Batch 8).
-- CS87xx (nullable, incl. CS8714 / CS8766) count attributable to the 7 Batch 8 files: 0.
+`SloLinkedList`, `SloStack`, `ScDictionary`) plus the four cross-child NewtonsoftHelpers waiver
+consumers cluster diagnostics:
 
-Whole-assembly error decomposition (unchanged from P0-T5 baseline; all pre-existing / out of scope;
-ZERO originate in a Batch 8 file, ZERO in `ReusableTypeClasses/`):
-- `error CS0618` (obsolete-API usage): 14 — Triage.cs (x2 in this class family), SortEmail.cs,
-  ManagerAsyncLazy.cs, IntelligenceConfig.cs, IAsyncEnumerableExtensions.cs, FolderExtraction.cs,
-  EmailFiler.cs, BayesianSerializationHelper.cs, BayesianClassifierGroup.cs, AutoFile.cs.
-- `error CS0168` (unused variable): 1 — pre-existing non-cluster file.
-- Zero errors and zero warnings originate in any of the 7 Batch 8 files.
-- No `System.Diagnostics.CodeAnalysis` post-condition attribute was added; no polyfill declared.
+- CS86xx (nullable) count attributed to any #366 cluster file (`ReusableTypeClasses/**` or the four
+  waiver files `WrapperScoDictionary.cs`, `ScoDictionaryConverter.cs`, `WrapperScDictionary.cs`,
+  `ScDictionaryConverter.cs`): **0** (AC1 for Batch 8).
+- CS8714 count anywhere in the whole build: **0**. Applying the three additive `where TKey : notnull`
+  constraint lines (`ScDictionary`, `WrapperScDictionary`, `ScDictionaryConverter`) cleared the +4
+  CS8714 that `ScDictionaryConverter.cs` would otherwise emit at
+  `(15,40)/(30,85)/(31,50)/(43,61)`. No FIFTH cross-child CS8714 consumer surfaced; the closed
+  four-consumer enumeration holds.
+
+## Whole-assembly error decomposition (all pre-existing or cross-child; ZERO originate in a #366 cluster file)
+
+Nullable (CS8xxx) totals across the whole UtilitiesCS assembly:
+- CS8600: 2, CS8601: 16, CS8602: 50, CS8603: 9, CS8604: 55, CS8619: 4, CS8620: 3, CS8625: 9
+  (total 148 CS86xx). CS8714: 0. CS8766: 0.
+
+Every CS8xxx error originates in a sibling-owned, out-of-#366-scope file. Distinct emitting files
+(all under `UtilitiesCS/EmailIntelligence/**` or `UtilitiesCS/OutlookObjects/Folder/**`):
+BayesianPerformanceMeasurement.cs, BayesianSerializationHelper.cs, ActionableClassifierGroup.cs,
+CategoryClassifierGroup.cs, ClassifierGroupUtilities.cs, ManagerAsyncLazy.cs, MulticlassEngine.cs,
+OlFolderClassifierGroup.cs, SpamBayes.Classify.cs, SpamBayes.Conditions.cs, Triage_OlLogic.cs,
+AutoFile.cs, EmailDataMiner.FolderExtraction.cs, EmailDataMiner.Serialization.cs,
+EmailDataMiner.Transform.cs, EmailFiler.cs, EmailFilerConfig.cs, SortEmail.cs,
+FolderPredictorEvaluator.cs, FlagClassNoItem.cs, IntelligenceConfig.cs,
+FilterOlFoldersController.cs, PeopleScoDictionaryNew.cs, SubjectMapEncoder.cs, FolderConverter.cs,
+FolderPredictor.cs, FolderScorer.cs, FolderTreeCompatibilityView.cs.
+
+These 148 CS86xx are the cross-child fan-in described by the epic P9-T3 ruling (sibling-owned
+nullable-enabled files on the integrated tree; the #376 capstone's obligation). They are NOT a
+#366 failure.
+
+Non-nullable pre-existing errors (unchanged from P0-T5 baseline; all out of scope):
+- CS0618 (obsolete-API usage): 14 occurrences — pre-existing non-cluster files.
+- CS0168 (unused variable): 1 occurrence — pre-existing non-cluster file.
+
+## Constraint placement (ratified `where TKey : notnull`, per [P6-T2] + four-file waiver)
+
+- APPLIED to `ScoDictionaryNew<TKey, TValue>` (Batch 6/prior commit) — clean.
+- APPLIED to `ScDictionary<TKey, TValue>` (this task) — clean. Its cross-child cascade lands entirely
+  in `WrapperScDictionary.cs` + `ScDictionaryConverter.cs` (both now constrained under the four-file
+  waiver). Zero residual CS8714.
+- APPLIED to `WrapperScDictionary<TDerived, TKey, TValue>` and
+  `ScDictionaryConverter<TDerived, TKey, TValue>` (this task, third+fourth waiver consumers under
+  Option A'').
+- NOT APPLIED to `ScoDictionaryStatic` — non-generic `public static class` of `Type` extension methods;
+  no `TKey` to constrain (mechanically inapplicable; the plan "four generic bases" wording is
+  inaccurate for this file).
+- NOT APPLIED to `ScBag` — `ConcurrentBag<T>`-based; takes `T`; no `notnull` requirement.
+
+## Scope compliance
+
+- No `System.Diagnostics.CodeAnalysis` post-condition attribute added; no polyfill declared.
 - No `record` / `init` / `record struct` conversion.
-- No `NewtonsoftHelpers` file was touched; the three exempt WinForms files carry no `#nullable enable`.
 - `SerializableList.cs` (575, pre-existing >500) remains a single file.
+- No NewtonsoftHelpers file other than the four waiver consumers was modified.
 - `/p:Nullable=enable` was NOT passed.
-
-## Constraint placement (ratified `where TKey : notnull`, per [P6-T2])
-
-- APPLIED to `ScoDictionaryNew<TKey, TValue>` — REQUIRED and clean. Its base
-  `ConcurrentObservableDictionary<TKey, TValue>` carries the constraint (Batch 6), so the derivation
-  emits CS8714 without it. Its downstream cascade is already fully absorbed by the two epic-authorized
-  #367 waiver files (`WrapperScoDictionary.cs`, `ScoDictionaryConverter.cs`), which already carry the
-  constraint. No new cascade from `ScoDictionaryNew`.
-- NOT APPLIED to `ScoDictionaryStatic` — mechanically inapplicable. Despite the [P6-T2]/plan wording
-  ("four generic dictionary bases"), `ScoDictionaryStatic` is a NON-GENERIC `public static class` of
-  `Type` extension methods with no generic parameter list; there is no `TKey` to constrain. Reaches
-  0 CS86xx / 0 CS8714 regardless.
-- NOT APPLIED to `ScBag` — `ConcurrentBag<T>`-based, takes `T`, no `notnull` requirement (per
-  ratification).
-- NOT APPLIED to `ScDictionary<TKey, TValue>` — BLOCKED (see STOP below). The ratified constraint was
-  applied and empirically verified to surface a THIRD-file CS8714 cascade in an un-waived
-  NewtonsoftHelpers consumer. It has been reverted to keep the tree green pending an epic
-  waiver-extension decision.
-
-## STOP — third-file CS8714 cascade (ScDictionary constraint), escalation required
-
-Applying the ratified `where TKey : notnull` to `ScDictionary<TKey, TValue>` and rebuilding
-(isolated-compile methodology) emitted CS8714 in a THIRD `#nullable enable` #367-owned NewtonsoftHelpers
-consumer that is NOT one of the two epic-authorized waiver files:
-
-    UtilitiesCS/NewtonsoftHelpers/WrapperScDictionary.cs(18,38): error CS8714
-      "The type 'TKey' cannot be used as type parameter 'TKey' in the generic type or method
-       'ScDictionary<TKey, TValue>'. Nullability of type argument 'TKey' doesn't match 'notnull'
-       constraint."
-    (2 occurrences = the same site double-counted under /t:Rebuild.)
-
-Root cause: `WrapperScDictionary<TDerived, TKey, TValue>` (`UtilitiesCS/NewtonsoftHelpers/WrapperScDictionary.cs`,
-line 18) declares `where TDerived : ScDictionary<TKey, TValue>` (line 19) with an UNCONSTRAINED `TKey`,
-and is already `#nullable enable` (merged sibling child #367). Once `ScDictionary<TKey, TValue>` carries
-`where TKey : notnull`, this constraint clause fails CS8714. On `main` (no pragma on this file) the
-consumer is null-oblivious and no CS8714 fires — which is why the [P6-T2] ratification's cascade survey
-(bounded to `WrapperScoDictionary.cs` + `ScoDictionaryConverter.cs` for the `ScoDictionaryNew` /
-`ConcurrentObservableDictionary` chain) did not enumerate it. `WrapperScDictionary` is the wrapper for
-the `ScDictionary` chain specifically, a distinct type from `WrapperScoDictionary`.
-
-Directive compliance: per the run directive ("If applying the constraint surfaces CS8714 in ANY THIRD
-file that is not already constrained, STOP immediately and report... do NOT edit a third file, do NOT
-self-widen the waiver") and the ratification dossier's static-cascade-bound clause ("If a THIRD
-cross-child consumer surfaces during execution, HALT and re-escalate to the epic orchestrator; the
-waiver must NOT be widened unilaterally"):
-- `WrapperScDictionary.cs` was NOT edited.
-- No `#pragma warning disable CS8714` was added.
-- The `ScDictionary` constraint was reverted to restore a green, buildable tree (0 cluster CS86xx /
-  0 cluster CS8714; whole-assembly back to the 14 CS0618 + 1 CS0168 pre-existing baseline).
-
-Escalation options for the epic orchestrator / maintainer (parallel to the Batch-6 Option-A
-resolution):
-  (A) Extend the Option-A scope-boundary waiver to a THIRD file — add one `where TKey : notnull` line
-      to `WrapperScDictionary<TDerived, TKey, TValue>` (and nothing else) — then re-apply the
-      `ScDictionary` constraint. Verified-safe: no further cascade is expected (see note below).
-  (B) Withdraw the `where TKey : notnull` from `ScDictionary` (on net481 it is a no-op; the cluster is
-      already green without it) and defer it to a coordinated cross-child integration change.
-  (C) Re-sequence so the constraint lands in a single integration change that also updates the
-      NewtonsoftHelpers consumer(s).
-
-Note on further cascade under Option (A): a follow-on rebuild would be required to confirm that
-constraining `WrapperScDictionary` does not itself surface a fourth consumer; that verification is
-withheld here because it would require editing the third file, which is not authorized under the
-current waiver.

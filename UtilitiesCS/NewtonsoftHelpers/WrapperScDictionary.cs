@@ -17,6 +17,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
 {
     public class WrapperScDictionary<TDerived, TKey, TValue>
         where TDerived : ScDictionary<TKey, TValue>
+        where TKey : notnull
     {
         public ConcurrentDictionary<TKey, TValue> ConcurrentDictionary { get; set; }
 

@@ -220,3 +220,70 @@ This resolution supersedes the two-file waiver above only by adding the third fi
 enactment remains in force. It is enacted in the revised plan tasks [P8-T2], [P9-T9], and [P9-T10],
 recorded in the child checkpoint `epic_decisions` and `human_interaction` blocks, and documented in
 the constraint-propagation commit message and the PR #380 body.
+
+## Epic-layer resolution — OPTION A-DOUBLE-PRIME (A'') EXTENDED TO A FOURTH FILE (2026-07-20T01:43:00Z, authorized)
+
+Timestamp: 2026-07-20T01-45
+
+During [P8-T2], applying the ratified `where TKey : notnull` to `ScDictionary<TKey, TValue>` AND to the
+A'-authorized third file `WrapperScDictionary<TDerived, TKey, TValue>` cleared their sites, but the
+isolated-cluster pragma-gate rebuild
+(`msbuild UtilitiesCS/UtilitiesCS.csproj /t:Rebuild /p:Configuration=Debug /p:Platform="Any CPU" /p:TreatWarningsAsErrors=true`,
+WITHOUT `/p:Nullable=enable`) then surfaced EXACTLY 4 NEW CS8714 in a FOURTH #367-owned NewtonsoftHelpers
+file, `UtilitiesCS/NewtonsoftHelpers/ScDictionaryConverter.cs` (NO `o`; commit c9284b30; distinct from the
+already-waived `ScoDictionaryConverter.cs` WITH `o`):
+
+    UtilitiesCS/NewtonsoftHelpers/ScDictionaryConverter.cs(15,40): error CS8714
+    UtilitiesCS/NewtonsoftHelpers/ScDictionaryConverter.cs(30,85): error CS8714
+    UtilitiesCS/NewtonsoftHelpers/ScDictionaryConverter.cs(31,50): error CS8714
+    UtilitiesCS/NewtonsoftHelpers/ScDictionaryConverter.cs(43,61): error CS8714
+
+`ScDictionaryConverter<TDerived, TKey, TValue> : JsonConverter<TDerived>` carries
+`where TDerived : ScDictionary<TKey, TValue>` with an unconstrained `TKey` under `#nullable enable`, so it
+independently fails the `notnull` constraint once `ScDictionary` and `WrapperScDictionary` are constrained.
+This is the exact symmetric analogue of the Sco family, which required BOTH `WrapperScoDictionary.cs` and
+`ScoDictionaryConverter.cs`; the Sc family likewise has BOTH `WrapperScDictionary.cs` and
+`ScDictionaryConverter.cs`, and the A' three-file waiver covered only `WrapperScDictionary.cs`. Verified:
+HEAD 2afaddb9 emits 0 CS8714; the two authorized edits (`ScDictionary` + `WrapperScDictionary` constraints)
+add exactly +4, all located in `ScDictionaryConverter.cs`; every other diagnostic is byte-identical. The
+child orchestrator HALTED per the A' fourth-consumer re-escalation clause and did NOT widen the waiver
+unilaterally.
+
+The epic layer (which owns cross-child boundaries; user informed with override standing) AUTHORIZED
+extending the waiver to this FOURTH #367-owned file — Option A-double-prime (A''):
+
+4. `UtilitiesCS/NewtonsoftHelpers/ScDictionaryConverter.cs` — add `where TKey : notnull` to
+   `ScDictionaryConverter<TDerived, TKey, TValue>` (declaration at line 15, bounded
+   `where TDerived : ScDictionary<TKey, TValue>`). Clears the 4 CS8714 at lines 15,30,31,43.
+
+FOUR-FILE WAIVER TOTAL (one `where TKey : notnull` line each, nothing else):
+1. `UtilitiesCS/NewtonsoftHelpers/WrapperScoDictionary.cs`   [applied in Batch 6]
+2. `UtilitiesCS/NewtonsoftHelpers/ScoDictionaryConverter.cs`  [applied in Batch 6]
+3. `UtilitiesCS/NewtonsoftHelpers/WrapperScDictionary.cs`    [applied under A' in Batch 8 constraint completion]
+4. `UtilitiesCS/NewtonsoftHelpers/ScDictionaryConverter.cs`  [applied under A'' in Batch 8 constraint completion]
+
+### Definitive assembly-wide enumeration — the cross-child consumer set is CLOSED at four
+
+An assembly-wide grep confirms the complete cross-child consumer set is EXACTLY these four
+NewtonsoftHelpers files. Each generic base with cross-child consumers (`ScoDictionaryNew`, `ScDictionary`)
+has exactly two consumers — a Wrapper and a Converter — a closed symmetric set of four.
+`WrapperPeopleScoDictionaryNew.cs` and `PeopleScoConverter.cs` are verified SAFE (concrete type arguments /
+commented-out reference). NO FIFTH CONSUMER EXISTS, so no further escalation is possible. If a fifth
+somehow appears anyway (contradicting the enumeration), HALT and re-escalate to the epic layer; do NOT
+widen the waiver unilaterally.
+
+This resolution supersedes the three-file waiver above only by adding the fourth file; the prior
+enactments remain in force. It is enacted in the revised plan tasks [P8-T2], [P9-T9], and [P9-T10],
+recorded in the child checkpoint `epic_decisions` and `human_interaction` blocks, and documented in the
+constraint-propagation commit message and the PR #380 body.
+
+### [P9-T3] operative-gate ruling (solution-wide zero is a documented cross-child-fan-in deviation)
+
+[P9-T3]'s literal "solution-wide 0 CS86xx / 0 CS8714" across `TaskMaster.sln` is UNSATISFIABLE for #366 in
+isolation: roughly ~140 pre-existing cross-child CS86xx arise from sibling-owned nullable-enabled files on
+the integrated tree (the same cross-child fan-in carried as the #372/#376 capstone input), not from #366's
+own opted-in cluster. The OPERATIVE gate for #366 is the ISOLATED-CLUSTER decomposition (Batch-6/7
+methodology): 0 CS86xx / 0 CS8714 within #366's own opted-in cluster, INCLUDING the four waived
+NewtonsoftHelpers propagation lines. This solution-wide-zero deviation is an expected cross-child-fan-in
+deviation and is documented here and in the feature-review artifacts; it is NOT a #366 failure.
+Solution-wide zero remains capstone #376's obligation.

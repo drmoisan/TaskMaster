@@ -20,6 +20,7 @@ namespace UtilitiesCS.ReusableTypeClasses
     public class ScDictionary<TKey, TValue>
         : ConcurrentDictionary<TKey, TValue>,
             ISmartSerializable<ScDictionary<TKey, TValue>>
+        where TKey : notnull
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
