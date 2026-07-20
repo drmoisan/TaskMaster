@@ -11,6 +11,7 @@ namespace UtilitiesCS.NewtonsoftHelpers.Sco
 {
     public class ScoDictionaryConverter<TDerived, TKey, TValue> : JsonConverter<TDerived>
         where TDerived : ScoDictionaryNew<TKey, TValue>
+        where TKey : notnull
     {
         public ScoDictionaryConverter() { }
 

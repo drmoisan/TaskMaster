@@ -19,6 +19,7 @@ namespace UtilitiesCS.NewtonsoftHelpers
 {
     public class WrapperScoDictionary<TDerived, TKey, TValue>
         where TDerived : ScoDictionaryNew<TKey, TValue>
+        where TKey : notnull
     {
         [JsonProperty("CoDictionary")]
         public ConcurrentObservableDictionary<TKey, TValue> CoDictionary { get; set; }

@@ -73,11 +73,102 @@ would hide a genuine null-key-contract violation instead of expressing the real 
 
 ## Decision
 
-BLOCKED: awaiting project-maintainer ratification of the `where TKey : notnull` public
-generic-parameter-list change on `ConcurrentObservableDictionary`, `ScoDictionaryNew`,
-`ScoDictionaryStatic`, and `ScDictionary`. The executor has NOT applied or committed the constraint.
-Note the empirical finding above: the constraint is not required to clear the net481 pragma gate, so
-the maintainer decision is whether to add it as a forward-looking contract (consistent with the
-epic's cross-module-contract intent) or to defer it until the target is nullable-annotated. Phases
-6-9 (which depend on this decision) are out of scope for this execution run and remain unstarted; the
-[P6-T2] plan checkbox is left UNCHECKED.
+RATIFIED: 2026-07-19T22:14:30Z — decided by the project maintainer in-session. The maintainer
+ratified adding the `where TKey : notnull` public generic-parameter-list constraint to
+`ConcurrentObservableDictionary`, `ScoDictionaryNew`, `ScoDictionaryStatic`, and `ScDictionary`. The
+empirical finding above stands: on net481 the BCL reference assemblies are not nullable-annotated, so
+ZERO CS8714 is actually emitted; the constraint is adopted as forward-looking public-contract hygiene
+consistent with the epic's cross-module-contract intent, with no runtime behavior change (the base
+`ConcurrentDictionary` already rejects null keys via `ArgumentNullException`). The constraint is
+applied to `ConcurrentObservableDictionary` in [P6-T3] and consistently to `ScoDictionaryNew`,
+`ScoDictionaryStatic`, and `ScDictionary` in [P8-T2]; the `ConcurrentBag<T>`-based
+`ConcurrentObservableBag` and `ScBag` are NOT constrained. The [P6-T2] STOP is cleared and Phases 6-9
+proceed.
+
+Prior status (superseded): BLOCKED pending maintainer ratification. The executor did not apply or
+commit the constraint before ratification.
+
+## Post-ratification empirical correction (2026-07-19T22-40) — EXECUTION BLOCKER
+
+When the ratified `where TKey : notnull` constraint was actually applied to
+`ConcurrentObservableDictionary<TKey, TValue>` and the full UtilitiesCS assembly was rebuilt
+(isolated-compile methodology per P0-T5), the build emitted 4 CS8714 errors — NOT zero. The
+ratification's empirical premise ("ZERO CS8714 is actually emitted on net481") was measured only
+against the base-class derivation (`: ConcurrentDictionary<TKey, TValue>`) in isolation. It did not
+account for a first-party downstream consumer that is already under `#nullable enable`.
+
+Emitted diagnostics (constraint applied):
+
+    UtilitiesCS/NewtonsoftHelpers/WrapperScoDictionary.cs(24,61): error CS8714
+    UtilitiesCS/NewtonsoftHelpers/WrapperScoDictionary.cs(33,63): error CS8714
+    UtilitiesCS/NewtonsoftHelpers/WrapperScoDictionary.cs(195,63): error CS8714
+    UtilitiesCS/NewtonsoftHelpers/WrapperScoDictionary.cs(207,66): error CS8714
+
+Root cause: sibling child #367 ("fix(367): remediate nullable-reference-type debt in
+UtilitiesCS/NewtonsoftHelpers via per-file #nullable enable", commit c9284b30) is ALREADY merged
+onto this feature branch. `WrapperScoDictionary<TDerived, TKey, TValue>` (a NewtonsoftHelpers file)
+now carries `#nullable enable`, declares an unconstrained `TKey`, and constructs / references
+`ConcurrentObservableDictionary<TKey, TValue>` at the four sites above. Under nullable annotation,
+an unconstrained `TKey` does not satisfy the new `notnull` constraint, so CS8714 fires. (On `main`
+WrapperScoDictionary.cs has no pragma, so this consumer was null-oblivious and no CS8714 fired —
+which is why the earlier isolated measurement missed it.) The same conflict compounds in [P8-T2]:
+constraining `ScoDictionaryNew<TKey, TValue>` will additionally break WrapperScoDictionary's
+`where TDerived : ScoDictionaryNew<TKey, TValue>` clause.
+
+Conflict (three simultaneously-unsatisfiable directives):
+1. [P6-T3]/[P8-T2] ratified: APPLY `where TKey : notnull` to the four dictionary bases.
+2. Scope invariant: do NOT touch any NewtonsoftHelpers file (sibling child; out of scope).
+3. Gate requirement: the per-file pragma gate and the solution-wide [P9-T3] gate must reach 0 CS8714.
+
+Applying (1) violates (3) via a file that can only be fixed by violating (2). Verified: with the
+constraint REMOVED, the cluster is 0 CS86xx / 0 CS8714 and the whole assembly emits 0 CS8714 (only
+the 15 pre-existing, out-of-scope CS0168/CS0618 warnings-as-errors remain). All other Batch 6
+annotations are correct and green without the constraint.
+
+Executor action: per the run directive ("If any invariant cannot be satisfied, STOP and report the
+exact blocker rather than working around it"), execution is HALTED at [P6-T3]. The four dictionary
+bases have NOT been constrained and nothing has been committed. All annotation-only Batch 6 work is
+applied and green. A maintainer/orchestrator decision is required among:
+  (A) Amend scope to permit the mechanically-necessary `where TKey : notnull` on the NewtonsoftHelpers
+      consumer(s) (`WrapperScoDictionary<TDerived, TKey, TValue>`), consistent with the ratification's
+      stated cross-module-contract intent; or
+  (B) Withdraw the constraint from [P6-T3]/[P8-T2] (on net481 it is a no-op; the cluster is already
+      green without it) and defer it to a coordinated cross-child integration change; or
+  (C) Re-sequence so the constraint lands in a single integration change that also updates the
+      NewtonsoftHelpers consumers.
+
+## Epic-layer resolution — OPTION A EXTENDED TO TWO FILES (2026-07-19T23:10:00Z)
+
+Timestamp: 2026-07-19T23-40
+
+The epic layer (epic-orchestrator; the epic owns cross-child boundaries; user informed in-session,
+may override) resolved both escalations by extending the Option-A scope-boundary waiver to EXACTLY
+TWO #367-owned NewtonsoftHelpers files, adding one `where TKey : notnull` line to each and nothing
+else:
+
+1. `UtilitiesCS/NewtonsoftHelpers/WrapperScoDictionary.cs` — add `where TKey : notnull` to
+   `public class WrapperScoDictionary<TDerived, TKey, TValue>`. Clears the 4 CS8714 at lines
+   24, 33, 195, 207.
+2. `UtilitiesCS/NewtonsoftHelpers/ScoDictionaryConverter.cs` — add `where TKey : notnull` to
+   `ScoDictionaryConverter<TDerived, TKey, TValue>`. Clears the 3 CS8714 at lines 27, 28, 40.
+   `ScoDictionaryConverter` carries `where TDerived : ScoDictionaryNew<TKey, TValue>` and
+   constructs/deserializes `WrapperScoDictionary<TDerived, TKey, TValue>`, so it independently fails
+   the `notnull` constraint once WrapperScoDictionary (and, in [P8-T2], `ScoDictionaryNew`) are
+   constrained.
+
+Static cascade bound (verified, MUST NOT be edited under this waiver):
+- `PeopleScoConverter.cs` — SAFE (the `WrapperScoDictionary` reference is commented-out; active code
+  uses concrete type arguments).
+- `WrapperPeopleScoDictionaryNew.cs` — SAFE (concrete `ScoDictionaryNew<string,string>` /
+  `ConcurrentObservableDictionary<string,string>`).
+
+The cascade is statically bounded at these two files. No other cross-child file may be modified under
+this waiver. If a THIRD cross-child consumer surfaces during execution, HALT and re-escalate to the
+epic orchestrator; the waiver must NOT be widened unilaterally.
+
+This resolution supersedes the earlier one-file Option-A authorization. It is enacted in the revised
+plan tasks [P6-T3] (apply to both #367 files + `ConcurrentObservableDictionary`), [P9-T9]
+(verify constraint present on both #367 consumers and no other NewtonsoftHelpers file modified), and
+[P9-T10] (both one-line additive constraints expected in the AC5 diff review). It is also recorded in
+the child checkpoint `epic_decisions` and `human_interaction` blocks, and is documented in the
+constraint-propagation commit message and the PR #380 body per the epic documentation requirement.

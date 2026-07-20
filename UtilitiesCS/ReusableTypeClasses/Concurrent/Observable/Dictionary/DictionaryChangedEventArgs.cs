@@ -14,8 +14,8 @@ namespace UtilitiesCS.ReusableTypeClasses.Concurrent.Observable.Dictionary
         public DictionaryChangedEventArgs(
             NotifyCollectionChangedAction action,
             TKey key,
-            TValue newValue,
-            TValue oldValue
+            TValue? newValue,
+            TValue? oldValue
         )
             : this(action)
         {
