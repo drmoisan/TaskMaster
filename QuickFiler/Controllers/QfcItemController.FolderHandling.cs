@@ -199,7 +199,9 @@ namespace QuickFiler.Controllers
                 }
                 else
                 {
-                    _itemViewer.SetFolderSelectedIndex(1);
+                    _itemViewer.SetFolderSelectedIndex(
+                        _folderHandler.FolderArray.Length == 1 ? 0 : 1
+                    );
                 }
                 _selectedFolder = _itemViewer.GetSelectedFolder();
             }
@@ -225,7 +227,8 @@ namespace QuickFiler.Controllers
             int predeterminedIndex = string.IsNullOrEmpty(predeterminedFolder)
                 ? -1
                 : comboBox.Items.IndexOf(predeterminedFolder);
-            comboBox.SelectedIndex = predeterminedIndex >= 0 ? predeterminedIndex : 1;
+            comboBox.SelectedIndex =
+                predeterminedIndex >= 0 ? predeterminedIndex : (folderArray.Length == 1 ? 0 : 1);
             return comboBox.SelectedItem as string;
         }
     }
