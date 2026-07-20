@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -43,7 +45,12 @@ namespace UtilitiesCS.ReusableTypeClasses
                 }
                 type = type.BaseType;
             }
-            return null;
+            // why: the Type[] return contract is preserved (return type unchanged) because the sole
+            // caller, ScoDictionaryConverter, only invokes this after CanConvert (i.e.
+            // IsDerivedFrom_ScoDictionaryNew is true), so this branch is unreachable for valid
+            // callers; keeping Type[] (not Type[]?) avoids cascading a nullable into that
+            // constraint-only #367 waiver file. The prior null return value is preserved exactly.
+            return null!;
         }
     }
 }

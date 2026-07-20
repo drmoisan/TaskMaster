@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -135,7 +137,8 @@ namespace UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable
             {
                 throw new InvalidOperationException("Stack is empty. Cannot pop an element");
             }
-            return TakeFirst();
+            // non-empty after the guard: TakeFirst returns a present element, never the empty sentinel
+            return TakeFirst()!;
         }
 
         /// <summary>Removes and returns the element at <paramref name="index"/>, shifting higher indices down (O(n)).</summary>
@@ -154,7 +157,8 @@ namespace UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable
             {
                 throw new InvalidOperationException("Stack is empty. No element to peek at");
             }
-            return First.Value;
+            // non-empty after the guard: First is a present node, not the null terminus
+            return First!.Value;
         }
 
         /// <summary>Returns the element at <paramref name="index"/> without removing it (O(n)).</summary>
@@ -164,19 +168,20 @@ namespace UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable
         public T this[int index] => NodeAt(index).Value;
 
         /// <summary>Tries to read the top element without removing it.</summary>
-        public bool TryPeek(out T result)
+        public bool TryPeek(out T? result)
         {
             if (Count == 0)
             {
                 result = default;
                 return false;
             }
-            result = First.Value;
+            // non-empty after the guard: First is a present node, not the null terminus
+            result = First!.Value;
             return true;
         }
 
         /// <summary>Tries to read the element at <paramref name="index"/> without removing it.</summary>
-        public bool TryPeek(out T result, int index)
+        public bool TryPeek(out T? result, int index)
         {
             if (index < 0 || index >= Count)
             {
@@ -188,7 +193,7 @@ namespace UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable
         }
 
         /// <summary>Tries to remove and return the top element.</summary>
-        public bool TryPop(out T result)
+        public bool TryPop(out T? result)
         {
             if (Count == 0)
             {
@@ -200,7 +205,7 @@ namespace UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable
         }
 
         /// <summary>Tries to remove and return the element at <paramref name="index"/>, shifting higher indices down.</summary>
-        public bool TryPop(out T result, int index)
+        public bool TryPop(out T? result, int index)
         {
             if (index < 0 || index >= Count)
             {
@@ -222,12 +227,13 @@ namespace UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable
                     $"Index {index} out of range. Stack only has {Count} elements."
                 );
             }
+            // within bounds: First and each subsequent Next are present nodes, never the null terminus
             var node = First;
             for (int i = 0; i < index; i++)
             {
-                node = node.Next;
+                node = node!.Next;
             }
-            return node;
+            return node!;
         }
 
         #endregion Stack
