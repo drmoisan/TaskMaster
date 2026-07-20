@@ -54,6 +54,12 @@ namespace TaskMaster
                 System.Threading.Thread.CurrentThread.ManagedThreadId
             );
 
+            // SelectAwait (System.Linq.Async) is obsolete (CS0618) per the framework's migration
+            // guidance ("Use Select... the SelectAwait functionality now exists as overloads of
+            // Select"), but migrating to the new overload signature is a call-shape change to
+            // production code, not an annotation-only edit. Suppressing narrowly preserves the
+            // exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
             InboxEngines = await configs
                 .Where(config => config.Value.Engine)
                 .Select(config =>
@@ -76,6 +82,7 @@ namespace TaskMaster
                 })
                 .Where(tup => tup.Engine is not null)
                 .ToConcurrentDictionaryAsync(tup => tup.Key, tup => tup.Engine);
+#pragma warning restore CS0618
         }
 
         #endregion ctor

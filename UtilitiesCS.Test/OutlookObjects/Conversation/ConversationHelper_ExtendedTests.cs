@@ -302,7 +302,13 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         public void GetMailItemList_NoBoolOverload_NullDf_ReturnsEmptyList()
         {
             var mockApp = new Mock<Outlook.Application>();
+            // This file has no project-level <Nullable> and no whole-file #nullable pragma;
+            // this pre-existing `?` cast annotation needs an explicit annotations context to
+            // avoid CS8632. Scoping narrowly to annotations-only avoids introducing new CS86xx
+            // diagnostics elsewhere in this file (no behavior change per AC7).
+#nullable enable annotations
             IList result = ConvHelper.GetMailItemList((DataFrame?)null, "storeId", mockApp.Object);
+#nullable restore annotations
             result.Count.Should().Be(0);
         }
 
@@ -402,8 +408,14 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         [TestMethod]
         public void GetConversation_NullObject_ReturnsNull()
         {
+            // This file has no project-level <Nullable> and no whole-file #nullable pragma;
+            // this pre-existing `?` annotation needs an explicit annotations context to avoid
+            // CS8632. Scoping narrowly to annotations-only avoids introducing new CS86xx
+            // diagnostics elsewhere in this file (no behavior change per AC7).
+#nullable enable annotations
             object? obj = null;
             Outlook.Conversation result = ConvHelper.GetConversation(obj);
+#nullable restore annotations
             result.Should().BeNull();
         }
 
@@ -552,8 +564,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         [TestMethod]
         public void ConversationCt_NullObject_ReturnsMinusOne()
         {
+            // Same CS8632 annotations-context scoping as elsewhere in this file.
+#nullable enable annotations
             object? item = null;
             int result = ConvHelper.ConversationCt(item, true, true);
+#nullable restore annotations
             result.Should().Be(-1);
         }
 
@@ -572,8 +587,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         [TestMethod]
         public void GetConversationDf_NullObject_ReturnsNull()
         {
+            // Same CS8632 annotations-context scoping as elsewhere in this file.
+#nullable enable annotations
             object? item = null;
             DataFrame result = ConvHelper.GetConversationDf(item);
+#nullable restore annotations
             result.Should().BeNull();
         }
 
@@ -584,8 +602,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         [TestMethod]
         public void GetConversationDf_NullConversation_ReturnsNull()
         {
+            // Same CS8632 annotations-context scoping as elsewhere in this file.
+#nullable enable annotations
             Outlook.Conversation? conv = null;
             DataFrame result = ConvHelper.GetConversationDf(conv);
+#nullable restore annotations
             result.Should().BeNull();
         }
 
@@ -596,16 +617,22 @@ namespace UtilitiesCS.Test.OutlookObjects.Conversation
         [TestMethod]
         public void GetTable_NullConversation_ReturnsNull()
         {
+            // Same CS8632 annotations-context scoping as elsewhere in this file.
+#nullable enable annotations
             Outlook.Conversation? conv = null;
             Outlook.Table result = ConvHelper.GetTable(conv, true, true);
+#nullable restore annotations
             result.Should().BeNull();
         }
 
         [TestMethod]
         public void GetTable_NullConversation_NoFlags_ReturnsNull()
         {
+            // Same CS8632 annotations-context scoping as elsewhere in this file.
+#nullable enable annotations
             Outlook.Conversation? conv = null;
             Outlook.Table result = ConvHelper.GetTable(conv, false, false);
+#nullable restore annotations
             result.Should().BeNull();
         }
 

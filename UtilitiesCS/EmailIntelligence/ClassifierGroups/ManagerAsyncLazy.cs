@@ -68,17 +68,25 @@ namespace UtilitiesCS
                 true,
                 true
             );
+            // SelectAwait is obsolete (CS0618) per the framework's migration guidance ("Use
+            // Select ... overloads of Select"), but the replacement overload requires adding a
+            // CancellationToken parameter to the lambda. Suppressing narrowly preserves the
+            // exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
             var resourceDictionary = await resourceSet
                 .Cast<DictionaryEntry>()
                 .ToDictionary<string, string>()
                 .ToAsyncEnumerable()
                 .SelectAwait(async kvp =>
                 {
-                    var loader = await SmartSerializableLoader.DeserializeAsync(Globals, kvp.Value);
+                    var loader = (
+                        await SmartSerializableLoader.DeserializeAsync(Globals, kvp.Value)
+                    )!;
                     loader.PropertyChanged += Loader_PropertyChanged;
                     return new KeyValuePair<string, SmartSerializableLoader>(kvp.Key, loader);
                 })
                 .ToConcurrentDictionaryAsync();
+#pragma warning restore CS0618
 
             return resourceDictionary;
         }
@@ -127,13 +135,13 @@ namespace UtilitiesCS
                     var classifierGroup = GetAsyncLazyClassifierLoader(loader);
                     if (classifierGroup != null)
                     {
-                        this[loader.Name] = classifierGroup;
+                        this[loader.Name!] = classifierGroup;
                         await Globals.Engines.RestartEngineAsync(loader.Name);
                     }
                 }
                 else if (!loader.Config.ClassifierActivated)
                 {
-                    this.TryRemove(loader.Name, out _);
+                    this.TryRemove(loader.Name!, out _);
                     Globals.Engines.InboxEngines.TryRemove(loader.Name, out _);
                 }
                 await WriteConfigurationAsync();
@@ -285,7 +293,7 @@ namespace UtilitiesCS
                 var classifier = await BayesianClassifierGroup.Static.DeserializeAsync(
                     loader,
                     true,
-                    GetAltLoader(loader)
+                    GetAltLoader(loader)!
                 );
                 classifier.PropertyChanged += Config_PropertyChanged;
                 return classifier;

@@ -52,10 +52,17 @@ namespace TaskMaster
         /// <exception cref="ArgumentNullException">
         /// Thrown when <paramref name="engineName"/> or <paramref name="factory"/> is null.
         /// </exception>
+        // This file has no project-level <Nullable> element and no whole-file #nullable pragma;
+        // the `?` annotations below are pre-existing and intentional (documented above as "may
+        // be null"), but CS8632 requires an explicit annotations context. Scoping narrowly to
+        // annotations-only (not full nullable enable) avoids introducing new CS86xx diagnostics
+        // elsewhere in this file (no behavior change per AC7).
+#nullable enable annotations
         public async Task<IConditionalEngine<MailItemHelper>?> TimeEngineAsync(
             string engineName,
             Func<Task<IConditionalEngine<MailItemHelper>?>> factory
         )
+#nullable restore annotations
         {
             if (engineName is null)
             {

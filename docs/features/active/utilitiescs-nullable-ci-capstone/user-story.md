@@ -107,35 +107,35 @@ maintainer decisions the other eleven children left open.
 
 ## Acceptance Criteria
 
-- [ ] AC1: The CI nullable-gate step no longer passes `/p:Nullable=enable` globally; it runs the
+- [x] AC1: The CI nullable-gate step no longer passes `/p:Nullable=enable` globally; it runs the
   gate under `/t:Rebuild /p:TreatWarningsAsErrors=true` and relies on each file's own `#nullable
   enable` pragma. Opted-in files are enforced; non-opted-in files do not cross-block. So that:
   the maintainer can trust that merging a not-yet-remediated cluster's PR will not be blocked by
   unrelated pre-existing debt, while an opted-in file's real null defects still fail the build.
-- [ ] AC2: A genuine-enforcement verification is defined and executed: a deliberately-introduced
+- [x] AC2: A genuine-enforcement verification is defined and executed: a deliberately-introduced
   null defect in an opted-in file fails the gate, and the same class of defect in a non-opted-in
   file does not fail the gate. The introduced defect is reverted before completion; the
   verification is evidenced. So that: the maintainer has proof, not an assertion, that the gate
   distinguishes opted-in from non-opted-in files correctly, and the branch is left exactly as
   clean as it started.
-- [ ] AC3: Any pwsh step or workflow YAML that is added or modified complies with
+- [x] AC3: Any pwsh step or workflow YAML that is added or modified complies with
   `.claude/rules/ci-workflows.md` (deliberately-failing nested command exit-code handling) and,
   where applicable, `.claude/rules/benchmark-baselines.md`. No leaked `$LASTEXITCODE` on the
   success path. So that: the workflow edit cannot silently leak a stale non-zero exit code and
   report a false failure (or false success) to GitHub Actions.
-- [ ] AC4: The `.claude/rules/csharp.md` rules-vs-convention conflict (the rule documents
+- [x] AC4: The `.claude/rules/csharp.md` rules-vs-convention conflict (the rule documents
   forcing `/p:Nullable=enable` globally, which conflicts with the per-file opt-in convention) is
   surfaced as an explicit maintainer-decision item in `spec.md`. No `.claude/rules/*` file is
   edited. So that: the maintainer is aware of the documentation/policy inconsistency and can
   choose how to resolve it, without this feature overstepping the policy prohibition on editing
   rule files.
-- [ ] AC5: The optional project-level `<Nullable>enable</Nullable>` capstone decision for
+- [x] AC5: The optional project-level `<Nullable>enable</Nullable>` capstone decision for
   `UtilitiesCS.csproj` and `SVGControl.csproj` is documented as a separately-gated OPTIONAL step
   with an explicit maintainer decision gate, not performed by default in this feature. So that:
   the maintainer can later choose a stronger, more conventional enforcement posture once the
   remaining Designer/Interfaces risk surface is verified clean, without this feature forcing that
   decision or its risk prematurely.
-- [ ] AC6: A single consolidated maintainer-decision summary is present in `spec.md`, folding in
+- [x] AC6: A single consolidated maintainer-decision summary is present in `spec.md`, folding in
   the epic-wide exclusions (`Interfaces/**` ~62 files where CS8618 cannot fire;
   `Properties/Resources.Designer.cs` and `Settings.Designer.cs` left null-oblivious) and the
   child flags: `PeopleScoDictionaryNewBackup.cs` (dead uncompiled duplicate, exclude/delete
@@ -143,7 +143,7 @@ maintainer decisions the other eleven children left open.
   not split, and `MSDemoConv.cs` / `To Depricate/*` / `MailResolution_ToRemove` maintainer
   decisions. So that: the maintainer reviews one artifact instead of reading every child spec to
   find open decisions.
-- [ ] AC7: No behavior change to production C# code and no reduction in coverage on changed
+- [x] AC7: No behavior change to production C# code and no reduction in coverage on changed
   lines (the feature's changes are limited to CI workflow YAML, feature documents, and — only if
   the optional AC5 gate is later approved — csproj `<Nullable>` elements, which is out of scope
   for this feature's default execution). So that: the capstone, like every other epic child,

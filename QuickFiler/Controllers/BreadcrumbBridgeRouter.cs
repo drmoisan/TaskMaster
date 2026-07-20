@@ -293,7 +293,7 @@ namespace QuickFiler.Controllers
             string requestId = "req-" + (++_requestSequence);
             try
             {
-                FolderTreeNodeKey key = await _provider.ResolveLeafKeyAsync(
+                FolderTreeNodeKey? key = await _provider.ResolveLeafKeyAsync(
                     leaf.FullPath,
                     CancellationToken.None
                 );
@@ -338,7 +338,7 @@ namespace QuickFiler.Controllers
         {
             try
             {
-                FolderTreeNodeKey key = await _provider.ResolveLeafKeyAsync(
+                FolderTreeNodeKey? key = await _provider.ResolveLeafKeyAsync(
                     folderPath,
                     cancellationToken
                 );

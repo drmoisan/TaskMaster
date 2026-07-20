@@ -202,8 +202,8 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
             ProgressPackage ppkg
         )
         {
-            var groups = collection.GroupBy(x => x.FolderInfo.RelativePath);
-            var sw = ppkg.StopWatch;
+            var groups = collection.GroupBy(x => x.FolderInfo!.RelativePath);
+            var sw = ppkg.StopWatch!;
 
             bool success = false;
             try
@@ -214,7 +214,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
                     {
                         await BuildClassifierAsync(group, classifierGroup, ppkg.Cancel);
                     },
-                    ppkg.ProgressTrackerPane,
+                    ppkg.ProgressTrackerPane!,
                     "Building Classifiers",
                     ppkg.Cancel
                 );
@@ -237,9 +237,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
             var ppkg = await ProgressPackage //.CreateAsTupleAsync(screen: Globals.Ol.GetExplorerScreen());
                 .CreateAsTuplePaneAsync(progressTrackerPane: Globals.AF.ProgressTracker)
                 .ConfigureAwait(false);
-            var sw = ppkg.StopWatch;
+            var sw = ppkg.StopWatch!;
             Globals.AF.ProgressPane.Visible = true;
-            ppkg.ProgressTrackerPane.Report(
+            ppkg.ProgressTrackerPane!.Report(
                 0,
                 "Building Folder Classifier -> Load Mined Mail Info"
             );
@@ -254,7 +254,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
             collection.ThrowIfNullOrEmpty();
             sw.LogDuration("Load Staging");
 
-            ppkg.ProgressTrackerPane.Report(
+            ppkg.ProgressTrackerPane!.Report(
                 10,
                 "Building Folder Classifier -> Getting Folder Paths"
             );
@@ -265,14 +265,14 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
                 .ToList();
             sw.LogDuration("Get Folder Paths");
 
-            ppkg.ProgressTrackerPane.Report(
+            ppkg.ProgressTrackerPane!.Report(
                 20,
                 "Building Folder Classifier -> Creating Classifier Group"
             );
             var classifierGroup = await GetOrCreateClassifierGroupAsync(collection);
             sw.LogDuration("Get or Create Classifier Group and shared token base");
             sw.WriteToLog(clear: false);
-            ppkg.ProgressTrackerPane.Report(
+            ppkg.ProgressTrackerPane!.Report(
                 30,
                 "Building Folder Classifier -> Building Classifiers"
             );
@@ -281,7 +281,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
                 .InitializeAsync(
                     ppkg.CancelSource,
                     ppkg.Cancel,
-                    ppkg.ProgressTrackerPane.SpawnChild(),
+                    ppkg.ProgressTrackerPane!.SpawnChild(),
                     ppkg.StopWatch
                 )
                 .ConfigureAwait(false);
@@ -292,7 +292,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.OlFolder
                 // set the configuration of classifierGroup
                 if ((await Globals.AF.Manager.Configuration).TryGetValue("Folder", out var loader))
                 {
-                    classifierGroup.Config = loader.Config.DeepCopy() as NewSmartSerializableConfig;
+                    classifierGroup.Config = (
+                        loader.Config.DeepCopy() as NewSmartSerializableConfig
+                    )!;
                     classifierGroup.Serialize();
 
                     Globals.AF.Manager["Folder"] = classifierGroup.ToAsyncLazy();

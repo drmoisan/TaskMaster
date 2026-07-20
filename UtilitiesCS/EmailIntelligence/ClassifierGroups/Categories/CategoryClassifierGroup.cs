@@ -102,7 +102,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
                 List<string> prefixList = ["Context", "Project"];
                 foreach (var prefixLu in prefixList)
                 {
-                    var prefix = Globals.TD.PrefixList.Find(x => x.Key == prefixLu);
+                    var prefix = Globals.TD.PrefixList.Find(x => x.Key == prefixLu)!;
                     // Remove the existing Category Classifier
                     Globals.AF.Manager.TryRemove(prefix.Key, out _);
 
@@ -127,7 +127,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
                         .InitializeAsync(
                             childPpkg.CancelSource,
                             childPpkg.Cancel,
-                            childPpkg.ProgressTrackerPane.SpawnChild(),
+                            childPpkg.ProgressTrackerPane!.SpawnChild(),
                             childPpkg.StopWatch
                         )
                         .ConfigureAwait(false);
@@ -144,8 +144,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
                             )
                         )
                         {
-                            classifierGroup.Config =
-                                loader.Config.DeepCopy() as NewSmartSerializableConfig;
+                            classifierGroup.Config = (
+                                loader.Config.DeepCopy() as NewSmartSerializableConfig
+                            )!;
                             classifierGroup.Serialize();
 
                             Globals.AF.Manager[prefix.Key] = classifierGroup.ToAsyncLazy();
@@ -179,9 +180,16 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
             var ppkg = await ProgressPackage
                 .CreateAsTuplePaneAsync(progressTrackerPane: Globals.AF.ProgressTracker)
                 .ConfigureAwait(false);
-            var sw = ppkg.StopWatch;
+            var sw = ppkg.StopWatch!;
             Globals.AF.ProgressPane.Visible = true;
+            // CreateAsTuplePaneAsync's tuple has all-nullable fields by declaration, but this
+            // method's own return type declares the same fields non-nullable; the fields are
+            // always populated by ProgressPackage.InitializeAsync's own defaulting logic.
+            // Suppressing narrowly preserves the exact pre-existing behavior (no behavior
+            // change per AC7) rather than restructuring the tuple shape.
+#pragma warning disable CS8619
             return (ppkg, sw);
+#pragma warning restore CS8619
         }
 
         private async Task<BayesianClassifierGroup> LoadClassifierGroup(
@@ -220,7 +228,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
             IPrefix prefix
         )
         {
-            ppkg.ProgressTrackerPane.Report(
+            ppkg.ProgressTrackerPane!.Report(
                 20,
                 $"Building {prefix.Key} Classifier -> Creating Classifier Group"
             );
@@ -317,21 +325,27 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
 
             var groups = exploded.GroupBy(x => x.GroupingKey);
 
-            var sw = ppkg.StopWatch;
+            var sw = ppkg.StopWatch!;
 
             bool success = false;
             try
             {
+                // The grouping key's runtime non-nullness is not tracked through GroupBy's
+                // nullability inference (see the identical pattern and rationale in
+                // ActionableClassifierGroup.BuildClassifiersAsync); suppressing narrowly
+                // preserves the exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS8620
                 await AsyncMultiTasker.AsyncMultiTaskChunker(
                     groups,
                     async (group) =>
                     {
                         await BuildClassifierAsync(group, classifierGroup, ppkg.Cancel);
                     },
-                    ppkg.ProgressTrackerPane,
+                    ppkg.ProgressTrackerPane!,
                     "Building Classifiers",
                     ppkg.Cancel
                 );
+#pragma warning restore CS8620
                 sw.LogDuration("Build Classifiers");
                 sw.WriteToLog(clear: false);
                 success = true;
@@ -349,7 +363,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
             {
                 return new List<MinedMailInfo> { m };
             }
-            var categories = new FlagParser([.. m.Categories.Split(separator: ',', trim: true)])
+            var categories = new FlagParser([.. m.Categories!.Split(separator: ',', trim: true)])
                 .Combined.AsListWithPrefix.Where(x => x.Contains(prefix.Value))
                 .ToList();
 
@@ -498,7 +512,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups.Categories
         {
             var type = olItem.TryGet().OlItemType(out var typeVal)
                 ? $"{typeVal}"
-                : $"{olItem.InnerObject.GetType()}";
+                : $"{olItem.InnerObject!.GetType()}";
             var created = olItem.TryGet().CreationTime(out var result)
                 ? $" created on {result:g}"
                 : "";

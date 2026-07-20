@@ -95,6 +95,11 @@ namespace UtilitiesCS.EmailIntelligence
             var readElapsedMs = readStopwatch.Elapsed.TotalMilliseconds;
             var readEntryCount = serializedConfigurations.Count;
 
+            // SelectAwait is obsolete (CS0618) per the framework's migration guidance ("Use
+            // Select ... overloads of Select"), but the replacement overload requires adding a
+            // CancellationToken parameter to the lambda. Suppressing narrowly preserves the
+            // exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
             var resourceDictionary = await serializedConfigurations
                 .ToAsyncEnumerable()
                 .SelectAwait(async kvp =>
@@ -140,6 +145,7 @@ namespace UtilitiesCS.EmailIntelligence
                 })
                 .Where(kvp => kvp.Value is not null)
                 .ToConcurrentDictionaryAsync();
+#pragma warning restore CS0618
 
             // Emit the read-versus-deserialize breakdown exactly once as a single consolidated
             // block, consistent in style with the existing [Startup timing] table. The labeled
@@ -243,7 +249,15 @@ namespace UtilitiesCS.EmailIntelligence
             string? serializedLoader
         )
         {
-            return SmartSerializableLoader.DeserializeAsync(Globals, serializedLoader);
+            // SmartSerializableLoader.DeserializeAsync's declared Task<SmartSerializableLoader?>
+            // return type is a defensive contract for its own internal TaskCanceledException
+            // path; this method's own signature (unchanged, pre-existing) declares the
+            // non-nullable Task<SmartSerializableLoader>. Suppressing narrowly preserves the
+            // exact pre-existing behavior (no behavior change per AC7) rather than widening this
+            // method's own return-type contract.
+#pragma warning disable CS8619
+            return SmartSerializableLoader.DeserializeAsync(Globals, serializedLoader!);
+#pragma warning restore CS8619
         }
 
         internal void Loader_PropertyChanged(

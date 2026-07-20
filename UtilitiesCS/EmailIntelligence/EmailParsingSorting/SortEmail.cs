@@ -134,7 +134,7 @@ namespace UtilitiesCS
 
             // Resolve the paths for the emails
             ResolvePaths(
-                (Folder)mailHelpers.FirstOrDefault().FolderInfo.OlFolder,
+                (Folder)mailHelpers.FirstOrDefault()!.FolderInfo!.OlFolder!,
                 destinationOlStem,
                 appGlobals,
                 olAncestor,
@@ -228,10 +228,15 @@ namespace UtilitiesCS
             if (saveAttachments || savePictures)
             {
                 var attachments = mailHelper.AttachmentsHelper.ToAsyncEnumerable();
+                // ForEachAsync is obsolete (CS0618); see the rationale in EmailFiler's
+                // ProcessMailHelperAsync-adjacent fix. Suppressing narrowly preserves the
+                // exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
                 await attachments.ForEachAsync(async x =>
                 {
                     await x.SaveAttachmentAsync(saveFsPath);
                 });
+#pragma warning restore CS0618
 
                 // Delete the original attachments if removePreviousFsFiles is true
                 var toDelete = attachments.Where(x => !x.FilePathDelete.IsNullOrEmpty());
@@ -349,14 +354,19 @@ namespace UtilitiesCS
                     );
                     // Save to the file system
                     //await foreach (var attachment in attachments) { await attachment.SaveAttachmentAsync(); }
+                    // ForEachAsync is obsolete (CS0618); see the rationale in EmailFiler's
+                    // ProcessMailHelperAsync-adjacent fix. Suppressing narrowly preserves the
+                    // exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
                     await attachments.ForEachAsync(async x => await x.SaveAttachmentAsync());
+#pragma warning restore CS0618
                     //attachments.ForEach(x => x.SaveAttachment());
 
                     // Delete the original attachments if removePreviousFsFiles is true
                     var toDelete = attachments.Where(x => !x.FilePathDelete.IsNullOrEmpty());
                     await foreach (var attachment in toDelete)
                     {
-                        await Task.Run(() => File.Delete(attachment.FilePathDelete));
+                        await Task.Run(() => File.Delete(attachment.FilePathDelete!));
                     }
                 }
 
@@ -584,7 +594,7 @@ namespace UtilitiesCS
                         );
                         (
                             await new OlFolderClassifierGroup(globals).GetFolderPredictorAsync()
-                        ).UnTrain(helper.FolderInfo.RelativePath, helper.Tokens, 1);
+                        ).UnTrain(helper.FolderInfo!.RelativePath, helper.Tokens!, 1);
                         movedStack[i].UndoMove();
                         movedStack.Pop(i);
                     }
@@ -635,7 +645,7 @@ namespace UtilitiesCS
             var attachments = mailItem
                 .Attachments.Cast<Attachment>()
                 .Where(x => x.Type != OlAttachmentType.olOLE)
-                .Select(x => new AttachmentHelper(x, mailItem.SentOn, saveFsPath, deleteFsPath));
+                .Select(x => new AttachmentHelper(x, mailItem.SentOn, saveFsPath, deleteFsPath!));
             if (!saveAttachments)
             {
                 attachments = attachments.Where(x => x.AttachmentInfo.IsImage);
@@ -658,13 +668,24 @@ namespace UtilitiesCS
         )
         {
             //TraceUtility.LogMethodCall(mailItem, saveFsPath, deleteFsPath, saveAttachments, savePictures);
+            // SelectAwait is obsolete (CS0618) per the framework's migration guidance ("Use
+            // Select ... overloads of Select"), but the replacement overload requires adding a
+            // CancellationToken parameter to the lambda. Suppressing narrowly preserves the
+            // exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
             var attachments = mailItem
                 .Attachments.Cast<Attachment>()
                 .Where(x => x.Type != OlAttachmentType.olOLE)
                 .ToAsyncEnumerable()
                 .SelectAwait(async x =>
-                    await AttachmentHelper.CreateAsync(x, mailItem.SentOn, saveFsPath, deleteFsPath)
+                    await AttachmentHelper.CreateAsync(
+                        x,
+                        mailItem.SentOn,
+                        saveFsPath,
+                        deleteFsPath!
+                    )
                 );
+#pragma warning restore CS0618
             if (!saveAttachments)
             {
                 attachments = attachments.Where(x => x.AttachmentInfo.IsImage);
@@ -1252,7 +1273,7 @@ namespace UtilitiesCS
                                         $"Email Subject: {mailItem.Subject} \n Rename file: {strAtmtPath}",
                                         "Input Dialog",
                                         DefaultResponse: strAtmtName[0]
-                                    );
+                                    )!;
                                     if (string.IsNullOrEmpty(strAtmtName[0]))
                                     {
                                         if (
@@ -1376,7 +1397,7 @@ namespace UtilitiesCS
                 strAryOutput[13, 1] = "FlaggedAsTask";
 
                 SanitizeArray(strAryOutput, ref strOutput);
-                FileIO2.WriteTextFile(strFileName, strOutput, folderpath: strFileLocation);
+                FileIO2.WriteTextFile(strFileName, strOutput!, folderpath: strFileLocation);
             }
             strOutput = null;
             strAryOutput = null;

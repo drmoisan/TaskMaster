@@ -169,7 +169,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             using (var writer = createTextWriter(disk.FilePath))
             {
                 serializer.Serialize(writer, obj);
-                disk.FileName = null;
+                disk.FileName = null!;
             }
         }
 
@@ -187,7 +187,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 serializer.Serialize(sw, obj);
                 sw.Close();
-                disk.FileName = null;
+                disk.FileName = null!;
             }
         }
 
@@ -355,9 +355,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             {
                 serializer.Serialize(sw, chunk);
                 sw.Close();
-                disk.FileName = null;
+                disk.FileName = null!;
             }
-            disk.FileName = null;
+            disk.FileName = null!;
         }
 
         public virtual async Task<bool> ValidateJson<T>(

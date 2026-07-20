@@ -691,7 +691,13 @@ namespace QuickFiler.Controllers.Tests
             await Task.CompletedTask;
 
             // Assert
+            // Placeholder assertion (pre-existing, tautological by construction). MSTEST0032
+            // flags the always-true condition; replacing it with a genuine assertion is a test
+            // behavior change out of scope for this narrow build-debt remediation (no behavior
+            // change per AC7). Suppressed narrowly rather than altered.
+#pragma warning disable MSTEST0032
             Assert.IsTrue(true);
+#pragma warning restore MSTEST0032
         }
 
         [TestMethod]

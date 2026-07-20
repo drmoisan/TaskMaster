@@ -98,7 +98,7 @@ namespace UtilitiesCS
         private FlagTranslator _people = null!;
         public FlagTranslator People
         {
-            get => Initializer.GetOrLoad(ref _people, () => LoadPeople(), false, Flags);
+            get => Initializer.GetOrLoad(ref _people, () => LoadPeople(), false, Flags)!;
             private set => _people = value;
         }
 
@@ -110,7 +110,7 @@ namespace UtilitiesCS
         private FlagTranslator _projects = null!;
         public FlagTranslator Projects
         {
-            get => Initializer.GetOrLoad(ref _projects, LoadProjects, false, Flags);
+            get => Initializer.GetOrLoad(ref _projects, LoadProjects, false, Flags)!;
             private set => _projects = value;
         }
 
@@ -122,7 +122,7 @@ namespace UtilitiesCS
         private FlagTranslator _context = null!;
         public FlagTranslator Context
         {
-            get => Initializer.GetOrLoad(ref _context, LoadContext, false, Flags);
+            get => Initializer.GetOrLoad(ref _context, LoadContext, false, Flags)!;
             private set => _context = value;
         }
 
@@ -134,7 +134,7 @@ namespace UtilitiesCS
         private FlagTranslator _topic = null!;
         public FlagTranslator Topics
         {
-            get => Initializer.GetOrLoad(ref _topic, LoadTopic, false, Flags);
+            get => Initializer.GetOrLoad(ref _topic, LoadTopic, false, Flags)!;
             private set => _topic = value;
         }
 
@@ -147,7 +147,7 @@ namespace UtilitiesCS
 
         public FlagTranslator KB
         {
-            get => Initializer.GetOrLoad(ref _kb, LoadKB, false, Flags);
+            get => Initializer.GetOrLoad(ref _kb, LoadKB, false, Flags)!;
             private set => _kb = value;
         }
 

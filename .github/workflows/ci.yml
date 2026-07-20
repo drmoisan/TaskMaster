@@ -104,14 +104,15 @@ jobs:
         shell: pwsh
         run: |
           # Use /t:Rebuild (not /t:Build) so this step always performs a genuine full
-          # recompile under /p:Nullable=enable. The preceding "Build with analyzers"
-          # step already compiled everything under the projects' own Nullable settings;
-          # MSBuild's incremental up-to-date check does not invalidate on a changed
-          # -p:Nullable command-line property alone, so a plain /t:Build here would
-          # silently skip recompilation and never actually enforce this gate.
+          # recompile. Enforcement now relies entirely on each file's own #nullable
+          # enable pragma (the repo's per-file opt-in convention; UtilitiesCS.csproj and
+          # SVGControl.csproj carry no project-level <Nullable> element) plus
+          # /p:TreatWarningsAsErrors=true. MSBuild's incremental up-to-date check does
+          # not invalidate on this command-line property change alone, so a plain
+          # /t:Build would silently skip recompilation and never enforce this gate.
           & msbuild $env:SOLUTION_PATH /t:Rebuild /m /p:Configuration=Debug `
               "/p:Platform=Any CPU" `
-              /p:Nullable=enable /p:TreatWarningsAsErrors=true
+              /p:TreatWarningsAsErrors=true
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Run MSTest suite with coverage

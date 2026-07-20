@@ -86,10 +86,16 @@ namespace TaskMaster.Test.AppGlobals
             var probe = new TaskMaster.EngineInitTimingProbe(s => emitted.Add(s));
 
             // Act
+            // This file has no project-level <Nullable> and no whole-file #nullable pragma; this
+            // pre-existing `?` type-argument annotation needs an explicit annotations context to
+            // avoid CS8632. Scoping narrowly to annotations-only avoids introducing new CS86xx
+            // diagnostics elsewhere in this file (no behavior change per AC7).
+#nullable enable annotations
             var result = await probe.TimeEngineAsync(
                 "Project",
                 () => Task.FromResult<IConditionalEngine<MailItemHelper>?>(null)
             );
+#nullable restore annotations
 
             // Assert: null engine produces engineNull=True and costHint=Skip; return is null.
             result.Should().BeNull();
@@ -130,11 +136,14 @@ namespace TaskMaster.Test.AppGlobals
             var boom = new InvalidOperationException("engine init failed");
 
             // Act
+            // Same CS8632 annotations-context scoping as above.
+#nullable enable annotations
             Func<Task> act = () =>
                 probe.TimeEngineAsync(
                     "Context",
                     () => Task.FromException<IConditionalEngine<MailItemHelper>?>(boom)
                 );
+#nullable restore annotations
 
             // Assert: the original exception propagates and no [engine-init] line is emitted for
             // the failed call (timing line is only written after a successful await).

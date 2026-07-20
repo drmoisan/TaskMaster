@@ -821,7 +821,13 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
 
             public string LastSerializedFilePath { get; private set; }
 
+            // Required by ISmartSerializable<T> : INotifyPropertyChanged; this stub never
+            // raises it (no test needs the notification), so CS0067 fires. Deleting it is not
+            // possible (the interface requires it); suppressing narrowly preserves the exact
+            // pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0067
             public event PropertyChangedEventHandler PropertyChanged;
+#pragma warning restore CS0067
 
             public TestSmartItem Deserialize(string fileName, string folderPath) => new();
 

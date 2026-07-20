@@ -266,12 +266,20 @@ namespace TaskMaster
                 var enginesAvailable = Globals
                     .Engines.InboxEngines.Where(kvp => kvp.Value is not null)
                     .ToArray();
+                // WhereAwait (System.Linq.Async) is obsolete (CS0618) per the framework's
+                // migration guidance ("Use Where... the WhereAwait functionality now exists as
+                // overloads of Where"), but migrating to the new overload signature is a
+                // call-shape change to production code, not an annotation-only edit. Suppressing
+                // narrowly preserves the exact pre-existing behavior (no behavior change per
+                // AC7).
+#pragma warning disable CS0618
                 var enginesApplicable = await enginesAvailable
                     .ToAsyncEnumerable()
                     .Where(kvp => kvp.Value is not null)
                     .WhereAwait(async kvp => await kvp.Value.AsyncCondition(mailItem))
                     .Where(kvp => kvp.Value.Engine is not null)
                     .ToArrayAsync();
+#pragma warning restore CS0618
 
                 if (!enginesAvailable.Any())
                 {
@@ -298,9 +306,17 @@ namespace TaskMaster
                     // primitives runs off the STA. Engine AsyncCondition/AsyncAction calls that
                     // touch live COM members on mailItem/helper.Item marshal back to the STA.
                     await Task.Yield();
+                    // ForEachAwaitAsync (System.Linq.Async) is obsolete (CS0618) per the
+                    // framework's migration guidance ("Use the language support for async foreach
+                    // instead"), but replacing it with `await foreach` here is a control-flow
+                    // change to a production async method, not an annotation-only edit.
+                    // Suppressing narrowly preserves the exact pre-existing behavior (no behavior
+                    // change per AC7).
+#pragma warning disable CS0618
                     await enginesApplicable
                         .ToAsyncEnumerable()
                         .ForEachAwaitAsync(async e => await e.Value.AsyncAction(helper));
+#pragma warning restore CS0618
 
                     // Marshal back to the STA for the COM write that marks the item processed.
                     helper.Item.SetUdf("AutoProcessed", true, OlUserPropertyType.olYesNo);

@@ -149,7 +149,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                 .InitializeAsync(
                     childPpkg.CancelSource,
                     childPpkg.Cancel,
-                    childPpkg.ProgressTrackerPane.SpawnChild(),
+                    childPpkg.ProgressTrackerPane!.SpawnChild(),
                     childPpkg.StopWatch
                 )
                 .ConfigureAwait(false);
@@ -169,7 +169,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                     (await Globals.AF.Manager.Configuration).TryGetValue(EngineName, out var loader)
                 )
                 {
-                    classifierGroup.Config = loader.Config.DeepCopy() as NewSmartSerializableConfig;
+                    classifierGroup.Config = (
+                        loader.Config.DeepCopy() as NewSmartSerializableConfig
+                    )!;
                     classifierGroup.Serialize();
 
                     Globals.AF.Manager[EngineName] = classifierGroup.ToAsyncLazy();
@@ -247,9 +249,16 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             var ppkg = await ProgressPackage
                 .CreateAsTuplePaneAsync(progressTrackerPane: Globals.AF.ProgressTracker)
                 .ConfigureAwait(false);
-            var sw = ppkg.StopWatch;
+            var sw = ppkg.StopWatch!;
             Globals.AF.ProgressPane.Visible = true;
+            // CreateAsTuplePaneAsync's tuple has all-nullable fields by declaration, but this
+            // method's own return type declares the same fields non-nullable; the fields are
+            // always populated by ProgressPackage.InitializeAsync's own defaulting logic.
+            // Suppressing narrowly preserves the exact pre-existing behavior (no behavior
+            // change per AC7) rather than restructuring the tuple shape.
+#pragma warning disable CS8619
             return (ppkg, sw);
+#pragma warning restore CS8619
         }
 
         private async Task<BayesianClassifierGroup> LoadClassifierGroup(
@@ -289,7 +298,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             int minimumCountPerToken = 0
         )
         {
-            ppkg.ProgressTrackerPane.Report(
+            ppkg.ProgressTrackerPane!.Report(
                 20,
                 $"Building {groupName} Classifier -> Creating Classifier Group"
             );
@@ -415,7 +424,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
         {
             var type = olItem.TryGet().OlItemType(out var typeVal)
                 ? $"{typeVal}"
-                : $"{olItem.InnerObject.GetType()}";
+                : $"{olItem.InnerObject!.GetType()}";
             var created = olItem.TryGet().CreationTime(out var result)
                 ? $" created on {result:g}"
                 : "";

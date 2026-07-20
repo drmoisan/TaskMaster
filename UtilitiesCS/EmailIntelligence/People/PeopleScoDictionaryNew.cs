@@ -100,7 +100,7 @@ namespace ToDoModel.Data_Model.People
             var helper = new MailItemHelper(olMail, Globals);
             var recipients = helper.ToRecipients.ToList();
             recipients.AddRange(helper.CcRecipients);
-            recipients.Add(helper.Sender);
+            recipients.Add(helper.Sender!);
 
             var addressList = recipients.Select(x => x.Address).ToList();
 
@@ -194,8 +194,8 @@ namespace ToDoModel.Data_Model.People
                 newPerson = InputBox.ShowDialog(
                     "The following category name will be added:",
                     "Add Category Dialog",
-                    DefaultResponse: newPerson
-                );
+                    DefaultResponse: newPerson!
+                )!;
                 // if user cancels, return null
                 if (newPerson is null)
                 {

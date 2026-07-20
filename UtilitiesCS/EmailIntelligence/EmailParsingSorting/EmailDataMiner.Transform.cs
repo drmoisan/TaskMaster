@@ -41,7 +41,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             _globals.AF.ProgressPane.Visible = true;
             var message =
                 $"Transforming from {typeof(FolderWrapper[][]).Name} to {typeof(IItemInfo[])}";
-            progress.Report(0, message);
+            progress!.Report(0, message);
 
             if (!_globals.FS.SpecialFolders.TryGetValue("AppData", out var folderRoot))
             {
@@ -161,9 +161,9 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             await mailInfo.TokenizeAsync();
             var serializable = mailInfo.ToSerializableObject();
             serializable.Sw = mailInfo.Sw;
-            serializable.Sw.LogDuration("ToSerializableObject");
+            serializable.Sw!.LogDuration("ToSerializableObject");
 
-            foreach (var attachment in serializable.AttachmentsInfo)
+            foreach (var attachment in serializable.AttachmentsInfo!)
             {
                 if (!attachment.IsImage)
                 {
@@ -198,7 +198,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 .ConfigureAwait(false);
             _globals.AF.ProgressPane.Visible = true;
             var message = $"Transforming from {typeof(Tin).Name} to {typeof(Tout)}";
-            progress.Report(0, message);
+            progress!.Report(0, message);
 
             var tInName = FolderConverter.SanitizeFilename(typeof(Tin).Name);
             var tOutName = FolderConverter.SanitizeFilename(typeof(Tout).Name);
@@ -243,12 +243,14 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                     }
                 }
 
-                Tin obj = await serializer
-                    .DeserializeAsync<Tin>(
-                        progress.SpawnChild(completedPerChunk),
-                        $"{tInName}_{i:0000}"
-                    )
-                    .ConfigureAwait(false);
+                Tin obj = (
+                    await serializer
+                        .DeserializeAsync<Tin>(
+                            progress.SpawnChild(completedPerChunk),
+                            $"{tInName}_{i:0000}"
+                        )
+                        .ConfigureAwait(false)
+                )!;
                 Tout result = await transformer(obj);
                 //if (count == 1)
                 //    SerializeAndSave(result, tOutName);
@@ -320,7 +322,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
                 .ConfigureAwait(false);
             _globals.AF.ProgressPane.Visible = true;
             var message = $"Transforming from {typeof(Tin).Name} to {typeof(Tout)}";
-            progress.Report(0, message);
+            progress!.Report(0, message);
 
             var tInName = FolderConverter.SanitizeFilename(typeof(Tin).Name);
             var tOutName = FolderConverter.SanitizeFilename(typeof(Tout).Name);
@@ -358,7 +360,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian
             CancellationToken token
         )
         {
-            var mailItems = QueryMailItems(folders.Select(x => x.OlFolder)).ToArray();
+            var mailItems = QueryMailItems(folders.Select(x => x.OlFolder!)).ToArray();
 
             var count = mailItems.Count();
             if (count == 0)

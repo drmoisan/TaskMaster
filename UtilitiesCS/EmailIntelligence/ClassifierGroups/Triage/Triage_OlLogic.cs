@@ -141,7 +141,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
                         if (parent.ChildCount == 1)
                         {
                             var brother = parent.Children.First();
-                            grandParent.Parent.RemoveChild(parent);
+                            grandParent.Parent!.RemoveChild(parent);
                             parent.Parent = null;
                             grandParent.AddChild(brother);
                             brother.Parent = grandParent;

@@ -216,7 +216,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             using (TextWriter sw = CreateTextWriter(disk.FilePath))
             {
                 serializer.Serialize(sw, obj);
-                disk.FileName = null;
+                disk.FileName = null!;
             }
         }
 
@@ -233,7 +233,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             {
                 serializer.Serialize(sw, obj);
                 sw.Close();
-                disk.FileName = null;
+                disk.FileName = null!;
             }
         }
 
@@ -313,7 +313,7 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             SerializeFsSave(mailInfo, "MailItemInfo", serializer, disk);
 
             var (minedInfo, sizeMinedInfo1) = TryLoadObjectAndGetMemorySize(() =>
-                new MinedMailInfo(mailInfo)
+                new MinedMailInfo(mailInfo!)
             );
             var sizeMinedInfo2 = 0; // ObjectSize(minedInfo);
             LogSizeComparison(
@@ -403,9 +403,9 @@ namespace UtilitiesCS.EmailIntelligence.ClassifierGroups
             {
                 serializer.Serialize(sw, chunk);
                 sw.Close();
-                disk.FileName = null;
+                disk.FileName = null!;
             }
-            disk.FileName = null;
+            disk.FileName = null!;
         }
 
         public virtual async Task<bool> ValidateJson<T>(

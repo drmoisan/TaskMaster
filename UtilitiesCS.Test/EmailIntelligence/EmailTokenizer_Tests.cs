@@ -58,8 +58,11 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var tokenizer = new EmailTokenizer();
 
             // Act
+            // null! deliberately passed to exercise the method's ArgumentNullException guard
+            // clause; the null-forgiving operator documents the intentional null without
+            // changing the runtime value (no behavior change per AC7).
             Action act = () =>
-                tokenizer.Tokenize(obj: null, globals: Mock.Of<IApplicationGlobals>()).ToArray();
+                tokenizer.Tokenize(obj: null!, globals: Mock.Of<IApplicationGlobals>()).ToArray();
 
             // Assert
             act.Should().Throw<ArgumentNullException>().WithParameterName("obj");

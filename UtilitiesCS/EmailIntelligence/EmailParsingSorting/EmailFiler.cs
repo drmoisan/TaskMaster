@@ -130,7 +130,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             //TraceUtility.LogMethodCall(mailHelpers);
             mailHelpers.ThrowIfNullOrEmpty(nameof(mailHelpers));
             MailHelpers = mailHelpers;
-            ResolvePaths((Folder)MailHelpers.FirstOrDefault().FolderInfo.OlFolder);
+            ResolvePaths((Folder)MailHelpers.FirstOrDefault()!.FolderInfo!.OlFolder!);
             return await SortAsync();
         }
 
@@ -270,15 +270,22 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
                     attachments = attachments.Where(x => x.AttachmentInfo.IsImage);
                 }
 
+                // ForEachAsync is obsolete (CS0618) per the framework's migration guidance
+                // ("Use the language support for async foreach instead"), but replacing it
+                // with `await foreach` here is a control-flow change to a production async
+                // method, not an annotation-only edit. Suppressing narrowly preserves the
+                // exact pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
                 await attachments.ForEachAsync(async x =>
                 {
                     await SaveAttachmentAsync(x).ConfigureAwait(false);
                 });
+#pragma warning restore CS0618
 
                 var toDelete = attachments.Where(x => !x.FilePathDelete.IsNullOrEmpty());
                 await foreach (var attachment in toDelete)
                 {
-                    await Task.Run(() => DeleteFile(attachment.FilePathDelete))
+                    await Task.Run(() => DeleteFile(attachment.FilePathDelete!))
                         .ConfigureAwait(false);
                 }
             }

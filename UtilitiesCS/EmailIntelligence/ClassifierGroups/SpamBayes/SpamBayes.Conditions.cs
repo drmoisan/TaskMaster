@@ -89,7 +89,7 @@ namespace UtilitiesCS.EmailIntelligence
         {
             var type = olItem.TryGet().OlItemType(out var typeVal)
                 ? $"{typeVal}"
-                : $"{olItem.InnerObject.GetType()}";
+                : $"{olItem.InnerObject!.GetType()}";
             var created = olItem.TryGet().CreationTime(out var result)
                 ? $" created on {result:g}"
                 : "";

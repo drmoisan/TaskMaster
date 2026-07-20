@@ -311,6 +311,12 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
         {
             using (var sourceStream = CreateTextWriteStream(filePath))
             {
+                // ForEachAwaitAsync is obsolete (CS0618) per the framework's migration guidance
+                // ("Use the language support for async foreach instead"), but replacing it with
+                // `await foreach` here is a control-flow change to a production async I/O method,
+                // not an annotation-only edit. Suppressing narrowly preserves the exact
+                // pre-existing behavior (no behavior change per AC7).
+#pragma warning disable CS0618
                 await texts
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(async text =>
@@ -318,6 +324,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
                         byte[] encodedText = Encoding.Unicode.GetBytes(text + Environment.NewLine);
                         await sourceStream.WriteAsync(encodedText, 0, encodedText.Length);
                     });
+#pragma warning restore CS0618
             }
             ;
         }
@@ -345,7 +352,7 @@ namespace UtilitiesCS.EmailIntelligence.Bayesian.Performance
             using (StreamWriter sw = File.CreateText(disk.FilePath))
             {
                 serializer.Serialize(sw, obj);
-                disk.FileName = null;
+                disk.FileName = null!;
             }
         }
 

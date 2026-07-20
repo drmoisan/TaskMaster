@@ -185,10 +185,10 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             //TraceUtility.LogMethodCall(currentFolder, DestinationOlStem, Globals, OlAncestor, FsAncestorEquivalent);
 
             DestinationOlPath = $"{OlAncestor}\\{DestinationOlStem}";
-            SaveFsPath = DestinationOlPath.ToFsFolderpath(OlAncestor, FsAncestorEquivalent);
+            SaveFsPath = DestinationOlPath.ToFsFolderpath(OlAncestor, FsAncestorEquivalent!);
             DeleteAndUnTrain = IsDeleteRelevant(currentFolder);
             DeleteFsPath = DeleteAndUnTrain
-                ? currentFolder.ToFsFolderpath(OlAncestor, FsAncestorEquivalent)
+                ? currentFolder.ToFsFolderpath(OlAncestor, FsAncestorEquivalent!)
                 : null;
             DestinationOlFolder = TryResolveDestinationFolder();
             OriginFolder = currentFolder;
@@ -201,7 +201,7 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             //TraceUtility.LogMethodCall(DestinationOlStem, Globals, OlAncestor, FsAncestorEquivalent);
 
             DestinationOlPath = $"{OlAncestor}\\{DestinationOlStem}";
-            SaveFsPath = DestinationOlPath.ToFsFolderpath(OlAncestor, FsAncestorEquivalent);
+            SaveFsPath = DestinationOlPath.ToFsFolderpath(OlAncestor, FsAncestorEquivalent!);
             DestinationOlFolder = TryResolveDestinationFolder();
         }
 
@@ -209,8 +209,8 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         {
             try
             {
-                var destinationOlFolder = new FolderPredictor(Globals).GetFolder(
-                    DestinationOlPath,
+                var destinationOlFolder = new FolderPredictor(Globals!).GetFolder(
+                    DestinationOlPath!,
                     Globals!.Ol.App
                 );
                 if (destinationOlFolder is null)
