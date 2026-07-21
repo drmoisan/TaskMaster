@@ -9,11 +9,12 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
     /// <summary>
     /// Unit tests for the host-neutral <see cref="BreadcrumbStateModel"/> /
     /// <see cref="BreadcrumbStateRow"/> collapse/expand state machine (#351 P3-T2): positive
-    /// collapse-after/re-expand/affordance flows, negative fail-fast validation, edge chains, and
-    /// state-transition sequences. Deterministic; no Outlook, WebView2, timers, or temp files.
+    /// collapse-after/re-expand/affordance flows, negative fail-fast validation, and edge chains. The
+    /// state-transition-sequence and #398 ReplaceRows groups live in the sibling partial
+    /// BreadcrumbStateModelSequenceTests.cs. Deterministic; no Outlook, WebView2, timers, or temp files.
     /// </summary>
     [TestClass]
-    public sealed class BreadcrumbStateModelTests
+    public sealed partial class BreadcrumbStateModelTests
     {
         private static FolderTreeNodeKey Key(string entryId, string path) =>
             new FolderTreeNodeKey("store-a", entryId, path);
@@ -314,161 +315,6 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             row.CollapsedAfterIndex.Should().BeNull();
             row.LeafExpanded.Should().BeFalse();
             row.Subfolders.Should().BeEmpty();
-        }
-
-        // --- State-transition sequences ---
-
-        [TestMethod]
-        public void Sequence_CollapseReExpandCollapse_TransitionsDeterministically()
-        {
-            // Arrange
-            var row = ModelWithSuggestion().Rows[0];
-
-            // Act + Assert stepwise
-            row.CollapseAfter(1);
-            row.CollapsedAfterIndex.Should().Be(1);
-            row.ReExpand();
-            row.CollapsedAfterIndex.Should().BeNull();
-            row.CollapseAfter(0);
-            row.CollapsedAfterIndex.Should().Be(0);
-        }
-
-        [TestMethod]
-        public void Sequence_ExpandListSubfoldersThenCollapse_ClearsTheList()
-        {
-            // Arrange
-            var model = ModelWithSuggestion();
-            var row = model.Rows[0];
-
-            // Act
-            row.TryExpandLeaf();
-            row.SetSubfolders(
-                new[]
-                {
-                    Segment("s1", "\\Inbox\\Projects\\Apollo\\A", "A", false),
-                    Segment("s2", "\\Inbox\\Projects\\Apollo\\B", "B", true),
-                }
-            );
-            var collapsed = row.TryCollapseLeaf();
-
-            // Assert
-            collapsed.Should().BeTrue();
-            row.LeafExpanded.Should().BeFalse();
-            row.Subfolders.Should().BeEmpty();
-            row.TryCollapseLeaf().Should().BeFalse("already collapsed is a reported no-op");
-        }
-
-        [TestMethod]
-        public void Arrows_RightExpandsThenLeftCollapses_UnhandledWhenNothingChanges()
-        {
-            // Arrange
-            var model = ModelWithSuggestion();
-
-            // Act + Assert: Right opens the leaf expansion.
-            model.RightArrow().Should().BeTrue();
-            model.SelectedRow.LeafExpanded.Should().BeTrue();
-
-            // Right again: nothing further to expand -> unhandled (legacy fall-through signal).
-            model.RightArrow().Should().BeFalse();
-
-            // Left closes the expansion; a second Left is unhandled.
-            model.LeftArrow().Should().BeTrue();
-            model.SelectedRow.LeafExpanded.Should().BeFalse();
-            model.LeftArrow().Should().BeFalse();
-        }
-
-        [TestMethod]
-        public void RightArrow_OnCollapsedRow_ReExpandsBeforeLeafExpansion()
-        {
-            // Arrange
-            var model = ModelWithSuggestion();
-            model.SelectedRow.CollapseAfter(0);
-
-            // Act + Assert: first Right restores the chain, second opens the leaf.
-            model.RightArrow().Should().BeTrue();
-            model.SelectedRow.CollapsedAfterIndex.Should().BeNull();
-            model.RightArrow().Should().BeTrue();
-            model.SelectedRow.LeafExpanded.Should().BeTrue();
-        }
-
-        [TestMethod]
-        public void Arrows_WithNoSelection_AreUnhandled()
-        {
-            // Arrange
-            var model = new BreadcrumbStateModel();
-            model.AddSuggestionRow(ThreeSegmentChain(), 0.4);
-
-            // Act, Assert
-            model.RightArrow().Should().BeFalse();
-            model.LeftArrow().Should().BeFalse();
-        }
-
-        [TestMethod]
-        public void SelectSubfolder_OutOfRangeIndex_Throws()
-        {
-            // Arrange
-            var model = ModelWithSuggestion();
-            model.SelectedRow.TryExpandLeaf();
-            model.SelectedRow.SetSubfolders(
-                new[] { Segment("sub", "\\Inbox\\Projects\\Apollo\\Sub", "Sub", false) }
-            );
-
-            // Act, Assert
-            ((System.Action)(() => model.SelectSubfolder(-1)))
-                .Should()
-                .Throw<ArgumentOutOfRangeException>();
-            ((System.Action)(() => model.SelectSubfolder(1)))
-                .Should()
-                .Throw<ArgumentOutOfRangeException>();
-        }
-
-        [TestMethod]
-        public void LeftArrow_WithSubfolderSelected_ResetsSubfolderSelectionAndCollapses()
-        {
-            // Arrange
-            var model = ModelWithSuggestion();
-            model.SelectedRow.TryExpandLeaf();
-            model.SelectedRow.SetSubfolders(
-                new[] { Segment("sub", "\\Inbox\\Projects\\Apollo\\Sub", "Sub", false) }
-            );
-            model.SelectSubfolder(0);
-
-            // Act
-            var handled = model.LeftArrow();
-
-            // Assert
-            handled.Should().BeTrue();
-            model.SelectedSubfolderIndex.Should().Be(-1);
-            model.SelectedRow.LeafExpanded.Should().BeFalse();
-        }
-
-        [TestMethod]
-        public void AddSuggestionRow_NullSegmentInChain_Throws()
-        {
-            // Arrange
-            var model = new BreadcrumbStateModel();
-            var chain = new[] { Segment("root", "\\Inbox", "Inbox", true), null };
-
-            // Act
-            Action act = () => model.AddSuggestionRow(chain, 0.5);
-
-            // Assert
-            act.Should().Throw<ArgumentException>().WithMessage("*null segments*");
-        }
-
-        [TestMethod]
-        public void Clear_RemovesRowsAndSelection()
-        {
-            // Arrange
-            var model = ModelWithSuggestion();
-
-            // Act
-            model.Clear();
-
-            // Assert
-            model.Rows.Should().BeEmpty();
-            model.SelectedIndex.Should().Be(-1);
-            model.SelectedRow.Should().BeNull();
         }
     }
 }

@@ -15,11 +15,13 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
     /// with a Moq-mocked <see cref="IFolderHierarchyProvider"/> returning completed tasks only:
     /// positive routing (expand -&gt; render+subfolderResponse, double-click collapse, Right-arrow
     /// expand), negative routing (provider exception -&gt; explicit error; malformed JSON -&gt;
-    /// error), edge fall-throughs (unhandledArrow left/right; theme re-render), and multi-message
-    /// state-transition sequences. Deterministic; no Outlook, WebView2, timers, or temp files.
+    /// error), and edge fall-throughs (unhandledArrow left/right; theme re-render). The multi-message
+    /// state-transition sequences and #398 in-flight rebuild invariants live in the sibling partial
+    /// FolderBreadcrumbBridgeRouterInFlightTests.cs. Deterministic; no Outlook, WebView2, timers, or
+    /// temp files.
     /// </summary>
     [TestClass]
-    public sealed class FolderBreadcrumbBridgeRouterTests
+    public sealed partial class FolderBreadcrumbBridgeRouterTests
     {
         private const string LeafPath = "\\Inbox\\Projects\\Apollo";
 
@@ -307,120 +309,6 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
                 .Theme.Should()
                 .Be("dark");
             BreadcrumbBridgeSerializer.Parse(outputs[1]).Should().BeOfType<RenderMessage>();
-        }
-
-        // --- State-transition sequences across multiple routed messages ---
-
-        [TestMethod]
-        public async Task Sequence_ExpandCollapseViaMessages_TransitionsDeterministically()
-        {
-            // Arrange
-            var router = await PopulatedRouterAsync(ProviderMock());
-
-            // Act + Assert stepwise: toggle open -> toggle closed -> double-click collapse ->
-            // toggle re-expands the collapsed chain.
-            (
-                await router.RouteAsync(
-                    "{\"type\":\"affordanceToggle\",\"rowIndex\":0}",
-                    CancellationToken.None
-                )
-            )
-                .Should()
-                .HaveCount(2);
-            router.Model.Rows[0].LeafExpanded.Should().BeTrue();
-
-            (
-                await router.RouteAsync(
-                    "{\"type\":\"affordanceToggle\",\"rowIndex\":0}",
-                    CancellationToken.None
-                )
-            )
-                .Should()
-                .ContainSingle();
-            router.Model.Rows[0].LeafExpanded.Should().BeFalse();
-
-            await router.RouteAsync(
-                "{\"type\":\"segmentDoubleClick\",\"rowIndex\":0,\"segmentIndex\":1}",
-                CancellationToken.None
-            );
-            router.Model.Rows[0].CollapsedAfterIndex.Should().Be(1);
-
-            await router.RouteAsync(
-                "{\"type\":\"affordanceToggle\",\"rowIndex\":0}",
-                CancellationToken.None
-            );
-            router.Model.Rows[0].CollapsedAfterIndex.Should().BeNull();
-        }
-
-        [TestMethod]
-        public async Task SetSuggestions_UnresolvablePath_FallsBackToPlainRowPreservingThePath()
-        {
-            // Arrange: the provider knows nothing about this path (G10 fallback).
-            var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
-            provider
-                .Setup(p => p.ResolveLeafKeyAsync("\\Ghost", It.IsAny<CancellationToken>()))
-                .ReturnsAsync((FolderTreeNodeKey)null);
-            var router = new FolderBreadcrumbBridgeRouter(provider.Object);
-
-            // Act
-            await router.SetSuggestionsAsync(
-                new[]
-                {
-                    new FolderRow(
-                        "\\Ghost",
-                        FolderRowKind.Suggestion,
-                        new FolderScore("\\Ghost", 10, 0.2)
-                    ),
-                },
-                CancellationToken.None
-            );
-
-            // Assert
-            router.Model.Rows[0].IsSuggestion.Should().BeFalse();
-            router.Model.Rows[0].VerbatimText.Should().Be("\\Ghost");
-        }
-
-        [TestMethod]
-        public void SetItemsAndAddItems_NullInput_ThrowExplicitly()
-        {
-            // Arrange
-            var router = new FolderBreadcrumbBridgeRouter(
-                new Mock<IFolderHierarchyProvider>(MockBehavior.Strict).Object
-            );
-
-            // Act, Assert
-            ((Action)(() => router.SetItems(null)))
-                .Should()
-                .Throw<ArgumentNullException>();
-            ((Action)(() => router.AddItems(null))).Should().Throw<ArgumentNullException>();
-        }
-
-        [TestMethod]
-        public void Constructor_NullProvider_Throws()
-        {
-            // Arrange, Act
-            Action act = () => new FolderBreadcrumbBridgeRouter(null);
-
-            // Assert
-            act.Should().Throw<ArgumentNullException>().WithParameterName("provider");
-        }
-
-        [TestMethod]
-        public async Task SetItems_PlainRows_RenderVerbatimIncludingTrashToDelete()
-        {
-            // Arrange
-            var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
-            var router = new FolderBreadcrumbBridgeRouter(provider.Object);
-
-            // Act (Path B population; no provider call is made for plain rows).
-            var renderJson = router.SetItems(new[] { "Trash to Delete", "\\Inbox\\Manual" });
-
-            // Assert
-            var render = (RenderMessage)BreadcrumbBridgeSerializer.Parse(renderJson);
-            render.Rows.Should().HaveCount(2);
-            render.Rows[0].Cells[0].Text.Should().Be("Trash to Delete");
-            render.Rows[0].PercentText.Should().BeEmpty();
-            await Task.CompletedTask;
         }
     }
 }

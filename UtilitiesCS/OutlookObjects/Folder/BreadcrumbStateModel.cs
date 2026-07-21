@@ -183,7 +183,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
     /// </summary>
     public sealed class BreadcrumbStateModel
     {
-        private readonly List<BreadcrumbStateRow> _rows = new List<BreadcrumbStateRow>();
+        private List<BreadcrumbStateRow> _rows = new List<BreadcrumbStateRow>();
         private int _selectedIndex = -1;
         private int _selectedSubfolderIndex = -1;
 
@@ -208,6 +208,33 @@ namespace UtilitiesCS.OutlookObjects.Folder
             _rows.Clear();
             _selectedIndex = -1;
             _selectedSubfolderIndex = -1;
+        }
+
+        /// <summary>
+        /// Atomically replaces all rows with <paramref name="rows"/> via a single backing-list
+        /// reference swap, so an observer never sees a transiently cleared or partially-populated
+        /// model during a rebuild (#398). The current selection is preserved when its index is still
+        /// valid against the new row count; any subfolder selection is reset. No intervening
+        /// mutation or <c>await</c> occurs, so a concurrent host selection cannot race an empty
+        /// window.
+        /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="rows"/> is null.</exception>
+        public void ReplaceRows(IReadOnlyList<BreadcrumbStateRow> rows)
+        {
+            if (rows == null)
+            {
+                throw new ArgumentNullException(nameof(rows));
+            }
+
+            var replacement = new List<BreadcrumbStateRow>(rows);
+            // Reconcile the selection against the new count BEFORE publishing the new list so no
+            // reader can observe the replacement list paired with a stale out-of-range index.
+            if (_selectedIndex >= replacement.Count)
+            {
+                _selectedIndex = -1;
+            }
+            _selectedSubfolderIndex = -1;
+            _rows = replacement;
         }
 
         /// <summary>Appends a Path A suggestion row (root-first chain, optional probability).</summary>

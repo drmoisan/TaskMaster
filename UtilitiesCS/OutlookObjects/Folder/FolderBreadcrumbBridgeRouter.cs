@@ -50,7 +50,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 throw new ArgumentNullException(nameof(rows));
             }
 
-            _model.Clear();
+            // #398: resolve every row's ancestor chain into a LOCAL collection first, mutating no
+            // shared model state while awaiting the provider, then swap the completed set into the
+            // model atomically. This removes the mid-rebuild empty window that let a concurrent host
+            // SelectRow race a transiently cleared or partially-populated model.
+            var built = new List<BreadcrumbStateRow>(rows.Count);
             foreach (var row in rows)
             {
                 if (row.Score.HasValue)
@@ -65,20 +69,21 @@ namespace UtilitiesCS.OutlookObjects.Folder
                             : await _provider
                                 .GetAncestorChainAsync(key, cancellationToken)
                                 .ConfigureAwait(false);
-                    if (chain.Count > 0)
-                    {
-                        _model.AddSuggestionRow(chain, row.Score.Value.Probability);
-                    }
-                    else
-                    {
-                        _model.AddPlainRow(path);
-                    }
+                    // A scored row whose path cannot be resolved falls back to a plain row carrying
+                    // the score's folder path so the selection contract still yields the exact path.
+                    built.Add(
+                        chain.Count > 0
+                            ? new BreadcrumbStateRow(chain, row.Score.Value.Probability)
+                            : new BreadcrumbStateRow(path)
+                    );
                 }
                 else
                 {
-                    _model.AddPlainRow(row.Text);
+                    built.Add(new BreadcrumbStateRow(row.Text));
                 }
             }
+
+            _model.ReplaceRows(built);
             return RenderJson();
         }
 
