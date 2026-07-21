@@ -470,5 +470,67 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             model.SelectedIndex.Should().Be(-1);
             model.SelectedRow.Should().BeNull();
         }
+
+        // --- #398 atomic-replace seam (ReplaceRows) ---
+
+        private static IReadOnlyList<BreadcrumbStateRow> PlainRows(params string[] texts)
+        {
+            var source = new BreadcrumbStateModel();
+            foreach (var text in texts)
+            {
+                source.AddPlainRow(text);
+            }
+            return source.Rows;
+        }
+
+        [TestMethod]
+        public void ReplaceRows_NullRows_Throws()
+        {
+            // Arrange
+            var model = new BreadcrumbStateModel();
+
+            // Act
+            Action act = () => model.ReplaceRows(null);
+
+            // Assert
+            act.Should().Throw<ArgumentNullException>().WithParameterName("rows");
+        }
+
+        [TestMethod]
+        public void ReplaceRows_PreservesSelectionWhenIndexStillValid()
+        {
+            // Arrange: a two-row model with the second row selected.
+            var model = new BreadcrumbStateModel();
+            model.AddPlainRow("A");
+            model.AddPlainRow("B");
+            model.SelectRow(1);
+
+            // Act: swap in an equal-length set so the selected index remains valid.
+            model.ReplaceRows(PlainRows("X", "Y"));
+
+            // Assert: the selection carries over and any subfolder selection is reset.
+            model.Rows.Should().HaveCount(2);
+            model.SelectedIndex.Should().Be(1);
+            model.SelectedSubfolderIndex.Should().Be(-1);
+        }
+
+        [TestMethod]
+        public void ReplaceRows_ClearsSelectionWhenIndexBeyondNewCount()
+        {
+            // Arrange: a three-row model with the last row selected.
+            var model = new BreadcrumbStateModel();
+            model.AddPlainRow("A");
+            model.AddPlainRow("B");
+            model.AddPlainRow("C");
+            model.SelectRow(2);
+
+            // Act: swap in a shorter set so the selected index no longer exists.
+            model.ReplaceRows(PlainRows("X"));
+
+            // Assert: the out-of-range selection is reset to none.
+            model.Rows.Should().ContainSingle();
+            model.SelectedIndex.Should().Be(-1);
+            model.SelectedRow.Should().BeNull();
+        }
     }
 }

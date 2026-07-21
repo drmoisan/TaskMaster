@@ -394,5 +394,67 @@ namespace QuickFiler.Test.Viewers
                 .Should()
                 .Throw<ArgumentNullException>();
         }
+
+        // --- #398 regression: mid-upgrade host selection must not race the rebuild ---
+
+        [TestMethod]
+        public void SelectRow_WhileSuggestionsUpgradeInFlight_DoesNotThrowAndAppliesSelection()
+        {
+            // Arrange: two scored suggestions. The provider resolves the first path from a
+            // completed task (so the rebuild adds one row) but the second path's leaf-key resolve
+            // is gated by a TaskCompletionSource, leaving the fire-and-forget upgrade parked inside
+            // the rebuild — the exact window that made BreadcrumbStateModel.SelectRow(1) throw
+            // ArgumentOutOfRangeException in issue #398 (transient row count of 1).
+            const string firstPath = "\\Inbox\\Alpha";
+            const string secondPath = "\\Inbox\\Beta";
+            var firstKey = MakeKey("k-alpha", firstPath);
+            var secondKey = MakeKey("k-beta", secondPath);
+            var gate = new TaskCompletionSource<FolderTreeNodeKey>();
+
+            var provider = new Mock<IFolderHierarchyProvider>();
+            provider
+                .Setup(p => p.ResolveLeafKeyAsync(firstPath, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(firstKey);
+            provider
+                .Setup(p => p.GetAncestorChainAsync(firstKey, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[] { Segment(firstKey, "Alpha", false) });
+            provider
+                .Setup(p => p.ResolveLeafKeyAsync(secondPath, It.IsAny<CancellationToken>()))
+                .Returns(gate.Task);
+            provider
+                .Setup(p => p.GetAncestorChainAsync(secondKey, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[] { Segment(secondKey, "Beta", false) });
+
+            var messenger = new Mock<IWebViewMessenger>();
+            var coordinator = new BreadcrumbBridgeCoordinator(messenger.Object, provider.Object);
+            var rows = new[]
+            {
+                new FolderRow(
+                    firstPath,
+                    FolderRowKind.Suggestion,
+                    new FolderScore(firstPath, 900, 0.6)
+                ),
+                new FolderRow(
+                    secondPath,
+                    FolderRowKind.Suggestion,
+                    new FolderScore(secondPath, 800, 0.4)
+                ),
+            };
+
+            // Act: start the synchronous facade (fire-and-forget upgrade parks on the gate), then
+            // the host applies the multi-suggestion fallback selection while the upgrade is pending.
+            coordinator.SetSuggestions(rows);
+            coordinator.SuggestionsUpgrade.IsCompleted.Should().BeFalse("the upgrade is gated");
+            Action selectDuringUpgrade = () => coordinator.SelectRow(1);
+
+            // Assert (AC-1): the mid-upgrade selection succeeds and is applied to the second row.
+            selectDuringUpgrade.Should().NotThrow<ArgumentOutOfRangeException>();
+            coordinator.GetSelectedFolder().Should().Be(secondPath);
+
+            // Release the gate and drain the upgrade: the host selection survives the atomic swap.
+            gate.SetResult(secondKey);
+            coordinator.SuggestionsUpgrade.GetAwaiter().GetResult();
+            coordinator.GetSelectedFolder().Should().Be(secondPath);
+        }
     }
 }
