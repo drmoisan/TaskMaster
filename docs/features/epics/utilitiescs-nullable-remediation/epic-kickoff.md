@@ -41,19 +41,19 @@ branch-off-`main` default (see `epic-planner-state.json.integration_base`).
 
 | issue_num | feature_folder | wave | complexity | plan-path |
 | --- | --- | --- | --- | --- |
-| 363 | utilitiescs-nullable-extensions | 0 | C3/opus | docs/features/active/utilitiescs-nullable-extensions/plan.2026-07-18T21-20.md |
-| 364 | utilitiescs-nullable-helperclasses | 0 | C3/opus | docs/features/active/utilitiescs-nullable-helperclasses/plan.2026-07-18T21-21.md |
-| 366 | utilitiescs-nullable-reusabletypes | 0 | C3/opus | docs/features/active/utilitiescs-nullable-reusabletypes/plan.2026-07-18T22-04.md |
-| 367 | utilitiescs-nullable-newtonsofthelpers | 0 | C3/opus | docs/features/active/utilitiescs-nullable-newtonsofthelpers/plan.2026-07-18T22-04.md |
-| 369 | utilitiescs-nullable-threading | 0 | C3/opus | docs/features/active/utilitiescs-nullable-threading/plan.2026-07-18T22-04.md |
-| 368 | utilitiescs-nullable-svgcontrol | 0 | C2/sonnet | docs/features/active/utilitiescs-nullable-svgcontrol/plan.2026-07-18T22-04.md |
-| 365 | utilitiescs-nullable-outlook-folder-store | 1 | C2/sonnet | docs/features/active/utilitiescs-nullable-outlook-folder-store/plan.2026-07-18T22-03.md |
-| 371 | utilitiescs-nullable-outlook-mailitem-item | 1 | C2/sonnet | docs/features/active/utilitiescs-nullable-outlook-mailitem-item/plan.2026-07-18T22-05.md |
-| 370 | utilitiescs-nullable-email-parsing | 1 | C2/sonnet | docs/features/active/utilitiescs-nullable-email-parsing/plan.2026-07-18T22-05.md |
-| 372 | utilitiescs-nullable-email-classifier | 1 | C3/opus | docs/features/active/utilitiescs-nullable-email-classifier/plan.2026-07-18T22-06.md |
-| 374 | utilitiescs-nullable-dialogs-misc | 1 | C2/sonnet | docs/features/active/utilitiescs-nullable-dialogs-misc/plan.2026-07-18T22-30.md |
-| 375 | utilitiescs-nullable-residuals | 1 | C3/opus | docs/features/active/utilitiescs-nullable-residuals/plan.2026-07-18T23-13.md |
-| 376 | utilitiescs-nullable-ci-capstone | 2 | C2/sonnet | docs/features/active/utilitiescs-nullable-ci-capstone/plan.2026-07-19T04-25.md |
+| 363 | utilitiescs-nullable-extensions | 0 | C3/opus | docs/features/active/2026-07-18-utilitiescs-nullable-extensions-363/plan.2026-07-18T21-20.md |
+| 364 | utilitiescs-nullable-helperclasses | 0 | C3/opus | docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/plan.2026-07-18T21-21.md |
+| 366 | utilitiescs-nullable-reusabletypes | 0 | C3/opus | docs/features/active/2026-07-18-utilitiescs-nullable-reusabletypes-366/plan.2026-07-18T22-04.md |
+| 367 | utilitiescs-nullable-newtonsofthelpers | 0 | C3/opus | docs/features/active/2026-07-18-utilitiescs-nullable-newtonsofthelpers-367/plan.2026-07-18T22-04.md |
+| 369 | utilitiescs-nullable-threading | 0 | C3/opus | docs/features/active/2026-07-18-utilitiescs-nullable-threading-369/plan.2026-07-18T22-04.md |
+| 368 | utilitiescs-nullable-svgcontrol | 0 | C2/sonnet | docs/features/active/2026-07-18-utilitiescs-nullable-svgcontrol-368/plan.2026-07-18T22-04.md |
+| 365 | utilitiescs-nullable-outlook-folder-store | 1 | C2/sonnet | docs/features/active/2026-07-18-utilitiescs-nullable-outlook-folder-store-365/plan.2026-07-18T22-03.md |
+| 371 | utilitiescs-nullable-outlook-mailitem-item | 1 | C2/sonnet | docs/features/active/2026-07-18-utilitiescs-nullable-outlook-mailitem-item-371/plan.2026-07-18T22-05.md |
+| 370 | utilitiescs-nullable-email-parsing | 1 | C2/sonnet | docs/features/active/2026-07-18-utilitiescs-nullable-email-parsing-370/plan.2026-07-18T22-05.md |
+| 372 | utilitiescs-nullable-email-classifier | 1 | C3/opus | docs/features/active/2026-07-18-utilitiescs-nullable-email-classifier-372/plan.2026-07-18T22-06.md |
+| 374 | utilitiescs-nullable-dialogs-misc | 1 | C2/sonnet | docs/features/active/2026-07-18-utilitiescs-nullable-dialogs-misc-374/plan.2026-07-18T22-30.md |
+| 375 | utilitiescs-nullable-residuals | 1 | C3/opus | docs/features/active/2026-07-18-utilitiescs-nullable-residuals-375/plan.2026-07-18T23-13.md |
+| 376 | utilitiescs-nullable-ci-capstone | 2 | C2/sonnet | docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/plan.2026-07-19T04-25.md |
 
 Dependency edges (keyed by feature_folder in the manifest):
 - Wave 0 (no dependencies): 363, 364, 366, 367, 368, 369.

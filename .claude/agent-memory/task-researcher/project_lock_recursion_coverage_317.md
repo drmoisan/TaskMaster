@@ -39,4 +39,4 @@ it. Worked around this by cross-referencing already-committed markdown evidence/
 artifacts from the F5 and F2 features instead, which is a reasonable substitute when git access is
 unavailable but is not a substitute for literally re-reading the historical blob — flagged this
 explicitly in the research artifact rather than asserting false certainty. Full research:
-`docs/features/active/collection-lock-recursion-coverage-317/research/research.2026-07-11T21-15.md`.
+`docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/research/research.2026-07-11T21-15.md`.

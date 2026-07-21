@@ -55,7 +55,7 @@ namespace SVGControl
         //private SvgDocument _doc;
         // The `ImagePath` property's `set` accessor body below is entirely commented out (a
         // pre-existing, already-documented dead no-op judgment call — see
-        // docs/features/active/utilitiescs-nullable-svgcontrol/evidence/other/imagepath-judgment-call-decision.md),
+        // docs/features/active/2026-07-18-utilitiescs-nullable-svgcontrol-368/evidence/other/imagepath-judgment-call-decision.md),
         // so neither field below is ever assigned on any live path. CS0649 is suppressed here
         // rather than resurrecting the dead setter logic, which is out of scope (no behavior
         // change per AC7).
@@ -92,7 +92,7 @@ namespace SVGControl
                     // behavior of returning whatever _relativeImagePath currently holds
                     // (including null) rather than introducing a `?? "(none)"` or other
                     // fallback, which would change the observable return value on this path.
-                    // See docs/features/active/utilitiescs-nullable-svgcontrol/evidence/other/imagepath-judgment-call-decision.md.
+                    // See docs/features/active/2026-07-18-utilitiescs-nullable-svgcontrol-368/evidence/other/imagepath-judgment-call-decision.md.
                     return _relativeImagePath!;
                 }
             }
