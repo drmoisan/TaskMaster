@@ -85,6 +85,7 @@ Root cause confirmed by code inspection (session 2026-07-20):
 - [x] AC-3: The breadcrumb readback contract (`FolderContains`, `GetSelectedFolder`, `GetFolderItems`, `SelectRow`) returns pre-upgrade-consistent results at every point during an in-flight upgrade, and the host-selected index survives the swap (the `UpgradeSuggestionsAsync` re-selection preserves a selection made after `SetSuggestions` returned).
 - [x] AC-4: Completed-upgrade behavior is unchanged: suggestion rows carry ancestor chains and probabilities, unresolvable scored rows fall back to plain rows, non-scored rows remain plain verbatim rows, and all existing `FolderBreadcrumbBridgeRouter` / `BreadcrumbBridgeCoordinator` / `QfcItemController` tests continue to pass.
 - [x] AC-5: The full C# toolchain passes in order (CSharpier format, .NET analyzers build, nullable build, MSTest via vstest.console.exe) with zero regressions relative to the Phase 0 baseline, and new/changed code meets the >= 90% coverage target.
+  - Coverage sub-clause confirmed (remediation 2026-07-20T22-30): the canonical HEAD JaCoCo artifact was regenerated at `artifacts/csharp/coverage.xml` (first-party denominator UtilitiesCS + QuickFiler). Verified via the gate hook functions `Get-JacocoRepoCoverage` / `Get-JacocoBranchCoverage`: line 86.54% (>= 85%), branch 80.85% (>= 75%). Full suite 5061/5061 passing; CSharpier/analyzer/nullable gates green. Test-only remediation (R1 partial-class splits), so production coverage is unchanged and the prior fix's new-code coverage (100%) is unaffected.
 
 ## Next Step
 
