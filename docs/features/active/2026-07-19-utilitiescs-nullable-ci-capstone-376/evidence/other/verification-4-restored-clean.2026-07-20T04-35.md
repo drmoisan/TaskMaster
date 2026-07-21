@@ -19,9 +19,9 @@ throughout this feature). Zero `error CS` diagnostics anywhere in the output.
   `ToDoModel/**`, `TaskVisualization/**`, `ToDoModel.Test/**`, `QuickFiler/**`,
   `QuickFiler.Test/**`, `TaskMaster/**`, `TaskMaster.Test/**`, `UtilitiesCS.Test/**`.
 - Phase 3: `.github/workflows/ci.yml` (gate-step edit).
-- Documentation: `docs/features/active/utilitiescs-nullable-ci-capstone/plan.2026-07-19T04-25.md`,
+- Documentation: `docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/plan.2026-07-19T04-25.md`,
   `spec.md`, `user-story.md`; `docs/features/epics/utilitiescs-nullable-remediation/epic.md`.
-- Untracked: `docs/features/active/utilitiescs-nullable-ci-capstone/evidence/` (this feature's own
+- Untracked: `docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/evidence/` (this feature's own
   evidence artifacts).
 
 No P4-T3/P4-T5 verification defect remains (both were reverted and confirmed via empty `git diff`

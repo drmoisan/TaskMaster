@@ -2,10 +2,10 @@
 
 - Timestamp: 2026-07-19T11-05
 - Task: [P9-T4]
-- Planned Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-threading/evidence/qa-gates/final-coverage.2026-07-19T11-05.cobertura.xml`
-- Executed Command (equivalent mechanism, method-consistent with the P0-T5 baseline): `dotnet-coverage collect --output docs/features/active/utilitiescs-nullable-threading/evidence/qa-gates/final-coverage.2026-07-19T11-05.cobertura.xml --output-format cobertura --settings coverage.config -- "<VS18 vstest.console.exe>" "UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" /Settings:<Workers=4 runsettings> /InIsolation /TestCaseFilter:TestCategory!=LiveOutlook`
+- Planned Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-threading-369/evidence/qa-gates/final-coverage.2026-07-19T11-05.cobertura.xml`
+- Executed Command (equivalent mechanism, method-consistent with the P0-T5 baseline): `dotnet-coverage collect --output docs/features/active/2026-07-18-utilitiescs-nullable-threading-369/evidence/qa-gates/final-coverage.2026-07-19T11-05.cobertura.xml --output-format cobertura --settings coverage.config -- "<VS18 vstest.console.exe>" "UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" /Settings:<Workers=4 runsettings> /InIsolation /TestCaseFilter:TestCategory!=LiveOutlook`
 - EXIT_CODE: 0
-- Cobertura XML: `docs/features/active/utilitiescs-nullable-threading/evidence/qa-gates/final-coverage.2026-07-19T11-05.cobertura.xml`
+- Cobertura XML: `docs/features/active/2026-07-18-utilitiescs-nullable-threading-369/evidence/qa-gates/final-coverage.2026-07-19T11-05.cobertura.xml`
 
 ## Output Summary
 

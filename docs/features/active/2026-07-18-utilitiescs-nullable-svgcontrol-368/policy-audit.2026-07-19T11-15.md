@@ -52,7 +52,7 @@ plan/task/phase subset. Full branch-diff scope (against the resolved merge-base)
   repository-wide; not found). Fallback: manual scan performed via
   `git diff --name-only origin/epic/utilitiescs-nullable-remediation-integration...HEAD | grep -E "^artifacts/(baselines|qa|evidence|coverage)/"`.
 - Result: **zero matches.** All evidence for this feature is written under the canonical
-  `docs/features/active/utilitiescs-nullable-svgcontrol/evidence/{baseline,qa-gates,regression-testing,other}/`
+  `docs/features/active/2026-07-18-utilitiescs-nullable-svgcontrol-368/evidence/{baseline,qa-gates,regression-testing,other}/`
   tree, per `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`. No
   `EVIDENCE_LOCATION_OVERRIDE_REJECTED` condition applies; no non-canonical path was supplied or
   used.

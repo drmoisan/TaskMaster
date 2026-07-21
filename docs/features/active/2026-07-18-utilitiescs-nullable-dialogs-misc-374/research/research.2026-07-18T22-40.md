@@ -11,14 +11,14 @@
 ### 1.1 What was read
 
 - `docs/features/epics/utilitiescs-nullable-remediation/epic.md` (full manifest, Wave decomposition, ownership map).
-- `docs/features/active/utilitiescs-nullable-email-parsing/spec.md` (gold-standard shape: batch grouping,
+- `docs/features/active/2026-07-18-utilitiescs-nullable-email-parsing-370/spec.md` (gold-standard shape: batch grouping,
   partial-class batching rules, upstream dependency mapping, net481 constraints, do-not-split rule).
-- `docs/features/active/utilitiescs-nullable-extensions/spec.md` and `plan.2026-07-18T21-20.md` (Wave-0,
+- `docs/features/active/2026-07-18-utilitiescs-nullable-extensions-363/spec.md` and `plan.2026-07-18T21-20.md` (Wave-0,
   issue #363: batch grouping for `Extensions/`, confirms `WinFormsExtensions.cs` is Batch D).
-- `docs/features/active/utilitiescs-nullable-helperclasses/spec.md` and `plan.2026-07-18T21-21.md`
+- `docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/spec.md` and `plan.2026-07-18T21-21.md`
   (Wave-0, issue #364: 8-batch grouping for `HelperClasses/`, `Interfaces/IHelperClasses/` explicitly
   out of scope/oblivious, Designer-file handling precedent for `DvgForm.Designer.cs`).
-- The existing (placeholder/unfilled) `docs/features/active/utilitiescs-nullable-dialogs-misc/spec.md`,
+- The existing (placeholder/unfilled) `docs/features/active/2026-07-18-utilitiescs-nullable-dialogs-misc-374/spec.md`,
   `issue.md`, `user-story.md`, `plan.2026-07-18T22-30.md` — all templates with no content yet; this
   research is the evidentiary input for filling them.
 - Every `.cs` file under `UtilitiesCS/Dialogs/` (16 files, read in full).

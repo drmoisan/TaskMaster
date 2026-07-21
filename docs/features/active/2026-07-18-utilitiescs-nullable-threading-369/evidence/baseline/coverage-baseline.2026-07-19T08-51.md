@@ -2,10 +2,10 @@
 
 - Timestamp: 2026-07-19T08-51
 - Task: [P0-T5]
-- Planned Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-threading/evidence/baseline/coverage-baseline.2026-07-19T08-51.cobertura.xml`
-- Executed Command (equivalent mechanism, see deviation note): `dotnet-coverage collect --output docs/features/active/utilitiescs-nullable-threading/evidence/baseline/coverage-baseline.2026-07-19T08-51.cobertura.xml --output-format cobertura --settings coverage.config -- "<VS18 vstest.console.exe>" "UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" /Settings:<Workers=4 runsettings> /InIsolation /TestCaseFilter:TestCategory!=LiveOutlook`
+- Planned Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-threading-369/evidence/baseline/coverage-baseline.2026-07-19T08-51.cobertura.xml`
+- Executed Command (equivalent mechanism, see deviation note): `dotnet-coverage collect --output docs/features/active/2026-07-18-utilitiescs-nullable-threading-369/evidence/baseline/coverage-baseline.2026-07-19T08-51.cobertura.xml --output-format cobertura --settings coverage.config -- "<VS18 vstest.console.exe>" "UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" /Settings:<Workers=4 runsettings> /InIsolation /TestCaseFilter:TestCategory!=LiveOutlook`
 - EXIT_CODE: 0
-- Cobertura XML: `docs/features/active/utilitiescs-nullable-threading/evidence/baseline/coverage-baseline.2026-07-19T08-51.cobertura.xml`
+- Cobertura XML: `docs/features/active/2026-07-18-utilitiescs-nullable-threading-369/evidence/baseline/coverage-baseline.2026-07-19T08-51.cobertura.xml`
 
 ## Output Summary
 

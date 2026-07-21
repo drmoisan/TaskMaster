@@ -1,11 +1,11 @@
 # Research: utilitiescs-nullable-reusabletypes (Issue #366) — Wave-0
 
 - Date: 2026-07-18T22-10
-- Feature: `docs/features/active/utilitiescs-nullable-reusabletypes/`
+- Feature: `docs/features/active/2026-07-18-utilitiescs-nullable-reusabletypes-366/`
 - Epic: `utilitiescs-nullable-remediation` (Wave 0, complexity C3, cross-module contract change)
 - Scope: per-file `#nullable enable` remediation of `UtilitiesCS/ReusableTypeClasses/` (recursive, including `TimedActions/` and `NewSmartSerializable/`).
 - Method: static reading only (no build permitted in this environment). All null-risk assessments are static inference from source; the atomic executor confirms exact diagnostics under the pragma-driven gate.
-- Sibling reference (format + shared language facts): `docs/features/active/utilitiescs-nullable-extensions/research/research-findings.2026-07-18T21-45.md`.
+- Sibling reference (format + shared language facts): `docs/features/active/2026-07-18-utilitiescs-nullable-extensions-363/research/research-findings.2026-07-18T21-45.md`.
 
 ---
 

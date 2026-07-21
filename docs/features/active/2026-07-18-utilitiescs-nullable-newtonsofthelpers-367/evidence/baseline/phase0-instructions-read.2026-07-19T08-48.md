@@ -22,14 +22,14 @@ Policy files:
 - `.claude/rules/csharp.md`
 
 Requirements sources:
-- `docs/features/active/utilitiescs-nullable-newtonsofthelpers/spec.md` (Definition of Done — AC source)
-- `docs/features/active/utilitiescs-nullable-newtonsofthelpers/user-story.md` (Acceptance Criteria — AC source)
-- `docs/features/active/utilitiescs-nullable-newtonsofthelpers/issue.md`
-- `docs/features/active/utilitiescs-nullable-newtonsofthelpers/research/research-findings.2026-07-18T22-05.md`
+- `docs/features/active/2026-07-18-utilitiescs-nullable-newtonsofthelpers-367/spec.md` (Definition of Done — AC source)
+- `docs/features/active/2026-07-18-utilitiescs-nullable-newtonsofthelpers-367/user-story.md` (Acceptance Criteria — AC source)
+- `docs/features/active/2026-07-18-utilitiescs-nullable-newtonsofthelpers-367/issue.md`
+- `docs/features/active/2026-07-18-utilitiescs-nullable-newtonsofthelpers-367/research/research-findings.2026-07-18T22-05.md`
 - `docs/features/epics/utilitiescs-nullable-remediation/epic.md` (read for cluster dependency context; `NewtonsoftHelpers` has `depends_on: []`)
 
 Plan under execution:
-- `docs/features/active/utilitiescs-nullable-newtonsofthelpers/plan.2026-07-18T22-04.md`
+- `docs/features/active/2026-07-18-utilitiescs-nullable-newtonsofthelpers-367/plan.2026-07-18T22-04.md`
 
 ## Key Compliance Constraints Confirmed
 

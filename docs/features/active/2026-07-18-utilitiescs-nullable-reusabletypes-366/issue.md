@@ -2,7 +2,7 @@
 
 - Date captured: 2026-07-18
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/utilitiescs-nullable-reusabletypes/ (Issue #366)
+- Status: Promoted -> docs/features/active/2026-07-18-utilitiescs-nullable-reusabletypes-366/ (Issue #366)
 
 - Issue: #366
 - Issue URL: https://github.com/drmoisan/TaskMaster/issues/366
@@ -85,4 +85,4 @@ clean opted-in build remain non-opted-in and must not be cross-blocked.
 ## Next Step
 
 - [x] Promote to GitHub issue (feature request template)
-- [x] Create `docs/features/active/utilitiescs-nullable-reusabletypes/` folder from the template
+- [x] Create `docs/features/active/2026-07-18-utilitiescs-nullable-reusabletypes-366/` folder from the template

@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-19T01-05
 
-Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-email-parsing/evidence/baseline/baseline-coverage.cobertura.xml`
+Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-email-parsing-370/evidence/baseline/baseline-coverage.cobertura.xml`
 
 EXIT_CODE: 0
 
@@ -13,7 +13,7 @@ Output Summary:
 - Total time: 35.0405 seconds
 - Baseline overall line-coverage: 83.7834%
 - Baseline overall branch-coverage: 76.3407%
-- Cobertura XML written to `docs/features/active/utilitiescs-nullable-email-parsing/evidence/baseline/baseline-coverage.cobertura.xml`.
+- Cobertura XML written to `docs/features/active/2026-07-18-utilitiescs-nullable-email-parsing-370/evidence/baseline/baseline-coverage.cobertura.xml`.
 
 Note: this run required a one-time environment step on this fresh worktree: the repo-local .NET
 SDK and NuGet restore were already established for P0-T4/P0-T5 (see those artifacts), but the

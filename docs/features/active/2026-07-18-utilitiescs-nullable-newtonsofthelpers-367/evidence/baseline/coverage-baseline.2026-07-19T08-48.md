@@ -1,7 +1,7 @@
 # Coverage Baseline (P0-T5)
 
 - Timestamp: 2026-07-19T08-48
-- Command: `dotnet-coverage collect --output docs/features/active/utilitiescs-nullable-newtonsofthelpers/evidence/baseline/coverage-baseline.2026-07-19T08-48.cobertura.xml --output-format cobertura --settings coverage.config -- "<VS18>/vstest.console.exe" "UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" /Settings:scripts/vscode/TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:TestCategory!=LiveOutlook`
+- Command: `dotnet-coverage collect --output docs/features/active/2026-07-18-utilitiescs-nullable-newtonsofthelpers-367/evidence/baseline/coverage-baseline.2026-07-19T08-48.cobertura.xml --output-format cobertura --settings coverage.config -- "<VS18>/vstest.console.exe" "UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" /Settings:scripts/vscode/TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:TestCategory!=LiveOutlook`
 - EXIT_CODE: 0
 - Output Summary: `Test Run Successful. Total tests: 4511, Passed: 4511, Total time: 21.51s`. Cobertura XML written to the baseline evidence folder.
 

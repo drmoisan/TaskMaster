@@ -63,7 +63,7 @@ All AC1–AC6 items in issue.md are already checked `[x]` and are confirmed by t
 checkbox changes were required.
 
 ### Acceptance Criteria Status
-- Source: docs/features/active/utilitiescs-nullable-reusabletypes/issue.md (`## Acceptance Criteria`)
+- Source: docs/features/active/2026-07-18-utilitiescs-nullable-reusabletypes-366/issue.md (`## Acceptance Criteria`)
 - Total AC items: 6
 - Checked off (delivered): 6
 - Remaining (unchecked): 0

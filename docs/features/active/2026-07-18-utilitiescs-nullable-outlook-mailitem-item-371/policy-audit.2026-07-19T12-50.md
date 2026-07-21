@@ -91,7 +91,7 @@ The plan and spec document a deliberate, child-scoped deviation: the nullable/ty
 ## Section 4 — Evidence Location Compliance
 
 All feature evidence is written under
-`docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/{baseline,qa-gates,regression-testing,other}/`,
+`docs/features/active/2026-07-18-utilitiescs-nullable-outlook-mailitem-item-371/evidence/{baseline,qa-gates,regression-testing,other}/`,
 the canonical `<FEATURE>/evidence/<kind>/` location. No files were written to `artifacts/baselines/`,
 `artifacts/qa/`, `artifacts/coverage/`, or `artifacts/evidence/`. No evidence-location violations
 found. Verdict: PASS.

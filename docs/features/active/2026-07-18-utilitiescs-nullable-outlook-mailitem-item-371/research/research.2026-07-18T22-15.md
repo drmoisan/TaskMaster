@@ -2,7 +2,7 @@
 
 - Timestamp: 2026-07-18T22-15
 - Scope verified: all `.cs` files under `UtilitiesCS/OutlookObjects/{MailItem,Item,Conversation,Attachment,Table}/` (30 files total: MailItem 12, Item 9, Conversation 2, Attachment 2, Table 5). Every file listed below was read in full.
-- Upstream specs read in full: `docs/features/active/utilitiescs-nullable-extensions/spec.md` (#363), `docs/features/active/utilitiescs-nullable-helperclasses/spec.md` (#364).
+- Upstream specs read in full: `docs/features/active/2026-07-18-utilitiescs-nullable-extensions-363/spec.md` (#363), `docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/spec.md` (#364).
 - Sibling feature docs read: `spec.md`, `issue.md`, `plan.2026-07-18T22-05.md` (all template placeholders, not yet filled in) for this feature (#371).
 
 ## 1. File inventory and one-line role

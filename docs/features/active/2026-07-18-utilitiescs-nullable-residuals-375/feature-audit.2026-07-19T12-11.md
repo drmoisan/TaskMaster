@@ -5,7 +5,7 @@
 - Diff base: `dffadd5a102884dd811ed5731477de18417594f1`
 - Feature HEAD: `c413e61cb32002bd802c4dc8e1f07f5a70729e55`
 - Work Mode: `full-feature`
-- AC sources: `docs/features/active/utilitiescs-nullable-residuals/spec.md` and `docs/features/active/utilitiescs-nullable-residuals/user-story.md` (AC1-AC8, identical in both)
+- AC sources: `docs/features/active/2026-07-18-utilitiescs-nullable-residuals-375/spec.md` and `docs/features/active/2026-07-18-utilitiescs-nullable-residuals-375/user-story.md` (AC1-AC8, identical in both)
 
 ## Scope and Baseline
 
@@ -40,7 +40,7 @@ Baseline is the epic-integration tip `dffadd5a`. The branch delivers a per-file 
 All eight ACs are evaluated PASS. Both AC source files (`spec.md` and `user-story.md`) already carry `- [x]` for AC1-AC8, so no check-off edit is required by this review. No unchecked AC remains.
 
 ### Acceptance Criteria Status
-- Source: `docs/features/active/utilitiescs-nullable-residuals/spec.md`, `docs/features/active/utilitiescs-nullable-residuals/user-story.md`
+- Source: `docs/features/active/2026-07-18-utilitiescs-nullable-residuals-375/spec.md`, `docs/features/active/2026-07-18-utilitiescs-nullable-residuals-375/user-story.md`
 - Total AC items: 8
 - Checked off (delivered): 8
 - Remaining (unchecked): 0

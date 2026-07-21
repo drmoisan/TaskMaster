@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-19T04-35
 
-Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-svgcontrol/evidence/qa-gates/final-coverage.cobertura.xml`
+Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-svgcontrol-368/evidence/qa-gates/final-coverage.cobertura.xml`
 (preceded by rebuilding `SVGControl.Test/SVGControl.Test.csproj`, since the prior `TaskMaster.sln
 /t:Rebuild` (P6-T3) cleaned `SVGControl`'s `bin`/`obj` outputs)
 

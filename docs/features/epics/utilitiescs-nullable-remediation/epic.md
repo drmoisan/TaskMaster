@@ -215,7 +215,7 @@ in this manifest: the capstone's scope is expanded from `~3 est. files` to inclu
 remediation (annotation-only / narrow-pragma-only, no behavior change) as a mandatory prerequisite
 for the CI gate finalization to be genuinely testable at all. The corresponding `spec.md`
 "Scope reconciliation (2026-07-19)" section in
-`docs/features/active/utilitiescs-nullable-ci-capstone/spec.md` records the full rationale and
+`docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/spec.md` records the full rationale and
 measurement detail. The `complexity` column above (`C2`) is retained as-is for this addendum;
 this capstone's own `orchestrator-state.json` checkpoint records the child orchestrator's
 complexity-band assessment for the expanded atomic planning/execution phases.

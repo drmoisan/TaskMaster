@@ -2,7 +2,7 @@
 
 - Timestamp: 2026-07-19T10-50
 - Task: [P0-T5]
-- Command: `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot UtilitiesCS.Test -CoverageOutput docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/baseline/coverage-baseline.2026-07-19T10-50.cobertura.xml`
+- Command: `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot UtilitiesCS.Test -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-outlook-mailitem-item-371/evidence/baseline/coverage-baseline.2026-07-19T10-50.cobertura.xml`
   - Driver wraps `dotnet-coverage collect --output-format cobertura --settings coverage.config -- <vstest.console.exe> UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /Settings:TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:TestCategory!=LiveOutlook`.
   - Scope note: `-SearchRoot UtilitiesCS.Test` scopes discovery to `UtilitiesCS.Test.dll` — the assembly every batch test task in this plan targets — for an apples-to-apples baseline/final delta. `coverage.config` module excludes prevent the Deedle/FSharp instrumentation flakiness that would otherwise fail DataFrame tests.
 - EXIT_CODE: 0

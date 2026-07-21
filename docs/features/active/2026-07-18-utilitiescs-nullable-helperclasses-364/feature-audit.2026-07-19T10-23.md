@@ -80,8 +80,8 @@ additional check-off changes were required. No item was left unchecked, so none 
 downgraded.
 
 ### Acceptance Criteria Status
-- Source: `docs/features/active/utilitiescs-nullable-helperclasses/spec.md`,
-  `docs/features/active/utilitiescs-nullable-helperclasses/user-story.md`
+- Source: `docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/spec.md`,
+  `docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/user-story.md`
 - Total AC items: 19 (9 DoD + 3 Seeded Test Conditions + 7 user-story AC)
 - Checked off (delivered): 19
 - Remaining (unchecked): 0

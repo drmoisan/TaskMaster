@@ -54,7 +54,7 @@ check-off state is confirmed accurate. No items required changing from `[ ]` to 
 was found to be incorrectly checked.
 
 ### Acceptance Criteria Status
-- Source: `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/spec.md` and `.../user-story.md`
+- Source: `docs/features/active/2026-07-18-utilitiescs-nullable-outlook-mailitem-item-371/spec.md` and `.../user-story.md`
 - Total AC items: 6 (per source) + spec DoD (7) + spec Seeded Test Conditions (4)
 - Checked off (delivered): all
 - Remaining (unchecked): 0

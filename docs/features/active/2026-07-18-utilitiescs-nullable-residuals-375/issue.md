@@ -2,7 +2,7 @@
 
 - Date captured: 2026-07-18
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/utilitiescs-nullable-residuals/ (Issue #375)
+- Status: Promoted -> docs/features/active/2026-07-18-utilitiescs-nullable-residuals-375/ (Issue #375)
 
 - Issue: #375
 - Issue URL: https://github.com/drmoisan/TaskMaster/issues/375
@@ -35,5 +35,5 @@ List notable constraints (performance, compatibility, scope) or risks.
 ## Next Step
 
 - [ ] Promote to GitHub issue (feature request template)
-- [ ] Create `docs/features/active/utilitiescs-nullable-residuals/` folder from the template
+- [ ] Create `docs/features/active/2026-07-18-utilitiescs-nullable-residuals-375/` folder from the template
 

@@ -1,7 +1,7 @@
 # Research: utilitiescs-nullable-svgcontrol (Issue #368) — Wave-0
 
 - Date: 2026-07-18T22-10
-- Feature: `docs/features/active/utilitiescs-nullable-svgcontrol/`
+- Feature: `docs/features/active/2026-07-18-utilitiescs-nullable-svgcontrol-368/`
 - Epic: `utilitiescs-nullable-remediation` (Wave 0, complexity C2, independent net481 WinForms control project)
 - Scope: per-file `#nullable enable` remediation of `SVGControl/` (recursive; 20 `.cs` files total: 12
   hand-authored remediation targets, 3 already-`#nullable enable` verify-only vendored files, 5

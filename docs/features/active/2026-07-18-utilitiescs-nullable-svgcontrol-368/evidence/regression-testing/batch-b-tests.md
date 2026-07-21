@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-19T02-25
 
-Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-svgcontrol/evidence/regression-testing/batch-b-coverage.cobertura.xml`
+Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-svgcontrol-368/evidence/regression-testing/batch-b-coverage.cobertura.xml`
 (preceded by rebuilding `SVGControl.Test/SVGControl.Test.csproj`)
 
 EXIT_CODE: 0

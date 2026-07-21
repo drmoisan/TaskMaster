@@ -113,8 +113,8 @@ rule).
 
 ### Acceptance Criteria Status
 
-- Source: `docs/features/active/utilitiescs-nullable-ci-capstone/spec.md`,
-  `docs/features/active/utilitiescs-nullable-ci-capstone/user-story.md`
+- Source: `docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/spec.md`,
+  `docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/user-story.md`
 - Total AC items: 7
 - Checked off (delivered): 7
 - Remaining (unchecked): 0

@@ -32,7 +32,7 @@ Blocking findings: 0.
 - Changed code files: 25 hand-written `.cs` files under `UtilitiesCS/Threading/` (all pre-existing,
   all MODIFIED; zero new source files; zero deleted files).
 - Changed non-code files: feature docs (`spec.md`, `user-story.md`, `plan.*.md`) and evidence
-  markdown/cobertura under `docs/features/active/utilitiescs-nullable-threading/evidence/`.
+  markdown/cobertura under `docs/features/active/2026-07-18-utilitiescs-nullable-threading-369/evidence/`.
 - Not changed (verified via `git diff --name-only`): no `.csproj`, no `.sln`, no `*.Designer.cs`,
   no `.resx`, no `.github/workflows/**`, no `scripts/benchmarks/**`.
 - Only language with changed code files in the branch diff: **C#**. TypeScript, Python, and
@@ -126,7 +126,7 @@ C# coverage verdict — changed-line no-regression gate: **PASS**. Rationale and
 
 Canonical coverage-artifact location: the canonical `artifacts/csharp/coverage.xml` (JaCoCo) is not
 present; coverage was instead verified from the executor's Cobertura at
-`docs/features/active/utilitiescs-nullable-threading/evidence/qa-gates/final-coverage.2026-07-19T11-05.cobertura.xml`
+`docs/features/active/2026-07-18-utilitiescs-nullable-threading-369/evidence/qa-gates/final-coverage.2026-07-19T11-05.cobertura.xml`
 (a canonical evidence location) plus its baseline sibling. This is a procedural gap, recorded as
 non-blocking recommendation R1 below; the coverage data itself exists and was reviewer-verified.
 
@@ -164,7 +164,7 @@ Reviewer inspected the diff of the concurrency-critical files directly:
   `git diff --name-only`.
 - No branch-diff file is written under `artifacts/baselines/`, `artifacts/qa/`,
   `artifacts/evidence/`, or `artifacts/coverage/`. All feature evidence is under the canonical
-  `docs/features/active/utilitiescs-nullable-threading/evidence/<kind>/` tree (baseline, qa-gates,
+  `docs/features/active/2026-07-18-utilitiescs-nullable-threading-369/evidence/<kind>/` tree (baseline, qa-gates,
   regression-testing, other). No violation.
 
 ## 7. Modified-Workflow Green-Run Gate

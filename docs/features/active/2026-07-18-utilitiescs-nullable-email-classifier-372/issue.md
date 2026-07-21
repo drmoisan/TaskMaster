@@ -2,7 +2,7 @@
 
 - Date captured: 2026-07-18
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/utilitiescs-nullable-email-classifier/ (Issue #372)
+- Status: Promoted -> docs/features/active/2026-07-18-utilitiescs-nullable-email-classifier-372/ (Issue #372)
 - Epic: utilitiescs-nullable-remediation
 - Integration branch: epic/utilitiescs-nullable-remediation-integration
 - Wave: 1 (depends on Wave-0 Extensions contracts, issue #363)
@@ -93,4 +93,4 @@ behavior-compatible. Existing null guards remain as-is.
 ## Next Step
 
 - [ ] Promote to GitHub issue (feature request template)
-- [ ] Create `docs/features/active/utilitiescs-nullable-email-classifier/` folder from the template
+- [ ] Create `docs/features/active/2026-07-18-utilitiescs-nullable-email-classifier-372/` folder from the template

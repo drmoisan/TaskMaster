@@ -16,10 +16,10 @@ Files were read in the mandated order defined by `policy-compliance-order` and t
 
 Then the requirements sources:
 
-5. `docs/features/active/utilitiescs-nullable-threading/spec.md` (Definition of Done — AC source)
-6. `docs/features/active/utilitiescs-nullable-threading/user-story.md` (Acceptance Criteria — AC source)
-7. `docs/features/active/utilitiescs-nullable-threading/issue.md`
-8. `docs/features/active/utilitiescs-nullable-threading/research/research-findings.2026-07-18T22-45.md`
+5. `docs/features/active/2026-07-18-utilitiescs-nullable-threading-369/spec.md` (Definition of Done — AC source)
+6. `docs/features/active/2026-07-18-utilitiescs-nullable-threading-369/user-story.md` (Acceptance Criteria — AC source)
+7. `docs/features/active/2026-07-18-utilitiescs-nullable-threading-369/issue.md`
+8. `docs/features/active/2026-07-18-utilitiescs-nullable-threading-369/research/research-findings.2026-07-18T22-45.md`
 
 ## Files Read (explicit list)
 

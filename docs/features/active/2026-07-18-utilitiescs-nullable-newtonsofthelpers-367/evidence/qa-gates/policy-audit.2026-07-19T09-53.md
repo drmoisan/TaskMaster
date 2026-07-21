@@ -28,7 +28,7 @@ None. The caller prompt supplied the correct full branch-vs-base audit scope (ep
 
 ## Evidence Location Compliance
 
-- `validate_evidence_locations.py` equivalent check performed via `git diff --name-only ... | grep -E '^artifacts/(baselines|qa|evidence|coverage)/'`: no matches. All feature evidence is written under the canonical `docs/features/active/utilitiescs-nullable-newtonsofthelpers/evidence/<kind>/` tree (`baseline/`, `qa-gates/`, `regression-testing/`, `other/`).
+- `validate_evidence_locations.py` equivalent check performed via `git diff --name-only ... | grep -E '^artifacts/(baselines|qa|evidence|coverage)/'`: no matches. All feature evidence is written under the canonical `docs/features/active/2026-07-18-utilitiescs-nullable-newtonsofthelpers-367/evidence/<kind>/` tree (`baseline/`, `qa-gates/`, `regression-testing/`, `other/`).
 - No `EVIDENCE_LOCATION_OVERRIDE_REJECTED` conditions encountered. This audit's own artifacts are written under `.../evidence/qa-gates/`, which is not a forbidden `artifacts/...` prefix per `enforce-evidence-locations.ps1`.
 
 ## 1. General Code Change Policy

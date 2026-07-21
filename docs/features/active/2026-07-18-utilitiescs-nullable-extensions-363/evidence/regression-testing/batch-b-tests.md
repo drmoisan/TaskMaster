@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-19T02-35
 
-Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-extensions/evidence/regression-testing/batch-b-coverage.cobertura.xml` (run after a normal `msbuild TaskMaster.sln /t:Build`)
+Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-extensions-363/evidence/regression-testing/batch-b-coverage.cobertura.xml` (run after a normal `msbuild TaskMaster.sln /t:Build`)
 
 EXIT_CODE: 0
 

@@ -2,7 +2,7 @@
 
 - Date captured: 2026-07-18
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/utilitiescs-nullable-outlook-mailitem-item/ (Issue #371)
+- Status: Promoted -> docs/features/active/2026-07-18-utilitiescs-nullable-outlook-mailitem-item-371/ (Issue #371)
 - Parent: Epic `utilitiescs-nullable-remediation` (Wave 1)
 - Depends on: utilitiescs-nullable-extensions (#363), utilitiescs-nullable-helperclasses (#364)
 
@@ -69,4 +69,4 @@ and null-safety work only: no behavior changes, no refactors, no API redesign.
 ## Next Step
 
 - [ ] Promote to GitHub issue (feature request template)
-- [ ] Create `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/` folder from the template
+- [ ] Create `docs/features/active/2026-07-18-utilitiescs-nullable-outlook-mailitem-item-371/` folder from the template

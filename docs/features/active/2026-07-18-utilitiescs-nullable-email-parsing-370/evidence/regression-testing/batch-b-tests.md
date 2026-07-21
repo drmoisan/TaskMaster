@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-19T02-20
 
-Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-email-parsing/evidence/regression-testing/batch-b-coverage.cobertura.xml`
+Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-email-parsing-370/evidence/regression-testing/batch-b-coverage.cobertura.xml`
 
 EXIT_CODE: 0
 

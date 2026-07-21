@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-19T01-20
 
-Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-extensions/evidence/baseline/baseline-coverage.cobertura.xml`
+Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-extensions-363/evidence/baseline/baseline-coverage.cobertura.xml`
 
 EXIT_CODE: 0
 

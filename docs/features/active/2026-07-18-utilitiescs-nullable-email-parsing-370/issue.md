@@ -2,7 +2,7 @@
 
 - Date captured: 2026-07-18
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/utilitiescs-nullable-email-parsing/ (Issue #370)
+- Status: Promoted -> docs/features/active/2026-07-18-utilitiescs-nullable-email-parsing-370/ (Issue #370)
 - Parent: Epic `utilitiescs-nullable-remediation` (Wave 1)
 - Depends on: `utilitiescs-nullable-extensions` (issue #363)
 
@@ -82,4 +82,4 @@ non-opted-in and must not be cross-blocked by this change.
 ## Next Step
 
 - [ ] Promote to GitHub issue (feature request template)
-- [ ] Create `docs/features/active/utilitiescs-nullable-email-parsing/` folder from the template
+- [ ] Create `docs/features/active/2026-07-18-utilitiescs-nullable-email-parsing-370/` folder from the template

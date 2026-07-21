@@ -2,7 +2,7 @@
 
 - Date captured: 2026-07-18
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/utilitiescs-nullable-outlook-folder-store/ (Issue #365)
+- Status: Promoted -> docs/features/active/2026-07-18-utilitiescs-nullable-outlook-folder-store-365/ (Issue #365)
 
 - Issue: #365
 - Issue URL: https://github.com/drmoisan/TaskMaster/issues/365
@@ -20,7 +20,7 @@ is remediated under the repository's per-file `#nullable enable` opt-in architec
 issue is the Wave-1 child of the `utilitiescs-nullable-remediation` epic covering
 `UtilitiesCS/OutlookObjects/Folder/` (including `MsgToMime/`) and
 `UtilitiesCS/OutlookObjects/Store/`. Per
-`docs/features/active/utilitiescs-nullable-outlook-folder-store/research/2026-07-18T22-30-outlook-folder-store-nullable-research.md`,
+`docs/features/active/2026-07-18-utilitiescs-nullable-outlook-folder-store-365/research/2026-07-18T22-30-outlook-folder-store-nullable-research.md`,
 the cluster contains 83 `.cs` files: 18 already opted in (verify-only), 2 Designer-generated
 files recommended to remain non-opted-in, and 63 opt-in remediation targets — a refined
 count that supersedes the epic manifest's stale `~29` estimate. This is null-annotation and
@@ -80,5 +80,5 @@ List notable constraints (performance, compatibility, scope) or risks.
 ## Next Step
 
 - [ ] Promote to GitHub issue (feature request template)
-- [ ] Create `docs/features/active/utilitiescs-nullable-outlook-folder-store/` folder from the template
+- [ ] Create `docs/features/active/2026-07-18-utilitiescs-nullable-outlook-folder-store-365/` folder from the template
 

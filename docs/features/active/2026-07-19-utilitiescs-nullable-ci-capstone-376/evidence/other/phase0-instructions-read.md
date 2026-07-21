@@ -19,11 +19,11 @@ Files read (in the order above, in full):
 - `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a990f1a3b96eb6fae\.claude\rules\benchmark-baselines.md`
 
 Also read for feature context (per delegation directive, not part of the six-file policy order above):
-- `docs/features/active/utilitiescs-nullable-ci-capstone/issue.md`
-- `docs/features/active/utilitiescs-nullable-ci-capstone/spec.md`
-- `docs/features/active/utilitiescs-nullable-ci-capstone/user-story.md`
-- `docs/features/active/utilitiescs-nullable-ci-capstone/research/2026-07-19T00-30-ci-capstone-research.md`
-- `docs/features/active/utilitiescs-nullable-ci-capstone/plan.2026-07-19T04-25.md`
+- `docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/issue.md`
+- `docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/spec.md`
+- `docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/user-story.md`
+- `docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/research/2026-07-19T00-30-ci-capstone-research.md`
+- `docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/plan.2026-07-19T04-25.md`
 - `docs/features/epics/utilitiescs-nullable-remediation/epic.md` (capstone scope addendum section)
 
 Notes:

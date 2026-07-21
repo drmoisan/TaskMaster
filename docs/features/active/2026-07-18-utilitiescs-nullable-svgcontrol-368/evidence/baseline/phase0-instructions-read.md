@@ -15,8 +15,8 @@ Files Read (in order, full content):
 4. `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a56dcba40416f18d6\.claude\rules\csharp.md`
 
 Notes:
-- Also read `docs/features/active/utilitiescs-nullable-svgcontrol/issue.md` and the plan
-  `docs/features/active/utilitiescs-nullable-svgcontrol/plan.2026-07-18T22-04.md` as the
+- Also read `docs/features/active/2026-07-18-utilitiescs-nullable-svgcontrol-368/issue.md` and the plan
+  `docs/features/active/2026-07-18-utilitiescs-nullable-svgcontrol-368/plan.2026-07-18T22-04.md` as the
   requirements/plan sources for this execution.
 - Confirmed the plan's explicit override of the generic C# toolchain type-check step: for
   this feature the per-file pragma gate commands

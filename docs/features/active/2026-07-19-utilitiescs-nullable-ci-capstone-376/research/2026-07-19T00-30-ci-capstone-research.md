@@ -184,7 +184,7 @@ defect class, independent of any pre-existing field-initialization nuance in the
 1. Confirm the pre-defect baseline is clean: run the proposed gate command once with no defect
    present and capture `EXIT_CODE: 0` plus a short `Output Summary:` to an evidence artifact
    (per `evidence-and-timestamp-conventions`, under
-   `docs/features/active/utilitiescs-nullable-ci-capstone/evidence/other/`).
+   `docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/evidence/other/`).
 2. Insert the opted-in-file defect only; re-run the gate; capture `EXIT_CODE: <non-zero>` and the
    `CS8602` line from the MSBuild error output as fail-before evidence.
 3. Revert the opted-in-file defect (confirm `git diff` for that file is empty); insert the
@@ -366,11 +366,11 @@ requiring the maintainer to read every child spec individually.
 - `.claude/skills/feature-review-workflow/SKILL.md` lines 68–75.
 - `docs/features/epics/utilitiescs-nullable-remediation/epic.md` lines 139–277 (capstone design,
   residual-scope decision, epic-wide exclusions, residuals execution-time findings).
-- `docs/features/active/utilitiescs-nullable-ci-capstone/issue.md` (AC1–AC7, full file).
-- `docs/features/active/utilitiescs-nullable-residuals/spec.md` lines 1–40, 160–268, 330–344.
-- `docs/features/active/utilitiescs-nullable-residuals/plan.2026-07-18T23-13.md` lines 1–29.
-- `docs/features/active/utilitiescs-nullable-dialogs-misc/spec.md` lines 46, 160–190, 255–284.
-- `docs/features/active/utilitiescs-nullable-svgcontrol/spec.md` lines 28, 45, 58, 126, 145–196,
+- `docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/issue.md` (AC1–AC7, full file).
+- `docs/features/active/2026-07-18-utilitiescs-nullable-residuals-375/spec.md` lines 1–40, 160–268, 330–344.
+- `docs/features/active/2026-07-18-utilitiescs-nullable-residuals-375/plan.2026-07-18T23-13.md` lines 1–29.
+- `docs/features/active/2026-07-18-utilitiescs-nullable-dialogs-misc-374/spec.md` lines 46, 160–190, 255–284.
+- `docs/features/active/2026-07-18-utilitiescs-nullable-svgcontrol-368/spec.md` lines 28, 45, 58, 126, 145–196,
   260–277.
 - `docs/features/archive/2026-07-06-appevents-loadasync-inbox-gating-243/runbooks/
   coverage-threshold-exception.runbook.md` (flagging precedent).

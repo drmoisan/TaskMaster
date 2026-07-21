@@ -4,8 +4,8 @@ Timestamp: 2026-07-19T07-15
 
 ## Inputs
 
-- Baseline: `docs/features/active/utilitiescs-nullable-email-parsing/evidence/baseline/baseline-coverage.cobertura.xml`
-- Post-change: `docs/features/active/utilitiescs-nullable-email-parsing/evidence/qa-gates/final-coverage.cobertura.xml`
+- Baseline: `docs/features/active/2026-07-18-utilitiescs-nullable-email-parsing-370/evidence/baseline/baseline-coverage.cobertura.xml`
+- Post-change: `docs/features/active/2026-07-18-utilitiescs-nullable-email-parsing-370/evidence/qa-gates/final-coverage.cobertura.xml`
 
 ## Repository-wide headline
 

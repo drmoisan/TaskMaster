@@ -2,11 +2,11 @@
 
 - Timestamp: 2026-07-19T08-51
 - Task: [P0-T5]
-- Command (plan-literal): `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-helperclasses/evidence/baseline/coverage-baseline.2026-07-19T08-51.cobertura.xml`
+- Command (plan-literal): `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/evidence/baseline/coverage-baseline.2026-07-19T08-51.cobertura.xml`
 - Command (actually executed): the script's underlying dotnet-coverage command, scoped to `UtilitiesCS.Test`:
   `dotnet-coverage collect --output <out.cobertura.xml> --output-format cobertura --settings coverage.config -- <vstest.console.exe> UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /Settings:scripts/vscode/TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:TestCategory!=LiveOutlook`
 - EXIT_CODE: 0
-- Cobertura XML: `docs/features/active/utilitiescs-nullable-helperclasses/evidence/baseline/coverage-baseline.2026-07-19T08-51.cobertura.xml`
+- Cobertura XML: `docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/evidence/baseline/coverage-baseline.2026-07-19T08-51.cobertura.xml`
 
 ## Invocation Note (single-assembly scope)
 

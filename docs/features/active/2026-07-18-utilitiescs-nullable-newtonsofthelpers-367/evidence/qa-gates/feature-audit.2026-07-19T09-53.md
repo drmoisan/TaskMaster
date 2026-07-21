@@ -60,7 +60,7 @@ Total AC items: 16.
 All 16 AC items were already marked `[x]` by the executor and are confirmed PASS by this review; no check-off changes are required (no item downgraded to unchecked).
 
 ### Acceptance Criteria Status
-- Source: `docs/features/active/utilitiescs-nullable-newtonsofthelpers/spec.md` (Definition of Done + Seeded Test Conditions) and `docs/features/active/utilitiescs-nullable-newtonsofthelpers/user-story.md` (Acceptance Criteria)
+- Source: `docs/features/active/2026-07-18-utilitiescs-nullable-newtonsofthelpers-367/spec.md` (Definition of Done + Seeded Test Conditions) and `docs/features/active/2026-07-18-utilitiescs-nullable-newtonsofthelpers-367/user-story.md` (Acceptance Criteria)
 - Total AC items: 16
 - Checked off (delivered and verified): 16
 - Remaining (unchecked): 0

@@ -2,7 +2,7 @@
 
 - **Epic:** `utilitiescs-nullable-remediation`
 - **Depends on:** `utilitiescs-nullable-extensions` (Wave-0, issue #363, spec at
-  `docs/features/active/utilitiescs-nullable-extensions/spec.md`)
+  `docs/features/active/2026-07-18-utilitiescs-nullable-extensions-363/spec.md`)
 - **Scope:** `UtilitiesCS/EmailIntelligence/EmailParsingSorting/`,
   `UtilitiesCS/EmailIntelligence/SubjectMap/`, `UtilitiesCS/EmailIntelligence/Ctf/`
 - **Researched:** 2026-07-18T22-05
@@ -218,7 +218,7 @@ No other files in this cluster are partial.
 Grep of the 25 cluster files for `UtilitiesCS.Extensions` usages and their call sites
 (`ThrowIfNull`, `ThrowIfNullOrEmpty`, `IsNullOrEmpty`, `Transpose`) shows the cluster consumes
 exactly four extension surfaces from `UtilitiesCS/Extensions/`, matching three of the Wave-0
-batches documented in `docs/features/active/utilitiescs-nullable-extensions/spec.md`:
+batches documented in `docs/features/active/2026-07-18-utilitiescs-nullable-extensions-363/spec.md`:
 
 - **`NullExtensions.cs`** (Wave-0 "Verify-only" — already `#nullable enable`, confirmed by
   direct read: file opens with `#nullable enable` at line 12 inside the namespace block).

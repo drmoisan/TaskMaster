@@ -25,7 +25,7 @@ The full branch diff for every changed language was audited.
 
 ## Evidence Location Compliance
 
-All evidence artifacts are written under the canonical `docs/features/active/utilitiescs-nullable-outlook-folder-store/evidence/{baseline,qa-gates,regression-testing,other}/` tree. A scan of `dffadd5a..HEAD` for files under `artifacts/baselines/`, `artifacts/qa/`, `artifacts/evidence/`, or `artifacts/coverage/` returned zero matches. No evidence-location violations. (`validate_evidence_locations.py` is not present in this worktree; the scan was performed with `git diff --name-only` filtered on the prohibited prefixes.)
+All evidence artifacts are written under the canonical `docs/features/active/2026-07-18-utilitiescs-nullable-outlook-folder-store-365/evidence/{baseline,qa-gates,regression-testing,other}/` tree. A scan of `dffadd5a..HEAD` for files under `artifacts/baselines/`, `artifacts/qa/`, `artifacts/evidence/`, or `artifacts/coverage/` returned zero matches. No evidence-location violations. (`validate_evidence_locations.py` is not present in this worktree; the scan was performed with `git diff --name-only` filtered on the prohibited prefixes.)
 
 ## Toolchain Compliance (C# Code Change Policy, CLAUDE.md order)
 

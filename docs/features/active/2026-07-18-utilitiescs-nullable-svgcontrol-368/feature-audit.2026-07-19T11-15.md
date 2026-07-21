@@ -182,7 +182,7 @@ required since all criteria are genuinely satisfied). No AC item is downgraded t
 
 ### Acceptance Criteria Status
 
-- Source: `docs/features/active/utilitiescs-nullable-svgcontrol/issue.md` (`## Acceptance
+- Source: `docs/features/active/2026-07-18-utilitiescs-nullable-svgcontrol-368/issue.md` (`## Acceptance
   Criteria`), cross-verified against identical AC text in `spec.md` and `user-story.md`
 - Total AC items: 6
 - Checked off (delivered): 6

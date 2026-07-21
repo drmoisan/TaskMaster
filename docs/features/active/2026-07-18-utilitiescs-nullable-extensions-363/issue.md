@@ -2,7 +2,7 @@
 
 - Date captured: 2026-07-18
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/utilitiescs-nullable-extensions/ (Issue #363)
+- Status: Promoted -> docs/features/active/2026-07-18-utilitiescs-nullable-extensions-363/ (Issue #363)
 
 - Issue: #363
 - Issue URL: https://github.com/drmoisan/TaskMaster/issues/363
@@ -78,4 +78,4 @@ signatures behavior-compatible.
 ## Next Step
 
 - [x] Promote to GitHub issue (feature request template)
-- [x] Create `docs/features/active/utilitiescs-nullable-extensions/` folder from the template
+- [x] Create `docs/features/active/2026-07-18-utilitiescs-nullable-extensions-363/` folder from the template

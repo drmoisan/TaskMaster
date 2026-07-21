@@ -159,7 +159,7 @@ These four edits are AUTHORIZED and are NOT scope violations and are NOT counted
 ## 7. Evidence Location Compliance
 
 All #366 evidence artifacts are written under the canonical
-`docs/features/active/utilitiescs-nullable-reusabletypes/evidence/<kind>/` tree
+`docs/features/active/2026-07-18-utilitiescs-nullable-reusabletypes-366/evidence/<kind>/` tree
 (baseline/, qa-gates/, regression-testing/, other/). Branch-diff scan for files written under
 `artifacts/baselines/`, `artifacts/qa/`, `artifacts/evidence/`, or `artifacts/coverage/`: none
 found. No evidence-location violation. PASS.

@@ -1,7 +1,7 @@
 # Research: utilitiescs-nullable-threading (Issue #369) — Wave-0
 
 - Date: 2026-07-18T22-45
-- Feature: `docs/features/active/utilitiescs-nullable-threading/`
+- Feature: `docs/features/active/2026-07-18-utilitiescs-nullable-threading-369/`
 - Epic: `utilitiescs-nullable-remediation` (Wave 0, complexity C3 — floored by `concurrency_or_ordering`)
 - Scope: per-file `#nullable enable` remediation of `UtilitiesCS/Threading/` (25 hand-written `.cs`, 4 WinForms Designer, 4 `.resx`)
 - Method: static reading only (no build permitted in this environment; consistent with the sibling Extensions research). All null-risk assessments are static hypotheses to be confirmed by the pragma-only build during execution.

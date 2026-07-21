@@ -14,7 +14,7 @@ AC source files (full-feature mode): `spec.md` (near line 334) and `user-story.m
 | AC5 | Public signatures of remediated members remain behavior-compatible; annotations reflect actual null behavior and honor #363 contracts. | PASS | `evidence/qa-gates/final-signature-compat.md` (additive nullability only; base/override + interface/implementer consistent; SubBayesianClassifier/SubClassifierGroup/SubCorpus contracts intact). |
 
 ## Acceptance Criteria Status
-- Source: `docs/features/active/utilitiescs-nullable-email-classifier/spec.md` and `docs/features/active/utilitiescs-nullable-email-classifier/user-story.md`
+- Source: `docs/features/active/2026-07-18-utilitiescs-nullable-email-classifier-372/spec.md` and `docs/features/active/2026-07-18-utilitiescs-nullable-email-classifier-372/user-story.md`
 - Total AC items: 5
 - Checked off (delivered): 5
 - Remaining (unchecked): 0

@@ -176,8 +176,8 @@ production changes).
 
 ### Coverage Evidence Checklist
 
-- C# baseline coverage artifact: `docs/features/active/utilitiescs-nullable-email-parsing/evidence/baseline/baseline-coverage.cobertura.xml` (Cobertura; present, reviewed).
-- C# post-change coverage artifact: `docs/features/active/utilitiescs-nullable-email-parsing/evidence/qa-gates/final-coverage.cobertura.xml` (Cobertura; present, reviewed).
+- C# baseline coverage artifact: `docs/features/active/2026-07-18-utilitiescs-nullable-email-parsing-370/evidence/baseline/baseline-coverage.cobertura.xml` (Cobertura; present, reviewed).
+- C# post-change coverage artifact: `docs/features/active/2026-07-18-utilitiescs-nullable-email-parsing-370/evidence/qa-gates/final-coverage.cobertura.xml` (Cobertura; present, reviewed).
 - TypeScript baseline coverage artifact: N/A — no TypeScript files changed on this branch.
 - TypeScript post-change coverage artifact: N/A — no TypeScript files changed on this branch.
 - Python coverage artifact: N/A — no Python files changed on this branch.

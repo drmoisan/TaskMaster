@@ -14,10 +14,10 @@ Per `policy-compliance-order` and the plan's P0-T1 read order:
 
 Then the requirements sources:
 
-5. `docs/features/active/utilitiescs-nullable-helperclasses/spec.md` (Definition of Done — AC source)
-6. `docs/features/active/utilitiescs-nullable-helperclasses/user-story.md` (Acceptance Criteria — AC source)
-7. `docs/features/active/utilitiescs-nullable-helperclasses/issue.md`
-8. `docs/features/active/utilitiescs-nullable-helperclasses/research/research-findings.2026-07-18T21-45.md`
+5. `docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/spec.md` (Definition of Done — AC source)
+6. `docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/user-story.md` (Acceptance Criteria — AC source)
+7. `docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/issue.md`
+8. `docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/research/research-findings.2026-07-18T21-45.md`
 
 ## Files Read (explicit list)
 
@@ -25,10 +25,10 @@ Then the requirements sources:
 - `.claude/rules/general-code-change.md` — read (loaded in session context)
 - `.claude/rules/general-unit-test.md` — read (loaded in session context)
 - `.claude/rules/csharp.md` — read in full
-- `docs/features/active/utilitiescs-nullable-helperclasses/spec.md` — read in full (8 Definition-of-Done checkboxes identified)
-- `docs/features/active/utilitiescs-nullable-helperclasses/user-story.md` — read in full (6 Acceptance-Criteria checkboxes identified)
-- `docs/features/active/utilitiescs-nullable-helperclasses/issue.md` — read in full
-- `docs/features/active/utilitiescs-nullable-helperclasses/research/research-findings.2026-07-18T21-45.md` — read in full
+- `docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/spec.md` — read in full (8 Definition-of-Done checkboxes identified)
+- `docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/user-story.md` — read in full (6 Acceptance-Criteria checkboxes identified)
+- `docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/issue.md` — read in full
+- `docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/research/research-findings.2026-07-18T21-45.md` — read in full
 
 ## Key Compliance Notes Captured
 

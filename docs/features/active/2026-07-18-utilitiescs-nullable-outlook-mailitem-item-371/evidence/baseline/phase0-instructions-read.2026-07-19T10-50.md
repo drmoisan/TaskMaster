@@ -23,11 +23,11 @@ Policy files:
 - `.claude/rules/csharp.md`
 
 Requirements sources (per plan Requirements Sources block):
-- `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/spec.md` (Definition of Done + AC1–AC6; AC source)
-- `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/user-story.md` (Acceptance Criteria; AC source)
-- `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/issue.md`
-- `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/research/research.2026-07-18T22-15.md`
-- `docs/features/active/utilitiescs-nullable-outlook-mailitem-item/plan.2026-07-18T22-05.md`
+- `docs/features/active/2026-07-18-utilitiescs-nullable-outlook-mailitem-item-371/spec.md` (Definition of Done + AC1–AC6; AC source)
+- `docs/features/active/2026-07-18-utilitiescs-nullable-outlook-mailitem-item-371/user-story.md` (Acceptance Criteria; AC source)
+- `docs/features/active/2026-07-18-utilitiescs-nullable-outlook-mailitem-item-371/issue.md`
+- `docs/features/active/2026-07-18-utilitiescs-nullable-outlook-mailitem-item-371/research/research.2026-07-18T22-15.md`
+- `docs/features/active/2026-07-18-utilitiescs-nullable-outlook-mailitem-item-371/plan.2026-07-18T22-05.md`
 
 ## Key Constraints Confirmed
 

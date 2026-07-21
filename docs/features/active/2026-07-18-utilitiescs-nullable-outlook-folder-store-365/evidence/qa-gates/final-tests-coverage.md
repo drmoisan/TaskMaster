@@ -1,7 +1,7 @@
 # Final Tests With Coverage (P12-T4)
 
 Timestamp: 2026-07-19T16-40
-Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot UtilitiesCS.Test -CoverageOutput docs/features/active/utilitiescs-nullable-outlook-folder-store/evidence/qa-gates/final-coverage.cobertura.xml`
+Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot UtilitiesCS.Test -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-outlook-folder-store-365/evidence/qa-gates/final-coverage.cobertura.xml`
 EXIT_CODE: 0
 Output Summary:
 - Test Run Successful. Total tests: 4511, Passed: 4511, Failed: 0 (AC3).

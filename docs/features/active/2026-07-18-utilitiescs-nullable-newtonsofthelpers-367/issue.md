@@ -2,7 +2,7 @@
 
 - Date captured: 2026-07-18
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/utilitiescs-nullable-newtonsofthelpers/ (Issue #367)
+- Status: Promoted -> docs/features/active/2026-07-18-utilitiescs-nullable-newtonsofthelpers-367/ (Issue #367)
 - Epic: utilitiescs-nullable-remediation (child, Wave 0)
 
 - Issue: #367
@@ -68,4 +68,4 @@ using a per-file `#nullable enable` opt-in:
 ## Next Step
 
 - [ ] Promote to GitHub issue (feature request template)
-- [ ] Create `docs/features/active/utilitiescs-nullable-newtonsofthelpers/` folder from the template
+- [ ] Create `docs/features/active/2026-07-18-utilitiescs-nullable-newtonsofthelpers-367/` folder from the template

@@ -4,7 +4,7 @@ Timestamp: 2026-07-19T23-45
 
 ## Command
 
-`pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-reusabletypes/evidence/regression-testing/batch-7-coverage.cobertura.xml`
+`pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-reusabletypes-366/evidence/regression-testing/batch-7-coverage.cobertura.xml`
 
 EXIT_CODE: 0
 
@@ -25,4 +25,4 @@ Whole-suite coverage headline (from `batch-7-coverage.cobertura.xml` `<coverage>
 - branch-rate: 0.763407 (76.34%)
 
 Cobertura XML written to
-`docs/features/active/utilitiescs-nullable-reusabletypes/evidence/regression-testing/batch-7-coverage.cobertura.xml`.
+`docs/features/active/2026-07-18-utilitiescs-nullable-reusabletypes-366/evidence/regression-testing/batch-7-coverage.cobertura.xml`.

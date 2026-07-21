@@ -2,7 +2,7 @@
 
 - Timestamp: 2026-07-19T11-45
 - Task: [P3-T5]
-- Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-dialogs-misc/evidence/regression-testing/batch-c-coverage.cobertura.xml`
+- Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-dialogs-misc-374/evidence/regression-testing/batch-c-coverage.cobertura.xml`
 - EXIT_CODE: 0
 
 ## Output Summary

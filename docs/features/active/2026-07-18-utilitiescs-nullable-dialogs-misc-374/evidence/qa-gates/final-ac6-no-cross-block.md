@@ -26,7 +26,7 @@ UtilitiesCS/WindowsAPI/ExtraDeclarations.cs
 ```
 
 All other changes are confined to
-`docs/features/active/utilitiescs-nullable-dialogs-misc/` (plan, spec/user-story AC check-offs, and
+`docs/features/active/2026-07-18-utilitiescs-nullable-dialogs-misc-374/` (plan, spec/user-story AC check-offs, and
 evidence artifacts).
 
 ## Result

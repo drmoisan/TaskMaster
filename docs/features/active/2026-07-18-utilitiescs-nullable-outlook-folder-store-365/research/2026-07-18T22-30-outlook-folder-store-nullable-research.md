@@ -454,13 +454,13 @@ resolved here and no `.claude/rules/*` file should be edited.
 
 ## 7. Citations
 
-- Upstream contracts consumed: `docs/features/active/utilitiescs-nullable-extensions/spec.md`
-  (issue #363) and `docs/features/active/utilitiescs-nullable-extensions/plan.2026-07-18T21-20.md`;
-  `docs/features/active/utilitiescs-nullable-helperclasses/spec.md` (issue #364) and
-  `docs/features/active/utilitiescs-nullable-helperclasses/plan.2026-07-18T21-21.md`.
+- Upstream contracts consumed: `docs/features/active/2026-07-18-utilitiescs-nullable-extensions-363/spec.md`
+  (issue #363) and `docs/features/active/2026-07-18-utilitiescs-nullable-extensions-363/plan.2026-07-18T21-20.md`;
+  `docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/spec.md` (issue #364) and
+  `docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/plan.2026-07-18T21-21.md`.
 - Epic manifest: `docs/features/epics/utilitiescs-nullable-remediation/epic.md` (Wave 1 table,
   `~29` file estimate for `utilitiescs-nullable-outlook-folder-store`, `depends_on` edges, and the
   rules-vs-convention conflict framing reused in §6 item 6).
 - This feature's own scaffolds (currently template placeholders, not yet filled in):
-  `docs/features/active/utilitiescs-nullable-outlook-folder-store/spec.md`,
+  `docs/features/active/2026-07-18-utilitiescs-nullable-outlook-folder-store-365/spec.md`,
   `.../issue.md`, `.../plan.2026-07-18T22-03.md`, `.../user-story.md`.

@@ -67,7 +67,7 @@ gate.
 ## Evidence Location Compliance
 
 All executor evidence and these three review artifacts are written under the canonical
-`docs/features/active/utilitiescs-nullable-email-classifier/evidence/<kind>/` locations
+`docs/features/active/2026-07-18-utilitiescs-nullable-email-classifier-372/evidence/<kind>/` locations
 (`baseline/`, `qa-gates/`, `regression-testing/`, `other/`). No evidence was written to the
 prohibited `artifacts/baselines/`, `artifacts/qa/`, `artifacts/coverage/`, or `artifacts/evidence/`
 paths. Diff scan of `git diff df2235bc..HEAD --name-only` shows no file added under any prohibited

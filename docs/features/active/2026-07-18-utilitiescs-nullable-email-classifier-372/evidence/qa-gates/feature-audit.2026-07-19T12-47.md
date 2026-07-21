@@ -46,8 +46,8 @@ unchecked.
 
 ## Acceptance Criteria Status
 
-- Source: `docs/features/active/utilitiescs-nullable-email-classifier/spec.md` and
-  `docs/features/active/utilitiescs-nullable-email-classifier/user-story.md`
+- Source: `docs/features/active/2026-07-18-utilitiescs-nullable-email-classifier-372/spec.md` and
+  `docs/features/active/2026-07-18-utilitiescs-nullable-email-classifier-372/user-story.md`
 - Total AC items: 5
 - Checked off (delivered): 5
 - Remaining (unchecked): 0

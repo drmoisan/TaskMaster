@@ -15,8 +15,8 @@ Files read (all four, in required order):
 - C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-aac70fb1e66a2e16a/.claude/rules/csharp.md
 
 Also read for scope compliance:
-- docs/features/active/utilitiescs-nullable-reusabletypes/plan.2026-07-18T22-04.md (approved plan; Scope Invariants section)
-- docs/features/active/utilitiescs-nullable-reusabletypes/issue.md (AC source, full-feature mode; Acceptance Criteria AC1-AC6)
+- docs/features/active/2026-07-18-utilitiescs-nullable-reusabletypes-366/plan.2026-07-18T22-04.md (approved plan; Scope Invariants section)
+- docs/features/active/2026-07-18-utilitiescs-nullable-reusabletypes-366/issue.md (AC source, full-feature mode; Acceptance Criteria AC1-AC6)
 
 Output Summary: All four required policy files were read in the mandated order prior to any
 code change. Key operative constraints for this run: per-file `#nullable enable` pragma opt-in

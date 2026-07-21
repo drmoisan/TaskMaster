@@ -47,7 +47,7 @@ audited.
 ## Evidence Location Compliance
 
 All executor evidence is written under the canonical
-`docs/features/active/utilitiescs-nullable-extensions/evidence/{baseline,qa-gates,regression-testing,other}/`
+`docs/features/active/2026-07-18-utilitiescs-nullable-extensions-363/evidence/{baseline,qa-gates,regression-testing,other}/`
 tree. A branch-diff scan for files under `artifacts/baselines/`, `artifacts/qa/`,
 `artifacts/evidence/`, or `artifacts/coverage/` returned no matches. No evidence-location
 violation was found.

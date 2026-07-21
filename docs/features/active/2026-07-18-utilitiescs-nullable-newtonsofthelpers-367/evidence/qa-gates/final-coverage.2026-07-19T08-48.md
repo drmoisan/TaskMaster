@@ -1,7 +1,7 @@
 # Final Coverage Gate (P9-T4)
 
 - Timestamp: 2026-07-19T08-48
-- Command: `dotnet-coverage collect --output docs/features/active/utilitiescs-nullable-newtonsofthelpers/evidence/qa-gates/final-coverage.2026-07-19T08-48.cobertura.xml --output-format cobertura --settings coverage.config -- "<VS18>/vstest.console.exe" "UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" /Settings:scripts/vscode/TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:TestCategory!=LiveOutlook`
+- Command: `dotnet-coverage collect --output docs/features/active/2026-07-18-utilitiescs-nullable-newtonsofthelpers-367/evidence/qa-gates/final-coverage.2026-07-19T08-48.cobertura.xml --output-format cobertura --settings coverage.config -- "<VS18>/vstest.console.exe" "UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" /Settings:scripts/vscode/TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:TestCategory!=LiveOutlook`
 - EXIT_CODE: 0
 - Output Summary: `Test Run Successful. Total tests: 4511, Passed: 4511, Failed: 0`. All UtilitiesCS tests green (including `Threading/AppGlobalsConverterTests.cs`, `HelperClasses/NLogTraceWriter_Test.cs`, and the People/converter/wrapper/SDIL suites). Cobertura written to the qa-gates evidence folder.
 

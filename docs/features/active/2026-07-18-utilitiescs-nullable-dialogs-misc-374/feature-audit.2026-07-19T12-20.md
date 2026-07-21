@@ -56,7 +56,7 @@ trusting the checkbox state. All six are correctly checked; no reviewer edit to 
 required and none was made.
 
 ### Acceptance Criteria Status
-- Source: `docs/features/active/utilitiescs-nullable-dialogs-misc/spec.md`, `docs/features/active/utilitiescs-nullable-dialogs-misc/user-story.md`
+- Source: `docs/features/active/2026-07-18-utilitiescs-nullable-dialogs-misc-374/spec.md`, `docs/features/active/2026-07-18-utilitiescs-nullable-dialogs-misc-374/user-story.md`
 - Total AC items: 6
 - Checked off (delivered): 6
 - Remaining (unchecked): 0

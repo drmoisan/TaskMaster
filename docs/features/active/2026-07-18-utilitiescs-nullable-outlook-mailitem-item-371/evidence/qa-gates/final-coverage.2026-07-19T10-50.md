@@ -2,7 +2,7 @@
 
 - Timestamp: 2026-07-19T10-50
 - Task: [P10-T4]
-- Command: `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot UtilitiesCS.Test -CoverageOutput docs/features/active/utilitiescs-nullable-outlook-mailitem-item/evidence/qa-gates/final-coverage.2026-07-19T10-50.cobertura.xml`
+- Command: `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot UtilitiesCS.Test -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-outlook-mailitem-item-371/evidence/qa-gates/final-coverage.2026-07-19T10-50.cobertura.xml`
   - Same scope as the P0-T5 baseline (UtilitiesCS.Test, the assembly every batch test task targets) for an apples-to-apples delta. `coverage.config` module excludes handle the Deedle/FSharp instrumentation flakiness.
 - EXIT_CODE: 0
 - Cobertura XML: `evidence/qa-gates/final-coverage.2026-07-19T10-50.cobertura.xml`

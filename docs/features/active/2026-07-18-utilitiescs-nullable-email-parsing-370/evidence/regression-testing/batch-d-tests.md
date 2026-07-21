@@ -13,7 +13,7 @@ temporarily edited to `Workers: 4`, the coverage script was run once successfull
 was restored to its original content (`git diff` and MD5 checksum
 `214be06fbfaf1aee387da41e907f4fb4` confirm zero net change before and after).
 
-Command (as actually run, after the temporary `Workers: 4` edit): `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-email-parsing/evidence/regression-testing/batch-d-coverage.cobertura.xml`
+Command (as actually run, after the temporary `Workers: 4` edit): `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-email-parsing-370/evidence/regression-testing/batch-d-coverage.cobertura.xml`
 
 EXIT_CODE: 0
 

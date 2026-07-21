@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-20T05-15
 
-Command: `scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-ci-capstone/evidence/qa-gates/qc-coverage.cobertura.xml`
+Command: `scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/evidence/qa-gates/qc-coverage.cobertura.xml`
 
 EXIT_CODE: 0
 

@@ -5,7 +5,7 @@ Timestamp: 2026-07-19T03-45
 ## Environment note: pre-existing full-suite parallelism flakiness (not a regression)
 
 The standard command `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput
-docs/features/active/utilitiescs-nullable-email-parsing/evidence/regression-testing/batch-c-coverage.cobertura.xml`
+docs/features/active/2026-07-18-utilitiescs-nullable-email-parsing-370/evidence/regression-testing/batch-c-coverage.cobertura.xml`
 crashed non-deterministically on 3 consecutive attempts (`EXIT_CODE` -1/127, no test failures —
 the process terminated mid-run at a different, unrelated test each time: once in
 `TaskVisualization.Test`, once in a COM-reflection-helper test). This matches a documented
@@ -25,7 +25,7 @@ successfully, and the file was then restored to its original content. `git diff`
 checksum (`214be06fbfaf1aee387da41e907f4fb4`, both before and after) confirm zero net change to
 the tracked file — no unrelated file was left modified by this diagnostic step (AC6 preserved).
 
-Command (as actually run, after the temporary `Workers: 4` edit): `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-email-parsing/evidence/regression-testing/batch-c-coverage.cobertura.xml`
+Command (as actually run, after the temporary `Workers: 4` edit): `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-email-parsing-370/evidence/regression-testing/batch-c-coverage.cobertura.xml`
 
 EXIT_CODE: 0
 

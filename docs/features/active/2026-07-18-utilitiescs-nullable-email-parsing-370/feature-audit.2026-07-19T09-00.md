@@ -84,9 +84,9 @@ what you find PASS and still unchecked" rule — nothing was unchecked here).
 
 ### Acceptance Criteria Status
 
-- Source: `docs/features/active/utilitiescs-nullable-email-parsing/issue.md`,
-  `docs/features/active/utilitiescs-nullable-email-parsing/spec.md`,
-  `docs/features/active/utilitiescs-nullable-email-parsing/user-story.md`
+- Source: `docs/features/active/2026-07-18-utilitiescs-nullable-email-parsing-370/issue.md`,
+  `docs/features/active/2026-07-18-utilitiescs-nullable-email-parsing-370/spec.md`,
+  `docs/features/active/2026-07-18-utilitiescs-nullable-email-parsing-370/user-story.md`
 - Total AC items: 6 (per source file; identical across all three files)
 - Checked off (delivered): 6 / 6 (all three files)
 - Remaining (unchecked): 0

@@ -390,8 +390,8 @@ maintainer and defers to the Wave-2 CI capstone child; resolving it is out of sc
 ## Upstream contract dependency (#363)
 
 This feature consumes the annotation contracts published by the Wave-0 Extensions child
-(issue #363). See `docs/features/active/utilitiescs-nullable-extensions/spec.md` and
-`docs/features/active/utilitiescs-nullable-extensions/plan.2026-07-18T21-20.md`. Consumed
+(issue #363). See `docs/features/active/2026-07-18-utilitiescs-nullable-extensions-363/spec.md` and
+`docs/features/active/2026-07-18-utilitiescs-nullable-extensions-363/plan.2026-07-18T21-20.md`. Consumed
 methods include `ThrowIfNull`/`ThrowIfNullOrEmpty` (`NullExtensions.cs`),
 `IsNullOrEmpty`/`StringJoin`/`ToFormattedText` (`StringExtensions.cs` / `IEnumerableExtensions.cs`),
 `ForEach`/`GroupAndCount`/`GroupAndCountAsync`/`ToDictionary` (`IEnumerableExtensions.cs`),

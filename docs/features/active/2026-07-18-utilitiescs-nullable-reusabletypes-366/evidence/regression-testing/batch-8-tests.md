@@ -8,7 +8,7 @@ under the ratified four-file cross-child waiver (Option A'').
 
 ## Command
 
-`pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-reusabletypes/evidence/regression-testing/batch-8-coverage.cobertura.xml`
+`pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-reusabletypes-366/evidence/regression-testing/batch-8-coverage.cobertura.xml`
 (pwsh 7).
 
 EXIT_CODE: 0

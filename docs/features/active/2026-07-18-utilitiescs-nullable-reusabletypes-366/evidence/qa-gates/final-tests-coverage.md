@@ -4,7 +4,7 @@ Timestamp: 2026-07-19T22-03
 
 ## Command
 
-`pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-reusabletypes/evidence/qa-gates/final-coverage.cobertura.xml`
+`pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-reusabletypes-366/evidence/qa-gates/final-coverage.cobertura.xml`
 (pwsh 7). A full `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug` was run immediately
 before this to restore all test assemblies (the preceding P9-T3 `/t:Rebuild` warnings-as-errors
 gate cleans-then-fails at vendored SVGControl, leaving a partial output tree; the restore build

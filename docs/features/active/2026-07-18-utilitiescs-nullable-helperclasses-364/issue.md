@@ -2,7 +2,7 @@
 
 - Date captured: 2026-07-18
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/utilitiescs-nullable-helperclasses/ (Issue #364)
+- Status: Promoted -> docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/ (Issue #364)
 - Epic: utilitiescs-nullable-remediation (child, Wave 0)
 
 - Issue: #364
@@ -65,4 +65,4 @@ using a per-file `#nullable enable` opt-in:
 ## Next Step
 
 - [ ] Promote to GitHub issue (feature request template)
-- [ ] Create `docs/features/active/utilitiescs-nullable-helperclasses/` folder from the template
+- [ ] Create `docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/` folder from the template

@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-19T01-00
 
-Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-svgcontrol/evidence/baseline/baseline-coverage.cobertura.xml`
+Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-svgcontrol-368/evidence/baseline/baseline-coverage.cobertura.xml`
 
 EXIT_CODE: 0
 
@@ -10,7 +10,7 @@ Output Summary:
 
 - Discovered 1 test assembly: `SVGControl.Test\bin\Debug\SVGControl.Test.dll`.
 - Total tests: 37. Passed: 37. Failed: 0. Total time: 1.5659s.
-- Coverage XML written to `docs/features/active/utilitiescs-nullable-svgcontrol/evidence/baseline/baseline-coverage.cobertura.xml` (post-processed for Koverage compatibility).
+- Coverage XML written to `docs/features/active/2026-07-18-utilitiescs-nullable-svgcontrol-368/evidence/baseline/baseline-coverage.cobertura.xml` (post-processed for Koverage compatibility).
 - Repository (SVGControl package) headline: line-rate `0.2651162790697674` (26.51%), branch-rate
   `0.3202054794520548` (32.02%), 870/3264 lines covered, 368/1140 branches covered.
 - `RelativePath.cs` class-level (the one file in scope with a real automated baseline):

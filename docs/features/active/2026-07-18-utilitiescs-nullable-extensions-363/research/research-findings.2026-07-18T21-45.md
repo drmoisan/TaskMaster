@@ -1,7 +1,7 @@
 # Research: utilitiescs-nullable-extensions (Issue #363) — Wave-0
 
 - Date: 2026-07-18T21-45
-- Feature: `docs/features/active/utilitiescs-nullable-extensions/`
+- Feature: `docs/features/active/2026-07-18-utilitiescs-nullable-extensions-363/`
 - Epic: `utilitiescs-nullable-remediation` (Wave 0, complexity C3, cross-module contract change)
 - Scope: per-file `#nullable enable` remediation of `UtilitiesCS/Extensions/` (recursive; 25 `.cs` files, 2 already enabled)
 - Method: static reading only (no build permitted in this environment). All null-risk assessments are static.

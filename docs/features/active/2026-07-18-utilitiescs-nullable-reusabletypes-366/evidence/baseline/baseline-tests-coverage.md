@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-19T09-06
 
-Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-reusabletypes/evidence/baseline/baseline-coverage.cobertura.xml`
+Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-reusabletypes-366/evidence/baseline/baseline-coverage.cobertura.xml`
 
 EXIT_CODE: 0
 
@@ -21,6 +21,6 @@ EXIT_CODE: 0
 - Branch coverage (branch-rate): 0.763563 = 76.36% (branches-covered 19535 / branches-valid 25584)
 
 Cobertura XML written to
-`docs/features/active/utilitiescs-nullable-reusabletypes/evidence/baseline/baseline-coverage.cobertura.xml`.
+`docs/features/active/2026-07-18-utilitiescs-nullable-reusabletypes-366/evidence/baseline/baseline-coverage.cobertura.xml`.
 This is the authoritative baseline for the AC4 changed-line no-regression comparison (P9-T5, out of
 this run's scope). Per-batch coverage artifacts are captured under `evidence/regression-testing/`.

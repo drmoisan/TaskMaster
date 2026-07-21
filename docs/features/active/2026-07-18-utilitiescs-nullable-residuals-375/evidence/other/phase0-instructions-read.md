@@ -17,9 +17,9 @@ Files Read (exact paths in this worktree):
 - C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a075d3c18cf9d6a65\docs\features\epics\utilitiescs-nullable-remediation\epic.md
 
 Additional requirement sources read for execution context:
-- docs/features/active/utilitiescs-nullable-residuals/plan.2026-07-18T23-13.md
-- docs/features/active/utilitiescs-nullable-residuals/spec.md
-- docs/features/active/utilitiescs-nullable-residuals/user-story.md
+- docs/features/active/2026-07-18-utilitiescs-nullable-residuals-375/plan.2026-07-18T23-13.md
+- docs/features/active/2026-07-18-utilitiescs-nullable-residuals-375/spec.md
+- docs/features/active/2026-07-18-utilitiescs-nullable-residuals-375/user-story.md
 
 Output Summary: All five required policy/manifest files read in the mandated order. Key constraints
 captured for execution: per-file `#nullable enable` opt-in only; no project/solution `<Nullable>`

@@ -2,7 +2,7 @@
 
 - Date captured: 2026-07-18
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/utilitiescs-nullable-dialogs-misc/ (Issue #374)
+- Status: Promoted -> docs/features/active/2026-07-18-utilitiescs-nullable-dialogs-misc-374/ (Issue #374)
 
 - Issue: #374
 - Issue URL: https://github.com/drmoisan/TaskMaster/issues/374
@@ -35,5 +35,5 @@ List notable constraints (performance, compatibility, scope) or risks.
 ## Next Step
 
 - [ ] Promote to GitHub issue (feature request template)
-- [ ] Create `docs/features/active/utilitiescs-nullable-dialogs-misc/` folder from the template
+- [ ] Create `docs/features/active/2026-07-18-utilitiescs-nullable-dialogs-misc-374/` folder from the template
 

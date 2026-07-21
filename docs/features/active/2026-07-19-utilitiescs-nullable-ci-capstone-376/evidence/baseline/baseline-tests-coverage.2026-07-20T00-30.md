@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-20T00-30
 Command: `scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput
-docs/features/active/utilitiescs-nullable-ci-capstone/evidence/baseline/baseline-coverage.cobertura.xml`
+docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/evidence/baseline/baseline-coverage.cobertura.xml`
 (discovers all 8 `*.Test.dll` assemblies solution-wide; `SVGControl.Test` has no `.csproj` and is
 not part of `TaskMaster.sln` — confirmed via `grep -i SVGControl TaskMaster.sln` — so it is not a
 discoverable MSTest assembly and is correctly absent from this run.)

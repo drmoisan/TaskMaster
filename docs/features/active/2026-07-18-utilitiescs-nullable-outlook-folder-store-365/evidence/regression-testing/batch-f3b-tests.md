@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-19T12-40
 
-Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot UtilitiesCS.Test -CoverageOutput docs/features/active/utilitiescs-nullable-outlook-folder-store/evidence/regression-testing/batch-f3b-coverage.cobertura.xml`
+Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot UtilitiesCS.Test -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-outlook-folder-store-365/evidence/regression-testing/batch-f3b-coverage.cobertura.xml`
 
 EXIT_CODE: 0
 

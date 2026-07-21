@@ -12,7 +12,7 @@
 The audit scope is the full branch diff against the resolved base commit `dffadd5a`. The diff comprises:
 
 - 37 hand-written `UtilitiesCS/*.cs` source files (per-file `#nullable enable` opt-in; annotation-only).
-- 5 baseline/other evidence files, 11 qa-gate evidence files, and 2 Cobertura coverage XML artifacts under the canonical `docs/features/active/utilitiescs-nullable-residuals/evidence/` tree.
+- 5 baseline/other evidence files, 11 qa-gate evidence files, and 2 Cobertura coverage XML artifacts under the canonical `docs/features/active/2026-07-18-utilitiescs-nullable-residuals-375/evidence/` tree.
 - `spec.md`, `user-story.md`, `plan.2026-07-18T23-13.md` (AC check-offs and plan progress).
 - 2 `.claude/agent-memory/atomic-executor/` markdown files (executor memory notes; documentation only, no code).
 
@@ -28,7 +28,7 @@ None detected. No caller instruction attempted to narrow the audit to a plan/tas
 
 ## Evidence Location Compliance
 
-All evidence artifacts on the branch are written under the canonical `docs/features/active/utilitiescs-nullable-residuals/evidence/<kind>/` path (`baseline/`, `other/`, `qa-gates/`). A name-only diff scan for non-canonical evidence paths (`artifacts/baselines/`, `artifacts/qa/`, `artifacts/evidence/`, `artifacts/coverage/`) returned zero matches. No `EVIDENCE_LOCATION_OVERRIDE_REJECTED` condition arose. `validate_evidence_locations.py` is not present in this repository; the manual scan is the substitute and shows no violations. Verdict: PASS.
+All evidence artifacts on the branch are written under the canonical `docs/features/active/2026-07-18-utilitiescs-nullable-residuals-375/evidence/<kind>/` path (`baseline/`, `other/`, `qa-gates/`). A name-only diff scan for non-canonical evidence paths (`artifacts/baselines/`, `artifacts/qa/`, `artifacts/evidence/`, `artifacts/coverage/`) returned zero matches. No `EVIDENCE_LOCATION_OVERRIDE_REJECTED` condition arose. `validate_evidence_locations.py` is not present in this repository; the manual scan is the substitute and shows no violations. Verdict: PASS.
 
 ## Policy Verdicts
 

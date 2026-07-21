@@ -1,7 +1,7 @@
 # Policy Audit — utilitiescs-nullable-ci-capstone (Issue #376)
 
 - Timestamp: 2026-07-20T06-00
-- Feature folder: `docs/features/active/utilitiescs-nullable-ci-capstone/`
+- Feature folder: `docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/`
 - Branch: `feature/utilitiescs-nullable-ci-capstone-376`
 - Diff base (resolved per `pr-base-branch-merge-base`, NOT `main`): `bfcdb394b19a12ca2345bf740a4efffe0ad6e330` (`origin/epic/utilitiescs-nullable-remediation-integration` tip; this feature merges to the epic integration branch, not `main`)
 - Head: uncommitted working-tree state on top of `bfcdb394` (`git log bfcdb394..HEAD` is empty — all reviewed work is currently uncommitted in the worktree; see Procedural Notes)
@@ -65,7 +65,7 @@ independently rather than take on faith. Nothing to record under this heading.
 
 ### 1.2.1 Per-Language Coverage Comparison
 
-- C#: Baseline: 83.88% line (87365/104150) / 76.36% branch (19529/25576). Post-change: 83.89% line (87378/104155) / 76.37% branch (19533/25576). Change: a marginal increase on both metrics — precisely +0.00008 (rounds to +0.01% displayed) line-rate, +0.00016 (+0.02% displayed) branch-rate. New/changed-code coverage: none reported — this feature's changes are nullable-annotation/pragma-suppression/dead-code-deletion edits to existing lines, not new executable production code; no new method or class is added. Disposition: FAIL on the absolute 85% line-coverage floor (pre-existing, non-regressed — see row above), PASS on the 75% branch floor and on no-regression. Evidence: `docs/features/active/utilitiescs-nullable-ci-capstone/evidence/baseline/baseline-tests-coverage.2026-07-20T00-30.md`, `docs/features/active/utilitiescs-nullable-ci-capstone/evidence/qa-gates/qc-tests-coverage.2026-07-20T05-15.md`, `docs/features/active/utilitiescs-nullable-ci-capstone/evidence/qa-gates/qc-coverage-delta.2026-07-20T05-20.md`.
+- C#: Baseline: 83.88% line (87365/104150) / 76.36% branch (19529/25576). Post-change: 83.89% line (87378/104155) / 76.37% branch (19533/25576). Change: a marginal increase on both metrics — precisely +0.00008 (rounds to +0.01% displayed) line-rate, +0.00016 (+0.02% displayed) branch-rate. New/changed-code coverage: none reported — this feature's changes are nullable-annotation/pragma-suppression/dead-code-deletion edits to existing lines, not new executable production code; no new method or class is added. Disposition: FAIL on the absolute 85% line-coverage floor (pre-existing, non-regressed — see row above), PASS on the 75% branch floor and on no-regression. Evidence: `docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/evidence/baseline/baseline-tests-coverage.2026-07-20T00-30.md`, `docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/evidence/qa-gates/qc-tests-coverage.2026-07-20T05-15.md`, `docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/evidence/qa-gates/qc-coverage-delta.2026-07-20T05-20.md`.
 - TypeScript: N/A — no `.ts`/`.tsx` files changed on this branch.
 - Python: N/A — no `.py` files changed on this branch.
 - PowerShell: N/A — no `.ps1`/`.psm1` files changed on this branch.

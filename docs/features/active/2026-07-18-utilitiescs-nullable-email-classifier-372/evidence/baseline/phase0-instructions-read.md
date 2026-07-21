@@ -11,9 +11,9 @@ Files read (in required order):
 4. .claude/rules/csharp.md (C#-specific toolchain and coding standards) — read via Read tool.
 
 Additional references consulted for execution correctness:
-- docs/features/active/utilitiescs-nullable-email-classifier/plan.2026-07-18T22-06.md (plan of record).
-- docs/features/active/utilitiescs-nullable-email-classifier/spec.md (AC1–AC5 source).
-- docs/features/active/utilitiescs-nullable-email-classifier/user-story.md (AC1–AC5 source).
+- docs/features/active/2026-07-18-utilitiescs-nullable-email-classifier-372/plan.2026-07-18T22-06.md (plan of record).
+- docs/features/active/2026-07-18-utilitiescs-nullable-email-classifier-372/spec.md (AC1–AC5 source).
+- docs/features/active/2026-07-18-utilitiescs-nullable-email-classifier-372/user-story.md (AC1–AC5 source).
 
 Key operative constraints acknowledged:
 - Verification uses the per-file `#nullable enable` pragma gate (project-scoped per batch, solution-wide at final QC) with `/t:Rebuild` and `/p:TreatWarningsAsErrors=true`, WITHOUT `/p:Nullable=enable` globally.

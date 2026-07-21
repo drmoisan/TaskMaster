@@ -71,8 +71,8 @@ post-annotation, no changed-line coverage regression, pragma-only nullable gate 
 
 ### Acceptance Criteria Status
 
-- Source: `docs/features/active/utilitiescs-nullable-threading/spec.md` (Definition of Done),
-  `docs/features/active/utilitiescs-nullable-threading/user-story.md` (Acceptance Criteria)
+- Source: `docs/features/active/2026-07-18-utilitiescs-nullable-threading-369/spec.md` (Definition of Done),
+  `docs/features/active/2026-07-18-utilitiescs-nullable-threading-369/user-story.md` (Acceptance Criteria)
 - Total AC items: 8 (spec.md) + 8 (user-story.md)
 - Checked off (delivered): 8 + 8
 - Remaining (unchecked): 0

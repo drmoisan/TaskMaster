@@ -100,7 +100,7 @@ passes (isolated build EXIT 0). The condition is flagged for the maintainer / ep
 - Command: `git diff --name-only <base>...HEAD | grep -E 'artifacts/(baselines|qa|evidence|coverage)/'`
   → NONE.
 - All evidence artifacts are written under the canonical
-  `docs/features/active/utilitiescs-nullable-helperclasses/evidence/{baseline,qa-gates,regression-testing,other}/`
+  `docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/evidence/{baseline,qa-gates,regression-testing,other}/`
   path. No non-canonical `artifacts/baselines|qa|coverage|evidence` writes exist in the diff.
 - `scripts/dev_tools/validate_evidence_locations.py` is not present in this repository (checked);
   the manual scan above is used instead.

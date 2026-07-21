@@ -2,11 +2,11 @@
 
 - Timestamp: 2026-07-19T10-07
 - Task: [P9-T4]
-- Command (plan-literal): `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-helperclasses/evidence/qa-gates/final-coverage.2026-07-19T10-07.cobertura.xml`
+- Command (plan-literal): `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/evidence/qa-gates/final-coverage.2026-07-19T10-07.cobertura.xml`
 - Command (actually executed): the script's underlying dotnet-coverage command scoped to `UtilitiesCS.Test` (same invocation as P0-T5 baseline for a comparable delta; see P0-T5 for the single-assembly StrictMode workaround rationale):
   `dotnet-coverage collect --output <out.cobertura.xml> --output-format cobertura --settings coverage.config -- <vstest> UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /Settings:scripts/vscode/TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:TestCategory!=LiveOutlook`
 - EXIT_CODE: 0
-- Cobertura XML: `docs/features/active/utilitiescs-nullable-helperclasses/evidence/qa-gates/final-coverage.2026-07-19T10-07.cobertura.xml`
+- Cobertura XML: `docs/features/active/2026-07-18-utilitiescs-nullable-helperclasses-364/evidence/qa-gates/final-coverage.2026-07-19T10-07.cobertura.xml`
 
 ## Output Summary
 

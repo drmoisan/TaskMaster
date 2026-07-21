@@ -19,8 +19,8 @@ golden/property/characterization tests must remain unchanged.
 ## 0. Upstream Contract Dependency (#363) — What This Feature Consumes
 
 Sources read and cited:
-- `docs/features/active/utilitiescs-nullable-extensions/spec.md`
-- `docs/features/active/utilitiescs-nullable-extensions/plan.2026-07-18T21-20.md`
+- `docs/features/active/2026-07-18-utilitiescs-nullable-extensions-363/spec.md`
+- `docs/features/active/2026-07-18-utilitiescs-nullable-extensions-363/plan.2026-07-18T21-20.md`
 - `UtilitiesCS/Extensions/NullExtensions.cs` (already `#nullable enable`; verify-only in #363)
 
 The classifier cluster consumes the following #363-annotated extension methods. Annotation choices

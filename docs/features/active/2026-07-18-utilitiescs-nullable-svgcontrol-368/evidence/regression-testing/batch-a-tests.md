@@ -2,7 +2,7 @@
 
 Timestamp: 2026-07-19T02-00
 
-Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/utilitiescs-nullable-svgcontrol/evidence/regression-testing/batch-a-coverage.cobertura.xml`
+Command: `pwsh scripts/vscode/Invoke-MSTestWithCoverage.ps1 -CoverageOutput docs/features/active/2026-07-18-utilitiescs-nullable-svgcontrol-368/evidence/regression-testing/batch-a-coverage.cobertura.xml`
 (preceded by `msbuild SVGControl.Test/SVGControl.Test.csproj /t:Build /p:Configuration=Debug /p:Platform=AnyCPU` to rebuild the test assembly against the updated `SVGControl.dll`)
 
 EXIT_CODE: 0

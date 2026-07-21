@@ -2,7 +2,7 @@
 
 - Date captured: 2026-07-18
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/utilitiescs-nullable-svgcontrol/ (Issue #368)
+- Status: Promoted -> docs/features/active/2026-07-18-utilitiescs-nullable-svgcontrol-368/ (Issue #368)
 
 - Issue: #368
 - Issue URL: https://github.com/drmoisan/TaskMaster/issues/368
@@ -103,4 +103,4 @@ behavior-compatible.
 ## Next Step
 
 - [x] Promote to GitHub issue (feature request template)
-- [x] Create `docs/features/active/utilitiescs-nullable-svgcontrol/` folder from the template
+- [x] Create `docs/features/active/2026-07-18-utilitiescs-nullable-svgcontrol-368/` folder from the template

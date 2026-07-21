@@ -231,4 +231,4 @@ Rationale for the wrapper-before-converter ordering: `ScDictionaryConverter`/`Sc
 
 ## Evidence-location note
 
-Per `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, any baseline/QA/coverage artifacts produced during execution must be written under `docs/features/active/utilitiescs-nullable-newtonsofthelpers/evidence/<kind>/`, not under `artifacts/`.
+Per `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, any baseline/QA/coverage artifacts produced during execution must be written under `docs/features/active/2026-07-18-utilitiescs-nullable-newtonsofthelpers-367/evidence/<kind>/`, not under `artifacts/`.

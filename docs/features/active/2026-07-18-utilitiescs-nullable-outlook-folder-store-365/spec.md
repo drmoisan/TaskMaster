@@ -22,7 +22,7 @@ Scope is the Folder+Store cluster: recursively, 83 `.cs` files, of which 18 alre
 `#nullable enable` and are verify-only, 2 are Designer-generated code-behind files
 recommended to remain non-opted-in (`DisabledStoresViewer.Designer.cs`,
 `StoreWrapperViewer.Designer.cs`), leaving 63 files as opt-in targets. This refined count
-(from `docs/features/active/utilitiescs-nullable-outlook-folder-store/research/2026-07-18T22-30-outlook-folder-store-nullable-research.md`)
+(from `docs/features/active/2026-07-18-utilitiescs-nullable-outlook-folder-store-365/research/2026-07-18T22-30-outlook-folder-store-nullable-research.md`)
 supersedes the epic manifest's stale `~29` estimate, which predates the breadcrumb
 (#327/#349/#350/#351) and folder-tree-percentage (#324/#325) work. This work is
 null-annotation and null-safety remediation only; it introduces no behavior changes, no

@@ -2,7 +2,7 @@
 
 - Date captured: 2026-07-18
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/utilitiescs-nullable-ci-capstone/ (Issue #376)
+- Status: Promoted -> docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/ (Issue #376)
 
 - Issue: #376
 - Issue URL: https://github.com/drmoisan/TaskMaster/issues/376
@@ -99,6 +99,6 @@ maintainer-decision items.
 ## Next Step
 
 - [x] Promote to GitHub issue (feature request template) — Issue #376
-- [x] Create `docs/features/active/utilitiescs-nullable-ci-capstone/` folder from the template
+- [x] Create `docs/features/active/2026-07-19-utilitiescs-nullable-ci-capstone-376/` folder from the template
 - [ ] Author spec.md and user-story.md (full-feature)
 - [ ] Generate and preflight-clear the atomic plan

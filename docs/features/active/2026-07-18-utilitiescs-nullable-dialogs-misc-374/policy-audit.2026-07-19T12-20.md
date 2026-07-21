@@ -54,7 +54,7 @@ transparency rather than rejected.
 
 `git diff --name-only dffadd5a..HEAD` was scanned for files written under `artifacts/baselines/`,
 `artifacts/qa/`, `artifacts/evidence/`, or `artifacts/coverage/`. None were found. All feature
-evidence is written under the canonical `docs/features/active/utilitiescs-nullable-dialogs-misc/evidence/<kind>/`
+evidence is written under the canonical `docs/features/active/2026-07-18-utilitiescs-nullable-dialogs-misc-374/evidence/<kind>/`
 path (`baseline/`, `qa-gates/`, `regression-testing/`, `other/`), consistent with the
 evidence-and-timestamp-conventions skill. No evidence-location violation. Verdict: PASS.
 
