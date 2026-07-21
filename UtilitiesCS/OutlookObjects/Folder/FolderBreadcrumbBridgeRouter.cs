@@ -18,6 +18,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
     {
         private readonly IFolderHierarchyProvider _provider;
         private readonly BreadcrumbStateModel _model = new BreadcrumbStateModel();
+        private readonly object _sync = new object();
+        private int _suggestionGeneration;
 
         /// <summary>
         /// Creates a router over the injected 9101 provider.
@@ -50,6 +52,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 throw new ArgumentNullException(nameof(rows));
             }
 
+            int generation = Interlocked.Increment(ref _suggestionGeneration);
+
             // #398: resolve every row's ancestor chain into a LOCAL collection first, mutating no
             // shared model state while awaiting the provider, then swap the completed set into the
             // model atomically. This removes the mid-rebuild empty window that let a concurrent host
@@ -60,22 +64,32 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 if (row.Score.HasValue)
                 {
                     string path = row.Score.Value.FolderPath;
-                    var key = await _provider
-                        .ResolveLeafKeyAsync(path, cancellationToken)
-                        .ConfigureAwait(false);
-                    IReadOnlyList<FolderBreadcrumbSegment> chain =
-                        key == null
-                            ? new FolderBreadcrumbSegment[0]
-                            : await _provider
-                                .GetAncestorChainAsync(key, cancellationToken)
-                                .ConfigureAwait(false);
-                    // A scored row whose path cannot be resolved falls back to a plain row carrying
-                    // the score's folder path so the selection contract still yields the exact path.
-                    built.Add(
-                        chain.Count > 0
-                            ? new BreadcrumbStateRow(chain, row.Score.Value.Probability)
-                            : new BreadcrumbStateRow(path)
-                    );
+                    var fallback = new BreadcrumbStateRow(path, path, row.Score.Value.Probability);
+                    try
+                    {
+                        var key = await _provider
+                            .ResolveLeafKeyAsync(path, cancellationToken)
+                            .ConfigureAwait(false);
+                        IReadOnlyList<FolderBreadcrumbSegment> chain =
+                            key == null
+                                ? new FolderBreadcrumbSegment[0]
+                                : await _provider
+                                    .GetAncestorChainAsync(key, cancellationToken)
+                                    .ConfigureAwait(false);
+                        built.Add(
+                            chain != null && chain.Count > 0
+                                ? new BreadcrumbStateRow(path, chain, row.Score.Value.Probability)
+                                : fallback
+                        );
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception)
+                    {
+                        built.Add(fallback);
+                    }
                 }
                 else
                 {
@@ -83,8 +97,47 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 }
             }
 
-            _model.ReplaceRows(built);
-            return RenderJson();
+            lock (_sync)
+            {
+                if (generation != _suggestionGeneration)
+                {
+                    return RenderJsonCore();
+                }
+                ReplaceRowsPreservingIdentity(built);
+                return RenderJsonCore();
+            }
+        }
+
+        /// <summary>
+        /// Synchronously publishes scored fallbacks before asynchronous hierarchy decoration.
+        /// </summary>
+        public string SetSuggestionFallbacks(IReadOnlyList<FolderRow> rows)
+        {
+            if (rows == null)
+            {
+                throw new ArgumentNullException(nameof(rows));
+            }
+
+            Interlocked.Increment(ref _suggestionGeneration);
+            var built = new List<BreadcrumbStateRow>(rows.Count);
+            foreach (var row in rows)
+            {
+                if (row.Score.HasValue)
+                {
+                    string path = row.Score.Value.FolderPath;
+                    built.Add(new BreadcrumbStateRow(path, path, row.Score.Value.Probability));
+                }
+                else
+                {
+                    built.Add(new BreadcrumbStateRow(row.Text));
+                }
+            }
+
+            lock (_sync)
+            {
+                ReplaceRowsPreservingIdentity(built);
+                return RenderJsonCore();
+            }
         }
 
         /// <summary>
@@ -98,12 +151,16 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 throw new ArgumentNullException(nameof(items));
             }
 
-            _model.Clear();
-            foreach (var item in items)
+            Interlocked.Increment(ref _suggestionGeneration);
+            lock (_sync)
             {
-                _model.AddPlainRow(item);
+                _model.Clear();
+                foreach (var item in items)
+                {
+                    _model.AddPlainRow(item);
+                }
+                return RenderJsonCore();
             }
-            return RenderJson();
         }
 
         /// <summary>Appends Path B plain rows without clearing (legacy AddRange semantics).</summary>
@@ -114,29 +171,48 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 throw new ArgumentNullException(nameof(items));
             }
 
-            foreach (var item in items)
+            Interlocked.Increment(ref _suggestionGeneration);
+            lock (_sync)
             {
-                _model.AddPlainRow(item);
+                foreach (var item in items)
+                {
+                    _model.AddPlainRow(item);
+                }
+                return RenderJsonCore();
             }
-            return RenderJson();
         }
 
         /// <summary>Clears all rows and the selection. Returns the (empty) render payload JSON.</summary>
         public string Clear()
         {
-            _model.Clear();
-            return RenderJson();
+            Interlocked.Increment(ref _suggestionGeneration);
+            lock (_sync)
+            {
+                _model.Clear();
+                return RenderJsonCore();
+            }
         }
 
         /// <summary>Host-driven row selection (SetFolderSelectedIndex). Returns the render payload JSON.</summary>
         public string SelectRow(int index)
         {
-            _model.SelectRow(index);
-            return RenderJson();
+            lock (_sync)
+            {
+                _model.SelectRow(index);
+                return RenderJsonCore();
+            }
         }
 
         /// <summary>The current render payload JSON (full re-render message, FR-6).</summary>
         public string RenderJson()
+        {
+            lock (_sync)
+            {
+                return RenderJsonCore();
+            }
+        }
+
+        private string RenderJsonCore()
         {
             return BreadcrumbBridgeSerializer.Serialize(
                 new RenderMessage(BreadcrumbRenderProjection.Project(_model))
@@ -178,10 +254,13 @@ namespace UtilitiesCS.OutlookObjects.Folder
                         return await ArrowAsync(m.Direction, cancellationToken)
                             .ConfigureAwait(false);
                     case SelectionChangeMessage m:
-                        _model.SelectRow(m.RowIndex);
-                        if (m.SubfolderIndex >= 0)
+                        lock (_sync)
                         {
-                            _model.SelectSubfolder(m.SubfolderIndex);
+                            _model.SelectRow(m.RowIndex);
+                            if (m.SubfolderIndex >= 0)
+                            {
+                                _model.SelectSubfolder(m.SubfolderIndex);
+                            }
                         }
                         // The ack carries no mapped folder; the coordinator resolves the output
                         // string through the selection map when raising SelectionChanged (FR-7).
@@ -343,6 +422,30 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 );
             }
             return _model.Rows[rowIndex];
+        }
+
+        private void ReplaceRowsPreservingIdentity(IReadOnlyList<BreadcrumbStateRow> rows)
+        {
+            string? selectedIdentity = _model.SelectedRow?.Identity;
+            _model.ReplaceRows(rows);
+            if (selectedIdentity == null)
+            {
+                return;
+            }
+            for (int index = 0; index < _model.Rows.Count; index++)
+            {
+                if (
+                    string.Equals(
+                        _model.Rows[index].Identity,
+                        selectedIdentity,
+                        StringComparison.Ordinal
+                    )
+                )
+                {
+                    _model.SelectRow(index);
+                    return;
+                }
+            }
         }
 
         private static IReadOnlyList<string> ErrorResponse(string message)

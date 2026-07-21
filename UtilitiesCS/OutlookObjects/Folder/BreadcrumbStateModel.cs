@@ -20,6 +20,13 @@ namespace UtilitiesCS.OutlookObjects.Folder
             IReadOnlyList<FolderBreadcrumbSegment> chain,
             double? probability
         )
+            : this(IdentityFromChain(chain), chain, probability) { }
+
+        internal BreadcrumbStateRow(
+            string identity,
+            IReadOnlyList<FolderBreadcrumbSegment> chain,
+            double? probability
+        )
         {
             if (chain == null || chain.Count == 0)
             {
@@ -36,22 +43,61 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 );
             }
 
+            Identity = RequireIdentity(identity);
             Chain = chain.ToArray();
             Probability = probability;
             VerbatimText = null;
+            IsSelectable = true;
+            IsScoredFallback = false;
             Subfolders = EmptySegments;
         }
 
         internal BreadcrumbStateRow(string verbatimText)
+            : this(
+                DefaultPlainIdentity(verbatimText),
+                verbatimText,
+                !IsBanner(verbatimText),
+                null,
+                false
+            ) { }
+
+        internal BreadcrumbStateRow(string identity, string verbatimText, bool isSelectable)
+            : this(identity, verbatimText, isSelectable, null, false) { }
+
+        internal BreadcrumbStateRow(string identity, string fallbackText, double? probability)
+            : this(identity, fallbackText, true, probability, true) { }
+
+        private BreadcrumbStateRow(
+            string identity,
+            string verbatimText,
+            bool isSelectable,
+            double? probability,
+            bool isScoredFallback
+        )
         {
+            Identity = RequireIdentity(identity);
             VerbatimText = verbatimText ?? throw new ArgumentNullException(nameof(verbatimText));
             Chain = EmptySegments;
-            Probability = null;
+            Probability = probability;
+            IsSelectable = isSelectable;
+            IsScoredFallback = isScoredFallback;
             Subfolders = EmptySegments;
         }
 
+        /// <summary>Stable row identity retained while fallback display data is upgraded.</summary>
+        public string Identity { get; }
+
         /// <summary>True for a Path A suggestion row; false for a Path B plain-string row.</summary>
         public bool IsSuggestion => VerbatimText == null;
+
+        /// <summary>True for an unresolved scored suggestion carrying fallback display text.</summary>
+        public bool IsScoredFallback { get; }
+
+        /// <summary>True when selector navigation and activation may choose this row.</summary>
+        public bool IsSelectable { get; }
+
+        /// <summary>Fallback display text for an unresolved scored suggestion; otherwise null.</summary>
+        public string? FallbackText => IsScoredFallback ? VerbatimText : null;
 
         /// <summary>Root-first ancestor chain for a suggestion row; empty for a plain row.</summary>
         public IReadOnlyList<FolderBreadcrumbSegment> Chain { get; }
@@ -173,6 +219,47 @@ namespace UtilitiesCS.OutlookObjects.Folder
             LeafExpanded = false;
             Subfolders = EmptySegments;
         }
+
+        private static string IdentityFromChain(IReadOnlyList<FolderBreadcrumbSegment> chain)
+        {
+            if (chain == null || chain.Count == 0)
+            {
+                throw new ArgumentException(
+                    "A suggestion row requires a non-empty ancestor chain.",
+                    nameof(chain)
+                );
+            }
+            return chain[chain.Count - 1]?.Key.ToString()
+                ?? throw new ArgumentException(
+                    "The ancestor chain must not contain null segments.",
+                    nameof(chain)
+                );
+        }
+
+        private static string DefaultPlainIdentity(string verbatimText)
+        {
+            if (verbatimText == null)
+            {
+                throw new ArgumentNullException(nameof(verbatimText));
+            }
+            return string.IsNullOrWhiteSpace(verbatimText) ? "plain-empty" : verbatimText;
+        }
+
+        private static bool IsBanner(string verbatimText) =>
+            verbatimText?.StartsWith(BreadcrumbRowBuilder.BannerPrefix, StringComparison.Ordinal)
+            == true;
+
+        private static string RequireIdentity(string identity)
+        {
+            if (string.IsNullOrWhiteSpace(identity))
+            {
+                throw new ArgumentException(
+                    "A non-empty stable identity is required.",
+                    nameof(identity)
+                );
+            }
+            return identity;
+        }
     }
 
     /// <summary>
@@ -246,10 +333,32 @@ namespace UtilitiesCS.OutlookObjects.Folder
             _rows.Add(new BreadcrumbStateRow(chain, probability));
         }
 
+        /// <summary>Appends a resolved scored suggestion with an explicit stable identity.</summary>
+        public void AddSuggestionRow(
+            string identity,
+            IReadOnlyList<FolderBreadcrumbSegment> chain,
+            double? probability
+        )
+        {
+            _rows.Add(new BreadcrumbStateRow(identity, chain, probability));
+        }
+
+        /// <summary>Appends a scored suggestion before hierarchy display data is available.</summary>
+        public void AddScoredFallbackRow(string identity, string fallbackText, double? probability)
+        {
+            _rows.Add(new BreadcrumbStateRow(identity, fallbackText, probability));
+        }
+
         /// <summary>Appends a Path B plain-string row carried verbatim without probability.</summary>
         public void AddPlainRow(string verbatimText)
         {
             _rows.Add(new BreadcrumbStateRow(verbatimText));
+        }
+
+        /// <summary>Appends a plain row with explicit stable identity and selectability.</summary>
+        public void AddPlainRow(string identity, string verbatimText, bool isSelectable)
+        {
+            _rows.Add(new BreadcrumbStateRow(identity, verbatimText, isSelectable));
         }
 
         /// <summary>

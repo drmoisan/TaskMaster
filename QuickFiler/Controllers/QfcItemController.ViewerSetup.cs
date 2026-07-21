@@ -19,11 +19,14 @@ using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence.EmailParsingSorting;
 using UtilitiesCS.Extensions;
+using UtilitiesCS.OutlookObjects.Folder;
 
 namespace QuickFiler.Controllers
 {
     internal partial class QfcItemController
     {
+        private ItemViewer _breadcrumbViewer;
+
         // Residual (bucket-iii, reclassified in Phase 6): the WebView2 SDK calls are now isolated behind
         // the injected IWebViewCoreInitializer seam (P6-T4), but this method still performs the
         // concrete-bound control access ((ItemViewer)_itemViewer).L0v2h2_WebView2 and awaits
@@ -107,6 +110,7 @@ namespace QuickFiler.Controllers
                 _webViewEnvironment
             );
             ((ItemViewer)_itemViewer).AttachBreadcrumbWebView();
+            ConfigureBreadcrumbDropDown((ItemViewer)_itemViewer, _webViewEnvironment);
             //var task = CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
 
             //await task.ContinueWith(t =>
@@ -124,14 +128,46 @@ namespace QuickFiler.Controllers
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal void EnsureBreadcrumbPipeline()
         {
-            if (_itemViewer is ItemViewer viewer && viewer.BreadcrumbCoordinator == null)
+            if (!(_itemViewer is ItemViewer viewer))
+            {
+                return;
+            }
+
+            if (viewer.BreadcrumbCoordinator == null)
             {
                 var provider = new UtilitiesCS.OutlookObjects.Folder.OutlookFolderHierarchyProvider(
                     _globals.Ol.FolderTreeService
                 );
                 viewer.InitializeBreadcrumbPipeline(provider);
-                viewer.BreadcrumbUnhandledArrow += (s, direction) =>
-                    _kbdHandler?.BreadcrumbArrowFallThrough(viewer, direction);
+            }
+
+            if (!ReferenceEquals(_breadcrumbViewer, viewer))
+            {
+                if (_breadcrumbViewer != null)
+                {
+                    _breadcrumbViewer.BreadcrumbUnhandledArrow -= OnBreadcrumbUnhandledArrow;
+                }
+                _breadcrumbViewer = viewer;
+                _breadcrumbViewer.BreadcrumbUnhandledArrow -= OnBreadcrumbUnhandledArrow;
+                _breadcrumbViewer.BreadcrumbUnhandledArrow += OnBreadcrumbUnhandledArrow;
+            }
+        }
+
+        /// <summary>Configures the lazy popup with the existing environment and active theme.</summary>
+        internal void ConfigureBreadcrumbDropDown(
+            ItemViewer viewer,
+            CoreWebView2Environment environment
+        )
+        {
+            viewer.ConfigureBreadcrumbDropDown(environment, _webViewInitializer);
+            viewer.SetBreadcrumbTheme(_globals.Ol.DarkMode ? "dark" : "light");
+        }
+
+        private void OnBreadcrumbUnhandledArrow(object sender, BreadcrumbArrowDirection direction)
+        {
+            if (sender is ItemViewer viewer)
+            {
+                _kbdHandler?.BreadcrumbArrowFallThrough(viewer, direction);
             }
         }
 
@@ -341,6 +377,11 @@ namespace QuickFiler.Controllers
             // #351: clear the breadcrumb rows/selection before releasing the pooled viewer, in
             // step with the _webViewEnvironment clearing below.
             (_itemViewer as ItemViewer)?.ResetBreadcrumb();
+            if (_breadcrumbViewer != null)
+            {
+                _breadcrumbViewer.BreadcrumbUnhandledArrow -= OnBreadcrumbUnhandledArrow;
+                _breadcrumbViewer = null;
+            }
             _globals = null;
             _itemViewer = null;
             _parent = null;

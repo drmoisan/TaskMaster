@@ -173,9 +173,149 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
                 CancellationToken.None
             );
 
-            // Assert (G10: the exact path is still the selection value).
+            // Assert: the exact path, stable identity, and supplied score remain available.
             router.Model.Rows[0].IsSuggestion.Should().BeFalse();
             router.Model.Rows[0].VerbatimText.Should().Be(LeafPath);
+            router.Model.Rows[0].IsScoredFallback.Should().BeTrue();
+            router.Model.Rows[0].Identity.Should().Be(LeafPath);
+            router.Model.Rows[0].Probability.Should().Be(0.5);
+            ((RenderMessage)BreadcrumbBridgeSerializer.Parse(router.RenderJson()))
+                .Rows[0]
+                .PercentText.Should()
+                .Be(PercentageFormatter.FormatPercent(0.5));
+        }
+
+        [TestMethod]
+        public void SetSuggestionFallbacks_SynchronouslyRetainsIdentityPathAndProbability()
+        {
+            // Arrange
+            var router = new FolderBreadcrumbBridgeRouter(
+                new Mock<IFolderHierarchyProvider>(MockBehavior.Strict).Object
+            );
+            var row = new FolderRow(
+                LeafPath,
+                FolderRowKind.Suggestion,
+                new FolderScore(LeafPath, 10, 0.73)
+            );
+            var method = typeof(FolderBreadcrumbBridgeRouter).GetMethod("SetSuggestionFallbacks");
+            method.Should().NotBeNull("issue #400 requires immediate scored fallback projection");
+
+            // Act
+            string json = (string)method!.Invoke(router, new object[] { new[] { row } })!;
+
+            // Assert
+            router.Model.Rows[0].Identity.Should().Be(LeafPath);
+            router.Model.Rows[0].FallbackText.Should().Be(LeafPath);
+            router.Model.Rows[0].Probability.Should().Be(0.73);
+            ((RenderMessage)BreadcrumbBridgeSerializer.Parse(json))
+                .Rows[0]
+                .PercentText.Should()
+                .Be(PercentageFormatter.FormatPercent(0.73));
+        }
+
+        [TestMethod]
+        public void SetSuggestionFallbacks_NullRowsRejectAndPlainRowsRemainUnscored()
+        {
+            // Arrange
+            var router = new FolderBreadcrumbBridgeRouter(
+                new Mock<IFolderHierarchyProvider>(MockBehavior.Strict).Object
+            );
+            var plainRow = new FolderRow("Recent folder", FolderRowKind.Recent, null);
+
+            // Act
+            Action nullRows = () => router.SetSuggestionFallbacks(null!);
+            string json = router.SetSuggestionFallbacks(new[] { plainRow });
+
+            // Assert
+            nullRows.Should().Throw<ArgumentNullException>();
+            router.Model.Rows.Should().ContainSingle();
+            router.Model.Rows[0].IsScoredFallback.Should().BeFalse();
+            ((RenderMessage)BreadcrumbBridgeSerializer.Parse(json))
+                .Rows[0]
+                .PercentText.Should()
+                .BeEmpty();
+        }
+
+        [TestMethod]
+        public async Task SetSuggestions_ResolvedHierarchy_RetainsFallbackIdentityAndProbability()
+        {
+            // Arrange
+            var router = new FolderBreadcrumbBridgeRouter(ProviderMock().Object);
+
+            // Act
+            await router.SetSuggestionsAsync(
+                new[]
+                {
+                    new FolderRow(
+                        LeafPath,
+                        FolderRowKind.Suggestion,
+                        new FolderScore(LeafPath, 10, 0.73)
+                    ),
+                },
+                CancellationToken.None
+            );
+
+            // Assert
+            router.Model.Rows[0].IsSuggestion.Should().BeTrue();
+            router.Model.Rows[0].Identity.Should().Be(LeafPath);
+            router.Model.Rows[0].Probability.Should().Be(0.73);
+        }
+
+        [TestMethod]
+        public async Task SetSuggestions_ProviderFailure_PreservesScoredFallback()
+        {
+            // Arrange
+            var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+            provider
+                .Setup(p => p.ResolveLeafKeyAsync(LeafPath, It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("snapshot unavailable"));
+            var router = new FolderBreadcrumbBridgeRouter(provider.Object);
+
+            // Act
+            Func<Task> act = () =>
+                router.SetSuggestionsAsync(
+                    new[]
+                    {
+                        new FolderRow(
+                            LeafPath,
+                            FolderRowKind.Suggestion,
+                            new FolderScore(LeafPath, 10, 0.73)
+                        ),
+                    },
+                    CancellationToken.None
+                );
+
+            // Assert
+            await act.Should().NotThrowAsync();
+            router.Model.Rows[0].IsScoredFallback.Should().BeTrue();
+            router.Model.Rows[0].Identity.Should().Be(LeafPath);
+            router.Model.Rows[0].Probability.Should().Be(0.73);
+        }
+
+        [TestMethod]
+        public async Task SetSuggestions_ProviderCancellation_PropagatesCancellation()
+        {
+            // Arrange: cancellation must remain distinct from the provider-failure fallback path.
+            var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+            provider
+                .Setup(p => p.ResolveLeafKeyAsync(LeafPath, It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new OperationCanceledException("hierarchy resolution canceled"));
+            var router = new FolderBreadcrumbBridgeRouter(provider.Object);
+            var rows = new[]
+            {
+                new FolderRow(
+                    LeafPath,
+                    FolderRowKind.Suggestion,
+                    new FolderScore(LeafPath, 10, 0.73)
+                ),
+            };
+
+            // Act
+            Func<Task> act = () => router.SetSuggestionsAsync(rows, CancellationToken.None);
+
+            // Assert
+            await act.Should().ThrowAsync<OperationCanceledException>();
+            router.Model.Rows.Should().BeEmpty();
         }
 
         [TestMethod]

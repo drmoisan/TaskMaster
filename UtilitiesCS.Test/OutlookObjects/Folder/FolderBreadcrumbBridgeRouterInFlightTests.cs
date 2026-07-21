@@ -250,7 +250,42 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             gate.SetResult(LeafKey);
             await upgrade;
             router.Model.SelectedIndex.Should().Be(1);
+            router.Model.SelectedRow.Identity.Should().Be(SecondPath);
             BreadcrumbSelectionMap.GetSelectedFolder(router.Model).Should().Be(SecondPath);
+        }
+
+        [TestMethod]
+        public async Task SetSuggestionsAsync_OlderCompletionCannotOverwriteNewerGeneration()
+        {
+            // Arrange: the older request waits while the newer request completes synchronously.
+            var oldGate = new TaskCompletionSource<FolderTreeNodeKey>();
+            var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+            provider
+                .Setup(p => p.ResolveLeafKeyAsync(LeafPath, It.IsAny<CancellationToken>()))
+                .Returns(oldGate.Task);
+            provider
+                .Setup(p => p.GetAncestorChainAsync(LeafKey, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(LeafChain());
+            provider
+                .Setup(p => p.ResolveLeafKeyAsync(SecondPath, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(SecondKey);
+            provider
+                .Setup(p => p.GetAncestorChainAsync(SecondKey, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[] { Segment(SecondKey, "Zephyr", false) });
+            var router = new FolderBreadcrumbBridgeRouter(provider.Object);
+            var oldRows = new[] { TwoScoredRows()[0] };
+            var newRows = new[] { TwoScoredRows()[1] };
+
+            // Act
+            Task<string> oldUpgrade = router.SetSuggestionsAsync(oldRows, CancellationToken.None);
+            await router.SetSuggestionsAsync(newRows, CancellationToken.None);
+            oldGate.SetResult(LeafKey);
+            await oldUpgrade;
+
+            // Assert
+            router.Model.Rows.Should().ContainSingle();
+            router.Model.Rows[0].Identity.Should().Be(SecondPath);
+            BreadcrumbSelectionMap.GetFolderItems(router.Model).Should().Equal(SecondPath);
         }
     }
 }

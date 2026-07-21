@@ -58,6 +58,16 @@
     <Compile Include="Controllers\BreadcrumbBridgeRouterQueueTests.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterTests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorTests.cs" />
+    <Compile Include="Viewers\BreadcrumbBridgeCoordinatorProbabilityTests.cs" />
+    <Compile Include="Viewers\BreadcrumbSelectorCoordinatorTests.cs" />
+    <Compile Include="Viewers\BreadcrumbMessengerHubTests.cs" />
+    <Compile Include="Viewers\BreadcrumbPopupPlacementTests.cs" />
+    <Compile Include="Viewers\BreadcrumbDropDownHostTests.cs" />
+    <Compile Include="Viewers\BreadcrumbDropDownLifecycleTests.cs" />
+    <Compile Include="Viewers\ItemViewerBreadcrumbDropDownContractTests.cs" />
+    <Compile Include="Viewers\BreadcrumbDropDownIntegrationTests.cs" />
+    <Compile Include="Controllers\QfcItemControllerBreadcrumbDropDownTests.cs" />
+    <Compile Include="Viewers\FolderBreadcrumbAssetContractTests.cs" />
     <Compile Include="Controllers\KbdActionsTests.cs" />
     <Compile Include="Controllers\KbdActionsRemainingBranchesTests.cs" />
     <Compile Include="Controllers\KaCharTests.cs" />

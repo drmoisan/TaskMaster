@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <!--
-  QuickFiler breadcrumb page (#351). Self-contained: inline CSS + JS, no external fetches, no
-  third-party libraries (G1/G2). Rendering is driven entirely by 'render' bridge messages from the
-  host (Phase 3 JSON protocol) over window.chrome.webview; interactions post messages back.
-  The percentage cell CSS below is the FR-5 fix selected by the P1-T2 analysis.
+  QuickFiler breadcrumb page (#351, #400). Self-contained: inline CSS + JS, no external fetches or
+  third-party libraries. Rendering is driven by host bridge messages over window.chrome.webview.
 -->
-<html lang="en">
+<html lang="en" data-mode="collapsed" data-view-mode="collapsed">
 <head>
 <meta charset="utf-8" />
 <title>Folder Breadcrumb</title>
@@ -19,6 +17,8 @@
     --bc-affordance: #0060b0;
     --bc-pct: #444444;
     --bc-sub-back: #f4f4f4;
+    --bc-button-border: #767676;
+    --bc-button-hover: #e5f1fb;
   }
   :root[data-theme="dark"] {
     --bc-back: #1e1e1e;
@@ -29,6 +29,8 @@
     --bc-affordance: #6cb6ff;
     --bc-pct: #c8c8c8;
     --bc-sub-back: #2a2a2a;
+    --bc-button-border: #9d9d9d;
+    --bc-button-hover: #333333;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme]) {
@@ -40,6 +42,8 @@
       --bc-affordance: #6cb6ff;
       --bc-pct: #c8c8c8;
       --bc-sub-back: #2a2a2a;
+      --bc-button-border: #9d9d9d;
+      --bc-button-hover: #333333;
     }
   }
   html, body {
@@ -51,63 +55,136 @@
     font-size: 13px;
     overflow-x: hidden;
   }
-  #list { outline: none; }
-  .row {
+  :root[data-mode="collapsed"],
+  :root[data-mode="collapsed"] body,
+  :root[data-mode="collapsed"] #list {
+    overflow-y: hidden;
+  }
+  #selector {
+    box-sizing: border-box;
     display: flex;
+    min-width: 0;
+    width: 100%;
+  }
+  #list {
+    box-sizing: border-box;
+    min-width: 0;
+    outline: none;
+  }
+  :root[data-mode="collapsed"] #list {
+    flex: 1 1 auto;
+  }
+  :root[data-mode="expanded"] #list {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+  #dropDownButton {
+    align-self: stretch;
+    appearance: none;
+    background: var(--bc-back);
+    border: 1px solid var(--bc-button-border);
+    box-sizing: border-box;
+    color: var(--bc-fore);
+    flex: 0 0 24px;
+    font: inherit;
+    min-height: 22px;
+    padding: 0;
+  }
+  #dropDownButton:hover,
+  #dropDownButton:focus-visible {
+    background: var(--bc-button-hover);
+  }
+  :root[data-mode="expanded"] #dropDownButton {
+    display: none;
+  }
+  .row {
     align-items: center;
-    padding: 2px 4px;
+    box-sizing: border-box;
     cursor: default;
+    display: flex;
+    min-width: 0;
+    padding: 2px 4px;
     white-space: nowrap;
   }
-  .row.selected { background: var(--bc-sel-back); color: var(--bc-sel-fore); }
-  /* Segment container: truncates long chains instead of pushing the percentage out (FR-5). */
+  .row.selected,
+  .row.active {
+    background: var(--bc-sel-back);
+    color: var(--bc-sel-fore);
+  }
   .crumbs {
-    display: flex;
     align-items: center;
+    display: flex;
     flex: 1 1 auto;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .seg { flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .seg {
+    flex: 0 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
   .seg.trunc { flex: 0 10 auto; min-width: 2ch; }
   .arrow { flex: 0 0 auto; padding: 0 3px; color: var(--bc-arrow); }
   .aff {
-    flex: 0 0 auto;
-    padding: 0 4px;
     color: var(--bc-affordance);
-    font-weight: bold;
     cursor: pointer;
-  }
-  /* Percentage cell: can never be compressed or overlapped (FR-5 CSS fix, P1-T2 analysis). */
-  .pct {
     flex: 0 0 auto;
-    margin-left: auto;
+    font-weight: bold;
+    padding: 0 4px;
+  }
+  .pct {
+    color: var(--bc-pct);
+    flex: 0 0 auto;
     flex-shrink: 0;
+    margin-left: auto;
     min-width: 5ch;
     text-align: right;
-    color: var(--bc-pct);
   }
-  .row.selected .pct { color: var(--bc-sel-fore); }
+  .row.selected .pct,
+  .row.active .pct {
+    color: var(--bc-sel-fore);
+  }
   .subs { background: var(--bc-sub-back); }
   .sub {
-    display: flex;
     align-items: center;
-    padding: 1px 4px 1px 24px;
     cursor: default;
+    display: flex;
+    padding: 1px 4px 1px 24px;
     white-space: nowrap;
   }
   .sub.selected { background: var(--bc-sel-back); color: var(--bc-sel-fore); }
 </style>
 </head>
 <body>
-<div id="list" tabindex="0"></div>
+<div id="selector">
+  <div id="list" tabindex="0" aria-label="Folder list"></div>
+  <button
+    id="dropDownButton"
+    type="button"
+    aria-label="Open folder list"
+    aria-haspopup="listbox"
+    aria-controls="list"
+    aria-expanded="false"
+  ><span aria-hidden="true">&#x25BC;</span></button>
+</div>
 <script>
 "use strict";
 (function () {
   var list = document.getElementById("list");
-  var state = { rows: [], selectedRowIndex: -1, selectedSubfolderIndex: -1 };
+  var dropDownButton = document.getElementById("dropDownButton");
+  var state = {
+    rows: [],
+    options: [],
+    selectedRowIndex: -1,
+    selectedSubfolderIndex: -1,
+    viewMode: "collapsed",
+    isOpen: false,
+    committedIdentity: null,
+    pendingIdentity: null
+  };
 
   function post(msg) {
     if (window.chrome && window.chrome.webview) {
@@ -116,86 +193,150 @@
   }
 
   function selectedRow() {
-    return state.rows.find(function (r) { return r.selected; }) || null;
+    return state.rows.find(function (row) { return row.selected; }) || null;
+  }
+
+  function optionForRow(row) {
+    return state.options[row.rowIndex] || null;
+  }
+
+  function applySelectorOptions() {
+    state.rows.forEach(function (row) {
+      var option = optionForRow(row);
+      row.identity = option && typeof option.identity === "string" ? option.identity : null;
+      row.isSelectable = option ? option.isSelectable === true : false;
+    });
+  }
+
+  function visibleRows() {
+    if (state.viewMode !== "collapsed") {
+      return state.rows;
+    }
+
+    var selectedRows = state.rows.filter(function (row) { return row.selected; }).slice(0, 1);
+    if (state.committedIdentity === null) {
+      return selectedRows;
+    }
+
+    var committedRows = state.rows.filter(function (row) {
+      return row.isSelectable && row.identity === state.committedIdentity;
+    }).slice(0, 1);
+    return committedRows.length === 1 ? committedRows : selectedRows;
   }
 
   function rowHasOpenAffordance(row) {
-    return row.cells.some(function (c) { return c.kind === "plus"; });
+    return row.cells.some(function (cell) { return cell.kind === "plus"; });
   }
 
   function makeCell(row, cell) {
-    var el;
+    var element;
     if (cell.kind === "segment") {
-      el = document.createElement("span");
-      el.className = cell.truncationEligible ? "seg trunc" : "seg";
-      el.textContent = cell.text;
-      el.title = cell.text;
-      el.addEventListener("dblclick", function (ev) {
-        ev.stopPropagation();
+      element = document.createElement("span");
+      element.className = cell.truncationEligible ? "seg trunc" : "seg";
+      element.textContent = cell.text;
+      element.title = cell.text;
+      element.addEventListener("dblclick", function (event) {
+        event.stopPropagation();
         post({ type: "segmentDoubleClick", rowIndex: row.rowIndex, segmentIndex: cell.segmentIndex });
       });
     } else if (cell.kind === "arrow") {
-      el = document.createElement("span");
-      el.className = "arrow";
-      el.textContent = "→";
+      element = document.createElement("span");
+      element.className = "arrow";
+      element.textContent = "→";
     } else {
-      el = document.createElement("span");
-      el.className = "aff";
-      el.textContent = cell.kind === "plus" ? "+" : "−";
-      el.addEventListener("click", function (ev) {
-        ev.stopPropagation();
+      element = document.createElement("span");
+      element.className = "aff";
+      element.textContent = cell.kind === "plus" ? "+" : "−";
+      element.addEventListener("click", function (event) {
+        event.stopPropagation();
         post({ type: "affordanceToggle", rowIndex: row.rowIndex });
       });
     }
-    return el;
+    return element;
   }
 
   function makeRow(row) {
-    var rowEl = document.createElement("div");
-    rowEl.className = row.selected && state.selectedSubfolderIndex < 0 ? "row selected" : "row";
+    var expanded = state.viewMode === "expanded";
+    var active = expanded && row.isSelectable && row.identity === state.pendingIdentity;
+    var rowElement = document.createElement("div");
+    rowElement.className = active
+      ? "row active"
+      : (!expanded && row.selected && state.selectedSubfolderIndex < 0 ? "row selected" : "row");
+
+    if (expanded && row.isSelectable) {
+      rowElement.id = "folder-option-" + row.rowIndex;
+      rowElement.setAttribute("role", "option");
+      rowElement.setAttribute("aria-selected", String(active));
+      rowElement.addEventListener("click", function () {
+        post({ type: "selectorActivate", identity: row.identity });
+      });
+    }
+
     var crumbs = document.createElement("div");
     crumbs.className = "crumbs";
     row.cells.forEach(function (cell) { crumbs.appendChild(makeCell(row, cell)); });
-    rowEl.appendChild(crumbs);
+    rowElement.appendChild(crumbs);
+
     var pct = document.createElement("span");
     pct.className = "pct";
     pct.textContent = row.percentText;
-    rowEl.appendChild(pct);
-    rowEl.addEventListener("click", function () {
-      post({ type: "selectionChange", rowIndex: row.rowIndex });
-    });
-    return rowEl;
+    rowElement.appendChild(pct);
+    return rowElement;
   }
 
   function makeSubfolders(row) {
     var subs = document.createElement("div");
     subs.className = "subs";
-    row.subfolders.forEach(function (sub, i) {
-      var subEl = document.createElement("div");
-      subEl.className =
-        row.selected && state.selectedSubfolderIndex === i ? "sub selected" : "sub";
+    row.subfolders.forEach(function (subfolder, index) {
+      var subfolderElement = document.createElement("div");
+      subfolderElement.className =
+        row.selected && state.selectedSubfolderIndex === index ? "sub selected" : "sub";
       var name = document.createElement("span");
       name.className = "seg";
-      name.textContent = sub.displayName;
-      name.title = sub.folderPath;
-      subEl.appendChild(name);
-      subEl.addEventListener("click", function (ev) {
-        ev.stopPropagation();
-        post({ type: "selectionChange", rowIndex: row.rowIndex, subfolderIndex: i });
+      name.textContent = subfolder.displayName;
+      name.title = subfolder.folderPath;
+      subfolderElement.appendChild(name);
+      subfolderElement.addEventListener("click", function (event) {
+        event.stopPropagation();
+        post({ type: "selectionChange", rowIndex: row.rowIndex, subfolderIndex: index });
       });
-      subs.appendChild(subEl);
+      subs.appendChild(subfolderElement);
     });
     return subs;
   }
 
   function render() {
+    var activeRow = null;
+    applySelectorOptions();
     list.textContent = "";
-    state.rows.forEach(function (row) {
-      list.appendChild(makeRow(row));
-      if (row.leafExpanded && row.subfolders.length > 0) {
+
+    if (state.viewMode === "expanded") {
+      list.setAttribute("role", "listbox");
+    } else {
+      list.removeAttribute("role");
+    }
+    list.removeAttribute("aria-activedescendant");
+
+    visibleRows().forEach(function (row) {
+      var rowElement = makeRow(row);
+      list.appendChild(rowElement);
+      if (rowElement.classList.contains("active")) {
+        activeRow = rowElement;
+      }
+      if (
+        state.viewMode === "expanded" &&
+        row.leafExpanded &&
+        row.subfolders.length > 0
+      ) {
         list.appendChild(makeSubfolders(row));
       }
     });
+
+    if (state.viewMode === "expanded" && activeRow !== null) {
+      var activeId = activeRow.id;
+      list.setAttribute("aria-activedescendant", activeId);
+      activeRow.scrollIntoView({ block: "nearest" });
+    }
   }
 
   function onArrow(direction) {
@@ -204,26 +345,70 @@
       row !== null && (row.collapsed || (!row.leafExpanded && rowHasOpenAffordance(row)));
     var canLeft = row !== null && row.leafExpanded;
     var can = direction === "right" ? canRight : canLeft;
-    // FR-6: an arrow the breadcrumb cannot consume is reported so the host can run the legacy
-    // fall-through behavior (Right -> Pop Out/Enumerate dialog; Left -> close/collapse).
-    post(can ? { type: "arrowKey", direction: direction } : { type: "unhandledArrow", direction: direction });
+    post(can
+      ? { type: "arrowKey", direction: direction }
+      : { type: "unhandledArrow", direction: direction });
   }
 
-  list.addEventListener("keydown", function (ev) {
-    if (ev.key === "ArrowRight") { ev.preventDefault(); onArrow("right"); }
-    else if (ev.key === "ArrowLeft") { ev.preventDefault(); onArrow("left"); }
-  });
+  var selectorKeys = {
+    ArrowUp: "up",
+    ArrowDown: "down",
+    Enter: "enter",
+    Escape: "escape"
+  };
 
-  window.addEventListener("focus", function () { list.focus(); });
+  function handleKeyDown(event) {
+    if (Object.prototype.hasOwnProperty.call(selectorKeys, event.key)) {
+      event.preventDefault();
+      post({ type: "selectorKey", key: selectorKeys[event.key] });
+      return;
+    }
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      onArrow("right");
+    } else if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      onArrow("left");
+    }
+  }
+
+  function focusForMode() {
+    if (state.viewMode === "expanded") {
+      list.focus();
+    } else {
+      dropDownButton.focus();
+    }
+  }
+
+  list.addEventListener("keydown", handleKeyDown);
+  dropDownButton.addEventListener("keydown", handleKeyDown);
+  dropDownButton.addEventListener("click", function () {
+    post({ type: "selectorToggle" });
+  });
+  window.addEventListener("focus", focusForMode);
 
   if (window.chrome && window.chrome.webview) {
-    window.chrome.webview.addEventListener("message", function (ev) {
-      var msg = ev.data;
-      if (!msg || typeof msg.type !== "string") { return; }
+    window.chrome.webview.addEventListener("message", function (event) {
+      var msg = event.data;
+      if (!msg || typeof msg.type !== "string") {
+        return;
+      }
+
       if (msg.type === "render") {
         state.rows = msg.rows || [];
-        var sel = selectedRow();
-        state.selectedRowIndex = sel ? sel.rowIndex : -1;
+        var selected = selectedRow();
+        state.selectedRowIndex = selected ? selected.rowIndex : -1;
+        render();
+      } else if (msg.type === "selectorView") {
+        state.viewMode = msg.mode === "expanded" ? "expanded" : "collapsed";
+        state.isOpen = msg.isOpen === true;
+        state.committedIdentity = msg.committedIdentity || null;
+        state.pendingIdentity = msg.pendingIdentity || null;
+        state.options = Array.isArray(msg.options) ? msg.options : [];
+        document.documentElement.setAttribute("data-mode", state.viewMode);
+        document.documentElement.setAttribute("data-view-mode", state.viewMode);
+        dropDownButton.setAttribute("aria-expanded", String(state.isOpen));
         render();
       } else if (msg.type === "themeChange") {
         document.documentElement.setAttribute(
@@ -234,8 +419,6 @@
         state.selectedSubfolderIndex =
           typeof msg.subfolderIndex === "number" ? msg.subfolderIndex : -1;
       }
-      // subfolderResponse payloads are folded into the accompanying render message; error
-      // messages are surfaced host-side and intentionally not rendered in the page.
     });
   }
 })();

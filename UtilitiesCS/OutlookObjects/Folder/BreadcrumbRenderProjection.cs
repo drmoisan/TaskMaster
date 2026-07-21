@@ -149,6 +149,24 @@ namespace UtilitiesCS.OutlookObjects.Folder
             return rows;
         }
 
+        /// <summary>Projects only the committed selected selectable row for the closed surface.</summary>
+        public static IReadOnlyList<BreadcrumbRowRender> ProjectCollapsed(
+            BreadcrumbStateModel model
+        )
+        {
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            var row = model.SelectedRow;
+            if (row == null || !row.IsSelectable)
+            {
+                return new BreadcrumbRowRender[0];
+            }
+            return new[] { ProjectRow(row, model.SelectedIndex, true) };
+        }
+
         private static BreadcrumbRowRender ProjectRow(
             BreadcrumbStateRow row,
             int rowIndex,
@@ -209,11 +227,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
             return new BreadcrumbRowRender(
                 rowIndex,
-                row.IsSuggestion,
+                row.IsSuggestion || row.IsScoredFallback,
                 selected,
                 row.CollapsedAfterIndex.HasValue,
                 row.LeafExpanded,
-                row.IsSuggestion
+                row.IsSuggestion || row.IsScoredFallback
                     ? PercentageFormatter.FormatPercent(row.Probability)
                     : string.Empty,
                 cells,

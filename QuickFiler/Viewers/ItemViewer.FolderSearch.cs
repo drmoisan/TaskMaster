@@ -28,15 +28,8 @@ namespace QuickFiler
 
         public void SetFolderSelectedItem(string item) => BreadcrumbCoordinator?.SelectItem(item);
 
-        // A breadcrumb has no literal dropped-down state; the intent maps to focus/expansion
-        // visibility per spec FR-7 (callers: QfcItemController.Navigation.cs, EventHandlers.cs).
-        public void SetFolderDroppedDown(bool droppedDown)
-        {
-            if (droppedDown)
-            {
-                FocusBreadcrumb();
-            }
-        }
+        public void SetFolderDroppedDown(bool droppedDown) =>
+            SetBreadcrumbDropDownState(droppedDown);
 
         public void ClearFolderItems() => BreadcrumbCoordinator?.Clear();
 
