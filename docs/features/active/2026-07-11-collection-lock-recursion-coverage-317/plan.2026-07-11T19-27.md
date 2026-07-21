@@ -7,7 +7,7 @@
 - **Status:** Draft
 - **Version:** 0.2
 - **Work Mode:** full-bug (spec.md present, defect/restoration; no user-story.md; enforces spec-driven expectations and the full QA loop per `atomic-plan-contract`)
-- **Feature folder (`<FEATURE>`):** `docs/features/active/collection-lock-recursion-coverage-317`
+- **Feature folder (`<FEATURE>`):** `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317`
 - **Worktree:** `C:/Users/DanMoisan/repos/TaskMaster-wt/collection-lock-recursion-coverage-317`, branch cut from `main` at `5ecbc4c6`
 - **Timestamp token:** every `<TS>` placeholder below MUST be substituted with the real ISO-8601
   timestamp (`yyyy-MM-ddTHH-mm`) at the moment the artifact is written, per
@@ -54,37 +54,37 @@ never PASS.
       feature worktree. Acceptance: file read; its Toolchain section quoted in the P0-T5 evidence
       artifact.
 - [x] [P0-T5] Write the Phase 0 policy-read evidence artifact to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/baseline/phase0-instructions-read.md`
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/baseline/phase0-instructions-read.md`
       containing at minimum `Timestamp:`, `Policy Order:` (the 4-item list from P0-T1..P0-T4 in
       order), and an explicit list of the four file paths read. Acceptance: the file exists at the
       exact path above and contains all three required fields.
 - [x] [P0-T6] Record baseline git state (current branch name and `HEAD` short SHA, obtained via
       `git rev-parse --abbrev-ref HEAD` and `git rev-parse --short HEAD` in the feature worktree) to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/baseline/git-baseline-state.<TS>.md`.
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/baseline/git-baseline-state.<TS>.md`.
       Acceptance: artifact exists with `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output
       Summary:` line stating the branch name and SHA.
 - [x] [P0-T7] Run the baseline analyzer build:
       `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
       in the feature worktree, before any restoration edit. Record to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/baseline/baseline-analyzer-build.<TS>.md`.
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/baseline/baseline-analyzer-build.<TS>.md`.
       Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`
       (build succeeded/failed, warning/error counts).
 - [x] [P0-T8] Run the baseline nullable build:
       `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
       in the feature worktree, before any restoration edit. Record to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/baseline/baseline-nullable-build.<TS>.md`.
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/baseline/baseline-nullable-build.<TS>.md`.
       Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
 - [x] [P0-T9] Run the baseline full test pass with coverage:
       `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage`
       in the feature worktree, before any restoration edit. Record to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/baseline/baseline-test-coverage.<TS>.md`.
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/baseline/baseline-test-coverage.<TS>.md`.
       Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, and an `Output Summary:`
       line with the numeric total test pass/fail counts and the numeric baseline line-coverage
       percentage for `UtilitiesCS.dll`.
 - [x] [P0-T10] Grep `UtilitiesCS.Test/**/*.cs` in the feature worktree for `LockRecursion` and for
       the combination of `CollectionChanged` with `DoesNotThrow`, confirming zero matches (the
       coverage-gap premise from spec.md and research.md). Record to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/baseline/baseline-coverage-gap-confirmation.<TS>.md`.
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/baseline/baseline-coverage-gap-confirmation.<TS>.md`.
       Acceptance: artifact contains `Timestamp:`, `Command:` (the grep patterns used), and
       `Output Summary:` stating "0 matches" for both patterns.
 
@@ -95,7 +95,7 @@ never PASS.
 - [x] [P1-T1] Run `git show 0ec111b29923cfadd63c26908e41e069924d4ea5~1:UtilitiesCS.Test/ReusableTypeClasses/Concurrent/Observable/Collection/ConcurrentObservableCollectionLockRecursionTests.cs`
       in the feature worktree (read-only) and record the exact recovered file content, including its
       literal pre-deletion namespace declaration line, to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/other/pre-deletion-file-recovery.<TS>.md`.
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/other/pre-deletion-file-recovery.<TS>.md`.
       Acceptance: artifact exists, contains `Timestamp:`, `Command:`, `EXIT_CODE:`, and the full
       recovered file content verbatim, with the literal namespace line called out explicitly.
 - [x] [P1-T2] Write
@@ -127,32 +127,32 @@ never PASS.
 - [x] [P2-T1] Run `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU"` in
       the feature worktree and confirm the restored file and csproj change compile with zero errors.
       Record to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/regression-testing/post-restore-build.<TS>.md`.
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/regression-testing/post-restore-build.<TS>.md`.
       Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`
       stating zero compile errors.
 - [x] [P2-T2] Run
       `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /Tests:Add_WhenCollectionChangedHandlerReadsCountFromCollection_DoesNotThrow,Add_WhenCollectionChangedHandlerUsesNewItemsFromEventArgs_DoesNotThrow`
       and confirm both restored tests pass. Record to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/regression-testing/restored-tests-pass.<TS>.md`.
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/regression-testing/restored-tests-pass.<TS>.md`.
       Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`
       stating `2/2 passed, 0 failed`. This satisfies AC-1.
 - [x] [P2-T3] Grep the restored file for the `namespace` declaration and confirm it equals
       `UtilitiesCS.Test.ReusableTypeClasses.Concurrent.Observable.Collection` exactly once. Record to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/regression-testing/namespace-verification.<TS>.md`.
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/regression-testing/namespace-verification.<TS>.md`.
       Acceptance: artifact contains the grep command, its output, and confirms exactly one matching
       namespace line. This satisfies AC-2.
 - [x] [P2-T4] Grep `UtilitiesCS.Test/UtilitiesCS.Test.csproj` for
       `ConcurrentObservableCollectionLockRecursionTests.cs` and confirm exactly one `<Compile
       Include>` line references it, positioned immediately after the
       `ConcurrentObservableCollection_Tests.cs` entry. Record to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/regression-testing/csproj-wiring-verification.<TS>.md`.
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/regression-testing/csproj-wiring-verification.<TS>.md`.
       Acceptance: artifact confirms exactly one match at the expected position. This satisfies AC-3.
 - [x] [P2-T5] Run `git diff --stat main` (repo root, no path filter) in the feature worktree and
       confirm the output lists exactly two changed files:
       `UtilitiesCS.Test/UtilitiesCS.Test.csproj` and
       `UtilitiesCS.Test/ReusableTypeClasses/Concurrent/Observable/Collection/ConcurrentObservableCollectionLockRecursionTests.cs`.
       Record to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/regression-testing/repo-wide-diff-scope.<TS>.md`.
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/regression-testing/repo-wide-diff-scope.<TS>.md`.
       Acceptance: artifact contains the full `git diff --stat main` output and confirms no other
       file (production or test) appears in it. This satisfies AC-4.
 
@@ -169,25 +169,25 @@ this phase complete without errors in a single pass.
       (scoped to this one file, not repo-wide, to avoid unrelated `.csproj`/`.cs` reformatting churn
       that would violate AC-4's two-file-only diff scope). If the check reports a diff, run
       `dotnet tool run csharpier format` on the same path and restart the phase. Record to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/qa-gates/csharpier-check.<TS>.md`.
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/qa-gates/csharpier-check.<TS>.md`.
       Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`
       confirming zero formatting diffs.
 - [x] [P3-T2] Run the post-change analyzer build:
       `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`.
       Record to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/qa-gates/post-change-analyzer-build.<TS>.md`.
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/qa-gates/post-change-analyzer-build.<TS>.md`.
       Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`
       confirming zero analyzer errors/warnings-as-errors on the touched file.
 - [x] [P3-T3] Run the post-change nullable/TreatWarningsAsErrors build:
       `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`.
       Record to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/qa-gates/post-change-nullable-build.<TS>.md`.
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/qa-gates/post-change-nullable-build.<TS>.md`.
       Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, `Output Summary:`
       confirming zero nullable warnings/errors.
 - [x] [P3-T4] Run the full post-change test pass with coverage:
       `vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /EnableCodeCoverage`.
       Record to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/qa-gates/post-change-test-coverage.<TS>.md`.
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/qa-gates/post-change-test-coverage.<TS>.md`.
       Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`
       with the numeric total test pass/fail counts (including the two newly-restored tests) and the
       numeric post-change line-coverage percentage for `UtilitiesCS.dll`. Any pre-existing failure
@@ -204,7 +204,7 @@ this phase complete without errors in a single pass.
       `OnCollectionChanged`, `Count`, `CollectionChanged` add/remove on
       `ConcurrentObservableCollection<T>` — is unchanged and already covered by the surviving sibling
       test file, so no production coverage regression is possible). Record to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/qa-gates/coverage-delta-verification.<TS>.md`.
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/qa-gates/coverage-delta-verification.<TS>.md`.
       Acceptance: artifact contains baseline coverage %, post-change coverage %, changed-file
       coverage %, and an explicit PASS/FAIL statement on "no regression on changed lines." This
       satisfies AC-5 together with P3-T1 through P3-T4.
@@ -213,19 +213,19 @@ this phase complete without errors in a single pass.
 
 ### Phase 4 — Acceptance Criteria Closure & Evidence Commit
 
-- [x] [P4-T1] Edit `docs/features/active/collection-lock-recursion-coverage-317/spec.md` to check off
+- [x] [P4-T1] Edit `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/spec.md` to check off
       AC-1 through AC-5 under `## Acceptance Criteria`, appending an inline evidence-artifact
       reference (relative path) to each checked item. Acceptance: all five AC checkboxes in
       `spec.md` are `- [x]` and each line cites the specific evidence artifact path(s) that satisfy
       it (from Phase 2 and Phase 3 above).
 - [x] [P4-T2] Write a closure-summary evidence artifact to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/other/ac-closure-summary.<TS>.md`
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/other/ac-closure-summary.<TS>.md`
       listing AC-1 through AC-5, each mapped to its exact backing evidence artifact path(s) from
       Phases 2 and 3. Acceptance: the artifact exists and every AC has at least one mapped, existing
       evidence-artifact path.
 - [x] [P4-T3] Run `git status --porcelain` in the feature worktree and confirm it returns empty
       (all code changes and evidence artifacts staged/committed). Record to
-      `docs/features/active/collection-lock-recursion-coverage-317/evidence/other/clean-worktree-confirmation.<TS>.md`.
+      `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/other/clean-worktree-confirmation.<TS>.md`.
       Acceptance: artifact contains `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and `Output Summary:`
       confirming empty `git status --porcelain` output.
 

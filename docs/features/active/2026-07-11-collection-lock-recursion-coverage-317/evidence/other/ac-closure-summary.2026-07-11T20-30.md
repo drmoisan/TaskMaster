@@ -30,4 +30,4 @@ Timestamp: 2026-07-11T20-30
 - Coverage delta verification: `evidence/qa-gates/coverage-delta-verification.2026-07-11T20-27.md`
 
 All five acceptance criteria are backed by existing, verified evidence artifacts under
-`docs/features/active/collection-lock-recursion-coverage-317/evidence/`.
+`docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/`.

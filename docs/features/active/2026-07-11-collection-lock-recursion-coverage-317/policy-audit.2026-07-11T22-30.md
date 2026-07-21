@@ -20,7 +20,7 @@ None detected. The calling prompt explicitly instructed full-branch-diff scope a
 
 - No `validate_evidence_locations.py` script exists in this repository (this is a cross-repo artifact referenced in prior memory notes, not a real TaskMaster tool); the check below is a manual scan.
 - Manual scan of `git diff --name-only main HEAD` for `artifacts/baselines/`, `artifacts/qa/`, `artifacts/evidence/`, `artifacts/coverage/`: **zero matches**.
-- All 21 feature-folder evidence files added by this branch resolve under the canonical `docs/features/active/collection-lock-recursion-coverage-317/evidence/{baseline,regression-testing,qa-gates,other}/` sub-paths, consistent with `evidence-and-timestamp-conventions`.
+- All 21 feature-folder evidence files added by this branch resolve under the canonical `docs/features/active/2026-07-11-collection-lock-recursion-coverage-317/evidence/{baseline,regression-testing,qa-gates,other}/` sub-paths, consistent with `evidence-and-timestamp-conventions`.
 - The plan's `artifacts/csharp/coverage.xml` output is the canonical, skill-documented tool-consumed coverage artifact path for C# (see the Coverage Artifact Paths table), not a forbidden evidence path. No violation.
 - **Verdict: PASS.**
 
