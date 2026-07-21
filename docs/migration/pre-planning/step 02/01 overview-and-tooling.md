@@ -1,590 +1,469 @@
+# Step 2 — Platform foundation overview and reusable tooling
+
 ## Conclusion
 
-**After the legacy-discovery additions, `drm-copilot` will have enough orchestration, planning, execution, evidence, and quality-control capability to manage Step 2. It will not yet have all of the specialized platform-engineering workflows needed to make Step 2 reliable and repeatable.**
+After the Step 1 discovery additions, `drm-copilot` will have the general orchestration, planning, execution, evidence, and review control plane needed to manage Step 2. It still needs a focused **platform-foundation capability pack** so that authentication, API, local-first storage, synchronization, telemetry, feature flags, PWA behavior, mobile behavior, environment configuration, and deployment are governed as one coherent platform rather than as unrelated code features.
 
-You do not need another agentic framework. You should add a **platform-foundation capability pack** to `drm-copilot`, while keeping the actual architecture, infrastructure, credentials, environments, and product implementation local to TMW.
+No second agentic framework is required.
 
-The existing repository already provides:
+The implementation split is:
 
-* large-feature orchestration;
-* atomic planning and execution;
-* language-specific C#, TypeScript, Python, and PowerShell engineers;
-* feature and staged review;
-* persistent orchestration state;
-* worktree isolation;
-* per-language quality gates;
-* CLI, MCP, and VS Code integration;
-* evidence and completion-gate enforcement.
+- `drm-copilot` owns reusable platform-engineering workflow, schemas, validation, and enforcement.
+- TaskMaster owns the pinned legacy oracle, fixtures, characterization, and expected outcomes.
+- TMW owns the product architecture and implementation.
 
-That is enough to coordinate the work. The main gaps concern **what must be designed, proven, and operationalized during a platform foundation phase**.
+## Critical architecture clarification
 
-# Assessment by Step 2 deliverable
+Step 2 must build around this client topology:
 
-| Deliverable                 | Current capability after Step 1 additions |            Additional reusable tooling needed? |
-| --------------------------- | ----------------------------------------: | ---------------------------------------------: |
-| Add-in shell                |                                   Partial |                                            Yes |
-| Authentication              |                                   Partial |                                            Yes |
-| API baseline                |                 Mostly orchestration only |                                            Yes |
-| Telemetry                   |                                   Partial |                                            Yes |
-| Feature flags               |                                   Partial |                                            Yes |
-| Local store scaffolding     |                                   Partial | Yes, especially for offline-first requirements |
-| DevOps baseline             |              General quality support only |                                            Yes |
-| Front-end foundation        |             Strong implementation support |                               Modest additions |
-| Back-end foundation         |             Strong implementation support |                               Modest additions |
-| Architecture governance     |                                   Partial |                                            Yes |
-| Environment reproducibility |                                   Partial |                                            Yes |
-| Security validation         |                Insufficiently specialized |                                            Yes |
+> **The Outlook add-in is the contextual online integration. The installable companion PWA is the full local-first and offline TaskMaster application.**
 
-The distinction is important:
+The companion PWA is not a diagnostics-only surface or a thin queue. For synchronized data it should support local message and folder browsing, search, recommendations, portable classifier inference, tasks, tags, settings, optimistic mailbox projections, durable pending operations, undo where permitted, synchronization, and conflict handling.
 
-> The current agents can write these components, but the framework does not yet appear to define the reusable contracts and gates that prove they form a coherent production platform.
+The PWA cannot directly modify Outlook's private native offline cache through supported Office.js or Microsoft Graph APIs. Outlook add-ins also do not run while the new Outlook is offline. The PWA therefore maintains its own TaskMaster projection, submits authoritative mailbox writes after reconnection, and Outlook later converges through its normal Exchange synchronization.
 
-# What `drm-copilot` can already do
+The platform foundation must make that temporary divergence explicit and safe.
 
-## 1. Coordinate the platform epic
+## Preconditions before Step 2 implementation
 
-The epic orchestrator can decompose the foundation into child features, manage dependencies, use isolated worktrees, and integrate the results.
+Do not begin authoritative Step 2 implementation until:
 
-A suitable decomposition would be:
+1. The Step 1 and Step 2 reusable capabilities are merged into `drm-copilot`.
+2. The extension and MCP package have been released.
+3. The released customizations have been pushed into TaskMaster and TMW through reviewed adoption branches.
+4. TaskMaster Step 1 discovery is merged and pinned to a commit.
+5. TMW Step 1 parity reconciliation is merged.
+6. The source feature contracts and parity matrix validate.
+7. Blocking unspecified-behavior decisions are resolved.
+8. Online, offline, reconnect, desktop, Outlook Mobile, and companion-PWA requirements are explicit.
+9. The selected Step 2 vertical slice has approved acceptance scenarios.
+10. Baseline quality gates pass in both repositories, or pre-existing failures are documented.
 
-```text
-Platform Foundation Epic
-├── Application shell
-├── Authentication and authorization
-├── API conventions and baseline
-├── Local persistence
-├── Synchronization substrate
-├── Telemetry and diagnostics
-├── Feature flags
-├── Environment and configuration
-├── CI/CD baseline
-└── Platform integration review
-```
+## Assessment by Step 2 deliverable
 
-## 2. Delegate language-specific implementation
+| Deliverable | Existing support | Reusable tooling addition | Product implementation location |
+|---|---:|---:|---|
+| Outlook add-in shell | Partial in TMW | Host-capability and integration contracts | TMW |
+| Companion PWA shell | Missing/incomplete | PWA and offline-readiness contracts | TMW |
+| Shared application core | Partial | Architecture-boundary validation | TMW |
+| Authentication | Partial | Identity contract and security review | TMW |
+| API baseline | Partial | API conventions and compatibility gates | TMW |
+| Durable backend persistence | Prototype only | Persistence decision and migration gates | TMW |
+| Local mailbox/task replica | Missing | Offline data and storage contracts | TMW |
+| Mutation outbox | Missing | Operation and idempotency schemas | TMW |
+| Synchronization/conflicts | Missing | Sync-protocol and conflict validators | TMW |
+| Local classifier/model snapshots | Missing | Portable-model and compatibility contracts | TMW |
+| Telemetry | Partial | Observability and privacy contracts | TMW |
+| Feature flags | Missing/partial | Flag governance and expiry validation | TMW |
+| DevOps/environment | Partial | Environment and deployment contracts | TMW |
+| Legacy oracle | Step 1 inputs only | Oracle bundle schema and validator | TaskMaster |
+| Integrated platform proof | Missing | Platform-foundation completion review | TMW using TaskMaster oracle |
 
-The existing roster includes TypeScript, modern C#, Python, PowerShell, and legacy C# engineers.
+## What `drm-copilot` already provides
 
-That is enough to implement:
+The existing runtime is already suitable for coordinating an epic with:
 
-* React or similar front-end shell;
-* Office add-in code;
-* API services;
-* infrastructure scripts;
-* test utilities;
-* build and deployment automation.
+- dependency-aware child features;
+- isolated worktrees;
+- persistent checkpoints;
+- atomic planning and execution;
+- TypeScript, modern C#, legacy C#, Python, and PowerShell specialists;
+- feature, staged, and epic review;
+- quality gates;
+- evidence-location enforcement;
+- MCP and VS Code wrappers;
+- cross-ecosystem publication.
 
-## 3. Enforce implementation quality
+Those mechanisms should be extended, not duplicated.
 
-The repository already has language-specific change-budget routing, QA gates, output validators, and restricted PR publication.
+## Reusable platform-foundation agents
 
-These are useful but mostly validate code quality and process integrity—not platform coherence.
-
-# Additional reusable capabilities needed in `drm-copilot`
-
-I recommend one additional cross-repository package:
-
-```text
-platform-foundation
-```
-
-This should be smaller than the discovery package. It should add specialized workflows and validation, not prescribe one technology stack.
-
-## 1. Platform Architect agent
-
-Add a generic `platform-architect` agent.
+### Platform architect
 
 Responsibilities:
 
-* convert architecture requirements into bounded platform decisions;
-* establish component boundaries;
-* identify cross-cutting contracts;
-* produce ADRs;
-* ensure front end, back end, add-in, local store, and cloud services fit together;
-* verify offline and mobile implications;
-* identify irreversible or expensive decisions;
-* avoid implementing application features.
-
-It should explicitly evaluate:
-
-* deployment topology;
-* trust boundaries;
-* online/offline ownership;
-* local versus server state;
-* authentication flows;
-* API boundaries;
-* telemetry flow;
-* feature-flag evaluation;
-* failure and recovery modes.
-
-The existing `task-researcher` is useful for investigating technologies, but its purpose is general implementation research rather than enforcing platform-level architectural consistency. Its current workflow focuses on current-state analysis, alternatives, behavioral semantics, requirements mapping, and testing implications.
-
-## 2. Security and identity reviewer
-
-Authentication should not be handled only as a coding task.
-
-Add a `security-identity-reviewer` agent or skill covering:
-
-* OAuth/OIDC flow selection;
-* Microsoft Entra application topology;
-* delegated versus application permissions;
-* token storage;
-* refresh behavior;
-* multi-tenant versus single-tenant configuration;
-* consent;
-* logout and account switching;
-* least privilege;
-* offline token behavior;
-* mobile authentication;
-* threat modeling;
-* secrets handling;
-* logging redaction.
-
-This should produce a threat model and security acceptance report, not credentials or tenant-specific settings.
-
-## 3. Offline-first architecture skill
-
-This is the most important missing capability.
-
-A generic skill should require explicit answers to:
-
-* What data is stored locally?
-* Which store is authoritative?
-* Which operations are permitted offline?
-* How are local writes recorded?
-* How are operations ordered?
-* How are operations made idempotent?
-* What happens after retries?
-* What happens after application termination?
-* How are conflicts identified?
-* How are conflicts resolved?
-* How are tombstones represented?
-* How is schema migration handled?
-* How is local data encrypted?
-* How is cache invalidation handled?
-* What is visible on mobile?
-* Which data must be prefetched?
-* How is storage bounded?
-
-The Step 1 framework will classify offline behavior, but Step 2 needs to convert those requirements into an actual local-first substrate.
-
-Add skills such as:
-
-```text
-design-offline-data-model
-design-sync-protocol
-review-conflict-resolution
-validate-offline-foundation
-```
-
-## 4. API baseline contract skill
-
-Add a workflow to establish and validate:
-
-* API versioning;
-* error envelope;
-* request correlation IDs;
-* idempotency keys;
-* pagination;
-* filtering and sorting;
-* concurrency tokens;
-* optimistic concurrency;
-* retry semantics;
-* cancellation;
-* authentication;
-* authorization;
-* rate limiting assumptions;
-* OpenAPI generation;
-* API compatibility checks;
-* health and readiness endpoints.
-
-The implementation can remain TMW-specific, but the contract and validator should be reusable.
-
-Recommended reusable tools:
-
-```text
-dev.platform.validate-openapi
-dev.platform.check-api-breaking-changes
-dev.platform.validate-error-contract
-dev.platform.validate-idempotency-contract
-```
-
-## 5. Observability baseline skill
-
-“Telemetry” should not merely mean adding a logging library.
-
-Create a reusable observability contract requiring:
-
-* structured logging;
-* traces;
-* metrics;
-* correlation across add-in, front end, API, and background processing;
-* environment and release identifiers;
-* privacy classification;
-* redaction rules;
-* sampling policy;
-* offline telemetry buffering;
-* retry and drop behavior;
-* client crash reporting;
-* health signals;
-* support diagnostic bundle;
-* alert ownership.
-
-The reusable framework should validate that telemetry events have:
-
-* stable names;
-* documented properties;
-* no prohibited data;
-* severity;
-* ownership;
-* retention classification.
-
-## 6. Feature-flag governance
-
-Feature flags require more than a client library.
-
-Add a generic contract covering:
-
-* flag identifier;
-* owner;
-* purpose;
-* default;
-* targeting;
-* offline default;
-* mobile behavior;
-* failure behavior;
-* expiration date;
-* cleanup issue;
-* telemetry;
-* security implications.
-
-Add a validator that rejects:
-
-* flags without owners;
-* flags without offline fallback;
-* permanent flags without explicit justification;
-* flags used as authorization controls;
-* stale flags past expiration.
-
-## 7. Platform integration review
-
-The existing feature review validates an individual feature. Step 2 requires a review that checks the foundation as an integrated platform.
-
-Add a `platform-foundation-review` skill or extend epic review to validate:
-
-* add-in starts and authenticates;
-* front end reaches API;
-* API validates identity;
-* local store works offline;
-* queued operations survive restart;
-* reconnect triggers synchronization;
-* telemetry correlates end to end;
-* feature flags work online and offline;
-* environment configuration is reproducible;
-* secrets are absent from source;
-* CI builds and tests all components;
-* deployment produces identifiable artifacts;
-* rollback is documented.
-
-# What should remain local to TMW
-
-The reusable extension should not implement the product platform itself.
-
-TMW must own the following.
-
-## Add-in shell
-
-* Office manifest
-* Ribbon commands
-* Task pane
-* mobile-form-factor behavior
-* initialization lifecycle
-* Office.js integration
-* capability detection
-* degraded-mode UI
-* host-specific error handling
-
-## Authentication implementation
-
-* Entra tenant and app registration identifiers
-* redirect URIs
-* scopes and permissions
-* environment configuration
-* token-cache implementation
-* account-selection behavior
-* authorization policy
-* backend identity validation
-* deployment secrets
-
-## API implementation
-
-* actual endpoints;
-* domain models;
-* persistence layer;
-* business authorization;
-* API hosting;
-* database;
-* queues;
-* migrations;
-* production configuration.
-
-## Telemetry implementation
-
-* telemetry provider;
-* instrumentation keys or connection data;
-* event catalog;
-* dashboards;
-* alerts;
-* retention;
-* environment-specific sampling.
-
-## Feature flags
-
-* provider;
-* actual flag inventory;
-* targeting rules;
-* environment values;
-* rollout plan;
-* cleanup schedule.
-
-## Local store and sync implementation
-
-* database technology;
-* schemas;
-* migrations;
-* operation queue;
-* tombstones;
-* conflict logic;
-* encryption;
-* cache limits;
-* synchronization protocol;
-* test fixtures.
-
-## DevOps
-
-* cloud resources;
-* deployment definitions;
-* environment topology;
-* GitHub environments;
-* secrets;
-* infrastructure-as-code;
-* release process;
-* rollback procedure;
-* production support ownership.
-
-# Additional TMW-local tooling needed
-
-Even with the extension additions, TMW should contain local engineering tools.
-
-## 1. Development environment bootstrap
-
-For example:
-
-```text
-tools/dev/
-  bootstrap.ps1
-  reset-local-environment.ps1
-  seed-development-data.ps1
-  verify-prerequisites.ps1
-```
-
-The agentic framework can invoke these, but TMW must define them.
-
-## 2. Identity emulator or test identity support
-
-You need a repeatable way to test:
-
-* authenticated user;
-* expired token;
-* revoked consent;
-* insufficient scope;
-* multiple accounts;
-* offline token availability.
-
-This may use mocks in automated testing and a documented development tenant for integration testing.
-
-## 3. API test harness
-
-Include:
-
-* generated client;
-* contract test suite;
-* in-memory or containerized backend;
-* test fixtures;
-* deterministic clock;
-* deterministic identifiers;
-* failure injection.
-
-## 4. Local-store and synchronization harness
-
-This is essential.
-
-It should simulate:
-
-* no network;
-* intermittent network;
-* API timeouts;
-* duplicate responses;
-* out-of-order responses;
-* stale version tokens;
-* local process termination;
-* partial synchronization;
-* server deletion;
-* simultaneous mobile and desktop edits;
-* schema upgrade with pending operations.
-
-## 5. Telemetry test sink
-
-Provide a local sink that verifies emitted events without sending development data to production telemetry.
-
-## 6. Feature-flag test provider
-
-Provide deterministic local flag values and tests for:
-
-* enabled;
-* disabled;
-* provider unavailable;
-* stale cached values;
-* offline fallback;
-* user-targeted variation.
-
-## 7. End-to-end smoke environment
-
-A single command should be able to:
-
-1. Start the API.
-2. Start required dependencies.
-3. seed test data;
-4. configure the front end;
-5. install or sideload the add-in;
-6. run smoke checks;
-7. produce diagnostics.
-
-# Suggested reusable additions to `drm-copilot`
-
-I would add the following—not another broad system.
-
-## Agents
-
-```text
-platform-architect
-security-identity-reviewer
-offline-sync-reviewer
-platform-foundation-reviewer
-```
-
-## Skills
+- define client and service topology;
+- establish trust and data boundaries;
+- make expensive or irreversible decisions explicit;
+- maintain architecture decision records;
+- enforce separation between Outlook host adapters, shared application logic, local storage, sync, API, and infrastructure;
+- evaluate desktop, mobile, online, offline, and reconnect consequences;
+- prevent implementation before required architecture decisions are approved.
+
+### Security and identity reviewer
+
+Responsibilities:
+
+- OAuth/OIDC and Entra topology;
+- delegated versus application permissions;
+- Outlook add-in and PWA authentication;
+- API audience and authorization;
+- Graph on-behalf-of behavior;
+- consent, expiry, revocation, logout, and account switching;
+- token-cache design;
+- secrets and certificates;
+- threat modeling;
+- telemetry redaction;
+- mobile and offline security;
+- least privilege.
+
+### Local-first and synchronization reviewer
+
+Responsibilities:
+
+- local replica scope;
+- storage technology and durability;
+- schema migration;
+- cache policy and quotas;
+- local classifiers and model snapshots;
+- mutation outbox;
+- idempotency;
+- ordering and retries;
+- conflict detection and resolution;
+- tombstones;
+- restart survival;
+- foreground and background synchronization;
+- account/mailbox partitioning;
+- local-data purge and recovery.
+
+### PWA and mobile reviewer
+
+Responsibilities:
+
+- installability;
+- service-worker cache behavior;
+- offline launch;
+- IndexedDB or selected local-store behavior;
+- storage persistence and eviction handling;
+- Outlook add-in to PWA handoff;
+- responsive and accessible mobile UX;
+- Outlook Mobile manifest and host limitations;
+- foreground sync;
+- physical-device verification;
+- distinction between Outlook Mobile add-in parity and companion-PWA parity.
+
+### API and operations reviewer
+
+Responsibilities:
+
+- API versioning;
+- OpenAPI generation;
+- errors;
+- correlation;
+- idempotency;
+- concurrency;
+- operation status;
+- sync endpoints;
+- health and readiness;
+- telemetry;
+- deployment;
+- database migration;
+- rollback;
+- supportability.
+
+### Platform-foundation reviewer
+
+Responsibilities:
+
+- review the integrated platform rather than isolated features;
+- verify the TaskMaster-derived vertical slice;
+- require evidence for desktop, offline, restart, reconnect, and mobile;
+- verify telemetry and feature flags;
+- verify deployability and rollback;
+- fail closed on disconnected scaffolds or unverified claims.
+
+## Reusable skills
+
+The platform-foundation pack should include workflows equivalent to:
 
 ```text
 platform-foundation-orchestrate
+initialize-platform-foundation
 author-architecture-decision
+define-client-topology
+define-domain-and-host-boundaries
 design-authentication-baseline
 threat-model-platform
 define-api-baseline
-design-offline-data-model
+design-local-replica
+design-portable-model-contract
+design-mutation-outbox
 design-sync-protocol
+review-conflict-resolution
+define-pwa-offline-readiness
+define-addin-pwa-handoff
+define-mobile-platform-contract
 define-observability-baseline
 define-feature-flag-governance
 define-environment-contract
+define-deployment-and-rollback
+import-legacy-oracle
 review-platform-foundation
+validate-platform-foundation
 ```
 
-## Schemas
+Each skill must:
+
+- declare exact inputs and outputs;
+- consume repository-local configuration;
+- remain product-neutral;
+- produce machine-readable artifacts;
+- support deterministic validation;
+- fail closed when required decisions or evidence are absent;
+- route to an appropriate specialist;
+- publish across Claude Code, Codex, and GitHub Copilot through existing mechanisms.
+
+## Repository-local configuration
+
+Consuming repositories should provide a versioned platform profile, for example:
+
+```text
+docs/migration/platform-foundation/platform-profile.yaml
+```
+
+The profile should support:
+
+- repository role;
+- source or target baseline references;
+- required clients and hosts;
+- online/offline/reconnect dimensions;
+- mobile platforms;
+- local storage requirements;
+- identity topology;
+- API roots;
+- environment list;
+- evidence roots;
+- feature-flag policy;
+- telemetry policy;
+- selected vertical slice;
+- completion gates;
+- excluded capabilities and rationale.
+
+TaskMaster's profile should identify it as a legacy oracle. TMW's profile should identify it as the modernization target.
+
+## Required schemas
+
+At minimum:
 
 ```text
 platform-profile.schema.json
 architecture-decision.schema.json
+client-topology.schema.json
+host-capability.schema.json
 authentication-contract.schema.json
 api-baseline.schema.json
+api-error.schema.json
+idempotent-operation.schema.json
+local-replica.schema.json
+local-storage-policy.schema.json
+portable-model.schema.json
+mutation-outbox.schema.json
+sync-protocol.schema.json
+conflict-policy.schema.json
+pwa-offline-readiness.schema.json
+addin-pwa-handoff.schema.json
+mobile-platform.schema.json
 observability-contract.schema.json
+telemetry-event.schema.json
 feature-flag.schema.json
-offline-data-contract.schema.json
-sync-contract.schema.json
 environment-contract.schema.json
+deployment-contract.schema.json
+legacy-oracle-manifest.schema.json
 platform-foundation-report.schema.json
 ```
 
-## Validators
+Schemas must be versioned and allow carefully bounded product extensions without weakening core required fields.
+
+## Required validators
+
+Commands should be available through the authoritative Python implementation and thin CLI/MCP/VS Code wrappers. Equivalent commands include:
 
 ```text
+dev.platform.init
 dev.platform.validate-profile
 dev.platform.validate-adrs
+dev.platform.validate-client-topology
+dev.platform.validate-host-capabilities
 dev.platform.validate-auth
 dev.platform.validate-api
+dev.platform.check-api-breaking-changes
+dev.platform.validate-idempotency
+dev.platform.validate-local-replica
+dev.platform.validate-local-storage
+dev.platform.validate-model-contract
+dev.platform.validate-outbox
+dev.platform.validate-sync
+dev.platform.validate-conflicts
+dev.platform.validate-pwa
+dev.platform.validate-handoff
+dev.platform.validate-mobile
 dev.platform.validate-observability
 dev.platform.validate-feature-flags
-dev.platform.validate-offline
-dev.platform.validate-sync
 dev.platform.validate-environments
+dev.platform.validate-deployment
+dev.platform.validate-oracle
 dev.platform.validate-foundation
 ```
 
-# Platform foundation completion gate
+Validation must detect:
 
-Step 2 should not be considered complete merely because each component exists.
+- missing or conflicting ADRs;
+- host-bound dependencies in the shared core;
+- blank required platform dimensions;
+- offline claims without local data and executable workflows;
+- mobile claims based only on task-pane rendering;
+- use of feature flags for authorization;
+- flags without owners, offline defaults, expiry, or cleanup references;
+- mailbox mutations without idempotency;
+- outbox entries without deterministic identity and lifecycle;
+- sync contracts without cursor, tombstone, retry, and conflict behavior;
+- storage designs without migrations, quota, persistence, purge, and corruption recovery;
+- telemetry that contains prohibited data;
+- API changes that break approved contracts;
+- deployment contracts without rollback;
+- completion reports without a TaskMaster oracle reference.
 
-The gate should require a vertical slice demonstrating:
+## Required hooks and gates
+
+Add reusable enforcement for:
+
+- architecture decisions before implementation;
+- research-time automation-feasibility assessment;
+- no production changes by architecture/research agents;
+- no Outlook COM dependencies in target modules;
+- no host APIs in shared application/domain modules;
+- no access tokens in local domain storage;
+- no mailbox mutation contract without idempotency;
+- no offline-complete status without restart and reconnect evidence;
+- no mobile-complete status without physical or approved host evidence;
+- no PWA-complete status without offline launch and storage evidence;
+- no parity status without a pinned TaskMaster oracle reference;
+- no platform completion without integrated deployment and rollback evidence.
+
+## What remains local to TaskMaster
+
+TaskMaster should own:
+
+- the Step 1 source baseline;
+- a versioned legacy oracle manifest;
+- sanitized fixture data;
+- legacy characterization scenarios;
+- expected outcomes;
+- a read-only reference exporter;
+- environment descriptions;
+- behavior and fixture checksums;
+- evidence from classic Outlook cached mode and reconnect;
+- explicit semantic-difference decisions.
+
+TaskMaster should not acquire:
+
+- modern authentication;
+- a new API;
+- a PWA;
+- feature flags;
+- a modern sync engine;
+- target deployment infrastructure;
+- a production dependency on TMW.
+
+## What remains local to TMW
+
+TMW should own:
+
+- the shared TaskMaster application core;
+- Outlook desktop/web/mobile host adapters;
+- the installable companion PWA;
+- service worker and application-shell cache;
+- local storage and migrations;
+- local model snapshots and inference adapters;
+- mutation outbox;
+- synchronization and conflicts;
+- add-in to PWA handoff;
+- authentication;
+- API and Graph adapters;
+- durable backend persistence;
+- telemetry;
+- feature flags;
+- environments and infrastructure as code;
+- deployment and rollback;
+- all target tests and parity status.
+
+## Additional TMW-local test tools
+
+TMW should contain:
+
+- development environment bootstrap;
+- local identity/test provider;
+- API contract harness;
+- local-store migration harness;
+- sync and conflict simulator;
+- network failure injection;
+- deterministic Graph adapter or emulator;
+- telemetry test sink;
+- feature-flag test provider;
+- PWA installation/offline harness;
+- service-worker update tests;
+- storage pressure and eviction tests where feasible;
+- mobile viewport and physical-device runbooks;
+- end-to-end deployed smoke environment.
+
+## Correct integrated completion gate
+
+Step 2 must prove this sequence:
 
 ```text
-Outlook add-in
-    ↓
-user signs in
-    ↓
-front end calls API
-    ↓
-API authenticates and returns data
-    ↓
-data is stored locally
-    ↓
-user performs one supported action offline
-    ↓
-action survives application restart
-    ↓
-reconnection synchronizes the action
-    ↓
-telemetry links the client action to the API operation
-    ↓
-feature flag can enable or disable the slice safely
+Outlook add-in online
+    -> authenticate
+    -> acquire selected-message context
+    -> create single-use handoff
+    -> open installed companion PWA
+    -> persist message/folder scope locally
+    -> disconnect
+    -> launch PWA independently
+    -> search and classify locally
+    -> perform filing action offline
+    -> atomically update local projection and outbox
+    -> close/restart PWA
+    -> pending state survives
+    -> reconnect
+    -> synchronize through API
+    -> API applies operation exactly once through Graph
+    -> PWA reconciles delta and operation state
+    -> Outlook later displays server result
+    -> telemetry correlates the full workflow
+    -> feature flag can disable the slice safely
 ```
 
-That single vertical slice is more valuable than six disconnected scaffolds.
+Required platforms:
 
-It should be tested in at least:
+- desktop Outlook add-in online;
+- desktop installed PWA offline;
+- desktop restart and reconnect;
+- Outlook Mobile add-in online;
+- installed mobile PWA offline;
+- mobile foreground reconnect;
+- telemetry provider unavailable;
+- feature-flag provider unavailable;
+- API timeout and ambiguous response;
+- remote move/delete conflict;
+- rollback or kill-switch exercise.
 
-* desktop online;
-* desktop cached/offline;
-* disconnect followed by reconnect;
-* mobile or mobile-equivalent surface where the selected Office add-in capability is supported;
-* telemetry-provider unavailable;
-* feature-flag-provider unavailable.
+## Publication and adoption sequence
 
-# Recommended answer
+1. Complete the `drm-copilot` platform-foundation feature.
+2. Run all language, MCP, extension, conversion, and publication tests.
+3. Merge to `drm-copilot/main`.
+4. publish a new extension and MCP release;
+5. push released customizations to TaskMaster and TMW on adoption branches;
+6. reconcile local policies and generated files;
+7. run customization validation;
+8. merge adoption pull requests;
+9. complete Step 1 in TaskMaster and TMW;
+10. run the Step 2 TaskMaster oracle prompt;
+11. run the Step 2 TMW platform-foundation prompt.
 
-**Yes, add further tooling—but only a focused platform-foundation layer.**
+## Step 2 documents
 
-After the discovery work, `drm-copilot` will already have the correct control plane:
-
-* orchestration;
-* agent delegation;
-* planning;
-* implementation;
-* review;
-* evidence;
-* validation;
-* cross-agent publishing.
-
-It still needs reusable platform-engineering contracts and reviewers for:
-
-1. architecture decisions;
-2. authentication and threat modeling;
-3. API conventions;
-4. offline-first local storage;
-5. synchronization and conflict resolution;
-6. observability;
-7. feature-flag governance;
-8. environment reproducibility;
-9. integrated platform acceptance.
-
-The actual add-in shell, authentication configuration, API, telemetry provider, flags, local database, synchronization implementation, and DevOps resources should remain in **TMW**, not `drm-copilot`.
-
-The largest risk is not missing a coding agent. It is completing six scaffolds independently without proving the offline-capable end-to-end vertical slice.
+- `02 repository-work-architecture-and-sequencing.md` defines the repository work and dependency waves.
+- `03 drm-copilot-platform-foundation-prompt.md` is the reusable tooling prompt.
+- `04a TaskMaster-prompt.md` creates the legacy oracle and fixtures.
+- `04b TMW-prompt.md` implements and validates the target platform foundation.
