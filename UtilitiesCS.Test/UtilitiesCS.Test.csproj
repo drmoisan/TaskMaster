@@ -549,8 +549,8 @@
     <Reference Include="FSharp.Core, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\FSharp.Core.11.0.100\lib\netstandard2.0\FSharp.Core.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=3.3.1.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.3.3.1\lib\net462\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=3.3.2.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.3.3.2\lib\net462\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ApplicationInsights, Version=3.1.2.115, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ApplicationInsights.3.1.2\lib\net462\Microsoft.ApplicationInsights.dll</HintPath>
@@ -558,6 +558,9 @@
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=10.0.0.10, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.10.0.10\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.Cryptography, Version=10.0.0.10, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.Cryptography.10.0.10\lib\net462\Microsoft.Bcl.Cryptography.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Bcl.HashCode, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.HashCode.6.0.0\lib\net462\Microsoft.Bcl.HashCode.dll</HintPath>
@@ -568,9 +571,6 @@
     </Reference>
     <Reference Include="Microsoft.Bcl.TimeProvider, Version=10.0.0.10, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.TimeProvider.10.0.10\lib\net462\Microsoft.Bcl.TimeProvider.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.TimeProvider.Testing, Version=9.10.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.TimeProvider.Testing.9.10.0\lib\net462\Microsoft.Extensions.TimeProvider.Testing.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Data.Analysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -618,8 +618,11 @@
     <Reference Include="Microsoft.Extensions.Primitives, Version=10.0.0.10, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Extensions.Primitives.10.0.10\lib\net462\Microsoft.Extensions.Primitives.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Graph, Version=5.105.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Graph.5.105.0\lib\netstandard2.0\Microsoft.Graph.dll</HintPath>
+    <Reference Include="Microsoft.Extensions.TimeProvider.Testing, Version=10.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.TimeProvider.Testing.10.8.0\lib\net462\Microsoft.Extensions.TimeProvider.Testing.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Graph, Version=6.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Graph.6.2.0\lib\netstandard2.0\Microsoft.Graph.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Graph.Core, Version=4.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Graph.Core.4.0.1\lib\net462\Microsoft.Graph.Core.dll</HintPath>
@@ -755,14 +758,14 @@
     <Reference Include="OpenTelemetry.Extensions.Hosting, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTelemetry.Extensions.Hosting.1.17.0\lib\net462\OpenTelemetry.Extensions.Hosting.dll</HintPath>
     </Reference>
-    <Reference Include="OpenTelemetry.PersistentStorage.Abstractions, Version=1.1.0.1067, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTelemetry.PersistentStorage.Abstractions.1.1.0\lib\net462\OpenTelemetry.PersistentStorage.Abstractions.dll</HintPath>
+    <Reference Include="OpenTelemetry.PersistentStorage.Abstractions, Version=1.1.1.1228, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenTelemetry.PersistentStorage.Abstractions.1.1.1\lib\net462\OpenTelemetry.PersistentStorage.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="OpenTelemetry.PersistentStorage.FileSystem, Version=1.1.0.1067, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenTelemetry.PersistentStorage.FileSystem.1.1.0\lib\net462\OpenTelemetry.PersistentStorage.FileSystem.dll</HintPath>
+    <Reference Include="OpenTelemetry.PersistentStorage.FileSystem, Version=1.1.1.1228, Culture=neutral, PublicKeyToken=7bd6737fe5b67e3c, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenTelemetry.PersistentStorage.FileSystem.1.1.1\lib\net462\OpenTelemetry.PersistentStorage.FileSystem.dll</HintPath>
     </Reference>
-    <Reference Include="Std.UriTemplate, Version=2.0.8.0, Culture=neutral, PublicKeyToken=c118b0afb4598f9a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Std.UriTemplate.2.0.8\lib\netstandard2.0\Std.UriTemplate.dll</HintPath>
+    <Reference Include="Std.UriTemplate, Version=2.0.12.0, Culture=neutral, PublicKeyToken=c118b0afb4598f9a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Std.UriTemplate.2.0.12\lib\netstandard2.0\Std.UriTemplate.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -825,8 +828,8 @@
     <Reference Include="System.Numerics.Vectors, Version=4.1.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Numerics.Vectors.4.6.1\lib\net462\System.Numerics.Vectors.dll</HintPath>
     </Reference>
-    <Reference Include="System.Reactive, Version=6.1.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reactive.6.1.0\lib\net472\System.Reactive.dll</HintPath>
+    <Reference Include="System.Reactive, Version=7.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.7.0.0\lib\net472\System.Reactive.dll</HintPath>
     </Reference>
     <Reference Include="System.Reactive.Async, Version=6.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Reactive.Async.6.0.0-alpha.18\lib\netstandard2.0\System.Reactive.Async.dll</HintPath>
@@ -912,6 +915,7 @@
     <Error Condition="!Exists('..\packages\MSTest.TestAdapter.4.3.2\build\net462\MSTest.TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSTest.TestAdapter.4.3.2\build\net462\MSTest.TestAdapter.props'))" />
     <Error Condition="!Exists('..\packages\MSTest.TestAdapter.4.3.2\build\net462\MSTest.TestAdapter.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSTest.TestAdapter.4.3.2\build\net462\MSTest.TestAdapter.targets'))" />
     <Error Condition="!Exists('..\packages\Meziantou.Analyzer.3.0.123\build\Meziantou.Analyzer.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Meziantou.Analyzer.3.0.123\build\Meziantou.Analyzer.props'))" />
+    <Error Condition="!Exists('..\packages\System.Reactive.7.0.0\build\System.Reactive.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Reactive.7.0.0\build\System.Reactive.targets'))" />
   </Target>
   <Import Project="..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" />
   <Import Project="..\packages\Microsoft.Testing.Platform.2.3.2\build\netstandard2.0\Microsoft.Testing.Platform.targets" Condition="Exists('..\packages\Microsoft.Testing.Platform.2.3.2\build\netstandard2.0\Microsoft.Testing.Platform.targets')" />
@@ -931,4 +935,5 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.BannedApiAnalyzers.3.3.4\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.BannedApiAnalyzers.dll" />
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)..\BannedSymbols.txt" />
   </ItemGroup>
+  <Import Project="..\packages\System.Reactive.7.0.0\build\System.Reactive.targets" Condition="Exists('..\packages\System.Reactive.7.0.0\build\System.Reactive.targets')" />
 </Project>
