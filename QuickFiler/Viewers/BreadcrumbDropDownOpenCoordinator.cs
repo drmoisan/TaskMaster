@@ -41,8 +41,7 @@ namespace QuickFiler.Viewers
         {
             _operations = operations ?? throw new ArgumentNullException(nameof(operations));
             _host = host ?? throw new ArgumentNullException(nameof(host));
-            _anchorBounds =
-                anchorBounds ?? throw new ArgumentNullException(nameof(anchorBounds));
+            _anchorBounds = anchorBounds ?? throw new ArgumentNullException(nameof(anchorBounds));
             _workingArea = workingArea ?? throw new ArgumentNullException(nameof(workingArea));
             _rowCount = rowCount ?? throw new ArgumentNullException(nameof(rowCount));
             _isSelectorOpen =
@@ -232,10 +231,7 @@ namespace QuickFiler.Viewers
         {
             if (_host.IsOpen && _host.Close(reason))
                 return true;
-            if (
-                reason == BreadcrumbDropDownCloseReason.Uncommitted
-                && _isSelectorOpen()
-            )
+            if (reason == BreadcrumbDropDownCloseReason.Uncommitted && _isSelectorOpen())
                 _cancelSelector();
             return false;
         }
@@ -259,8 +255,7 @@ namespace QuickFiler.Viewers
                 return IsCurrentCore(generation);
         }
 
-        private bool IsCurrentCore(int generation) =>
-            !_released && generation == _generation;
+        private bool IsCurrentCore(int generation) => !_released && generation == _generation;
 
         private bool IsReleased()
         {

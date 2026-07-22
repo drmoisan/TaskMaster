@@ -221,6 +221,5 @@ namespace QuickFiler.Viewers
                 throw;
             }
         }
-
     }
 }

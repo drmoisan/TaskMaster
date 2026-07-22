@@ -145,7 +145,11 @@ namespace QuickFiler
                     "The breadcrumb pipeline must be initialized before attaching a surface."
                 );
             }
-            AttachBreadcrumbSurface(messenger, BreadcrumbViewMode.Collapsed, ref _breadcrumbMessenger);
+            AttachBreadcrumbSurface(
+                messenger,
+                BreadcrumbViewMode.Collapsed,
+                ref _breadcrumbMessenger
+            );
         }
 
         internal void ConfigureBreadcrumbDropDown(
@@ -202,18 +206,17 @@ namespace QuickFiler
                 if (!ReferenceEquals(_breadcrumbDropDownOpenCoordinator?.Host, host))
                 {
                     ReleaseBreadcrumbDropDownHostCore();
-                    _breadcrumbDropDownOpenCoordinator =
-                        new BreadcrumbDropDownOpenCoordinator(
-                            _breadcrumbPopupUiOperations,
-                            host,
-                            anchorBounds,
-                            workingArea,
-                            () => BreadcrumbCoordinator?.GetFolderItems().Length ?? 0,
-                            () => BreadcrumbCoordinator?.IsSelectorOpen == true,
-                            () => BreadcrumbCoordinator?.OpenSelector() == true,
-                            () => BreadcrumbCoordinator?.CancelSelector(),
-                            () => DetachBreadcrumbMessenger(ref _popupMessenger)
-                        );
+                    _breadcrumbDropDownOpenCoordinator = new BreadcrumbDropDownOpenCoordinator(
+                        _breadcrumbPopupUiOperations,
+                        host,
+                        anchorBounds,
+                        workingArea,
+                        () => BreadcrumbCoordinator?.GetFolderItems().Length ?? 0,
+                        () => BreadcrumbCoordinator?.IsSelectorOpen == true,
+                        () => BreadcrumbCoordinator?.OpenSelector() == true,
+                        () => BreadcrumbCoordinator?.CancelSelector(),
+                        () => DetachBreadcrumbMessenger(ref _popupMessenger)
+                    );
                 }
                 else
                     _breadcrumbDropDownOpenCoordinator.UpdateRequestProviders(
@@ -350,8 +353,7 @@ namespace QuickFiler
 
         private void ReleaseBreadcrumbDropDownHostCore()
         {
-            BreadcrumbDropDownOpenCoordinator coordinator =
-                _breadcrumbDropDownOpenCoordinator;
+            BreadcrumbDropDownOpenCoordinator coordinator = _breadcrumbDropDownOpenCoordinator;
             if (coordinator == null)
                 return;
 
