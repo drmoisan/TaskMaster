@@ -1,5 +1,7 @@
 # Atomic Executor Memory Index
 
+- [csharpier pipe-files is a non-enforcing gate](project_csharpier_pipefiles_nonenforcing_gate.md) — `csharpier pipe-files`+re-hash-unmodified-file enforces nothing; use `csharpier check`/`format`; #400 P5 tests balloon past 500 lines under genuine format (size new files AFTER format, not hand-written count)
+
 - [#398 test-split gate gotchas](project_398_test_split_gate_gotchas.md) — pre-existing CS2002 duplicate PercentageFormatterTests Compile (latent til recompile, out of scope, don't Rebuild-to-verify); /EnableCodeCoverage has no branch% + .coverage merges to empty cobertura → use Cobertura-runsettings variant + single report-level JaCoCo counter; cobertura run needs MSTest Workers=4 or TryAddValuesAsync times out ~22s
 - [#376 capstone scope-expansion layers](project_376_capstone_scope_expansion_layers.md) — 5 escalated layers past P2-T17 resolved via the 3 authorized patterns; stop-condition never triggered
 - [BOM breaks grep ^ anchor](project_bom_grep_anchor_false_negative.md) — bash grep `^#nullable` misses BOM-prefixed files; always use the Grep tool for opt-in/candidate classification, never bash grep
