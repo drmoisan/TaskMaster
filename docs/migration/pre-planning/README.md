@@ -8,6 +8,19 @@ This folder contains the working migration plan for replacing the legacy TaskMas
 
 The PWA can maintain and modify its own scoped mailbox projection while offline. It cannot directly rewrite Outlook's private native offline cache through supported Office.js or Graph APIs. After reconnection, queued operations are applied to Exchange and Outlook converges through its normal mailbox synchronization.
 
+## Read this before executing the prompts
+
+[Step 1 authoritative clarifications](step%2001/00%20current-architecture-and-tooling-clarifications.md) resolves terminology that changed as the architecture was refined. Where an older Step 1 note conflicts with that file, the clarification is authoritative.
+
+In particular:
+
+- reusable agents, schemas, validators, hooks, and commands belong in `drm-copilot` and remain domain-neutral;
+- TaskMaster-specific discovery truth remains in TaskMaster;
+- TMW-specific target architecture and implementation truth remains in TMW;
+- the Outlook add-in and companion PWA are separate clients;
+- Outlook Mobile add-in status and mobile PWA status are separate parity dimensions;
+- PWA offline parity must be substantive and cannot be reduced to queue insertion.
+
 ## Required execution order
 
 1. Complete and release the Step 1 and Step 2 reusable capabilities in `drm-copilot`.
@@ -30,12 +43,13 @@ The PWA can maintain and modify its own scoped mailbox projection while offline.
 
 ### Step 1 — Discovery and parity definition
 
-1. [Overview](step%2001/01%20overview.md)
-2. [Planned division of responsibilities](step%2001/02%20planned-division-of-responsibilities.md)
-3. [`drm-copilot` discovery tooling prompt](step%2001/03%20drm-copilot-tooling-prompt.md)
-4. [Remaining prompts and sequencing](step%2001/04%20remaining-prompts-and-sequencing.md)
-5. [TaskMaster Step 1 prompt](step%2001/04a%20TaskMaster-prompt.md)
-6. [TMW Step 1 prompt](step%2001/04b%20TMW-prompt.md)
+1. [Authoritative architecture and tooling clarifications](step%2001/00%20current-architecture-and-tooling-clarifications.md)
+2. [Overview](step%2001/01%20overview.md)
+3. [Planned division of responsibilities](step%2001/02%20planned-division-of-responsibilities.md)
+4. [`drm-copilot` discovery tooling prompt](step%2001/03%20drm-copilot-tooling-prompt.md)
+5. [Remaining prompts and sequencing](step%2001/04%20remaining-prompts-and-sequencing.md)
+6. [TaskMaster Step 1 prompt](step%2001/04a%20TaskMaster-prompt.md)
+7. [TMW Step 1 prompt](step%2001/04b%20TMW-prompt.md)
 
 ### Step 2 — Platform foundation
 
