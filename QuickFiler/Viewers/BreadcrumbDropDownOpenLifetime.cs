@@ -99,9 +99,7 @@ namespace QuickFiler.Viewers
                 lease = new BreadcrumbDropDownOpenLease(_generation, _cancellation.Task);
             }
             ScheduleObserved(() =>
-                IsLifecycleCurrent(lease, allowDisposed: false)
-                    ? operation()
-                    : Task.CompletedTask
+                IsLifecycleCurrent(lease, allowDisposed: false) ? operation() : Task.CompletedTask
             );
         }
 
@@ -146,14 +144,7 @@ namespace QuickFiler.Viewers
             }
             catch (Exception exception)
             {
-                try
-                {
-                    await HandleOpenFailureAsync(exception, lease).ConfigureAwait(false);
-                }
-                catch (Exception recoveryFailure)
-                {
-                    _uiOperations.Report(recoveryFailure);
-                }
+                await HandleOpenFailureAsync(exception, lease).ConfigureAwait(false);
             }
             finally
             {
@@ -358,10 +349,7 @@ namespace QuickFiler.Viewers
             }
         }
 
-        private bool IsLifecycleCurrent(
-            BreadcrumbDropDownOpenLease lease,
-            bool allowDisposed
-        )
+        private bool IsLifecycleCurrent(BreadcrumbDropDownOpenLease lease, bool allowDisposed)
         {
             lock (_sync)
             {

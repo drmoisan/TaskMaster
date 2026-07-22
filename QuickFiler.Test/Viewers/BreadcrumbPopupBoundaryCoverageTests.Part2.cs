@@ -302,8 +302,8 @@ namespace QuickFiler.Test.Viewers
             }
         }
 
-        /// <summary>Lifetime 153-156: a failing open failure-recovery dispatch is reported exactly once, the
-        /// shared open task completes as an unfaulted false, and the stored open task is cleared.</summary>
+        /// <summary>Lifetime: a failing open failure-recovery dispatch is reported exactly once by
+        /// HandleOpenFailureAsync's internal catch; the open task completes unfaulted false and is cleared.</summary>
         [TestMethod]
         public void OpenAsync_RecoveryDispatchFails_ReportsOnceAndClearsStoredOpenTask()
         {
