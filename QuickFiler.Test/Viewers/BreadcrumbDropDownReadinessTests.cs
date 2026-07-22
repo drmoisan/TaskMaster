@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FluentAssertions;
@@ -20,7 +21,7 @@ namespace QuickFiler.Test.Viewers
     public sealed class BreadcrumbDropDownReadinessTests
     {
         [TestMethod]
-        public async Task OpenAsync_ReadinessPendingDefersAttachmentReplayShowAndFocusUntilSuccess()
+        public void OpenAsync_ReadinessPendingDefersAttachmentReplayShowAndFocusUntilSuccess()
         {
             // Arrange
             ConstructorInfo constructor = RequireReadinessAwareConstructor();
@@ -43,7 +44,7 @@ namespace QuickFiler.Test.Viewers
 
                 // Act
                 harness.Readiness.SetResult(true);
-                bool opened = await opening;
+                bool opened = harness.DrainUntil(opening);
 
                 // Assert successful readiness
                 opened.Should().BeTrue();
@@ -69,7 +70,7 @@ namespace QuickFiler.Test.Viewers
         }
 
         [TestMethod]
-        public async Task OpenAsync_ReadinessFailureRollsBackDisposesPartialSurfaceAndReturnsFocusOnce()
+        public void OpenAsync_ReadinessFailureRollsBackDisposesPartialSurfaceAndReturnsFocusOnce()
         {
             // Arrange
             ConstructorInfo constructor = RequireReadinessAwareConstructor();
@@ -83,7 +84,7 @@ namespace QuickFiler.Test.Viewers
                 // Act
                 Task<bool> opening = harness.OpenAsync();
                 harness.Readiness.SetException(failure);
-                bool opened = await opening;
+                bool opened = harness.DrainUntil(opening);
 
                 // Assert
                 opened.Should().BeFalse();
@@ -117,34 +118,176 @@ namespace QuickFiler.Test.Viewers
             }
         }
 
+        [TestMethod]
+        public void CaptureCurrent_ControlledContext_CreatesOperationsWithoutInvokingWebView()
+        {
+            // Arrange
+            SynchronizationContext previous = SynchronizationContext.Current;
+            BreadcrumbPopupUiOperations operations;
+
+            // Act
+            try
+            {
+                SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+                operations = BreadcrumbPopupUiOperations.CaptureCurrent();
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previous);
+            }
+
+            // Assert
+            operations.Should().NotBeNull();
+        }
+
+        [DataTestMethod]
+        [DataRow(0, "initializer")]
+        [DataRow(1, "html")]
+        [DataRow(2, "operations")]
+        [DataRow(3, "initializer")]
+        [DataRow(4, "html")]
+        public void SurfaceFactory_InvalidArgumentsFailBeforeUiContextCapture(
+            int kind,
+            string parameter
+        )
+        {
+            var initializer = new Mock<IWebViewCoreInitializer>().Object;
+            BreadcrumbPopupUiOperations operations = CreateNoOpOperations(_ => { });
+            Action[] actions =
+            {
+                () => BreadcrumbWebViewSurfaceFactory.Create(null, "html"),
+                () => BreadcrumbWebViewSurfaceFactory.Create(initializer, null),
+                () => BreadcrumbWebViewSurfaceFactory.Create(initializer, "html", null),
+                () => BreadcrumbWebViewSurfaceFactory.Create(null, "html", operations),
+                () => BreadcrumbWebViewSurfaceFactory.Create(initializer, null, operations),
+            };
+            SynchronizationContext previous = SynchronizationContext.Current;
+            try
+            {
+                SynchronizationContext.SetSynchronizationContext(null);
+                actions[kind].Should().Throw<ArgumentNullException>().WithParameterName(parameter);
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previous);
+            }
+        }
+
+        [TestMethod]
+        public void RunAsync_NullAction_ThrowsArgumentNullException()
+        {
+            // Arrange
+            BreadcrumbPopupUiOperations operations = CreateNoOpOperations(_ => { });
+
+            // Act
+            Action runNull = () => operations.RunAsync((Action)null);
+
+            // Assert
+            runNull.Should().Throw<ArgumentNullException>().WithParameterName("action");
+        }
+
+        [TestMethod]
+        public void DisposeSurfaceAsync_NullSurface_ReturnsCompletedTask()
+        {
+            // Arrange
+            BreadcrumbPopupUiOperations operations = CreateNoOpOperations(_ => { });
+
+            // Act
+            Task cleanup = operations.DisposeSurfaceAsync(null, null);
+
+            // Assert
+            cleanup.Should().BeSameAs(Task.CompletedTask);
+        }
+
+        [TestMethod]
+        public async Task ObserveReadinessAsync_CancellationRethrowsWithoutReporting()
+        {
+            // Arrange
+            var observed = new List<Exception>();
+            BreadcrumbPopupUiOperations operations = CreateNoOpOperations(observed.Add);
+            var readiness = new TaskCompletionSource<bool>(
+                TaskCreationOptions.RunContinuationsAsynchronously
+            );
+            Task observation = operations.ObserveReadinessAsync(readiness.Task);
+
+            // Act
+            readiness.SetCanceled();
+            Func<Task> observeCancellation = () => observation;
+
+            // Assert
+            await observeCancellation.Should().ThrowAsync<OperationCanceledException>();
+            observed.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public async Task ObserveInitializationAsync_CancellationReportsIdenticalExceptionOnce()
+        {
+            // Arrange
+            var observed = new List<Exception>();
+            BreadcrumbPopupUiOperations operations = CreateNoOpOperations(observed.Add);
+            var initialization = new TaskCompletionSource<bool>(
+                TaskCreationOptions.RunContinuationsAsynchronously
+            );
+            Task observation = operations.ObserveInitializationAsync(initialization.Task);
+
+            // Act
+            initialization.SetCanceled();
+            Func<Task> observeCancellation = () => observation;
+            OperationCanceledException thrown = (
+                await observeCancellation.Should().ThrowAsync<OperationCanceledException>()
+            ).Which;
+
+            // Assert
+            observed.Should().ContainSingle().Which.Should().BeSameAs(thrown);
+        }
+
+        private static BreadcrumbPopupUiOperations CreateNoOpOperations(
+            Action<Exception> errorSink
+        ) =>
+            new BreadcrumbPopupUiOperations(
+                new BreadcrumbUiDispatcher(new SynchronizationContext(), errorSink),
+                () => null,
+                (initializer, control, environment) => Task.CompletedTask,
+                control => null,
+                (core, control, html) =>
+                    Tuple.Create<IWebViewMessenger, Task>(null, Task.CompletedTask),
+                (control, messenger) => { }
+            );
+
         private static ConstructorInfo RequireReadinessAwareConstructor()
         {
             Type factoryType = typeof(Func<
                 CoreWebView2Environment,
                 Task<Tuple<Control, IWebViewMessenger, Task>>
             >);
-            ConstructorInfo constructor = typeof(BreadcrumbDropDownHost).GetConstructor(
+            Type[] parameters =
+            {
+                typeof(Control),
+                typeof(CoreWebView2Environment),
+                factoryType,
+                typeof(Action),
+                typeof(Action),
+                typeof(Action),
+                typeof(Action<ToolStripDropDown, Control, Point>),
+            };
+            ConstructorInfo contract = typeof(BreadcrumbDropDownHost).GetConstructor(
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
                 null,
-                new[]
-                {
-                    typeof(Control),
-                    typeof(CoreWebView2Environment),
-                    factoryType,
-                    typeof(Action),
-                    typeof(Action),
-                    typeof(Action),
-                    typeof(Action<ToolStripDropDown, Control, Point>),
-                },
+                parameters,
                 null
             );
-            constructor
+            contract
                 .Should()
                 .NotBeNull(
                     "the popup host requires a readiness-aware surface contract before it can "
                         + "defer messenger exposure, cached replay, show, and focus"
                 );
-            return constructor;
+            return typeof(BreadcrumbDropDownHost).GetConstructor(
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                null,
+                parameters.Concat(new[] { typeof(BreadcrumbPopupUiOperations) }).ToArray(),
+                null
+            );
         }
 
         private static int CountType(IEnumerable<string> messages, string type) =>
@@ -152,11 +295,18 @@ namespace QuickFiler.Test.Viewers
 
         private sealed class ReadinessHarness : IDisposable
         {
-            private readonly BreadcrumbMessengerHub _hub = new BreadcrumbMessengerHub();
-            private readonly Panel _anchor = new Panel();
+            private readonly SynchronizationContext _previousContext;
+            private readonly PumpSynchronizationContext _context;
+            private readonly BreadcrumbMessengerHub _hub;
+            private readonly Panel _anchor;
 
             internal ReadinessHarness(ConstructorInfo constructor)
             {
+                _previousContext = SynchronizationContext.Current;
+                _context = new PumpSynchronizationContext();
+                SynchronizationContext.SetSynchronizationContext(_context);
+                _hub = new BreadcrumbMessengerHub();
+                _anchor = new Panel();
                 var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
                 Coordinator = new BreadcrumbBridgeCoordinator(
                     _hub,
@@ -171,6 +321,9 @@ namespace QuickFiler.Test.Viewers
                 > factory = CreateSurfaceAsync;
                 Action<ToolStripDropDown, Control, Point> show = (dropDown, owner, point) =>
                     ShowCount++;
+                var operations = new BreadcrumbPopupUiOperations(
+                    new BreadcrumbUiDispatcher(_context, _ => { })
+                );
                 Host = (BreadcrumbDropDownHost)
                     constructor.Invoke(
                         new object[]
@@ -186,6 +339,7 @@ namespace QuickFiler.Test.Viewers
                                 Coordinator.CancelSelector();
                             }),
                             show,
+                            operations,
                         }
                     );
                 Host.PopupMessengerReady += OnPopupMessengerReady;
@@ -223,12 +377,16 @@ namespace QuickFiler.Test.Viewers
                     new Size(390, 180)
                 );
 
+            internal bool DrainUntil(Task<bool> operation) => _context.DrainUntil(operation);
+
             public void Dispose()
             {
                 Host.PopupMessengerReady -= OnPopupMessengerReady;
                 Host.Dispose();
+                _context.DrainAll();
                 _hub.Dispose();
                 _anchor.Dispose();
+                SynchronizationContext.SetSynchronizationContext(_previousContext);
             }
 
             private Task<Tuple<Control, IWebViewMessenger, Task>> CreateSurfaceAsync(
@@ -259,6 +417,45 @@ namespace QuickFiler.Test.Viewers
             }
         }
 
+        private sealed class PumpSynchronizationContext : SynchronizationContext
+        {
+            private readonly Queue<Tuple<SendOrPostCallback, object>> _pending =
+                new Queue<Tuple<SendOrPostCallback, object>>();
+
+            public override void Post(SendOrPostCallback callback, object state)
+            {
+                lock (_pending)
+                    _pending.Enqueue(Tuple.Create(callback, state));
+            }
+
+            internal T DrainUntil<T>(Task<T> operation)
+            {
+                while (!operation.IsCompleted)
+                    if (!DrainOne())
+                        Thread.Yield();
+                while (DrainOne()) { }
+                return operation.GetAwaiter().GetResult();
+            }
+
+            internal void DrainAll()
+            {
+                while (DrainOne()) { }
+            }
+
+            private bool DrainOne()
+            {
+                Tuple<SendOrPostCallback, object> work;
+                lock (_pending)
+                {
+                    if (_pending.Count == 0)
+                        return false;
+                    work = _pending.Dequeue();
+                }
+                work.Item1(work.Item2);
+                return true;
+            }
+        }
+
         private sealed class TrackingControl : Panel
         {
             internal int DisposeCount { get; private set; }
@@ -266,9 +463,7 @@ namespace QuickFiler.Test.Viewers
             protected override void Dispose(bool disposing)
             {
                 if (disposing && !IsDisposed)
-                {
                     DisposeCount++;
-                }
                 base.Dispose(disposing);
             }
         }
@@ -297,13 +492,7 @@ namespace QuickFiler.Test.Viewers
 
             public void PostJson(string json) => Posted.Add(json);
 
-            public void Dispose()
-            {
-                if (DisposeCount == 0)
-                {
-                    DisposeCount++;
-                }
-            }
+            public void Dispose() => DisposeCount = 1;
         }
     }
 }

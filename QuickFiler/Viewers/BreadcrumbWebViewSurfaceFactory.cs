@@ -1,10 +1,8 @@
 #nullable enable
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Web.WebView2.Core;
-using Microsoft.Web.WebView2.WinForms;
 
 namespace QuickFiler.Viewers
 {
@@ -169,105 +167,60 @@ namespace QuickFiler.Viewers
                 throw new ArgumentNullException(nameof(initializer));
             if (html == null)
                 throw new ArgumentNullException(nameof(html));
-            return environment => CreateSurfaceAsync(initializer, environment, html);
+            return Create(initializer, html, BreadcrumbPopupUiOperations.CaptureCurrent());
         }
 
-        // Direct third-party adapter; lifecycle behavior is tested through the injected factory.
-        [ExcludeFromCodeCoverage]
+        internal static ReadySurfaceFactory Create(
+            IWebViewCoreInitializer initializer,
+            string html,
+            BreadcrumbPopupUiOperations operations
+        )
+        {
+            if (initializer == null)
+                throw new ArgumentNullException(nameof(initializer));
+            if (html == null)
+                throw new ArgumentNullException(nameof(html));
+            if (operations == null)
+                throw new ArgumentNullException(nameof(operations));
+            return environment => CreateSurfaceAsync(initializer, environment, html, operations);
+        }
+
         private static async Task<ReadySurface> CreateSurfaceAsync(
             IWebViewCoreInitializer initializer,
             CoreWebView2Environment environment,
-            string html
+            string html,
+            BreadcrumbPopupUiOperations operations
         )
         {
-            var webView = new WebView2 { Dock = DockStyle.Fill };
+            Control? control = null;
+            IWebViewMessenger? messenger = null;
             try
             {
-                await initializer.EnsureCoreWebView2Async(webView, environment);
-                CoreWebView2 core =
-                    webView.CoreWebView2
-                    ?? throw new InvalidOperationException(
-                        "Popup CoreWebView2 initialization completed without a core instance."
-                    );
-                BreadcrumbNavigationReadiness readiness = NavigateToDocument(
-                    core,
-                    webView,
-                    () => webView.NavigateToString(html),
-                    "Popup"
-                );
+                control = await operations.CreateControlAsync().ConfigureAwait(false);
+                Task initialization = await operations
+                    .BeginInitializationAsync(initializer, control, environment)
+                    .ConfigureAwait(false);
+                await operations.ObserveInitializationAsync(initialization).ConfigureAwait(false);
+                CoreWebView2 core = await operations.ReadCoreAsync(control).ConfigureAwait(false);
+                Tuple<IWebViewMessenger, Task> navigation = await operations
+                    .BeginNavigationAsync(core, control, html)
+                    .ConfigureAwait(false);
+                messenger = navigation.Item1;
+                Task readiness = operations.ObserveReadinessAsync(navigation.Item2);
                 return Tuple.Create<Control, IWebViewMessenger, Task>(
-                    webView,
-                    new WebView2Messenger(core),
-                    readiness.Completion
+                    control,
+                    messenger,
+                    readiness
                 );
             }
             catch
             {
-                webView.Dispose();
+                await operations
+                    .DisposeSurfaceAfterFailureAsync(control, messenger)
+                    .ConfigureAwait(false);
                 throw;
             }
         }
 
-        /// <summary>
-        /// Registers handlers before navigation and returns the shared exact-ID readiness lifetime.
-        /// The caller may dispose the lifetime to cancel and detach a reset navigation.
-        /// </summary>
-        // Direct third-party event adapter; host-neutral correlation is covered through the lease.
-        [ExcludeFromCodeCoverage]
-        internal static BreadcrumbNavigationReadiness NavigateToDocument(
-            CoreWebView2 core,
-            Control owner,
-            Action navigate,
-            string surfaceName
-        )
-        {
-            if (core == null)
-                throw new ArgumentNullException(nameof(core));
-            if (owner == null)
-                throw new ArgumentNullException(nameof(owner));
-            if (navigate == null)
-                throw new ArgumentNullException(nameof(navigate));
-
-            BreadcrumbNavigationReadiness? readiness = null;
-
-            void DetachHandlers()
-            {
-                core.NavigationStarting -= OnNavigationStarting;
-                core.NavigationCompleted -= OnNavigationCompleted;
-                owner.Disposed -= OnDisposed;
-            }
-
-            void OnNavigationStarting(
-                object? sender,
-                CoreWebView2NavigationStartingEventArgs args
-            ) => readiness?.NavigationStarted(args.NavigationId);
-
-            void OnNavigationCompleted(
-                object? sender,
-                CoreWebView2NavigationCompletedEventArgs args
-            ) =>
-                readiness?.NavigationCompleted(
-                    args.NavigationId,
-                    args.IsSuccess,
-                    args.WebErrorStatus.ToString()
-                );
-
-            void OnDisposed(object? sender, EventArgs args) => readiness?.Cancel();
-
-            readiness = new BreadcrumbNavigationReadiness(surfaceName, DetachHandlers);
-            try
-            {
-                core.NavigationStarting += OnNavigationStarting;
-                core.NavigationCompleted += OnNavigationCompleted;
-                owner.Disposed += OnDisposed;
-                readiness.BeginNavigation(navigate);
-                return readiness;
-            }
-            catch
-            {
-                readiness.Dispose();
-                throw;
-            }
-        }
     }
 }

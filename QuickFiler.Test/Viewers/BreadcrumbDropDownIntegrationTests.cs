@@ -120,15 +120,15 @@ namespace QuickFiler.Test.Viewers
                     .Viewer.BreadcrumbCoordinator.HandleSelectorKey(BreadcrumbSelectorKey.Down)
                     .Should()
                     .BeTrue();
-                harness.Viewer.BreadcrumbCoordinator.CommittedIdentity.Should().Be("A");
-                harness.Viewer.BreadcrumbCoordinator.PendingIdentity.Should().Be("B");
+                harness.Viewer.BreadcrumbCoordinator.CommittedIdentity.Should().Be("plain:0:A");
+                harness.Viewer.BreadcrumbCoordinator.PendingIdentity.Should().Be("plain:1:B");
 
                 // Act
                 harness.RaiseNativeClose();
 
                 // Assert
                 harness.Viewer.BreadcrumbCoordinator.IsSelectorOpen.Should().BeFalse();
-                harness.Viewer.BreadcrumbCoordinator.CommittedIdentity.Should().Be("A");
+                harness.Viewer.BreadcrumbCoordinator.CommittedIdentity.Should().Be("plain:0:A");
                 harness.Viewer.BreadcrumbCoordinator.PendingIdentity.Should().BeNull();
                 harness.Viewer.GetSelectedFolder().Should().Be("A");
                 selections.Should().Be(0);

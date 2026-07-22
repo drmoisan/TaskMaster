@@ -6,23 +6,21 @@ using System.Windows.Forms;
 using Microsoft.Web.WebView2.Core;
 using QuickFiler.Viewers;
 using UtilitiesCS.OutlookObjects.Folder;
+using BreadcrumbViewMode = UtilitiesCS.OutlookObjects.Folder.BreadcrumbSelectorViewMode;
 
 namespace QuickFiler
 {
-    // WinForms ownership and lifecycle glue for the host-neutral breadcrumb selector. The
-    // coordinator owns selection behavior; this partial owns the collapsed WebView, native popup,
-    // two-surface messenger hub, and deterministic pooled-viewer cleanup.
+    /// <summary>Owns the WinForms surfaces and lifecycle glue for the breadcrumb selector.</summary>
     public partial class ItemViewer
     {
         private BreadcrumbMessengerHub _breadcrumbHub;
         private BreadcrumbCollapsedSurfaceController _breadcrumbCollapsedSurfaceController;
         private BreadcrumbCollapsedAttachment _breadcrumbCollapsedAttachment;
         private IWebViewMessenger _breadcrumbMessenger;
-        private IWebViewMessenger _breadcrumbPopupMessenger;
-        private IBreadcrumbDropDownHost _breadcrumbDropDownHost;
-        private Func<Rectangle> _breadcrumbAnchorBounds;
-        private Func<Rectangle> _breadcrumbWorkingArea;
+        private IWebViewMessenger _popupMessenger;
+        private BreadcrumbDropDownOpenCoordinator _breadcrumbDropDownOpenCoordinator;
         private BreadcrumbResourceOwner _breadcrumbResourceOwner;
+        private BreadcrumbPopupUiOperations _breadcrumbPopupUiOperations;
 
         /// <summary>The Designer-declared breadcrumb WebView2 occupying the old CboFolders cell.</summary>
         public Microsoft.Web.WebView2.WinForms.WebView2 L0vhBreadcrumb_WebView2
@@ -31,19 +29,18 @@ namespace QuickFiler
             set => _l0vhBreadcrumb_WebView2 = value;
         }
 
-        /// <summary>The breadcrumb coordinator after the controller initializes the pipeline.</summary>
         internal BreadcrumbBridgeCoordinator BreadcrumbCoordinator { get; private set; }
+        internal IBreadcrumbDropDownHost BreadcrumbDropDownHost =>
+            _breadcrumbDropDownOpenCoordinator?.Host;
 
-        /// <summary>The ItemViewer-owned native popup host.</summary>
-        internal IBreadcrumbDropDownHost BreadcrumbDropDownHost => _breadcrumbDropDownHost;
+        internal Task<bool> BreadcrumbOpenTask =>
+            _breadcrumbDropDownOpenCoordinator?.CurrentOpenTask ?? Task.FromResult(false);
 
-        /// <summary>Raised when the breadcrumb reports an arrow it could not consume.</summary>
         internal event EventHandler<BreadcrumbArrowDirection> BreadcrumbUnhandledArrow;
 
         private EventHandler _folderSelectionChangedHandlers;
         private KeyEventHandler _folderKeyDownHandlers;
 
-        /// <summary>Creates the idempotent two-surface hub and host-neutral coordinator.</summary>
         internal void InitializeBreadcrumbPipeline(IFolderHierarchyProvider provider)
         {
             if (BreadcrumbCoordinator != null)
@@ -58,19 +55,23 @@ namespace QuickFiler
                 _breadcrumbHub,
                 _breadcrumbCollapsedSurfaceController
             );
-            BreadcrumbCoordinator = new BreadcrumbBridgeCoordinator(_breadcrumbHub, provider);
+            var dispatcher = BreadcrumbUiDispatcher.CaptureCurrent();
+            _breadcrumbPopupUiOperations = new BreadcrumbPopupUiOperations(dispatcher);
+            BreadcrumbCoordinator = new BreadcrumbBridgeCoordinator(
+                _breadcrumbHub,
+                provider,
+                dispatcher
+            );
             BreadcrumbCoordinator.SelectionChanged += OnBreadcrumbSelectionChanged;
             BreadcrumbCoordinator.FolderArrowKeyDown += OnBreadcrumbFolderArrowKeyDown;
             BreadcrumbCoordinator.UnhandledArrow += OnBreadcrumbUnhandledArrow;
             BreadcrumbCoordinator.SelectorOpenStateChanged += OnBreadcrumbSelectorOpenStateChanged;
         }
 
-        /// <summary>Starts one correlated navigation for the persistent collapsed surface.</summary>
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal Task<bool> AttachBreadcrumbWebViewAsync() =>
             AttachBreadcrumbWebViewAsync(CreateCollapsedBreadcrumbCandidate);
 
-        /// <summary>Starts collapsed attachment through an injectable navigation boundary.</summary>
         internal Task<bool> AttachBreadcrumbWebViewAsync(
             Func<Tuple<IWebViewMessenger, BreadcrumbNavigationReadiness>> candidateFactory
         )
@@ -86,12 +87,15 @@ namespace QuickFiler
             BreadcrumbNavigationReadiness
         > CreateCollapsedBreadcrumbCandidate()
         {
-            var messenger = new WebView2Messenger(_l0vhBreadcrumb_WebView2.CoreWebView2);
+            CoreWebView2 core = _l0vhBreadcrumb_WebView2.CoreWebView2;
+            BreadcrumbUiDispatcher dispatcher = BreadcrumbUiDispatcher.CaptureCurrent();
+            var messenger = new WebView2Messenger(core, dispatcher);
             try
             {
                 BreadcrumbNavigationReadiness readiness =
-                    BreadcrumbWebViewSurfaceFactory.NavigateToDocument(
-                        _l0vhBreadcrumb_WebView2.CoreWebView2,
+                    BreadcrumbPopupUiOperations.NavigateToDocument(
+                        dispatcher,
+                        core,
                         _l0vhBreadcrumb_WebView2,
                         () =>
                             _l0vhBreadcrumb_WebView2.NavigateToString(
@@ -111,7 +115,6 @@ namespace QuickFiler
             }
         }
 
-        /// <summary>Testable attachment boundary shared with the production navigation adapter.</summary>
         internal Task<bool> AttachBreadcrumbMessengerWhenReadyAsync(
             IWebViewMessenger messenger,
             BreadcrumbNavigationReadiness readiness
@@ -130,7 +133,6 @@ namespace QuickFiler
             );
         }
 
-        /// <summary>Attaches the collapsed surface exactly once, replacing any prior surface.</summary>
         internal void AttachBreadcrumbMessenger(IWebViewMessenger messenger)
         {
             if (messenger == null)
@@ -143,36 +145,22 @@ namespace QuickFiler
                     "The breadcrumb pipeline must be initialized before attaching a surface."
                 );
             }
-            if (ReferenceEquals(_breadcrumbMessenger, messenger))
-            {
-                _breadcrumbHub.Attach(messenger, BreadcrumbSelectorViewMode.Collapsed);
-                return;
-            }
-
-            if (_breadcrumbMessenger != null)
-            {
-                _breadcrumbHub.Detach(_breadcrumbMessenger);
-                _breadcrumbMessenger = null;
-            }
-            if (_breadcrumbHub.Attach(messenger, BreadcrumbSelectorViewMode.Collapsed))
-            {
-                _breadcrumbMessenger = messenger;
-            }
+            AttachBreadcrumbSurface(messenger, BreadcrumbViewMode.Collapsed, ref _breadcrumbMessenger);
         }
 
-        /// <summary>Creates the production lazy popup using the controller's existing environment.</summary>
         internal void ConfigureBreadcrumbDropDown(
             CoreWebView2Environment environment,
             IWebViewCoreInitializer initializer
         )
         {
             if (
-                _breadcrumbDropDownHost is BreadcrumbDropDownHost existing
+                BreadcrumbDropDownHost is BreadcrumbDropDownHost existing
                 && ReferenceEquals(existing.Environment, environment)
             )
             {
                 return;
             }
+            BreadcrumbPopupUiOperations operations = _breadcrumbPopupUiOperations;
             BreadcrumbDropDownHost host = null;
             host = new BreadcrumbDropDownHost(
                 _l0vhBreadcrumb_WebView2,
@@ -180,8 +168,9 @@ namespace QuickFiler
                 initializer,
                 Properties.Resources.FolderBreadcrumb,
                 () => host.ControlHost?.Control.Focus(),
-                FocusBreadcrumb,
-                () => BreadcrumbCoordinator?.CancelSelector()
+                FocusBreadcrumbCore,
+                () => BreadcrumbCoordinator?.CancelSelector(),
+                operations
             );
             ConfigureBreadcrumbDropDown(
                 host,
@@ -193,7 +182,6 @@ namespace QuickFiler
             );
         }
 
-        /// <summary>Configures deterministic host and placement seams for the ItemViewer.</summary>
         internal void ConfigureBreadcrumbDropDown(
             IBreadcrumbDropDownHost host,
             Func<Rectangle> anchorBounds,
@@ -204,35 +192,53 @@ namespace QuickFiler
             {
                 throw new ArgumentNullException(nameof(host));
             }
-            _breadcrumbAnchorBounds =
-                anchorBounds ?? throw new ArgumentNullException(nameof(anchorBounds));
-            _breadcrumbWorkingArea =
-                workingArea ?? throw new ArgumentNullException(nameof(workingArea));
+            _ = anchorBounds ?? throw new ArgumentNullException(nameof(anchorBounds));
+            _ = workingArea ?? throw new ArgumentNullException(nameof(workingArea));
+            _breadcrumbPopupUiOperations ??= BreadcrumbPopupUiOperations.CaptureCurrentOrTests();
             EnsureBreadcrumbResourceOwnership();
 
-            if (!ReferenceEquals(_breadcrumbDropDownHost, host))
+            _ = _breadcrumbPopupUiOperations.PostAsync(() =>
             {
-                ReleaseBreadcrumbDropDownHost();
-                _breadcrumbDropDownHost = host;
-            }
-
-            host.PopupMessengerReady -= OnBreadcrumbPopupMessengerReady;
-            host.PopupMessengerReady += OnBreadcrumbPopupMessengerReady;
-            if (host.PopupMessenger != null)
-            {
-                AttachBreadcrumbPopupMessenger(host.PopupMessenger);
-            }
+                if (!ReferenceEquals(_breadcrumbDropDownOpenCoordinator?.Host, host))
+                {
+                    ReleaseBreadcrumbDropDownHostCore();
+                    _breadcrumbDropDownOpenCoordinator =
+                        new BreadcrumbDropDownOpenCoordinator(
+                            _breadcrumbPopupUiOperations,
+                            host,
+                            anchorBounds,
+                            workingArea,
+                            () => BreadcrumbCoordinator?.GetFolderItems().Length ?? 0,
+                            () => BreadcrumbCoordinator?.IsSelectorOpen == true,
+                            () => BreadcrumbCoordinator?.OpenSelector() == true,
+                            () => BreadcrumbCoordinator?.CancelSelector(),
+                            () => DetachBreadcrumbMessenger(ref _popupMessenger)
+                        );
+                }
+                else
+                    _breadcrumbDropDownOpenCoordinator.UpdateRequestProviders(
+                        anchorBounds,
+                        workingArea
+                    );
+                host.PopupMessengerReady -= OnBreadcrumbPopupMessengerReady;
+                host.PopupMessengerReady += OnBreadcrumbPopupMessengerReady;
+                if (host.PopupMessenger != null)
+                    AttachBreadcrumbPopupMessenger(host.PopupMessenger);
+            });
         }
 
-        /// <summary>Routes a theme update to both selector surfaces and the native host.</summary>
         internal void SetBreadcrumbTheme(string theme)
         {
             BreadcrumbCoordinator?.SetTheme(theme);
-            _breadcrumbDropDownHost?.SetTheme(theme);
+            BreadcrumbDropDownHost?.SetTheme(theme);
         }
 
-        /// <summary>Moves focus to the persistent collapsed selector.</summary>
         internal void FocusBreadcrumb()
+        {
+            DispatchBreadcrumbPopup(FocusBreadcrumbCore);
+        }
+
+        private void FocusBreadcrumbCore()
         {
             if (
                 !IsDisposed
@@ -244,10 +250,9 @@ namespace QuickFiler
             }
         }
 
-        /// <summary>Opens or closes the native selector with combo-box session semantics.</summary>
         internal void SetBreadcrumbDropDownState(bool droppedDown)
         {
-            if (BreadcrumbCoordinator == null)
+            if (_breadcrumbDropDownOpenCoordinator == null)
             {
                 if (droppedDown)
                 {
@@ -255,44 +260,13 @@ namespace QuickFiler
                 }
                 return;
             }
-
-            if (droppedDown)
-            {
-                if (
-                    !BreadcrumbCoordinator.OpenSelector()
-                    && _breadcrumbDropDownHost?.IsOpen == true
-                )
-                {
-                    _ = OpenBreadcrumbDropDownAsync();
-                }
-                return;
-            }
-
-            if (_breadcrumbDropDownHost?.IsOpen == true)
-            {
-                _breadcrumbDropDownHost.Close(BreadcrumbDropDownCloseReason.Uncommitted);
-            }
-            else
-            {
-                BreadcrumbCoordinator.CancelSelector();
-            }
+            _breadcrumbDropDownOpenCoordinator.SetDroppedDown(droppedDown);
         }
 
-        /// <summary>Cancels open work, releases the lazy popup surface, and clears pooled state.</summary>
         internal void ResetBreadcrumb()
         {
-            if (_breadcrumbDropDownHost?.IsOpen == true)
-            {
-                _breadcrumbDropDownHost.Close(BreadcrumbDropDownCloseReason.Uncommitted);
-            }
-            else
-            {
-                BreadcrumbCoordinator?.CancelSelector();
-            }
-
-            DetachBreadcrumbPopupMessenger();
-            _breadcrumbDropDownHost?.Reset();
-            DetachBreadcrumbMessenger();
+            _breadcrumbDropDownOpenCoordinator?.Reset();
+            DetachBreadcrumbMessenger(ref _breadcrumbMessenger);
             _breadcrumbCollapsedAttachment?.Reset();
             BreadcrumbCoordinator?.Clear();
         }
@@ -316,54 +290,17 @@ namespace QuickFiler
             BreadcrumbArrowDirection direction
         ) => BreadcrumbUnhandledArrow?.Invoke(this, direction);
 
-        private async void OnBreadcrumbSelectorOpenStateChanged(object sender, EventArgs e)
-        {
-            if (BreadcrumbCoordinator?.IsSelectorOpen == true)
-            {
-                await OpenBreadcrumbDropDownAsync();
-            }
-            else if (_breadcrumbDropDownHost?.IsOpen == true)
-            {
-                // The coordinator has already committed or rolled back. This close only dismisses
-                // the native surface and must not apply a second selection transition.
-                _breadcrumbDropDownHost.Close(BreadcrumbDropDownCloseReason.ExplicitCommit);
-            }
-        }
-
-        private async Task<bool> OpenBreadcrumbDropDownAsync()
-        {
-            IBreadcrumbDropDownHost host = _breadcrumbDropDownHost;
-            Func<Rectangle> anchorBounds = _breadcrumbAnchorBounds;
-            Func<Rectangle> workingArea = _breadcrumbWorkingArea;
-            if (host == null || anchorBounds == null || workingArea == null)
-            {
-                FocusBreadcrumb();
-                BreadcrumbCoordinator?.CancelSelector();
-                return false;
-            }
-
-            Rectangle anchor = anchorBounds();
-            int rowCount = BreadcrumbCoordinator?.GetFolderItems().Length ?? 0;
-            var desiredSize = new Size(anchor.Width, Math.Min(320, Math.Max(120, rowCount * 26)));
-            bool opened = await host.OpenAsync(anchor, workingArea(), desiredSize);
-            if (!opened)
-            {
-                BreadcrumbCoordinator?.CancelSelector();
-            }
-            else if (BreadcrumbCoordinator?.IsSelectorOpen != true && host.IsOpen)
-            {
-                host.Close(BreadcrumbDropDownCloseReason.ExplicitCommit);
-            }
-            return opened;
-        }
+        private void OnBreadcrumbSelectorOpenStateChanged(object sender, EventArgs e) =>
+            _breadcrumbDropDownOpenCoordinator?.HandleSelectorOpenStateChanged();
 
         private void OnBreadcrumbPopupMessengerReady(object sender, EventArgs e)
         {
-            IWebViewMessenger messenger = _breadcrumbDropDownHost?.PopupMessenger;
-            if (messenger != null)
+            _ = _breadcrumbPopupUiOperations.PostAsync(() =>
             {
-                AttachBreadcrumbPopupMessenger(messenger);
-            }
+                IWebViewMessenger messenger = BreadcrumbDropDownHost?.PopupMessenger;
+                if (messenger != null)
+                    AttachBreadcrumbPopupMessenger(messenger);
+            });
         }
 
         private void AttachBreadcrumbPopupMessenger(IWebViewMessenger messenger)
@@ -372,50 +309,55 @@ namespace QuickFiler
             {
                 return;
             }
-            if (ReferenceEquals(_breadcrumbPopupMessenger, messenger))
+            AttachBreadcrumbSurface(messenger, BreadcrumbViewMode.Expanded, ref _popupMessenger);
+        }
+
+        private void AttachBreadcrumbSurface(
+            IWebViewMessenger messenger,
+            BreadcrumbViewMode mode,
+            ref IWebViewMessenger slot
+        )
+        {
+            if (ReferenceEquals(slot, messenger))
             {
-                _breadcrumbHub.Attach(messenger, BreadcrumbSelectorViewMode.Expanded);
+                _breadcrumbHub.Attach(messenger, mode);
                 return;
             }
-
-            DetachBreadcrumbPopupMessenger();
-            if (_breadcrumbHub.Attach(messenger, BreadcrumbSelectorViewMode.Expanded))
+            DetachBreadcrumbMessenger(ref slot);
+            if (_breadcrumbHub.Attach(messenger, mode))
             {
-                _breadcrumbPopupMessenger = messenger;
+                slot = messenger;
             }
         }
 
-        private void DetachBreadcrumbMessenger()
+        private void DetachBreadcrumbMessenger(ref IWebViewMessenger messenger)
         {
-            if (_breadcrumbMessenger == null)
-            {
+            if (messenger == null)
                 return;
-            }
-            _breadcrumbHub?.Detach(_breadcrumbMessenger);
-            _breadcrumbMessenger = null;
+            _breadcrumbHub?.Detach(messenger);
+            messenger = null;
         }
 
-        private void DetachBreadcrumbPopupMessenger()
+        private void DispatchBreadcrumbPopup(Action action)
         {
-            if (_breadcrumbPopupMessenger == null)
+            if (_breadcrumbPopupUiOperations == null)
             {
+                action();
                 return;
             }
-            _breadcrumbHub?.Detach(_breadcrumbPopupMessenger);
-            _breadcrumbPopupMessenger = null;
+            _ = _breadcrumbPopupUiOperations.PostAsync(action);
         }
 
-        private void ReleaseBreadcrumbDropDownHost()
+        private void ReleaseBreadcrumbDropDownHostCore()
         {
-            if (_breadcrumbDropDownHost == null)
-            {
+            BreadcrumbDropDownOpenCoordinator coordinator =
+                _breadcrumbDropDownOpenCoordinator;
+            if (coordinator == null)
                 return;
-            }
 
-            _breadcrumbDropDownHost.PopupMessengerReady -= OnBreadcrumbPopupMessengerReady;
-            DetachBreadcrumbPopupMessenger();
-            _breadcrumbDropDownHost.Dispose();
-            _breadcrumbDropDownHost = null;
+            coordinator.Host.PopupMessengerReady -= OnBreadcrumbPopupMessengerReady;
+            coordinator.Release();
+            _breadcrumbDropDownOpenCoordinator = null;
         }
 
         private void EnsureBreadcrumbResourceOwnership()
@@ -441,11 +383,11 @@ namespace QuickFiler
                     OnBreadcrumbSelectorOpenStateChanged;
             }
 
-            DetachBreadcrumbMessenger();
+            DetachBreadcrumbMessenger(ref _breadcrumbMessenger);
             _breadcrumbCollapsedAttachment?.Dispose();
             _breadcrumbCollapsedAttachment = null;
             _breadcrumbCollapsedSurfaceController = null;
-            ReleaseBreadcrumbDropDownHost();
+            DispatchBreadcrumbPopup(ReleaseBreadcrumbDropDownHostCore);
             _breadcrumbHub?.Dispose();
             _breadcrumbHub = null;
             BreadcrumbCoordinator = null;

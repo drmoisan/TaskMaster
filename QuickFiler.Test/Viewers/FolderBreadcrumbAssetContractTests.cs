@@ -178,7 +178,11 @@ namespace QuickFiler.Test.Viewers
             using (var hub = new BreadcrumbMessengerHub())
             {
                 hub.Attach(surface.Object, BreadcrumbSelectorViewMode.Expanded);
-                var coordinator = new BreadcrumbBridgeCoordinator(hub, provider.Object);
+                var coordinator = new BreadcrumbBridgeCoordinator(
+                    hub,
+                    provider.Object,
+                    BreadcrumbUiDispatcher.CreateForCurrentThreadTests()
+                );
                 coordinator.SetSuggestions(
                     new[]
                     {

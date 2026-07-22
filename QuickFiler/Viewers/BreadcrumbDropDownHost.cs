@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -12,31 +11,30 @@ namespace QuickFiler.Viewers
         CoreWebView2Environment,
         Task<Tuple<Control, IWebViewMessenger>>
     >;
-    using ReadySurface = Tuple<Control, IWebViewMessenger, Task>;
     using ReadySurfaceFactory = Func<
         CoreWebView2Environment,
         Task<Tuple<Control, IWebViewMessenger, Task>>
     >;
 
-    /// <summary>Owns the ItemViewer-scoped popup and its lazy WebView surface.</summary>
+    /// <summary>Owns the native popup and its lazily created breadcrumb surface.</summary>
     public sealed class BreadcrumbDropDownHost : IBreadcrumbDropDownHost
     {
         private readonly ReadySurfaceFactory _surfaceFactory;
+        private readonly BreadcrumbPopupUiOperations _uiOperations;
+        private readonly BreadcrumbDropDownOpenLifetime _openLifetime;
         private readonly Action _focusPending;
         private readonly Action _focusAnchor;
         private readonly Action _cancelSelection;
         private readonly Action<ToolStripDropDown, Control, Point> _showPopup;
+        private readonly Action<ToolStripDropDown, ToolStripDropDownCloseReason> _closePopup;
         private ToolStripControlHost? _controlHost;
         private Control? _popupControl;
         private IWebViewMessenger? _popupMessenger;
-        private TaskCompletionSource<bool> _lifecycleCancellation = NewCompletionSource();
-        private Task<bool>? _openTask;
-        private long _lifecycleGeneration;
         private bool _isOpen;
         private bool _programmaticClose;
         private bool _disposed;
 
-        /// <summary>Creates the lazy production popup using the existing WebView environment.</summary>
+        /// <summary>Creates a production popup host on the current UI boundary.</summary>
         public BreadcrumbDropDownHost(
             Control anchor,
             CoreWebView2Environment environment,
@@ -49,14 +47,36 @@ namespace QuickFiler.Viewers
             : this(
                 anchor,
                 environment,
-                BreadcrumbWebViewSurfaceFactory.Create(initializer, html),
+                initializer ?? throw new ArgumentNullException(nameof(initializer)),
+                html ?? throw new ArgumentNullException(nameof(html)),
                 focusPending,
                 focusAnchor,
                 cancelSelection,
-                ShowOwnedPopup
+                BreadcrumbPopupUiOperations.CaptureCurrent()
             ) { }
 
-        /// <summary>Creates a host with legacy surface and display seams for unit tests.</summary>
+        internal BreadcrumbDropDownHost(
+            Control anchor,
+            CoreWebView2Environment environment,
+            IWebViewCoreInitializer initializer,
+            string html,
+            Action focusPending,
+            Action focusAnchor,
+            Action cancelSelection,
+            BreadcrumbPopupUiOperations operations
+        )
+            : this(
+                anchor,
+                environment,
+                BreadcrumbWebViewSurfaceFactory.Create(initializer, html, operations),
+                focusPending,
+                focusAnchor,
+                cancelSelection,
+                BreadcrumbPopupUiOperations.ShowOwnedPopup,
+                operations
+            ) { }
+
+        /// <summary>Creates a popup host using a host-neutral surface factory seam.</summary>
         public BreadcrumbDropDownHost(
             Control anchor,
             CoreWebView2Environment environment,
@@ -69,14 +89,16 @@ namespace QuickFiler.Viewers
             : this(
                 anchor,
                 environment,
-                NormalizeFactory(surfaceFactory),
+                BreadcrumbPopupUiOperations.NormalizeFactory(
+                    surfaceFactory ?? throw new ArgumentNullException(nameof(surfaceFactory))
+                ),
                 focusPending,
                 focusAnchor,
                 cancelSelection,
-                showPopup
+                showPopup,
+                BreadcrumbPopupUiOperations.CaptureCurrentOrTests()
             ) { }
 
-        /// <summary>Creates a host whose surface reports document readiness separately.</summary>
         internal BreadcrumbDropDownHost(
             Control anchor,
             CoreWebView2Environment environment,
@@ -85,6 +107,50 @@ namespace QuickFiler.Viewers
             Action focusAnchor,
             Action cancelSelection,
             Action<ToolStripDropDown, Control, Point> showPopup
+        )
+            : this(
+                anchor,
+                environment,
+                surfaceFactory,
+                focusPending,
+                focusAnchor,
+                cancelSelection,
+                showPopup,
+                BreadcrumbPopupUiOperations.CaptureCurrentOrTests()
+            ) { }
+
+        internal BreadcrumbDropDownHost(
+            Control anchor,
+            CoreWebView2Environment environment,
+            ReadySurfaceFactory surfaceFactory,
+            Action focusPending,
+            Action focusAnchor,
+            Action cancelSelection,
+            Action<ToolStripDropDown, Control, Point> showPopup,
+            BreadcrumbPopupUiOperations operations
+        )
+            : this(
+                anchor,
+                environment,
+                surfaceFactory,
+                focusPending,
+                focusAnchor,
+                cancelSelection,
+                showPopup,
+                operations,
+                (popup, reason) => popup.Close(reason)
+            ) { }
+
+        internal BreadcrumbDropDownHost(
+            Control anchor,
+            CoreWebView2Environment environment,
+            ReadySurfaceFactory surfaceFactory,
+            Action focusPending,
+            Action focusAnchor,
+            Action cancelSelection,
+            Action<ToolStripDropDown, Control, Point> showPopup,
+            BreadcrumbPopupUiOperations operations,
+            Action<ToolStripDropDown, ToolStripDropDownCloseReason> closePopup
         )
         {
             Anchor = anchor ?? throw new ArgumentNullException(nameof(anchor));
@@ -96,7 +162,8 @@ namespace QuickFiler.Viewers
             _cancelSelection =
                 cancelSelection ?? throw new ArgumentNullException(nameof(cancelSelection));
             _showPopup = showPopup ?? throw new ArgumentNullException(nameof(showPopup));
-
+            _closePopup = closePopup ?? throw new ArgumentNullException(nameof(closePopup));
+            _uiOperations = operations ?? throw new ArgumentNullException(nameof(operations));
             DropDown = new ToolStripDropDown
             {
                 AutoClose = true,
@@ -104,18 +171,19 @@ namespace QuickFiler.Viewers
                 Padding = Padding.Empty,
             };
             DropDown.Closed += OnDropDownClosed;
+            _openLifetime = new BreadcrumbDropDownOpenLifetime(this, _uiOperations);
         }
 
-        /// <summary>The control whose top-level window owns the popup.</summary>
+        /// <summary>The collapsed control that owns popup placement.</summary>
         public Control Anchor { get; }
 
-        /// <summary>The existing WebView2 environment reused by the popup.</summary>
+        /// <summary>The WebView environment used for lazy surface creation.</summary>
         public CoreWebView2Environment Environment { get; }
 
-        /// <summary>The native popup owned for the full host lifetime.</summary>
+        /// <summary>The native popup surface.</summary>
         public ToolStripDropDown DropDown { get; }
 
-        /// <summary>The hosted popup control wrapper after initialization.</summary>
+        /// <summary>The installed hosted control, when initialized.</summary>
         public ToolStripControlHost? ControlHost => _controlHost;
 
         /// <inheritdoc />
@@ -124,14 +192,43 @@ namespace QuickFiler.Viewers
         /// <inheritdoc />
         public bool IsOpen => _isOpen;
 
-        /// <summary>The latest requested theme.</summary>
+        /// <summary>The retained popup theme.</summary>
         public string Theme { get; private set; } = "light";
 
-        /// <summary>The last current-lifecycle initialization or show failure.</summary>
-        public Exception? LastInitializationException { get; private set; }
+        /// <summary>The latest initialization or open failure.</summary>
+        public Exception? LastInitializationException { get; internal set; }
 
         /// <inheritdoc />
         public event EventHandler? PopupMessengerReady;
+
+        internal ReadySurfaceFactory SurfaceFactory => _surfaceFactory;
+
+        internal ToolStripControlHost? InstalledControlHost
+        {
+            get => _controlHost;
+            set => _controlHost = value;
+        }
+
+        internal Control? InstalledPopupControl
+        {
+            get => _popupControl;
+            set => _popupControl = value;
+        }
+
+        internal IWebViewMessenger? InstalledPopupMessenger
+        {
+            get => _popupMessenger;
+            set => _popupMessenger = value;
+        }
+
+        internal bool HasInstalledSurface =>
+            _controlHost != null && _popupControl != null && _popupMessenger != null;
+
+        internal bool OpenState
+        {
+            get => _isOpen;
+            set => _isOpen = value;
+        }
 
         /// <inheritdoc />
         public Task<bool> OpenAsync(
@@ -143,121 +240,11 @@ namespace QuickFiler.Viewers
             ThrowIfDisposed();
             if (_isOpen)
             {
-                _focusPending();
+                _openLifetime.Schedule(_focusPending);
                 return Task.FromResult(true);
             }
-            if (_openTask != null)
-                return _openTask;
-
-            InvalidateLifecycle();
             LastInitializationException = null;
-            long generation = _lifecycleGeneration;
-            Task cancellation = _lifecycleCancellation.Task;
-            TaskCompletionSource<bool> completion = NewCompletionSource();
-            _openTask = completion.Task;
-            _ = CompleteOpenAsync(
-                anchorScreenBounds,
-                workingArea,
-                desiredSize,
-                generation,
-                cancellation,
-                completion
-            );
-            return completion.Task;
-        }
-
-        private async Task CompleteOpenAsync(
-            Rectangle anchorBounds,
-            Rectangle workingArea,
-            Size desiredSize,
-            long generation,
-            Task cancellation,
-            TaskCompletionSource<bool> completion
-        )
-        {
-            try
-            {
-                completion.TrySetResult(
-                    await OpenCoreAsync(
-                        anchorBounds,
-                        workingArea,
-                        desiredSize,
-                        generation,
-                        cancellation
-                    )
-                );
-            }
-            catch (Exception ex)
-            {
-                if (IsCurrent(generation, cancellation))
-                {
-                    LastInitializationException = ex;
-                    RestoreAfterOpenFailure();
-                }
-                completion.TrySetResult(false);
-            }
-            finally
-            {
-                if (
-                    generation == _lifecycleGeneration
-                    && ReferenceEquals(_openTask, completion.Task)
-                )
-                    _openTask = null;
-            }
-        }
-
-        private async Task<bool> OpenCoreAsync(
-            Rectangle anchorBounds,
-            Rectangle workingArea,
-            Size desiredSize,
-            long generation,
-            Task cancellation
-        )
-        {
-            if (!await EnsureSurfaceAsync(generation, cancellation))
-                return false;
-            if (!IsCurrent(generation, cancellation))
-                return false;
-
-            BreadcrumbPopupPlacementResult placement = BreadcrumbPopupPlacement.Calculate(
-                anchorBounds,
-                workingArea,
-                desiredSize
-            );
-            if (placement.Bounds.Width == 0 || placement.Bounds.Height == 0)
-            {
-                if (!IsCurrent(generation, cancellation))
-                    return false;
-                LastInitializationException = new InvalidOperationException(
-                    "The active working area has no space for the folder selector popup."
-                );
-                RestoreAfterOpenFailure();
-                return false;
-            }
-
-            _controlHost!.Size = placement.Bounds.Size;
-            _popupControl!.Size = placement.Bounds.Size;
-            DropDown.Size = placement.Bounds.Size;
-            _isOpen = true;
-            try
-            {
-                _showPopup(DropDown, Anchor, placement.Bounds.Location);
-                if (!IsCurrent(generation, cancellation) || !_isOpen)
-                    return false;
-                _focusPending();
-                if (!IsCurrent(generation, cancellation) || !_isOpen)
-                    return false;
-                LastInitializationException = null;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                if (!IsCurrent(generation, cancellation))
-                    return false;
-                LastInitializationException = ex;
-                CompleteClose(BreadcrumbDropDownCloseReason.Uncommitted, closeNative: false);
-                return false;
-            }
+            return _openLifetime.OpenAsync(anchorScreenBounds, workingArea, desiredSize);
         }
 
         /// <inheritdoc />
@@ -265,7 +252,7 @@ namespace QuickFiler.Viewers
         {
             if (_disposed || !_isOpen)
                 return false;
-            CompleteClose(reason, closeNative: true);
+            _openLifetime.InvalidateAndSchedule(() => CompleteClose(reason, closeNative: true));
             return true;
         }
 
@@ -282,108 +269,110 @@ namespace QuickFiler.Viewers
         public void Reset()
         {
             ThrowIfDisposed();
-            InvalidateLifecycle();
-            if (_isOpen)
-                CompleteClose(BreadcrumbDropDownCloseReason.Uncommitted, closeNative: true);
-            DisposeSurface();
-            LastInitializationException = null;
+            _openLifetime.InvalidateAndSchedule(ResetCoreAsync);
         }
 
-        /// <summary>Closes, unhooks native events, and disposes owned resources.</summary>
+        /// <inheritdoc />
         public void Dispose()
         {
             if (_disposed)
                 return;
             _disposed = true;
-            InvalidateLifecycle();
-            if (_isOpen)
-                CompleteClose(BreadcrumbDropDownCloseReason.Uncommitted, closeNative: true);
-            DropDown.Closed -= OnDropDownClosed;
-            DisposeSurface();
-            DropDown.Dispose();
+            _openLifetime.DisposeAndSchedule(DisposeCoreAsync);
             GC.SuppressFinalize(this);
         }
 
-        private async Task<bool> EnsureSurfaceAsync(long generation, Task cancellation)
-        {
-            if (_popupControl != null && _popupMessenger != null && _controlHost != null)
-                return true;
+        internal void FocusPending() => _focusPending();
 
-            ReadySurface? created = null;
-            bool installed = false;
+        internal void ShowPopup(Point location) => _showPopup(DropDown, Anchor, location);
+
+        internal void PublishPopupMessengerReady() =>
+            PopupMessengerReady?.Invoke(this, EventArgs.Empty);
+
+        private async Task ResetCoreAsync()
+        {
             try
             {
-                created = await _surfaceFactory(Environment);
-                if (!IsCurrent(generation, cancellation))
-                    return RejectCreatedSurface(created);
-                if (created?.Item1 == null || created.Item2 == null || created.Item3 == null)
-                {
-                    throw new InvalidOperationException(
-                        "Popup initialization did not provide a control, messenger, and readiness task."
-                    );
-                }
-                if (!await WaitForReadinessAsync(created.Item3, cancellation))
-                    return RejectCreatedSurface(created);
-                if (!IsCurrent(generation, cancellation))
-                    return RejectCreatedSurface(created);
-
-                var host = new ToolStripControlHost(created.Item1)
-                {
-                    AutoSize = false,
-                    Margin = Padding.Empty,
-                    Padding = Padding.Empty,
-                };
-                _popupControl = created.Item1;
-                _popupMessenger = created.Item2;
-                _controlHost = host;
-                installed = true;
-                DropDown.Items.Add(host);
-                PopupMessengerReady?.Invoke(this, EventArgs.Empty);
-                return true;
+                await _uiOperations
+                    .RunAsync(() =>
+                    {
+                        if (_isOpen)
+                            CompleteClose(
+                                BreadcrumbDropDownCloseReason.Uncommitted,
+                                closeNative: true
+                            );
+                    })
+                    .ConfigureAwait(false);
             }
-            catch (Exception ex)
+            finally
             {
-                if (!IsCurrent(generation, cancellation))
+                try
                 {
-                    if (!installed)
-                        RejectCreatedSurface(created);
-                    return false;
+                    await DisposeSurfaceAsync().ConfigureAwait(false);
                 }
-                LastInitializationException = ex;
-                if (!installed)
-                    RejectCreatedSurface(created);
-                DisposeSurface();
-                RestoreAfterOpenFailure();
-                return false;
+                finally
+                {
+                    LastInitializationException = null;
+                }
             }
         }
 
-        private void InvalidateLifecycle()
+        private Task DisposeCoreAsync() =>
+            _uiOperations.RunAsync(() =>
+            {
+                Tuple<ToolStripControlHost?, Control?, IWebViewMessenger?> owned =
+                    TakeOwnedSurface();
+                _isOpen = false;
+                CompleteAll(
+                    () => DropDown.Closed -= OnDropDownClosed,
+                    () =>
+                    {
+                        if (owned.Item1 != null)
+                            DropDown.Items.Remove(owned.Item1);
+                    },
+                    () => owned.Item1?.Dispose(),
+                    () =>
+                    {
+                        if (owned.Item2 != null && !owned.Item2.IsDisposed)
+                            owned.Item2.Dispose();
+                    },
+                    () => (owned.Item3 as IDisposable)?.Dispose(),
+                    DropDown.Dispose
+                );
+            });
+
+        private async Task DisposeSurfaceAsync()
         {
-            _lifecycleGeneration++;
-            _lifecycleCancellation.TrySetResult(true);
-            _lifecycleCancellation = NewCompletionSource();
-            _openTask = null;
+            Tuple<ToolStripControlHost?, Control?, IWebViewMessenger?> owned = await _uiOperations
+                .RunAsync(TakeOwnedSurface)
+                .ConfigureAwait(false);
+            await _uiOperations
+                .DisposeHostedSurfaceAsync(DropDown, owned.Item1, owned.Item2, owned.Item3)
+                .ConfigureAwait(false);
         }
 
-        private bool IsCurrent(long generation, Task cancellation) =>
-            !_disposed && generation == _lifecycleGeneration && !cancellation.IsCompleted;
-
-        private static async Task<bool> WaitForReadinessAsync(Task readiness, Task cancellation)
+        internal async Task DisposeSurfaceAfterFailureAsync()
         {
-            Task completed = await Task.WhenAny(readiness, cancellation);
-            if (!ReferenceEquals(completed, readiness))
-                return false;
-            await readiness;
-            return !cancellation.IsCompleted;
+            Tuple<ToolStripControlHost?, Control?, IWebViewMessenger?> owned = await _uiOperations
+                .RunAsync(TakeOwnedSurface, reportFailure: false)
+                .ConfigureAwait(false);
+            await _uiOperations
+                .DisposeHostedSurfaceAfterFailureAsync(
+                    DropDown,
+                    owned.Item1,
+                    owned.Item2,
+                    owned.Item3
+                )
+                .ConfigureAwait(false);
         }
 
-        private static bool RejectCreatedSurface(ReadySurface? created)
+        private Tuple<ToolStripControlHost?, Control?, IWebViewMessenger?> TakeOwnedSurface()
         {
-            if (created?.Item1 != null && !created.Item1.IsDisposed)
-                created.Item1.Dispose();
-            (created?.Item2 as IDisposable)?.Dispose();
-            return false;
+            var owned = Tuple.Create(_controlHost, _popupControl, _popupMessenger);
+            _controlHost = null;
+            _popupControl = null;
+            _popupMessenger = null;
+            return owned;
         }
 
         private void CompleteClose(BreadcrumbDropDownCloseReason reason, bool closeNative)
@@ -391,58 +380,87 @@ namespace QuickFiler.Viewers
             if (!_isOpen)
                 return;
             _isOpen = false;
-            if (closeNative)
+            CompleteAll(
+                () =>
+                {
+                    if (closeNative)
+                        CloseNative();
+                },
+                () => FinishClose(reason)
+            );
+        }
+
+        private void CloseNative()
+        {
+            _programmaticClose = true;
+            try
             {
-                _programmaticClose = true;
-                try
-                {
-                    DropDown.Close(ToolStripDropDownCloseReason.CloseCalled);
-                }
-                finally
-                {
-                    _programmaticClose = false;
-                }
+                _closePopup(DropDown, ToolStripDropDownCloseReason.CloseCalled);
             }
-            FinishClose(reason);
+            finally
+            {
+                _programmaticClose = false;
+            }
         }
 
         private void OnDropDownClosed(object? sender, ToolStripDropDownClosedEventArgs e)
         {
             if (_disposed || _programmaticClose || !_isOpen)
                 return;
-            _isOpen = false;
-            FinishClose(BreadcrumbDropDownCloseReason.Uncommitted);
+            _openLifetime.InvalidateAndSchedule(() =>
+            {
+                if (_disposed || _programmaticClose || !_isOpen)
+                    return;
+                _isOpen = false;
+                FinishClose(BreadcrumbDropDownCloseReason.Uncommitted);
+            });
         }
 
         private void FinishClose(BreadcrumbDropDownCloseReason reason)
         {
-            if (reason == BreadcrumbDropDownCloseReason.Uncommitted)
-                _cancelSelection();
-            _focusAnchor();
+            CompleteAll(
+                () =>
+                {
+                    if (reason == BreadcrumbDropDownCloseReason.Uncommitted)
+                        _cancelSelection();
+                },
+                _focusAnchor
+            );
         }
 
-        private void RestoreAfterOpenFailure()
+        internal void RestoreAfterOpenFailure()
         {
+            bool closeNative = _isOpen || DropDown.Visible;
             _isOpen = false;
-            FinishClose(BreadcrumbDropDownCloseReason.Uncommitted);
+            CompleteAll(
+                () =>
+                {
+                    if (closeNative)
+                        CloseNative();
+                },
+                () => FinishClose(BreadcrumbDropDownCloseReason.Uncommitted)
+            );
         }
 
-        private void DisposeSurface()
+        private void CompleteAll(params Action[] operations)
         {
-            IWebViewMessenger? messenger = _popupMessenger;
-            ToolStripControlHost? host = _controlHost;
-            Control? control = _popupControl;
-            _popupMessenger = null;
-            _controlHost = null;
-            _popupControl = null;
-            if (host != null)
+            Exception? failure = null;
+            foreach (Action operation in operations)
             {
-                DropDown.Items.Remove(host);
-                host.Dispose();
+                try
+                {
+                    operation();
+                }
+                catch (Exception exception)
+                {
+                    if (failure == null)
+                        failure = exception;
+                    else
+                        _uiOperations.Report(exception);
+                }
             }
-            if (control != null && !control.IsDisposed)
-                control.Dispose();
-            (messenger as IDisposable)?.Dispose();
+            if (failure != null)
+                throw failure;
         }
 
         private void ThrowIfDisposed()
@@ -450,35 +468,5 @@ namespace QuickFiler.Viewers
             if (_disposed)
                 throw new ObjectDisposedException(nameof(BreadcrumbDropDownHost));
         }
-
-        private static ReadySurfaceFactory NormalizeFactory(LegacySurfaceFactory surfaceFactory)
-        {
-            if (surfaceFactory == null)
-                throw new ArgumentNullException(nameof(surfaceFactory));
-            return async environment =>
-            {
-                Tuple<Control, IWebViewMessenger> created = await surfaceFactory(environment);
-                if (created == null)
-                    throw new InvalidOperationException(
-                        "Popup initialization returned no surface."
-                    );
-                return Tuple.Create<Control, IWebViewMessenger, Task>(
-                    created.Item1,
-                    created.Item2,
-                    Task.CompletedTask
-                );
-            };
-        }
-
-        private static TaskCompletionSource<bool> NewCompletionSource() =>
-            new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-
-        // Direct WinForms display adapter; placement is tested through the injected callback.
-        [ExcludeFromCodeCoverage]
-        private static void ShowOwnedPopup(
-            ToolStripDropDown dropDown,
-            Control anchor,
-            Point screenLocation
-        ) => dropDown.Show(anchor, anchor.PointToClient(screenLocation));
     }
 }

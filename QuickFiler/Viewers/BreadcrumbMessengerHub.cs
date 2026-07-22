@@ -399,15 +399,11 @@ namespace QuickFiler.Viewers
         private void Release(bool dispose)
         {
             IWebViewMessenger? ready;
-            IWebViewMessenger? pending;
-            BreadcrumbNavigationReadiness? readiness;
             if (_disposed)
                 return;
             _disposed = dispose;
             _generation++;
             ready = _readyMessenger;
-            pending = _pendingMessenger;
-            readiness = _pendingReadiness;
             _readyMessenger = null;
             _pendingMessenger = null;
             _pendingReadiness = null;
@@ -419,8 +415,6 @@ namespace QuickFiler.Viewers
                 _controller.Dispose();
             else
                 _controller.Reset();
-            readiness?.Dispose();
-            (pending as IDisposable)?.Dispose();
         }
 
         private bool IsCurrent(long generation, IWebViewMessenger messenger) =>

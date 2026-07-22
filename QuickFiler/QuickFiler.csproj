@@ -391,6 +391,9 @@
     <Compile Include="Viewers\IItemViewer.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinator.cs" />
     <Compile Include="Viewers\BreadcrumbUiDispatcher.cs" />
+    <Compile Include="Viewers\BreadcrumbPopupUiOperations.cs" />
+    <Compile Include="Viewers\BreadcrumbDropDownOpenLifetime.cs" />
+    <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinator.cs" />
     <Compile Include="Viewers\BreadcrumbMessengerHub.cs" />
     <Compile Include="Viewers\BreadcrumbPopupPlacement.cs" />
     <Compile Include="Viewers\IBreadcrumbDropDownHost.cs" />

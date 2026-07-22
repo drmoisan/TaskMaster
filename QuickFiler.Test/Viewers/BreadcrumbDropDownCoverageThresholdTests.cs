@@ -1,10 +1,11 @@
 using System;
+using System.Collections.Concurrent;
 using System.Drawing;
 using System.Runtime.Serialization;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Web.WebView2.Core;
 using QuickFiler.Viewers;
@@ -16,39 +17,78 @@ namespace QuickFiler.Test.Viewers
     public sealed class BreadcrumbDropDownCoverageThresholdTests
     {
         [TestMethod]
-        public async Task OpenAsync_RollbackCallbackFailsOnce_OuterPipelineCompletesRecovery()
+        public void OpenAsync_RollbackCallbackFailsOnce_OuterPipelineCompletesRecovery()
         {
             // Arrange
-            using (var harness = new ThresholdHarness())
+            using (new AssertionScope())
             {
-                var initializationFailure = new InvalidOperationException("initialization failed");
-                var rollbackFailure = new InvalidOperationException("rollback failed");
-                harness.FactoryFailure = initializationFailure;
-                harness.CancelAction = () =>
+                using (var harness = new ThresholdHarness())
                 {
-                    if (harness.CancelCount == 1)
-                    {
-                        throw rollbackFailure;
-                    }
-                };
+                    var initializationFailure = new InvalidOperationException(
+                        "initialization failed"
+                    );
+                    var rollbackFailure = new InvalidOperationException("rollback failed");
+                    var focusFailure = new InvalidOperationException("focus failed");
+                    var expectedFailures = new[] { rollbackFailure, focusFailure };
+                    harness.FactoryFailure = initializationFailure;
+                    harness.CancelAction = () => throw rollbackFailure;
+                    harness.FocusAnchorAction = () => throw focusFailure;
 
-                // Act
-                bool opened = await harness.OpenAsync();
+                    // Act
+                    bool opened = harness.Open();
 
-                // Assert
-                opened.Should().BeFalse();
-                harness.FactoryCount.Should().Be(1);
-                harness.CancelCount.Should().Be(2);
-                harness.FocusAnchorCount.Should().Be(1);
-                harness.ShowCount.Should().Be(0);
-                harness.FocusPendingCount.Should().Be(0);
-                harness.Host.LastInitializationException.Should().BeSameAs(rollbackFailure);
-                AssertClosedWithoutSurface(harness);
+                    // Assert
+                    opened.Should().BeFalse();
+                    harness.FactoryCount.Should().Be(1);
+                    harness.CancelCount.Should().Be(1);
+                    harness.FocusAnchorCount.Should().Be(1);
+                    harness.ShowCount.Should().Be(0);
+                    harness.FocusPendingCount.Should().Be(0);
+                    harness.NativeCloseCount.Should().Be(0);
+                    harness
+                        .Host.LastInitializationException.Should()
+                        .BeSameAs(initializationFailure);
+                    harness.ErrorSnapshot.Should().BeEquivalentTo(expectedFailures);
+                    AssertClosedWithoutSurface(harness);
+
+                    harness.FactoryFailure = null;
+                    harness.CancelAction = () => { };
+                    harness.FocusAnchorAction = () => { };
+                    harness.Open().Should().BeTrue();
+                    harness.Host.IsOpen.Should().BeTrue();
+                    harness.ErrorSnapshot.Should().BeEquivalentTo(expectedFailures);
+                }
+
+                using (var placementHarness = new ThresholdHarness())
+                {
+                    var rollbackFailure = new InvalidOperationException(
+                        "placement rollback failed"
+                    );
+                    placementHarness.CancelAction = () => throw rollbackFailure;
+
+                    bool opened = placementHarness.Open(Rectangle.Empty);
+
+                    opened.Should().BeFalse();
+                    placementHarness.CancelCount.Should().Be(1);
+                    placementHarness.FocusAnchorCount.Should().Be(1);
+                    InvalidOperationException placementFailure = placementHarness
+                        .Host.LastInitializationException.Should()
+                        .BeOfType<InvalidOperationException>()
+                        .Which;
+                    placementFailure.Message.Should()
+                        .Be("The active working area has no space for the folder selector popup.");
+                    placementHarness
+                        .ErrorSnapshot.Should()
+                        .HaveCount(2)
+                        .And.Contain(placementFailure)
+                        .And.Contain(rollbackFailure);
+                    placementHarness.Host.IsOpen.Should().BeFalse();
+                }
             }
         }
 
         [TestMethod]
-        public async Task OpenAsync_ReadyHandlerResetsLifecycle_RejectsInstalledSurface()
+        public void OpenAsync_ReadyHandlerResetsLifecycle_RejectsInstalledSurface()
         {
             // Arrange
             using (var harness = new ThresholdHarness())
@@ -56,7 +96,7 @@ namespace QuickFiler.Test.Viewers
                 harness.ReadyAction = harness.Host.Reset;
 
                 // Act
-                bool opened = await harness.OpenAsync();
+                bool opened = harness.Open();
 
                 // Assert
                 opened.Should().BeFalse();
@@ -73,7 +113,7 @@ namespace QuickFiler.Test.Viewers
         }
 
         [TestMethod]
-        public async Task OpenAsync_ShowCallbackResetsLifecycle_StopsBeforeFocus()
+        public void OpenAsync_ShowCallbackResetsLifecycle_StopsBeforeFocus()
         {
             // Arrange
             using (var harness = new ThresholdHarness())
@@ -81,7 +121,7 @@ namespace QuickFiler.Test.Viewers
                 harness.ShowAction = harness.Host.Reset;
 
                 // Act
-                bool opened = await harness.OpenAsync();
+                bool opened = harness.Open();
 
                 // Assert
                 opened.Should().BeFalse();
@@ -97,31 +137,51 @@ namespace QuickFiler.Test.Viewers
         }
 
         [TestMethod]
-        public async Task OpenAsync_FocusCallbackResetsLifecycle_StopsBeforeSuccess()
+        public void OpenAsync_FocusCallbackFailsAfterShow_ClosesThenPermitsRetry()
         {
             // Arrange
             using (var harness = new ThresholdHarness())
             {
-                harness.FocusPendingAction = harness.Host.Reset;
+                var focusFailure = new InvalidOperationException("focus failed");
+                harness.FocusPendingAction = () =>
+                {
+                    if (harness.FocusPendingCount == 1)
+                    {
+                        throw focusFailure;
+                    }
+                };
 
                 // Act
-                bool opened = await harness.OpenAsync();
+                bool opened = harness.Open();
+                bool closedAfterFailure = !harness.Host.IsOpen;
+                Exception observedFailure = harness.Host.LastInitializationException;
+                Exception[] errorSnapshot = harness.ErrorSnapshot;
+                int nativeCloseCount = harness.NativeCloseCount;
+                int focusAnchorCount = harness.FocusAnchorCount;
+                bool retried = harness.Open();
 
                 // Assert
-                opened.Should().BeFalse();
-                harness.ReadyEventCount.Should().Be(1);
-                harness.ShowCount.Should().Be(1);
-                harness.FocusPendingCount.Should().Be(1);
-                harness.CancelCount.Should().Be(1);
-                harness.FocusAnchorCount.Should().Be(1);
-                AssertDisposedSurface(harness);
-                AssertClosedWithoutSurface(harness);
-                harness.Host.LastInitializationException.Should().BeNull();
+                using (new AssertionScope())
+                {
+                    opened.Should().BeFalse();
+                    closedAfterFailure.Should().BeTrue();
+                    observedFailure.Should().BeSameAs(focusFailure);
+                    errorSnapshot.Should().ContainSingle().Which.Should().BeSameAs(focusFailure);
+                    nativeCloseCount.Should().Be(1);
+                    focusAnchorCount.Should().Be(1);
+                    harness.CancelCount.Should().Be(1);
+                    retried.Should().BeTrue();
+                    harness.Host.IsOpen.Should().BeTrue();
+                    harness.ShowCount.Should().Be(2);
+                    harness.FocusPendingCount.Should().Be(2);
+                    harness.NativeCloseCount.Should().Be(1);
+                    harness.FocusAnchorCount.Should().Be(1);
+                }
             }
         }
 
         [TestMethod]
-        public async Task OpenAsync_ShowCallbackResetsThenThrows_DoesNotOverwriteCurrentLifecycle()
+        public void OpenAsync_ShowCallbackResetsThenThrows_DoesNotOverwriteCurrentLifecycle()
         {
             // Arrange
             using (var harness = new ThresholdHarness())
@@ -134,7 +194,7 @@ namespace QuickFiler.Test.Viewers
                 };
 
                 // Act
-                bool opened = await harness.OpenAsync();
+                bool opened = harness.Open();
 
                 // Assert
                 opened.Should().BeFalse();
@@ -150,7 +210,7 @@ namespace QuickFiler.Test.Viewers
         }
 
         [TestMethod]
-        public async Task OpenAsync_ResetWhileReadinessPending_CancellationRejectsSurface()
+        public void OpenAsync_ResetWhileReadinessPending_CancellationRejectsSurface()
         {
             // Arrange
             using (var harness = new ThresholdHarness())
@@ -164,7 +224,7 @@ namespace QuickFiler.Test.Viewers
 
                 // Act
                 harness.Host.Reset();
-                bool opened = await opening;
+                bool opened = harness.Drain(opening);
 
                 // Assert
                 opened.Should().BeFalse();
@@ -178,17 +238,21 @@ namespace QuickFiler.Test.Viewers
                 AssertDisposedSurface(harness);
                 AssertClosedWithoutSurface(harness);
                 harness.Host.LastInitializationException.Should().BeNull();
+
+                harness.PrepareFreshSurface();
+                harness.Open().Should().BeTrue();
+                harness.Host.IsOpen.Should().BeTrue();
             }
         }
 
         [TestMethod]
-        public async Task OpenAsync_LegacyFactoryReturnsNull_ReportsNoSurfaceAndRollsBack()
+        public void OpenAsync_LegacyFactoryReturnsNull_ReportsNoSurfaceAndRollsBack()
         {
             // Arrange
             using (var harness = new ThresholdHarness(useLegacyFactory: true))
             {
                 // Act
-                bool opened = await harness.OpenAsync();
+                bool opened = harness.Open();
 
                 // Assert
                 opened.Should().BeFalse();
@@ -224,56 +288,56 @@ namespace QuickFiler.Test.Viewers
         private sealed class ThresholdHarness : IDisposable
         {
             private readonly Panel _anchor;
-            private readonly SynchronizationContext _previousContext;
+            private readonly BreadcrumbSelectorToggleUiBoundaryTests.CapturingSynchronizationContext _context;
+            private readonly ConcurrentQueue<Exception> _errors =
+                new ConcurrentQueue<Exception>();
 
             internal ThresholdHarness(bool useLegacyFactory = false)
             {
-                _previousContext = SynchronizationContext.Current;
-                SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+                _context =
+                    new BreadcrumbSelectorToggleUiBoundaryTests.CapturingSynchronizationContext();
                 _anchor = new Panel();
                 var environment = (CoreWebView2Environment)
                     FormatterServices.GetUninitializedObject(typeof(CoreWebView2Environment));
+                Func<
+                    CoreWebView2Environment,
+                    Task<Tuple<Control, IWebViewMessenger, Task>>
+                > factory = CreateReadySurfaceAsync;
                 if (useLegacyFactory)
-                {
-                    Func<CoreWebView2Environment, Task<Tuple<Control, IWebViewMessenger>>> factory =
-                        CreateLegacySurfaceAsync;
-                    Host = new BreadcrumbDropDownHost(
-                        _anchor,
-                        environment,
-                        factory,
-                        FocusPending,
-                        FocusAnchor,
-                        CancelSelection,
-                        ShowPopup
-                    );
-                }
-                else
                 {
                     Func<
                         CoreWebView2Environment,
-                        Task<Tuple<Control, IWebViewMessenger, Task>>
-                    > factory = CreateReadySurfaceAsync;
-                    Host = new BreadcrumbDropDownHost(
-                        _anchor,
-                        environment,
-                        factory,
-                        FocusPending,
-                        FocusAnchor,
-                        CancelSelection,
-                        ShowPopup
-                    );
+                        Task<Tuple<Control, IWebViewMessenger>>
+                    > legacyFactory =
+                        CreateLegacySurfaceAsync;
+                    factory = BreadcrumbPopupUiOperations.NormalizeFactory(legacyFactory);
                 }
+                var operations = new BreadcrumbPopupUiOperations(
+                    new BreadcrumbUiDispatcher(_context, _errors.Enqueue)
+                );
+                Host = new BreadcrumbDropDownHost(
+                    _anchor,
+                    environment,
+                    factory,
+                    FocusPending,
+                    FocusAnchor,
+                    CancelSelection,
+                    ShowPopup,
+                    operations,
+                    ClosePopup
+                );
                 Host.PopupMessengerReady += OnPopupMessengerReady;
             }
 
             internal BreadcrumbDropDownHost Host { get; }
-            internal TrackingControl Surface { get; } = new TrackingControl();
-            internal TrackingMessenger Messenger { get; } = new TrackingMessenger();
+            internal TrackingControl Surface { get; private set; } = new TrackingControl();
+            internal TrackingMessenger Messenger { get; private set; } = new TrackingMessenger();
             internal Task ReadinessTask { get; set; } = Task.CompletedTask;
             internal Exception FactoryFailure { get; set; }
             internal Action ReadyAction { get; set; } = () => { };
             internal Action ShowAction { get; set; } = () => { };
             internal Action FocusPendingAction { get; set; } = () => { };
+            internal Action FocusAnchorAction { get; set; } = () => { };
             internal Action CancelAction { get; set; } = () => { };
             internal int FactoryCount { get; private set; }
             internal int ReadyEventCount { get; private set; }
@@ -281,25 +345,44 @@ namespace QuickFiler.Test.Viewers
             internal int FocusPendingCount { get; private set; }
             internal int FocusAnchorCount { get; private set; }
             internal int CancelCount { get; private set; }
+            internal int NativeCloseCount { get; private set; }
+            internal Exception[] ErrorSnapshot => _errors.ToArray();
 
-            internal Task<bool> OpenAsync() =>
+            internal bool Open(Rectangle? workingArea = null) =>
+                Drain(OpenAsync(workingArea));
+
+            internal Task<bool> OpenAsync(Rectangle? workingArea = null) =>
                 Host.OpenAsync(
                     new Rectangle(120, 240, 390, 25),
-                    new Rectangle(0, 0, 1920, 1040),
+                    workingArea ?? new Rectangle(0, 0, 1920, 1040),
                     new Size(390, 180)
                 );
+
+            internal bool Drain(Task<bool> opening)
+            {
+                _context.DrainUntil(opening);
+                return opening.GetAwaiter().GetResult();
+            }
+
+            internal void PrepareFreshSurface()
+            {
+                Surface = new TrackingControl();
+                Messenger = new TrackingMessenger();
+                ReadinessTask = Task.CompletedTask;
+            }
 
             public void Dispose()
             {
                 Host.PopupMessengerReady -= OnPopupMessengerReady;
                 Host.Dispose();
+                _context.DrainAll();
                 if (!Surface.IsDisposed)
                 {
                     Surface.Dispose();
                 }
-                Messenger.Dispose();
+                if (Messenger.DisposeCount == 0)
+                    Messenger.Dispose();
                 _anchor.Dispose();
-                SynchronizationContext.SetSynchronizationContext(_previousContext);
             }
 
             private Task<Tuple<Control, IWebViewMessenger, Task>> CreateReadySurfaceAsync(
@@ -342,13 +425,22 @@ namespace QuickFiler.Test.Viewers
                 ShowAction();
             }
 
+            private void ClosePopup(
+                ToolStripDropDown dropDown,
+                ToolStripDropDownCloseReason reason
+            ) => NativeCloseCount++;
+
             private void FocusPending()
             {
                 FocusPendingCount++;
                 FocusPendingAction();
             }
 
-            private void FocusAnchor() => FocusAnchorCount++;
+            private void FocusAnchor()
+            {
+                FocusAnchorCount++;
+                FocusAnchorAction();
+            }
 
             private void CancelSelection()
             {
@@ -363,10 +455,8 @@ namespace QuickFiler.Test.Viewers
 
             protected override void Dispose(bool disposing)
             {
-                if (disposing && !IsDisposed)
-                {
+                if (disposing)
                     DisposeCount++;
-                }
                 base.Dispose(disposing);
             }
         }
@@ -383,13 +473,7 @@ namespace QuickFiler.Test.Viewers
 
             public void PostJson(string json) { }
 
-            public void Dispose()
-            {
-                if (DisposeCount == 0)
-                {
-                    DisposeCount++;
-                }
-            }
+            public void Dispose() => DisposeCount++;
         }
     }
 }

@@ -77,6 +77,8 @@ namespace QuickFiler.Viewers
 
             if (IsCurrentBoundary())
             {
+                BreadcrumbUiDispatcher? previousDispatcher = _executingDispatcher;
+                _executingDispatcher = this;
                 try
                 {
                     action();
@@ -84,6 +86,10 @@ namespace QuickFiler.Viewers
                 catch (Exception exception)
                 {
                     Report(exception);
+                }
+                finally
+                {
+                    _executingDispatcher = previousDispatcher;
                 }
                 return Task.CompletedTask;
             }
@@ -139,6 +145,90 @@ namespace QuickFiler.Viewers
             {
                 ReportOnce(exception);
                 completion.TrySetResult(null);
+            }
+
+            return completion.Task;
+        }
+
+        /// <summary>
+        /// Schedules one synchronous value-producing operation and propagates scheduling or action
+        /// failure through both the observable sink and the returned task.
+        /// </summary>
+        internal Task<T> DispatchValue<T>(Func<T> action, bool reportFailure = true)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            // Only a currently executing synchronous dispatcher callback proves that inline
+            // control access is safe. Ambient context and thread identity do not survive awaits.
+            if (ReferenceEquals(_executingDispatcher, this))
+            {
+                try
+                {
+                    return Task.FromResult(action());
+                }
+                catch (Exception exception)
+                {
+                    if (reportFailure)
+                        Report(exception);
+                    return Task.FromException<T>(exception);
+                }
+            }
+
+            if (_context == null)
+            {
+                var failure = new InvalidOperationException(
+                    "The owner-thread-only test dispatcher cannot marshal cross-thread UI work."
+                );
+                if (reportFailure)
+                    Report(failure);
+                return Task.FromException<T>(failure);
+            }
+
+            var completion = new TaskCompletionSource<T>(
+                TaskCreationOptions.RunContinuationsAsynchronously
+            );
+            int failureReported = 0;
+
+            void ReportOnce(Exception exception)
+            {
+                if (Interlocked.Exchange(ref failureReported, 1) == 0)
+                {
+                    if (reportFailure)
+                        Report(exception);
+                }
+            }
+
+            try
+            {
+                _context.Post(
+                    _ =>
+                    {
+                        BreadcrumbUiDispatcher? previousDispatcher = _executingDispatcher;
+                        _executingDispatcher = this;
+                        try
+                        {
+                            completion.TrySetResult(action());
+                        }
+                        catch (Exception exception)
+                        {
+                            ReportOnce(exception);
+                            completion.TrySetException(exception);
+                        }
+                        finally
+                        {
+                            _executingDispatcher = previousDispatcher;
+                        }
+                    },
+                    null
+                );
+            }
+            catch (Exception exception)
+            {
+                ReportOnce(exception);
+                completion.TrySetException(exception);
             }
 
             return completion.Task;

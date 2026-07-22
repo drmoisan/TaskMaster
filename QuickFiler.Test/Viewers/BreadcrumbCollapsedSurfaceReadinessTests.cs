@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler.Viewers;
 using UtilitiesCS.OutlookObjects.Folder;
+using CapturingContext = QuickFiler.Test.Viewers.BreadcrumbSelectorToggleUiBoundaryTests.CapturingSynchronizationContext;
 
 namespace QuickFiler.Test.Viewers
 {
@@ -180,21 +181,16 @@ namespace QuickFiler.Test.Viewers
         }
 
         [TestMethod]
-        public async Task ViewerAttachment_PendingCachesAndReplaysCurrentStateExactlyOnce()
+        public void ViewerAttachment_PendingCachesAndReplaysCurrentStateExactlyOnce()
         {
             // Arrange
+            SynchronizationContext previous = SynchronizationContext.Current;
             using (var harness = new ViewerIntegrationHarness())
             {
                 var surface = new TrackingMessenger();
                 var readiness = Readiness(301);
-                Task<bool> first = harness.Viewer.AttachBreadcrumbMessengerWhenReadyAsync(
-                    surface,
-                    readiness
-                );
-                Task<bool> repeated = harness.Viewer.AttachBreadcrumbMessengerWhenReadyAsync(
-                    surface,
-                    readiness
-                );
+                Task<bool> first = harness.Attach(surface, readiness);
+                Task<bool> repeated = harness.Attach(surface, readiness);
                 const string render = "{\"type\":\"render\",\"rows\":[{\"percentText\":\"73%\"}]}";
                 const string selector =
                     "{\"type\":\"selectorView\",\"mode\":\"collapsed\",\"isOpen\":false}";
@@ -212,67 +208,60 @@ namespace QuickFiler.Test.Viewers
                 surface.SubscriberCount.Should().Be(0);
                 surface.Posted.Should().BeEmpty();
                 readiness.NavigationCompleted(301, true, null);
-                (await first.ConfigureAwait(false)).Should().BeTrue();
-                (await repeated.ConfigureAwait(false)).Should().BeTrue();
+                harness.Context.DrainUntil(first);
+                harness.Context.DrainUntil(repeated);
+                first.GetAwaiter().GetResult().Should().BeTrue();
+                repeated.GetAwaiter().GetResult().Should().BeTrue();
                 surface.SubscriberCount.Should().Be(1);
                 surface.Posted.Should().Equal(render, selector, theme);
 
                 // Act and assert ready reattachment remains idempotent
-                (
-                    await harness
-                        .Viewer.AttachBreadcrumbMessengerWhenReadyAsync(surface, readiness)
-                        .ConfigureAwait(false)
-                )
-                    .Should()
-                    .BeTrue();
+                Task<bool> ready = harness.Attach(surface, readiness);
+                harness.Context.DrainUntil(ready);
+                ready.GetAwaiter().GetResult().Should().BeTrue();
                 surface.SubscriberCount.Should().Be(1);
                 surface.Posted.Should().Equal(render, selector, theme);
+                AssertCreatorThreadDispatch(harness.Context);
             }
+            SynchronizationContext.Current.Should().BeSameAs(previous);
         }
 
         [TestMethod]
-        public async Task ViewerAttachment_FailureResetReuseAndDisposalLeaveNoStaleAttachment()
+        public void ViewerAttachment_FailureResetReuseAndDisposalLeaveNoStaleAttachment()
         {
             // Arrange exact failure
+            SynchronizationContext previous = SynchronizationContext.Current;
             using (var harness = new ViewerIntegrationHarness())
             {
                 var failedSurface = new TrackingMessenger();
                 var failedReadiness = Readiness(311);
-                Task<bool> failed = harness.Viewer.AttachBreadcrumbMessengerWhenReadyAsync(
-                    failedSurface,
-                    failedReadiness
-                );
+                Task<bool> failed = harness.Attach(failedSurface, failedReadiness);
 
                 // Act and assert failure cleanup
                 failedReadiness.NavigationCompleted(311, false, "ConnectionAborted");
-                (await failed.ConfigureAwait(false)).Should().BeFalse();
+                harness.Context.DrainUntil(failed);
+                failed.GetAwaiter().GetResult().Should().BeFalse();
                 failedSurface.SubscriberCount.Should().Be(0);
                 failedSurface.DisposeCount.Should().Be(1);
 
                 // Arrange and act reset while pending
                 var resetSurface = new TrackingMessenger();
                 var resetReadiness = Readiness(321);
-                Task<bool> reset = harness.Viewer.AttachBreadcrumbMessengerWhenReadyAsync(
-                    resetSurface,
-                    resetReadiness
-                );
+                Task<bool> reset = harness.Attach(resetSurface, resetReadiness);
                 harness.Viewer.ResetBreadcrumb();
                 resetReadiness.NavigationCompleted(321, true, null);
 
                 // Assert reset rejection and pooled reuse
-                (await reset.ConfigureAwait(false))
-                    .Should()
-                    .BeFalse();
+                harness.Context.DrainUntil(reset);
+                reset.GetAwaiter().GetResult().Should().BeFalse();
                 resetSurface.SubscriberCount.Should().Be(0);
                 resetSurface.DisposeCount.Should().Be(1);
                 var reusedSurface = new TrackingMessenger();
                 var reusedReadiness = Readiness(331);
-                Task<bool> reused = harness.Viewer.AttachBreadcrumbMessengerWhenReadyAsync(
-                    reusedSurface,
-                    reusedReadiness
-                );
+                Task<bool> reused = harness.Attach(reusedSurface, reusedReadiness);
                 reusedReadiness.NavigationCompleted(331, true, null);
-                (await reused.ConfigureAwait(false)).Should().BeTrue();
+                harness.Context.DrainUntil(reused);
+                reused.GetAwaiter().GetResult().Should().BeTrue();
                 reusedSurface.SubscriberCount.Should().Be(1);
 
                 // Act and assert ready reset and pending disposal
@@ -281,16 +270,16 @@ namespace QuickFiler.Test.Viewers
                 reusedSurface.DisposeCount.Should().Be(1);
                 var disposedSurface = new TrackingMessenger();
                 var disposedReadiness = Readiness(341);
-                Task<bool> disposed = harness.Viewer.AttachBreadcrumbMessengerWhenReadyAsync(
-                    disposedSurface,
-                    disposedReadiness
-                );
+                Task<bool> disposed = harness.Attach(disposedSurface, disposedReadiness);
                 harness.Viewer.Dispose();
                 disposedReadiness.NavigationCompleted(341, true, null);
-                (await disposed.ConfigureAwait(false)).Should().BeFalse();
+                harness.Context.DrainUntil(disposed);
+                disposed.GetAwaiter().GetResult().Should().BeFalse();
                 disposedSurface.SubscriberCount.Should().Be(0);
                 disposedSurface.DisposeCount.Should().Be(1);
+                AssertCreatorThreadDispatch(harness.Context);
             }
+            SynchronizationContext.Current.Should().BeSameAs(previous);
         }
 
         [TestMethod]
@@ -392,6 +381,13 @@ namespace QuickFiler.Test.Viewers
             return readiness;
         }
 
+        private static void AssertCreatorThreadDispatch(CapturingContext context)
+        {
+            context.ExceptionSnapshot.Should().BeEmpty();
+            context.ExecutedThreadSnapshot.Should().NotBeEmpty();
+            context.ExecutedThreadSnapshot.Should().OnlyContain(thread => thread == context.CreatorThreadId);
+        }
+
         private sealed class CollapsedHarness : IDisposable
         {
             internal BreadcrumbCollapsedSurfaceController Controller { get; } =
@@ -411,24 +407,49 @@ namespace QuickFiler.Test.Viewers
             internal ViewerIntegrationHarness()
             {
                 _previous = SynchronizationContext.Current;
-                SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
-                Viewer = new QuickFiler.ItemViewer();
-                var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
-                Viewer.InitializeBreadcrumbPipeline(provider.Object);
-                FieldInfo field = typeof(QuickFiler.ItemViewer).GetField(
-                    "_breadcrumbHub",
-                    BindingFlags.Instance | BindingFlags.NonPublic
-                );
-                Hub = (BreadcrumbMessengerHub)field.GetValue(Viewer);
+                Context = new CapturingContext();
+                SynchronizationContext.SetSynchronizationContext(Context);
+                try
+                {
+                    Viewer = new QuickFiler.ItemViewer();
+                    var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+                    Viewer.InitializeBreadcrumbPipeline(provider.Object);
+                    FieldInfo field = typeof(QuickFiler.ItemViewer).GetField(
+                        "_breadcrumbHub",
+                        BindingFlags.Instance | BindingFlags.NonPublic
+                    );
+                    Hub = (BreadcrumbMessengerHub)field.GetValue(Viewer);
+                }
+                catch
+                {
+                    SynchronizationContext.SetSynchronizationContext(_previous);
+                    throw;
+                }
             }
 
             internal QuickFiler.ItemViewer Viewer { get; }
             internal BreadcrumbMessengerHub Hub { get; }
+            internal CapturingContext Context { get; }
+
+            internal Task<bool> Attach(
+                IWebViewMessenger messenger,
+                BreadcrumbNavigationReadiness readiness
+            ) => Viewer.AttachBreadcrumbMessengerWhenReadyAsync(messenger, readiness);
 
             public void Dispose()
             {
-                Viewer.Dispose();
-                SynchronizationContext.SetSynchronizationContext(_previous);
+                if (Environment.CurrentManagedThreadId != Context.CreatorThreadId)
+                    throw new InvalidOperationException(
+                        "Viewer integration cleanup must run on its creator thread."
+                    );
+                try
+                {
+                    Viewer.Dispose();
+                }
+                finally
+                {
+                    SynchronizationContext.SetSynchronizationContext(_previous);
+                }
             }
         }
 
@@ -458,10 +479,7 @@ namespace QuickFiler.Test.Viewers
 
             public void Dispose()
             {
-                if (DisposeCount == 0)
-                {
-                    DisposeCount++;
-                }
+                DisposeCount++;
             }
         }
     }

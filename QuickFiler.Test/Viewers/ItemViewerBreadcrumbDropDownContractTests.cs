@@ -1,8 +1,10 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Web.WebView2.Core;
 using QuickFiler.Viewers;
@@ -95,6 +97,36 @@ namespace QuickFiler.Test.Viewers
                 .GetEvent("FolderKeyDown")
                 .EventHandlerType.Should()
                 .Be(typeof(KeyEventHandler));
+        }
+
+        [TestMethod]
+        public void HostNeutralPopupOpenOrchestration_IsOwnedByInstrumentedCoordinator()
+        {
+            // Arrange
+            Type coordinatorType = typeof(QuickFiler.ItemViewer).Assembly.GetType(
+                "QuickFiler.Viewers.BreadcrumbDropDownOpenCoordinator",
+                false
+            );
+            MethodInfo itemViewerOpenMethod = typeof(QuickFiler.ItemViewer).GetMethod(
+                "OpenBreadcrumbDropDownAsync",
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly
+            );
+
+            // Assert
+            using (new AssertionScope())
+            {
+                coordinatorType
+                    .Should()
+                    .NotBeNull("host-neutral popup-open orchestration must be instrumented");
+                coordinatorType?.IsNotPublic.Should().BeTrue("the coordinator is internal");
+                coordinatorType
+                    ?.GetCustomAttribute<ExcludeFromCodeCoverageAttribute>()
+                    .Should()
+                    .BeNull("the coordinator must remain measurable");
+                itemViewerOpenMethod
+                    .Should()
+                    .BeNull("ItemViewer must delegate host-neutral popup-open orchestration");
+            }
         }
     }
 }

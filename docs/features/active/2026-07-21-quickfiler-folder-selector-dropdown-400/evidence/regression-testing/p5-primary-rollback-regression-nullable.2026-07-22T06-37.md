@@ -1,0 +1,9 @@
+# P5 Primary Rollback Regression Nullable Analysis
+
+Timestamp: 2026-07-22T06:37:01.8648308Z
+
+Command: `& 'C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe' 'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskMaster.sln' /t:Build /p:Configuration=Debug /p:Platform='Any CPU' /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+
+EXIT_CODE: 0
+
+Output Summary: The fully expanded nullable warnings-as-errors solution build succeeded with 0 errors and 5 existing `System.Reactive` packages.config compatibility warnings. No compiler or nullable diagnostic was introduced by the corrected rollback tests. This artifact supersedes the earlier relative-command P5-T47 artifact.

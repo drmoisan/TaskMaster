@@ -184,6 +184,96 @@ namespace QuickFiler.Test.Viewers
         }
 
         [TestMethod]
+        public async Task DispatchValue_AmbientOwningContext_StillSchedulesBeforeControlAccess()
+        {
+            // Arrange
+            var context = new RecordingSynchronizationContext();
+            var observed = new List<Exception>();
+            var dispatcher = new BreadcrumbUiDispatcher(context, observed.Add);
+            Task<int> dispatch;
+            Action dispatchNull = () => dispatcher.DispatchValue<int>(null);
+            SynchronizationContext previous = SynchronizationContext.Current;
+            try
+            {
+                SynchronizationContext.SetSynchronizationContext(context);
+
+                // Act
+                dispatch = dispatcher.DispatchValue(() => 42);
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previous);
+            }
+
+            // Assert
+            dispatchNull.Should().Throw<ArgumentNullException>().WithParameterName("action");
+            dispatch.IsCompleted.Should().BeFalse("ambient context alone is not an inline proof");
+            context.PostCount.Should().Be(1);
+            await context.DrainUntilAsync(dispatch).ConfigureAwait(false);
+            (await dispatch.ConfigureAwait(false)).Should().Be(42);
+            observed.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public void DispatchValue_NestedSynchronousDispatch_ExecutesInlineWithoutAnotherPost()
+        {
+            // Arrange
+            var context = new RecordingSynchronizationContext();
+            var observed = new List<Exception>();
+            var dispatcher = new BreadcrumbUiDispatcher(context, observed.Add);
+            Task<int> nested = null;
+            Task<int> nestedFailure = null;
+            var failure = new InvalidOperationException("nested value action failed");
+            SynchronizationContext previous = SynchronizationContext.Current;
+
+            // Act
+            try
+            {
+                SynchronizationContext.SetSynchronizationContext(context);
+                dispatcher.Dispatch(() =>
+                {
+                    nested = dispatcher.DispatchValue(() => 17);
+                    nestedFailure = dispatcher.DispatchValue<int>(() => throw failure);
+                });
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previous);
+            }
+
+            // Assert
+            nested.Should().NotBeNull();
+            nested.Status.Should().Be(TaskStatus.RanToCompletion);
+            nested.GetAwaiter().GetResult().Should().Be(17);
+            Action observeFailure = () => nestedFailure.GetAwaiter().GetResult();
+            observeFailure.Should().Throw<InvalidOperationException>().Which.Should().Be(failure);
+            context.PostCount.Should().Be(0);
+            observed.Should().ContainSingle().Which.Should().BeSameAs(failure);
+        }
+
+        [TestMethod]
+        public async Task DispatchValue_SchedulingFailure_ReportsOnceAndFaultsReturnedTask()
+        {
+            // Arrange
+            var failure = new InvalidOperationException("value scheduling rejected");
+            var context = new ThrowingSynchronizationContext(failure);
+            var observed = new List<Exception>();
+            var dispatcher = new BreadcrumbUiDispatcher(context, observed.Add);
+
+            // Act
+            Task<int> dispatch = dispatcher.DispatchValue(() => 1);
+            Func<Task> observeFailure = async () => await dispatch.ConfigureAwait(false);
+
+            // Assert
+            await observeFailure
+                .Should()
+                .ThrowAsync<InvalidOperationException>()
+                .Where(value => ReferenceEquals(value, failure));
+            context.PostAttempts.Should().Be(1);
+            observed.Should().ContainSingle().Which.Should().BeSameAs(failure);
+        }
+
+        [TestMethod]
         public void ProductionCaptureWithoutUiContext_FailsFast()
         {
             // Arrange
@@ -204,6 +294,17 @@ namespace QuickFiler.Test.Viewers
             {
                 SynchronizationContext.SetSynchronizationContext(previous);
             }
+
+            BreadcrumbUiDispatcher testDispatcher =
+                BreadcrumbUiDispatcher.CreateForCurrentThreadTests();
+            Func<Task> dispatchWithoutContext = async () =>
+                await Task.Run(() => testDispatcher.DispatchValue(() => 1)).ConfigureAwait(false);
+            dispatchWithoutContext
+                .Should()
+                .ThrowAsync<InvalidOperationException>()
+                .WithMessage("*cannot marshal cross-thread UI work*")
+                .GetAwaiter()
+                .GetResult();
         }
 
         [TestMethod]
