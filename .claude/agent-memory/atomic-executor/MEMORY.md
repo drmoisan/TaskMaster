@@ -1,5 +1,6 @@
 # Atomic Executor Memory Index
 
+- [#400 CompleteOpenAsync unreachable recovery catch](project_400_completeopenasync_unreachable_recovery_catch.md) — P5-T185..204: CompleteOpenAsync d__16 153-156 is dead code (dispatcher.Report swallows sink exceptions), can't reach >=90% test-only; blocks T202-T204, escalated; 17-class gate deadlocks PopupControlDispatch testhost, retry after clearing runners (passed 5th try)
 - [csharpier pipe-files is a non-enforcing gate](project_csharpier_pipefiles_nonenforcing_gate.md) — `csharpier pipe-files`+re-hash-unmodified-file enforces nothing; use `csharpier check`/`format`; #400 P5 tests balloon past 500 lines under genuine format (size new files AFTER format, not hand-written count)
 
 - [#398 test-split gate gotchas](project_398_test_split_gate_gotchas.md) — pre-existing CS2002 duplicate PercentageFormatterTests Compile (latent til recompile, out of scope, don't Rebuild-to-verify); /EnableCodeCoverage has no branch% + .coverage merges to empty cobertura → use Cobertura-runsettings variant + single report-level JaCoCo counter; cobertura run needs MSTest Workers=4 or TryAddValuesAsync times out ~22s
