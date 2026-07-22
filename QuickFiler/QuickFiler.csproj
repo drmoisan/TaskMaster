@@ -390,10 +390,13 @@
     </Compile>
     <Compile Include="Viewers\IItemViewer.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinator.cs" />
+    <Compile Include="Viewers\BreadcrumbUiDispatcher.cs" />
     <Compile Include="Viewers\BreadcrumbMessengerHub.cs" />
     <Compile Include="Viewers\BreadcrumbPopupPlacement.cs" />
     <Compile Include="Viewers\IBreadcrumbDropDownHost.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownHost.cs" />
+    <Compile Include="Viewers\BreadcrumbCollapsedSurfaceController.cs" />
+    <Compile Include="Viewers\BreadcrumbWebViewSurfaceFactory.cs" />
     <Compile Include="Viewers\IWebViewCoreInitializer.cs" />
     <Compile Include="Viewers\IBreadcrumbWebHost.cs" />
     <Compile Include="Viewers\WebView2BreadcrumbHost.cs" />

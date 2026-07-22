@@ -6,42 +6,26 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS.OutlookObjects.Folder
 {
-    /// <summary>
-    /// Pure async message router for the QuickFiler breadcrumb bridge (#351 P3-T7): JSON string in
-    /// -&gt; typed message -&gt; <see cref="BreadcrumbStateModel"/> transition and/or
-    /// <see cref="IFolderHierarchyProvider"/> call -&gt; JSON string(s) out. Also owns the
-    /// host-driven population entry points (suggestions, plain items, clear, selection) so all
-    /// correctness lives in this host-neutral, fully unit-testable type. No WebView2, WinForms, or
-    /// COM references; the only I/O reachable from here is behind the injected provider (G6).
-    /// </summary>
+    /// <summary>Host-neutral breadcrumb message router and population boundary.</summary>
     public sealed class FolderBreadcrumbBridgeRouter
     {
         private readonly IFolderHierarchyProvider _provider;
         private readonly BreadcrumbStateModel _model = new BreadcrumbStateModel();
+        private readonly BreadcrumbSelectionSession _selectionSession;
         private readonly object _sync = new object();
         private int _suggestionGeneration;
 
-        /// <summary>
-        /// Creates a router over the injected 9101 provider.
-        /// </summary>
-        /// <param name="provider">The merged 9101 hierarchy provider. Required.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="provider"/> is null.</exception>
+        /// <summary>Creates a router over the injected hierarchy provider.</summary>
         public FolderBreadcrumbBridgeRouter(IFolderHierarchyProvider provider)
         {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
+            _selectionSession = new BreadcrumbSelectionSession(_model);
         }
 
-        /// <summary>The routed state model (selection reads go through the selection map).</summary>
-        public BreadcrumbStateModel Model => _model;
+        /// <summary>Test-visible mutable model; production callers use router snapshots.</summary>
+        internal BreadcrumbStateModel Model => _model;
 
-        /// <summary>
-        /// Populates Path A suggestion rows: each scored row's ancestor chain comes from the
-        /// provider (<c>ResolveLeafKeyAsync</c> + <c>GetAncestorChainAsync</c>, FR-1/FR-4); scored
-        /// rows whose path cannot be resolved fall back to a plain row carrying the score's folder
-        /// path so the selection contract still yields the exact path (G10). Non-scored rows
-        /// (separators, search results, recents) become plain verbatim rows. Returns the render
-        /// payload JSON.
-        /// </summary>
+        /// <summary>Resolves scored rows to chains, retaining exact-path fallbacks.</summary>
         public async Task<string> SetSuggestionsAsync(
             IReadOnlyList<FolderRow> rows,
             CancellationToken cancellationToken
@@ -54,17 +38,15 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
             int generation = Interlocked.Increment(ref _suggestionGeneration);
 
-            // #398: resolve every row's ancestor chain into a LOCAL collection first, mutating no
-            // shared model state while awaiting the provider, then swap the completed set into the
-            // model atomically. This removes the mid-rebuild empty window that let a concurrent host
-            // SelectRow race a transiently cleared or partially-populated model.
+            // Resolve locally, then atomically swap, so provider awaits expose no partial model.
             var built = new List<BreadcrumbStateRow>(rows.Count);
-            foreach (var row in rows)
+            for (int rowIndex = 0; rowIndex < rows.Count; rowIndex++)
             {
+                FolderRow row = rows[rowIndex];
+                BreadcrumbStateRow fallback = CreateFallbackRow(row, rowIndex);
                 if (row.Score.HasValue)
                 {
                     string path = row.Score.Value.FolderPath;
-                    var fallback = new BreadcrumbStateRow(path, path, row.Score.Value.Probability);
                     try
                     {
                         var key = await _provider
@@ -78,7 +60,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
                                     .ConfigureAwait(false);
                         built.Add(
                             chain != null && chain.Count > 0
-                                ? new BreadcrumbStateRow(path, chain, row.Score.Value.Probability)
+                                ? new BreadcrumbStateRow(
+                                    fallback.Identity,
+                                    chain,
+                                    row.Score.Value.Probability
+                                )
                                 : fallback
                         );
                     }
@@ -93,7 +79,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 }
                 else
                 {
-                    built.Add(new BreadcrumbStateRow(row.Text));
+                    built.Add(fallback);
                 }
             }
 
@@ -103,14 +89,12 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 {
                     return RenderJsonCore();
                 }
-                ReplaceRowsPreservingIdentity(built);
+                ReplaceRowsPreservingSession(built);
                 return RenderJsonCore();
             }
         }
 
-        /// <summary>
-        /// Synchronously publishes scored fallbacks before asynchronous hierarchy decoration.
-        /// </summary>
+        /// <summary>Publishes scored fallbacks before asynchronous hierarchy decoration.</summary>
         public string SetSuggestionFallbacks(IReadOnlyList<FolderRow> rows)
         {
             if (rows == null)
@@ -120,30 +104,19 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
             Interlocked.Increment(ref _suggestionGeneration);
             var built = new List<BreadcrumbStateRow>(rows.Count);
-            foreach (var row in rows)
+            for (int rowIndex = 0; rowIndex < rows.Count; rowIndex++)
             {
-                if (row.Score.HasValue)
-                {
-                    string path = row.Score.Value.FolderPath;
-                    built.Add(new BreadcrumbStateRow(path, path, row.Score.Value.Probability));
-                }
-                else
-                {
-                    built.Add(new BreadcrumbStateRow(row.Text));
-                }
+                built.Add(CreateFallbackRow(rows[rowIndex], rowIndex));
             }
 
             lock (_sync)
             {
-                ReplaceRowsPreservingIdentity(built);
+                ReplaceRowsPreservingSession(built);
                 return RenderJsonCore();
             }
         }
 
-        /// <summary>
-        /// Populates Path B plain rows verbatim (search results, including the literal
-        /// "Trash to Delete"; G10). Returns the render payload JSON.
-        /// </summary>
+        /// <summary>Replaces the model with exact Path B plain-row values.</summary>
         public string SetItems(IReadOnlyList<string> items)
         {
             if (items == null)
@@ -155,10 +128,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
             lock (_sync)
             {
                 _model.Clear();
-                foreach (var item in items)
-                {
-                    _model.AddPlainRow(item);
-                }
+                AddPlainRows(items);
+                _selectionSession.SynchronizeCommittedSelection();
                 return RenderJsonCore();
             }
         }
@@ -174,43 +145,69 @@ namespace UtilitiesCS.OutlookObjects.Folder
             Interlocked.Increment(ref _suggestionGeneration);
             lock (_sync)
             {
-                foreach (var item in items)
-                {
-                    _model.AddPlainRow(item);
-                }
+                AddPlainRows(items);
+                _selectionSession.SynchronizeCommittedSelection();
                 return RenderJsonCore();
             }
         }
 
-        /// <summary>Clears all rows and the selection. Returns the (empty) render payload JSON.</summary>
-        public string Clear()
+        private void AddPlainRows(IReadOnlyList<string> items)
+        {
+            int firstOccurrence = _model.Rows.Count;
+            for (int index = 0; index < items.Count; index++)
+            {
+                string item = items[index];
+                _model.AddPlainRow(
+                    BreadcrumbRowIdentity.ForPlainRow(item, firstOccurrence + index),
+                    item,
+                    !BreadcrumbStateRow.IsBanner(item)
+                );
+            }
+        }
+
+        /// <summary>Clears rows and closes any open selector session.</summary>
+        public BreadcrumbSelectionTransition Clear()
         {
             Interlocked.Increment(ref _suggestionGeneration);
-            lock (_sync)
-            {
-                _model.Clear();
-                return RenderJsonCore();
-            }
+            return Mutate(_selectionSession.ClearSelector);
         }
 
-        /// <summary>Host-driven row selection (SetFolderSelectedIndex). Returns the render payload JSON.</summary>
-        public string SelectRow(int index)
-        {
-            lock (_sync)
-            {
-                _model.SelectRow(index);
-                return RenderJsonCore();
-            }
-        }
+        /// <summary>Selects one row and synchronizes committed selector state.</summary>
+        public BreadcrumbSelectionTransition SelectRow(int index) =>
+            Mutate(() => _selectionSession.SelectRow(index));
+
+        /// <summary>Selects the first row whose output equals <paramref name="item"/>.</summary>
+        public BreadcrumbSelectionTransition SelectItem(string item) =>
+            Mutate(() => _selectionSession.SelectItem(item));
+
+        public BreadcrumbSelectionTransition OpenSelector() =>
+            Mutate(_selectionSession.OpenSelector);
+
+        public BreadcrumbSelectionTransition MoveSelector(bool previous) =>
+            Mutate(() => _selectionSession.MoveSelector(previous));
+
+        public BreadcrumbSelectionTransition CommitSelector() =>
+            Mutate(_selectionSession.CommitSelector);
+
+        public BreadcrumbSelectionTransition ActivateSelector(string identity) =>
+            Mutate(() => _selectionSession.ActivateSelector(identity));
+
+        public BreadcrumbSelectionTransition CancelSelector() =>
+            Mutate(_selectionSession.CancelSelector);
+
+        public BreadcrumbSelectorState GetSelectorState() => Read(_selectionSession.Snapshot);
+
+        public string? GetSelectedFolder() =>
+            Read(() => BreadcrumbSelectionMap.GetSelectedFolder(_model));
+
+        public string[] GetFolderItems() =>
+            Read(() => BreadcrumbSelectionMap.GetFolderItems(_model));
+
+        public bool Contains(string item) =>
+            Read(() => BreadcrumbSelectionMap.FolderContains(_model, item));
 
         /// <summary>The current render payload JSON (full re-render message, FR-6).</summary>
-        public string RenderJson()
-        {
-            lock (_sync)
-            {
-                return RenderJsonCore();
-            }
-        }
+        public string RenderJson() => Read(RenderJsonCore);
 
         private string RenderJsonCore()
         {
@@ -219,12 +216,51 @@ namespace UtilitiesCS.OutlookObjects.Folder
             );
         }
 
-        /// <summary>
-        /// Routes one inbound bridge message and returns the ordered outbound JSON messages.
-        /// Malformed input, unroutable messages, invalid indexes, and provider failures surface as
-        /// an explicit <c>error</c> response (fail fast at this boundary — never silently dropped);
-        /// cancellation propagates.
-        /// </summary>
+        private BreadcrumbSelectionTransition Mutate(Func<BreadcrumbSelectionEffects> mutation)
+        {
+            lock (_sync)
+            {
+                return Transition(mutation());
+            }
+        }
+
+        private static BreadcrumbStateRow CreateFallbackRow(FolderRow row, int index)
+        {
+            string identity = BreadcrumbRowIdentity.ForFolderRow(row, index);
+            return row.Score.HasValue
+                ? new BreadcrumbStateRow(
+                    identity,
+                    row.Score.Value.FolderPath,
+                    row.Score.Value.Probability
+                )
+                : new BreadcrumbStateRow(identity, row.Text, row.Kind != FolderRowKind.Separator);
+        }
+
+        private T Read<T>(Func<T> reader)
+        {
+            lock (_sync)
+            {
+                return reader();
+            }
+        }
+
+        private BreadcrumbSelectionTransition Transition(BreadcrumbSelectionEffects effects) =>
+            new BreadcrumbSelectionTransition(
+                HasEffect(effects, BreadcrumbSelectionEffects.Handled),
+                HasEffect(effects, BreadcrumbSelectionEffects.SelectionChanged),
+                HasEffect(effects, BreadcrumbSelectionEffects.OpenStateChanged),
+                HasEffect(effects, BreadcrumbSelectionEffects.RenderRequired)
+                    ? RenderJsonCore()
+                    : null,
+                _selectionSession.Snapshot()
+            );
+
+        private static bool HasEffect(
+            BreadcrumbSelectionEffects effects,
+            BreadcrumbSelectionEffects expected
+        ) => (effects & expected) != 0;
+
+        /// <summary>Routes one inbound message and returns ordered outbound JSON.</summary>
         public async Task<IReadOnlyList<string>> RouteAsync(
             string inboundJson,
             CancellationToken cancellationToken
@@ -261,9 +297,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
                             {
                                 _model.SelectSubfolder(m.SubfolderIndex);
                             }
+                            _selectionSession.SynchronizeCommittedSelection();
                         }
-                        // The ack carries no mapped folder; the coordinator resolves the output
-                        // string through the selection map when raising SelectionChanged (FR-7).
                         return new[]
                         {
                             RenderJson(),
@@ -281,8 +316,6 @@ namespace UtilitiesCS.OutlookObjects.Folder
                             RenderJson(),
                         };
                     case UnhandledArrowMessage m:
-                        // The JS-side report is re-emitted so the coordinator can invoke the
-                        // legacy fall-through behavior (FR-6).
                         return new[] { BreadcrumbBridgeSerializer.Serialize(m) };
                     default:
                         return ErrorResponse(
@@ -296,8 +329,6 @@ namespace UtilitiesCS.OutlookObjects.Folder
             }
             catch (Exception ex)
             {
-                // Boundary catch (JS bridge edge): state/provider failures must surface to the page
-                // as an explicit error response instead of tearing down the message pump.
                 return ErrorResponse(ex.Message);
             }
         }
@@ -377,8 +408,6 @@ namespace UtilitiesCS.OutlookObjects.Folder
             }
             catch (Exception ex)
             {
-                // Boundary catch: revert the expansion so the model stays consistent, then surface
-                // the provider failure explicitly (P3-T8 negative contract).
                 row.TryCollapseLeaf();
                 return ErrorResponse($"Subfolder query failed: {ex.Message}");
             }
@@ -424,28 +453,10 @@ namespace UtilitiesCS.OutlookObjects.Folder
             return _model.Rows[rowIndex];
         }
 
-        private void ReplaceRowsPreservingIdentity(IReadOnlyList<BreadcrumbStateRow> rows)
+        private void ReplaceRowsPreservingSession(IReadOnlyList<BreadcrumbStateRow> rows)
         {
-            string? selectedIdentity = _model.SelectedRow?.Identity;
             _model.ReplaceRows(rows);
-            if (selectedIdentity == null)
-            {
-                return;
-            }
-            for (int index = 0; index < _model.Rows.Count; index++)
-            {
-                if (
-                    string.Equals(
-                        _model.Rows[index].Identity,
-                        selectedIdentity,
-                        StringComparison.Ordinal
-                    )
-                )
-                {
-                    _model.SelectRow(index);
-                    return;
-                }
-            }
+            _selectionSession.ReconcileRowsReplaced();
         }
 
         private static IReadOnlyList<string> ErrorResponse(string message)

@@ -1,0 +1,87 @@
+Timestamp: 2026-07-21T22-07Z
+Command: `git status --short`
+EXIT_CODE: 0
+Output Summary: The status captures the complete current remediation worktree. Tracked production/test/project/spec changes, new readiness/lifecycle production/tests, prior audit/remediation/evidence artifacts, and the current remediation-plan/evidence additions are all preserved. No path was cleaned, reset, or discarded.
+
+Exact output:
+
+```text
+ M QuickFiler.Test/QuickFiler.Test.csproj
+ M QuickFiler.Test/Viewers/BreadcrumbDropDownIntegrationTests.cs
+ M QuickFiler.Test/Viewers/BreadcrumbSelectorCoordinatorTests.cs
+ M QuickFiler/QuickFiler.csproj
+ M QuickFiler/Viewers/BreadcrumbDropDownHost.cs
+ M docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/spec.md
+?? QuickFiler.Test/Viewers/BreadcrumbDropDownCoverageThresholdTests.cs
+?? QuickFiler.Test/Viewers/BreadcrumbDropDownLifecycleConcurrencyTests.cs
+?? QuickFiler.Test/Viewers/BreadcrumbDropDownReadinessTests.cs
+?? QuickFiler/Viewers/BreadcrumbWebViewSurfaceFactory.cs
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/code-review.2026-07-21T18-19.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/code-review.2026-07-21T21-27.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/baseline/ac-remediation-reset.2026-07-21T22-06.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/baseline/analyzers-baseline.2026-07-21T18-53.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/baseline/coverage-accounting-baseline.2026-07-21T18-55.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/baseline/coverage-remediation-baseline.2026-07-21T18-54.cobertura.xml
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/baseline/csharpier-baseline.2026-07-21T18-53.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/baseline/mstest-coverage-baseline.2026-07-21T18-55.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/baseline/nullable-baseline.2026-07-21T18-54.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/baseline/phase0-instructions-read.2026-07-21T18-51.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/baseline/phase0-instructions-read.2026-07-21T22-03.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/baseline/remediation-requirements-map.2026-07-21T18-51.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/baseline/remediation-requirements-map.2026-07-21T22-05.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/baseline/repository-state.2026-07-21T18-53.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/baseline/scope-and-project-baseline.2026-07-21T18-55.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/baseline/scope-and-project-rebaseline.2026-07-21T19-40.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/acceptance-verification.2026-07-21T21-19.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/artifact-validation.2026-07-21T21-24.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/coverage-delta.2026-07-21T21-18.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/coverage-exclusion-integrity.2026-07-21T20-18.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/coverage-final.2026-07-21T20-20.cobertura.xml
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/coverage-final.2026-07-21T20-25.cobertura.xml
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/coverage-final.2026-07-21T20-38.cobertura.xml
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/coverage-final.2026-07-21T21-09.cobertura.xml
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/coverage-threshold-analyzers.2026-07-21T21-04.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/coverage-threshold-csharpier.2026-07-21T21-04.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/coverage-threshold-nullable.2026-07-21T21-04.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/coverage-threshold-scope-integrity.2026-07-21T21-06.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/file-size-and-project-includes.2026-07-21T20-19.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/final-analyzers.2026-07-21T20-25.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/final-analyzers.2026-07-21T20-38.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/final-analyzers.2026-07-21T21-07.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/final-csharpier.2026-07-21T20-25.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/final-csharpier.2026-07-21T20-38.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/final-csharpier.2026-07-21T21-07.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/final-diff-integrity.2026-07-21T21-21.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/final-mstest-coverage.2026-07-21T20-25.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/final-mstest-coverage.2026-07-21T20-38.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/final-mstest-coverage.2026-07-21T21-09.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/final-nullable.2026-07-21T20-25.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/final-nullable.2026-07-21T20-38.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/final-nullable.2026-07-21T21-07.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/final-pass-integrity.2026-07-21T20-27.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/final-pass-integrity.2026-07-21T20-40.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/final-pass-integrity.2026-07-21T21-11.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/final-pass-superseded.2026-07-21T20-32.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/final-pass-superseded.2026-07-21T20-44.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/host-fix-scope.2026-07-21T20-04.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/nonnumeric-adapter-accounting.2026-07-21T20-19.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/semantic-test-policy.2026-07-21T20-17.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/qa-gates/spec-checkbox-reconciliation.2026-07-21T21-23.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/regression-testing/closed-surface-regression.2026-07-21T20-03.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/regression-testing/coverage-threshold-focused-pass.2026-07-21T21-04.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/regression-testing/coverage-threshold-test-baseline.2026-07-21T20-54.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/regression-testing/failure-first-test-policy.2026-07-21T19-14.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/regression-testing/host-readiness-lifecycle-pass.2026-07-21T19-55.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/regression-testing/lifecycle-fail-before.2026-07-21T19-13.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/regression-testing/preserved-selector-contracts.2026-07-21T20-15.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/regression-testing/readiness-fail-before.2026-07-21T19-04.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/regression-testing/semantic-composition.2026-07-21T20-14.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/feature-audit.2026-07-21T18-19.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/feature-audit.2026-07-21T21-27.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/policy-audit.2026-07-21T18-19.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/policy-audit.2026-07-21T21-27.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/remediation-inputs.2026-07-21T18-19.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/remediation-inputs.2026-07-21T21-37.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/remediation-plan.2026-07-21T18-19.md
+?? docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/remediation-plan.2026-07-21T21-37.md
+```

@@ -1,7 +1,9 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using UtilitiesCS.OutlookObjects.Folder;
 
 namespace QuickFiler.Viewers
@@ -26,7 +28,7 @@ namespace QuickFiler.Viewers
             }
 
             public IWebViewMessenger Messenger { get; }
-            public BreadcrumbSelectorViewMode Mode { get; set; }
+            public BreadcrumbSelectorViewMode Mode { get; }
             public EventHandler<string> Handler { get; }
         }
 
@@ -57,7 +59,7 @@ namespace QuickFiler.Viewers
 
         /// <summary>
         /// Attaches one page surface in its presentation mode. Reattaching the same messenger is
-        /// idempotent and changing its mode does not add a second inbound subscription.
+        /// a no-op that preserves its original mode, subscription, and replay state.
         /// </summary>
         public bool Attach(IWebViewMessenger messenger, BreadcrumbSelectorViewMode mode)
         {
@@ -69,23 +71,26 @@ namespace QuickFiler.Viewers
             lock (_sync)
             {
                 ThrowIfDisposed();
-                if (_attachments.TryGetValue(messenger, out Attachment? existing))
+                if (_attachments.ContainsKey(messenger))
                 {
-                    if (existing.Mode == mode)
-                    {
-                        return false;
-                    }
-                    existing.Mode = mode;
-                    ReplayCachedState(existing);
                     return false;
                 }
 
                 EventHandler<string> handler = OnSurfaceMessageReceived;
                 var attachment = new Attachment(messenger, mode, handler);
                 _attachments.Add(messenger, attachment);
-                messenger.MessageReceived += handler;
-                ReplayCachedState(attachment);
-                return true;
+                try
+                {
+                    messenger.MessageReceived += handler;
+                    ReplayCachedState(attachment);
+                    return true;
+                }
+                catch
+                {
+                    _attachments.Remove(messenger);
+                    SafeUnsubscribe(attachment);
+                    throw;
+                }
             }
         }
 
@@ -104,8 +109,8 @@ namespace QuickFiler.Viewers
                     return false;
                 }
 
-                messenger.MessageReceived -= attachment.Handler;
                 _attachments.Remove(messenger);
+                SafeUnsubscribe(attachment);
                 return true;
             }
         }
@@ -140,13 +145,11 @@ namespace QuickFiler.Viewers
                     return;
                 }
 
+                _disposed = true;
                 foreach (Attachment attachment in _attachments.Values)
-                {
-                    attachment.Messenger.MessageReceived -= attachment.Handler;
-                }
+                    SafeUnsubscribe(attachment);
                 _attachments.Clear();
                 _cachedStates.Clear();
-                _disposed = true;
             }
             GC.SuppressFinalize(this);
         }
@@ -156,7 +159,11 @@ namespace QuickFiler.Viewers
             EventHandler<string>? handler;
             lock (_sync)
             {
-                if (_disposed)
+                if (
+                    _disposed
+                    || !(sender is IWebViewMessenger messenger)
+                    || !_attachments.ContainsKey(messenger)
+                )
                 {
                     return;
                 }
@@ -249,6 +256,207 @@ namespace QuickFiler.Viewers
             {
                 throw new ObjectDisposedException(nameof(BreadcrumbMessengerHub));
             }
+        }
+
+        private static void SafeUnsubscribe(Attachment attachment)
+        {
+            try
+            {
+                attachment.Messenger.MessageReceived -= attachment.Handler;
+            }
+            catch (Exception exception)
+            {
+                log4net
+                    .LogManager.GetLogger(typeof(BreadcrumbMessengerHub))
+                    .Error("Breadcrumb surface detachment failed.", exception);
+            }
+        }
+    }
+
+    /// <summary>Attaches one collapsed candidate only after its exact navigation is ready.</summary>
+    internal sealed class BreadcrumbCollapsedAttachment : IDisposable
+    {
+        private readonly BreadcrumbMessengerHub _hub;
+        private readonly BreadcrumbCollapsedSurfaceController _controller;
+        private IWebViewMessenger? _pendingMessenger;
+        private BreadcrumbNavigationReadiness? _pendingReadiness;
+        private Task<bool>? _pendingAttachment;
+        private IWebViewMessenger? _readyMessenger;
+        private long _generation;
+        private bool _disposed;
+
+        internal BreadcrumbCollapsedAttachment(
+            BreadcrumbMessengerHub hub,
+            BreadcrumbCollapsedSurfaceController controller
+        )
+        {
+            _hub = hub ?? throw new ArgumentNullException(nameof(hub));
+            _controller = controller ?? throw new ArgumentNullException(nameof(controller));
+        }
+
+        internal Task<bool> AttachAsync(
+            Func<Tuple<IWebViewMessenger, BreadcrumbNavigationReadiness>> candidateFactory
+        )
+        {
+            if (candidateFactory == null)
+                throw new ArgumentNullException(nameof(candidateFactory));
+
+            ThrowIfDisposed();
+            if (_readyMessenger != null)
+                return Task.FromResult(true);
+            Task<bool>? pending = _pendingAttachment;
+            if (pending?.IsCompleted == false)
+                return pending;
+
+            long generation = ++_generation;
+            TaskCompletionSource<bool> completion = NewCompletionSource();
+            _pendingAttachment = completion.Task;
+            IWebViewMessenger? messenger = null;
+            BreadcrumbNavigationReadiness? readiness = null;
+            try
+            {
+                Tuple<IWebViewMessenger, BreadcrumbNavigationReadiness>? candidate =
+                    candidateFactory();
+                messenger = candidate?.Item1;
+                readiness = candidate?.Item2;
+                if (messenger == null || readiness == null)
+                    throw new InvalidOperationException(
+                        "Collapsed attachment did not provide a messenger and readiness lease."
+                    );
+                if (_disposed || generation != _generation)
+                {
+                    readiness.Dispose();
+                    (messenger as IDisposable)?.Dispose();
+                    completion.TrySetResult(false);
+                    return completion.Task;
+                }
+
+                _pendingMessenger = messenger;
+                _pendingReadiness = readiness;
+                _ = CompleteAsync(messenger, readiness, generation, completion);
+            }
+            catch (Exception exception)
+            {
+                readiness?.Dispose();
+                (messenger as IDisposable)?.Dispose();
+                if (generation == _generation)
+                    _pendingAttachment = null;
+                completion.TrySetException(exception);
+            }
+            return completion.Task;
+        }
+
+        internal void Reset() => Release(dispose: false);
+
+        public void Dispose()
+        {
+            Release(dispose: true);
+            GC.SuppressFinalize(this);
+        }
+
+        private async Task CompleteAsync(
+            IWebViewMessenger messenger,
+            BreadcrumbNavigationReadiness readiness,
+            long generation,
+            TaskCompletionSource<bool> completion
+        )
+        {
+            bool attached = false;
+            try
+            {
+                // Preserve the ItemViewer synchronization context for the hub subscription/replay.
+                bool ready = await _controller.AttachAsync(messenger, readiness);
+                if (
+                    ready
+                    && IsCurrent(generation, messenger)
+                    && ReferenceEquals(_controller.ReadyMessenger, messenger)
+                )
+                {
+                    _hub.Attach(messenger, BreadcrumbSelectorViewMode.Collapsed);
+                    _readyMessenger = messenger;
+                    attached = true;
+                }
+            }
+            catch (Exception exception)
+            {
+                if (IsCurrent(generation, messenger))
+                    _controller.Reset();
+                completion.TrySetException(exception);
+                return;
+            }
+            finally
+            {
+                if (IsCurrent(generation, messenger))
+                {
+                    _pendingMessenger = null;
+                    _pendingReadiness = null;
+                    _pendingAttachment = null;
+                }
+            }
+            completion.TrySetResult(attached);
+        }
+
+        private void Release(bool dispose)
+        {
+            IWebViewMessenger? ready;
+            IWebViewMessenger? pending;
+            BreadcrumbNavigationReadiness? readiness;
+            if (_disposed)
+                return;
+            _disposed = dispose;
+            _generation++;
+            ready = _readyMessenger;
+            pending = _pendingMessenger;
+            readiness = _pendingReadiness;
+            _readyMessenger = null;
+            _pendingMessenger = null;
+            _pendingReadiness = null;
+            _pendingAttachment = null;
+
+            if (ready != null)
+                _hub.Detach(ready);
+            if (dispose)
+                _controller.Dispose();
+            else
+                _controller.Reset();
+            readiness?.Dispose();
+            (pending as IDisposable)?.Dispose();
+        }
+
+        private bool IsCurrent(long generation, IWebViewMessenger messenger) =>
+            !_disposed
+            && generation == _generation
+            && ReferenceEquals(_pendingMessenger, messenger);
+
+        private void ThrowIfDisposed()
+        {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(BreadcrumbCollapsedAttachment));
+        }
+
+        private static TaskCompletionSource<bool> NewCompletionSource() =>
+            new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+    }
+
+    /// <summary>Runs the ItemViewer breadcrumb cleanup from its component lifetime.</summary>
+    internal sealed class BreadcrumbResourceOwner : Component
+    {
+        private Action? _dispose;
+
+        internal BreadcrumbResourceOwner(Action dispose)
+        {
+            _dispose = dispose ?? throw new ArgumentNullException(nameof(dispose));
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Action? dispose = _dispose;
+                _dispose = null;
+                dispose?.Invoke();
+            }
+            base.Dispose(disposing);
         }
     }
 }

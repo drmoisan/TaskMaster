@@ -220,7 +220,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             Subfolders = EmptySegments;
         }
 
-        private static string IdentityFromChain(IReadOnlyList<FolderBreadcrumbSegment> chain)
+        internal static string IdentityFromChain(IReadOnlyList<FolderBreadcrumbSegment> chain)
         {
             if (chain == null || chain.Count == 0)
             {
@@ -236,7 +236,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 );
         }
 
-        private static string DefaultPlainIdentity(string verbatimText)
+        internal static string DefaultPlainIdentity(string verbatimText)
         {
             if (verbatimText == null)
             {
@@ -245,7 +245,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             return string.IsNullOrWhiteSpace(verbatimText) ? "plain-empty" : verbatimText;
         }
 
-        private static bool IsBanner(string verbatimText) =>
+        internal static bool IsBanner(string verbatimText) =>
             verbatimText?.StartsWith(BreadcrumbRowBuilder.BannerPrefix, StringComparison.Ordinal)
             == true;
 
@@ -314,6 +314,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             }
 
             var replacement = new List<BreadcrumbStateRow>(rows);
+            BreadcrumbRowIdentity.RequireUnique(replacement);
             // Reconcile the selection against the new count BEFORE publishing the new list so no
             // reader can observe the replacement list paired with a stale out-of-range index.
             if (_selectedIndex >= replacement.Count)
@@ -330,7 +331,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             double? probability
         )
         {
-            _rows.Add(new BreadcrumbStateRow(chain, probability));
+            AddSuggestionRow(BreadcrumbStateRow.IdentityFromChain(chain), chain, probability);
         }
 
         /// <summary>Appends a resolved scored suggestion with an explicit stable identity.</summary>
@@ -340,26 +341,33 @@ namespace UtilitiesCS.OutlookObjects.Folder
             double? probability
         )
         {
-            _rows.Add(new BreadcrumbStateRow(identity, chain, probability));
+            _rows.Add(new BreadcrumbStateRow(UniqueIdentity(identity), chain, probability));
         }
 
         /// <summary>Appends a scored suggestion before hierarchy display data is available.</summary>
         public void AddScoredFallbackRow(string identity, string fallbackText, double? probability)
         {
-            _rows.Add(new BreadcrumbStateRow(identity, fallbackText, probability));
+            _rows.Add(new BreadcrumbStateRow(UniqueIdentity(identity), fallbackText, probability));
         }
 
         /// <summary>Appends a Path B plain-string row carried verbatim without probability.</summary>
         public void AddPlainRow(string verbatimText)
         {
-            _rows.Add(new BreadcrumbStateRow(verbatimText));
+            AddPlainRow(
+                BreadcrumbStateRow.DefaultPlainIdentity(verbatimText),
+                verbatimText,
+                !BreadcrumbStateRow.IsBanner(verbatimText)
+            );
         }
 
         /// <summary>Appends a plain row with explicit stable identity and selectability.</summary>
         public void AddPlainRow(string identity, string verbatimText, bool isSelectable)
         {
-            _rows.Add(new BreadcrumbStateRow(identity, verbatimText, isSelectable));
+            _rows.Add(new BreadcrumbStateRow(UniqueIdentity(identity), verbatimText, isSelectable));
         }
+
+        private string UniqueIdentity(string identity) =>
+            BreadcrumbRowIdentity.Disambiguate(identity, _rows);
 
         /// <summary>
         /// Selects the row at <paramref name="index"/> (or -1 to clear the selection) and resets any

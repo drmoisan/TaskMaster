@@ -1,13 +1,89 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 
 namespace UtilitiesCS.OutlookObjects.Folder
 {
+    /// <summary>Immutable selector option exposed across the router boundary.</summary>
+    public sealed class BreadcrumbSelectorOptionState
+    {
+        internal BreadcrumbSelectorOptionState(string identity, bool isSelectable)
+        {
+            Identity = identity;
+            IsSelectable = isSelectable;
+        }
+
+        public string Identity { get; }
+        public bool IsSelectable { get; }
+    }
+
+    /// <summary>Immutable committed, pending, and option state captured under the router lock.</summary>
+    public sealed class BreadcrumbSelectorState
+    {
+        internal BreadcrumbSelectorState(
+            bool isOpen,
+            string? committedIdentity,
+            string? pendingIdentity,
+            IReadOnlyList<BreadcrumbSelectorOptionState> options
+        )
+        {
+            IsOpen = isOpen;
+            CommittedIdentity = committedIdentity;
+            PendingIdentity = pendingIdentity;
+            var copy = new BreadcrumbSelectorOptionState[options.Count];
+            for (int index = 0; index < options.Count; index++)
+            {
+                copy[index] = options[index];
+            }
+            Options = Array.AsReadOnly(copy);
+        }
+
+        public bool IsOpen { get; }
+        public string? CommittedIdentity { get; }
+        public string? PendingIdentity { get; }
+        public IReadOnlyList<BreadcrumbSelectorOptionState> Options { get; }
+    }
+
+    /// <summary>Immutable outcome of one router-owned selector transition.</summary>
+    public sealed class BreadcrumbSelectionTransition
+    {
+        internal BreadcrumbSelectionTransition(
+            bool handled,
+            bool selectionChanged,
+            bool openStateChanged,
+            string? renderJson,
+            BreadcrumbSelectorState selectorState
+        )
+        {
+            Handled = handled;
+            SelectionChanged = selectionChanged;
+            OpenStateChanged = openStateChanged;
+            RenderJson = renderJson;
+            SelectorState = selectorState;
+        }
+
+        public bool Handled { get; }
+        public bool SelectionChanged { get; }
+        public bool OpenStateChanged { get; }
+        public string? RenderJson { get; }
+        public BreadcrumbSelectorState SelectorState { get; }
+    }
+
+    [Flags]
+    internal enum BreadcrumbSelectionEffects
+    {
+        None = 0,
+        Handled = 1,
+        SelectionChanged = 2,
+        OpenStateChanged = 4,
+        RenderRequired = 8,
+    }
+
     /// <summary>
     /// Host-neutral selector session over stable row identities. Closed navigation commits directly;
     /// open navigation changes only pending state until commit or cancellation.
     /// </summary>
-    public sealed class BreadcrumbSelectionSession
+    internal sealed class BreadcrumbSelectionSession
     {
         private readonly BreadcrumbStateModel _model;
 
@@ -37,6 +113,151 @@ namespace UtilitiesCS.OutlookObjects.Folder
             {
                 CommittedIdentity = _model.SelectedRow?.Identity;
             }
+        }
+
+        /// <summary>Reconciles session identities against an atomically replaced row snapshot.</summary>
+        public void ReconcileRowsReplaced()
+        {
+            int committedIndex = IndexOfSelectable(CommittedIdentity);
+            _model.SelectRow(committedIndex);
+            if (committedIndex < 0)
+            {
+                CommittedIdentity = null;
+            }
+
+            if (!IsOpen)
+            {
+                return;
+            }
+            if (IndexOfSelectable(OriginalIdentity) < 0)
+            {
+                OriginalIdentity = CommittedIdentity;
+            }
+            if (IndexOfSelectable(PendingIdentity) < 0)
+            {
+                PendingIdentity = CommittedIdentity;
+            }
+        }
+
+        /// <summary>Captures immutable selector state from the current model.</summary>
+        public BreadcrumbSelectorState Snapshot()
+        {
+            var options = new BreadcrumbSelectorOptionState[_model.Rows.Count];
+            for (int index = 0; index < options.Length; index++)
+            {
+                BreadcrumbStateRow row = _model.Rows[index];
+                options[index] = new BreadcrumbSelectorOptionState(row.Identity, row.IsSelectable);
+            }
+            return new BreadcrumbSelectorState(IsOpen, CommittedIdentity, PendingIdentity, options);
+        }
+
+        public BreadcrumbSelectionEffects ClearSelector()
+        {
+            bool wasOpen = IsOpen;
+            Cancel();
+            _model.Clear();
+            SynchronizeCommittedSelection();
+            return BreadcrumbSelectionEffects.Handled
+                | BreadcrumbSelectionEffects.RenderRequired
+                | (
+                    wasOpen
+                        ? BreadcrumbSelectionEffects.OpenStateChanged
+                        : BreadcrumbSelectionEffects.None
+                );
+        }
+
+        public BreadcrumbSelectionEffects SelectRow(int index)
+        {
+            _model.SelectRow(index);
+            SynchronizeCommittedSelection();
+            return BreadcrumbSelectionEffects.Handled
+                | BreadcrumbSelectionEffects.SelectionChanged
+                | BreadcrumbSelectionEffects.RenderRequired;
+        }
+
+        public BreadcrumbSelectionEffects SelectItem(string item)
+        {
+            if (!BreadcrumbSelectionMap.TrySelectItem(_model, item))
+            {
+                return BreadcrumbSelectionEffects.None;
+            }
+            SynchronizeCommittedSelection();
+            return BreadcrumbSelectionEffects.Handled
+                | BreadcrumbSelectionEffects.SelectionChanged
+                | BreadcrumbSelectionEffects.RenderRequired;
+        }
+
+        public BreadcrumbSelectionEffects OpenSelector()
+        {
+            return Open()
+                ? BreadcrumbSelectionEffects.Handled | BreadcrumbSelectionEffects.OpenStateChanged
+                : BreadcrumbSelectionEffects.None;
+        }
+
+        public BreadcrumbSelectionEffects MoveSelector(bool previous)
+        {
+            bool wasOpen = IsOpen;
+            bool moved = previous ? MovePrevious() : MoveNext();
+            if (!moved)
+            {
+                return BreadcrumbSelectionEffects.None;
+            }
+            return BreadcrumbSelectionEffects.Handled
+                | (
+                    wasOpen
+                        ? BreadcrumbSelectionEffects.None
+                        : BreadcrumbSelectionEffects.SelectionChanged
+                            | BreadcrumbSelectionEffects.RenderRequired
+                );
+        }
+
+        public BreadcrumbSelectionEffects CommitSelector()
+        {
+            if (!IsOpen)
+            {
+                return BreadcrumbSelectionEffects.None;
+            }
+            bool changed = CommitPending();
+            return BreadcrumbSelectionEffects.Handled
+                | BreadcrumbSelectionEffects.OpenStateChanged
+                | BreadcrumbSelectionEffects.RenderRequired
+                | (
+                    changed
+                        ? BreadcrumbSelectionEffects.SelectionChanged
+                        : BreadcrumbSelectionEffects.None
+                );
+        }
+
+        public BreadcrumbSelectionEffects ActivateSelector(string identity)
+        {
+            bool wasOpen = IsOpen;
+            bool changed = Activate(identity);
+            bool closed = wasOpen && !IsOpen;
+            if (!changed && !closed)
+            {
+                return BreadcrumbSelectionEffects.None;
+            }
+            return BreadcrumbSelectionEffects.Handled
+                | BreadcrumbSelectionEffects.RenderRequired
+                | (
+                    changed
+                        ? BreadcrumbSelectionEffects.SelectionChanged
+                        : BreadcrumbSelectionEffects.None
+                )
+                | (
+                    closed
+                        ? BreadcrumbSelectionEffects.OpenStateChanged
+                        : BreadcrumbSelectionEffects.None
+                );
+        }
+
+        public BreadcrumbSelectionEffects CancelSelector()
+        {
+            return Cancel()
+                ? BreadcrumbSelectionEffects.Handled
+                    | BreadcrumbSelectionEffects.OpenStateChanged
+                    | BreadcrumbSelectionEffects.RenderRequired
+                : BreadcrumbSelectionEffects.None;
         }
 
         /// <summary>Snapshots committed selection and starts an open session.</summary>

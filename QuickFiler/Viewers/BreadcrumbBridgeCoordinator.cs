@@ -24,9 +24,9 @@ namespace QuickFiler.Viewers
     /// </summary>
     public sealed class BreadcrumbBridgeCoordinator
     {
+        private readonly BreadcrumbUiDispatcher _dispatcher;
         private readonly IWebViewMessenger _messenger;
         private readonly FolderBreadcrumbBridgeRouter _router;
-        private readonly BreadcrumbSelectionSession _selectionSession;
 
         /// <summary>
         /// Creates the coordinator and subscribes to inbound page messages.
@@ -38,10 +38,19 @@ namespace QuickFiler.Viewers
             IWebViewMessenger messenger,
             IFolderHierarchyProvider provider
         )
+            : this(messenger, provider, CaptureProductionDispatcher(messenger, provider)) { }
+
+        internal BreadcrumbBridgeCoordinator(
+            IWebViewMessenger messenger,
+            IFolderHierarchyProvider provider,
+            BreadcrumbUiDispatcher dispatcher
+        )
         {
             _messenger = messenger ?? throw new ArgumentNullException(nameof(messenger));
-            _router = new FolderBreadcrumbBridgeRouter(provider);
-            _selectionSession = new BreadcrumbSelectionSession(_router.Model);
+            _router = new FolderBreadcrumbBridgeRouter(
+                provider ?? throw new ArgumentNullException(nameof(provider))
+            );
+            _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
             _messenger.MessageReceived += OnMessageReceived;
         }
 
@@ -61,13 +70,13 @@ namespace QuickFiler.Viewers
         public Task LastDispatch { get; private set; } = Task.CompletedTask;
 
         /// <summary>True while the expanded selector owns a pending selection session.</summary>
-        public bool IsSelectorOpen => _selectionSession.IsOpen;
+        public bool IsSelectorOpen => _router.GetSelectorState().IsOpen;
 
         /// <summary>The stable identity currently committed to the model.</summary>
-        public string? CommittedIdentity => _selectionSession.CommittedIdentity;
+        public string? CommittedIdentity => _router.GetSelectorState().CommittedIdentity;
 
         /// <summary>The stable identity highlighted in the expanded selector.</summary>
-        public string? PendingIdentity => _selectionSession.PendingIdentity;
+        public string? PendingIdentity => _router.GetSelectorState().PendingIdentity;
 
         /// <summary>
         /// Populates Path A suggestion rows through the router/provider and posts the render
@@ -81,9 +90,8 @@ namespace QuickFiler.Viewers
             var renderJson = await _router
                 .SetSuggestionsAsync(rows, cancellationToken)
                 .ConfigureAwait(false);
-            _selectionSession.SynchronizeCommittedSelection();
-            _messenger.PostJson(renderJson);
-            PostSelectorState();
+            BreadcrumbSelectorState selectorState = _router.GetSelectorState();
+            await PostRenderAndSelectorAsync(renderJson, selectorState).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -100,9 +108,9 @@ namespace QuickFiler.Viewers
                 throw new ArgumentNullException(nameof(rows));
             }
 
-            _messenger.PostJson(_router.SetSuggestionFallbacks(rows));
-            _selectionSession.SynchronizeCommittedSelection();
-            PostSelectorState();
+            string renderJson = _router.SetSuggestionFallbacks(rows);
+            BreadcrumbSelectorState selectorState = _router.GetSelectorState();
+            _ = PostRenderAndSelectorAsync(renderJson, selectorState);
             SuggestionsUpgrade = UpgradeSuggestionsAsync(rows);
         }
 
@@ -114,40 +122,28 @@ namespace QuickFiler.Viewers
             var renderJson = await _router
                 .SetSuggestionsAsync(rows, CancellationToken.None)
                 .ConfigureAwait(false);
-            _selectionSession.SynchronizeCommittedSelection();
-            _messenger.PostJson(renderJson);
-            PostSelectorState();
+            BreadcrumbSelectorState selectorState = _router.GetSelectorState();
+            await PostRenderAndSelectorAsync(renderJson, selectorState).ConfigureAwait(false);
         }
 
         /// <summary>Appends Path B plain rows verbatim and re-renders (legacy AddRange semantics).</summary>
         public void AddItems(IReadOnlyList<string> items)
         {
-            _messenger.PostJson(_router.AddItems(items));
-            _selectionSession.SynchronizeCommittedSelection();
-            PostSelectorState();
+            string renderJson = _router.AddItems(items);
+            BreadcrumbSelectorState selectorState = _router.GetSelectorState();
+            _ = PostRenderAndSelectorAsync(renderJson, selectorState);
         }
 
         /// <summary>Clears all rows and the selection, emptying the page (backs <c>ClearFolderItems</c>).</summary>
         public void Clear()
         {
-            bool wasOpen = _selectionSession.IsOpen;
-            _selectionSession.Cancel();
-            _messenger.PostJson(_router.Clear());
-            _selectionSession.SynchronizeCommittedSelection();
-            PostSelectorState();
-            if (wasOpen)
-            {
-                SelectorOpenStateChanged?.Invoke(this, EventArgs.Empty);
-            }
+            ApplyTransition(_router.Clear());
         }
 
         /// <summary>Selects the row at <paramref name="index"/> and re-renders (backs <c>SetFolderSelectedIndex</c>).</summary>
         public void SelectRow(int index)
         {
-            _messenger.PostJson(_router.SelectRow(index));
-            _selectionSession.SynchronizeCommittedSelection();
-            PostSelectorState();
-            SelectionChanged?.Invoke(this, EventArgs.Empty);
+            ApplyTransition(_router.SelectRow(index));
         }
 
         /// <summary>
@@ -156,44 +152,31 @@ namespace QuickFiler.Viewers
         /// </summary>
         public void SelectItem(string item)
         {
-            if (BreadcrumbSelectionMap.TrySelectItem(_router.Model, item))
-            {
-                _selectionSession.SynchronizeCommittedSelection();
-                _messenger.PostJson(_router.RenderJson());
-                PostSelectorState();
-                SelectionChanged?.Invoke(this, EventArgs.Empty);
-            }
+            ApplyTransition(_router.SelectItem(item));
         }
 
         /// <summary>The selection output string (backs <c>GetSelectedFolder</c>; FR-7/G10).</summary>
         public string? GetSelectedFolder()
         {
-            return BreadcrumbSelectionMap.GetSelectedFolder(_router.Model);
+            return _router.GetSelectedFolder();
         }
 
         /// <summary>The per-row output strings (backs <c>GetFolderItems</c>).</summary>
         public string[] GetFolderItems()
         {
-            return BreadcrumbSelectionMap.GetFolderItems(_router.Model);
+            return _router.GetFolderItems();
         }
 
         /// <summary>True when a row's output string equals <paramref name="item"/> (backs <c>FolderContains</c>).</summary>
         public bool Contains(string item)
         {
-            return BreadcrumbSelectionMap.FolderContains(_router.Model, item);
+            return _router.Contains(item);
         }
 
         /// <summary>Starts a pending selector session without changing the committed selection.</summary>
         public bool OpenSelector()
         {
-            if (!_selectionSession.Open())
-            {
-                return false;
-            }
-
-            PostSelectorState();
-            SelectorOpenStateChanged?.Invoke(this, EventArgs.Empty);
-            return true;
+            return ApplyTransition(_router.OpenSelector());
         }
 
         /// <summary>
@@ -220,86 +203,72 @@ namespace QuickFiler.Viewers
         /// <summary>Commits a row activated by stable identity and closes an open session.</summary>
         public bool ActivateSelector(string identity)
         {
-            bool wasOpen = _selectionSession.IsOpen;
-            bool changed = _selectionSession.Activate(identity);
-            bool closed = wasOpen && !_selectionSession.IsOpen;
-            if (!changed && !closed)
-            {
-                return false;
-            }
-
-            _messenger.PostJson(_router.RenderJson());
-            PostSelectorState();
-            if (changed)
-            {
-                SelectionChanged?.Invoke(this, EventArgs.Empty);
-            }
-            if (closed)
-            {
-                SelectorOpenStateChanged?.Invoke(this, EventArgs.Empty);
-            }
-            return true;
+            return ApplyTransition(_router.ActivateSelector(identity));
         }
 
         /// <summary>Closes an open session without committing its pending identity.</summary>
         public bool CancelSelector()
         {
-            if (!_selectionSession.Cancel())
-            {
-                return false;
-            }
-
-            _messenger.PostJson(_router.RenderJson());
-            PostSelectorState();
-            SelectorOpenStateChanged?.Invoke(this, EventArgs.Empty);
-            return true;
+            return ApplyTransition(_router.CancelSelector());
         }
 
         /// <summary>Posts a theme switch to the page ("dark"/"light"; FR-5 theming).</summary>
         public void SetTheme(string theme)
         {
-            _messenger.PostJson(
-                BreadcrumbBridgeSerializer.Serialize(new ThemeChangeMessage(theme))
-            );
+            string themeJson = BreadcrumbBridgeSerializer.Serialize(new ThemeChangeMessage(theme));
+            _ = _dispatcher.Dispatch(() => _messenger.PostJson(themeJson));
+        }
+
+        private bool ApplyTransition(BreadcrumbSelectionTransition transition)
+        {
+            if (!transition.Handled)
+            {
+                return false;
+            }
+            _ = _dispatcher.Dispatch(() => PublishTransition(transition));
+            return true;
         }
 
         private bool MoveSelector(bool previous)
         {
-            bool wasOpen = _selectionSession.IsOpen;
-            bool moved = previous ? _selectionSession.MovePrevious() : _selectionSession.MoveNext();
-            if (!moved)
-            {
-                return false;
-            }
-
-            if (!wasOpen)
-            {
-                _messenger.PostJson(_router.RenderJson());
-                SelectionChanged?.Invoke(this, EventArgs.Empty);
-            }
-            PostSelectorState();
-            return true;
+            return ApplyTransition(_router.MoveSelector(previous));
         }
 
         private bool CommitSelector()
         {
-            if (!_selectionSession.IsOpen)
-            {
-                return false;
-            }
+            return ApplyTransition(_router.CommitSelector());
+        }
 
-            bool changed = _selectionSession.CommitPending();
-            _messenger.PostJson(_router.RenderJson());
-            PostSelectorState();
-            if (changed)
+        private Task PostRenderAndSelectorAsync(
+            string renderJson,
+            BreadcrumbSelectorState selectorState
+        )
+        {
+            return _dispatcher.Dispatch(() =>
+            {
+                _messenger.PostJson(renderJson);
+                PostSelectorStateCore(selectorState);
+            });
+        }
+
+        private void PublishTransition(BreadcrumbSelectionTransition transition)
+        {
+            if (transition.RenderJson != null)
+            {
+                _messenger.PostJson(transition.RenderJson);
+            }
+            PostSelectorStateCore(transition.SelectorState);
+            if (transition.SelectionChanged)
             {
                 SelectionChanged?.Invoke(this, EventArgs.Empty);
             }
-            SelectorOpenStateChanged?.Invoke(this, EventArgs.Empty);
-            return true;
+            if (transition.OpenStateChanged)
+            {
+                SelectorOpenStateChanged?.Invoke(this, EventArgs.Empty);
+            }
         }
 
-        private void PostSelectorState()
+        private void PostSelectorStateCore(BreadcrumbSelectorState state)
         {
             if (!(_messenger is BreadcrumbMessengerHub))
             {
@@ -309,16 +278,16 @@ namespace QuickFiler.Viewers
             string selectorJson = BreadcrumbSelectorMessageSerializer.Serialize(
                 new BreadcrumbSelectorViewMessage(
                     BreadcrumbSelectorViewMode.Collapsed,
-                    _selectionSession.IsOpen,
-                    _selectionSession.CommittedIdentity,
-                    _selectionSession.PendingIdentity
+                    state.IsOpen,
+                    state.CommittedIdentity,
+                    state.PendingIdentity
                 )
             );
-            var options = _router
-                .Model.Rows.Select(row => new
+            var options = state
+                .Options.Select(option => new
                 {
-                    identity = row.Identity,
-                    isSelectable = row.IsSelectable,
+                    identity = option.Identity,
+                    isSelectable = option.IsSelectable,
                 })
                 .ToArray();
             string optionsJson = new JavaScriptSerializer().Serialize(options);
@@ -327,28 +296,52 @@ namespace QuickFiler.Viewers
             );
         }
 
-        private async void OnMessageReceived(object? sender, string json)
+        private void OnMessageReceived(object? sender, string json)
         {
-            if (TryHandleSelectorMessage(json))
+            LastDispatch = ObserveInboundAsync(json);
+        }
+
+        private async Task ObserveInboundAsync(string json)
+        {
+            try
             {
-                LastDispatch = Task.CompletedTask;
+                await DispatchInboundMessageAsync(json).ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                // The event contract cannot return its task. Observe every current dispatch
+                // failure here and route it through the same production sink exactly once.
+                _dispatcher.Report(exception);
+            }
+        }
+
+        private async Task DispatchInboundMessageAsync(string json)
+        {
+            if (json == null)
+            {
+                throw new ArgumentNullException(nameof(json));
+            }
+
+            if (IsSelectorMessage(json))
+            {
+                await _dispatcher.Dispatch(() => HandleSelectorMessage(json)).ConfigureAwait(false);
                 return;
             }
 
-            // Event-handler boundary: the dispatch task is tracked so callers/tests can observe
-            // completion; RouteAsync converts all routing/provider failures into explicit error
-            // responses, so this await only propagates cancellation.
-            var dispatch = DispatchAsync(json);
-            LastDispatch = dispatch;
-            await dispatch.ConfigureAwait(false);
+            await DispatchAsync(json).ConfigureAwait(false);
         }
 
         private async Task DispatchAsync(string json)
         {
-            RaiseSyntheticArrowKey(json);
+            await _dispatcher.Dispatch(() => RaiseSyntheticArrowKey(json)).ConfigureAwait(false);
             var outputs = await _router
                 .RouteAsync(json, CancellationToken.None)
                 .ConfigureAwait(false);
+            await _dispatcher.Dispatch(() => PublishRouterOutputs(outputs)).ConfigureAwait(false);
+        }
+
+        private void PublishRouterOutputs(IReadOnlyList<string> outputs)
+        {
             foreach (var output in outputs)
             {
                 var message = BreadcrumbBridgeSerializer.Parse(output);
@@ -361,27 +354,26 @@ namespace QuickFiler.Viewers
                 _messenger.PostJson(output);
                 if (message is SelectionChangeMessage)
                 {
-                    _selectionSession.SynchronizeCommittedSelection();
-                    PostSelectorState();
+                    PostSelectorStateCore(_router.GetSelectorState());
                     SelectionChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
 
-        private bool TryHandleSelectorMessage(string json)
+        private static bool IsSelectorMessage(string json)
         {
             string? type = MessageType(json);
-            if (type == null || !type.StartsWith("selector", StringComparison.Ordinal))
-            {
-                return false;
-            }
+            return type != null && type.StartsWith("selector", StringComparison.Ordinal);
+        }
 
+        private void HandleSelectorMessage(string json)
+        {
             try
             {
                 switch (BreadcrumbSelectorMessageSerializer.Parse(json))
                 {
                     case BreadcrumbSelectorToggleMessage _:
-                        if (_selectionSession.IsOpen)
+                        if (IsSelectorOpen)
                         {
                             CancelSelector();
                         }
@@ -402,7 +394,6 @@ namespace QuickFiler.Viewers
             {
                 // Selector messages are a focused UI boundary; invalid values are deterministic no-ops.
             }
-            return true;
         }
 
         private static string? MessageType(string json)
@@ -443,6 +434,22 @@ namespace QuickFiler.Viewers
             {
                 FolderArrowKeyDown?.Invoke(this, report.Direction);
             }
+        }
+
+        private static BreadcrumbUiDispatcher CaptureProductionDispatcher(
+            IWebViewMessenger messenger,
+            IFolderHierarchyProvider provider
+        )
+        {
+            if (messenger == null)
+            {
+                throw new ArgumentNullException(nameof(messenger));
+            }
+            if (provider == null)
+            {
+                throw new ArgumentNullException(nameof(provider));
+            }
+            return BreadcrumbUiDispatcher.CaptureCurrent();
         }
     }
 }

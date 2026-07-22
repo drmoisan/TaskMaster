@@ -200,6 +200,15 @@
     return state.options[row.rowIndex] || null;
   }
 
+  function selectableRowForIdentity(identity) {
+    if (identity === null) {
+      return null;
+    }
+    return state.rows.find(function (row) {
+      return row.isSelectable && row.identity === identity;
+    }) || null;
+  }
+
   function applySelectorOptions() {
     state.rows.forEach(function (row) {
       var option = optionForRow(row);
@@ -214,14 +223,8 @@
     }
 
     var selectedRows = state.rows.filter(function (row) { return row.selected; }).slice(0, 1);
-    if (state.committedIdentity === null) {
-      return selectedRows;
-    }
-
-    var committedRows = state.rows.filter(function (row) {
-      return row.isSelectable && row.identity === state.committedIdentity;
-    }).slice(0, 1);
-    return committedRows.length === 1 ? committedRows : selectedRows;
+    var committedRow = selectableRowForIdentity(state.committedIdentity);
+    return committedRow === null ? selectedRows : [committedRow];
   }
 
   function rowHasOpenAffordance(row) {
@@ -255,9 +258,9 @@
     return element;
   }
 
-  function makeRow(row) {
+  function makeRow(row, activeRowIndex) {
     var expanded = state.viewMode === "expanded";
-    var active = expanded && row.isSelectable && row.identity === state.pendingIdentity;
+    var active = expanded && row.isSelectable && row.rowIndex === activeRowIndex;
     var rowElement = document.createElement("div");
     rowElement.className = active
       ? "row active"
@@ -308,6 +311,8 @@
   function render() {
     var activeRow = null;
     applySelectorOptions();
+    var pendingRow = selectableRowForIdentity(state.pendingIdentity);
+    var activeRowIndex = pendingRow === null ? -1 : pendingRow.rowIndex;
     list.textContent = "";
 
     if (state.viewMode === "expanded") {
@@ -318,7 +323,7 @@
     list.removeAttribute("aria-activedescendant");
 
     visibleRows().forEach(function (row) {
-      var rowElement = makeRow(row);
+      var rowElement = makeRow(row, activeRowIndex);
       list.appendChild(rowElement);
       if (rowElement.classList.contains("active")) {
         activeRow = rowElement;

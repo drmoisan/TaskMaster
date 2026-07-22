@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Web.WebView2.Core;
@@ -84,6 +87,38 @@ namespace QuickFiler.Controllers.Tests
         }
 
         [TestMethod]
+        public void ConfigureBreadcrumbDropDown_RepeatedSameEnvironmentReusesPopupHost()
+        {
+            // Arrange
+            using (ViewerScope scope = new ViewerScope())
+            {
+                var environment = (CoreWebView2Environment)
+                    FormatterServices.GetUninitializedObject(typeof(CoreWebView2Environment));
+                var initializer = new Mock<IWebViewCoreInitializer>(MockBehavior.Strict);
+                var ol = new Mock<IOlObjects>();
+                ol.SetupGet(value => value.DarkMode).Returns(false);
+                var globals = new Mock<IApplicationGlobals>();
+                globals.SetupGet(value => value.Ol).Returns(ol.Object);
+                var controller = new HarnessController();
+                QfcItemControllerTestSupport.SetField(
+                    controller,
+                    "_webViewInitializer",
+                    initializer.Object
+                );
+                QfcItemControllerTestSupport.SetField(controller, "_globals", globals.Object);
+                InvokeConfigure(controller, scope.Viewer, environment);
+                object firstHost = Host(scope.Viewer);
+
+                // Act
+                InvokeConfigure(controller, scope.Viewer, environment);
+
+                // Assert
+                Host(scope.Viewer).Should().BeSameAs(firstHost);
+                initializer.VerifyNoOtherCalls();
+            }
+        }
+
+        [TestMethod]
         public void Cleanup_ResetsInjectedHostForPooledViewerReuse()
         {
             // Arrange
@@ -145,6 +180,100 @@ namespace QuickFiler.Controllers.Tests
                 keyboard.VerifyAll();
             }
         }
+
+        [TestMethod]
+        public async Task ConfigureAndAttachBreadcrumbAsync_CachesCurrentThemeAndCreatesOneCandidatePerSession()
+        {
+            // Arrange
+            using (ViewerScope scope = new ViewerScope())
+            {
+                scope.Viewer.InitializeBreadcrumbPipeline(
+                    new Mock<IFolderHierarchyProvider>(MockBehavior.Strict).Object
+                );
+                var environment = (CoreWebView2Environment)
+                    FormatterServices.GetUninitializedObject(typeof(CoreWebView2Environment));
+                var initializer = new Mock<IWebViewCoreInitializer>(MockBehavior.Strict);
+                bool darkMode = true;
+                var ol = new Mock<IOlObjects>();
+                ol.SetupGet(value => value.DarkMode).Returns(() => darkMode);
+                var globals = new Mock<IApplicationGlobals>();
+                globals.SetupGet(value => value.Ol).Returns(ol.Object);
+                var controller = new HarnessController();
+                QfcItemControllerTestSupport.SetField(
+                    controller,
+                    "_webViewInitializer",
+                    initializer.Object
+                );
+                QfcItemControllerTestSupport.SetField(controller, "_globals", globals.Object);
+                var firstSurface = new TrackingMessenger();
+                int factoryCalls = 0;
+                Func<Tuple<IWebViewMessenger, BreadcrumbNavigationReadiness>> factory = () =>
+                {
+                    factoryCalls++;
+                    return Tuple.Create<IWebViewMessenger, BreadcrumbNavigationReadiness>(
+                        firstSurface,
+                        CompletedReadiness(401)
+                    );
+                };
+                Task<bool> repeated = null;
+
+                // Act synchronous readiness and repeated setup in the same session
+                bool attached = await controller.ConfigureAndAttachBreadcrumbAsync(
+                    scope.Viewer,
+                    environment,
+                    () =>
+                    {
+                        Task<bool> first = scope.Viewer.AttachBreadcrumbWebViewAsync(factory);
+                        repeated = scope.Viewer.AttachBreadcrumbWebViewAsync(factory);
+                        return first;
+                    }
+                );
+
+                // Assert current theme replay and one candidate factory invocation
+                attached.Should().BeTrue();
+                (await repeated.ConfigureAwait(false)).Should().BeTrue();
+                factoryCalls.Should().Be(1);
+                ThemeMessages(firstSurface).Should().Equal(Theme("dark"));
+
+                // Act pooled reuse with a changed theme and synchronous readiness
+                scope.Viewer.ResetBreadcrumb();
+                darkMode = false;
+                var reusedSurface = new TrackingMessenger();
+                bool reused = await controller.ConfigureAndAttachBreadcrumbAsync(
+                    scope.Viewer,
+                    environment,
+                    () =>
+                        scope.Viewer.AttachBreadcrumbWebViewAsync(() =>
+                            Tuple.Create<IWebViewMessenger, BreadcrumbNavigationReadiness>(
+                                reusedSurface,
+                                CompletedReadiness(402)
+                            )
+                        )
+                );
+
+                // Assert no stale pooled theme is replayed
+                reused.Should().BeTrue();
+                ThemeMessages(reusedSurface).Should().Equal(Theme("light"));
+                initializer.VerifyNoOtherCalls();
+            }
+        }
+
+        private static BreadcrumbNavigationReadiness CompletedReadiness(ulong navigationId)
+        {
+            var readiness = new BreadcrumbNavigationReadiness("Collapsed", () => { });
+            readiness.BeginNavigation(() =>
+            {
+                readiness.NavigationStarted(navigationId);
+                readiness.NavigationCompleted(navigationId, true, null);
+            });
+            return readiness;
+        }
+
+        private static IEnumerable<string> ThemeMessages(TrackingMessenger surface) =>
+            surface.Posted.Where(json => json.Contains("\"type\":\"themeChange\""));
+
+        private static string Theme(string theme) =>
+            "{\"type\":\"themeChange\",\"theme\":\"" + theme + "\"}";
 
         private static void InvokeConfigure(
             HarnessController controller,
@@ -208,6 +337,21 @@ namespace QuickFiler.Controllers.Tests
 
         private static T Property<T>(object target, string property) =>
             (T)target.GetType().GetProperty(property).GetValue(target);
+
+        private sealed class TrackingMessenger : IWebViewMessenger, IDisposable
+        {
+            internal List<string> Posted { get; } = new List<string>();
+
+            public event EventHandler<string> MessageReceived
+            {
+                add { }
+                remove { }
+            }
+
+            public void PostJson(string json) => Posted.Add(json);
+
+            public void Dispose() { }
+        }
 
         private sealed class ViewerScope : IDisposable
         {

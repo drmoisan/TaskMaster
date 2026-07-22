@@ -1,7 +1,14 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using QuickFiler.Viewers;
+using UtilitiesCS;
+using UtilitiesCS.OutlookObjects.Folder;
 
 namespace QuickFiler.Test.Viewers
 {
@@ -39,9 +46,8 @@ namespace QuickFiler.Test.Viewers
                     @"state\.rows\.filter\(function\s*\(row\)\s*\{\s*return\s+row\.selected;\s*\}\)\.slice\(0,\s*1\)"
                 );
             Html.Should()
-                .MatchRegex(
-                    @"(?s)state\.committedIdentity.*?row\.isSelectable\s*&&\s*row\.identity\s*===\s*state\.committedIdentity"
-                );
+                .Contain("var committedRow = selectableRowForIdentity(state.committedIdentity);");
+            Html.Should().Contain("return committedRow === null ? selectedRows : [committedRow];");
         }
 
         [TestMethod]
@@ -75,7 +81,7 @@ namespace QuickFiler.Test.Viewers
         public void Markup_ContainsExactlyOneAccessibleDropDownButton()
         {
             // Assert
-            Match button = Find(@"<button\b[^>]*>");
+            System.Text.RegularExpressions.Match button = Find(@"<button\b[^>]*>");
             Count(@"<button\b").Should().Be(1);
             Count(@"document\.createElement\(\s*[\""']button[\""']\s*\)").Should().Be(0);
             button.Success.Should().BeTrue("the compiled page must contain the drop-down button");
@@ -125,7 +131,13 @@ namespace QuickFiler.Test.Viewers
             Html.Should().Contain("row.isSelectable");
             Html.Should()
                 .MatchRegex(
-                    @"(?s)var\s+(?<expandedFlag>[A-Za-z_$][\w$]*)\s*=\s*state\.viewMode\s*===\s*\""expanded\""\s*;.*?var\s+active\s*=\s*\k<expandedFlag>\s*&&\s*row\.isSelectable\s*&&\s*row\.identity\s*===\s*state\.pendingIdentity"
+                    @"(?s)function\s+selectableRowForIdentity\s*\(\s*identity\s*\).*?state\.rows\.find\(function\s*\(row\).*?row\.isSelectable\s*&&\s*row\.identity\s*===\s*identity"
+                );
+            Html.Should()
+                .Contain("var pendingRow = selectableRowForIdentity(state.pendingIdentity);");
+            Html.Should()
+                .MatchRegex(
+                    @"var\s+active\s*=\s*expanded\s*&&\s*row\.isSelectable\s*&&\s*row\.rowIndex\s*===\s*activeRowIndex"
                 );
             Html.Should()
                 .MatchRegex(
@@ -135,6 +147,83 @@ namespace QuickFiler.Test.Viewers
                 .MatchRegex(
                     @"list\.setAttribute\(\s*[\""']aria-activedescendant[\""']\s*,\s*[A-Za-z_$][\w$]*\s*\)"
                 );
+        }
+
+        [TestMethod]
+        public void ExpandedDuplicatePathState_YieldsExactlyOneActiveAriaSelectedOption()
+        {
+            // Arrange
+            const string duplicatePath = "\\Inbox\\Shared";
+            var key = new FolderTreeNodeKey("store", "shared", duplicatePath);
+            var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+            provider
+                .Setup(candidate =>
+                    candidate.ResolveLeafKeyAsync(duplicatePath, It.IsAny<CancellationToken>())
+                )
+                .ReturnsAsync(key);
+            provider
+                .Setup(candidate =>
+                    candidate.GetAncestorChainAsync(key, It.IsAny<CancellationToken>())
+                )
+                .ReturnsAsync(
+                    new[] { new FolderBreadcrumbSegment(key, "Shared", duplicatePath, false) }
+                );
+            var posted = new List<string>();
+            var surface = new Mock<IWebViewMessenger>();
+            surface
+                .Setup(messenger => messenger.PostJson(It.IsAny<string>()))
+                .Callback<string>(posted.Add);
+
+            // Act
+            using (var hub = new BreadcrumbMessengerHub())
+            {
+                hub.Attach(surface.Object, BreadcrumbSelectorViewMode.Expanded);
+                var coordinator = new BreadcrumbBridgeCoordinator(hub, provider.Object);
+                coordinator.SetSuggestions(
+                    new[]
+                    {
+                        new FolderRow(
+                            duplicatePath,
+                            FolderRowKind.Suggestion,
+                            new FolderScore(duplicatePath, 100, 0.73)
+                        ),
+                        new FolderRow(duplicatePath, FolderRowKind.Recent, null),
+                    }
+                );
+                coordinator.SuggestionsUpgrade.GetAwaiter().GetResult();
+                coordinator.SelectRow(0);
+                coordinator.OpenSelector().Should().BeTrue();
+
+                string selectorView = posted.Last(json =>
+                    json.Contains("\"type\":\"selectorView\"")
+                );
+                string[] selectableIdentities = Regex
+                    .Matches(
+                        selectorView,
+                        @"""identity"":""(?<identity>(?:\\.|[^""])*)"",""isSelectable"":true",
+                        RegexOptions.CultureInvariant
+                    )
+                    .Cast<System.Text.RegularExpressions.Match>()
+                    .Select(match => match.Groups["identity"].Value)
+                    .ToArray();
+                string pendingIdentity = Regex
+                    .Match(
+                        selectorView,
+                        @"""pendingIdentity"":""(?<identity>(?:\\.|[^""])*)""",
+                        RegexOptions.CultureInvariant
+                    )
+                    .Groups["identity"]
+                    .Value;
+
+                // Assert: the compiled asset resolves one pending logical row and applies active
+                // and aria-selected through that row's unique render index.
+                selectableIdentities.Should().HaveCount(2);
+                selectableIdentities.Count(identity => identity == pendingIdentity).Should().Be(1);
+                Html.Should()
+                    .Contain("var pendingRow = selectableRowForIdentity(state.pendingIdentity);");
+                Html.Should().Contain("row.rowIndex === activeRowIndex");
+                Html.Should().Contain("setAttribute(\"aria-selected\", String(active))");
+            }
         }
 
         [TestMethod]
@@ -161,7 +250,9 @@ namespace QuickFiler.Test.Viewers
                     @"(?s)if\s*\(Object\.prototype\.hasOwnProperty\.call\(selectorKeys,\s*event\.key\)\)\s*\{.*?event\.preventDefault\(\);.*?post\(\{\s*type:\s*\""selectorKey\"",\s*key:\s*selectorKeys\[event\.key\]\s*\}\);.*?return;\s*\}"
                 );
 
-            Match selectorKeys = Find(@"var\s+selectorKeys\s*=\s*\{(?<keys>.*?)\};");
+            System.Text.RegularExpressions.Match selectorKeys = Find(
+                @"var\s+selectorKeys\s*=\s*\{(?<keys>.*?)\};"
+            );
             selectorKeys.Success.Should().BeTrue();
             selectorKeys.Groups["keys"].Value.Should().NotContain("ArrowLeft");
             selectorKeys.Groups["keys"].Value.Should().NotContain("ArrowRight");
@@ -209,7 +300,7 @@ namespace QuickFiler.Test.Viewers
         private static int Count(string pattern) =>
             Regex.Matches(Html, pattern, ContractRegexOptions).Count;
 
-        private static Match Find(string pattern) =>
+        private static System.Text.RegularExpressions.Match Find(string pattern) =>
             Regex.Match(Html, pattern, ContractRegexOptions);
 
         private const RegexOptions ContractRegexOptions =

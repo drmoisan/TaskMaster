@@ -34,7 +34,7 @@ namespace QuickFiler.Test.Viewers
                 .ReturnsAsync(Chain(firstKey, "Alpha"));
             var posted = new List<string>();
             var messenger = Messenger(posted);
-            var coordinator = new BreadcrumbBridgeCoordinator(messenger.Object, provider.Object);
+            var coordinator = CreateCoordinator(messenger.Object, provider.Object);
 
             // Act
             coordinator.SetSuggestions(new[] { Scored(FirstPath, 0.73) });
@@ -71,10 +71,7 @@ namespace QuickFiler.Test.Viewers
                 .Setup(p => p.GetAncestorChainAsync(secondKey, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Chain(secondKey, "Beta"));
             var posted = new List<string>();
-            var coordinator = new BreadcrumbBridgeCoordinator(
-                Messenger(posted).Object,
-                provider.Object
-            );
+            var coordinator = CreateCoordinator(Messenger(posted).Object, provider.Object);
             coordinator.AddItems(new[] { FirstPath, SecondPath });
             coordinator.SelectRow(0);
             posted.Clear();
@@ -129,10 +126,7 @@ namespace QuickFiler.Test.Viewers
             var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
             configure(provider);
             var posted = new List<string>();
-            var coordinator = new BreadcrumbBridgeCoordinator(
-                Messenger(posted).Object,
-                provider.Object
-            );
+            var coordinator = CreateCoordinator(Messenger(posted).Object, provider.Object);
             coordinator.SetSuggestions(new[] { Scored(FirstPath, 0.73) });
             coordinator.SuggestionsUpgrade.GetAwaiter().GetResult();
             return PostedRenders(posted).Last();
@@ -143,6 +137,18 @@ namespace QuickFiler.Test.Viewers
             var messenger = new Mock<IWebViewMessenger>();
             messenger.Setup(m => m.PostJson(It.IsAny<string>())).Callback<string>(posted.Add);
             return messenger;
+        }
+
+        private static BreadcrumbBridgeCoordinator CreateCoordinator(
+            IWebViewMessenger messenger,
+            IFolderHierarchyProvider provider
+        )
+        {
+            return new BreadcrumbBridgeCoordinator(
+                messenger,
+                provider,
+                BreadcrumbUiDispatcher.CreateForCurrentThreadTests()
+            );
         }
 
         private static IEnumerable<RenderMessage> PostedRenders(IEnumerable<string> posted) =>

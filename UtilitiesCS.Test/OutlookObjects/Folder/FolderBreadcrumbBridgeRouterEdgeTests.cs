@@ -177,7 +177,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             router.Model.Rows[0].IsSuggestion.Should().BeFalse();
             router.Model.Rows[0].VerbatimText.Should().Be(LeafPath);
             router.Model.Rows[0].IsScoredFallback.Should().BeTrue();
-            router.Model.Rows[0].Identity.Should().Be(LeafPath);
+            router.Model.Rows[0].Identity.Should().Be("suggestion:0:" + LeafPath);
             router.Model.Rows[0].Probability.Should().Be(0.5);
             ((RenderMessage)BreadcrumbBridgeSerializer.Parse(router.RenderJson()))
                 .Rows[0]
@@ -204,7 +204,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             string json = (string)method!.Invoke(router, new object[] { new[] { row } })!;
 
             // Assert
-            router.Model.Rows[0].Identity.Should().Be(LeafPath);
+            router.Model.Rows[0].Identity.Should().Be("suggestion:0:" + LeafPath);
             router.Model.Rows[0].FallbackText.Should().Be(LeafPath);
             router.Model.Rows[0].Probability.Should().Be(0.73);
             ((RenderMessage)BreadcrumbBridgeSerializer.Parse(json))
@@ -257,7 +257,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
 
             // Assert
             router.Model.Rows[0].IsSuggestion.Should().BeTrue();
-            router.Model.Rows[0].Identity.Should().Be(LeafPath);
+            router.Model.Rows[0].Identity.Should().Be("suggestion:0:" + LeafPath);
             router.Model.Rows[0].Probability.Should().Be(0.73);
         }
 
@@ -288,7 +288,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             // Assert
             await act.Should().NotThrowAsync();
             router.Model.Rows[0].IsScoredFallback.Should().BeTrue();
-            router.Model.Rows[0].Identity.Should().Be(LeafPath);
+            router.Model.Rows[0].Identity.Should().Be("suggestion:0:" + LeafPath);
             router.Model.Rows[0].Probability.Should().Be(0.73);
         }
 

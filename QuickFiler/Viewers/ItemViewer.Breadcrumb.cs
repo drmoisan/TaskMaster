@@ -15,6 +15,8 @@ namespace QuickFiler
     public partial class ItemViewer
     {
         private BreadcrumbMessengerHub _breadcrumbHub;
+        private BreadcrumbCollapsedSurfaceController _breadcrumbCollapsedSurfaceController;
+        private BreadcrumbCollapsedAttachment _breadcrumbCollapsedAttachment;
         private IWebViewMessenger _breadcrumbMessenger;
         private IWebViewMessenger _breadcrumbPopupMessenger;
         private IBreadcrumbDropDownHost _breadcrumbDropDownHost;
@@ -51,6 +53,11 @@ namespace QuickFiler
 
             EnsureBreadcrumbResourceOwnership();
             _breadcrumbHub = new BreadcrumbMessengerHub();
+            _breadcrumbCollapsedSurfaceController = new BreadcrumbCollapsedSurfaceController();
+            _breadcrumbCollapsedAttachment = new BreadcrumbCollapsedAttachment(
+                _breadcrumbHub,
+                _breadcrumbCollapsedSurfaceController
+            );
             BreadcrumbCoordinator = new BreadcrumbBridgeCoordinator(_breadcrumbHub, provider);
             BreadcrumbCoordinator.SelectionChanged += OnBreadcrumbSelectionChanged;
             BreadcrumbCoordinator.FolderArrowKeyDown += OnBreadcrumbFolderArrowKeyDown;
@@ -58,16 +65,69 @@ namespace QuickFiler
             BreadcrumbCoordinator.SelectorOpenStateChanged += OnBreadcrumbSelectorOpenStateChanged;
         }
 
-        /// <summary>Loads and attaches the persistent one-row collapsed WebView surface.</summary>
-        internal void AttachBreadcrumbWebView()
-        {
-            if (_breadcrumbHub == null || _breadcrumbMessenger != null)
-            {
-                return;
-            }
+        /// <summary>Starts one correlated navigation for the persistent collapsed surface.</summary>
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        internal Task<bool> AttachBreadcrumbWebViewAsync() =>
+            AttachBreadcrumbWebViewAsync(CreateCollapsedBreadcrumbCandidate);
 
-            _l0vhBreadcrumb_WebView2.NavigateToString(Properties.Resources.FolderBreadcrumb);
-            AttachBreadcrumbMessenger(new WebView2Messenger(_l0vhBreadcrumb_WebView2.CoreWebView2));
+        /// <summary>Starts collapsed attachment through an injectable navigation boundary.</summary>
+        internal Task<bool> AttachBreadcrumbWebViewAsync(
+            Func<Tuple<IWebViewMessenger, BreadcrumbNavigationReadiness>> candidateFactory
+        )
+        {
+            if (_breadcrumbCollapsedAttachment == null)
+                return Task.FromResult(false);
+            return _breadcrumbCollapsedAttachment.AttachAsync(candidateFactory);
+        }
+
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        private Tuple<
+            IWebViewMessenger,
+            BreadcrumbNavigationReadiness
+        > CreateCollapsedBreadcrumbCandidate()
+        {
+            var messenger = new WebView2Messenger(_l0vhBreadcrumb_WebView2.CoreWebView2);
+            try
+            {
+                BreadcrumbNavigationReadiness readiness =
+                    BreadcrumbWebViewSurfaceFactory.NavigateToDocument(
+                        _l0vhBreadcrumb_WebView2.CoreWebView2,
+                        _l0vhBreadcrumb_WebView2,
+                        () =>
+                            _l0vhBreadcrumb_WebView2.NavigateToString(
+                                Properties.Resources.FolderBreadcrumb
+                            ),
+                        "Collapsed"
+                    );
+                return Tuple.Create<IWebViewMessenger, BreadcrumbNavigationReadiness>(
+                    messenger,
+                    readiness
+                );
+            }
+            catch
+            {
+                messenger.Dispose();
+                throw;
+            }
+        }
+
+        /// <summary>Testable attachment boundary shared with the production navigation adapter.</summary>
+        internal Task<bool> AttachBreadcrumbMessengerWhenReadyAsync(
+            IWebViewMessenger messenger,
+            BreadcrumbNavigationReadiness readiness
+        )
+        {
+            if (messenger == null)
+                throw new ArgumentNullException(nameof(messenger));
+            if (readiness == null)
+                throw new ArgumentNullException(nameof(readiness));
+            if (_breadcrumbCollapsedAttachment == null)
+                throw new InvalidOperationException(
+                    "The breadcrumb pipeline must be initialized before attaching a surface."
+                );
+            return _breadcrumbCollapsedAttachment.AttachAsync(() =>
+                Tuple.Create<IWebViewMessenger, BreadcrumbNavigationReadiness>(messenger, readiness)
+            );
         }
 
         /// <summary>Attaches the collapsed surface exactly once, replacing any prior surface.</summary>
@@ -92,9 +152,12 @@ namespace QuickFiler
             if (_breadcrumbMessenger != null)
             {
                 _breadcrumbHub.Detach(_breadcrumbMessenger);
+                _breadcrumbMessenger = null;
             }
-            _breadcrumbMessenger = messenger;
-            _breadcrumbHub.Attach(messenger, BreadcrumbSelectorViewMode.Collapsed);
+            if (_breadcrumbHub.Attach(messenger, BreadcrumbSelectorViewMode.Collapsed))
+            {
+                _breadcrumbMessenger = messenger;
+            }
         }
 
         /// <summary>Creates the production lazy popup using the controller's existing environment.</summary>
@@ -103,6 +166,13 @@ namespace QuickFiler
             IWebViewCoreInitializer initializer
         )
         {
+            if (
+                _breadcrumbDropDownHost is BreadcrumbDropDownHost existing
+                && ReferenceEquals(existing.Environment, environment)
+            )
+            {
+                return;
+            }
             BreadcrumbDropDownHost host = null;
             host = new BreadcrumbDropDownHost(
                 _l0vhBreadcrumb_WebView2,
@@ -222,6 +292,8 @@ namespace QuickFiler
 
             DetachBreadcrumbPopupMessenger();
             _breadcrumbDropDownHost?.Reset();
+            DetachBreadcrumbMessenger();
+            _breadcrumbCollapsedAttachment?.Reset();
             BreadcrumbCoordinator?.Clear();
         }
 
@@ -307,8 +379,20 @@ namespace QuickFiler
             }
 
             DetachBreadcrumbPopupMessenger();
-            _breadcrumbPopupMessenger = messenger;
-            _breadcrumbHub.Attach(messenger, BreadcrumbSelectorViewMode.Expanded);
+            if (_breadcrumbHub.Attach(messenger, BreadcrumbSelectorViewMode.Expanded))
+            {
+                _breadcrumbPopupMessenger = messenger;
+            }
+        }
+
+        private void DetachBreadcrumbMessenger()
+        {
+            if (_breadcrumbMessenger == null)
+            {
+                return;
+            }
+            _breadcrumbHub?.Detach(_breadcrumbMessenger);
+            _breadcrumbMessenger = null;
         }
 
         private void DetachBreadcrumbPopupMessenger()
@@ -357,36 +441,14 @@ namespace QuickFiler
                     OnBreadcrumbSelectorOpenStateChanged;
             }
 
-            if (_breadcrumbMessenger != null)
-            {
-                _breadcrumbHub?.Detach(_breadcrumbMessenger);
-                _breadcrumbMessenger = null;
-            }
+            DetachBreadcrumbMessenger();
+            _breadcrumbCollapsedAttachment?.Dispose();
+            _breadcrumbCollapsedAttachment = null;
+            _breadcrumbCollapsedSurfaceController = null;
             ReleaseBreadcrumbDropDownHost();
             _breadcrumbHub?.Dispose();
             _breadcrumbHub = null;
             BreadcrumbCoordinator = null;
-        }
-
-        private sealed class BreadcrumbResourceOwner : Component
-        {
-            private Action _dispose;
-
-            internal BreadcrumbResourceOwner(Action dispose)
-            {
-                _dispose = dispose ?? throw new ArgumentNullException(nameof(dispose));
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                if (disposing)
-                {
-                    Action dispose = _dispose;
-                    _dispose = null;
-                    dispose?.Invoke();
-                }
-                base.Dispose(disposing);
-            }
         }
     }
 }

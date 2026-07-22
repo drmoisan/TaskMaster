@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuickFiler.Viewers;
@@ -134,25 +135,132 @@ namespace QuickFiler.Test.Viewers
         }
 
         [TestMethod]
-        public void Attach_WithDifferentMode_ReplaysCachedStateWithoutSecondSubscription()
+        public void Attach_WithDifferentMode_PreservesOriginalModeWithoutReplayOrSecondSubscription()
         {
             // Arrange
             var hub = new BreadcrumbMessengerHub();
             var surface = new TrackingMessenger();
             const string state =
                 "{\"type\":\"selectorView\",\"mode\":\"collapsed\",\"isOpen\":true}";
+            const string later =
+                "{\"type\":\"selectorView\",\"mode\":\"expanded\",\"isOpen\":false}";
             hub.Attach(surface, BreadcrumbSelectorViewMode.Collapsed).Should().BeTrue();
             hub.PostJson(state);
 
             // Act
             bool attached = hub.Attach(surface, BreadcrumbSelectorViewMode.Expanded);
+            hub.PostJson(later);
 
             // Assert
             attached.Should().BeFalse();
             surface.SubscriberCount.Should().Be(1);
             surface
                 .Posted.Should()
-                .Equal(state, state.Replace("\"mode\":\"collapsed\"", "\"mode\":\"expanded\""));
+                .Equal(state, later.Replace("\"mode\":\"expanded\"", "\"mode\":\"collapsed\""));
+        }
+
+        [TestMethod]
+        public void Attach_AfterPendingUpdates_ReplaysOnlyCurrentStateOncePerSurface()
+        {
+            // Arrange
+            var hub = new BreadcrumbMessengerHub();
+            var collapsed = new TrackingMessenger();
+            var popup = new TrackingMessenger();
+            const string staleRender = "{\"type\":\"render\",\"rows\":[{\"percentText\":\"21%\"}]}";
+            const string render = "{\"type\":\"render\",\"rows\":[{\"percentText\":\"73%\"}]}";
+            const string selector =
+                "{\"type\":\"selectorView\",\"mode\":\"collapsed\",\"isOpen\":true}";
+            const string theme = "{\"type\":\"themeChange\",\"theme\":\"dark\"}";
+            hub.PostJson(staleRender);
+            hub.PostJson(render);
+            hub.PostJson(selector);
+            hub.PostJson(theme);
+
+            // Act
+            hub.Attach(collapsed, BreadcrumbSelectorViewMode.Collapsed).Should().BeTrue();
+            hub.Attach(popup, BreadcrumbSelectorViewMode.Expanded).Should().BeTrue();
+            hub.Attach(collapsed, BreadcrumbSelectorViewMode.Collapsed).Should().BeFalse();
+            hub.Attach(popup, BreadcrumbSelectorViewMode.Expanded).Should().BeFalse();
+
+            // Assert
+            collapsed.Posted.Should().Equal(render, selector, theme);
+            popup
+                .Posted.Should()
+                .Equal(
+                    render,
+                    selector.Replace("\"mode\":\"collapsed\"", "\"mode\":\"expanded\""),
+                    theme
+                );
+            collapsed.SubscriberCount.Should().Be(1);
+            popup.SubscriberCount.Should().Be(1);
+        }
+
+        [TestMethod]
+        public void Attach_ReplayFailureRollsBackSubscriptionAndAllowsRetry()
+        {
+            // Arrange
+            var hub = new BreadcrumbMessengerHub();
+            var surface = new TrackingMessenger { ThrowOnPost = true };
+            const string render = "{\"type\":\"render\",\"rows\":[]}";
+            hub.PostJson(render);
+
+            // Act
+            Action attach = () => hub.Attach(surface, BreadcrumbSelectorViewMode.Collapsed);
+
+            // Assert rollback and retry
+            attach.Should().Throw<InvalidOperationException>();
+            surface.SubscriberCount.Should().Be(0);
+            surface.ThrowOnPost = false;
+            hub.Attach(surface, BreadcrumbSelectorViewMode.Collapsed).Should().BeTrue();
+            surface.SubscriberCount.Should().Be(1);
+            surface.Posted.Should().Equal(render);
+        }
+
+        [TestMethod]
+        public async Task CollapsedAttachment_ReplayFailureAndDisposeDetachBeforeMessengerCleanup()
+        {
+            // Arrange a replay failure after exact collapsed readiness
+            var hub = new BreadcrumbMessengerHub();
+            hub.PostJson("{\"type\":\"render\",\"rows\":[]}");
+            var controller = new BreadcrumbCollapsedSurfaceController();
+            var attachment = new BreadcrumbCollapsedAttachment(hub, controller);
+            var failedSurface = new TrackingMessenger { ThrowOnPost = true };
+            Task<bool> failed = attachment.AttachAsync(() =>
+                Tuple.Create<IWebViewMessenger, BreadcrumbNavigationReadiness>(
+                    failedSurface,
+                    CompletedReadiness(501)
+                )
+            );
+
+            // Act and assert transactional failure cleanup
+            Func<Task> awaitFailure = async () => await failed.ConfigureAwait(false);
+            await awaitFailure.Should().ThrowAsync<InvalidOperationException>();
+            controller.ReadyMessenger.Should().BeNull();
+            failedSurface.SubscriberCount.Should().Be(0);
+            failedSurface.DisposeCount.Should().Be(1);
+            failedSurface.Lifecycle.Should().ContainInOrder("unsubscribe", "dispose");
+
+            // Act a successful retry, then dispose the ready attachment
+            var readySurface = new TrackingMessenger();
+            (
+                await attachment
+                    .AttachAsync(() =>
+                        Tuple.Create<IWebViewMessenger, BreadcrumbNavigationReadiness>(
+                            readySurface,
+                            CompletedReadiness(502)
+                        )
+                    )
+                    .ConfigureAwait(false)
+            )
+                .Should()
+                .BeTrue();
+            attachment.Dispose();
+            hub.Dispose();
+
+            // Assert hub detachment precedes controller-owned messenger disposal
+            readySurface.SubscriberCount.Should().Be(0);
+            readySurface.DisposeCount.Should().Be(1);
+            readySurface.Lifecycle.Should().ContainInOrder("unsubscribe", "dispose");
         }
 
         [TestMethod]
@@ -166,6 +274,9 @@ namespace QuickFiler.Test.Viewers
 
             // Act
             bool detachedUnknown = hub.Detach(surface);
+            hub.Attach(surface, BreadcrumbSelectorViewMode.Collapsed);
+            hub.Detach(surface);
+            surface.ReceiveLastRemoved("{\"type\":\"selectorToggle\"}");
             hub.Attach(surface, BreadcrumbSelectorViewMode.Collapsed);
             hub.Dispose();
             hub.Dispose();
@@ -239,13 +350,27 @@ namespace QuickFiler.Test.Viewers
         private static bool Detach(object hub, IWebViewMessenger messenger) =>
             (bool)hub.GetType().GetMethod("Detach").Invoke(hub, new object[] { messenger });
 
-        private sealed class TrackingMessenger : IWebViewMessenger
+        private static BreadcrumbNavigationReadiness CompletedReadiness(ulong navigationId)
+        {
+            var readiness = new BreadcrumbNavigationReadiness("Collapsed", () => { });
+            readiness.BeginNavigation(() =>
+            {
+                readiness.NavigationStarted(navigationId);
+                readiness.NavigationCompleted(navigationId, true, null);
+            });
+            return readiness;
+        }
+
+        private sealed class TrackingMessenger : IWebViewMessenger, IDisposable
         {
             private EventHandler<string> _messageReceived;
             private EventHandler<string> _lastRemovedMessageReceived;
 
             public int SubscriberCount { get; private set; }
+            public int DisposeCount { get; private set; }
             public List<string> Posted { get; } = new List<string>();
+            public List<string> Lifecycle { get; } = new List<string>();
+            public bool ThrowOnPost { get; set; }
 
             public event EventHandler<string> MessageReceived
             {
@@ -253,21 +378,37 @@ namespace QuickFiler.Test.Viewers
                 {
                     _messageReceived += value;
                     SubscriberCount++;
+                    Lifecycle.Add("subscribe");
                 }
                 remove
                 {
                     _messageReceived -= value;
                     _lastRemovedMessageReceived = value;
                     SubscriberCount--;
+                    Lifecycle.Add("unsubscribe");
                 }
             }
 
-            public void PostJson(string json) => Posted.Add(json);
+            public void PostJson(string json)
+            {
+                if (ThrowOnPost)
+                    throw new InvalidOperationException("Replay rejected");
+                Posted.Add(json);
+            }
 
             public void Receive(string json) => _messageReceived?.Invoke(this, json);
 
             public void ReceiveLastRemoved(string json) =>
                 _lastRemovedMessageReceived?.Invoke(this, json);
+
+            public void Dispose()
+            {
+                if (DisposeCount == 0)
+                {
+                    DisposeCount++;
+                    Lifecycle.Add("dispose");
+                }
+            }
         }
     }
 }

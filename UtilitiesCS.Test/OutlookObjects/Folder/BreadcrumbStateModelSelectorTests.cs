@@ -1,8 +1,10 @@
 #nullable enable
 using System;
+using System.Linq;
 using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using UtilitiesCS;
 using UtilitiesCS.OutlookObjects.Folder;
 
 namespace UtilitiesCS.Test.OutlookObjects.Folder
@@ -113,6 +115,66 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             // Assert
             blankIdentity.Should().Throw<ArgumentException>();
             nullPlainText.Should().Throw<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void AppendRows_DuplicateExplicitIdentityIsDisambiguatedWithoutChangingOutputs()
+        {
+            // Arrange
+            var model = new BreadcrumbStateModel();
+
+            // Act
+            model.AddScoredFallbackRow("logical-row", "\\Inbox\\Shared", 0.73);
+            model.AddPlainRow("logical-row", "\\Inbox\\Shared", true);
+
+            // Assert
+            model.Rows.Select(row => row.Identity).Should().Equal("logical-row", "logical-row~2");
+            BreadcrumbSelectionMap
+                .GetFolderItems(model)
+                .Should()
+                .Equal("\\Inbox\\Shared", "\\Inbox\\Shared");
+            model.Rows[0].Probability.Should().Be(0.73);
+            model.Rows[1].Probability.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void ReplaceRows_DuplicateIdentitySnapshotRejectsWithoutMutatingDestination()
+        {
+            // Arrange
+            var first = new BreadcrumbStateModel();
+            first.AddPlainRow("duplicate", "A", true);
+            var second = new BreadcrumbStateModel();
+            second.AddPlainRow("duplicate", "B", true);
+            var destination = new BreadcrumbStateModel();
+            destination.AddPlainRow("existing", "Existing", true);
+
+            // Act
+            Action replace = () => destination.ReplaceRows(new[] { first.Rows[0], second.Rows[0] });
+            Action nullRow = () => destination.ReplaceRows(new BreadcrumbStateRow[] { null! });
+
+            // Assert
+            replace.Should().Throw<ArgumentException>().WithParameterName("rows");
+            nullRow.Should().Throw<ArgumentException>().WithParameterName("rows");
+            destination.Rows.Should().ContainSingle();
+            destination.Rows[0].Identity.Should().Be("existing");
+            destination.Rows[0].VerbatimText.Should().Be("Existing");
+        }
+
+        [TestMethod]
+        public void BreadcrumbRowIdentity_InvalidSourceOccurrenceAndOutputRejectExplicitly()
+        {
+            // Arrange
+            var invalidSource = new FolderRow("A", (FolderRowKind)int.MaxValue, null);
+
+            // Act
+            Action source = () => BreadcrumbRowIdentity.ForFolderRow(invalidSource, 0);
+            Action occurrence = () => BreadcrumbRowIdentity.ForPlainRow("A", -1);
+            Action output = () => BreadcrumbRowIdentity.ForPlainRow(null!, 0);
+
+            // Assert
+            source.Should().Throw<ArgumentOutOfRangeException>();
+            occurrence.Should().Throw<ArgumentOutOfRangeException>();
+            output.Should().Throw<ArgumentNullException>();
         }
 
         private static void AddScoredFallback(

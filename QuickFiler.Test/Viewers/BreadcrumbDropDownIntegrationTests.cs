@@ -4,8 +4,10 @@ using System.Drawing;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Web.WebView2.Core;
 using Moq;
 using QuickFiler.Viewers;
 using UtilitiesCS.OutlookObjects.Folder;
@@ -16,6 +18,26 @@ namespace QuickFiler.Test.Viewers
     [TestClass]
     public sealed class BreadcrumbDropDownIntegrationTests
     {
+        [TestMethod]
+        public void Constructor_NullLegacySurfaceFactory_ThrowsForSurfaceFactory()
+        {
+            Action act = () =>
+                new BreadcrumbDropDownHost(
+                    null,
+                    null,
+                    (Func<CoreWebView2Environment, Task<Tuple<Control, IWebViewMessenger>>>)null,
+                    () => { },
+                    () => { },
+                    () => { },
+                    (popup, control, location) => { }
+                );
+
+            act.Should()
+                .Throw<ArgumentNullException>()
+                .Which.ParamName.Should()
+                .Be("surfaceFactory");
+        }
+
         [TestMethod]
         public void SetFolderDroppedDownTrue_OpensOnceWithScreenBoundsAndWorkingArea()
         {
@@ -85,6 +107,36 @@ namespace QuickFiler.Test.Viewers
         }
 
         [TestMethod]
+        public void NativeAutomaticClose_RestoresOriginalCommittedIdentityWithoutPendingPublicationAndReturnsFocusOnce()
+        {
+            // Arrange
+            using (var harness = new ItemViewerDropDownHarness())
+            {
+                int selections = 0;
+                harness.Viewer.BreadcrumbCoordinator.SelectionChanged += (sender, args) =>
+                    selections++;
+                harness.Viewer.SetFolderDroppedDown(true);
+                harness
+                    .Viewer.BreadcrumbCoordinator.HandleSelectorKey(BreadcrumbSelectorKey.Down)
+                    .Should()
+                    .BeTrue();
+                harness.Viewer.BreadcrumbCoordinator.CommittedIdentity.Should().Be("A");
+                harness.Viewer.BreadcrumbCoordinator.PendingIdentity.Should().Be("B");
+
+                // Act
+                harness.RaiseNativeClose();
+
+                // Assert
+                harness.Viewer.BreadcrumbCoordinator.IsSelectorOpen.Should().BeFalse();
+                harness.Viewer.BreadcrumbCoordinator.CommittedIdentity.Should().Be("A");
+                harness.Viewer.BreadcrumbCoordinator.PendingIdentity.Should().BeNull();
+                harness.Viewer.GetSelectedFolder().Should().Be("A");
+                selections.Should().Be(0);
+                harness.FocusReturnCount.Should().Be(1);
+            }
+        }
+
+        [TestMethod]
         public void ClosedAndPopupAttachmentAndTheme_AreExactlyOncePerSurface()
         {
             // Arrange
@@ -106,6 +158,68 @@ namespace QuickFiler.Test.Viewers
                 CountType(harness.PopupMessenger.Posted, "themeChange").Should().Be(2);
                 harness.Host.Verify(host => host.SetTheme("dark"), Times.Once());
                 harness.Host.Verify(host => host.SetTheme("light"), Times.Once());
+            }
+        }
+
+        [TestMethod]
+        public async Task ClosedSurfaceReadyBoundary_DefersPopupReplayAndReopenDoesNotDuplicateSubscriptions()
+        {
+            // Arrange
+            using (var harness = new ItemViewerDropDownHarness())
+            {
+                harness.Viewer.SetFolderItems(new[] { "A", "B", "C" });
+                harness.Viewer.SetFolderSelectedIndex(1);
+                harness.SetTheme("dark");
+                harness.AttachClosedSurface();
+
+                // Assert pending readiness
+                harness.ClosedMessenger.SubscriberCount.Should().Be(1);
+                harness.PopupMessenger.SubscriberCount.Should().Be(0);
+                harness.PopupMessenger.Posted.Should().BeEmpty();
+
+                // Act
+                harness.RaisePopupReady();
+                IWebViewMessenger readyMessenger = harness.Host.Object.PopupMessenger;
+
+                // Assert readiness replay
+                readyMessenger.Should().BeSameAs(harness.PopupMessenger);
+                harness.PopupMessenger.SubscriberCount.Should().Be(1);
+                CountType(harness.PopupMessenger.Posted, "render").Should().Be(1);
+                CountType(harness.PopupMessenger.Posted, "themeChange").Should().Be(1);
+                CountType(harness.PopupMessenger.Posted, "selectorView").Should().Be(1);
+                harness.PopupMessenger.Posted.Should().HaveCount(3);
+
+                // Act
+                bool firstOpened = await harness.OpenDropDownAsync();
+                bool closed = harness.Host.Object.Close(
+                    BreadcrumbDropDownCloseReason.ExplicitCommit
+                );
+                bool reopened = await harness.OpenDropDownAsync();
+
+                // Assert close and reopen reuse
+                firstOpened.Should().BeTrue();
+                closed.Should().BeTrue();
+                reopened.Should().BeTrue();
+                harness.Host.Object.PopupMessenger.Should().BeSameAs(readyMessenger);
+                harness.PopupMessenger.SubscriberCount.Should().Be(1);
+                CountType(harness.PopupMessenger.Posted, "render").Should().Be(1);
+                CountType(harness.PopupMessenger.Posted, "themeChange").Should().Be(1);
+                CountType(harness.PopupMessenger.Posted, "selectorView").Should().Be(1);
+                harness.PopupMessenger.Posted.Should().HaveCount(3);
+                harness.Host.Verify(
+                    host =>
+                        host.OpenAsync(
+                            harness.AnchorScreenBounds,
+                            harness.WorkingArea,
+                            It.IsAny<Size>()
+                        ),
+                    Times.Exactly(2)
+                );
+
+                // Act and assert repeated readiness is idempotent
+                harness.RaisePopupReady();
+                harness.PopupMessenger.SubscriberCount.Should().Be(1);
+                harness.PopupMessenger.Posted.Should().HaveCount(3);
             }
         }
 
@@ -215,6 +329,7 @@ namespace QuickFiler.Test.Viewers
     {
         private readonly SynchronizationContext _previousContext;
         private bool _hostOpen;
+        private bool _popupReady;
 
         internal ItemViewerDropDownHarness()
         {
@@ -227,7 +342,8 @@ namespace QuickFiler.Test.Viewers
             Viewer.SetFolderSelectedIndex(0);
 
             Host = new Mock<IBreadcrumbDropDownHost>();
-            Host.SetupGet(host => host.PopupMessenger).Returns(() => PopupMessenger);
+            Host.SetupGet(host => host.PopupMessenger)
+                .Returns(() => _popupReady ? PopupMessenger : null);
             Host.SetupGet(host => host.IsOpen).Returns(() => _hostOpen);
             Host.Setup(host =>
                     host.OpenAsync(It.IsAny<Rectangle>(), It.IsAny<Rectangle>(), It.IsAny<Size>())
@@ -248,7 +364,12 @@ namespace QuickFiler.Test.Viewers
                     }
                     return true;
                 });
-            Host.Setup(host => host.Reset()).Callback(() => _hostOpen = false);
+            Host.Setup(host => host.Reset())
+                .Callback(() =>
+                {
+                    _hostOpen = false;
+                    _popupReady = false;
+                });
             ConfigureAgain();
         }
 
@@ -258,6 +379,7 @@ namespace QuickFiler.Test.Viewers
         internal TrackingMessenger PopupMessenger { get; } = new TrackingMessenger();
         internal Rectangle AnchorScreenBounds { get; } = new Rectangle(120, 240, 390, 25);
         internal Rectangle WorkingArea { get; } = new Rectangle(0, 0, 1920, 1040);
+        internal int FocusReturnCount { get; private set; }
 
         internal void ConfigureAgain()
         {
@@ -299,8 +421,29 @@ namespace QuickFiler.Test.Viewers
             method.Invoke(Viewer, new object[] { ClosedMessenger });
         }
 
-        internal void RaisePopupReady() =>
+        internal void RaisePopupReady()
+        {
+            _popupReady = true;
             Host.Raise(host => host.PopupMessengerReady += null, Host.Object, EventArgs.Empty);
+        }
+
+        internal void RaiseNativeClose()
+        {
+            if (!_hostOpen)
+            {
+                return;
+            }
+            _hostOpen = false;
+            Viewer.BreadcrumbCoordinator.CancelSelector();
+            FocusReturnCount++;
+        }
+
+        internal Task<bool> OpenDropDownAsync() =>
+            Host.Object.OpenAsync(
+                AnchorScreenBounds,
+                WorkingArea,
+                new Size(AnchorScreenBounds.Width, 120)
+            );
 
         internal void SetTheme(string theme)
         {

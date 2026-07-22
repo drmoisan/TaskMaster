@@ -92,6 +92,83 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         }
 
         [TestMethod]
+        public void SubfolderActivationMessage_RoundTripsUniqueRowIdentityAndSubfolderIndex()
+        {
+            // Arrange
+            Type messageType = RequireType("BreadcrumbSelectorSubfolderActivationMessage");
+            object message = Activator.CreateInstance(messageType, "suggestion:folder-b:0", 2)!;
+
+            // Act
+            string json = Serialize(message);
+            object parsed = Parse(json);
+
+            // Assert
+            json.Should().Contain("\"type\":\"selectorSubfolderActivate\"");
+            json.Should().Contain("\"rowIdentity\":\"suggestion:folder-b:0\"");
+            json.Should().Contain("\"subfolderIndex\":2");
+            parsed.GetType().Should().Be(messageType);
+            Property<string>(parsed, "Type").Should().Be("selectorSubfolderActivate");
+            Property<string>(parsed, "RowIdentity").Should().Be("suggestion:folder-b:0");
+            Property<int>(parsed, "SubfolderIndex").Should().Be(2);
+        }
+
+        [TestMethod]
+        public void SubfolderActivationConstructor_RejectsBlankIdentityAndNegativeIndex()
+        {
+            // Arrange
+            Type messageType = RequireType("BreadcrumbSelectorSubfolderActivationMessage");
+            Action blankIdentity = () => Activator.CreateInstance(messageType, " ", 0);
+            Action negativeIndex = () => Activator.CreateInstance(messageType, "row-a", -1);
+
+            // Act and assert
+            blankIdentity
+                .Should()
+                .Throw<TargetInvocationException>()
+                .WithInnerException<ArgumentException>();
+            negativeIndex
+                .Should()
+                .Throw<TargetInvocationException>()
+                .WithInnerException<ArgumentOutOfRangeException>();
+        }
+
+        [DataTestMethod]
+        [DataRow("{\"type\":\"selectorSubfolderActivate\",\"subfolderIndex\":0}", "rowIdentity")]
+        [DataRow(
+            "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":\" \",\"subfolderIndex\":0}",
+            "rowIdentity"
+        )]
+        [DataRow(
+            "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":\"row-a\"}",
+            "subfolderIndex"
+        )]
+        [DataRow(
+            "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":\"row-a\",\"subfolderIndex\":-1}",
+            "subfolderIndex"
+        )]
+        public void Parse_InvalidSubfolderActivationPayload_RejectsExplicitly(
+            string json,
+            string expected
+        )
+        {
+            // Arrange
+            MethodInfo parse = SerializerType().GetMethod("Parse")!;
+
+            // Act
+            Action act = () => parse.Invoke(null, new object[] { json });
+
+            // Assert
+            act.Should().Throw<TargetInvocationException>().WithInnerException<FormatException>();
+            try
+            {
+                parse.Invoke(null, new object[] { json });
+            }
+            catch (TargetInvocationException ex)
+            {
+                ex.InnerException!.Message.Should().ContainEquivalentOf(expected);
+            }
+        }
+
+        [TestMethod]
         public void Constructors_RejectBlankStableIdentities()
         {
             // Arrange

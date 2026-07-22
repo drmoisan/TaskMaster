@@ -109,8 +109,12 @@ namespace QuickFiler.Controllers
                 ((ItemViewer)_itemViewer).L0vhBreadcrumb_WebView2,
                 _webViewEnvironment
             );
-            ((ItemViewer)_itemViewer).AttachBreadcrumbWebView();
-            ConfigureBreadcrumbDropDown((ItemViewer)_itemViewer, _webViewEnvironment);
+            var breadcrumbViewer = (ItemViewer)_itemViewer;
+            await ConfigureAndAttachBreadcrumbAsync(
+                breadcrumbViewer,
+                _webViewEnvironment,
+                breadcrumbViewer.AttachBreadcrumbWebViewAsync
+            );
             //var task = CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
 
             //await task.ContinueWith(t =>
@@ -161,6 +165,19 @@ namespace QuickFiler.Controllers
         {
             viewer.ConfigureBreadcrumbDropDown(environment, _webViewInitializer);
             viewer.SetBreadcrumbTheme(_globals.Ol.DarkMode ? "dark" : "light");
+        }
+
+        /// <summary>Caches the current theme before collapsed navigation can complete.</summary>
+        internal Task<bool> ConfigureAndAttachBreadcrumbAsync(
+            ItemViewer viewer,
+            CoreWebView2Environment environment,
+            Func<Task<bool>> attachCollapsed
+        )
+        {
+            if (attachCollapsed == null)
+                throw new ArgumentNullException(nameof(attachCollapsed));
+            ConfigureBreadcrumbDropDown(viewer, environment);
+            return attachCollapsed();
         }
 
         private void OnBreadcrumbUnhandledArrow(object sender, BreadcrumbArrowDirection direction)
