@@ -1,10 +1,16 @@
-using System;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Drawing;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Web.WebView2.Core;
+using Moq;
 using QuickFiler.Viewers;
+using CapturingContext = QuickFiler.Test.Viewers.BreadcrumbSelectorToggleUiBoundaryTests.CapturingSynchronizationContext;
 
 namespace QuickFiler.Test.Viewers
 {
@@ -215,6 +221,260 @@ namespace QuickFiler.Test.Viewers
                 .GetResult();
             messenger.Dispose();
             control.Dispose();
+        }
+
+        /// <summary>Lifetime 292-301 and 324: a lease superseded after install declines retention and disposes
+        /// the exact installed host, control, and messenger exactly once.</summary>
+        [TestMethod]
+        public void OpenAsync_LeaseSupersededDuringInstall_DisposesInstalledSurfaceExactlyOnce()
+        {
+            using (var probe = new PopupLifecycleProbe())
+            {
+                probe.OnItemAdded = probe.Lifetime.Dispose;
+                probe.Open().Should().BeFalse();
+                ((ToolStripControlHost)probe.AddedItem)
+                    .Control.Should()
+                    .BeNull("the exact installed control host was disposed");
+                probe.Host.DropDown.Items.Count.Should().Be(0);
+                probe.Surface.DisposeCount.Should().Be(1, "the installed control is disposed once");
+                probe
+                    .MessengerDisposeCount.Should()
+                    .Be(1, "the installed messenger is disposed once");
+                probe.Host.InstalledControlHost.Should().BeNull();
+                probe.Host.InstalledPopupControl.Should().BeNull();
+                probe.Host.InstalledPopupMessenger.Should().BeNull();
+                probe
+                    .ReadyCount.Should()
+                    .Be(0, "declined retention publishes no messenger readiness");
+            }
+        }
+
+        /// <summary>Lifetime 315: a creation failure whose post-failure disposal succeeds disposes the owned
+        /// surface exactly once, emits no cleanup report, and preserves the creation failure.</summary>
+        [TestMethod]
+        public void OpenAsync_CreationFailsAndCleanupSucceeds_DisposesOwnedSurfaceWithoutReport()
+        {
+            using (var probe = new PopupLifecycleProbe())
+            {
+                var creationFailure = new InvalidOperationException("surface creation");
+                var owned = new TrackingMessenger();
+                probe.FactoryFailure = creationFailure;
+                probe.Host.InstalledPopupMessenger = owned;
+                probe.Open().Should().BeFalse();
+                owned.DisposeCount.Should().Be(1, "post-failure disposal ran exactly once");
+                probe.Host.InstalledPopupMessenger.Should().BeNull();
+                probe.Errors.Should().BeEmpty("a successful cleanup emits no report");
+                probe.Host.LastInitializationException.Should().BeSameAs(creationFailure);
+            }
+        }
+
+        /// <summary>Lifetime 310-313 with 315: a failing post-failure disposal reports its secondary exactly
+        /// once and never replaces the primary creation failure.</summary>
+        [TestMethod]
+        public void OpenAsync_CleanupDispatchFails_ReportsSecondaryOnceAndPreservesPrimary()
+        {
+            using (var probe = new PopupLifecycleProbe())
+            {
+                var creationFailure = new InvalidOperationException("readiness");
+                var cleanupFailure = new InvalidOperationException("cleanup dispatch");
+                var readiness = new TaskCompletionSource<bool>(
+                    TaskCreationOptions.RunContinuationsAsynchronously
+                );
+                probe.Readiness = readiness.Task;
+                probe.MessengerDisposal = () => probe.EnqueuePostFailure(cleanupFailure);
+                Task<bool> opening = probe.OpenAsync();
+                int dispatches = 0;
+                probe.DrainUntil(
+                    opening,
+                    () =>
+                    {
+                        if (++dispatches == 1)
+                            readiness.SetException(creationFailure);
+                    }
+                );
+                Exception primary = probe.Host.LastInitializationException;
+                opening.Result.Should().BeFalse();
+                probe.Errors.Should().ContainSingle().Which.Should().BeSameAs(cleanupFailure);
+                primary
+                    .Should()
+                    .BeSameAs(creationFailure, "the secondary never replaces the primary");
+                probe.MessengerDisposeCount.Should().Be(1);
+            }
+        }
+
+        /// <summary>Lifetime 153-156: a failing open failure-recovery dispatch is reported exactly once, the
+        /// shared open task completes as an unfaulted false, and the stored open task is cleared.</summary>
+        [TestMethod]
+        public void OpenAsync_RecoveryDispatchFails_ReportsOnceAndClearsStoredOpenTask()
+        {
+            using (var probe = new PopupLifecycleProbe())
+            {
+                var kickoffFailure = new InvalidOperationException("kickoff dispatch");
+                var recoveryFailure = new InvalidOperationException("recovery dispatch");
+                probe.EnqueuePostFailure(kickoffFailure);
+                probe.EnqueuePostFailure(recoveryFailure);
+                Task<bool> opening = probe.OpenAsync();
+                probe.DrainUntil(opening);
+                opening.Status.Should().Be(TaskStatus.RanToCompletion);
+                opening.Result.Should().BeFalse();
+                probe.Errors.Should().Equal(kickoffFailure, recoveryFailure);
+                probe
+                    .Host.LastInitializationException.Should()
+                    .BeNull("recovery never reached the host");
+                probe.StoredOpenTask.Should().BeNull("the stored current open task is cleared");
+            }
+        }
+
+        /// <summary>Host 413: a native closed notification whose scheduled body drains after the host already
+        /// left the open state performs no late close work at all.</summary>
+        [TestMethod]
+        public void NativeClosedCallback_HostClosedBeforeDrain_PerformsNoLateCloseWork()
+        {
+            using (var probe = new PopupLifecycleProbe())
+            {
+                probe.Open().Should().BeTrue();
+                int cancels = probe.CancelCount;
+                int focusAnchors = probe.FocusAnchorCount;
+                int nativeCloses = probe.NativeCloseCount;
+                probe.RaiseNativeClosed();
+                probe.Host.OpenState = false;
+                probe.DrainAll();
+                probe.CancelCount.Should().Be(cancels, "the late body returns before cancelling");
+                probe.FocusAnchorCount.Should().Be(focusAnchors, "no anchor focus is returned");
+                probe.NativeCloseCount.Should().Be(nativeCloses);
+                probe.Host.IsOpen.Should().BeFalse("the observed open state is unchanged");
+            }
+        }
+
+        /// <summary>Shared deterministic popup-lifecycle harness: it is the owner synchronization boundary and
+        /// delegates queueing to the capturing context, so scheduling drains step by step and a chosen dispatch
+        /// can be made to fail. No Outlook, live WebView2, timers, sleeps, retries, or temp files.</summary>
+        private sealed class PopupLifecycleProbe : SynchronizationContext, IDisposable
+        {
+            private const BindingFlags Hidden = BindingFlags.Instance | BindingFlags.NonPublic;
+            private static readonly object[] ClosedArguments =
+            {
+                null,
+                new ToolStripDropDownClosedEventArgs(ToolStripDropDownCloseReason.AppClicked),
+            };
+            private readonly CapturingContext _queue = new CapturingContext();
+            private readonly ConcurrentQueue<Exception> _postFailures =
+                new ConcurrentQueue<Exception>();
+            private readonly ConcurrentQueue<Exception> _errors = new ConcurrentQueue<Exception>();
+            private readonly Panel _anchor = new Panel();
+
+            internal PopupLifecycleProbe()
+            {
+                var messenger = new Mock<IWebViewMessenger>();
+                messenger
+                    .As<IDisposable>()
+                    .Setup(value => value.Dispose())
+                    .Callback(() =>
+                    {
+                        MessengerDisposeCount++;
+                        MessengerDisposal();
+                    });
+                Messenger = messenger.Object;
+                Host = new BreadcrumbDropDownHost(
+                    _anchor,
+                    Uninitialized<CoreWebView2Environment>(),
+                    CreateSurfaceAsync,
+                    () => { },
+                    () => FocusAnchorCount++,
+                    () => CancelCount++,
+                    (popup, owner, location) => { },
+                    new BreadcrumbPopupUiOperations(
+                        new BreadcrumbUiDispatcher(this, _errors.Enqueue)
+                    ),
+                    (popup, reason) => NativeCloseCount++
+                );
+                Lifetime = (BreadcrumbDropDownOpenLifetime)
+                    typeof(BreadcrumbDropDownHost).GetField("_openLifetime", Hidden).GetValue(Host);
+                Host.PopupMessengerReady += (sender, args) => ReadyCount++;
+                Host.DropDown.ItemAdded += (sender, args) =>
+                {
+                    AddedItem = args.Item;
+                    OnItemAdded();
+                };
+            }
+
+            internal BreadcrumbDropDownHost Host { get; }
+            internal BreadcrumbDropDownOpenLifetime Lifetime { get; }
+            internal TrackingControl Surface { get; } = new TrackingControl();
+            internal IWebViewMessenger Messenger { get; }
+            internal ToolStripItem AddedItem { get; private set; }
+            internal Exception FactoryFailure { get; set; }
+            internal Task Readiness { get; set; } = Task.CompletedTask;
+            internal Action OnItemAdded { get; set; } = () => { };
+            internal Action MessengerDisposal { get; set; } = () => { };
+            internal int MessengerDisposeCount { get; private set; }
+            internal int FocusAnchorCount { get; private set; }
+            internal int CancelCount { get; private set; }
+            internal int NativeCloseCount { get; private set; }
+            internal int ReadyCount { get; private set; }
+            internal Exception[] Errors => _errors.ToArray();
+            internal object StoredOpenTask =>
+                typeof(BreadcrumbDropDownOpenLifetime)
+                    .GetField("_openTask", Hidden)
+                    .GetValue(Lifetime);
+
+            /// <summary>Queues one scheduling failure; the next dispatch attempt throws it instead.</summary>
+            internal void EnqueuePostFailure(Exception failure) => _postFailures.Enqueue(failure);
+
+            public override void Post(SendOrPostCallback callback, object state)
+            {
+                if (_postFailures.TryDequeue(out Exception failure))
+                    throw failure;
+                _queue.Post(callback, state);
+            }
+
+            internal void DrainAll() => _queue.DrainAll();
+
+            internal void DrainUntil(Task operation, Action afterDispatch = null) =>
+                _queue.DrainUntil(operation, afterDispatch);
+
+            internal Task<bool> OpenAsync() =>
+                Host.OpenAsync(
+                    new Rectangle(120, 240, 390, 25),
+                    new Rectangle(0, 0, 1920, 1040),
+                    new Size(390, 180)
+                );
+
+            internal bool Open()
+            {
+                Task<bool> opening = OpenAsync();
+                DrainUntil(opening);
+                return opening.GetAwaiter().GetResult();
+            }
+
+            internal void RaiseNativeClosed() =>
+                typeof(BreadcrumbDropDownHost)
+                    .GetMethod("OnDropDownClosed", Hidden)
+                    .Invoke(Host, ClosedArguments);
+
+            public void Dispose()
+            {
+                MessengerDisposal = () => { };
+                OnItemAdded = () => { };
+                Host.Dispose();
+                DrainAll();
+                Host.DropDown.Dispose();
+                Surface.Dispose();
+                _anchor.Dispose();
+            }
+
+            private Task<Tuple<Control, IWebViewMessenger, Task>> CreateSurfaceAsync(
+                CoreWebView2Environment environment
+            ) =>
+                FactoryFailure != null
+                    ? Task.FromException<Tuple<Control, IWebViewMessenger, Task>>(FactoryFailure)
+                    : Task.FromResult(
+                        Tuple.Create<Control, IWebViewMessenger, Task>(
+                            Surface,
+                            Messenger,
+                            Readiness
+                        )
+                    );
         }
     }
 }
