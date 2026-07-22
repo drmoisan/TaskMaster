@@ -254,12 +254,27 @@ namespace QuickFiler.Viewers
 
         private bool IsCurrentBoundary()
         {
-            return ReferenceEquals(_executingDispatcher, this)
-                || (_context != null && ReferenceEquals(SynchronizationContext.Current, _context))
-                || (
-                    _ownerThreadId.HasValue
-                    && Environment.CurrentManagedThreadId == _ownerThreadId.Value
-                );
+            // A currently executing dispatcher callback is always a valid inline boundary.
+            if (ReferenceEquals(_executingDispatcher, this))
+            {
+                return true;
+            }
+
+            // When a context was captured it is the authoritative boundary, so only an ambient
+            // reference match to that exact context proves the caller is on it. Bare owner-thread
+            // identity must never substitute here: a continuation resumed after
+            // ConfigureAwait(false) can be scheduled onto a recycled thread-pool thread whose
+            // managed thread ID equals the captured owner thread ID, which would run UI work inline
+            // and complete the returned task without any post ever crossing the captured context.
+            if (_context != null)
+            {
+                return ReferenceEquals(SynchronizationContext.Current, _context);
+            }
+
+            // The owner-thread-only test dispatcher has no context to compare against, so thread
+            // identity is the only boundary proof available to it.
+            return _ownerThreadId.HasValue
+                && Environment.CurrentManagedThreadId == _ownerThreadId.Value;
         }
 
         private static void LogFailure(Exception exception)
