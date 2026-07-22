@@ -1,5 +1,7 @@
 # Atomic Planner Memory Index
 
+- [Dead-code removal vs coverage exclusion](project_deadcode_removal_vs_coverage_exclusion.md) — coverage gate blocked by unreachable dead prod code → plan removal (shrink denominator), never exclusion/carve-out/forced-rethrow
+
 - [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/
 - [CSharpier gate: format not pipe-files](csharpier-format-not-pipe-files-gate.md) — formatting tasks must use `csharpier format` + scoped `csharpier check` exit 0; `pipe-files` is stdout-only/non-enforcing and masked a 500-line overflow in #400
 - [#400 partial-class headroom placement](project_400_partial_class_headroom_placement.md) — put new coverage cases in existing `.Part2.cs` `[TestClass] partial` files to keep the 17-class filter/count assertions stable
