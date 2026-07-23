@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Web.WebView2.Core;
 using Moq;
 using QuickFiler.Viewers;
+using OperationEntry = System.Tuple<string, System.Threading.SynchronizationContext>;
 
 namespace QuickFiler.Test.Viewers
 {
@@ -109,7 +110,8 @@ namespace QuickFiler.Test.Viewers
             );
             Tuple<Control, IWebViewMessenger, Task> created = await Factory(operations)(
                 Uninitialized<CoreWebView2Environment>()
-            ).ConfigureAwait(false);
+            )
+                .ConfigureAwait(false);
             var failure = new InvalidOperationException("readiness failed");
             readiness.SetException(failure);
             InvalidOperationException thrown = await CaptureFailure<InvalidOperationException>(
@@ -129,7 +131,7 @@ namespace QuickFiler.Test.Viewers
         public void Readiness_DisposeFromAmbientNullWorker_DispatchesHandlerDetachment()
         {
             var context = new RecordingSynchronizationContext();
-            var errors = new ExceptionRecorder();
+            var errors = new ConcurrentQueue<Exception>();
             var log = new OperationRecorder(context);
             var dispatcher = new BreadcrumbUiDispatcher(context, errors.Enqueue);
             BreadcrumbNavigationReadiness readiness =
@@ -157,7 +159,7 @@ namespace QuickFiler.Test.Viewers
         {
             var failure = new InvalidOperationException("detach scheduling failed");
             var context = new RecordingSynchronizationContext(failure);
-            var errors = new ExceptionRecorder();
+            var errors = new ConcurrentQueue<Exception>();
             var dispatcher = new BreadcrumbUiDispatcher(context, errors.Enqueue);
             int detachCount = 0;
             BreadcrumbNavigationReadiness readiness =
@@ -177,7 +179,7 @@ namespace QuickFiler.Test.Viewers
         public async Task DisposeSurfaceAsync_MessengerFailure_StillDisposesControlAndReportsOnce()
         {
             var context = new RecordingSynchronizationContext();
-            var errors = new ExceptionRecorder();
+            var errors = new ConcurrentQueue<Exception>();
             var dispatcher = new BreadcrumbUiDispatcher(context, errors.Enqueue);
             var operations = new BreadcrumbPopupUiOperations(dispatcher);
             var control = new TrackingControl();
@@ -204,7 +206,7 @@ namespace QuickFiler.Test.Viewers
         [TestMethod]
         public void DirectAdapters_CreateGuardAndReportThroughOwnedBoundary()
         {
-            var errors = new ExceptionRecorder();
+            var errors = new ConcurrentQueue<Exception>();
             var operations = new BreadcrumbPopupUiOperations(
                 new BreadcrumbUiDispatcher(new RecordingSynchronizationContext(), errors.Enqueue)
             );
@@ -253,7 +255,8 @@ namespace QuickFiler.Test.Viewers
             new BreadcrumbPopupUiOperations(
                 new BreadcrumbUiDispatcher(fixture.Context, fixture.Errors.Enqueue),
                 () => fixture.Log.Record("create", fixture.Control),
-                (initializer, value, environment) => fixture.Log.Record("initialize", initialization),
+                (initializer, value, environment) =>
+                    fixture.Log.Record("initialize", initialization),
                 value => fixture.Log.Record<CoreWebView2>("core", null),
                 (core, value, html) =>
                 {
@@ -290,7 +293,7 @@ namespace QuickFiler.Test.Viewers
 
             internal RecordingSynchronizationContext Context { get; } =
                 new RecordingSynchronizationContext();
-            internal ExceptionRecorder Errors { get; } = new ExceptionRecorder();
+            internal ConcurrentQueue<Exception> Errors { get; } = new ConcurrentQueue<Exception>();
             internal OperationRecorder Log { get; }
             internal TrackingControl Control { get; }
             internal TrackingMessenger Messenger { get; }
@@ -308,7 +311,7 @@ namespace QuickFiler.Test.Viewers
 
         private static async Task VerifyCreateAndInstallCleanupAsync(bool cancellationWins)
         {
-            var errors = new ExceptionRecorder();
+            var errors = new ConcurrentQueue<Exception>();
             var operations = new BreadcrumbPopupUiOperations(
                 new BreadcrumbUiDispatcher(new RecordingSynchronizationContext(), errors.Enqueue)
             );
@@ -380,8 +383,7 @@ namespace QuickFiler.Test.Viewers
         {
             private readonly object _sync = new object();
             private readonly SynchronizationContext _expected;
-            private readonly List<Tuple<string, SynchronizationContext>> _values =
-                new List<Tuple<string, SynchronizationContext>>();
+            private readonly List<OperationEntry> _values = new List<OperationEntry>();
 
             internal OperationRecorder(SynchronizationContext expected) => _expected = expected;
 
@@ -401,16 +403,12 @@ namespace QuickFiler.Test.Viewers
                 return value;
             }
 
-            private IReadOnlyList<string> ReadNames(
-                Predicate<Tuple<string, SynchronizationContext>> predicate
-            )
+            private IReadOnlyList<string> ReadNames(Predicate<OperationEntry> predicate)
             {
                 lock (_sync)
                     return _values.FindAll(predicate).ConvertAll(value => value.Item1);
             }
         }
-
-        private sealed class ExceptionRecorder : ConcurrentQueue<Exception> { }
 
         private sealed class TrackingControl : Panel
         {
@@ -454,6 +452,7 @@ namespace QuickFiler.Test.Viewers
         private sealed class RecordingSynchronizationContext : SynchronizationContext
         {
             private readonly Exception _postFailure;
+
             internal RecordingSynchronizationContext(Exception postFailure = null) =>
                 _postFailure = postFailure;
 

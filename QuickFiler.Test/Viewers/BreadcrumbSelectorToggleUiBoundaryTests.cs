@@ -12,10 +12,8 @@ using Moq;
 using QuickFiler.Viewers;
 using UtilitiesCS;
 using UtilitiesCS.OutlookObjects.Folder;
-using DisposableMessenger =
-    QuickFiler.Test.Viewers.BreadcrumbSelectorOpenRetryTests.DisposableMessenger;
-using FailOnceSynchronizationContext =
-    QuickFiler.Test.Viewers.BreadcrumbSelectorOpenRetryTests.FailOnceSynchronizationContext;
+using DisposableMessenger = QuickFiler.Test.Viewers.BreadcrumbSelectorOpenRetryTests.DisposableMessenger;
+using FailOnceSynchronizationContext = QuickFiler.Test.Viewers.BreadcrumbSelectorOpenRetryTests.FailOnceSynchronizationContext;
 
 namespace QuickFiler.Test.Viewers
 {
@@ -165,9 +163,9 @@ namespace QuickFiler.Test.Viewers
                 context.DrainAll();
                 callbackThreads.Should().NotBeEmpty();
                 callbackThreads.Should().OnlyContain(value => value == creatorThread);
-                context.ExecutedThreadSnapshot.Should().OnlyContain(
-                    value => value == creatorThread
-                );
+                context
+                    .ExecutedThreadSnapshot.Should()
+                    .OnlyContain(value => value == creatorThread);
                 context.CreatorThreadId.Should().Be(creatorThread);
                 context.ExceptionSnapshot.Should().BeEmpty();
                 errors.Should().BeEmpty();
@@ -356,8 +354,7 @@ namespace QuickFiler.Test.Viewers
 
             internal int CreatorThreadId { get; } = Environment.CurrentManagedThreadId;
             internal Exception[] ExceptionSnapshot => ReadLocked(() => _exceptions.ToArray());
-            internal int[] ExecutedThreadSnapshot =>
-                ReadLocked(() => _executedThreads.ToArray());
+            internal int[] ExecutedThreadSnapshot => ReadLocked(() => _executedThreads.ToArray());
             internal int PendingCount => ReadLocked(() => _pending.Count);
             internal int PostCount => ReadLocked(() => _pending.Count + _executedThreads.Count);
 
@@ -407,7 +404,9 @@ namespace QuickFiler.Test.Viewers
             internal bool DrainOne()
             {
                 if (Environment.CurrentManagedThreadId != CreatorThreadId)
-                    throw new InvalidOperationException("Queued work must drain on its creator thread.");
+                    throw new InvalidOperationException(
+                        "Queued work must drain on its creator thread."
+                    );
                 Tuple<SendOrPostCallback, object> work;
                 lock (_sync)
                 {
@@ -475,6 +474,5 @@ namespace QuickFiler.Test.Viewers
                 }
             }
         }
-
     }
 }

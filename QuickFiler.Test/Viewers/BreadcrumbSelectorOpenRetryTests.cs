@@ -14,8 +14,7 @@ using Microsoft.Web.WebView2.Core;
 using Moq;
 using QuickFiler.Viewers;
 using UtilitiesCS.OutlookObjects.Folder;
-using CapturingSynchronizationContext =
-    QuickFiler.Test.Viewers.BreadcrumbSelectorToggleUiBoundaryTests.CapturingSynchronizationContext;
+using CapturingSynchronizationContext = QuickFiler.Test.Viewers.BreadcrumbSelectorToggleUiBoundaryTests.CapturingSynchronizationContext;
 
 namespace QuickFiler.Test.Viewers
 {
@@ -192,23 +191,20 @@ namespace QuickFiler.Test.Viewers
                     () => RecordOperation(operationThreads, ref focusCount),
                     () => RecordOperation(operationThreads, ref anchorFocusCount),
                     () => RecordOperation(operationThreads, ref cancelCount),
-                    (dropDown, owner, point) =>
-                        RecordOperation(operationThreads, ref showCount),
+                    (dropDown, owner, point) => RecordOperation(operationThreads, ref showCount),
                     operations,
-                    (dropDown, reason) =>
-                        RecordOperation(operationThreads, ref nativeCloseCount)
+                    (dropDown, reason) => RecordOperation(operationThreads, ref nativeCloseCount)
                 )
             )
             {
                 host.PopupMessengerReady += (sender, args) =>
                     RecordOperation(operationThreads, ref readyCount);
-                Task<bool> opening = BreadcrumbSelectorToggleUiBoundaryTests.InvokeAmbientNull(
-                    () =>
-                        host.OpenAsync(
-                            new Rectangle(120, 240, 390, 25),
-                            new Rectangle(0, 0, 1920, 1040),
-                            new Size(390, 180)
-                        )
+                Task<bool> opening = BreadcrumbSelectorToggleUiBoundaryTests.InvokeAmbientNull(() =>
+                    host.OpenAsync(
+                        new Rectangle(120, 240, 390, 25),
+                        new Rectangle(0, 0, 1920, 1040),
+                        new Size(390, 180)
+                    )
                 );
                 context.WaitForPost();
                 context.DrainOne();
@@ -240,7 +236,9 @@ namespace QuickFiler.Test.Viewers
                 context.ExceptionSnapshot.Should().BeEmpty();
                 context.PendingCount.Should().Be(0);
                 operationThreads.Should().OnlyContain(thread => thread == creatorThread);
-                context.ExecutedThreadSnapshot.Should().OnlyContain(thread => thread == creatorThread);
+                context
+                    .ExecutedThreadSnapshot.Should()
+                    .OnlyContain(thread => thread == creatorThread);
             }
         }
 
@@ -468,6 +466,5 @@ namespace QuickFiler.Test.Viewers
                     throw _failure;
             }
         }
-
     }
 }

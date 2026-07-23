@@ -75,7 +75,8 @@ namespace QuickFiler.Test.Viewers
                         .Host.LastInitializationException.Should()
                         .BeOfType<InvalidOperationException>()
                         .Which;
-                    placementFailure.Message.Should()
+                    placementFailure
+                        .Message.Should()
                         .Be("The active working area has no space for the folder selector popup.");
                     placementHarness
                         .ErrorSnapshot.Should()
@@ -289,8 +290,7 @@ namespace QuickFiler.Test.Viewers
         {
             private readonly Panel _anchor;
             private readonly BreadcrumbSelectorToggleUiBoundaryTests.CapturingSynchronizationContext _context;
-            private readonly ConcurrentQueue<Exception> _errors =
-                new ConcurrentQueue<Exception>();
+            private readonly ConcurrentQueue<Exception> _errors = new ConcurrentQueue<Exception>();
 
             internal ThresholdHarness(bool useLegacyFactory = false)
             {
@@ -308,8 +308,7 @@ namespace QuickFiler.Test.Viewers
                     Func<
                         CoreWebView2Environment,
                         Task<Tuple<Control, IWebViewMessenger>>
-                    > legacyFactory =
-                        CreateLegacySurfaceAsync;
+                    > legacyFactory = CreateLegacySurfaceAsync;
                     factory = BreadcrumbPopupUiOperations.NormalizeFactory(legacyFactory);
                 }
                 var operations = new BreadcrumbPopupUiOperations(
@@ -348,8 +347,7 @@ namespace QuickFiler.Test.Viewers
             internal int NativeCloseCount { get; private set; }
             internal Exception[] ErrorSnapshot => _errors.ToArray();
 
-            internal bool Open(Rectangle? workingArea = null) =>
-                Drain(OpenAsync(workingArea));
+            internal bool Open(Rectangle? workingArea = null) => Drain(OpenAsync(workingArea));
 
             internal Task<bool> OpenAsync(Rectangle? workingArea = null) =>
                 Host.OpenAsync(
