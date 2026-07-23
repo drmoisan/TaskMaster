@@ -25,21 +25,24 @@ namespace QuickFiler.Test.Viewers
             using (var harness = new PendingHostHarness())
             {
                 Task<bool> opening = harness.OpenAsync();
+                Task<bool> sharedOpening = harness.OpenAsync();
                 PendingAttempt attempt = harness.Attempts[0];
 
                 // Act
                 bool firstClose = harness.Host.Close(BreadcrumbDropDownCloseReason.Uncommitted);
                 bool repeatedClose = harness.Host.Close(BreadcrumbDropDownCloseReason.Uncommitted);
+                opening.IsCompleted.Should().BeTrue("close must not wait for the factory");
+                (await opening.ConfigureAwait(false)).Should().BeFalse();
                 attempt.CompleteFactory();
                 attempt.CompleteReadiness();
-                bool opened = await opening.ConfigureAwait(false);
+                await attempt.Disposed.ConfigureAwait(false);
 
                 // Assert
+                sharedOpening.Should().BeSameAs(opening);
                 harness
                     .ShowCount.Should()
                     .Be(0, "a factory completion cannot show after pending open was closed");
                 harness.FocusPendingCount.Should().Be(0);
-                opened.Should().BeFalse();
                 firstClose.Should().BeTrue("pending open work is a closeable selector state");
                 repeatedClose.Should().BeFalse();
                 harness.CancelCount.Should().Be(1);
@@ -61,8 +64,10 @@ namespace QuickFiler.Test.Viewers
 
                 // Act
                 bool closed = harness.Host.Close(BreadcrumbDropDownCloseReason.Uncommitted);
+                opening.IsCompleted.Should().BeTrue("close must not wait for readiness");
+                (await opening.ConfigureAwait(false)).Should().BeFalse();
                 attempt.CompleteReadiness();
-                bool opened = await opening.ConfigureAwait(false);
+                await attempt.Disposed.ConfigureAwait(false);
 
                 // Assert
                 harness
@@ -70,7 +75,6 @@ namespace QuickFiler.Test.Viewers
                     .Be(0, "a readiness completion cannot show after pending open was closed");
                 harness.FocusPendingCount.Should().Be(0);
                 harness.ReadyEventCount.Should().Be(0);
-                opened.Should().BeFalse();
                 closed.Should().BeTrue();
                 harness.CancelCount.Should().Be(1);
                 harness.FocusAnchorCount.Should().Be(1);
@@ -87,8 +91,6 @@ namespace QuickFiler.Test.Viewers
                 Task<bool> staleOpening = harness.OpenAsync();
                 PendingAttempt stale = harness.Attempts[0];
                 bool closed = harness.Host.Close(BreadcrumbDropDownCloseReason.Uncommitted);
-                stale.CompleteFactory();
-                stale.CompleteReadiness();
                 (await staleOpening.ConfigureAwait(false)).Should().BeFalse();
                 closed.Should().BeTrue();
 
@@ -98,6 +100,9 @@ namespace QuickFiler.Test.Viewers
                 current.CompleteFactory();
                 current.CompleteReadiness();
                 bool opened = await freshOpening.ConfigureAwait(false);
+                stale.CompleteFactory();
+                stale.CompleteReadiness();
+                await stale.Disposed.ConfigureAwait(false);
 
                 // Assert
                 opened.Should().BeTrue();
@@ -108,6 +113,10 @@ namespace QuickFiler.Test.Viewers
                 harness.CancelCount.Should().Be(1);
                 harness.FocusAnchorCount.Should().Be(1);
                 harness.Host.PopupMessenger.Should().BeSameAs(current.Messenger);
+                stale.Surface.DisposeCount.Should().Be(1);
+                stale.Messenger.DisposeCount.Should().Be(1);
+                current.Surface.DisposeCount.Should().Be(0);
+                current.Messenger.DisposeCount.Should().Be(0);
             }
         }
 
@@ -115,11 +124,14 @@ namespace QuickFiler.Test.Viewers
         public void ToggleAndEscapeWhileOpenIsPending_EachClosesHostExactlyOnce()
         {
             // Arrange and act
-            int toggleCloseCount = ExercisePendingViewerClose(viewer =>
-                viewer.SetBreadcrumbDropDownState(false)
+            int toggleCloseCount = ExercisePendingViewerClose(
+                viewer => viewer.SetBreadcrumbDropDownState(false),
+                BreadcrumbDropDownCloseReason.Uncommitted
             );
-            int escapeCloseCount = ExercisePendingViewerClose(viewer =>
-                viewer.BreadcrumbCoordinator.HandleSelectorKey(BreadcrumbSelectorKey.Escape)
+            int escapeCloseCount = ExercisePendingViewerClose(
+                viewer =>
+                    viewer.BreadcrumbCoordinator.HandleSelectorKey(BreadcrumbSelectorKey.Escape),
+                BreadcrumbDropDownCloseReason.ExplicitCommit
             );
 
             // Assert
@@ -131,15 +143,19 @@ namespace QuickFiler.Test.Viewers
         public void AutomaticSelectorCloseWhileOpenIsPending_ClosesHostExactlyOnce()
         {
             // Arrange and act
-            int closeCount = ExercisePendingViewerClose(viewer =>
-                viewer.BreadcrumbCoordinator.CancelSelector()
+            int closeCount = ExercisePendingViewerClose(
+                viewer => viewer.BreadcrumbCoordinator.CancelSelector(),
+                BreadcrumbDropDownCloseReason.ExplicitCommit
             );
 
             // Assert
             closeCount.Should().Be(1);
         }
 
-        private static int ExercisePendingViewerClose(Action<QuickFiler.ItemViewer> close)
+        private static int ExercisePendingViewerClose(
+            Action<QuickFiler.ItemViewer> close,
+            BreadcrumbDropDownCloseReason expectedReason
+        )
         {
             using (var scope = new ViewerScope())
             {
@@ -158,7 +174,7 @@ namespace QuickFiler.Test.Viewers
                         )
                     )
                     .Returns(opening.Task);
-                host.Setup(value => value.Close(BreadcrumbDropDownCloseReason.Uncommitted))
+                host.Setup(value => value.Close(expectedReason))
                     .Returns(() =>
                     {
                         closeCount++;
@@ -267,6 +283,7 @@ namespace QuickFiler.Test.Viewers
                 new TaskCompletionSource<bool>();
             internal TrackingControl Surface { get; } = new TrackingControl();
             internal TrackingMessenger Messenger { get; } = new TrackingMessenger();
+            internal Task Disposed => Task.WhenAll(Surface.DisposedTask, Messenger.DisposedTask);
 
             internal void CompleteFactory() =>
                 Factory.SetResult(
@@ -282,18 +299,39 @@ namespace QuickFiler.Test.Viewers
             internal void DisposeUnclaimedResources()
             {
                 if (!Surface.IsDisposed)
-                {
                     Surface.Dispose();
-                }
-                Messenger.Dispose();
+                if (Messenger.DisposeCount == 0)
+                    Messenger.Dispose();
             }
         }
 
-        private sealed class TrackingControl : Panel { }
+        private sealed class TrackingControl : Panel
+        {
+            private readonly TaskCompletionSource<bool> _disposed =
+                new TaskCompletionSource<bool>();
+
+            internal int DisposeCount { get; private set; }
+            internal Task DisposedTask => _disposed.Task;
+
+            protected override void Dispose(bool disposing)
+            {
+                if (disposing && !IsDisposed)
+                {
+                    DisposeCount++;
+                    _disposed.TrySetResult(true);
+                }
+                base.Dispose(disposing);
+            }
+        }
 
         private sealed class TrackingMessenger : IWebViewMessenger, IDisposable
         {
             private EventHandler<string> _messageReceived;
+            private readonly TaskCompletionSource<bool> _disposed =
+                new TaskCompletionSource<bool>();
+
+            internal int DisposeCount { get; private set; }
+            internal Task DisposedTask => _disposed.Task;
 
             public event EventHandler<string> MessageReceived
             {
@@ -303,7 +341,13 @@ namespace QuickFiler.Test.Viewers
 
             public void PostJson(string json) { }
 
-            public void Dispose() { }
+            public void Dispose()
+            {
+                if (DisposeCount > 0)
+                    return;
+                DisposeCount++;
+                _disposed.TrySetResult(true);
+            }
         }
 
         private sealed class ViewerScope : IDisposable

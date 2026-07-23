@@ -96,6 +96,48 @@ namespace UtilitiesCS.OutlookObjects.Folder
         public string Identity { get; }
     }
 
+    /// <summary>Page-to-host activation of an expanded subfolder by stable row identity.</summary>
+    public sealed class BreadcrumbSelectorSubfolderActivationMessage : BreadcrumbSelectorMessage
+    {
+        /// <summary>Creates an explicit selector subfolder activation.</summary>
+        /// <param name="rowIdentity">The unique stable identity of the containing row.</param>
+        /// <param name="subfolderIndex">The zero-based index of the expanded subfolder.</param>
+        /// <exception cref="ArgumentException"><paramref name="rowIdentity"/> is blank.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="subfolderIndex"/> is negative.
+        /// </exception>
+        public BreadcrumbSelectorSubfolderActivationMessage(string rowIdentity, int subfolderIndex)
+        {
+            if (string.IsNullOrWhiteSpace(rowIdentity))
+            {
+                throw new ArgumentException(
+                    "A non-empty stable row identity is required.",
+                    nameof(rowIdentity)
+                );
+            }
+            if (subfolderIndex < 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(subfolderIndex),
+                    subfolderIndex,
+                    "A subfolder index cannot be negative."
+                );
+            }
+
+            RowIdentity = rowIdentity;
+            SubfolderIndex = subfolderIndex;
+        }
+
+        /// <summary>The selector message discriminator.</summary>
+        public override string Type => "selectorSubfolderActivate";
+
+        /// <summary>The unique stable identity of the containing row.</summary>
+        public string RowIdentity { get; }
+
+        /// <summary>The zero-based index of the activated expanded subfolder.</summary>
+        public int SubfolderIndex { get; }
+    }
+
     /// <summary>Strict JSON serializer for the focused selector message family.</summary>
     public static class BreadcrumbSelectorMessageSerializer
     {
@@ -132,6 +174,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
                     return new BreadcrumbSelectorActivationMessage(
                         RequireIdentity(root, "identity")
                     );
+                case "selectorSubfolderActivate":
+                    return new BreadcrumbSelectorSubfolderActivationMessage(
+                        RequireIdentity(root, "rowIdentity"),
+                        RequireNonNegativeInt(root, "subfolderIndex")
+                    );
                 default:
                     throw new FormatException($"Unknown selector message type '{type}'.");
             }
@@ -163,6 +210,10 @@ namespace UtilitiesCS.OutlookObjects.Folder
                     break;
                 case BreadcrumbSelectorActivationMessage activation:
                     root["identity"] = activation.Identity;
+                    break;
+                case BreadcrumbSelectorSubfolderActivationMessage subfolderActivation:
+                    root["rowIdentity"] = subfolderActivation.RowIdentity;
+                    root["subfolderIndex"] = subfolderActivation.SubfolderIndex;
                     break;
                 default:
                     throw new FormatException(
@@ -212,9 +263,52 @@ namespace UtilitiesCS.OutlookObjects.Folder
             return identity;
         }
 
-        private static string RequireString(JObject root, string name) =>
-            root.Value<string>(name)
-            ?? throw new FormatException($"Selector message is missing the '{name}' field.");
+        private static int RequireNonNegativeInt(JObject root, string name)
+        {
+            JToken? token = root[name];
+            if (token == null || token.Type == JTokenType.Null)
+            {
+                throw new FormatException($"Selector message is missing the '{name}' field.");
+            }
+            if (token.Type != JTokenType.Integer)
+            {
+                throw new FormatException($"Selector '{name}' must be a JSON integer.");
+            }
+
+            int value;
+            try
+            {
+                value = token.Value<int>();
+            }
+            catch (Exception ex)
+                when (ex is OverflowException || ex is InvalidCastException || ex is FormatException
+                )
+            {
+                throw new FormatException(
+                    $"Selector '{name}' must be an in-range 32-bit integer.",
+                    ex
+                );
+            }
+            if (value < 0)
+            {
+                throw new FormatException($"Selector '{name}' must not be negative.");
+            }
+            return value;
+        }
+
+        private static string RequireString(JObject root, string name)
+        {
+            JToken? token = root[name];
+            if (token == null || token.Type == JTokenType.Null)
+            {
+                throw new FormatException($"Selector message is missing the '{name}' field.");
+            }
+            if (token.Type != JTokenType.String)
+            {
+                throw new FormatException($"Selector '{name}' must be a JSON string.");
+            }
+            return token.Value<string>()!;
+        }
 
         private static string? OptionalString(JObject root, string name)
         {

@@ -268,10 +268,10 @@ namespace QuickFiler
 
         internal void ResetBreadcrumb()
         {
+            BreadcrumbCoordinator?.Reset();
             _breadcrumbDropDownOpenCoordinator?.Reset();
             DetachBreadcrumbMessenger(ref _breadcrumbMessenger);
             _breadcrumbCollapsedAttachment?.Reset();
-            BreadcrumbCoordinator?.Clear();
         }
 
         private void OnBreadcrumbSelectionChanged(object sender, EventArgs e) =>
@@ -383,6 +383,7 @@ namespace QuickFiler
                 BreadcrumbCoordinator.UnhandledArrow -= OnBreadcrumbUnhandledArrow;
                 BreadcrumbCoordinator.SelectorOpenStateChanged -=
                     OnBreadcrumbSelectorOpenStateChanged;
+                BreadcrumbCoordinator.Dispose();
             }
 
             DetachBreadcrumbMessenger(ref _breadcrumbMessenger);

@@ -1,0 +1,55 @@
+# Phase 8 focused-regression correction scope audit
+
+Timestamp: 2026-07-23T00:05:17.2893779-04:00
+
+Command: `$ErrorActionPreference='Stop'; $expectedPre=@{'QuickFiler/Viewers/BreadcrumbDropDownOpenLifetime.cs'='4566CA3383471E2DDC946309125930A8A08C140B924406507E68D10AD80F03E0';'QuickFiler.Test/Controllers/QfcItemControllerBreadcrumbDropDownTests.cs'='9C236CAFDDBD6E2465C7FD6B022817FC5B077B9FD33514515C555826A3A8C3DB';'QuickFiler.Test/Viewers/BreadcrumbDropDownIntegrationTests.cs'='A018588873F04CDA716CB2D37BFEED573EFD3EFE676AEF4C89A4167E20B15B8A'}; $expectedProtected=@{'QuickFiler.Test/Viewers/BreadcrumbDropDownCoverageThresholdTests.cs'='25EE741353DB8CFA625F5783ED7CA17697768FBAB826865F53D72F0DF4BBBD77';'QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.cs'='989BE280294875DCEFD2E936F6F48D65F3EAFED21B4AE4530D4E6288561AFC59';'QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs'='326D190D5BB4B3634A0ABDE6A786A25354349A925B7DE8226AEB11990C8E3B01';'coverage.config'='B9CD80356C6BDBE03807A0B8CB106AE03D24EFBDBB2515097FBF003099050943';'QuickFiler/QuickFiler.csproj'='D05401B1F146FDF84D3B9323F2E05A97028DD511CE5FE7C6C3B438F52907F7BF';'QuickFiler.Test/QuickFiler.Test.csproj'='06663711C83A1FE5DE1B485D5B361DB9EDCE43501E0C37A5AF081DC0D0804FC7';'TaskMaster.sln'='8884A3C7B88B79C6A052FF7199D055297AF19B5BE3D5264DD32E8F9EAF7016E9';'.editorconfig'='E19340D3A51E6B2CF90CB2669FDB1B85A5AAB96900C0F2ABB925BC2CC4CA96AA';'Directory.Build.targets'='94D5CE3889BA4F018C4717AA841E2E021288A6DF167B03D6C469D0F1BA03C013';'scripts/vscode/Invoke-MSTestWithCoverage.ps1'='4782C4E3F00CEA7F852AC884387AE9FDD15615F888F132CB7E71F2F1D9868E26'}; foreach($entry in $expectedProtected.GetEnumerator()){if((Get-FileHash -Algorithm SHA256 -LiteralPath $entry.Key).Hash -ne $entry.Value){throw "Protected hash changed: $($entry.Key)"}}; $utf8=New-Object System.Text.UTF8Encoding($false); function Get-TextHash([string]$text){$algorithm=[System.Security.Cryptography.SHA256]::Create(); try{return [Convert]::ToHexString($algorithm.ComputeHash($utf8.GetBytes($text)))} finally{$algorithm.Dispose()}}; $lifetime=[IO.File]::ReadAllText((Resolve-Path 'QuickFiler/Viewers/BreadcrumbDropDownOpenLifetime.cs')); if(([regex]::Matches($lifetime,[regex]::Escape('The active working area has no space for the folder selector popup.'))).Count -ne 1){throw 'Placement message invariant failed.'}; if((Get-TextHash $lifetime.Replace('"The active working area has no space for the folder selector popup."','"The popup working area has no available space."')) -ne $expectedPre['QuickFiler/Viewers/BreadcrumbDropDownOpenLifetime.cs']){throw 'Lifetime correction delta exceeded the message replacement.'}; if(([regex]::Matches($lifetime,'anchorScreenBounds')).Count -lt 2){throw 'anchorScreenBounds contract missing.'}; $controller=[IO.File]::ReadAllText((Resolve-Path 'QuickFiler.Test/Controllers/QfcItemControllerBreadcrumbDropDownTests.cs')); $crlf=([string][char]13)+([string][char]10); $newline=if($controller.Contains($crlf)){$crlf}else{[string][char]10}; $calls=[regex]::Matches($controller,'InitializeBreadcrumbPipeline\(scope\.Viewer\);'); if($calls.Count -ne 3){throw 'Controller helper call count changed.'}; $methodNames=@('ConfigureBreadcrumbDropDown_PassesExistingEnvironmentAndDarkThemeLazily','ConfigureBreadcrumbDropDown_LightThemeUsesSameControllerSetupSeam','ConfigureBreadcrumbDropDown_RepeatedSameEnvironmentReusesPopupHost','Cleanup_ResetsInjectedHostForPooledViewerReuse'); for($i=0;$i -lt 3;$i++){if($calls[$i].Index -lt $controller.IndexOf($methodNames[$i]) -or $calls[$i].Index -gt $controller.IndexOf($methodNames[$i+1])){throw "Helper call is outside named test $($methodNames[$i])."}}; if($controller.Contains('CaptureCurrentOrTests')){throw 'Prohibited dispatcher fallback found.'}; $helper="        private static void InitializeBreadcrumbPipeline(QuickFiler.ItemViewer viewer)$newline        {$newline            var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);$newline            viewer.InitializeBreadcrumbPipeline(provider.Object);$newline        }$newline$newline"; if(([regex]::Matches($controller,[regex]::Escape($helper))).Count -ne 1){throw 'Strict provider helper invariant failed.'}; $controllerBefore=$controller.Replace("                InitializeBreadcrumbPipeline(scope.Viewer);$newline",'').Replace($helper,''); if((Get-TextHash $controllerBefore) -ne $expectedPre['QuickFiler.Test/Controllers/QfcItemControllerBreadcrumbDropDownTests.cs']){throw 'Controller correction delta exceeded the authorized helper changes.'}; $integration=[IO.File]::ReadAllText((Resolve-Path 'QuickFiler.Test/Viewers/BreadcrumbDropDownIntegrationTests.cs')); $testStart=$integration.IndexOf('public void InitializationFailure_CancelsSessionWithoutDuplicateClose()'); $testEnd=$integration.IndexOf('[TestMethod]',$testStart); $testBlock=$integration.Substring($testStart,$testEnd-$testStart); foreach($required in @('.Callback(() =>','harness.SetHostOpen(false);','harness.Viewer.BreadcrumbCoordinator.CancelSelector();','.ReturnsAsync(false);','IsSelectorOpen.Should().BeFalse();','host.Close(It.IsAny<BreadcrumbDropDownCloseReason>())','Times.Once()')){if(-not $testBlock.Contains($required)){throw "Integration invariant missing: $required"}}; $closeNeedle="host => host.Close(It.IsAny<BreadcrumbDropDownCloseReason>()),$newline                    Times.Once()"; if(([regex]::Matches($integration,[regex]::Escape($closeNeedle))).Count -ne 1){throw 'Expected exactly one corrected any-reason close witness.'}; if((Get-TextHash $integration.Replace($closeNeedle,"host => host.Close(It.IsAny<BreadcrumbDropDownCloseReason>()),$newline                    Times.Never()")) -ne $expectedPre['QuickFiler.Test/Viewers/BreadcrumbDropDownIntegrationTests.cs']){throw 'Integration correction delta exceeded the one expectation.'}; $pending=Get-Content -Raw 'QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.cs'; if(([regex]::Matches($pending,'(?s)PendingAutomaticClose_RequestsExplicitCommitWhenHostIsNotOpen.*?CloseReasons\.Should\(\)\.Equal\(BreadcrumbDropDownCloseReason\.ExplicitCommit\)')).Count -ne 1){throw 'P6 pending-close witness weakened.'}; $lineLimits=@{'QuickFiler/Viewers/BreadcrumbDropDownOpenLifetime.cs'=480;'QuickFiler.Test/Controllers/QfcItemControllerBreadcrumbDropDownTests.cs'=500;'QuickFiler.Test/Viewers/BreadcrumbDropDownIntegrationTests.cs'=500}; foreach($entry in $lineLimits.GetEnumerator()){if((Get-Content -LiteralPath $entry.Key).Count -gt $entry.Value){throw "Line limit exceeded: $($entry.Key)"}}; 'P8_T13_SCOPE_AUDIT_OK tuple_deltas=3 protected_hashes=10 helper_calls=3 integration_close=1 placement_message=1 public_signature_changes=0 pending_close_contract=preserved'`
+
+EXIT_CODE: 0
+
+Output Summary: `P8_T13_SCOPE_AUDIT_OK tuple_deltas=3 protected_hashes=10 helper_calls=3 integration_close=1 placement_message=1 public_signature_changes=0 pending_close_contract=preserved`
+
+## Exact correction tuple
+
+The audit reversed each authorized correction in memory without writing a file. Each reconstructed SHA-256 matched the corresponding P8-T3 pre-correction hash:
+
+| File | Reconstructed pre-correction SHA-256 | Current SHA-256 | Physical lines |
+|---|---:|---:|---:|
+| `QuickFiler/Viewers/BreadcrumbDropDownOpenLifetime.cs` | `4566CA3383471E2DDC946309125930A8A08C140B924406507E68D10AD80F03E0` | `7C3DEAE9A4768C9ED9819787B2C7E3DE831C668094DDEA5A8546BA724AC1AC1B` | 477 |
+| `QuickFiler.Test/Controllers/QfcItemControllerBreadcrumbDropDownTests.cs` | `9C236CAFDDBD6E2465C7FD6B022817FC5B077B9FD33514515C555826A3A8C3DB` | `57EC681D71E4016D576265BE07BB3760DE82F08D2E54852FD13F60FCBF189777` | 385 |
+| `QuickFiler.Test/Viewers/BreadcrumbDropDownIntegrationTests.cs` | `A018588873F04CDA716CB2D37BFEED573EFD3EFE676AEF4C89A4167E20B15B8A` | `305C35FDCEAC1A4B52394B181A288D850FF09E6125EA51AEC9183A2C38BE0840` | 500 |
+
+This proves the production-file delta is only the exact placement message, the controller-test delta is only the helper plus its three calls, and the integration-test delta is only the one close expectation. No fourth production or test file was required.
+
+## Behavior and invariant checks
+
+- `InitializeBreadcrumbPipeline(scope.Viewer)` occurs exactly three times and only inside:
+  - `ConfigureBreadcrumbDropDown_PassesExistingEnvironmentAndDarkThemeLazily`
+  - `ConfigureBreadcrumbDropDown_LightThemeUsesSameControllerSetupSeam`
+  - `ConfigureBreadcrumbDropDown_RepeatedSameEnvironmentReusesPopupHost`
+- The helper creates one `Mock<IFolderHierarchyProvider>(MockBehavior.Strict)` and calls the existing viewer initialization seam.
+- `InvokeConfigure` is byte-identical to P8-T3 after reversing the helper-only delta.
+- The controller test contains no `CaptureCurrentOrTests` call.
+- The production reverse-delta hash proves no fallback dependency, dispatcher, placement calculation, rollback, generation, cancellation, dispatch, cleanup, focus, or public-signature change.
+- `anchorScreenBounds` remains present and unchanged by the correction.
+- `InitializationFailure_CancelsSessionWithoutDuplicateClose` retains its exact name, `OpenAsync` callback, `SetHostOpen(false)`, `CancelSelector`, `ReturnsAsync(false)`, and closed-selection-session assertion.
+- Its existing any-reason verification now requires exactly one total host close.
+- The exact restored production message occurs once: `The active working area has no space for the folder selector popup.`
+- The protected P6 witness `PendingAutomaticClose_RequestsExplicitCommitWhenHostIsNotOpen` still requires one-element `CloseReasons` equality with `BreadcrumbDropDownCloseReason.ExplicitCommit`.
+- P8-T11 passed all five correction tests, and P8-T12 passed the unchanged 149-test preservation composition.
+
+## Protected hashes
+
+| File | Current and required SHA-256 |
+|---|---:|
+| `QuickFiler.Test/Viewers/BreadcrumbDropDownCoverageThresholdTests.cs` | `25EE741353DB8CFA625F5783ED7CA17697768FBAB826865F53D72F0DF4BBBD77` |
+| `QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.cs` | `989BE280294875DCEFD2E936F6F48D65F3EAFED21B4AE4530D4E6288561AFC59` |
+| `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs` | `326D190D5BB4B3634A0ABDE6A786A25354349A925B7DE8226AEB11990C8E3B01` |
+| `coverage.config` | `B9CD80356C6BDBE03807A0B8CB106AE03D24EFBDBB2515097FBF003099050943` |
+| `QuickFiler/QuickFiler.csproj` | `D05401B1F146FDF84D3B9323F2E05A97028DD511CE5FE7C6C3B438F52907F7BF` |
+| `QuickFiler.Test/QuickFiler.Test.csproj` | `06663711C83A1FE5DE1B485D5B361DB9EDCE43501E0C37A5AF081DC0D0804FC7` |
+| `TaskMaster.sln` | `8884A3C7B88B79C6A052FF7199D055297AF19B5BE3D5264DD32E8F9EAF7016E9` |
+| `.editorconfig` | `E19340D3A51E6B2CF90CB2669FDB1B85A5AAB96900C0F2ABB925BC2CC4CA96AA` |
+| `Directory.Build.targets` | `94D5CE3889BA4F018C4717AA841E2E021288A6DF167B03D6C469D0F1BA03C013` |
+| `scripts/vscode/Invoke-MSTestWithCoverage.ps1` | `4782C4E3F00CEA7F852AC884387AE9FDD15615F888F132CB7E71F2F1D9868E26` |
+
+Project, package, configuration, runsettings, test-filter, threshold, persisted-setting, and coverage-exclusion sources remain unchanged from P8-T3.

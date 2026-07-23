@@ -1,0 +1,212 @@
+# Runtime-refined remediation complete pass-after
+
+Timestamp: 2026-07-23T03:39:16.8603344Z
+
+Command: `$vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'; $vstest = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1; if (-not $vstest) { throw 'VSTest was not resolved.' }; $filter = 'FullyQualifiedName~BreadcrumbDuplicateIdentityTests|FullyQualifiedName~BreadcrumbDuplicateIdentityIntegrationTests|FullyQualifiedName~BreadcrumbUiThreadDispatchTests|FullyQualifiedName~BreadcrumbCollapsedSurfaceReadinessTests|FullyQualifiedName~FolderBreadcrumbRouterSelectionConcurrencyTests|FullyQualifiedName~BreadcrumbCoordinatorLifecycleTests|FullyQualifiedName~BreadcrumbPendingOpenCloseTests|FullyQualifiedName~BreadcrumbSubfolderSelectorSessionTests|FullyQualifiedName~BreadcrumbSubfolderActivationTests|FullyQualifiedName~BreadcrumbSelectorToggleUiBoundaryTests|FullyQualifiedName~BreadcrumbPopupControlDispatchTests|FullyQualifiedName~BreadcrumbSelectorOpenRetryTests|FullyQualifiedName~BreadcrumbDropDownOpenCoordinatorTests|FullyQualifiedName~BreadcrumbPopupBoundaryCoverageTests|FullyQualifiedName~BreadcrumbDropDownLifecycleCoverageTests|FullyQualifiedName~BreadcrumbMessengerHubCoverageTests'; & $vstest 'UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll' 'QuickFiler.Test\bin\Debug\QuickFiler.Test.dll' /InIsolation "/TestCaseFilter:$filter" /Logger:'console;Verbosity=normal'; exit $LASTEXITCODE`
+
+EXIT_CODE: 0
+
+Output Summary: VSTest 18.8.0 resolved through `vswhere`, matched both assemblies, and dynamically discovered 149 cases in the exact 16-class filter. All 149 passed with zero failures and zero skips in 4.3277 seconds. Per-class discovery was 7+4+9+10+6+10+5+4+6+4+13+8+18+23+12+10 = 149.
+
+## Discovery inventory
+
+### `BreadcrumbDuplicateIdentityTests` — 7 passed
+
+- `SetSuggestionFallbacks_DuplicateSuggestionAndRecentPathsHaveDistinctIdentities`
+- `SetSuggestionsAsync_ResolvedUpgradePreservesDistinctFallbackIdentities`
+- `SameOutputAcrossAllSources_PreservesOrderKindScoreAndSelectability`
+- `ClosedMoveNext_DuplicateOutputPathsCommitsSecondLogicalRow`
+- `OpenMoveNextThenCommit_DuplicateOutputPathsCommitsSecondLogicalRow`
+- `Activate_SecondDuplicateIdentityCommitsExactLogicalRow`
+- `OpenCommit_CollapsedReadbackUsesSecondDuplicateSuggestionProbability`
+
+### `BreadcrumbDuplicateIdentityIntegrationTests` — 4 passed
+
+- `ClosedDown_DuplicateSuggestionAndRecentCommitsRecentOccurrence`
+- `OpenDownThenEnter_DuplicateSuggestionAndRecentCommitsPendingOccurrence`
+- `ActivateSelector_SecondPublishedIdentityCommitsExactDuplicateOccurrence`
+- `CollapsedReadback_SecondDuplicateSuggestionRetainsItsProbability`
+
+### `BreadcrumbUiThreadDispatchTests` — 9 passed
+
+- `SetSuggestionsAsync_WorkerProviderCompletion_SchedulesPostOnOwningContext`
+- `InboundWorkerMessage_SchedulesEveryPostAndCallbackOnOwningContext`
+- `DispatcherSchedulingFailure_IsReportedThroughObservableErrorSink`
+- `DispatcherActionFailure_IsReportedExactlyOnce`
+- `DispatchValue_AmbientOwningContext_StillSchedulesBeforeControlAccess`
+- `DispatchValue_NestedSynchronousDispatch_ExecutesInlineWithoutAnotherPost`
+- `DispatchValue_SchedulingFailure_ReportsOnceAndFaultsReturnedTask`
+- `ProductionCaptureWithoutUiContext_FailsFast`
+- `InboundCurrentDispatchFailure_IsObservedWithoutEscapingEventBoundary`
+
+### `BreadcrumbCollapsedSurfaceReadinessTests` — 10 passed
+
+- `AttachAsync_PendingAndUnrelatedNavigation_DefersReadyPublicationUntilExactSuccess`
+- `AttachAsync_ExactNavigationFailure_LeavesNoReadyMessenger`
+- `Reset_PendingNavigation_CancelsDetachesAndRejectsLateSuccess`
+- `Dispose_PendingNavigation_CancelsDetachesAndRejectsLateSuccess`
+- `LaterNavigation_InvalidatesEarlierGenerationAndPublishesOnlyCurrentMessenger`
+- `ViewerAttachment_PendingCachesAndReplaysCurrentStateExactlyOnce`
+- `ViewerAttachment_FailureResetReuseAndDisposalLeaveNoStaleAttachment`
+- `NavigationReadiness_UnrelatedCompletionCannotReleaseExactNavigation`
+- `NavigationReadiness_SynchronousSuccessDetachesBeforeNavigationReturns`
+- `NavigationReadiness_FailureAndSynchronousExceptionDetachEveryPath`
+
+### `FolderBreadcrumbRouterSelectionConcurrencyTests` — 6 passed
+
+- `UpgradeStarted_ClosedMoveToDuplicateRow_RemainsSelectedAfterReplacement`
+- `UpgradeStarted_OpenPendingMoveToDuplicateRow_CommitsExactMovedRow`
+- `UpgradeStarted_ActivationOfDuplicateRow_CommitsExactActivatedRow`
+- `UpgradeStarted_DirectItemSelectionOfAnotherPath_SurvivesReplacement`
+- `PublicStateSnapshot_IsImmutableAndRouterDoesNotExposeMutableModel`
+- `StaleUpgradeCompletion_CannotReplaceNewerRowsOrCommittedSelection`
+
+### `BreadcrumbCoordinatorLifecycleTests` — 10 passed
+
+- `OverlappingUpgrades_CurrentCompletionPostsOnceAndStaleCompletionPostsNothing`
+- `Clear_InvalidatesLateSuccessfulUpgradeBeforeAnyPostOrCallback`
+- `ViewerResetThenReuse_InvalidatesLateFailureWithoutDuplicatingCurrentState`
+- `Dispose_InvalidatesLateSuccessAndUnsubscribesBeforePostOrCallback`
+- `Dispose_InvalidatesLateFailureWithoutPostCallbackOrErrorMutation`
+- `CurrentProviderCancellation_PropagatesWithoutPublishingAnUpgrade`
+- `DisposedCoordinator_RejectsPopulationAndClearRemainsSafe`
+- `AsyncPopulation_SupersededCompletionDoesNotPublishAgain`
+- `AddItems_InvalidatesLateUpgradeBeforeDuplicatePost`
+- `QueuedCompletion_DisposedBeforeOwnerDrain_DoesNotPublish`
+
+### `BreadcrumbPendingOpenCloseTests` — 5 passed
+
+- `CloseWhileFactoryPending_InvalidatesOpenAndRepeatedCloseIsIdempotent`
+- `CloseWhileReadinessPending_RejectsLateReadyAttachShowAndFocus`
+- `CloseCanceledFactory_AllowsOneFreshReopenWithoutLateMutation`
+- `ToggleAndEscapeWhileOpenIsPending_EachClosesHostExactlyOnce`
+- `AutomaticSelectorCloseWhileOpenIsPending_ClosesHostExactlyOnce`
+
+### `BreadcrumbSubfolderSelectorSessionTests` — 4 passed
+
+- `OpenSelector_SubfolderActivationThenEnter_PreservesCommittedFullPath`
+- `OpenSelector_SubfolderActivationThenEscape_PreservesCommittedFullPath`
+- `OpenSelector_SubfolderActivationThenAutomaticClose_PreservesCommittedFullPath`
+- `OpenSelector_InvalidSubfolderIndexes_LeaveSessionAndParentSelectionUnchanged`
+
+### `BreadcrumbSubfolderActivationTests` — 6 passed
+
+- `OpenSelector_SubfolderActivationThenEnter_PublishesAndClosesExactlyOnce`
+- `OpenSelector_SubfolderActivationThenEscape_PublishesAndClosesExactlyOnce`
+- `OpenSelector_SubfolderActivationThenNativeClose_PublishesAndClosesExactlyOnce`
+- `OpenSelector_InvalidIdentityAndIndexes_DoNotPublishCloseFocusOrMutate`
+- `OpenSelector_SubfolderActivationForPlainRow_IsDeterministicNoOp`
+- `OpenSelector_SubfolderActivation_PublishesOneDurableRenderAndNoLegacySelectionChange`
+
+### `BreadcrumbSelectorToggleUiBoundaryTests` — 4 passed
+
+- `WorkerProviderAndSelectorToggle_MarshalPostsAndCallbackEntryToOwningBoundary`
+- `PopupHost_WorkerCompletions_RunOnlyWhenCreatorThreadDrainsBoundary`
+- `PopupHost_FocusFailureAfterShow_NativeClosesThenRetriesClosedSession`
+- `PopupHost_FirstSchedulingFailure_SettlesFalseThenRetriesAndObservesLifecycle`
+
+### `BreadcrumbPopupControlDispatchTests` — 13 passed
+
+- `SurfaceFactory_WorkerCompletion_DispatchesEveryStageAndCleanup`
+- `SurfaceFactory_InitializationFailure_ReportsOnceAndCleansUp`
+- `SurfaceFactory_NavigationActionFailure_ReportsOnceAndCleansUp`
+- `SurfaceFactory_ReadinessFailure_ReportsOnceThenDisposesSurface`
+- `Readiness_DisposeFromAmbientNullWorker_DispatchesHandlerDetachment`
+- `Readiness_DetachSchedulingFailure_ReportsOnceWithoutDirectDetach`
+- `DisposeSurfaceAsync_MessengerFailure_StillDisposesControlAndReportsOnce`
+- `CreateAndInstall_CancellationCleanupFailure_RetriesOnlyFailedResource`
+- `CreateAndInstall_StaleHostCleanup_DoesNotDisposeOwnedControlDirectly`
+- `DirectAdapters_CreateGuardAndReportThroughOwnedBoundary`
+- `SurfaceFactory_InvalidNavigationResult_ReportsOnceAndCleansUp (0)`
+- `SurfaceFactory_InvalidNavigationResult_ReportsOnceAndCleansUp (1)`
+- `SurfaceFactory_InvalidNavigationResult_ReportsOnceAndCleansUp (2)`
+
+### `BreadcrumbSelectorOpenRetryTests` — 8 passed
+
+- `MouseToggle_FirstOpenFaultsAfterAwait_SecondClickRetriesCleanly`
+- `SetFolderDroppedDownTrue_UsesSameOpenRequestAsMouseSelectorToggle`
+- `Placement_StaleCurrentCheck_StopsSubsequentMutations (1)`
+- `Placement_StaleCurrentCheck_StopsSubsequentMutations (2)`
+- `Placement_StaleCurrentCheck_StopsSubsequentMutations (3)`
+- `Placement_StaleCurrentCheck_StopsSubsequentMutations (4)`
+- `HostedCleanup_HostDisposeFailure_PreservesPrimaryAndDisposesAllOnce`
+- `Dispose_WhenResetAndOpenWorkAreQueued_HasNoLateActivity`
+
+### `BreadcrumbDropDownOpenCoordinatorTests` — 18 passed
+
+- `ConstructorAndProviderUpdates_GuardEveryRequiredDelegate`
+- `RequestOpen_ConcurrentCallersShareOneUiBoundSnapshot`
+- `RequestOpen_SnapshotFailureCancelsOnceAndRetrySucceeds`
+- `RequestOpen_FalseResultCancelsOnceAndPermitsRetry`
+- `RequestOpen_SynchronousAndAsynchronousFaultsAreObserved`
+- `PendingToggleClose_HostOwnershipSuppressesFallbackAndRepeatedClose`
+- `PendingToggleClose_RejectedHostPerformsOneFallbackCancellation`
+- `PendingAutomaticClose_RequestsExplicitCommitWhenHostIsNotOpen`
+- `RequestOpen_HostSideCancellationBeforeFalseCompletionIsNotDuplicated`
+- `RequestOpen_SelectorClosesBeforeSuccess_ClosesLatePopupExplicitly`
+- `SetDroppedDown_MouseAndKeyboardPathsShareRequestAndCloseUncommitted`
+- `SelectorStateTransitions_RequestOpenThenCloseOnlyWhenRequired`
+- `ResetReleaseAndCloseResults_PreserveRetryAndBlockReleasedWork`
+- `SetDroppedDown_AfterRelease_PostsNothingAndLeavesHostStateUntouched`
+- `HandleSelectorOpenStateChanged_AfterRelease_PostsNothingAndSkipsSelectorPredicate`
+- `HandleSelectorOpenStateChanged_QueuedBodyDrainedAfterRelease_PerformsNoWork`
+- `Reset_AfterRelease_PostsNothingAndNeverDetachesOrResetsHost`
+- `RequestOpen_RollbackOperationThrows_CompletesFalseWithoutSurfacingSecondary`
+
+### `BreadcrumbPopupBoundaryCoverageTests` — 23 passed
+
+- `Dispatcher_NullInputsAndThrowingSink_AreHandledByContract`
+- `Dispatcher_OwnerOnlyWorker_ReportsWithoutRunningAction`
+- `Dispatcher_PostedFailure_ReportsOnceAndRestoresBoundary`
+- `ProductionFactoryCreate_ControlledContext_CapturesWithoutInvokingAdapters`
+- `InjectedFactory_Success_UsesOwnerBoundaryAndReturnsReadySurface`
+- `InjectedFactory_CreateFailure_ReportsOnceWithoutCleanup`
+- `InjectedFactory_InitializationFailure_DisposesControlOnce`
+- `InjectedFactory_CoreFailure_DisposesControlOnce`
+- `InjectedFactory_NavigationFailure_DisposesControlOnce`
+- `InjectedFactory_CleanupFailure_DoesNotReplacePrimaryFailure`
+- `Readiness_ConstructorGuardsBlankNameAndNullDetach`
+- `Readiness_BeginNavigationGuardsNullDuplicateAndTerminalRequests`
+- `Readiness_UnrelatedAndDuplicateNotifications_CompleteCapturedSuccessOnce`
+- `Readiness_Failure_NormalizesNullAndBlankStatuses`
+- `Readiness_CancelAndDispose_AreIdempotent`
+- `Readiness_DetachFailure_IsContainedAndCompletionSucceeds`
+- `CaptureCurrentOrTests_NullAndControlledContexts_SelectExpectedBoundaries`
+- `NormalizeFactory_SuccessAndNullResultPaths_PreserveContract`
+- `OpenAsync_LeaseSupersededDuringInstall_DisposesInstalledSurfaceExactlyOnce`
+- `OpenAsync_CreationFailsAndCleanupSucceeds_DisposesOwnedSurfaceWithoutReport`
+- `OpenAsync_CleanupDispatchFails_ReportsSecondaryOnceAndPreservesPrimary`
+- `OpenAsync_RecoveryDispatchFails_ReportsOnceAndClearsStoredOpenTask`
+- `NativeClosedCallback_HostClosedBeforeDrain_PerformsNoLateCloseWork`
+
+### `BreadcrumbDropDownLifecycleCoverageTests` — 12 passed
+
+- `OpenLifetime_SharedOpenWithoutPlacement_CompletesFalseAndCleansSurface`
+- `OpenLifetime_ScheduleOverloads_RunSuccessAndContainReportedFaults`
+- `OpenLifetime_DisposeIsIdempotentAndSuppressesLaterSchedules`
+- `OpenLifetime_RollbackReporterFailure_IsContainedAndPrimaryIsRetained`
+- `OpenLifetime_StaleAndFailedRetention_CleansEachSurfaceExactlyOnce`
+- `Host_FourForwardingConstructors_CreateWithoutInvokingSurfaceAdapters`
+- `Host_InstalledMessengerAndAlreadyOpenPath_ReuseAndFocusCurrentSurface`
+- `Host_CloseFalseTrueReasonsAndRepeatedClose_HaveExactCallbacks`
+- `Host_SetTheme_ValidAndBlankValues_FollowExactContract`
+- `Host_DisposeAndUseAfterDispose_FollowDeterministicContract`
+- `Host_NativeClosedCallback_CancelsOnceAndIgnoresRepeatedNotification`
+- `Host_CoreConstructorNullDependencies_UseExactParameterContracts`
+
+### `BreadcrumbMessengerHubCoverageTests` — 10 passed
+
+- `Hub_NullDuplicateAndDisposedOperations_FollowExactContracts`
+- `Hub_SubscribeAndUnsubscribeFailures_RollBackWithoutStaleInbound`
+- `Hub_CachedAndNoncachedPosts_ReplayOnlyLatestStateInSequence`
+- `Hub_MalformedMissingAndSameModeMessages_AreParsedWithoutMutation`
+- `Hub_InvalidUnknownAndStaleInboundSenders_AreIgnoredExactly`
+- `Attachment_ConstructorFactoryAndCandidateGuards_AllowRetry`
+- `Attachment_SharedPendingAndReadyBypass_ReuseOneCandidate`
+- `Attachment_StaleFactoryCandidateAndReadyReset_CleanExactlyOnce`
+- `Attachment_ControllerAndHubFailures_ResetAndPermitRetry`
+- `Attachment_PendingDisposeIsIdempotentAndBlocksLaterAttach`
+
+## Diagnostic disposition
+
+The first attempt at the same exact gate exceeded the 120-second command timeout while its owned VSTest/testhost process remained idle. Those exact owned processes were terminated; the unrelated Visual Studio service VSTest process was left unchanged. Bounded diagnostic subsets passed 17/17, 44/44, and 88/88, and the required exact two-assembly command then passed 149/149. The timed-out attempt is not counted as pass evidence and changed no source or test file.

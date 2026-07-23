@@ -385,7 +385,9 @@ namespace QuickFiler.Test.Viewers
         {
             context.ExceptionSnapshot.Should().BeEmpty();
             context.ExecutedThreadSnapshot.Should().NotBeEmpty();
-            context.ExecutedThreadSnapshot.Should().OnlyContain(thread => thread == context.CreatorThreadId);
+            context
+                .ExecutedThreadSnapshot.Should()
+                .OnlyContain(thread => thread == context.CreatorThreadId);
         }
 
         private sealed class CollapsedHarness : IDisposable
@@ -394,10 +396,7 @@ namespace QuickFiler.Test.Viewers
                 new BreadcrumbCollapsedSurfaceController();
             internal TrackingMessenger Surface { get; } = new TrackingMessenger();
 
-            public void Dispose()
-            {
-                Controller.Dispose();
-            }
+            public void Dispose() => Controller.Dispose();
         }
 
         private sealed class ViewerIntegrationHarness : IDisposable

@@ -87,6 +87,30 @@ namespace QuickFiler.Test.Viewers
             }
         }
 
+        private sealed class InlineSynchronizationContext : SynchronizationContext
+        {
+            public override void Post(SendOrPostCallback callback, object state) => callback(state);
+        }
+
+        private static BreadcrumbBridgeCoordinator CreateContextOwnedCoordinator(
+            IWebViewMessenger messenger,
+            IFolderHierarchyProvider provider
+        )
+        {
+            SynchronizationContext priorContext = SynchronizationContext.Current;
+            try
+            {
+                SynchronizationContext.SetSynchronizationContext(
+                    new InlineSynchronizationContext()
+                );
+                return new BreadcrumbBridgeCoordinator(messenger, provider);
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(priorContext);
+            }
+        }
+
         private static Harness CreateHarness(bool leafHasChildren = true, bool populate = true)
         {
             var harness = new Harness
@@ -98,7 +122,7 @@ namespace QuickFiler.Test.Viewers
             harness
                 .Messenger.Setup(m => m.PostJson(It.IsAny<string>()))
                 .Callback<string>(harness.Posted.Add);
-            harness.Coordinator = new BreadcrumbBridgeCoordinator(
+            harness.Coordinator = CreateContextOwnedCoordinator(
                 harness.Messenger.Object,
                 harness.Provider.Object
             );
@@ -187,7 +211,9 @@ namespace QuickFiler.Test.Viewers
         public void MalformedInboundMessage_PostsRouterErrorResponse()
         {
             // Arrange
+            SynchronizationContext priorContext = SynchronizationContext.Current;
             var harness = CreateHarness();
+            SynchronizationContext.Current.Should().BeSameAs(priorContext);
 
             // Act
             harness.Receive("{oops");
@@ -426,7 +452,9 @@ namespace QuickFiler.Test.Viewers
                 .ReturnsAsync(new[] { Segment(secondKey, "Beta", false) });
 
             var messenger = new Mock<IWebViewMessenger>();
-            var coordinator = new BreadcrumbBridgeCoordinator(messenger.Object, provider.Object);
+            SynchronizationContext priorContext = SynchronizationContext.Current;
+            var coordinator = CreateContextOwnedCoordinator(messenger.Object, provider.Object);
+            SynchronizationContext.Current.Should().BeSameAs(priorContext);
             var rows = new[]
             {
                 new FolderRow(

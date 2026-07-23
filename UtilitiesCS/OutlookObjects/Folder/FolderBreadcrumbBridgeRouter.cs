@@ -192,6 +192,19 @@ namespace UtilitiesCS.OutlookObjects.Folder
         public BreadcrumbSelectionTransition ActivateSelector(string identity) =>
             Mutate(() => _selectionSession.ActivateSelector(identity));
 
+        /// <summary>Atomically commits an expanded subfolder in the current selector session.</summary>
+        /// <param name="rowIdentity">The unique stable identity of the containing row.</param>
+        /// <param name="subfolderIndex">The zero-based expanded subfolder index.</param>
+        /// <returns>
+        /// A handled selection/open-state/render transition for a valid open-session activation;
+        /// otherwise an unhandled no-op for a closed session, unknown or non-subfolder row, or
+        /// invalid index.
+        /// </returns>
+        public BreadcrumbSelectionTransition ActivateSelectorSubfolder(
+            string rowIdentity,
+            int subfolderIndex
+        ) => Mutate(() => _selectionSession.ActivateSubfolder(rowIdentity, subfolderIndex));
+
         public BreadcrumbSelectionTransition CancelSelector() =>
             Mutate(_selectionSession.CancelSelector);
 
@@ -211,8 +224,13 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         private string RenderJsonCore()
         {
+            IReadOnlyList<BreadcrumbRowRender> rows = BreadcrumbRenderProjection.Project(_model);
             return BreadcrumbBridgeSerializer.Serialize(
-                new RenderMessage(BreadcrumbRenderProjection.Project(_model))
+                new RenderMessage(
+                    rows,
+                    _model.SelectedSubfolderIndex,
+                    BreadcrumbSelectionMap.GetSelectedFolder(_model)
+                )
             );
         }
 

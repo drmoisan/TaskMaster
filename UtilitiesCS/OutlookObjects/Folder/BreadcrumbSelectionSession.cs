@@ -118,12 +118,19 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// <summary>Reconciles session identities against an atomically replaced row snapshot.</summary>
         public void ReconcileRowsReplaced()
         {
+            int retainedIndex = _model.SelectedIndex;
             int committedIndex = IndexOfSelectable(CommittedIdentity);
-            _model.SelectRow(committedIndex);
-            if (committedIndex < 0)
+            if (
+                committedIndex < 0
+                && retainedIndex >= 0
+                && retainedIndex < _model.Rows.Count
+                && _model.Rows[retainedIndex].IsSelectable
+            )
             {
-                CommittedIdentity = null;
+                committedIndex = retainedIndex;
             }
+            _model.SelectRow(committedIndex);
+            CommittedIdentity = committedIndex < 0 ? null : _model.Rows[committedIndex].Identity;
 
             if (!IsOpen)
             {
@@ -249,6 +256,42 @@ namespace UtilitiesCS.OutlookObjects.Folder
                         ? BreadcrumbSelectionEffects.OpenStateChanged
                         : BreadcrumbSelectionEffects.None
                 );
+        }
+
+        /// <summary>Commits an expanded subfolder and ends the current selector session.</summary>
+        /// <param name="rowIdentity">The unique stable identity of the containing row.</param>
+        /// <param name="subfolderIndex">The zero-based expanded subfolder index.</param>
+        /// <returns>
+        /// The complete explicit-commit effects, or <see cref="BreadcrumbSelectionEffects.None"/>
+        /// without mutation when the session, row, or index is invalid.
+        /// </returns>
+        public BreadcrumbSelectionEffects ActivateSubfolder(string rowIdentity, int subfolderIndex)
+        {
+            if (!IsOpen || subfolderIndex < 0)
+            {
+                return BreadcrumbSelectionEffects.None;
+            }
+
+            int rowIndex = IndexOfSelectable(rowIdentity);
+            if (rowIndex < 0)
+            {
+                return BreadcrumbSelectionEffects.None;
+            }
+
+            BreadcrumbStateRow row = _model.Rows[rowIndex];
+            if (!row.IsSuggestion || !row.LeafExpanded || subfolderIndex >= row.Subfolders.Count)
+            {
+                return BreadcrumbSelectionEffects.None;
+            }
+
+            _model.SelectRow(rowIndex);
+            _model.SelectSubfolder(subfolderIndex);
+            CommittedIdentity = row.Identity;
+            EndOpenSession();
+            return BreadcrumbSelectionEffects.Handled
+                | BreadcrumbSelectionEffects.SelectionChanged
+                | BreadcrumbSelectionEffects.OpenStateChanged
+                | BreadcrumbSelectionEffects.RenderRequired;
         }
 
         public BreadcrumbSelectionEffects CancelSelector()

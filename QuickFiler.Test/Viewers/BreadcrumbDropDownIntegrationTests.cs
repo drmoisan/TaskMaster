@@ -288,7 +288,7 @@ namespace QuickFiler.Test.Viewers
                 harness.Viewer.BreadcrumbCoordinator.IsSelectorOpen.Should().BeFalse();
                 harness.Host.Verify(
                     host => host.Close(It.IsAny<BreadcrumbDropDownCloseReason>()),
-                    Times.Never()
+                    Times.Once()
                 );
             }
         }

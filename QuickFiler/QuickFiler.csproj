@@ -390,6 +390,7 @@
     </Compile>
     <Compile Include="Viewers\IItemViewer.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinator.cs" />
+    <Compile Include="Viewers\BreadcrumbCoordinatorUpgradeLifetime.cs" />
     <Compile Include="Viewers\BreadcrumbUiDispatcher.cs" />
     <Compile Include="Viewers\BreadcrumbPopupUiOperations.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenLifetime.cs" />

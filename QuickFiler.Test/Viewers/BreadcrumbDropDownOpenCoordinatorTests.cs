@@ -259,6 +259,64 @@ namespace QuickFiler.Test.Viewers
             harness.Context.ExceptionSnapshot.Should().BeEmpty();
         }
 
+        [TestMethod]
+        public void PendingToggleClose_HostOwnershipSuppressesFallbackAndRepeatedClose()
+        {
+            var pending = NewCompletion();
+            var harness = new CoordinatorHarness();
+            harness.Host.Enqueue(pending.Task);
+            Task<bool> opening = harness.Coordinator.RequestOpen();
+            harness.Context.DrainOne().Should().BeTrue();
+
+            harness.Coordinator.SetDroppedDown(false);
+            harness.Coordinator.SetDroppedDown(false);
+            harness.Context.DrainAll();
+            pending.SetResult(false);
+            harness.Context.DrainUntil(opening);
+
+            opening.Result.Should().BeFalse();
+            harness.Host.CloseReasons.Should().Equal(BreadcrumbDropDownCloseReason.Uncommitted);
+            harness.CancelCount.Should().Be(0, "the accepting host owns pending rollback");
+        }
+
+        [TestMethod]
+        public void PendingToggleClose_RejectedHostPerformsOneFallbackCancellation()
+        {
+            var pending = NewCompletion();
+            var harness = new CoordinatorHarness();
+            harness.Host.CloseResult = false;
+            harness.Host.Enqueue(pending.Task);
+            Task<bool> opening = harness.Coordinator.RequestOpen();
+            harness.Context.DrainOne().Should().BeTrue();
+
+            harness.Coordinator.SetDroppedDown(false);
+            harness.Context.DrainAll();
+            pending.SetResult(false);
+            harness.Context.DrainUntil(opening);
+
+            harness.Host.CloseReasons.Should().Equal(BreadcrumbDropDownCloseReason.Uncommitted);
+            harness.CancelCount.Should().Be(1);
+        }
+
+        [TestMethod]
+        public void PendingAutomaticClose_RequestsExplicitCommitWhenHostIsNotOpen()
+        {
+            var pending = NewCompletion();
+            var harness = new CoordinatorHarness();
+            harness.Host.Enqueue(pending.Task);
+            Task<bool> opening = harness.Coordinator.RequestOpen();
+            harness.Context.DrainOne().Should().BeTrue();
+            harness.SelectorOpen = false;
+
+            harness.Coordinator.HandleSelectorOpenStateChanged();
+            harness.Context.DrainAll();
+            pending.SetResult(false);
+            harness.Context.DrainUntil(opening);
+
+            harness.Host.CloseReasons.Should().Equal(BreadcrumbDropDownCloseReason.ExplicitCommit);
+            harness.CancelCount.Should().Be(0);
+        }
+
         private static TaskCompletionSource<bool> NewCompletion() =>
             new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 

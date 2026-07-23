@@ -7,10 +7,12 @@ using Microsoft.Web.WebView2.Core;
 
 namespace QuickFiler.Viewers
 {
+    using InstalledSurface = Tuple<ToolStripControlHost, Control, IWebViewMessenger>;
     using LegacySurfaceFactory = Func<
         CoreWebView2Environment,
         Task<Tuple<Control, IWebViewMessenger>>
     >;
+    using OwnedSurface = Tuple<ToolStripControlHost?, Control?, IWebViewMessenger?>;
     using ReadySurfaceFactory = Func<
         CoreWebView2Environment,
         Task<Tuple<Control, IWebViewMessenger, Task>>
@@ -19,7 +21,7 @@ namespace QuickFiler.Viewers
     /// <summary>Owns the native popup and its lazily created breadcrumb surface.</summary>
     public sealed class BreadcrumbDropDownHost : IBreadcrumbDropDownHost
     {
-        private readonly ReadySurfaceFactory _surfaceFactory;
+        private readonly ReadySurfaceFactory _factory;
         private readonly BreadcrumbPopupUiOperations _uiOperations;
         private readonly BreadcrumbDropDownOpenLifetime _openLifetime;
         private readonly Action _focusPending;
@@ -27,10 +29,7 @@ namespace QuickFiler.Viewers
         private readonly Action _cancelSelection;
         private readonly Action<ToolStripDropDown, Control, Point> _showPopup;
         private readonly Action<ToolStripDropDown, ToolStripDropDownCloseReason> _closePopup;
-        private ToolStripControlHost? _controlHost;
-        private Control? _popupControl;
-        private IWebViewMessenger? _popupMessenger;
-        private bool _isOpen;
+        private bool _resetPending;
         private bool _programmaticClose;
         private bool _disposed;
 
@@ -155,8 +154,7 @@ namespace QuickFiler.Viewers
         {
             Anchor = anchor ?? throw new ArgumentNullException(nameof(anchor));
             Environment = environment ?? throw new ArgumentNullException(nameof(environment));
-            _surfaceFactory =
-                surfaceFactory ?? throw new ArgumentNullException(nameof(surfaceFactory));
+            _factory = surfaceFactory ?? throw new ArgumentNullException(nameof(surfaceFactory));
             _focusPending = focusPending ?? throw new ArgumentNullException(nameof(focusPending));
             _focusAnchor = focusAnchor ?? throw new ArgumentNullException(nameof(focusAnchor));
             _cancelSelection =
@@ -184,13 +182,13 @@ namespace QuickFiler.Viewers
         public ToolStripDropDown DropDown { get; }
 
         /// <summary>The installed hosted control, when initialized.</summary>
-        public ToolStripControlHost? ControlHost => _controlHost;
+        public ToolStripControlHost? ControlHost => InstalledControlHost;
 
         /// <inheritdoc />
         public IWebViewMessenger? PopupMessenger => _popupMessenger;
 
         /// <inheritdoc />
-        public bool IsOpen => _isOpen;
+        public bool IsOpen => OpenState;
 
         /// <summary>The retained popup theme.</summary>
         public string Theme { get; private set; } = "light";
@@ -201,19 +199,19 @@ namespace QuickFiler.Viewers
         /// <inheritdoc />
         public event EventHandler? PopupMessengerReady;
 
-        internal ReadySurfaceFactory SurfaceFactory => _surfaceFactory;
+        internal ReadySurfaceFactory SurfaceFactory => _factory;
 
-        internal ToolStripControlHost? InstalledControlHost
-        {
-            get => _controlHost;
-            set => _controlHost = value;
-        }
+        internal ToolStripControlHost? InstalledControlHost { get; set; }
+
+        internal Control? _popupControl;
 
         internal Control? InstalledPopupControl
         {
             get => _popupControl;
             set => _popupControl = value;
         }
+
+        internal IWebViewMessenger? _popupMessenger;
 
         internal IWebViewMessenger? InstalledPopupMessenger
         {
@@ -222,13 +220,9 @@ namespace QuickFiler.Viewers
         }
 
         internal bool HasInstalledSurface =>
-            _controlHost != null && _popupControl != null && _popupMessenger != null;
+            InstalledControlHost != null && _popupControl != null && _popupMessenger != null;
 
-        internal bool OpenState
-        {
-            get => _isOpen;
-            set => _isOpen = value;
-        }
+        internal bool OpenState { get; set; }
 
         /// <inheritdoc />
         public Task<bool> OpenAsync(
@@ -238,7 +232,7 @@ namespace QuickFiler.Viewers
         )
         {
             ThrowIfDisposed();
-            if (_isOpen)
+            if (OpenState)
             {
                 _openLifetime.Schedule(_focusPending);
                 return Task.FromResult(true);
@@ -250,10 +244,14 @@ namespace QuickFiler.Viewers
         /// <inheritdoc />
         public bool Close(BreadcrumbDropDownCloseReason reason)
         {
-            if (_disposed || !_isOpen)
+            if (_disposed)
                 return false;
-            _openLifetime.InvalidateAndSchedule(() => CompleteClose(reason, closeNative: true));
-            return true;
+            if (OpenState)
+            {
+                _openLifetime.InvalidateAndSchedule(() => CompleteClose(reason, true));
+                return true;
+            }
+            return _openLifetime.TryCancelPendingOpen(() => CompleteClose(reason, OpenState));
         }
 
         /// <inheritdoc />
@@ -269,6 +267,7 @@ namespace QuickFiler.Viewers
         public void Reset()
         {
             ThrowIfDisposed();
+            _resetPending = true;
             _openLifetime.InvalidateAndSchedule(ResetCoreAsync);
         }
 
@@ -296,11 +295,8 @@ namespace QuickFiler.Viewers
                 await _uiOperations
                     .RunAsync(() =>
                     {
-                        if (_isOpen)
-                            CompleteClose(
-                                BreadcrumbDropDownCloseReason.Uncommitted,
-                                closeNative: true
-                            );
+                        if (OpenState)
+                            CompleteClose(BreadcrumbDropDownCloseReason.Uncommitted, true);
                     })
                     .ConfigureAwait(false);
             }
@@ -313,6 +309,7 @@ namespace QuickFiler.Viewers
                 finally
                 {
                     LastInitializationException = null;
+                    _resetPending = false;
                 }
             }
         }
@@ -320,9 +317,10 @@ namespace QuickFiler.Viewers
         private Task DisposeCoreAsync() =>
             _uiOperations.RunAsync(() =>
             {
-                Tuple<ToolStripControlHost?, Control?, IWebViewMessenger?> owned =
-                    TakeOwnedSurface();
-                _isOpen = false;
+                if (OpenState && !_resetPending)
+                    CompleteClose(BreadcrumbDropDownCloseReason.Uncommitted, true);
+                OpenState = false;
+                OwnedSurface owned = TakeOwnedSurface();
                 CompleteAll(
                     () => DropDown.Closed -= OnDropDownClosed,
                     () =>
@@ -343,18 +341,18 @@ namespace QuickFiler.Viewers
 
         private async Task DisposeSurfaceAsync()
         {
-            Tuple<ToolStripControlHost?, Control?, IWebViewMessenger?> owned = await _uiOperations
-                .RunAsync(TakeOwnedSurface)
+            OwnedSurface owned = await _uiOperations
+                .RunAsync(() => TakeOwnedSurface())
                 .ConfigureAwait(false);
             await _uiOperations
                 .DisposeHostedSurfaceAsync(DropDown, owned.Item1, owned.Item2, owned.Item3)
                 .ConfigureAwait(false);
         }
 
-        internal async Task DisposeSurfaceAfterFailureAsync()
+        internal async Task DisposeSurfaceAfterFailureAsync(InstalledSurface? expected)
         {
-            Tuple<ToolStripControlHost?, Control?, IWebViewMessenger?> owned = await _uiOperations
-                .RunAsync(TakeOwnedSurface, reportFailure: false)
+            OwnedSurface owned = await _uiOperations
+                .RunAsync(() => TakeOwnedSurface(expected), reportFailure: false)
                 .ConfigureAwait(false);
             await _uiOperations
                 .DisposeHostedSurfaceAfterFailureAsync(
@@ -366,10 +364,19 @@ namespace QuickFiler.Viewers
                 .ConfigureAwait(false);
         }
 
-        private Tuple<ToolStripControlHost?, Control?, IWebViewMessenger?> TakeOwnedSurface()
+        private OwnedSurface TakeOwnedSurface(InstalledSurface? expected = null)
         {
-            var owned = Tuple.Create(_controlHost, _popupControl, _popupMessenger);
-            _controlHost = null;
+            if (
+                expected != null
+                && (
+                    !ReferenceEquals(InstalledControlHost, expected.Item1)
+                    || !ReferenceEquals(_popupControl, expected.Item2)
+                    || !ReferenceEquals(_popupMessenger, expected.Item3)
+                )
+            )
+                return new OwnedSurface(null, null, null);
+            var owned = Tuple.Create(InstalledControlHost, _popupControl, _popupMessenger);
+            InstalledControlHost = null;
             _popupControl = null;
             _popupMessenger = null;
             return owned;
@@ -377,13 +384,14 @@ namespace QuickFiler.Viewers
 
         private void CompleteClose(BreadcrumbDropDownCloseReason reason, bool closeNative)
         {
-            if (!_isOpen)
+            if (!OpenState && !_openLifetime.IsPendingClose)
                 return;
-            _isOpen = false;
+            bool wasOpen = OpenState;
+            OpenState = false;
             CompleteAll(
                 () =>
                 {
-                    if (closeNative)
+                    if (closeNative && wasOpen)
                         CloseNative();
                 },
                 () => FinishClose(reason)
@@ -405,13 +413,13 @@ namespace QuickFiler.Viewers
 
         private void OnDropDownClosed(object? sender, ToolStripDropDownClosedEventArgs e)
         {
-            if (_disposed || _programmaticClose || !_isOpen)
+            if (_disposed || _programmaticClose || !OpenState)
                 return;
             _openLifetime.InvalidateAndSchedule(() =>
             {
-                if (_disposed || _programmaticClose || !_isOpen)
+                if (_disposed || _programmaticClose || !OpenState)
                     return;
-                _isOpen = false;
+                OpenState = false;
                 FinishClose(BreadcrumbDropDownCloseReason.Uncommitted);
             });
         }
@@ -430,8 +438,8 @@ namespace QuickFiler.Viewers
 
         internal void RestoreAfterOpenFailure()
         {
-            bool closeNative = _isOpen || DropDown.Visible;
-            _isOpen = false;
+            bool closeNative = OpenState || DropDown.Visible;
+            OpenState = false;
             CompleteAll(
                 () =>
                 {

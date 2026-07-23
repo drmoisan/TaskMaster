@@ -22,11 +22,13 @@ namespace QuickFiler.Viewers
     /// <c>IItemViewer.FolderKeyDown</c>, keeping this type free of WinForms/WebView2/COM usage.
     /// Router responses are awaited directly — no timers.
     /// </summary>
-    public sealed class BreadcrumbBridgeCoordinator
+    public sealed class BreadcrumbBridgeCoordinator : IDisposable
     {
         private readonly BreadcrumbUiDispatcher _dispatcher;
         private readonly IWebViewMessenger _messenger;
+        private readonly EventHandler<string> _messageReceivedHandler;
         private readonly FolderBreadcrumbBridgeRouter _router;
+        private readonly BreadcrumbCoordinatorUpgradeLifetime _upgradeLifetime;
 
         /// <summary>
         /// Creates the coordinator and subscribes to inbound page messages.
@@ -51,7 +53,9 @@ namespace QuickFiler.Viewers
                 provider ?? throw new ArgumentNullException(nameof(provider))
             );
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
-            _messenger.MessageReceived += OnMessageReceived;
+            _upgradeLifetime = new BreadcrumbCoordinatorUpgradeLifetime(_dispatcher.Report);
+            _messageReceivedHandler = OnMessageReceived;
+            _messenger.MessageReceived += _messageReceivedHandler;
         }
 
         /// <summary>Raised when the page selection changes (backs <c>FolderSelectionChanged</c>).</summary>
@@ -87,57 +91,84 @@ namespace QuickFiler.Viewers
             CancellationToken cancellationToken
         )
         {
-            var renderJson = await _router
-                .SetSuggestionsAsync(rows, cancellationToken)
-                .ConfigureAwait(false);
-            BreadcrumbSelectorState selectorState = _router.GetSelectorState();
-            await PostRenderAndSelectorAsync(renderJson, selectorState).ConfigureAwait(false);
+            _ = rows ?? throw new ArgumentNullException(nameof(rows));
+            BreadcrumbUpgradeLease lease = _upgradeLifetime.BeginPopulation(cancellationToken);
+            await PopulateSuggestionsAsync(rows, lease).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// Synchronous population facade for the void <c>IItemViewer.SetFolderSuggestions</c>
-        /// contract: rows are populated immediately as scored full-path fallbacks so the selection
-        /// contract (FolderContains/SetFolderSelectedItem/GetSelectedFolder readback) holds
-        /// without awaiting the provider, then the ancestor-chain upgrade runs asynchronously
-        /// (<see cref="SuggestionsUpgrade"/>) preserving stable identity and probability (FR-1/G10).
-        /// </summary>
+        /// <summary>Publishes scored fallbacks immediately, then resolves current hierarchy chains.</summary>
         public void SetSuggestions(IReadOnlyList<FolderRow> rows)
         {
-            if (rows == null)
-            {
-                throw new ArgumentNullException(nameof(rows));
-            }
+            _ = rows ?? throw new ArgumentNullException(nameof(rows));
 
-            string renderJson = _router.SetSuggestionFallbacks(rows);
-            BreadcrumbSelectorState selectorState = _router.GetSelectorState();
-            _ = PostRenderAndSelectorAsync(renderJson, selectorState);
-            SuggestionsUpgrade = UpgradeSuggestionsAsync(rows);
+            BreadcrumbUpgradeLease lease = _upgradeLifetime.BeginPopulation();
+            _upgradeLifetime.RunSynchronous(
+                lease,
+                () =>
+                {
+                    string renderJson = _router.SetSuggestionFallbacks(rows);
+                    BreadcrumbSelectorState selectorState = _router.GetSelectorState();
+                    _ = PostRenderAndSelectorAsync(renderJson, selectorState, lease);
+                    SuggestionsUpgrade = PopulateSuggestionsAsync(rows, lease);
+                }
+            );
         }
 
         /// <summary>The in-flight ancestor-chain upgrade of the latest <see cref="SetSuggestions"/> call.</summary>
         public Task SuggestionsUpgrade { get; private set; } = Task.CompletedTask;
 
-        private async Task UpgradeSuggestionsAsync(IReadOnlyList<FolderRow> rows)
-        {
-            var renderJson = await _router
-                .SetSuggestionsAsync(rows, CancellationToken.None)
-                .ConfigureAwait(false);
-            BreadcrumbSelectorState selectorState = _router.GetSelectorState();
-            await PostRenderAndSelectorAsync(renderJson, selectorState).ConfigureAwait(false);
-        }
+        private Task PopulateSuggestionsAsync(
+            IReadOnlyList<FolderRow> rows,
+            BreadcrumbUpgradeLease lease
+        ) =>
+            _upgradeLifetime.RunAsync(
+                lease,
+                token => _router.SetSuggestionsAsync(rows, token),
+                render => PostRenderAndSelectorAsync(render, _router.GetSelectorState(), lease)
+            );
 
         /// <summary>Appends Path B plain rows verbatim and re-renders (legacy AddRange semantics).</summary>
         public void AddItems(IReadOnlyList<string> items)
         {
-            string renderJson = _router.AddItems(items);
-            BreadcrumbSelectorState selectorState = _router.GetSelectorState();
-            _ = PostRenderAndSelectorAsync(renderJson, selectorState);
+            _ = items ?? throw new ArgumentNullException(nameof(items));
+            BreadcrumbUpgradeLease lease = _upgradeLifetime.BeginPopulation();
+            _upgradeLifetime.RunSynchronous(
+                lease,
+                () =>
+                {
+                    string renderJson = _router.AddItems(items);
+                    BreadcrumbSelectorState selectorState = _router.GetSelectorState();
+                    _ = _upgradeLifetime.RunAsync(
+                        lease,
+                        _ => PostRenderAndSelectorAsync(renderJson, selectorState, lease)
+                    );
+                }
+            );
         }
 
         /// <summary>Clears all rows and the selection, emptying the page (backs <c>ClearFolderItems</c>).</summary>
         public void Clear()
         {
+            if (!_upgradeLifetime.Invalidate())
+            {
+                return;
+            }
             ApplyTransition(_router.Clear());
+        }
+
+        /// <summary>Invalidates pending work and clears state before pooled viewer reuse.</summary>
+        public void Reset() => Clear();
+
+        /// <summary>Cancels suggestion work and unsubscribes the exact inbound handler.</summary>
+        public void Dispose()
+        {
+            if (!_upgradeLifetime.TryDispose())
+            {
+                return;
+            }
+            _messenger.MessageReceived -= _messageReceivedHandler;
+            _router.Clear();
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>Selects the row at <paramref name="index"/> and re-renders (backs <c>SetFolderSelectedIndex</c>).</summary>
@@ -156,28 +187,16 @@ namespace QuickFiler.Viewers
         }
 
         /// <summary>The selection output string (backs <c>GetSelectedFolder</c>; FR-7/G10).</summary>
-        public string? GetSelectedFolder()
-        {
-            return _router.GetSelectedFolder();
-        }
+        public string? GetSelectedFolder() => _router.GetSelectedFolder();
 
         /// <summary>The per-row output strings (backs <c>GetFolderItems</c>).</summary>
-        public string[] GetFolderItems()
-        {
-            return _router.GetFolderItems();
-        }
+        public string[] GetFolderItems() => _router.GetFolderItems();
 
         /// <summary>True when a row's output string equals <paramref name="item"/> (backs <c>FolderContains</c>).</summary>
-        public bool Contains(string item)
-        {
-            return _router.Contains(item);
-        }
+        public bool Contains(string item) => _router.Contains(item);
 
         /// <summary>Starts a pending selector session without changing the committed selection.</summary>
-        public bool OpenSelector()
-        {
-            return ApplyTransition(_router.OpenSelector());
-        }
+        public bool OpenSelector() => ApplyTransition(_router.OpenSelector());
 
         /// <summary>
         /// Applies native combo-box key semantics: closed arrows commit, open arrows move pending,
@@ -201,16 +220,11 @@ namespace QuickFiler.Viewers
         }
 
         /// <summary>Commits a row activated by stable identity and closes an open session.</summary>
-        public bool ActivateSelector(string identity)
-        {
-            return ApplyTransition(_router.ActivateSelector(identity));
-        }
+        public bool ActivateSelector(string identity) =>
+            ApplyTransition(_router.ActivateSelector(identity));
 
         /// <summary>Closes an open session without committing its pending identity.</summary>
-        public bool CancelSelector()
-        {
-            return ApplyTransition(_router.CancelSelector());
-        }
+        public bool CancelSelector() => ApplyTransition(_router.CancelSelector());
 
         /// <summary>Posts a theme switch to the page ("dark"/"light"; FR-5 theming).</summary>
         public void SetTheme(string theme)
@@ -241,14 +255,24 @@ namespace QuickFiler.Viewers
 
         private Task PostRenderAndSelectorAsync(
             string renderJson,
-            BreadcrumbSelectorState selectorState
+            BreadcrumbSelectorState selectorState,
+            BreadcrumbUpgradeLease? lease = null
         )
         {
-            return _dispatcher.Dispatch(() =>
+            if (lease != null && !_upgradeLifetime.IsCurrent(lease))
             {
-                _messenger.PostJson(renderJson);
-                PostSelectorStateCore(selectorState);
-            });
+                return Task.CompletedTask;
+            }
+            return _dispatcher.Dispatch(
+                _upgradeLifetime.Guard(
+                    lease,
+                    () =>
+                    {
+                        _messenger.PostJson(renderJson);
+                        PostSelectorStateCore(selectorState);
+                    }
+                )
+            );
         }
 
         private void PublishTransition(BreadcrumbSelectionTransition transition)
@@ -387,6 +411,14 @@ namespace QuickFiler.Viewers
                         break;
                     case BreadcrumbSelectorActivationMessage activation:
                         ActivateSelector(activation.Identity);
+                        break;
+                    case BreadcrumbSelectorSubfolderActivationMessage subfolderActivation:
+                        ApplyTransition(
+                            _router.ActivateSelectorSubfolder(
+                                subfolderActivation.RowIdentity,
+                                subfolderActivation.SubfolderIndex
+                            )
+                        );
                         break;
                 }
             }

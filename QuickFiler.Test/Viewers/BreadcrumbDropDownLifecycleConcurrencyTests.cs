@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FluentAssertions;
@@ -224,34 +225,48 @@ namespace QuickFiler.Test.Viewers
         private sealed class LifecycleHarness : IDisposable
         {
             private readonly BreadcrumbMessengerHub _hub = new BreadcrumbMessengerHub();
-            private readonly Panel _anchor = new Panel();
+            private readonly SynchronizationContext _previousContext;
+            private readonly Panel _anchor;
 
             internal LifecycleHarness()
             {
-                _hub.PostJson("{\"type\":\"render\"}");
-                _hub.PostJson("{\"type\":\"themeChange\",\"theme\":\"dark\"}");
-                _hub.PostJson(
-                    BreadcrumbSelectorMessageSerializer.Serialize(
-                        new BreadcrumbSelectorViewMessage(
-                            BreadcrumbSelectorViewMode.Collapsed,
-                            true,
-                            "A",
-                            "B"
+                _previousContext = SynchronizationContext.Current;
+                SynchronizationContext.SetSynchronizationContext(
+                    new InlineSynchronizationContext()
+                );
+                try
+                {
+                    _anchor = new Panel();
+                    _hub.PostJson("{\"type\":\"render\"}");
+                    _hub.PostJson("{\"type\":\"themeChange\",\"theme\":\"dark\"}");
+                    _hub.PostJson(
+                        BreadcrumbSelectorMessageSerializer.Serialize(
+                            new BreadcrumbSelectorViewMessage(
+                                BreadcrumbSelectorViewMode.Collapsed,
+                                true,
+                                "A",
+                                "B"
+                            )
                         )
-                    )
-                );
-                var environment = (CoreWebView2Environment)
-                    FormatterServices.GetUninitializedObject(typeof(CoreWebView2Environment));
-                Host = new BreadcrumbDropDownHost(
-                    _anchor,
-                    environment,
-                    CreateSurfaceAsync,
-                    () => FocusPendingCount++,
-                    () => FocusAnchorCount++,
-                    () => CancelCount++,
-                    (dropDown, owner, point) => ShowCount++
-                );
-                Host.PopupMessengerReady += OnPopupMessengerReady;
+                    );
+                    var environment = (CoreWebView2Environment)
+                        FormatterServices.GetUninitializedObject(typeof(CoreWebView2Environment));
+                    Host = new BreadcrumbDropDownHost(
+                        _anchor,
+                        environment,
+                        CreateSurfaceAsync,
+                        () => FocusPendingCount++,
+                        () => FocusAnchorCount++,
+                        () => CancelCount++,
+                        (dropDown, owner, point) => ShowCount++
+                    );
+                    Host.PopupMessengerReady += OnPopupMessengerReady;
+                }
+                catch
+                {
+                    SynchronizationContext.SetSynchronizationContext(_previousContext);
+                    throw;
+                }
             }
 
             internal BreadcrumbDropDownHost Host { get; }
@@ -273,14 +288,21 @@ namespace QuickFiler.Test.Viewers
 
             public void Dispose()
             {
-                Host.PopupMessengerReady -= OnPopupMessengerReady;
-                Host.Dispose();
-                _hub.Dispose();
-                foreach (SurfaceAttempt attempt in Attempts)
+                try
                 {
-                    attempt.DisposeUnclaimedResources();
+                    Host.PopupMessengerReady -= OnPopupMessengerReady;
+                    Host.Dispose();
+                    _hub.Dispose();
+                    foreach (SurfaceAttempt attempt in Attempts)
+                    {
+                        attempt.DisposeUnclaimedResources();
+                    }
+                    _anchor.Dispose();
                 }
-                _anchor.Dispose();
+                finally
+                {
+                    SynchronizationContext.SetSynchronizationContext(_previousContext);
+                }
             }
 
             private Task<Tuple<Control, IWebViewMessenger>> CreateSurfaceAsync(
@@ -374,6 +396,11 @@ namespace QuickFiler.Test.Viewers
                     DisposeCount++;
                 }
             }
+        }
+
+        private sealed class InlineSynchronizationContext : SynchronizationContext
+        {
+            public override void Post(SendOrPostCallback callback, object state) => callback(state);
         }
     }
 }

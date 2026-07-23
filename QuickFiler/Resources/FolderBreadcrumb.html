@@ -180,6 +180,7 @@
     options: [],
     selectedRowIndex: -1,
     selectedSubfolderIndex: -1,
+    selectedFolder: null,
     viewMode: "collapsed",
     isOpen: false,
     committedIdentity: null,
@@ -227,6 +228,19 @@
     return committedRow === null ? selectedRows : [committedRow];
   }
 
+  function selectedChildForRow(row) {
+    var index = state.selectedSubfolderIndex;
+    if (
+      !row.selected || !Number.isInteger(state.selectedSubfolderIndex) || index < 0 ||
+      !Array.isArray(row.subfolders) || index >= row.subfolders.length ||
+      typeof state.selectedFolder !== "string"
+    ) {
+      return null;
+    }
+    var child = row.subfolders[index];
+    return child && child.folderPath === state.selectedFolder ? child : null;
+  }
+
   function rowHasOpenAffordance(row) {
     return row.cells.some(function (cell) { return cell.kind === "plus"; });
   }
@@ -258,13 +272,15 @@
     return element;
   }
 
-  function makeRow(row, activeRowIndex) {
+  function makeRow(row, activeRowIndex, selectedChildOwnsActive) {
     var expanded = state.viewMode === "expanded";
-    var active = expanded && row.isSelectable && row.rowIndex === activeRowIndex;
+    var selectedChild = selectedChildForRow(row);
+    var active =
+      expanded && row.isSelectable && row.rowIndex === activeRowIndex && !selectedChildOwnsActive;
     var rowElement = document.createElement("div");
     rowElement.className = active
       ? "row active"
-      : (!expanded && row.selected && state.selectedSubfolderIndex < 0 ? "row selected" : "row");
+      : (!expanded && row.selected ? "row selected" : "row");
 
     if (expanded && row.isSelectable) {
       rowElement.id = "folder-option-" + row.rowIndex;
@@ -277,7 +293,15 @@
 
     var crumbs = document.createElement("div");
     crumbs.className = "crumbs";
-    row.cells.forEach(function (cell) { crumbs.appendChild(makeCell(row, cell)); });
+    if (!expanded && selectedChild !== null) {
+      var selectedPath = document.createElement("span");
+      selectedPath.className = "seg";
+      selectedPath.textContent = state.selectedFolder;
+      selectedPath.title = state.selectedFolder;
+      crumbs.appendChild(selectedPath);
+    } else {
+      row.cells.forEach(function (cell) { crumbs.appendChild(makeCell(row, cell)); });
+    }
     rowElement.appendChild(crumbs);
 
     var pct = document.createElement("span");
@@ -287,21 +311,38 @@
     return rowElement;
   }
 
-  function makeSubfolders(row) {
+  function makeSubfolders(row, selectedChildOwnsActive) {
     var subs = document.createElement("div");
     subs.className = "subs";
     row.subfolders.forEach(function (subfolder, index) {
       var subfolderElement = document.createElement("div");
-      subfolderElement.className =
-        row.selected && state.selectedSubfolderIndex === index ? "sub selected" : "sub";
+      var active = selectedChildOwnsActive && state.selectedSubfolderIndex === index;
+      subfolderElement.id = "folder-option-" + row.rowIndex + "-subfolder-" + index;
+      subfolderElement.className = active ? "sub selected active" : "sub";
+      subfolderElement.setAttribute("role", "option");
+      subfolderElement.setAttribute("aria-selected", String(active));
+      subfolderElement.tabIndex = 0;
       var name = document.createElement("span");
       name.className = "seg";
       name.textContent = subfolder.displayName;
       name.title = subfolder.folderPath;
       subfolderElement.appendChild(name);
-      subfolderElement.addEventListener("click", function (event) {
+
+      function activateSubfolder(event) {
+        event.preventDefault();
         event.stopPropagation();
-        post({ type: "selectionChange", rowIndex: row.rowIndex, subfolderIndex: index });
+        post({
+          type: "selectorSubfolderActivate",
+          rowIdentity: row.identity,
+          subfolderIndex: index
+        });
+      }
+
+      subfolderElement.addEventListener("click", activateSubfolder);
+      subfolderElement.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " ") {
+          activateSubfolder(event);
+        }
       });
       subs.appendChild(subfolderElement);
     });
@@ -323,7 +364,9 @@
     list.removeAttribute("aria-activedescendant");
 
     visibleRows().forEach(function (row) {
-      var rowElement = makeRow(row, activeRowIndex);
+      var selectedChildOwnsActive =
+        selectedChildForRow(row) !== null && row.identity === state.pendingIdentity;
+      var rowElement = makeRow(row, activeRowIndex, selectedChildOwnsActive);
       list.appendChild(rowElement);
       if (rowElement.classList.contains("active")) {
         activeRow = rowElement;
@@ -333,7 +376,12 @@
         row.leafExpanded &&
         row.subfolders.length > 0
       ) {
-        list.appendChild(makeSubfolders(row));
+        var subfoldersElement = makeSubfolders(row, selectedChildOwnsActive);
+        list.appendChild(subfoldersElement);
+        var activeSubfolder = subfoldersElement.querySelector(".sub.active");
+        if (activeSubfolder !== null) {
+          activeRow = activeSubfolder;
+        }
       }
     });
 
@@ -401,8 +449,17 @@
       }
 
       if (msg.type === "render") {
-        state.rows = msg.rows || [];
+        state.rows = Array.isArray(msg.rows) ? msg.rows : [];
+        state.selectedSubfolderIndex = Number.isInteger(msg.selectedSubfolderIndex)
+          ? msg.selectedSubfolderIndex
+          : -1;
+        state.selectedFolder =
+          typeof msg.selectedFolder === "string" ? msg.selectedFolder : null;
         var selected = selectedRow();
+        if (selected === null || selectedChildForRow(selected) === null) {
+          state.selectedSubfolderIndex = -1;
+          state.selectedFolder = null;
+        }
         state.selectedRowIndex = selected ? selected.rowIndex : -1;
         render();
       } else if (msg.type === "selectorView") {

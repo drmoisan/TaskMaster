@@ -19,16 +19,15 @@ namespace QuickFiler.Viewers
         internal Task Cancellation { get; }
     }
 
-    /// <summary>
-    /// Owns the shared open task, generation invalidation, and observed owner-boundary scheduling
-    /// for one popup host.
-    /// </summary>
+    /// <summary>Owns shared popup-open generation, cancellation, and owner scheduling.</summary>
     internal sealed class BreadcrumbDropDownOpenLifetime : IDisposable
     {
         private readonly object _sync = new object();
         private readonly BreadcrumbDropDownHost _host;
         private readonly BreadcrumbPopupUiOperations _uiOperations;
         private TaskCompletionSource<bool> _cancellation = NewCompletionSource();
+        private TaskCompletionSource<bool>? _openCompletion;
+        private volatile TaskCompletionSource<bool>? _pendingCloseCompletion;
         private Task<bool>? _openTask;
         private long _generation;
         private bool _disposed;
@@ -48,8 +47,8 @@ namespace QuickFiler.Viewers
             Size desiredSize
         )
         {
-            TaskCompletionSource<bool> completion;
-            TaskCompletionSource<bool> canceled;
+            TaskCompletionSource<bool> completion,
+                canceled;
             BreadcrumbDropDownOpenLease lease;
             lock (_sync)
             {
@@ -59,9 +58,10 @@ namespace QuickFiler.Viewers
                 canceled = InvalidateCore();
                 lease = new BreadcrumbDropDownOpenLease(_generation, _cancellation.Task);
                 completion = NewCompletionSource();
+                _openCompletion = completion;
                 _openTask = completion.Task;
             }
-            CompleteInvalidation(canceled);
+            canceled.TrySetResult(true);
 
             Task<Task<bool>> kickoff = RunOnOwnerAsync(() =>
                 OpenCoreAsync(anchorScreenBounds, workingArea, desiredSize, lease)
@@ -70,15 +70,36 @@ namespace QuickFiler.Viewers
             return completion.Task;
         }
 
+        internal bool TryCancelPendingOpen(Action closeOperation)
+        {
+            _ = closeOperation ?? throw new ArgumentNullException(nameof(closeOperation));
+            TaskCompletionSource<bool> completion,
+                canceled;
+            lock (_sync)
+            {
+                if (_disposed || _openCompletion == null || _pendingCloseCompletion != null)
+                    return false;
+                completion = _openCompletion;
+                _pendingCloseCompletion = completion;
+                canceled = InvalidateCore();
+            }
+            canceled.TrySetResult(true);
+            Task<Task> kickoff = RunOnOwnerAsync(() =>
+            {
+                closeOperation();
+                return Task.CompletedTask;
+            });
+            _ = CompletePendingCloseAsync(kickoff, completion);
+            return true;
+        }
+
         internal bool IsCurrent(BreadcrumbDropDownOpenLease lease)
         {
             lock (_sync)
-            {
-                return !_disposed
-                    && lease.Generation == _generation
-                    && !lease.Cancellation.IsCompleted;
-            }
+                return IsCurrentCore(lease, allowDisposed: false);
         }
+
+        internal bool IsPendingClose => _pendingCloseCompletion != null;
 
         internal void Schedule(Action operation)
         {
@@ -126,7 +147,7 @@ namespace QuickFiler.Viewers
                 _disposed = true;
                 canceled = InvalidateCore();
             }
-            CompleteInvalidation(canceled);
+            canceled.TrySetResult(true);
         }
 
         private async Task CompleteOpenAsync(
@@ -150,12 +171,43 @@ namespace QuickFiler.Viewers
             {
                 lock (_sync)
                 {
-                    if (ReferenceEquals(_openTask, completion.Task))
+                    if (!ReferenceEquals(_pendingCloseCompletion, completion))
                     {
+                        if (ReferenceEquals(_openCompletion, completion))
+                        {
+                            _openCompletion = null;
+                            _openTask = null;
+                        }
+                        completion.TrySetResult(result && IsCurrentCore(lease, false));
+                    }
+                }
+            }
+        }
+
+        private async Task CompletePendingCloseAsync(
+            Task<Task> kickoff,
+            TaskCompletionSource<bool> completion
+        )
+        {
+            try
+            {
+                Task running = await kickoff.ConfigureAwait(false);
+                await running.ConfigureAwait(false);
+            }
+            catch { }
+            finally
+            {
+                lock (_sync)
+                {
+                    if (ReferenceEquals(_openCompletion, completion))
+                    {
+                        _openCompletion = null;
                         _openTask = null;
                     }
-                    completion.TrySetResult(result);
+                    if (ReferenceEquals(_pendingCloseCompletion, completion))
+                        _pendingCloseCompletion = null;
                 }
+                completion.TrySetResult(false);
             }
         }
 
@@ -175,7 +227,7 @@ namespace QuickFiler.Viewers
                     .PlaceSurfaceAsync(
                         _host.DropDown,
                         _host.InstalledControlHost!,
-                        _host.InstalledPopupControl!,
+                        _host._popupControl!,
                         anchorScreenBounds,
                         workingArea,
                         desiredSize,
@@ -226,11 +278,9 @@ namespace QuickFiler.Viewers
         private bool ValidatePlacement(BreadcrumbPopupPlacementResult placement)
         {
             if (placement.Bounds.Width == 0 || placement.Bounds.Height == 0)
-            {
                 throw new InvalidOperationException(
                     "The active working area has no space for the folder selector popup."
                 );
-            }
             return true;
         }
 
@@ -259,18 +309,18 @@ namespace QuickFiler.Viewers
             if (_host.HasInstalledSurface)
                 return await _uiOperations.RunAsync(() => IsCurrent(lease)).ConfigureAwait(false);
 
+            Tuple<ToolStripControlHost, Control, IWebViewMessenger>? installed = null;
             try
             {
-                Tuple<ToolStripControlHost, Control, IWebViewMessenger>? installed =
-                    await _uiOperations
-                        .CreateAndInstallSurfaceAsync(
-                            _host.SurfaceFactory,
-                            _host.Environment,
-                            _host.DropDown,
-                            () => IsCurrent(lease),
-                            lease.Cancellation
-                        )
-                        .ConfigureAwait(false);
+                installed = await _uiOperations
+                    .CreateAndInstallSurfaceAsync(
+                        _host.SurfaceFactory,
+                        _host.Environment,
+                        _host.DropDown,
+                        () => IsCurrent(lease),
+                        lease.Cancellation
+                    )
+                    .ConfigureAwait(false);
                 if (installed == null)
                     return false;
 
@@ -296,7 +346,10 @@ namespace QuickFiler.Viewers
             {
                 try
                 {
-                    await _host.DisposeSurfaceAfterFailureAsync().ConfigureAwait(false);
+                    if (installed != null || IsCurrent(lease))
+                        await _host
+                            .DisposeSurfaceAfterFailureAsync(installed)
+                            .ConfigureAwait(false);
                 }
                 catch (Exception cleanupFailure)
                 {
@@ -314,8 +367,8 @@ namespace QuickFiler.Viewers
             if (!IsCurrent(lease))
                 return null;
             _host.InstalledControlHost = installed.Item1;
-            _host.InstalledPopupControl = installed.Item2;
-            _host.InstalledPopupMessenger = installed.Item3;
+            _host._popupControl = installed.Item2;
+            _host._popupMessenger = installed.Item3;
             _host.PublishPopupMessengerReady();
             return IsCurrent(lease);
         }
@@ -352,12 +405,13 @@ namespace QuickFiler.Viewers
         private bool IsLifecycleCurrent(BreadcrumbDropDownOpenLease lease, bool allowDisposed)
         {
             lock (_sync)
-            {
-                return (allowDisposed || !_disposed)
-                    && lease.Generation == _generation
-                    && !lease.Cancellation.IsCompleted;
-            }
+                return IsCurrentCore(lease, allowDisposed);
         }
+
+        private bool IsCurrentCore(BreadcrumbDropDownOpenLease lease, bool allowDisposed) =>
+            (allowDisposed || !_disposed)
+            && lease.Generation == _generation
+            && !lease.Cancellation.IsCompleted;
 
         private void ScheduleInvalidating(Func<Task> operation, bool disposing)
         {
@@ -369,9 +423,14 @@ namespace QuickFiler.Viewers
                     return;
                 _disposed = disposing;
                 canceled = InvalidateCore();
+                if (_pendingCloseCompletion == null)
+                {
+                    _openCompletion = null;
+                    _openTask = null;
+                }
                 lease = new BreadcrumbDropDownOpenLease(_generation, _cancellation.Task);
             }
-            CompleteInvalidation(canceled);
+            canceled.TrySetResult(true);
             ScheduleObserved(() =>
                 IsLifecycleCurrent(lease, disposing) ? operation() : Task.CompletedTask
             );
@@ -387,11 +446,7 @@ namespace QuickFiler.Viewers
                 .PostAsync(() => running = _uiOperations.RunAsync(operation))
                 .ConfigureAwait(false);
             if (running == null)
-            {
-                throw new InvalidOperationException(
-                    "The breadcrumb popup operation could not be scheduled on its owning UI boundary."
-                );
-            }
+                throw new InvalidOperationException("The popup operation could not be scheduled.");
             return await running.ConfigureAwait(false);
         }
 
@@ -415,9 +470,6 @@ namespace QuickFiler.Viewers
             _cancellation = NewCompletionSource();
             return canceled;
         }
-
-        private static void CompleteInvalidation(TaskCompletionSource<bool> canceled) =>
-            canceled.TrySetResult(true);
 
         private static TaskCompletionSource<bool> NewCompletionSource() =>
             new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);

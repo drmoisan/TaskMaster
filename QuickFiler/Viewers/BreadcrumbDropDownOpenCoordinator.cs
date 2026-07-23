@@ -25,6 +25,7 @@ namespace QuickFiler.Viewers
         private Func<Rectangle> _workingArea;
         private Task<bool>? _currentOpenTask;
         private int _generation;
+        private bool _closePending;
         private bool _released;
 
         internal BreadcrumbDropDownOpenCoordinator(
@@ -88,6 +89,9 @@ namespace QuickFiler.Viewers
                     return ClosedTask;
                 if (_currentOpenTask != null && !_currentOpenTask.IsCompleted)
                     return _currentOpenTask;
+                if (_closePending && _host.IsOpen)
+                    return ClosedTask;
+                _closePending = false;
                 _currentOpenTask = OpenCoreAsync(_generation);
                 return _currentOpenTask;
             }
@@ -122,8 +126,8 @@ namespace QuickFiler.Viewers
                     return;
                 if (_isSelectorOpen())
                     _ = RequestOpen();
-                else if (_host.IsOpen)
-                    _host.Close(BreadcrumbDropDownCloseReason.ExplicitCommit);
+                else
+                    CloseCore(BreadcrumbDropDownCloseReason.ExplicitCommit);
             });
         }
 
@@ -133,7 +137,11 @@ namespace QuickFiler.Viewers
                 return;
             _ = _operations.PostAsync(() =>
             {
-                CloseCore(BreadcrumbDropDownCloseReason.Uncommitted);
+                if (
+                    (!_host.IsOpen || !_host.Close(BreadcrumbDropDownCloseReason.Uncommitted))
+                    && _isSelectorOpen()
+                )
+                    _cancelSelector();
                 _detachPopupMessenger();
                 _host.Reset();
             });
@@ -201,8 +209,7 @@ namespace QuickFiler.Viewers
             }
             if (!current || !_isSelectorOpen())
             {
-                if (_host.IsOpen)
-                    _host.Close(BreadcrumbDropDownCloseReason.ExplicitCommit);
+                CloseCore(BreadcrumbDropDownCloseReason.ExplicitCommit);
                 return false;
             }
             return true;
@@ -229,11 +236,40 @@ namespace QuickFiler.Viewers
 
         private bool CloseCore(BreadcrumbDropDownCloseReason reason)
         {
-            if (_host.IsOpen && _host.Close(reason))
+            lock (_sync)
+            {
+                if (_released)
+                    return false;
+                if (_closePending)
+                    return true;
+                _closePending = true;
+            }
+            bool closed;
+            try
+            {
+                closed = _host.Close(reason);
+            }
+            catch
+            {
+                ClearClosePending();
+                throw;
+            }
+            if (closed)
+            {
+                lock (_sync)
+                    _generation++;
                 return true;
+            }
+            ClearClosePending();
             if (reason == BreadcrumbDropDownCloseReason.Uncommitted && _isSelectorOpen())
                 _cancelSelector();
             return false;
+        }
+
+        private void ClearClosePending()
+        {
+            lock (_sync)
+                _closePending = false;
         }
 
         private bool Invalidate(bool release)
@@ -244,6 +280,7 @@ namespace QuickFiler.Viewers
                     return false;
                 _generation++;
                 _currentOpenTask = null;
+                _closePending = false;
                 _released = release;
                 return true;
             }

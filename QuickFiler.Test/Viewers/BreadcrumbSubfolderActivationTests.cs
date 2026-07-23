@@ -107,6 +107,88 @@ namespace QuickFiler.Test.Viewers
             }
         }
 
+        [TestMethod]
+        public void OpenSelector_SubfolderActivation_PublishesOneDurableRenderAndNoLegacySelectionChange()
+        {
+            // Arrange
+            using (var harness = new SubfolderActivationHarness())
+            {
+                int selectionChanges = 0;
+                harness.Coordinator.SelectionChanged += (sender, args) => selectionChanges++;
+                harness.OpenSelector();
+                harness.ClearPostedMessages();
+
+                // Act
+                harness.Receive(harness.CreateSubfolderActivationJson());
+
+                // Assert
+                string renderJson = harness.PostedMessages.Single(json =>
+                    json.Contains("\"type\":\"render\"")
+                );
+                renderJson.Should().Contain("\"selectedSubfolderIndex\":0");
+                renderJson
+                    .Should()
+                    .Contain(
+                        "\"selectedFolder\":" + JsonString(SubfolderActivationHarness.SubfolderPath)
+                    );
+                harness
+                    .PostedMessages.Should()
+                    .ContainSingle(json => json.Contains("\"type\":\"selectorView\""));
+                harness
+                    .PostedMessages.Should()
+                    .NotContain(json => json.Contains("\"type\":\"selectionChange\""));
+                harness
+                    .Coordinator.GetSelectedFolder()
+                    .Should()
+                    .Be(SubfolderActivationHarness.SubfolderPath);
+                selectionChanges.Should().Be(1);
+                harness.CloseReasons.Should().Equal(BreadcrumbDropDownCloseReason.ExplicitCommit);
+                harness.FocusReturnCount.Should().Be(1);
+
+                string parentIdentity = harness.Coordinator.CommittedIdentity;
+                harness.Coordinator.AddItems(new[] { "Recent other row" });
+                harness.ClearPostedMessages();
+                harness.OpenSelector();
+                string reopenView = harness.PostedMessages.Single(json =>
+                    json.Contains("\"type\":\"selectorView\"")
+                );
+                harness.Coordinator.PendingIdentity.Should().Be(parentIdentity);
+                reopenView.Should().Contain("\"committedIdentity\":" + JsonString(parentIdentity));
+                reopenView.Should().Contain("\"pendingIdentity\":" + JsonString(parentIdentity));
+
+                harness.ClearPostedMessages();
+                harness.Coordinator.HandleSelectorKey(BreadcrumbSelectorKey.Down).Should().BeTrue();
+                string movedIdentity = harness.Coordinator.PendingIdentity;
+                movedIdentity.Should().NotBe(parentIdentity);
+                harness.Coordinator.CommittedIdentity.Should().Be(parentIdentity);
+                harness
+                    .Coordinator.GetSelectedFolder()
+                    .Should()
+                    .Be(SubfolderActivationHarness.SubfolderPath);
+                harness
+                    .PostedMessages.Single(json => json.Contains("\"type\":\"selectorView\""))
+                    .Should()
+                    .Contain("\"pendingIdentity\":" + JsonString(movedIdentity));
+            }
+
+            using (var invalidHarness = new SubfolderActivationHarness())
+            {
+                invalidHarness.OpenSelector();
+                invalidHarness.ClearPostedMessages();
+
+                // Act
+                invalidHarness.Receive(
+                    "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":\"missing-row\",\"subfolderIndex\":0}"
+                );
+
+                // Assert
+                invalidHarness.PostedMessages.Should().BeEmpty();
+                invalidHarness.Coordinator.IsSelectorOpen.Should().BeTrue();
+                invalidHarness.CloseReasons.Should().BeEmpty();
+                invalidHarness.FocusReturnCount.Should().Be(0);
+            }
+        }
+
         private static void AssertDurableActivation(FollowupAction followup)
         {
             // Arrange
@@ -286,6 +368,7 @@ namespace QuickFiler.Test.Viewers
         internal List<BreadcrumbDropDownCloseReason> CloseReasons { get; } =
             new List<BreadcrumbDropDownCloseReason>();
         internal int FocusReturnCount { get; private set; }
+        internal IReadOnlyList<string> PostedMessages => _messenger.PostedMessages;
 
         internal void OpenSelector()
         {
@@ -298,6 +381,11 @@ namespace QuickFiler.Test.Viewers
         {
             _messenger.Receive(json);
             Coordinator.LastDispatch.GetAwaiter().GetResult();
+        }
+
+        internal void ClearPostedMessages()
+        {
+            _messenger.ClearPostedMessages();
         }
 
         internal string CreateSubfolderActivationJson()
@@ -364,6 +452,7 @@ namespace QuickFiler.Test.Viewers
     internal sealed class TrackingSubfolderMessenger : IWebViewMessenger
     {
         private EventHandler<string> _messageReceived;
+        private readonly List<string> _postedMessages = new List<string>();
 
         public event EventHandler<string> MessageReceived
         {
@@ -371,7 +460,17 @@ namespace QuickFiler.Test.Viewers
             remove { _messageReceived -= value; }
         }
 
-        public void PostJson(string json) { }
+        internal IReadOnlyList<string> PostedMessages => _postedMessages;
+
+        public void PostJson(string json)
+        {
+            _postedMessages.Add(json);
+        }
+
+        internal void ClearPostedMessages()
+        {
+            _postedMessages.Clear();
+        }
 
         internal void Receive(string json)
         {

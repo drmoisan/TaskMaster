@@ -22,10 +22,15 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
     public sealed class FolderBreadcrumbBridgeRouterEdgeTests
     {
         private const string LeafPath = "\\Inbox\\Projects\\Apollo";
+        private const string TargetLeafPath = "\\Inbox\\Projects\\Zeus";
 
         private static readonly FolderTreeNodeKey RootKey = Key("root", "\\Inbox");
         private static readonly FolderTreeNodeKey MidKey = Key("mid", "\\Inbox\\Projects");
         private static readonly FolderTreeNodeKey LeafKey = Key("leaf", LeafPath);
+        private static readonly FolderTreeNodeKey TargetLeafKey = Key(
+            "target-leaf",
+            TargetLeafPath
+        );
 
         private static FolderTreeNodeKey Key(string entryId, string path) =>
             new FolderTreeNodeKey("store-a", entryId, path);
@@ -55,6 +60,30 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             provider
                 .Setup(p => p.GetImmediateSubfoldersAsync(LeafKey, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new[] { Segment(Key("s1", LeafPath + "\\Alpha"), "Alpha", false) });
+            provider
+                .Setup(p => p.ResolveLeafKeyAsync(TargetLeafPath, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(TargetLeafKey);
+            provider
+                .Setup(p => p.GetAncestorChainAsync(TargetLeafKey, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(
+                    new[]
+                    {
+                        Segment(RootKey, "Inbox", true),
+                        Segment(MidKey, "Projects", true),
+                        Segment(TargetLeafKey, "Zeus", true),
+                    }
+                );
+            provider
+                .Setup(p =>
+                    p.GetImmediateSubfoldersAsync(TargetLeafKey, It.IsAny<CancellationToken>())
+                )
+                .ReturnsAsync(
+                    new[]
+                    {
+                        Segment(Key("s2", TargetLeafPath + "\\Gamma"), "Gamma", false),
+                        Segment(Key("s3", TargetLeafPath + "\\Delta"), "Delta", false),
+                    }
+                );
             return provider;
         }
 
@@ -341,6 +370,93 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
                 .Should()
                 .Be(LeafPath + "\\Alpha");
             outputs.Should().HaveCount(2);
+        }
+
+        [TestMethod]
+        public async Task ActivateSelectorSubfolder_ValidIdentity_CommitsAndEndsSession()
+        {
+            // Arrange
+            var router = new FolderBreadcrumbBridgeRouter(ProviderMock().Object);
+            await router.SetSuggestionsAsync(
+                new[]
+                {
+                    new FolderRow(
+                        LeafPath,
+                        FolderRowKind.Suggestion,
+                        new FolderScore(LeafPath, 1000, 0.73)
+                    ),
+                    new FolderRow(
+                        TargetLeafPath,
+                        FolderRowKind.Suggestion,
+                        new FolderScore(TargetLeafPath, 900, 0.61)
+                    ),
+                },
+                CancellationToken.None
+            );
+            router.SelectRow(0);
+            await router.RouteAsync(
+                "{\"type\":\"affordanceToggle\",\"rowIndex\":1}",
+                CancellationToken.None
+            );
+            string identity = router.GetSelectorState().Options[1].Identity;
+            router.Model.SelectedIndex.Should().Be(0);
+            router.OpenSelector().Handled.Should().BeTrue();
+
+            // Act
+            BreadcrumbSelectionTransition transition = router.ActivateSelectorSubfolder(
+                identity,
+                1
+            );
+
+            // Assert
+            transition.Handled.Should().BeTrue();
+            transition.SelectionChanged.Should().BeTrue();
+            transition.OpenStateChanged.Should().BeTrue();
+            transition.RenderJson.Should().NotBeNull();
+            transition.SelectorState.IsOpen.Should().BeFalse();
+            transition.SelectorState.CommittedIdentity.Should().Be(identity);
+            router.Model.SelectedIndex.Should().Be(1);
+            router.Model.SelectedSubfolderIndex.Should().Be(1);
+            router.GetSelectedFolder().Should().Be(TargetLeafPath + "\\Delta");
+            var rendered = (RenderMessage)BreadcrumbBridgeSerializer.Parse(transition.RenderJson!);
+            rendered.Rows.Single(row => row.Selected).RowIndex.Should().Be(1);
+            rendered.Rows[1].Subfolders[1].FolderPath.Should().Be(TargetLeafPath + "\\Delta");
+            router.CommitSelector().Handled.Should().BeFalse();
+            router.CancelSelector().Handled.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task ActivateSelectorSubfolder_InvalidInputs_DoNotMutateOpenSession()
+        {
+            // Arrange
+            var router = await PopulatedRouterAsync(ProviderMock());
+            await router.RouteAsync(
+                "{\"type\":\"affordanceToggle\",\"rowIndex\":0}",
+                CancellationToken.None
+            );
+            router.AddItems(new[] { "Recent without children" });
+            BreadcrumbSelectorState before = router.GetSelectorState();
+            before.CommittedIdentity.Should().NotBeNull();
+            string identity = before.CommittedIdentity!;
+            string plainIdentity = before.Options[1].Identity;
+            router.OpenSelector().Handled.Should().BeTrue();
+
+            // Act
+            var transitions = new[]
+            {
+                router.ActivateSelectorSubfolder("missing-row", 0),
+                router.ActivateSelectorSubfolder(identity, -1),
+                router.ActivateSelectorSubfolder(identity, 1),
+                router.ActivateSelectorSubfolder(plainIdentity, 0),
+            };
+
+            // Assert
+            transitions.Should().OnlyContain(transition => !transition.Handled);
+            router.GetSelectorState().IsOpen.Should().BeTrue();
+            router.GetSelectorState().CommittedIdentity.Should().Be(identity);
+            router.GetSelectorState().PendingIdentity.Should().Be(identity);
+            router.Model.SelectedSubfolderIndex.Should().Be(-1);
+            router.GetSelectedFolder().Should().Be(LeafPath);
         }
 
         [TestMethod]

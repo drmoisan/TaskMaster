@@ -278,6 +278,85 @@ namespace QuickFiler.Test.Viewers
         }
 
         [TestMethod]
+        public void ExpandedSubfolders_UseOneAccessibleStableIdentityActivationPath()
+        {
+            // Assert
+            Html.Should().Contain("subfolderElement.setAttribute(\"role\", \"option\");");
+            Html.Should()
+                .Contain("subfolderElement.setAttribute(\"aria-selected\", String(active));");
+            Html.Should().Contain("subfolderElement.tabIndex = 0;");
+            Html.Should()
+                .MatchRegex(
+                    @"(?s)function\s+activateSubfolder\s*\(\s*event\s*\)\s*\{.*?event\.preventDefault\(\);.*?event\.stopPropagation\(\);.*?post\(\{\s*type:\s*\""selectorSubfolderActivate\"",\s*rowIdentity:\s*row\.identity,\s*subfolderIndex:\s*index\s*\}\);.*?\}"
+                );
+            Html.Should()
+                .MatchRegex(
+                    @"subfolderElement\.addEventListener\(\s*\""click\"",\s*activateSubfolder\s*\)"
+                );
+            Html.Should()
+                .MatchRegex(
+                    @"(?s)subfolderElement\.addEventListener\(\s*\""keydown\"",\s*function\s*\(\s*event\s*\)\s*\{.*?event\.key\s*===\s*\""Enter\"".*?event\.key\s*===\s*\"" \"".*?activateSubfolder\(event\);.*?\}\s*\)"
+                );
+            Html.Should()
+                .NotContain(
+                    "post({ type: \"selectionChange\", rowIndex: row.rowIndex, subfolderIndex: index });"
+                );
+        }
+
+        [TestMethod]
+        public void RenderReceiver_OwnsSelectedChildExpandedAndCollapsedProjection()
+        {
+            // Arrange
+            string selectedChildBody = FunctionBody("selectedChildForRow", "rowHasOpenAffordance");
+            string makeRowBody = FunctionBody("makeRow", "makeSubfolders");
+            string makeSubfoldersBody = FunctionBody("makeSubfolders", "render");
+            string renderBody = FunctionBody("render", "onArrow");
+            System.Text.RegularExpressions.Match renderReceiver = Find(
+                @"if\s*\(msg\.type\s*===\s*\""render\""\)\s*\{(?<body>.*?)(?=\}\s*else\s+if\s*\(msg\.type\s*===\s*\""selectorView\""\))"
+            );
+
+            // Assert
+            selectedChildBody.Should().Contain("Number.isInteger(state.selectedSubfolderIndex)");
+            selectedChildBody.Should().Contain("row.subfolders.length");
+            selectedChildBody.Should().Contain("state.selectedFolder");
+            makeRowBody.Should().Contain("selectedChildForRow(row)");
+            makeRowBody.Should().Contain("selectedPath.textContent = state.selectedFolder;");
+            makeRowBody.Should().Contain("pct.textContent = row.percentText;");
+            makeSubfoldersBody
+                .Should()
+                .Contain(
+                    "subfolderElement.id = \"folder-option-\" + row.rowIndex + \"-subfolder-\" + index;"
+                );
+            makeSubfoldersBody
+                .Should()
+                .Contain("selectedChildOwnsActive && state.selectedSubfolderIndex === index");
+            makeSubfoldersBody
+                .Should()
+                .Contain("subfolderElement.setAttribute(\"aria-selected\", String(active));");
+            renderBody.Should().Contain("selectedChildOwnsActive");
+            renderBody.Should().Contain("row.identity === state.pendingIdentity");
+            renderBody.Should().Contain("activeRow = activeSubfolder;");
+            renderBody.Should().Contain("list.setAttribute(\"aria-activedescendant\", activeId);");
+            renderReceiver.Success.Should().BeTrue();
+            renderReceiver
+                .Groups["body"]
+                .Value.Should()
+                .Contain(
+                    "state.selectedSubfolderIndex = Number.isInteger(msg.selectedSubfolderIndex)"
+                );
+            renderReceiver.Groups["body"].Value.Should().Contain("state.selectedFolder =");
+            renderReceiver
+                .Groups["body"]
+                .Value.Should()
+                .Contain("selected === null || selectedChildForRow(selected) === null");
+            renderReceiver
+                .Groups["body"]
+                .Value.Should()
+                .Contain("state.selectedSubfolderIndex = -1;");
+            renderReceiver.Groups["body"].Value.Should().Contain("state.selectedFolder = null;");
+        }
+
+        [TestMethod]
         public void LeftAndRightBreadcrumbMessages_RemainSupported()
         {
             // Assert
@@ -306,6 +385,19 @@ namespace QuickFiler.Test.Viewers
 
         private static System.Text.RegularExpressions.Match Find(string pattern) =>
             Regex.Match(Html, pattern, ContractRegexOptions);
+
+        private static string FunctionBody(string functionName, string nextFunctionName)
+        {
+            System.Text.RegularExpressions.Match match = Find(
+                @"function\s+"
+                    + Regex.Escape(functionName)
+                    + @"\s*\([^)]*\)\s*\{(?<body>.*?)(?=\n\s*function\s+"
+                    + Regex.Escape(nextFunctionName)
+                    + @"\s*\()"
+            );
+            match.Success.Should().BeTrue($"the {functionName} function must be present");
+            return match.Groups["body"].Value;
+        }
 
         private const RegexOptions ContractRegexOptions =
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline;

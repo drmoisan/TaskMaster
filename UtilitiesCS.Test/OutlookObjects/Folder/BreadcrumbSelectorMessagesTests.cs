@@ -150,22 +150,72 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             string expected
         )
         {
-            // Arrange
-            MethodInfo parse = SerializerType().GetMethod("Parse")!;
+            AssertParseFormatException(json, expected);
+        }
 
-            // Act
-            Action act = () => parse.Invoke(null, new object[] { json });
-
-            // Assert
-            act.Should().Throw<TargetInvocationException>().WithInnerException<FormatException>();
-            try
-            {
-                parse.Invoke(null, new object[] { json });
-            }
-            catch (TargetInvocationException ex)
-            {
-                ex.InnerException!.Message.Should().ContainEquivalentOf(expected);
-            }
+        [DataTestMethod]
+        [DataRow(
+            "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":1,\"subfolderIndex\":0}",
+            "rowIdentity"
+        )]
+        [DataRow(
+            "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":1.5,\"subfolderIndex\":0}",
+            "rowIdentity"
+        )]
+        [DataRow(
+            "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":true,\"subfolderIndex\":0}",
+            "rowIdentity"
+        )]
+        [DataRow(
+            "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":null,\"subfolderIndex\":0}",
+            "rowIdentity"
+        )]
+        [DataRow(
+            "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":[],\"subfolderIndex\":0}",
+            "rowIdentity"
+        )]
+        [DataRow(
+            "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":{},\"subfolderIndex\":0}",
+            "rowIdentity"
+        )]
+        [DataRow(
+            "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":\"row-a\",\"subfolderIndex\":\"0\"}",
+            "subfolderIndex"
+        )]
+        [DataRow(
+            "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":\"row-a\",\"subfolderIndex\":1.5}",
+            "subfolderIndex"
+        )]
+        [DataRow(
+            "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":\"row-a\",\"subfolderIndex\":true}",
+            "subfolderIndex"
+        )]
+        [DataRow(
+            "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":\"row-a\",\"subfolderIndex\":null}",
+            "subfolderIndex"
+        )]
+        [DataRow(
+            "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":\"row-a\",\"subfolderIndex\":[]}",
+            "subfolderIndex"
+        )]
+        [DataRow(
+            "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":\"row-a\",\"subfolderIndex\":{}}",
+            "subfolderIndex"
+        )]
+        [DataRow(
+            "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":\"row-a\",\"subfolderIndex\":2147483648}",
+            "subfolderIndex"
+        )]
+        [DataRow(
+            "{\"type\":\"selectorSubfolderActivate\",\"rowIdentity\":\"row-a\",\"subfolderIndex\":999999999999999999999999999999999999999}",
+            "subfolderIndex"
+        )]
+        public void Parse_SubfolderActivationWrongTokenKindsAndOverflow_RejectAsFormatException(
+            string json,
+            string expected
+        )
+        {
+            AssertParseFormatException(json, expected);
         }
 
         [TestMethod]
@@ -259,6 +309,21 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
 
         private static object Parse(string json) =>
             SerializerType().GetMethod("Parse")!.Invoke(null, new object[] { json })!;
+
+        private static void AssertParseFormatException(string json, string expected)
+        {
+            MethodInfo parse = SerializerType().GetMethod("Parse")!;
+            Action act = () => parse.Invoke(null, new object[] { json });
+            act.Should().Throw<TargetInvocationException>().WithInnerException<FormatException>();
+            try
+            {
+                parse.Invoke(null, new object[] { json });
+            }
+            catch (TargetInvocationException ex)
+            {
+                ex.InnerException!.Message.Should().ContainEquivalentOf(expected);
+            }
+        }
 
         private static string Serialize(object message) =>
             (string)SerializerType().GetMethod("Serialize")!.Invoke(null, new[] { message })!;

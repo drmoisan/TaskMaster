@@ -41,6 +41,7 @@ namespace QuickFiler.Controllers.Tests
                     initializer.Object
                 );
                 QfcItemControllerTestSupport.SetField(controller, "_globals", globals.Object);
+                InitializeBreadcrumbPipeline(scope.Viewer);
 
                 // Act
                 InvokeConfigure(controller, scope.Viewer, environment);
@@ -76,6 +77,7 @@ namespace QuickFiler.Controllers.Tests
                     initializer.Object
                 );
                 QfcItemControllerTestSupport.SetField(controller, "_globals", globals.Object);
+                InitializeBreadcrumbPipeline(scope.Viewer);
 
                 // Act
                 InvokeConfigure(controller, scope.Viewer, environment);
@@ -106,6 +108,7 @@ namespace QuickFiler.Controllers.Tests
                     initializer.Object
                 );
                 QfcItemControllerTestSupport.SetField(controller, "_globals", globals.Object);
+                InitializeBreadcrumbPipeline(scope.Viewer);
                 InvokeConfigure(controller, scope.Viewer, environment);
                 object firstHost = Host(scope.Viewer);
 
@@ -274,6 +277,12 @@ namespace QuickFiler.Controllers.Tests
 
         private static string Theme(string theme) =>
             "{\"type\":\"themeChange\",\"theme\":\"" + theme + "\"}";
+
+        private static void InitializeBreadcrumbPipeline(QuickFiler.ItemViewer viewer)
+        {
+            var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+            viewer.InitializeBreadcrumbPipeline(provider.Object);
+        }
 
         private static void InvokeConfigure(
             HarnessController controller,
