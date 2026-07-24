@@ -34,7 +34,7 @@ Call the extension's resolver as the first action:
 - Tool: `mcp__drm-copilot__resolve_execute_hard_lock_prompt`
 - Parameters:
   - `target` (required): the plan-of-record path (`${plan-path}`).
-  - `workspace_root` (optional): the workspace root. Omit to default to the current working directory.
+  - `workspace_root` (required): the absolute root of the calling agent's checkout or worktree. The MCP server cannot infer the caller's checkout, so this value must be passed explicitly.
 
 On success, the response contains an `artifacts` array whose first entry is the absolute path of a file containing the resolved hard-lock prompt (produced by the extension passing `--output` and `--quiet` to the bundled Python resolver).
 

@@ -2,7 +2,7 @@ default_permissions = ":danger-full-access"
 
 [mcp_servers.drm-copilot]
 command = "npx"
-args = ["-y", "@danmoisan/drm-copilot-mcp"]
+args = ["-y", "@danmoisan/drm-copilot-mcp@1.0.18"]
 required = true
 enabled_tools = [
     "collect_commit_context",
@@ -28,60 +28,225 @@ enabled_tools = [
 ]
 default_tools_approval_mode = "prompt"
 
+[mcp_servers.drm-copilot.tools.collect_commit_context]
+approval_mode = "approve"
+
+[mcp_servers.drm-copilot.tools.collect_pr_context]
+approval_mode = "approve"
+
+[mcp_servers.drm-copilot.tools.new_potential_bug_entry]
+approval_mode = "approve"
+
+[mcp_servers.drm-copilot.tools.new_potential_entry]
+approval_mode = "approve"
+
+[mcp_servers.drm-copilot.tools.link_parent_child]
+approval_mode = "approve"
+
+[mcp_servers.drm-copilot.tools.potential_to_issue]
+approval_mode = "approve"
+
+[mcp_servers.drm-copilot.tools.new_active_feature_folder]
+approval_mode = "approve"
+
+[mcp_servers.drm-copilot.tools.run_poshqc_format]
+approval_mode = "approve"
+
+[mcp_servers.drm-copilot.tools.run_poshqc_analyze]
+approval_mode = "approve"
+
+[mcp_servers.drm-copilot.tools.run_poshqc_test]
+approval_mode = "approve"
+
+[mcp_servers.drm-copilot.tools.run_poshqc_analyze_autofix]
+approval_mode = "approve"
+
+[mcp_servers.drm-copilot.tools.run_poshqc_suite]
+approval_mode = "approve"
+
+[mcp_servers.drm-copilot.tools.resolve_policy_audit_template_asset]
+approval_mode = "approve"
+
+[mcp_servers.drm-copilot.tools.resolve_execute_hard_lock_prompt]
+approval_mode = "approve"
+
+[mcp_servers.drm-copilot.tools.resolve_atomic_plan_prompt]
+approval_mode = "approve"
+
 [mcp_servers.drm-copilot.tools.validate_orchestration_artifacts]
 approval_mode = "approve"
 
+[permissions.orchestrator-workspace]
+description = "Workspace-scoped orchestration with network access for Git, GitHub, and MCP workflows."
+extends = ":workspace"
+
+[permissions.orchestrator-workspace.filesystem.":workspace_roots"]
+".codex" = "read"
+".agents" = "read"
+"AGENTS.md" = "read"
+"config/orchestration-routing.json" = "read"
+
+[permissions.orchestrator-workspace.network]
+enabled = true
+
 [features]
 multi_agent = true
+hooks = true
+
+[agents]
+max_depth = 3
+max_threads = 12
+
+[[hooks.UserPromptSubmit]]
+
+[[hooks.UserPromptSubmit.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/authorize-root-epic-invocation.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/authorize-root-epic-invocation.ps1"'
+timeout = 15
+statusMessage = "Authorizing root epic entry"
+
+[[hooks.SubagentStart]]
+matcher = "epic-planner|epic-orchestrator|orchestrator|atomic-planner|atomic-executor|feature-review|feature-reviewer|task-researcher|prd-feature|pr-author|typed-engineer|-c"
+
+[[hooks.SubagentStart.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/record-subagent-routing-attestation.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/record-subagent-routing-attestation.ps1"'
+timeout = 15
+statusMessage = "Recording subagent routing attestation"
 
 [[hooks.PreToolUse]]
-matcher = "Bash"
-command = "pwsh -NoProfile -File .codex/hooks/validate-bash.ps1"
+matcher = "^Bash$"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/validate-bash.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/validate-bash.ps1"'
+timeout = 30
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-promotion-mcp-only.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-promotion-mcp-only.ps1"'
+timeout = 30
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1"'
+timeout = 30
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-merge-gate.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-merge-gate.ps1"'
+timeout = 30
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-worktree-removal-gate.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-worktree-removal-gate.ps1"'
+timeout = 30
 
 [[hooks.PreToolUse]]
-matcher = "Bash"
-command = "pwsh -NoProfile -File .codex/hooks/enforce-promotion-mcp-only.ps1"
+matcher = "^(Bash|shell_command|apply_patch|Edit|Write|mcp__.*)$"
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-root-invocation.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-root-invocation.ps1"'
+timeout = 30
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-codex-model-routing.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-codex-model-routing.ps1"'
+timeout = 30
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-planning-only.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-planning-only.ps1"'
+timeout = 30
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-wave-barrier.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-wave-barrier.ps1"'
+timeout = 30
+
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-child-worktree-binding.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-epic-child-worktree-binding.ps1"'
+timeout = 30
 
 [[hooks.PreToolUse]]
-matcher = "Bash"
-command = "pwsh -NoProfile -File .codex/hooks/enforce-orchestration-preimplementation-gate.ps1"
+matcher = "^(apply_patch|Edit|Write)$"
 
-[[hooks.PreToolUse]]
-matcher = "Write|Edit"
-command = "pwsh -NoProfile -File .codex/hooks/check-python-test-purity.ps1"
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/check-python-test-purity.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/check-python-test-purity.ps1"'
+timeout = 30
 
-[[hooks.PreToolUse]]
-matcher = "Write|Edit"
-command = "pwsh -NoProfile -File .codex/hooks/enforce-python-batch-budget.ps1"
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-python-batch-budget.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-python-batch-budget.ps1"'
+timeout = 30
 
-[[hooks.PreToolUse]]
-matcher = "Write|Edit"
-command = "pwsh -NoProfile -File .codex/hooks/check-powershell-test-purity.ps1"
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/check-powershell-test-purity.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/check-powershell-test-purity.ps1"'
+timeout = 30
 
-[[hooks.PreToolUse]]
-matcher = "Write|Edit"
-command = "pwsh -NoProfile -File .codex/hooks/enforce-powershell-batch-budget.ps1"
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-powershell-batch-budget.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-powershell-batch-budget.ps1"'
+timeout = 30
 
-[[hooks.PreToolUse]]
-matcher = "Write|Edit"
-command = "pwsh -NoProfile -File .codex/hooks/enforce-evidence-locations.ps1"
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-evidence-locations.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-evidence-locations.ps1"'
+timeout = 30
 
-[[hooks.PreToolUse]]
-matcher = "Write|Edit"
-command = "pwsh -NoProfile -File .codex/hooks/enforce-orchestration-preimplementation-gate.ps1"
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-orchestration-preimplementation-gate.ps1"'
+timeout = 30
 
-[[hooks.PreToolUse]]
-matcher = "Write|Edit"
-command = "pwsh -NoProfile -File .codex/hooks/enforce-checkpoint-monotonic.ps1"
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-checkpoint-monotonic.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-checkpoint-monotonic.ps1"'
+timeout = 30
 
-[[hooks.PreToolUse]]
-matcher = "Write|Edit"
-command = "pwsh -NoProfile -File .codex/hooks/enforce-completion-consistency.ps1"
+[[hooks.PreToolUse.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-completion-consistency.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/enforce-completion-consistency.ps1"'
+timeout = 30
 
-[[hooks.PreToolUse]]
-matcher = "Agent"
-command = "pwsh -NoProfile -File .codex/hooks/enforce-orchestration-preimplementation-gate.ps1"
+[[hooks.SubagentStop]]
+matcher = "epic-planner|epic-orchestrator|orchestrator|atomic-planner|atomic-executor|feature-review|feature-reviewer|task-researcher|prd-feature|pr-author|typed-engineer|-c"
+
+[[hooks.SubagentStop.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/validate-codex-subagent-routing.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/validate-codex-subagent-routing.ps1"'
+timeout = 30
 
 [[hooks.SubagentStop]]
 matcher = "feature-review|feature-reviewer"
-command = "pwsh -NoProfile -File .codex/hooks/validate-feature-review-coverage.ps1"
+
+[[hooks.SubagentStop.hooks]]
+type = "command"
+command = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/validate-feature-review-coverage.ps1"'
+command_windows = 'pwsh -NoProfile -File "$(git rev-parse --show-toplevel)/.codex/hooks/validate-feature-review-coverage.ps1"'
+timeout = 30

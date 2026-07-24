@@ -1,5 +1,7 @@
 name = "prd-feature"
 description = "Converted subagent"
+model = "gpt-5.6-terra"
+model_reasoning_effort = "high"
 developer_instructions = '''
 Canonical migration source: .github/agents/prd-feature.agent.md
 Read the canonical source agent file first and follow it exactly.

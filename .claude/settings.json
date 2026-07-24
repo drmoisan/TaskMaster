@@ -155,6 +155,10 @@
           {
             "type": "command",
             "command": "pwsh -NoProfile -File .claude/hooks/enforce-completion-consistency.ps1"
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/enforce-discovery-artifact-gate.ps1"
           }
         ]
       },
@@ -191,6 +195,10 @@
           {
             "type": "command",
             "command": "pwsh -NoProfile -Command \"$input = $env:CLAUDE_HOOK_INPUT | ConvertFrom-Json; $output = $input.output; if (-not ($output -match '(plan-path|research-path|review-artifact|PREFLIGHT|evidence/)')) { Write-Error 'Subagent stopped without required completion artifact path'; exit 1 }; exit 0\""
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/validate-discovery-artifact-gate.ps1"
           }
         ]
       },

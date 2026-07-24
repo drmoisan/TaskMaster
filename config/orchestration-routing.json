@@ -4,6 +4,12 @@
   "routes": {
     "small": {
       "description": "Minor-audit path for work inside the applicable language budget.",
+      "codex_topology_requirement": {
+        "receipt_key": "codex_topology_receipts",
+        "required_execution_context": "standalone",
+        "required_route": "small",
+        "delegation_agent_source": "resolved_language_typed_engineer"
+      },
       "required_agents": [
         "atomic-planner",
         "atomic-executor",
@@ -38,9 +44,7 @@
       ],
       "required_skills": [
         "orchestrate",
-        "orchestrator-workflow",
         "feature-promotion-lifecycle",
-        "repo-automation-adapter",
         "atomic-plan-contract",
         "acceptance-criteria-tracking",
         "pr-context-artifacts",
@@ -73,8 +77,7 @@
       ]
     },
     "preparation": {
-      "description": "Epic preparation path: promotion, research, feature documents (spec.md, user-story.md), atomic planning, and atomic-executor preflight clearance only. Atomic execution, PR authoring, and CI monitoring are out of scope and are executed later by epic-orchestrator. Terminates at next_step S5_atomic_execution with no ci_gate/pr_gate evidence required.",
-      "requires_pr_gate": false,
+      "description": "Epic preparation path driven by epic-planner: promotion, research, feature documents, atomic planning, and preflight clearance only. Atomic execution, PR authoring, and CI monitoring are out of scope and deferred to the epic execution phase, so this route requires no CI gate at completion.",
       "requires_ci_gate": false,
       "required_agents": [
         "task-researcher",
@@ -185,6 +188,146 @@
   },
   "model_budget": {
     "description": "Session-level model budget. fable_policy is a three-way switch controlling whether the fable tier is disabled (removed and clamped to opus), available (used as-is), or preferred (applies the preferred_overlay).",
-    "fable_policy": "available"
+    "fable_policy": "preferred"
+  },
+  "codex_topology_policy": {
+    "description": "Codex-native production-file-count routing. This axis selects the initial implementation topology independently from C1-C4 model selection.",
+    "execution_contexts": [
+      "standalone",
+      "epic_preparation_child",
+      "epic_execution_child"
+    ],
+    "language_budgets": {
+      "python": {
+        "direct_mode_enabled": true,
+        "max_production_files": 3,
+        "max_test_files": 3,
+        "logical_agent": "python-typed-engineer"
+      },
+      "powershell": {
+        "direct_mode_enabled": true,
+        "max_production_files": 2,
+        "max_test_files": 3,
+        "logical_agent": "powershell-typed-engineer"
+      },
+      "csharp": {
+        "direct_mode_enabled": true,
+        "max_production_files": 3,
+        "max_test_files": 3,
+        "logical_agent": "csharp-typed-engineer"
+      },
+      "typescript": {
+        "direct_mode_enabled": false,
+        "max_production_files": 0,
+        "max_test_files": 0,
+        "logical_agent": "typescript-engineer"
+      }
+    },
+    "orchestrator_logical_agent": "orchestrator",
+    "epic_child_contexts": [
+      "epic_preparation_child",
+      "epic_execution_child"
+    ],
+      "forced_root_personas": [
+        "epic-planner",
+        "epic-orchestrator"
+      ],
+      "parallelism": {
+        "default_max_parallel_features": 4,
+        "hard_max_parallel_features": 8
+      },
+      "escalation_precedence": [
+      "epic_child_context",
+      "invalid_estimate",
+      "cross_language",
+      "unsupported_language",
+      "cross_cutting",
+        "direct_mode_disabled",
+        "production_budget_exceeded"
+    ],
+    "receipt_key": "codex_topology_receipts"
+  },
+  "codex_model_policy": {
+    "description": "Codex-native deployment profiles. Complexity selects model and reasoning independently from the file-count route; exact model slugs are mandatory and unavailable profiles do not fall back silently.",
+    "profile_order": [
+      "c1",
+      "c2",
+      "c3",
+      "c3-elevated",
+      "c4"
+    ],
+    "execution_contexts": [
+      "standalone",
+      "epic_preparation_child",
+      "epic_execution_child"
+    ],
+    "logical_agent_aliases": {
+      "feature-review": "feature-reviewer"
+    },
+    "complexity_to_profile": {
+      "C1": {
+        "suffix": "c1",
+        "model": "gpt-5.6-luna",
+        "model_reasoning_effort": "low"
+      },
+      "C2": {
+        "suffix": "c2",
+        "model": "gpt-5.6-terra",
+        "model_reasoning_effort": "medium"
+      },
+      "C3": {
+        "suffix": "c3",
+        "model": "gpt-5.6-terra",
+        "model_reasoning_effort": "high"
+      },
+      "C4": {
+        "suffix": "c4",
+        "model": "gpt-5.6-sol",
+        "model_reasoning_effort": "max"
+      }
+    },
+      "c3_elevated_profile": {
+      "suffix": "c3-elevated",
+      "model": "gpt-5.6-sol",
+      "model_reasoning_effort": "high",
+      "activation": {
+        "operator": "any",
+        "execution_contexts": [
+          "epic_execution_child",
+          "epic_preparation_child"
+        ],
+        "orchestration_complexity_ceiling": "C4"
+      }
+      },
+      "ceiling_transition_policy": {
+        "monotonic": true,
+        "receipt_key": "ceiling_transition",
+        "affected_delegation_ids_required_on_increase": true
+      },
+      "forced_personas": {
+      "epic-planner": {
+        "suffix": "",
+        "model": "gpt-5.6-sol",
+        "model_reasoning_effort": "ultra"
+      },
+      "epic-orchestrator": {
+        "suffix": "",
+        "model": "gpt-5.6-sol",
+        "model_reasoning_effort": "ultra"
+      }
+    },
+    "generated_agent_families": [
+      "orchestrator",
+      "atomic-planner",
+      "atomic-executor",
+      "feature-reviewer",
+      "task-researcher",
+      "prd-feature",
+      "pr-author",
+      "python-typed-engineer",
+      "powershell-typed-engineer",
+      "csharp-typed-engineer",
+      "typescript-engineer"
+    ]
   }
 }
