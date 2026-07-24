@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Web.WebView2.Core;
 using Moq;
 using QuickFiler.Viewers;
-using OperationEntry = System.Tuple<string, System.Threading.SynchronizationContext>;
+using OperationEntry = System.Tuple<string, int>;
 
 namespace QuickFiler.Test.Viewers
 {
@@ -19,57 +20,40 @@ namespace QuickFiler.Test.Viewers
     public sealed class BreadcrumbPopupControlDispatchTests
     {
         [TestMethod]
-        public async Task SurfaceFactory_WorkerCompletion_DispatchesEveryStageAndCleanup()
+        public void SurfaceFactory_WorkerCompletion_DispatchesEveryStageAndCleanup()
         {
             var fixture = new SurfaceFactoryFixture();
-            var initialization = NewCompletionSource();
-            var readiness = NewCompletionSource();
-            BreadcrumbPopupUiOperations operations = Operations(
-                fixture,
-                initialization.Task,
-                readiness.Task
-            );
-            var factory = Factory(operations);
-            Task<Tuple<Control, IWebViewMessenger, Task>> creating = Task.Run(() =>
-                factory(Uninitialized<CoreWebView2Environment>())
-            );
-            await Task.Run(() => initialization.SetResult(true)).ConfigureAwait(false);
-            Tuple<Control, IWebViewMessenger, Task> created = await creating.ConfigureAwait(false);
-            await Task.Run(() => readiness.SetResult(true)).ConfigureAwait(false);
-            await created.Item3.ConfigureAwait(false);
-            await operations
-                .DisposeSurfaceAsync(created.Item1, created.Item2)
-                .ConfigureAwait(false);
+            var initialization = fixture.Completion();
+            var readiness = fixture.Completion();
+            var operations = fixture.Operations(initialization.Task, readiness.Task);
+            var creating = Task.Run(() => fixture.CreateSurface(operations));
+            fixture.Drain(creating, 2);
+            fixture.CompleteOnWorker(initialization);
+            var created = fixture.Complete(creating);
+            fixture.CompleteOnWorker(readiness);
+            fixture.Drain(created.Item3);
+            fixture.Drain(operations.DisposeSurfaceAsync(created.Item1, created.Item2));
 
             fixture.Log.Names.Should().Equal("create", "initialize", "core", "navigate", "cleanup");
             fixture.Log.OffBoundary.Should().BeEmpty();
-            fixture.Context.PostCount.Should().Be(5);
+            fixture.PostCount.Should().Be(5);
             fixture.Errors.Should().BeEmpty();
             fixture.Control.DisposeCount.Should().Be(1);
             fixture.Messenger.DisposeCount.Should().Be(1);
         }
 
         [TestMethod]
-        public async Task SurfaceFactory_InitializationFailure_ReportsOnceAndCleansUp()
+        public void SurfaceFactory_InitializationFailure_ReportsOnceAndCleansUp()
         {
-            var initialization = NewCompletionSource();
             var failure = new InvalidOperationException("initialization failed");
             var cleanupFailure = new InvalidOperationException("cleanup failed");
-            var fixture = new SurfaceFactoryFixture(
-                new TrackingControl { DisposeFailure = cleanupFailure }
-            );
-            BreadcrumbPopupUiOperations operations = Operations(
-                fixture,
-                initialization.Task,
-                Task.CompletedTask
-            );
-            Task<Tuple<Control, IWebViewMessenger, Task>> creating = Factory(operations)(
-                Uninitialized<CoreWebView2Environment>()
-            );
+            var fixture = new SurfaceFactoryFixture(disposeFailure: cleanupFailure);
+            var initialization = fixture.Completion();
+            var operations = fixture.Operations(initialization.Task, Task.CompletedTask);
+            var creating = fixture.CreateSurface(operations);
+            fixture.Drain(creating, 2);
             initialization.SetException(failure);
-            InvalidOperationException thrown = await CaptureFailure<InvalidOperationException>(
-                creating
-            );
+            var thrown = fixture.Failure<InvalidOperationException>(creating);
 
             thrown.Should().BeSameAs(failure);
             fixture.Errors.Should().ContainSingle().Which.Should().BeSameAs(failure);
@@ -78,19 +62,17 @@ namespace QuickFiler.Test.Viewers
         }
 
         [TestMethod]
-        public async Task SurfaceFactory_NavigationActionFailure_ReportsOnceAndCleansUp()
+        public void SurfaceFactory_NavigationActionFailure_ReportsOnceAndCleansUp()
         {
             var fixture = new SurfaceFactoryFixture();
             var failure = new InvalidOperationException("navigation rejected");
-            BreadcrumbPopupUiOperations operations = Operations(
-                fixture,
+            var operations = fixture.Operations(
                 Task.CompletedTask,
                 Task.CompletedTask,
                 () => throw failure
             );
-            InvalidOperationException thrown = await CaptureFailure<InvalidOperationException>(
-                Factory(operations)(Uninitialized<CoreWebView2Environment>())
-            );
+            var creating = fixture.CreateSurface(operations);
+            var thrown = fixture.Failure<InvalidOperationException>(creating);
 
             thrown.Should().BeSameAs(failure);
             fixture.Errors.Should().ContainSingle().Which.Should().BeSameAs(failure);
@@ -99,27 +81,16 @@ namespace QuickFiler.Test.Viewers
         }
 
         [TestMethod]
-        public async Task SurfaceFactory_ReadinessFailure_ReportsOnceThenDisposesSurface()
+        public void SurfaceFactory_ReadinessFailure_ReportsOnceThenDisposesSurface()
         {
             var fixture = new SurfaceFactoryFixture();
-            var readiness = NewCompletionSource();
-            BreadcrumbPopupUiOperations operations = Operations(
-                fixture,
-                Task.CompletedTask,
-                readiness.Task
-            );
-            Tuple<Control, IWebViewMessenger, Task> created = await Factory(operations)(
-                Uninitialized<CoreWebView2Environment>()
-            )
-                .ConfigureAwait(false);
+            var readiness = fixture.Completion();
+            var operations = fixture.Operations(Task.CompletedTask, readiness.Task);
+            var created = fixture.Complete(fixture.CreateSurface(operations));
             var failure = new InvalidOperationException("readiness failed");
             readiness.SetException(failure);
-            InvalidOperationException thrown = await CaptureFailure<InvalidOperationException>(
-                created.Item3
-            );
-            await operations
-                .DisposeSurfaceAsync(created.Item1, created.Item2)
-                .ConfigureAwait(false);
+            var thrown = fixture.Failure<InvalidOperationException>(created.Item3);
+            fixture.Drain(operations.DisposeSurfaceAsync(created.Item1, created.Item2));
 
             thrown.Should().BeSameAs(failure);
             fixture.Errors.Should().ContainSingle().Which.Should().BeSameAs(failure);
@@ -130,99 +101,89 @@ namespace QuickFiler.Test.Viewers
         [TestMethod]
         public void Readiness_DisposeFromAmbientNullWorker_DispatchesHandlerDetachment()
         {
-            var context = new RecordingSynchronizationContext();
-            var errors = new ConcurrentQueue<Exception>();
-            var log = new OperationRecorder(context);
-            var dispatcher = new BreadcrumbUiDispatcher(context, errors.Enqueue);
-            BreadcrumbNavigationReadiness readiness =
-                BreadcrumbPopupUiOperations.CreateDispatchedReadiness(
-                    dispatcher,
-                    "Popup",
-                    () => log.Record("detach")
-                );
-            Task.Run(() =>
-                {
-                    SynchronizationContext.SetSynchronizationContext(null);
-                    readiness.Dispose();
-                })
-                .GetAwaiter()
-                .GetResult();
+            var fixture = new SurfaceFactoryFixture();
+            var dispatcher = new BreadcrumbUiDispatcher(fixture, fixture.Errors.Enqueue);
+            var readiness = BreadcrumbPopupUiOperations.CreateDispatchedReadiness(
+                dispatcher,
+                "Popup",
+                () => fixture.Log.Record("detach")
+            );
+            var disposing = Task.Run(() =>
+            {
+                SynchronizationContext.SetSynchronizationContext(null);
+                readiness.Dispose();
+            });
+            fixture.Drain(disposing);
 
-            log.Names.Should().Equal("detach");
-            log.OffBoundary.Should().BeEmpty();
-            context.PostCount.Should().Be(1);
-            errors.Should().BeEmpty();
+            fixture.Log.Names.Should().Equal("detach");
+            fixture.Log.OffBoundary.Should().BeEmpty();
+            fixture.PostCount.Should().Be(1);
+            fixture.Errors.Should().BeEmpty();
         }
 
         [TestMethod]
         public void Readiness_DetachSchedulingFailure_ReportsOnceWithoutDirectDetach()
         {
             var failure = new InvalidOperationException("detach scheduling failed");
-            var context = new RecordingSynchronizationContext(failure);
-            var errors = new ConcurrentQueue<Exception>();
-            var dispatcher = new BreadcrumbUiDispatcher(context, errors.Enqueue);
+            var fixture = new SurfaceFactoryFixture(postFailure: failure);
+            var dispatcher = new BreadcrumbUiDispatcher(fixture, fixture.Errors.Enqueue);
             int detachCount = 0;
-            BreadcrumbNavigationReadiness readiness =
-                BreadcrumbPopupUiOperations.CreateDispatchedReadiness(
-                    dispatcher,
-                    "Popup",
-                    () => detachCount++
-                );
+            var readiness = BreadcrumbPopupUiOperations.CreateDispatchedReadiness(
+                dispatcher,
+                "Popup",
+                () => detachCount++
+            );
             readiness.Dispose();
+            fixture.Drain();
 
-            context.PostCount.Should().Be(1);
+            fixture.PostCount.Should().Be(1);
             detachCount.Should().Be(0);
-            errors.Should().ContainSingle().Which.Should().BeSameAs(failure);
+            fixture.Errors.Should().ContainSingle().Which.Should().BeSameAs(failure);
         }
 
         [TestMethod]
-        public async Task DisposeSurfaceAsync_MessengerFailure_StillDisposesControlAndReportsOnce()
+        public void DisposeSurfaceAsync_MessengerFailure_StillDisposesControlAndReportsOnce()
         {
-            var context = new RecordingSynchronizationContext();
-            var errors = new ConcurrentQueue<Exception>();
-            var dispatcher = new BreadcrumbUiDispatcher(context, errors.Enqueue);
-            var operations = new BreadcrumbPopupUiOperations(dispatcher);
-            var control = new TrackingControl();
+            var fixture = new SurfaceFactoryFixture();
+            var operations = fixture.Operations();
             var failure = new InvalidOperationException("messenger dispose failed");
-            var messenger = new TrackingMessenger { DisposeFailure = failure };
-            InvalidOperationException thrown = await CaptureFailure<InvalidOperationException>(
-                operations.DisposeSurfaceAsync(control, messenger)
+            fixture.Messenger.DisposeFailure = failure;
+            var thrown = fixture.Failure<InvalidOperationException>(
+                operations.DisposeSurfaceAsync(fixture.Control, fixture.Messenger)
             );
 
             thrown.Should().BeSameAs(failure);
-            messenger.DisposeCount.Should().Be(1);
-            control.DisposeCount.Should().Be(1);
-            errors.Should().ContainSingle().Which.Should().BeSameAs(failure);
+            fixture.Messenger.DisposeCount.Should().Be(1);
+            fixture.Control.DisposeCount.Should().Be(1);
+            fixture.Errors.Should().ContainSingle().Which.Should().BeSameAs(failure);
         }
 
         [TestMethod]
-        public Task CreateAndInstall_CancellationCleanupFailure_RetriesOnlyFailedResource() =>
-            VerifyCreateAndInstallCleanupAsync(cancellationWins: true);
+        public void CreateAndInstall_CancellationCleanupFailure_RetriesOnlyFailedResource() =>
+            new SurfaceFactoryFixture().VerifyCreateAndInstallCleanup(cancellationWins: true);
 
         [TestMethod]
-        public Task CreateAndInstall_StaleHostCleanup_DoesNotDisposeOwnedControlDirectly() =>
-            VerifyCreateAndInstallCleanupAsync(cancellationWins: false);
+        public void CreateAndInstall_StaleHostCleanup_DoesNotDisposeOwnedControlDirectly() =>
+            new SurfaceFactoryFixture().VerifyCreateAndInstallCleanup(cancellationWins: false);
 
         [TestMethod]
         public void DirectAdapters_CreateGuardAndReportThroughOwnedBoundary()
         {
-            var errors = new ConcurrentQueue<Exception>();
-            var operations = new BreadcrumbPopupUiOperations(
-                new BreadcrumbUiDispatcher(new RecordingSynchronizationContext(), errors.Enqueue)
-            );
+            var fixture = new SurfaceFactoryFixture();
+            var operations = fixture.Operations();
             var failure = new InvalidOperationException("reported");
             BreadcrumbPopupUiOperations.CreateForCurrentThreadTests().Should().NotBeNull();
             Action normalize = () => BreadcrumbPopupUiOperations.NormalizeFactory(null);
             normalize.Should().Throw<ArgumentNullException>().WithParameterName("factory");
             operations.Report(failure);
-            errors.Should().ContainSingle().Which.Should().BeSameAs(failure);
+            fixture.Errors.Should().ContainSingle().Which.Should().BeSameAs(failure);
         }
 
         [DataTestMethod]
         [DataRow(0)]
         [DataRow(1)]
         [DataRow(2)]
-        public async Task SurfaceFactory_InvalidNavigationResult_ReportsOnceAndCleansUp(int kind)
+        public void SurfaceFactory_InvalidNavigationResult_ReportsOnceAndCleansUp(int kind)
         {
             var fixture = new SurfaceFactoryFixture();
             Func<Tuple<IWebViewMessenger, Task>> navigation = () =>
@@ -232,170 +193,240 @@ namespace QuickFiler.Test.Viewers
                         kind == 1 ? null : fixture.Messenger,
                         kind == 2 ? null : Task.CompletedTask
                     );
-            BreadcrumbPopupUiOperations operations = Operations(
-                fixture,
-                Task.CompletedTask,
-                Task.CompletedTask,
-                navigation
-            );
-            InvalidOperationException thrown = await CaptureFailure<InvalidOperationException>(
-                Factory(operations)(Uninitialized<CoreWebView2Environment>())
+            var operations = fixture.Operations(Task.CompletedTask, Task.CompletedTask, navigation);
+            var thrown = fixture.Failure<InvalidOperationException>(
+                fixture.CreateSurface(operations)
             );
             fixture.Errors.Should().ContainSingle().Which.Should().BeSameAs(thrown);
             fixture.Control.DisposeCount.Should().Be(1);
             fixture.Messenger.DisposeCount.Should().Be(kind == 2 ? 1 : 0);
         }
 
-        private static BreadcrumbPopupUiOperations Operations(
-            SurfaceFactoryFixture fixture,
-            Task initialization,
-            Task readiness,
-            Func<Tuple<IWebViewMessenger, Task>> navigation = null
-        ) =>
-            new BreadcrumbPopupUiOperations(
-                new BreadcrumbUiDispatcher(fixture.Context, fixture.Errors.Enqueue),
-                () => fixture.Log.Record("create", fixture.Control),
-                (initializer, value, environment) =>
-                    fixture.Log.Record("initialize", initialization),
-                value => fixture.Log.Record<CoreWebView2>("core", null),
-                (core, value, html) =>
-                {
-                    fixture.Log.Record("navigate");
-                    return navigation == null
-                        ? Tuple.Create<IWebViewMessenger, Task>(fixture.Messenger, readiness)
-                        : navigation();
-                },
-                (value, surfaceMessenger) =>
-                {
-                    fixture.Log.Record("cleanup");
-                    try
-                    {
-                        (surfaceMessenger as IDisposable)?.Dispose();
-                    }
-                    finally
-                    {
-                        value?.Dispose();
-                    }
-                }
-            );
-
-        private sealed class SurfaceFactoryFixture
+        private sealed class SurfaceFactoryFixture : SynchronizationContext
         {
+            private readonly Queue<Tuple<SendOrPostCallback, object>> _pending =
+                new Queue<Tuple<SendOrPostCallback, object>>();
+            private readonly Exception _postFailure;
+            private int _postCount;
+
             internal SurfaceFactoryFixture(
-                TrackingControl control = null,
-                TrackingMessenger messenger = null
+                Exception postFailure = null,
+                Exception disposeFailure = null
             )
             {
-                Control = control ?? new TrackingControl();
-                Messenger = messenger ?? new TrackingMessenger();
-                Log = new OperationRecorder(Context);
+                _postFailure = postFailure;
+                CreatorThreadId = Environment.CurrentManagedThreadId;
+                Log = new OperationRecorder(CreatorThreadId);
+                Control = Invoke(() => new TrackingControl { DisposeFailure = disposeFailure });
+                WebEnvironment = (CoreWebView2Environment)
+                    FormatterServices.GetUninitializedObject(typeof(CoreWebView2Environment));
             }
 
-            internal RecordingSynchronizationContext Context { get; } =
-                new RecordingSynchronizationContext();
             internal ConcurrentQueue<Exception> Errors { get; } = new ConcurrentQueue<Exception>();
             internal OperationRecorder Log { get; }
             internal TrackingControl Control { get; }
-            internal TrackingMessenger Messenger { get; }
-        }
+            internal TrackingMessenger Messenger { get; } = new TrackingMessenger();
+            internal CoreWebView2Environment WebEnvironment { get; }
+            internal int PostCount => Volatile.Read(ref _postCount);
+            internal int CreatorThreadId { get; }
 
-        private static Func<
-            CoreWebView2Environment,
-            Task<Tuple<Control, IWebViewMessenger, Task>>
-        > Factory(BreadcrumbPopupUiOperations operations) =>
-            BreadcrumbWebViewSurfaceFactory.Create(
-                new Mock<IWebViewCoreInitializer>(MockBehavior.Strict).Object,
-                "<html></html>",
-                operations
-            );
-
-        private static async Task VerifyCreateAndInstallCleanupAsync(bool cancellationWins)
-        {
-            var errors = new ConcurrentQueue<Exception>();
-            var operations = new BreadcrumbPopupUiOperations(
-                new BreadcrumbUiDispatcher(new RecordingSynchronizationContext(), errors.Enqueue)
-            );
-            var failure = new InvalidOperationException("cleanup failed");
-            var control = new TrackingControl { SuppressBaseDisposal = !cancellationWins };
-            var messenger = new TrackingMessenger
+            public override void Post(SendOrPostCallback callback, object state)
             {
-                DisposeFailure = cancellationWins ? failure : null,
-                FailOnlyFirstDispose = true,
-            };
-            var ready = Tuple.Create<Control, IWebViewMessenger, Task>(
-                control,
-                messenger,
-                cancellationWins ? NewCompletionSource().Task : Task.CompletedTask
-            );
-            int currentChecks = 0;
-            using (var dropDown = new ToolStripDropDown())
-            {
-                Task<Tuple<ToolStripControlHost, Control, IWebViewMessenger>> opening =
-                    operations.CreateAndInstallSurfaceAsync(
-                        environment => Task.FromResult(ready),
-                        Uninitialized<CoreWebView2Environment>(),
-                        dropDown,
-                        () => cancellationWins || ++currentChecks == 1,
-                        cancellationWins ? Task.CompletedTask : NewCompletionSource().Task
-                    );
-                InvalidOperationException thrown = null;
-                Tuple<ToolStripControlHost, Control, IWebViewMessenger> installed = null;
-                if (cancellationWins)
-                    thrown = await CaptureFailure<InvalidOperationException>(opening);
-                else
-                    installed = await opening.ConfigureAwait(false);
-                int controlDisposals = control.DisposeCount;
-                control.SuppressBaseDisposal = false;
-                if (!control.IsDisposed)
-                    control.Dispose();
+                Interlocked.Increment(ref _postCount);
+                if (_postFailure != null)
+                    throw _postFailure;
+                lock (_pending)
+                    _pending.Enqueue(Tuple.Create(callback, state));
+                Signal();
+            }
 
-                if (cancellationWins)
+            internal void Drain(Task operation = null, int workLimit = int.MaxValue)
+            {
+                EnsureCreatorThread();
+                if (operation != null && !operation.IsCompleted)
+                    operation.ConfigureAwait(false).GetAwaiter().OnCompleted(Signal);
+                int drained = 0;
+                while (drained < workLimit)
                 {
-                    thrown.Should().BeSameAs(failure);
-                    errors.Should().ContainSingle().Which.Should().BeSameAs(failure);
+                    Tuple<SendOrPostCallback, object> work = null;
+                    lock (_pending)
+                    {
+                        if (_pending.Count != 0)
+                            work = _pending.Dequeue();
+                        else if (operation == null || operation.IsCompleted)
+                            break;
+                        else
+                        {
+                            Monitor.Wait(_pending);
+                            continue;
+                        }
+                    }
+                    Invoke(() =>
+                    {
+                        work.Item1(work.Item2);
+                        return true;
+                    });
+                    drained++;
                 }
-                else
+                if (operation != null && workLimit == int.MaxValue)
+                    operation.GetAwaiter().GetResult();
+            }
+
+            internal T Invoke<T>(Func<T> action)
+            {
+                EnsureCreatorThread();
+                SynchronizationContext previous = Current;
+                try
                 {
-                    installed.Should().BeNull();
-                    errors.Should().BeEmpty();
+                    SetSynchronizationContext(this);
+                    return action();
                 }
-                dropDown.Items.Count.Should().Be(0);
-                currentChecks.Should().Be(cancellationWins ? 0 : 2);
-                controlDisposals.Should().Be(1);
-                messenger.DisposeCount.Should().Be(cancellationWins ? 2 : 1);
+                finally
+                {
+                    SetSynchronizationContext(previous);
+                }
+            }
+
+            internal TaskCompletionSource<bool> Completion() =>
+                new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+            internal void CompleteOnWorker(TaskCompletionSource<bool> completion) =>
+                Task.Run(() => completion.SetResult(true)).GetAwaiter().GetResult();
+
+            internal BreadcrumbPopupUiOperations Operations() =>
+                new BreadcrumbPopupUiOperations(new BreadcrumbUiDispatcher(this, Errors.Enqueue));
+
+            internal BreadcrumbPopupUiOperations Operations(
+                Task initialization,
+                Task readiness,
+                Func<Tuple<IWebViewMessenger, Task>> navigation = null
+            ) =>
+                new BreadcrumbPopupUiOperations(
+                    new BreadcrumbUiDispatcher(this, Errors.Enqueue),
+                    () => Log.Record("create", Control),
+                    (initializer, value, environment) => Log.Record("initialize", initialization),
+                    value => Log.Record<CoreWebView2>("core", null),
+                    (core, value, html) =>
+                    {
+                        Log.Record("navigate");
+                        return navigation == null
+                            ? Tuple.Create<IWebViewMessenger, Task>(Messenger, readiness)
+                            : navigation();
+                    },
+                    (value, surfaceMessenger) =>
+                    {
+                        Log.Record("cleanup");
+                        try
+                        {
+                            (surfaceMessenger as IDisposable)?.Dispose();
+                        }
+                        finally
+                        {
+                            value?.Dispose();
+                        }
+                    }
+                );
+
+            internal Task<Tuple<Control, IWebViewMessenger, Task>> CreateSurface(
+                BreadcrumbPopupUiOperations operations
+            ) =>
+                BreadcrumbWebViewSurfaceFactory.Create(
+                    new Mock<IWebViewCoreInitializer>(MockBehavior.Strict).Object,
+                    "<html></html>",
+                    operations
+                )(WebEnvironment);
+
+            internal T Complete<T>(Task<T> operation)
+            {
+                Drain(operation);
+                return operation.GetAwaiter().GetResult();
+            }
+
+            internal TException Failure<TException>(Task operation)
+                where TException : Exception
+            {
+                Action action = () => Drain(operation);
+                return action.Should().Throw<TException>().Which;
+            }
+
+            internal void VerifyCreateAndInstallCleanup(bool cancellationWins)
+            {
+                BreadcrumbPopupUiOperations operations = Operations();
+                var failure = new InvalidOperationException("cleanup failed");
+                Control.SuppressBaseDisposal = !cancellationWins;
+                Messenger.DisposeFailure = cancellationWins ? failure : null;
+                Messenger.FailOnlyFirstDispose = true;
+                var ready = Tuple.Create<Control, IWebViewMessenger, Task>(
+                    Control,
+                    Messenger,
+                    cancellationWins ? Completion().Task : Task.CompletedTask
+                );
+                int currentChecks = 0;
+                using (var dropDown = Invoke(() => new ToolStripDropDown()))
+                {
+                    Task<Tuple<ToolStripControlHost, Control, IWebViewMessenger>> opening =
+                        operations.CreateAndInstallSurfaceAsync(
+                            environment => Task.FromResult(ready),
+                            WebEnvironment,
+                            dropDown,
+                            () => cancellationWins || ++currentChecks == 1,
+                            cancellationWins ? Task.CompletedTask : Completion().Task
+                        );
+                    InvalidOperationException thrown = null;
+                    Tuple<ToolStripControlHost, Control, IWebViewMessenger> installed = null;
+                    if (cancellationWins)
+                        thrown = Failure<InvalidOperationException>(opening);
+                    else
+                        installed = Complete(opening);
+                    int controlDisposals = Control.DisposeCount;
+                    Control.SuppressBaseDisposal = false;
+                    if (!Control.IsDisposed)
+                        Control.Dispose();
+                    if (cancellationWins)
+                    {
+                        thrown.Should().BeSameAs(failure);
+                        Errors.Should().ContainSingle().Which.Should().BeSameAs(failure);
+                    }
+                    else
+                    {
+                        installed.Should().BeNull();
+                        Errors.Should().BeEmpty();
+                    }
+                    dropDown.Items.Count.Should().Be(0);
+                    currentChecks.Should().Be(cancellationWins ? 0 : 2);
+                    controlDisposals.Should().Be(1);
+                    Messenger.DisposeCount.Should().Be(cancellationWins ? 2 : 1);
+                }
+            }
+
+            private void Signal()
+            {
+                lock (_pending)
+                    Monitor.PulseAll(_pending);
+            }
+
+            private void EnsureCreatorThread()
+            {
+                if (Environment.CurrentManagedThreadId != CreatorThreadId)
+                    throw new InvalidOperationException("Only the creator thread may drain.");
             }
         }
-
-        private static async Task<TException> CaptureFailure<TException>(Task operation)
-            where TException : Exception
-        {
-            Func<Task> action = () => operation;
-            return (await action.Should().ThrowAsync<TException>()).Which;
-        }
-
-        private static T Uninitialized<T>()
-            where T : class => (T)FormatterServices.GetUninitializedObject(typeof(T));
-
-        private static TaskCompletionSource<bool> NewCompletionSource() =>
-            new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         private sealed class OperationRecorder
         {
-            private readonly object _sync = new object();
-            private readonly SynchronizationContext _expected;
-            private readonly List<OperationEntry> _values = new List<OperationEntry>();
+            private readonly int _expectedThreadId;
+            private readonly ConcurrentQueue<OperationEntry> _values =
+                new ConcurrentQueue<OperationEntry>();
 
-            internal OperationRecorder(SynchronizationContext expected) => _expected = expected;
+            internal OperationRecorder(int expectedThreadId) =>
+                _expectedThreadId = expectedThreadId;
 
             internal IReadOnlyList<string> Names => ReadNames(value => true);
             internal IReadOnlyList<string> OffBoundary =>
-                ReadNames(value => !ReferenceEquals(value.Item2, _expected));
+                ReadNames(value => value.Item2 != _expectedThreadId);
 
-            internal void Record(string name)
-            {
-                lock (_sync)
-                    _values.Add(Tuple.Create(name, SynchronizationContext.Current));
-            }
+            internal void Record(string name) =>
+                _values.Enqueue(Tuple.Create(name, Environment.CurrentManagedThreadId));
 
             internal T Record<T>(string name, T value)
             {
@@ -403,11 +434,8 @@ namespace QuickFiler.Test.Viewers
                 return value;
             }
 
-            private IReadOnlyList<string> ReadNames(Predicate<OperationEntry> predicate)
-            {
-                lock (_sync)
-                    return _values.FindAll(predicate).ConvertAll(value => value.Item1);
-            }
+            private IReadOnlyList<string> ReadNames(Func<OperationEntry, bool> predicate) =>
+                _values.Where(predicate).Select(value => value.Item1).ToArray();
         }
 
         private sealed class TrackingControl : Panel
@@ -446,33 +474,6 @@ namespace QuickFiler.Test.Viewers
                 DisposeCount++;
                 if (DisposeFailure != null && (!FailOnlyFirstDispose || DisposeCount == 1))
                     throw DisposeFailure;
-            }
-        }
-
-        private sealed class RecordingSynchronizationContext : SynchronizationContext
-        {
-            private readonly Exception _postFailure;
-
-            internal RecordingSynchronizationContext(Exception postFailure = null) =>
-                _postFailure = postFailure;
-
-            internal int PostCount { get; private set; }
-
-            public override void Post(SendOrPostCallback callback, object state)
-            {
-                PostCount++;
-                if (_postFailure != null)
-                    throw _postFailure;
-                SynchronizationContext previous = Current;
-                try
-                {
-                    SetSynchronizationContext(this);
-                    callback(state);
-                }
-                finally
-                {
-                    SetSynchronizationContext(previous);
-                }
             }
         }
     }
