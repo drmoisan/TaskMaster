@@ -48,7 +48,23 @@ Use as needed:
 - Every required delegated specialist must exist as a native Codex agent under `.codex/agents/`. If a required agent file is missing, set `blocked_reason` to `spawn_agent_unavailable` and stop.
 - Required delegated steps MUST delegate or stop execution.
 - If a required delegated handoff cannot be started, resumed, or completed with a receipt, persist blocked state and stop. Do not perform that step directly.
-- Direct local execution is allowed only for workflow steps that are not designated below as required delegated handoffs.
+- Direct local implementation is prohibited. Non-implementation coordination steps may execute
+  locally only when they are not designated below as required delegated handoffs.
+
+### Root-only epic boundary
+
+This workflow handles one feature or bug. It must never delegate to `epic-planner` or
+`epic-orchestrator`. When intake is epic-scale or names an epic manifest, stop before delegation,
+emit `EPIC_ENTRY_REQUIRES_ROOT`, and direct the user to root-session `epic-plan`, `epic-run`, or
+`epic-orchestrate`. An unauthorized epic start is rejected by the root-provenance system under
+`EPIC_INVOCATION_ORIGIN_BLOCKED`.
+
+### Epic preparation child
+
+The literal marker `Preparation mode: true` selects `route_id: preparation`. Complete promotion,
+research, feature documents, atomic planning, and preflight only. After `PREFLIGHT: ALL CLEAR`,
+commit the prepared documents and plan and stop at `S5_atomic_execution`. Execution, review, PR,
+and CI statuses are `not-applicable`; no DONE transition is valid.
 
 ## Checkpoint Contract
 
@@ -191,6 +207,7 @@ Required-delegation step map:
 - small path:
   - Step 5 -> `atomic-planner`
   - Step 6 -> `atomic-executor`
+  - implementation delivery -> language-resolved generated typed-engineer profile
   - Step 9 -> `atomic-executor`
   - Step 10 -> `feature-reviewer`
 - large path:
@@ -245,6 +262,11 @@ If an exact signal or required path field is missing, set the relevant step to `
 7. Select `route_id` from `config/orchestration-routing.json` and persist the
    exact required agent, skill, and MCP lists from the matrix before starting
    lifecycle automation.
+8. Keep topology routing separate from C1-C4 model routing. Persist both topology and
+   model-routing receipts and select the exact generated Codex deployment agent before every
+   delegation.
+9. Use Terra/High for standalone ceiling-C3 work. Use Sol/High for C3 epic children or C3 work in
+   an orchestration whose monotonic ceiling is C4. Do not infer this overlay from file count.
 
 ## Small Path
 
@@ -278,8 +300,17 @@ Required behavior:
    - If the handoff cannot be started or does not return a receipt, set `step6_status` to `blocked`, set `blocked_reason`, and stop
 8. If and only if the initial user request explicitly opted into manual orchestration from the beginning, persist the resume checkpoint and stop after Phase 0.
    - Otherwise manual bootstrap is prohibited; continue automated execution.
-9. Otherwise continue with constrained implementation:
-   - steps that are not modeled as required delegated handoffs may execute directly while staying within the approved plan and applicable repo policy
+9. Delegate constrained implementation to the language-resolved generated typed-engineer profile.
+   - Python -> `python-typed-engineer-<profile>`
+   - PowerShell -> `powershell-typed-engineer-<profile>`
+   - C# -> `csharp-typed-engineer-<profile>`
+   - TypeScript has no canonical small-path budget and therefore routes to the large path
+   - `<profile>` comes from the persisted C1-C4 routing receipt and never from file count
+   - pass the approved plan, exact file budget, feature folder, and Phase 0 baseline evidence
+   - require implementation and QA result fields appropriate to the language policy
+   - record topology, model-routing, and delegation receipts before continuing
+   - if no typed-engineer family exists for the dominant language, fail closed to large-path
+     root deployment instead of implementing locally
 10. Validate the delivered work against `${feature-folder}/issue.md` and persist plan or acceptance-criteria checkoffs before review.
    - MUST delegate to `atomic-executor` for validation and checklist updates
    - Record a delegation receipt and set `step9_status` to `verified` before continuing
@@ -370,6 +401,8 @@ Do not claim mission completion until all of the following are true:
 
 - the selected path completed end to end
 - all required delegations completed with receipts
+- small-path implementation has a receipt from the exact language-specific generated
+  typed-engineer deployment profile
 - all required skills have `skill_receipts` with evidence
 - all required MCP tools have successful `mcp_call_receipts`
 - no local execution override or delegation bypass is recorded
@@ -387,7 +420,7 @@ Do not claim mission completion until all of the following are true:
 - any required remediation artifacts exist on disk and the latest re-review is clean
 - any required remediation loop run also includes a remediation execution receipt, a remediation commit receipt, and a final `REVIEW_STATUS: PASS`
 - validator-backed checks for the approved plan, policy audit, code review, feature audit, and checkpoint state pass
-- the canonical checkpoint passes `validate_orchestration_artifacts` with `artifact_type: "orchestrator-state"` and `require_complete: true`
+- the canonical checkpoint passes `validate_orchestration_artifacts` with `artifact_type: "orchestrator-state"`, `require_complete: true`, `require_codex_topology: true`, and `require_codex_model_routing: true`
 - required GitHub checks pass for the current PR head SHA before PR/DONE completion
 
 ## Hard Constraints
@@ -409,6 +442,8 @@ Do not claim mission completion until all of the following are true:
 - Do not persist placeholder lifecycle values such as `NONE` or `TBD` for `${relativeFile}`, `${issue-num}`, `${feature-folder}`, or `${plan-path}` once lifecycle setup begins.
 - Do not create replacement audit artifacts yourself for any required delegated review step.
 - Do not execute required delegated steps locally as a fallback.
+- Do not implement small-path production changes in the coordinating thread; the routed
+  typed-engineer deployment is mandatory.
 - Do not accept stale PR-context artifacts, unsupported checklist checkoffs, or missing required evidence as PASS outcomes.
 - Do not treat Codex lifecycle hooks as the hard completion boundary; use deterministic validator and CI gates for completion enforcement.
 - Do not claim completion without reporting the checkpoint path and the created or updated artifact paths.

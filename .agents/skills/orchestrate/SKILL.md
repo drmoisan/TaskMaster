@@ -1,23 +1,24 @@
 ---
 name: orchestrate
 description: Route a repository request through the deterministic orchestration workflow for feature, bug, research, planning, execution, and review handoffs.
-argument-hint: "[objective]"
 ---
 
 # Orchestrate Skill
 
-This skill frames work for the already-active main session, which serves as the orchestrator runtime for end-to-end feature or bug delivery.
+This skill frames root-session intake and deterministic deployment for end-to-end feature or bug delivery.
 
 ## Entry-Point Contract
 
-The already-active main session is the canonical orchestrator runtime for this
-skill. Optional orchestrator profiles, agent configuration files, or named
-profiles are configuration aids only; they do not replace the active
-main-session orchestration contract.
+The root session owns the read-only intake, production-file budget estimate, route selection,
+and deployment decision. Work inside the applicable language budget remains a single-feature
+small route, but implementation is delegated to the complexity-specific typed-engineer profile.
+Over-budget, cross-cutting, mixed-language, or unsupported standalone work is deployed to the
+complexity-specific `orchestrator-<profile>` agent, which owns checkpoint updates, lifecycle
+sequencing, specialist delegation, and completion gating. Epic planning and execution use only
+the forced `epic-planner` and `epic-orchestrator` personas through their root skills.
 
-The main session owns route selection, checkpoint updates, lifecycle sequencing,
-delegation decisions, and completion gating unless a required workflow step is
-explicitly delegated by this skill or by `orchestrator-workflow`.
+Agent profile selection is operational, not advisory. Do not execute a large standalone route in
+the root thread and do not implement a small route in the coordinating thread.
 
 ## Prerequisites
 
@@ -37,6 +38,79 @@ On every invocation, the main session must:
 4. Read `config/orchestration-routing.json` before route selection and copy the
    selected route's required agents, skills, and MCP tools into checkpoint
    state.
+
+## Epic Entry Boundary
+
+This standalone workflow must not invoke `epic-planner` or `epic-orchestrator`. If intake names
+an epic manifest, requests epic planning, or requires multi-feature epic execution, stop before
+delegation and report exactly `EPIC_ENTRY_REQUIRES_ROOT`. Direct the user to root-session
+`epic-plan`, `epic-run`, or `epic-orchestrate` as appropriate. Both epic personas delegate to
+ordinary orchestrators; permitting an orchestrator-originated epic invocation would create an
+invalid recursive delegation chain. The Codex root-provenance hooks enforce the stronger
+root-only policy and use `EPIC_INVOCATION_ORIGIN_BLOCKED` for unauthorized starts.
+
+## Axis 1 Deployment Topology
+
+Apply the deterministic production-file axis before model selection:
+
+- Inside the applicable language budget: use the small route and delegate implementation to
+  `python-typed-engineer-<profile>`, `powershell-typed-engineer-<profile>`,
+  or `csharp-typed-engineer-<profile>`. The typed-engineer delegation and result must have a
+  receipt. TypeScript has no canonical direct-mode budget, so standalone TypeScript work fails
+  closed to the large orchestrator topology.
+- Outside the applicable budget, cross-cutting, mixed-language, or unsupported: deploy
+  `orchestrator-<profile>` and let that agent run the large path.
+- Epic planning: deploy the forced `epic-planner` Sol/Ultra persona.
+- Prepared or manual epic execution: deploy the forced `epic-orchestrator` Sol/Ultra persona.
+
+Only the production-file limit selects inside versus outside the language topology budget. The
+test-file estimate remains in the receipt and governs typed-engineer batching; it does not change
+the selected topology. The `<profile>` is produced by the independent C1-C4 resolver after the
+topology is known. File count does not choose a model, and complexity does not change the
+small/large result.
+Persist the deterministic topology resolver output in `codex_topology_receipts[]` before running
+the model resolver or spawning the selected logical agent.
+
+## Preparation Mode
+
+A parent prompt containing the literal marker `Preparation mode: true` selects only
+`route_id: preparation`. This route is the planning phase of `epic-plan`, not a reduced execution
+route.
+
+- Copy the exact required agents, skills, and MCP tools from the central `preparation` route.
+- Perform promotion through the MCP surface, research, `spec.md`, `user-story.md`, atomic
+  planning, and atomic-executor preflight only.
+- Iterate revisions against the same plan path until `PREFLIGHT: ALL CLEAR`.
+- Commit the prepared feature folder and approved plan to the worktree branch.
+- Stop with `completed_steps` containing `S3_promotion` and `S4_atomic_planning`,
+  `next_step: "S5_atomic_execution"`, all execution-through-CI step statuses exactly
+  `not-applicable`, and `blocked_reason: "none"`.
+- Do not edit production code, execute the plan, author or edit a PR, run feature review, monitor
+  CI, set `next_step: "complete"`, record `S12_complete`, or claim feature completion.
+
+Only the literal JSON Boolean `false` in the route configuration disables the CI requirement.
+Missing, malformed, string-valued, or unknown route data fails closed. The preparation mutation
+hook is a deterrent; the MCP completion validator is authoritative.
+
+## Codex Model Deployment
+
+The deterministic size route selects topology. The independent C1-C4 assessment selects the
+checked-in Codex deployment agent. Before every delegation:
+
+1. Resolve and persist the topology receipt from languages, file counts, context, and route
+   markers before selecting the logical agent.
+2. Record the phase assessment, deterministic floor, signals, rationale, execution context, and
+   monotonic orchestration complexity ceiling.
+3. Resolve and persist the provider-aware model-routing receipt with logical and deployment agents,
+   model, reasoning effort, and C3 overlay fields.
+4. Spawn the exact deployment agent recorded in the receipts.
+5. Require the `SubagentStart` model attestation to match the receipt before accepting mutation
+   or completion.
+
+C3 defaults to Terra/High when it is the standalone orchestration ceiling. It elevates to
+Sol/High only for epic preparation/execution children or when a C4 sibling sets the ceiling to
+C4. If the required model/profile is unavailable, record `model_unavailable` and stop without a
+silent fallback.
 
 ## Read-Only Intake and Route Selection Gate
 
@@ -222,6 +296,12 @@ After reading `artifacts/orchestration/orchestrator-state.json`, the main sessio
 - `commit-steward` — writes commit messages from commit-context artifacts
 
 The orchestrator does not perform deep implementation itself. It coordinates, tracks state, and enforces completion.
+
+For a small route, resolve the language-specific generated typed-engineer deployment profile,
+delegate all implementation and changed-scope QA to that agent, and persist its routing and
+delegation receipts. Direct coordinating-thread implementation is prohibited. For a large route,
+the root session must deploy the generated `orchestrator-<profile>` before this delegation model
+is applied.
 
 Every worker listed above must exist as a native Codex agent under `.codex/agents/`.
 For required delegated steps, missing agent configuration, failed spawn, missing

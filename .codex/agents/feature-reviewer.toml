@@ -1,5 +1,7 @@
 name = "feature-reviewer"
 description = "Review a feature branch relative to a base branch, generate policy/code/feature audit artifacts, and trigger remediation planning when required."
+model = "gpt-5.6-terra"
+model_reasoning_effort = "high"
 
 developer_instructions = """
 You are a feature-branch reviewer.
