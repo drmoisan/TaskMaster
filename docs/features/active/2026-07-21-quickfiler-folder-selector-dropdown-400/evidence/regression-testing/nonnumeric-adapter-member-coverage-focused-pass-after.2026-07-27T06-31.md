@@ -32,5 +32,5 @@ Passed results: `SetBridgeCoordinator_SameReference_DoesNotDuplicateSubscription
 - Pre-run related processes: none
 - Post-run related processes: none
 - TRX: `nonnumeric-adapter-member-coverage-focused-pass-after.2026-07-27T06-31.trx` — SHA-256 `77900C27813D10C68E298B637C04BAEEBB3CCDE69AB42B2E1C669AA8D7629B76`
-- Stdout: `nonnumeric-adapter-member-coverage-focused-pass-after.2026-07-27T06-31.stdout.txt` — SHA-256 `8FBF25ACE4B0025DB719EC99FA9631AFBDB792244D451FDD34D406B85880464C`
+- Stdout: `nonnumeric-adapter-member-coverage-focused-pass-after.2026-07-27T06-31.stdout.txt` — SHA-256 `6AC9EAC5F29B64C421849EDCE805ECF10AF4F06EE8F61C94B773929017272E7A`
 - Stderr: `nonnumeric-adapter-member-coverage-focused-pass-after.2026-07-27T06-31.stderr.txt` — SHA-256 `E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855`
