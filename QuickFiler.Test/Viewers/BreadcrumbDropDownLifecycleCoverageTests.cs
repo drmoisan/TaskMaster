@@ -197,6 +197,7 @@ namespace QuickFiler.Test.Viewers
         public void Host_DisposeAndUseAfterDispose_FollowDeterministicContract()
         {
             _harness.Open().Should().BeTrue();
+            _harness.Host.InstalledPopupControl = _harness.Surface;
             _harness.DisposeHost();
             _harness.DisposeHost();
             AssertSurfaceDisposed(_harness);

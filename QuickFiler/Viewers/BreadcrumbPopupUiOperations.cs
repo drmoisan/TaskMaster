@@ -128,12 +128,25 @@ namespace QuickFiler.Viewers
             Control control,
             WebEnvironment environment
         ) =>
+            BeginInitializationAsync(() => _beginInitialization(initializer, control, environment));
+
+        internal Task<Task> BeginInitializationAsync(Func<Task> initialize) =>
             RunAsync(() =>
-                _beginInitialization(initializer, control, environment)
+                initialize()
                 ?? throw Invalid("Popup WebView initialization returned no completion task.")
             );
 
-        internal Task<WebCore> ReadCoreAsync(Control control) => RunAsync(() => _readCore(control));
+        internal Task<WebCore> ReadCoreAsync(Control control) =>
+            ReadCoreAsync(() => _readCore(control));
+
+        internal Task<WebCore> ReadCoreAsync(Func<WebCore> readCore) =>
+            ReadRequiredAsync(
+                readCore,
+                "Popup CoreWebView2 initialization completed without a core instance."
+            );
+
+        internal Task<T> ReadRequiredAsync<T>(Func<T> read, string missingMessage)
+            where T : class => RunAsync(() => read() ?? throw Invalid(missingMessage));
 
         internal Task<NavigationSurface> BeginNavigationAsync(
             WebCore core,
@@ -354,24 +367,6 @@ namespace QuickFiler.Viewers
                 throw failure;
         }
 
-        private static void CompleteAll(params Action[] cleanups)
-        {
-            Exception? failure = null;
-            foreach (Action cleanup in cleanups)
-            {
-                try
-                {
-                    cleanup();
-                }
-                catch (Exception exception)
-                {
-                    failure ??= exception;
-                }
-            }
-            if (failure != null)
-                throw failure;
-        }
-
         private static Exception Invalid(string message) => new InvalidOperationException(message);
 
         [ExcludeFromCodeCoverage]
@@ -386,10 +381,7 @@ namespace QuickFiler.Viewers
 
         [ExcludeFromCodeCoverage]
         private static WebCore ReadProductionCore(Control control) =>
-            ((WebView2)control).CoreWebView2
-            ?? throw Invalid(
-                "Popup CoreWebView2 initialization completed without a core instance."
-            );
+            ((WebView2)control).CoreWebView2;
 
         [ExcludeFromCodeCoverage]
         private static NavigationSurface BeginProductionNavigation(
@@ -397,30 +389,24 @@ namespace QuickFiler.Viewers
             WebCore core,
             Control control,
             string html
-        )
-        {
-            Readiness readiness = NavigateToDocument(
-                dispatcher,
-                core,
-                control,
-                () => ((WebView2)control).NavigateToString(html),
-                "Popup"
+        ) =>
+            BreadcrumbPopupLifecycleOperations.CreateNavigationSurface(
+                NavigateToDocument(
+                    dispatcher,
+                    core,
+                    control,
+                    () => ((WebView2)control).NavigateToString(html),
+                    "Popup"
+                ),
+                () => new WebView2Messenger(core, dispatcher)
             );
-            try
-            {
-                Messenger messenger = new WebView2Messenger(core, dispatcher);
-                return Tuple.Create(messenger, readiness.Completion);
-            }
-            catch
-            {
-                readiness.Dispose();
-                throw;
-            }
-        }
 
         [ExcludeFromCodeCoverage]
         private static void DisposeProductionSurface(Control? control, Messenger? messenger) =>
-            CompleteAll(() => (messenger as IDisposable)?.Dispose(), () => control?.Dispose());
+            BreadcrumbPopupLifecycleOperations.DisposeTwoResources(
+                () => (messenger as IDisposable)?.Dispose(),
+                () => control?.Dispose()
+            );
 
         internal static Readiness CreateDispatchedReadiness(
             BreadcrumbUiDispatcher dispatcher,
@@ -428,8 +414,15 @@ namespace QuickFiler.Viewers
             Action detachHandlers
         ) => new Readiness(surfaceName, () => _ = dispatcher.Dispatch(detachHandlers));
 
-        [ExcludeFromCodeCoverage]
         internal static Readiness NavigateToDocument(
+            BreadcrumbUiDispatcher dispatcher,
+            WebCore core,
+            Control owner,
+            Action navigate,
+            string surfaceName
+        ) => NavigateToDocumentCore(dispatcher, core, owner, navigate, surfaceName);
+
+        private static Readiness NavigateToDocumentCore(
             BreadcrumbUiDispatcher dispatcher,
             WebCore core,
             Control owner,
@@ -440,41 +433,44 @@ namespace QuickFiler.Viewers
             _ = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
             _ = core ?? throw new ArgumentNullException(nameof(core));
             _ = owner ?? throw new ArgumentNullException(nameof(owner));
-            _ = navigate ?? throw new ArgumentNullException(nameof(navigate));
+            return BindProductionNavigation(dispatcher, core, owner, navigate, surfaceName);
+        }
 
-            Readiness? readiness = null;
-            void Detach()
-            {
-                core.NavigationStarting -= Starting;
-                core.NavigationCompleted -= Completed;
-                owner.Disposed -= Disposed;
-            }
-            void Starting(object _, CoreWebView2NavigationStartingEventArgs args) =>
-                _ = dispatcher.Dispatch(() => readiness?.NavigationStarted(args.NavigationId));
-            void Completed(object _, CoreWebView2NavigationCompletedEventArgs args) =>
-                _ = dispatcher.Dispatch(() =>
-                    readiness?.NavigationCompleted(
-                        args.NavigationId,
-                        args.IsSuccess,
-                        args.WebErrorStatus.ToString()
-                    )
-                );
-            void Disposed(object _, EventArgs __) =>
-                _ = dispatcher.Dispatch(() => readiness?.Cancel());
-            readiness = CreateDispatchedReadiness(dispatcher, surfaceName, Detach);
-            try
-            {
-                core.NavigationStarting += Starting;
-                core.NavigationCompleted += Completed;
-                owner.Disposed += Disposed;
-                readiness.BeginNavigation(navigate);
-                return readiness;
-            }
-            catch
-            {
-                readiness.Dispose();
-                throw;
-            }
+        [ExcludeFromCodeCoverage]
+        private static Readiness BindProductionNavigation(
+            BreadcrumbUiDispatcher dispatcher,
+            WebCore core,
+            Control owner,
+            Action navigate,
+            string surfaceName
+        )
+        {
+            return BreadcrumbPopupLifecycleOperations.NavigateWithSubscription(
+                dispatcher,
+                surfaceName,
+                navigate,
+                (navigationStarted, navigationCompleted, ownerDisposed) =>
+                {
+                    EventHandler<CoreWebView2NavigationStartingEventArgs> starting = (_, args) =>
+                        navigationStarted(args.NavigationId);
+                    EventHandler<CoreWebView2NavigationCompletedEventArgs> completed = (_, args) =>
+                        navigationCompleted(
+                            args.NavigationId,
+                            args.IsSuccess,
+                            args.WebErrorStatus.ToString()
+                        );
+                    EventHandler disposed = (_, __) => ownerDisposed();
+                    core.NavigationStarting += starting;
+                    core.NavigationCompleted += completed;
+                    owner.Disposed += disposed;
+                    return new BreadcrumbNavigationSubscription(() =>
+                    {
+                        core.NavigationStarting -= starting;
+                        core.NavigationCompleted -= completed;
+                        owner.Disposed -= disposed;
+                    });
+                }
+            );
         }
     }
 }

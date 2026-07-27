@@ -1,0 +1,445 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="e8290ca0-e05b-4720-b921-55607a13cc77" name="DanMoisan@MEGALODON4 2026-07-27 00:29:34" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-07-27T00:29:34.2463526-04:00" queuing="2026-07-27T00:29:34.2463526-04:00" start="2026-07-27T00:29:33.1683927-04:00" finish="2026-07-27T00:29:34.5988502-04:00" />
+  <TestSettings name="default" id="fc28f475-c1c5-414a-9b0e-c30dc0f64bc5">
+    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-07-27_00_29_34" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="36f95c44-47aa-4e3e-96c5-97d0cd541bdc" testId="122759a8-1e90-8af4-a8b6-e7ff1e35e788" testName="SearchTextKeyDownAndKeyUp_RecordCursorAndFilterToSelected" computerName="MEGALODON4" duration="00:00:00.0012474" startTime="2026-07-27T00:29:34.4645355-04:00" endTime="2026-07-27T00:29:34.4655357-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="36f95c44-47aa-4e3e-96c5-97d0cd541bdc" />
+    <UnitTestResult executionId="5ef7365a-8439-47eb-a293-40fe53f20565" testId="1d4fd81f-e693-8eaf-9f97-966b09d75b2c" testName="GetUserInputCategory_WithEmptyName_LoopsUntilNonSpaceResponse" computerName="MEGALODON4" duration="00:00:00.0068663" startTime="2026-07-27T00:29:34.4165101-04:00" endTime="2026-07-27T00:29:34.4235098-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5ef7365a-8439-47eb-a293-40fe53f20565" />
+    <UnitTestResult executionId="0cb843f1-2048-4454-a19c-01cd773d632b" testId="162ac0f5-4840-868e-bc21-b4873e1f793e" testName="GetDefaultPrefix_ReturnsEmptyOtherPrefix" computerName="MEGALODON4" duration="00:00:00.0010980" startTime="2026-07-27T00:29:34.3909622-04:00" endTime="2026-07-27T00:29:34.3925048-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0cb843f1-2048-4454-a19c-01cd773d632b" />
+    <UnitTestResult executionId="eb36c32e-87e1-496d-a0fb-8b7d1a5acd74" testId="1d9ecc00-019f-8634-a8c4-0b8f591e53af" testName="AutoFind_ForwardsItemToDelegate" computerName="MEGALODON4" duration="00:00:00.0003670" startTime="2026-07-27T00:29:34.3705728-04:00" endTime="2026-07-27T00:29:34.3715768-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="eb36c32e-87e1-496d-a0fb-8b7d1a5acd74" />
+    <UnitTestResult executionId="69ee5bfb-90f4-4b99-925c-df529a24bd52" testId="1378751a-1dbe-82ba-8828-9283a405ddb1" testName="SelectPageUp_WhenRowAboveViewport_ScrollsToIt" computerName="MEGALODON4" duration="00:00:00.0013074" startTime="2026-07-27T00:29:34.4820440-04:00" endTime="2026-07-27T00:29:34.4830442-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="69ee5bfb-90f4-4b99-925c-df529a24bd52" />
+    <UnitTestResult executionId="9067f10b-e9bd-439f-bad1-fca6df48a163" testId="16d70254-b1dc-80c5-89d7-a2c4803ac565" testName="AddColorCategory_WithEmptyInput_DoesNotAddOption" computerName="MEGALODON4" duration="00:00:00.0011110" startTime="2026-07-27T00:29:34.4425142-04:00" endTime="2026-07-27T00:29:34.4445135-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9067f10b-e9bd-439f-bad1-fca6df48a163" />
+    <UnitTestResult executionId="92dabaac-40aa-4ba3-b641-3d194ea2051f" testId="1394659e-4222-88e9-86fb-ccc27b3ca592" testName="Properties_RoundTripFilterListAndDelegates" computerName="MEGALODON4" duration="00:00:00.0007209" startTime="2026-07-27T00:29:34.3765802-04:00" endTime="2026-07-27T00:29:34.3775809-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="92dabaac-40aa-4ba3-b641-3d194ea2051f" />
+    <UnitTestResult executionId="63f4d333-c61c-4596-8e93-4df0bf984a18" testId="1ffaaae9-dc36-8603-a006-46595a013d81" testName="AutoFindAsync_RunsSyncDelegateAndReturnsResult" computerName="MEGALODON4" duration="00:00:00.0028825" startTime="2026-07-27T00:29:34.3715768-04:00" endTime="2026-07-27T00:29:34.3765802-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="63f4d333-c61c-4596-8e93-4df0bf984a18" />
+    <UnitTestResult executionId="34232ad8-5ace-44c0-a406-e907cedd5508" testId="1fcf8756-aea9-8527-b202-e3919d516744" testName="ResolvePrefix_ResolvesDefaultsAndThrowsOnUnknownKey" computerName="MEGALODON4" duration="00:00:00.0101383" startTime="2026-07-27T00:29:34.3810262-04:00" endTime="2026-07-27T00:29:34.3909622-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="34232ad8-5ace-44c0-a406-e907cedd5508" />
+    <UnitTestResult executionId="b8cfb338-81a5-4942-afbe-bc3dfc9d30d9" testId="1bd0a0c9-69d5-8644-b5d9-0c6cd62808e6" testName="SelectPageUp_WhenNoRowAboveViewport_SelectsFirstControl" computerName="MEGALODON4" duration="00:00:00.0004487" startTime="2026-07-27T00:29:34.4830442-04:00" endTime="2026-07-27T00:29:34.4840449-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b8cfb338-81a5-4942-afbe-bc3dfc9d30d9" />
+    <UnitTestResult executionId="16566c7e-1334-4fd8-a954-3171c7c979f3" testId="1389c233-dee4-8461-ae7d-9299d74778f8" testName="TryGetAutoAssignment_WithMailAndYes_AddsAssignmentsAndReturnsTrue" computerName="MEGALODON4" duration="00:00:00.0042057" startTime="2026-07-27T00:29:34.4455142-04:00" endTime="2026-07-27T00:29:34.4505139-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="16566c7e-1334-4fd8-a954-3171c7c979f3" />
+    <UnitTestResult executionId="cd75702d-b564-4332-83ef-1a0c2277db5d" testId="1c43c0b7-73e0-80c5-9454-4e68a31f3eed" testName="Search_WhenNoStringsOrMatches_ReturnsSourceOrEmpty" computerName="MEGALODON4" duration="00:00:00.0240237" startTime="2026-07-27T00:29:34.2180609-04:00" endTime="2026-07-27T00:29:34.2413507-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cd75702d-b564-4332-83ef-1a0c2277db5d" />
+    <UnitTestResult executionId="6e23cc98-5e70-42e8-bf94-13bd8f149bbf" testId="191e761f-2bfa-8264-81a1-5323e1f956a8" testName="GetUserInputCategory_WithPrefilledName_RoutesThroughPrompt" computerName="MEGALODON4" duration="00:00:00.0037278" startTime="2026-07-27T00:29:34.4125093-04:00" endTime="2026-07-27T00:29:34.4165101-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6e23cc98-5e70-42e8-bf94-13bd8f149bbf" />
+    <UnitTestResult executionId="c8f62e1a-0819-439c-a1a1-b24c249eb0a4" testId="1962ede2-970c-82f9-bfc9-0f627cf32367" testName="CtrlCBSetter_WhenReassigned_UnsubscribesPreviousCheckbox" computerName="MEGALODON4" duration="00:00:00.0053928" startTime="2026-07-27T00:29:34.4485135-04:00" endTime="2026-07-27T00:29:34.4570217-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c8f62e1a-0819-439c-a1a1-b24c249eb0a4" />
+    <UnitTestResult executionId="e0df53ab-4d72-48e9-a354-64239131705c" testId="10f010f7-deb0-843c-b332-26bad5799369" testName="ResolveMailItem_ReturnsMailForMailItemAndNullOtherwise" computerName="MEGALODON4" duration="00:00:00.2282009" startTime="2026-07-27T00:29:34.0629222-04:00" endTime="2026-07-27T00:29:34.3785774-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e0df53ab-4d72-48e9-a354-64239131705c" />
+    <UnitTestResult executionId="1aa5812a-1c06-4904-b22b-feb61adb8094" testId="1feeeeaf-2bcc-8c4e-a831-9c4cf50ebbda" testName="AddChoicesToDict_ForwardsMailItemToDelegate" computerName="MEGALODON4" duration="00:00:00.1553766" startTime="2026-07-27T00:29:34.0619232-04:00" endTime="2026-07-27T00:29:34.3050908-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1aa5812a-1c06-4904-b22b-feb61adb8094" />
+    <UnitTestResult executionId="3d34546d-00e7-4ded-a63b-7b59b6d2b042" testId="141f06bb-9155-8370-a956-50eca625e45a" testName="AddColorCategory_WithUserInput_AddsOptionAndFiltersToSelected" computerName="MEGALODON4" duration="00:00:00.0188137" startTime="2026-07-27T00:29:34.4235098-04:00" endTime="2026-07-27T00:29:34.4425142-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3d34546d-00e7-4ded-a63b-7b59b6d2b042" />
+    <UnitTestResult executionId="cfab2932-cf28-400e-8c5f-490978689048" testId="112a1190-558c-841d-94d0-5826e09c0388" testName="ParseSearchStrings_WhenEmptyWhitespaceOrWildcard_ReturnsExpectedTokens" computerName="MEGALODON4" duration="00:00:00.0613575" startTime="2026-07-27T00:29:34.0619232-04:00" endTime="2026-07-27T00:29:34.2098932-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cfab2932-cf28-400e-8c5f-490978689048" />
+    <UnitTestResult executionId="ddc093e1-4eec-4ef3-9aa4-5a03f897ed6a" testId="128482ab-05d1-8f01-85ca-f474c05af696" testName="CheckboxClick_WithUnprefixedOptionAndPrefix_DoesNotReconstructMissingKey" computerName="MEGALODON4" duration="00:00:00.2942465" startTime="2026-07-27T00:29:34.0619232-04:00" endTime="2026-07-27T00:29:34.4435135-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ddc093e1-4eec-4ef3-9aa4-5a03f897ed6a" />
+    <UnitTestResult executionId="81dc12a6-b3ca-48a3-abb4-00234ca85ed8" testId="1cf15a04-43ee-844d-9bb3-d05b143955fb" testName="PropertyForwarders_RouteToViewer" computerName="MEGALODON4" duration="00:00:00.0016202" startTime="2026-07-27T00:29:34.4560206-04:00" endTime="2026-07-27T00:29:34.4570217-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="81dc12a6-b3ca-48a3-abb4-00234ca85ed8" />
+    <UnitTestResult executionId="278d4c7f-a957-4fb6-8806-6de7caeff082" testId="150399cd-ff7a-8957-ab7b-3203b9e5b8b1" testName="AddOption_WhenNewDuplicateAndEmptyInputs_UpdatesSelectionState" computerName="MEGALODON4" duration="00:00:00.2288881" startTime="2026-07-27T00:29:34.0619232-04:00" endTime="2026-07-27T00:29:34.3775809-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="278d4c7f-a957-4fb6-8806-6de7caeff082" />
+    <UnitTestResult executionId="d1d8af58-5e0b-4384-89ec-63a4da02c521" testId="1f599be5-79b5-8309-9eec-fcffa188856b" testName="AddColorCategory_WhenAutoAssignerReturnsNullCategory_ReturnsEarly" computerName="MEGALODON4" duration="00:00:00.0017052" startTime="2026-07-27T00:29:34.4445135-04:00" endTime="2026-07-27T00:29:34.4455142-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d1d8af58-5e0b-4384-89ec-63a4da02c521" />
+    <UnitTestResult executionId="46690a52-ecb1-41bd-a0ed-279585db1382" testId="1dca5090-9cc7-8ebe-b93a-8fb0a92ea6f9" testName="LoadSelections_WhenExistingSelectionsUseBothForms_TogglesMatchingOptions" computerName="MEGALODON4" duration="00:00:00.0010473" startTime="2026-07-27T00:29:34.4535132-04:00" endTime="2026-07-27T00:29:34.4535132-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="46690a52-ecb1-41bd-a0ed-279585db1382" />
+    <UnitTestResult executionId="4330ef89-7ad8-49b0-9ff4-817f19ccad0e" testId="10769aea-8d15-8e6e-8285-f61efb4dadcb" testName="SelectPageDown_WhenNoRowBelowViewport_SelectsLastControl" computerName="MEGALODON4" duration="00:00:00.0096343" startTime="2026-07-27T00:29:34.4695391-04:00" endTime="2026-07-27T00:29:34.4790440-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4330ef89-7ad8-49b0-9ff4-817f19ccad0e" />
+    <UnitTestResult executionId="88297fa4-56b7-4c00-a158-74f612271c12" testId="10fc910e-4636-8336-bcfc-f4dc3d2ab63c" testName="SetDictOptions_ReplacesActiveOptionsWithoutTouchingOriginal" computerName="MEGALODON4" duration="00:00:00.0002670" startTime="2026-07-27T00:29:34.3925048-04:00" endTime="2026-07-27T00:29:34.3925048-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="88297fa4-56b7-4c00-a158-74f612271c12" />
+    <UnitTestResult executionId="93fd826d-b7d9-453e-8b4a-bac707e47715" testId="1a64cec7-88d1-8419-a35f-a4a0accabb97" testName="AddColorCategory_ForwardsPrefixAndNameToDelegate" computerName="MEGALODON4" duration="00:00:00.0657838" startTime="2026-07-27T00:29:34.3050908-04:00" endTime="2026-07-27T00:29:34.3705728-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="93fd826d-b7d9-453e-8b4a-bac707e47715" />
+    <UnitTestResult executionId="5a844b62-4b02-4a28-b5d5-b9d756ebf28f" testId="17b2981f-994c-86d1-8569-326d38536d65" testName="SelectPageDown_WhenRowBelowViewport_ScrollsToIt" computerName="MEGALODON4" duration="00:00:00.0030622" startTime="2026-07-27T00:29:34.4790440-04:00" endTime="2026-07-27T00:29:34.4820440-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5a844b62-4b02-4a28-b5d5-b9d756ebf28f" />
+    <UnitTestResult executionId="3f34caa0-d0ea-4c20-a05f-b792661bea1a" testId="1528a911-0750-8e7d-9401-ef44990f073d" testName="OptionsPanelKeyDown_MovesFocusUpAndDown" computerName="MEGALODON4" duration="00:00:00.0009650" startTime="2026-07-27T00:29:34.4595303-04:00" endTime="2026-07-27T00:29:34.4605309-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3f34caa0-d0ea-4c20-a05f-b792661bea1a" />
+    <UnitTestResult executionId="d722c691-e7ca-4df8-b6ec-8d89ee648700" testId="1806d20c-893f-86c3-b2d4-a0ef0e674b99" testName="UpdateSelections_AfterFiltering_SynchronizesPrivateSelectionLists" computerName="MEGALODON4" duration="00:00:00.0009934" startTime="2026-07-27T00:29:34.4570217-04:00" endTime="2026-07-27T00:29:34.4570217-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d722c691-e7ca-4df8-b6ec-8d89ee648700" />
+    <UnitTestResult executionId="6f44ab70-8da2-4951-b4b0-9c685242dda0" testId="181155fe-3eee-8b4d-9c40-f5761f6c95c6" testName="DrawFocus_DefaultBody_DrawsFocusRectangleOnUnshownCheckBox" computerName="MEGALODON4" duration="00:00:00.3327240" startTime="2026-07-27T00:29:34.0629222-04:00" endTime="2026-07-27T00:29:34.4830442-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6f44ab70-8da2-4951-b4b0-9c685242dda0" />
+    <UnitTestResult executionId="e2fa0649-d407-4a5b-bcf7-e904e7cacd08" testId="1638b151-4c4f-84b1-9076-1d56d3d18862" testName="ResolvePrefix_WhenMissingOrInvalid_UsesDefaultOrThrows" computerName="MEGALODON4" duration="00:00:00.0008710" startTime="2026-07-27T00:29:34.4515141-04:00" endTime="2026-07-27T00:29:34.4525135-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e2fa0649-d407-4a5b-bcf7-e904e7cacd08" />
+    <UnitTestResult executionId="94305445-0300-4dd3-a86b-5ab01212059f" testId="185b0464-4488-8f35-ba44-d43b70f34b3e" testName="TryGetAutoAssignment_WhenUserDeclines_ReturnsFalse" computerName="MEGALODON4" duration="00:00:00.0009304" startTime="2026-07-27T00:29:34.4505139-04:00" endTime="2026-07-27T00:29:34.4515141-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="94305445-0300-4dd3-a86b-5ab01212059f" />
+    <UnitTestResult executionId="0386aa96-472c-4342-99e6-a80f47c1d693" testId="1e4eaf2b-02f1-863a-a490-c53fe6ea1ac9" testName="AddOption_AddsNewUpdatesExistingAndSyncsFilteredSet" computerName="MEGALODON4" duration="00:00:00.0022672" startTime="2026-07-27T00:29:34.3755825-04:00" endTime="2026-07-27T00:29:34.3775809-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0386aa96-472c-4342-99e6-a80f47c1d693" />
+    <UnitTestResult executionId="9cc23e0c-2002-42c0-a04d-e9ddb7323e58" testId="149015a4-4541-8706-b690-85f8c62d8fe3" testName="SearchAndReload_WhenFilterChanges_ReplacesVisibleCheckboxes" computerName="MEGALODON4" duration="00:00:00.0022821" startTime="2026-07-27T00:29:34.4535132-04:00" endTime="2026-07-27T00:29:34.4570217-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9cc23e0c-2002-42c0-a04d-e9ddb7323e58" />
+    <UnitTestResult executionId="cbf2ec74-7654-4f6c-889f-373ffef81491" testId="1878b3e7-7fcf-81db-9135-6aa3cce68f4d" testName="FilterArchive_WhenExclusionsPresent_RemovesMatchesCaseInsensitively" computerName="MEGALODON4" duration="00:00:00.0698105" startTime="2026-07-27T00:29:34.2413507-04:00" endTime="2026-07-27T00:29:34.3121751-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cbf2ec74-7654-4f6c-889f-373ffef81491" />
+    <UnitTestResult executionId="9f75615d-2e83-428b-a70c-96c7e9afdd90" testId="17703666-0e1d-85f8-9524-0a8cc21e800d" testName="SetAutoAssignState_TogglesViewerButtonVisibilityByMailAndAssigner" computerName="MEGALODON4" duration="00:00:00.0009711" startTime="2026-07-27T00:29:34.4570217-04:00" endTime="2026-07-27T00:29:34.4585249-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9f75615d-2e83-428b-a70c-96c7e9afdd90" />
+    <UnitTestResult executionId="92d4ab67-6428-41e6-9f81-65cb6b7ee18e" testId="1e85aedb-02f4-827c-9332-50f5d5d28065" testName="AutoAssignAction_WhenExistingAndNewAssignmentsReturned_UpdatesSelections" computerName="MEGALODON4" duration="00:00:00.0024947" startTime="2026-07-27T00:29:34.5241749-04:00" endTime="2026-07-27T00:29:34.5281750-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="92d4ab67-6428-41e6-9f81-65cb6b7ee18e" />
+    <UnitTestResult executionId="1ffa8b67-db28-487e-8ef1-d76041335a34" testId="1eeaf61c-ee7e-8884-9acb-4d8022823346" testName="ResolveMailItem_OutlookItemWrappedMail_ReturnsInnerMailItem" computerName="MEGALODON4" duration="00:00:00.0337228" startTime="2026-07-27T00:29:34.3785774-04:00" endTime="2026-07-27T00:29:34.4125093-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1ffa8b67-db28-487e-8ef1-d76041335a34" />
+    <UnitTestResult executionId="f2875799-60ad-4f4a-b13c-78f682543cb7" testId="1abee3d3-71c7-80a9-a6ec-7f958307e8bb" testName="ToggleMethods_WhenOptionExists_AddRemoveAndUpdateSelectionState" computerName="MEGALODON4" duration="00:00:00.0643219" startTime="2026-07-27T00:29:34.3785774-04:00" endTime="2026-07-27T00:29:34.4425142-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f2875799-60ad-4f4a-b13c-78f682543cb7" />
+    <UnitTestResult executionId="20005ac9-9b42-4231-9706-2391c91dcd4b" testId="1424e191-698b-8b1c-8957-45c251d60450" testName="CheckBoxConstructor_WiresSuppliedCheckbox" computerName="MEGALODON4" duration="00:00:00.0052116" startTime="2026-07-27T00:29:34.4570217-04:00" endTime="2026-07-27T00:29:34.4645355-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="20005ac9-9b42-4231-9706-2391c91dcd4b" />
+    <UnitTestResult executionId="b794cfb7-949b-4968-849a-b8f584fa7bd3" testId="1ca4e9d5-2b0b-8ef0-9ced-46cf7372550f" testName="LoadSelections_WhenKeyMissingAndUserDeclines_DoesNotPromptForCategory" computerName="MEGALODON4" duration="00:00:00.0011792" startTime="2026-07-27T00:29:34.4535132-04:00" endTime="2026-07-27T00:29:34.4560206-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b794cfb7-949b-4968-849a-b8f584fa7bd3" />
+    <UnitTestResult executionId="d4710fdf-3780-48e7-bd11-bc2ccb355730" testId="12317ae6-d2d5-804a-8bce-1c0d6f2868e6" testName="DecideClick_WhenKeyTriggeredAndValueChanged_ResetsBothFlags" computerName="MEGALODON4" duration="00:00:00.0010089" startTime="2026-07-27T00:29:34.2175380-04:00" endTime="2026-07-27T00:29:34.2191001-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d4710fdf-3780-48e7-bd11-bc2ccb355730" />
+    <UnitTestResult executionId="b4b75a19-8128-4044-8bf7-a2741ac62856" testId="1c90add1-37f3-8962-8a0e-b9e483cc4942" testName="ToggleMethods_MutateSelectionState" computerName="MEGALODON4" duration="00:00:00.0015323" startTime="2026-07-27T00:29:34.3735779-04:00" endTime="2026-07-27T00:29:34.3755825-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b4b75a19-8128-4044-8bf7-a2741ac62856" />
+    <UnitTestResult executionId="5031e561-0f94-4788-b5e8-476fde0e26c7" testId="18c0de5c-6fd8-854b-b39f-310a032d38a7" testName="FilterToSelected_AfterStateTransitions_ReloadsOnlySelectedControls" computerName="MEGALODON4" duration="00:00:00.0008027" startTime="2026-07-27T00:29:34.4525135-04:00" endTime="2026-07-27T00:29:34.4535132-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5031e561-0f94-4788-b5e8-476fde0e26c7" />
+    <UnitTestResult executionId="26b9d793-ce21-4c00-a182-0916be68af7d" testId="10aa1ab2-4c57-8f3a-aad3-5c1acd1aa409" testName="FilterArchive_WhenAutoAssignerNull_ReturnsSourceUnchanged" computerName="MEGALODON4" duration="00:00:00.0001685" startTime="2026-07-27T00:29:34.3121751-04:00" endTime="2026-07-27T00:29:34.3121751-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="26b9d793-ce21-4c00-a182-0916be68af7d" />
+    <UnitTestResult executionId="6e0a552e-7bb8-47a3-861f-e10083214581" testId="1cfc2c6f-d0ad-8423-9e9c-8f85c8f347dd" testName="TryGetAutoAssignment_WhenNotMail_ReturnsFalseWithoutPrompting" computerName="MEGALODON4" duration="00:00:00.0011128" startTime="2026-07-27T00:29:34.4515141-04:00" endTime="2026-07-27T00:29:34.4525135-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6e0a552e-7bb8-47a3-861f-e10083214581" />
+    <UnitTestResult executionId="77c3b48d-bc9f-4b93-bba6-8ed6788b1767" testId="1f915229-d24c-8231-925c-717b6ed75862" testName="SelectionAccessors_ReturnOnlySelectedKeys" computerName="MEGALODON4" duration="00:00:00.0025154" startTime="2026-07-27T00:29:34.3715768-04:00" endTime="2026-07-27T00:29:34.3735779-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="77c3b48d-bc9f-4b93-bba6-8ed6788b1767" />
+    <UnitTestResult executionId="05a6d598-45d7-420b-80db-02e5484cb7e6" testId="1e28d1c8-0d76-8c78-86be-8eb766a3432f" testName="TagViewerKeyDown_OnEnter_TriggersOkExit" computerName="MEGALODON4" duration="00:00:00.0030210" startTime="2026-07-27T00:29:34.4605309-04:00" endTime="2026-07-27T00:29:34.4645355-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="05a6d598-45d7-420b-80db-02e5484cb7e6" />
+    <UnitTestResult executionId="02170258-4df6-479c-bdb7-70f7b7585516" testId="1cc90ed5-cfa7-8ac9-98a5-574ff5ceb6f2" testName="SearchTextKeyUp_OnEnter_TriggersOkExit" computerName="MEGALODON4" duration="00:00:00.0004293" startTime="2026-07-27T00:29:34.4665384-04:00" endTime="2026-07-27T00:29:34.4665384-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="02170258-4df6-479c-bdb7-70f7b7585516" />
+    <UnitTestResult executionId="0f72ee37-5b95-4462-9cb1-376500c82245" testId="171ca244-13f8-8a00-b5da-86e1d3498403" testName="HideArchive_WhenToggled_ReloadsFilteredAndOriginalOptions" computerName="MEGALODON4" duration="00:00:00.0629077" startTime="2026-07-27T00:29:34.4605309-04:00" endTime="2026-07-27T00:29:34.5241749-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0f72ee37-5b95-4462-9cb1-376500c82245" />
+    <UnitTestResult executionId="2a2a094a-9543-4fee-b8bf-173fdc160790" testId="10272ed0-8317-806f-993b-749d2af6e48c" testName="LoadSelections_WhenKeyMissingAndUserAgrees_RoutesToAddColorCategory" computerName="MEGALODON4" duration="00:00:00.0016147" startTime="2026-07-27T00:29:34.4525135-04:00" endTime="2026-07-27T00:29:34.4535132-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2a2a094a-9543-4fee-b8bf-173fdc160790" />
+    <UnitTestResult executionId="be6b8401-ce49-48fc-9a1c-41a1f96f07fa" testId="1da58161-73ca-8ac3-acac-575bddc82c70" testName="OptionsPanelPreviewKeyDown_MarksUpAndDownAsInputKeys" computerName="MEGALODON4" duration="00:00:00.0009980" startTime="2026-07-27T00:29:34.4585249-04:00" endTime="2026-07-27T00:29:34.4595303-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="be6b8401-ce49-48fc-9a1c-41a1f96f07fa" />
+    <UnitTestResult executionId="4547c8ea-bd19-482d-83a8-7e34d52b902e" testId="1733b019-db0f-8877-9840-fd0499f1347b" testName="FilterArchive_WhenAutoAssignerHasExclusions_RemovesMatchesCaseInsensitively" computerName="MEGALODON4" duration="00:00:00.0012158" startTime="2026-07-27T00:29:34.4505139-04:00" endTime="2026-07-27T00:29:34.4515141-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4547c8ea-bd19-482d-83a8-7e34d52b902e" />
+    <UnitTestResult executionId="a1cdcf53-8909-4edb-9928-49734a80c2b5" testId="1ba40c56-8a01-85b5-ba96-bda715ab6d26" testName="SelectPageDown_WhenScrollFits_DoesNothing" computerName="MEGALODON4" duration="00:00:00.0018298" startTime="2026-07-27T00:29:34.4675385-04:00" endTime="2026-07-27T00:29:34.4695391-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a1cdcf53-8909-4edb-9928-49734a80c2b5" />
+    <UnitTestResult executionId="bc5f8e44-3608-453c-a282-14fde4952e0c" testId="1df92f2a-8aca-8041-ad71-d3080ab628c2" testName="GetAutoAssign_BuildsConfiguredInstance" computerName="MEGALODON4" duration="00:00:00.0023433" startTime="2026-07-27T00:29:34.3775809-04:00" endTime="2026-07-27T00:29:34.3802099-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bc5f8e44-3608-453c-a282-14fde4952e0c" />
+    <UnitTestResult executionId="cc103813-2e49-40a8-981f-79251c8b3d74" testId="17d25810-ceb4-866c-95bd-880f4665668a" testName="CtrlCBSetter_WhenSubscribedCheckboxClicked_TogglesParentSelection" computerName="MEGALODON4" duration="00:00:00.2928031" startTime="2026-07-27T00:29:34.0649221-04:00" endTime="2026-07-27T00:29:34.4485135-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cc103813-2e49-40a8-981f-79251c8b3d74" />
+    <UnitTestResult executionId="f639c883-1d35-4647-b282-12c89ff87b49" testId="1b7e5ecb-f5cb-83ca-9ed8-3f7d653885ae" testName="SearchTextKeyDown_OnDown_MovesFocusToFirstOption" computerName="MEGALODON4" duration="00:00:00.0006197" startTime="2026-07-27T00:29:34.4655357-04:00" endTime="2026-07-27T00:29:34.4665384-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f639c883-1d35-4647-b282-12c89ff87b49" />
+    <UnitTestResult executionId="193b5555-e6ad-4f67-bd2f-2b4db87bb3f3" testId="15446c3f-76e2-8c7d-a665-6e58607a4476" testName="IsPrefixMissing_CoversPresentAbsentNullAndShortSamples" computerName="MEGALODON4" duration="00:00:00.0583556" startTime="2026-07-27T00:29:34.3121751-04:00" endTime="2026-07-27T00:29:34.3705728-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="193b5555-e6ad-4f67-bd2f-2b4db87bb3f3" />
+    <UnitTestResult executionId="ab699d24-c4e3-48f1-b93d-5bb01d8571c1" testId="17fc9018-011e-8804-b04f-0103ba379ed3" testName="DecideClick_WhenKeyTriggeredAndValueNotChanged_FlipsCheckAndSetsValueFlag" computerName="MEGALODON4" duration="00:00:00.0006230" startTime="2026-07-27T00:29:34.2191001-04:00" endTime="2026-07-27T00:29:34.2227524-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ab699d24-c4e3-48f1-b93d-5bb01d8571c1" />
+    <UnitTestResult executionId="21c22ece-d790-4b36-aaa7-abd35ca823d9" testId="17806b81-013a-8f4b-98d1-e47ce831c28a" testName="FilterToSelectedSet_KeepsOnlySelectedOptions" computerName="MEGALODON4" duration="00:00:00.0019969" startTime="2026-07-27T00:29:34.3785774-04:00" endTime="2026-07-27T00:29:34.3810262-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="21c22ece-d790-4b36-aaa7-abd35ca823d9" />
+    <UnitTestResult executionId="2ec6d3b3-97bd-4a82-afaf-18161e5252b5" testId="1963da9d-5d5c-8fe2-904a-bbf4cf1beff4" testName="SelectControlMethods_WhenPositionsChange_UpdateFocusIndexOrThrow" computerName="MEGALODON4" duration="00:00:00.0026944" startTime="2026-07-27T00:29:34.4570217-04:00" endTime="2026-07-27T00:29:34.4605309-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2ec6d3b3-97bd-4a82-afaf-18161e5252b5" />
+    <UnitTestResult executionId="147447fc-8393-4224-928b-fbf3224a7b21" testId="1024c353-1e72-8c1d-9df6-20792e0a34d6" testName="DecideClick_WhenNotKeyTriggeredAndTagPresent_TogglesUsingTag" computerName="MEGALODON4" duration="00:00:00.0419606" startTime="2026-07-27T00:29:34.0619232-04:00" endTime="2026-07-27T00:29:34.1965998-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="147447fc-8393-4224-928b-fbf3224a7b21">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="d25b20a1-8b4f-4d14-99f9-044d2c067c37" testId="14732f9e-bd4d-8e43-84a8-6fa7170b18d3" testName="DecideClick_WhenTagNullOrEmpty_TogglesUsingPrefixPlusText" computerName="MEGALODON4" duration="00:00:00.0018299" startTime="2026-07-27T00:29:34.2058933-04:00" endTime="2026-07-27T00:29:34.2088930-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d25b20a1-8b4f-4d14-99f9-044d2c067c37" />
+    <UnitTestResult executionId="b7ad3d06-5848-4841-807b-249fabb89e8c" testId="1b2c9ffd-53a1-83a9-b3b9-ec5435caa942" testName="UpdateSelections_SnapshotsSelectedKeysFromBothDictionaries" computerName="MEGALODON4" duration="00:00:00.0005415" startTime="2026-07-27T00:29:34.3775809-04:00" endTime="2026-07-27T00:29:34.3785774-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b7ad3d06-5848-4841-807b-249fabb89e8c" />
+    <UnitTestResult executionId="ccdf489d-ec30-47f8-a961-f6c820db6505" testId="17af0b7f-ec02-80fc-8ee7-6541d1b9d375" testName="SearchAndParse_WhenInputIsEmptyMissingOrWildcard_ReturnsExpectedMatches" computerName="MEGALODON4" duration="00:00:00.0071226" startTime="2026-07-27T00:29:34.4425142-04:00" endTime="2026-07-27T00:29:34.4505139-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ccdf489d-ec30-47f8-a961-f6c820db6505" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="LoadSelections_WhenKeyMissingAndUserDeclines_DoesNotPromptForCategory" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1ca4e9d5-2b0b-8ef0-9ced-46cf7372550f">
+      <Execution id="b794cfb7-949b-4968-849a-b8f584fa7bd3" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="LoadSelections_WhenKeyMissingAndUserDeclines_DoesNotPromptForCategory" />
+    </UnitTest>
+    <UnitTest name="SelectPageDown_WhenNoRowBelowViewport_SelectsLastControl" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="10769aea-8d15-8e6e-8285-f61efb4dadcb">
+      <Execution id="4330ef89-7ad8-49b0-9ff4-817f19ccad0e" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="SelectPageDown_WhenNoRowBelowViewport_SelectsLastControl" />
+    </UnitTest>
+    <UnitTest name="Properties_RoundTripFilterListAndDelegates" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1394659e-4222-88e9-86fb-ccc27b3ca592">
+      <Execution id="92dabaac-40aa-4ba3-b641-3d194ea2051f" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.LauncherAutoAssignTests" name="Properties_RoundTripFilterListAndDelegates" />
+    </UnitTest>
+    <UnitTest name="GetUserInputCategory_WithEmptyName_LoopsUntilNonSpaceResponse" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1d4fd81f-e693-8eaf-9f97-966b09d75b2c">
+      <Execution id="5ef7365a-8439-47eb-a293-40fe53f20565" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="GetUserInputCategory_WithEmptyName_LoopsUntilNonSpaceResponse" />
+    </UnitTest>
+    <UnitTest name="GetAutoAssign_BuildsConfiguredInstance" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1df92f2a-8aca-8041-ad71-d3080ab628c2">
+      <Execution id="bc5f8e44-3608-453c-a282-14fde4952e0c" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.LauncherAutoAssignTests" name="GetAutoAssign_BuildsConfiguredInstance" />
+    </UnitTest>
+    <UnitTest name="CheckBoxConstructor_WiresSuppliedCheckbox" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1424e191-698b-8b1c-8957-45c251d60450">
+      <Execution id="20005ac9-9b42-4231-9706-2391c91dcd4b" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.CheckBoxControllerWiringStaTests" name="CheckBoxConstructor_WiresSuppliedCheckbox" />
+    </UnitTest>
+    <UnitTest name="FilterArchive_WhenAutoAssignerHasExclusions_RemovesMatchesCaseInsensitively" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1733b019-db0f-8877-9840-fd0499f1347b">
+      <Execution id="4547c8ea-bd19-482d-83a8-7e34d52b902e" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerCoverageExpansionTests" name="FilterArchive_WhenAutoAssignerHasExclusions_RemovesMatchesCaseInsensitively" />
+    </UnitTest>
+    <UnitTest name="AddColorCategory_WhenAutoAssignerReturnsNullCategory_ReturnsEarly" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1f599be5-79b5-8309-9eec-fcffa188856b">
+      <Execution id="d1d8af58-5e0b-4384-89ec-63a4da02c521" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="AddColorCategory_WhenAutoAssignerReturnsNullCategory_ReturnsEarly" />
+    </UnitTest>
+    <UnitTest name="ResolvePrefix_WhenMissingOrInvalid_UsesDefaultOrThrows" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1638b151-4c4f-84b1-9076-1d56d3d18862">
+      <Execution id="e2fa0649-d407-4a5b-bcf7-e904e7cacd08" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerCoverageExpansionTests" name="ResolvePrefix_WhenMissingOrInvalid_UsesDefaultOrThrows" />
+    </UnitTest>
+    <UnitTest name="ToggleMethods_WhenOptionExists_AddRemoveAndUpdateSelectionState" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1abee3d3-71c7-80a9-a6ec-7f958307e8bb">
+      <Execution id="f2875799-60ad-4f4a-b13c-78f682543cb7" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerCoverageExpansionTests" name="ToggleMethods_WhenOptionExists_AddRemoveAndUpdateSelectionState" />
+    </UnitTest>
+    <UnitTest name="AddOption_AddsNewUpdatesExistingAndSyncsFilteredSet" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1e4eaf2b-02f1-863a-a490-c53fe6ea1ac9">
+      <Execution id="0386aa96-472c-4342-99e6-a80f47c1d693" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagSelectionModelTests" name="AddOption_AddsNewUpdatesExistingAndSyncsFilteredSet" />
+    </UnitTest>
+    <UnitTest name="ResolveMailItem_ReturnsMailForMailItemAndNullOtherwise" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="10f010f7-deb0-843c-b332-26bad5799369">
+      <Execution id="e0df53ab-4d72-48e9-a354-64239131705c" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="ResolveMailItem_ReturnsMailForMailItemAndNullOtherwise" />
+    </UnitTest>
+    <UnitTest name="DecideClick_WhenTagNullOrEmpty_TogglesUsingPrefixPlusText" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="14732f9e-bd4d-8e43-84a8-6fa7170b18d3">
+      <Execution id="d25b20a1-8b4f-4d14-99f9-044d2c067c37" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.CheckBoxControllerDecisionTests" name="DecideClick_WhenTagNullOrEmpty_TogglesUsingPrefixPlusText" />
+    </UnitTest>
+    <UnitTest name="OptionsPanelKeyDown_MovesFocusUpAndDown" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1528a911-0750-8e7d-9401-ef44990f073d">
+      <Execution id="3f34caa0-d0ea-4c20-a05f-b792661bea1a" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="OptionsPanelKeyDown_MovesFocusUpAndDown" />
+    </UnitTest>
+    <UnitTest name="GetUserInputCategory_WithPrefilledName_RoutesThroughPrompt" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="191e761f-2bfa-8264-81a1-5323e1f956a8">
+      <Execution id="6e23cc98-5e70-42e8-bf94-13bd8f149bbf" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="GetUserInputCategory_WithPrefilledName_RoutesThroughPrompt" />
+    </UnitTest>
+    <UnitTest name="SearchTextKeyUp_OnEnter_TriggersOkExit" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1cc90ed5-cfa7-8ac9-98a5-574ff5ceb6f2">
+      <Execution id="02170258-4df6-479c-bdb7-70f7b7585516" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="SearchTextKeyUp_OnEnter_TriggersOkExit" />
+    </UnitTest>
+    <UnitTest name="SetAutoAssignState_TogglesViewerButtonVisibilityByMailAndAssigner" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="17703666-0e1d-85f8-9524-0a8cc21e800d">
+      <Execution id="9f75615d-2e83-428b-a70c-96c7e9afdd90" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="SetAutoAssignState_TogglesViewerButtonVisibilityByMailAndAssigner" />
+    </UnitTest>
+    <UnitTest name="TryGetAutoAssignment_WhenUserDeclines_ReturnsFalse" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="185b0464-4488-8f35-ba44-d43b70f34b3e">
+      <Execution id="94305445-0300-4dd3-a86b-5ab01212059f" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="TryGetAutoAssignment_WhenUserDeclines_ReturnsFalse" />
+    </UnitTest>
+    <UnitTest name="FilterArchive_WhenExclusionsPresent_RemovesMatchesCaseInsensitively" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1878b3e7-7fcf-81db-9135-6aa3cce68f4d">
+      <Execution id="cbf2ec74-7654-4f6c-889f-373ffef81491" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagSelectionModelTests" name="FilterArchive_WhenExclusionsPresent_RemovesMatchesCaseInsensitively" />
+    </UnitTest>
+    <UnitTest name="SelectControlMethods_WhenPositionsChange_UpdateFocusIndexOrThrow" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1963da9d-5d5c-8fe2-904a-bbf4cf1beff4">
+      <Execution id="2ec6d3b3-97bd-4a82-afaf-18161e5252b5" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerCoverageExpansionTests" name="SelectControlMethods_WhenPositionsChange_UpdateFocusIndexOrThrow" />
+    </UnitTest>
+    <UnitTest name="AutoAssignAction_WhenExistingAndNewAssignmentsReturned_UpdatesSelections" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1e85aedb-02f4-827c-9332-50f5d5d28065">
+      <Execution id="92d4ab67-6428-41e6-9f81-65cb6b7ee18e" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerCoverageExpansionTests" name="AutoAssignAction_WhenExistingAndNewAssignmentsReturned_UpdatesSelections" />
+    </UnitTest>
+    <UnitTest name="HideArchive_WhenToggled_ReloadsFilteredAndOriginalOptions" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="171ca244-13f8-8a00-b5da-86e1d3498403">
+      <Execution id="0f72ee37-5b95-4462-9cb1-376500c82245" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerCoverageExpansionTests" name="HideArchive_WhenToggled_ReloadsFilteredAndOriginalOptions" />
+    </UnitTest>
+    <UnitTest name="CtrlCBSetter_WhenSubscribedCheckboxClicked_TogglesParentSelection" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="17d25810-ceb4-866c-95bd-880f4665668a">
+      <Execution id="cc103813-2e49-40a8-981f-79251c8b3d74" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.CheckBoxControllerWiringStaTests" name="CtrlCBSetter_WhenSubscribedCheckboxClicked_TogglesParentSelection" />
+    </UnitTest>
+    <UnitTest name="AddColorCategory_WithEmptyInput_DoesNotAddOption" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="16d70254-b1dc-80c5-89d7-a2c4803ac565">
+      <Execution id="9067f10b-e9bd-439f-bad1-fca6df48a163" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="AddColorCategory_WithEmptyInput_DoesNotAddOption" />
+    </UnitTest>
+    <UnitTest name="AddColorCategory_ForwardsPrefixAndNameToDelegate" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1a64cec7-88d1-8419-a35f-a4a0accabb97">
+      <Execution id="93fd826d-b7d9-453e-8b4a-bac707e47715" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.LauncherAutoAssignTests" name="AddColorCategory_ForwardsPrefixAndNameToDelegate" />
+    </UnitTest>
+    <UnitTest name="AddColorCategory_WithUserInput_AddsOptionAndFiltersToSelected" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="141f06bb-9155-8370-a956-50eca625e45a">
+      <Execution id="3d34546d-00e7-4ded-a63b-7b59b6d2b042" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="AddColorCategory_WithUserInput_AddsOptionAndFiltersToSelected" />
+    </UnitTest>
+    <UnitTest name="SelectPageUp_WhenRowAboveViewport_ScrollsToIt" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1378751a-1dbe-82ba-8828-9283a405ddb1">
+      <Execution id="69ee5bfb-90f4-4b99-925c-df529a24bd52" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="SelectPageUp_WhenRowAboveViewport_ScrollsToIt" />
+    </UnitTest>
+    <UnitTest name="DecideClick_WhenKeyTriggeredAndValueChanged_ResetsBothFlags" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="12317ae6-d2d5-804a-8bce-1c0d6f2868e6">
+      <Execution id="d4710fdf-3780-48e7-bd11-bc2ccb355730" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.CheckBoxControllerDecisionTests" name="DecideClick_WhenKeyTriggeredAndValueChanged_ResetsBothFlags" />
+    </UnitTest>
+    <UnitTest name="ResolveMailItem_OutlookItemWrappedMail_ReturnsInnerMailItem" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1eeaf61c-ee7e-8884-9acb-4d8022823346">
+      <Execution id="1ffa8b67-db28-487e-8ef1-d76041335a34" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="ResolveMailItem_OutlookItemWrappedMail_ReturnsInnerMailItem" />
+    </UnitTest>
+    <UnitTest name="AddOption_WhenNewDuplicateAndEmptyInputs_UpdatesSelectionState" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="150399cd-ff7a-8957-ab7b-3203b9e5b8b1">
+      <Execution id="278d4c7f-a957-4fb6-8806-6de7caeff082" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerCoverageExpansionTests" name="AddOption_WhenNewDuplicateAndEmptyInputs_UpdatesSelectionState" />
+    </UnitTest>
+    <UnitTest name="UpdateSelections_AfterFiltering_SynchronizesPrivateSelectionLists" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1806d20c-893f-86c3-b2d4-a0ef0e674b99">
+      <Execution id="d722c691-e7ca-4df8-b6ec-8d89ee648700" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerCoverageExpansionTests" name="UpdateSelections_AfterFiltering_SynchronizesPrivateSelectionLists" />
+    </UnitTest>
+    <UnitTest name="SearchAndReload_WhenFilterChanges_ReplacesVisibleCheckboxes" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="149015a4-4541-8706-b690-85f8c62d8fe3">
+      <Execution id="9cc23e0c-2002-42c0-a04d-e9ddb7323e58" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerCoverageExpansionTests" name="SearchAndReload_WhenFilterChanges_ReplacesVisibleCheckboxes" />
+    </UnitTest>
+    <UnitTest name="SetDictOptions_ReplacesActiveOptionsWithoutTouchingOriginal" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="10fc910e-4636-8336-bcfc-f4dc3d2ab63c">
+      <Execution id="88297fa4-56b7-4c00-a158-74f612271c12" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagSelectionModelTests" name="SetDictOptions_ReplacesActiveOptionsWithoutTouchingOriginal" />
+    </UnitTest>
+    <UnitTest name="SelectionAccessors_ReturnOnlySelectedKeys" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1f915229-d24c-8231-925c-717b6ed75862">
+      <Execution id="77c3b48d-bc9f-4b93-bba6-8ed6788b1767" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagSelectionModelTests" name="SelectionAccessors_ReturnOnlySelectedKeys" />
+    </UnitTest>
+    <UnitTest name="DecideClick_WhenNotKeyTriggeredAndTagPresent_TogglesUsingTag" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1024c353-1e72-8c1d-9df6-20792e0a34d6">
+      <Execution id="147447fc-8393-4224-928b-fbf3224a7b21" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.CheckBoxControllerDecisionTests" name="DecideClick_WhenNotKeyTriggeredAndTagPresent_TogglesUsingTag" />
+    </UnitTest>
+    <UnitTest name="LoadSelections_WhenExistingSelectionsUseBothForms_TogglesMatchingOptions" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1dca5090-9cc7-8ebe-b93a-8fb0a92ea6f9">
+      <Execution id="46690a52-ecb1-41bd-a0ed-279585db1382" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerCoverageExpansionTests" name="LoadSelections_WhenExistingSelectionsUseBothForms_TogglesMatchingOptions" />
+    </UnitTest>
+    <UnitTest name="AutoFind_ForwardsItemToDelegate" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1d9ecc00-019f-8634-a8c4-0b8f591e53af">
+      <Execution id="eb36c32e-87e1-496d-a0fb-8b7d1a5acd74" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.LauncherAutoAssignTests" name="AutoFind_ForwardsItemToDelegate" />
+    </UnitTest>
+    <UnitTest name="AddChoicesToDict_ForwardsMailItemToDelegate" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1feeeeaf-2bcc-8c4e-a831-9c4cf50ebbda">
+      <Execution id="1aa5812a-1c06-4904-b22b-feb61adb8094" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.LauncherAutoAssignTests" name="AddChoicesToDict_ForwardsMailItemToDelegate" />
+    </UnitTest>
+    <UnitTest name="DrawFocus_DefaultBody_DrawsFocusRectangleOnUnshownCheckBox" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="181155fe-3eee-8b4d-9c40-f5761f6c95c6">
+      <Execution id="6f44ab70-8da2-4951-b4b0-9c685242dda0" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerRenderingStaTests" name="DrawFocus_DefaultBody_DrawsFocusRectangleOnUnshownCheckBox" />
+    </UnitTest>
+    <UnitTest name="TagViewerKeyDown_OnEnter_TriggersOkExit" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1e28d1c8-0d76-8c78-86be-8eb766a3432f">
+      <Execution id="05a6d598-45d7-420b-80db-02e5484cb7e6" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="TagViewerKeyDown_OnEnter_TriggersOkExit" />
+    </UnitTest>
+    <UnitTest name="FilterToSelected_AfterStateTransitions_ReloadsOnlySelectedControls" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="18c0de5c-6fd8-854b-b39f-310a032d38a7">
+      <Execution id="5031e561-0f94-4788-b5e8-476fde0e26c7" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerCoverageExpansionTests" name="FilterToSelected_AfterStateTransitions_ReloadsOnlySelectedControls" />
+    </UnitTest>
+    <UnitTest name="AutoFindAsync_RunsSyncDelegateAndReturnsResult" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1ffaaae9-dc36-8603-a006-46595a013d81">
+      <Execution id="63f4d333-c61c-4596-8e93-4df0bf984a18" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.LauncherAutoAssignTests" name="AutoFindAsync_RunsSyncDelegateAndReturnsResult" />
+    </UnitTest>
+    <UnitTest name="PropertyForwarders_RouteToViewer" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1cf15a04-43ee-844d-9bb3-d05b143955fb">
+      <Execution id="81dc12a6-b3ca-48a3-abb4-00234ca85ed8" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="PropertyForwarders_RouteToViewer" />
+    </UnitTest>
+    <UnitTest name="CheckboxClick_WithUnprefixedOptionAndPrefix_DoesNotReconstructMissingKey" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="128482ab-05d1-8f01-85ca-f474c05af696">
+      <Execution id="ddc093e1-4eec-4ef3-9aa4-5a03f897ed6a" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerTests" name="CheckboxClick_WithUnprefixedOptionAndPrefix_DoesNotReconstructMissingKey" />
+    </UnitTest>
+    <UnitTest name="FilterToSelectedSet_KeepsOnlySelectedOptions" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="17806b81-013a-8f4b-98d1-e47ce831c28a">
+      <Execution id="21c22ece-d790-4b36-aaa7-abd35ca823d9" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagSelectionModelTests" name="FilterToSelectedSet_KeepsOnlySelectedOptions" />
+    </UnitTest>
+    <UnitTest name="TryGetAutoAssignment_WithMailAndYes_AddsAssignmentsAndReturnsTrue" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1389c233-dee4-8461-ae7d-9299d74778f8">
+      <Execution id="16566c7e-1334-4fd8-a954-3171c7c979f3" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="TryGetAutoAssignment_WithMailAndYes_AddsAssignmentsAndReturnsTrue" />
+    </UnitTest>
+    <UnitTest name="TryGetAutoAssignment_WhenNotMail_ReturnsFalseWithoutPrompting" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1cfc2c6f-d0ad-8423-9e9c-8f85c8f347dd">
+      <Execution id="6e0a552e-7bb8-47a3-861f-e10083214581" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="TryGetAutoAssignment_WhenNotMail_ReturnsFalseWithoutPrompting" />
+    </UnitTest>
+    <UnitTest name="CtrlCBSetter_WhenReassigned_UnsubscribesPreviousCheckbox" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1962ede2-970c-82f9-bfc9-0f627cf32367">
+      <Execution id="c8f62e1a-0819-439c-a1a1-b24c249eb0a4" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.CheckBoxControllerWiringStaTests" name="CtrlCBSetter_WhenReassigned_UnsubscribesPreviousCheckbox" />
+    </UnitTest>
+    <UnitTest name="SelectPageDown_WhenRowBelowViewport_ScrollsToIt" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="17b2981f-994c-86d1-8569-326d38536d65">
+      <Execution id="5a844b62-4b02-4a28-b5d5-b9d756ebf28f" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="SelectPageDown_WhenRowBelowViewport_ScrollsToIt" />
+    </UnitTest>
+    <UnitTest name="SearchTextKeyDownAndKeyUp_RecordCursorAndFilterToSelected" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="122759a8-1e90-8af4-a8b6-e7ff1e35e788">
+      <Execution id="36f95c44-47aa-4e3e-96c5-97d0cd541bdc" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="SearchTextKeyDownAndKeyUp_RecordCursorAndFilterToSelected" />
+    </UnitTest>
+    <UnitTest name="DecideClick_WhenKeyTriggeredAndValueNotChanged_FlipsCheckAndSetsValueFlag" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="17fc9018-011e-8804-b04f-0103ba379ed3">
+      <Execution id="ab699d24-c4e3-48f1-b93d-5bb01d8571c1" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.CheckBoxControllerDecisionTests" name="DecideClick_WhenKeyTriggeredAndValueNotChanged_FlipsCheckAndSetsValueFlag" />
+    </UnitTest>
+    <UnitTest name="GetDefaultPrefix_ReturnsEmptyOtherPrefix" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="162ac0f5-4840-868e-bc21-b4873e1f793e">
+      <Execution id="0cb843f1-2048-4454-a19c-01cd773d632b" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagSelectionModelTests" name="GetDefaultPrefix_ReturnsEmptyOtherPrefix" />
+    </UnitTest>
+    <UnitTest name="SearchAndParse_WhenInputIsEmptyMissingOrWildcard_ReturnsExpectedMatches" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="17af0b7f-ec02-80fc-8ee7-6541d1b9d375">
+      <Execution id="ccdf489d-ec30-47f8-a961-f6c820db6505" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerCoverageExpansionTests" name="SearchAndParse_WhenInputIsEmptyMissingOrWildcard_ReturnsExpectedMatches" />
+    </UnitTest>
+    <UnitTest name="LoadSelections_WhenKeyMissingAndUserAgrees_RoutesToAddColorCategory" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="10272ed0-8317-806f-993b-749d2af6e48c">
+      <Execution id="2a2a094a-9543-4fee-b8bf-173fdc160790" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="LoadSelections_WhenKeyMissingAndUserAgrees_RoutesToAddColorCategory" />
+    </UnitTest>
+    <UnitTest name="UpdateSelections_SnapshotsSelectedKeysFromBothDictionaries" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1b2c9ffd-53a1-83a9-b3b9-ec5435caa942">
+      <Execution id="b7ad3d06-5848-4841-807b-249fabb89e8c" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagSelectionModelTests" name="UpdateSelections_SnapshotsSelectedKeysFromBothDictionaries" />
+    </UnitTest>
+    <UnitTest name="IsPrefixMissing_CoversPresentAbsentNullAndShortSamples" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="15446c3f-76e2-8c7d-a665-6e58607a4476">
+      <Execution id="193b5555-e6ad-4f67-bd2f-2b4db87bb3f3" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagSelectionModelTests" name="IsPrefixMissing_CoversPresentAbsentNullAndShortSamples" />
+    </UnitTest>
+    <UnitTest name="ParseSearchStrings_WhenEmptyWhitespaceOrWildcard_ReturnsExpectedTokens" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="112a1190-558c-841d-94d0-5826e09c0388">
+      <Execution id="cfab2932-cf28-400e-8c5f-490978689048" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagSelectionModelTests" name="ParseSearchStrings_WhenEmptyWhitespaceOrWildcard_ReturnsExpectedTokens" />
+    </UnitTest>
+    <UnitTest name="SelectPageUp_WhenNoRowAboveViewport_SelectsFirstControl" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1bd0a0c9-69d5-8644-b5d9-0c6cd62808e6">
+      <Execution id="b8cfb338-81a5-4942-afbe-bc3dfc9d30d9" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="SelectPageUp_WhenNoRowAboveViewport_SelectsFirstControl" />
+    </UnitTest>
+    <UnitTest name="ResolvePrefix_ResolvesDefaultsAndThrowsOnUnknownKey" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1fcf8756-aea9-8527-b202-e3919d516744">
+      <Execution id="34232ad8-5ace-44c0-a406-e907cedd5508" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagSelectionModelTests" name="ResolvePrefix_ResolvesDefaultsAndThrowsOnUnknownKey" />
+    </UnitTest>
+    <UnitTest name="Search_WhenNoStringsOrMatches_ReturnsSourceOrEmpty" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1c43c0b7-73e0-80c5-9454-4e68a31f3eed">
+      <Execution id="cd75702d-b564-4332-83ef-1a0c2277db5d" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagSelectionModelTests" name="Search_WhenNoStringsOrMatches_ReturnsSourceOrEmpty" />
+    </UnitTest>
+    <UnitTest name="SearchTextKeyDown_OnDown_MovesFocusToFirstOption" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1b7e5ecb-f5cb-83ca-9ed8-3f7d653885ae">
+      <Execution id="f639c883-1d35-4647-b282-12c89ff87b49" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="SearchTextKeyDown_OnDown_MovesFocusToFirstOption" />
+    </UnitTest>
+    <UnitTest name="OptionsPanelPreviewKeyDown_MarksUpAndDownAsInputKeys" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1da58161-73ca-8ac3-acac-575bddc82c70">
+      <Execution id="be6b8401-ce49-48fc-9a1c-41a1f96f07fa" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="OptionsPanelPreviewKeyDown_MarksUpAndDownAsInputKeys" />
+    </UnitTest>
+    <UnitTest name="SelectPageDown_WhenScrollFits_DoesNothing" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1ba40c56-8a01-85b5-ba96-bda715ab6d26">
+      <Execution id="a1cdcf53-8909-4edb-9928-49734a80c2b5" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagControllerSeamTests" name="SelectPageDown_WhenScrollFits_DoesNothing" />
+    </UnitTest>
+    <UnitTest name="ToggleMethods_MutateSelectionState" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="1c90add1-37f3-8962-8a0e-b9e483cc4942">
+      <Execution id="b4b75a19-8128-4044-8bf7-a2741ac62856" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagSelectionModelTests" name="ToggleMethods_MutateSelectionState" />
+    </UnitTest>
+    <UnitTest name="FilterArchive_WhenAutoAssignerNull_ReturnsSourceUnchanged" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tags.test\bin\debug\tags.test.dll" id="10aa1ab2-4c57-8f3a-aad3-5c1acd1aa409">
+      <Execution id="26b9d793-ce21-4c00-a182-0916be68af7d" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Tags.Test.TagSelectionModelTests" name="FilterArchive_WhenAutoAssignerNull_ReturnsSourceUnchanged" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="122759a8-1e90-8af4-a8b6-e7ff1e35e788" executionId="36f95c44-47aa-4e3e-96c5-97d0cd541bdc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d4fd81f-e693-8eaf-9f97-966b09d75b2c" executionId="5ef7365a-8439-47eb-a293-40fe53f20565" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="162ac0f5-4840-868e-bc21-b4873e1f793e" executionId="0cb843f1-2048-4454-a19c-01cd773d632b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d9ecc00-019f-8634-a8c4-0b8f591e53af" executionId="eb36c32e-87e1-496d-a0fb-8b7d1a5acd74" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1378751a-1dbe-82ba-8828-9283a405ddb1" executionId="69ee5bfb-90f4-4b99-925c-df529a24bd52" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16d70254-b1dc-80c5-89d7-a2c4803ac565" executionId="9067f10b-e9bd-439f-bad1-fca6df48a163" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1394659e-4222-88e9-86fb-ccc27b3ca592" executionId="92dabaac-40aa-4ba3-b641-3d194ea2051f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ffaaae9-dc36-8603-a006-46595a013d81" executionId="63f4d333-c61c-4596-8e93-4df0bf984a18" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1fcf8756-aea9-8527-b202-e3919d516744" executionId="34232ad8-5ace-44c0-a406-e907cedd5508" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1bd0a0c9-69d5-8644-b5d9-0c6cd62808e6" executionId="b8cfb338-81a5-4942-afbe-bc3dfc9d30d9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1389c233-dee4-8461-ae7d-9299d74778f8" executionId="16566c7e-1334-4fd8-a954-3171c7c979f3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c43c0b7-73e0-80c5-9454-4e68a31f3eed" executionId="cd75702d-b564-4332-83ef-1a0c2277db5d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="191e761f-2bfa-8264-81a1-5323e1f956a8" executionId="6e23cc98-5e70-42e8-bf94-13bd8f149bbf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1962ede2-970c-82f9-bfc9-0f627cf32367" executionId="c8f62e1a-0819-439c-a1a1-b24c249eb0a4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10f010f7-deb0-843c-b332-26bad5799369" executionId="e0df53ab-4d72-48e9-a354-64239131705c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1feeeeaf-2bcc-8c4e-a831-9c4cf50ebbda" executionId="1aa5812a-1c06-4904-b22b-feb61adb8094" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="141f06bb-9155-8370-a956-50eca625e45a" executionId="3d34546d-00e7-4ded-a63b-7b59b6d2b042" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="112a1190-558c-841d-94d0-5826e09c0388" executionId="cfab2932-cf28-400e-8c5f-490978689048" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="128482ab-05d1-8f01-85ca-f474c05af696" executionId="ddc093e1-4eec-4ef3-9aa4-5a03f897ed6a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1cf15a04-43ee-844d-9bb3-d05b143955fb" executionId="81dc12a6-b3ca-48a3-abb4-00234ca85ed8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="150399cd-ff7a-8957-ab7b-3203b9e5b8b1" executionId="278d4c7f-a957-4fb6-8806-6de7caeff082" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f599be5-79b5-8309-9eec-fcffa188856b" executionId="d1d8af58-5e0b-4384-89ec-63a4da02c521" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1dca5090-9cc7-8ebe-b93a-8fb0a92ea6f9" executionId="46690a52-ecb1-41bd-a0ed-279585db1382" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10769aea-8d15-8e6e-8285-f61efb4dadcb" executionId="4330ef89-7ad8-49b0-9ff4-817f19ccad0e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10fc910e-4636-8336-bcfc-f4dc3d2ab63c" executionId="88297fa4-56b7-4c00-a158-74f612271c12" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a64cec7-88d1-8419-a35f-a4a0accabb97" executionId="93fd826d-b7d9-453e-8b4a-bac707e47715" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17b2981f-994c-86d1-8569-326d38536d65" executionId="5a844b62-4b02-4a28-b5d5-b9d756ebf28f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1528a911-0750-8e7d-9401-ef44990f073d" executionId="3f34caa0-d0ea-4c20-a05f-b792661bea1a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1806d20c-893f-86c3-b2d4-a0ef0e674b99" executionId="d722c691-e7ca-4df8-b6ec-8d89ee648700" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="181155fe-3eee-8b4d-9c40-f5761f6c95c6" executionId="6f44ab70-8da2-4951-b4b0-9c685242dda0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1638b151-4c4f-84b1-9076-1d56d3d18862" executionId="e2fa0649-d407-4a5b-bcf7-e904e7cacd08" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="185b0464-4488-8f35-ba44-d43b70f34b3e" executionId="94305445-0300-4dd3-a86b-5ab01212059f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e4eaf2b-02f1-863a-a490-c53fe6ea1ac9" executionId="0386aa96-472c-4342-99e6-a80f47c1d693" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="149015a4-4541-8706-b690-85f8c62d8fe3" executionId="9cc23e0c-2002-42c0-a04d-e9ddb7323e58" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1878b3e7-7fcf-81db-9135-6aa3cce68f4d" executionId="cbf2ec74-7654-4f6c-889f-373ffef81491" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17703666-0e1d-85f8-9524-0a8cc21e800d" executionId="9f75615d-2e83-428b-a70c-96c7e9afdd90" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e85aedb-02f4-827c-9332-50f5d5d28065" executionId="92d4ab67-6428-41e6-9f81-65cb6b7ee18e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1eeaf61c-ee7e-8884-9acb-4d8022823346" executionId="1ffa8b67-db28-487e-8ef1-d76041335a34" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1abee3d3-71c7-80a9-a6ec-7f958307e8bb" executionId="f2875799-60ad-4f4a-b13c-78f682543cb7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1424e191-698b-8b1c-8957-45c251d60450" executionId="20005ac9-9b42-4231-9706-2391c91dcd4b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ca4e9d5-2b0b-8ef0-9ced-46cf7372550f" executionId="b794cfb7-949b-4968-849a-b8f584fa7bd3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12317ae6-d2d5-804a-8bce-1c0d6f2868e6" executionId="d4710fdf-3780-48e7-bd11-bc2ccb355730" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c90add1-37f3-8962-8a0e-b9e483cc4942" executionId="b4b75a19-8128-4044-8bf7-a2741ac62856" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18c0de5c-6fd8-854b-b39f-310a032d38a7" executionId="5031e561-0f94-4788-b5e8-476fde0e26c7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10aa1ab2-4c57-8f3a-aad3-5c1acd1aa409" executionId="26b9d793-ce21-4c00-a182-0916be68af7d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1cfc2c6f-d0ad-8423-9e9c-8f85c8f347dd" executionId="6e0a552e-7bb8-47a3-861f-e10083214581" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f915229-d24c-8231-925c-717b6ed75862" executionId="77c3b48d-bc9f-4b93-bba6-8ed6788b1767" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e28d1c8-0d76-8c78-86be-8eb766a3432f" executionId="05a6d598-45d7-420b-80db-02e5484cb7e6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1cc90ed5-cfa7-8ac9-98a5-574ff5ceb6f2" executionId="02170258-4df6-479c-bdb7-70f7b7585516" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="171ca244-13f8-8a00-b5da-86e1d3498403" executionId="0f72ee37-5b95-4462-9cb1-376500c82245" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10272ed0-8317-806f-993b-749d2af6e48c" executionId="2a2a094a-9543-4fee-b8bf-173fdc160790" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1da58161-73ca-8ac3-acac-575bddc82c70" executionId="be6b8401-ce49-48fc-9a1c-41a1f96f07fa" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1733b019-db0f-8877-9840-fd0499f1347b" executionId="4547c8ea-bd19-482d-83a8-7e34d52b902e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ba40c56-8a01-85b5-ba96-bda715ab6d26" executionId="a1cdcf53-8909-4edb-9928-49734a80c2b5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1df92f2a-8aca-8041-ad71-d3080ab628c2" executionId="bc5f8e44-3608-453c-a282-14fde4952e0c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17d25810-ceb4-866c-95bd-880f4665668a" executionId="cc103813-2e49-40a8-981f-79251c8b3d74" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b7e5ecb-f5cb-83ca-9ed8-3f7d653885ae" executionId="f639c883-1d35-4647-b282-12c89ff87b49" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15446c3f-76e2-8c7d-a665-6e58607a4476" executionId="193b5555-e6ad-4f67-bd2f-2b4db87bb3f3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17fc9018-011e-8804-b04f-0103ba379ed3" executionId="ab699d24-c4e3-48f1-b93d-5bb01d8571c1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17806b81-013a-8f4b-98d1-e47ce831c28a" executionId="21c22ece-d790-4b36-aaa7-abd35ca823d9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1963da9d-5d5c-8fe2-904a-bbf4cf1beff4" executionId="2ec6d3b3-97bd-4a82-afaf-18161e5252b5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1024c353-1e72-8c1d-9df6-20792e0a34d6" executionId="147447fc-8393-4224-928b-fbf3224a7b21" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14732f9e-bd4d-8e43-84a8-6fa7170b18d3" executionId="d25b20a1-8b4f-4d14-99f9-044d2c067c37" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b2c9ffd-53a1-83a9-b3b9-ec5435caa942" executionId="b7ad3d06-5848-4841-807b-249fabb89e8c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17af0b7f-ec02-80fc-8ee7-6541d1b9d375" executionId="ccdf489d-ec30-47f8-a961-f6c820db6505" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="65" executed="65" passed="65" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\Tags.Test\bin\Debug\Tags.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

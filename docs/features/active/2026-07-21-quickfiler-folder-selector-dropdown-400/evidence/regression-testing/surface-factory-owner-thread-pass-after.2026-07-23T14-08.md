@@ -39,4 +39,3 @@ or mutable shared state.
 | Static members | `0` |
 | Uninstrumented | `13/13 passed` |
 | Instrumented | `13/13 passed` |
-

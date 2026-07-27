@@ -361,6 +361,36 @@ namespace QuickFiler.Test.Viewers
             }
         }
 
+        [TestMethod]
+        public void PostRenderAndSelectorAsync_StaleLeaseReturnsCompletedWithoutPublishing()
+        {
+            var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+            var messenger = new TrackingMessenger();
+            var coordinator = new BreadcrumbBridgeCoordinator(messenger, provider.Object);
+            var lifetimeField = typeof(BreadcrumbBridgeCoordinator).GetField(
+                "_upgradeLifetime",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
+            );
+            lifetimeField.Should().NotBeNull();
+            var lifetime =
+                lifetimeField.GetValue(coordinator) as BreadcrumbCoordinatorUpgradeLifetime;
+            lifetime.Should().NotBeNull();
+            BreadcrumbUpgradeLease lease = lifetime.BeginPopulation();
+            lifetime.Invalidate().Should().BeTrue();
+
+            var method = typeof(BreadcrumbBridgeCoordinator).GetMethod(
+                "PostRenderAndSelectorAsync",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
+            );
+            method.Should().NotBeNull();
+            var result = method.Invoke(coordinator, new object[] { "render", null, lease }) as Task;
+
+            result.Should().NotBeNull();
+            result.IsCompleted.Should().BeTrue();
+            result.GetAwaiter().GetResult();
+            messenger.Posted.Should().BeEmpty();
+        }
+
         private static TaskCompletionSource<FolderTreeNodeKey> Completion() =>
             new TaskCompletionSource<FolderTreeNodeKey>(
                 TaskCreationOptions.RunContinuationsAsynchronously

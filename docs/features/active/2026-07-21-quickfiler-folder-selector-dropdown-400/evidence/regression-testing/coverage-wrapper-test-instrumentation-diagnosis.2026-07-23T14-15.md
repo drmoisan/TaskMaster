@@ -76,4 +76,3 @@ Canonical `coverage.config` SHA-256 is
 `B9CD80356C6BDBE03807A0B8CB106AE03D24EFBDBB2515097FBF003099050943`
 and is a byte-preservation gate. No post-processing, runsettings, test filter, threshold,
 or canonical exclusion will change.
-

@@ -17,6 +17,46 @@ namespace QuickFiler.Test.Viewers
     public sealed partial class BreadcrumbDropDownOpenCoordinatorTests
     {
         [TestMethod]
+        public void Reset_HostAlreadyClosedWithOpenSelector_CancelsExactlyOnce()
+        {
+            var harness = new CoordinatorHarness { SelectorOpen = true };
+
+            harness.Coordinator.Reset();
+            harness.Context.DrainAll();
+
+            harness.CancelCount.Should().Be(1);
+            harness.Host.CloseReasons.Should().BeEmpty();
+            harness.Host.ResetCount.Should().Be(1);
+        }
+
+        [TestMethod]
+        public void SetDroppedDown_CloseThrows_ReportsOnceAndAllowsRetry()
+        {
+            var failure = new InvalidOperationException("close failed");
+            var harness = new CoordinatorHarness();
+            harness.Host.SetOpen(true);
+            harness.Host.CloseFailure = failure;
+
+            harness.Coordinator.SetDroppedDown(false);
+            harness.Context.DrainAll();
+
+            harness.Host.CloseFailure = null;
+            harness.SelectorOpen = true;
+            harness.Host.SetOpen(true);
+            harness.Coordinator.SetDroppedDown(false);
+            harness.Context.DrainAll();
+
+            harness
+                .Host.CloseReasons.Should()
+                .Equal(
+                    BreadcrumbDropDownCloseReason.Uncommitted,
+                    BreadcrumbDropDownCloseReason.Uncommitted
+                );
+            harness.Errors.Should().ContainSingle().Which.Should().BeSameAs(failure);
+            harness.CancelCount.Should().Be(0);
+        }
+
+        [TestMethod]
         public void RequestOpen_HostSideCancellationBeforeFalseCompletionIsNotDuplicated()
         {
             var pending = NewCompletion();

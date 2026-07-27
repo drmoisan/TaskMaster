@@ -18,4 +18,3 @@ An earlier attempt used `dotnet tool run csharpier`, but the repository-local `d
 shim cannot execute SDK tools in this checkout. That attempt exited nonzero and changed
 no file. P8-T31 was restarted from formatting with the installed, approved
 `csharpier.exe`; only the passing restart is current gate evidence.
-

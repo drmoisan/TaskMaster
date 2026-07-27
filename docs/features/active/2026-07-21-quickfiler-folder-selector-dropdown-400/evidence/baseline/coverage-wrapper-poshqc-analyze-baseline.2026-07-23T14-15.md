@@ -12,4 +12,3 @@
 
 The final P8-T40 gate must introduce zero findings in either authorized file and must
 not increase the existing folder-scan count.
-

@@ -156,6 +156,7 @@
     <Compile Include="EmailIntelligence\EmailFiler_TestSupport.cs" />
     <Compile Include="EmailIntelligence\EmailFilerConfig_Tests.cs" />
     <Compile Include="EmailIntelligence\SpamBayes_Tests.cs" />
+    <Compile Include="EmailIntelligence\SpamBayesActionsRegressionTests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MailItemHelperTests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MinedMailInfoTests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\AttachmentInfoTests.cs" />

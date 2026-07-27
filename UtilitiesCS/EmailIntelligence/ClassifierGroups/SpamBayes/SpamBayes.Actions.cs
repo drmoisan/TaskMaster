@@ -54,11 +54,8 @@ namespace UtilitiesCS.EmailIntelligence
             }
             if (isSpam == true)
             {
-                if (
-                    ((mailItem.Parent as Folder)?.FolderPath ?? "")
-                    != ((Globals?.Ol?.JunkCertain?.FolderPath ?? "junk_folder_not_set"))
-                ) { return mailItem.Parent as Folder; }
-                return Globals?.Ol?.JunkCertain;
+                var junkCertain = Globals?.Ol?.JunkCertain;
+                return junkCertain ?? mailItem.Parent as Folder;
             }
             else if (isSpam == false)
             {

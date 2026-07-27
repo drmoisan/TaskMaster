@@ -109,4 +109,3 @@ reported no finding. The review independently confirmed:
 - there is no static/shared fixture state or anti-masking mechanism;
 - the 480-line source hash and all protected hashes match;
 - both 13/13 pass artifacts and the Cobertura file are present and valid.
-

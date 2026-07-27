@@ -70,4 +70,3 @@ introduce mutable static state.
 The authorized implementation scope is exactly the existing test file. No production,
 project, package, configuration, runsettings, filter, threshold, or exclusion change is
 authorized by this batch.
-

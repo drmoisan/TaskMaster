@@ -60,6 +60,9 @@
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorTests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorProbabilityTests.cs" />
     <Compile Include="Viewers\BreadcrumbCoordinatorLifecycleTests.cs" />
+    <Compile Include="Viewers\BreadcrumbCoordinatorUpgradeLifetimeTests.cs" />
+    <Compile Include="Viewers\BreadcrumbItemViewerLifecycleCoordinatorTests.cs" />
+    <Compile Include="Viewers\BreadcrumbPopupUiOperationsDirectAdapterTests.cs" />
     <Compile Include="Viewers\BreadcrumbUiThreadDispatchTests.cs" />
     <Compile Include="Viewers\BreadcrumbSelectorToggleUiBoundaryTests.cs" />
     <Compile Include="Viewers\BreadcrumbPopupControlDispatchTests.cs" />

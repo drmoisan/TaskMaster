@@ -414,10 +414,12 @@ namespace QuickFiler.Test.Viewers
                     var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
                     Viewer.InitializeBreadcrumbPipeline(provider.Object);
                     FieldInfo field = typeof(QuickFiler.ItemViewer).GetField(
-                        "_breadcrumbHub",
+                        "_breadcrumbLifecycleCoordinator",
                         BindingFlags.Instance | BindingFlags.NonPublic
                     );
-                    Hub = (BreadcrumbMessengerHub)field.GetValue(Viewer);
+                    var lifecycle = (BreadcrumbItemViewerLifecycleCoordinator)
+                        field.GetValue(Viewer);
+                    Hub = lifecycle.Hub;
                 }
                 catch
                 {

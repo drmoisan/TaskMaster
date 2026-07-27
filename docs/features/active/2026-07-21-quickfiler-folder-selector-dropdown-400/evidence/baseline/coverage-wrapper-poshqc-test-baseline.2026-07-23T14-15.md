@@ -24,4 +24,3 @@ The existing test file has SHA-256
 `835D3F4890C7D896B09D43330F414A815ACB7670AD0A385CC042F33720EE7F5E`
 and 169 physical lines. The final P8-T41 gate must pass through the required PoshQC tool;
 the supplementary passing run does not waive that requirement.
-

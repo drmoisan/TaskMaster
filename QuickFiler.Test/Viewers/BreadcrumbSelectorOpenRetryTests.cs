@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -255,18 +254,10 @@ namespace QuickFiler.Test.Viewers
                 SynchronizationContext.SetSynchronizationContext(Context);
                 Viewer = new QuickFiler.ItemViewer();
                 var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
-                Viewer.InitializeBreadcrumbPipeline(provider.Object);
-                typeof(QuickFiler.ItemViewer)
-                    .GetField(
-                        "_breadcrumbPopupUiOperations",
-                        BindingFlags.Instance | BindingFlags.NonPublic
-                    )
-                    .SetValue(
-                        Viewer,
-                        new BreadcrumbPopupUiOperations(
-                            new BreadcrumbUiDispatcher(Context, _errors.Add)
-                        )
-                    );
+                var operations = new BreadcrumbPopupUiOperations(
+                    new BreadcrumbUiDispatcher(Context, _errors.Add)
+                );
+                Viewer.InitializeBreadcrumbPipeline(provider.Object, operations);
                 Viewer.SetFolderItems(new[] { "A", "B" });
                 Viewer.SetFolderSelectedIndex(0);
                 Host = new RecordingDropDownHost(openResults, CancelSelection);

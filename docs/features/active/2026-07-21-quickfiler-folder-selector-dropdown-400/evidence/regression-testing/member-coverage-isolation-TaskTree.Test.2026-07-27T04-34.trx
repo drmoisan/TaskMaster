@@ -1,0 +1,366 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="270f1042-dfb4-42f2-a405-c682e8cc3286" name="DanMoisan@MEGALODON4 2026-07-27 00:29:57" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-07-27T00:29:57.5364018-04:00" queuing="2026-07-27T00:29:57.5364018-04:00" start="2026-07-27T00:29:56.4338334-04:00" finish="2026-07-27T00:29:57.8202970-04:00" />
+  <TestSettings name="default" id="bc034fc5-bfe7-45a2-a569-9e3ac099dc9c">
+    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-07-27_00_29_57" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="6a09c940-ac0e-4113-9e9a-e1818c736e40" testId="167ed801-8fdb-804a-b905-048f42046bd4" testName="MoveObjectsToChildren_DesyncedRoot_FiresMessageSeam" computerName="MEGALODON4" duration="00:00:00.0038517" startTime="2026-07-27T00:29:57.6228255-04:00" endTime="2026-07-27T00:29:57.6268296-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6a09c940-ac0e-4113-9e9a-e1818c736e40" />
+    <UnitTestResult executionId="67fc20c0-a91c-48ee-a1ec-0955183ab93b" testId="100e51f1-2ca4-8462-9cbf-9660bdf85983" testName="InitializeTreeListView_InvokesFacadeWithRootsAndFilter" computerName="MEGALODON4" duration="00:00:00.0216838" startTime="2026-07-27T00:29:57.4985166-04:00" endTime="2026-07-27T00:29:57.5200408-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="67fc20c0-a91c-48ee-a1ec-0955183ab93b" />
+    <UnitTestResult executionId="7fec70d1-a828-43a3-b221-a7cbaca09602" testId="14f23d29-f44d-81d1-878b-97aa7e71dbe3" testName="MoveObjectsToSibling_RootNotInRoots_FiresMessageSeam" computerName="MEGALODON4" duration="00:00:00.0065355" startTime="2026-07-27T00:29:57.5975328-04:00" endTime="2026-07-27T00:29:57.6040455-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7fec70d1-a828-43a3-b221-a7cbaca09602" />
+    <UnitTestResult executionId="40c19232-75fa-4452-8270-bdf0865bc085" testId="150b48d6-bbc3-885a-8c14-cf60a16221e1" testName="MoveObjectsToSibling_ChildTarget_InsertsIntoParentChildren" computerName="MEGALODON4" duration="00:00:00.0143480" startTime="2026-07-27T00:29:57.6040455-04:00" endTime="2026-07-27T00:29:57.6188260-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="40c19232-75fa-4452-8270-bdf0865bc085" />
+    <UnitTestResult executionId="8306b4d5-6e16-4bec-b9c1-9b7fcdd20d2b" testId="1b0b8e49-8d6e-8134-bc2c-f9be91713d98" testName="ToggleExpandCollapseAll_AlternatesExpandThenCollapse" computerName="MEGALODON4" duration="00:00:00.0007535" startTime="2026-07-27T00:29:57.5200408-04:00" endTime="2026-07-27T00:29:57.5210382-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8306b4d5-6e16-4bec-b9c1-9b7fcdd20d2b" />
+    <UnitTestResult executionId="47059f4d-0d68-4e22-8151-580ad3b1312d" testId="1dc37883-98d1-8b14-a071-1088db6f224b" testName="ActivateOlItem_WhenSelectable_ClearsThenAddsToSelection" computerName="MEGALODON4" duration="00:00:00.2432835" startTime="2026-07-27T00:29:57.2002436-04:00" endTime="2026-07-27T00:29:57.5140373-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="47059f4d-0d68-4e22-8151-580ad3b1312d" />
+    <UnitTestResult executionId="8f0a81ea-3847-4831-947e-b87787fca88a" testId="1bb9560d-4183-85e0-9707-d52d993a15bc" testName="MoveObjectsToChildren_RootSource_ReparentsAndRemovesFromRoots" computerName="MEGALODON4" duration="00:00:00.0042130" startTime="2026-07-27T00:29:57.6188260-04:00" endTime="2026-07-27T00:29:57.6228255-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8f0a81ea-3847-4831-947e-b87787fca88a" />
+    <UnitTestResult executionId="ca43fa53-e9af-44e0-ba79-c56f2050d0bb" testId="1b9ae98d-bd3f-8fef-9150-714f2006fc74" testName="ActivateOlItem_WhenNotSelectable_DisplaysTaskItem" computerName="MEGALODON4" duration="00:00:00.0375504" startTime="2026-07-27T00:29:57.5160400-04:00" endTime="2026-07-27T00:29:57.5534832-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ca43fa53-e9af-44e0-ba79-c56f2050d0bb" />
+    <UnitTestResult executionId="de8e95c9-9842-4ff4-bd97-7de7454cdfbe" testId="12b1a8e1-e64a-888c-8d13-4186c1a56e87" testName="FindChildByID_NotFound_ReturnsNull" computerName="MEGALODON4" duration="00:00:00.0001962" startTime="2026-07-27T00:29:57.6308285-04:00" endTime="2026-07-27T00:29:57.6318287-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="de8e95c9-9842-4ff4-bd97-7de7454cdfbe" />
+    <UnitTestResult executionId="bcc16b3f-2388-4931-b4af-851ce28d76d0" testId="1f5c6f38-3a8f-8271-81bc-184f581955ec" testName="GetSelectedTreeNode_WhenNothingSelected_ReturnsNull" computerName="MEGALODON4" duration="00:00:00.0003251" startTime="2026-07-27T00:29:57.5975328-04:00" endTime="2026-07-27T00:29:57.5985329-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bcc16b3f-2388-4931-b4af-851ce28d76d0" />
+    <UnitTestResult executionId="bb4d383f-529e-470e-b26a-33cb613968c3" testId="15e649bb-5503-8d52-b815-4ad476fafb6f" testName="IsValidType_MailItem_ReturnsTrue" computerName="MEGALODON4" duration="00:00:00.0003106" startTime="2026-07-27T00:29:57.5995367-04:00" endTime="2026-07-27T00:29:57.5995367-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bb4d383f-529e-470e-b26a-33cb613968c3" />
+    <UnitTestResult executionId="63ef5469-5fc6-4afa-b7eb-685cf519820d" testId="169d4e46-b384-847d-bc1d-5b876c1eb085" testName="HandleModelCanDrop_DropOnSelf_SetsNoneEffect" computerName="MEGALODON4" duration="00:00:00.0025197" startTime="2026-07-27T00:29:57.6318287-04:00" endTime="2026-07-27T00:29:57.6348283-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="63ef5469-5fc6-4afa-b7eb-685cf519820d" />
+    <UnitTestResult executionId="12d0867c-ff0f-48f7-acf6-7535b919eabf" testId="1c22d742-9bf8-88a6-984c-d34dfae48fd6" testName="ApplyPostDropView_WhenFilterActive_ReAppliesFilterAndSorts" computerName="MEGALODON4" duration="00:00:00.0008903" startTime="2026-07-27T00:29:57.6198255-04:00" endTime="2026-07-27T00:29:57.6208254-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="12d0867c-ff0f-48f7-acf6-7535b919eabf" />
+    <UnitTestResult executionId="14e2536e-1b39-47c9-9a7f-3ba3e4caf102" testId="11ccb02a-4372-87d2-bf2b-f6843bff31f0" testName="MoveObjectsToRoots_CrossTree_RemovesFromSourceAddsToTarget" computerName="MEGALODON4" duration="00:00:00.0021620" startTime="2026-07-27T00:29:57.4975159-04:00" endTime="2026-07-27T00:29:57.4995159-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="14e2536e-1b39-47c9-9a7f-3ba3e4caf102" />
+    <UnitTestResult executionId="9290aa9b-c3f4-4e53-a0e7-025de8ec5184" testId="1749486a-333a-8c0d-827e-0a70e14ccc0a" testName="IsValidType_TaskItem_ReturnsTrue" computerName="MEGALODON4" duration="00:00:00.0002006" startTime="2026-07-27T00:29:57.5995367-04:00" endTime="2026-07-27T00:29:57.5995367-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9290aa9b-c3f4-4e53-a0e7-025de8ec5184" />
+    <UnitTestResult executionId="01a61162-41ff-4644-81ca-23654aa27b2a" testId="1248e525-2154-8543-8ca1-fff97e234ff0" testName="RouteDrop_Background_RoutesToRoots_ReturnsTrue" computerName="MEGALODON4" duration="00:00:00.2293536" startTime="2026-07-27T00:29:57.1982437-04:00" endTime="2026-07-27T00:29:57.4995159-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="01a61162-41ff-4644-81ca-23654aa27b2a" />
+    <UnitTestResult executionId="2d91392a-6a23-4805-b68d-fb16ab30b553" testId="19c8bc4e-81bc-8dfd-bcb0-31d9f6fed798" testName="TreeLvActivateItem_WhenValidType_ActivatesSelectedItem" computerName="MEGALODON4" duration="00:00:00.0403614" startTime="2026-07-27T00:29:57.5624435-04:00" endTime="2026-07-27T00:29:57.6030460-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2d91392a-6a23-4805-b68d-fb16ab30b553" />
+    <UnitTestResult executionId="d1836bcc-e897-4df9-9371-48b01013d268" testId="14c847a1-6973-8f29-9fde-ff7b4f113c11" testName="FindChildByID_NullId_MatchesEmptyIdNode" computerName="MEGALODON4" duration="00:00:00.0001694" startTime="2026-07-27T00:29:57.6318287-04:00" endTime="2026-07-27T00:29:57.6318287-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d1836bcc-e897-4df9-9371-48b01013d268" />
+    <UnitTestResult executionId="a03fb8ea-1cba-440d-855c-6fc26dc8f75e" testId="13a9a1f8-8533-8220-b152-813105c11909" testName="TreeLvActivateItem_WhenNoSelection_IsNoOp" computerName="MEGALODON4" duration="00:00:00.0005726" startTime="2026-07-27T00:29:57.6005362-04:00" endTime="2026-07-27T00:29:57.6020411-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a03fb8ea-1cba-440d-855c-6fc26dc8f75e" />
+    <UnitTestResult executionId="12c993c6-ed55-42ae-99eb-80fd45e9e998" testId="1fee666a-27d7-8f1b-a224-625b890aa142" testName="HandleModelDropped_DefaultLocation_ReturnsEarly" computerName="MEGALODON4" duration="00:00:00.0011347" startTime="2026-07-27T00:29:57.6368284-04:00" endTime="2026-07-27T00:29:57.6378284-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="12c993c6-ed55-42ae-99eb-80fd45e9e998">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+Fired HandleModelDropped</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="170909e2-a8ee-4723-9285-214d6fcd7c54" testId="1fd0ca88-0663-8726-9f1a-562a52b28f19" testName="ToggleHideComplete_AlternatesClearThenSetFilter" computerName="MEGALODON4" duration="00:00:00.0012061" startTime="2026-07-27T00:29:57.5210382-04:00" endTime="2026-07-27T00:29:57.5220388-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="170909e2-a8ee-4723-9285-214d6fcd7c54" />
+    <UnitTestResult executionId="2c5c7356-953d-4e59-8ef9-138853e598d2" testId="18058251-a42a-892d-b673-f4a4a70eaf32" testName="ActivateOlItem_WhenItemNull_NoExplorerInteraction" computerName="MEGALODON4" duration="00:00:00.0004129" startTime="2026-07-27T00:29:57.6005362-04:00" endTime="2026-07-27T00:29:57.6005362-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2c5c7356-953d-4e59-8ef9-138853e598d2" />
+    <UnitTestResult executionId="44caa32a-86ca-411d-9cef-6c44e65640b1" testId="1f15c9a3-edfc-8af2-8cf4-d9572ac0df60" testName="ResolveRowStyle_WhenComplete_AddsStrikeout" computerName="MEGALODON4" duration="00:00:00.0001465" startTime="2026-07-27T00:29:57.5985329-04:00" endTime="2026-07-27T00:29:57.5985329-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="44caa32a-86ca-411d-9cef-6c44e65640b1" />
+    <UnitTestResult executionId="53cfeb0b-2ac6-43c9-aab1-00b296238e94" testId="1da2a0e6-c3bd-8d37-92fc-a91a5bcb775a" testName="MoveObjectsToRoots_SameTree_AlreadyRoot_DoesNothing" computerName="MEGALODON4" duration="00:00:00.0006446" startTime="2026-07-27T00:29:57.4995159-04:00" endTime="2026-07-27T00:29:57.5005194-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="53cfeb0b-2ac6-43c9-aab1-00b296238e94" />
+    <UnitTestResult executionId="00b64b5a-ea25-4e0a-aa46-884e3917070e" testId="150f1362-fffb-8151-a780-f8f1b7221302" testName="ActivateOlItem_WhenNotSelectable_DisplaysMailItem" computerName="MEGALODON4" duration="00:00:00.0017170" startTime="2026-07-27T00:29:57.5140373-04:00" endTime="2026-07-27T00:29:57.5160400-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="00b64b5a-ea25-4e0a-aa46-884e3917070e" />
+    <UnitTestResult executionId="98f3329e-c93d-4b5f-997f-356a552e46d2" testId="1b022fc4-5b62-8ebf-92d7-630eecd543cc" testName="HandleModelCanDrop_ReorderAboveItem_SetsMoveEffect" computerName="MEGALODON4" duration="00:00:00.0002652" startTime="2026-07-27T00:29:57.6348283-04:00" endTime="2026-07-27T00:29:57.6348283-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="98f3329e-c93d-4b5f-997f-356a552e46d2" />
+    <UnitTestResult executionId="6711c669-b96b-4e86-87d4-5f3f072938f9" testId="12657b4e-553c-8d05-a3bb-c652619c0bfc" testName="ActivateOlItemAsync_WhenItemNull_NoExplorerInteraction" computerName="MEGALODON4" duration="00:00:00.0005992" startTime="2026-07-27T00:29:57.6005362-04:00" endTime="2026-07-27T00:29:57.6005362-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6711c669-b96b-4e86-87d4-5f3f072938f9" />
+    <UnitTestResult executionId="2f5eefc0-5518-449d-a6ea-5e032a8dd8e2" testId="15bfb0ca-d576-8661-9696-f51c8f8d3405" testName="IsValidType_OtherObject_ReturnsFalse" computerName="MEGALODON4" duration="00:00:00.0001821" startTime="2026-07-27T00:29:57.5995367-04:00" endTime="2026-07-27T00:29:57.6005362-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2f5eefc0-5518-449d-a6ea-5e032a8dd8e2" />
+    <UnitTestResult executionId="75ac6304-6b7f-43f2-b3bb-a457b3e8a5ce" testId="1f42c2e8-687a-849f-a162-5226ff9e6a4c" testName="RebuildTreeVisual_InvokesRebuildTreeWithRoots" computerName="MEGALODON4" duration="00:00:00.0703169" startTime="2026-07-27T00:29:57.5220388-04:00" endTime="2026-07-27T00:29:57.5928868-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="75ac6304-6b7f-43f2-b3bb-a457b3e8a5ce" />
+    <UnitTestResult executionId="74959087-4f20-4803-9e9a-ceb26a23be16" testId="17d03bb2-b09d-867b-8410-ba96b117467c" testName="HandleModelCanDrop_BackgroundAllRoots_SaysAlreadyRoots" computerName="MEGALODON4" duration="00:00:00.0007273" startTime="2026-07-27T00:29:57.6348283-04:00" endTime="2026-07-27T00:29:57.6358282-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="74959087-4f20-4803-9e9a-ceb26a23be16" />
+    <UnitTestResult executionId="995edd79-b326-4015-beb3-06f76cad00f4" testId="18b46a4a-b66e-8116-b5c0-ec902de82f37" testName="RouteDrop_BelowItem_InsertsSiblingAfterTarget_ReturnsTrue" computerName="MEGALODON4" duration="00:00:00.0114335" startTime="2026-07-27T00:29:57.6070455-04:00" endTime="2026-07-27T00:29:57.6188260-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="995edd79-b326-4015-beb3-06f76cad00f4" />
+    <UnitTestResult executionId="547076b2-425d-4705-b6d6-3f7b50c3a535" testId="1dcbdb8a-e2e8-8a99-9d8c-e8212c30e7fd" testName="ResolveRowStyle_WhenNotComplete_RemovesStrikeout" computerName="MEGALODON4" duration="00:00:00.0004907" startTime="2026-07-27T00:29:57.5985329-04:00" endTime="2026-07-27T00:29:57.5995367-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="547076b2-425d-4705-b6d6-3f7b50c3a535" />
+    <UnitTestResult executionId="b012ebfd-824e-4346-bcf8-0eea1a97ac43" testId="1082f545-787d-8f55-9c1f-6bbac578bcc1" testName="TreeLvActivateItemAsync_WhenNoSelection_IsNoOp" computerName="MEGALODON4" duration="00:00:00.0006893" startTime="2026-07-27T00:29:57.6588298-04:00" endTime="2026-07-27T00:29:57.6598288-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b012ebfd-824e-4346-bcf8-0eea1a97ac43" />
+    <UnitTestResult executionId="9aa25994-137b-4730-8f69-7c6d340c1d94" testId="1ce89144-692a-81da-95af-9f71ee82164c" testName="MoveObjectsToSibling_RootTarget_RemovesFromRootsAndReseeds" computerName="MEGALODON4" duration="00:00:00.0882865" startTime="2026-07-27T00:29:57.5090370-04:00" endTime="2026-07-27T00:29:57.5975328-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9aa25994-137b-4730-8f69-7c6d340c1d94" />
+    <UnitTestResult executionId="758aadb5-35e7-4b59-8a1d-1dd0bef2e618" testId="1fa9b2a2-8d11-87b2-b0cc-045fd1aad708" testName="MoveObjectsToChildren_NonRootSource_ReparentsUnderTarget" computerName="MEGALODON4" duration="00:00:00.0034084" startTime="2026-07-27T00:29:57.6268296-04:00" endTime="2026-07-27T00:29:57.6308285-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="758aadb5-35e7-4b59-8a1d-1dd0bef2e618" />
+    <UnitTestResult executionId="75631471-4946-4b02-b691-390dbcce365c" testId="11e98410-c594-813f-b937-503c0425816a" testName="HandleModelCanDrop_DropOnDescendant_SaysParadox" computerName="MEGALODON4" duration="00:00:00.0003473" startTime="2026-07-27T00:29:57.6358282-04:00" endTime="2026-07-27T00:29:57.6358282-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="75631471-4946-4b02-b691-390dbcce365c" />
+    <UnitTestResult executionId="aee1b49a-6e26-4d9c-87aa-1b55379a0c3a" testId="15358730-8a15-86b3-a32b-2ea47ffb66f0" testName="FindChildByID_FoundAtDepth_ReturnsNode" computerName="MEGALODON4" duration="00:00:00.0005146" startTime="2026-07-27T00:29:57.6308285-04:00" endTime="2026-07-27T00:29:57.6308285-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="aee1b49a-6e26-4d9c-87aa-1b55379a0c3a" />
+    <UnitTestResult executionId="4789fa00-841f-4b1d-95fc-a1c88fa902f1" testId="16fb34db-6bd4-80aa-8bf3-cd26858c8be9" testName="ActivateOlItemAsync_WhenSelectable_ClearsAddsAndActivates" computerName="MEGALODON4" duration="00:00:00.0040176" startTime="2026-07-27T00:29:57.5534832-04:00" endTime="2026-07-27T00:29:57.5603359-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4789fa00-841f-4b1d-95fc-a1c88fa902f1" />
+    <UnitTestResult executionId="14007f74-d4b2-4304-9be8-eb9425ea1ed1" testId="1db0df22-7861-800d-ac7a-50c3f41ef5cd" testName="Constructor_NullMessageSeam_DoesNotThrow" computerName="MEGALODON4" duration="00:00:00.0217130" startTime="2026-07-27T00:29:57.4753014-04:00" endTime="2026-07-27T00:29:57.4985166-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="14007f74-d4b2-4304-9be8-eb9425ea1ed1" />
+    <UnitTestResult executionId="1b045f0c-dd3e-4466-a634-2bbbd2202abb" testId="139fc246-3379-80fd-9d9f-fb031ad290e0" testName="GetSelectedTreeNode_ReturnsFacadeSelection" computerName="MEGALODON4" duration="00:00:00.0039751" startTime="2026-07-27T00:29:57.5938869-04:00" endTime="2026-07-27T00:29:57.5975328-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1b045f0c-dd3e-4466-a634-2bbbd2202abb" />
+    <UnitTestResult executionId="eadca802-11c1-4b9e-9084-c0bb86f52fe1" testId="1a138784-ce2c-88c4-9778-35028e43b6bd" testName="Constructor_AssignsControllerOnViewer" computerName="MEGALODON4" duration="00:00:00.1905109" startTime="2026-07-27T00:29:57.1982437-04:00" endTime="2026-07-27T00:29:57.4679231-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="eadca802-11c1-4b9e-9084-c0bb86f52fe1" />
+    <UnitTestResult executionId="a01853c7-c63c-4b1b-ba9e-f7e1f4243d16" testId="10fe1d11-ef93-8a0b-a003-9cf5d06110a8" testName="MoveObjectsToRoots_SameTree_PromotesChildToRoot" computerName="MEGALODON4" duration="00:00:00.2253901" startTime="2026-07-27T00:29:57.2002436-04:00" endTime="2026-07-27T00:29:57.4975159-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a01853c7-c63c-4b1b-ba9e-f7e1f4243d16">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="534df948-5766-40a7-b28b-a0d5569e82e3" testId="183dab59-5900-8475-96fe-1bb27477a615" testName="RouteDrop_UnhandledLocation_ReturnsFalse_NoMove" computerName="MEGALODON4" duration="00:00:00.0007672" startTime="2026-07-27T00:29:57.6188260-04:00" endTime="2026-07-27T00:29:57.6198255-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="534df948-5766-40a7-b28b-a0d5569e82e3" />
+    <UnitTestResult executionId="2ac90cb3-24a1-4af6-8aba-c6940777849a" testId="18d619a4-83cf-89b8-b58f-67d103e55d40" testName="RouteDrop_AboveItem_InsertsSiblingBeforeTarget_ReturnsTrue" computerName="MEGALODON4" duration="00:00:00.0140779" startTime="2026-07-27T00:29:57.5928868-04:00" endTime="2026-07-27T00:29:57.6070455-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2ac90cb3-24a1-4af6-8aba-c6940777849a" />
+    <UnitTestResult executionId="4c9d0fd8-dc9c-4d6c-898f-86039bc24e53" testId="117e089a-1796-83a4-bb5f-41ef6089e351" testName="ApplyPostDropView_WhenFilterInactive_SortsWithoutReapplyingFilter" computerName="MEGALODON4" duration="00:00:00.0010248" startTime="2026-07-27T00:29:57.6208254-04:00" endTime="2026-07-27T00:29:57.6218258-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4c9d0fd8-dc9c-4d6c-898f-86039bc24e53" />
+    <UnitTestResult executionId="7fde410a-5f56-4c71-b5fd-e50ac00bab37" testId="18879cb1-a2c7-8398-b24e-5ace8977792d" testName="ActivateOlItemAsync_WhenNotSelectable_DisplaysAndActivates" computerName="MEGALODON4" duration="00:00:00.0016539" startTime="2026-07-27T00:29:57.5603359-04:00" endTime="2026-07-27T00:29:57.5619233-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7fde410a-5f56-4c71-b5fd-e50ac00bab37" />
+    <UnitTestResult executionId="8bffc879-94d9-49f1-8c0d-eacd49995f7d" testId="1df164e1-2be3-8574-89ca-89e62c9a9e15" testName="ResizeForm_InvokesResizeControlsAndAutoSize" computerName="MEGALODON4" duration="00:00:00.0007972" startTime="2026-07-27T00:29:57.5928868-04:00" endTime="2026-07-27T00:29:57.5938869-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8bffc879-94d9-49f1-8c0d-eacd49995f7d" />
+    <UnitTestResult executionId="9cca9a6b-a3cf-4629-8a93-10c165763142" testId="1220912b-ac99-8823-90f7-52f1e8248600" testName="TreeLvActivateItemAsync_WhenValidType_ActivatesSelectedItem" computerName="MEGALODON4" duration="00:00:00.0125509" startTime="2026-07-27T00:29:57.6030460-04:00" endTime="2026-07-27T00:29:57.6178257-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9cca9a6b-a3cf-4629-8a93-10c165763142" />
+    <UnitTestResult executionId="488f64f2-c9b7-4530-b921-f5c3ec1c4653" testId="1d0bc0be-3888-8842-a29a-48399f1400d7" testName="RouteDrop_Item_RoutesToChildren_ReturnsTrue" computerName="MEGALODON4" duration="00:00:00.0928659" startTime="2026-07-27T00:29:57.4995159-04:00" endTime="2026-07-27T00:29:57.5928868-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="488f64f2-c9b7-4530-b921-f5c3ec1c4653" />
+    <UnitTestResult executionId="e17f3ee4-8ac0-4341-8781-26bd6ed98c19" testId="179d3161-20d3-8dfe-a1e8-34990d9e6db0" testName="TreeLvActivateItemAsync_WhenUnsupportedType_FiresMessageSeam" computerName="MEGALODON4" duration="00:00:00.0006909" startTime="2026-07-27T00:29:57.6598288-04:00" endTime="2026-07-27T00:29:57.6628283-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e17f3ee4-8ac0-4341-8781-26bd6ed98c19" />
+    <UnitTestResult executionId="1c323cc3-69a2-4332-be65-68f5c6034f05" testId="17eb1dd5-5a7f-8bcd-8af8-b6ce53a16ac6" testName="TreeLvActivateItem_WhenUnsupportedType_FiresMessageSeam" computerName="MEGALODON4" duration="00:00:00.0571726" startTime="2026-07-27T00:29:57.6020411-04:00" endTime="2026-07-27T00:29:57.6588298-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1c323cc3-69a2-4332-be65-68f5c6034f05" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="TreeLvActivateItem_WhenNoSelection_IsNoOp" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="13a9a1f8-8533-8220-b152-813105c11909">
+      <Execution id="a03fb8ea-1cba-440d-855c-6fc26dc8f75e" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="TreeLvActivateItem_WhenNoSelection_IsNoOp" />
+    </UnitTest>
+    <UnitTest name="ResizeForm_InvokesResizeControlsAndAutoSize" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1df164e1-2be3-8574-89ca-89e62c9a9e15">
+      <Execution id="8bffc879-94d9-49f1-8c0d-eacd49995f7d" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="ResizeForm_InvokesResizeControlsAndAutoSize" />
+    </UnitTest>
+    <UnitTest name="HandleModelCanDrop_BackgroundAllRoots_SaysAlreadyRoots" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="17d03bb2-b09d-867b-8410-ba96b117467c">
+      <Execution id="74959087-4f20-4803-9e9a-ceb26a23be16" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerMoveLogicTests" name="HandleModelCanDrop_BackgroundAllRoots_SaysAlreadyRoots" />
+    </UnitTest>
+    <UnitTest name="IsValidType_MailItem_ReturnsTrue" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="15e649bb-5503-8d52-b815-4ad476fafb6f">
+      <Execution id="bb4d383f-529e-470e-b26a-33cb613968c3" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="IsValidType_MailItem_ReturnsTrue" />
+    </UnitTest>
+    <UnitTest name="ResolveRowStyle_WhenComplete_AddsStrikeout" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1f15c9a3-edfc-8af2-8cf4-d9572ac0df60">
+      <Execution id="44caa32a-86ca-411d-9cef-6c44e65640b1" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="ResolveRowStyle_WhenComplete_AddsStrikeout" />
+    </UnitTest>
+    <UnitTest name="GetSelectedTreeNode_ReturnsFacadeSelection" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="139fc246-3379-80fd-9d9f-fb031ad290e0">
+      <Execution id="1b045f0c-dd3e-4466-a634-2bbbd2202abb" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="GetSelectedTreeNode_ReturnsFacadeSelection" />
+    </UnitTest>
+    <UnitTest name="HandleModelCanDrop_DropOnDescendant_SaysParadox" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="11e98410-c594-813f-b937-503c0425816a">
+      <Execution id="75631471-4946-4b02-b691-390dbcce365c" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerMoveLogicTests" name="HandleModelCanDrop_DropOnDescendant_SaysParadox" />
+    </UnitTest>
+    <UnitTest name="HandleModelCanDrop_DropOnSelf_SetsNoneEffect" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="169d4e46-b384-847d-bc1d-5b876c1eb085">
+      <Execution id="63ef5469-5fc6-4afa-b7eb-685cf519820d" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerMoveLogicTests" name="HandleModelCanDrop_DropOnSelf_SetsNoneEffect" />
+    </UnitTest>
+    <UnitTest name="RouteDrop_UnhandledLocation_ReturnsFalse_NoMove" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="183dab59-5900-8475-96fe-1bb27477a615">
+      <Execution id="534df948-5766-40a7-b28b-a0d5569e82e3" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerRouteDropTests" name="RouteDrop_UnhandledLocation_ReturnsFalse_NoMove" />
+    </UnitTest>
+    <UnitTest name="InitializeTreeListView_InvokesFacadeWithRootsAndFilter" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="100e51f1-2ca4-8462-9cbf-9660bdf85983">
+      <Execution id="67fc20c0-a91c-48ee-a1ec-0955183ab93b" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="InitializeTreeListView_InvokesFacadeWithRootsAndFilter" />
+    </UnitTest>
+    <UnitTest name="Constructor_NullMessageSeam_DoesNotThrow" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1db0df22-7861-800d-ac7a-50c3f41ef5cd">
+      <Execution id="14007f74-d4b2-4304-9be8-eb9425ea1ed1" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="Constructor_NullMessageSeam_DoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="RouteDrop_AboveItem_InsertsSiblingBeforeTarget_ReturnsTrue" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="18d619a4-83cf-89b8-b58f-67d103e55d40">
+      <Execution id="2ac90cb3-24a1-4af6-8aba-c6940777849a" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerRouteDropTests" name="RouteDrop_AboveItem_InsertsSiblingBeforeTarget_ReturnsTrue" />
+    </UnitTest>
+    <UnitTest name="ActivateOlItem_WhenItemNull_NoExplorerInteraction" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="18058251-a42a-892d-b673-f4a4a70eaf32">
+      <Execution id="2c5c7356-953d-4e59-8ef9-138853e598d2" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="ActivateOlItem_WhenItemNull_NoExplorerInteraction" />
+    </UnitTest>
+    <UnitTest name="ActivateOlItemAsync_WhenSelectable_ClearsAddsAndActivates" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="16fb34db-6bd4-80aa-8bf3-cd26858c8be9">
+      <Execution id="4789fa00-841f-4b1d-95fc-a1c88fa902f1" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerActivateTests" name="ActivateOlItemAsync_WhenSelectable_ClearsAddsAndActivates" />
+    </UnitTest>
+    <UnitTest name="HandleModelCanDrop_ReorderAboveItem_SetsMoveEffect" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1b022fc4-5b62-8ebf-92d7-630eecd543cc">
+      <Execution id="98f3329e-c93d-4b5f-997f-356a552e46d2" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerMoveLogicTests" name="HandleModelCanDrop_ReorderAboveItem_SetsMoveEffect" />
+    </UnitTest>
+    <UnitTest name="ActivateOlItem_WhenSelectable_ClearsThenAddsToSelection" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1dc37883-98d1-8b14-a071-1088db6f224b">
+      <Execution id="47059f4d-0d68-4e22-8151-580ad3b1312d" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerActivateTests" name="ActivateOlItem_WhenSelectable_ClearsThenAddsToSelection" />
+    </UnitTest>
+    <UnitTest name="MoveObjectsToChildren_DesyncedRoot_FiresMessageSeam" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="167ed801-8fdb-804a-b905-048f42046bd4">
+      <Execution id="6a09c940-ac0e-4113-9e9a-e1818c736e40" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerMoveLogicTests" name="MoveObjectsToChildren_DesyncedRoot_FiresMessageSeam" />
+    </UnitTest>
+    <UnitTest name="HandleModelDropped_DefaultLocation_ReturnsEarly" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1fee666a-27d7-8f1b-a224-625b890aa142">
+      <Execution id="12c993c6-ed55-42ae-99eb-80fd45e9e998" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerMoveLogicTests" name="HandleModelDropped_DefaultLocation_ReturnsEarly" />
+    </UnitTest>
+    <UnitTest name="MoveObjectsToSibling_ChildTarget_InsertsIntoParentChildren" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="150b48d6-bbc3-885a-8c14-cf60a16221e1">
+      <Execution id="40c19232-75fa-4452-8270-bdf0865bc085" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerMoveLogicTests" name="MoveObjectsToSibling_ChildTarget_InsertsIntoParentChildren" />
+    </UnitTest>
+    <UnitTest name="GetSelectedTreeNode_WhenNothingSelected_ReturnsNull" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1f5c6f38-3a8f-8271-81bc-184f581955ec">
+      <Execution id="bcc16b3f-2388-4931-b4af-851ce28d76d0" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="GetSelectedTreeNode_WhenNothingSelected_ReturnsNull" />
+    </UnitTest>
+    <UnitTest name="IsValidType_OtherObject_ReturnsFalse" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="15bfb0ca-d576-8661-9696-f51c8f8d3405">
+      <Execution id="2f5eefc0-5518-449d-a6ea-5e032a8dd8e2" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="IsValidType_OtherObject_ReturnsFalse" />
+    </UnitTest>
+    <UnitTest name="ToggleExpandCollapseAll_AlternatesExpandThenCollapse" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1b0b8e49-8d6e-8134-bc2c-f9be91713d98">
+      <Execution id="8306b4d5-6e16-4bec-b9c1-9b7fcdd20d2b" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="ToggleExpandCollapseAll_AlternatesExpandThenCollapse" />
+    </UnitTest>
+    <UnitTest name="TreeLvActivateItemAsync_WhenUnsupportedType_FiresMessageSeam" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="179d3161-20d3-8dfe-a1e8-34990d9e6db0">
+      <Execution id="e17f3ee4-8ac0-4341-8781-26bd6ed98c19" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="TreeLvActivateItemAsync_WhenUnsupportedType_FiresMessageSeam" />
+    </UnitTest>
+    <UnitTest name="RouteDrop_Background_RoutesToRoots_ReturnsTrue" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1248e525-2154-8543-8ca1-fff97e234ff0">
+      <Execution id="01a61162-41ff-4644-81ca-23654aa27b2a" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerRouteDropTests" name="RouteDrop_Background_RoutesToRoots_ReturnsTrue" />
+    </UnitTest>
+    <UnitTest name="ActivateOlItem_WhenNotSelectable_DisplaysTaskItem" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1b9ae98d-bd3f-8fef-9150-714f2006fc74">
+      <Execution id="ca43fa53-e9af-44e0-ba79-c56f2050d0bb" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerActivateTests" name="ActivateOlItem_WhenNotSelectable_DisplaysTaskItem" />
+    </UnitTest>
+    <UnitTest name="MoveObjectsToSibling_RootNotInRoots_FiresMessageSeam" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="14f23d29-f44d-81d1-878b-97aa7e71dbe3">
+      <Execution id="7fec70d1-a828-43a3-b221-a7cbaca09602" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerMoveLogicTests" name="MoveObjectsToSibling_RootNotInRoots_FiresMessageSeam" />
+    </UnitTest>
+    <UnitTest name="FindChildByID_FoundAtDepth_ReturnsNode" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="15358730-8a15-86b3-a32b-2ea47ffb66f0">
+      <Execution id="aee1b49a-6e26-4d9c-87aa-1b55379a0c3a" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerMoveLogicTests" name="FindChildByID_FoundAtDepth_ReturnsNode" />
+    </UnitTest>
+    <UnitTest name="MoveObjectsToChildren_RootSource_ReparentsAndRemovesFromRoots" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1bb9560d-4183-85e0-9707-d52d993a15bc">
+      <Execution id="8f0a81ea-3847-4831-947e-b87787fca88a" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerMoveLogicTests" name="MoveObjectsToChildren_RootSource_ReparentsAndRemovesFromRoots" />
+    </UnitTest>
+    <UnitTest name="ToggleHideComplete_AlternatesClearThenSetFilter" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1fd0ca88-0663-8726-9f1a-562a52b28f19">
+      <Execution id="170909e2-a8ee-4723-9285-214d6fcd7c54" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="ToggleHideComplete_AlternatesClearThenSetFilter" />
+    </UnitTest>
+    <UnitTest name="RebuildTreeVisual_InvokesRebuildTreeWithRoots" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1f42c2e8-687a-849f-a162-5226ff9e6a4c">
+      <Execution id="75ac6304-6b7f-43f2-b3bb-a457b3e8a5ce" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="RebuildTreeVisual_InvokesRebuildTreeWithRoots" />
+    </UnitTest>
+    <UnitTest name="RouteDrop_Item_RoutesToChildren_ReturnsTrue" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1d0bc0be-3888-8842-a29a-48399f1400d7">
+      <Execution id="488f64f2-c9b7-4530-b921-f5c3ec1c4653" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerRouteDropTests" name="RouteDrop_Item_RoutesToChildren_ReturnsTrue" />
+    </UnitTest>
+    <UnitTest name="ApplyPostDropView_WhenFilterActive_ReAppliesFilterAndSorts" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1c22d742-9bf8-88a6-984c-d34dfae48fd6">
+      <Execution id="12d0867c-ff0f-48f7-acf6-7535b919eabf" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerRouteDropTests" name="ApplyPostDropView_WhenFilterActive_ReAppliesFilterAndSorts" />
+    </UnitTest>
+    <UnitTest name="Constructor_AssignsControllerOnViewer" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1a138784-ce2c-88c4-9778-35028e43b6bd">
+      <Execution id="eadca802-11c1-4b9e-9084-c0bb86f52fe1" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="Constructor_AssignsControllerOnViewer" />
+    </UnitTest>
+    <UnitTest name="ActivateOlItemAsync_WhenNotSelectable_DisplaysAndActivates" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="18879cb1-a2c7-8398-b24e-5ace8977792d">
+      <Execution id="7fde410a-5f56-4c71-b5fd-e50ac00bab37" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerActivateTests" name="ActivateOlItemAsync_WhenNotSelectable_DisplaysAndActivates" />
+    </UnitTest>
+    <UnitTest name="MoveObjectsToRoots_SameTree_AlreadyRoot_DoesNothing" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1da2a0e6-c3bd-8d37-92fc-a91a5bcb775a">
+      <Execution id="53cfeb0b-2ac6-43c9-aab1-00b296238e94" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerMoveLogicTests" name="MoveObjectsToRoots_SameTree_AlreadyRoot_DoesNothing" />
+    </UnitTest>
+    <UnitTest name="MoveObjectsToRoots_CrossTree_RemovesFromSourceAddsToTarget" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="11ccb02a-4372-87d2-bf2b-f6843bff31f0">
+      <Execution id="14e2536e-1b39-47c9-9a7f-3ba3e4caf102" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerMoveLogicTests" name="MoveObjectsToRoots_CrossTree_RemovesFromSourceAddsToTarget" />
+    </UnitTest>
+    <UnitTest name="ResolveRowStyle_WhenNotComplete_RemovesStrikeout" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1dcbdb8a-e2e8-8a99-9d8c-e8212c30e7fd">
+      <Execution id="547076b2-425d-4705-b6d6-3f7b50c3a535" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="ResolveRowStyle_WhenNotComplete_RemovesStrikeout" />
+    </UnitTest>
+    <UnitTest name="ApplyPostDropView_WhenFilterInactive_SortsWithoutReapplyingFilter" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="117e089a-1796-83a4-bb5f-41ef6089e351">
+      <Execution id="4c9d0fd8-dc9c-4d6c-898f-86039bc24e53" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerRouteDropTests" name="ApplyPostDropView_WhenFilterInactive_SortsWithoutReapplyingFilter" />
+    </UnitTest>
+    <UnitTest name="TreeLvActivateItemAsync_WhenValidType_ActivatesSelectedItem" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1220912b-ac99-8823-90f7-52f1e8248600">
+      <Execution id="9cca9a6b-a3cf-4629-8a93-10c165763142" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerActivateTests" name="TreeLvActivateItemAsync_WhenValidType_ActivatesSelectedItem" />
+    </UnitTest>
+    <UnitTest name="IsValidType_TaskItem_ReturnsTrue" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1749486a-333a-8c0d-827e-0a70e14ccc0a">
+      <Execution id="9290aa9b-c3f4-4e53-a0e7-025de8ec5184" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="IsValidType_TaskItem_ReturnsTrue" />
+    </UnitTest>
+    <UnitTest name="MoveObjectsToChildren_NonRootSource_ReparentsUnderTarget" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1fa9b2a2-8d11-87b2-b0cc-045fd1aad708">
+      <Execution id="758aadb5-35e7-4b59-8a1d-1dd0bef2e618" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerMoveLogicTests" name="MoveObjectsToChildren_NonRootSource_ReparentsUnderTarget" />
+    </UnitTest>
+    <UnitTest name="TreeLvActivateItemAsync_WhenNoSelection_IsNoOp" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1082f545-787d-8f55-9c1f-6bbac578bcc1">
+      <Execution id="b012ebfd-824e-4346-bcf8-0eea1a97ac43" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="TreeLvActivateItemAsync_WhenNoSelection_IsNoOp" />
+    </UnitTest>
+    <UnitTest name="TreeLvActivateItem_WhenValidType_ActivatesSelectedItem" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="19c8bc4e-81bc-8dfd-bcb0-31d9f6fed798">
+      <Execution id="2d91392a-6a23-4805-b68d-fb16ab30b553" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerActivateTests" name="TreeLvActivateItem_WhenValidType_ActivatesSelectedItem" />
+    </UnitTest>
+    <UnitTest name="MoveObjectsToRoots_SameTree_PromotesChildToRoot" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="10fe1d11-ef93-8a0b-a003-9cf5d06110a8">
+      <Execution id="a01853c7-c63c-4b1b-ba9e-f7e1f4243d16" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerMoveLogicTests" name="MoveObjectsToRoots_SameTree_PromotesChildToRoot" />
+    </UnitTest>
+    <UnitTest name="MoveObjectsToSibling_RootTarget_RemovesFromRootsAndReseeds" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="1ce89144-692a-81da-95af-9f71ee82164c">
+      <Execution id="9aa25994-137b-4730-8f69-7c6d340c1d94" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerMoveLogicTests" name="MoveObjectsToSibling_RootTarget_RemovesFromRootsAndReseeds" />
+    </UnitTest>
+    <UnitTest name="RouteDrop_BelowItem_InsertsSiblingAfterTarget_ReturnsTrue" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="18b46a4a-b66e-8116-b5c0-ec902de82f37">
+      <Execution id="995edd79-b326-4015-beb3-06f76cad00f4" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerRouteDropTests" name="RouteDrop_BelowItem_InsertsSiblingAfterTarget_ReturnsTrue" />
+    </UnitTest>
+    <UnitTest name="TreeLvActivateItem_WhenUnsupportedType_FiresMessageSeam" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="17eb1dd5-5a7f-8bcd-8af8-b6ce53a16ac6">
+      <Execution id="1c323cc3-69a2-4332-be65-68f5c6034f05" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="TreeLvActivateItem_WhenUnsupportedType_FiresMessageSeam" />
+    </UnitTest>
+    <UnitTest name="ActivateOlItemAsync_WhenItemNull_NoExplorerInteraction" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="12657b4e-553c-8d05-a3bb-c652619c0bfc">
+      <Execution id="6711c669-b96b-4e86-87d4-5f3f072938f9" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerTests" name="ActivateOlItemAsync_WhenItemNull_NoExplorerInteraction" />
+    </UnitTest>
+    <UnitTest name="FindChildByID_NotFound_ReturnsNull" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="12b1a8e1-e64a-888c-8d13-4186c1a56e87">
+      <Execution id="de8e95c9-9842-4ff4-bd97-7de7454cdfbe" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerMoveLogicTests" name="FindChildByID_NotFound_ReturnsNull" />
+    </UnitTest>
+    <UnitTest name="FindChildByID_NullId_MatchesEmptyIdNode" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="14c847a1-6973-8f29-9fde-ff7b4f113c11">
+      <Execution id="d1836bcc-e897-4df9-9371-48b01013d268" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerMoveLogicTests" name="FindChildByID_NullId_MatchesEmptyIdNode" />
+    </UnitTest>
+    <UnitTest name="ActivateOlItem_WhenNotSelectable_DisplaysMailItem" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\tasktree.test\bin\debug\tasktree.test.dll" id="150f1362-fffb-8151-a780-f8f1b7221302">
+      <Execution id="00b64b5a-ea25-4e0a-aa46-884e3917070e" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskTree.Test.TaskTreeControllerActivateTests" name="ActivateOlItem_WhenNotSelectable_DisplaysMailItem" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="167ed801-8fdb-804a-b905-048f42046bd4" executionId="6a09c940-ac0e-4113-9e9a-e1818c736e40" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="100e51f1-2ca4-8462-9cbf-9660bdf85983" executionId="67fc20c0-a91c-48ee-a1ec-0955183ab93b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14f23d29-f44d-81d1-878b-97aa7e71dbe3" executionId="7fec70d1-a828-43a3-b221-a7cbaca09602" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="150b48d6-bbc3-885a-8c14-cf60a16221e1" executionId="40c19232-75fa-4452-8270-bdf0865bc085" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b0b8e49-8d6e-8134-bc2c-f9be91713d98" executionId="8306b4d5-6e16-4bec-b9c1-9b7fcdd20d2b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1dc37883-98d1-8b14-a071-1088db6f224b" executionId="47059f4d-0d68-4e22-8151-580ad3b1312d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1bb9560d-4183-85e0-9707-d52d993a15bc" executionId="8f0a81ea-3847-4831-947e-b87787fca88a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b9ae98d-bd3f-8fef-9150-714f2006fc74" executionId="ca43fa53-e9af-44e0-ba79-c56f2050d0bb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12b1a8e1-e64a-888c-8d13-4186c1a56e87" executionId="de8e95c9-9842-4ff4-bd97-7de7454cdfbe" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f5c6f38-3a8f-8271-81bc-184f581955ec" executionId="bcc16b3f-2388-4931-b4af-851ce28d76d0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15e649bb-5503-8d52-b815-4ad476fafb6f" executionId="bb4d383f-529e-470e-b26a-33cb613968c3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="169d4e46-b384-847d-bc1d-5b876c1eb085" executionId="63ef5469-5fc6-4afa-b7eb-685cf519820d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c22d742-9bf8-88a6-984c-d34dfae48fd6" executionId="12d0867c-ff0f-48f7-acf6-7535b919eabf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11ccb02a-4372-87d2-bf2b-f6843bff31f0" executionId="14e2536e-1b39-47c9-9a7f-3ba3e4caf102" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1749486a-333a-8c0d-827e-0a70e14ccc0a" executionId="9290aa9b-c3f4-4e53-a0e7-025de8ec5184" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1248e525-2154-8543-8ca1-fff97e234ff0" executionId="01a61162-41ff-4644-81ca-23654aa27b2a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19c8bc4e-81bc-8dfd-bcb0-31d9f6fed798" executionId="2d91392a-6a23-4805-b68d-fb16ab30b553" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14c847a1-6973-8f29-9fde-ff7b4f113c11" executionId="d1836bcc-e897-4df9-9371-48b01013d268" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13a9a1f8-8533-8220-b152-813105c11909" executionId="a03fb8ea-1cba-440d-855c-6fc26dc8f75e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1fee666a-27d7-8f1b-a224-625b890aa142" executionId="12c993c6-ed55-42ae-99eb-80fd45e9e998" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1fd0ca88-0663-8726-9f1a-562a52b28f19" executionId="170909e2-a8ee-4723-9285-214d6fcd7c54" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18058251-a42a-892d-b673-f4a4a70eaf32" executionId="2c5c7356-953d-4e59-8ef9-138853e598d2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f15c9a3-edfc-8af2-8cf4-d9572ac0df60" executionId="44caa32a-86ca-411d-9cef-6c44e65640b1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1da2a0e6-c3bd-8d37-92fc-a91a5bcb775a" executionId="53cfeb0b-2ac6-43c9-aab1-00b296238e94" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="150f1362-fffb-8151-a780-f8f1b7221302" executionId="00b64b5a-ea25-4e0a-aa46-884e3917070e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b022fc4-5b62-8ebf-92d7-630eecd543cc" executionId="98f3329e-c93d-4b5f-997f-356a552e46d2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12657b4e-553c-8d05-a3bb-c652619c0bfc" executionId="6711c669-b96b-4e86-87d4-5f3f072938f9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15bfb0ca-d576-8661-9696-f51c8f8d3405" executionId="2f5eefc0-5518-449d-a6ea-5e032a8dd8e2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f42c2e8-687a-849f-a162-5226ff9e6a4c" executionId="75ac6304-6b7f-43f2-b3bb-a457b3e8a5ce" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17d03bb2-b09d-867b-8410-ba96b117467c" executionId="74959087-4f20-4803-9e9a-ceb26a23be16" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18b46a4a-b66e-8116-b5c0-ec902de82f37" executionId="995edd79-b326-4015-beb3-06f76cad00f4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1dcbdb8a-e2e8-8a99-9d8c-e8212c30e7fd" executionId="547076b2-425d-4705-b6d6-3f7b50c3a535" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1082f545-787d-8f55-9c1f-6bbac578bcc1" executionId="b012ebfd-824e-4346-bcf8-0eea1a97ac43" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ce89144-692a-81da-95af-9f71ee82164c" executionId="9aa25994-137b-4730-8f69-7c6d340c1d94" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1fa9b2a2-8d11-87b2-b0cc-045fd1aad708" executionId="758aadb5-35e7-4b59-8a1d-1dd0bef2e618" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11e98410-c594-813f-b937-503c0425816a" executionId="75631471-4946-4b02-b691-390dbcce365c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15358730-8a15-86b3-a32b-2ea47ffb66f0" executionId="aee1b49a-6e26-4d9c-87aa-1b55379a0c3a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16fb34db-6bd4-80aa-8bf3-cd26858c8be9" executionId="4789fa00-841f-4b1d-95fc-a1c88fa902f1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1db0df22-7861-800d-ac7a-50c3f41ef5cd" executionId="14007f74-d4b2-4304-9be8-eb9425ea1ed1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="139fc246-3379-80fd-9d9f-fb031ad290e0" executionId="1b045f0c-dd3e-4466-a634-2bbbd2202abb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a138784-ce2c-88c4-9778-35028e43b6bd" executionId="eadca802-11c1-4b9e-9084-c0bb86f52fe1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10fe1d11-ef93-8a0b-a003-9cf5d06110a8" executionId="a01853c7-c63c-4b1b-ba9e-f7e1f4243d16" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="183dab59-5900-8475-96fe-1bb27477a615" executionId="534df948-5766-40a7-b28b-a0d5569e82e3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18d619a4-83cf-89b8-b58f-67d103e55d40" executionId="2ac90cb3-24a1-4af6-8aba-c6940777849a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="117e089a-1796-83a4-bb5f-41ef6089e351" executionId="4c9d0fd8-dc9c-4d6c-898f-86039bc24e53" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18879cb1-a2c7-8398-b24e-5ace8977792d" executionId="7fde410a-5f56-4c71-b5fd-e50ac00bab37" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1df164e1-2be3-8574-89ca-89e62c9a9e15" executionId="8bffc879-94d9-49f1-8c0d-eacd49995f7d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1220912b-ac99-8823-90f7-52f1e8248600" executionId="9cca9a6b-a3cf-4629-8a93-10c165763142" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d0bc0be-3888-8842-a29a-48399f1400d7" executionId="488f64f2-c9b7-4530-b921-f5c3ec1c4653" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="179d3161-20d3-8dfe-a1e8-34990d9e6db0" executionId="e17f3ee4-8ac0-4341-8781-26bd6ed98c19" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17eb1dd5-5a7f-8bcd-8af8-b6ce53a16ac6" executionId="1c323cc3-69a2-4332-be65-68f5c6034f05" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="51" executed="51" passed="51" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

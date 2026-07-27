@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
+using System.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -149,18 +149,34 @@ namespace QuickFiler.Test.Viewers
             var messenger = new Mock<IWebViewMessenger>();
             var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
             var coordinator = CreateCoordinator(messenger.Object, provider.Object);
+            FieldInfo routerField = typeof(BreadcrumbBridgeCoordinator).GetField(
+                "_router",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            routerField.Should().NotBeNull();
+            var router = routerField.GetValue(coordinator) as FolderBreadcrumbBridgeRouter;
+            router.Should().NotBeNull();
+            FieldInfo routerSyncField = typeof(FolderBreadcrumbBridgeRouter).GetField(
+                "_sync",
+                BindingFlags.Instance | BindingFlags.NonPublic
+            );
+            routerSyncField.Should().NotBeNull();
+            object routerSync = routerSyncField.GetValue(router);
+            routerSync.Should().NotBeNull();
             int posts = 0;
             int selections = 0;
+            bool postObservedLockHeld = false;
+            bool selectionObservedLockHeld = false;
             messenger
                 .Setup(value => value.PostJson(It.IsAny<string>()))
                 .Callback(() =>
                 {
-                    AssertRouterAvailable(coordinator);
+                    postObservedLockHeld |= Monitor.IsEntered(routerSync);
                     posts++;
                 });
             coordinator.SelectionChanged += (sender, args) =>
             {
-                AssertRouterAvailable(coordinator);
+                selectionObservedLockHeld |= Monitor.IsEntered(routerSync);
                 selections++;
             };
 
@@ -171,6 +187,8 @@ namespace QuickFiler.Test.Viewers
             // Assert
             posts.Should().Be(2);
             selections.Should().Be(1);
+            postObservedLockHeld.Should().BeFalse();
+            selectionObservedLockHeld.Should().BeFalse();
         }
 
         [TestMethod]
@@ -365,14 +383,6 @@ namespace QuickFiler.Test.Viewers
                 json
             );
             harness.Coordinator.LastDispatch.GetAwaiter().GetResult();
-        }
-
-        private static void AssertRouterAvailable(BreadcrumbBridgeCoordinator coordinator)
-        {
-            Task read = Task.Run(() => coordinator.GetFolderItems());
-            read.Wait(TimeSpan.FromSeconds(1))
-                .Should()
-                .BeTrue("external work must run after the router releases its lock");
         }
 
         private static BreadcrumbBridgeCoordinator CreateCoordinator(

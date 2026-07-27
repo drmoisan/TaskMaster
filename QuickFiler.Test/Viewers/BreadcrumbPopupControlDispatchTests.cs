@@ -198,6 +198,10 @@ namespace QuickFiler.Test.Viewers
                 fixture.CreateSurface(operations)
             );
             fixture.Errors.Should().ContainSingle().Which.Should().BeSameAs(thrown);
+            thrown
+                .Message.Should()
+                .Be("Popup navigation did not provide a messenger and readiness task.");
+            fixture.Log.Names.Should().Equal("create", "initialize", "core", "navigate", "cleanup");
             fixture.Control.DisposeCount.Should().Be(1);
             fixture.Messenger.DisposeCount.Should().Be(kind == 2 ? 1 : 0);
         }
@@ -218,6 +222,7 @@ namespace QuickFiler.Test.Viewers
                 CreatorThreadId = Environment.CurrentManagedThreadId;
                 Log = new OperationRecorder(CreatorThreadId);
                 Control = Invoke(() => new TrackingControl { DisposeFailure = disposeFailure });
+                Core = (CoreWebView2)FormatterServices.GetUninitializedObject(typeof(CoreWebView2));
                 WebEnvironment = (CoreWebView2Environment)
                     FormatterServices.GetUninitializedObject(typeof(CoreWebView2Environment));
             }
@@ -225,6 +230,7 @@ namespace QuickFiler.Test.Viewers
             internal ConcurrentQueue<Exception> Errors { get; } = new ConcurrentQueue<Exception>();
             internal OperationRecorder Log { get; }
             internal TrackingControl Control { get; }
+            internal CoreWebView2 Core { get; }
             internal TrackingMessenger Messenger { get; } = new TrackingMessenger();
             internal CoreWebView2Environment WebEnvironment { get; }
             internal int PostCount => Volatile.Read(ref _postCount);
@@ -305,7 +311,7 @@ namespace QuickFiler.Test.Viewers
                     new BreadcrumbUiDispatcher(this, Errors.Enqueue),
                     () => Log.Record("create", Control),
                     (initializer, value, environment) => Log.Record("initialize", initialization),
-                    value => Log.Record<CoreWebView2>("core", null),
+                    value => Log.Record("core", Core),
                     (core, value, html) =>
                     {
                         Log.Record("navigate");

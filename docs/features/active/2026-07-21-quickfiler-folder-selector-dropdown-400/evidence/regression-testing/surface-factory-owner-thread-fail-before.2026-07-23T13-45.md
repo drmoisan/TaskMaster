@@ -21,4 +21,3 @@ inline fake.
 The run completed in `1.0023` seconds. There was no unrelated failure, build failure,
 crash, timeout, hang, missing test, or skipped test. This is the required deterministic
 failure-first result for P8-T29.
-

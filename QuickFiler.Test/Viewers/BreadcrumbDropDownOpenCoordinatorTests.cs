@@ -389,6 +389,7 @@ namespace QuickFiler.Test.Viewers
             internal List<BreadcrumbDropDownCloseReason> CloseReasons { get; } =
                 new List<BreadcrumbDropDownCloseReason>();
             internal bool CloseResult { get; set; } = true;
+            internal Exception CloseFailure { get; set; }
             internal int ResetCount { get; private set; }
             internal int DisposeCount { get; private set; }
 
@@ -414,6 +415,8 @@ namespace QuickFiler.Test.Viewers
             public bool Close(BreadcrumbDropDownCloseReason reason)
             {
                 CloseReasons.Add(reason);
+                if (CloseFailure != null)
+                    throw CloseFailure;
                 if (CloseResult)
                     IsOpen = false;
                 return CloseResult;

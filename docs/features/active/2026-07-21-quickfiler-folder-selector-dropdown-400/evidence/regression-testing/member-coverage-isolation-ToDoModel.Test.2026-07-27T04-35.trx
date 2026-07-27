@@ -1,0 +1,893 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="bc98ef87-9a3f-4de0-99cb-a920807c63c6" name="DanMoisan@MEGALODON4 2026-07-27 00:30:21" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-07-27T00:30:21.7899604-04:00" queuing="2026-07-27T00:30:21.7899604-04:00" start="2026-07-27T00:30:20.6239321-04:00" finish="2026-07-27T00:30:22.6228385-04:00" />
+  <TestSettings name="default" id="13236525-19b2-4687-a168-8e8ac70c57cc">
+    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-07-27_00_30_21" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="02ee1ed5-9b67-4fc1-89e8-2387de2b6ad0" testId="1e0189cf-80a7-8419-a976-28c1bb418469" testName="CompareToObject_ProjectEntry_DelegatesToTypedCompareTo" computerName="MEGALODON4" duration="00:00:00.0000968" startTime="2026-07-27T00:30:21.7909595-04:00" endTime="2026-07-27T00:30:21.7909595-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="02ee1ed5-9b67-4fc1-89e8-2387de2b6ad0" />
+    <UnitTestResult executionId="c60baa63-dbfb-4f87-957f-93fdaaf32186" testId="133845d0-b7b3-81bc-80aa-77fe4474c7a3" testName="SetAndSaveRefSetterSaver_NotReadOnly_NullSaver_InvokesSetterWithoutThrowing" computerName="MEGALODON4" duration="00:00:00.0012250" startTime="2026-07-27T00:30:21.7967007-04:00" endTime="2026-07-27T00:30:21.7982685-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c60baa63-dbfb-4f87-957f-93fdaaf32186" />
+    <UnitTestResult executionId="a9368a15-0981-469e-b908-4e97485e4567" testId="1381cc71-89ff-82cd-99a4-e4b2109dab78" testName="ToBase_NegativeNumber_ThrowsArgumentOutOfRangeException" computerName="MEGALODON4" duration="00:00:00.0031995" startTime="2026-07-27T00:30:21.7977429-04:00" endTime="2026-07-27T00:30:21.8008846-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a9368a15-0981-469e-b908-4e97485e4567" />
+    <UnitTestResult executionId="fd8793ae-faaf-411f-8730-d0e56ef88c5b" testId="1a9aded0-ef18-86b8-9a53-a088deac687c" testName="CompareToObject_NonProjectEntry_ThrowsArgumentException" computerName="MEGALODON4" duration="00:00:00.0060308" startTime="2026-07-27T00:30:21.7909595-04:00" endTime="2026-07-27T00:30:21.7972197-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fd8793ae-faaf-411f-8730-d0e56ef88c5b" />
+    <UnitTestResult executionId="8939f7ac-b90f-4dcb-b170-4c9f47dcf9eb" testId="1ff5554d-585a-8443-a426-237818341f16" testName="Rebuild_WhenStoreIdExcluded_DoesNotProcessExcludedStore" computerName="MEGALODON4" duration="00:00:00.0047655" startTime="2026-07-27T00:30:22.1824039-04:00" endTime="2026-07-27T00:30:22.1874038-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8939f7ac-b90f-4dcb-b170-4c9f47dcf9eb" />
+    <UnitTestResult executionId="d48b7594-c689-4164-85a3-869b3199385f" testId="106340bb-d034-83cb-bff7-de704c46f01a" testName="CreateFolder_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0000750" startTime="2026-07-27T00:30:21.9397429-04:00" endTime="2026-07-27T00:30:21.9397429-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d48b7594-c689-4164-85a3-869b3199385f" />
+    <UnitTestResult executionId="67b71b60-0d5b-41d7-8d3f-574618982cb7" testId="1dda38f2-d8e9-890a-8473-30c5f578f73e" testName="CloneAndEquals_UseReferenceEqualityForDistinctInstances" computerName="MEGALODON4" duration="00:00:00.0117612" startTime="2026-07-27T00:30:22.2943246-04:00" endTime="2026-07-27T00:30:22.3058376-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="67b71b60-0d5b-41d7-8d3f-574618982cb7" />
+    <UnitTestResult executionId="a11d175b-82a3-4170-a7f3-fa79801ad0a7" testId="107091c2-5afe-89cf-909c-80248dd818a0" testName="GetNextToDoID_NoCollision_ReturnsNextBase36ValueAndAddsIt" computerName="MEGALODON4" duration="00:00:00.0584349" startTime="2026-07-27T00:30:21.6137459-04:00" endTime="2026-07-27T00:30:21.7869546-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a11d175b-82a3-4170-a7f3-fa79801ad0a7" />
+    <UnitTestResult executionId="84145107-250c-47ad-b541-2d45f9d2fbb8" testId="1fb7b82b-0e27-8de0-85f2-4c87f33f8e10" testName="SetAndSaveRefSetterOnly_ReadOnly_AssignsRefButSkipsSetterAndSaver" computerName="MEGALODON4" duration="00:00:00.0015884" startTime="2026-07-27T00:30:21.7859544-04:00" endTime="2026-07-27T00:30:21.7869546-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="84145107-250c-47ad-b541-2d45f9d2fbb8" />
+    <UnitTestResult executionId="ec5a8735-33d2-4eef-a4b1-f952fe133a33" testId="1edddf9c-cd84-8a52-9c9e-e1b656e3b543" testName="SetProjectId_MalformedId_ShowsErrorDialogAndReturnsFalse" computerName="MEGALODON4" duration="00:00:00.7385995" startTime="2026-07-27T00:30:21.6147461-04:00" endTime="2026-07-27T00:30:22.4689724-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ec5a8735-33d2-4eef-a4b1-f952fe133a33" />
+    <UnitTestResult executionId="9125a9e6-daa7-4f54-8fb7-ec168e417365" testId="1a15c9c7-81ae-899e-af6c-c578cf103ba5" testName="SetAndSaveValueSetterSaver_ValueEqualToExisting_StillInvokesSetterWhenNotReadOnly" computerName="MEGALODON4" duration="00:00:00.0003955" startTime="2026-07-27T00:30:21.8024603-04:00" endTime="2026-07-27T00:30:21.8034545-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9125a9e6-daa7-4f54-8fb7-ec168e417365" />
+    <UnitTestResult executionId="5a399b47-1b1b-46f3-bd12-962b0da44163" testId="1da5399c-92b0-860d-9bc7-eec9a46fe0cf" testName="SetAndSaveValueSetterSaver_NotReadOnly_NullSaver_InvokesSetterWithoutThrowing" computerName="MEGALODON4" duration="00:00:00.0005279" startTime="2026-07-27T00:30:21.8019399-04:00" endTime="2026-07-27T00:30:21.8024603-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5a399b47-1b1b-46f3-bd12-962b0da44163" />
+    <UnitTestResult executionId="4a69d879-af19-45c9-b507-77bfc61284b1" testId="1df35507-935e-87c4-92fc-caf24b103ad0" testName="Flatten_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0000680" startTime="2026-07-27T00:30:21.7879552-04:00" endTime="2026-07-27T00:30:21.7879552-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4a69d879-af19-45c9-b507-77bfc61284b1">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="298883d5-e600-47aa-a2ee-3efa9dc13f25" testId="1023ca46-0723-857a-ae72-29a848794d64" testName="GetToDoListAsync_WhenStoreIdExcluded_DoesNotResolveExcludedStoreFolder" computerName="MEGALODON4" duration="00:00:00.0308492" startTime="2026-07-27T00:30:22.0115175-04:00" endTime="2026-07-27T00:30:22.0432583-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="298883d5-e600-47aa-a2ee-3efa9dc13f25" />
+    <UnitTestResult executionId="95b96c45-6c7a-4d9c-b17e-17230228f05a" testId="12dbb0f0-e480-8148-9474-35d33088eff3" testName="ToBase10Char_MaxDigit_ReturnsThirtyFive" computerName="MEGALODON4" duration="00:00:00.0001570" startTime="2026-07-27T00:30:21.7869546-04:00" endTime="2026-07-27T00:30:21.7869546-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="95b96c45-6c7a-4d9c-b17e-17230228f05a" />
+    <UnitTestResult executionId="c23ff10f-af8c-414d-8302-a7ef6ba87e84" testId="16e58f45-f102-89c6-ab47-b9f7159a3733" testName="SetAndSaveRefSetterSaver_ReadOnly_SkipsSetterAndSaverEvenWithNullSetter" computerName="MEGALODON4" duration="00:00:00.0006595" startTime="2026-07-27T00:30:21.7982685-04:00" endTime="2026-07-27T00:30:21.7993149-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c23ff10f-af8c-414d-8302-a7ef6ba87e84" />
+    <UnitTestResult executionId="96385bc2-96ea-4f56-ace6-c5564f437390" testId="135c0262-6142-8ff6-90c1-d898b4f18103" testName="Disabled_GetAttachmentFilename_StateUnderTest_NoExtension" computerName="MEGALODON4" duration="00:00:00.0000553" startTime="2026-07-27T00:30:21.7667023-04:00" endTime="2026-07-27T00:30:21.7677990-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="96385bc2-96ea-4f56-ace6-c5564f437390" />
+    <UnitTestResult executionId="8e3f419e-0827-4a39-9f2a-5fbcc55241c9" testId="16c06786-f676-8a87-995f-eaea7f1ab52a" testName="ProgramsByProjectNames_WithNullInput_ReturnsEmptyString" computerName="MEGALODON4" duration="00:00:00.0018501" startTime="2026-07-27T00:30:21.9527541-04:00" endTime="2026-07-27T00:30:21.9547539-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8e3f419e-0827-4a39-9f2a-5fbcc55241c9">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+Object reference not set to an instance of an object.&#xD;
+   at ToDoModel.ProjectData.Programs_ByProjectNames(String projectNames) in C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel\Data Model\Project\ProjectData.cs:line 331</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="bfeafd4d-9ed0-4f7a-a976-8d1b1294d0dc" testId="101bc6c3-37f8-8833-806a-e58e0b7442b3" testName="GetToDoList_WhenStoreIdExcluded_DoesNotResolveExcludedStoreFolder" computerName="MEGALODON4" duration="00:00:00.2841145" startTime="2026-07-27T00:30:21.6081502-04:00" endTime="2026-07-27T00:30:22.0115175-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bfeafd4d-9ed0-4f7a-a976-8d1b1294d0dc" />
+    <UnitTestResult executionId="9fde1ec0-e99b-455f-88dc-2cee1dd147a2" testId="1712c7f6-ec8a-86e8-b07f-dfa279af578c" testName="SetProjectId_SameValueAsExisting_NoChangeReturnsFalse" computerName="MEGALODON4" duration="00:00:00.0007550" startTime="2026-07-27T00:30:21.7859544-04:00" endTime="2026-07-27T00:30:21.7869546-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9fde1ec0-e99b-455f-88dc-2cee1dd147a2" />
+    <UnitTestResult executionId="018d02b2-ad8c-47b6-83e9-e2e90fadf749" testId="1ac6dbc9-1c10-8ff0-8349-6874f0162274" testName="AddChild_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0001452" startTime="2026-07-27T00:30:21.7709926-04:00" endTime="2026-07-27T00:30:21.7715361-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="018d02b2-ad8c-47b6-83e9-e2e90fadf749">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="bfba6298-0187-48e2-a620-35e79d9b2ff2" testId="1b9e3fd2-6acb-8683-aa46-1f62cfb5a450" testName="GetNextToDoID_LengthBoundaryRollover_ProducesLongerId" computerName="MEGALODON4" duration="00:00:00.0002216" startTime="2026-07-27T00:30:21.7879552-04:00" endTime="2026-07-27T00:30:21.7889589-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bfba6298-0187-48e2-a620-35e79d9b2ff2" />
+    <UnitTestResult executionId="f662e85c-cd5e-4c1a-9de4-340f873bbf0b" testId="1273228d-0d68-8a62-b62d-853a9e61fbdf" testName="AddChildren_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0000754" startTime="2026-07-27T00:30:21.7720435-04:00" endTime="2026-07-27T00:30:21.7720435-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f662e85c-cd5e-4c1a-9de4-340f873bbf0b">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="0c80bf2d-463f-478f-ba33-8c25b2317795" testId="1aa38188-a98a-85e0-864f-23ca56fd835d" testName="ToBase_ThreeDigitResult_PrependsSingleZero" computerName="MEGALODON4" duration="00:00:00.0001664" startTime="2026-07-27T00:30:21.8019399-04:00" endTime="2026-07-27T00:30:21.8019399-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0c80bf2d-463f-478f-ba33-8c25b2317795" />
+    <UnitTestResult executionId="425c957a-7582-4878-88e9-342c61a62ab3" testId="13c5d2c0-0c8c-801a-b60c-f840c9cc992d" testName="ConstructorWithString_LoadsIdentifierDefaultsWithoutOutlookAccess" computerName="MEGALODON4" duration="00:00:00.1844184" startTime="2026-07-27T00:30:21.6081502-04:00" endTime="2026-07-27T00:30:21.9107457-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="425c957a-7582-4878-88e9-342c61a62ab3" />
+    <UnitTestResult executionId="6ce9799c-71a0-4794-9746-07f85fa42d2c" testId="12592692-bf13-89ba-bac8-a376c38d328e" testName="FindByDelegate_StateUnderTest_ExpectedBehavior1" computerName="MEGALODON4" duration="00:00:00.0001023" startTime="2026-07-27T00:30:21.7869546-04:00" endTime="2026-07-27T00:30:21.7869546-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6ce9799c-71a0-4794-9746-07f85fa42d2c">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="5b771ced-0f23-4edd-ad70-e01d58164600" testId="12042fbe-d302-886f-a02e-6fa10b34d2c4" testName="AutoCodeIdAsync_WithNullAndEmptyInputs_ReturnsWithoutIdListAccess" computerName="MEGALODON4" duration="00:00:00.0256973" startTime="2026-07-27T00:30:22.3936829-04:00" endTime="2026-07-27T00:30:22.4195414-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5b771ced-0f23-4edd-ad70-e01d58164600" />
+    <UnitTestResult executionId="eb954dde-c909-49c4-9398-6a60c385781e" testId="133c8824-1b7a-8a66-985d-01007ae40db7" testName="GetMatchingFolders_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0000696" startTime="2026-07-27T00:30:21.9407430-04:00" endTime="2026-07-27T00:30:21.9407430-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="eb954dde-c909-49c4-9398-6a60c385781e" />
+    <UnitTestResult executionId="aa121f2e-7932-42a5-9b24-501c96f5595d" testId="1e40cc62-ffd4-81c5-b843-7d2375981b1f" testName="SetProjectId_ChangeConfirmedNo_LeavesProjectIdUnchanged" computerName="MEGALODON4" duration="00:00:00.0155326" startTime="2026-07-27T00:30:22.4878907-04:00" endTime="2026-07-27T00:30:22.5042621-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="aa121f2e-7932-42a5-9b24-501c96f5595d" />
+    <UnitTestResult executionId="10def146-c2e4-4762-8b89-f022847a31cf" testId="15eabe1d-700d-814f-b11e-3eb4d6611cc7" testName="Traverse_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0001138" startTime="2026-07-27T00:30:21.7829545-04:00" endTime="2026-07-27T00:30:21.7829545-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="10def146-c2e4-4762-8b89-f022847a31cf">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="8338e45d-d089-48d0-9744-c9e71e8b2786" testId="1a2422e8-01ed-8e20-80d5-c485bf2ec5f9" testName="ToBase36_StateUnderTest_ExpectedBehavior_38" computerName="MEGALODON4" duration="00:00:00.0001405" startTime="2026-07-27T00:30:21.7899604-04:00" endTime="2026-07-27T00:30:21.7899604-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8338e45d-d089-48d0-9744-c9e71e8b2786" />
+    <UnitTestResult executionId="ef308cd7-adc6-424c-bb80-d9dccd8b1a0a" testId="1f2745d8-f3cc-885c-8da1-e775b059527a" testName="InputNewFoldername_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0000760" startTime="2026-07-27T00:30:21.9397429-04:00" endTime="2026-07-27T00:30:21.9397429-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ef308cd7-adc6-424c-bb80-d9dccd8b1a0a" />
+    <UnitTestResult executionId="a4c45525-dcaf-45a8-9cfe-59ea469c0ecb" testId="1ea7296e-85b7-8e39-af56-0c59869bb162" testName="Descendents_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0000748" startTime="2026-07-27T00:30:21.7869546-04:00" endTime="2026-07-27T00:30:21.7879552-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a4c45525-dcaf-45a8-9cfe-59ea469c0ecb">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="50b58fc7-764b-48cd-aa9e-17b34ac77fc4" testId="19feb4e7-498f-8e94-9774-ab8674d234f2" testName="ToBase10_StateUnderTest_ExpectedBehavior_11" computerName="MEGALODON4" duration="00:00:00.0090898" startTime="2026-07-27T00:30:21.7704473-04:00" endTime="2026-07-27T00:30:21.7799493-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="50b58fc7-764b-48cd-aa9e-17b34ac77fc4" />
+    <UnitTestResult executionId="77b94b9f-dbe3-4e25-a672-e5142d0eae61" testId="1591190c-da7c-830e-8ebf-abf7eae73364" testName="SettableProperties_UpdateCachedStateAndSaveBackToFlaggableItem" computerName="MEGALODON4" duration="00:00:00.0249384" startTime="2026-07-27T00:30:22.2466228-04:00" endTime="2026-07-27T00:30:22.2713186-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="77b94b9f-dbe3-4e25-a672-e5142d0eae61" />
+    <UnitTestResult executionId="75a9e345-9d6b-482e-813c-0e981517d16b" testId="1257813f-c036-88fd-94da-60fcdcc5289d" testName="CompareTo_EqualOrdinalThenLongerOtherLength_ReturnsPositiveOne" computerName="MEGALODON4" duration="00:00:00.0001915" startTime="2026-07-27T00:30:22.5462852-04:00" endTime="2026-07-27T00:30:22.5492924-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="75a9e345-9d6b-482e-813c-0e981517d16b" />
+    <UnitTestResult executionId="473200a6-b12b-46a4-917f-814ff12ecba7" testId="11243f17-dc64-8edd-b8a3-b41ff65cefdb" testName="UpdateProjectID_WithDuplicateAndNewIds_ReturnsExpectedValues" computerName="MEGALODON4" duration="00:00:00.0013659" startTime="2026-07-27T00:30:21.9547539-04:00" endTime="2026-07-27T00:30:21.9567541-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="473200a6-b12b-46a4-917f-814ff12ecba7" />
+    <UnitTestResult executionId="fb812ef3-bfe9-43ef-a948-23bb0b0f125f" testId="1795c40d-2ea1-856b-a287-8f27538b53b4" testName="RecalculateSuggestions_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0000796" startTime="2026-07-27T00:30:21.9407430-04:00" endTime="2026-07-27T00:30:21.9407430-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fb812ef3-bfe9-43ef-a948-23bb0b0f125f" />
+    <UnitTestResult executionId="9e1ac214-f806-433b-939d-8480dd16b1fa" testId="12ecf062-8819-8641-bfc7-55d67c0eb557" testName="ToBase10Char_UpperLetter_ReturnsIndexValue" computerName="MEGALODON4" duration="00:00:00.0001373" startTime="2026-07-27T00:30:21.7869546-04:00" endTime="2026-07-27T00:30:21.7869546-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9e1ac214-f806-433b-939d-8480dd16b1fa" />
+    <UnitTestResult executionId="901604ec-246e-4aa8-b4c1-93dac43ebb5c" testId="1475f632-41c0-8910-9416-138f90a96c5c" testName="CompareTo_NullOther_ReturnsPositiveOne" computerName="MEGALODON4" duration="00:00:00.0004030" startTime="2026-07-27T00:30:21.7869546-04:00" endTime="2026-07-27T00:30:21.7869546-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="901604ec-246e-4aa8-b4c1-93dac43ebb5c" />
+    <UnitTestResult executionId="1ae10251-7adf-4ff5-8fb1-b4098af95867" testId="1a614c62-3741-8ac8-85b6-a1562245eef7" testName="SetAndSaveValueSetterSaver_NotReadOnly_InvokesSetterAndSuppliedSaver" computerName="MEGALODON4" duration="00:00:00.0006094" startTime="2026-07-27T00:30:21.8003630-04:00" endTime="2026-07-27T00:30:21.8008846-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1ae10251-7adf-4ff5-8fb1-b4098af95867" />
+    <UnitTestResult executionId="2695ba25-65e7-4e11-aa5a-0ed3ffadd51f" testId="15bedd8e-f868-82e9-b2cb-46c2801c13cc" testName="DfToListEntries_WithProjectCategories_ParsesProjectAndProgramNames" computerName="MEGALODON4" duration="00:00:00.0236813" startTime="2026-07-27T00:30:22.1581815-04:00" endTime="2026-07-27T00:30:22.1814041-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2695ba25-65e7-4e11-aa5a-0ed3ffadd51f" />
+    <UnitTestResult executionId="767f9327-72b7-4d4b-b5cd-a5e61bd605e7" testId="1e0b20d2-d964-867a-9986-7d3e60af19d1" testName="FlattenIf_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0000752" startTime="2026-07-27T00:30:21.7879552-04:00" endTime="2026-07-27T00:30:21.7879552-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="767f9327-72b7-4d4b-b5cd-a5e61bd605e7">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="bced5e05-5dae-47d1-a6cb-c04afedc9826" testId="16080e8a-6261-8912-a045-6376dfae4857" testName="ToBase10_StateUnderTest_ExpectedBehavior_10" computerName="MEGALODON4" duration="00:00:00.0293945" startTime="2026-07-27T00:30:21.6137459-04:00" endTime="2026-07-27T00:30:21.7556374-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bced5e05-5dae-47d1-a6cb-c04afedc9826" />
+    <UnitTestResult executionId="f27582cc-8d7b-4e97-b5c4-1a8c7b9cc837" testId="1fded191-9cba-8ef9-bf79-a9f30a0ec371" testName="ToBase10Char_Digit_ReturnsNumericValue" computerName="MEGALODON4" duration="00:00:00.0003697" startTime="2026-07-27T00:30:21.7859544-04:00" endTime="2026-07-27T00:30:21.7859544-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f27582cc-8d7b-4e97-b5c4-1a8c7b9cc837" />
+    <UnitTestResult executionId="14f0fda5-b988-44d7-b96f-e9ca1b5f5abd" testId="10dd3d5c-5a61-8a3d-955f-ef35f72ca283" testName="GetRelevantOlPathPortion_StateUnderTest_ExpectedBehavior2" computerName="MEGALODON4" duration="00:00:00.0004191" startTime="2026-07-27T00:30:21.9950025-04:00" endTime="2026-07-27T00:30:21.9960026-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="14f0fda5-b988-44d7-b96f-e9ca1b5f5abd" />
+    <UnitTestResult executionId="d2cd4398-9b83-4d0f-b77e-ac80055c9d5d" testId="185c6822-6af6-82c8-9a7d-0d9435b52ea2" testName="SetAndSaveValueSetterSaver_NotReadOnly_NullSetter_ThrowsArgumentNullException" computerName="MEGALODON4" duration="00:00:00.0004977" startTime="2026-07-27T00:30:21.8008846-04:00" endTime="2026-07-27T00:30:21.8014127-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d2cd4398-9b83-4d0f-b77e-ac80055c9d5d" />
+    <UnitTestResult executionId="05b97bc3-8176-4100-9420-5df57ddacd4a" testId="1b14f0c1-6f31-8cdb-a61c-36c07388204d" testName="ToBase10_StateUnderTest_ExpectedBehavior_12" computerName="MEGALODON4" duration="00:00:00.0002451" startTime="2026-07-27T00:30:21.7829545-04:00" endTime="2026-07-27T00:30:21.7829545-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="05b97bc3-8176-4100-9420-5df57ddacd4a" />
+    <UnitTestResult executionId="2e7be1b9-f915-4b87-ac50-988c9cf228cb" testId="1cb7bf0b-da8f-8f72-bf15-f69311014298" testName="VisibilityAndExpandedStateTransitions_SetBitsAndClearChangeMarker" computerName="MEGALODON4" duration="00:00:00.0119720" startTime="2026-07-27T00:30:22.2813209-04:00" endTime="2026-07-27T00:30:22.2943246-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2e7be1b9-f915-4b87-ac50-988c9cf228cb" />
+    <UnitTestResult executionId="0f6b68a6-d2ba-4499-abc8-733a447767e1" testId="1a4e038d-94a5-8837-b65d-79baecddf79c" testName="ToBase_MinDigitsOne_DoesNotPadSingleDigit" computerName="MEGALODON4" duration="00:00:00.0001451" startTime="2026-07-27T00:30:21.8019399-04:00" endTime="2026-07-27T00:30:21.8024603-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0f6b68a6-d2ba-4499-abc8-733a447767e1" />
+    <UnitTestResult executionId="0b98d9cf-5085-4a5c-9cb1-500e70c7ea32" testId="12d96bf3-5b62-872b-96ae-b0b887f37ced" testName="ToBase_Zero_ReturnsEvenPaddedZero" computerName="MEGALODON4" duration="00:00:00.0001838" startTime="2026-07-27T00:30:21.8008846-04:00" endTime="2026-07-27T00:30:21.8014127-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0b98d9cf-5085-4a5c-9cb1-500e70c7ea32" />
+    <UnitTestResult executionId="9495b566-af1a-4be0-a47d-78fa413af1f4" testId="1d09f1b8-7355-8308-b2ca-4830dea00f40" testName="SetProjectId_NullNewIdWhenCurrentIsAlsoNull_ReturnsTrueWithoutDialog" computerName="MEGALODON4" duration="00:00:00.0029904" startTime="2026-07-27T00:30:21.7819544-04:00" endTime="2026-07-27T00:30:21.7859544-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9495b566-af1a-4be0-a47d-78fa413af1f4" />
+    <UnitTestResult executionId="12465723-5afc-4309-8d5e-8e639fa674f4" testId="1182f5fa-bc1f-8dac-8557-63a62d377e42" testName="GetNextToDoID_NullSeed_ThrowsArgumentException" computerName="MEGALODON4" duration="00:00:00.0087262" startTime="2026-07-27T00:30:21.7889589-04:00" endTime="2026-07-27T00:30:21.7977429-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="12465723-5afc-4309-8d5e-8e639fa674f4" />
+    <UnitTestResult executionId="57f305d1-e5d8-4ace-8a0e-4822fbcdfdf4" testId="1c433fa6-6353-8e9e-86a9-bd2c7dcfd3df" testName="InsertChild_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0000816" startTime="2026-07-27T00:30:21.7720435-04:00" endTime="2026-07-27T00:30:21.7720435-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="57f305d1-e5d8-4ace-8a0e-4822fbcdfdf4">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="de97b833-33ac-4b22-bde2-5f723de3022e" testId="10746d8f-3a10-8f2b-9c00-409f77f8e13d" testName="SetAndSaveRefSetterSaver_NotReadOnly_AssignsRefInvokesSetterAndSuppliedSaver" computerName="MEGALODON4" duration="00:00:00.0010943" startTime="2026-07-27T00:30:21.7879552-04:00" endTime="2026-07-27T00:30:21.7889589-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="de97b833-33ac-4b22-bde2-5f723de3022e" />
+    <UnitTestResult executionId="0efb7a80-7e44-4d91-9076-b987c239c71f" testId="1aecbe34-8069-8f96-8190-64017cfb7128" testName="GetNextToDoID_IdAlreadyPresent_AdvancesPastTheCollision" computerName="MEGALODON4" duration="00:00:00.0003032" startTime="2026-07-27T00:30:21.7869546-04:00" endTime="2026-07-27T00:30:21.7869546-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0efb7a80-7e44-4d91-9076-b987c239c71f" />
+    <UnitTestResult executionId="438eeeaa-5932-4346-86aa-470abd94a876" testId="15b25348-c944-83ca-96c6-5ea05d0438e9" testName="ToBase36_StateUnderTest_ExpectedBehavior_50615" computerName="MEGALODON4" duration="00:00:00.0024325" startTime="2026-07-27T00:30:21.7859544-04:00" endTime="2026-07-27T00:30:21.7889589-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="438eeeaa-5932-4346-86aa-470abd94a876" />
+    <UnitTestResult executionId="d790312f-b60d-4445-b805-320d383d8301" testId="1ba7facd-63ee-832c-acdf-1476fa7bde84" testName="SetAndSaveValueSetterOnly_ReadOnly_SkipsSetterAndSaver" computerName="MEGALODON4" duration="00:00:00.0002462" startTime="2026-07-27T00:30:21.7998412-04:00" endTime="2026-07-27T00:30:21.8003630-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d790312f-b60d-4445-b805-320d383d8301" />
+    <UnitTestResult executionId="18faf9fd-5b1a-4c3a-88fc-d745427ab5a0" testId="1557d2db-7703-8f55-acc0-088b8d97f9fb" testName="SetAndSaveRefSetterSaver_NotReadOnly_NullSetter_ThrowsArgumentNullException" computerName="MEGALODON4" duration="00:00:00.0072640" startTime="2026-07-27T00:30:21.7889589-04:00" endTime="2026-07-27T00:30:21.7967007-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="18faf9fd-5b1a-4c3a-88fc-d745427ab5a0" />
+    <UnitTestResult executionId="be63f4ec-a73f-48fe-92f7-adc7a1b9f2ac" testId="1d4ccfd6-5b16-8480-b320-85119cd35fae" testName="ToBase10Char_BaseBelowOne_ThrowsArgumentOutOfRangeException" computerName="MEGALODON4" duration="00:00:00.0004106" startTime="2026-07-27T00:30:21.7967007-04:00" endTime="2026-07-27T00:30:21.7972197-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="be63f4ec-a73f-48fe-92f7-adc7a1b9f2ac" />
+    <UnitTestResult executionId="fe336878-24ef-4ecb-9502-147216986b6d" testId="1711526a-aa52-8eb4-9d81-ddfa24410bde" testName="SetAndGetProperties_ShouldWorkCorrectly" computerName="MEGALODON4" duration="00:00:00.0045859" startTime="2026-07-27T00:30:22.2456260-04:00" endTime="2026-07-27T00:30:22.2506231-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fe336878-24ef-4ecb-9502-147216986b6d" />
+    <UnitTestResult executionId="7928d87a-aec2-4d52-a554-c781caf37f3a" testId="1730655f-d540-8f36-90a8-1fa74136b009" testName="ToBase10Char_CharacterNotInConverter_ThrowsArgumentOutOfRangeException" computerName="MEGALODON4" duration="00:00:00.0092734" startTime="2026-07-27T00:30:21.7869546-04:00" endTime="2026-07-27T00:30:21.7967007-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7928d87a-aec2-4d52-a554-c781caf37f3a" />
+    <UnitTestResult executionId="58e59f6f-8aa8-40e8-b308-0b6a99ce4aed" testId="13369a46-d6e2-8813-932c-aeb8dadd1789" testName="SetProjectId_ChangeConfirmedYes_UpdatesProjectId" computerName="MEGALODON4" duration="00:00:00.0175972" startTime="2026-07-27T00:30:22.4689724-04:00" endTime="2026-07-27T00:30:22.4878907-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="58e59f6f-8aa8-40e8-b308-0b6a99ce4aed" />
+    <UnitTestResult executionId="ecb02c2e-5aeb-4bf7-8609-931880ea26a7" testId="1f4140f6-3980-8a8d-b454-455e432901d3" testName="ToBase36_StateUnderTest_ExpectedBehavior_73" computerName="MEGALODON4" duration="00:00:00.0001848" startTime="2026-07-27T00:30:21.7899604-04:00" endTime="2026-07-27T00:30:21.7899604-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ecb02c2e-5aeb-4bf7-8609-931880ea26a7" />
+    <UnitTestResult executionId="2d2c00bf-fc1c-4615-b8bd-f06d2d431945" testId="10518822-9945-8414-8b44-2d9f23458d4d" testName="GetFolder_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0001768" startTime="2026-07-27T00:30:21.9387470-04:00" endTime="2026-07-27T00:30:21.9387470-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2d2c00bf-fc1c-4615-b8bd-f06d2d431945" />
+    <UnitTestResult executionId="706b43e2-08a8-4740-84ce-9106a4f4c312" testId="1f98dc5d-1fd1-87c2-b750-f2a525135721" testName="LoopFolders_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0000907" startTime="2026-07-27T00:30:21.9407430-04:00" endTime="2026-07-27T00:30:21.9407430-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="706b43e2-08a8-4740-84ce-9106a4f4c312" />
+    <UnitTestResult executionId="f3848b84-ecd2-40a4-801f-7b438fc9353f" testId="19137cba-549a-8f58-ae56-e6616511c4d9" testName="People_DeserializeShortcut_CanDeserializePatternCorrectly" computerName="MEGALODON4" duration="00:00:00.0163026" startTime="2026-07-27T00:30:22.1291739-04:00" endTime="2026-07-27T00:30:22.1451707-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f3848b84-ecd2-40a4-801f-7b438fc9353f">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="080b7c64-8b28-4da8-8a03-ef7b501f2fda" testId="1e8c9c7f-79e9-8139-9233-dc075cffc4d6" testName="AddSuggestions_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0000754" startTime="2026-07-27T00:30:21.9407430-04:00" endTime="2026-07-27T00:30:21.9407430-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="080b7c64-8b28-4da8-8a03-ef7b501f2fda" />
+    <UnitTestResult executionId="47773f15-e9fc-4b48-9125-eba9d0c53e7f" testId="1176dd17-d5b2-8c4e-94b9-7ac25a9ec5d3" testName="CompareTo_EqualOrdinalThenShorterOtherLength_ReturnsNegativeOne" computerName="MEGALODON4" duration="00:00:00.0009981" startTime="2026-07-27T00:30:22.5455841-04:00" endTime="2026-07-27T00:30:22.5462852-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="47773f15-e9fc-4b48-9125-eba9d0c53e7f" />
+    <UnitTestResult executionId="57d8e2db-7df2-4457-bd6f-4e033db2c2a9" testId="192d12ed-9146-8524-ba67-7e919162be3c" testName="AddRecents_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0000595" startTime="2026-07-27T00:30:21.9397429-04:00" endTime="2026-07-27T00:30:21.9397429-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="57d8e2db-7df2-4457-bd6f-4e033db2c2a9" />
+    <UnitTestResult executionId="47f5e8fb-cfe8-4cb3-9310-4381178feca7" testId="1b38896a-c265-839d-93fc-3359260978a9" testName="IsAncestor_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0248706" startTime="2026-07-27T00:30:21.6081502-04:00" endTime="2026-07-27T00:30:21.7556374-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="47f5e8fb-cfe8-4cb3-9310-4381178feca7">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="3284dd26-6a12-4743-8643-e3009cbbf959" testId="1e975f71-f68a-8ed3-be1d-0235904f25a4" testName="FilterToProjectIDs_WithNullAndMixedRowKeys_ReturnsOnlyFourCharacterRows" computerName="MEGALODON4" duration="00:00:00.2008686" startTime="2026-07-27T00:30:21.9567541-04:00" endTime="2026-07-27T00:30:22.1581815-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3284dd26-6a12-4743-8643-e3009cbbf959" />
+    <UnitTestResult executionId="b826fc61-138a-4b0a-a4e6-7df413c0eb43" testId="160daa1f-d0ad-8463-a976-133f5965c16a" testName="Disabled_InitializeSortToExisting_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0192236" startTime="2026-07-27T00:30:21.6081502-04:00" endTime="2026-07-27T00:30:21.7546376-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b826fc61-138a-4b0a-a4e6-7df413c0eb43" />
+    <UnitTestResult executionId="0e6f498e-6bba-43ef-a986-fd54758ae98a" testId="158abbfb-ec39-8567-adcc-f2c50e951ecb" testName="Constructors_WithDefaultListAndEnumerableInputs_LoadEntriesWithoutFileSystem" computerName="MEGALODON4" duration="00:00:00.0783399" startTime="2026-07-27T00:30:21.6147461-04:00" endTime="2026-07-27T00:30:21.8050341-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0e6f498e-6bba-43ef-a986-fd54758ae98a" />
+    <UnitTestResult executionId="0a1de0e5-7fc0-4d59-b23e-e7830006e31b" testId="1544d267-614e-8db5-b948-0e4314392c0d" testName="SetProjectId_FromEmptyToNonEmpty_SetsAndReturnsTrue" computerName="MEGALODON4" duration="00:00:00.0561733" startTime="2026-07-27T00:30:21.6137459-04:00" endTime="2026-07-27T00:30:21.7819544-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0a1de0e5-7fc0-4d59-b23e-e7830006e31b" />
+    <UnitTestResult executionId="ebda740b-53e1-46d0-9712-4767a02565d9" testId="148f1670-ebdd-8634-88ef-5c4aeb65e293" testName="SetProjectId_ChangeConfirmedYes_WithUpdateAction_InvokesAction" computerName="MEGALODON4" duration="00:00:00.0258978" startTime="2026-07-27T00:30:22.5042621-04:00" endTime="2026-07-27T00:30:22.5315654-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ebda740b-53e1-46d0-9712-4767a02565d9" />
+    <UnitTestResult executionId="31997847-61b8-4f88-be6f-d83c14d36390" testId="1a596f21-f77f-8c62-acec-6ea5c22af1a4" testName="SetProjectId_ChangeConfirmedNo_WithUpdateAction_DoesNotInvokeAction" computerName="MEGALODON4" duration="00:00:00.0120586" startTime="2026-07-27T00:30:22.5315654-04:00" endTime="2026-07-27T00:30:22.5445823-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="31997847-61b8-4f88-be6f-d83c14d36390" />
+    <UnitTestResult executionId="fe274b27-b34d-40f3-b0f6-aa473631d48b" testId="192f96e1-74ff-88af-8d3a-b7f259c722a8" testName="Queries_WithDuplicateMissingAndCaseVariants_ReturnExpectedMatches" computerName="MEGALODON4" duration="00:00:00.0092730" startTime="2026-07-27T00:30:21.9437475-04:00" endTime="2026-07-27T00:30:21.9527541-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fe274b27-b34d-40f3-b0f6-aa473631d48b" />
+    <UnitTestResult executionId="42162b41-5ad7-40ac-9212-774e9725175b" testId="1f14086a-5669-89b7-a46d-20a8aeb69352" testName="WriteFlagsBatch_WithTranslatorValues_UpdatesUserDefinedFields" computerName="MEGALODON4" duration="00:00:00.0608299" startTime="2026-07-27T00:30:22.3328391-04:00" endTime="2026-07-27T00:30:22.3936829-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="42162b41-5ad7-40ac-9212-774e9725175b" />
+    <UnitTestResult executionId="ed3503a7-a517-4dac-9e12-05a689f4ced8" testId="1146ac8c-98cb-86a7-a338-0e0c4de68a8f" testName="People_Deserialize_CanDeserializePatternCorrectly" computerName="MEGALODON4" duration="00:00:00.4027896" startTime="2026-07-27T00:30:21.6137459-04:00" endTime="2026-07-27T00:30:22.1291739-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ed3503a7-a517-4dac-9e12-05a689f4ced8">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="72868ace-7048-4557-aaac-7dbd09443393" testId="1aff5a7f-d660-877e-b2f4-425dbfec6195" testName="ToBase36_StateUnderTest_ExpectedBehavior_36" computerName="MEGALODON4" duration="00:00:00.0001823" startTime="2026-07-27T00:30:21.7889589-04:00" endTime="2026-07-27T00:30:21.7899604-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="72868ace-7048-4557-aaac-7dbd09443393" />
+    <UnitTestResult executionId="f1724842-15d9-447c-a497-649020b704cd" testId="1ccd0a75-0df3-886c-9cea-74742e6f4184" testName="SetAndSaveRefSetterOnly_NotReadOnly_AssignsRefAndInvokesSetterAndOlSaver" computerName="MEGALODON4" duration="00:00:00.0592013" startTime="2026-07-27T00:30:21.6087416-04:00" endTime="2026-07-27T00:30:21.7859544-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f1724842-15d9-447c-a497-649020b704cd" />
+    <UnitTestResult executionId="45c21e4c-ae0f-4639-ae08-3a69e0ef7f84" testId="1cb82137-db51-8e75-ab75-d1d6e812109d" testName="SetIdUpdateAction_WithEntries_PropagatesActionToEveryEntry" computerName="MEGALODON4" duration="00:00:00.1259662" startTime="2026-07-27T00:30:21.8050341-04:00" endTime="2026-07-27T00:30:21.9307458-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="45c21e4c-ae0f-4639-ae08-3a69e0ef7f84" />
+    <UnitTestResult executionId="6d547724-c986-45af-8568-e7169fb1a6ab" testId="14b00a91-4a58-885f-92eb-6ed31feff0d6" testName="GetAsyncEnumerableOfToDoItemsInView_WhenStoreIdExcluded_DoesNotResolveExcludedStoreFolder" computerName="MEGALODON4" duration="00:00:00.0038566" startTime="2026-07-27T00:30:22.0432583-04:00" endTime="2026-07-27T00:30:22.0474371-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6d547724-c986-45af-8568-e7169fb1a6ab" />
+    <UnitTestResult executionId="535fdea3-830b-4447-a3bf-ad696f42f5ad" testId="14a71ff0-2950-8ce0-b4cf-5f2a5f13122f" testName="CompareTo_DifferentIds_ReturnsOrdinalSign" computerName="MEGALODON4" duration="00:00:00.0013787" startTime="2026-07-27T00:30:21.7889589-04:00" endTime="2026-07-27T00:30:21.7899604-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="535fdea3-830b-4447-a3bf-ad696f42f5ad" />
+    <UnitTestResult executionId="e3d6f049-feee-4c2a-9318-412d564facf1" testId="164c0882-6e62-8732-a50f-22d91643509d" testName="CompareToObject_NullObject_ReturnsPositiveOne" computerName="MEGALODON4" duration="00:00:00.0001981" startTime="2026-07-27T00:30:21.7899604-04:00" endTime="2026-07-27T00:30:21.7909595-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e3d6f049-feee-4c2a-9318-412d564facf1" />
+    <UnitTestResult executionId="912d09ad-122d-4989-bb56-0c180e1f746b" testId="120c45ef-c345-838d-8b4e-c52a3b02128d" testName="ConstructorWithFlaggableItem_LoadsFieldsAndCustomState" computerName="MEGALODON4" duration="00:00:00.3350979" startTime="2026-07-27T00:30:21.9107457-04:00" endTime="2026-07-27T00:30:22.2466228-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="912d09ad-122d-4989-bb56-0c180e1f746b" />
+    <UnitTestResult executionId="1b08764c-3f31-4633-bd25-01902a7d524e" testId="1e966b4e-5892-8215-8ccb-76c394360883" testName="SetAndSaveValueSetterOnly_NotReadOnly_InvokesSetterAndOlSaver" computerName="MEGALODON4" duration="00:00:00.0006955" startTime="2026-07-27T00:30:21.7993149-04:00" endTime="2026-07-27T00:30:21.7998412-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1b08764c-3f31-4633-bd25-01902a7d524e" />
+    <UnitTestResult executionId="1d0ed8cb-fc81-46b0-a0ed-573013f9a0a7" testId="1445557f-02a4-8855-9746-ef286d8cf739" testName="ToBase_SingleDigit_PadsToTwoDigits" computerName="MEGALODON4" duration="00:00:00.0001572" startTime="2026-07-27T00:30:21.8014127-04:00" endTime="2026-07-27T00:30:21.8014127-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1d0ed8cb-fc81-46b0-a0ed-573013f9a0a7" />
+    <UnitTestResult executionId="654acb17-bea5-4453-bcdd-55c450dcf152" testId="17df5583-dbe9-88db-a466-603dd5d0ae82" testName="ToBase10_StateUnderTest_ExpectedBehavior_1Z" computerName="MEGALODON4" duration="00:00:00.0001696" startTime="2026-07-27T00:30:21.7829545-04:00" endTime="2026-07-27T00:30:21.7829545-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="654acb17-bea5-4453-bcdd-55c450dcf152" />
+    <UnitTestResult executionId="e8a73de5-3498-4a5f-8fd9-476941f34d2a" testId="1c7f1622-1b24-8043-8364-4eb24fc70600" testName="Traverse_StateUnderTest_ExpectedBehavior1" computerName="MEGALODON4" duration="00:00:00.0000833" startTime="2026-07-27T00:30:21.7829545-04:00" endTime="2026-07-27T00:30:21.7829545-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e8a73de5-3498-4a5f-8fd9-476941f34d2a">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="c6e8089f-b54c-462c-8196-9305a55c64b3" testId="1af495fb-cca2-89c9-a82f-360232f35bf9" testName="RemoveChild_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0001582" startTime="2026-07-27T00:30:21.7819544-04:00" endTime="2026-07-27T00:30:21.7829545-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c6e8089f-b54c-462c-8196-9305a55c64b3">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="a3179e50-2bed-4559-b0b3-c4a55a60ac1a" testId="1724f203-ffcf-850b-ab4b-d4eadc2ff0d6" testName="IsCorrupt_WithEmptyValidAndNullEntry_ReturnsExpectedIndices" computerName="MEGALODON4" duration="00:00:00.0126066" startTime="2026-07-27T00:30:21.9307458-04:00" endTime="2026-07-27T00:30:21.9437475-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a3179e50-2bed-4559-b0b3-c4a55a60ac1a" />
+    <UnitTestResult executionId="a932e150-0f33-49f9-8591-fce15991f19b" testId="1f2f1176-cd93-82b0-a9c0-fdda01bcccb4" testName="SetAndSaveValueSetterSaver_ReadOnly_SkipsSetterAndSaver" computerName="MEGALODON4" duration="00:00:00.0002686" startTime="2026-07-27T00:30:21.8024603-04:00" endTime="2026-07-27T00:30:21.8024603-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a932e150-0f33-49f9-8591-fce15991f19b" />
+    <UnitTestResult executionId="ffe73f9b-8571-4004-a4d7-920df4cb3d2e" testId="178770c1-e89c-8eae-aff9-6786c94c88cc" testName="GetNextToDoID_MultipleConsecutiveCollisions_AdvancesToFirstFreeValue" computerName="MEGALODON4" duration="00:00:00.0002356" startTime="2026-07-27T00:30:21.7869546-04:00" endTime="2026-07-27T00:30:21.7879552-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ffe73f9b-8571-4004-a4d7-920df4cb3d2e" />
+    <UnitTestResult executionId="2e1c9904-4102-4dd3-991c-7a06d2179713" testId="185fee70-badb-85c8-ae6d-64b5640ca84a" testName="Constructor_WithOutlookItem_ShouldInitializeProperties" computerName="MEGALODON4" duration="00:00:00.5168465" startTime="2026-07-27T00:30:21.6147461-04:00" endTime="2026-07-27T00:30:22.2431134-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2e1c9904-4102-4dd3-991c-7a06d2179713" />
+    <UnitTestResult executionId="b455e392-d0fd-406a-97bf-98e7852e5f17" testId="110f3150-e884-86a7-84bf-cc1af5b1cbe6" testName="ToBase36_StateUnderTest_ExpectedBehavior_71" computerName="MEGALODON4" duration="00:00:00.0001335" startTime="2026-07-27T00:30:21.7899604-04:00" endTime="2026-07-27T00:30:21.7899604-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b455e392-d0fd-406a-97bf-98e7852e5f17" />
+    <UnitTestResult executionId="2d4d0715-b11c-480c-9241-11fa88022bb2" testId="14496eae-77fb-8077-9356-ec84f4ed7adc" testName="ReadOnlyPropertyTransitions_UpdateCachedStateWithoutWritingFields" computerName="MEGALODON4" duration="00:00:00.0114391" startTime="2026-07-27T00:30:22.4631055-04:00" endTime="2026-07-27T00:30:22.4749140-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2d4d0715-b11c-480c-9241-11fa88022bb2" />
+    <UnitTestResult executionId="1b722b99-cdb1-43af-a89e-ecab9063558f" testId="1a01a8d1-be00-860f-a884-b92596b0f686" testName="CompareTo_EqualIds_ReturnsZero" computerName="MEGALODON4" duration="00:00:00.0001905" startTime="2026-07-27T00:30:21.7879552-04:00" endTime="2026-07-27T00:30:21.7889589-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1b722b99-cdb1-43af-a89e-ecab9063558f" />
+    <UnitTestResult executionId="98fb5a75-6678-4b39-900d-6f3f4446ca10" testId="1914e447-def6-87c1-b026-c084fca5c787" testName="ConstructorWithNullFlaggableItem_ThrowsBeforeOutlookAccess" computerName="MEGALODON4" duration="00:00:00.0006095" startTime="2026-07-27T00:30:22.3058376-04:00" endTime="2026-07-27T00:30:22.3068411-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="98fb5a75-6678-4b39-900d-6f3f4446ca10" />
+    <UnitTestResult executionId="3361fe3c-ddde-4bf8-a7f9-52227fa5c744" testId="13f67cf2-104e-8d18-b13d-cbde03531a19" testName="FindFolder_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.2126367" startTime="2026-07-27T00:30:21.6147461-04:00" endTime="2026-07-27T00:30:21.9387470-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3361fe3c-ddde-4bf8-a7f9-52227fa5c744" />
+    <UnitTestResult executionId="3b55a0f0-0b31-4c67-9c65-634188f21b4e" testId="1127936a-85eb-8d71-84fd-9daf0935ff47" testName="ToBase10_StateUnderTest_ExpectedBehavior_131Z" computerName="MEGALODON4" duration="00:00:00.0001932" startTime="2026-07-27T00:30:21.7859544-04:00" endTime="2026-07-27T00:30:21.7859544-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3b55a0f0-0b31-4c67-9c65-634188f21b4e" />
+    <UnitTestResult executionId="55dac6db-645e-49ec-ac79-04ca4c90bc9d" testId="19344dfa-6457-8360-bc13-4a1eb6918cc1" testName="FindAll_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0000864" startTime="2026-07-27T00:30:21.7879552-04:00" endTime="2026-07-27T00:30:21.7879552-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="55dac6db-645e-49ec-ac79-04ca4c90bc9d">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="641123d9-5c58-4f09-83f2-282a3f6b805f" testId="181f556c-06e5-8ea8-a88c-98e5085333f3" testName="AutoCodeIdAsync_WithEmptyAndExistingIds_UsesBranchSpecificTransitions" computerName="MEGALODON4" duration="00:00:00.0428539" startTime="2026-07-27T00:30:22.4195414-04:00" endTime="2026-07-27T00:30:22.4631055-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="641123d9-5c58-4f09-83f2-282a3f6b805f" />
+    <UnitTestResult executionId="2543110e-88c6-4b87-be02-d2ac6d9310cf" testId="11e26144-be7b-8985-a3f9-f4ebb5f2ce7e" testName="Constructor_WithString_ShouldInitializeToDoID" computerName="MEGALODON4" duration="00:00:00.0001696" startTime="2026-07-27T00:30:22.2456260-04:00" endTime="2026-07-27T00:30:22.2456260-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2543110e-88c6-4b87-be02-d2ac6d9310cf" />
+    <UnitTestResult executionId="5a77a3b5-5126-48d2-a63c-75099e403a93" testId="11662281-3fa5-8d20-9285-4072e0fb1940" testName="DateAndStatusBoundaries_UseDefaultsAndBooleanTransitions" computerName="MEGALODON4" duration="00:00:00.0103528" startTime="2026-07-27T00:30:22.2713186-04:00" endTime="2026-07-27T00:30:22.2813209-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5a77a3b5-5126-48d2-a63c-75099e403a93" />
+    <UnitTestResult executionId="02fcdb1b-823d-4013-b08f-9286819d36b8" testId="1bcb0e92-d9d9-8555-adeb-82fd088142ea" testName="Constructor_WithOutlookItemAndOnDemand_ShouldNotInitializeProperties" computerName="MEGALODON4" duration="00:00:00.0016132" startTime="2026-07-27T00:30:22.2431134-04:00" endTime="2026-07-27T00:30:22.2446190-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="02fcdb1b-823d-4013-b08f-9286819d36b8" />
+    <UnitTestResult executionId="29fb5944-bb18-4b41-a6f8-ea2a6368d015" testId="18bbf3f0-10bc-8aa0-b1b4-3da7d0983e32" testName="ForceSave_WhenReadOnlyPersistsCachedState_RestoresReadOnlyState" computerName="MEGALODON4" duration="00:00:00.0260348" startTime="2026-07-27T00:30:22.3068411-04:00" endTime="2026-07-27T00:30:22.3328391-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="29fb5944-bb18-4b41-a6f8-ea2a6368d015" />
+    <UnitTestResult executionId="478aa5ff-b642-4e6a-875f-358ea72a5bfc" testId="1ac09a59-0069-8a00-b128-f6d49958365d" testName="FindByDelegate_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0001282" startTime="2026-07-27T00:30:21.7859544-04:00" endTime="2026-07-27T00:30:21.7859544-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="478aa5ff-b642-4e6a-875f-358ea72a5bfc">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="64432dd3-1ee6-4983-b7b3-2085edd8b4ac" testId="1a97aaf5-2e95-8acc-9d25-5cdeb6c63138" testName="ToBase10Char_BaseAboveMaxBase_ThrowsArgumentOutOfRangeException" computerName="MEGALODON4" duration="00:00:00.0002829" startTime="2026-07-27T00:30:21.7972197-04:00" endTime="2026-07-27T00:30:21.7977429-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="64432dd3-1ee6-4983-b7b3-2085edd8b4ac" />
+    <UnitTestResult executionId="e74ef12b-b99b-46d0-bab5-ee17800103e3" testId="1e47390d-6492-8ee1-93c7-dc2fc4eeffba" testName="AddMatches_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0001041" startTime="2026-07-27T00:30:21.9407430-04:00" endTime="2026-07-27T00:30:21.9407430-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e74ef12b-b99b-46d0-bab5-ee17800103e3" />
+    <UnitTestResult executionId="cda19d78-0536-472e-a501-daaecd785570" testId="1935838b-9f74-836b-89dc-a2a9e6f2fbfc" testName="MaxBase_EqualsConverterStringLength_36" computerName="MEGALODON4" duration="00:00:00.0508873" startTime="2026-07-27T00:30:21.6081502-04:00" endTime="2026-07-27T00:30:21.7773301-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cda19d78-0536-472e-a501-daaecd785570">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="879f7035-6f23-491b-909c-bf3e3051076e" testId="1fc2a77f-beb4-8525-8026-0eb95d609796" testName="CompareTo_ThisProjectIdNull_ReturnsNegativeOne" computerName="MEGALODON4" duration="00:00:00.0001800" startTime="2026-07-27T00:30:21.7879552-04:00" endTime="2026-07-27T00:30:21.7879552-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="879f7035-6f23-491b-909c-bf3e3051076e" />
+    <UnitTestResult executionId="6130ee4a-8cd1-4737-8d72-0e05802a0c27" testId="14ba09d6-50de-8211-babb-7aa507b34be8" testName="GetFolder_StateUnderTest_ExpectedBehavior2" computerName="MEGALODON4" duration="00:00:00.0000754" startTime="2026-07-27T00:30:21.9397429-04:00" endTime="2026-07-27T00:30:21.9397429-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6130ee4a-8cd1-4737-8d72-0e05802a0c27" />
+    <UnitTestResult executionId="6c259537-011c-4cb3-88eb-b5e33c9c30fa" testId="134b072d-3ec8-8bb5-a5b3-7515f12b26b2" testName="AddChild_StateUnderTest_ExpectedBehavior1" computerName="MEGALODON4" duration="00:00:00.0000973" startTime="2026-07-27T00:30:21.7715361-04:00" endTime="2026-07-27T00:30:21.7720435-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6c259537-011c-4cb3-88eb-b5e33c9c30fa">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="f205e819-f73d-4d89-92b6-9939cdf54130" testId="19823285-1bcf-86f3-95f3-91929f27a3b3" testName="AddChild_StateUnderTest_ExpectedBehavior2" computerName="MEGALODON4" duration="00:00:00.0000949" startTime="2026-07-27T00:30:21.7720435-04:00" endTime="2026-07-27T00:30:21.7720435-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f205e819-f73d-4d89-92b6-9939cdf54130">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="29734c72-43a6-4b4a-a2d9-b5fe7e8d81be" testId="1051b2d8-5389-81ac-be03-f7858d276c0d" testName="GetNextToDoID_EmptySeed_ThrowsArgumentException" computerName="MEGALODON4" duration="00:00:00.0005354" startTime="2026-07-27T00:30:21.7977429-04:00" endTime="2026-07-27T00:30:21.7982685-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="29734c72-43a6-4b4a-a2d9-b5fe7e8d81be" />
+    <UnitTestResult executionId="3ae6c541-cbca-4c88-b94e-8388cbb345da" testId="1c443272-ef6b-8cb1-99ba-68e7103b2a73" testName="GetRelevantOlPathPortion_StateUnderTest_ExpectedBehavior1" computerName="MEGALODON4" duration="00:00:00.2689507" startTime="2026-07-27T00:30:21.6087416-04:00" endTime="2026-07-27T00:30:21.9950025-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3ae6c541-cbca-4c88-b94e-8388cbb345da" />
+    <UnitTestResult executionId="5dd38c7d-a3e9-4532-8c46-8009b4e2a4ea" testId="1c793ef5-0e27-8120-b26a-bbfccdead1f5" testName="Descendents_StateUnderTest_ExpectedBehavior2" computerName="MEGALODON4" duration="00:00:00.0348615" startTime="2026-07-27T00:30:21.6081502-04:00" endTime="2026-07-27T00:30:21.7606403-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5dd38c7d-a3e9-4532-8c46-8009b4e2a4ea">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿Original Tree&#xD;
+\-a&#xD;
+  |-b&#xD;
+  | |-d&#xD;
+  | |-e&#xD;
+  | \-f&#xD;
+  \-c&#xD;
+    \-g&#xD;
+
+Expected Results&#xD;
+b,d,e,f,c,g&#xD;
+
+Results&#xD;
+b,d,e,f,c,g</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="d22f57da-83b9-4c64-9e56-5413a863d97f" testId="1d20661b-c022-8c36-8a6d-51beabf3632a" testName="Disabled_GetAttachmentFilename_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0293554" startTime="2026-07-27T00:30:21.6081502-04:00" endTime="2026-07-27T00:30:21.7566397-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d22f57da-83b9-4c64-9e56-5413a863d97f" />
+    <UnitTestResult executionId="1fa19e69-6751-43b8-bd8c-9d8dc374f5ff" testId="1994e938-ea33-8a2c-87aa-babc0583a405" testName="ToBase36_StateUnderTest_ExpectedBehavior_37" computerName="MEGALODON4" duration="00:00:00.0002799" startTime="2026-07-27T00:30:21.7889589-04:00" endTime="2026-07-27T00:30:21.7889589-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1fa19e69-6751-43b8-bd8c-9d8dc374f5ff" />
+    <UnitTestResult executionId="933cff90-3a65-43f5-add3-619bbf397bdf" testId="16facf8f-29c5-81e3-aa08-153544de1d3f" testName="GetFolder_StateUnderTest_ExpectedBehavior1" computerName="MEGALODON4" duration="00:00:00.0001081" startTime="2026-07-27T00:30:21.9397429-04:00" endTime="2026-07-27T00:30:21.9397429-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="933cff90-3a65-43f5-add3-619bbf397bdf" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="AutoCodeIdAsync_WithEmptyAndExistingIds_UsesBranchSpecificTransitions" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="181f556c-06e5-8ea8-a88c-98e5085333f3">
+      <Execution id="641123d9-5c58-4f09-83f2-282a3f6b805f" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoItemCoverageExpansionTests" name="AutoCodeIdAsync_WithEmptyAndExistingIds_UsesBranchSpecificTransitions" />
+    </UnitTest>
+    <UnitTest name="AutoCodeIdAsync_WithNullAndEmptyInputs_ReturnsWithoutIdListAccess" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="12042fbe-d302-886f-a02e-6fa10b34d2c4">
+      <Execution id="5b771ced-0f23-4edd-ad70-e01d58164600" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoItemCoverageExpansionTests" name="AutoCodeIdAsync_WithNullAndEmptyInputs_ReturnsWithoutIdListAccess" />
+    </UnitTest>
+    <UnitTest name="Descendents_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1ea7296e-85b7-8e39-af56-0c59869bb162">
+      <Execution id="a4c45525-dcaf-45a8-9cfe-59ea469c0ecb" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.Data_Model.Tree.TreeNodeTests_UnfinishedStubs" name="Descendents_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="SetAndSaveValueSetterSaver_ValueEqualToExisting_StillInvokesSetterWhenNotReadOnly" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1a15c9c7-81ae-899e-af6c-c578cf103ba5">
+      <Execution id="9125a9e6-daa7-4f54-8fb7-ec168e417365" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoLoaderSetAndSaveTests" name="SetAndSaveValueSetterSaver_ValueEqualToExisting_StillInvokesSetterWhenNotReadOnly" />
+    </UnitTest>
+    <UnitTest name="SetAndSaveValueSetterSaver_NotReadOnly_InvokesSetterAndSuppliedSaver" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1a614c62-3741-8ac8-85b6-a1562245eef7">
+      <Execution id="1ae10251-7adf-4ff5-8fb1-b4098af95867" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoLoaderSetAndSaveTests" name="SetAndSaveValueSetterSaver_NotReadOnly_InvokesSetterAndSuppliedSaver" />
+    </UnitTest>
+    <UnitTest name="FindByDelegate_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1ac09a59-0069-8a00-b128-f6d49958365d">
+      <Execution id="478aa5ff-b642-4e6a-875f-358ea72a5bfc" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.Data_Model.Tree.TreeNodeTests_UnfinishedStubs" name="FindByDelegate_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="FindByDelegate_StateUnderTest_ExpectedBehavior1" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="12592692-bf13-89ba-bac8-a376c38d328e">
+      <Execution id="6ce9799c-71a0-4794-9746-07f85fa42d2c" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.Data_Model.Tree.TreeNodeTests_UnfinishedStubs" name="FindByDelegate_StateUnderTest_ExpectedBehavior1" />
+    </UnitTest>
+    <UnitTest name="AddMatches_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1e47390d-6492-8ee1-93c7-dc2fc4eeffba">
+      <Execution id="e74ef12b-b99b-46d0-bab5-ee17800103e3" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.FolderHandlerTests_UnfinishedStubs" name="AddMatches_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="SetProjectId_MalformedId_ShowsErrorDialogAndReturnsFalse" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1edddf9c-cd84-8a52-9c9e-e1b656e3b543">
+      <Execution id="ec5a8735-33d2-4eef-a4b1-f952fe133a33" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectEntryDialogBranchesTests" name="SetProjectId_MalformedId_ShowsErrorDialogAndReturnsFalse" />
+    </UnitTest>
+    <UnitTest name="Traverse_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="15eabe1d-700d-814f-b11e-3eb4d6611cc7">
+      <Execution id="10def146-c2e4-4762-8b89-f022847a31cf" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.Data_Model.Tree.TreeNodeTests_UnfinishedStubs" name="Traverse_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="ToBase_SingleDigit_PadsToTwoDigits" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1445557f-02a4-8855-9746-ef286d8cf739">
+      <Execution id="1d0ed8cb-fc81-46b0-a0ed-573013f9a0a7" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerRemainingBranchesTests" name="ToBase_SingleDigit_PadsToTwoDigits" />
+    </UnitTest>
+    <UnitTest name="CreateFolder_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="106340bb-d034-83cb-bff7-de704c46f01a">
+      <Execution id="d48b7594-c689-4164-85a3-869b3199385f" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.FolderHandlerTests_UnfinishedStubs" name="CreateFolder_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="UpdateProjectID_WithDuplicateAndNewIds_ReturnsExpectedValues" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="11243f17-dc64-8edd-b8a3-b41ff65cefdb">
+      <Execution id="473200a6-b12b-46a4-917f-814ff12ecba7" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectDataCoverageExpansionTests" name="UpdateProjectID_WithDuplicateAndNewIds_ReturnsExpectedValues" />
+    </UnitTest>
+    <UnitTest name="Flatten_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1df35507-935e-87c4-92fc-caf24b103ad0">
+      <Execution id="4a69d879-af19-45c9-b507-77bfc61284b1" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.Data_Model.Tree.TreeNodeTests_UnfinishedStubs" name="Flatten_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="GetToDoList_WhenStoreIdExcluded_DoesNotResolveExcludedStoreFolder" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="101bc6c3-37f8-8833-806a-e58e0b7442b3">
+      <Execution id="bfeafd4d-9ed0-4f7a-a976-8d1b1294d0dc" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.StoreFilterRoutingTests" name="GetToDoList_WhenStoreIdExcluded_DoesNotResolveExcludedStoreFolder" />
+    </UnitTest>
+    <UnitTest name="GetNextToDoID_NullSeed_ThrowsArgumentException" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1182f5fa-bc1f-8dac-8557-63a62d377e42">
+      <Execution id="12465723-5afc-4309-8d5e-8e639fa674f4" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.IDListGetNextToDoIDTests" name="GetNextToDoID_NullSeed_ThrowsArgumentException" />
+    </UnitTest>
+    <UnitTest name="SetAndSaveValueSetterSaver_NotReadOnly_NullSetter_ThrowsArgumentNullException" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="185c6822-6af6-82c8-9a7d-0d9435b52ea2">
+      <Execution id="d2cd4398-9b83-4d0f-b77e-ac80055c9d5d" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoLoaderSetAndSaveTests" name="SetAndSaveValueSetterSaver_NotReadOnly_NullSetter_ThrowsArgumentNullException" />
+    </UnitTest>
+    <UnitTest name="AddChildren_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1273228d-0d68-8a62-b62d-853a9e61fbdf">
+      <Execution id="f662e85c-cd5e-4c1a-9de4-340f873bbf0b" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.Data_Model.Tree.TreeNodeTests_UnfinishedStubs" name="AddChildren_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="ToBase_MinDigitsOne_DoesNotPadSingleDigit" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1a4e038d-94a5-8837-b65d-79baecddf79c">
+      <Execution id="0f6b68a6-d2ba-4499-abc8-733a447767e1" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerRemainingBranchesTests" name="ToBase_MinDigitsOne_DoesNotPadSingleDigit" />
+    </UnitTest>
+    <UnitTest name="SetAndSaveRefSetterSaver_NotReadOnly_NullSetter_ThrowsArgumentNullException" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1557d2db-7703-8f55-acc0-088b8d97f9fb">
+      <Execution id="18faf9fd-5b1a-4c3a-88fc-d745427ab5a0" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoLoaderSetAndSaveTests" name="SetAndSaveRefSetterSaver_NotReadOnly_NullSetter_ThrowsArgumentNullException" />
+    </UnitTest>
+    <UnitTest name="SetAndSaveValueSetterSaver_ReadOnly_SkipsSetterAndSaver" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1f2f1176-cd93-82b0-a9c0-fdda01bcccb4">
+      <Execution id="a932e150-0f33-49f9-8591-fce15991f19b" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoLoaderSetAndSaveTests" name="SetAndSaveValueSetterSaver_ReadOnly_SkipsSetterAndSaver" />
+    </UnitTest>
+    <UnitTest name="GetRelevantOlPathPortion_StateUnderTest_ExpectedBehavior2" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="10dd3d5c-5a61-8a3d-955f-ef35f72ca283">
+      <Execution id="14f0fda5-b988-44d7-b96f-e9ca1b5f5abd" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.FolderHandlerTests_Written" name="GetRelevantOlPathPortion_StateUnderTest_ExpectedBehavior2" />
+    </UnitTest>
+    <UnitTest name="RecalculateSuggestions_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1795c40d-2ea1-856b-a287-8f27538b53b4">
+      <Execution id="fb812ef3-bfe9-43ef-a948-23bb0b0f125f" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.FolderHandlerTests_UnfinishedStubs" name="RecalculateSuggestions_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="SetAndSaveRefSetterSaver_ReadOnly_SkipsSetterAndSaverEvenWithNullSetter" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="16e58f45-f102-89c6-ab47-b9f7159a3733">
+      <Execution id="c23ff10f-af8c-414d-8302-a7ef6ba87e84" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoLoaderSetAndSaveTests" name="SetAndSaveRefSetterSaver_ReadOnly_SkipsSetterAndSaverEvenWithNullSetter" />
+    </UnitTest>
+    <UnitTest name="SetAndSaveRefSetterSaver_NotReadOnly_NullSaver_InvokesSetterWithoutThrowing" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="133845d0-b7b3-81bc-80aa-77fe4474c7a3">
+      <Execution id="c60baa63-dbfb-4f87-957f-93fdaaf32186" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoLoaderSetAndSaveTests" name="SetAndSaveRefSetterSaver_NotReadOnly_NullSaver_InvokesSetterWithoutThrowing" />
+    </UnitTest>
+    <UnitTest name="ToBase10_StateUnderTest_ExpectedBehavior_12" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1b14f0c1-6f31-8cdb-a61c-36c07388204d">
+      <Execution id="05b97bc3-8176-4100-9420-5df57ddacd4a" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerTests" name="ToBase10_StateUnderTest_ExpectedBehavior_12" />
+    </UnitTest>
+    <UnitTest name="ToBase_ThreeDigitResult_PrependsSingleZero" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1aa38188-a98a-85e0-864f-23ca56fd835d">
+      <Execution id="0c80bf2d-463f-478f-ba33-8c25b2317795" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerRemainingBranchesTests" name="ToBase_ThreeDigitResult_PrependsSingleZero" />
+    </UnitTest>
+    <UnitTest name="SetProjectId_NullNewIdWhenCurrentIsAlsoNull_ReturnsTrueWithoutDialog" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1d09f1b8-7355-8308-b2ca-4830dea00f40">
+      <Execution id="9495b566-af1a-4be0-a47d-78fa413af1f4" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectEntryTests" name="SetProjectId_NullNewIdWhenCurrentIsAlsoNull_ReturnsTrueWithoutDialog" />
+    </UnitTest>
+    <UnitTest name="Traverse_StateUnderTest_ExpectedBehavior1" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1c7f1622-1b24-8043-8364-4eb24fc70600">
+      <Execution id="e8a73de5-3498-4a5f-8fd9-476941f34d2a" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.Data_Model.Tree.TreeNodeTests_UnfinishedStubs" name="Traverse_StateUnderTest_ExpectedBehavior1" />
+    </UnitTest>
+    <UnitTest name="SetProjectId_ChangeConfirmedYes_WithUpdateAction_InvokesAction" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="148f1670-ebdd-8634-88ef-5c4aeb65e293">
+      <Execution id="ebda740b-53e1-46d0-9712-4767a02565d9" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectEntryDialogBranchesTests" name="SetProjectId_ChangeConfirmedYes_WithUpdateAction_InvokesAction" />
+    </UnitTest>
+    <UnitTest name="WriteFlagsBatch_WithTranslatorValues_UpdatesUserDefinedFields" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1f14086a-5669-89b7-a46d-20a8aeb69352">
+      <Execution id="42162b41-5ad7-40ac-9212-774e9725175b" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoItemCoverageExpansionTests" name="WriteFlagsBatch_WithTranslatorValues_UpdatesUserDefinedFields" />
+    </UnitTest>
+    <UnitTest name="Constructor_WithString_ShouldInitializeToDoID" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="11e26144-be7b-8985-a3f9-f4ebb5f2ce7e">
+      <Execution id="2543110e-88c6-4b87-be02-d2ac6d9310cf" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoItemTests" name="Constructor_WithString_ShouldInitializeToDoID" />
+    </UnitTest>
+    <UnitTest name="ConstructorWithNullFlaggableItem_ThrowsBeforeOutlookAccess" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1914e447-def6-87c1-b026-c084fca5c787">
+      <Execution id="98fb5a75-6678-4b39-900d-6f3f4446ca10" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoItemCoverageExpansionTests" name="ConstructorWithNullFlaggableItem_ThrowsBeforeOutlookAccess" />
+    </UnitTest>
+    <UnitTest name="SetAndSaveValueSetterSaver_NotReadOnly_NullSaver_InvokesSetterWithoutThrowing" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1da5399c-92b0-860d-9bc7-eec9a46fe0cf">
+      <Execution id="5a399b47-1b1b-46f3-bd12-962b0da44163" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoLoaderSetAndSaveTests" name="SetAndSaveValueSetterSaver_NotReadOnly_NullSaver_InvokesSetterWithoutThrowing" />
+    </UnitTest>
+    <UnitTest name="Disabled_GetAttachmentFilename_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1d20661b-c022-8c36-8a6d-51beabf3632a">
+      <Execution id="d22f57da-83b9-4c64-9e56-5413a863d97f" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Disabled.ToDoModel.Test.Email_Utilities.SortItemsToExistingFolderTests" name="Disabled_GetAttachmentFilename_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="People_DeserializeShortcut_CanDeserializePatternCorrectly" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="19137cba-549a-8f58-ae56-e6616511c4d9">
+      <Execution id="f3848b84-ecd2-40a4-801f-7b438fc9353f" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Tests.Data_Model.People.PeopleScoDictionaryNewTests" name="People_DeserializeShortcut_CanDeserializePatternCorrectly" />
+    </UnitTest>
+    <UnitTest name="ConstructorWithString_LoadsIdentifierDefaultsWithoutOutlookAccess" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="13c5d2c0-0c8c-801a-b60c-f840c9cc992d">
+      <Execution id="425c957a-7582-4878-88e9-342c61a62ab3" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoItemCoverageExpansionTests" name="ConstructorWithString_LoadsIdentifierDefaultsWithoutOutlookAccess" />
+    </UnitTest>
+    <UnitTest name="GetMatchingFolders_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="133c8824-1b7a-8a66-985d-01007ae40db7">
+      <Execution id="eb954dde-c909-49c4-9398-6a60c385781e" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.FolderHandlerTests_UnfinishedStubs" name="GetMatchingFolders_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="InsertChild_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1c433fa6-6353-8e9e-86a9-bd2c7dcfd3df">
+      <Execution id="57f305d1-e5d8-4ace-8a0e-4822fbcdfdf4" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.Data_Model.Tree.TreeNodeTests_UnfinishedStubs" name="InsertChild_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="ToBase10Char_UpperLetter_ReturnsIndexValue" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="12ecf062-8819-8641-bfc7-55d67c0eb557">
+      <Execution id="9e1ac214-f806-433b-939d-8480dd16b1fa" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerRemainingBranchesTests" name="ToBase10Char_UpperLetter_ReturnsIndexValue" />
+    </UnitTest>
+    <UnitTest name="SetProjectId_ChangeConfirmedNo_LeavesProjectIdUnchanged" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1e40cc62-ffd4-81c5-b843-7d2375981b1f">
+      <Execution id="aa121f2e-7932-42a5-9b24-501c96f5595d" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectEntryDialogBranchesTests" name="SetProjectId_ChangeConfirmedNo_LeavesProjectIdUnchanged" />
+    </UnitTest>
+    <UnitTest name="DateAndStatusBoundaries_UseDefaultsAndBooleanTransitions" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="11662281-3fa5-8d20-9285-4072e0fb1940">
+      <Execution id="5a77a3b5-5126-48d2-a63c-75099e403a93" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoItemCoverageExpansionTests" name="DateAndStatusBoundaries_UseDefaultsAndBooleanTransitions" />
+    </UnitTest>
+    <UnitTest name="FindFolder_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="13f67cf2-104e-8d18-b13d-cbde03531a19">
+      <Execution id="3361fe3c-ddde-4bf8-a7f9-52227fa5c744" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.FolderHandlerTests_UnfinishedStubs" name="FindFolder_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="GetRelevantOlPathPortion_StateUnderTest_ExpectedBehavior1" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1c443272-ef6b-8cb1-99ba-68e7103b2a73">
+      <Execution id="3ae6c541-cbca-4c88-b94e-8388cbb345da" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.FolderHandlerTests_Written" name="GetRelevantOlPathPortion_StateUnderTest_ExpectedBehavior1" />
+    </UnitTest>
+    <UnitTest name="ForceSave_WhenReadOnlyPersistsCachedState_RestoresReadOnlyState" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="18bbf3f0-10bc-8aa0-b1b4-3da7d0983e32">
+      <Execution id="29fb5944-bb18-4b41-a6f8-ea2a6368d015" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoItemCoverageExpansionTests" name="ForceSave_WhenReadOnlyPersistsCachedState_RestoresReadOnlyState" />
+    </UnitTest>
+    <UnitTest name="ToBase36_StateUnderTest_ExpectedBehavior_50615" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="15b25348-c944-83ca-96c6-5ea05d0438e9">
+      <Execution id="438eeeaa-5932-4346-86aa-470abd94a876" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerTests" name="ToBase36_StateUnderTest_ExpectedBehavior_50615" />
+    </UnitTest>
+    <UnitTest name="SetAndGetProperties_ShouldWorkCorrectly" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1711526a-aa52-8eb4-9d81-ddfa24410bde">
+      <Execution id="fe336878-24ef-4ecb-9502-147216986b6d" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoItemTests" name="SetAndGetProperties_ShouldWorkCorrectly" />
+    </UnitTest>
+    <UnitTest name="ConstructorWithFlaggableItem_LoadsFieldsAndCustomState" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="120c45ef-c345-838d-8b4e-c52a3b02128d">
+      <Execution id="912d09ad-122d-4989-bb56-0c180e1f746b" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoItemCoverageExpansionTests" name="ConstructorWithFlaggableItem_LoadsFieldsAndCustomState" />
+    </UnitTest>
+    <UnitTest name="ToBase10Char_MaxDigit_ReturnsThirtyFive" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="12dbb0f0-e480-8148-9474-35d33088eff3">
+      <Execution id="95b96c45-6c7a-4d9c-b17e-17230228f05a" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerRemainingBranchesTests" name="ToBase10Char_MaxDigit_ReturnsThirtyFive" />
+    </UnitTest>
+    <UnitTest name="Disabled_GetAttachmentFilename_StateUnderTest_NoExtension" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="135c0262-6142-8ff6-90c1-d898b4f18103">
+      <Execution id="96385bc2-96ea-4f56-ace6-c5564f437390" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Disabled.ToDoModel.Test.Email_Utilities.SortItemsToExistingFolderTests" name="Disabled_GetAttachmentFilename_StateUnderTest_NoExtension" />
+    </UnitTest>
+    <UnitTest name="AddChild_StateUnderTest_ExpectedBehavior2" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="19823285-1bcf-86f3-95f3-91929f27a3b3">
+      <Execution id="f205e819-f73d-4d89-92b6-9939cdf54130" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.Data_Model.Tree.TreeNodeTests_UnfinishedStubs" name="AddChild_StateUnderTest_ExpectedBehavior2" />
+    </UnitTest>
+    <UnitTest name="FilterToProjectIDs_WithNullAndMixedRowKeys_ReturnsOnlyFourCharacterRows" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1e975f71-f68a-8ed3-be1d-0235904f25a4">
+      <Execution id="3284dd26-6a12-4743-8643-e3009cbbf959" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectDataCoverageExpansionTests" name="FilterToProjectIDs_WithNullAndMixedRowKeys_ReturnsOnlyFourCharacterRows" />
+    </UnitTest>
+    <UnitTest name="CompareTo_EqualOrdinalThenLongerOtherLength_ReturnsPositiveOne" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1257813f-c036-88fd-94da-60fcdcc5289d">
+      <Execution id="75a9e345-9d6b-482e-813c-0e981517d16b" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectEntryDialogBranchesTests" name="CompareTo_EqualOrdinalThenLongerOtherLength_ReturnsPositiveOne" />
+    </UnitTest>
+    <UnitTest name="FlattenIf_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1e0b20d2-d964-867a-9986-7d3e60af19d1">
+      <Execution id="767f9327-72b7-4d4b-b5cd-a5e61bd605e7" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.Data_Model.Tree.TreeNodeTests_UnfinishedStubs" name="FlattenIf_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="GetToDoListAsync_WhenStoreIdExcluded_DoesNotResolveExcludedStoreFolder" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1023ca46-0723-857a-ae72-29a848794d64">
+      <Execution id="298883d5-e600-47aa-a2ee-3efa9dc13f25" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.StoreFilterRoutingTests" name="GetToDoListAsync_WhenStoreIdExcluded_DoesNotResolveExcludedStoreFolder" />
+    </UnitTest>
+    <UnitTest name="ToBase10Char_BaseBelowOne_ThrowsArgumentOutOfRangeException" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1d4ccfd6-5b16-8480-b320-85119cd35fae">
+      <Execution id="be63f4ec-a73f-48fe-92f7-adc7a1b9f2ac" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerRemainingBranchesTests" name="ToBase10Char_BaseBelowOne_ThrowsArgumentOutOfRangeException" />
+    </UnitTest>
+    <UnitTest name="DfToListEntries_WithProjectCategories_ParsesProjectAndProgramNames" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="15bedd8e-f868-82e9-b2cb-46c2801c13cc">
+      <Execution id="2695ba25-65e7-4e11-aa5a-0ed3ffadd51f" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectDataCoverageExpansionTests" name="DfToListEntries_WithProjectCategories_ParsesProjectAndProgramNames" />
+    </UnitTest>
+    <UnitTest name="GetFolder_StateUnderTest_ExpectedBehavior1" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="16facf8f-29c5-81e3-aa08-153544de1d3f">
+      <Execution id="933cff90-3a65-43f5-add3-619bbf397bdf" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.FolderHandlerTests_UnfinishedStubs" name="GetFolder_StateUnderTest_ExpectedBehavior1" />
+    </UnitTest>
+    <UnitTest name="FindAll_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="19344dfa-6457-8360-bc13-4a1eb6918cc1">
+      <Execution id="55dac6db-645e-49ec-ac79-04ca4c90bc9d" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.Data_Model.Tree.TreeNodeTests_UnfinishedStubs" name="FindAll_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="Disabled_InitializeSortToExisting_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="160daa1f-d0ad-8463-a976-133f5965c16a">
+      <Execution id="b826fc61-138a-4b0a-a4e6-7df413c0eb43" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.Email_Utilities.Disabled_SortItemsToExistingFolderTests_Unfinished" name="Disabled_InitializeSortToExisting_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="ToBase36_StateUnderTest_ExpectedBehavior_71" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="110f3150-e884-86a7-84bf-cc1af5b1cbe6">
+      <Execution id="b455e392-d0fd-406a-97bf-98e7852e5f17" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerTests" name="ToBase36_StateUnderTest_ExpectedBehavior_71" />
+    </UnitTest>
+    <UnitTest name="Descendents_StateUnderTest_ExpectedBehavior2" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1c793ef5-0e27-8120-b26a-bbfccdead1f5">
+      <Execution id="5dd38c7d-a3e9-4532-8c46-8009b4e2a4ea" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.TreeNodeTests" name="Descendents_StateUnderTest_ExpectedBehavior2" />
+    </UnitTest>
+    <UnitTest name="Rebuild_WhenStoreIdExcluded_DoesNotProcessExcludedStore" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1ff5554d-585a-8443-a426-237818341f16">
+      <Execution id="8939f7ac-b90f-4dcb-b170-4c9f47dcf9eb" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectDataCoverageExpansionTests" name="Rebuild_WhenStoreIdExcluded_DoesNotProcessExcludedStore" />
+    </UnitTest>
+    <UnitTest name="VisibilityAndExpandedStateTransitions_SetBitsAndClearChangeMarker" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1cb7bf0b-da8f-8f72-bf15-f69311014298">
+      <Execution id="2e7be1b9-f915-4b87-ac50-988c9cf228cb" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoItemCoverageExpansionTests" name="VisibilityAndExpandedStateTransitions_SetBitsAndClearChangeMarker" />
+    </UnitTest>
+    <UnitTest name="CompareTo_EqualOrdinalThenShorterOtherLength_ReturnsNegativeOne" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1176dd17-d5b2-8c4e-94b9-7ac25a9ec5d3">
+      <Execution id="47773f15-e9fc-4b48-9125-eba9d0c53e7f" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectEntryDialogBranchesTests" name="CompareTo_EqualOrdinalThenShorterOtherLength_ReturnsNegativeOne" />
+    </UnitTest>
+    <UnitTest name="CompareToObject_NonProjectEntry_ThrowsArgumentException" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1a9aded0-ef18-86b8-9a53-a088deac687c">
+      <Execution id="fd8793ae-faaf-411f-8730-d0e56ef88c5b" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectEntryTests" name="CompareToObject_NonProjectEntry_ThrowsArgumentException" />
+    </UnitTest>
+    <UnitTest name="Constructor_WithOutlookItemAndOnDemand_ShouldNotInitializeProperties" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1bcb0e92-d9d9-8555-adeb-82fd088142ea">
+      <Execution id="02fcdb1b-823d-4013-b08f-9286819d36b8" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoItemTests" name="Constructor_WithOutlookItemAndOnDemand_ShouldNotInitializeProperties" />
+    </UnitTest>
+    <UnitTest name="AddSuggestions_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1e8c9c7f-79e9-8139-9233-dc075cffc4d6">
+      <Execution id="080b7c64-8b28-4da8-8a03-ef7b501f2fda" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.FolderHandlerTests_UnfinishedStubs" name="AddSuggestions_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="CompareToObject_NullObject_ReturnsPositiveOne" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="164c0882-6e62-8732-a50f-22d91643509d">
+      <Execution id="e3d6f049-feee-4c2a-9318-412d564facf1" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectEntryTests" name="CompareToObject_NullObject_ReturnsPositiveOne" />
+    </UnitTest>
+    <UnitTest name="Constructor_WithOutlookItem_ShouldInitializeProperties" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="185fee70-badb-85c8-ae6d-64b5640ca84a">
+      <Execution id="2e1c9904-4102-4dd3-991c-7a06d2179713" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoItemTests" name="Constructor_WithOutlookItem_ShouldInitializeProperties" />
+    </UnitTest>
+    <UnitTest name="SetProjectId_ChangeConfirmedYes_UpdatesProjectId" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="13369a46-d6e2-8813-932c-aeb8dadd1789">
+      <Execution id="58e59f6f-8aa8-40e8-b308-0b6a99ce4aed" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectEntryDialogBranchesTests" name="SetProjectId_ChangeConfirmedYes_UpdatesProjectId" />
+    </UnitTest>
+    <UnitTest name="CompareToObject_ProjectEntry_DelegatesToTypedCompareTo" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1e0189cf-80a7-8419-a976-28c1bb418469">
+      <Execution id="02ee1ed5-9b67-4fc1-89e8-2387de2b6ad0" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectEntryTests" name="CompareToObject_ProjectEntry_DelegatesToTypedCompareTo" />
+    </UnitTest>
+    <UnitTest name="ToBase_Zero_ReturnsEvenPaddedZero" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="12d96bf3-5b62-872b-96ae-b0b887f37ced">
+      <Execution id="0b98d9cf-5085-4a5c-9cb1-500e70c7ea32" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerRemainingBranchesTests" name="ToBase_Zero_ReturnsEvenPaddedZero" />
+    </UnitTest>
+    <UnitTest name="ProgramsByProjectNames_WithNullInput_ReturnsEmptyString" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="16c06786-f676-8a87-995f-eaea7f1ab52a">
+      <Execution id="8e3f419e-0827-4a39-9f2a-5fbcc55241c9" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectDataCoverageExpansionTests" name="ProgramsByProjectNames_WithNullInput_ReturnsEmptyString" />
+    </UnitTest>
+    <UnitTest name="LoopFolders_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1f98dc5d-1fd1-87c2-b750-f2a525135721">
+      <Execution id="706b43e2-08a8-4740-84ce-9106a4f4c312" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.FolderHandlerTests_UnfinishedStubs" name="LoopFolders_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="SetAndSaveValueSetterOnly_ReadOnly_SkipsSetterAndSaver" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1ba7facd-63ee-832c-acdf-1476fa7bde84">
+      <Execution id="d790312f-b60d-4445-b805-320d383d8301" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoLoaderSetAndSaveTests" name="SetAndSaveValueSetterOnly_ReadOnly_SkipsSetterAndSaver" />
+    </UnitTest>
+    <UnitTest name="ToBase10Char_CharacterNotInConverter_ThrowsArgumentOutOfRangeException" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1730655f-d540-8f36-90a8-1fa74136b009">
+      <Execution id="7928d87a-aec2-4d52-a554-c781caf37f3a" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerRemainingBranchesTests" name="ToBase10Char_CharacterNotInConverter_ThrowsArgumentOutOfRangeException" />
+    </UnitTest>
+    <UnitTest name="GetNextToDoID_LengthBoundaryRollover_ProducesLongerId" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1b9e3fd2-6acb-8683-aa46-1f62cfb5a450">
+      <Execution id="bfba6298-0187-48e2-a620-35e79d9b2ff2" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.IDListGetNextToDoIDTests" name="GetNextToDoID_LengthBoundaryRollover_ProducesLongerId" />
+    </UnitTest>
+    <UnitTest name="CompareTo_ThisProjectIdNull_ReturnsNegativeOne" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1fc2a77f-beb4-8525-8026-0eb95d609796">
+      <Execution id="879f7035-6f23-491b-909c-bf3e3051076e" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectEntryTests" name="CompareTo_ThisProjectIdNull_ReturnsNegativeOne" />
+    </UnitTest>
+    <UnitTest name="CompareTo_NullOther_ReturnsPositiveOne" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1475f632-41c0-8910-9416-138f90a96c5c">
+      <Execution id="901604ec-246e-4aa8-b4c1-93dac43ebb5c" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectEntryTests" name="CompareTo_NullOther_ReturnsPositiveOne" />
+    </UnitTest>
+    <UnitTest name="SetAndSaveRefSetterOnly_NotReadOnly_AssignsRefAndInvokesSetterAndOlSaver" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1ccd0a75-0df3-886c-9cea-74742e6f4184">
+      <Execution id="f1724842-15d9-447c-a497-649020b704cd" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoLoaderSetAndSaveTests" name="SetAndSaveRefSetterOnly_NotReadOnly_AssignsRefAndInvokesSetterAndOlSaver" />
+    </UnitTest>
+    <UnitTest name="AddRecents_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="192d12ed-9146-8524-ba67-7e919162be3c">
+      <Execution id="57d8e2db-7df2-4457-bd6f-4e033db2c2a9" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.FolderHandlerTests_UnfinishedStubs" name="AddRecents_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="ToBase36_StateUnderTest_ExpectedBehavior_73" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1f4140f6-3980-8a8d-b454-455e432901d3">
+      <Execution id="ecb02c2e-5aeb-4bf7-8609-931880ea26a7" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerTests" name="ToBase36_StateUnderTest_ExpectedBehavior_73" />
+    </UnitTest>
+    <UnitTest name="SetProjectId_FromEmptyToNonEmpty_SetsAndReturnsTrue" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1544d267-614e-8db5-b948-0e4314392c0d">
+      <Execution id="0a1de0e5-7fc0-4d59-b23e-e7830006e31b" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectEntryTests" name="SetProjectId_FromEmptyToNonEmpty_SetsAndReturnsTrue" />
+    </UnitTest>
+    <UnitTest name="ToBase10_StateUnderTest_ExpectedBehavior_11" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="19feb4e7-498f-8e94-9774-ab8674d234f2">
+      <Execution id="50b58fc7-764b-48cd-aa9e-17b34ac77fc4" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerTests" name="ToBase10_StateUnderTest_ExpectedBehavior_11" />
+    </UnitTest>
+    <UnitTest name="SettableProperties_UpdateCachedStateAndSaveBackToFlaggableItem" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1591190c-da7c-830e-8ebf-abf7eae73364">
+      <Execution id="77b94b9f-dbe3-4e25-a672-e5142d0eae61" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoItemCoverageExpansionTests" name="SettableProperties_UpdateCachedStateAndSaveBackToFlaggableItem" />
+    </UnitTest>
+    <UnitTest name="SetAndSaveValueSetterOnly_NotReadOnly_InvokesSetterAndOlSaver" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1e966b4e-5892-8215-8ccb-76c394360883">
+      <Execution id="1b08764c-3f31-4633-bd25-01902a7d524e" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoLoaderSetAndSaveTests" name="SetAndSaveValueSetterOnly_NotReadOnly_InvokesSetterAndOlSaver" />
+    </UnitTest>
+    <UnitTest name="SetAndSaveRefSetterSaver_NotReadOnly_AssignsRefInvokesSetterAndSuppliedSaver" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="10746d8f-3a10-8f2b-9c00-409f77f8e13d">
+      <Execution id="de97b833-33ac-4b22-bde2-5f723de3022e" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoLoaderSetAndSaveTests" name="SetAndSaveRefSetterSaver_NotReadOnly_AssignsRefInvokesSetterAndSuppliedSaver" />
+    </UnitTest>
+    <UnitTest name="ToBase10Char_BaseAboveMaxBase_ThrowsArgumentOutOfRangeException" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1a97aaf5-2e95-8acc-9d25-5cdeb6c63138">
+      <Execution id="64432dd3-1ee6-4983-b7b3-2085edd8b4ac" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerRemainingBranchesTests" name="ToBase10Char_BaseAboveMaxBase_ThrowsArgumentOutOfRangeException" />
+    </UnitTest>
+    <UnitTest name="Queries_WithDuplicateMissingAndCaseVariants_ReturnExpectedMatches" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="192f96e1-74ff-88af-8d3a-b7f259c722a8">
+      <Execution id="fe274b27-b34d-40f3-b0f6-aa473631d48b" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectDataCoverageExpansionTests" name="Queries_WithDuplicateMissingAndCaseVariants_ReturnExpectedMatches" />
+    </UnitTest>
+    <UnitTest name="ToBase10_StateUnderTest_ExpectedBehavior_10" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="16080e8a-6261-8912-a045-6376dfae4857">
+      <Execution id="bced5e05-5dae-47d1-a6cb-c04afedc9826" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerTests" name="ToBase10_StateUnderTest_ExpectedBehavior_10" />
+    </UnitTest>
+    <UnitTest name="IsAncestor_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1b38896a-c265-839d-93fc-3359260978a9">
+      <Execution id="47f5e8fb-cfe8-4cb3-9310-4381178feca7" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.Data_Model.Tree.TreeNodeTests_UnfinishedStubs" name="IsAncestor_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="SetAndSaveRefSetterOnly_ReadOnly_AssignsRefButSkipsSetterAndSaver" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1fb7b82b-0e27-8de0-85f2-4c87f33f8e10">
+      <Execution id="84145107-250c-47ad-b541-2d45f9d2fbb8" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoLoaderSetAndSaveTests" name="SetAndSaveRefSetterOnly_ReadOnly_AssignsRefButSkipsSetterAndSaver" />
+    </UnitTest>
+    <UnitTest name="InputNewFoldername_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1f2745d8-f3cc-885c-8da1-e775b059527a">
+      <Execution id="ef308cd7-adc6-424c-bb80-d9dccd8b1a0a" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.FolderHandlerTests_UnfinishedStubs" name="InputNewFoldername_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="GetFolder_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="10518822-9945-8414-8b44-2d9f23458d4d">
+      <Execution id="2d2c00bf-fc1c-4615-b8bd-f06d2d431945" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.FolderHandlerTests_UnfinishedStubs" name="GetFolder_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="GetAsyncEnumerableOfToDoItemsInView_WhenStoreIdExcluded_DoesNotResolveExcludedStoreFolder" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="14b00a91-4a58-885f-92eb-6ed31feff0d6">
+      <Execution id="6d547724-c986-45af-8568-e7169fb1a6ab" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.StoreFilterRoutingTests" name="GetAsyncEnumerableOfToDoItemsInView_WhenStoreIdExcluded_DoesNotResolveExcludedStoreFolder" />
+    </UnitTest>
+    <UnitTest name="CloneAndEquals_UseReferenceEqualityForDistinctInstances" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1dda38f2-d8e9-890a-8473-30c5f578f73e">
+      <Execution id="67b71b60-0d5b-41d7-8d3f-574618982cb7" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoItemCoverageExpansionTests" name="CloneAndEquals_UseReferenceEqualityForDistinctInstances" />
+    </UnitTest>
+    <UnitTest name="ToBase36_StateUnderTest_ExpectedBehavior_37" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1994e938-ea33-8a2c-87aa-babc0583a405">
+      <Execution id="1fa19e69-6751-43b8-bd8c-9d8dc374f5ff" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerTests" name="ToBase36_StateUnderTest_ExpectedBehavior_37" />
+    </UnitTest>
+    <UnitTest name="ToBase_NegativeNumber_ThrowsArgumentOutOfRangeException" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1381cc71-89ff-82cd-99a4-e4b2109dab78">
+      <Execution id="a9368a15-0981-469e-b908-4e97485e4567" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerRemainingBranchesTests" name="ToBase_NegativeNumber_ThrowsArgumentOutOfRangeException" />
+    </UnitTest>
+    <UnitTest name="GetNextToDoID_NoCollision_ReturnsNextBase36ValueAndAddsIt" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="107091c2-5afe-89cf-909c-80248dd818a0">
+      <Execution id="a11d175b-82a3-4170-a7f3-fa79801ad0a7" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.IDListGetNextToDoIDTests" name="GetNextToDoID_NoCollision_ReturnsNextBase36ValueAndAddsIt" />
+    </UnitTest>
+    <UnitTest name="SetProjectId_ChangeConfirmedNo_WithUpdateAction_DoesNotInvokeAction" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1a596f21-f77f-8c62-acec-6ea5c22af1a4">
+      <Execution id="31997847-61b8-4f88-be6f-d83c14d36390" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectEntryDialogBranchesTests" name="SetProjectId_ChangeConfirmedNo_WithUpdateAction_DoesNotInvokeAction" />
+    </UnitTest>
+    <UnitTest name="Constructors_WithDefaultListAndEnumerableInputs_LoadEntriesWithoutFileSystem" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="158abbfb-ec39-8567-adcc-f2c50e951ecb">
+      <Execution id="0e6f498e-6bba-43ef-a986-fd54758ae98a" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectDataCoverageExpansionTests" name="Constructors_WithDefaultListAndEnumerableInputs_LoadEntriesWithoutFileSystem" />
+    </UnitTest>
+    <UnitTest name="ToBase36_StateUnderTest_ExpectedBehavior_36" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1aff5a7f-d660-877e-b2f4-425dbfec6195">
+      <Execution id="72868ace-7048-4557-aaac-7dbd09443393" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerTests" name="ToBase36_StateUnderTest_ExpectedBehavior_36" />
+    </UnitTest>
+    <UnitTest name="People_Deserialize_CanDeserializePatternCorrectly" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1146ac8c-98cb-86a7-a338-0e0c4de68a8f">
+      <Execution id="ed3503a7-a517-4dac-9e12-05a689f4ced8" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Tests.Data_Model.People.PeopleScoDictionaryNewTests" name="People_Deserialize_CanDeserializePatternCorrectly" />
+    </UnitTest>
+    <UnitTest name="CompareTo_EqualIds_ReturnsZero" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1a01a8d1-be00-860f-a884-b92596b0f686">
+      <Execution id="1b722b99-cdb1-43af-a89e-ecab9063558f" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectEntryTests" name="CompareTo_EqualIds_ReturnsZero" />
+    </UnitTest>
+    <UnitTest name="ReadOnlyPropertyTransitions_UpdateCachedStateWithoutWritingFields" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="14496eae-77fb-8077-9356-ec84f4ed7adc">
+      <Execution id="2d4d0715-b11c-480c-9241-11fa88022bb2" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ToDoItemCoverageExpansionTests" name="ReadOnlyPropertyTransitions_UpdateCachedStateWithoutWritingFields" />
+    </UnitTest>
+    <UnitTest name="CompareTo_DifferentIds_ReturnsOrdinalSign" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="14a71ff0-2950-8ce0-b4cf-5f2a5f13122f">
+      <Execution id="535fdea3-830b-4447-a3bf-ad696f42f5ad" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectEntryTests" name="CompareTo_DifferentIds_ReturnsOrdinalSign" />
+    </UnitTest>
+    <UnitTest name="ToBase10Char_Digit_ReturnsNumericValue" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1fded191-9cba-8ef9-bf79-a9f30a0ec371">
+      <Execution id="f27582cc-8d7b-4e97-b5c4-1a8c7b9cc837" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerRemainingBranchesTests" name="ToBase10Char_Digit_ReturnsNumericValue" />
+    </UnitTest>
+    <UnitTest name="IsCorrupt_WithEmptyValidAndNullEntry_ReturnsExpectedIndices" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1724f203-ffcf-850b-ab4b-d4eadc2ff0d6">
+      <Execution id="a3179e50-2bed-4559-b0b3-c4a55a60ac1a" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectDataCoverageExpansionTests" name="IsCorrupt_WithEmptyValidAndNullEntry_ReturnsExpectedIndices" />
+    </UnitTest>
+    <UnitTest name="GetNextToDoID_MultipleConsecutiveCollisions_AdvancesToFirstFreeValue" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="178770c1-e89c-8eae-aff9-6786c94c88cc">
+      <Execution id="ffe73f9b-8571-4004-a4d7-920df4cb3d2e" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.IDListGetNextToDoIDTests" name="GetNextToDoID_MultipleConsecutiveCollisions_AdvancesToFirstFreeValue" />
+    </UnitTest>
+    <UnitTest name="GetNextToDoID_EmptySeed_ThrowsArgumentException" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1051b2d8-5389-81ac-be03-f7858d276c0d">
+      <Execution id="29734c72-43a6-4b4a-a2d9-b5fe7e8d81be" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.IDListGetNextToDoIDTests" name="GetNextToDoID_EmptySeed_ThrowsArgumentException" />
+    </UnitTest>
+    <UnitTest name="RemoveChild_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1af495fb-cca2-89c9-a82f-360232f35bf9">
+      <Execution id="c6e8089f-b54c-462c-8196-9305a55c64b3" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.Data_Model.Tree.TreeNodeTests_UnfinishedStubs" name="RemoveChild_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="ToBase10_StateUnderTest_ExpectedBehavior_131Z" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1127936a-85eb-8d71-84fd-9daf0935ff47">
+      <Execution id="3b55a0f0-0b31-4c67-9c65-634188f21b4e" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerTests" name="ToBase10_StateUnderTest_ExpectedBehavior_131Z" />
+    </UnitTest>
+    <UnitTest name="GetNextToDoID_IdAlreadyPresent_AdvancesPastTheCollision" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1aecbe34-8069-8f96-8190-64017cfb7128">
+      <Execution id="0efb7a80-7e44-4d91-9076-b987c239c71f" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.IDListGetNextToDoIDTests" name="GetNextToDoID_IdAlreadyPresent_AdvancesPastTheCollision" />
+    </UnitTest>
+    <UnitTest name="ToBase10_StateUnderTest_ExpectedBehavior_1Z" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="17df5583-dbe9-88db-a466-603dd5d0ae82">
+      <Execution id="654acb17-bea5-4453-bcdd-55c450dcf152" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerTests" name="ToBase10_StateUnderTest_ExpectedBehavior_1Z" />
+    </UnitTest>
+    <UnitTest name="SetIdUpdateAction_WithEntries_PropagatesActionToEveryEntry" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1cb82137-db51-8e75-ab75-d1d6e812109d">
+      <Execution id="45c21e4c-ae0f-4639-ae08-3a69e0ef7f84" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectDataCoverageExpansionTests" name="SetIdUpdateAction_WithEntries_PropagatesActionToEveryEntry" />
+    </UnitTest>
+    <UnitTest name="AddChild_StateUnderTest_ExpectedBehavior" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1ac6dbc9-1c10-8ff0-8349-6874f0162274">
+      <Execution id="018d02b2-ad8c-47b6-83e9-e2e90fadf749" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.Data_Model.Tree.TreeNodeTests_UnfinishedStubs" name="AddChild_StateUnderTest_ExpectedBehavior" />
+    </UnitTest>
+    <UnitTest name="AddChild_StateUnderTest_ExpectedBehavior1" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="134b072d-3ec8-8bb5-a5b3-7515f12b26b2">
+      <Execution id="6c259537-011c-4cb3-88eb-b5e33c9c30fa" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.Data_Model.Tree.TreeNodeTests_UnfinishedStubs" name="AddChild_StateUnderTest_ExpectedBehavior1" />
+    </UnitTest>
+    <UnitTest name="GetFolder_StateUnderTest_ExpectedBehavior2" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="14ba09d6-50de-8211-babb-7aa507b34be8">
+      <Execution id="6130ee4a-8cd1-4737-8d72-0e05802a0c27" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="Z.Unfinished.ToDoModel.Test.FolderHandlerTests_UnfinishedStubs" name="GetFolder_StateUnderTest_ExpectedBehavior2" />
+    </UnitTest>
+    <UnitTest name="ToBase36_StateUnderTest_ExpectedBehavior_38" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1a2422e8-01ed-8e20-80d5-c485bf2ec5f9">
+      <Execution id="8338e45d-d089-48d0-9744-c9e71e8b2786" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerTests" name="ToBase36_StateUnderTest_ExpectedBehavior_38" />
+    </UnitTest>
+    <UnitTest name="MaxBase_EqualsConverterStringLength_36" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1935838b-9f74-836b-89dc-a2a9e6f2fbfc">
+      <Execution id="cda19d78-0536-472e-a501-daaecd785570" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.BaseChangerRemainingBranchesTests" name="MaxBase_EqualsConverterStringLength_36" />
+    </UnitTest>
+    <UnitTest name="SetProjectId_SameValueAsExisting_NoChangeReturnsFalse" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\todomodel.test\bin\debug\todomodel.test.dll" id="1712c7f6-ec8a-86e8-b07f-dfa279af578c">
+      <Execution id="9fde1ec0-e99b-455f-88dc-2cee1dd147a2" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="ToDoModel.Test.ProjectEntryTests" name="SetProjectId_SameValueAsExisting_NoChangeReturnsFalse" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1e0189cf-80a7-8419-a976-28c1bb418469" executionId="02ee1ed5-9b67-4fc1-89e8-2387de2b6ad0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="133845d0-b7b3-81bc-80aa-77fe4474c7a3" executionId="c60baa63-dbfb-4f87-957f-93fdaaf32186" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1381cc71-89ff-82cd-99a4-e4b2109dab78" executionId="a9368a15-0981-469e-b908-4e97485e4567" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a9aded0-ef18-86b8-9a53-a088deac687c" executionId="fd8793ae-faaf-411f-8730-d0e56ef88c5b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ff5554d-585a-8443-a426-237818341f16" executionId="8939f7ac-b90f-4dcb-b170-4c9f47dcf9eb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="106340bb-d034-83cb-bff7-de704c46f01a" executionId="d48b7594-c689-4164-85a3-869b3199385f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1dda38f2-d8e9-890a-8473-30c5f578f73e" executionId="67b71b60-0d5b-41d7-8d3f-574618982cb7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="107091c2-5afe-89cf-909c-80248dd818a0" executionId="a11d175b-82a3-4170-a7f3-fa79801ad0a7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1fb7b82b-0e27-8de0-85f2-4c87f33f8e10" executionId="84145107-250c-47ad-b541-2d45f9d2fbb8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1edddf9c-cd84-8a52-9c9e-e1b656e3b543" executionId="ec5a8735-33d2-4eef-a4b1-f952fe133a33" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a15c9c7-81ae-899e-af6c-c578cf103ba5" executionId="9125a9e6-daa7-4f54-8fb7-ec168e417365" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1da5399c-92b0-860d-9bc7-eec9a46fe0cf" executionId="5a399b47-1b1b-46f3-bd12-962b0da44163" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1df35507-935e-87c4-92fc-caf24b103ad0" executionId="4a69d879-af19-45c9-b507-77bfc61284b1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1023ca46-0723-857a-ae72-29a848794d64" executionId="298883d5-e600-47aa-a2ee-3efa9dc13f25" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12dbb0f0-e480-8148-9474-35d33088eff3" executionId="95b96c45-6c7a-4d9c-b17e-17230228f05a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16e58f45-f102-89c6-ab47-b9f7159a3733" executionId="c23ff10f-af8c-414d-8302-a7ef6ba87e84" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="135c0262-6142-8ff6-90c1-d898b4f18103" executionId="96385bc2-96ea-4f56-ace6-c5564f437390" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16c06786-f676-8a87-995f-eaea7f1ab52a" executionId="8e3f419e-0827-4a39-9f2a-5fbcc55241c9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="101bc6c3-37f8-8833-806a-e58e0b7442b3" executionId="bfeafd4d-9ed0-4f7a-a976-8d1b1294d0dc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1712c7f6-ec8a-86e8-b07f-dfa279af578c" executionId="9fde1ec0-e99b-455f-88dc-2cee1dd147a2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ac6dbc9-1c10-8ff0-8349-6874f0162274" executionId="018d02b2-ad8c-47b6-83e9-e2e90fadf749" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b9e3fd2-6acb-8683-aa46-1f62cfb5a450" executionId="bfba6298-0187-48e2-a620-35e79d9b2ff2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1273228d-0d68-8a62-b62d-853a9e61fbdf" executionId="f662e85c-cd5e-4c1a-9de4-340f873bbf0b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1aa38188-a98a-85e0-864f-23ca56fd835d" executionId="0c80bf2d-463f-478f-ba33-8c25b2317795" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13c5d2c0-0c8c-801a-b60c-f840c9cc992d" executionId="425c957a-7582-4878-88e9-342c61a62ab3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12592692-bf13-89ba-bac8-a376c38d328e" executionId="6ce9799c-71a0-4794-9746-07f85fa42d2c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12042fbe-d302-886f-a02e-6fa10b34d2c4" executionId="5b771ced-0f23-4edd-ad70-e01d58164600" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="133c8824-1b7a-8a66-985d-01007ae40db7" executionId="eb954dde-c909-49c4-9398-6a60c385781e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e40cc62-ffd4-81c5-b843-7d2375981b1f" executionId="aa121f2e-7932-42a5-9b24-501c96f5595d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15eabe1d-700d-814f-b11e-3eb4d6611cc7" executionId="10def146-c2e4-4762-8b89-f022847a31cf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a2422e8-01ed-8e20-80d5-c485bf2ec5f9" executionId="8338e45d-d089-48d0-9744-c9e71e8b2786" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f2745d8-f3cc-885c-8da1-e775b059527a" executionId="ef308cd7-adc6-424c-bb80-d9dccd8b1a0a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ea7296e-85b7-8e39-af56-0c59869bb162" executionId="a4c45525-dcaf-45a8-9cfe-59ea469c0ecb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19feb4e7-498f-8e94-9774-ab8674d234f2" executionId="50b58fc7-764b-48cd-aa9e-17b34ac77fc4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1591190c-da7c-830e-8ebf-abf7eae73364" executionId="77b94b9f-dbe3-4e25-a672-e5142d0eae61" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1257813f-c036-88fd-94da-60fcdcc5289d" executionId="75a9e345-9d6b-482e-813c-0e981517d16b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11243f17-dc64-8edd-b8a3-b41ff65cefdb" executionId="473200a6-b12b-46a4-917f-814ff12ecba7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1795c40d-2ea1-856b-a287-8f27538b53b4" executionId="fb812ef3-bfe9-43ef-a948-23bb0b0f125f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12ecf062-8819-8641-bfc7-55d67c0eb557" executionId="9e1ac214-f806-433b-939d-8480dd16b1fa" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1475f632-41c0-8910-9416-138f90a96c5c" executionId="901604ec-246e-4aa8-b4c1-93dac43ebb5c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a614c62-3741-8ac8-85b6-a1562245eef7" executionId="1ae10251-7adf-4ff5-8fb1-b4098af95867" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15bedd8e-f868-82e9-b2cb-46c2801c13cc" executionId="2695ba25-65e7-4e11-aa5a-0ed3ffadd51f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e0b20d2-d964-867a-9986-7d3e60af19d1" executionId="767f9327-72b7-4d4b-b5cd-a5e61bd605e7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16080e8a-6261-8912-a045-6376dfae4857" executionId="bced5e05-5dae-47d1-a6cb-c04afedc9826" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1fded191-9cba-8ef9-bf79-a9f30a0ec371" executionId="f27582cc-8d7b-4e97-b5c4-1a8c7b9cc837" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10dd3d5c-5a61-8a3d-955f-ef35f72ca283" executionId="14f0fda5-b988-44d7-b96f-e9ca1b5f5abd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="185c6822-6af6-82c8-9a7d-0d9435b52ea2" executionId="d2cd4398-9b83-4d0f-b77e-ac80055c9d5d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b14f0c1-6f31-8cdb-a61c-36c07388204d" executionId="05b97bc3-8176-4100-9420-5df57ddacd4a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1cb7bf0b-da8f-8f72-bf15-f69311014298" executionId="2e7be1b9-f915-4b87-ac50-988c9cf228cb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a4e038d-94a5-8837-b65d-79baecddf79c" executionId="0f6b68a6-d2ba-4499-abc8-733a447767e1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12d96bf3-5b62-872b-96ae-b0b887f37ced" executionId="0b98d9cf-5085-4a5c-9cb1-500e70c7ea32" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d09f1b8-7355-8308-b2ca-4830dea00f40" executionId="9495b566-af1a-4be0-a47d-78fa413af1f4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1182f5fa-bc1f-8dac-8557-63a62d377e42" executionId="12465723-5afc-4309-8d5e-8e639fa674f4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c433fa6-6353-8e9e-86a9-bd2c7dcfd3df" executionId="57f305d1-e5d8-4ace-8a0e-4822fbcdfdf4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10746d8f-3a10-8f2b-9c00-409f77f8e13d" executionId="de97b833-33ac-4b22-bde2-5f723de3022e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1aecbe34-8069-8f96-8190-64017cfb7128" executionId="0efb7a80-7e44-4d91-9076-b987c239c71f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15b25348-c944-83ca-96c6-5ea05d0438e9" executionId="438eeeaa-5932-4346-86aa-470abd94a876" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ba7facd-63ee-832c-acdf-1476fa7bde84" executionId="d790312f-b60d-4445-b805-320d383d8301" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1557d2db-7703-8f55-acc0-088b8d97f9fb" executionId="18faf9fd-5b1a-4c3a-88fc-d745427ab5a0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d4ccfd6-5b16-8480-b320-85119cd35fae" executionId="be63f4ec-a73f-48fe-92f7-adc7a1b9f2ac" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1711526a-aa52-8eb4-9d81-ddfa24410bde" executionId="fe336878-24ef-4ecb-9502-147216986b6d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1730655f-d540-8f36-90a8-1fa74136b009" executionId="7928d87a-aec2-4d52-a554-c781caf37f3a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13369a46-d6e2-8813-932c-aeb8dadd1789" executionId="58e59f6f-8aa8-40e8-b308-0b6a99ce4aed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f4140f6-3980-8a8d-b454-455e432901d3" executionId="ecb02c2e-5aeb-4bf7-8609-931880ea26a7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10518822-9945-8414-8b44-2d9f23458d4d" executionId="2d2c00bf-fc1c-4615-b8bd-f06d2d431945" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f98dc5d-1fd1-87c2-b750-f2a525135721" executionId="706b43e2-08a8-4740-84ce-9106a4f4c312" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19137cba-549a-8f58-ae56-e6616511c4d9" executionId="f3848b84-ecd2-40a4-801f-7b438fc9353f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e8c9c7f-79e9-8139-9233-dc075cffc4d6" executionId="080b7c64-8b28-4da8-8a03-ef7b501f2fda" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1176dd17-d5b2-8c4e-94b9-7ac25a9ec5d3" executionId="47773f15-e9fc-4b48-9125-eba9d0c53e7f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="192d12ed-9146-8524-ba67-7e919162be3c" executionId="57d8e2db-7df2-4457-bd6f-4e033db2c2a9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b38896a-c265-839d-93fc-3359260978a9" executionId="47f5e8fb-cfe8-4cb3-9310-4381178feca7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e975f71-f68a-8ed3-be1d-0235904f25a4" executionId="3284dd26-6a12-4743-8643-e3009cbbf959" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="160daa1f-d0ad-8463-a976-133f5965c16a" executionId="b826fc61-138a-4b0a-a4e6-7df413c0eb43" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="158abbfb-ec39-8567-adcc-f2c50e951ecb" executionId="0e6f498e-6bba-43ef-a986-fd54758ae98a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1544d267-614e-8db5-b948-0e4314392c0d" executionId="0a1de0e5-7fc0-4d59-b23e-e7830006e31b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="148f1670-ebdd-8634-88ef-5c4aeb65e293" executionId="ebda740b-53e1-46d0-9712-4767a02565d9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a596f21-f77f-8c62-acec-6ea5c22af1a4" executionId="31997847-61b8-4f88-be6f-d83c14d36390" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="192f96e1-74ff-88af-8d3a-b7f259c722a8" executionId="fe274b27-b34d-40f3-b0f6-aa473631d48b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f14086a-5669-89b7-a46d-20a8aeb69352" executionId="42162b41-5ad7-40ac-9212-774e9725175b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1146ac8c-98cb-86a7-a338-0e0c4de68a8f" executionId="ed3503a7-a517-4dac-9e12-05a689f4ced8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1aff5a7f-d660-877e-b2f4-425dbfec6195" executionId="72868ace-7048-4557-aaac-7dbd09443393" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ccd0a75-0df3-886c-9cea-74742e6f4184" executionId="f1724842-15d9-447c-a497-649020b704cd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1cb82137-db51-8e75-ab75-d1d6e812109d" executionId="45c21e4c-ae0f-4639-ae08-3a69e0ef7f84" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14b00a91-4a58-885f-92eb-6ed31feff0d6" executionId="6d547724-c986-45af-8568-e7169fb1a6ab" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14a71ff0-2950-8ce0-b4cf-5f2a5f13122f" executionId="535fdea3-830b-4447-a3bf-ad696f42f5ad" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="164c0882-6e62-8732-a50f-22d91643509d" executionId="e3d6f049-feee-4c2a-9318-412d564facf1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="120c45ef-c345-838d-8b4e-c52a3b02128d" executionId="912d09ad-122d-4989-bb56-0c180e1f746b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e966b4e-5892-8215-8ccb-76c394360883" executionId="1b08764c-3f31-4633-bd25-01902a7d524e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1445557f-02a4-8855-9746-ef286d8cf739" executionId="1d0ed8cb-fc81-46b0-a0ed-573013f9a0a7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17df5583-dbe9-88db-a466-603dd5d0ae82" executionId="654acb17-bea5-4453-bcdd-55c450dcf152" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c7f1622-1b24-8043-8364-4eb24fc70600" executionId="e8a73de5-3498-4a5f-8fd9-476941f34d2a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1af495fb-cca2-89c9-a82f-360232f35bf9" executionId="c6e8089f-b54c-462c-8196-9305a55c64b3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1724f203-ffcf-850b-ab4b-d4eadc2ff0d6" executionId="a3179e50-2bed-4559-b0b3-c4a55a60ac1a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f2f1176-cd93-82b0-a9c0-fdda01bcccb4" executionId="a932e150-0f33-49f9-8591-fce15991f19b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="178770c1-e89c-8eae-aff9-6786c94c88cc" executionId="ffe73f9b-8571-4004-a4d7-920df4cb3d2e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="185fee70-badb-85c8-ae6d-64b5640ca84a" executionId="2e1c9904-4102-4dd3-991c-7a06d2179713" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="110f3150-e884-86a7-84bf-cc1af5b1cbe6" executionId="b455e392-d0fd-406a-97bf-98e7852e5f17" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14496eae-77fb-8077-9356-ec84f4ed7adc" executionId="2d4d0715-b11c-480c-9241-11fa88022bb2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a01a8d1-be00-860f-a884-b92596b0f686" executionId="1b722b99-cdb1-43af-a89e-ecab9063558f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1914e447-def6-87c1-b026-c084fca5c787" executionId="98fb5a75-6678-4b39-900d-6f3f4446ca10" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13f67cf2-104e-8d18-b13d-cbde03531a19" executionId="3361fe3c-ddde-4bf8-a7f9-52227fa5c744" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1127936a-85eb-8d71-84fd-9daf0935ff47" executionId="3b55a0f0-0b31-4c67-9c65-634188f21b4e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19344dfa-6457-8360-bc13-4a1eb6918cc1" executionId="55dac6db-645e-49ec-ac79-04ca4c90bc9d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="181f556c-06e5-8ea8-a88c-98e5085333f3" executionId="641123d9-5c58-4f09-83f2-282a3f6b805f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11e26144-be7b-8985-a3f9-f4ebb5f2ce7e" executionId="2543110e-88c6-4b87-be02-d2ac6d9310cf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11662281-3fa5-8d20-9285-4072e0fb1940" executionId="5a77a3b5-5126-48d2-a63c-75099e403a93" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1bcb0e92-d9d9-8555-adeb-82fd088142ea" executionId="02fcdb1b-823d-4013-b08f-9286819d36b8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18bbf3f0-10bc-8aa0-b1b4-3da7d0983e32" executionId="29fb5944-bb18-4b41-a6f8-ea2a6368d015" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ac09a59-0069-8a00-b128-f6d49958365d" executionId="478aa5ff-b642-4e6a-875f-358ea72a5bfc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a97aaf5-2e95-8acc-9d25-5cdeb6c63138" executionId="64432dd3-1ee6-4983-b7b3-2085edd8b4ac" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e47390d-6492-8ee1-93c7-dc2fc4eeffba" executionId="e74ef12b-b99b-46d0-bab5-ee17800103e3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1935838b-9f74-836b-89dc-a2a9e6f2fbfc" executionId="cda19d78-0536-472e-a501-daaecd785570" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1fc2a77f-beb4-8525-8026-0eb95d609796" executionId="879f7035-6f23-491b-909c-bf3e3051076e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14ba09d6-50de-8211-babb-7aa507b34be8" executionId="6130ee4a-8cd1-4737-8d72-0e05802a0c27" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="134b072d-3ec8-8bb5-a5b3-7515f12b26b2" executionId="6c259537-011c-4cb3-88eb-b5e33c9c30fa" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19823285-1bcf-86f3-95f3-91929f27a3b3" executionId="f205e819-f73d-4d89-92b6-9939cdf54130" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1051b2d8-5389-81ac-be03-f7858d276c0d" executionId="29734c72-43a6-4b4a-a2d9-b5fe7e8d81be" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c443272-ef6b-8cb1-99ba-68e7103b2a73" executionId="3ae6c541-cbca-4c88-b94e-8388cbb345da" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c793ef5-0e27-8120-b26a-bbfccdead1f5" executionId="5dd38c7d-a3e9-4532-8c46-8009b4e2a4ea" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d20661b-c022-8c36-8a6d-51beabf3632a" executionId="d22f57da-83b9-4c64-9e56-5413a863d97f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1994e938-ea33-8a2c-87aa-babc0583a405" executionId="1fa19e69-6751-43b8-bd8c-9d8dc374f5ff" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16facf8f-29c5-81e3-aa08-153544de1d3f" executionId="933cff90-3a65-43f5-add3-619bbf397bdf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="122" executed="122" passed="122" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel.Test\bin\Debug\ToDoModel.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

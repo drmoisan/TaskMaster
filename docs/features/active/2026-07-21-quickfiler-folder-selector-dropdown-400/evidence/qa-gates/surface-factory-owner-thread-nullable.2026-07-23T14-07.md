@@ -9,4 +9,3 @@
 `3FE231161F91AB05FE28F4E99AE047B5D56B95FC8C09EF263B2FC4FB39676D38`.
 No nullable-flow or compiler diagnostic was introduced by the owner-thread fixture
 correction.
-

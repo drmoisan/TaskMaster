@@ -1,0 +1,39 @@
+{
+  "StartedUtc": "2026-07-27T09:23:58.8432204Z",
+  "CompletedUtc": "2026-07-27T09:25:00.8997154Z",
+  "RunnerProcessId": 253348,
+  "RootProcessId": 271176,
+  "CleanupDeadlineUtc": "2026-07-27T09:31:58.8432204Z",
+  "TimedOut": false,
+  "ExitCode": 1,
+  "DirectOutputFiles": {
+    "StandardOutput": "C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\2026-07-21T10-25\\docs\\features\\active\\2026-07-21-quickfiler-folder-selector-dropdown-400\\evidence\\regression-testing\\nonnumeric-adapter-coverage-failure-classification-unbuffered.2026-07-27T09-23.stdout.txt",
+    "StandardError": "C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\2026-07-21T10-25\\docs\\features\\active\\2026-07-21-quickfiler-folder-selector-dropdown-400\\evidence\\regression-testing\\nonnumeric-adapter-coverage-failure-classification-unbuffered.2026-07-27T09-23.stderr.txt"
+  },
+  "ObservedProcesses": [
+    {
+      "ObservedUtc": "2026-07-27T09:24:01.8424041Z",
+      "ProcessId": 265872,
+      "ParentProcessId": 273968,
+      "Name": "conhost.exe",
+      "CommandLine": "\\??\\C:\\WINDOWS\\system32\\conhost.exe 0x4"
+    },
+    {
+      "ObservedUtc": "2026-07-27T09:23:58.8432204Z",
+      "ProcessId": 271176,
+      "ParentProcessId": 253348,
+      "Name": "vstest.console.exe",
+      "CommandLine": "C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\Extensions\\TestPlatform\\vstest.console.exe \"C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\2026-07-21T10-25\\QuickFiler.Test\\bin\\Debug\\QuickFiler.Test.dll\" \"C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\2026-07-21T10-25\\Tags.Test\\bin\\Debug\\Tags.Test.dll\" \"C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\2026-07-21T10-25\\TaskMaster.Test\\bin\\Debug\\TaskMaster.Test.dll\" \"C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\2026-07-21T10-25\\TaskTree.Test\\bin\\Debug\\TaskTree.Test.dll\" \"C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\2026-07-21T10-25\\TaskVisualization.Test\\bin\\Debug\\TaskVisualization.Test.dll\" \"C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\2026-07-21T10-25\\ToDoModel.Test\\bin\\Debug\\ToDoModel.Test.dll\" \"C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\2026-07-21T10-25\\UtilitiesCS.Test\\bin\\Debug\\UtilitiesCS.Test.dll\" \"C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\2026-07-21T10-25\\VBFunctions.Test\\bin\\Debug\\VBFunctions.Test.dll\" /Settings:scripts/vscode/TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:TestCategory!=LiveOutlook /Logger:Console;Verbosity=Detailed /ResultsDirectory:\"C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\2026-07-21T10-25\\docs\\features\\active\\2026-07-21-quickfiler-folder-selector-dropdown-400\\evidence\\regression-testing\" /Logger:trx;LogFileName=nonnumeric-adapter-coverage-failure-classification-unbuffered.2026-07-27T09-23.trx"
+    },
+    {
+      "ObservedUtc": "2026-07-27T09:24:01.8397276Z",
+      "ProcessId": 273968,
+      "ParentProcessId": 271176,
+      "Name": "testhost.exe",
+      "CommandLine": "\"C:\\Program Files\\Microsoft Visual Studio\\18\\Community\\Common7\\IDE\\Extensions\\TestPlatform\\Extensions\\..\\testhost.exe\"  --port 57224 --endpoint 127.0.0.1:057224 --role client --parentprocessid 271176 --telemetryoptedin false"
+    }
+  ],
+  "TerminatedVerifiedDescendants": [],
+  "PreRunRelatedProcesses": [],
+  "PostRunRelatedProcesses": []
+}

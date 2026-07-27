@@ -10,4 +10,3 @@
 The five warnings are the existing System.Reactive packages.config compatibility warning
 reported for `UtilitiesCS`, `ToDoModel`, `QuickFiler`, `TaskMaster`, and
 `UtilitiesCS.Test`; the owner-thread batch introduced no analyzer diagnostic.
-

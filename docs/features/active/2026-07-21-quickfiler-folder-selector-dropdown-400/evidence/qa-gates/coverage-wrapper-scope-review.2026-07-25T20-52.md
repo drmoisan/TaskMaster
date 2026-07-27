@@ -31,7 +31,7 @@ Commit `d16b5dcc` also checkpoints earlier authorized C# and feature-evidence wo
 | Focused Pester failures | 0 | 0 | 0 | PASS |
 | Focused Pester skipped tests | 0 | 0 | 0 | PASS |
 
-The required final MCP Pester run executed 30 tests with 30 passing test-case nodes, zero failures, zero errors, zero disabled tests, and zero skipped tests. The supplementary P8-T36 baseline had passed all 11 then-existing focused tests; the 19 additional cases include the four derived-settings lifecycle regressions.
+The required final MCP Pester run executed 30 tests with 30 passing test-case nodes, zero failures, zero errors, zero disabled tests, and zero skipped tests. `tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1` contains 15 total Pester cases: 11 original cases plus the four derived-settings lifecycle regressions. The other Pester files contain 15 cases.
 
 Current gate artifacts:
 

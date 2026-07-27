@@ -6,21 +6,14 @@ using System.Windows.Forms;
 using Microsoft.Web.WebView2.Core;
 using QuickFiler.Viewers;
 using UtilitiesCS.OutlookObjects.Folder;
-using BreadcrumbViewMode = UtilitiesCS.OutlookObjects.Folder.BreadcrumbSelectorViewMode;
 
 namespace QuickFiler
 {
-    /// <summary>Owns the WinForms surfaces and lifecycle glue for the breadcrumb selector.</summary>
+    /// <summary>Owns the WinForms wrappers for the breadcrumb selector lifecycle coordinator.</summary>
     public partial class ItemViewer
     {
-        private BreadcrumbMessengerHub _breadcrumbHub;
-        private BreadcrumbCollapsedSurfaceController _breadcrumbCollapsedSurfaceController;
-        private BreadcrumbCollapsedAttachment _breadcrumbCollapsedAttachment;
-        private IWebViewMessenger _breadcrumbMessenger;
-        private IWebViewMessenger _popupMessenger;
-        private BreadcrumbDropDownOpenCoordinator _breadcrumbDropDownOpenCoordinator;
+        private BreadcrumbItemViewerLifecycleCoordinator _breadcrumbLifecycleCoordinator;
         private BreadcrumbResourceOwner _breadcrumbResourceOwner;
-        private BreadcrumbPopupUiOperations _breadcrumbPopupUiOperations;
 
         /// <summary>The Designer-declared breadcrumb WebView2 occupying the old CboFolders cell.</summary>
         public Microsoft.Web.WebView2.WinForms.WebView2 L0vhBreadcrumb_WebView2
@@ -31,44 +24,41 @@ namespace QuickFiler
 
         internal BreadcrumbBridgeCoordinator BreadcrumbCoordinator { get; private set; }
         internal IBreadcrumbDropDownHost BreadcrumbDropDownHost =>
-            _breadcrumbDropDownOpenCoordinator?.Host;
+            _breadcrumbLifecycleCoordinator?.DropDownHost;
 
         internal Task<bool> BreadcrumbOpenTask =>
-            _breadcrumbDropDownOpenCoordinator?.CurrentOpenTask ?? Task.FromResult(false);
+            _breadcrumbLifecycleCoordinator?.CurrentOpenTask ?? Task.FromResult(false);
 
         internal event EventHandler<BreadcrumbArrowDirection> BreadcrumbUnhandledArrow;
 
         private EventHandler _folderSelectionChangedHandlers;
         private KeyEventHandler _folderKeyDownHandlers;
 
-        internal void InitializeBreadcrumbPipeline(IFolderHierarchyProvider provider)
+        internal void InitializeBreadcrumbPipeline(IFolderHierarchyProvider provider) =>
+            InitializeBreadcrumbPipeline(provider, BreadcrumbPopupUiOperations.CaptureCurrent());
+
+        internal void InitializeBreadcrumbPipeline(
+            IFolderHierarchyProvider provider,
+            BreadcrumbPopupUiOperations operations
+        )
         {
             if (BreadcrumbCoordinator != null)
             {
                 return;
             }
 
-            EnsureBreadcrumbResourceOwnership();
-            _breadcrumbHub = new BreadcrumbMessengerHub();
-            _breadcrumbCollapsedSurfaceController = new BreadcrumbCollapsedSurfaceController();
-            _breadcrumbCollapsedAttachment = new BreadcrumbCollapsedAttachment(
-                _breadcrumbHub,
-                _breadcrumbCollapsedSurfaceController
+            BreadcrumbItemViewerLifecycleCoordinator lifecycle = EnsureBreadcrumbLifecycle(
+                operations
             );
-            var dispatcher = BreadcrumbUiDispatcher.CaptureCurrent();
-            _breadcrumbPopupUiOperations = new BreadcrumbPopupUiOperations(dispatcher);
-            BreadcrumbCoordinator = new BreadcrumbBridgeCoordinator(
-                _breadcrumbHub,
+            var bridgeCoordinator = new BreadcrumbBridgeCoordinator(
+                lifecycle.Hub,
                 provider,
-                dispatcher
+                BreadcrumbUiDispatcher.CaptureCurrent()
             );
-            BreadcrumbCoordinator.SelectionChanged += OnBreadcrumbSelectionChanged;
-            BreadcrumbCoordinator.FolderArrowKeyDown += OnBreadcrumbFolderArrowKeyDown;
-            BreadcrumbCoordinator.UnhandledArrow += OnBreadcrumbUnhandledArrow;
-            BreadcrumbCoordinator.SelectorOpenStateChanged += OnBreadcrumbSelectorOpenStateChanged;
+            lifecycle.SetBridgeCoordinator(bridgeCoordinator);
+            BreadcrumbCoordinator = bridgeCoordinator;
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal Task<bool> AttachBreadcrumbWebViewAsync() =>
             AttachBreadcrumbWebViewAsync(CreateCollapsedBreadcrumbCandidate);
 
@@ -76,12 +66,14 @@ namespace QuickFiler
             Func<Tuple<IWebViewMessenger, BreadcrumbNavigationReadiness>> candidateFactory
         )
         {
-            if (_breadcrumbCollapsedAttachment == null)
+            if (_breadcrumbLifecycleCoordinator == null)
+            {
                 return Task.FromResult(false);
-            return _breadcrumbCollapsedAttachment.AttachAsync(candidateFactory);
+            }
+
+            return _breadcrumbLifecycleCoordinator.AttachCollapsedAsync(candidateFactory);
         }
 
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         private Tuple<
             IWebViewMessenger,
             BreadcrumbNavigationReadiness
@@ -89,10 +81,9 @@ namespace QuickFiler
         {
             CoreWebView2 core = _l0vhBreadcrumb_WebView2.CoreWebView2;
             BreadcrumbUiDispatcher dispatcher = BreadcrumbUiDispatcher.CaptureCurrent();
-            var messenger = new WebView2Messenger(core, dispatcher);
-            try
-            {
-                BreadcrumbNavigationReadiness readiness =
+            return BreadcrumbPopupLifecycleOperations.CreateCollapsedCandidate(
+                () => new WebView2Messenger(core, dispatcher),
+                () =>
                     BreadcrumbPopupUiOperations.NavigateToDocument(
                         dispatcher,
                         core,
@@ -102,17 +93,8 @@ namespace QuickFiler
                                 Properties.Resources.FolderBreadcrumb
                             ),
                         "Collapsed"
-                    );
-                return Tuple.Create<IWebViewMessenger, BreadcrumbNavigationReadiness>(
-                    messenger,
-                    readiness
-                );
-            }
-            catch
-            {
-                messenger.Dispose();
-                throw;
-            }
+                    )
+            );
         }
 
         internal Task<bool> AttachBreadcrumbMessengerWhenReadyAsync(
@@ -121,15 +103,23 @@ namespace QuickFiler
         )
         {
             if (messenger == null)
+            {
                 throw new ArgumentNullException(nameof(messenger));
+            }
             if (readiness == null)
+            {
                 throw new ArgumentNullException(nameof(readiness));
-            if (_breadcrumbCollapsedAttachment == null)
+            }
+            if (_breadcrumbLifecycleCoordinator == null)
+            {
                 throw new InvalidOperationException(
                     "The breadcrumb pipeline must be initialized before attaching a surface."
                 );
-            return _breadcrumbCollapsedAttachment.AttachAsync(() =>
-                Tuple.Create<IWebViewMessenger, BreadcrumbNavigationReadiness>(messenger, readiness)
+            }
+
+            return _breadcrumbLifecycleCoordinator.AttachCollapsedWithReadinessAsync(
+                messenger,
+                readiness
             );
         }
 
@@ -139,17 +129,14 @@ namespace QuickFiler
             {
                 throw new ArgumentNullException(nameof(messenger));
             }
-            if (_breadcrumbHub == null)
+            if (_breadcrumbLifecycleCoordinator == null)
             {
                 throw new InvalidOperationException(
                     "The breadcrumb pipeline must be initialized before attaching a surface."
                 );
             }
-            AttachBreadcrumbSurface(
-                messenger,
-                BreadcrumbViewMode.Collapsed,
-                ref _breadcrumbMessenger
-            );
+
+            _breadcrumbLifecycleCoordinator.AttachCollapsedMessenger(messenger);
         }
 
         internal void ConfigureBreadcrumbDropDown(
@@ -164,7 +151,10 @@ namespace QuickFiler
             {
                 return;
             }
-            BreadcrumbPopupUiOperations operations = _breadcrumbPopupUiOperations;
+
+            BreadcrumbItemViewerLifecycleCoordinator lifecycle = EnsureBreadcrumbLifecycle(
+                BreadcrumbPopupUiOperations.CaptureCurrentOrTests()
+            );
             BreadcrumbDropDownHost host = null;
             host = new BreadcrumbDropDownHost(
                 _l0vhBreadcrumb_WebView2,
@@ -174,7 +164,7 @@ namespace QuickFiler
                 () => host.ControlHost?.Control.Focus(),
                 FocusBreadcrumbCore,
                 () => BreadcrumbCoordinator?.CancelSelector(),
-                operations
+                lifecycle.Operations
             );
             ConfigureBreadcrumbDropDown(
                 host,
@@ -198,47 +188,24 @@ namespace QuickFiler
             }
             _ = anchorBounds ?? throw new ArgumentNullException(nameof(anchorBounds));
             _ = workingArea ?? throw new ArgumentNullException(nameof(workingArea));
-            _breadcrumbPopupUiOperations ??= BreadcrumbPopupUiOperations.CaptureCurrentOrTests();
-            EnsureBreadcrumbResourceOwnership();
-
-            _ = _breadcrumbPopupUiOperations.PostAsync(() =>
-            {
-                if (!ReferenceEquals(_breadcrumbDropDownOpenCoordinator?.Host, host))
-                {
-                    ReleaseBreadcrumbDropDownHostCore();
-                    _breadcrumbDropDownOpenCoordinator = new BreadcrumbDropDownOpenCoordinator(
-                        _breadcrumbPopupUiOperations,
-                        host,
-                        anchorBounds,
-                        workingArea,
-                        () => BreadcrumbCoordinator?.GetFolderItems().Length ?? 0,
-                        () => BreadcrumbCoordinator?.IsSelectorOpen == true,
-                        () => BreadcrumbCoordinator?.OpenSelector() == true,
-                        () => BreadcrumbCoordinator?.CancelSelector(),
-                        () => DetachBreadcrumbMessenger(ref _popupMessenger)
-                    );
-                }
-                else
-                    _breadcrumbDropDownOpenCoordinator.UpdateRequestProviders(
-                        anchorBounds,
-                        workingArea
-                    );
-                host.PopupMessengerReady -= OnBreadcrumbPopupMessengerReady;
-                host.PopupMessengerReady += OnBreadcrumbPopupMessengerReady;
-                if (host.PopupMessenger != null)
-                    AttachBreadcrumbPopupMessenger(host.PopupMessenger);
-            });
+            BreadcrumbItemViewerLifecycleCoordinator lifecycle = EnsureBreadcrumbLifecycle(
+                BreadcrumbPopupUiOperations.CaptureCurrentOrTests()
+            );
+            lifecycle.ConfigureHost(host, anchorBounds, workingArea);
         }
 
-        internal void SetBreadcrumbTheme(string theme)
-        {
-            BreadcrumbCoordinator?.SetTheme(theme);
-            BreadcrumbDropDownHost?.SetTheme(theme);
-        }
+        internal void SetBreadcrumbTheme(string theme) =>
+            _breadcrumbLifecycleCoordinator?.SetTheme(theme);
 
         internal void FocusBreadcrumb()
         {
-            DispatchBreadcrumbPopup(FocusBreadcrumbCore);
+            if (_breadcrumbLifecycleCoordinator == null)
+            {
+                FocusBreadcrumbCore();
+                return;
+            }
+
+            _breadcrumbLifecycleCoordinator.Focus(FocusBreadcrumbCore);
         }
 
         private void FocusBreadcrumbCore()
@@ -255,7 +222,7 @@ namespace QuickFiler
 
         internal void SetBreadcrumbDropDownState(bool droppedDown)
         {
-            if (_breadcrumbDropDownOpenCoordinator == null)
+            if (_breadcrumbLifecycleCoordinator == null)
             {
                 if (droppedDown)
                 {
@@ -263,24 +230,16 @@ namespace QuickFiler
                 }
                 return;
             }
-            _breadcrumbDropDownOpenCoordinator.SetDroppedDown(droppedDown);
+
+            _breadcrumbLifecycleCoordinator.SetDroppedDown(droppedDown, FocusBreadcrumbCore);
         }
 
-        internal void ResetBreadcrumb()
-        {
-            BreadcrumbCoordinator?.Reset();
-            _breadcrumbDropDownOpenCoordinator?.Reset();
-            DetachBreadcrumbMessenger(ref _breadcrumbMessenger);
-            _breadcrumbCollapsedAttachment?.Reset();
-        }
+        internal void ResetBreadcrumb() => _breadcrumbLifecycleCoordinator?.Reset();
 
-        private void OnBreadcrumbSelectionChanged(object sender, EventArgs e) =>
+        private void OnBreadcrumbSelectionChanged() =>
             _folderSelectionChangedHandlers?.Invoke(this, EventArgs.Empty);
 
-        private void OnBreadcrumbFolderArrowKeyDown(
-            object sender,
-            BreadcrumbArrowDirection direction
-        ) =>
+        private void OnBreadcrumbFolderArrowKeyDown(BreadcrumbArrowDirection direction) =>
             _folderKeyDownHandlers?.Invoke(
                 this,
                 new KeyEventArgs(
@@ -288,78 +247,33 @@ namespace QuickFiler
                 )
             );
 
-        private void OnBreadcrumbUnhandledArrow(
-            object sender,
-            BreadcrumbArrowDirection direction
-        ) => BreadcrumbUnhandledArrow?.Invoke(this, direction);
+        private void OnBreadcrumbUnhandledArrow(BreadcrumbArrowDirection direction) =>
+            BreadcrumbUnhandledArrow?.Invoke(this, direction);
 
-        private void OnBreadcrumbSelectorOpenStateChanged(object sender, EventArgs e) =>
-            _breadcrumbDropDownOpenCoordinator?.HandleSelectorOpenStateChanged();
-
-        private void OnBreadcrumbPopupMessengerReady(object sender, EventArgs e)
-        {
-            _ = _breadcrumbPopupUiOperations.PostAsync(() =>
-            {
-                IWebViewMessenger messenger = BreadcrumbDropDownHost?.PopupMessenger;
-                if (messenger != null)
-                    AttachBreadcrumbPopupMessenger(messenger);
-            });
-        }
-
-        private void AttachBreadcrumbPopupMessenger(IWebViewMessenger messenger)
-        {
-            if (_breadcrumbHub == null)
-            {
-                return;
-            }
-            AttachBreadcrumbSurface(messenger, BreadcrumbViewMode.Expanded, ref _popupMessenger);
-        }
-
-        private void AttachBreadcrumbSurface(
-            IWebViewMessenger messenger,
-            BreadcrumbViewMode mode,
-            ref IWebViewMessenger slot
+        private BreadcrumbItemViewerLifecycleCoordinator EnsureBreadcrumbLifecycle(
+            BreadcrumbPopupUiOperations operations
         )
         {
-            if (ReferenceEquals(slot, messenger))
+            if (_breadcrumbLifecycleCoordinator != null)
             {
-                _breadcrumbHub.Attach(messenger, mode);
-                return;
+                return _breadcrumbLifecycleCoordinator;
             }
-            DetachBreadcrumbMessenger(ref slot);
-            if (_breadcrumbHub.Attach(messenger, mode))
-            {
-                slot = messenger;
-            }
-        }
 
-        private void DetachBreadcrumbMessenger(ref IWebViewMessenger messenger)
-        {
-            if (messenger == null)
-                return;
-            _breadcrumbHub?.Detach(messenger);
-            messenger = null;
-        }
-
-        private void DispatchBreadcrumbPopup(Action action)
-        {
-            if (_breadcrumbPopupUiOperations == null)
-            {
-                action();
-                return;
-            }
-            _ = _breadcrumbPopupUiOperations.PostAsync(action);
-        }
-
-        private void ReleaseBreadcrumbDropDownHostCore()
-        {
-            BreadcrumbDropDownOpenCoordinator coordinator = _breadcrumbDropDownOpenCoordinator;
-            if (coordinator == null)
-                return;
-
-            coordinator.Host.PopupMessengerReady -= OnBreadcrumbPopupMessengerReady;
-            coordinator.Release();
-            _breadcrumbDropDownOpenCoordinator = null;
+            EnsureBreadcrumbResourceOwnership();
+            var hub = new BreadcrumbMessengerHub();
+            var attachment = new BreadcrumbCollapsedAttachment(
+                hub,
+                new BreadcrumbCollapsedSurfaceController()
+            );
+            _breadcrumbLifecycleCoordinator = new BreadcrumbItemViewerLifecycleCoordinator(
+                hub,
+                attachment,
+                operations,
+                OnBreadcrumbSelectionChanged,
+                OnBreadcrumbFolderArrowKeyDown,
+                OnBreadcrumbUnhandledArrow
+            );
+            return _breadcrumbLifecycleCoordinator;
         }
 
         private void EnsureBreadcrumbResourceOwnership()
@@ -376,23 +290,8 @@ namespace QuickFiler
 
         private void DisposeBreadcrumbResources()
         {
-            if (BreadcrumbCoordinator != null)
-            {
-                BreadcrumbCoordinator.SelectionChanged -= OnBreadcrumbSelectionChanged;
-                BreadcrumbCoordinator.FolderArrowKeyDown -= OnBreadcrumbFolderArrowKeyDown;
-                BreadcrumbCoordinator.UnhandledArrow -= OnBreadcrumbUnhandledArrow;
-                BreadcrumbCoordinator.SelectorOpenStateChanged -=
-                    OnBreadcrumbSelectorOpenStateChanged;
-                BreadcrumbCoordinator.Dispose();
-            }
-
-            DetachBreadcrumbMessenger(ref _breadcrumbMessenger);
-            _breadcrumbCollapsedAttachment?.Dispose();
-            _breadcrumbCollapsedAttachment = null;
-            _breadcrumbCollapsedSurfaceController = null;
-            DispatchBreadcrumbPopup(ReleaseBreadcrumbDropDownHostCore);
-            _breadcrumbHub?.Dispose();
-            _breadcrumbHub = null;
+            _breadcrumbLifecycleCoordinator?.Dispose();
+            _breadcrumbLifecycleCoordinator = null;
             BreadcrumbCoordinator = null;
         }
     }
