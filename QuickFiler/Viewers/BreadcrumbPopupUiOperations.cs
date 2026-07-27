@@ -34,6 +34,14 @@ namespace QuickFiler.Viewers
             WebEnvironment environment
         );
 
+        internal delegate Readiness NavigationBinder(
+            BreadcrumbUiDispatcher dispatcher,
+            WebCore core,
+            Control owner,
+            Action navigate,
+            string surfaceName
+        );
+
         private readonly BreadcrumbUiDispatcher _dispatcher;
         private readonly Func<Control> _createControl;
         private readonly BeginInitialization _beginInitialization;
@@ -420,20 +428,30 @@ namespace QuickFiler.Viewers
             Control owner,
             Action navigate,
             string surfaceName
-        ) => NavigateToDocumentCore(dispatcher, core, owner, navigate, surfaceName);
+        ) =>
+            NavigateToDocumentCore(
+                dispatcher,
+                core,
+                owner,
+                navigate,
+                surfaceName,
+                BindProductionNavigation
+            );
 
-        private static Readiness NavigateToDocumentCore(
+        internal static Readiness NavigateToDocumentCore(
             BreadcrumbUiDispatcher dispatcher,
             WebCore core,
             Control owner,
             Action navigate,
-            string surfaceName
+            string surfaceName,
+            NavigationBinder bindNavigation
         )
         {
             _ = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
             _ = core ?? throw new ArgumentNullException(nameof(core));
             _ = owner ?? throw new ArgumentNullException(nameof(owner));
-            return BindProductionNavigation(dispatcher, core, owner, navigate, surfaceName);
+            _ = bindNavigation ?? throw new ArgumentNullException(nameof(bindNavigation));
+            return bindNavigation(dispatcher, core, owner, navigate, surfaceName);
         }
 
         [ExcludeFromCodeCoverage]

@@ -1,0 +1,6 @@
+[31;1mNew-Item: [0mC:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\scripts\vscode\Invoke-MSTestWithCoverage.ps1:280:5[0m
+[31;1m[0m[36;1mLine |[0m
+[31;1m[0m[36;1m[36;1m 280 | [0m     [36;1mNew-Item -ItemType Directory -Path $outputDir[0m | Out-Null[0m
+[31;1m[0m[36;1m[36;1m[0m[36;1m[0m[36;1m     | [31;1m     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[31;1m[0m[36;1m[36;1m[0m[36;1m[0m[36;1m[31;1m[31;1m[36;1m     | [31;1mThe filename, directory name, or volume label syntax is incorrect. :[0m
+[31;1m[0m[36;1m[36;1m[0m[36;1m[0m[36;1m[31;1m[31;1m[36;1m[31;1m[36;1m     | [31;1m'C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\qa-gates'.[0m

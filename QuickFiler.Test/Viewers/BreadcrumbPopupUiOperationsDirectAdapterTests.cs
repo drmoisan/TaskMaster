@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Web.WebView2.Core;
 using QuickFiler.Viewers;
 
 namespace QuickFiler.Test.Viewers
@@ -131,6 +134,95 @@ namespace QuickFiler.Test.Viewers
             calls.Should().Equal("messenger", "control");
         }
 
+        [TestMethod]
+        public void NavigateToDocument_NullDispatcher_ThrowsArgumentNullException()
+        {
+            Action navigate = () =>
+                BreadcrumbPopupUiOperations.NavigateToDocument(
+                    null,
+                    null,
+                    null,
+                    () => { },
+                    "Popup"
+                );
+
+            navigate.Should().Throw<ArgumentNullException>().WithParameterName("dispatcher");
+        }
+
+        [TestMethod]
+        public void NavigateToDocument_NullCore_ThrowsArgumentNullException()
+        {
+            using (var fixture = new PopupFixture())
+            {
+                Action navigate = () =>
+                    BreadcrumbPopupUiOperations.NavigateToDocument(
+                        fixture.Dispatcher,
+                        null,
+                        null,
+                        () => { },
+                        "Popup"
+                    );
+
+                navigate.Should().Throw<ArgumentNullException>().WithParameterName("core");
+            }
+        }
+
+        [TestMethod]
+        public void NavigateToDocument_NullOwner_ThrowsArgumentNullException()
+        {
+            using (var fixture = new PopupFixture())
+            {
+                var core = (CoreWebView2)
+                    FormatterServices.GetUninitializedObject(typeof(CoreWebView2));
+                Action navigate = () =>
+                    BreadcrumbPopupUiOperations.NavigateToDocument(
+                        fixture.Dispatcher,
+                        core,
+                        null,
+                        () => { },
+                        "Popup"
+                    );
+
+                navigate.Should().Throw<ArgumentNullException>().WithParameterName("owner");
+            }
+        }
+
+        [TestMethod]
+        public void NavigateToDocumentCore_InjectedBinderReturnsReadiness()
+        {
+            using (var fixture = new PopupFixture())
+            {
+                var binding = new RecordingNavigationBinding();
+                var core = (CoreWebView2)
+                    FormatterServices.GetUninitializedObject(typeof(CoreWebView2));
+                var owner = (Control)FormatterServices.GetUninitializedObject(typeof(Control));
+
+                BreadcrumbNavigationReadiness readiness =
+                    BreadcrumbPopupUiOperations.NavigateToDocumentCore(
+                        fixture.Dispatcher,
+                        core,
+                        owner,
+                        () => { },
+                        "Popup",
+                        (_dispatcher, _core, _owner, _navigate, _surfaceName) =>
+                            BreadcrumbPopupLifecycleOperations.NavigateWithSubscription(
+                                fixture.Dispatcher,
+                                "Popup",
+                                () => { },
+                                binding.Create
+                            )
+                    );
+                binding.Start(42);
+                fixture.Queue.DrainOnCreatorThread();
+                binding.Complete(42, true, "none");
+                fixture.Queue.DrainOnCreatorThread();
+
+                binding.InvocationCount.Should().Be(1);
+                readiness.Completion.Status.Should().Be(TaskStatus.RanToCompletion);
+                binding.DetachCount.Should().Be(1);
+            }
+        }
+
         private sealed class PopupFixture : IDisposable
         {
             internal PopupFixture()
@@ -156,6 +248,7 @@ namespace QuickFiler.Test.Viewers
             private Action _ownerDisposed;
 
             internal int DetachCount { get; private set; }
+            internal int InvocationCount { get; private set; }
 
             internal BreadcrumbNavigationSubscription Create(
                 Action<ulong> started,
@@ -163,6 +256,7 @@ namespace QuickFiler.Test.Viewers
                 Action ownerDisposed
             )
             {
+                InvocationCount++;
                 _started = started;
                 _completed = completed;
                 _ownerDisposed = ownerDisposed;

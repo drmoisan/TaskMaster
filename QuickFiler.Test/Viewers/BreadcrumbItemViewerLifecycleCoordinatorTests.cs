@@ -7,6 +7,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler.Viewers;
+using UtilitiesCS.OutlookObjects.Folder;
 
 namespace QuickFiler.Test.Viewers
 {
@@ -130,6 +131,90 @@ namespace QuickFiler.Test.Viewers
             }
         }
 
+        [TestMethod]
+        public void SetBridgeCoordinator_SameReference_DoesNotDuplicateSubscriptions()
+        {
+            using (var fixture = new LifecycleFixture())
+            {
+                BreadcrumbBridgeCoordinator bridge = fixture.CreateBridge();
+                fixture.Coordinator.SetBridgeCoordinator(bridge);
+                fixture.Coordinator.SetBridgeCoordinator(bridge);
+
+                bridge.AddItems(new[] { "A", "B" });
+                fixture.Queue.DrainOnCreatorThread();
+                bridge.SelectRow(1);
+                fixture.Queue.DrainOnCreatorThread();
+
+                fixture.Coordinator.BridgeCoordinator.Should().BeSameAs(bridge);
+                fixture.SelectionChangedCount.Should().Be(1);
+            }
+        }
+
+        [TestMethod]
+        public void AttachCollapsedMessenger_Null_ThrowsArgumentNullException()
+        {
+            using (var fixture = new LifecycleFixture())
+            {
+                Action attach = () => fixture.Coordinator.AttachCollapsedMessenger(null);
+
+                attach.Should().Throw<ArgumentNullException>().WithParameterName("messenger");
+            }
+        }
+
+        [TestMethod]
+        public void AttachCollapsedMessenger_SameReference_ReusesHubAttachment()
+        {
+            using (var fixture = new LifecycleFixture())
+            {
+                var messenger = new Mock<IWebViewMessenger>();
+
+                fixture.Coordinator.AttachCollapsedMessenger(messenger.Object);
+                fixture.Coordinator.AttachCollapsedMessenger(messenger.Object);
+
+                messenger.VerifyAdd(
+                    value => value.MessageReceived += It.IsAny<EventHandler<string>>(),
+                    Times.Once
+                );
+            }
+        }
+
+        [TestMethod]
+        public void AttachCollapsedMessenger_ReplacementDetachesPrevious()
+        {
+            using (var fixture = new LifecycleFixture())
+            {
+                var first = new Mock<IWebViewMessenger>();
+                var second = new Mock<IWebViewMessenger>();
+
+                fixture.Coordinator.AttachCollapsedMessenger(first.Object);
+                fixture.Coordinator.AttachCollapsedMessenger(second.Object);
+
+                first.VerifyRemove(
+                    value => value.MessageReceived -= It.IsAny<EventHandler<string>>(),
+                    Times.Once
+                );
+                second.VerifyAdd(
+                    value => value.MessageReceived += It.IsAny<EventHandler<string>>(),
+                    Times.Once
+                );
+            }
+        }
+
+        [TestMethod]
+        public void DisposedCoordinator_SetBridgeCoordinatorThrows()
+        {
+            using (var fixture = new LifecycleFixture())
+            {
+                BreadcrumbBridgeCoordinator bridge = fixture.CreateBridge();
+                fixture.Coordinator.SetBridgeCoordinator(bridge);
+                fixture.Coordinator.Dispose();
+
+                Action setBridge = () => fixture.Coordinator.SetBridgeCoordinator(bridge);
+
+                setBridge.Should().Throw<ObjectDisposedException>();
+            }
+        }
+
         private static Rectangle FixtureAnchor() => new Rectangle(10, 20, 30, 40);
 
         private static Rectangle FixtureWorkingArea() => new Rectangle(0, 0, 1920, 1080);
@@ -140,15 +225,15 @@ namespace QuickFiler.Test.Viewers
             {
                 Queue = new QueuedCreatorThreadSynchronizationContext();
                 Dispatcher = new BreadcrumbUiDispatcher(Queue, _ => { });
-                var hub = new BreadcrumbMessengerHub();
+                Hub = new BreadcrumbMessengerHub();
                 Coordinator = new BreadcrumbItemViewerLifecycleCoordinator(
-                    hub,
+                    Hub,
                     new BreadcrumbCollapsedAttachment(
-                        hub,
+                        Hub,
                         new BreadcrumbCollapsedSurfaceController()
                     ),
                     new BreadcrumbPopupUiOperations(Dispatcher),
-                    () => { },
+                    () => SelectionChangedCount++,
                     _ => { },
                     _ => { }
                 );
@@ -156,7 +241,15 @@ namespace QuickFiler.Test.Viewers
 
             internal QueuedCreatorThreadSynchronizationContext Queue { get; }
             internal BreadcrumbUiDispatcher Dispatcher { get; }
+            internal BreadcrumbMessengerHub Hub { get; }
             internal BreadcrumbItemViewerLifecycleCoordinator Coordinator { get; }
+            internal int SelectionChangedCount { get; private set; }
+
+            internal BreadcrumbBridgeCoordinator CreateBridge()
+            {
+                var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+                return new BreadcrumbBridgeCoordinator(Hub, provider.Object, Dispatcher);
+            }
 
             public void Dispose() => Coordinator.Dispose();
         }
