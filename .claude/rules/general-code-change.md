@@ -36,7 +36,7 @@ Run the full seven-stage toolchain in this exact order and repeat until all stag
 2. **Linting** (e.g., Ruff, ESLint, PSScriptAnalyzer, .NET analyzers)
 3. **Type checking** (e.g., Pyright, TSC, nullable analysis; skip for PowerShell)
 4. **Architecture-boundary tests** (e.g., dependency-cruiser, NetArchTest.Rules)
-5. **Unit tests** (e.g., Pytest, Vitest, MSTest, Pester) including property-based tests where applicable per `quality-tiers.md`
+5. **Unit tests** (e.g., Pytest, Jest, MSTest, Pester) including property-based tests where applicable per `quality-tiers.md`
 6. **Contract / schema compatibility checks** (e.g., oasdiff, schema-snapshot diff)
 7. **Integration tests**
 
