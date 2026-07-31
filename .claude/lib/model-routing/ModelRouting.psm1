@@ -11,8 +11,9 @@
       - Resolve-DelegationModel port of scripts/dev_tools/resolve_delegation_model.py
 
     Both functions are pure and deterministic: they read no file at runtime and
-    encode only the fixed band ordering, the base complexity-to-model table, the
-    preferred overlay, and the disabled-mode clamp as module-scope constants.
+    encode only the fixed band ordering, the floor-signal name set, the base
+    complexity-to-model table, the preferred overlay, and the disabled-mode clamp
+    as module-scope constants.
     Those literals are pinned to config/orchestration-routing.json (model_policy /
     model_budget) by a static config-parity Pester test, and the Python modules
     remain the validator's authoritative reference. This module is one half of a
@@ -28,6 +29,20 @@ $script:BAND_ORDER = @('C1', 'C2', 'C3', 'C4')
 
 # The lowest band, returned when no floor signal is present (LOWEST_BAND).
 $script:LOWEST_BAND = 'C1'
+
+# The catalog signal names flagged "floor": true in model_policy.complexity. Only
+# a signal named here contributes a floor candidate; a "floor": false name and an
+# unknown name each contribute nothing. Hard-coded (never read from disk) because
+# this module is pushed down to consumer repositories that do not ship
+# config/orchestration-routing.json; a static parity Pester test pins this set to
+# the config's "floor": true entries. Mirrors FLOOR_SIGNAL_NAMES in
+# scripts/dev_tools/compute_complexity_floor.py.
+$script:FLOOR_SIGNAL_NAMES = @(
+    'classifier_or_model_logic',
+    'auth_or_token_handling',
+    'concurrency_or_ordering',
+    'cross_module_contract_change'
+)
 
 # Every present floor signal contributes this uniform candidate band, per the
 # model_policy.complexity contract (each [floor] signal contributes C3).
@@ -78,21 +93,22 @@ function Get-ComplexityFloor {
     .DESCRIPTION
         Faithful PowerShell port of compute_complexity_floor
         (scripts/dev_tools/compute_complexity_floor.py). Returns the deterministic
-        lower-bound complexity band implied by the set of present floor signals:
-        each present floor signal contributes a candidate band of C3, the floor is
-        the maximum triggered candidate band, and the floor never exceeds C3
-        (C4 is never floor-forced). With no floor signal present the floor is the
-        lowest band C1. The function is pure: it reads no file and does not mutate
-        its input, and the result is independent of input ordering.
+        lower-bound complexity band implied by the recorded signal names: the
+        function intersects the input with FLOOR_SIGNAL_NAMES, each surviving
+        [floor] signal contributes a candidate band of C3, the floor is the maximum
+        triggered candidate band, and the floor never exceeds C3 (C4 is never
+        floor-forced). With no floor signal present the floor is the lowest band C1.
+        The function is pure: it reads no file and does not mutate its input, and
+        the result is independent of input ordering.
 
     .PARAMETER SignalsPresent
-        The names of the present signals flagged [floor] in the
-        model_policy.complexity catalog. Every element is treated as a triggered
-        floor signal contributing the candidate band C3. An empty collection means
-        no floor signal is present.
+        The full set of recorded signal names, as written to the checkpoint's
+        signals_present[] array. The caller does not pre-filter: names outside
+        FLOOR_SIGNAL_NAMES ("floor": false catalog names and unknown names alike)
+        contribute nothing. An empty collection means no floor signal is present.
 
     .OUTPUTS
-        System.String. The floor band: C1 when no floor signal is present,
+        System.String. The floor band: C1 when no recorded name is a floor signal,
         otherwise the maximum triggered candidate band clamped to at most C3.
         C4 is never returned.
     #>
@@ -104,9 +120,13 @@ function Get-ComplexityFloor {
         [string[]] $SignalsPresent
     )
 
+    # Keep only the recorded names that are floor signals. A "floor": false catalog
+    # name and an unknown name both drop out here and contribute no candidate band.
+    $triggered = @($SignalsPresent | Where-Object { $script:FLOOR_SIGNAL_NAMES -contains $_ })
+
     # With no present floor signal there is no candidate band to raise the floor
     # above the lowest band, so the floor is C1 (mirrors the empty-input guard).
-    if (-not $SignalsPresent -or $SignalsPresent.Count -eq 0) {
+    if ($triggered.Count -eq 0) {
         return $script:LOWEST_BAND
     }
 

@@ -37,7 +37,7 @@ The correct response to a file that contains untestable lines is to refactor it 
 **Permitted `exclude` entries** (non-production paths only):
 - Build output directories: `dist/**`, `lib/**`, `lib-amd/**`.
 - Test files and test infrastructure: `**/*.test.ts`, `tests/**`, `src/test-support/**`.
-- Config files that are not production code: `vitest.config.ts`, `eslint.config.mjs`, `.dependency-cruiser.cjs`, `webpack.config.js`.
+- Config files that are not production code: `jest.config.cjs`, `eslint.config.mjs`, `.dependency-cruiser.cjs`, `webpack.config.js`.
 - `node_modules/**`.
 
 **Prohibited `exclude` entries:**
@@ -102,4 +102,4 @@ All test code must be deterministic. The following infrastructure requirements a
 - **Controllable clock** — use a `Clock` interface (TypeScript) or `TimeProvider` (.NET) injected into code under test. Do not read wall-clock time directly in production code under test.
 - **Seeded RNG** — randomness must be supplied via a seedable interface; on test failure the seed must be printed so the failure is reproducible.
 - **Banned APIs in test code** — `setTimeout`, `Thread.Sleep`, `Task.Delay`, real wall-clock waits, and `Date.now()` outside the clock interface are prohibited in tests.
-- **Virtual scheduler / fake timers / `FakeTimeProvider`** — async tests must use the framework's fake-timer facility (`vi.useFakeTimers()` for Vitest, `FakeTimeProvider` for .NET) to advance simulated time deterministically.
+- **Virtual scheduler / fake timers / `FakeTimeProvider`** — async tests must use the framework's fake-timer facility (`jest.useFakeTimers()` for Jest, `FakeTimeProvider` for .NET) to advance simulated time deterministically.

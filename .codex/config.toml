@@ -2,7 +2,7 @@ default_permissions = ":danger-full-access"
 
 [mcp_servers.drm-copilot]
 command = "npx"
-args = ["-y", "@danmoisan/drm-copilot-mcp@1.0.18"]
+args = ["-y", "@danmoisan/drm-copilot-mcp@1.0.20"]
 required = true
 enabled_tools = [
     "collect_commit_context",

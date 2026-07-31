@@ -245,6 +245,28 @@ function Invoke-EpicPlanningOnlyDecision {
     return Get-EpicPlanningDenyDecision -Reason "tool '$toolName' is not classified for preparation mode."
 }
 
+function Invoke-EpicPlanningGit {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][string[]] $GitArgs)
+
+    return & git @GitArgs 2>$null
+}
+
+function Get-EpicPlanningCurrentBranch {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory)][string] $RepositoryRoot)
+
+    $currentBranch = [string](Invoke-EpicPlanningGit -GitArgs @('-C', $RepositoryRoot, 'branch', '--show-current'))
+    if ($LASTEXITCODE -ne 0) {
+        throw 'EPIC_PLANNING_ONLY_BLOCKED: current branch could not be resolved before push.'
+    }
+    if ([string]::IsNullOrWhiteSpace($currentBranch)) {
+        return ''
+    }
+    return $currentBranch.Trim()
+}
+
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
@@ -270,11 +292,7 @@ try {
     }
     if ([string]$payload.tool_name -eq 'Bash' -and
         [string]$payload.tool_input.command -match '^\s*git\s+push\b') {
-        $currentBranch = [string](& git -C $repositoryRoot branch --show-current 2>$null)
-        if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($currentBranch)) {
-            throw 'EPIC_PLANNING_ONLY_BLOCKED: current branch could not be resolved before push.'
-        }
-        $currentBranch = $currentBranch.Trim()
+        $currentBranch = Get-EpicPlanningCurrentBranch -RepositoryRoot $repositoryRoot
     }
     $decision = Invoke-EpicPlanningOnlyDecision `
         -PayloadRaw $payloadRaw `

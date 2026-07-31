@@ -165,9 +165,15 @@ function Invoke-RoutingContractValidation {
         string is unchanged for every existing caller of this hook.
 
         Returns a hashtable with keys:
-          - HasErrors:  $true when the validator reported a non-zero exit or
-                        produced any error text; $false when clean.
-          - ErrorText:  the validator's combined output text (empty on success).
+          - HasErrors:  $true only when the validator reported a non-zero exit
+                        code; $false when it exited 0. The exit code is the sole
+                        discriminator, because the validator prints its success
+                        line to stdout on a clean pass and the default Invoker
+                        captures with 2>&1, so output text is present on success.
+          - ErrorText:  the validator's combined captured output text, carried
+                        through unchanged: the error lines on a failure, and the
+                        success line (Python CLI) or empty (portable fallback)
+                        on a clean pass.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -219,9 +225,11 @@ function Invoke-RoutingContractValidation {
         $outputText = ([string]$result.Output).Trim()
     }
 
-    # The validator signals a routing-contract failure either through a non-zero
-    # exit code or through emitted error text; either condition blocks DONE.
-    $hasErrors = ($exitCode -ne 0) -or (-not [string]::IsNullOrWhiteSpace($outputText))
+    # The exit code is the complete failure discriminator: the validator prints every
+    # error to stderr and returns non-zero, and prints its success line to stdout and
+    # returns 0. Because the default invoker captures with 2>&1, the success line lands
+    # in $outputText on a clean pass, so output text must not influence this decision.
+    $hasErrors = ($exitCode -ne 0)
     return @{ HasErrors = $hasErrors; ErrorText = $outputText }
 }
 
