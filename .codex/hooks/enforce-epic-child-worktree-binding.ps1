@@ -267,6 +267,18 @@ function Invoke-CodexChildGuardGit {
     return & git @GitArgs 2>&1
 }
 
+function Get-CodexChildGuardLiveBranch {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param([Parameter(Mandatory)][string] $RepositoryRoot)
+
+    $liveBranch = [string](Invoke-CodexChildGuardGit -GitArgs @('-C', $RepositoryRoot, 'branch', '--show-current'))
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($liveBranch)) {
+        return ''
+    }
+    return $liveBranch.Trim()
+}
+
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
@@ -308,12 +320,9 @@ try {
     } else {
         ''
     }
-    $liveBranch = [string](Invoke-CodexChildGuardGit -GitArgs @('-C', $repositoryRoot, 'branch', '--show-current'))
-    if ($LASTEXITCODE -ne 0) {
-        $liveBranch = ''
-    }
+    $liveBranch = Get-CodexChildGuardLiveBranch -RepositoryRoot $repositoryRoot
     $decision = Invoke-CodexEpicChildGuardDecision -PayloadRaw $payloadRaw -ReceiptRaw $receiptRaw `
-        -Attestation $attestation -HookRepositoryRoot $repositoryRoot -LiveBranch $liveBranch.Trim() `
+        -Attestation $attestation -HookRepositoryRoot $repositoryRoot -LiveBranch $liveBranch `
         -ActualSpecSha256 $actualSpecSha256 -ActualProfileSha256 $actualProfileSha256
     if ($null -ne $decision) {
         $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
