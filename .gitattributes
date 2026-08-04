@@ -3,6 +3,11 @@
 ###############################################################################
 * text=auto
 
+# Preserve the byte-identical damaged evidence payload recorded by Issue #400's
+# remediation corruption-recovery record. Its terminal blank line is part of
+# the preserved diagnostic payload rather than an authoring whitespace error.
+docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400/evidence/other/remediation-plan.corruption-recovery.2026-08-04T10-24.damaged.md whitespace=-blank-at-eof
+
 ###############################################################################
 # Set default behavior for command prompt diff.
 #

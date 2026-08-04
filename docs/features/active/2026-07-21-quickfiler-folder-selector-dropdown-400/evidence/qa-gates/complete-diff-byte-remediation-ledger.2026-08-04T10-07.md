@@ -1,0 +1,31 @@
+# P11-T3 complete-diff byte-remediation ledger
+
+Timestamp: 2026-08-04T10-07
+
+Command: An in-memory `TrailingWhitespaceCleaner` byte-stream operation read each allowed path as bytes; for each line it removed only the terminal `0x20`/`0x09` sequence before `CRLF`, `LF`, `CR`, or EOF; it then wrote the unchanged byte stream with only those bytes omitted. Verification used `git cat-file --filters --path=<path> HEAD:<path>` for CRLF/TRX artifacts and raw `git cat-file blob HEAD:<path>` for LF Markdown artifacts, rebuilt the permitted normalized stream in memory, and required byte equality.
+
+EXIT_CODE: 0
+
+Output Summary: All fifteen allowed files changed only by 1,452 permitted trailing-whitespace byte deletions. All BOM states, EOL sequence counts, and TRX `Counters` total/executed/passed/failed values are unchanged. The original `git diff --check` baseline contained 1,396 diagnostic headers; post-remediation verification rebuilt the allowed normalized bytes and matched each worktree file exactly.
+
+| Path | Before SHA-256 | After SHA-256 | Before/after bytes | Deleted | BOM/EOL | TRX totals |
+| --- | --- | --- | --- | ---: | --- | --- |
+| evidence/regression-testing/member-coverage-all-eight-determinism-attempt-2.2026-07-27T04-31.trx | 4D95E611B057DE22903BB9C416F331418546D5EAE59A814CC2E17A8A10474D8F | C6CF1B6D49E47B242F4FFE45462B22CF4928F07B2EDFA1D3D20E4335C5F560DD | 8133762/8133755 | 7 | BOM yes; CRLF 41308/41308 | total=6056; executed=6056; passed=6056; failed=0 |
+| evidence/regression-testing/member-coverage-all-eight-determinism-run-1.2026-07-27T04-43.trx | 37039067BA6E354AB2C8D3E0AD012EA14CCCD8708EE914B7E86E08B59ABFB0F4 | EC4179C4950B5F83D7144CE5B8AED6F997A4249C41059D40DD47C4EF5ABF1990 | 8133780/8133773 | 7 | BOM yes; CRLF 41311/41311 | total=6056; executed=6056; passed=6056; failed=0 |
+| evidence/regression-testing/member-coverage-all-eight-determinism-run-2.2026-07-27T04-44.trx | B194EB9938B76FBE48AB20DC4E9E398825954B73509CDBDEBB8C32820C3BEDBF | 1F6E1280A97B581D4EC6D3EFE9EB7F0EF1167279DDD8A84CF5E049795251ECC9 | 8133763/8133756 | 7 | BOM yes; CRLF 41308/41308 | total=6056; executed=6056; passed=6056; failed=0 |
+| evidence/regression-testing/member-coverage-bridge-stale-aggregate-blame.2026-07-27T05-34.trx | B9DB777DA5B528CB29C54F5EF4C6FEA69EF53F10D4D30276C9898708418C7909 | D50149F0AD394101681F1563B59D3B0DDCE6EE7BB6A97A56018FA80C6FEA6951 | 8134739/8134732 | 7 | BOM yes; CRLF 41321/41321 | total=6056; executed=6056; passed=6055; failed=1 |
+| evidence/regression-testing/member-coverage-isolation-TaskMaster.Test.2026-07-27T04-34.trx | F8B4B8339A455E1037AFC1F28DD3128D0B364FF1A03FADFBC3BDB673C280F33B | FB6D353B48764CB28DCFBB21FC2718865506AF2411255F3F454A3754A4E287E0 | 400232/400231 | 1 | BOM yes; CRLF 2172/2172 | total=250; executed=250; passed=250; failed=0 |
+| evidence/regression-testing/member-coverage-isolation-UtilitiesCS.Test.2026-07-27T04-35.trx | 100822059866281AF1446A0E327DF0C4EEA27B2EC6E3109D99EF3C66D776E1C1 | 6120C40B50E8223DF417BBAD8A57C3E82575B441E50BDE26889A10CBCBDE70E9 | 6151483/6151477 | 6 | BOM yes; CRLF 31238/31238 | total=4608; executed=4608; passed=4608; failed=0 |
+| evidence/regression-testing/member-coverage-selector-transition-determinism-run-1.2026-07-27T06-04.trx | 38F46BB43E41BF7D8CD44BDBF5D5554D2363D27A462ED01DD7456B047546EE9A | D8D39E39AA646688C8D18DAECC581AFACC8506FBDFB6A56B818850DDE28A268D | 8133774/8133767 | 7 | BOM yes; CRLF 41311/41311 | total=6056; executed=6056; passed=6056; failed=0 |
+| evidence/regression-testing/member-coverage-selector-transition-determinism-run-2.2026-07-27T06-05.trx | F208EA98C355C35A6086B2C73E4624F3CCE59E832C464EE1414174592C32D505 | 6C0E84A883489337D83416B21158D8AA4640E2857BECF99490E7494BF656D941 | 8133777/8133770 | 7 | BOM yes; CRLF 41311/41311 | total=6056; executed=6056; passed=6056; failed=0 |
+| evidence/regression-testing/nonnumeric-adapter-coverage-failure-classification-unbuffered.2026-07-27T09-23.stdout.txt | 873E8F989C30E3E316E105F8A55C4289A516BBFEF7C67118B89BA26981346C32 | CE7DEA6EB7A436334847812FC8587D1D08A2ED4FCF2680F83A65907B069B2BF6 | 648382/647037 | 1345 | BOM no; CRLF 11881/11881 | n/a |
+| evidence/regression-testing/nonnumeric-adapter-coverage-failure-classification-unbuffered.2026-07-27T09-23.trx | 435D38D656CD63582003B8F961F9933380B7BC6D8D4A1F99DC83213AA0670111 | 4B5C8F8BF86742D26EF1E9D70A421340AD585A026D780D0C2FA4AC6D6FF72A77 | 8160968/8160961 | 7 | BOM yes; CRLF 41498/41498 | total=6066; executed=6066; passed=6058; failed=8 |
+| evidence/regression-testing/p9-t4-all-assembly-spambayes-diagnostic.2026-07-27T02-59.trx | 470139F604B78B68E98ED837C2A8EA4F580626067AA6ED9851F1FE4B17132134 | 5A5EF08CE1B242510A9DDA4B867C6E03E07C9C2048888C485E0630A0A4F8A0C2 | 8128872/8128865 | 7 | BOM yes; CRLF 41376/41376 | total=6047; executed=6047; passed=6043; failed=4 |
+| evidence/regression-testing/spambayes-all-assembly-pass-after.2026-07-27T03-28.trx | 99F099B4390F1AC4AD416213DA38D4A00B0338240D23824F7B22FB5333DECFA9 | EDBF32008448E67356B8ED7B5C482F4252E533A526A2D28838F6421220AEAE37 | 8124490/8124483 | 7 | BOM yes; CRLF 41269/41269 | total=6049; executed=6049; passed=6049; failed=0 |
+| code-review.2026-07-27T12-02.md | AE747426DAF73FDD61DBEC57580E608C2EA4D9AEB7E34E87B817E69CA0B10C69 | FD018B851C44349372D601E46328731B9C6DD74B897DFEC07BFC811563041704 | 7580/7568 | 12 | BOM no; LF 101/101 | n/a |
+| feature-audit.2026-07-27T12-02.md | 769B6C49D1EA97D73063D3B9104242949E52339D66AC76209ECA3EAACEDF358E | 58C54FAE8624E9C9FAFCA32FB9E27D74E5E86BAB3A42B60662D93BA84F19B1E3 | 6421/6411 | 10 | BOM no; LF 80/80 | n/a |
+| policy-audit.2026-07-27T12-02.md | 197CC89ED33B3D2755771C40FDF0D5DA51A08CE0554639F6BDE9AE57A3E8911B | 8F20F9886BD4532FEDA4FC2DB71C12E096CFEF61D93A3259BB79AAABBC96E049 | 11082/11076 | 6 | BOM no; LF 163/163 | n/a |
+
+## Hash-reference reconciliation
+
+The pre-operation search found no feature evidence artifact containing any of the fifteen pre-remediation SHA-256 values. The P11-T1 baseline, created during this phase, intentionally retains the before-state inventory and is provenance rather than a current-state hash reference; it is not rewritten. Therefore, no existing hash-reference file required an update. No narrative conclusion, command, timestamp, test total, or review conclusion was modified.

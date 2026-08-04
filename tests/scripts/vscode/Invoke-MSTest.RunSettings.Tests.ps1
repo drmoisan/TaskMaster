@@ -4,20 +4,23 @@ BeforeAll {
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
     $script:mstestScript = Join-Path $script:repoRoot 'scripts\vscode\Invoke-MSTest.ps1'
     $script:coverageScript = Join-Path $script:repoRoot 'scripts\vscode\Invoke-MSTestWithCoverage.ps1'
-
-    # Dot-source the scripts to import their functions into the test scope. The
-    # top-level body resolves vswhere/assemblies after the functions are defined,
-    # so any body error does not prevent the function definitions from loading.
-    # Functions under test (Resolve-RunSettingsPath, Get-VsTestArgumentList,
-    # Get-DotnetCoverageArgumentList, and the wrapper seams) are declared before the
-    # body, making them available regardless of body execution.
-    # The body may throw in environments without vswhere/dotnet-coverage; the
-    # function definitions are already loaded by that point, so the body error is
-    # intentionally tolerated and recorded for diagnostics rather than rethrown.
-    try { . $script:mstestScript -NoExecute } catch { Write-Verbose "Invoke-MSTest body skipped: $_" }
-    try { . $script:coverageScript -NoExecute } catch { Write-Verbose "Invoke-MSTestWithCoverage body skipped: $_" }
-
     $script:scriptDir = Join-Path $script:repoRoot 'scripts\vscode'
+
+    # Import the existing non-coverage script's definitions.
+    try { . $script:mstestScript -NoExecute } catch { Write-Verbose "Invoke-MSTest body skipped: $_" }
+
+    # Parse and dot-source the coverage scriptblock. The production entrypoint checks
+    # dot-source invocation, so only definitions are imported for these in-process tests.
+    $tokens = $null
+    $parseErrors = $null
+    $coverageAst = [System.Management.Automation.Language.Parser]::ParseFile(
+        $script:coverageScript,
+        [ref]$tokens,
+        [ref]$parseErrors)
+    $parseErrors | Should -BeNullOrEmpty
+    . $coverageAst.GetScriptBlock()
+    . (Join-Path $script:scriptDir 'Invoke-MSTestWithCoverage.Helpers.ps1')
+
     $script:expectedRunSettings = Join-Path $script:scriptDir 'TaskMaster.cli.runsettings'
 }
 
@@ -324,5 +327,125 @@ Describe 'Invoke-MSTestWithCoverage derived settings' {
             $script:removedCoverageSettingsPaths |
                 Should -Be @($script:writtenCoverageSettingsPath)
         }
+    }
+}
+
+Describe 'Invoke-MSTestWithCoverage main wrapper seam' {
+    It 'exposes a callable main entrypoint for isolated mocked execution' {
+        Get-Command -Name Invoke-MSTestWithCoverageMain -ErrorAction SilentlyContinue |
+            Should -Not -BeNullOrEmpty
+    }
+
+    It 'exposes a callable vswhere wrapper for executable-free tests' {
+        Get-Command -Name Invoke-VsWhereExe -ErrorAction SilentlyContinue |
+            Should -Not -BeNullOrEmpty
+    }
+}
+
+Describe 'Invoke-MSTestWithCoverageMain' {
+    BeforeEach {
+        $script:coverageCallCount = 0
+        $script:vsWhereArgs = $null
+        $script:canonicalCoverageXml = '<Configuration><CodeCoverage><ModulePaths><Exclude /></ModulePaths></CodeCoverage></Configuration>'
+
+        Mock Resolve-Path {
+            [pscustomobject]@{ Path = 'C:\repo' }
+        }
+        Mock Test-Path { $true }
+        Mock Resolve-RunSettingsPath { 'C:\repo\scripts\vscode\TaskMaster.cli.runsettings' }
+        Mock Invoke-VsWhereExe {
+            param([string]$VsWherePath, [string[]]$VsWhereArgs)
+            $null = $VsWherePath
+            $script:vsWhereArgs = $VsWhereArgs
+            'C:\repo\vstest.console.exe'
+        }
+        Mock Get-Command { [pscustomobject]@{ Name = 'dotnet-coverage' } }
+        Mock Get-ChildItem {
+            [pscustomobject]@{ FullName = 'C:\repo\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll' }
+        }
+        Mock Invoke-DotnetCoverageCollection {
+            $script:coverageCallCount++
+        }
+        Mock Get-Content { '<coverage />' }
+        Mock ConvertTo-KoverageCoberturaXml { '<processedCoverage />' }
+        Mock Set-Content {}
+    }
+
+    It 'uses only mocked discovery and builds the vswhere command for the main happy path' {
+        Invoke-MSTestWithCoverageMain `
+            -SearchRoot 'QuickFiler.Test' `
+            -NoExecute `
+            -ScriptRoot $script:scriptDir
+
+        $script:vsWhereArgs | Should -Be @(
+            '-latest', '-products', '*', '-find', 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe'
+        )
+        Should -Invoke Invoke-DotnetCoverageCollection -Times 0 -Exactly
+    }
+
+    It 'does not start coverage collection when NoExecute is supplied' {
+        Invoke-MSTestWithCoverageMain -NoExecute -ScriptRoot $script:scriptDir
+
+        $script:coverageCallCount | Should -Be 0
+    }
+
+    It 'collects and post-processes coverage on the fully mocked main happy path' {
+        Invoke-MSTestWithCoverageMain -ScriptRoot $script:scriptDir
+
+        Should -Invoke Invoke-DotnetCoverageCollection -Times 1 -Exactly
+        Should -Invoke ConvertTo-KoverageCoberturaXml -Times 1 -Exactly
+        Should -Invoke Set-Content -Times 1 -Exactly
+    }
+
+    It 'fails when the search root cannot be found' {
+        Mock Test-Path { $false }
+
+        { Invoke-MSTestWithCoverageMain -NoExecute -ScriptRoot $script:scriptDir } |
+            Should -Throw -ExpectedMessage 'Search root not found: C:\repo\.'
+    }
+}
+
+Describe 'Invoke-MSTestWithCoverage isolated error paths' {
+    It 'fails when coverage settings have no module exclusion node' {
+        {
+            ConvertTo-DerivedCoverageSettingsXml -CanonicalSettingsXml '<Configuration />'
+        } | Should -Throw -ExpectedMessage 'Coverage settings do not contain Configuration/CodeCoverage/ModulePaths/Exclude.'
+    }
+
+    It 'fails when coverage settings repeat the test assembly exclusion' {
+        $settings = '<Configuration><CodeCoverage><ModulePaths><Exclude><ModulePath>.*\.Test\.dll$</ModulePath><ModulePath>.*\.Test\.dll$</ModulePath></Exclude></ModulePaths></CodeCoverage></Configuration>'
+
+        {
+            ConvertTo-DerivedCoverageSettingsXml -CanonicalSettingsXml $settings
+        } | Should -Throw -ExpectedMessage 'Coverage settings contain the test-assembly exclusion more than once: .*\.Test\.dll$'
+    }
+
+    It 'fails when the derived path equals the canonical coverage path' {
+        Mock Get-DerivedCoverageSettingsPath { 'C:\repo\coverage.config' }
+
+        {
+            Invoke-DotnetCoverageCollection `
+                -OutputPath 'C:\repo\coverage.config' `
+                -CoverageConfig 'C:\repo\coverage.config' `
+                -VsTestPath 'C:\repo\vstest.console.exe' `
+                -TestAssembly @('C:\repo\A.Test.dll') `
+                -RunSettingsPath 'C:\repo\TaskMaster.cli.runsettings'
+        } | Should -Throw -ExpectedMessage 'Derived coverage settings path must differ from the canonical settings path.'
+    }
+
+    It 'fails when dotnet coverage returns a nonzero exit code' {
+        Mock Get-Content { '<Configuration><CodeCoverage><ModulePaths><Exclude /></ModulePaths></CodeCoverage></Configuration>' }
+        Mock Set-Content {}
+        Mock Remove-Item {}
+        Mock Invoke-DotnetCoverageExe { $global:LASTEXITCODE = 7 }
+
+        {
+            Invoke-DotnetCoverageCollection `
+                -OutputPath 'C:\repo\coverage\coverage.cobertura.xml' `
+                -CoverageConfig 'C:\repo\coverage.config' `
+                -VsTestPath 'C:\repo\vstest.console.exe' `
+                -TestAssembly @('C:\repo\A.Test.dll') `
+                -RunSettingsPath 'C:\repo\TaskMaster.cli.runsettings'
+        } | Should -Throw -ExpectedMessage 'MSTest with coverage failed with exit code 7'
     }
 }

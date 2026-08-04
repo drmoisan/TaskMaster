@@ -17,28 +17,28 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
       The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
       the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
       non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
- 
+
       Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
- 
+
       A paid commercial license supports the development and continued increasing support of
       Fluent Assertions users under both commercial and community licenses. Help us
       keep Fluent Assertions at the forefront of unit testing.
- 
+
       For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
- 
- 
+
+
  Debug Trace:
       Warning:
       The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
       the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
       non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
- 
+
       Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
- 
+
       A paid commercial license supports the development and continued increasing support of
       Fluent Assertions users under both commercial and community licenses. Help us
       keep Fluent Assertions at the forefront of unit testing.
- 
+
       For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
 
 
@@ -61,324 +61,324 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed WaitForQueue_WhenWorkerBusyAndQueueShort_AwaitsInjectedTwoHundredMsDelay [4 ms]
   Passed QfcFormController_ShouldConstruct [57 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed CaptureItemSettings_ShouldCaptureSettings [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed RemoveTemplatesAndSetupTlp_ShouldSetupTlp [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed SetupLightDark_ShouldSetupThemes [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed SpaceForEmail_ShouldReturnCorrectValue [7 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed RegisterFormEventHandlers_ShouldRegisterHandlers [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed UnregisterFormEventHandlers_ShouldUnregisterHandlers [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Cleanup_ShouldCleanupResources [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ItemsPerIteration_ShouldGetAndSetCorrectly [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ActiveTheme_ShouldGetAndSetCorrectly [3 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed DarkMode_ShouldGetAndSetCorrectly [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Groups_ShouldReturnCorrectValue [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed FormHandle_ShouldReturnCorrectValue [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed FormViewer_ShouldReturnCorrectValue [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Token_ShouldReturnCorrectValue [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed TokenSource_ShouldReturnCorrectValue [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed DarkMode_CheckedChanged_ShouldUpdateTheme [5 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ButtonCancel_Click_ShouldCancelAction [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ButtonOK_Click_ShouldPerformAction [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadUiFromQueue_ShouldLoadUi [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed MoveAndIterate_ShouldMoveAndIterate [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed BackGroundMoveAsync_ShouldMoveEmails [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ButtonUndo_Click_ShouldUndoAction [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed SpnEmailPerLoad_ValueChanged_ShouldChangeValue_EqualsItemPerIteration [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed SpnEmailPerLoad_ValueChanged_ShouldChangeValue_GreaterItemPerIteration [13 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed AdjustTlp_ShouldAdjustTlp [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ButtonSkip_Click_ShouldSkipGroup [7 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed SkipGroupAsync_ShouldSkipGroup [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadItems_ShouldLoadItems [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadItems_ShouldLoadMailItems [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadItemsAsync_ShouldLoadMailItemsAsync [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ConfigureAndAttachBreadcrumbAsync_CachesCurrentThemeAndCreatesOneCandidatePerSession [234 ms]
   Passed MaximizeFormViewer_ShouldMaximizeForm [66 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed RegisterFormEventHandlers_WiresAllIntentCommandEvents [15 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed RegisterFormEventHandlers_UsesExclusionControlsFromFormViewer [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed MinimizeFormViewer_ShouldMinimizeForm [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed UndoDialog_ShouldUndoMoves [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed UndoConsumer_ShouldConsumeUndoQueue [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed OkClicked_WhenRaised_RoutesToControllerWithoutThrowing [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Viewer_Activate_ShouldThrowNotImplementedException [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed CancelClicked_WhenRaised_CancelsParentTokenSource [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed UndoClicked_WhenRaised_RoutesToControllerWithoutThrowing [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ApplyHighConfidenceFilterAsync_WhenModeEnabled_RemovesBelowThresholdOnce [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ItemsPerLoadValueChanged_WhenRaised_RoutesToSpinnerHandler [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ApplyHighConfidenceFilterAsync_WhenGroupsIsNull_DoesNothing [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ApplyHighConfidenceFilterAsync_WhenQfSettingsIsNull_DoesNotRemove [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ApplyHighConfidenceFilterAsync_WhenModeDisabled_NeverRemoves [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -389,51 +389,51 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed IsAltKeyCommand_WithNone_ReturnsFalse [< 1 ms]
   Passed SkipClicked_WhenRaised_TogglesSkipButtonTextAndEnabled [6 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed FilterAsync_ProbabilityDebugLog_IncludesCallerSubjectEntryIdScoreAndTopFolder [1 ms]
   Passed LoadItemsAsync_PreScored_DoesNotInvokePostUiRemoval [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ButtonSkipHandler_WhenInvoked_TogglesSkipButtonTextAndEnabled [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed CaptureItemSettings_WhenCellStatesPopulated_StoresStates [3 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed CaptureItemSettings_WhenCellStatesNull_StoresNullAndHides [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed CaptureItemSettings_WhenRowStylesNull_ReturnsEarly [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadItemsAsync_MailItemPath_DoesNotApplyPostDisplayHighConfidenceRemoval [3 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -475,198 +475,198 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed InitializeFormControllerDataFieldsWithFactory_ValidatesArguments [1 ms]
   Passed IterateQueueAsync_DataModelComplete [46 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed IterateQueueAsync_QueueEmpty [3 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Cleanup_ExecutesCorrectly [31 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed IterateQueueAsync_Queue2 [8 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Loaded_PropertyWorksCorrectly [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ExplorerController_PropertyWorksCorrectly [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed FormController_PropertyWorksCorrectly [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed KeyboardHandler_PropertyWorksCorrectly [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed DataModel_PropertyWorksCorrectly [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed FilerQueue_PropertyWorksCorrectly [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed IterateQueueAsync_WhenDequeueReturnsFullQualifiedPage_EnqueuesAllItems [11 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed UiScheduler_PropertyWorksCorrectly [8 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Iterate_ExecutesCorrectly [5 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Iterate_HighConfidenceEnabled_DoesNotLoadDirectSynchronousBatch [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Iterate2_ExecutesCorrectly [3 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed SwapStopWatch_ExecutesCorrectly [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed HighConfidencePreFilterLoader_CanBeOverridden_ForTesting [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ClassSelectorSelectedIndexChanged_WithKnownClass_UpdatesActiveErrorAndFormValues [103 ms]
   Passed StopWatch_PropertyWorksCorrectly [18 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed QuickFileMetrics_WRITE_WhenGetCalendarReturnsNull_DoesNotThrow [73 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed TokenSource_PropertyWorksCorrectly [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Token_PropertyWorksCorrectly [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed GetMoveDiagnostics_NullAppointment_DoesNotThrow [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed WorkerComplete_PropertyWorksCorrectly [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed UiSyncContext_PropertyWorksCorrectly [5 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed WriteMetricsAsync_UsesInjectedClock_ForDateAndTimeStamps [14 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Constructor_InitializesCorrectly [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed QuickFileMetrics_WRITE_UsesInjectedClock_ForDataLine [3 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed NonBlockingProducer_DelaySeam_HonorsInjectedTwentyMillisecondDelay [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -771,8 +771,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed MenuItem_MouseLeave_SetsBackColor [< 1 ms]
   Passed Init_InitializesCorrectly [288 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -1128,8 +1128,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed OlvDriversSelectionChanged_WithSelectedToken_PopulatesDriverPresence [590 ms]
   Passed InitAsync_InitializesCorrectly [808 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -1155,8 +1155,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed AssignFolderComboBox_WhenNoPredeterminedFolder_SelectsTopSuggestionViaViewer [1 ms]
   Passed RunAsync_HighConfidenceEnabled_LoadsFirstPageFromStreamingDequeue [1 s]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -1215,8 +1215,8 @@ System.InvalidOperationException: Popup CoreWebView2 initialization completed wi
   Passed PopupHost_WorkerCompletions_RunOnlyWhenCreatorThreadDrainsBoundary [317 ms]
   Passed RunAsync_HighConfidenceDisabled_DoesNotPreFilterUsesPlainOverload [48 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -1241,8 +1241,8 @@ System.InvalidOperationException: Popup CoreWebView2 initialization completed wi
   Passed PendingAutomaticClose_RequestsExplicitCommitWhenHostIsNotOpen [< 1 ms]
   Passed RunAsync_HighConfidenceDisabled_UsesPlainOverloadOnly [20 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -1271,8 +1271,8 @@ System.InvalidOperationException: Popup CoreWebView2 initialization completed wi
   Passed ArrowKeyRight_ThenLeft_ExpandsAndCollapses [9 ms]
   Passed Run_ExecutesCorrectly [15 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -1303,8 +1303,8 @@ System.NullReferenceException: Object reference not set to an instance of an obj
   Passed BindRowsAsync_NullPresentedRows_ThrowsArgumentNullException [1 ms]
   Passed Run_HighConfidenceEnabled_DoesNotLoadUnfilteredInitialBatch [7 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -1322,8 +1322,8 @@ System.NullReferenceException: Object reference not set to an instance of an obj
   Passed Bind_WhenProviderCanceled_PropagatesCancellation [2 ms]
   Passed RunAsync_ExecutesCorrectly [15 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -1409,8 +1409,8 @@ System.InvalidOperationException: Popup CoreWebView2 initialization completed wi
   Passed SetFolderDroppedDownTrue_OpensOnceWithScreenBoundsAndWorkingArea [837 ms]
   Passed Worker_RunWorkerCompleted_HandlesCompletionCorrectly [320 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -1500,28 +1500,28 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
       The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
       the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
       non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
- 
+
       Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
- 
+
       A paid commercial license supports the development and continued increasing support of
       Fluent Assertions users under both commercial and community licenses. Help us
       keep Fluent Assertions at the forefront of unit testing.
- 
+
       For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
- 
- 
+
+
  Debug Trace:
       Warning:
       The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
       the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
       non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
- 
+
       Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
- 
+
       A paid commercial license supports the development and continued increasing support of
       Fluent Assertions users under both commercial and community licenses. Help us
       keep Fluent Assertions at the forefront of unit testing.
- 
+
       For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
 
 
@@ -1597,28 +1597,28 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
       The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
       the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
       non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
- 
+
       Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
- 
+
       A paid commercial license supports the development and continued increasing support of
       Fluent Assertions users under both commercial and community licenses. Help us
       keep Fluent Assertions at the forefront of unit testing.
- 
+
       For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
- 
- 
+
+
  Debug Trace:
       Warning:
       The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
       the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
       non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
- 
+
       Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
- 
+
       A paid commercial license supports the development and continued increasing support of
       Fluent Assertions users under both commercial and community licenses. Help us
       keep Fluent Assertions at the forefront of unit testing.
- 
+
       For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
 
 
@@ -1739,8 +1739,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed People_CollectionChanged_SerializesPeopleDictionary [65 ms]
   Passed Constructor_WithoutLoadBasic_DoesNotMaterializeCollaboratorsUntilForceBasicLoad [343 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,249 DEBUG TaskMaster.AppFileSystemFolderPaths - Error in TryAddSpecialFolder for key name because pathParts has null elements at . AppFileSystemFolderPaths.TryAddSpecialFolder -> AppFileSystemFolderPaths.TryAddSpecialFolder -> AppFileSystemFolderPaths.LoadFolders -> AppFileSystemFolderPaths..ctor -> ApplicationGlobals.LoadBasicMethod -> ApplicationGlobals.<.ctor>b__4_0 -> ApplicationGlobals.ForceBasicLoad -> ApplicationGlobalsTests.Constructor_WithoutLoadBasic_DoesNotMaterializeCollaboratorsUntilForceBasicLoad
 
@@ -1750,8 +1750,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed InitializeEnginesPhaseAsync_InvokesEngineInitializationThroughRealHelper [2 ms]
   Passed LoadAsync_EmitsStartupInboxTimingEnvelopeBeforeDeferredProcessingWindow [361 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,247 DEBUG TaskMaster.AppEvents - [Startup timing] LoadAsync start | startup-active status | threadId=30; syncContext=null; startup-active=True | deferred processing window pending
  2026-07-27 05:24:08,309 DEBUG TaskMaster.AppEvents - [Startup timing] LoadAsync startup hook skipped | startup hook | threadId=30; syncContext=null; startup-active=True | EventsHooked=false
@@ -1776,16 +1776,16 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed FileBackedProperties_WhenPythonStagingMissing_ReturnNullWithoutFilesystemAccess [13 ms]
   Passed RehookAsync_StoreNotFound_LogsAndReturnsWithoutThrowing [5 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,363 WARN TaskMaster.StoreRehookCoordinator - [store-rehook] identity='Mailbox - Test' outcome=StoreNotFound; no live store matched the identity.
 
 
   Passed RehookAsync_TransientTimeout_LogsAndReturnsWithoutThrowing [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,367 ERROR TaskMaster.StoreRehookCoordinator - [store-rehook] identity='Mailbox - Test' storeId='store-1' outcome=TransientTimeout; the store-scoped readiness gate never reported ready within 20 attempts.
 
@@ -1793,8 +1793,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed FileBackedProperties_WhenOnlyFlowFolderExists_StillSkipPythonStagingLoads [7 ms]
   Passed RehookAsync_PermanentErrorFromComException_LogsHResultAndReturnsWithoutThrowing [5 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,371 ERROR TaskMaster.StoreRehookCoordinator - [store-rehook] identity='Mailbox - Test' storeId='store-1' outcome=PermanentError; subsystem=store-hookup; hresult=0x8004010F
  System.Runtime.InteropServices.COMException (0x8004010F): boom
@@ -1810,8 +1810,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed EnsureLogDirectory_DirectoryAlreadyExists_DoesNotCreateAndReturnsFalse [1 ms]
   Passed RehookAsync_PermanentErrorFromNonComException_LogsAndReturnsWithoutThrowing [3 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,377 ERROR TaskMaster.StoreRehookCoordinator - [store-rehook] identity='Mailbox - Test' storeId='store-1' outcome=PermanentError; subsystem=store-hookup; hresult=n/a
  System.InvalidOperationException: boom
@@ -1827,8 +1827,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed EnsureLogDirectory_NullOrBlankPath_ThrowsArgumentException ("") [< 1 ms]
   Passed RehookAsync_Success_LogsAndReturnsWithoutThrowing [8 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,380 DEBUG TaskMaster.StoreRehookCoordinator - [store-rehook] identity='Mailbox - Test' storeId='store-1' outcome=Success
 
@@ -1837,8 +1837,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed EnsureLogDirectory_NullOrBlankPath_ThrowsArgumentException ("   ") [< 1 ms]
   Passed RehookAsync_PublicAdapter_ExtractsIdentityValueDelegatesAndReturnsWithoutThrowing [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,389 DEBUG TaskMaster.StoreRehookCoordinator - [store-rehook] identity='Mailbox - Test' storeId='store-1' outcome=AlreadyHooked
 
@@ -1847,8 +1847,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed EnsureLogDirectoryForPath_MissingDirectory_ResolvesThenCreates [3 ms]
   Passed LoadPeopleAsync_CanLoadProperly [347 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -1860,50 +1860,50 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed SubscribeInboxForStore_WithNullStoreOrInbox_IsNoOp [1 ms]
   Passed LoadIdListAsync_DoesNotReadOutlookApplicationFromWorkerThread [27 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadIdListAsync_ReturnsEmptyWhenAppDataDirectoryMissing [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadIdListFromDisk_ReturnsEmptyWhenJsonDeserializationFails [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadIdListFromDisk_ReturnsEmptyWhenPersistedJsonIsCorrupted [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadIdListFromDisk_ReturnsEmptyWhenReadThrowsIOException [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadIdListFromDisk_ReturnsEmptyWhenIdListFileIsMissing [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadIdListFromDisk_ReturnsPersistedIdsWhenJsonIsValid [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -1911,17 +1911,17 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed CommonWordsSetter_WhenFlowFolderMissing_DoesNotSerializeOrAssignFolder [5 ms]
   Passed LoadIdListAsync_RefreshesFromOutlookOnlyWhenDiskListIsEmpty [7 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadWhenIdle_QueuesTodoAutoFileBatchBeforeEngineAndEvents [127 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
- 2026-07-27 05:24:08,325 DEBUG UtilitiesCS.Threading.ApplicationIdleTimer - ApplicationIdle is subscribing to Idle event. 
+ 2026-07-27 05:24:08,325 DEBUG UtilitiesCS.Threading.ApplicationIdleTimer - ApplicationIdle is subscribing to Idle event.
 TRACE	ApplicationIdleTimer..ctor -> StartTimer()
  2026-07-27 05:24:08,340 DEBUG UtilitiesCS.Threading.IdleAsyncQueue - IdleAsyncQueue.AddEntry subscribed to ApplicationIdleTimer
  2026-07-27 05:24:08,404 ERROR UtilitiesCS.ReusableTypeClasses.SmartSerializableLoader - Error in DeserializeAsync. globals cannot be null
@@ -1934,24 +1934,24 @@ Value cannot be null.
 
   Passed LoadIdListAsync_SkipsOutlookRefreshWhenDiskListAlreadyContainsEntries [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadFolderPredictorAsync_SettingOnWithPersistedFile_PopulatesHolder [490 ms]
   Passed LoadIdListAsync_SkipsOutlookRefreshWhenParentAppIsNull [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadSequentialAsync_KeepsComPhasesOnCallerThreadAndYieldsBetweenHeavyPhases [3 ms]
   Passed LoadFolderPredictorAsync_SettingOnButFileMissing_LeavesHolderNull [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,452 WARN TaskMaster.AppAutoFileObjects - LCPPN predictor file 'LcppnFolder.json' not found or empty; Folder seam falls back to the flat classifier.
 
@@ -1960,8 +1960,8 @@ Value cannot be null.
   Passed LoadSequentialAsync_OffloadsEnginesInitAsyncWithTaskRun [< 1 ms]
   Passed PrivateAsyncLoaders_WhenConfigurationMissing_FailDeterministically [18 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,450 ERROR TaskMaster.AppAutoFileObjects - Recents config not found.
 
@@ -1969,8 +1969,8 @@ Value cannot be null.
   Passed LoadSequentialAsync_RunsAutoFileLoadOnCallerThread [6 ms]
   Passed LoadFolderPredictorAsync_SettingOnButReadThrows_FailsSoftToNull [11 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,454 ERROR TaskMaster.AppAutoFileObjects - Failed to load LCPPN predictor file 'LcppnFolder.json'. Folder seam falls back to the flat classifier.
  System.IO.IOException: simulated unreadable file
@@ -1980,8 +1980,8 @@ Value cannot be null.
 
   Passed BackupLoaders_WithMissingFiles_ReturnEmptyCollections [9 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,463 ERROR TaskMaster.AppAutoFileObjects - File not found C:\TaskMaster\missing-common-words.csv
 
@@ -1989,8 +1989,8 @@ Value cannot be null.
   Passed LoadFolderPredictorAsync_SettingOff_DoesNotLoad [7 ms]
   Passed OlInboxItemsItemAdd_WhenProcessingThrows_ContainsAndDoesNotRethrow [86 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,463 ERROR TaskMaster.AppEvents - OlInboxItems_ItemAdd handler faulted; contained to prevent process termination.
  System.InvalidOperationException: engines unavailable
@@ -2012,24 +2012,24 @@ Value cannot be null.
 
   Passed LoadFolderPredictorAsync_AppDataMissing_FailsSoftToNull [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,475 WARN TaskMaster.AppAutoFileObjects - AppData special folder not resolved; LCPPN predictor not loaded. Folder seam falls back to the flat classifier.
 
 
   Passed OlInboxItemsItemAdd_WhenProcessingNonMailItem_CompletesWithoutException [12 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
- 2026-07-27 05:24:08,478 DEBUG TaskMaster.AppEvents - Skipping item of type olMailItem with Subject: 
+ 2026-07-27 05:24:08,478 DEBUG TaskMaster.AppEvents - Skipping item of type olMailItem with Subject:
 
 
   Passed LoadSequentialAsync_ExecutesRealCoordinatorSequenceThroughPhaseWrappers [29 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,474 DEBUG TaskMaster.ApplicationGlobals - [continuation-resume] priorPhase=IntelConfig waitMs=0.1 resumeThreadId=34 resumeSyncContext=null staIsIdle=False staCpuUsage=212.166 staGuiActivity=0.0
  2026-07-27 05:24:08,475 DEBUG TaskMaster.ApplicationGlobals - [phase-net] phase=IntelConfig grossMs=0.2 storeWrapperInitMs=0.0 netMs=0.2
@@ -2046,36 +2046,36 @@ Value cannot be null.
 
   Passed LoadProjInfoAsync_SkipsRebuildWhenOutlookApplicationIsNull [40 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadProjInfoAsync_SkipsRebuildWhenProjectCountIsNonZero [34 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadProjInfoAsync_RebuildsWhenProjectCountIsZeroAndOutlookApplicationIsAvailable [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadProjInfoAsync_DoesNotReadOutlookApplicationFromWorkerThread [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ProcessNewInboxItemsAsync_BatchesMailboxProcessingAfterInteractiveCheckpoint [427 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,463 DEBUG TaskMaster.AppEvents - [Startup timing] ProcessNewInboxItemsAsync start | startup-active status | threadId=30; syncContext=null; startup-active=True
  2026-07-27 05:24:08,466 DEBUG TaskMaster.AppEvents - [Startup timing] ProcessNewInboxItemsAsync startup inbox restriction start | inbox restriction | threadId=30; syncContext=null; startup-active=True | inboxIndex=1; filter=@SQL="http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/AutoProcessed" is null
@@ -2095,8 +2095,8 @@ Value cannot be null.
 
   Passed ProcessNewInboxItemsAsync_WhenEngineProcessesStartupBatch_LogsSuccessAndDeferredContinuation [150 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,792 DEBUG TaskMaster.AppEvents - [Startup timing] ProcessNewInboxItemsAsync start | startup-active status | threadId=30; syncContext=null; startup-active=True
  2026-07-27 05:24:08,793 DEBUG TaskMaster.AppEvents - [Startup timing] ProcessNewInboxItemsAsync startup inbox restriction start | inbox restriction | threadId=30; syncContext=null; startup-active=True | inboxIndex=1; filter=@SQL="http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/AutoProcessed" is null
@@ -2170,8 +2170,8 @@ Value cannot be null.
 
   Passed LoadAsync_WhenEventsHooked_EmitsStartupHookLifecycleLogs [57 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,911 DEBUG TaskMaster.AppEvents - [Startup timing] LoadAsync start | startup-active status | threadId=30; syncContext=null; startup-active=True | deferred processing window pending
  2026-07-27 05:24:08,912 DEBUG TaskMaster.AppEvents - [Startup timing] LoadAsync startup hook dispatch | startup hook | threadId=30; syncContext=null; startup-active=True
@@ -2191,16 +2191,16 @@ Value cannot be null.
 
   Passed LogStartupTiming_PrefixesPhaseAndIncludesStartupState [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,958 DEBUG TaskMaster.AppEvents - [Startup timing] Hook start | startup hook | threadId=30; syncContext=null; startup-active=True | detail-segment
 
 
   Passed HandleInboxItemAddAsync_WhenCollaboratorThrows_LogsExceptionAndDoesNotRethrow [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,964 ERROR TaskMaster.AppEvents - OlInboxItems_ItemAdd handler faulted; contained to prevent process termination.
  System.ArgumentException: The parameter 'sectionGroupName' is invalid.
@@ -2210,8 +2210,8 @@ Value cannot be null.
 
   Passed HandleToDoItemChangeAsync_WhenCollaboratorThrows_LogsExceptionAndDoesNotRethrow [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:08,967 ERROR TaskMaster.AppEvents - OlToDoItems_ItemChange handler faulted; contained to prevent process termination.
  System.ArgumentException: The parameter 'sectionGroupName' is invalid.
@@ -2242,8 +2242,8 @@ Value cannot be null.
   Passed RibbonFolderOperations_DoNotConstructThrowawayFolderTrees [< 1 ms]
   Passed Init_MaterializingStores_ObservesEnumerationPhaseIdentityInsideMoveNext [9 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:09,133 DEBUG UtilitiesCS.OutlookObjects.Store.StoresWrapper - [store-filter] displayName=Stalling Store exchangeStoreTypeMs=0.2 filePathMs=0.1 included=false rule=PublicFolder
  2026-07-27 05:24:09,134 DEBUG UtilitiesCS.OutlookObjects.Store.StoresWrapper - [store-filter] GetFilteredStores completed: 0 stores in 5 ms
@@ -2251,8 +2251,8 @@ Value cannot be null.
 
   Passed RewireOlObjectsAsync_MaterializingStores_ObservesEnumerationPhaseIdentityInsideMoveNext [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:09,138 DEBUG UtilitiesCS.OutlookObjects.Store.StoresWrapper - [store-filter] displayName=Stalling Store exchangeStoreTypeMs=0.0 filePathMs=0.0 included=false rule=PublicFolder
  2026-07-27 05:24:09,139 DEBUG UtilitiesCS.OutlookObjects.Store.StoresWrapper - [Startup timing] GetFilteredStores completed: 0 stores in 0 ms
@@ -2261,8 +2261,8 @@ Value cannot be null.
 
   Passed Init_HealthyMultiStore_PreservesIncludedSetAndOrder_AndClearsContextAfterReturn [8 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:09,140 DEBUG UtilitiesCS.OutlookObjects.Store.StoresWrapper - [store-filter] displayName=Primary Store exchangeStoreTypeMs=0.0 filePathMs=0.0 included=true rule=Included
  2026-07-27 05:24:09,140 DEBUG UtilitiesCS.OutlookObjects.Store.StoresWrapper - [store-filter] displayName=Archive Store exchangeStoreTypeMs=0.0 filePathMs=0.0 included=true rule=Included
@@ -2298,8 +2298,8 @@ Value cannot be null.
   Passed RewireAfterDeserializeAsync_YieldsBetweenAdapterWrappedStores [< 1 ms]
   Passed RewireAfterDeserializeAsync_PublicEntryRewiresWrappedStores [10 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:09,153 DEBUG UtilitiesCS.OutlookObjects.Store.StoresWrapper - [store-filter] displayName=Primary Store exchangeStoreTypeMs=0.0 filePathMs=0.0 included=true rule=Included
  2026-07-27 05:24:09,154 DEBUG UtilitiesCS.OutlookObjects.Store.StoresWrapper - [Startup timing] GetFilteredStores completed: 1 stores in 0 ms
@@ -2325,8 +2325,8 @@ Value cannot be null.
 
   Passed RewireAfterDeserializeAsync_PublicEntryMultiStoreHitsInnerYieldBranch [10 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:09,164 DEBUG UtilitiesCS.OutlookObjects.Store.StoresWrapper - [store-filter] displayName=Primary Store exchangeStoreTypeMs=0.0 filePathMs=0.0 included=true rule=Included
  2026-07-27 05:24:09,165 DEBUG UtilitiesCS.OutlookObjects.Store.StoresWrapper - [store-filter] displayName=Archive Store exchangeStoreTypeMs=0.0 filePathMs=0.0 included=true rule=Included
@@ -2370,8 +2370,8 @@ Value cannot be null.
 
   Passed LoadAsync_WhenTimingDisabled_RecordsNothingAndEmitsNoTable [10 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:09,175 DEBUG TaskMaster.ApplicationGlobals - [continuation-resume] priorPhase=IntelConfig waitMs=0.0 resumeThreadId=8 resumeSyncContext=null staIsIdle=False staCpuUsage=37.457 staGuiActivity=0.0
  2026-07-27 05:24:09,177 DEBUG TaskMaster.ApplicationGlobals - [phase-net] phase=IntelConfig grossMs=0.1 storeWrapperInitMs=0.0 netMs=0.1
@@ -2388,8 +2388,8 @@ Value cannot be null.
 
   Passed LoadAsync_WhenTimingEnabled_RecordsAllPhasesInStartupOrderWithLoadBasicFirst [5 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:09,185 DEBUG TaskMaster.ApplicationGlobals - [continuation-resume] priorPhase=IntelConfig waitMs=0.0 resumeThreadId=38 resumeSyncContext=null staIsIdle=False staCpuUsage=1.640 staGuiActivity=0.0
  2026-07-27 05:24:09,186 DEBUG TaskMaster.ApplicationGlobals - [phase-net] phase=IntelConfig grossMs=0.0 storeWrapperInitMs=0.0 netMs=0.0
@@ -2415,13 +2415,13 @@ Value cannot be null.
  |  0:00.00  Events       |
  |  0:00.01  TOTAL        |
  ==========================
- 
+
 
 
   Passed LoadAsync_WhenTimingEnabled_EmitsExactlyOneTableWithPhaseNamesAndTotal [9 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:09,191 DEBUG TaskMaster.ApplicationGlobals - [continuation-resume] priorPhase=IntelConfig waitMs=0.0 resumeThreadId=33 resumeSyncContext=null staIsIdle=False staCpuUsage=2.013 staGuiActivity=0.0
  2026-07-27 05:24:09,192 DEBUG TaskMaster.ApplicationGlobals - [phase-net] phase=IntelConfig grossMs=0.0 storeWrapperInitMs=0.0 netMs=0.0
@@ -2447,13 +2447,13 @@ Value cannot be null.
  |  0:00.00  Events       |
  |  0:00.01  TOTAL        |
  ==========================
- 
+
 
 
   Passed LoadAsync_PreservesPhaseOrderingAndYieldCount_WhenTimingOnVersusOff [7 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:09,200 DEBUG TaskMaster.ApplicationGlobals - [continuation-resume] priorPhase=IntelConfig waitMs=0.0 resumeThreadId=10 resumeSyncContext=null staIsIdle=False staCpuUsage=1.248 staGuiActivity=0.0
  2026-07-27 05:24:09,201 DEBUG TaskMaster.ApplicationGlobals - [phase-net] phase=IntelConfig grossMs=0.0 storeWrapperInitMs=0.0 netMs=0.0
@@ -2490,13 +2490,13 @@ Value cannot be null.
  |  0:00.00  Events       |
  |  0:00.00  TOTAL        |
  ==========================
- 
+
 
 
   Passed LoadSequentialAsync_InvokesProbeForEachBoundaryInStartupOrder [3 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:09,209 DEBUG TaskMaster.ApplicationGlobals - [phase-net] phase=IntelConfig grossMs=0.0 storeWrapperInitMs=0.0 netMs=0.0
  2026-07-27 05:24:09,210 DEBUG TaskMaster.ApplicationGlobals - [phase-net] phase=OlObjects grossMs=0.6 storeWrapperInitMs=0.0 netMs=0.6
@@ -2508,8 +2508,8 @@ Value cannot be null.
 
   Passed LoadSequentialAsync_InvokesProbeExactlyOncePerBoundary [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:09,212 DEBUG TaskMaster.ApplicationGlobals - [phase-net] phase=IntelConfig grossMs=0.0 storeWrapperInitMs=0.0 netMs=0.0
  2026-07-27 05:24:09,212 DEBUG TaskMaster.ApplicationGlobals - [phase-net] phase=OlObjects grossMs=0.3 storeWrapperInitMs=0.0 netMs=0.3
@@ -2525,24 +2525,24 @@ Value cannot be null.
   Passed LoadAsync_AssignsStoresWrapperFromConfigAndCompletes [2 ms]
   Passed LoadStoresAsync_WhenConfigMissing_BuildsFreshStoresWrapper [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:09,219 WARN TaskMaster.AppOlObjects - StoresWrapper config not found; rebuilding from live stores.
 
 
   Passed LoadStoresAsync_WhenConfigDeserializesToNull_BuildsFreshStoresWrapper [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:09,221 WARN TaskMaster.AppOlObjects - StoresWrapper config deserialized to null; rebuilding from live stores.
 
 
   Passed LoadStoresAsync_WhenDeserializeThrows_AbsorbsExceptionAndLeavesStoresWrapperNull [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:09,223 ERROR TaskMaster.AppOlObjects - Failed to load StoresWrapper; store settings will remain unavailable until this is resolved. Operation is not valid due to the current state of the object.
  System.InvalidOperationException: Operation is not valid due to the current state of the object.
@@ -2560,8 +2560,8 @@ Value cannot be null.
 Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskTree.Test\bin\Debug\TaskTree.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed BuildFreshStoresWrapper_WhenLiveStoresAvailable_ReturnsInitializedWrapper [16 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2026-07-27 05:24:09,236 DEBUG UtilitiesCS.OutlookObjects.Store.StoresWrapper - [store-filter] displayName=Mailbox exchangeStoreTypeMs=0.2 filePathMs=0.3 included=true rule=Included
  2026-07-27 05:24:09,236 DEBUG UtilitiesCS.OutlookObjects.Store.StoresWrapper - [store-filter] GetFilteredStores completed: 1 stores in 2 ms
@@ -2587,28 +2587,28 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
       The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
       the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
       non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
- 
+
       Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
- 
+
       A paid commercial license supports the development and continued increasing support of
       Fluent Assertions users under both commercial and community licenses. Help us
       keep Fluent Assertions at the forefront of unit testing.
- 
+
       For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
- 
- 
+
+
  Debug Trace:
       Warning:
       The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
       the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
       non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
- 
+
       Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
- 
+
       A paid commercial license supports the development and continued increasing support of
       Fluent Assertions users under both commercial and community licenses. Help us
       keep Fluent Assertions at the forefront of unit testing.
- 
+
       For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
 
 
@@ -2660,8 +2660,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
 Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\TaskVisualization.Test\bin\Debug\TaskVisualization.Test.dll (Workers: 24, Scope: ClassLevel)
   Passed HandleModelDropped_DefaultLocation_ReturnsEarly [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Fired HandleModelDropped
 
@@ -2677,28 +2677,28 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
       The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
       the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
       non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
- 
+
       Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
- 
+
       A paid commercial license supports the development and continued increasing support of
       Fluent Assertions users under both commercial and community licenses. Help us
       keep Fluent Assertions at the forefront of unit testing.
- 
+
       For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
- 
- 
+
+
  Debug Trace:
       Warning:
       The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
       the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
       non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
- 
+
       Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
- 
+
       A paid commercial license supports the development and continued increasing support of
       Fluent Assertions users under both commercial and community licenses. Help us
       keep Fluent Assertions at the forefront of unit testing.
- 
+
       For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
 
 
@@ -2871,8 +2871,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed ToBase10_StateUnderTest_ExpectedBehavior_131Z [< 1 ms]
   Passed IsAncestor_StateUnderTest_ExpectedBehavior [23 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -2880,8 +2880,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed ToBase36_StateUnderTest_ExpectedBehavior_50615 [< 1 ms]
   Passed AddChild_StateUnderTest_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -2889,103 +2889,103 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed ToBase36_StateUnderTest_ExpectedBehavior_37 [< 1 ms]
   Passed AddChild_StateUnderTest_ExpectedBehavior1 [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ToBase36_StateUnderTest_ExpectedBehavior_36 [< 1 ms]
   Passed AddChild_StateUnderTest_ExpectedBehavior2 [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ToBase36_StateUnderTest_ExpectedBehavior_38 [< 1 ms]
   Passed InsertChild_StateUnderTest_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ToBase36_StateUnderTest_ExpectedBehavior_71 [< 1 ms]
   Passed AddChildren_StateUnderTest_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ToBase36_StateUnderTest_ExpectedBehavior_73 [< 1 ms]
   Passed RemoveChild_StateUnderTest_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Traverse_StateUnderTest_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Traverse_StateUnderTest_ExpectedBehavior1 [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed FindByDelegate_StateUnderTest_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed FindByDelegate_StateUnderTest_ExpectedBehavior1 [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Descendents_StateUnderTest_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed FindAll_StateUnderTest_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Flatten_StateUnderTest_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed FlattenIf_StateUnderTest_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Descendents_StateUnderTest_ExpectedBehavior2 [33 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Original Tree
  \-a
@@ -2995,42 +2995,42 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
    | \-f
    \-c
      \-g
- 
+
 Expected Results
  b,d,e,f,c,g
- 
+
 Results
  b,d,e,f,c,g
 
 
   Passed MaxBase_EqualsConverterStringLength_36 [45 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
       Warning:
       The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
       the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
       non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
- 
+
       Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
- 
+
       A paid commercial license supports the development and continued increasing support of
       Fluent Assertions users under both commercial and community licenses. Help us
       keep Fluent Assertions at the forefront of unit testing.
- 
+
       For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
       Warning:
       The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
       the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
       non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
- 
+
       Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
- 
+
       A paid commercial license supports the development and continued increasing support of
       Fluent Assertions users under both commercial and community licenses. Help us
       keep Fluent Assertions at the forefront of unit testing.
- 
+
       For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
 
 
@@ -3093,8 +3093,8 @@ Results
   Passed Queries_WithDuplicateMissingAndCaseVariants_ReturnExpectedMatches [10 ms]
   Passed ProgramsByProjectNames_WithNullInput_ReturnsEmptyString [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Object reference not set to an instance of an object.
     at ToDoModel.ProjectData.Programs_ByProjectNames(String projectNames) in C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\ToDoModel\Data Model\Project\ProjectData.cs:line 331
@@ -3108,15 +3108,15 @@ Results
   Passed GetAsyncEnumerableOfToDoItemsInView_WhenStoreIdExcluded_DoesNotResolveExcludedStoreFolder [4 ms]
   Passed People_Deserialize_CanDeserializePatternCorrectly [464 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed People_DeserializeShortcut_CanDeserializePatternCorrectly [16 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -3175,28 +3175,28 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
       The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
       the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
       non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
- 
+
       Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
- 
+
       A paid commercial license supports the development and continued increasing support of
       Fluent Assertions users under both commercial and community licenses. Help us
       keep Fluent Assertions at the forefront of unit testing.
- 
+
       For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
- 
- 
+
+
  Debug Trace:
       Warning:
       The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
       the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
       non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
- 
+
       Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
- 
+
       A paid commercial license supports the development and continued increasing support of
       Fluent Assertions users under both commercial and community licenses. Help us
       keep Fluent Assertions at the forefront of unit testing.
- 
+
       For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
 
 
@@ -3286,8 +3286,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed ProcessQueue_StateUnderTest_ExpectedBehavior [122 ms]
   Passed WriteJson_StateUnderTest_ExpectedBehavior [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -3326,8 +3326,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed Get_WhenCoordinatesAreOutOfBounds_ThrowsMessageWithExceededDimension [< 1 ms]
   Passed ProcessQueue_StateUnderTest_MalformedEntry1 [38 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error converting to int at line 0 in CtfIncidence.TryDequeueIncidence of the backup loader
 
@@ -3338,8 +3338,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed DefaultConstructor_CreatesEmptyMatrix [< 1 ms]
   Passed ProcessQueue_StateUnderTest_MalformedEntry2 [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error dequeuing at line 0 in CtfIncidence.TryDequeueIncidence of the backup loader
 
@@ -3354,8 +3354,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed To2d_ConvertsRectangularJaggedArrayToMultidimensionalArray [< 1 ms]
   Passed TryDequeueIncidence_HandlesIncompleteQueue [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error dequeuing at line 0 in CtfIncidence.TryDequeueIncidence of the backup loader
 
@@ -3364,8 +3364,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed Constructor_WithNullFactory_ReturnsDefaultValueWhenEvaluated [< 1 ms]
   Passed TryDequeueIncidence_HandlesIncorrectType1 [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error converting to int at line 0 in CtfIncidence.TryDequeueIncidence of the backup loader
 
@@ -3373,8 +3373,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed Constructors_WithThreadSafetyOptions_StillEvaluateSuccessfully [8 ms]
   Passed TryDequeueIncidence_HandlesIncorrectType2 [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error converting to int at line 0 in CtfIncidence.TryDequeueIncidence of the backup loader
 
@@ -3404,8 +3404,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed PeekAndPop_WithOutOfRangeIndex_ThrowIndexOutOfRangeException [1 ms]
   Passed EmptyStackOperations_ReturnSentinelValueWithoutThrowing [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Stack is empty
  Stack is empty now
@@ -3478,8 +3478,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed Value_Setter_UpdatesStoredValue [< 1 ms]
   Passed SimpleConversionTest [320 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿JSON Object
  {
@@ -3587,8 +3587,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed Previous_OnStandaloneNode_ReturnsNull [< 1 ms]
   Passed ReadJson_StateUnderTest_ExpectedBehavior [85 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -3984,8 +3984,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed SerializeToStream_WithTypeNameHandlingNone_UsesNonAutoBranch [< 1 ms]
   Passed ValidPropertyArgs_rejects_missing_required_inputs [26 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Argument value=123 is of type System.Int32 which is not assignable to olText which is of type System.String.Stack Trace: UtilitiesCS.dll.ValidPropertyArgs -> UserDefinedFieldsTests.ValidPropertyArgs_rejects_missing_required_inputs
 
@@ -4082,8 +4082,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed Equals_ShouldReturnFalse_WhenOtherIsNull [< 1 ms]
   Passed ValidPropertyArgs_WhenWrongTypeForField_ShouldReturnFalse [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Argument value=not-a-bool is of type System.String which is not assignable to olYesNo which is of type System.Boolean.Stack Trace: UtilitiesCS.dll.ValidPropertyArgs -> UserDefinedFieldsTests.ValidPropertyArgs_WhenWrongTypeForField_ShouldReturnFalse
 
@@ -4300,8 +4300,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed AsyncLazyUsage_UseResource_CompletesForInternalSampleAsync [1 ms]
   Passed Extract_Test_EmailReadable_All [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Target: Type: Microsoft.Office.Interop.Outlook.MailItem, Subject: TestSubjectString, Date: 12-25-2025 12:05 PM
  Test: Type: Microsoft.Office.Interop.Outlook.MailItem, Subject: TestSubjectString, Date: 12-25-2025 12:05 PM
@@ -4511,8 +4511,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed BuildRow_WithNullArguments_ThrowsArgumentNullException [1 ms]
   Passed TotalWork_WhenWrappingTaskLikeItem_ShouldIgnoreSetterFailure [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error setting TotalWork to value 45
 
@@ -4578,8 +4578,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed GetGlobalAddressList_WithNullStore_ThrowsArgumentNullException [1 ms]
   Passed NoConflicts_WhenConflictLookupThrows_ShouldReturnFalse [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  1
 
@@ -4660,8 +4660,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed ViewMessage_RoundTripsModeOpenAndStableIdentities ("Collapsed",False) [16 ms]
   Passed JoinFixedWidth_FormatsColumnsWithDividers [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  [A    |   BB| CCC [
 
@@ -4675,8 +4675,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed Constructor_WithHasChildrenFalse_ClearsExpandAffordanceFlag [< 1 ms]
   Passed JoinFixedWidth_SingleCell_FormatsCorrectly [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  |X  |
 
@@ -4713,8 +4713,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed GetMailItemList_NotStrict_NullDf_ReturnsEmptyList [< 1 ms]
   Passed TrySetUdf_WhenValueTypeIsWrongForOlUdfType_ShouldReturnFalse [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Argument value=not-a-number is of type System.String which is not assignable to olNumber which is of type System.Double.Stack Trace: UtilitiesCS.dll.ValidPropertyArgs -> UtilitiesCS.dll.TrySetUdf -> UserDefinedFieldsTests.TrySetUdf_WhenValueTypeIsWrongForOlUdfType_ShouldReturnFalse
 
@@ -4882,8 +4882,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed FilterConversation_MailOnlyTrue_FiltersToIPMNote [< 1 ms]
   Passed NoConflicts_WhenItemIsUnsupported_ShouldReturnFalse [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  2
 
@@ -4983,8 +4983,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed FakeDispatcherYield_CanceledTokenThrows [21 ms]
   Passed TrySetUdf_WhenFindThrowsException_ShouldReturnFalse [150 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error in set user property: COM error
  Call Stack:    at Moq.Behaviors.ThrowException.Execute(Invocation invocation) in /_/src/Moq/Behaviors/ThrowException.cs:line 22
@@ -5003,8 +5003,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed SetSuggestions_UnresolvablePath_FallsBackToPlainRowPreservingThePath [1 ms]
   Passed SetUdf_WhenValueTypeIsWrongForOlUdfType_ShouldThrowArgumentException [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Argument value=not-a-number is of type System.String which is not assignable to olNumber which is of type System.Double.Stack Trace: UtilitiesCS.dll.ValidPropertyArgs -> UtilitiesCS.dll.SetUdf -> <>c__DisplayClass45_0.<SetUdf_WhenValueTypeIsWrongForOlUdfType_ShouldThrowArgumentException>b__0 -> UserDefinedFieldsTests.SetUdf_WhenValueTypeIsWrongForOlUdfType_ShouldThrowArgumentException
 
@@ -5273,20 +5273,20 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed Constructor_CreatesInstanceWithClient [1 ms]
   Passed ConversationCt_MailItem_WithConversation_EmptyTable_ReturnsZero [16 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
- Col1  Col2  Col3  Col4  Col5  Col6  Col7  Col8  Col9  
- 
+ Col1  Col2  Col3  Col4  Col5  Col6  Col7  Col8  Col9
+
 
 
   Passed ConversationCt_MailItem_NoFilters_ReturnsZero [6 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
- Col1  Col2  Col3  Col4  Col5  Col6  Col7  Col8  Col9  
- 
+ Col1  Col2  Col3  Col4  Col5  Col6  Col7  Col8  Col9
+
 
 
   Passed GetConversationDf_MailItem_NullConversation_ReturnsNull [< 1 ms]
@@ -5296,8 +5296,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed GetConversationDf_MailItem_WithConversation_EmptyTable_ReturnsEmptyDf [11 ms]
   Passed ReadPropertyName_ValidInput_Success [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5307,15 +5307,15 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed GetConversationTable_SetsUpColumnsAndRemovesEntryID [1 ms]
   Passed ReadPropertyName_NullValue_Failure [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ReadPropertyName_WrongType_Failure [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5323,52 +5323,52 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed GetConversationDf_MailItemPath_COMException_ReturnsNull [< 1 ms]
   Passed ReadPropertyValue_ValidInput_Success [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ReadPropertyValue_WrongType_Failure [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed GetDataFrameAsync_NullFromTimeout_ReturnsNull [1 ms]
   Passed ExtractFolderPath_WithKnownSpecialFolder_CombinesRelativePath [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ExtractFolderPath_WithUnknownSpecialFolder_ReturnsNull [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ExtractFolderPath_WithMissingSpecialFolderName_ReturnsNull [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadRelativePath_WhenFolderPathEqualsRootPath_ReturnsFullPath [108 ms]
   Passed ExtractFileName_WhenFileNamePresent_ReturnsValue [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed EnumerateColumnHeaders_FormatsHeaders [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  [Name      |      Date[
  [Name      |      Date[
@@ -5379,8 +5379,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed LoadRelativePath_WhenFolderPathDoesNotContainRootPath_ReturnsFullPath [4 ms]
   Passed ExtractFileName_WhenFileNameMissing_ThrowsJsonReaderException [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5392,8 +5392,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed FilterSelected_WhenSomeNodesSelected_ReturnsOnlySelectedSubtree [121 ms]
   Passed GetSerializablePath_WithMatchingSpecialFolder_ReturnsNameAndRelativePath [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5401,15 +5401,15 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed LoadRelativePath_WhenFolderIsNull_ReturnsNull [< 1 ms]
   Passed GetSerializablePath_WithNoMatch_ReturnsNotFoundAndFullPath [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed SetUdMailItem_WhenArgsAreInvalid_ShouldReturnFalse [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Argument value=not-a-number is of type System.String which is not assignable to olNumber which is of type System.Double.Stack Trace: UtilitiesCS.dll.ValidPropertyArgs -> UtilitiesCS.dll.SetUdf -> UserDefinedFieldsTests.SetUdMailItem_WhenArgsAreInvalid_ShouldReturnFalse
 
@@ -5418,8 +5418,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed State_WhenOlFolderChanges_ResetLazyReloadsNameAndRelativePath [< 1 ms]
   Passed ExtractFolderPath_StringOverload_WithNoneSpecialFolder_ReturnsRelativePath [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5440,8 +5440,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed ToCompositionOld_ExtractsDictionaryEntries [< 1 ms]
   Passed SetUdf_AppointmentItem_WhenArgsAreInvalid_ShouldReturnFalse [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Argument value=not-a-number is of type System.String which is not assignable to olNumber which is of type System.Double.Stack Trace: UtilitiesCS.dll.ValidPropertyArgs -> UtilitiesCS.dll.SetUdf -> UserDefinedFieldsTests.SetUdf_AppointmentItem_WhenArgsAreInvalid_ShouldReturnFalse
 
@@ -5457,8 +5457,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed Constructor_WithMultipleRoots_RemovesNestedSubsetRoots [4 ms]
   Passed SetUdf_AppointmentItem_WhenFindThrows_ShouldReturnFalse [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error in set user property: COM error
  Call Stack:    at Moq.Behaviors.ThrowException.Execute(Invocation invocation) in /_/src/Moq/Behaviors/ThrowException.cs:line 22
@@ -5477,8 +5477,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed EmitNewClass_CreatesType [2 ms]
   Passed SetUdf_MeetingItem_WhenArgsAreInvalid_ShouldReturnFalse [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Argument value=not-a-number is of type System.String which is not assignable to olNumber which is of type System.Double.Stack Trace: UtilitiesCS.dll.ValidPropertyArgs -> UtilitiesCS.dll.SetUdf -> UserDefinedFieldsTests.SetUdf_MeetingItem_WhenArgsAreInvalid_ShouldReturnFalse
 
@@ -5495,8 +5495,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed Trace_WhenMessageContainsFilterTerm_DoesNotInvokeLog [< 1 ms]
   Passed SetUdf_MeetingItem_WhenFindThrows_ShouldReturnFalse [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error in set user property: COM error
  Call Stack:    at Moq.Behaviors.ThrowException.Execute(Invocation invocation) in /_/src/Moq/Behaviors/ThrowException.cs:line 22
@@ -5514,8 +5514,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed Trace_WhenLogIsNull_DoesNotThrow [< 1 ms]
   Passed SetUdf_TaskItem_WhenArgsAreInvalid_ShouldReturnFalse [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Argument value=not-a-number is of type System.String which is not assignable to olNumber which is of type System.Double.Stack Trace: UtilitiesCS.dll.ValidPropertyArgs -> UtilitiesCS.dll.SetUdf -> UserDefinedFieldsTests.SetUdf_TaskItem_WhenArgsAreInvalid_ShouldReturnFalse
 
@@ -5534,8 +5534,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed WriteJson_ValidInput_DelegatesToOnWriteJson [< 1 ms]
   Passed SetUdf_TaskItem_WhenFindThrows_ShouldReturnFalse [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error in set user property: COM error
  Call Stack:    at Moq.Behaviors.ThrowException.Execute(Invocation invocation) in /_/src/Moq/Behaviors/ThrowException.cs:line 22
@@ -5553,8 +5553,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed ReadJson_ResetsGuardAfterRead_CanReadAgain [< 1 ms]
   Passed Constructor_DefaultConstructor_CreatesInstance [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5567,8 +5567,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed ReadJson_WhenOnReadJsonThrows_GuardIsReset [< 1 ms]
   Passed CanRead_Default_ReturnsBaseCanRead [6 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5576,8 +5576,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed ReadRecords_IncludedStore_ReadsPrimitiveRootMetadata [338 ms]
   Passed SetUdf_ObsoleteObjectOverload_WhenItemIsNonCOM_ShouldReturnFalse [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error in set user property: Member 'Object.UserProperties' not found.
  Call Stack:    at UtilitiesCS.OutlookItem.GetPropertyValue[T](String propertyName) in C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\UtilitiesCS\OutlookObjects\Item\OutlookItem.cs:line 394
@@ -5621,23 +5621,23 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed IsAnImage_WhenNullExtension_ShouldReturnFalse [< 1 ms]
   Passed Constructor_Default_InitializesCoDictionary [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ToComposition_ShouldExtractScDictionaryAndFields [46 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed EmitOperand_InlineMethod_MethodInfo_EmitsWithoutThrow [1 ms]
   Passed Constructor_DefaultConstructor_CreatesInstance [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5655,8 +5655,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed EmitOperand_ShortInlineBrTarget_EmitsWithoutThrow [1 ms]
   Passed ToDerived_ShouldRecreateScDictionaryDerivative [9 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5683,8 +5683,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed GetHeadersExtendedMapi_ShouldReturnPropertyAccessorValue [1 ms]
   Passed ToComposition_ShouldExtractDictionaryAndAdditionalFields [11 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5696,8 +5696,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed IsValid_WhenInnerObjectIsPost_ShouldReturnTrue [< 1 ms]
   Passed WriteJson_DictionaryWithEntries_ProducesJson [21 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5717,8 +5717,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed Operand_SetAndGet_ReturnsExpected [< 1 ms]
   Passed WriteJson_EmptyDictionary_ProducesJson [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5732,8 +5732,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed ProcessSpecialTypes_Int32_ReturnsInt [< 1 ms]
   Passed ToDerived_ShouldRecreateDerivedInstance [12 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5741,8 +5741,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed GetBytes_WhenNonByValueTempPathReadFails_FallsBackToAccessor [7 ms]
   Passed ReadJson_NullWrapper_ReturnsNull [8 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5754,15 +5754,15 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed InitAsync_WithFromFieldAndUnsupportedObject_ThrowsArgumentException [1 ms]
   Passed EndToEnd_ShouldRecreateDerivedInstance [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed CompileType_ShouldCreateTypeWithAdditionalFields [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5777,8 +5777,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed InitializeFromEmail_WhenNullPassed_ThrowsArgumentException [< 1 ms]
   Passed ConvertToNewClassInstance_ShouldCreateInstanceWithFields [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5790,8 +5790,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed GetCode_WithTokenTypeOperand_ShowsFullName [< 1 ms]
   Passed ReplicateProperty_WithExplicitField_CreatesRoundTrippableProperty [11 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5802,8 +5802,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed GetCode_LargeOffset_FormatsCorrectly [< 1 ms]
   Passed ReplicateProperty_WhenSetterIsMissing_ThrowsInvalidOperationException [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5815,8 +5815,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed TryFromSaveAsLoad_WhenSaveAsFileThrows_ReturnsFalseAndNullBytes [1 ms]
   Passed ReplicateProperty_WhenGetterIsMissing_ThrowsInvalidOperationException [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5828,24 +5828,24 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed GetCode_WithConstructorOperand_ShowsInstanceConstructorSignature [< 1 ms]
   Passed GetBackingField_WhenPropertyHasBackingField_ReturnsUnderlyingField [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ConstructInstructions_WithMetadataOperands_ResolvesFieldMethodAndType [2 ms]
   Passed RoundTrip_DictionaryWithEntries_PreservesData [20 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed EmitOperand_InlineTok_InvalidOperand_ThrowsInvalidCastException [1 ms]
   Passed GetBackingField_WhenGetterIsMissing_ThrowsInvalidOperationException [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -5962,8 +5962,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed WithProgressReporting_WithCountCallback_HandlesEmptySource [6 ms]
   Passed CreateCategory_WhenAddThrows_ReturnsNull [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Add failed
     at Moq.Behaviors.ThrowException.Execute(Invocation invocation) in /_/src/Moq/Behaviors/ThrowException.cs:line 22
@@ -5983,8 +5983,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed ToConcurrentDictionary_WhenDuplicateKeysExist_ThrowsInvalidOperationException [8 ms]
   Passed FrexpTest [49 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Actual: System.Collections.Generic.List`1[System.ValueTuple`2[System.Double,System.Int32]]
  Expected: System.ValueTuple`2[System.Double,System.Int32][]
@@ -6127,15 +6127,15 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed GetAncestor_ChainWithNoMatchingType_ReturnsNullWithoutThrowing [4 ms]
   Passed ExtractLinks_StateUnderTest_ExpectedBehavior [509 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 Expected:
  ( 10z Week 38 Rollback CID.xlsx, https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EVpXvJ8dfZ9DmaoSjGJ16uIBuc7kN7LG9esDj9pciuoriA)
  ( Snackers Week 37 Rollback CID.xlsx, https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EZckiLtanGtMjumaLHLwsCsBwQsHSfAuMpzsMyfcIPUTdg?email=dmoisan%40sabra.com&e=YRrQJk)
  (trindels@sabra.com, mailto:chollingsworth@sabra.com)
- 
+
 Actual:
  ( 10z Week 38 Rollback CID.xlsx, https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EVpXvJ8dfZ9DmaoSjGJ16uIBuc7kN7LG9esDj9pciuoriA)
  ( Snackers Week 37 Rollback CID.xlsx, https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EZckiLtanGtMjumaLHLwsCsBwQsHSfAuMpzsMyfcIPUTdg?email=dmoisan%40sabra.com&e=YRrQJk)
@@ -6146,14 +6146,14 @@ Actual:
   Passed AutoFindPeople_WhenMissingRecipientsAndNotifyEnabled_ShowsUnknownRecipientsDialog [47 ms]
   Passed FilterLinksByDomain_StateUnderTest_ExpectedBehavior [9 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 Expected:
  ( 10z Week 38 Rollback CID.xlsx, https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EVpXvJ8dfZ9DmaoSjGJ16uIBuc7kN7LG9esDj9pciuoriA)
  ( Snackers Week 37 Rollback CID.xlsx, https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EZckiLtanGtMjumaLHLwsCsBwQsHSfAuMpzsMyfcIPUTdg?email=dmoisan%40sabra.com&e=YRrQJk)
- 
+
 Actual:
  ( 10z Week 38 Rollback CID.xlsx, https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EVpXvJ8dfZ9DmaoSjGJ16uIBuc7kN7LG9esDj9pciuoriA)
  ( Snackers Week 37 Rollback CID.xlsx, https://sabradipping.sharepoint.com/:x:/s/Sales-LargeFormatTeam2/EZckiLtanGtMjumaLHLwsCsBwQsHSfAuMpzsMyfcIPUTdg?email=dmoisan%40sabra.com&e=YRrQJk)
@@ -6171,8 +6171,8 @@ Actual:
   Passed GroupBoxEnterHandler_WithInactiveBox_SetsHighlightColors [1 ms]
   Passed FilterView_WithJetFilter_AppendsParenthesizedTriageClause [16 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  [Subject] = 'Roadmap'
 
@@ -6235,8 +6235,8 @@ Actual:
   Passed HelperMethods_ReturnDeterministicPrefixAndTimestampSuffixShape [< 1 ms]
   Passed ToComposition_FromPeopleScoDictionary_ExtractsEntries [25 s]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -6246,8 +6246,8 @@ Actual:
   Passed UpdateOrRemove_RemovesOrUpdatesBasedOnCondition [10 ms]
   Passed ToComposition_SetsRemainingObject [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -6257,38 +6257,38 @@ Actual:
   Passed Show_Init_ChangeFolders_ActivateNetAndSave_PersistsUpdatedConfig [25 s]
   Passed WriteJson_ValidPeopleScoDictionary_ProducesJson [25 s]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed DefaultConstructor_CreatesInstance [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed AddRecents_WhenRecentsExist_AppendsHeaderAndEntries [6 ms]
   Passed ToDerived_FromWrapper_RecreatesDictionary [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ThrowIfNullOrEmpty_ForStringsInAsyncMethod_UsesArgumentExpression [10 ms]
   Passed Constructor_ShouldInitializeParent [6 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Constructor_WithTag_InitializesProperties [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -6296,8 +6296,8 @@ Actual:
   Passed Constructor_WithMaxFoldersPerConversation_SetsMaxAndInitializesCollections [< 1 ms]
   Passed Constructor_WithTagAndParent_SetsParent [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -6305,15 +6305,15 @@ Actual:
   Passed AddSuggestions_WhenSuggestionsExist_AppendsHeaderAndTopSuggestions [3 ms]
   Passed ToDerived_WithWrapperParam_RecreatesDictionary [3 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Tag_GetSet_RoundTrips [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -6328,8 +6328,8 @@ Actual:
   Passed FindID_WhenConversationIsMissing_ReturnsMinusOne [< 1 ms]
   Passed MatchEmailCount_GetSet_RoundTrips [6 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -6337,8 +6337,8 @@ Actual:
   Passed CopyToAsync_ShouldThrowWhenCancellationIsRequestedBeforeCopy [8 ms]
   Passed FromTokenBase_WithNullParent_ThrowsArgumentNullException [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -6347,16 +6347,16 @@ Actual:
   Passed CTF_Incidence_INIT_ResetsTrackedSlotsToSentinels [< 1 ms]
   Passed FromTokenBase_WithNullTag_ThrowsArgumentNullException [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed CtfIncidencePositionAdd_WhenCountBelongsInMiddle_InsertsInDescendingOrder [< 1 ms]
   Passed FromTokenBase_WithNullMatches_ThrowsArgumentNullException [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -6364,15 +6364,15 @@ Actual:
   Passed DefaultOn_NoHeldPredictor_FallsBackToFlat [8 ms]
   Passed ToComposition_ShouldExtractScDictionaryAndFields [25 s]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed FromTokenBase_WithZeroEmailCount_ThrowsArgumentOutOfRangeException [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -6380,15 +6380,15 @@ Actual:
   Passed InheritedListOperations_AllowAddRemoveAndDuplicateEntries [< 1 ms]
   Passed FromTokenBase_WithValidParams_CreatesClassifier [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed TryDequeueIncidence_WithOverflowCount_ReturnsNull [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error converting to int at line 0 in CtfIncidence.TryDequeueIncidence of the backup loader
 
@@ -6418,8 +6418,8 @@ Actual:
   Passed StripCommonWords_WithSerializableListOverload_DelegatesToListImplementation [< 1 ms]
   Passed FilterViewAsync_ShouldCallFilterView [49 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿[Triage] = 'A'
 
@@ -6435,8 +6435,8 @@ Actual:
   Passed Add_StateUnderTest_AddToExisting [< 1 ms]
   Passed FilterView_ShouldCallFilterViewWithTriageValues [3 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿[Triage] = 'A'
 
@@ -6452,16 +6452,16 @@ Actual:
   Passed Add_WhenEntryAlreadyExists_AccumulatesEmailCount [< 1 ms]
   Passed FromTokenBase_AddToParent_UpdatesSharedTokenBase [43 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed FolderRowArray_WithSuggestionsAndRecents_MatchesFolderArrayTextAndTagsKinds [25 s]
   Passed ProcessQueue_StateUnderTest_MalformedEntry1 [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error converting to int at line 0 in CtfMapEntry.TryDequeueEntry of the backup loader
 
@@ -6469,15 +6469,15 @@ Actual:
   Passed Add_WhenEntryDoesNotExist_CreatesNewEntry [< 1 ms]
   Passed Train_AddTokensToClassifier_UpdatesMatchCount [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ProcessQueue_StateUnderTest_MalformedEntry2 [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error converting to int at line 0 in CtfMapEntry.TryDequeueEntry of the backup loader
 
@@ -6488,8 +6488,8 @@ Actual:
   Passed ProcessQueue_WithValidEntries_ReturnsAllEntries [< 1 ms]
   Passed TryDequeueEntry_StateUnderTest_IncompleteQueue [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error dequeuing at line 0 in CtfMapEntry.TryDequeueEntry of the backup loader
 
@@ -6497,16 +6497,16 @@ Actual:
   Passed TryDequeueEntry_WithValidEntry_ReturnsEntry [< 1 ms]
   Passed TryDequeueEntry_StateUnderTest_IncorrectType1 [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error converting to int at line 0 in CtfMapEntry.TryDequeueEntry of the backup loader
 
 
   Passed TryDequeueEntry_WithInvalidIntegerFormat_ReturnsNull [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error converting to int at line 0 in CtfMapEntry.TryDequeueEntry of the backup loader
 
@@ -6514,8 +6514,8 @@ Actual:
   Passed OlFolderTreePropertyChanged_WhenUpdateIsFalse_SyncsRemapTreeAndUpdatesViewer [21 ms]
   Passed TryDequeueEntry_StateUnderTest_IncorrectType2 [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error converting to int at line 0 in CtfMapEntry.TryDequeueEntry of the backup loader
 
@@ -6529,16 +6529,16 @@ Actual:
   Passed HandleModelCanDrop_WhenSourceContainsTarget_SetsCannotDropOnSelfMessage [1 ms]
   Passed FilterView_WithTriageValues_ShouldApplyFilter [16 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿[Triage] = 'A'
 
 
   Passed TryDequeueEntry_WithOverflowInteger_ReturnsNull [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Error converting to int at line 0 in CtfMapEntry.TryDequeueEntry of the backup loader
 
@@ -6547,8 +6547,8 @@ Actual:
   Passed HandleModelCanDrop_WhenTargetAlreadyMapped_SetsInfoMessageAboutExistingMapping [< 1 ms]
   Passed ParseAndStripFilter_ShouldReturnStrippedFilter [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -6558,8 +6558,8 @@ Actual:
   Passed PrivateHelpers_ArrayToQueueAndReadFileToArray_CoverRemainingFileBranches [1 ms]
   Passed ParseAndStripFilter_ShouldReturnStrippedFilter2 [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿("http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Actionable" LIKE '%Task%' AND ("http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage" LIKE '%A%' OR "http://schemas.microsoft.com/mapi/string/{00020329-0000-0000-C000-000000000046}/Triage" = 'B'))
  ()
@@ -6574,8 +6574,8 @@ Actual:
 
   Passed PythonIntegrationTest [91 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿===============================================
  |         Probability Integration Test        |
@@ -6586,14 +6586,14 @@ Actual:
  | a and b     0.032525  0.032525      -       |
  | d, a and b  0.233942  0.233942      -       |
  ===============================================
- 
+
 
 
   Passed ReadTextFile_WhenFileIsMissing_ThrowsFileNotFoundException [< 1 ms]
   Passed ParseAndStripFilter_WithEmptyString_ShouldReturnEmpty [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -6603,15 +6603,15 @@ Actual:
   Passed IsEntryID_StateUnderTest_FewerCharacters [3 ms]
   Passed ParseAndStripFilter_WithNoTriageReferences_ShouldReturnOriginal [3 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Constructor_InitializesEmptyClassifiers [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -6620,16 +6620,16 @@ Actual:
   Passed Constructor_WithPrefix_PopulatesPrefixedRepresentationsWhenListChanges [< 1 ms]
   Passed Train_NewTag_CreatesClassifier [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed HandleModelDropped_WithBackgroundLocation_DoesNotAlterMappings [1 ms]
   Passed ParseAndStripFilter_WithSingleTriageEquals_ShouldRemoveIt [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -6639,24 +6639,24 @@ Actual:
   Passed ListSetter_WithNullValue_ClearsExistingItems [< 1 ms]
   Passed StripFilter_WithNullParent_ShouldReturnNull [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Analyze_WithUnsupportedEngine_ReturnsEmptyResult [< 1 ms]
   Passed TrainMultiTag_MultipleTags_CreatesAllClassifiers [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ListWithPrefix_WhenMutated_UpdatesListWithoutPrefixes [< 1 ms]
   Passed StripFilter_WithNoMatch_ShouldReturnOriginalTree [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -6666,8 +6666,8 @@ Actual:
   Passed Constructor_WithCategoryString_ParsesKnownFlagsAndExposesTranslators [2 ms]
   Passed StripFilter_WithMatchAndParent_ShouldRemoveNode [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -6676,40 +6676,40 @@ Actual:
   Passed Constructor_WithCategoryList_NormalizesCategoryNamesFromParsedFlags [< 1 ms]
   Passed FilterView_WithEmptyTriageValues_ShouldNotThrow [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed UnTrain_ExistingTag_ReducesOrRemoves [6 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed GetFolder_WithThrowExFalse_WhenFolderMissing_UsesPromptSeamAndReturnsNull [1 ms]
   Passed UnTrain_MissingTag_NoOp [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed GetMatchProbability_StateUnderTest_ExpectedBehavior [106 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
- ﻿Integration test of GetMatchProbability method which 
+ ﻿Integration test of GetMatchProbability method which
 calls GetProbabilityList and CombineProbabilities
- 
+
 SOURCE PROBABILITY TOKENS:
 [dedicated7,dedicated8,shared2,shared1,shared7,shared8]
- 
+
 SHARED TOKENS:
 [shared1,shared2,shared3,shared4,shared5,shared6,shared7,shared8]
- 
+
 DEDICATED TOKENS:
 [dedicated6,dedicated2,dedicated7,dedicated3,dedicated8,dedicated4,dedicated5,dedicated1]
  ============================
@@ -6723,7 +6723,7 @@ DEDICATED TOKENS:
  | shared7          0.3333  |
  | shared8          0.3333  |
  ============================
- 
+
  ===================================
  |         Probability List        |
  | Class              Probability  |
@@ -6736,15 +6736,15 @@ DEDICATED TOKENS:
  | .28571shared11          0.7143  |
  | .33333shared76          0.3333  |
  ===================================
- 
+
  Expected: 0.39182
  Actual:   0.39182
 
 
   Passed FilterView_WhenExplorerIsNull_ShouldReturnGracefully [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -6753,24 +6753,24 @@ DEDICATED TOKENS:
   Passed Constructor_WithItemInfo_MapsAllSupportedProperties [3 ms]
   Passed ParseAndStripFilter_WithUnsupportedAndSupportedClauses_StripsTriagePreservesSupported [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed PilDecodeParts_WithOversizedAttachment_AddsBigImageToken [3 ms]
   Passed UnTrainMultiTag_ReducesCountAndTokenBase [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Constructor_WithOutlookCategoryList_PopulatesOlCategoriesAndSelection [7 ms]
   Passed TrainSelectionAsync_ShouldTrainSelection [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -6785,10 +6785,10 @@ DEDICATED TOKENS:
   Passed TodayAndBullpin_Setters_ProxyToUnderlyingFlags [< 1 ms]
   Passed GetMatchProbability_StateUnderTest_ExpectedBehavior [38 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
- ﻿Integration test of GetMatchProbability method which 
+ ﻿Integration test of GetMatchProbability method which
 calls GetProbabilityList and CombineProbabilities
  ============================
  | Source token probability |
@@ -6801,7 +6801,7 @@ calls GetProbabilityList and CombineProbabilities
  | shared7          0.3333  |
  | shared8          0.3333  |
  ============================
- 
+
  ======================
  |    Shared tokens   |
  | Token       Count  |
@@ -6823,7 +6823,7 @@ calls GetProbabilityList and CombineProbabilities
  | dedicated4      6  |
  | dedicated1      6  |
  ======================
- 
+
  ============================
  |   Source probabilities   |
  | Class       Probability  |
@@ -6835,15 +6835,15 @@ calls GetProbabilityList and CombineProbabilities
  | shared7          0.3333  |
  | shared8          0.3333  |
  ============================
- 
+
  Expected: 0.39182
  Actual:   0.39182
 
 
   Passed TrainSelectionAsync_WhenSelectionIsNull_SkipsWithoutThrowingOrTraining [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -6856,28 +6856,28 @@ calls GetProbabilityList and CombineProbabilities
   Passed Constructor_WithBeforeAndAfterMove_PopulatesDerivedFields [3 ms]
   Passed GetProbabilityList_MultiCase_ExpectedBehavior [19 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Tests several conditions:
 1) A subset of tokens are found in the probability list.
 2) A subset of tokens are not found in the probability list but are found in either the shared token list or the dedicated token list, and
-3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list. 
+3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list.
    When included, they should carry the minimum probability of a match to the current classifier because they are important to other classifiers
 4) There is one new token, which should be excluded
 5) There are two duplicated tokens which should have two entries
- 
+
 SOURCE PROBABILITY TOKENS:
 [a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z]
- 
+
 SHARED TOKENS:
 [shared1,shared2,shared3,shared4,shared5,shared6,shared7,shared8]
- 
+
 DEDICATED TOKENS:
 [dedicated6,dedicated2,dedicated7,dedicated3,dedicated8,dedicated4,dedicated5,dedicated1]
  Total Token Count: 163
- 
-Input Tokens: 
+
+Input Tokens:
 [i, j, k, l, j, k, dedicated2, dedicated3, shared1, shared2, shared3, new1]
 
  Expected list should exclude:
@@ -6899,7 +6899,7 @@ new1:       does not exist in any list
  | .31000j4                0.6900  |
  | .32000i0                0.6800  |
  ===================================
- 
+
  ===================================
  |     Actual Probability List     |
  | Class              Probability  |
@@ -6914,20 +6914,20 @@ new1:       does not exist in any list
  | .31000j4                0.6900  |
  | .32000i0                0.6800  |
  ===================================
- 
+
 
 
   Passed NotNull_WhenAnyParameterIsNull_ReturnsFalse [< 1 ms]
   Passed NotNull_WhenAllParametersHaveValues_ReturnsTrue [< 1 ms]
   Passed GetInterestingList_MultiCase_ExpectedBehavior [9 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Tests several conditions:
 1) A subset of tokens are found in the probability list.
 2) A subset of tokens are not found in the probability list but are found in either the shared token list or the dedicated token list, and
-3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list. 
+3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list.
    When included, they should carry the minimum probability of a match to the current classifier because they are important to other classifiers
 4) There is one new token, which should be excluded
 5) There are two duplicated tokens which should have two entries
@@ -6963,7 +6963,7 @@ new1:       does not exist in any list
  | x           0.8300  |
  | z           0.8500  |
  =======================
- 
+
  ======================
  |    Shared tokens   |
  | Token       Count  |
@@ -6985,9 +6985,9 @@ new1:       does not exist in any list
  | dedicated4      6  |
  | dedicated1      6  |
  ======================
- 
- 
-Input Tokens: 
+
+
+Input Tokens:
 [i, j, k, l, j, k, dedicated2, dedicated3, shared1, shared2, shared3, new1]
 
  ======================
@@ -7006,7 +7006,7 @@ Input Tokens:
  | shared3         1  |
  | new1            1  |
  ======================
- 
+
  ===================================
  |    Expected Probability List    |
  | Class              Probability  |
@@ -7022,7 +7022,7 @@ Input Tokens:
  | .32000i0                0.6800  |
  | .50000new10             0.5000  |
  ===================================
- 
+
  ===================================
  |     Actual Probability List     |
  | Class              Probability  |
@@ -7038,22 +7038,22 @@ Input Tokens:
  | .32000i0                0.6800  |
  | .50000new10             0.5000  |
  ===================================
- 
+
 
 
   Passed GetProbabilityList_NullCase_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Tests null input
- 
+
 SOURCE PROBABILITY TOKENS:
 [a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z]
- 
+
 SHARED TOKENS:
 [shared1,shared2,shared3,shared4,shared5,shared6,shared7,shared8]
- 
+
 DEDICATED TOKENS:
 [dedicated6,dedicated2,dedicated7,dedicated3,dedicated8,dedicated4,dedicated5,dedicated1]
  =======================
@@ -7062,31 +7062,31 @@ DEDICATED TOKENS:
  =======================
  |   Object is empty   |
  =======================
- 
+
  =======================
  |    Actual Output    |
  | Class  Probability  |
  =======================
  |   Object is empty   |
  =======================
- 
+
 
 
   Passed MailItemGetter_WhenMailItemWasAssigned_ReturnsSameReference [< 1 ms]
   Passed FolderOldGetter_WhenFolderWasAssigned_ReturnsSameReference [< 1 ms]
   Passed GetProbabilityList_EmptyCase_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Tests empty input
- 
+
 SOURCE PROBABILITY TOKENS:
 [a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z]
- 
+
 SHARED TOKENS:
 [shared1,shared2,shared3,shared4,shared5,shared6,shared7,shared8]
- 
+
 DEDICATED TOKENS:
 [dedicated6,dedicated2,dedicated7,dedicated3,dedicated8,dedicated4,dedicated5,dedicated1]
  =======================
@@ -7095,20 +7095,20 @@ DEDICATED TOKENS:
  =======================
  |   Object is empty   |
  =======================
- 
+
  =======================
  |    Actual Output    |
  | Class  Probability  |
  =======================
  |   Object is empty   |
  =======================
- 
+
 
 
   Passed GetInterestingList_NullCase_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Tests null input
  =======================
@@ -7143,7 +7143,7 @@ DEDICATED TOKENS:
  | x           0.8300  |
  | z           0.8500  |
  =======================
- 
+
  ======================
  |    Shared tokens   |
  | Token       Count  |
@@ -7165,36 +7165,36 @@ DEDICATED TOKENS:
  | dedicated4      6  |
  | dedicated1      6  |
  ======================
- 
+
  =======================
  |   Expected Output   |
  | Class  Probability  |
  =======================
  |   Object is empty   |
  =======================
- 
+
  =======================
  |    Actual Output    |
  | Class  Probability  |
  =======================
  |   Object is empty   |
  =======================
- 
+
 
 
   Passed GetProbabilityList_AllNew_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Tests all new tokens
- 
+
 SOURCE PROBABILITY TOKENS:
 [a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z]
- 
+
 SHARED TOKENS:
 [shared1,shared2,shared3,shared4,shared5,shared6,shared7,shared8]
- 
+
 DEDICATED TOKENS:
 [dedicated6,dedicated2,dedicated7,dedicated3,dedicated8,dedicated4,dedicated5,dedicated1]
  =======================
@@ -7203,20 +7203,20 @@ DEDICATED TOKENS:
  =======================
  |   Object is empty   |
  =======================
- 
+
  =======================
  |    Actual Output    |
  | Class  Probability  |
  =======================
  |   Object is empty   |
  =======================
- 
+
 
 
   Passed GetInterestingList_EmptyCase_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Tests empty input
  =======================
@@ -7251,7 +7251,7 @@ DEDICATED TOKENS:
  | x           0.8300  |
  | z           0.8500  |
  =======================
- 
+
  ======================
  |    Shared tokens   |
  | Token       Count  |
@@ -7273,27 +7273,27 @@ DEDICATED TOKENS:
  | dedicated4      6  |
  | dedicated1      6  |
  ======================
- 
+
  =======================
  |   Expected Output   |
  | Class  Probability  |
  =======================
  |   Object is empty   |
  =======================
- 
+
  =======================
  |    Actual Output    |
  | Class  Probability  |
  =======================
  |   Object is empty   |
  =======================
- 
+
 
 
   Passed CombineProbabilities_01ExcludeEntriesAfterInterestingWordCount_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Tests whether the cutoff for Knobs.InterestingWordCount is working
 
@@ -7329,7 +7329,7 @@ DEDICATED TOKENS:
  | .40000averagetoken3         0.5000  |
  | .40000averagetoken4         0.5000  |
  =======================================
- 
+
  Expected: 1.00 since all entries at 0.50 probability are cut off
  Actual: 1.00
 
@@ -7338,8 +7338,8 @@ DEDICATED TOKENS:
   Passed OlAppSetter_WhenAssigned_SetsApplicationAndRootPath [5 ms]
   Passed GetInterestingList_AllNew_ExpectedBehavior [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Tests all new tokens
  =======================
@@ -7374,7 +7374,7 @@ DEDICATED TOKENS:
  | x           0.8300  |
  | z           0.8500  |
  =======================
- 
+
  ======================
  |    Shared tokens   |
  | Token       Count  |
@@ -7396,7 +7396,7 @@ DEDICATED TOKENS:
  | dedicated4      6  |
  | dedicated1      6  |
  ======================
- 
+
  =============================
  |      Expected Output      |
  | Class        Probability  |
@@ -7405,7 +7405,7 @@ DEDICATED TOKENS:
  | .50000new20       0.5000  |
  | .50000new30       0.5000  |
  =============================
- 
+
  =============================
  |       Actual Output       |
  | Class        Probability  |
@@ -7414,15 +7414,15 @@ DEDICATED TOKENS:
  | .50000new20       0.5000  |
  | .50000new30       0.5000  |
  =============================
- 
+
 
 
   Passed CreateFolderAsync_WhenAsyncValidationRetries_CoversMessagesAndCreatesDirectory [8 ms]
   Passed Imconcattb_WithSmallBitmaps_ReturnsCombined [< 1 ms]
   Passed CombineProbabilities_02FewEntries_ExpectedBehavior [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Tests whether properly handles few entries
 
@@ -7451,7 +7451,7 @@ DEDICATED TOKENS:
  | .00001highprobtoken8        1.0000  |
  | .00001highprobtoken9        1.0000  |
  =======================================
- 
+
  Expected: 1.00
  Actual: 1.00
 
@@ -7459,8 +7459,8 @@ DEDICATED TOKENS:
   Passed GlobalsSetter_WhenAssigned_PreservesReference [< 1 ms]
   Passed CombineProbabilities_01ExcludeEntriesAfterInterestingWordCount_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Tests whether the cutoff for Knobs.InterestingWordCount is working
 
@@ -7496,15 +7496,15 @@ DEDICATED TOKENS:
  | .40000averagetoken3         0.5000  |
  | .40000averagetoken4         0.5000  |
  =======================================
- 
+
  Expected: 1.00 since all entries at 0.50 probability are cut off
  Actual: 1.00
 
 
   Passed CombineProbabilities_03NoEntries_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Tests whether properly handles no entries
 
@@ -7515,15 +7515,15 @@ DEDICATED TOKENS:
  =======================
  |   Object is empty   |
  =======================
- 
+
  Expected: 0.00
  Actual: 0.00
 
 
   Passed CombineProbabilities_02FewEntries_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Tests whether properly handles few entries
 
@@ -7552,7 +7552,7 @@ DEDICATED TOKENS:
  | .00001highprobtoken8        1.0000  |
  | .00001highprobtoken9        1.0000  |
  =======================================
- 
+
  Expected: 1.00
  Actual: 1.00
 
@@ -7560,8 +7560,8 @@ DEDICATED TOKENS:
   Passed InjectedPrompt_InputFoldername_WhenNameIsIllegalThenValid_ReturnsValidName [1 ms]
   Passed CombineProbabilities_03NoEntries_ExpectedBehavior [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Tests whether properly handles no entries
 
@@ -7572,7 +7572,7 @@ DEDICATED TOKENS:
  =======================
  |   Object is empty   |
  =======================
- 
+
  Expected: 0.00
  Actual: 0.00
 
@@ -7609,8 +7609,8 @@ DEDICATED TOKENS:
   Passed Equals_ReturnsTrueOnlyWhenFolderAndSubjectMatch [4 ms]
   Passed Train_01BuildFromEmpty_ExpectedBehavior [23 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
  ====================================
@@ -7624,8 +7624,8 @@ DEDICATED TOKENS:
  | token03     12       12          |
  | token04      4       4           |
  ====================================
- 
- 
+
+
  ====================================
  |  TOTAL Token Frequency (expected |
  |            vs actual)            |
@@ -7640,14 +7640,14 @@ DEDICATED TOKENS:
  | token06     12       12          |
  | token07      4       4           |
  ====================================
- 
- 
+
+
  Expected Match email count: 7
  Actual Match email count: 7
- 
+
  Expected Total token count: 16
  Actual Total token count: 16
- 
+
  ====================================
  |     Probabilities (expected vs   |
  |              actual)             |
@@ -7659,7 +7659,7 @@ DEDICATED TOKENS:
  | token03   0.7861   0.7861        |
  | token04   0.5592   0.5592        |
  ====================================
- 
+
 
 
   Passed ReadyToEncode_WithEncoder_AugmentsTokenDictionary [6 ms]
@@ -7673,8 +7673,8 @@ DEDICATED TOKENS:
   Passed FolderpathAndEmailSubject_WithEncoder_EncodeValuesAndSupportPropertyRoundTrip [10 ms]
   Passed EncodeOverloads_AndScalarProperties_CoverAdditionalPublicBranches [7 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  SubjectEncoded set to null
 
@@ -7695,8 +7695,8 @@ DEDICATED TOKENS:
   Passed GetCheckedState_WhenNoneHaveMappedTo_ReturnsUnchecked [< 1 ms]
   Passed Constructors_WhenSerializedSourceExists_LoadEntriesAcrossFileOverloads [7 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  SubjectEncoded set to null
  SubjectEncoded set to null
@@ -7791,8 +7791,8 @@ DEDICATED TOKENS:
   Passed GetDestinationFolder_WhenSpamTrueAndJunkCertainIsNull_ReturnsCurrentParent [< 1 ms]
   Passed Constructor_StateUnderTest_ExpectedBehavior [54 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 EXPECTED:
@@ -7828,7 +7828,7 @@ true
 [{"FileExtension":"","FilenameSeed":"20240101_FileName","IsImage":false,"AttachmentData":null,"BlockLevel":0,"Class":0,"ContentId":null,"DisplayName":null,"FileName":"FileName","Index":0,"PathName":"PathName//FileName","Position":0,"Size":65001,"Type":1}]
 65001
 ]
- 
+
 ACTUAL:
  [
 {"__interceptors":[{}],"__target":null,"__interfaces":["Moq.IMocked, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920","Moq.IMocked`1[[Microsoft.Office.Interop.Outlook.MailItem, Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c]], Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920","Moq.Internals.IProxy, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920"],"__baseType":"Moq.Internals.InterfaceProxy, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920","__proxyGenerationOptions":{"hook":{},"selector":null,"mixins":null,"baseTypeForInterfaceProxy.AssemblyQualifiedName":"Moq.Internals.InterfaceProxy, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920"},"__proxyTypeId":"interface.without.target","__targetFieldType":"System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089","__theInterface":"Microsoft.Office.Interop.Outlook.MailItem, Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c"}
@@ -7866,387 +7866,387 @@ true
 
   Passed TryProjectMailItemMembers_NullSource_ReturnsEmptyProjection [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed TryProjectMailItemMembers_ValidMailItem_ReturnsProjected [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed TryProjectMailItemMembers_ObjectWithoutProperties_ReturnsEmpty [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed CompressPlainText_NullTextAndPrefix_ReturnsEomMarker [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed CompressPlainText_SimpleText_CompressesWhitespace [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed CompressPlainText_StripWarning_RemovesPrefix [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed CompressPlainText_StripLinks_RemovesHttpLinks [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed CompressPlainText_StripLinksShowStripped_ReplacesWithLinkTag [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed CompressPlainText_StripFormatting_CollapsesWhitespace [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed CompressPlainText_StripReplyHeader_RemovesReplyBlock [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed CompressPlainText_StripReplyHeaderShowStripped_IncludesEomChain [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed CompressPlainText_StripReplyBodyOnly_PreservesHeader [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ToggleDark_InitiallyOff_TogglesOn [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ToggleDark_OnThenOff_RemovesDarkModeHeader [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ToggleDark_AlreadyOn_DesiredOn_NoDoubleInsert [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ToggleDark_AlreadyOff_DesiredOff_NoChange [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Equals_NullOther_ReturnsFalse [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Equals_SameReference_ReturnsTrue [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Equals_DifferentSize_ReturnsFalse [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Equals_DifferentSentDate_ReturnsFalse [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Equals_DifferentSubject_ReturnsFalse [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Equals_DifferentBody_ReturnsFalse [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Equals_DifferentSender_ReturnsFalse [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed RecipientsEquivalent_BothNull_ReturnsTrue [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed RecipientsEquivalent_SourceNull_ReturnsFalse [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed RecipientsEquivalent_OtherNull_ReturnsFalse [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed RecipientsEquivalent_DifferentLength_ReturnsFalse [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed RecipientsEquivalent_MatchingRecipients_ReturnsTrue [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed RecipientsEquivalent_NoMatch_ReturnsFalse [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed PropertyChanged_CcRecipientsHtml_RaisesEvent [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed PropertyChanged_CcRecipientsName_RaisesEvent [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed PropertyChanged_ToRecipientsHtml_RaisesEvent [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed PropertyChanged_ToRecipientsName_RaisesEvent [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed SetSender_ValidRecipient_SetsSenderFields [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadRecipients_WithMockedRecipients_SetsProperties [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadRecipientsForce_ForcesLazyEvaluation [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed LoadPriorityForce_ForcesLazyFieldEvaluation [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ToSerializableObject_ReturnsItemInfo [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ToMatchableObject_ReturnsItemInfoWithKeyFields [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed EmailHeader2_ContainsSenderAndRecipientInfo [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed EmailHeader_ContainsHtmlStructure [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed EmailHeader_CalledTwice_ReturnsCachedValue [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed GetHtml_InsertsEmailHeader [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed GetHtml_WithHtmlBody_InsertsEmailHeader [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed MailItemProjection_Constructor_SetsProperties [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed MailItemProjection_NullSubject_DefaultsToEmpty [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Properties_SetAndGet_WorkCorrectly [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed PlainTextOptions_SetAndGet_WorkCorrectly [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed DefaultConstructor_WithProjection_InitializesSafeDefaults [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ResolveFolderRoot_ArchivePath_ReturnsArchiveRoot [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ResolveFolderRoot_InboxPath_ReturnsInbox [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed UnRead_SetValue_UpdatesMailItem [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Tokenizer_DefaultsToEmailTokenizer [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ToggleOff_ResolvesFlatOnly_PreservingAc13 [953 ms]
   Passed RoundTrip_ToCompositionAndToDerived_PreservesEntries [968 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed TrainMultiTagAsync_SameAsSync [875 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8258,15 +8258,15 @@ true
   Passed ProcessMailHelperAsync_WhenMoveSucceeds_RunsAllPostMoveActions [679 ms]
   Passed TokenizeAsync_ReturnsTokens [504 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ToComposition_EmptyDictionary_HandledCorrectly [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8277,31 +8277,31 @@ true
   Passed TokenizeObject_WithNullObject_ThrowsArgumentNullException [4 ms]
   Passed ToComposition_WithNullDerivedInstance_ThrowsArgumentNullException [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed FromDefaultFolder_Store_WhenGetTableReturnsNull_ReturnsNull [1 ms]
   Passed ToDerived_WhenCoDictionaryIsNull_ThrowsArgumentNullException [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed UnTrainMultiTagAsync_SameAsSync [6 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed TokenizeObject_WithUnsupportedType_ThrowsArgumentException [< 1 ms]
   Passed Train_01BuildFromEmptyAsync_ExpectedBehavior [833 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
  ====================================
@@ -8315,8 +8315,8 @@ true
  | token03     12       12          |
  | token04      4       4           |
  ====================================
- 
- 
+
+
  ====================================
  |  TOTAL Token Frequency (expected |
  |            vs actual)            |
@@ -8331,14 +8331,14 @@ true
  | token06     12       12          |
  | token07      4       4           |
  ====================================
- 
- 
+
+
  Expected Match email count: 7
  Actual Match email count: 7
- 
+
  Expected Total token count: 16
  Actual Total token count: 16
- 
+
  ====================================
  |     Probabilities (expected vs   |
  |              actual)             |
@@ -8350,29 +8350,29 @@ true
  | token03   0.7861   0.7861        |
  | token04   0.5592   0.5592        |
  ====================================
- 
+
 
 
   Passed TrainSelectionAsync_WhenSelectionContainsMailItem_TrainsClassifierWithExpectedLabel [877 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ExplicitConfig_OverridesPersistedDefault [7 ms]
   Passed AddToEmailCount_IncrementsTotal [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed WithProgressReporting_ShouldReportProgressAndReturnAllValues [992 ms]
   Passed ToDerived_WhenRemainingObjectIsNull_ThrowsArgumentNullException [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8382,8 +8382,8 @@ true
   Passed StartTrainingMetrics_WhenCalled_InvokesAllTrainingHooks [11 ms]
   Passed ToDerived_WhenConfigFieldIsMissing_StillRestoresDictionaryEntries [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8393,8 +8393,8 @@ true
   Passed SaveMessageAsMsgAsync_WhenSubjectNeedsSanitizing_UsesMsgSavePath [17 ms]
   Passed TypedConverter_IntegrationTest_SerializeAndDeserialize [26 s]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿{
    "$id": "1",
@@ -8441,15 +8441,15 @@ true
   Passed FromDefaultFolder_StoresWithOneStoreThatHasNoData_ReturnsEmptyFrame [6 ms]
   Passed ToDerived_ShouldRecreateScDictionaryDerivative [980 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Train_02AddIncremental_ExpectedBehavior [17 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
  ====================================
@@ -8466,8 +8466,8 @@ true
  | token09      5       5           |
  | token10     11       11          |
  ====================================
- 
- 
+
+
  ====================================
  |  TOTAL Token Frequency (expected |
  |            vs actual)            |
@@ -8485,14 +8485,14 @@ true
  | token09      5       5           |
  | token10     11       11          |
  ====================================
- 
- 
+
+
  Expected Match email count: 8
  Actual Match email count: 8
- 
+
  Expected Total token count: 17
  Actual Total token count: 17
- 
+
  ====================================
  |     Probabilities (expected vs   |
  |              actual)             |
@@ -8507,20 +8507,20 @@ true
  | token09   0.9587   0.9587        |
  | token10   0.9804   0.9804        |
  ====================================
- 
+
 
 
   Passed TrainSelectionAsync_WhenSelectionContainsTwoMailItemsWithSameConversationId_TrainsOnlyOneItem_TotalEmailCountIncrementsOnce [17 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed FromTokenBaseAsync_StateUnderTest_ExpectedBehavior [881 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿======================
  |     Match Token    |
@@ -8534,7 +8534,7 @@ true
  | shared7        25  |
  | shared8        20  |
  ======================
- 
+
  ======================
  |    Filtered Match  |
  |   Token Frequency  |
@@ -8547,7 +8547,7 @@ true
  | shared7        25  |
  | shared8        20  |
  ======================
- 
+
  ===================
  |   Filtered Not  |
  |   Match Token   |
@@ -8561,7 +8561,7 @@ true
  | shared5      4  |
  | shared8     20  |
  ===================
- 
+
  Filtered Shared Match Count: 79
  Filtered Shared NotMatch Count: 79
  ============================
@@ -8576,7 +8576,7 @@ true
  | shared7          0.3333  |
  | shared8          0.3333  |
  ============================
- 
+
  ============================
  |   Resulting probability  |
  |          tokens          |
@@ -8589,7 +8589,7 @@ true
  | shared7          0.3333  |
  | shared8          0.3333  |
  ============================
- 
+
 
 
   Passed FindFolderRows_WithRecalcSuggestionsAndUnresolvableItem_ThrowsArgumentException [1 ms]
@@ -8597,8 +8597,8 @@ true
   Passed PropertySetters_AllowMutationIncludingNullClassAndZeroProbability [4 ms]
   Passed FromMailItemAsync_MaterializesTokenizationDependenciesBeforeBackgroundTokenAccess [25 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8613,8 +8613,8 @@ true
   Passed DeepClone_Expected [< 1 ms]
   Passed CompileType_CreatesTypeWithConfigProperty [15 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8624,16 +8624,16 @@ true
   Passed Add_WhenFolderPathIsNull_SwallowsArgumentNullException [12 ms]
   Passed ToComposition_ShouldExtractDictionaryAndAdditionalFields [8 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Constructor_NullSetStrFunc_ShouldThrowArgumentNullException [< 1 ms]
   Passed CopyTo_WithRemainingObjectType_CopiesConfig [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8644,8 +8644,8 @@ true
   Passed TokenizeMessage_WithHtmlBody_DoesNotPreventTokenization [6 ms]
   Passed FromTokenBaseAsync_01AddToParent_False [6 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
  ====================================
@@ -8662,8 +8662,8 @@ true
  | token09      5       5           |
  | token10     11       11          |
  ====================================
- 
- 
+
+
  ====================================
  |  TOTAL Token Frequency (expected |
  |            vs actual)            |
@@ -8681,14 +8681,14 @@ true
  | token09      5       5           |
  | token10     11       11          |
  ====================================
- 
- 
+
+
  Expected Match email count: 8
  Actual Match email count: 8
- 
+
  Expected Total token count: 17
  Actual Total token count: 17
- 
+
  ====================================
  |     Probabilities (expected vs   |
  |              actual)             |
@@ -8703,15 +8703,15 @@ true
  | token09   0.9587   0.9587        |
  | token10   0.9804   0.9804        |
  ====================================
- 
+
 
 
   Passed Constructor_NullGetListFunc_ShouldThrowArgumentNullException [< 1 ms]
   Passed Find_BySubject_WhenEntryMissing_ReturnsNullOrNormalizedMatches [< 1 ms]
   Passed CreateConfigProperty_CreatesReadableConfigPropertyAndBackingField [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8722,8 +8722,8 @@ true
   Passed Constructor_NullSetListFunc_ShouldThrowArgumentNullException [4 ms]
   Passed TrainSelectionAsync_WhenSelectionContainsTwoMailItemsWithSameConversationId_TrainsOnlyOneItem_MatchEmailCountIncrementsOnce [10 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8736,8 +8736,8 @@ true
   Passed AsStringWithPrefix_Get_ShouldCallGetStrFuncWithTrue [< 1 ms]
   Passed ReplicateProperty_WithExplicitBackingField_CreatesRoundTrippableProperty [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8749,8 +8749,8 @@ true
   Passed AsStringWithPrefix_Set_ShouldCallSetStrFuncWithTrue [< 1 ms]
   Passed ReplicateProperty_WhenSetterIsMissing_SkipsSetterAndCreatesReadableProperty [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8758,15 +8758,15 @@ true
   Passed Prefix_SetAndGet_ShouldWork [9 ms]
   Passed Classify_TokenArray_ReturnsResults [45 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ToDerived_ShouldRecreateDerivedInstance [15 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8774,8 +8774,8 @@ true
   Passed GetAltLoader_WhenLoaderTypeExposesFactory_ReturnsWorkingFactoryDelegate [8 ms]
   Passed FromTokenBaseAsync_02AddToParent_True [14 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
  ====================================
@@ -8792,8 +8792,8 @@ true
  | token09      5       5           |
  | token10     11       11          |
  ====================================
- 
- 
+
+
  ====================================
  |  TOTAL Token Frequency (expected |
  |            vs actual)            |
@@ -8811,14 +8811,14 @@ true
  | token09      5       5           |
  | token10     11       11          |
  ====================================
- 
- 
+
+
  Expected Match email count: 8
  Actual Match email count: 8
- 
+
  Expected Total token count: 17
  Actual Total token count: 17
- 
+
  ====================================
  |     Probabilities (expected vs   |
  |              actual)             |
@@ -8833,7 +8833,7 @@ true
  | token09   0.9587   0.9587        |
  | token10   0.9804   0.9804        |
  ====================================
- 
+
 
 
   Passed TokenizeObject_WithDerivedMailItemHelper_UsesMailItemHelperBranch [14 ms]
@@ -8841,8 +8841,8 @@ true
   Passed GetAltLoader_WhenLoaderTypeDoesNotExposeFactory_ReturnsNull [8 ms]
   Passed UntypedConverter_IntegrationTest_SerializeAndDeserialize [34 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿{
    "$id": "1",
@@ -8882,8 +8882,8 @@ true
   Passed IsPeopleCategory_WhenStringStartsWithPrefix_ShouldReturnTrue [< 1 ms]
   Passed ReplicateProperty_WhenGetterIsMissing_ThrowsInvalidOperationException [9 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8891,8 +8891,8 @@ true
   Passed SaveMessageAsMsgAsync_WhenCalled_SanitizesSubjectAndUsesMsgFormat [11 ms]
   Passed EndToEnd_ShouldRecreateDerivedInstance [10 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8900,15 +8900,15 @@ true
   Passed IsPeopleCategory_WhenStringDoesNotStartWithPrefix_ShouldReturnFalse [< 1 ms]
   Passed FromTokenBaseAsync_03NullParent [9 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Classify_TokenIncidence_ReturnsResults [10 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8916,8 +8916,8 @@ true
   Passed ConstructorAndRefresh_UseCachedArchiveSnapshotAndReplaceView [961 ms]
   Passed GetBackingField_WhenPropertyHasBackingField_ReturnsUnderlyingField [3 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8925,8 +8925,8 @@ true
   Passed ToString_ShouldReturnAsStringNoPrefix [< 1 ms]
   Passed CompileType_ShouldCreateTypeWithAdditionalFields [3 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8937,8 +8937,8 @@ true
   Passed AddPrefix_WhenSeedAlreadyStartsWithPrefix_ShouldReturnUnchanged [< 1 ms]
   Passed FromTokenBaseAsync_04NullTag [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8948,16 +8948,16 @@ true
   Passed ResolveTessdataPath_ReturnsLocalAppDataTaskMasterTessdataPath [< 1 ms]
   Passed GetBackingField_WhenGetterIsMissing_ThrowsInvalidOperationException [5 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed InternalHelpers_CoverFilenameWordAndEntityBranches [8 ms]
   Passed ConvertToNewClassInstance_ShouldCreateInstanceWithFields [5 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8969,8 +8969,8 @@ true
   Passed Config_SetAndGet_RoundTrips [< 1 ms]
   Passed FromTokenBaseAsync_05AllNull [3 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -8979,15 +8979,15 @@ true
   Passed MailHelpers_SetAndGet_RoundTrips [< 1 ms]
   Passed TrainSelectionAsync_WhenSelectionContainsTwoMailItemsWithSameConversationId_WritesTriageUdfToEveryItem [33 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed SubjectMapSco_RoundTrips_AsBareConcreteElementArray [6 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  SubjectEncoded set to null
  SubjectEncoded set to null
@@ -8995,12 +8995,12 @@ true
 
   Passed AddTokens_IntegrationTest_ExpectedBehavior [55 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Match tokens: [token00,token01,token02,token03,token04,token02,token03,token02,token03,token00,token01,token02,token03,token04,token02,token03,token02,token03,token00,token01,token02,token03,token04,token02,token03,token02,token03,token00,token01,token02,token03,token04,token02,token03,token02,token03]
  Not Match tokens: [token03,token04,token05,token06,token07,token05,token06,token05,token06,token03,token04,token05,token06,token07,token05,token06,token05,token06,token03,token04,token05,token06,token07,token05,token06,token05,token06,token03,token04,token05,token06,token07,token05,token06,token05,token06]
- 
+
 Token count calculation
  ===================
  |  Expected Match |
@@ -9013,9 +9013,9 @@ Token count calculation
  | token03     12  |
  | token04      4  |
  ===================
- 
+
  Expected Match token count: 28
- 
+
  ===================
  |   Actual Match  |
  | token frequency |
@@ -9027,9 +9027,9 @@ Token count calculation
  | token03     12  |
  | token04      4  |
  ===================
- 
+
  Actual Match token count: 28
- 
+
  ===================
  |   Expected Not  |
  |   Match token   |
@@ -9042,9 +9042,9 @@ Token count calculation
  | token06     12  |
  | token07      4  |
  ===================
- 
+
  Expected Not Match token count: 36
- 
+
  ===================
  |    Actual Not   |
  |   Match token   |
@@ -9057,9 +9057,9 @@ Token count calculation
  | token06     12  |
  | token07      4  |
  ===================
- 
+
  Actual Not Match token count: 36
- 
+
  =========================
  | Expected Probabilities|
  | Class    Probability  |
@@ -9071,7 +9071,7 @@ Token count calculation
  | token06       0.0110  |
  | token07       0.0110  |
  =========================
- 
+
  =========================
  |  Actual Probabilities |
  | Class    Probability  |
@@ -9083,14 +9083,14 @@ Token count calculation
  | token02       0.9999  |
  | token03       0.6585  |
  =========================
- 
+
 
 
   Passed MatchToExisting_WhenExactMatchAvailable_ReturnsExactMatchResult [8 ms]
   Passed ReplicateProperty_WithExplicitField_CreatesRoundTrippableProperty [10 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9098,15 +9098,15 @@ Token count calculation
   Passed DefaultConstructor_CreatesInstance [< 1 ms]
   Passed FromTokenBaseAsync_06EmailCountOutOfRange [7 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ReplicateProperty_WhenSetterIsMissing_SkipsSetterAndCreatesReadableProperty [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9117,15 +9117,15 @@ Token count calculation
   Passed CreateNewClassifier_ReturnsConfiguredGroup [4 ms]
   Passed TrainMultiTag_UpdatesMatchCountsWithoutChangingSharedTokenBase [5 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed UntypedConverter_IntegrationTest_SerializeAndDeserialize_InternalJsonProperty [28 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿{
    "$id": "1",
@@ -9162,8 +9162,8 @@ Token count calculation
 
   Passed ReplicateProperty_WhenGetterIsMissing_ThrowsInvalidOperationException [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9173,8 +9173,8 @@ Token count calculation
   Passed Constructor_WithGlobals_SetsProbabilityThreshold [4 ms]
   Passed UnTrainMultiTag_RemovesCountsWithoutChangingSharedTokenBase [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9187,8 +9187,8 @@ Token count calculation
   Passed Globals_ShouldReturnInjectedGlobals [< 1 ms]
   Passed GetBackingField_WhenPropertyHasBackingField_ReturnsUnderlyingField [5 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9196,8 +9196,8 @@ Token count calculation
   Passed ConstructorWithMappings_BuildsRemapTreeAndInvertsMappedTargets [22 ms]
   Passed WriteJson_StateUnderTest_ExpectedBehavior [7 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9207,8 +9207,8 @@ Token count calculation
   Passed SplitAddressToFirstLastName_WithMiddleNameSegment_IncludesMiddleNameInResult [< 1 ms]
   Passed GetBackingField_WhenGetterIsMissing_ThrowsInvalidOperationException [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9223,8 +9223,8 @@ Token count calculation
   Passed TryMoveMailItemForProcessingAsync_WhenMoveThrows_ReturnsOriginalAndNullMoved [12 ms]
   Passed UnTrain_ReversesIncrementalTrainingState [18 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9236,8 +9236,8 @@ Token count calculation
   Passed SpamBayesMissingHandler_WhenSkip_ReturnsFalse [26 ms]
   Passed UpdateProbability_RemovesToken_WhenBelowMinimumInclusion [5 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9256,8 +9256,8 @@ Token count calculation
   Passed Serialize_WithoutEngine_DoesNotThrow [4 ms]
   Passed UpdateProbability_WithNoNonMatchAndHighMatch_UsesCertainMatchScore [6 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9266,8 +9266,8 @@ Token count calculation
   Passed IsActivated_NoClassifierGroup_ReturnsFalse [< 1 ms]
   Passed UpdateProbability_WithNoNonMatchAndLowMatch_UsesLikelyMatchScore [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9285,8 +9285,8 @@ Token count calculation
   Passed CreateEngineAsync_GroupNotInManager_ReturnsNull [7 ms]
   Passed UpdateProbability_WithBothCounts_StoresBoundedProbability [12 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9302,8 +9302,8 @@ Token count calculation
   Passed CreateClassifierGroupAsync_WithCollection_ReturnsGroup [28 ms]
   Passed UpdateProbabilitySb_RemovesToken_WhenMatchCountIsZero [14 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9326,8 +9326,8 @@ Token count calculation
   Passed AsyncAction_SetAndGet [< 1 ms]
   Passed UpdateProbabilitySb_WithWordInfo_ReturnsProbabilityBetweenZeroAndOne [15 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9336,16 +9336,16 @@ Token count calculation
   Passed IsActivated_WithClassifierGroup_ReturnsTrue [8 ms]
   Passed UpdateProbabilitySb_WithToken_UsesStoredCounts [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed AsyncCondition_SetAndGet [< 1 ms]
   Passed ConstructorTest [174 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Expected Object:
 {"Categories":"Category1, Category2, Category3","Tokens":["Token1","Token2","Token3"],"FolderInfo":{"__interceptors":[{}],"__target":null,"__interfaces":["Moq.IMocked, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920","Moq.IMocked`1[[UtilitiesCS.IFolderWrapper, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920","Moq.Internals.IProxy, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920"],"__baseType":"Moq.Internals.InterfaceProxy, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920","__proxyGenerationOptions":{"hook":{},"selector":null,"mixins":null,"baseTypeForInterfaceProxy.AssemblyQualifiedName":"Moq.Internals.InterfaceProxy, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920"},"__proxyTypeId":"interface.without.target","__targetFieldType":"System.Object, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089","__theInterface":"UtilitiesCS.IFolderWrapper, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null"},"ToRecipients":[{"__interceptors":[{}],"__interfaces":["Moq.IMocked, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920","Moq.IMocked`1[[UtilitiesCS.RecipientInfo, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920","Moq.Internals.IProxy, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920"],"__baseType":"UtilitiesCS.RecipientInfo, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null","__proxyGenerationOptions":{"hook":{},"selector":null,"mixins":null,"baseTypeForInterfaceProxy.AssemblyQualifiedName":"Moq.Internals.InterfaceProxy, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920"},"__proxyTypeId":"class","__delegateToBase":false,"__data":[null,null,null]},{"__interceptors":[{}],"__interfaces":["Moq.IMocked, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920","Moq.IMocked`1[[UtilitiesCS.RecipientInfo, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920","Moq.Internals.IProxy, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920"],"__baseType":"UtilitiesCS.RecipientInfo, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null","__proxyGenerationOptions":{"hook":{},"selector":null,"mixins":null,"baseTypeForInterfaceProxy.AssemblyQualifiedName":"Moq.Internals.InterfaceProxy, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920"},"__proxyTypeId":"class","__delegateToBase":false,"__data":[null,null,null]}],"CcRecipients":[{"__interceptors":[{}],"__interfaces":["Moq.IMocked, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920","Moq.IMocked`1[[UtilitiesCS.RecipientInfo, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920","Moq.Internals.IProxy, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920"],"__baseType":"UtilitiesCS.RecipientInfo, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null","__proxyGenerationOptions":{"hook":{},"selector":null,"mixins":null,"baseTypeForInterfaceProxy.AssemblyQualifiedName":"Moq.Internals.InterfaceProxy, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920"},"__proxyTypeId":"class","__delegateToBase":false,"__data":[null,null,null]},{"__interceptors":[{}],"__interfaces":["Moq.IMocked, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920","Moq.IMocked`1[[UtilitiesCS.RecipientInfo, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920","Moq.Internals.IProxy, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920"],"__baseType":"UtilitiesCS.RecipientInfo, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null","__proxyGenerationOptions":{"hook":{},"selector":null,"mixins":null,"baseTypeForInterfaceProxy.AssemblyQualifiedName":"Moq.Internals.InterfaceProxy, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920"},"__proxyTypeId":"class","__delegateToBase":false,"__data":[null,null,null]}],"Sender":{"__interceptors":[{}],"__interfaces":["Moq.IMocked, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920","Moq.IMocked`1[[UtilitiesCS.RecipientInfo, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920","Moq.Internals.IProxy, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920"],"__baseType":"UtilitiesCS.RecipientInfo, UtilitiesCS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null","__proxyGenerationOptions":{"hook":{},"selector":null,"mixins":null,"baseTypeForInterfaceProxy.AssemblyQualifiedName":"Moq.Internals.InterfaceProxy, Moq, Version=4.20.72.0, Culture=neutral, PublicKeyToken=69f491c39445e920"},"__proxyTypeId":"class","__delegateToBase":false,"__data":[null,null,null]},"ConversationId":"1A2B3C4DMockConversationId5E6F7G","EntryId":null,"StoreId":null,"Subject":null,"Actionable":null}
@@ -9356,8 +9356,8 @@ Token count calculation
   Passed AddConversationBasedSuggestions_WhenConversationExists_AddsWeightedMatches [45 ms]
   Passed CombineProbabilities_WithNull_ThrowsArgumentNullException [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9377,8 +9377,8 @@ Token count calculation
   Passed Train_NullTokenizer_Throws [11 ms]
   Passed Constructor_SetsGlobals [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9390,8 +9390,8 @@ Token count calculation
   Passed CreateClassifier_ReturnsGroupWithNonNullSharedTokenBase [10 ms]
   Passed Deserialize_WhenAppDataMissing_ReturnsDefault [10 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9409,8 +9409,8 @@ Token count calculation
   Passed TypedItem_SetAndGet [< 1 ms]
   Passed Deserialize_WithExistingFile_ReturnsDeserializedObject [3 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9418,8 +9418,8 @@ Token count calculation
   Passed Serialize_WithClassifierGroup_DoesNotThrow [< 1 ms]
   Passed Deserialize_WhenFileMissingUnderAppData_ReturnsDefault [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9452,8 +9452,8 @@ Token count calculation
   Passed QuerySubject_WithSubjectMapSco_GroupsScoresByFolderPath [12 ms]
   Passed DeserializeAsync_WithExistingFile_ReturnsDeserializedObject [17 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9462,8 +9462,8 @@ Token count calculation
   Passed TokenizeEmailAsync_NullInput_ReturnsEmptyArray [1 ms]
   Passed DeserializeAsync_WhenFileMissingUnderAppData_ReturnsDefault [5 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9474,8 +9474,8 @@ Token count calculation
   Passed PutCheckedStateMethod_Expanded_UpdatesOnlyCurrentNode [6 ms]
   Passed GetProbabilityDrivers_ReturnsCombinedProbabilityAndDrivers [62 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿============================
  | Source token probability |
@@ -9488,7 +9488,7 @@ Token count calculation
  | shared7          0.3333  |
  | shared8          0.3333  |
  ============================
- 
+
  ======================
  |    Shared tokens   |
  | Token       Count  |
@@ -9510,7 +9510,7 @@ Token count calculation
  | dedicated4      6  |
  | dedicated1      6  |
  ======================
- 
+
 
 
   Passed HasValidTriageManagerAsync_ManagerWithTriageGroup_ReturnsTrue [25 ms]
@@ -9520,8 +9520,8 @@ Token count calculation
   Passed SpamBayes_ValidateSpamClassifierAsync_InvalidValidator_CallsAction [11 ms]
   Passed DeserializeAsync_WithProgressAndExistingFile_ReturnsDeserializedObject [13 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9541,8 +9541,8 @@ Token count calculation
   Passed Build_EmptyCollection_ContainsOnlyRoot [< 1 ms]
   Passed DeserializeAsync_WithProgressAndInvalidJson_ReturnsDefault [14 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9556,8 +9556,8 @@ Token count calculation
   Passed EngineInitializer_IsNotNull [20 ms]
   Passed NonPublicHelpers_ReturnExpectedDiskAndJsonSettings [13 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9565,15 +9565,15 @@ Token count calculation
   Passed InitAsync_ClassifierGroupNotInManager_ReturnsDefault [1 ms]
   Passed ClassifyAsync_TokenArray_ReturnsResults [214 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed MinimumProbability_SetAndGet_Works [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9583,8 +9583,8 @@ Token count calculation
   Passed Classify_FixedCorpus_RanksMatchingFolderFirstInDescendingOrder [38 ms]
   Passed SharedTokenBase_SetAndGet_Works [60 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9626,8 +9626,8 @@ Token count calculation
   Passed InitAsync_GroupInManager_WiresClassifierGroupAndEngineName [209 ms]
   Passed GetMatchProbabilityAsync_ReturnsSameAsSynchronousCalculation [241 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿============================
  | Source token probability |
@@ -9640,7 +9640,7 @@ Token count calculation
  | shared7          0.3333  |
  | shared8          0.3333  |
  ============================
- 
+
  ======================
  |    Shared tokens   |
  | Token       Count  |
@@ -9662,14 +9662,14 @@ Token count calculation
  | dedicated4      6  |
  | dedicated1      6  |
  ======================
- 
+
 
 
   Passed Config_InvalidMinimumPathProbability_Throws (1.5) [50 ms]
   Passed GetMatchProbability_WithEnumerableTokens_ReturnsProbability [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿============================
  | Source token probability |
@@ -9682,7 +9682,7 @@ Token count calculation
  | shared7          0.3333  |
  | shared8          0.3333  |
  ============================
- 
+
  ======================
  |    Shared tokens   |
  | Token       Count  |
@@ -9704,7 +9704,7 @@ Token count calculation
  | dedicated4      6  |
  | dedicated1      6  |
  ======================
- 
+
  ===================================
  |         Probability List        |
  | Class              Probability  |
@@ -9713,7 +9713,7 @@ Token count calculation
  | .28571shared10          0.7143  |
  | .28571shared11          0.7143  |
  ===================================
- 
+
 
 
   Passed CreateEngineAsync_WithValidGlobals_ReturnsSpamBayes [251 ms]
@@ -9721,8 +9721,8 @@ Token count calculation
   Passed TryLoadObjectAndGetMemorySize_WhenLoaderSucceedsAcrossCopies_ReturnsObjectAndSize [50 ms]
   Passed WordInfo_StoresCounts [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9735,15 +9735,15 @@ Token count calculation
   Passed ValidateJson_WhenDeserializeAsyncThrowsWithSuffix_ReturnsFalse [< 1 ms]
   Passed RebuildClassifier_ReplacesExistingClassifier [176 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed NonPublicHelpers_WithMissingAppDataAndRepoFile_ReturnExpectedFallbacks [240 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9751,8 +9751,8 @@ Token count calculation
   Passed ExplodeMailsByCategory_NullCategories_ReturnsSelf [1 ms]
   Passed GetReportMessage_WithCompletedItems_IncludesSpeed [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9761,8 +9761,8 @@ Token count calculation
   Passed GetProgressMessage_WhenCompletedWorkExists_IncludesCountsAndElapsedText [< 1 ms]
   Passed WordStream_StoresNameAndWords [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9774,8 +9774,8 @@ Token count calculation
   Passed Config_NegativeMinColdStartExamples_Throws [20 ms]
   Passed GetReportMessage_WithZeroCompleted_NoSpeed [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9788,8 +9788,8 @@ Token count calculation
   Passed GetSerializer_ReturnsIndentedSerializerWithAutoTypeNames [< 1 ms]
   Passed Chi2SpamProb_WithNoClues_ReturnsHalfProbability [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9821,8 +9821,8 @@ Token count calculation
   Passed ScoreChildren_NullTokens_Throws [1 ms]
   Passed SaveTextsAsync_WritesUnicodeTextAndOverwritesExistingFile [43 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9831,16 +9831,16 @@ Token count calculation
   Passed Condition_WhenMessageClassIsNotNote_ReturnsFalse [6 ms]
   Passed Constructor_SetsGlobals [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Constructor_WithTokens_GroupsAndCounts [< 1 ms]
   Passed SaveWip_DefaultsToTrue [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9849,15 +9849,15 @@ Token count calculation
   Passed GroupAndCountAsync_ReturnsCorrectCounts [15 ms]
   Passed SaveCsvAsync_WritesCommaSeparatedText [16 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed SaveWip_SetAndGet_Works [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9870,8 +9870,8 @@ Token count calculation
   Passed UnTrain_RemovesClassifierWhenCountReachesZero [< 1 ms]
   Passed Serialization_IsSetInConstructor [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9885,8 +9885,8 @@ Token count calculation
   Passed Constructor_WithComparer_UsesCustomComparer [< 1 ms]
   Passed Chi2SpamProb_WithEvidence_ReturnsEvidenceEntries [16 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿============================
  | Source token probability |
@@ -9899,7 +9899,7 @@ Token count calculation
  | shared7          0.3333  |
  | shared8          0.3333  |
  ============================
- 
+
  ======================
  |    Shared tokens   |
  | Token       Count  |
@@ -9921,7 +9921,7 @@ Token count calculation
  | dedicated4      6  |
  | dedicated1      6  |
  ======================
- 
+
 
 
   Passed DeserializeAsync_WhenStoredTextExists_ReturnsDeserializedValue [5 ms]
@@ -9930,8 +9930,8 @@ Token count calculation
   Passed ExplodeMailsByCategory_EmptyCategories_ReturnsOriginalItemWithoutCategoryKey [27 ms]
   Passed SerializeAndSave_WritesJsonToInMemoryStore [14 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9939,8 +9939,8 @@ Token count calculation
   Passed Classify_ConstructedCorpus_ReturnsLeafWithPathProductProbability [132 ms]
   Passed DefaultConstructor_CreatesInstance [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -9949,16 +9949,16 @@ Token count calculation
   Passed SerializeAndSave_CoreWriterStoresJsonAndClearsFileName [1 ms]
   Passed Constructor_WithTag_InitializesProperties [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Classify_FixedCorpus_IsDeterministicAcrossIdenticalInstances [248 ms]
   Passed Chi2SpamProb_WordStreamAndDictionaryOverloads_ReturnConsistentProbabilities [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿============================
  | Source token probability |
@@ -9971,7 +9971,7 @@ Token count calculation
  | shared7          0.3333  |
  | shared8          0.3333  |
  ============================
- 
+
  ======================
  |    Shared tokens   |
  | Token       Count  |
@@ -9993,13 +9993,13 @@ Token count calculation
  | dedicated4      6  |
  | dedicated1      6  |
  ======================
- 
+
 
 
   Passed Tag_GetSet_RoundTrips [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10011,15 +10011,15 @@ Token count calculation
   Passed Constructor_WithComparer_UsesCustomComparer [< 1 ms]
   Passed GroupOutcomes_WithTestOutcomes_GroupsByActualAndPredicted [10 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Load_WithTokens_InitializesMatchAndNotMatch [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 Token count calculation
@@ -10034,8 +10034,8 @@ Token count calculation
   Passed InitAsync_GroupInManager_SetsExistingClassifierGroup [12 ms]
   Passed AddMatch_AddsTokensToMatchCorpus [5 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10043,8 +10043,8 @@ Token count calculation
   Passed Constructor_ConcurrencyAndCapacity_CreatesEmpty [< 1 ms]
   Passed Chi2SpamProbAsync_ReturnsSameAsSynchronousCalculation [12 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿============================
  | Source token probability |
@@ -10057,7 +10057,7 @@ Token count calculation
  | shared7          0.3333  |
  | shared8          0.3333  |
  ============================
- 
+
  ======================
  |    Shared tokens   |
  | Token       Count  |
@@ -10079,13 +10079,13 @@ Token count calculation
  | dedicated4      6  |
  | dedicated1      6  |
  ======================
- 
+
 
 
   Passed FolderWrapperStagingJson_ExcludesRuntimeOnlyMembersDuringSerialization [17 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10099,31 +10099,31 @@ Token count calculation
   Passed ValidateJson_WhenDeserializeAsyncThrowsWithoutSuffix_ReturnsFalse [< 1 ms]
   Passed AddNotMatch_AddsTokensToNotMatchCorpus [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Chi2Q_ReturnsValueInExpectedRange [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ContainsInteger_WhenNotSet_ReturnsFalse [< 1 ms]
   Passed Loaded_DefaultIsFalse [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed Condition_WhenSpamPropertyExists_SetsAutoProcessedAndReturnsFalse [31 ms]
   Passed DefaultConstructor_InitializesEmptyClassifiers [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10131,8 +10131,8 @@ Token count calculation
   Passed UnTrain_IntermediateParentMissing_SkipsMissingSegment [14 ms]
   Passed FolderWrapperStagingJson_IgnoresLegacyRuntimeOnlyMembersDuringDeserialization [14 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10141,8 +10141,8 @@ Token count calculation
   Passed Indicator_SetAndGet_Works [14 ms]
   Passed SharedTokenBase_DefaultIsEmpty [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10151,8 +10151,8 @@ Token count calculation
   Passed DecrementOrRemoveToken_CountReachesZero_RemovesToken [< 1 ms]
   Passed Constructor_WithPositiveAndNegativeTokens_InitializesCorrectly [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 Token count calculation
@@ -10162,8 +10162,8 @@ Token count calculation
   Passed SetGetAndOverwrite_WhenIntegerAndObjectValuesChange_ReturnLatestValues [14 ms]
   Passed GroupOutcomes_WithVerboseTestOutcomes_PersistsVerboseAndSimpleResults [22 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10171,8 +10171,8 @@ Token count calculation
   Passed ContainsObject_WhenNotSet_ReturnsFalse [4 ms]
   Passed DedicatedTokens_DefaultIsEmpty [5 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10186,8 +10186,8 @@ Token count calculation
   Passed AddOrIncrementTokens_AddsMultiple [< 1 ms]
   Passed GetClues_RespectsMinDistanceAndMaximumDiscriminators [8 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿============================
  | Source token probability |
@@ -10200,7 +10200,7 @@ Token count calculation
  | shared7          0.3333  |
  | shared8          0.3333  |
  ============================
- 
+
  ======================
  |    Shared tokens   |
  | Token       Count  |
@@ -10222,7 +10222,7 @@ Token count calculation
  | dedicated4      6  |
  | dedicated1      6  |
  ======================
- 
+
 
 
   Passed SetAndGetColor_RoundTrips [1 ms]
@@ -10232,22 +10232,22 @@ Token count calculation
   Passed DecrementOrRemoveToken_CountReachesZero_Removes [9 ms]
   Passed GetWordDistance_WithUnknownWord_UsesUnknownProbability [11 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed FromTokenBase_WithValidInputs_ReturnsClassifier [7 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed SerializeAndSaveAsync_WritesJsonUsingProgressPath [19 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10257,8 +10257,8 @@ Token count calculation
   Passed TriageMissingHandlerAsync_ThrowTreatment_ThrowsArgumentNullException [12 ms]
   Passed WriteTextsAsync_AppendsEachLine [11 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10266,8 +10266,8 @@ Token count calculation
   Passed GetPadding_WhenNotSet_ReturnsEmptyPadding [< 1 ms]
   Passed NonPublicPropertySetters_RoundTripExpectedState [12 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10279,8 +10279,8 @@ Token count calculation
   Passed TriageMissingHandlerAsync_InvalidTreatment_ThrowsArgumentOutOfRange [1 ms]
   Passed GetWordInfo_WithNoCounts_ReturnsNull [23 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10289,8 +10289,8 @@ Token count calculation
   Passed GetRectangle_WhenNotSet_ReturnsEmptyRectangle [< 1 ms]
   Passed TypedWrapperValues_WhenStoredObjectHasWrongType_ReturnEmptyAndFoundFalse [25 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Fail: Have non-null object that isnt a color wrapper stored in a color entry!
  Did someone SetObject instead of SetColor?
@@ -10306,8 +10306,8 @@ Token count calculation
   Passed AsyncCondition_WhenMessageClassIsNotNote_ReturnsFalse [11 ms]
   Passed InternalSerializeAndSave_UsesProvidedSerializerAndDisk [12 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10315,16 +10315,16 @@ Token count calculation
   Passed FilePath_SetAndGet_Works [< 1 ms]
   Passed CountHitsMisses_WithGroupedTestOutcomes_ComputesCountsPerFolder [27 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed SetAndGetRectangle_RoundTrips [< 1 ms]
   Passed GetWordInfo_WithCounts_ReturnsMatchAndNotMatchCounts [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10332,8 +10332,8 @@ Token count calculation
   Passed SubtractOrRemoveValue_ReducesCount [6 ms]
   Passed ForceClassifierUpdate_CreatesNewClassifier [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 Token count calculation
@@ -10348,8 +10348,8 @@ Token count calculation
   Passed AsyncCondition_WhenSpamPropertyMissing_ReturnsTrue [9 ms]
   Passed GetProbabilityList_WithMixedSources_ReturnsOnlyIncludedTokens [21 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10357,8 +10357,8 @@ Token count calculation
   Passed SubtractOrRemoveValues_Collection_SubtractsAll [< 1 ms]
   Passed AddOrUpdateClassifier_CreatesNewIfNotExists [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 Token count calculation
@@ -10368,8 +10368,8 @@ Token count calculation
   Passed GetObject_WithOutBool_WhenNotSet_FoundIsFalse [< 1 ms]
   Passed CombineProbabilities_WithNull_ThrowsArgumentNullException [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10380,8 +10380,8 @@ Token count calculation
   Passed AddTokenCount_IncrementsCount [< 1 ms]
   Passed GetMatchProbability_WithKnownTokens_ReturnsExpectedCombinedScore [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿=============================
  |      Probability List     |
@@ -10390,13 +10390,13 @@ Token count calculation
  | .20000high0       0.8000  |
  | .20000low1        0.2000  |
  =============================
- 
+
 
 
   Passed Classify_WithTokens_ReturnsResults [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 Token count calculation
@@ -10407,8 +10407,8 @@ Token count calculation
   Passed Serialize_WithNoPath_IsNoOp [< 1 ms]
   Passed TotalTokenCount_GetSet_RoundTrips [10 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10417,8 +10417,8 @@ Token count calculation
   Passed WrapperSetters_WhenExistingObjectValueIsNull_CreateNewWrappers [< 1 ms]
   Passed RemovePositiveAndRemoveNegative_UpdateTokenFrequencies [11 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 Token count calculation
@@ -10426,8 +10426,8 @@ Token count calculation
 
   Passed GetReportMessage_WithCompletedItems_FormatsCorrectly [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10473,37 +10473,37 @@ Token count calculation
   Passed RemoveObject_WhenRemovingDifferentElementSlots_ClearsOnlyRequestedValues [< 1 ms]
   Passed GetReportMessage_ZeroCompleted_FormatsCorrectly [22 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed CountHitsMisses_WithVerboseGroupedOutcomes_ComputesVerboseCounts [53 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed GetResultType_ReturnsExpectedLabels [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed CalculateTestScores_WithNullCounts_UsesSerializedCountsAndAddsTotal [3 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed MoveSpamOrHam_WithHelperAndDestination_ReplacesHelperItem [21 ms]
   Passed CalculateTestScoresAsync_WithNullCounts_UsesSerializedCountsAndAddsTotal [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10529,8 +10529,8 @@ Token count calculation
   Passed StopAtNotImplemented_SeamReturnsYes_ReturnsTrueThrowPath [78 ms]
   Passed SetterPaths_RoundTripExpectedState [89 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10541,12 +10541,12 @@ Token count calculation
   Passed RoundTrip_EmptyPredictor_Succeeds [93 ms]
   Passed Classify_ObjectInput_UsesTokenizerDelegate [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 Token count calculation
- 
+
 Token count calculation
  ===============================
  |       Probability List      |
@@ -10555,7 +10555,7 @@ Token count calculation
  | .01100shared0       0.0110  |
  | .01100shared1       0.0110  |
  ===============================
- 
+
  ===============================
  |       Probability List      |
  | Class          Probability  |
@@ -10563,13 +10563,13 @@ Token count calculation
  | .00020shared0       0.9998  |
  | .00020shared1       0.9998  |
  ===============================
- 
+
 
 
   Passed CalculateVerboseTestScoresAsync_WithNullDetails_UsesSerializedDetailsAndAddsTotal [82 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10578,8 +10578,8 @@ Token count calculation
   Passed LoadClassifierGroup_ProgressPackageOverload_ReturnsUtilitiesResult [15 ms]
   Passed Trace_TraceLevel_Error [41 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Logger:    Error
  Message:   Test Error Message
@@ -10589,12 +10589,12 @@ Token count calculation
   Passed Serialize_ProducesParseableJson [16 ms]
   Passed LogMetricsAndLogState_WithConfiguredGroup_DoNotThrow [16 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 Token count calculation
- 
+
 Token count calculation
 
 
@@ -10603,22 +10603,22 @@ Token count calculation
   Passed DependenciesNotNull_ExpectedState_False_ParamsIsNull [< 1 ms]
   Passed Trace_TraceLevel_Warning [9 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Logger:    Warn
  Message:   Test Warning Message
- Exception: 
+ Exception:
 
 
   Passed OnDeserializedMethod_WithConfiguredGroup_DoesNotThrow [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 Token count calculation
- 
+
 Token count calculation
 
 
@@ -10628,20 +10628,20 @@ Token count calculation
   Passed Constructor_WithNameAndText_CreatesButton [25 ms]
   Passed BuildConfusionMatrixAsync_WhenFolderPathsMissing_LoadsResultsAndSavesOutputs [26 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed DependenciesNotNull_ExpectedState_Exception_ParamsIsNull [< 1 ms]
   Passed Trace_TraceLevel_Info [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Logger:    Info
  Message:   Test Info Message
- Exception: 
+ Exception:
 
 
   Passed DependenciesNotNull_ExpectedState_Exception_ParamsIsEmpty [< 1 ms]
@@ -10652,8 +10652,8 @@ Token count calculation
   Passed TestAsync_Selection_WhenInputContainsMailItem_ProcessesMessage [110 ms]
   Passed BuildConfusionMatrixAsync_WithVerboseResults_ConvertsToSimpleResults [13 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10662,12 +10662,12 @@ Token count calculation
   Passed SerializeActiveItem_WhenLoaderReturnsMailItem_InvokesSerializeMailInfo [2 ms]
   Passed Trace_TraceLevel_Verbose [13 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Logger:    Debug
  Message:   Test Verbose Message
- Exception: 
+ Exception:
 
 
   Passed Constructor_WithDialogResult_SetsDialogResult [12 ms]
@@ -10679,8 +10679,8 @@ Token count calculation
   Passed DeleteStagingFiles_WhenBayesianFolderMissing_SkipsEnumeration [1 ms]
   Passed AsyncRefreshWorkflow_RebuildsProbabilitiesAndMarksClassifierLoaded [168 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10689,8 +10689,8 @@ Token count calculation
   Passed BuildButtons_ProducesThreeLabelledButtons_RoutingToCorrectF1Calls [36 ms]
   Passed SaveScoresAsync_WithTestScores_SerializesJsonAndText [22 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10701,8 +10701,8 @@ Token count calculation
   Passed TryResolveMapiHandles_WhenFoldersNull_ReturnsFalse [1 ms]
   Passed SaveScoresAsync_WithVerboseScores_SerializesVerboseAndSimpleForms [12 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10716,8 +10716,8 @@ Token count calculation
   Passed Clone_WhenSourceIsNull_ReturnsNull [< 1 ms]
   Passed SplitAndSave_SerializesTrainAndTestPartitions [9 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10725,8 +10725,8 @@ Token count calculation
   Passed Clone_WhenSourceHasNestedObjects_CreatesDeepCopy [4 ms]
   Passed SplitAndSave_WithEmptyCollection_ThrowsBeforeWritingOutput [6 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10743,8 +10743,8 @@ Token count calculation
   Passed GetObjectSize_ReturnsCharacterCountTimesTwoForStrings [< 1 ms]
   Passed LoadIfNullAsync_WithSerializedInputs_LoadsMissingValues [18 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10754,8 +10754,8 @@ Token count calculation
   Passed GetObjectSize_TraversesComplexReferenceGraphs [< 1 ms]
   Passed LoadIfNullAsync_WhenLengthsMismatch_ThrowsArgumentException [7 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10770,24 +10770,24 @@ Token count calculation
   Passed JsonRoundTrip_PreservesTokenFrequencyMap [1 ms]
   Passed LoadIfNullAsync_ForFolderClassifierInputs_ReturnsDistinctFolderPaths [25 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed GetDuplicateEntriesByColumn_ReturnsDuplicateValues [11 ms]
   Passed DgvForm_ResizeEnd_DoesNotThrow [126 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  Size is {Width=640, Height=363}
 
 
   Passed GetVerboseTestDetails_ReturnsProbabilityDriversForPredictedClassifier [6 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10833,8 +10833,8 @@ Token count calculation
   Passed MakeButton_WithText_CreatesButton [3 ms]
   Passed InferNegativeTokensAsync_WithLegacyNullProbabilities_RebuildsMatchFromSharedTokenBase [189 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10847,8 +10847,8 @@ Token count calculation
   Passed ToString_ShouldDelegateToWrappedFileInfo [< 1 ms]
   Passed FromTokenBaseAsync_WithValidInputs_ReturnsClassifierWithProbabilities [1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿====================
  |    Match Token   |
@@ -10857,7 +10857,7 @@ Token count calculation
  ====================
  | shared-1      6  |
  ====================
- 
+
  ====================
  |   Filtered Match |
  |  Token Frequency |
@@ -10865,7 +10865,7 @@ Token count calculation
  ====================
  | shared-1      6  |
  ====================
- 
+
  ====================
  |    Filtered Not  |
  |    Match Token   |
@@ -10874,7 +10874,7 @@ Token count calculation
  ====================
  | shared-2      6  |
  ====================
- 
+
  Filtered Shared Match Count: 6
  Filtered Shared NotMatch Count: 16
 
@@ -10893,8 +10893,8 @@ Token count calculation
   Passed GetMyTraceString_WithCurrentTrace_ReturnsProjectTrace [11 ms]
   Passed DiagnosePoorPerformanceAsync_WithConfusedOutcomes_ReturnsClassificationErrors [112 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10908,8 +10908,8 @@ Token count calculation
   Passed GetOrLoad_WithIsInitializedPredicate_LoadsWhenNotInitialized [< 1 ms]
   Passed DebugTextWriter_Constructor_ShouldEnableAutoFlushAndExposeWritableStream [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10927,8 +10927,8 @@ Token count calculation
   Passed Evaluate_SameInput_ProducesDeterministicSplitAndResult [935 ms]
   Passed DebugTextWriter_BaseStream_ShouldThrowForUnsupportedOperationsAndAllowWrites [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿writer
 
@@ -10954,8 +10954,8 @@ Token count calculation
   Passed Load_WithDefaultValue_WhenDependenciesValid_InvokesLoader [< 1 ms]
   Passed DiagnosePoorPerformanceAsync_WithVerboseScores_FiltersOnlyFalseResults [34 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -10963,19 +10963,19 @@ Token count calculation
   Passed Condition_WithNoteMailItem_ReturnsTrue [< 1 ms]
   Passed ToJustifiedText_AddSpacing_Test [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
- ﻿Expected: 80 T e s t     o f     t h e     T o J u s t i f i e d T e x t     m e t h o d .   
- Actual:   80 T e s t     o f     t h e     T o J u s t i f i e d T e x t     m e t h o d .   
+ ﻿Expected: 80 T e s t     o f     t h e     T o J u s t i f i e d T e x t     m e t h o d .
+ Actual:   80 T e s t     o f     t h e     T o J u s t i f i e d T e x t     m e t h o d .
 
 
   Passed GetCallerMethod_WithOutOfRangeFrameLevel_ReturnsNull [< 1 ms]
   Passed SetAndSave_WithObjectSetterOnly_SetsVariableAndCallsSetter [< 1 ms]
   Passed ToJustifiedText_Truncate_Test [< 1 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿Expected: 32 Test of the ToJustifiedText meth
  Actual:   32 Test of the ToJustifiedText meth
@@ -11038,8 +11038,8 @@ Token count calculation
   Passed FullName_ShouldDelegateToUnderlyingFileSystemInfo [< 1 ms]
   Passed RunSensitivityAsync_WithNullInput_LoadsSerializedVerboseOutcomes [47 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -11192,8 +11192,8 @@ Token count calculation
   Passed Triage_Config_ReturnsClassifierGroupConfig [< 1 ms]
   Passed RunClassifierTestAsync_WithSingleItem_SerializesOutcomeAndRestoresProgressPane [108 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -11253,10 +11253,10 @@ Token count calculation
   Passed Read_WithOffset_ThrowsNotImplemented [< 1 ms]
   Passed FindAllControls_WithNestedControls_PopulatesDict [11 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
- 
+
   panel1
    button1
 
@@ -11264,8 +11264,8 @@ Token count calculation
   Passed Constructor_WithGroupNumber_StoresGroupNumberAndColumnWidthDefaultsToZero [24 ms]
   Passed RunVerboseClassifierTestAsync_WithSingleItem_SerializesVerboseAndSimpleOutcomes [45 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -11281,32 +11281,32 @@ Token count calculation
   Passed SetMailRead_Async_RoutesThroughInjectedDispatcherBeginInvoke [44 ms]
   Passed TestFolderClassifierAsync_WhenVerboseFalse_UsesSerializedStagingData [35 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed TestFolderClassifierAsync_WhenVerboseTrue_SerializesVerboseArtifacts [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
   Passed ResizeAllControls_AfterFind_DoesNotThrow [41 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
- 
+
   panel1
 
 
   Passed ToFunctionButtonsAsync_WhenFunctionInvoked_SetsGroupResult [150 ms]
   Passed PrivateProgressHelpers_FormatExpectedMessages [3 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿
 
@@ -11316,10 +11316,10 @@ Token count calculation
   Passed Constructor_OneField_EmptyControls_ThrowsArgumentOutOfRange [< 1 ms]
   Passed SetResizeDimensions_KnownControl_ReturnsTrue [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
- 
+
   label1
 
 
@@ -11329,10 +11329,10 @@ Token count calculation
   Passed CreateTemplate_FromControl_CapturesProperties [15 ms]
   Passed SetResizeDimensions_UnknownControl_ReturnsFalse [14 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
- 
+
 
 
   Passed ResizeDimensions_EnumValues [< 1 ms]
@@ -11644,12 +11644,12 @@ Token count calculation
   Passed GetColumnHeaders_SchemaName_MapsToFieldName [< 1 ms]
   Passed EnumerateTable_WritesFormattedOutputAndMovesToStart [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
-          Store                Subject        
-          Store                Subject        
-  STORE-ID-009           Subject              
+          Store                Subject
+          Store                Subject
+  STORE-ID-009           Subject
 
 
   Passed GetTableInViewAsync_ImmediateSuccess_CallsGetTableOnceAndReturnsSnapshot [1 ms]
@@ -11773,70 +11773,70 @@ Token count calculation
   Passed EvaluateLaunchReadiness_WhenModelAndStoresPopulated_ReturnsReadyWithDisplayNames [< 1 ms]
   Passed AfterDeserialize_WithConfiguredGlobals_LoadsClassifiersAndReportsCompletion [4 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
- 
+
 Token count calculation
 
 
   Passed HeavyParallelizationAsync_WithNullProbabilities_RebuildsLegacyClassifierState [6 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
- 
+
 Token count calculation
 
 
   Passed HeavyParallelizationAsync_WithFewerClassifiersThanProcessors_DoesNotThrow [2 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
- 
+
 Token count calculation
 
 
@@ -11858,8 +11858,8 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
   Passed ReflectionHelpers_CoverInternalFormattingBranches [8 ms]
   Passed ComputerInfo_PropertyTests [30 ms]
   Standard Output Messages:
- 
- 
+
+
  Debug Trace:
  ﻿===========================================
  |               Memory Stats              |
@@ -11870,7 +11870,7 @@ Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-
  | AvailableVirtualMemory   140,731.50 GB  |
  | TotalVirtualMemory       140,737.49 GB  |
  ===========================================
- 
+
 
 
 

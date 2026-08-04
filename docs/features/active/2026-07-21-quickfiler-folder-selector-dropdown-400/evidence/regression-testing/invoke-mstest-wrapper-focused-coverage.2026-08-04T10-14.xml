@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE report PUBLIC "-//JACOCO//DTD Report 1.1//EN" "report.dtd"[]>
+<report name="Pester (08/04/2026 10:15:02)">
+  <sessioninfo id="this" start="1785838499540" dump="1785838502299" />
+  <package name="vscode">
+    <class name="vscode/Invoke-MSTestWithCoverage" sourcefilename="Invoke-MSTestWithCoverage.ps1">
+      <method name="Resolve-RunSettingsPath" desc="()" line="33">
+        <counter type="INSTRUCTION" missed="0" covered="5" />
+        <counter type="LINE" missed="0" covered="4" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Get-DotnetCoverageArgumentList" desc="()" line="70">
+        <counter type="INSTRUCTION" missed="0" covered="4" />
+        <counter type="LINE" missed="0" covered="3" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="ConvertTo-DerivedCoverageSettingsXml" desc="()" line="93">
+        <counter type="INSTRUCTION" missed="2" covered="14" />
+        <counter type="LINE" missed="2" covered="13" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Get-DerivedCoverageSettingsPath" desc="()" line="128">
+        <counter type="INSTRUCTION" missed="1" covered="5" />
+        <counter type="LINE" missed="1" covered="5" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="Invoke-DotnetCoverageExe" desc="()" line="153">
+        <counter type="INSTRUCTION" missed="1" covered="0" />
+        <counter type="LINE" missed="1" covered="0" />
+        <counter type="METHOD" missed="1" covered="0" />
+      </method>
+      <method name="Invoke-DotnetCoverageCollection" desc="()" line="182">
+        <counter type="INSTRUCTION" missed="3" covered="19" />
+        <counter type="LINE" missed="3" covered="19" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <method name="&lt;script&gt;" desc="()" line="229">
+        <counter type="INSTRUCTION" missed="13" covered="39" />
+        <counter type="LINE" missed="12" covered="29" />
+        <counter type="METHOD" missed="0" covered="1" />
+      </method>
+      <counter type="INSTRUCTION" missed="20" covered="86" />
+      <counter type="LINE" missed="19" covered="73" />
+      <counter type="METHOD" missed="1" covered="6" />
+      <counter type="CLASS" missed="0" covered="1" />
+    </class>
+    <sourcefile name="Invoke-MSTestWithCoverage.ps1">
+      <line nr="33" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="34" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="35" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="38" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="70" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="71" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="76" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="93" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="94" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="95" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="96" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="99" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="100" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="101" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="102" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="105" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="106" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="109" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="110" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="111" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="112" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="115" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="128" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="129" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="130" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="131" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="134" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="135" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="153" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="182" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="183" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="184" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="185" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="186" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="188" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="189" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="192" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="193" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="196" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="198" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="199" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="202" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="203" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="209" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="216" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="217" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="218" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="219" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="220" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="223" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="224" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="229" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="230" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="232" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="234" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="235" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="238" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="239" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="242" mi="0" ci="3" mb="0" cb="0" />
+      <line nr="243" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="245" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="246" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="249" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="251" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="252" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="253" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="256" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="257" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="258" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="261" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="262" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="265" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="266" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="267" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="271" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="273" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="274" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="277" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="278" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="279" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="280" mi="2" ci="0" mb="0" cb="0" />
+      <line nr="283" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="284" mi="0" ci="2" mb="0" cb="0" />
+      <line nr="285" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="289" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="291" mi="0" ci="1" mb="0" cb="0" />
+      <line nr="295" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="307" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="308" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="309" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="311" mi="1" ci="0" mb="0" cb="0" />
+      <line nr="312" mi="1" ci="0" mb="0" cb="0" />
+      <counter type="INSTRUCTION" missed="20" covered="86" />
+      <counter type="LINE" missed="19" covered="73" />
+      <counter type="METHOD" missed="1" covered="6" />
+      <counter type="CLASS" missed="0" covered="1" />
+    </sourcefile>
+    <counter type="INSTRUCTION" missed="20" covered="86" />
+    <counter type="LINE" missed="19" covered="73" />
+    <counter type="METHOD" missed="1" covered="6" />
+    <counter type="CLASS" missed="0" covered="1" />
+  </package>
+  <counter type="INSTRUCTION" missed="20" covered="86" />
+  <counter type="LINE" missed="19" covered="73" />
+  <counter type="METHOD" missed="1" covered="6" />
+  <counter type="CLASS" missed="0" covered="1" />
+</report>

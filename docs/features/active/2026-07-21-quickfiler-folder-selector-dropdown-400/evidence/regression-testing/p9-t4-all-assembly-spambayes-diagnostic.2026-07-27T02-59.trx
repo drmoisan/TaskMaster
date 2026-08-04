@@ -2519,7 +2519,7 @@ System.IO.IOException: simulated unreadable file&#xD;
 ﻿Tests several conditions:
 1) A subset of tokens are found in the probability list.
 2) A subset of tokens are not found in the probability list but are found in either the shared token list or the dedicated token list, and
-3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list. 
+3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list.
    When included, they should carry the minimum probability of a match to the current classifier because they are important to other classifiers
 4) There is one new token, which should be excluded
 5) There are two duplicated tokens which should have two entries&#xD;
@@ -2579,7 +2579,7 @@ System.IO.IOException: simulated unreadable file&#xD;
 ======================&#xD;
 &#xD;
 
-Input Tokens: 
+Input Tokens:
 [i, j, k, l, j, k, dedicated2, dedicated3, shared1, shared2, shared3, new1]
 &#xD;
 ======================&#xD;
@@ -3858,7 +3858,7 @@ System.ArgumentException: The parameter 'sectionGroupName' is invalid.&#xD;
     <UnitTestResult executionId="829cd11f-88f0-4a58-8caa-1f19cb5f8f51" testId="191082db-f9ae-85d0-a892-400f18533a75" testName="LoadWhenIdle_QueuesTodoAutoFileBatchBeforeEngineAndEvents" computerName="MEGALODON4" duration="00:00:00.1155061" startTime="2026-07-26T22:59:12.0537989-04:00" endTime="2026-07-26T22:59:12.1689769-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="829cd11f-88f0-4a58-8caa-1f19cb5f8f51">
       <Output>
         <StdOut>Debug Trace:&#xD;
-2026-07-26 22:59:12,062 DEBUG UtilitiesCS.Threading.ApplicationIdleTimer - ApplicationIdle is subscribing to Idle event. 
+2026-07-26 22:59:12,062 DEBUG UtilitiesCS.Threading.ApplicationIdleTimer - ApplicationIdle is subscribing to Idle event.
 TRACE	ApplicationIdleTimer..ctor -&gt; StartTimer()&#xD;
 2026-07-26 22:59:12,079 DEBUG UtilitiesCS.Threading.IdleAsyncQueue - IdleAsyncQueue.AddEntry subscribed to ApplicationIdleTimer&#xD;
 2026-07-26 22:59:12,141 ERROR UtilitiesCS.ReusableTypeClasses.SmartSerializableLoader - Error in DeserializeAsync. globals cannot be null
@@ -5121,7 +5121,7 @@ Actual:&#xD;
     <UnitTestResult executionId="9ff4561b-0280-4e66-88d5-4d1c205ec66b" testId="109529d7-4d3c-8e53-a11b-be93efaf6b87" testName="GetMatchProbability_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0230361" startTime="2026-07-26T22:59:40.8846803-04:00" endTime="2026-07-26T22:59:40.9083364-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9ff4561b-0280-4e66-88d5-4d1c205ec66b">
       <Output>
         <StdOut>Debug Trace:&#xD;
-﻿Integration test of GetMatchProbability method which 
+﻿Integration test of GetMatchProbability method which
 calls GetProbabilityList and CombineProbabilities&#xD;
 ============================&#xD;
 | Source token probability |&#xD;
@@ -9248,7 +9248,7 @@ Argument value=123 is of type System.Int32 which is not assignable to olText whi
 ﻿Tests several conditions:
 1) A subset of tokens are found in the probability list.
 2) A subset of tokens are not found in the probability list but are found in either the shared token list or the dedicated token list, and
-3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list. 
+3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list.
    When included, they should carry the minimum probability of a match to the current classifier because they are important to other classifiers
 4) There is one new token, which should be excluded
 5) There are two duplicated tokens which should have two entries&#xD;
@@ -9263,7 +9263,7 @@ DEDICATED TOKENS:
 [dedicated6,dedicated2,dedicated7,dedicated3,dedicated8,dedicated4,dedicated5,dedicated1]&#xD;
 Total Token Count: 163&#xD;
 
-Input Tokens: 
+Input Tokens:
 [i, j, k, l, j, k, dedicated2, dedicated3, shared1, shared2, shared3, new1]
 &#xD;
 Expected list should exclude:
@@ -10869,7 +10869,7 @@ Token count calculation</StdOut>
     <UnitTestResult executionId="9e041bbc-23ad-4949-bd8b-9ba27f648464" testId="11553d01-9d19-8cb2-83f4-000add72fcef" testName="GetMatchProbability_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0750637" startTime="2026-07-26T22:59:40.8248572-04:00" endTime="2026-07-26T22:59:40.9007016-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9e041bbc-23ad-4949-bd8b-9ba27f648464">
       <Output>
         <StdOut>Debug Trace:&#xD;
-﻿Integration test of GetMatchProbability method which 
+﻿Integration test of GetMatchProbability method which
 calls GetProbabilityList and CombineProbabilities&#xD;
 
 SOURCE PROBABILITY TOKENS:

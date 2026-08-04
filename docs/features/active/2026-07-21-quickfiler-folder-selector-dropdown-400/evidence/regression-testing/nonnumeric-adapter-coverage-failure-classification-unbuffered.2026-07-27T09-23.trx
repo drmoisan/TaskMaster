@@ -2252,7 +2252,7 @@ System.NullReferenceException: Object reference not set to an instance of an obj
 ﻿Tests several conditions:
 1) A subset of tokens are found in the probability list.
 2) A subset of tokens are not found in the probability list but are found in either the shared token list or the dedicated token list, and
-3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list. 
+3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list.
    When included, they should carry the minimum probability of a match to the current classifier because they are important to other classifiers
 4) There is one new token, which should be excluded
 5) There are two duplicated tokens which should have two entries&#xD;
@@ -2267,7 +2267,7 @@ DEDICATED TOKENS:
 [dedicated6,dedicated2,dedicated7,dedicated3,dedicated8,dedicated4,dedicated5,dedicated1]&#xD;
 Total Token Count: 163&#xD;
 
-Input Tokens: 
+Input Tokens:
 [i, j, k, l, j, k, dedicated2, dedicated3, shared1, shared2, shared3, new1]
 &#xD;
 Expected list should exclude:
@@ -3344,7 +3344,7 @@ Object reference not set to an instance of an object.&#xD;
 ﻿Tests several conditions:
 1) A subset of tokens are found in the probability list.
 2) A subset of tokens are not found in the probability list but are found in either the shared token list or the dedicated token list, and
-3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list. 
+3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list.
    When included, they should carry the minimum probability of a match to the current classifier because they are important to other classifiers
 4) There is one new token, which should be excluded
 5) There are two duplicated tokens which should have two entries&#xD;
@@ -3404,7 +3404,7 @@ Object reference not set to an instance of an object.&#xD;
 ======================&#xD;
 &#xD;
 
-Input Tokens: 
+Input Tokens:
 [i, j, k, l, j, k, dedicated2, dedicated3, shared1, shared2, shared3, new1]
 &#xD;
 ======================&#xD;
@@ -7252,7 +7252,7 @@ Error converting to int at line 0 in CtfIncidence.TryDequeueIncidence of the bac
     <UnitTestResult executionId="6d6a3280-a0b9-4ca1-a21c-2312fb6c7ef9" testId="191082db-f9ae-85d0-a892-400f18533a75" testName="LoadWhenIdle_QueuesTodoAutoFileBatchBeforeEngineAndEvents" computerName="MEGALODON4" duration="00:00:00.1277941" startTime="2026-07-27T05:24:08.3163805-04:00" endTime="2026-07-27T05:24:08.4447821-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6d6a3280-a0b9-4ca1-a21c-2312fb6c7ef9">
       <Output>
         <StdOut>Debug Trace:&#xD;
-2026-07-27 05:24:08,325 DEBUG UtilitiesCS.Threading.ApplicationIdleTimer - ApplicationIdle is subscribing to Idle event. 
+2026-07-27 05:24:08,325 DEBUG UtilitiesCS.Threading.ApplicationIdleTimer - ApplicationIdle is subscribing to Idle event.
 TRACE	ApplicationIdleTimer..ctor -&gt; StartTimer()&#xD;
 2026-07-27 05:24:08,340 DEBUG UtilitiesCS.Threading.IdleAsyncQueue - IdleAsyncQueue.AddEntry subscribed to ApplicationIdleTimer&#xD;
 2026-07-27 05:24:08,404 ERROR UtilitiesCS.ReusableTypeClasses.SmartSerializableLoader - Error in DeserializeAsync. globals cannot be null
@@ -7342,7 +7342,7 @@ Error converting to int at line 0 in CtfIncidence.TryDequeueIncidence of the bac
     <UnitTestResult executionId="47e8c2df-22de-4d15-9939-9e7500d30f7e" testId="11553d01-9d19-8cb2-83f4-000add72fcef" testName="GetMatchProbability_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.1064414" startTime="2026-07-27T05:24:41.1407237-04:00" endTime="2026-07-27T05:24:41.2472111-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="47e8c2df-22de-4d15-9939-9e7500d30f7e">
       <Output>
         <StdOut>Debug Trace:&#xD;
-﻿Integration test of GetMatchProbability method which 
+﻿Integration test of GetMatchProbability method which
 calls GetProbabilityList and CombineProbabilities&#xD;
 
 SOURCE PROBABILITY TOKENS:
@@ -10496,7 +10496,7 @@ DEDICATED TOKENS:
     <UnitTestResult executionId="00bd13d5-04a5-4d91-80a3-12775ea79403" testId="109529d7-4d3c-8e53-a11b-be93efaf6b87" testName="GetMatchProbability_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0382031" startTime="2026-07-27T05:24:41.2185634-04:00" endTime="2026-07-27T05:24:41.2566601-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="00bd13d5-04a5-4d91-80a3-12775ea79403">
       <Output>
         <StdOut>Debug Trace:&#xD;
-﻿Integration test of GetMatchProbability method which 
+﻿Integration test of GetMatchProbability method which
 calls GetProbabilityList and CombineProbabilities&#xD;
 ============================&#xD;
 | Source token probability |&#xD;

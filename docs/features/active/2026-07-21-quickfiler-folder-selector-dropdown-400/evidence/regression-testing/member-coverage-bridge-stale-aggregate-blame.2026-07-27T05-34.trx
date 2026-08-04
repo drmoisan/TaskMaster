@@ -865,7 +865,7 @@ DEDICATED TOKENS:
 ﻿Tests several conditions:
 1) A subset of tokens are found in the probability list.
 2) A subset of tokens are not found in the probability list but are found in either the shared token list or the dedicated token list, and
-3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list. 
+3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list.
    When included, they should carry the minimum probability of a match to the current classifier because they are important to other classifiers
 4) There is one new token, which should be excluded
 5) There are two duplicated tokens which should have two entries&#xD;
@@ -880,7 +880,7 @@ DEDICATED TOKENS:
 [dedicated6,dedicated2,dedicated7,dedicated3,dedicated8,dedicated4,dedicated5,dedicated1]&#xD;
 Total Token Count: 163&#xD;
 
-Input Tokens: 
+Input Tokens:
 [i, j, k, l, j, k, dedicated2, dedicated3, shared1, shared2, shared3, new1]
 &#xD;
 Expected list should exclude:
@@ -2935,7 +2935,7 @@ Actual:   32 Test of the ToJustifiedText meth</StdOut>
 ﻿Tests several conditions:
 1) A subset of tokens are found in the probability list.
 2) A subset of tokens are not found in the probability list but are found in either the shared token list or the dedicated token list, and
-3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list. 
+3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list.
    When included, they should carry the minimum probability of a match to the current classifier because they are important to other classifiers
 4) There is one new token, which should be excluded
 5) There are two duplicated tokens which should have two entries&#xD;
@@ -2995,7 +2995,7 @@ Actual:   32 Test of the ToJustifiedText meth</StdOut>
 ======================&#xD;
 &#xD;
 
-Input Tokens: 
+Input Tokens:
 [i, j, k, l, j, k, dedicated2, dedicated3, shared1, shared2, shared3, new1]
 &#xD;
 ======================&#xD;
@@ -3622,7 +3622,7 @@ Actual: 1.00</StdOut>
     <UnitTestResult executionId="6a9873e9-3066-4053-937e-1e18a967dc48" testId="109529d7-4d3c-8e53-a11b-be93efaf6b87" testName="GetMatchProbability_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0127339" startTime="2026-07-27T01:32:09.2756605-04:00" endTime="2026-07-27T01:32:09.2886614-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6a9873e9-3066-4053-937e-1e18a967dc48">
       <Output>
         <StdOut>Debug Trace:&#xD;
-﻿Integration test of GetMatchProbability method which 
+﻿Integration test of GetMatchProbability method which
 calls GetProbabilityList and CombineProbabilities&#xD;
 ============================&#xD;
 | Source token probability |&#xD;
@@ -10126,7 +10126,7 @@ Actual Total token count: 16&#xD;
     <UnitTestResult executionId="26cfc7bb-ec58-4f2e-aa25-10930fd664bd" testId="11553d01-9d19-8cb2-83f4-000add72fcef" testName="GetMatchProbability_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0444166" startTime="2026-07-27T01:32:09.1135378-04:00" endTime="2026-07-27T01:32:09.1579510-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="26cfc7bb-ec58-4f2e-aa25-10930fd664bd">
       <Output>
         <StdOut>Debug Trace:&#xD;
-﻿Integration test of GetMatchProbability method which 
+﻿Integration test of GetMatchProbability method which
 calls GetProbabilityList and CombineProbabilities&#xD;
 
 SOURCE PROBABILITY TOKENS:
@@ -10808,7 +10808,7 @@ Actual: 1.00</StdOut>
     <UnitTestResult executionId="0f2485ce-169d-4e5e-ba5d-2518a48ae07b" testId="191082db-f9ae-85d0-a892-400f18533a75" testName="LoadWhenIdle_QueuesTodoAutoFileBatchBeforeEngineAndEvents" computerName="MEGALODON4" duration="00:00:00.1794905" startTime="2026-07-27T01:31:59.3178117-04:00" endTime="2026-07-27T01:31:59.4979085-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0f2485ce-169d-4e5e-ba5d-2518a48ae07b">
       <Output>
         <StdOut>Debug Trace:&#xD;
-2026-07-27 01:31:59,329 DEBUG UtilitiesCS.Threading.ApplicationIdleTimer - ApplicationIdle is subscribing to Idle event. 
+2026-07-27 01:31:59,329 DEBUG UtilitiesCS.Threading.ApplicationIdleTimer - ApplicationIdle is subscribing to Idle event.
 TRACE	ApplicationIdleTimer..ctor -&gt; StartTimer()&#xD;
 2026-07-27 01:31:59,344 DEBUG UtilitiesCS.Threading.IdleAsyncQueue - IdleAsyncQueue.AddEntry subscribed to ApplicationIdleTimer&#xD;
 2026-07-27 01:31:59,424 ERROR UtilitiesCS.ReusableTypeClasses.SmartSerializableLoader - Error in DeserializeAsync. globals cannot be null

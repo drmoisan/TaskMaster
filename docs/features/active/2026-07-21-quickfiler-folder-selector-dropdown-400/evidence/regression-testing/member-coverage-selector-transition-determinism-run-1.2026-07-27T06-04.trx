@@ -2718,7 +2718,7 @@ Argument value=not-a-number is of type System.String which is not assignable to 
 ﻿Tests several conditions:
 1) A subset of tokens are found in the probability list.
 2) A subset of tokens are not found in the probability list but are found in either the shared token list or the dedicated token list, and
-3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list. 
+3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list.
    When included, they should carry the minimum probability of a match to the current classifier because they are important to other classifiers
 4) There is one new token, which should be excluded
 5) There are two duplicated tokens which should have two entries&#xD;
@@ -2733,7 +2733,7 @@ DEDICATED TOKENS:
 [dedicated6,dedicated2,dedicated7,dedicated3,dedicated8,dedicated4,dedicated5,dedicated1]&#xD;
 Total Token Count: 163&#xD;
 
-Input Tokens: 
+Input Tokens:
 [i, j, k, l, j, k, dedicated2, dedicated3, shared1, shared2, shared3, new1]
 &#xD;
 Expected list should exclude:
@@ -5656,7 +5656,7 @@ Token count calculation</StdOut>
     <UnitTestResult executionId="901f77af-6cbf-401e-a535-c1cee8c93cf3" testId="109529d7-4d3c-8e53-a11b-be93efaf6b87" testName="GetMatchProbability_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0362962" startTime="2026-07-27T02:03:02.4614957-04:00" endTime="2026-07-27T02:03:02.4989616-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="901f77af-6cbf-401e-a535-c1cee8c93cf3">
       <Output>
         <StdOut>Debug Trace:&#xD;
-﻿Integration test of GetMatchProbability method which 
+﻿Integration test of GetMatchProbability method which
 calls GetProbabilityList and CombineProbabilities&#xD;
 ============================&#xD;
 | Source token probability |&#xD;
@@ -7215,7 +7215,7 @@ Token count calculation</StdOut>
 ﻿Tests several conditions:
 1) A subset of tokens are found in the probability list.
 2) A subset of tokens are not found in the probability list but are found in either the shared token list or the dedicated token list, and
-3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list. 
+3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list.
    When included, they should carry the minimum probability of a match to the current classifier because they are important to other classifiers
 4) There is one new token, which should be excluded
 5) There are two duplicated tokens which should have two entries&#xD;
@@ -7275,7 +7275,7 @@ Token count calculation</StdOut>
 ======================&#xD;
 &#xD;
 
-Input Tokens: 
+Input Tokens:
 [i, j, k, l, j, k, dedicated2, dedicated3, shared1, shared2, shared3, new1]
 &#xD;
 ======================&#xD;
@@ -10175,7 +10175,7 @@ Error converting to int at line 0 in CtfMapEntry.TryDequeueEntry of the backup l
     <UnitTestResult executionId="b1cb9816-c9be-4d33-b55c-87629b512614" testId="11553d01-9d19-8cb2-83f4-000add72fcef" testName="GetMatchProbability_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.1280413" startTime="2026-07-27T02:03:02.3587767-04:00" endTime="2026-07-27T02:03:02.4869632-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b1cb9816-c9be-4d33-b55c-87629b512614">
       <Output>
         <StdOut>Debug Trace:&#xD;
-﻿Integration test of GetMatchProbability method which 
+﻿Integration test of GetMatchProbability method which
 calls GetProbabilityList and CombineProbabilities&#xD;
 
 SOURCE PROBABILITY TOKENS:
@@ -10684,7 +10684,7 @@ Actual:&#xD;
     <UnitTestResult executionId="66bf0a1d-fe81-4cbc-a867-afc073762abe" testId="191082db-f9ae-85d0-a892-400f18533a75" testName="LoadWhenIdle_QueuesTodoAutoFileBatchBeforeEngineAndEvents" computerName="MEGALODON4" duration="00:00:00.1186566" startTime="2026-07-27T02:02:28.2797761-04:00" endTime="2026-07-27T02:02:28.3985838-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="66bf0a1d-fe81-4cbc-a867-afc073762abe">
       <Output>
         <StdOut>Debug Trace:&#xD;
-2026-07-27 02:02:28,288 DEBUG UtilitiesCS.Threading.ApplicationIdleTimer - ApplicationIdle is subscribing to Idle event. 
+2026-07-27 02:02:28,288 DEBUG UtilitiesCS.Threading.ApplicationIdleTimer - ApplicationIdle is subscribing to Idle event.
 TRACE	ApplicationIdleTimer..ctor -&gt; StartTimer()&#xD;
 2026-07-27 02:02:28,305 DEBUG UtilitiesCS.Threading.IdleAsyncQueue - IdleAsyncQueue.AddEntry subscribed to ApplicationIdleTimer&#xD;
 2026-07-27 02:02:28,369 ERROR UtilitiesCS.ReusableTypeClasses.SmartSerializableLoader - Error in DeserializeAsync. globals cannot be null

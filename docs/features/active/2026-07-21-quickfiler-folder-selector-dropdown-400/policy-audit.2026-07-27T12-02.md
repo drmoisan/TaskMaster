@@ -1,7 +1,7 @@
 # Policy Audit: QuickFiler Folder Selector Drop-Down (#400)
 
-**Audit Date:** 2026-07-27  
-**Reviewed range:** `origin/main` merge base `e63ddc7c18ca71e2c968b3329e42d965d45af1eb` to `83efd313c3f49b66d5f2e133467770284cca7253`  
+**Audit Date:** 2026-07-27
+**Reviewed range:** `origin/main` merge base `e63ddc7c18ca71e2c968b3329e42d965d45af1eb` to `83efd313c3f49b66d5f2e133467770284cca7253`
 **Feature folder:** `docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400`
 
 ## Executive Summary
@@ -159,5 +159,5 @@ msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU' /p:
 pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput <feature>/evidence/qa-gates/coverage.cobertura.xml
 ```
 
-**Audit Completed By:** Codex feature reviewer  
+**Audit Completed By:** Codex feature reviewer
 **Policy Version:** Current as of 2026-07-27

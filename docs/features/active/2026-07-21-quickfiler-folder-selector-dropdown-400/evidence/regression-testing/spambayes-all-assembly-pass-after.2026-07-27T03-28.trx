@@ -1825,7 +1825,7 @@ Size is {Width=640, Height=363}</StdOut>
 ﻿Tests several conditions:
 1) A subset of tokens are found in the probability list.
 2) A subset of tokens are not found in the probability list but are found in either the shared token list or the dedicated token list, and
-3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list. 
+3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list.
    When included, they should carry the minimum probability of a match to the current classifier because they are important to other classifiers
 4) There is one new token, which should be excluded
 5) There are two duplicated tokens which should have two entries&#xD;
@@ -1840,7 +1840,7 @@ DEDICATED TOKENS:
 [dedicated6,dedicated2,dedicated7,dedicated3,dedicated8,dedicated4,dedicated5,dedicated1]&#xD;
 Total Token Count: 163&#xD;
 
-Input Tokens: 
+Input Tokens:
 [i, j, k, l, j, k, dedicated2, dedicated3, shared1, shared2, shared3, new1]
 &#xD;
 Expected list should exclude:
@@ -6684,7 +6684,7 @@ Error converting to int at line 0 in CtfIncidence.TryDequeueIncidence of the bac
 ﻿Tests several conditions:
 1) A subset of tokens are found in the probability list.
 2) A subset of tokens are not found in the probability list but are found in either the shared token list or the dedicated token list, and
-3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list. 
+3) Some of the tokens found in those lists do not meet the minimum threshhold for inclusion and are excluded from the list.
    When included, they should carry the minimum probability of a match to the current classifier because they are important to other classifiers
 4) There is one new token, which should be excluded
 5) There are two duplicated tokens which should have two entries&#xD;
@@ -6744,7 +6744,7 @@ Error converting to int at line 0 in CtfIncidence.TryDequeueIncidence of the bac
 ======================&#xD;
 &#xD;
 
-Input Tokens: 
+Input Tokens:
 [i, j, k, l, j, k, dedicated2, dedicated3, shared1, shared2, shared3, new1]
 &#xD;
 ======================&#xD;
@@ -7299,7 +7299,7 @@ Token count calculation</StdOut>
     <UnitTestResult executionId="73d63c76-9bd3-4546-b7ac-e45ec7deff6e" testId="191082db-f9ae-85d0-a892-400f18533a75" testName="LoadWhenIdle_QueuesTodoAutoFileBatchBeforeEngineAndEvents" computerName="MEGALODON4" duration="00:00:00.1110801" startTime="2026-07-26T23:29:00.8175588-04:00" endTime="2026-07-26T23:29:00.9293812-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="73d63c76-9bd3-4546-b7ac-e45ec7deff6e">
       <Output>
         <StdOut>Debug Trace:&#xD;
-2026-07-26 23:29:00,827 DEBUG UtilitiesCS.Threading.ApplicationIdleTimer - ApplicationIdle is subscribing to Idle event. 
+2026-07-26 23:29:00,827 DEBUG UtilitiesCS.Threading.ApplicationIdleTimer - ApplicationIdle is subscribing to Idle event.
 TRACE	ApplicationIdleTimer..ctor -&gt; StartTimer()&#xD;
 2026-07-26 23:29:00,842 DEBUG UtilitiesCS.Threading.IdleAsyncQueue - IdleAsyncQueue.AddEntry subscribed to ApplicationIdleTimer&#xD;
 2026-07-26 23:29:00,908 ERROR UtilitiesCS.ReusableTypeClasses.SmartSerializableLoader - Error in DeserializeAsync. globals cannot be null
@@ -9630,7 +9630,7 @@ Col1  Col2  Col3  Col4  Col5  Col6  Col7  Col8  Col9</StdOut>
     <UnitTestResult executionId="03e12ec7-ce71-4b1e-bc87-d91c0ca0bfa4" testId="109529d7-4d3c-8e53-a11b-be93efaf6b87" testName="GetMatchProbability_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0223043" startTime="2026-07-26T23:29:12.8412097-04:00" endTime="2026-07-26T23:29:12.8642461-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="03e12ec7-ce71-4b1e-bc87-d91c0ca0bfa4">
       <Output>
         <StdOut>Debug Trace:&#xD;
-﻿Integration test of GetMatchProbability method which 
+﻿Integration test of GetMatchProbability method which
 calls GetProbabilityList and CombineProbabilities&#xD;
 ============================&#xD;
 | Source token probability |&#xD;
@@ -10388,7 +10388,7 @@ Error converting to int at line 0 in CtfMapEntry.TryDequeueEntry of the backup l
     <UnitTestResult executionId="02224fa8-b011-4306-a45f-d919ff06e380" testId="11553d01-9d19-8cb2-83f4-000add72fcef" testName="GetMatchProbability_StateUnderTest_ExpectedBehavior" computerName="MEGALODON4" duration="00:00:00.0495490" startTime="2026-07-26T23:29:12.7743893-04:00" endTime="2026-07-26T23:29:12.8241966-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="02224fa8-b011-4306-a45f-d919ff06e380">
       <Output>
         <StdOut>Debug Trace:&#xD;
-﻿Integration test of GetMatchProbability method which 
+﻿Integration test of GetMatchProbability method which
 calls GetProbabilityList and CombineProbabilities&#xD;
 
 SOURCE PROBABILITY TOKENS:

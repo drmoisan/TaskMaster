@@ -225,7 +225,7 @@ Debug Trace:&#xD;
     <UnitTestResult executionId="148e292c-f97d-4613-ba9b-7d2decad8cf9" testId="191082db-f9ae-85d0-a892-400f18533a75" testName="LoadWhenIdle_QueuesTodoAutoFileBatchBeforeEngineAndEvents" computerName="MEGALODON4" duration="00:00:00.0912762" startTime="2026-07-27T00:29:45.7392203-04:00" endTime="2026-07-27T00:29:45.8303324-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="148e292c-f97d-4613-ba9b-7d2decad8cf9">
       <Output>
         <StdOut>Debug Trace:&#xD;
-2026-07-27 00:29:45,746 DEBUG UtilitiesCS.Threading.ApplicationIdleTimer - ApplicationIdle is subscribing to Idle event. 
+2026-07-27 00:29:45,746 DEBUG UtilitiesCS.Threading.ApplicationIdleTimer - ApplicationIdle is subscribing to Idle event.
 TRACE	ApplicationIdleTimer..ctor -&gt; StartTimer()&#xD;
 2026-07-27 00:29:45,759 DEBUG UtilitiesCS.Threading.IdleAsyncQueue - IdleAsyncQueue.AddEntry subscribed to ApplicationIdleTimer&#xD;
 2026-07-27 00:29:45,816 ERROR UtilitiesCS.ReusableTypeClasses.SmartSerializableLoader - Error in DeserializeAsync. globals cannot be null

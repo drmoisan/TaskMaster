@@ -1,10 +1,10 @@
 # Feature Audit: QuickFiler Folder Selector Drop-Down (#400)
 
-**Audit Date:** 2026-07-27  
-**Feature Folder:** `docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400`  
-**Base Branch:** `origin/main`  
-**Head Branch:** `bug/quickfiler-folder-selector-dropdown-400`  
-**Work Mode:** `full-bug`  
+**Audit Date:** 2026-07-27
+**Feature Folder:** `docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400`
+**Base Branch:** `origin/main`
+**Head Branch:** `bug/quickfiler-folder-selector-dropdown-400`
+**Work Mode:** `full-bug`
 **Audit Type:** Independent post-remediation acceptance verification
 
 ## Scope and Baseline

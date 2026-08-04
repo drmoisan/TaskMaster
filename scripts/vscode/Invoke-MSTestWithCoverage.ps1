@@ -153,6 +153,22 @@ function Invoke-DotnetCoverageExe {
     & dotnet-coverage @DotnetCoverageArgs
 }
 
+function Invoke-VsWhereExe {
+    <#
+    .SYNOPSIS
+        Wrapper seam that splats the argument list into vswhere.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$VsWherePath,
+
+        [Parameter(Mandatory = $true)]
+        [string[]]$VsWhereArgs
+    )
+
+    & $VsWherePath @VsWhereArgs
+}
+
 function Invoke-DotnetCoverageCollection {
     <#
     .SYNOPSIS
@@ -229,84 +245,104 @@ function Invoke-DotnetCoverageCollection {
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-. (Join-Path $PSScriptRoot 'Invoke-MSTestWithCoverage.Helpers.ps1')
+function Invoke-MSTestWithCoverageMain {
+    <#
+    .SYNOPSIS
+        Discovers test assemblies and collects a Cobertura coverage report.
+    #>
+    param(
+        [string]$SearchRoot,
+        [string]$Configuration,
+        [string]$CoverageOutput = 'coverage\coverage.cobertura.xml',
+        [switch]$NoExecute,
+        [string]$ScriptRoot = $PSScriptRoot
+    )
 
-if ([string]::IsNullOrWhiteSpace($SearchRoot)) {
-    $SearchRoot = '.'
+    . (Join-Path $ScriptRoot 'Invoke-MSTestWithCoverage.Helpers.ps1')
+
+    if ([string]::IsNullOrWhiteSpace($SearchRoot)) {
+        $SearchRoot = '.'
+    }
+
+    if ([string]::IsNullOrWhiteSpace($Configuration)) {
+        $Configuration = 'Debug'
+    }
+
+    $repoRoot = (Resolve-Path (Join-Path $ScriptRoot '..\..')).Path
+    $resolvedSearchRoot = Join-Path $repoRoot $SearchRoot
+
+    if (-not (Test-Path $resolvedSearchRoot)) {
+        throw "Search root not found: $resolvedSearchRoot"
+    }
+
+    $runSettingsPath = Resolve-RunSettingsPath -ScriptRoot $ScriptRoot
+    $vswherePath = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+    if (-not (Test-Path $vswherePath)) {
+        throw 'vswhere.exe was not found. Install Visual Studio 2022 (or Build Tools) with Test Platform components.'
+    }
+
+    $vstestPath = Invoke-VsWhereExe `
+        -VsWherePath $vswherePath `
+        -VsWhereArgs @('-latest', '-products', '*', '-find', 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe') |
+        Select-Object -First 1
+    if (-not $vstestPath) {
+        throw 'vstest.console.exe not found via vswhere. Install Visual Studio Test Platform components.'
+    }
+
+    if (-not (Get-Command 'dotnet-coverage' -ErrorAction SilentlyContinue)) {
+        throw 'dotnet-coverage not found. Install it with: dotnet tool install --global dotnet-coverage'
+    }
+
+    $testAssemblies = @(Get-ChildItem -Path $resolvedSearchRoot -Recurse -Filter '*.Test.dll' |
+            Where-Object {
+                $_.FullName -match "\\bin\\$Configuration\\" -and
+                $_.FullName -notmatch '\\obj\\' -and
+                $_.FullName -notmatch '\\ref\\'
+            } |
+                Select-Object -ExpandProperty FullName)
+
+    if (-not $testAssemblies -or $testAssemblies.Count -eq 0) {
+        throw "No test assemblies found under '$resolvedSearchRoot' for configuration '$Configuration'. Build first."
+    }
+
+    $resolvedOutputPath = Join-Path $repoRoot $CoverageOutput
+    $outputDir = Split-Path $resolvedOutputPath -Parent
+    if (-not (Test-Path $outputDir)) {
+        New-Item -ItemType Directory -Path $outputDir | Out-Null
+    }
+
+    Write-Output "Using vstest.console: $vstestPath"
+    Write-Output "Discovered $($testAssemblies.Count) test assemblies."
+    Write-Output "Coverage output: $resolvedOutputPath"
+
+    # Resolve the coverage settings file (excludes third-party/F# assemblies to prevent
+    # instrumentation from breaking tests like those using Deedle/FSharp.Core).
+    $coverageConfig = Join-Path $repoRoot 'coverage.config'
+
+    if ($NoExecute) {
+        return
+    }
+
+    Invoke-DotnetCoverageCollection `
+        -OutputPath $resolvedOutputPath `
+        -CoverageConfig $coverageConfig `
+        -VsTestPath $vstestPath `
+        -TestAssembly $testAssemblies `
+        -RunSettingsPath $runSettingsPath
+
+    # Post-process the Cobertura XML for Koverage compatibility:
+    #   1. Rewrite absolute paths to workspace-relative paths using native separators.
+    #   2. Inject <sources><source>.</source></sources> (required by cobertura-parse).
+    #   3. Remove <package> elements for third-party assemblies that are not part
+    #      of the solution (dotnet-coverage instruments all loaded DLLs at runtime).
+    Write-Output 'Post-processing coverage XML for Koverage compatibility...'
+    $xmlContent = Get-Content $resolvedOutputPath -Raw -Encoding UTF8
+    $processedXmlContent = ConvertTo-KoverageCoberturaXml -XmlContent $xmlContent -RepoRoot $repoRoot
+
+    Set-Content -Path $resolvedOutputPath -Value $processedXmlContent -Encoding UTF8 -NoNewline
+    Write-Output "Done. Coverage artifact: $resolvedOutputPath"
 }
 
-if ([string]::IsNullOrWhiteSpace($Configuration)) {
-    $Configuration = 'Debug'
+if ($MyInvocation.InvocationName -ne '.') {
+    Invoke-MSTestWithCoverageMain @PSBoundParameters
 }
-
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
-$resolvedSearchRoot = Join-Path $repoRoot $SearchRoot
-
-if (-not (Test-Path $resolvedSearchRoot)) {
-    throw "Search root not found: $resolvedSearchRoot"
-}
-
-$runSettingsPath = Resolve-RunSettingsPath -ScriptRoot $PSScriptRoot
-
-$vswherePath = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
-if (-not (Test-Path $vswherePath)) {
-    throw 'vswhere.exe was not found. Install Visual Studio 2022 (or Build Tools) with Test Platform components.'
-}
-
-$vstestPath = & $vswherePath -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-if (-not $vstestPath) {
-    throw 'vstest.console.exe not found via vswhere. Install Visual Studio Test Platform components.'
-}
-
-if (-not (Get-Command 'dotnet-coverage' -ErrorAction SilentlyContinue)) {
-    throw "dotnet-coverage not found. Install it with: dotnet tool install --global dotnet-coverage"
-}
-
-$testAssemblies = @(Get-ChildItem -Path $resolvedSearchRoot -Recurse -Filter '*.Test.dll' |
-        Where-Object {
-            $_.FullName -match "\\bin\\$Configuration\\" -and
-            $_.FullName -notmatch '\\obj\\' -and
-            $_.FullName -notmatch '\\ref\\'
-        } |
-            Select-Object -ExpandProperty FullName)
-
-if (-not $testAssemblies -or $testAssemblies.Count -eq 0) {
-    throw "No test assemblies found under '$resolvedSearchRoot' for configuration '$Configuration'. Build first."
-}
-
-$resolvedOutputPath = Join-Path $repoRoot $CoverageOutput
-$outputDir = Split-Path $resolvedOutputPath -Parent
-if (-not (Test-Path $outputDir)) {
-    New-Item -ItemType Directory -Path $outputDir | Out-Null
-}
-
-Write-Output "Using vstest.console: $vstestPath"
-Write-Output "Discovered $($testAssemblies.Count) test assemblies."
-Write-Output "Coverage output: $resolvedOutputPath"
-
-# Resolve the coverage settings file (excludes third-party/F# assemblies to prevent
-# instrumentation from breaking tests like those using Deedle/FSharp.Core).
-$coverageConfig = Join-Path $repoRoot 'coverage.config'
-
-if ($NoExecute) {
-    return
-}
-
-Invoke-DotnetCoverageCollection `
-    -OutputPath $resolvedOutputPath `
-    -CoverageConfig $coverageConfig `
-    -VsTestPath $vstestPath `
-    -TestAssembly $testAssemblies `
-    -RunSettingsPath $runSettingsPath
-
-# Post-process the Cobertura XML for Koverage compatibility:
-#   1. Rewrite absolute paths to workspace-relative paths using native separators.
-#   2. Inject <sources><source>.</source></sources> (required by cobertura-parse).
-#   3. Remove <package> elements for third-party assemblies that are not part
-#      of the solution (dotnet-coverage instruments all loaded DLLs at runtime).
-Write-Output "Post-processing coverage XML for Koverage compatibility..."
-$xmlContent = Get-Content $resolvedOutputPath -Raw -Encoding UTF8
-$processedXmlContent = ConvertTo-KoverageCoberturaXml -XmlContent $xmlContent -RepoRoot $repoRoot
-
-Set-Content -Path $resolvedOutputPath -Value $processedXmlContent -Encoding UTF8 -NoNewline
-Write-Output "Done. Coverage artifact: $resolvedOutputPath"

@@ -1,11 +1,11 @@
 # Code Review: QuickFiler Folder Selector Drop-Down (#400)
 
-**Review Date:** 2026-07-27  
-**Reviewer:** Codex feature reviewer  
-**Feature Folder:** `docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400`  
-**Feature Folder Selection Rule:** Active folder suffix matches canonical issue 400 and PR-context changed scoping documents.  
-**Base Branch:** `origin/main` at `e63ddc7c18ca71e2c968b3329e42d965d45af1eb`  
-**Head Branch:** `bug/quickfiler-folder-selector-dropdown-400` at `83efd313c3f49b66d5f2e133467770284cca7253`  
+**Review Date:** 2026-07-27
+**Reviewer:** Codex feature reviewer
+**Feature Folder:** `docs/features/active/2026-07-21-quickfiler-folder-selector-dropdown-400`
+**Feature Folder Selection Rule:** Active folder suffix matches canonical issue 400 and PR-context changed scoping documents.
+**Base Branch:** `origin/main` at `e63ddc7c18ca71e2c968b3329e42d965d45af1eb`
+**Head Branch:** `bug/quickfiler-folder-selector-dropdown-400` at `83efd313c3f49b66d5f2e133467770284cca7253`
 **Review Type:** Independent post-remediation full-feature review
 
 ## Executive Summary
