@@ -232,11 +232,13 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             // rebuild completes.
             var gate = new TaskCompletionSource<FolderTreeNodeKey>();
             var router = new FolderBreadcrumbBridgeRouter(GatedTwoRowProvider(gate).Object);
+            FolderRow[] rows = TwoScoredRows();
             router.SetItems(new[] { LeafPath, SecondPath });
             router.SelectRow(1);
+            string plainIdentity = router.Model.SelectedRow.Identity;
 
             // Act: park the rebuild on the gated first resolve.
-            var upgrade = router.SetSuggestionsAsync(TwoScoredRows(), CancellationToken.None);
+            var upgrade = router.SetSuggestionsAsync(rows, CancellationToken.None);
 
             // Assert (AC-3): the readback contract stays pre-upgrade-consistent in flight.
             upgrade.IsCompleted.Should().BeFalse();
@@ -249,8 +251,133 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             // Release the gate and drain: the host-selected index survives the atomic swap.
             gate.SetResult(LeafKey);
             await upgrade;
+            string replacementIdentity = BreadcrumbRowIdentity.ForFolderRow(rows[1], 1);
             router.Model.SelectedIndex.Should().Be(1);
-            BreadcrumbSelectionMap.GetSelectedFolder(router.Model).Should().Be(SecondPath);
+            router.Model.SelectedRow.Identity.Should().Be(replacementIdentity);
+            replacementIdentity.Should().NotBe(plainIdentity);
+            router.GetSelectorState().CommittedIdentity.Should().Be(replacementIdentity);
+            router.GetSelectedFolder().Should().Be(SecondPath);
+        }
+
+        [TestMethod]
+        public void SetSuggestionFallbacks_IdentityMigration_RebasesOriginalAndPreservesDistinctPending()
+        {
+            // Arrange: the committed recent identity will change source, while the pending
+            // suggestion identity remains valid across the replacement.
+            var router = new FolderBreadcrumbBridgeRouter(
+                new Mock<IFolderHierarchyProvider>(MockBehavior.Strict).Object
+            );
+            FolderRow[] replacements = TwoScoredRows();
+            var initialRows = new[]
+            {
+                new FolderRow(LeafPath, FolderRowKind.Recent, null),
+                replacements[1],
+            };
+            router.SetSuggestionFallbacks(initialRows);
+            router.SelectRow(0);
+            router.OpenSelector().Handled.Should().BeTrue();
+            router.MoveSelector(previous: false).Handled.Should().BeTrue();
+            string pendingIdentity = router.GetSelectorState().PendingIdentity;
+
+            // Act
+            router.SetSuggestionFallbacks(replacements);
+
+            // Assert: the invalid committed/original identity rebases by retained index, while
+            // the still-valid distinct pending identity is preserved.
+            string replacementIdentity = BreadcrumbRowIdentity.ForFolderRow(replacements[0], 0);
+            BreadcrumbSelectorState state = router.GetSelectorState();
+            state.IsOpen.Should().BeTrue();
+            state.CommittedIdentity.Should().Be(replacementIdentity);
+            state.PendingIdentity.Should().Be(pendingIdentity);
+            router.CancelSelector().Handled.Should().BeTrue();
+            router.Model.SelectedIndex.Should().Be(0);
+            router.GetSelectorState().CommittedIdentity.Should().Be(replacementIdentity);
+            router.GetSelectedFolder().Should().Be(LeafPath);
+        }
+
+        [TestMethod]
+        public void SetSuggestionFallbacks_OutOfRangeRetainedIndex_DoesNotFallback()
+        {
+            // Arrange
+            var router = new FolderBreadcrumbBridgeRouter(
+                new Mock<IFolderHierarchyProvider>(MockBehavior.Strict).Object
+            );
+            FolderRow[] rows = TwoScoredRows();
+            router.SetSuggestionFallbacks(rows);
+            router.SelectRow(1);
+
+            // Act
+            router.SetSuggestionFallbacks(new[] { rows[0] });
+
+            // Assert
+            router.Model.SelectedIndex.Should().Be(-1);
+            router.Model.SelectedRow.Should().BeNull();
+            router.GetSelectorState().CommittedIdentity.Should().BeNull();
+            router.GetSelectedFolder().Should().BeNull();
+        }
+
+        [TestMethod]
+        public void SetSuggestionFallbacks_NonselectableRetainedIndex_DoesNotFallback()
+        {
+            // Arrange
+            var router = new FolderBreadcrumbBridgeRouter(
+                new Mock<IFolderHierarchyProvider>(MockBehavior.Strict).Object
+            );
+            FolderRow[] rows = TwoScoredRows();
+            router.SetSuggestionFallbacks(rows);
+            router.SelectRow(1);
+            var replacements = new[]
+            {
+                rows[0],
+                new FolderRow("===== RECENT =====", FolderRowKind.Separator, null),
+            };
+
+            // Act
+            router.SetSuggestionFallbacks(replacements);
+
+            // Assert
+            router.Model.Rows[1].IsSelectable.Should().BeFalse();
+            router.Model.SelectedIndex.Should().Be(-1);
+            router.Model.SelectedRow.Should().BeNull();
+            router.GetSelectorState().CommittedIdentity.Should().BeNull();
+            router.GetSelectedFolder().Should().BeNull();
+        }
+
+        [TestMethod]
+        public async Task SetSuggestionsAsync_OlderCompletionCannotOverwriteNewerGeneration()
+        {
+            // Arrange: the older request waits while the newer request completes synchronously.
+            var oldGate = new TaskCompletionSource<FolderTreeNodeKey>();
+            var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+            provider
+                .Setup(p => p.ResolveLeafKeyAsync(LeafPath, It.IsAny<CancellationToken>()))
+                .Returns(oldGate.Task);
+            provider
+                .Setup(p => p.GetAncestorChainAsync(LeafKey, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(LeafChain());
+            provider
+                .Setup(p => p.ResolveLeafKeyAsync(SecondPath, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(SecondKey);
+            provider
+                .Setup(p => p.GetAncestorChainAsync(SecondKey, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[] { Segment(SecondKey, "Zephyr", false) });
+            var router = new FolderBreadcrumbBridgeRouter(provider.Object);
+            var oldRows = new[] { TwoScoredRows()[0] };
+            var newRows = new[] { TwoScoredRows()[1] };
+
+            // Act
+            Task<string> oldUpgrade = router.SetSuggestionsAsync(oldRows, CancellationToken.None);
+            await router.SetSuggestionsAsync(newRows, CancellationToken.None);
+            oldGate.SetResult(LeafKey);
+            await oldUpgrade;
+
+            // Assert
+            router.Model.Rows.Should().ContainSingle();
+            router
+                .Model.Rows[0]
+                .Identity.Should()
+                .Be(BreadcrumbRowIdentity.ForFolderRow(newRows[0], 0));
+            BreadcrumbSelectionMap.GetFolderItems(router.Model).Should().Equal(SecondPath);
         }
     }
 }

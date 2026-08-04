@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="a931b7c5-7d80-48b5-9559-d261ae3ff359" name="DanMoisan@MEGALODON4 2026-07-27 00:31:25" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-07-27T00:31:25.7733124-04:00" queuing="2026-07-27T00:31:25.7733124-04:00" start="2026-07-27T00:31:24.7775089-04:00" finish="2026-07-27T00:31:25.7923130-04:00" />
+  <TestSettings name="default" id="ae17f815-a88d-432c-bc0f-afa6a868c9f1">
+    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-07-27_00_31_25" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="a5ebf292-77b6-4c16-aeb0-b1905ef1ef2f" testId="1c20ef4c-abc4-82eb-a747-521b28574c58" testName="ComputerInfo_PropertyTests" computerName="MEGALODON4" duration="00:00:00.0356921" startTime="2026-07-27T00:31:25.5848833-04:00" endTime="2026-07-27T00:31:25.7044108-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a5ebf292-77b6-4c16-aeb0-b1905ef1ef2f">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿===========================================&#xD;
+|               Memory Stats              |&#xD;
+| Property                 Value          |&#xD;
+===========================================&#xD;
+| AvailablePhysicalMemory       69.09 GB  |&#xD;
+| TotalPhysicalMemory          136.66 GB  |&#xD;
+| AvailableVirtualMemory   140,732.31 GB  |&#xD;
+| TotalVirtualMemory       140,737.49 GB  |&#xD;
+===========================================</StdOut>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="ComputerInfo_PropertyTests" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-07-21t10-25\vbfunctions.test\bin\debug\vbfunctions.test.dll" id="1c20ef4c-abc4-82eb-a747-521b28574c58">
+      <Execution id="a5ebf292-77b6-4c16-aeb0-b1905ef1ef2f" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\VBFunctions.Test\bin\Debug\VBFunctions.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="VBFunctions.Test.ComputerInfo_Test" name="ComputerInfo_PropertyTests" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1c20ef4c-abc4-82eb-a747-521b28574c58" executionId="a5ebf292-77b6-4c16-aeb0-b1905ef1ef2f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="1" executed="1" passed="1" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\VBFunctions.Test\bin\Debug\VBFunctions.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

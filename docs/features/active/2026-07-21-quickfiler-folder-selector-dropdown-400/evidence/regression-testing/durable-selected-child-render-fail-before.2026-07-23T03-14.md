@@ -1,0 +1,9 @@
+# Durable Selected-Child Render Failure-Before Gate
+
+Timestamp: 2026-07-23T03:14:50.8155877Z
+
+Command: `$buildOutput = & msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU' 2>&1; $buildExit = $LASTEXITCODE; $buildOutput; Write-Output "BUILD_EXIT_CODE: $buildExit"; if ($buildExit -ne 0) { exit $buildExit }; $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'; $vstest = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1; if (-not $vstest) { Write-Error 'VSTest was not resolved.'; exit 1 }; Write-Output "VSTEST_PATH: $vstest"; & $vstest UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation /TestCaseFilter:'FullyQualifiedName~BreadcrumbBridgeMessagesTests|FullyQualifiedName~BreadcrumbSubfolderActivationTests|FullyQualifiedName~FolderBreadcrumbAssetContractTests' /Logger:'console;Verbosity=normal'; $testExit = $LASTEXITCODE; Write-Output "TEST_EXIT_CODE: $testExit"; exit $testExit`
+
+EXIT_CODE: 1
+
+Output Summary: The unchanged-production build succeeded with zero errors and six existing warnings. VSTest resolved to `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe`. Exactly 43 tests were discovered: 40 passed and the three named regressions failed. `RoundTrip_Render_PreservesSelectedChildStateAndLegacyDefaults` failed because `RenderMessage` had no three-argument selected-child constructor. `OpenSelector_SubfolderActivation_PublishesOneDurableRenderAndNoLegacySelectionChange` failed because the activation render omitted `selectedSubfolderIndex`. `RenderReceiver_OwnsSelectedChildExpandedAndCollapsedProjection` failed because the compiled HTML lacked the selected-child render projection. No unrelated test failed.

@@ -44,7 +44,7 @@ function Get-DotnetCoverageArgumentList {
         Builds the dotnet-coverage argument list, including the inner vstest /Settings:.
     .DESCRIPTION
         Returns the full argument array for dotnet-coverage collect. The outer
-        --settings <coverage.config> (instrumentation excludes) is preserved and remains
+        --settings path carries the effective instrumentation exclusions and remains
         distinct from the inner vstest /Settings:<TaskMaster.runsettings> applied after
         the -- separator and the vstest executable path. Pure function; no I/O or execution.
     #>
@@ -65,8 +65,8 @@ function Get-DotnetCoverageArgumentList {
         [string]$RunSettingsPath
     )
 
-    # The outer dotnet-coverage --settings is the instrumentation-exclude file
-    # (coverage.config); the inner vstest /Settings: is the MSTest runsettings.
+    # The outer dotnet-coverage --settings is the effective instrumentation-exclude
+    # file; the inner vstest /Settings: is the MSTest runsettings.
     return @(
         'collect',
         '--output', $OutputPath,
@@ -74,6 +74,65 @@ function Get-DotnetCoverageArgumentList {
         '--settings', $CoverageConfig,
         '--', $VsTestPath
     ) + @($TestAssembly) + @("/Settings:$RunSettingsPath", '/InIsolation', '/TestCaseFilter:TestCategory!=LiveOutlook')
+}
+
+function ConvertTo-DerivedCoverageSettingsXml {
+    <#
+    .SYNOPSIS
+        Adds the test-assembly instrumentation exclusion to coverage settings.
+    .DESCRIPTION
+        Parses canonical dotnet-coverage settings in memory, retains every
+        existing module exclusion, and returns XML containing exactly one
+        test-assembly exclusion. The canonical settings file is never written.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$CanonicalSettingsXml
+    )
+
+    [xml]$settings = $CanonicalSettingsXml
+    $excludeNode = $settings.SelectSingleNode('/Configuration/CodeCoverage/ModulePaths/Exclude')
+    if ($null -eq $excludeNode) {
+        throw 'Coverage settings do not contain Configuration/CodeCoverage/ModulePaths/Exclude.'
+    }
+
+    $testAssemblyPattern = '.*\.Test\.dll$'
+    $existingTestExclusions = @(
+        $excludeNode.SelectNodes('ModulePath') |
+            Where-Object { $_.InnerText -ceq $testAssemblyPattern }
+    )
+
+    if ($existingTestExclusions.Count -gt 1) {
+        throw "Coverage settings contain the test-assembly exclusion more than once: $testAssemblyPattern"
+    }
+
+    if ($existingTestExclusions.Count -eq 0) {
+        $testAssemblyExclusion = $settings.CreateElement('ModulePath')
+        $testAssemblyExclusion.InnerText = $testAssemblyPattern
+        $null = $excludeNode.AppendChild($testAssemblyExclusion)
+    }
+
+    return $settings.OuterXml
+}
+
+function Get-DerivedCoverageSettingsPath {
+    <#
+    .SYNOPSIS
+        Returns the effective settings path associated with a coverage output.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$OutputPath
+    )
+
+    $resolvedOutputPath = [IO.Path]::GetFullPath($OutputPath)
+    $outputDirectory = [IO.Path]::GetDirectoryName($resolvedOutputPath)
+    if ([string]::IsNullOrWhiteSpace($outputDirectory)) {
+        throw "Coverage output must have a parent directory: $OutputPath"
+    }
+
+    $outputName = [IO.Path]::GetFileName($resolvedOutputPath)
+    return Join-Path $outputDirectory "$outputName.effective-coverage.config"
 }
 
 function Invoke-DotnetCoverageExe {
@@ -94,93 +153,196 @@ function Invoke-DotnetCoverageExe {
     & dotnet-coverage @DotnetCoverageArgs
 }
 
+function Invoke-VsWhereExe {
+    <#
+    .SYNOPSIS
+        Wrapper seam that splats the argument list into vswhere.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$VsWherePath,
+
+        [Parameter(Mandatory = $true)]
+        [string[]]$VsWhereArgs
+    )
+
+    & $VsWherePath @VsWhereArgs
+}
+
+function Invoke-DotnetCoverageCollection {
+    <#
+    .SYNOPSIS
+        Runs coverage with an output-adjacent effective settings file.
+    .DESCRIPTION
+        Reads the canonical settings without modifying them, writes one derived
+        settings file beside the requested Cobertura output, and removes only
+        that verified derived path in a finally block.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$OutputPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$CoverageConfig,
+
+        [Parameter(Mandatory = $true)]
+        [string]$VsTestPath,
+
+        [Parameter(Mandatory = $true)]
+        [string[]]$TestAssembly,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RunSettingsPath
+    )
+
+    $derivedSettingsPath = Get-DerivedCoverageSettingsPath -OutputPath $OutputPath
+    $canonicalFullPath = [IO.Path]::GetFullPath($CoverageConfig)
+    $derivedFullPath = [IO.Path]::GetFullPath($derivedSettingsPath)
+    $outputDirectory = [IO.Path]::GetDirectoryName([IO.Path]::GetFullPath($OutputPath))
+    $derivedDirectory = [IO.Path]::GetDirectoryName($derivedFullPath)
+
+    if (-not [string]::Equals($outputDirectory, $derivedDirectory, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Derived coverage settings must be adjacent to the requested output: $derivedFullPath"
+    }
+
+    if ([string]::Equals($canonicalFullPath, $derivedFullPath, [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Derived coverage settings path must differ from the canonical settings path.'
+    }
+
+    $shouldRemoveDerivedSettings = $false
+    try {
+        $canonicalSettingsXml = Get-Content -LiteralPath $canonicalFullPath -Raw -Encoding UTF8
+        $derivedSettingsXml = ConvertTo-DerivedCoverageSettingsXml `
+            -CanonicalSettingsXml $canonicalSettingsXml
+
+        $shouldRemoveDerivedSettings = $true
+        Set-Content `
+            -LiteralPath $derivedFullPath `
+            -Value $derivedSettingsXml `
+            -Encoding UTF8 `
+            -NoNewline
+
+        $dotnetCoverageArgs = Get-DotnetCoverageArgumentList `
+            -OutputPath $OutputPath `
+            -CoverageConfig $derivedFullPath `
+            -VsTestPath $VsTestPath `
+            -TestAssembly $TestAssembly `
+            -RunSettingsPath $RunSettingsPath
+
+        $global:LASTEXITCODE = 0
+        Invoke-DotnetCoverageExe -DotnetCoverageArgs $dotnetCoverageArgs
+        $coverageExitCode = [int]$LASTEXITCODE
+        if ($coverageExitCode -ne 0) {
+            throw "MSTest with coverage failed with exit code $coverageExitCode"
+        }
+    } finally {
+        if ($shouldRemoveDerivedSettings) {
+            Remove-Item -LiteralPath $derivedFullPath -Force -ErrorAction SilentlyContinue
+        }
+    }
+}
+
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-. (Join-Path $PSScriptRoot 'Invoke-MSTestWithCoverage.Helpers.ps1')
+function Invoke-MSTestWithCoverageMain {
+    <#
+    .SYNOPSIS
+        Discovers test assemblies and collects a Cobertura coverage report.
+    #>
+    param(
+        [string]$SearchRoot,
+        [string]$Configuration,
+        [string]$CoverageOutput = 'coverage\coverage.cobertura.xml',
+        [switch]$NoExecute,
+        [string]$ScriptRoot = $PSScriptRoot
+    )
 
-if ([string]::IsNullOrWhiteSpace($SearchRoot)) {
-    $SearchRoot = '.'
+    . (Join-Path $ScriptRoot 'Invoke-MSTestWithCoverage.Helpers.ps1')
+
+    if ([string]::IsNullOrWhiteSpace($SearchRoot)) {
+        $SearchRoot = '.'
+    }
+
+    if ([string]::IsNullOrWhiteSpace($Configuration)) {
+        $Configuration = 'Debug'
+    }
+
+    $repoRoot = (Resolve-Path (Join-Path $ScriptRoot '..\..')).Path
+    $resolvedSearchRoot = Join-Path $repoRoot $SearchRoot
+
+    if (-not (Test-Path $resolvedSearchRoot)) {
+        throw "Search root not found: $resolvedSearchRoot"
+    }
+
+    $runSettingsPath = Resolve-RunSettingsPath -ScriptRoot $ScriptRoot
+    $vswherePath = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+    if (-not (Test-Path $vswherePath)) {
+        throw 'vswhere.exe was not found. Install Visual Studio 2022 (or Build Tools) with Test Platform components.'
+    }
+
+    $vstestPath = Invoke-VsWhereExe `
+        -VsWherePath $vswherePath `
+        -VsWhereArgs @('-latest', '-products', '*', '-find', 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe') |
+        Select-Object -First 1
+    if (-not $vstestPath) {
+        throw 'vstest.console.exe not found via vswhere. Install Visual Studio Test Platform components.'
+    }
+
+    if (-not (Get-Command 'dotnet-coverage' -ErrorAction SilentlyContinue)) {
+        throw 'dotnet-coverage not found. Install it with: dotnet tool install --global dotnet-coverage'
+    }
+
+    $testAssemblies = @(Get-ChildItem -Path $resolvedSearchRoot -Recurse -Filter '*.Test.dll' |
+            Where-Object {
+                $_.FullName -match "\\bin\\$Configuration\\" -and
+                $_.FullName -notmatch '\\obj\\' -and
+                $_.FullName -notmatch '\\ref\\'
+            } |
+                Select-Object -ExpandProperty FullName)
+
+    if (-not $testAssemblies -or $testAssemblies.Count -eq 0) {
+        throw "No test assemblies found under '$resolvedSearchRoot' for configuration '$Configuration'. Build first."
+    }
+
+    $resolvedOutputPath = Join-Path $repoRoot $CoverageOutput
+    $outputDir = Split-Path $resolvedOutputPath -Parent
+    if (-not (Test-Path $outputDir)) {
+        New-Item -ItemType Directory -Path $outputDir | Out-Null
+    }
+
+    Write-Output "Using vstest.console: $vstestPath"
+    Write-Output "Discovered $($testAssemblies.Count) test assemblies."
+    Write-Output "Coverage output: $resolvedOutputPath"
+
+    # Resolve the coverage settings file (excludes third-party/F# assemblies to prevent
+    # instrumentation from breaking tests like those using Deedle/FSharp.Core).
+    $coverageConfig = Join-Path $repoRoot 'coverage.config'
+
+    if ($NoExecute) {
+        return
+    }
+
+    Invoke-DotnetCoverageCollection `
+        -OutputPath $resolvedOutputPath `
+        -CoverageConfig $coverageConfig `
+        -VsTestPath $vstestPath `
+        -TestAssembly $testAssemblies `
+        -RunSettingsPath $runSettingsPath
+
+    # Post-process the Cobertura XML for Koverage compatibility:
+    #   1. Rewrite absolute paths to workspace-relative paths using native separators.
+    #   2. Inject <sources><source>.</source></sources> (required by cobertura-parse).
+    #   3. Remove <package> elements for third-party assemblies that are not part
+    #      of the solution (dotnet-coverage instruments all loaded DLLs at runtime).
+    Write-Output 'Post-processing coverage XML for Koverage compatibility...'
+    $xmlContent = Get-Content $resolvedOutputPath -Raw -Encoding UTF8
+    $processedXmlContent = ConvertTo-KoverageCoberturaXml -XmlContent $xmlContent -RepoRoot $repoRoot
+
+    Set-Content -Path $resolvedOutputPath -Value $processedXmlContent -Encoding UTF8 -NoNewline
+    Write-Output "Done. Coverage artifact: $resolvedOutputPath"
 }
 
-if ([string]::IsNullOrWhiteSpace($Configuration)) {
-    $Configuration = 'Debug'
+if ($MyInvocation.InvocationName -ne '.') {
+    Invoke-MSTestWithCoverageMain @PSBoundParameters
 }
-
-$repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
-$resolvedSearchRoot = Join-Path $repoRoot $SearchRoot
-
-if (-not (Test-Path $resolvedSearchRoot)) {
-    throw "Search root not found: $resolvedSearchRoot"
-}
-
-$runSettingsPath = Resolve-RunSettingsPath -ScriptRoot $PSScriptRoot
-
-$vswherePath = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
-if (-not (Test-Path $vswherePath)) {
-    throw 'vswhere.exe was not found. Install Visual Studio 2022 (or Build Tools) with Test Platform components.'
-}
-
-$vstestPath = & $vswherePath -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-if (-not $vstestPath) {
-    throw 'vstest.console.exe not found via vswhere. Install Visual Studio Test Platform components.'
-}
-
-if (-not (Get-Command 'dotnet-coverage' -ErrorAction SilentlyContinue)) {
-    throw "dotnet-coverage not found. Install it with: dotnet tool install --global dotnet-coverage"
-}
-
-$testAssemblies = @(Get-ChildItem -Path $resolvedSearchRoot -Recurse -Filter '*.Test.dll' |
-    Where-Object {
-        $_.FullName -match "\\bin\\$Configuration\\" -and
-        $_.FullName -notmatch '\\obj\\' -and
-        $_.FullName -notmatch '\\ref\\'
-    } |
-        Select-Object -ExpandProperty FullName)
-
-if (-not $testAssemblies -or $testAssemblies.Count -eq 0) {
-    throw "No test assemblies found under '$resolvedSearchRoot' for configuration '$Configuration'. Build first."
-}
-
-$resolvedOutputPath = Join-Path $repoRoot $CoverageOutput
-$outputDir = Split-Path $resolvedOutputPath -Parent
-if (-not (Test-Path $outputDir)) {
-    New-Item -ItemType Directory -Path $outputDir | Out-Null
-}
-
-Write-Output "Using vstest.console: $vstestPath"
-Write-Output "Discovered $($testAssemblies.Count) test assemblies."
-Write-Output "Coverage output: $resolvedOutputPath"
-
-# Resolve the coverage settings file (excludes third-party/F# assemblies to prevent
-# instrumentation from breaking tests like those using Deedle/FSharp.Core).
-$coverageConfig = Join-Path $repoRoot 'coverage.config'
-
-# Pass -- to dotnet-coverage to signal the start of the test runner command and its arguments.
-$dotnetCoverageArgs = Get-DotnetCoverageArgumentList `
-    -OutputPath $resolvedOutputPath `
-    -CoverageConfig $coverageConfig `
-    -VsTestPath $vstestPath `
-    -TestAssembly $testAssemblies `
-    -RunSettingsPath $runSettingsPath
-
-if ($NoExecute) {
-    return
-}
-
-Invoke-DotnetCoverageExe -DotnetCoverageArgs $dotnetCoverageArgs
-if ($LASTEXITCODE -ne 0) {
-    throw "MSTest with coverage failed with exit code $LASTEXITCODE"
-}
-
-# Post-process the Cobertura XML for Koverage compatibility:
-#   1. Rewrite absolute paths to workspace-relative paths using native separators.
-#   2. Inject <sources><source>.</source></sources> (required by cobertura-parse).
-#   3. Remove <package> elements for third-party assemblies that are not part
-#      of the solution (dotnet-coverage instruments all loaded DLLs at runtime).
-Write-Output "Post-processing coverage XML for Koverage compatibility..."
-$xmlContent = Get-Content $resolvedOutputPath -Raw -Encoding UTF8
-$processedXmlContent = ConvertTo-KoverageCoberturaXml -XmlContent $xmlContent -RepoRoot $repoRoot
-
-Set-Content -Path $resolvedOutputPath -Value $processedXmlContent -Encoding UTF8 -NoNewline
-Write-Output "Done. Coverage artifact: $resolvedOutputPath"

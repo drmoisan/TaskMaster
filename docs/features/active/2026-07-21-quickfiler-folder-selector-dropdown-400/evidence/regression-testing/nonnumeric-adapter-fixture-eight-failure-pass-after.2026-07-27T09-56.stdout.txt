@@ -1,0 +1,51 @@
+VSTest version 18.8.0 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll
+  Passed SurfaceFactory_WorkerCompletion_DispatchesEveryStageAndCleanup [177 ms]
+  Standard Output Messages:
+      Warning:
+      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
+      the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
+      non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
+
+      Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
+
+      A paid commercial license supports the development and continued increasing support of
+      Fluent Assertions users under both commercial and community licenses. Help us
+      keep Fluent Assertions at the forefront of unit testing.
+
+      For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
+
+
+ Debug Trace:
+      Warning:
+      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
+      the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
+      non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
+
+      Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
+
+      A paid commercial license supports the development and continued increasing support of
+      Fluent Assertions users under both commercial and community licenses. Help us
+      keep Fluent Assertions at the forefront of unit testing.
+
+      For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
+
+
+  Passed SurfaceFactory_NavigationActionFailure_ReportsOnceAndCleansUp [10 ms]
+  Passed SurfaceFactory_ReadinessFailure_ReportsOnceThenDisposesSurface [1 ms]
+  Passed SurfaceFactory_InvalidNavigationResult_ReportsOnceAndCleansUp (0) [4 ms]
+  Passed SurfaceFactory_InvalidNavigationResult_ReportsOnceAndCleansUp (1) [< 1 ms]
+  Passed SurfaceFactory_InvalidNavigationResult_ReportsOnceAndCleansUp (2) [< 1 ms]
+  Passed MouseToggle_FirstOpenFaultsAfterAwait_SecondClickRetriesCleanly [1 s]
+  Passed SetFolderDroppedDownTrue_UsesSameOpenRequestAsMouseSelectorToggle [211 ms]
+  Passed ViewerAttachment_PendingCachesAndReplaysCurrentStateExactlyOnce [177 ms]
+  Passed ViewerAttachment_FailureResetReuseAndDisposalLeaveNoStaleAttachment [139 ms]
+
+Test Run Successful.
+Total tests: 10
+     Passed: 10
+ Total time: 3.2914 Seconds
+Results File: C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\regression-testing\nonnumeric-adapter-fixture-eight-failure-pass-after.2026-07-27T09-56.trx

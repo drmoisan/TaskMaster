@@ -1,0 +1,9 @@
+# Durable Selected-Child Render CSharpier Gate
+
+Timestamp: 2026-07-23T03:22:21.8196349Z
+
+Command: `$files=@('UtilitiesCS/OutlookObjects/Folder/BreadcrumbBridgeMessages.cs','UtilitiesCS/OutlookObjects/Folder/FolderBreadcrumbBridgeRouter.cs','UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbBridgeMessagesTests.cs','QuickFiler.Test/Viewers/BreadcrumbSubfolderActivationTests.cs','QuickFiler.Test/Viewers/FolderBreadcrumbAssetContractTests.cs'); $before=@{}; foreach($file in $files){$before[$file]=(Get-FileHash -Algorithm SHA256 $file).Hash}; & csharpier format @files; $formatExit=$LASTEXITCODE; if($formatExit -ne 0){exit $formatExit}; $changed=@($files | Where-Object {(Get-FileHash -Algorithm SHA256 $_).Hash -ne $before[$_]}); $stable=@{}; foreach($file in $files){$stable[$file]=(Get-FileHash -Algorithm SHA256 $file).Hash}; & csharpier format @files; $secondFormatExit=$LASTEXITCODE; if($secondFormatExit -ne 0){exit $secondFormatExit}; $secondChanged=@($files | Where-Object {(Get-FileHash -Algorithm SHA256 $_).Hash -ne $stable[$_]}); if($secondChanged.Count -ne 0){exit 1}; & csharpier check @files; $checkExit=$LASTEXITCODE; if($checkExit -ne 0){exit $checkExit}; git diff --check -- QuickFiler/Resources/FolderBreadcrumb.html; $htmlExit=$LASTEXITCODE; if($htmlExit -ne 0){exit $htmlExit}; @($files + 'QuickFiler/Resources/FolderBreadcrumb.html') | ForEach-Object {$count=(Get-Content $_).Count; if($count -gt 500){$script:overLimit=$true}}; if($overLimit){exit 1}; exit 0`
+
+EXIT_CODE: 0
+
+Output Summary: This final restarted gate supersedes the 03-20 artifact after correcting two stale asset assertions. The first pass changed one test file, the second pass was stable across all five C# files, `csharpier check` reported `Checked 5 files`, and the HTML diff check passed. Final line counts are 463, 485, 328, 480, 405, and 489 for the exact six-file batch; all remain at most 500 lines.

@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
 using UtilitiesCS.OutlookObjects.Folder;
 
 namespace UtilitiesCS.Test.OutlookObjects.Folder
@@ -138,6 +141,50 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             m.Rows[0].Cells.Select(c => c.Text).Should().Equal(rows[0].Cells.Select(c => c.Text));
             m.Rows[1].Selected.Should().BeTrue();
             m.Rows[1].IsSuggestion.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void RoundTrip_Render_PreservesSelectedChildStateAndLegacyDefaults()
+        {
+            // Arrange
+            var model = new BreadcrumbStateModel();
+            model.AddSuggestionRow(SampleChain(), 0.73);
+            var rows = BreadcrumbRenderProjection.Project(model);
+            const string selectedFolder = "\\Inbox\\Leaf\\Alpha";
+            Type renderType = typeof(RenderMessage);
+            ConstructorInfo constructor = renderType.GetConstructor(
+                new[] { typeof(IReadOnlyList<BreadcrumbRowRender>), typeof(int), typeof(string) }
+            );
+            PropertyInfo selectedSubfolderIndex = renderType.GetProperty("SelectedSubfolderIndex");
+            PropertyInfo selectedFolderProperty = renderType.GetProperty("SelectedFolder");
+
+            // Act
+            constructor
+                .Should()
+                .NotBeNull("render messages need a cacheable selected-child shape");
+            selectedSubfolderIndex.Should().NotBeNull();
+            selectedFolderProperty.Should().NotBeNull();
+            var selectedMessage = (RenderMessage)
+                constructor.Invoke(new object[] { rows, 0, selectedFolder });
+            string selectedJson = RoundTrip(selectedMessage, out var selectedParsed);
+            var legacyRoot = JObject.Parse(
+                BreadcrumbBridgeSerializer.Serialize(new RenderMessage(rows))
+            );
+            legacyRoot.Remove("selectedSubfolderIndex");
+            legacyRoot.Remove("selectedFolder");
+            var legacyParsed = BreadcrumbBridgeSerializer
+                .Parse(legacyRoot.ToString())
+                .Should()
+                .BeOfType<RenderMessage>()
+                .Subject;
+
+            // Assert
+            selectedJson.Should().Contain("\"selectedSubfolderIndex\":0");
+            selectedJson.Should().Contain("\"selectedFolder\":\"\\\\Inbox\\\\Leaf\\\\Alpha\"");
+            selectedSubfolderIndex.GetValue(selectedParsed).Should().Be(0);
+            selectedFolderProperty.GetValue(selectedParsed).Should().Be(selectedFolder);
+            selectedSubfolderIndex.GetValue(legacyParsed).Should().Be(-1);
+            selectedFolderProperty.GetValue(legacyParsed).Should().BeNull();
         }
 
         [TestMethod]

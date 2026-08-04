@@ -1,0 +1,11 @@
+{
+  "StartedUtc": "2026-07-27T08:53:17.0246650Z",
+  "CompletedUtc": "2026-07-27T08:53:20.7207539Z",
+  "RootProcessId": 278488,
+  "TimedOut": false,
+  "ExitCode": 1,
+  "ObservedProcesses": [],
+  "TerminatedVerifiedDescendants": [],
+  "PreRunRelatedProcesses": [],
+  "PostRunRelatedProcesses": []
+}

@@ -1,8 +1,10 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 using UtilitiesCS;
 using UtilitiesCS.OutlookObjects.Folder;
 
@@ -20,10 +22,13 @@ namespace QuickFiler.Viewers
     /// <c>IItemViewer.FolderKeyDown</c>, keeping this type free of WinForms/WebView2/COM usage.
     /// Router responses are awaited directly — no timers.
     /// </summary>
-    public sealed class BreadcrumbBridgeCoordinator
+    public sealed class BreadcrumbBridgeCoordinator : IDisposable
     {
+        private readonly BreadcrumbUiDispatcher _dispatcher;
         private readonly IWebViewMessenger _messenger;
+        private readonly EventHandler<string> _messageReceivedHandler;
         private readonly FolderBreadcrumbBridgeRouter _router;
+        private readonly BreadcrumbCoordinatorUpgradeLifetime _upgradeLifetime;
 
         /// <summary>
         /// Creates the coordinator and subscribes to inbound page messages.
@@ -35,10 +40,22 @@ namespace QuickFiler.Viewers
             IWebViewMessenger messenger,
             IFolderHierarchyProvider provider
         )
+            : this(messenger, provider, CaptureProductionDispatcher(messenger, provider)) { }
+
+        internal BreadcrumbBridgeCoordinator(
+            IWebViewMessenger messenger,
+            IFolderHierarchyProvider provider,
+            BreadcrumbUiDispatcher dispatcher
+        )
         {
             _messenger = messenger ?? throw new ArgumentNullException(nameof(messenger));
-            _router = new FolderBreadcrumbBridgeRouter(provider);
-            _messenger.MessageReceived += OnMessageReceived;
+            _router = new FolderBreadcrumbBridgeRouter(
+                provider ?? throw new ArgumentNullException(nameof(provider))
+            );
+            _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+            _upgradeLifetime = new BreadcrumbCoordinatorUpgradeLifetime(_dispatcher.Report);
+            _messageReceivedHandler = OnMessageReceived;
+            _messenger.MessageReceived += _messageReceivedHandler;
         }
 
         /// <summary>Raised when the page selection changes (backs <c>FolderSelectionChanged</c>).</summary>
@@ -50,8 +67,20 @@ namespace QuickFiler.Viewers
         /// <summary>Synthetic key event for every inbound arrow message (handled or not).</summary>
         public event EventHandler<BreadcrumbArrowDirection>? FolderArrowKeyDown;
 
+        /// <summary>Raised once when a selector session opens or closes.</summary>
+        public event EventHandler? SelectorOpenStateChanged;
+
         /// <summary>The dispatch task of the most recent inbound message (awaitable by tests/glue).</summary>
         public Task LastDispatch { get; private set; } = Task.CompletedTask;
+
+        /// <summary>True while the expanded selector owns a pending selection session.</summary>
+        public bool IsSelectorOpen => _router.GetSelectorState().IsOpen;
+
+        /// <summary>The stable identity currently committed to the model.</summary>
+        public string? CommittedIdentity => _router.GetSelectorState().CommittedIdentity;
+
+        /// <summary>The stable identity highlighted in the expanded selector.</summary>
+        public string? PendingIdentity => _router.GetSelectorState().PendingIdentity;
 
         /// <summary>
         /// Populates Path A suggestion rows through the router/provider and posts the render
@@ -62,70 +91,90 @@ namespace QuickFiler.Viewers
             CancellationToken cancellationToken
         )
         {
-            var renderJson = await _router
-                .SetSuggestionsAsync(rows, cancellationToken)
-                .ConfigureAwait(false);
-            _messenger.PostJson(renderJson);
+            _ = rows ?? throw new ArgumentNullException(nameof(rows));
+            BreadcrumbUpgradeLease lease = _upgradeLifetime.BeginPopulation(cancellationToken);
+            await PopulateSuggestionsAsync(rows, lease).ConfigureAwait(false);
         }
 
-        /// <summary>
-        /// Synchronous population facade for the void <c>IItemViewer.SetFolderSuggestions</c>
-        /// contract: rows are populated immediately as plain full-path rows so the selection
-        /// contract (FolderContains/SetFolderSelectedItem/GetSelectedFolder readback) holds
-        /// without awaiting the provider, then the ancestor-chain upgrade runs asynchronously
-        /// (<see cref="SuggestionsUpgrade"/>) preserving the selected index (FR-1/G10).
-        /// </summary>
+        /// <summary>Publishes scored fallbacks immediately, then resolves current hierarchy chains.</summary>
         public void SetSuggestions(IReadOnlyList<FolderRow> rows)
         {
-            if (rows == null)
-            {
-                throw new ArgumentNullException(nameof(rows));
-            }
+            _ = rows ?? throw new ArgumentNullException(nameof(rows));
 
-            var immediate = new string[rows.Count];
-            for (int i = 0; i < rows.Count; i++)
-            {
-                var score = rows[i].Score;
-                immediate[i] = score.HasValue ? score.Value.FolderPath : rows[i].Text;
-            }
-            _messenger.PostJson(_router.SetItems(immediate));
-            SuggestionsUpgrade = UpgradeSuggestionsAsync(rows);
+            BreadcrumbUpgradeLease lease = _upgradeLifetime.BeginPopulation();
+            _upgradeLifetime.RunSynchronous(
+                lease,
+                () =>
+                {
+                    string renderJson = _router.SetSuggestionFallbacks(rows);
+                    BreadcrumbSelectorState selectorState = _router.GetSelectorState();
+                    _ = PostRenderAndSelectorAsync(renderJson, selectorState, lease);
+                    SuggestionsUpgrade = PopulateSuggestionsAsync(rows, lease);
+                }
+            );
         }
 
         /// <summary>The in-flight ancestor-chain upgrade of the latest <see cref="SetSuggestions"/> call.</summary>
         public Task SuggestionsUpgrade { get; private set; } = Task.CompletedTask;
 
-        private async Task UpgradeSuggestionsAsync(IReadOnlyList<FolderRow> rows)
-        {
-            int selected = _router.Model.SelectedIndex;
-            var renderJson = await _router
-                .SetSuggestionsAsync(rows, CancellationToken.None)
-                .ConfigureAwait(false);
-            if (selected >= 0 && selected < _router.Model.Rows.Count)
-            {
-                // Row order and count are preserved by the rebuild, so index selection carries over.
-                renderJson = _router.SelectRow(selected);
-            }
-            _messenger.PostJson(renderJson);
-        }
+        private Task PopulateSuggestionsAsync(
+            IReadOnlyList<FolderRow> rows,
+            BreadcrumbUpgradeLease lease
+        ) =>
+            _upgradeLifetime.RunAsync(
+                lease,
+                token => _router.SetSuggestionsAsync(rows, token),
+                render => PostRenderAndSelectorAsync(render, _router.GetSelectorState(), lease)
+            );
 
         /// <summary>Appends Path B plain rows verbatim and re-renders (legacy AddRange semantics).</summary>
         public void AddItems(IReadOnlyList<string> items)
         {
-            _messenger.PostJson(_router.AddItems(items));
+            _ = items ?? throw new ArgumentNullException(nameof(items));
+            BreadcrumbUpgradeLease lease = _upgradeLifetime.BeginPopulation();
+            _upgradeLifetime.RunSynchronous(
+                lease,
+                () =>
+                {
+                    string renderJson = _router.AddItems(items);
+                    BreadcrumbSelectorState selectorState = _router.GetSelectorState();
+                    _ = _upgradeLifetime.RunAsync(
+                        lease,
+                        _ => PostRenderAndSelectorAsync(renderJson, selectorState, lease)
+                    );
+                }
+            );
         }
 
         /// <summary>Clears all rows and the selection, emptying the page (backs <c>ClearFolderItems</c>).</summary>
         public void Clear()
         {
-            _messenger.PostJson(_router.Clear());
+            if (!_upgradeLifetime.Invalidate())
+            {
+                return;
+            }
+            ApplyTransition(_router.Clear());
+        }
+
+        /// <summary>Invalidates pending work and clears state before pooled viewer reuse.</summary>
+        public void Reset() => Clear();
+
+        /// <summary>Cancels suggestion work and unsubscribes the exact inbound handler.</summary>
+        public void Dispose()
+        {
+            if (!_upgradeLifetime.TryDispose())
+            {
+                return;
+            }
+            _messenger.MessageReceived -= _messageReceivedHandler;
+            _router.Clear();
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>Selects the row at <paramref name="index"/> and re-renders (backs <c>SetFolderSelectedIndex</c>).</summary>
         public void SelectRow(int index)
         {
-            _messenger.PostJson(_router.SelectRow(index));
-            SelectionChanged?.Invoke(this, EventArgs.Empty);
+            ApplyTransition(_router.SelectRow(index));
         }
 
         /// <summary>
@@ -134,55 +183,189 @@ namespace QuickFiler.Viewers
         /// </summary>
         public void SelectItem(string item)
         {
-            if (BreadcrumbSelectionMap.TrySelectItem(_router.Model, item))
-            {
-                _messenger.PostJson(_router.RenderJson());
-                SelectionChanged?.Invoke(this, EventArgs.Empty);
-            }
+            ApplyTransition(_router.SelectItem(item));
         }
 
         /// <summary>The selection output string (backs <c>GetSelectedFolder</c>; FR-7/G10).</summary>
-        public string? GetSelectedFolder()
-        {
-            return BreadcrumbSelectionMap.GetSelectedFolder(_router.Model);
-        }
+        public string? GetSelectedFolder() => _router.GetSelectedFolder();
 
         /// <summary>The per-row output strings (backs <c>GetFolderItems</c>).</summary>
-        public string[] GetFolderItems()
-        {
-            return BreadcrumbSelectionMap.GetFolderItems(_router.Model);
-        }
+        public string[] GetFolderItems() => _router.GetFolderItems();
 
         /// <summary>True when a row's output string equals <paramref name="item"/> (backs <c>FolderContains</c>).</summary>
-        public bool Contains(string item)
+        public bool Contains(string item) => _router.Contains(item);
+
+        /// <summary>Starts a pending selector session without changing the committed selection.</summary>
+        public bool OpenSelector() => ApplyTransition(_router.OpenSelector());
+
+        /// <summary>
+        /// Applies native combo-box key semantics: closed arrows commit, open arrows move pending,
+        /// Enter commits the pending identity, and Escape restores the opening identity.
+        /// </summary>
+        public bool HandleSelectorKey(BreadcrumbSelectorKey key)
         {
-            return BreadcrumbSelectionMap.FolderContains(_router.Model, item);
+            switch (key)
+            {
+                case BreadcrumbSelectorKey.Up:
+                    return MoveSelector(previous: true);
+                case BreadcrumbSelectorKey.Down:
+                    return MoveSelector(previous: false);
+                case BreadcrumbSelectorKey.Enter:
+                    return CommitSelector();
+                case BreadcrumbSelectorKey.Escape:
+                    return CancelSelector();
+                default:
+                    return false;
+            }
         }
+
+        /// <summary>Commits a row activated by stable identity and closes an open session.</summary>
+        public bool ActivateSelector(string identity) =>
+            ApplyTransition(_router.ActivateSelector(identity));
+
+        /// <summary>Closes an open session without committing its pending identity.</summary>
+        public bool CancelSelector() => ApplyTransition(_router.CancelSelector());
 
         /// <summary>Posts a theme switch to the page ("dark"/"light"; FR-5 theming).</summary>
         public void SetTheme(string theme)
         {
-            _messenger.PostJson(
-                BreadcrumbBridgeSerializer.Serialize(new ThemeChangeMessage(theme))
+            string themeJson = BreadcrumbBridgeSerializer.Serialize(new ThemeChangeMessage(theme));
+            _ = _dispatcher.Dispatch(() => _messenger.PostJson(themeJson));
+        }
+
+        private bool ApplyTransition(BreadcrumbSelectionTransition transition)
+        {
+            if (!transition.Handled)
+            {
+                return false;
+            }
+            _ = _dispatcher.Dispatch(() => PublishTransition(transition));
+            return true;
+        }
+
+        private bool MoveSelector(bool previous)
+        {
+            return ApplyTransition(_router.MoveSelector(previous));
+        }
+
+        private bool CommitSelector()
+        {
+            return ApplyTransition(_router.CommitSelector());
+        }
+
+        private Task PostRenderAndSelectorAsync(
+            string renderJson,
+            BreadcrumbSelectorState selectorState,
+            BreadcrumbUpgradeLease? lease = null
+        )
+        {
+            if (lease != null && !_upgradeLifetime.IsCurrent(lease))
+            {
+                return Task.CompletedTask;
+            }
+            return _dispatcher.Dispatch(
+                _upgradeLifetime.Guard(
+                    lease,
+                    () =>
+                    {
+                        _messenger.PostJson(renderJson);
+                        PostSelectorStateCore(selectorState);
+                    }
+                )
             );
         }
 
-        private async void OnMessageReceived(object? sender, string json)
+        private void PublishTransition(BreadcrumbSelectionTransition transition)
         {
-            // Event-handler boundary: the dispatch task is tracked so callers/tests can observe
-            // completion; RouteAsync converts all routing/provider failures into explicit error
-            // responses, so this await only propagates cancellation.
-            var dispatch = DispatchAsync(json);
-            LastDispatch = dispatch;
-            await dispatch.ConfigureAwait(false);
+            if (transition.RenderJson != null)
+            {
+                _messenger.PostJson(transition.RenderJson);
+            }
+            PostSelectorStateCore(transition.SelectorState);
+            if (transition.SelectionChanged)
+            {
+                SelectionChanged?.Invoke(this, EventArgs.Empty);
+            }
+            if (transition.OpenStateChanged)
+            {
+                SelectorOpenStateChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private void PostSelectorStateCore(BreadcrumbSelectorState state)
+        {
+            if (!(_messenger is BreadcrumbMessengerHub))
+            {
+                return;
+            }
+
+            string selectorJson = BreadcrumbSelectorMessageSerializer.Serialize(
+                new BreadcrumbSelectorViewMessage(
+                    BreadcrumbSelectorViewMode.Collapsed,
+                    state.IsOpen,
+                    state.CommittedIdentity,
+                    state.PendingIdentity
+                )
+            );
+            var options = state
+                .Options.Select(option => new
+                {
+                    identity = option.Identity,
+                    isSelectable = option.IsSelectable,
+                })
+                .ToArray();
+            string optionsJson = new JavaScriptSerializer().Serialize(options);
+            _messenger.PostJson(
+                selectorJson.Insert(selectorJson.Length - 1, ",\"options\":" + optionsJson)
+            );
+        }
+
+        private void OnMessageReceived(object? sender, string json)
+        {
+            LastDispatch = ObserveInboundAsync(json);
+        }
+
+        private async Task ObserveInboundAsync(string json)
+        {
+            try
+            {
+                await DispatchInboundMessageAsync(json).ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                // The event contract cannot return its task. Observe every current dispatch
+                // failure here and route it through the same production sink exactly once.
+                _dispatcher.Report(exception);
+            }
+        }
+
+        private async Task DispatchInboundMessageAsync(string json)
+        {
+            if (json == null)
+            {
+                throw new ArgumentNullException(nameof(json));
+            }
+
+            if (IsSelectorMessage(json))
+            {
+                await _dispatcher.Dispatch(() => HandleSelectorMessage(json)).ConfigureAwait(false);
+                return;
+            }
+
+            await DispatchAsync(json).ConfigureAwait(false);
         }
 
         private async Task DispatchAsync(string json)
         {
-            RaiseSyntheticArrowKey(json);
+            await _dispatcher.Dispatch(() => RaiseSyntheticArrowKey(json)).ConfigureAwait(false);
             var outputs = await _router
                 .RouteAsync(json, CancellationToken.None)
                 .ConfigureAwait(false);
+            await _dispatcher.Dispatch(() => PublishRouterOutputs(outputs)).ConfigureAwait(false);
+        }
+
+        private void PublishRouterOutputs(IReadOnlyList<string> outputs)
+        {
             foreach (var output in outputs)
             {
                 var message = BreadcrumbBridgeSerializer.Parse(output);
@@ -195,9 +378,71 @@ namespace QuickFiler.Viewers
                 _messenger.PostJson(output);
                 if (message is SelectionChangeMessage)
                 {
+                    PostSelectorStateCore(_router.GetSelectorState());
                     SelectionChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
+        }
+
+        private static bool IsSelectorMessage(string json)
+        {
+            string? type = MessageType(json);
+            return type != null && type.StartsWith("selector", StringComparison.Ordinal);
+        }
+
+        private void HandleSelectorMessage(string json)
+        {
+            try
+            {
+                switch (BreadcrumbSelectorMessageSerializer.Parse(json))
+                {
+                    case BreadcrumbSelectorToggleMessage _:
+                        if (IsSelectorOpen)
+                        {
+                            CancelSelector();
+                        }
+                        else
+                        {
+                            OpenSelector();
+                        }
+                        break;
+                    case BreadcrumbSelectorKeyMessage key:
+                        HandleSelectorKey(key.Key);
+                        break;
+                    case BreadcrumbSelectorActivationMessage activation:
+                        ActivateSelector(activation.Identity);
+                        break;
+                    case BreadcrumbSelectorSubfolderActivationMessage subfolderActivation:
+                        ApplyTransition(
+                            _router.ActivateSelectorSubfolder(
+                                subfolderActivation.RowIdentity,
+                                subfolderActivation.SubfolderIndex
+                            )
+                        );
+                        break;
+                }
+            }
+            catch (FormatException)
+            {
+                // Selector messages are a focused UI boundary; invalid values are deterministic no-ops.
+            }
+        }
+
+        private static string? MessageType(string json)
+        {
+            const string marker = "\"type\"";
+            int markerIndex = json.IndexOf(marker, StringComparison.Ordinal);
+            if (markerIndex < 0)
+            {
+                return null;
+            }
+
+            int colonIndex = json.IndexOf(':', markerIndex + marker.Length);
+            int valueStart = colonIndex < 0 ? -1 : json.IndexOf('"', colonIndex + 1);
+            int valueEnd = valueStart < 0 ? -1 : json.IndexOf('"', valueStart + 1);
+            return valueEnd > valueStart
+                ? json.Substring(valueStart + 1, valueEnd - valueStart - 1)
+                : null;
         }
 
         private void RaiseSyntheticArrowKey(string json)
@@ -221,6 +466,22 @@ namespace QuickFiler.Viewers
             {
                 FolderArrowKeyDown?.Invoke(this, report.Direction);
             }
+        }
+
+        private static BreadcrumbUiDispatcher CaptureProductionDispatcher(
+            IWebViewMessenger messenger,
+            IFolderHierarchyProvider provider
+        )
+        {
+            if (messenger == null)
+            {
+                throw new ArgumentNullException(nameof(messenger));
+            }
+            if (provider == null)
+            {
+                throw new ArgumentNullException(nameof(provider));
+            }
+            return BreadcrumbUiDispatcher.CaptureCurrent();
         }
     }
 }

@@ -1,21 +1,19 @@
 using System;
-using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Web.WebView2.Core;
 using QuickFiler.Viewers;
 using UtilitiesCS.OutlookObjects.Folder;
 
 namespace QuickFiler
 {
-    // Breadcrumb WinForms glue (#351). The host-neutral seams (BreadcrumbBridgeCoordinator ->
-    // FolderBreadcrumbBridgeRouter/BreadcrumbStateModel/BreadcrumbSelectionMap in UtilitiesCS) own all
-    // correctness; this partial holds only the WinForms glue (WebView2 property exposure, page
-    // load via NavigateToString, focus hand-off, and the pre-init message relay). The whole
-    // ItemViewer type is [ExcludeFromCodeCoverage] via its primary partial in ItemViewer.cs
-    // (the attribute is not repeated here to avoid duplicate-attribute CS0579 on the partial type).
+    /// <summary>Owns the WinForms wrappers for the breadcrumb selector lifecycle coordinator.</summary>
     public partial class ItemViewer
     {
-        private BreadcrumbMessengerRelay _breadcrumbRelay;
-        private WebView2Messenger _breadcrumbMessenger;
+        private BreadcrumbItemViewerLifecycleCoordinator _breadcrumbLifecycleCoordinator;
+        private BreadcrumbResourceOwner _breadcrumbResourceOwner;
 
         /// <summary>The Designer-declared breadcrumb WebView2 occupying the old CboFolders cell.</summary>
         public Microsoft.Web.WebView2.WinForms.WebView2 L0vhBreadcrumb_WebView2
@@ -24,118 +22,277 @@ namespace QuickFiler
             set => _l0vhBreadcrumb_WebView2 = value;
         }
 
-        /// <summary>
-        /// The breadcrumb coordinator once the pipeline is initialized; null on a bare viewer
-        /// (folder intent members are inert no-ops until the controller initializes the pipeline).
-        /// </summary>
         internal BreadcrumbBridgeCoordinator BreadcrumbCoordinator { get; private set; }
+        internal IBreadcrumbDropDownHost BreadcrumbDropDownHost =>
+            _breadcrumbLifecycleCoordinator?.DropDownHost;
 
-        /// <summary>
-        /// Raised when the breadcrumb reports an arrow it could not consume, so the keyboard
-        /// handler can run the legacy fall-through behavior (FR-6).
-        /// </summary>
+        internal Task<bool> BreadcrumbOpenTask =>
+            _breadcrumbLifecycleCoordinator?.CurrentOpenTask ?? Task.FromResult(false);
+
         internal event EventHandler<BreadcrumbArrowDirection> BreadcrumbUnhandledArrow;
 
-        // Multicast backing delegates for the IItemViewer folder events (raised synthetically from
-        // the coordinator; add/remove implemented in ItemViewer.FolderSearch.cs).
         private EventHandler _folderSelectionChangedHandlers;
         private KeyEventHandler _folderKeyDownHandlers;
 
-        /// <summary>
-        /// Creates the host-neutral breadcrumb pipeline (relay messenger + coordinator) so folder
-        /// population and selection are correct even before the WebView2 core init completes.
-        /// Idempotent; called by the controller with the DI-resolved 9101 provider (G6).
-        /// </summary>
-        internal void InitializeBreadcrumbPipeline(IFolderHierarchyProvider provider)
+        internal void InitializeBreadcrumbPipeline(IFolderHierarchyProvider provider) =>
+            InitializeBreadcrumbPipeline(provider, BreadcrumbPopupUiOperations.CaptureCurrent());
+
+        internal void InitializeBreadcrumbPipeline(
+            IFolderHierarchyProvider provider,
+            BreadcrumbPopupUiOperations operations
+        )
         {
             if (BreadcrumbCoordinator != null)
             {
                 return;
             }
 
-            _breadcrumbRelay = new BreadcrumbMessengerRelay();
-            BreadcrumbCoordinator = new BreadcrumbBridgeCoordinator(_breadcrumbRelay, provider);
-            BreadcrumbCoordinator.SelectionChanged += (s, e) =>
-                _folderSelectionChangedHandlers?.Invoke(this, EventArgs.Empty);
-            BreadcrumbCoordinator.FolderArrowKeyDown += (s, direction) =>
-                _folderKeyDownHandlers?.Invoke(
-                    this,
-                    new KeyEventArgs(
-                        direction == BreadcrumbArrowDirection.Right ? Keys.Right : Keys.Left
-                    )
-                );
-            BreadcrumbCoordinator.UnhandledArrow += (s, direction) =>
-                BreadcrumbUnhandledArrow?.Invoke(this, direction);
+            BreadcrumbItemViewerLifecycleCoordinator lifecycle = EnsureBreadcrumbLifecycle(
+                operations
+            );
+            var bridgeCoordinator = new BreadcrumbBridgeCoordinator(
+                lifecycle.Hub,
+                provider,
+                BreadcrumbUiDispatcher.CaptureCurrent()
+            );
+            lifecycle.SetBridgeCoordinator(bridgeCoordinator);
+            BreadcrumbCoordinator = bridgeCoordinator;
         }
 
-        /// <summary>
-        /// Attaches the initialized breadcrumb CoreWebView2: loads the self-contained page via
-        /// NavigateToString (mirroring ItemViewer.WebViewThread.cs) and flushes every buffered
-        /// bridge message through the real messenger.
-        /// </summary>
-        internal void AttachBreadcrumbWebView()
+        internal Task<bool> AttachBreadcrumbWebViewAsync() =>
+            AttachBreadcrumbWebViewAsync(CreateCollapsedBreadcrumbCandidate);
+
+        internal Task<bool> AttachBreadcrumbWebViewAsync(
+            Func<Tuple<IWebViewMessenger, BreadcrumbNavigationReadiness>> candidateFactory
+        )
         {
-            if (_breadcrumbRelay == null || _breadcrumbMessenger != null)
+            if (_breadcrumbLifecycleCoordinator == null)
+            {
+                return Task.FromResult(false);
+            }
+
+            return _breadcrumbLifecycleCoordinator.AttachCollapsedAsync(candidateFactory);
+        }
+
+        private Tuple<
+            IWebViewMessenger,
+            BreadcrumbNavigationReadiness
+        > CreateCollapsedBreadcrumbCandidate()
+        {
+            CoreWebView2 core = _l0vhBreadcrumb_WebView2.CoreWebView2;
+            BreadcrumbUiDispatcher dispatcher = BreadcrumbUiDispatcher.CaptureCurrent();
+            return BreadcrumbPopupLifecycleOperations.CreateCollapsedCandidate(
+                () => new WebView2Messenger(core, dispatcher),
+                () =>
+                    BreadcrumbPopupUiOperations.NavigateToDocument(
+                        dispatcher,
+                        core,
+                        _l0vhBreadcrumb_WebView2,
+                        () =>
+                            _l0vhBreadcrumb_WebView2.NavigateToString(
+                                Properties.Resources.FolderBreadcrumb
+                            ),
+                        "Collapsed"
+                    )
+            );
+        }
+
+        internal Task<bool> AttachBreadcrumbMessengerWhenReadyAsync(
+            IWebViewMessenger messenger,
+            BreadcrumbNavigationReadiness readiness
+        )
+        {
+            if (messenger == null)
+            {
+                throw new ArgumentNullException(nameof(messenger));
+            }
+            if (readiness == null)
+            {
+                throw new ArgumentNullException(nameof(readiness));
+            }
+            if (_breadcrumbLifecycleCoordinator == null)
+            {
+                throw new InvalidOperationException(
+                    "The breadcrumb pipeline must be initialized before attaching a surface."
+                );
+            }
+
+            return _breadcrumbLifecycleCoordinator.AttachCollapsedWithReadinessAsync(
+                messenger,
+                readiness
+            );
+        }
+
+        internal void AttachBreadcrumbMessenger(IWebViewMessenger messenger)
+        {
+            if (messenger == null)
+            {
+                throw new ArgumentNullException(nameof(messenger));
+            }
+            if (_breadcrumbLifecycleCoordinator == null)
+            {
+                throw new InvalidOperationException(
+                    "The breadcrumb pipeline must be initialized before attaching a surface."
+                );
+            }
+
+            _breadcrumbLifecycleCoordinator.AttachCollapsedMessenger(messenger);
+        }
+
+        internal void ConfigureBreadcrumbDropDown(
+            CoreWebView2Environment environment,
+            IWebViewCoreInitializer initializer
+        )
+        {
+            if (
+                BreadcrumbDropDownHost is BreadcrumbDropDownHost existing
+                && ReferenceEquals(existing.Environment, environment)
+            )
             {
                 return;
             }
 
-            _l0vhBreadcrumb_WebView2.NavigateToString(Properties.Resources.FolderBreadcrumb);
-            _breadcrumbMessenger = new WebView2Messenger(_l0vhBreadcrumb_WebView2.CoreWebView2);
-            _breadcrumbRelay.Attach(_breadcrumbMessenger);
+            BreadcrumbItemViewerLifecycleCoordinator lifecycle = EnsureBreadcrumbLifecycle(
+                BreadcrumbPopupUiOperations.CaptureCurrentOrTests()
+            );
+            BreadcrumbDropDownHost host = null;
+            host = new BreadcrumbDropDownHost(
+                _l0vhBreadcrumb_WebView2,
+                environment,
+                initializer,
+                Properties.Resources.FolderBreadcrumb,
+                () => host.ControlHost?.Control.Focus(),
+                FocusBreadcrumbCore,
+                () => BreadcrumbCoordinator?.CancelSelector(),
+                lifecycle.Operations
+            );
+            ConfigureBreadcrumbDropDown(
+                host,
+                () =>
+                    _l0vhBreadcrumb_WebView2.RectangleToScreen(
+                        _l0vhBreadcrumb_WebView2.ClientRectangle
+                    ),
+                () => Screen.FromControl(_l0vhBreadcrumb_WebView2).WorkingArea
+            );
         }
 
-        /// <summary>
-        /// Focus glue for FocusFolderDropDown()/SetFolderDroppedDown(true): keyboard focus lands
-        /// in the breadcrumb WebView2 and the page focuses its list container on window focus.
-        /// </summary>
+        internal void ConfigureBreadcrumbDropDown(
+            IBreadcrumbDropDownHost host,
+            Func<Rectangle> anchorBounds,
+            Func<Rectangle> workingArea
+        )
+        {
+            if (host == null)
+            {
+                throw new ArgumentNullException(nameof(host));
+            }
+            _ = anchorBounds ?? throw new ArgumentNullException(nameof(anchorBounds));
+            _ = workingArea ?? throw new ArgumentNullException(nameof(workingArea));
+            BreadcrumbItemViewerLifecycleCoordinator lifecycle = EnsureBreadcrumbLifecycle(
+                BreadcrumbPopupUiOperations.CaptureCurrentOrTests()
+            );
+            lifecycle.ConfigureHost(host, anchorBounds, workingArea);
+        }
+
+        internal void SetBreadcrumbTheme(string theme) =>
+            _breadcrumbLifecycleCoordinator?.SetTheme(theme);
+
         internal void FocusBreadcrumb()
         {
-            _l0vhBreadcrumb_WebView2.Focus();
-        }
-
-        /// <summary>Clears breadcrumb rows/selection when the pooled viewer is recycled.</summary>
-        internal void ResetBreadcrumb()
-        {
-            BreadcrumbCoordinator?.Clear();
-        }
-
-        /// <summary>
-        /// Buffering relay implementing the messenger seam before the WebView2 core exists:
-        /// outbound JSON is queued and flushed on <see cref="Attach"/>; inbound messages from the
-        /// real messenger are forwarded 1:1. Pure glue with no message interpretation.
-        /// </summary>
-        internal sealed class BreadcrumbMessengerRelay : IWebViewMessenger
-        {
-            private readonly Queue<string> _pending = new Queue<string>();
-            private IWebViewMessenger _real;
-
-            public event EventHandler<string> MessageReceived;
-
-            public void PostJson(string json)
+            if (_breadcrumbLifecycleCoordinator == null)
             {
-                if (json == null)
-                {
-                    throw new ArgumentNullException(nameof(json));
-                }
-
-                if (_real != null)
-                {
-                    _real.PostJson(json);
-                    return;
-                }
-                _pending.Enqueue(json);
+                FocusBreadcrumbCore();
+                return;
             }
 
-            public void Attach(IWebViewMessenger real)
+            _breadcrumbLifecycleCoordinator.Focus(FocusBreadcrumbCore);
+        }
+
+        private void FocusBreadcrumbCore()
+        {
+            if (
+                !IsDisposed
+                && _l0vhBreadcrumb_WebView2 != null
+                && !_l0vhBreadcrumb_WebView2.IsDisposed
+            )
             {
-                _real = real ?? throw new ArgumentNullException(nameof(real));
-                _real.MessageReceived += (s, json) => MessageReceived?.Invoke(this, json);
-                while (_pending.Count > 0)
-                {
-                    _real.PostJson(_pending.Dequeue());
-                }
+                _l0vhBreadcrumb_WebView2.Focus();
             }
+        }
+
+        internal void SetBreadcrumbDropDownState(bool droppedDown)
+        {
+            if (_breadcrumbLifecycleCoordinator == null)
+            {
+                if (droppedDown)
+                {
+                    FocusBreadcrumb();
+                }
+                return;
+            }
+
+            _breadcrumbLifecycleCoordinator.SetDroppedDown(droppedDown, FocusBreadcrumbCore);
+        }
+
+        internal void ResetBreadcrumb() => _breadcrumbLifecycleCoordinator?.Reset();
+
+        private void OnBreadcrumbSelectionChanged() =>
+            _folderSelectionChangedHandlers?.Invoke(this, EventArgs.Empty);
+
+        private void OnBreadcrumbFolderArrowKeyDown(BreadcrumbArrowDirection direction) =>
+            _folderKeyDownHandlers?.Invoke(
+                this,
+                new KeyEventArgs(
+                    direction == BreadcrumbArrowDirection.Right ? Keys.Right : Keys.Left
+                )
+            );
+
+        private void OnBreadcrumbUnhandledArrow(BreadcrumbArrowDirection direction) =>
+            BreadcrumbUnhandledArrow?.Invoke(this, direction);
+
+        private BreadcrumbItemViewerLifecycleCoordinator EnsureBreadcrumbLifecycle(
+            BreadcrumbPopupUiOperations operations
+        )
+        {
+            if (_breadcrumbLifecycleCoordinator != null)
+            {
+                return _breadcrumbLifecycleCoordinator;
+            }
+
+            EnsureBreadcrumbResourceOwnership();
+            var hub = new BreadcrumbMessengerHub();
+            var attachment = new BreadcrumbCollapsedAttachment(
+                hub,
+                new BreadcrumbCollapsedSurfaceController()
+            );
+            _breadcrumbLifecycleCoordinator = new BreadcrumbItemViewerLifecycleCoordinator(
+                hub,
+                attachment,
+                operations,
+                OnBreadcrumbSelectionChanged,
+                OnBreadcrumbFolderArrowKeyDown,
+                OnBreadcrumbUnhandledArrow
+            );
+            return _breadcrumbLifecycleCoordinator;
+        }
+
+        private void EnsureBreadcrumbResourceOwnership()
+        {
+            if (_breadcrumbResourceOwner != null)
+            {
+                return;
+            }
+
+            components ??= new Container();
+            _breadcrumbResourceOwner = new BreadcrumbResourceOwner(DisposeBreadcrumbResources);
+            components.Add(_breadcrumbResourceOwner);
+        }
+
+        private void DisposeBreadcrumbResources()
+        {
+            _breadcrumbLifecycleCoordinator?.Dispose();
+            _breadcrumbLifecycleCoordinator = null;
+            BreadcrumbCoordinator = null;
         }
     }
 }

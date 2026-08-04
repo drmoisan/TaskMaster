@@ -1,0 +1,9 @@
+# Durable Selected-Child Render CSharpier Gate
+
+Timestamp: 2026-07-23T03:17:04.5477271Z
+
+Command: `$files=@('UtilitiesCS/OutlookObjects/Folder/BreadcrumbBridgeMessages.cs','UtilitiesCS/OutlookObjects/Folder/FolderBreadcrumbBridgeRouter.cs','UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbBridgeMessagesTests.cs','QuickFiler.Test/Viewers/BreadcrumbSubfolderActivationTests.cs','QuickFiler.Test/Viewers/FolderBreadcrumbAssetContractTests.cs'); $before=@{}; foreach($file in $files){$before[$file]=(Get-FileHash -Algorithm SHA256 $file).Hash}; & csharpier format @files; $formatExit=$LASTEXITCODE; if($formatExit -ne 0){exit $formatExit}; $changed=@($files | Where-Object {(Get-FileHash -Algorithm SHA256 $_).Hash -ne $before[$_]}); $stable=@{}; foreach($file in $files){$stable[$file]=(Get-FileHash -Algorithm SHA256 $file).Hash}; & csharpier format @files; $secondFormatExit=$LASTEXITCODE; if($secondFormatExit -ne 0){exit $secondFormatExit}; $secondChanged=@($files | Where-Object {(Get-FileHash -Algorithm SHA256 $_).Hash -ne $stable[$_]}); if($secondChanged.Count -ne 0){exit 1}; & csharpier check @files; $checkExit=$LASTEXITCODE; if($checkExit -ne 0){exit $checkExit}; git diff --check -- QuickFiler/Resources/FolderBreadcrumb.html; $htmlExit=$LASTEXITCODE; if($htmlExit -ne 0){exit $htmlExit}; @($files + 'QuickFiler/Resources/FolderBreadcrumb.html') | ForEach-Object {$count=(Get-Content $_).Count; if($count -gt 500){$script:overLimit=$true}}; if($overLimit){exit 1}; exit 0`
+
+EXIT_CODE: 0
+
+Output Summary: The first scoped format pass changed all five C# files. The required restarted P7-T26 pass was stable across all five files, and `csharpier check` reported `Checked 5 files` with exit code 0. The HTML diff check passed. Final physical line counts are 463 and 485 for the C# production files, 328, 455, and 393 for the three test files, and 485 for the HTML production file; all six are at most 500 lines.

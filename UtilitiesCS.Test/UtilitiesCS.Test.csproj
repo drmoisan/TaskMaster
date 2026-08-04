@@ -156,6 +156,7 @@
     <Compile Include="EmailIntelligence\EmailFiler_TestSupport.cs" />
     <Compile Include="EmailIntelligence\EmailFilerConfig_Tests.cs" />
     <Compile Include="EmailIntelligence\SpamBayes_Tests.cs" />
+    <Compile Include="EmailIntelligence\SpamBayesActionsRegressionTests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MailItemHelperTests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\MinedMailInfoTests.cs" />
     <Compile Include="EmailIntelligence\EmailParsingSorting\AttachmentInfoTests.cs" />
@@ -277,10 +278,17 @@
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbBridgeRouterEdgeTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbBridgeRouterTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbBridgeRouterInFlightTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderBreadcrumbRouterSelectionConcurrencyTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbSelectionMapTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRenderProjectionTests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbRenderProjectionSelectorTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbStateModelTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbStateModelSequenceTests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbSelectionSessionTests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbSubfolderSelectorSessionTests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbSelectorMessagesTests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbStateModelSelectorTests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbDuplicateIdentityTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbSegmentTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderHierarchyProviderAdapterTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeSnapshotQueriesAncestorChainTests.cs" />

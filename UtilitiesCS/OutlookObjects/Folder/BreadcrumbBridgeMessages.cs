@@ -134,12 +134,23 @@ namespace UtilitiesCS.OutlookObjects.Folder
     public sealed class RenderMessage : BreadcrumbBridgeMessage
     {
         public RenderMessage(IReadOnlyList<BreadcrumbRowRender> rows)
+            : this(rows, -1, null) { }
+
+        public RenderMessage(
+            IReadOnlyList<BreadcrumbRowRender> rows,
+            int selectedSubfolderIndex,
+            string? selectedFolder
+        )
         {
             Rows = rows ?? throw new ArgumentNullException(nameof(rows));
+            SelectedSubfolderIndex = selectedSubfolderIndex;
+            SelectedFolder = selectedFolder;
         }
 
         public override string Type => "render";
         public IReadOnlyList<BreadcrumbRowRender> Rows { get; }
+        public int SelectedSubfolderIndex { get; }
+        public string? SelectedFolder { get; }
     }
 
     /// <summary>An arrow the breadcrumb could not consume; triggers the legacy fall-through (FR-6).</summary>
@@ -223,7 +234,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 case "themeChange":
                     return new ThemeChangeMessage(RequireString(root, "theme"));
                 case "render":
-                    return new RenderMessage(ParseRows(RequireArray(root, "rows")));
+                    return new RenderMessage(
+                        ParseRows(RequireArray(root, "rows")),
+                        root.Value<int?>("selectedSubfolderIndex") ?? -1,
+                        root.Value<string>("selectedFolder")
+                    );
                 case "unhandledArrow":
                     return new UnhandledArrowMessage(RequireDirection(root));
                 case "error":
@@ -274,6 +289,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
                     break;
                 case RenderMessage m:
                     root["rows"] = new JArray(m.Rows.Select(RowToJson));
+                    root["selectedSubfolderIndex"] = m.SelectedSubfolderIndex;
+                    if (m.SelectedFolder != null)
+                    {
+                        root["selectedFolder"] = m.SelectedFolder;
+                    }
                     break;
                 case UnhandledArrowMessage m:
                     root["direction"] = DirectionName(m.Direction);

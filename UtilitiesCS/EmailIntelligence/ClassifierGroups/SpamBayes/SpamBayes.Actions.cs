@@ -54,11 +54,8 @@ namespace UtilitiesCS.EmailIntelligence
             }
             if (isSpam == true)
             {
-                if (
-                    ((mailItem.Parent as Folder)?.FolderPath ?? "")
-                    != Globals.Ol.JunkCertain.FolderPath
-                ) { }
-                return Globals.Ol.JunkCertain;
+                var junkCertain = Globals?.Ol?.JunkCertain;
+                return junkCertain ?? mailItem.Parent as Folder;
             }
             else if (isSpam == false)
             {
@@ -70,9 +67,9 @@ namespace UtilitiesCS.EmailIntelligence
             {
                 if (
                     ((mailItem.Parent as Folder)?.FolderPath ?? "")
-                    != Globals.Ol.JunkPotential.FolderPath
+                    != (Globals?.Ol?.JunkPotential?.FolderPath ?? "junk_potential_not_set")
                 )
-                    return Globals.Ol.JunkPotential;
+                    return Globals?.Ol?.JunkPotential;
             }
             return null;
         }

@@ -1,0 +1,3 @@
+Using vstest.console: C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe
+Discovered 8 test assemblies.
+Coverage output: C:\Users\DanMoisan\repos\TaskMaster-wt\2026-07-21T10-25\docs\features\active\2026-07-21-quickfiler-folder-selector-dropdown-400\evidence\qa-gates\coverage-nonnumeric-adapter-member-coverage-relative-output.2026-07-27T10-55.cobertura.xml

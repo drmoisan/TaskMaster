@@ -628,6 +628,9 @@
     <Compile Include="OutlookObjects\Folder\BreadcrumbBridgeMessages.cs" />
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbBridgeRouter.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbSelectionMap.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbSelectionSession.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbSelectorMessages.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbRowIdentity.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRenderProjection.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbStateModel.cs" />
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbSegment.cs" />

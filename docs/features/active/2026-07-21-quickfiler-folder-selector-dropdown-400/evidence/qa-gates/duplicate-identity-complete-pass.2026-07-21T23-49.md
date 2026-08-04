@@ -1,0 +1,4 @@
+Timestamp: 2026-07-21T23:49:18Z
+Command: `& 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe' 'UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll' 'QuickFiler.Test\bin\Debug\QuickFiler.Test.dll' /InIsolation '/TestCaseFilter:FullyQualifiedName~BreadcrumbDuplicateIdentityTests|FullyQualifiedName~BreadcrumbDuplicateIdentityIntegrationTests|FullyQualifiedName~FolderBreadcrumbAssetContractTests|FullyQualifiedName~FolderBreadcrumbRouterSelectionConcurrencyTests' '/Logger:console;Verbosity=normal'`
+EXIT_CODE: 0
+Output Summary: VSTest discovered and passed all 30 duplicate-path identity, in-flight replacement, closed/open movement, activation, collapsed probability, asset, and accessibility tests. Failed: 0. Total time: 2.6201 seconds.
