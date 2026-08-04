@@ -1,0 +1,99 @@
+# svg-renderer-null-document-nre (Issue #418)
+
+- Date captured: 2026-08-04
+- Author: Dan Moisan
+- Status: Promoted -> docs/features/active/svg-renderer-null-document-nre/ (Issue #418)
+
+> Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
+
+- Issue: #418
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/418
+- Last Updated: 2026-08-04
+- Work Mode: minor-audit
+
+## Summary
+
+`SvgRenderer.GetSvgDocument(byte[])` swallows every parse exception and returns `null`. The two byte-array `SvgRenderer` constructors dereference that result immediately (`_doc.Draw()`), so any parse failure surfaces as an opaque `NullReferenceException` at control-construction time instead of a diagnosable error.
+
+## Environment
+
+- OS/version: Windows 11 Pro 10.0.26200
+- .NET/framework: .NET Framework 4.8.1 (`net481`), WinForms
+- Projects: `SVGControl` (control library), `UtilitiesCS` (consumer, `MyBoxViewer`)
+- Dependencies: `Svg 3.4.7`, `ExCSS 4.3.1`, `Fizzler 1.3.1` (from `packages/`)
+- Command/flags used: WinForms designer load of `UtilitiesCS/Dialogs/MyBoxViewer.cs`; also reachable from `vstest.console.exe` test hosts
+- Data source or fixture: the hardcoded default SVG in `SVGControl/SvgImageSelector.cs` (`SVGControl.Defaults.GetDefault.SvgImage`)
+
+## Steps to Reproduce
+
+1. Open `UtilitiesCS/Dialogs/MyBoxViewer.cs` in the WinForms designer (or construct the control at runtime in a host that does not apply the project's `app.config` binding redirects).
+2. Designer-generated code constructs `PictureBoxSVG`, which constructs `SvgImageSelector(Size, Padding, AutoSize, useDefaultImage: true)`.
+3. That constructor calls `new SvgRenderer(Defaults.GetDefault.SvgImage, outer, margin, autoSize)`.
+4. `SvgRenderer.GetSvgDocument(byte[])` calls `SvgDocument.Open<SvgDocument>(stream)`, which throws; the `catch (Exception) { return null; }` block discards it.
+5. The constructor executes `_original = _doc.Draw().Size;` on the `null` result.
+
+## Expected Behavior
+
+Either the default SVG parses successfully in every supported host (designer, test host, production), or the failure is reported as an explicit, diagnosable error that names the underlying cause. A parse failure must never surface as a `NullReferenceException`, and the underlying exception must not be discarded without being logged.
+
+## Actual Behavior
+
+`NullReferenceException` thrown from the `SvgRenderer(byte[], Size, Padding, AutoSize)` constructor at `SVGControl/SvgRenderer.cs:138` (`_original = _doc.Draw().Size;`). The originating exception from `SvgDocument.Open` is unavailable because `GetSvgDocument` catches `Exception` and returns `null` with no logging.
+
+## Logs / Screenshots
+
+- [ ] Attached minimal logs or screenshot
+- Snippet: `System.NullReferenceException: Object reference not set to an instance of an object.` at `SVGControl.SvgRenderer..ctor(Byte[], Size, Padding, AutoSize)`
+
+## Impact / Severity
+
+- [ ] Blocker
+- [x] High
+- [ ] Medium
+- [ ] Low
+
+The WinForms designer cannot load any form that hosts `PictureBoxSVG`/`ButtonSVG` with the default image, and the discarded exception makes every SVG parse failure undiagnosable at any call site.
+
+## Suspected Cause / Notes
+
+Two distinct defects are suspected and must be separated:
+
+1. **Error-handling defect (confirmed by inspection).** `SVGControl/SvgRenderer.cs:320-331` catches `Exception` and returns `null`. The byte-array constructors at lines 126-142 dereference the result without a guard. This is a direct violation of the repository's fail-fast and no-silent-swallow rules in `.claude/rules/general-code-change.md` and `.claude/rules/csharp.md`.
+
+2. **Underlying parse/binding failure (root cause not yet confirmed).** An existing in-file comment at `SVGControl/SvgRenderer.cs:24-31` documents a prior occurrence: `Svg 3.4.7` was compiled against `ExCSS 4.2.3.0` while the repo deploys `ExCSS 4.3.1.0`, so `SvgDocument.Open` throws `FileNotFoundException` in hosts that ignore the project `app.config` binding redirects. A static-constructor `AssemblyResolve` fallback was added in commit `0b4c5c43` to compensate. Since that fallback is present on `main` and the failure is still reported, the actual current cause is undetermined. Candidate lines of inquiry:
+   - The WinForms designer host (`devenv.exe` / `DesignToolsServer.exe`) does not apply `UtilitiesCS/app.config` or `SVGControl/app.config` binding redirects, and the `AssemblyResolve` fallback may not be reached or may not satisfy the request in that host.
+   - `SVGControl/app.config:18-20` redirects `Fizzler` to `1.3.0.0`, but the deployed package is `Fizzler 1.3.1`. If the deployed assembly version is not `1.3.0.0`, this redirect targets a version that is not present. The same redirect appears in at least ten project `app.config` files.
+   - The hardcoded default SVG is emitted with `Encoding.ASCII.GetBytes`, which is only safe while the literal stays ASCII-only.
+
+The determination of which of these actually fires — and in which host — is the research question this bug opens.
+
+## Acceptance Criteria
+
+Acceptance criteria are grouped by the two defects identified under `## Suspected Cause / Notes`. AC-1 through AC-6 address the confirmed error-handling defect and are unconditional. AC-7 and AC-8 address the underlying parse/binding failure and are conditioned on the research outcome.
+
+- [ ] **AC-1 — Failing regression test exists first.** A deterministic MSTest regression test in `SVGControl.Test` reproduces the defect before the fix is applied: constructing `SvgRenderer` from a byte array that `SvgDocument.Open` cannot parse currently produces a `NullReferenceException`. The test is recorded as failing (pre-fix) and passing (post-fix) in the feature evidence.
+- [ ] **AC-2 — No silent exception swallow.** `SVGControl/SvgRenderer.cs` no longer contains a `catch (Exception)` block that discards the caught exception without logging or propagating it. Any retained catch logs the exception through the existing `log4net` logger already declared in the file and either rethrows or returns a result the caller is required to inspect.
+- [ ] **AC-3 — Parse failure degrades visibly instead of throwing a `NullReferenceException`.** Decided 2026-08-04: the byte-array `SvgRenderer` constructors must **not** throw. When the document cannot be produced, the constructor logs the cause at error level through the existing `log4net` logger, leaves `_doc` null, and initializes `_original` to a safe value without dereferencing `_doc`. A `NullReferenceException` is never the observed failure mode. Rationale: `PictureBoxSVG` is instantiated by designer-generated code in eleven forms, including `QuickFiler/Viewers/ItemViewer`, which runs inside the Outlook add-in. Throwing from the constructor would convert a blank-icon degradation into a control-construction failure for end users.
+
+  The diagnostic must be observable in the WinForms designer host, not only through `log4net`. `SVGControl` declares a `log4net` logger but there is no evidence an appender is configured inside `devenv.exe`, so a `log4net`-only diagnostic may surface nowhere the operator can see it. The implementation must therefore also emit the failure through a channel the designer surfaces — `System.Diagnostics.Trace`/`Debug` output, which appears in the Visual Studio Output window — in addition to the `log4net` call. Both channels must carry the exception type and message.
+- [ ] **AC-4 — A fail-fast API exists for callers that want it, and every null-tolerant call site keeps its contract.** A public API on `SvgRenderer` reports parse failure explicitly rather than by returning `null` — either a `Try`-style member that surfaces the captured exception, or a throwing overload that raises an explicit exception whose `InnerException` is the original exception from `SvgDocument.Open`. The existing null-tolerant consumers (`SvgRenderer.Document` setter, `SvgRenderer.Render()`, `SvgImageSelector.SaveRendering`, `SvgImageSelector.ResourceName`, `SvgImageSelector.UseDefaultImage`, `SvgImageSelector.SetDefaultImage`) keep their current tolerant behavior, and no call site is left dereferencing a value that can still be `null`.
+- [ ] **AC-5 — Coverage on changed code.** New MSTest coverage using Moq and FluentAssertions covers the success path, the parse-failure path, and the argument-boundary paths of the changed methods. Coverage does not regress on changed lines, and newly added members reach the `>= 90%` threshold required by the C# unit test policy. Note that `SvgDocument.Open` has two distinct null-producing paths: malformed input throws (`XmlException`), while element-free input such as `Array.Empty<byte>()` returns `null` without throwing. Both paths require coverage, and only the first can carry an `InnerException`.
+- [ ] **AC-6 — Toolchain passes in a single clean pass, measured against the recorded baseline.** CSharpier, the .NET analyzer build, the nullable/`TreatWarningsAsErrors` build, and `vstest.console.exe` all run in one consecutive pass in the order given by `CLAUDE.md`, with no auto-fixes and **zero new diagnostics relative to the Phase 0 baseline**.
+
+  Amended 2026-08-04 after Phase 0 baseline capture. The absolute `EXIT_CODE: 0` form of this criterion is not reachable in this checkout for reasons unrelated to bug #418: the VSTO runtime assemblies `Microsoft.Office.Tools.Outlook.v4.0.Utilities` and `Microsoft.Office.Tools.Common.v4.0.Utilities` (`Version=10.0.0.0`, `PublicKeyToken=b03f5f7f11d50a3a`) are not installed, producing `MSB3245` and four `CS0234` errors in `TaskMaster/ThisAddIn.Designer.cs`. The recorded baselines are 4 errors / 44 warnings for the analyzer build and 5 errors / 5 warnings for the nullable build, and every error is confined to `TaskMaster/TaskMaster.csproj` — none originates in `SVGControl` or `SVGControl.Test`. Installing the Office Developer Tools component is a machine-level change outside the scope of this bug fix, so the criterion is measured relatively here and the absolute gate is enforced by CI on the pull request, where the toolchain is complete. Evidence: `evidence/baseline/analyzer-build.2026-08-04T14-36.md` and `evidence/baseline/nullable-build.2026-08-04T14-36.md`.
+- [ ] **AC-7 — Underlying failure identified in writing.** A research artifact under this feature's `research/` directory names the exception thrown by `SvgDocument.Open` for `Defaults.GetDefault.SvgImage`, identifies the host(s) in which it reproduces, and states whether the existing `AssemblyResolve` fallback at `SVGControl/SvgRenderer.cs:36-104` is reached in the failing host. Delivered by `research/2026-08-04T15-05-svg-renderer-null-document-research.md`, which establishes: `Svg 3.4.7` binds `ExCSS, Version=4.2.3.0` while only `4.3.1.0` is deployed; the WinForms designer loads `SVGControl.dll` into `devenv.exe`, whose configuration carries no ExCSS redirect; the fallback is reached but returns `null` because `Assembly.Load` probes the Visual Studio directory rather than the directory containing `SVGControl.dll`; and production is a VSTO add-in inside `OUTLOOK.EXE` whose per-add-in AppDomain redirects correctly, so production does not reproduce.
+- [ ] **AC-8 — `AssemblyResolve` fallback resolves from the assembly's own directory.** The fallback at `SVGControl/SvgRenderer.cs:44-104` gains a directory-probing strategy that attempts `Assembly.LoadFrom` against ordered candidate directories derived from the already-loaded `SVGControl` assembly (`Assembly.Location` directory, `CodeBase` directory, then `AppDomain.CurrentDomain.BaseDirectory`), so a same-key assembly deployed next to `SVGControl.dll` is found in a host that does not apply the project binding redirects. The implementation tolerates an empty `Location` (byte-array or shadow-copied loads) without throwing, preserves the existing re-entrance guard, and preserves the existing public-key-token match requirement.
+- [ ] **AC-9 — `SVGControl.Test` builds and runs.** Decided 2026-08-04: repair the test project in this change. `SVGControl.Test` is added to `TaskMaster.sln`, its five pinned packages (`Castle.Core 5.1.1`, `FluentAssertions 6.12.0`, `Moq 4.20.69`, `MSTest.TestAdapter 3.1.1`, `MSTest.TestFramework 3.1.1`) are restored under `packages/`, and the hard MSBuild `<Error>` at `SVGControl.Test/SVGControl.Test.csproj:158-170` no longer fires. The project compiles and its tests execute under `vstest.console.exe`.
+- [ ] **AC-10 — Incorrect ExCSS redirect in the test config is corrected.** `SVGControl.Test/app.config:23` currently redirects ExCSS to `newVersion="4.2.4.0"`, a version that exists nowhere in the repository, while all sixteen sibling configs use `4.3.1.0`. It is corrected to `4.3.1.0` so the test host can resolve ExCSS through the binding redirect rather than depending on the `AssemblyResolve` fallback to mask it.
+- [ ] **AC-11 — Designer load verified by the documented human step.** The runbook recorded under this feature's `runbooks/` directory is executed and its evidence captured: opening `UtilitiesCS/Dialogs/MyBoxViewer.cs` in the Visual Studio WinForms designer after the fix loads the form without a `NullReferenceException`. Per the research artifact's favourable sequencing, the same capture supplies the observed exception identity for AC-7 if the bind still fails, because the fix stops discarding the exception. This criterion is satisfied by attaching the human-captured evidence to the feature folder.
+
+## Proposed Fix / Validation Ideas
+
+- [ ] Unit coverage areas: `SvgRenderer.GetSvgDocument` success and failure paths; the byte-array `SvgRenderer` constructors on malformed input; `SvgImageSelector.SetDefaultImage`; round-trip parse of `Defaults.GetDefault.SvgImage`. `SVGControl.Test` currently contains no coverage for any of these.
+- [ ] Integration scenario to retest: designer-time construction path `MyBoxViewer` -> `PictureBoxSVG` -> `SvgImageSelector` -> `SvgRenderer`.
+- [ ] Manual verification notes: confirm the WinForms designer loads `MyBoxViewer` without exception after the fix.
+
+## Next Step
+
+- [x] Promote to GitHub issue (bug-report template)
+- [x] Move to active fix folder / branch

@@ -275,6 +275,9 @@
       <HintPath>..\packages\OpenTelemetry.PersistentStorage.FileSystem.1.1.1\lib\net462\OpenTelemetry.PersistentStorage.FileSystem.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Svg, Version=3.4.0.0, Culture=neutral, PublicKeyToken=12a0bac221edeae2, processorArchitecture=MSIL">
+      <HintPath>..\packages\Svg.3.4.8\lib\net481\Svg.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
       <HintPath>..\packages\System.Buffers.4.6.1\lib\net462\System.Buffers.dll</HintPath>
