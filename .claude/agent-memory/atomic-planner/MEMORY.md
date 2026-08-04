@@ -1,6 +1,8 @@
 # Atomic Planner Memory Index
 
 - [Dead-code removal vs coverage exclusion](project_deadcode_removal_vs_coverage_exclusion.md) — coverage gate blocked by unreachable dead prod code → plan removal (shrink denominator), never exclusion/carve-out/forced-rethrow
+- [Coverage gate on CLR-invoked private members](coverage-gate-clr-invoked-private-members.md) — never gate AssemblyResolve-style private members at >=90%; split newly-added vs changed per the AC's own wording
+- [Nullable context mismatch: prod vs test](project_nullable_context_mismatch_prod_vs_test.md) — check `#nullable enable` in the prod file AND missing `<LangVersion>` (C# 7.3) in the test csproj before writing literal C# signatures
 
 - [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/
 - [CSharpier gate: format not pipe-files](csharpier-format-not-pipe-files-gate.md) — formatting tasks must use `csharpier format` + scoped `csharpier check` exit 0; `pipe-files` is stdout-only/non-enforcing and masked a 500-line overflow in #400
@@ -22,4 +24,5 @@
 - [#351 QuickFiler breadcrumb plan seams](project_351_quickfiler_breadcrumb_plan_seams.md) — JSON code in UtilitiesCS only (QuickFiler lacks Newtonsoft); P2-T1 blocked-if-9101-absent; evidence/repro/ rejected; coordinator pattern
 - [Invoke-MSTestWithCoverage.ps1 canonical coverage runner](reference_invoke_mstest_with_coverage_script.md) — full-suite *.Test.dll → Cobertura XML via dotnet-coverage+vstest /InIsolation; cite for baseline/final-QC coverage tasks
 - [Coverage threshold conflict: CLAUDE.md vs general-unit-test.md](project_coverage_threshold_conflict_claude_md_vs_general_unit_test.md) — 80/90 vs uniform 85/75 no-tier-floor; unresolved as of 2026-07-18; flag to user, don't silently pick
+- [Planner may lack the MCP plan validator](project_planner_mcp_validator_not_in_tool_surface.md) — file-only tool surface (no Bash/no mcp__drm-copilot__*); never claim the gate passed, report VALIDATOR NOT RUN + structural self-check
 - [#349 breadcrumb plan seams](project_349_efcviewer_breadcrumb_plan_seams.md) — P0-T6 halt-gate on 9101 provider; evidence/repro/ authorized; EfcViewer3 mechanical swap only; Newtonsoft in UtilitiesCS only
