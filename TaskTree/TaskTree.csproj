@@ -97,7 +97,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <!-- Issue #181: analyzer-only references (first-party scope). Severities are set to suggestion in .editorconfig so none break the nullable TreatWarningsAsErrors build. -->
-    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.137\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
+    <Analyzer Include="..\packages\Meziantou.Analyzer.3.0.138\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll" />
     <Analyzer Include="..\packages\SonarAnalyzer.CSharp.10.31.0.145097\analyzers\SonarAnalyzer.CSharp.dll" />
     <Analyzer Include="..\packages\Roslynator.Analyzers.4.15.0\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll" />
     <Analyzer Include="..\packages\Roslynator.Analyzers.4.15.0\analyzers\dotnet\roslyn4.7\cs\Roslynator_Analyzers_Roslynator.Common.dll" />
