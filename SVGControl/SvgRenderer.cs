@@ -22,6 +22,8 @@ namespace SVGControl
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
         );
 
+        private const string ParseFailed = "SvgRenderer could not parse the SVG payload: ";
+
         // Svg 3.4.7 was compiled against ExCSS 4.2.3.0 but the repo deploys ExCSS 4.3.1.0
         // (same publicKeyToken). Production resolves this via TaskMaster.exe.config binding
         // redirects, but vstest's testhost ignores the test DLL's .config in some modes, so
@@ -81,20 +83,56 @@ namespace SVGControl
             }
             try
             {
-                var byName = System.Reflection.Assembly.Load(
-                    new System.Reflection.AssemblyName(requested.Name)
-                );
-                if (
-                    byName != null
-                    && PublicKeyTokensEqual(byName.GetName().GetPublicKeyToken(), requestedKey)
-                )
+                // Strategy 2 — load by simple name from the probing path.
+                try
                 {
-                    return byName;
+                    var name = new System.Reflection.AssemblyName(requested.Name);
+                    var byName = System.Reflection.Assembly.Load(name);
+                    byte[]? byNameKey = byName?.GetName().GetPublicKeyToken();
+                    if (byName != null && PublicKeyTokensEqual(byNameKey, requestedKey))
+                    {
+                        return byName;
+                    }
                 }
-            }
-            catch
-            {
-                // Swallow — return null so other resolvers (or default resolution) can run.
+                // Trace, not log4net: log4net inside an AssemblyResolve handler can itself trigger a
+                // re-entrant assembly load, so this diagnostic must not depend on it being loadable.
+                catch (Exception ex)
+                {
+                    Trace.TraceWarning(
+                        $"SvgRenderer load '{requested.Name}': {DescribeFailure(ex)}"
+                    );
+                }
+
+                // Strategy 3 — probe candidate directories for a same-key file on disk. Ordered after
+                // strategies 1 and 2 so an already-loaded match always wins over a fresh LoadFrom.
+                var self = typeof(SvgRenderer).Assembly;
+                IReadOnlyList<string> probeDirectories = SvgAssemblyProbe.GetProbeDirectories(
+                    self.Location,
+                    self.CodeBase,
+                    AppDomain.CurrentDomain.BaseDirectory
+                );
+                foreach (string directory in probeDirectories)
+                {
+                    string path = Path.Combine(directory, requested.Name + ".dll");
+                    if (!File.Exists(path))
+                    {
+                        continue;
+                    }
+                    // Trace here for the same re-entrancy reason given above.
+                    try
+                    {
+                        var loaded = System.Reflection.Assembly.LoadFrom(path);
+                        byte[] loadedFileKey = loaded.GetName().GetPublicKeyToken();
+                        if (PublicKeyTokensEqual(loadedFileKey, requestedKey))
+                        {
+                            return loaded;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceWarning($"SvgRenderer load '{path}': {DescribeFailure(ex)}");
+                    }
+                }
             }
             finally
             {
@@ -126,11 +164,20 @@ namespace SVGControl
 
         public SvgRenderer(byte[] doc, Size size, AutoSize autoSize)
         {
-            // GetSvgDocument is annotated SvgDocument? because it swallows load failures and
-            // returns null; this call site preserves pre-existing behavior (assume success and
-            // let a genuine failure surface as an NRE from Draw(), as it always has).
-            _doc = GetSvgDocument(doc)!;
-            _original = _doc.Draw().Size;
+            if (TryGetSvgDocument(doc, out SvgDocument? parsed, out Exception? error))
+            {
+                _doc = parsed;
+                _original = parsed!.Draw().Size;
+            }
+            else
+            {
+                // Issue #418: degrade instead of raising. The swallowed null used to be dereferenced
+                // one line later, surfacing as an opaque NRE inside the WinForms designer.
+                string detail = "SvgRenderer(byte[], Size, AutoSize): " + DescribeFailure(error);
+                logger.Error(detail, error);
+                Trace.TraceError(detail);
+                _original = Size.Empty;
+            }
             _margin = new Padding(0);
             Size = CalcInnerSize(size, _margin);
             _autoSize = autoSize;
@@ -138,12 +185,32 @@ namespace SVGControl
 
         public SvgRenderer(byte[] doc, Size size, Padding margin, AutoSize autoSize)
         {
-            // See the other byte[]-doc constructor above for the rationale on the `!`.
-            _doc = GetSvgDocument(doc)!;
-            _original = _doc.Draw().Size;
+            if (TryGetSvgDocument(doc, out SvgDocument? parsed, out Exception? error))
+            {
+                _doc = parsed;
+                _original = parsed!.Draw().Size;
+            }
+            else
+            {
+                // See the other byte[]-doc constructor for the degrade-and-log rationale.
+                string detail =
+                    "SvgRenderer(byte[], Size, Padding, AutoSize): " + DescribeFailure(error);
+                logger.Error(detail, error);
+                Trace.TraceError(detail);
+                _original = Size.Empty;
+            }
             _margin = margin;
             Size = CalcInnerSize(size, _margin);
             _autoSize = autoSize;
+        }
+
+        // Renders a failure for a log record. A null error is the element-free case, where the parser
+        // reports failure by returning no document rather than by raising.
+        private static string DescribeFailure(Exception? error)
+        {
+            return error == null
+                ? "the payload contained no SVG elements."
+                : error.GetType().FullName + ": " + error.Message;
         }
 
         public SvgRenderer(SvgDocument doc, Size size, AutoSize autoSize)
@@ -327,17 +394,91 @@ namespace SVGControl
             return proportions;
         }
 
-        public static SvgDocument? GetSvgDocument(byte[] file)
+        // Returns null when the payload holds no SVG elements, which is how the parser reports that
+        // condition without raising. No handler here by design: TryGetSvgDocument is the boundary.
+        internal static SvgDocument? OpenFromBytes(byte[] file)
         {
-            Stream stream = new MemoryStream(file);
-            try
+            using (var stream = new MemoryStream(file))
             {
                 return SvgDocument.Open<SvgDocument>(stream);
             }
-            catch (Exception)
+        }
+
+        // Single parse-failure boundary for this type: every failure mode becomes a false result plus
+        // an optionally captured exception, so no caller can silently lose a diagnostic. The parse
+        // delegate is the seam that lets tests assert exact exception identity without global state.
+        internal static bool TryGetSvgDocument(
+            byte[] file,
+            Func<byte[], SvgDocument?> parse,
+            out SvgDocument? document,
+            out Exception? error
+        )
+        {
+            if (file == null || parse == null)
             {
-                return null;
+                throw new ArgumentNullException(file == null ? nameof(file) : nameof(parse));
             }
+            try
+            {
+                document = parse(file);
+                error = null;
+                if (document != null)
+                {
+                    return true;
+                }
+                // Element-free input makes the parser return null without raising: nothing to hand back.
+                string empty = ParseFailed + DescribeFailure(null);
+                logger.Error(empty);
+                Trace.TraceError(empty);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                // Dual channel on purpose: log4net for production, Trace because no log4net appender
+                // is known to be configured inside the designer host (devenv.exe).
+                string detail = ParseFailed + DescribeFailure(ex);
+                logger.Error(detail, ex);
+                Trace.TraceError(detail);
+                document = null;
+                error = ex;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Production entry point for the try-style parse. Surfaces the captured exception so a caller
+        /// can report the real cause instead of inferring it from a null result.
+        /// </summary>
+        public static bool TryGetSvgDocument(
+            byte[] file,
+            out SvgDocument? document,
+            out Exception? error
+        )
+        {
+            return TryGetSvgDocument(file, OpenFromBytes, out document, out error);
+        }
+
+        /// <summary>
+        /// Fail-fast counterpart to GetSvgDocument. InnerException carries the original parser
+        /// exception when one exists, and is null for the element-free case.
+        /// </summary>
+        public static SvgDocument GetSvgDocumentOrThrow(byte[] file)
+        {
+            if (TryGetSvgDocument(file, out SvgDocument? document, out Exception? error))
+            {
+                return document!; // non-null on the true branch by TryGetSvgDocument's contract
+            }
+            throw new InvalidOperationException(ParseFailed + DescribeFailure(error), error);
+        }
+
+        /// <summary>
+        /// Tolerant parse kept for consumers that treat a missing document as a normal state. Use
+        /// TryGetSvgDocument or GetSvgDocumentOrThrow when the cause matters.
+        /// </summary>
+        public static SvgDocument? GetSvgDocument(byte[] file)
+        {
+            TryGetSvgDocument(file, out SvgDocument? document, out _);
+            return document;
         }
 
         #region EventHandlers

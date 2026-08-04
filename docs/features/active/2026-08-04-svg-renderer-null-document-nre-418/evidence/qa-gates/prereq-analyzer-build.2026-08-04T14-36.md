@@ -1,106 +1,95 @@
 # Prerequisite Analyzer Build — Solution Gate After SVGControl.Test Joins (Issue #418, task P1-T6)
 
-Timestamp: 2026-08-04T18-20
+Timestamp: 2026-08-04T18-13
 
-Command: `pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform "Any CPU" -EnableNETAnalyzers -EnforceCodeStyleInBuild`
+Issue: #418
+Plan: `docs/features/active/2026-08-04-svg-renderer-null-document-nre-418/plan.2026-08-04T14-36.md`
+Task: `[P1-T6]`
+Branch: `bug/svg-renderer-null-document-nre-418`
+HEAD: `296eac953c5ac3f69c429c7554ab47218e64e852`
+Base: `ce0c91e6` (PR #419 repository-wide NuGet package update)
+MSBuild: `C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe`
+Working directory: repository root (`C:\Users\DanMoisan\repos\TaskMaster`)
 
-Working directory: repository root (`c:\Users\DanMoisan\source\repos\drmoisan\TaskMaster`)
+> **This artifact was overwritten in full.** The prior content at this path recorded a
+> superseded pre-rebase capture (`EXIT_CODE: 1`, four `CS0234`, one `MSB3277`, and a
+> `SCOPE_EXCEEDED` determination) taken on a host that lacked the VSTO runtime assemblies and
+> against a pre-package-update dependency graph. That record is obsolete and has been replaced,
+> not appended to, so this artifact asserts exactly one outcome. The superseded conditions are
+> both resolved: the VSTO assemblies resolve on this host (zero `CS0234`, zero `MSB3245`), and
+> the `System.Runtime.CompilerServices.Unsafe` pin divergence that produced the `MSB3277` was
+> realigned upstream by PR #419 (plan Design Decision 10).
 
-EXIT_CODE: 1
+## Command (plan-commanded, authoritative)
 
-Per the AC-6 amendment recorded in `issue.md` (human-interaction requirement H-3, resolved by
-`scope_change`), the absolute `EXIT_CODE: 0` acceptance is not reachable in this checkout: the
-VSTO runtime assemblies `Microsoft.Office.Tools.Outlook.v4.0.Utilities` and
-`Microsoft.Office.Tools.Common.v4.0.Utilities` are not installed. The governing measure is the
-relative one. `EXIT_CODE: 1` reproduces the Phase 0 baseline exactly at the error level.
-
-Output Summary: **Build FAILED** with `4 Error(s)` and `9 Warning(s)`, elapsed `00:00:02.22`.
-
-- **New analyzer diagnostics vs baseline: 0.** No new `CS`, `CA`, `S`, `MSTEST`, or other
-  analyzer rule ID appeared. The four errors are byte-for-byte the four `CS0234` diagnostics
-  recorded in `evidence/baseline/analyzer-build.2026-08-04T14-36.md`, all in
-  `TaskMaster/ThisAddIn.Designer.cs`, all in `TaskMaster/TaskMaster.csproj`. `SVGControl` and
-  `SVGControl.Test` produced zero errors and zero analyzer warnings.
-- **New MSBuild (non-analyzer) diagnostics vs baseline: 1.** One `MSB3277` reference-conflict
-  warning appeared that is absent from the Phase 0 baseline warning inventory. See the
-  attribution section below. This is the finding that triggers the `SCOPE_EXCEEDED` stop
-  clause in the task text.
-
-Files edited for remediation: none
-
-## Error set (4 errors — identical to the Phase 0 baseline)
-
-| File and position | Diagnostic |
-| --- | --- |
-| `TaskMaster/ThisAddIn.Designer.cs(18,76)` | `error CS0234: The type or namespace name 'OutlookAddInBase' does not exist in the namespace 'Microsoft.Office.Tools.Outlook'` |
-| `TaskMaster/ThisAddIn.Designer.cs(235,88)` | `error CS0234: The type or namespace name 'RibbonCollectionBase' does not exist in the namespace 'Microsoft.Office.Tools.Ribbon'` |
-| `TaskMaster/ThisAddIn.Designer.cs(257,93)` | `error CS0234: The type or namespace name 'FormRegionCollectionBase' does not exist in the namespace 'Microsoft.Office.Tools.Outlook'` |
-| `TaskMaster/ThisAddIn.Designer.cs(279,95)` | `error CS0234: The type or namespace name 'FormRegionCollectionBase' does not exist in the namespace 'Microsoft.Office.Tools.Outlook'` |
-
-Distinct error codes: `CS0234` only. Projects producing errors: `TaskMaster/TaskMaster.csproj`
-only. No error came from `SVGControl` or `SVGControl.Test`.
-
-## Warning set (9 warnings)
-
-| Code | Warnings | Present in Phase 0 baseline | Emitting project(s) |
-| --- | --- | --- | --- |
-| `CS8632` | 3 | yes (baseline listed `CS8632`) | `TaskMaster/TaskMaster.csproj` (`AppGlobals/ApplicationGlobals.cs(251,57)`, `AppGlobals/EngineInitTimingProbe.cs(55,61)`, `AppGlobals/EngineInitTimingProbe.cs(57,57)`) |
-| `MSB3245` | 4 | yes | `TaskMaster/TaskMaster.csproj` (the two VSTO utility assemblies) |
-| `MSB3327` | 1 | yes | `TaskMaster/TaskMaster.csproj` (no ClickOnce code-signing certificate) |
-| `MSB3277` | 1 | **no — NEW** | `SVGControl.Test/SVGControl.Test.csproj` (sole emitter) |
-
-The total warning count is lower than the baseline's 44 because this run was incremental and
-most projects were already up to date, so their pre-existing warnings did not recompile. The
-comparison that matters is the per-code one above, not the aggregate.
-
-## Attribution of the new `MSB3277`
-
-```text
-warning MSB3277: Found conflicts between different versions of
-"System.Runtime.CompilerServices.Unsafe" that could not be resolved.
-warning MSB3277: There was a conflict between
-"System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, ..., PublicKeyToken=b03f5f7f11d50a3a" and
-"System.Runtime.CompilerServices.Unsafe, Version=6.0.3.0, ..., PublicKeyToken=b03f5f7f11d50a3a".
-"...Version=6.0.0.0..." was chosen because it was primary and "...Version=6.0.3.0..." was not.
+```
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform "Any CPU" -EnableNETAnalyzers -EnforceCodeStyleInBuild
 ```
 
-Grep of the full build log confirms the only `[<project>.csproj]` tag attached to any
-`MSB3277` line is `SVGControl.Test\SVGControl.Test.csproj`, and the only conflicting simple
-name is `System.Runtime.CompilerServices.Unsafe`.
+EXIT_CODE: 0
 
-Root cause is a package pin divergence between the test project and the project it references:
+## Output Summary
 
-| Project | `packages.config` pin | `<Reference>` `Version=` | HintPath |
-| --- | --- | --- | --- |
-| `SVGControl/SVGControl.csproj` | `System.Runtime.CompilerServices.Unsafe 6.1.2` | `6.0.3.0` | `..\packages\System.Runtime.CompilerServices.Unsafe.6.1.2\lib\net462\...` |
-| `SVGControl.Test/SVGControl.Test.csproj` | `System.Runtime.CompilerServices.Unsafe 6.0.0` | `6.0.0.0` | `..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\...` |
+Build succeeded. **0 errors, 6 warnings.** Elapsed 00:00:11.14.
 
-`SVGControl/bin/Debug/System.Runtime.CompilerServices.Unsafe.dll` was verified on disk as
-assembly version `6.0.3.0`. `SVGControl.Test` flows that file in through its `ProjectReference`
-copy-local set while separately declaring a primary reference to `6.0.0.0`, so
-`ResolveAssemblyReferences` reports an unresolvable conflict.
+- **New diagnostics vs baseline: 0**
+- **Baseline artifact compared: `evidence/baseline/analyzer-build.2026-08-04T21-04.md`**
+- **Files edited for remediation: none**
 
-The divergence pre-exists in `SVGControl.Test/SVGControl.Test.csproj`; it becomes observable
-only now, because task P1-T1 made the project a solution member and it therefore builds for the
-first time. It is a direct and unavoidable consequence of delivering AC-9.
+`MSB3277` count: **0**. `CS0234` count: **0**. `MSB3245` count: **0**. `SVGControl` and
+`SVGControl.Test` emitted zero errors and zero warnings of any code.
 
-## `SCOPE_EXCEEDED` determination
+### Diagnostic inventory — plan-commanded incremental run
 
-Task P1-T6 restricts remediation to "`SVGControl.Test`-owned files only, restricted to the
-Scope Lock's pre-existing-`SVGControl.Test`-files list" — that list contains only eight `.cs`
-files (`Form1.cs`, `Form1.Designer.cs`, `Form2.cs`, `Form2.Designer.cs`,
-`Resources.Designer.cs`, `Properties/AssemblyInfo.cs`, `GetRelativePath_Test.cs`,
-`RelativePathCoverageTests.cs`).
+| Count | Severity | Code | Emitting project |
+|---|---|---|---|
+| 5 | warning | (no code) `System.Reactive.PackagesConfigCheck.targets(31,5)` | `UtilitiesCS.csproj`, `ToDoModel.csproj`, `QuickFiler.csproj`, `TaskMaster.csproj`, `UtilitiesCS.Test.csproj` |
+| 1 | warning | `CS2002` | `UtilitiesCS.Test.csproj` |
+| — | error | none | — |
 
-`MSB3277` is an MSBuild `ResolveAssemblyReferences` diagnostic. It cannot be cleared by any
-edit to a `.cs` file. Clearing it requires editing `SVGControl.Test/packages.config` and
-`SVGControl.Test/SVGControl.Test.csproj`, both of which are outside the eight-file list.
+Distinct diagnostic codes: `CS2002`, plus one code-less MSBuild warning from
+`System.Reactive.PackagesConfigCheck.targets`. This is **identical** to the code set recorded in
+the plan-commanded run of `evidence/baseline/analyzer-build.2026-08-04T21-04.md` (0 errors,
+6 warnings, same two codes, `MSB3277` count 0). Both diagnostics are pre-existing and out of the
+issue #418 Scope Lock: `CS2002` is a duplicate `<Compile>` include for
+`UtilitiesCS.Test\OutlookObjects\Folder\PercentageFormatterTests.cs`, and the code-less warning
+is the `System.Reactive 7.0.0` `packages.config` deprecation notice.
 
-Status: **`SCOPE_EXCEEDED` reported to the orchestrator.** Task P1-T6 is left unchecked pending
-an orchestrator decision. The proposed minimal remediation, and the alternative of accepting
-the warning, are stated in the executor's report.
+### Supplementary full-recompile inventory (methodology parity with the baseline)
 
-## Log location
+The plan-commanded run used MSBuild target `Build` and executed only **1** `CoreCompile`, because
+legacy non-SDK up-to-date checks are timestamp-based rather than `/p:`-property-based. An
+incremental run alone cannot enumerate the analyzer diagnostics of skipped projects, so — exactly
+as the `2026-08-04T21-04` baseline artifact does — a supplementary run with the **identical
+property set** and target `Rebuild` was executed solely to produce a complete inventory. It is
+supplementary evidence; it is not the plan command and does not replace the result above.
 
-Full build log retained for this session at
-`<scratchpad>/p1t6-analyzer.log` (session-scoped, not committed).
+Supplementary command:
+```
+MSBuild.exe TaskMaster.sln /t:Rebuild /p:Configuration=Debug /p:Platform='Any CPU' /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true /m
+```
+Supplementary EXIT_CODE: 0 — Build succeeded, **0 errors, 6 warnings**. Genuine full recompile
+confirmed: 36 `csc.exe` invocations, 84 `CoreCompile` occurrences, with `SVGControl` and
+`SVGControl.Test` both rebuilt (their `bin\Debug` outputs were deleted by `CoreClean` and
+regenerated).
+
+| Count | Severity | Code | Emitting project |
+|---|---|---|---|
+| 5 | warning | (no code) | five `packages.config` projects (`System.Reactive 7.0.0` notice) |
+| 1 | warning | `CS2002` | `UtilitiesCS.Test.csproj` |
+| 0 | error | — | — |
+
+Comparison against the baseline's supplementary full-recompile inventory (0 errors, 8 warnings):
+the two `MSB3061` `CoreClean` warnings in `TaskMaster.csproj` are **absent** here because
+Microsoft Outlook was confirmed not running before the build, so it no longer held
+`leptonica-1.82.0.dll` and `tesseract50.dll` open. That is an environmental improvement, not a
+code change; the warning count is 6 instead of 8 and no diagnostic code appeared that was absent
+from the baseline.
+
+### Verdict
+
+`EXIT_CODE: 0`, zero errors, and zero diagnostic codes absent from
+`evidence/baseline/analyzer-build.2026-08-04T21-04.md` at either incremental or full-recompile
+scope. Bringing `SVGControl.Test` into the solution introduces no new analyzer diagnostic. No
+remediation edit was required, so the task's 20-edit `SCOPE_EXCEEDED` ceiling was not approached
+and no file outside the Scope Lock was touched.

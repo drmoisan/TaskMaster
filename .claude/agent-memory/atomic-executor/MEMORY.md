@@ -1,5 +1,7 @@
 # Atomic Executor Memory Index
 
+- [#418 500-line gate vs mandated plan content](project_418_500line_gate_vs_plan_content.md) — P1-T19 unsatisfiable: ~193 new lines into 146 headroom, tightening only reached 547; per-block logger.Error+Trace.TraceError clauses block centralizing; delta = extract pure helpers to a new file
+- [Invoke-MSTest.ps1 dies on a single test assembly](project_418_invoke_mstest_single_assembly_bug.md) — StrictMode Latest + `.Count` on a scalar String throws before vstest runs; use a direct vstest.console.exe call with the script's own arg list
 - [Incremental build makes a vacuous baseline](project_incremental_build_vacuous_baseline.md) — Invoke-VSBuild only does /t:Build + timestamp-based up-to-date checks ignore /p: changes → nullable/analyzer baseline returns EXIT 0 with 0 CoreCompile; add a supplementary /t:Rebuild to enumerate diagnostics
 - [#400 CompleteOpenAsync unreachable recovery catch](project_400_completeopenasync_unreachable_recovery_catch.md) — P5-T185..204: CompleteOpenAsync d__16 153-156 is dead code (dispatcher.Report swallows sink exceptions), can't reach >=90% test-only; blocks T202-T204, escalated; 17-class gate deadlocks PopupControlDispatch testhost, retry after clearing runners (passed 5th try)
 - [csharpier pipe-files is a non-enforcing gate](project_csharpier_pipefiles_nonenforcing_gate.md) — `csharpier pipe-files`+re-hash-unmodified-file enforces nothing; use `csharpier check`/`format`; #400 P5 tests balloon past 500 lines under genuine format (size new files AFTER format, not hand-written count)
