@@ -9,6 +9,7 @@
 - [Named coverage exception: verify the member body](named-coverage-exception-verify-member-body.md) — read the member before writing "untestable branch"; put gap-closure BEFORE the toolchain-clean-pass task; pin line-rate vs branch-rate
 
 - [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/
+- [.csharpierignore scope: packages.config is NOT exempt](csharpierignore-scope-packages-config.md) — only *.csproj/*.props/*.targets are excluded; justify single-line package entries by character width, never by formatter exemption
 - [CSharpier gate: format not pipe-files](csharpier-format-not-pipe-files-gate.md) — formatting tasks must use `csharpier format` + scoped `csharpier check` exit 0; `pipe-files` is stdout-only/non-enforcing and masked a 500-line overflow in #400
 - [#400 partial-class headroom placement](project_400_partial_class_headroom_placement.md) — put new coverage cases in existing `.Part2.cs` `[TestClass] partial` files to keep the 17-class filter/count assertions stable
 - [Manager AsyncLazy shared seam](project_manager_asynclazy_shared_seam.md) — Globals.AF.Manager is shared across all classifier subsystems; use a key-specific accessor, never retype the dictionary value for one key
