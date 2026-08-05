@@ -1,5 +1,6 @@
 # Atomic Executor Memory Index
 
+- [Plan rationale clauses are evidence](project_418_plan_rationale_clauses_are_evidence.md) — #418 cycle 2 needed 3 preflight passes; all 3 blockers were unmeasured world-state claims in prose (clean-tree, csharpier scope, obj/ cache read as a live project), never in the fix
 - [#418 500-line gate vs mandated plan content](project_418_500line_gate_vs_plan_content.md) — P1-T19 unsatisfiable: ~193 new lines into 146 headroom, tightening only reached 547; per-block logger.Error+Trace.TraceError clauses block centralizing; delta = extract pure helpers to a new file
 - [Invoke-MSTest.ps1 dies on a single test assembly](project_418_invoke_mstest_single_assembly_bug.md) — StrictMode Latest + `.Count` on a scalar String throws before vstest runs; use a direct vstest.console.exe call with the script's own arg list
 - [Incremental build makes a vacuous baseline](project_incremental_build_vacuous_baseline.md) — Invoke-VSBuild only does /t:Build + timestamp-based up-to-date checks ignore /p: changes → nullable/analyzer baseline returns EXIT 0 with 0 CoreCompile; add a supplementary /t:Rebuild to enumerate diagnostics
