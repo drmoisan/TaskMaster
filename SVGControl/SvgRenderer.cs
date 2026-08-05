@@ -394,8 +394,10 @@ namespace SVGControl
             return proportions;
         }
 
-        // Returns null when the payload holds no SVG elements, which is how the parser reports that
-        // condition without raising. No handler here by design: TryGetSvgDocument is the boundary.
+        // Can return null in principle. That path is driven in tests through the injected parse
+        // delegate on TryGetSvgDocument; whether a well-formed-XML-but-no-SVG-element payload
+        // reaches it here is unmeasured (open question U-3). An empty payload does not: it raises
+        // XmlException. No handler here by design: TryGetSvgDocument is the boundary.
         internal static SvgDocument? OpenFromBytes(byte[] file)
         {
             using (var stream = new MemoryStream(file))

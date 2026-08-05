@@ -13,8 +13,10 @@ namespace SVGControl.Test
     /// <summary>
     /// Regression tests for issue #418. The byte-array <see cref="SvgRenderer"/> constructors must
     /// degrade to a null document instead of throwing when the SVG payload cannot be parsed.
-    /// Two distinct failure shapes are covered: malformed input, where the underlying parser
-    /// throws, and element-free input, where the parser returns null without throwing.
+    /// Two distinct failure shapes are covered: input the underlying parser rejects by throwing
+    /// (malformed bytes, and an empty payload, which raises XmlException for a missing root
+    /// element), and the element-free path where the parser returns null without throwing, which
+    /// is driven deterministically through the injected parse delegate.
     /// </summary>
     [TestClass]
     public class SvgRendererParseContractTests
@@ -276,6 +278,24 @@ namespace SVGControl.Test
                 .Which.InnerException.Should()
                 .BeOfType<XmlException>(
                     "the original parser exception must be preserved as the inner exception"
+                );
+        }
+
+        [TestMethod]
+        public void GetSvgDocumentOrThrow_WithTheBuiltInDefaultImage_ReturnsADocument()
+        {
+            // Arrange — the shipped default image is a known-good payload, so this is the success
+            // path of the fail-fast member: it returns the parsed document rather than throwing.
+            byte[] valid = Defaults.GetDefault.SvgImage;
+
+            // Act
+            SvgDocument document = SvgRenderer.GetSvgDocumentOrThrow(valid);
+
+            // Assert
+            document
+                .Should()
+                .NotBeNull(
+                    "the fail-fast member returns the parsed document for a well-formed payload"
                 );
         }
 
