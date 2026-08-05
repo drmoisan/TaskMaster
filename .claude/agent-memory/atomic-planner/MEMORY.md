@@ -2,8 +2,10 @@
 
 - [Dead-code removal vs coverage exclusion](project_deadcode_removal_vs_coverage_exclusion.md) — coverage gate blocked by unreachable dead prod code → plan removal (shrink denominator), never exclusion/carve-out/forced-rethrow
 - [Coverage gate on CLR-invoked private members](coverage-gate-clr-invoked-private-members.md) — never gate AssemblyResolve-style private members at >=90%; split newly-added vs changed per the AC's own wording
-- [Nullable context mismatch: prod vs test](project_nullable_context_mismatch_prod_vs_test.md) — check `#nullable enable` in the prod file AND missing `<LangVersion>` (C# 7.3) in the test csproj before writing literal C# signatures
+- [Nullable context mismatch: prod vs test](project_nullable_context_mismatch_prod_vs_test.md) — check `#nullable enable` in the prod file AND missing `<LangVersion>` (C# 7.3) in the test csproj; adding `<LangVersion>latest</LangVersion>` is never "one property"
+- [C# pure-move extraction pattern](csharp-pure-move-extraction-pattern.md) — moving members out of a 497/500-line file: keep the static-ctor install trigger, route testable members to an existing covered class, declare relocation-not-new-module
 - [Research claims as acceptance clauses](research-claims-as-acceptance-clauses.md) — never encode an unmeasured third-party null-vs-throw claim as a literal AC clause; #418 §1.4 empty-bytes claim cost a revision pass
+- [Enumerate condition outcomes before the case list](enumerate-condition-outcomes-before-case-list.md) — 100% branch-rate tasks: 2 outcomes per condition in every ||/&& clause; a null-pairing guard needs all four orderings, not three
 - [Named coverage exception: verify the member body](named-coverage-exception-verify-member-body.md) — read the member before writing "untestable branch"; put gap-closure BEFORE the toolchain-clean-pass task; pin line-rate vs branch-rate
 
 - [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/

@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -9,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Svg;
@@ -24,142 +22,9 @@ namespace SVGControl
 
         private const string ParseFailed = "SvgRenderer could not parse the SVG payload: ";
 
-        // Svg 3.4.7 was compiled against ExCSS 4.2.3.0 but the repo deploys ExCSS 4.3.1.0
-        // (same publicKeyToken). Production resolves this via TaskMaster.exe.config binding
-        // redirects, but vstest's testhost ignores the test DLL's .config in some modes, so
-        // SvgDocument.Open throws FileNotFoundException for ExCSS 4.2.3. The exception is
-        // swallowed by GetSvgDocument and surfaces downstream as an NRE in the SvgRenderer
-        // ctor. Register an AssemblyResolve fallback that satisfies any version request
-        // for an already-loaded assembly with a matching simple name + public key token.
-        private static int _resolverInstalled;
-
-        [ThreadStatic]
-        private static HashSet<string>? _resolving;
-
         static SvgRenderer()
         {
-            if (Interlocked.Exchange(ref _resolverInstalled, 1) == 0)
-            {
-                AppDomain.CurrentDomain.AssemblyResolve += ResolveByNameAndKey;
-            }
-        }
-
-        private static System.Reflection.Assembly? ResolveByNameAndKey(
-            object sender,
-            ResolveEventArgs args
-        )
-        {
-            var requested = new System.Reflection.AssemblyName(args.Name);
-            byte[] requestedKey = requested.GetPublicKeyToken();
-            foreach (var loaded in System.AppDomain.CurrentDomain.GetAssemblies())
-            {
-                var loadedName = loaded.GetName();
-                if (
-                    !string.Equals(
-                        loadedName.Name,
-                        requested.Name,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                )
-                {
-                    continue;
-                }
-                byte[] loadedKey = loadedName.GetPublicKeyToken();
-                if (PublicKeyTokensEqual(loadedKey, requestedKey))
-                {
-                    return loaded;
-                }
-            }
-
-            // No loaded match — fall back to loading by simple name from the probing path.
-            // This recovers cases where a versioned reference (e.g., ExCSS 4.2.3) is being
-            // requested but only a newer same-key version is deployed alongside the test DLL.
-            // Re-entrance guard prevents infinite recursion when Assembly.Load itself fails
-            // and re-raises AssemblyResolve on this thread.
-            _resolving ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            if (!_resolving.Add(requested.Name))
-            {
-                return null;
-            }
-            try
-            {
-                // Strategy 2 — load by simple name from the probing path.
-                try
-                {
-                    var name = new System.Reflection.AssemblyName(requested.Name);
-                    var byName = System.Reflection.Assembly.Load(name);
-                    byte[]? byNameKey = byName?.GetName().GetPublicKeyToken();
-                    if (byName != null && PublicKeyTokensEqual(byNameKey, requestedKey))
-                    {
-                        return byName;
-                    }
-                }
-                // Trace, not log4net: log4net inside an AssemblyResolve handler can itself trigger a
-                // re-entrant assembly load, so this diagnostic must not depend on it being loadable.
-                catch (Exception ex)
-                {
-                    Trace.TraceWarning(
-                        $"SvgRenderer load '{requested.Name}': {DescribeFailure(ex)}"
-                    );
-                }
-
-                // Strategy 3 — probe candidate directories for a same-key file on disk. Ordered after
-                // strategies 1 and 2 so an already-loaded match always wins over a fresh LoadFrom.
-                var self = typeof(SvgRenderer).Assembly;
-                IReadOnlyList<string> probeDirectories = SvgAssemblyProbe.GetProbeDirectories(
-                    self.Location,
-                    self.CodeBase,
-                    AppDomain.CurrentDomain.BaseDirectory
-                );
-                foreach (string directory in probeDirectories)
-                {
-                    string path = Path.Combine(directory, requested.Name + ".dll");
-                    if (!File.Exists(path))
-                    {
-                        continue;
-                    }
-                    // Trace here for the same re-entrancy reason given above.
-                    try
-                    {
-                        var loaded = System.Reflection.Assembly.LoadFrom(path);
-                        byte[] loadedFileKey = loaded.GetName().GetPublicKeyToken();
-                        if (PublicKeyTokensEqual(loadedFileKey, requestedKey))
-                        {
-                            return loaded;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Trace.TraceWarning($"SvgRenderer load '{path}': {DescribeFailure(ex)}");
-                    }
-                }
-            }
-            finally
-            {
-                _resolving.Remove(requested.Name);
-            }
-
-            return null;
-        }
-
-        private static bool PublicKeyTokensEqual(byte[]? a, byte[]? b)
-        {
-            if (a == null || b == null)
-            {
-                return a == b || (a != null && a.Length == 0) || (b != null && b.Length == 0);
-            }
-            if (a.Length != b.Length)
-            {
-                return false;
-            }
-            for (int i = 0; i < a.Length; i++)
-            {
-                if (a[i] != b[i])
-                {
-                    return false;
-                }
-            }
-            return true;
+            SvgAssemblyResolver.Install();
         }
 
         public SvgRenderer(byte[] doc, Size size, AutoSize autoSize)
@@ -206,7 +71,7 @@ namespace SVGControl
 
         // Renders a failure for a log record. A null error is the element-free case, where the parser
         // reports failure by returning no document rather than by raising.
-        private static string DescribeFailure(Exception? error)
+        internal static string DescribeFailure(Exception? error)
         {
             return error == null
                 ? "the payload contained no SVG elements."

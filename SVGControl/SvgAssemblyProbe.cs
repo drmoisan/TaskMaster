@@ -6,9 +6,10 @@ using System.IO;
 namespace SVGControl
 {
     /// <summary>
-    /// Pure path-string helpers used by the SVGControl assembly-resolve fallback. Separated from
-    /// SvgRenderer because these concern assembly probing rather than SVG rendering, and because
-    /// they carry no renderer state, which makes them directly unit-testable.
+    /// Pure path-string and public-key-token helpers used by the SVGControl assembly-resolve
+    /// fallback. Separated from SvgRenderer because these concern assembly probing and identity
+    /// matching rather than SVG rendering, and because they carry no renderer state, which makes
+    /// them directly unit-testable.
     /// </summary>
     internal static class SvgAssemblyProbe
     {
@@ -48,7 +49,9 @@ namespace SVGControl
                     ? Path.GetDirectoryName(location)
                     : null,
                 TryGetDirectoryFromCodeBase(assemblyCodeBase),
-                baseDirectory,
+                baseDirectory != null && baseDirectory.IndexOfAny(Path.GetInvalidPathChars()) < 0
+                    ? baseDirectory
+                    : null,
             };
             // Candidates are null-checked explicitly rather than with IsNullOrWhiteSpace: net481 has
             // no NotNullWhen post-conditions, so that call would not narrow state and Add emits CS8604.
@@ -62,6 +65,29 @@ namespace SVGControl
                 }
             }
             return ordered;
+        }
+
+        // Compares two public key tokens for equality, treating null and zero-length as equivalent
+        // (both denote an unsigned assembly). Never raises, so it is safe inside an AssemblyResolve
+        // handler.
+        internal static bool PublicKeyTokensEqual(byte[]? a, byte[]? b)
+        {
+            if (a == null || b == null)
+            {
+                return a == b || (a != null && a.Length == 0) || (b != null && b.Length == 0);
+            }
+            if (a.Length != b.Length)
+            {
+                return false;
+            }
+            for (int i = 0; i < a.Length; i++)
+            {
+                if (a[i] != b[i])
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

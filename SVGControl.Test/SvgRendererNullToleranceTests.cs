@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -57,7 +58,7 @@ namespace SVGControl.Test
             renderer.Document = null;
 
             // Act
-            Bitmap rendered = renderer.Render();
+            Bitmap? rendered = renderer.Render();
 
             // Assert — returning null rather than throwing is the pre-existing tolerant contract
             // that AC-4 requires the issue #418 fix to preserve.
@@ -84,7 +85,7 @@ namespace SVGControl.Test
 
             // Act
             selector.SetDefaultImage();
-            Bitmap rendered = selector.Render();
+            Bitmap? rendered = selector.Render();
 
             // Assert
             try
@@ -105,7 +106,7 @@ namespace SVGControl.Test
         public void DefaultImageConstructor_DoesNotThrow()
         {
             // Arrange
-            SvgImageSelector selector = null;
+            SvgImageSelector selector = null!;
 
             // Act
             Action act = () => selector = CreateSelectorWithDefaultImage();

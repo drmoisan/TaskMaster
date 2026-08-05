@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Drawing;
 using System.Text;
@@ -33,7 +34,7 @@ namespace SVGControl.Test
         {
             // Arrange
             byte[] malformed = MalformedSvgBytes();
-            SvgRenderer renderer = null;
+            SvgRenderer renderer = null!;
 
             // Act
             Action act = () =>
@@ -57,7 +58,7 @@ namespace SVGControl.Test
         {
             // Arrange
             byte[] malformed = MalformedSvgBytes();
-            SvgRenderer renderer = null;
+            SvgRenderer renderer = null!;
 
             // Act
             Action act = () =>
@@ -87,7 +88,7 @@ namespace SVGControl.Test
             // Arrange — an empty payload is a distinct failure shape from malformed input: the XML
             // reader finds no root element. Either shape must degrade to a null document rather
             // than reaching the caller.
-            SvgRenderer renderer = null;
+            SvgRenderer renderer = null!;
 
             // Act
             Action act = () =>
@@ -107,7 +108,7 @@ namespace SVGControl.Test
         public void Constructor_WithEmptyBytesAndMargin_DoesNotThrowAndLeavesDocumentNull()
         {
             // Arrange
-            SvgRenderer renderer = null;
+            SvgRenderer renderer = null!;
 
             // Act
             Action act = () =>
@@ -133,7 +134,7 @@ namespace SVGControl.Test
             byte[] valid = Defaults.GetDefault.SvgImage;
 
             // Act
-            SvgDocument document = SvgRenderer.GetSvgDocument(valid);
+            SvgDocument? document = SvgRenderer.GetSvgDocument(valid);
 
             // Assert
             document
@@ -142,10 +143,33 @@ namespace SVGControl.Test
         }
 
         [TestMethod]
+        public void Constructor_WithTheBuiltInDefaultImageAndNoMargin_LeavesDocumentNonNull()
+        {
+            // Arrange — CR-5: the success branch of the three-argument byte-array overload was driven
+            // by no test, while the four-argument overload's identical branch was covered. This is the
+            // branch a real caller takes in the normal case.
+            byte[] valid = Defaults.GetDefault.SvgImage;
+
+            // Act
+            SvgRenderer renderer = new SvgRenderer(
+                valid,
+                new Size(64, 64),
+                AutoSize.MaintainAspectRatio
+            );
+
+            // Assert
+            renderer
+                .Document.Should()
+                .NotBeNull(
+                    "a well-formed payload must leave the parsed document on the renderer, mirroring the four-argument overload"
+                );
+        }
+
+        [TestMethod]
         public void GetSvgDocument_WithNullPayload_ThrowsArgumentNullException()
         {
             // Arrange, Act
-            Action act = () => SvgRenderer.GetSvgDocument(null);
+            Action act = () => SvgRenderer.GetSvgDocument(null!);
 
             // Assert — a null argument is a caller defect, not a parse failure, so it fails fast
             // rather than degrading to a null document.
@@ -159,7 +183,7 @@ namespace SVGControl.Test
         public void TryGetSvgDocument_WithNullPayload_ThrowsArgumentNullException()
         {
             // Arrange, Act
-            Action act = () => SvgRenderer.TryGetSvgDocument(null, out _, out _);
+            Action act = () => SvgRenderer.TryGetSvgDocument(null!, out _, out _);
 
             // Assert
             act.Should()
@@ -177,8 +201,8 @@ namespace SVGControl.Test
             // Act
             bool parsed = SvgRenderer.TryGetSvgDocument(
                 malformed,
-                out SvgDocument document,
-                out Exception error
+                out SvgDocument? document,
+                out Exception? error
             );
 
             // Assert
@@ -199,8 +223,8 @@ namespace SVGControl.Test
             // XmlException("Root element is missing.") is what the parser produces for empty input.
             bool parsed = SvgRenderer.TryGetSvgDocument(
                 Array.Empty<byte>(),
-                out SvgDocument document,
-                out Exception error
+                out SvgDocument? document,
+                out Exception? error
             );
 
             // Assert
@@ -217,18 +241,20 @@ namespace SVGControl.Test
         public void TryGetSvgDocument_WhenTheParseSeamReturnsNull_ReturnsFalseWithNoCapturedError()
         {
             // Arrange — the element-free path, where the parser reports failure by returning null
-            // instead of raising. No plain byte payload reaches it: malformed input and empty input
-            // both make the XML reader raise. The delegate seam is therefore the only deterministic
-            // way to drive this branch, and it needs no global state to do so.
+            // instead of raising. The two payload shapes measured here, malformed and empty, both make
+            // the XML reader raise; whether a well-formed-XML-but-no-SVG-element payload reaches this
+            // branch is unmeasured (open question U-3), matching the hedge the production comment on
+            // OpenFromBytes carries. The delegate seam is therefore the deterministic way to drive
+            // this branch, and it needs no global state to do so.
             var parse = new Mock<Func<byte[], SvgDocument>>();
-            parse.Setup(f => f(It.IsAny<byte[]>())).Returns((SvgDocument)null);
+            parse.Setup(f => f(It.IsAny<byte[]>())).Returns((SvgDocument)null!);
 
             // Act
             bool parsed = SvgRenderer.TryGetSvgDocument(
                 MalformedSvgBytes(),
                 parse.Object,
-                out SvgDocument document,
-                out Exception error
+                out SvgDocument? document,
+                out Exception? error
             );
 
             // Assert
@@ -303,9 +329,9 @@ namespace SVGControl.Test
         public void TryGetSvgDocument_WithInjectedParseSeam_SurfacesTheSameExceptionInstance()
         {
             // Arrange — the delegate seam exists so exact exception identity can be asserted without
-            // mutating any global state. Declared without a nullable annotation because
-            // SVGControl.Test compiles as C# 7.3; it binds to the Func<byte[], SvgDocument?>
-            // parameter because nullability is metadata-only and the CLR type is identical.
+            // mutating any global state. The mock's type argument carries no nullable annotation and
+            // still binds to the Func<byte[], SvgDocument?> parameter, because nullability is
+            // metadata-only and the CLR type is identical.
             var sentinel = new InvalidTimeZoneException("sentinel parse failure");
             var parse = new Mock<Func<byte[], SvgDocument>>();
             parse.Setup(f => f(It.IsAny<byte[]>())).Throws(sentinel);
@@ -314,8 +340,8 @@ namespace SVGControl.Test
             bool parsed = SvgRenderer.TryGetSvgDocument(
                 MalformedSvgBytes(),
                 parse.Object,
-                out SvgDocument document,
-                out Exception error
+                out SvgDocument? document,
+                out Exception? error
             );
 
             // Assert

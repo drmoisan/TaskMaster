@@ -107,6 +107,7 @@
       <DependentUpon>PictureBoxSVG.cs</DependentUpon>
     </Compile>
     <Compile Include="SvgAssemblyProbe.cs" />
+    <Compile Include="SvgAssemblyResolver.cs" />
     <Compile Include="SvgOptionsConverter.cs" />
     <Compile Include="SvgOptionsConverter2.cs" />
     <Compile Include="SvgRenderer.cs" />

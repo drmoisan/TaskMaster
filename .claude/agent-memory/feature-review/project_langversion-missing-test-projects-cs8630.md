@@ -1,0 +1,19 @@
+---
+name: langversion-missing-test-projects-cs8630
+description: Six TaskMaster test projects declare no <LangVersion> and default to C# 7.3, so /p:Nullable=enable emits CS8630; the mandated nullable gate only passes because legacy up-to-date checks are timestamp-based, not property-based
+metadata:
+  type: project
+---
+
+Six test projects declare no `<LangVersion>` and therefore default to **C# 7.3** on net481 non-SDK projects: `QuickFiler.Test`, `SVGControl.Test`, `Tags.Test`, `TaskTree.Test`, `TaskVisualization.Test`, `ToDoModel.Test`. Under the repo-mandated `/p:Nullable=enable` property any of them emits `error CS8630: Invalid 'nullable' value: 'Enable' for C# 7.3. Please use language version '8.0' or greater.` The projects that DO declare it: `TaskMaster.Test`, `UtilitiesCS.Test`, `VBFunctions.Test` (plus every production project).
+
+**Why the mandated gate still returns exit 0:** `msbuild TaskMaster.sln /t:Build /p:Nullable=enable /p:TreatWarningsAsErrors=true` is vacuous in an up-to-date tree. Legacy non-SDK up-to-date checks are **timestamp-based, not property-based**, so changing `/p:` properties triggers no recompile. Verified on #418: the command completed in **1.70 s with 0 `CoreCompile` targets**. A `/t:Rebuild` with the identical property set exits 1 with **196 errors** — 195 pre-existing `CS86xx` in `UtilitiesCS` (`CS8766` x130, `CS8618` x23, `CS8625` x12, `CS8600` x9, `CS8601` x8, `CS8604` x7, `CS8602` x3, `CS8603` x2, `CS8714` x1) plus 1 `CS8630`. So a cold solution-wide nullable build cannot pass on this repo regardless of any feature branch.
+
+**Only one of the six surfaces its CS8630.** `SVGControl.Test` project-references only `SVGControl`, so it reaches its own `CoreCompile`; the other five cascade-fail from `UtilitiesCS` first and never compile. Do not conclude from a diagnostic inventory listing one `CS8630` that only one project has the condition.
+
+**How to apply:**
+- Never accept a solution-level nullable/TWAE exit 0 as evidence of nullable cleanliness. Check elapsed time and `CoreCompile` count. To get a real result, force-rebuild the *changed project* alone: `MSBuild.exe <Proj>.csproj /t:Rebuild /p:Configuration=Debug /p:Platform=AnyCPU /p:Nullable=enable /p:TreatWarningsAsErrors=true`. On #418 `SVGControl.csproj` returned exit 0 / 0 errors / 0 warnings this way — a genuine independent compile of the changed production code.
+- Resolve msbuild via `vswhere` (`${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe -latest -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe"`); `/p:Platform=AnyCPU` works when invoking a `.csproj` directly. See [[project_msbuild-invocation-via-bash]].
+- **Do not `/t:Rebuild` a test project that depends on `UtilitiesCS`** — it cascades into that project's pre-existing nullable debt, aborts, and leaves build outputs partially stale. Restore with the mandated solution analyzer build (`Invoke-VSBuild.ps1 ... -EnableNETAnalyzers -EnforceCodeStyleInBuild`), which is a real build (~11 s) and returns exit 0 / 0 errors / 6 pre-existing warnings.
+- **Feature-vs-base framing trap:** when a branch newly adds a `LangVersion`-less test project to `TaskMaster.sln`, executor evidence may call its `CS8630` "present in the baseline". Check *which* baseline: on #418 the cited baseline was captured at the branch's own first commit, the one that added the project. Against the real merge-base the diagnostic is unreachable. Recommend the one-line `<LangVersion>latest</LangVersion>` fix, and warn that raising it can surface latent diagnostics in the project's pre-existing test files.
+- The repo's steady-state pre-existing analyzer-build warning set is **6**: 4 code-less `System.Reactive.PackagesConfigCheck.targets` warnings and 2 `CS2002` occurrences of one duplicate `<Compile>` in `UtilitiesCS.Test.csproj`. The nullable-build set is 5. Use these as the no-new-diagnostics comparison basis.
