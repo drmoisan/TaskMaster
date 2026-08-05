@@ -9,6 +9,7 @@
 - [Named coverage exception: verify the member body](named-coverage-exception-verify-member-body.md) — read the member before writing "untestable branch"; put gap-closure BEFORE the toolchain-clean-pass task; pin line-rate vs branch-rate
 
 - [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/
+- [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — obj/ cache filenames outlive tear-down commits; verify project/source files with git ls-files or a glob before writing an existence claim into acceptance text
 - [Never pin a HEAD SHA as a plan expectation](never-pin-head-sha-as-plan-expectation.md) — record HEAD, gate on tree invariants (clean porcelain + no .cs/.csproj/packages.config/app.config diff vs the baseline-capture sha)
 - [.csharpierignore scope: packages.config is NOT exempt](csharpierignore-scope-packages-config.md) — only *.csproj/*.props/*.targets are excluded; justify single-line package entries by character width, never by formatter exemption
 - [CSharpier gate: format not pipe-files](csharpier-format-not-pipe-files-gate.md) — formatting tasks must use `csharpier format` + scoped `csharpier check` exit 0; `pipe-files` is stdout-only/non-enforcing and masked a 500-line overflow in #400
