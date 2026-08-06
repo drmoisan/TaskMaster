@@ -180,7 +180,7 @@ Research is sufficient to complete this specification. The implementation plan m
 - [x] FilterOlFolders cold initialization awaits the snapshot without synchronously blocking the UI dispatcher, and the viewer is wired only after snapshot acquisition.
 - [x] Deterministic MSTest coverage proves worker-started cold build affinity, continuation affinity after a forced yield, service-composition and notification-sink affinity, and nonblocking cold filter initialization without Outlook, network, temporary files, sleeps, or retry loops.
 - [x] The final C# toolchain passes in one uninterrupted final pass: CSharpier, analyzer build, nullable build, and MSTest with code coverage; changed behavior meets the repository coverage requirements.
-- [ ] The feature documentation records the final implementation decisions, validation evidence, and any approved deviation from this scope.
+- [x] The feature documentation records the final implementation decisions, validation evidence, and any approved deviation from this scope.
 
 ## Risks & Mitigations
 - Technical or operational risks:
