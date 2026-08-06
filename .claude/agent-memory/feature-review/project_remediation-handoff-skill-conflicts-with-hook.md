@@ -1,0 +1,14 @@
+---
+name: remediation-handoff-skill-conflicts-with-hook
+description: remediation-handoff-atomic-planner mandates an audit/<ts>/policy-audit.md folder layout that the validate-feature-review-coverage hook rejects; use the flat timestamp-suffixed form and record the conflict
+metadata:
+  type: project
+---
+
+`.claude/skills/remediation-handoff-atomic-planner/SKILL.md` specifies a folder-per-cycle artifact layout: `docs/features/active/<slug>/audit/<exit-ts>/policy-audit.md`, `.../code-review.md`, `.../feature-audit.md`, and `docs/features/active/<slug>/remediation/<entry-ts>/remediation-inputs.md`. That layout is **incompatible** with `.claude/hooks/validate-feature-review-coverage.ps1`, whose `Get-ReviewArtifactInfo` regex is `^docs/features/active/(?<Folder>.+)/<stem>\.(?<Timestamp>\d{4}-\d{2}-\d{2}T\d{2}-\d{2})\.md$` — it requires the timestamp in the *filename*, so a bare `policy-audit.md` fails regardless of folder depth. The hook additionally requires `code-review`, `feature-audit`, and `remediation-inputs` to share the policy audit's `Folder` and `Timestamp` captures.
+
+**How to apply:** Use the flat form `docs/features/active/<slug>/<stem>.<yyyy-MM-ddTHH-mm>.md` for all four artifacts with one shared timestamp. That is what the enforced gate accepts and what the feature-review agent contract states. Record the conflict as a documented gap in the policy audit rather than silently picking one, so it gets resolved in the skill documents instead of rediscovered each cycle.
+
+Second conflict in the same pair: `feature-review-workflow/SKILL.md` step 8 tells feature-review to "create the target remediation plan file from the canonical plan template," while `remediation-handoff-atomic-planner` assigns plan authorship to `atomic-planner` and states the orchestrator must not act on plan content itself. Follow the handoff skill — write `remediation-inputs` only, name the planner as the next link explicitly, and note the conflict. Writing a stub the planner immediately overwrites adds no value and risks a malformed plan entering the chain.
+
+**Also absent in TaskMaster** (do not waste time looking for them; both are referenced by skills but not present): `scripts/dev_tools/validate_evidence_locations.py` (use a `git diff --name-only ce0c91e6...HEAD | grep -E '^artifacts/(baselines|qa|evidence|coverage)/'` filter instead) and `scripts/feature-review/Test-ModifiedWorkflowNeedsGreenRun.ps1` (use a `git diff --name-only` filter for `.github/workflows/**`, `.github/actions/**`, `scripts/benchmarks/**`). No `mcp__drm-copilot__*` tool is in the feature-review tool surface either, so the MCP template-asset and artifact-validator steps cannot be run; the canonical policy-audit heading set is fully enumerated in prose in `policy-audit-template-usage/SKILL.md` § Required Steps, so reproduce it from there and document the assumption rather than emitting a BLOCKED stub. See [[project_taskmaster-validator-memories-are-cross-repo]].

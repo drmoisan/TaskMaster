@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -9,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Svg;
@@ -22,115 +20,29 @@ namespace SVGControl
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
         );
 
-        // Svg 3.4.7 was compiled against ExCSS 4.2.3.0 but the repo deploys ExCSS 4.3.1.0
-        // (same publicKeyToken). Production resolves this via TaskMaster.exe.config binding
-        // redirects, but vstest's testhost ignores the test DLL's .config in some modes, so
-        // SvgDocument.Open throws FileNotFoundException for ExCSS 4.2.3. The exception is
-        // swallowed by GetSvgDocument and surfaces downstream as an NRE in the SvgRenderer
-        // ctor. Register an AssemblyResolve fallback that satisfies any version request
-        // for an already-loaded assembly with a matching simple name + public key token.
-        private static int _resolverInstalled;
-
-        [ThreadStatic]
-        private static HashSet<string>? _resolving;
+        private const string ParseFailed = "SvgRenderer could not parse the SVG payload: ";
 
         static SvgRenderer()
         {
-            if (Interlocked.Exchange(ref _resolverInstalled, 1) == 0)
-            {
-                AppDomain.CurrentDomain.AssemblyResolve += ResolveByNameAndKey;
-            }
-        }
-
-        private static System.Reflection.Assembly? ResolveByNameAndKey(
-            object sender,
-            ResolveEventArgs args
-        )
-        {
-            var requested = new System.Reflection.AssemblyName(args.Name);
-            byte[] requestedKey = requested.GetPublicKeyToken();
-            foreach (var loaded in System.AppDomain.CurrentDomain.GetAssemblies())
-            {
-                var loadedName = loaded.GetName();
-                if (
-                    !string.Equals(
-                        loadedName.Name,
-                        requested.Name,
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                )
-                {
-                    continue;
-                }
-                byte[] loadedKey = loadedName.GetPublicKeyToken();
-                if (PublicKeyTokensEqual(loadedKey, requestedKey))
-                {
-                    return loaded;
-                }
-            }
-
-            // No loaded match — fall back to loading by simple name from the probing path.
-            // This recovers cases where a versioned reference (e.g., ExCSS 4.2.3) is being
-            // requested but only a newer same-key version is deployed alongside the test DLL.
-            // Re-entrance guard prevents infinite recursion when Assembly.Load itself fails
-            // and re-raises AssemblyResolve on this thread.
-            _resolving ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            if (!_resolving.Add(requested.Name))
-            {
-                return null;
-            }
-            try
-            {
-                var byName = System.Reflection.Assembly.Load(
-                    new System.Reflection.AssemblyName(requested.Name)
-                );
-                if (
-                    byName != null
-                    && PublicKeyTokensEqual(byName.GetName().GetPublicKeyToken(), requestedKey)
-                )
-                {
-                    return byName;
-                }
-            }
-            catch
-            {
-                // Swallow — return null so other resolvers (or default resolution) can run.
-            }
-            finally
-            {
-                _resolving.Remove(requested.Name);
-            }
-
-            return null;
-        }
-
-        private static bool PublicKeyTokensEqual(byte[]? a, byte[]? b)
-        {
-            if (a == null || b == null)
-            {
-                return a == b || (a != null && a.Length == 0) || (b != null && b.Length == 0);
-            }
-            if (a.Length != b.Length)
-            {
-                return false;
-            }
-            for (int i = 0; i < a.Length; i++)
-            {
-                if (a[i] != b[i])
-                {
-                    return false;
-                }
-            }
-            return true;
+            SvgAssemblyResolver.Install();
         }
 
         public SvgRenderer(byte[] doc, Size size, AutoSize autoSize)
         {
-            // GetSvgDocument is annotated SvgDocument? because it swallows load failures and
-            // returns null; this call site preserves pre-existing behavior (assume success and
-            // let a genuine failure surface as an NRE from Draw(), as it always has).
-            _doc = GetSvgDocument(doc)!;
-            _original = _doc.Draw().Size;
+            if (TryGetSvgDocument(doc, out SvgDocument? parsed, out Exception? error))
+            {
+                _doc = parsed;
+                _original = parsed!.Draw().Size;
+            }
+            else
+            {
+                // Issue #418: degrade instead of raising. The swallowed null used to be dereferenced
+                // one line later, surfacing as an opaque NRE inside the WinForms designer.
+                string detail = "SvgRenderer(byte[], Size, AutoSize): " + DescribeFailure(error);
+                logger.Error(detail, error);
+                Trace.TraceError(detail);
+                _original = Size.Empty;
+            }
             _margin = new Padding(0);
             Size = CalcInnerSize(size, _margin);
             _autoSize = autoSize;
@@ -138,12 +50,32 @@ namespace SVGControl
 
         public SvgRenderer(byte[] doc, Size size, Padding margin, AutoSize autoSize)
         {
-            // See the other byte[]-doc constructor above for the rationale on the `!`.
-            _doc = GetSvgDocument(doc)!;
-            _original = _doc.Draw().Size;
+            if (TryGetSvgDocument(doc, out SvgDocument? parsed, out Exception? error))
+            {
+                _doc = parsed;
+                _original = parsed!.Draw().Size;
+            }
+            else
+            {
+                // See the other byte[]-doc constructor for the degrade-and-log rationale.
+                string detail =
+                    "SvgRenderer(byte[], Size, Padding, AutoSize): " + DescribeFailure(error);
+                logger.Error(detail, error);
+                Trace.TraceError(detail);
+                _original = Size.Empty;
+            }
             _margin = margin;
             Size = CalcInnerSize(size, _margin);
             _autoSize = autoSize;
+        }
+
+        // Renders a failure for a log record. A null error is the element-free case, where the parser
+        // reports failure by returning no document rather than by raising.
+        internal static string DescribeFailure(Exception? error)
+        {
+            return error == null
+                ? "the payload contained no SVG elements."
+                : error.GetType().FullName + ": " + error.Message;
         }
 
         public SvgRenderer(SvgDocument doc, Size size, AutoSize autoSize)
@@ -327,17 +259,93 @@ namespace SVGControl
             return proportions;
         }
 
-        public static SvgDocument? GetSvgDocument(byte[] file)
+        // Can return null in principle. That path is driven in tests through the injected parse
+        // delegate on TryGetSvgDocument; whether a well-formed-XML-but-no-SVG-element payload
+        // reaches it here is unmeasured (open question U-3). An empty payload does not: it raises
+        // XmlException. No handler here by design: TryGetSvgDocument is the boundary.
+        internal static SvgDocument? OpenFromBytes(byte[] file)
         {
-            Stream stream = new MemoryStream(file);
-            try
+            using (var stream = new MemoryStream(file))
             {
                 return SvgDocument.Open<SvgDocument>(stream);
             }
-            catch (Exception)
+        }
+
+        // Single parse-failure boundary for this type: every failure mode becomes a false result plus
+        // an optionally captured exception, so no caller can silently lose a diagnostic. The parse
+        // delegate is the seam that lets tests assert exact exception identity without global state.
+        internal static bool TryGetSvgDocument(
+            byte[] file,
+            Func<byte[], SvgDocument?> parse,
+            out SvgDocument? document,
+            out Exception? error
+        )
+        {
+            if (file == null || parse == null)
             {
-                return null;
+                throw new ArgumentNullException(file == null ? nameof(file) : nameof(parse));
             }
+            try
+            {
+                document = parse(file);
+                error = null;
+                if (document != null)
+                {
+                    return true;
+                }
+                // Element-free input makes the parser return null without raising: nothing to hand back.
+                string empty = ParseFailed + DescribeFailure(null);
+                logger.Error(empty);
+                Trace.TraceError(empty);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                // Dual channel on purpose: log4net for production, Trace because no log4net appender
+                // is known to be configured inside the designer host (devenv.exe).
+                string detail = ParseFailed + DescribeFailure(ex);
+                logger.Error(detail, ex);
+                Trace.TraceError(detail);
+                document = null;
+                error = ex;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Production entry point for the try-style parse. Surfaces the captured exception so a caller
+        /// can report the real cause instead of inferring it from a null result.
+        /// </summary>
+        public static bool TryGetSvgDocument(
+            byte[] file,
+            out SvgDocument? document,
+            out Exception? error
+        )
+        {
+            return TryGetSvgDocument(file, OpenFromBytes, out document, out error);
+        }
+
+        /// <summary>
+        /// Fail-fast counterpart to GetSvgDocument. InnerException carries the original parser
+        /// exception when one exists, and is null for the element-free case.
+        /// </summary>
+        public static SvgDocument GetSvgDocumentOrThrow(byte[] file)
+        {
+            if (TryGetSvgDocument(file, out SvgDocument? document, out Exception? error))
+            {
+                return document!; // non-null on the true branch by TryGetSvgDocument's contract
+            }
+            throw new InvalidOperationException(ParseFailed + DescribeFailure(error), error);
+        }
+
+        /// <summary>
+        /// Tolerant parse kept for consumers that treat a missing document as a normal state. Use
+        /// TryGetSvgDocument or GetSvgDocumentOrThrow when the cause matters.
+        /// </summary>
+        public static SvgDocument? GetSvgDocument(byte[] file)
+        {
+            TryGetSvgDocument(file, out SvgDocument? document, out _);
+            return document;
         }
 
         #region EventHandlers

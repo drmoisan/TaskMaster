@@ -1,6 +1,6 @@
 ---
 name: legacy-csproj-explicit-compile-include
-description: Legacy non-SDK / packages.config C# projects in this repo list every source via explicit <Compile Include> (no glob); new .cs files need csproj wiring in plan scope-lock + task AC
+description: Legacy non-SDK / packages.config C# projects in this repo list every source via explicit <Compile Include> (no glob) AND do not receive transitive assembly references through ProjectReference; both need plan scope-lock + task AC
 metadata:
   type: project
 ---
@@ -10,3 +10,11 @@ Legacy non-SDK / packages.config C# projects in this repo enumerate every source
 **Why:** Caught during #207 planning. Executor passed preflight and completed Phase 0, then correctly STOPPED at P1-T1 because the plan created two new `UtilitiesCS/OutlookObjects/*.cs` files but `UtilitiesCS.csproj` was not in the scope-lock list and no `<Compile Include>` wiring was specified — the files could not build into `UtilitiesCS.dll`. The plan already did the equivalent for `TaskMaster.Test.csproj`, so it was a consistency gap.
 
 **How to apply:** When a plan creates ANY new `.cs` file in a legacy/packages.config project, the plan MUST (a) list a `MODIFY <project>.csproj` entry in the scope-lock with the exact `<Compile Include>` item(s), and (b) fold the csproj wiring into the file-creation task's single binary outcome (file exists AND is wired into the csproj so it compiles). Verify a project is legacy by checking for `packages.config` and explicit `<Compile Include>` items rather than SDK-style globbing.
+
+## Second failure mode: transitive assembly references do not flow
+
+In a legacy non-SDK project, a `<ProjectReference>` does NOT flow the referenced project's assembly references to the compiler — they land in `ReferenceDependencyPaths` (copy-local at runtime) rather than `ReferencePath` (compile-time). A test that merely names a type from a transitively-referenced package fails to compile with `CS0012`.
+
+**Why:** Caught during #418 preflight. `SVGControl.Test.csproj` had a `ProjectReference` to `SVGControl` but no `<Reference Include="Svg" ...>` and no `Svg` entry in its own `packages.config`; every planned test named `SvgDocument`, so the whole test file would have failed with `CS0012` for `Svg, Version=3.4.0.0`.
+
+**How to apply:** Before planning tests in a legacy test project, grep that project's own `.csproj` `<Reference>` block and `packages.config` for every third-party type the tests will name. If a type comes only from the production project's package set, add an explicit task that adds BOTH the `packages.config` `<package id=... />` entry and the `<Reference Include=... ><HintPath>..\packages\<id>.<ver>\lib\<tfm>\<dll>.dll</HintPath></Reference>` item, copying the exact `Version=`/`PublicKeyToken=` from the production project's csproj. Widen the scope-lock entry for that csproj to permit `<Reference>` items, and add the `packages.config` unconditionally.

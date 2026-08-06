@@ -1,15 +1,25 @@
 # Atomic Planner Memory Index
 
 - [Dead-code removal vs coverage exclusion](project_deadcode_removal_vs_coverage_exclusion.md) — coverage gate blocked by unreachable dead prod code → plan removal (shrink denominator), never exclusion/carve-out/forced-rethrow
+- [Coverage gate on CLR-invoked private members](coverage-gate-clr-invoked-private-members.md) — never gate AssemblyResolve-style private members at >=90%; split newly-added vs changed per the AC's own wording
+- [Nullable context mismatch: prod vs test](project_nullable_context_mismatch_prod_vs_test.md) — check `#nullable enable` in the prod file AND missing `<LangVersion>` (C# 7.3) in the test csproj; adding `<LangVersion>latest</LangVersion>` is never "one property"
+- [C# pure-move extraction pattern](csharp-pure-move-extraction-pattern.md) — moving members out of a 497/500-line file: keep the static-ctor install trigger, route testable members to an existing covered class, declare relocation-not-new-module
+- [Research claims as acceptance clauses](research-claims-as-acceptance-clauses.md) — never encode an unmeasured third-party null-vs-throw claim as a literal AC clause; #418 §1.4 empty-bytes claim cost a revision pass
+- [Enumerate condition outcomes before the case list](enumerate-condition-outcomes-before-case-list.md) — 100% branch-rate tasks: 2 outcomes per condition in every ||/&& clause; a null-pairing guard needs all four orderings, not three
+- [Named coverage exception: verify the member body](named-coverage-exception-verify-member-body.md) — read the member before writing "untestable branch"; put gap-closure BEFORE the toolchain-clean-pass task; pin line-rate vs branch-rate
 
 - [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/
+- [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — obj/ cache filenames outlive tear-down commits; verify project/source files with git ls-files or a glob before writing an existence claim into acceptance text
+- [Never pin a HEAD SHA as a plan expectation](never-pin-head-sha-as-plan-expectation.md) — record HEAD, gate on tree invariants (clean porcelain + no .cs/.csproj/packages.config/app.config diff vs the baseline-capture sha)
+- [.csharpierignore scope: packages.config is NOT exempt](csharpierignore-scope-packages-config.md) — only *.csproj/*.props/*.targets are excluded; justify single-line package entries by character width, never by formatter exemption
 - [CSharpier gate: format not pipe-files](csharpier-format-not-pipe-files-gate.md) — formatting tasks must use `csharpier format` + scoped `csharpier check` exit 0; `pipe-files` is stdout-only/non-enforcing and masked a 500-line overflow in #400
 - [#400 partial-class headroom placement](project_400_partial_class_headroom_placement.md) — put new coverage cases in existing `.Part2.cs` `[TestClass] partial` files to keep the 17-class filter/count assertions stable
 - [Manager AsyncLazy shared seam](project_manager_asynclazy_shared_seam.md) — Globals.AF.Manager is shared across all classifier subsystems; use a key-specific accessor, never retype the dictionary value for one key
 - [Folder predictor AF holder seam](project_folder_predictor_af_holder_seam.md) — #177 F1: route flag-on LCPPN predictor through a Folder-only holder on IAppAutoFileObjects (globals.AF), not per-instance OlFolderClassifierGroup state
 - [Plan validator phase-heading constraint](plan-validator-phase-heading-constraint.md) — MCP plan validator requires exact `### Phase N — <Title>`; no tokens between Phase N and em-dash; H1 title line is exempt
 - [Plan validator task-ID sequential constraint](plan-validator-task-id-sequential-constraint.md) — task IDs must be digit-only and sequential-by-appearance; mid-phase insertion forces renumbering all later tasks + cross-refs
-- [Legacy csproj explicit Compile Include](project_legacy_csproj_explicit_compile_include.md) — new .cs in UtilitiesCS/TaskMaster.Test (packages.config, no glob) needs <Compile Include> wiring in scope-lock + task AC
+- [Legacy csproj wiring](project_legacy_csproj_explicit_compile_include.md) — packages.config projects need `Compile Include` wiring and their own `Reference`; ProjectReference gives no compile-time flow (CS0012)
+- [C# Phase 0 toolchain bootstrap](project_csharp_phase0_toolchain_bootstrap.md) — .dotnet-sdk/ absent + no dotnet tool restore + no dotnet-coverage; make it [P0-T1] or all csharpier/coverage tasks fail
 - [#211 startup-lifetime heartbeat seam](project_211_startup_lifetime_heartbeat_seam.md) — Phase 3.3 [startup-lifetime-heartbeat] DispatcherTimer in ThisAddIn.cs (exempt), pure logic in StartupDiagnosticsProbe; AC15
 - [#292 CurrentStoreContext parallel seam](project_292_currentstorecontext_parallel_seam.md) — process-global static; scope-opening store test classes must be [DoNotParallelize] or they pollute reader-baseline tests under UtilitiesCS.Test ClassLevel parallelization
 - [WinForms STA-refinement exemption rule](project_winforms_sta_refinement_exemption_rule.md) — epic #295 STA refinement: remove HWND-only default-body + PerformClick-wiring exemptions via dedicated *.StaTests.cs; keep dialog/Form/launcher exemptions
@@ -20,5 +30,8 @@
 - [Durable script copy into feature folder](durable-script-copy-into-feature-folder.md) — copy scratchpad-supplied scripts into `<FEATURE>/scripts/` before referencing them in plan tasks (session-scoped temp paths aren't durable)
 - [#351 QuickFiler breadcrumb plan seams](project_351_quickfiler_breadcrumb_plan_seams.md) — JSON code in UtilitiesCS only (QuickFiler lacks Newtonsoft); P2-T1 blocked-if-9101-absent; evidence/repro/ rejected; coordinator pattern
 - [Invoke-MSTestWithCoverage.ps1 canonical coverage runner](reference_invoke_mstest_with_coverage_script.md) — full-suite *.Test.dll → Cobertura XML via dotnet-coverage+vstest /InIsolation; cite for baseline/final-QC coverage tasks
+- [Invoke-MSTest.ps1 single-SearchRoot defect](reference_invoke_mstest_single_searchroot_defect.md) — scalar `.Count` under StrictMode throws when one assembly matches; always cite `-SearchRoot .`
+- [Literal-call clauses block file-size tightening](literal-call-clauses-block-file-size-tightening.md) — clauses pinning a call in 2+ places + a near-500-line file = unsatisfiable; plan the type split up front (no waiver for .cs)
 - [Coverage threshold conflict: CLAUDE.md vs general-unit-test.md](project_coverage_threshold_conflict_claude_md_vs_general_unit_test.md) — 80/90 vs uniform 85/75 no-tier-floor; unresolved as of 2026-07-18; flag to user, don't silently pick
+- [Planner may lack the MCP plan validator](project_planner_mcp_validator_not_in_tool_surface.md) — file-only tool surface (no Bash/no mcp__drm-copilot__*); never claim the gate passed, report VALIDATOR NOT RUN + structural self-check
 - [#349 breadcrumb plan seams](project_349_efcviewer_breadcrumb_plan_seams.md) — P0-T6 halt-gate on 9101 provider; evidence/repro/ authorized; EfcViewer3 mechanical swap only; Newtonsoft in UtilitiesCS only
