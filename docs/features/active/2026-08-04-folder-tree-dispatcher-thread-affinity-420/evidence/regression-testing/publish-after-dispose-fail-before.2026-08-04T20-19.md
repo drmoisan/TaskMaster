@@ -7,4 +7,3 @@ Command: `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Exte
 EXIT_CODE: 1
 
 Output Summary: After temporarily removing only `ThrowIfDisposed()` from the publication lock in `OutlookFolderTreeService.BuildAndPublishAsync`, the deterministic controlled incomplete-builder test failed because no `ObjectDisposedException` was thrown after disposal. The terminal-state guard was immediately restored before any further work.
-

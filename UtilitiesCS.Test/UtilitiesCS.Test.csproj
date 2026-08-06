@@ -93,6 +93,7 @@
     <Compile Include="EmailIntelligence\FilterOlFoldersControllerInitializationTests.cs" />
     <Compile Include="EmailIntelligence\FilterOlFoldersControllerRefreshDisposalTests.cs" />
     <Compile Include="EmailIntelligence\FilterOlFoldersControllerRefreshDisposalTests.LifecycleRaces.cs" />
+    <Compile Include="EmailIntelligence\FilterOlFoldersControllerRefreshDisposalTests.Coverage.cs" />
     <Compile Include="EmailIntelligence\FilterOlFoldersViewer_Tests.cs" />
     <Compile Include="EmailIntelligence\FolderInfoViewer_Tests.cs" />
     <Compile Include="EmailIntelligence\OSBrowser_Tests.cs" />
@@ -327,6 +328,7 @@
     <Compile Include="OutlookObjects\Folder\OutlookFolderTreeServiceDisposalTests.cs" />
     <Compile Include="OutlookObjects\Folder\OutlookFolderTreeServiceInvalidationTests.cs" />
     <Compile Include="OutlookObjects\Folder\OutlookFolderTreeServiceTraversalCancellationTests.cs" />
+    <Compile Include="OutlookObjects\Folder\OutlookFolderTreeServiceTraversalCancellationTests.Coverage.cs" />
     <Compile Include="OutlookObjects\Folder\OutlookFolderTreeServiceScopeTests.cs" />
     <Compile Include="OutlookObjects\Folder\OutlookFolderTreeServiceStateTests.cs" />
     <Compile Include="OutlookObjects\Folder\WpfDispatcherYieldTests.cs" />

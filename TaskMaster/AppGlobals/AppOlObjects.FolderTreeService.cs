@@ -210,16 +210,6 @@ namespace TaskMaster
                         _folderTreeServiceCompositionStarted = false;
                         _folderTreeServiceCompositionThreadId = 0;
                     }
-                    else if (ReferenceEquals(initialization, _folderTreeServiceInitialization))
-                    {
-                        terminallyCompleted = initialization.TrySetException(
-                            new ObjectDisposedException(nameof(AppOlObjects))
-                        );
-                        _folderTreeServiceInitialization = null;
-                        _folderTreeServiceDispatcher = null;
-                        _folderTreeServiceCompositionStarted = false;
-                        _folderTreeServiceCompositionThreadId = 0;
-                    }
                 }
 
                 if (discardService)
@@ -287,7 +277,8 @@ namespace TaskMaster
             Task dispatchTask
         )
         {
-            if (!dispatchTask.IsCanceled && !dispatchTask.IsFaulted)
+            var terminalStatus = dispatchTask.Status;
+            if (terminalStatus != TaskStatus.Canceled && terminalStatus != TaskStatus.Faulted)
             {
                 return;
             }
@@ -296,14 +287,15 @@ namespace TaskMaster
             {
                 dispatchTask.GetAwaiter().GetResult();
             }
-            catch (OperationCanceledException exception) when (dispatchTask.IsCanceled)
+            catch (OperationCanceledException exception)
+                when (terminalStatus == TaskStatus.Canceled)
             {
                 CompleteFolderTreeServiceCompositionCancellation(
                     initialization,
                     exception.CancellationToken
                 );
             }
-            catch (Exception exception) when (dispatchTask.IsFaulted)
+            catch (Exception exception) when (terminalStatus == TaskStatus.Faulted)
             {
                 CompleteFolderTreeServiceCompositionFailure(initialization, exception);
             }

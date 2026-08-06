@@ -295,6 +295,7 @@
     <Compile Include="AppGlobals\AppOlObjectsCoverageTests.cs" />
       <Compile Include="AppGlobals\AppOlObjectsFolderTreeServiceTests.cs" />
       <Compile Include="AppGlobals\AppOlObjectsFolderTreeServiceLifecycleTests.cs" />
+      <Compile Include="AppGlobals\AppOlObjectsFolderTreeServiceLifecycleTests.Coverage.cs" />
     <Compile Include="AppGlobals\AppOlObjectsTests.cs" />
     <Compile Include="AppGlobals\JunkFolderPathNavigatorTests.cs" />
     <Compile Include="AppGlobals\AppQuickFilerSettingsTests.cs" />

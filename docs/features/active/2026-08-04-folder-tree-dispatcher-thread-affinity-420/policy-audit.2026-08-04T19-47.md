@@ -1,6 +1,6 @@
 # Policy Compliance Audit: Folder-tree dispatcher thread affinity
 
-**Audit Date:** 2026-08-04  
+**Audit Date:** 2026-08-04
 **Code Under Test:** Full uncommitted diff from `origin/main` to `bug/folder-tree-dispatcher-thread-affinity-420`, including nine production C# files, eight test sources, and two project manifests.
 
 | Language | Files Changed | Tests | Test Result | Baseline Coverage | Post-Change Coverage | New Code Coverage |
@@ -146,6 +146,6 @@ msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU' /p:
 pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput docs/features/active/2026-08-04-folder-tree-dispatcher-thread-affinity-420/evidence/qa-gates/coverage-final.cobertura.xml
 ```
 
-**Audit Completed By:** feature-reviewer-c3  
-**Audit Date:** 2026-08-04  
+**Audit Completed By:** feature-reviewer-c3
+**Audit Date:** 2026-08-04
 **Policy Version:** Current

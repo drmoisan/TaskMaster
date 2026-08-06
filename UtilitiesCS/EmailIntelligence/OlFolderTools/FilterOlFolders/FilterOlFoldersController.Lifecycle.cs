@@ -15,8 +15,14 @@ namespace UtilitiesCS
     {
         public FilterOlFoldersController(IApplicationGlobals appGlobals)
         {
-            InitializeConstruction(appGlobals, CreateAndShowViewer());
+            InitializeConstruction(appGlobals, CreateAndShowViewer(CreateViewerFactory()));
         }
+
+        internal FilterOlFoldersController(
+            IApplicationGlobals appGlobals,
+            Func<IFilterOlFoldersViewer> viewerFactory
+        )
+            : this(appGlobals, CreateAndShowViewer(viewerFactory)) { }
 
         internal FilterOlFoldersController(
             IApplicationGlobals appGlobals,
@@ -71,7 +77,8 @@ namespace UtilitiesCS
             IUiDispatcher? uiDispatcher
         )
         {
-            var factory = viewerFactory ?? CreateAndShowViewer;
+            var factory =
+                viewerFactory ?? (() => CreateAndShowViewer(() => new FilterOlFoldersViewer()));
             var viewer = factory();
             var controller = uiDispatcher is null
                 ? new FilterOlFoldersController(appGlobals, viewer)
@@ -112,11 +119,15 @@ namespace UtilitiesCS
             }
 
             var candidateView = CreateCompatibilityView(snapshot);
-            if (candidateView is null || !TryCommitFolderTreeView(candidateView))
+            if (
+                candidateView is null
+                || !TryCommitFolderTreeView(OnFolderTreeViewCandidateCreated(candidateView))
+            )
             {
                 return;
             }
 
+            OnFolderTreeViewCommitted();
             if (IsDisposed)
             {
                 return;
@@ -161,9 +172,11 @@ namespace UtilitiesCS
             }
         }
 
-        private static IFilterOlFoldersViewer CreateAndShowViewer()
+        private static IFilterOlFoldersViewer CreateAndShowViewer(
+            Func<IFilterOlFoldersViewer> viewerFactory
+        )
         {
-            var viewer = new FilterOlFoldersViewer();
+            var viewer = viewerFactory();
             try
             {
                 viewer.Show();
@@ -243,11 +256,15 @@ namespace UtilitiesCS
             }
 
             var candidateView = CreateCompatibilityView(snapshot);
-            if (candidateView is null || !TryCommitFolderTreeView(candidateView))
+            if (
+                candidateView is null
+                || !TryCommitFolderTreeView(OnFolderTreeViewCandidateCreated(candidateView))
+            )
             {
                 return;
             }
 
+            OnFolderTreeViewCommitted();
             lock (_lifecycleGate)
             {
                 if (IsDisposed)
@@ -323,9 +340,9 @@ namespace UtilitiesCS
                 return null;
             }
 
-            var candidateView = new FolderTreeCompatibilityView(
+            var candidateView = CreateFolderTreeCompatibilityView(
                 archiveRootSnapshot,
-                new(selectedPaths)
+                selectedPaths
             );
             if (!IsDisposed)
             {
@@ -382,7 +399,7 @@ namespace UtilitiesCS
             }
         }
 
-        private bool TryAttachSnapshotSubscription()
+        internal bool TryAttachSnapshotSubscription()
         {
             if (IsDisposed)
             {

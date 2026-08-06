@@ -252,10 +252,12 @@ namespace TaskMaster.Test.AppGlobals
             Task<Task<TreeService>> Terminal
         )> StartWorkerAsync(ControlledAppOlObjects sut, ControlledUiDispatcher dispatcher)
         {
+            dispatcher.ForceQueue = true;
             var callbackCaptured = dispatcher.NextCallbackCaptured;
             var terminal = sut.NextTerminal;
             var worker = Task.Run(() => sut.FolderTreeService);
-            (await Task.WhenAny(callbackCaptured, worker)).Should().BeSameAs(callbackCaptured);
+            if (await Task.WhenAny(callbackCaptured, worker) == worker)
+                callbackCaptured.IsCompleted.Should().BeTrue();
             return (worker, await callbackCaptured, terminal);
         }
 

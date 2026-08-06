@@ -7,4 +7,3 @@ Command: `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Exte
 EXIT_CODE: 1
 
 Output Summary: After temporarily moving only the `FormClosed` subscription from constructor time to after the initial snapshot await, the controlled close-before-completion regression failed because the viewer was wired to a `FilterOlFoldersController`. The early constructor subscription was restored immediately.
-

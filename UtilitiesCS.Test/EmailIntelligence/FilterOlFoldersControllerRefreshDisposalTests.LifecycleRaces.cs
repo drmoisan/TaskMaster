@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FluentAssertions;
-using FluentAssertions.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using UtilitiesCS.OutlookObjects.Folder;
 
@@ -79,12 +78,9 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 var notificationOperation = controller.LastAsyncOperation;
                 await notificationOperation.ConfigureAwait(false);
 
-                using (new AssertionScope())
-                {
-                    controller.FolderTreeView.Should().BeNull();
-                    controller.RefreshViewAppliedCount.Should().Be(0);
-                    service.SnapshotChangedHandlerCount.Should().Be(0);
-                }
+                controller.FolderTreeView.Should().BeNull();
+                controller.RefreshViewAppliedCount.Should().Be(0);
+                service.SnapshotChangedHandlerCount.Should().Be(0);
             }
             finally
             {
@@ -118,18 +114,75 @@ namespace UtilitiesCS.Test.EmailIntelligence
                 service.ReleaseSubscription();
                 await controller.Readiness.ConfigureAwait(false);
 
-                using (new AssertionScope())
-                {
-                    controller.FolderTreeView.Should().BeNull();
-                    controller.RefreshViewAppliedCount.Should().Be(0);
-                    service.SnapshotChangedHandlerCount.Should().Be(0);
-                }
+                controller.FolderTreeView.Should().BeNull();
+                controller.RefreshViewAppliedCount.Should().Be(0);
+                service.SnapshotChangedHandlerCount.Should().Be(0);
             }
             finally
             {
                 service.ReleaseSubscription();
                 await controller.Readiness.ConfigureAwait(false);
             }
+        }
+
+        [TestMethod]
+        public async Task CommittedCandidate_DisposeBeforeInitializationContinuation_DoesNotMutateViewer()
+        {
+            var snapshot = new TaskCompletionSource<FolderTreeSnapshot>(
+                TaskCreationOptions.RunContinuationsAsynchronously
+            );
+            var controller = CreateDisposalRaceController(snapshot, disposeAfterCommit: true);
+            snapshot.SetResult(FilterOlFoldersControllerInitializationTests.CreateSnapshot());
+            await controller.Readiness;
+
+            (controller.CandidateCreatedCount, controller.CommittedCount).Should().Be((1, 1));
+            controller.FolderTreeView.Should().BeNull();
+        }
+
+        [TestMethod]
+        public async Task CommittedCandidate_DisposeBeforeRefreshNotification_DoesNotMutateViewer()
+        {
+            var service = new DelayedFolderTreeService(
+                Task.FromResult(FilterOlFoldersControllerInitializationTests.CreateSnapshot()),
+                Task.FromResult(FilterOlFoldersControllerInitializationTests.CreateSnapshot())
+            );
+            var dispatcher = new RecordingInlineUiDispatcher();
+            var controller = new DisposalRaceController(
+                FilterOlFoldersControllerInitializationTests.CreateGlobals(service).Object,
+                new FilterOlFoldersControllerInitializationTests.RecordingFilterViewer(),
+                dispatcher,
+                false,
+                false,
+                false
+            );
+            await controller.Readiness;
+            service.SnapshotChangedHandlerCount.Should().Be(1);
+            controller.DisposeAfterCommit = true;
+            service.RaiseSnapshotChanged();
+
+            controller.CommittedCount.Should().Be(2);
+            controller.FolderTreeView.Should().BeNull();
+        }
+
+        [TestMethod]
+        public async Task FinalCheckStatePutterAssignment_DisposeStopsInitialization()
+        {
+            var service = new DelayedFolderTreeService(
+                Task.FromResult(FilterOlFoldersControllerInitializationTests.CreateSnapshot())
+            );
+            var viewer = new BlockingRecordingViewer();
+            viewer.ReleaseSetController();
+            viewer.OnSecondFilteredTreeRequest = viewer.DisposeController;
+            var controller = new DisposalRaceController(
+                FilterOlFoldersControllerInitializationTests.CreateGlobals(service).Object,
+                viewer,
+                new RecordingInlineUiDispatcher()
+            );
+
+            await controller.Readiness.ConfigureAwait(false);
+
+            controller.FolderTreeView.Should().BeNull();
+            service.SnapshotChangedHandlerCount.Should().Be(0);
         }
 
         private sealed class BlockingRecordingViewer : IFilterOlFoldersViewer
@@ -142,18 +195,25 @@ namespace UtilitiesCS.Test.EmailIntelligence
             private readonly TaskCompletionSource<bool> _releaseSetController = new(
                 TaskCreationOptions.RunContinuationsAsynchronously
             );
-
+            private int _filteredTreeRequestCount;
             internal Task SetControllerEntered => _setControllerEntered.Task;
-
+            internal Action? OnSecondFilteredTreeRequest { get; set; }
             public event FormClosedEventHandler FormClosed
             {
                 add => _inner.FormClosed += value;
                 remove => _inner.FormClosed -= value;
             }
-
             public BrightIdeasSoftware.TreeListView TlvNotFiltered => _inner.TlvNotFiltered;
+            public BrightIdeasSoftware.TreeListView TlvFiltered =>
+                ++_filteredTreeRequestCount == 2
+                    ? InvokeSecondFilteredTreeRequest()
+                    : _inner.TlvFiltered;
 
-            public BrightIdeasSoftware.TreeListView TlvFiltered => _inner.TlvFiltered;
+            private BrightIdeasSoftware.TreeListView InvokeSecondFilteredTreeRequest()
+            {
+                OnSecondFilteredTreeRequest?.Invoke();
+                return _inner.TlvFiltered;
+            }
 
             public bool InvokeRequired => _inner.InvokeRequired;
 
@@ -173,6 +233,8 @@ namespace UtilitiesCS.Test.EmailIntelligence
             public void Dispose() => _inner.Dispose();
 
             internal void ReleaseSetController() => _releaseSetController.TrySetResult(true);
+
+            internal void DisposeController() => _inner.Controller.Dispose();
         }
 
         private sealed class SubscriptionBarrierFolderTreeService : IOutlookFolderTreeService

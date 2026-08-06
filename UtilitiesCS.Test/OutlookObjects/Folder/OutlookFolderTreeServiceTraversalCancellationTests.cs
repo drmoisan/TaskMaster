@@ -12,7 +12,7 @@ using UtilitiesCS.Threading;
 namespace UtilitiesCS.Test.OutlookObjects.Folder
 {
     [TestClass]
-    public sealed class OutlookFolderTreeServiceTraversalCancellationTests
+    public sealed partial class OutlookFolderTreeServiceTraversalCancellationTests
     {
         [TestMethod]
         public async Task Dispose_CancelsInFlightTraversalBeforeItCanPublish()

@@ -119,6 +119,45 @@ namespace UtilitiesCS.Test.Threading
             }
         }
 
+        [TestMethod]
+        public async Task InjectedDispatcher_ActionInvokeAsync_ReportsSuccessFaultAndCancellation()
+        {
+            var host = new StaDispatcherHost();
+            try
+            {
+                var dispatcher = new WpfUiDispatcher(host.Dispatcher);
+                var invokedThreadId = -1;
+                await dispatcher.InvokeAsync(() =>
+                    invokedThreadId = Thread.CurrentThread.ManagedThreadId
+                );
+
+                var expectedFailure = new InvalidOperationException("controlled action fault");
+                Func<Task> faultedInvocation = () =>
+                    dispatcher.InvokeAsync(new Action(() => throw expectedFailure));
+                (await faultedInvocation.Should().ThrowAsync<InvalidOperationException>())
+                    .Which.Should()
+                    .BeSameAs(expectedFailure);
+
+                using var cancellation = new CancellationTokenSource();
+                var canceledActionExecuted = false;
+                cancellation.Cancel();
+                Func<Task> canceledInvocation = () =>
+                    dispatcher.InvokeAsync(
+                        () => canceledActionExecuted = true,
+                        DispatcherPriority.Normal,
+                        cancellation.Token
+                    );
+                await canceledInvocation.Should().ThrowAsync<OperationCanceledException>();
+
+                invokedThreadId.Should().Be(host.ThreadId);
+                canceledActionExecuted.Should().BeFalse();
+            }
+            finally
+            {
+                await host.StopAsync().ConfigureAwait(false);
+            }
+        }
+
         private sealed class StaDispatcherHost
         {
             private readonly AutoResetEvent _ready = new AutoResetEvent(false);

@@ -18,6 +18,20 @@ namespace UtilitiesCS
             System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType!
         );
 
+        protected internal virtual FolderTreeCompatibilityView CreateFolderTreeCompatibilityView(
+            FolderTreeSnapshot archiveRootSnapshot,
+            IReadOnlyCollection<string> selectedPaths
+        ) => new(archiveRootSnapshot, new(selectedPaths));
+
+        protected internal virtual FolderTreeCompatibilityView OnFolderTreeViewCandidateCreated(
+            FolderTreeCompatibilityView candidateView
+        ) => candidateView;
+
+        protected internal virtual void OnFolderTreeViewCommitted() { }
+
+        protected internal virtual Func<IFilterOlFoldersViewer> CreateViewerFactory() =>
+            () => new FilterOlFoldersViewer();
+
         #region Event Handlers
 
         internal void Discard() => _viewer.Close();

@@ -3,7 +3,7 @@
 - **Issue:** #420
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-04T19-41
+- **Last Updated:** 2026-08-06T18-38
 - **Status:** Implementation and final QA complete; feature review pending
 - **Version:** 0.1
 
@@ -80,7 +80,7 @@ PR #215 added the shared folder-tree service and unconditionally wires `WpfDispa
 - No package, configuration, or service dependency is required. The work depends on the dispatcher captured during add-in startup being available before session service composition.
 
 ### Implementation strategy (what changes, not sequencing):
-	
+
 #### Files/modules to change:
 
 - `TaskMaster/AppGlobals/AppOlObjects.cs`: serialize first service creation and marshal the complete live composition root to the captured UI dispatcher when first requested from a worker.
@@ -125,12 +125,13 @@ No feature flag is required. The repair is limited to internal execution context
 
 ### Implemented design and evidence
 
-- `AppOlObjects` serializes the session service initialization and invokes the complete live composition root through `WpfUiDispatcher`.
-- `OutlookFolderTreeService` receives the composition-time UI dispatcher and routes live builds and notification refreshes through it. Test-only construction may omit the dispatcher to preserve isolated non-COM service tests.
-- Builder and reader traversal awaits retain the captured dispatcher until immutable snapshot publication. `WpfDispatcherYield` remains strict without a dispatcher.
-- The ribbon uses the awaited `FilterOlFoldersController.CreateAsync` path; the controller wires the viewer only after snapshot acquisition.
-- Targeted evidence: `evidence/regression-testing/targeted-regressions-pass.2026-08-04T19-33.md` and `evidence/regression-testing/acceptance-criteria-mapping.2026-08-04T19-33.md`.
-- Scope deviation: none.
+- `AppOlObjects` uses a worker-first `IUiDispatcher.InvokeAsync(Action)` composition protocol: the first caller creates the shared completion state, queues complete live composition to the captured Outlook dispatcher, and waits for that task without changing the existing `BeginInvoke` compatibility behavior. Composition failure, dispatcher failure, cancellation, and disposal complete the same terminal state without publishing a candidate service.
+- Factory-created FilterOlFolders viewers are disposed or closed on initialization failure while preserving the original synchronous exception identity and parameter name. The delayed-snapshot path linearizes ArchiveRoot inspection, compatibility-view commit, viewer wiring, and snapshot-subscription attachment so a close or disposal cannot mutate a detached view.
+- `OutlookFolderTreeService` keeps the M2 in-flight refresh-fault lifecycle and the M3 queued-cleanup and terminal-isolation behavior. Its authorization, candidate-disposal, and cleanup observers preserve a single terminal result while preventing cleanup-observer failures from escaping a completed request.
+- Builder and reader traversal awaits retain the captured dispatcher until immutable snapshot publication. `WpfDispatcherYield` remains strict without a dispatcher. The ribbon H4 path awaits the asynchronous FilterOlFolders initialization and surfaces initialization failures through the task-returning path.
+- P5 implementation and regression evidence: `evidence/regression-testing/remediation-cycle4-predecessor-reconciliation.2026-08-06T16-14.md`, `remediation-cycle4-testability-seam.2026-08-06T18-20.md`, and `remediation-cycle4-acceptance-criteria-mapping.2026-08-06T18-20.md`.
+- Final QA evidence: `evidence/qa-gates/remediation-cycle4-csharpier.2026-08-06T18-33.md`, `remediation-cycle4-analyzers.2026-08-06T18-34.md`, `remediation-cycle4-nullable.2026-08-06T18-34.md`, `remediation-cycle4-mstest-coverage.2026-08-06T18-35.md`, `remediation-cycle4-coverage-and-quality-delta.2026-08-06T18-36.md`, and `remediation-cycle4-diff-check.2026-08-06T18-37.md`.
+- Final QA passed without a coverage waiver: 6,166/6,166 tests passed; repository line coverage was 93,687/110,478 (84.8015%); changed production coverage was 879/881 (99.7730%).
 
 #### Required configuration keys and defaults:
 
@@ -172,13 +173,13 @@ Research is sufficient to complete this specification. The implementation plan m
 
 
 ## Acceptance Criteria
-- [ ] A dispatcher-free worker can initiate a cold folder-tree request without `WpfDispatcherYield` throwing `InvalidOperationException`.
-- [ ] Service composition, notification-sink construction, every live hierarchy adapter access, and every post-yield continuation for a cold build or refresh execute on the captured Outlook STA dispatcher.
-- [ ] The production live traversal path uses `WpfDispatcherYield` on the captured dispatcher and does not select `Task.Yield`, a worker-local dispatcher, or caller-specific yield fallback logic.
-- [ ] The folder-tree service retains one session-scoped instance, coalesces concurrent cold requests, and preserves cancellation, stale/current, invalidation, publication, and disposal behavior.
-- [ ] FilterOlFolders cold initialization awaits the snapshot without synchronously blocking the UI dispatcher, and the viewer is wired only after snapshot acquisition.
-- [ ] Deterministic MSTest coverage proves worker-started cold build affinity, continuation affinity after a forced yield, service-composition and notification-sink affinity, and nonblocking cold filter initialization without Outlook, network, temporary files, sleeps, or retry loops.
-- [ ] The final C# toolchain passes in one uninterrupted final pass: CSharpier, analyzer build, nullable build, and MSTest with code coverage; changed behavior meets the repository coverage requirements.
+- [x] A dispatcher-free worker can initiate a cold folder-tree request without `WpfDispatcherYield` throwing `InvalidOperationException`.
+- [x] Service composition, notification-sink construction, every live hierarchy adapter access, and every post-yield continuation for a cold build or refresh execute on the captured Outlook STA dispatcher.
+- [x] The production live traversal path uses `WpfDispatcherYield` on the captured dispatcher and does not select `Task.Yield`, a worker-local dispatcher, or caller-specific yield fallback logic.
+- [x] The folder-tree service retains one session-scoped instance, coalesces concurrent cold requests, and preserves cancellation, stale/current, invalidation, publication, and disposal behavior.
+- [x] FilterOlFolders cold initialization awaits the snapshot without synchronously blocking the UI dispatcher, and the viewer is wired only after snapshot acquisition.
+- [x] Deterministic MSTest coverage proves worker-started cold build affinity, continuation affinity after a forced yield, service-composition and notification-sink affinity, and nonblocking cold filter initialization without Outlook, network, temporary files, sleeps, or retry loops.
+- [x] The final C# toolchain passes in one uninterrupted final pass: CSharpier, analyzer build, nullable build, and MSTest with code coverage; changed behavior meets the repository coverage requirements.
 - [ ] The feature documentation records the final implementation decisions, validation evidence, and any approved deviation from this scope.
 
 ## Risks & Mitigations
