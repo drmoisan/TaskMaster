@@ -1,0 +1,4 @@
+Timestamp: 2026-08-04T20:34:00-04:00
+Command: & 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe' UtilitiesCS.Test/bin/Debug/UtilitiesCS.Test.dll /Tests:UtilitiesCS.Test.EmailIntelligence.FilterOlFoldersControllerInitializationTests
+EXIT_CODE: 1
+Output Summary: Expected pre-fix failure. All four deterministic `FilterOlFoldersControllerInitializationTests` failed without constructing a real WinForms viewer or starting a message loop. The three `CreateAsync` cases could not find the required public `CreateAsync(IApplicationGlobals, Func<IFilterOlFoldersViewer>)` signature. `InjectedViewerConstructor_Readiness_PropagatesSnapshotFaultAndLeavesViewerUnwired` observed a successfully completed `Readiness` task instead of the original controlled `InvalidOperationException`. These failures establish the missing public optional-factory and shared observable initialization contracts required by P1-T5.

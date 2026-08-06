@@ -820,6 +820,7 @@
     <Compile Include="OutlookObjects\MailItem\ItemInfo.cs" />
     <Compile Include="OutlookObjects\Folder\FolderWrapper .cs" />
     <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersController.cs" />
+    <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersController.Lifecycle.cs" />
     <Compile Include="EmailIntelligence\OlFolderTools\FilterOlFolders\FilterOlFoldersViewer.cs">
       <SubType>Form</SubType>
     </Compile>

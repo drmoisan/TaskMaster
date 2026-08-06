@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS;
 using UtilitiesCS.OutlookObjects.Folder;
@@ -90,31 +91,6 @@ namespace TaskMaster
 
         private Lazy<IEnumerable<Folder>> _inboxes;
         public IEnumerable<Folder> Inboxes => _inboxes.Value;
-
-        private IOutlookFolderTreeService _folderTreeService;
-        public IOutlookFolderTreeService FolderTreeService =>
-            Initializer.GetOrLoad(ref _folderTreeService, LoadFolderTreeService);
-
-        protected internal virtual IOutlookFolderTreeService LoadFolderTreeService()
-        {
-            var reader = new OutlookFolderHierarchyReader(NamespaceMAPI, StoresWrapper);
-            var builder = new FolderTreeSnapshotBuilder(
-                reader,
-                new DeadlineClock(TimeSpan.FromMilliseconds(15)),
-                new WpfDispatcherYield()
-            );
-            // why: issue #263. Hold the sink instance so the runtime rehook coordinator can reach
-            // the SAME live sink (via FolderNotificationSink) to call AddStore; a separate instance
-            // would subscribe COM events not wired to this tree service's cache-invalidation.
-            _folderNotificationSink = new OutlookFolderNotificationSink(NamespaceMAPI);
-            return new OutlookFolderTreeService(builder, _folderNotificationSink);
-        }
-
-        public void Dispose()
-        {
-            _folderTreeService?.Dispose();
-            _folderTreeService = null;
-        }
 
         internal IEnumerable<Folder> LoadInboxes()
         {

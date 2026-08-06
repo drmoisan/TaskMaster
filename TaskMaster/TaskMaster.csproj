@@ -416,6 +416,7 @@
     <Compile Include="AppGlobals\IStartupTimingRecorder.cs" />
     <Compile Include="AppGlobals\StartupTimingRecorder.cs" />
     <Compile Include="AppGlobals\AppOlObjects.cs" />
+    <Compile Include="AppGlobals\AppOlObjects.FolderTreeService.cs" />
     <Compile Include="AppGlobals\AppOlObjects.JunkFolders.cs" />
     <Compile Include="AppGlobals\AppOlObjects.StoreLoading.cs" />
     <Compile Include="AppGlobals\AppOlObjects.StoreRehook.cs" />

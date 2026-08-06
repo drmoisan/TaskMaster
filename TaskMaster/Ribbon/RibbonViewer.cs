@@ -35,10 +35,31 @@ namespace TaskMaster
         public RibbonViewer(RibbonController Controller)
         {
             _controller = Controller;
+            _loadFolderFilterAsync = () => _controller.Try.TryLoadFolderFilterAsync();
+            _reportFolderFilterInitializationFailure = ReportFolderFilterInitializationFailure;
+        }
+
+        internal RibbonViewer(
+            Func<Task> loadFolderFilterAsync,
+            Action<System.Exception> reportFolderFilterInitializationFailure
+        )
+        {
+            _controller = null;
+            _loadFolderFilterAsync =
+                loadFolderFilterAsync
+                ?? throw new ArgumentNullException(nameof(loadFolderFilterAsync));
+            _reportFolderFilterInitializationFailure =
+                reportFolderFilterInitializationFailure
+                ?? throw new ArgumentNullException(nameof(reportFolderFilterInitializationFailure));
         }
 
         private Office.IRibbonUI _ribbon;
         private RibbonController _controller;
+        private readonly Func<Task> _loadFolderFilterAsync;
+        private readonly Action<System.Exception> _reportFolderFilterInitializationFailure;
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
         internal RibbonController Controller => _controller;
 
         public void SetController(RibbonController Controller)
@@ -362,7 +383,35 @@ namespace TaskMaster
         public void GetImage_Click(Office.IRibbonControl control) => _controller.Try.TryGetImage();
 
         public void LoadFolderFilter_Click(Office.IRibbonControl control) =>
-            _controller.Try.TryLoadFolderFilter();
+            RunFolderFilterCallback();
+
+        internal async void RunFolderFilterCallback()
+        {
+            try
+            {
+                await _loadFolderFilterAsync();
+            }
+            catch (System.Exception exception)
+            {
+                try
+                {
+                    _reportFolderFilterInitializationFailure(exception);
+                }
+                catch (System.Exception reporterException)
+                {
+                    logger.Error(
+                        "Unable to report the folder-filter initialization failure.",
+                        reporterException
+                    );
+                }
+            }
+        }
+
+        private static void ReportFolderFilterInitializationFailure(System.Exception exception)
+        {
+            logger.Error("Unable to initialize the folder-filter viewer.", exception);
+            MessageBox.Show($"Unable to initialize the folder-filter viewer: {exception.Message}");
+        }
 
         public void LoadFolderRemap_Click(Office.IRibbonControl control) =>
             _controller.Try.TryLoadFolderRemap();

@@ -24,5 +24,16 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
                     .ThrowAsync<OperationCanceledException>();
             }
         }
+
+        [TestMethod]
+        public async Task YieldAsync_WithoutDispatcher_RemainsStrict()
+        {
+            var dispatcherYield = new WpfDispatcherYield();
+
+            await dispatcherYield
+                .Invoking(item => item.YieldAsync(CancellationToken.None))
+                .Should()
+                .ThrowAsync<InvalidOperationException>();
+        }
     }
 }

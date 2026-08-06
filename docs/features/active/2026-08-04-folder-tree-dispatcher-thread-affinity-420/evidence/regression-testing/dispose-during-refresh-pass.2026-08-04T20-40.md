@@ -1,0 +1,4 @@
+Timestamp: 2026-08-04T20:40:00-04:00
+Command: msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU'; & 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe' UtilitiesCS.Test/bin/Debug/UtilitiesCS.Test.dll /Tests:UtilitiesCS.Test.OutlookObjects.Folder.OutlookFolderTreeServiceDisposalTests
+EXIT_CODE: 0
+Output Summary: The solution build succeeded with the existing six package/source warnings. All five disposal regressions passed, including the added deterministic `Dispose_DuringRefresh_LeavesDisposedWithoutPublicationOrNotification`. Together with the completed-build and in-flight cold-build cases, the suite verifies terminal disposal state, no post-disposal publication or event, and no retained notification handler.

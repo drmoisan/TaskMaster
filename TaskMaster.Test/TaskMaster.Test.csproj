@@ -263,6 +263,7 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="WindowsBase" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
@@ -292,7 +293,8 @@
     <Compile Include="AppGlobals\AppEventsTests.Helpers.cs" />
     <Compile Include="AppGlobals\AppFileSystemFolderPathsMatchBestSpecialFolderTests.cs" />
     <Compile Include="AppGlobals\AppOlObjectsCoverageTests.cs" />
-    <Compile Include="AppGlobals\AppOlObjectsFolderTreeServiceTests.cs" />
+      <Compile Include="AppGlobals\AppOlObjectsFolderTreeServiceTests.cs" />
+      <Compile Include="AppGlobals\AppOlObjectsFolderTreeServiceLifecycleTests.cs" />
     <Compile Include="AppGlobals\AppOlObjectsTests.cs" />
     <Compile Include="AppGlobals\JunkFolderPathNavigatorTests.cs" />
     <Compile Include="AppGlobals\AppQuickFilerSettingsTests.cs" />
@@ -306,6 +308,7 @@
     <Compile Include="OutlookObjects\Store\StoresWrapperEnumerationScopeTests.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapperTests.cs" />
     <Compile Include="Ribbon\RibbonControllerTests.cs" />
+    <Compile Include="Ribbon\TryFunctionalityInConstructionTests.cs" />
     <Compile Include="Ribbon\RibbonExplorerXmlTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

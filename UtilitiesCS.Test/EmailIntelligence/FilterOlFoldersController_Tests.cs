@@ -22,7 +22,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
     public class FilterOlFoldersController_Tests
     {
         [STATestMethod]
-        public void Constructor_WithFakeSnapshot_UsesCallerLocalSelectionAndWiresViewer()
+        public async Task Constructor_WithFakeSnapshot_UsesCallerLocalSelectionAndWiresViewer()
         {
             var service = new FakeFolderTreeService(CreateSnapshot());
             var scraping = new ScoDictionaryNew<string, int>();
@@ -30,7 +30,11 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var viewer = new FakeFilterViewer();
             var globals = CreateGlobals(service, scraping);
 
-            var controller = new FilterOlFoldersController(globals.Object, viewer);
+            var controller = await FilterOlFoldersController.CreateAsync(
+                globals.Object,
+                () => viewer,
+                new FilterOlFoldersControllerRefreshDisposalTests.RecordingInlineUiDispatcher()
+            );
 
             controller.FilterSelected(true).Should().ContainSingle();
             controller.FilterSelected(true)[0].Value.RelativePath.Should().Be("Archive\\Filtered");
@@ -63,13 +67,14 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         [STATestMethod]
-        public void ViewerClose_DisposesViewAndRemovesServiceHandler()
+        public async Task ViewerClose_DisposesViewAndRemovesServiceHandler()
         {
             var service = new FakeFolderTreeService(CreateSnapshot());
             var viewer = new FakeFilterViewer();
-            var controller = new FilterOlFoldersController(
+            var controller = await FilterOlFoldersController.CreateAsync(
                 CreateGlobals(service, new ScoDictionaryNew<string, int>()).Object,
-                viewer
+                () => viewer,
+                new FilterOlFoldersControllerRefreshDisposalTests.RecordingInlineUiDispatcher()
             );
             var view = controller.FolderTreeView;
 
@@ -80,7 +85,7 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         [STATestMethod]
-        public void ConstructorAndRefresh_UseCachedArchiveSnapshotAndReplaceView()
+        public async Task ConstructorAndRefresh_UseCachedArchiveSnapshotAndReplaceView()
         {
             var archivePath = "\\Missing";
             var archiveRoot = new Mock<Outlook.Folder>();
@@ -90,9 +95,10 @@ namespace UtilitiesCS.Test.EmailIntelligence
             var scraping = new ScoDictionaryNew<string, int>();
             scraping.TryAdd("Archive\\Visible", 1);
 
-            var controller = new FilterOlFoldersController(
+            var controller = await FilterOlFoldersController.CreateAsync(
                 CreateGlobals(service, scraping, archiveRoot.Object).Object,
-                new FakeFilterViewer()
+                () => new FakeFilterViewer(),
+                new FilterOlFoldersControllerRefreshDisposalTests.RecordingInlineUiDispatcher()
             );
 
             service.LastRequest.AllowStaleSnapshot.Should().BeTrue();
