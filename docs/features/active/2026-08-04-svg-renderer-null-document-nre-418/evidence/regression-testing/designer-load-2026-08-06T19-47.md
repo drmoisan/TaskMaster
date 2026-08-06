@@ -36,7 +36,13 @@ The maintainer initially asked where to find detail in the Output window and rep
 
 ## What this does NOT verify — recorded as a limitation, not an omission
 
-**The designer-host observability of the diagnostic was not exercised.** AC-3 requires the failure diagnostic to reach both `log4net` and `Trace` so it is visible in the Visual Studio Output window. Because nothing failed during this session, that channel was never driven in `devenv.exe`. The dual-channel behavior is proven by unit tests in `SVGControl.Test`, and the degrade-without-throwing behavior is proven by the AC-1 regression tests, but the specific claim "an operator would see the diagnostic in the VS Output window" remains verified by construction rather than by observation. Confirming it would require inducing a parse failure in the designer host, which is outside this issue's scope.
+**The designer-host observability of the diagnostic was not exercised.** AC-3 requires the failure diagnostic to reach both `log4net` and `Trace` so it is visible in the Visual Studio Output window. Because nothing failed during this session, that channel was never driven in `devenv.exe`.
+
+**Correction, 2026-08-06.** An earlier revision of this artifact stated that the dual-channel behavior is "proven by unit tests in `SVGControl.Test`". **That was false and is retracted.** `SVGControl.Test` contains zero occurrences of `Trace`, `log4net`, `Listener`, `Appender`, or `DescribeFailure`; no test asserts either channel. The parse-failure tests *execute* those lines — which is why `DescribeFailure` measures 100% coverage — but execution is not assertion. The clause was load-bearing, because it was the fallback offered when disclaiming this very limitation, so the corrected basis is stated below.
+
+The accurate basis is **static inspection of the implementation**, which is what AC-3's operative requirement actually calls for: it constrains the implementation ("must therefore also emit the failure through a channel the designer surfaces... Both channels must carry the exception type and message"), not an observation. Verified in source: four paired `logger.Error` / `Trace.TraceError` sites, with `DescribeFailure` composing `error.GetType().FullName + ": " + error.Message`. The degrade-without-throwing behavior *is* genuinely proven by the AC-1 regression tests, which assert no throw and a null `Document`.
+
+The specific claim "an operator would see the diagnostic in the VS Output window" therefore remains verified by construction rather than by observation. Confirming it would require inducing a parse failure in the designer host, which is outside this issue's scope.
 
 **Attribution of the successful bind is not established.** Three mechanisms could each account for it, and this capture cannot distinguish them:
 
@@ -46,7 +52,13 @@ The maintainer initially asked where to find detail in the Output window and rep
 
 A pass/fail render cannot separate these. Distinguishing them would need a fusion log or a run with the resolver uninstalled.
 
-**Open question U-2 remains open.** Runbook step 10 asks whether `ExCSS.dll` is present in `%LOCALAPPDATA%\Microsoft\VisualStudio\<version>\ProjectAssemblies\` alongside `SVGControl.dll`. That observation was not reported and is not recorded here. U-2 stays open in the plan's Open Questions section. It does not gate AC-11, whose criterion is the absence of a `NullReferenceException` on load.
+**Open question U-2 remains open — but the runbook was fully executed.** Runbook step 10 asks whether `ExCSS.dll` is present in `%LOCALAPPDATA%\Microsoft\VisualStudio\<version>\ProjectAssemblies\` alongside `SVGControl.dll`.
+
+**Correction, 2026-08-06.** An earlier revision recorded this as "not reported", which reads as an operator omission. It was not. Step 10 is explicitly conditional — "Optionally, and only if the designer error page reported a failure to load `ExCSS`" — and the runbook's own field list qualifies it "*if performed*". No error page appeared, so the precondition was false and the step was correctly skipped. The runbook was executed in full.
+
+U-2 therefore stays open in the plan's Open Questions section for want of a triggering condition, not for want of an observation. It does not gate AC-11, whose criterion is the absence of a `NullReferenceException` on load.
+
+**Two runbook fields are not recorded here:** the Visual Studio version and build configuration, and whether Visual Studio was restarted after the build. The second exists to guarantee the designer loaded the freshly built `SVGControl.dll` rather than a cached copy. AC-11 still holds without them, because the same environment demonstrably produced the `NullReferenceException` before the fix — that observation is the bug report itself — but the inference now spans two sessions rather than one recorded prerequisite. Recorded as a gap in this artifact rather than filled by assumption.
 
 ## Relationship to AC-7
 

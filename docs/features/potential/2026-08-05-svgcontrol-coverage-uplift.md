@@ -81,9 +81,22 @@ Total uncovered in this group: **532 lines.**
 4. Treat `DropDownEditor`, `SvgFileNameEditor`, and `ToggleSwitch` last; each will need a seam or an
    extraction before it is unit-testable at all.
 
+## Also in scope: `SVGControl/SvgAssemblyResolver.cs` (added 2026-08-06)
+
+That file measures **61.63% line and 53.85% branch** against the `>= 85%` / `>= 75%` file-level floors, and carries a **maintainer-authorized threshold exception** granted 2026-08-06. The authorization, its basis, and its scope are recorded in the committed record at `docs/features/active/2026-08-04-svg-renderer-null-document-nre-418/issue.md` under AC-5.
+
+It is listed here so the file has a named owner rather than surfacing in a future audit as an unexplained floor failure.
+
+Three things a future uplift should know:
+
+- The entire shortfall is `ResolveByNameAndKey`, a `private static` member invoked only by the CLR on a failed assembly bind. It carries the ratified `COVERAGE_MEMBER_UNREACHABLE` exception. `Install()` in the same file is already at 6/6 = 100%.
+- Its strategy-3 `Assembly.LoadFrom` branch cannot be driven from a unit test without staging a real mismatched-key assembly on disk, which `.claude/rules/general-unit-test.md` UT4 prohibits with zero approved exceptions. Raising this file therefore needs a genuine seam, not more tests against the current shape.
+- The exception is a **threshold** exception, not a measurement exclusion. No `[ExcludeFromCodeCoverage]` was applied and the file's uncovered lines remain in the repository-wide denominator. Any uplift must preserve that property.
+
 ## Acceptance ideas (for the promoted entry to refine)
 
 - [ ] `SVGControl/SvgRenderer.cs` reaches `>= 85%` line coverage.
+- [ ] `SVGControl/SvgAssemblyResolver.cs` either reaches the file-level floors through a testable seam for the `AssemblyResolve` wiring, or its 2026-08-06 maintainer exception is re-ratified with the reason it still holds.
 - [ ] Every `SVGControl` production file is either covered or has a maintainer-ratified, documented
       exemption; none is excluded from measurement.
 - [ ] Repository-wide line coverage stays `>= 85%` and branch coverage `>= 75%`.
