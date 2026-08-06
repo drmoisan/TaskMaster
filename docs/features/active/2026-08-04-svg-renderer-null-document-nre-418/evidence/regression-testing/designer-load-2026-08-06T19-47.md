@@ -32,7 +32,7 @@ The maintainer initially asked where to find detail in the Output window and rep
 ## What this verifies
 
 - **AC-11** — satisfied. The designer loads the form without a `NullReferenceException`, which is the criterion's stated requirement and the observation the bug report opened on.
-- **AC-8** — corroborated. The original defect was that `SvgDocument.Open` threw `FileNotFoundException` for `ExCSS` inside `devenv.exe`, whose configuration carries no ExCSS binding redirect, and the pre-existing `AssemblyResolve` fallback returned `null` because `Assembly.Load` probed the Visual Studio directory rather than the directory holding `SVGControl.dll`. The bind now succeeds in that host.
+- **AC-8** — corroborated **conditionally**, not proven. The original defect was that `SvgDocument.Open` threw `FileNotFoundException` for `ExCSS` inside `devenv.exe`, whose configuration carries no ExCSS binding redirect, and the pre-existing `AssemblyResolve` fallback returned `null` because `Assembly.Load` probed the Visual Studio directory rather than the directory holding `SVGControl.dll`. The bind succeeds in that host now. Attributing that to the AC-8 fix depends on the designer having executed the rebuilt assembly, which was not separately confirmed — see the environment fields below. AC-8's own acceptance is met by the implementation and its unit tests; this capture adds supporting, not decisive, evidence.
 
 ## What this does NOT verify — recorded as a limitation, not an omission
 
@@ -58,7 +58,20 @@ A pass/fail render cannot separate these. Distinguishing them would need a fusio
 
 U-2 therefore stays open in the plan's Open Questions section for want of a triggering condition, not for want of an observation. It does not gate AC-11, whose criterion is the absence of a `NullReferenceException` on load.
 
-**Two runbook fields are not recorded here:** the Visual Studio version and build configuration, and whether Visual Studio was restarted after the build. The second exists to guarantee the designer loaded the freshly built `SVGControl.dll` rather than a cached copy. AC-11 still holds without them, because the same environment demonstrably produced the `NullReferenceException` before the fix — that observation is the bug report itself — but the inference now spans two sessions rather than one recorded prerequisite. Recorded as a gap in this artifact rather than filled by assumption.
+### Runbook environment fields — supplied 2026-08-06
+
+**Visual Studio version.** Visual Studio Community 2026, product display version **18.8.2**, installation version **18.8.12023.21**, resolved via `vswhere -latest -property catalog_productDisplayVersion`. Build configuration `Debug`; `SVGControl/bin/Debug/SVGControl.dll` last built 2026-08-04 23:46:27 UTC, which is after the final production edit in commit `a62391f7`.
+
+**Visual Studio was NOT restarted after the build.** The maintainer reported: "I did not restart Visual Studio. I just rebuilt and restarted and it appears that everything rendered correctly."
+
+This is recorded rather than smoothed over, because runbook step 2 exists precisely to guarantee the designer loaded the freshly built `SVGControl.dll` instead of an assembly already resident in the `devenv.exe` AppDomain. Without a restart, that guarantee is not established, and the consequence is specific:
+
+- **AC-11 is unaffected and remains satisfied by direct observation.** Its criterion is that opening the form in the designer loads it without a `NullReferenceException`. The form was opened and it loaded without one. That is a first-hand observation, not an inference.
+- **The AC-8 corroboration below is weakened to conditional.** Attributing the successful bind to the AC-8 directory-probing fallback requires that the designer actually executed the rebuilt assembly. A stale in-process assembly could render identically *if* the ExCSS bind succeeds on this host for an unrelated reason — for example `ExCSS.dll` already resident in the designer's shadow-copy directory, which is exactly the condition open question U-2 asks about and which was not measured. This capture therefore cannot distinguish "the fix worked" from "the original failure does not reproduce on this host".
+
+That distinction was already recorded under *Attribution of the successful bind is not established*; the missing restart is a second, independent reason the same attribution cannot be closed, and it is recorded here so the two are not mistaken for one.
+
+**What would close it**, if a future session wants the stronger claim: restart Visual Studio, reopen the form once, and record the result. That is a five-minute confirmation, not a re-run of the feature. It is deliberately not treated as required here, because AC-11's stated criterion does not depend on it.
 
 ## Relationship to AC-7
 
