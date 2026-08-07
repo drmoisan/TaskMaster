@@ -7,7 +7,7 @@ using System.Windows.Threading;
 namespace UtilitiesCS.OutlookObjects.Folder
 {
     /// <summary>
-    /// Yields folder tree work through the current WPF dispatcher.
+    /// Yields folder tree work through the captured UI dispatcher.
     /// </summary>
     [ExcludeFromCodeCoverage]
     public sealed class WpfDispatcherYield : IDispatcherYield
@@ -15,7 +15,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
         public async Task YieldAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await Dispatcher.Yield(DispatcherPriority.Background);
+            await UtilitiesCS.UiThread.Dispatcher.InvokeAsync(
+                () => { },
+                DispatcherPriority.Background,
+                cancellationToken
+            );
             cancellationToken.ThrowIfCancellationRequested();
         }
     }
