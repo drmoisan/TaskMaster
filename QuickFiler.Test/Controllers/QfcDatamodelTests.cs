@@ -113,10 +113,12 @@ namespace QuickFiler.Controllers.Tests
             globals.SetupGet(x => x.QfSettings).Returns(settings.Object);
 
             var worker = new BackgroundWorker();
-            SetPrivateField(worker, "isRunning", true);
             SetPrivateField(model, "_globals", globals.Object);
             SetPrivateField(model, "_worker", worker);
             SetPrivateField(model, "_masterQueue", new LockingLinkedList<MailItem>());
+            // Issue #424: the source-active signal is the datamodel-owned liveness flag, not
+            // BackgroundWorker.isRunning, which is dishonest for an async void DoWork handler.
+            SetPrivateField(model, "_remainingLoadActive", true);
 
             Task<IList<MailItem>> pending = model.DequeueNextItemGroupAsync(1, 200);
 
@@ -128,7 +130,7 @@ namespace QuickFiler.Controllers.Tests
                     "the datamodel source-active signal must keep polling while the worker can still add candidates"
                 );
 
-            SetPrivateField(worker, "isRunning", false);
+            SetPrivateField(model, "_remainingLoadActive", false);
             fake.Advance(TimeSpan.FromMilliseconds(200));
             IList<MailItem> result = await pending;
 
@@ -287,9 +289,11 @@ namespace QuickFiler.Controllers.Tests
             model.TimeProvider = fake;
 
             var worker = new BackgroundWorker();
-            SetPrivateField(worker, "isRunning", true); // BackgroundWorker.IsBusy => true
             SetPrivateField(model, "_worker", worker);
             SetPrivateField(model, "_masterQueue", new LockingLinkedList<MailItem>()); // Count == 0
+            // Issue #424: WaitForQueue now loops on the datamodel-owned producer-liveness flag
+            // instead of BackgroundWorker.IsBusy, so the loop is driven through that flag.
+            SetPrivateField(model, "_remainingLoadActive", true);
 
             var method = typeof(QfcDatamodel).GetMethod("WaitForQueue", NonPublicInstance);
 
@@ -300,9 +304,9 @@ namespace QuickFiler.Controllers.Tests
             task.IsCompleted.Should()
                 .BeFalse("WaitForQueue must await the injected 200 ms delay, not wall-clock");
 
-            // Release the loop: worker becomes idle, then advancing the clock completes the delay
+            // Release the loop: the producer goes idle, then advancing the clock completes the delay
             // so the loop re-checks its condition and exits.
-            SetPrivateField(worker, "isRunning", false);
+            SetPrivateField(model, "_remainingLoadActive", false);
             fake.Advance(TimeSpan.FromMilliseconds(200));
             await task;
             task.IsCompleted.Should().BeTrue();

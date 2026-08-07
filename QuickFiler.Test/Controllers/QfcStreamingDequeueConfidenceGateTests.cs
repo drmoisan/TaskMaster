@@ -13,7 +13,7 @@ using Moq;
 namespace QuickFiler.Controllers.Tests
 {
     [TestClass]
-    public class QfcStreamingDequeueConfidenceGateTests
+    public partial class QfcStreamingDequeueConfidenceGateTests
     {
         private static MailItem CreateMailItem(string subject, string entryId)
         {
@@ -29,13 +29,82 @@ namespace QuickFiler.Controllers.Tests
             double threshold,
             TimeProvider timeProvider = null,
             Action<string> debugLog = null,
-            Func<bool> sourceActive = null
+            Func<bool> sourceActive = null,
+            TimeSpan? firstBatchDeadline = null,
+            Action<int, int, int> progressCallback = null
         )
         {
             Type gateType = typeof(QfcDatamodel).Assembly.GetType(
                 "QuickFiler.Controllers.QfcStreamingDequeueConfidenceGate"
             );
             gateType.Should().NotBeNull("the dequeue-layer confidence gate must exist");
+
+            // Issue #424: the gate gained an optional first-batch deadline and an optional progress
+            // callback. Prefer the widest constructor; fall back to the older shapes so this helper
+            // keeps compiling against a pre-#424 gate.
+            ConstructorInfo constructorWithProgress = gateType.GetConstructor(
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                binder: null,
+                types: new[]
+                {
+                    typeof(Func<MailItem>),
+                    typeof(Func<MailItem, CancellationToken, Task<long>>),
+                    typeof(double),
+                    typeof(TimeProvider),
+                    typeof(Action<string>),
+                    typeof(Func<bool>),
+                    typeof(TimeSpan?),
+                    typeof(Action<int, int, int>),
+                },
+                modifiers: null
+            );
+            if (constructorWithProgress != null)
+            {
+                return constructorWithProgress.Invoke(
+                    new object[]
+                    {
+                        tryTakeNext,
+                        scoreLoader,
+                        threshold,
+                        timeProvider,
+                        debugLog,
+                        sourceActive,
+                        firstBatchDeadline,
+                        progressCallback,
+                    }
+                );
+            }
+
+            ConstructorInfo constructorWithDeadline = gateType.GetConstructor(
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                binder: null,
+                types: new[]
+                {
+                    typeof(Func<MailItem>),
+                    typeof(Func<MailItem, CancellationToken, Task<long>>),
+                    typeof(double),
+                    typeof(TimeProvider),
+                    typeof(Action<string>),
+                    typeof(Func<bool>),
+                    typeof(TimeSpan?),
+                },
+                modifiers: null
+            );
+            if (constructorWithDeadline != null)
+            {
+                return constructorWithDeadline.Invoke(
+                    new object[]
+                    {
+                        tryTakeNext,
+                        scoreLoader,
+                        threshold,
+                        timeProvider,
+                        debugLog,
+                        sourceActive,
+                        firstBatchDeadline,
+                    }
+                );
+            }
 
             ConstructorInfo constructorWithSourceState = gateType.GetConstructor(
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
@@ -92,7 +161,9 @@ namespace QuickFiler.Controllers.Tests
             double threshold = 0.90,
             TimeProvider timeProvider = null,
             Action<string> debugLog = null,
-            Func<bool> sourceActive = null
+            Func<bool> sourceActive = null,
+            TimeSpan? firstBatchDeadline = null,
+            Action<int, int, int> progressCallback = null
         )
         {
             return CreateGate(
@@ -105,7 +176,9 @@ namespace QuickFiler.Controllers.Tests
                 threshold,
                 timeProvider,
                 debugLog,
-                sourceActive
+                sourceActive,
+                firstBatchDeadline,
+                progressCallback
             );
         }
 

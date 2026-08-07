@@ -9,6 +9,17 @@ namespace QuickFiler.Controllers
 {
     public partial class QfcDatamodel
     {
+        /// <summary>
+        /// Issue #424: honest producer-liveness signal. Set <see langword="true"/> immediately before
+        /// each <c>RunWorkerAsync()</c> call and cleared in a <c>finally</c> once the awaited
+        /// <c>RemainingEmailLoader</c> completes. <c>BackgroundWorker.IsBusy</c> cannot serve this
+        /// role: <c>Worker_DoWork</c> is <c>async void</c>, so it returns at its first yielding await
+        /// and reports idle while the loader is still producing. Both the dequeue gate's
+        /// <c>sourceActive</c> signal and <see cref="WaitForQueue"/> consume this flag. Declared
+        /// <c>volatile</c> because it is written on the worker thread and read by dequeue callers.
+        /// </summary>
+        private volatile bool _remainingLoadActive;
+
         //TODO: Implement UndoMove()
         public void UndoMove()
         {
@@ -54,13 +65,36 @@ namespace QuickFiler.Controllers
 
         public async Task<IList<MailItem>> DequeueNextItemGroupAsync(int quantity, int timeOut)
         {
+            // Issue #424: the pre-existing two-argument contract is preserved exactly; it delegates
+            // with the default first-batch deadline and no progress sink.
+            return await DequeueNextItemGroupAsync(
+                quantity,
+                timeOut,
+                QfcStreamingDequeueConfidenceGate.DefaultFirstBatchDeadline,
+                null
+            );
+        }
+
+        public async Task<IList<MailItem>> DequeueNextItemGroupAsync(
+            int quantity,
+            int timeOut,
+            TimeSpan firstBatchDeadline,
+            Action<int, int, int> progress
+        )
+        {
             _token.ThrowIfCancellationRequested();
 
             if (_globals?.QfSettings?.HighConfidenceModeEnabled == true)
             {
-                return await DequeueWithHighConfidenceGateAsync(quantity, timeOut);
+                return await DequeueWithHighConfidenceGateAsync(
+                    quantity,
+                    timeOut,
+                    firstBatchDeadline,
+                    progress
+                );
             }
 
+            // Normal mode neither scores nor reports scanning progress, so both arguments are moot.
             return await DequeueDirectAsync(quantity);
         }
 
@@ -75,7 +109,9 @@ namespace QuickFiler.Controllers
 
         private async Task<IList<MailItem>> DequeueWithHighConfidenceGateAsync(
             int quantity,
-            int timeOut
+            int timeOut,
+            TimeSpan? firstBatchDeadline = null,
+            Action<int, int, int> progress = null
         )
         {
             var gate = new QfcStreamingDequeueConfidenceGate(
@@ -84,7 +120,9 @@ namespace QuickFiler.Controllers
                 _globals.QfSettings.HighConfidenceThreshold,
                 TimeProvider,
                 null,
-                () => _worker?.IsBusy == true
+                () => _remainingLoadActive,
+                firstBatchDeadline,
+                progress
             );
 
             var nodes = (await gate.DequeueAsync(quantity, timeOut, _token)).ToList();
@@ -129,7 +167,7 @@ namespace QuickFiler.Controllers
 
         internal async Task WaitForQueue(int quantity, CancellationToken token)
         {
-            while (_worker.IsBusy && (_masterQueue?.Count < quantity))
+            while (_remainingLoadActive && (_masterQueue?.Count < quantity))
             {
                 token.ThrowIfCancellationRequested();
                 await TimeProvider.Delay(TimeSpan.FromMilliseconds(200), token);

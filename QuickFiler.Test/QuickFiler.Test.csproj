@@ -112,12 +112,16 @@
     <Compile Include="Controllers\QfcCollectionControllerTests.cs" />
     <Compile Include="Controllers\QfcCollectionControllerDarkModeTests.cs" />
     <Compile Include="Controllers\QfcDatamodelTests.cs" />
+    <Compile Include="Controllers\QfcDatamodelLivenessTests.cs" />
     <Compile Include="Controllers\QfcInitEmailQueueZeroBatchTests.cs" />
     <Compile Include="Controllers\QfcFormControllerTests.cs" />
     <Compile Include="Controllers\QfcFormControllerSeamTests.cs" />
     <Compile Include="Controllers\QfcFormKeyHandlerTests.cs" />
     <Compile Include="Controllers\QfcHighConfidencePreFilterTests.cs" />
+    <Compile Include="Controllers\QfcScanProgressBandMapperTests.cs" />
     <Compile Include="Controllers\QfcStreamingDequeueConfidenceGateTests.cs" />
+    <Compile Include="Controllers\QfcStreamingDequeueConfidenceGateTests.Part2.cs" />
+    <Compile Include="Controllers\QfcStreamingDequeueConfidenceGateTests.Part3.cs" />
     <Compile Include="Controllers\QfcHomeControllerIssue218Tests.cs" />
     <Compile Include="Controllers\QfcHomeControllerIterationTests.cs" />
     <Compile Include="Controllers\QfcHomeControllerMetricsTests.cs" />

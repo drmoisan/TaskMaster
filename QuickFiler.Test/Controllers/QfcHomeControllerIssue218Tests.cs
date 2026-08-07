@@ -98,7 +98,14 @@ namespace QuickFiler.Controllers.Tests
                 )
                 .ReturnsAsync(new List<MailItem>());
             mockDataModel
-                .Setup(x => x.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()))
+                .Setup(x =>
+                    x.DequeueNextItemGroupAsync(
+                        It.IsAny<int>(),
+                        It.IsAny<int>(),
+                        It.IsAny<TimeSpan>(),
+                        It.IsAny<System.Action<int, int, int>>()
+                    )
+                )
                 .ReturnsAsync(new List<MailItem>());
             mockDataModel.Setup(x => x.Complete).Returns(true);
             _controller.DataModel = mockDataModel.Object;
@@ -157,7 +164,13 @@ namespace QuickFiler.Controllers.Tests
             );
             Mock.Get(_controller.DataModel)
                 .Verify(
-                    m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()),
+                    m =>
+                        m.DequeueNextItemGroupAsync(
+                            It.IsAny<int>(),
+                            It.IsAny<int>(),
+                            It.IsAny<TimeSpan>(),
+                            It.IsAny<System.Action<int, int, int>>()
+                        ),
                     Times.Once,
                     "the first displayed page must come from the dequeue-layer gate"
                 );
@@ -189,7 +202,14 @@ namespace QuickFiler.Controllers.Tests
                 )
                 .ReturnsAsync(new List<MailItem>());
             mockDataModel
-                .Setup(x => x.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()))
+                .Setup(x =>
+                    x.DequeueNextItemGroupAsync(
+                        It.IsAny<int>(),
+                        It.IsAny<int>(),
+                        It.IsAny<TimeSpan>(),
+                        It.IsAny<System.Action<int, int, int>>()
+                    )
+                )
                 .ReturnsAsync(new List<MailItem>());
             mockDataModel.Setup(x => x.Complete).Returns(true);
             _controller.DataModel = mockDataModel.Object;
@@ -223,7 +243,13 @@ namespace QuickFiler.Controllers.Tests
 
             sequence.Should().Equal("LoadItemsAsync");
             mockDataModel.Verify(
-                m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()),
+                m =>
+                    m.DequeueNextItemGroupAsync(
+                        It.IsAny<int>(),
+                        It.IsAny<int>(),
+                        It.IsAny<TimeSpan>(),
+                        It.IsAny<System.Action<int, int, int>>()
+                    ),
                 Times.Once
             );
             mockFormController.Verify(
