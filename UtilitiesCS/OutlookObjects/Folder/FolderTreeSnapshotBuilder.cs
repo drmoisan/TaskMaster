@@ -36,9 +36,12 @@ namespace UtilitiesCS.OutlookObjects.Folder
         )
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var nodes = await _reader
-                .ReadFoldersAsync(request, _deadlineClock, _dispatcherYield, cancellationToken)
-                .ConfigureAwait(false);
+            var nodes = await _reader.ReadFoldersAsync(
+                request,
+                _deadlineClock,
+                _dispatcherYield,
+                cancellationToken
+            );
             var lookup = nodes.ToDictionary(node => node.Key);
             var roots = nodes
                 .Where(node => node.ParentKey == null)
@@ -50,7 +53,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             while (stack.Count > 0)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                await YieldIfNeededAsync(cancellationToken).ConfigureAwait(false);
+                await YieldIfNeededAsync(cancellationToken);
                 var key = stack.Pop();
                 if (!lookup.TryGetValue(key, out var node))
                 {
@@ -74,7 +77,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 return;
             }
 
-            await _dispatcherYield.YieldAsync(cancellationToken).ConfigureAwait(false);
+            await _dispatcherYield.YieldAsync(cancellationToken);
             _deadlineClock.Reset();
         }
     }

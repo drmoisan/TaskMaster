@@ -1,0 +1,8 @@
+Timestamp: 2026-08-06T17-17
+Task: [P5-T42] red testability proof for the preserved public controller constructor.
+
+The fresh P5-T46 report shows the public `FilterOlFoldersController(IApplicationGlobals)` constructor is 0/1 covered. Its current body delegates directly to a concrete `FilterOlFoldersViewer` factory. Under the plan constraints, a test cannot substitute a deterministic viewer through that public path: using the concrete form would require a real viewer/message loop, and replacing it through reflection or a global hook is prohibited.
+
+The existing internal delegate constructor cannot cover the public constructor. The narrow required seam is an instance-local protected-internal virtual viewer-factory provider invoked by the preserved public constructor. The base implementation retains the same concrete viewer creation and `Show`/disposal behavior. A derived test controller can override only that provider to return a deterministic fake-viewer delegate.
+
+Green verification: `FilterOlFoldersController.Lifecycle.cs` changed by 28 additions and 8 deletions across the current cycle-4 diff and is 498 physical lines; the existing controller partial is 202 physical lines. `PublicConstructor_UsesOverriddenViewerFactoryProvider` covers the exact preserved public constructor with a local fake delegate. `BaseViewerFactoryProvider_ReturnsConcreteDelegateWithoutInvokingIt` covers the base provider without constructing a real viewer. CSharpier, analyzer, and nullable builds passed; the focused refresh-disposal fixture passed 15/15 tests. Existing package-configuration and duplicate-source warnings were unchanged.

@@ -33,5 +33,11 @@ namespace UtilitiesCS.Threading
         /// Asynchronously executes <paramref name="func"/> on the UI thread and returns its result.
         /// </summary>
         Task<TResult> InvokeAsync<TResult>(Func<TResult> func);
+
+        /// <summary>
+        /// Asynchronously executes an asynchronous operation on the UI thread and awaits its result
+        /// without releasing the UI dispatcher context during the operation.
+        /// </summary>
+        Task<TResult> InvokeAsync<TResult>(Func<Task<TResult>> func);
     }
 }

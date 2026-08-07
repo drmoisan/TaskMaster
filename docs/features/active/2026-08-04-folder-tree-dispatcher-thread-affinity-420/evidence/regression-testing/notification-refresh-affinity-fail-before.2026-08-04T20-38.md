@@ -1,0 +1,4 @@
+Timestamp: 2026-08-04T20:38:00-04:00
+Command: msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU'; & 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe' UtilitiesCS.Test/bin/Debug/UtilitiesCS.Test.dll /Tests:UtilitiesCS.Test.OutlookObjects.Folder.OutlookFolderTreeServiceInvalidationTests.NotificationRefresh_RunsOnCapturedDispatcher
+EXIT_CODE: 1
+Output Summary: Expected pre-fix failure. After temporarily replacing only the dispatcher branch in `OutlookFolderTreeService.BuildSnapshotAsync` with a direct builder call, the worker-raised notification refresh accessed the recording reader off the captured STA and the dispatcher-affinity assertion failed. The production dispatcher branch was restored immediately after the run.

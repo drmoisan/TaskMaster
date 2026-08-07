@@ -51,12 +51,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
         )
         {
             var records = await ReadRecordsAsync(
-                    request,
-                    deadlineClock,
-                    dispatcherYield,
-                    cancellationToken
-                )
-                .ConfigureAwait(false);
+                request,
+                deadlineClock,
+                dispatcherYield,
+                cancellationToken
+            );
             return records.Select(record => ToNode(record, records)).ToArray();
         }
 
@@ -83,8 +82,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             foreach (var store in _storeProvider())
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                await YieldIfNeededAsync(deadlineClock, dispatcherYield, cancellationToken)
-                    .ConfigureAwait(false);
+                await YieldIfNeededAsync(deadlineClock, dispatcherYield, cancellationToken);
                 if (!store.ShouldInclude(_storesWrapper))
                 {
                     continue;
@@ -103,14 +101,13 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 }
 
                 await ReadStoreAsync(
-                        root,
-                        storeId,
-                        records,
-                        deadlineClock,
-                        dispatcherYield,
-                        cancellationToken
-                    )
-                    .ConfigureAwait(false);
+                    root,
+                    storeId,
+                    records,
+                    deadlineClock,
+                    dispatcherYield,
+                    cancellationToken
+                );
             }
 
             return records;
@@ -132,8 +129,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             while (stack.Count > 0)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                await YieldIfNeededAsync(deadlineClock, dispatcherYield, cancellationToken)
-                    .ConfigureAwait(false);
+                await YieldIfNeededAsync(deadlineClock, dispatcherYield, cancellationToken);
                 var current = stack.Pop();
                 var folder = current.Item1;
                 var parentEntryId = current.Item2;
@@ -174,7 +170,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 return;
             }
 
-            await dispatcherYield.YieldAsync(cancellationToken).ConfigureAwait(false);
+            await dispatcherYield.YieldAsync(cancellationToken);
             deadlineClock.Reset();
         }
 

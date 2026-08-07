@@ -1,0 +1,4 @@
+Timestamp: 2026-08-04T23-04
+Command: `Get-Process vstest,msbuild`; `msbuild UtilitiesCS.Test/UtilitiesCS.Test.csproj /t:Build /p:Configuration=Debug /p:Platform=AnyCPU`; `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /Tests:CloseDuringRefresh_SuppressesViewMutationAndPropertyNotification`
+EXIT_CODE: 0
+Output Summary: No active vstest or msbuild process was present before the run. The instance-local lazy dispatcher harness compiled successfully. The focused serialized MSTest case passed: 1 total, 1 passed. The changed split test file has 226 lines. The earlier orphaned runner was stale test infrastructure caused by a non-pumping STA continuation in the test harness; the harness now uses a default TaskCompletionSource and directly awaits each captured dispatcher task.

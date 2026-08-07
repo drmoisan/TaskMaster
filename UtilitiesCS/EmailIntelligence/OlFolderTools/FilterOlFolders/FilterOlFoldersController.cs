@@ -8,56 +8,29 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using BrightIdeasSoftware;
 using UtilitiesCS.OutlookObjects.Folder;
+using UtilitiesCS.Threading;
 
 namespace UtilitiesCS
 {
-    public class FilterOlFoldersController : IDisposable
+    public partial class FilterOlFoldersController : IDisposable
     {
-        public FilterOlFoldersController(IApplicationGlobals appGlobals)
-            : this(appGlobals, CreateAndShowViewer()) { }
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod()!.DeclaringType!
+        );
 
-        /// <summary>
-        /// Initializes a new instance of <see cref="FilterOlFoldersController"/> with an
-        /// injected viewer. Intended for unit testing: pass a
-        /// <see cref="IFilterOlFoldersViewer"/> mock so that no real window is opened.
-        /// </summary>
-        /// <param name="appGlobals">Application globals.</param>
-        /// <param name="viewer">Viewer to use. Must not be null.</param>
-        internal FilterOlFoldersController(
-            IApplicationGlobals appGlobals,
-            IFilterOlFoldersViewer viewer
-        )
-        {
-            _globals = appGlobals;
-            _viewer = viewer;
-            _folderTreeService = _globals.Ol.FolderTreeService;
-            _folderTreeService.SnapshotChanged += FolderTreeService_SnapshotChanged;
-            _viewer.FormClosed += Viewer_FormClosed;
-            SetFolderTreeView(
-                CreateCompatibilityView(GetFolderTreeSnapshotAsync().GetAwaiter().GetResult())
-            );
-            _viewer.SetController(this);
-            //PutCheckedState = PutCheckedStateMethod;
-            _viewer.TlvNotFiltered.CheckStateGetter = GetCheckedState;
-            _viewer.TlvNotFiltered.CheckStatePutter = PutCheckedStateMethodNotFiltered;
-            _viewer.TlvFiltered.CheckStateGetter = GetCheckedState;
-            _viewer.TlvFiltered.CheckStatePutter = PutCheckedStateMethodFiltered;
-        }
+        protected internal virtual FolderTreeCompatibilityView CreateFolderTreeCompatibilityView(
+            FolderTreeSnapshot archiveRootSnapshot,
+            IReadOnlyCollection<string> selectedPaths
+        ) => new(archiveRootSnapshot, new(selectedPaths));
 
-        private static IFilterOlFoldersViewer CreateAndShowViewer()
-        {
-            var viewer = new FilterOlFoldersViewer();
-            viewer.Show();
-            return viewer;
-        }
+        protected internal virtual FolderTreeCompatibilityView OnFolderTreeViewCandidateCreated(
+            FolderTreeCompatibilityView candidateView
+        ) => candidateView;
 
-        private IApplicationGlobals _globals;
-        private IFilterOlFoldersViewer _viewer;
-        private IOutlookFolderTreeService _folderTreeService;
-        private FolderTreeCompatibilityView? _folderTreeView;
-        private bool _disposed;
+        protected internal virtual void OnFolderTreeViewCommitted() { }
 
-        internal FolderTreeCompatibilityView FolderTreeView => _folderTreeView!;
+        protected internal virtual Func<IFilterOlFoldersViewer> CreateViewerFactory() =>
+            () => new FilterOlFoldersViewer();
 
         #region Event Handlers
 
@@ -93,26 +66,6 @@ namespace UtilitiesCS
             {
                 OlFolderTree_PropertyChangedInternal(sender, e);
             }
-        }
-
-        private void Viewer_FormClosed(object sender, FormClosedEventArgs e) => Dispose();
-
-        private void FolderTreeService_SnapshotChanged(
-            object sender,
-            FolderTreeSnapshotChangedEventArgs e
-        )
-        {
-            _ = RefreshFolderTreeViewAsync();
-        }
-
-        private async Task RefreshFolderTreeViewAsync()
-        {
-            var snapshot = await GetFolderTreeSnapshotAsync().ConfigureAwait(false);
-            SetFolderTreeView(CreateCompatibilityView(snapshot));
-            OlFolderTree_PropertyChanged(
-                this,
-                new PropertyChangedEventArgs(nameof(FolderTreeView))
-            );
         }
 
         internal void OlFolderTree_PropertyChangedInternal(
@@ -225,77 +178,6 @@ namespace UtilitiesCS
             return selected;
         }
 
-        internal virtual Task<FolderTreeSnapshot> GetFolderTreeSnapshotAsync()
-        {
-            return _folderTreeService.GetSnapshotAsync(
-                CreateFolderTreeRequest(),
-                CancellationToken.None
-            );
-        }
-
-        private FolderTreeRequest CreateFolderTreeRequest()
-        {
-            var storeId = _globals.Ol.ArchiveRoot?.StoreID;
-            return string.IsNullOrWhiteSpace(storeId)
-                ? FolderTreeRequest.AllStores(allowStaleSnapshot: true)
-                : FolderTreeRequest.ForStore(storeId!, allowStaleSnapshot: true);
-        }
-
-        private FolderTreeCompatibilityView CreateCompatibilityView(FolderTreeSnapshot snapshot)
-        {
-            var selectedPaths = _globals.TD.FilteredFolderScraping.Keys.ToList();
-            return new(CreateArchiveRootSnapshot(snapshot), new(selectedPaths));
-        }
-
-        private FolderTreeSnapshot CreateArchiveRootSnapshot(FolderTreeSnapshot snapshot)
-        {
-            var archiveRoot = _globals.Ol.ArchiveRoot;
-            var archiveNode = archiveRoot is null
-                ? null
-                : snapshot.FindByPath(archiveRoot.StoreID, archiveRoot.FolderPath);
-            if (archiveNode is null)
-            {
-                return snapshot;
-            }
-
-            return FolderTreeSnapshotQueries.CreateSubtreeSnapshot(snapshot, archiveNode);
-        }
-
-        private void SetFolderTreeView(FolderTreeCompatibilityView view)
-        {
-            UnsubscribeFolderTreeView();
-            _folderTreeView?.Dispose();
-            _folderTreeView = view;
-            foreach (var node in _folderTreeView.Roots.SelectMany(EnumerateNodes))
-            {
-                node.Value.PropertyChanged += OlFolderTree_PropertyChanged;
-            }
-        }
-
-        private void UnsubscribeFolderTreeView()
-        {
-            if (_folderTreeView == null)
-            {
-                return;
-            }
-
-            foreach (var node in _folderTreeView.Roots.SelectMany(EnumerateNodes))
-            {
-                node.Value.PropertyChanged -= OlFolderTree_PropertyChanged;
-            }
-        }
-
-        private static IEnumerable<TreeNode<FolderWrapper>> EnumerateNodes(
-            TreeNode<FolderWrapper> root
-        )
-        {
-            yield return root;
-            foreach (var child in root.Children.SelectMany(EnumerateNodes))
-            {
-                yield return child;
-            }
-        }
-
         private static void FilterChildren(
             TreeNode<FolderWrapper> source,
             ICollection<TreeNode<FolderWrapper>> destination,
@@ -317,28 +199,6 @@ namespace UtilitiesCS
             {
                 FilterChildren(sourceChild, destination, include);
             }
-        }
-
-        public void Dispose()
-        {
-            if (_disposed)
-            {
-                return;
-            }
-
-            if (_viewer != null)
-            {
-                _viewer.FormClosed -= Viewer_FormClosed;
-            }
-
-            if (_folderTreeService != null)
-            {
-                _folderTreeService.SnapshotChanged -= FolderTreeService_SnapshotChanged;
-            }
-
-            UnsubscribeFolderTreeView();
-            _folderTreeView?.Dispose();
-            _disposed = true;
         }
     }
 }

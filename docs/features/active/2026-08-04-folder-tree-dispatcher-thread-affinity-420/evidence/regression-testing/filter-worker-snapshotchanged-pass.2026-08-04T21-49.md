@@ -1,0 +1,4 @@
+Timestamp: 2026-08-04T21:49:00-04:00
+Command: & 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe' 'UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll' /Tests:UtilitiesCS.Test.EmailIntelligence.FilterOlFoldersControllerInitializationTests.SnapshotChanged_FromWorker_RefreshesOnCapturedStaAndObservesOriginalFault
+EXIT_CODE: 0
+Output Summary: The dedicated-STA P1-T10 regression passed. A worker-originated notification performs the successful snapshot request, `ArchiveRoot` access, and completed view-refresh mutation on the captured STA; the subsequent controlled refresh fault reaches the observed controller error boundary as the original exception. Closing the fake viewer removes the service handler. The test uses a fake service, fake viewer, task-completion signals, and a dedicated STA dispatcher only.

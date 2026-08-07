@@ -1,0 +1,4 @@
+Timestamp: 2026-08-04T21:58:00-04:00
+Command: & 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe' 'TaskMaster.Test\bin\Debug\TaskMaster.Test.dll' /Tests:TaskMaster.Test.AppGlobals.AppOlObjectsFolderTreeServiceTests.FolderTreeService_AfterDispose_ThrowsObjectDisposedException,TaskMaster.Test.AppGlobals.AppOlObjectsFolderTreeServiceTests.FolderTreeService_CompositionFailure_ClearsInitializationAndRetries,TaskMaster.Test.AppGlobals.AppOlObjectsFolderTreeServiceTests.CreateFolderTreeServiceDispatcher_BaseFactory_ReturnsWpfUiDispatcher
+EXIT_CODE: 0
+Output Summary: Three P5-T4 regressions passed. The disposed getter throws `ObjectDisposedException`; a controlled composition exception clears initialization so the next access publishes one replacement service; and the test-subclass pass-through verifies the base dispatcher factory creates `WpfUiDispatcher`.

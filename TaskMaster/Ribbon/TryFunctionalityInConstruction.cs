@@ -29,6 +29,8 @@ namespace TaskMaster.Ribbon
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
         );
+        private Func<IApplicationGlobals, Task> _loadFolderFilterAsync = globals =>
+            FilterOlFoldersController.CreateAsync(globals);
 
         #region Try specific methods
 
@@ -154,12 +156,9 @@ namespace TaskMaster.Ribbon
             return System.Drawing.Image.FromHbitmap((IntPtr)disp.Handle, (IntPtr)disp.hPal);
         }
 
-        internal void TryLoadFolderFilter()
-        {
-            var filter = new FilterOlFoldersController(AppGlobals);
-            //var filter = new FilterOlFoldersViewer();
-            //filter.ShowDialog();
-        }
+        internal Task TryLoadFolderFilter() => TryLoadFolderFilterAsync();
+
+        internal Task TryLoadFolderFilterAsync() => _loadFolderFilterAsync(AppGlobals);
 
         internal void TryLoadFolderRemap()
         {

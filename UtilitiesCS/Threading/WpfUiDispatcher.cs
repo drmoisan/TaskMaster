@@ -11,30 +11,53 @@ namespace UtilitiesCS.Threading
     /// <see cref="IUiDispatcher"/> member 1:1 to the static WPF <see cref="UiThread.Dispatcher"/>.
     /// The isolated one-line forwards exist precisely so that callers routed through
     /// <see cref="IUiDispatcher"/> become unit-testable; the forwarding body itself is exercised
-    /// (cycle-3, P9-T7) against a real, running <see cref="Dispatcher"/> hosted on a dedicated STA
+    /// against a real, running <see cref="Dispatcher"/> hosted on a dedicated STA
     /// thread, requiring no live WinForms/WPF application host.
     /// </summary>
     public sealed class WpfUiDispatcher : IUiDispatcher
     {
-        /// <inheritdoc />
-        public void Invoke(Action action) => UiThread.Dispatcher.Invoke(action);
+        private readonly Func<Dispatcher> _dispatcherProvider;
+
+        /// <summary>
+        /// Initializes a dispatcher adapter backed by the application UI dispatcher.
+        /// </summary>
+        public WpfUiDispatcher()
+            : this(() => UiThread.Dispatcher) { }
+
+        /// <summary>
+        /// Initializes a dispatcher adapter for a dedicated STA test dispatcher.
+        /// </summary>
+        internal WpfUiDispatcher(Dispatcher dispatcher)
+            : this(() => dispatcher ?? throw new ArgumentNullException(nameof(dispatcher))) { }
+
+        private WpfUiDispatcher(Func<Dispatcher> dispatcherProvider) =>
+            _dispatcherProvider =
+                dispatcherProvider ?? throw new ArgumentNullException(nameof(dispatcherProvider));
+
+        private Dispatcher Dispatcher => _dispatcherProvider();
 
         /// <inheritdoc />
-        public Task InvokeAsync(Action action) => UiThread.Dispatcher.InvokeAsync(action).Task;
+        public void Invoke(Action action) => Dispatcher.Invoke(action);
+
+        /// <inheritdoc />
+        public Task InvokeAsync(Action action) => Dispatcher.InvokeAsync(action).Task;
 
         /// <inheritdoc />
         public Task InvokeAsync(
             Action action,
             DispatcherPriority priority,
             CancellationToken token
-        ) => UiThread.Dispatcher.InvokeAsync(action, priority, token).Task;
+        ) => Dispatcher.InvokeAsync(action, priority, token).Task;
 
         /// <inheritdoc />
-        public IAsyncResult BeginInvoke(Action action) =>
-            UiThread.Dispatcher.BeginInvoke(action).Task;
+        public IAsyncResult BeginInvoke(Action action) => Dispatcher.BeginInvoke(action).Task;
 
         /// <inheritdoc />
         public Task<TResult> InvokeAsync<TResult>(Func<TResult> func) =>
-            UiThread.Dispatcher.InvokeAsync(func).Task;
+            Dispatcher.InvokeAsync(func).Task;
+
+        /// <inheritdoc />
+        public Task<TResult> InvokeAsync<TResult>(Func<Task<TResult>> func) =>
+            Dispatcher.InvokeAsync(func).Task.Unwrap();
     }
 }

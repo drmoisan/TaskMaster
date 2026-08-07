@@ -1,0 +1,33 @@
+# Code Review: Folder-tree dispatcher thread affinity
+
+## Executive Summary
+
+Reviewed the full uncommitted diff against `origin/main` (`ce0c91e686bf7e060aaab6f185ee6883269e4fd4`), not only the planned files. The repair correctly avoids the rejected `Task.Yield` fallback and routes cold folder-tree builds through an injected dispatcher. It is not ready for merge because it creates or leaves four high-severity lifecycle and concurrency defects, and the tests do not cover them.
+
+## Findings Table
+
+| Severity | File | Location | Finding | Recommendation | Rationale | Evidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| HIGH | `TaskMaster/AppGlobals/AppOlObjects.cs` | 100-106 | `FolderTreeService` holds `_folderTreeServiceGate` while synchronously calling `IUiDispatcher.Invoke`. A worker can hold the gate while waiting for UI work; if the UI thread enters `Dispose` and waits on that same gate first, the UI cannot execute the queued composition action. | Do not hold the service gate across synchronous UI dispatch. Represent initialization as a single task/state that callers can await outside the lock, and add a deterministic UI-dispose/worker-first-access regression test. | This is a deadlock between the worker's synchronous UI invocation and UI-thread disposal. | Static inspection; no added test covers a concurrent worker access and UI `Dispose`. |
+| HIGH | `UtilitiesCS/OutlookObjects/Folder/OutlookFolderTreeService.cs` | 283-293 | `Dispose` calls `_notificationSink.Dispose()` on the caller thread even though the production notification sink is created from Outlook COM on the captured STA. | Marshal notification unsubscription/disposal through the captured dispatcher and test its thread affinity. | COM event unsubscription and cleanup must remain on the owning STA; a caller-thread cleanup can reintroduce thread-affinity failures. | `AppOlObjects.LoadFolderTreeService` constructs the sink under dispatcher invocation; service `Dispose` has no dispatch. |
+| HIGH | `UtilitiesCS/OutlookObjects/Folder/OutlookFolderTreeService.cs` | 105-142, 283-293 | An in-flight `BuildAndPublishAsync` can acquire `_gate` after `Dispose`, overwrite `Disposed` with `Current` or `Refreshing`, publish a snapshot, and raise `SnapshotChanged`. | Synchronize disposal with build completion/publication, prevent post-dispose publication, and add deterministic dispose-during-build coverage. | The service state must not leave `Disposed`, and post-dispose events can access disposed UI/COM state. | No disposed-state check occurs inside the publication lock; no regression test targets this race. |
+| HIGH | `UtilitiesCS/EmailIntelligence/OlFolderTools/FilterOlFolders/FilterOlFoldersController.cs` | 16-20, 54-70 | The public constructor shows a viewer and fire-and-forgets `InitializeAsync`. It neither observes exceptions nor returns a readiness task; the caller can receive a partially initialized controller. Additionally, `FormClosed` is subscribed only after the cold snapshot await, so a user can close the viewer before it is subscribed and the continuation later wires a closed viewer and service event handler. | Remove or make the public constructor delegate to an observable initialization contract; attach closure/cancellation handling before awaiting the cold snapshot, and add failure and close-during-load tests. | A failure becomes unobserved and a close during load cannot set `_disposed`, causing leaked/wired-closed state. | `CreateAsync` test covers only successful completion; no test closes the viewer before `TaskCompletionSource` completes or faults the snapshot. |
+| MEDIUM | `TaskMaster/Ribbon/RibbonViewer.cs`; `TaskMaster/Ribbon/TryFunctionalityInConstruction.cs` | `RibbonViewer.cs:364-365`; `TryFunctionalityInConstruction.cs:159-164` | The event handler awaits the new path, but neither the handler nor the delegated initialization seam has a tested failure policy. The legacy synchronous wrapper still fire-and-forgets the task. | Define and test exception handling at the UI boundary; remove or redirect the legacy fire-and-forget wrapper if it remains reachable. | A faulted `CreateAsync` can surface through an `async void` event handler or be lost through the legacy wrapper. | No test exercises a faulted factory task or confirms UI error reporting. |
+| HIGH | `UtilitiesCS/Threading/WpfUiDispatcher.cs`; coverage evidence | 41-42 | The new async dispatcher overload required for live traversal has zero coverage. | Add dedicated STA-hosted tests for the overload and coverage for cancellation/fault propagation. | It is the central dispatch seam for the repair and is currently unverified in the coverage report. | Cobertura reports line-rate 0 for `InvokeAsync(Func<Task<TResult>>)`. |
+| HIGH | QA evidence | `coverage-and-quality-delta.2026-08-04T19-40.md` | The report waives new-method coverage and claims a valid repository delta although baseline/final coverage denominators differ. | Recompute coverage using equivalent scope; enforce the documented >=90% new-method requirement or obtain an explicit approved exception. | The policy explicitly applies the 90% target to new methods, and non-comparable scopes cannot prove a delta. | Baseline 54,785/79,137 versus final 92,429/109,324; multiple added-line rates below 90%. |
+
+## Verified Positive Findings
+
+- `WpfDispatcherYield` remains strict and the full diff contains no `Task.Yield` production fallback.
+- `FolderTreeSnapshotBuilder` and `OutlookFolderHierarchyReader` no longer use `ConfigureAwait(false)` at live traversal/yield continuation points.
+- The recorded targeted regression evidence covers worker-originated build dispatch, composition dispatch, forced-yield continuation affinity, and successful asynchronous FilterOlFolders initialization.
+- `git diff --check origin/main` returned no whitespace errors.
+
+## Review Scope and Limitations
+
+- Canonical PR-context artifacts were present. Their summary has a zero commit range because all work is currently uncommitted, while the appendix lists the working-tree diff; review used the full `origin/main` working-tree diff as authoritative scope.
+- Full test execution was not repeated by this review because the canonical full coverage run already produced the policy-relevant coverage artifact and re-running it would overwrite feature evidence. Formatter and both build modes were independently rerun successfully.
+
+## Required Remediation
+
+Address CR-001 through CR-007 before PR review resumes. Tests must cover each race/failure path and demonstrate dispatcher affinity for construction, build, refresh, notification cleanup, and disposal.

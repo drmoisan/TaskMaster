@@ -1,0 +1,4 @@
+Timestamp: 2026-08-04T20:39:00-04:00
+Command: msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU'; & 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe' UtilitiesCS.Test/bin/Debug/UtilitiesCS.Test.dll /Tests:UtilitiesCS.Test.OutlookObjects.Folder.OutlookFolderTreeServiceInvalidationTests.NotificationRefresh_RunsOnCapturedDispatcher
+EXIT_CODE: 0
+Output Summary: The solution build succeeded with the existing six package/source warnings. The dedicated-STA notification-refresh regression passed. It verifies subscription, worker-raised refresh execution, notification unsubscription, and sink disposal use the captured dispatcher; no Outlook, network, temporary file, sleep, timer, retry, or UI message loop was used.

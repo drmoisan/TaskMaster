@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -119,6 +120,38 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             );
 
             clock.ResetCount.Should().BeGreaterThan(0);
+        }
+
+        [TestMethod]
+        public async Task ReadRecordsAsync_AfterForcedYield_KeepsFolderAccessOnDispatcher()
+        {
+            using (var dispatcherHost = new StaDispatcherHost())
+            {
+                var folder = new ThreadRecordingFolder();
+                var store = CreateStore("store-a", include: true, folder);
+                var reader = new OutlookFolderHierarchyReader(
+                    () => new[] { store.Object },
+                    new StoresWrapper { ExcludedStoreNameContains = new List<string>() }
+                );
+                var dispatcherYield = new WorkerCompletingDispatcherYield();
+
+                var readTask = dispatcherHost
+                    .Dispatcher.InvokeAsync(() =>
+                        reader.ReadRecordsAsync(
+                            FolderTreeRequest.AllStores(false),
+                            new AlwaysYieldClock(),
+                            dispatcherYield,
+                            CancellationToken.None
+                        )
+                    )
+                    .Task;
+
+                await dispatcherYield.Entered;
+                await Task.Run(dispatcherYield.Release);
+                await (await readTask);
+
+                folder.AccessThreadIds.Should().OnlyContain(id => id == dispatcherHost.ThreadId);
+            }
         }
 
         [TestMethod]
@@ -297,6 +330,103 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
                 }
 
                 return root;
+            }
+        }
+
+        private sealed class ThreadRecordingFolder
+            : OutlookFolderHierarchyReader.IOutlookFolderAdapter
+        {
+            private readonly List<int> _accessThreadIds = new List<int>();
+
+            public IReadOnlyList<int> AccessThreadIds => _accessThreadIds;
+
+            public string EntryID
+            {
+                get
+                {
+                    _accessThreadIds.Add(Thread.CurrentThread.ManagedThreadId);
+                    return "entry-a";
+                }
+            }
+
+            public string Name
+            {
+                get
+                {
+                    _accessThreadIds.Add(Thread.CurrentThread.ManagedThreadId);
+                    return "Inbox";
+                }
+            }
+
+            public string FolderPath
+            {
+                get
+                {
+                    _accessThreadIds.Add(Thread.CurrentThread.ManagedThreadId);
+                    return "\\Inbox";
+                }
+            }
+
+            public IReadOnlyList<OutlookFolderHierarchyReader.IOutlookFolderAdapter> Children
+            {
+                get
+                {
+                    _accessThreadIds.Add(Thread.CurrentThread.ManagedThreadId);
+                    return new OutlookFolderHierarchyReader.IOutlookFolderAdapter[0];
+                }
+            }
+        }
+
+        private sealed class WorkerCompletingDispatcherYield : IDispatcherYield
+        {
+            private readonly TaskCompletionSource<bool> _entered = new TaskCompletionSource<bool>();
+            private readonly TaskCompletionSource<bool> _released = new TaskCompletionSource<bool>(
+                TaskCreationOptions.RunContinuationsAsynchronously
+            );
+
+            public Task Entered => _entered.Task;
+
+            public Task YieldAsync(CancellationToken cancellationToken)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                _entered.TrySetResult(true);
+                return _released.Task;
+            }
+
+            public void Release()
+            {
+                _released.TrySetResult(true);
+            }
+        }
+
+        private sealed class StaDispatcherHost : IDisposable
+        {
+            private readonly AutoResetEvent _ready = new AutoResetEvent(false);
+            private readonly Thread _thread;
+
+            public StaDispatcherHost()
+            {
+                _thread = new Thread(() =>
+                {
+                    Dispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
+                    ThreadId = Thread.CurrentThread.ManagedThreadId;
+                    _ready.Set();
+                    System.Windows.Threading.Dispatcher.Run();
+                });
+                _thread.SetApartmentState(ApartmentState.STA);
+                _thread.Start();
+                _ready.WaitOne();
+            }
+
+            public Dispatcher Dispatcher { get; private set; }
+
+            public int ThreadId { get; private set; }
+
+            public void Dispose()
+            {
+                Dispatcher.BeginInvokeShutdown(DispatcherPriority.Send);
+                _thread.Join();
+                _ready.Dispose();
             }
         }
     }
