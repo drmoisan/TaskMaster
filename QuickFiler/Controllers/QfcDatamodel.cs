@@ -184,7 +184,18 @@ namespace QuickFiler.Controllers
                 // Start the time-consuming operation.
                 //e.Result = await LoadRemainingEmailsToQueueAsync(bw, _token);
                 //e.Result = LoadRemainingEmailsToQueue(bw, _token);
-                e.Result = await RemainingEmailLoader(_token);
+                try
+                {
+                    e.Result = await RemainingEmailLoader(_token);
+                }
+                finally
+                {
+                    // Issue #424: clear the producer-liveness flag exactly when the awaited loader
+                    // completes — including on the throwing path. This method is async void, so
+                    // BackgroundWorker.IsBusy has already gone false; this continuation is the only
+                    // point that truthfully marks the end of production.
+                    _remainingLoadActive = false;
+                }
 
                 // If the operation was canceled by the user,
                 // set the DoWorkEventArgs.Cancel property to true.
@@ -238,6 +249,9 @@ namespace QuickFiler.Controllers
             if (batchSize <= 0)
             {
                 SetupWorker(worker);
+                // Issue #424: mark the producer live before starting it, so a dequeue that runs
+                // before Worker_DoWork's first await cannot mistake an empty queue for exhaustion.
+                _remainingLoadActive = true;
                 worker.RunWorkerAsync();
                 return new List<MailItem>();
             }
@@ -262,6 +276,9 @@ namespace QuickFiler.Controllers
                 .ToList();
 
             SetupWorker(worker);
+            // Issue #424: see the zero-batch path above — the flag is the honest producer-liveness
+            // signal and must be set before the worker starts.
+            _remainingLoadActive = true;
             worker.RunWorkerAsync();
 
             return emailList;

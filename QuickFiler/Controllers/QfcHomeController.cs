@@ -291,7 +291,17 @@ namespace QuickFiler.Controllers
 
             if (highConfidenceModeEnabled)
             {
-                listEmail = await _datamodel.DequeueNextItemGroupAsync(itemsPerIteration, 1000);
+                // Issue #424: bound the pre-UI scan and surface its progress. The mapper owns the
+                // 0->30 band mapping; reports route through the existing ProgressTracker, which
+                // marshals to the UI thread. O1: the empty-queue poll drops 1000 -> 200 ms at this
+                // pre-UI call site only.
+                var scanProgress = new QfcScanProgressBandMapper(progress.Report);
+                listEmail = await _datamodel.DequeueNextItemGroupAsync(
+                    itemsPerIteration,
+                    200,
+                    QfcStreamingDequeueConfidenceGate.DefaultFirstBatchDeadline,
+                    scanProgress.Report
+                );
             }
 
             progress.Report(30, "Initializing Qfc Items");

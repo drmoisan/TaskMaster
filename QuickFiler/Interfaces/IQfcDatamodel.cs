@@ -24,6 +24,25 @@ namespace QuickFiler.Interfaces
     public interface IQfcDatamodel
     {
         Task<IList<MailItem>> DequeueNextItemGroupAsync(int quantity, int timeOut);
+
+        /// <summary>
+        /// Issue #424 overload carrying the dequeue-gate first-batch deadline and an optional
+        /// incremental progress sink. The two-argument overload delegates here with
+        /// <c>QfcStreamingDequeueConfidenceGate.DefaultFirstBatchDeadline</c> and a null sink.
+        /// </summary>
+        /// <param name="firstBatchDeadline">
+        /// Overall budget for assembling the first batch. <c>Timeout.InfiniteTimeSpan</c> disables it.
+        /// </param>
+        /// <param name="progress">
+        /// Optional sink invoked once per scored candidate with <c>(scanned, accepted, quantity)</c>.
+        /// Exceptions thrown by the sink propagate. Ignored outside high-confidence mode.
+        /// </param>
+        Task<IList<MailItem>> DequeueNextItemGroupAsync(
+            int quantity,
+            int timeOut,
+            TimeSpan firstBatchDeadline,
+            Action<int, int, int> progress
+        );
         IList<MailItem> DequeueNextItemGroup(int quantity);
         void UndoMove();
         SloStack<IMovedMailInfo> MovedItems { get; }
