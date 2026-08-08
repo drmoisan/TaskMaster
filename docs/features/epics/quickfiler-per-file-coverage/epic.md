@@ -43,8 +43,8 @@ features:
   - issue_num: 437
     feature_folder: 2026-08-07-quickfiler-efc-home-controller-coverage-437
     depends_on: [432]
-  - issue_num: 1009
-    feature_folder: quickfiler-efc-form-item-controller-coverage
+  - issue_num: 452
+    feature_folder: 2026-08-07-quickfiler-efc-form-item-controller-coverage-452
     depends_on: [432]
   - issue_num: 453
     feature_folder: 2026-08-07-quickfiler-item-controller-coverage-453
@@ -74,7 +74,7 @@ features:
       - 435
       - 433
       - 437
-      - 1009
+      - 452
       - 453
       - 454
       - 1012
@@ -91,9 +91,9 @@ features:
 
 > **Issue-number back-fill status (2026-08-08).** `issue_num` values were placeholders at
 > manifest-authoring time and are replaced with the real GitHub issue number from each child's
-> promotion receipt as its preparation completes. Eleven are now resolved — **432** (F1), **430**,
-> **431**, **433**, **434**, **435**, **436**, **437**, **453**, **454**, **455**. Five remain
-> placeholders in the `1009`-`1016` range and belong to children still in preparation. Every `depends_on` edge on the wave-0 enabler
+> promotion receipt as its preparation completes. Twelve are now resolved — **432** (F1), **430**,
+> **431**, **433**, **434**, **435**, **436**, **437**, **452**, **453**, **454**, **455**. Four
+> remain placeholders in the `1012`-`1016` range and belong to children still in preparation. Every `depends_on` edge on the wave-0 enabler
 > now points at the real **432**. The manifest is committed in final resolved form, with no
 > placeholder remaining, before the kickoff artifact is written.
 
@@ -818,6 +818,76 @@ method-level exemptions keeps its lambdas in the denominator, permanently uncove
 raised. The fix is a class-level-exempt adapter **type** — which carries its own trap: **that type
 must not be `partial`**, or the attribute silently exempts the entire type across every partial, the
 same propagation confirmed on `QfcDatamodel.cs:25` and `ItemViewer.cs`.
+
+## Epic Ruling: DEC-1 — unshown Form construction on an STA thread is ratified (F9)
+
+F9's plan halts at `P0-T14` awaiting a literal `RATIFIED_APPROACH`. **The ruling is Approach A.**
+
+The problem: `[ExcludeFromCodeCoverage]` at `EfcViewer.cs:20` sits on the partial *type*, so it also
+suppresses `EfcViewer.Designer.cs` (4,277 lines). Removing it — which the epic requires — moves those
+generated lines into the denominator in the same edit. F9 offered two routes:
+
+- **Approach A:** construct one **unshown** `EfcViewer` on an STA thread, dispose in `finally`.
+  Yields ~100% on `EfcViewer.cs` and ~99% on the Designer, *adding* roughly 2,000 covered lines.
+- **Approach B:** no Form construction. ~82% line, forfeits those ~2,000 lines, and requires
+  method-level attributes **inside generated code** that Visual Studio silently drops on
+  regeneration.
+
+`epic-planner` verified the precedent F9 cited rather than taking it on trust.
+`QuickFiler.Test/Controllers/BayesianPerformanceController.TestSupport.cs` already does exactly
+this, in merged code, in this very test project: `RunWithViewer` constructs a real Form-derived
+`BayesianPerformanceViewer`, never shows it, disposes it in `finally`, saves and restores the
+`SynchronizationContext`, runs on an `ApartmentState.STA` thread, and marshals exceptions back with
+`ExceptionDispatchInfo`. The pattern is established, not invented.
+
+Four reasons decide it:
+
+1. **The precedent is real and already merged**, in the same assembly, doing the same thing.
+2. **Approach A makes the generated file genuinely covered rather than exempted.** ~99% on the
+   Designer is a better outcome than any exemption: the file is measured and passes on its own
+   merit, and the ~2,000 added covered lines help every child's retain-or-improve obligation.
+3. **Approach B's mechanism is self-destroying.** Attributes written into generated code are removed
+   the next time the designer regenerates the file, so the exemption silently lapses and the file
+   fails a later gate with no diff to explain why. It also has zero repo precedent.
+4. The `winforms-testability-refactor` condition barring Form-derived types in tests is aimed at
+   **live** forms. The operative distinction is *shown or message-pumping* versus
+   *constructed-and-disposed-unshown*, and only the former is a policy hazard.
+
+**Conditions.** Approach A is ratified only in this shape:
+
+- Reuse the existing `RunWithViewer` harness shape verbatim: STA thread, never shown, `finally`
+  dispose, `SynchronizationContext` save/restore, `ExceptionDispatchInfo` exception marshalling.
+- STA-bound tests live in dedicated `*.StaTests.cs` files and each documents why no seam suffices.
+- **Never** call `.Show()`, `.ShowDialog()`, or anything that pumps a message loop. A test that
+  displays a popup remains a policy violation.
+- This ratifies Form *construction* for coverage of designer-generated control-tree initialization.
+  It does not license exercising interactive behavior through a live form.
+
+**This supersedes the stricter "constructing a live form is never acceptable" wording given to F14
+in its original brief.** F14 faces the identical situation on `ItemViewer.Designer.cs` (6,224 lines,
+suppressed by the type-level attribute on `ItemViewer.cs`) and may apply Approach A under the same
+four conditions. F15 may do likewise for its designer-backed viewers.
+
+## Epic Ruling: DEC-5 — a `measured-not-gated` disposition for generated files
+
+F9 also raised, correctly, that F1's three ledger buckets cannot express the state generated
+designer files land in under Approach A: **~99% line but capped near 50% branch by construction**,
+because generated control-tree initialization contains branches no test can meaningfully drive.
+Marking them `testable` makes the branch gate unsatisfiable; marking them `ratified-exempt` discards
+~2,000 legitimately covered lines from the totals.
+
+**Ruling: add a fourth ledger disposition, `measured-not-gated`,** for generated
+`*.Designer.cs` and generated `Properties/` files. Such files:
+
+- **are** instrumented, measured, and reported with real line and branch figures;
+- **do** contribute to repository-wide totals;
+- are **not** individually gated on either the 80% line or 75% branch floor;
+- carry no `[ExcludeFromCodeCoverage]` attribute.
+
+This is distinct from `interface-only / not-measured`, which has no denominator at all. Generated
+files have a real denominator and a real, useful numerator — they simply are not code this epic
+authored or controls. F16 verifies that every `measured-not-gated` row is genuinely generated code
+and not a testable file parked in a convenient bucket.
 
 ## Latent Defect Promotion
 
