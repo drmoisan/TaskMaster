@@ -31,8 +31,8 @@ features:
   - issue_num: 434
     feature_folder: 2026-08-07-quickfiler-helper-classes-coverage-434
     depends_on: [1001]
-  - issue_num: 1005
-    feature_folder: quickfiler-datamodel-coverage
+  - issue_num: 436
+    feature_folder: 2026-08-07-quickfiler-datamodel-coverage-436
     depends_on: [1001]
   - issue_num: 1006
     feature_folder: quickfiler-qfc-form-explorer-controller-coverage
@@ -70,7 +70,7 @@ features:
       - 431
       - 430
       - 434
-      - 1005
+      - 436
       - 1006
       - 433
       - 437
@@ -355,6 +355,20 @@ All 13 files under `QuickFiler/Helper Classes/`: `cInfoMail.cs` (231),
 
 ### F5 — quickfiler-datamodel-coverage (wave 1, C3)
 
+> **Two corrections from F5's research (2026-08-07), both re-verified by `epic-planner`.**
+> First, `QfcDatamodel.FrameBuilding.cs` is **not** WinForms code: it has zero
+> `System.Windows.Forms` references and its `Frame` is `Deedle.Frame<int, string>`. The STA
+> apparatus this brief originally scoped in does not apply, and no `*.StaTests.cs` is created.
+> Second, **F11 is not an `IQfcDatamodel` consumer** — `QfcCollectionController.cs` has no reference
+> to it at all. The real additional consumers are **F2** (`QfcQueue.cs:476`) and **F6**
+> (`QfcFormController.EventHandlers.cs:196`), both reaching it via `IQfcHomeController.DataModel`,
+> which is invisible to a grep for the interface name. `IQfcDatamodel` itself takes zero production
+> edits, so no sibling faces a compile break.
+>
+> The live hazard is different and subtler: there are **19 `Mock<IQfcDatamodel>` sites across six
+> F7-owned test files** that silently return `default` rather than failing. A behavioral change
+> behind that interface would not break the build; it would quietly change what those mocks imply.
+
 `Controllers/QfcDatamodel.cs` (496) `[X]`, `Controllers/QfcDatamodel.FrameBuilding.cs` (154),
 `Controllers/QfcDatamodel.QueueProcessing.cs` (177), `Controllers/EfcDataModel.cs` (397),
 `Interfaces/IQfcDatamodel.cs` (59). ~1,283 lines / 5 files.
@@ -534,6 +548,47 @@ rather than crashes:
    reports `line-rate="0"` because it has no lines, not because it is uncovered. Keying on
    `line-rate` mis-reports every `interface-only` file as a 0% failure — exactly the false alarm the
    third bucket exists to prevent.
+
+## Verified Toolchain and Tooling Facts
+
+Each item below was verified directly by `epic-planner` against this checkout, because two children
+reported contradictory claims and a wrong answer would cost real work at execution time.
+
+### `csharpier .` is stale for the pinned version — use a subcommand
+
+`dotnet-tools.json` at the repository root pins **csharpier 1.2.6**. The v1 CLI requires a
+subcommand, so the bare `csharpier .` form given in `CLAUDE.md` §C#1 and §CUT3 does not work against
+the pinned tool. Use `dotnet tool run csharpier format .` (or `check` for a non-mutating gate). An
+existing `atomic-executor` memory note records the same conclusion independently.
+
+`CLAUDE.md` is a policy document and is **not** amended by this epic; children apply the working
+command form and record the deviation in their own evidence rather than editing policy.
+
+### CRLF plans validate — do not normalize
+
+F5 flagged a CRLF hazard and F8 reported the opposite. **F8 is correct.** Verified directly:
+
+- `core.autocrlf=true` with `* text=auto` in `.gitattributes` means committed plans do materialize as
+  **pure CRLF** on a fresh Windows checkout. That half of F5's observation is accurate — all six
+  committed plans are 100% CRLF with zero bare LF.
+- The MCP plan validator nonetheless **accepts them**. All six committed plans were re-validated in
+  the integration worktree with `artifact_type: "plan"` and every one returned `ok: true`.
+
+There is therefore **no CRLF normalization step** to perform before re-validating a plan at execution
+time. Doing it anyway would be pointless churn against files that already pass.
+
+### An `[ExcludeFromCodeCoverage]` on a partial type suppresses every partial
+
+Confirmed on `QuickFiler/Controllers/QfcDatamodel.cs:25`, where the attribute sits on
+`public partial class QfcDatamodel`. It suppresses instrumentation for `QfcDatamodel.cs`,
+`QfcDatamodel.QueueProcessing.cs`, and `QfcDatamodel.FrameBuilding.cs` alike, so the latter two read
+as zero measured coverage despite carrying no attribute of their own.
+
+This generalises and matters beyond F5. **Absence from a coverage report never means zero coverage
+and never means the file is exempt — check whether some other partial of the same type carries the
+attribute.** F14's `ItemViewer` family is the other instance: one attribute on `ItemViewer.cs`
+suppresses six files. Note that a partial type may be annotated only once; annotating two parts is
+CS0579.
 
 ## Latent Defect Promotion
 
