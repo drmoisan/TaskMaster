@@ -1,3 +1,4 @@
+- [Re-fetch integration before declaring prep done](refetch-integration-before-declaring-prep-done.md) — epic-planner publishes binding child directives mid-run; siblings share .git so origin refs move silently. Re-fetch, rebase, diff the manifest, absorb, re-preflight
 - [Store-lockup watchdog null-model hazard](project_store_lockup_watchdog_null_model_hazard.md) — #260 watchdog is live; new startup COM attribution scopes need a responder phase-branch that returns before the disable-service write, or the watchdog thread crashes on the null store model
 - [VS Code extension location](project_extension_location.md) — the extension lives at `extensions/drm-copilot/`, not at the repo root.
 - [Verify package.json before vsce work](feedback_vsce_verify_package_location.md) — in multi-package repos, never assume the repo root is the publishable extension; locate it first.
