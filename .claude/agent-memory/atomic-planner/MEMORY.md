@@ -10,8 +10,11 @@
 
 - [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/
 - [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — obj/ cache filenames outlive tear-down commits; verify project/source files with git ls-files or a glob before writing an existence claim into acceptance text
+- [Diff gates need a commit task](diff-gates-need-a-commit-task.md) — `git diff <MERGE_BASE>..HEAD` gates pass vacuously with no commit task; Phase 0 porcelain is non-empty by construction; whitelist docs/ + agent-memory in scope-lock diff gates
 - [Never pin a HEAD SHA as a plan expectation](never-pin-head-sha-as-plan-expectation.md) — record HEAD, gate on tree invariants (clean porcelain + no .cs/.csproj/packages.config/app.config diff vs the baseline-capture sha)
 - [.csharpierignore scope: packages.config is NOT exempt](csharpierignore-scope-packages-config.md) — only *.csproj/*.props/*.targets are excluded; justify single-line package entries by character width, never by formatter exemption
+- [Repo-wide csharpier format breaks zero-diff ACs](csharpier-repowide-format-breaks-zero-diff-acs.md) — scope the mutating pass to the plan's own path list; keep `check .` read-only; re-verify the zero-line diff AFTER formatting
+- [#503 ribbon readiness plan seams](project_503_ribbon_readiness_plan_seams.md) — RibbonViewer 487/500 forces a 26-member region move; 6+4 Compile entries; compile-time red + dossier; #504-#508 already promoted
 - [CSharpier gate: format not pipe-files](csharpier-format-not-pipe-files-gate.md) — formatting tasks must use `csharpier format` + scoped `csharpier check` exit 0; `pipe-files` is stdout-only/non-enforcing and masked a 500-line overflow in #400
 - [#400 partial-class headroom placement](project_400_partial_class_headroom_placement.md) — put new coverage cases in existing `.Part2.cs` `[TestClass] partial` files to keep the 17-class filter/count assertions stable
 - [Manager AsyncLazy shared seam](project_manager_asynclazy_shared_seam.md) — Globals.AF.Manager is shared across all classifier subsystems; use a key-specific accessor, never retype the dictionary value for one key

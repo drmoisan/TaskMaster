@@ -25,3 +25,4 @@
 - [efcviewer-breadcrumb-webview2-349](project_efcviewer_breadcrumb_webview2_349.md) — #349 (epic child 9102): EfcViewer3 dead; no JS<->.NET bridge precedent in repo; percent defect = unscaled ColumnHeader widths at high-DPI design scale (2026-07-16)
 - [svgcontrol-test-unwired-418](project_svgcontrol_test_unwired_418.md) — #418: SVGControl.Test absent from the .sln and its pinned test packages missing, so it cannot build; ExCSS 4.2.3-vs-4.3.1 redirect topology; Fizzler redirects inert (2026-08-04)
 - [winforms-pump-seam-230](project_winforms_pump_seam_230.md) — #230: WinFormsPumpHost design decided; CreateAsync factory-seam gap; InitializeWebViewAsync stays exempt; 19 -> 11 max (2026-08-07)
+- [ribbon-engine-readiness-503](project_ribbon_engine_readiness_503.md) — #503: whole TaskMaster Ribbon layer is coverage-excluded; net481 blocks default interface members; 5 orphan onAction callbacks in RibbonExplorer.xml (2026-08-08)
