@@ -20,7 +20,7 @@ namespace QuickFiler.Viewers
     }
 
     /// <summary>Owns shared popup-open generation, cancellation, and owner scheduling.</summary>
-    internal sealed class BreadcrumbDropDownOpenLifetime : IDisposable
+    internal sealed partial class BreadcrumbDropDownOpenLifetime : IDisposable
     {
         private readonly object _sync = new object();
         private readonly BreadcrumbDropDownHost _host;
@@ -44,7 +44,8 @@ namespace QuickFiler.Viewers
         internal Task<bool> OpenAsync(
             Rectangle anchorScreenBounds,
             Rectangle workingArea,
-            Size desiredSize
+            Size desiredSize,
+            bool takeFocus
         )
         {
             TaskCompletionSource<bool> completion,
@@ -64,7 +65,7 @@ namespace QuickFiler.Viewers
             canceled.TrySetResult(true);
 
             Task<Task<bool>> kickoff = RunOnOwnerAsync(() =>
-                OpenCoreAsync(anchorScreenBounds, workingArea, desiredSize, lease)
+                OpenCoreAsync(anchorScreenBounds, workingArea, desiredSize, lease, takeFocus)
             );
             _ = CompleteOpenAsync(kickoff, lease, completion);
             return completion.Task;
@@ -215,7 +216,8 @@ namespace QuickFiler.Viewers
             Rectangle anchorScreenBounds,
             Rectangle workingArea,
             Size desiredSize,
-            BreadcrumbDropDownOpenLease lease
+            BreadcrumbDropDownOpenLease lease,
+            bool takeFocus
         )
         {
             try
@@ -243,7 +245,7 @@ namespace QuickFiler.Viewers
                 if (!shown)
                     return false;
                 return await _uiOperations
-                    .RunAsync(() => FocusCurrentSurface(lease))
+                    .RunAsync(() => FocusCurrentSurface(lease, takeFocus))
                     .ConfigureAwait(false);
             }
             catch (Exception exception)
@@ -283,26 +285,6 @@ namespace QuickFiler.Viewers
                 );
             return true;
         }
-
-        private bool FocusCurrentSurface(BreadcrumbDropDownOpenLease lease) =>
-            RunIfCurrent(
-                lease,
-                () =>
-                {
-                    if (!_host.OpenState)
-                        return false;
-                    _host.FocusPending();
-                    return IsCurrent(lease) && _host.OpenState;
-                }
-            )
-            && RunIfCurrent(
-                lease,
-                () =>
-                {
-                    _host.LastInitializationException = null;
-                    return true;
-                }
-            );
 
         private async Task<bool> EnsureSurfaceAsync(BreadcrumbDropDownOpenLease lease)
         {

@@ -1,6 +1,7 @@
 # Atomic Executor Memory Index
 
 ## Plan validation & gates
+- [Verify line citations with numbered output](feedback_verify_line_citations_with_numbered_output.md) — never hand-count from a `sed` window; a wrong #438 advisory got applied and corrupted 3 correct citations in plan + spec
 - [Self-derived gate thresholds are blind](project_preflight_selfderived_gate_thresholds_are_blind.md) — a "count >= floor" gate whose floor comes from the runs it validates is deflation-blind + scope-incommensurable; use git-enumeration + `/ListTests` existence proofs
 - [Merge-base diff gates need a commit cadence](project_preflight_mergebase_diff_gates_need_commit_cadence.md) — `<MERGE_BASE>..HEAD` gates are vacuous while HEAD == merge-base and unsatisfiable once HEAD is ahead; on a later cycle scope-audit via `git show --numstat --format= HEAD`
 - [Inserted plan tasks force renumbering](project_plan_task_ids_digit_only_forces_renumbering.md) — suffixed IDs (`P3-T5a`) fail validation; say "insert + renumber downstream", then verify defs-vs-mentions mechanically
@@ -34,6 +35,8 @@
 - [Compile-time red needs body-level refs](project_compile_red_needs_body_level_references.md) — a missing type in a method SIGNATURE suppresses body binding, so an `[expect-fail]` task requiring N named CS0246s reports only 1; construct the types inline in test bodies
 
 ## Test execution & isolation
+- [Tests must mock GUI; no visible window](feedback_tests_must_mock_gui_no_visible_window.md) — user saw a window pop up during a QuickFiler.Test run; new tests must use headless seams (Mock<IItemViewer>, injected show/focus delegates, host-neutral types), never Form.Show/Application.Run
+- [WinFormsPumpHost tests are load-flaky](project_winformspumphost_tests_load_flaky.md) — QfcItemController_InitializationTests fail with "window handle has been created"/60s timeouts when the box is CPU-saturated; re-run when load drops, don't treat as a red baseline
 - [vstest /InIsolation + FilePathHelper serialization](project_vstest_isolation_and_filepathhelper_serialization.md) — Moq assemblies need /InIsolation (else STTE Setup FileNotFound); FilePathHelper.FilePath is "" default but null after JSON deserialize
 - [Invoke-MSTest.ps1 dies on a single test assembly](project_418_invoke_mstest_single_assembly_bug.md) — StrictMode + `.Count` on a scalar String throws before vstest runs; call vstest.console.exe directly with the script's arg list
 - [Timed-out MSTest leaves detached runner](project_timedout_mstest_leaves_detached_runner.md) — leaves a pwsh runner respawning testhosts → user.config hangs; kill the pwsh runner too, verify 0, rerun >=8min

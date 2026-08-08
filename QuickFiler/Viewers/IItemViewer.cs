@@ -88,6 +88,16 @@ namespace QuickFiler
         void SetFolderSelectedIndex(int index);
         void SetFolderSelectedItem(string item);
         void SetFolderDroppedDown(bool droppedDown);
+
+        // Additive intent member (#438): presents one folder-search result set. Replaces the
+        // controller's per-keystroke ClearFolderItems + SetFolderItems + SetFolderSelectedIndex +
+        // SetFolderDroppedDown composition, which opened the drop-down (stealing keyboard focus from
+        // the search textbox) and committed a mid-search folder selection on every keystroke. The
+        // rows are replaced, the selector is opened only if closed, and the first selectable row is
+        // highlighted pending-only — all without transferring focus. Additive alongside — not a
+        // replacement for — SetFolderDroppedDown(bool), which every explicit gesture still uses.
+        void PresentFolderSearchResults(string[] items);
+
         void ClearFolderItems();
         void FocusFolderDropDown();
         bool FolderContains(string item);

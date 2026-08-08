@@ -10,7 +10,7 @@ namespace QuickFiler.Viewers
     /// Owns host-neutral ItemViewer breadcrumb lifecycle state and exact event subscriptions.
     /// Native ItemViewer wrappers provide the WebView and WinForms operations as delegates.
     /// </summary>
-    internal sealed class BreadcrumbItemViewerLifecycleCoordinator : IDisposable
+    internal sealed partial class BreadcrumbItemViewerLifecycleCoordinator : IDisposable
     {
         private readonly BreadcrumbMessengerHub _hub;
         private readonly BreadcrumbCollapsedAttachment _collapsedAttachment;

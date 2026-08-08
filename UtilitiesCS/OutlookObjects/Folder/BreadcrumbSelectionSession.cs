@@ -83,7 +83,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
     /// Host-neutral selector session over stable row identities. Closed navigation commits directly;
     /// open navigation changes only pending state until commit or cancellation.
     /// </summary>
-    internal sealed class BreadcrumbSelectionSession
+    internal sealed partial class BreadcrumbSelectionSession
     {
         private readonly BreadcrumbStateModel _model;
 

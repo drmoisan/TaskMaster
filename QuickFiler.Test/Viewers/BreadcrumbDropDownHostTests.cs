@@ -15,7 +15,7 @@ namespace QuickFiler.Test.Viewers
 {
     /// <summary>Failure-first native drop-down ownership and focus contracts for issue #400.</summary>
     [TestClass]
-    public sealed class BreadcrumbDropDownHostTests
+    public sealed partial class BreadcrumbDropDownHostTests
     {
         [TestMethod]
         public void Constructor_OwnsAutoClosingToolStripDropDownWithoutGlobalTopmostForm()

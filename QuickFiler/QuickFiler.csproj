@@ -391,16 +391,20 @@
     </Compile>
     <Compile Include="Viewers\IItemViewer.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinator.cs" />
+    <Compile Include="Viewers\BreadcrumbBridgeCoordinator.Search.cs" />
     <Compile Include="Viewers\BreadcrumbCoordinatorUpgradeLifetime.cs" />
     <Compile Include="Viewers\BreadcrumbItemViewerLifecycleCoordinator.cs" />
+    <Compile Include="Viewers\BreadcrumbItemViewerLifecycleCoordinator.Search.cs" />
     <Compile Include="Viewers\BreadcrumbUiDispatcher.cs" />
     <Compile Include="Viewers\BreadcrumbPopupUiOperations.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenLifetime.cs" />
+    <Compile Include="Viewers\BreadcrumbDropDownOpenLifetime.Focus.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinator.cs" />
     <Compile Include="Viewers\BreadcrumbMessengerHub.cs" />
     <Compile Include="Viewers\BreadcrumbPopupPlacement.cs" />
     <Compile Include="Viewers\IBreadcrumbDropDownHost.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownHost.cs" />
+    <Compile Include="Viewers\BreadcrumbDropDownHost.Open.cs" />
     <Compile Include="Viewers\BreadcrumbCollapsedSurfaceController.cs" />
     <Compile Include="Viewers\BreadcrumbWebViewSurfaceFactory.cs" />
     <Compile Include="Viewers\IWebViewCoreInitializer.cs" />
