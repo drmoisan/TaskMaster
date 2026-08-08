@@ -8,43 +8,54 @@
 ## Story Statement
 
 - As a **wave-1 sibling child feature (F2–F15)**, I want an authoritative statement of which of my
-  assigned files are in my coverage target set and which sit on a ratified exemption, so that I can
-  state my own acceptance criteria without guessing whether a file such as `ItemViewer.Designer.cs`
-  belongs to me.
+  assigned files are in my coverage target set, which sit on a ratified exemption, and which have no
+  coverable lines at all, so that I can state my own acceptance criteria without guessing whether a
+  file such as `ItemViewer.Designer.cs` belongs to me.
 - As a **wave-1 sibling child feature**, I want each `[ExcludeFromCodeCoverage]` attribute on my
   assigned files to arrive with a `ratified` or `remove` disposition and a sequencing instruction,
   so that I neither leave an attribute on a testable seam nor remove one before the covering tests
   exist.
-- As the **F16 capstone**, I want one consistent per-file measurement produced by a single shared
-  harness, so that I can close issue #136 with numeric evidence rather than reconciling fifteen
-  independently built reports.
+- As the **F16 capstone**, I want one consistent per-file measurement of **both line and branch**
+  coverage produced by a single shared harness, so that I can close issue #136 with numeric evidence
+  rather than reconciling fifteen independently built reports.
+- As a **sibling that creates a production file mid-wave** (F2, F3, F7, F9, F11), I want the ledger
+  to carry the classification rules and not just the rows, so that I can classify and append a row
+  for a file that did not exist when the ledger was written, without re-running F1.
 - As the **maintainer reviewing a pull request**, I want every retained `[ExcludeFromCodeCoverage]`
   attribute and every `ratified-exempt` classification to carry an auditable rationale drawn from a
   closed set of grounds, so that I can judge each exemption in review instead of accepting it on
   assertion.
-- As the **maintainer**, I want the ledger's file list to be verified against
-  `QuickFiler/QuickFiler.csproj` by an automated test, so that a later change to the compiled surface
-  fails at the next toolchain run rather than silently invalidating fifteen downstream features.
+- As the **maintainer**, I want the ledger's file list to be verified for completeness against
+  `QuickFiler/QuickFiler.csproj` by an automated test, so that a compiled file with no ledger row
+  fails at the next toolchain run rather than silently invalidating fifteen downstream features —
+  while a sibling that adds a compiled file *and* its ledger row in the same change passes.
 
 ## Problem / Why
 
 Epic #136 requires that every production `.cs` file compiled by `QuickFiler/QuickFiler.csproj`
-reach at least 80% line coverage or sit on an explicitly ratified exemption ledger. Fifteen sibling
-child features are blocked on three shared prerequisites that must be settled exactly once:
+reach at least 80% line coverage and 75% branch coverage, or sit on an explicitly ratified exemption
+ledger, or be recorded as having no coverable lines at all. Fifteen sibling child features are
+blocked on three shared prerequisites that must be settled exactly once:
 
 1. **The denominator is undefined.** No authoritative per-file classification exists that says which
-   of the 121 compiled files are `testable` and which are `ratified-exempt`. Without it, a child
-   cannot state its own acceptance criteria, because it cannot tell whether a file such as
-   `ItemViewer.Designer.cs` is inside its target set.
+   compiled files are `testable`, which are `ratified-exempt`, and which are
+   `interface-only / not-measured`. Without it, a child cannot state its own acceptance criteria,
+   because it cannot tell whether a file such as `ItemViewer.Designer.cs` is inside its target set.
+   The denominator is also **dynamic**: it is the set of `<Compile Include=...>` entries in
+   `QuickFiler/QuickFiler.csproj` at evaluation time, and 121 is the count at authoring time rather
+   than a frozen list, because F2, F3, F7, F9, and F11 create production files during execution.
 2. **The existing `[ExcludeFromCodeCoverage]` attributes are unratified.** QuickFiler carries a
    population of these attributes that has never been judged against the irreducible-remainder
    standard. Per the epic manifest, an attribute sitting on a *testable* seam is a Blocking finding.
    Until each one has a recorded disposition, children would independently and inconsistently decide
    whether to remove or keep them, and would collide on shared configuration.
 3. **There is no per-file coverage measurement.** `scripts/vscode/Invoke-MSTestWithCoverage.ps1`
-   emits a Cobertura report, but nothing derives per-file line-coverage percentages from it. Fifteen
-   children each building their own reporting would produce fifteen inconsistent numbers and a
-   capstone (F16) that cannot close.
+   emits a Cobertura report, but nothing derives per-file line- or branch-coverage percentages from
+   it. Fifteen children each building their own reporting would produce fifteen inconsistent numbers
+   and a capstone (F16) that cannot close. The epic manifest makes the per-file line figure
+   (>= 80%) and the per-file branch figure (>= 75%) two independent gates and requires the shared
+   harness to emit both; F8 measured `EfcHomeController.Timing.cs` at 100% line and 66.67% branch,
+   passing one gate and failing the other.
 
 Aggregate assembly coverage does not satisfy issue #136, which measures success per production file.
 
@@ -63,8 +74,8 @@ obvious way would report a figure that neither its siblings nor the capstone cou
 - **Persona: a wave-1 sibling child feature (F2–F15), acting through its planner and executor.**
   - *Who:* one of fourteen parallel child features, each owning a disjoint set of compiled
     QuickFiler files ranging from 2 to 15 files.
-  - *What they care about:* knowing precisely which of their files must reach 80% line coverage, and
-    being able to prove they did.
+  - *What they care about:* knowing precisely which of their files must reach 80% line coverage and
+    75% branch coverage, and being able to prove they did.
   - *Constraints:* they cannot modify files owned by a sibling, cannot change repository-wide
     thresholds, and cannot re-legislate the CLAUDE.md / rules coverage-exemption reconciliation.
   - *Goals and frustrations:* a child that mis-reads the denominator either over-invests in
@@ -75,8 +86,8 @@ obvious way would report a figure that neither its siblings nor the capstone cou
 - **Scenario: F10 plans its coverage work for the `QfcItemController` partial family.**
   1. *Trigger:* F1 has merged; the epic orchestrator releases wave 1 and F10 begins research.
   2. F10 reads `docs/features/epics/quickfiler-per-file-coverage/coverage-ledger.md` and finds its
-     eleven assigned files, each classified `testable` or `ratified-exempt` with an owning child of
-     `F10`.
+     eleven assigned files, each classified `testable`, `ratified-exempt`, or
+     `interface-only / not-measured` with an owning child of `F10`.
   3. F10 finds 18 member-level `[ExcludeFromCodeCoverage]` dispositions across six of its files —
      not the six file-level exemptions the manifest's `[X]` markers implied. Each disposition is
      `ratified` with a rationale or `remove` with the instruction to write the covering tests first
@@ -87,8 +98,8 @@ obvious way would report a figure that neither its siblings nor the capstone cou
      lines would have entered the denominator immediately and the numerator only later, registering
      as a coverage regression for both the `QuickFiler` package and the repository.
   6. *Outcome:* F10 runs `scripts/vscode/Get-PerFileCoverage.ps1` against its own Cobertura output
-     and commits the per-file report under `<FEATURE>/evidence/qa-gates/` as numeric evidence for
-     each of its eleven files.
+     and commits the per-file report — carrying both a line and a branch percentage for each file —
+     under `<FEATURE>/evidence/qa-gates/` as numeric evidence for each of its eleven files.
 
 - **Persona: the F16 capstone.**
   - *Who:* the wave-2 verification gate that closes epic #136.
@@ -121,8 +132,11 @@ obvious way would report a figure that neither its siblings nor the capstone cou
   2. The maintainer opens `coverage-ledger.md`, locates the row by its repo-relative path, and reads
      the `exempt_ground` and rationale.
   3. *Decision point:* the ground must be one of `generated-designer`, `interface-only`, or
-     `irreducible-host-wiring`. For the third, the rationale must name the specific host dependency
-     that no interface seam, injectable delegate, or adapter can isolate.
+     `irreducible-host-wiring`. For `irreducible-host-wiring`, the rationale must name the specific
+     host dependency that no interface seam, injectable delegate, or adapter can isolate. A file
+     citing `interface-only` is not `ratified-exempt` at all — it belongs to the
+     `interface-only / not-measured` bucket, carries no `[ExcludeFromCodeCoverage]` attribute, and
+     must not be accompanied by shape-assertion tests written to manufacture coverage for it.
   4. *Outcome:* the maintainer either accepts the exemption on its stated ground or rejects it as a
      Blocking finding, in both cases from the diff alone.
 
@@ -150,13 +164,25 @@ each one. This document introduces no additional or conflicting criteria.
   not modified. The reconciliation between the CLAUDE.md § UT2 COM/VSTO/WinForms exemption and the
   `.claude/rules/general-unit-test.md` Coverage Exclusion Policy is already recorded in the epic
   manifest; this feature implements it.
-- **No change to repository-wide coverage thresholds**, and no adjudication of the tension between
-  the 80% floor in `CLAUDE.md` § UT2 and the 85% figure in `.claude/rules/general-unit-test.md`.
-  Epic #136's per-file target is unambiguously 80%.
+- **No change to repository-wide coverage thresholds**, and no adjudication of which figure applies
+  at which scope. The epic manifest's `## Coverage-Target Reconciliation` settles that once for the
+  epic: per production file, line >= 80% and branch >= 75%; files newly created by the epic, line
+  >= 90%; changed lines, no regression; repository-wide, retain or improve against the measured
+  baseline of 70.19% recorded in issue #424's evidence at the merge base. The absolute
+  repository-wide floors in `CLAUDE.md` § UT2 (80%) and `.claude/rules/general-unit-test.md` (85%)
+  remain the standing repository aspiration and are untouched. This feature implements that
+  reconciliation; it does not re-legislate it.
 - **No fix to the double-counted repository-wide `lines-valid` figure.** That defect in
   `Get-CoberturaCoverageSummary` is real and verified, but correcting it would perturb every existing
   gate and every committed evidence baseline. It is out of scope here and tracked at issue #441. The
-  new harness simply does not reproduce the defect in its own per-file computation.
+  new harness simply does not reproduce the defect in its own per-file computation. Issue #441 was
+  created directly with `gh issue create` rather than through the MCP promotion lifecycle the
+  manifest's `## Latent Defect Promotion` directs; the persistent issue exists, so no duplicate was
+  raised. The deviation is recorded in `spec.md` and in the ledger's notes.
+- **No edit to `QuickFiler/QuickFiler.csproj` or `UtilitiesCS/Properties/AssemblyInfo.cs`.** The
+  manifest records both as cross-child constraints. This feature adds no C# and no compiled file, so
+  it touches neither; its obligation is limited to recording the rules siblings must follow when they
+  do.
 - **No coverage of files that are not compiled.** `QuickFiler/Legacy/**`, `QuickFiler/Notes/**`, and
   the orphan viewer files that are absent from the csproj `<Compile>` list are outside the
   denominator. The seven attribute-carrying non-compiled files are recorded in the ledger's
