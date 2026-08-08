@@ -91,9 +91,9 @@ features:
 
 > **Issue-number back-fill status (2026-08-08).** `issue_num` values were placeholders at
 > manifest-authoring time and are replaced with the real GitHub issue number from each child's
-> promotion receipt as its preparation completes. Eight are now resolved — **432** (F1), **430**,
-> **431**, **433**, **434**, **435**, **436**, **437**. Eight remain placeholders in the `1009`-`1016`
-> range and belong to children still in preparation. Every `depends_on` edge on the wave-0 enabler
+> promotion receipt as its preparation completes. Nine are now resolved — **432** (F1), **430**,
+> **431**, **433**, **434**, **435**, **436**, **437**, **454**. Seven remain placeholders in the
+> `1009`-`1016` range and belong to children still in preparation. Every `depends_on` edge on the wave-0 enabler
 > now points at the real **432**. The manifest is committed in final resolved form, with no
 > placeholder remaining, before the kickoff artifact is written.
 
