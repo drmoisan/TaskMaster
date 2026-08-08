@@ -52,8 +52,8 @@ features:
   - issue_num: 454
     feature_folder: 2026-08-07-quickfiler-collection-controller-coverage-454
     depends_on: [432]
-  - issue_num: 1012
-    feature_folder: quickfiler-breadcrumb-bridge-coverage
+  - issue_num: 495
+    feature_folder: 2026-08-08-quickfiler-breadcrumb-bridge-coverage-495
     depends_on: [432]
   - issue_num: 455
     feature_folder: 2026-08-07-quickfiler-breadcrumb-dropdown-webview-coverage-455
@@ -77,7 +77,7 @@ features:
       - 452
       - 453
       - 454
-      - 1012
+      - 495
       - 455
       - 456
       - 1015
@@ -92,8 +92,9 @@ features:
 > **Issue-number back-fill status (2026-08-08).** `issue_num` values were placeholders at
 > manifest-authoring time and are replaced with the real GitHub issue number from each child's
 > promotion receipt as its preparation completes. Twelve are now resolved — **432** (F1), **430**,
-> **431**, **433**, **434**, **435**, **436**, **437**, **452**, **453**, **454**, **455**, **456**.
-> Three remain placeholders (F12, F15, F16), whose children are still in preparation and belong to children still in preparation. Every `depends_on` edge on the wave-0 enabler
+> **431**, **433**, **434**, **435**, **436**, **437**, **452**, **453**, **454**, **455**, **456**,
+> and **495** (F12, back-filled 2026-08-08 on completion of F12's preparation resume).
+> Two remain placeholders (F15, F16), whose children are still in preparation. Every `depends_on` edge on the wave-0 enabler
 > now points at the real **432**. The manifest is committed in final resolved form, with no
 > placeholder remaining, before the kickoff artifact is written.
 
@@ -1058,9 +1059,20 @@ wave-1 children:
   reconcile it against F4's plan first; if #426 is executed independently while F4 is in flight,
   expect a genuine semantic conflict rather than a merely textual one.
 
+- **#440** `Bug: breadcrumb-left-right-arrow-parent-child-navigation` (added 2026-08-08 from F12's
+  research) — open, **not yet promoted to an active feature folder**, which is why it was missed in
+  the initial survey and in the #426 back-fill. Its body names `BreadcrumbBridgeRouter` and
+  `BreadcrumbRow` on the Efc path and `BreadcrumbBridgeCoordinator` / `FolderBreadcrumbBridgeRouter`
+  on the Qfc path, so it collides with **two of F12's five files** and reaches F13/F14 breadcrumb
+  surfaces. It will rewrite the Left/Right arrow-key semantics that F12's coverage tests must pin.
+  **Rule for F12 and any sibling that meets it: tests pin current behavior, not corrected
+  behavior**, and cite #440 in the test doc comment so a future break is legible. Whoever schedules
+  #440 should expect to update those tests as part of the fix rather than treat them as a
+  regression.
+
 Note that a *promoted-but-not-yet-active* issue is invisible to a `docs/features/active/` scan. That
-is how #426 was missed at decomposition time. Children whose research touches an area should search
-open GitHub issues by keyword, not only the active feature folders.
+is how #426 and #440 were missed at decomposition time. Children whose research touches an area
+should search open GitHub issues by keyword, not only the active feature folders.
 
 Neither blocks planning. At execution time `epic-orchestrator` rebases the integration branch on
 `main` before each wave, and any conflict is handled by the child's own R1–R5 remediation loop per
