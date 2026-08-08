@@ -58,8 +58,8 @@ features:
   - issue_num: 455
     feature_folder: 2026-08-07-quickfiler-breadcrumb-dropdown-webview-coverage-455
     depends_on: [432]
-  - issue_num: 1014
-    feature_folder: quickfiler-itemviewer-coverage
+  - issue_num: 456
+    feature_folder: 2026-08-07-quickfiler-itemviewer-coverage-456
     depends_on: [432]
   - issue_num: 1015
     feature_folder: quickfiler-form-viewers-bayesian-coverage
@@ -79,7 +79,7 @@ features:
       - 454
       - 1012
       - 455
-      - 1014
+      - 456
       - 1015
 ---
 
@@ -92,8 +92,8 @@ features:
 > **Issue-number back-fill status (2026-08-08).** `issue_num` values were placeholders at
 > manifest-authoring time and are replaced with the real GitHub issue number from each child's
 > promotion receipt as its preparation completes. Twelve are now resolved — **432** (F1), **430**,
-> **431**, **433**, **434**, **435**, **436**, **437**, **452**, **453**, **454**, **455**. Four
-> remain placeholders in the `1012`-`1016` range and belong to children still in preparation. Every `depends_on` edge on the wave-0 enabler
+> **431**, **433**, **434**, **435**, **436**, **437**, **452**, **453**, **454**, **455**, **456**.
+> Three remain placeholders (F12, F15, F16), whose children are still in preparation and belong to children still in preparation. Every `depends_on` edge on the wave-0 enabler
 > now points at the real **432**. The manifest is committed in final resolved form, with no
 > placeholder remaining, before the kickoff artifact is written.
 
@@ -870,11 +870,25 @@ four conditions. F15 may do likewise for its designer-backed viewers.
 
 ## Epic Ruling: DEC-5 — a `measured-not-gated` disposition for generated files
 
-F9 also raised, correctly, that F1's three ledger buckets cannot express the state generated
-designer files land in under Approach A: **~99% line but capped near 50% branch by construction**,
-because generated control-tree initialization contains branches no test can meaningfully drive.
-Marking them `testable` makes the branch gate unsatisfiable; marking them `ratified-exempt` discards
-~2,000 legitimately covered lines from the totals.
+F9 raised that F1's three ledger buckets cannot express the state generated designer files land in
+under Approach A. F14 then disputed the framing, and **F14 is substantially right**, so the
+rationale below is corrected from F9's original.
+
+`epic-planner` measured the actual branch surface. A designer file carries exactly **one** branching
+line — `ItemViewerExpanded.Designer.cs` (612 lines) and `BayesianPerformanceViewer.Designer.cs`
+(350 lines) each have a single `branch="True"` line carrying four conditions, of which two are
+covered, giving the 50% figure. This is a lone generated construct, typically the `Dispose` null
+check — not a broad structural branch deficit as F9's "capped near 50% by construction" implied.
+
+F14's decisive point stands on measurement: **removing the type-level attribute improves repository
+coverage by +0.57 pp, while exempting the designer costs −0.16 pp**, because `InitializeComponent()`
+is branch-free across thousands of lines and one construction covers ~99.95% of it. **Generated
+designer files are therefore NOT `ratified-exempt`**, correcting this manifest's own earlier
+ground-1 classification of them as exempt-candidates. Exempting them destroys real, freely-obtained
+coverage.
+
+What remains unresolvable is only the branch gate on that single generated line, which no test can
+meaningfully drive.
 
 **Ruling: add a fourth ledger disposition, `measured-not-gated`,** for generated
 `*.Designer.cs` and generated `Properties/` files. Such files:
@@ -888,6 +902,17 @@ This is distinct from `interface-only / not-measured`, which has no denominator 
 files have a real denominator and a real, useful numerator — they simply are not code this epic
 authored or controls. F16 verifies that every `measured-not-gated` row is genuinely generated code
 and not a testable file parked in a convenient bucket.
+
+### Zero-branch files report N/A, never 0% — binding on F1
+
+F14 raised this as a blocking requirement and it is correct. This manifest previously stated the
+N/A rule only for the **line** denominator. It applies identically to branches:
+
+**A file whose `branches-valid` is 0 reports branch coverage as `N/A`, never `0%`, and never counts
+as a failure.** `ItemViewer.WebViewThread.cs`, `ItemViewer.Commands.cs`, and
+`ItemViewer.DisplayState.cs` contain no branch points at all and could not otherwise pass a 75%
+branch gate no matter how thoroughly tested. F1's harness must implement this, and F14's Phase 0
+carries a halt gate on it.
 
 ## Latent Defect Promotion
 
@@ -1019,8 +1044,9 @@ follow it rather than reaching into `UtilitiesCS` internals.
 Two QuickFiler features are active on `main` concurrently with this epic and touch files assigned to
 wave-1 children:
 
-- **#400** `2026-07-21-quickfiler-folder-selector-dropdown-400` — overlaps F13
-  (breadcrumb drop-down) territory.
+- **#400** `2026-07-21-quickfiler-folder-selector-dropdown-400` — overlaps **both F13 and F14**.
+  F14 established that #400's live remediation plan explicitly authorizes edits to
+  `ItemViewer.Breadcrumb.cs`, which is F14-owned; an earlier revision named only F13.
 - **#424** `2026-08-06-quickfiler-high-confidence-queue-init-stall-424` — overlaps F7
   (`QfcHomeController`) and possibly F2 (high-confidence queue admission) territory.
 - **#426** `Bug: emailmovemonitor-rejected-item-hook-retention` (added 2026-08-07 from F4's
