@@ -50,6 +50,14 @@ skip because they read as prose. Recompute all four of these mechanically at pre
    phase and re-add them. #452 claimed 293 with a per-phase breakdown summing to 299/308, and stated
    a branch-B Phase-2 figure of 21 against 17 actual tasks.
 4. **Per-phase task-range counts** — `last_id - first_id + 1` for each contiguous test block.
+5. **Declaration count vs execution count when a `[DataTestMethod]` is present.** Executions =
+   (plain `[TestMethod]` count) + (total `[DataRow]` count). The recurring error is adding the
+   DataRows to the *declaration* total instead of substituting for the one data-driven declaration.
+   #495 Phase 2 had 5 plain + 1 `[DataTestMethod]`×3 rows and claimed "6 declarations with 9
+   executions"; the true figure is 8 (6 + 3 instead of 5 + 3). The same plan's Phases 4 and 5 did
+   the substitution correctly, so a single phase can drift while its siblings are right — check
+   every phase independently, then re-add the Test Plan grand total. Blocking: the scoped-run task
+   asserts "N new executions passed" and vstest will report N−1.
 
 Counts inside a task body are blocking (the executor must record them in an evidence artifact a
 feature-reviewer later re-derives); counts in a summary section are still worth a delta because the
