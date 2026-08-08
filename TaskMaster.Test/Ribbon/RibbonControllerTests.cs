@@ -30,7 +30,7 @@ namespace TaskMaster.Test.Ribbon
     /// </summary>
     [DoNotParallelize]
     [TestClass]
-    public class RibbonControllerTests
+    public partial class RibbonControllerTests
     {
         private bool _originalModeEnabled;
         private double _originalThreshold;

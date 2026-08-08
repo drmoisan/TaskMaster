@@ -26,11 +26,14 @@ namespace TaskMaster
         /// <remarks>
         /// The readiness accessor is <c>() =&gt; Globals?.Engines</c>. The null-conditional is
         /// load-bearing: ribbon callbacks are reachable before <c>SetGlobals</c> has run, and the
-        /// gate must report "not ready" rather than throw. The existing
-        /// <c>RibbonController.Engines</c> property is deliberately NOT used as the accessor
-        /// because it is not null-safe on <c>Globals</c>. The readiness decision is likewise never
-        /// routed through <c>SB</c> / <c>Triage</c> / <c>TriageAsync</c>, whose getters install a
-        /// real <c>WindowsFormsSynchronizationContext</c> on the calling thread as a side effect.
+        /// gate must report "not ready" rather than throw. The accessor reads <c>Globals</c>
+        /// directly rather than going through the <c>RibbonController.Engines</c> property so that
+        /// the readiness decision stays independent of that property's implementation. (As of
+        /// issue #507 that property is itself null-safe — <c>Globals?.Engines</c> — so it would no
+        /// longer throw here; keeping the accessor direct is a deliberate decoupling, not a
+        /// workaround.) The readiness decision is likewise never routed through <c>SB</c> /
+        /// <c>Triage</c> / <c>TriageAsync</c>, whose getters install a real
+        /// <c>WindowsFormsSynchronizationContext</c> on the calling thread as a side effect.
         /// </remarks>
         private EngineGatedCommandRunner EngineCommands =>
             _engineCommandRunner ??= new EngineGatedCommandRunner(
