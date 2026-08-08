@@ -74,6 +74,13 @@ namespace TaskMaster
                 {
                     _currentStartupStageLabel = StartupStageLabels.Loading;
                     await _globals.LoadAsync(false);
+
+                    // Issue #503: this refresh is load-bearing, not cosmetic. Office caches each
+                    // getEnabled response per control until the add-in invalidates it, so without
+                    // this call the eight engine-backed buttons remain disabled for the whole
+                    // session even after AppItemEngines.InitAsync() has succeeded.
+                    _ribbonController.RefreshEngineCommands();
+
                     logger.Debug("Finished loading globals");
                     _currentStartupStageLabel = StartupStageLabels.PostLoad;
                     _startupPostLoadReached = true;

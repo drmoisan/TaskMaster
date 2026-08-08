@@ -2,6 +2,7 @@
 
 ## Plan validation & gates
 - [Self-derived gate thresholds are blind](project_preflight_selfderived_gate_thresholds_are_blind.md) — a "count >= floor" gate whose floor comes from the runs it validates is deflation-blind + scope-incommensurable; use git-enumeration + `/ListTests` existence proofs
+- [Merge-base diff gates need a commit cadence](project_preflight_mergebase_diff_gates_need_commit_cadence.md) — `<MERGE_BASE>..HEAD` gates are vacuous while HEAD == merge-base and unsatisfiable once HEAD is ahead; on a later cycle scope-audit via `git show --numstat --format= HEAD`
 - [Inserted plan tasks force renumbering](project_plan_task_ids_digit_only_forces_renumbering.md) — suffixed IDs (`P3-T5a`) fail validation; say "insert + renumber downstream", then verify defs-vs-mentions mechanically
 - [Plan rationale clauses are evidence](project_418_plan_rationale_clauses_are_evidence.md) — #418 needed 3 preflight passes; all blockers were unmeasured world-state claims in prose, never in the fix
 - [#418 500-line gate vs mandated plan content](project_418_500line_gate_vs_plan_content.md) — P1-T19 unsatisfiable (193 new lines into 146 headroom); per-block logging clauses block centralizing; delta = extract helpers to a new file
@@ -22,10 +23,15 @@
 - [Legacy csproj: no transitive compile refs](project_legacy_csproj_no_transitive_compile_refs.md) — non-SDK ProjectReference doesn't flow package types to csc (CS0012 despite copy-local DLL); tests need their own `<Reference>` + packages.config entry
 - [sln/csproj edits: preserve CRLF](project_sln_csproj_edit_crlf_preserve.md) — git-bash `sed -i` strips CRLF from TaskMaster.sln (churn + BOM loss); use Edit or `perl -0777` w/ explicit `\r\n`
 - [Incremental build makes a vacuous baseline](project_incremental_build_vacuous_baseline.md) — Invoke-VSBuild's /t:Build up-to-date check ignores /p: changes → EXIT 0 with 0 CoreCompile; add /t:Rebuild to enumerate diagnostics
+- [Nullable /t:Build gate is vacuous](project_nullable_build_gate_is_vacuous_incremental.md) — the standard nullable gate passes without type-checking; isolated `/t:Rebuild ... /p:BuildProjectReferences=false` exposed 223 errors (never add /p:OutputPath — it breaks ProjectReference resolution)
+- [CSharpier 1.3.0 formats XML at 100 cols](project_csharpier_formats_xml_print_width.md) — a "reformatting churn" finding on an XML resource can be formatter-mandated; measure line length + run repo-wide `check` before accepting it
+- [Evidence <TS> collision clobbers committed artifacts](project_evidence_timestamp_collision_clobbers_artifacts.md) — same-day remediation can silently overwrite implementation-cycle evidence; a ` M` under `evidence/` means clobber
 - [csharpier pipe-files is a non-enforcing gate](project_csharpier_pipefiles_nonenforcing_gate.md) — use `csharpier check`/`format`; tests balloon past 500 lines under genuine format (size new files AFTER format)
 - [PowerShell new files need UTF-8 BOM](powershell-bom-required.md) — PSScriptAnalyzer enforces PSUseBOMForUnicodeEncodedFile; prepend BOM after Write or restart the format loop
 - [poshqc Pester MCP exits -1](project_poshqc_pester_mcp_exit_minus1.md) — run_poshqc_test exits -1 (no detail) here; run it for the record, pair with direct Invoke-Pester (pwsh7) for the numeric proof
 - [BOM breaks grep ^ anchor](project_bom_grep_anchor_false_negative.md) — bash grep `^#nullable` misses BOM-prefixed files; use the Grep tool for opt-in classification, never bash grep
+
+- [Compile-time red needs body-level refs](project_compile_red_needs_body_level_references.md) — a missing type in a method SIGNATURE suppresses body binding, so an `[expect-fail]` task requiring N named CS0246s reports only 1; construct the types inline in test bodies
 
 ## Test execution & isolation
 - [vstest /InIsolation + FilePathHelper serialization](project_vstest_isolation_and_filepathhelper_serialization.md) — Moq assemblies need /InIsolation (else STTE Setup FileNotFound); FilePathHelper.FilePath is "" default but null after JSON deserialize

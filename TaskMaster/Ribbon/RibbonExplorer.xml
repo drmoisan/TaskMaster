@@ -100,12 +100,14 @@
             id="TrainSpam"
             imageMso="CancelAll"
             onAction="TrainSpam_Click"
+            getEnabled="EngineCommand_GetEnabled"
             label="Train Spam"
           />
           <button
             id="TrainHam"
             imageMso="ClickToRunEnableUpdates"
             onAction="TrainHam_Click"
+            getEnabled="EngineCommand_GetEnabled"
             label="Train Ham"
           />
           <menu id="OtherSpamActions" imageMso="AdministrationHome" label="Other" size="normal">
@@ -151,6 +153,7 @@
               id="TestSpam"
               imageMso="CalculateNow"
               onAction="TestSpam_Click"
+              getEnabled="EngineCommand_GetEnabled"
               label="Test Spam"
             />
             <button
@@ -442,20 +445,37 @@
           </menu>
         </group>
         <group id="TriageGroup" imageMso="Filter" label="Triage">
-          <button id="TriageSetA" onAction="TriageSetA_Click" label="Set A" />
-          <button id="TriageSetB" onAction="TriageSetB_Click" label="Set B" />
-          <button id="TriageSetC" onAction="TriageSetC_Click" label="Set C" />
+          <button
+            id="TriageSetA"
+            onAction="TriageSetA_Click"
+            getEnabled="EngineCommand_GetEnabled"
+            label="Set A"
+          />
+          <button
+            id="TriageSetB"
+            onAction="TriageSetB_Click"
+            getEnabled="EngineCommand_GetEnabled"
+            label="Set B"
+          />
+          <button
+            id="TriageSetC"
+            onAction="TriageSetC_Click"
+            getEnabled="EngineCommand_GetEnabled"
+            label="Set C"
+          />
           <menu id="OtherTriageActions" label="Other" size="normal">
             <button
               id="FilterTriageGroup"
               imageMso="Filter"
               onAction="FilterViewer_Click"
+              getEnabled="EngineCommand_GetEnabled"
               label="Filter"
             />
             <button
               id="ClearTriage"
               imageMso="Clear"
               onAction="ClearTriage_Click"
+              getEnabled="EngineCommand_GetEnabled"
               label="Clear Triage Field"
             />
             <button
