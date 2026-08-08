@@ -37,8 +37,8 @@ features:
   - issue_num: 1006
     feature_folder: quickfiler-qfc-form-explorer-controller-coverage
     depends_on: [1001]
-  - issue_num: 1007
-    feature_folder: quickfiler-qfc-home-controller-coverage
+  - issue_num: 433
+    feature_folder: 2026-08-07-quickfiler-qfc-home-controller-coverage-433
     depends_on: [1001]
   - issue_num: 437
     feature_folder: 2026-08-07-quickfiler-efc-home-controller-coverage-437
@@ -72,7 +72,7 @@ features:
       - 1004
       - 1005
       - 1006
-      - 1007
+      - 433
       - 437
       - 1009
       - 1010
@@ -472,6 +472,63 @@ Bands use the `model_policy` scale in `config/orchestration-routing.json`.
 | F14 | C3 | Form-derived viewer partials; STA last-resort determination and seam extraction across the WebView thread boundary. |
 | F15 | C2 | Small testable surface; the bulk is generated designer code resolved by ledger classification rather than by refactor. |
 | F16 | C3 | Repository-wide verification gate closing all eight acceptance criteria with numeric per-file evidence. |
+
+## Coverage-Target Reconciliation (authoritative for this epic)
+
+Three documents state different coverage numbers, and F7's research established that the
+repository baseline sits below all of them: issue #424's evidence recorded a **merge-base
+repository line rate of 70.19%**. No child can satisfy an absolute repository-wide floor on its
+own, so the targets are reconciled here once. This is a reconciliation of which number gates
+which scope — **not a waiver of any policy**.
+
+| Scope | Target | Source |
+| --- | --- | --- |
+| Per production file, line | **>= 80%** | Issue #136 AC1 — the operative acceptance bar for this epic |
+| Per production file, branch | **>= 75%** | `.claude/rules/general-unit-test.md` — the only branch figure stated anywhere |
+| Files newly created by this epic, line | **>= 90%** | `CLAUDE.md` §UT2 new-module rule |
+| Changed lines | **No regression** | `CLAUDE.md` §UT2 and `.claude/rules/general-unit-test.md` |
+| Repository-wide | **Retain or improve against the measured baseline** | Issue #136 AC8 |
+
+The repository-wide row is the one that needed a decision. Issue #136's own acceptance criterion
+reads "Repository-wide coverage expectations are **retained or improved**" — retained, not met. The
+absolute repository-wide floors in `CLAUDE.md` (80%) and `.claude/rules/general-unit-test.md` (85%)
+remain the standing repository aspiration and are untouched by this epic; they are simply not the
+per-child gate here, because the baseline was already below them before this epic began and gating
+every child on a pre-existing shortfall would make the epic unexecutable. Each child measures
+repository-wide coverage before and after and must not reduce it.
+
+Note that the 80% per-file line figure and the 75% branch figure are independent gates. F8 found
+`EfcHomeController.Timing.cs` at 100% line and 66.67% branch — passing one and failing the other.
+Report both.
+
+## Mid-Wave File Creation and the Ledger Denominator
+
+F7 identified a gap that would otherwise surface only as a capstone failure. F1 authors its ledger
+against the 121 files compiled today, but several children **create new production files** during
+execution, after the ledger exists:
+
+- F2 — `QfcQueue.cs` (610 lines) partial split
+- F3 — two K1 seam files
+- F7 — `QfcHomeController.Properties.cs` (the split is mandatory, not optional: the file is at 487 of
+  a 500-line limit and the minimum seam set projects it to ~502)
+- F9, F11 — `EfcFormController.cs`, `EfcItemController.cs`, `QfcCollectionController.cs` splits
+
+Rules that close the gap:
+
+1. **The denominator is dynamic.** The coverage denominator is the set of `<Compile Include=...>`
+   entries in `QuickFiler/QuickFiler.csproj` **at evaluation time** — never a frozen 121-file list.
+2. **The ledger carries rules, not just rows.** F1's ledger must state the classification rules
+   (the three exemption grounds) so a file that did not exist at authoring time can still be
+   classified without re-running F1.
+3. **Creating child appends its own row.** Any child that adds a production file appends a ledger
+   row for it in the same change that adds the `<Compile Include>` entry. Like the csproj, the
+   ledger is therefore an additive shared file; fan-in conflicts on it are expected and resolved by
+   keeping both sides.
+4. **New files default to `testable` at >= 90%.** A file extracted from existing code is new
+   production code and takes the `CLAUDE.md` new-module target. Claiming `ratified-exempt` for a
+   newly created file requires a rationale meeting one of the three grounds.
+5. **F16 re-derives and reconciles.** The capstone recomputes the denominator from the csproj and
+   fails if any compiled file lacks a ledger row.
 
 ## Cross-Child Constraints Discovered During Preparation
 
