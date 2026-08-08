@@ -34,8 +34,8 @@ features:
   - issue_num: 436
     feature_folder: 2026-08-07-quickfiler-datamodel-coverage-436
     depends_on: [1001]
-  - issue_num: 1006
-    feature_folder: quickfiler-qfc-form-explorer-controller-coverage
+  - issue_num: 435
+    feature_folder: 2026-08-07-quickfiler-qfc-form-explorer-controller-coverage-435
     depends_on: [1001]
   - issue_num: 433
     feature_folder: 2026-08-07-quickfiler-qfc-home-controller-coverage-433
@@ -71,7 +71,7 @@ features:
       - 430
       - 434
       - 436
-      - 1006
+      - 435
       - 433
       - 437
       - 1009
@@ -590,6 +590,48 @@ attribute.** F14's `ItemViewer` family is the other instance: one attribute on `
 suppresses six files. Note that a partial type may be annotated only once; annotating two parts is
 CS0579.
 
+## Epic Ruling: delete the dead region in `QfcExplorerController.cs` (F6)
+
+F6 escalated an open decision. `QfcExplorerController.cs` cannot reach the 80% line floor while
+`#region Email Sorting To Rewrite` remains: roughly 50-60 uncoverable statements against 60 live
+ones. F6 had routed the deletion to issue **#449** to avoid two children editing one file, which
+left the floor unreachable and pushed the shortfall to a ledger exemption.
+
+**Ruling: the deletion belongs in F6.** `epic-planner` verified the region independently before
+deciding:
+
+- It spans **lines 183-321 of a 323-line file** — 43% of the file.
+- Every reference to its six members occurs between lines 185 and 278, i.e. **entirely inside the
+  region**. Nothing in lines 1-182 touches it.
+- Five of the six members are `private static` and so are unreachable from any other file by
+  construction. The sixth, `internal static StripTabsCrLf`, is referenced only at lines 193 and 264,
+  both inside the region, and nowhere else in `QuickFiler/` or `QuickFiler.Test/`.
+- The same-named methods found elsewhere in the solution belong to different types in
+  `UtilitiesCS.EmailIntelligence` and `ToDoModel`, not to this controller. The region is a
+  superseded duplicate, consistent with its own "To Rewrite" name.
+
+The region is therefore a self-contained island of unreachable code. Three reasons decide it:
+
+1. **No sibling contention exists.** `QfcExplorerController.cs` is F6's exclusive assignment, and
+   #449 is an issue F6 itself filed — not a child of this epic. The "two children editing one file"
+   risk that motivated the deferral does not apply.
+2. **Policy prefers the refactor.** `.claude/rules/general-unit-test.md` states the correct response
+   to untestable lines is to refactor, not exclude. Deleting unreachable code is the cleanest
+   available refactor.
+3. **It preserves behavior.** Removing code that nothing can call satisfies the epic's
+   no-behavior-change NFR.
+
+The alternative — ratifying an exemption for code everyone agrees should be deleted — is exactly the
+"exempt rather than fix" pattern this epic's policy reconciliation rejects, and would set a poor
+precedent for the fifteen other children.
+
+**Consequences.** F6's approved plan currently routes the deletion away and must be revised to add a
+deletion phase before the coverage phases; the plan-path is otherwise unchanged and the revision
+re-runs the normal planner/executor preflight cycle. Issue **#449** narrows to its two remaining
+findings — `ExplConvView_Cleanup` throwing on a public interface member, and `OpenQFItem`
+re-resolving the explorer. `OOS-7` in F6's `spec.md` and `open_risk_for_epic_planner` in its
+checkpoint are resolved by this ruling.
+
 ## Latent Defect Promotion
 
 Preparation research surfaces real defects that are out of scope to fix under the epic's
@@ -670,6 +712,19 @@ Expect merge conflicts on this file during execution fan-in. They are additive o
 the correct resolution is nearly always to keep both sets of entries. This is handled by the
 child's own R1-R5 remediation loop per the `epic-orchestrate` skill; it is not a decomposition
 defect and must not be treated as one.
+
+### 1b. `QuickFiler.Test.csproj` is the larger shared-file surface
+
+F6 identified a shared file the original decomposition did not assign, and it is a bigger conflict
+surface than the production csproj. `QuickFiler.Test/QuickFiler.Test.csproj` is also a non-SDK
+project — `<Project ToolsVersion="15.0" xmlns="...">` — with **107 explicit `<Compile Include>`
+entries and no globbing**. Verified directly.
+
+Every child in this epic adds test files, so **every child must edit it**, whereas only the subset
+that creates production files touches `QuickFiler.csproj`. F6 alone adds 31 entries. The same rules
+apply: own entries only, minimal adjacent hunks, preserve CRLF, and expect additive fan-in conflicts
+resolved by keeping both sides. Neither csproj is owned by any child; both are shared infrastructure
+that this epic edits by necessity.
 
 ### 2. `QuickFiler.Test` has no `InternalsVisibleTo` grant from `UtilitiesCS`
 
