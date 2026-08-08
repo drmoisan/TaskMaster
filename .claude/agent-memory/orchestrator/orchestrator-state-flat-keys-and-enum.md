@@ -26,6 +26,11 @@ source is `extensions/drm-copilot/src/lib/validate/orchestrator-state-core.ts`
 
 **How to apply:** In preparation-mode epic-child runs (and any orchestrator run), the checkpoint also
 needs `complexity_assessments[]` + `model_routing_receipts[]` populated for every delegated agent to
-pass `require_model_routing=true`. In this repo `config/orchestration-routing.json` has
-`fable_policy: "available"`, so C3 -> opus for all agents (base `complexity_to_model` table, no clamp,
-no overlay). See [[orchestrator-state-validator-divergence]] and [[pr-author-hook-blocks-gh-in-this-repo]].
+pass `require_model_routing=true`. Read `fable_policy` from `config/orchestration-routing.json` each
+time — it has changed (it read `available` in early 2026-07, `preferred` by 2026-08-08) and a session
+directive can override the file. Resolution: `disabled` clamps a `fable` cell to `opus` and records
+`clamped_from: "fable"`; `available` uses the base `complexity_to_model` table as-is (C3 -> opus);
+`preferred` redirects ONLY the C3 cell to `fable` and ONLY for `atomic-planner`, `prd-feature`,
+`feature-review`, `task-researcher` — `atomic-executor` and `pr-author` stay at `opus` on C3 under
+every policy. See [[orchestrator-state-validator-divergence]], [[pr-author-hook-blocks-gh-in-this-repo]],
+and [[model-routing-scripts-absent-on-epic-integration-base]].
