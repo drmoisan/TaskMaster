@@ -31,5 +31,12 @@
 
 - [efc-home-controller-deps-437](project_efc_home_controller_deps_437.md) — #437/epic #136 F8: dep files already ~86-93% covered (class name != file name); F9 consumes nothing from them; Production* statics vs ClassLevel parallelism hazard (2026-08-07)
 - [svgcontrol-test-unwired-418](project_svgcontrol_test_unwired_418.md) — #418: SVGControl.Test absent from the .sln and its pinned test packages missing, so it cannot build; ExCSS 4.2.3-vs-4.3.1 redirect topology; Fizzler redirects inert (2026-08-04)
+- [qfc-home-controller-metrics-433](project_qfc_home_controller_metrics_433.md) — #433/epic #136 F7: BlockingCollection can't throw OCE with an uncancelled token; QFC metrics consumer never runs (dead CompareExchange + unstarted timer); Efc delegate-writer precedent; #424 didn't touch the Metrics partial (2026-08-07)
+- [qfc-home-controller-iteration-433](project_qfc_home_controller_iteration_433.md) — #433 F7: #424's 12s deadline leaked into the 2-arg dequeue, so empty-batch => irreversible CompleteAdding is now unsound; Iterate/Iterate2 dead (2026-08-07)
+- [qfc-home-controller-coverage-433](project_qfc_home_controller_coverage_433.md) — #433/epic #136 F7 main partial: coverage-check BOTH halves before splitting; line 133 live-form is what makes line 136 work; LaunchAsync is 0% structurally; derive hit maps from committed Cobertura (2026-08-07)
+- [quickfiler-interface-only-files-433](project_quickfiler_interface_only_files_433.md) — interface-only .cs emit NO Cobertura class entry (MailItemActionsAdapter = positive control); net481+preview still bars DIM; IQfcHomeController.cs exists twice (one orphan); EfcHomeController throws on 3 IFilerHomeController members (2026-08-07)
+
+## Additional entries
+
 - [efc-home-controller-coverage-437](project_efc_home_controller_coverage_437.md) — #437 (epic #136 F8): family already ~90% covered and fully seamed; Timing.cs reads NO clock; dual default-factory lambdas make coverage order-dependent (2026-08-07)
 - [quickfiler-percoverage-epic-136](project_quickfiler_percoverage_epic_136.md) — epic #136: read exact per-file line-rate from committed Cobertura under evidence/qa-gates/ instead of assuming low coverage (2026-08-07)
