@@ -7,6 +7,8 @@
 - [Research claims as acceptance clauses](research-claims-as-acceptance-clauses.md) — never encode an unmeasured third-party null-vs-throw claim as a literal AC clause; #418 §1.4 empty-bytes claim cost a revision pass
 - [Enumerate condition outcomes before the case list](enumerate-condition-outcomes-before-case-list.md) — 100% branch-rate tasks: 2 outcomes per condition in every ||/&& clause; a null-pairing guard needs all four orderings, not three
 - [Named coverage exception: verify the member body](named-coverage-exception-verify-member-body.md) — read the member before writing "untestable branch"; put gap-closure BEFORE the toolchain-clean-pass task; pin line-rate vs branch-rate
+- [Seam default CS0236 + intermediate consumers](csharp-seam-default-cs0236-and-intermediate-consumers.md) — a delegate-seam default capturing `_field` in a property initializer is CS0236 (use backing field + lazy default); extraction rewires must check lines BETWEEN the call sites for pre-transform consumers
+- [AC source sweep: Definition of Done](ac-source-sweep-definition-of-done.md) — every AC needs a verification task, and spec.md's `## Definition of Done` checkboxes are AC-source too (`## Seeded Test Conditions` are not)
 
 - [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/
 - [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — obj/ cache filenames outlive tear-down commits; verify project/source files with git ls-files or a glob before writing an existence claim into acceptance text
@@ -35,5 +37,7 @@
 - [Coverage threshold conflict: CLAUDE.md vs general-unit-test.md](project_coverage_threshold_conflict_claude_md_vs_general_unit_test.md) — 80/90 vs 85/75; repo baseline 70.19/58.30 → repo-wide figure reported non-blocking on fixes (#424 precedent), change-scoped gates blocking
 - [Planner may lack the MCP plan validator](project_planner_mcp_validator_not_in_tool_surface.md) — file-only tool surface (no Bash/no mcp__drm-copilot__*); never claim the gate passed, report VALIDATOR NOT RUN + structural self-check
 - [#349 breadcrumb plan seams](project_349_efcviewer_breadcrumb_plan_seams.md) — P0-T6 halt-gate on 9101 provider; evidence/repro/ authorized; EfcViewer3 mechanical swap only; Newtonsoft in UtilitiesCS only
+- [#136 wave-1 non-halting F1 dependency](project_136_wave1_nonhalting_f1_dependency.md) — F1 ledger/harness absent at planning time is by design; write it as an execution-time read, never a preflight-evaluable gate
+- [#433 F7 QfcHomeController plan seams](project_433_f7_qfchomecontroller_plan_seams.md) — partial split before seams (487+15>500); `:133`/`:136` viewer/scheduler coupling; 5 frozen #424 test files; QuickFiler.Test.csproj wiring
 - [#424 QuickFiler deadline plan seams](project_424_quickfiler_deadline_plan_seams.md) — 12s const; Part2 partial no-[TestClass]; overload migration breaks loose-mock Setup/Verify (Issue218 "dormant" misclassification); grep old overload shape in ALL test files
 - [vstest scoped-run + csharpier 1.2.6 commands](reference_vstest_scoped_run_command.md) — vswhere-resolved vstest.console.exe + /InIsolation + /TestCaseFilter (join `|`); every run task needs an explicit command; csharpier needs format/check subcommands

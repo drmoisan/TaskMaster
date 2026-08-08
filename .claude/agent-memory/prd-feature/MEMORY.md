@@ -2,3 +2,4 @@
 - [Promotion scaffold metadata defects](project_promotion_scaffold_metadata_defects.md) — fix Status folder path and Last Updated date in scaffolded issue.md before filling docs
 - [Test disposition: grep for old-overload pins](feedback_test_disposition_overload_pins.md) — grep test project for Setup/Verify of retired overloads before marking any test file "unchanged"; loose mocks fail at run time
 - [AC gates: verify satisfiability + fresh reads](feedback_ac_gates_verify_satisfiability.md) — check baseline evidence before encoding repo-wide coverage floors as blocking AC; re-read spec from disk before reporting tallies
+- [Interface files are zero-denominator for coverage](reference_interface_files_zero_coverage_denominator.md) — reusable 3-proof argument (no body / net48 no DIM / no Cobertura class element) + why shape tests are rejected
