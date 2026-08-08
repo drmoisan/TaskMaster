@@ -1,6 +1,6 @@
 ---
 name: promotion-scaffold-metadata-defects
-description: Promotion tooling scaffolds issue.md with a Status path missing the date prefix and -NNN issue suffix, and sometimes a wrong Last Updated date — verify and fix both when filling feature docs
+description: Promotion tooling scaffolds issue.md with a Status path missing the date prefix and -NNN issue suffix, a wrong Last Updated date, and AC checkboxes shredded by line-wrap — verify and fix all three when filling feature docs
 metadata:
   type: project
 ---
@@ -9,6 +9,8 @@ The feature-promotion scaffold can emit `issue.md` metadata defects that the prd
 
 - `- Status: Promoted -> docs/features/active/<slug>/` omitting the `YYYY-MM-DD-` prefix and `-<issue#>` suffix of the actual active folder (seen on issue #424, 2026-08-06).
 - `- Last Updated:` dated in the future relative to the current date (424 scaffold said 2026-08-07 on 2026-08-06).
+- **Shredded checkboxes.** When the scaffold copies a wrapped `- [ ]` item from `issue.md` into `spec.md` / `user-story.md`, each wrapped continuation line becomes its own `- [ ]`. Seen on issue #430 (2026-08-07): 7 draft AC in `issue.md` became 13 bogus checkboxes in `user-story.md` and 7 in the spec's "Seeded Test Conditions". Rewrite them as whole criteria; never leave a half-sentence checkbox.
+- **Definition of Done checkboxes inflate AC tallies.** The `spec.md` template ships `## Definition of Done` as `- [ ]` items, which a naive count conflates with the real AC. Convert that section to a numbered non-checkbox list and state that the `## Acceptance Criteria` block is authoritative, so `grep '^- \[ \]'` on each AC source returns exactly the AC count.
 
 **Why:** The delegating orchestrator requires all paths/cross-references to use the canonical issue number and folder name; stale scaffold metadata would fail review.
 
