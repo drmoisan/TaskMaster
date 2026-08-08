@@ -13,6 +13,8 @@ Two defect classes cost a full preflight iteration on #435 F6 (531-task plan). B
 **2. Aggregate claims silently rot when a later delta adds tasks.**
 Three separate counts went stale in one round: the "exactly four authorized conditional branches" inventory missed a fifth branch spanning three tasks ([P0-T12]/[P11-T1]/[P11-T2]); the Test Plan said "eleven `.PartN.cs`" and "eleven base `[TestClass]`" after a sizing delta made it 17 and 12; the Notes said "split nine fixtures into twenty-six files" when it was twelve into twenty-nine. Derived downstream figures (31 total, 31 csproj lines) were already right, which is what hid the errors.
 
+**3. Evidence roll-up inventories rot the same way.** On #497 (164-task plan), a delta added a PowerShell baseline task ([P0-T22]) and a final-pass PowerShell coverage task ([P13-T10]), but the `## Test Plan` -> **Coverage evidence** bullet list still enumerated only the pre-delta artifact set. Any delta that adds an artifact-producing task must also extend the artifact roll-up, with the producing task ID beside each path.
+
 **Why:** The plan validator counts task IDs and phase headings; it never cross-checks prose against the task list. A stale inventory or an unsatisfiable acceptance clause routes the executor into a state with no legal exit, which surfaces only at preflight — one full revision cycle late.
 
 **How to apply:** After writing or revising any plan, before returning it for preflight:

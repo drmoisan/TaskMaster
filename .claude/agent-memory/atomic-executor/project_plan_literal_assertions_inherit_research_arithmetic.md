@@ -55,5 +55,22 @@ Counts inside a task body are blocking (the executor must record them in an evid
 feature-reviewer later re-derives); counts in a summary section are still worth a delta because the
 fix is one token.
 
+**Third class: cross-document count sweeps.** When a wrong count word (sibling count, child count,
+file count) appears in the plan, it almost always also appears in `issue.md`, `spec.md`, and
+`user-story.md`, because all four were authored from the same research artifact. Raise the delta
+against *every* requirements source at once, not just the plan — otherwise the next preflight
+iteration reopens the same finding (#497 F16 capstone: `fourteen` -> `fifteen` needed three rounds
+because the first delta named only the plan).
+
+Two guards on such a sweep:
+
+1. **Protect homonymous numerics.** The same word can carry an unrelated meaning elsewhere in the
+   document — in #497, `fifteen-point improvement` (coverage points) and `fifteen children each said
+   they were done` sit next to the sibling-count uses. Name the protected `file:line` set in the
+   delta so the planner does not sweep them.
+2. **Verify the applied revision with `git diff -U0`,** not by re-reading prose. That shows in one
+   screen that the edit touched only the intended lines and left every AC line and checkbox state
+   untouched — which is exactly the invariant a count-sweep is most likely to break.
+
 Related: [[project_418_plan_rationale_clauses_are_evidence]],
 [[project_mstest_donotparallelize_overlaps_parallel_bucket]]

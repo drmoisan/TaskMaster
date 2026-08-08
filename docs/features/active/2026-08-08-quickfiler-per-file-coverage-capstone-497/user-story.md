@@ -22,9 +22,9 @@
 
 ## Problem / Why
 
-Fourteen sibling children each measure only their own assignment. That is the correct decomposition
+Fifteen sibling children each measure only their own assignment. That is the correct decomposition
 for parallel execution, and it is exactly why the epic cannot prove its own outcome. Five failure
-modes survive fourteen green merges:
+modes survive fifteen green merges:
 
 1. **A file assigned to nobody.** The ledger is authored against the 121 files compiled at planning
    time, but F2, F3, F7, F9, and F11 all add `<Compile Include>` entries mid-wave. A file created
@@ -56,7 +56,7 @@ once, at the end — which is what this capstone is.
   - Frustration: an epic that reports success by asserting it.
 
 - **Scenario: closing issue #136.**
-  - *Who acts:* `epic-orchestrator` runs F16 after all fourteen siblings have merged to the
+  - *Who acts:* `epic-orchestrator` runs F16 after all fifteen siblings have merged to the
     integration branch.
   - *Trigger:* wave 1 fan-in completes.
   - *Steps:* F16 confirms F1's ledger and harness exist on the branch; inspects the harness for the
@@ -64,7 +64,7 @@ once, at the end — which is what this capstone is.
     set from the csproj at that moment; captures repository-wide coverage; runs the full C#
     toolchain; captures repository-wide coverage again with the identical command; recomputes both
     figures from class-level `<line>` elements; reconciles every compiled file against the ledger;
-    re-runs the attribute census per type; audits the fourteen siblings for per-file research
+    re-runs the attribute census per type; audits the fifteen siblings for per-file research
     artifacts and atomic test steps; verifies the defect-promotion trail against the live issue
     index; then maps each of #136's eight criteria to the artifact that closes it.
   - *Obstacles and decisions:* F1's ledger may not carry a fourth-ground enum value for

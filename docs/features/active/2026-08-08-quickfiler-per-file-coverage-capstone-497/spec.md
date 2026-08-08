@@ -15,7 +15,7 @@
 Epic #136 brings every production `.cs` file compiled by `QuickFiler/QuickFiler.csproj` to at least
 80% line coverage, or onto an explicitly ratified exemption ledger, across fifteen sibling children.
 Nothing in that decomposition proves the result. Each child measures only its own assignment, so all
-of the following survive fourteen successful child merges undetected:
+of the following survive fifteen successful child merges undetected:
 
 - a compiled file assigned to no child, or created mid-wave after F1 authored its ledger;
 - an exemption granted on a ground that does not textually exist;
@@ -53,7 +53,7 @@ Its verification is mechanical and re-runnable, not a narrative assertion. It ve
 - `scripts/vscode/Get-PerFileCoverage.ps1` and `Get-PerFileCoverage.Helpers.ps1` — F1's harness.
 - `QuickFiler/**/*.cs` source, for the attribute census and the third-bucket screen.
 - `QuickFiler.Test/**/*.cs`, for the convention and determinism scans.
-- The fourteen sibling feature folders, for the AC2/AC3 per-file artifact audits.
+- The fifteen sibling feature folders, for the AC2/AC3 per-file artifact audits.
 - The GitHub issue index, for the defect-trail audit.
 
 **Outputs — all under `<FEATURE>/evidence/`, per `evidence-and-timestamp-conventions`:**
@@ -75,7 +75,11 @@ Repository-wide gate is *retain or improve*, not an absolute floor.
 
 ## API / CLI Surface
 
-No public API change. The capstone may add at most one PowerShell reconciliation script. Research
+No public API change. The capstone may add at most one PowerShell reconciliation tool — an entry-point
+script plus its dot-sourced `.Helpers.ps1` module, matching the repository's existing
+`Invoke-MSTestWithCoverage.ps1` / `.Helpers.ps1` and F1's `Get-PerFileCoverage.ps1` / `.Helpers.ps1`
+layout — within the `.claude/rules/powershell.md` budget of 2 production PowerShell files plus their
+tests. Research
 established that PowerShell is the only viable language (the repository has no Python CI job, no
 Python toolchain wiring, and no `.claude/rules/python.md`), that the script belongs at
 `scripts/vscode/<Name>.ps1`, and that its tests belong at `tests/scripts/vscode/<Name>.Tests.ps1`.
@@ -171,12 +175,15 @@ Recorded per the epic's instruction to plan against reality when research dispro
   secondary type only. It is *partially* suppressed and contributes **0** to the 24, not 1. A naive
   one-attribute-equals-one-file implementation computes 25 and then "corrects" the epic in the wrong
   direction. The census must be per-type, with a `21 + 5 + 7 = 33` partition cross-check.
-- **DEV-6 — the epic manifest still carries placeholder issue numbers.** F12, F15, and F16 read
-  `1012`, `1015`, `1016` in the YAML front matter against real numbers **495**, **496**, **497**.
-  F16's own `depends_on` list therefore names five issues that do not exist. Any epic-orchestrator
-  dependency gate keyed on `depends_on` will fail or silently skip. This is an epic-sequencing
-  finding for the manifest owner; F16 verifies the repair and does not perform it, because `epic.md`
-  is not a per-child owned file.
+- **DEV-6 — the epic manifest still carries one placeholder issue number.** Re-verified 2026-08-08:
+  F12 has been back-filled to **495** and F15 to **496**, and F16's own `depends_on` list now names
+  real issue numbers throughout, carrying no `1012`/`1015` entry. The sole remaining defect is F16's
+  own entry — `issue_num: 1016` against the real **497**, and
+  `feature_folder: quickfiler-per-file-coverage-capstone` against the real
+  `2026-08-08-quickfiler-per-file-coverage-capstone-497`. Any epic-orchestrator gate keyed on F16's
+  own manifest entry will fail or silently skip. This is an epic-sequencing finding for the manifest
+  owner; F16 verifies the repair and does not perform it, because `epic.md` is not a per-child owned
+  file.
 - **DEV-7 — AC2's per-file obligation for third-bucket files is unsettled.** F13 has 11 research
   artifacts against 15 assigned files; the four missing are all interface-only. F2, F3, F6, and F7
   all produced artifacts for their interface files, and F7 gave them their own plan phases. The

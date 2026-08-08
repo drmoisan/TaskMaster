@@ -19,7 +19,7 @@ Epic #136 brings every production `.cs` file compiled by `QuickFiler/QuickFiler.
 Nothing in that decomposition proves the result. Each child measures only its own assignment, so a
 compiled file assigned to no child, a file whose exemption was granted on a ground that does not
 exist, a file passing the line floor while failing the branch floor, or a repository-wide figure
-compared against an incompatible baseline would all survive fourteen successful child merges
+compared against an incompatible baseline would all survive fifteen successful child merges
 undetected.
 
 This capstone is the verification gate. It re-derives the coverage denominator from the csproj at

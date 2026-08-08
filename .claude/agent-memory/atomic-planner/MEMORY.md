@@ -13,6 +13,8 @@
 - [Per-phase size gates need a scoped csharpier](per-phase-size-gates-need-scoped-csharpier.md) — an interim 500-line gate measured before CSharpier runs is not load-bearing; same for any "byte-identical after CSharpier" clause
 - [Named coverage exception: verify the member body](named-coverage-exception-verify-member-body.md) — read the member before writing "untestable branch"; put gap-closure BEFORE the toolchain-clean-pass task; pin line-rate vs branch-rate
 - [Re-derive plan aggregate claims after every delta](plan-aggregate-claims-must-be-rederived-after-deltas.md) — stale branch/file counts and acceptance that only one arm can satisfy; validator never cross-checks prose against the task list
+- [Pre-applied deltas: reconcile to the stated wording](pre-applied-deltas-reconcile-to-stated-wording.md) — "already applied, just verify" often left the weaker phrasing (asserted vs re-derived); diff the sentence, not the number
+- [Numeric corrections must sweep all requirement docs](numeric-corrections-must-sweep-all-requirement-docs.md) — plan+spec is not enough; sweep issue.md and user-story.md too, but classify homonym numbers before replacing
 
 ## Additional entries
 
