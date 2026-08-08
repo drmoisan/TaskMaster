@@ -30,7 +30,7 @@
 - [BOM breaks grep ^ anchor](project_bom_grep_anchor_false_negative.md) — use the Grep tool, never bash grep, for anchored classification
 - [PowerShell new files need UTF-8 BOM](powershell-bom-required.md) — PSUseBOMForUnicodeEncodedFile; prepend BOM after Write
 - [poshqc Pester MCP exits -1](project_poshqc_pester_mcp_exit_minus1.md) — pair with a direct Invoke-Pester run for the numeric proof
-- [csharpier pipe-files is a non-enforcing gate](project_csharpier_pipefiles_nonenforcing_gate.md) — use `check`/`format`; size new files AFTER format
+- [csharpier pipe-files is a non-enforcing gate](project_csharpier_pipefiles_nonenforcing_gate.md) — use `check`/`format`; size AFTER format; post-deletion tolerances open downward
 
 ## Test execution and coverage measurement
 
@@ -93,4 +93,4 @@
 
 - [Preflight: probe mandated C# shapes with csc](project_preflight_csc_probe_for_mandated_csharp_shapes.md) — vswhere-resolved Roslyn csc on a scratchpad file proves a dictated construct compiles
 - [Preflight evidence fields need a token scan](project_preflight_evidence_field_token_scan.md) — prose "the `git diff ...` command" omits literal `Command:`; scan tokens + order, non-blocking
-- [Plan literals inherit research arithmetic errors](project_plan_literal_assertions_inherit_research_arithmetic.md) — recompute every quoted expected literal at preflight
+- [Plan literals inherit research arithmetic errors](project_plan_literal_assertions_inherit_research_arithmetic.md) — recompute every quoted literal, line-count projection, and "all N sites" count at preflight

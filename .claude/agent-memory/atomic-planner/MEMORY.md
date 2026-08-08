@@ -10,6 +10,7 @@
 - [Named coverage exception: verify the member body](named-coverage-exception-verify-member-body.md) — read the member before writing "untestable branch"; put gap-closure BEFORE the toolchain-clean-pass task; pin line-rate vs branch-rate
 - [Seam default CS0236 + intermediate consumers](csharp-seam-default-cs0236-and-intermediate-consumers.md) — a delegate-seam default capturing `_field` in a property initializer is CS0236 (use backing field + lazy default); extraction rewires must check lines BETWEEN the call sites for pre-transform consumers
 - [AC source sweep: Definition of Done](ac-source-sweep-definition-of-done.md) — every AC needs a verification task, and spec.md's `## Definition of Done` checkboxes are AC-source too (`## Seeded Test Conditions` are not)
+- [#453 QfcItemController plan seams](project_453_qfcitemcontroller_plan_seams.md) — AC-8 caps de-exemption at 15 and overrides 3 research artifacts; AC-4 = tests-first ordering not bundling; FlagTasks ctor touches COM; #441 false pass
 
 ## Additional entries
 

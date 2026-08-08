@@ -7,3 +7,4 @@
 ## Additional entries
 
 - [QuickFiler per-file coverage baseline](reference_quickfiler_perfile_coverage_baseline.md) — grep the #424 Cobertura artifact for indicative per-file rates before scoping an epic #136 child; most files are already above 80%
+- [Ratified exemption boundaries](reference_ratified_exemption_boundaries.md) — check docs/features/archive/ for a maintainer-decision artifact before planning any [ExcludeFromCodeCoverage] removal; never promise N -> 0
