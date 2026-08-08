@@ -25,8 +25,8 @@ features:
   - issue_num: 431
     feature_folder: quickfiler-queue-admission-coverage
     depends_on: [1001]
-  - issue_num: 1003
-    feature_folder: quickfiler-keyboard-actions-coverage
+  - issue_num: 430
+    feature_folder: 2026-08-07-quickfiler-keyboard-actions-coverage-430
     depends_on: [1001]
   - issue_num: 1004
     feature_folder: quickfiler-helper-classes-coverage
@@ -68,7 +68,7 @@ features:
     feature_folder: quickfiler-per-file-coverage-capstone
     depends_on:
       - 431
-      - 1003
+      - 430
       - 1004
       - 1005
       - 1006
@@ -472,6 +472,50 @@ Bands use the `model_policy` scale in `config/orchestration-routing.json`.
 | F14 | C3 | Form-derived viewer partials; STA last-resort determination and seam extraction across the WebView thread boundary. |
 | F15 | C2 | Small testable surface; the bulk is generated designer code resolved by ledger classification rather than by refactor. |
 | F16 | C3 | Repository-wide verification gate closing all eight acceptance criteria with numeric per-file evidence. |
+
+## Cross-Child Constraints Discovered During Preparation
+
+Both constraints below were verified directly against the working tree during F3's preparation.
+They apply to every child, not just F3.
+
+### 1. `QuickFiler.csproj` is an unavoidable shared file
+
+`QuickFiler/QuickFiler.csproj` is a legacy non-SDK project that uses **no globbing**: every source
+file is listed as an explicit `<Compile Include=...>` entry. Any child that adds a new production
+`.cs` file — a seam extraction, or a partial split to satisfy the 500-line rule — **must** edit that
+one file. F2 (`QfcQueue.cs` at 610 lines), F3 (two K1 seam files), F9, and F11
+(`QfcCollectionController.cs` at 2,349 lines) are all in this position.
+
+This is a deliberate, accepted exception to the epic's shared-file prohibition: a project's own
+`.csproj` is not a shared *build property* file, and there is no alternative — the code cannot
+compile without the entry. Rules for every child:
+
+- Edit `QuickFiler.csproj` **only** to add `<Compile Include=...>` entries for files that child owns.
+  No property changes, no reference changes, no reordering of unrelated entries.
+- Keep the edit to minimal adjacent hunks so concurrent children conflict on as few lines as
+  possible.
+- **Preserve CRLF.** The file is CRLF-terminated; a git-bash `sed -i` will strip it and produce a
+  whole-file diff that is guaranteed to conflict. Use the Edit tool or `perl -0777` with explicit
+  `\r\n`.
+
+Expect merge conflicts on this file during execution fan-in. They are additive on both sides, so
+the correct resolution is nearly always to keep both sets of entries. This is handled by the
+child's own R1-R5 remediation loop per the `epic-orchestrate` skill; it is not a decomposition
+defect and must not be treated as one.
+
+### 2. `QuickFiler.Test` has no `InternalsVisibleTo` grant from `UtilitiesCS`
+
+`UtilitiesCS/Properties/AssemblyInfo.cs` grants `InternalsVisibleTo` to `DynamicProxyGenAssembly2`,
+`UtilitiesCS.Test`, and `ToDoModel.Test` — but **not** to `QuickFiler.Test`. Any `UtilitiesCS`
+internal is therefore unreachable from a QuickFiler test. F3 hit this on `MyBox.DialogInvoker`: the
+existing dialog seam cannot be used, so a test reaching `KeyboardHandler.cs:304` or `:350` without a
+local seam would display a modal dialog — a unit-test-policy violation.
+
+**Resolution for this epic: build a local seam in the child's own assignment; do not edit
+`UtilitiesCS/Properties/AssemblyInfo.cs`.** That file is outside every child's file assignment, and
+widening the internals grant to another assembly is an encapsulation change this epic has no mandate
+to make. F3 set the precedent with its K1 dialog seam; later children hitting the same wall should
+follow it rather than reaching into `UtilitiesCS` internals.
 
 ## Known Conflict Risks
 
