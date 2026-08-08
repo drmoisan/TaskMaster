@@ -40,8 +40,8 @@ features:
   - issue_num: 1007
     feature_folder: quickfiler-qfc-home-controller-coverage
     depends_on: [1001]
-  - issue_num: 1008
-    feature_folder: quickfiler-efc-home-controller-coverage
+  - issue_num: 437
+    feature_folder: 2026-08-07-quickfiler-efc-home-controller-coverage-437
     depends_on: [1001]
   - issue_num: 1009
     feature_folder: quickfiler-efc-form-item-controller-coverage
@@ -73,7 +73,7 @@ features:
       - 1005
       - 1006
       - 1007
-      - 1008
+      - 437
       - 1009
       - 1010
       - 1011
@@ -131,6 +131,65 @@ are outside the coverage denominator and outside this epic. Of the 121 compiled 
 
 That leaves roughly 87 files in the testable denominator, several of which need seam extraction
 before any deterministic unit test can reach them.
+
+## Measured Coverage Baseline (added 2026-08-07, indicative)
+
+Preparation of F8 discovered that committed Cobertura reports already exist in the repository, so
+the epic does not have to guess at its starting point. The most recent QuickFiler-wide report is
+`docs/features/active/2026-08-06-quickfiler-high-confidence-queue-init-stall-424/evidence/qa-gates/coverage-final.cobertura.xml`
+(feature #424); feature #400 has a further set under its own `evidence/` tree.
+
+**This baseline is indicative, not authoritative.** It was captured on another feature's branch, so
+it does not reflect the integration branch exactly. F1's harness, run on each child's own branch,
+remains the authority. Children must still measure; they must not cite these numbers as their
+acceptance evidence.
+
+Two facts from that report change how children should plan:
+
+**1. QuickFiler is far better covered than the file inventory suggests.** Only 22 of the 70
+instrumented files sit below the 80% line floor. Many are already at or near 100%. The epic is
+therefore mostly a *gap-closure and exemption-removal* exercise, not a build-from-zero effort. Any
+child whose research assumes its files are untested is working from a false premise — verify first.
+Measured below 80% line coverage:
+
+| File | Lines | Line % | Child |
+| --- | --- | --- | --- |
+| `Helper Classes/EfcThemeHelper.cs` | 872 | 0.0% | F4 |
+| `Properties/Settings.Designer.cs` | 8 | 0.0% | F15 (exempt-candidate) |
+| `Controllers/QfcFormController.Actions.cs` | 289 | 37.0% | F6 |
+| `Viewers/ItemViewerExpanded.cs` | 205 | 39.0% | F14 |
+| `Controllers/FilerQueue.cs` | 69 | 40.6% | F2 |
+| `Controllers/QfcFormController.EventHandlers.cs` | 298 | 43.3% | F6 |
+| `Controllers/QfcQueue.cs` | 504 | 46.2% | F2 |
+| `Helper Classes/EmailMoveMonitor.cs` | 208 | 50.0% | F4 |
+| `Viewers/BayesianPerformanceViewer.cs` | 70 | 54.3% | F15 |
+| `Controllers/EfcDataModel.cs` | 356 | 55.6% | F5 |
+| `Viewers/ToolStripMenuItemCb.cs` | 78 | 61.5% | F15 |
+| `Controllers/QfcHomeController.Metrics.cs` | 212 | 65.1% | F7 |
+| `Controllers/QfcFormController.SetupDisposal.cs` | 307 | 70.7% | F6 |
+| `Controllers/QfcHomeController.cs` | 395 | 71.4% | F7 |
+| `Helper Classes/ConversationResolver.Loading.cs` | 298 | 71.8% | F4 |
+| `Controllers/BayesianPerformanceController.cs` | 173 | 72.3% | F15 |
+| `Viewers/ToolStripMenuItemCb.Designer.cs` | 22 | 72.7% | F15 (exempt-candidate) |
+| `Controllers/QfcItemController.ViewerSetup.cs` | 277 | 74.4% | F10 |
+| `Controllers/QfcFormController.cs` | 180 | 75.6% | F6 |
+| `Controllers/QfcItemController.FocusAndTheme.cs` | 373 | 75.6% | F10 |
+| `Controllers/QfcItemController.MailActions.cs` | 189 | 77.8% | F10 |
+| `Controllers/QfcItemController.EventHandlers.cs` | 187 | 79.7% | F10 |
+
+**2. The exempted files are invisible, and that is where the bulk of the work is.** Roughly 51
+compiled files do not appear in the report at all, because `[ExcludeFromCodeCoverage]` removes them
+from instrumentation entirely (interface-only files are also absent, legitimately). Every file whose
+exemption F1's ledger orders removed will appear for the first time at an unknown coverage level,
+most likely near zero. `QfcCollectionController.cs` (F11), `EfcFormController.cs` and
+`EfcItemController.cs` (F9), `QfcDatamodel.cs` (F5), `KeyboardHandler.cs` (F3),
+`QfcExplorerController.cs` (F6), `ItemViewer.cs` (F14), and the WebView2 trio (F13) are all in this
+category. **An absent file is not a covered file.**
+
+**3. Branch coverage is a separate, unmet gate.** `.claude/rules/general-unit-test.md` sets a 75%
+branch floor alongside the 85% line figure, and issue #136's own target is 80% line. F8 found
+`EfcHomeController.Timing.cs` at 100% line but **66.67% branch** — passing the line gate and failing
+the branch gate. Children must report both, and F1's harness must emit both.
 
 ## Non-Goals
 
