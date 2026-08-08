@@ -52,15 +52,19 @@
 - [qfc-home-controller-coverage-433](project_qfc_home_controller_coverage_433.md) — #433/epic #136 F7 main partial: coverage-check BOTH halves before splitting; line 133 live-form is what makes line 136 work; LaunchAsync is 0% structurally; derive hit maps from committed Cobertura (2026-08-07)
 - [quickfiler-interface-only-files-433](project_quickfiler_interface_only_files_433.md) — interface-only .cs emit NO Cobertura class entry (MailItemActionsAdapter = positive control); net481+preview still bars DIM; IQfcHomeController.cs exists twice (one orphan); EfcHomeController throws on 3 IFilerHomeController members (2026-08-07)
 - [efc-home-controller-coverage-437](project_efc_home_controller_coverage_437.md) — #437 (epic #136 F8): family already ~90% covered and fully seamed; Timing.cs reads NO clock; dual default-factory lambdas make coverage order-dependent (2026-08-07)
-- [quickfiler-percoverage-epic-136](project_quickfiler_percoverage_epic_136.md) — epic #136: never trust the emitted `<class line-rate>` (issue #441 double-count; can inflate OR deflate) — recompute from the class-level `<lines>` union (2026-08-07)
+- [efc-item-controller-452](project_efc_item_controller_452.md) — #452/epic #136 F9: IItemViewer already covers ~70% of the viewer surface (1:1 forwards); WpfUiDispatcher(Dispatcher) ctor internal to UtilitiesCS; F8 deps stop at EfcFormController (2026-08-07)
+- [qfc-f9-measurement-441-and-designer-inheritance](project_qfc_f9_measurement_441_and_designer_inheritance.md) — #452/epic #136 F9: issue #441 also corrupts per-file `@line-rate` (6dp vs 16dp tell); Designer partial exempt only by type-attribute inheritance; csharpier 1.2.6 needs `format` (2026-08-07)
+- [quickfiler-percoverage-epic-136](project_quickfiler_percoverage_epic_136.md) — epic #136: read exact per-file line-rate from committed Cobertura under evidence/qa-gates/ instead of assuming low coverage (2026-08-07)
+- [winforms-designer-coverage-mechanics](project_winforms_designer_coverage_mechanics.md) — #452/F9: class-level exempt hides the Designer half too; one form construction auto-covers ~99% of it; Forms ARE constructed in this repo's tests (2026-08-07)
+- [efc-form-controller-452](project_efc_form_controller_452.md) — #452/F9 EfcFormController: copy the merged IQfcFormViewer:IForm triple; IControl inherits IWin32Window/IDisposable/ISynchronizeInvoke; ViewerQueueCore does NOT pool; #439 = path-namespace mismatch; no STA needed (2026-08-07)
+
+## Additional entries
+
 - [qfc-item-controller-230-pump-seam](project_qfc_item_controller_230_pump_seam.md) — open #230 (WinForms pump seam) is the sole root cause of the 4 remaining QfcItemController exemptions; 3 of the 19 sit on DEAD members — delete, don't test (2026-08-07)
 - [qfc-item-controller-f10-coverage-453](project_qfc_item_controller_f10_coverage_453.md) — #453/F10: QuickFiler.Test.csproj needs explicit Compile Includes; FocusAndThemeTests 497/500 AND FolderHandlingTests 498/500; branch gaps live in logger.Debug null-conditionals (2026-08-07)
 - [cobertura-exemption-and-branchrate-gotchas](project_cobertura_exemption_and_branchrate_gotchas.md) — method-level [ExcludeFromCodeCoverage] does NOT exempt lambdas; branch-rate double-counts (line-rate disputed) (2026-08-07)
 - [qfc-item-controller-f10-init-viewersetup-453](project_excludefromcodecoverage_lambda_leak.md) — #453/F10: 3 of 7 Initialization exemptions are on DEAD members; every exemption comment cites an already-defeated "live ItemViewer" barrier; ViewerSetup fails branch (56%) worse than line (2026-08-07)
 - [qfc-conversation-seam-ratified-453](project_qfc_conversation_seam_ratified_453.md) — F10 #453 cycle-2: DoLoadConversationResolverCoreAsync exemption is #227-ratified, not removable; same bucket covers Navigation.cs seams too; expr-bodied members cost +1 line, not the cross-cutting doc's +8 (2026-08-07)
-
-## Additional entries
-
 - [qfc-collection-controller-454](project_qfc_collection_controller_454.md) — #454/epic #136 F11: #444 defect is in DEAD code; 12 unreachable members; UiThread.Dispatcher null in tests; DynamicProxyGenAssembly2 grant hides in F2-owned QfcHighConfidencePreFilter.cs:11; `async public` defeats greps (2026-08-07)
 - [quickfiler-test-sta-and-ivt](project_quickfiler_test_sta_and_ivt.md) — QuickFiler DOES grant internals to QuickFiler.Test; QuickFiler.Test already has manual STA-thread infra, no MSTest.STAExtensions needed (2026-08-07)
 - [webview2-exemption-and-coverage-asymmetry](project_webview2_exemption_and_coverage_asymmetry.md) — #455/F13: class-level `[ExcludeFromCodeCoverage]` suppresses nested lambdas, method-level does NOT; §UT2's 3 grounds don't cover SDK adapters; WebView2 type constructibility (2026-08-07)

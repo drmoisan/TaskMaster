@@ -32,7 +32,9 @@
 
 - [Verify line spans and computed literals](verify-line-spans-and-computed-literals.md) — replace-L<a>-L<b> spans swallow still-referenced field decls; recompute asserted literals incl. format rounding (`##0.00` rounds away from zero → "0.67" not "0.66")
 - [Never assert .Method.Name on a lambda-valued delegate](never-assert-method-name-on-lambda-valued-delegate.md) — classify each Production* default as named-method vs lambda before writing a ".Method.Name identity only" clause; lambdas need NotBeSameAs(sentinel)
+- [Verify caller-supplied citation corrections](verify-caller-supplied-citation-corrections.md) — preflight "fix this line number" deltas are themselves sometimes off-by-one; re-read the source before transcribing one into a validated plan
 
+- [#452 F9 EFC form/item/viewer plan seams](project_452_efc_form_item_viewer_plan_seams.md) — shared Phase 1 before per-file phases; viewer→form→item order; DEC-1 Form-construction IN/OUT task lists; IEfcFormViewer forward-member coverage trap
 - [#437 EfcHomeController plan seams](project_437_efc_home_controller_plan_seams.md) — EFC test files at 459-476 lines force new files; MoveFailureMessageAction=MessageBox.Show CI hang; ClassLevel parallelism + Production* statics; Timing.cs has no clock
 - [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/
 - [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — obj/ cache filenames outlive tear-down commits; verify project/source files with git ls-files or a glob before writing an existence claim into acceptance text
