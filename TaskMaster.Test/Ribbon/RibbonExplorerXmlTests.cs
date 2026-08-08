@@ -195,9 +195,18 @@ namespace TaskMaster.Test.Ribbon
                         "the catalog control id '{0}' must exist in the ribbon XML",
                         controlId
                     );
-                elementsById[controlId]
-                    .Attribute("getEnabled")
-                    ?.Value.Should()
+                // Bind the attribute first. A null-conditional dereference here would
+                // short-circuit the whole assertion chain, including .Should(), so the
+                // test would pass silently on the exact regression it exists to catch.
+                var getEnabled = elementsById[controlId].Attribute("getEnabled");
+                getEnabled
+                    .Should()
+                    .NotBeNull(
+                        "control '{0}' is engine-backed and must declare a getEnabled callback",
+                        controlId
+                    );
+                getEnabled!
+                    .Value.Should()
                     .Be(
                         EngineCommandGetEnabledCallback,
                         "control '{0}' is engine-backed and must be disabled until its engine loads",
