@@ -22,7 +22,7 @@ features:
   - issue_num: 1001
     feature_folder: quickfiler-coverage-denominator-and-exemption-ledger
     depends_on: []
-  - issue_num: 1002
+  - issue_num: 431
     feature_folder: quickfiler-queue-admission-coverage
     depends_on: [1001]
   - issue_num: 1003
@@ -67,7 +67,7 @@ features:
   - issue_num: 1016
     feature_folder: quickfiler-per-file-coverage-capstone
     depends_on:
-      - 1002
+      - 431
       - 1003
       - 1004
       - 1005
@@ -114,8 +114,20 @@ are outside the coverage denominator and outside this epic. Of the 121 compiled 
   and `EfcViewer.Designer.cs` at 4,276 lines).
 - 3 are generated `Properties/` files (`AssemblyInfo.cs`, `Resources.Designer.cs`,
   `Settings.Designer.cs`).
-- 33 currently carry `[ExcludeFromCodeCoverage]`, including `QfcCollectionController.cs` (2,349
-  lines), `EfcItemController.cs` (1,170), and `EfcFormController.cs` (1,086).
+- 21 currently carry a real `[ExcludeFromCodeCoverage]` attribute, including
+  `QfcCollectionController.cs` (2,349 lines), `EfcItemController.cs` (1,170), and
+  `EfcFormController.cs` (1,086).
+
+> **Marker accuracy note (corrected 2026-08-07 during F2 preparation).** An initial survey
+> reported 33 exempted files. That figure was inflated two ways: a plain `grep` for
+> `ExcludeFromCodeCoverage` also matched XML doc-comment *references* to the attribute, and it
+> matched files that are not in the csproj compile set. The accurate figure is **21 compiled files
+> carrying a real attribute**. Five files mention the attribute only in a doc comment and are NOT
+> exempt: `Controllers/QfcScanProgressBandMapper.cs`, `Viewers/ItemViewer.Commands.cs`,
+> `Viewers/ItemViewer.DisplayState.cs`, `Viewers/ItemViewer.FolderSearch.cs`, and
+> `Viewers/ItemViewer.WebViewThread.cs`. The `[X]` markers below have been corrected accordingly.
+> Children must verify a marker against the file before acting on it; F1's ledger is the
+> authoritative record.
 
 That leaves roughly 87 files in the testable denominator, several of which need seam extraction
 before any deterministic unit test can reach them.
@@ -258,7 +270,7 @@ each of the 33 existing `[ExcludeFromCodeCoverage]` attributes assigned to its o
 `Controllers/QfcRemainingQueueAdmission.cs` (48),
 `Controllers/QfcStreamingDequeueConfidenceGate.cs` (171),
 `Controllers/QfcHighConfidencePreFilter.cs` (191) `[X]`,
-`Controllers/QfcScanProgressBandMapper.cs` (79) `[X]`,
+`Controllers/QfcScanProgressBandMapper.cs` (79),
 `Controllers/BreadcrumbOutboundQueue.cs` (67), `Controllers/EmailSorter.cs` (85),
 `Controllers/QfcItemGroup.cs` (52), `Controllers/IQfcQueue.cs` (41),
 `Controllers/IQfcQueue1.cs` (44). ~1,471 lines / 11 files. Predominantly pure logic with existing
@@ -354,8 +366,8 @@ files. Coordinate with in-flight issue #400 (see Known Conflict Risks).
 
 ### F14 — quickfiler-itemviewer-coverage (wave 1, C3)
 
-`Viewers/ItemViewer.cs` (432) `[X]`, `.DisplayState.cs` (81) `[X]`, `.Commands.cs` (109) `[X]`,
-`.Breadcrumb.cs` (298), `.FolderSearch.cs` (74) `[X]`, `.WebViewThread.cs` (37) `[X]`,
+`Viewers/ItemViewer.cs` (432) `[X]`, `.DisplayState.cs` (81), `.Commands.cs` (109),
+`.Breadcrumb.cs` (298), `.FolderSearch.cs` (74), `.WebViewThread.cs` (37),
 `Viewers/ItemViewerExpanded.cs` (181), `Viewers/IItemViewer.cs` (133), plus exempt-candidates
 `Viewers/ItemViewer.Designer.cs` (6,224) and `Viewers/ItemViewerExpanded.Designer.cs` (821).
 ~1,345 testable lines / 10 files. Form-derived; the STA last-resort clause is most likely to apply
