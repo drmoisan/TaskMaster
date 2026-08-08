@@ -27,6 +27,7 @@
 - [Folder predictor AF holder seam](project_folder_predictor_af_holder_seam.md) — #177 F1: route flag-on LCPPN predictor through a Folder-only holder on IAppAutoFileObjects (globals.AF), not per-instance OlFolderClassifierGroup state
 - [Plan validator phase-heading constraint](plan-validator-phase-heading-constraint.md) — MCP plan validator requires exact `### Phase N — <Title>`; no tokens between Phase N and em-dash; H1 title line is exempt
 - [Plan validator task-ID sequential constraint](plan-validator-task-id-sequential-constraint.md) — task IDs must be digit-only and sequential-by-appearance; mid-phase insertion forces renumbering all later tasks + cross-refs
+- [Decomposition must cover newly-inserted tasks](decomposition-must-cover-newly-inserted-tasks.md) — a revision that decomposes bundled measure/split/register tasks must also fix the ones it itself inserts, and re-derive the Decision record's enumeration
 - [Legacy csproj wiring](project_legacy_csproj_explicit_compile_include.md) — packages.config projects need `Compile Include` wiring and their own `Reference`; ProjectReference gives no compile-time flow (CS0012)
 - [C# Phase 0 toolchain bootstrap](project_csharp_phase0_toolchain_bootstrap.md) — .dotnet-sdk/ absent + no dotnet tool restore + no dotnet-coverage; make it [P0-T1] or all csharpier/coverage tasks fail
 - [#211 startup-lifetime heartbeat seam](project_211_startup_lifetime_heartbeat_seam.md) — Phase 3.3 [startup-lifetime-heartbeat] DispatcherTimer in ThisAddIn.cs (exempt), pure logic in StartupDiagnosticsProbe; AC15
