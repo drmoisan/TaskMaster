@@ -215,6 +215,43 @@ namespace QuickFiler.Test.Viewers
             }
         }
 
+        [TestMethod]
+        public void PresentSearchResults_NoOpenCoordinator_BridgeReceivesItemsWithoutThrow()
+        {
+            // Issue #438 R1: covers the null-_openCoordinator arm of PresentSearchResults
+            // (ConfigureHost is never called), asserting the bridge coordinator still receives
+            // the search-result items and no exception is thrown.
+            using (var fixture = new LifecycleFixture())
+            {
+                BreadcrumbBridgeCoordinator bridge = fixture.CreateBridge();
+                fixture.Coordinator.SetBridgeCoordinator(bridge);
+
+                Action act = () =>
+                    fixture.Coordinator.PresentSearchResults(new[] { "Alpha", "Beta" });
+
+                act.Should().NotThrow();
+                fixture.Queue.DrainOnCreatorThread();
+                bridge.GetFolderItems().Should().Equal("Alpha", "Beta");
+            }
+        }
+
+        [TestMethod]
+        public void PresentSearchResults_NoBridgeCoordinator_IsDeterministicNoOp()
+        {
+            // Issue #438 R1: covers the null-_bridgeCoordinator arm of PresentSearchResults
+            // (neither ConfigureHost nor SetBridgeCoordinator is called), asserting the call is a
+            // deterministic no-op: no exception, no bridge coordinator attached, no selection
+            // change raised.
+            using (var fixture = new LifecycleFixture())
+            {
+                Action act = () => fixture.Coordinator.PresentSearchResults(new[] { "Gamma" });
+
+                act.Should().NotThrow();
+                fixture.Coordinator.BridgeCoordinator.Should().BeNull();
+                fixture.SelectionChangedCount.Should().Be(0);
+            }
+        }
+
         private static Rectangle FixtureAnchor() => new Rectangle(10, 20, 30, 40);
 
         private static Rectangle FixtureWorkingArea() => new Rectangle(0, 0, 1920, 1080);
