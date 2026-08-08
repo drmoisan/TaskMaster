@@ -132,7 +132,7 @@ Each task verifies its evidence, then flips exactly ONE checkbox in `<FEATURE>/s
 ### Phase 8 — Documentation & Handoff
 
 - [x] [P8-T1] Update `<FEATURE>/issue.md` (validation checkboxes, outcome summary, deviations: D1 command correction, D3 `partial` enablers, D5 dossier usage) and record the HV-1 pointer: post-fix human verification per `<FEATURE>/runbooks/verify-search-focus-retention.runbook.md`, non-gating; a negative HV-1 outcome is promoted as a new issue, never reopened under #438. Accept: files updated; no policy document modified.
-- [ ] [P8-T2] Final status: verify every plan checkbox in this file is `[x]`, all evidence paths resolve, and the working tree is committed (clean porcelain). Record the commands run in the final toolchain pass and their exit codes. Evidence: `<FEATURE>/evidence/other/final-status.<ts>.md`.
+- [x] [P8-T2] Final status: verify every plan checkbox in this file is `[x]`, all evidence paths resolve, and the working tree is committed (clean porcelain). Record the commands run in the final toolchain pass and their exit codes. Evidence: `<FEATURE>/evidence/other/final-status.<ts>.md`.
 
 ## Traceability — Spec AC → Plan Tasks
 
