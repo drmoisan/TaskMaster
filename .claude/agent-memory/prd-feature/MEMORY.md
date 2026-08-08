@@ -6,4 +6,4 @@
 
 ## Additional entries
 
-- [QuickFiler per-file coverage baseline](reference_quickfiler_perfile_coverage_baseline.md) — grep the #424 Cobertura artifact for indicative per-file rates before scoping an epic #136 child; most files are already above 80%
+- [QuickFiler per-file coverage baseline](reference_quickfiler_perfile_coverage_baseline.md) — use the #424 Cobertura artifact for indicative rates, but NEVER read @line-rate/@branch-rate: issue #441 corrupts them per-file
