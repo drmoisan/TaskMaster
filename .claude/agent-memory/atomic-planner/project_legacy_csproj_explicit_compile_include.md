@@ -11,6 +11,14 @@ Legacy non-SDK / packages.config C# projects in this repo enumerate every source
 
 **How to apply:** When a plan creates ANY new `.cs` file in a legacy/packages.config project, the plan MUST (a) list a `MODIFY <project>.csproj` entry in the scope-lock with the exact `<Compile Include>` item(s), and (b) fold the csproj wiring into the file-creation task's single binary outcome (file exists AND is wired into the csproj so it compiles). Verify a project is legacy by checking for `packages.config` and explicit `<Compile Include>` items rather than SDK-style globbing.
 
+**Anti-pattern — the batched csproj task.** Do NOT collect a phase's `<Compile Include>` additions into one later "add all entries" task. Every task between the creating task and the batch task that asserts "the file compiles" is then unsatisfiable, because the file is not in the compilation until its entry lands. Caught in #455 F13 preflight: five tasks across four phases (`[P1-T1]`, `[P1-T3]`, `[P2-T1]`, `[P3-T1]`, `[P4-T2]`) each asserted compilation before the batch task ran. The fix is to fold each entry into its own creating task and demote the former batch task to a **verification** task (entry count, CRLF line-count delta, no unrelated entry moved). A file *move* is the worst case: it breaks the project build outright until the old path's entry is removed.
+
+## Third failure mode: "the file compiles" mid-refactor
+
+A "compiles" acceptance is unsatisfiable for any task in the middle of a multi-task extraction, even with correct csproj wiring, whenever an earlier task deleted a member whose call site a later task rebinds. In #455 Phase 1, `[P1-T2]` deleted `BreadcrumbPopupUiOperations.ShowOwnedPopup` but `[P1-T4]` rebinds its only call site, so nothing between them compiles.
+
+**How to apply:** Reserve build-bearing acceptances for the phase's dedicated msbuild task. For intermediate refactor steps use content-based acceptance (symbol absent, symbol present, attribute count) and add an explicit clause naming the task that first exercises a compiling build.
+
 ## Second failure mode: transitive assembly references do not flow
 
 In a legacy non-SDK project, a `<ProjectReference>` does NOT flow the referenced project's assembly references to the compiler — they land in `ReferenceDependencyPaths` (copy-local at runtime) rather than `ReferencePath` (compile-time). A test that merely names a type from a transitively-referenced package fails to compile with `CS0012`.

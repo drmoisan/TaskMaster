@@ -7,3 +7,4 @@
 ## Additional entries
 
 - [QuickFiler per-file coverage baseline](reference_quickfiler_perfile_coverage_baseline.md) — grep the #424 Cobertura artifact for indicative per-file rates before scoping an epic #136 child; most files are already above 80%
+- [ExcludeFromCodeCoverage lambda propagation](reference_exclude_from_code_coverage_lambda_propagation.md) — method-level leaks nested lambdas into the denominator, class-level does not; a partial-class attribute exempts the whole type

@@ -6,6 +6,7 @@
 - [Inserted plan tasks force renumbering](project_plan_task_ids_digit_only_forces_renumbering.md) — suffixed IDs (`P3-T5a`) fail validation; insert + renumber downstream
 - [Plan rationale clauses are evidence](project_418_plan_rationale_clauses_are_evidence.md) — unmeasured world-state claims in prose block preflight, not the fix
 - [Line locators go stale after a doc edit](project_plan_line_locators_stale_after_doc_edit.md) — a revision that expands spec.md shifts every later citation; verify each cited line
+- [csproj line ranges shift during execution](project_plan_csproj_line_ranges_shift_during_execution.md) — earlier tasks adding Compile entries invalidate a later task's cited block range; cite blocks by name
 - [#418 500-line gate vs mandated plan content](project_418_500line_gate_vs_plan_content.md) — unsatisfiable size gate; delta = extract pure helpers to a new file
 - [#376 capstone scope-expansion layers](project_376_capstone_scope_expansion_layers.md) — 5 escalated layers resolved via the 3 authorized patterns
 - [#207 Hook() redesign breaks AppEventsTests](project_207_hook_redesign_breaks_appeventstests.md) — needs a plan revision, not a test weakening
