@@ -28,8 +28,8 @@ features:
   - issue_num: 430
     feature_folder: 2026-08-07-quickfiler-keyboard-actions-coverage-430
     depends_on: [1001]
-  - issue_num: 1004
-    feature_folder: quickfiler-helper-classes-coverage
+  - issue_num: 434
+    feature_folder: 2026-08-07-quickfiler-helper-classes-coverage-434
     depends_on: [1001]
   - issue_num: 1005
     feature_folder: quickfiler-datamodel-coverage
@@ -69,7 +69,7 @@ features:
     depends_on:
       - 431
       - 430
-      - 1004
+      - 434
       - 1005
       - 1006
       - 433
@@ -501,6 +501,62 @@ Note that the 80% per-file line figure and the 75% branch figure are independent
 `EfcHomeController.Timing.cs` at 100% line and 66.67% branch — passing one and failing the other.
 Report both.
 
+## Directives for F1's Ledger and Harness
+
+Three children independently converged on the same gaps in F1's brief. These are binding
+requirements on F1's deliverables.
+
+### A third ledger bucket: `interface-only / not-measured`
+
+F4 and F7 both found files with **zero coverable lines** — not files that are hard to test, files
+with no executable IL at all. F4 identified four: `IConversationResolver.cs`, `IEmailMoveMonitor.cs`,
+`QfEnums.cs`, and `cInfoMail.cs` (231 lines of entirely commented-out dead code whose only live
+content is eight `using` directives). F7 evidenced the same for both its interface files, three ways,
+using `MailItemActionsAdapter` as a positive control to prove the folder was instrumented.
+
+These must **not** be classified `ratified-exempt`, which implies untestable production logic that
+was argued away. They are a distinct category with no denominator, and **none receives
+`[ExcludeFromCodeCoverage]`**. The ledger carries three buckets: `testable`, `ratified-exempt`, and
+`interface-only / not-measured`. A file in the third bucket is reported N/A, never 0%, and never
+counts as a failure. Shape-assertion tests written purely to manufacture coverage for such a file
+are prohibited.
+
+### Two harness correctness requirements
+
+Both come from F4's reading of the actual Cobertura output, and both are silent-wrong-answer bugs
+rather than crashes:
+
+1. **Aggregate per file, not per class.** One source file can produce multiple Cobertura `<class>`
+   elements sharing a single `filename` — a type plus its compiler-generated `<>c` closure class.
+   The harness must union them, taking **max hits per line**. Reporting the first `<class>` alone
+   understates coverage.
+2. **Decide the denominator on `<line>` child count, never `line-rate`.** A declaration-only file
+   reports `line-rate="0"` because it has no lines, not because it is uncovered. Keying on
+   `line-rate` mis-reports every `interface-only` file as a 0% failure — exactly the false alarm the
+   third bucket exists to prevent.
+
+## Latent Defect Promotion
+
+Preparation research surfaces real defects that are out of scope to fix under the epic's
+no-behavior-change NFR. **Promote them to GitHub issues via the MCP promotion lifecycle; do not
+leave them as prose in a feature folder**, where they are lost once the folder moves to
+`completed/`. F3, F7, and F8 did this, producing issues #442-#447 and #451.
+
+F4 recorded eight defects as plan follow-ups without promoting them. Its execution run must promote
+them via the MCP promotion surface before it completes:
+
+- Leaked `BeforeItemMove` subscription when a mail's parent folder changes.
+- Handler predicate reading live COM instead of the cached ID.
+- Unsynchronised `Queue<T>` across the dispatcher boundary.
+- `Reset` double-dispose.
+- `DequeueChunk` unbounded regrowth.
+- Missing `[Flags]` on `QfEnums.InitTypeEnum`.
+- `MailItemInfoTests.cs:25` uses banned `DateTime.Now`.
+- `ConversationResolverTests.cs` at 578 lines, breaching the 500-line limit.
+
+The last two are test-policy violations in existing tests, not production defects, and are
+in-scope for F4's own execution rather than deferral.
+
 ## Mid-Wave File Creation and the Ledger Denominator
 
 F7 identified a gap that would otherwise surface only as a capstone failure. F1 authors its ledger
@@ -583,6 +639,18 @@ wave-1 children:
   (breadcrumb drop-down) territory.
 - **#424** `2026-08-06-quickfiler-high-confidence-queue-init-stall-424` — overlaps F7
   (`QfcHomeController`) and possibly F2 (high-confidence queue admission) territory.
+- **#426** `Bug: emailmovemonitor-rejected-item-hook-retention` (added 2026-08-07 from F4's
+  research) — open but **not yet promoted to an active feature folder**, which is why it was missed
+  in the initial survey. Its subject is the `EmailMoveMonitor` hook lifecycle, squarely inside F4's
+  assignment, and its candidate fixes reach into F5- and F2-owned paths. Two of F4's own deferred
+  defects (the leaked `BeforeItemMove` subscription and the handler predicate reading live COM
+  instead of the cached ID) are plausibly the same underlying defect. Whoever schedules #426 should
+  reconcile it against F4's plan first; if #426 is executed independently while F4 is in flight,
+  expect a genuine semantic conflict rather than a merely textual one.
+
+Note that a *promoted-but-not-yet-active* issue is invisible to a `docs/features/active/` scan. That
+is how #426 was missed at decomposition time. Children whose research touches an area should search
+open GitHub issues by keyword, not only the active feature folders.
 
 Neither blocks planning. At execution time `epic-orchestrator` rebases the integration branch on
 `main` before each wave, and any conflict is handled by the child's own R1–R5 remediation loop per
