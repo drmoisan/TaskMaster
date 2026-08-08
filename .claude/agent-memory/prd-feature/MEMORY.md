@@ -6,7 +6,8 @@
 
 ## Additional entries
 
-- [QuickFiler per-file coverage baseline](reference_quickfiler_perfile_coverage_baseline.md) — use the #424 Cobertura artifact for indicative rates, but NEVER read @line-rate/@branch-rate: issue #441 corrupts them per-file
+- [QuickFiler per-file coverage baseline](reference_quickfiler_perfile_coverage_baseline.md) — grep the #424 Cobertura artifact for indicative per-file rates before scoping an epic #136 child; most files are already above 80%
+- [WinForms Designer partial coverage](reference_winforms_designer_partial_coverage.md) — 4-part argument that a *.Designer.cs is `testable`: QfcFormViewer positive control, no permitted exemption, 99.9% line on one construction, branch capped at 75%
 
 ## Additional entries
 
