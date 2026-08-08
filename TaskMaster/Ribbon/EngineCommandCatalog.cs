@@ -48,9 +48,8 @@ namespace TaskMaster
             ["FilterTriageGroup"] = "Triage",
         };
 
-        private static readonly IReadOnlyCollection<string> ControlIdList = new ReadOnlyCollection<
-            string
-        >(new List<string>(Map.Keys));
+        private static readonly IReadOnlyCollection<string> ControlIdList =
+            new ReadOnlyCollection<string>(new List<string>(Map.Keys));
 
         /// <summary>
         /// The engine-backed Explorer-ribbon control ids, without duplicates.

@@ -30,8 +30,13 @@ namespace TaskMaster
         /// ignores a signature mismatch — the code compiles and nothing happens — which is why
         /// <c>RibbonExplorerXmlTests</c> pins this signature by reflection.
         /// </remarks>
+        /// <remarks>
+        /// The null-forgiving operator on <c>control?.Id</c> records that a null id is a supported
+        /// input: <c>EngineCommandCatalog.TryGetEngineName</c> returns <see langword="false"/> for
+        /// it by contract, so the callback yields <see langword="false"/> rather than throwing.
+        /// </remarks>
         public bool EngineCommand_GetEnabled(Office.IRibbonControl control) =>
-            _controller?.IsEngineCommandEnabled(control?.Id) ?? false;
+            _controller?.IsEngineCommandEnabled(control?.Id!) ?? false;
 
         /// <summary>
         /// Invalidates every engine-backed control so Office re-queries
@@ -66,8 +71,8 @@ namespace TaskMaster
             var dispatcher = UiThread.Dispatcher;
             if (dispatcher != null && !dispatcher.CheckAccess())
             {
-                dispatcher.Invoke(
-                    () => EngineCommandRefreshPlanner.InvalidateAll(ribbon.InvalidateControl)
+                dispatcher.Invoke(() =>
+                    EngineCommandRefreshPlanner.InvalidateAll(ribbon.InvalidateControl)
                 );
                 return;
             }

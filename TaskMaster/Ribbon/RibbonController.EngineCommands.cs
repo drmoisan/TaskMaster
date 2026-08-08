@@ -34,7 +34,10 @@ namespace TaskMaster
         /// </remarks>
         private EngineGatedCommandRunner EngineCommands =>
             _engineCommandRunner ??= new EngineGatedCommandRunner(
-                new EngineReadinessGate(() => Globals?.Engines),
+                // The null-forgiving operator records that this accessor may legitimately return
+                // null before SetGlobals has run. EngineReadinessGate treats a null result as
+                // "not ready" by contract, so null is a supported value rather than a defect.
+                new EngineReadinessGate(() => Globals?.Engines!),
                 NotifyEngineCommandNotReady
             );
 

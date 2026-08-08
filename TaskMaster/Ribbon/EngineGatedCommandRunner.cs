@@ -116,8 +116,14 @@ namespace TaskMaster
         /// </summary>
         private static string BuildNotReadyMessage(string controlId)
         {
+            // The lookup uses the rendered id so the argument is never null. A null control id
+            // renders as "(null)", which is not a catalog key, so it resolves to "(unmapped)" —
+            // exactly the same outcome as looking up null directly, without a nullable argument.
             var renderedControlId = controlId ?? NullControlIdToken;
-            var engineName = EngineCommandCatalog.TryGetEngineName(controlId, out var mapped)
+            var engineName = EngineCommandCatalog.TryGetEngineName(
+                renderedControlId,
+                out var mapped
+            )
                 ? mapped
                 : UnmappedEngineToken;
 

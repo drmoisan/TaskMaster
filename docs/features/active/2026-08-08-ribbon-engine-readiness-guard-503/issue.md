@@ -82,3 +82,28 @@ Constraints to honor:
 
 - [x] Promote to GitHub issue (bug-report template)
 - [x] Move to active fix folder / branch
+
+## Delivered Outcome (2026-08-08)
+
+Status: **Delivered** on branch `bug/ribbon-engine-readiness-guard-503` (merge-base `003c5715055d7d1933db68a742531332756e30b2`). Full delivery notes and deviations are in `spec.md` under `## Delivery Notes and Deviations`.
+
+The initialization race is closed by a per-engine-key readiness signal computed from the existing `IAppItemEngines.InboxEngines` member, implemented in four new host-neutral types under `TaskMaster\Ribbon\` that are deliberately not `[ExcludeFromCodeCoverage]`:
+
+- `EngineCommandCatalog` — the single control-id to engine-key map (8 entries).
+- `EngineReadinessGate` — the per-key readiness predicate, recomputed on every query.
+- `EngineGatedCommandRunner` — the `getEnabled` decision and the click guard; defers the engine dereference into a `Func<Task>` lambda.
+- `EngineCommandRefreshPlanner` — the post-initialization invalidation set.
+
+Wiring: `getEnabled="EngineCommand_GetEnabled"` on the eight engine-backed `<button>` elements in `RibbonExplorer.xml`; one new Office-typed shim `public bool EngineCommand_GetEnabled(Office.IRibbonControl)` on a new `RibbonViewer` partial; one refresh call in `ThisAddIn.cs` immediately after `await _globals.LoadAsync(false)`, marshalled explicitly through `UiThread.Dispatcher`.
+
+Corrections to this issue's original text, established by research and carried into `spec.md`:
+
+- The affected set is exactly **eight** handlers (`Spam` x3, `Triage` x5), not "every engine in `InboxEngines`". No ribbon callback dereferences the `Project`, `Context`, or `Actionable` engines.
+- `TestSpam_Click` throws `KeyNotFoundException` (dictionary indexer), not `NullReferenceException`. Both types are covered by the regression tests.
+- The readiness signal is **not** added to `AppItemEngines` / `IAppItemEngines`: .NET Framework 4.8.1 has no default interface members, so any new interface member could only be bodied inside the `[ExcludeFromCodeCoverage]` `AppItemEngines` and would be uncoverable. Both files take a **zero-line diff**, which is stronger R4 compliance than the original phrasing required.
+
+Constraints honoured: `AppItemEngines.InitAsync()` untouched; `SB`/`Triage`/`TrainAsync` ready-path expressions byte-identical to before.
+
+Verification: 6338 tests pass (up from 6293), zero failed, zero skipped. All four new types at 100% line coverage. `csharpier check .` exit 0 over 1498 files; analyzer build 0 errors; nullable build 0 errors. Evidence under `evidence/baseline/`, `evidence/regression-testing/`, `evidence/qa-gates/`, `evidence/manual-verification/`, and `evidence/issue-updates/`.
+
+Outstanding: AC19, AC20, AC21 are MANUAL-ONLY and remain unchecked pending maintainer execution of `evidence/manual-verification/ac19-ac21-checklist.2026-08-08T15-00.md` against a live Outlook profile.

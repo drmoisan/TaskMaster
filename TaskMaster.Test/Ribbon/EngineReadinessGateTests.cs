@@ -128,7 +128,9 @@ namespace TaskMaster.Test.Ribbon
             var ready = gate.IsEngineReady(engineName);
 
             // Assert
-            ready.Should().BeFalse("a null or whitespace engine name can never identify an engine");
+            ready
+                .Should()
+                .BeFalse("a null or whitespace engine name can never identify an engine");
         }
 
         [TestMethod]

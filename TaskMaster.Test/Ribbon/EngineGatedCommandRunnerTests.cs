@@ -116,9 +116,7 @@ namespace TaskMaster.Test.Ribbon
                     "the indexer path in TestSpam_Click must also be suppressed during the "
                         + "initialization window rather than throwing KeyNotFoundException"
                 );
-            invoked
-                .Should()
-                .BeFalse("the indexer must never be evaluated when the gate is closed");
+            invoked.Should().BeFalse("the indexer must never be evaluated when the gate is closed");
         }
 
         [TestMethod]
@@ -192,7 +190,9 @@ namespace TaskMaster.Test.Ribbon
             // Assert
             actionCompleted
                 .Should()
-                .BeTrue("RunAsync must await the supplied action to completion, not fire-and-forget");
+                .BeTrue(
+                    "RunAsync must await the supplied action to completion, not fire-and-forget"
+                );
         }
 
         [TestMethod]
@@ -283,7 +283,9 @@ namespace TaskMaster.Test.Ribbon
             var enabled = runner.IsCommandEnabled("TrainSpam");
 
             // Assert
-            enabled.Should().BeFalse("Office must render the button disabled during initialization");
+            enabled
+                .Should()
+                .BeFalse("Office must render the button disabled during initialization");
         }
 
         [TestMethod]
