@@ -30,7 +30,7 @@ namespace TaskMaster
 
     [System.Runtime.InteropServices.ComVisible(true)]
     [ExcludeFromCodeCoverage]
-    public class RibbonViewer : Office.IRibbonExtensibility
+    public partial class RibbonViewer : Office.IRibbonExtensibility
     {
         public RibbonViewer(RibbonController Controller)
         {
@@ -246,105 +246,6 @@ namespace TaskMaster
             await _controller.BuildActionableClassifierAsync();
 
         #endregion Folder Classifier
-
-        #region Spam Manager
-
-        public async void ClearSpam_Click(Office.IRibbonControl control) =>
-            await Controller.ClearSpamManagerAsync();
-
-        public async void TrainSpam_Click(Office.IRibbonControl control) =>
-            await Controller.SB.TrainAsync(Controller.OlSelection, true);
-
-        public async void TrainHam_Click(Office.IRibbonControl control) =>
-            await Controller.SB.TrainAsync(Controller.OlSelection, false);
-
-        public async void TestSpam_Click(Office.IRibbonControl control) =>
-            await (
-                (SpamBayes)Controller.Engines.InboxEngines[SpamBayes.GroupName].Engine
-            ).TestAsync(Controller.OlSelection);
-
-        public void TestSpamVerbose_Click(Office.IRibbonControl control) =>
-            Controller.TestSpamVerbose();
-
-        public void SpamMetrics_Click(Office.IRibbonControl control) => Controller.SpamMetrics();
-
-        public void SpamInvestigateErrors_Click(Office.IRibbonControl control) =>
-            Controller.SpamInvestigateErrors();
-
-        #region Spam Config
-
-        public void SpamBayesEnabled_Click(Office.IRibbonControl control, bool pressed) =>
-            Controller.Engines.ToggleEngineAsync(SpamBayes.GroupName);
-
-        public async Task<bool> SpamBayesEnabled_GetPressed(Office.IRibbonControl control) =>
-            await Controller.Engines.EngineActiveAsync(SpamBayes.GroupName);
-
-        public async void SpamSaveNetwork_Click(Office.IRibbonControl control) =>
-            await Controller.Engines.ShowDiskDialog(SpamBayes.GroupName, false);
-
-        public async void SpamSaveLocal_Click(Office.IRibbonControl control) =>
-            await Controller.Engines.ShowDiskDialog(SpamBayes.GroupName, true);
-
-        public void GetSaveLocation_Click(Office.IRibbonControl control) =>
-            Controller.Engines.ShowSaveInfo(SpamBayes.GroupName);
-
-        public void SpamFolderSettings_Click(Office.IRibbonControl control) =>
-            Controller.FolderStoresSettings();
-
-        #endregion Spam Config
-
-        #endregion Spam Manager
-
-        #region Triage
-
-        public async void TriageSelection_Click(Office.IRibbonControl control) =>
-            await _controller.TriageSelectionAsync();
-
-        public async void TriageSetA_Click(Office.IRibbonControl control) =>
-            await _controller.Triage.OlLogic.TrainSelectionAsync("A");
-
-        public async void TriageSetB_Click(Office.IRibbonControl control) =>
-            await _controller.Triage.OlLogic.TrainSelectionAsync("B");
-
-        public async void TriageSetC_Click(Office.IRibbonControl control) =>
-            await _controller.Triage.OlLogic.TrainSelectionAsync("C");
-
-        //public async void TriageSetA_Click(Office.IRibbonControl control) => await _controller.TriageSetAAsync();
-        //public async void TriageSetB_Click(Office.IRibbonControl control) => await _controller.TriageSetBAsync();
-        //public async void TriageSetC_Click(Office.IRibbonControl control) => await _controller.TriageSetCAsync();
-
-        public async void ClearTriage_Click(Office.IRibbonControl control) =>
-            await _controller.Triage.OlLogic.UnTrainSelectionAsync();
-
-        public async void ResetTriage_Click(Office.IRibbonControl control) =>
-            await _controller.ResetTriageClassifierAync();
-
-        public async void SetPrecision_Click(Office.IRibbonControl control) =>
-            await _controller.TriageSetPrecision();
-
-        public async void FilterViewer_Click(Office.IRibbonControl control) =>
-            await _controller.Triage.OlLogic.FilterViewAsync();
-
-        #region Triage Config
-
-        public void TriageEnabled_Click(Office.IRibbonControl control, bool pressed) =>
-            Controller.Engines.ToggleEngineAsync("Triage");
-
-        public async Task<bool> TriageEnabled_GetPressed(Office.IRibbonControl control) =>
-            await Controller.Engines.EngineActiveAsync("Triage");
-
-        public async void TriageSaveNetwork_Click(Office.IRibbonControl control) =>
-            await Controller.Engines.ShowDiskDialog("Triage", false);
-
-        public async void TriageSaveLocal_Click(Office.IRibbonControl control) =>
-            await Controller.Engines.ShowDiskDialog("Triage", true);
-
-        public void TriageGetSaveLocation_Click(Office.IRibbonControl control) =>
-            Controller.Engines.ShowSaveInfo("Triage");
-
-        #endregion Triage Config
-
-        #endregion Triage
 
         public async void CompareFolders_Click(Office.IRibbonControl control) =>
             await _controller.CompareFoldersAsync();
