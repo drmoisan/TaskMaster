@@ -55,9 +55,13 @@
 - [qfc-collection-controller-454](project_qfc_collection_controller_454.md) — #454/epic #136 F11: #444 defect is in DEAD code; 12 unreachable members; UiThread.Dispatcher null in tests; DynamicProxyGenAssembly2 grant hides in F2-owned QfcHighConfidencePreFilter.cs:11; `async public` defeats greps (2026-08-07)
 - [quickfiler-test-sta-and-ivt](project_quickfiler_test_sta_and_ivt.md) — QuickFiler DOES grant internals to QuickFiler.Test; QuickFiler.Test already has manual STA-thread infra, no MSTest.STAExtensions needed (2026-08-07)
 - [quickfiler-percoverage-epic-136](project_quickfiler_percoverage_epic_136.md) — epic #136: read exact per-file line-rate from committed Cobertura under evidence/qa-gates/ instead of assuming low coverage (2026-08-07)
-- [cobertura-perfile-attribution-contract](project_cobertura_perfile_attribution_contract.md) — per-file attribution works for partial classes, but the `line-rate` ATTRIBUTE is inflated (double-count + bad merge blend) — recompute from class-level `<lines>` only (2026-08-07)
+- [webview2-exemption-and-coverage-asymmetry](project_webview2_exemption_and_coverage_asymmetry.md) — #455/F13: class-level `[ExcludeFromCodeCoverage]` suppresses nested lambdas, method-level does NOT; §UT2's 3 grounds don't cover SDK adapters; WebView2 type constructibility (2026-08-07)
+- [qfc-breadcrumb-dropdown-f13-455](project_qfc_breadcrumb_dropdown_f13_455.md) — #455/epic #136 F13: files already pass the 75% branch floor (91-92%); key the harness on `filename` not `<class name>`; async `throw;` makes a catch's closing brace unreachable (2026-08-07)
+- [qfc455-exclude-attribute-lambda-leak](project_qfc455_exclude_attribute_lambda_leak.md) — method-level [ExcludeFromCodeCoverage] leaks its lambdas into the denominator (type-level does not); #441 inflation = exactly the per-method `<lines>` block (2026-08-07)
+- [qfc455-reentrant-dispose-seam](project_qfc455_reentrant_dispose_seam.md) — #455 F13: an existing disposal-callback reentrancy point opens an otherwise-unreachable async window — look for outward calls made outside the lock before adding a test-only scheduling seam (2026-08-07)
 
 ## Additional entries
 
+- [cobertura-perfile-attribution-contract](project_cobertura_perfile_attribution_contract.md) — per-file attribution works for partial classes, but the `line-rate` ATTRIBUTE is inflated (double-count + bad merge blend) — recompute from class-level `<lines>` only (2026-08-07)
 - [quickfiler-coverage-ledger-432](project_quickfiler_coverage_ledger_432.md) — #432/epic #136 F1: 121 compiled files confirmed; manifest's "33 exemptions" is really 40 usages/21 files; 24 files suppressed via partial-class inheritance (2026-08-07)
 - [cobertura-line-double-count](project_cobertura_line_double_count.md) — repo-wide lines-valid is ~2x actual (`.//lines/line` matches method-level AND class-level rollups); merged class `line-rate` is biased — recompute per-file from `<line>` nodes (2026-08-07)

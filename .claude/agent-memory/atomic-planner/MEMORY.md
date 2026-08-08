@@ -41,8 +41,12 @@
 - [CRLF plans validate — do not normalize](crlf-plans-validate-do-not-normalize.md) — verified: all six epic-child plans returned ok:true as pure CRLF; never add an LF-normalization step (the csproj CRLF rule is unrelated and stays)
 - [Plan validator phase-heading constraint](plan-validator-phase-heading-constraint.md) — MCP plan validator requires exact `### Phase N — <Title>`; no tokens between Phase N and em-dash; H1 title line is exempt
 - [Plan validator task-ID sequential constraint](plan-validator-task-id-sequential-constraint.md) — task IDs must be digit-only and sequential-by-appearance; mid-phase insertion forces renumbering all later tasks + cross-refs
+- [Legacy csproj wiring](project_legacy_csproj_explicit_compile_include.md) — fold `Compile Include` into the creating task (never a batched entry task); own `Reference` needed, ProjectReference gives no compile-time flow (CS0012)
+- [Preflight delta with colliding task IDs](preflight-delta-colliding-task-ids.md) — when two findings pin the same ID, keep the ID cited by literal replacement text, place the reordered task adjacent, and report the deviation
+
+## Additional entries
+
 - [Decomposition must cover newly-inserted tasks](decomposition-must-cover-newly-inserted-tasks.md) — a revision that decomposes bundled measure/split/register tasks must also fix the ones it itself inserts, and re-derive the Decision record's enumeration
-- [Legacy csproj wiring](project_legacy_csproj_explicit_compile_include.md) — packages.config projects need `Compile Include` wiring and their own `Reference`; ProjectReference gives no compile-time flow (CS0012)
 - [C# Phase 0 toolchain bootstrap](project_csharp_phase0_toolchain_bootstrap.md) — .dotnet-sdk/ absent + no dotnet tool restore + no dotnet-coverage; make it [P0-T1] or all csharpier/coverage tasks fail
 - [#211 startup-lifetime heartbeat seam](project_211_startup_lifetime_heartbeat_seam.md) — Phase 3.3 [startup-lifetime-heartbeat] DispatcherTimer in ThisAddIn.cs (exempt), pure logic in StartupDiagnosticsProbe; AC15
 - [#292 CurrentStoreContext parallel seam](project_292_currentstorecontext_parallel_seam.md) — process-global static; scope-opening store test classes must be [DoNotParallelize] or they pollute reader-baseline tests under UtilitiesCS.Test ClassLevel parallelization
@@ -61,6 +65,7 @@
 - [#430 QuickFiler keyboard plan seams](project_430_quickfiler_keyboard_plan_seams.md) — K1 mandatory (QuickFiler.Test absent from UtilitiesCS InternalsVisibleTo); R2 Option A; amended AC9 two-csproj allowance; ItemViewer needs an ambient SynchronizationContext
 - [#432 coverage-ledger plan seams](project_432_coverage_ledger_plan_seams.md) — 121-file disjoint partition arithmetic; classification vs disposition are orthogonal axes; entry fn returns ExitCode (never calls exit); zero-line files can never be `testable`
 - [#349 breadcrumb plan seams](project_349_efcviewer_breadcrumb_plan_seams.md) — P0-T6 halt-gate on 9101 provider; evidence/repro/ authorized; EfcViewer3 mechanical swap only; Newtonsoft in UtilitiesCS only
+- [#455 F13 breadcrumb/WebView2 plan seams](project_455_f13_breadcrumb_webview_plan_seams.md) — separate-type (never partial) exemption extraction; method-level attrs leak lambdas, type-level don't; 8/11 files already pass
 - [#136 wave-1 non-halting F1 dependency](project_136_wave1_nonhalting_f1_dependency.md) — F1 ledger/harness absent at planning time is by design; write it as an execution-time read, never a preflight-evaluable gate
 - [#433 F7 QfcHomeController plan seams](project_433_f7_qfchomecontroller_plan_seams.md) — partial split before seams (487+15>500); `:133`/`:136` viewer/scheduler coupling; 5 frozen #424 test files; QuickFiler.Test.csproj wiring
 - [#424 QuickFiler deadline plan seams](project_424_quickfiler_deadline_plan_seams.md) — 12s const; Part2 partial no-[TestClass]; overload migration breaks loose-mock Setup/Verify (Issue218 "dormant" misclassification); grep old overload shape in ALL test files
