@@ -19,6 +19,10 @@
 - [Partial-class seam: declare and consume in the same phase](partial-class-seam-declaration-and-consumption-same-phase.md) — per-file phases must not split a seam's declaration from its consumption across two partials; dead code fails the analyzer build and blocks the earlier phase's coverage gate
 - [Seam default CS0236 + intermediate consumers](csharp-seam-default-cs0236-and-intermediate-consumers.md) — a delegate-seam default capturing `_field` in a property initializer is CS0236 (use backing field + lazy default); extraction rewires must check lines BETWEEN the call sites for pre-transform consumers
 - [AC source sweep: Definition of Done](ac-source-sweep-definition-of-done.md) — every AC needs a verification task, and spec.md's `## Definition of Done` checkboxes are AC-source too (`## Seeded Test Conditions` are not)
+- [Stale-worktree guard must be repo-relative](stale-worktree-guard-must-be-repo-relative.md) — absolute `\.claude\` match flags the executing agent worktree's own DLLs and can never pass after a build; anchor to `(Resolve-Path .)`
+- [Baseline-relative gates; vacuous diff comparators](baseline-relative-toolchain-gates-and-vacuous-diff-comparators.md) — never assert absolute exit 0 for solution-wide CMD-ANALYZE/CMD-NULLABLE; `<merge-base>..HEAD` proves nothing when the plan never commits
+- [Seam shape: cardinality and mutability](seam-shape-must-match-target-cardinality-and-mutability.md) — per-element targets need a stateless facade (target as 1st param); reassigned fields need accessor delegates, never a readonly snapshot; re-attribute downstream tasks after narrowing a facade
+- [Task counts must be mechanical and recorded](task-counts-must-be-mechanical-and-recorded.md) — count `^- \[ \] \[P\d+-T\d+\]` matches, record per-phase totals in the plan header; line-vs-unique-ID divergence means a duplicate ID
 
 ## Additional entries
 

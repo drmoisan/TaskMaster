@@ -6,4 +6,4 @@
 
 ## Additional entries
 
-- [QuickFiler per-file coverage baseline](reference_quickfiler_perfile_coverage_baseline.md) — grep the #424 Cobertura artifact for indicative per-file rates before scoping an epic #136 child; most files are already above 80%
+- [QuickFiler per-file coverage baseline](reference_quickfiler_perfile_coverage_baseline.md) — indicative per-file rates for epic #136 children; NEVER trust the Cobertura line-rate attribute (#441/#478) — recompute from class-level lines
