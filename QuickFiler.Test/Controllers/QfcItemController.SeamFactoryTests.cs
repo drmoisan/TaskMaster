@@ -11,6 +11,7 @@ using Moq;
 using QuickFiler.Controllers;
 using QuickFiler.Helper_Classes;
 using QuickFiler.Interfaces;
+using QuickFiler.Test.TestSupport;
 using TaskVisualization;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence.EmailParsingSorting;
@@ -279,6 +280,157 @@ namespace QuickFiler.Controllers.Tests
             viewer.VerifyAdd(v => v.SearchKeyDown += It.IsAny<KeyEventHandler>(), Times.Once());
             viewer.VerifyAdd(v => v.EmailCopyChanged += It.IsAny<EventHandler>(), Times.Once());
             viewer.VerifyAdd(v => v.AttachmentsChanged += It.IsAny<EventHandler>(), Times.Once());
+        }
+
+        // ------------------------- #230 static-factory de-exemption -------------------------
+
+        /// <summary>
+        /// Harness bound for the #230 pump-hosted factory tests (MSTest <c>[Timeout]</c> precedent
+        /// <c>TaskMaster.Test/AppGlobals/NonBlockingDelayTests.cs</c>). Every wait is on a
+        /// deterministic completion signal; the attribute only converts a genuine deadlock into a
+        /// test failure instead of a CI hang.
+        /// </summary>
+        private const int PumpTimeoutMs = 60000;
+
+        /// <summary>
+        /// #230 (de-exempted): <c>CreateSequentialAsync</c> constructs the controller, applies the
+        /// injected seams, saves its parameters, and awaits <c>InitializeSequentialAsync</c>, whose
+        /// web-view tail is fire-and-forget — so the factory runs to normal completion and returns
+        /// the initialized controller (D13). The new optional seam parameters supply a mocked
+        /// <c>IWebViewCoreInitializer</c>, an inline-executing <c>IUiDispatcher</c>, and a mocked
+        /// conversation-resolver factory, so the real WebView2 runtime is never reached.
+        /// </summary>
+        [TestMethod]
+        [Timeout(PumpTimeoutMs)]
+        public async Task CreateSequentialAsync_WithInjectedSeams_ReturnsAnInitializedController()
+        {
+            // Arrange
+            WinFormsPumpHost host = new WinFormsPumpHost();
+            QfcItemController_InitializationTests.PumpHarness harness = null;
+            try
+            {
+                harness = await QfcItemController_InitializationTests
+                    .BuildPumpHarnessAsync(host, darkMode: false)
+                    .ConfigureAwait(false);
+                QfcItemController_InitializationTests.FactoryArguments arguments =
+                    QfcItemController_InitializationTests.BuildFactoryArguments(harness);
+
+                // Act — awaited to normal completion from the MSTest thread.
+                QfcItemController created = await QfcItemController
+                    .CreateSequentialAsync(
+                        arguments.Globals,
+                        arguments.HomeController,
+                        arguments.Parent,
+                        harness.Viewer,
+                        viewerPosition: 4,
+                        itemNumberDigits: 2,
+                        mailItem: arguments.MailItem,
+                        tlpStates: null,
+                        token: arguments.Token,
+                        uiDispatcher: arguments.UiDispatcher,
+                        webViewInitializer: harness.WebViewInitializer.Object,
+                        conversationResolverFactory: arguments.ConversationResolverFactory
+                    )
+                    .ConfigureAwait(false);
+
+                // Assert — the factory returned a controller whose initialization actually ran.
+                created.Should().NotBeNull();
+                created.Parent.Should().BeSameAs(arguments.Parent);
+                created.ItemNumber.Should().Be(4);
+                created.TableLayoutPanels.Should().NotBeNullOrEmpty();
+                created.Buttons.Should().NotBeNullOrEmpty();
+                QfcItemControllerTestSupport
+                    .GetField(created, "_themes")
+                    .Should()
+                    .NotBeNull(because: "InitializeSequentialAsync ran through the pump");
+                QfcItemControllerTestSupport
+                    .GetField(created, "_webViewInitializer")
+                    .Should()
+                    .BeSameAs(
+                        harness.WebViewInitializer.Object,
+                        because: "the injected seam must survive SaveParameters' ??= defaults"
+                    );
+            }
+            finally
+            {
+                if (harness != null)
+                {
+                    harness.Restore();
+                }
+
+                await host.StopAsync().ConfigureAwait(false);
+            }
+        }
+
+        /// <summary>
+        /// #230 (de-exempted): <c>CreateAsync</c> awaits <c>InitializeAsync</c>, whose final
+        /// statement is <c>await InitializeWebViewAsync()</c>. Under the mocked web-view seam that
+        /// await always faults, so <c>CreateAsync</c> can never reach its <c>return controller;</c>
+        /// statement in a unit test (D13) — its per-member coverage is partial by construction and
+        /// the D5 gate (c) bar for it is "&gt; 0%", not "no uncovered lines". The test asserts the
+        /// injected exception's identity on the awaited factory task, and asserts the observable
+        /// state the preceding lines set on the injected viewer and controller.
+        /// </summary>
+        [TestMethod]
+        [Timeout(PumpTimeoutMs)]
+        public async Task CreateAsync_WithFaultingWebViewSeam_FaultsWithThatExceptionAfterInitializing()
+        {
+            // Arrange
+            WinFormsPumpHost host = new WinFormsPumpHost();
+            QfcItemController_InitializationTests.PumpHarness harness = null;
+            try
+            {
+                harness = await QfcItemController_InitializationTests
+                    .BuildPumpHarnessAsync(host, darkMode: false)
+                    .ConfigureAwait(false);
+                QfcItemController_InitializationTests.FactoryArguments arguments =
+                    QfcItemController_InitializationTests.BuildFactoryArguments(harness);
+
+                // Act
+                Func<Task<QfcItemController>> act = () =>
+                    QfcItemController.CreateAsync(
+                        arguments.Globals,
+                        arguments.HomeController,
+                        arguments.Parent,
+                        harness.Viewer,
+                        viewerPosition: 6,
+                        itemNumberDigits: 2,
+                        mailItem: arguments.MailItem,
+                        tlpStates: null,
+                        token: arguments.Token,
+                        uiDispatcher: arguments.UiDispatcher,
+                        webViewInitializer: harness.WebViewInitializer.Object,
+                        conversationResolverFactory: arguments.ConversationResolverFactory
+                    );
+
+                // Assert — the controlled fault from the mocked seam, not a timeout or a hang.
+                await act.Should()
+                    .ThrowAsync<QfcItemController_InitializationTests.WebViewSentinelException>(
+                        because: "execution must stop at the mocked web-view seam"
+                    )
+                    .ConfigureAwait(false);
+
+                // Assert — the lines preceding the faulting tail did run against the real viewer.
+                // SaveParameters sets the viewer's back-reference to the factory-built controller,
+                // which is the only handle a test has on it once the factory faults.
+                harness.Viewer.Controller.Should().NotBeNull();
+                QfcItemController factoryBuilt = (QfcItemController)harness.Viewer.Controller;
+                factoryBuilt.ItemNumber.Should().Be(6);
+                factoryBuilt.TableLayoutPanels.Should().NotBeNullOrEmpty();
+                QfcItemControllerTestSupport
+                    .GetField(factoryBuilt, "_themes")
+                    .Should()
+                    .NotBeNull(because: "SetupThemes precedes the faulting await");
+            }
+            finally
+            {
+                if (harness != null)
+                {
+                    harness.Restore();
+                }
+
+                await host.StopAsync().ConfigureAwait(false);
+            }
         }
     }
 }

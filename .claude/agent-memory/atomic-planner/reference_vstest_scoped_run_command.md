@@ -8,9 +8,12 @@ metadata:
 Executor-verified (#424 preflight, 2026-08-06) canonical scoped test-run form for plan tasks — `vstest.console.exe` is NOT on PATH in this environment:
 
 ```
-$vstest = vswhere -latest -products * -find Common7\IDE\Extensions\TestPlatform\vstest.console.exe
+$vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+$vstest = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
 & $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~<Name>"
 ```
+
+- **`vswhere` is NOT on PATH either** (#230 preflight B1, 2026-08-07): bare `vswhere` fails; resolve it by the explicit `${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe` path, as every repo script does. Resolves to `C:\Program Files\Microsoft Visual Studio\18\Community\...\vstest.console.exe` in this environment.
 
 - `/InIsolation` is mandatory for the Moq-based test assemblies (`scripts/vscode/Invoke-MSTest.ps1:54` already passes it).
 - vstest 18.x rejects `OR` inside `/TestCaseFilter` — join clauses with `|`.

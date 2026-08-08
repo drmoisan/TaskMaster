@@ -132,10 +132,9 @@ namespace QuickFiler.Controllers
             );
         }
 
-        // Residual (bucket-iii): orchestration overload that funnels into Initialize(bool), whose body
-        // drives concrete control-tree construction (ResolveControlGroups/SetupThemes/WireEvents against
-        // the live ItemViewer). Not unit-reachable without a real ItemViewer under Option A.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        // #230: de-exempted. The overload funnels into Initialize(bool); the former barrier was the
+        // missing WinForms message pump for that body, not headless construction. Covered by
+        // QfcItemController_InitializationTests.InitializeNineArgOverload_ThroughThePumpHost_*.
         private void Initialize(
             IApplicationGlobals AppGlobals,
             IFilerHomeController homeController,
@@ -162,10 +161,10 @@ namespace QuickFiler.Controllers
             Initialize(async);
         }
 
-        // Residual (bucket-iii): orchestrates concrete control-tree construction — calls
-        // ResolveControlGroups((ItemViewer)_itemViewer), QfcThemeHelper.SetupThemes((ItemViewer)...),
-        // and WireEvents (ForAllControls) — all requiring a live ItemViewer. Not unit-reachable.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        // #230: de-exempted. The orchestration runs against a real ItemViewer and its tail dispatches
+        // InitializeWebViewAsync through the viewer's WPF dispatcher; both require a live message
+        // loop, which the WinFormsPumpHost test seam supplies. Covered by
+        // QfcItemController_InitializationTests.InitializeBool_ThroughThePumpHost_*.
         public void Initialize(bool async)
         {
             // Group controls into collections
@@ -194,10 +193,12 @@ namespace QuickFiler.Controllers
             //Task.Run(() => InitializeWebViewAsync());
         }
 
-        // Residual (bucket-iii): async orchestration of concrete control-tree construction
-        // (ResolveControlGroupsAsync((ItemViewer)...), SetupThemes((ItemViewer)...),
-        // InitializeWebViewAsync, WireEvents). Not unit-reachable without a live ItemViewer.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        // #230: de-exempted. The former barrier was the missing WinForms message pump for this
+        // orchestration, not headless construction. Covered by
+        // QfcItemController_InitializationTests.InitializeAsync_ThroughThePumpHost_*, which runs
+        // every line and asserts the controlled fault at the mocked web-view seam. The terminal
+        // `await InitializeWebViewAsync()` is not completable in a unit test (the CoreWebView2
+        // runtime is an external process), so this member's coverage is partial by construction.
         public async Task InitializeAsync()
         {
             //TraceUtility.LogMethodCall();
@@ -255,9 +256,10 @@ namespace QuickFiler.Controllers
             await InitializeWebViewAsync();
         }
 
-        // Residual (bucket-iii): same concrete control-tree orchestration as InitializeAsync
-        // (ResolveControlGroups/SetupThemes against the live ItemViewer). Not unit-reachable.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        // #230: de-exempted. The former barrier was the missing WinForms message pump, not headless
+        // construction: the orchestration marshals through the concrete ItemViewer's WinForms
+        // context. The WinFormsPumpHost test seam supplies that loop, so the member is covered by
+        // QfcItemController_InitializationTests.InitializeGraphicsAsync_ThroughThePumpHost_*.
         public async Task InitializeGraphicsAsync()
         {
             // Group controls into collections
@@ -286,9 +288,10 @@ namespace QuickFiler.Controllers
             _ = InitializeWebViewAsync();
         }
 
-        // Residual (bucket-iii): same concrete control-tree orchestration as InitializeAsync
-        // (ResolveControlGroups/SetupThemes against the live ItemViewer). Not unit-reachable.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        // #230: de-exempted. The former barrier was the missing WinForms message pump, not headless
+        // construction: the orchestration marshals through the concrete ItemViewer's WinForms
+        // context. The WinFormsPumpHost test seam supplies that loop, so the member is covered by
+        // QfcItemController_InitializationTests.InitializeSequentialAsync_ThroughThePumpHost_*.
         public async Task InitializeSequentialAsync()
         {
             Token.ThrowIfCancellationRequested();
@@ -397,10 +400,12 @@ namespace QuickFiler.Controllers
             _folderPredictorEmptyFactory ??= globals => new FolderPredictor(globals);
         }
 
-        // Residual (bucket-iii): static factory that constructs the controller and awaits
-        // InitializeAsync (concrete control-tree orchestration). Barrier is inherited from the async
-        // init it drives; not unit-reachable without a live ItemViewer.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        // #230: de-exempted. The optional seam parameters below give the factory the injection point
+        // it previously lacked, and the WinFormsPumpHost test seam supplies the message loop
+        // InitializeAsync needs. Covered by
+        // QfcItemController_SeamFactoryTests.CreateAsync_WithFaultingWebViewSeam_*, which asserts the
+        // controlled fault at the mocked web-view seam (the `return controller;` statement is not
+        // reachable in a unit test - see the D13 note in the #230 plan).
         public static async Task<QfcItemController> CreateAsync(
             IApplicationGlobals AppGlobals,
             IFilerHomeController homeController,
@@ -410,12 +415,21 @@ namespace QuickFiler.Controllers
             int itemNumberDigits,
             MailItem mailItem,
             TlpCellStates tlpStates,
-            CancellationToken token
+            CancellationToken token,
+            UtilitiesCS.Threading.IUiDispatcher uiDispatcher = null,
+            QuickFiler.Viewers.IWebViewCoreInitializer webViewInitializer = null,
+            Func<MailItem, ConversationResolver> conversationResolverFactory = null
         )
         {
             token.ThrowIfCancellationRequested();
 
             var controller = new QfcItemController();
+            // Store any injected seams before SaveParameters applies the production defaults for the
+            // ones left null, mirroring the primary constructor's optional-seam pattern. Non-breaking:
+            // every seam parameter is optional and defaults preserve the previous behavior.
+            controller._uiDispatcher = uiDispatcher;
+            controller._webViewInitializer = webViewInitializer;
+            controller._conversationResolverFactory = conversationResolverFactory;
             controller.SaveParameters(
                 AppGlobals,
                 homeController,
@@ -430,10 +444,10 @@ namespace QuickFiler.Controllers
             return controller;
         }
 
-        // Residual (bucket-iii): static factory that constructs the controller and awaits
-        // InitializeSequentialAsync (concrete control-tree orchestration). Barrier inherited from the
-        // async init it drives; not unit-reachable without a live ItemViewer.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        // #230: de-exempted. The optional seam parameters below give the factory the injection point
+        // it previously lacked, and the WinFormsPumpHost test seam supplies the message loop
+        // InitializeSequentialAsync needs. Covered by
+        // QfcItemController_SeamFactoryTests.CreateSequentialAsync_WithInjectedSeams_*.
         public static async Task<QfcItemController> CreateSequentialAsync(
             IApplicationGlobals AppGlobals,
             IFilerHomeController homeController,
@@ -443,12 +457,21 @@ namespace QuickFiler.Controllers
             int itemNumberDigits,
             MailItem mailItem,
             TlpCellStates tlpStates,
-            CancellationToken token
+            CancellationToken token,
+            UtilitiesCS.Threading.IUiDispatcher uiDispatcher = null,
+            QuickFiler.Viewers.IWebViewCoreInitializer webViewInitializer = null,
+            Func<MailItem, ConversationResolver> conversationResolverFactory = null
         )
         {
             token.ThrowIfCancellationRequested();
 
             var controller = new QfcItemController();
+            // Store any injected seams before SaveParameters applies the production defaults for the
+            // ones left null, mirroring the primary constructor's optional-seam pattern. Non-breaking:
+            // every seam parameter is optional and defaults preserve the previous behavior.
+            controller._uiDispatcher = uiDispatcher;
+            controller._webViewInitializer = webViewInitializer;
+            controller._conversationResolverFactory = conversationResolverFactory;
             controller.SaveParameters(
                 AppGlobals,
                 homeController,

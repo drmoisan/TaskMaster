@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler;
 using QuickFiler.Controllers;
+using QuickFiler.Test.TestSupport;
 using UtilitiesCS;
 
 namespace QuickFiler.Controllers.Tests
@@ -24,6 +25,14 @@ namespace QuickFiler.Controllers.Tests
     [TestClass]
     public class QfcItemController_ViewerSetupTests
     {
+        /// <summary>
+        /// Harness bound for the #230 pump-hosted tests (MSTest <c>[Timeout]</c> precedent
+        /// <c>TaskMaster.Test/AppGlobals/NonBlockingDelayTests.cs</c>). Every wait in those tests is
+        /// on a deterministic completion signal; this attribute only converts a genuine deadlock in
+        /// production code into a test failure instead of a CI hang.
+        /// </summary>
+        private const int PumpTimeoutMs = 60000;
+
         private static Mock<IApplicationGlobals> BuildGlobals(
             bool moveConversation,
             bool saveEmailCopy,
@@ -401,6 +410,57 @@ namespace QuickFiler.Controllers.Tests
             finally
             {
                 SynchronizationContext.SetSynchronizationContext(previousContext);
+            }
+        }
+
+        /// <summary>
+        /// #230 (de-exempted): <c>ResolveControlGroupsAsync(ItemViewer)</c> is the pure pump case —
+        /// it builds <c>QfcTipsDetails</c> for every tip label and awaits
+        /// <c>itemViewer.UiSyncContext</c> before walking the Designer control tree. On a thread-pool
+        /// MSTest thread that await never completes; running the viewer on
+        /// <see cref="WinFormsPumpHost"/> supplies the message loop that drains it, so the member can
+        /// be awaited from the MSTest thread and its observable state asserted.
+        /// </summary>
+        [TestMethod]
+        [Timeout(PumpTimeoutMs)]
+        public async Task ResolveControlGroupsAsync_ThroughThePumpHost_PopulatesTipsAndControlGroups()
+        {
+            // Arrange — the viewer must be constructed on the pump so UiSyncContext binds there.
+            WinFormsPumpHost host = new WinFormsPumpHost();
+            try
+            {
+                QuickFiler.ItemViewer viewer = await host.InvokeAsync(() =>
+                        new QuickFiler.ItemViewer()
+                    )
+                    .ConfigureAwait(false);
+                HarnessController controller = new HarnessController();
+                QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer);
+                controller.Token = CancellationToken.None;
+
+                // Act — awaited from the MSTest thread; continuations drain through the live pump.
+                await controller.ResolveControlGroupsAsync(viewer).ConfigureAwait(false);
+
+                // Assert — the tip-detail collections and concrete control groups are populated.
+                QfcItemControllerTestSupport
+                    .GetField(controller, "_itemPositionTips")
+                    .Should()
+                    .NotBeNull(because: "the item-number tip is built before the context await");
+                ICollection tipsDetails = (ICollection)
+                    QfcItemControllerTestSupport.GetField(controller, "_listTipsDetails");
+                tipsDetails.Should().NotBeNull();
+                tipsDetails
+                    .Count.Should()
+                    .BeGreaterThan(0, because: "the viewer's Designer tree carries tip labels");
+                QfcItemControllerTestSupport
+                    .GetField(controller, "_listTipsExpanded")
+                    .Should()
+                    .NotBeNull();
+                controller.TableLayoutPanels.Should().NotBeNullOrEmpty();
+                controller.Buttons.Should().NotBeNullOrEmpty();
+            }
+            finally
+            {
+                await host.StopAsync().ConfigureAwait(false);
             }
         }
     }

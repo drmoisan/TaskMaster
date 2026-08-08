@@ -1,0 +1,18 @@
+---
+name: project-230-winforms-pump-seam-plan-facts
+description: "#230 verified plan seams: 19 census sites in QfcItemController partials; Initialization.cs at 466/500 lines; test-file headroom figures; new TestSupport files need csproj Compile Include; 8-of-9 de-exemption target (19->11)"
+metadata:
+  type: project
+---
+
+Verified facts behind the #230 plan (`docs/features/active/2026-08-07-winforms-message-pump-test-seam-230/plan.2026-08-07T20-36.md`), measured 2026-08-07:
+
+- `[ExcludeFromCodeCoverage]` census inside `QuickFiler/Controllers/QfcItemController.*.cs` = exactly 19 sites (Conversation 1, EventWiring 1, EventHandlers 5, Initialization 7, Navigation 2, ViewerSetup 3). `EnsureBreadcrumbPipeline` (ViewerSetup.cs:132, from #351) is the post-ratification 19th site vs the 18-member ratified controller boundary. Target 19 -> 11; `InitializeWebViewAsync` (ViewerSetup.cs:38) stays exempt (WebView2 runtime barrier).
+- `QfcItemController.Initialization.cs` = 466 lines pre-change — the factory-seam optional-parameter edit (~+16-20 lines, offset by 7 attribute/comment removals) needs an explicit <=500 verification task (plan P5-T2).
+- Test-file headroom: InitializationTests 193, SeamFactoryTests 284, ViewerSetupTests 407 (tight — overflow rule: `*.Part2.cs` partial continuation, no new `[TestClass]`).
+- New `QuickFiler.Test/TestSupport/*.cs` files require `<Compile Include>` in the legacy `QuickFiler.Test.csproj` (see [[project-legacy-csproj-explicit-compile-include]]).
+- Factory seam: `CreateAsync`/`CreateSequentialAsync` do `new QfcItemController(); SaveParameters(...)` with `??=` production defaults (incl. real `WebView2CoreInitializer`) — de-exempting them requires the 3 optional params (`IUiDispatcher`, `IWebViewCoreInitializer`, `Func<MailItem, ConversationResolver>`) assigned before `SaveParameters`, mirroring primary ctor lines 38-64 exactly (`= null` defaults are nullable-gate-safe because the primary ctor already passes with them).
+- Factory tail asymmetry (preflight-verified, plan D13): `CreateSequentialAsync`/`InitializeSequentialAsync`/`InitializeGraphicsAsync` end with fire-and-forget `_ = InitializeWebViewAsync();` and return normally under a mocked seam; `CreateAsync` → `InitializeAsync` ends with an AWAITED `InitializeWebViewAsync()` that always faults (null `CoreWebView2`), so `CreateAsync` never reaches `return controller;` in a unit test — test it to the controlled fault, partial per-member coverage by construction (gate "> 0%").
+- Preflight revision 2 (2026-08-07) also encoded: vswhere-by-explicit-path in D6 (see [[reference-vstest-scoped-run-command]]), post-format file-size audit in Phase 8 (see [[feedback-postformat-file-size-audit]]), one AC per check-off task (see [[feedback-ac-checkoff-one-per-task]]), Compile-Include wiring verification task (P7-T8), `Select-String` EXIT_CODE via `$?`, and Cobertura per-member aggregation from `QfcItemController+<Member>d__NN` state-machine classes.
+- Preflight revision 3 (2026-08-07) retired the executed-test-count floor: P7-T8 now proves wiring via csproj enumeration against `git diff --name-only` PLUS `vstest /ListTests` discovery of every statically-enumerated new `[TestMethod]` name; P8-T5 records repo-wide counts as audit trail only (see [[feedback-wiring-gates-must-be-wiring-sensitive]]).
+- **How to apply:** any revision pass on this plan must preserve the census scope (controller partials only), the D5 coverage gates (post >= baseline raw AND denominator-adjusted, changed lines >= 90%, each of the 8 members > 0% with the CreateAsync/InitializeAsync carve-out), and the WPF-dispatcher interop smoke test ordering (host self-test before any controller pump test relies on `Initialize(bool)`'s dispatcher tail).
