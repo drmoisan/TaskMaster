@@ -3,6 +3,7 @@
 ## Plan structure, preflight, execution protocol
 
 - [Preflight: blanket assertions + forward-phase deps](project_preflight_blanket_assertion_and_forward_dependency.md) — the two recurring blockers to check mechanically
+- [pwsh -Command quoting boundary](project_pwsh_command_quoting_boundary.md) — outer double quotes let bash/PowerShell eat `$var` and `$(...)` before pwsh sees them; execute plan commands verbatim during preflight
 - [Inserted plan tasks force renumbering](project_plan_task_ids_digit_only_forces_renumbering.md) — suffixed IDs (`P3-T5a`) fail validation; insert + renumber downstream
 - [Plan rationale clauses are evidence](project_418_plan_rationale_clauses_are_evidence.md) — unmeasured world-state claims in prose block preflight, not the fix
 - [Line locators go stale after a doc edit](project_plan_line_locators_stale_after_doc_edit.md) — a revision that expands spec.md shifts every later citation; verify each cited line

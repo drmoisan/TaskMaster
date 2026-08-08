@@ -1,5 +1,7 @@
 # Atomic Planner Memory Index
 
+- [pwsh -Command quoting in plan tasks](pwsh-command-quoting-in-plan-tasks.md) — outer SINGLE quotes, inner double; outer-double is eaten by the calling Bash/PowerShell and fakes a Phase 0 halt
+
 - [Dead-code removal vs coverage exclusion](project_deadcode_removal_vs_coverage_exclusion.md) — coverage gate blocked by unreachable dead prod code → plan removal (shrink denominator), never exclusion/carve-out/forced-rethrow
 - [Dead code retained: residual to the ledger](deadcode-retained-residual-to-ledger.md) — when deletion is routed out of scope, measure the real rate and request ratification; never exclude, never reflect-invoke private statics to inflate
 - [Coverage gate on CLR-invoked private members](coverage-gate-clr-invoked-private-members.md) — never gate AssemblyResolve-style private members at >=90%; split newly-added vs changed per the AC's own wording
@@ -52,8 +54,10 @@
 - [Coverage threshold conflict: CLAUDE.md vs general-unit-test.md](project_coverage_threshold_conflict_claude_md_vs_general_unit_test.md) — 80/90 vs 85/75; repo baseline 70.19/58.30 → repo-wide figure reported non-blocking on fixes (#424 precedent), change-scoped gates blocking
 - [Planner may lack the MCP plan validator](project_planner_mcp_validator_not_in_tool_surface.md) — file-only tool surface (no Bash/no mcp__drm-copilot__*); never claim the gate passed, report VALIDATOR NOT RUN + structural self-check
 - [#430 QuickFiler keyboard plan seams](project_430_quickfiler_keyboard_plan_seams.md) — K1 mandatory (QuickFiler.Test absent from UtilitiesCS InternalsVisibleTo); R2 Option A; amended AC9 two-csproj allowance; ItemViewer needs an ambient SynchronizationContext
+- [#432 coverage-ledger plan seams](project_432_coverage_ledger_plan_seams.md) — 121-file disjoint partition arithmetic; classification vs disposition are orthogonal axes; entry fn returns ExitCode (never calls exit); zero-line files can never be `testable`
 - [#349 breadcrumb plan seams](project_349_efcviewer_breadcrumb_plan_seams.md) — P0-T6 halt-gate on 9101 provider; evidence/repro/ authorized; EfcViewer3 mechanical swap only; Newtonsoft in UtilitiesCS only
 - [#136 wave-1 non-halting F1 dependency](project_136_wave1_nonhalting_f1_dependency.md) — F1 ledger/harness absent at planning time is by design; write it as an execution-time read, never a preflight-evaluable gate
 - [#433 F7 QfcHomeController plan seams](project_433_f7_qfchomecontroller_plan_seams.md) — partial split before seams (487+15>500); `:133`/`:136` viewer/scheduler coupling; 5 frozen #424 test files; QuickFiler.Test.csproj wiring
 - [#424 QuickFiler deadline plan seams](project_424_quickfiler_deadline_plan_seams.md) — 12s const; Part2 partial no-[TestClass]; overload migration breaks loose-mock Setup/Verify (Issue218 "dormant" misclassification); grep old overload shape in ALL test files
+- [PoshQC MCP measurement limits](reference_poshqc_mcp_measurement_limits.md) — no file list/count, no BRANCH counter, hooks-only coverage allow-list (scripts/vscode/ never instrumented); never clause `EXIT_CODE: 0` for analyze or test
 - [vstest scoped-run + csharpier 1.2.6 commands](reference_vstest_scoped_run_command.md) — vswhere-resolved vstest.console.exe + /InIsolation + /TestCaseFilter (join `|`); every run task needs an explicit command; csharpier needs format/check subcommands
