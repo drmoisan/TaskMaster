@@ -61,8 +61,8 @@ features:
   - issue_num: 456
     feature_folder: 2026-08-07-quickfiler-itemviewer-coverage-456
     depends_on: [432]
-  - issue_num: 1015
-    feature_folder: quickfiler-form-viewers-bayesian-coverage
+  - issue_num: 496
+    feature_folder: 2026-08-08-quickfiler-form-viewers-bayesian-coverage-496
     depends_on: [432]
   - issue_num: 1016
     feature_folder: quickfiler-per-file-coverage-capstone
@@ -80,7 +80,7 @@ features:
       - 1012
       - 455
       - 456
-      - 1015
+      - 496
 ---
 
 # Epic: QuickFiler Per-File 80% Coverage (#136)
@@ -92,8 +92,9 @@ features:
 > **Issue-number back-fill status (2026-08-08).** `issue_num` values were placeholders at
 > manifest-authoring time and are replaced with the real GitHub issue number from each child's
 > promotion receipt as its preparation completes. Twelve are now resolved — **432** (F1), **430**,
-> **431**, **433**, **434**, **435**, **436**, **437**, **452**, **453**, **454**, **455**, **456**.
-> Three remain placeholders (F12, F15, F16), whose children are still in preparation and belong to children still in preparation. Every `depends_on` edge on the wave-0 enabler
+> **431**, **433**, **434**, **435**, **436**, **437**, **452**, **453**, **454**, **455**, **456**,
+> **496**. Two remain placeholders — F12 (**#495**) and F16 (**#497**), whose issues are already
+> promoted and whose children are in preparation and belong to children still in preparation. Every `depends_on` edge on the wave-0 enabler
 > now points at the real **432**. The manifest is committed in final resolved form, with no
 > placeholder remaining, before the kickoff artifact is written.
 
