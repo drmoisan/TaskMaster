@@ -55,8 +55,8 @@ features:
   - issue_num: 1012
     feature_folder: quickfiler-breadcrumb-bridge-coverage
     depends_on: [432]
-  - issue_num: 1013
-    feature_folder: quickfiler-breadcrumb-dropdown-webview-coverage
+  - issue_num: 455
+    feature_folder: 2026-08-07-quickfiler-breadcrumb-dropdown-webview-coverage-455
     depends_on: [432]
   - issue_num: 1014
     feature_folder: quickfiler-itemviewer-coverage
@@ -78,7 +78,7 @@ features:
       - 1010
       - 454
       - 1012
-      - 1013
+      - 455
       - 1014
       - 1015
 ---
@@ -91,9 +91,9 @@ features:
 
 > **Issue-number back-fill status (2026-08-08).** `issue_num` values were placeholders at
 > manifest-authoring time and are replaced with the real GitHub issue number from each child's
-> promotion receipt as its preparation completes. Nine are now resolved — **432** (F1), **430**,
-> **431**, **433**, **434**, **435**, **436**, **437**, **454**. Seven remain placeholders in the
-> `1009`-`1016` range and belong to children still in preparation. Every `depends_on` edge on the wave-0 enabler
+> promotion receipt as its preparation completes. Ten are now resolved — **432** (F1), **430**,
+> **431**, **433**, **434**, **435**, **436**, **437**, **454**, **455**. Six remain placeholders in
+> the `1009`-`1016` range and belong to children still in preparation. Every `depends_on` edge on the wave-0 enabler
 > now points at the real **432**. The manifest is committed in final resolved form, with no
 > placeholder remaining, before the kickoff artifact is written.
 
@@ -707,6 +707,75 @@ re-runs the normal planner/executor preflight cycle. Issue **#449** narrows to i
 findings — `ExplConvView_Cleanup` throwing on a public interface member, and `OpenQFItem`
 re-resolving the explorer. `OOS-7` in F6's `spec.md` and `open_risk_for_epic_planner` in its
 checkpoint are resolved by this ruling.
+
+## Epic Ruling: a fourth exemption ground for prohibited-to-execute adapters (F13)
+
+F13 escalated a gap it could not resolve, and it is right. `CLAUDE.md` §UT2 enumerates three
+exemption grounds — VSTO add-in lifecycle, WinForms form-derived and Designer-generated code, and
+Outlook Interop event-handler classes — and **none of them textually covers the WebView2 files**.
+None is VSTO lifecycle, none is form-derived, none touches `Microsoft.Office.Interop.Outlook`. All
+three existing attributes therefore rest on a ground that does not exist. Two agents reached this
+conclusion independently.
+
+`epic-planner` verified `WebView2CoreInitializer.cs` directly. It is a `sealed`, non-`partial`
+class carrying a type-level attribute, with exactly two expression-bodied members, each a 1:1
+forward into the WebView2 SDK:
+
+```csharp
+public Task<CoreWebView2Environment> CreateEnvironmentAsync(string cacheFolder, CoreWebView2EnvironmentOptions options)
+    => CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
+```
+
+**Ruling: ratify a fourth ground — irreducible adapters whose execution is *prohibited* by test
+policy.** The justification is derived from existing policy rather than invented.
+`.claude/rules/general-unit-test.md` forbids unit tests that depend on external services or
+processes, and forbids creating temporary files. Executing `CreateEnvironmentAsync` requires the
+WebView2 Evergreen runtime (an external out-of-process dependency) and writes a user-data cache
+folder (a filesystem side effect). A file whose only executable content requires exactly what the
+test policy prohibits is not merely *hard* to test — it is unreachable by any **policy-compliant**
+test. That is a categorically stronger argument than the "hard to test" reasoning the epic
+otherwise rejects, and it is why this ground is admissible where a convenience exemption is not.
+
+F13's own research is the proof that this ground is narrow rather than a loophole: of the three
+WebView2 files, **two do not qualify**. `WebView2BreadcrumbHost.InitializeAsync` is already testable
+behind a seam its own constructor injects, so its exemption must be removed and the code covered.
+Only `WebView2CoreInitializer` survives.
+
+A file qualifies under this fourth ground only when **all** of the following hold. Any failure means
+extract a seam and cover the code instead:
+
+1. Every member is a **pure 1:1 forward** to a third-party or host API — no branching, no
+   computation, no state, nothing a test could meaningfully assert beyond the forward itself.
+2. Executing any member would require an external process, an external runtime, or a filesystem
+   side effect that `.claude/rules/general-unit-test.md` prohibits in a unit test.
+3. A **seam interface exists** and the consuming code is tested against that interface, so the
+   untested surface is the adapter alone and not the logic behind it.
+4. The type is `sealed` and **not `partial`** (see the `#457` trap below), and the attribute is
+   applied at **type level**.
+
+This ground is ratified **for this epic only** and recorded here rather than in `CLAUDE.md`, which
+this epic does not amend. Extending it repository-wide requires maintainer ratification, exactly as
+the existing §UT2 exemption did.
+
+## Measurement Trap: method-level exemptions do not suppress lambdas (#457)
+
+F13 filed **#457**, and it has epic-wide reach because several children plan to adopt the
+thin-forwarder seam pattern:
+
+- A **method-level** `[ExcludeFromCodeCoverage]` does **not** suppress lambdas nested inside that
+  method. The compiler lifts them into a separate generated closure type (`<>c`), which the
+  attribute never marks.
+- A **type-level** attribute does suppress them.
+
+This is corroborated independently by F4's finding that a closure class surfaces as its own
+`<class>` element sharing the source `filename` — and by this epic's own harness rule, which unions
+classes by filename and therefore *counts* that closure against the file.
+
+The consequence is a silent coverage cap: a file using the preferred thin-forwarder pattern with
+method-level exemptions keeps its lambdas in the denominator, permanently uncovered, and no error is
+raised. The fix is a class-level-exempt adapter **type** — which carries its own trap: **that type
+must not be `partial`**, or the attribute silently exempts the entire type across every partial, the
+same propagation confirmed on `QfcDatamodel.cs:25` and `ItemViewer.cs`.
 
 ## Latent Defect Promotion
 
