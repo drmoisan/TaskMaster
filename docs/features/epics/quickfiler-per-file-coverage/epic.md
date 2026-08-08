@@ -64,8 +64,8 @@ features:
   - issue_num: 496
     feature_folder: 2026-08-08-quickfiler-form-viewers-bayesian-coverage-496
     depends_on: [432]
-  - issue_num: 1016
-    feature_folder: quickfiler-per-file-coverage-capstone
+  - issue_num: 497
+    feature_folder: 2026-08-08-quickfiler-per-file-coverage-capstone-497
     depends_on:
       - 431
       - 430
@@ -91,12 +91,11 @@ features:
 
 > **Issue-number back-fill status (2026-08-08).** `issue_num` values were placeholders at
 > manifest-authoring time and are replaced with the real GitHub issue number from each child's
-> promotion receipt as its preparation completes. **Fifteen of sixteen are now resolved** — **432**
-> (F1), **430**, **431**, **433**, **434**, **435**, **436**, **437**, **452**, **453**, **454**,
-> **455**, **456**, **495** (F12) and **496** (F15). **One placeholder remains: F16 (`1016`), whose
-> real issue is #497** — already promoted and open, with its child in preparation. Every
-> `depends_on` edge on the wave-0 enabler now points at the real **432**. The manifest is committed
-> in final resolved form, with no placeholder remaining, before the kickoff artifact is written.
+> promotion receipt as its preparation completes. **All sixteen are now resolved and no placeholder
+> remains** — **432** (F1), **430**, **431**, **433**, **434**, **435**, **436**, **437**, **452**,
+> **453**, **454**, **455**, **456**, **495** (F12), **496** (F15) and **497** (F16). Every
+> `depends_on` edge on the wave-0 enabler points at the real **432**, and every `feature_folder`
+> resolves to a concrete directory on this branch. The manifest is in its final resolved form.
 
 ## Goal
 
