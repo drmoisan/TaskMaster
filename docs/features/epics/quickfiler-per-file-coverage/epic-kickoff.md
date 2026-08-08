@@ -21,29 +21,31 @@ Run `/epic-run quickfiler-per-file-coverage` to execute this epic, or paste the 
 > runs in isolated worktrees, merge-on-green fan-in to the integration branch, and the final
 > integration-to-main PR.
 
+## Wave Layout
+
+Wave **0** holds 1 feature (the enabler), wave **1** holds 14, and wave **2** holds 1 (the
+capstone). Wave 1 exceeds the parallelism cap of 8, so it executes in two batches.
+
 ## Feature Summary
 
 | issue_num | feature_folder | wave | complexity | plan-path |
 | --- | --- | --- | --- | --- |
-| #432 | `2026-08-07-quickfiler-coverage-ledger-432` | 0 | C3 | `docs/features/active/2026-08-07-quickfiler-coverage-ledger-432/plan.2026-08-07T20-41.md` |
-| #430 | `2026-08-07-quickfiler-keyboard-actions-coverage-430` | 1 | C3 | `docs/features/active/2026-08-07-quickfiler-keyboard-actions-coverage-430/plan.2026-08-07T20-41.md` |
-| #431 | `quickfiler-queue-admission-coverage` | 1 | C2 | `docs/features/active/quickfiler-queue-admission-coverage/plan.2026-08-07T20-41.md` |
-| #433 | `2026-08-07-quickfiler-qfc-home-controller-coverage-433` | 1 | C3 | `docs/features/active/2026-08-07-quickfiler-qfc-home-controller-coverage-433/plan.2026-08-07T20-41.md` |
-| #434 | `2026-08-07-quickfiler-helper-classes-coverage-434` | 1 | C3 | `docs/features/active/2026-08-07-quickfiler-helper-classes-coverage-434/plan.2026-08-07T20-41.md` |
-| #435 | `2026-08-07-quickfiler-qfc-form-explorer-controller-coverage-435` | 1 | C3 | `docs/features/active/2026-08-07-quickfiler-qfc-form-explorer-controller-coverage-435/plan.2026-08-07T20-41.md` |
-| #436 | `2026-08-07-quickfiler-datamodel-coverage-436` | 1 | C3 | `docs/features/active/2026-08-07-quickfiler-datamodel-coverage-436/plan.2026-08-07T20-42.md` |
-| #437 | `2026-08-07-quickfiler-efc-home-controller-coverage-437` | 1 | C3 | `docs/features/active/2026-08-07-quickfiler-efc-home-controller-coverage-437/plan.2026-08-07T20-42.md` |
-| #452 | `2026-08-07-quickfiler-efc-form-item-controller-coverage-452` | 1 | C3 | `docs/features/active/2026-08-07-quickfiler-efc-form-item-controller-coverage-452/plan.2026-08-07T22-35.md` |
-| #453 | `2026-08-07-quickfiler-item-controller-coverage-453` | 1 | C3 | `docs/features/active/2026-08-07-quickfiler-item-controller-coverage-453/plan.2026-08-07T22-35.md` |
-| #454 | `2026-08-07-quickfiler-collection-controller-coverage-454` | 1 | C3 | `docs/features/active/2026-08-07-quickfiler-collection-controller-coverage-454/plan.2026-08-07T22-35.md` |
-| #455 | `2026-08-07-quickfiler-breadcrumb-dropdown-webview-coverage-455` | 1 | C3 | `docs/features/active/2026-08-07-quickfiler-breadcrumb-dropdown-webview-coverage-455/plan.2026-08-07T22-36.md` |
-| #456 | `2026-08-07-quickfiler-itemviewer-coverage-456` | 1 | C3 | `docs/features/active/2026-08-07-quickfiler-itemviewer-coverage-456/plan.2026-08-07T22-38.md` |
-| #495 | `2026-08-08-quickfiler-breadcrumb-bridge-coverage-495` | 1 | C3 | `docs/features/active/2026-08-08-quickfiler-breadcrumb-bridge-coverage-495/plan.2026-08-08T00-32.md` |
-| #496 | `2026-08-08-quickfiler-form-viewers-bayesian-coverage-496` | 1 | C2 | `docs/features/active/2026-08-08-quickfiler-form-viewers-bayesian-coverage-496/plan.2026-08-08T09-52.md` |
-| #497 | `2026-08-08-quickfiler-per-file-coverage-capstone-497` | 2 | C3 | `docs/features/active/2026-08-08-quickfiler-per-file-coverage-capstone-497/plan.2026-08-08T00-34.md` |
-
-Waves: **0** = 1 feature (the enabler), **1** = 14 features, **2** = 1 feature (the capstone).
-Wave 1 exceeds the parallelism cap of 8, so it executes in two batches.
+| 432 | 2026-08-07-quickfiler-coverage-ledger-432 | 0 | C3 | docs/features/active/2026-08-07-quickfiler-coverage-ledger-432/plan.2026-08-07T20-41.md |
+| 430 | 2026-08-07-quickfiler-keyboard-actions-coverage-430 | 1 | C3 | docs/features/active/2026-08-07-quickfiler-keyboard-actions-coverage-430/plan.2026-08-07T20-41.md |
+| 431 | quickfiler-queue-admission-coverage | 1 | C2 | docs/features/active/quickfiler-queue-admission-coverage/plan.2026-08-07T20-41.md |
+| 433 | 2026-08-07-quickfiler-qfc-home-controller-coverage-433 | 1 | C3 | docs/features/active/2026-08-07-quickfiler-qfc-home-controller-coverage-433/plan.2026-08-07T20-41.md |
+| 434 | 2026-08-07-quickfiler-helper-classes-coverage-434 | 1 | C3 | docs/features/active/2026-08-07-quickfiler-helper-classes-coverage-434/plan.2026-08-07T20-41.md |
+| 435 | 2026-08-07-quickfiler-qfc-form-explorer-controller-coverage-435 | 1 | C3 | docs/features/active/2026-08-07-quickfiler-qfc-form-explorer-controller-coverage-435/plan.2026-08-07T20-41.md |
+| 436 | 2026-08-07-quickfiler-datamodel-coverage-436 | 1 | C3 | docs/features/active/2026-08-07-quickfiler-datamodel-coverage-436/plan.2026-08-07T20-42.md |
+| 437 | 2026-08-07-quickfiler-efc-home-controller-coverage-437 | 1 | C3 | docs/features/active/2026-08-07-quickfiler-efc-home-controller-coverage-437/plan.2026-08-07T20-42.md |
+| 452 | 2026-08-07-quickfiler-efc-form-item-controller-coverage-452 | 1 | C3 | docs/features/active/2026-08-07-quickfiler-efc-form-item-controller-coverage-452/plan.2026-08-07T22-35.md |
+| 453 | 2026-08-07-quickfiler-item-controller-coverage-453 | 1 | C3 | docs/features/active/2026-08-07-quickfiler-item-controller-coverage-453/plan.2026-08-07T22-35.md |
+| 454 | 2026-08-07-quickfiler-collection-controller-coverage-454 | 1 | C3 | docs/features/active/2026-08-07-quickfiler-collection-controller-coverage-454/plan.2026-08-07T22-35.md |
+| 455 | 2026-08-07-quickfiler-breadcrumb-dropdown-webview-coverage-455 | 1 | C3 | docs/features/active/2026-08-07-quickfiler-breadcrumb-dropdown-webview-coverage-455/plan.2026-08-07T22-36.md |
+| 456 | 2026-08-07-quickfiler-itemviewer-coverage-456 | 1 | C3 | docs/features/active/2026-08-07-quickfiler-itemviewer-coverage-456/plan.2026-08-07T22-38.md |
+| 495 | 2026-08-08-quickfiler-breadcrumb-bridge-coverage-495 | 1 | C3 | docs/features/active/2026-08-08-quickfiler-breadcrumb-bridge-coverage-495/plan.2026-08-08T00-32.md |
+| 496 | 2026-08-08-quickfiler-form-viewers-bayesian-coverage-496 | 1 | C2 | docs/features/active/2026-08-08-quickfiler-form-viewers-bayesian-coverage-496/plan.2026-08-08T09-52.md |
+| 497 | 2026-08-08-quickfiler-per-file-coverage-capstone-497 | 2 | C3 | docs/features/active/2026-08-08-quickfiler-per-file-coverage-capstone-497/plan.2026-08-08T00-34.md |
 
 ## What epic-orchestrator Must Know Before Wave 0
 
