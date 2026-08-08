@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace UtilitiesCS.OutlookObjects.Folder
 {
     /// <summary>Host-neutral breadcrumb message router and population boundary.</summary>
-    public sealed class FolderBreadcrumbBridgeRouter
+    public sealed partial class FolderBreadcrumbBridgeRouter
     {
         private readonly IFolderHierarchyProvider _provider;
         private readonly BreadcrumbStateModel _model = new BreadcrumbStateModel();

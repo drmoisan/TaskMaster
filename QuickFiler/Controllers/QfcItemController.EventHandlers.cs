@@ -161,6 +161,15 @@ namespace QuickFiler.Controllers
             ((ToolStripMenuItem)sender).BackColor = _themes[_activeTheme].ButtonBackColor;
         }
 
+        // Issue #438: this handler runs on every keystroke in the folder-search textbox. It formerly
+        // issued ClearFolderItems + SetFolderItems + SetFolderSelectedIndex(1) +
+        // SetFolderDroppedDown(true), a composition that (a) closed and reopened the selector session
+        // per keystroke, (b) moved keyboard focus onto the popup on open and back to the collapsed
+        // anchor on close, and (c) committed a mid-search folder selection. Focus therefore left the
+        // textbox after one to two characters. It now issues a single presentation intent; the
+        // coordinator layer owns the replace/open-if-closed/highlight sequencing on its posted FIFO
+        // queue, none of which transfers focus. TextBoxSearch_KeyDown (Down arrow) is unchanged and
+        // still both drops down and focuses, because that is an explicit user gesture.
         internal void TextBoxSearch_TextChanged(object sender, EventArgs e)
         {
             var folders = _folderHandler.FindFolder(
@@ -169,12 +178,7 @@ namespace QuickFiler.Controllers
                 recalcSuggestions: false,
                 objItem: Mail
             );
-            _itemViewer.ClearFolderItems();
-            _itemViewer.SetFolderItems(folders);
-
-            if (folders.Length >= 2)
-                _itemViewer.SetFolderSelectedIndex(1);
-            _itemViewer.SetFolderDroppedDown(true);
+            _itemViewer.PresentFolderSearchResults(folders);
         }
 
         internal void TextBoxSearch_KeyDown(object sender, KeyEventArgs e)

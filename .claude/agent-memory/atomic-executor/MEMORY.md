@@ -1,6 +1,7 @@
 # Atomic Executor Memory Index
 
 ## Plan validation & gates
+- [Verify line citations with numbered output](feedback_verify_line_citations_with_numbered_output.md) — never hand-count from a `sed` window; a wrong #438 advisory got applied and corrupted 3 correct citations in plan + spec
 - [Self-derived gate thresholds are blind](project_preflight_selfderived_gate_thresholds_are_blind.md) — a "count >= floor" gate whose floor comes from the runs it validates is deflation-blind + scope-incommensurable; use git-enumeration + `/ListTests` existence proofs
 - [Inserted plan tasks force renumbering](project_plan_task_ids_digit_only_forces_renumbering.md) — suffixed IDs (`P3-T5a`) fail validation; say "insert + renumber downstream", then verify defs-vs-mentions mechanically
 - [Plan rationale clauses are evidence](project_418_plan_rationale_clauses_are_evidence.md) — #418 needed 3 preflight passes; all blockers were unmeasured world-state claims in prose, never in the fix
@@ -28,6 +29,8 @@
 - [BOM breaks grep ^ anchor](project_bom_grep_anchor_false_negative.md) — bash grep `^#nullable` misses BOM-prefixed files; use the Grep tool for opt-in classification, never bash grep
 
 ## Test execution & isolation
+- [Tests must mock GUI; no visible window](feedback_tests_must_mock_gui_no_visible_window.md) — user saw a window pop up during a QuickFiler.Test run; new tests must use headless seams (Mock<IItemViewer>, injected show/focus delegates, host-neutral types), never Form.Show/Application.Run
+- [WinFormsPumpHost tests are load-flaky](project_winformspumphost_tests_load_flaky.md) — QfcItemController_InitializationTests fail with "window handle has been created"/60s timeouts when the box is CPU-saturated; re-run when load drops, don't treat as a red baseline
 - [vstest /InIsolation + FilePathHelper serialization](project_vstest_isolation_and_filepathhelper_serialization.md) — Moq assemblies need /InIsolation (else STTE Setup FileNotFound); FilePathHelper.FilePath is "" default but null after JSON deserialize
 - [Invoke-MSTest.ps1 dies on a single test assembly](project_418_invoke_mstest_single_assembly_bug.md) — StrictMode + `.Count` on a scalar String throws before vstest runs; call vstest.console.exe directly with the script's arg list
 - [Timed-out MSTest leaves detached runner](project_timedout_mstest_leaves_detached_runner.md) — leaves a pwsh runner respawning testhosts → user.config hangs; kill the pwsh runner too, verify 0, rerun >=8min

@@ -31,6 +31,13 @@ namespace QuickFiler
         public void SetFolderDroppedDown(bool droppedDown) =>
             SetBreadcrumbDropDownState(droppedDown);
 
+        // #438: the search-path presentation intent. Thin forwarding to the non-focusing breadcrumb
+        // path (ItemViewer.Breadcrumb.cs), which latches the non-focusing open on the open
+        // coordinator and delegates to BreadcrumbBridgeCoordinator.PresentSearchResults. Both of
+        // those are host-neutral and unit-tested; this partial stays coverage-exempt forwarding.
+        public void PresentFolderSearchResults(string[] items) =>
+            PresentBreadcrumbSearchResults(items);
+
         public void ClearFolderItems() => BreadcrumbCoordinator?.Clear();
 
         public void FocusFolderDropDown() => FocusBreadcrumb();

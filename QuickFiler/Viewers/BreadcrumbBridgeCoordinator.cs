@@ -22,7 +22,7 @@ namespace QuickFiler.Viewers
     /// <c>IItemViewer.FolderKeyDown</c>, keeping this type free of WinForms/WebView2/COM usage.
     /// Router responses are awaited directly — no timers.
     /// </summary>
-    public sealed class BreadcrumbBridgeCoordinator : IDisposable
+    public sealed partial class BreadcrumbBridgeCoordinator : IDisposable
     {
         private readonly BreadcrumbUiDispatcher _dispatcher;
         private readonly IWebViewMessenger _messenger;

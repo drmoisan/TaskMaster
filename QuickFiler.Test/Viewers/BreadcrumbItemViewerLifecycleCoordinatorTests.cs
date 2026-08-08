@@ -282,7 +282,25 @@ namespace QuickFiler.Test.Viewers
                 Rectangle anchorScreenBounds,
                 Rectangle workingArea,
                 Size desiredSize
-            ) => Task.FromResult(false);
+            ) => OpenAsync(anchorScreenBounds, workingArea, desiredSize, takeFocus: true);
+
+            /// <summary>
+            /// Issue #438: the focus intent recorded for each open request, in request order.
+            /// </summary>
+            internal List<bool> RequestedTakeFocus { get; } = new List<bool>();
+
+            // Issue #438: additive 4-parameter overload delegating to the existing body, plus the
+            // recorded focus intent. No existing behavior changes.
+            public Task<bool> OpenAsync(
+                Rectangle anchorScreenBounds,
+                Rectangle workingArea,
+                Size desiredSize,
+                bool takeFocus
+            )
+            {
+                RequestedTakeFocus.Add(takeFocus);
+                return Task.FromResult(false);
+            }
 
             public bool Close(BreadcrumbDropDownCloseReason reason) => true;
 

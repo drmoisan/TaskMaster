@@ -309,11 +309,31 @@ namespace QuickFiler.Controllers.Tests
         /// Cycle-3 P10-T16 (member #27, de-exempted): the call site already reads
         /// <c>_folderHandler.FindFolder(...)</c>, which now targets the narrow
         /// <see cref="IFolderSearchHandler"/> interface — directly mockable, no live Outlook/COM host.
+        /// <para>
+        /// Issue #438 (the single sanctioned test-method rewrite, plan D4 / spec AC-11). This method
+        /// previously pinned the exact defective composition under repair — <c>ClearFolderItems</c>
+        /// once, <c>SetFolderItems</c> once, <c>SetFolderSelectedIndex(1)</c> once,
+        /// <c>SetFolderDroppedDown(true)</c> once — which opened the drop-down (stealing keyboard
+        /// focus from the search textbox) and committed a mid-search folder selection on every
+        /// keystroke. It is rewritten against the replacement intent because the composition it
+        /// asserted <em>is</em> the defect.
+        /// </para>
+        /// <para>
+        /// Every durable behavior the original protected is re-asserted here: the wildcard
+        /// <c>FindFolder</c> query is still built from <c>SearchText</c>, the drop-down is still
+        /// populated (now via <c>PresentFolderSearchResults</c> receiving the exact
+        /// <c>FindFolder</c> result), the first row is still highlighted, and the drop-down is still
+        /// shown — all of which now happen inside the presentation composite. Added negative
+        /// assertions pin the fix: no <c>SetFolderDroppedDown</c>, no <c>FocusFolderDropDown</c>,
+        /// and no <c>SetFolderSelectedIndex</c>.
+        /// </para>
         /// </summary>
         [TestMethod]
-        public void TextBoxSearch_TextChanged_UsesInjectedFolderSearchHandler_PopulatesAndSelectsFolder()
+        public void TextBoxSearch_TextChanged_UsesInjectedFolderSearchHandler_PresentsSearchResultsWithoutFocusOrCommit()
         {
             // Arrange
+            string[] matched = { @"\\A\one", @"\\A\two" };
+            string capturedQuery = null;
             Mock<IFolderSearchHandler> folderHandler = new Mock<IFolderSearchHandler>();
             folderHandler
                 .Setup(f =>
@@ -328,7 +348,21 @@ namespace QuickFiler.Controllers.Tests
                         >()
                     )
                 )
-                .Returns(new[] { @"\\A\one", @"\\A\two" });
+                .Callback(
+                    (
+                        string searchString,
+                        object objItem,
+                        bool reload,
+                        List<string> roots,
+                        bool recalc,
+                        IEnumerable<(
+                            string root,
+                            string excludedFolder,
+                            bool excludeChildren
+                        )> exclusions
+                    ) => capturedQuery = searchString
+                )
+                .Returns(matched);
             Mock<IItemViewer> viewer = new Mock<IItemViewer>();
             viewer.SetupGet(v => v.SearchText).Returns("query");
             HarnessController controller = new HarnessController();
@@ -342,11 +376,16 @@ namespace QuickFiler.Controllers.Tests
             // Act
             controller.TextBoxSearch_TextChanged(null, EventArgs.Empty);
 
-            // Assert
-            viewer.Verify(v => v.ClearFolderItems(), Times.Once());
-            viewer.Verify(v => v.SetFolderItems(It.IsAny<string[]>()), Times.Once());
-            viewer.Verify(v => v.SetFolderSelectedIndex(1), Times.Once());
-            viewer.Verify(v => v.SetFolderDroppedDown(true), Times.Once());
+            // Assert — durable behavior: the wildcard query is built from SearchText, and the exact
+            // FindFolder result is handed to the presentation intent that populates the drop-down,
+            // highlights the first row, and shows it.
+            capturedQuery.Should().Be("*query*");
+            viewer.Verify(v => v.PresentFolderSearchResults(matched), Times.Once());
+
+            // Assert — the fix: no focus transfer and no committed-selection change.
+            viewer.Verify(v => v.SetFolderDroppedDown(It.IsAny<bool>()), Times.Never());
+            viewer.Verify(v => v.FocusFolderDropDown(), Times.Never());
+            viewer.Verify(v => v.SetFolderSelectedIndex(It.IsAny<int>()), Times.Never());
         }
 
         // ------------------------- Search key-down -------------------------

@@ -7,7 +7,7 @@ metadata:
 
 The feature-promotion scaffold can emit `issue.md` metadata defects that the prd-feature agent must correct when filling documents:
 
-- `- Status: Promoted -> docs/features/active/<slug>/` omitting the `YYYY-MM-DD-` prefix and `-<issue#>` suffix of the actual active folder (seen on issue #424, 2026-08-06).
+- `- Status: Promoted -> docs/features/active/<slug>/` omitting the `YYYY-MM-DD-` prefix and `-<issue#>` suffix of the actual active folder (seen on issue #424, 2026-08-06; recurred on issue #438, 2026-08-08 — treat as the scaffold's standing behavior).
 - `- Last Updated:` dated in the future relative to the current date (424 scaffold said 2026-08-07 on 2026-08-06).
 
 **Why:** The delegating orchestrator requires all paths/cross-references to use the canonical issue number and folder name; stale scaffold metadata would fail review.
