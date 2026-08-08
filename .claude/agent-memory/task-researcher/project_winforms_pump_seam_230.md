@@ -1,0 +1,17 @@
+---
+name: winforms-pump-seam-230
+description: Issue #230 research (2026-08-07) — WinFormsPumpHost design decided; CreateAsync factory-seam gap; InitializeWebViewAsync stays exempt (CoreWebView2 null); target boundary 19 -> 11.
+metadata:
+  type: project
+---
+
+Issue #230 research (`docs/features/active/2026-08-07-winforms-message-pump-test-seam-230/research/2026-08-07T21-00-winforms-message-pump-seam-research.md`) resolved the 9-member `UiSyncContext` bucket left by [[qfc227-headless-itemviewer-and-tlpcellsnapshot]]. Non-obvious findings:
+
+1. **Factory seam gap:** `CreateAsync`/`CreateSequentialAsync` (`QfcItemController.Initialization.cs:403-464`) internally do `new QfcItemController(); SaveParameters(...); await Initialize*Async()`, and `SaveParameters` applies `_webViewInitializer ??= new WebView2CoreInitializer()` (the REAL WebView2 adapter) with no injection point. De-exempting the two factories requires additive optional seam parameters on the static factories (mirrors the primary ctor's optional-seam pattern). Without that production change, target is 19 -> 13 instead of 19 -> 11.
+2. **`InitializeWebViewAsync` stays exempt even with the pump:** lines 76+ dereference `((ItemViewer)_itemViewer).L0v2h2_WebView2.CoreWebView2`, null without the real WebView2 runtime (external-process dependency, policy-barred). Pump removes only the `await UiSyncContext` barrier.
+3. **Census drift:** controller partials now carry 19 attribute sites but only 18 are ratified — `EnsureBreadcrumbPipeline` (`QfcItemController.ViewerSetup.cs:132`) was added by #351 AFTER the 2026-07-02 ratification (the ratified 19th member is `WebView2CoreInitializer`, non-controller). Any grep-count comparison against the ratified 19 must account for this.
+4. **Awaiter semantics:** `UiThread.SynchronizationContextAwaiter.IsCompleted` is reference-equality (`_context == Current`); `Post` on a `WindowsFormsSynchronizationContext` goes through the thread's marshaling window and only drains under a message loop. WinForms auto-install replaces a base-type ambient context during Control construction (proven by `ProgressViewer_Tests` asserting `BeOfType<WindowsFormsSynchronizationContext>`), but does NOT replace an already-installed WFSC — so the host installs one explicitly before signalling ready.
+5. **Decided design:** `WinFormsPumpHost` (sealed class, net481-safe, no init/record) in `QuickFiler.Test/TestSupport/` — `Application.Run(ApplicationContext)` on named STA background thread, MRES readiness w/ pre-ready init-error capture, Task-returning `InvokeAsync`/`RunAsync` only (no sync bridge that can deadlock), `Application.ThreadException` recorder surfaced at `StopAsync`, shutdown = post `Application.ExitThread` + await stopped-TCS + Join. No shared test-support project exists in the sln; deliberately NOT created (test-to-test refs drag TaskMaster VSTO into QuickFiler.Test closure).
+6. **Open verification item:** `Initialize(bool)` dispatches through the WPF `Dispatcher` captured on the pump thread; WPF-dispatcher-serviced-by-WinForms-loop interop is standard but has no in-repo proof — the host's self-test file must include that smoke test first.
+
+**How to apply:** if implementing/planning #230, do not plan factory-member tests without the optional-parameter production change (#1); do not promise 9/9 de-exemption (8/9 max, #2); re-baseline the attribute census before quoting counts (#3).

@@ -1,11 +1,19 @@
+using System;
+using System.Collections;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Threading;
 using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.WinForms;
 using Moq;
 using QuickFiler.Controllers;
 using QuickFiler.Interfaces;
+using QuickFiler.Test.TestSupport;
+using QuickFiler.Viewers;
 using UtilitiesCS;
 
 namespace QuickFiler.Controllers.Tests
@@ -19,8 +27,16 @@ namespace QuickFiler.Controllers.Tests
     /// SaveParameters only stores references (it does not dereference the mail item or tlp states).
     /// </summary>
     [TestClass]
-    public class QfcItemController_InitializationTests
+    public partial class QfcItemController_InitializationTests
     {
+        /// <summary>
+        /// Harness bound for the #230 pump-hosted tests (MSTest <c>[Timeout]</c> precedent
+        /// <c>TaskMaster.Test/AppGlobals/NonBlockingDelayTests.cs</c>). Every wait in those tests is
+        /// on a deterministic completion signal; the attribute only converts a genuine deadlock in
+        /// production code into a test failure instead of a CI hang.
+        /// </summary>
+        internal const int PumpTimeoutMs = 60000;
+
         private static Mock<IFilerHomeController> BuildHomeController(
             out Mock<IQfcKeyboardHandler> kbd,
             out Mock<IQfcExplorerController> explorer,
