@@ -1,4 +1,4 @@
 - [push-down command pattern](project_push_down_pattern.md) — 10-file change map for adding a new push-down command; reference impl is pushDownCodexAndAgentsCustomizations
-- [Promotion scaffold metadata defects](project_promotion_scaffold_metadata_defects.md) — fix Status folder path and Last Updated date in scaffolded issue.md before filling docs
+- [Promotion scaffold metadata defects](project_promotion_scaffold_metadata_defects.md) — fix Status path, Last Updated date, line-wrap-shredded AC checkboxes, and DoD checkbox inflation before filling docs
 - [Test disposition: grep for old-overload pins](feedback_test_disposition_overload_pins.md) — grep test project for Setup/Verify of retired overloads before marking any test file "unchanged"; loose mocks fail at run time
 - [AC gates: verify satisfiability + fresh reads](feedback_ac_gates_verify_satisfiability.md) — check baseline evidence before encoding repo-wide coverage floors as blocking AC; re-read spec from disk before reporting tallies
