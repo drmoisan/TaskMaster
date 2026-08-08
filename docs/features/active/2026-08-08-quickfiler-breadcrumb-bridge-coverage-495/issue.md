@@ -67,8 +67,13 @@ and ordering invariants, which is exactly why branch coverage lags line coverage
 
 ## Constraints & Risks
 
-- **Determinism.** Use an injected clock and fake timers. `Thread.Sleep`, `Task.Delay`, and real
-  wall-clock waits are prohibited in tests.
+- **Determinism.** ~~Use an injected clock and fake timers.~~ **STRUCK 2026-08-08 — refuted by
+  research on all five files.** Zero occurrences of `DateTime`, `Stopwatch`, `Timer`, `Task.Delay`,
+  `Thread.Sleep`, or `TimeProvider` anywhere in this cluster; there is no time dependency to control,
+  and an injected clock would be a seam with nothing behind it. Determinism here is **scheduler and
+  completion-source control**, adopting sibling F13's ratified ruling
+  (`.../455/spec.md:381-390` §8.1). See `spec.md` §5. `Thread.Sleep`, `Task.Delay`, and real
+  wall-clock waits remain prohibited in tests.
 - **Sibling boundaries.** The drop-down surface and WebView2 host files belong to F13 (#455);
   `ItemViewer.Breadcrumb.cs` belongs to F14. Neither may be edited by this child.
 - **#457 trap.** A method-level `[ExcludeFromCodeCoverage]` does not suppress nested lambdas; the
@@ -84,17 +89,44 @@ and ordering invariants, which is exactly why branch coverage lags line coverage
   already. If research disproves any figure in this brief, the correction is recorded as a
   documented deviation in `spec.md` and the plan is written against reality.
 
+## Research Outcome (2026-08-08)
+
+Preparation research produced one artifact per production file under `research/`, per issue #136.
+All five coverage rows in the table above were **confirmed** by independent recomputation — F12 is
+the first child in the epic whose brief figures survived re-measurement unchanged. The corrections
+found were structural, and are recorded in `spec.md` §7. Headline results:
+
+- **No production edit is required on any of the five files.** No csproj edit, no ledger row, and the
+  #457 trap does not engage.
+- **49 untaken branch outcomes** on `BreadcrumbItemViewerLifecycleCoordinator.cs`; 46 reachable,
+  6 structurally unreachable across the cluster with proofs recorded in `spec.md` §4.1.
+- **Five latent defects promoted** via the MCP lifecycle: **#498**, **#499**, **#500**, **#501**,
+  **#502**. A verified correction plus two adjacent defects were posted to existing **#488**.
+- **Open #440** will rewrite arrow-key semantics in two of these files and is now registered in the
+  epic's Known Conflict Risks. Tests pin current behavior.
+
+Acceptance criteria for this child are the numbered `AC-1 .. AC-16` in `spec.md` and `US-1 .. US-8`
+in `user-story.md`; the draft list above is superseded by them.
+
 ## Test Conditions to Consider
 
 - [ ] Guard-clause untaken branches across all five files
-- [ ] Cancellation and cancelled-token paths
+- [ ] Cancellation and cancelled-token paths — **N/A** for `BreadcrumbMessengerHub.cs` and
+      `BreadcrumbItemViewerLifecycleCoordinator.cs` (no `CancellationToken` in either)
 - [ ] Double-invoke and re-entrancy guards
 - [ ] Out-of-order and unexpected state transitions
-- [ ] Disposal and post-disposal invocation paths
+- [ ] Disposal and post-disposal invocation paths — **N/A** for `Controllers/BreadcrumbBridgeRouter.cs`
+      (implements no `IDisposable`, holds no disposable resource, has no disposal flag)
 - [ ] Error/exception paths in message routing and bridge upgrade
-- [ ] Deterministic time-dependent behavior via injected clock and fake timers
+- [ ] ~~Deterministic time-dependent behavior via injected clock and fake timers~~ — **STRUCK**; no
+      time-dependent behavior exists in this cluster. Replaced by deterministic scheduler and
+      completion-source control.
 
 ## Next Step
 
-- [ ] Promote to GitHub issue (feature request template), citing parent epic #136
-- [ ] Create the active feature folder from the template
+- [x] Promote to GitHub issue (feature request template), citing parent epic #136 — issue #495
+- [x] Create the active feature folder from the template
+- [x] Per-file research (5 artifacts under `research/`)
+- [x] Feature documents (`spec.md`, `user-story.md`)
+- [ ] Atomic plan and executor preflight clearance
+- [ ] Execution, deferred to `epic-orchestrator`

@@ -41,6 +41,7 @@
 - [qfc-queueprocessing-436](project_qfc_queueprocessing_436.md) — #436 F5 QueueProcessing.cs: zero COM deref so no new seam; 2 latent defects (null@quantity<=0, rejects discarded still-hooked); missing FakeTimeProvider fails silently (2026-08-08)
 - [qfc-framebuilding-436](project_qfc_framebuilding_436.md) — #436 F5 FrameBuilding.cs is Deedle data-frames NOT WinForms (issue.md wrong); DfDeedle modal dialogs are behind an IVT wall QuickFiler.Test can't cross (2026-08-08)
 - [iqfcdatamodel-contract-436](project_iqfcdatamodel_contract_436.md) — Cobertura emits NO class element for any interface or enum (declaration-only files are absent, not 0%); indirect consumers via IQfcHomeController.DataModel hide from a type-name grep (2026-08-08)
+- [qfc-breadcrumb-lifecycle-f12-495](project_qfc_breadcrumb_lifecycle_f12_495.md) — #495 F12: a multi-type .cs emits ONE Cobertura class element; `0/2` on `factory() ?? throw` means the factory THREW; emitted rates reconstruct as class+method union (2026-08-08)
 
 ## Additional entries
 
