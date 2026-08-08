@@ -6,6 +6,7 @@
 - [C# pure-move extraction pattern](csharp-pure-move-extraction-pattern.md) — moving members out of a 497/500-line file: keep the static-ctor install trigger, route testable members to an existing covered class, declare relocation-not-new-module
 - [Research claims as acceptance clauses](research-claims-as-acceptance-clauses.md) — never encode an unmeasured third-party null-vs-throw claim as a literal AC clause; #418 §1.4 empty-bytes claim cost a revision pass
 - [Enumerate condition outcomes before the case list](enumerate-condition-outcomes-before-case-list.md) — 100% branch-rate tasks: 2 outcomes per condition in every ||/&& clause; a null-pairing guard needs all four orderings, not three
+- [Partial-class seam: declare and consume in the same phase](partial-class-seam-declaration-and-consumption-same-phase.md) — per-file phases must not split a seam's declaration from its consumption across two partials; dead code fails the analyzer build and blocks the earlier phase's coverage gate
 - [Named coverage exception: verify the member body](named-coverage-exception-verify-member-body.md) — read the member before writing "untestable branch"; put gap-closure BEFORE the toolchain-clean-pass task; pin line-rate vs branch-rate
 
 - [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/
