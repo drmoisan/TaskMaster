@@ -1,13 +1,20 @@
 # Atomic Planner Memory Index
 
 - [Dead-code removal vs coverage exclusion](project_deadcode_removal_vs_coverage_exclusion.md) — coverage gate blocked by unreachable dead prod code → plan removal (shrink denominator), never exclusion/carve-out/forced-rethrow
+- [Dead code retained: residual to the ledger](deadcode-retained-residual-to-ledger.md) — when deletion is routed out of scope, measure the real rate and request ratification; never exclude, never reflect-invoke private statics to inflate
 - [Coverage gate on CLR-invoked private members](coverage-gate-clr-invoked-private-members.md) — never gate AssemblyResolve-style private members at >=90%; split newly-added vs changed per the AC's own wording
 - [Nullable context mismatch: prod vs test](project_nullable_context_mismatch_prod_vs_test.md) — check `#nullable enable` in the prod file AND missing `<LangVersion>` (C# 7.3) in the test csproj; adding `<LangVersion>latest</LangVersion>` is never "one property"
 - [C# pure-move extraction pattern](csharp-pure-move-extraction-pattern.md) — moving members out of a 497/500-line file: keep the static-ctor install trigger, route testable members to an existing covered class, declare relocation-not-new-module
 - [Research claims as acceptance clauses](research-claims-as-acceptance-clauses.md) — never encode an unmeasured third-party null-vs-throw claim as a literal AC clause; #418 §1.4 empty-bytes claim cost a revision pass
 - [Enumerate condition outcomes before the case list](enumerate-condition-outcomes-before-case-list.md) — 100% branch-rate tasks: 2 outcomes per condition in every ||/&& clause; a null-pairing guard needs all four orderings, not three
-- [Partial-class seam: declare and consume in the same phase](partial-class-seam-declaration-and-consumption-same-phase.md) — per-file phases must not split a seam's declaration from its consumption across two partials; dead code fails the analyzer build and blocks the earlier phase's coverage gate
+- [Size test fixtures by measured lines-per-test](test-fixture-sizing-lines-per-test.md) — 17 methods is the sub-500 ceiling for mock-heavy QuickFiler.Test/Controllers; cap 16/12, split via `.PartN.cs` partials with no repeated [TestClass]
+- [Per-phase size gates need a scoped csharpier](per-phase-size-gates-need-scoped-csharpier.md) — an interim 500-line gate measured before CSharpier runs is not load-bearing; same for any "byte-identical after CSharpier" clause
 - [Named coverage exception: verify the member body](named-coverage-exception-verify-member-body.md) — read the member before writing "untestable branch"; put gap-closure BEFORE the toolchain-clean-pass task; pin line-rate vs branch-rate
+- [Re-derive plan aggregate claims after every delta](plan-aggregate-claims-must-be-rederived-after-deltas.md) — stale branch/file counts and acceptance that only one arm can satisfy; validator never cross-checks prose against the task list
+
+## Additional entries
+
+- [Partial-class seam: declare and consume in the same phase](partial-class-seam-declaration-and-consumption-same-phase.md) — per-file phases must not split a seam's declaration from its consumption across two partials; dead code fails the analyzer build and blocks the earlier phase's coverage gate
 - [Seam default CS0236 + intermediate consumers](csharp-seam-default-cs0236-and-intermediate-consumers.md) — a delegate-seam default capturing `_field` in a property initializer is CS0236 (use backing field + lazy default); extraction rewires must check lines BETWEEN the call sites for pre-transform consumers
 - [AC source sweep: Definition of Done](ac-source-sweep-definition-of-done.md) — every AC needs a verification task, and spec.md's `## Definition of Done` checkboxes are AC-source too (`## Seeded Test Conditions` are not)
 
