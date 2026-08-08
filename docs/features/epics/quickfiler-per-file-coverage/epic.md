@@ -49,8 +49,8 @@ features:
   - issue_num: 1010
     feature_folder: quickfiler-item-controller-coverage
     depends_on: [432]
-  - issue_num: 1011
-    feature_folder: quickfiler-collection-controller-coverage
+  - issue_num: 454
+    feature_folder: 2026-08-07-quickfiler-collection-controller-coverage-454
     depends_on: [432]
   - issue_num: 1012
     feature_folder: quickfiler-breadcrumb-bridge-coverage
@@ -76,7 +76,7 @@ features:
       - 437
       - 1009
       - 1010
-      - 1011
+      - 454
       - 1012
       - 1013
       - 1014
@@ -531,11 +531,9 @@ Bands use the `model_policy` scale in `config/orchestration-routing.json`.
 
 ## Coverage-Target Reconciliation (authoritative for this epic)
 
-Three documents state different coverage numbers, and F7's research established that the
-repository baseline sits below all of them: issue #424's evidence recorded a **merge-base
-repository line rate of 70.19%**. No child can satisfy an absolute repository-wide floor on its
-own, so the targets are reconciled here once. This is a reconciliation of which number gates
-which scope — **not a waiver of any policy**.
+Three documents state different coverage numbers and no child can satisfy an absolute
+repository-wide floor on its own, so the targets are reconciled here once. This is a
+reconciliation of which number gates which scope — **not a waiver of any policy**.
 
 | Scope | Target | Source |
 | --- | --- | --- |
@@ -549,9 +547,38 @@ The repository-wide row is the one that needed a decision. Issue #136's own acce
 reads "Repository-wide coverage expectations are **retained or improved**" — retained, not met. The
 absolute repository-wide floors in `CLAUDE.md` (80%) and `.claude/rules/general-unit-test.md` (85%)
 remain the standing repository aspiration and are untouched by this epic; they are simply not the
-per-child gate here, because the baseline was already below them before this epic began and gating
-every child on a pre-existing shortfall would make the epic unexecutable. Each child measures
-repository-wide coverage before and after and must not reduce it.
+per-child gate here, because gating every child on a pre-existing shortfall would make the epic
+unexecutable.
+
+### The repository-wide comparison must be like-for-like, and no imported figure is valid
+
+An earlier revision of this section cited a **merge-base repository line rate of 70.19%** as the
+reference point. **That figure is withdrawn as a comparison baseline.** F11 flagged it and
+`epic-planner` verified the cause directly against feature #424's two artifacts:
+
+| Artifact | Root line-rate | Packages | Lines valid |
+| --- | --- | --- | --- |
+| `evidence/baseline/coverage-baseline.cobertura.xml` | **70.19%** | 14 | 79,957 |
+| `evidence/qa-gates/coverage-final.cobertura.xml` | **85.65%** | 9 | 110,849 |
+
+The two differ for two independent reasons, either of which alone invalidates the comparison:
+
+1. **Different package sets.** The raw baseline includes five vendored third-party packages —
+   `Microsoft.IO.RecyclableMemoryStream`, `Mono.Reflection`, `System.Interactive`,
+   `System.Linq.Async`, `log4net` — which the post-processing step strips. Vendored code is poorly
+   covered and drags the raw figure down.
+2. **Different instrumented scope.** `lines-valid` *rises* from 79,957 to 110,849 despite the
+   package count falling, so the two runs did not even instrument the same body of code.
+
+A child that measures post-processed output against the raw 70.19% would report roughly fifteen
+points of phantom improvement it did not produce.
+
+**Rule: the repository-wide criterion is satisfied by a self-consistent before/after pair, never by
+comparison against an imported number.** Each child captures repository-wide coverage on its own
+branch using the identical command and identical post-processing, before and after its change, and
+must not reduce it. Cite both figures and the command in the evidence artifact so the comparison is
+auditable. Do not carry a repository-wide figure across branches, across tools, or between raw and
+post-processed artifacts.
 
 Note that the 80% per-file line figure and the 75% branch figure are independent gates. F8 found
 `EfcHomeController.Timing.cs` at 100% line and 66.67% branch — passing one and failing the other.
@@ -590,6 +617,13 @@ rather than crashes:
    reports `line-rate="0"` because it has no lines, not because it is uncovered. Keying on
    `line-rate` mis-reports every `interface-only` file as a 0% failure — exactly the false alarm the
    third bucket exists to prevent.
+3. **Read only the class-level `<lines>` block, never a descendant axis.** `class.iter('line')` or
+   an `.//lines/line` XPath unions the class-level block with each method's block and double-counts
+   every line present in both. Filed as **#441** against the repository's own coverage scripts, and
+   it corrupted this epic's first baseline table before correction.
+4. **F11 found a second, distinct defect — filed as #478.** The merge step blends a correct
+   class-level union with a primary-only method subtree. **Fixing #441's axis alone does not fix
+   #478**; both must be addressed in one change or the harness stays wrong in a different way.
 
 ## Verified Toolchain and Tooling Facts
 
@@ -767,6 +801,23 @@ that creates production files touches `QuickFiler.csproj`. F6 alone adds 31 entr
 apply: own entries only, minimal adjacent hunks, preserve CRLF, and expect additive fan-in conflicts
 resolved by keeping both sides. Neither csproj is owned by any child; both are shared infrastructure
 that this epic edits by necessity.
+
+### 1c. `QfcCollectionController` has two frozen public surfaces (F11)
+
+F11's split of `QfcCollectionController.cs` into partials must preserve two contracts that siblings
+already consume. Both verified directly:
+
+- **`public static string xComma(string)` at line 2330** is called by **F8** from
+  `EfcHomeController.Metrics.cs:79` as `QfcCollectionController.xComma(...)`, and by
+  `Legacy/QfcGroupOperationsLegacy.cs` at four sites. The split must keep this member `public
+  static` on a type still named `QfcCollectionController`. Moving it to a differently-named type,
+  or reducing its accessibility, breaks F8's compile.
+- **The constructor signature is frozen by F6**, which constructs the concrete type at
+  `QfcFormController.Actions.cs` lines 49, 83, and 139.
+
+Neither constraint blocks the split — partials share one type name and one accessibility surface —
+but a split that reorganises members across *types* rather than across *files* would break both
+siblings. Split by file, not by type.
 
 ### 2. `QuickFiler.Test` has no `InternalsVisibleTo` grant from `UtilitiesCS`
 
