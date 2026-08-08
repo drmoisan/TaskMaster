@@ -61,9 +61,11 @@
 - [Epic-child self-merge: step9 passed vs verified](epic-child-self-merge-step9-passed-vs-verified.md) — enforce-epic-merge-gate.ps1 needs on-disk step9_status "passed"+epic_mode:true; MCP validator REJECTS the "passed" enum; keep "passed" for the merge, flip to "verified" after, revalidate
 - [Epic-child agent-memory merge conflicts](epic-child-agent-memory-merge-conflicts.md) — parallel children's child->integration PR shows CONFLICTING solely on shared .claude/agent-memory/*/MEMORY.md index files; resolve by union, then re-verify post-merge before push
 - [Epic-child nullable fan-in debt is deferred](project_epic_child_nullable_fanin_debt_deferred.md) — per-child #nullable gate is scoped to the child's own branch; cross-child CS86xx fan-in accumulates on integration (tip already carried 15 pre-merge) and is the Wave-2 capstone's job — merge on blocking_count==0+CLEAN, don't over-remediate sibling files
-- [Parallel prep children saturate the subagent cap](parallel-prep-children-subagent-saturation.md) — 8 concurrent epic prep children exhaust the 20-subagent limit; wait and retry, never do the delegated step in-thread
-- [Prep-child upstream dependency must be non-halting](prep-child-upstream-dependency-must-be-nonhalting.md) — tell planner AND preflight that the concurrently-prepared wave-0 artifact is an execution-time read; otherwise the child halts at WI-0 on a legitimately-absent file
+- [Planner/executor lack the MCP validator](planner-executor-lack-mcp-validator.md) — atomic-planner and atomic-executor have file-tools only; run the plan + orchestrator-state validator gates from the orchestrator thread yourself
+- [Subagent limit is session-wide](subagent-limit-shared-across-epic-children.md) — parallel epic children compete for the 20-agent pool; keep fan-out to 2-4, relaunch after rejection, and a held slot proves your agent is alive not dead
 
 ## Additional entries
 
+- [Parallel prep children saturate the subagent cap](parallel-prep-children-subagent-saturation.md) — 8 concurrent epic prep children exhaust the 20-subagent limit; wait and retry, never do the delegated step in-thread
+- [Prep-child upstream dependency must be non-halting](prep-child-upstream-dependency-must-be-nonhalting.md) — tell planner AND preflight that the concurrently-prepared wave-0 artifact is an execution-time read; otherwise the child halts at WI-0 on a legitimately-absent file
 - [Preparation-mode plans need repo-relative paths](preparation-mode-plans-need-repo-relative-paths.md) — prep-mode child plans execute later in a DIFFERENT worktree; forbid absolute paths up front, and tell preflight that upstream outputs are legitimately absent
