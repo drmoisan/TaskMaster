@@ -46,8 +46,8 @@ features:
   - issue_num: 1009
     feature_folder: quickfiler-efc-form-item-controller-coverage
     depends_on: [432]
-  - issue_num: 1010
-    feature_folder: quickfiler-item-controller-coverage
+  - issue_num: 453
+    feature_folder: 2026-08-07-quickfiler-item-controller-coverage-453
     depends_on: [432]
   - issue_num: 454
     feature_folder: 2026-08-07-quickfiler-collection-controller-coverage-454
@@ -75,7 +75,7 @@ features:
       - 433
       - 437
       - 1009
-      - 1010
+      - 453
       - 454
       - 1012
       - 455
@@ -91,9 +91,9 @@ features:
 
 > **Issue-number back-fill status (2026-08-08).** `issue_num` values were placeholders at
 > manifest-authoring time and are replaced with the real GitHub issue number from each child's
-> promotion receipt as its preparation completes. Ten are now resolved — **432** (F1), **430**,
-> **431**, **433**, **434**, **435**, **436**, **437**, **454**, **455**. Six remain placeholders in
-> the `1009`-`1016` range and belong to children still in preparation. Every `depends_on` edge on the wave-0 enabler
+> promotion receipt as its preparation completes. Eleven are now resolved — **432** (F1), **430**,
+> **431**, **433**, **434**, **435**, **436**, **437**, **453**, **454**, **455**. Five remain
+> placeholders in the `1009`-`1016` range and belong to children still in preparation. Every `depends_on` edge on the wave-0 enabler
 > now points at the real **432**. The manifest is committed in final resolved form, with no
 > placeholder remaining, before the kickoff artifact is written.
 
@@ -262,9 +262,40 @@ These are reconciled the same way the `winforms-testability-refactor` epic recon
 (precedent, ratified 2026-07-09): **refactor first, exempt only the irreducible remainder.** The
 qualifier "without an injectable seam" in the CLAUDE.md exemption is read as a live obligation, not
 a standing permission — if a seam can be introduced, the exemption does not apply and the file must
-be covered. `[ExcludeFromCodeCoverage]` on a *testable* seam is a Blocking finding. The 33 existing
-attributes are treated as unratified until F1's ledger either justifies each one against the
-irreducible-remainder test or marks it for removal by the owning child.
+be covered. `[ExcludeFromCodeCoverage]` on a *testable* seam is a Blocking finding.
+
+### Correction: a prior maintainer ratification supersedes this epic's ledger
+
+An earlier revision said the existing attributes were "treated as unratified until F1's ledger
+judges them." **That was wrong, and F10 caught it.** `epic-planner` verified the correction against
+GitHub directly:
+
+- **Issue #227** (`Refactor: qfc-item-controller-testability`, now **closed**) already adjudicated
+  the `QfcItemController` exemption boundary. Over five remediation cycles it was cut from 103
+  members to 19, with the maintainer rejecting each intermediate count. **18 of F10's 19 attributes
+  were ratified there.**
+- **Issue #230** (still **open**) is titled *"Build a WinForms message-pump test seam
+  (Application.Run() background thread) to unblock 9 QfcItemController orchestration members"* —
+  the title alone corroborates that nine of those exemptions are a **deliberate, tracked deferral**,
+  explicitly not a merge condition.
+
+**Ruling: F1's ledger has no authority to overturn a maintainer decision.** The ledger records such
+attributes with provenance `ratified-by-maintainer (#227)` and does not re-litigate them. This is
+not a weakening of the epic's stance — the refactor-first rule still governs every attribute that
+has *not* been through a maintainer adjudication, which is the large majority. It simply recognises
+that the question was already asked and answered for one family, by the only authority that can
+answer it.
+
+Consequences:
+
+- **Epic AC2, as originally worded, was unsatisfiable** for F10. The correct target is **19 → 15**,
+  not 19 → 0: one genuinely unratified attribute is removed (`EnsureBreadcrumbPipeline` at
+  `ViewerSetup.cs:132`, post-ratification drift that F10 isolated by diffing the ratified 18-member
+  list against a live grep of 19 sites), and three more fall away with dead-code deletion.
+- **No task may build the #230 seam.** That work is tracked, deferred, and out of this epic's scope.
+- Any other child that meets an attribute traceable to a closed maintainer-ratification issue
+  applies the same rule: record the provenance, do not re-litigate, and report it rather than
+  removing it.
 
 ### 2. Seam hierarchy
 
@@ -624,6 +655,17 @@ rather than crashes:
 4. **F11 found a second, distinct defect — filed as #478.** The merge step blends a correct
    class-level union with a primary-only method subtree. **Fixing #441's axis alone does not fix
    #478**; both must be addressed in one change or the harness stays wrong in a different way.
+5. **Never trust the emitted `line-rate` / `branch-rate` attributes — recompute from the
+   `<line>` elements.** Because of #441 the emitted rates are not per-file figures at all. F10
+   documented two proofs: `FocusAndTheme.cs` emits `line-rate=0.756032 = 282/373` for a **326-line
+   file**, and — far worse — `MailActions.cs` emits `branch-rate="0.75"`, **falsely passing** the
+   75% branch gate against a true 72.7%. The distortion runs in both directions, so no correction
+   factor exists.
+
+   This is also why the corrected baseline table in this manifest can be relied on: it was computed
+   by summing `condition-coverage` across the class-level `<line>` elements rather than reading the
+   emitted attributes, and its 72.7% for `MailActions.cs` **independently matches F10's true
+   figure** while the emitted attribute does not. Compute; do not read.
 
 ## Verified Toolchain and Tooling Facts
 
