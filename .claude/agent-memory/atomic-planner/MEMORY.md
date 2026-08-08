@@ -7,7 +7,10 @@
 - [Research claims as acceptance clauses](research-claims-as-acceptance-clauses.md) — never encode an unmeasured third-party null-vs-throw claim as a literal AC clause; #418 §1.4 empty-bytes claim cost a revision pass
 - [Enumerate condition outcomes before the case list](enumerate-condition-outcomes-before-case-list.md) — 100% branch-rate tasks: 2 outcomes per condition in every ||/&& clause; a null-pairing guard needs all four orderings, not three
 - [Named coverage exception: verify the member body](named-coverage-exception-verify-member-body.md) — read the member before writing "untestable branch"; put gap-closure BEFORE the toolchain-clean-pass task; pin line-rate vs branch-rate
+- [Verify line spans and computed literals](verify-line-spans-and-computed-literals.md) — replace-L<a>-L<b> spans swallow still-referenced field decls; recompute asserted literals incl. format rounding (`##0.00` rounds away from zero → "0.67" not "0.66")
+- [Never assert .Method.Name on a lambda-valued delegate](never-assert-method-name-on-lambda-valued-delegate.md) — classify each Production* default as named-method vs lambda before writing a ".Method.Name identity only" clause; lambdas need NotBeSameAs(sentinel)
 
+- [#437 EfcHomeController plan seams](project_437_efc_home_controller_plan_seams.md) — EFC test files at 459-476 lines force new files; MoveFailureMessageAction=MessageBox.Show CI hang; ClassLevel parallelism + Production* statics; Timing.cs has no clock
 - [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/
 - [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — obj/ cache filenames outlive tear-down commits; verify project/source files with git ls-files or a glob before writing an existence claim into acceptance text
 - [Never pin a HEAD SHA as a plan expectation](never-pin-head-sha-as-plan-expectation.md) — record HEAD, gate on tree invariants (clean porcelain + no .cs/.csproj/packages.config/app.config diff vs the baseline-capture sha)
