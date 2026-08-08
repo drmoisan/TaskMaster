@@ -74,6 +74,8 @@
 ## Additional entries
 
 - [Parallel prep children saturate the subagent cap](parallel-prep-children-subagent-saturation.md) — 8 concurrent epic prep children exhaust the 20-subagent limit; wait and retry, never do the delegated step in-thread
+- [Check for a prior ratified exemption boundary](check-for-prior-ratified-exemption-boundary.md) — search docs/features/archive for maintainer-decision + exemption-boundary artifacts BEFORE planning coverage work; a ratified boundary overrides an epic's "treat as unratified" instruction; read the ratified rationale, not the stale in-code comment
+- [Cobertura line-rate double-counts](cobertura-line-rate-double-counts.md) — emitted line-rate/branch-rate are not per-file figures and distort BOTH ways, so a file can falsely PASS a gate; recompute from class-level `<line>` children (open #441, don't re-file)
 - [Prep-child upstream dependency must be non-halting](prep-child-upstream-dependency-must-be-nonhalting.md) — tell planner AND preflight that the concurrently-prepared wave-0 artifact is an execution-time read; otherwise the child halts at WI-0 on a legitimately-absent file
 - [Preparation-mode plans need repo-relative paths](preparation-mode-plans-need-repo-relative-paths.md) — prep-mode child plans execute later in a DIFFERENT worktree; forbid absolute paths up front, and tell preflight that upstream outputs are legitimately absent
 - [Preflight finds forward-referencing acceptances](preflight-forward-referencing-acceptances.md) — budget 3 preflight rounds; name "no acceptance may reference state a later task establishes" explicitly; MCP validator passes right through it
