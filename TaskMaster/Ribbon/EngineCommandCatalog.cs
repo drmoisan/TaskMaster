@@ -46,6 +46,19 @@ namespace TaskMaster
             ["TriageSetC"] = "Triage",
             ["ClearTriage"] = "Triage",
             ["FilterTriageGroup"] = "Triage",
+            // Issue #518: the six save/info commands. Their engine work reduces to an
+            // InboxEngines lookup that no-ops when the key is absent, so engine readiness is the
+            // semantically exact predicate for them — unlike the two activation toggles, which are
+            // backed by configuration and live in EngineToggleCatalog instead. Note the id and
+            // handler names diverge for the "current location" buttons: the control ids are
+            // GetSaveState / TriageGetSaveState while their onAction handlers remain
+            // GetSaveLocation_Click / TriageGetSaveLocation_Click, as pinned by the ribbon XML.
+            ["SpamSaveNetwork"] = "Spam",
+            ["SpamSaveLocal"] = "Spam",
+            ["GetSaveState"] = "Spam",
+            ["TriageSaveNetwork"] = "Triage",
+            ["TriageSaveLocal"] = "Triage",
+            ["TriageGetSaveState"] = "Triage",
         };
 
         private static readonly IReadOnlyCollection<string> ControlIdList =
