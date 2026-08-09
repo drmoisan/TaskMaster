@@ -27,3 +27,4 @@
 - [winforms-pump-seam-230](project_winforms_pump_seam_230.md) — #230: WinFormsPumpHost design decided; CreateAsync factory-seam gap; InitializeWebViewAsync stays exempt; 19 -> 11 max (2026-08-07)
 - [qfc438-search-focus-steal](project_qfc438_search_focus_steal.md) — #438: TWO focus-steal mechanisms (open _focusPending + close _focusAnchor via per-keystroke Clear); CancelSelector emits no SelectionChanged -> stale _selectedFolder (2026-08-08)
 - [ribbon-engine-readiness-503](project_ribbon_engine_readiness_503.md) — #503: whole TaskMaster Ribbon layer is coverage-excluded; net481 blocks default interface members; 5 orphan onAction callbacks in RibbonExplorer.xml (2026-08-08)
+- [ribbon-toggle-state-guards-505](project_ribbon_toggle_state_guards_505.md) — #505/#506/#518: toggle(config) vs command(InboxEngines) guard asymmetry; catalog<->XML set-equality tests; MessageBox in notify sink blocks viewer-level tests (2026-08-08)

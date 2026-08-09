@@ -29,5 +29,21 @@ leaves outputs cleaned, so follow it with a passing analyzer Rebuild to restore 
 any coverage run; and `Invoke-VSBuild.ps1` also runs `Sync-PackageReferences.ps1` on every
 invocation, so verify `git status` afterwards.
 
+**This is NOT specific to `Invoke-VSBuild.ps1`.** Re-measured 2026-08-08 (#505 preflight) with a
+direct `MSBuild.exe` call — the exact `CLAUDE.md` analyzer command
+(`TaskMaster.sln /t:Build /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true
+/p:EnforceCodeStyleInBuild=true`) run immediately after a plain `/t:Build` returned `EXIT_CODE=0`
+with **18 `Skipping target "CoreCompile"` notices and 0 `csc.exe` invocations**. The analyzer gate
+therefore analyzed nothing. Measure it with
+`/fl /flp:"logfile=<log>;verbosity=normal"` then count `Skipping target "CoreCompile"` and
+`csc.exe` occurrences — `csc.exe = 0` is the unambiguous vacuity signal.
+
+**Plan-review consequence:** in any final-QC phase the analyzer step almost always follows an
+earlier build of the same tree (and, on a loop restart, follows the type-check `/t:Rebuild`), so a
+`/t:Build` analyzer gate is vacuous by construction. Require `/t:Rebuild` for the analyzer gate, or
+require the acceptance artifact to record a non-zero `csc.exe`/`CoreCompile` count for
+`TaskMaster` and `TaskMaster.Test`. CI does not hit this because it always starts from a clean
+checkout; `ci.yml` states the same rationale in a comment on its type-check step.
+
 Related: [[project_repo_sdk_and_nullable_rebuild]], [[project_364_nullable_gate_preexisting_blockers]],
-[[project_vs18_build_toolchain_paths]].
+[[project_vs18_build_toolchain_paths]], [[project_nullable_build_gate_is_vacuous_incremental]].
