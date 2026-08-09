@@ -56,7 +56,31 @@ sites in `RibbonViewer.EngineCommands.cs`, not to `Globals` dereferences inside
 `RibbonController.Intelligence.cs`) and #507 (closed; the `Engines` property itself). **No existing
 issue covers item 2.** Promotion is therefore required.
 
-### Disposition: PROMOTION DEFERRED TO ORCHESTRATOR
+### Disposition: PROMOTED BY ORCHESTRATOR — issue #524
+
+**Resolved 2026-08-09T00-20.** The orchestrator holds the promotion MCP tools and completed the
+handoff. It first re-verified the tracker search independently (`gh issue list --search
+"RibbonController Intelligence Globals"` returned only #504/#507/#503; `--search "unguarded Globals"`
+returned only #518/#507 — confirming no existing issue covers item 2), then ran the lifecycle:
+
+```
+mcp__drm-copilot__new_potential_bug_entry(short_name=ribbon-controller-intelligence-unguarded-globals-deref)
+  -> docs/features/potential/2026-08-08-ribbon-controller-intelligence-unguarded-globals-deref.md
+
+mcp__drm-copilot__potential_to_issue(promotion_type=bug, work_mode=full-bug)
+  -> https://github.com/drmoisan/TaskMaster/issues/524
+  -> docs/features/potential/promoted/2026-08-08-ribbon-controller-intelligence-unguarded-globals-deref.md
+```
+
+`work_mode=full-bug` was selected rather than `minor-audit` because the affected-site list is
+explicitly indicative rather than exhaustive, so the production-file budget cannot be bounded until
+a full enumeration is done. No active feature folder was created: the repository's convention is
+that an active folder is created when the work starts, not at promotion time (consistent with #504,
+#505, and #506, which were promoted without active folders).
+
+The original deferral record follows, retained unchanged for the audit trail.
+
+### Original disposition: PROMOTION DEFERRED TO ORCHESTRATOR
 
 Promotion must go through the promotion lifecycle, in this order:
 
@@ -162,6 +186,9 @@ No `QuickFiler` source was modified and no test was weakened, per plan rule 17.
 | Item | Disposition | Action needed from the orchestrator |
 |---|---|---|
 | 1 — orphan `onAction` callbacks | Already promoted: **#504** (OPEN) | None |
-| 2 — `RibbonController.Intelligence.cs` unguarded `Globals` | **PROMOTION DEFERRED TO ORCHESTRATOR** | Run the three MCP promotion calls with the prepared title and body above |
+| 2 — `RibbonController.Intelligence.cs` unguarded `Globals` | **PROMOTED: #524** (2026-08-09T00-20) | None — completed |
 | 3 — `spec.md` template gap | Resolved during authoring | None |
 | Extra — `WinFormsPumpHost` load flakiness | Already tracked: **#511** (OPEN) | None |
+
+All four out-of-scope items are now dispositioned. Nothing from this delivery's research remains
+unpromoted, satisfying AC-17 (scope held to #505/#506/#518; further defects promoted, not fixed).
