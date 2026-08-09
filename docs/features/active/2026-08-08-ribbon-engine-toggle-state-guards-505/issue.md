@@ -217,11 +217,19 @@ Three points a reviewer should read before treating anything here as complete:
 2. **The type-check gate deliberately omits `/p:Nullable=enable`** (AC16), using CI's actual
    command instead, per issue **#522**. This is a documented deviation recorded in the
    `## Verification` section of `spec.md`, not non-compliance.
-3. **One promotion is outstanding** (AC17). Research §10 item 1 is already tracked as **#504**;
+3. **All promotions are complete** (AC17). Research §10 item 1 is already tracked as **#504**;
    item 3 was resolved during spec authoring; item 2 — unguarded `Globals` dereferences in
-   `RibbonController.Intelligence.cs` — has no existing tracker issue and its promotion is deferred
-   to the orchestrator with a prepared title and body in
-   `evidence/issue-updates/research-defect-promotions.2026-08-08T21-43.md`.
+   `RibbonController.Intelligence.cs` — was promoted by the orchestrator as **#524** on
+   2026-08-09T00-20 through `new_potential_bug_entry` -> `potential_to_issue` (bug, full-bug), after
+   an independent tracker re-check confirmed no existing issue covered it. The receipt is recorded
+   in `evidence/issue-updates/research-defect-promotions.2026-08-08T21-43.md`. The `WinFormsPumpHost`
+   load-flakiness observed during Phase 5 is already tracked as **#511**.
+4. **One non-blocking Major finding from code review is promoted, not fixed here** (CR-1, recorded
+   in `code-review.2026-08-08T21-59.md`). `EngineToggleStateCoordinator.ApplyPrimeAsync` can let an
+   in-flight prime overwrite a fresher toggle-written cache value, leaving a stale toggle display
+   until the next click. It is display-only, self-correcting on the next click, strictly better than
+   the merge-base behavior (in which the toggles never reflected engine state at all), and violates
+   no acceptance criterion. Promoted as **#525** rather than widened into this delivery.
 
 Intended user-visible change to call out at review: the six Spam/Triage save-options buttons
 (**Network**, **Local**, **Current Location**) now render **disabled** until their engine finishes
