@@ -168,29 +168,62 @@ below are the issue-level restatement used to confirm all three GitHub issues ar
 
 ### From #505 (async getPressed signature)
 
-- [ ] AC1 — `SpamBayesEnabled_GetPressed` is declared `public bool SpamBayesEnabled_GetPressed(Office.IRibbonControl control)`; no `async`, no `Task<bool>`.
-- [ ] AC2 — `TriageEnabled_GetPressed` is declared `public bool TriageEnabled_GetPressed(Office.IRibbonControl control)`; no `async`, no `Task<bool>`.
-- [ ] AC3 — Both callbacks return the real engine activation state derived from `IAppItemEngines.EngineActiveAsync`, without blocking the STA on an async call.
-- [ ] AC4 — A test pins both signatures by reflection so a future regression fails the build rather than failing silently in Office.
+- [x] AC1 — `SpamBayesEnabled_GetPressed` is declared `public bool SpamBayesEnabled_GetPressed(Office.IRibbonControl control)`; no `async`, no `Task<bool>`.
+- [x] AC2 — `TriageEnabled_GetPressed` is declared `public bool TriageEnabled_GetPressed(Office.IRibbonControl control)`; no `async`, no `Task<bool>`.
+- [x] AC3 — Both callbacks return the real engine activation state derived from `IAppItemEngines.EngineActiveAsync`, without blocking the STA on an async call.
+- [x] AC4 — A test pins both signatures by reflection so a future regression fails the build rather than failing silently in Office.
 
 ### From #506 (fire-and-forget toggle)
 
-- [ ] AC5 — `SpamBayesEnabled_Click` observes the completion of `ToggleEngineAsync` rather than discarding the returned `Task`.
-- [ ] AC6 — `TriageEnabled_Click` observes the completion of `ToggleEngineAsync` rather than discarding the returned `Task`.
-- [ ] AC7 — A fault raised inside the toggle is observed and reported through the project logging pattern rather than being swallowed into an unobserved task.
-- [ ] AC8 — Both handlers match the `async void` + `await` + boundary `try`/`catch` shape already used by the sibling `*SaveNetwork_Click` / `*SaveLocal_Click` handlers in the same regions.
-- [ ] AC9 — After a toggle completes, the corresponding ribbon control is invalidated so Office re-queries `getPressed`.
+- [x] AC5 — `SpamBayesEnabled_Click` observes the completion of `ToggleEngineAsync` rather than discarding the returned `Task`.
+- [x] AC6 — `TriageEnabled_Click` observes the completion of `ToggleEngineAsync` rather than discarding the returned `Task`.
+- [x] AC7 — A fault raised inside the toggle is observed and reported through the project logging pattern rather than being swallowed into an unobserved task.
+- [x] AC8 — Both handlers match the `async void` + `await` + boundary `try`/`catch` shape already used by the sibling `*SaveNetwork_Click` / `*SaveLocal_Click` handlers in the same regions.
+- [x] AC9 — After a toggle completes, the corresponding ribbon control is invalidated so Office re-queries `getPressed`.
 
 ### From #518 (unguarded Engines dereference)
 
-- [ ] AC10 — All 10 unguarded `Controller.Engines.<member>` call sites listed in the Actual Behavior table are guarded and degrade gracefully when the engines are unavailable.
-- [ ] AC11 — The already-gated `TestSpam_Click` site is left functionally unchanged; the guarded-site count is verified as exactly 10 and reported.
-- [ ] AC12 — No call site raises a `NullReferenceException` when invoked before `SetGlobals` has assigned `Globals`.
-- [ ] AC13 — `RibbonController.Engines` remains `Globals?.Engines` (the #507 fix); the `?.` is not reverted.
+- [x] AC10 — All 10 unguarded `Controller.Engines.<member>` call sites listed in the Actual Behavior table are guarded and degrade gracefully when the engines are unavailable.
+- [x] AC11 — The already-gated `TestSpam_Click` site is left functionally unchanged; the guarded-site count is verified as exactly 10 and reported.
+- [x] AC12 — No call site raises a `NullReferenceException` when invoked before `SetGlobals` has assigned `Globals`.
+- [x] AC13 — `RibbonController.Engines` remains `Globals?.Engines` (the #507 fix); the `?.` is not reverted.
 
 ### Cross-cutting
 
-- [ ] AC14 — Logic extracted out of the `[ExcludeFromCodeCoverage]` ribbon handlers is host-neutral and unit-tested; the exemption is neither removed nor widened to manufacture coverage.
-- [ ] AC15 — Failing regression tests are written first and demonstrated red before the fix, per the `CLAUDE.md` bugfix workflow.
-- [ ] AC16 — The full C# toolchain passes in a single final pass: `csharpier .` -> analyzer msbuild -> type-check msbuild (CI's command, without the defective `/p:Nullable=enable`, per #522) -> `vstest.console.exe /EnableCodeCoverage`.
-- [ ] AC17 — Scope is held to these three issues; any further defect found is promoted to its own issue rather than fixed here.
+- [x] AC14 — Logic extracted out of the `[ExcludeFromCodeCoverage]` ribbon handlers is host-neutral and unit-tested; the exemption is neither removed nor widened to manufacture coverage.
+- [x] AC15 — Failing regression tests are written first and demonstrated red before the fix, per the `CLAUDE.md` bugfix workflow.
+- [x] AC16 — The full C# toolchain passes in a single final pass: `csharpier .` -> analyzer msbuild -> type-check msbuild (CI's command, without the defective `/p:Nullable=enable`, per #522) -> `vstest.console.exe /EnableCodeCoverage`.
+- [x] AC17 — Scope is held to these three issues; any further defect found is promoted to its own issue rather than fixed here.
+
+## Delivery Note (2026-08-08)
+
+Delivered on `bug/ribbon-engine-toggle-state-guards-505` from `origin/main` at `f910ff2f`. All
+seventeen issue-level criteria above are checked off against verified evidence in
+`docs/features/active/2026-08-08-ribbon-engine-toggle-state-guards-505/evidence/`. The authoritative
+criteria for this `full-bug` delivery are AC-1 through AC-23 in `spec.md`; the mapping from these
+items to those criteria is the issue-tag coverage map at the end of the `spec.md` acceptance
+section.
+
+Three points a reviewer should read before treating anything here as complete:
+
+1. **AC9 is checked off on automated evidence only.** It maps to spec **AC-9** (the recorded
+   update-before-invalidate call sequence, verified by
+   `ExecuteToggleAsync_PerformsToggleThenRefreshThenCacheThenInvalidate_InOrder`) **and** to spec
+   **AC-22**, which is MANUAL-ONLY. **AC-22 is still `- [ ]` in `spec.md` and is pending maintainer
+   execution** of `evidence/manual-verification/ac22-checklist.2026-08-08T21-44.md`. Live-Outlook
+   confirmation that the corrected `getPressed` actually binds, that each toggle survives a menu
+   reopen, and that the ten callbacks are safe pre-`SetGlobals` has **not** been performed. AC9's
+   check-off above records only what unit tests can establish.
+2. **The type-check gate deliberately omits `/p:Nullable=enable`** (AC16), using CI's actual
+   command instead, per issue **#522**. This is a documented deviation recorded in the
+   `## Verification` section of `spec.md`, not non-compliance.
+3. **One promotion is outstanding** (AC17). Research §10 item 1 is already tracked as **#504**;
+   item 3 was resolved during spec authoring; item 2 — unguarded `Globals` dereferences in
+   `RibbonController.Intelligence.cs` — has no existing tracker issue and its promotion is deferred
+   to the orchestrator with a prepared title and body in
+   `evidence/issue-updates/research-defect-promotions.2026-08-08T21-43.md`.
+
+Intended user-visible change to call out at review: the six Spam/Triage save-options buttons
+(**Network**, **Local**, **Current Location**) now render **disabled** until their engine finishes
+loading, instead of being always enabled and silently doing nothing, and re-enable automatically
+after the post-load refresh.

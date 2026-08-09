@@ -535,43 +535,43 @@ checked off on the strength of unit tests; they require recorded live-Outlook ve
 
 ### Signatures and toggle state (#505)
 
-- [ ] **AC-1 (iAC1)** `SpamBayesEnabled_GetPressed` is declared exactly
+- [x] **AC-1 (iAC1)** `SpamBayesEnabled_GetPressed` is declared exactly
   `public bool SpamBayesEnabled_GetPressed(Office.IRibbonControl control)` — no `async`, no
   `Task<bool>`. Verified by the R1 reflection pin (return type `bool`, one parameter,
   `ParameterType.FullName == "Microsoft.Office.Core.IRibbonControl"`).
-- [ ] **AC-2 (iAC2)** `TriageEnabled_GetPressed` is declared exactly
+- [x] **AC-2 (iAC2)** `TriageEnabled_GetPressed` is declared exactly
   `public bool TriageEnabled_GetPressed(Office.IRibbonControl control)`. Verified by the same R1
   pin.
-- [ ] **AC-3 (iAC3)** Both callbacks return engine activation state derived from
+- [x] **AC-3 (iAC3)** Both callbacks return engine activation state derived from
   `IAppItemEngines.EngineActiveAsync` through the coordinator's cache, and the change contains no
   `.Result`, `.Wait()`, or `GetAwaiter().GetResult()` on engine tasks anywhere (grep over the
   branch diff returns zero occurrences). The cached-read semantics of B2 — never-primed key
   returns `false`; at most one prime per key; prime completion updates the cache and invalidates
   the mapped control; prime fault is logged and leaves `false` — are each verified by a named
   test in `EngineToggleStateCoordinatorTests`.
-- [ ] **AC-4 (iAC4)** The R1 signature pins for both `getPressed` and both `onAction` callbacks
+- [x] **AC-4 (iAC4)** The R1 signature pins for both `getPressed` and both `onAction` callbacks
   exist in `RibbonExplorerXmlTests` (or a sibling viewer test), so a future signature regression
   fails the build rather than failing silently in Office.
 
 ### Awaited toggle and ordering (#506)
 
-- [ ] **AC-5 (iAC5)** `SpamBayesEnabled_Click` observes the completion of the toggle: it is
+- [x] **AC-5 (iAC5)** `SpamBayesEnabled_Click` observes the completion of the toggle: it is
   `async void`, awaits `Controller.HandleEngineToggleClickAsync(SpamBayes.GroupName)`, and
   carries `AsyncStateMachineAttribute` (R5 pin). No discarded `Task` remains at line 120's
   replacement.
-- [ ] **AC-6 (iAC6)** `TriageEnabled_Click` likewise awaits `HandleEngineToggleClickAsync("Triage")`
+- [x] **AC-6 (iAC6)** `TriageEnabled_Click` likewise awaits `HandleEngineToggleClickAsync("Triage")`
   and carries `AsyncStateMachineAttribute` (R5 pin).
-- [ ] **AC-7 (iAC7)** A fault raised inside the toggle path is observed at the
+- [x] **AC-7 (iAC7)** A fault raised inside the toggle path is observed at the
   `HandleToggleClickAsync` boundary and reported through the injected `logError` delegate
   (production wiring `logger.Error(message, exception)`); the boundary does not rethrow and does
   not invalidate; `ExecuteToggleAsync` itself propagates the fault unchanged (no new
   `catch (Exception)` below the boundary). Verified by named tests in
   `EngineToggleStateCoordinatorTests` asserting on the injected delegates.
-- [ ] **AC-8 (iAC8)** Both toggle handlers match the `async void` + single awaited expression
+- [x] **AC-8 (iAC8)** Both toggle handlers match the `async void` + single awaited expression
   shape of the sibling `*SaveNetwork_Click`/`*SaveLocal_Click` handlers in the same regions;
   the two `ShowSaveInfo` handlers (`GetSaveLocation_Click`, `TriageGetSaveLocation_Click`) also
   become `async void` + `await`. Verified by the R5 shape pins.
-- [ ] **AC-9 (iAC9)** After a toggle completes, the coordinator updates the cache **before**
+- [x] **AC-9 (iAC9)** After a toggle completes, the coordinator updates the cache **before**
   invoking `invalidateControl` with the mapped control id, so Office re-queries `getPressed`
   against fresh state. Verified by a recorded-sequence test
   (`ToggleEngineAsync` → `EngineActiveAsync` → cache readable → `invalidateControl`) in
@@ -579,7 +579,7 @@ checked off on the strength of unit tests; they require recorded live-Outlook ve
 
 ### Guarded dereferences (#518)
 
-- [ ] **AC-10 (iAC10)** All 10 unguarded sites in the defect-surface table are guarded with the
+- [x] **AC-10 (iAC10)** All 10 unguarded sites in the defect-surface table are guarded with the
   shape matched to their semantics: the four toggle/getPressed sites route through
   `EngineToggleStateCoordinator` (never through `RunEngineCommandAsync`), and the six command
   sites route through `Controller.RunEngineCommandAsync` with the engine dereference deferred
@@ -587,16 +587,16 @@ checked off on the strength of unit tests; they require recorded live-Outlook ve
   `SpamSaveLocal`, `GetSaveState` → `"Spam"`; `TriageSaveNetwork`, `TriageSaveLocal`,
   `TriageGetSaveState` → `"Triage"`) and matching `getEnabled="EngineCommand_GetEnabled"` XML
   attributes. Verified by R3, R4, and source inspection of the ten rewritten call sites.
-- [ ] **AC-11 (iAC11)** `TestSpam_Click` is functionally unchanged, and the guarded-site count is
+- [x] **AC-11 (iAC11)** `TestSpam_Click` is functionally unchanged, and the guarded-site count is
   verified and reported as exactly **10**: a grep of `Engines\.` over the post-change
   `RibbonViewer.EngineCommands.cs` shows every remaining production dereference inside a gated
   lambda or behind the coordinator, and the count of newly guarded sites (10) plus the
   pre-existing gated site (1) is recorded in the review evidence.
-- [ ] **AC-12 (iAC12)** No call site raises `NullReferenceException` when invoked before
+- [x] **AC-12 (iAC12)** No call site raises `NullReferenceException` when invoked before
   `SetGlobals` has assigned `Globals`: `getPressed` returns `false` (R2); a toggle click emits
   exactly one `notifyUnavailable` message and invokes nothing; the six command sites are blocked
   by the closed gate without invoking their action. Verified by R2 plus named coordinator tests.
-- [ ] **AC-13 (iAC13)** `RibbonController.Engines` remains exactly
+- [x] **AC-13 (iAC13)** `RibbonController.Engines` remains exactly
   `internal IAppItemEngines Engines => Globals?.Engines;`
   (`RibbonController.Intelligence.cs:204`) — a zero-line diff on that member; the `?.` is not
   reverted and #507 is not re-fixed. Verified by branch diff inspection and the untouched
@@ -604,15 +604,15 @@ checked off on the strength of unit tests; they require recorded live-Outlook ve
 
 ### Cross-cutting (iAC14-iAC17)
 
-- [ ] **AC-14 (iAC14)** `EngineToggleStateCoordinator` (and any sibling map type) is host-neutral
+- [x] **AC-14 (iAC14)** `EngineToggleStateCoordinator` (and any sibling map type) is host-neutral
   — zero `Microsoft.Office.*` and zero `Microsoft.Office.Interop.Outlook` using directives, no
   `MessageBox`, no WinForms types — and carries no `[ExcludeFromCodeCoverage]` attribute; no
   existing exemption is removed or widened, and no new exemption is added anywhere in the change.
   Verified by grep over the new and changed files.
-- [ ] **AC-15 (iAC15)** The R1-R5 regression tests are written first and demonstrated red against
+- [x] **AC-15 (iAC15)** The R1-R5 regression tests are written first and demonstrated red against
   the pre-fix code (recorded run output under `.../evidence/regression-testing/`), then green
   after the fix, per the `CLAUDE.md` bugfix workflow.
-- [ ] **AC-16 (iAC16)** The full toolchain passes in a single uninterrupted final pass:
+- [x] **AC-16 (iAC16)** The full toolchain passes in a single uninterrupted final pass:
   `csharpier .` reports no changes; the analyzer msbuild
   (`/p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`) completes with zero errors and
   no new diagnostics; the type-check msbuild uses **CI's command**
@@ -621,7 +621,7 @@ checked off on the strength of unit tests; they require recorded live-Outlook ve
   completes with zero errors; `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`
   reports zero failed and zero skipped tests, with stale `\.claude\worktrees\` assemblies excluded
   from the glob. Outputs recorded under `.../evidence/qa-gates/`.
-- [ ] **AC-17 (iAC17)** Scope is held to #505/#506/#518: the research §10 defects (orphan
+- [x] **AC-17 (iAC17)** Scope is held to #505/#506/#518: the research §10 defects (orphan
   `onAction` callbacks; `RibbonController.Intelligence.cs` unguarded `Globals` dereferences) and
   any further defect found during execution are promoted to their own issues through the
   promotion lifecycle, not fixed here. Verified by recorded promotion receipts (checking the
@@ -630,23 +630,23 @@ checked off on the strength of unit tests; they require recorded live-Outlook ve
 
 ### Quality gates (decomposed from iAC14-iAC16 for independent verification)
 
-- [ ] **AC-18 (iAC14)** `EngineToggleStateCoordinatorTests` covers every scenario listed in
+- [x] **AC-18 (iAC14)** `EngineToggleStateCoordinatorTests` covers every scenario listed in
   *Test Strategy* (constructor contracts; unknown/null key; null accessor; single prime;
   prime fault; toggle ordering; fault propagation vs. boundary observation; blocked click), and
   `EngineToggleStateCoordinator` reaches **>= 90% line coverage** in the final coverage XML under
   `.../evidence/qa-gates/`.
-- [ ] **AC-19 (iAC16)** A merge-base coverage baseline is captured under `.../evidence/baseline/`
+- [x] **AC-19 (iAC16)** A merge-base coverage baseline is captured under `.../evidence/baseline/`
   before implementation; the post-change figure is compared against it showing no regression on
   changed lines; the repo-wide figure on the `CLAUDE.md` § UT2 testable denominator is recorded
   and reported in the comparison artifact (record-and-report, not an independent numeric floor —
   the modified handlers are coverage-exempt, so a flat repo-wide figure is expected and is not a
   regression).
-- [ ] **AC-20 (iAC14, iAC16)** No automated test in this change creates a temporary file, calls
+- [x] **AC-20 (iAC14, iAC16)** No automated test in this change creates a temporary file, calls
   `Thread.Sleep` or `Task.Delay`, reads the wall clock, constructs a `Form`, `MessageBox`, or
   `BackgroundWorker`, starts a WinForms message pump, or touches live COM/Outlook; no test drives
   a path reaching `NotifyEngineCommandNotReady`. Verified by grep over the new and changed test
   files plus the AC-16 test run.
-- [ ] **AC-21 (iAC10)** Every file touched by this change is at or under **500 lines** after the
+- [x] **AC-21 (iAC10)** Every file touched by this change is at or under **500 lines** after the
   change, verified by a line count of each path in the branch diff. (`RibbonExplorer.xml` retains
   its pre-existing recorded overage from #503; it is a declarative embedded UI resource and is
   not remediated here.)
@@ -655,7 +655,7 @@ checked off on the strength of unit tests; they require recorded live-Outlook ve
   updates after a click and survives a menu reopen; the ten callbacks invoked before
   initialization completes produce no `NullReferenceException`. Outcome recorded under
   `.../evidence/manual-verification/`; must not be checked off on the strength of unit tests.
-- [ ] **AC-23** This spec and `issue.md` reflect the delivered outcome, including any deviation
+- [x] **AC-23** This spec and `issue.md` reflect the delivered outcome, including any deviation
   recorded in a `## Delivery Notes and Deviations` section, and the `issue.md` restatement items
   iAC1-iAC17 are checked off in `issue.md` as their covering criteria here are verified.
 
@@ -710,3 +710,82 @@ element facts were re-verified against this worktree (`RibbonViewer.EngineComman
 `RibbonExplorer.xml:141, 520`). One process note: the issue-level AC16 text names the `CLAUDE.md`
 toolchain generically; this spec binds the type-check step to CI's exact command and records the
 #522 deviation explicitly so it cannot be misread as non-compliance.
+
+---
+
+## Delivery Notes and Deviations
+
+Delivered 2026-08-08 on `bug/ribbon-engine-toggle-state-guards-505` from `origin/main` at
+`f910ff2f21c67a03cf8eebcb340727d5415d8e08`. Twenty-two of the twenty-three acceptance criteria are
+checked off above; **AC-22 remains `- [ ]` by design** (MANUAL-ONLY).
+
+### What was delivered
+
+- Two new host-neutral, non-exempt types under `TaskMaster/Ribbon/`:
+  `EngineToggleCatalog` (engine key to toggle control id) and `EngineToggleStateCoordinator`
+  (synchronous cached `getPressed`, at-most-one lazy prime per key, awaited toggle with
+  update-before-invalidate ordering, observed-and-logged click boundary).
+- Thin glue inside the existing `[ExcludeFromCodeCoverage]` types: `EngineToggles` plus
+  `IsEngineToggleActive` / `HandleEngineToggleClickAsync` on `RibbonController`, and
+  `InvalidateEngineToggle` on `RibbonViewer`.
+- The four toggle/`getPressed` callbacks rewritten to the exact Office shapes; the six save/info
+  command callbacks routed through `RunEngineCommandAsync` with the engine dereference deferred
+  into the lambda; six new `EngineCommandCatalog` entries and six matching
+  `getEnabled="EngineCommand_GetEnabled"` attributes in `RibbonExplorer.xml`, landed atomically.
+- Regression tests R1-R5 written first and demonstrated red, then green; 22 new seam test members
+  (25 executed cases) with the new coordinator at 0.991 line coverage and the catalog at 1.000.
+
+### Deviations and notable outcomes
+
+1. **Type-check command (issue #522).** The type-check gate uses CI's command
+   (`msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`)
+   and deliberately omits the `CLAUDE.md` variant's `/p:Nullable=enable`, per the *Verification*
+   section above. This is a documented deviation, not non-compliance. #522 was not fixed.
+2. **Intended UX change (B7).** The six save/info buttons now render disabled until their engine
+   loads, instead of being always enabled and silently no-oping. They re-enable automatically via
+   the existing post-load refresh. The stale comment at `RibbonExplorerXmlTests.cs` was updated to
+   describe the new per-control gating.
+3. **No `Part2` test-file split.** `EngineToggleStateCoordinatorTests.cs` is 459 physical lines
+   after formatting, under the 500-line cap, so the conditional split was not triggered and the
+   test project gained three `<Compile Include>` entries rather than four.
+4. **Prime-fault observation uses a continuation, not a second `catch`.** `ExecuteToggleAsync` and
+   the prime path contain no `catch`; the prime's fault is observed by a `ContinueWith`
+   continuation that reads `Task.Exception`. The file therefore holds exactly one `catch (`, inside
+   `HandleToggleClickAsync`, as the boundary-catch rule requires.
+5. **Coverage-exemption uncertainty resolved empirically.** The plan required the
+   `[ExcludeFromCodeCoverage]` narrative to be stated as expected-but-unverified, because
+   `coverage.config` supplies a custom `<CodeCoverage>` block that could displace the default
+   `<Attributes>` excludes. It was probed directly: `RibbonViewer.cs` and `RibbonController.cs` are
+   **absent** from the final Cobertura document, so the attribute is being honored. Recorded in the
+   coverage-comparison artifact.
+6. **Accepted pre-existing size overages.** `RibbonExplorer.xml` (539 to 545 lines) and
+   `TaskMaster.csproj` (582 to 584 lines) exceed 500 lines. Both were already over at the
+   merge-base and are declarative resource / MSBuild project files rather than production, test, or
+   reusable-script code. Every `.cs` file in the diff is at or under 500 lines.
+7. **Phase 5 was restarted once for an environmental cause.** A first final-QC pass aborted at the
+   test gate on `QuickFiler.Test`'s `WinFormsPumpHost` message-pump tests, which fail under machine
+   load with a WinForms handle-creation race. `QuickFiler` has no reference to `TaskMaster`, its
+   binaries are compiled from merge-base source, and the same tests pass 4/4 in isolation once load
+   is reduced. The cause was removed rather than worked around; no test was weakened and no
+   `QuickFiler` source was touched. The known flakiness is already tracked as issue **#511**. The
+   recorded final pass is uninterrupted, with an identical before/after tree fingerprint.
+8. **One promotion deferred.** Research §10 item 2 (unguarded `Globals` dereferences in
+   `RibbonController.Intelligence.cs`) has no existing tracker issue and requires promotion through
+   the MCP lifecycle, which is outside the executing agent's tool set. The prepared potential-entry
+   title and body are recorded under `evidence/issue-updates/` for the orchestrator. Item 1 is
+   already promoted as **#504**; item 3 was resolved during authoring.
+
+### Evidence index
+
+| Kind | Location |
+|---|---|
+| Baseline (12 artifacts) | `evidence/baseline/` |
+| Red-before / green-after (4 artifacts) | `evidence/regression-testing/` |
+| QA gates (14 artifacts) | `evidence/qa-gates/` |
+| Promotion dispositions | `evidence/issue-updates/research-defect-promotions.2026-08-08T21-43.md` |
+| AC-22 manual checklist (PENDING) | `evidence/manual-verification/ac22-checklist.2026-08-08T21-44.md` |
+| Phase notes and commits | `evidence/other/` |
+
+Raw Cobertura documents and MSBuild logs are intentionally **not** committed; they live under the
+gitignored `coverage/` directory and are regenerable from the recorded commands. Numeric headline
+values are recorded in the Markdown artifacts.

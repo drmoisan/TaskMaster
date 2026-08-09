@@ -165,9 +165,7 @@ namespace TaskMaster.Test.Ribbon
             {
                 var callbackName = ResolveCallbackName(document, controlId, "getPressed");
                 var callback = GetPublicInstanceMethod(callbackName);
-                callback
-                    .Should()
-                    .NotBeNull("'{0}' must exist to be invoked", callbackName);
+                callback.Should().NotBeNull("'{0}' must exist to be invoked", callbackName);
 
                 // A bare RibbonController leaves Globals unassigned, so RibbonController.Engines
                 // yields null — exactly the pre-SetGlobals state the ribbon can be polled in.
@@ -246,9 +244,7 @@ namespace TaskMaster.Test.Ribbon
                 handler.Should().NotBeNull("'{0}' must exist on RibbonViewer", handlerName);
 
                 var parameters = handler!.GetParameters();
-                parameters
-                    .Should()
-                    .ContainSingle("'{0}' takes exactly one parameter", handlerName);
+                parameters.Should().ContainSingle("'{0}' takes exactly one parameter", handlerName);
                 parameters[0]
                     .ParameterType.FullName.Should()
                     .Be(
@@ -291,10 +287,7 @@ namespace TaskMaster.Test.Ribbon
                 );
             parameters[1]
                 .ParameterType.Should()
-                .Be<bool>(
-                    "the second parameter of '{0}' must be the pressed state",
-                    handlerName
-                );
+                .Be<bool>("the second parameter of '{0}' must be the pressed state", handlerName);
         }
 
         /// <summary>
@@ -306,11 +299,7 @@ namespace TaskMaster.Test.Ribbon
         {
             handler
                 .ReturnType.Should()
-                .Be(
-                    typeof(void),
-                    "'{0}' is an Office callback and must return void",
-                    handlerName
-                );
+                .Be(typeof(void), "'{0}' is an Office callback and must return void", handlerName);
             handler
                 .GetCustomAttribute<AsyncStateMachineAttribute>()
                 .Should()
@@ -333,18 +322,12 @@ namespace TaskMaster.Test.Ribbon
             var element = document
                 .Descendants()
                 .SingleOrDefault(candidate => candidate.Attribute("id")?.Value == controlId);
-            element
-                .Should()
-                .NotBeNull("control '{0}' must exist in the ribbon XML", controlId);
+            element.Should().NotBeNull("control '{0}' must exist in the ribbon XML", controlId);
 
             var attribute = element!.Attribute(attributeName);
             attribute
                 .Should()
-                .NotBeNull(
-                    "control '{0}' must declare a '{1}' callback",
-                    controlId,
-                    attributeName
-                );
+                .NotBeNull("control '{0}' must declare a '{1}' callback", controlId, attributeName);
 
             return attribute!.Value;
         }

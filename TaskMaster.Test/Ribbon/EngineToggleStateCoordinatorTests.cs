@@ -115,7 +115,9 @@ namespace TaskMaster.Test.Ribbon
             // Assert
             pressed.Should().BeFalse("an unusable engine key must report the toggle as unchecked");
             harness.Engines.Verify(x => x.EngineActiveAsync(It.IsAny<string>()), Times.Never);
-            harness.Invalidations.Should().BeEmpty("nothing changed, so nothing may be invalidated");
+            harness
+                .Invalidations.Should()
+                .BeEmpty("nothing changed, so nothing may be invalidated");
             harness
                 .Coordinator.GetPrimeTask(engineName)
                 .IsCompleted.Should()
@@ -224,7 +226,9 @@ namespace TaskMaster.Test.Ribbon
             // Assert
             harness
                 .Errors.Should()
-                .ContainSingle("a prime fault must be observed exactly once, never left unobserved");
+                .ContainSingle(
+                    "a prime fault must be observed exactly once, never left unobserved"
+                );
             harness.Errors[0].Message.Should().Contain(SpamEngine);
             harness.Errors[0].Exception.Should().BeSameAs(failure);
             harness.Invalidations.Should().BeEmpty("a failed prime changed no state to display");
@@ -301,7 +305,8 @@ namespace TaskMaster.Test.Ribbon
             Func<Task> act = () => harness.Coordinator.ExecuteToggleAsync(SpamEngine);
 
             // Assert: the testable core never catches, so the fault reaches the boundary intact.
-            (await act.Should().ThrowAsync<InvalidOperationException>()).Which.Should()
+            (await act.Should().ThrowAsync<InvalidOperationException>())
+                .Which.Should()
                 .BeSameAs(failure);
             harness.Invalidations.Should().BeEmpty("a failed toggle changed no state to display");
             harness.Errors.Should().BeEmpty("only the click boundary reports faults");
@@ -314,8 +319,7 @@ namespace TaskMaster.Test.Ribbon
             var harness = new Harness();
 
             // Act
-            Func<Task> act = () =>
-                harness.Coordinator.ExecuteToggleAsync("NotAToggleBackedEngine");
+            Func<Task> act = () => harness.Coordinator.ExecuteToggleAsync("NotAToggleBackedEngine");
 
             // Assert: fail fast — an unmapped key has no control to invalidate.
             (await act.Should().ThrowAsync<ArgumentException>()).WithParameterName("engineName");

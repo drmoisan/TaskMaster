@@ -73,8 +73,10 @@ namespace TaskMaster
         /// at-most-one-prime guard; its value is the test-observable handle returned by
         /// <see cref="GetPrimeTask"/>.
         /// </summary>
-        private readonly ConcurrentDictionary<string, Task> _primeTasks =
-            new ConcurrentDictionary<string, Task>(StringComparer.Ordinal);
+        private readonly ConcurrentDictionary<string, Task> _primeTasks = new ConcurrentDictionary<
+            string,
+            Task
+        >(StringComparer.Ordinal);
 
         /// <summary>
         /// Creates a coordinator over an engines accessor and three injected sinks.
