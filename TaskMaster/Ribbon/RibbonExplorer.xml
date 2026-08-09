@@ -116,18 +116,21 @@
                 id="SpamSaveNetwork"
                 imageMso="ServerConnection"
                 onAction="SpamSaveNetwork_Click"
+                getEnabled="EngineCommand_GetEnabled"
                 label="Network"
               />
               <button
                 id="SpamSaveLocal"
                 imageMso="FillDown"
                 onAction="SpamSaveLocal_Click"
+                getEnabled="EngineCommand_GetEnabled"
                 label="Local"
               />
               <button
                 id="GetSaveState"
                 imageMso="Help"
                 onAction="GetSaveLocation_Click"
+                getEnabled="EngineCommand_GetEnabled"
                 label="Current Location"
               />
             </menu>
@@ -501,18 +504,21 @@
                 id="TriageSaveNetwork"
                 imageMso="ServerConnection"
                 onAction="TriageSaveNetwork_Click"
+                getEnabled="EngineCommand_GetEnabled"
                 label="Network"
               />
               <button
                 id="TriageSaveLocal"
                 imageMso="FillDown"
                 onAction="TriageSaveLocal_Click"
+                getEnabled="EngineCommand_GetEnabled"
                 label="Local"
               />
               <button
                 id="TriageGetSaveState"
                 imageMso="Help"
                 onAction="TriageGetSaveLocation_Click"
+                getEnabled="EngineCommand_GetEnabled"
                 label="Current Location"
               />
             </menu>

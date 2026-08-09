@@ -19,6 +19,7 @@ namespace TaskMaster
     public partial class RibbonController
     {
         private EngineGatedCommandRunner _engineCommandRunner;
+        private EngineToggleStateCoordinator _engineToggleCoordinator;
 
         /// <summary>
         /// The lazily-built gated runner for engine-backed ribbon commands.
@@ -43,6 +44,66 @@ namespace TaskMaster
                 new EngineReadinessGate(() => Globals?.Engines!),
                 NotifyEngineCommandNotReady
             );
+
+        /// <summary>
+        /// The lazily-built state coordinator for the two engine-activation toggle checkboxes.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Deliberately separate from <see cref="EngineCommands"/>. The gated runner is keyed on
+        /// engine <em>readiness</em> (<c>InboxEngines</c> membership), which is the wrong predicate
+        /// for a configuration toggle: an engine that is configured off never enters
+        /// <c>InboxEngines</c>, so a readiness-gated toggle could never be used to re-enable it.
+        /// </para>
+        /// <para>
+        /// The engines accessor reads <c>Globals</c> directly rather than going through the
+        /// <c>RibbonController.Engines</c> property, matching the <see cref="EngineCommands"/>
+        /// decoupling, and is never routed through <c>SB</c> / <c>Triage</c> / <c>TriageAsync</c>,
+        /// whose getters install a real <c>WindowsFormsSynchronizationContext</c> on the calling
+        /// thread as a side effect. The blocked-click notice reuses
+        /// <see cref="NotifyEngineCommandNotReady"/>, so presentation stays in this exempt shim.
+        /// </para>
+        /// </remarks>
+        private EngineToggleStateCoordinator EngineToggles =>
+            _engineToggleCoordinator ??= new EngineToggleStateCoordinator(
+                // The null-forgiving operator records that this accessor may legitimately return
+                // null before SetGlobals has run. EngineToggleStateCoordinator treats a null
+                // result as "state unknown" by contract, so null is a supported value rather than
+                // a defect.
+                () => Globals?.Engines!,
+                controlId => _viewer?.InvalidateEngineToggle(controlId),
+                NotifyEngineCommandNotReady,
+                (message, exception) => logger.Error(message, exception)
+            );
+
+        /// <summary>
+        /// The <c>getPressed</c> decision for an engine-activation toggle checkbox.
+        /// </summary>
+        /// <param name="engineName">The engine key backing the toggle.</param>
+        /// <returns>
+        /// The last known activation state, or <see langword="false"/> when it is not yet known.
+        /// A synchronous dictionary read: Office polls this on the STA, so it must never await or
+        /// block.
+        /// </returns>
+        internal bool IsEngineToggleActive(string engineName)
+        {
+            return EngineToggles.GetPressed(engineName);
+        }
+
+        /// <summary>
+        /// Handles a click on an engine-activation toggle checkbox: flips the setting, refreshes
+        /// the cached state, and invalidates the control, observing any fault.
+        /// </summary>
+        /// <param name="engineName">The engine key backing the toggle.</param>
+        /// <returns>
+        /// A task that completes when the toggle has completed or its fault has been observed.
+        /// The returned task never faults, so the <c>async void</c> Office handler that awaits it
+        /// cannot raise an unobserved exception.
+        /// </returns>
+        internal Task HandleEngineToggleClickAsync(string engineName)
+        {
+            return EngineToggles.HandleToggleClickAsync(engineName);
+        }
 
         /// <summary>
         /// The <c>getEnabled</c> decision for an engine-backed ribbon control.
