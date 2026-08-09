@@ -216,9 +216,14 @@ namespace TaskMaster.Test.Ribbon
         }
 
         /// <summary>
-        /// No element other than the engine-backed controls may declare the callback. Putting it
-        /// on a containing menu would disable save-location, folder-settings, and enable-toggle
-        /// commands that remain safe and useful during initialization.
+        /// No element other than the engine-backed controls may declare the callback. The hazard
+        /// this guards against is disabling via a <em>containing menu</em>, which would sweep up
+        /// folder-settings and the enable-toggle checkboxes along with the commands. Per-control
+        /// gating is different: as of issue #518 the save-location and save-info buttons are
+        /// themselves engine-backed catalog members, so they are disabled exactly while they would
+        /// otherwise no-op. The two enable-toggle checkboxes remain outside the catalog by design —
+        /// they are backed by engine configuration rather than readiness, and a readiness-gated
+        /// toggle could never re-enable a disabled engine.
         /// </summary>
         [TestMethod]
         public void RibbonExplorerXml_GetEnabledIsDeclaredOnlyOnEngineBackedControls()

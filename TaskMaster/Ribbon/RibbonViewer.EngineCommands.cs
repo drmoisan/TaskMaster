@@ -80,6 +80,47 @@ namespace TaskMaster
             EngineCommandRefreshPlanner.InvalidateAll(ribbon.InvalidateControl);
         }
 
+        /// <summary>
+        /// Invalidates a single engine-activation toggle checkbox so Office re-queries its
+        /// <c>getPressed</c> callback against freshly cached state.
+        /// </summary>
+        /// <param name="controlId">The toggle control id supplied by the coordinator.</param>
+        /// <remarks>
+        /// <para>
+        /// This is the toggle counterpart of <see cref="InvalidateEngineCommands"/> and follows the
+        /// same rules: <c>IRibbonUI</c> is an Office COM object handed to <c>Ribbon_Load</c> on the
+        /// STA and must be called back on the STA, so the marshalling through
+        /// <c>UtilitiesCS.UiThread.Dispatcher</c> is explicit rather than left to the ambient
+        /// synchronization context. The engine state prime runs on a thread-pool continuation and
+        /// therefore frequently arrives off the dispatcher thread.
+        /// </para>
+        /// <para>
+        /// The toggles are invalidated individually rather than through
+        /// <c>EngineCommandRefreshPlanner</c>, because they are deliberately outside
+        /// <c>EngineCommandCatalog</c>.
+        /// </para>
+        /// <para>
+        /// Returns without throwing when the ribbon has not been loaded yet.
+        /// </para>
+        /// </remarks>
+        internal void InvalidateEngineToggle(string controlId)
+        {
+            var ribbon = _ribbon;
+            if (ribbon is null)
+            {
+                return;
+            }
+
+            var dispatcher = UiThread.Dispatcher;
+            if (dispatcher != null && !dispatcher.CheckAccess())
+            {
+                dispatcher.Invoke(() => ribbon.InvalidateControl(controlId));
+                return;
+            }
+
+            ribbon.InvalidateControl(controlId);
+        }
+
         #region Spam Manager
 
         public async void ClearSpam_Click(Office.IRibbonControl control) =>
@@ -116,20 +157,63 @@ namespace TaskMaster
 
         #region Spam Config
 
-        public void SpamBayesEnabled_Click(Office.IRibbonControl control, bool pressed) =>
-            Controller.Engines.ToggleEngineAsync(SpamBayes.GroupName);
+        /// <summary>
+        /// The Office <c>onAction</c> callback of the <c>SpamBayesEnabledToggle</c> checkbox.
+        /// </summary>
+        /// <remarks>
+        /// A single awaited expression, matching the sibling <c>*SaveNetwork_Click</c> /
+        /// <c>*SaveLocal_Click</c> shape. The awaited task never faults — the coordinator observes
+        /// and logs at its own boundary — so this <c>async void</c> handler cannot raise an
+        /// unobserved exception, which is the #506 defect.
+        /// </remarks>
+        public async void SpamBayesEnabled_Click(Office.IRibbonControl control, bool pressed) =>
+            await Controller.HandleEngineToggleClickAsync(SpamBayes.GroupName);
 
-        public async Task<bool> SpamBayesEnabled_GetPressed(Office.IRibbonControl control) =>
-            await Controller.Engines.EngineActiveAsync(SpamBayes.GroupName);
+        /// <summary>
+        /// The Office <c>getPressed</c> callback of the <c>SpamBayesEnabledToggle</c> checkbox.
+        /// </summary>
+        /// <param name="control">The control Office is querying.</param>
+        /// <returns>
+        /// The engine's last known activation state, or <see langword="false"/> when the
+        /// controller is not attached or the state is not yet known.
+        /// </returns>
+        /// <remarks>
+        /// The signature is fixed by Office: a <c>public</c> instance method returning
+        /// <see cref="bool"/> with a single <c>Office.IRibbonControl</c> parameter. An
+        /// <c>async Task&lt;bool&gt;</c> declaration is silently ignored by VSTO — the #505 defect
+        /// — so <c>RibbonViewerEngineCallbackShapeTests</c> pins this signature by reflection.
+        /// Office polls this on the STA, so the coordinator answers from cache and starts the
+        /// asynchronous refresh in the background rather than blocking.
+        /// </remarks>
+        public bool SpamBayesEnabled_GetPressed(Office.IRibbonControl control) =>
+            _controller?.IsEngineToggleActive(SpamBayes.GroupName) ?? false;
 
         public async void SpamSaveNetwork_Click(Office.IRibbonControl control) =>
-            await Controller.Engines.ShowDiskDialog(SpamBayes.GroupName, false);
+            await Controller.RunEngineCommandAsync(
+                "SpamSaveNetwork",
+                () => Controller.Engines.ShowDiskDialog(SpamBayes.GroupName, false)
+            );
 
         public async void SpamSaveLocal_Click(Office.IRibbonControl control) =>
-            await Controller.Engines.ShowDiskDialog(SpamBayes.GroupName, true);
+            await Controller.RunEngineCommandAsync(
+                "SpamSaveLocal",
+                () => Controller.Engines.ShowDiskDialog(SpamBayes.GroupName, true)
+            );
 
-        public void GetSaveLocation_Click(Office.IRibbonControl control) =>
-            Controller.Engines.ShowSaveInfo(SpamBayes.GroupName);
+        /// <summary>
+        /// The Office <c>onAction</c> callback of the <c>GetSaveState</c> button. The method name
+        /// and the control id diverge because the name is pinned by <c>onAction</c> in the ribbon
+        /// XML while the catalog is keyed on the control id.
+        /// </summary>
+        public async void GetSaveLocation_Click(Office.IRibbonControl control) =>
+            await Controller.RunEngineCommandAsync(
+                "GetSaveState",
+                () =>
+                {
+                    Controller.Engines.ShowSaveInfo(SpamBayes.GroupName);
+                    return Task.CompletedTask;
+                }
+            );
 
         public void SpamFolderSettings_Click(Office.IRibbonControl control) =>
             Controller.FolderStoresSettings();
@@ -185,20 +269,57 @@ namespace TaskMaster
 
         #region Triage Config
 
-        public void TriageEnabled_Click(Office.IRibbonControl control, bool pressed) =>
-            Controller.Engines.ToggleEngineAsync("Triage");
+        /// <summary>
+        /// The Office <c>onAction</c> callback of the <c>TriageEnabledToggle</c> checkbox.
+        /// </summary>
+        /// <remarks>
+        /// The Triage mirror of <see cref="SpamBayesEnabled_Click"/>; see that member for the
+        /// awaited-boundary rationale.
+        /// </remarks>
+        public async void TriageEnabled_Click(Office.IRibbonControl control, bool pressed) =>
+            await Controller.HandleEngineToggleClickAsync("Triage");
 
-        public async Task<bool> TriageEnabled_GetPressed(Office.IRibbonControl control) =>
-            await Controller.Engines.EngineActiveAsync("Triage");
+        /// <summary>
+        /// The Office <c>getPressed</c> callback of the <c>TriageEnabledToggle</c> checkbox.
+        /// </summary>
+        /// <param name="control">The control Office is querying.</param>
+        /// <returns>
+        /// The engine's last known activation state, or <see langword="false"/> when the
+        /// controller is not attached or the state is not yet known.
+        /// </returns>
+        /// <remarks>
+        /// The Triage mirror of <see cref="SpamBayesEnabled_GetPressed"/>; see that member for the
+        /// Office signature contract and the reason the read is synchronous.
+        /// </remarks>
+        public bool TriageEnabled_GetPressed(Office.IRibbonControl control) =>
+            _controller?.IsEngineToggleActive("Triage") ?? false;
 
         public async void TriageSaveNetwork_Click(Office.IRibbonControl control) =>
-            await Controller.Engines.ShowDiskDialog("Triage", false);
+            await Controller.RunEngineCommandAsync(
+                "TriageSaveNetwork",
+                () => Controller.Engines.ShowDiskDialog("Triage", false)
+            );
 
         public async void TriageSaveLocal_Click(Office.IRibbonControl control) =>
-            await Controller.Engines.ShowDiskDialog("Triage", true);
+            await Controller.RunEngineCommandAsync(
+                "TriageSaveLocal",
+                () => Controller.Engines.ShowDiskDialog("Triage", true)
+            );
 
-        public void TriageGetSaveLocation_Click(Office.IRibbonControl control) =>
-            Controller.Engines.ShowSaveInfo("Triage");
+        /// <summary>
+        /// The Office <c>onAction</c> callback of the <c>TriageGetSaveState</c> button. As with
+        /// <see cref="GetSaveLocation_Click"/>, the method name is pinned by the ribbon XML while
+        /// the catalog is keyed on the control id.
+        /// </summary>
+        public async void TriageGetSaveLocation_Click(Office.IRibbonControl control) =>
+            await Controller.RunEngineCommandAsync(
+                "TriageGetSaveState",
+                () =>
+                {
+                    Controller.Engines.ShowSaveInfo("Triage");
+                    return Task.CompletedTask;
+                }
+            );
 
         #endregion Triage Config
 

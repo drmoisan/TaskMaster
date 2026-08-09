@@ -1,9 +1,22 @@
 ---
 name: missing-vsto-runtime-breaks-baseline-gates
-description: On this host the VSTO Office Tools runtime assemblies are absent, so the analyzer and nullable solution builds fail with 4x CS0234 in TaskMaster/ThisAddIn.Designer.cs and UtilitiesCS.Test/TaskMaster.Test never build - collapsing repo-wide coverage
+description: HISTORICAL (2026-08-04) - absent VSTO Office Tools assemblies once broke the solution build and collapsed repo-wide coverage; NOT reproducing as of 2026-08-08, so always re-verify by building before citing this
 metadata:
   type: project
 ---
+
+> **RE-VERIFIED 2026-08-08 (issue #505 worktree) — DOES NOT REPRODUCE.** The two named
+> assemblies (`Microsoft.Office.Tools.Common.v4.0.Utilities`,
+> `Microsoft.Office.Tools.Outlook.v4.0.Utilities`) are still absent from the GAC, the VS
+> install, and `Common Files\Microsoft Shared\VSTO` — yet
+> `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug "/p:Platform=Any CPU"` after
+> `nuget restore TaskMaster.sln` completed **EXIT 0 with zero errors** and produced all
+> 18 project outputs, including `TaskMaster.dll` and all **9** `*.Test.dll`. The
+> `Microsoft.Office.Tools.*` (non-`v4.0.Utilities`) assemblies present in
+> `C:\Windows\Microsoft.NET\assembly\GAC_MSIL` are apparently sufficient for
+> `ThisAddIn.Designer.cs` to bind. **Never assert the CS0234/6-assembly failure below from
+> memory — build first.** Treat the text that follows as a record of one historical
+> environment state.
 
 `msbuild TaskMaster.sln` (both the analyzer gate and the nullable gate) fails on this machine
 with 4 `CS0234` errors in `TaskMaster/ThisAddIn.Designer.cs`, naming

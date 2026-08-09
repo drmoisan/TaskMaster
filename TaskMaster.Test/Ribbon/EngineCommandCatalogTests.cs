@@ -21,6 +21,12 @@ namespace TaskMaster.Test.Ribbon
         [DataRow("TriageSetC", "Triage")]
         [DataRow("ClearTriage", "Triage")]
         [DataRow("FilterTriageGroup", "Triage")]
+        [DataRow("SpamSaveNetwork", "Spam")]
+        [DataRow("SpamSaveLocal", "Spam")]
+        [DataRow("GetSaveState", "Spam")]
+        [DataRow("TriageSaveNetwork", "Triage")]
+        [DataRow("TriageSaveLocal", "Triage")]
+        [DataRow("TriageGetSaveState", "Triage")]
         public void TryGetEngineName_ForEachEngineBackedControlId_ReturnsExpectedEngineName(
             string controlId,
             string expectedEngineName
@@ -71,7 +77,7 @@ namespace TaskMaster.Test.Ribbon
         }
 
         [TestMethod]
-        public void ControlIds_ContainsExactlyTheEightEngineBackedControlIds()
+        public void ControlIds_ContainsExactlyTheFourteenEngineBackedControlIds()
         {
             // Arrange
             var expected = new[]
@@ -84,6 +90,12 @@ namespace TaskMaster.Test.Ribbon
                 "TriageSetC",
                 "ClearTriage",
                 "FilterTriageGroup",
+                "SpamSaveNetwork",
+                "SpamSaveLocal",
+                "GetSaveState",
+                "TriageSaveNetwork",
+                "TriageSaveLocal",
+                "TriageGetSaveState",
             };
 
             // Act
@@ -94,7 +106,7 @@ namespace TaskMaster.Test.Ribbon
                 .Should()
                 .BeEquivalentTo(
                     expected,
-                    "the verified defect surface is exactly these eight controls"
+                    "the verified defect surface is the eight #503 controls plus the six #518 save/info commands"
                 );
         }
 
