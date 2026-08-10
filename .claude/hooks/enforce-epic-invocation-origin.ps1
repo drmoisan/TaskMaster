@@ -1,12 +1,14 @@
 <#
 .SYNOPSIS
-    Pre-tool-use hook that blocks epic-planner and epic-orchestrator delegations
-    originating from an orchestrator agent.
+    Pre-tool-use hook that blocks epic-planner, epic-orchestrator,
+    parallel-planner, and parallel-orchestrator delegations originating from an
+    orchestrator agent.
 
 .DESCRIPTION
     Invoked by the Claude Code PreToolUse hook on the "Agent" matcher before any
     Agent (Task) call runs. Activates only when the delegation target
-    subagent_type is 'epic-planner' or 'epic-orchestrator'.
+    subagent_type is 'epic-planner', 'epic-orchestrator', 'parallel-planner',
+    or 'parallel-orchestrator'.
 
     Caller identity resolution:
       - The full PreToolUse payload (CLAUDE_HOOK_INPUT) carries a top-level
@@ -17,13 +19,15 @@
 
     Decision procedure:
       1. Resolve the target subagent_type from CLAUDE_TOOL_INPUT, falling back
-         to the payload's tool_input object. A non-epic target allows.
+         to the payload's tool_input object. A non-gated target allows.
       2. Resolve the calling agent_type from the payload. An absent or empty
          agent_type indicates a main-thread invocation, which allows.
-      3. Deny with reason EPIC_INVOCATION_ORIGIN_BLOCKED when the calling
-         agent_type is exactly 'orchestrator'. Both epic agents delegate to
-         Agent(orchestrator); an orchestrator-originated invocation would nest
-         orchestrator inside its own delegation chain.
+      3. Deny when the calling agent_type is exactly 'orchestrator', with the
+         reason variant selected by target: EPIC_INVOCATION_ORIGIN_BLOCKED for
+         an epic target, PARALLEL_INVOCATION_ORIGIN_BLOCKED for a parallel
+         target. All four gated agents delegate to Agent(orchestrator); an
+         orchestrator-originated invocation would nest orchestrator inside its
+         own delegation chain.
 
 .NOTES
     Compatible with PowerShell 7+. No external module dependencies. Read-only
@@ -33,7 +37,8 @@
 [CmdletBinding()]
 param()
 
-$script:GatedSubagentTypes = @('epic-planner', 'epic-orchestrator')
+$script:GatedSubagentTypes = @('epic-planner', 'epic-orchestrator', 'parallel-planner', 'parallel-orchestrator')
+$script:ParallelSubagentTypes = @('parallel-planner', 'parallel-orchestrator')
 $script:ProhibitedCallerAgentType = 'orchestrator'
 
 function Get-EpicInvocationOriginAllowDecision {
@@ -194,7 +199,7 @@ function Invoke-EpicInvocationOriginDecision {
         [string] $ToolInputRaw
     )
 
-    # The tool input identifies the delegation target; a non-epic target is
+    # The tool input identifies the delegation target; a non-gated target is
     # outside this hook's scope, so the hook input is not parsed for it.
     $toolInput = ConvertFrom-EpicInvocationOriginPayload -RawPayload $ToolInputRaw -PayloadName 'CLAUDE_TOOL_INPUT'
     $hookInputParsed = $false
@@ -218,11 +223,18 @@ function Invoke-EpicInvocationOriginDecision {
     }
 
     # An absent agent_type marks a main-thread invocation, which is the
-    # intended entry point for both epic agents; only an orchestrator-context
+    # intended entry point for every gated agent; only an orchestrator-context
     # invocation is prohibited.
     $caller = Get-EpicInvocationOriginCallerAgentType -HookInput $hookInput
     if ($caller -ne $script:ProhibitedCallerAgentType) {
         return Get-EpicInvocationOriginAllowDecision
+    }
+
+    # The parallel family carries its own reason variant because the epic reason
+    # names the two epic agents literally; the deny prose is selected by target.
+    if ($script:ParallelSubagentTypes -contains $target) {
+        $parallelReason = "PARALLEL_INVOCATION_ORIGIN_BLOCKED: Agent($target) must not be invoked from an orchestrator agent. Both parallel-planner and parallel-orchestrator delegate to Agent(orchestrator), so an orchestrator-originated invocation would nest orchestrator inside its own delegation chain. Invoke $target from the main session instead."
+        return Get-EpicInvocationOriginBlockDecision -Reason $parallelReason
     }
 
     $reason = "EPIC_INVOCATION_ORIGIN_BLOCKED: Agent($target) must not be invoked from an orchestrator agent. Both epic-planner and epic-orchestrator delegate to Agent(orchestrator), so an orchestrator-originated invocation would nest orchestrator inside its own delegation chain. Invoke $target from the main session instead."
