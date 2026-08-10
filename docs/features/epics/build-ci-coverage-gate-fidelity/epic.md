@@ -31,7 +31,7 @@ features:
     feature_folder: coverage-threshold-policy-reconciliation-494
     depends_on: [457]
   - issue_num: 394
-    feature_folder: utilitiescs-test-cs2002-duplicate-compile-entry-394
+    feature_folder: 2026-08-10-utilitiescs-test-cs2002-duplicate-compile-entry-394
     depends_on: []
 ---
 
