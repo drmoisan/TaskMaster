@@ -8,6 +8,7 @@
 - [Enumerate condition outcomes before the case list](enumerate-condition-outcomes-before-case-list.md) — 100% branch-rate tasks: 2 outcomes per condition in every ||/&& clause; a null-pairing guard needs all four orderings, not three
 - [Named coverage exception: verify the member body](named-coverage-exception-verify-member-body.md) — read the member before writing "untestable branch"; put gap-closure BEFORE the toolchain-clean-pass task; pin line-rate vs branch-rate
 
+- [#457 closure-filter plan seams](project_457_closure_filter_plan_seams.md) — pipeline overwrites raw Cobertura in place; post-processed artifacts cannot answer `d__`/`b__` name questions; pre-merge insertion is a correctness constraint
 - [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/
 - [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — obj/ cache filenames outlive tear-down commits; verify project/source files with git ls-files or a glob before writing an existence claim into acceptance text
 - [Diff gates need a commit task](diff-gates-need-a-commit-task.md) — `git diff <MERGE_BASE>..HEAD` gates pass vacuously with no commit task; Phase 0 porcelain is non-empty by construction; whitelist docs/ + agent-memory in scope-lock diff gates
