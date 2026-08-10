@@ -114,6 +114,14 @@
           {
             "type": "command",
             "command": "pwsh -NoProfile -File .claude/hooks/enforce-epic-worktree-removal-gate.ps1"
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/enforce-parallel-worktree-removal-gate.ps1"
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/enforce-parallel-abandon-gate.ps1"
           }
         ]
       },
@@ -184,6 +192,14 @@
           {
             "type": "command",
             "command": "pwsh -NoProfile -File .claude/hooks/enforce-epic-invocation-origin.ps1"
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/enforce-parallel-cohort-barrier.ps1"
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/enforce-parallel-drift-gate.ps1"
           }
         ]
       }
@@ -244,6 +260,15 @@
           {
             "type": "command",
             "command": "pwsh -NoProfile -File .claude/hooks/validate-orchestrator-output.ps1 -CheckpointPath artifacts/orchestration/epic-orchestrator-state.json -ArtifactType epic-orchestrator-state"
+          }
+        ]
+      },
+      {
+        "matcher": "parallel-orchestrator",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/validate-orchestrator-output.ps1 -CheckpointPath artifacts/orchestration/parallel-orchestrator-state.json -ArtifactType parallel-orchestrator-state"
           }
         ]
       }
