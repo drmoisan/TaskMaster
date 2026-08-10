@@ -281,6 +281,7 @@
     <Compile Include="OutlookObjects\Folder\BreadcrumbBridgeMessagesTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbBridgeRouterEdgeTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbBridgeRouterTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderBreadcrumbBridgeRouterReplaceItemsTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbBridgeRouterInFlightTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbRouterSelectionConcurrencyTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbSelectionMapTests.cs" />
@@ -289,6 +290,7 @@
     <Compile Include="OutlookObjects\Folder\BreadcrumbStateModelTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbStateModelSequenceTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbSelectionSessionTests.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbSelectionSessionHighlightTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbSubfolderSelectorSessionTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbSelectorMessagesTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbStateModelSelectorTests.cs" />

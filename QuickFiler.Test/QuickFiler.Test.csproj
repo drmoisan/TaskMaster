@@ -72,6 +72,7 @@
     <Compile Include="Viewers\BreadcrumbMessengerHubTests.cs" />
     <Compile Include="Viewers\BreadcrumbPopupPlacementTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownHostTests.cs" />
+    <Compile Include="Viewers\BreadcrumbDropDownHostTests.Part2.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownReadinessTests.cs" />
     <Compile Include="Viewers\BreadcrumbCollapsedSurfaceReadinessTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownLifecycleConcurrencyTests.cs" />
@@ -80,7 +81,10 @@
     <Compile Include="Viewers\ItemViewerBreadcrumbDropDownContractTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinatorTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinatorTests.Part2.cs" />
+    <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinatorTests.Part3.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownIntegrationTests.cs" />
+    <Compile Include="Viewers\BreadcrumbDropDownSearchIntegrationTests.cs" />
+    <Compile Include="Viewers\BreadcrumbDropDownSearchIntegrationTests.Part2.cs" />
     <Compile Include="Viewers\BreadcrumbPopupBoundaryCoverageTests.cs" />
     <Compile Include="Viewers\BreadcrumbPopupBoundaryCoverageTests.Part2.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownLifecycleCoverageTests.cs" />
@@ -139,8 +143,11 @@
     <Compile Include="Controllers\QfcItemController.PropertiesTests.cs" />
     <Compile Include="Controllers\QfcItemController.TestSupport.cs" />
     <Compile Include="Controllers\QfcItemController.InitializationTests.cs" />
+    <Compile Include="Controllers\QfcItemController.InitializationTests.Part2.cs" />
+    <Compile Include="Controllers\QfcItemController.InitializationTests.Part3.cs" />
     <Compile Include="Controllers\QfcItemController.ViewerSetupTests.cs" />
     <Compile Include="Controllers\QfcItemController.EventHandlersTests.cs" />
+    <Compile Include="Controllers\QfcItemController.SearchFocusRegressionTests.cs" />
     <Compile Include="Controllers\QfcItemController.FocusAndThemeTests.cs" />
     <Compile Include="Controllers\QfcItemController.SeamDispatcherTests.cs" />
     <Compile Include="Controllers\QfcItemController.SeamCoreTests.cs" />
@@ -149,6 +156,8 @@
     <Compile Include="Controllers\WpfUiDispatcherTests.cs" />
     <Compile Include="Controllers\WebView2CoreInitializerTests.cs" />
     <Compile Include="Controllers\QfcQueueTests.cs" />
+    <Compile Include="TestSupport\WinFormsPumpHost.cs" />
+    <Compile Include="TestSupport\WinFormsPumpHostTests.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

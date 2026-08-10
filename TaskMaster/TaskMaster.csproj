@@ -456,10 +456,18 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Ribbon\EngineCommandCatalog.cs" />
+    <Compile Include="Ribbon\EngineCommandRefreshPlanner.cs" />
+    <Compile Include="Ribbon\EngineGatedCommandRunner.cs" />
+    <Compile Include="Ribbon\EngineReadinessGate.cs" />
+    <Compile Include="Ribbon\EngineToggleCatalog.cs" />
+    <Compile Include="Ribbon\EngineToggleStateCoordinator.cs" />
     <Compile Include="Ribbon\RibbonController.cs" />
+    <Compile Include="Ribbon\RibbonController.EngineCommands.cs" />
     <Compile Include="Ribbon\RibbonController.FolderTree.cs" />
     <Compile Include="Ribbon\RibbonController.Intelligence.cs" />
     <Compile Include="Ribbon\RibbonViewer.cs" />
+    <Compile Include="Ribbon\RibbonViewer.EngineCommands.cs" />
     <Compile Include="Ribbon\TryFunctionalityInConstruction.cs" />
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>

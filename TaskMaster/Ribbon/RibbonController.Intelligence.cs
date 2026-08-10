@@ -201,7 +201,7 @@ namespace TaskMaster
             }
         }
 
-        internal IAppItemEngines Engines => Globals.Engines;
+        internal IAppItemEngines Engines => Globals?.Engines;
 
         internal async Task ClearSpamManagerAsync()
         {

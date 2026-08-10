@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Xml.Linq;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -157,5 +158,166 @@ namespace TaskMaster.Test.Ribbon
                     "the built-in Mail tab must not host any custom TaskMaster group after the move"
                 );
         }
+
+        #region Issue #503 — engine-readiness getEnabled wiring
+
+        /// <summary>
+        /// The <c>getEnabled</c> callback name declared in the ribbon XML for every engine-backed
+        /// control. Office matches this string against a public instance method on
+        /// <see cref="RibbonViewer"/> by name.
+        /// </summary>
+        private const string EngineCommandGetEnabledCallback = "EngineCommand_GetEnabled";
+
+        /// <summary>
+        /// Every engine-backed control id in <c>EngineCommandCatalog</c> must exist in the ribbon
+        /// XML and must declare the <c>getEnabled</c> callback. Without the attribute the control
+        /// stays clickable for the whole initialization window, which is the #503 defect.
+        /// </summary>
+        [TestMethod]
+        public void RibbonExplorerXml_EveryEngineBackedControlDeclaresGetEnabledCallback()
+        {
+            // Arrange
+            var document = LoadRibbonDocument();
+
+            // Act: index every element that carries an id.
+            var elementsById = document
+                .Descendants()
+                .Where(element => element.Attribute("id") != null)
+                .ToDictionary(element => element.Attribute("id")!.Value, element => element);
+
+            // Assert
+            foreach (var controlId in EngineCommandCatalog.ControlIds)
+            {
+                elementsById
+                    .Should()
+                    .ContainKey(
+                        controlId,
+                        "the catalog control id '{0}' must exist in the ribbon XML",
+                        controlId
+                    );
+                // Bind the attribute first. A null-conditional dereference here would
+                // short-circuit the whole assertion chain, including .Should(), so the
+                // test would pass silently on the exact regression it exists to catch.
+                var getEnabled = elementsById[controlId].Attribute("getEnabled");
+                getEnabled
+                    .Should()
+                    .NotBeNull(
+                        "control '{0}' is engine-backed and must declare a getEnabled callback",
+                        controlId
+                    );
+                getEnabled!
+                    .Value.Should()
+                    .Be(
+                        EngineCommandGetEnabledCallback,
+                        "control '{0}' is engine-backed and must be disabled until its engine loads",
+                        controlId
+                    );
+            }
+        }
+
+        /// <summary>
+        /// No element other than the engine-backed controls may declare the callback. The hazard
+        /// this guards against is disabling via a <em>containing menu</em>, which would sweep up
+        /// folder-settings and the enable-toggle checkboxes along with the commands. Per-control
+        /// gating is different: as of issue #518 the save-location and save-info buttons are
+        /// themselves engine-backed catalog members, so they are disabled exactly while they would
+        /// otherwise no-op. The two enable-toggle checkboxes remain outside the catalog by design —
+        /// they are backed by engine configuration rather than readiness, and a readiness-gated
+        /// toggle could never re-enable a disabled engine.
+        /// </summary>
+        [TestMethod]
+        public void RibbonExplorerXml_GetEnabledIsDeclaredOnlyOnEngineBackedControls()
+        {
+            // Arrange
+            var document = LoadRibbonDocument();
+
+            // Act
+            var declaringIds = document
+                .Descendants()
+                .Where(element =>
+                    element.Attribute("getEnabled")?.Value == EngineCommandGetEnabledCallback
+                )
+                .Select(element => element.Attribute("id")?.Value ?? "(no id)")
+                .ToList();
+
+            // Assert: set equality guards against over-disabling the UI.
+            declaringIds
+                .Should()
+                .BeEquivalentTo(
+                    EngineCommandCatalog.ControlIds,
+                    "only the engine-backed controls may be disabled by the readiness callback"
+                );
+        }
+
+        /// <summary>
+        /// The CustomUI schema exposes <c>getEnabled</c> on controls such as <c>button</c>, but
+        /// not on <c>group</c> or <c>tab</c>. A catalog id resolving to a container would make the
+        /// whole document illegal, which Outlook rejects all-or-nothing.
+        /// </summary>
+        [TestMethod]
+        public void RibbonExplorerXml_EngineBackedControlsAreSchemaLegalForGetEnabled()
+        {
+            // Arrange
+            var document = LoadRibbonDocument();
+            var elementsById = document
+                .Descendants()
+                .Where(element => element.Attribute("id") != null)
+                .ToDictionary(element => element.Attribute("id")!.Value, element => element);
+
+            // Act, Assert
+            foreach (var controlId in EngineCommandCatalog.ControlIds)
+            {
+                elementsById[controlId]
+                    .Name.LocalName.Should()
+                    .Be(
+                        "button",
+                        "control '{0}' must be a button; group and tab do not permit getEnabled",
+                        controlId
+                    );
+            }
+        }
+
+        /// <summary>
+        /// VSTO silently ignores a callback whose signature does not match: the code compiles and
+        /// nothing happens when Office queries the control. This pins the exact required shape
+        /// <c>public bool GetEnabled(Office.IRibbonControl control)</c>.
+        /// </summary>
+        /// <remarks>
+        /// The parameter type is compared by <see cref="Type.FullName"/> rather than with
+        /// <c>typeof</c>: <c>TaskMaster.Test.csproj</c> carries no reference to the
+        /// <c>Office</c> (Microsoft.Office.Core) primary interop assembly, and a legacy non-SDK
+        /// <c>ProjectReference</c> does not flow that reference to the compiler. <c>office.dll</c>
+        /// is present in the test output directory and in the GAC, so the runtime reflection
+        /// resolves the type at test time.
+        /// </remarks>
+        [TestMethod]
+        public void RibbonExplorerXml_GetEnabledCallbackMatchesOfficeSignatureOnRibbonViewer()
+        {
+            // Act
+            var callback = typeof(RibbonViewer).GetMethod(
+                EngineCommandGetEnabledCallback,
+                BindingFlags.Public | BindingFlags.Instance
+            );
+
+            // Assert
+            callback
+                .Should()
+                .NotBeNull(
+                    "'{0}' must be a public instance method on RibbonViewer",
+                    EngineCommandGetEnabledCallback
+                );
+            callback!.ReturnType.Should().Be<bool>("Office requires a bool getEnabled callback");
+
+            var parameters = callback.GetParameters();
+            parameters.Should().ContainSingle("the Office callback takes exactly one parameter");
+            parameters[0]
+                .ParameterType.FullName.Should()
+                .Be(
+                    "Microsoft.Office.Core.IRibbonControl",
+                    "the single parameter must be the Office IRibbonControl"
+                );
+        }
+
+        #endregion Issue #503 — engine-readiness getEnabled wiring
     }
 }

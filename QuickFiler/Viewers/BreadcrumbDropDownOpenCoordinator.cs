@@ -27,6 +27,7 @@ namespace QuickFiler.Viewers
         private int _generation;
         private bool _closePending;
         private bool _released;
+        private bool _nextOpenTakesNoFocus;
 
         internal BreadcrumbDropDownOpenCoordinator(
             BreadcrumbPopupUiOperations operations,
@@ -94,6 +95,38 @@ namespace QuickFiler.Viewers
                 _closePending = false;
                 _currentOpenTask = OpenCoreAsync(_generation);
                 return _currentOpenTask;
+            }
+        }
+
+        /// <summary>
+        /// Issue #438: latches "the next native open takes no focus" for a search-originated open.
+        /// </summary>
+        /// <remarks>
+        /// The latch exists because the actual open request does not arrive on the call that starts
+        /// it: <c>SetDroppedDown</c> opens the selector session, and the resulting
+        /// <c>SelectorOpenStateChanged</c> event is what reaches <see cref="RequestOpen"/>. Both the
+        /// <c>SetDroppedDown</c>-posted work and the <c>HandleSelectorOpenStateChanged</c>-posted
+        /// work run FIFO on the same <see cref="BreadcrumbPopupUiOperations"/> queue, so a latch set
+        /// before the session is opened is deterministically observed by the open it belongs to, and
+        /// by no later one. <see cref="BeginOpenCore"/> consumes the latch exactly once.
+        /// </remarks>
+        internal void LatchNextOpenTakesNoFocus()
+        {
+            lock (_sync)
+            {
+                if (_released)
+                    return;
+                _nextOpenTakesNoFocus = true;
+            }
+        }
+
+        /// <summary>Test-visible latch state; true while a non-focusing open is pending.</summary>
+        internal bool NextOpenTakesNoFocus
+        {
+            get
+            {
+                lock (_sync)
+                    return _nextOpenTakesNoFocus;
             }
         }
 
@@ -181,18 +214,31 @@ namespace QuickFiler.Viewers
         {
             Func<Rectangle> anchorBounds;
             Func<Rectangle> workingArea;
+            bool takeFocus;
             lock (_sync)
             {
                 if (!IsCurrentCore(generation))
                     return ClosedTask;
                 anchorBounds = _anchorBounds;
                 workingArea = _workingArea;
+                // Consume the latch exactly once, so a search-driven open does not leak its
+                // non-focusing intent onto a later gesture open.
+                takeFocus = !_nextOpenTakesNoFocus;
+                _nextOpenTakesNoFocus = false;
             }
 
             Rectangle anchor = anchorBounds();
             int rows = _rowCount();
             var size = new Size(anchor.Width, Math.Min(320, Math.Max(120, rows * 26)));
-            return _host.OpenAsync(anchor, workingArea(), size)
+            // A default (gesture) open deliberately keeps calling the original 3-parameter overload
+            // rather than the 4-parameter one with takeFocus: true. The two are semantically
+            // identical, but existing loose Mock<IBreadcrumbDropDownHost> setups across the suite are
+            // configured only for the 3-parameter shape; a 4-parameter call would return a null Task
+            // and trip the guard below. Only the non-focusing search open needs the new overload.
+            Task<bool>? opening = takeFocus
+                ? _host.OpenAsync(anchor, workingArea(), size)
+                : _host.OpenAsync(anchor, workingArea(), size, takeFocus: false);
+            return opening
                 ?? throw new InvalidOperationException(
                     "The breadcrumb popup host returned no open task."
                 );

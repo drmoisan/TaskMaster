@@ -13,3 +13,5 @@
 
 - [Ratified exemption boundaries](reference_ratified_exemption_boundaries.md) — check docs/features/archive/ for a maintainer-decision artifact before planning any [ExcludeFromCodeCoverage] removal; never promise N -> 0
 - [ExcludeFromCodeCoverage lambda propagation](reference_exclude_from_code_coverage_lambda_propagation.md) — method-level leaks nested lambdas into the denominator, class-level does not; a partial-class attribute exempts the whole type
+- [full-bug means spec.md only](feedback_full_bug_spec_only.md) — never create user-story.md in full-bug mode; the agent's Expected Outputs header conflicts with the AC-tracking skill
+- [#522 nullable type-check deviation](project_522_nullable_typecheck_deviation.md) — CLAUDE.md's /p:Nullable=enable gate is defective; bind spec verification to CI's msbuild command and cite #522

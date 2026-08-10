@@ -308,7 +308,15 @@
     <Compile Include="AppGlobals\AppToDoObjectsTests.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapperEnumerationScopeTests.cs" />
     <Compile Include="OutlookObjects\Store\StoresWrapperTests.cs" />
+    <Compile Include="Ribbon\EngineCommandCatalogTests.cs" />
+    <Compile Include="Ribbon\EngineCommandRefreshPlannerTests.cs" />
+    <Compile Include="Ribbon\EngineGatedCommandRunnerTests.cs" />
+    <Compile Include="Ribbon\EngineReadinessGateTests.cs" />
+    <Compile Include="Ribbon\EngineToggleCatalogTests.cs" />
+    <Compile Include="Ribbon\EngineToggleStateCoordinatorTests.cs" />
     <Compile Include="Ribbon\RibbonControllerTests.cs" />
+    <Compile Include="Ribbon\RibbonControllerTests.Engines.cs" />
+    <Compile Include="Ribbon\RibbonViewerEngineCallbackShapeTests.cs" />
     <Compile Include="Ribbon\TryFunctionalityInConstructionTests.cs" />
     <Compile Include="Ribbon\RibbonExplorerXmlTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

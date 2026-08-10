@@ -19,7 +19,7 @@ namespace QuickFiler.Viewers
     >;
 
     /// <summary>Owns the native popup and its lazily created breadcrumb surface.</summary>
-    public sealed class BreadcrumbDropDownHost : IBreadcrumbDropDownHost
+    public sealed partial class BreadcrumbDropDownHost : IBreadcrumbDropDownHost
     {
         private readonly ReadySurfaceFactory _factory;
         private readonly BreadcrumbPopupUiOperations _uiOperations;
@@ -223,23 +223,6 @@ namespace QuickFiler.Viewers
             InstalledControlHost != null && _popupControl != null && _popupMessenger != null;
 
         internal bool OpenState { get; set; }
-
-        /// <inheritdoc />
-        public Task<bool> OpenAsync(
-            Rectangle anchorScreenBounds,
-            Rectangle workingArea,
-            Size desiredSize
-        )
-        {
-            ThrowIfDisposed();
-            if (OpenState)
-            {
-                _openLifetime.Schedule(_focusPending);
-                return Task.FromResult(true);
-            }
-            LastInitializationException = null;
-            return _openLifetime.OpenAsync(anchorScreenBounds, workingArea, desiredSize);
-        }
 
         /// <inheritdoc />
         public bool Close(BreadcrumbDropDownCloseReason reason)

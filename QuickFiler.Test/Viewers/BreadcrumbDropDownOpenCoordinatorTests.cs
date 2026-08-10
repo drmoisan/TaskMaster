@@ -385,6 +385,12 @@ namespace QuickFiler.Test.Viewers
 
             internal List<Tuple<Rectangle, Rectangle, Size>> Requests { get; } =
                 new List<Tuple<Rectangle, Rectangle, Size>>();
+
+            /// <summary>
+            /// Issue #438: the focus intent recorded for each open request, in request order.
+            /// The 3-parameter overload records <c>true</c> (its documented default).
+            /// </summary>
+            internal List<bool> RequestedTakeFocus { get; } = new List<bool>();
             internal List<int> RequestThreads { get; } = new List<int>();
             internal List<BreadcrumbDropDownCloseReason> CloseReasons { get; } =
                 new List<BreadcrumbDropDownCloseReason>();
@@ -404,9 +410,19 @@ namespace QuickFiler.Test.Viewers
                 Rectangle anchorScreenBounds,
                 Rectangle workingArea,
                 Size desiredSize
+            ) => OpenAsync(anchorScreenBounds, workingArea, desiredSize, takeFocus: true);
+
+            // Issue #438: additive 4-parameter overload delegating to the existing body, plus the
+            // recorded focus intent. No existing behavior changes.
+            public Task<bool> OpenAsync(
+                Rectangle anchorScreenBounds,
+                Rectangle workingArea,
+                Size desiredSize,
+                bool takeFocus
             )
             {
                 Requests.Add(Tuple.Create(anchorScreenBounds, workingArea, desiredSize));
+                RequestedTakeFocus.Add(takeFocus);
                 RequestThreads.Add(Environment.CurrentManagedThreadId);
                 Task<bool> result = _openResults.Dequeue()();
                 return CompleteOpenAsync(result);

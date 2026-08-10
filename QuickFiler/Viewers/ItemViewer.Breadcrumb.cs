@@ -234,6 +234,27 @@ namespace QuickFiler
             _breadcrumbLifecycleCoordinator.SetDroppedDown(droppedDown, FocusBreadcrumbCore);
         }
 
+        /// <summary>
+        /// Issue #438: presents a folder-search result set without transferring focus to the
+        /// breadcrumb surface.
+        /// </summary>
+        /// <remarks>
+        /// The non-focusing counterpart of <see cref="SetBreadcrumbDropDownState"/>. The bare-viewer
+        /// branch (no lifecycle coordinator) deliberately performs no <c>FocusBreadcrumb()</c> call:
+        /// that call is the fallback branch's focus steal, and a keystroke must leave the caret in
+        /// the search textbox. <see cref="SetBreadcrumbDropDownState"/> itself is unchanged, so every
+        /// explicit gesture keeps its current focus-on-open semantics.
+        /// </remarks>
+        internal void PresentBreadcrumbSearchResults(string[] items)
+        {
+            if (_breadcrumbLifecycleCoordinator == null)
+            {
+                return;
+            }
+
+            _breadcrumbLifecycleCoordinator.PresentSearchResults(items);
+        }
+
         internal void ResetBreadcrumb() => _breadcrumbLifecycleCoordinator?.Reset();
 
         private void OnBreadcrumbSelectionChanged() =>

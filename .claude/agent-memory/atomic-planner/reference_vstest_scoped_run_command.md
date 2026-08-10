@@ -8,11 +8,14 @@ metadata:
 Executor-verified (#424 preflight, 2026-08-06) canonical scoped test-run form for plan tasks — `vstest.console.exe` is NOT on PATH in this environment:
 
 ```
-$vstest = vswhere -latest -products * -find Common7\IDE\Extensions\TestPlatform\vstest.console.exe
+$vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+$vstest = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
 & $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~<Name>"
 ```
 
 - **`vstest.console.exe` never compiles.** It runs a prebuilt DLL. Any plan phase that authors a NEW test file and then runs a scoped filter in the same phase MUST prepend `msbuild TaskMaster.sln /t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`, or the new tests are absent from the assembly and `/TestCaseFilter` matches zero tests — which vstest reports without an obvious failure. Cheapest fix in a revision loop is to put the build line inside the shared scoped-run Command Reference block (one edit, no task renumbering) rather than editing each phase's run task. Also state that a zero-match run is a failure, not a pass. Cost a blocking finding across 15 tasks in #454 preflight.
+- **`vswhere` is NOT on PATH either** (#230 preflight B1, 2026-08-07): bare `vswhere` fails; resolve it by the explicit `${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe` path, as every repo script does. Resolves to `C:\Program Files\Microsoft Visual Studio\18\Community\...\vstest.console.exe` in this environment.
+
 - `/InIsolation` is mandatory for the Moq-based test assemblies (`scripts/vscode/Invoke-MSTest.ps1:54` already passes it).
 - vstest 18.x rejects `OR` inside `/TestCaseFilter` — join clauses with `|`.
 - From a bash shell, prefix `MSYS_NO_PATHCONV=1`.

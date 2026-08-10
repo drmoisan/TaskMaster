@@ -27,14 +27,17 @@ namespace QuickFiler.Controllers
     {
         private ItemViewer _breadcrumbViewer;
 
-        // Residual (bucket-iii, reclassified in Phase 6): the WebView2 SDK calls are now isolated behind
-        // the injected IWebViewCoreInitializer seam (P6-T4), but this method still performs the
-        // concrete-bound control access ((ItemViewer)_itemViewer).L0v2h2_WebView2 and awaits
-        // _itemViewer.UiSyncContext on the live UI thread. IItemViewer intentionally exposes no
-        // WebView-core-init intent member (cycle-1 narrowing retained the raw control here, per
-        // IItemViewer.cs), so the concrete cast cannot execute against a Mock<IItemViewer>; the method
-        // is not unit-reachable under Option A. The SDK dependency itself lives only in the exempt
-        // WebView2CoreInitializer adapter.
+        // Residual, retained. #230 resolved the pump barrier: the `await _itemViewer.UiSyncContext`
+        // on line 55 is now drainable by the WinFormsPumpHost test seam, and tests do reach the
+        // IWebViewCoreInitializer seam call. The RESIDUAL barrier is the
+        // ((ItemViewer)_itemViewer).L0v2h2_WebView2.CoreWebView2 dependency below, which is null
+        // unless the real WebView2 runtime initialized the control - an external process barred by
+        // the repository unit-test policy. With the mocked IWebViewCoreInitializer execution must
+        // stop at the seam call (controlled fault), so the member cannot be meaningfully covered
+        // end-to-end and keeps this attribute. The separate concrete-accessor barrier (IItemViewer
+        // intentionally exposes no WebView-core-init intent member, so the concrete cast cannot
+        // execute against a Mock<IItemViewer>) is tracked separately per issue #230. The SDK
+        // dependency itself lives only in the exempt WebView2CoreInitializer adapter.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         internal async Task InitializeWebViewAsync()
         {
@@ -248,9 +251,10 @@ namespace QuickFiler.Controllers
             Buttons = controls.Where(x => x is Button).Select(x => (Button)x).ToList();
         }
 
-        // Residual (bucket-iii): async control-tree traversal counterpart of ResolveControlGroups;
-        // takes a concrete ItemViewer and walks its Designer controls. Not unit-reachable.
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        // #230: de-exempted. The former barrier was the missing WinForms message pump - the member
+        // awaits itemViewer.UiSyncContext, which never resumes on a thread-pool MSTest thread. The
+        // WinFormsPumpHost test seam supplies that loop, so the member is now covered by
+        // QfcItemController_ViewerSetupTests.ResolveControlGroupsAsync_ThroughThePumpHost_*.
         internal async Task ResolveControlGroupsAsync(ItemViewer itemViewer)
         {
             Token.ThrowIfCancellationRequested();

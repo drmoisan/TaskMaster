@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
@@ -10,9 +9,43 @@ namespace UtilitiesCS.OutlookObjects.Folder
     /// <summary>
     /// Yields folder tree work through the captured UI dispatcher.
     /// </summary>
-    [ExcludeFromCodeCoverage]
     public sealed class WpfDispatcherYield : IDispatcherYield
     {
+        private readonly Func<Dispatcher?> _currentThreadDispatcherProvider;
+        private readonly Func<Dispatcher?> _fallbackDispatcherProvider;
+
+        /// <summary>
+        /// Initializes a yielder that resolves dispatchers exactly as it always has: the
+        /// dispatcher affinitized to the calling thread, then the process-global UI dispatcher.
+        /// </summary>
+        public WpfDispatcherYield()
+            : this(null, null) { }
+
+        /// <summary>
+        /// Initializes a yielder whose dispatcher lookups are supplied by the caller. Tests use
+        /// this to arrange the dispatcher-free case explicitly instead of inheriting it from
+        /// ambient thread and process state.
+        /// </summary>
+        /// <param name="currentThreadDispatcherProvider">
+        /// Supplies the dispatcher affinitized to the calling thread. Null selects the production
+        /// lookup.
+        /// </param>
+        /// <param name="fallbackDispatcherProvider">
+        /// Supplies the process-global dispatcher used when the calling thread has none. Null
+        /// selects the production lookup.
+        /// </param>
+        internal WpfDispatcherYield(
+            Func<Dispatcher?>? currentThreadDispatcherProvider,
+            Func<Dispatcher?>? fallbackDispatcherProvider
+        )
+        {
+            _currentThreadDispatcherProvider =
+                currentThreadDispatcherProvider
+                ?? (() => Dispatcher.FromThread(Thread.CurrentThread));
+            _fallbackDispatcherProvider =
+                fallbackDispatcherProvider ?? (() => UtilitiesCS.UiThread.Dispatcher);
+        }
+
         public async Task YieldAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -24,8 +57,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
             // UiThread.Dispatcher is set-once state populated by UiThread.Init() and is null
             // outside a live host, so that null state is surfaced as InvalidOperationException to
             // preserve the strict contract callers relied on.
-            Dispatcher dispatcher =
-                Dispatcher.FromThread(Thread.CurrentThread) ?? UtilitiesCS.UiThread.Dispatcher;
+            Dispatcher? dispatcher =
+                _currentThreadDispatcherProvider() ?? _fallbackDispatcherProvider();
             if (dispatcher is null)
             {
                 throw new InvalidOperationException(

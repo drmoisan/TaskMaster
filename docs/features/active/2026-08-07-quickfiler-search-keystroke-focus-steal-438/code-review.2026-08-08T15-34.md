@@ -1,0 +1,51 @@
+# Code Review — QuickFiler Search Keystroke Focus Steal (Issue #438) — Cycle 2 (Post-Remediation Re-Audit)
+
+- **Date:** 2026-08-08T15-34 (clock-read)
+- **Branch:** `bug/quickfiler-search-keystroke-focus-steal-438` @ `2134fa7b` vs `main` @ `003c5715`
+- **Scope:** full branch diff (97 files; 30 `.cs`, 4 `.csproj`, remainder docs/evidence/agent-memory). C# is the only changed language; no Python files changed, so no typed-Python review section applies.
+- **Delta reviewed in depth this cycle:** commits `1852eeb8`, `59fadcfe`, `b47f19e0`, `2134fa7b` (everything since cycle-1 head `ff9d14ab`). All cycle-1 findings and design assessments were re-anchored at the new head; the production code is bit-identical to what cycle 1 reviewed.
+
+## Executive Summary
+
+The remediation is exactly what it claims to be: two additive `[TestMethod]`s in `BreadcrumbItemViewerLifecycleCoordinatorTests.cs` covering the two null-conditional arms of `PresentSearchResults`, with no production change, no csproj change, no existing-test change, and no coverage-exclusion shortcut. The tests are well-constructed: they reuse the file's existing `LifecycleFixture`, assert observable outcomes (bridge receives items through the null-open-coordinator arm; deterministic no-op with no selection change through the null-bridge arm) rather than merely "does not throw", drain the posted-operation queue deterministically, and document intent with issue-referenced comments. The R1 target file now measures 100% line / 100% branch, reproducibly across four independent clean runs.
+
+The cycle-1 blocking finding is resolved. This cycle's two adjudicated items — the literal repo-wide line-floor miss on plan task `[P2-T7]` and the estimated evidence timestamps — are both dispositioned non-blocking on independent evidence (see `policy-audit.2026-08-08T15-34.md` §1.3 and §7 CQ-2). No new blocking or major code finding was found in the delta. The remaining table entries carry forward known residuals and process observations with updated status.
+
+## Findings Table
+
+| Severity | File | Location | Finding | Recommendation | Rationale | Evidence |
+|---|---|---|---|---|---|---|
+| Resolved (was Blocking) | QuickFiler/Viewers/BreadcrumbItemViewerLifecycleCoordinator.Search.cs | Lines 40, 42 (`PresentSearchResults`) | Cycle-1 R1: null-conditional arms untested (50% branch, 2/4). Now covered by `PresentSearchResults_NoOpenCoordinator_BridgeReceivesItemsWithoutThrow` and `PresentSearchResults_NoBridgeCoordinator_IsDeterministicNoOp`; file measures 100% line (5/5) / 100% branch (4/4), stable across four clean runs. | None — resolved. | Uniform new-file floors (85%/75%) now cleared with margin; the documented fallback behavior is pinned by observable-outcome assertions. | Reviewer per-line parse of `artifacts/csharp/coverage.xml`: lines 40, 42 each `100% (2/2)`; test diff hunk read in full |
+| Major (pre-existing residual, dispositioned non-blocking) | QuickFiler/Controllers/QfcItemController.EventHandlers.cs | Whole file | Still 78.65% line / 61.11% branch — bit-identical to cycle 1 (remediation correctly did not touch it). Pre-existing sub-floor at baseline; zero changed-line regression; identical uncovered-line set. | Maintainer disposition remains outstanding: follow-up issue to cover the remaining WinForms handlers, or a recorded CLAUDE.md § UT2 exemption analysis. Do not widen #438. | The substantive policy requirement (no regression on changed lines) is met; residue is pre-existing debt in untouched handlers. | Comparative Cobertura parse cycle-1 vs final: identical figures |
+| Major (recurring tooling, corrected in place; still untracked) | artifacts/pr_context.summary.txt | "Changed files overview" | The cycle-2 refreshed summary again reports "Core logic changes: 0 files" despite 30 changed C# files, which unmitigated silently disables the termination hook's C# coverage enforcement. Corrected in place this session (full `.cs`/`.csproj` enumeration appended). Cycle-1 follow-up F2 promised a tooling issue; `gh` search confirms none exists. | Promote the classifier defect to its own issue via the promotion lifecycle — it has now falsified the overview on two consecutive reviews of this branch and on 15+ prior features. | The hook enumerates languages from the summary bullets, not `git diff`; the defect recurs on every refresh, so per-review manual correction is not a durable control. | Summary lines ~252-254 pre-correction; correction section appended 2026-08-08T15-34; `gh issue list --search` → no match |
+| Minor (process, adjudicated) | docs/features/active/.../evidence/* (remediation cycle) | Filename labels and `Timestamp:` fields | Executor evidence labels (`20:45`–`22:35`) and most orchestrator checkpoint timestamps were estimated, not clock-read; actual work occurred ~`15:23`–`15:34` local. Disclosed in two committed correction artifacts; files deliberately not renamed to preserve cross-references. | Accept as disclosed. Going forward: read the clock before stamping (already recorded as corrective practice); treat this cycle's labels as opaque ordering identifiers only. | Technical content and relative ordering verified reproducible (all load-bearing figures re-derived by this reviewer from committed XMLs); only absolute-time inference is lost. | `remediation-final-status.2026-08-08T15-25.md` §2; `timestamp-and-coverage-floor-correction.2026-08-08T19-25Z.md` |
+| Minor (process, adjudicated) | remediation-plan.2026-08-08T13-25.md | `[P2-T7]`, `[P2-T9]` | Left unchecked: the literal fixed-constant line floor (0.858665) was missed by 0.000045 after five clean runs; commit was withheld by the executor pending user-level authority. | Accept both unchecked boxes as the correct honest record; no retry warranted. Author future remediation-plan coverage gates against a same-session baseline, not a cross-session constant. | Independent per-file diff proves the miss lives entirely in three untouched legacy files (net −3 covered lines); the control run on the unmodified tree already missed the constant. Root cause tracked in #511. | Policy audit §1.3 (this cycle); `coverage-delta-remediation.2026-08-08T22-30-final.md` |
+| Info | Worktree history | Commit `b47f19e0` | A concurrent writer committed the three follow-up promotions and inadvertently swept five of the remediation executor's mid-flight Phase-0 evidence files plus its plan check-offs into that commit. Add-only; no content loss; executor correctly declined to rewrite history. | None within #438. Operationally: avoid a second committing process against a worktree with an executor mid-flight. | Disclosed in `remediation-final-status.2026-08-08T15-25.md` §1; verified add-only via `git show --stat b47f19e0`. | Evidence cited |
+| Info | QuickFiler.Test/Viewers/BreadcrumbItemViewerLifecycleCoordinatorTests.cs | Whole file | Now 382 lines (345 + 37); comfortable headroom under the 500-line ceiling. `BreadcrumbDropDownHostTests.cs` remains at 499 (unchanged); its growth path is the existing Part2 partial. | Extend via partials when files approach the ceiling (pattern already established). | Prevents tripping the hard limit on the next edit. | `awk NR` counts this session |
+
+## Detailed Review Notes
+
+### The two new tests (full-depth review)
+
+- **Null-open-coordinator arm:** `SetBridgeCoordinator` is called but `ConfigureHost` never is, so `_openCoordinator` remains null — precisely the configuration the file's XML remark documents ("the bare fallback performs no Focus call at all") and which cycle 1 flagged as unverified. The assertion set proves the items still flow to the bridge (`bridge.GetFolderItems().Should().Equal("Alpha", "Beta")`) after a deterministic queue drain, which is a behavioral assertion, not a coverage-chasing no-op.
+- **Null-bridge-coordinator arm:** neither wiring call is made; the test asserts no-throw, `BridgeCoordinator` still null, and `SelectionChangedCount == 0` — pinning the deterministic-no-op contract and guarding against a future change that would raise selection events from an unwired coordinator.
+- Strict-mock safety was pre-analyzed (plan D3): `PresentSearchResults` never touches `IFolderHierarchyProvider`, so the fixture's `MockBehavior.Strict` provider mock cannot throw. Borne out by 12/12 scoped pass.
+- Both tests are independent (fresh fixture per test, `using`-disposed), deterministic (no timing waits; queue drained explicitly), and AAA-structured with intent comments.
+
+### Verification that the remediation could not have masked anything
+
+- The diff since `ff9d14ab` contains exactly one non-docs file (the test file), with zero removed lines — no existing test could have been weakened, and no production behavior could have changed. All cycle-1 behavioral verdicts (strictly additive contracts, gesture-path preservation, EfcViewer zero diff, sanctioned AC-11 edits) therefore carry forward by construction, and were spot-re-anchored against the head diff.
+- The canonical coverage artifact is byte-identical (SHA-256 verified) to the committed remediation-final Cobertura, ruling out a stale-artifact substitution.
+- Non-vacuity audit of the remediation's own gates: scoped filter selected 12 (recorded non-zero); the XPath target gate enforces node count == 1 with zero-count an automatic FAIL; the P2-T8 tracked-only `git diff` blind spot was compensated by P2-T9's `git status --porcelain` untracked enumeration and closed conclusively by this review's full-branch enumeration at the now-clean head.
+
+### Cycle-1 findings status roll-up
+
+| Cycle-1 finding | Status now |
+|---|---|
+| Blocking R1 (new-file branch floor) | Resolved, verified 4/4 |
+| Major R2 (EventHandlers.cs floor residual) | Unchanged, dispositioned non-blocking; maintainer disposition outstanding |
+| Major (PR-context misclassification) | Recurred on refresh; corrected in place again; tracking issue still not filed |
+| Minor (duplicate PercentageFormatterTests compile entry) | Discharged: promoted as #510, closed as duplicate of pre-existing OPEN #394 |
+| Minor (WinFormsPumpHost flakiness) | Discharged: promoted as #511 (OPEN); also now tracks coverage nondeterminism root cause |
+| Info (499-line test file headroom) | Unchanged (file untouched this cycle) |
+| Info (#400 AC-13 gesture-scoped qualification) | Unchanged; assessment stands |
