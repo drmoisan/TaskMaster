@@ -11,9 +11,15 @@ This rule file summarizes the C#-specific policies for this repository.
 
 ## Toolchain
 
-1. **Formatting — CSharpier**: All C# source files must be formatted with CSharpier. Do not use `dotnet format`. Command: `dotnet tool run csharpier .` or `csharpier .`
-2. **Linting — .NET Analyzers**: C# code must pass Roslyn/.NET analyzer diagnostics. Command: `msbuild <solution>.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
-3. **Type Checking — Nullable Analysis**: Enable nullable reference types and fail on warnings. Command: `msbuild <solution>.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+1. **Formatting — CSharpier**: All C# source files must be formatted with CSharpier. Do not use `dotnet format`. Apply: `dotnet tool run csharpier format .` Verify (CI parity, read-only): `dotnet tool run csharpier check .` Always invoke through `dotnet tool run` so the `dotnet-tools.json` pinned version is used; do not invoke a globally installed `csharpier`.
+2. **Linting — .NET Analyzers**: C# code must pass Roslyn/.NET analyzer diagnostics. Command: `msbuild <solution>.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+   - Use `/t:Rebuild` so the step always performs a genuine recompile; a warm `/t:Build` skips `CoreCompile` and runs no analyzers. CI uses `/t:Build /m` because a runner checkout is cold.
+3. **Type Checking — Nullable Analysis**: Nullable analysis is per-file opt-in via `#nullable enable`; the gate promotes the resulting diagnostics to errors. Command: `msbuild <solution>.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
+   - Use `/t:Rebuild` so the step always performs a genuine recompile; a warm `/t:Build` skips `CoreCompile` and runs no analyzers. CI uses `/t:Build /m` because a runner checkout is cold.
+   - This is `ci.yml`'s command verbatim. Do not add `/p:Nullable=enable` (no project carries a
+     `<Nullable>` element; the flag opts in every un-annotated file at once and makes the gate
+     unpassable) and do not use `/t:Build` (a warm build skips `CoreCompile` and the gate cannot
+     fail).
 4. **Testing — MSTest + Moq + FluentAssertions**: Run tests with: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`
 
 Run the toolchain in order: format → lint → type-check → test. Restart from step 1 if any step fails or changes files.
@@ -80,7 +86,7 @@ This repository adopts a fixed set of FIVE static-analysis packages, wired into 
 
 ### Severity-first ordering invariant
 
-All new analyzer rule severities are configured in `.editorconfig` at `severity = suggestion` (never `warning`/`error`) BEFORE any `<Analyzer Include>` item is wired into a project. This is required because the type-check toolchain step runs `msbuild ... /p:Nullable=enable /p:TreatWarningsAsErrors=true`, which promotes any `warning`-severity analyzer diagnostic to a build error. Keeping new analyzer diagnostics at `suggestion` (message level) prevents the analyzer adoption from breaking the protected nullable gate.
+All new analyzer rule severities are configured in `.editorconfig` at `severity = suggestion` (never `warning`/`error`) BEFORE any `<Analyzer Include>` item is wired into a project. This is required because the type-check toolchain step runs `msbuild ... /t:Rebuild /m ... /p:TreatWarningsAsErrors=true`, which promotes any `warning`-severity analyzer diagnostic to a build error. Keeping new analyzer diagnostics at `suggestion` (message level) prevents the analyzer adoption from breaking the protected nullable gate.
 
 ### Deferred analyzer — SecurityCodeScan.VS2019
 

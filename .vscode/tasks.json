@@ -127,6 +127,8 @@
         "Debug",
         "-Platform",
         "Any CPU",
+        "-Target",
+        "Rebuild",
         "-EnableNETAnalyzers",
         "-EnforceCodeStyleInBuild"
       ],
@@ -154,7 +156,8 @@
         "Debug",
         "-Platform",
         "Any CPU",
-        "-EnableNullable",
+        "-Target",
+        "Rebuild",
         "-TreatWarningsAsErrors"
       ],
       "dependsOn": [
