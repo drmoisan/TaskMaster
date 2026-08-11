@@ -7,6 +7,11 @@
 - [Research claims as acceptance clauses](research-claims-as-acceptance-clauses.md) — never encode an unmeasured third-party null-vs-throw claim as a literal AC clause; #418 §1.4 empty-bytes claim cost a revision pass
 - [Enumerate condition outcomes before the case list](enumerate-condition-outcomes-before-case-list.md) — 100% branch-rate tasks: 2 outcomes per condition in every ||/&& clause; a null-pairing guard needs all four orderings, not three
 - [Named coverage exception: verify the member body](named-coverage-exception-verify-member-body.md) — read the member before writing "untestable branch"; put gap-closure BEFORE the toolchain-clean-pass task; pin line-rate vs branch-rate
+- [Acceptance edits must be false-before/true-after](acceptance-edits-must-be-false-before-true-after.md) — a revised acceptance clause already true at branch head is a no-op gate (#494 P3-T7); anchor a region by the heading that OPENS it, not the next one
+- [Zero-hit grep gates need carve-outs](zero-hit-grep-gates-need-carveouts.md) — denial-sentence replacement text and non-coverage numerals (mutation 75%, determinism, format 100%) make "grep returns no hits" unsatisfiable by construction
+- [PoshQC MCP + msbuild invocation facts](poshqc-mcp-and-msbuild-invocation-facts.md) — run_poshqc_test takes only workspace_root/scan_folders; can exit -1 while "available"; hidden-parent test dirs may never be collected; msbuild needs vswhere
+- [Never plan a mid-plan halt on MCP availability](never-plan-a-mid-plan-halt-on-mcp-availability.md) — executor and orchestrator tool surfaces differ; Phase 0 probe + record-blocker-and-continue, never "halt", never a different route
+- [Single-numeral gates must name the role](single-numeral-gates-must-name-the-role.md) — count "enforced repo-wide line floor compared against in executable code", enumerate doc/policy-constant occurrences; inventory patterns need prose alternations
 
 - [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/
 - [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — obj/ cache filenames outlive tear-down commits; verify project/source files with git ls-files or a glob before writing an existence claim into acceptance text
