@@ -25,7 +25,7 @@ features:
     feature_folder: excludefromcodecoverage-nested-lambdas-457
     depends_on: [441]
   - issue_num: 512
-    feature_folder: csharp-toolchain-gate-fidelity-512
+    feature_folder: 2026-08-10-csharp-toolchain-gate-fidelity-512
     depends_on: []
   - issue_num: 494
     feature_folder: 2026-08-10-coverage-threshold-policy-reconciliation-494
