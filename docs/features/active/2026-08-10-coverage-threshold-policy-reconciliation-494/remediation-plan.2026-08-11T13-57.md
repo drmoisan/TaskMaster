@@ -27,24 +27,24 @@ This is a recorded halt condition, not a manual operator task. No plan task requ
 
 ### Phase 0 — Policy, Scope, and Input Baseline
 
-- [ ] [P0-T1] Read `AGENTS.md`, `.agents/skills/policy-compliance-order/SKILL.md`, `.agents/skills/atomic-plan-contract/SKILL.md`, `.agents/skills/evidence-and-timestamp-conventions/SKILL.md`, and `.agents/skills/acceptance-criteria-tracking/SKILL.md` in that order; write `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/remediation-baseline/phase0-instructions-read.<runtime ISO timestamp>.md`.
+- [x] [P0-T1] Read `AGENTS.md`, `.agents/skills/policy-compliance-order/SKILL.md`, `.agents/skills/atomic-plan-contract/SKILL.md`, `.agents/skills/evidence-and-timestamp-conventions/SKILL.md`, and `.agents/skills/acceptance-criteria-tracking/SKILL.md` in that order; write `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/remediation-baseline/phase0-instructions-read.<runtime ISO timestamp>.md`.
   - Acceptance: the artifact lists every file in order and records the TaskMaster no-`CLAUDE.md`/no-executable-`.claude/**` boundary, the no-upstream-write boundary, and `spec.md` as the full-bug AC source.
 
-- [ ] [P0-T2] Capture `git rev-parse HEAD` and `git status --porcelain` in `C:\Users\DanMoisan\repos\TaskMaster`; write `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/remediation-baseline/taskmaster-git-state.<runtime ISO timestamp>.md`.
+- [x] [P0-T2] Capture `git rev-parse HEAD` and `git status --porcelain` in `C:\Users\DanMoisan\repos\TaskMaster`; write `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/remediation-baseline/taskmaster-git-state.<runtime ISO timestamp>.md`.
   - Acceptance: the artifact records the SHA and complete porcelain output without claiming a clean worktree or modifying any baseline path.
 
-- [ ] [P0-T3] Inspect `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/other/upstream-claude-policy-reconciliation-prompt.2026-08-11T12-41.md`; write `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/remediation-baseline/upstream-prompt-contract-check.<runtime ISO timestamp>.md`.
+- [x] [P0-T3] Inspect `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/other/upstream-claude-policy-reconciliation-prompt.2026-08-11T12-41.md`; write `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/remediation-baseline/upstream-prompt-contract-check.<runtime ISO timestamp>.md`.
   - Acceptance: the artifact confirms that the prompt names issue #494, identifies the upstream-only source boundary, requires reconciled policy and fail-closed gate behavior, deterministic tests, publication information, every affected future TaskMaster path, and #512 non-interference; it records no claimed upstream execution.
 
 ### Phase 1 — Automated Receipt Gate
 
-- [ ] [P1-T1] Search `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/other/` for an upstream release/validation receipt and validate it against `evidence/other/upstream-reconciliation-receipt-check.2026-08-11T13-46.md`; write `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/other/upstream-reconciliation-receipt-check.<runtime ISO timestamp>.md`.
+- [x] [P1-T1] Search `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/other/` for an upstream release/validation receipt and validate it against `evidence/other/upstream-reconciliation-receipt-check.2026-08-11T13-46.md`; write `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/other/upstream-reconciliation-receipt-check.<runtime ISO timestamp>.md`.
   - Acceptance: the artifact records the exact search scope, filename patterns, every candidate path, and a field-by-field result for upstream changed source paths, generation/publication mechanism, exact validation commands/results/exit codes, final policy values, missing/malformed-input behavior, branch disposition, deterministic test evidence, future TaskMaster output paths, and #512 non-interference.
 
-- [ ] [P1-T2] Write `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/other/upstream-reconciliation-disposition.<runtime ISO timestamp>.md` from the P1-T1 result.
+- [x] [P1-T2] Write `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/other/upstream-reconciliation-disposition.<runtime ISO timestamp>.md` from the P1-T1 result.
   - Acceptance: a complete valid receipt produces `RECEIPT-VALIDATED`; any absent, incomplete, or malformed receipt produces exactly `BLOCKED: UPSTREAM CUSTOMIZATION RELEASE EVIDENCE ABSENT`, identifies the missing fields, and cites the `human_interaction` halt requirement in this plan.
 
-- [ ] [P1-T3] If P1-T2 is blocked, halt plan execution after recording its evidence and leave every task in Phase 2 unchecked.
+- [x] [P1-T3] If P1-T2 is blocked, halt plan execution after recording its evidence and leave every task in Phase 2 unchecked.
   - Acceptance: execution reports the recorded blocked reason and resume condition without adding a manual task, editing any upstream checkout, or checking off any `spec.md` acceptance criterion.
 
 ### Phase 2 — Receipt-Dependent TaskMaster Reconciliation
