@@ -33,6 +33,7 @@
 - [PowerShell new files need UTF-8 BOM](powershell-bom-required.md) — PSScriptAnalyzer enforces PSUseBOMForUnicodeEncodedFile; prepend BOM after Write or restart the format loop
 - [poshqc MCP tools report no verdict](project_poshqc_pester_mcp_exit_minus1.md) — run_poshqc_test returns ok:true with no counts/exit code, so any "EXIT_CODE 0"/"N failures"/expect-fail gate on it is vacuous; pair with direct Invoke-Pester
 - [BOM breaks grep ^ anchor](project_bom_grep_anchor_false_negative.md) — bash grep `^#nullable` misses BOM-prefixed files; use the Grep tool for opt-in classification, never bash grep
+- [StrictMode Latest + missing XML attribute throws](project_pester_strictmode_xml_attribute_property_access.md) — a fixture omitting `branch` (or `complexity` on a merge-path `<class>`) throws PropertyNotFoundStrict instead of the assertion diff; enumerate ALL bare `$node.attr` reads on the traversed path, not one attribute at a time
 
 - [Compile-time red needs body-level refs](project_compile_red_needs_body_level_references.md) — a missing type in a method SIGNATURE suppresses body binding, so an `[expect-fail]` task requiring N named CS0246s reports only 1; construct the types inline in test bodies
 
