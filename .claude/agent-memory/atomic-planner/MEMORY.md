@@ -7,6 +7,9 @@
 - [Research claims as acceptance clauses](research-claims-as-acceptance-clauses.md) — never encode an unmeasured third-party null-vs-throw claim as a literal AC clause; #418 §1.4 empty-bytes claim cost a revision pass
 - [Enumerate condition outcomes before the case list](enumerate-condition-outcomes-before-case-list.md) — 100% branch-rate tasks: 2 outcomes per condition in every ||/&& clause; a null-pairing guard needs all four orderings, not three
 - [Named coverage exception: verify the member body](named-coverage-exception-verify-member-body.md) — read the member before writing "untestable branch"; put gap-closure BEFORE the toolchain-clean-pass task; pin line-rate vs branch-rate
+- [Thread granted discharges through consumers](thread-granted-discharges-through-consumers.md) — softening one task's measurement clause without the intermediate producer task makes the discharge unreachable and the middle task uncheckable
+- [pwsh -Command payload quoting](pwsh-command-payload-quoting.md) — `-Command "...$c..."` expands in the parent shell; single-quote the payload, double the inner literals, and say so at the command site
+- [Pester exits 0 on failing It blocks](pester-invoke-does-not-exit-nonzero.md) — 5.6.1 defaults Run.Exit/Run.Throw to False; scope every exit-code clause to a named channel in two-channel [expect-fail] tasks
 
 - [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/
 - [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — obj/ cache filenames outlive tear-down commits; verify project/source files with git ls-files or a glob before writing an existence claim into acceptance text

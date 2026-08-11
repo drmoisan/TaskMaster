@@ -22,3 +22,7 @@ Planning seams discovered while writing `docs/features/active/2026-08-10-csharp-
 5. **The CSharpier manifest is `dotnet-tools.json` at the repo root**, not `.config/dotnet-tools.json`.
 
 6. **`/t:Rebuild` failures delete every project's `bin`/`obj`.** Any failing rebuild (the AC12 debt probe, the AC4 negative control) needs an ordered restorative rebuild task after it, or later steps have no assemblies.
+
+7. **`mcp__drm-copilot__run_poshqc_test` output detail is unmeasured in this repo.** The only recorded call at the merge base emitted `EXIT_CODE: 0` and a one-sentence summary — no numeric pass/fail counts, no per-`It` enumeration. Every task consuming that channel must take counts and per-test names from a direct Pester run and carry an `MCP_DETAIL_UNAVAILABLE:` fallback. Same standard as `run_poshqc_format` (also unmeasured). The two channels also disagree on **exit semantics**, not just detail — see [[pester-invoke-does-not-exit-nonzero]]. See [[research-claims-as-acceptance-clauses]].
+
+8. **The PoshQC formatter may legitimately rewrite the files this feature edits**, so a "line numbers unchanged after the fix" gate on `run_poshqc_analyze` contradicts the final-QC format task. Allow the formatter delta as a second accounted-for term alongside the insertion delta.
