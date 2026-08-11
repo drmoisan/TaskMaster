@@ -8,7 +8,7 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 - Integration branch: `epic/build-ci-coverage-gate-fidelity-integration`
 - Manifest: `docs/features/epics/build-ci-coverage-gate-fidelity/epic.md`
 - Current wave: 2
-- Last updated: 2026-08-11T05-55
+- Last updated: 2026-08-11T13-20
 
 ## Features
 
@@ -48,26 +48,44 @@ CI-equivalent verification recorded as feature evidence. The integrated tree is 
 a `workflow_dispatch` CI run against the integration branch at each wave boundary, and the final
 integration-to-`main` PR receives full CI because it is `main`-based.
 
-## Open Blocker for the Final Integration PR
+## Integrated-Tree CI Gate
 
-The integrated tree carries a pre-existing intermittent test failure inherited from `main`, not
-introduced by this epic. `workflow_dispatch` run 31456943481 against the integration branch failed
-on exactly one MSTest case out of 6435:
+Child PRs based on the integration branch are ineligible for `ci.yml` (its `pull_request` trigger
+lists only `[main, development]`), so the integrated tree is gated separately by `workflow_dispatch`
+runs against the integration branch.
+
+| run | head | features covered | conclusion |
+| --- | --- | --- | --- |
+| [31456943481](https://github.com/drmoisan/TaskMaster/actions/runs/31456943481) | `1c221399` | 394, 441/478 | failure — one intermittent case, see below |
+| [31493339489](https://github.com/drmoisan/TaskMaster/actions/runs/31493339489) | `c7d398c2` | 394, 441/478, 512/492/509/522, 457 | **success** (actionlint + full build/analyze/test) |
+
+Run 31493339489 is the first green full-CI signal for any of this epic's work.
+
+## Dispositioned: Main-Inherited Intermittent Test
+
 `TimeoutAfter_GenericTask_ShouldPropagateFaultedSourceException_WhenSourceFaultsLater`
-(`UtilitiesCS.Test/Threading/TimeOutTask_AdditionalTests.cs:12`).
+(`UtilitiesCS.Test/Threading/TimeOutTask_AdditionalTests.cs:12`) was raised as a blocker for the
+final gate. It is now dispositioned as **confirmed intermittent, pre-existing, and not a blocker to
+this epic**, on four samples against unchanged test code:
 
-The push-event run on `main` at `a682c7a2` — this integration branch's base commit — failed on the
-identical single test with the identical 6435 total (run 31409582674). The immediately preceding
-`main` run at `cee6a1ca` passed, so the failure is intermittent rather than deterministic.
+| ref | run | result |
+| --- | --- | --- |
+| `main` @ `cee6a1ca` | 31379345104 | pass |
+| `main` @ `a682c7a2` (this branch's base) | 31409582674 | fail — this single case, 6435 total |
+| integration @ `1c221399` | 31456943481 | fail — this single case, 6435 total |
+| integration @ `c7d398c2` | 31493339489 | pass — full suite |
 
-Mechanism: the test races a real 100 ms wall-clock timeout (`source.Task.TimeoutAfter(100)`)
-against fault propagation from a `TaskCompletionSource`. Under CI load the timer can win, and the
-proxy throws the timeout instead of the expected `InvalidOperationException`. This violates the
-determinism requirements in `.claude/rules/general-unit-test.md`, which ban real wall-clock waits
-in tests and require a `FakeTimeProvider` or virtual scheduler.
+The failure originates on `main` and is timing-dependent; no feature in this epic introduces or
+worsens it. The underlying defect is nonetheless real and remains open: the test races a 100 ms real
+wall-clock timeout (`source.Task.TimeoutAfter(100)`) against fault propagation from a
+`TaskCompletionSource`, so under load the timer wins and the proxy throws the timeout instead of the
+expected `InvalidOperationException`. That violates the determinism requirements in
+`.claude/rules/general-unit-test.md`, which ban real wall-clock waits in tests and require a
+`FakeTimeProvider` or virtual scheduler. Three sibling tests in the same file share the pattern.
 
-This must be resolved before the integration-to-`main` PR can merge on a truthful green gate. It is
-out of scope for every child feature in this epic.
+It is out of scope for every child of this epic and is recorded here rather than silently absorbed.
+If the final integration PR trips it, the correct response is a re-run plus this record — never a
+threshold or gate adjustment.
 
 ## Issues Closed
 
