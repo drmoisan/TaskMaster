@@ -133,6 +133,41 @@ Verified pre-change result on this branch: Pester **5.6.1**; **8 passed, 0 faile
 
 For the `QfcHomeController` class the branch *ratio* is unchanged by the double count (8/12 and 12/18 both equal 0.666667) while the *counts* are inflated 50%. F1's line-rate is likewise `0.666667` both before and after the fix. **F1 and F2 must assert on `lines-valid`/`lines-covered` and `branches-valid`/`branches-covered`. An assertion on `line-rate` or `branch-rate` alone passes against the defective code and is therefore not a regression test.**
 
+## Fixture XML Attribute Rule (mandatory — measured 2026-08-10)
+
+Every `<line>` element in every fixture authored by this plan — Phase 1 fixtures F1-F6 and
+the inline `<class>` elements built by P3-T3..P3-T6 — MUST carry an explicit `branch`
+attribute on whichever of the `<methods>/<method>/<lines>` axis and the class-level
+`<lines>` axis the fixture actually contains. Use `branch="False"` unless the fixture
+specification calls for `branch="True"`.
+
+This is not stylistic. `tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1:1`
+sets `Set-StrictMode -Version Latest`, which propagates into the production functions
+dot-sourced in `BeforeAll`. Under that mode, property access on a missing XML attribute
+throws instead of returning `$null`, and `Helpers.ps1:128` reads `$line.branch` by bare
+property access. Measured against unmodified `Helpers.ps1`: an F1-shaped fixture without
+`branch` fails with `The property 'branch' cannot be found on this object`, whereas the
+same fixture with `branch="False"` fails with the intended `Expected: '3' But was: '6'` /
+`Expected: '2' But was: '4'`. All eight pre-existing fixtures already carry
+`branch="False"` on every line, which is why the hazard is invisible from the current file.
+
+Every `<class>` element in a fixture that exercises the class-merge path — F3 and F6,
+the two fixtures with two classes sharing one `filename` — MUST additionally carry an
+explicit `complexity` attribute (any integer, e.g. `complexity="1"`).
+`Merge-CoberturaClassesByFilename` sums group complexity at `Helpers.ps1:277-281` via
+the bare property read `$_.complexity`. Measured 2026-08-10 against unmodified
+`Helpers.ps1`: an F3-shaped fixture whose `<class>` elements omit `complexity` fails
+with `The property 'complexity' cannot be found on this object` instead of the intended
+`Expected: '0.6' But was: '0.75'`. It fails the same way *after* the fix, because P2-T3
+replaces only pre-change lines 270-273 and leaves the complexity accumulator in place,
+so this also breaks P3-T1's 14/14 green gate. F1, F2, F4 and F5 have a single class
+each, never enter that loop, and do not need the attribute. Every pre-existing merge
+fixture in the test file already carries `complexity`, which is why the hazard is
+invisible from the current file.
+
+Adding the attribute changes no line count and therefore does not affect the per-block
+budgets in § Test-File Line Budget.
+
 ## Test-File Line Budget (mandatory)
 
 `tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1` is 222 lines today (verified 2026-08-10T18-24); the 500-line ceiling in `.claude/rules/general-code-change.md` applies to test code. AC-18 pins the change to exactly two source files, so **the overflow must not be resolved by adding a third test file.** Write the six fixture here-strings compactly: collapse `<methods>`, `<method>` and the method's `<lines>` wrapper onto single lines and keep one `<line>` element per line only inside the class-level `<lines>` rollup. Per-block budgets: F1 <= 24, F2 <= 28, F3 <= 34, F4 <= 26, F5 <= 24, F6 <= 34, helper unit-test `Describe` <= 80. Enforced by P3-T9 (pre-format) and P4-T5 (post-format).
@@ -220,7 +255,7 @@ foreach ($p in @(
 Bugfix Workflow (`CLAUDE.md` § Bugfix Workflow) applies: the regression tests come first and must be demonstrated failing against unmodified `Helpers.ps1`. All six fixtures are **new** `It` blocks appended inside the existing `Describe 'ConvertTo-KoverageCoberturaXml'` block in `tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1`. No existing block may be modified. Every fixture uses an inline single-quoted here-string (`@'` ... `'@`), creates no file on disk, uses no mock, and passes `-ProjectNames` explicitly for determinism.
 
 - [ ] [P1-T1] [expect-fail] Add fixture **F1** (issue #441, lines) to `tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1`: one package, one class; `<methods>` with one `<method>` carrying lines 10 (`hits=1`), 11 (`hits=0`), 12 (`hits=1`); class-level `<lines>` carrying the identical three. Acceptance: the block asserts root `lines-valid` = `'3'`, `lines-covered` = `'2'` and `line-rate` = `'0.666667'`, and the block is <= 24 lines. It must assert the counts, not the rate alone.
-- [ ] [P1-T2] [expect-fail] Add fixture **F2** (issue #441, branches): as F1 plus line 12 carrying `branch="True" condition-coverage="50% (1/2)"` with a `<conditions>` child on **both** axes. Acceptance: the block asserts root `branches-valid` = `'2'` and `branches-covered` = `'1'`; it contains **no** assertion on `branch-rate` alone; the block is <= 28 lines.
+- [ ] [P1-T2] [expect-fail] Add fixture **F2** (issue #441, branches): as F1 (lines 10 and 11 retain `branch="False"`) plus line 12 carrying `branch="True" condition-coverage="50% (1/2)"` with a `<conditions>` child on **both** axes. Acceptance: the block asserts root `branches-valid` = `'2'` and `branches-covered` = `'1'`; it contains **no** assertion on `branch-rate` alone; the block is <= 28 lines.
 - [ ] [P1-T3] [expect-fail] Add fixture **F3** (issue #478, merge): two classes with the same `filename`; primary `Ns.Foo` with `<methods>` lines 56,57,58 (`hits=1`) and class-level `<lines>` 56,57,58; sibling `Ns.Foo.<>c` with `<methods>` lines 12,13 (`hits=0`) and class-level `<lines>` 12,13. Acceptance: the block asserts the merged class `line-rate` = `'0.6'` and that the merged class-level `<lines>` has exactly five `line` children numbered 12, 13, 56, 57, 58 in ascending order; the block is <= 34 lines.
 - [ ] [P1-T4] [expect-fail] Add fixture **F4** (`max(hits)` dedup): one class where line 5 appears in `.ctor ()` with `hits=1` and in `.ctor (int)` with `hits=0`, and class-level `<lines>` has line 5 with `hits=1`. Acceptance: the block asserts root `lines-valid` = `'1'` and `lines-covered` = `'1'`; the block is <= 26 lines.
 - [ ] [P1-T5] Add fixture **F5** (rollup-absent guard): one class with `<methods>` carrying lines 20 (`hits=1`) and 21 (`hits=0`) and **no class-level `<lines>` element at all**. Acceptance: the block asserts root `lines-valid` = `'2'` and `lines-covered` = `'1'`; the block is <= 24 lines. F5 passes both before and after the fix and is therefore **not** tagged `[expect-fail]`.
@@ -245,7 +280,11 @@ Construction rule (each map entry carries `Node`, `Hits`, `Branch`, `Covered`, `
   # 1. Enumerate ./lines/line (class-level rollup) THEN ./methods/method/lines/line.
   # 2. Key by [int]$node.number. On a repeat key:
   #      Hits    = max(existing, candidate)
-  #      Branch  = $true if either entry has branch="True"
+  #      Branch  = $true if either entry has branch="True", read as
+  #                $node.GetAttribute('branch') -eq 'True' (NOT $node.branch).
+  #                Bare property access throws under Set-StrictMode -Version Latest when the
+  #                attribute is absent; the existing union builder at :236 already uses
+  #                GetAttribute for exactly this reason. Read hits the same way.
   #      Covered/Total taken from the entry with the larger Total, tie-broken by larger Covered,
   #      via the existing pure helper Get-CoberturaLineConditionCoverageParts.
   # 3. TotalLines      = $lineMap.Count
@@ -428,7 +467,7 @@ AC source is `<FEATURE>/spec.md` § Acceptance Criteria (work mode `full-bug`). 
 - [ ] [P7-T11] Check off **AC-11** (six fixtures present and passing) in `<FEATURE>/spec.md`, citing `<FEATURE>/evidence/regression-testing/pass-after-f1-f6.<TS>.md`. Acceptance: AC-11 is `[x]`, all six fixtures pass, and none creates a file on disk or mocks an arithmetic path.
 - [ ] [P7-T12] Check off **AC-12** (fail-before evidence) in `<FEATURE>/spec.md`, citing `<FEATURE>/evidence/regression-testing/fail-before-f1-f4.<TS>.md`. Acceptance: AC-12 is `[x]` and the artifact records F1 6/4, F2 4/2, F3 `'0.75'`, F4 3/2 against unmodified `Helpers.ps1`.
 - [ ] [P7-T13] Check off **AC-13** (helper precedence branches covered) in `<FEATURE>/spec.md`, citing `<FEATURE>/evidence/regression-testing/helper-unit-tests.<TS>.md`. Acceptance: AC-13 is `[x]` and all three precedence-branch tests pass.
-- [ ] [P7-T14] Check off **AC-14** (zero existing tests broken) in `<FEATURE>/spec.md`, citing `<FEATURE>/evidence/baseline/pester-baseline.<TS>.md` and `<FEATURE>/evidence/qa-gates/pester-final.<TS>.md`. Acceptance: AC-14 is `[x]`, all eight pre-existing blocks pass in both runs, and the test-file diff shows 0 deletions.
+- [ ] [P7-T14] Check off **AC-14** (zero existing tests broken) in `<FEATURE>/spec.md`, citing `<FEATURE>/evidence/baseline/pester-baseline.<TS>.md`, `<FEATURE>/evidence/qa-gates/pester-final.<TS>.md` and `<FEATURE>/evidence/regression-testing/pass-after-f1-f6.<TS>.md` (which carries the 0-deletions numstat record written by P3-T2). Acceptance: AC-14 is `[x]`, all eight pre-existing blocks pass in both runs, and the test-file diff shows 0 deletions.
 - [ ] [P7-T15] Check off **AC-15** (toolchain green) in `<FEATURE>/spec.md`, citing the three P4 artifacts `poshqc-format.<TS>.md`, `poshqc-analyze.<TS>.md` and `pester-final.<TS>.md`. Acceptance: AC-15 is `[x]` and the artifacts record a single clean pass.
 - [ ] [P7-T16] Check off **AC-17** (no threshold re-tuned) in `<FEATURE>/spec.md`, citing `<FEATURE>/evidence/qa-gates/threshold-no-change.<TS>.md` and `<FEATURE>/evidence/other/threshold-handoff-494.<TS>.md`. Acceptance: AC-17 is `[x]` and the diff gate returned empty output.
 - [ ] [P7-T17] Check off **AC-18** (scope boundary held) in `<FEATURE>/spec.md`, citing `<FEATURE>/evidence/qa-gates/scope-lock.<TS>.md`. Acceptance: AC-18 is `[x]` and the gate lists exactly the two in-scope source files.

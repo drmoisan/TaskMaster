@@ -630,7 +630,7 @@ and must be filed through the MCP promotion lifecycle rather than left as prose:
 
 ## Acceptance Criteria
 
-**Amendment 2026-08-10T18-24 (AC-15 and AC-16 only; preparation-time, before any execution).** Two criteria were unsatisfiable as originally written and were corrected so that execution cannot check off a false statement. AC-15 had required *zero* PSScriptAnalyzer findings on both changed files; `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` carries one pre-existing `PSUseSingularNouns` finding on `Get-CoberturaLineConditionCoverageParts`, and clearing it would require renaming an exported function that § Implementation strategy lists as Unmodified and § Technical specifications forbids changing. AC-15 is now a no-new-findings gate against a recorded Phase 0 baseline. AC-16 had enumerated only `{baseline, qa-gates, regression-testing}`; the plan legitimately also writes to `issue-updates/` and `other/`, both canonical under `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, so the enumeration was completed. No other criterion text is altered, no threshold is affected, and no criterion is weakened in substance.
+**Amendment 2026-08-10T18-24 (AC-15 and AC-16 only; preparation-time, before any execution).** Two criteria were unsatisfiable as originally written and were corrected so that execution cannot check off a false statement. AC-15 had required *zero* PSScriptAnalyzer findings on both changed files; `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` carries one pre-existing `PSUseSingularNouns` finding on `Get-CoberturaLineConditionCoverageParts`, and clearing it would require renaming an exported function that § Implementation strategy lists as Unmodified and § Technical specifications forbids changing. AC-15 is now a no-new-findings gate against a recorded Phase 0 baseline. AC-16 had enumerated only `{baseline, qa-gates, regression-testing}`; the plan legitimately also writes to `issue-updates/` and `other/`, both canonical under `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, so the enumeration was completed. No other criterion text is altered, no threshold is affected, and no criterion is weakened in substance. A further preparation-time correction on 2026-08-10T21-40 scoped AC-16's schema-field requirement to command-step artifacts, because the plan legitimately writes narrative artifacts (for example the AC status summary) that record no command and therefore carry no `EXIT_CODE:`; requiring that field of every artifact made the criterion unsatisfiable and would have forced a false check-off. No threshold is affected and the criterion is not weakened in substance.
 
 - [ ] **AC-1 (headline: generator parity).** With the fix applied, dot-sourcing
   `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` and running
@@ -698,8 +698,10 @@ and must be filed through the MCP promotion lifecycle rather than left as prose:
   `docs/features/active/2026-08-10-cobertura-coverage-arithmetic-441/evidence/qa-gates/`.
 - [ ] **AC-16 (canonical evidence locations).** Every evidence artifact for this feature lives under
   `docs/features/active/2026-08-10-cobertura-coverage-arithmetic-441/evidence/{baseline,qa-gates,regression-testing,issue-updates,other}/`,
-  carries `Timestamp`, `Command` and `EXIT_CODE` fields (baseline artifacts additionally carry
-  `Output Summary`), and no evidence artifact is written under any `artifacts/` path.
+  every command-step artifact carries `Timestamp`, `Command` and `EXIT_CODE` fields (baseline
+  artifacts additionally carry `Output Summary`), every narrative artifact that records no command
+  carries `Timestamp` and is individually enumerated in the final sweep, and no evidence artifact is
+  written under any `artifacts/` path.
 - [ ] **AC-17 (no threshold re-tuned).** The diff contains no change to `CLAUDE.md`, to any file
   under `.claude/rules/`, to `coverage.config`, or to any other file that states a coverage
   threshold. The 85.0317%-versus-85% observation is recorded in evidence as a handoff to #494 and
