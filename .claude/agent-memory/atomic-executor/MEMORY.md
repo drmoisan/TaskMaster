@@ -33,9 +33,11 @@
 - [Evidence <TS> collision clobbers committed artifacts](project_evidence_timestamp_collision_clobbers_artifacts.md) — same-day remediation can silently overwrite implementation-cycle evidence; a ` M` under `evidence/` means clobber
 - [csharpier pipe-files is a non-enforcing gate](project_csharpier_pipefiles_nonenforcing_gate.md) — use `csharpier check`/`format`; tests balloon past 500 lines under genuine format (size new files AFTER format)
 - [PowerShell new files need UTF-8 BOM](powershell-bom-required.md) — PSScriptAnalyzer enforces PSUseBOMForUnicodeEncodedFile; prepend BOM after Write or restart the format loop
-- [poshqc MCP tools report no verdict](project_poshqc_pester_mcp_exit_minus1.md) — run_poshqc_test returns ok:true with no counts/exit code, so any "EXIT_CODE 0"/"N failures"/expect-fail gate on it is vacuous; pair with direct Invoke-Pester
+- [poshqc test MCP carries no verdict and no numbers](project_poshqc_pester_mcp_exit_minus1.md) — run_poshqc_test returns only {ok,tool,workspace_root,summary}: no exit code, counts or coverage, so any EXIT_CODE/N-failures/expect-fail gate on it is vacuous; scan_folders accepts FILE paths; Pester 5 has no branch metric; pair with direct Invoke-Pester
+- [poshqc analyze exits 1 on a Warning](project_poshqc_analyze_exit1_on_warning.md) — "EXIT_CODE 0 with zero error-severity" is self-contradictory; Helpers.ps1 carries a pre-existing PSUseSingularNouns; `Remove-*` needs SupportsShouldProcess
 - [BOM breaks grep ^ anchor](project_bom_grep_anchor_false_negative.md) — bash grep `^#nullable` misses BOM-prefixed files; use the Grep tool for opt-in classification, never bash grep
 - [StrictMode Latest + missing XML attribute throws](project_pester_strictmode_xml_attribute_property_access.md) — a fixture omitting `branch` (or `complexity` on a merge-path `<class>`) throws PropertyNotFoundStrict instead of the assertion diff; enumerate ALL bare `$node.attr` reads on the traversed path, not one attribute at a time
+- [pwsh -Command needs single-quoted outer](project_pwsh_command_quoting_from_bash.md) — a double-quoted outer wrapper lets bash eat `$` → empty counts + inverted exit gates or a hard ParserError; `''` inside single quotes is not an escape
 
 - [Compile-time red needs body-level refs](project_compile_red_needs_body_level_references.md) — a missing type in a method SIGNATURE suppresses body binding, so an `[expect-fail]` task requiring N named CS0246s reports only 1; construct the types inline in test bodies
 

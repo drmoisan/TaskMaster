@@ -30,12 +30,29 @@ pass `require_model_routing=true`. In this repo `config/orchestration-routing.js
 `fable_policy: "available"`, so C3 -> opus for all agents (base `complexity_to_model` table, no clamp,
 no overlay). A delegation prompt may override the policy for the session (`disabled` was passed on the
 #441 run); under `disabled` the C3 cell is already `opus`, so `clamped_from` stays `null` — the clamp
-only fires on a `fable` table cell. See [[orchestrator-state-validator-divergence]] and
-[[pr-author-hook-blocks-gh-in-this-repo]].
+only fires on a `fable` table cell.
 
-**Each `delegation_receipts[]` entry needs SIX keys beyond the obvious ones**, or the validator emits
-one error per missing key per receipt: `step`, `agent_id`, `skill_source`, `started_at`,
-`result_signal`, `artifact_paths` (an ARRAY; a scalar `artifact_path` does not satisfy it). Verified
-2026-08-10 on the #441 preparation resume — a receipt carrying only
-`agent_name`/`phase`/`status`/`model`/`artifact_path`/`completed_at` produced 24 errors across 4
-receipts. For an in-flight delegation, `completed_at: null` and `result_signal: null` are accepted.
+A receipt carrying only `agent_name`/`phase`/`status`/`model`/`artifact_path`/`completed_at` produced
+24 errors across 4 receipts (verified 2026-08-10 on the #441 preparation resume). For an in-flight
+delegation, `completed_at: null` and `result_signal: null` are accepted.
+
+no overlay). See [[orchestrator-state-validator-divergence]] and [[pr-author-hook-blocks-gh-in-this-repo]].
+
+**Per-receipt required keys (verified 2026-08-10, #457 preparation).** Every entry in the
+`delegation_receipts` LIST must carry all eight of: `agent_name`, `step`, `agent_id`, `skill_source`,
+`started_at`, `completed_at`, `result_signal`, `artifact_paths`. The validator names the missing key
+per receipt index (`Checkpoint delegation receipt #0 missing key: step`), so one malformed receipt
+produces seven errors. `phase` is NOT a substitute for `step` — `require_model_routing` matches
+`model_routing_receipts[].phase` against the assessment phases while the receipt schema wants `step`,
+so carry both. Also confirmed on that run: `step5_status`..`step10_status` all set to
+`not-applicable` is accepted (the preparation route's out-of-scope steps), and
+`require_model_routing=true` passes with HAND-COMPUTED routing when `scripts/dev_tools/` is absent
+from the branch entirely — the validator checks receipt shape and floor/model consistency, not that
+you shelled out to the Python reference implementations. See
+[[model-routing-scripts-absent-on-epic-integration-base]].
+
+**Do not fabricate a lost receipt.** When a prior attempt dies and takes the gitignored checkpoint
+with it, the raw MCP promotion payloads are gone. Record `receipt: null` plus a `receipt_note`
+explaining what corroborates the invocation (folder on disk, issue.md provenance section), and set
+`agent_id: "unknown-prior-attempt"` rather than inventing an ID. The validator accepts this; the
+audit trail stays honest.

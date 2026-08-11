@@ -16,6 +16,8 @@
 - [pwsh -Command payload quoting](pwsh-command-payload-quoting.md) — `-Command "...$c..."` expands in the parent shell; single-quote the payload, double the inner literals, and say so at the command site
 - [Pester exits 0 on failing It blocks](pester-invoke-does-not-exit-nonzero.md) — 5.6.1 defaults Run.Exit/Run.Throw to False; scope every exit-code clause to a named channel in two-channel [expect-fail] tasks
 
+- [#457 closure-filter plan seams](project_457_closure_filter_plan_seams.md) — pipeline overwrites raw Cobertura in place; post-processed artifacts cannot answer `d__`/`b__` name questions; pre-merge insertion is a correctness constraint
+- [PowerShell gate observables](powershell-gate-observables.md) — no Invoke-Pester exit code; explicit `scan_folders`; `git status` can't count edits; outer-single/inner-double quoting; repo-root `coverage.xml`; aggregate-only `CoveragePercent`; no Pester 5 branch counter; `iter<N>` filename collisions
 - [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/
 - [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — obj/ cache filenames outlive tear-down commits; verify project/source files with git ls-files or a glob before writing an existence claim into acceptance text
 - [Diff gates need a commit task](diff-gates-need-a-commit-task.md) — `git diff <MERGE_BASE>..HEAD` gates pass vacuously with no commit task; Phase 0 porcelain is non-empty by construction; whitelist docs/ + agent-memory in scope-lock diff gates
