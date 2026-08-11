@@ -119,17 +119,11 @@ function Get-CoberturaCoverageSummary {
         }
 
         foreach ($cls in $pkg.SelectNodes('.//class')) {
-            foreach ($line in $cls.SelectNodes('.//lines/line')) {
-                $totalLines++
-                if ([int]$line.hits -gt 0) {
-                    $coveredLines++
-                }
-
-                if ($line.branch -eq 'True' -and $line.HasAttribute('condition-coverage') -and $line.'condition-coverage' -match '\(([0-9]+)/([0-9]+)\)') {
-                    $coveredBranches += [int]$Matches[1]
-                    $totalBranches += [int]$Matches[2]
-                }
-            }
+            $classSummary = Get-CoberturaClassLineSummary -ClassNode $cls
+            $totalLines += $classSummary.TotalLines
+            $coveredLines += $classSummary.CoveredLines
+            $totalBranches += $classSummary.TotalBranches
+            $coveredBranches += $classSummary.CoveredBranches
         }
     }
 
@@ -161,6 +155,106 @@ function Get-CoberturaLineConditionCoverageParts {
     return [pscustomobject]@{
         Covered = 0
         Total   = 0
+    }
+}
+
+function Get-CoberturaClassLineSummary {
+    <#
+        .SYNOPSIS
+        Reduces one Cobertura <class> element to a deduplicated per-line summary.
+
+        .DESCRIPTION
+        Cobertura repeats every source line under <methods>/<method>/<lines> and again in the
+        class-level <lines> rollup, so counting over the descendant axis counts each line twice
+        (issue #441). This helper enumerates the class-level rollup first and then the method-level
+        view, keys by line number, and resolves a repeated key by taking the maximum hits value,
+        treating the line as a branch if either entry is a branch, and retaining the
+        condition-coverage of the entry with the larger denominator (ties broken by the larger
+        covered count). The precedence rule is the one already used by the merge path and is
+        evaluated through Get-CoberturaLineConditionCoverageParts rather than re-derived.
+
+        The function is pure: it performs no I/O and mutates nothing in the source document.
+
+        .PARAMETER ClassNode
+        A Cobertura <class> element. A class with no <lines> element, no <methods> element, or
+        neither is valid input and yields TotalLines = 0.
+
+        .OUTPUTS
+        A pscustomobject carrying LineMap, TotalLines, CoveredLines, TotalBranches and
+        CoveredBranches.
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [System.Xml.XmlElement]$ClassNode
+    )
+
+    $lineMap = @{}
+
+    # Class-level rollup first, then the method-level view of the same lines.
+    $lineNodes = @($ClassNode.SelectNodes('./lines/line')) +
+    @($ClassNode.SelectNodes('./methods/method/lines/line'))
+
+    foreach ($lineNode in $lineNodes) {
+        $lineNumber = [int]$lineNode.GetAttribute('number')
+        # GetAttribute is used rather than bare property access because Set-StrictMode -Version
+        # Latest makes a missing XML attribute throw instead of returning $null.
+        $hits = [int]$lineNode.GetAttribute('hits')
+        $isBranch = $lineNode.GetAttribute('branch') -eq 'True'
+        $candidateCoverage = Get-CoberturaLineConditionCoverageParts -LineNode $lineNode
+
+        if (-not $lineMap.Contains($lineNumber)) {
+            $lineMap[$lineNumber] = [pscustomobject]@{
+                Node    = $lineNode
+                Hits    = $hits
+                Branch  = $isBranch
+                Covered = $candidateCoverage.Covered
+                Total   = $candidateCoverage.Total
+            }
+            continue
+        }
+
+        $existing = $lineMap[$lineNumber]
+        if ($hits -gt $existing.Hits) {
+            $existing.Hits = $hits
+        }
+
+        if ($isBranch) {
+            $existing.Branch = $true
+        }
+
+        if (
+            $candidateCoverage.Total -gt $existing.Total -or
+            ($candidateCoverage.Total -eq $existing.Total -and $candidateCoverage.Covered -gt $existing.Covered)
+        ) {
+            $existing.Node = $lineNode
+            $existing.Covered = $candidateCoverage.Covered
+            $existing.Total = $candidateCoverage.Total
+        }
+    }
+
+    $coveredLines = 0
+    $totalBranches = 0
+    $coveredBranches = 0
+
+    foreach ($entry in $lineMap.Values) {
+        if ($entry.Hits -gt 0) {
+            $coveredLines++
+        }
+
+        if ($entry.Branch) {
+            $totalBranches += $entry.Total
+            $coveredBranches += $entry.Covered
+        }
+    }
+
+    [pscustomobject]@{
+        LineMap         = $lineMap
+        TotalLines      = $lineMap.Count
+        CoveredLines    = $coveredLines
+        TotalBranches   = $totalBranches
+        CoveredBranches = $coveredBranches
     }
 }
 
@@ -267,13 +361,17 @@ function Merge-CoberturaClassesByFilename {
                 [void]$linesNode.AppendChild($lineMap[$lineNumber].Node)
             }
 
-            $classSummaryXml = [xml]"<coverage><packages><package><classes /></package></packages></coverage>"
-            $classSummaryClasses = $classSummaryXml.SelectSingleNode('//classes')
-            [void]$classSummaryClasses.AppendChild($classSummaryXml.ImportNode($mergedClassNode, $true))
-            $classSummary = Get-CoberturaCoverageSummary -XmlDocument $classSummaryXml
+            $mergedSummary = Get-CoberturaClassLineSummary -ClassNode $mergedClassNode
 
-            $mergedClassNode.SetAttribute('line-rate', $classSummary.LineRate)
-            $mergedClassNode.SetAttribute('branch-rate', $classSummary.BranchRate)
+            # The rate expressions below are duplicated from Get-CoberturaCoverageSummary rather
+            # than shared through a second helper: the spec specifies exactly one new helper, and
+            # existing assertions such as line-rate | Should -Be '1' depend on this rounding and on
+            # the '0' zero-denominator fallback matching that function exactly.
+            $mergedLineRate = if ($mergedSummary.TotalLines -gt 0) { [string]([math]::Round($mergedSummary.CoveredLines / $mergedSummary.TotalLines, 6)) } else { '0' }
+            $mergedBranchRate = if ($mergedSummary.TotalBranches -gt 0) { [string]([math]::Round($mergedSummary.CoveredBranches / $mergedSummary.TotalBranches, 6)) } else { '0' }
+
+            $mergedClassNode.SetAttribute('line-rate', $mergedLineRate)
+            $mergedClassNode.SetAttribute('branch-rate', $mergedBranchRate)
             $mergedClassNode.SetAttribute('complexity', [string](
                     ($group | ForEach-Object {
                         if ($_.complexity) { [double]$_.complexity } else { 0d }

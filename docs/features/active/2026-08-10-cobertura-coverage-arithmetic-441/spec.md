@@ -632,63 +632,63 @@ and must be filed through the MCP promotion lifecycle rather than left as prose:
 
 **Amendment 2026-08-10T18-24 (AC-15 and AC-16 only; preparation-time, before any execution).** Two criteria were unsatisfiable as originally written and were corrected so that execution cannot check off a false statement. AC-15 had required *zero* PSScriptAnalyzer findings on both changed files; `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` carries one pre-existing `PSUseSingularNouns` finding on `Get-CoberturaLineConditionCoverageParts`, and clearing it would require renaming an exported function that § Implementation strategy lists as Unmodified and § Technical specifications forbids changing. AC-15 is now a no-new-findings gate against a recorded Phase 0 baseline. AC-16 had enumerated only `{baseline, qa-gates, regression-testing}`; the plan legitimately also writes to `issue-updates/` and `other/`, both canonical under `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, so the enumeration was completed. No other criterion text is altered, no threshold is affected, and no criterion is weakened in substance. A further preparation-time correction on 2026-08-10T21-40 scoped AC-16's schema-field requirement to command-step artifacts, because the plan legitimately writes narrative artifacts (for example the AC status summary) that record no command and therefore carry no `EXIT_CODE:`; requiring that field of every artifact made the criterion unsatisfiable and would have forced a false check-off. No threshold is affected and the criterion is not weakened in substance.
 
-- [ ] **AC-1 (headline: generator parity).** With the fix applied, dot-sourcing
+- [x] **AC-1 (headline: generator parity).** With the fix applied, dot-sourcing
   `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` and running
   `Get-CoberturaCoverageSummary` over
   `docs/features/active/2026-08-06-quickfiler-high-confidence-queue-init-stall-424/evidence/baseline/coverage-baseline.cobertura.xml`
   returns exactly `LinesValid = 79957`, `LinesCovered = 56124`, `BranchesValid = 23109`,
   `BranchesCovered = 13472` — reproducing that document's own root attributes.
-- [ ] **AC-2 (pre-change figure).** The pre-change run of the same procedure against unmodified
+- [x] **AC-2 (pre-change figure).** The pre-change run of the same procedure against unmodified
   `Helpers.ps1` is recorded numerically and shows `LinesValid = 161086`, with `LinesCovered`,
   `BranchesValid` and `BranchesCovered` recorded as concrete integers, each strictly greater than
   its AC-1 post-change counterpart.
-- [ ] **AC-3 (package-filtered A/B).** Reprocessing
+- [x] **AC-3 (package-filtered A/B).** Reprocessing
   `.../424/evidence/qa-gates/coverage-final.cobertura.xml` through `ConvertTo-KoverageCoberturaXml`
   yields root `lines-valid = 62345`, `lines-covered = 53013`, and `line-rate` = 0.850317 (post-fix),
   recorded against the pre-fix values 110849 / 94937 / 0.856453.
-- [ ] **AC-4 (per-file merged rate).** The merged-class `line-rate` defect is corrected from
+- [x] **AC-4 (per-file merged rate).** The merged-class `line-rate` defect is corrected from
   0.8625 (69/80) to 0.803571 (45/56) for the `QfcHomeController.Iteration.cs` case, demonstrated in
   the suite by fixture F3, whose merged class asserts `line-rate` = `'0.6'` (3/5) where the
   unmodified code produces `'0.75'` (6/8), and whose merged class-level `<lines>` contains exactly
   five `line` children numbered 12, 13, 56, 57, 58 in ascending order.
-- [ ] **AC-5 (branch counts deduplicated).** Fixture F2 asserts `branches-valid` = `'2'` and
+- [x] **AC-5 (branch counts deduplicated).** Fixture F2 asserts `branches-valid` = `'2'` and
   `branches-covered` = `'1'` where the unmodified code produces 4 and 2. No branch regression
   assertion in the suite relies on `branch-rate` alone.
-- [ ] **AC-6 (helper contract).** A new pure function `Get-CoberturaClassLineSummary` exists in
+- [x] **AC-6 (helper contract).** A new pure function `Get-CoberturaClassLineSummary` exists in
   `Helpers.ps1`, takes a mandatory `-ClassNode [System.Xml.XmlElement]`, enumerates `./lines/line`
   then `./methods/method/lines/line`, keys by `[int]$node.number`, resolves repeats by `max(hits)`
   / `branch=True` if either / `condition-coverage` from the larger `Total` (tie-broken by larger
   `Covered`) via `Get-CoberturaLineConditionCoverageParts`, and returns `LineMap`, `TotalLines`,
   `CoveredLines`, `TotalBranches`, `CoveredBranches`.
-- [ ] **AC-7 (defect removed at its one site).** The expression
+- [x] **AC-7 (defect removed at its one site).** The expression
   `$cls.SelectNodes('.//lines/line')` no longer appears anywhere in
   `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1`, and `Get-CoberturaCoverageSummary`
   accumulates its four totals from `Get-CoberturaClassLineSummary`.
-- [ ] **AC-8 (correct site untouched).** The union builder at `Helpers.ps1:217-268`, including the
+- [x] **AC-8 (correct site untouched).** The union builder at `Helpers.ps1:217-268`, including the
   child-axis selection `$classNode.SelectNodes('./lines/line')`, is byte-identical to `main` in the
   diff.
-- [ ] **AC-9 (delegation replaced).** The `$classSummaryXml` synthetic-document block formerly at
+- [x] **AC-9 (delegation replaced).** The `$classSummaryXml` synthetic-document block formerly at
   `Helpers.ps1:270-273` is removed, and the merged class's `line-rate` / `branch-rate` attributes
   are set from a direct `Get-CoberturaClassLineSummary` call on `$mergedClassNode`.
-- [ ] **AC-10 (structure preserved).** Fixture F6 passes: the merged class still carries a
+- [x] **AC-10 (structure preserved).** Fixture F6 passes: the merged class still carries a
   `<methods>` element containing exactly the primary class's one `<method>` child, and no `<line>`
   element's `hits` attribute differs from the input. The `<methods>` subtrees are neither merged nor
   stripped.
-- [ ] **AC-11 (six fixtures present and passing).** Fixtures F1-F6 exist as six new `It` blocks in
+- [x] **AC-11 (six fixtures present and passing).** Fixtures F1-F6 exist as six new `It` blocks in
   `tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1`, use inline single-quoted
   here-strings matching the file's existing style, create no file on disk, use no mock in any
   arithmetic path, and all pass.
-- [ ] **AC-12 (fail-before evidence).** F1, F2, F3 and F4 are demonstrated to fail against
+- [x] **AC-12 (fail-before evidence).** F1, F2, F3 and F4 are demonstrated to fail against
   unmodified `Helpers.ps1` with the pre-fix values stated in § Test Strategy, and the failing run is
   recorded under
   `docs/features/active/2026-08-10-cobertura-coverage-arithmetic-441/evidence/regression-testing/`.
-- [ ] **AC-13 (helper precedence branches covered).** Direct unit tests cover all three branches of
+- [x] **AC-13 (helper precedence branches covered).** Direct unit tests cover all three branches of
   the `condition-coverage` precedence rule: candidate `Total` greater; `Total` equal and `Covered`
   greater; neither (existing value retained).
-- [ ] **AC-14 (zero existing tests broken).** All eight pre-existing `It` blocks in
+- [x] **AC-14 (zero existing tests broken).** All eight pre-existing `It` blocks in
   `tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1` pass unmodified, and the diff
   shows no edit to any of them — including the `lines-valid | Should -Be '3'` assertion.
-- [ ] **AC-15 (toolchain green).** A single clean pass of PoshQC format
+- [x] **AC-15 (toolchain green).** A single clean pass of PoshQC format
   (`mcp__drm-copilot__run_poshqc_format`, no files changed), PSScriptAnalyzer
   (`mcp__drm-copilot__run_poshqc_analyze` plus a per-file `Invoke-ScriptAnalyzer` breakdown, **no
   finding on either changed file that is absent from the recorded Phase 0 baseline**; the single
@@ -696,22 +696,22 @@ and must be filed through the MCP promotion lifecycle rather than left as prose:
   baselined and out of scope, since clearing it requires renaming an exported function this spec
   marks Unmodified), and Pester (direct `Invoke-Pester` run, `FailedCount` = 0) is recorded under
   `docs/features/active/2026-08-10-cobertura-coverage-arithmetic-441/evidence/qa-gates/`.
-- [ ] **AC-16 (canonical evidence locations).** Every evidence artifact for this feature lives under
+- [x] **AC-16 (canonical evidence locations).** Every evidence artifact for this feature lives under
   `docs/features/active/2026-08-10-cobertura-coverage-arithmetic-441/evidence/{baseline,qa-gates,regression-testing,issue-updates,other}/`,
   every command-step artifact carries `Timestamp`, `Command` and `EXIT_CODE` fields (baseline
   artifacts additionally carry `Output Summary`), every narrative artifact that records no command
   carries `Timestamp` and is individually enumerated in the final sweep, and no evidence artifact is
   written under any `artifacts/` path.
-- [ ] **AC-17 (no threshold re-tuned).** The diff contains no change to `CLAUDE.md`, to any file
+- [x] **AC-17 (no threshold re-tuned).** The diff contains no change to `CLAUDE.md`, to any file
   under `.claude/rules/`, to `coverage.config`, or to any other file that states a coverage
   threshold. The 85.0317%-versus-85% observation is recorded in evidence as a handoff to #494 and
   nowhere acted upon.
-- [ ] **AC-18 (scope boundary held).** The diff touches exactly two source files —
+- [x] **AC-18 (scope boundary held).** The diff touches exactly two source files —
   `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` and
   `tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1` — plus evidence and feature
   documents. `scripts/vscode/Invoke-MSTestWithCoverage.ps1` is unchanged, including its missing
   `\.claude\` discovery exclusion.
-- [ ] **AC-19 (file ceiling).** `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` remains under
+- [x] **AC-19 (file ceiling).** `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` remains under
   500 lines (357 before the change).
 - [ ] **AC-20 (follow-ups filed).** The four follow-up candidates in § Rollout & Follow-up are filed
   as GitHub issues through the promotion lifecycle, with their issue numbers recorded in this
