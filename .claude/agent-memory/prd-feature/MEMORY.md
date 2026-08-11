@@ -4,3 +4,4 @@
 - [AC gates: verify satisfiability + fresh reads](feedback_ac_gates_verify_satisfiability.md) — check baseline evidence before encoding repo-wide coverage floors as blocking AC; re-read spec from disk before reporting tallies
 - [full-bug means spec.md is the only AC source](feedback_full_bug_spec_only.md) — no user-story.md by default (Expected Outputs header vs AC-tracking skill); two exceptions (epic-prep route, cross-reference instruction) handled by making it checkbox-free narrative with a banner
 - [#522 nullable type-check deviation](project_522_nullable_typecheck_deviation.md) — CLAUDE.md's /p:Nullable=enable gate is defective; bind spec verification to CI's msbuild command and cite #522
+- [MSBuild non-vacuity assertion](project_msbuild_nonvacuity_assertion.md) — prove a build compiled with zero `Skipping target "CoreCompile"`; csc.exe counts and CoreCompile headers both mislead

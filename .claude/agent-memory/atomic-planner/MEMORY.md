@@ -12,6 +12,9 @@
 - [PoshQC MCP + msbuild invocation facts](poshqc-mcp-and-msbuild-invocation-facts.md) — run_poshqc_test takes only workspace_root/scan_folders; can exit -1 while "available"; hidden-parent test dirs may never be collected; msbuild needs vswhere
 - [Never plan a mid-plan halt on MCP availability](never-plan-a-mid-plan-halt-on-mcp-availability.md) — executor and orchestrator tool surfaces differ; Phase 0 probe + record-blocker-and-continue, never "halt", never a different route
 - [Single-numeral gates must name the role](single-numeral-gates-must-name-the-role.md) — count "enforced repo-wide line floor compared against in executable code", enumerate doc/policy-constant occurrences; inventory patterns need prose alternations
+- [Thread granted discharges through consumers](thread-granted-discharges-through-consumers.md) — softening one task's measurement clause without the intermediate producer task makes the discharge unreachable and the middle task uncheckable
+- [pwsh -Command payload quoting](pwsh-command-payload-quoting.md) — `-Command "...$c..."` expands in the parent shell; single-quote the payload, double the inner literals, and say so at the command site
+- [Pester exits 0 on failing It blocks](pester-invoke-does-not-exit-nonzero.md) — 5.6.1 defaults Run.Exit/Run.Throw to False; scope every exit-code clause to a named channel in two-channel [expect-fail] tasks
 
 - [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/
 - [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — obj/ cache filenames outlive tear-down commits; verify project/source files with git ls-files or a glob before writing an existence claim into acceptance text
@@ -22,6 +25,7 @@
 - [Repo-wide csharpier format breaks zero-diff ACs](csharpier-repowide-format-breaks-zero-diff-acs.md) — scope the mutating pass to the plan's own path list; keep `check .` read-only; re-verify the zero-line diff AFTER formatting
 - [Embedded-resource fail-proof needs a rebuild gate](embedded-resource-failproof-rebuild-gate.md) — edit → rebuild → assert embedded bytes → `[expect-fail]` run; skipping the assert makes the fail-proof itself vacuous
 - [#503 ribbon readiness plan seams](project_503_ribbon_readiness_plan_seams.md) — RibbonViewer 487/500 forces a 26-member region move; 6+4 Compile entries; compile-time red + dossier; #504-#508 already promoted
+- [#512 toolchain gate fidelity plan seams](project_512_toolchain_gate_fidelity_plan_seams.md) — AC6 needs a same-line `/t:Build`+`Nullable=enable` grep; PoshQC red at 16; `-EnableNullable` no-op proved by EXIT 0; zero-skip non-vacuity
 - [#505 toggle-state guards plan seams](project_505_toggle_state_guards_plan_seams.md) — runtime red (no dossier); R4 red between catalog and XML tasks; raw cobertura to gitignored coverage/; #522 CI type-check cmd; manual-verification kind accepted
 - [CSharpier gate: format not pipe-files](csharpier-format-not-pipe-files-gate.md) — formatting tasks must use `csharpier format` + scoped `csharpier check` exit 0; `pipe-files` is stdout-only/non-enforcing and masked a 500-line overflow in #400
 - [#400 partial-class headroom placement](project_400_partial_class_headroom_placement.md) — put new coverage cases in existing `.Part2.cs` `[TestClass] partial` files to keep the 17-class filter/count assertions stable
