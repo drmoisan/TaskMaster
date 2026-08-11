@@ -19,7 +19,7 @@ intent:
     - Every corrected figure must be accompanied by a re-captured baseline in the same change.
 features:
   - issue_num: 441
-    feature_folder: cobertura-coverage-arithmetic-441
+    feature_folder: 2026-08-10-cobertura-coverage-arithmetic-441
     depends_on: []
   - issue_num: 457
     feature_folder: excludefromcodecoverage-nested-lambdas-457
