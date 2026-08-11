@@ -160,13 +160,13 @@
 | `Compile` | 452 | 1 — `OutlookObjects\Folder\PercentageFormatterTests.cs` (lines 304, 356) — the defect this feature fixes |
 | `EmbeddedResource` | 1 | none |
 | `None` | 7 (across three `<ItemGroup>`s) | none |
-| `Reference` | ~114 | none (every `Include` assembly-name token is distinct) |
+| `Reference` | 126 | none (every `Include` assembly-name token is distinct) |
 | `ProjectReference` | 2 | none |
 | `BootstrapperPackage` | 2 | none |
-| `Analyzer` | 9 | none |
+| `Analyzer` | 11 | none |
 | `AdditionalFiles` | 1 | none |
 | `PackageReference` | 0 | not applicable — legacy `packages.config`-style project, `PackageReference` is not used |
-| `packages.config` `<package>` | ~99 | none |
+| `packages.config` `<package>` | 105 | none |
 
 One non-duplicate-`Include` anomaly was found and is recorded as out of scope above: the
 `System.Linq` `Reference` item (lines 842-846) contains a duplicated `<Private>True</Private>`
