@@ -8,14 +8,14 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 - Integration branch: `epic/build-ci-coverage-gate-fidelity-integration`
 - Manifest: `docs/features/epics/build-ci-coverage-gate-fidelity/epic.md`
 - Current wave: 1
-- Last updated: 2026-08-11T04-05
+- Last updated: 2026-08-11T04-20
 
 ## Features
 
 | feature_folder | issue_num | wave | merge_status | pr_url | merge_commit_sha | worktree_created_at | pr_opened_at | merge_confirmed_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 2026-08-10-cobertura-coverage-arithmetic-441 | 441 | 0 | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/538 | fb257cd6e0c56cbf5eacf7e6a73641cc0414c930 | 2026-08-11T02-28 | 2026-08-11T03-45 | 2026-08-11T04-00 | 2026-08-11T04-01 |
-| 2026-08-10-csharp-toolchain-gate-fidelity-512 | 512 | 0 | worktree_created | — | — | 2026-08-11T02-28 | — | — | — |
+| 2026-08-10-csharp-toolchain-gate-fidelity-512 | 512 | 0 | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/540 | 22eaee849263515e4a66e0f654baf162a27018b2 | 2026-08-11T02-28 | 2026-08-11T03-55 | 2026-08-11T04-20 | 2026-08-11T04-21 |
 | 2026-08-10-utilitiescs-test-cs2002-duplicate-compile-entry-394 | 394 | 0 | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/533 | c1fe3565a8677184831a4e33917852cd02f8d521 | 2026-08-11T02-28 | 2026-08-11T03-20 | 2026-08-11T03-32 | 2026-08-11T03-35 |
 | 2026-08-10-excludefromcodecoverage-nested-lambdas-457 | 457 | 1 | worktree_created | — | — | 2026-08-11T04-05 | — | — | — |
 | 2026-08-10-coverage-threshold-policy-reconciliation-494 | 494 | 2 | not_started | — | — | — | — | — | — |
@@ -24,7 +24,7 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 
 | wave | features | status |
 | --- | --- | --- |
-| 0 | `2026-08-10-cobertura-coverage-arithmetic-441`, `2026-08-10-csharp-toolchain-gate-fidelity-512`, `2026-08-10-utilitiescs-test-cs2002-duplicate-compile-entry-394` | in_progress |
+| 0 | `2026-08-10-cobertura-coverage-arithmetic-441`, `2026-08-10-csharp-toolchain-gate-fidelity-512`, `2026-08-10-utilitiescs-test-cs2002-duplicate-compile-entry-394` | complete |
 | 1 | `2026-08-10-excludefromcodecoverage-nested-lambdas-457` | in_progress |
 | 2 | `2026-08-10-coverage-threshold-policy-reconciliation-494` | not_started |
 
@@ -47,6 +47,27 @@ workflow and receives an empty `statusCheckRollup`. Child merge-on-green degrade
 CI-equivalent verification recorded as feature evidence. The integrated tree is gated separately by
 a `workflow_dispatch` CI run against the integration branch at each wave boundary, and the final
 integration-to-`main` PR receives full CI because it is `main`-based.
+
+## Open Blocker for the Final Integration PR
+
+The integrated tree carries a pre-existing intermittent test failure inherited from `main`, not
+introduced by this epic. `workflow_dispatch` run 31456943481 against the integration branch failed
+on exactly one MSTest case out of 6435:
+`TimeoutAfter_GenericTask_ShouldPropagateFaultedSourceException_WhenSourceFaultsLater`
+(`UtilitiesCS.Test/Threading/TimeOutTask_AdditionalTests.cs:12`).
+
+The push-event run on `main` at `a682c7a2` — this integration branch's base commit — failed on the
+identical single test with the identical 6435 total (run 31409582674). The immediately preceding
+`main` run at `cee6a1ca` passed, so the failure is intermittent rather than deterministic.
+
+Mechanism: the test races a real 100 ms wall-clock timeout (`source.Task.TimeoutAfter(100)`)
+against fault propagation from a `TaskCompletionSource`. Under CI load the timer can win, and the
+proxy throws the timeout instead of the expected `InvalidOperationException`. This violates the
+determinism requirements in `.claude/rules/general-unit-test.md`, which ban real wall-clock waits
+in tests and require a `FakeTimeProvider` or virtual scheduler.
+
+This must be resolved before the integration-to-`main` PR can merge on a truthful green gate. It is
+out of scope for every child feature in this epic.
 
 ## Issues Closed
 
