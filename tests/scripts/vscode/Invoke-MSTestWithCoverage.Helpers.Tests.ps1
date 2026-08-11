@@ -180,6 +180,183 @@ Describe 'ConvertTo-KoverageCoberturaXml' {
         $resultXml.coverage.'lines-covered' | Should -Be '1'
         $resultXml.coverage.'lines-valid' | Should -Be '2'
     }
+
+    It 'counts each source line once when methods repeat the class-level rollup' {
+        # Regression for Issue #441. Assert counts, not the rate: the rate does not discriminate.
+        $inputXml = @'
+<?xml version="1.0" encoding="utf-8"?>
+<coverage line-rate="0" branch-rate="0" lines-covered="0" lines-valid="0" branches-covered="0" branches-valid="0">
+  <packages><package name="Ns" line-rate="0" branch-rate="0" complexity="1"><classes>
+        <class name="Ns.Foo" filename="C:\repo\Ns\Foo.cs" line-rate="0" branch-rate="0" complexity="1">
+          <methods><method name="M" signature="()" line-rate="0" branch-rate="0"><lines><line number="10" hits="1" branch="False" /><line number="11" hits="0" branch="False" /><line number="12" hits="1" branch="False" /></lines></method></methods>
+          <lines>
+            <line number="10" hits="1" branch="False" />
+            <line number="11" hits="0" branch="False" />
+            <line number="12" hits="1" branch="False" />
+          </lines>
+        </class>
+      </classes></package></packages>
+</coverage>
+'@
+
+        [xml]$resultXml = ConvertTo-KoverageCoberturaXml -XmlContent $inputXml -RepoRoot 'C:\repo' -PathSeparator '\' -ProjectNames @('Ns')
+
+        $resultXml.coverage.'lines-valid' | Should -Be '3'
+        $resultXml.coverage.'lines-covered' | Should -Be '2'
+        $resultXml.coverage.'line-rate' | Should -Be '0.666667'
+    }
+
+    It 'counts each branch line once when methods repeat the class-level rollup' {
+        # Regression for Issue #441 branch arithmetic. The branch RATIO is unchanged by the
+        # double count, so this must assert branches-valid/branches-covered, never branch-rate.
+        $inputXml = @'
+<?xml version="1.0" encoding="utf-8"?>
+<coverage line-rate="0" branch-rate="0" lines-covered="0" lines-valid="0" branches-covered="0" branches-valid="0">
+  <packages><package name="Ns" line-rate="0" branch-rate="0" complexity="1"><classes>
+        <class name="Ns.Foo" filename="C:\repo\Ns\Foo.cs" line-rate="0" branch-rate="0" complexity="1">
+          <methods><method name="M" signature="()" line-rate="0" branch-rate="0"><lines><line number="10" hits="1" branch="False" /><line number="11" hits="0" branch="False" /><line number="12" hits="1" branch="True" condition-coverage="50% (1/2)"><conditions><condition number="0" type="jump" coverage="50%" /></conditions></line></lines></method></methods>
+          <lines>
+            <line number="10" hits="1" branch="False" />
+            <line number="11" hits="0" branch="False" />
+            <line number="12" hits="1" branch="True" condition-coverage="50% (1/2)">
+              <conditions>
+                <condition number="0" type="jump" coverage="50%" />
+              </conditions>
+            </line>
+          </lines>
+        </class>
+      </classes></package></packages>
+</coverage>
+'@
+
+        [xml]$resultXml = ConvertTo-KoverageCoberturaXml -XmlContent $inputXml -RepoRoot 'C:\repo' -PathSeparator '\' -ProjectNames @('Ns')
+
+        $resultXml.coverage.'branches-valid' | Should -Be '2'
+        $resultXml.coverage.'branches-covered' | Should -Be '1'
+    }
+
+    It 'computes the merged per-file line-rate from the merged rollup alone' {
+        # Regression for Issue #478: miniature of the confirmed QfcHomeController.Iteration.cs
+        # case. The merged rate must be 3/5 = 0.6, not the blended 6/8 = 0.75.
+        $inputXml = @'
+<?xml version="1.0" encoding="utf-8"?>
+<coverage line-rate="0" branch-rate="0" lines-covered="0" lines-valid="0" branches-covered="0" branches-valid="0">
+  <packages><package name="Ns" line-rate="0" branch-rate="0" complexity="1"><classes>
+        <class name="Ns.Foo" filename="C:\repo\Ns\Foo.cs" line-rate="0" branch-rate="0" complexity="2">
+          <methods><method name="M" signature="()" line-rate="0" branch-rate="0"><lines><line number="56" hits="1" branch="False" /><line number="57" hits="1" branch="False" /><line number="58" hits="1" branch="False" /></lines></method></methods>
+          <lines>
+            <line number="56" hits="1" branch="False" />
+            <line number="57" hits="1" branch="False" />
+            <line number="58" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="Ns.Foo.&lt;&gt;c" filename="C:\repo\Ns\Foo.cs" line-rate="0" branch-rate="0" complexity="3">
+          <methods><method name="N" signature="()" line-rate="0" branch-rate="0"><lines><line number="12" hits="0" branch="False" /><line number="13" hits="0" branch="False" /></lines></method></methods>
+          <lines>
+            <line number="12" hits="0" branch="False" />
+            <line number="13" hits="0" branch="False" />
+          </lines>
+        </class>
+      </classes></package></packages>
+</coverage>
+'@
+
+        [xml]$resultXml = ConvertTo-KoverageCoberturaXml -XmlContent $inputXml -RepoRoot 'C:\repo' -PathSeparator '\' -ProjectNames @('Ns')
+        $mergedClass = $resultXml.SelectSingleNode('//class[@filename="Ns\Foo.cs"]')
+        $mergedLines = @($mergedClass.SelectNodes('./lines/line'))
+
+        $mergedClass.'line-rate' | Should -Be '0.6'
+        $mergedLines.Count | Should -Be 5
+        (@($mergedLines | ForEach-Object { $_.number }) -join ',') | Should -Be '12,13,56,57,58'
+    }
+
+    It 'deduplicates a repeated line number by taking the maximum hits value' {
+        # Line 5 appears in two constructor overloads with differing hits and once in the
+        # class-level rollup. It must count exactly once, and as covered.
+        $inputXml = @'
+<?xml version="1.0" encoding="utf-8"?>
+<coverage line-rate="0" branch-rate="0" lines-covered="0" lines-valid="0" branches-covered="0" branches-valid="0">
+  <packages><package name="Ns" line-rate="0" branch-rate="0" complexity="1"><classes>
+        <class name="Ns.Foo" filename="C:\repo\Ns\Foo.cs" line-rate="0" branch-rate="0" complexity="1">
+          <methods><method name=".ctor" signature="()" line-rate="0" branch-rate="0"><lines><line number="5" hits="1" branch="False" /></lines></method><method name=".ctor" signature="(int)" line-rate="0" branch-rate="0"><lines><line number="5" hits="0" branch="False" /></lines></method></methods>
+          <lines>
+            <line number="5" hits="1" branch="False" />
+          </lines>
+        </class>
+      </classes></package></packages>
+</coverage>
+'@
+
+        [xml]$resultXml = ConvertTo-KoverageCoberturaXml -XmlContent $inputXml -RepoRoot 'C:\repo' -PathSeparator '\' -ProjectNames @('Ns')
+
+        $resultXml.coverage.'lines-valid' | Should -Be '1'
+        $resultXml.coverage.'lines-covered' | Should -Be '1'
+    }
+
+    It 'retains method-level lines when the class-level rollup element is absent' {
+        # Guard: a bare child-axis switch would silently drop these two lines. Passes both
+        # before and after the fix, and pins the union behaviour against that regression.
+        $inputXml = @'
+<?xml version="1.0" encoding="utf-8"?>
+<coverage line-rate="0" branch-rate="0" lines-covered="0" lines-valid="0" branches-covered="0" branches-valid="0">
+  <packages><package name="Ns" line-rate="0" branch-rate="0" complexity="1"><classes>
+        <class name="Ns.Foo" filename="C:\repo\Ns\Foo.cs" line-rate="0" branch-rate="0" complexity="1">
+          <methods><method name="M" signature="()" line-rate="0" branch-rate="0"><lines><line number="20" hits="1" branch="False" /><line number="21" hits="0" branch="False" /></lines></method></methods>
+        </class>
+      </classes></package></packages>
+</coverage>
+'@
+
+        [xml]$resultXml = ConvertTo-KoverageCoberturaXml -XmlContent $inputXml -RepoRoot 'C:\repo' -PathSeparator '\' -ProjectNames @('Ns')
+
+        $resultXml.coverage.'lines-valid' | Should -Be '2'
+        $resultXml.coverage.'lines-covered' | Should -Be '1'
+    }
+
+    It 'preserves the primary class methods subtree and every hits value when merging' {
+        # Locks the decision not to merge or strip <methods>. Reuses the F3 document.
+        $inputXml = @'
+<?xml version="1.0" encoding="utf-8"?>
+<coverage line-rate="0" branch-rate="0" lines-covered="0" lines-valid="0" branches-covered="0" branches-valid="0">
+  <packages><package name="Ns" line-rate="0" branch-rate="0" complexity="1"><classes>
+        <class name="Ns.Foo" filename="C:\repo\Ns\Foo.cs" line-rate="0" branch-rate="0" complexity="2">
+          <methods><method name="M" signature="()" line-rate="0" branch-rate="0"><lines><line number="56" hits="1" branch="False" /><line number="57" hits="1" branch="False" /><line number="58" hits="1" branch="False" /></lines></method></methods>
+          <lines>
+            <line number="56" hits="1" branch="False" />
+            <line number="57" hits="1" branch="False" />
+            <line number="58" hits="1" branch="False" />
+          </lines>
+        </class>
+        <class name="Ns.Foo.&lt;&gt;c" filename="C:\repo\Ns\Foo.cs" line-rate="0" branch-rate="0" complexity="3">
+          <methods><method name="N" signature="()" line-rate="0" branch-rate="0"><lines><line number="12" hits="0" branch="False" /><line number="13" hits="0" branch="False" /></lines></method></methods>
+          <lines>
+            <line number="12" hits="0" branch="False" />
+            <line number="13" hits="0" branch="False" />
+          </lines>
+        </class>
+      </classes></package></packages>
+</coverage>
+'@
+
+        [xml]$resultXml = ConvertTo-KoverageCoberturaXml -XmlContent $inputXml -RepoRoot 'C:\repo' -PathSeparator '\' -ProjectNames @('Ns')
+        $mergedClass = $resultXml.SelectSingleNode('//class[@filename="Ns\Foo.cs"]')
+        $methodNodes = @($mergedClass.SelectNodes('./methods/method'))
+        $hitsByLine = @($mergedClass.SelectNodes('./lines/line')) | ForEach-Object { '{0}={1}' -f $_.number, $_.hits }
+
+        $methodNodes.Count | Should -Be 1
+        $methodNodes[0].name | Should -Be 'M'
+        ($hitsByLine -join ',') | Should -Be '12=0,13=0,56=1,57=1,58=1'
+    }
+
+    It 'still throws when the document has no packages node' {
+        # Error handling: the existing guard must survive the arithmetic rewrite verbatim.
+        [xml]$doc = @'
+<coverage line-rate="0" branch-rate="0" />
+'@
+
+        { Get-CoberturaCoverageSummary -XmlDocument $doc } |
+            Should -Throw 'Cobertura XML does not contain a <packages> node.'
+    }
 }
 
 Describe 'Get-KoverageProjectAllowlist' {
@@ -218,5 +395,74 @@ Describe 'Get-KoverageProjectAllowlist' {
 
         $allowlist | Should -Contain 'Sample'
         $allowlist | Should -Not -Contain 'Sample.Test'
+    }
+}
+
+Describe 'Get-CoberturaClassLineSummary' {
+    It 'retains the candidate condition-coverage when its total is greater' {
+        # Precedence branch 1: the method-level denominator (4) exceeds the class-level one (2).
+        [xml]$doc = @'
+<class name="Ns.Foo" filename="Foo.cs">
+  <methods><method name="M" signature="()"><lines><line number="5" hits="1" branch="True" condition-coverage="50% (2/4)" /></lines></method></methods>
+  <lines>
+    <line number="5" hits="1" branch="True" condition-coverage="100% (2/2)" />
+  </lines>
+</class>
+'@
+
+        $summary = Get-CoberturaClassLineSummary -ClassNode $doc.SelectSingleNode('//class')
+
+        $summary.TotalBranches | Should -Be 4
+        $summary.CoveredBranches | Should -Be 2
+    }
+
+    It 'retains the candidate condition-coverage when totals tie and its covered count is greater' {
+        # Precedence branch 2: equal denominators (2), method-level covered (1) beats class-level (0).
+        [xml]$doc = @'
+<class name="Ns.Foo" filename="Foo.cs">
+  <methods><method name="M" signature="()"><lines><line number="5" hits="1" branch="True" condition-coverage="50% (1/2)" /></lines></method></methods>
+  <lines>
+    <line number="5" hits="1" branch="True" condition-coverage="0% (0/2)" />
+  </lines>
+</class>
+'@
+
+        $summary = Get-CoberturaClassLineSummary -ClassNode $doc.SelectSingleNode('//class')
+
+        $summary.TotalBranches | Should -Be 2
+        $summary.CoveredBranches | Should -Be 1
+    }
+
+    It 'retains the existing condition-coverage when neither precedence condition holds' {
+        # Precedence branch 3: method-level total (2) is smaller, so the class-level 2/4 is kept.
+        [xml]$doc = @'
+<class name="Ns.Foo" filename="Foo.cs">
+  <methods><method name="M" signature="()"><lines><line number="5" hits="1" branch="True" condition-coverage="100% (2/2)" /></lines></method></methods>
+  <lines>
+    <line number="5" hits="1" branch="True" condition-coverage="50% (2/4)" />
+  </lines>
+</class>
+'@
+
+        $summary = Get-CoberturaClassLineSummary -ClassNode $doc.SelectSingleNode('//class')
+
+        $summary.TotalBranches | Should -Be 4
+        $summary.CoveredBranches | Should -Be 2
+    }
+
+    It 'returns zero totals for a class with neither a lines nor a methods element' {
+        # Boundary: valid input per the helper contract; must yield zeros and must not throw.
+        [xml]$doc = @'
+<class name="Ns.Foo" filename="Foo.cs" />
+'@
+        $classNode = $doc.SelectSingleNode('//class')
+
+        { Get-CoberturaClassLineSummary -ClassNode $classNode } | Should -Not -Throw
+        $summary = Get-CoberturaClassLineSummary -ClassNode $classNode
+
+        $summary.TotalLines | Should -Be 0
+        $summary.CoveredLines | Should -Be 0
+        $summary.TotalBranches | Should -Be 0
+        $summary.CoveredBranches | Should -Be 0
     }
 }
