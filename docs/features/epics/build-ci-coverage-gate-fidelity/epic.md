@@ -28,7 +28,7 @@ features:
     feature_folder: csharp-toolchain-gate-fidelity-512
     depends_on: []
   - issue_num: 494
-    feature_folder: coverage-threshold-policy-reconciliation-494
+    feature_folder: 2026-08-10-coverage-threshold-policy-reconciliation-494
     depends_on: [457]
   - issue_num: 394
     feature_folder: 2026-08-10-utilitiescs-test-cs2002-duplicate-compile-entry-394
