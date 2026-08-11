@@ -501,53 +501,53 @@ change. Type checking is not applicable to PowerShell. Exit codes are recorded i
 
 ## Acceptance Criteria
 
-- [ ] A lambda declared inside a member carrying `[ExcludeFromCodeCoverage]` does not appear in the coverage
+- [x] A lambda declared inside a member carrying `[ExcludeFromCodeCoverage]` does not appear in the coverage
       denominator of the post-processed Cobertura report.
-- [ ] A lambda declared inside a member that does **not** carry `[ExcludeFromCodeCoverage]` still appears in
+- [x] A lambda declared inside a member that does **not** carry `[ExcludeFromCodeCoverage]` still appears in
       the coverage denominator.
-- [ ] The selected fix surface (Candidate 1c, post-processing closure filter) is recorded in this `spec.md`
+- [x] The selected fix surface (Candidate 1c, post-processing closure filter) is recorded in this `spec.md`
       with an explicit justification against every candidate alternative evaluated in research: Candidate 2
       (`coverage.config` / dotnet-coverage settings), Candidate 3 (type-level attribute), and the two
       disqualified Candidate-1 variants (blanket `<>c` exclusion; keying on `CompilerGeneratedAttribute`).
-- [ ] Deterministic Pester regression tests cover both required directions and create no temporary files, no
+- [x] Deterministic Pester regression tests cover both required directions and create no temporary files, no
       on-disk fixtures, and no committed `.cs` sources; every fixture is an inline here-string Cobertura
       document.
-- [ ] A repository coverage baseline is re-captured against the post-#441 arithmetic and recorded numerically
+- [x] A repository coverage baseline is re-captured against the post-#441 arithmetic and recorded numerically
       under `<FEATURE>/evidence/baseline/` and `<FEATURE>/evidence/qa-gates/`.
-- [ ] No coverage threshold is changed by this feature; any corrected figure that would fail an existing
+- [x] No coverage threshold is changed by this feature; any corrected figure that would fail an existing
       threshold is recorded in evidence and handed to issue #494.
-- [ ] Full PowerShell toolchain pass completed in order (`run_poshqc_format` → `run_poshqc_analyze` →
+- [x] Full PowerShell toolchain pass completed in order (`run_poshqc_format` → `run_poshqc_analyze` →
       `run_poshqc_test`) with recorded exit codes in `<FEATURE>/evidence/qa-gates/`.
-- [ ] `Remove-CoberturaExemptClosureCoverage` is invoked inside `ConvertTo-KoverageCoberturaXml` after the
+- [x] `Remove-CoberturaExemptClosureCoverage` is invoked inside `ConvertTo-KoverageCoberturaXml` after the
       `//class[@filename]` path-normalization loop and **before** `Merge-CoberturaClassesByFilename`, and a
       test drives a fixture end-to-end through `ConvertTo-KoverageCoberturaXml` to prove the pre-merge
       ordering (regression case 6).
-- [ ] The presence set admits `Type.<Member>d__<N>` state-machine class names as proof that a declaring member
+- [x] The presence set admits `Type.<Member>d__<N>` state-machine class names as proof that a declaring member
       exists, and a regression test proves that a covered lambda inside a **non-exempt async** member is
       retained (regression case 3).
-- [ ] All ten regression cases enumerated in the Test Strategy section are implemented as individually named,
+- [x] All ten regression cases enumerated in the Test Strategy section are implemented as individually named,
       passing Pester tests across
       `tests/scripts/vscode/Invoke-MSTestWithCoverage.ClosureFilter.Tests.ps1` and
       `tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1`.
-- [ ] The filter is a pure XML-to-XML transform: it reads no file, invokes no process, reads no clock, and
+- [x] The filter is a pure XML-to-XML transform: it reads no file, invokes no process, reads no clock, and
       makes no network call, and running it twice over the same document produces no further change.
-- [ ] An unrecognized compiler-generated name shape causes the affected class or method to be **retained**,
+- [x] An unrecognized compiler-generated name shape causes the affected class or method to be **retained**,
       not removed; no code path can remove coverage for a member the filter failed to resolve.
-- [ ] Production changes are limited to the new file
+- [x] Production changes are limited to the new file
       `scripts/vscode/Invoke-MSTestWithCoverage.ClosureFilter.ps1` and exactly two edits in
       `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` (a dot-source line and one call site); both files
       remain under 500 lines; no C# file, no `coverage.config`, no `*.runsettings`, no `CLAUDE.md` and nothing
       under `.claude/rules/` is modified.
-- [ ] The corrected per-file figure for `QuickFiler/Viewers/BreadcrumbPopupUiOperations.cs` is **measured**
+- [x] The corrected per-file figure for `QuickFiler/Viewers/BreadcrumbPopupUiOperations.cs` is **measured**
       from an actual post-fix, post-#441 run and recorded in evidence, and the record notes that the two
       covered lines contributed by `<>c__DisplayClass42_0` leave both the numerator and the denominator, so
       the corrected rate is not `covered / (valid - 22)`.
-- [ ] The three documented residuals are recorded in the feature's evidence and handed off as follow-up issue
+- [x] The three documented residuals are recorded in the feature's evidence and handed off as follow-up issue
       references rather than silently absorbed or widened into this feature: (a) lambda bodies inside
       `[ExcludeFromCodeCoverage]` **async** members remain counted; (b) local functions
       (`<Member>g__Local|N_M`) inside attributed members remain counted; (c) overload-name collisions cause
       under-exclusion, never over-exclusion.
-- [ ] The probe for the unverified question — whether the collector emits a `Type.<Member>d__<N>` class for an
+- [x] The probe for the unverified question — whether the collector emits a `Type.<Member>d__<N>` class for an
       attributed `async` member — is executed and its observed result recorded in
       `<FEATURE>/evidence/baseline/`; the residual description in this spec is corrected if the probe shows no
       `d__` class is emitted.

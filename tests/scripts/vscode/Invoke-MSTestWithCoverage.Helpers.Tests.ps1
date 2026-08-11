@@ -348,6 +348,28 @@ Describe 'ConvertTo-KoverageCoberturaXml' {
         ($hitsByLine -join ',') | Should -Be '12=0,13=0,56=1,57=1,58=1'
     }
 
+    It 'removes exempt closure lines before the filename merge collapses the closure class' {
+        # Regression case 6 for Issue #457: the ordering guard. The filter must run BEFORE
+        # Merge-CoberturaClassesByFilename; after the merge the surviving node is named for the
+        # declaring type, carries no '.<>c' marker, and no longer holds <Exempt>b__0, so a filter
+        # placed after the merge is a no-op and lines 406/409 survive in the merged rollup.
+        $inputXml = @'
+<coverage line-rate="0" branch-rate="0" lines-covered="0" lines-valid="0" branches-covered="0" branches-valid="0">
+  <packages><package name="Ns" line-rate="0" branch-rate="0" complexity="1"><classes>
+        <class name="Ns.T" filename="C:\repo\Ns\T.cs" line-rate="0" branch-rate="0" complexity="1"><methods><method name="Visible" signature="()" line-rate="0" branch-rate="0"><lines><line number="10" hits="1" branch="False" /><line number="11" hits="1" branch="False" /></lines></method></methods><lines><line number="10" hits="1" branch="False" /><line number="11" hits="1" branch="False" /></lines></class>
+        <class name="Ns.T.&lt;&gt;c__DisplayClass41_0" filename="C:\repo\Ns\T.cs" line-rate="0" branch-rate="0" complexity="1"><methods><method name="&lt;Exempt&gt;b__0" signature="()" line-rate="0" branch-rate="0"><lines><line number="406" hits="0" branch="False" /><line number="409" hits="0" branch="False" /></lines></method></methods><lines><line number="406" hits="0" branch="False" /><line number="409" hits="0" branch="False" /></lines></class>
+      </classes></package></packages>
+</coverage>
+'@
+
+        [xml]$resultXml = ConvertTo-KoverageCoberturaXml -XmlContent $inputXml -RepoRoot 'C:\repo' -PathSeparator '\' -ProjectNames @('Ns')
+        $merged = @($resultXml.SelectNodes('//class[@filename="Ns\T.cs"]'))
+
+        $merged.Count | Should -Be 1
+        ((@($merged[0].SelectNodes('./lines/line')) | ForEach-Object { $_.number }) -join ',') | Should -Be '10,11'
+        $resultXml.coverage.'lines-valid' | Should -Be '2'
+    }
+
     It 'still throws when the document has no packages node' {
         # Error handling: the existing guard must survive the arithmetic rewrite verbatim.
         [xml]$doc = @'
