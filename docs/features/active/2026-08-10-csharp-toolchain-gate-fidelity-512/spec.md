@@ -5,8 +5,8 @@
 - **Parent (optional):** epic `build-ci-coverage-gate-fidelity` (Lane A, Wave 0)
 - **Owner:** drmoisan
 - **Work Mode:** full-bug (this file is the authoritative acceptance-criteria source)
-- **Last Updated:** 2026-08-10T15-30
-- **Status:** Draft
+- **Last Updated:** 2026-08-11T01-05
+- **Status:** Complete — all 13 acceptance criteria delivered and verified; see `plan.2026-08-10T14-08.md` and `evidence/qa-gates/completion-attestation.2026-08-11T01-08.md`
 - **Version:** 1.0
 
 ## Context
@@ -798,45 +798,45 @@ These are mirrored verbatim from `issue.md` and are **not** renumbered. `issue.m
 of the numbering; this file is the check-off surface for the `full-bug` work mode. Recorded
 deviations are listed after the list and do not modify any criterion's text.
 
-- [ ] AC1 — Every site that documents the C# format command uses a command that executes successfully
+- [x] AC1 — Every site that documents the C# format command uses a command that executes successfully
       against the CSharpier version pinned in `dotnet-tools.json`, verified by running each documented
       form and recording `EXIT_CODE: 0`.
-- [ ] AC2 — Every site that documents the C# type-check command uses a command that performs a genuine
+- [x] AC2 — Every site that documents the C# type-check command uses a command that performs a genuine
       compilation, proven by a non-vacuous compile assertion (a `csc.exe` invocation count greater than
       zero in an MSBuild file log), not by exit code alone.
-- [ ] AC3 — The documented type-check command returns `EXIT_CODE: 0` against an unperturbed clean
+- [x] AC3 — The documented type-check command returns `EXIT_CODE: 0` against an unperturbed clean
       checkout of this branch. The gate is passable.
-- [ ] AC4 — **Negative-path proof (#512).** A deliberately introduced nullable violation in a
+- [x] AC4 — **Negative-path proof (#512).** A deliberately introduced nullable violation in a
       production file that carries a `#nullable enable` pragma causes the corrected type-check gate to
       return a non-zero exit code with the expected `CS86xx` diagnostic. The evidence artifact records
       the file, the exact perturbation, the command, the diagnostic, the exit code, and confirmation
       that the perturbation was reverted. This proof must be non-vacuous: the perturbed file's project
       must be one the corrected command genuinely recompiles.
-- [ ] AC5 — The documented format command, the documented analyzer command, and the documented
+- [x] AC5 — The documented format command, the documented analyzer command, and the documented
       type-check command are each consistent with the corresponding step in
       `.github/workflows/ci.yml`. Any deliberate difference between a documented command and CI's
       command is stated in-line with its rationale.
-- [ ] AC6 — The complete site inventory is reconciled. No site anywhere in the repository still
+- [x] AC6 — The complete site inventory is reconciled. No site anywhere in the repository still
       documents the CSharpier v0 bare-path form, and no site still documents a `/t:Build`-based
       nullable type-check command. Verified by a repository-wide grep recorded in the evidence
       artifact. Sites deliberately left unchanged are enumerated with rationale.
-- [ ] AC7 — A verification step exists that proves each documented command runs green against a clean
+- [x] AC7 — A verification step exists that proves each documented command runs green against a clean
       checkout, and it has been executed with its output recorded as evidence.
-- [ ] AC8 — No policy requirement is relaxed, weakened, or deleted. The diff contains no reduction of
+- [x] AC8 — No policy requirement is relaxed, weakened, or deleted. The diff contains no reduction of
       any threshold, no removal of any mandatory step, and no new suppression.
-- [ ] AC9 — `CLAUDE.md` § UT2, `.claude/rules/general-unit-test.md`, and
+- [x] AC9 — `CLAUDE.md` § UT2, `.claude/rules/general-unit-test.md`, and
       `.claude/rules/quality-tiers.md` are unmodified, verified by a zero-line diff against the merge
       base for those files and sections.
-- [ ] AC10 — Factually incorrect rationale prose adjacent to the corrected commands is either
+- [x] AC10 — Factually incorrect rationale prose adjacent to the corrected commands is either
       corrected or explicitly recorded as verified-correct. In particular the claim at `CLAUDE.md:188`
       that CSharpier "formats only `*.cs` without touching project files" is resolved against measured
       behavior and `.csharpierignore`.
-- [ ] AC11 — Baseline evidence under `evidence/baseline/` and final-QC evidence under
+- [x] AC11 — Baseline evidence under `evidence/baseline/` and final-QC evidence under
       `evidence/qa-gates/` exist for every command step, each recording `Timestamp:`, `Command:`,
       `EXIT_CODE:` and `Output Summary:`.
-- [ ] AC12 — The nullable diagnostics exposed by the corrected gate are recorded as a measured figure
+- [x] AC12 — The nullable diagnostics exposed by the corrected gate are recorded as a measured figure
       with per-project attribution for the follow-on burn-down epic. They are **not** fixed here.
-- [ ] AC13 — The documented analyzer step's vacuity is resolved by an explicit, recorded decision in
+- [x] AC13 — The documented analyzer step's vacuity is resolved by an explicit, recorded decision in
       `spec.md`: either the analyzer command is corrected alongside the type-check command, or it is
       deliberately left unchanged with the asymmetry explained in-line at the documentation site and a
       follow-up issue filed. Silent inaction does not satisfy this criterion.
