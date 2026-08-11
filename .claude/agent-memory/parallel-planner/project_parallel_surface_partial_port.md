@@ -1,40 +1,53 @@
 ---
 name: parallel-surface-partial-port
-description: The parallel orchestration surface is only partially ported into TaskMaster from drm-copilot; cohort computation never landed in either repo, so parallel-plan cannot reach a ready checkpoint
+description: The parallel surface is now structurally present in TaskMaster (PR #544) but config/blast-radius.json was pushed down verbatim and is unfit for the C#/VSTO layout, so parallel-plan yields zero parallelism
 metadata:
   type: project
 ---
 
-As of 2026-08-10 the `parallel` orchestration surface in TaskMaster is an **incomplete port** from
-the upstream [[drm-copilot-is-claude-governance-upstream]] repo. Verify current state before
-relying on this — the gaps are expected to close as the port continues.
+Status as of 2026-08-11. Supersedes the 2026-08-10 assessment, which was wrong on one hard blocker.
+Verify against the repo before relying on this.
 
-**Present in TaskMaster:** `.claude/lib/blast-radius/*.psm1` (PowerShell port, includes
-`Test-BlastRadiusConflict`), `.claude/hooks/enforce-parallel-*.ps1`, the six `.claude/skills/parallel-*`
-skills, both `.claude/agents/parallel-*.md`, and settings.json hook wiring. The MCP validators
-`parallel-planner-state` and `parallel-kickoff` dispatch correctly (verified by probe).
+**Structurally present now.** PR #544 ("(chore): push down claude parallel orchestrator", merged to
+`main` as `2073f717`) landed the governance payload from [[drm-copilot-is-claude-governance-upstream]]:
+`.claude/rules/parallel-orchestration.md`, `config/blast-radius.json`, `route_id: parallel` in
+`config/orchestration-routing.json`, and `.claude/lib/bash/compute-cohorts.sh` +
+`parallel-cohorts.sh`. Already present before that: `.claude/lib/blast-radius/*.psm1`,
+`.claude/hooks/enforce-parallel-*.ps1`, the six `parallel-*` skills, both `parallel-*` agents. MCP
+`parallel-planner-state` and `parallel-kickoff` dispatch correctly.
 
-**Missing in TaskMaster:** `config/blast-radius.json`, `.claude/rules/parallel-orchestration.md`,
-and `route_id: parallel` in `config/orchestration-routing.json` (routes are only small, large,
-remediation, preparation, epic).
+**Cohort computation is NOT missing — the earlier verdict was a false negative.** `compute_cohorts`
+exists upstream at `scripts/dev_tools/parallel_cohort_computation.py` (commit `663d71ee`, issue #445)
+with `compute_concurrency_batches`, and TaskMaster now has the bash entry point
+`.claude/lib/bash/compute-cohorts.sh` (no Python or Poetry required; emits compact JSON identical to
+the Python authority). The 2026-08-10 "absent from both repos" finding came from
+`git grep -in "compute_cohorts|welsh"` **without `-E`** — git grep defaults to basic regex, so the
+`|` was matched literally and the search could never hit. Always pass `-E` when using alternation.
 
-**Missing in BOTH repos:** the cohort-computation library (`compute_cohorts` / Welsh-Powell
-coloring). `git grep -in "compute_cohorts|welsh"` returns nothing tracked in drm-copilot. The
-`feature/parallel-cohort-scheduler-445` branch and its feature folder exist, but no code landed;
-the parallel epic merged F7/F8 (hooks, drift, schemas, validators) without it.
+**The real remaining blocker: `config/blast-radius.json` is unfit for this repo.** It was pushed
+down verbatim and describes the governance payload's own layout, not TaskMaster's. It lists modules
+`.claude/**`, `config/**`, `docs/**`, `tests/**` and shared surfaces `.claude/settings.json`,
+`config/orchestration-routing.json`, `config/blast-radius.json`. Verified consequences (probed
+directly through `Get-BlastRadius` / `Test-BlastRadiusConflict`):
 
-**Why:** the parallel surface was built in drm-copilot and is being distributed into consumer repos
-like TaskMaster; the port is mid-flight and F2 (cohort scheduler) was never implemented upstream.
+1. **Zero parallelism.** `Get-BlastRadius` always appends the feature-folder glob
+   `docs/features/active/<name>/**`, and module `docs` maps to `docs/**`, so *every* item carries
+   module `docs` and every pair conflicts with reason `module_overlap`. The conflict graph is a
+   complete graph, Welsh-Powell yields one cohort per item, and an N-item run is fully serial.
+2. **Fail-open on real collisions.** TaskMaster's actual root shared surfaces (`TaskMaster.sln`,
+   `Directory.Build.targets`, `.editorconfig`, `coverage.config`, `.github/workflows/**`) are not in
+   `shared_surfaces`. Per the F1a rule, a separator-free root token is admitted only as an exact
+   member of that list, so a plan editing `coverage.config` or `Directory.Build.targets` produces a
+   radius that does not mention them at all. Two items editing the same build config are reported
+   non-conflicting once the `docs` edge above is removed.
+3. **C# projects attribute to no module.** None of the 9 production or 9 test project directories
+   (`QuickFiler/`, `UtilitiesCS/`, `ToDoModel/`, ...) appear in `modules`; `tests/` in TaskMaster
+   holds only `scripts/` (PowerShell), not the C# test projects.
 
-**How to apply:** `/parallel-plan` cannot produce a valid ready checkpoint in TaskMaster. Cohort
-seeding and the P5 recomputation-parity check both require the absent library, and self-implementing
-the coloring would make the parity check compare an implementation against itself. Halt and report
-rather than fanning out preparation delegations. Note also that the skill's
-`poetry run python -c "from scripts.dev_tools..."` invocation form does not apply here: TaskMaster has
-no `scripts/dev_tools/`, no `pyproject.toml`, and no `poetry.lock` — the port is PowerShell.
-
-Also note drm-copilot's `config/blast-radius.json` is **not** reusable in TaskMaster: its modules
-(`scripts/dev_tools`, `packages/mcp-server`, `extensions/drm-copilot`) and shared surfaces
-(`poetry.lock`, `package-lock.json`) describe drm-copilot's own layout, not a C#/VSTO repo. Copying
-it would under-report contention, the opposite of the fail-closed direction the F1a corrections
-(issue #452 / PR #453) established.
+**How to apply:** treat `/parallel-plan` as unable to produce a *useful* run until
+`config/blast-radius.json` is authored for TaskMaster (enumerate the real `.csproj` module set and
+the real root shared surfaces, and keep the feature-folder glob from collapsing the graph). Fixing it
+is a design decision about which surfaces are shared in a C#/VSTO repo, so promote it as an issue
+rather than editing the just-merged config inside a planner run. Separately, the parallel schema
+prohibits `depends_on` and `wave`, so any requirement of the form "these items must land in a given
+order" belongs to `/epic-plan`, not to this surface — see [[parallel-surface-cannot-express-ordering]].
