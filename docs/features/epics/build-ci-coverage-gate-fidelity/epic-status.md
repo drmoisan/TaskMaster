@@ -8,7 +8,7 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 - Integration branch: `epic/build-ci-coverage-gate-fidelity-integration`
 - Manifest: `docs/features/epics/build-ci-coverage-gate-fidelity/epic.md`
 - Current wave: 0
-- Last updated: 2026-08-11T02-28
+- Last updated: 2026-08-11T03-35
 
 ## Features
 
@@ -16,7 +16,7 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 2026-08-10-cobertura-coverage-arithmetic-441 | 441 | 0 | worktree_created | — | — | 2026-08-11T02-28 | — | — | — |
 | 2026-08-10-csharp-toolchain-gate-fidelity-512 | 512 | 0 | worktree_created | — | — | 2026-08-11T02-28 | — | — | — |
-| 2026-08-10-utilitiescs-test-cs2002-duplicate-compile-entry-394 | 394 | 0 | worktree_created | — | — | 2026-08-11T02-28 | — | — | — |
+| 2026-08-10-utilitiescs-test-cs2002-duplicate-compile-entry-394 | 394 | 0 | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/533 | c1fe3565a8677184831a4e33917852cd02f8d521 | 2026-08-11T02-28 | 2026-08-11T03-20 | 2026-08-11T03-32 | 2026-08-11T03-35 |
 | 2026-08-10-excludefromcodecoverage-nested-lambdas-457 | 457 | 1 | not_started | — | — | — | — | — | — |
 | 2026-08-10-coverage-threshold-policy-reconciliation-494 | 494 | 2 | not_started | — | — | — | — | — | — |
 
@@ -38,6 +38,15 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 | ci_gate | — |
 | merge_commit_sha | — |
 | merged_at | — |
+
+## Verification Note — CI Coverage of Child PRs
+
+`.github/workflows/ci.yml` triggers `pull_request` only on `[main, development]`. A child PR whose
+base is `epic/build-ci-coverage-gate-fidelity-integration` is therefore ineligible for every
+workflow and receives an empty `statusCheckRollup`. Child merge-on-green degrades to local
+CI-equivalent verification recorded as feature evidence. The integrated tree is gated separately by
+a `workflow_dispatch` CI run against the integration branch at each wave boundary, and the final
+integration-to-`main` PR receives full CI because it is `main`-based.
 
 ## Issues Closed
 
