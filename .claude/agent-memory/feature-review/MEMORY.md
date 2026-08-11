@@ -54,3 +54,4 @@
 - [null-conditional fix relocates NRE, check callers](project_null-conditional-fix-relocates-nre-check-callers.md) — #507: grep every call site before crediting a throw->null fix with resolving the reachable crash
 - [coverage hook needs label+coverage+PASS/FAIL on one line](project_coverage-hook-label-plus-verdict-same-line-507.md) — #507: Test-LanguageCoverageRow needs label, coverage keyword, and PASS/FAIL on the SAME line; dot-source and simulate before finalizing
 - [505 coordinator prime/toggle race (CR-1)](project_505-coordinator-prime-toggle-race.md) — EngineToggleStateCoordinator lazy prime can overwrite a fresher toggle write; Major non-blocking, TryAdd fix recommended — check in later ribbon reviews
+- [457 review residuals](project_457-review-residuals.md) — PASS/0 blocking; CR-1 rollup-rebuild drift vs merge path; AC15 potential_to_issue owed at epic close; post-457 baseline 0.855355/0.790134
