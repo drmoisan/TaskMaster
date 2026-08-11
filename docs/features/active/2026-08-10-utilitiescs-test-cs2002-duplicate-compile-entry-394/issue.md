@@ -104,16 +104,16 @@ entries within the single large `<ItemGroup>` each carry the same file.
 The authoritative acceptance-criteria source for this `full-bug` feature is `spec.md`. The list
 below mirrors it for convenience and must be kept consistent with it.
 
-- [ ] Exactly one `<Compile Include>` item for `OutlookObjects\Folder\PercentageFormatterTests.cs`
+- [x] Exactly one `<Compile Include>` item for `OutlookObjects\Folder\PercentageFormatterTests.cs`
       remains in `UtilitiesCS.Test/UtilitiesCS.Test.csproj`.
-- [ ] A pre-change build of `UtilitiesCS.Test.csproj` captures the CS2002 warning for that file
+- [x] A pre-change build of `UtilitiesCS.Test.csproj` captures the CS2002 warning for that file
       as fail-before evidence.
-- [ ] A post-change build of `UtilitiesCS.Test.csproj` emits no CS2002 for that file.
-- [ ] `PercentageFormatterTests` still runs with an unchanged test count, verified via vstest,
+- [x] A post-change build of `UtilitiesCS.Test.csproj` emits no CS2002 for that file.
+- [x] `PercentageFormatterTests` still runs with an unchanged test count, verified via vstest,
       with the before and after counts recorded numerically.
-- [ ] The rest of `UtilitiesCS.Test.csproj` is swept for other duplicate `<Compile Include>`
+- [x] The rest of `UtilitiesCS.Test.csproj` is swept for other duplicate `<Compile Include>`
       entries; findings are reported and any found are fixed in the same change.
-- [ ] The diff touches only `UtilitiesCS.Test/UtilitiesCS.Test.csproj` (plus feature-folder
+- [x] The diff touches only `UtilitiesCS.Test/UtilitiesCS.Test.csproj` (plus feature-folder
       documentation and evidence), with no reformatting or reordering.
 </content>
 </invoke>

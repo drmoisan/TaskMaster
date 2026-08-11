@@ -160,13 +160,13 @@
 | `Compile` | 452 | 1 — `OutlookObjects\Folder\PercentageFormatterTests.cs` (lines 304, 356) — the defect this feature fixes |
 | `EmbeddedResource` | 1 | none |
 | `None` | 7 (across three `<ItemGroup>`s) | none |
-| `Reference` | ~114 | none (every `Include` assembly-name token is distinct) |
+| `Reference` | 126 | none (every `Include` assembly-name token is distinct) |
 | `ProjectReference` | 2 | none |
 | `BootstrapperPackage` | 2 | none |
-| `Analyzer` | 9 | none |
+| `Analyzer` | 11 | none |
 | `AdditionalFiles` | 1 | none |
 | `PackageReference` | 0 | not applicable — legacy `packages.config`-style project, `PackageReference` is not used |
-| `packages.config` `<package>` | ~99 | none |
+| `packages.config` `<package>` | 105 | none |
 
 One non-duplicate-`Include` anomaly was found and is recorded as out of scope above: the
 `System.Linq` `Reference` item (lines 842-846) contains a duplicated `<Private>True</Private>`
@@ -314,36 +314,36 @@ from 452 total items has no observable effect on build time within normal varian
   file.
 
 ## Acceptance Criteria
-- [ ] Exactly one `<Compile Include="OutlookObjects\Folder\PercentageFormatterTests.cs" />` item
+- [x] Exactly one `<Compile Include="OutlookObjects\Folder\PercentageFormatterTests.cs" />` item
       remains in `UtilitiesCS.Test/UtilitiesCS.Test.csproj` after the change (the item previously at
       line 356 is removed; the item previously at line 304 is retained unchanged).
-- [ ] Fail-before evidence captures the CS2002 warning for `PercentageFormatterTests.cs`, using a
+- [x] Fail-before evidence captures the CS2002 warning for `PercentageFormatterTests.cs`, using a
       `/t:Rebuild` command (`msbuild UtilitiesCS.Test\UtilitiesCS.Test.csproj /t:Rebuild /p:Configuration=Debug /p:Platform=AnyCPU`
       or the equivalent solution-level `/t:Rebuild` command). An artifact captured from a `/t:Build`
       invocation does not satisfy this criterion, because `/t:Build` can skip `CoreCompile` on an
       already-built tree and silently omit CS2002 for reasons unrelated to the fix. Evidence is
       recorded under `docs/features/active/2026-08-10-utilitiescs-test-cs2002-duplicate-compile-entry-394/evidence/baseline/`.
-- [ ] Post-change build of the same project, using the same `/t:Rebuild` command, emits no CS2002
+- [x] Post-change build of the same project, using the same `/t:Rebuild` command, emits no CS2002
       for `PercentageFormatterTests.cs`. Evidence is recorded under
       `docs/features/active/2026-08-10-utilitiescs-test-cs2002-duplicate-compile-entry-394/evidence/qa-gates/`.
-- [ ] `PercentageFormatterTests` test count is unchanged at 7, verified via vstest
+- [x] `PercentageFormatterTests` test count is unchanged at 7, verified via vstest
       (`/TestCaseFilter:"FullyQualifiedName~PercentageFormatterTests"`), with the before and after
       counts recorded numerically in
       `docs/features/active/2026-08-10-utilitiescs-test-cs2002-duplicate-compile-entry-394/evidence/regression-testing/`.
-- [ ] The duplicate sweep across every item type in `UtilitiesCS.Test.csproj` (Compile,
+- [x] The duplicate sweep across every item type in `UtilitiesCS.Test.csproj` (Compile,
       EmbeddedResource, None, Reference, ProjectReference, BootstrapperPackage, Analyzer,
       AdditionalFiles, packages.config) is recorded, with findings reported. Beyond the one
       `Compile` duplicate this feature fixes, no other duplicate `Include` value exists; the
       unrelated `System.Linq` duplicated-`<Private>` anomaly is reported but explicitly not fixed
       (see Scope & Non-Goals).
-- [ ] The diff touches only `UtilitiesCS.Test/UtilitiesCS.Test.csproj` (a single-line deletion) plus
+- [x] The diff touches only `UtilitiesCS.Test/UtilitiesCS.Test.csproj` (a single-line deletion) plus
       this feature folder's own documentation and evidence files, with no reformatting, reordering,
       or line-ending change anywhere in the `.csproj`.
-- [ ] Full toolchain pass completed for the applicable stages: CSharpier formatting and
+- [x] Full toolchain pass completed for the applicable stages: CSharpier formatting and
       analyzer/nullable-flow checks are not applicable to a `.csproj`-only change (documented above
       as "Not applicable"); the applicable stage is the build/test verification in Test Strategy
       steps 2-5, all of which pass.
-- [ ] Docs/config references updated to match the new behavior: this `spec.md` and the mirrored
+- [x] Docs/config references updated to match the new behavior: this `spec.md` and the mirrored
       acceptance-criteria list in `issue.md` are consistent with each other and with the delivered
       change.
 
