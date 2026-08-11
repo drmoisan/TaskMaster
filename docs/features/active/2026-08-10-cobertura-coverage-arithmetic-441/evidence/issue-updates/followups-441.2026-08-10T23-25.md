@@ -201,9 +201,69 @@ prohibited.
 
 ## Entry summary (exactly four entries, one per candidate)
 
+Superseded by the RESOLUTION section below. Retained as the record of the executing session's state.
+
 | # | Candidate | Issue number | URL | Status |
 | --- | --- | --- | --- | --- |
-| 1 | Package-level rates never recomputed | — | — | **POSTING BLOCKED** |
-| 2 | Merged class retains only the primary `<methods>` | — | — | **POSTING BLOCKED** |
-| 3 | `Invoke-MSTestWithCoverage.ps1` lacks a `\.claude\` discovery exclusion | — | — | **POSTING BLOCKED** |
-| 4 | Agent memory records an incorrect generalization | — | — | **POSTING BLOCKED** |
+| 1 | Package-level rates never recomputed | — | — | **POSTING BLOCKED** (superseded) |
+| 2 | Merged class retains only the primary `<methods>` | — | — | **POSTING BLOCKED** (superseded) |
+| 3 | `Invoke-MSTestWithCoverage.ps1` lacks a `\.claude\` discovery exclusion | — | — | **POSTING BLOCKED** (superseded) |
+| 4 | Agent memory records an incorrect generalization | — | — | **POSTING BLOCKED** (superseded) |
+
+---
+
+# RESOLUTION — filed by the orchestrator
+
+Timestamp: 2026-08-10T23-50
+
+PostedAs: body
+
+Command:
+
+```
+mcp__drm-copilot__new_potential_bug_entry  (candidates 1-4)
+mcp__drm-copilot__potential_to_issue       (candidates 1-4, promotion_type=bug, work_mode=minor-audit)
+```
+
+EXIT_CODE: 0
+
+Output Summary:
+
+```
+All four candidates filed through the MCP promotion lifecycle. The promotion tools were unavailable
+to the executing atomic-executor session but ARE exposed to the orchestrator session, so the
+POSTING BLOCKED branch above was resolved rather than deferred. Four issues created: #529, #530,
+#531, #532. Each potential entry was authored from the prepared body verbatim, then promoted; the
+promotion tool moved each entry to docs/features/potential/promoted/ and created the GitHub issue.
+No active feature folder was created for any of the four: they are follow-ups, not work started now.
+```
+
+## Resolved entry summary (exactly four entries, one per candidate)
+
+| # | Candidate | Issue number | URL | Status |
+| --- | --- | --- | --- | --- |
+| 1 | Package-level `line-rate` / `branch-rate` never recomputed after filtering and merging | **529** | https://github.com/drmoisan/TaskMaster/issues/529 | **FILED** |
+| 2 | Merged Cobertura class retains only the primary class's `<methods>` | **530** | https://github.com/drmoisan/TaskMaster/issues/530 | **FILED** |
+| 3 | `Invoke-MSTestWithCoverage.ps1` discovery lacks a `\.claude\` exclusion | **531** | https://github.com/drmoisan/TaskMaster/issues/531 | **FILED** |
+| 4 | Agent memory records an incorrect Cobertura dedup generalization | **532** | https://github.com/drmoisan/TaskMaster/issues/532 | **FILED** |
+
+## Promoted potential-entry provenance
+
+| # | Promoted potential entry |
+| --- | --- |
+| 1 | `docs/features/potential/promoted/2026-08-10-cobertura-package-rates-not-recomputed.md` |
+| 2 | `docs/features/potential/promoted/2026-08-10-cobertura-merged-class-methods-incomplete.md` |
+| 3 | `docs/features/potential/promoted/2026-08-10-mstest-coverage-discovery-claude-worktree-exclusion.md` |
+| 4 | `docs/features/potential/promoted/2026-08-10-agent-memory-cobertura-dedup-generalization-wrong.md` |
+
+## None of the four is fixed in this change
+
+Re-verified after filing, per P6-T6: the diff touches exactly two source files
+(`scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1`,
+`tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1`), and
+`git diff --name-only edf3d34c -- scripts/vscode/Invoke-MSTestWithCoverage.ps1 scripts/temp-extract-coverage.ps1`
+returns empty. Candidate 4's target file
+(`.claude/agent-memory/atomic-executor/project_coverage_delta_reproduce_baseline_counting_method.md`)
+is likewise unmodified by the fix commit.
+
+AC-20 is therefore satisfied and is checked off in `spec.md`.

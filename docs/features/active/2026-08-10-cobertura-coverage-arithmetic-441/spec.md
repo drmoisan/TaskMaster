@@ -713,6 +713,6 @@ and must be filed through the MCP promotion lifecycle rather than left as prose:
   `\.claude\` discovery exclusion.
 - [x] **AC-19 (file ceiling).** `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` remains under
   500 lines (357 before the change).
-- [ ] **AC-20 (follow-ups filed).** The four follow-up candidates in § Rollout & Follow-up are filed
+- [x] **AC-20 (follow-ups filed).** The four follow-up candidates in § Rollout & Follow-up are filed
   as GitHub issues through the promotion lifecycle, with their issue numbers recorded in this
   feature's evidence, and none of them is fixed in this change.
