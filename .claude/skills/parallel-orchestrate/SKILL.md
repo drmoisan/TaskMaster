@@ -54,7 +54,8 @@ only run-level artifacts under `docs/features/parallel/<slug>/`.
 nine parallel enums are defined once as prose invariants in
 `.claude/rules/parallel-orchestration.md` (manifest invariants M1 through M7) and are enforced by
 the F3-owned validators `scripts/dev_tools/parallel_manifest_contract.py` and
-`scripts/dev_tools/validate_parallel_orchestrator_state.py`. This is a deliberate delta from
+`scripts/dev_tools/validate_parallel_orchestrator_state.py`, with the manifest half reachable on the
+destination-runtime path as `bash .claude/lib/bash/validate-parallel-manifest.sh`. This is a deliberate delta from
 `.claude/skills/epic-orchestrate/SKILL.md`, whose manifest section carries its schema inline. Read
 the schema from the rule file and the validators; consume it here and never redefine or extend it.
 
@@ -72,13 +73,17 @@ Consumption rules:
   Presence of either is an explicit rejection, not a tolerated extra field.
 - A malformed manifest is rejected before any kickoff, recorded as a synthetic Blocking finding in
   the checkpoint. Do not guess a repair, do not silently skip the offending item, and do not launch
-  a partial cohort. Validate by calling `validate_parallel_manifest_text` from
-  `scripts/dev_tools/parallel_manifest_contract.py`, which is a library call and deliberately not
-  an MCP artifact type. That module exposes no CLI entry point, so the permitted mechanism for the
-  call is the granted interpreter invocation
-  `poetry run python -c "import pathlib, sys; from scripts.dev_tools.parallel_manifest_contract import validate_parallel_manifest_text; errors = validate_parallel_manifest_text(pathlib.Path(sys.argv[1]).read_text(encoding='utf-8')); print(errors); sys.exit(1 if errors else 0)" docs/features/parallel/<slug>/parallel.md`,
-  whose non-zero exit is the rejection signal and whose printed error list is the content of the
-  Blocking finding.
+  a partial cohort. Validate with the destination-runtime bash entry point, which needs no Python
+  interpreter and is published by push-down alongside `.claude`:
+  `bash .claude/lib/bash/validate-parallel-manifest.sh docs/features/parallel/<slug>/parallel.md`.
+  Its non-zero exit is the rejection signal and its printed error list, one error per line on
+  stdout, is the content of the Blocking finding; exit 1 means the manifest is invalid and exit 2
+  means the file is unreadable or uses a YAML construct outside the supported subset. Consume
+  `mode` and `max_concurrency` through the same entry point's `--print-mode` and
+  `--print-max-concurrency` subcommands rather than reading the frontmatter directly.
+  `validate_parallel_manifest_text` in `scripts/dev_tools/parallel_manifest_contract.py` remains the
+  repository authority and the parity reference. Manifest validation is deliberately not an MCP
+  artifact type.
 
 ## Cohort Consumption and Ordering
 
@@ -122,10 +127,13 @@ items independently of cohort size: a cohort of twelve items executes at most `m
 items at a time. Fill slots in ascending item-key order, keyed on `issue_num`, and refill each
 freed slot with the next unstarted item of the current cohort in that same ascending item-key
 order. A cohort larger than `max_concurrency` therefore launches in several batches from the same
-recorded `main` tip. The batching is a pure function:
+recorded `main` tip. The batching is a pure function, reached on the destination-runtime path as
+`bash .claude/lib/bash/compute-concurrency-batches.sh --keys "<k1> <k2> ..." --max-concurrency <n>`.
+It prints a compact JSON array of arrays, returns the batches in order, and sorts the keys itself,
+so determinism does not depend on caller ordering.
 `compute_concurrency_batches(cohort_item_keys, max_concurrency)` in
-`scripts/dev_tools/parallel_cohort_computation.py` returns the batches in order and sorts the keys
-itself, so determinism does not depend on caller ordering.
+`scripts/dev_tools/parallel_cohort_computation.py` remains the repository authority and the parity
+reference.
 
 **Mechanical enforcement of the barrier is F7 scope, not this feature's.** F7 delivers a two-layer
 design, because no single `PreToolUse` hook can validate a batch of concurrent `Agent` calls: hooks
@@ -484,8 +492,11 @@ carries exactly ONE current-generation entry per index, so returned keys landing
 `current_cohort` JOIN the pinned members of that one entry instead of forming a second entry with
 the same index, which F3 invariant 13 rejects.
 
-Coloring is delegated in full to the Welsh-Powell entry point `compute_cohorts` in
-`scripts/dev_tools/parallel_cohort_computation.py`. No part of the coloring, the vertex ordering, or
+Coloring is delegated in full to the Welsh-Powell entry point
+`bash .claude/lib/bash/compute-cohorts.sh --keys "<k1> ..." --edges "<a>:<b> ..."`, the
+destination-runtime port of `compute_cohorts` in
+`scripts/dev_tools/parallel_cohort_computation.py`, which remains the repository authority and the
+parity reference. No part of the coloring, the vertex ordering, or
 the tie-break is reimplemented by the mutation engine, and the offset is applied entirely inside the
 mutation engine's own recolor function.
 

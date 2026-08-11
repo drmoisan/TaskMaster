@@ -56,11 +56,15 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    advances `proposed` -> `admitted` -> `prepared` during this step, recorded as item-state updates in
    `items[]` with the checkpoint's lifecycle timestamps.
 
-3. **Compute conflict edges over ALL items, including in-flight ones.** Invoke the landed
-   contention relation `conflicts(a, b, config)` from `scripts/dev_tools/compute_blast_radius.py`
-   (defined in `scripts/dev_tools/_blast_radius_conflicts.py`). `a` and `b` are the two items'
-   `BlastRadius` value objects, not strings, and `config` is the required parsed
-   `config/blast-radius.json` mapping. Map each conflicting pair onto an `(int, int)` conflict edge
+3. **Compute conflict edges over ALL items, including in-flight ones.** Invoke the contention
+   relation `Test-BlastRadiusConflict` from the destination-runtime PowerShell port
+   `.claude/lib/blast-radius/BlastRadius.psm1`, which is published by push-down and needs no Python
+   interpreter (`Import-Module .claude/lib/blast-radius/BlastRadius.psm1 -Force`). Its two radius
+   arguments are the two items' radius hashtables, not strings, and the third argument is the
+   required parsed `config/blast-radius.json` mapping, which push-down publishes into the
+   destination workspace. `conflicts(a, b, config)` in `scripts/dev_tools/compute_blast_radius.py`
+   (defined in `scripts/dev_tools/_blast_radius_conflicts.py`) remains the repository authority and
+   the parity reference. Map each conflicting pair onto an `(int, int)` conflict edge
    of `items[].issue_num` values, normalized so `a < b`. Do not reimplement the relation and do not
    compute edges over the unstarted subset only: an in-flight conflict is precisely what the
    admission decision turns on.
