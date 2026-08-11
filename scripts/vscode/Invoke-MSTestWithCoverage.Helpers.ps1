@@ -1,4 +1,5 @@
 Set-StrictMode -Version Latest
+. (Join-Path $PSScriptRoot 'Invoke-MSTestWithCoverage.ClosureFilter.ps1')
 
 function Get-KoverageProjectAllowlist {
     [CmdletBinding()]
@@ -423,6 +424,7 @@ function ConvertTo-KoverageCoberturaXml {
         $classNode.filename = ConvertTo-KoverageRelativePath -Path $classNode.filename -RepoRoot $RepoRoot -PathSeparator $PathSeparator
     }
 
+    Remove-CoberturaExemptClosureCoverage -XmlDocument $xml
     Merge-CoberturaClassesByFilename -XmlDocument $xml
 
     if (-not $xml.SelectSingleNode('//sources')) {
