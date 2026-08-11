@@ -142,15 +142,27 @@ Three residual risks are recorded rather than eliminated:
 
 ## Radius Computation and Validation
 
-The blast-radius feature landed as an **import-only Python library with no CLI entry point**,
-matching the `scripts/dev_tools/epic_wave_computation.py` precedent. Reach it through the
-`"Bash(poetry run *)"` allowlist entry as an importable-library call:
+Reach blast-radius derivation, validation, and contention through the **destination-runtime
+PowerShell port** under `.claude/lib/blast-radius/`, which is published by push-down and needs no
+Python interpreter:
 
-```bash
-poetry run python -c "from scripts.dev_tools.compute_blast_radius import derive_blast_radius"
+```powershell
+Import-Module .claude/lib/blast-radius/BlastRadius.psm1 -Force
 ```
 
-Landed contract, consumed as-is and never reimplemented here:
+The facade re-exports the five functions this skill needs: `Get-PlanPaths` (port of
+`extract_plan_paths`), `Get-BlastRadius` (port of `derive_blast_radius`),
+`Get-BlastRadiusFromObservedPaths` (port of `radius_from_observed_paths`), `Test-BlastRadius`
+(port of `validate_blast_radius`), and `Test-BlastRadiusConflict` (port of `conflicts`). Wrap a
+call to `Test-BlastRadius` in `@(...)`: it writes its findings to the pipeline, so a zero-element
+result writes nothing and a one-element result writes a single object.
+
+The truth table the port reads is `config/blast-radius.json`, which push-down publishes into the
+destination workspace alongside `.claude`.
+
+The Python modules named below remain the repository authority and the parity reference; they are
+cited for their contract, not invoked on the destination-runtime path. Landed contract, consumed
+as-is and never reimplemented here:
 
 - **Derivation.**
   `derive_blast_radius(plan_text, spec_text, feature_folder, config, *, source, computed_at) -> BlastRadius`
@@ -201,19 +213,26 @@ them; it defines none of them.
 
 ## Cohort Seeding
 
-The cohort-scheduler feature likewise landed as an **import-only Python library with no CLI entry
-point**, invoked through the same `"Bash(poetry run *)"` allowlist entry:
+Reach cohort computation through the **destination-runtime bash entry point** under
+`.claude/lib/bash/`, which is published by push-down and needs no Python interpreter:
 
 ```bash
-poetry run python -c "from scripts.dev_tools.parallel_cohort_computation import compute_cohorts"
+bash .claude/lib/bash/compute-cohorts.sh --keys "<k1> <k2> ..." --edges "<a>:<b> <a>:<b> ..."
 ```
 
-Landed contract:
+`--edges` is optional; omitting it, or passing an empty string, means the conflict graph has no
+edges. The entry point prints a compact JSON array of arrays on stdout, identical to Python
+`json.dumps(..., separators=(",", ":"))`. On malformed input it prints the reference
+implementation's exact message on stderr and exits 1; a token outside the accepted integer lexis
+`-?(0|[1-9][0-9]*)` is rejected fail-closed with exit 2.
+
+Landed contract, mirrored byte for byte by the bash entry point:
 
 - `compute_cohorts(item_keys, conflict_edges) -> list[list[int]]` in
-  `scripts/dev_tools/parallel_cohort_computation.py`. The signature accepts exactly two parameters,
-  `item_keys: Iterable[int]` and `conflict_edges: Iterable[tuple[int, int]]`. There is no third
-  parameter and nothing further to supply at seeding time.
+  `scripts/dev_tools/parallel_cohort_computation.py` is the repository authority and the parity
+  reference. The signature accepts exactly two parameters, `item_keys: Iterable[int]` and
+  `conflict_edges: Iterable[tuple[int, int]]`. There is no third parameter and nothing further to
+  supply at seeding time.
 - The return value is a plain list of lists in deterministic Welsh-Powell order: vertices are
   visited by the composite key `(-degree, item_key)` ascending — descending distinct-neighbour
   degree with ties broken by ascending item key — and each vertex takes the lowest cohort index not
@@ -227,17 +246,19 @@ The library returns the partition; the planner supplies the record fields.
 
 ### Seeding procedure
 
-1. Invoke `compute_cohorts` exactly once per plan run, over the full conflict graph, after every
+1. Invoke `compute-cohorts.sh` exactly once per plan run, over the full conflict graph, after every
    item is `prepared` and radius-validated. Derive the conflict edge set by applying
-   `conflicts(a, b, config)` to every unordered pair of `declared` radii.
+   `Test-BlastRadiusConflict` to every unordered pair of `declared` radii, then pass the pairs as
+   `--edges "<a>:<b> ..."` and the item keys as `--keys "<k1> <k2> ..."`.
 2. Record `cohorts[]` at `generation: 0`, each cohort's `item_keys[]` sorted ascending.
 3. Record `conflict_edges[]` as `{a, b, reason}` entries for auditability.
 4. Record `recolor_generation: 0` and `current_cohort: 0`.
 5. Record `max_concurrency` — default 4, bounded 1 through 8 by the F3 schema — without enforcing
    it. Enforcement is F5's, through
-   `compute_concurrency_batches(cohort_item_keys, max_concurrency)`, which fills slots in ascending
-   item-key order. Recoloring under add, remove, or drift mutation is F6 and F8 scope. This skill
-   performs seeding only.
+   `bash .claude/lib/bash/compute-concurrency-batches.sh --keys "<k1> ..." --max-concurrency <n>`
+   (the bash port of `compute_concurrency_batches(cohort_item_keys, max_concurrency)`), which fills
+   slots in ascending item-key order. Recoloring under add, remove, or drift mutation is F6 and F8
+   scope. This skill performs seeding only.
 
 ### Recomputation parity (planner-owned check)
 
@@ -276,9 +297,29 @@ field; both are prohibited-key rejections in the schema. Commit it to `parallel/
 fully resolved form — every negative placeholder `issue_num` replaced by its promoted number —
 before the kickoff artifact is written.
 
-Manifest validation is a library call to `scripts/dev_tools/parallel_manifest_contract.py`
-(`validate_parallel_manifest_text`, with the default-resolving accessors `manifest_mode` and
-`manifest_max_concurrency`). It is deliberately not an MCP `artifact_type`; do not attempt to
+Validate the manifest with the **destination-runtime bash entry point**, which is published by
+push-down and needs no Python interpreter:
+
+```bash
+bash .claude/lib/bash/validate-parallel-manifest.sh <manifest-path>
+```
+
+It prints validation errors one per line on stdout and exits 0 for a valid manifest, 1 for an
+invalid one, and 2 for an unreadable file or a YAML construct outside the supported subset. The two
+default-resolving accessors are subcommands of the same entry point:
+
+```bash
+bash .claude/lib/bash/validate-parallel-manifest.sh --print-mode <manifest-path>
+bash .claude/lib/bash/validate-parallel-manifest.sh --print-max-concurrency <manifest-path>
+```
+
+They resolve the documented defaults `closed` and `4` when the manifest omits the key or carries a
+malformed value. Consume `mode` and `max_concurrency` through these accessors rather than reading
+the frontmatter directly.
+
+`scripts/dev_tools/parallel_manifest_contract.py` (`validate_parallel_manifest_text`,
+`manifest_mode`, `manifest_max_concurrency`) remains the repository authority and the parity
+reference. Manifest validation is deliberately not an MCP `artifact_type`; do not attempt to
 validate the manifest through `mcp__drm-copilot__validate_orchestration_artifacts`.
 
 ## Checkpoint Persistence

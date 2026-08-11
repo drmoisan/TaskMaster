@@ -15,6 +15,9 @@ tools:
   - "Bash(gh *)"
   - "Bash(poetry run python -c *)"
   - "Bash(poetry run python -m *)"
+  - "Bash(bash .claude/lib/bash/compute-cohorts.sh*)"
+  - "Bash(bash .claude/lib/bash/compute-concurrency-batches.sh*)"
+  - "Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)"
   - "mcp__drm-copilot__collect_pr_context"
   - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:
@@ -66,16 +69,32 @@ frames the *who* and *when*; the skill documents the *how* in full. The manifest
 checkpoint schema, and the parallel enums are defined once in
 `.claude/rules/parallel-orchestration.md` and are consumed here, never redefined.
 
-Two of that procedure's steps are reached through a Python interpreter rather than through a
-dedicated command, so the `tools` allowlist grants exactly two invocation prefixes for them.
-`scripts/dev_tools/parallel_manifest_contract.py` is an import-only library with no CLI entry point,
-so the manifest gate's `validate_parallel_manifest_text` check is invoked as
-`poetry run python -c`; the checkpoint-validator CLI fallback the skill names in its
-`## Parallel-Level Checkpoint` section is invoked as `poetry run python -m`. Both grants are scoped
+The manifest gate is reached through the destination-runtime bash entry point, which needs no
+Python interpreter and is published by push-down alongside `.claude`, so the `tools` allowlist
+grants one entry per command-line entry point —
+`"Bash(bash .claude/lib/bash/compute-cohorts.sh*)"`,
+`"Bash(bash .claude/lib/bash/compute-concurrency-batches.sh*)"`, and
+`"Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)"` — the last of which covers it:
+
+```bash
+bash .claude/lib/bash/validate-parallel-manifest.sh docs/features/parallel/<slug>/parallel.md
+```
+
+Exit 0 accepts the manifest, exit 1 rejects it with one error per line on stdout, and exit 2 means
+the file is unreadable or uses a YAML construct outside the supported subset. The same entry point's
+`--print-mode` and `--print-max-concurrency` subcommands supply `mode` and `max_concurrency` with
+their documented defaults. `validate_parallel_manifest_text` in
+`scripts/dev_tools/parallel_manifest_contract.py` remains the repository authority and the parity
+reference; it is not invoked on the destination-runtime path. Cohort recoloring and concurrency
+batching use `compute-cohorts.sh` and `compute-concurrency-batches.sh` under the same allowlist
+entry.
+
+The two `poetry run` grants remain for the repository-local paths that still need an interpreter:
+the checkpoint-validator CLI fallback the skill names in its `## Parallel-Level Checkpoint` section
+is invoked as `poetry run python -m`, and the drift-detection CLI likewise. Both grants stay scoped
 to those two invocation forms only — not to `poetry run` as a whole — so `pytest`, `black`, `ruff`,
 and every other `poetry run` subcommand remain outside the allowlist. The sibling persona
-`.claude/agents/parallel-planner.md` records the same rationale for the same class of import-only
-upstream library.
+`.claude/agents/parallel-planner.md` records the same destination-runtime posture.
 
 ## Startup Protocol
 
