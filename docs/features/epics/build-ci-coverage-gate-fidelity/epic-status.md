@@ -7,8 +7,8 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 
 - Integration branch: `epic/build-ci-coverage-gate-fidelity-integration`
 - Manifest: `docs/features/epics/build-ci-coverage-gate-fidelity/epic.md`
-- Current wave: 1
-- Last updated: 2026-08-11T04-20
+- Current wave: 2
+- Last updated: 2026-08-11T05-55
 
 ## Features
 
@@ -17,16 +17,16 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 | 2026-08-10-cobertura-coverage-arithmetic-441 | 441 | 0 | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/538 | fb257cd6e0c56cbf5eacf7e6a73641cc0414c930 | 2026-08-11T02-28 | 2026-08-11T03-45 | 2026-08-11T04-00 | 2026-08-11T04-01 |
 | 2026-08-10-csharp-toolchain-gate-fidelity-512 | 512 | 0 | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/540 | 22eaee849263515e4a66e0f654baf162a27018b2 | 2026-08-11T02-28 | 2026-08-11T03-55 | 2026-08-11T04-20 | 2026-08-11T04-21 |
 | 2026-08-10-utilitiescs-test-cs2002-duplicate-compile-entry-394 | 394 | 0 | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/533 | c1fe3565a8677184831a4e33917852cd02f8d521 | 2026-08-11T02-28 | 2026-08-11T03-20 | 2026-08-11T03-32 | 2026-08-11T03-35 |
-| 2026-08-10-excludefromcodecoverage-nested-lambdas-457 | 457 | 1 | worktree_created | — | — | 2026-08-11T04-05 | — | — | — |
-| 2026-08-10-coverage-threshold-policy-reconciliation-494 | 494 | 2 | not_started | — | — | — | — | — | — |
+| 2026-08-10-excludefromcodecoverage-nested-lambdas-457 | 457 | 1 | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/542 | ee082ba1c078c5f2721b3ef5306172047daa1a09 | 2026-08-11T04-05 | 2026-08-11T05-35 | 2026-08-11T05-50 | 2026-08-11T05-51 |
+| 2026-08-10-coverage-threshold-policy-reconciliation-494 | 494 | 2 | worktree_created | — | — | 2026-08-11T05-55 | — | — | — |
 
 ## Waves
 
 | wave | features | status |
 | --- | --- | --- |
 | 0 | `2026-08-10-cobertura-coverage-arithmetic-441`, `2026-08-10-csharp-toolchain-gate-fidelity-512`, `2026-08-10-utilitiescs-test-cs2002-duplicate-compile-entry-394` | complete |
-| 1 | `2026-08-10-excludefromcodecoverage-nested-lambdas-457` | in_progress |
-| 2 | `2026-08-10-coverage-threshold-policy-reconciliation-494` | not_started |
+| 1 | `2026-08-10-excludefromcodecoverage-nested-lambdas-457` | complete |
+| 2 | `2026-08-10-coverage-threshold-policy-reconciliation-494` | in_progress |
 
 ## Integration PR
 
