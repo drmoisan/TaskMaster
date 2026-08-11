@@ -33,6 +33,7 @@
 - [poshqc test MCP has no numeric detail](project_poshqc_pester_mcp_exit_minus1.md) — run_poshqc_test returns only {ok,summary}: no exit code, counts, or coverage; scan_folders accepts FILE paths; Pester 5 has no branch metric
 - [poshqc analyze exits 1 on a Warning](project_poshqc_analyze_exit1_on_warning.md) — "EXIT_CODE 0 with zero error-severity" is self-contradictory; Helpers.ps1 carries a pre-existing PSUseSingularNouns; `Remove-*` needs SupportsShouldProcess
 - [BOM breaks grep ^ anchor](project_bom_grep_anchor_false_negative.md) — bash grep `^#nullable` misses BOM-prefixed files; use the Grep tool for opt-in classification, never bash grep
+- [pwsh -Command needs single-quoted outer](project_pwsh_command_quoting_from_bash.md) — a double-quoted outer wrapper lets bash eat `$` → empty counts + inverted exit gates or a hard ParserError; `''` inside single quotes is not an escape
 
 - [Compile-time red needs body-level refs](project_compile_red_needs_body_level_references.md) — a missing type in a method SIGNATURE suppresses body binding, so an `[expect-fail]` task requiring N named CS0246s reports only 1; construct the types inline in test bodies
 
