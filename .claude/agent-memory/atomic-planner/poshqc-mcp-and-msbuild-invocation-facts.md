@@ -11,6 +11,12 @@ Command-shape facts that make PowerShell/C# plan tasks executable in this repo.
   own bundled Pester settings. `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` is a *bundled
   extension resource* cited by `.claude/rules/powershell.md:18`; `scripts/powershell/` does not exist in this
   repository, so naming that path as a config argument in a plan task is a defect.
+- **"Available" is not "working."** `run_poshqc_test` can terminate with exit `-1` and no per-test detail while
+  remaining callable. A fallback authorization worded "if the MCP tool is *unavailable*" therefore leaves a
+  final-QC task demanding `EXIT_CODE: 0` with no non-SKIPPED completion path. Word every MCP fallback trigger as
+  "unavailable **or** returns a non-zero/negative exit code without per-test diagnostic detail", require both the
+  MCP attempt and the fallback to be recorded with their exit codes, and bind the `EXIT_CODE: 0` requirement to
+  *the route that produced the reported figures*.
 - **Test-file discovery is not guaranteed.** `config/poshqc-scan.json` does not exist here and every existing
   Pester file lives under `tests/scripts/vscode/`. A new test file under a hidden-parent directory
   (e.g. `tests/.claude/hooks/`) may never be collected, so a green suite proves nothing. Any suite-run task
