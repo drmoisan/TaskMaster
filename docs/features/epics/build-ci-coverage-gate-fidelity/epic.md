@@ -22,7 +22,7 @@ features:
     feature_folder: 2026-08-10-cobertura-coverage-arithmetic-441
     depends_on: []
   - issue_num: 457
-    feature_folder: excludefromcodecoverage-nested-lambdas-457
+    feature_folder: 2026-08-10-excludefromcodecoverage-nested-lambdas-457
     depends_on: [441]
   - issue_num: 512
     feature_folder: 2026-08-10-csharp-toolchain-gate-fidelity-512
