@@ -1,12 +1,21 @@
 ---
-name: poshqc-pester-mcp-exit-minus1
-description: mcp__drm-copilot__run_poshqc_test exits -1 (4294967295) with no detail in TaskMaster worktrees; use direct Invoke-Pester as the numeric proof
+name: poshqc-mcp-tools-report-no-verdict
+description: mcp__drm-copilot__run_poshqc_test returns ok:true with no test counts/exit code, so any "EXIT_CODE 0"/"N failures" acceptance built on it is vacuous; pair with direct Invoke-Pester
 metadata:
   type: project
 ---
 
-The bundled `mcp__drm-copilot__run_poshqc_test` MCP tool exits `-1` (4294967295) with no stderr detail, both with and without `scan_folders`, in this TaskMaster worktree. It failed identically at baseline (before any change) and post-change during #283, so it is a pre-existing environment/bundled-runner condition, not caused by the change under test.
+`mcp__drm-copilot__run_poshqc_test` carries **no verdict**. Measured 2026-08-10 in a TaskMaster worktree with `scan_folders=["scripts/vscode","tests/scripts/vscode"]`, the entire payload was:
 
-**Why:** the plan mandated that exact command for the PowerShell test gate, but it produces no runnable result here. `run_poshqc_format` (ok) and `run_poshqc_analyze` (exits 1 only because of pre-existing folder-wide findings) both work.
+```
+{"ok":true,"tool":"run_poshqc_test","workspace_root":"...","summary":"Ran bundled PoshQC test against '...' with 2 selected scan folder(s)."}
+```
 
-**How to apply:** still EXECUTE the mandated MCP command and record its exit code (No-SKIPPED rule), but pair it with a direct `Invoke-Pester` proof for the numeric pass/coverage headline. Direct pattern that works (Pester 5.6.1): `New-PesterConfiguration`, set `Run.Path`, `Run.PassThru=$true`, `CodeCoverage.Enabled=$true` + `CodeCoverage.Path=@(...scripts...)`, then read `$r.PassedCount`/`$r.FailedCount`/`$r.CodeCoverage.CoveragePercent`. PSScriptAnalyzer and Pester both require pwsh7 (Windows PowerShell 5.1 cannot load PSScriptAnalyzer here). See [[project_build_test_env]].
+No test counts, no per-test names, no exit code, no failure detail. It reports *that it ran*, not *what happened*. (An earlier session recorded it exiting `-1`; the tool now returns `ok:true`. Either way it yields no result data — do not treat `ok:true` as "tests passed".)
+
+**Why:** plans routinely write acceptance criteria like `EXIT_CODE: 0`, "zero failures", or "F1 fails with 6/4" against this command. Every one of those is vacuous (passes unconditionally) or unsatisfiable (the datum does not exist). An `[expect-fail]` task is the worst case: the tool returns `ok:true` while the tests are red.
+
+**How to apply:** still execute the mandated MCP command and record its `ok`/`summary` verbatim (No-SKIPPED rule), but attribute every numeric verdict to a direct Pester run. Verified working recipe (Pester 5.6.1, pwsh7, `Set-Location $root` first — the config takes repo-relative paths):
+`New-PesterConfiguration`; `Run.Path`; `Run.PassThru=$true`; `CodeCoverage.Enabled=$true`; `CodeCoverage.Path`; `CodeCoverage.OutputFormat='JaCoCo'`; `CodeCoverage.OutputPath`. Then `$r.TotalCount/PassedCount/FailedCount`, per-test detail via `$r.Tests | ForEach-Object { $_.Result; $_.ExpandedName; $_.ErrorRecord.Exception.Message }`, and JaCoCo counters from the XML. Pester emits INSTRUCTION/LINE/METHOD/CLASS and **no BRANCH** counter.
+
+`run_poshqc_analyze` **does** carry a verdict (`ok:false` + `PSScriptAnalyzer reported N issue(s).`), but only a count — no file or rule. `scan_folders` genuinely narrows it (`["tests/scripts/vscode"]` -> ok:true; adding `scripts/vscode` -> 16 issues), so scoping cannot rescue a folder that already carries findings; use direct `Invoke-ScriptAnalyzer` for a per-file, per-rule baseline. See [[project_build_test_env]].

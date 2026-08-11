@@ -6,9 +6,9 @@
 - **Parent (optional):** `docs/features/epics/build-ci-coverage-gate-fidelity/epic.md`
 - **Integration Branch:** `epic/build-ci-coverage-gate-fidelity-integration`
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-10T15-05
-- **Status:** Ready for planning
-- **Version:** 1.0
+- **Last Updated:** 2026-08-10T18-24
+- **Status:** Prepared (plan preflight-cleared; execution deferred to epic-orchestrator)
+- **Version:** 1.1 (AC-15 and AC-16 amended — see § Acceptance Criteria)
 - **Complexity Band:** C3 (`cross_module_contract_change`)
 - **AC Source:** This document. Under work mode `full-bug`,
   `.claude/skills/acceptance-criteria-tracking/SKILL.md` resolves `spec.md` as the sole
@@ -630,6 +630,8 @@ and must be filed through the MCP promotion lifecycle rather than left as prose:
 
 ## Acceptance Criteria
 
+**Amendment 2026-08-10T18-24 (AC-15 and AC-16 only; preparation-time, before any execution).** Two criteria were unsatisfiable as originally written and were corrected so that execution cannot check off a false statement. AC-15 had required *zero* PSScriptAnalyzer findings on both changed files; `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` carries one pre-existing `PSUseSingularNouns` finding on `Get-CoberturaLineConditionCoverageParts`, and clearing it would require renaming an exported function that § Implementation strategy lists as Unmodified and § Technical specifications forbids changing. AC-15 is now a no-new-findings gate against a recorded Phase 0 baseline. AC-16 had enumerated only `{baseline, qa-gates, regression-testing}`; the plan legitimately also writes to `issue-updates/` and `other/`, both canonical under `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, so the enumeration was completed. No other criterion text is altered, no threshold is affected, and no criterion is weakened in substance.
+
 - [ ] **AC-1 (headline: generator parity).** With the fix applied, dot-sourcing
   `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` and running
   `Get-CoberturaCoverageSummary` over
@@ -688,11 +690,14 @@ and must be filed through the MCP promotion lifecycle rather than left as prose:
   shows no edit to any of them — including the `lines-valid | Should -Be '3'` assertion.
 - [ ] **AC-15 (toolchain green).** A single clean pass of PoshQC format
   (`mcp__drm-copilot__run_poshqc_format`, no files changed), PSScriptAnalyzer
-  (`mcp__drm-copilot__run_poshqc_analyze`, zero findings on both changed files), and Pester
-  (`mcp__drm-copilot__run_poshqc_test`, zero failures) is recorded under
+  (`mcp__drm-copilot__run_poshqc_analyze` plus a per-file `Invoke-ScriptAnalyzer` breakdown, **no
+  finding on either changed file that is absent from the recorded Phase 0 baseline**; the single
+  pre-existing `PSUseSingularNouns` finding on `Get-CoberturaLineConditionCoverageParts` is
+  baselined and out of scope, since clearing it requires renaming an exported function this spec
+  marks Unmodified), and Pester (direct `Invoke-Pester` run, `FailedCount` = 0) is recorded under
   `docs/features/active/2026-08-10-cobertura-coverage-arithmetic-441/evidence/qa-gates/`.
 - [ ] **AC-16 (canonical evidence locations).** Every evidence artifact for this feature lives under
-  `docs/features/active/2026-08-10-cobertura-coverage-arithmetic-441/evidence/{baseline,qa-gates,regression-testing}/`,
+  `docs/features/active/2026-08-10-cobertura-coverage-arithmetic-441/evidence/{baseline,qa-gates,regression-testing,issue-updates,other}/`,
   carries `Timestamp`, `Command` and `EXIT_CODE` fields (baseline artifacts additionally carry
   `Output Summary`), and no evidence artifact is written under any `artifacts/` path.
 - [ ] **AC-17 (no threshold re-tuned).** The diff contains no change to `CLAUDE.md`, to any file
