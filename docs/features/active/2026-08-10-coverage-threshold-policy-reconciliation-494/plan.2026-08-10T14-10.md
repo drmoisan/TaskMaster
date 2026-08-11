@@ -5,7 +5,7 @@
 - **Work Mode:** `full-bug` (spec-driven)
 - **Feature folder:** `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/`
 - **Branch:** `bug/coverage-threshold-policy-reconciliation-494`
-- **Workspace root:** `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-abe56d74550beb67c`
+- **Workspace root:** the repository root of the executing worktree. Every path in this plan is relative to that root; no absolute path from the planning session is authoritative.
 - **Baseline HEAD at planning time:** `edf3d34c` (recorded, not gated — see P0-T2)
 - **Plan created:** 2026-08-10T14-10
 
@@ -32,20 +32,39 @@
   `scripts/vscode/Invoke-CoverageThresholdGate.ps1` (new),
   `tests/scripts/vscode/Invoke-CoverageThresholdGate.Tests.ps1` (new),
   `tests/.claude/hooks/validate-feature-review-coverage.Tests.ps1` (new),
-  `tests/fixtures/coverage/*.xml` (new), and everything under `<FEATURE>/`.
+  `tests/fixtures/coverage/*.xml` (new),
+  `docs/features/potential/*.md` (new, authored by P5-T1 only),
+  and everything under `<FEATURE>/`. `.claude/agent-memory/**` is a permitted incidental path that this
+  feature does not deliberately edit; it must be excluded by pathspec from every scope-audit diff rather
+  than treated as a violation.
 - **Out of bounds (owned by `csharp-toolchain-gate-fidelity-512`):** the `CLAUDE.md` C# toolchain command
   blocks (regions 181-208, 377-386, 397-402 as of `edf3d34c`), `.claude/rules/csharp.md`, and
   `.claude/skills/csharp-qa-gate/SKILL.md`.
 - **Not a gate for this feature:** the `/p:Nullable=enable` type-check command (issue #522, defective; fixed by 512).
 
-## Planner Note — One Divergence Between the Two Acceptance-Criteria Sources
+## Planner Note — The Two Acceptance-Criteria Sources Are Reconciled
 
-`issue.md` AC6 was widened on 2026-08-10T16-10 to cover `.claude/rules/quality-tiers.md:9,20`,
-`.claude/rules/general-code-change.md:29`, and `.agents/skills/quality-tiers/SKILL.md:27`. `spec.md`'s own
-`## Acceptance Criteria` block still carries the **narrow** AC6 wording, and `spec.md` D6/D7 defer the latter
-two sites to follow-up FU-A. Per the planning directive ("AC6 was widened; use the current text"), this plan
-executes the **widened** AC6 and includes P5-T4, which reconciles `spec.md`'s AC6 text and D6/D7 dispositions
-to match. This is recorded openly rather than resolved silently.
+`issue.md` AC6 was widened and AC7 disambiguated on 2026-08-10T16-10. `spec.md` initially retained the
+narrow AC6 wording and the pre-disambiguation AC7 wording, and `spec.md` D6/D7 deferred
+`.claude/rules/general-code-change.md:29` and `.agents/skills/quality-tiers/SKILL.md` to follow-up FU-A.
+That divergence was **closed during preparation on 2026-08-10T18-30**, before this plan was preflighted:
+`spec.md` AC1-AC10 now match `issue.md` AC1-AC10 verbatim, and `spec.md` D6, the D6 carve-out table, the
+in-scope Files and Sites table (new rows 3a and 3b), the out-of-scope table (rows 12 and 20), Boundaries
+item 4, Risk 8, the Traceability AC6/AC7 rows, and the FU-A scope list all record the widened dispositions.
+
+Consequences for this plan, all already reflected in the tasks below:
+
+- The widened AC6 is executed: P2-T15 removes the false `quality-tiers.yml` claim from
+  `.claude/rules/general-code-change.md`, and P2-T16 removes the three false claims from
+  `.agents/skills/quality-tiers/SKILL.md`. Neither task edits a coverage numeral at either site; the
+  85/75 numerals in `.agents/skills/quality-tiers/SKILL.md` remain FU-A scope (P5-T2).
+- The disambiguated AC7 is executed: Phase 1 re-measures coverage at execution time and Phase 2 is
+  blocked until Phase 1 completes, and no task writes a coverage figure captured during preparation.
+  P1-T7 records the D1-versus-measurement reconciliation and routes a contradicting measurement to
+  `spec.md` Risk 2 (halt and escalate) rather than to a re-tuned threshold.
+- P5-T5 is therefore a **verification** task, not an edit task: it confirms the two acceptance-criteria
+  sources are still identical at execution time and that no disposition in `spec.md` defers a site this
+  plan actually edited.
 
 ---
 
@@ -60,7 +79,7 @@ to match. This is recorded openly rather than resolved silently.
 - [ ] [P0-T4] Execute the D1 execution-time provenance re-verification gate and write `<FEATURE>/evidence/baseline/d1-provenance-reverification.<TS>.md`, running exactly: `git log --follow --oneline -- .claude/rules/quality-tiers.md`; `git log --follow --oneline -- .claude/rules/general-unit-test.md`; `git log -L 23,24:.claude/rules/general-unit-test.md`; `git log -L 31,46:.claude/rules/general-unit-test.md`; `git log -L 292,306:CLAUDE.md`; `git show --stat 48e46387`; `git show --stat --format="" 48e46387 -- CLAUDE.md`.
   - Acceptance: the artifact records each command with its `EXIT_CODE:` and output, and compares each result against `<FEATURE>/evidence/other/threshold-provenance-verification.2026-08-10T16-10.md` sections E1-E7 (note: `48e46387` is dated **2026-07-05**, not 2026-08-05).
   - **Halt condition (blocking, D1):** if the history shows a commit that touched **both** `CLAUDE.md` and the 85/75 surfaces with a message adjudicating which governs — i.e. the 85/75 reintroduction was an explicit maintainer reconciliation that also adjudicated `CLAUDE.md` — then D1's premise is falsified. Write `HALT: D1 FALSIFIED` into the artifact, stop, and escalate. Do not apply any governance edit.
-- [ ] [P0-T5] Verify that `CLAUDE.md` § UT2 is textually disjoint from every 512-owned region, by locating the line span of the anchor `### UT2. Coverage and Scenarios` through the line before `- **Scenario Completeness**`, and the line spans of the three C# toolchain command blocks (regions 181-208, 377-386, 397-402 as of `edf3d34c`, re-located by their quoted headings `2. **Linting / Static Analysis — .NET analyzers**`, `## C# Toolchain (run in this exact order)`, and `## Key Skills Reference`); record all spans in `<FEATURE>/evidence/baseline/claude-md-region-disjointness.<TS>.md`.
+- [ ] [P0-T5] Verify that `CLAUDE.md` § UT2 is textually disjoint from every 512-owned region, by locating the line span of the anchor `### UT2. Coverage and Scenarios` through the line before `- **Scenario Completeness**`, and the line spans of the three C# toolchain command blocks (regions 181-208, 377-386, 397-402 as of `edf3d34c`, re-located by the heading that opens each region: `### C#1. Tooling & Baseline for C#` for 181-208, `### CUT3. C# Toolchain Command Selection` for 377-386, and `## C# Toolchain (run in this exact order)` for 397-402; each region ends at the line before the next `##`/`###` heading, so region 397-402 terminates before `## Key Skills Reference`); record all spans in `<FEATURE>/evidence/baseline/claude-md-region-disjointness.<TS>.md`.
   - Acceptance: the artifact states the numeric gap between the § UT2 span and the nearest 512 region and asserts the spans do not overlap. **Halt condition:** if any span overlaps, stop and escalate a merge-coordination conflict with feature 512 rather than editing.
 - [ ] [P0-T6] Record the then-current signatures and first five body lines of `Get-CoberturaCoverageSummary`, `Merge-CoberturaClassesByFilename`, `Get-CoberturaLineConditionCoverageParts`, `ConvertTo-KoverageCoberturaXml`, and `Get-KoverageProjectAllowlist` from `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` into `<FEATURE>/evidence/baseline/coverage-function-signatures.<TS>.md`.
   - Acceptance: all five symbols are recorded with their current line numbers; this is the toolchain-drift record required by spec D9.
@@ -72,8 +91,8 @@ to match. This is recorded openly rather than resolved silently.
   - Acceptance: artifact records `Command:`, `EXIT_CODE:`, and whether any file was rewritten.
 - [ ] [P0-T10] Run the baseline PowerShell lint `mcp__drm-copilot__run_poshqc_analyze` and write `<FEATURE>/evidence/baseline/ps-analyze.<TS>.md`.
   - Acceptance: artifact records `EXIT_CODE:` and the pre-existing diagnostic count by severity.
-- [ ] [P0-T11] Run the baseline PowerShell test suite with coverage `mcp__drm-copilot__run_poshqc_test` (config `scripts/powershell/PoshQC/settings/pester.runsettings.psd1`) and write `<FEATURE>/evidence/baseline/ps-pester-coverage.<TS>.md`.
-  - Acceptance: `Output Summary:` records numeric baseline PowerShell **line coverage %** and **branch coverage %**, the passed/failed/total test counts, and confirms the four pre-existing files under `tests/scripts/vscode/` all pass. If the MCP tool is unavailable in the execution session, this task is explicitly authorized to fall back to `pwsh -NoProfile -Command "Invoke-Pester -Path tests -CI -CodeCoverage @('scripts/**/*.ps1','.claude/hooks/*.ps1') -CodeCoverageOutputFile artifacts/pester/powershell-coverage.xml -CodeCoverageOutputFileFormat JaCoCo"` and must record which route was used. `EXIT_CODE: SKIPPED` is not a valid outcome.
+- [ ] [P0-T11] Run the baseline PowerShell test suite with coverage `mcp__drm-copilot__run_poshqc_test` (the MCP tool supplies its own bundled Pester settings; `scripts/powershell/PoshQC/settings/pester.runsettings.psd1` is a bundled extension resource cited by `.claude/rules/powershell.md:18` and is **not** a path in this repository, and no config argument is passed — the tool accepts only `workspace_root` and `scan_folders`) and write `<FEATURE>/evidence/baseline/ps-pester-coverage.<TS>.md`.
+  - Acceptance: `Output Summary:` records numeric baseline PowerShell **line coverage %** and **branch coverage %**, the passed/failed/total test counts, and confirms the four pre-existing files under `tests/scripts/vscode/` all pass. The artifact must additionally enumerate the executed test **files** and record which discovery route reached them; if any of the four files under `tests/scripts/vscode/` is absent from the executed inventory, re-run with an explicit `scan_folders` argument naming `tests`, record which route was used, and record whether `config/poshqc-scan.json` exists in this worktree. A green run that collected no test file fails this task. If the MCP tool is unavailable in the execution session, this task is explicitly authorized to fall back to `pwsh -NoProfile -Command "Invoke-Pester -Path tests -CI -CodeCoverage @('scripts/**/*.ps1','.claude/hooks/*.ps1') -CodeCoverageOutputFile artifacts/pester/powershell-coverage.xml -CodeCoverageOutputFileFormat JaCoCo"` and must record which route was used. `EXIT_CODE: SKIPPED` is not a valid outcome.
 - [ ] [P0-T12] Establish the coverage re-measurement preconditions and record them in `<FEATURE>/evidence/baseline/test-discovery-precondition.<TS>.md`: (a) no other agent worktree is executing tests (enumerate running `vstest.console`/`testhost`/`dotnet-coverage` processes), and (b) the discovery rule that every `*.Test.dll` path found under `scripts/vscode/Invoke-MSTestWithCoverage.ps1`'s default `-SearchRoot .` must begin with the workspace-root prefix and must contain no `\.claude\worktrees\` segment *after* that prefix.
   - Acceptance: the artifact lists the running-process check output and states the discovery assertion verbatim. **Halt condition:** if a concurrent test host is running, wait and re-check rather than proceeding.
 
@@ -84,8 +103,8 @@ to match. This is recorded openly rather than resolved silently.
 This phase must complete before any task in Phase 2. No figure produced here selects a threshold
 (spec D9 reasoning point 3); the figures validate, contextualise, and identify failing assemblies.
 
-- [ ] [P1-T1] Rebuild the solution so the analyzer/compile step actually runs: `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU"`, and write `<FEATURE>/evidence/baseline/csharp-rebuild.<TS>.md`.
-  - Acceptance: `EXIT_CODE: 0` and `Output Summary:` records warning/error counts. Do **not** add `/p:Nullable=enable`.
+- [ ] [P1-T1] Rebuild the solution so the analyzer/compile step actually runs. `msbuild` is not on `PATH` in this environment, and `scripts/vscode/Invoke-VSBuild.ps1` hard-codes `/t:Build` at line 64 and exposes no target parameter, so it cannot deliver the `/t:Rebuild` this task requires. Resolve MSBuild the way that wrapper does at lines 127-134 — `& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\MSBuild.exe' | Select-Object -First 1` — then run `& $msbuildPath TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU"`, and write `<FEATURE>/evidence/baseline/csharp-rebuild.<TS>.md`.
+  - Acceptance: the artifact records the resolved MSBuild path, `EXIT_CODE: 0`, `Output Summary:` with warning/error counts, and a **non-zero `CoreCompile` project count** proving the rebuild was not skipped as up-to-date. Do **not** add `/p:Nullable=enable`.
 - [ ] [P1-T2] Execute coverage re-measurement run 1: `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput coverage/remeasure-run1.cobertura.xml`, and write `<FEATURE>/evidence/baseline/coverage-remeasurement-run1.<TS>.md`.
   - Acceptance: `Output Summary:` records the discovered assembly **list and count**, the explicit `Total tests:` value (an `Unknown` value fails this task and requires a re-run with per-assembly isolation), and the root `line-rate`, `branch-rate`, `lines-valid`, `lines-covered` from `coverage/remeasure-run1.cobertura.xml`. The P0-T12 discovery assertion is re-checked against the recorded assembly list.
 - [ ] [P1-T3] Execute coverage re-measurement run 2 against an unchanged working tree: `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput coverage/remeasure-run2.cobertura.xml`, and write `<FEATURE>/evidence/baseline/coverage-remeasurement-run2.<TS>.md`.
@@ -93,7 +112,7 @@ This phase must complete before any task in Phase 2. No figure produced here sel
 - [ ] [P1-T4] Execute coverage re-measurement run 3 against an unchanged working tree: `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput coverage/remeasure-run3.cobertura.xml`, and write `<FEATURE>/evidence/baseline/coverage-remeasurement-run3.<TS>.md`.
   - Acceptance: same fields as P1-T3.
 - [ ] [P1-T5] Compute the reproducibility spread from the three runs and evaluate it against the D5 tolerance, writing `<FEATURE>/evidence/baseline/coverage-remeasurement-spread.<TS>.md`.
-  - Acceptance: the artifact records max, min, median and spread for repository-wide **line rate** and for **lines-valid**, then states `TOLERANCE MET` only if line-rate spread `<= 1.0` percentage point **and** lines-valid spread `<= 0.5%` of median lines-valid; otherwise `TOLERANCE NOT MET`, which sets the FU-B trigger consumed by P5-T2.
+  - Acceptance: the artifact records max, min, median and spread for repository-wide **line rate** and for **lines-valid**, then states `TOLERANCE MET` only if line-rate spread `<= 1.0` percentage point **and** lines-valid spread `<= 0.5%` of median lines-valid; otherwise `TOLERANCE NOT MET`, which sets the FU-B trigger consumed by P5-T3.
 - [ ] [P1-T6] Produce the per-assembly coverage table from `coverage/remeasure-run3.cobertura.xml` for the nine production projects (`QuickFiler`, `SVGControl`, `Tags`, `TaskMaster`, `TaskTree`, `TaskVisualization`, `ToDoModel`, `UtilitiesCS`, `VBFunctions`) and write `<FEATURE>/evidence/baseline/coverage-per-assembly.<TS>.md`.
   - Acceptance: the artifact lists each project with line rate and branch rate, and explicitly enumerates which projects fall below 80% line and which fall below 75% branch.
 - [ ] [P1-T7] Record the D1-versus-measurement reconciliation required by `spec.md` Risk 2 in `<FEATURE>/evidence/other/d1-measurement-reconciliation.<TS>.md`.
@@ -111,8 +130,8 @@ Appendix A, B and C at the end of this plan.
 - [ ] [P2-T2] Insert the coverage-authority declaration and conflict-resolution rule (Appendix A block A1) into `CLAUDE.md` § UT2, immediately after the `### UT2. Coverage and Scenarios` heading and before the `- **Comprehensive Coverage (within reason)**` bullet.
   - Acceptance: `CLAUDE.md` § UT2 contains the sentence "This section is authoritative for coverage policy" and the sentence "An agent encountering such a divergence resolves it by this rule and does **not** halt."
 - [ ] [P2-T3] Replace the threshold bullets in `CLAUDE.md` § UT2 with Appendix A block A2, so the section states `>= 80%` repository-wide line coverage and `>= 90%` line coverage for new modules, classes, and methods.
-  - Acceptance: the two numerals `>= 80%` and `>= 90%` each appear exactly once in the threshold bullets of `CLAUDE.md` § UT2 and the pre-existing "must not reduce coverage for the lines that were changed" bullet is retained.
-- [ ] [P2-T4] Replace the COM/VSTO/WinForms exemption bullet in `CLAUDE.md` § UT2 with the single reconciled denominator-and-exclusion rule, Appendix A block A3.
+  - Acceptance: the `- **Comprehensive Coverage (within reason)**` block in `CLAUDE.md` § UT2 is byte-identical to Appendix A block A2 after whitespace normalization; specifically the new-code bullet now reads "must target `>= 90%` **line** coverage" (the word "line" was absent pre-edit), and the pre-edit COM/VSTO exemption bullet and its three sub-bullets no longer appear in this block (they are re-inserted in reconciled form by P2-T4).
+- [ ] [P2-T4] Insert the single reconciled denominator-and-exclusion rule, Appendix A block A3, into `CLAUDE.md` § UT2 immediately after the "Repository-wide line coverage must remain `>= 80%`" bullet written by P2-T3, replacing the pre-edit COM/VSTO/WinForms exemption bullet that block A2 deliberately drops.
   - Acceptance: `CLAUDE.md` § UT2 contains the mechanism-independent sentence "Production lines may leave the denominator **only** through one of the three categories above", retains the `[ExcludeFromCodeCoverage]` / `coverage.config` mechanisms, retains the maintainer-ratification authority clause, and retains the explicit "NOT exempt" sentence naming `ToDoLoader`, `IDList`, `KbdActions<>` and path/settings helpers.
 - [ ] [P2-T5] Insert the branch-coverage disposition bullet (Appendix A block A4) into `CLAUDE.md` § UT2.
   - Acceptance: `CLAUDE.md` § UT2 states that branch coverage is measured and reported, that no branch floor is adopted, and that this is a recorded decision rather than an omission.
@@ -124,26 +143,28 @@ Appendix A, B and C at the end of this plan.
   - Acceptance: `grep -n "85%\|75%\|80%\|90%" .claude/rules/general-unit-test.md` returns no hit inside the `## Coverage Requirements` section.
 - [ ] [P2-T9] Remove the `## Coverage Exclusion Policy` section of `.claude/rules/general-unit-test.md` in full (from the heading through the "**Enforcement:**" sentence) and replace it with Appendix B block B2, a one-paragraph citation of `CLAUDE.md` § UT2.
   - Acceptance: the strings "No production file may be excluded from coverage measurement", `dist/**`, `node_modules/**`, `jest.config.cjs` and `src/test-support/**` no longer appear anywhere in `.claude/rules/general-unit-test.md`.
-- [ ] [P2-T10] Verify that the `## Test Categories` tier references in `.claude/rules/general-unit-test.md` (the "tier-dependent obligations per `.claude/rules/quality-tiers.md`" and "required for all tiers (T1–T4)" lines) still cite content that survives Phase 2, and adjust the citation wording if it points at removed content; record the outcome in `<FEATURE>/evidence/other/general-unit-test-tier-refs.<TS>.md`.
-  - Acceptance: every `.claude/rules/quality-tiers.md` citation in `.claude/rules/general-unit-test.md` resolves to a section that still exists after P2-T11 through P2-T14.
-- [ ] [P2-T11] Remove the false artifact claims from `.claude/rules/quality-tiers.md`: delete the `docs/ci.research.md` source-of-truth citation and the `quality-tiers.yml` mapping-file claim from the opening paragraph (line 9 as of `edf3d34c`), and delete the entire `## Source of Truth` section (lines 18-21 as of `edf3d34c`), replacing the opening paragraph with Appendix C block C1.
-  - Acceptance: `grep -n "quality-tiers.yml\|tier-classification\|ci.research" .claude/rules/quality-tiers.md` returns no hits.
-- [ ] [P2-T12] Rewrite the four tier example bullets in `.claude/rules/quality-tiers.md` (lines 13-16 as of `edf3d34c`) with Appendix C block C2, naming only projects that exist in `TaskMaster.sln`.
+- [ ] [P2-T10] Remove the false artifact claims from `.claude/rules/quality-tiers.md`: delete the `docs/ci.research.md` source-of-truth citation and the `quality-tiers.yml` mapping-file claim from the opening paragraph (line 9 as of `edf3d34c`), and delete the entire `## Source of Truth` section (lines 18-21 as of `edf3d34c`), replacing the opening paragraph with Appendix C block C1.
+  - Acceptance: `grep -n "quality-tiers.yml\|tier-classification\|ci.research" .claude/rules/quality-tiers.md` returns no hits. Removal means deletion of the assertion, not replacement with a denial sentence; block C1 is written so that it contains none of those three literal strings.
+- [ ] [P2-T11] Rewrite the four tier example bullets in `.claude/rules/quality-tiers.md` (lines 13-16 as of `edf3d34c`) with Appendix C block C2, naming only projects that exist in `TaskMaster.sln`.
   - Acceptance: the strings `TaskMaster.Domain`, `TaskMaster.Application`, `Office.js`, `Microsoft Graph`, and `No-COM architecture` no longer appear in `.claude/rules/quality-tiers.md`.
-- [ ] [P2-T13] Replace the `Line coverage: >= 85%.` and `Branch coverage: >= 75%.` bullets in the `### Uniform across all tiers (T1–T4)` list of `.claude/rules/quality-tiers.md` with Appendix C block C3, a citation that states no numeral.
-  - Acceptance: neither `>= 85%` nor `>= 75%` appears in the uniform-gate list of `.claude/rules/quality-tiers.md`.
-- [ ] [P2-T14] Replace the `## Rationale (uniform coverage thresholds)` paragraph in `.claude/rules/quality-tiers.md` with Appendix C block C4, removing the `85%`/`75%` numerals while retaining the rationale.
-  - Acceptance: `grep -n "85%\|75%" .claude/rules/quality-tiers.md` returns no hits anywhere in the file.
+- [ ] [P2-T12] Replace the `Line coverage: >= 85%.` and `Branch coverage: >= 75%.` bullets in the `### Uniform across all tiers (T1–T4)` list of `.claude/rules/quality-tiers.md` with Appendix C block C3, a citation that states no numeral. Block C3 replaces those two bullets only; the pre-existing `- No regression on changed lines.` bullet that follows them is retained unchanged and is not part of block C3.
+  - Acceptance: neither `>= 85%` nor `>= 75%` appears in the uniform-gate list of `.claude/rules/quality-tiers.md`, and `- No regression on changed lines.` appears exactly once in the file.
+- [ ] [P2-T13] Replace the `## Rationale (uniform coverage thresholds)` paragraph in `.claude/rules/quality-tiers.md` with Appendix C block C4, removing the `85%`/`75%` numerals while retaining the rationale.
+  - Acceptance: neither `85%` nor `75%` appears anywhere in `.claude/rules/quality-tiers.md` outside the `### Tier-dependent` gate matrix. The `| Mutation score | >= 75% | trend-only | none | none |` row of that matrix is a tier-dependent **non-coverage** gate, is outside the authorized edit scope (`spec.md` Boundaries item 4), and is left unchanged; the task records that row explicitly as the sole permitted `75%` occurrence.
+- [ ] [P2-T14] Verify that the `## Test Categories` tier references in `.claude/rules/general-unit-test.md` (the "tier-dependent obligations per `.claude/rules/quality-tiers.md`" and "required for all tiers (T1–T4)" lines) still cite content that survives Phase 2, and adjust the citation wording if it points at removed content; record the outcome in `<FEATURE>/evidence/other/general-unit-test-tier-refs.<TS>.md`.
+  - Acceptance: every `.claude/rules/quality-tiers.md` citation in `.claude/rules/general-unit-test.md` resolves to a section that still exists after P2-T10 through P2-T13.
 - [ ] [P2-T15] Remove the false `quality-tiers.yml` assertion from `.claude/rules/general-code-change.md` by deleting the sentence "Every project must be classified in `quality-tiers.yml` at repo root." (line 29 as of `edf3d34c`, re-located by quoted text) and retaining the preceding sentence that cites `.claude/rules/quality-tiers.md`.
   - Acceptance: `grep -n "quality-tiers.yml" .claude/rules/general-code-change.md` returns no hits. This satisfies the AC6 widening of 2026-08-10T16-10.
-- [ ] [P2-T16] Remove the three false tier claims (`quality-tiers.yml`, `tier-classification`, `docs/ci.research.md`) from `.agents/skills/quality-tiers/SKILL.md`, re-locating each by quoted text, and leave the tier taxonomy itself intact.
+- [ ] [P2-T16] Remove the three false tier claims (`quality-tiers.yml`, `tier-classification`, `docs/ci.research.md`) from `.agents/skills/quality-tiers/SKILL.md`, re-locating each by quoted text, and leave the tier taxonomy itself intact. Removal means **deletion of the assertion**, not replacement with a denial sentence: any replacement text written here must not contain the literal strings `quality-tiers.yml`, `tier-classification`, or `ci.research`.
   - Acceptance: `grep -n "quality-tiers.yml\|tier-classification\|ci.research" .agents/skills/quality-tiers/SKILL.md` returns no hits.
-- [ ] [P2-T17] Sweep for T1-T4 references left dangling by P2-T11 through P2-T16 across `.claude/rules/`, `.claude/skills/`, `.agents/skills/` and `.github/instructions/`, and record an explicit disposition for each in `<FEATURE>/evidence/other/tier-reference-dispositions.<TS>.md`.
+- [ ] [P2-T17] Sweep for T1-T4 references left dangling by P2-T10 through P2-T16 across `.claude/rules/`, `.claude/skills/`, `.agents/skills/` and `.github/instructions/`, and record an explicit disposition for each in `<FEATURE>/evidence/other/tier-reference-dispositions.<TS>.md`.
   - Acceptance: every hit is assigned exactly one of `no change needed` (taxonomy reference stating no numeral and asserting no missing file), `aligned here` (edited in this phase), or `deferred to FU-A`, and no hit points at content deleted by this phase. `.claude/rules/architecture-boundaries.md` and `.claude/rules/powershell.md` must each appear with a disposition.
 - [ ] [P2-T18] Prove single-numeral authority across the three in-scope documents by re-running the P0-T7 grep restricted to `CLAUDE.md`, `.claude/rules/general-unit-test.md`, and `.claude/rules/quality-tiers.md`, and writing `<FEATURE>/evidence/other/authority-single-numeral-proof.<TS>.md`.
-  - Acceptance: every coverage-threshold numeral hit in those three files lies inside the `CLAUDE.md` § UT2 span; the other two files return zero hits. This is the AC1 and AC3 mechanical proof.
+  - Acceptance: every **coverage-threshold** numeral hit in those three files lies inside the `CLAUDE.md` § UT2 span; the other two files return zero coverage-threshold hits. Hits that are demonstrably non-coverage gates — the `| Mutation score | >= 75% |` row in `.claude/rules/quality-tiers.md` and the `mutation score >= 75%` bullet in `.claude/rules/general-unit-test.md` — are enumerated in the artifact with that classification and excluded from the coverage-threshold hit set. This is the AC1 and AC3 mechanical proof.
 - [ ] [P2-T19] Audit governance-edit scope by running `git diff --name-only` and comparing the result against the authorized edit path list in this plan's Conventions section, writing `<FEATURE>/evidence/other/governance-edit-scope-audit.<TS>.md`.
-  - Acceptance: every changed path is on the authorized list. Any `.claude/rules/` or `.agents/` path not on the list, and any 512-owned path, is a Blocking finding that stops the phase.
+  - Acceptance: the diff is taken with an explicit pathspec that excludes the permitted incidental paths — `git diff --name-only -- . ':(exclude).claude/agent-memory' ':(exclude)docs'` — and every remaining changed path is on the authorized edit path list. The excluded incidental paths are listed separately in the artifact as `permitted incidental` rather than omitted silently. Any `.claude/rules/` or `.agents/` path not on the authorized list, and any 512-owned path, is a Blocking finding that stops the phase.
+- [ ] [P2-T20] Prove the AC2 and AC5 substance across the three in-scope documents and write `<FEATURE>/evidence/other/ac2-ac5-substance-proof.<TS>.md`.
+  - Acceptance: (AC2) exactly one **normative** denominator/exclusion rule exists across `CLAUDE.md`, `.claude/rules/general-unit-test.md`, and `.claude/rules/quality-tiers.md`; the artifact quotes it from `CLAUDE.md` § UT2, confirms it names the mechanism-independent "only through one of the three categories above" rule, and separately quotes the passages in the two rule files (Appendix B blocks B1 and B2) and confirms each is a citation of the authority that grants no exclusion permission and states no category or mechanism of its own — such citations are not counted as competing statements. (AC5) the artifact quotes the `CLAUDE.md` § UT2 gate-scope block and confirms it is labelled a ratification, names #424 and #230, states the change-scoped gates as unconditionally Blocking, states the repository-wide floor as reported-and-tracked, and states the numeric reproducibility exit condition.
 
 ---
 
@@ -156,13 +177,13 @@ Appendix A, B and C at the end of this plan.
 - [ ] [P3-T3] Add the pure verdict function `Test-CoverageThresholdVerdict` to `scripts/vscode/Invoke-CoverageThresholdGate.ps1`, taking `-LineRatePercent [Nullable[double]]`, `-BranchRatePercent [Nullable[double]]`, `-ArtifactAvailable [bool]`, `-LineFloorPercent [double]` and returning `@{ Ok; ArtifactAvailable; LineRatePercent; BranchRatePercent; Reason }`.
   - Acceptance: `Ok` is `$false` whenever `ArtifactAvailable` is `$false` or `LineRatePercent` is `$null` (fail closed); `Ok` is `$true` when `LineRatePercent -ge $LineFloorPercent`; `BranchRatePercent` is carried into the result but never influences `Ok` (spec D3).
 - [ ] [P3-T4] Add the pure function `Test-CoverageNumeralAuthority` to `scripts/vscode/Invoke-CoverageThresholdGate.ps1`, taking `-DocumentMap [hashtable]` of path-to-text and `-AuthoritySpanText [string]`, and returning the list of coverage-threshold numeral hits found outside the authority span.
-  - Acceptance: the function performs no filesystem access, takes all text as parameters, and returns an empty list for a compliant document map.
+  - Acceptance: the function performs no filesystem access, takes all text as parameters, and returns an empty list for a compliant document map. The numeral-detection pattern must match **coverage-threshold statements only**: it must not match the tier-dependent `| Mutation score | >= 75% |` row, the `Determinism (retry rate)` values, or `Format check: 100% pass.` in `.claude/rules/quality-tiers.md`. P4-T9 pins this exclusion.
 - [ ] [P3-T5] Add the wrapper `Invoke-CoverageThresholdGate` plus the script exit tail to `scripts/vscode/Invoke-CoverageThresholdGate.ps1`: the wrapper resolves content through `-ContentReader`, calls `Get-CoberturaCoverageRates` then `Test-CoverageThresholdVerdict`, and the tail (guarded by the `$MyInvocation.InvocationName -eq '.'` dot-source check) writes the verdict and calls `exit 1` when `Ok` is `$false`, otherwise `exit 0`.
   - Acceptance: `scripts/vscode/Invoke-CoverageThresholdGate.ps1` is the only file that performs filesystem access for the gate, and the pure functions remain callable without it. Running the script with a `-CoveragePath` that does not exist returns exit code 1.
 - [ ] [P3-T6] Add a `.NOTES` block to `scripts/vscode/Invoke-CoverageThresholdGate.ps1` naming the committed producer for each language artifact: C# — `scripts/vscode/Invoke-MSTestWithCoverage.ps1` emitting Cobertura to `coverage/coverage.cobertura.xml`; PowerShell — `mcp__drm-copilot__run_poshqc_test` emitting JaCoCo to `artifacts/pester/powershell-coverage.xml`; and stating that a gate must never depend on an artifact whose only producer is an uncommitted scratchpad tool.
   - Acceptance: the `.NOTES` block names a producer for every artifact path the gate or the hook reads.
 - [ ] [P3-T7] Rewrite the coverage sentences in the `.SYNOPSIS`/`.DESCRIPTION` of `.claude/hooks/validate-feature-review-coverage.ps1` so the documented behaviour states the reconciled numbers: repository-wide line floor 80 percent, new-code line floor 90 percent, branch coverage reported and not gated, and coverage artifact absent or malformed treated as a failure.
-  - Acceptance: the string "below 80 percent" is replaced by wording that states the same 80 floor the enforced constant uses, and the documentation block mentions no `85` and no `75`.
+  - Acceptance: the `.SYNOPSIS`/`.DESCRIPTION` block states all four reconciled facts, each verifiable by a distinct string: (i) the repository-wide line floor as `80`, (ii) the new-code line floor as `90`, (iii) that branch coverage is reported and **not** gated, and (iv) that a coverage artifact that is absent or malformed is treated as a failure. Statements (ii), (iii) and (iv) are absent from the pre-edit block, so the task cannot complete without adding them; the artifact records the pre-edit and post-edit text of the block to prove the delta is non-empty. The block mentions no `85` and no `75`.
 - [ ] [P3-T8] Dot-source the gate script from `.claude/hooks/validate-feature-review-coverage.ps1` using a `$PSScriptRoot`-relative path to `scripts/vscode/Invoke-CoverageThresholdGate.ps1` resolved through `Join-Path $PSScriptRoot '..\..\scripts\vscode\Invoke-CoverageThresholdGate.ps1'`.
   - Acceptance: the hook resolves the gate script without depending on the process working directory, and dot-sourcing does not execute the gate's exit tail.
 - [ ] [P3-T9] Re-point the C# rows of `Get-LanguageRepoCoverage` and `Get-LanguageBranchCoverage` in `.claude/hooks/validate-feature-review-coverage.ps1` from `artifacts/csharp/coverage.xml` (JaCoCo, no committed producer) to `coverage/coverage.cobertura.xml` parsed by `Get-CoberturaCoverageRates`, leaving the TypeScript, Python and PowerShell rows unchanged.
@@ -172,9 +193,9 @@ Appendix A, B and C at the end of this plan.
 - [ ] [P3-T11] Remove the branch-gate block from `Test-LanguageCoverageRow` in `.claude/hooks/validate-feature-review-coverage.ps1` — the `$BranchFloor = 75.0` assignment, the `$BranchPct -lt $BranchFloor` comparison, and its unconditional `Ok = $false` return — while retaining the `-BranchPct` parameter so branch coverage continues to be measured and reported.
   - Acceptance: `grep -n "BranchFloor\|75.0" .claude/hooks/validate-feature-review-coverage.ps1` returns no hits, and a below-75 branch figure no longer produces a failing row.
 - [ ] [P3-T12] Make the artifact-absent path fail closed in `.claude/hooks/validate-feature-review-coverage.ps1` by routing each changed language through `Test-CoverageThresholdVerdict` and returning a failing row with a distinguishable reason when `ArtifactAvailable` is `$false`, replacing the current `$null -ne $RepoWidePct` guard that skips the numeric check entirely.
-  - Acceptance: for a language with changed files and no coverage artifact, `Invoke-FeatureReviewCoverageValidation` returns `Ok = $false` with a reason naming the missing artifact path; the below-floor case continues to require a FAIL verdict on a coverage row per spec D5 (reported-and-tracked, not silently blocking).
+  - Acceptance: for a language with changed files and no coverage artifact, `Invoke-FeatureReviewCoverageValidation` returns `Ok = $false` with a reason naming the missing artifact path; and a below-floor line figure with the artifact present produces a row whose reason names the measured rate and the floor from `Get-CoverageThresholdPolicy`, rather than a row that merely requires the policy-audit text to contain a FAIL token (`spec.md` Verified Current State item 8). The task output records which of the two pre-edit code paths was replaced.
 - [ ] [P3-T13] Prove AC8 internal consistency by grepping `.claude/hooks/validate-feature-review-coverage.ps1` and `scripts/vscode/Invoke-CoverageThresholdGate.ps1` for coverage numerals and writing `<FEATURE>/evidence/other/hook-consistency-proof.<TS>.md`.
-  - Acceptance: exactly one line-floor numeral exists across both files, it lives in `Get-CoverageThresholdPolicy`, it equals the number stated in `CLAUDE.md` § UT2, and the hook's documentation block states the same number.
+  - Acceptance: exactly one **enforced** line-floor numeral exists across both files and it lives in `Get-CoverageThresholdPolicy`; no other executable statement in either file compares against a coverage literal; the value equals the number stated in `CLAUDE.md` § UT2; and the hook's documentation block states that same value in prose. The documentation occurrence written by P3-T7 is the single permitted non-executable occurrence and is recorded as such in the artifact.
 - [ ] [P3-T14] Audit file sizes for `scripts/vscode/Invoke-CoverageThresholdGate.ps1` and `.claude/hooks/validate-feature-review-coverage.ps1` and record the line counts in `<FEATURE>/evidence/other/file-size-audit.<TS>.md`.
   - Acceptance: both files are under the 500-line repository limit. If the hook exceeds 500 lines after the edits, split the coverage-reading functions into the gate script rather than requesting a waiver.
 
@@ -186,7 +207,7 @@ Tests create no temporary files. Inline here-string fixtures follow the pattern 
 `tests/scripts/vscode/Invoke-MSTestWithCoverage.Helpers.Tests.ps1`. The single on-disk fixture is committed.
 
 - [ ] [P4-T1] Create the committed below-threshold fixture `tests/fixtures/coverage/below-threshold.cobertura.xml`, a minimal valid Cobertura document whose root attributes give a repository-wide line rate strictly below the D1 floor (for example `lines-valid="1000" lines-covered="700"`).
-  - Acceptance: the file is committed, is valid XML, parses through `Get-CoberturaCoverageRates` to a line rate below 80.0, and is referenced by both P4-T11 and the Pester suite.
+  - Acceptance: the file is committed, is valid XML, parses through `Get-CoberturaCoverageRates` to a line rate below 80.0, and is referenced by both P4-T12 and the Pester suite.
 - [ ] [P4-T2] Create `tests/scripts/vscode/Invoke-CoverageThresholdGate.Tests.ps1` with a `BeforeAll` that dot-sources `scripts/vscode/Invoke-CoverageThresholdGate.ps1` by a `$PSScriptRoot`-relative path, and the first `It`: a line rate above the floor yields `Ok = $true`.
   - Acceptance: the test passes, uses an inline here-string Cobertura fixture, and touches no filesystem path other than dot-sourcing the script under test.
 - [ ] [P4-T3] Add the boundary `It` to `tests/scripts/vscode/Invoke-CoverageThresholdGate.Tests.ps1` asserting that a line rate one basis point **below** the floor yields `Ok = $false` with a reason naming the floor.
@@ -199,56 +220,60 @@ Tests create no temporary files. Inline here-string fixtures follow the pattern 
   - Acceptance: the test passes and the reason string is distinct from the absent-artifact reason and from the below-floor reason.
 - [ ] [P4-T7] Add the `It` to `tests/scripts/vscode/Invoke-CoverageThresholdGate.Tests.ps1` asserting that a branch rate below 75 with a line rate above the floor yields `Ok = $true`, pinning spec D3 against silent reintroduction of a branch gate.
   - Acceptance: the test passes and fails if any branch comparison is added to `Test-CoverageThresholdVerdict`.
-- [ ] [P4-T8] Add the AC3 authority-consistency `It` to `tests/scripts/vscode/Invoke-CoverageThresholdGate.Tests.ps1`, calling `Test-CoverageNumeralAuthority` over the committed text of `CLAUDE.md`, `.claude/rules/general-unit-test.md` and `.claude/rules/quality-tiers.md` and asserting the returned hit list is empty, and separately asserting that `(Get-CoverageThresholdPolicy).LineFloorPercent` equals the numeral stated in `CLAUDE.md` § UT2.
-  - Acceptance: the test passes, reads only committed files, writes nothing, and fails if a coverage numeral is reintroduced into either rule file or if the gate constant drifts from the authority document.
-- [ ] [P4-T9] Create `tests/.claude/hooks/validate-feature-review-coverage.Tests.ps1` covering the hook's reconciled behaviour: a changed-language row with an absent coverage artifact returns `Ok = $false` (fail closed), and a below-75 branch figure with an above-floor line figure no longer produces a failing row.
+- [ ] [P4-T8] Add the AC3 authority-consistency `It` to `tests/scripts/vscode/Invoke-CoverageThresholdGate.Tests.ps1`, calling `Test-CoverageNumeralAuthority` over the on-disk text of `CLAUDE.md`, `.claude/rules/general-unit-test.md` and `.claude/rules/quality-tiers.md` and asserting the returned hit list is empty, and separately asserting that `(Get-CoverageThresholdPolicy).LineFloorPercent` equals the numeral stated in `CLAUDE.md` § UT2.
+  - Acceptance: the test passes, reads the on-disk repository copies of those three files (not `git show` of any commit) and writes nothing, and fails if a coverage numeral is reintroduced into either rule file or if the gate constant drifts from the authority document.
+- [ ] [P4-T9] Add the non-coverage-numeral negative `It` to `tests/scripts/vscode/Invoke-CoverageThresholdGate.Tests.ps1`, feeding `Test-CoverageNumeralAuthority` an in-memory document map containing the three non-coverage strings `| Mutation score | >= 75% | trend-only | none | none |`, `| Determinism (retry rate) | < 0.5% | < 1% | < 2% | n/a |`, and `Format check: 100% pass.`, and asserting the returned hit list is empty.
+  - Acceptance: the test passes, performs no filesystem access, and fails if the numeral-detection pattern is widened to match tier-dependent mutation, determinism, or format-check values. This pins the P3-T4 exclusion against the false-positive class that would otherwise defeat P2-T18 and P6-T7.
+- [ ] [P4-T10] Create `tests/.claude/hooks/validate-feature-review-coverage.Tests.ps1` covering the hook's reconciled behaviour: a changed-language row with an absent coverage artifact returns `Ok = $false` (fail closed), and a below-75 branch figure with an above-floor line figure no longer produces a failing row.
   - Acceptance: both tests pass, dot-source the hook by a `$PSScriptRoot`-relative path, use in-memory payload strings, and create no temporary files. This is the executing-path proof required by `spec.md` Risk 6.
-- [ ] [P4-T10] Audit determinism and temporary-file prohibition across `tests/scripts/vscode/Invoke-CoverageThresholdGate.Tests.ps1` and `tests/.claude/hooks/validate-feature-review-coverage.Tests.ps1` by grepping for `New-TemporaryFile`, `New-Item`, `Out-File`, `Set-Content`, `$env:TEMP`, `Start-Sleep`, `Get-Date` and `Get-Random`, and write `<FEATURE>/evidence/other/test-determinism-audit.<TS>.md`.
+- [ ] [P4-T11] Audit determinism and temporary-file prohibition across `tests/scripts/vscode/Invoke-CoverageThresholdGate.Tests.ps1` and `tests/.claude/hooks/validate-feature-review-coverage.Tests.ps1` by grepping for `New-TemporaryFile`, `New-Item`, `Out-File`, `Set-Content`, `$env:TEMP`, `Start-Sleep`, `Get-Date` and `Get-Random`, and write `<FEATURE>/evidence/other/test-determinism-audit.<TS>.md`.
   - Acceptance: zero hits for every pattern; this is the AC9 mechanical proof.
-- [ ] [P4-T11] `[expect-fail]` Execute AC4 Case A — below-threshold input — by running `pwsh -NoProfile -File scripts/vscode/Invoke-CoverageThresholdGate.ps1 -CoveragePath tests/fixtures/coverage/below-threshold.cobertura.xml` and capturing the transcript to `<FEATURE>/evidence/regression-testing/ac4-negative-path-case-a.<TS>.md`.
+- [ ] [P4-T12] `[expect-fail]` Execute AC4 Case A — below-threshold input — by running `pwsh -NoProfile -File scripts/vscode/Invoke-CoverageThresholdGate.ps1 -CoveragePath tests/fixtures/coverage/below-threshold.cobertura.xml` and capturing the transcript to `<FEATURE>/evidence/regression-testing/ac4-negative-path-case-a.<TS>.md`.
   - Acceptance: `EXIT_CODE: 1` is recorded, the emitted reason names the measured line rate and the 80 floor, and `Output Summary:` labels the record "Case A — below-threshold input".
-- [ ] [P4-T12] `[expect-fail]` Execute AC4 Case B — absent artifact — by running `pwsh -NoProfile -File scripts/vscode/Invoke-CoverageThresholdGate.ps1 -CoveragePath coverage/deliberately-absent.cobertura.xml` (a path that is not created and not deleted) and capturing the transcript to `<FEATURE>/evidence/regression-testing/ac4-negative-path-case-b.<TS>.md`.
+- [ ] [P4-T13] `[expect-fail]` Execute AC4 Case B — absent artifact — by running `pwsh -NoProfile -File scripts/vscode/Invoke-CoverageThresholdGate.ps1 -CoveragePath coverage/deliberately-absent.cobertura.xml` (a path that is not created and not deleted) and capturing the transcript to `<FEATURE>/evidence/regression-testing/ac4-negative-path-case-b.<TS>.md`.
   - Acceptance: `EXIT_CODE: 1` is recorded, the emitted reason names the missing artifact path, and `Output Summary:` labels the record "Case B — absent artifact". A zero exit code fails this task and means the gate is not fail-closed.
-- [ ] [P4-T13] Consolidate the two-case AC4 proof into `<FEATURE>/evidence/regression-testing/ac4-negative-path-proof.<TS>.md`, citing both case artifacts by path.
+- [ ] [P4-T14] Consolidate the two-case AC4 proof into `<FEATURE>/evidence/regression-testing/ac4-negative-path-proof.<TS>.md`, citing both case artifacts by path.
   - Acceptance: the consolidated artifact records `Timestamp:`, `Command:` for each case, `EXIT_CODE:` for each case, and an `Output Summary:` that names Case A and Case B **individually**. A proof covering only Case A does not satisfy AC4.
-- [ ] [P4-T14] Run the full PowerShell test suite via `mcp__drm-copilot__run_poshqc_test` and write `<FEATURE>/evidence/other/pester-suite-post-implementation.<TS>.md`.
-  - Acceptance: all tests pass, including the four pre-existing files under `tests/scripts/vscode/` unchanged (Boundaries invariant 7), and `Output Summary:` records passed/failed/total counts plus line and branch coverage percentages.
+- [ ] [P4-T15] Run the full PowerShell test suite via `mcp__drm-copilot__run_poshqc_test` and write `<FEATURE>/evidence/other/pester-suite-post-implementation.<TS>.md`.
+  - Acceptance: all tests pass, including the four pre-existing files under `tests/scripts/vscode/` unchanged (Boundaries invariant 7), and `Output Summary:` records passed/failed/total counts plus line and branch coverage percentages. The artifact must additionally enumerate the executed test **files** and prove both new files were collected with a non-zero test count each — `tests/scripts/vscode/Invoke-CoverageThresholdGate.Tests.ps1` and `tests/.claude/hooks/validate-feature-review-coverage.Tests.ps1`. If either file is absent from the executed inventory, the MCP default scan set does not reach it (note that `config/poshqc-scan.json` does not exist in this worktree and no pre-existing Pester file lives under a hidden-parent directory such as `tests/.claude/`); re-run with an explicit `scan_folders` argument naming `tests`, record which route was used, and record whether `config/poshqc-scan.json` had to be authored. A green suite that did not collect both files fails this task.
 
 ---
 
 ### Phase 5 — Follow-Up Issues, Document Reconciliation, and Acceptance-Criteria Check-Off
 
-- [ ] [P5-T1] File follow-up issue **FU-A** ("Convert all remaining coverage-numeral sites to citations of `CLAUDE.md` § UT2") through the MCP promotion lifecycle and mirror the result to `<FEATURE>/evidence/issue-updates/fu-a.<TS>.md`.
+- [ ] [P5-T1] Author the potential-feature entries that the MCP promotion lifecycle consumes: `docs/features/potential/<TS-date>-coverage-numeral-citation-conversion.md` (FU-A), `docs/features/potential/<TS-date>-coverage-measurement-determinism.md` (FU-B, authored only if P1-T5 recorded `TOLERANCE NOT MET`), and `docs/features/potential/<TS-date>-remove-temp-extract-coverage.md` (FU-C).
+  - Acceptance: each authored entry exists at a repository-relative path under `docs/features/potential/` and is the exact `potential_path` value the corresponding promotion task (P5-T2, P5-T3, P5-T4) passes to `mcp__drm-copilot__potential_to_issue`. Verify that `mcp__drm-copilot__potential_to_issue` is available in the session before authoring; if it is not, halt per `feature-promotion-lifecycle` rather than filing issues by another route.
+- [ ] [P5-T2] File follow-up issue **FU-A** ("Convert all remaining coverage-numeral sites to citations of `CLAUDE.md` § UT2") through the MCP promotion lifecycle and mirror the result to `<FEATURE>/evidence/issue-updates/fu-a.<TS>.md`.
   - Acceptance: the mirror records the created issue number and URL, and the issue body explicitly names `.claude/agents/feature-review.md` (highest priority, self-contradicting), `.claude/rules/powershell.md`, `.claude/skills/powershell-qa-gate/SKILL.md`, `.claude/skills/feature-review-workflow/SKILL.md`, `.github/instructions/general-unit-test.instructions.md`, `AGENTS.md`, the three divergent `.agents/` files, `.codex/hooks/validate-feature-review-coverage.ps1`, and the `.claude/agent-memory/**` entries superseded on landing.
-- [ ] [P5-T2] Record the **FU-B** determination from the P1-T5 spread result and, if `TOLERANCE NOT MET`, file FU-B ("Coverage measurement determinism") through the MCP promotion lifecycle; mirror either outcome to `<FEATURE>/evidence/issue-updates/fu-b.<TS>.md`.
+- [ ] [P5-T3] Record the **FU-B** determination from the P1-T5 spread result and, if `TOLERANCE NOT MET`, file FU-B ("Coverage measurement determinism") through the MCP promotion lifecycle; mirror either outcome to `<FEATURE>/evidence/issue-updates/fu-b.<TS>.md`.
   - Acceptance: the mirror records the measured line-rate and lines-valid spreads and states either the created issue number or an explicit `FU-B NOT REQUIRED` determination citing the tolerance result. An unrecorded determination fails this task.
-- [ ] [P5-T3] File follow-up issue **FU-C** ("Remove or relocate `scripts/temp-extract-coverage.ps1`") through the MCP promotion lifecycle and mirror the result to `<FEATURE>/evidence/issue-updates/fu-c.<TS>.md`.
+- [ ] [P5-T4] File follow-up issue **FU-C** ("Remove or relocate `scripts/temp-extract-coverage.ps1`") through the MCP promotion lifecycle and mirror the result to `<FEATURE>/evidence/issue-updates/fu-c.<TS>.md`.
   - Acceptance: the mirror records the created issue number and URL; `scripts/temp-extract-coverage.ps1` itself is not modified by this feature.
-- [ ] [P5-T4] Reconcile the AC6 divergence between the two acceptance-criteria sources by updating `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md`: replace the narrow AC6 text in the `## Acceptance Criteria` block with the widened `issue.md` wording, and update the D6 carve-out table and the D7 out-of-scope table so `.claude/rules/general-code-change.md:29` and `.agents/skills/quality-tiers/SKILL.md` read `aligned here` rather than `deferred to FU-A`.
-  - Acceptance: the AC6 text in `spec.md` matches `issue.md` verbatim, and no row in the `spec.md` out-of-scope table defers a site this plan actually edited.
-- [ ] [P5-T5] Append any newly discovered threshold-stating sites from the P0-T7 inventory to the `spec.md` out-of-scope disposition table with an explicit disposition each, in `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md`.
+- [ ] [P5-T5] Verify that the two acceptance-criteria sources are still identical and that no `spec.md` disposition contradicts what this plan edited, by comparing the `## Acceptance Criteria` blocks of `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` criterion by criterion, and writing `<FEATURE>/evidence/other/ac-source-parity.<TS>.md`.
+  - Acceptance: all ten criteria AC1-AC10 match verbatim after whitespace normalization; the `spec.md` in-scope Files and Sites table contains rows 3a and 3b; no row in the `spec.md` out-of-scope table defers a site this plan actually edited. Any mismatch is repaired in `spec.md` (the `issue.md` wording governs) and the repair is recorded in the artifact.
+- [ ] [P5-T6] Append any newly discovered threshold-stating sites from the P0-T7 inventory to the `spec.md` out-of-scope disposition table with an explicit disposition each, in `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md`.
   - Acceptance: every hit in `<FEATURE>/evidence/baseline/coverage-numeral-inventory.<TS>.md` appears in the table with exactly one of `aligned here`, `deferred to FU-A`, `non-normative`, or `no change needed`; `.codex/hooks/validate-feature-review-coverage.ps1` appears explicitly.
-- [ ] [P5-T6] Check off **AC1** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing `<FEATURE>/evidence/other/authority-single-numeral-proof.<TS>.md`.
+- [ ] [P5-T7] Check off **AC1** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing `<FEATURE>/evidence/other/authority-single-numeral-proof.<TS>.md`.
   - Acceptance: exactly one acceptance-criterion checkbox is flipped by this task, in both files, with the evidence pointer recorded inline.
-- [ ] [P5-T7] Check off **AC2** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing the P2-T4 and P2-T9 results recorded in `<FEATURE>/evidence/other/claude-md-scope-check.<TS>.md`.
+- [ ] [P5-T8] Check off **AC2** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing `<FEATURE>/evidence/other/ac2-ac5-substance-proof.<TS>.md` (P2-T20) alongside the P2-T4 and P2-T9 results recorded in `<FEATURE>/evidence/other/claude-md-scope-check.<TS>.md`.
   - Acceptance: exactly one acceptance-criterion checkbox is flipped by this task, in both files, with the evidence pointer recorded inline.
-- [ ] [P5-T8] Check off **AC3** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing `<FEATURE>/evidence/other/authority-single-numeral-proof.<TS>.md` and the P4-T8 authority-consistency test.
+- [ ] [P5-T9] Check off **AC3** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing `<FEATURE>/evidence/other/authority-single-numeral-proof.<TS>.md` and the P4-T8 authority-consistency test.
   - Acceptance: exactly one acceptance-criterion checkbox is flipped by this task, in both files, with the evidence pointer recorded inline.
-- [ ] [P5-T9] Check off **AC4** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing `<FEATURE>/evidence/regression-testing/ac4-negative-path-proof.<TS>.md`.
+- [ ] [P5-T10] Check off **AC4** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing `<FEATURE>/evidence/regression-testing/ac4-negative-path-proof.<TS>.md`.
   - Acceptance: exactly one acceptance-criterion checkbox is flipped by this task, in both files, and the cited proof names Case A and Case B individually.
-- [ ] [P5-T10] Check off **AC5** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing the ratified gate-scope block written by P2-T6 in `CLAUDE.md`.
+- [ ] [P5-T11] Check off **AC5** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing the ratified gate-scope block written by P2-T6 in `CLAUDE.md` as verified in `<FEATURE>/evidence/other/ac2-ac5-substance-proof.<TS>.md` (P2-T20).
   - Acceptance: exactly one acceptance-criterion checkbox is flipped by this task, in both files, with the evidence pointer recorded inline.
-- [ ] [P5-T11] Check off **AC6** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing the P2-T11, P2-T15, P2-T16 greps and `<FEATURE>/evidence/other/tier-reference-dispositions.<TS>.md`.
+- [ ] [P5-T12] Check off **AC6** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing the P2-T10, P2-T15, P2-T16 greps and `<FEATURE>/evidence/other/tier-reference-dispositions.<TS>.md`.
   - Acceptance: exactly one acceptance-criterion checkbox is flipped by this task, in both files, and the widened AC6 text is the text being checked off.
-- [ ] [P5-T12] Check off **AC7** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing `<FEATURE>/evidence/baseline/coverage-remeasurement-spread.<TS>.md` and `<FEATURE>/evidence/other/d1-measurement-reconciliation.<TS>.md`.
+- [ ] [P5-T13] Check off **AC7** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing `<FEATURE>/evidence/baseline/coverage-remeasurement-spread.<TS>.md` and `<FEATURE>/evidence/other/d1-measurement-reconciliation.<TS>.md`.
   - Acceptance: exactly one acceptance-criterion checkbox is flipped by this task, in both files, and the cited evidence pre-dates every Phase 2 governance edit.
-- [ ] [P5-T13] Check off **AC8** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing `<FEATURE>/evidence/other/hook-consistency-proof.<TS>.md`.
+- [ ] [P5-T14] Check off **AC8** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing `<FEATURE>/evidence/other/hook-consistency-proof.<TS>.md`.
   - Acceptance: exactly one acceptance-criterion checkbox is flipped by this task, in both files, with the evidence pointer recorded inline.
-- [ ] [P5-T14] Check off **AC9** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing `<FEATURE>/evidence/other/test-determinism-audit.<TS>.md` and recording that the mirrored test paths follow the `spec.md` Test Strategy restatement.
+- [ ] [P5-T15] Check off **AC9** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing `<FEATURE>/evidence/other/test-determinism-audit.<TS>.md` and recording that the mirrored test paths follow the `spec.md` Test Strategy restatement.
   - Acceptance: exactly one acceptance-criterion checkbox is flipped by this task, in both files, and the restatement rationale is cited rather than silently deviated from.
-- [ ] [P5-T15] Check off **AC10** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing the completed disposition table and the FU-A issue number from `<FEATURE>/evidence/issue-updates/fu-a.<TS>.md`.
+- [ ] [P5-T16] Check off **AC10** in both `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` and `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/issue.md`, citing the completed disposition table and the FU-A issue number from `<FEATURE>/evidence/issue-updates/fu-a.<TS>.md`.
   - Acceptance: exactly one acceptance-criterion checkbox is flipped by this task, in both files, and FU-A exists as a real issue rather than as prose.
-- [ ] [P5-T16] Write the acceptance-criteria status summary to `<FEATURE>/evidence/issue-updates/ac-status-summary.<TS>.md`, listing AC1-AC10 with status and evidence path.
+- [ ] [P5-T17] Write the acceptance-criteria status summary to `<FEATURE>/evidence/issue-updates/ac-status-summary.<TS>.md`, listing AC1-AC10 with status and evidence path.
   - Acceptance: all ten criteria are listed, each with a `[x]` status and a resolvable evidence path.
 
 ---
@@ -265,13 +290,13 @@ No task in this phase may complete with `EXIT_CODE: SKIPPED`.
 - [ ] [P6-T3] Record the type-check stage disposition in `<FEATURE>/evidence/qa-gates/final-typecheck-disposition.<TS>.md`: PowerShell has no type-check stage per `.claude/rules/powershell.md` step 3, and no C# source file changed in this feature.
   - Acceptance: the artifact records `git diff --name-only` filtered to `*.cs`, `*.csproj`, `*.props`, `*.targets` and shows an empty result; if that result is non-empty, the full C# toolchain (format, analyze, rebuild) must be run and recorded here, excluding `/p:Nullable=enable`.
 - [ ] [P6-T4] Run the final PowerShell test stage with coverage `mcp__drm-copilot__run_poshqc_test` and write `<FEATURE>/evidence/qa-gates/final-ps-pester-coverage.<TS>.md`.
-  - Acceptance: `EXIT_CODE: 0`, all tests pass, and `Output Summary:` records post-change **line coverage %** and **branch coverage %** plus passed/failed/total counts. The JaCoCo artifact `artifacts/pester/powershell-coverage.xml` exists after the run.
+  - Acceptance: `EXIT_CODE: 0`, all tests pass, and `Output Summary:` records post-change **line coverage %** and **branch coverage %** plus passed/failed/total counts. The JaCoCo artifact `artifacts/pester/powershell-coverage.xml` exists after the run. The artifact must additionally enumerate the executed test **files** and prove both new files were collected with a non-zero test count each — `tests/scripts/vscode/Invoke-CoverageThresholdGate.Tests.ps1` and `tests/.claude/hooks/validate-feature-review-coverage.Tests.ps1`. If either file is absent from the executed inventory, re-run with an explicit `scan_folders` argument naming `tests`, record which route was used, and record whether `config/poshqc-scan.json` had to be authored. A green suite that did not collect both files fails this task.
 - [ ] [P6-T5] Compute and record the coverage delta and new-code threshold check in `<FEATURE>/evidence/qa-gates/coverage-delta.<TS>.md`, comparing the P0-T11 baseline against the P6-T4 post-change figures and computing coverage for the newly added files `scripts/vscode/Invoke-CoverageThresholdGate.ps1` and the changed lines of `.claude/hooks/validate-feature-review-coverage.ps1`.
-  - Acceptance: the artifact reports baseline coverage, post-change coverage, and new/changed-code coverage numerically; new-code line coverage is `>= 90%`; changed lines show no coverage regression. A shortfall is a remediation-required outcome, not a PASS.
+  - Acceptance: the artifact reports baseline coverage, post-change coverage, and new/changed-code coverage numerically; new-code line coverage is `>= 90%`; changed lines show no coverage regression. The artifact must include the per-file coverage row for `scripts/vscode/Invoke-CoverageThresholdGate.ps1` **by name**. If the P6-T4 route does not emit a per-file row for that path, this task is authorized to run a scoped `pwsh -NoProfile -Command "Invoke-Pester -Path tests/scripts/vscode/Invoke-CoverageThresholdGate.Tests.ps1 -CI -CodeCoverage scripts/vscode/Invoke-CoverageThresholdGate.ps1"` and must record which route produced the figure. A missing per-file figure, or a shortfall against the `>= 90%` bar, is a remediation-required outcome, not a PASS.
 - [ ] [P6-T6] Verify the gate's executing path end to end by running `pwsh -NoProfile -File scripts/vscode/Invoke-CoverageThresholdGate.ps1 -CoveragePath coverage/remeasure-run3.cobertura.xml` and recording the result in `<FEATURE>/evidence/qa-gates/gate-executing-path.<TS>.md`.
-  - Acceptance: the run produces a verdict against the real re-measured artifact and records `EXIT_CODE:` plus the measured line rate; the artifact also names `.claude/hooks/validate-feature-review-coverage.ps1` as the hook-level executing path proven by P4-T9.
+  - Acceptance: the run produces a verdict against the real re-measured artifact and records `EXIT_CODE:` plus the measured line rate; the artifact also names `.claude/hooks/validate-feature-review-coverage.ps1` as the hook-level executing path proven by P4-T10. A **non-zero exit code here is an expected and permitted outcome**: under spec D5 the repository-wide floor is reported-and-tracked and is not a Blocking gate until the reproducibility exit condition is met. Record the verdict and the D5 disposition; do **not** restart the Phase 6 toolchain loop on a non-zero exit from this task, and do not record it as `EXIT_CODE: SKIPPED`.
 - [ ] [P6-T7] Re-run the AC1/AC3 authority grep across `CLAUDE.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/quality-tiers.md`, `.claude/rules/general-code-change.md`, and `.agents/skills/quality-tiers/SKILL.md` after all edits, and write `<FEATURE>/evidence/qa-gates/final-authority-grep.<TS>.md`.
-  - Acceptance: coverage-threshold numerals appear only inside the `CLAUDE.md` § UT2 span and inside `Get-CoverageThresholdPolicy`; `quality-tiers.yml`, `tier-classification`, and `ci.research` return zero hits across all five paths.
+  - Acceptance: `quality-tiers.yml`, `tier-classification`, and `ci.research` return zero hits across all five paths. **Coverage-threshold** numerals appear only inside the `CLAUDE.md` § UT2 span and inside `Get-CoverageThresholdPolicy`, with exactly one enumerated exception: the three FU-A-deferred lines in `.agents/skills/quality-tiers/SKILL.md` (`- Line coverage: >= 85%.`, `- Branch coverage: >= 75%.`, and the `## Rationale (uniform coverage thresholds)` sentence restating both), which `spec.md` in-scope row 3b and the Planner Note expressly leave unedited; the artifact must list those three hits individually and classify each as `deferred to FU-A`, citing the FU-A issue number from `<FEATURE>/evidence/issue-updates/fu-a.<TS>.md`. Any coverage-threshold hit that is neither inside the authority span, nor inside `Get-CoverageThresholdPolicy`, nor one of those three enumerated FU-A lines, fails this task. The same non-coverage classification carve-out P2-T18 applies is applied here: the `| Mutation score | >= 75% |` rows in `.claude/rules/quality-tiers.md` and `.agents/skills/quality-tiers/SKILL.md`, the `| Determinism (retry rate) | < 0.5% | < 1% | < 2% | n/a |` rows, the `Format check: 100% pass.` bullets, and the `mutation score >= 75%` bullet in `.claude/rules/general-unit-test.md` are enumerated with that classification and excluded from the coverage-threshold hit set.
 - [ ] [P6-T8] Audit file sizes for every file added or modified by this feature and write `<FEATURE>/evidence/qa-gates/final-file-size-audit.<TS>.md`, running the audit **after** the P6-T1 format stage.
   - Acceptance: every `.ps1` file added or modified is under 500 lines; Markdown documentation files are exempt per `.claude/rules/general-code-change.md`.
 - [ ] [P6-T9] Commit all source, test, governance and evidence changes on `bug/coverage-threshold-policy-reconciliation-494` with a message referencing issue #494, and record the commit sha in `<FEATURE>/evidence/qa-gates/final-commit.<TS>.md`.
@@ -287,8 +312,14 @@ No task in this phase may complete with `EXIT_CODE: SKIPPED`.
 
 ## Appendix A — `CLAUDE.md` § UT2 Replacement Text
 
-The blocks below replace the `- **Comprehensive Coverage (within reason)**` bullet block (lines 294-306 as of
-`edf3d34c`). The `- **Scenario Completeness**` sub-block is not touched.
+These blocks are applied to `CLAUDE.md` § UT2 in two steps, and the semantics differ per block. Block A1 is
+**inserted** immediately after the `### UT2. Coverage and Scenarios` heading (P2-T2). Block A2 **replaces the
+whole `- **Comprehensive Coverage (within reason)**` bullet block** (lines 294-306 as of `edf3d34c`) including
+the pre-edit COM/VSTO/WinForms exemption bullet and its three sub-bullets, which A2 deliberately omits (P2-T3).
+Block A3 is then **inserted** immediately after the `Repository-wide line coverage must remain >= 80%` bullet
+that A2 wrote, re-instating the exemption in reconciled form (P2-T4); the net effect of P2-T3 plus P2-T4 is that
+the exemption is neither lost nor duplicated. Blocks A4 and A5 are appended into the same section (P2-T5,
+P2-T6). The `- **Scenario Completeness**` sub-block is not touched by any block.
 
 ### Block A1 — Authority declaration and conflict-resolution rule (P2-T2)
 
@@ -337,7 +368,10 @@ The blocks below replace the `- **Comprehensive Coverage (within reason)**` bull
     the denominator by any other means, or for any category not enumerated here, is a **Blocking**
     finding. Testable seams within otherwise-COM-bound assemblies (e.g., `ToDoLoader`, `IDList`
     arithmetic, `KbdActions<>`, path/settings helpers) are explicitly **NOT** exempt and must meet the
-    `>= 80%` floor. **Authority**: this exemption is ratified by the project maintainer and is tracked in
+    `>= 80%` floor. Type-only and interface-only files with no executable behavior legitimately report 0%
+    executable coverage and may be omitted from measurement; this is a clarification of the denominator, not
+    a fourth exemption category, and lowers no threshold. **Authority**: this exemption is ratified by the
+    project maintainer and is tracked in
     `feature/csharp-coverage-uplift`; widening the enumerated categories requires maintainer ratification.
 ```
 
@@ -388,9 +422,8 @@ definition, the enumerated exemption categories, and the change-scoped versus re
   acceptable even if the overall percentage looks good.
 - Configure coverage tooling to exclude test files (e.g., `tests/`) so metrics reflect application code,
   not tests.
-- Type-only / interface-only modules with no executable behavior may be omitted from coverage
-  measurement. Examples: TypeScript interface/type-only files and C# interface-only files. Such modules
-  legitimately report 0% executable coverage. This is a clarification only; it lowers no threshold.
+- Type-only / interface-only modules with no executable behavior are dispositioned by `CLAUDE.md` § UT2;
+  this file states no exclusion permission of its own.
 ```
 
 ### Block B2 — replaces `## Coverage Exclusion Policy` (P2-T9)
@@ -406,16 +439,15 @@ that rule directly: removing production lines from the denominator outside the c
 
 ## Appendix C — `.claude/rules/quality-tiers.md` Replacement Text
 
-### Block C1 — replaces the opening paragraph and deletes `## Source of Truth` (P2-T11)
+### Block C1 — replaces the opening paragraph and deletes `## Source of Truth` (P2-T10)
 
 ```
 This rule defines the T1–T4 module rigor taxonomy used to describe module criticality in this
-repository. The taxonomy is descriptive. There is no `quality-tiers.yml` mapping file, no
-`tier-classification` CI stage, and no `docs/ci.research.md`; nothing in this file asserts that any of
-them exists, and none is required for the gates below.
+repository. The taxonomy is descriptive. No mapping file, CI classification stage, or external
+research document is required by, or asserted by, this file; the gates below stand on their own.
 ```
 
-### Block C2 — replaces the four tier example bullets (P2-T12)
+### Block C2 — replaces the four tier example bullets (P2-T11)
 
 ```
 - **T1 — Critical.** Behavior bugs cause silent data loss or misclassification. Examples: the
@@ -429,15 +461,18 @@ them exists, and none is required for the gates below.
   tooling, `.claude/hooks/` governance hooks, and generated designer code.
 ```
 
-### Block C3 — replaces the two coverage bullets in the uniform-gate list (P2-T13)
+### Block C3 — replaces the two coverage bullets in the uniform-gate list (P2-T12)
+
+Scope note: this block replaces the `Line coverage: >= 85%.` and `Branch coverage: >= 75%.` bullets only. The
+pre-existing `- No regression on changed lines.` bullet that follows them is retained as-is and is deliberately
+not reproduced here, so that applying this block cannot duplicate it.
 
 ```
 - Line and branch coverage: see `CLAUDE.md` § UT2, the single authority for coverage policy. This file
   states no coverage numeral.
-- No regression on changed lines.
 ```
 
-### Block C4 — replaces `## Rationale (uniform coverage thresholds)` (P2-T14)
+### Block C4 — replaces `## Rationale (uniform coverage thresholds)` (P2-T13)
 
 ```
 ## Rationale (uniform coverage thresholds)
@@ -452,13 +487,13 @@ repository. The numeric values live in `CLAUDE.md` § UT2 and are not repeated h
 
 | AC | Implementing tasks | Verifying tasks | Check-off |
 |---|---|---|---|
-| AC1 | P2-T3, P2-T8, P2-T13, P2-T14 | P2-T18, P6-T7 | P5-T6 |
-| AC2 | P2-T4, P2-T9 | P2-T7, P6-T7 | P5-T7 |
-| AC3 | P2-T2, P2-T8, P2-T13, P3-T4 | P2-T18, P4-T8, P6-T7 | P5-T8 |
-| AC4 | P3-T1 through P3-T6, P3-T12, P4-T1 | P4-T3, P4-T5, P4-T11, P4-T12, P4-T13, P6-T6 | P5-T9 |
-| AC5 | P2-T6 | P2-T7 | P5-T10 |
-| AC6 | P2-T11, P2-T12, P2-T15, P2-T16 | P2-T17, P6-T7 | P5-T11 |
-| AC7 | P1-T1 through P1-T7 (all before Phase 2) | P1-T5, P1-T7 | P5-T12 |
-| AC8 | P3-T7, P3-T10, P3-T11 | P3-T13, P4-T9 | P5-T13 |
-| AC9 | P4-T2 through P4-T9 | P4-T10, P4-T14 | P5-T14 |
-| AC10 | P5-T4, P5-T5 | P5-T1, P0-T7 | P5-T15 |
+| AC1 | P2-T3, P2-T8, P2-T12, P2-T13 | P2-T18, P6-T7 | P5-T7 |
+| AC2 | P2-T4, P2-T9 | P2-T7, P2-T20, P6-T7 | P5-T8 |
+| AC3 | P2-T2, P2-T8, P2-T12, P3-T4 | P2-T18, P4-T8, P4-T9, P6-T7 | P5-T9 |
+| AC4 | P3-T1 through P3-T6, P3-T12, P4-T1 | P4-T3, P4-T5, P4-T12, P4-T13, P4-T14, P6-T6 | P5-T10 |
+| AC5 | P2-T6 | P2-T7, P2-T20 | P5-T11 |
+| AC6 | P2-T10, P2-T11, P2-T15, P2-T16 | P2-T17, P6-T7 | P5-T12 |
+| AC7 | P1-T1 through P1-T7 (all before Phase 2) | P1-T5, P1-T7 | P5-T13 |
+| AC8 | P3-T7, P3-T10, P3-T11 | P3-T13, P4-T10 | P5-T14 |
+| AC9 | P4-T2 through P4-T10 | P4-T11, P4-T15 | P5-T15 |
+| AC10 | P5-T5, P5-T6 | P5-T1, P5-T2, P0-T7 | P5-T16 |

@@ -131,7 +131,8 @@ labelled otherwise.
     `.claude/rules/quality-tiers.md:9,20-21` asserts all three **[VERIFIED]**.
 11. **A fourth site asserts the missing tier file.** `.claude/rules/general-code-change.md:29`
     states "Every project must be classified in `quality-tiers.yml` at repo root" **[VERIFIED]**.
-    This site is not enumerated in `issue.md` and is not named by AC6. See D6.
+    Discovered during specification and absent from `issue.md`'s original inventory; `issue.md` AC6
+    was widened on 2026-08-10T16-10 to name it, and it is now in scope. See D6.
 12. **The 85/75 vocabulary does not fit this codebase.** `.claude/rules/general-unit-test.md:37-44`
     names `dist/**`, `lib-amd/**`, `**/*.test.ts`, `src/test-support/**`, `jest.config.cjs`,
     `eslint.config.mjs`, `.dependency-cruiser.cjs`, `webpack.config.js`, `node_modules/**`, and
@@ -534,17 +535,26 @@ exist, are deleted or rewritten to name real projects.
 | `.claude/rules/architecture-boundaries.md:10` **[VERIFIED]** | "uniform gate across all tiers (T1-T4)" | **Leave unchanged.** The reference is to the tier vocabulary as a descriptive taxonomy, states no coverage numeral, and does not assert the missing file. Retaining the taxonomy without an asserted enforcement mechanism keeps the reference coherent. |
 | `.claude/rules/powershell.md:63-64` **[VERIFIED]** | "line coverage >= 85% across all tiers (T1-T4) per `.claude/rules/quality-tiers.md`" / "branch coverage >= 75%" | **Deferred to the AC10 follow-up issue** (D7). It is a coverage-numeral site, so it is governed by D4's cite-do-not-restate rule; the follow-up replaces both lines with a citation of the authority. |
 | `.claude/rules/general-unit-test.md:89,91` **[VERIFIED]** | "tier-dependent obligations per `.claude/rules/quality-tiers.md`" / "required for all tiers (T1-T4)" | **In scope.** This file is already being edited by this feature; the references are retained as taxonomy but must not cite removed claims. |
-| `.claude/rules/general-code-change.md:29` **[VERIFIED]** | "Every project must be classified in `quality-tiers.yml` at repo root." | **Newly discovered; see below.** |
-| `.agents/skills/quality-tiers/SKILL.md:15,26-27` **[RESEARCH]** | duplicates all three false claims | **Deferred to the AC10 follow-up issue** (D7). |
+| `.claude/rules/general-code-change.md:29` **[VERIFIED]** | "Every project must be classified in `quality-tiers.yml` at repo root." | **In scope (AC6 widening 2026-08-10T16-10).** The sentence asserting the absent `quality-tiers.yml` is deleted; the preceding sentence citing `.claude/rules/quality-tiers.md` is retained. No other content in this file is edited. See the widening record below. |
+| `.agents/skills/quality-tiers/SKILL.md:15,26-27` **[RESEARCH]** | duplicates all three false claims | **Split disposition (AC6 widening 2026-08-10T16-10).** The three false artifact claims (`quality-tiers.yml`, `tier-classification`, `docs/ci.research.md`) are **in scope** and removed here, because AC6 requires that no governance document assert an absent file and this file is the canonical Codex runtime surface. The file's 85/75 **coverage numerals** remain **deferred to FU-A** under D7, because converting numerals to citations is AC10 work, not AC6 work. |
 
-**Gap recorded explicitly.** `.claude/rules/general-code-change.md:29` asserts the missing
-`quality-tiers.yml` **[VERIFIED]**. It is **not** enumerated in `issue.md`, and AC6 as written scopes
-the resolution to `.claude/rules/quality-tiers.md` only. Removing the claim from `quality-tiers.md`
-while leaving it live in `general-code-change.md` leaves a false assertion in an always-loaded rule
-file. Disposition: this site is **deferred to the AC10 follow-up issue**, and the deferral is safe
-under D4 only in the weak sense that the site states no coverage numeral. It is nevertheless a
-residual defect this feature knowingly does not close, and it is recorded here so that a reviewer
-sees the choice rather than a gap.
+**AC6 widening recorded (2026-08-10T16-10; supersedes the earlier deferral).**
+`.claude/rules/general-code-change.md:29` asserts the missing `quality-tiers.yml` **[VERIFIED]**, and
+`.agents/skills/quality-tiers/SKILL.md:27` duplicates all three false claims. An earlier revision of
+this specification deferred both sites to the AC10 follow-up on the grounds that AC6 as originally
+worded scoped the resolution to `.claude/rules/quality-tiers.md` alone. That deferral is **withdrawn**.
+`issue.md` AC6 was widened on 2026-08-10T16-10 to cover every site carrying the claim, on the recorded
+rationale that resolving one always-loaded rule file while leaving the identical false claim live in a
+second always-loaded rule file reproduces the exact defect this feature exists to remove. The
+supporting site inventory is verified at
+`evidence/other/threshold-provenance-verification.2026-08-10T16-10.md` § E7.
+
+The widening is deliberately narrow. It authorises the removal of the **false-artifact assertions
+only**. It does not authorise any coverage-numeral edit at either site, does not authorise any other
+content change in `.claude/rules/general-code-change.md`, and does not disturb the D7 deferral of the
+numeral-to-citation conversion. Boundaries item 4 is read subject to this: the governance-edit
+authorization covers the coverage-threshold and coverage-exclusion content `issue.md` enumerates,
+**and** the tier-claim content AC6 enumerates, and nothing else.
 
 **Alternatives considered and rejected.**
 
@@ -705,6 +715,8 @@ Tooling locators are function and symbol names. Governance-document line numbers
 | 1 | `CLAUDE.md` | § UT2 "Coverage and Scenarios", lines 292-306 | Restate thresholds per D1 and D3; restate the reconciled denominator rule per D2; add the authority declaration and conflict-resolution rule per D4; add the ratified change-scoped and repo-wide rules per D5. Lines 308-315 ("Scenario Completeness") are not touched. |
 | 2 | `.claude/rules/general-unit-test.md` | § "Coverage Requirements" (lines 21-29) and § "Coverage Exclusion Policy" (lines 31-46) | Replace both blocks with a citation of `CLAUDE.md` § UT2 stating no numeral, per D2 and D4. Retain the non-coverage content. Ensure the tier references at lines 89 and 91 do not cite claims removed by D6. |
 | 3 | `.claude/rules/quality-tiers.md` | Lines 9, 20-21 (false claims); 13-16 (non-existent project examples); 33-34 and 51 (numerals) | Remove the false claims per D6; replace the coverage numerals with a citation per D4. |
+| 3a | `.claude/rules/general-code-change.md` | The sentence "Every project must be classified in `quality-tiers.yml` at repo root." (line 29 as of `edf3d34c`; re-locate by quoted text) | **AC6 widening only.** Delete that one sentence; retain the preceding sentence citing `.claude/rules/quality-tiers.md`. No coverage numeral and no other content in this file is edited. |
+| 3b | `.agents/skills/quality-tiers/SKILL.md` | The `quality-tiers.yml`, `tier-classification`, and `docs/ci.research.md` claims (lines 15, 26-27 as of `edf3d34c`; re-locate by quoted text) | **AC6 widening only.** Remove the three false artifact claims per D6; leave the tier taxonomy intact. The file's 85/75 coverage numerals are **not** edited here and remain deferred to FU-A. |
 | 4 | `.claude/hooks/validate-feature-review-coverage.ps1` | `.SYNOPSIS`; `Test-LanguageCoverageRow`; `Get-LanguageRepoCoverage`; `Get-LanguageBranchCoverage` | AC8: make documented behaviour and enforced constants agree and equal the D1 numbers. Extract the floor to a named script-scope constant with a comment citing the authority. Remove the unconditional branch-fail path per D3. Make the artifact-absent path fail closed per D8. Adjust the C# artifact path/format per D8's producer decision. |
 | 5 | New gate script (path chosen by the plan; `scripts/vscode/` recommended) | new pure function plus thin I/O wrapper | AC4: the threshold gate. Pure function takes coverage figures or a coverage-XML string plus floors and returns a structured verdict; wrapper reads the artifact. Only the wrapper touches the filesystem. |
 | 6 | Committed coverage-artifact producer (path chosen by the plan) | — | AC4/D8 requirement 1: a committed, reproducible producer for the artifact the gate consumes. May be satisfied by re-pointing the gate at the existing Cobertura output rather than by adding a converter. |
@@ -732,7 +744,7 @@ D4 authority rule to state no policy; a stale numeral there is incorrect but not
 | 9 | `.claude/agents/feature-review.md:112-114` and `:126-128` **[VERIFIED]** | 85/75 **and** 90/80/80 in one procedure | **Deferred (FU-A), flagged highest severity** | A live agent definition that contradicts itself fourteen lines apart. Not in `issue.md`'s inventory. FU-A must replace both blocks with a single citation of the authority. Until then, D4's conflict-resolution rule makes `CLAUDE.md` § UT2 govern, so the contradiction is resolvable rather than halting — but the agent still contains two different numeric procedures and will produce inconsistent verdicts. |
 | 10 | `.claude/agents/feature-review.md:129` **[VERIFIED]** | missing artifact = FAIL | **No change needed** | Already fail-closed; corroborates D8 and is the behaviour the hook must be brought into line with. |
 | 11 | `.agents/skills/general-unit-test/SKILL.md:29-30` **[VERIFIED]** | 85/75 | **Deferred (FU-A)** | Codex runtime surface. |
-| 12 | `.agents/skills/quality-tiers/SKILL.md:15,26-27,39-40,49,57` **[VERIFIED for 39-40,57]** | 85/75 plus all three false tier claims | **Deferred (FU-A)** | Duplicates the D6 defects. |
+| 12 | `.agents/skills/quality-tiers/SKILL.md:15,26-27,39-40,49,57` **[VERIFIED for 39-40,57]** | 85/75 plus all three false tier claims | **Split: false tier claims aligned here (in-scope row 3b); 85/75 numerals deferred (FU-A)** | The three false artifact claims are removed by this feature under the widened AC6. The coverage numerals are AC10 work and stay with FU-A. |
 | 13 | `.agents/skills/powershell/SKILL.md:64-65` **[VERIFIED]** | 80/90 | **Deferred (FU-A)** | **Diverges from its `.claude/` counterpart (85/75).** Numerals happen to agree with D1; the divergence itself is the defect. |
 | 14 | `.agents/skills/powershell-qa-gate/SKILL.md:45` **[VERIFIED]** | >= 90% | **Deferred (FU-A)** | Diverges from its `.claude/` counterpart (85/75). |
 | 15 | `.agents/skills/feature-review-workflow/SKILL.md:101-103` **[VERIFIED]** | 90/80/80 | **Deferred (FU-A)** | Diverges from its `.claude/` counterpart (85/75). |
@@ -740,7 +752,7 @@ D4 authority rule to state no policy; a stale numeral there is incorrect but not
 | 17 | `.claude/rules/csharp.md:39-41` **[VERIFIED for 39-40]** | 80/90 | **Deferred (FU-A); file owned by 512** | **Out of bounds for this feature.** Numerals already agree with D1, which reduces the 512 coordination risk to a documentation-consistency item. Sits at lines 39-41, outside 512's stated edit range (lines 14-16 and 83), so no merge conflict is expected in either order. |
 | 18 | `.claude/skills/csharp-qa-gate/SKILL.md:46` | >= 90% new units | **Deferred (FU-A); file owned by 512** | Same. 512's stated edit range is line 32. |
 | 19 | `CLAUDE.md` C# toolchain command blocks (regions 181-208, 377-386, 397-402) | toolchain commands | **Out of bounds; owned by 512** | Provably disjoint from § UT2 (292-306); nearest approach is 71 lines **[RESEARCH]**. No merge conflict expected. |
-| 20 | `.claude/rules/general-code-change.md:29` **[VERIFIED]** | asserts `quality-tiers.yml` exists | **Deferred (FU-A)** | Newly discovered; not in `issue.md` and not named by AC6. See D6's recorded gap. |
+| 20 | `.claude/rules/general-code-change.md:29` **[VERIFIED]** | asserts `quality-tiers.yml` exists | **Aligned here (in-scope row 3a)** | Named by AC6 as widened on 2026-08-10T16-10. The single false-assertion sentence is deleted by this feature; the file's remaining content is untouched. The earlier FU-A deferral of this site is withdrawn. |
 | 21 | `.claude/rules/architecture-boundaries.md:10` **[VERIFIED]** | "all tiers (T1-T4)", no numeral | **No change needed** | Taxonomy reference only; states no coverage numeral and asserts no missing file. |
 | 22 | `.claude/agent-memory/**` entries asserting coverage authority | prose assertions that `CLAUDE.md` 80/90 governs | **Superseded on landing** | Once D4 is written into `CLAUDE.md`, these memory entries are redundant. They are not policy and must not be cited as such. FU-A should prune or annotate them. |
 | 23 | `scripts/temp-extract-coverage.ps1` | `if ($lr -lt 0.80)` categorisation, hard-coded output path to a non-existent feature folder | **Deferred (separate follow-up FU-C)** | Not a threshold site; a committed throwaway script and a latent-cleanup candidate. |
@@ -762,8 +774,12 @@ The following must not change. A violation of any item is a Blocking finding.
    reported-and-tracked disposition plus a named remediation path — **not** a lower number.
 4. **The governance-edit authorization is narrow.** It suspends the `policy-compliance-order` hard
    constraint against editing `.claude/rules/` **only** for the coverage-threshold and
-   coverage-exclusion content `issue.md` enumerates. No other content in those files may be edited
-   for any purpose.
+   coverage-exclusion content `issue.md` enumerates, **and** for the tier-claim content AC6
+   enumerates as widened on 2026-08-10T16-10 (the `quality-tiers.yml` / `tier-classification` /
+   `docs/ci.research.md` assertions at `.claude/rules/quality-tiers.md`,
+   `.claude/rules/general-code-change.md:29`, and `.agents/skills/quality-tiers/SKILL.md:27`). No
+   other content in those files may be edited for any purpose. In particular, the AC6 widening
+   authorises **no** coverage-numeral edit at the two newly added sites.
 5. **The `CLAUDE.md:303` maintainer-ratification clause for the exemption is retained.** D2 keeps an
    already-ratified exemption; it does not grant new exemption authority to agents, and it does not
    disturb the recorded #227 denial precedent.
@@ -878,7 +894,7 @@ D9. If any C# file is touched, the full four-stage C# toolchain applies, excludi
 | 5 | **The governance-edit authorization is exceeded.** Editing coverage content in a `.claude/rules/` file is authorized; editing anything else there is not. | Medium / high | Boundaries item 4. Every edit must trace to a row in the in-scope Files and Sites table. Feature review must treat an unlisted `.claude/rules/` edit as Blocking. |
 | 6 | **The AC4 gate is authored but is not wired into any executing path**, leaving a gate that exists and never runs — the exact failure mode this epic exists to end. | Medium / high | D8 requirement 1 makes a committed producer mandatory. The plan must name the executing path (which script or hook invokes the gate) as a task acceptance criterion, not leave it implicit. |
 | 7 | **Removing the branch gate (D3) is misread as relaxing a policy to make a gate pass.** | Medium / medium | D3 records the reasoning, the #178 "line-only, no branch gate" record, and the four-of-nine package evidence explicitly, and requires the decision be stated identically in all three documents. The removed branch gate was never a decision of this repository; it arrived with the same import D1 supersedes. |
-| 8 | **`.claude/rules/general-code-change.md:29` retains the false `quality-tiers.yml` claim** after AC6 removes it from `quality-tiers.md`. | Certain / low | Recorded openly in D6 as a knowingly unclosed gap and deferred to FU-A. It states no coverage numeral, so it cannot produce a wrong coverage verdict; it can produce a wrong belief that a classification file exists. |
+| 8 | **A false `quality-tiers.yml` claim survives in a second always-loaded rule file** after AC6 removes it from `quality-tiers.md`. | Closed by the AC6 widening | Withdrawn as a residual gap. AC6 was widened on 2026-08-10T16-10 to name `.claude/rules/general-code-change.md:29` and `.agents/skills/quality-tiers/SKILL.md:27` explicitly; both are in-scope rows 3a and 3b, and the final verification grep must return zero hits for `quality-tiers.yml`, `tier-classification`, and `ci.research` across all AC6 sites. The residual exposure is now limited to any site not present in the verified inventory at `evidence/other/threshold-provenance-verification.2026-08-10T16-10.md` § E7; the execution-time inventory task re-runs that search to detect one. |
 | 9 | **Concurrent agent worktrees corrupt the re-measurement** through test-host contention or stale `*.Test.dll` discovery. | Medium / high | D9's hazard table: require no concurrent test execution, assert the worktree-prefix condition on every discovered assembly, record the assembly list and count, and record `Total tests:` so an `Unknown` outcome is detected. |
 
 ---
@@ -951,8 +967,8 @@ criterion is left unmapped.
 | **AC3** — documents name the authority; non-authoritative documents cite rather than restate | D4 | In-scope files 1, 2, 3. Authority declaration and conflict-resolution rule written into `CLAUDE.md` § UT2 itself, not inherited from the existing precedence list or the non-auto-loaded `policy-compliance-order` skill | Authority-consistency Pester test (case 7). The conflict-resolution rule is readable in `CLAUDE.md` § UT2 and states that a divergence is resolved by rule and does not trigger a halt |
 | **AC4** — tooling enforces the thresholds; a deliberately introduced regression fails the gate; negative-path proof under `evidence/regression-testing/` | D8, D1, D3, D5 | In-scope files 4, 5, 6, 7. New gate (pure function plus wrapper), committed producer, fail-closed artifact handling, hook constants aligned | Two-case proof: Case A (below-threshold input) **and** Case B (absent artifact). Transcript captured to `evidence/regression-testing/` with `EXIT_CODE:` and both cases named individually |
 | **AC5** — the #424/#230 precedent ratified or superseded, in writing, in the authority | D5 | In-scope file 1. `CLAUDE.md` § UT2 gains the ratified split: change-scoped gates blocking; repository-wide floor reported-and-tracked with the stated reproducibility tolerance and exit condition | The written rule is present in `CLAUDE.md` § UT2, is labelled a ratification, states the tolerance numerically, and states the condition under which the repo-wide floor becomes blocking |
-| **AC6** — `quality-tiers.yml` / `tier-classification` claim resolved; document asserts no absent file | D6 | In-scope file 3. Lines 9, 20-21 and the non-existent project examples at 13-16 removed | Grep confirms `.claude/rules/quality-tiers.md` no longer names `quality-tiers.yml`, `tier-classification`, or `docs/ci.research.md`. **Recorded gap:** `.claude/rules/general-code-change.md:29` retains the claim and is deferred to FU-A; AC6 as written scopes to `quality-tiers.md` only |
-| **AC7** — governing numbers decided against coverage re-measured post-#441/#478 and post-#457, captured before the numbers are written | D9, D5, D1 | Evidence artifacts under `evidence/baseline/`: three coverage runs, the spread artifact, the recorded function signatures, and the D1 `git log` verification | Task ordering: the re-measurement tasks precede every governance-document edit task in the plan. The numbers written cite the evidence artifact by path. **Recorded nuance:** the re-measurement validates and contextualises D1; it does not select the number (D9 reasoning point 3) |
+| **AC6** — `quality-tiers.yml` / `tier-classification` / `docs/ci.research.md` claims resolved at **every** site carrying them; no governance document asserts an absent file | D6 | In-scope files 3, **3a**, **3b**. In `quality-tiers.md`: lines 9, 20-21 and the non-existent project examples at 13-16 removed. In `.claude/rules/general-code-change.md`: the single `quality-tiers.yml` sentence deleted. In `.agents/skills/quality-tiers/SKILL.md`: the three false artifact claims removed | Grep across all three AC6 sites returns zero hits for `quality-tiers.yml`, `tier-classification`, and `ci.research`. Every T1-T4 reference left dangling by the removals (`.claude/rules/architecture-boundaries.md`, `.claude/rules/powershell.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`) carries an explicit recorded disposition. **No residual gap:** the earlier FU-A deferral of `general-code-change.md:29` is withdrawn |
+| **AC7** — governing numbers **validated** against coverage re-measured post-#441/#478 and post-#457, captured before any number is written, and treated as an execution-time input rather than a hard-coded figure | D9, D5, D1 | Evidence artifacts under `evidence/baseline/`: three coverage runs, the spread artifact, the recorded function signatures, and the D1 `git log` verification | Task ordering: the re-measurement tasks precede every governance-document edit task in the plan. No plan task writes a figure captured during preparation; every figure is captured at execution time and cited by artifact path. **Binding nuance:** the re-measurement validates and contextualises D1 and identifies which assemblies fail; it does **not** select the number (D9 reasoning point 3). A re-measurement that contradicts D1 routes to Risk 2 — halt and escalate — never to a silently re-tuned threshold |
 | **AC8** — `.claude/hooks/validate-feature-review-coverage.ps1` internally consistent, and its constants equal the reconciled thresholds | D8, D1, D3 | In-scope file 4. `.SYNOPSIS` prose, the `85.0` literal, the `$BranchFloor = 75.0` literal, and both message strings brought into agreement; floor extracted to a named constant citing the authority; the branch path removed per D3; the line/branch asymmetry resolved | Grep confirms exactly one line-floor numeral in the file, in a named constant, equal to the D1 number, and that `.SYNOPSIS` states the same number. Pester test asserts the constant equals the authority's number |
 | **AC9** — Pester tests at the mirrored path, deterministic, no temporary files | D8 | In-scope file 7 | Tests placed at the mirror of their subject (restatement recorded in Test Strategy). Determinism verified by repeated runs. Grep confirms no temp-file API in any added test |
 | **AC10** — out-of-scope threshold sites enumerated with a recorded disposition | D7, D6 | Files and Sites § "Out-of-scope sites and their dispositions" — 23 rows, each with exactly one disposition | Every site in the research inventory appears in the table, including the three sites `issue.md` missed (`.claude/agents/feature-review.md`, `.github/instructions/general-unit-test.instructions.md`, the `.agents/` divergences) and one site the research inventory did not flag for AC6 (`.claude/rules/general-code-change.md:29`). FU-A must be filed through the MCP promotion lifecycle **before merge** |
@@ -981,12 +997,29 @@ numbering. They are not additional criteria. Check-off must be mirrored in `issu
 - [ ] AC5 — The #424 / #230 improvised precedent (no-regression against a captured baseline plus
       a 90% changed-line bar as blocking, raw repo-wide figures non-blocking) is either ratified
       as the written rule or explicitly superseded, in writing, in the authoritative document.
-- [ ] AC6 — The `quality-tiers.yml` / `tier-classification` claim in
-      `.claude/rules/quality-tiers.md` is resolved: either the file and the classification stage
-      are authored, or the claim is removed. The document does not assert a file that is absent.
-- [ ] AC7 — The governing threshold numbers are decided against coverage re-measured under the
+- [ ] AC6 — The `quality-tiers.yml` / `tier-classification` / `docs/ci.research.md` claims are
+      resolved: either the referenced files and the classification stage are authored, or the
+      claims are removed. No governance document asserts a file that is absent. **Scope widened
+      2026-08-10T16-10:** this criterion covers every site carrying the claim, not
+      `.claude/rules/quality-tiers.md` alone. Verified sites are
+      `.claude/rules/quality-tiers.md:9,20` and `.claude/rules/general-code-change.md:29` (both
+      always-loaded), plus the `.agents/skills/quality-tiers/SKILL.md:27` snapshot copy. Rationale
+      for widening: resolving one always-loaded rule file while leaving the identical false claim
+      live in another reproduces the exact defect this feature exists to remove. Any T1-T4
+      reference left dangling by the removal (`.claude/rules/architecture-boundaries.md`,
+      `.claude/rules/powershell.md`, `.claude/rules/general-code-change.md`) must be given an
+      explicit disposition rather than left pointing at deleted content.
+- [ ] AC7 — The governing threshold numbers are validated against coverage re-measured under the
       post-#441/#478 and post-#457 arithmetic, with the re-measurement captured as evidence
-      before the numbers are written into the governance documents.
+      **before** any number is written into a governance document, and with the numbers treated as
+      an input refreshed at execution time rather than a figure hard-coded from a measurement
+      taken during preparation. **Disambiguation 2026-08-10T16-10:** this criterion governs
+      sequencing and evidence, and does not make the measurement the selector of the threshold.
+      The governing numbers are decided on the governance-provenance grounds recorded in `spec.md`
+      D1; the re-measurement validates them, supplies context, and identifies which assemblies
+      fail. If the re-measurement contradicts D1, the `spec.md` Risk 2 path applies: halt and
+      escalate. Silently re-tuning a threshold to match a measured figure is prohibited by the
+      epic non-goal and is not a permitted way to satisfy this criterion.
 - [ ] AC8 — `.claude/hooks/validate-feature-review-coverage.ps1` is internally consistent: its
       documented behavior and its enforced constants state the same numbers, and those numbers
       equal the reconciled thresholds.
@@ -1012,12 +1045,15 @@ Prose in a feature folder does not survive the merge. Each of the following must
 issue.
 
 - **FU-A — Convert all remaining coverage-numeral sites to citations of `CLAUDE.md` § UT2.** Covers
-  rows 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 20 and 22 of the out-of-scope
-  table. Must explicitly include: `.claude/agents/feature-review.md` (the self-contradicting live
-  agent definition, highest priority), `.claude/rules/powershell.md` (the only deferred site whose
-  numerals are both live and wrong after this feature lands), the three divergent `.agents/` files,
-  `.github/instructions/general-unit-test.instructions.md`, and `.claude/rules/general-code-change.md:29`
-  (the residual `quality-tiers.yml` assertion recorded in D6).
+  rows 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12 (numerals only), 13, 14, 15, 16, 17, 18 and 22 of the
+  out-of-scope table. Must explicitly include: `.claude/agents/feature-review.md` (the
+  self-contradicting live agent definition, highest priority), `.claude/rules/powershell.md` (the
+  only deferred site whose numerals are both live and wrong after this feature lands), the three
+  divergent `.agents/` files, and `.github/instructions/general-unit-test.instructions.md`.
+  **Rows 20 and the tier-claim half of row 12 are no longer FU-A scope**: the AC6 widening of
+  2026-08-10T16-10 brings `.claude/rules/general-code-change.md:29` and the false tier claims in
+  `.agents/skills/quality-tiers/SKILL.md` into this feature. FU-A retains only the 85/75 coverage
+  numerals in `.agents/skills/quality-tiers/SKILL.md`.
 - **FU-B — Coverage measurement determinism.** File if and only if D9's three-run spread exceeds
   D5's tolerance. Scope: non-deterministic assembly instrumentation in the `dotnet-coverage`
   collection path, which neither #441/#478 nor #457 addresses. This issue is the named blocker on
