@@ -1,4 +1,5 @@
-- [CLAUDE.md nullable command != the CI gate](project_claudemd_nullable_command_diverges_from_ci.md) — ci.yml omits `/p:Nullable=enable`; CS86xx from the forced flag is a FALSE blocker
+- [CLAUDE.md nullable command != CI gate — RESOLVED by #540](project_claudemd_nullable_command_diverges_from_ci.md) — docs now match ci.yml; a reappearance of `/p:Nullable=enable` or `/t:Build` is a regression. Carries the 195-error UtilitiesCS lower bound for #492
+- [PoshQC test drops coverage.xml at repo root](poshqc-test-drops-coverage-xml-at-repo-root.md) — untracked, not gitignored/csharpierignored; inflates the CSharpier file count and leaks into `git add -A`
 - [Agent-worktree discovery + evidence hygiene](project_agent_worktree_discovery_and_evidence_hygiene.md) — `\.claude\` test-glob filter must use the RELATIVE path; never commit raw Cobertura
 - [Completion-gate receipt shapes](completion-gate-receipt-shapes.md) — exact fields require_complete wants: delegation_receipts as a LIST, skill_receipts required:true
 - [JaCoCo not Cobertura for coverage evidence](jacoco-not-cobertura-for-evidence.md) — maintainer deletes committed Cobertura; convert to package-level JaCoCo before pushing
@@ -68,7 +69,7 @@
 - [C# coverage has two denominators](csharp-coverage-denominator-two-figures.md) — filtered first-party ~85.9% clears the gate, unfiltered ~70.4% doesn't; measure before trusting
 - [Preflight catches vacuous gates](preflight-catches-vacuous-gates.md) — MCP `ok:true` is not enough; executor preflight found 6 gates that passed while verifying nothing
 - [Bash tool mangles MSBuild switches](bash-tool-mangles-msbuild-switches.md) — `/m` becomes `M:/` (MSB1008); run C# tools via `pwsh -NoProfile` with absolute paths
-- [Analyzer gate is vacuous without /t:Rebuild](msbuild-analyzer-gate-vacuous-without-rebuild.md) — `/t:Build` after any earlier build skips CoreCompile and compiles NOTHING at EXIT 0
+- [Analyzer gate is vacuous without /t:Rebuild](msbuild-analyzer-gate-vacuous-without-rebuild.md) — `/t:Build` after any earlier build skips CoreCompile and compiles NOTHING at EXIT 0; assert a ZERO `Skipping target "CoreCompile"` count, NOT a csc.exe count (csc is 0 even on real compiles)
 - [Aggregate vstest crash: isolate per assembly](vstest-aggregate-crash-isolate-per-assembly.md) — "Test host process crashed" is environmental; re-run per assembly with /InIsolation
 - [Direct-csproj build facts (AnyCPU; CS2002)](csharp-direct-csproj-build-facts.md) — a single project needs `AnyCPU` (no space) while the .sln needs `"Any CPU"`; TWAE doesn't promote CS2002
 - [Model-routing hook reads the canonical path only](model-routing-hook-reads-canonical-path-only.md) — it hardcodes artifacts/orchestration/orchestrator-state.json; a child-scoped file alone is blocked
