@@ -31,11 +31,27 @@ anchored on function and symbol names only, because features #441, #457 and #478
 ## User-Authorized Scope Correction
 
 This section supersedes every prior delivery instruction in this document that would edit
-TaskMaster `CLAUDE.md`, `.claude/**`, or `.agents/skills/**`, obtain an upstream receipt, or write
-to any external repository. The existing TaskMaster artifact
+TaskMaster `CLAUDE.md`, a non-memory Claude runtime customization path, or `.agents/skills/**`,
+obtain an upstream receipt, or write to any external repository. The existing TaskMaster artifact
 `evidence/other/upstream-claude-policy-reconciliation-prompt.2026-08-11T12-41.md` is the complete
 local deliverable for all such prohibited runtime changes. Future application is expressly
 deferred outside TaskMaster and does not block this feature.
+
+Only the following six immutable pre-existing repository-specific `.claude/agent-memory/**`
+records are permitted, solely for protected-path classification; neither their content nor their
+history may be modified:
+
+1. `.claude/agent-memory/atomic-executor/MEMORY.md`
+2. `.claude/agent-memory/atomic-executor/project_511_is_a_testhost_crash_not_n_failing_tests.md`
+3. `.claude/agent-memory/atomic-executor/project_pester5_result_shape_container_tests_and_ci_codecoverage.md`
+4. `.claude/agent-memory/atomic-planner/MEMORY.md`
+5. `.claude/agent-memory/atomic-planner/poshqc-mcp-and-msbuild-invocation-facts.md`
+6. `.claude/agent-memory/atomic-planner/project_494_threshold_reconciliation_plan_seams.md`
+
+TaskMaster continues to prohibit `CLAUDE.md`; all non-memory Claude runtime customization classes
+(rules, hooks, skills, agents, settings, and generated runtime assets); `.agents/skills/**`; and
+external repositories. No upstream receipt, release, publication, validation, or other external
+evidence is required for TaskMaster completion.
 
 The active TaskMaster implementation scope is the permitted coverage runner and its deterministic
 Pester tests. Existing post-#441/#478/#457 measurements remain reusable evidence only after
@@ -994,12 +1010,12 @@ the User-Authorized Scope Correction replaces its local Claude-runtime change di
 
 | AC | TaskMaster delivery | Verification |
 |---|---|---|
-| AC1 | Retain the existing upstream prompt as the local deliverable; defer application outside TaskMaster. | Prompt-deliverable validation and final scope validation show the prompt is present and no local `CLAUDE.md` or `.claude/**` path changed. |
+| AC1 | Retain the existing upstream prompt as the local deliverable; defer application outside TaskMaster. | Final scope validation shows the prompt is present, no `CLAUDE.md`, non-memory Claude runtime customization, or `.agents/skills/**` path changed, and only the six immutable pre-existing agent-memory paths are classified. |
 | AC2 | Retain the prompt's upstream exclusion-policy requirement; no local Claude-runtime edit. | Prompt-deliverable validation. |
 | AC3 | Retain the prompt's upstream authority-source requirement; no local Claude-runtime edit. | Prompt-deliverable validation. |
 | AC4 | Add the permitted Cobertura threshold evaluator and runner invocation with deterministic Pester coverage. | Fail-before and pass-after evidence, plus final per-file coverage evidence. |
 | AC5 | Retain the prompt's upstream precedent-disposition requirement; no local Claude-runtime edit. | Prompt-deliverable validation. |
-| AC6 | Retain the prompt's false-claim-resolution requirement; no local Claude or Codex runtime-policy edit. | Prompt-deliverable and final scope validation. |
+| AC6 | Retain the prompt's false-claim-resolution requirement; no local `CLAUDE.md`, non-memory Claude runtime, or Codex runtime-policy edit. | Prompt-deliverable and final scope validation using only the six immutable pre-existing agent-memory paths for protected-path classification. |
 | AC7 | Reuse only schema-valid corrected-arithmetic evidence as contextual input. | Reused-baseline validation records the evidence and its no-threshold-selection restriction. |
 | AC8 | Retain the prompt's upstream hook-reconciliation requirement; no local hook edit. | Prompt-deliverable and final scope validation. |
 | AC9 | Add deterministic Pester cases alongside the TaskMaster coverage helper. | Pester pass-after and final per-file coverage evidence. |
@@ -1013,8 +1029,11 @@ satisfied locally only by validating the existing upstream prompt; they do not r
 or prove external execution.
 
 - [x] AC1 — The existing upstream prompt is retained as the complete TaskMaster deliverable for
-      reconciling coverage thresholds in the upstream source of truth; no TaskMaster `CLAUDE.md`
-      or `.claude/**` file is changed, and future application is deferred outside TaskMaster.
+      reconciling coverage thresholds in the upstream source of truth; no TaskMaster `CLAUDE.md`,
+      non-memory Claude runtime customization path, or `.agents/skills/**` path is changed. The
+      exact six immutable pre-existing `.claude/agent-memory/**` records in the User-Authorized
+      Scope Correction are permitted solely for protected-path classification, with no content or
+      history modification, and future application is deferred outside TaskMaster.
 - [x] AC2 — The existing upstream prompt explicitly requires the upstream owner to reconcile the
       coverage exclusion/exemption policy; TaskMaster records that deferred requirement without
       editing any local Claude-runtime path.
@@ -1030,7 +1049,10 @@ or prove external execution.
 - [x] AC6 — The existing upstream prompt carries the requirement to resolve the false
       `quality-tiers.yml`, `tier-classification`, and `docs/ci.research.md` claims at their
       upstream-owned runtime sites; TaskMaster records that deferred requirement without editing
-      `.claude/**` or `.agents/skills/**`.
+      `CLAUDE.md`, any non-memory Claude runtime customization path, or `.agents/skills/**`. The
+      exact six immutable pre-existing `.claude/agent-memory/**` records in the User-Authorized
+      Scope Correction are permitted solely for protected-path classification, with no content or
+      history modification.
 - [x] AC7 — Corrected-arithmetic remeasurement evidence is retained and validated as an
       execution-time input before the local threshold gate is implemented; it does not select or
       lower a threshold.

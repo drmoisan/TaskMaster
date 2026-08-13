@@ -94,13 +94,25 @@ must not be hard-coded from a figure measured before those features land.
 
 This section supersedes the earlier governance-document authorization and every receipt-gated
 delivery assumption in this issue. The TaskMaster deliverable for every prohibited `CLAUDE.md`
-or `.claude/**` change is the existing upstream prompt at
+or non-memory Claude runtime change is the existing upstream prompt at
 `evidence/other/upstream-claude-policy-reconciliation-prompt.2026-08-11T12-41.md`.
 
-TaskMaster must not edit `CLAUDE.md`, any `.claude/**` path, or `.agents/skills/**`, and it must
-not write to an upstream repository. Future application of the prompt is expressly deferred
-outside TaskMaster. No upstream receipt, release, validation, publication, or other external
-evidence is required for TaskMaster completion.
+TaskMaster must not edit `CLAUDE.md`; any non-memory Claude runtime customization path (rules,
+hooks, skills, agents, settings, or generated runtime assets); or `.agents/skills/**`, and it
+must not write to an upstream repository. The only permitted `.claude/agent-memory/**` range
+paths are the six immutable pre-existing repository-specific records listed below, solely for
+protected-path classification; neither their content nor their history may be modified:
+
+1. `.claude/agent-memory/atomic-executor/MEMORY.md`
+2. `.claude/agent-memory/atomic-executor/project_511_is_a_testhost_crash_not_n_failing_tests.md`
+3. `.claude/agent-memory/atomic-executor/project_pester5_result_shape_container_tests_and_ci_codecoverage.md`
+4. `.claude/agent-memory/atomic-planner/MEMORY.md`
+5. `.claude/agent-memory/atomic-planner/poshqc-mcp-and-msbuild-invocation-facts.md`
+6. `.claude/agent-memory/atomic-planner/project_494_threshold_reconciliation_plan_seams.md`
+
+Future application of the prompt is expressly deferred outside TaskMaster. No upstream receipt,
+release, validation, publication, or other external evidence is required for TaskMaster
+completion.
 
 The remaining TaskMaster-owned scope is limited to permitted coverage tooling and deterministic
 tests. The existing corrected-arithmetic coverage evidence remains an execution input and may
@@ -109,8 +121,11 @@ not select or lower a threshold. The issue #512 C# toolchain ownership boundary 
 ## Acceptance Criteria
 
 - [ ] AC1 — The existing upstream prompt is retained as the complete TaskMaster deliverable for
-      reconciling coverage thresholds in the upstream source of truth; no TaskMaster `CLAUDE.md`
-      or `.claude/**` file is changed, and future application is deferred outside TaskMaster.
+      reconciling coverage thresholds in the upstream source of truth; no TaskMaster `CLAUDE.md`,
+      non-memory Claude runtime customization path, or `.agents/skills/**` path is changed. The
+      exact six immutable pre-existing `.claude/agent-memory/**` records in the User-Authorized
+      Scope Correction are permitted solely for protected-path classification, with no content or
+      history modification, and future application is deferred outside TaskMaster.
 - [ ] AC2 — The existing upstream prompt explicitly requires the upstream owner to reconcile the
       coverage exclusion/exemption policy; TaskMaster records that deferred requirement without
       editing any local Claude-runtime path.
@@ -126,7 +141,10 @@ not select or lower a threshold. The issue #512 C# toolchain ownership boundary 
 - [ ] AC6 — The existing upstream prompt carries the requirement to resolve the false
       `quality-tiers.yml`, `tier-classification`, and `docs/ci.research.md` claims at their
       upstream-owned runtime sites; TaskMaster records that deferred requirement without editing
-      `.claude/**` or `.agents/skills/**`.
+      `CLAUDE.md`, any non-memory Claude runtime customization path, or `.agents/skills/**`. The
+      exact six immutable pre-existing `.claude/agent-memory/**` records in the User-Authorized
+      Scope Correction are permitted solely for protected-path classification, with no content or
+      history modification.
 - [ ] AC7 — Corrected-arithmetic remeasurement evidence is retained and validated as an
       execution-time input before the local threshold gate is implemented; it does not select or
       lower a threshold.

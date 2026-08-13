@@ -5,7 +5,7 @@
 - **Work Mode:** `full-bug` — acceptance criteria are tracked in `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` only.
 - **Feature folder:** `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494`
 - **Target plan:** `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/plan.2026-08-10T14-10.md`
-- **Scope correction:** TaskMaster `CLAUDE.md` and every TaskMaster `.claude/**` path are read-only. Their reconciliation, hook implementation, tests, regeneration, and publication are upstream-only work governed exclusively by `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/other/upstream-claude-policy-reconciliation-prompt.2026-08-11T12-41.md`.
+- **Scope correction:** TaskMaster `CLAUDE.md`; every non-memory Claude runtime customization path (rules, hooks, skills, agents, settings, and generated runtime assets); `.agents/skills/**`; and external repositories are prohibited. The existing upstream prompt remains a TaskMaster artifact and its future application is deferred, with no completion dependency on an upstream receipt, release, publication, or validation. The only permitted `.claude/agent-memory/**` range paths are the six immutable pre-existing repository-specific records below, solely for protected-path classification; neither their content nor history may change: `.claude/agent-memory/atomic-executor/MEMORY.md`, `.claude/agent-memory/atomic-executor/project_511_is_a_testhost_crash_not_n_failing_tests.md`, `.claude/agent-memory/atomic-executor/project_pester5_result_shape_container_tests_and_ci_codecoverage.md`, `.claude/agent-memory/atomic-planner/MEMORY.md`, `.claude/agent-memory/atomic-planner/poshqc-mcp-and-msbuild-invocation-facts.md`, and `.claude/agent-memory/atomic-planner/project_494_threshold_reconciliation_plan_seams.md`.
 - **C# ownership boundary:** no task changes C# toolchain commands, `CLAUDE.md`, `.claude/rules/csharp.md`, or `.claude/skills/csharp-qa-gate/SKILL.md`; those remain issue #512 territory.
 
 ## Conventions
@@ -13,10 +13,10 @@
 - `<FEATURE>` means `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494`.
 - `<TS>` means the execution-time timestamp in `yyyy-MM-ddTHH-mm` format.
 - Every command evidence artifact is written only below `<FEATURE>/evidence/<kind>/` and contains `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Decision artifacts contain `Timestamp:`, `Inputs:`, and `Determination:`.
-- The only TaskMaster files this plan permits an executor to write are files below `<FEATURE>/evidence/` and the single `[ ]` to `[x]` checkbox change in `spec.md` authorized by P3-T2. No task writes `issue.md`, `CLAUDE.md`, `.claude/**`, source, tests, configuration, `artifacts/**`, or a potential-feature entry.
+- The only TaskMaster files this plan permits an executor to write are files below `<FEATURE>/evidence/`, the authorized documentation-scope corrections in `issue.md`, `spec.md`, and this plan, and the individual AC1/AC6 marker updates in `spec.md` when verified. No task writes `CLAUDE.md`, a non-memory `.claude/**` runtime customization path, `.agents/skills/**`, source, tests, configuration, `artifacts/**`, a potential-feature entry, or an external repository. The six immutable pre-existing agent-memory paths in the Scope correction are classification-only exceptions and may not have their content or history modified.
 - Pester 5.x reports line/command coverage but does not provide a branch counter. PowerShell branch coverage is therefore recorded as `NOT MEASURABLE — Pester 5.x emits no branch counter` and is not a threshold, delta, or acceptance gate.
 - Each corrected-arithmetic measurement has exactly two valid outcome classes: (1) a zero-failure pass with `EXIT_CODE: 0` and an empty failure set; or (2) the exact #511 two-test failure set of `QuickFiler.Controllers.Tests.QfcItemController_InitializationTests.InitializeBool_ThroughThePumpHost_CompletesAndInitializesState` and `QuickFiler.Controllers.Tests.QfcItemController_InitializationTests.InitializeNineArgOverload_ThroughThePumpHost_SavesParametersAndDelegates`, both with the documented `System.InvalidOperationException: Invoke or BeginInvoke cannot be called on a control until the window handle has been created.` Every other non-zero result, including a missing, renamed, differently-excepted, or additional failure, is a blocking stop. The runner's raw XML is never corrected-arithmetic evidence; each raw XML produced by a valid outcome must be converted with the current helper before any coverage value is used.
-- This plan contains no manual or human-validation step. If the required upstream release evidence is absent, execution records an automated remediation-required blocked disposition, then continues P2-T4 through P3-T3 to complete all required evidence, status, acceptance-tracking, and scope-lock tasks. It does not ask a human to perform a validation task.
+- This plan contains no manual or human-validation step. The existing upstream prompt remains deferred TaskMaster context; it does not require upstream release evidence, an external receipt, publication, or validation for completion. Acceptance tracking uses individual TaskMaster evidence and does not ask a human to perform a validation task.
 
 ---
 
@@ -102,8 +102,7 @@
 
 | AC | Delivery authority | Check-off source | Required evidence |
 |---|---|---|---|
-| AC1–AC6 | Upstream customization owner | `spec.md` | P2-T4 verified upstream receipt |
-| AC7 | TaskMaster re-measurement plus upstream sequencing | `spec.md` | P1-T13 and P2-T4 receipt |
-| AC8–AC10 | Upstream customization owner | `spec.md` | P2-T4 verified upstream receipt |
+| AC1 and AC6 | TaskMaster deferred-prompt and protected-path classification | `spec.md` | Fresh documentation-scope, protected-path, targeted-test, coverage, and analyzer evidence |
+| AC2–AC5 and AC7–AC10 | Historical acceptance disposition retained | `spec.md` | Existing recorded evidence; not re-evaluated by this remediation |
 
-An absent P2-T2 receipt completes evidence and status tasks with `REMEDIATION-REQUIRED`, never passing close-out, and never checks acceptance criteria without individual verified evidence.
+No upstream receipt, release, publication, validation, or other external evidence is a completion dependency. AC1 and AC6 are checked only after their individual fresh TaskMaster evidence is verified; the other eight AC markers and dispositions remain unchanged.
