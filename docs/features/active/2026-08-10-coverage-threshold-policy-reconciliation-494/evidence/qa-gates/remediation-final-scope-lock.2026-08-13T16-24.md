@@ -1,40 +1,20 @@
-Timestamp: 2026-08-13T16-24
-Command: `git status --porcelain; git diff --name-only epic/build-ci-coverage-gate-fidelity-integration...HEAD; git diff --check`
+Timestamp: 2026-08-13T17-46
+Command: git status --porcelain
 EXIT_CODE: 0
-Output Summary: After excluding pre-existing working-tree paths and immutable range-classification paths, this remediation introduced only the authorized `issue.md`, `spec.md`, `plan.2026-08-10T14-10.md`, and canonical feature evidence paths. It introduced no CLAUDE.md, agent-memory, non-memory .claude runtime, .agents/skills, source, test, configuration, artifacts, or external-repository modification. Whitespace validation passed.
+Output Summary: After excluding the pre-existing remediation plan file recorded by P0-T2, the working tree contains only permitted `spec.md`, `user-story.md`, plan bookkeeping, and canonical evidence paths. No protected runtime, source, PowerShell, Pester, configuration, `artifacts/**`, or external-repository path is present.
 
-## Baseline Exclusions
+## Final Working-Tree Paths
 
-- Pre-existing untracked feature inputs: `code-review.2026-08-13T16-24.md`, `feature-audit.2026-08-13T16-24.md`, `policy-audit.2026-08-13T16-24.md`, `remediation-inputs.2026-08-13T16-24.md`, and `remediation-plan.2026-08-13T16-24.md`.
-- The six `.claude/agent-memory/**` range paths recorded in `evidence/remediation-baseline/runtime-scope-baseline.2026-08-13T16-24.md` are immutable pre-existing protected-path classifications. They are not remediation modifications.
-- Earlier range changes to PowerShell source and Pester tests predate this documentation-scope remediation and are excluded by its explicit boundary.
+```text
+ M docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/remediation-baseline/phase0-policy-read.2026-08-13T16-24.md
+ M docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/remediation-plan.2026-08-13T16-24.md
+ M docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md
+ M docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/user-story.md
+?? docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/other/acceptance-source-and-scope-consistency.2026-08-13T16-24.md
+?? docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/qa-gates/protected-path-validation.2026-08-13T16-24.md
+?? docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/remediation-baseline/protected-path-baseline.2026-08-13T16-24.md
+```
 
-## Remediation-Introduced Paths
+## Scope Determination
 
-- `issue.md`
-- `spec.md`
-- `plan.2026-08-10T14-10.md`
-- `evidence/remediation-baseline/phase0-policy-read.2026-08-13T16-24.md`
-- `evidence/remediation-baseline/runtime-scope-baseline.2026-08-13T16-24.md`
-- `evidence/remediation-baseline/verification-inputs.2026-08-13T16-24.md`
-- `evidence/other/documentation-scope-consistency.2026-08-13T16-24.md`
-- `evidence/qa-gates/runtime-scope-validation.2026-08-13T16-24.md`
-- `evidence/qa-gates/remediation-powershell-coverage.2026-08-13T16-24.xml`
-- `evidence/qa-gates/remediation-powershell-test-coverage.2026-08-13T16-24.md`
-- `evidence/qa-gates/remediation-powershell-analyze.2026-08-13T16-24.md`
-- `evidence/issue-updates/ac1-ac6-revalidation.2026-08-13T16-24.md`
-- `evidence/issue-updates/ac1-ac6-status.2026-08-13T16-24.md`
-- `evidence/other/remediation-review-readiness.2026-08-13T16-24.md`
-- `evidence/qa-gates/remediation-final-scope-lock.2026-08-13T16-24.md`
-- `evidence/qa-gates/remediation-plan-validation.2026-08-13T16-24.md`
-
-## Determination
-
-The final path set is within the remediation allowlist. No modification was introduced to `CLAUDE.md`, `.claude/agent-memory/**`, non-memory `.claude/**`, `.agents/skills/**`, source, tests, configuration, `artifacts/**`, or an external repository. `git diff --check` succeeded.
-
-## Final Reconciliation
-
-After P3-T2 and P3-T3 created their canonical evidence artifacts, `git status --porcelain` and
-`git diff --check` were rerun. The final status contains only the authorized documentation paths,
-canonical feature evidence paths, and the recorded pre-existing exclusions. Whitespace validation
-again exited 0.
+PASS. The P0-T2 baseline identified the remediation plan file as the only pre-existing working-tree path. This remediation's changes are limited to authorized `spec.md`, `user-story.md`, plan bookkeeping, and canonical evidence paths. No protected runtime, source, PowerShell, Pester, configuration, `artifacts/**`, or external-repository path is changed.

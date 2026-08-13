@@ -13,15 +13,9 @@
 
 ## Document Status and Acceptance-Criteria Authority
 
-This document is the sole acceptance-criteria source for issue #494. The persisted `full-bug`
-work-mode marker resolves acceptance-criteria ownership to `spec.md` under the
-`acceptance-criteria-tracking` protocol. `issue.md` is contextual and its checkboxes are not
-checked off by execution.
-
-A `user-story.md` also exists in this feature folder. It exists only because the epic
-preparation route requires it as a deliverable; it carries **no** acceptance criteria and is
-**not** an acceptance-criteria authority. The AC authority for this feature is `issue.md` plus
-this `spec.md`.
+For this remediation, only the `## Acceptance Criteria` section in this `spec.md` is the sole
+acceptance-criteria source. No other feature document, historical plan, or evidence artifact may
+be used for acceptance-criteria check-off.
 
 Governance-document line numbers in this document are labelled **"as of `edf3d34c`"** and were
 re-verified against the working tree while this specification was written. Tooling locators are
@@ -1023,10 +1017,12 @@ the User-Authorized Scope Correction replaces its local Claude-runtime change di
 
 ## Acceptance Criteria
 
-These are the active, scope-corrected acceptance criteria for the `full-bug` feature. Do not
-check an item until its individual TaskMaster evidence is verified. The deferred criteria are
-satisfied locally only by validating the existing upstream prompt; they do not require, request,
-or prove external execution.
+These are the active, scope-corrected acceptance criteria for the `full-bug` feature. For this
+remediation, this section is the sole acceptance-criteria source; do not use another feature
+document, historical plan, or evidence artifact for acceptance-criteria check-off. Do not check an
+item until its individual TaskMaster evidence is verified. The deferred criteria are satisfied
+locally only by validating the existing upstream prompt; they do not require, request, or prove
+external execution.
 
 - [x] AC1 — The existing upstream prompt is retained as the complete TaskMaster deliverable for
       reconciling coverage thresholds in the upstream source of truth; no TaskMaster `CLAUDE.md`,
