@@ -27,7 +27,7 @@ The targeted canonical Pester operation returned `ok: true`. Targeted analyzer e
 
 | Severity | File | Location | Finding | Recommendation | Rationale | Evidence |
 |---|---|---|---|---|---|---|
-| Minor | `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` | `Get-CoberturaLineConditionCoverageParts`, line 141 | Targeted PSScriptAnalyzer exits 1 for one warning. | Resolve or formally baseline the warning in separately authorized work. | Raw quality-gate failure prevents a clean toolchain result. | Current `mcp__drm-copilot__run_poshqc_analyze`; prior audit attributes it to pre-feature code. |
+| Minor | `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` | `Get-CoberturaLineConditionCoverageParts`, line 141 | Targeted PSScriptAnalyzer exits 1 for one warning. | The approved zero-delta baseline requires no issue #494 action; separate cleanup may be tracked independently. | The warning predates the feature and produces zero branch delta under the accepted no-regression disposition. | Current `mcp__drm-copilot__run_poshqc_analyze`; prior audit attributes it to pre-feature code. |
 | Info | scope correction documents | `spec.md` and `user-story.md` | Scope correction is internally consistent and preserves `issue.md` unchanged at HEAD. | No change required. | It enforces local-only prompt delivery and correct AC ownership. | Fresh PR context; `git diff --quiet HEAD^ HEAD -- issue.md`. |
 
 ## Implementation Audit
