@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
-            public class IntelligenceFilters { }
+    public class IntelligenceFilters { }
 }
