@@ -19,6 +19,20 @@
     "billed_windows_seconds": 764,
     "captured_at": "2026-08-14T14:33:12Z"
   },
+  "third_sample": {
+    "run_id": 31813885124,
+    "head_sha": "df49d208efb56e19faee106556b723022939e5a2",
+    "wall_clock_seconds": 245,
+    "billed_windows_seconds": 747,
+    "captured_at": "2026-08-14T15:23:20Z"
+  },
+  "sample_summary": {
+    "n": 3,
+    "wall_clock_seconds": [259, 433, 245],
+    "median_wall_clock_seconds": 259,
+    "median_reduction_vs_baseline_percent": 41.7,
+    "note": "Two of three samples cluster at 245-259s; the 433s sample is an outlier attributed to hosted-runner slowness, diagnosed step-by-step in the addendum of the measurement file."
+  },
   "compared_against_baseline": "../baseline/ci-sequential-baseline.2026-08-14T13-05.md",
   "compared_against_baseline_seconds": 444,
   "collection_command": "gh api repos/drmoisan/TaskMaster/actions/runs/<run-id>/jobs",

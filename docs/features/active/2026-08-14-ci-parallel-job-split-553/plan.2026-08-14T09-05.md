@@ -331,15 +331,15 @@ function Test-CalleeContract([string]$Path, [int]$Timeout) {
   - Evidence pointers: `FEATURE/evidence/qa-gates/ci-split-timing-comparison.<TS>.md`.
   - Acceptance: spec checkbox `[x]` with evidence path.
 
-- [ ] [P5-T14] Commit and push the Phase 3–5 evidence and document updates
+- [x] [P5-T14] Commit and push the Phase 3–5 evidence and document updates
   - Files staged (explicit): `FEATURE/evidence/**` (new artifacts from Phases 3–5), `FEATURE/spec.md`, `FEATURE/issue.md`, `FEATURE/user-story.md`, `FEATURE/plan.2026-08-14T09-05.md`.
   - Verification: `git status --porcelain` scoped to `FEATURE/**` and `.github/**` is empty after commit; push succeeds.
 
-- [ ] [P5-T15] Confirm a green run on the final pre-migration head and record `FEATURE/evidence/qa-gates/pre-migration-green.<TS>.md`
+- [x] [P5-T15] Confirm a green run on the final pre-migration head and record `FEATURE/evidence/qa-gates/pre-migration-green.<TS>.md`
   - Commands: `gh run watch <run-id> --exit-status` on the run triggered by P5-T14's push; `gh api repos/drmoisan/TaskMaster/actions/runs/<run-id>/jobs --jq '.jobs[] | {name, conclusion}'`; `gh pr view --json headRefOid`.
   - Acceptance: all five jobs `success` on the current PR head SHA; artifact records run id and head SHA. This head is the reference state for the ruleset migration.
 
-- [ ] [P5-T16] Capture the exact check-run context names from the final head SHA into `FEATURE/evidence/other/check-run-names.<TS>.md`
+- [x] [P5-T16] Capture the exact check-run context names from the final head SHA into `FEATURE/evidence/other/check-run-names.<TS>.md`
   - Command: `gh api repos/drmoisan/TaskMaster/commits/<head-sha>/check-runs --jq '.check_runs[].name'` (head SHA from P5-T15).
   - Contents: `Timestamp:`, `Command:`, `EXIT_CODE:`, the verbatim name list, and the selected five required-context strings (the five CI contexts of the form `<caller job name> / <callee job name>`, plus/including the relocated actionlint context — captured, never assumed; research Q8 fact 3).
   - Acceptance: artifact exists with exactly five selected context strings, each copied verbatim from the API output. This file is committed in P7-T9 (committing it now would advance the head; the context names are derived from workflow/job names and do not vary by SHA).

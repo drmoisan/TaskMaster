@@ -38,7 +38,16 @@ run `<tool> -h` during preflight when a plan hard-codes flags. Also note `-verbo
 prints `Collected N YAML files` / `Found 0 errors in N files`, which is how you prove a
 lint run actually covered the file set instead of silently skipping it.
 
-**Why:** all four produce a wrong result rather than an obvious error — #2 emits a usage
+**5. `gh workflow run --ref <branch>` races `git push` and silently runs the OLD sha.**
+Verified 2026-08-14 on #553: `git push && gh workflow run ci.yml --ref <branch>` produced
+a run whose `head_sha` was the PREVIOUS commit, because GitHub resolved the ref before the
+push replicated. For a fault-isolation probe this is the worst possible failure — the run
+goes GREEN and looks like the probe proved the gate does not fire. Always verify
+`gh run list --json headSha` (or `gh api .../runs/<id> --jq .head_sha`) equals the intended
+sha BEFORE watching, cancel and re-dispatch if it does not, and put a few seconds plus a
+`git ls-remote --heads origin <branch>` tip check between push and dispatch.
+
+**Why:** all five produce a wrong result rather than an obvious error — #2 emits a usage
 dump that a wrapper can read as "no output, therefore clean", and #3 reports an empty
 diff for files that genuinely changed.
 

@@ -134,6 +134,37 @@ ceiling, and in both samples all five jobs started within 2 seconds of each othe
 — so **neither sample was queued**, and queueing is excluded as the cause of the
 run-B slowdown. The slowdown is within-job execution time.
 
+## Addendum (2026-08-14T11-23): third green sample reclassifies run B as an outlier
+
+The [P5-T15] pre-migration green run produced a third sample of the same
+byte-identical pipeline, and it changes the interpretation above:
+
+| Sample | Run | Head | Wall clock | vs 444s baseline | Windows billed |
+| --- | --- | --- | --- | --- | --- |
+| A | 31809697953 | `0b016c81` | 259s | −41.7% | 764s |
+| B (measurement of record) | 31812508684 | `ad28ea81` | 433s | −2.5% | 954s |
+| C | 31813885124 | `df49d208` | **245s** | **−44.8%** | 747s |
+
+Sample C per-job: actionlint 30s, format-check 113s, build-nullable 193s,
+build-analyzers 196s, mstest-coverage 245s.
+
+**Two of three samples cluster at 245–259s (−41.7% to −44.8%); run B at 433s is
+the outlier.** The median of the three is 259s, a 41.7% reduction. Sample C is
+also the fastest of the three and slightly better than the spec's ~277s target
+estimate.
+
+Run B remains labelled the measurement of record because the plan designates the
+[P4-T4] run as such, and it is retained rather than discarded: it is a real
+observation of what this pipeline does on a slow runner, and it bounds the
+downside honestly. But the central estimate of the split's benefit is better
+represented by the cluster than by that single sample. The step-level diagnosis
+above stands — run B's slowdown was uniform across compute-bound steps and is
+attributable to hosted-runner variance, not to workflow structure.
+
+Caveat retained: three samples is still a small number, all drawn within roughly
+one hour, and the baseline remains a single sample. No numeric threshold is gated
+on any of these figures.
+
 ## Acceptance ([P4-T6])
 
 - Artifact exists with the comparison table populated from live API data; no
