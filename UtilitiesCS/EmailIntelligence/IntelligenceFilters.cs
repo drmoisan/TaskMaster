@@ -7,5 +7,8 @@ using System.Threading.Tasks;
 
 namespace UtilitiesCS
 {
-    public class IntelligenceFilters { }
+    public class IntelligenceFilters
+    {
+        public static string ProbeValue() => null;
+    }
 }
