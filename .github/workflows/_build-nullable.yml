@@ -1,0 +1,60 @@
+name: build-nullable
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-nullable:
+    name: Build with nullable warnings treated as errors
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    env:
+      SOLUTION_PATH: TaskMaster.sln
+      BUILD_CONFIGURATION: Debug
+      BUILD_PLATFORM: Any CPU
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+        with:
+          nuget-version: latest
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/packages.config') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Restore solution
+        shell: pwsh
+        run: nuget restore $env:SOLUTION_PATH
+
+      - name: Build with nullable warnings treated as errors
+        shell: pwsh
+        run: |
+          # Use /t:Rebuild (not /t:Build) so this step always performs a genuine full
+          # recompile. Enforcement now relies entirely on each file's own #nullable
+          # enable pragma (the repo's per-file opt-in convention; UtilitiesCS.csproj and
+          # SVGControl.csproj carry no project-level <Nullable> element) plus
+          # /p:TreatWarningsAsErrors=true. MSBuild's incremental up-to-date check does
+          # not invalidate on this command-line property change alone, so a plain
+          # /t:Build would silently skip recompilation and never enforce this gate.
+          & msbuild $env:SOLUTION_PATH /t:Rebuild /m /p:Configuration=Debug `
+              "/p:Platform=Any CPU" `
+              /p:TreatWarningsAsErrors=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

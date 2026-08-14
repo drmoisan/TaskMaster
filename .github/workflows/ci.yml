@@ -17,144 +17,16 @@ concurrency:
 jobs:
   actionlint:
     name: actionlint
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: Run actionlint
-        shell: bash
-        run: |
-          set -euo pipefail
-          version=1.7.7
-          curl -sSL "https://github.com/rhysd/actionlint/releases/download/v${version}/actionlint_${version}_linux_amd64.tar.gz" -o actionlint.tar.gz
-          tar -xzf actionlint.tar.gz actionlint
-          ./actionlint
-
-  quality-gates:
-    name: Format, build, analyze, and test
-    runs-on: windows-latest
-    timeout-minutes: 60
-
-    env:
-      SOLUTION_PATH: TaskMaster.sln
-      BUILD_CONFIGURATION: Debug
-      BUILD_PLATFORM: Any CPU
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 10.0.x
-
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v2
-
-      - name: Setup NuGet
-        uses: nuget/setup-nuget@v2
-        with:
-          nuget-version: latest
-
-      - name: Cache NuGet packages
-        uses: actions/cache@v4
-        with:
-          path: packages
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/packages.config') }}
-          restore-keys: |
-            nuget-${{ runner.os }}-
-
-      - name: Restore solution
-        shell: pwsh
-        run: nuget restore $env:SOLUTION_PATH
-
-      - name: Cache dotnet tools
-        uses: actions/cache@v4
-        with:
-          path: ~/.nuget/packages
-          key: dotnet-tools-${{ runner.os }}-${{ hashFiles('dotnet-tools.json') }}
-          restore-keys: |
-            dotnet-tools-${{ runner.os }}-
-
-      - name: Setup CSharpier
-        shell: pwsh
-        run: dotnet tool restore
-
-      - name: Verify formatting
-        shell: pwsh
-        run: dotnet csharpier check .
-
-      - name: Build with analyzers and code style enforcement
-        shell: pwsh
-        run: |
-          & msbuild $env:SOLUTION_PATH /t:Build /m /p:Configuration=Debug `
-              "/p:Platform=Any CPU" `
-              /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-      - name: Build with nullable warnings treated as errors
-        shell: pwsh
-        run: |
-          # Use /t:Rebuild (not /t:Build) so this step always performs a genuine full
-          # recompile. Enforcement now relies entirely on each file's own #nullable
-          # enable pragma (the repo's per-file opt-in convention; UtilitiesCS.csproj and
-          # SVGControl.csproj carry no project-level <Nullable> element) plus
-          # /p:TreatWarningsAsErrors=true. MSBuild's incremental up-to-date check does
-          # not invalidate on this command-line property change alone, so a plain
-          # /t:Build would silently skip recompilation and never enforce this gate.
-          & msbuild $env:SOLUTION_PATH /t:Rebuild /m /p:Configuration=Debug `
-              "/p:Platform=Any CPU" `
-              /p:TreatWarningsAsErrors=true
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-      - name: Run MSTest suite with coverage
-        shell: pwsh
-        run: |
-          Set-StrictMode -Version Latest
-          $ErrorActionPreference = 'Stop'
-
-          $vswherePath = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
-          if (-not (Test-Path $vswherePath)) {
-              throw 'vswhere.exe was not found. Install Visual Studio 2022 (or Build Tools) with Test Platform components.'
-          }
-
-          $vstestPath = & $vswherePath -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-          if (-not $vstestPath) {
-              throw 'vstest.console.exe not found via vswhere. Install Visual Studio Test Platform components.'
-          }
-
-          $testAssemblies = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Filter '*.Test.dll' |
-              Where-Object {
-                  $_.FullName -match "\\bin\\$($env:BUILD_CONFIGURATION)\\" -and
-                  $_.FullName -notmatch '\\obj\\' -and
-                  $_.FullName -notmatch '\\ref\\'
-              } |
-              Select-Object -ExpandProperty FullName
-
-          if (-not $testAssemblies -or $testAssemblies.Count -eq 0) {
-              throw "No test assemblies found under '$env:GITHUB_WORKSPACE' for configuration '$env:BUILD_CONFIGURATION'."
-          }
-
-          New-Item -ItemType Directory -Path 'TestResults' -Force | Out-Null
-          & $vstestPath $testAssemblies /EnableCodeCoverage /InIsolation /Logger:trx /TestCaseFilter:"TestCategory!=LiveOutlook"
-          if ($LASTEXITCODE -ne 0) {
-              throw "MSTest execution failed with exit code $LASTEXITCODE"
-          }
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: |
-            TestResults/**/*.trx
-            TestResults/**/*.coverage
-          if-no-files-found: warn
+    uses: ./.github/workflows/_actionlint.yml
+  format-check:
+    name: format-check
+    uses: ./.github/workflows/_format-check.yml
+  build-analyzers:
+    name: build-analyzers
+    uses: ./.github/workflows/_build-analyzers.yml
+  build-nullable:
+    name: build-nullable
+    uses: ./.github/workflows/_build-nullable.yml
+  mstest-coverage:
+    name: mstest-coverage
+    uses: ./.github/workflows/_mstest-coverage.yml

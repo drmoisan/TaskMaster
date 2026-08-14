@@ -1,0 +1,53 @@
+name: build-analyzers
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-analyzers:
+    name: Build with analyzers and code style enforcement
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    env:
+      SOLUTION_PATH: TaskMaster.sln
+      BUILD_CONFIGURATION: Debug
+      BUILD_PLATFORM: Any CPU
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+        with:
+          nuget-version: latest
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/packages.config') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Restore solution
+        shell: pwsh
+        run: nuget restore $env:SOLUTION_PATH
+
+      - name: Build with analyzers and code style enforcement
+        shell: pwsh
+        run: |
+          & msbuild $env:SOLUTION_PATH /t:Build /m /p:Configuration=Debug `
+              "/p:Platform=Any CPU" `
+              /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
