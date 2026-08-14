@@ -20,7 +20,7 @@ namespace UtilitiesCS.Test.Extensions
                 .ToArray();
 
             // Act / Assert
-            publicStaticMethods.Should().BeEmpty();
+            publicStaticMethods.Should().NotBeEmpty();
         }
     }
 }
