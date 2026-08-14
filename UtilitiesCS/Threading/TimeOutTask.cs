@@ -835,10 +835,16 @@ namespace UtilitiesCS
         /// </summary>
         /// <param name="task"></param>
         /// <param name="millisecondsTimeout"></param>
+        /// <param name="timeProvider">
+        /// Clock used to arm the timeout timer. When null, <see cref="TimeProvider.System"/> is used
+        /// (production); tests pass a <c>FakeTimeProvider</c> so the timeout fires only when the fake
+        /// clock is advanced, making the timeout-versus-completion race deterministic.
+        /// </param>
         /// <returns></returns>
         public static Task<TResult> TimeoutAfter<TResult>(
             this Task<TResult> task,
-            int millisecondsTimeout
+            int millisecondsTimeout,
+            TimeProvider? timeProvider = null
         )
         {
             // Short-circuit #1: infinite timeout or task already completed
@@ -861,7 +867,7 @@ namespace UtilitiesCS
             }
 
             // Set up a timer to complete after the specified timeout period
-            Timer timer = new Timer(
+            ITimer timer = (timeProvider ?? TimeProvider.System).CreateTimer(
                 state =>
                 {
                     // Recover your state information
@@ -871,8 +877,8 @@ namespace UtilitiesCS
                     myTcs.TrySetException(new TimeoutException());
                 },
                 tcs,
-                millisecondsTimeout,
-                Timeout.Infinite
+                TimeSpan.FromMilliseconds(millisecondsTimeout),
+                Timeout.InfiniteTimeSpan
             );
 
             // Wire up the logic for what happens when source task completes
@@ -880,7 +886,7 @@ namespace UtilitiesCS
                 (antecedent, state) =>
                 {
                     // Recover our state data
-                    var tuple = (Tuple<Timer, TaskCompletionSource<TResult>>)state;
+                    var tuple = (Tuple<ITimer, TaskCompletionSource<TResult>>)state;
 
                     // Cancel the Timer
                     tuple.Item1.Dispose();
@@ -915,7 +921,18 @@ namespace UtilitiesCS
             return result!;
         }
 
-        public static Task TimeoutAfter(this Task task, int millisecondsTimeout)
+        /// <param name="task"></param>
+        /// <param name="millisecondsTimeout"></param>
+        /// <param name="timeProvider">
+        /// Clock used to arm the timeout timer. When null, <see cref="TimeProvider.System"/> is used
+        /// (production); tests pass a <c>FakeTimeProvider</c> so the timeout fires only when the fake
+        /// clock is advanced, making the timeout-versus-completion race deterministic.
+        /// </param>
+        public static Task TimeoutAfter(
+            this Task task,
+            int millisecondsTimeout,
+            TimeProvider? timeProvider = null
+        )
         {
             // Short-circuit #1: infinite timeout or task already completed
             if (task.IsCompleted || (millisecondsTimeout == Timeout.Infinite))
@@ -937,7 +954,7 @@ namespace UtilitiesCS
             }
 
             // Set up a timer to complete after the specified timeout period
-            Timer timer = new Timer(
+            ITimer timer = (timeProvider ?? TimeProvider.System).CreateTimer(
                 state =>
                 {
                     // Recover your state information
@@ -947,8 +964,8 @@ namespace UtilitiesCS
                     myTcs.TrySetException(new TimeoutException());
                 },
                 tcs,
-                millisecondsTimeout,
-                Timeout.Infinite
+                TimeSpan.FromMilliseconds(millisecondsTimeout),
+                Timeout.InfiniteTimeSpan
             );
 
             // Wire up the logic for what happens when source task completes
@@ -956,7 +973,7 @@ namespace UtilitiesCS
                 (antecedent, state) =>
                 {
                     // Recover our state data
-                    var tuple = (Tuple<Timer, TaskCompletionSource<VoidTypeStruct>>)state;
+                    var tuple = (Tuple<ITimer, TaskCompletionSource<VoidTypeStruct>>)state;
 
                     // Cancel the Timer
                     tuple.Item1.Dispose();
