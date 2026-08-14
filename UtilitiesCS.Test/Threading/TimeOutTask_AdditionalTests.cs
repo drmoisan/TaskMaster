@@ -2,18 +2,29 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test
 {
     public partial class TimeOutTask_Tests
     {
+        /// <summary>
+        /// The source-completes-later tests race the timeout timer against the source completion.
+        /// Driving <c>TimeoutAfter</c> from a <see cref="FakeTimeProvider"/> that is never advanced
+        /// makes the outcome deterministic: the timer cannot fire, so the source result is always
+        /// the one marshalled to the proxy. A real-clock timeout leaves the outcome dependent on
+        /// how long the runner thread is preempted between arming the timer and completing the
+        /// source, which is what failed under CI parallelism plus coverage instrumentation.
+        /// </summary>
+        private static FakeTimeProvider FrozenClock() => new FakeTimeProvider();
+
         [TestMethod]
         public async Task TimeoutAfter_GenericTask_ShouldPropagateFaultedSourceException_WhenSourceFaultsLater()
         {
             // Arrange
             var source = new TaskCompletionSource<int>();
-            var proxy = source.Task.TimeoutAfter(100);
+            var proxy = source.Task.TimeoutAfter(100, FrozenClock());
 
             // Act
             source.SetException(new InvalidOperationException("boom"));
@@ -28,7 +39,7 @@ namespace UtilitiesCS.Test
         {
             // Arrange
             var source = new TaskCompletionSource<int>();
-            var proxy = source.Task.TimeoutAfter(100);
+            var proxy = source.Task.TimeoutAfter(100, FrozenClock());
 
             // Act
             source.SetCanceled();
@@ -43,7 +54,7 @@ namespace UtilitiesCS.Test
         {
             // Arrange
             var source = new TaskCompletionSource<bool>();
-            var proxy = ((Task)source.Task).TimeoutAfter(100);
+            var proxy = ((Task)source.Task).TimeoutAfter(100, FrozenClock());
 
             // Act
             source.SetException(new InvalidOperationException("boom"));
@@ -58,7 +69,7 @@ namespace UtilitiesCS.Test
         {
             // Arrange
             var source = new TaskCompletionSource<bool>();
-            var proxy = ((Task)source.Task).TimeoutAfter(100);
+            var proxy = ((Task)source.Task).TimeoutAfter(100, FrozenClock());
 
             // Act
             source.SetCanceled();
@@ -66,6 +77,38 @@ namespace UtilitiesCS.Test
             // Assert
             Func<Task> act = async () => await proxy;
             await act.Should().ThrowAsync<TaskCanceledException>();
+        }
+
+        [TestMethod]
+        public async Task TimeoutAfter_GenericTask_ShouldFaultWithTimeout_WhenInjectedClockPassesTheDeadline()
+        {
+            // Arrange
+            var clock = FrozenClock();
+            var source = new TaskCompletionSource<int>();
+            var proxy = source.Task.TimeoutAfter(100, clock);
+
+            // Act
+            clock.Advance(TimeSpan.FromMilliseconds(100));
+
+            // Assert
+            Func<Task> act = async () => await proxy;
+            await act.Should().ThrowAsync<TimeoutException>();
+        }
+
+        [TestMethod]
+        public async Task TimeoutAfter_NonGenericTask_ShouldFaultWithTimeout_WhenInjectedClockPassesTheDeadline()
+        {
+            // Arrange
+            var clock = FrozenClock();
+            var source = new TaskCompletionSource<bool>();
+            var proxy = ((Task)source.Task).TimeoutAfter(100, clock);
+
+            // Act
+            clock.Advance(TimeSpan.FromMilliseconds(100));
+
+            // Assert
+            Func<Task> act = async () => await proxy;
+            await act.Should().ThrowAsync<TimeoutException>();
         }
 
         [TestMethod]
