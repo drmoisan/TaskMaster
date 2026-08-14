@@ -51,21 +51,21 @@ reliance is not implicit.
 
 ## Acceptance Criteria (early draft)
 
-- [ ] The formatting gate, the analyzer build gate, the nullable build gate, and the
+- [x] The formatting gate, the analyzer build gate, the nullable build gate, and the
       MSTest gate each run as separate GitHub Actions jobs with no `needs:` edge
       forcing them to serialize, except where an edge is required to consume an
       uploaded build artifact.
-- [ ] Each gate is a callable reusable workflow `_<name>.yml` declaring both
+- [x] Each gate is a callable reusable workflow `_<name>.yml` declaring both
       `on: workflow_call:` and `on: workflow_dispatch:`.
-- [ ] `ci.yml` becomes an orchestrator workflow containing only `uses:` references
+- [x] `ci.yml` becomes an orchestrator workflow containing only `uses:` references
       and contains no inline `steps:`.
-- [ ] Any file shared between jobs crosses the boundary via explicit
+- [x] Any file shared between jobs crosses the boundary via explicit
       `actions/upload-artifact` + `actions/download-artifact`.
 - [ ] The `main` branch ruleset's `required_status_checks` contexts are updated to
       match the new job names, with no window in which a merge can bypass a gate.
-- [ ] `.github/workflows/README.md` documents the per-stage `workflow_dispatch`
+- [x] `.github/workflows/README.md` documents the per-stage `workflow_dispatch`
       procedure and the branch-protection rename procedure.
-- [ ] The reworked pipeline produces a green run against the branch head, satisfying
+- [x] The reworked pipeline produces a green run against the branch head, satisfying
       `modified-workflow-needs-green-run`.
 - [ ] Every gate enforced by the current `quality-gates` job is still enforced after
       the split; no check is dropped, weakened, or made non-required.
@@ -121,3 +121,9 @@ reliance is not implicit.
 
 - [ ] Promote to GitHub issue (feature request template)
 - [ ] Create `docs/features/active/ci-parallel-job-split/` folder from the template
+
+## References
+
+- Workflows README: `.github/workflows/README.md` (created by #553) — documents
+  the pipeline topology, the per-stage `workflow_dispatch` procedure, and the
+  branch-protection rename procedure.

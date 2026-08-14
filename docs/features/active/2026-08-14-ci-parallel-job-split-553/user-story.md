@@ -95,19 +95,19 @@ These criteria are consistent with the draft in `issue.md`, resolved against the
 adopted design (research topology (c) plus actionlint extraction). Where a draft
 criterion admitted alternatives, the resolved form is stated.
 
-- [ ] The formatting gate, the analyzer build gate, the nullable build gate, and
+- [x] The formatting gate, the analyzer build gate, the nullable build gate, and
       the MSTest gate each run as separate GitHub Actions jobs with no `needs:`
       edge forcing them to serialize. Resolved form: the adopted topology shares
       no build output between jobs, so the pipeline contains **zero** `needs:`
       edges (the draft's artifact-consumption exception is unused).
-- [ ] Each gate is a callable reusable workflow `_<name>.yml` declaring both
+- [x] Each gate is a callable reusable workflow `_<name>.yml` declaring both
       `on: workflow_call:` and `on: workflow_dispatch:`.
-- [ ] `ci.yml` becomes an orchestrator workflow containing only `uses:` references
+- [x] `ci.yml` becomes an orchestrator workflow containing only `uses:` references
       and no inline `steps:`. Resolved form: the `actionlint` job is also
       extracted into `_actionlint.yml`, so this criterion holds without exception
       and the pipeline comprises five callee workflows and five required
       status-check contexts.
-- [ ] Any file shared between jobs crosses the boundary via explicit
+- [x] Any file shared between jobs crosses the boundary via explicit
       `actions/upload-artifact` + `actions/download-artifact`. Resolved form: no
       cross-job file sharing exists in the adopted topology; the only artifact
       operation is the preserved `test-results` upload to workflow storage, with
@@ -117,9 +117,9 @@ criterion admitted alternatives, the resolved form is stated.
       gate: exact context strings are captured from a live green run on the PR
       head, and the update is a single atomic PUT of the full writable ruleset
       object.
-- [ ] `.github/workflows/README.md` documents the per-stage `workflow_dispatch`
+- [x] `.github/workflows/README.md` documents the per-stage `workflow_dispatch`
       procedure and the branch-protection rename procedure.
-- [ ] The reworked pipeline produces a green run against the branch head,
+- [x] The reworked pipeline produces a green run against the branch head,
       satisfying `modified-workflow-needs-green-run`.
 - [ ] Every gate enforced by the current `quality-gates` job is still enforced
       after the split; no check is dropped, weakened, or made non-required. In

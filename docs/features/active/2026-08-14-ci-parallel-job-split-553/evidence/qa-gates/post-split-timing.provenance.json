@@ -1,0 +1,27 @@
+{
+  "measurement_file": "ci-split-timing-comparison.2026-08-14T11-10.md",
+  "issue": 553,
+  "metric": "ci_pipeline_wall_clock_seconds",
+  "runner_class": "windows-latest",
+  "host_signature": "github-hosted:windows-latest:runner-group=GitHub Actions",
+  "workflow_run_url": "https://github.com/drmoisan/TaskMaster/actions/runs/31812508684",
+  "measurement_of_record": {
+    "run_id": 31812508684,
+    "head_sha": "ad28ea81e85ed09399feb4275828d00efeccc790",
+    "wall_clock_seconds": 433,
+    "billed_windows_seconds": 954,
+    "captured_at": "2026-08-14T15:09:50Z"
+  },
+  "second_sample": {
+    "run_id": 31809697953,
+    "head_sha": "0b016c81a78f3fafc0864de472f4139cc0938002",
+    "wall_clock_seconds": 259,
+    "billed_windows_seconds": 764,
+    "captured_at": "2026-08-14T14:33:12Z"
+  },
+  "compared_against_baseline": "../baseline/ci-sequential-baseline.2026-08-14T13-05.md",
+  "compared_against_baseline_seconds": 444,
+  "collection_command": "gh api repos/drmoisan/TaskMaster/actions/runs/<run-id>/jobs",
+  "parity_statement": "Both the baseline and both post-split samples were captured on GitHub-hosted runners of the same class (windows-latest gate jobs, ubuntu-latest lint job) using the same collection command. No measurement was taken on a developer workstation.",
+  "notes": "Two green samples of byte-identical workflow files are recorded because they differ substantially (433s vs 259s wall clock). Step-level analysis attributes the difference to uniform hosted-runner slowness in the critical-path mstest-coverage job, not to a workflow-structure change; neither run was queued. No numeric threshold is gated on this measurement. Filename differs from the rule's 'baseline.provenance.json' pattern because this file documents a post-change measurement rather than a committed baseline; it carries the same required fields (runner_class, host_signature, workflow_run_url)."
+}

@@ -79,9 +79,24 @@ Two caveats:
    a subsequent push, and it will not cancel an in-flight CI run.
 2. **A standalone dispatch does not update a pull request's required checks.** It
    produces its own run with its own check; it does not re-report the
-   `CI / <gate>` context that branch protection requires. To turn a required
-   context green, re-run the failed job from the pull request's Checks tab, which
-   re-runs it within the `ci.yml` run.
+   `<caller job> / <callee job>` context that branch protection requires. To turn
+   a required context green, re-run the failed job from the pull request's Checks
+   tab, which re-runs it within the `ci.yml` run.
+
+The required context names take the form `<caller job id> / <callee job name>` —
+the job id used in `ci.yml`, then the `name:` of the job inside the callee. The
+five contexts this pipeline reports are, verbatim:
+
+```
+actionlint / actionlint
+format-check / Verify formatting
+build-analyzers / Build with analyzers and code style enforcement
+build-nullable / Build with nullable warnings treated as errors
+mstest-coverage / Run MSTest suite with coverage
+```
+
+Do not hand-write these strings when editing branch protection; capture them from
+a live run as described in the next section.
 
 ## Branch-protection rename procedure
 

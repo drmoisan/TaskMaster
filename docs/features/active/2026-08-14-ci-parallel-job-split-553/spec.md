@@ -321,22 +321,22 @@ determinable from repository data (research Q7).
 
 ## Acceptance Criteria
 
-- [ ] The formatting gate, the analyzer build gate, the nullable build gate, and
+- [x] The formatting gate, the analyzer build gate, the nullable build gate, and
       the MSTest gate each run as separate GitHub Actions jobs with **zero**
       `needs:` edges (no build-output artifact sharing exists, so no
       artifact-consumption edge is justified).
-- [ ] Five callee reusable workflows exist — `_actionlint.yml`,
+- [x] Five callee reusable workflows exist — `_actionlint.yml`,
       `_format-check.yml`, `_build-analyzers.yml`, `_build-nullable.yml`,
       `_mstest-coverage.yml` — each declaring both `on: workflow_call:` and
       `on: workflow_dispatch:`, its own `permissions:`, a right-sized
       `timeout-minutes`, and no `concurrency` block.
-- [ ] `ci.yml` is an orchestrator containing only `uses:` job references and no
+- [x] `ci.yml` is an orchestrator containing only `uses:` job references and no
       inline `steps:` (the `actionlint` extraction resolves the criterion as
       originally drafted in `issue.md`).
-- [ ] No file is shared between jobs; the only artifact operation is the preserved
+- [x] No file is shared between jobs; the only artifact operation is the preserved
       `test-results` upload (workflow storage, `if: always()`, same name and
       paths).
-- [ ] The four gate commands and the actionlint step are byte-identical to their
+- [x] The four gate commands and the actionlint step are byte-identical to their
       pre-split counterparts, including the `/t:Rebuild` rationale comment, the
       `$LASTEXITCODE` guards, and the zero-test-assembly `throw` guard.
 - [ ] The `main` ruleset's `required_status_checks` contexts are replaced in one
@@ -344,13 +344,13 @@ determinable from repository data (research Q7).
       the PR head, with no window in which a merge can bypass a gate, and the
       pre-PUT JSON, PUT payload, and post-PUT GET response are recorded as
       evidence.
-- [ ] `.github/workflows/README.md` documents the per-stage `workflow_dispatch`
+- [x] `.github/workflows/README.md` documents the per-stage `workflow_dispatch`
       procedure and the branch-protection rename procedure.
-- [ ] The reworked pipeline produces a green run against the branch head,
+- [x] The reworked pipeline produces a green run against the branch head,
       satisfying `modified-workflow-needs-green-run`.
 - [ ] Every gate enforced by the current `quality-gates` job is still enforced
       after the split; no check is dropped, weakened, or made non-required.
-- [ ] Post-split wall-clock duration is measured with the same collection method
+- [x] Post-split wall-clock duration is measured with the same collection method
       as the baseline and recorded as evidence in this feature folder, compared
       against the measured 444s baseline.
 
@@ -367,19 +367,19 @@ determinable from repository data (research Q7).
 
 ## Seeded Test Conditions (from potential)
 
-- [ ] `actionlint` passes against every new and modified workflow file.
+- [x] `actionlint` passes against every new and modified workflow file.
 - [ ] Each `_<name>.yml` is independently dispatchable via `workflow_dispatch` and
       succeeds standalone.
-- [ ] A deliberate formatting violation fails only the formatting gate and reports
+- [x] A deliberate formatting violation fails only the formatting gate and reports
       a distinct red check. (Exercised as a temporary probe commit on the PR
       branch, then reverted — not as a permanent workflow step, so no
       deliberately-failing nested command enters the committed pipeline.)
-- [ ] A deliberate nullable violation fails only the nullable gate. (Same
+- [x] A deliberate nullable violation fails only the nullable gate. (Same
       probe-commit method.)
-- [ ] A deliberate test failure fails only the MSTest gate. (Same probe-commit
+- [x] A deliberate test failure fails only the MSTest gate. (Same probe-commit
       method.)
-- [ ] Test results and coverage artifacts continue to upload with the same names.
-- [ ] Total wall-clock duration of the reworked pipeline is measured against the
+- [x] Test results and coverage artifacts continue to upload with the same names.
+- [x] Total wall-clock duration of the reworked pipeline is measured against the
       current sequential baseline and recorded as evidence.
-- [ ] No `pwsh` step leaks a residual non-zero `$LASTEXITCODE` per
+- [x] No `pwsh` step leaks a residual non-zero `$LASTEXITCODE` per
       `.claude/rules/ci-workflows.md`.

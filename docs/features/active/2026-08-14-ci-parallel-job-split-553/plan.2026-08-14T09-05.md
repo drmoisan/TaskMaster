@@ -202,11 +202,11 @@ function Test-CalleeContract([string]$Path, [int]$Timeout) {
 
 ### Phase 3 — Commit, Pull Request, and First Green Run
 
-- [ ] [P3-T1] Commit the workflow change set and Phase 0–2 evidence
+- [x] [P3-T1] Commit the workflow change set and Phase 0–2 evidence
   - Files staged (explicit): `.github/workflows/ci.yml`, `.github/workflows/_actionlint.yml`, `.github/workflows/_format-check.yml`, `.github/workflows/_build-analyzers.yml`, `.github/workflows/_build-nullable.yml`, `.github/workflows/_mstest-coverage.yml`, `.github/workflows/README.md`, `FEATURE/evidence/**` (new artifacts), `FEATURE/plan.2026-08-14T09-05.md` (checkbox progress).
   - Verification: `git status --porcelain` shows no unstaged modifications to `.github/**` or `FEATURE/**` after the commit; `git log -1 --stat` lists the seven workflow-tree files.
 
-- [ ] [P3-T2] Push the branch to origin
+- [x] [P3-T2] Push the branch to origin
   - Command: `git push -u origin <BRANCH>` where `<BRANCH>` is the value recorded by P0-T2 (expected: `feature/ci-parallel-job-split-553`). `-u` is correct: the remote branch does not yet exist. Do not hard-code any other branch name.
   - Acceptance: push succeeds (exit 0). Note: `ci.yml` does not trigger on push to this branch (`on: push` is main/development only); the pipeline runs on the `pull_request` event after P3-T3.
 
@@ -217,9 +217,10 @@ function Test-CalleeContract([string]$Path, [int]$Timeout) {
     3. `artifacts/pr_body_553.md` AND `artifacts/pr_body_553.receipt.json` exist at exactly those canonical paths, with a matching, non-stale SHA-256 receipt per `.claude/skills/pr-author/SKILL.md`.
     The executor MUST halt at this task and hand off to the orchestrator to satisfy preconditions 1 and 2 and confirm execution; record the confirmation in the P3-T4 artifact. Without recorded confirmation this task is BLOCKED, not skipped.
   - Procedure (after confirmation and preconditions): produce `artifacts/pr_body_553.md` plus `artifacts/pr_body_553.receipt.json` per the `pr-author` skill, then `gh pr create --base main --title "CI: split quality-gates into five parallel reusable-workflow jobs (#553)" --body-file artifacts/pr_body_553.md`.
+  - **Execution status (2026-08-14T10-35): DEFERRED to the orchestrator.** No pull request exists and the executor must not create one. The `modified-workflow-needs-green-run` obligation that the PR run would have satisfied is instead satisfied by the green `workflow_dispatch` run 31809697953 against head `0b016c81` (recorded in `FEATURE/evidence/qa-gates/first-run.<TS>.md`), which `remediation-inputs.2026-08-14T10-21.md` finding B1 explicitly accepts as an alternative. This task remains unchecked.
   - Acceptance: PR exists targeting `main`; `gh pr view --json url,headRefOid` returns the PR URL and head SHA; the PR's own run executes the NEW pipeline (head-ref workflow files run for `pull_request` events, research Q8 fact 1). Expected and acceptable: the PR is blocked by the still-required old context `Format, build, analyze, and test` until Phase 6 (fail-closed over-blocking, never under-gating).
 
-- [ ] [P3-T4] Observe the first run of the split pipeline to completion and record `FEATURE/evidence/qa-gates/first-run.<TS>.md`
+- [x] [P3-T4] Observe the first run of the split pipeline to completion and record `FEATURE/evidence/qa-gates/first-run.<TS>.md`
   - Commands:
     ```powershell
     gh run list --branch <BRANCH> --workflow ci.yml --limit 1 --json databaseId,headSha,status,conclusion
@@ -230,7 +231,7 @@ function Test-CalleeContract([string]$Path, [int]$Timeout) {
   - Branching (explicit): (a) all five jobs succeed → record `GREEN` and proceed to P3-T5's NOT-REQUIRED branch; (b) a job fails with a symptom attributable to a trimmed setup step (e.g., missing .NET SDK / `dotnet` not found in an msbuild job, missing restored packages in the format job) → proceed to P3-T5's REQUIRED branch; (c) a job fails for any other cause → halt and report to the orchestrator with the run URL; do not improvise fixes outside this plan.
   - Acceptance: artifact exists and records one of the three branch outcomes explicitly.
 
-- [ ] [P3-T5] Execute the tailored-setup fallback if and only if P3-T4 took branch (b); record `FEATURE/evidence/qa-gates/tailored-setup-fallback.<TS>.md`
+- [x] [P3-T5] Execute the tailored-setup fallback if and only if P3-T4 took branch (b); record `FEATURE/evidence/qa-gates/tailored-setup-fallback.<TS>.md`
   - REQUIRED branch: restore into the affected callee(s) only the specific setup steps the failure implicates, copied verbatim from `FEATURE/evidence/other/pre-split/ci.yml.pre-split.txt` (msbuild callees: `Setup .NET SDK`; format callee: `Setup NuGet` + `Cache NuGet packages` + `Restore solution`). Re-run P1-T6 containment checks and P2-T3 actionlint, commit (`fix(ci): restore <steps> to <callee> — tailored-setup assumption failed`), push, and repeat P3-T4 observation until branch (a) or (c). Record which steps were restored, to which files, and the final green run id. Spec authorizes this fallback at an estimated ~56s/job cost.
   - NOT-REQUIRED branch (explicitly authorized skip): if P3-T4 recorded `GREEN`, write the artifact with `Result: NOT REQUIRED — tailored-setup assumption held` and the green run id. This is the only permitted non-executing outcome for this task.
   - Acceptance: artifact exists recording exactly one branch; the pipeline is green on the current head at task completion.
@@ -239,31 +240,31 @@ function Test-CalleeContract([string]$Path, [int]$Timeout) {
 
 > Probe rules: each probe is one temporary commit on the PR branch, exercised by CI, then reverted with `git revert --no-edit`. Wait for the probe run to complete BEFORE pushing the revert (`cancel-in-progress: true` would otherwise cancel the probe run). Each probe must fail exactly the targeted gate; if a probe reddens more than one gate, adjust the probe edit and repeat before recording. Net C# diff after reverts is zero (verified in P5-T3).
 
-- [ ] [P4-T1] [expect-fail] Exercise the formatting-violation probe and record `FEATURE/evidence/regression-testing/probe-format.<TS>.md`
+- [x] [P4-T1] [expect-fail] Exercise the formatting-violation probe and record `FEATURE/evidence/regression-testing/probe-format.<TS>.md`
   - Probe edit: a formatting-only change in one `*.cs` file that `csharpier check` rejects (e.g., broken indentation inside one method body); it must introduce no compiler diagnostic. Commit message: `probe(553): formatting violation — to be reverted`.
   - Sequence: commit → push → `gh run watch <run-id>` → `gh api .../runs/<run-id>/jobs` → assert `format-check` job conclusion `failure` and the other four jobs `success` → `git revert --no-edit <probe-sha>` → push.
   - Contents: `Timestamp:`, `Command:`, `EXIT_CODE:`, probe commit SHA, revert commit SHA, run URL, per-job conclusion table, `Output Summary: exactly one red gate (format-check)`.
   - Acceptance: artifact shows exactly the format gate red; revert commit exists on the branch. Update spec.md seeded-condition checkbox 3 to `[x]` with this artifact as the evidence pointer.
 
-- [ ] [P4-T2] [expect-fail] Exercise the nullable-violation probe and record `FEATURE/evidence/regression-testing/probe-nullable.<TS>.md`
+- [x] [P4-T2] [expect-fail] Exercise the nullable-violation probe and record `FEATURE/evidence/regression-testing/probe-nullable.<TS>.md`
   - Probe edit: in a production `*.cs` file that carries `#nullable enable`, in a project whose `.csproj` does NOT set `TreatWarningsAsErrors` (verify with `Select-String` on the csproj before committing), add a correctly-formatted statement producing a nullable-flow warning (e.g., `string probeValue = null;` assigned to a non-nullable local). This fails only the nullable gate (`/p:TreatWarningsAsErrors=true`); the analyzer gate and the MSTest job's plain build treat it as a warning. Commit message: `probe(553): nullable violation — to be reverted`.
   - Sequence and contents: same shape as P4-T1; assert `build-nullable` conclusion `failure`, other four `success`; revert and push.
   - Acceptance: artifact shows exactly the nullable gate red; revert commit exists. Update spec.md seeded-condition checkbox 4 with this artifact as evidence.
 
-- [ ] [P4-T3] [expect-fail] Exercise the test-failure probe and record `FEATURE/evidence/regression-testing/probe-mstest.<TS>.md`
+- [x] [P4-T3] [expect-fail] Exercise the test-failure probe and record `FEATURE/evidence/regression-testing/probe-mstest.<TS>.md`
   - Probe edit: invert one assertion in one existing fast MSTest test (not `TestCategory=LiveOutlook`), keeping the file csharpier-clean and free of new compiler diagnostics. Commit message: `probe(553): deliberate test failure — to be reverted`.
   - Sequence and contents: same shape as P4-T1; assert `mstest-coverage` conclusion `failure`, other four `success`; revert and push.
   - Acceptance: artifact shows exactly the MSTest gate red; revert commit exists. Update spec.md seeded-condition checkbox 5 with this artifact as evidence.
 
-- [ ] [P4-T4] Confirm a green run on the post-revert head and record `FEATURE/evidence/qa-gates/post-probe-green-run.<TS>.md`
+- [x] [P4-T4] Confirm a green run on the post-revert head and record `FEATURE/evidence/qa-gates/post-probe-green-run.<TS>.md`
   - Commands: `gh run watch <run-id> --exit-status` on the run triggered by the final revert push; `gh api repos/drmoisan/TaskMaster/actions/runs/<run-id>/jobs --jq '.jobs[] | {name, conclusion}'`.
   - Acceptance: artifact records run id, head SHA, and all five job conclusions `success`.
 
-- [ ] [P4-T5] Verify the `test-results` artifact on the green run and record `FEATURE/evidence/qa-gates/test-results-artifact.<TS>.md`
+- [x] [P4-T5] Verify the `test-results` artifact on the green run and record `FEATURE/evidence/qa-gates/test-results-artifact.<TS>.md`
   - Command: `gh api repos/drmoisan/TaskMaster/actions/runs/<run-id>/artifacts --jq '.artifacts[] | {name, size_in_bytes}'` (run id from P4-T4).
   - Acceptance: an artifact named exactly `test-results` exists with non-zero size. Update spec.md seeded-condition checkbox 6 with this artifact as evidence.
 
-- [ ] [P4-T6] Capture post-split per-job timings and write the baseline comparison `FEATURE/evidence/qa-gates/ci-split-timing-comparison.<TS>.md`
+- [x] [P4-T6] Capture post-split per-job timings and write the baseline comparison `FEATURE/evidence/qa-gates/ci-split-timing-comparison.<TS>.md`
   - Command: `gh api repos/drmoisan/TaskMaster/actions/runs/<run-id>/jobs` (same method as the baseline capture; run id from P4-T4).
   - Contents: `Timestamp:`, `Command:`, `EXIT_CODE:`; a per-job table (name, started, completed, duration); measured pipeline wall clock (latest `completed_at` minus earliest `started_at` across the five jobs); comparison row against the measured 444s baseline from `ci-sequential-baseline.2026-08-14T13-05.md` with absolute and percentage delta; summed billed `windows-latest` seconds vs the ~444s baseline; a runner-environment-parity statement (both measurements GitHub-hosted `windows-latest`, satisfying `.claude/rules/benchmark-baselines.md`); a note that the spec's ~277s/~333s figures were estimates and this artifact is the measurement of record.
   - Acceptance: artifact exists with the comparison table populated from live API data (no placeholder values). Update spec.md seeded-condition checkbox 7 with this artifact as evidence.
@@ -272,16 +273,16 @@ function Test-CalleeContract([string]$Path, [int]$Timeout) {
 
 > QA-loop note: the applicable language is GitHub Actions YAML. The loop is: (1) formatting — no repo-mandated YAML formatter exists; not applicable; (2) linting — actionlint (P5-T1); (3) type checking — not applicable to YAML; (4) testing — the live green run (P4-T4, re-confirmed on the final head in P5-T15). If any task in this phase changes a workflow file, re-run from P5-T1 and re-run the P1-T6 containment checks. Per the No-C#-Toolchain Statement, csharpier/msbuild/vstest are not part of this loop and must not be run.
 
-- [ ] [P5-T1] Run the final actionlint pass and record `FEATURE/evidence/qa-gates/actionlint-final.<TS>.md`
+- [x] [P5-T1] Run the final actionlint pass and record `FEATURE/evidence/qa-gates/actionlint-final.<TS>.md`
   - Command: `& "<SCRATCH>\actionlint-553\actionlint.exe" -no-color` from the repository root (re-download per P0-T3 if the scratchpad was cleared).
   - Acceptance: `EXIT_CODE: 0` over all seven workflow files. Update spec.md seeded-condition checkbox 1 with this artifact as evidence.
 
-- [ ] [P5-T2] Verify `$LASTEXITCODE` hygiene across the pwsh-bearing workflow files and record `FEATURE/evidence/qa-gates/lastexitcode-review.<TS>.md`
+- [x] [P5-T2] Verify `$LASTEXITCODE` hygiene across the pwsh-bearing workflow files and record `FEATURE/evidence/qa-gates/lastexitcode-review.<TS>.md`
   - Scope: six of the seven workflow files are enumerated — the five callees plus `ci.yml` (the orchestrator has no steps). `.github/workflows/codex-web-setup-test.yml` is explicitly EXCLUDED from enumeration because it declares no `shell: pwsh` or `shell: powershell` step, so the `.claude/rules/ci-workflows.md` pattern cannot apply to it; the artifact must state this exclusion and reason so the recorded enumeration is consistent with its scope statement.
   - Method: enumerate every `shell: pwsh` step in the five callees and `ci.yml` (the orchestrator has none); confirm (a) no step intentionally invokes a failing nested command (the `.claude/rules/ci-workflows.md` pattern is therefore not triggered — matches research Q9), and (b) both msbuild gate guards `if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }` and the vstest `throw` are present, via `Select-String -Path .github/workflows/_build-analyzers.yml,.github/workflows/_build-nullable.yml -Pattern 'if \(\$LASTEXITCODE -ne 0\) \{ exit \$LASTEXITCODE \}'` (2 matches) and `Select-String -Path .github/workflows/_mstest-coverage.yml -Pattern 'throw "MSTest execution failed'` (1 match) and `Select-String -Path .github/workflows/_mstest-coverage.yml -Pattern 'throw "No test assemblies found'` (1 match).
   - Acceptance: artifact records the step-by-step table and the four match counts. Update spec.md seeded-condition checkbox 8 with this artifact as evidence.
 
-- [ ] [P5-T3] Verify the branch contains zero C#/project-file changes and record `FEATURE/evidence/qa-gates/no-csharp-diff.<TS>.md`
+- [x] [P5-T3] Verify the branch contains zero C#/project-file changes and record `FEATURE/evidence/qa-gates/no-csharp-diff.<TS>.md`
   - Command (two statements — PowerShell does not concatenate a subexpression with a trailing `..HEAD` into one argument):
     ```powershell
     $base = git merge-base origin/main HEAD
@@ -290,43 +291,43 @@ function Test-CalleeContract([string]$Path, [int]$Timeout) {
     (the `**/` prefix is required on `packages.config` and `app.config`: a git pathspec with no wildcard is anchored to the repo root and would match zero files; `*.cs` and the other extension globs already match at any depth)
   - Acceptance: output is empty (probe commits are fully cancelled by their reverts). The artifact restates the No-C#-Toolchain Statement as the justification for the absence of a C# toolchain pass. If output is non-empty, halt and report — an unreverted probe or scope drift exists.
 
-- [ ] [P5-T4] Audit file sizes and record `FEATURE/evidence/qa-gates/file-size-audit.<TS>.md`
+- [x] [P5-T4] Audit file sizes and record `FEATURE/evidence/qa-gates/file-size-audit.<TS>.md`
   - Command: `Get-ChildItem .github/workflows/*.yml, .github/workflows/README.md | ForEach-Object { "{0}`t{1}" -f $_.Name, (Get-Content $_.FullName).Count }`
   - Acceptance: every listed file is under 500 lines (expected: each callee < 100, `ci.yml` ~32, README < 150).
 
-- [ ] [P5-T5] Link the new workflows README from the feature folder
+- [x] [P5-T5] Link the new workflows README from the feature folder
   - Edit: append to `FEATURE/issue.md` a `## References` entry: `- Workflows README: `.github/workflows/README.md` (created by #553)`.
   - Acceptance: `Select-String -Path FEATURE/issue.md -Pattern 'workflows/README.md'` matches (satisfies the spec DoD "created and linked from the feature folder" clause, completed by P7-T6).
 
-- [ ] [P5-T6] Check off spec.md acceptance criterion 1 (four gates as separate jobs, zero `needs:` edges) and its mirrors (issue.md AC 1, user-story.md AC 1)
+- [x] [P5-T6] Check off spec.md acceptance criterion 1 (four gates as separate jobs, zero `needs:` edges) and its mirrors (issue.md AC 1, user-story.md AC 1)
   - Evidence pointers: `.github/workflows/ci.yml` (P2-T1 verification 3), `FEATURE/evidence/qa-gates/post-probe-green-run.<TS>.md`.
   - Acceptance: all three checkboxes `[x]`, each citing the evidence paths.
 
-- [ ] [P5-T7] Check off spec.md acceptance criterion 2 (five callee workflows with the reusable-workflow contract) and its mirrors (issue.md AC 2, user-story.md AC 2)
+- [x] [P5-T7] Check off spec.md acceptance criterion 2 (five callee workflows with the reusable-workflow contract) and its mirrors (issue.md AC 2, user-story.md AC 2)
   - Evidence pointers: the five P1 task verifications (`Test-CalleeContract` results), `FEATURE/evidence/qa-gates/actionlint-final.<TS>.md`.
   - Acceptance: all three checkboxes `[x]` with evidence paths.
 
-- [ ] [P5-T8] Check off spec.md acceptance criterion 3 (`ci.yml` orchestrator, no inline `steps:`) and its mirrors (issue.md AC 3, user-story.md AC 3)
+- [x] [P5-T8] Check off spec.md acceptance criterion 3 (`ci.yml` orchestrator, no inline `steps:`) and its mirrors (issue.md AC 3, user-story.md AC 3)
   - Evidence pointers: P2-T1 verification outputs (no `steps:` match, five `uses:` references).
   - Acceptance: all three checkboxes `[x]` with evidence paths.
 
-- [ ] [P5-T9] Check off spec.md acceptance criterion 4 (no cross-job file sharing; `test-results` upload preserved) and its mirrors (issue.md AC 4, user-story.md AC 4)
+- [x] [P5-T9] Check off spec.md acceptance criterion 4 (no cross-job file sharing; `test-results` upload preserved) and its mirrors (issue.md AC 4, user-story.md AC 4)
   - Evidence pointers: `FEATURE/evidence/qa-gates/byte-identity.<TS>.md` (upload block), `FEATURE/evidence/qa-gates/test-results-artifact.<TS>.md`.
   - Acceptance: all three checkboxes `[x]` with evidence paths.
 
-- [ ] [P5-T10] Check off spec.md acceptance criterion 5 (gate commands and actionlint step byte-identical, incl. `/t:Rebuild` comment, `$LASTEXITCODE` guards, zero-assembly `throw`)
+- [x] [P5-T10] Check off spec.md acceptance criterion 5 (gate commands and actionlint step byte-identical, incl. `/t:Rebuild` comment, `$LASTEXITCODE` guards, zero-assembly `throw`)
   - Evidence pointers: `FEATURE/evidence/qa-gates/byte-identity.<TS>.md`, `FEATURE/evidence/qa-gates/lastexitcode-review.<TS>.md`.
   - Acceptance: spec checkbox `[x]` with evidence paths (no issue/user-story mirror carries this criterion standalone; their AC 8 equivalents are handled in P7-T3).
 
-- [ ] [P5-T11] Check off spec.md acceptance criterion 7 (README documents dispatch + rename procedures) and its mirrors (issue.md AC 6, user-story.md AC 6)
+- [x] [P5-T11] Check off spec.md acceptance criterion 7 (README documents dispatch + rename procedures) and its mirrors (issue.md AC 6, user-story.md AC 6)
   - Evidence pointers: `.github/workflows/README.md` (P2-T2 heading verification).
   - Acceptance: all three checkboxes `[x]` with evidence paths.
 
-- [ ] [P5-T12] Check off spec.md acceptance criterion 8 (green run against the branch head, `modified-workflow-needs-green-run`) and its mirrors (issue.md AC 7, user-story.md AC 7)
+- [x] [P5-T12] Check off spec.md acceptance criterion 8 (green run against the branch head, `modified-workflow-needs-green-run`) and its mirrors (issue.md AC 7, user-story.md AC 7)
   - Evidence pointers: `FEATURE/evidence/qa-gates/post-probe-green-run.<TS>.md` (superseded by P5-T15's final-head confirmation if additional commits landed in this phase).
   - Acceptance: all three checkboxes `[x]` with evidence paths.
 
-- [ ] [P5-T13] Check off spec.md acceptance criterion 10 (post-split wall clock measured with the baseline's collection method and recorded)
+- [x] [P5-T13] Check off spec.md acceptance criterion 10 (post-split wall clock measured with the baseline's collection method and recorded)
   - Evidence pointers: `FEATURE/evidence/qa-gates/ci-split-timing-comparison.<TS>.md`.
   - Acceptance: spec checkbox `[x]` with evidence path.
 
