@@ -8,12 +8,22 @@ namespace UtilitiesCS.Test
 {
     public partial class TimeOutTask_Tests
     {
+        /// <summary>
+        /// A finite timeout that cannot elapse during a test run. The source-completes-later
+        /// tests need a finite value so <c>TimeoutAfter</c> builds the proxy and exercises
+        /// <c>MarshalTaskResults</c> rather than short-circuiting on <see cref="Timeout.Infinite"/>.
+        /// A short window (previously 100 ms) races the source completion: when the runner thread
+        /// is preempted for longer than the window, the timeout timer faults the proxy with
+        /// <see cref="TimeoutException"/> before the source result is marshalled.
+        /// </summary>
+        private const int NonElapsingTimeoutMs = int.MaxValue;
+
         [TestMethod]
         public async Task TimeoutAfter_GenericTask_ShouldPropagateFaultedSourceException_WhenSourceFaultsLater()
         {
             // Arrange
             var source = new TaskCompletionSource<int>();
-            var proxy = source.Task.TimeoutAfter(100);
+            var proxy = source.Task.TimeoutAfter(NonElapsingTimeoutMs);
 
             // Act
             source.SetException(new InvalidOperationException("boom"));
@@ -28,7 +38,7 @@ namespace UtilitiesCS.Test
         {
             // Arrange
             var source = new TaskCompletionSource<int>();
-            var proxy = source.Task.TimeoutAfter(100);
+            var proxy = source.Task.TimeoutAfter(NonElapsingTimeoutMs);
 
             // Act
             source.SetCanceled();
@@ -43,7 +53,7 @@ namespace UtilitiesCS.Test
         {
             // Arrange
             var source = new TaskCompletionSource<bool>();
-            var proxy = ((Task)source.Task).TimeoutAfter(100);
+            var proxy = ((Task)source.Task).TimeoutAfter(NonElapsingTimeoutMs);
 
             // Act
             source.SetException(new InvalidOperationException("boom"));
@@ -58,7 +68,7 @@ namespace UtilitiesCS.Test
         {
             // Arrange
             var source = new TaskCompletionSource<bool>();
-            var proxy = ((Task)source.Task).TimeoutAfter(100);
+            var proxy = ((Task)source.Task).TimeoutAfter(NonElapsingTimeoutMs);
 
             // Act
             source.SetCanceled();
