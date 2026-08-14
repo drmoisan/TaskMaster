@@ -1,9 +1,15 @@
 ---
 name: svgcontrol-test-unwired-418
-description: SVGControl.Test is absent from TaskMaster.sln and its pinned test packages are missing from packages/, so it cannot build; plus the ExCSS/Fizzler binding-redirect topology behind issue #418
+description: "STALE as of 2026-08-14: SVGControl.Test is now IN TaskMaster.sln (line 42). Historical #418 findings on missing pinned packages and the ExCSS/Fizzler redirect topology retained below; re-verify build state before reuse"
 metadata:
   type: project
 ---
+
+**UPDATE 2026-08-14:** `SVGControl.Test` now appears in `TaskMaster.sln` (project entry at line 42,
+GUID `{13AC39E6-DE06-4337-8EB0-41CE674A4C3B}`), so the solution-membership claim below is stale.
+Package/build state was not re-verified on 2026-08-14; treat everything below as a 2026-08-04 snapshot.
+
+Original 2026-08-04 findings:
 
 `SVGControl.Test` is **not** listed in `TaskMaster.sln` (only `SVGControl` is), its `packages.config` pins
 `Castle.Core 5.1.1`, `FluentAssertions 6.12.0`, `Moq 4.20.69`, `MSTest.TestAdapter 3.1.1`,
