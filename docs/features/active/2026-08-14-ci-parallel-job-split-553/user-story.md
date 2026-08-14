@@ -112,7 +112,7 @@ criterion admitted alternatives, the resolved form is stated.
       cross-job file sharing exists in the adopted topology; the only artifact
       operation is the preserved `test-results` upload to workflow storage, with
       `if: always()` and the same artifact name and paths as today.
-- [ ] The `main` branch ruleset's `required_status_checks` contexts are updated to
+- [x] The `main` branch ruleset's `required_status_checks` contexts are updated to
       match the new context names, with no window in which a merge can bypass a
       gate: exact context strings are captured from a live green run on the PR
       head, and the update is a single atomic PUT of the full writable ruleset
@@ -121,7 +121,7 @@ criterion admitted alternatives, the resolved form is stated.
       procedure and the branch-protection rename procedure.
 - [x] The reworked pipeline produces a green run against the branch head,
       satisfying `modified-workflow-needs-green-run`.
-- [ ] Every gate enforced by the current `quality-gates` job is still enforced
+- [x] Every gate enforced by the current `quality-gates` job is still enforced
       after the split; no check is dropped, weakened, or made non-required. In
       particular, every gate command is byte-identical to its pre-split
       counterpart, the `/t:Rebuild` rationale comment and the zero-test-assembly

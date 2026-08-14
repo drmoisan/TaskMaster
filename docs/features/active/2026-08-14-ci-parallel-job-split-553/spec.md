@@ -339,7 +339,7 @@ determinable from repository data (research Q7).
 - [x] The four gate commands and the actionlint step are byte-identical to their
       pre-split counterparts, including the `/t:Rebuild` rationale comment, the
       `$LASTEXITCODE` guards, and the zero-test-assembly `throw` guard.
-- [ ] The `main` ruleset's `required_status_checks` contexts are replaced in one
+- [x] The `main` ruleset's `required_status_checks` contexts are replaced in one
       atomic PUT with the five context strings captured from a live green run on
       the PR head, with no window in which a merge can bypass a gate, and the
       pre-PUT JSON, PUT payload, and post-PUT GET response are recorded as
@@ -348,7 +348,7 @@ determinable from repository data (research Q7).
       procedure and the branch-protection rename procedure.
 - [x] The reworked pipeline produces a green run against the branch head,
       satisfying `modified-workflow-needs-green-run`.
-- [ ] Every gate enforced by the current `quality-gates` job is still enforced
+- [x] Every gate enforced by the current `quality-gates` job is still enforced
       after the split; no check is dropped, weakened, or made non-required.
 - [x] Post-split wall-clock duration is measured with the same collection method
       as the baseline and recorded as evidence in this feature folder, compared
