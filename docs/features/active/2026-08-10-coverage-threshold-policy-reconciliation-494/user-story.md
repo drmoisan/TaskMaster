@@ -10,10 +10,34 @@
 
 > **Why this document exists.** The work mode for issue #494 is `full-bug`, for which a
 > `user-story.md` is normally absent; this document exists because the epic preparation route
-> requires it as a deliverable. **The acceptance-criteria authority for this feature is `issue.md`
-> plus `spec.md`.** This document carries no acceptance criteria and must not be used as an
-> acceptance-criteria source. The "Outcomes" section below is narrative context, not a check-off
-> list.
+> requires it as a deliverable. **For this remediation, only the `## Acceptance Criteria` section
+> in `spec.md` is the sole acceptance-criteria source.** This document is narrative context only
+> and must not be used for acceptance-criteria check-off. The "Outcomes" section below is
+> narrative context, not a check-off list.
+
+## Operative Remediation Scope Correction
+
+The existing upstream prompt at
+`evidence/other/upstream-claude-policy-reconciliation-prompt.2026-08-11T12-41.md` is the local
+TaskMaster deliverable. No upstream receipt, release, publication, validation, or external
+execution is required. `CLAUDE.md`, all non-memory `.claude/**` paths (including rules, hooks,
+skills, agents, settings, and generated runtime assets), `.agents/skills/**`, and external
+repositories are prohibited. Active scope remains limited to the existing TaskMaster coverage
+runner and Pester work already present in the repository; this remediation does not reopen,
+implement, test, re-evaluate, or plan that work.
+
+The following pre-existing `.claude/agent-memory/**` records are immutable and are permitted
+solely for protected-path classification:
+
+- `.claude/agent-memory/atomic-executor/MEMORY.md`
+- `.claude/agent-memory/atomic-executor/project_511_is_a_testhost_crash_not_n_failing_tests.md`
+- `.claude/agent-memory/atomic-executor/project_pester5_result_shape_container_tests_and_ci_codecoverage.md`
+- `.claude/agent-memory/atomic-planner/MEMORY.md`
+- `.claude/agent-memory/atomic-planner/poshqc-mcp-and-msbuild-invocation-facts.md`
+- `.claude/agent-memory/atomic-planner/project_494_threshold_reconciliation_plan_seams.md`
+
+Do not edit, create, delete, rename, stage, or otherwise modify these records, including their
+content or history.
 
 ## Story Statement
 
@@ -103,7 +127,7 @@ a gate.
   counterparts, so a Codex session and a Claude session reach different coverage verdicts on the
   same PowerShell change and on the same feature review today.
 
-### Scenario — Planning a C# bug fix, after this feature lands
+### Scenario — Planning a C# bug fix, after this feature lands — Historical, non-executable
 
 An agent plans a change to `QuickFiler`. It reads `CLAUDE.md` § UT2 and finds one set of numbers,
 one denominator rule, and an explicit statement that this section is authoritative over
@@ -113,7 +137,7 @@ own. The agent writes change-scoped blocking gates — no regression on changed 
 units — and records the repository-wide figure as a reported, tracked value with the written reason
 it is not yet blocking. No halt, no improvisation, no archaeology.
 
-### Scenario — A coverage regression reaches the gate
+### Scenario — A coverage regression reaches the gate — Historical, non-executable
 
 A change lowers coverage below the floor. The gate reads the coverage artifact produced by a
 committed script, compares against the floor from the authority, and returns non-zero with a
@@ -121,7 +145,7 @@ message naming the figure and the floor. A second attempt omits the coverage art
 gate returns non-zero for a missing input rather than skipping the check. Both outcomes are proven
 by unit tests before the gate is trusted, and the proof is captured as acceptance evidence.
 
-### Scenario — A future divergence appears
+### Scenario — A future divergence appears — Historical, non-executable
 
 Someone syncs a governance bundle that reintroduces a different number into
 `.claude/rules/general-unit-test.md`. An agent reading both surfaces applies the written
@@ -131,8 +155,8 @@ authority-consistency test in the Pester suite detects the reintroduced numeral 
 
 ## Outcomes This Feature Is Expected to Produce
 
-Narrative only. The binding criteria are `issue.md` AC1-AC10 and the traceability table in
-`spec.md`.
+Narrative only. For this remediation, only the `## Acceptance Criteria` section in `spec.md` is
+the acceptance-criteria source; this document is not a check-off list.
 
 - One set of coverage numbers exists in one document; every other document cites it and states no
   numeral of its own.

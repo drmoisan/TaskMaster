@@ -90,74 +90,72 @@ Every coverage figure in the repository will therefore differ by execution time.
 thresholds must be decided against the corrected measurement, captured at execution time, and
 must not be hard-coded from a figure measured before those features land.
 
-## Governance-Document Authorization
+## User-Authorized Scope Correction
 
-The `policy-compliance-order` hard constraint against modifying `.claude/rules/` documents is
-suspended for this feature only, and only for the coverage-threshold and coverage-exclusion
-content this issue enumerates, because the defect is that those documents contradict each other.
+This section supersedes the earlier governance-document authorization and every receipt-gated
+delivery assumption in this issue. The TaskMaster deliverable for every prohibited `CLAUDE.md`
+or non-memory Claude runtime change is the existing upstream prompt at
+`evidence/other/upstream-claude-policy-reconciliation-prompt.2026-08-11T12-41.md`.
 
-Hard limits:
+TaskMaster must not edit `CLAUDE.md`; any non-memory Claude runtime customization path (rules,
+hooks, skills, agents, settings, or generated runtime assets); or `.agents/skills/**`, and it
+must not write to an upstream repository. The only permitted `.claude/agent-memory/**` range
+paths are the six immutable pre-existing repository-specific records listed below, solely for
+protected-path classification; neither their content nor their history may be modified:
 
-- A threshold may be changed only by an explicit, recorded decision with stated rationale in
-  `spec.md`. A corrected denominator moving a measured figure is not by itself a justification
-  for lowering a bar. If the reconciled number is lower than a number in a current document, the
-  spec must say so in those words and justify it.
-- Out of bounds for this feature (owned by sibling feature `csharp-toolchain-gate-fidelity-512`):
-  the C# toolchain command block in `CLAUDE.md`, `.claude/rules/csharp.md`, and
-  `.claude/skills/csharp-qa-gate/SKILL.md`.
+1. `.claude/agent-memory/atomic-executor/MEMORY.md`
+2. `.claude/agent-memory/atomic-executor/project_511_is_a_testhost_crash_not_n_failing_tests.md`
+3. `.claude/agent-memory/atomic-executor/project_pester5_result_shape_container_tests_and_ci_codecoverage.md`
+4. `.claude/agent-memory/atomic-planner/MEMORY.md`
+5. `.claude/agent-memory/atomic-planner/poshqc-mcp-and-msbuild-invocation-facts.md`
+6. `.claude/agent-memory/atomic-planner/project_494_threshold_reconciliation_plan_seams.md`
+
+Future application of the prompt is expressly deferred outside TaskMaster. No upstream receipt,
+release, validation, publication, or other external evidence is required for TaskMaster
+completion.
+
+The remaining TaskMaster-owned scope is limited to permitted coverage tooling and deterministic
+tests. The existing corrected-arithmetic coverage evidence remains an execution input and may
+not select or lower a threshold. The issue #512 C# toolchain ownership boundary remains intact.
 
 ## Acceptance Criteria
 
-- [ ] AC1 — A single set of coverage thresholds appears in `CLAUDE.md` § UT2,
-      `.claude/rules/general-unit-test.md`, and `.claude/rules/quality-tiers.md`, with no numeric
-      disagreement between them.
-- [ ] AC2 — The exclusion/exemption policy is stated once, in the document named authoritative,
-      and does not contradict itself across those documents. The COM/VSTO/WinForms
-      testable-denominator exemption and the "no production file may be excluded" clause are
-      reconciled into one rule.
-- [ ] AC3 — The documents name which source is authoritative for coverage policy, so a future
-      divergence is resolvable by rule rather than by precedent. Non-authoritative documents cite
-      the authority rather than restating a number that can drift.
-- [ ] AC4 — Tooling enforces the agreed thresholds, and a deliberately introduced coverage
-      regression fails the gate. This negative-path proof is the acceptance evidence; a
-      demonstration that the gate returns non-zero on a synthetic below-threshold input is
-      required, captured under `evidence/regression-testing/`.
-- [ ] AC5 — The #424 / #230 improvised precedent (no-regression against a captured baseline plus
-      a 90% changed-line bar as blocking, raw repo-wide figures non-blocking) is either ratified
-      as the written rule or explicitly superseded, in writing, in the authoritative document.
-- [ ] AC6 — The `quality-tiers.yml` / `tier-classification` / `docs/ci.research.md` claims are
-      resolved: either the referenced files and the classification stage are authored, or the
-      claims are removed. No governance document asserts a file that is absent. **Scope widened
-      2026-08-10T16-10:** this criterion covers every site carrying the claim, not
-      `.claude/rules/quality-tiers.md` alone. Verified sites are
-      `.claude/rules/quality-tiers.md:9,20` and `.claude/rules/general-code-change.md:29` (both
-      always-loaded), plus the `.agents/skills/quality-tiers/SKILL.md:27` snapshot copy. Rationale
-      for widening: resolving one always-loaded rule file while leaving the identical false claim
-      live in another reproduces the exact defect this feature exists to remove. Any T1-T4
-      reference left dangling by the removal (`.claude/rules/architecture-boundaries.md`,
-      `.claude/rules/powershell.md`, `.claude/rules/general-code-change.md`) must be given an
-      explicit disposition rather than left pointing at deleted content.
-- [ ] AC7 — The governing threshold numbers are validated against coverage re-measured under the
-      post-#441/#478 and post-#457 arithmetic, with the re-measurement captured as evidence
-      **before** any number is written into a governance document, and with the numbers treated as
-      an input refreshed at execution time rather than a figure hard-coded from a measurement
-      taken during preparation. **Disambiguation 2026-08-10T16-10:** this criterion governs
-      sequencing and evidence, and does not make the measurement the selector of the threshold.
-      The governing numbers are decided on the governance-provenance grounds recorded in `spec.md`
-      D1; the re-measurement validates them, supplies context, and identifies which assemblies
-      fail. If the re-measurement contradicts D1, the `spec.md` Risk 2 path applies: halt and
-      escalate. Silently re-tuning a threshold to match a measured figure is prohibited by the
-      epic non-goal and is not a permitted way to satisfy this criterion.
-- [ ] AC8 — `.claude/hooks/validate-feature-review-coverage.ps1` is internally consistent: its
-      documented behavior and its enforced constants state the same numbers, and those numbers
-      equal the reconciled thresholds.
-- [ ] AC9 — Any Pester tests added live at `tests/scripts/powershell/<Name>.Tests.ps1`, are
-      deterministic, and create no temporary files.
-- [ ] AC10 — Threshold-stating sites outside this feature's edit scope (`AGENTS.md`,
-      `.claude/rules/python.md`, `.claude/rules/typescript.md`, `.claude/rules/powershell.md`,
-      the `*-qa-gate` skills, the `.agents/skills/` mirror, and the 512-owned C# documents) are
-      enumerated in the spec with a recorded disposition: aligned here, deferred to a named
-      follow-up, or explicitly declared non-normative under the AC3 authority rule.
+- [ ] AC1 — The existing upstream prompt is retained as the complete TaskMaster deliverable for
+      reconciling coverage thresholds in the upstream source of truth; no TaskMaster `CLAUDE.md`,
+      non-memory Claude runtime customization path, or `.agents/skills/**` path is changed. The
+      exact six immutable pre-existing `.claude/agent-memory/**` records in the User-Authorized
+      Scope Correction are permitted solely for protected-path classification, with no content or
+      history modification, and future application is deferred outside TaskMaster.
+- [ ] AC2 — The existing upstream prompt explicitly requires the upstream owner to reconcile the
+      coverage exclusion/exemption policy; TaskMaster records that deferred requirement without
+      editing any local Claude-runtime path.
+- [ ] AC3 — The existing upstream prompt explicitly requires one authoritative upstream coverage
+      policy source and non-conflicting generated references; TaskMaster records that deferred
+      requirement without editing any local Claude-runtime path.
+- [ ] AC4 — TaskMaster coverage tooling rejects a valid synthetic Cobertura result below 80%,
+      accepts the exact 80% boundary, and has deterministic negative-path evidence under
+      `evidence/regression-testing/`; upstream Claude-hook reconciliation remains deferred.
+- [ ] AC5 — The existing upstream prompt carries the requirement to ratify or supersede the
+      #424/#230 precedent in the authoritative upstream policy; TaskMaster records that deferred
+      requirement without editing any local Claude-runtime path.
+- [ ] AC6 — The existing upstream prompt carries the requirement to resolve the false
+      `quality-tiers.yml`, `tier-classification`, and `docs/ci.research.md` claims at their
+      upstream-owned runtime sites; TaskMaster records that deferred requirement without editing
+      `CLAUDE.md`, any non-memory Claude runtime customization path, or `.agents/skills/**`. The
+      exact six immutable pre-existing `.claude/agent-memory/**` records in the User-Authorized
+      Scope Correction are permitted solely for protected-path classification, with no content or
+      history modification.
+- [ ] AC7 — Corrected-arithmetic remeasurement evidence is retained and validated as an
+      execution-time input before the local threshold gate is implemented; it does not select or
+      lower a threshold.
+- [ ] AC8 — The existing upstream prompt carries the requirement to reconcile the upstream
+      feature-review coverage hook's documentation and behavior; TaskMaster records that deferred
+      requirement without editing `.claude/hooks/**`.
+- [ ] AC9 — Added Pester tests mirror their TaskMaster coverage-tooling subjects, are deterministic,
+      and create no temporary files.
+- [ ] AC10 — The existing upstream prompt identifies the future affected TaskMaster paths and
+      requires upstream coverage-site disposition; TaskMaster records the deferral without editing
+      the protected Claude or Codex runtime policy surfaces.
 
 ## Out of Scope
 

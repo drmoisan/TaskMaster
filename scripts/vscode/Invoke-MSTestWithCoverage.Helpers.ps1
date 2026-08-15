@@ -455,3 +455,37 @@ function ConvertTo-KoverageCoberturaXml {
 
     return $stringWriter.ToString()
 }
+
+function Assert-CoberturaLineCoverageThreshold {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$CoberturaXml
+    )
+
+    [xml]$coverageDocument = $CoberturaXml
+    $coverageNode = $coverageDocument.SelectSingleNode('/coverage')
+    $lineRateText = if ($coverageNode) { $coverageNode.GetAttribute('line-rate') } else { $null }
+    if ([string]::IsNullOrWhiteSpace($lineRateText)) {
+        throw 'Cobertura line-rate is missing.'
+    }
+
+    [decimal]$lineRate = 0
+    if (-not [decimal]::TryParse(
+            $lineRateText,
+            [System.Globalization.NumberStyles]::Float,
+            [System.Globalization.CultureInfo]::InvariantCulture,
+            [ref]$lineRate)) {
+        throw 'Cobertura line-rate must be numeric.'
+    }
+
+    if ($lineRate -lt 0 -or $lineRate -gt 1) {
+        throw 'Cobertura line-rate must be between 0 and 1.'
+    }
+
+    $percentage = $lineRate * 100
+    if ($percentage -lt 80) {
+        $formattedPercentage = $percentage.ToString('0.####', [System.Globalization.CultureInfo]::InvariantCulture)
+        throw "Cobertura line coverage $formattedPercentage% is below the required 80% threshold."
+    }
+}

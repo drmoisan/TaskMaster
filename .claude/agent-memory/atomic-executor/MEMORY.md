@@ -37,12 +37,14 @@
 - [poshqc analyze exits 1 on a Warning](project_poshqc_analyze_exit1_on_warning.md) — "EXIT_CODE 0 with zero error-severity" is self-contradictory; Helpers.ps1 carries a pre-existing PSUseSingularNouns; `Remove-*` needs SupportsShouldProcess
 - [BOM breaks grep ^ anchor](project_bom_grep_anchor_false_negative.md) — bash grep `^#nullable` misses BOM-prefixed files; use the Grep tool for opt-in classification, never bash grep
 - [StrictMode Latest + missing XML attribute throws](project_pester_strictmode_xml_attribute_property_access.md) — a fixture omitting `branch` (or `complexity` on a merge-path `<class>`) throws PropertyNotFoundStrict instead of the assertion diff; enumerate ALL bare `$node.attr` reads on the traversed path, not one attribute at a time
+- [Pester 5 result shape: no container .Tests, no -CI + -CodeCoverage](project_pester5_result_shape_container_tests_and_ci_codecoverage.md) — `$_.Tests.Count` silently renders 0 per file (use `TotalCount`); `-CI` and `-CodeCoverage` are different parameter sets and cannot be combined
 - [pwsh -Command needs single-quoted outer](project_pwsh_command_quoting_from_bash.md) — a double-quoted outer wrapper lets bash eat `$` → empty counts + inverted exit gates or a hard ParserError; `''` inside single quotes is not an escape
 
 - [Compile-time red needs body-level refs](project_compile_red_needs_body_level_references.md) — a missing type in a method SIGNATURE suppresses body binding, so an `[expect-fail]` task requiring N named CS0246s reports only 1; construct the types inline in test bodies
 
 ## Test execution & isolation
 - [Tests must mock GUI; no visible window](feedback_tests_must_mock_gui_no_visible_window.md) — use headless seams (mocked viewers, injected show/focus delegates), never Form.Show/Application.Run
+- [#511 is a test-host crash, not N failing tests](project_511_is_a_testhost_crash_not_n_failing_tests.md) — load-driven abort with `Total tests: Unknown` (no readable verdict); `/InIsolation` loop gave 0 failed; never gate on a pinned failing-name count
 - [WinFormsPumpHost tests are load-flaky](project_winformspumphost_tests_load_flaky.md) — QfcItemController_InitializationTests fail with "window handle has been created"/60s timeouts when the box is CPU-saturated; re-run when load drops, don't treat as a red baseline
 - [vstest /InIsolation + FilePathHelper serialization](project_vstest_isolation_and_filepathhelper_serialization.md) — Moq assemblies need /InIsolation (else STTE Setup FileNotFound); FilePathHelper.FilePath is "" default but null after JSON deserialize
 - [Invoke-MSTest.ps1 dies on a single test assembly](project_418_invoke_mstest_single_assembly_bug.md) — StrictMode + `.Count` on a scalar String throws before vstest runs; call vstest.console.exe directly with the script's arg list
