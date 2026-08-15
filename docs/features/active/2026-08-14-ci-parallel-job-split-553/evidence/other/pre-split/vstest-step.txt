@@ -1,0 +1,33 @@
+      - name: Run MSTest suite with coverage
+        shell: pwsh
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+
+          $vswherePath = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+          if (-not (Test-Path $vswherePath)) {
+              throw 'vswhere.exe was not found. Install Visual Studio 2022 (or Build Tools) with Test Platform components.'
+          }
+
+          $vstestPath = & $vswherePath -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
+          if (-not $vstestPath) {
+              throw 'vstest.console.exe not found via vswhere. Install Visual Studio Test Platform components.'
+          }
+
+          $testAssemblies = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Filter '*.Test.dll' |
+              Where-Object {
+                  $_.FullName -match "\\bin\\$($env:BUILD_CONFIGURATION)\\" -and
+                  $_.FullName -notmatch '\\obj\\' -and
+                  $_.FullName -notmatch '\\ref\\'
+              } |
+              Select-Object -ExpandProperty FullName
+
+          if (-not $testAssemblies -or $testAssemblies.Count -eq 0) {
+              throw "No test assemblies found under '$env:GITHUB_WORKSPACE' for configuration '$env:BUILD_CONFIGURATION'."
+          }
+
+          New-Item -ItemType Directory -Path 'TestResults' -Force | Out-Null
+          & $vstestPath $testAssemblies /EnableCodeCoverage /InIsolation /Logger:trx /TestCaseFilter:"TestCategory!=LiveOutlook"
+          if ($LASTEXITCODE -ne 0) {
+              throw "MSTest execution failed with exit code $LASTEXITCODE"
+          }

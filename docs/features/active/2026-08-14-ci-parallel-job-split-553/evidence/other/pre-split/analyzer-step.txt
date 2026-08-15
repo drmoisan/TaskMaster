@@ -1,0 +1,7 @@
+      - name: Build with analyzers and code style enforcement
+        shell: pwsh
+        run: |
+          & msbuild $env:SOLUTION_PATH /t:Build /m /p:Configuration=Debug `
+              "/p:Platform=Any CPU" `
+              /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
