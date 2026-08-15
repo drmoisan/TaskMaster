@@ -11,15 +11,14 @@ This rule file summarizes the C#-specific policies for this repository.
 
 ## Toolchain
 
-1. **Formatting — CSharpier**: All C# source files must be formatted with CSharpier. Do not use `dotnet format`. Apply: `dotnet tool run csharpier format .` Verify (CI parity, read-only): `dotnet tool run csharpier check .` Always invoke through `dotnet tool run` so the `dotnet-tools.json` pinned version is used; do not invoke a globally installed `csharpier`.
+1. **Formatting — CSharpier**: All C# source files must be formatted with CSharpier. Do not use `dotnet format`. Run `dotnet tool restore` first when the manifest tool has not been restored. Apply: `dotnet tool run csharpier format .` Verify (CI parity, read-only): `dotnet tool run csharpier check .` Always invoke through `dotnet tool run` so the `dotnet-tools.json` pinned version is used; do not invoke a globally installed `csharpier`.
 2. **Linting — .NET Analyzers**: C# code must pass Roslyn/.NET analyzer diagnostics. Command: `msbuild <solution>.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
-   - Use `/t:Rebuild` so the step always performs a genuine recompile; a warm `/t:Build` skips `CoreCompile` and runs no analyzers. CI uses `/t:Build /m` because a runner checkout is cold.
+   - Use `/t:Rebuild` so the step always performs a genuine recompile; a warm `/t:Build` skips `CoreCompile` and runs no analyzers. CI's analyzer job (`.github/workflows/_build-analyzers.yml`) retains `/t:Build /m` because a runner checkout is always cold.
 3. **Type Checking — Nullable Analysis**: Nullable analysis is per-file opt-in via `#nullable enable`; the gate promotes the resulting diagnostics to errors. Command: `msbuild <solution>.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
-   - Use `/t:Rebuild` so the step always performs a genuine recompile; a warm `/t:Build` skips `CoreCompile` and runs no analyzers. CI uses `/t:Build /m` because a runner checkout is cold.
-   - This is `ci.yml`'s command verbatim. Do not add `/p:Nullable=enable` (no project carries a
-     `<Nullable>` element; the flag opts in every un-annotated file at once and makes the gate
-     unpassable) and do not use `/t:Build` (a warm build skips `CoreCompile` and the gate cannot
-     fail).
+   - This is CI's nullable job (`.github/workflows/_build-nullable.yml`) command verbatim. Do not add
+     `/p:Nullable=enable` (no project carries a `<Nullable>` element; the flag opts in every
+     un-annotated file at once and makes the gate unpassable) and do not use `/t:Build` (a warm build
+     skips `CoreCompile` and the gate cannot fail).
 4. **Testing — MSTest + Moq + FluentAssertions**: Run tests with: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`
 
 Run the toolchain in order: format → lint → type-check → test. Restart from step 1 if any step fails or changes files.

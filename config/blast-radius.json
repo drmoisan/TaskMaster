@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "shared_surfaces": [
+    ".claude/settings.json",
+    "config/orchestration-routing.json",
+    "config/blast-radius.json"
+  ],
+  "shared_surface_globs": [],
+  "modules": {
+    "claude-runtime": [".claude/**"],
+    "config": ["config/**"],
+    "docs": ["docs/**"],
+    "tests": ["tests/**"]
+  },
+  "over_breadth_fraction": 0.25
+}

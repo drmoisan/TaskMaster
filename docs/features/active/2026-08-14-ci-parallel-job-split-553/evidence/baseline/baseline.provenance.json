@@ -1,0 +1,15 @@
+{
+  "baseline_file": "ci-sequential-baseline.2026-08-14T13-05.md",
+  "issue": 553,
+  "metric": "ci_pipeline_wall_clock_seconds",
+  "value_seconds": 444,
+  "runner_class": "windows-latest",
+  "host_signature": "github-hosted:windows-latest:runner-group=GitHub Actions",
+  "workflow_run_url": "https://github.com/drmoisan/TaskMaster/actions/runs/31749877507",
+  "captured_at": "2026-08-14T13:05:16Z",
+  "captured_from_head_sha": "d5e4a99687f22ecf14b88a206db623d85fe9a97f",
+  "captured_from_branch": "bug/coverage-threshold-policy-reconciliation-494",
+  "collection_command": "gh api repos/drmoisan/TaskMaster/actions/runs/31749877507/jobs",
+  "measured_job": "Format, build, analyze, and test",
+  "notes": "Pre-split sequential baseline. Runner-captured on a GitHub-hosted windows-latest runner, not a developer workstation, satisfying the runner-environment-parity requirement of .claude/rules/benchmark-baselines.md. This is a workflow-run timing record, not a BenchmarkDotNet result, so it carries no HostEnvironmentInfo block and the 'Unknown processor' rejection condition does not apply; host identity is established by the runner label and the workflow_run_url above. Compared against post-split measurements in ../qa-gates/ci-split-timing-comparison.2026-08-14T11-10.md."
+}

@@ -17,6 +17,7 @@
 - [Swordfish F5 test misclassification](project_swordfish_f5_test_misclassification.md) — verify using/namespace before treating a removal as Swordfish-only
 
 ## Build / toolchain environment
+- [pwsh/git/gh CLI gotchas](project_pwsh_git_gh_cli_gotchas.md) — jq NOT installed (only `gh --jq`); pwsh won't concatenate `$(git merge-base ...)..HEAD`; bare `packages.config` pathspec matches 0 files
 - [Project Build/Test Env](project_build_test_env.md) — git-bash quirks (MSBuild switches, MSYS_NO_PATHCONV), csharpier v1 syntax, legacy csproj Compile includes, IVT for Moq
 - [VS18 build/test toolchain paths](project_vs18_build_toolchain_paths.md) — use VS **18** full-framework msbuild.exe (not .dotnet-sdk, dies on binary resx MSB3822); nuget.exe restore; dotnet-coverage needs `--` separator
 - [Repo-local SDK install + nullable Rebuild](project_repo_sdk_and_nullable_rebuild.md) — .dotnet-sdk install needs pwsh7; csharpier check/format subcommands; nullable debt scope NOT stable across sessions — re-verify which csproj errors come from

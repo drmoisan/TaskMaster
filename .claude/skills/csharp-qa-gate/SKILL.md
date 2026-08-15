@@ -27,10 +27,12 @@ Before invoking this gate, the agent must have:
 
 Run the full toolchain in this exact order. If any step fails or modifies files, fix the issue and restart from step 1. Do not stop the loop until all four steps complete without errors in a single pass.
 
-1. `dotnet tool run csharpier format .` (then `dotnet tool run csharpier check .` to verify)
+1. `dotnet tool restore` (when the manifest tool has not been restored), then `dotnet tool run csharpier format .` to apply formatting and `dotnet tool run csharpier check .` to verify read-only.
 2. `msbuild <solution>.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
 3. `msbuild <solution>.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
 4. `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`
+
+`/t:Rebuild /m` is intentional for the local gate: on a warm worktree `/t:Build` can skip `CoreCompile` through MSBuild incrementality and exit 0 without running analyzers or the compiler. CI may retain `/t:Build` on a cold checkout. Projects opt into nullable per file with `#nullable enable`; do not pass `/p:Nullable=enable`.
 
 If the environment prevents running any tool, stop and report the change as **unverified**. Do not declare completion.
 
