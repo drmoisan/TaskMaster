@@ -338,6 +338,7 @@ function Invoke-MSTestWithCoverageMain {
     Write-Output 'Post-processing coverage XML for Koverage compatibility...'
     $xmlContent = Get-Content $resolvedOutputPath -Raw -Encoding UTF8
     $processedXmlContent = ConvertTo-KoverageCoberturaXml -XmlContent $xmlContent -RepoRoot $repoRoot
+    Assert-CoberturaLineCoverageThreshold -CoberturaXml $processedXmlContent
 
     Set-Content -Path $resolvedOutputPath -Value $processedXmlContent -Encoding UTF8 -NoNewline
     Write-Output "Done. Coverage artifact: $resolvedOutputPath"

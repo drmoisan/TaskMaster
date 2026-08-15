@@ -1,0 +1,108 @@
+# Coverage Threshold Policy Reconciliation (Issue #494) — Scope-Corrected Atomic Plan
+
+- **Issue:** #494 — https://github.com/drmoisan/TaskMaster/issues/494
+- **Epic lineage:** `build-ci-coverage-gate-fidelity` (informational only; this plan does not authorize a Codex epic-child launch)
+- **Work Mode:** `full-bug` — acceptance criteria are tracked in `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/spec.md` only.
+- **Feature folder:** `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494`
+- **Target plan:** `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/plan.2026-08-10T14-10.md`
+- **Scope correction:** TaskMaster `CLAUDE.md`; every non-memory Claude runtime customization path (rules, hooks, skills, agents, settings, and generated runtime assets); `.agents/skills/**`; and external repositories are prohibited. The existing upstream prompt remains a TaskMaster artifact and its future application is deferred, with no completion dependency on an upstream receipt, release, publication, or validation. The only permitted `.claude/agent-memory/**` range paths are the six immutable pre-existing repository-specific records below, solely for protected-path classification; neither their content nor history may change: `.claude/agent-memory/atomic-executor/MEMORY.md`, `.claude/agent-memory/atomic-executor/project_511_is_a_testhost_crash_not_n_failing_tests.md`, `.claude/agent-memory/atomic-executor/project_pester5_result_shape_container_tests_and_ci_codecoverage.md`, `.claude/agent-memory/atomic-planner/MEMORY.md`, `.claude/agent-memory/atomic-planner/poshqc-mcp-and-msbuild-invocation-facts.md`, and `.claude/agent-memory/atomic-planner/project_494_threshold_reconciliation_plan_seams.md`.
+- **C# ownership boundary:** no task changes C# toolchain commands, `CLAUDE.md`, `.claude/rules/csharp.md`, or `.claude/skills/csharp-qa-gate/SKILL.md`; those remain issue #512 territory.
+
+## Conventions
+
+- `<FEATURE>` means `docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494`.
+- `<TS>` means the execution-time timestamp in `yyyy-MM-ddTHH-mm` format.
+- Every command evidence artifact is written only below `<FEATURE>/evidence/<kind>/` and contains `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Decision artifacts contain `Timestamp:`, `Inputs:`, and `Determination:`.
+- The only TaskMaster files this plan permits an executor to write are files below `<FEATURE>/evidence/`, the authorized documentation-scope corrections in `issue.md`, `spec.md`, and this plan, and the individual AC1/AC6 marker updates in `spec.md` when verified. No task writes `CLAUDE.md`, a non-memory `.claude/**` runtime customization path, `.agents/skills/**`, source, tests, configuration, `artifacts/**`, a potential-feature entry, or an external repository. The six immutable pre-existing agent-memory paths in the Scope correction are classification-only exceptions and may not have their content or history modified.
+- Pester 5.x reports line/command coverage but does not provide a branch counter. PowerShell branch coverage is therefore recorded as `NOT MEASURABLE — Pester 5.x emits no branch counter` and is not a threshold, delta, or acceptance gate.
+- Each corrected-arithmetic measurement has exactly two valid outcome classes: (1) a zero-failure pass with `EXIT_CODE: 0` and an empty failure set; or (2) the exact #511 two-test failure set of `QuickFiler.Controllers.Tests.QfcItemController_InitializationTests.InitializeBool_ThroughThePumpHost_CompletesAndInitializesState` and `QuickFiler.Controllers.Tests.QfcItemController_InitializationTests.InitializeNineArgOverload_ThroughThePumpHost_SavesParametersAndDelegates`, both with the documented `System.InvalidOperationException: Invoke or BeginInvoke cannot be called on a control until the window handle has been created.` Every other non-zero result, including a missing, renamed, differently-excepted, or additional failure, is a blocking stop. The runner's raw XML is never corrected-arithmetic evidence; each raw XML produced by a valid outcome must be converted with the current helper before any coverage value is used.
+- This plan contains no manual or human-validation step. The existing upstream prompt remains deferred TaskMaster context; it does not require upstream release evidence, an external receipt, publication, or validation for completion. Acceptance tracking uses individual TaskMaster evidence and does not ask a human to perform a validation task.
+
+---
+
+### Phase 0 — Policy, Scope, and Baseline Capture
+
+- [x] [P0-T1] Read `AGENTS.md`, `.agents/skills/policy-compliance-order/SKILL.md`, `.agents/skills/atomic-plan-contract/SKILL.md`, `.agents/skills/evidence-and-timestamp-conventions/SKILL.md`, `.agents/skills/acceptance-criteria-tracking/SKILL.md`, `.agents/skills/csharp/SKILL.md`, and `.agents/skills/powershell/SKILL.md` in that order; write `<FEATURE>/evidence/baseline/phase0-instructions-read.<TS>.md`.
+  - Acceptance: the artifact lists each path in order and contains the required timestamp, policy-order, and output-summary fields.
+- [x] [P0-T2] Capture `git rev-parse HEAD` and `git status --porcelain` in `<FEATURE>/evidence/baseline/git-state.<TS>.md`.
+  - Acceptance: the artifact records the observed SHA and complete porcelain output without claiming that the tree is clean.
+- [x] [P0-T3] Inspect the changed-path set from P0-T2 and write `<FEATURE>/evidence/baseline/taskmaster-claude-scope-baseline.<TS>.md`.
+  - Acceptance: the artifact identifies every pre-existing TaskMaster `CLAUDE.md` or `.claude/**` change as out-of-plan scope and records that this plan will neither modify nor revert it.
+- [x] [P0-T4] Verify that `<FEATURE>/evidence/other/upstream-claude-policy-reconciliation-prompt.2026-08-11T12-41.md` exists and contains the upstream-only boundary, issue #494, missing-input failure behavior, branch-coverage disposition, deterministic upstream tests, and the issue #512 boundary; write `<FEATURE>/evidence/baseline/upstream-prompt-contract.<TS>.md`.
+  - Acceptance: the artifact quotes each required prompt section with its line number and records `UPSTREAM-ONLY HANDOFF INPUT READY`; it makes no copy or edit of the prompt.
+- [x] [P0-T5] Record that PowerShell formatting is not invoked because this evidence-only TaskMaster plan changes no PowerShell source and its write allowlist excludes source, tests, and configuration; write `<FEATURE>/evidence/baseline/powershell-format-scope-disposition.<TS>.md`.
+  - Acceptance: the artifact identifies `mcp__drm-copilot__run_poshqc_format` as write-capable, records that no PowerShell source is in scope, and confirms that direct numeric PowerShell coverage remains required by P0-T8. It does not invoke the formatter or modify any TaskMaster PowerShell file.
+- [x] [P0-T6] Run `mcp__drm-copilot__run_poshqc_analyze` and write `<FEATURE>/evidence/baseline/powershell-analyze.<TS>.md`.
+  - Acceptance: the artifact records the exact MCP invocation, exit code, and reported diagnostic count; it establishes the PowerShell analyzer baseline without suppressing diagnostics.
+- [x] [P0-T7] Run `mcp__drm-copilot__run_poshqc_test` and write `<FEATURE>/evidence/baseline/powershell-pester-mcp.<TS>.md`.
+  - Acceptance: the artifact records the exact MCP invocation and result. When the MCP response does not supply counts or coverage, it records that limitation; the limitation does not satisfy the numeric-coverage requirement.
+- [x] [P0-T8] Run `pwsh -NoProfile -Command 'Import-Module Pester -MinimumVersion 5.0; $c = New-PesterConfiguration; $c.Run.Path = "tests"; $c.Run.PassThru = $true; $c.CodeCoverage.Enabled = $true; $c.CodeCoverage.Path = @("scripts"); $c.CodeCoverage.OutputFormat = "JaCoCo"; $c.CodeCoverage.OutputPath = "docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/baseline/powershell-baseline.jacoco.xml"; $r = Invoke-Pester -Configuration $c; "PASSED=$($r.PassedCount) FAILED=$($r.FailedCount) SKIPPED=$($r.SkippedCount) TOTAL=$($r.TotalCount) LINEPCT=$($r.CodeCoverage.CoveragePercent)"; exit [int]($r.FailedCount -ne 0)'` and write `<FEATURE>/evidence/baseline/powershell-baseline-coverage.<TS>.md`.
+  - Acceptance: the artifact records passed, failed, skipped, and total counts and a numeric PowerShell line/command coverage percentage. It records `BranchCoverage: NOT MEASURABLE — Pester 5.x emits no branch counter` and does not fabricate a branch value.
+- [x] [P0-T9] Verify `git merge-base --is-ancestor fb257cd6 HEAD` for #441/#478 and `git merge-base --is-ancestor 8d0d1fec HEAD` for #457, then record the current signatures of `Get-CoberturaCoverageSummary`, `Merge-CoberturaClassesByFilename`, `Get-CoberturaLineConditionCoverageParts`, `ConvertTo-KoverageCoberturaXml`, and `Get-KoverageProjectAllowlist` from `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` in `<FEATURE>/evidence/baseline/coverage-helper-signatures.<TS>.md`.
+  - Acceptance: the artifact records both ancestry commands and exit codes, each symbol and current line location, and fails closed if either ancestry check fails or either `Get-CoberturaLineConditionCoverageParts` or `Merge-CoberturaClassesByFilename` is absent.
+- [x] [P0-T10] Resolve acceptance-criteria ownership from the `full-bug` marker in `<FEATURE>/issue.md` and write `<FEATURE>/evidence/issue-updates/ac-source-resolution.<TS>.md`.
+  - Acceptance: the artifact identifies `<FEATURE>/spec.md` as the sole authoritative AC source, identifies `issue.md` as contextual only, and records that no AC checkbox changes before individual verification.
+
+---
+
+### Phase 1 — Corrected-Arithmetic C# Coverage Re-Measurement
+
+- [x] [P1-T1] Verify that no concurrent `vstest.console`, `testhost`, or `dotnet-coverage` process is running and enumerate the `*.Test.dll` candidates that `scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot .` can discover; write `<FEATURE>/evidence/baseline/coverage-discovery-precondition.<TS>.md`.
+  - Acceptance: every candidate begins with the workspace-root path and contains no `\.claude\worktrees\` segment after that prefix. A concurrent test process is a blocking automated stop.
+- [x] [P1-T2] Run `pwsh -NoProfile -File scripts/vscode/Invoke-VSBuild.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform "Any CPU" -Target Rebuild` and write `<FEATURE>/evidence/baseline/csharp-rebuild.<TS>.md`.
+  - Acceptance: the artifact records `-Target Rebuild`, the resolved MSBuild path, exit code, warning/error summary, and a non-zero `CoreCompile` project count. Do not use a Build target where this task requires a rebuild, do not add `/p:Nullable=enable`, and do not alter issue #512-owned toolchain behavior.
+- [x] [P1-T3] Run corrected-arithmetic measurement run 1 with `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput <FEATURE>/evidence/baseline/coverage-remeasurement-run1.raw.cobertura.xml`; write `<FEATURE>/evidence/baseline/coverage-remeasurement-run1-command.<TS>.md`.
+  - Acceptance: the command evidence records exactly one valid outcome class: either `EXIT_CODE: 0` with `Failed: 0` and an empty failure set, or a non-zero exit with exact equality to the two #511 tests and documented `System.InvalidOperationException` message defined in Conventions. Any other non-zero result is a blocking stop. `git status --porcelain` proves no source, test, project, configuration, `CLAUDE.md`, or `.claude/**` file changed between runs.
+- [x] [P1-T4] Convert the P1-T3 raw Cobertura XML with `pwsh -NoProfile -Command '. ./scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1; $raw = Get-Content "docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/baseline/coverage-remeasurement-run1.raw.cobertura.xml" -Raw -Encoding UTF8; $corrected = ConvertTo-KoverageCoberturaXml -XmlContent $raw -RepoRoot (Get-Location).Path; Set-Content "docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/baseline/coverage-remeasurement-run1.corrected.cobertura.xml" -Value $corrected -Encoding UTF8 -NoNewline'`; write `<FEATURE>/evidence/baseline/coverage-remeasurement-run1-conversion.<TS>.md`.
+  - Acceptance: the conversion evidence records the helper command and `EXIT_CODE: 0`; the corrected XML has readable root `line-rate`, `branch-rate`, `lines-valid`, and `lines-covered` attributes. The raw XML is not used as coverage evidence.
+- [x] [P1-T5] Extract run 1's corrected root attributes and per-package values into `<FEATURE>/evidence/baseline/coverage-remeasurement-run1-summary.<TS>.md`.
+  - Acceptance: the artifact reports numeric line and branch values as observations and names every package; it does not apply a branch threshold.
+- [x] [P1-T6] Run corrected-arithmetic measurement run 2 with `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput <FEATURE>/evidence/baseline/coverage-remeasurement-run2.raw.cobertura.xml`; write `<FEATURE>/evidence/baseline/coverage-remeasurement-run2-command.<TS>.md`.
+  - Acceptance: the command evidence records exactly one valid outcome class defined in Conventions: either `EXIT_CODE: 0` with `Failed: 0` and an empty failure set, or a non-zero exit with exact equality to the two #511 tests and documented `System.InvalidOperationException` message. Any other non-zero result is a blocking stop. `git status --porcelain` proves no source, test, project, configuration, `CLAUDE.md`, or `.claude/**` file changed between runs.
+- [x] [P1-T7] Convert the P1-T6 raw Cobertura XML with `pwsh -NoProfile -Command '. ./scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1; $raw = Get-Content "docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/baseline/coverage-remeasurement-run2.raw.cobertura.xml" -Raw -Encoding UTF8; $corrected = ConvertTo-KoverageCoberturaXml -XmlContent $raw -RepoRoot (Get-Location).Path; Set-Content "docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/baseline/coverage-remeasurement-run2.corrected.cobertura.xml" -Value $corrected -Encoding UTF8 -NoNewline'`; write `<FEATURE>/evidence/baseline/coverage-remeasurement-run2-conversion.<TS>.md`.
+  - Acceptance: the corrected output passes the P1-T4 root-attribute check and the conversion artifact records `EXIT_CODE: 0`.
+- [x] [P1-T8] Extract run 2's corrected root attributes and per-package values into `<FEATURE>/evidence/baseline/coverage-remeasurement-run2-summary.<TS>.md`.
+  - Acceptance: the artifact meets P1-T5's observation-only coverage reporting rule.
+- [x] [P1-T9] Run corrected-arithmetic measurement run 3 with `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput <FEATURE>/evidence/baseline/coverage-remeasurement-run3.raw.cobertura.xml`; write `<FEATURE>/evidence/baseline/coverage-remeasurement-run3-command.<TS>.md`.
+  - Acceptance: the command evidence records exactly one valid outcome class defined in Conventions: either `EXIT_CODE: 0` with `Failed: 0` and an empty failure set, or a non-zero exit with exact equality to the two #511 tests and documented `System.InvalidOperationException` message. Any other non-zero result is a blocking stop, and the unchanged-tree assertion from P1-T6 passes.
+- [x] [P1-T10] Convert the P1-T9 raw Cobertura XML with `pwsh -NoProfile -Command '. ./scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1; $raw = Get-Content "docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/baseline/coverage-remeasurement-run3.raw.cobertura.xml" -Raw -Encoding UTF8; $corrected = ConvertTo-KoverageCoberturaXml -XmlContent $raw -RepoRoot (Get-Location).Path; Set-Content "docs/features/active/2026-08-10-coverage-threshold-policy-reconciliation-494/evidence/baseline/coverage-remeasurement-run3.corrected.cobertura.xml" -Value $corrected -Encoding UTF8 -NoNewline'`; write `<FEATURE>/evidence/baseline/coverage-remeasurement-run3-conversion.<TS>.md`.
+  - Acceptance: the corrected output passes the P1-T4 root-attribute check and the conversion artifact records `EXIT_CODE: 0`.
+- [x] [P1-T11] Extract run 3's corrected root attributes and per-package values into `<FEATURE>/evidence/baseline/coverage-remeasurement-run3-summary.<TS>.md`.
+  - Acceptance: the artifact meets P1-T5's observation-only coverage reporting rule.
+- [x] [P1-T12] Calculate the line-rate and `lines-valid` min, max, median, and spread from the three corrected summaries; write `<FEATURE>/evidence/baseline/coverage-remeasurement-spread.<TS>.md`.
+  - Acceptance: the artifact cites the valid outcome class recorded by P1-T3, P1-T6, and P1-T9; states whether the `<= 1.0` percentage-point line-rate and `<= 0.5%` median-`lines-valid` reproducibility conditions are met; and records branch figures only as observations without deriving a PowerShell or C# branch gate.
+- [x] [P1-T13] Record the AC7 sequencing evidence in `<FEATURE>/evidence/other/ac7-remeasurement-input.<TS>.md`.
+  - Acceptance: the artifact cites P1-T2 through P1-T12, includes each remeasurement's valid outcome class, states that all figures are post-#441/#478/#457 corrected-arithmetic observations, and states that measurement cannot silently choose or lower a policy threshold.
+
+---
+
+### Phase 2 — Upstream-Only Reconciliation Dependency
+
+- [x] [P2-T1] Create `<FEATURE>/evidence/other/upstream-reconciliation-input-index.<TS>.md` listing the exact upstream prompt, `issue.md`, `spec.md`, and the P1-T13 AC7 input artifact as the only TaskMaster inputs for upstream work.
+  - Acceptance: the index identifies the existing prompt path verbatim and contains no replacement prompt, no TaskMaster Claude-customization patch, and no claim of Codex epic-child launch authority.
+- [x] [P2-T2] Check for an upstream release/validation receipt placed under `<FEATURE>/evidence/other/` and write `<FEATURE>/evidence/other/upstream-reconciliation-receipt-check.<TS>.md`.
+  - Acceptance: a receipt is valid only if it identifies upstream changed source paths, regeneration/publication mechanism, exact upstream validation commands and results, coverage policy values, missing/malformed-input behavior, branch disposition, and issue #512 non-interference. The task performs read-only validation of TaskMaster files.
+- [x] [P2-T3] Persist the P2-T2 outcome in `<FEATURE>/evidence/other/upstream-reconciliation-disposition.<TS>.md`.
+  - Acceptance: a valid receipt records `VERIFIED`; an absent or invalid receipt records `REMEDIATION-REQUIRED` and `BLOCKED: UPSTREAM CUSTOMIZATION RELEASE EVIDENCE ABSENT`. The task introduces no manual validation, TaskMaster customization edit, or acceptance-criteria check-off. This disposition is not an execution stop: complete P2-T4, P3-T1, P3-T2, and P3-T3, checking off each task after its evidence or status acceptance criteria pass.
+- [x] [P2-T4] Compare the P2-T2 receipt result read-only with AC1-AC6 and AC8-AC10 in `spec.md`; write `<FEATURE>/evidence/other/upstream-ac-validation.<TS>.md`.
+  - Acceptance: every criterion is mapped to receipt evidence with exactly one disposition of `VERIFIED` or `REMEDIATION-REQUIRED`. When P2-T2 has no valid receipt, all affected rows are `REMEDIATION-REQUIRED`. The task does not inspect or modify TaskMaster `CLAUDE.md` or `.claude/**`.
+
+---
+
+### Phase 3 — Spec-Only Acceptance Tracking and Closure
+
+- [x] [P3-T1] Create `<FEATURE>/evidence/issue-updates/ac-evidence-map.<TS>.md` mapping every `spec.md` AC to its individual P1 or P2 evidence path and disposition.
+  - Acceptance: every AC row has exactly one disposition. All-`VERIFIED` is required for a passing close-out; any other disposition records a remediation-required outcome without changing `spec.md`.
+- [x] [P3-T2] For each `spec.md` AC individually marked `VERIFIED` by P3-T1, change only its corresponding `- [ ]` marker to `- [x]`; leave every other AC unchanged; write `<FEATURE>/evidence/issue-updates/ac-status-summary.<TS>.md`.
+  - Acceptance: criterion text and `issue.md` remain unchanged. The summary reports total, checked, remaining, disposition, and evidence path for every AC. A remaining unchecked AC produces `REMEDIATION-REQUIRED`, not a manual step or a passing close-out.
+- [x] [P3-T3] Compare the final `git status --porcelain` path set to the P0-T2 baseline path set and write `<FEATURE>/evidence/qa-gates/final-scope-lock.<TS>.md`.
+  - Acceptance: after excluding paths already present in P0-T2, paths newly introduced by this plan are limited to `<FEATURE>/evidence/**` and the authorized checkbox markers in `<FEATURE>/spec.md`; the audit reports zero newly introduced TaskMaster `CLAUDE.md`, `.claude/**`, source, test, configuration, issue.md, `artifacts/**`, and issue #512-owned path changes. Pre-existing user changes are listed as baseline exclusions and are neither modified nor reverted.
+
+## Acceptance-Criteria Disposition
+
+| AC | Delivery authority | Check-off source | Required evidence |
+|---|---|---|---|
+| AC1 and AC6 | TaskMaster deferred-prompt and protected-path classification | `spec.md` | Fresh documentation-scope, protected-path, targeted-test, coverage, and analyzer evidence |
+| AC2–AC5 and AC7–AC10 | Historical acceptance disposition retained | `spec.md` | Existing recorded evidence; not re-evaluated by this remediation |
+
+No upstream receipt, release, publication, validation, or other external evidence is a completion dependency. AC1 and AC6 are checked only after their individual fresh TaskMaster evidence is verified; the other eight AC markers and dispositions remain unchanged.
