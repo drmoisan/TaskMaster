@@ -7,8 +7,13 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 
 - Integration branch: `epic/build-ci-coverage-gate-fidelity-integration`
 - Manifest: `docs/features/epics/build-ci-coverage-gate-fidelity/epic.md`
-- Current wave: 2
-- Last updated: 2026-08-11T13-20
+- Current wave: 2 (all waves complete; awaiting integration PR)
+- Last updated: 2026-08-14T22-55
+
+This projection was regenerated from `git` and `gh` rather than from
+`artifacts/orchestration/epic-orchestrator-state.json`, which is not present in this worktree. Per
+the cache doctrine, the checkpoint is a cache of durable state and `git worktree list`,
+`git branch`, and `gh pr view` are authoritative when the two disagree.
 
 ## Features
 
@@ -18,7 +23,7 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 | 2026-08-10-csharp-toolchain-gate-fidelity-512 | 512 | 0 | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/540 | 22eaee849263515e4a66e0f654baf162a27018b2 | 2026-08-11T02-28 | 2026-08-11T03-55 | 2026-08-11T04-20 | 2026-08-11T04-21 |
 | 2026-08-10-utilitiescs-test-cs2002-duplicate-compile-entry-394 | 394 | 0 | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/533 | c1fe3565a8677184831a4e33917852cd02f8d521 | 2026-08-11T02-28 | 2026-08-11T03-20 | 2026-08-11T03-32 | 2026-08-11T03-35 |
 | 2026-08-10-excludefromcodecoverage-nested-lambdas-457 | 457 | 1 | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/542 | ee082ba1c078c5f2721b3ef5306172047daa1a09 | 2026-08-11T04-05 | 2026-08-11T05-35 | 2026-08-11T05-50 | 2026-08-11T05-51 |
-| 2026-08-10-coverage-threshold-policy-reconciliation-494 | 494 | 2 | worktree_created | — | — | 2026-08-11T05-55 | — | — | — |
+| 2026-08-10-coverage-threshold-policy-reconciliation-494 | 494 | 2 | merged | https://github.com/drmoisan/TaskMaster/pull/551 | 85ff0c34a60b13e0399fc7a6c8e4f9ded7e397f0 | 2026-08-11T05-55 | 2026-08-13T21-13 | 2026-08-15T02-27 | — |
 
 ## Waves
 
@@ -26,7 +31,7 @@ is the machine-authoritative source; `epic.md` is the human-authored manifest an
 | --- | --- | --- |
 | 0 | `2026-08-10-cobertura-coverage-arithmetic-441`, `2026-08-10-csharp-toolchain-gate-fidelity-512`, `2026-08-10-utilitiescs-test-cs2002-duplicate-compile-entry-394` | complete |
 | 1 | `2026-08-10-excludefromcodecoverage-nested-lambdas-457` | complete |
-| 2 | `2026-08-10-coverage-threshold-policy-reconciliation-494` | in_progress |
+| 2 | `2026-08-10-coverage-threshold-policy-reconciliation-494` | complete |
 
 ## Integration PR
 
@@ -61,6 +66,14 @@ runs against the integration branch.
 
 Run 31493339489 is the first green full-CI signal for any of this epic's work.
 
+**The tree has moved since that green run.** Two changes landed after `c7d398c2`: feature 494
+(PR #551, merge commit `85ff0c34`) and a merge of `main` (`fb8eff9b`) that brought in the CI
+parallel job split (#553, PR #556) and the `TimeOutTask` changes. Neither is covered by run
+31493339489, and the job split replaced `ci.yml`'s inline steps with the reusable
+`_actionlint` / `_format-check` / `_build-analyzers` / `_build-nullable` / `_mstest-coverage`
+workflows, so the check-run names differ from those in the table above. The integration PR against
+`main` is the gate for the current tree; no separate `workflow_dispatch` run is needed for it.
+
 ## Dispositioned: Main-Inherited Intermittent Test
 
 `TimeoutAfter_GenericTask_ShouldPropagateFaultedSourceException_WhenSourceFaultsLater`
@@ -87,8 +100,17 @@ It is out of scope for every child of this epic and is recorded here rather than
 If the final integration PR trips it, the correct response is a re-run plus this record — never a
 threshold or gate adjustment.
 
-## Issues Closed
+## Issues — Pending Closure
 
 Nine issues across five features: 441 and 478 (feature 441); 492, 509, 512 and 522 (feature 512);
 394; 457; 494. Issue 513 is out of scope and must be fixed upstream in the `drm-copilot`
 repository.
+
+All nine are **still open** on GitHub as of 2026-08-14. This is structural, not an oversight:
+GitHub auto-closes a referenced issue only when the closing PR merges into the repository's default
+branch, and every child PR in this epic targeted the integration branch instead. The child work is
+merged; the issue records simply have not been closed by it.
+
+They close when the integration PR merges into `main`, which makes that PR's closing-keyword list a
+correctness-critical artifact rather than boilerplate. If any issue remains open after that merge,
+close it manually against the integration merge commit.
