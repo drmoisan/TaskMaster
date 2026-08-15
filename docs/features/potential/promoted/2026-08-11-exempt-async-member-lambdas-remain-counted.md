@@ -1,11 +1,14 @@
-# exempt-async-member-lambdas-remain-counted (Potential Bug)
+# exempt-async-member-lambdas-remain-counted (Issue #558)
 
 - Date captured: 2026-08-11
 - Author: Dan Moisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/exempt-async-member-lambdas-remain-counted/ (Issue #558)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
+- Issue: #558
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/558
+- Last Updated: 2026-08-15
 ## Summary
 
 Lambda bodies declared inside a member that carries `[ExcludeFromCodeCoverage]` **and** is `async` (or

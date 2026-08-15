@@ -1,11 +1,14 @@
-# local-functions-in-exempt-members-remain-counted (Potential Bug)
+# local-functions-in-exempt-members-remain-counted (Issue #559)
 
 - Date captured: 2026-08-11
 - Author: Dan Moisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/local-functions-in-exempt-members-remain-counted/ (Issue #559)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
+- Issue: #559
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/559
+- Last Updated: 2026-08-15
 ## Summary
 
 Local functions declared inside a member that carries `[ExcludeFromCodeCoverage]` remain in the

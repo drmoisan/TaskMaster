@@ -1,11 +1,14 @@
-# overload-name-collision-under-exclusion (Potential Bug)
+# overload-name-collision-under-exclusion (Issue #560)
 
 - Date captured: 2026-08-11
 - Author: Dan Moisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/overload-name-collision-under-exclusion/ (Issue #560)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
+- Issue: #560
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/560
+- Last Updated: 2026-08-15
 ## Summary
 
 When one overload of a member carries `[ExcludeFromCodeCoverage]` and another overload of the same
