@@ -185,25 +185,31 @@ These are the required tools for C# code in this repo:
 1. **Formatting — `csharpier`**
    - All C# source files (`*.cs`) must be formatted with `csharpier`.
    - Do **not** use `dotnet format` — it loads the solution/project model and can mis-handle legacy VSTO / .NET Framework projects by rewriting `.csproj` files.
-   - `csharpier` is file-based and formats only `*.cs` without touching project files.
+   - `csharpier` is file-based and does not load the solution or project model, so it cannot rewrite a `.csproj` as a side effect of parsing the build graph. It is **not** restricted to `*.cs`: CSharpier 1.2.6 also accepts and processes `*.xml` and `packages.config`. `*.csproj`, `*.props` and `*.targets` are kept out of the check by `.csharpierignore`, not by any inherent CSharpier behavior.
    - Do not hand-format; if a diff disagrees with `csharpier`, formatter output wins.
-   - Approved commands:
-     - `dotnet tool run csharpier .`
-     - or `csharpier .` (if installed globally)
+   - Run `dotnet tool restore` once per clone or worktree before the first invocation.
+   - Approved commands (CSharpier is pinned to 1.2.6 by `dotnet-tools.json`; v1 requires a subcommand, so the bare-path form does not run):
+     - Apply formatting: `dotnet tool run csharpier format .`
+     - Verify, read-only, CI parity: `dotnet tool run csharpier check .`
+   - Always invoke through `dotnet tool run` so the manifest-pinned version is used. Do not invoke a globally installed `csharpier`: a different global version produces diffs that disagree with `.github/workflows/ci.yml`, which runs the pinned version after `dotnet tool restore`.
 
 2. **Linting / Static Analysis — .NET analyzers**
    - C# code must pass Roslyn/.NET analyzer diagnostics configured by `.editorconfig`, `.globalconfig`, and project properties.
    - Enforce analyzer diagnostics in build using `EnableNETAnalyzers` and `EnforceCodeStyleInBuild`.
    - Prefer fixing diagnostics over suppressing them.
    - Approved commands (PowerShell):
-     - `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU' /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+     - `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+   - Use `/t:Rebuild`, not `/t:Build`. Analyzer diagnostics are produced during compilation, and MSBuild's incremental up-to-date check compares timestamps without invalidating on a command-line `/p:` change, so a warm `/t:Build` returns exit 0 with `CoreCompile` skipped on every project and runs no analyzers. `.github/workflows/ci.yml` uses `/t:Build /m` for its analyzer step because a runner checkout is always cold; a local working tree is not.
 
 3. **Type Checking — C# compiler + nullable analysis**
    - Treat C# compiler diagnostics and nullable-flow warnings as first-class type-safety checks.
-   - Enable nullable reference types and fail builds on warnings for touched code paths.
+   - Nullable enforcement in this repository is **per-file opt-in**: a file participates in nullable analysis when it carries a `#nullable enable` directive, and `/p:TreatWarningsAsErrors=true` then promotes its `CS86xx` diagnostics to build errors.
    - Avoid introducing nullable warnings; fix the root null-state issue instead.
    - Approved commands (PowerShell):
-     - `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU' /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+     - `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
+   - This is character-for-character the command in `.github/workflows/ci.yml` (step "Build with nullable warnings treated as errors"). Two properties of it are load-bearing and must not be "restored":
+     - **Do not add `/p:Nullable=enable`.** No project in this repository carries a `<Nullable>` element and there is no `Directory.Build.props`, so the property is a solution-wide opt-in that conscripts every file which has never adopted the pragma. Forcing it produced 195 errors in `UtilitiesCS.csproj` on 2026-08-10 against zero errors without it, and CI omits it deliberately. Removing it loses no enforcement over any file that has opted in.
+     - **Do not use `/t:Build`.** MSBuild's up-to-date check does not invalidate on a command-line `/p:` change, so a warm `/t:Build` returns exit 0 having skipped `CoreCompile` on every project: the gate cannot fail.
 
 > **Testing tools and behavior are defined in the unit test policies.** Do not define test behavior here; instead, obey the General Unit Test Policy and C# Unit Test Policy below.
 
@@ -378,9 +384,9 @@ If there is any conflict between these documents, halt and notify the user.
 
 For C# work, use these concrete commands for the general policy toolchain loop:
 
-1. `csharpier .`
-2. `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
-3. `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+1. `dotnet tool run csharpier format .` (verify with `dotnet tool run csharpier check .`)
+2. `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+3. `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
 4. `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`
 
 The loop behavior (restart rules, must-pass requirements, and audit expectations) is defined by the General Code Change Policy above.
@@ -396,9 +402,9 @@ The loop behavior (restart rules, must-pass requirements, and audit expectations
 
 ## C# Toolchain (run in this exact order)
 
-1. **Format**: `dotnet tool run csharpier .` (or `csharpier .` if installed globally)
-2. **Analyze**: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU' /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
-3. **Type-check**: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform='Any CPU' /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+1. **Format**: `dotnet tool run csharpier format .` (verify: `dotnet tool run csharpier check .`; always via `dotnet tool run`, never a global install)
+2. **Analyze**: `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+3. **Type-check**: `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
 4. **Test**: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`
 
 If any step fails, fix and restart from step 1.

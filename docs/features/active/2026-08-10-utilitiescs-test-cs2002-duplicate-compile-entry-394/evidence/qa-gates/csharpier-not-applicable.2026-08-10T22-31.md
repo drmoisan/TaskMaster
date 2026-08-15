@@ -1,0 +1,5 @@
+Timestamp: 2026-08-10T22-31
+
+Determination: CSharpier is not run for this change.
+
+Rationale: This feature's only diff is a single-line deletion in `UtilitiesCS.Test/UtilitiesCS.Test.csproj`, a build-configuration project file. No `.cs` file is added, removed, or modified. Per `.claude/rules/csharp.md` (read in full at P0-T4), CSharpier's mandated scope is `**/*.cs` and `**/*.csproj` for the rule file's path matcher, but the tool itself (`dotnet tool run csharpier .` / `csharpier .`) is a file-based C# source formatter that formats only `*.cs` files and does not touch project files (`.claude/rules/csharp.md`, "Formatting — CSharpier: All C# source files must be formatted with CSharpier... Do not use `dotnet format`"; CLAUDE.md C#1.1 states the same: "`csharpier` is file-based and formats only `*.cs` without touching project files"). Since zero `.cs` files are touched by this change, there is no CSharpier-formattable content for CSharpier to act on. This determination is recorded explicitly rather than silently skipping the step.

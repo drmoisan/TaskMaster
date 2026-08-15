@@ -9,6 +9,10 @@ param(
     [string]$Platform = 'Any CPU',
 
     [Parameter(Mandatory = $false)]
+    [ValidateSet('Build', 'Rebuild')]
+    [string]$Target = 'Build',
+
+    [Parameter(Mandatory = $false)]
     [string[]]$MSBuildProperty = @(),
 
     [Parameter(Mandatory = $false)]
@@ -17,6 +21,7 @@ param(
     [Parameter(Mandatory = $false)]
     [switch]$EnforceCodeStyleInBuild,
 
+    # Deprecated and no-op. Retained so existing callers still bind. See CLAUDE.md C#1 item 3.
     [Parameter(Mandatory = $false)]
     [switch]$EnableNullable,
 
@@ -56,12 +61,16 @@ function Get-MSBuildBuildArguments {
         [string]$Platform,
 
         [Parameter(Mandatory = $false)]
+        [ValidateSet('Build', 'Rebuild')]
+        [string]$Target = 'Build',
+
+        [Parameter(Mandatory = $false)]
         [string[]]$MSBuildProperty = @()
     )
 
     $arguments = @(
         $ResolvedSolutionPath,
-        '/t:Build',
+        "/t:$Target",
         "/p:Configuration=$Configuration",
         "/p:Platform=$Platform"
     )
@@ -86,6 +95,7 @@ function Get-RequestedMSBuildProperties {
         [Parameter(Mandatory = $false)]
         [switch]$EnforceCodeStyleInBuild,
 
+        # Deprecated and no-op. Retained so existing callers still bind. See CLAUDE.md C#1 item 3.
         [Parameter(Mandatory = $false)]
         [switch]$EnableNullable,
 
@@ -104,7 +114,7 @@ function Get-RequestedMSBuildProperties {
     }
 
     if ($EnableNullable) {
-        $properties += 'Nullable=enable'
+        Write-Warning 'The -EnableNullable switch is deprecated and has no effect. This repository enforces nullability per file via #nullable enable; /p:Nullable=enable is deliberately absent from CI and makes the gate unpassable. See CLAUDE.md C#1 item 3.'
     }
 
     if ($TreatWarningsAsErrors) {
@@ -145,7 +155,7 @@ if (Test-Path $syncScript) {
 }
 
 $requestedMSBuildProperties = Get-RequestedMSBuildProperties -MSBuildProperty $MSBuildProperty -EnableNETAnalyzers:$EnableNETAnalyzers -EnforceCodeStyleInBuild:$EnforceCodeStyleInBuild -EnableNullable:$EnableNullable -TreatWarningsAsErrors:$TreatWarningsAsErrors
-$msbuildArguments = Get-MSBuildBuildArguments -ResolvedSolutionPath $resolvedSolutionPath -Configuration $Configuration -Platform $Platform -MSBuildProperty $requestedMSBuildProperties
+$msbuildArguments = Get-MSBuildBuildArguments -ResolvedSolutionPath $resolvedSolutionPath -Configuration $Configuration -Platform $Platform -Target $Target -MSBuildProperty $requestedMSBuildProperties
 
 if ($NoExecute) {
     return

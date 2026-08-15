@@ -41,6 +41,28 @@ Describe 'Get-MSBuildBuildArguments' {
             '/m'
         )
     }
+
+    It 'emits /t:Rebuild in the target position when -Target Rebuild is supplied' {
+        $arguments = Get-MSBuildBuildArguments `
+            -ResolvedSolutionPath 'C:\repo\TaskMaster.sln' `
+            -Configuration 'Debug' `
+            -Platform 'Any CPU' `
+            -Target 'Rebuild' `
+            -MSBuildProperty @(
+            'EnableNETAnalyzers=true',
+            'EnforceCodeStyleInBuild=true'
+        )
+
+        $arguments | Should -Be @(
+            'C:\repo\TaskMaster.sln',
+            '/t:Rebuild',
+            '/p:Configuration=Debug',
+            '/p:Platform=Any CPU',
+            '/p:EnableNETAnalyzers=true',
+            '/p:EnforceCodeStyleInBuild=true',
+            '/m'
+        )
+    }
 }
 
 Describe 'Get-RequestedMSBuildProperties' {
@@ -53,11 +75,10 @@ Describe 'Get-RequestedMSBuildProperties' {
         )
     }
 
-    It 'maps nullable switches to the expected MSBuild properties' {
+    It 'emits no MSBuild property for the deprecated -EnableNullable switch' {
         $properties = Get-RequestedMSBuildProperties -EnableNullable -TreatWarningsAsErrors
 
         $properties | Should -Be @(
-            'Nullable=enable',
             'TreatWarningsAsErrors=true'
         )
     }

@@ -1,0 +1,30 @@
+# Code Review — utilitiescs-test-cs2002-duplicate-compile-entry-394 (Reaudit — Remediation Cycle 1 Exit Gate)
+
+- **Issue:** #394
+- **Branch:** `bug/utilitiescs-test-cs2002-duplicate-compile-entry-394` (HEAD `f39c6fc9`)
+- **Base:** `origin/epic/build-ci-coverage-gate-fidelity-integration`
+- **Timestamp:** 2026-08-11T04-05
+- **Entry review (unmodified, retained):** `code-review.2026-08-10T23-45.md`
+
+## Executive Summary
+
+This reaudit evaluates only the delta introduced by remediation cycle 1 (commits `2a2116eb`, `f39c6fc9`), since the entry review already found the underlying CS2002 fix itself free of quality issues (confirmed unregressed this cycle — see policy-audit reaudit Section 2). The remediation cycle: (1) removes the previously-flagged committed PowerShell helper script, resolving both blocking findings the entry review raised against it; (2) corrects three stale numeric figures in `spec.md`'s duplicate-sweep table; (3) adds an `analyzer-not-applicable` evidence artifact for parity with sibling determinations; and (4) revises one remediation-plan task's acceptance wording mid-execution to accommodate a legitimate subagent memory-index byproduct. No new quality defect is introduced.
+
+## Findings Table
+
+| Severity | File | Location | Finding | Recommendation | Rationale | Evidence |
+|---|---|---|---|---|---|---|
+| Informational | `docs/.../evidence/baseline/duplicate-sweep.ps1` | (deleted) | The entry review's two findings against this file (Blocking: no coverage artifact/toolchain run; Minor: no `[CmdletBinding()]`, no error handling) are both resolved by deletion rather than remediation of the script itself | None — deletion is the correct proportionate response for a one-off audit helper whose logic and full output are already durably captured verbatim in `evidence/baseline/duplicate-sweep.2026-08-10T22-31.md` | `general-code-change.md`'s "temporary throwaway scripts" allowance; avoids an unfunded Pester/PoshQC/coverage-tooling obligation for a script with no lasting reuse value | `git diff --name-only` shows zero `.ps1` files in the current diff; file confirmed absent from disk |
+| Resolved | `docs/.../spec.md` | `## Root Cause Analysis` -> "Duplicate Sweep Result" table | The entry review's Minor finding (Analyzer=9 vs actual 11, Reference=~114 vs actual 126, packages.config=~99 vs actual 105) is corrected | None — figures now read `Analyzer`=11, `Reference`=126, `packages.config`=105, matching `evidence/baseline/duplicate-sweep.2026-08-10T22-31.md` exactly | Documentation accuracy; independently re-verified numerically in this reaudit's policy-audit Section 5 | `evidence/qa-gates/post-remediation-spec-table.2026-08-10T23-45.md`; direct read of current `spec.md` lines 160-169 |
+| Resolved | `docs/.../evidence/qa-gates/analyzer-not-applicable.2026-08-10T23-45.md` | new file | The feature-audit's non-blocking observation (no dedicated analyzer-not-applicable artifact for evidentiary parity with the CSharpier/nullable determinations) is addressed | None — artifact added, states the zero-`.cs`-files rationale, cross-references the two sibling determinations | Evidentiary parity | Direct read of the artifact |
+| Informational | `remediation-plan.2026-08-10T23-45.md` | `[P2-T2]` | Acceptance clause revised mid-execution from a blanket "no path outside `<FEATURE>/` other than the csproj" to four explicit clauses (a)-(d), carving out `.claude/agent-memory/**` while re-affirming (and making explicit) the `CLAUDE.md`/`.claude/rules/`/`scripts/`/`.cs`/other-`.csproj`/coverage-threshold exclusions and, critically, stating the `.ps1`/`.psm1`/`.psd1` check is exempt from no carve-out | None — the revision is judged legitimate; it does not weaken any check this remediation cycle exists to enforce | Trigger was a genuine, verified two-line append to a pre-existing feature-review subagent memory file — a delegation byproduct, not a scope violation | Diff of `2a2116eb` vs `f39c6fc9` versions of the plan file; `git diff` of the memory-index file itself (2 insertions, 0 deletions) — see policy-audit reaudit Section 3 |
+| Informational | `UtilitiesCS.Test/UtilitiesCS.Test.csproj` | (unchanged this cycle) | No line of this file is touched by the remediation cycle; the single-line deletion from the original fix (`f58f8474`) remains intact and unregressed | None | Confirms the remediation cycle did not reopen or perturb the underlying fix | `git diff origin/epic/build-ci-coverage-gate-fidelity-integration...HEAD -- UtilitiesCS.Test/UtilitiesCS.Test.csproj` shows `1 -`, `0 +` |
+| Informational | Remediation-cycle evidence artifacts (all) | `evidence/other/`, `evidence/qa-gates/`, `evidence/remediation-baseline/` | All 15 remediation-plan tasks' artifacts carry `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` fields; no `EXIT_CODE: SKIPPED` occurrences; `[P2-T2]`'s evidence file explicitly documents its own superseding re-run after the mid-execution revision rather than silently replacing the earlier capture | None | Meets `evidence-and-timestamp-conventions` schema requirements; the explicit "supersedes" framing is good practice for auditability | Direct read of each artifact |
+
+## Design and API Impact
+
+Not applicable — no class, method, interface, or public API is added, removed, or changed by this remediation cycle. The cycle is documentation/evidence-tree maintenance plus one file deletion (a non-production PowerShell helper).
+
+## Overall Assessment
+
+The remediation cycle correctly and proportionately closes the entry review's blocking finding by removing the unplanned PowerShell helper script rather than building out unfunded toolchain/coverage infrastructure for it. The three stale-figure corrections in `spec.md` are numerically accurate. The one mid-execution acceptance-wording revision is judged legitimate on inspection of both the original and revised text: it narrows the exclusion to exactly the byproduct that triggered it while explicitly re-stating (and strengthening, via explicit non-exemption) the substantive checks the original clause protected. No new code-quality or policy-compliance defect is introduced by this cycle.
