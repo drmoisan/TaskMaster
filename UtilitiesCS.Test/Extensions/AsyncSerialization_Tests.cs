@@ -427,23 +427,41 @@ namespace UtilitiesCS.Test.Extensions
             jobName.Should().Contain("Copy");
         }
 
+        /// <summary>
+        /// Locates the multi-megabyte Microsoft.Graph XML documentation file used as a
+        /// read-only large-file fixture. The package version is discovered rather than
+        /// hard-coded so that a NuGet upgrade does not break these tests.
+        /// </summary>
         private static FileInfo GetLargeTextFixture()
         {
             var current = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
 
             while (current is not null)
             {
-                var candidate = Path.Combine(
-                    current.FullName,
-                    "packages",
-                    "Microsoft.Graph.6.2.0",
-                    "lib",
-                    "netstandard2.0",
-                    "Microsoft.Graph.xml"
-                );
-                if (File.Exists(candidate))
+                var packages = new DirectoryInfo(Path.Combine(current.FullName, "packages"));
+                if (packages.Exists)
                 {
-                    return new FileInfo(candidate);
+                    // Ordinal sort keeps selection deterministic when several versions of the
+                    // package are present in the shared packages folder.
+                    var versionDirectories = packages.GetDirectories("Microsoft.Graph.*");
+                    Array.Sort(
+                        versionDirectories,
+                        (left, right) => string.CompareOrdinal(left.Name, right.Name)
+                    );
+
+                    foreach (var versionDirectory in versionDirectories)
+                    {
+                        var candidate = Path.Combine(
+                            versionDirectory.FullName,
+                            "lib",
+                            "netstandard2.0",
+                            "Microsoft.Graph.xml"
+                        );
+                        if (File.Exists(candidate))
+                        {
+                            return new FileInfo(candidate);
+                        }
+                    }
                 }
 
                 current = current.Parent;
