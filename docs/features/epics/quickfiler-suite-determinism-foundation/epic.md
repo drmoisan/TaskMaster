@@ -182,3 +182,80 @@ epic consumes.
 6. **The four child issues are already open.** Each child must call only
    `mcp__drm-copilot__new_active_feature_folder`; `potential_to_issue` has no idempotent path and
    would file a duplicate.
+
+## Known-Stale Potential-Document References
+
+The promoted potential documents are the authoritative requirements source for this corpus, but
+their line references have drifted against `main`. Every child MUST re-derive its own line numbers
+by reading the target file and MUST NOT trust a `file:line` citation in its potential document. A
+child that edits a region named by a drifted reference will edit the wrong code.
+
+Measured drift, recorded for the whole four-epic corpus (only the first two rows affect this epic
+indirectly; the rest are recorded so later epics do not re-discover them):
+
+| Document | Drift |
+| --- | --- |
+| `286.md` | Stale by +17 lines. `RemoveSpecificControlGroupAsync` is at `:1159-1248`, not `:1142-1233`. |
+| `462.md` | Stale by approximately +46 lines. |
+| `474.md` | Premise false. The document asserts `IQfcFormController` and `IFilerFormController` are unrelated; `QuickFiler/Controllers/IQfcFormController.cs:13` already inherits `IFilerFormController`, which reduces the defect to a field and constructor retype. |
+| `482.md` | Misattributes the divergent expansion registries to `QfcItemController.Navigation.cs`; they are in `QuickFiler/Controllers/QfcItemController.EventWiring.cs:306-389`. |
+| `498.md` | Places `BreadcrumbRow.cs` and `BreadcrumbMessageCodec.cs` under `QuickFiler/Controllers/`; both are under `UtilitiesCS/OutlookObjects/Folder/`. |
+| `440.md` | Asserts the two breadcrumb surfaces share `BreadcrumbRow`. They do not: the EFC surface uses `BreadcrumbRow`, the QFC surface uses `BreadcrumbStateRow`. |
+
+## Hard Constraints for Children
+
+1. **Do not edit anything under `.claude/**`.** That tree is push-down-owned: a sync overwrites all
+   of it (skills, lib, hooks, agents, rules, `settings.json`) plus `config/blast-radius.json` and
+   `config/orchestration-routing.json` from an upstream bundle with no merge, so any local edit is
+   destroyed. Where an issue cites a rule file, the citation is the policy the fix is measured
+   against, not an edit target. Safe to edit: `CLAUDE.md`, `coverage.config`,
+   `Directory.Build.targets`, `quality-tiers.yml`, `.github/workflows/**`, `scripts/**`, `tests/**`,
+   every C# project, and `.claude/agent-memory/**`.
+2. **`vstest` requires `/InIsolation`.** Without it, each assembly's `app.config` binding redirects
+   are ignored and roughly 1,695 phantom failures appear with empty messages and sub-millisecond
+   durations, surfacing as a Moq `TypeInitializationException` via
+   `System.Threading.Tasks.Extensions`. A child that omits the flag will see a fabricated mass
+   regression and must not attempt to "fix" it. Use
+   `vstest.console.exe <assemblies> /EnableCodeCoverage /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook"`,
+   and exclude `\.claude\` from recursive `*.Test.dll` discovery so stale agent-worktree builds are
+   not loaded.
+3. **#511 must not delete #571's coverage.** #511's proposed remedy — replacing the real pump with
+   an injectable synchronization-context seam — executed literally would delete or reclassify the
+   very tests #571 stabilizes, along with the coverage justifications at
+   `QuickFiler/Controllers/QfcItemController.Initialization.cs:166, 261, 293, 404, 448` and
+   `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs:31, 256`. #571's root cause is narrow:
+   `WinFormsPumpHost.RunPumpThread` calls `Application.Run(new ApplicationContext())` and never adds
+   a form or control, so no window handle is ever created, and only the two synchronous `Initialize`
+   paths reach `Control.Invoke`. The spec must reconcile the two issues and retain the coverage.
+4. **No Python toolchain exists.** There is no `scripts/dev_tools/` and no Poetry manifest, so any
+   skill step naming `poetry run python -m scripts.dev_tools.*` is unrunnable by absence. Report it
+   as such; do not fabricate a result and do not silently skip it. PowerShell equivalents are under
+   `.claude/lib/`.
+5. **Evidence paths are non-overridable**: `<FEATURE>/evidence/<kind>/` only. No `artifacts/`
+   sub-path other than `artifacts/orchestration/` may hold evidence.
+
+## Recorded Preconditions for Later Epics
+
+Recorded here so they are not re-litigated, and deliberately NOT solved by this epic:
+
+- **`QuickFiler/Controllers/QfcCollectionController.cs` is 2,349 lines**, 4.7x the 500-line cap in
+  `.claude/rules/general-code-change.md`, with no partial-class siblings. Nine corpus issues target
+  it, and only #468 reduces it — to approximately 2,114 lines, still 4.2x. `feature-review` will
+  raise the cap violation on every pull request touching the file. **Epic 2
+  (`quickfiler-qfc-controllers`) must either carry a ratified exemption or add a partial-class split
+  child before its collection-controller work.** `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs`
+  is exactly at the 500-line cap, so every new regression test there needs a new file and therefore
+  a new project-file compile entry.
+- **`quality-tiers.yml` does not exist at the repository root**, although
+  `.claude/rules/quality-tiers.md` states every project must be classified there and that an
+  unclassified project fails CI. No QuickFiler tier classification is available to cite. Owned
+  outside this epic.
+- **The remaining potential-document restoration is in flight.** 61 files under
+  `docs/features/potential/promoted/` exist on `origin/epic/quickfiler-per-file-coverage-integration`
+  and are absent from `main` (98 versus 55). They are being restored to `main` under a separate pull
+  request. Epics 2 through 4 are gated on that landing. No child of this epic may write under
+  `docs/features/potential/**`.
+- **No in-flight collision hazard.** All 20 `feature/quickfiler-*` branches are reachable from
+  `epic/quickfiler-per-file-coverage-integration`, and that branch differs from `origin/main` by
+  zero files under `QuickFiler/` and `QuickFiler.Test/`; the per-file-coverage epic's code has
+  already landed on `main`. No unmerged non-QuickFiler branch touches QuickFiler.
