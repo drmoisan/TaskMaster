@@ -79,13 +79,17 @@ Do not record a partial removal, and do not record the rejection itself in `muta
 
 3. **Unstarted removal (recompute).** Set the item's state to `withdrawn`, drop its vertex, and
    recolor by calling `recolor_unstarted(unstarted_items, conflict_edges, pinned,
-   current_generation, current_cohort=current_cohort)`. Write
+   current_generation, current_cohort=current_cohort,
+   highest_pinned_cohort=highest_pinned_cohort)`. Write
    `RecolorResult.cohort_assignments` into `cohorts[]` and set the top-level `recolor_generation`
    to `RecolorResult.generation`; the generation increments by exactly one. The result names no
    pinned key, so no in-flight item moves.
 
-   `current_cohort` is F3's top-level field, read from the re-verified durable state, and is the
-   index the pinned items occupy. The returned indices are ABSOLUTE and are written VERBATIM into
+   `current_cohort` is F3's top-level field, read from the re-verified durable state: the lowest
+   current-generation cohort index still holding a non-terminal item. Under the per-edge barrier an
+   in-flight item is not confined to that index, so `highest_pinned_cohort` — the highest
+   current-generation cohort index occupied by any in-flight item — is read from the same
+   re-verified state. The returned indices are ABSOLUTE and are written VERBATIM into
    `cohorts[].index`, never re-based to zero. Returned keys whose index equals `current_cohort` are
    MERGED into the single existing current-generation cohort entry at that index alongside its
    pinned members, never written as a second entry carrying the same `index`, which F3 invariant 13

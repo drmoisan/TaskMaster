@@ -22,7 +22,7 @@ This rule defines the T1–T4 module rigor tier system used by all CI gates in t
 
 ## Uniform-vs-Tier-Dependent Gate Matrix
 
-Per Authoritative Decision #2, line and branch coverage thresholds are uniform across all tiers. Other gates remain tier-dependent.
+Per Authoritative Decision #2, line and branch coverage thresholds are uniform across all tiers. The line threshold applies to every coverage language; the branch threshold applies to languages whose coverage tooling measures branch coverage. Other gates remain tier-dependent.
 
 ### Uniform across all tiers (T1–T4)
 
@@ -31,7 +31,7 @@ Per Authoritative Decision #2, line and branch coverage thresholds are uniform a
 - Type errors: 0.
 - Architecture violations: 0.
 - Line coverage: >= 85%.
-- Branch coverage: >= 75%.
+- Branch coverage: >= 75% for languages whose coverage tooling measures branch coverage. PowerShell (Pester) and bash (kcov) are exempt from this threshold because neither tool measures branch coverage; no branch-coverage gate applies to them.
 - No regression on changed lines.
 
 ### Tier-dependent
@@ -48,4 +48,4 @@ Per Authoritative Decision #2, line and branch coverage thresholds are uniform a
 
 ## Rationale (uniform coverage thresholds)
 
-High test coverage is a fundamental quality-control design choice that enables autonomous agentic development and trust in the work product. For that reason, line coverage >= 85% and branch coverage >= 75% apply uniformly across T1–T4; tier-specific lower coverage floors are not used in this repository.
+High test coverage is a fundamental quality-control design choice that enables autonomous agentic development and trust in the work product. For that reason, line coverage >= 85% applies uniformly across T1–T4 to every coverage language, and branch coverage >= 75% applies uniformly across T1–T4 to every language whose coverage tooling measures branch coverage; tier-specific lower coverage floors are not used in this repository. The branch threshold is not applied to PowerShell or bash because Pester and kcov do not measure branch coverage. That exemption is a capability limit on an unevaluable threshold, not a licence to exclude files from measurement: PowerShell and bash production files remain in the coverage denominator under the Coverage Exclusion Policy in `.claude/rules/general-unit-test.md`.

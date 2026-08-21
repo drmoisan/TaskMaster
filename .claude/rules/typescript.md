@@ -25,21 +25,50 @@ Run the toolchain in order: format → lint → type-check → test. Restart fro
 - **Domain types**: Model domain concepts with interfaces/types that encode invariants. Prefer discriminated unions for state machines.
 - **Naming**: `PascalCase` for classes, interfaces, enums, and type aliases. `camelCase` for functions, methods, variables, and object properties. No `I` prefix on interfaces.
 - **File naming**: Prefer kebab-case filenames (e.g., `user-session.ts`, `task-runner.ts`).
-- **Separation of concerns**: Keep pure logic separate from VS Code extension APIs, filesystem/network I/O, and UI wiring.
+- **Separation of concerns**: Keep pure logic separate from Office.js, Microsoft Graph SDK, and other host-bound APIs, filesystem/network I/O, and UI wiring.
 - **Error handling**: Fail fast with clear errors. Avoid catch-all `catch (e)` without rethrowing or adding context.
 - **Dependencies**: Do not add new runtime dependencies unless explicitly approved.
+
+## ESLint Stack
+
+- Require `typescript-eslint` strict-type-checked + stylistic-type-checked rule sets.
+- Enable type-aware parsing (`parserOptions.project = true`).
+- Required plugins: `eslint-plugin-office-addins`, `eslint-plugin-promise`, `eslint-plugin-security`, `eslint-plugin-import`.
+- Error-level rules: `no-floating-promises`, `no-misused-promises`, all `no-unsafe-*`.
+- Add a `no-restricted-syntax` rule banning `Date.now`, `setTimeout`, `setInterval`, and `Math.random` outside an explicit infrastructure allowlist.
 
 ## Testing Standards
 
 - Use **Jest** as the test framework.
 - Name test files `*.test.ts`.
-- Unit tests must not require the VS Code extension host.
+- Unit tests must not require the Outlook host runtime.
 - Follow Arrange–Act–Assert structure.
 - Each test targets one behavior.
 - Use `jest.spyOn` or `jest.mock` for targeted mocking; reset mocks with `afterEach(() => { jest.resetAllMocks(); })`.
 - No external dependencies (network, filesystem temp files, external processes) in unit tests.
 - Avoid snapshot tests unless stable and intentional.
-- Repository-wide line coverage must remain >= 80%.
-- Any new module, class, or method must reach >= 90% coverage.
-- Coverage command: `npm run test:unit:coverage`
+- Coverage thresholds follow the uniform tier rule defined in `.claude/rules/quality-tiers.md`: line coverage >= 85% and branch coverage >= 75% across all tiers (T1–T4).
+- Coverage command: `npm run test:unit:coverage` (the root `package.json` script runs `node run-jest.cjs --coverage`).
 - Coverage regression on changed lines is a blocking finding.
+- Interface/type-only files with no executable behavior — files consisting solely of `interface` or `type` declarations — may be omitted from coverage measurement. Such files legitimately report 0% executable coverage. This is a clarification only; it does not lower any coverage threshold.
+
+## Architecture Boundaries
+
+Layer rules and the No-COM architecture assertions are defined in `.claude/rules/architecture-boundaries.md`. The TypeScript enforcement tool is `dependency-cruiser` with configuration file `.dependency-cruiser.cjs`.
+
+## Property-Based and Mutation Testing
+
+- `fast-check` provides property-based tests; T1 and T2 modules require >= 1 property test per pure function.
+- `StrykerJS` provides mutation testing; T1 modules require mutation score >= 75%.
+- Both run in pre-merge or nightly pipelines per `general-code-change.md`.
+
+## Golden Tests
+
+- T1 classifier modules require golden-output snapshots tested against a versioned corpus.
+- The general guidance to avoid snapshot tests unless stable and intentional remains in force for all other scenarios; classifier-output and schema-evolution snapshots are explicitly permitted when versioned.
+
+## Runtime Determinism
+
+- `Date`, `Math.random`, and `setTimeout` access must flow through an injected `Clock` / `Random` interface.
+- Tests use Jest fake timers (`jest.useFakeTimers()`).
+- Prefer `await flushPromises()` over `setTimeout(0)` for awaiting micro-tasks.

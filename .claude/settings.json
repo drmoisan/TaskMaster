@@ -64,6 +64,7 @@
       "Skill(execute-hard-lock *)",
       "Skill(identify-session-id *)",
       "Skill(show-my-agent-tree *)",
+      "Skill(mermaid-diagram *)",
       "Edit(/.claude/skills/execute-hard-lock/**)",
       "Edit(/.claude/skills/feature-review-workflow/**)",
       "Edit(/.claude/skills/csharp-qa-gate/**)"
@@ -170,6 +171,10 @@
           {
             "type": "command",
             "command": "pwsh -NoProfile -File .claude/hooks/enforce-discovery-artifact-gate.ps1"
+          },
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/enforce-mermaid-validation.ps1"
           }
         ]
       },

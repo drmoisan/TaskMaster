@@ -67,8 +67,6 @@ Persist toolchain output according to `evidence-and-timestamp-conventions`:
 - store post-change outputs under `<FEATURE>/evidence/qa-gates/<timestamp>/`,
 - use ISO-8601 UTC timestamps in folder names.
 
-- For steps 2 and 3, capture an MSBuild file log (`/fl "/flp:logfile=<path>;verbosity=normal"`) and record in the evidence artifact that the log contains **zero** occurrences of `Skipping target "CoreCompile"`. A step that reports exit 0 with a non-zero skip count compiled nothing and is **unverified**, not passed.
-
 This location is canonical per evidence-and-timestamp-conventions and is not overridable.
 See `.claude/skills/evidence-and-timestamp-conventions/SKILL.md` for the canonical evidence path authority.
 

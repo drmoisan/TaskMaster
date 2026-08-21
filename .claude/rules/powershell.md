@@ -61,7 +61,7 @@ Introduce the smallest seam that enables reliable mocking. Apply these options i
 - Mock sparingly; prefer real code paths.
 - No external dependencies in unit tests.
 - Line coverage must remain >= 85% across all tiers (T1–T4) per `.claude/rules/quality-tiers.md`.
-- Branch coverage must remain >= 75% across all tiers (T1–T4).
+- Pester reports **command (instruction) coverage and line coverage only**. The uniform line-coverage threshold (>= 85% per `.claude/rules/quality-tiers.md`) applies. Branch coverage is not measurable by Pester for PowerShell; there is no PowerShell branch-coverage gate. This removes an unevaluable threshold, not a measurement obligation: PowerShell production files remain in the coverage denominator per the Coverage Exclusion Policy in `.claude/rules/general-unit-test.md`, and command coverage is reported for information only, with no threshold attached.
 - Coverage regression on changed lines is a blocking finding.
 
 ### Deterministic Test Requirements

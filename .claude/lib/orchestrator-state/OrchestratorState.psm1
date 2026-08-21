@@ -19,15 +19,14 @@
     Every public function FAILS CLOSED: a missing checkpoint file, invalid JSON, a
     missing required key, an invalid step status, or an unmet readiness condition all
     yield a non-zero ExitCode with a non-empty Output message. The Python validator
-    remains the authoritative reference; this module is the destination-runtime
-    mirror used only when the Python module is not importable.
+    is the parity reference this module is measured against; as of issue #475 it is
+    not consulted at runtime, and this module is the only implementation the hooks
+    run in every repository, drm-copilot included.
 
-    This module also hosts the capability-detection probe
-    (Test-PythonOrchestratorValidatorAvailable), shared by both pushed-down hooks
-    (.claude/hooks/enforce-pr-author-skill.ps1 and
-    .claude/hooks/validate-orchestrator-output.ps1) so neither hook duplicates it
-    locally, and the PR-creation preflight orchestration helper
-    (Invoke-OrchestratorStatePreflight) consumed by enforce-pr-author-skill.ps1.
+    This module also hosts the PR-creation preflight orchestration helper
+    (Invoke-OrchestratorStatePreflight) consumed by
+    .claude/hooks/enforce-pr-author-skill.ps1. Its default seam runs the portable
+    in-process validation and names no interpreter on any code path.
 #>
 
 Set-StrictMode -Version Latest
@@ -222,7 +221,7 @@ function Get-OrchestratorStateField {
         [string] $Name
     )
 
-    $names = @($State.PSObject.Properties.Name)
+    $names = @($State.PSObject.Properties | ForEach-Object { $_.Name })
     if ($names -contains $Name) {
         return @{ Present = $true; Value = $State.$Name }
     }
@@ -253,7 +252,7 @@ function Get-OrchestratorStateBasePresenceError {
     )
 
     $errors = [System.Collections.Generic.List[string]]::new()
-    $names = @($State.PSObject.Properties.Name)
+    $names = @($State.PSObject.Properties | ForEach-Object { $_.Name })
 
     # Require every canonical top-level field; a missing key is reported individually
     # so the operator sees exactly which fields are absent.
@@ -343,41 +342,14 @@ function Get-OrchestratorStatePrCreationReadinessError {
     return $errors.ToArray()
 }
 
-function Test-PythonOrchestratorValidatorAvailable {
-    <#
-    .SYNOPSIS
-        Probe whether the authoritative Python orchestrator-state validator is importable.
-    .DESCRIPTION
-        Capability-detection seam. Returns $true only when
-        ``python -c "import scripts.dev_tools.validate_orchestration_artifacts"`` exits 0,
-        indicating the authoritative Python validator ships in this repository (drm-copilot).
-        Returns $false on any non-zero exit or error, so a consumer repository that received
-        only the pushed-down `.claude` pack (no `scripts/dev_tools`) routes to the portable
-        PowerShell module. Any probe failure routes to the portable path, which itself fails
-        closed on bad checkpoints, preserving fail-closed semantics in both branches. Tests
-        mock this seam directly; they never mock `python`.
-    .OUTPUTS
-        System.Boolean
-    #>
-    [CmdletBinding()]
-    [OutputType([bool])]
-    param()
-
-    try {
-        & python -c 'import scripts.dev_tools.validate_orchestration_artifacts' 2>&1 | Out-Null
-        return ($LASTEXITCODE -eq 0)
-    } catch {
-        return $false
-    }
-}
-
 function Test-OrchestratorStatePrCreationReadiness {
     <#
     .SYNOPSIS
         Validate a checkpoint is ready for the first `gh pr create` of a branch.
     .DESCRIPTION
-        Public entry point used by the pushed-down enforce-pr-author-skill hook when
-        the authoritative Python validator is not importable. Loads the checkpoint
+        Public entry point consumed by the preflight seam that the pushed-down
+        enforce-pr-author-skill hook runs. It is the only implementation: there is no
+        alternative branch and no capability detection. Loads the checkpoint
         (fail-closed on missing file / invalid JSON), runs the base-presence check
         (required keys, step-status validity, blocked_reason validity), then runs the
         PR-creation-readiness parity check. Returns a hashtable compatible with the
@@ -422,11 +394,14 @@ function Invoke-OrchestratorStatePreflight {
     .DESCRIPTION
         Shared by the pushed-down enforce-pr-author-skill hook. Mirrors
         Invoke-RoutingContractValidation (.claude/hooks/validate-orchestrator-output.ps1):
-        an injectable subprocess scriptblock seam defaults to ``python -m
-        scripts.dev_tools.validate_orchestration_artifacts orchestrator-state <CheckpointPath>
-        --require-pr-creation-ready``. A missing checkpoint or --require-pr-creation-ready failure
-        both surface via the validator's non-zero exit/stderr text; no separate file-existence check
-        is made, validating pre-PR-creation readiness (steps 5-8, blocked_reason) not full completion.
+        an injectable scriptblock seam whose default runs the portable in-process validation
+        and starts no subprocess. As of issue #475 there is no capability detection and no
+        alternative branch: the default seam runs the ported unconditional-block (U family)
+        checks followed by Test-OrchestratorStatePrCreationReadiness, which together match the
+        Python plain-call-plus---require-pr-creation-ready surface. A missing checkpoint or a
+        readiness failure both surface via the non-zero exit code and error text; no separate
+        file-existence check is made, validating pre-PR-creation readiness (steps 5-8,
+        blocked_reason) not full completion.
     .PARAMETER CheckpointPath
         The path to the orchestrator-state checkpoint JSON file. Callers pass their own
         checkpoint-path variable explicitly; the default below is only used when a caller omits
@@ -443,22 +418,40 @@ function Invoke-OrchestratorStatePreflight {
         [Parameter(Mandatory = $false)]
         [scriptblock] $Invoker = {
             param($Path)
-            # Capability detection: use the authoritative Python CLI when
-            # scripts.dev_tools is importable (drm-copilot); otherwise fall back to
-            # the portable PowerShell function that lives alongside this one in the
-            # pushed-down pack.
-            if (Test-PythonOrchestratorValidatorAvailable) {
-                $output = & python -m scripts.dev_tools.validate_orchestration_artifacts `
-                    orchestrator-state $Path --require-pr-creation-ready 2>&1
-                [pscustomobject]@{
-                    ExitCode = $LASTEXITCODE
-                    Output   = ($output | Out-String)
-                }
+            # The portable in-process path is the only path. Import the U-family
+            # aggregator lazily and only when its function is not already available,
+            # so a repeated call (or a test that pre-imports and mocks it) does not
+            # reload the module, and so this module does not import a sibling that
+            # imports it back at load time.
+            if (-not (Get-Command -Name Get-OrchestratorStateUnconditionalError -ErrorAction SilentlyContinue)) {
+                Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateUnconditional.psm1') -Force
+            }
+
+            # Fail closed when the checkpoint cannot be loaded, before either check runs.
+            $loaded = Get-OrchestratorStateCheckpoint -CheckpointPath $Path
+            if (-not $loaded.Ok) {
+                [pscustomobject]@{ ExitCode = 1; Output = $loaded.Error }
             } else {
-                $portable = Test-OrchestratorStatePrCreationReadiness -CheckpointPath $Path
-                [pscustomobject]@{
-                    ExitCode = $portable.ExitCode
-                    Output   = $portable.Output
+                # The unconditional block, then the PR-creation-readiness gate: together
+                # the equivalent of the Python plain call plus --require-pr-creation-ready.
+                $errors = [System.Collections.Generic.List[string]]::new()
+                $errors.AddRange([string[]]@(Get-OrchestratorStateUnconditionalError -State $loaded.State))
+
+                # The readiness entry point re-runs the base-presence checks the
+                # unconditional block already ran, so its lines are merged rather than
+                # appended wholesale: each error string is emitted exactly once, the same
+                # single-emission rule the completion module applies to its M3 leg.
+                $readiness = Test-OrchestratorStatePrCreationReadiness -CheckpointPath $Path
+                foreach ($line in ([string]$readiness.Output -split "`r?`n")) {
+                    if (-not [string]::IsNullOrWhiteSpace($line) -and -not $errors.Contains($line)) {
+                        $errors.Add($line)
+                    }
+                }
+
+                if ($errors.Count -gt 0) {
+                    [pscustomobject]@{ ExitCode = 1; Output = ($errors -join [System.Environment]::NewLine) }
+                } else {
+                    [pscustomobject]@{ ExitCode = 0; Output = '' }
                 }
             }
         }
@@ -471,7 +464,7 @@ function Invoke-OrchestratorStatePreflight {
     # before .Name is ever accessed.
     $resultPropertyNames = @()
     if ($null -ne $result -and @($result.PSObject.Properties).Count -gt 0) {
-        $resultPropertyNames = @($result.PSObject.Properties.Name)
+        $resultPropertyNames = @($result.PSObject.Properties | ForEach-Object { $_.Name })
     }
     $exitCode = 0
     if ($resultPropertyNames -contains 'ExitCode') { $exitCode = [int]$result.ExitCode }
@@ -484,14 +477,12 @@ function Invoke-OrchestratorStatePreflight {
 # Export the public readiness entry point plus the reusable load, field-accessor,
 # and base-presence primitives so the sibling OrchestratorStateCompletion module can
 # consume them via Import-Module without duplicating the shared parsing and
-# base-check logic. Test-PythonOrchestratorValidatorAvailable and
-# Invoke-OrchestratorStatePreflight are exported so both pushed-down hooks
-# (enforce-pr-author-skill.ps1, validate-orchestrator-output.ps1) can consume them
-# without duplicating the capability probe or the PR-creation preflight orchestration.
+# base-check logic. Invoke-OrchestratorStatePreflight is exported so the pushed-down
+# enforce-pr-author-skill.ps1 hook can consume the PR-creation preflight
+# orchestration without duplicating it.
 Export-ModuleMember -Function `
     Test-OrchestratorStatePrCreationReadiness, `
     Get-OrchestratorStateCheckpoint, `
     Get-OrchestratorStateField, `
     Get-OrchestratorStateBasePresenceError, `
-    Test-PythonOrchestratorValidatorAvailable, `
     Invoke-OrchestratorStatePreflight

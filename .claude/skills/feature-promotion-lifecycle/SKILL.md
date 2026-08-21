@@ -68,7 +68,13 @@ When orchestrator routing selects short path, promotion/folder initialization st
 - `${feature-folder}/issue.md` contains an explicit `## Acceptance Criteria` section
 - `${feature-folder}/spec.md` does not exist
 - `${feature-folder}/user-story.md` does not exist
+- the promoted record under `docs/features/potential/promoted/` is still present (see 4b)
 - if any check fails, stop and remediate before planning
+
+4b) Verify the promoted record was retained after `new_active_feature_folder`:
+- the promoted file the earlier `potential_to_issue` step reported as its `destination_path` must still exist under `docs/features/potential/promoted/`
+- `new_active_feature_folder` COPIES a promoted source into the active folder as `issue.md`; it MOVES a source resolved from `docs/features/potential/` directly. An absent promoted record after a promoted-source run is a defect, not expected cleanup (issue #487).
+- this check applies to every work mode, not only `minor-audit`
 
 5) Delegate minimal-audit plan creation to `atomic_planner` with directive:
 - `DIRECTIVE: MINIMAL-AUDIT PLAN REQUIRED`

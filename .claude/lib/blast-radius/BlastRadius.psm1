@@ -54,6 +54,7 @@ Set-StrictMode -Version Latest
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusExtraction.psm1') -Force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusGlob.psm1') -Force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusConfig.psm1') -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusNormalization.psm1') -Force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusValidation.psm1') -Force
 
 # Feature-folder handling. Every radius contains its own feature folder, and a
@@ -65,6 +66,11 @@ $script:FeatureFolderPrefix = 'docs/features/'
 # radius always records.
 $script:SourceDerived = 'derived'
 $script:SourceObserved = 'observed'
+
+# A contract identifier names something callable or referenceable, so it must
+# carry at least one ASCII letter (issue #489). Get-NormalizedDeclaredRadius
+# re-applies that rule to identifiers a pre-#489 extractor already recorded.
+$script:ContractLetterPattern = [regex]::new('[A-Za-z]')
 
 # Contention reason kinds, in the fixed order every result reports them. These
 # strings are contract literals consumed by the downstream parallel schema.
@@ -167,10 +173,20 @@ function Get-BlastRadius {
     $entry = [System.Collections.Generic.List[string]]::new()
     $entry.AddRange([string[]]@(Get-PlanPaths -PlanText $PlanText -RootSurface $rootSurface))
     $entry.AddRange([string[]]@(Get-PathFromLine -Line $specLine -RootSurface $rootSurface))
-    $entry.Add((Get-FeatureFolderGlob -FeatureFolder (
+
+    # Read-by-mandate citations are dropped before the feature folder is added: a
+    # plan cites the policy rules because its author was told to read them, not
+    # because the change will write them (issue #489). Test-BlastRadius applies
+    # the same filter, which is what keeps the derived radius passing V1 and V2
+    # against its own plan. The feature-folder glob is added afterwards so it can
+    # never be excluded.
+    $surviving = [System.Collections.Generic.List[string]]::new()
+    $surviving.AddRange([string[]]@(Get-NonMandateReadEntry -Entry $entry.ToArray() `
+                -MandateRead ([string[]]@(Get-ConfigMandateRead -Config $Config))))
+    $surviving.Add((Get-FeatureFolderGlob -FeatureFolder (
                 Get-RequiredText -Value $FeatureFolder -FieldName 'feature_folder')))
 
-    $paths = [string[]]@(Get-OrdinalSortedEntry -Entry $entry.ToArray())
+    $paths = [string[]]@(Get-OrdinalSortedEntry -Entry $surviving.ToArray())
     $concrete = [string[]]@(Get-ConcreteEntry -Entry $paths)
 
     return ConvertTo-NormalizedBlastRadius -Radius @{
@@ -180,6 +196,92 @@ function Get-BlastRadius {
         contracts       = @(Get-ContractIdentifier -SpecText $SpecText)
         source          = $Source
         computed_at     = $ComputedAt
+    }
+}
+
+function Get-NormalizedDeclaredRadius {
+    <#
+    .SYNOPSIS
+        Re-apply the current extraction rules to an already-recorded radius.
+
+    .DESCRIPTION
+        Port of normalize_declared_radius. A radius recorded by an older
+        extractor can carry entries the current rules reject: directory-shaped
+        tokens, cross-corpus documentation globs, read-by-mandate citations, and
+        letterless contract tokens. Re-deriving from the plan text is not always
+        possible, so this function re-filters the recorded radius in place of a
+        fresh derivation and re-resolves the levels that depend on the surviving
+        paths (issue #489). source and computed_at are preserved and the input is
+        never mutated.
+
+    .PARAMETER Radius
+        A derived or declared radius hashtable to re-filter.
+
+    .PARAMETER Config
+        Parsed config/blast-radius.json. The root-surface set, the mandate-read
+        list, the module map, and the shared-surface list are all read from this
+        one value.
+
+    .OUTPUTS
+        System.Collections.Hashtable. A new radius carrying the surviving paths,
+        contracts re-filtered by the ASCII-letter rule, and modules and shared
+        surfaces re-resolved from the surviving paths. Throws when the radius
+        source is observed: an observed radius records a diff listing rather than
+        a plan-text harvest, so the plan-text acceptance rules do not apply to it
+        and re-filtering one would silently discard genuine evidence.
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowNull()]
+        [object] $Radius,
+        [Parameter(Mandatory = $true)]
+        [AllowNull()]
+        [object] $Config
+    )
+
+    $normalized = ConvertTo-NormalizedBlastRadius -Radius $Radius
+
+    # Fail fast, before any other work, so the prohibition is unambiguous and no
+    # partially-filtered value can escape.
+    if ($normalized['source'] -eq $script:SourceObserved) {
+        throw ("Get-NormalizedDeclaredRadius rejects a radius whose source is " +
+            "'$($script:SourceObserved)': an observed radius records a diff listing, " +
+            'not a plan-text harvest, so the plan-text acceptance rules must not ' +
+            'be applied to it.')
+    }
+
+    $rootSurface = [string[]]@(Get-ConfigRootSurface -Config $Config)
+
+    # Re-run the classifier over each recorded entry. An entry the current rules
+    # reject is dropped; the mandate-read filter then removes the citations that
+    # are evidence of a read rather than of a write.
+    $accepted = [System.Collections.Generic.List[string]]::new()
+    foreach ($entry in @($normalized['paths'])) {
+        if ($null -ne (Get-PathTokenKind -Token $entry -RootSurface $rootSurface)) {
+            $accepted.Add([string]$entry)
+        }
+    }
+
+    $paths = [string[]]@(Get-NonMandateReadEntry -Entry $accepted.ToArray() `
+            -MandateRead ([string[]]@(Get-ConfigMandateRead -Config $Config)))
+    $concrete = [string[]]@(Get-ConcreteEntry -Entry $paths)
+
+    $contract = [System.Collections.Generic.List[string]]::new()
+    foreach ($identifier in @($normalized['contracts'])) {
+        if ($script:ContractLetterPattern.IsMatch([string]$identifier)) {
+            $contract.Add([string]$identifier)
+        }
+    }
+
+    return ConvertTo-NormalizedBlastRadius -Radius @{
+        paths           = $paths
+        modules         = @(Resolve-BlastRadiusModule -PathEntry $paths -Config $Config)
+        shared_surfaces = @(Resolve-BlastRadiusSharedSurface -ConcretePath $concrete -Config $Config)
+        contracts       = @($contract.ToArray())
+        source          = $normalized['source']
+        computed_at     = $normalized['computed_at']
     }
 }
 
@@ -374,6 +476,7 @@ function Test-BlastRadiusConflict {
 Export-ModuleMember -Function `
     Get-PlanPaths, `
     Get-BlastRadius, `
+    Get-NormalizedDeclaredRadius, `
     Get-BlastRadiusFromObservedPaths, `
     Test-BlastRadius, `
     Test-BlastRadiusConflict

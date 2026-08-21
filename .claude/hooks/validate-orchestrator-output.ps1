@@ -149,31 +149,94 @@ function Test-HumanInteractionShape {
     return @{ Ok = $true; Message = $null }
 }
 
+function Test-OrchestratorCheckpointStructure {
+    <#
+    .SYNOPSIS
+        Type-scoped structural check for the epic and parallel checkpoint types.
+    .DESCRIPTION
+        PD-3 implementation. The Python reference exposes no validation surface for
+        `epic-orchestrator-state` or `parallel-orchestrator-state` under this hook's
+        flag pair: argparse rejects the pair and exits 2 without running a single
+        check, so parity is UNDEFINED in this region. Rather than inherit an
+        undefined behavior, this hook defines it: the checkpoint must exist, parse
+        as JSON, and have an object root. That is the largest assertion that holds
+        for every checkpoint type without importing a schema this hook does not own.
+
+        Deliberately NOT applied here:
+          - the standard-checkpoint REQUIRED_STATE_KEYS presence block, whose key
+            set belongs to the standard checkpoint and would produce false
+            ROUTING_CONTRACT_BLOCKED verdicts against a well-formed epic or
+            parallel checkpoint (defect D-1),
+          - the model-routing gate, whose receipts live on the standard checkpoint.
+
+        The check fails closed: a missing file, unreadable content, invalid JSON, or
+        a non-object root all yield ExitCode 1 with the load error as Output.
+    .PARAMETER CheckpointPath
+        The path to the checkpoint JSON file.
+    .OUTPUTS
+        System.Collections.Hashtable with keys ExitCode (int, 0 or 1) and Output (string).
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $CheckpointPath
+    )
+
+    # Get-OrchestratorStateCheckpoint already implements exactly the three
+    # structural conditions (exists, parses, object root) and reports each as a
+    # fail-closed Error string, so the structural leg reuses it rather than
+    # duplicating the load contract.
+    $loaded = Get-OrchestratorStateCheckpoint -CheckpointPath $CheckpointPath
+    if (-not $loaded.Ok) {
+        return @{ ExitCode = 1; Output = $loaded.Error }
+    }
+
+    return @{ ExitCode = 0; Output = '' }
+}
+
 function Invoke-RoutingContractValidation {
     <#
     .SYNOPSIS
-        Runs the authoritative Python routing-contract validator against the
-        on-disk checkpoint and reports whether it emitted errors.
+        Runs the portable routing-contract validation against the on-disk
+        checkpoint and reports whether it emitted errors.
     .DESCRIPTION
-        Invokes the validator through an injectable subprocess scriptblock seam.
-        The default Invoker runs the authoritative Python CLI:
-          python -m scripts.dev_tools.validate_orchestration_artifacts \
-              <ArtifactType> <CheckpointPath> --require-complete
-        Tests inject a mock scriptblock so no Python process runs. The function
-        does not reimplement routing logic; it delegates to the Python validator.
-        ArtifactType defaults to 'orchestrator-state' so the default invocation
-        string is unchanged for every existing caller of this hook.
+        Invokes the validation through an injectable scriptblock seam. As of issue
+        #475 the default Invoker names no interpreter and starts no subprocess: the
+        portable PowerShell path is the ONLY path, so the hook behaves identically
+        in this repository and in every destination that received only the
+        pushed-down `.claude` pack. The former capability-detection probe and the
+        interpreter-subprocess leg it guarded are both gone.
+
+        The default Invoker dispatches on ArtifactType:
+
+          orchestrator-state
+              the COMPLETE-PARITY completion validation
+              (Test-OrchestratorStateCompletionReadiness), a row-by-row port of the
+              Python call surface `--require-complete --require-model-routing`.
+
+          epic-orchestrator-state, parallel-orchestrator-state
+              the type-scoped structural check
+              (Test-OrchestratorCheckpointStructure): exists, parses as JSON,
+              object root. PD-3: this is DEFINED behavior in a region where Python
+              parity is UNDEFINED (argparse exit 2, zero checks run). It is a
+              design decision, not a deferral. The standard-checkpoint
+              REQUIRED_STATE_KEYS block and the model-routing gate are deliberately
+              not applied, which is the D-1 fix.
+
+          anything else
+              fail closed, naming the unsupported type. An unrecognized type must
+              never read as a clean pass.
+
+        ArtifactType defaults to 'orchestrator-state' so every existing caller of
+        this hook keeps its current behavior.
 
         Returns a hashtable with keys:
-          - HasErrors:  $true only when the validator reported a non-zero exit
+          - HasErrors:  $true only when the validation reported a non-zero exit
                         code; $false when it exited 0. The exit code is the sole
-                        discriminator, because the validator prints its success
-                        line to stdout on a clean pass and the default Invoker
-                        captures with 2>&1, so output text is present on success.
-          - ErrorText:  the validator's combined captured output text, carried
-                        through unchanged: the error lines on a failure, and the
-                        success line (Python CLI) or empty (portable fallback)
-                        on a clean pass.
+                        discriminator.
+          - ErrorText:  the validation's output text, carried through unchanged:
+                        the error lines on a failure, empty on a clean pass.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -187,29 +250,36 @@ function Invoke-RoutingContractValidation {
         [Parameter(Mandatory = $false)]
         [scriptblock] $Invoker = {
             param($Path, $Type)
-            # Capability detection: use the authoritative Python CLI when
-            # scripts.dev_tools is importable (drm-copilot); otherwise fall back to
-            # the portable PowerShell completion module that travels with the
-            # pushed-down pack. The portable path performs the presence-level
-            # required-once-delegated existence gate and still fails closed.
-            if (Test-PythonOrchestratorValidatorAvailable) {
-                $output = & python -m scripts.dev_tools.validate_orchestration_artifacts `
-                    $Type $Path --require-complete --require-model-routing 2>&1
-                [pscustomobject]@{
-                    ExitCode = $LASTEXITCODE
-                    Output   = ($output | Out-String)
+            switch ($Type) {
+                'orchestrator-state' {
+                    # Import the portable completion module only when its function is not
+                    # already available, so a repeated call (or a test that pre-imports and
+                    # mocks the function) does not reload the module and reset the seam.
+                    if (-not (Get-Command -Name Test-OrchestratorStateCompletionReadiness -ErrorAction SilentlyContinue)) {
+                        Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateCompletion.psm1') -Force
+                    }
+                    $portable = Test-OrchestratorStateCompletionReadiness -CheckpointPath $Path
+                    [pscustomobject]@{
+                        ExitCode = $portable.ExitCode
+                        Output   = $portable.Output
+                    }
                 }
-            } else {
-                # Import the portable completion module only when its function is not
-                # already available, so a repeated call (or a test that pre-imports and
-                # mocks the function) does not reload the module and reset the seam.
-                if (-not (Get-Command -Name Test-OrchestratorStateCompletionReadiness -ErrorAction SilentlyContinue)) {
-                    Import-Module (Join-Path $PSScriptRoot '../lib/orchestrator-state/OrchestratorStateCompletion.psm1') -Force
+                { $_ -in @('epic-orchestrator-state', 'parallel-orchestrator-state') } {
+                    # PD-3: defined fail-closed structural behavior in an
+                    # undefined-parity region. See Test-OrchestratorCheckpointStructure.
+                    $structural = Test-OrchestratorCheckpointStructure -CheckpointPath $Path
+                    [pscustomobject]@{
+                        ExitCode = $structural.ExitCode
+                        Output   = $structural.Output
+                    }
                 }
-                $portable = Test-OrchestratorStateCompletionReadiness -CheckpointPath $Path
-                [pscustomobject]@{
-                    ExitCode = $portable.ExitCode
-                    Output   = $portable.Output
+                default {
+                    # Fail closed on an unwired type: an unrecognized artifact type is
+                    # not a clean pass.
+                    [pscustomobject]@{
+                        ExitCode = 1
+                        Output   = "orchestrator hook: unsupported artifact type '$Type'; no validation surface is wired for it. Supported types: orchestrator-state, epic-orchestrator-state, parallel-orchestrator-state."
+                    }
                 }
             }
         }
@@ -225,10 +295,10 @@ function Invoke-RoutingContractValidation {
         $outputText = ([string]$result.Output).Trim()
     }
 
-    # The exit code is the complete failure discriminator: the validator prints every
-    # error to stderr and returns non-zero, and prints its success line to stdout and
-    # returns 0. Because the default invoker captures with 2>&1, the success line lands
-    # in $outputText on a clean pass, so output text must not influence this decision.
+    # The exit code is the complete failure discriminator: every dispatch leg
+    # returns a non-zero ExitCode with its error text on failure and ExitCode 0
+    # with empty Output on a clean pass, so output text must not influence this
+    # decision.
     $hasErrors = ($exitCode -ne 0)
     return @{ HasErrors = $hasErrors; ErrorText = $outputText }
 }
@@ -313,9 +383,10 @@ function Invoke-OrchestratorOutputValidation {
         return @{ Ok = $false; Message = $hiResult.Message }
     }
 
-    # Delegate to the authoritative Python routing-contract validator. The
-    # optional RoutingInvoker seam lets tests inject a mock; the default seam
-    # produces the real subprocess call.
+    # Delegate to the portable routing-contract validation, dispatched on
+    # ArtifactType. The optional RoutingInvoker seam lets tests inject a mock; the
+    # default seam runs the in-process PowerShell validation and starts no
+    # subprocess.
     $routingArgs = @{ CheckpointPath = $CheckpointPath; ArtifactType = $ArtifactType }
     if ($PSBoundParameters.ContainsKey('RoutingInvoker') -and $null -ne $RoutingInvoker) {
         $routingArgs['Invoker'] = $RoutingInvoker

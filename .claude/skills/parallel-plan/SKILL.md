@@ -62,9 +62,42 @@ Intake proceeds directly to preparation fan-out.
 ## Preparation Fan-Out
 
 One preparation-mode `Agent(orchestrator)` run per item. Preparation produces documents and plans
-rather than code, and items carry no ordering constraint, so launch ALL item preparations
-concurrently: one message, N `Agent` calls, each `isolation: "worktree"` and
-`run_in_background: true`. Create each preparation worktree's branch from `origin/main`.
+rather than code, and items carry no ordering constraint, so preparations may run concurrently —
+but they are BOUNDED, not unbounded.
+
+**Launch preparations in waves of at most `max_concurrency`.** Compute the waves with the same
+deterministic chunker the execution phase uses:
+
+```
+bash .claude/lib/bash/compute-concurrency-batches.sh --keys "<all item keys>" --max-concurrency <n>
+```
+
+(already granted to this agent at `.claude/agents/parallel-planner.md:18`). It prints a compact
+JSON array of arrays, returns the batches in order, and sorts the keys itself, so wave membership
+does not depend on caller ordering. Launch wave *k* as one message carrying that wave's `Agent`
+calls, each `isolation: "worktree"` and `run_in_background: true`.
+Create each preparation worktree's branch from `origin/main`.
+Launch wave *k+1* only after every child of wave *k* has TERMINATED — not merely reported
+progress. All of this happens inside a single `/parallel-plan` invocation with no operator action
+between waves.
+
+The bound is `max_concurrency` itself, and no new knob is introduced. A preparation child and an
+execution child are the same workload class — one background orchestrator per item — so the
+operator's declared appetite for concurrent children applies to both phases. At the motivating
+scale, `max_concurrency: 13` over 69 items runs `ceil(69 / 13) = 6` waves.
+
+**A `max_preparation_concurrency` manifest key was considered and is explicitly NOT adopted now.**
+Such a key would carry the same `1..32` bounds and the same boolean rejection as M4 and would
+default to `max_concurrency`. It is deferred because no evidence yet shows the two phases need
+different caps, and adding a second knob would force every operator to reason about two numbers
+where one suffices. Revisit it only if a real run shows preparation and execution have materially
+different concurrency profiles.
+
+**`/parallel-add` is NOT the intake path.** It performs incremental admission into an
+already-running open-mode queue: exactly one item per invocation, with a single sequential
+preparation child. Preparing 69 items through it would take 57 or more separate operator
+invocations after the initial plan. Use `/parallel-plan` for intake and `/parallel-add` only to
+admit an item into a run that is already in flight.
 
 Each delegation prompt includes this literal kickoff line, followed by the model-budget marker
 line:
@@ -188,14 +221,34 @@ separator-free repository-root shared surfaces from plan and spec text, admittin
 as an exact ordinal member of the configured `shared_surfaces` list in `config/blast-radius.json`;
 and the contention path comparison now honours listed-directory prefixes on both sides, aligning
 with `is_path_subsumed`. Both corrections move results in the fail-closed direction — they report
-more contention, not less. Do not work around either correction, and do not narrow a radius in
-order to suppress a conflict edge they produce.
+more contention, not less. Do not work around either correction.
+
+**The exclusions are configured, not improvised (issue #489).** `config/blast-radius.json` carries
+an optional `mandate_reads` list naming the paths every agent is instructed to read before doing
+any work: the policy rules, the tier map, and the process artifacts. A citation of one of those
+paths is evidence that the author obeyed the reading order, not evidence that the change will write
+the file, so `derive_blast_radius` drops it from the harvest and `validate_blast_radius` drops it
+from its plan-side extraction, which keeps V1 and V2 self-consistent. The extractor likewise rejects
+three token shapes that were never write claims: a wildcard-free token naming a directory rather
+than a file, a `docs/features/` glob whose wildcard spans every feature folder, and a contract token
+carrying no ASCII letter. These exclusions are part of the landed contract, so the prohibition now
+reads: do not narrow a radius beyond the configured exclusions in order to suppress a conflict edge.
+
+**Appending an excluded path is the planner's obligation, not an exception.** An exclusion describes
+the default reading relationship, not a permanent ban. When an item's plan will genuinely WRITE a
+path that the exclusions remove — amending a rule file under `.claude/rules/`, editing
+`quality-tiers.yml`, or changing an instruction document under `.github/instructions/` — the planner
+MUST append that exact path to the item's declared radius explicitly after normalization. Omitting
+it under-reports contention and lets two items that both rewrite the same policy file run
+concurrently.
 
 ### Planner procedure
 
 1. After an item's plan is approved and preflight-clear, read the approved plan text and the
-   feature `spec.md` text, derive the radius with `source: "declared"`, and record it on the item.
-   The `declared` radius is the authoritative input to scheduling.
+   feature `spec.md` text, derive the radius with `source: "declared"`, then call
+   `normalize_declared_radius(radius, config)` to re-apply the current extraction rules and the
+   configured exclusions, append any excluded path the plan's diff will genuinely write, and record
+   the result on the item. The `declared` radius is the authoritative input to scheduling.
 2. Validate the radius and record the findings under the item's `radius_validation` entry.
 3. **V1 (coverage) or V2 (shared-surface enumeration) Blocking failure.** The item does NOT
    transition to `prepared`. Record the findings in the checkpoint and issue a follow-up
@@ -250,10 +303,27 @@ The library returns the partition; the planner supplies the record fields.
    item is `prepared` and radius-validated. Derive the conflict edge set by applying
    `Test-BlastRadiusConflict` to every unordered pair of `declared` radii, then pass the pairs as
    `--edges "<a>:<b> ..."` and the item keys as `--keys "<k1> <k2> ..."`.
-2. Record `cohorts[]` at `generation: 0`, each cohort's `item_keys[]` sorted ascending.
-3. Record `conflict_edges[]` as `{a, b, reason}` entries for auditability.
-4. Record `recolor_generation: 0` and `current_cohort: 0`.
-5. Record `max_concurrency` — default 4, bounded 1 through 8 by the F3 schema — without enforcing
+2. Immediately after the conflict-edge set is derived and before anything consumes it, run the
+   lane-assertion diagnostic:
+   `poetry run python -m scripts.dev_tools.parallel_lane_assertion --manifest docs/features/parallel/<slug>/parallel.md --edges "<a>:<b> ..."`
+   (covered by the planner's existing `Bash(poetry run *)` grant). It compares the manifest's
+   optional `expected_conflict_components` assertion (invariant M8) against the connected
+   components of the DERIVED conflict graph and prints one `ADVISORY` line per finding in four
+   classes: expected-together-but-derived-apart, expected-apart-but-derived-together, a member
+   naming no manifest item, and — informational only — a manifest item covered by no expected
+   component.
+   **The diagnostic is ADVISORY ONLY.** It never blocks the run, never modifies or suppresses a
+   derived edge, never feeds `compute_cohorts`, and never influences scheduling. It always exits 0,
+   including when it reports disagreements. A disagreement is a signal to re-examine the blast
+   radii; it is never a licence to narrow a radius to suppress an edge, which stays prohibited.
+   When the manifest carries no `expected_conflict_components` key the diagnostic still runs and
+   reports every item as uncovered, which is the expected output for a run with no assertion.
+   Recording the diagnostic's result in the planner checkpoint is a tolerated extra field, not a
+   validated one; no validator changes for it.
+3. Record `cohorts[]` at `generation: 0`, each cohort's `item_keys[]` sorted ascending.
+4. Record `conflict_edges[]` as `{a, b, reason}` entries for auditability.
+5. Record `recolor_generation: 0` and `current_cohort: 0`.
+6. Record `max_concurrency` — default 4, bounded 1 through 32 by the F3 schema — without enforcing
    it. Enforcement is F5's, through
    `bash .claude/lib/bash/compute-concurrency-batches.sh --keys "<k1> ..." --max-concurrency <n>`
    (the bash port of `compute_concurrency_batches(cohort_item_keys, max_concurrency)`), which fills
@@ -281,16 +351,23 @@ No production module is added for this check; it is a re-invocation of the lande
 ## Manifest Authoring
 
 Write `docs/features/parallel/<slug>/parallel.md` conforming to the F3-owned frontmatter schema
-recorded in `.claude/rules/parallel-orchestration.md` (manifest invariants M1-M7):
+recorded in `.claude/rules/parallel-orchestration.md` (manifest invariants M1-M8):
 
 - `parallel` — the run slug, a non-empty string.
 - `mode` — `closed` or `open`; defaults to `closed` when absent.
-- `max_concurrency` — an integer from 1 through 8; defaults to `4` when absent.
+- `max_concurrency` — an integer from 1 through 32; defaults to `4` when absent.
 - `created_at` — a non-empty ISO-8601 string.
 - `items[]` — one entry per item, each carrying `issue_num` (a positive integer, unique across
   items), `feature_folder` (a non-empty string), `kind` (`feature` or `bug`), `state`, and
   `blast_radius` carrying `paths`, `modules`, `shared_surfaces`, `contracts`, `source: "declared"`,
   and `computed_at`.
+- `expected_conflict_components[]` — OPTIONAL (invariant M8). A block sequence of objects, each
+  carrying a required non-empty `members` list of positive `issue_num` integers that resolve to
+  declared items, with no item in two components, plus an optional non-empty-string `name` used as
+  a diagnostic label only. A flow-style value (`members: [101, 102]`) is outside the bash YAML
+  subset and must not be authored. The field is an ASSERTION consumed by the advisory lane
+  diagnostic in `### Seeding procedure`: it never overrides a derived edge, never feeds
+  `compute_cohorts`, and never influences scheduling.
 
 The manifest carries no `depends_on` field at any level and no top-level `integration_branch`
 field; both are prohibited-key rejections in the schema. Commit it to `parallel/<slug>-plan` in
@@ -454,6 +531,11 @@ The final report to the operator must include:
 - Per item: one `plan-path:` line, the branch name, the preflight status, and the
   radius-validation result, including any V3 Advisory findings.
 - The cohort table at `generation 0`, together with the result of the recomputation-parity check.
+- The lane-assertion diagnostic's result: the derived conflict-component count, the disagreement
+  count, and every `ADVISORY` line it emitted. This line-item is REQUIRED and is reported even when
+  the manifest carries no `expected_conflict_components` assertion and even when the diagnostic
+  found nothing, so its silence is never ambiguous. Report it as advisory information: it does not
+  gate the report, does not change the cohort table, and no finding is escalated to Blocking.
 - Both kickoff artifact paths: `artifacts/orchestration/parallel-kickoff-<slug>.md` and
   `docs/features/parallel/<slug>/parallel-kickoff.md`.
 

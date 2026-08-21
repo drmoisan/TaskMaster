@@ -6,11 +6,75 @@
     "config/blast-radius.json"
   ],
   "shared_surface_globs": [],
+  "mandate_reads": [
+    ".claude/rules/**",
+    ".claude/skills/atomic-plan-contract/SKILL.md",
+    ".claude/skills/evidence-and-timestamp-conventions/SKILL.md",
+    ".github/instructions/**",
+    "artifacts/**",
+    "quality-tiers.yml"
+  ],
   "modules": {
-    "claude-runtime": [".claude/**"],
-    "config": ["config/**"],
-    "docs": ["docs/**"],
-    "tests": ["tests/**"]
+    "QuickFiler": [
+      "QuickFiler/**"
+    ],
+    "QuickFiler.Test": [
+      "QuickFiler.Test/**"
+    ],
+    "SVGControl": [
+      "SVGControl/**"
+    ],
+    "SVGControl.Test": [
+      "SVGControl.Test/**"
+    ],
+    "Tags": [
+      "Tags/**"
+    ],
+    "Tags.Test": [
+      "Tags.Test/**"
+    ],
+    "TaskMaster": [
+      "TaskMaster/**"
+    ],
+    "TaskMaster.Test": [
+      "TaskMaster.Test/**"
+    ],
+    "TaskTree": [
+      "TaskTree/**"
+    ],
+    "TaskTree.Test": [
+      "TaskTree.Test/**"
+    ],
+    "TaskVisualization": [
+      "TaskVisualization/**"
+    ],
+    "TaskVisualization.Test": [
+      "TaskVisualization.Test/**"
+    ],
+    "ToDoModel": [
+      "ToDoModel/**"
+    ],
+    "ToDoModel.Test": [
+      "ToDoModel.Test/**"
+    ],
+    "UtilitiesCS": [
+      "UtilitiesCS/**"
+    ],
+    "UtilitiesCS.Test": [
+      "UtilitiesCS.Test/**"
+    ],
+    "VBFunctions": [
+      "VBFunctions/**"
+    ],
+    "VBFunctions.Test": [
+      "VBFunctions.Test/**"
+    ],
+    "claude-runtime": [
+      ".claude/**"
+    ],
+    "config": [
+      "config/**"
+    ]
   },
   "over_breadth_fraction": 0.25
 }

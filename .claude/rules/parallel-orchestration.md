@@ -26,7 +26,7 @@ Enforced by `validate_parallel_orchestrator_state_text(text, *, require_complete
 
 3. **Mode enum.** `mode` must be `closed` or `open`.
 
-4. **Bounded concurrency.** `max_concurrency` must be an integer from 1 through 8, and must not be a boolean.
+4. **Bounded concurrency.** `max_concurrency` must be an integer from 1 through 32, and must not be a boolean.
 
 5. **Item uniqueness and shape.** Each `items[]` entry must be an object whose `issue_num` is a positive integer unique across items and whose `feature_folder` is a non-empty string.
 
@@ -98,13 +98,29 @@ Enforced by `validate_parallel_manifest_text(text)` in `scripts/dev_tools/parall
 
 - **M3 — Mode default.** `mode`, when present, must be `closed` or `open`. When absent it defaults to `closed`: the accessor `manifest_mode(mapping)` returns the default and the validator emits no error for absence.
 
-- **M4 — Concurrency default.** `max_concurrency`, when present, must be an integer from 1 through 8. When absent it defaults to `4`: the accessor `manifest_max_concurrency(mapping)` returns the default and the validator emits no error for absence.
+- **M4 — Concurrency default.** `max_concurrency`, when present, must be an integer from 1 through 32. When absent it defaults to `4`: the accessor `manifest_max_concurrency(mapping)` returns the default and the validator emits no error for absence.
 
 - **M5 — Created-at.** `created_at` must be a non-empty string.
 
 - **M6 — Items.** `items` must be a list. An empty list is valid at authoring time. Each entry must be an object carrying `issue_num` (positive integer, unique across items), `feature_folder` (non-empty string), `kind` in `{feature, bug}`, `state` in the item-state enum, and `blast_radius` in the shape of orchestrator invariant 9.
 
 - **M7 — Prohibited keys.** No `depends_on` key may appear at any level, and no `integration_branch` key may appear at top level. Presence is an explicit rejection.
+
+- **M8 — Expected conflict components (optional assertion).** `expected_conflict_components`, when present, must be a list. Each entry must be an object carrying a required `members` list that is non-empty and holds positive integers, each of which resolves to an `items[].issue_num`, with no `issue_num` appearing in more than one component; and an optional `name` that, when present, must be a non-empty string. When the key is ABSENT the invariant contributes zero errors and the manifest's error list is byte-identical to what it was before M8 existed.
+
+  The value must be authored as a YAML BLOCK sequence. The destination-runtime bash YAML subset parser (`.claude/lib/bash/parallel-yaml-scan.sh`) rejects a non-empty flow collection, so a flow-style value such as `members: [101, 102]` is outside the supported subset and is not accepted on the bash path.
+
+  `expected_conflict_components` is an ASSERTION, not a declaration. It NEVER overrides a derived conflict edge, NEVER feeds `compute_cohorts`, and NEVER influences scheduling. It is consumed by a planner diagnostic (`scripts/dev_tools/parallel_lane_assertion.py`), invoked advisory-only, whose findings never block. Its name deliberately references the DERIVED conflict graph: the field asserts what the operator expects blast-radius derivation to produce, and a mismatch is a signal to re-examine the radii, never a licence to edit the graph. The prohibition on narrowing a radius beyond the configured exclusions to suppress an edge is unaffected, as is the `depends_on` prohibition of invariant 10, P3, and M7 — this key is not a dependency edge and does not express ordering.
+
+  Example, in the mandatory block-sequence form:
+
+  ```yaml
+  expected_conflict_components:
+    - name: hooks-lane          # optional, diagnostic label only
+      members:                  # required, non-empty, positive ints
+        - 101
+        - 102
+  ```
 
 ## Cache Doctrine — the checkpoint is not the source of truth
 
@@ -135,9 +151,18 @@ Per-item `merge_commit_sha` is retained; only the run-level merge-pull-request b
 
 ## Concurrency Bound (A7)
 
-`max_concurrency` is bounded at 1 through 8 inclusive and defaults to `4` when absent from the manifest. The design document sets only the default of 4; the upper bound of 8 is adopted here for symmetry with the epic surface, whose `max_parallel_features` is validated as `1..8`. The bound is recorded in this rule file so that downstream features do not re-litigate it. Booleans are rejected even though `True` and `False` are integers in Python.
+`max_concurrency` is bounded at 1 through 32 inclusive and defaults to `4` when absent from the manifest. The design document sets only the default of 4. Booleans are rejected even though `True` and `False` are integers in Python.
+
+The upper bound is derived from a constraint analysis of this surface alone. No other surface's bound is a reason for it. The findings recorded here so that downstream features do not re-litigate them:
+
+- **No constraint binds hard below O(100) concurrent worktrees.** Git worktrees, per-item feature branches, checkpoint size, and the cohort-coloring computation all scale well past a hundred concurrent items; none of them fails, or degrades sharply, anywhere near 32.
+- **The first-binding constraint is GitHub Actions job concurrency**, which begins to bite at roughly 10 to 20 concurrent items on a typical plan. It binds by QUEUING, not by failing: excess jobs wait for a runner and the run completes more slowly. A `max_concurrency` above that point is therefore not an error, merely a setting whose marginal throughput is absorbed by the queue.
+- **The ceiling of 32 is a SANITY limit, not a capacity limit.** Its purpose is to reject an order-of-magnitude operator typo (`320` for `32`), not to express a supported maximum. Do not read a value at or below 32 as an assurance that the runner pool can serve it.
+- **Under the per-edge cohort barrier `max_concurrency` is a pure throughput throttle.** Mutual exclusion inside a conflict component is automatic: a conflicting neighbour in a strictly prior current-generation cohort must be `merged` or `worktree_removed` before an item starts, so raising the cap can never co-schedule two conflicting items. Raising it changes only how many independent lanes advance at once.
 
 The bound is enforced in three places with the same semantics: orchestrator invariant 4, planner invariant P2, and manifest invariant M4.
+
+The epic surface is unaffected. `max_parallel_features` remains bounded at `1..8`; it is a different field on a different surface and is not changed by this bound.
 
 ## Drift-Event Recording Rule (A8)
 
@@ -173,6 +198,65 @@ F3 deliberately excludes the kickoff-prompt contract module `scripts/dev_tools/p
 
 F3's `require_ready_for_execution` gate is STRUCTURAL ONLY. It enforces the kickoff-PATH invariant (P9: `kickoff_prompt_path` must equal `artifacts/orchestration/parallel-kickoff-<parallel_slug>.md`) and does not parse or cross-check kickoff CONTENT. The deeper readiness-integrity machinery of the epic surface — git-integrity checks, launch-evidence binding, and kickoff-contract cross-checks — is left to F4, which may layer repository-aware checks behind an additional keyword without changing the schema. F3 likewise does not recompute the cohort coloring (planner invariant P5).
 
+## Blast-Radius Contention Doctrine (issue #489)
+
+The conflict graph that seeds cohorts is only as good as the evidence that produces its edges. Two
+classes of derivation defect made thematically unrelated items contend, and the corrections below
+are part of the landed contract. Enforcement remains prose plus validator logic; no JSON Schema is
+authored, imported, or read for any of it.
+
+### Read-by-mandate classification
+
+Every agent in this repository is instructed to read the policy rules, the tier map, and the process
+artifacts before doing any work. A plan that cites `.claude/rules/python.md` or `quality-tiers.yml`
+is therefore reporting compliance with the reading order, not declaring that its diff will write
+those files. Counting such a citation as contention made every well-formed plan collide with every
+other well-formed plan.
+
+`config/blast-radius.json` carries an optional `mandate_reads` list enumerating those paths as exact
+entries and `**` subtree globs. That list is the mandate-read exclusion set. `derive_blast_radius` removes matching citations from the harvest
+before resolving modules and shared surfaces, and `validate_blast_radius` removes them from its
+plan-side extraction so V1 and V2 stay self-consistent against a radius derived from the same plan.
+The key is optional and fail-closed: a truth table that omits it excludes nothing and reproduces
+pre-change behaviour exactly.
+
+Three constraints bound the mandate-read exclusion:
+
+1. **The planner remains obliged to enumerate a genuine write explicitly.** An exclusion describes
+   the default reading relationship, not a permanent ban. When an item's plan will actually write an
+   excluded path, the planner appends that exact path to the declared radius after normalization.
+2. **`quality-tiers.yml` stays a shared surface.** It is listed in both `shared_surfaces` and
+   `mandate_reads`: the first governs what happens when an item really writes it, the second governs
+   what happens when an item merely cites it.
+3. **`detect_escaped_paths` makes the read/write distinction exact at execution time.** The
+   derivation heuristic reads intent from plan text and can be wrong in either direction; drift
+   detection compares the declared radius against the paths a diff actually touched, so an item that
+   wrote an excluded path is caught against observed evidence rather than against prose.
+
+The extractor additionally rejects three token shapes that were never write claims: a wildcard-free
+token whose final component names a directory rather than a file, a `docs/features/` glob whose
+wildcard occupies or truncates the feature-folder segment, and a contract token carrying no ASCII
+letter. `artifacts/` is not a known top-level segment, so a bare `artifacts/**` subtree claim no
+longer satisfies the shape rules.
+
+### Module-map granularity criterion
+
+Issue #472 removed the location-bucket modules `docs` and `tests` because a bucket keyed on where a
+file lives rather than on which subsystem owns it attaches to nearly every work item. The same
+reasoning extends to umbrella buckets keyed on a top-level directory that essentially every item
+writes into: an umbrella that matches almost every radius is not a coherent unit of contention,
+because a level that always fires carries no information and only suppresses concurrency.
+
+Under that criterion `python-dev-tools`, `vscode-extension`, `claude-runtime`, `copilot-surface`,
+and `agents-surface` were removed, leaving the seven subsystem modules `mcp-server`, `benchmarks`,
+`poshqc`, `powershell-dev-tools`, `codex-runtime`, `config`, and `schemas`. Removing a module never
+weakens the relation below the path level: two items editing the same file still contend on
+`path_overlap`, and two items editing a declared shared surface still contend on
+`shared_surface_overlap`.
+
+A candidate module belongs in the map when it names a subsystem an item could plausibly not touch.
+A candidate that matches the majority of work items belongs nowhere.
+
 ## Enforcement
 
 - `scripts/dev_tools/validate_parallel_orchestrator_state.py`, with the helper modules `scripts/dev_tools/_parallel_state_common.py`, `scripts/dev_tools/_parallel_state_structures.py`, and `scripts/dev_tools/_parallel_state_records.py`, appends one error per violated orchestrator invariant. The completion-gate invariants 20 and 21 run only when the caller passes `require_complete=True`.
@@ -182,3 +266,4 @@ F3's `require_ready_for_execution` gate is STRUCTURAL ONLY. It enforces the kick
 - The TypeScript parity port at `extensions/drm-copilot/src/lib/validate/parallel-state-shared.ts`, `parallel-state-structures.ts`, `parallel-state-records.ts`, `parallel-orchestrator-state-core.ts`, and `parallel-planner-state-core.ts` reproduces the same invariants and is dispatched from `extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts` for both new `artifact_type` values. Verified scope: 96 of 96 error strings matched across 43 constructed documents, for JSON-representable values that round-trip through both runtimes' native types. Three divergence classes are known outside that verified scope: (1) **`pythonRepr` quote selection** — `parallel-state-shared.ts:112-132` always single-quotes, while Python's `repr` switches to double quotes when the value contains a single quote (recorded repo-wide at `docs/features/potential/2026-08-07-python-repr-quote-selection-divergence.md`); (2) **integral floats** — `JSON.parse` erases Python's `int`/`float` distinction, so an integral float value produces a different Python-side error count than the TypeScript side; (3) **boolean/integer equality** — `parallel-state-structures.ts:228` uses `===`, so a boolean value is not selected the way Python's `True == 1` equality selects it, producing differing error counts.
 - Enforcement is therefore Python validator logic, plus the TypeScript parity port, plus this prose file. It is NEVER an imported JSON Schema. No schema file is read at validation time.
 - The `parallel` route entry lives in `config/orchestration-routing.json` with `requires_pr_gate: false` (there is no run-level pull request to gate; each child's own route checkpoint enforces its per-item pull-request gate) and is mirrored byte-for-byte in `extensions/drm-copilot/resources/config/orchestration-routing.json`.
+- The `PreToolUse` merge gate `.claude/hooks/enforce-epic-merge-gate.ps1` carries a parallel allow-branch that authorizes a per-item `gh pr merge --merge` from the parallel-orchestrator checkpoint when `route_id == "parallel"`, the target item's `merge_status == "ci_green"`, and the command's PR number matches that item's `pr_number`; any other case fails closed with `EPIC_MERGE_GATE_BLOCKED`.

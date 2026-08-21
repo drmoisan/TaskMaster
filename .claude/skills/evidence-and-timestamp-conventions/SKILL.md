@@ -110,6 +110,19 @@ When evidence artifacts are used for automated checking or plan reconciliation, 
 - `Command: <exact command>`
 - `EXIT_CODE: <int>`
 
+One optional field may also be declared:
+- `ExpectedExitCode: <int>` — the exit code the gate is expected to produce.
+
+Rules for the optional expectation field:
+- The spelling is exact and case-sensitive: `ExpectedExitCode`. `expectedexitcode` and `Expected Exit Code` do not match the accept-list and are discarded as unrecognized rows.
+- The value is a single integer. A leading sign is accepted and no range check is applied; the value is used for an equality comparison only.
+- When the field is absent the expectation defaults to `0`, so every artifact that omits it keeps its existing result. Writing `ExpectedExitCode: 0` explicitly renders identically to omitting the field.
+- A present but non-integer value (including an empty value) makes the WHOLE artifact `unparseable`. An unparseable artifact is dropped by the collector filter, so a typo in the expectation removes the row from the PR body rather than degrading it to `fail`.
+- When the field is duplicated, the FIRST occurrence wins in both the Python and the TypeScript parser; later occurrences are ignored.
+- The field is per-FILE, not per-gate: one artifact carries exactly one expectation, so an artifact recording several gates cannot express a different expectation for each. Record a gate that needs a non-zero expectation in its own artifact file.
+
+A gate whose observed `EXIT_CODE` equals its declared expectation is normalized to `pass`. The observed exit code is still displayed, and the rendered row additionally carries `  - Expected EXIT_CODE: <int>` between the `EXIT_CODE` and `Normalized result` lines when the expectation is non-zero.
+
 ### Baseline Evidence Output Summary (Required)
 
 For baseline evidence artifacts stored under `evidence/baseline/`, include an output summary in addition to the schema fields above:

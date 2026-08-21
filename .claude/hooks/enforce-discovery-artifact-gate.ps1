@@ -25,8 +25,10 @@
     interprets the CLI's exit code and captured output.
 
 .NOTES
-    Compatible with PowerShell 7+. Read-only validation gate; the validator
-    subprocess is the only external process invoked.
+    Requires PowerShell 7.4+ (the shared validation module uses
+    `Test-Json -SchemaFile` Draft 2020-12 support). Read-only validation gate that
+    invokes NO external process: validation runs in-process through
+    `.claude/lib/discovery-validation/DiscoveryValidation.psm1` (issue #475).
 #>
 [CmdletBinding()]
 param()
@@ -34,11 +36,23 @@ param()
 function Invoke-DiscoveryValidatorExe {
     <#
     .SYNOPSIS
-        Wrapper around the discovery-artifact validator CLI. Mockable seam.
+        Wrapper around the discovery-artifact validator. Mockable seam.
     .DESCRIPTION
-        Invokes `python -m scripts.dev_tools.validate_discovery_artifacts` with
-        the supplied arguments and captures both stdout and stderr. Tests mock
-        this function directly; production code must never mock `python`.
+        Delegates to the portable PowerShell implementation in
+        `.claude/lib/discovery-validation/DiscoveryValidation.psm1`, keeping this
+        function's name, its `-ValidatorArgs <string[]>` parameter, and its
+        `@{ ExitCode; Output }` return shape unchanged so existing mocks and
+        `Should -Invoke` assertions continue to bind.
+
+        This no longer invokes a Python interpreter (issue #475). The `.claude/**`
+        payload ships to destinations with no guaranteed Python, Poetry, or
+        `scripts/dev_tools`, where the previous `python -m ...` call failed
+        obscurely or blocked every operation.
+
+        Success is SILENT by contract: a passing validation returns `ExitCode = 0`
+        with an EMPTY `Output`. The caller denies on a non-zero exit code OR on
+        non-empty output, so any success chatter here would deny a passing
+        validation (defect D-2).
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]
@@ -47,8 +61,14 @@ function Invoke-DiscoveryValidatorExe {
         [string[]] $ValidatorArgs
     )
 
-    $output = & python -m scripts.dev_tools.validate_discovery_artifacts @ValidatorArgs 2>&1
-    return @{ ExitCode = $LASTEXITCODE; Output = ($output | Out-String).Trim() }
+    $modulePath = Join-Path -Path $PSScriptRoot `
+        -ChildPath '../lib/discovery-validation/DiscoveryValidation.psm1'
+    if (-not (Test-Path -LiteralPath $modulePath -PathType Leaf)) {
+        return @{ ExitCode = 1; Output = "Discovery-validation module not found: $modulePath" }
+    }
+
+    Import-Module -Name $modulePath -Force -ErrorAction Stop
+    return Invoke-DiscoveryArtifactValidation -ValidatorArgs $ValidatorArgs
 }
 
 function Get-DiscoveryArtifactType {

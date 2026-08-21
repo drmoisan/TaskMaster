@@ -21,7 +21,7 @@ Every unit test must satisfy all five of these properties:
 ## Coverage Requirements
 
 - **Line coverage must remain >= 85% across all tiers (T1–T4).**
-- **Branch coverage must remain >= 75% across all tiers (T1–T4).**
+- **Branch coverage must remain >= 75% across all tiers (T1–T4) for languages whose coverage tooling measures branch coverage.** PowerShell (Pester) and bash (kcov) are the exceptions: neither tool measures branch coverage in any output format, so only the line threshold applies to them and there is no branch-coverage gate. This is a threshold exemption only; PowerShell and bash production files remain in the coverage denominator under the Coverage Exclusion Policy below.
 - Code changes or refactors must not reduce coverage for the lines that were changed.
 - Tier-specific lower coverage thresholds are not used in this repository. See `.claude/rules/quality-tiers.md` for the full tier system.
 - Coverage is a supporting metric, not the sole quality gate. Untested critical behavior is not acceptable even if the overall percentage looks good.
