@@ -21,16 +21,16 @@ intent:
     - Full C# toolchain (csharpier, analyzers, nullable, MSTest with coverage) green per child.
 features:
   - issue_num: 511
-    feature_folder: 2026-08-21-winformspumphost-suite-determinism-511
+    feature_folder: winformspumphost-suite-determinism-511
     depends_on: []
   - issue_num: 445
-    feature_folder: 2026-08-21-quickfiler-keyboard-action-contract-defects-445
+    feature_folder: 2026-08-07-quickfiler-keyboard-action-contract-defects-445
     depends_on: []
   - issue_num: 491
-    feature_folder: 2026-08-21-quickfiler-test-form1-live-form-491
+    feature_folder: 2026-08-07-quickfiler-test-form1-live-form-491
     depends_on: []
   - issue_num: 449
-    feature_folder: 2026-08-21-quickfiler-explorer-controller-latent-defects-449
+    feature_folder: 2026-08-07-quickfiler-explorer-controller-latent-defects-449
     depends_on: []
 ---
 
