@@ -1,53 +1,64 @@
 ---
 name: parallel-surface-partial-port
-description: The parallel surface is now structurally present in TaskMaster (PR #544) but config/blast-radius.json was pushed down verbatim and is unfit for the C#/VSTO layout, so parallel-plan yields zero parallelism
+
+description: Parallel surface works in TaskMaster and issue #545 is fixed, but three spurious-contention defects in config/blast-radius.json and the path extractor make any large run effectively serial (measured 83.3% graph density, mean cohort width 1.45)
 metadata:
   type: project
 ---
 
-Status as of 2026-08-11. Supersedes the 2026-08-10 assessment, which was wrong on one hard blocker.
-Verify against the repo before relying on this.
+Status as of 2026-08-21, measured empirically on `main @ a01bdbb0`. Supersedes the 2026-08-11
+assessment, which is now wrong on its headline blocker. Re-verify before relying on this.
 
-**Structurally present now.** PR #544 ("(chore): push down claude parallel orchestrator", merged to
-`main` as `2073f717`) landed the governance payload from [[drm-copilot-is-claude-governance-upstream]]:
-`.claude/rules/parallel-orchestration.md`, `config/blast-radius.json`, `route_id: parallel` in
-`config/orchestration-routing.json`, and `.claude/lib/bash/compute-cohorts.sh` +
-`parallel-cohorts.sh`. Already present before that: `.claude/lib/blast-radius/*.psm1`,
-`.claude/hooks/enforce-parallel-*.ps1`, the six `parallel-*` skills, both `parallel-*` agents. MCP
-`parallel-planner-state` and `parallel-kickoff` dispatch correctly.
+**Issue #545 is CLOSED and its blocker is gone.** `config/blast-radius.json` was re-authored for
+TaskMaster: it now enumerates the real 18 C# project modules (`QuickFiler`, `UtilitiesCS`,
+`ToDoModel`, ... plus `.Test` siblings) and the location-bucket modules `docs`/`tests` that used to
+collapse the graph are gone. The feature-folder glob no longer causes universal contention.
+`/parallel-plan` is structurally usable.
 
-**Cohort computation is NOT missing — the earlier verdict was a false negative.** `compute_cohorts`
-exists upstream at `scripts/dev_tools/parallel_cohort_computation.py` (commit `663d71ee`, issue #445)
-with `compute_concurrency_batches`, and TaskMaster now has the bash entry point
-`.claude/lib/bash/compute-cohorts.sh` (no Python or Poetry required; emits compact JSON identical to
-the Python authority). The 2026-08-10 "absent from both repos" finding came from
-`git grep -in "compute_cohorts|welsh"` **without `-E`** — git grep defaults to basic regex, so the
-`|` was matched literally and the search could never hit. Always pass `-E` when using alternation.
+**The remaining problem is the opposite of the old one: spurious contention, not zero parallelism.**
+Measured over the 16 real committed plans under `docs/features/active/`, deriving each radius with
+`Get-BlastRadius` and testing all 120 pairs with `Test-BlastRadiusConflict`:
 
-**The real remaining blocker: `config/blast-radius.json` is unfit for this repo.** It was pushed
-down verbatim and describes the governance payload's own layout, not TaskMaster's. It lists modules
-`.claude/**`, `config/**`, `docs/**`, `tests/**` and shared surfaces `.claude/settings.json`,
-`config/orchestration-routing.json`, `config/blast-radius.json`. Verified consequences (probed
-directly through `Get-BlastRadius` / `Test-BlastRadiusConflict`):
+- conflict graph density **83.3%** (100 of 120 pairs conflict)
+- `compute-cohorts.sh` yields **11 cohorts for 16 items**, max parallel width **2**, mean width **1.45**
+- per-edge reasons: `path_overlap` 83, `module_overlap` 80
 
-1. **Zero parallelism.** `Get-BlastRadius` always appends the feature-folder glob
-   `docs/features/active/<name>/**`, and module `docs` maps to `docs/**`, so *every* item carries
-   module `docs` and every pair conflicts with reason `module_overlap`. The conflict graph is a
-   complete graph, Welsh-Powell yields one cohort per item, and an N-item run is fully serial.
-2. **Fail-open on real collisions.** TaskMaster's actual root shared surfaces (`TaskMaster.sln`,
-   `Directory.Build.targets`, `.editorconfig`, `coverage.config`, `.github/workflows/**`) are not in
-   `shared_surfaces`. Per the F1a rule, a separator-free root token is admitted only as an exact
-   member of that list, so a plan editing `coverage.config` or `Directory.Build.targets` produces a
-   radius that does not mention them at all. Two items editing the same build config are reported
-   non-conflicting once the `docs` edge above is removed.
-3. **C# projects attribute to no module.** None of the 9 production or 9 test project directories
-   (`QuickFiler/`, `UtilitiesCS/`, `ToDoModel/`, ...) appear in `modules`; `tests/` in TaskMaster
-   holds only `scripts/` (PowerShell), not the C# test projects.
+Three distinct, independently fixable defects drive most of that, each creating a clique:
 
-**How to apply:** treat `/parallel-plan` as unable to produce a *useful* run until
-`config/blast-radius.json` is authored for TaskMaster (enumerate the real `.csproj` module set and
-the real root shared surfaces, and keep the feature-folder glob from collapsing the graph). Fixing it
-is a design decision about which surfaces are shared in a C#/VSTO repo, so promote it as an issue
-rather than editing the just-merged config inside a planner run. Separately, the parallel schema
-prohibits `depends_on` and `wave`, so any requirement of the form "these items must land in a given
-order" belongs to `/epic-plan`, not to this surface — see [[parallel-surface-cannot-express-ordering]].
+1. **`claude-runtime` umbrella module is still present** (`.claude/** -> claude-runtime`), matching
+   **10/16 = 62%** of plans. `.claude/rules/parallel-orchestration.md` "Module-map granularity
+   criterion" states this module was REMOVED upstream (alongside `python-dev-tools`,
+   `vscode-extension`, `copilot-surface`, `agents-surface`) precisely because an umbrella keyed on a
+   top-level directory carries no information and only suppresses concurrency. TaskMaster's copy
+   never got that removal. Single largest clique driver.
+2. **Mandate-read leakage.** `mandate_reads` lists only two skill files by exact path
+   (`atomic-plan-contract`, `evidence-and-timestamp-conventions`, both under `.claude/skills/`).
+   Real plans also cite, and therefore contend on: `.claude/skills/acceptance-criteria-tracking/SKILL.md`
+   (6/16), `.claude/skills/policy-compliance-order/SKILL.md` (3/16), `.claude/agent-memory/**`
+   (4/16), and the **entire `.agents/skills/**` tree** (3/16 each for `atomic-plan-contract`,
+   `evidence-and-timestamp-conventions`, `csharp`). `.agents/` is a live parallel skill tree in this
+   repo and appears nowhere in `mandate_reads`.
+3. **Placeholder tokens are extracted as real paths.** `Get-PlanPaths` does NOT reject
+   placeholder-bearing tokens, unlike the plan-acceptance gates. Verified: `<FEATURE>/spec.md`,
+   `<FEATURE>/evidence/baseline/x.md`, and `${VAR}/y.cs` all extract verbatim. `<FEATURE>/spec.md`
+   appears in 5/16 plans and `<FEATURE>/issue.md` in 4/16, so two otherwise-disjoint items
+   (`QuickFiler/A.cs` vs `ToDoModel/B.cs`) conflict with
+   `detail=<FEATURE>/spec.md ~ <FEATURE>/spec.md`. Relative per-feature evidence paths
+   (`evidence/qa-gates/coverage-final.cobertura.xml`, 3/16) do the same.
+
+**Genuine contention that must NOT be "fixed away":** `scripts/vscode/Invoke-MSTestWithCoverage.ps1`
+(9/16 = 56%), `.github/workflows/ci.yml` (3/16), and the `*.Test.csproj` compile-entry files. Those
+are real shared surfaces and their serialization is correct.
+
+**Still open and unported:** issue #576 (`shared_surfaces` omits TaskMaster's root build files, so
+`TaskMaster.sln`, `Directory.Build.targets`, `coverage.config`, `.editorconfig` are dropped entirely
+from derived radii and such pairs report `conflict=False` — fail-OPEN). Until it lands, hand-append
+those exact paths per the rule file's sanctioned remedy.
+
+**How to apply:** do not fan out a large parallel run before defects 1-3 are fixed. At 83.3% density
+an 80-item run is roughly 60+ cohorts deep — effectively serial, so `max_concurrency` is inert — and
+most of that depth is spurious and would be recomputed away once the config is corrected. Fix the
+truth table first (small, contained), then plan. Note `max_concurrency` is bounded 1..32 since
+PR #575; do not clamp to 8. See [[parallel-surface-cannot-express-ordering]] for why the
+coverage/CI cluster needs `/epic-plan` instead, and [[blast-radius-extractor-mechanics]] for the
+backtick rule that governs whether any of this fires at all.
