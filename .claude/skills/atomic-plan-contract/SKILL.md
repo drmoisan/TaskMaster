@@ -157,6 +157,21 @@ Before a plan can be treated as approved:
 - reject the plan if that validator exits non-zero,
 - do not treat human-readable summaries as a substitute for validator success.
 
+The same validator call also applies the acceptance-gate rules G1 through G6 defined in `.claude/rules/plan-acceptance-gates.md`. Those rules report acceptance conditions that cannot fail — a coverage argument that collects no data, or a search for a literal that returns zero matches whatever the executor does. They run automatically on the existing `plan` route with no additional flag. Blocking findings appear in the validator's error output and fail the gate; Warnings are surfaced without failing it, prefixed with `PLAN GATE WARNING: ` on the CLI and carried on the optional `warnings` field of the MCP result. Read that rule file before authoring acceptance conditions.
+
+## Wrap-Tolerant Assertion Authoring (Mandatory)
+
+An acceptance condition must be able to fail. A condition whose command returns the same result whatever the executor does verifies nothing, however precise it reads. Author every acceptance condition in a wrap-tolerant form: one that survives line wrapping and shell quoting in the file it asserts against.
+
+Rules:
+
+- **Prefer a named test over a phrase search.** When a test can carry the assertion, name the test and its node ID and assert its pass count. A test node ID is stable under reformatting; a prose phrase is not. Reserve searches for cases where no test can express the condition.
+- **Single-line token rule.** Where a search is unavoidable, assert a short, single-line, non-interpolated token that the plan quotes verbatim. A multi-word phrase drawn from prose is wrap-fragile: once the target file reflows, the phrase spans two lines and a line-oriented search returns zero matches even though the text is present. Rule G6 in `.claude/rules/plan-acceptance-gates.md` reports this case.
+- **No placeholders in an asserted token.** A token containing `<`, `>`, `${`, `$(`, or `%` is treated as a documented command shape rather than a real assertion and is skipped by the gate, so it gates nothing. Substitute the concrete value.
+- **Dotted coverage-argument form.** Coverage assertions must name an importable dotted module, for example `--cov=scripts.dev_tools.plan_gate_discrimination`. The filesystem-path spellings `--cov=scripts/dev_tools/module.py` and `--cov=scripts/dev_tools/module` collect no data, so a coverage threshold asserted against them cannot fail. Rules G1 through G3 report those spellings.
+- **Use the `=` form, not the space-separated form.** `--cov <value>` can bind the following positional argument. Rule G4 reports it.
+- **Quote what the task will create.** When an asserted literal does not yet exist in the tree, quote the exact literal in the plan prose outside the command span. The gate reads that quotation as the executor's instruction and exonerates the assertion; a paraphrase does not.
+
 ## Plan-Path Continuity Contract (Mandatory)
 
 When a caller provides an explicit target plan file path (for example `${plan-path}` or `${file}`):

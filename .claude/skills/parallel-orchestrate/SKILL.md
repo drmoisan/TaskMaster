@@ -65,7 +65,7 @@ Consumption rules:
   so it does not drift when an item's folder moves from `docs/features/active/` to
   `docs/features/completed/`.
 - Read `mode` (`closed` or `open`, defaulting to `closed`), `max_concurrency` (an integer from 1
-  through 8, defaulting to 4), and each item's identity and state: `feature_folder`, `kind`,
+  through 32, defaulting to 4), and each item's identity and state: `feature_folder`, `kind`,
   `state`, and `blast_radius`.
 - The manifest is read-only to `parallel-orchestrator`. It is static input authored by
   `parallel-planner`: never write it, rewrite it, or back-fill a field into it.
@@ -111,23 +111,58 @@ in order to combine two cohorts or widen a launch batch.
 
 ## Cohort Barrier and Max-Concurrency Slot Filling
 
-Two independent controls govern every launch. The cohort barrier governs when a cohort may start.
-`max_concurrency` governs how many items of a started cohort run at once. Neither substitutes for
+Two independent controls govern every launch. The cohort barrier governs when an individual item
+may start. `max_concurrency` governs how many eligible items run at once. Neither substitutes for
 the other.
 
-**Cohort barrier.** Cohort `N+1` branches from `main` only after every cohort-`N` item is `merged`
-or `worktree_removed`. Increment `current_cohort` only on durable confirmation from
-`git worktree list --porcelain`, `git branch`, and
-`gh pr view --json state,mergedAt,headRefOid` — never from an in-memory completion notification. A
-blocked item (`blocked_ci_loop_limit` or `blocked_drift`) is neither `merged` nor
-`worktree_removed`, so a blocked item holds the barrier and cohort `N+1` does not start.
+**Cohort barrier (per-edge).** An item may start only when every conflicting neighbour
+(`conflict_edges[]`) that sits in a strictly prior current-generation cohort has `merge_status` of
+`merged` or `worktree_removed`. `ci_green` does not satisfy the barrier: the pull request is not
+merged, so its work is not on `main`. Same-cohort and later-cohort neighbours do not hold an item
+back, and items with no conflicting prior-cohort neighbour may start regardless of other cohorts'
+progress. The barrier is a predicate over one item's own conflict edges, not a global gate over
+whole cohorts.
+
+Evaluate the predicate only against durable state read from `git worktree list --porcelain`,
+`git branch`, and `gh pr view --json state,mergedAt,headRefOid` — never from an in-memory
+completion notification. A blocked item (`blocked_ci_loop_limit` or `blocked_drift`) is neither
+`merged` nor `worktree_removed`, so it holds every conflicting later-cohort neighbour and,
+transitively, the tail of its own conflict component; items outside that component are unaffected.
+
+**`current_cohort` is a progress indicator, not a gate.** `current_cohort` is the LOWEST
+current-generation cohort index that still contains a non-terminal, non-withdrawn item. It is
+recomputed and written only on durable confirmation from `git worktree list --porcelain`,
+`git branch`, and `gh pr view --json state,mergedAt,headRefOid` — never from an in-memory
+completion notification. It gates nothing: no item's eligibility is decided by comparing it to
+`current_cohort`, because eligibility is the per-edge predicate above. It is reported in the status
+document, is the base index the mutation engine recolors from, and is bounded by rule invariant 14,
+whose text is unchanged. Because the barrier is per-edge, in-flight items are not confined to
+`current_cohort`; the highest current-generation index any pinned item occupies is a separate value
+(`highest_pinned_cohort`, see `## Membership Mutation Protocol (F6)`).
+
+**Safety argument.** An item that starts under the per-edge rule while a non-conflicting
+prior-cohort item is still open branches from a `main` that lacks only non-conflicting merged work.
+That is byte-for-byte the situation the same-cohort merge-order text above already accepts as safe:
+"Items within a cohort are non-conflicting by construction — a cohort is an independent set in the
+conflict graph — so they may branch from the same `main` tip and may merge in any order." The
+per-edge barrier extends that accepted situation across cohort boundaries without weakening it,
+because the only work the starting item can be missing is work it does not conflict with. That
+same-cohort text is unchanged by this rule.
+
+**Availability argument.** Under a global barrier a single `blocked_ci_loop_limit` or
+`blocked_drift` item halts every lane, because no item of the next cohort may start until every
+item of the current one is terminal. Under the per-edge rule the blocked item holds only its own
+conflict component's tail: its conflicting later-cohort neighbours, and transitively theirs.
+Unrelated lanes keep advancing. That is the difference between one stuck item stalling a 13-lane
+run and one stuck item stalling one lane.
 
 **`max_concurrency` slot filling.** `max_concurrency` caps the number of simultaneously in-flight
 items independently of cohort size: a cohort of twelve items executes at most `max_concurrency`
 items at a time. Fill slots in ascending item-key order, keyed on `issue_num`, and refill each
 freed slot with the next unstarted item of the current cohort in that same ascending item-key
-order. A cohort larger than `max_concurrency` therefore launches in several batches from the same
-recorded `main` tip. The batching is a pure function, reached on the destination-runtime path as
+order. A cohort larger than `max_concurrency` therefore launches in several batches, each from the
+`main` tip recorded for that batch. The batching is a pure function, reached on the
+destination-runtime path as
 `bash .claude/lib/bash/compute-concurrency-batches.sh --keys "<k1> <k2> ..." --max-concurrency <n>`.
 It prints a compact JSON array of arrays, returns the batches in order, and sorts the keys itself,
 so determinism does not depend on caller ordering.
@@ -152,11 +187,33 @@ fire per call with no cross-call state visibility.
 Neither layer is shipped by this feature; both are named here so the obligation is legible to an
 operator and to the F7 planner. Until F7 lands, the barrier is enforced by this procedure alone.
 
+**The two layers fail closed differently, and the difference is deliberate.** Do not read either
+layer's silence as permission.
+
+- Layer 1 is PROSPECTIVE and evaluated per launch, so it denies fail-closed on every condition that
+  leaves the target's own eligibility unknowable: a missing or unparseable checkpoint, an unresolved
+  feature-folder token, a missing `items[]` record for the target, a target with no
+  current-generation cohort assignment, a missing neighbour record, and a missing neighbour
+  `merge_status`. Its one permissive case is neighbour-side: a NEIGHBOUR that carries no
+  current-generation cohort assignment is skipped rather than denied, because such a neighbour sits
+  in no prior cohort and therefore constrains nothing.
+- Layer 2 is RETROSPECTIVE and evaluated per edge, so it is deliberately silent on an edge it cannot
+  judge; a malformed edge is invariant 15's to report, not the barrier's. It applies three readings
+  of the same edge. The STRUCTURAL reading rejects two conflicting items colored into the same
+  current-generation cohort outright — a violation Layer 1 has no counterpart for, because Layer 1
+  only ever asks about strictly prior cohorts. The STATUS reading is the retrospective
+  contrapositive of the per-edge launch rule. The TEMPORAL reading rejects
+  `merged_at(earlier) > worktree_created_at(later)`, and degrades to the status reading alone when
+  either timestamp is absent or is not a string.
+
 ## Per-Item Branch and Worktree Lifecycle
 
-1. Run one `git fetch origin main` immediately before each cohort launch, so every item in that
-   cohort branches from the same current remote `main` tip rather than from a stale local ref.
-   Record the fetched tip.
+1. Run one `git fetch origin main` immediately before each launch batch, so every item in that
+   batch branches from the same current remote `main` tip rather than from a stale local ref.
+   The unit is the launch batch, not the cohort: under the per-edge barrier a cohort's items
+   become eligible at different times, and a cohort larger than `max_concurrency` launches in
+   several batches, so a per-cohort fetch would leave later batches on a stale tip. Record the
+   fetched tip for each batch.
 2. Each item's worktree is created by that item's delegation spawn,
    `Agent(orchestrator, isolation: "worktree", run_in_background: true)`, branched from
    `origin/main`. Do not create or check out item worktrees by hand.
@@ -267,13 +324,14 @@ Procedure, per item:
    `docs/features/parallel/<slug>/parallel-status.md`.
 5. On a merge failure caused by a conflict, follow `## Per-Item Merge-Conflict Handling`.
 
-**F7 dependency.** `.claude/hooks/enforce-epic-merge-gate.ps1` is a project-wide `PreToolUse`
-Bash-matcher hook that denies any `gh pr merge --merge` unless an epic-shaped checkpoint satisfies
-its allow conditions; its block reason is `EPIC_MERGE_GATE_BLOCKED`. A parallel run has no
-epic-shaped checkpoint, so step 3 above is denied until F7 scopes or extends that gate's allow
-conditions for the parallel case. This feature modifies no file under `.claude/hooks/` and does not
-change `.claude/settings.json`, so the parallel surface is not executable end-to-end before F7
-lands. That limitation is documented, not worked around.
+**Merge-gate authorization.** `.claude/hooks/enforce-epic-merge-gate.ps1` is a project-wide
+`PreToolUse` Bash-matcher hook that denies any `gh pr merge --merge` unless a checkpoint satisfies
+one of its allow conditions; its block reason is `EPIC_MERGE_GATE_BLOCKED`. The gate now authorizes
+a parallel per-item merge when the parallel-orchestrator checkpoint has `route_id == "parallel"`,
+the target item's `merge_status == "ci_green"`, and, when a PR number is named, it matches the
+item's `pr_number`. Step 3 above is therefore permitted for a legitimate parallel merge; a missing,
+unreadable, or invalid parallel checkpoint, a target item whose `merge_status` is not `ci_green`, or
+a PR number that matches no item still fails closed with `EPIC_MERGE_GATE_BLOCKED`.
 
 Branch protection on `main` affects only the pacing of step 3, not its ownership: if `main`
 requires branches to be up to date, an automated `gh pr update-branch` plus re-green cycle is
@@ -310,8 +368,11 @@ this surface.
    feature.
 5. On loop exhaustion, the parent records the terminal `merge_status: blocked_ci_loop_limit` for the
    item; the child's own checkpoint retains its precise blocked status. A blocked item is neither
-   `merged` nor `worktree_removed`, so it holds the cohort barrier defined in
-   `## Cohort Barrier and Max-Concurrency Slot Filling`.
+   `merged` nor `worktree_removed`, so under the per-edge barrier defined in
+   `## Cohort Barrier and Max-Concurrency Slot Filling` it holds back exactly its own conflicting
+   later-cohort neighbours — and, transitively, the tail of its own conflict component. Every item
+   outside that component, including every item of a later cohort that shares no conflict edge with
+   it, remains eligible and continues to launch.
 
 Boundary with F8: a merge conflict between two same-cohort items is evidence that the declared
 blast radius under-reported, and this feature records the child's blocked or remediated outcome
@@ -469,23 +530,29 @@ integers (`items[].issue_num`) everywhere on this surface.
 ### Pinning invariant
 
 **In-flight items are pinned. Scheduling is recomputed only over the not-yet-started subgraph, and
-recoloring is a pure function of `(remaining subgraph, pinned set, pinned cohort index)`.**
+recoloring is a pure function of `(remaining subgraph, pinned set, pinned cohort indices)`.**
 
 The recolor function takes the induced subgraph of unstarted items (states `proposed`, `admitted`,
-`prepared`, `scheduled`), the pinned set (state `in_flight`), the current generation, and — as a
-third scheduling input — the current cohort index `current_cohort` that the pinned items occupy. It
-returns cohort assignments for unstarted items ONLY: the returned mapping's key set equals the
-unstarted set exactly and contains no pinned key. A pinned item is therefore absent from the result
-rather than reassigned, and that absence IS the guarantee that a mutation never moves work already
-running.
+`prepared`, `scheduled`), the pinned set (state `in_flight`), the current generation, and — as two
+further scheduling inputs — `current_cohort` and `highest_pinned_cohort`, the highest
+current-generation cohort index occupied by any pinned item. Both are derived from re-verified
+durable state. Two inputs are required because the per-edge barrier does not confine in-flight items
+to one index: an item starts as soon as its own conflicting prior-cohort neighbours are terminal, so
+the pinned frontier can span several cohorts. It returns cohort assignments for unstarted items
+ONLY: the returned mapping's key set equals the unstarted set exactly and contains no pinned key. A
+pinned item is therefore absent from the result rather than reassigned, and that absence IS the
+guarantee that a mutation never moves work already running.
 
 **Pinned-barrier offset.** The returned indices are ABSOLUTE checkpoint cohort indices at or above
-`current_cohort`, and strictly above `current_cohort` whenever any conflict edge joins an unstarted
-item to a pinned item. When no such edge exists the lowest returned index equals `current_cohort`
-exactly, so unstarted items may share the running cohort and `max_concurrency` slot filling is
-preserved. The offset is a single uniform shift applied to every color class, so F2's distinct color
-classes remain distinct cohort indices and independence within the unstarted set is preserved
-exactly.
+`current_cohort`, and strictly above `highest_pinned_cohort` whenever any conflict edge joins an
+unstarted item to a pinned item. When no such edge exists the lowest returned index equals
+`current_cohort` exactly, so unstarted items may share the running cohort and `max_concurrency` slot
+filling is preserved. Shifting above the highest pinned index — rather than above `current_cohort`
+alone — is what keeps a deferred candidate off the index of any pinned item it conflicts with when
+the pinned frontier spans more than one cohort. The offset is a single uniform shift applied to
+every color class, so F2's distinct color classes remain distinct cohort indices and independence
+within the unstarted set is preserved exactly. When every pinned item sits at `current_cohort` the
+two inputs coincide and the offset is identical to the earlier single-frontier rule.
 
 Write the returned indices VERBATIM into `cohorts[].index`; never re-base them to zero. `cohorts[]`
 carries exactly ONE current-generation entry per index, so returned keys landing on index
@@ -506,8 +573,14 @@ freed slot from the same current cohort — see
 `## Cohort Barrier and Max-Concurrency Slot Filling` — so the current cohort durably holds
 not-yet-launched `scheduled` members that a candidate can contend with. Recoloring previously
 dropped the candidate-to-pinned edges together with the pinned vertices, which discarded the pinned
-CONSTRAINT as well as the pinned VERTICES and returned a deferred candidate to cohort 0, the current
-cohort, whenever the cohort barrier held `current_cohort` at 0.
+CONSTRAINT as well as the pinned VERTICES and returned a deferred candidate to the current cohort,
+undoing the deferral.
+
+**Third design correction (per-edge barrier).** The offset previously shifted to
+`current_cohort + 1`, which was sound only while the documented barrier was global and every pinned
+item therefore sat at `current_cohort`. Under the per-edge barrier the pinned frontier can span
+several indices, so the offset now shifts above `highest_pinned_cohort`. Where the frontier is a
+single index the two expressions agree, so no reachable earlier recoloring changed.
 
 ### Recompute boundary
 
@@ -613,9 +686,11 @@ engine's `build_requeue_entry` constructor and the recolor through `recolor_unst
   `new_state: blocked`, `disposition: null`, and `recolor_generation` equal to `g` + 1 — the requeue
   is a recompute.
 - The recolor runs over the unstarted subgraph only, so no other in-flight item moves. Its call
-  shape is the five-argument form
-  `recolor_unstarted(unstarted_items, conflict_edges, pinned, current_generation, current_cohort=current_cohort)`,
-  where `current_cohort` is required and keyword-only.
+  shape is the six-argument form
+  `recolor_unstarted(unstarted_items, conflict_edges, pinned, current_generation, current_cohort=current_cohort, highest_pinned_cohort=highest_pinned_cohort)`,
+  where `current_cohort` and `highest_pinned_cohort` are both required and keyword-only.
+  `highest_pinned_cohort` is derived from re-verified durable state: the highest
+  current-generation cohort index occupied by any in-flight item.
 
 The drift event itself is recorded in `drift_events[]`, which this protocol does not write. See
 `## Radius Drift Detection (F8)`.

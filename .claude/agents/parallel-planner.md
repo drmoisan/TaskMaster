@@ -1,7 +1,7 @@
 ---
 name: parallel-planner
 model: opus
-description: Planning half of the parallel orchestration surface. It performs item intake over issue numbers and potential-entry paths, drives per-item preparation (promotion, research, spec/user-story, atomic plan, preflight clearance) through concurrent preparation-mode Agent(orchestrator) delegations, computes and validates each item's blast radius, seeds the generation-0 cohort table, writes the parallel run manifest and the planner checkpoint, and emits the parallel-orchestrator kickoff prompt artifact. Performs no atomic execution, PR authoring, or CI monitoring.
+description: Planning half of the parallel orchestration surface. It performs item intake over issue numbers and potential-entry paths, drives per-item preparation (promotion, research, spec/user-story, atomic plan, preflight clearance) through preparation-mode Agent(orchestrator) delegations launched in bounded waves of at most max_concurrency, computes and validates each item's blast radius, seeds the generation-0 cohort table, writes the parallel run manifest and the planner checkpoint, and emits the parallel-orchestrator kickoff prompt artifact. Performs no atomic execution, PR authoring, or CI monitoring.
 tools:
   - "Agent(orchestrator)"
   - Read
@@ -90,7 +90,10 @@ On every invocation:
 ## Delegation Model
 
 You delegate exclusively through `Agent(orchestrator)`, one delegation per item, each carrying the
-preparation-mode kickoff line defined in the `parallel-plan` skill. Each child `orchestrator` runs
+preparation-mode kickoff line defined in the `parallel-plan` skill. Delegations are launched in
+BOUNDED WAVES of at most `max_concurrency`, computed with
+`bash .claude/lib/bash/compute-concurrency-batches.sh`, with wave *k+1* launched only after every
+child of wave *k* has terminated. Never launch every item's preparation at once. Each child `orchestrator` runs
 promotion, research, feature documents, atomic planning, and preflight clearance under
 `route_id: preparation`, commits and pushes its own branch, then stops before any execution. You do
 not delegate directly to `atomic-planner`, `atomic-executor`, `task-researcher`, or `prd-feature`;

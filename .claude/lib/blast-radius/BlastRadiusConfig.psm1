@@ -39,6 +39,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusGlob.psm1') 
 $script:ConfigSharedSurfaceKey = 'shared_surfaces'
 $script:ConfigSharedSurfaceGlobKey = 'shared_surface_globs'
 $script:ConfigModuleKey = 'modules'
+$script:ConfigMandateReadKey = 'mandate_reads'
 $script:ConfigOverBreadthKey = 'over_breadth_fraction'
 
 # Numeric types a JSON or literal truth table may carry for the V3 threshold.
@@ -279,6 +280,36 @@ function Get-ConfigRootSurface {
     return @($rootSurface.ToArray())
 }
 
+function Get-ConfigMandateRead {
+    <#
+    .SYNOPSIS
+        Read the read-by-mandate exclusion list from the truth table.
+
+    .DESCRIPTION
+        Port of config_mandate_reads. Mandate reads are the paths every agent is
+        instructed to read before doing any work, so a citation of one of them is
+        evidence that the author obeyed the reading order rather than evidence
+        that the change will write the file (issue #489).
+
+    .PARAMETER Config
+        Parsed config/blast-radius.json. Only the mandate_reads key is read.
+
+    .OUTPUTS
+        System.Object[]. Entries sorted and deduplicated by the underlying
+        reader. A config with no mandate_reads key yields an empty array, which
+        excludes nothing and reproduces pre-change behavior.
+    #>
+    [CmdletBinding()]
+    [OutputType([System.Object[]])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowNull()]
+        [object] $Config
+    )
+
+    return @(Get-ConfigStringList -Config $Config -Key $script:ConfigMandateReadKey)
+}
+
 function Get-ConfigModuleEntry {
     <#
     .SYNOPSIS
@@ -374,57 +405,6 @@ function Get-ConfigOverBreadthFraction {
     return $fraction
 }
 
-function Resolve-BlastRadiusModule {
-    <#
-    .SYNOPSIS
-        Resolve path entries to the module names of the truth-table map.
-
-    .DESCRIPTION
-        Port of resolve_modules. A module joins the radius as soon as one of its
-        globs covers one entry, so the search stops at the first hit per module.
-        A path matching no glob resolves to no module.
-
-    .PARAMETER PathEntry
-        Concrete paths and globs of a radius. An empty collection is accepted.
-
-    .PARAMETER Config
-        Parsed config/blast-radius.json.
-
-    .OUTPUTS
-        System.Object[]. Matched module names, deduplicated and ordinally sorted.
-    #>
-    [CmdletBinding()]
-    [OutputType([System.Object[]])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyCollection()]
-        [AllowEmptyString()]
-        [string[]] $PathEntry,
-        [Parameter(Mandatory = $true)]
-        [AllowNull()]
-        [object] $Config
-    )
-
-    $matched = [System.Collections.Generic.List[string]]::new()
-    foreach ($pair in @(Get-ConfigModuleEntry -Config $Config)) {
-        foreach ($pattern in $pair['globs']) {
-            $hit = $false
-            foreach ($entry in $PathEntry) {
-                if (Test-GlobMatch -Pattern $pattern -Candidate $entry) {
-                    $matched.Add([string]$pair['name'])
-                    $hit = $true
-                    break
-                }
-            }
-            if ($hit) {
-                break
-            }
-        }
-    }
-
-    return @(Get-OrdinalSortedEntry -Entry $matched.ToArray())
-}
-
 function Resolve-BlastRadiusSharedSurface {
     <#
     .SYNOPSIS
@@ -485,7 +465,7 @@ Export-ModuleMember -Function `
     Get-RequiredMapping, `
     Get-ConfigStringList, `
     Get-ConfigRootSurface, `
+    Get-ConfigMandateRead, `
     Get-ConfigModuleEntry, `
     Get-ConfigOverBreadthFraction, `
-    Resolve-BlastRadiusModule, `
     Resolve-BlastRadiusSharedSurface

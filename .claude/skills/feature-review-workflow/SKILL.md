@@ -108,10 +108,10 @@ If the branch diff modifies any path matching `.github/workflows/**`, `scripts/b
         - Python: `poetry run pytest --cov` → artifact: `artifacts/python/lcov.info`
         - PowerShell: `mcp__drm-copilot__run_poshqc_test` → artifact: `artifacts/pester/powershell-coverage.xml`
         - C#: `dotnet test --collect:"XPlat Code Coverage"` → artifact: `artifacts/csharp/coverage.xml`
-        - Coverage thresholds (uniform tier rule per quality-tiers.md):
-          - New code files (added in this feature): line coverage >= 85% and branch coverage >= 75%. Flag as FAIL otherwise.
-          - Modified files (changed but previously existing): line coverage >= 85%, branch coverage >= 75%, and no regression on changed lines relative to baseline. Flag as FAIL otherwise.
-          - Repo-wide per language: line coverage >= 85% and branch coverage >= 75%. Flag as FAIL otherwise.
+        - Coverage thresholds (uniform tier rule per quality-tiers.md). The branch threshold applies only to branch-capable languages — TypeScript, Python, and C#. PowerShell is a coverage language and is fully subject to the line threshold and the no-regression requirement, but Pester measures command (instruction) coverage and line coverage only, so no branch percentage exists to evaluate and no branch threshold applies to it (see `.claude/rules/powershell.md`). Do not flag a missing PowerShell branch figure as FAIL:
+          - New code files (added in this feature): line coverage >= 85%, and branch coverage >= 75% for branch-capable languages. Flag as FAIL otherwise.
+          - Modified files (changed but previously existing): line coverage >= 85%, branch coverage >= 75% for branch-capable languages, and no regression on changed lines relative to baseline. Flag as FAIL otherwise.
+          - Repo-wide per language: line coverage >= 85%, and branch coverage >= 75% for branch-capable languages. Flag as FAIL otherwise.
         - If coverage artifacts already exist from the executor run, inspect them instead of re-running.
         - If no coverage artifact exists for a language that has changed files, flag as FAIL — coverage verification is mandatory for all languages with changed files.
    - Run the smallest relevant subset first when the repo policy permits it.

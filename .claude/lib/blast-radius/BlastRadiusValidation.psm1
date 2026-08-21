@@ -37,6 +37,7 @@ Set-StrictMode -Version Latest
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusExtraction.psm1') -Force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusGlob.psm1') -Force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusConfig.psm1') -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusNormalization.psm1') -Force
 
 # Finding vocabulary. These strings are contract literals consumed by the
 # downstream parallel schema and planner features.
@@ -348,9 +349,14 @@ function Test-BlastRadius {
     # The root-surface set comes from the same -Config value that V1 and V2 use
     # below to resolve modules and shared surfaces, and from the same reader
     # Get-BlastRadius calls. That shared source is what keeps a derived radius
-    # passing V1 and V2 against its own plan (issue #452).
-    $planPath = [string[]]@(Get-PlanPaths -PlanText $PlanText `
-            -RootSurface ([string[]]@(Get-ConfigRootSurface -Config $Config)))
+    # passing V1 and V2 against its own plan (issue #452). The mandate-read
+    # exclusion is applied here for the same reason: the derivation harvest drops
+    # those citations, so V1 and V2 must not then demand that the radius cover
+    # them (issue #489).
+    $planPath = [string[]]@(Get-NonMandateReadEntry -MandateRead (
+            [string[]]@(Get-ConfigMandateRead -Config $Config)) -Entry (
+            [string[]]@(Get-PlanPaths -PlanText $PlanText `
+                    -RootSurface ([string[]]@(Get-ConfigRootSurface -Config $Config)))))
     $planConcrete = [string[]]@(Get-ConcreteEntry -Entry $planPath)
 
     $finding = [System.Collections.Generic.List[hashtable]]::new()

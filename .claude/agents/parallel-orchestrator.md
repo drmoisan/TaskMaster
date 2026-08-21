@@ -187,10 +187,17 @@ Read `cohorts[] { index, generation, item_keys[] }` and schedule from it exactly
 
 Two scheduling rules govern every launch:
 
-1. **Cohort barrier.** Cohort `N+1` branches from `main` only after every cohort-`N` item is
-   `merged` or `worktree_removed`. `current_cohort` increments only on durable confirmation via
-   `git` and `gh` commands, never from in-memory notifications. A blocked item is neither `merged`
-   nor `worktree_removed`, so a blocked item holds the barrier.
+1. **Cohort barrier (per-edge).** An item may start only when every conflicting neighbour
+   (`conflict_edges[]`) that sits in a strictly prior current-generation cohort has `merge_status`
+   of `merged` or `worktree_removed`. `ci_green` does not satisfy the barrier. Same-cohort and
+   later-cohort neighbours do not hold an item back, and an item with no conflicting prior-cohort
+   neighbour may start regardless of other cohorts' progress. Evaluate the predicate only against
+   durable state confirmed by `git` and `gh` commands, never from in-memory notifications. A
+   blocked item is neither `merged` nor `worktree_removed`, so it holds only its own conflicting
+   later-cohort neighbours and, transitively, the tail of its own conflict component; unrelated
+   lanes keep advancing. `current_cohort` is a PROGRESS INDICATOR — the lowest current-generation
+   cohort index still holding a non-terminal, non-withdrawn item, updated only on the same durable
+   confirmation — and gates nothing.
 2. **`max_concurrency` slot filling.** `max_concurrency` caps the number of simultaneously in-flight
    items independently of cohort size. Fill slots in ascending item-key (`issue_num`) order, and
    refill each freed slot with the next unstarted item of the current cohort in the same ascending

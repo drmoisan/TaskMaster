@@ -78,16 +78,21 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
      current-cohort member, so no cohort assignment needs to change.
    - `DEFER_AND_RECOLOR` — the candidate shares an edge with at least one member of the current
      cohort, pinned or not-yet-launched. Defer it to a future cohort and recolor by calling
-     `recolor_unstarted(unstarted_items, conflict_edges, pinned, current_generation, current_cohort=current_cohort)`.
+     `recolor_unstarted(unstarted_items, conflict_edges, pinned, current_generation, current_cohort=current_cohort, highest_pinned_cohort=highest_pinned_cohort)`.
+     `highest_pinned_cohort` is derived from re-verified durable state: the highest
+     current-generation cohort index occupied by any in-flight item.
      The recolor is a recompute: `recolor_generation` increments by exactly one, and it places every
-     unstarted item at an index at or above `current_cohort`, strictly above it when a pinned
-     conflict exists.
+     unstarted item at an index at or above `current_cohort`, strictly above
+     `highest_pinned_cohort` when a pinned conflict exists.
 
    Derive `current_cohort_members` from the re-verified durable state, not from the cached
    checkpoint: it is the full membership of the current-generation cohort at `current_cohort`,
    INCLUDING its not-yet-launched `scheduled` members. Derive `current_cohort` from that same
-   re-verified state; it is F3's top-level `current_cohort` field and is the index the pinned items
-   occupy. Both matter because `max_concurrency` caps simultaneously in-flight items independently
+   re-verified state; it is F3's top-level `current_cohort` field, the lowest current-generation
+   cohort index still holding a non-terminal item. Under the per-edge barrier an in-flight item is
+   not confined to that index, so derive `highest_pinned_cohort` from the same re-verified state as
+   well: the highest current-generation cohort index occupied by any in-flight item. Both matter
+   because `max_concurrency` caps simultaneously in-flight items independently
    of cohort size and refills each freed slot from the same current cohort — see
    `## Cohort Barrier and Max-Concurrency Slot Filling` in
    `.claude/skills/parallel-orchestrate/SKILL.md` — so the current cohort durably holds `scheduled`

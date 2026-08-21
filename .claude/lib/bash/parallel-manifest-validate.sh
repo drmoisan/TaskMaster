@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # parallel-manifest-validate.sh: sourceable bash port of
 # scripts/dev_tools/parallel_manifest_contract.py. Validates a parallel-run
-# manifest document against invariants M1 through M7 and exposes the two
+# manifest document against invariants M1 through M8 and exposes the two
 # default-resolving accessors that every consumer uses instead of reading
 # `mode` and `max_concurrency` directly.
 #
@@ -9,7 +9,8 @@
 # frontmatter checks short-circuit with a single error; then run identity
 # (M2 parallel, M3 mode, M4 max_concurrency, M5 created_at) in schema field
 # order; then the M7 prohibited-key scan, deep results in document order
-# followed by the top-level results; then the M6 items collection.
+# followed by the top-level results; then the M6 items collection; then the
+# key-gated M8 expected_conflict_components assertion.
 #
 # Every error string begins with the literal prefix `Parallel manifest` and
 # ends with a period. The Python module remains the repository authority.
@@ -43,7 +44,7 @@ PM_DEFAULT_MAX_CONCURRENCY=4
 
 # Inclusive bounds on a present `max_concurrency` (invariant M4, A7).
 PM_MIN_CONCURRENCY=1
-PM_MAX_CONCURRENCY=8
+PM_MAX_CONCURRENCY=32
 
 # Keys the manifest rejects at any nesting level (invariant M7).
 PM_DEEP_PROHIBITED_KEYS="depends_on"
@@ -53,6 +54,11 @@ PM_TOP_LEVEL_PROHIBITED_KEYS="integration_branch"
 
 # Detail recorded when the parser refuses an out-of-subset construct.
 PM_SUBSET_DETAIL=""
+
+# Issue numbers already claimed by an earlier expected_conflict_components
+# entry (invariant M8). Threaded across components so cross-component duplicate
+# membership is decided in one pass; reset by pm_validate_text.
+PM_CLAIMED=""
 
 pm_parse_manifest() {
 	# Parse manifest text into the shared node table (invariant M1).
@@ -128,6 +134,108 @@ pm_validate_identity() {
 	fi
 }
 
+pm_declared_issue_nums() {
+	# Echo the space-separated issue_num values the items collection declares.
+	#
+	# Supplies the resolution target for invariant M8 without re-running the M6
+	# item validation: a malformed entry is reported once by M6 and simply
+	# contributes no resolvable key here.
+	local declared="" count index entry_path issue_type issue_value
+	[[ $(yp_type_of "items") == seq ]] || return 0
+	count=$(yp_count_of "items")
+	# Accept only entries whose primary key is already well formed; admitting a
+	# malformed one would produce a second, confusing M8 error for one defect.
+	for ((index = 0; index < count; index++)); do
+		entry_path="items[${index}]"
+		[[ $(yp_type_of "$entry_path") == map ]] || continue
+		issue_type=$(yp_type_of "${entry_path}.issue_num")
+		issue_value=$(yp_value_of "${entry_path}.issue_num")
+		pc_is_positive_integer "$issue_type" "$issue_value" || continue
+		declared="$declared $issue_value"
+	done
+	printf '%s' "$declared"
+}
+
+pm_validate_component_members() {
+	# Validate one component's members list against invariant M8.
+	#
+	# Args: $1 = node path of the members list, $2 = component-scoped context
+	# prefix, $3 = space-separated declared issue_num values. Appends every
+	# accepted key to PM_CLAIMED so the caller's running set enforces the
+	# no-duplicate-membership rule across components.
+	local path="$1" ctx="$2" declared="$3"
+	local members_type count=0 index slot entry_path member_type member_value
+	members_type=$(yp_type_of "$path")
+	if [[ $members_type == seq ]]; then
+		count=$(yp_count_of "$path")
+	fi
+	# A missing key, a scalar, and an empty list are one violation: the
+	# component asserts no membership and therefore carries no information.
+	if [[ $members_type != seq ]] || ((count == 0)); then
+		pc_error_add "$ctx members must be a non-empty list of positive integers."
+		return 0
+	fi
+
+	# Three successive gates per member; the first failure ends that member's
+	# checks, because an unusable value cannot be resolved and an unresolved key
+	# cannot meaningfully duplicate another.
+	for ((index = 0; index < count; index++)); do
+		entry_path="${path}[${index}]"
+		slot="$ctx members[${index}]"
+		member_type=$(yp_type_of "$entry_path")
+		member_value=$(yp_value_of "$entry_path")
+		if ! pc_is_positive_integer "$member_type" "$member_value"; then
+			pc_error_add "$slot must be a positive integer; found: $(pi_repr_at "$entry_path")."
+			continue
+		fi
+		if ! pc_contains_word "$declared" "$member_value"; then
+			pc_error_add "$slot does not resolve to an items[] issue_num; found: $member_value."
+			continue
+		fi
+		if pc_contains_word "$PM_CLAIMED" "$member_value"; then
+			pc_error_add "$slot repeats issue_num $member_value, already claimed by an earlier component."
+			continue
+		fi
+		PM_CLAIMED="$PM_CLAIMED $member_value"
+	done
+}
+
+pm_validate_expected_components() {
+	# Validate the optional expected_conflict_components key (invariant M8).
+	#
+	# Key gated: absence is the overwhelmingly common shape and must cost the
+	# caller nothing, so the whole invariant is skipped rather than defaulted
+	# and a pre-M8 manifest's error list is unchanged.
+	local root="expected_conflict_components"
+	yp_has "$root" || return 0
+	if [[ $(yp_type_of "$root") != seq ]]; then
+		pc_error_add "$PM_CONTEXT $root must be a list."
+		return 0
+	fi
+
+	local declared total position comp_path ctx name_type name_value
+	declared=$(pm_declared_issue_nums)
+	total=$(yp_count_of "$root")
+	for ((position = 0; position < total; position++)); do
+		comp_path="${root}[${position}]"
+		ctx="$PM_CONTEXT ${root}[${position}]"
+		if [[ $(yp_type_of "$comp_path") != map ]]; then
+			pc_error_add "$ctx must be an object."
+			continue
+		fi
+		# Field order follows the documented authoring order: the optional
+		# diagnostic label first, then the required membership list.
+		if yp_has "${comp_path}.name"; then
+			name_type=$(yp_type_of "${comp_path}.name")
+			name_value=$(yp_value_of "${comp_path}.name")
+			if ! pc_is_non_empty_string "$name_type" "$name_value"; then
+				pc_error_add "$ctx name must be a non-empty string."
+			fi
+		fi
+		pm_validate_component_members "${comp_path}.members" "$ctx" "$declared"
+	done
+}
+
 pm_validate_text() {
 	# Validate a manifest document against invariants M1 to M7.
 	#
@@ -139,6 +247,7 @@ pm_validate_text() {
 	local text="$1" parse_status=0
 	pc_errors_reset
 	PM_SUBSET_DETAIL=""
+	PM_CLAIMED=""
 	pm_parse_manifest "$text" || parse_status=$?
 	# An out-of-subset refusal propagates so the caller can distinguish it from
 	# a validation verdict; an M1 failure returns the single-element error list
@@ -156,6 +265,9 @@ pm_validate_text() {
 	# The manifest carries `kind` on every item, unlike the orchestrator
 	# checkpoint, so the shared item validator is asked to require it (S1).
 	pi_validate_items "items" "$PM_CONTEXT" 1
+	# M8 runs last because its membership check resolves against the same items
+	# collection the previous call validated.
+	pm_validate_expected_components
 	return 0
 }
 

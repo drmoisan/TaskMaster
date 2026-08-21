@@ -1,5 +1,6 @@
 ---
 name: typescript-engineer
+model: sonnet
 description: Project-scoped worker that implements and verifies TypeScript changes within typed repository boundaries.
 tools:
   - Read

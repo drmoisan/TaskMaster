@@ -6,8 +6,11 @@
     Destination-runtime PowerShell port of the text-scanning half of
     scripts/dev_tools/_blast_radius_extraction.py. Normalizes line endings,
     partitions atomic-plan lines, extracts backtick-delimited inline-code tokens,
-    classifies those tokens as concrete repository paths or globs, and extracts
-    contract identifiers from a feature spec's interface sections.
+    and classifies those tokens as concrete repository paths or globs.
+    Get-ContractIdentifier was relocated to BlastRadiusNormalization.psm1 so this
+    module stays inside the 500-line limit (issue #489); the three module-scoped
+    heading variables it read travelled with it, because $script: scope is per
+    module.
 
     The Python module remains the authoritative reference implementation. This
     module is one half of a two-language mirror; it never imports validator
@@ -53,16 +56,26 @@ $script:PlanTaskPattern = [regex]::new(
 # on its own line, from producing spurious spans.
 $script:InlineCodeSpanPattern = [regex]::new('`([^`]+)`')
 
-# Markdown ATX heading pattern used to locate spec interface sections.
-$script:HeadingPattern = [regex]::new('^(?<hashes>#{1,6}) (?<title>.+)$')
-
 # Top-level directories of this repository. A token starting with one of these is
-# accepted without needing a recognized extension, which admits directory-shaped
-# tokens and ** globs.
+# accepted without needing a recognized extension, which admits ** globs naming a
+# subtree. artifacts/ is deliberately absent (issue #489): the process-artifact
+# tree is read by mandate rather than written by a work item, so admitting
+# artifacts/** as a subtree claim made unrelated items contend.
 $script:KnownTopLevelSegment = @(
     'scripts/', 'tests/', 'docs/', 'config/', 'schemas/', 'packages/',
-    'extensions/', '.claude/', '.codex/', '.github/', '.agents/', 'artifacts/'
+    'extensions/', '.claude/', '.codex/', '.github/', '.agents/'
 )
+
+# A file citation may carry a trailing line reference such as :90. The suffix is
+# stripped before the extension test so a line-anchored citation keeps the
+# acceptance its unanchored form has; the token itself is recorded verbatim.
+$script:LineSuffixPattern = [regex]::new(':\d+$')
+
+# Documentation-corpus root and the index, counted after that prefix, of the
+# segment that names one feature folder. A glob whose wildcard reaches this
+# segment or any earlier one claims every feature folder in the corpus.
+$script:FeatureCorpusPrefix = 'docs/features/'
+$script:FeatureFolderSegmentIndex = 1
 
 # Fallback acceptance rule: a token shaped <segment>/.../<name>.<ext> counts as a
 # repository path when its final component carries one of these extensions.
@@ -74,18 +87,10 @@ $script:RecognizedPathExtension = [System.Collections.Generic.HashSet[string]]::
     ),
     [StringComparer]::Ordinal)
 
-# A spec section qualifies as an interface section when its heading, or the
-# heading of an ancestor section, contains one of these words.
-$script:ContractHeadingKeyword = @('API', 'Interface', 'Contract', 'Surface')
-
 # Classification vocabulary for accepted path tokens. Concrete entries take part
 # in exact-match checks; glob entries cannot and are matched by pattern.
 $script:PathKindConcrete = 'concrete'
 $script:PathKindGlob = 'glob'
-
-# Heading depth sentinel standing in for the Python `qualifying_depth is None`
-# state: markdown heading levels are 1..6, so 0 can never be a real level.
-$script:NoQualifyingHeadingDepth = 0
 
 
 function ConvertTo-NormalizedLine {
@@ -228,6 +233,60 @@ function Get-InlineCodeToken {
     return @($token.ToArray())
 }
 
+function Test-MultipleFeatureFolderSpan {
+    <#
+    .SYNOPSIS
+        Report whether a glob claims more than one documentation feature folder.
+
+    .DESCRIPTION
+        Port of spans_multiple_feature_folders. The documentation corpus is laid
+        out as docs/features/<bucket>/<feature-folder>/..., so a glob whose
+        wildcard occupies or truncates the feature-folder segment claims every
+        feature folder in the corpus. That made two unrelated work items contend
+        purely because both wrote documentation (issue #489). A glob carrying a
+        complete, wildcard-free feature-folder segment claims one folder and is
+        retained.
+
+    .PARAMETER Token
+        A wildcard-bearing token already accepted by the shape rules of
+        Get-PathTokenKind.
+
+    .OUTPUTS
+        System.Boolean. True when the token is rooted in the documentation corpus
+        and its wildcard reaches the feature-folder segment or any earlier one.
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [string] $Token
+    )
+
+    if (-not $Token.StartsWith($script:FeatureCorpusPrefix,
+            [System.StringComparison]::Ordinal)) {
+        return $false
+    }
+
+    $segment = @($Token.Substring($script:FeatureCorpusPrefix.Length) -split '/')
+
+    # A token that stops at or before the feature-folder segment has had that
+    # segment truncated away by the wildcard, so it spans the whole corpus.
+    if ($segment.Count -le $script:FeatureFolderSegmentIndex) {
+        return $true
+    }
+
+    # Every segment up to and including the feature-folder name must be a literal
+    # for the claim to resolve to exactly one folder.
+    for ($index = 0; $index -le $script:FeatureFolderSegmentIndex; $index++) {
+        if ($segment[$index].IndexOf('*') -ge 0) {
+            return $true
+        }
+    }
+
+    return $false
+}
+
 function Get-PathTokenKind {
     <#
     .SYNOPSIS
@@ -287,12 +346,28 @@ function Get-PathTokenKind {
     }
 
     # Read the final component's extension for the fallback acceptance rule; a
-    # component with no dot (a directory name or **) has no extension.
-    $finalComponent = $Token.Substring($Token.LastIndexOf('/') + 1)
+    # component with no dot (a directory name or **) has no extension. A trailing
+    # line reference is stripped first so file.md:90 reads as md rather than as
+    # the unrecognized extension md:90.
+    $finalComponent = $script:LineSuffixPattern.Replace(
+        $Token.Substring($Token.LastIndexOf('/') + 1), '')
     $extension = ''
     $dotIndex = $finalComponent.LastIndexOf('.')
     if ($dotIndex -ge 0) {
         $extension = $finalComponent.Substring($dotIndex + 1).ToLowerInvariant()
+    }
+
+    $hasExtension = $script:RecognizedPathExtension.Contains($extension)
+
+    # A wildcard-free token must name a file, not a directory (issue #489). A
+    # directory-shaped token such as scripts/dev_tools is a location reference,
+    # not a write claim, and admitting it made every item touching anything under
+    # that directory contend at the path level.
+    if ($Token.IndexOf('*') -lt 0) {
+        if ($hasExtension) {
+            return $script:PathKindConcrete
+        }
+        return $null
     }
 
     $hasKnownSegment = $false
@@ -303,18 +378,23 @@ function Get-PathTokenKind {
         }
     }
 
-    # Failing both shape rules means the token is prose or a non-path expression
-    # that merely contains a separator, so it is dropped.
-    if (-not $hasKnownSegment -and -not $script:RecognizedPathExtension.Contains($extension)) {
+    # A wildcard-bearing token must still satisfy one of the two documented shape
+    # rules; failing both means the token is prose or a non-path expression that
+    # merely contains a separator, so it is dropped.
+    if (-not $hasKnownSegment -and -not $hasExtension) {
+        return $null
+    }
+
+    # A documentation glob spanning the whole feature corpus is a cross-corpus
+    # claim rather than a write claim, so it is dropped before it can become a
+    # radius entry.
+    if (Test-MultipleFeatureFolderSpan -Token $Token) {
         return $null
     }
 
     # An accepted token carrying a wildcard names a set of files, so it cannot
     # take part in concrete exact-match comparisons and is recorded as a glob.
-    if ($Token.IndexOf('*') -ge 0) {
-        return $script:PathKindGlob
-    }
-    return $script:PathKindConcrete
+    return $script:PathKindGlob
 }
 
 function Get-PathFromLine {
@@ -407,84 +487,12 @@ function Get-PlanPaths {
     return @(Get-PathFromLine -Line $allLine.ToArray() -RootSurface $RootSurface)
 }
 
-function Get-ContractIdentifier {
-    <#
-    .SYNOPSIS
-        Extract contract identifiers from a spec's interface sections.
-
-    .DESCRIPTION
-        Port of extract_contract_identifiers. Implements the contracts level of
-        the radius model: exported symbols, schema names, and CLI identifiers
-        named in inline code inside sections whose heading, or an ancestor
-        heading, contains API, Interface, Contract, or Surface. Markdown sections
-        nest, so a heading deeper than the innermost qualifying heading stays
-        inside that section and inherits its qualification; a heading at or above
-        that level ends the section and is judged on its own title.
-
-    .PARAMETER SpecText
-        Full feature spec.md document text; may be empty.
-
-    .OUTPUTS
-        System.Object[]. Identifiers, deduplicated and ordinally sorted. Tokens
-        containing a separator are excluded as path references.
-    #>
-    [CmdletBinding()]
-    [OutputType([System.Object[]])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyString()]
-        [string] $SpecText
-    )
-
-    $identifier = [System.Collections.Generic.List[string]]::new()
-    $qualifyingDepth = $script:NoQualifyingHeadingDepth
-
-    foreach ($line in @(ConvertTo-NormalizedLine -Text $SpecText)) {
-        $headingMatch = $script:HeadingPattern.Match($line)
-
-        # A heading changes the section context and contributes no identifiers of
-        # its own, so each heading is handled and the line is then skipped.
-        if ($headingMatch.Success) {
-            $headingLevel = $headingMatch.Groups['hashes'].Value.Length
-            if ($qualifyingDepth -ne $script:NoQualifyingHeadingDepth -and
-                $headingLevel -gt $qualifyingDepth) {
-                continue
-            }
-
-            $headingTitle = $headingMatch.Groups['title'].Value
-            $qualifyingDepth = $script:NoQualifyingHeadingDepth
-            foreach ($keyword in $script:ContractHeadingKeyword) {
-                if ($headingTitle.IndexOf($keyword, [System.StringComparison]::Ordinal) -ge 0) {
-                    $qualifyingDepth = $headingLevel
-                    break
-                }
-            }
-            continue
-        }
-
-        if ($qualifyingDepth -eq $script:NoQualifyingHeadingDepth) {
-            continue
-        }
-
-        # Inside a qualifying section an inline-code token without a separator is
-        # a contract identifier; a token with one is a path reference and is
-        # recorded at the paths level instead.
-        foreach ($token in @(Get-InlineCodeToken -Line $line)) {
-            if ($token.IndexOf('/') -lt 0) {
-                $identifier.Add($token)
-            }
-        }
-    }
-
-    return @(Get-OrdinalSortedEntry -Entry $identifier.ToArray())
-}
-
 Export-ModuleMember -Function `
     Get-OrdinalSortedEntry, `
     ConvertTo-NormalizedLine, `
     Get-PlanLineScan, `
     Get-InlineCodeToken, `
+    Test-MultipleFeatureFolderSpan, `
     Get-PathTokenKind, `
     Get-PathFromLine, `
-    Get-PlanPaths, `
-    Get-ContractIdentifier
+    Get-PlanPaths

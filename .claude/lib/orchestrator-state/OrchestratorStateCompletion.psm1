@@ -1,37 +1,68 @@
 <#
 .SYNOPSIS
-    Portable completion-gate presence checks for the orchestrator-state checkpoint.
+    Complete-parity completion-gate validation for the orchestrator-state checkpoint.
 
 .DESCRIPTION
-    Provides the destination-runtime PowerShell mirror of the completion-gate
-    presence checks the pushed-down validate-orchestrator-output hook needs when the
-    authoritative Python validator (`scripts/dev_tools`) is not importable. It
-    reuses the shared load, field-accessor, and base-presence primitives from the
-    sibling `OrchestratorState.psm1` and imports `.claude/lib/model-routing/ModelRouting.psm1`
-    so per-receipt model formulas are available where practical.
+    Provides the destination-runtime PowerShell implementation of the completion
+    validation the pushed-down validate-orchestrator-output hook performs. As of
+    issue #475 this is a COMPLETE-PARITY port of the Python validator's call
+    surface `orchestrator-state --require-complete --require-model-routing`,
+    measured row by row against the parity inventory. It is no longer a
+    presence-level subset and no longer a fallback for an importable Python
+    validator: the portable path is the only path.
 
-    The single public function `Test-OrchestratorStateCompletionReadiness` fails
-    closed on a missing checkpoint file, invalid JSON, or an invalid base shape, then
-    applies the model-routing "required once delegated" existence gate - the
-    delegated-agent set (derived from `delegation_receipts[].agent_name` plus a
-    delegating `next_step`) must be a subset of `model_routing_receipts[].agent` -
-    mirroring `scripts/dev_tools/_orchestrator_state_model_routing_gate.py`. Deep
-    per-receipt routing-contract correctness that requires full Python authority is a
-    documented Non-Goal for the portable path; the gate performs the presence-level
-    existence check and reports missing receipts with error text containing the
-    literal token `model_routing_receipts`, so the completion hook maps a failure to
-    its `MODEL_ROUTING_BLOCKED:` block reason. The Python validator remains
-    authoritative; this module is the fallback mirror only.
+    `Test-OrchestratorStateCompletionReadiness` composes, in the Python
+    reference's order:
+
+      U1        the loader contract (missing file, invalid JSON, non-object root),
+                fail-closed, from `Get-OrchestratorStateCheckpoint`
+      U2-U6     the whole unconditional block, from
+                `Get-OrchestratorStateUnconditionalError`
+      C1,C2     completion step statuses and blocked_reason
+      C3,C4     the route-gated pr_gate and ci_gate contracts
+      C5        mandatory route phases
+      C6        the routing contract, from `OrchestratorStateRoutingContract.psm1`
+      C7        the preparation terminal contract
+      M1        model-routing receipt required once delegated
+      M2        a complexity assessment for every matched receipt phase
+      M3        per-entry re-validation of the U6.C and U6.M families
+
+    PD-2 SINGLE EMISSION (declared divergence). The Python reference emits the
+    U6.C and U6.M per-entry errors TWICE for this flag pair: once in the
+    unconditional block and again inside the model-routing gate's M3 re-run. This
+    port emits each error string exactly once. The M3 reuse requirement is
+    satisfied by INVOKING the same per-entry validator implementation
+    (`Get-OrchestratorStateComplexityAssessmentError` and
+    `Get-OrchestratorStateModelRoutingReceiptError` from
+    `OrchestratorStateModelReceipts.psm1`) inside the gate, exactly as the Python
+    gate reuses its validators, and then adding only strings the accumulated
+    result does not already carry. Reuse is therefore real, and duplication is
+    not. The divergence is deliberate: a hook that counted errors would behave
+    differently against a duplicating validator.
+
+    The `MODEL_ROUTING_BLOCKED` routing guarantee is preserved: a missing routing
+    receipt still yields error text containing the literal token
+    `model_routing_receipts`, so the completion hook maps the failure to its
+    `MODEL_ROUTING_BLOCKED:` block reason.
 #>
 
 Set-StrictMode -Version Latest
 
-# Import the sibling shared module and the portable model-routing module, resolved
-# relative to this module's directory so the imports travel with the pushed-down
-# pack regardless of the consumer repository's working directory.
+# Import the sibling shared module, the portable model-routing formulas, and the
+# ported check families, resolved relative to this module's directory so every
+# import travels with the pushed-down pack regardless of the working directory.
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorState.psm1') -Force
 $script:ModelRoutingModulePath = Join-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath '..') -ChildPath (Join-Path -Path 'model-routing' -ChildPath 'ModelRouting.psm1')
 Import-Module $script:ModelRoutingModulePath -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCheckpointValue.psm1') -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateModelReceipts.psm1') -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateUnconditional.psm1') -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCompletionChecks.psm1') -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateRoutingContract.psm1') -Force
+
+# The two optional keys the M3 leg re-validates, guarded on key presence so an
+# absent key does not emit a spurious "must be a list when present" error.
+$script:COMPLEXITY_ASSESSMENTS_KEY = 'complexity_assessments'
 
 # The subagent types delegated via the Agent tool that can be named by a delegating
 # next_step. Pinned to _DELEGATING_AGENTS in
@@ -182,32 +213,173 @@ function Get-OrchestratorStateModelRoutingGateError {
 
     $receiptAgents = @(Get-OrchestratorStateRoutingReceiptAgent -State $State)
 
-    # Existence invariant: the routing-receipt agent set must be a superset of the
-    # delegated-agent set. Report each delegated agent with no receipt, sorted for
-    # deterministic error ordering.
+    # M1: the routing-receipt agent set must be a superset of the delegated-agent
+    # set. Report each delegated agent with no receipt, sorted for deterministic
+    # error ordering.
     $missing = $delegated | Where-Object { $receiptAgents -notcontains $_ } | Sort-Object
     foreach ($agent in $missing) {
         $errors.Add("Checkpoint model_routing_receipts is missing a receipt for delegated agent: $agent.")
     }
 
+    # M2: every phase named by a receipt that MATCHED a delegated agent must carry
+    # a complexity assessment. Only matched receipts impose the requirement, so an
+    # unrelated receipt cannot force an assessment.
+    $matchedPhases = @(Get-OrchestratorStateMatchedReceiptPhase -State $State -DelegatedAgent $delegated)
+    $assessedPhases = @(Get-OrchestratorStateAssessedPhase -State $State)
+    $unassessed = $matchedPhases | Where-Object { $assessedPhases -cnotcontains $_ } | Sort-Object
+    foreach ($phase in $unassessed) {
+        $errors.Add("Checkpoint complexity_assessments is missing an entry for phase $phase referenced by a model_routing_receipts entry.")
+    }
+
+    # M3: re-validate the U6.M and U6.C families by INVOKING the same per-entry
+    # validator implementation the unconditional block uses, exactly as the Python
+    # gate reuses its validators. Both calls are key-gated so an absent key does
+    # not emit a spurious "must be a list when present" error. Emission is left to
+    # the caller, which applies the PD-2 single-emission rule.
+    $routingField = Get-CheckpointObjectMember -Owner $State -Name $script:MODEL_ROUTING_RECEIPTS_KEY
+    if ($routingField.Present) {
+        $errors.AddRange([string[]]@(Get-OrchestratorStateModelRoutingReceiptError -Value $routingField.Value))
+    }
+    $complexityField = Get-CheckpointObjectMember -Owner $State -Name $script:COMPLEXITY_ASSESSMENTS_KEY
+    if ($complexityField.Present) {
+        $errors.AddRange([string[]]@(Get-OrchestratorStateComplexityAssessmentError -Value $complexityField.Value))
+    }
+
     return $errors.ToArray()
+}
+
+function Get-OrchestratorStateMatchedReceiptPhase {
+    <#
+    .SYNOPSIS
+        Collect the phases named by routing receipts that matched a delegated agent.
+    .DESCRIPTION
+        Private helper mirroring the matched-phase half of
+        ``_routing_receipt_agents_and_matched_phases``. Only a receipt whose
+        ``agent`` is in the delegated set contributes its ``phase``, so an
+        unrelated receipt cannot force a complexity assessment.
+    .PARAMETER State
+        The parsed checkpoint object.
+    .PARAMETER DelegatedAgent
+        The delegated-agent names.
+    .OUTPUTS
+        System.String[] - the matched phases, rendered with Python str() semantics
+        so a non-string phase still yields a stable, comparable key.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [psobject] $State,
+
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [string[]] $DelegatedAgent
+    )
+
+    $phases = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    $receipts = (Get-CheckpointObjectMember -Owner $State -Name $script:MODEL_ROUTING_RECEIPTS_KEY).Value
+    if (-not (Test-CheckpointListValue -Value $receipts)) { return [string[]]@($phases) }
+
+    foreach ($receipt in @($receipts)) {
+        if (-not (Test-CheckpointObjectValue -Value $receipt)) { continue }
+        $agent = (Get-CheckpointObjectMember -Owner $receipt -Name 'agent').Value
+        if (($agent -is [string]) -and ($DelegatedAgent -ccontains [string]$agent)) {
+            $phase = (Get-CheckpointObjectMember -Owner $receipt -Name 'phase').Value
+            [void]$phases.Add((ConvertTo-PythonDisplayText -Value $phase))
+        }
+    }
+    return [string[]]@($phases)
+}
+
+function Get-OrchestratorStateAssessedPhase {
+    <#
+    .SYNOPSIS
+        Collect the phases that carry a complexity-assessment entry.
+    .DESCRIPTION
+        Private helper mirroring ``_assessed_phases``. Every well-formed
+        assessment object contributes its ``phase`` value, including a null one,
+        so a receipt phase paired with an assessment is not reported missing.
+    .PARAMETER State
+        The parsed checkpoint object.
+    .OUTPUTS
+        System.String[] - the assessed phases, rendered with Python str()
+        semantics to match the matched-phase keys.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [psobject] $State
+    )
+
+    $phases = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+    $assessments = (Get-CheckpointObjectMember -Owner $State -Name $script:COMPLEXITY_ASSESSMENTS_KEY).Value
+    if (-not (Test-CheckpointListValue -Value $assessments)) { return [string[]]@($phases) }
+
+    foreach ($assessment in @($assessments)) {
+        if (-not (Test-CheckpointObjectValue -Value $assessment)) { continue }
+        $phase = (Get-CheckpointObjectMember -Owner $assessment -Name 'phase').Value
+        [void]$phases.Add((ConvertTo-PythonDisplayText -Value $phase))
+    }
+    return [string[]]@($phases)
+}
+
+function Add-OrchestratorStateErrorOnce {
+    <#
+    .SYNOPSIS
+        Append error strings the accumulated list does not already carry.
+    .DESCRIPTION
+        Private helper implementing the PD-2 single-emission rule. The M3 leg
+        deliberately re-invokes the U6.C and U6.M per-entry validators, which the
+        unconditional block already ran, so its output overlaps. Appending only
+        the strings not already present keeps the reuse real while emitting each
+        error exactly once, the declared divergence from the Python reference's
+        duplicate emission.
+    .PARAMETER Accumulated
+        The accumulated error list, appended in place.
+    .PARAMETER Candidate
+        The candidate error strings.
+    .OUTPUTS
+        None. The Accumulated list is appended in place.
+    #>
+    [CmdletBinding()]
+    [OutputType([void])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [System.Collections.Generic.List[string]] $Accumulated,
+
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [string[]] $Candidate
+    )
+
+    foreach ($item in $Candidate) {
+        if (-not $Accumulated.Contains($item)) { $Accumulated.Add($item) }
+    }
 }
 
 function Test-OrchestratorStateCompletionReadiness {
     <#
     .SYNOPSIS
-        Validate a checkpoint satisfies the portable completion-gate presence checks.
+        Validate a checkpoint against the complete-parity completion contract.
     .DESCRIPTION
-        Public entry point used by the pushed-down validate-orchestrator-output hook
-        when the authoritative Python validator is not importable. Loads the
-        checkpoint (fail-closed on missing file / invalid JSON / invalid base shape),
-        runs the base-presence check (required keys, step-status validity,
-        blocked_reason validity), then applies the model-routing required-once-
-        delegated existence gate. Returns a hashtable compatible with the hook's
-        invoker contract: ExitCode is 1 whenever any error is present, and Output
-        carries the newline-joined error text (empty on success). A missing routing
-        receipt yields error text containing ``model_routing_receipts`` so the hook
-        surfaces it under ``MODEL_ROUTING_BLOCKED:``.
+        Public entry point used by the pushed-down validate-orchestrator-output
+        hook. Loads the checkpoint (fail-closed on missing file, invalid JSON, or
+        non-object root), then runs the whole unconditional block, the C family,
+        and the M family in the Python reference's order. Returns a hashtable
+        compatible with the hook's invoker contract: ExitCode is 1 whenever any
+        error is present, and Output carries the newline-joined error text (empty
+        on success).
+
+        PD-2 single emission applies to the M3 leg only: the per-entry U6.C and
+        U6.M validators are invoked again there, as the Python gate does, but a
+        string already emitted by the unconditional block is not repeated. Every
+        other check contributes its errors directly.
+
+        A missing routing receipt yields error text containing
+        ``model_routing_receipts`` so the hook surfaces it under
+        ``MODEL_ROUTING_BLOCKED:``.
     .PARAMETER CheckpointPath
         The path to the orchestrator-state checkpoint JSON file.
     .OUTPUTS
@@ -220,18 +392,35 @@ function Test-OrchestratorStateCompletionReadiness {
         [string] $CheckpointPath
     )
 
-    # Fail closed when the checkpoint cannot be loaded: the load error is the whole
-    # output and ExitCode is 1.
+    # U1: fail closed when the checkpoint cannot be loaded. The load error is the
+    # whole output and ExitCode is 1.
     $loaded = Get-OrchestratorStateCheckpoint -CheckpointPath $CheckpointPath
     if (-not $loaded.Ok) {
         return @{ ExitCode = 1; Output = $loaded.Error }
     }
+    $state = $loaded.State
 
-    # Accumulate base-presence errors and existence-gate errors; any error yields a
-    # non-zero ExitCode so the completion hook blocks DONE.
     $errors = [System.Collections.Generic.List[string]]::new()
-    $errors.AddRange([string[]]@(Get-OrchestratorStateBasePresenceError -State $loaded.State))
-    $errors.AddRange([string[]]@(Get-OrchestratorStateModelRoutingGateError -State $loaded.State))
+
+    # U2 through U6: the whole unconditional block, in reference order.
+    $errors.AddRange([string[]]@(Get-OrchestratorStateUnconditionalError -State $state))
+
+    # C family, in the reference's require_complete order: step statuses,
+    # blocked_reason, pr_gate, ci_gate, phase completeness, routing contract, and
+    # the preparation terminal contract.
+    $errors.AddRange([string[]]@(Get-OrchestratorStateCompletionStepStatusError -State $state))
+    $errors.AddRange([string[]]@(Get-OrchestratorStateCompletionBlockedReasonError -State $state))
+    $errors.AddRange([string[]]@(Get-OrchestratorStateCompletionPrGateError -State $state))
+    $errors.AddRange([string[]]@(Get-OrchestratorStateCompletionCiGateError -State $state))
+    $errors.AddRange([string[]]@(Get-OrchestratorStatePhaseCompletenessError -State $state))
+    $errors.AddRange([string[]]@(Get-OrchestratorStateRoutingContractError -State $state))
+    $errors.AddRange([string[]]@(Get-OrchestratorStatePreparationTerminalError -State $state))
+
+    # M family. The gate's M3 leg re-invokes the U6.C and U6.M validators, so its
+    # output is merged under the PD-2 single-emission rule rather than appended
+    # wholesale.
+    Add-OrchestratorStateErrorOnce -Accumulated $errors `
+        -Candidate ([string[]]@(Get-OrchestratorStateModelRoutingGateError -State $state))
 
     if ($errors.Count -gt 0) {
         return @{ ExitCode = 1; Output = ($errors -join [System.Environment]::NewLine) }
