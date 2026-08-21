@@ -1,0 +1,184 @@
+---
+epic: quickfiler-suite-determinism-foundation
+integration_branch: epic/quickfiler-suite-determinism-foundation-integration
+created_at: 2026-08-21T17-45
+intent:
+  epic_type: enabler
+  business_outcome_hypothesis: >-
+    Removing the two sources of nondeterminism from the QuickFiler test suite, and settling the
+    three isolated contract defects that later QuickFiler work must build on, produces a suite
+    whose red is trustworthy — so that the remaining 43 open QuickFiler defects can be certified
+    against evidence rather than against a suite that fails on some runs and passes on others.
+  leading_indicators:
+    - The full nine-assembly suite passes on ten consecutive runs under induced CPU load.
+    - No unit-test run creates a visible window on the desktop.
+    - The IKbdAction contract has no commented-out members and no implementer reporting a
+      delegate type it does not store.
+  nfrs:
+    - No test is stabilized by adding a sleep, a retry, or a timing tolerance.
+    - Coverage of QuickFiler.csproj is retained or improved at every child merge.
+    - No production file exceeds 500 lines after change.
+    - Full C# toolchain (csharpier, analyzers, nullable, MSTest with coverage) green per child.
+features:
+  - issue_num: 511
+    feature_folder: 2026-08-21-winformspumphost-suite-determinism-511
+    depends_on: []
+  - issue_num: 445
+    feature_folder: 2026-08-21-quickfiler-keyboard-action-contract-defects-445
+    depends_on: []
+  - issue_num: 491
+    feature_folder: 2026-08-21-quickfiler-test-form1-live-form-491
+    depends_on: []
+  - issue_num: 449
+    feature_folder: 2026-08-21-quickfiler-explorer-controller-latent-defects-449
+    depends_on: []
+---
+
+# Epic: QuickFiler Suite Determinism Foundation
+
+## Goal
+
+Make the QuickFiler test suite deterministic and headless, and settle three isolated contract
+defects, so that the remaining QuickFiler defect backlog can be delivered against a suite whose
+failures mean something.
+
+This epic is the first of three planned over the QuickFiler defect corpus. It is deliberately the
+smallest and the least entangled: every child here owns a file set that no other child in this
+epic and no child of the two later epics contends on, with the single exception of the shared
+test project file discussed under Shared-Surface Coordination.
+
+## Scope
+
+Five issues across four children:
+
+- **#511 + #571 — `WinFormsPumpHost` suite determinism.** `QuickFiler.Test/TestSupport/WinFormsPumpHost.cs`
+  runs `Application.Run(new ApplicationContext())` on a dedicated STA thread and never adds a form
+  or control, so no window handle is ever created. Eight consumer tests plus thirteen self-tests
+  depend on it. #571's two intermittent failures
+  (`InitializeNineArgOverload_ThroughThePumpHost_SavesParametersAndDelegates` and
+  `InitializeBool_ThroughThePumpHost_CompletesAndInitializesState`) fail inside
+  `QfcItemController.InvokeBeginInvoke` at `QuickFiler/Controllers/QfcItemController.FocusAndTheme.cs:256`
+  precisely because `Control.Invoke` is reached before a handle exists. #511 and #571 are one
+  feature, not two, for the reason in Decomposition Rationale below.
+- **#445 — keyboard-action contract defects.** Three defects across `KaChar.cs`, `KaKey.cs`,
+  `KaStringAsync.cs`, `KbdActions.cs`, and `QuickFiler/Interfaces/IKbdAction.cs`: an inconsistent
+  `Activated` gate in `KaStringAsync.KeyEquals`, an `ArgumentOutOfRangeException` on
+  `KeyEquals("")`, and `KaChar.DelegateType` reporting `typeof(Action<Keys>)` while storing an
+  `Action<char>`.
+- **#491 — live form in the test project.** `QuickFiler.Test/Form1.cs` and its designer are
+  compiled into the test assembly and construct a real form.
+- **#449 — explorer-controller latent defects.** Two latent defects in
+  `QuickFiler/Controllers/QfcExplorerController.cs` plus a block of dead duplicated code.
+
+## Non-Goals
+
+- The `IItemViewer` UI-thread seam consolidation (#489) is **not** in this epic. It rewrites
+  `IItemViewer`, `ItemViewer.cs`, and `ItemViewer.WebViewThread.cs`, which the third epic's
+  ItemViewer child owns. It is scheduled there.
+- Replacing the real message pump with a synchronization-context seam wholesale is **not**
+  mandated here. See Decomposition Rationale.
+- No `.claude/**` file is edited by any child of this epic. Where an issue cites a rule file, the
+  citation is the policy the fix is measured against, not an edit target.
+
+## Shared Design
+
+The suite's nondeterminism has one shape: a real WinForms control is reached through a real
+`Control.Invoke` before its window handle exists, and whether the handle exists depends on OS
+scheduling. The existing seam is already interface-typed and already mockable — see Decomposition
+Rationale — so the correction is deterministic fixture setup, not new abstraction.
+
+## Decomposition Rationale
+
+**#511 and #571 are one child, not two.** `QuickFiler.Test/Controllers/QfcItemController.InitializationTests.Part2.cs:51`
+defines a `UiThreadDispatcherGate` and a `SwapUiThreadDispatcher` helper that mutate the
+process-wide static `UtilitiesCS.UiThread._dispatcher` by reflection, serializing the pump tests
+across two test classes. Any change to the host or its harness must preserve that serialization or
+`QfcItemController.SeamFactoryTests` and `QfcItemController.InitializationTests` deadlock against
+each other under class-level parallelization. Two branches cannot safely make that change
+independently.
+
+The two issues are also in **tension rather than dependency**, and the child must reconcile them
+rather than assume an order. #511 proposes replacing the real pump with an injectable
+synchronization-context seam. Executed literally, that deletes or reclassifies the very tests #571
+wants to stabilize, along with the coverage justifications recorded at
+`QuickFiler/Controllers/QfcItemController.Initialization.cs:166, 261, 293, 404, 448` and
+`QuickFiler/Controllers/QfcItemController.ViewerSetup.cs:31, 256`. The child's spec must decide the
+direction, not inherit it.
+
+**The marshalling seam already exists.** `QfcItemController` holds `IItemViewer` (not a concrete
+control) at `QuickFiler/Controllers/QfcItemController.cs:51`, and `Invoke`, `BeginInvoke`, and
+`InvokeRequired` are re-declared on the interface at `QuickFiler/Viewers/IItemViewer.cs:95-100`
+specifically to stay mockable. A second seam, `UtilitiesCS.Threading.IUiDispatcher`, is held at
+`QuickFiler/Controllers/QfcItemController.cs:66`. Both are already exercised without a pump in
+`QuickFiler.Test/Controllers/QfcItemController.FocusAndThemeTests.cs:99-115`. This epic therefore
+introduces no new seam; the planning premise that a shared test-support seam must be built first
+did not survive inspection.
+
+**Forcing a handle is not a prohibited timing hack.** `.claude/rules/csharp.md:95` prohibits
+"adding sleeps, retries, or timing hacks to mask flaky behavior." Deterministically establishing a
+control's window handle on the pump thread before the act removes the race rather than masking it,
+and is therefore permitted. The child must still record this reading in its spec, because #571's
+own text raises the question.
+
+## Shared-Surface Coordination
+
+`QuickFiler.Test/QuickFiler.Test.csproj` is a legacy non-SDK project with 116 explicit
+`<Compile Include>` entries, so any child that adds or removes a test file must edit it. Two
+children here do, and their regions are partitioned:
+
+- **#491 owns the `Form1` region** — `QuickFiler.Test/QuickFiler.Test.csproj:161-165` (the
+  `Form1.cs` and `Form1.Designer.cs` compile entries) and `:180-181` (the `Form1.resx` embedded
+  resource). No other child may touch those lines.
+- **#449 owns one appended `Compile Include`** for the explorer-controller test file it must
+  create, because no `*Explorer*` test file exists today. It appends to the `Controllers` item
+  group and must not touch the `Form1` region.
+- **#511/#571 and #445 add no compile entry.** Their regression tests belong in existing files
+  that already carry entries: `QuickFiler.Test/TestSupport/WinFormsPumpHostTests.cs` and
+  `QuickFiler.Test/Controllers/QfcItemController.InitializationTests.Part3.cs` for the former;
+  `KaCharTests.cs`, `KaKeyTests.cs`, `KaStringAsyncTests.cs`, `KbdActionsTests.cs`, and
+  `KbdActionsRemainingBranchesTests.cs` for the latter.
+
+With those regions partitioned, all four children sit in wave 0 and the dependency graph is empty.
+
+## Waves
+
+Wave 0 (all four, no dependency edges): #511/#571, #445, #491, #449.
+
+The graph is intentionally empty. Ordering in this epic comes from the csproj region partition
+above, not from `depends_on` edges, because no child's fix changes a contract another child in this
+epic consumes.
+
+## Complexity Assessment
+
+| child | band | rationale |
+| --- | --- | --- |
+| #511 + #571 | C3 | Two issues in tension that the child must reconcile; a process-wide static mutated by reflection; 8 consumer tests and 13 self-tests in blast radius; a policy reading to settle. |
+| #449 | C3 | Two latent defects plus dead duplicated code in a 1,065-line legacy neighbour; no existing test file, so the harness is new; touches `UtilitiesCS` mail-filing collaborators. |
+| #445 | C2 | Five small files, but one genuine behavioural decision (whether the third `KeyEquals` branch should be `Activated`-gated) and a `DelegateType` removal that must not break `KaCharAsync`/`KaKeyAsync`. |
+| #491 | C2 | Bounded removal of a live form from the test assembly, with csproj and one dependent test file. |
+
+## Execution Notes for epic-orchestrator
+
+1. **Re-normalize prepared plans to LF before revalidating.** `core.autocrlf` is `true` in this
+   repository, so each prepared plan committed here as LF materializes as CRLF in a freshly created
+   child worktree, and the MCP `plan` validator has rejected CRLF plans. A validator failure on a
+   plan that passed during preparation is this effect, not a defect in the plan.
+2. **`vstest` requires `/InIsolation`.** Without it, binding redirects in each assembly's
+   `app.config` are ignored and roughly 1,695 phantom failures appear with empty messages and
+   sub-millisecond durations, surfacing as a `TypeInitializationException` from Moq via
+   `System.Threading.Tasks.Extensions`. Use
+   `vstest.console.exe <assemblies> /EnableCodeCoverage /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook"`.
+3. **Exclude `\.claude\` from recursive `*.Test.dll` discovery.** Six stale agent worktrees exist
+   under `.claude/worktrees/`. None currently holds build output, but any of them will once built,
+   and a CI-style recursive search would then load stale assemblies.
+4. **Do not rely on any `PreToolUse` hook.** Every hook in this repository currently reads
+   `$toolInput.command` while the payload nests the value at `$toolInput.tool_input.command`, so
+   the property is always null and each hook returns `permissionDecision: allow`. The epic wave
+   barrier, merge gate, and worktree-removal gate are all inert. Confirm every wave transition from
+   `git worktree list --porcelain`, `git branch`, and `gh pr view --json state,mergedAt,headRefOid`.
+5. **No Python toolchain exists here.** There is no `scripts/dev_tools/` and no Poetry manifest, so
+   any skill step naming `poetry run python -m scripts.dev_tools.*` is unrunnable by absence. The
+   PowerShell equivalents live under `.claude/lib/`.
+6. **The four child issues are already open.** Each child must call only
+   `mcp__drm-copilot__new_active_feature_folder`; `potential_to_issue` has no idempotent path and
+   would file a duplicate.
