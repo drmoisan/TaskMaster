@@ -946,60 +946,60 @@ authoritative verification.
 Sixteen criteria. Each is independently verifiable and names its verification (a test name, a command,
 or an artifact path).
 
-- [ ] **AC-1 (D1, defect 1 remedy).** `void ExplConvView_Cleanup();` is removed from
+- [x] **AC-1 (D1, defect 1 remedy).** `void ExplConvView_Cleanup();` is removed from
       `QuickFiler/Interfaces/IQfcExplorerController.cs:12`, and the implementation plus its
       `//PRIORITY:` comment are removed from `QuickFiler/Controllers/QfcExplorerController.cs:60-64`.
       **Verify:** `git grep -n "ExplConvView_Cleanup" -- "*.cs"` returns hits only in the uncompiled
       `QuickFiler/Legacy/QuickFileController.cs` and `QuickFiler/Notes/notes_interfaces.cs`, and
       toolchain steps 3 and 4 pass.
-- [ ] **AC-2 (D1 knowledge preservation).** This spec carries a section headed exactly
+- [x] **AC-2 (D1 knowledge preservation).** This spec carries a section headed exactly
       `## Removed contract — legacy semantics for future restoration` containing the verbatim legacy
       body from `QuickFiler/Legacy/QuickFileController.cs:851-869`, the semantic summary, the modern
       member-equivalence table, the fallback implementation, and the recorded catch-asymmetry analysis.
       **Verify:** read the section in `spec.md`; the pull-request body references it.
-- [ ] **AC-3 (D2, defect 2 remedy with a named regression test).** `QfcExplorerController.cs:140` reads
+- [x] **AC-3 (D2, defect 2 remedy with a named regression test).** `QfcExplorerController.cs:140` reads
       `_activeExplorer.CurrentFolder = (MAPIFolder)mailItem.Parent;`, and the test
       `OpenQFItem_WhenActiveExplorerChangesAfterConstruction_UsesTheConstructorCapturedExplorer` in
       `QuickFiler.Test/Controllers/QfcExplorerControllerTests.cs` passes. **Verify:** the test-run
       artifact under `evidence/qa-gates/` shows the named test failing before the fix and passing after,
       per the D7 `[expect-fail]` sequencing.
-- [ ] **AC-4 (D2 residual re-resolution check).** No `ActiveExplorer()` call remains in
+- [x] **AC-4 (D2 residual re-resolution check).** No `ActiveExplorer()` call remains in
       `QfcExplorerController.cs` other than the constructor capture at line 35. **Verify:**
       `git grep -n "ActiveExplorer()" -- QuickFiler/Controllers/QfcExplorerController.cs` returns exactly
       one line.
-- [ ] **AC-5 (D2 documentation correction).** The spec records that the defective call is in the private
+- [x] **AC-5 (D2 documentation correction).** The spec records that the defective call is in the private
       helper `NavigateToOutlookFolder(MailItem)` (lines 133-143) reached from `OpenQFItem` via line 149,
       not directly in `OpenQFItem`; that line 140 was the only re-resolution in the file; and that the
       issue criterion's alternative branch ("document why a fresh call is required") does not apply
       because no behavioral dependency on the fresh call exists. **Verify:** read Root Cause Analysis
       and decision D2 in this spec.
-- [ ] **AC-6 (D3, defect 3 deletion).** Lines 183-321 of `QfcExplorerController.cs` — the
+- [x] **AC-6 (D3, defect 3 deletion).** Lines 183-321 of `QfcExplorerController.cs` — the
       `#region Email Sorting To Rewrite` — are deleted, and none of `SanitizeArrayLineTSV`,
       `StripTabsCrLf`, `WriteCSV_StartNewFileIfDoesNotExist`, `SanitizeArray`, `SaveMessageAsMSG`,
       `GetCurrentExplorerFolder` remains anywhere under `QuickFiler/`. **Verify:**
       `git grep -n -E "SanitizeArrayLineTSV|StripTabsCrLf|WriteCSV_StartNewFileIfDoesNotExist|SanitizeArray|SaveMessageAsMSG|GetCurrentExplorerFolder" -- QuickFiler QuickFiler.Test`
       returns no match.
-- [ ] **AC-7 (D3 no-behavior-change evidence).** A full-suite run before the change and a full-suite run
+- [x] **AC-7 (D3 no-behavior-change evidence).** A full-suite run before the change and a full-suite run
       after the change produce the same set of passing tests, with the new tests as the only additions
       and no new failures. **Verify:** both run logs are committed under
       `docs/features/active/2026-08-07-quickfiler-explorer-controller-latent-defects-449/evidence/qa-gates/`
       and the comparison is stated in the pull-request body.
-- [ ] **AC-8 (D4 hygiene, self-verifying).** The nine directives at lines 1, 2, 3, 4, 5, 6, 7, 8, 13, 15
+- [x] **AC-8 (D4 hygiene, self-verifying).** The nine directives at lines 1, 2, 3, 4, 5, 6, 7, 8, 13, 15
       identified in the D4 table are removed and the six retained directives (9, 10, 11, 12, 14, 16)
       remain. **Verify:** toolchain steps 3 and 4 pass, which proves no removed directive was required
       (a required directive fails with CS0246 or CS1061); and the pull-request body labels the removal as
       hygiene, not a gate fix, noting that three of the directives were already unused on green `main`.
-- [ ] **AC-9 (D5 attribute removal).** No `[ExcludeFromCodeCoverage]` attribute remains anywhere in
+- [x] **AC-9 (D5 attribute removal).** No `[ExcludeFromCodeCoverage]` attribute remains anywhere in
       `QuickFiler/Controllers/QfcExplorerController.cs`. **Verify:**
       `git grep -n "ExcludeFromCodeCoverage" -- QuickFiler/Controllers/QfcExplorerController.cs` returns
       no match.
-- [ ] **AC-10 (D5 dialog seam).** An injectable modal-dialog seam exists on `QfcExplorerController` whose
+- [x] **AC-10 (D5 dialog seam).** An injectable modal-dialog seam exists on `QfcExplorerController` whose
       default invokes `MessageBox.Show` with the existing message, caption, buttons, and icon; the call
       at line 168 goes through it; and a test exercises the not-in-view branch with the seam replaced, so
       no dialog is displayed. **Verify:** the named seam test passes in the run artifact under
       `evidence/qa-gates/`, and `git grep -n "MessageBox.Show" -- QuickFiler/Controllers/QfcExplorerController.cs`
       shows the call only in the seam's default initialiser.
-- [ ] **AC-11 (D5 coverage decision, measured and reported).** A merge-base coverage baseline is
+- [x] **AC-11 (D5 coverage decision, measured and reported).** A merge-base coverage baseline is
       captured and committed under
       `docs/features/active/2026-08-07-quickfiler-explorer-controller-latent-defects-449/evidence/baseline/`
       and the post-change measurement under
@@ -1013,7 +1013,7 @@ or an artifact path).
       the epic NFR "Coverage of `QuickFiler.csproj` is retained or improved" is not met, the shortfall is
       stated explicitly with its reason. **No blanket class-level `[ExcludeFromCodeCoverage]` is
       restored.** **Verify:** read the coverage evidence artifact; confirm AC-9 still holds.
-- [ ] **AC-12 (D6 test file and single project-file entry).**
+- [x] **AC-12 (D6 test file and single project-file entry).**
       `QuickFiler.Test/Controllers/QfcExplorerControllerTests.cs` exists with class
       `QfcExplorerControllerTests` in namespace `QuickFiler.Controllers.Tests`, using MSTest, Moq, and
       FluentAssertions; exactly one `<Compile Include="Controllers\QfcExplorerControllerTests.cs" />`
@@ -1023,25 +1023,25 @@ or an artifact path).
       `Form1.resx` `EmbeddedResource` are unchanged. **Verify:**
       `git diff -- QuickFiler.Test/QuickFiler.Test.csproj` shows a single added line adjacent to the
       `QfcDatamodelLivenessTests` entry and no change within the `Form1` region.
-- [ ] **AC-13 (deterministic regression tests).** No test added by this change creates a temporary file,
+- [x] **AC-13 (deterministic regression tests).** No test added by this change creates a temporary file,
       constructs a live form, starts a message pump, calls `MessageBox.Show`, or uses `Thread.Sleep`,
       `Task.Delay`, or a wall-clock wait; tests pass in any order. **Verify:**
       `git grep -n -E "Thread.Sleep|Task.Delay|MessageBox.Show|Path.GetTempPath|new Form|Application.Run" -- QuickFiler.Test/Controllers/QfcExplorerControllerTests.cs`
       returns no match, and the suite passes on two consecutive full runs recorded under
       `evidence/qa-gates/`.
-- [ ] **AC-14 (D7 fail-before dossiers).** Two `fail-before-exception.<timestamp>.md` dossiers exist
+- [x] **AC-14 (D7 fail-before dossiers).** Two `fail-before-exception.<timestamp>.md` dossiers exist
       under
       `docs/features/active/2026-08-07-quickfiler-explorer-controller-latent-defects-449/evidence/regression-testing/`
       — one for defect 1, one for defect 3 — each carrying `Timestamp:`, `Command:`, `EXIT_CODE:`,
       `WhyFailingRunImpossible:`, and the absence proof as `SearchScope:`, `SearchPatterns:`, and
       `SearchResult:` fields. **Verify:** read both artifacts; confirm each `Command:` reproduces the
       recorded `SearchResult:`.
-- [ ] **AC-15 (clean full-toolchain pass).** The five-step toolchain above completes in a single pass
+- [x] **AC-15 (clean full-toolchain pass).** The five-step toolchain above completes in a single pass
       with no failure and no file modified by a formatting step, using `/t:Rebuild` (never `/t:Build`),
       without `/p:Nullable=enable`, with `/InIsolation`, and with `\.claude\` excluded from test-assembly
       discovery. **Verify:** the commands run and their exit codes are recorded under
       `evidence/qa-gates/`, and the pull-request body states that all steps passed in the final pass.
-- [ ] **AC-16 (file-size cap attribution).** Every file in the diff is under 500 lines —
+- [x] **AC-16 (file-size cap attribution).** Every file in the diff is under 500 lines —
       `QfcExplorerController.cs` approximately 179, `IQfcExplorerController.cs` 14,
       `QuickFiler.Test.csproj` 485, and the new test file under 500 — and neither
       `UtilitiesCS/EmailIntelligence/EmailParsingSorting/SortEmail.cs` nor
