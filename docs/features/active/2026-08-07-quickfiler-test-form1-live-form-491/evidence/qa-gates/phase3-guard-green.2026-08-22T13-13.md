@@ -1,0 +1,6 @@
+Timestamp: 2026-08-22T13-13
+Command: & $vstest .\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCoverage /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName~NoLiveFormInTestAssemblyTests"
+EXIT_CODE: 1
+Output Summary: Total tests: 1. Failed: 1 (Passed: 0, implicit). Fully-qualified name that ran: `QuickFiler.Test.NoLiveFormInTestAssemblyTests.ExecutingAssembly_ContainsNoFormDerivedType`.
+
+ACCEPTANCE NOT MET: this task requires `EXIT_CODE: 0`, total 1, passed 1, failed 0, i.e. the guard's green counterpart to the P1-T5 red run. Instead the guard remains red after Phase 2's `Form1` removal, for the same reason documented in the P1-T6 and phase3-vstest artifacts: `QuickFiler.Test` still contains the unrelated, pre-existing Form-derived type `QuickFiler.Controllers.Tests.QfcHomeControllerTests+QfcFormViewerDerived` (extending production type `QuickFiler.Viewers.QfcFormViewer : Form`), which is outside this plan's owned file set and is not removed by Phase 2. Consequently acceptance criterion 1 in `spec.md` cannot be checked off against this run (see P4-T6 disposition in the completion report). This finding is escalated rather than resolved by widening scope.

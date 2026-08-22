@@ -1,0 +1,10 @@
+Timestamp: 2026-08-22T13-13
+Command: (no new command; this artifact compares the P0-T18 baseline counts against the P3-T6 post-change counts, both already captured)
+EXIT_CODE: N/A
+Output Summary: Baseline (P0-T18): Total 6437, Passed 6436, Failed 1, Skipped 0. Post-change (P3-T6): Total 6438, Passed 6437, Failed 1, Skipped 0.
+
+Total-count check: post-change total (6438) equals baseline total (6437) plus exactly 1 — SATISFIED. No re-run trigger fires (the plan's re-run allowance is conditioned on a non-numeric placeholder total or a total-count difference other than 1; neither condition is present here, so no re-run is authorized or needed for the total-count check).
+
+Failed-count check: post-change failed count must be 0 — NOT SATISFIED (post-change failed count is 1).
+
+This task's acceptance condition ("the post-change failed count is 0 and the post-change total equals the baseline total plus exactly 1") is therefore NOT fully met. The one post-change failure is the new guard test itself (`NoLiveFormInTestAssemblyTests.ExecutingAssembly_ContainsNoFormDerivedType`), failing for the reason documented throughout Phase 1/Phase 3 (the pre-existing, out-of-scope `QfcFormViewerDerived` type). This is not a regressed or dropped pre-existing test — the baseline's own single failure (`UtilitiesCS.Test.Threading.ProgressTrackerAsync_Tests.InitializeAsync_WithCurrentDispatcher_InitializesAndReturnsTracker`, an unrelated load-flaky STA-timing test) did not recur in the post-change run, and no other pre-existing test regressed. The sole reason this task's failed-count condition fails is the new guard test's own deterministic assertion against a pre-existing structural condition outside this plan's scope. A re-run would not change this outcome, since the failure is deterministic, not flaky, so no re-run was performed for this condition. This task is left unchecked and is escalated in the plan-completion report. Acceptance criterion 9 in `spec.md` (P4-T14) cannot be checked off against this artifact as written, though the "no pre-existing test regresses" half of AC 9 IS independently true.

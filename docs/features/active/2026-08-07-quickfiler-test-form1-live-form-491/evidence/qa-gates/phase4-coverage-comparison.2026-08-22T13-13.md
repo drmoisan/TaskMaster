@@ -1,0 +1,4 @@
+Timestamp: 2026-08-22T13-13
+Command: N/A — this task's prerequisite (P4-T2's numeric post-change figures) does not exist.
+EXIT_CODE: N/A
+Output Summary: NOT COMPLETED. No comparison can be honestly made without a genuine, Koverage-filtered post-change coverage figure (see phase4-coverage-capture and phase4-coverage-postchange artifacts for the root cause: the guard-test failure caused by the pre-existing, out-of-scope `QfcFormViewerDerived` type prevents `Invoke-MSTestWithCoverage.ps1` from completing a filtered coverage run). Baseline figures remain available from P0-T20 (85.5788%, lines-covered 53402, lines-valid 62401), but no comparable post-change figure exists. This task is left unchecked and reported as an open item in the completion report. Acceptance criterion 10 in `spec.md` (P4-T15) cannot be checked off against this artifact.

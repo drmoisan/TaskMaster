@@ -1,23 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Interfaces;
-using ToDoModel;
 using UtilitiesCS;
-using UtilitiesCS.OutlookExtensions;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace QuickFiler.Controllers
 {
-    [ExcludeFromCodeCoverage]
     internal class QfcExplorerController : IQfcExplorerController
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(
@@ -57,11 +46,21 @@ namespace QuickFiler.Controllers
             get => _activeExplorer.CommandBars.GetPressedMso("ShowInConversations");
         }
 
-        //PRIORITY: Implement ExplConvView_Cleanup
-        public void ExplConvView_Cleanup()
-        {
-            throw new NotImplementedException();
-        }
+        // Injectable seam for the not-in-view prompt. The branch it guards calls a modal WinForms
+        // dialog, which cannot be exercised in a headless unit test: the dialog blocks on user input
+        // and requires a message pump. Tests replace this delegate with a stub that records the
+        // arguments and returns the DialogResult under test. The delegate type is written fully
+        // qualified as System.Func<...> so the seam does not resurrect the `using System;` directive
+        // that was removed as orphaned, matching the file's existing fully-qualified style for
+        // log4net.ILog and System.Reflection.MethodBase above.
+        internal System.Func<
+            string,
+            string,
+            MessageBoxButtons,
+            MessageBoxIcon,
+            DialogResult
+        > NotInViewDialogInvoker { get; set; } =
+            (text, caption, buttons, icon) => MessageBox.Show(text, caption, buttons, icon);
 
         public void ExplConvView_ReturnState()
         {
@@ -137,7 +136,7 @@ namespace QuickFiler.Controllers
             )
             {
                 ExplConvView_ReturnState();
-                _globals.Ol.App.ActiveExplorer().CurrentFolder = (MAPIFolder)mailItem.Parent;
+                _activeExplorer.CurrentFolder = (MAPIFolder)mailItem.Parent;
                 BlShowInConversations = AutoFile.AreConversationsGrouped(_activeExplorer);
             }
         }
@@ -165,7 +164,7 @@ namespace QuickFiler.Controllers
             }
             else
             {
-                DialogResult result = MessageBox.Show(
+                DialogResult result = NotInViewDialogInvoker(
                     "Selected message is not in view. Would you like to open it?",
                     "Error",
                     MessageBoxButtons.YesNo,
@@ -179,145 +178,5 @@ namespace QuickFiler.Controllers
             if (_initType.HasFlag(QfEnums.InitTypeEnum.Sort) & BlShowInConversations)
                 await Task.Run(() => ExplConvView_ToggleOn());
         }
-
-        #region Email Sorting To Rewrite
-
-        private static string SanitizeArrayLineTSV(ref string[] strOutput)
-        {
-            if (strOutput.IsInitialized())
-            {
-                return string.Join(
-                    "\t",
-                    strOutput
-                        .Where(s => !string.IsNullOrEmpty(s))
-                        .Select(s => StripTabsCrLf(s))
-                        .ToArray()
-                );
-            }
-            else
-            {
-                return "";
-            }
-        }
-
-        internal static string StripTabsCrLf(string str)
-        {
-            var _regex = new Regex(@"[\t\n\r]*");
-            string result = _regex.Replace(str, " ");
-
-            // ensure max of one space per word
-            _regex = new Regex(@"  +");
-            result = _regex.Replace(result, " ");
-            result = result.Trim();
-            return result;
-        }
-
-        //TODO: Rewrite WriteCSV_StartNewFileIfDoesNotExist To Split it into one task per function
-        private static void WriteCSV_StartNewFileIfDoesNotExist(
-            string strFileName,
-            string strFileLocation
-        )
-        {
-            string[] strOutput = null;
-            string[,] strAryOutput;
-            if (File.Exists(Path.Combine(strFileName, strFileLocation)))
-            {
-                strAryOutput = new string[14, 2];
-
-                strAryOutput[1, 1] = "Triage";
-                strAryOutput[2, 1] = "FolderName";
-                strAryOutput[3, 1] = "Sent_On";
-                strAryOutput[4, 1] = "From";
-                strAryOutput[5, 1] = "To";
-                strAryOutput[6, 1] = "CC";
-                strAryOutput[7, 1] = "Subject";
-                strAryOutput[8, 1] = "Body";
-                strAryOutput[9, 1] = "fromDomain";
-                strAryOutput[10, 1] = "Conversation_ID";
-                strAryOutput[11, 1] = "EntryID";
-                strAryOutput[12, 1] = "Attachments";
-                strAryOutput[13, 1] = "FlaggedAsTask";
-
-                SanitizeArray(strAryOutput, ref strOutput);
-                FileIO2.WriteTextFile(strFileName, strOutput, folderpath: strFileLocation);
-            }
-            strOutput = null;
-            strAryOutput = null;
-        }
-
-        //QUESTION: Does this exist in a utility class? Check FileIO2
-        private static void SanitizeArray(string[,] strAryOutput, ref string[] strOutput)
-        {
-            if (strAryOutput == null)
-            {
-                Debug.WriteLine($"The array {nameof(strAryOutput)} is empty.");
-            }
-            else
-            {
-                for (int j = 0; j < strAryOutput.GetLength(0); j++)
-                {
-                    strOutput[j] = string.Join(
-                        "\t",
-                        strAryOutput
-                            .SliceRow(j)
-                            .Where(s => !string.IsNullOrEmpty(s))
-                            .Select(s => StripTabsCrLf(s))
-                            .ToArray()
-                    );
-                }
-            }
-        }
-
-        //TODO: Implement SaveMessageAsMSG
-        private static void SaveMessageAsMSG(string fileSystem_LOC, IList<MailItem> selItems)
-        {
-            throw new NotImplementedException();
-        }
-
-        //TODO: Convert GetCurrentExplorerFolder to use the folder handler class
-        private static Folder GetCurrentExplorerFolder(
-            Explorer ActiveExplorer,
-            object objItem = null
-        )
-        {
-            if (objItem is null)
-            {
-                objItem = ActiveExplorer.Selection[0];
-            }
-
-            if (objItem is MailItem)
-            {
-                MailItem OlMail = (MailItem)objItem;
-                return (Folder)OlMail.Parent;
-            }
-            else if (objItem is AppointmentItem)
-            {
-                AppointmentItem OlAppointment = (AppointmentItem)objItem;
-                return (Folder)OlAppointment.Parent;
-            }
-            else if (objItem is MeetingItem)
-            {
-                MeetingItem OlMeeting = (MeetingItem)objItem;
-                return (Folder)OlMeeting.Parent;
-            }
-            else if (objItem is TaskItem)
-            {
-                TaskItem OlTask = (TaskItem)objItem;
-                return (Folder)OlTask.Parent;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        //public static void Cleanup_Files()
-        //{
-        //    // Call WRITE_Text_File     - Writes to the recents list
-        //    // Call Email_AutoCategorize.CTF_Incidence_Text_File_WRITE - Writes to the CTF_Incidence file
-        //    // Call Email_AutoCategorize.Subject_MAP_Text_File_WRITE - Writes to the Subject_MAP file
-        //}
-
-        #endregion
     }
 }
