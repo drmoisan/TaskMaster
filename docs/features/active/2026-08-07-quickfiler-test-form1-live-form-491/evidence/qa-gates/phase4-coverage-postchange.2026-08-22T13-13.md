@@ -1,0 +1,4 @@
+Timestamp: 2026-08-22T13-13
+Command: N/A — this task's prerequisite (a valid, Koverage-filtered post-change Cobertura artifact from P4-T1) does not exist.
+EXIT_CODE: N/A
+Output Summary: NOT COMPLETED. Per the phase4-coverage-capture artifact, `Invoke-MSTestWithCoverage.ps1` threw at line 236 (a non-zero `dotnet-coverage`/vstest exit code, caused by the guard-test failure documented in P1-T6/phase3-vstest/phase3-guard-green) before producing a Koverage-filtered artifact. No numeric post-change line-coverage percentage, `lines-covered`, or `lines-valid` value can be honestly extracted without either (a) fabricating a figure, which is prohibited, or (b) substituting the raw, unfiltered, disqualified figure recorded and discarded in the phase4-coverage-capture artifact, which the plan explicitly forbids using as either side of the comparison. This task is left unchecked in the plan and reported as an open item in the completion report.

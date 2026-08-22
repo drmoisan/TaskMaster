@@ -1,7 +1,7 @@
 - [CLAUDE.md nullable command != CI gate — RESOLVED by #540](project_claudemd_nullable_command_diverges_from_ci.md) — docs now match ci.yml; a reappearance of `/p:Nullable=enable` or `/t:Build` is a regression. Carries the 195-error UtilitiesCS lower bound for #492
 - [PoshQC test drops coverage.xml at repo root](poshqc-test-drops-coverage-xml-at-repo-root.md) — untracked, not gitignored/csharpierignored; inflates the CSharpier file count and leaks into `git add -A`
 - [Agent-worktree discovery + evidence hygiene](project_agent_worktree_discovery_and_evidence_hygiene.md) — `\.claude\` test-glob filter must use the RELATIVE path; never commit raw Cobertura
-- [Completion-gate receipt shapes](completion-gate-receipt-shapes.md) — exact fields require_complete wants: delegation_receipts as a LIST, skill_receipts required:true
+- [Completion-gate receipt shapes](completion-gate-receipt-shapes.md) — SOLVED: the missing key is `evidence`; plus the bug-route `new_potential_bug_entry` swap that MCP and the hook disagree on
 - [JaCoCo not Cobertura for coverage evidence](jacoco-not-cobertura-for-evidence.md) — maintainer deletes committed Cobertura; convert to package-level JaCoCo before pushing
 - [Store-lockup watchdog null-model hazard](project_store_lockup_watchdog_null_model_hazard.md) — new startup COM scopes need a phase-branch returning before the disable-service write
 - [VS Code extension location](project_extension_location.md) — the extension lives at `extensions/drm-copilot/`, not the repo root
@@ -51,7 +51,8 @@
 - [STA controls ratified as last resort](feedback_sta_controls_last_resort_ratified.md) — unshown WinForms controls on STA are OK only after seams, in dedicated *.StaTests.cs
 - [Epic children need full lifecycle + PRs](feedback_epic_children_require_full_lifecycle_and_prs.md) — maintainer rejected executor-driver shortcuts and direct child merges; PRs are mandatory
 - [Verify subagent capability claims](feedback_verify_subagent_capability_claims.md) — never relay "agent type not registered" without checking .claude/agents yourself
-- [Epic-child plan Phase 0 paths are stale](feedback_plan_phase0_paths_are_stale_in_epic_children.md) — plans cite the planning worktree's absolute paths; redirect the executor to the current one
+- [Epic-child plan Phase 0 paths are stale](feedback_plan_phase0_paths_are_stale_in_epic_children.md) — redirect the executor at execution time; in PREPARATION mode fix the plan to resolve WS from git rev-parse
+- [Absolute-zero gate on a sibling-owned assembly](absolute-zero-gate-on-sibling-owned-assembly.md) — a child can't pass "Failed 0" over an assembly holding a wave-sibling's failures; scope zero to owned classes
 - [Unplanned epic-child worktree mechanics](unplanned-epic-child-worktree-mechanics.md) — cross-worktree delegation works via absolute paths; C# tools need pwsh + explicit paths
 - [Epic generic-constraint cascades across children](epic-generic-constraint-cascades-multiple-children.md) — a `where TKey : notnull` emits CS8714 in EVERY consumer; enumerate all of them first
 - [Parallel epic children name collisions](parallel-epic-children-name-collisions.md) — siblings coin identical type names; CS0101/CS0104 surface only at rebase; rename YOUR types
@@ -78,3 +79,7 @@
 - [Removing a halt requires branch propagation](removing-a-halt-requires-branch-propagation.md) — converting a HALT into a recorded blocker strands downstream tasks; propagate to ALL consumers
 - [Bash tool rejects complex commands in isolated worktrees](bash-tool-rejects-complex-commands-in-isolated-worktree.md) — heredoc+redirect+git compounds are refused as unverifiable; gather with plain chained commands, then author via Write
 - [#457 coverage moved UP, and the kickoff figure was wrong](project_457_coverage_moved_up_not_down.md) — the denominator fix raised the rate 85.3514%→85.5355%; kickoff's 85.0317% matched no measurement, so #494 must re-measure
+- [atomic-planner has no MCP validator tool](atomic-planner-lacks-mcp-validator-tool.md) — it cannot run the mandatory plan gate; run it yourself and tell the planner not to fabricate a result
+- [C# agent worktree needs three bootstrap steps](csharp-agent-worktree-needs-three-bootstrap-steps.md) — no `.dotnet-sdk`, no `packages/`, and a clean restore still hits `error CS0006` on skewed analyzer versions; green CI is cache-explained, not tolerance
+- [potential_to_issue keeps ONLY the Summary section](potential-to-issue-keeps-only-summary-section.md) — every other section becomes "(not provided in potential file)"; verify the issue body, post the rest as a comment
+- [Epic kickoff facts need independent measurement](epic-kickoff-facts-need-independent-measurement.md) — a kickoff predicted a 500-line cap finding from a conflated file; the named file was 323 lines, not 1,065

@@ -240,17 +240,6 @@ namespace QuickFiler.Controllers.Tests
             );
         }
 
-        public class QfcFormViewerDerived : QfcFormViewer
-        {
-            public QfcFormViewerDerived()
-                : base() { }
-
-            public new virtual void Show() => base.Show();
-
-            //public new virtual DialogResult ShowDialog() => base.ShowDialog();
-            public new virtual FormWindowState WindowState { get; set; }
-        }
-
         //[TestMethod]
         //public void QuickFileMetrics_WRITE_ExecutesCorrectly()
         //{
