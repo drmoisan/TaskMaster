@@ -5,7 +5,7 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 and at final integration-pull-request completion. Never hand-edited. `epic.md` remains the
 human-authored manifest and narrative source of truth.
 
-- Last updated: 2026-08-22T09-40
+- Last updated: 2026-08-22T09-58
 - Integration branch: `epic/quickfiler-suite-determinism-foundation-integration`
 - Current wave: 0
 - Max parallel features: 4
@@ -15,12 +15,25 @@ human-authored manifest and narrative source of truth.
 
 | feature_folder | issue_num | wave | merge_status | PR | merge_commit_sha | worktree_created_at | pr_opened_at | merge_confirmed_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `2026-08-07-quickfiler-explorer-controller-latent-defects-449` | 449 | 0 | not_started | — | — | — | — | — | — |
-| `2026-08-07-quickfiler-keyboard-action-contract-defects-445` | 445 | 0 | not_started | — | — | — | — | — | — |
-| `2026-08-07-quickfiler-test-form1-live-form-491` | 491 | 0 | not_started | — | — | — | — | — | — |
-| `winformspumphost-suite-determinism-511` | 511 | 0 | not_started | — | — | — | — | — | — |
+| `2026-08-07-quickfiler-explorer-controller-latent-defects-449` | 449 | 0 | worktree_created | — | — | 2026-08-22T09-58 | — | — | — |
+| `2026-08-07-quickfiler-keyboard-action-contract-defects-445` | 445 | 0 | worktree_created | — | — | 2026-08-22T09-58 | — | — | — |
+| `2026-08-07-quickfiler-test-form1-live-form-491` | 491 | 0 | worktree_created | — | — | 2026-08-22T09-58 | — | — | — |
+| `winformspumphost-suite-determinism-511` | 511 | 0 | worktree_created | — | — | 2026-08-22T09-58 | — | — | — |
 
 Issue #571 is closed by the #511 feature; it is not a separate child.
+
+## Execution Branches
+
+The four canonical `bug/*` branches from the preparation run are still checked out in
+framework-locked worktrees, so each execution child works on a distinct `-exec` branch
+created with `git checkout -B <branch> origin/epic/quickfiler-suite-determinism-foundation-integration`.
+
+| issue_num | execution branch | worktree |
+| --- | --- | --- |
+| 445 | `bug/quickfiler-keyboard-action-contract-defects-445-exec` | `.claude/worktrees/agent-a6e508cbcd1e0a79d` |
+| 449 | `bug/quickfiler-explorer-controller-latent-defects-449-exec` | `.claude/worktrees/agent-a5600546d71e73061` |
+| 491 | `bug/quickfiler-test-form1-live-form-491-exec` | `.claude/worktrees/agent-a28821f6e56934fc7` |
+| 511 | `bug/winformspumphost-suite-determinism-511-exec` | `.claude/worktrees/agent-ad37a256a0fb60243` |
 
 ## Wave Structure
 
