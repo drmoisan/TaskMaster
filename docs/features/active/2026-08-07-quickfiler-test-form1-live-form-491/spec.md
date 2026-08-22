@@ -3,8 +3,8 @@
 - **Issue:** #491
 - **Parent (optional):** epic `quickfiler-suite-determinism-foundation`
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-21T19-06
-- **Status:** Approved
+- **Last Updated:** 2026-08-22T14-17
+- **Status:** Partially delivered — 10 of 11 acceptance criteria met following remediation cycle 1 (deletion of the dead `QfcFormViewerDerived` nested class); 1 remaining (AC10, coverage non-regression), blocked on a reproducible, unrelated, environment-driven coverage-measurement condition, not on this change (see `evidence/other/ac-status-summary.2026-08-22T13-13.md`)
 - **Version:** 1.1
 
 ## Context
@@ -402,37 +402,37 @@ there is no user-facing surface to validate manually.
 
 ## Acceptance Criteria
 
-- [ ] No `System.Windows.Forms.Form`-derived type is compiled into the `QuickFiler.Test` assembly,
+- [x] No `System.Windows.Forms.Form`-derived type is compiled into the `QuickFiler.Test` assembly,
       proven by a named MSTest guard test (`NoLiveFormInTestAssemblyTests` or equivalent) that
       reflects over `Assembly.GetExecutingAssembly().GetTypes()` and fails if any such type is
       present.
-- [ ] `QuickFiler.Test/Form1.cs`, `QuickFiler.Test/Form1.Designer.cs`, and
+- [x] `QuickFiler.Test/Form1.cs`, `QuickFiler.Test/Form1.Designer.cs`, and
       `QuickFiler.Test/Form1.resx` are deleted from the working tree.
-- [ ] The corresponding `<Compile Include>` and `<EmbeddedResource Include>` entries are removed
+- [x] The corresponding `<Compile Include>` and `<EmbeddedResource Include>` entries are removed
       from `QuickFiler.Test/QuickFiler.Test.csproj`, with the edit confined to the two owned line
       regions (the re-derived `Form1.cs`/`Form1.Designer.cs` compile block, and the re-derived
       `Form1.resx` `<ItemGroup>`), and with the new guard test's `<Compile Include>` entry placed
       inside the same owned region rather than elsewhere in the file.
-- [ ] The `<Reference Include="System.Drawing" />`, `<Reference Include="System.Drawing.Design" />`,
+- [x] The `<Reference Include="System.Drawing" />`, `<Reference Include="System.Drawing.Design" />`,
       and `<Reference Include="System.Windows.Forms" />` entries remain present and unmodified in
       `QuickFiler.Test.csproj`.
-- [ ] `dotnet tool run csharpier format .` and `dotnet tool run csharpier check .` both complete
+- [x] `dotnet tool run csharpier format .` and `dotnet tool run csharpier check .` both complete
       with no diffs.
-- [ ] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+- [x] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
       completes with zero analyzer errors.
-- [ ] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
+- [x] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
       completes with zero errors, and no command in this change ever passes
       `/p:Nullable=enable`.
-- [ ] `vstest.console.exe <QuickFiler.Test assembly path> /EnableCodeCoverage /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook"`
+- [x] `vstest.console.exe <QuickFiler.Test assembly path> /EnableCodeCoverage /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook"`
       completes with zero failing tests.
-- [ ] No pre-existing `QuickFiler.Test` test regresses as a result of this change (test-count and
+- [x] No pre-existing `QuickFiler.Test` test regresses as a result of this change (test-count and
       pass-count parity with the pre-change run, apart from the one new guard test).
 - [ ] Post-change line coverage (captured via `Invoke-MSTestWithCoverage.ps1`) is greater than or
       equal to the baseline line coverage captured via the same script before the change, with both
       values recorded as actual numbers in the evidence artifacts. For this harness the expected
       delta is 0 (see Coverage impact and targets above); the criterion remains satisfied by an
       observed delta of 0 and is not satisfied by an unrecorded or estimated value.
-- [ ] Item 2 of the potential document (the three `internal` members of
+- [x] Item 2 of the potential document (the three `internal` members of
       `ItemViewer.Breadcrumb.cs`) is explicitly recorded as deferred to a later epic's
       ItemViewer-owning child, not silently dropped from tracking.
 
