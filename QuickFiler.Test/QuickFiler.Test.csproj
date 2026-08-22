@@ -117,6 +117,8 @@
     <Compile Include="Controllers\QfcCollectionControllerDarkModeTests.cs" />
     <Compile Include="Controllers\QfcDatamodelTests.cs" />
     <Compile Include="Controllers\QfcDatamodelLivenessTests.cs" />
+    <Compile Include="Controllers\QfcExplorerController.ConversationViewTests.cs" />
+    <Compile Include="Controllers\QfcExplorerControllerTests.cs" />
     <Compile Include="Controllers\QfcInitEmailQueueZeroBatchTests.cs" />
     <Compile Include="Controllers\QfcFormControllerTests.cs" />
     <Compile Include="Controllers\QfcFormControllerSeamTests.cs" />

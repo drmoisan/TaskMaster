@@ -9,7 +9,6 @@ namespace QuickFiler.Interfaces
         Task OpenQFItem(MailItem mailItem);
         void ExplConvView_ToggleOff();
         void ExplConvView_ToggleOn();
-        void ExplConvView_Cleanup();
         void ExplConvView_ReturnState();
     }
 }
