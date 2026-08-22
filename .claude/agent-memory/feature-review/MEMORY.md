@@ -59,3 +59,4 @@
 - [epic fan-in artifact path + hook regex traps](project_epic_fanin_artifact_path_and_hook_regex.md) — hook regex demands docs/features/active/; UNVERIFIED is a narrowing word and "Pester" alone satisfies both label+coverage tests
 - [build-ci-coverage-gate-fidelity epic outcome](project_build-ci-coverage-gate-fidelity-epic-outcome.md) — 80-vs-85 contradiction NOT removed; runner gate 80 vs hook 85; C# 85.55%, PS branch nonexistent
 - [PowerShell coverage is nondeterministic](project_powershell-coverage-nondeterministic-vsbuild-tests.md) — Invoke-VSBuild.Tests.ps1 runs vswhere + Sync-PackageReferences for real; measure PS coverage in-session, never quote a stored figure
+- [449-review-residuals](project_449-review-residuals.md) — PASS/0 blocking; untracked #584 promotion doc owed a non-child route; unused usings in base test file; AC-supersession-via-plan-provision pattern validated
