@@ -1,7 +1,7 @@
 - [CLAUDE.md nullable command != CI gate — RESOLVED by #540](project_claudemd_nullable_command_diverges_from_ci.md) — docs now match ci.yml; a reappearance of `/p:Nullable=enable` or `/t:Build` is a regression. Carries the 195-error UtilitiesCS lower bound for #492
 - [PoshQC test drops coverage.xml at repo root](poshqc-test-drops-coverage-xml-at-repo-root.md) — untracked, not gitignored/csharpierignored; inflates the CSharpier file count and leaks into `git add -A`
 - [Agent-worktree discovery + evidence hygiene](project_agent_worktree_discovery_and_evidence_hygiene.md) — `\.claude\` test-glob filter must use the RELATIVE path; never commit raw Cobertura
-- [Completion-gate receipt shapes](completion-gate-receipt-shapes.md) — exact fields require_complete wants: delegation_receipts as a LIST, skill_receipts required:true
+- [Completion-gate receipt shapes](completion-gate-receipt-shapes.md) — SOLVED: the missing key is `evidence`; plus the bug-route `new_potential_bug_entry` swap that MCP and the hook disagree on
 - [JaCoCo not Cobertura for coverage evidence](jacoco-not-cobertura-for-evidence.md) — maintainer deletes committed Cobertura; convert to package-level JaCoCo before pushing
 - [Store-lockup watchdog null-model hazard](project_store_lockup_watchdog_null_model_hazard.md) — new startup COM scopes need a phase-branch returning before the disable-service write
 - [VS Code extension location](project_extension_location.md) — the extension lives at `extensions/drm-copilot/`, not the repo root
