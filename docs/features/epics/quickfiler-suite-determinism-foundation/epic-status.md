@@ -5,7 +5,7 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 and at final integration-pull-request completion. Never hand-edited. `epic.md` remains the
 human-authored manifest and narrative source of truth.
 
-- Last updated: 2026-08-22T16-05
+- Last updated: 2026-08-22T16-25
 - Integration branch: `epic/quickfiler-suite-determinism-foundation-integration`
 - Current wave: 0
 - Max parallel features: 4
@@ -17,7 +17,7 @@ human-authored manifest and narrative source of truth.
 | feature_folder | issue | wave | merge_status | PR | merge_commit_sha | worktree_created_at | pr_opened_at | merge_confirmed_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `2026-08-07-quickfiler-explorer-controller-latent-defects-449` | 449 | 0 | merged | [#585](https://github.com/drmoisan/TaskMaster/pull/585)<br>[#590](https://github.com/drmoisan/TaskMaster/pull/590) (docs only) | `5d1c2074cefc` | 2026-08-22T09-58 | 2026-08-22T15:40 | 2026-08-22T16-05 | — |
-| `2026-08-07-quickfiler-keyboard-action-contract-defects-445` | 445 | 0 | merged | [#587](https://github.com/drmoisan/TaskMaster/pull/587) | `577270dcfd14` | 2026-08-22T09-58 | 2026-08-22T15:42 | 2026-08-22T16-05 | — |
+| `2026-08-07-quickfiler-keyboard-action-contract-defects-445` | 445 | 0 | merged | [#587](https://github.com/drmoisan/TaskMaster/pull/587)<br>[#591](https://github.com/drmoisan/TaskMaster/pull/591) (agent-memory only) | `577270dcfd14` | 2026-08-22T09-58 | 2026-08-22T15:42 | 2026-08-22T16-05 | — |
 | `2026-08-07-quickfiler-test-form1-live-form-491` | 491 | 0 | merged | [#588](https://github.com/drmoisan/TaskMaster/pull/588) | `b8b4a9e582ea` | 2026-08-22T09-58 | 2026-08-22T15:45 | 2026-08-22T16-05 | — |
 | `winformspumphost-suite-determinism-511` | 511 | 0 | worktree_created | — | — | 2026-08-22T09-58 | — | — | — |
 
@@ -65,6 +65,7 @@ issues 584, 586, and 589 must NOT be closed by it.
 
 | issue | title | promoted by child |
 | --- | --- | --- |
+| #583 | KaStringAsync.KeyEquals branch 1 computes a prefix-only Substring offset under a Contains guard | #445 |
 | #584 | UiThread.Dispatcher null race | #449 |
 | #586 | utilitiescs-test-form1-live-form | #491 |
 | #589 | collect-pr-context-shared-path-race-across-concurrent-children | #449 |
@@ -93,11 +94,19 @@ Two unused using directives remain at QuickFiler.Test/Controllers/QfcExplorerCon
 
 ### Analyzer version skew (live risk for the final PR)
 
-All 16 first-party csproj files reference Meziantou.Analyzer 3.0.156 and Roslynator.Analyzers 4.16.0 in unconditional Analyzer Include items while packages.config pins 3.0.174 and 4.16.1, so a cold CI cache or fresh clone fails the analyzer build with error CS0006. Children #445 and #449 worked around it via the untracked packages/ tree only, editing no tracked file. Child #511's plan task P6-T20 files it as its own issue. This is a live risk for the final integration-to-main pull request, which DOES get full CI on a cold runner.
+CONFIRMED by epic-orchestrator on 2026-08-22 against the integration tip and against origin/main. packages.config pins Meziantou.Analyzer 3.0.174 and Roslynator.Analyzers 4.16.1 (multi-line XML attribute form, which single-line greps miss). The csproj files still carry 16 stale <Analyzer Include> paths under packages/Meziantou.Analyzer.3.0.156/ and 64 under packages/Roslynator.Analyzers.4.16.0/ -- directories a clean restore never creates. MECHANISM for CI nonetheless being green: .github/workflows/_build-analyzers.yml uses actions/cache@v4 with key nuget-<os>-<hashFiles(**/packages.config)> AND restore-keys fallback nuget-<os>-. When packages.config changes the exact key misses, but the fallback restores an OLDER cache that still contains the 3.0.156 and 4.16.0 directories; nuget restore then adds the new versions without deleting the old ones, so the stale paths resolve. Green CI is therefore cache-explained, not MSBuild tolerance. RISK ASSESSMENT for the final integration-to-main pull request: origin/main carries the identical skew, so the final pull request is no worse than main and should be green while the fallback cache survives. It fails with error CS0006 the first time GitHub evicts that cache entry (7-day idle expiry or the 10 GB repository limit). If the final pull request goes red on build-analyzers or build-nullable with CS0006, that is this pre-existing defect and NOT a regression from any child of this epic; the remedy is the issue child #511 files from plan task P6-T20, not a change inside this epic. Do not edit .github/workflows to work around it.
 
 ### Child issues stay open until the integration PR
 
 A pull request into an integration branch cannot auto-close an issue, so every child used 'Refs #N' rather than 'Closes #N'. Issues 445, 449, 491, 511, and 571 all remain OPEN and the final integration-to-main pull request MUST carry the closing keywords for all five. Follow-up issues 584, 586, and 589 stay open and must NOT be closed by it.
+
+### child_checkpoint_validator_hook_disagreement
+
+Child #445 reported an unresolvable disagreement between two validators over the child checkpoint's required_mcp_tools list for a bug-mode route. The PowerShell completion hook applies a bug-promotion swap and requires new_potential_bug_entry; the MCP validate_orchestration_artifacts surface requires new_potential_entry. The list is compared by exact equality, so no single value satisfies both. #445 conformed to the hook (it is what actually blocks, and is semantically correct for a bug), leaving the MCP require_complete call reporting exactly two divergence errors that represent no missing work. This does NOT affect the epic checkpoint: the epic route's required_mcp_tools are collect_pr_context and validate_orchestration_artifacts, with no promotion tool in the set. Worth promoting as its own defect outside this epic.
+
+### ci_gate_conclusion_literal_is_a_schema_artifact
+
+Because child pull requests receive zero checks, each child recorded ci_gate.conclusion: 'success' to satisfy the schema's required literal while adding a conclusion_basis field stating that it denotes the LOCAL toolchain gate and that zero GitHub checks ran. Children also had to hold step9_status at 'passed' across the merge (the epic merge hook requires that literal) and flip it to 'verified' afterwards (the completion validator rejects 'passed'). Both are recorded so a later reader does not mistake 'success' for a CI result. #445 additionally proved its local gate was not vacuous by showing a 'Skipping target "CoreCompile"' count of 0 in both MSBuild logs.
 
 ## Execution Conditions Recorded at Kickoff
 
