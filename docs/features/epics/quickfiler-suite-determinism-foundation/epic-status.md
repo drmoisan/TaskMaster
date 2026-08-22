@@ -5,11 +5,11 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 and at final integration-pull-request completion. Never hand-edited. `epic.md` remains the
 human-authored manifest and narrative source of truth.
 
-- Last updated: 2026-08-22T16-25
+- Last updated: 2026-08-22T17-05
 - Integration branch: `epic/quickfiler-suite-determinism-foundation-integration`
 - Current wave: 0
 - Max parallel features: 4
-- Next step: `await_child_511_then_gate_integrated_tree_and_open_final_integration_pr`
+- Next step: `open_final_integration_pr_to_main_closing_445_449_491`
 - Epic checkpoint: `artifacts/orchestration/epic-orchestrator-state.json`
 
 ## Feature Status
@@ -61,6 +61,36 @@ branch cannot auto-close an issue, so every child used `Refs #N`. The final
 integration-to-`main` pull request must carry the closing keywords for all five. Follow-up
 issues 584, 586, and 589 must NOT be closed by it.
 
+
+## Epic Disposition
+
+**Decision: `deliver_three_children_descope_511`** (decided by epic-orchestrator at 2026-08-22T17-05)
+
+Children 445, 449 and 491 are merged, green, and touch file sets disjoint from #511's (#511 modified only QfcItemController test files). Holding three completed children hostage to a child blocked by a planning-time misdiagnosis would deliver less and fix nothing. Landing #511's no-op remedy would put a false claim in repository history and close two issues that are not fixed. The valuable output of #511's run is the measurement, which is preserved on its branch, mirrored into #511 and #571 as comments, and tracked forward as issue #592.
+
+Consequences:
+
+- The final integration-to-main pull request closes 445, 449 and 491 only.
+- Issues 511 and 571 remain OPEN and are explicitly NOT closed by it.
+- Epic completion requirement 1 (every feature merged or worktree_removed) is not satisfied, so require_complete=True will fail by design. The epic is reported as delivered-with-one-child-descoped, not as complete.
+- Follow-up issues 583, 584, 586, 589, 592, 593 and 594 stay open.
+
+## Halted Child: #511 (premise_falsified)
+
+Work preserved on `bug/winformspumphost-suite-determinism-511-exec` at commit `53a2a08fd95a`; nothing merged.
+
+**What was measured.** The remedy is a measured no-op. ItemViewer's constructor calls InitializeComponent, which runs ISupportInitialize BeginInit/EndInit on both WebView2 children (QuickFiler/Viewers/ItemViewer.Designer.cs:89-90 and :6166-6167). EndInit creates the child handles and WinForms creates a parent's handle when a child's is created, so the viewer's handle exists the instant construction returns. Verified independently by epic-orchestrator. A bare new ItemViewer() on the pump thread already reports both children handle-created, and the measured state is identical with the inserted statement commented out.
+
+**The real root cause.** Seven expiries at the 60,000 ms PumpTimeoutMs under machine load. A missing handle throws immediately; it does not hang for sixty seconds. Pre-fix run-level failure rate is about 1 in 21, so thirty consecutive clean runs has probability about 0.23 under the null hypothesis of no effect. Under 17-node contention a supplementary pass was 8 of 10 green: the suite still fails under load. Tracked as issue #592.
+
+**Why it could not be fixed inside this epic.** The epic forbade every remedy that plausibly addresses a load-induced timeout: no production edits, no sleeps/retries/timing tolerances (which rules out raising PumpTimeoutMs), and no injectable synchronization-context seam (ruled out because it would delete the coverage #571 stabilizes). Those constraints were chosen against the misdiagnosed root cause; against the correct one they leave no in-scope remedy.
+
+**Scope lock.** Both coverage-bearing production files hash to their exact merge-base blobs, so #571's coverage is untouched. No production file was modified.
+
+**Spec AC 6.** Spec AC 6 requires asserting that both WebView2 children remain handle-less, which the measurement shows is never true. Correctly left unchecked. AC status 9 of 14.
+
+**merge_status enum gap.** The merge_status enum has no member for a halt in which every delegation and validator succeeded but the premise was falsified. worktree_created is retained because it is factually accurate (a worktree exists, nothing merged); this halt block carries the real disposition. Same gap filed as issue #593.
+
 ## Follow-Up Issues Promoted During This Epic
 
 | issue | title | promoted by child |
@@ -69,6 +99,9 @@ issues 584, 586, and 589 must NOT be closed by it.
 | #584 | UiThread.Dispatcher null race | #449 |
 | #586 | utilitiescs-test-form1-live-form | #491 |
 | #589 | collect-pr-context-shared-path-race-across-concurrent-children | #449 |
+| #592 | Pump-hosted QfcItemController tests expire at the 60s PumpTimeoutMs under CPU contention | #511 |
+| #593 | orchestrator-state blocked_reason enum cannot express a premise-falsified halt | #511 |
+| #594 | Three pre-existing UtilitiesCS.Test flakes block any suite-wide zero-failure gate | #511 |
 
 ## Carried Findings
 
@@ -107,6 +140,10 @@ Child #445 reported an unresolvable disagreement between two validators over the
 ### ci_gate_conclusion_literal_is_a_schema_artifact
 
 Because child pull requests receive zero checks, each child recorded ci_gate.conclusion: 'success' to satisfy the schema's required literal while adding a conclusion_basis field stating that it denotes the LOCAL toolchain gate and that zero GitHub checks ran. Children also had to hold step9_status at 'passed' across the merge (the epic merge hook requires that literal) and flip it to 'verified' afterwards (the completion validator rejects 'passed'). Both are recorded so a later reader does not mistake 'success' for a CI result. #445 additionally proved its local gate was not vacuous by showing a 'Skipping target "CoreCompile"' count of 0 in both MSBuild logs.
+
+### evidence_trx_volume
+
+Child #511 produced 1.2 GB of evidence, of which 56 raw .trx result files account for about 359 MB and 1.86 million lines of XML. epic-orchestrator committed them once in error and rewrote the commit to exclude them (branch bug/winformspumphost-suite-determinism-511-exec, force-pushed to 53a2a08f). The 36 markdown artifacts, 204 KB, carry the Command, EXIT_CODE and Output Summary the evidence conventions require. Note that committing large evidence is a pre-existing repository norm: docs/features/archive already carries individual cobertura XML files of 30 to 44 MB. A repository-wide policy on raw test-result artifacts is worth deciding outside this epic.
 
 ## Execution Conditions Recorded at Kickoff
 
