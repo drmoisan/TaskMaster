@@ -3,8 +3,8 @@
 - **Issue:** #491
 - **Parent (optional):** epic `quickfiler-suite-determinism-foundation`
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-22T13-13
-- **Status:** Partially delivered — 7 of 11 acceptance criteria met; 4 remaining, blocked on a pre-existing out-of-scope Form-derived type (`QfcFormViewerDerived`) discovered during execution (see `evidence/other/ac-status-summary.2026-08-22T13-13.md`)
+- **Last Updated:** 2026-08-22T14-17
+- **Status:** Partially delivered — 10 of 11 acceptance criteria met following remediation cycle 1 (deletion of the dead `QfcFormViewerDerived` nested class); 1 remaining (AC10, coverage non-regression), blocked on a reproducible, unrelated, environment-driven coverage-measurement condition, not on this change (see `evidence/other/ac-status-summary.2026-08-22T13-13.md`)
 - **Version:** 1.1
 
 ## Context
@@ -402,7 +402,7 @@ there is no user-facing surface to validate manually.
 
 ## Acceptance Criteria
 
-- [ ] No `System.Windows.Forms.Form`-derived type is compiled into the `QuickFiler.Test` assembly,
+- [x] No `System.Windows.Forms.Form`-derived type is compiled into the `QuickFiler.Test` assembly,
       proven by a named MSTest guard test (`NoLiveFormInTestAssemblyTests` or equivalent) that
       reflects over `Assembly.GetExecutingAssembly().GetTypes()` and fails if any such type is
       present.
@@ -423,9 +423,9 @@ there is no user-facing surface to validate manually.
 - [x] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
       completes with zero errors, and no command in this change ever passes
       `/p:Nullable=enable`.
-- [ ] `vstest.console.exe <QuickFiler.Test assembly path> /EnableCodeCoverage /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook"`
+- [x] `vstest.console.exe <QuickFiler.Test assembly path> /EnableCodeCoverage /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook"`
       completes with zero failing tests.
-- [ ] No pre-existing `QuickFiler.Test` test regresses as a result of this change (test-count and
+- [x] No pre-existing `QuickFiler.Test` test regresses as a result of this change (test-count and
       pass-count parity with the pre-change run, apart from the one new guard test).
 - [ ] Post-change line coverage (captured via `Invoke-MSTestWithCoverage.ps1`) is greater than or
       equal to the baseline line coverage captured via the same script before the change, with both
