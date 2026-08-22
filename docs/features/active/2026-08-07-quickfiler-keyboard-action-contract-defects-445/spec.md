@@ -543,86 +543,86 @@ number of visible QuickFiler rows), executed on a keystroke. No allocation is ad
 
 ## Acceptance Criteria
 
-- [ ] **AC1 — Branch-3 gating applied.** In `QuickFiler/Controllers/KaStringAsync.cs`, the branch-3
+- [x] **AC1 — Branch-3 gating applied.** In `QuickFiler/Controllers/KaStringAsync.cs`, the branch-3
       guard (at `:72` as read on 2026-08-21) reads `if (Activated && Update is not null)`, so all
       three branches of `KeyEquals` gate their `Update` and `ToggleControl` side effects on
       `Activated`. No other guard in the method is weakened.
-- [ ] **AC2 — Contract documented in-code.** `KaStringAsync.KeyEquals` carries an XML documentation
+- [x] **AC2 — Contract documented in-code.** `KaStringAsync.KeyEquals` carries an XML documentation
       comment that states the `Activated` latch contract: every observable side effect fires only
       while `Activated` is true; a matching probe (branch 1) deliberately does not clear the latch;
       a non-matching probe clears it at the trailing `Activated = false`. The comment also documents
       the null and empty argument contract of AC4 and AC5.
-- [ ] **AC3 — Anti-regression: the early return is preserved.** Branch 1 of `KeyEquals` still returns
+- [x] **AC3 — Anti-regression: the early return is preserved.** Branch 1 of `KeyEquals` still returns
       `true` immediately (at `:63` as read on 2026-08-21) and does **not** fall through to the
       trailing `Activated = false` reset. The existing test
       `KeyEquals_ContainsMatchWhileActivated_InvokesUpdateAndReturnsTrue`
       (`QuickFiler.Test/Controllers/KaStringAsyncTests.cs:76-96`), which asserts
       `ka.Activated.Should().BeTrue()` after a matching probe, passes unmodified.
-- [ ] **AC4 — Null argument rejected explicitly.** `KaStringAsync.KeyEquals(null)` throws
+- [x] **AC4 — Null argument rejected explicitly.** `KaStringAsync.KeyEquals(null)` throws
       `ArgumentNullException` naming `other`, thrown from a guard clause placed above the
       `Key.Contains(other)` test rather than from inside `string.Contains`.
-- [ ] **AC5 — Empty argument rejected explicitly.** `KaStringAsync.KeyEquals("")` throws
+- [x] **AC5 — Empty argument rejected explicitly.** `KaStringAsync.KeyEquals("")` throws
       `ArgumentException` naming `other`, with a message explaining that an empty probe would
       otherwise match every registered action.
-- [ ] **AC6 — The `ArgumentOutOfRangeException` path is closed.** `KeyEquals("")` throws
+- [x] **AC6 — The `ArgumentOutOfRangeException` path is closed.** `KeyEquals("")` throws
       `ArgumentException` (AC5) for every combination of instance state, including `Activated = true`
       with a non-null `Update`; `Key.Substring(other.Length - 1, 1)` is never evaluated with a
       negative start index.
-- [ ] **AC7 — `DelegateType` removed from both implementers.** The `DelegateType` property is deleted
+- [x] **AC7 — `DelegateType` removed from both implementers.** The `DelegateType` property is deleted
       from `QuickFiler/Controllers/KaChar.cs` (`:43-46`) and `QuickFiler/Controllers/KaKey.cs`
       (`:43-46`). A repository-wide search over `*.cs` for `DelegateType` returns zero hits. No
       `DelegateType` member is added to `QuickFiler/Interfaces/IKbdAction.cs`.
-- [ ] **AC8 — Dead `Update` removed from four implementers.** The `Update` property and its backing
+- [x] **AC8 — Dead `Update` removed from four implementers.** The `Update` property and its backing
       field are deleted from `KaChar` (`KaChar.cs:50-55`), `KaCharAsync` (`KaChar.cs:92-97`), `KaKey`
       (`KaKey.cs:50-55`), and `KaKeyAsync` (`KaKey.cs:92-97`).
-- [ ] **AC9 — `Update` retained on `KaStringAsync`.** The `Update` property remains on
+- [x] **AC9 — `Update` retained on `KaStringAsync`.** The `Update` property remains on
       `QuickFiler/Controllers/KaStringAsync.cs` (`:81-86`) and the five-argument constructor still
       assigns it (`:25`), because it is read at `:61`, `:62`, `:72`, and `:73`.
-- [ ] **AC10 — Unused `using` removed from `KaChar.cs` only.** `using System.Windows.Forms;` is
+- [x] **AC10 — Unused `using` removed from `KaChar.cs` only.** `using System.Windows.Forms;` is
       removed from `QuickFiler/Controllers/KaChar.cs:6`, and `QuickFiler/Controllers/KaKey.cs`
       retains its `using System.Windows.Forms;` because `Keys` remains its key type.
-- [ ] **AC11 — Commented-out interface members removed.** Both commented-out lines at
+- [x] **AC11 — Commented-out interface members removed.** Both commented-out lines at
       `QuickFiler/Interfaces/IKbdAction.cs:15-16` are deleted. The four live members at `:11-14` are
       byte-identical to their pre-change text, and no implementer signature changes.
-- [ ] **AC12 — Test renamed.** `KeyEquals_MultiCharNonMatch_InvokesUpdateWithFirstCharAndReturnsFalse`
+- [x] **AC12 — Test renamed.** `KeyEquals_MultiCharNonMatch_InvokesUpdateWithFirstCharAndReturnsFalse`
       (`QuickFiler.Test/Controllers/KaStringAsyncTests.cs:134`) is renamed to
       `KeyEquals_MultiCharNonMatchWhileActivated_InvokesUpdateWithFirstCharAndReturnsFalse`, and its
       body is otherwise unchanged.
-- [ ] **AC13 — Defect-1 regression test added, red before and green after.** A new test in
+- [x] **AC13 — Defect-1 regression test added, red before and green after.** A new test in
       `QuickFiler.Test/Controllers/KaStringAsyncTests.cs` arranges `Activated = false` with a non-null
       `Update` and a multi-character non-matching probe, then asserts `Update` is not invoked and the
       result is `false`. The test is observed **failing** against the unmodified production code and
       **passing** after the fix; both runs are recorded under
       `docs/features/active/2026-08-07-quickfiler-keyboard-action-contract-defects-445/evidence/qa-gates/`.
-- [ ] **AC14 — Latch-survives-transition test added.** A new test asserts that a row which matches at
+- [x] **AC14 — Latch-survives-transition test added.** A new test asserts that a row which matches at
       depth 1 and then fails at depth 2 still receives its `Key[0]` reset, pinning the behavior that
       AC3 protects.
-- [ ] **AC15 — Defect-2 regression tests added, red before and green after.** New tests assert
+- [x] **AC15 — Defect-2 regression tests added, red before and green after.** New tests assert
       `ArgumentException` for `KeyEquals("")` (including the `Activated = true` / non-null `Update`
       variant) and `ArgumentNullException` for `KeyEquals(null)`. Each is observed failing before the
       guard clause is added and passing after; both runs are recorded under the same `evidence/qa-gates/`
       directory.
-- [ ] **AC16 — No pre-existing test is deleted or weakened.** The other seven tests in
+- [x] **AC16 — No pre-existing test is deleted or weakened.** The other seven tests in
       `KaStringAsyncTests.cs` and every test in `KbdActionsTests.cs`,
       `KbdActionsRemainingBranchesTests.cs`, `KaCharTests.cs`, and `KaKeyTests.cs` pass without
       modification. The only permitted change to committed test code is the AC12 rename and the
       addition of the AC13 through AC15 tests.
-- [ ] **AC17 — No test-project file edit.** `git diff` reports no change to
+- [x] **AC17 — No test-project file edit.** `git diff` reports no change to
       `QuickFiler.Test/QuickFiler.Test.csproj`. All new tests land in existing files, so no
       `<Compile Include>` entry is required.
-- [ ] **AC18 — Scope boundaries respected.** No file under `.claude/**` and no file under
+- [x] **AC18 — Scope boundaries respected.** No file under `.claude/**` and no file under
       `docs/features/potential/**` is modified. `QuickFiler/Controllers/KbdActions.cs`,
       `QuickFiler/Controllers/KeyboardHandler.cs`, and
       `QuickFiler/Controllers/QfcCollectionController.cs` are unmodified.
-- [ ] **AC19 — Out-of-scope fourth defect not fixed, and filed.** `KaStringAsync.cs:62` still reads
+- [x] **AC19 — Out-of-scope fourth defect not fixed, and filed.** `KaStringAsync.cs:62` still reads
       `Update(Key.Substring(other.Length - 1, 1))`, branch 1 still tests `Key.Contains(other)`, and
       the assertion at `KaStringAsyncTests.cs:89-91` (`.Be("b")` for `Key = "abc"`, `other = "ab"`) is
       unchanged. A new GitHub issue is filed for the non-prefix `Substring` defect and its number is
       recorded in **Rollout & Follow-up**.
-- [ ] **AC20 — File-size limit respected.** No changed file exceeds 500 lines.
+- [x] **AC20 — File-size limit respected.** No changed file exceeds 500 lines.
       `QuickFiler/Controllers/KaChar.cs`, `QuickFiler/Controllers/KaKey.cs`, and
       `QuickFiler/Interfaces/IKbdAction.cs` are each shorter after the change than before.
-- [ ] **AC21 — Full C# toolchain green.** In one final uninterrupted pass, in this order:
+- [x] **AC21 — Full C# toolchain green.** In one final uninterrupted pass, in this order:
       `dotnet tool run csharpier check .` reports no file needing formatting;
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
       succeeds; `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
@@ -695,4 +695,5 @@ number of visible QuickFiler rows), executed on a keystroke. No allocation is ad
   - Plan: `docs/features/active/2026-08-07-quickfiler-keyboard-action-contract-defects-445/plan.2026-08-21T18-09.md`
   - Related: issue #430 (`quickfiler-keyboard-actions-coverage`, child F3 of epic #136), whose
     no-behavior-change acceptance criterion is why these defects were deferred.
-  - Follow-up issue for the non-prefix `Substring` defect: to be filed (see AC19).
+  - Follow-up issue for the non-prefix `Substring` defect: **#583** —
+    https://github.com/drmoisan/TaskMaster/issues/583 (filed 2026-08-22, satisfies AC19).

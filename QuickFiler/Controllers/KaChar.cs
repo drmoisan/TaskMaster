@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using QuickFiler.Interfaces;
 
 namespace QuickFiler.Controllers
@@ -40,19 +39,7 @@ namespace QuickFiler.Controllers
             set => _action = value;
         }
 
-        public Type DelegateType
-        {
-            get => typeof(Action<Keys>);
-        }
-
         public bool KeyEquals(char other) => Key == other;
-
-        private Action<string> _update;
-        public Action<string> Update
-        {
-            get => _update;
-            set => _update = value;
-        }
     }
 
     public class KaCharAsync : IKbdAction<char, Func<char, Task>>
@@ -88,12 +75,5 @@ namespace QuickFiler.Controllers
         }
 
         public bool KeyEquals(char other) => Key == other;
-
-        private Action<string> _update;
-        public Action<string> Update
-        {
-            get => _update;
-            set => _update = value;
-        }
     }
 }

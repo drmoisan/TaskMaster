@@ -40,19 +40,7 @@ namespace QuickFiler.Controllers
             set => _action = value;
         }
 
-        public Type DelegateType
-        {
-            get => typeof(Action<Keys>);
-        }
-
         public bool KeyEquals(Keys other) => Key == other;
-
-        private Action<string> _update;
-        public Action<string> Update
-        {
-            get => _update;
-            set => _update = value;
-        }
     }
 
     public class KaKeyAsync : IKbdAction<Keys, Func<Keys, Task>>
@@ -88,12 +76,5 @@ namespace QuickFiler.Controllers
         }
 
         public bool KeyEquals(Keys other) => Key == other;
-
-        private Action<string> _update;
-        public Action<string> Update
-        {
-            get => _update;
-            set => _update = value;
-        }
     }
 }

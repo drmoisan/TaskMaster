@@ -12,7 +12,5 @@ namespace QuickFiler.Interfaces
         T Key { get; set; }
         U Delegate { get; set; }
         bool KeyEquals(T other);
-        //Action<string> Update { get; set; }
-        //Type DelegateType { get; }
     }
 }
