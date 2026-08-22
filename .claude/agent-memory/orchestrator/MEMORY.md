@@ -51,7 +51,8 @@
 - [STA controls ratified as last resort](feedback_sta_controls_last_resort_ratified.md) — unshown WinForms controls on STA are OK only after seams, in dedicated *.StaTests.cs
 - [Epic children need full lifecycle + PRs](feedback_epic_children_require_full_lifecycle_and_prs.md) — maintainer rejected executor-driver shortcuts and direct child merges; PRs are mandatory
 - [Verify subagent capability claims](feedback_verify_subagent_capability_claims.md) — never relay "agent type not registered" without checking .claude/agents yourself
-- [Epic-child plan Phase 0 paths are stale](feedback_plan_phase0_paths_are_stale_in_epic_children.md) — plans cite the planning worktree's absolute paths; redirect the executor to the current one
+- [Epic-child plan Phase 0 paths are stale](feedback_plan_phase0_paths_are_stale_in_epic_children.md) — redirect the executor at execution time; in PREPARATION mode fix the plan to resolve WS from git rev-parse
+- [Absolute-zero gate on a sibling-owned assembly](absolute-zero-gate-on-sibling-owned-assembly.md) — a child can't pass "Failed 0" over an assembly holding a wave-sibling's failures; scope zero to owned classes
 - [Unplanned epic-child worktree mechanics](unplanned-epic-child-worktree-mechanics.md) — cross-worktree delegation works via absolute paths; C# tools need pwsh + explicit paths
 - [Epic generic-constraint cascades across children](epic-generic-constraint-cascades-multiple-children.md) — a `where TKey : notnull` emits CS8714 in EVERY consumer; enumerate all of them first
 - [Parallel epic children name collisions](parallel-epic-children-name-collisions.md) — siblings coin identical type names; CS0101/CS0104 surface only at rebase; rename YOUR types
