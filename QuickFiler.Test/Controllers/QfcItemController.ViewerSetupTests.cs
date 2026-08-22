@@ -433,6 +433,9 @@ namespace QuickFiler.Controllers.Tests
                         new QuickFiler.ItemViewer()
                     )
                     .ConfigureAwait(false);
+                // #571: force the invisible window handle on the pump thread; .Handle is
+                // non-recursive, so the two WebView2 children stay handle-less.
+                _ = await host.InvokeAsync(() => viewer.Handle).ConfigureAwait(false);
                 HarnessController controller = new HarnessController();
                 QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer);
                 controller.Token = CancellationToken.None;

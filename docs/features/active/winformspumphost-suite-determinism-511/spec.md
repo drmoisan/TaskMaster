@@ -595,11 +595,11 @@ this feature's acceptance.
 
 ## Acceptance Criteria
 
-- [ ] `InitializeNineArgOverload_ThroughThePumpHost_SavesParametersAndDelegates`
+- [x] `InitializeNineArgOverload_ThroughThePumpHost_SavesParametersAndDelegates`
       (`QuickFiler.Test/Controllers/QfcItemController.InitializationTests.Part3.cs:175`) passes in
       every one of ten consecutive full nine-assembly runs, with the ten TRX results stored under
       `evidence/regression-testing/`.
-- [ ] `InitializeBool_ThroughThePumpHost_CompletesAndInitializesState`
+- [x] `InitializeBool_ThroughThePumpHost_CompletesAndInitializesState`
       (`QuickFiler.Test/Controllers/QfcItemController.InitializationTests.Part3.cs:131`) passes in
       every one of those same ten consecutive full nine-assembly runs.
 - [ ] The ten consecutive full nine-assembly runs are executed under induced CPU load and are all
@@ -608,17 +608,17 @@ this feature's acceptance.
       `evidence/regression-testing/`. (Ten under induced load is chosen over #571's "at least 5"
       because it is the epic's stated leading indicator, it targets #511's load-induced cascade
       directly, and it satisfies #571's threshold a fortiori.)
-- [ ] An empirical pre-fix baseline artifact exists under `evidence/regression-testing/` recording,
+- [x] An empirical pre-fix baseline artifact exists under `evidence/regression-testing/` recording,
       per run across ten runs, the pass/fail outcome of both named tests and the observed harness
       viewer `IsHandleCreated` value, establishing the pre-fix failure behaviour by execution rather
       than by static reading.
-- [ ] `BuildPumpHarness_ForcesTheViewerWindowHandleOnThePumpThread` exists in
+- [x] `BuildPumpHarness_ForcesTheViewerWindowHandleOnThePumpThread` exists in
       `QuickFiler.Test/Controllers/QfcItemController.InitializationTests.Part3.cs`, asserts the
       harness viewer's `IsHandleCreated` is `true` before the act, and passes.
 - [ ] `BuildPumpHarness_DoesNotCreateTheWebViewChildHandles` exists in
       `QuickFiler.Test/Controllers/QfcItemController.InitializationTests.Part3.cs`, asserts both
       WebView2 children remain handle-less, and passes.
-- [ ] `git diff` reports zero hunks in both
+- [x] `git diff` reports zero hunks in both
       `QuickFiler/Controllers/QfcItemController.Initialization.cs` and
       `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`, and file inspection confirms all
       seven `#230` de-exemption comment blocks in `Initialization.cs` (lines 135, 164, 196, 259,
@@ -628,22 +628,22 @@ this feature's acceptance.
       `QuickFiler.Test/TestSupport/WinFormsPumpHostTests.cs` and the 8 consumer tests (5 in
       `QfcItemController.InitializationTests.Part3.cs`, 2 in `QfcItemController.SeamFactoryTests.cs`,
       1 in `QfcItemController.ViewerSetupTests.cs`).
-- [ ] `git diff --name-only` against the merge base lists exactly three code files, all under
+- [x] `git diff --name-only` against the merge base lists exactly three code files, all under
       `QuickFiler.Test/` (`Controllers/QfcItemController.InitializationTests.Part2.cs`,
       `Controllers/QfcItemController.ViewerSetupTests.cs`,
       `Controllers/QfcItemController.InitializationTests.Part3.cs`), and lists no file under
       `QuickFiler/`, no `*.csproj`, and no path under `.claude/` other than `.claude/agent-memory/`,
       which epic hard constraint 1 lists as safe to edit and which is agent bookkeeping rather than
       part of the fix.
-- [ ] `QfcItemController_SeamFactoryTests` and `QfcItemController_InitializationTests` both pass in
+- [x] `QfcItemController_SeamFactoryTests` and `QfcItemController_InitializationTests` both pass in
       the same run, and file inspection confirms `UiThreadDispatcherGate`
       (`QfcItemController.InitializationTests.Part2.cs:51`) and `SwapUiThreadDispatcher` (`:139`)
       retain their acquire-and-release structure.
-- [ ] Every changed file is under 500 lines after the change:
+- [x] Every changed file is under 500 lines after the change:
       `QfcItemController.InitializationTests.Part2.cs` (was 409),
       `QfcItemController.ViewerSetupTests.cs` (was 467), and
       `QfcItemController.InitializationTests.Part3.cs` (was 290).
-- [ ] `git diff` introduces no occurrence of `Thread.Sleep`, `Task.Delay`, `SpinWait`, a retry loop,
+- [x] `git diff` introduces no occurrence of `Thread.Sleep`, `Task.Delay`, `SpinWait`, a retry loop,
       or a raised timeout constant, and every existing timeout constant retains its current value
       (`PumpTimeoutMs = 60000`, `TimeoutMs = 30000`).
 - [ ] The five-step toolchain in `## Test Strategy` completes green in a single final pass, coverage

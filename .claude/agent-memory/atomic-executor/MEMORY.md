@@ -46,6 +46,7 @@
 - [Compile-time red needs body-level refs](project_compile_red_needs_body_level_references.md) — a missing type in a method SIGNATURE suppresses body binding, so an `[expect-fail]` task requiring N named CS0246s
 
 ## Test execution & isolation
+- [Long runs need a detached process](project_long_runs_need_detached_process.md) — Bash `run_in_background` runners get killed after ~1h, taking `Start-Job` load generators with them; use `Start-Process -PassThru` + foreground `sleep 570` to advance real time
 - [Tests must mock GUI; no visible window](feedback_tests_must_mock_gui_no_visible_window.md) — use headless seams (mocked viewers, injected show/focus delegates), never Form.Show/Application.Run
 - [#511 is a test-host crash, not N failing tests](project_511_is_a_testhost_crash_not_n_failing_tests.md) — load-driven abort with `Total tests: Unknown` (no readable verdict); `/InIsolation` loop gave 0 failed; never gate on a
 - [WinFormsPumpHost tests are load-flaky](project_winformspumphost_tests_load_flaky.md) — QfcItemController_InitializationTests fail with "window handle has been created"/60s timeouts when the box is
@@ -87,6 +88,7 @@
 - [Outlook `Action`/`Exception` ambiguity](project_outlook_action_ambiguity.md) — bare `Action` AND bare `Exception` are CS0104-ambiguous in Outlook-interop files; use
 
 ## Component-specific gotchas
+- [WebView2 EndInit already creates child handles](project_webview2_endinit_creates_handles.md) — `new ItemViewer()` alone leaves BOTH WebView2 children handle-created, so a `IsHandleCreated == false` assertion is unsatisfiable; also 3 pre-existing UtilitiesCS.Test flakes (shared Console.Out) that break any all-assembly `failed == 0` gate
 - [#349 breadcrumb WebView2 gotchas](project_349_breadcrumb_webview2_gotchas.md) — retyped Designer field breaks reflection-injected tests; aggregate async d__ classes for >=90%
 - QuickFiler #227 cycle notes: [cycle-4 ToggleFocus](project_qfc227_cycle4_toggle_focus_genuine_test_gotchas.md), [cycle-3 Theme/FolderPredictor seam](project_theme_folderpredictor_seam_retrofit_gotchas.md)
 - [ObjectListView TreeListView headless selection](project_objectlistview_treelistview_headless_selection.md) — selection needs a native handle; cache the node via SelectionChanged
