@@ -5,11 +5,11 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 and at final integration-pull-request completion. Never hand-edited. `epic.md` remains the
 human-authored manifest and narrative source of truth.
 
-- Last updated: 2026-08-22T17-05
-- Integration branch: `epic/quickfiler-suite-determinism-foundation-integration`
-- Current wave: 0
+- Last updated: 2026-08-22T18-05
+- Integration branch: `epic/quickfiler-suite-determinism-foundation-integration` (merged to `main`)
+- Current wave: 0 (final)
 - Max parallel features: 4
-- Next step: `open_final_integration_pr_to_main_closing_445_449_491`
+- Next step: `EPIC_DELIVERED_WITH_ONE_CHILD_DESCOPED`
 - Epic checkpoint: `artifacts/orchestration/epic-orchestrator-state.json`
 
 ## Feature Status
@@ -19,7 +19,7 @@ human-authored manifest and narrative source of truth.
 | `2026-08-07-quickfiler-explorer-controller-latent-defects-449` | 449 | 0 | merged | [#585](https://github.com/drmoisan/TaskMaster/pull/585)<br>[#590](https://github.com/drmoisan/TaskMaster/pull/590) (docs only) | `5d1c2074cefc` | 2026-08-22T09-58 | 2026-08-22T15:40 | 2026-08-22T16-05 | — |
 | `2026-08-07-quickfiler-keyboard-action-contract-defects-445` | 445 | 0 | merged | [#587](https://github.com/drmoisan/TaskMaster/pull/587)<br>[#591](https://github.com/drmoisan/TaskMaster/pull/591) (agent-memory only) | `577270dcfd14` | 2026-08-22T09-58 | 2026-08-22T15:42 | 2026-08-22T16-05 | — |
 | `2026-08-07-quickfiler-test-form1-live-form-491` | 491 | 0 | merged | [#588](https://github.com/drmoisan/TaskMaster/pull/588) | `b8b4a9e582ea` | 2026-08-22T09-58 | 2026-08-22T15:45 | 2026-08-22T16-05 | — |
-| `winformspumphost-suite-determinism-511` | 511 | 0 | worktree_created | — | — | 2026-08-22T09-58 | — | — | — |
+| `winformspumphost-suite-determinism-511` | 511 | 0 | worktree_created (halted: `premise_falsified`, descoped) | — | — | 2026-08-22T09-58 | — | — | — |
 
 Issue #571 is closed by the #511 feature; it is not a separate child.
 
@@ -40,7 +40,7 @@ created from `origin/epic/quickfiler-suite-determinism-foundation-integration`.
 
 | wave | features | status |
 | --- | --- | --- |
-| 0 | 449, 445, 491, 511 | in_progress |
+| 0 | 449, 445, 491, 511 | completed_with_one_child_descoped |
 
 The dependency graph is empty by design: no child's fix changes a contract another child
 in this epic consumes. Ordering comes from the `QuickFiler.Test.csproj` region partition
@@ -50,16 +50,57 @@ recorded in `epic.md` under Shared-Surface Coordination, not from `depends_on` e
 
 | field | value |
 | --- | --- |
-| pr_number | — |
-| pr_url | — |
-| ci_gate | — |
-| merge_commit_sha | — |
-| merged_at | — |
+| pr_number | 595 |
+| pr_url | https://github.com/drmoisan/TaskMaster/pull/595 |
+| base_branch | `main` |
+| head_branch | `epic/quickfiler-suite-determinism-foundation-integration` |
+| head_sha | `e7b4824aeb2197a4342ce39d8bdfe15aa0d63dcb` |
+| ci_gate | success — workflow run [32593830908](https://github.com/drmoisan/TaskMaster/actions/runs/32593830908), 5 of 5 checks pass |
+| merge_commit_sha | `20462ed7fa4f4d9a23c02bc504f20b96b52f3060` |
+| merged_at | 2026-08-22T22:03:11Z |
 
-Issues **445, 449, 491, 511, and 571** all remain OPEN: a pull request into an integration
-branch cannot auto-close an issue, so every child used `Refs #N`. The final
-integration-to-`main` pull request must carry the closing keywords for all five. Follow-up
-issues 584, 586, and 589 must NOT be closed by it.
+### CI gate detail
+
+This pull request targets `main`, which IS in `.github/workflows/ci.yml`'s `pull_request`
+trigger list, so unlike every child pull request in this epic it received real GitHub Actions
+CI. The run's `headSha` was verified equal to the pull request's `headRefOid` before the gate
+was accepted.
+
+| check | result | duration |
+| --- | --- | --- |
+| actionlint / actionlint | pass | 36s |
+| build-analyzers / Build with analyzers and code style enforcement | pass | 3m8s |
+| build-nullable / Build with nullable warnings treated as errors | pass | 3m4s |
+| format-check / Verify formatting | pass | 1m34s |
+| mstest-coverage / Run MSTest suite with coverage | pass | 4m19s |
+
+`scripts/orchestration/Invoke-CiGateParser.ps1` does not exist in this repository (the whole
+`scripts/orchestration` directory is absent, consistent with the recorded `no_python_toolchain`
+condition). The gate was therefore evaluated directly from `gh pr checks 595` and
+`gh run view 32593830908 --json headSha,conclusion,status,event`, and is reported as
+parser-absent rather than fabricated or silently skipped.
+
+`build-analyzers` and `build-nullable` both passed, so the pre-existing analyzer version skew
+described below did not produce CS0006 on this run: the `actions/cache` fallback entry is still
+alive. `mstest-coverage` passing on the integrated tree also discharges the re-check that child
+#491 left open on its coverage AC10.
+
+### Issue disposition, verified after the merge
+
+| issue | state after merge | basis |
+| --- | --- | --- |
+| 445 | CLOSED | `Closes #445` in the pull request body |
+| 449 | CLOSED | `Closes #449` in the pull request body |
+| 491 | CLOSED | `Closes #491` in the pull request body |
+| 511 | OPEN | descoped — the remedy was measured to be a no-op |
+| 571 | OPEN | depends on #511, which did not land |
+| 583, 584, 586, 589, 592, 593, 594 | OPEN | follow-up issues, deliberately not closed |
+
+A pull request into an integration branch cannot auto-close an issue, so every child used
+`Refs #N`. The kickoff-time note that the final pull request "must carry the closing keywords
+for all five" of 445, 449, 491, 511 and 571 was **superseded** by the epic disposition below:
+closing keywords were carried for the three children that actually landed, and 511 and 571 were
+deliberately left open because nothing was fixed for them.
 
 
 ## Epic Disposition
@@ -74,6 +115,34 @@ Consequences:
 - Issues 511 and 571 remain OPEN and are explicitly NOT closed by it.
 - Epic completion requirement 1 (every feature merged or worktree_removed) is not satisfied, so require_complete=True will fail by design. The epic is reported as delivered-with-one-child-descoped, not as complete.
 - Follow-up issues 583, 584, 586, 589, 592, 593 and 594 stay open.
+
+## Completion Assessment
+
+Final state against the four completion requirements of the `epic-orchestrate` skill.
+
+| # | Requirement | Status |
+| --- | --- | --- |
+| 1 | Every feature has `merge_status` in {`merged`, `worktree_removed`} | **NOT SATISFIED, by design.** 449, 445 and 491 are `merged`. 511 is `worktree_created` and descoped. |
+| 2 | Final integration-to-`main` pull request merged, `epic_merge_pr.merge_commit_sha` recorded | SATISFIED. PR #595 merged as `20462ed7fa4f4d9a23c02bc504f20b96b52f3060` at 2026-08-22T22:03:11Z. |
+| 3 | `epic-status.md` reflects the completed state | SATISFIED by this document. |
+| 4 | Epic checkpoint passes `validate_epic_orchestrator_state_text` with `require_complete=True` | **NOT SATISFIED**, as a direct consequence of requirement 1. |
+
+The epic is therefore reported as **delivered with one child descoped**, not as complete.
+Requirements 1 and 4 fail together on the single descoped child, and the failure is the
+deliberate outcome recorded under Epic Disposition above rather than an unfinished step. No
+work is outstanding inside this epic: #511's remaining work is tracked as issues #592, #593
+and #594, and #571 remains open behind #592.
+
+### Worktree cleanup outstanding
+
+All four child worktrees under `.claude/worktrees` remain framework-locked with
+`claude agent <id> (pid 324272)`, the live session process that also hosts the orchestration
+run. `git worktree remove` exits 128 with `cannot remove a locked working tree` for each, and
+`remove -f -f` is prohibited. Removal was attempted three times (2026-08-22T16-10, T17-40 and
+T18-04) and deferred each time. This does not affect the completion gate: `merged` is already a
+terminal value alongside `worktree_removed`. The #511 worktree is retained deliberately in any
+case, since it holds the preserved measurement work at `53a2a08f` and the removal gate
+correctly denies a worktree whose feature never merged.
 
 ## Halted Child: #511 (premise_falsified)
 
@@ -119,19 +188,19 @@ mcp__drm-copilot__potential_to_issue discards every section of a potential docum
 
 ### #491 coverage AC10 left unchecked
 
-Child #491 left AC10 (post-change coverage >= baseline) unchecked: 85.5788% -> 85.5627%, a 0.0161pp shortfall. feature-review re-derived it from the committed Cobertura XML as having zero own-effect (no QuickFiler.Test class appears in either coverage file) and fully attributable to two unrelated untouched production files. Both readings clear the 85% floor. Dispositioned non-blocking. Re-check against the integrated tree before the final pull request.
+Child #491 left AC10 (post-change coverage >= baseline) unchecked: 85.5788% -> 85.5627%, a 0.0161pp shortfall. feature-review re-derived it from the committed Cobertura XML as having zero own-effect (no QuickFiler.Test class appears in either coverage file) and fully attributable to two unrelated untouched production files. Both readings clear the 85% floor. Dispositioned non-blocking. RE-CHECK DISCHARGED: the mstest-coverage job passed on the integrated tree in workflow run 32593830908 against PR #595's head e7b4824a.
 
 ### #449 unused `using` directives retained
 
 Two unused using directives remain at QuickFiler.Test/Controllers/QfcExplorerControllerTests.cs:1-2, stranded by the test-file split. No gate fires (CS8019 hidden, IDE0005 unwired). Left in place because remediating would have required a full toolchain re-run invalidating audit artifacts pinned to the audited diff. Recorded in PR #585's body.
 
-### Analyzer version skew (live risk for the final PR)
+### Analyzer version skew (did not fire on the final PR; still open)
 
 CONFIRMED by epic-orchestrator on 2026-08-22 against the integration tip and against origin/main. packages.config pins Meziantou.Analyzer 3.0.174 and Roslynator.Analyzers 4.16.1 (multi-line XML attribute form, which single-line greps miss). The csproj files still carry 16 stale <Analyzer Include> paths under packages/Meziantou.Analyzer.3.0.156/ and 64 under packages/Roslynator.Analyzers.4.16.0/ -- directories a clean restore never creates. MECHANISM for CI nonetheless being green: .github/workflows/_build-analyzers.yml uses actions/cache@v4 with key nuget-<os>-<hashFiles(**/packages.config)> AND restore-keys fallback nuget-<os>-. When packages.config changes the exact key misses, but the fallback restores an OLDER cache that still contains the 3.0.156 and 4.16.0 directories; nuget restore then adds the new versions without deleting the old ones, so the stale paths resolve. Green CI is therefore cache-explained, not MSBuild tolerance. RISK ASSESSMENT for the final integration-to-main pull request: origin/main carries the identical skew, so the final pull request is no worse than main and should be green while the fallback cache survives. It fails with error CS0006 the first time GitHub evicts that cache entry (7-day idle expiry or the 10 GB repository limit). If the final pull request goes red on build-analyzers or build-nullable with CS0006, that is this pre-existing defect and NOT a regression from any child of this epic; the remedy is the issue child #511 files from plan task P6-T20, not a change inside this epic. Do not edit .github/workflows to work around it.
 
 ### Child issues stay open until the integration PR
 
-A pull request into an integration branch cannot auto-close an issue, so every child used 'Refs #N' rather than 'Closes #N'. Issues 445, 449, 491, 511, and 571 all remain OPEN and the final integration-to-main pull request MUST carry the closing keywords for all five. Follow-up issues 584, 586, and 589 stay open and must NOT be closed by it.
+A pull request into an integration branch cannot auto-close an issue, so every child used 'Refs #N' rather than 'Closes #N'. SUPERSEDED at final merge: the kickoff-time expectation that the final integration-to-main pull request would carry closing keywords for all five of 445, 449, 491, 511 and 571 was overtaken by the epic disposition. PR #595 carried Closes for 445, 449 and 491 only; 511 and 571 were deliberately left open because #511's remedy was measured to be a no-op, and closing them would have asserted a fix that does not exist. Follow-up issues 583, 584, 586, 589, 592, 593 and 594 also stay open. All twelve issue states were verified with gh issue view after the merge.
 
 ### child_checkpoint_validator_hook_disagreement
 
