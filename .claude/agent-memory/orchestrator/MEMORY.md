@@ -78,3 +78,4 @@
 - [Removing a halt requires branch propagation](removing-a-halt-requires-branch-propagation.md) — converting a HALT into a recorded blocker strands downstream tasks; propagate to ALL consumers
 - [Bash tool rejects complex commands in isolated worktrees](bash-tool-rejects-complex-commands-in-isolated-worktree.md) — heredoc+redirect+git compounds are refused as unverifiable; gather with plain chained commands, then author via Write
 - [#457 coverage moved UP, and the kickoff figure was wrong](project_457_coverage_moved_up_not_down.md) — the denominator fix raised the rate 85.3514%→85.5355%; kickoff's 85.0317% matched no measurement, so #494 must re-measure
+- [C# agent worktree needs three bootstrap steps](csharp-agent-worktree-needs-three-bootstrap-steps.md) — no `.dotnet-sdk`, no `packages/`, and a clean restore still hits `error CS0006` on skewed analyzer versions; green CI is cache-explained, not tolerance
