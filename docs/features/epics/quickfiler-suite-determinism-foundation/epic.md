@@ -155,7 +155,7 @@ epic consumes.
 | #511 + #571 | C3 | Two issues in tension that the child must reconcile; a process-wide static mutated by reflection; 8 consumer tests and 13 self-tests in blast radius; a policy reading to settle. |
 | #449 | C3 | Two latent defects plus dead duplicated code in a 1,065-line legacy neighbour; no existing test file, so the harness is new; touches `UtilitiesCS` mail-filing collaborators. |
 | #445 | C2 | Five small files, but one genuine behavioural decision (whether the third `KeyEquals` branch should be `Activated`-gated) and a `DelegateType` removal that must not break `KaCharAsync`/`KaKeyAsync`. |
-| #491 | C2 | Bounded removal of a live form from the test assembly, with csproj and one dependent test file. |
+| #491 | C2 | Bounded removal of a live form from the test assembly, plus the csproj compile and embedded-resource entries. Corrected 2026-08-22: an earlier revision of this row claimed "one dependent test file". There is none - nothing under `QuickFiler.Test/` references `Form1` outside its own two files, so the removal is self-contained and the plan adds a guard test rather than editing a dependent one. |
 
 ## Execution Notes for epic-orchestrator
 
@@ -259,3 +259,22 @@ Recorded here so they are not re-litigated, and deliberately NOT solved by this 
   `epic/quickfiler-per-file-coverage-integration`, and that branch differs from `origin/main` by
   zero files under `QuickFiler/` and `QuickFiler.Test/`; the per-file-coverage epic's code has
   already landed on `main`. No unmerged non-QuickFiler branch touches QuickFiler.
+
+## Defects Found During Preparation (not fixed here)
+
+Recorded so they are not lost when this epic's feature folders are archived. Neither is in scope
+for any child of this epic.
+
+- **A second live WinForms form survives #491, in a different assembly.**
+  `UtilitiesCS.Test/ResourceTests.cs:20` executes `Form1 frm = new Form1();` inside `[TestMethod]
+  TestMethod1`, resolving to `UtilitiesCS.Test/Form1.cs` and `UtilitiesCS.Test/Form1.Designer.cs` —
+  a pair entirely separate from the `QuickFiler.Test/Form1.*` pair that #491 removes. It is the
+  exact hazard #491 exists to eliminate (a real form constructed during a unit-test run, which
+  `.claude/rules/general-unit-test.md` forbids), and it is untouched by this epic because it lives
+  in `UtilitiesCS.Test`. **Promote as its own bug.** Verified by direct read on 2026-08-22.
+
+- **`.claude/agent-memory/` writes by preparation subagents are left uncommitted by design.**
+  The `atomic-planner` and `atomic-executor` write to their own memory namespaces during a
+  preparation run. Those writes are not feature deliverables and are deliberately not committed
+  onto a child branch. Hard Constraint 1 of this manifest lists `.claude/agent-memory/**` as safe
+  to edit, so this is a delegation-level choice rather than a violation of that constraint.
