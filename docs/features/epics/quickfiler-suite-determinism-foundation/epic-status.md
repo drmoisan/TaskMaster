@@ -5,19 +5,20 @@ Generated projection of `artifacts/orchestration/epic-orchestrator-state.json`. 
 and at final integration-pull-request completion. Never hand-edited. `epic.md` remains the
 human-authored manifest and narrative source of truth.
 
-- Last updated: 2026-08-22T09-58
+- Last updated: 2026-08-22T16-05
 - Integration branch: `epic/quickfiler-suite-determinism-foundation-integration`
 - Current wave: 0
 - Max parallel features: 4
+- Next step: `await_child_511_then_gate_integrated_tree_and_open_final_integration_pr`
 - Epic checkpoint: `artifacts/orchestration/epic-orchestrator-state.json`
 
 ## Feature Status
 
-| feature_folder | issue_num | wave | merge_status | PR | merge_commit_sha | worktree_created_at | pr_opened_at | merge_confirmed_at | worktree_removed_at |
+| feature_folder | issue | wave | merge_status | PR | merge_commit_sha | worktree_created_at | pr_opened_at | merge_confirmed_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `2026-08-07-quickfiler-explorer-controller-latent-defects-449` | 449 | 0 | worktree_created | — | — | 2026-08-22T09-58 | — | — | — |
-| `2026-08-07-quickfiler-keyboard-action-contract-defects-445` | 445 | 0 | worktree_created | — | — | 2026-08-22T09-58 | — | — | — |
-| `2026-08-07-quickfiler-test-form1-live-form-491` | 491 | 0 | worktree_created | — | — | 2026-08-22T09-58 | — | — | — |
+| `2026-08-07-quickfiler-explorer-controller-latent-defects-449` | 449 | 0 | merged | [#585](https://github.com/drmoisan/TaskMaster/pull/585)<br>[#590](https://github.com/drmoisan/TaskMaster/pull/590) (docs only) | `5d1c2074cefc` | 2026-08-22T09-58 | 2026-08-22T15:40 | 2026-08-22T16-05 | — |
+| `2026-08-07-quickfiler-keyboard-action-contract-defects-445` | 445 | 0 | merged | [#587](https://github.com/drmoisan/TaskMaster/pull/587) | `577270dcfd14` | 2026-08-22T09-58 | 2026-08-22T15:42 | 2026-08-22T16-05 | — |
+| `2026-08-07-quickfiler-test-form1-live-form-491` | 491 | 0 | merged | [#588](https://github.com/drmoisan/TaskMaster/pull/588) | `b8b4a9e582ea` | 2026-08-22T09-58 | 2026-08-22T15:45 | 2026-08-22T16-05 | — |
 | `winformspumphost-suite-determinism-511` | 511 | 0 | worktree_created | — | — | 2026-08-22T09-58 | — | — | — |
 
 Issue #571 is closed by the #511 feature; it is not a separate child.
@@ -26,9 +27,9 @@ Issue #571 is closed by the #511 feature; it is not a separate child.
 
 The four canonical `bug/*` branches from the preparation run are still checked out in
 framework-locked worktrees, so each execution child works on a distinct `-exec` branch
-created with `git checkout -B <branch> origin/epic/quickfiler-suite-determinism-foundation-integration`.
+created from `origin/epic/quickfiler-suite-determinism-foundation-integration`.
 
-| issue_num | execution branch | worktree |
+| issue | execution branch | worktree |
 | --- | --- | --- |
 | 445 | `bug/quickfiler-keyboard-action-contract-defects-445-exec` | `.claude/worktrees/agent-a6e508cbcd1e0a79d` |
 | 449 | `bug/quickfiler-explorer-controller-latent-defects-449-exec` | `.claude/worktrees/agent-a5600546d71e73061` |
@@ -41,9 +42,9 @@ created with `git checkout -B <branch> origin/epic/quickfiler-suite-determinism-
 | --- | --- | --- |
 | 0 | 449, 445, 491, 511 | in_progress |
 
-The dependency graph is empty by design: no child's fix changes a contract another child in this
-epic consumes. Ordering comes from the `QuickFiler.Test.csproj` region partition recorded in
-`epic.md` under Shared-Surface Coordination, not from `depends_on` edges.
+The dependency graph is empty by design: no child's fix changes a contract another child
+in this epic consumes. Ordering comes from the `QuickFiler.Test.csproj` region partition
+recorded in `epic.md` under Shared-Surface Coordination, not from `depends_on` edges.
 
 ## Final Integration Pull Request
 
@@ -55,30 +56,60 @@ epic consumes. Ordering comes from the `QuickFiler.Test.csproj` region partition
 | merge_commit_sha | — |
 | merged_at | — |
 
+Issues **445, 449, 491, 511, and 571** all remain OPEN: a pull request into an integration
+branch cannot auto-close an issue, so every child used `Refs #N`. The final
+integration-to-`main` pull request must carry the closing keywords for all five. Follow-up
+issues 584, 586, and 589 must NOT be closed by it.
+
+## Follow-Up Issues Promoted During This Epic
+
+| issue | title | promoted by child |
+| --- | --- | --- |
+| #584 | UiThread.Dispatcher null race | #449 |
+| #586 | utilitiescs-test-form1-live-form | #491 |
+| #589 | collect-pr-context-shared-path-race-across-concurrent-children | #449 |
+
+## Carried Findings
+
+### Manifest line-count misattribution (corrected)
+
+epic.md and the #449 kickoff prompt both described QuickFiler/Controllers/QfcExplorerController.cs as a 1,065-line legacy file requiring a 500-line-cap finding and a promoted partial-class split. Measured on the integration tip, that file is 182 lines after change (323 before). The 1,065-line file is QuickFiler/Legacy/QuickFileController.cs, which has zero <Compile Include> references in QuickFiler/QuickFiler.csproj and is therefore not compiled at all. Child #449 caught the misattribution, raised no cap finding, and promoted no split issue; verified independently by epic-orchestrator. The sibling precondition in epic.md that QuickFiler/Controllers/QfcCollectionController.cs is 2,349 lines IS correct and is unaffected. The final integration pull request must not repeat the false claim.
+
+### `collect_pr_context` cross-child race (issue #589)
+
+mcp__drm-copilot__collect_pr_context returns ok:true with worktree paths but writes its output into the MAIN checkout, which every concurrent child shares. Child #491 overwrote child #449's context between collection and use; #449 detected it by comparing the summary's head SHA against its own HEAD, since presence and mtime checks both pass on a sibling's file. Filed as issue #589. epic-orchestrator verified PR #587 (#445) was NOT contaminated. The final integration pull request runs after every child has finished, so the contention window is closed for it, but the head-SHA check must still be performed.
+
+### `potential_to_issue` discards all but `## Summary`
+
+mcp__drm-copilot__potential_to_issue discards every section of a potential document except ## Summary; the rest become '(not provided in potential file)'. Child #449's ~90-line analysis became a 33-line issue. Because an epic child cannot commit under docs/features/potential/**, the promoted file dies with the worktree and the truncated issue would be the only record. Mitigation used: post the full analysis as an issue comment.
+
+### #491 coverage AC10 left unchecked
+
+Child #491 left AC10 (post-change coverage >= baseline) unchecked: 85.5788% -> 85.5627%, a 0.0161pp shortfall. feature-review re-derived it from the committed Cobertura XML as having zero own-effect (no QuickFiler.Test class appears in either coverage file) and fully attributable to two unrelated untouched production files. Both readings clear the 85% floor. Dispositioned non-blocking. Re-check against the integrated tree before the final pull request.
+
+### #449 unused `using` directives retained
+
+Two unused using directives remain at QuickFiler.Test/Controllers/QfcExplorerControllerTests.cs:1-2, stranded by the test-file split. No gate fires (CS8019 hidden, IDE0005 unwired). Left in place because remediating would have required a full toolchain re-run invalidating audit artifacts pinned to the audited diff. Recorded in PR #585's body.
+
+### Analyzer version skew (live risk for the final PR)
+
+All 16 first-party csproj files reference Meziantou.Analyzer 3.0.156 and Roslynator.Analyzers 4.16.0 in unconditional Analyzer Include items while packages.config pins 3.0.174 and 4.16.1, so a cold CI cache or fresh clone fails the analyzer build with error CS0006. Children #445 and #449 worked around it via the untracked packages/ tree only, editing no tracked file. Child #511's plan task P6-T20 files it as its own issue. This is a live risk for the final integration-to-main pull request, which DOES get full CI on a cold runner.
+
+### Child issues stay open until the integration PR
+
+A pull request into an integration branch cannot auto-close an issue, so every child used 'Refs #N' rather than 'Closes #N'. Issues 445, 449, 491, 511, and 571 all remain OPEN and the final integration-to-main pull request MUST carry the closing keywords for all five. Follow-up issues 584, 586, and 589 stay open and must NOT be closed by it.
+
 ## Execution Conditions Recorded at Kickoff
 
-1. **Child pull requests receive no CI.** `.github/workflows/ci.yml` triggers `pull_request` only
-   on `[main, development]`, so a pull request based on the integration branch runs zero checks and
-   merge-on-green cannot be satisfied by CI. Each child's gate is its own full local C# toolchain
-   (`csharpier check`, analyzer rebuild, nullable rebuild, `vstest` with coverage). The integrated
-   tree is gated by a `workflow_dispatch` run against the integration branch before the final
-   pull request. The workflow is not edited mid-epic.
-2. **All `PreToolUse` hooks are inert.** Each reads `$toolInput.command` while the payload nests
-   the value at `$toolInput.tool_input.command`, so the wave barrier, merge gate, and
-   worktree-removal gate all return `allow`. Every transition is confirmed from
-   `git worktree list --porcelain`, `git branch`, and
-   `gh pr view --json state,mergedAt,headRefOid`.
-3. **Execution children use `-exec` branch names.** The four canonical child branches from the
-   preparation run remain checked out in framework-locked worktrees under `.claude/worktrees` held
-   by the live session process, and non-force removal fails. Those branches carried only
-   `.claude/agent-memory` commits, which were cherry-picked onto the integration branch as
-   `8e71d6ee..7e25b47c`, so no content is stranded.
-4. **`vstest` requires `/InIsolation`.** Omitting it ignores each assembly's `app.config` binding
-   redirects and fabricates roughly 1,695 phantom failures via a Moq
-   `TypeInitializationException`. Recursive `*.Test.dll` discovery must exclude `\.claude\`.
-5. **No Python toolchain exists.** There is no `scripts/dev_tools/` and no Poetry manifest, so any
-   skill step naming `poetry run python -m scripts.dev_tools.*` is unrunnable by absence and is
-   reported as such rather than fabricated or silently skipped.
-6. **Prepared-plan line endings are not a gate.** Three of the four plans are CRLF and one is LF,
-   and all four passed the MCP plan validator. The manifest's re-normalization advice was
-   superseded by the kickoff artifact after measurement.
+1. **`ci_absent_on_integration_base`** — .github/workflows/ci.yml triggers pull_request only on [main, development]. A child pull request based on epic/quickfiler-suite-determinism-foundation-integration receives zero checks, so merge-on-green cannot be satisfied by CI. Each child's gate is its own full local C# toolchain (csharpier check, analyzer rebuild, nullable rebuild, vstest with coverage). The integrated tree is gated by a manual workflow_dispatch run against the integration branch before the final pull request. The workflow is not edited.
+
+2. **`pretooluse_hooks_inert`** — Every PreToolUse hook reads $toolInput.command while the payload nests the value at $toolInput.tool_input.command, so the wave barrier, merge gate, and worktree-removal gate all return allow. Every transition is confirmed from git worktree list --porcelain, git branch, and gh pr view --json state,mergedAt,headRefOid.
+
+3. **`stale_preparation_worktrees_locked`** — The four canonical child branches from the preparation run remain checked out in framework-locked worktrees under .claude/worktrees held by the live session pid 324272. Non-force removal fails and forcing is prohibited, so each execution child uses a distinct -exec branch name branched from origin/<integration_branch>. The preparation branches carried only .claude/agent-memory commits, which were cherry-picked onto the integration branch as 8e71d6ee..7e25b47c, so no content is stranded.
+
+4. **`vstest_invocation`** — vstest.console.exe <assemblies> /EnableCodeCoverage /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook". Omitting /InIsolation ignores each assembly's app.config binding redirects and fabricates roughly 1,695 phantom failures via a Moq TypeInitializationException. Exclude \.claude\ from recursive *.Test.dll discovery.
+
+5. **`no_python_toolchain`** — There is no scripts/dev_tools directory and no Poetry manifest. Any skill step naming poetry run python -m scripts.dev_tools.* is unrunnable by absence and must be reported as such, never fabricated and never silently skipped. PowerShell equivalents live under .claude/lib.
+
+6. **`plan_line_endings_not_a_gate`** — Three of the four prepared plans are CRLF and one is LF, and all four passed the MCP plan validator. The manifest's advice to re-normalize plans to LF was superseded by the kickoff artifact after measurement. Do not re-normalize; diagnose any validator failure on its actual message.
+
