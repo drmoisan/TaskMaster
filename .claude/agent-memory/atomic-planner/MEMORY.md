@@ -1,5 +1,9 @@
 # Atomic Planner Memory Index
 
+- [Agent worktrees need SDK + NuGet + analyzer-backfill bootstrap](agent-worktrees-need-sdk-and-nuget-bootstrap.md) — no `.dotnet-sdk`, no `packages/`, and a clean restore still misses the skewed analyzer versions (CS0006, not a warning); three Phase 0 tasks
+- [/Logger:trx needs /ResultsDirectory](trx-needs-resultsdirectory.md) — TRX lands in `TestResults\` relative to cwd; TRX-existence-under-evidence acceptance is unsatisfiable without it, and the clean-tree gate won't catch it
+- [Per-task TRX subdirectory](trx-needs-resultsdirectory.md) — a shared `/ResultsDirectory:` makes "ten distinct TRX files" ambiguous once `[expect-fail]` runs deposit earlier TRX there; give each task a `p#-t#` segment
+- [Terminal-phase planner traps](terminal-phase-planner-traps.md) — sweep the last phase for an unowned "a follow-up issue should carry it", artifacts written after the clean-tree commit task, and a false "clarification against the spec's wording"
 - [#553 CI parallel-split plan seams](project_553_ci_parallel_split_plan_seams.md) — workflow-only scope: no C# toolchain; Phase 0 snapshot for byte-identity; ruleset PUT + gh pr create orchestrator-gated; no jq (ConvertTo-Json -Depth 20); pathspec anchoring; BRANCH/SCRATCH conventions
 
 - [Dead-code removal vs coverage exclusion](project_deadcode_removal_vs_coverage_exclusion.md) — coverage gate blocked by unreachable dead prod code → plan removal (shrink denominator), never exclusion/carve-out/forced-rethrow
