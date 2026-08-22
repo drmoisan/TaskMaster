@@ -336,7 +336,7 @@ step modifies a file, restart from P2-T1. Do not leave this loop while any step 
 
 ### Phase 5 — Commit
 
-- [ ] [P5-T1] Stage exactly the owned paths with
+- [x] [P5-T1] Stage exactly the owned paths with
       `git add -- QuickFiler.Test/Controllers/QfcHomeControllerTests.cs docs/features/active/2026-08-07-quickfiler-test-form1-live-form-491`
       (no `-A` flag; no other pathspec) followed by
       `git commit -m "fix(quickfiler-test): remove dead QfcFormViewerDerived nested class blocking the live-form guard (#491)"`.
@@ -351,7 +351,7 @@ step modifies a file, restart from P2-T1. Do not leave this loop while any step 
       produces empty output after the commit; any residual porcelain entry outside that pathspec is
       recorded verbatim in the artifact and must lie under `.claude/agent-memory/`; and the recorded
       new commit sha differs from each of `c7557c3d`, `5cec657b`, and `3f2fb8d1`.
-- [ ] [P5-T2] Verify scope lock over this cycle's own commit by running
+- [x] [P5-T2] Verify scope lock over this cycle's own commit by running
       `git show --name-only --format= HEAD` and recording the full introduced-path list in the
       P5-T1 artifact. Acceptance: every path introduced by the P5-T1 commit is either
       `QuickFiler.Test/Controllers/QfcHomeControllerTests.cs` or a path under
