@@ -26,3 +26,6 @@ boundary to gate the *integrated* tree; (3) rely on the final `main`-based integ
 authoritative full-CI gate. Do not "fix" this by adding the integration branch to the workflow's
 trigger list mid-epic — a `.github/workflows/**` diff is itself Blocking under the
 `modified-workflow-needs-green-run` policy rule and is outside every child's scope.
+
+Re-verified unchanged on 2026-08-22 against `origin/epic/quickfiler-suite-determinism-foundation-integration`:
+the trigger list is still `[main, development]` and `workflow_dispatch` is still declared.
