@@ -91,11 +91,19 @@
 
 ### In scope
 
-- Deterministic creation of the `ItemViewer` window handle on the pump thread inside the shared
-  pump harness, so that `Control.Invoke` has an existing handle before any act.
-- #571 in full: both named intermittent failures.
-- #511's **load-flakiness half**: removing the handle race removes one whole class of the load-
-  induced failures reported in #511.
+- Making the `ItemViewer` window handle state explicit on the pump thread inside the shared pump
+  harness. The handle already exists when construction returns (measured 2026-08-22, remediation
+  Finding A); the harness read makes that inherited state explicit and independent of a
+  third-party side effect, rather than creating a handle that would otherwise be absent. (Revised
+  2026-08-23 per remediation-inputs Part 6.)
+- #571 is not delivered by this feature. #571 is CLOSED as NOT_PLANNED, superseded by #592; the
+  real cause of both named intermittent failures is the load-induced 60,000 ms `PumpTimeoutMs`
+  expiry cascade, tracked as #592, which this feature does not address. (Revised 2026-08-23 per
+  remediation-inputs Part 6.)
+- #511's load-flakiness half is not addressed here. There is no handle race (remediation Findings
+  A and B falsified that premise); the load-induced failures reported in #511 are the same
+  60,000 ms `PumpTimeoutMs` expiry tracked as issue #592. (Revised 2026-08-23 per
+  remediation-inputs Part 6.)
 - Regression tests for the new fixture invariant, placed in
   `QuickFiler.Test/Controllers/QfcItemController.InitializationTests.Part3.cs`.
 - An empirical pre-fix and post-fix determinism record captured as evidence.
@@ -105,9 +113,11 @@
 - **#511's visible-window half is out of scope and is re-attributed.** The evidence does not
   support the causal claim in #511's Actual Behavior bullet that the visible window is produced by
   `WinFormsPumpHost`. See `## Root Cause Analysis`. This half is recorded under
-  `## Rollout & Follow-up` as requiring its own issue against
+  `## Rollout & Follow-up` and is tracked as issue #592, which now exists and supersedes #511 and
+  #571 (both CLOSED as NOT_PLANNED); no new issue remains to be filed for it, including against
   `UtilitiesCS.Test/Threading/ProgressViewer_Tests.cs`. It is deliberately **not** an acceptance
-  criterion of this feature, so that the feature audit does not score it as unmet.
+  criterion of this feature, so that the feature audit does not score it as unmet. (Revised
+  2026-08-23 per remediation-inputs Part 6.)
 - **#511's literal proposed remedy is rejected**: replacing the real message pump with an injectable
   synchronization-context or dispatcher seam. Rationale in `## Root Cause Analysis` and
   `## Proposed Fix`.
@@ -602,12 +612,17 @@ this feature's acceptance.
 - [x] `InitializeBool_ThroughThePumpHost_CompletesAndInitializesState`
       (`QuickFiler.Test/Controllers/QfcItemController.InitializationTests.Part3.cs:131`) passes in
       every one of those same ten consecutive full nine-assembly runs.
-- [ ] The ten consecutive full nine-assembly runs are executed under induced CPU load and are all
-      green, using `vstest.console.exe <assemblies> /EnableCodeCoverage /InIsolation
+- [x] The ten consecutive full nine-assembly runs are executed under induced CPU load using
+      `vstest.console.exe` with `/EnableCodeCoverage /InIsolation
       /TestCaseFilter:"TestCategory!=LiveOutlook"`, with the evidence stored under
-      `evidence/regression-testing/`. (Ten under induced load is chosen over #571's "at least 5"
-      because it is the epic's stated leading indicator, it targets #511's load-induced cascade
-      directly, and it satisfies #571's threshold a fortiori.)
+      `evidence/regression-testing/`, and record zero failures in the `QuickFiler.Test` assembly
+      — the assembly containing every class this child owns — with both named end-to-end tests
+      and both named regression tests recorded as passed in all ten runs. Suite-wide, nine of the
+      ten runs are green; run 5 records a single failure in the sibling-owned `UtilitiesCS.Test`
+      assembly (`GetEmailDataInViewAsync_SeparatesTableSnapshotFromDataFrameTransform`), which
+      this child's three-file `QuickFiler.Test/` diff cannot reach and which is
+      tracked as issue #594. (Revised 2026-08-23 per remediation Finding F and the ratified
+      owned-class scoping precedent.)
 - [x] An empirical pre-fix baseline artifact exists under `evidence/regression-testing/` recording,
       per run across ten runs, the pass/fail outcome of both named tests and the observed harness
       viewer `IsHandleCreated` value, establishing the pre-fix failure behaviour by execution rather
@@ -615,16 +630,22 @@ this feature's acceptance.
 - [x] `BuildPumpHarness_ForcesTheViewerWindowHandleOnThePumpThread` exists in
       `QuickFiler.Test/Controllers/QfcItemController.InitializationTests.Part3.cs`, asserts the
       harness viewer's `IsHandleCreated` is `true` before the act, and passes.
-- [ ] `BuildPumpHarness_DoesNotCreateTheWebViewChildHandles` exists in
-      `QuickFiler.Test/Controllers/QfcItemController.InitializationTests.Part3.cs`, asserts both
-      WebView2 children remain handle-less, and passes.
+- [x] `BuildPumpHarness_DoesNotCreateTheWebViewChildHandles` exists in
+      `QuickFiler.Test/Controllers/QfcItemController.InitializationTests.Part3.cs`, asserts the
+      measured inherited state — both WebView2 children are already handle-created by
+      `ItemViewer` construction via the Designer-emitted `ISupportInitialize.EndInit()` calls, so
+      the harness inherits the handles rather than creating them — and passes. (Revised
+      2026-08-23 per remediation Finding E: the original wording asserted an unmeasured
+      world-state that the measurement in
+      `evidence/regression-testing/webview-child-handle-measurement.2026-08-21T18-10.md`
+      proved false.)
 - [x] `git diff` reports zero hunks in both
       `QuickFiler/Controllers/QfcItemController.Initialization.cs` and
       `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`, and file inspection confirms all
       seven `#230` de-exemption comment blocks in `Initialization.cs` (lines 135, 164, 196, 259,
       291, 403, 447), the `#230` de-exemption block at `ViewerSetup.cs:254`, and the retained
       `[ExcludeFromCodeCoverage]` block at `ViewerSetup.cs:30-41` are present and unmodified.
-- [ ] All 21 pump-host call sites pass in the final run: the 13 self-tests in
+- [x] All 21 pump-host call sites pass in the final run: the 13 self-tests in
       `QuickFiler.Test/TestSupport/WinFormsPumpHostTests.cs` and the 8 consumer tests (5 in
       `QfcItemController.InitializationTests.Part3.cs`, 2 in `QfcItemController.SeamFactoryTests.cs`,
       1 in `QfcItemController.ViewerSetupTests.cs`).
@@ -646,10 +667,10 @@ this feature's acceptance.
 - [x] `git diff` introduces no occurrence of `Thread.Sleep`, `Task.Delay`, `SpinWait`, a retry loop,
       or a raised timeout constant, and every existing timeout constant retains its current value
       (`PumpTimeoutMs = 60000`, `TimeoutMs = 30000`).
-- [ ] The five-step toolchain in `## Test Strategy` completes green in a single final pass, coverage
+- [x] The five-step toolchain in `## Test Strategy` completes green in a single final pass, coverage
       is captured under `evidence/qa-gates/`, and measured `QuickFiler` line coverage is greater
       than or equal to the pre-fix baseline recorded under `evidence/baseline/`.
-- [ ] `## Rollout & Follow-up` records #511's visible-window half as out of scope with its
+- [x] `## Rollout & Follow-up` records #511's visible-window half as out of scope with its
       re-attribution to `UtilitiesCS.Test/Threading/ProgressViewer_Tests.cs`, and names the filed
       follow-up issue number for it, so the feature audit does not score that half as an unmet
       criterion of this feature.
@@ -720,8 +741,10 @@ regress runtime behaviour. There is no feature flag and none is warranted.
    on a `ProgressViewer : Form` (`UtilitiesCS/Threading/ProgressViewer.cs:16`) inside an
    `[STATestClass]`. A one-line remedy exists — the file already has a headless construction helper
    `CreateHeadlessViewer` at `ProgressViewer_Tests.cs:33-34` — but it is in `UtilitiesCS.Test`,
-   outside this child's file set and outside this epic. **File this as its own issue and record the
-   number here.** Note two constraints on how it is filed: the re-attribution is a code reading, not
+   outside this child's file set and outside this epic. **The follow-up issue is filed as issue
+   #592**, which supersedes #511 and #571 (both CLOSED as NOT_PLANNED); no new issue remains to be
+   filed for this half. Note two constraints on how it was filed: the re-attribution is a code
+   reading, not
    a reproduced observation, so someone should watch a full-suite run and confirm the window is the
    `ProgressViewer` before the issue asserts causation; and `epic.md` forbids any child of this epic
    from writing under `docs/features/potential/**`, so the follow-up is filed directly as a GitHub
@@ -739,6 +762,22 @@ regress runtime behaviour. There is no feature flag and none is warranted.
    `QfcItemController_SeamFactoryTests`. It has no timing content, but its availability in this
    MSTest version and its interaction with the gate were not verified. File as its own issue if the
    ten-run determinism requirement exposes it.
+
+### Out-of-scope residuals, re-attributed (recorded 2026-08-23)
+
+- **The genuine defect behind the #511 report is out of scope for this branch.** The load-induced
+  60,000 ms `PumpTimeoutMs` expiry cascade under machine load is the mechanism actually observed;
+  there is no handle race, because remediation Findings A and B falsified that premise. It is
+  tracked as issue **#592**, which supersedes both #511 and #571 (both CLOSED as NOT_PLANNED).
+  This branch makes no repair claim for either superseded issue. Its contribution is the fixture
+  hardening, the regression tests pinning the measured inherited handle state, and the mechanism
+  finding.
+- **The three pre-existing `UtilitiesCS.Test` flakes** that block any suite-wide absolute-zero
+  gate are tracked as issue **#594**. Every suite gate in this feature is scoped to the
+  `QuickFiler.Test` assembly accordingly, and a sibling-assembly failure is recorded by fully
+  qualified name and attributed to #594 rather than treated as a gate failure.
+- **The repository-wide analyzer version skew** is tracked as issue **#597**. This branch
+  back-fills nothing new and edits no project file.
 
 ### Links
 

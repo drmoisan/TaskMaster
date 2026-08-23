@@ -84,11 +84,13 @@ namespace QuickFiler.Controllers.Tests
             QuickFiler.ItemViewer viewer = await host.InvokeAsync(() => new QuickFiler.ItemViewer())
                 .ConfigureAwait(false);
 
-            // #571: Control.Invoke throws on a handle-less control, and
-            // Application.Run(new ApplicationContext()) never creates one, so the viewer can
-            // reach the act with no window handle. Reading .Handle is non-recursive, so the two
-            // WebView2 children are not dragged into handle creation; CreateControl() would
-            // recurse into them because it is Visible-gated over visible children.
+            // #571 (measured 2026-08-22): both WebView2 children — and therefore the parent
+            // ItemViewer — are already handle-created when construction returns, because
+            // InitializeComponent runs the Designer-emitted ISupportInitialize.EndInit() calls on
+            // both children and WinForms creates a parent's handle when a child's is created. This
+            // read is therefore redundant today; it is retained deliberately as a defensive
+            // measure so the fixture does not silently depend on a third-party side effect this
+            // repository neither controls nor observes.
             _ = await host.InvokeAsync(() => viewer.Handle).ConfigureAwait(false);
 
             Mock<IQfcKeyboardHandler> kbd;
