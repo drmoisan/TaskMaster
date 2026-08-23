@@ -20,3 +20,21 @@ to LF before re-running the plan validator gate in a newly created worktree. Do 
 resulting validator failure as a defect in the prepared plan.
 
 Related: [[epic-plan-tooling-not-vendored]].
+
+## CORRECTION 2026-08-22: a CRLF plan passes the validator
+
+Measured directly, not inferred. The #445 prepared plan in the
+`quickfiler-suite-determinism-foundation` epic is CRLF — `file(1)` reports "with CRLF line
+terminators" — and `mcp__drm-copilot__validate_orchestration_artifacts` with
+`artifact_type: "plan"` returned `ok` against it. In the same epic the #491 plan is LF (its child's
+Edit operations converted it) and also passes. **Both line endings validate.**
+
+So the rejection claim above is not reproducible against the current validator. Treat
+re-normalization as PRECAUTIONARY, not required: it is harmless to do and cheap, but a CRLF plan is
+not by itself a reason to expect a gate failure, and an execution-time validator failure should be
+diagnosed on its actual message rather than attributed to line endings.
+
+Keep the underlying mechanism in mind, which is still real: `core.autocrlf=true` means a plan
+committed as LF materializes as CRLF in a fresh worktree, so the bytes on disk at execution time
+genuinely differ from the bytes committed. That is worth knowing for any byte-exact comparison; it
+is just not a validator failure.
