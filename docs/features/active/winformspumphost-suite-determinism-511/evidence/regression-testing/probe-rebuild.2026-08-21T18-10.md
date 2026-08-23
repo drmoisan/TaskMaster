@@ -9,7 +9,7 @@ pwsh -NoProfile -Command 'msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=
 ```
 
 Run from the worktree root
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad37a256a0fb60243`, with `msbuild`
+`<repo-root>\.claude\worktrees\agent-ad37a256a0fb60243`, with `msbuild`
 invoked through its absolute resolved path
 `C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe`. Log captured
 to `coverage\p1-t2-rebuild.log`.

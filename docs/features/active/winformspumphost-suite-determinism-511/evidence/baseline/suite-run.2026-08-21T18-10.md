@@ -21,7 +21,7 @@ Command:
 ```
 
 Run from the worktree root
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad37a256a0fb60243` through
+`<repo-root>\.claude\worktrees\agent-ad37a256a0fb60243` through
 `pwsh -NoProfile`. `vstest.console.exe` was resolved with
 `vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe'`. All
 nine assembly paths came from the plan's canonical assembly list and all nine were confirmed present
@@ -51,7 +51,7 @@ The TRX `<Counters>` element corroborates the console summary exactly:
 ## TRX path
 
 ```
-docs/features/active/winformspumphost-suite-determinism-511/evidence/baseline/p0-t15/DanMoisan_MEGALODON4_2026-08-22_09_27_19_net481.trx
+docs/features/active/winformspumphost-suite-determinism-511/evidence/baseline/p0-t15/2026-08-22_09_27_19_net481.trx
 ```
 
 The file exists (9,150,580 bytes) and is the **only** TRX file in that subdirectory. Directory
@@ -59,8 +59,8 @@ listing:
 
 ```
 d76a53ba-c575-4bfc-94cd-7d71737150a5/                          (holds the binary .coverage attachment)
-DanMoisan_MEGALODON4_2026-08-22_09_27_19/                      (per-test attachment folder)
-DanMoisan_MEGALODON4_2026-08-22_09_27_19_net481.trx            (the single TRX)
+2026-08-22_09_27_19/                      (per-test attachment folder)
+2026-08-22_09_27_19_net481.trx            (the single TRX)
 ```
 
 ## Acceptance conditions

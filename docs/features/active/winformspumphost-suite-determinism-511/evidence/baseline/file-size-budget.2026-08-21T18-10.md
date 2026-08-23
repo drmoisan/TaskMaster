@@ -9,7 +9,7 @@ pwsh -NoProfile -Command "@('QuickFiler.Test/Controllers/QfcItemController.Initi
 ```
 
 Run from the worktree root
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad37a256a0fb60243`. `Get-Content
+`<repo-root>\.claude\worktrees\agent-ad37a256a0fb60243`. `Get-Content
 -LiteralPath` was invoked once per file and the returned lines were counted, as the task specifies.
 
 EXIT_CODE: 0

@@ -11,7 +11,7 @@ cat global.json
 dotnet --version
 
 # 2. Provisioning (mirror method, authorized by the task text)
-pwsh -NoProfile -Command "robocopy 'C:\Users\DanMoisan\repos\TaskMaster\.dotnet-sdk' 'C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad37a256a0fb60243\.dotnet-sdk' /E /MT:16 /NFL /NDL /NJH /NP"
+pwsh -NoProfile -Command "robocopy '<repo-root>\.dotnet-sdk' '<repo-root>\.claude\worktrees\agent-ad37a256a0fb60243\.dotnet-sdk' /E /MT:16 /NFL /NDL /NJH /NP"
 
 # 3. Post-state confirmation (run from the worktree root)
 dotnet --version
@@ -53,7 +53,7 @@ Output Summary:
 
 **Mirror**, not the install script. The task authorizes either
 `pwsh -NoProfile -File .\scripts\vscode\Install-RepoDotNetSdk.ps1` or mirroring the already-populated
-`.dotnet-sdk` tree from the main checkout at `C:\Users\DanMoisan\repos\TaskMaster`. The mirror was
+`.dotnet-sdk` tree from the main checkout at `<repo-root>`. The mirror was
 chosen because the source tree was already present and complete (747 MB, containing
 `.dotnet-sdk\sdk\8.0.205\`), so the mirror avoids a network download and produces a byte-identical
 tree. `robocopy /E /MT:16` was used to perform the recursive copy.
@@ -64,7 +64,7 @@ tree. `robocopy /E /MT:16` was used to perform the recursive copy.
 - `dotnet --list-sdks` run from the worktree root:
 
   ```
-  8.0.205 [C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad37a256a0fb60243\.dotnet-sdk\sdk]
+  8.0.205 [<repo-root>\.claude\worktrees\agent-ad37a256a0fb60243\.dotnet-sdk\sdk]
   10.0.302 [C:\Program Files\dotnet\sdk]
   ```
 

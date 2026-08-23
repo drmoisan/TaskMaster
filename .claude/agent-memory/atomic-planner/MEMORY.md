@@ -72,3 +72,6 @@
 - [One AC per check-off task](feedback_ac_checkoff_one_per_task.md) — preflight rejects batched AC check-offs; one checkbox + own evidence pointer per task (#230 B4)
 - [Post-format file-size audit + async-tail asymmetry](feedback_postformat_file_size_audit.md) — 500-line audit goes AFTER final csharpier format; awaited vs fire-and-forget tails decide completion-vs-fault test shape (#230 B2/B3)
 - [Wiring gates must be wiring-sensitive](feedback_wiring_gates_must_be_wiring_sensitive.md) — count floors deflate with the defect they guard; use static [TestMethod] enumeration vs /ListTests discovery (#230 rev3)
+
+## Artifact hygiene
+- [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.

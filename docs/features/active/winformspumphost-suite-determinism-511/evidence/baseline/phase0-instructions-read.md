@@ -17,7 +17,7 @@ Files read, in the order read:
 - `.claude/rules/csharp.md` — read end to end, 96 lines (P0-T4)
 
 All four paths are relative to the worktree root
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad37a256a0fb60243`.
+`<repo-root>\.claude\worktrees\agent-ad37a256a0fb60243`.
 
 ---
 

@@ -9,7 +9,7 @@ dotnet tool run csharpier check .
 ```
 
 Run from the worktree root
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad37a256a0fb60243`. Read-only: the
+`<repo-root>\.claude\worktrees\agent-ad37a256a0fb60243`. Read-only: the
 `check` subcommand reports formatting divergence and writes no file.
 
 EXIT_CODE: 0

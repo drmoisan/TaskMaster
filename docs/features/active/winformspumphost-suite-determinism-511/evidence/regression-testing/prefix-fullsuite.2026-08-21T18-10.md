@@ -21,7 +21,7 @@ Command (executed ten consecutive times):
 ```
 
 Run from the worktree root
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad37a256a0fb60243` through
+`<repo-root>\.claude\worktrees\agent-ad37a256a0fb60243` through
 `pwsh -NoProfile`. All nine assembly paths come from the plan's canonical assembly list.
 
 EXIT_CODE: 0

@@ -42,7 +42,7 @@ install count.
 Feeds used, as reported by NuGet:
 
 ```
-    C:\Users\DanMoisan\.nuget\packages\
+    <user-profile>\.nuget\packages\
     https://api.nuget.org/v3/index.json
     C:\Program Files (x86)\Microsoft SDKs\NuGetPackages\
 ```

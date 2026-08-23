@@ -61,3 +61,6 @@
 - [build-ci-coverage-gate-fidelity epic outcome](project_build-ci-coverage-gate-fidelity-epic-outcome.md) — 80-vs-85 contradiction NOT removed; runner gate 80 vs hook 85; C# 85.55%, PS branch nonexistent
 - [PowerShell coverage is nondeterministic](project_powershell-coverage-nondeterministic-vsbuild-tests.md) — Invoke-VSBuild.Tests.ps1 runs vswhere + Sync-PackageReferences for real; measure PS coverage in-session, never quote a stored figure
 - [449-review-residuals](project_449-review-residuals.md) — PASS/0 blocking; untracked #584 promotion doc owed a non-child route; unused usings in base test file; AC-supersession-via-plan-provision pattern validated
+
+## Artifact hygiene
+- [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.

@@ -9,7 +9,7 @@ pwsh -NoProfile -File .\scripts\vscode\Invoke-MSTestWithCoverage.ps1 -SearchRoot
 ```
 
 Run from the worktree root
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad37a256a0fb60243`. The script wraps the
+`<repo-root>\.claude\worktrees\agent-ad37a256a0fb60243`. The script wraps the
 same nine assemblies with `dotnet-coverage` and emits Cobertura XML; `vstest.console.exe
 /EnableCodeCoverage` alone emits a binary `.coverage` file, not a percentage, which is why this
 script is the source of numeric coverage in this plan.

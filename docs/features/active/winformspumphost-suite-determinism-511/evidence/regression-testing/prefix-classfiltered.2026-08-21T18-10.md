@@ -14,7 +14,7 @@ Command (executed ten consecutive times):
 ```
 
 Run from the worktree root
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad37a256a0fb60243` through
+`<repo-root>\.claude\worktrees\agent-ad37a256a0fb60243` through
 `pwsh -NoProfile`. `vstest.console.exe` was resolved with `vswhere`. `/EnableCodeCoverage` is
 deliberately absent: the task specifies it only for the full-suite run in P1-T4.
 
@@ -43,16 +43,16 @@ pump thread is `false`. A passing probe therefore establishes `IsHandleCreated: 
 
 | Run | Scope | Exit | `InitializeBool_...CompletesAndInitializesState` | `InitializeNineArgOverload_...SavesParametersAndDelegates` | `BuildPumpHarness_ForcesTheViewerWindowHandleOnThePumpThread` | `IsHandleCreated` | Total | Passed | Failed | TRX |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `DanMoisan_MEGALODON4_2026-08-22_09_52_25_net481.trx` |
-| 2 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `DanMoisan_MEGALODON4_2026-08-22_09_52_28_net481.trx` |
-| 3 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `DanMoisan_MEGALODON4_2026-08-22_09_52_33_net481.trx` |
-| 4 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `DanMoisan_MEGALODON4_2026-08-22_09_52_41_net481.trx` |
-| 5 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `DanMoisan_MEGALODON4_2026-08-22_09_52_51_net481.trx` |
-| 6 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `DanMoisan_MEGALODON4_2026-08-22_09_52_55_net481.trx` |
-| 7 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `DanMoisan_MEGALODON4_2026-08-22_09_52_59_net481.trx` |
-| 8 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `DanMoisan_MEGALODON4_2026-08-22_09_53_04_net481.trx` |
-| 9 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `DanMoisan_MEGALODON4_2026-08-22_09_53_08_net481.trx` |
-| 10 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `DanMoisan_MEGALODON4_2026-08-22_09_53_16_net481.trx` |
+| 1 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `2026-08-22_09_52_25_net481.trx` |
+| 2 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `2026-08-22_09_52_28_net481.trx` |
+| 3 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `2026-08-22_09_52_33_net481.trx` |
+| 4 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `2026-08-22_09_52_41_net481.trx` |
+| 5 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `2026-08-22_09_52_51_net481.trx` |
+| 6 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `2026-08-22_09_52_55_net481.trx` |
+| 7 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `2026-08-22_09_52_59_net481.trx` |
+| 8 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `2026-08-22_09_53_04_net481.trx` |
+| 9 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `2026-08-22_09_53_08_net481.trx` |
+| 10 | class-filtered | 0 | Passed | Passed | Passed | true | 10 | 10 | 0 | `2026-08-22_09_53_16_net481.trx` |
 
 Observed failure rate in this scope: **0 of 10 runs** for each of the three tracked tests.
 

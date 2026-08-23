@@ -31,7 +31,7 @@ Output Summary:
 | Test run | Passed | **1** |
 | Test run | Failed | **0** |
 | Test run | Duration | 2.78 s |
-| Test run | TRX | `evidence/regression-testing/p2-t6/DanMoisan_MEGALODON4_2026-08-22_10_22_48_net481.trx` |
+| Test run | TRX | `evidence/regression-testing/p2-t6/2026-08-22_10_22_48_net481.trx` |
 
 ## Pre-fix and post-fix side by side
 

@@ -13,7 +13,7 @@ blocking, because every `EXIT_CODE: 0` acceptance downstream is unreachable with
    `rollForward: latestFeature` and `paths: [".dotnet-sdk", "$host$"]`. A fresh worktree has none, and
    the host SDK (10.0.302) cannot satisfy it. `dotnet --version` from the worktree root prints the
    `global.json` `errorMessage` instead of a version. Fix: `scripts/vscode/Install-RepoDotNetSdk.ps1`,
-   or mirror `C:\Users\DanMoisan\repos\TaskMaster\.dotnet-sdk`. Ignored by `.gitignore:350` (`.dotnet*/`).
+   or mirror `<repo-root>\.dotnet-sdk`. Ignored by `.gitignore:350` (`.dotnet*/`).
 2. **`packages/` is absent.** Every project declares `EnsureNuGetPackageBuildImports` whose `<Error>`
    fires at `BeforeTargets="PrepareForBuild"`, so msbuild hard-fails. Fix: `nuget restore TaskMaster.sln`
    (what CI does at `.github/workflows/_build-analyzers.yml:45`). Restored content is ignored by

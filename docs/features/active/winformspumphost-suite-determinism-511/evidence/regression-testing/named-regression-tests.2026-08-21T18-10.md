@@ -17,7 +17,7 @@ EXIT_CODE: 0
 
 Output Summary:
 
-TRX: `evidence/regression-testing/p3-t4/DanMoisan_MEGALODON4_2026-08-22_10_34_47_net481.trx`
+TRX: `evidence/regression-testing/p3-t4/2026-08-22_10_34_47_net481.trx`
 (the only file in that subdirectory).
 
 TRX `<Counters>` verbatim:

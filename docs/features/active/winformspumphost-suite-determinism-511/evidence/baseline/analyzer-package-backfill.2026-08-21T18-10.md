@@ -72,8 +72,8 @@ Binding Constraints note describes on CI and in the main checkout.
 2. **Both named DLL files exist:**
 
    ```
-   -rwxr-xr-x 1 DanMoisan 197121 2749952 Aug 14 20:39 packages/Meziantou.Analyzer.3.0.156/analyzers/dotnet/roslyn5.0/cs/Meziantou.Analyzer.dll
-   -rwxr-xr-x 1 DanMoisan 197121  382464 Aug  8 12:24 packages/Roslynator.Analyzers.4.16.0/analyzers/dotnet/roslyn4.7/cs/Roslynator.CSharp.Analyzers.dll
+   -rwxr-xr-x 1 <user> 197121 2749952 Aug 14 20:39 packages/Meziantou.Analyzer.3.0.156/analyzers/dotnet/roslyn5.0/cs/Meziantou.Analyzer.dll
+   -rwxr-xr-x 1 <user> 197121  382464 Aug  8 12:24 packages/Roslynator.Analyzers.4.16.0/analyzers/dotnet/roslyn4.7/cs/Roslynator.CSharp.Analyzers.dll
    ```
 
    The remaining three Roslynator `4.16.0` DLLs the project files name are also present, so all five

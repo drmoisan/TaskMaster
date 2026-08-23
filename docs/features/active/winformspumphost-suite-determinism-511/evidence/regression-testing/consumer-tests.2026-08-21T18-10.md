@@ -13,7 +13,7 @@ EXIT_CODE: 0
 
 Output Summary:
 
-TRX: `evidence/regression-testing/p3-t5/DanMoisan_MEGALODON4_2026-08-22_10_36_21_net481.trx`
+TRX: `evidence/regression-testing/p3-t5/2026-08-22_10_36_21_net481.trx`
 
 TRX `<Counters>` verbatim:
 

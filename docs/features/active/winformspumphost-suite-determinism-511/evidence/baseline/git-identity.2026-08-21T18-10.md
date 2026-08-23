@@ -12,7 +12,7 @@ git status --porcelain
 ```
 
 All four commands were run from the worktree root
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ad37a256a0fb60243`.
+`<repo-root>\.claude\worktrees\agent-ad37a256a0fb60243`.
 
 EXIT_CODE: 0
 
