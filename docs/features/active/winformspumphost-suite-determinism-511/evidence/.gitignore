@@ -1,0 +1,19 @@
+# Raw vstest.console.exe output is never committed under this evidence tree.
+#
+# The evidence of record is the distilled per-run markdown alongside these paths. The raw
+# artifacts are large (a single ten-run pass produced roughly 1.2 GB) and the repository's
+# standing policy is against committing raw machine test and coverage output. Repository-root
+# .gitignore already excludes *.coverage; *.trx was not excluded, so a `git add -A` in this
+# worktree would otherwise stage hundreds of megabytes of TRX.
+#
+# See other/raw-vstest-artifact-disposition.2026-08-23T21-40.md for the recorded disposition.
+
+*.trx
+*.coverage
+*.coveragexml
+
+# vstest per-run scratch directories. The date-stamped form is the default results layout;
+# the Deploy_* form is the deployment scratch directory, whose default name embeds the
+# account and host and is therefore also a host-identifier leak.
+Deploy_*/
+20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]_*/
