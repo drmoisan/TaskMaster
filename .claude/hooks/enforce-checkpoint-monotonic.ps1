@@ -43,6 +43,8 @@
 [CmdletBinding()]
 param()
 
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 $script:CanonicalStepPrefixes = @(
     'S0_startup_checks',
     'S1_change_budget_estimation',
@@ -197,7 +199,7 @@ function Test-IsCheckpointPath {
 function Invoke-CheckpointMonotonicDecision {
     <#
     .SYNOPSIS
-        Parses CLAUDE_TOOL_INPUT and returns an allow-or-block decision.
+        Parses the PreToolUse envelope and returns an allow-or-block decision.
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -205,18 +207,20 @@ function Invoke-CheckpointMonotonicDecision {
         [string] $ToolInputRaw
     )
 
-    if (-not $ToolInputRaw) {
-        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
+    $envelope = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $envelope.IsValid) {
+        return [ordered]@{
+            hookSpecificOutput = [ordered]@{
+                hookEventName            = 'PreToolUse'
+                permissionDecision       = 'deny'
+                permissionDecisionReason = 'CHECKPOINT_MONOTONIC_BLOCKED: payload anomaly - ' +
+                (Get-ClaudeHookPayloadAnomalyReason -Anomaly $envelope.Anomaly) +
+                '. The gate fails closed on an envelope it cannot read.'
+            }
+        }
     }
 
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    }
-    catch {
-        throw "enforce-checkpoint-monotonic hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
-    }
-
-    $filePath = $toolInput.file_path
+    $filePath = Get-ClaudeHookToolInputString -ToolInput $envelope.Value -Name 'file_path'
     if (-not $filePath) {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
@@ -228,7 +232,7 @@ function Invoke-CheckpointMonotonicDecision {
 
     # Write tool: validate the content payload. Edit tool: partial new_string is
     # not reliable without the full target file content, so allow.
-    $content = $toolInput.content
+    $content = Get-ClaudeHookToolInputString -ToolInput $envelope.Value -Name 'content'
     if (-not $content) {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
@@ -298,13 +302,7 @@ if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-}
-catch {
-    Write-Error $_
-    exit 1
-}
+$decision = Invoke-CheckpointMonotonicDecision -ToolInputRaw (Read-ClaudeHookRawPayload)
 
 $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 

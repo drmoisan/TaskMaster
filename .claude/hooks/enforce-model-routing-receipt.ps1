@@ -5,7 +5,7 @@
 
 .DESCRIPTION
     Invoked by the Claude Code PreToolUse hook on the Agent (Task) tool. Reads
-    tool input JSON from the CLAUDE_TOOL_INPUT environment variable and the
+    tool input JSON from the the envelope's nested tool_input environment variable and the
     orchestrator checkpoint from artifacts/orchestration/orchestrator-state.json.
 
     The hook enforces presence only: it cannot read the delegate's chosen
@@ -32,6 +32,8 @@
 [CmdletBinding()]
 param()
 
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 function Get-ModelRoutingCheckpoint {
     <#
     .SYNOPSIS
@@ -118,7 +120,7 @@ function Test-ModelRoutingReceiptPresent {
 function Invoke-ModelRoutingReceiptDecision {
     <#
     .SYNOPSIS
-        Parses CLAUDE_TOOL_INPUT and returns an allow-or-block decision object.
+        Parses the envelope's nested tool_input and returns an allow-or-block decision object.
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -128,21 +130,23 @@ function Invoke-ModelRoutingReceiptDecision {
 
     $allow = [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
 
-    # Empty or absent tool input is not a delegation this hook can gate.
-    if (-not $ToolInputRaw) {
-        return $allow
+    # Envelope-level anomalies fail closed (issue #501): an unreadable envelope means
+    # the PreToolUse contract drifted, which is exactly the condition that made every
+    # gate in this runtime inert, so it must deny rather than pass through.
+    $envelope = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $envelope.IsValid) {
+        return [ordered]@{
+            hookSpecificOutput = [ordered]@{
+                hookEventName            = 'PreToolUse'
+                permissionDecision       = 'deny'
+                permissionDecisionReason = 'MODEL_ROUTING_RECEIPT_BLOCKED: payload anomaly - ' +
+                (Get-ClaudeHookPayloadAnomalyReason -Anomaly $envelope.Anomaly) +
+                '. The gate fails closed on an envelope it cannot read.'
+            }
+        }
     }
 
-    # Malformed tool-input JSON is allowed through gracefully; this hook is a
-    # deterrent, not the authoritative validator.
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    }
-    catch {
-        return $allow
-    }
-
-    $subagent = [string]$toolInput.subagent_type
+    $subagent = Get-ClaudeHookToolInputString -ToolInput $envelope.Value -Name 'subagent_type'
 
     # Only the gated Agent-tool delegates are receipt-checked; any other
     # subagent_type (including orchestrator) passes through.
@@ -169,13 +173,7 @@ if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $decision = Invoke-ModelRoutingReceiptDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-}
-catch {
-    Write-Error $_
-    exit 1
-}
+$decision = Invoke-ModelRoutingReceiptDecision -ToolInputRaw (Read-ClaudeHookRawPayload)
 
 $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 

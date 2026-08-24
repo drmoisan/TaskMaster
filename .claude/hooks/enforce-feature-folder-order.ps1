@@ -4,8 +4,9 @@
     spec.md, or user-story.md are not yet present in that same folder.
 
 .DESCRIPTION
-    Invoked by the Claude Code PreToolUse hook on Write or Edit operations. Reads
-    tool input JSON from the CLAUDE_TOOL_INPUT environment variable. When the
+    Invoked by the Claude Code PreToolUse hook on Write or Edit operations. Acquires
+    the hook payload through the shared reader and reads file_path from the envelope's
+    nested tool_input. When the
     target file_path matches a feature-folder plan.md path under
     docs/features/(active|archive)/<folder>/plan.md, the script verifies that
     each of issue.md, spec.md, and user-story.md exists in the same folder.
@@ -24,6 +25,8 @@
 [CmdletBinding()]
 param()
 
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 function Get-FeatureFolderFileExistence {
     <#
     .SYNOPSIS
@@ -87,28 +90,34 @@ function Test-IsFeaturePlanPath {
 function Invoke-FeatureFolderOrderDecision {
     <#
     .SYNOPSIS
-        Parses CLAUDE_TOOL_INPUT and produces an allow-or-block decision.
+        Parses the PreToolUse envelope and produces an allow-or-block decision.
     .PARAMETER ToolInputRaw
-        Raw JSON string. Empty/null returns allow.
+        The raw JSON hook payload acquired by Read-ClaudeHookRawPayload. An envelope
+        anomaly fails closed as a deny; a well-formed tool_input carrying no file_path
+        remains an allow.
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
+        [AllowNull()]
+        [AllowEmptyString()]
         [string] $ToolInputRaw
     )
 
-    if (-not $ToolInputRaw) {
-        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
+    $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $payload.IsValid) {
+        return [ordered]@{
+            hookSpecificOutput = [ordered]@{
+                hookEventName            = 'PreToolUse'
+                permissionDecision       = 'deny'
+                permissionDecisionReason = 'FEATURE_FOLDER_ORDER_BLOCKED: payload anomaly - ' +
+                (Get-ClaudeHookPayloadAnomalyReason -Anomaly $payload.Anomaly) +
+                '. The gate fails closed on an envelope it cannot read.'
+            }
+        }
     }
 
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    }
-    catch {
-        throw "enforce-feature-folder-order hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
-    }
-
-    $filePath = $toolInput.file_path
+    $filePath = Get-ClaudeHookToolInputString -ToolInput $payload.Value -Name 'file_path'
     if (-not $filePath) {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
@@ -134,19 +143,55 @@ function Invoke-FeatureFolderOrderDecision {
     }
 }
 
+function Invoke-FeatureFolderOrderEntryPoint {
+    <#
+    .SYNOPSIS
+        Runs the hook decision and returns the process exit code.
+    .DESCRIPTION
+        Acquires the payload through the shared reader unless the caller supplies
+        one, emits the compact decision JSON, and returns 0. It never returns 1:
+        exit 1 is non-blocking for PreToolUse, so every anomaly is already a deny
+        decision by the time control reaches here. The function does not call exit;
+        the thin tail converts the returned code into a process exit.
+    .PARAMETER ToolInputRaw
+        Optional pre-acquired payload text. When omitted the ReadPayload seam runs.
+    .PARAMETER ReadPayload
+        Seam for payload acquisition, so tests can drive the empty-on-all-transports
+        case without touching a console.
+    .OUTPUTS
+        System.Int32
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $ToolInputRaw,
+
+        [scriptblock] $ReadPayload = { Read-ClaudeHookRawPayload }
+    )
+
+    if (-not $PSBoundParameters.ContainsKey('ToolInputRaw')) {
+        $ToolInputRaw = [string](& $ReadPayload)
+    }
+
+    $decision = Invoke-FeatureFolderOrderDecision -ToolInputRaw $ToolInputRaw
+    $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+
+    return 0
+}
+
 # Guard allows dot-sourcing in tests without executing the entrypoint.
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $decision = Invoke-FeatureFolderOrderDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-}
-catch {
-    Write-Error $_
-    exit 1
+# The entry point returns its [int] exit code as the last pipeline element and the
+# decision JSON before it. `exit (<call>)` would capture BOTH into the exit
+# expression and emit nothing, so the decision is written explicitly here first.
+$entryPointResult = @(Invoke-FeatureFolderOrderEntryPoint)
+if ($entryPointResult.Count -gt 1) {
+    $entryPointResult[0..($entryPointResult.Count - 2)] | Write-Output
 }
 
-$decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
-
-exit 0
+exit ([int]$entryPointResult[-1])

@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     Invoked by the Claude Code PreToolUse hook on the "Bash" matcher before any Bash
-    command runs. Regex-matches git worktree remove against CLAUDE_TOOL_INPUT.command,
+    command runs. Regex-matches git worktree remove against the envelope's tool_input.command,
     extracts the target worktree path argument, reads
     artifacts/orchestration/epic-orchestrator-state.json, and finds the features[] record
     whose worktree_path matches. Allows removal only when that record's merge_status is
@@ -21,6 +21,8 @@
 [CmdletBinding()]
 param()
 
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 $script:EpicCheckpointPath = 'artifacts/orchestration/epic-orchestrator-state.json'
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
 
@@ -169,7 +171,7 @@ function Get-EpicWorktreeGateBlockDecision {
 function Invoke-EpicWorktreeRemovalGateDecision {
     <#
     .SYNOPSIS
-        Parses CLAUDE_TOOL_INPUT and returns an allow-or-block decision.
+        Parses the PreToolUse envelope and returns an allow-or-block decision.
     .PARAMETER ToolInputRaw
         The raw JSON tool payload supplied by Claude Code.
     .OUTPUTS
@@ -181,17 +183,15 @@ function Invoke-EpicWorktreeRemovalGateDecision {
         [string] $ToolInputRaw
     )
 
-    if (-not $ToolInputRaw) {
-        return Get-EpicWorktreeGateAllowDecision
+    $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $payload.IsValid) {
+        return Get-EpicWorktreeGateBlockDecision -Reason (
+            'EPIC_WORKTREE_REMOVAL_BLOCKED: payload anomaly - ' +
+            (Get-ClaudeHookPayloadAnomalyReason -Anomaly $payload.Anomaly) +
+            '. The gate fails closed on an envelope it cannot read.')
     }
 
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        throw "enforce-epic-worktree-removal-gate hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
-    }
-
-    $commandText = $toolInput.command
+    $commandText = Get-ClaudeHookToolInputString -ToolInput $payload.Value -Name 'command'
     if (-not $commandText) {
         return Get-EpicWorktreeGateAllowDecision
     }
@@ -220,18 +220,55 @@ function Invoke-EpicWorktreeRemovalGateDecision {
     return Get-EpicWorktreeGateBlockDecision -Reason "EPIC_WORKTREE_REMOVAL_BLOCKED: git worktree remove for '$worktreePath' requires a matching epic checkpoint features[] record with merge_status in {merged, worktree_removed}. The checkpoint was unreadable, no matching record was found, or merge_status was not yet safe for removal."
 }
 
+function Invoke-EpicWorktreeRemovalGateEntryPoint {
+    <#
+    .SYNOPSIS
+        Runs the hook decision and returns the process exit code.
+    .DESCRIPTION
+        Acquires the payload through the shared reader unless the caller supplies
+        one, emits the compact decision JSON, and returns 0. It never returns 1:
+        exit 1 is non-blocking for PreToolUse, so every anomaly is already a deny
+        decision by the time control reaches here. The function does not call exit;
+        the thin tail converts the returned code into a process exit.
+    .PARAMETER ToolInputRaw
+        Optional pre-acquired payload text. When omitted the ReadPayload seam runs.
+    .PARAMETER ReadPayload
+        Seam for payload acquisition, so tests can drive the empty-on-all-transports
+        case without touching a console.
+    .OUTPUTS
+        System.Int32
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $ToolInputRaw,
+
+        [scriptblock] $ReadPayload = { Read-ClaudeHookRawPayload }
+    )
+
+    if (-not $PSBoundParameters.ContainsKey('ToolInputRaw')) {
+        $ToolInputRaw = [string](& $ReadPayload)
+    }
+
+    $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $ToolInputRaw
+    $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+
+    return 0
+}
+
 # Guard allows dot-sourcing in tests without executing the entrypoint.
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $decision = Invoke-EpicWorktreeRemovalGateDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-} catch {
-    Write-Error $_
-    exit 1
+# The entry point returns its [int] exit code as the last pipeline element and the
+# decision JSON before it. `exit (<call>)` would capture BOTH into the exit
+# expression and emit nothing, so the decision is written explicitly here first.
+$entryPointResult = @(Invoke-EpicWorktreeRemovalGateEntryPoint)
+if ($entryPointResult.Count -gt 1) {
+    $entryPointResult[0..($entryPointResult.Count - 2)] | Write-Output
 }
 
-$decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
-
-exit 0
+exit ([int]$entryPointResult[-1])

@@ -2,8 +2,11 @@
   "version": 1,
   "shared_surfaces": [
     ".claude/settings.json",
+    "config/blast-radius.json",
     "config/orchestration-routing.json",
-    "config/blast-radius.json"
+    "package-lock.json",
+    "poetry.lock",
+    "quality-tiers.yml"
   ],
   "shared_surface_globs": [],
   "mandate_reads": [
@@ -12,7 +15,11 @@
     ".claude/skills/evidence-and-timestamp-conventions/SKILL.md",
     ".github/instructions/**",
     "artifacts/**",
-    "quality-tiers.yml"
+    "quality-tiers.yml",
+    ".claude/skills/acceptance-criteria-tracking/SKILL.md",
+    ".claude/skills/policy-compliance-order/SKILL.md",
+    ".claude/agent-memory/**",
+    ".agents/skills/**"
   ],
   "modules": {
     "QuickFiler": [
@@ -68,9 +75,6 @@
     ],
     "VBFunctions.Test": [
       "VBFunctions.Test/**"
-    ],
-    "claude-runtime": [
-      ".claude/**"
     ],
     "config": [
       "config/**"

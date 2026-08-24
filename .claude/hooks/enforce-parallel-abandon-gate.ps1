@@ -5,7 +5,8 @@
 
 .DESCRIPTION
     Invoked by the Claude Code PreToolUse hook on the "Bash" matcher before any Bash
-    command runs. Reads CLAUDE_TOOL_INPUT, extracts the command text, and matches it
+    command runs. Reads the hook payload through the shared reader, extracts the
+    command text from the envelope's nested tool_input, and matches it
     against the two tokens declared at the top of this file: the abandon disposition
     token and the confirmation marker. A command carrying the abandon disposition token
     without the confirmation marker in the SAME command is denied with reason prefix
@@ -32,6 +33,8 @@
 [CmdletBinding()]
 param()
 
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 # The two tokens this gate matches on. These are the ONLY places either token literal
 # appears in this file; the seam test extracts the consumer-side values from exactly
 # these two named assignments.
@@ -44,8 +47,8 @@ $script:AbandonBlockedReasonCode = 'PARALLEL_ABANDON_BLOCKED'
 function Get-ParallelAbandonGateToolInput {
     <#
     .SYNOPSIS
-        Read the raw JSON tool payload supplied by Claude Code. Tests mock this
-        function (read seam).
+        Read the raw JSON hook payload through the shared reader (stdin first, then
+        the two environment fallbacks). Tests mock this function (read seam).
     .OUTPUTS
         System.String or $null
     #>
@@ -53,7 +56,7 @@ function Get-ParallelAbandonGateToolInput {
     [OutputType([string])]
     param()
 
-    return $env:CLAUDE_TOOL_INPUT
+    return Read-ClaudeHookRawPayload
 }
 
 function Get-ParallelAbandonNormalizedCommand {
@@ -201,7 +204,7 @@ function Get-ParallelAbandonGateBlockReason {
 function Invoke-ParallelAbandonGateDecision {
     <#
     .SYNOPSIS
-        Parses CLAUDE_TOOL_INPUT and returns an allow-or-block decision.
+        Parses the PreToolUse envelope and returns an allow-or-block decision.
     .PARAMETER ToolInputRaw
         The raw JSON tool payload supplied by Claude Code.
     .OUTPUTS
@@ -218,17 +221,16 @@ function Invoke-ParallelAbandonGateDecision {
     # An absent payload carries no command to gate, so there is nothing in scope. This is
     # allow rather than deny because the gate constrains one specific destructive command
     # shape and must not become a blanket Bash block.
-    if (-not $ToolInputRaw) {
-        return Get-ParallelAbandonGateAllowDecision
+    $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $payload.IsValid) {
+        return Get-ParallelAbandonGateBlockDecision -Reason (
+            $script:AbandonBlockedReasonCode + ': payload anomaly - ' +
+            (Get-ClaudeHookPayloadAnomalyReason -Anomaly $payload.Anomaly) +
+            '. The gate fails closed on an envelope it cannot read.')
     }
 
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        throw "enforce-parallel-abandon-gate hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
-    }
-
-    $normalizedCommand = Get-ParallelAbandonNormalizedCommand -CommandText ([string]$toolInput.command)
+    $commandText = Get-ClaudeHookToolInputString -ToolInput $payload.Value -Name 'command'
+    $normalizedCommand = Get-ParallelAbandonNormalizedCommand -CommandText $commandText
     if (-not (Test-ParallelAbandonCommandInScope -NormalizedCommand $normalizedCommand)) {
         return Get-ParallelAbandonGateAllowDecision
     }
@@ -247,12 +249,7 @@ if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw (Get-ParallelAbandonGateToolInput)
-} catch {
-    Write-Error $_
-    exit 1
-}
+$decision = Invoke-ParallelAbandonGateDecision -ToolInputRaw (Get-ParallelAbandonGateToolInput)
 
 $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 

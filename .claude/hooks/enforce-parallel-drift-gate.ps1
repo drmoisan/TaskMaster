@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     Invoked by the Claude Code PreToolUse hook on the "Agent" matcher. Activates only when
-    CLAUDE_TOOL_INPUT.subagent_type == "feature-review" and the prompt carries the
+    the envelope's nested tool_input.subagent_type == "feature-review" and the prompt carries the
     parallel-mode kickoff marker defined in the "Parallel-Mode Kickoff Parameter" section
     of .claude/skills/parallel-orchestrate/SKILL.md, matched byte-for-byte (ordinal).
 
@@ -61,6 +61,8 @@
 [CmdletBinding()]
 param()
 
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 # Dot-source the shape-and-derivation helpers. Guarded so a missing file produces a clear error
 # and so dot-sourcing this hook in tests loads the helpers too.
 $script:ParallelDriftGateHelpersPath = Join-Path $PSScriptRoot 'enforce-parallel-drift-gate-helpers.ps1'
@@ -270,28 +272,32 @@ function Get-ParallelDriftGateBlockDecision {
 function Invoke-ParallelDriftGateDecision {
     <#
     .SYNOPSIS
-        Parse the raw CLAUDE_TOOL_INPUT JSON payload and return an allow-or-block decision.
+        Parse the PreToolUse envelope and return an allow-or-block decision.
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
-    param([string] $ToolInputRaw)
+    param(
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $ToolInputRaw
+    )
 
-    if (-not $ToolInputRaw) {
-        return Get-ParallelDriftGateAllowDecision
-    }
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        throw "enforce-parallel-drift-gate hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
+    $envelope = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $envelope.IsValid) {
+        return Get-ParallelDriftGateBlockDecision -Reason (
+            'PARALLEL_DRIFT_GATE_BLOCKED: payload anomaly - ' +
+            (Get-ClaudeHookPayloadAnomalyReason -Anomaly $envelope.Anomaly) +
+            '. The gate fails closed on an envelope it cannot read.')
     }
 
     # Two cheap disqualifiers first: this gate governs only feature-review delegations, and
     # only under the parallel-mode marker, matched byte-for-byte with an ordinal Contains
     # rather than a wildcard or a culture-sensitive comparison.
-    if (([string]$toolInput.subagent_type) -cne $script:ReviewSubagentType) {
+    $subagent = Get-ClaudeHookToolInputString -ToolInput $envelope.Value -Name 'subagent_type'
+    if ($subagent -cne $script:ReviewSubagentType) {
         return Get-ParallelDriftGateAllowDecision
     }
-    $prompt = [string]$toolInput.prompt
+    $prompt = Get-ClaudeHookToolInputString -ToolInput $envelope.Value -Name 'prompt'
     if (-not $prompt -or -not $prompt.Contains($script:ParallelModeMarker, [System.StringComparison]::Ordinal)) {
         return Get-ParallelDriftGateAllowDecision
     }
@@ -342,18 +348,47 @@ function Invoke-ParallelDriftGateDecision {
     return Get-ParallelDriftGateBlockDecision -Reason "PARALLEL_DRIFT_GATE_BLOCKED: item $itemKey ('$featureFolder') has an unresolved radius drift event and no $script:FindingFilePrefix<timestamp>$script:FindingFileSuffix finding dated at or after that event recorded in its feature folder. The synthetic Blocking finding for the current event must be written before review proceeds, or the drift event log was unreadable."
 }
 
+function Invoke-ParallelDriftGateEntryPoint {
+    <#
+    .SYNOPSIS
+        Runs the hook decision and returns the process exit code.
+    .DESCRIPTION
+        Acquires the payload through the shared reader unless the caller supplies
+        one, emits the compact decision JSON, and returns 0. It never returns 1:
+        exit 1 is non-blocking for PreToolUse, so every anomaly is already a deny
+        decision by the time control reaches here. The function does not call exit;
+        the thin tail converts the returned code into a process exit.
+    .PARAMETER ToolInputRaw
+        Optional pre-acquired payload text. When omitted the ReadPayload seam runs.
+    .PARAMETER ReadPayload
+        Seam for payload acquisition, so tests can drive the empty-on-all-transports
+        case without touching a console.
+    .OUTPUTS
+        System.Int32
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $ToolInputRaw,
+
+        [scriptblock] $ReadPayload = { Read-ClaudeHookRawPayload }
+    )
+
+    if (-not $PSBoundParameters.ContainsKey('ToolInputRaw')) {
+        $ToolInputRaw = [string](& $ReadPayload)
+    }
+
+    $decision = Invoke-ParallelDriftGateDecision -ToolInputRaw $ToolInputRaw
+    $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+
+    return 0
+}
+
 # Guard allows dot-sourcing in tests without executing the entrypoint.
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $decision = Invoke-ParallelDriftGateDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-} catch {
-    Write-Error $_
-    exit 1
-}
-
-$decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
-
-exit 0
+exit (Invoke-ParallelDriftGateEntryPoint)

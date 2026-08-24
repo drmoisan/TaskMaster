@@ -4,8 +4,8 @@
 
 .DESCRIPTION
     This script is invoked by the Claude Code PreToolUse hook before any Bash
-    command runs. It reads the tool input from the CLAUDE_TOOL_INPUT environment
-    variable, inspects the attempted command text, and blocks direct promotion
+    command runs. It acquires the hook payload through the shared reader and reads
+    the command from the envelope's nested tool_input, then blocks direct promotion
     script execution that would bypass the repository's MCP-only promotion path.
 
     Forbidden command tokens (legacy promotion-script bypass):
@@ -29,6 +29,8 @@
 [CmdletBinding()]
 param()
 
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 $script:PromotionMcpOnlyBlockedReason = 'PROMOTION_MCP_ONLY_BLOCKED: Direct Bash promotion-script execution is not allowed in agent sessions. Use the drm-copilot MCP promotion tools instead.'
 
 $script:PromotionMcpOnlyGhIssueBlockedReason = 'PROMOTION_MCP_ONLY_BLOCKED: Direct GitHub issue creation via `gh` bypasses the approved drm-copilot MCP promotion path (`mcp__drm-copilot__new_potential_entry` -> `mcp__drm-copilot__potential_to_issue` -> `mcp__drm-copilot__new_active_feature_folder`). Use those MCP tools instead.'
@@ -70,7 +72,7 @@ function Get-PromotionBypassReason {
         Returns the gh-CLI issue creation reason when a forbidden gh pattern is matched.
         Returns $null when the command is allowed.
     .PARAMETER CommandText
-        The Bash command text extracted from CLAUDE_TOOL_INPUT.
+        The Bash command text extracted from the envelope's tool_input.
     .OUTPUTS
         System.String or $null.
     #>
@@ -118,7 +120,7 @@ function Test-PromotionBypassToken {
     .SYNOPSIS
         Return $true when a Bash command contains a forbidden promotion bypass pattern.
     .PARAMETER CommandText
-        The Bash command text extracted from CLAUDE_TOOL_INPUT.
+        The Bash command text extracted from the envelope's tool_input.
     .OUTPUTS
         System.Boolean
     #>
@@ -183,7 +185,7 @@ function Get-PromotionMcpOnlyAllowDecision {
 function Invoke-PromotionMcpOnlyDecision {
     <#
     .SYNOPSIS
-        Parse CLAUDE_TOOL_INPUT and return an allow-or-block decision.
+        Parse the PreToolUse envelope and return an allow-or-block decision.
     .PARAMETER ToolInputRaw
         The raw JSON tool payload supplied by Claude Code.
     .OUTPUTS
@@ -198,17 +200,15 @@ function Invoke-PromotionMcpOnlyDecision {
         [string] $ToolInputRaw
     )
 
-    if (-not $ToolInputRaw) {
-        return Get-PromotionMcpOnlyAllowDecision
+    $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $payload.IsValid) {
+        return Get-PromotionMcpOnlyBlockDecision -Reason (
+            'PROMOTION_MCP_ONLY_BLOCKED: payload anomaly - ' +
+            (Get-ClaudeHookPayloadAnomalyReason -Anomaly $payload.Anomaly) +
+            '. The gate fails closed on an envelope it cannot read.')
     }
 
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        throw "enforce-promotion-mcp-only hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
-    }
-
-    $commandText = $toolInput.command
+    $commandText = Get-ClaudeHookToolInputString -ToolInput $payload.Value -Name 'command'
     if (-not $commandText) {
         return Get-PromotionMcpOnlyAllowDecision
     }
@@ -221,18 +221,55 @@ function Invoke-PromotionMcpOnlyDecision {
     return Get-PromotionMcpOnlyAllowDecision
 }
 
+function Invoke-PromotionMcpOnlyEntryPoint {
+    <#
+    .SYNOPSIS
+        Runs the hook decision and returns the process exit code.
+    .DESCRIPTION
+        Acquires the payload through the shared reader unless the caller supplies
+        one, emits the compact decision JSON, and returns 0. It never returns 1:
+        exit 1 is non-blocking for PreToolUse, so every anomaly is already a deny
+        decision by the time control reaches here. The function does not call exit;
+        the thin tail converts the returned code into a process exit.
+    .PARAMETER ToolInputRaw
+        Optional pre-acquired payload text. When omitted the ReadPayload seam runs.
+    .PARAMETER ReadPayload
+        Seam for payload acquisition, so tests can drive the empty-on-all-transports
+        case without touching a console.
+    .OUTPUTS
+        System.Int32
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $ToolInputRaw,
+
+        [scriptblock] $ReadPayload = { Read-ClaudeHookRawPayload }
+    )
+
+    if (-not $PSBoundParameters.ContainsKey('ToolInputRaw')) {
+        $ToolInputRaw = [string](& $ReadPayload)
+    }
+
+    $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw $ToolInputRaw
+    $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+
+    return 0
+}
+
 # Allow dot-sourcing in tests without executing the entrypoint.
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $decision = Invoke-PromotionMcpOnlyDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-} catch {
-    Write-Error $_
-    exit 1
+# The entry point returns its [int] exit code as the last pipeline element and the
+# decision JSON before it. `exit (<call>)` would capture BOTH into the exit
+# expression and emit nothing, so the decision is written explicitly here first.
+$entryPointResult = @(Invoke-PromotionMcpOnlyEntryPoint)
+if ($entryPointResult.Count -gt 1) {
+    $entryPointResult[0..($entryPointResult.Count - 2)] | Write-Output
 }
 
-$decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
-
-exit 0
+exit ([int]$entryPointResult[-1])

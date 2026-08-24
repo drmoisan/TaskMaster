@@ -10,16 +10,22 @@
     subagent_type is 'epic-planner', 'epic-orchestrator', 'parallel-planner',
     or 'parallel-orchestrator'.
 
+    The payload is acquired through the shared reader
+    (.claude/lib/hook-payload/HookPayload.psm1: stdin first, then the two
+    environment-variable fallbacks).
+
     Caller identity resolution:
-      - The full PreToolUse payload (CLAUDE_HOOK_INPUT) carries a top-level
-        'agent_type' field only when the tool call is made from inside a
-        subagent context. A main-thread call carries no 'agent_type'.
-      - The Agent tool input (CLAUDE_TOOL_INPUT, or the payload's 'tool_input'
-        object) carries the delegation target 'subagent_type'.
+      - The PreToolUse envelope carries a top-level 'agent_type' field only when
+        the tool call is made from inside a subagent context. A main-thread call
+        carries no 'agent_type'.
+      - The envelope's nested 'tool_input' object carries the delegation target
+        'subagent_type'.
 
     Decision procedure:
-      1. Resolve the target subagent_type from CLAUDE_TOOL_INPUT, falling back
-         to the payload's tool_input object. A non-gated target allows.
+      0. An envelope this hook cannot read at all -- empty on every transport,
+         unparseable, or carrying no usable tool_input -- denies (fail closed).
+      1. Resolve the target subagent_type from the nested tool_input. A non-gated
+         target allows.
       2. Resolve the calling agent_type from the payload. An absent or empty
          agent_type indicates a main-thread invocation, which allows.
       3. Deny when the calling agent_type is exactly 'orchestrator', with the
@@ -37,9 +43,12 @@
 [CmdletBinding()]
 param()
 
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 $script:GatedSubagentTypes = @('epic-planner', 'epic-orchestrator', 'parallel-planner', 'parallel-orchestrator')
 $script:ParallelSubagentTypes = @('parallel-planner', 'parallel-orchestrator')
 $script:ProhibitedCallerAgentType = 'orchestrator'
+$script:EmptyPayloadAnomaly = 'EmptyPayload'
 
 function Get-EpicInvocationOriginAllowDecision {
     [CmdletBinding()]
@@ -110,9 +119,9 @@ function Get-EpicInvocationOriginTargetSubagent {
         Resolves the delegation target subagent_type from the tool input,
         falling back to the full payload's tool_input object.
     .PARAMETER ToolInput
-        Parsed CLAUDE_TOOL_INPUT object, or $null when absent.
+        Parsed legacy tool-input object, or $null when absent.
     .PARAMETER HookInput
-        Parsed CLAUDE_HOOK_INPUT object, or $null when absent.
+        Parsed PreToolUse envelope object, or $null when absent.
     .OUTPUTS
         System.String or $null
     #>
@@ -151,7 +160,7 @@ function Get-EpicInvocationOriginCallerAgentType {
         Resolves the calling agent_type from the full hook payload. Returns
         $null for a main-thread invocation (no agent_type field).
     .PARAMETER HookInput
-        Parsed CLAUDE_HOOK_INPUT object, or $null when absent.
+        Parsed PreToolUse envelope object, or $null when absent.
     .OUTPUTS
         System.String or $null
     #>
@@ -180,10 +189,17 @@ function Invoke-EpicInvocationOriginDecision {
     <#
     .SYNOPSIS
         Parses the hook payloads and returns an allow-or-block decision.
+    .DESCRIPTION
+        The caller's agent_type is read off the envelope root and the delegation
+        target's subagent_type off the nested tool_input. An envelope this hook cannot
+        read at all -- empty on every transport, unparseable, or carrying no usable
+        tool_input -- is a fail-closed deny, because an unreadable envelope means the
+        PreToolUse contract drifted (issue #501).
     .PARAMETER HookInputRaw
-        The raw full PreToolUse payload JSON supplied via CLAUDE_HOOK_INPUT.
+        The raw PreToolUse envelope JSON acquired by Read-ClaudeHookRawPayload.
     .PARAMETER ToolInputRaw
-        The raw Agent tool input JSON supplied via CLAUDE_TOOL_INPUT.
+        Optional legacy direct tool-input payload, retained so an undocumented wrapper
+        that supplies the bare tool input keeps working.
     .OUTPUTS
         System.Collections.Specialized.OrderedDictionary
     #>
@@ -199,27 +215,38 @@ function Invoke-EpicInvocationOriginDecision {
         [string] $ToolInputRaw
     )
 
-    # The tool input identifies the delegation target; a non-gated target is
-    # outside this hook's scope, so the hook input is not parsed for it.
-    $toolInput = ConvertFrom-EpicInvocationOriginPayload -RawPayload $ToolInputRaw -PayloadName 'CLAUDE_TOOL_INPUT'
-    $hookInputParsed = $false
+    # The envelope carries both halves: the caller's agent_type at the root and the
+    # delegation target's subagent_type inside tool_input.
+    $anomaly = $script:EmptyPayloadAnomaly
     $hookInput = $null
+    if (-not [string]::IsNullOrWhiteSpace($HookInputRaw)) {
+        $resolved = Resolve-ClaudeHookToolInput -Raw $HookInputRaw
+        $hookInput = $resolved.Envelope
+        $anomaly = if ($resolved.IsValid) { $null } else { $resolved.Anomaly }
+    }
+
+    # Legacy direct tool-input payload, retained for an undocumented wrapper that
+    # supplies the bare tool input rather than the documented envelope.
+    $toolInput = $null
+    if (-not [string]::IsNullOrWhiteSpace($ToolInputRaw)) {
+        $legacy = ConvertFrom-ClaudeHookEnvelope -Raw $ToolInputRaw
+        if ($legacy.IsValid) {
+            $toolInput = $legacy.Value
+            $anomaly = $null
+        }
+    }
 
     $target = Get-EpicInvocationOriginTargetSubagent -ToolInput $toolInput -HookInput $hookInput
-    if (-not $target -and -not [string]::IsNullOrWhiteSpace($HookInputRaw)) {
-        # Fallback: some harness surfaces supply only the full payload, whose
-        # tool_input object carries the target subagent_type.
-        $hookInput = ConvertFrom-EpicInvocationOriginPayload -RawPayload $HookInputRaw -PayloadName 'CLAUDE_HOOK_INPUT'
-        $hookInputParsed = $true
-        $target = Get-EpicInvocationOriginTargetSubagent -ToolInput $toolInput -HookInput $hookInput
+
+    if (-not $target -and $anomaly) {
+        return Get-EpicInvocationOriginBlockDecision -Reason (
+            'EPIC_INVOCATION_ORIGIN_BLOCKED: payload anomaly - ' +
+            (Get-ClaudeHookPayloadAnomalyReason -Anomaly $anomaly) +
+            '. The gate fails closed on an envelope it cannot read.')
     }
 
     if (-not $target -or $script:GatedSubagentTypes -notcontains $target) {
         return Get-EpicInvocationOriginAllowDecision
-    }
-
-    if (-not $hookInputParsed) {
-        $hookInput = ConvertFrom-EpicInvocationOriginPayload -RawPayload $HookInputRaw -PayloadName 'CLAUDE_HOOK_INPUT'
     }
 
     # An absent agent_type marks a main-thread invocation, which is the
@@ -246,12 +273,7 @@ if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $decision = Invoke-EpicInvocationOriginDecision -HookInputRaw $env:CLAUDE_HOOK_INPUT -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-} catch {
-    Write-Error $_
-    exit 1
-}
+$decision = Invoke-EpicInvocationOriginDecision -HookInputRaw (Read-ClaudeHookRawPayload)
 
 $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 

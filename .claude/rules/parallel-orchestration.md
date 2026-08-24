@@ -257,6 +257,69 @@ weakens the relation below the path level: two items editing the same file still
 A candidate module belongs in the map when it names a subsystem an item could plausibly not touch.
 A candidate that matches the majority of work items belongs nowhere.
 
+### The published truth table is not a copy of this one (issue #500)
+
+The push-down publishes a second truth table into a destination workspace at
+`extensions/drm-copilot/resources/claude-customizations/config/blast-radius.json`. That copy stood
+stale after issue #489 corrected only the self-hosted one, and correcting it fixed contention in
+both directions at once. Three points fix the relation between the two copies so a later maintainer
+does not re-synchronise them by hand.
+
+**A destination's module map is DERIVED, so the bundled `modules` key is not consumed.**
+`assembleModules` in `extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts`
+computes a destination's module map from the destination's OWN layout — the manifest-bearing
+directories its scan observes — unioned with `PAYLOAD_MODULES`. It never reads the source document's
+`modules` key. The bundled `modules` key is retained rather than deleted only so that a maintainer
+reading the file is not told something false, and because
+`tests/scripts/dev_tools/test_blast_radius_config.py` calls `load_module_globs` on it and that
+helper raises on an absent key. Nothing schedules on it.
+
+**`PAYLOAD_MODULES` carries `config` only.** `claude-runtime` was removed from it by the same
+granularity criterion that removed it from this repository's own map. The criterion transfers
+without modification: every agent in the runtime is instructed to read the policy rules and process
+skills before doing any work, so a `.claude/**` umbrella matches nearly every radius in a
+destination exactly as it did here. The no-signal floor is preserved because `config/**` in a
+destination holds only the two published files, which makes `config` a subsystem an item can
+plausibly not touch and keeps the assembled map non-empty so the forbidden-glob guard has a
+non-vacuous input.
+
+**The bundled `shared_surfaces` and `shared_surface_globs` sets are the destination-portable
+subset, not a copy of the self-hosted sets.** They were authored narrow when the bundled copy was
+created and were never a copy that fell behind, so the correct gate is portable-set equality against
+a declared constant plus a subset relation against the self-hosted list — never byte-equality with
+the self-hosted file. Only `version`, `over_breadth_fraction`, and `mandate_reads` are byte-equal
+across the two copies.
+
+The reason the two key groups take different relations is an asymmetry between surfaces and modules.
+An over-matching MODULE glob costs concurrency on every pair of items it touches, because a module
+that fires for both radii forces contention whether or not the items are related. A SURFACE or
+mandate-read entry naming a path the destination lacks is inert: it matches nothing, so it costs
+nothing. Erring wide is therefore free on the surface side and expensive on the module side, which
+is why the portable surface set carries ecosystem-standard root filenames a given destination may
+not have. A separator-free shared surface carries additional weight: it is the sole gate on whether
+the path-token extractor accepts a separator-free token at all, so a published table with no
+separator-free surface entry cannot detect two items rewriting the same root build file, whatever
+that file is named.
+
+**A directional invariant closes the residual Class 2 gap (issue #500 remediation).** Portable-set
+equality against the declared portable-surface constant and the `bundled <= self_hosted` subset
+relation together do not observe the self-hosted copy gaining a portable separator-free surface
+that never reaches the bundle: both checks are satisfied by a bundled set that stays fixed while
+the self-hosted set grows around it. `test_every_separator_free_self_hosted_shared_surface_reaches_the_bundle`
+in `tests/scripts/dev_tools/test_blast_radius_config_parity.py`, mirrored in
+`tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`, closes that gap
+structurally by asserting the reverse containment for separator-free entries: every separator-free
+self-hosted `shared_surfaces` entry must also appear in the bundled separator-free set.
+
+**The key-partition gate now asserts exhaustiveness (issue #500 remediation, R8).** The three
+declared classes each assert a property of the keys they name, but none of them asserted that
+the two committed copies' top-level key sets are identical, or that every top-level key
+belongs to one of the three declared classes. `test_every_top_level_key_is_classified_and_shared_by_both_copies`
+in `tests/scripts/dev_tools/test_blast_radius_config_parity.py`, mirrored in
+`tests/scripts/claude-lib/blast-radius/BlastRadius.KeyPartition.Tests.ps1`, closes that gap: the
+union of both copies' top-level keys is exhaustively covered by the three declared classes, and
+an unclassified key or a key present in only one copy fails loudly and names itself.
+
 ## Enforcement
 
 - `scripts/dev_tools/validate_parallel_orchestrator_state.py`, with the helper modules `scripts/dev_tools/_parallel_state_common.py`, `scripts/dev_tools/_parallel_state_structures.py`, and `scripts/dev_tools/_parallel_state_records.py`, appends one error per violated orchestrator invariant. The completion-gate invariants 20 and 21 run only when the caller passes `require_complete=True`.
