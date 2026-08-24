@@ -1,5 +1,7 @@
 # Atomic Planner Memory Index
 
+- [#468 preflight revision seams](project_468_preflight_revision_seams.md) — seam before red test or full-suite `failed==0` gates die; [expect-fail] on run tasks only; epic-child merge-base vs integration branch; pre-commit diff gates use working-tree form + non-zero count
+
 - [Agent worktrees need SDK + NuGet + analyzer-backfill bootstrap](agent-worktrees-need-sdk-and-nuget-bootstrap.md) — no `.dotnet-sdk`, no `packages/`, and a clean restore still misses the skewed analyzer versions (CS0006, not a warning); three Phase 0 tasks
 - [/Logger:trx needs /ResultsDirectory](trx-needs-resultsdirectory.md) — TRX lands in `TestResults\` relative to cwd; TRX-existence-under-evidence acceptance is unsatisfiable without it, and the clean-tree gate won't catch it
 - [Per-task TRX subdirectory](trx-needs-resultsdirectory.md) — a shared `/ResultsDirectory:` makes "ten distinct TRX files" ambiguous once `[expect-fail]` runs deposit earlier TRX there; give each task a `p#-t#` segment

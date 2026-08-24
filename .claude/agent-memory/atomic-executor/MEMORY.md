@@ -10,6 +10,7 @@
 - [AC check-off "inline pointer" + artifacts/ tool-output paths](project_preflight_ac_checkoff_and_tooloutput_paths.md) — inline evidence pointer in an AC task violates the tracking skill; artifacts/*/coverage XML is a producer path
 - [Exact-count gate vs remediation loop](project_exact_count_gate_vs_remediation_loop.md) — a pinned `TotalCount = 19` collides with an "add tests and restart" remediation path; use `B + N` and re-scan count
 - [Tracked agent-memory breaks unscoped git gates](project_agent_memory_tracked_breaks_unscoped_git_gates.md) — `.claude/agent-memory/**` is tracked + dirty; every git diff/status gate needs an explicit pathspec
+- [Zero-hit identifier sweep + red-test straddle](project_preflight_zerohit_identifier_and_red_test_straddle.md) — a bare method name isn't a repo-unique key (175 files match `LoadSequentialAsync`); a full-suite `failed == 0` gate can't sit between an `[expect-fail]` test's Compile Include and its fix
 - [Absolute-zero gate on a sibling-owned assembly + pinned WS](project_preflight_absolute_zero_gate_on_sibling_owned_assembly.md) — `Failed 0` on an assembly a sibling owns is unsatisfiable; never pin an absolute WS in preparation mode
 - [#418 500-line gate vs mandated plan content](project_418_500line_gate_vs_plan_content.md) — P1-T19 unsatisfiable (193 new lines into 146 headroom); per-block logging clauses block centralizing; delta = extract
 - [#207 Hook() redesign breaks AppEventsTests](project_207_hook_redesign_breaks_appeventstests.md) — needs a plan revision, not a test weakening

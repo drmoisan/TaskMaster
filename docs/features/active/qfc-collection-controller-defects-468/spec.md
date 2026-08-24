@@ -1219,7 +1219,10 @@ individually verifiable from evidence.
       throw and no viewer text written after.
 - [ ] **AC-11 (#471).** `EliminateSpaceForItems` reduces `_itemTlp.MinimumSize.Height` and
       `_itemTlp.Size.Height` by exactly `_template.Height * removalCount`, and
-      `MakeSpaceForItems(i, n)` followed by `EliminateSpaceForItems(i, n)` is height-neutral.
+      `MakeSpaceForItems(i, n)` followed by `EliminateSpaceForItems(i, n)` returns
+      `_itemTlp.MinimumSize.Height` to its starting value. `MakeSpaceForItems` adjusts `MinimumSize`
+      only (`:2031-2034`) and never `Size`, so `Size.Height` neutrality is out of scope and is not
+      asserted; the asymmetry is recorded in the P10 evidence.
       Verified by named MSTest tests against the pure `ShrinkByRows` helper (MTA) and, if taken, one
       `[STATestClass]` call-site test in `QfcCollectionControllerLayout.StaTests.cs`. The inversion is
       removed in exactly one place, not both.
@@ -1248,10 +1251,17 @@ individually verifiable from evidence.
 
 ### Verification, scope, and process
 
-- [ ] **AC-16 (#468 residual risk).** A repository-wide search of non-`.cs` files for the twelve
-      removed identifiers, plus a `GetMethod(` / `InvokeMember(` search across the `QuickFiler` tree,
-      returns no reference to any removed member. The search commands and their output are recorded in
-      the feature's evidence folder.
+- [ ] **AC-16 (#468 residual risk).** A build-input-file search plus an enumerated reflective-call
+      review returns no reference to any removed member: (a) a search of build-input file types only
+      (`*.csproj`, `*.resx`, `*.config`, `*.xaml`, `*.json`, `*.settings`, excluding `docs/`,
+      `.claude/`, `packages/`, and `TestResults/`) for the twelve removed identifiers returns zero
+      hits, and (b) every `GetMethod(` / `InvokeMember(` hit across the `QuickFiler` and
+      `QuickFiler.Test` trees is enumerated with a per-hit statement that its string literal is not
+      one of the twelve identifiers. A repository-wide sweep is deliberately not performed:
+      `LoadSequentialAsync` names three unrelated live members in `TaskMaster/AppGlobals/` and the
+      feature's own documents quote every identifier, so a repository-wide zero-hit condition would be
+      unsatisfiable by construction. The search commands and their verbatim output are recorded in the
+      feature's evidence folder.
 - [ ] **AC-17 (fix order).** The commit sequence follows the fix order in `## Proposed Fix`
       (#468 dead-code removal first, then #474-1, then #286, then #469-3, then the remainder), with
       the dead-code removal isolated in its own commit so the file renumbering is a single reviewable
