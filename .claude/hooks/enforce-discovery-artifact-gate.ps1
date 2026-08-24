@@ -5,7 +5,7 @@
 
 .DESCRIPTION
     Invoked by the Claude Code PreToolUse hook on Write or Edit operations
-    (matcher "Write|Edit"). The hook reads $env:CLAUDE_TOOL_INPUT JSON
+    (matcher "Write|Edit"). The hook reads the PreToolUse envelope JSON
     containing file_path, and either content (Write) or old_string/new_string
     (Edit).
 
@@ -33,6 +33,8 @@
 [CmdletBinding()]
 param()
 
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 function Invoke-DiscoveryValidatorExe {
     <#
     .SYNOPSIS
@@ -151,7 +153,7 @@ function Get-RequiredDiscoveryArtifactDeclaration {
 function Invoke-DiscoveryArtifactGateDecision {
     <#
     .SYNOPSIS
-        Parses CLAUDE_TOOL_INPUT and returns an allow-or-deny decision for a
+        Parses the PreToolUse envelope and returns an allow-or-deny decision for a
         discovery-artifact completion gate.
     #>
     [CmdletBinding()]
@@ -163,18 +165,21 @@ function Invoke-DiscoveryArtifactGateDecision {
         [scriptblock] $RequiredArtifactReader = { Get-RequiredDiscoveryArtifactDeclaration }
     )
 
-    if (-not $ToolInputRaw) {
-        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
+    $envelope = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $envelope.IsValid) {
+        return [ordered]@{
+            hookSpecificOutput = [ordered]@{
+                hookEventName            = 'PreToolUse'
+                permissionDecision       = 'deny'
+                permissionDecisionReason = 'DISCOVERY_ARTIFACT_GATE_BLOCKED: payload anomaly - ' +
+                (Get-ClaudeHookPayloadAnomalyReason -Anomaly $envelope.Anomaly) +
+                '. The gate fails closed on an envelope it cannot read.'
+            }
+        }
     }
 
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    }
-    catch {
-        throw "enforce-discovery-artifact-gate hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
-    }
-
-    $filePath = $toolInput.file_path
+    $toolInput = $envelope.Value
+    $filePath = Get-ClaudeHookToolInputString -ToolInput $toolInput -Name 'file_path'
     if (-not $filePath) {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
@@ -220,13 +225,7 @@ if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-}
-catch {
-    Write-Error $_
-    exit 1
-}
+$decision = Invoke-DiscoveryArtifactGateDecision -ToolInputRaw (Read-ClaudeHookRawPayload)
 
 $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 

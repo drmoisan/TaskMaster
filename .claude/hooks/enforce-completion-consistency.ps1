@@ -41,6 +41,8 @@
 [CmdletBinding()]
 param()
 
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 # Dot-source the shared validation helpers. Guarded so a missing file produces a
 # clear error and so dot-sourcing this hook in tests loads the helpers too.
 $script:CompletionHelpersPath = Join-Path $PSScriptRoot 'enforce-completion-helpers.ps1'
@@ -314,7 +316,7 @@ function Resolve-EditedCheckpointContent {
 function Invoke-CompletionConsistencyDecision {
     <#
     .SYNOPSIS
-        Parses CLAUDE_TOOL_INPUT and returns an allow-or-block decision based on
+        Parses the PreToolUse envelope and returns an allow-or-block decision based on
         completion-evidence consistency.
     #>
     [CmdletBinding()]
@@ -332,18 +334,21 @@ function Invoke-CompletionConsistencyDecision {
         [scriptblock] $RoutingMatrixReader
     )
 
-    if (-not $ToolInputRaw) {
-        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
+    $envelope = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $envelope.IsValid) {
+        return [ordered]@{
+            hookSpecificOutput = [ordered]@{
+                hookEventName            = 'PreToolUse'
+                permissionDecision       = 'deny'
+                permissionDecisionReason = 'COMPLETION_CONSISTENCY_BLOCKED: payload anomaly - ' +
+                (Get-ClaudeHookPayloadAnomalyReason -Anomaly $envelope.Anomaly) +
+                '. The gate fails closed on an envelope it cannot read.'
+            }
+        }
     }
 
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    }
-    catch {
-        throw "enforce-completion-consistency hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
-    }
-
-    $filePath = $toolInput.file_path
+    $toolInput = $envelope.Value
+    $filePath = Get-ClaudeHookToolInputString -ToolInput $toolInput -Name 'file_path'
     if (-not $filePath) {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
@@ -356,7 +361,7 @@ function Invoke-CompletionConsistencyDecision {
     # Write tool: validate the content payload directly. Edit tool: no content is
     # supplied, so read the on-disk checkpoint through the injectable seam and
     # apply the old_string -> new_string patch in memory (read-then-validate).
-    $content = $toolInput.content
+    $content = Get-ClaudeHookToolInputString -ToolInput $toolInput -Name 'content'
     if (-not $content) {
         $content = Resolve-EditedCheckpointContent -ToolInput $toolInput -CheckpointReader $CheckpointReader
         if (-not $content) {
@@ -403,13 +408,7 @@ if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $decision = Invoke-CompletionConsistencyDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-}
-catch {
-    Write-Error $_
-    exit 1
-}
+$decision = Invoke-CompletionConsistencyDecision -ToolInputRaw (Read-ClaudeHookRawPayload)
 
 $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 

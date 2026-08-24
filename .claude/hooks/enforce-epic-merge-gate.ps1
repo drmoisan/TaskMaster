@@ -5,7 +5,7 @@
 .DESCRIPTION
     Invoked by the Claude Code PreToolUse hook on the "Bash" matcher before any Bash
     command runs. Regex-matches gh pr merge with a --merge flag against
-    CLAUDE_TOOL_INPUT.command and, when matched, allows the merge only when one of three
+    the envelope's tool_input.command and, when matched, allows the merge only when one of three
     checkpoint-only conditions holds:
 
       1. Child-feature path: artifacts/orchestration/orchestrator-state.json exists,
@@ -38,6 +38,8 @@
 #>
 [CmdletBinding()]
 param()
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 
 $script:ChildCheckpointPath = 'artifacts/orchestration/orchestrator-state.json'
 $script:EpicCheckpointPath = 'artifacts/orchestration/epic-orchestrator-state.json'
@@ -338,29 +340,34 @@ function Get-EpicMergeGateBlockDecision {
 function Invoke-EpicMergeGateDecision {
     <#
     .SYNOPSIS
-        Parses CLAUDE_TOOL_INPUT and returns an allow-or-block decision.
+        Parses the PreToolUse envelope and returns an allow-or-block decision.
+    .DESCRIPTION
+        Envelope-level anomalies (empty payload, unparseable JSON, missing or
+        malformed tool_input) fail closed as a deny; the legacy flat root shape is
+        one such anomaly. Property-level absence of command inside a well-formed
+        tool_input remains an allow, because that is this gate's scope filter.
     .PARAMETER ToolInputRaw
-        The raw JSON tool payload supplied by Claude Code.
+        The raw JSON hook payload acquired by Read-ClaudeHookRawPayload.
     .OUTPUTS
         System.Collections.Specialized.OrderedDictionary
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
     param(
+        [AllowNull()]
+        [AllowEmptyString()]
         [string] $ToolInputRaw
     )
 
-    if (-not $ToolInputRaw) {
-        return Get-EpicMergeGateAllowDecision
+    $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $payload.IsValid) {
+        return Get-EpicMergeGateBlockDecision -Reason (
+            'EPIC_MERGE_GATE_BLOCKED: payload anomaly - ' +
+            (Get-ClaudeHookPayloadAnomalyReason -Anomaly $payload.Anomaly) +
+            '. The gate fails closed on an envelope it cannot read.')
     }
 
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        throw "enforce-epic-merge-gate hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
-    }
-
-    $commandText = $toolInput.command
+    $commandText = Get-ClaudeHookToolInputString -ToolInput $payload.Value -Name 'command'
     if (-not $commandText) {
         return Get-EpicMergeGateAllowDecision
     }
@@ -391,18 +398,55 @@ function Invoke-EpicMergeGateDecision {
     return Get-EpicMergeGateBlockDecision -Reason 'EPIC_MERGE_GATE_BLOCKED: gh pr merge --merge requires either a per-feature checkpoint with epic_mode == true and step9_status == "passed", an epic checkpoint with epic_merge_pr.ci_gate.conclusion == "success" and a matching pr_number, or a parallel-orchestrator checkpoint with route_id == "parallel" whose target item (matched by pr_number) has merge_status == "ci_green". No checkpoint satisfied this gate.'
 }
 
+function Invoke-EpicMergeGateEntryPoint {
+    <#
+    .SYNOPSIS
+        Runs the merge-gate decision and returns the process exit code.
+    .DESCRIPTION
+        Acquires the payload through the shared reader unless the caller supplies
+        one, emits the compact decision JSON, and returns 0. It never returns 1:
+        exit 1 is non-blocking for PreToolUse, so every anomaly is already a deny
+        decision by the time control reaches here. The function does not call exit;
+        the thin tail converts the returned code into a process exit.
+    .PARAMETER ToolInputRaw
+        Optional pre-acquired payload text. When omitted the ReadPayload seam runs.
+    .PARAMETER ReadPayload
+        Seam for payload acquisition, so tests can drive the empty-on-all-transports
+        case without touching a console.
+    .OUTPUTS
+        System.Int32
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $ToolInputRaw,
+
+        [scriptblock] $ReadPayload = { Read-ClaudeHookRawPayload }
+    )
+
+    if (-not $PSBoundParameters.ContainsKey('ToolInputRaw')) {
+        $ToolInputRaw = [string](& $ReadPayload)
+    }
+
+    $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $ToolInputRaw
+    $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+
+    return 0
+}
+
 # Guard allows dot-sourcing in tests without executing the entrypoint.
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $decision = Invoke-EpicMergeGateDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-} catch {
-    Write-Error $_
-    exit 1
+# The entry point returns its [int] exit code as the last pipeline element and the
+# decision JSON before it. `exit (<call>)` would capture BOTH into the exit
+# expression and emit nothing, so the decision is written explicitly here first.
+$entryPointResult = @(Invoke-EpicMergeGateEntryPoint)
+if ($entryPointResult.Count -gt 1) {
+    $entryPointResult[0..($entryPointResult.Count - 2)] | Write-Output
 }
 
-$decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
-
-exit 0
+exit ([int]$entryPointResult[-1])

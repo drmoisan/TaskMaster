@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     Invoked by the Claude Code PreToolUse hook on the "Agent" matcher before any Agent
-    (Task) call runs. Activates only when CLAUDE_TOOL_INPUT.subagent_type == "orchestrator"
+    (Task) call runs. Activates only when the envelope's nested tool_input.subagent_type == "orchestrator"
     and the serialized prompt contains the epic-mode kickoff marker "Epic mode: true".
 
     Resolution and decision procedure:
@@ -33,6 +33,8 @@
 [CmdletBinding()]
 param()
 
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 $script:EpicCheckpointPath = 'artifacts/orchestration/epic-orchestrator-state.json'
 $script:AllowedMergeStatuses = @('merged', 'worktree_removed')
 $script:EpicModeMarker = 'Epic mode: true'
@@ -232,7 +234,7 @@ function Get-EpicWaveBarrierBlockDecision {
 function Invoke-EpicWaveBarrierDecision {
     <#
     .SYNOPSIS
-        Parses CLAUDE_TOOL_INPUT and returns an allow-or-block decision.
+        Parses the envelope's nested tool_input and returns an allow-or-block decision.
     .PARAMETER ToolInputRaw
         The raw JSON tool payload supplied by Claude Code.
     .OUTPUTS
@@ -244,22 +246,20 @@ function Invoke-EpicWaveBarrierDecision {
         [string] $ToolInputRaw
     )
 
-    if (-not $ToolInputRaw) {
-        return Get-EpicWaveBarrierAllowDecision
+    $envelope = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $envelope.IsValid) {
+        return Get-EpicWaveBarrierBlockDecision -Reason (
+            'EPIC_WAVE_BARRIER_BLOCKED: payload anomaly - ' +
+            (Get-ClaudeHookPayloadAnomalyReason -Anomaly $envelope.Anomaly) +
+            '. The gate fails closed on an envelope it cannot read.')
     }
 
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        throw "enforce-epic-wave-barrier hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
-    }
-
-    $subagent = $toolInput.subagent_type
+    $subagent = Get-ClaudeHookToolInputString -ToolInput $envelope.Value -Name 'subagent_type'
     if (-not $subagent -or $subagent -ne 'orchestrator') {
         return Get-EpicWaveBarrierAllowDecision
     }
 
-    $prompt = [string]$toolInput.prompt
+    $prompt = Get-ClaudeHookToolInputString -ToolInput $envelope.Value -Name 'prompt'
     if (-not $prompt -or $prompt -notlike "*$script:EpicModeMarker*") {
         return Get-EpicWaveBarrierAllowDecision
     }
@@ -287,18 +287,47 @@ function Invoke-EpicWaveBarrierDecision {
     return Get-EpicWaveBarrierBlockDecision -Reason "EPIC_WAVE_BARRIER_BLOCKED: '$featureFolder' cannot start until every dependency in its depends_on list is durably confirmed merged or worktree_removed in the epic checkpoint. The checkpoint was unreadable, the feature record was not found, or a dependency is not yet safe."
 }
 
+function Invoke-EpicWaveBarrierEntryPoint {
+    <#
+    .SYNOPSIS
+        Runs the hook decision and returns the process exit code.
+    .DESCRIPTION
+        Acquires the payload through the shared reader unless the caller supplies
+        one, emits the compact decision JSON, and returns 0. It never returns 1:
+        exit 1 is non-blocking for PreToolUse, so every anomaly is already a deny
+        decision by the time control reaches here. The function does not call exit;
+        the thin tail converts the returned code into a process exit.
+    .PARAMETER ToolInputRaw
+        Optional pre-acquired payload text. When omitted the ReadPayload seam runs.
+    .PARAMETER ReadPayload
+        Seam for payload acquisition, so tests can drive the empty-on-all-transports
+        case without touching a console.
+    .OUTPUTS
+        System.Int32
+    #>
+    [CmdletBinding()]
+    [OutputType([int])]
+    param(
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string] $ToolInputRaw,
+
+        [scriptblock] $ReadPayload = { Read-ClaudeHookRawPayload }
+    )
+
+    if (-not $PSBoundParameters.ContainsKey('ToolInputRaw')) {
+        $ToolInputRaw = [string](& $ReadPayload)
+    }
+
+    $decision = Invoke-EpicWaveBarrierDecision -ToolInputRaw $ToolInputRaw
+    $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
+
+    return 0
+}
+
 # Guard allows dot-sourcing in tests without executing the entrypoint.
 if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $decision = Invoke-EpicWaveBarrierDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-} catch {
-    Write-Error $_
-    exit 1
-}
-
-$decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
-
-exit 0
+exit (Invoke-EpicWaveBarrierEntryPoint)

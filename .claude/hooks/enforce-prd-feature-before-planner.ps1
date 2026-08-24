@@ -1,12 +1,15 @@
 <#
 .SYNOPSIS
     Pre-tool-use hook that blocks atomic-planner delegations when the target
-    feature folder does not yet contain spec.md and user-story.md.
+    feature folder does not yet contain the prd-feature outputs its persisted
+    work mode requires.
 
 .DESCRIPTION
     Invoked by the Claude Code PreToolUse hook on the Agent (Task) tool. Reads
-    tool input JSON from the CLAUDE_TOOL_INPUT environment variable. Activates
-    only when subagent_type is 'atomic-planner'.
+    the tool payload through the shared hook-payload reader (stdin first, with
+    environment-variable fallback) and takes the tool arguments from the
+    envelope's nested tool_input object. Activates only when subagent_type is
+    'atomic-planner'.
 
     Feature folder resolution order:
       1. Scan the prompt text for any path matching
@@ -18,11 +21,25 @@
       3. If neither yields a folder, block with a reason instructing the caller
          to reference a feature folder explicitly.
 
-    Once the folder is resolved, the hook verifies that both spec.md and
-    user-story.md exist in that folder. If either is missing, the script emits a
-    PreToolUse JSON response with hookSpecificOutput.permissionDecision='deny'
-    and a reason naming the missing file(s) and instructing the orchestrator to
-    invoke prd-feature first. Allowed delegations emit
+    Once the folder is resolved, the hook reads the persisted work-mode marker
+    (`- Work Mode: minor-audit|full-feature|full-bug|full`) from that folder's
+    issue.md, per the mode contract in
+    .claude/skills/feature-promotion-lifecycle/SKILL.md, and derives the
+    required prerequisite set:
+      - full-feature -> spec.md and user-story.md are both required.
+      - full-bug     -> spec.md only is required.
+      - minor-audit  -> neither is required; issue.md carries the acceptance
+                        criteria for this mode.
+      - marker absent, unreadable, or unrecognized -> fail closed to the
+        strictest set (spec.md and user-story.md), and the block reason states
+        that the work mode could not be determined so the operator can tell
+        this case apart from a genuine missing prerequisite. The legacy `full`
+        marker normalizes to full-feature's requirement set.
+
+    If any required file is missing, the script emits a PreToolUse JSON
+    response with hookSpecificOutput.permissionDecision='deny' and a reason
+    naming the missing file(s) and instructing the orchestrator to invoke
+    prd-feature first. Allowed delegations emit
     hookSpecificOutput.permissionDecision='allow'.
 
     Filesystem reads and orchestrator-state lookups go through wrapper functions
@@ -34,6 +51,8 @@
 [CmdletBinding()]
 param()
 
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 function Get-PrdFeatureFileExistence {
     <#
     .SYNOPSIS
@@ -47,6 +66,96 @@ function Get-PrdFeatureFileExistence {
     )
 
     return [bool](Test-Path -LiteralPath $Path -PathType Leaf)
+}
+
+function Get-PrdFeatureIssueContent {
+    <#
+    .SYNOPSIS
+        Wrapper around Get-Content for a feature folder's issue.md. Tests mock
+        this directly to inject work-mode marker content without touching disk.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $FeatureFolder
+    )
+
+    $issuePath = "$FeatureFolder/issue.md"
+    if (-not (Test-Path -LiteralPath $issuePath -PathType Leaf)) {
+        return $null
+    }
+
+    try {
+        return Get-Content -LiteralPath $issuePath -Raw -ErrorAction Stop
+    }
+    catch {
+        return $null
+    }
+}
+
+function Resolve-PrdFeatureWorkMode {
+    <#
+    .SYNOPSIS
+        Parses the persisted `- Work Mode: ...` marker out of issue.md content
+        and returns the canonical mode, or $null when the marker is absent,
+        unreadable, or unrecognized.
+    .DESCRIPTION
+        Recognizes minor-audit, full-feature, full-bug, and the legacy full
+        marker (normalized to full-feature), mirroring the regex convention
+        used by scripts/dev_tools/prompt_mode_contract.py so both runtimes
+        agree on what counts as a valid marker line.
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [AllowNull()]
+        [string] $IssueContent
+    )
+
+    if ([string]::IsNullOrWhiteSpace($IssueContent)) {
+        return $null
+    }
+
+    $match = [regex]::Match($IssueContent, '(?im)^-\s*Work Mode:\s*(minor-audit|full-feature|full-bug|full)\s*$')
+    if (-not $match.Success) {
+        return $null
+    }
+
+    $rawMode = $match.Groups[1].Value
+    if ($rawMode -eq 'full') {
+        return 'full-feature'
+    }
+    return $rawMode
+}
+
+function Get-PrdFeatureRequiredFile {
+    <#
+    .SYNOPSIS
+        Maps a resolved work mode to the set of prd-feature output files the
+        target folder must contain before an atomic-planner delegation is
+        allowed.
+    .DESCRIPTION
+        full-feature requires spec.md and user-story.md; full-bug requires
+        spec.md only; minor-audit requires neither. A $null or unrecognized
+        mode fails closed to the strictest set (spec.md and user-story.md) so
+        an undeterminable mode never becomes permissive.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [AllowNull()]
+        [string] $WorkMode
+    )
+
+    # Route on the canonical mode; anything outside the three known values
+    # (including $null) falls through to the fail-closed default case.
+    switch ($WorkMode) {
+        'full-feature' { return [string[]]@('spec.md', 'user-story.md') }
+        'full-bug' { return [string[]]@('spec.md') }
+        'minor-audit' { return [string[]]@() }
+        default { return [string[]]@('spec.md', 'user-story.md') }
+    }
 }
 
 function Get-PrdFeatureCheckpointFolder {
@@ -126,19 +235,22 @@ function Find-PrdFeatureFolderFromPrompt {
 function Get-PrdFeatureMissingFile {
     <#
     .SYNOPSIS
-        Returns the list of required files (spec.md, user-story.md) missing in
-        the target folder.
+        Returns the subset of $RequiredFile that is missing from the target
+        folder.
     #>
     [CmdletBinding()]
     [OutputType([string[]])]
     param(
         [Parameter(Mandatory)]
-        [string] $FeatureFolder
+        [string] $FeatureFolder,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $RequiredFile
     )
 
-    $required = @('spec.md', 'user-story.md')
     [System.Collections.Generic.List[string]] $missing = [System.Collections.Generic.List[string]]::new()
-    foreach ($name in $required) {
+    foreach ($name in $RequiredFile) {
         $candidate = "$FeatureFolder/$name"
         if (-not (Get-PrdFeatureFileExistence -Path $candidate)) {
             $missing.Add($name)
@@ -150,7 +262,7 @@ function Get-PrdFeatureMissingFile {
 function Invoke-PrdFeatureBeforePlannerDecision {
     <#
     .SYNOPSIS
-        Parses CLAUDE_TOOL_INPUT and returns an allow-or-block decision.
+        Parses the envelope's nested tool_input and returns an allow-or-block decision.
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -158,23 +270,25 @@ function Invoke-PrdFeatureBeforePlannerDecision {
         [string] $ToolInputRaw
     )
 
-    if (-not $ToolInputRaw) {
-        return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
+    $envelope = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $envelope.IsValid) {
+        return [ordered]@{
+            hookSpecificOutput = [ordered]@{
+                hookEventName            = 'PreToolUse'
+                permissionDecision       = 'deny'
+                permissionDecisionReason = 'PRD_FEATURE_BLOCKED: payload anomaly - ' +
+                (Get-ClaudeHookPayloadAnomalyReason -Anomaly $envelope.Anomaly) +
+                '. The gate fails closed on an envelope it cannot read.'
+            }
+        }
     }
 
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    }
-    catch {
-        throw "enforce-prd-feature-before-planner hook received malformed JSON in CLAUDE_TOOL_INPUT: $_"
-    }
-
-    $subagent = $toolInput.subagent_type
+    $subagent = Get-ClaudeHookToolInputString -ToolInput $envelope.Value -Name 'subagent_type'
     if (-not $subagent -or $subagent -ne 'atomic-planner') {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
-    $prompt = [string]$toolInput.prompt
+    $prompt = Get-ClaudeHookToolInputString -ToolInput $envelope.Value -Name 'prompt'
     $folder = Find-PrdFeatureFolderFromPrompt -Prompt $prompt
     if (-not $folder) {
         $folder = Get-PrdFeatureCheckpointFolder
@@ -191,17 +305,36 @@ function Invoke-PrdFeatureBeforePlannerDecision {
     }
 
     $folderNormalized = ($folder -replace '\\', '/').TrimEnd('/')
-    $missing = Get-PrdFeatureMissingFile -FeatureFolder $folderNormalized
+
+    # Derive the prerequisite set from the persisted work-mode marker rather
+    # than a fixed spec.md/user-story.md pair. A marker that cannot be read or
+    # recognized must fail closed to the strictest set, not fail open.
+    $issueContent = Get-PrdFeatureIssueContent -FeatureFolder $folderNormalized
+    $workMode = Resolve-PrdFeatureWorkMode -IssueContent $issueContent
+    $modeDetermined = [bool]$workMode
+    # Force array wrapping: PowerShell unravels a zero-element array return down
+    # the pipeline to $null, which would otherwise fail the Mandatory
+    # -RequiredFile parameter on Get-PrdFeatureMissingFile for minor-audit mode.
+    $required = @(Get-PrdFeatureRequiredFile -WorkMode $workMode)
+
+    $missing = Get-PrdFeatureMissingFile -FeatureFolder $folderNormalized -RequiredFile $required
     if ($missing.Count -eq 0) {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
     $list = ($missing -join ', ')
+    if ($modeDetermined) {
+        $reason = "PRD_FEATURE_BLOCKED: cannot delegate to atomic-planner before prd-feature outputs are present in '$folderNormalized'. Missing: $list (work mode: $workMode). Invoke the prd-feature subagent first."
+    }
+    else {
+        $reason = "PRD_FEATURE_BLOCKED: cannot delegate to atomic-planner before prd-feature outputs are present in '$folderNormalized'. Missing: $list. Work mode could not be determined from '$folderNormalized/issue.md' (marker absent, unreadable, or unrecognized); failing closed to the strictest prerequisite set (spec.md, user-story.md). Invoke the prd-feature subagent first."
+    }
+
     return [ordered]@{
         hookSpecificOutput = [ordered]@{
             hookEventName            = 'PreToolUse'
             permissionDecision       = 'deny'
-            permissionDecisionReason = "PRD_FEATURE_BLOCKED: cannot delegate to atomic-planner before prd-feature outputs are present in '$folderNormalized'. Missing: $list. Invoke the prd-feature subagent first."
+            permissionDecisionReason = $reason
         }
     }
 }
@@ -211,13 +344,7 @@ if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-try {
-    $decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
-}
-catch {
-    Write-Error $_
-    exit 1
-}
+$decision = Invoke-PrdFeatureBeforePlannerDecision -ToolInputRaw (Read-ClaudeHookRawPayload)
 
 $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 

@@ -4,9 +4,9 @@
 
 .DESCRIPTION
     This script is invoked by the Claude Code PreToolUse hook before any Write or Edit
-    operation. It reads the tool input from the CLAUDE_TOOL_INPUT environment variable
-    (JSON with 'file_path' plus 'content' for Write, or 'old_string'/'new_string' for
-    Edit) and applies two independent gates:
+    operation. It acquires the hook payload through the shared reader and reads the
+    envelope's nested tool_input ('file_path' plus 'content' for Write, or
+    'old_string'/'new_string' for Edit), then applies two independent gates:
 
       1. Syntax gate. On a Write of a '.mmd'/'.mermaid' file, the whole file is one
          diagram. On a Write of a Markdown file, every fenced ```mermaid block is a
@@ -21,8 +21,8 @@
     Blocking a valid diagram is worse than missing an invalid one, so the hook declines
     to judge rather than rejecting whenever it cannot classify content confidently:
 
-      - empty, absent, or unparseable CLAUDE_TOOL_INPUT: allow;
-      - missing 'file_path', or a path outside the '.mmd'/'.mermaid'/Markdown scope: allow;
+      - missing 'file_path' inside a well-formed tool_input, or a path outside the
+        '.mmd'/'.mermaid'/Markdown scope: allow;
       - the validation module absent from disk: allow;
       - an Edit payload (the syntax check needs the whole file, which an
         old_string/new_string fragment cannot supply): allow;
@@ -32,13 +32,17 @@
       - a fence immediately preceded by '<!-- mermaid-validator: ignore -->': skip that
         block, and only that block.
 
-    DELIBERATE DIVERGENCE FROM enforce-evidence-locations.ps1: that hook throws on
-    malformed CLAUDE_TOOL_INPUT JSON and its entry point exits 1. This hook allows
-    instead. The difference is intentional and must not be "fixed" into a hard failure:
-    a content gate that hard-fails on input it cannot parse converts an unparseable
-    payload into a blocked write, which is the false-positive failure mode this feature
-    exists to avoid. The evidence-location hook gates a path, which is always parseable
-    when present; this hook gates content, which is not.
+    ENVELOPE VERSUS CONTENT (revised by issue #501). The hook now distinguishes two
+    kinds of unreadability that the original note conflated. An ENVELOPE-level anomaly
+    -- empty payload on every transport, unparseable envelope JSON, or a payload with
+    no usable tool_input -- means the PreToolUse contract itself drifted, which is the
+    exact defect #501 fixed and which must fail loudly rather than silently allow; the
+    hook therefore denies. A CONTENT-level judgement remains permissive, and that half
+    of the original note stands unchanged and must not be "fixed" into a hard failure:
+    an Edit fragment, a Markdown file with no fence, an absent validation module, and a
+    diagram the classifier cannot classify all still allow, because blocking a valid
+    diagram is worse than missing an invalid one. The prior blanket allow-on-unparseable
+    made the gate inert against the payload the harness actually sends.
 
     The extension scope check runs before any content scan, so a write outside the
     Mermaid scope pays only the JSON parse.
@@ -54,6 +58,8 @@
 param()
 
 Set-StrictMode -Version Latest
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 
 $script:MermaidModulePath = Join-Path -Path $PSScriptRoot -ChildPath '../lib/mermaid/MermaidValidation.psm1'
 $script:MermaidSkillPointer = 'See .claude/skills/mermaid-diagram/SKILL.md.'
@@ -288,7 +294,7 @@ function Invoke-MermaidValidationDecision {
         business (out of scope, unparseable, or a Markdown file with no fence), which the
         entry point treats as a silent allow.
     .PARAMETER ToolInputRaw
-        The raw JSON string from $env:CLAUDE_TOOL_INPUT.
+        The raw JSON hook payload acquired by Read-ClaudeHookRawPayload.
     #>
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -298,15 +304,17 @@ function Invoke-MermaidValidationDecision {
         [string] $ToolInputRaw
     )
 
-    if ([string]::IsNullOrWhiteSpace($ToolInputRaw)) { return $null }
-
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    } catch {
-        # Fail open. See the DELIBERATE DIVERGENCE note in this file's header before
-        # changing this to a throw.
-        return $null
+    # Envelope-level anomaly: fail closed. See the ENVELOPE VERSUS CONTENT note in
+    # this file's header before changing this back to a silent allow.
+    $envelope = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $envelope.IsValid) {
+        return Get-MermaidDenyDecision -Reason (
+            'MERMAID_VALIDATION_BLOCKED: payload anomaly - ' +
+            (Get-ClaudeHookPayloadAnomalyReason -Anomaly $envelope.Anomaly) +
+            '. The gate fails closed on an envelope it cannot read.')
     }
+
+    $toolInput = $envelope.Value
 
     $filePath = [string](Get-MermaidToolInputField -InputObject $toolInput -Name 'file_path')
     if ([string]::IsNullOrWhiteSpace($filePath)) { return $null }
@@ -362,15 +370,19 @@ function Invoke-MermaidValidationEntryPoint {
         output stream as the JSON, so the caller would consume the JSON instead of
         printing it and the decision would never reach Claude Code.
     .PARAMETER ToolInputRaw
-        The raw JSON string from $env:CLAUDE_TOOL_INPUT.
+        The raw JSON hook payload acquired by Read-ClaudeHookRawPayload.
     #>
     [CmdletBinding()]
     [OutputType([string])]
     param(
         [AllowEmptyString()]
         [AllowNull()]
-        [string] $ToolInputRaw = $env:CLAUDE_TOOL_INPUT
+        [string] $ToolInputRaw
     )
+
+    if (-not $PSBoundParameters.ContainsKey('ToolInputRaw')) {
+        $ToolInputRaw = Read-ClaudeHookRawPayload
+    }
 
     $decision = Invoke-MermaidValidationDecision -ToolInputRaw $ToolInputRaw
     if ($null -eq $decision) { return }
@@ -383,7 +395,7 @@ if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-Invoke-MermaidValidationEntryPoint -ToolInputRaw $env:CLAUDE_TOOL_INPUT
+Invoke-MermaidValidationEntryPoint -ToolInputRaw (Read-ClaudeHookRawPayload)
 
 # Exit 0 on allow and on deny alike: the decision travels in the JSON, never in the
 # exit code.

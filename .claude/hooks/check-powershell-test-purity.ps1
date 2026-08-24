@@ -5,10 +5,10 @@
 .DESCRIPTION
     This script is invoked by the Claude Code PreToolUse hook before any Write or Edit
     operation on a file path matching a Pester test file (*.Tests.ps1 or tests/**/*.ps1).
-    It reads the tool input from the CLAUDE_TOOL_INPUT environment variable (JSON with
-    'file_path' and a content field: 'content' for Write, 'new_string' for Edit) and
-    rejects the operation when the proposed content introduces forbidden runtime
-    dependencies or violates the mocking rules.
+    It acquires the hook payload through the shared reader and reads the envelope's
+    nested tool_input ('file_path' plus a content field: 'content' for Write,
+    'new_string' for Edit), then rejects the operation when the proposed content
+    introduces forbidden runtime dependencies or violates the mocking rules.
 
     Forbidden patterns in Pester unit tests include:
       - direct external-executable mocking (Mock git, Mock gh, Mock actionlint, etc.)
@@ -32,6 +32,8 @@
 [CmdletBinding()]
 param()
 
+
+Import-Module (Join-Path $PSScriptRoot '../lib/hook-payload/HookPayload.psm1') -Force
 function Get-PowerShellTestPurityBlockDecision {
     [CmdletBinding()]
     [OutputType([System.Collections.Specialized.OrderedDictionary])]
@@ -68,18 +70,15 @@ function Invoke-PowerShellTestPurityDecision {
         [string] $ToolInputRaw
     )
 
-    if (-not $ToolInputRaw) {
-        return $null
+    $payload = Resolve-ClaudeHookToolInput -Raw $ToolInputRaw
+    if (-not $payload.IsValid) {
+        return Get-PowerShellTestPurityBlockDecision -Reason (
+            'PowerShell unit test purity hook received an unreadable PreToolUse envelope: ' +
+            (Get-ClaudeHookPayloadAnomalyReason -Anomaly $payload.Anomaly) +
+            '. The gate fails closed on an envelope it cannot read.')
     }
 
-    try {
-        $toolInput = $ToolInputRaw | ConvertFrom-Json -ErrorAction Stop
-    }
-    catch {
-        return $null
-    }
-
-    $filePath = $toolInput.file_path
+    $filePath = Get-ClaudeHookToolInputString -ToolInput $payload.Value -Name 'file_path'
     if (-not $filePath) {
         return $null
     }
@@ -88,12 +87,9 @@ function Invoke-PowerShellTestPurityDecision {
         return $null
     }
 
-    $content = $null
-    if ($null -ne $toolInput.content) {
-        $content = [string]$toolInput.content
-    }
-    elseif ($null -ne $toolInput.new_string) {
-        $content = [string]$toolInput.new_string
+    $content = Get-ClaudeHookToolInputString -ToolInput $payload.Value -Name 'content'
+    if (-not $content) {
+        $content = Get-ClaudeHookToolInputString -ToolInput $payload.Value -Name 'new_string'
     }
 
     if (-not $content) {
@@ -141,7 +137,7 @@ if ($MyInvocation.InvocationName -eq '.') {
     return
 }
 
-$decision = Invoke-PowerShellTestPurityDecision -ToolInputRaw $env:CLAUDE_TOOL_INPUT
+$decision = Invoke-PowerShellTestPurityDecision -ToolInputRaw (Read-ClaudeHookRawPayload)
 if ($null -ne $decision -and $decision.hookSpecificOutput.permissionDecision -eq 'deny') {
     $decision | ConvertTo-Json -Compress -Depth 5 | Write-Output
 }
