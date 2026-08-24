@@ -2,6 +2,7 @@
 
 ## Plan validation & gates
 - [Verify line citations with numbered output](feedback_verify_line_citations_with_numbered_output.md) — never hand-count from a `sed` window; a wrong #438 advisory got applied and corrupted 3 correct citations in plan + spec
+- [Four recurring C# plan defect classes](project_preflight_recurring_csharp_plan_defect_classes.md) — omitted `.claude/rules/csharp.md` read, exact `dotnet --version` equality vs global.json rollForward, absolute `Failed: 0`, and a `Select-String -LineNumber` switch that does not exist
 - [Self-derived gate thresholds are blind](project_preflight_selfderived_gate_thresholds_are_blind.md) — a "count >= floor" gate whose floor comes from the runs it validates is deflation-blind + scope-incommensurable; use
 - [Multi-pattern gates detach shared qualifiers](project_multipattern_gate_shared_qualifier_detachment.md) — rewriting one clause re-scopes the trailing allowlist to the last pattern only; restate the carve-out per pattern +
 - [Merge-base diff gates need a commit cadence](project_preflight_mergebase_diff_gates_need_commit_cadence.md) — `<MERGE_BASE>..HEAD` gates are vacuous while HEAD == merge-base; plan an explicit commit task
