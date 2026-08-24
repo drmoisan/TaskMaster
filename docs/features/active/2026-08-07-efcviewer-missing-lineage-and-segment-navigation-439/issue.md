@@ -9,6 +9,8 @@
 - Issue: #439
 - Issue URL: https://github.com/drmoisan/TaskMaster/issues/439
 - Last Updated: 2026-08-08
+- Work Mode: full-bug
+
 ## Summary
 
 In EfcViewer, suggested and searched folder rows render as a single leaf name with no ancestor lineage, so the arrow-separated ancestor chain is missing. The companion behavior is also gone or non-functional: clicking a non-leaf part of the lineage should move up to that ancestor node in the tree and let the user expand that node to see all of its children.
