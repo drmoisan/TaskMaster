@@ -19,7 +19,7 @@ In EfcViewer, suggested and searched folder rows render as a single leaf name wi
 
 - OS/version: Windows 11 Pro 10.0.26200
 - Runtime: .NET Framework 4.8.1 WinForms VSTO add-in with Microsoft WebView2
-- UI path: EfcViewer folder list (`EfcViewer.FolderListBox`, exposed as `BreadcrumbWebView`), driven by `EfcFormController` through `BreadcrumbBridgeRouter` and `QuickFiler/Resources/FolderBreadcrumb.html`
+- UI path: EfcViewer folder list (`EfcViewer.FolderListBox`, exposed as `BreadcrumbWebView`), driven by `EfcFormController` through `BreadcrumbBridgeRouter` and the generated `BreadcrumbHtmlRenderer` document
 - Data source or fixture: `EfcDataModel.FindMatches` search results and `FolderPredictor.Suggestions` suggestion rows, under an `ArchiveRootPath`-rooted search
 
 ## Steps to Reproduce
@@ -32,7 +32,7 @@ In EfcViewer, suggested and searched folder rows render as a single leaf name wi
 
 ## Expected Behavior
 
-- Every suggestion row and every search-result row renders its full root-to-leaf ancestor lineage, with each ancestor separated from the next by an arrow separator (the `→` separator cell in `FolderBreadcrumb.html`, written `->` in the original report).
+- Every suggestion row and every search-result row renders its full root-to-leaf ancestor lineage in the Efc-generated document, with each ancestor separated from the next by the `→` glyph.
 - Clicking a non-leaf lineage segment moves the selection up to that ancestor node in the folder tree.
 - The ancestor node selected that way can then be expanded to show all of its children, so the user can pick a sibling of the originally-suggested folder without retyping a search.
 - Rows whose ancestor chain genuinely cannot be resolved still render and stay selectable (the existing single-segment fallback), but this must be the exception, not the normal case.
@@ -67,25 +67,23 @@ Read of the current sources on 2026-08-07. There are two distinct defects.
 - `QuickFiler/Controllers/BreadcrumbBridgeRouter.cs:333-352` — `FetchChainAsync` returns `null` when `ResolveLeafKeyAsync` returns `null`, without calling `GetAncestorChainAsync`.
 - `UtilitiesCS/OutlookObjects/Folder/BreadcrumbRowBuilder.cs:119-129` — with a null chain, `BuildRow` takes the documented fallback and emits one leaf-only segment. The row stays visible and selectable, which is why the failure presents as missing lineage rather than as missing rows.
 
-Confirm during planning whether the suggestion rows (`FolderPredictor.AddSuggestions`, line 804, via `Suggestions.ToArray(5)`) use the same relative-stem form as the search matches. The reported symptom covers both sections, which is consistent with a single shared path-form mismatch, but the suggestion path was not traced end to end for this write-up.
-
-Note the same key-form question applies to the probability join in `BreadcrumbRowBuilder.BuildProbabilityIndex` (keyed on `FolderScore.FolderPath`); if the forms disagree there too, the percentage would also be dropped. That is adjacent to issue #400 and should be checked, not assumed.
+Research on 2026-08-24 confirmed that suggestions use the same archive-relative scorer key form as search matches. `FolderScore.Probability` is also keyed by that original relative form, so a hierarchy resolution to a full Outlook path must not replace the filing target or the score-lookup key. This is not an Issue #400 change.
 
 **B. Non-leaf segment click does not navigate to the ancestor or expand it.**
 
-- `QuickFiler/Resources/FolderBreadcrumb.html:250-257` — a segment cell wires only a `dblclick` handler, which posts `segmentDoubleClick`. There is no single-click ancestor-navigation gesture.
-- `QuickFiler/Controllers/BreadcrumbBridgeRouter.cs:168-172` — `SegmentDoubleClick` calls `row.CollapseAfter(segmentIndex)` and re-renders. It collapses the row's trailing segments; it does not change the selected node and does not request the ancestor's children.
-- `QuickFiler/Controllers/BreadcrumbBridgeRouter.cs:225-250` — the only expansion path is `ExpandLeafAsync(row)`, reached from `Right` or the leaf toggle. There is no code path that expands an arbitrary non-leaf ancestor segment into its children.
-
-`FolderBreadcrumb.html:258-261` confirms the intended separator glyph is `→`, so the separator itself is implemented; only the multi-segment chain that would use it is absent.
+- `BreadcrumbDocumentAssets.cs` emits the generated Efc document's segment and row event handlers. A segment-specific gesture posts only `segmentDoubleClick`; ordinary clicks bubble to whole-row selection. There is no typed non-leaf activation message.
+- `QuickFiler/Controllers/BreadcrumbBridgeRouter.cs` handles `segmentDoubleClick` by calling `row.CollapseAfter(segmentIndex)` and re-rendering. It does not change the active selection or request the clicked ancestor's children. Its expansion path uses `row.LeafSegment`, so it cannot expand an arbitrary ancestor.
+- `BreadcrumbHtmlRenderer.cs` is the active Efc renderer and writes `&gt;` between segments. `QuickFiler/Resources/FolderBreadcrumb.html` has a `→` glyph but belongs to the separate ItemViewer path and cannot fix EfcViewer.
 
 ## Proposed Fix / Validation Ideas
 
 Design direction (to be confirmed during planning):
 
-- Establish one canonical folder-path form at the boundary between the predictor's presented rows and `IFolderHierarchyProvider`. Either present full folder paths, or normalize the archive-root-relative stem back to a full path before resolution. Do not add prefix-matching heuristics inside `BreadcrumbRowBuilder`; the builder's contract explicitly derives no hierarchy from row text.
-- Treat an unresolved chain as a diagnosable condition, not a silent fallback: log at a level that makes a systematic resolution failure visible rather than presenting as a cosmetic omission.
-- Add an ancestor-navigation message for a non-leaf segment gesture, distinct from the existing `segmentDoubleClick` collapse, that selects the ancestor node and makes its children expandable.
+- At the Efc binding boundary, carry both the original archive-relative filing target and a hierarchy-only path. Expand a target with `ArchiveRootPath` only when it is not already rooted there; use the resulting full path only for `IFolderHierarchyProvider` exact resolution. Do not add fuzzy or prefix provider matching, and do not reconstruct paths in `BreadcrumbRowBuilder`.
+- Keep the original filing target as the normal selection output and as the `FolderScore.Probability` lookup key. When an ancestor or returned child is activated, derive its selection target by removing the same archive-root prefix from that verified full hierarchy path.
+- Retain the selectable one-segment fallback only for a null resolution key, an empty ancestor chain, or a provider failure. Make each such fallback diagnosable through the existing logging pattern; it must not be used for ordinary archive-relative targets.
+- Extend the generated-document bridge with typed, validated non-leaf `segmentActivate` and rendered-child activation messages. Stop propagation for segment activation, select the indexed ancestor, query that ancestor's immediate children on expansion, and allow child or sibling activation. Keep `segmentDoubleClick` as the separate collapse gesture.
+- Render `→` in `BreadcrumbHtmlRenderer` between visible Efc lineage segments. Do not modify ItemViewer's `FolderBreadcrumb.html`; keyboard Left/Right navigation, Issue #400 behavior, banners, and `Trash to Delete` remain outside this issue.
 
 Validation:
 
