@@ -4,14 +4,14 @@
 - **Parent:** epic `quickfiler-bug-family` (integration branch `epic/quickfiler-bug-family-integration`)
 - **Owner:** drmoisan
 - **Work Mode:** `full-bug`
-- **Last Updated:** 2026-08-24T11-00
-- **Status:** Ready for preflight
-- **Version:** 1.0
+- **Last Updated:** 2026-08-24T12-00
+- **Status:** Ready for preflight (revision cycle 1 deltas B1-B9, A1, A2 applied)
+- **Version:** 1.1
 - **Plan path (fixed for all revisions):** `docs/features/active/quickfiler-home-controller-metrics-442/plan.2026-08-24T09-40.md`
 
-> **Timestamp provenance.** No shell clock is reachable from the planning session. `2026-08-24T11-00`
-> is derived from the session date and is known to be at or after `10-30`, the `Last Updated` value
-> of `spec.md`, the input this plan consumes. The minute component is approximate, not clock-read.
+> **Timestamp provenance.** No shell clock is reachable from the planning session. `2026-08-24T12-00`
+> is derived from the session date and is known to be at or after the preflight cycle 1 result this
+> revision responds to. The minute component is approximate, not clock-read.
 
 ---
 
@@ -101,8 +101,10 @@ registered at `QuickFiler.Test/QuickFiler.Test.csproj:110` and `:133`.
 4. The flush invariant is a happens-before condition: the writer Task completes before the Task
    returned by `WriteMetricsAsync` completes, with nothing deferred to a timer, a background
    consumer, or `Cleanup()`. It completes before `Globals` is nulled at `QfcHomeController.cs:391`.
-5. #443 end-of-database path: `QfcHomeController.Metrics.cs:121` reads `_stopWatchMoved`. The
-   `MoveAndIterate` race is knowingly out of scope (CFN-1, feature 446).
+5. #443 end-of-database path: `QfcHomeController.Metrics.cs:121` currently reads
+   `Duration = StopWatch.Elapsed.Seconds;`, and `_stopWatchMoved` appears only on the commented-out
+   line 120; task P4-T7 redirects line 121 to `_stopWatchMoved.Elapsed.TotalSeconds` and deletes
+   the comment. The `MoveAndIterate` race is knowingly out of scope (CFN-1, feature 446).
 6. `QfcCollectionController.cs:2284` trailing-null gets an owned-file mitigation only (null and
    whitespace filtering before the write). The root fix is CFN-2 for feature 468.
 7. Culture invariance is in scope. The `"hh:mm"` 12-hour defect is out of scope (CFN-4).
@@ -165,11 +167,13 @@ Test method names asserted by this plan:
 
 - [ ] [P0-T1] Read, in the `policy-compliance-order` sequence, `CLAUDE.md`,
       `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`,
-      `.claude/rules/plan-acceptance-gates.md`, `.claude/rules/quality-tiers.md`, and
-      `.claude/rules/tonality.md`. Write `FF/evidence/baseline/phase0-instructions-read.TS.md`
+      `.claude/rules/csharp.md`, `.claude/rules/plan-acceptance-gates.md`,
+      `.claude/rules/quality-tiers.md`, and `.claude/rules/tonality.md`. The C#-specific rule file
+      is mandatory because every file this plan touches is C#. Write
+      `FF/evidence/baseline/phase0-instructions-read.TS.md`
       carrying `Timestamp:`, `Policy Order:` (the sequence above, in order), and an explicit list of
       every file read with its repository-relative path. Acceptance: the artifact exists and its
-      file list contains all six paths.
+      file list contains all seven paths.
 - [ ] [P0-T2] Record the git baseline and resolve `WS`. Run `git rev-parse --show-toplevel`,
       `git rev-parse HEAD`, `git rev-parse --abbrev-ref HEAD`, and `git status --porcelain`. The
       value returned by `git rev-parse --show-toplevel` is `WS` for every remaining task in this
@@ -225,16 +229,24 @@ Test method names asserted by this plan:
 - [ ] [P0-T9] Capture the coverage baseline. Run
       `pwsh -NoProfile -File "scripts\vscode\Invoke-MSTestWithCoverage.ps1" -Configuration Debug -CoverageOutput "coverage\coverage.cobertura.xml"`
       from `WS`. The run takes roughly 20 minutes; allow a timeout of at least 45 minutes. The
-      runner asserts a repository-wide 80% line floor and throws below it, so a non-zero exit is an
-      expected outcome that must be recorded, not retried. Write
+      runner has no coverage-floor assertion. Its only run-related throw
+      (`scripts/vscode/Invoke-MSTestWithCoverage.ps1:236`) is raised when the underlying
+      dotnet-coverage/vstest process itself exits non-zero, which happens when tests fail or when
+      the tooling fails. A non-zero exit caused by failing tests is a baseline observation to
+      record; a run the tooling could not complete (vstest crashed, or no Cobertura file was
+      produced) is a blocker that must be investigated, not recorded as expected. Write
       `FF/evidence/baseline/mstest-coverage.TS.md` with `Timestamp:`, `Command:`, `EXIT_CODE:` (as
       observed), and an `Output Summary:` recording: the passed and failed test counts, the
       repository-wide `line-rate` and `branch-rate` read from the root `coverage` element of
-      `coverage\coverage.cobertura.xml` expressed as percentages to two decimals, and the per-file
+      `coverage\coverage.cobertura.xml` expressed as percentages to two decimals, the per-file
       line-rate for each of the five owned production files, aggregated across every `class` element
       sharing the same `filename` attribute so that compiler-generated async and lambda classes are
-      not counted as separate denominators. Acceptance: the artifact records a numeric
-      repository-wide line-rate percentage and five numeric per-file line-rate percentages.
+      not counted as separate denominators, and a `RunDisposition:` line reading exactly one of
+      `CLEAN`, `TESTS_FAILED` (with the failed-test count), or `TOOLING_FAILURE`. Acceptance: the
+      artifact records a numeric repository-wide line-rate percentage, five numeric per-file
+      line-rate percentages, and a `RunDisposition:` line; a `TOOLING_FAILURE` disposition is a
+      blocker requiring investigation, and this task is not complete until the recorded disposition
+      is `CLEAN` or `TESTS_FAILED`.
 - [ ] [P0-T10] Record the pre-change line count of each of the seven owned files (five production,
       two test) into `FF/evidence/baseline/owned-file-line-counts.TS.md` with `Timestamp:`,
       `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: the artifact lists seven paths, each
@@ -249,7 +261,9 @@ Test method names asserted by this plan:
       under `QuickFiler/Controllers/`. Write `FF/evidence/baseline/defect-site-census.TS.md`.
       Acceptance: the artifact records a non-zero hit count for `Elapsed.Seconds`, for
       `int elapsedSeconds`, for `NotImplementedException`, for `volatile`, for `RecipientSender`,
-      and for the five-way alternation, and a zero hit count for `Stopwatch.StartNew`. This artifact
+      and for the five-way alternation, and exactly one hit for `Stopwatch.StartNew`, at
+      `QuickFiler/Controllers/EfcHomeController.cs:176` (the pre-existing `selectionStopwatch`
+      call, unrelated to `_stopWatch`). This artifact
       is the pre-fix half of the grep-based acceptance criteria AC-7, AC-10, AC-12, AC-14, and
       AC-15.
 - [ ] [P0-T12] Resolve the two unverified points carried from research. Read
@@ -332,7 +346,7 @@ Test method names asserted by this plan:
       `/t:Rebuild` and runs in Phase 6. Write
       `FF/evidence/regression-testing/efc-metrics-red.TS.md` with `Timestamp:`, `Command:`,
       `EXIT_CODE:`, `ExpectedExitCode: 1`, and an `Output Summary:` that names each failing test and
-      quotes its verbatim failure message. Acceptance: the artifact records the seven tests from
+      quotes its verbatim failure message. Acceptance: the artifact records the eight tests from
       P1-T1, P1-T2, P1-T3, P1-T4, P1-T6, P1-T7, P1-T8, and P1-T9 as failing, records
       `BuildQuickFileMetricLines_WithNinetySeconds_RendersUntruncatedDuration` as passing, and the
       TRX file exists under `TestResults\p1-t10`.
@@ -345,8 +359,9 @@ Test method names asserted by this plan:
 - [ ] [P2-T2] In `QuickFiler/Controllers/EfcHomeController.cs`, replace the two-statement
       construct-then-nothing pattern at lines 76 and 225 with the single form
       `_stopWatch = Stopwatch.StartNew();`. `System.Diagnostics` is already imported at line 3.
-      Acceptance: a search for `Stopwatch.StartNew` in that file returns exactly two hits and the
-      solution compiles.
+      Acceptance: a search for `Stopwatch.StartNew` in that file returns exactly three hits, at
+      lines 76, 176, and 225 — line 176 is the pre-existing `selectionStopwatch` call, unrelated to
+      `_stopWatch` — and the solution compiles.
 - [ ] [P2-T3] In `QuickFiler/Controllers/EfcHomeController.Metrics.cs` line 23, change the argument
       from the 0-59 `Seconds` component to `TotalSeconds`. Acceptance: a search for
       `Elapsed.Seconds` in that file returns no match and the solution compiles.
@@ -391,7 +406,8 @@ Test method names asserted by this plan:
       `QuickFiler.Test/`, and for `Stopwatch.StartNew` in
       `QuickFiler/Controllers/EfcHomeController.cs`. Write
       `FF/evidence/qa-gates/efc-search-census.TS.md`. Acceptance: the first four searches each
-      return zero hits and the fifth returns exactly two hits, at lines 76 and 225.
+      return zero hits and the fifth returns exactly three hits, at lines 76, 176, and 225 (line
+      176 being the pre-existing `selectionStopwatch` call, unrelated to `_stopWatch`).
 
 ### Phase 3 — EFC re-entrancy guard (#451 defect 3)
 
@@ -435,8 +451,11 @@ Test method names asserted by this plan:
 - [ ] [P4-T1] [expect-fail] Add `WriteMetricsAsync_ReadsMovedStopwatchForDuration` to
       `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`. Build the controller through
       the existing `BuildLooseMetricsController()` helper, set `_stopWatchMoved` by reflection to a
-      stopwatch that has been started and stopped over a non-zero interval, set `_stopWatch` by
-      reflection to a freshly constructed stopwatch, await `WriteMetricsAsync`, and verify the
+      stopped stopwatch whose internal elapsed-tick field is itself set by reflection to a fixed,
+      explicit non-zero value — the deterministic construction that P7-T3 names — never by
+      start/stop wall-clock timing, which does not guarantee a non-zero elapsed value, set
+      `_stopWatch` by reflection to a freshly constructed stopwatch, await `WriteMetricsAsync`, and
+      verify the
       mocked `GetMoveDiagnostics` was called with a `duration` argument matched by
       `It.Is<double>(d => d > 0)`. The pre-fix source reads the fresh stopwatch and passes zero.
       Acceptance: the method exists, compiles, and is decorated `[TestMethod]`.
@@ -584,7 +603,12 @@ Test method names asserted by this plan:
       499. The file began at 421 lines with roughly 79 lines of headroom; P5-T11 recovers roughly 25
       more. If the count exceeds 499, shorten the new test methods by reusing
       `BuildLooseMetricsController()` rather than relocating any test into the EFC file, which is
-      the wrong home. Write `FF/evidence/qa-gates/qfc-test-file-size.TS.md` recording the measured
+      the wrong home. Fallback disposition: if the count still exceeds 499 after shortening the new
+      test methods, record the residual overage in the artifact as a blocker and consolidate the
+      duplicated arrange code of the existing tests into `BuildLooseMetricsController()` until the
+      count is at most 499; relocating any test into the EFC file and creating a new file both
+      remain forbidden, and Phase 6 must not start while the count exceeds 499. Write
+      `FF/evidence/qa-gates/qfc-test-file-size.TS.md` recording the measured
       line count. Acceptance: the recorded line count is at most 499.
 
 ### Phase 6 — Final QC toolchain loop
@@ -627,11 +651,12 @@ phase.
       `TryBeginExecuteMoves`, `ResetExecuteMovesState`, the implemented single-argument
       `QuickFileMetrics_WRITE`, and `WriteMetricsAsync`. Per the spec, the repository-wide figure is
       a record-and-report obligation and not a blocking threshold, because no merge-base baseline
-      existed at spec time; the change-scoped figures are the gating ones. Acceptance: the artifact
-      records every value named above as a number, the signed repository-wide difference is not
-      negative, and each of the six named members reports at least 90.00 percent line coverage or
-      carries a named, member-specific justification for why the residual lines are unreachable
-      without a live Outlook process.
+      existed at spec time; the change-scoped figures are the gating ones. The repository-wide
+      line-rate and its signed difference are recorded values only and carry no pass/fail
+      condition; the per-file and per-member figures carry the gate. Acceptance: the artifact
+      records every value named above as a number, and each of the six named members reports at
+      least 90.00 percent line coverage or carries a named, member-specific justification for why
+      the residual lines are unreachable without a live Outlook process.
 - [ ] [P6-T7] Audit file sizes after formatting. Record the post-format line count of each of the
       seven owned files into `FF/evidence/qa-gates/owned-file-line-counts.TS.md` alongside the
       P0-T10 pre-change counts. Acceptance: every one of the seven counts is at most 499, and
@@ -669,8 +694,9 @@ phase.
 - [ ] [P7-T2] Write `FF/evidence/qa-gates/efc-stopwatch-site-reachability.TS.md` recording which of
       the two EFC construction sites the P1-T7 test actually exercises, and, if
       `QuickFiler/Controllers/EfcHomeController.cs:76` proved unreachable from a fixture without a
-      live Outlook mail item, naming that blocker explicitly and citing the two-hit
-      `Stopwatch.StartNew` search result from P2-T10 as the covering evidence for that site.
+      live Outlook mail item, naming that blocker explicitly and citing the three-hit
+      `Stopwatch.StartNew` search result from P2-T10 (hits at lines 76, 176, and 225, of which
+      lines 76 and 225 are the `_stopWatch` sites) as the covering evidence for that site.
       Acceptance: the artifact names the exercised site and either records that both sites are test-
       reachable or names the blocker for the unreachable one.
 - [ ] [P7-T3] Write `FF/evidence/other/coverage-boundaries.TS.md` recording the two coverage
@@ -703,116 +729,124 @@ phase.
       changes. Write `FF/evidence/qa-gates/ownership-gate.TS.md`. Acceptance: the command produces
       no output lines.
 - [ ] [P7-T7] Run the project-file and new-source gate. From `WS`, run
-      `git diff --name-only BASELINE_SHA -- "*.csproj" "*.props" "*.targets"` and
-      `git diff --name-only --diff-filter=A BASELINE_SHA -- "*.cs"`. Write
-      `FF/evidence/qa-gates/project-file-gate.TS.md`. Acceptance: both commands produce no output
-      lines.
+      `git diff --name-only BASELINE_SHA -- "*.csproj" "*.props" "*.targets"`,
+      `git diff --name-only --diff-filter=A BASELINE_SHA -- "*.cs"`, and
+      `git ls-files --others --exclude-standard -- "*.cs"`. The third command is required because
+      `git diff` never lists untracked files and this plan's only commit (P7-T35) runs after this
+      task, so a forbidden newly created `.cs` file would still be untracked here and invisible to
+      the first two commands. Write `FF/evidence/qa-gates/project-file-gate.TS.md`. Acceptance: all
+      three commands produce no output lines.
 - [ ] [P7-T8] Record the full changed-file inventory. From `WS`, run
-      `git diff --name-only BASELINE_SHA` and `git status --porcelain`. Write
+      `git diff --name-only BASELINE_SHA -- QuickFiler QuickFiler.Test docs/features/active/quickfiler-home-controller-metrics-442`
+      and
+      `git status --porcelain -- QuickFiler QuickFiler.Test docs/features/active/quickfiler-home-controller-metrics-442`.
+      Both commands are scoped to the feature's owned surface so that a write elsewhere in the tree
+      (for example under `.claude/agent-memory/`, which holds tracked files this feature does not
+      own) cannot fail this gate. Write
       `FF/evidence/qa-gates/changed-file-inventory.TS.md` listing every path. Acceptance: every
       listed path is one of the five owned production files, one of the two owned test files, or a
       path under `docs/features/active/quickfiler-home-controller-metrics-442/`.
-- [ ] [P7-T9] Check off AC-1 in `FF/spec.md` and record the evidence pointers
+- [ ] [P7-T9] Check off AC-1 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointers are recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointers
       `FF/evidence/regression-testing/efc-metrics-red.TS.md`,
       `FF/evidence/regression-testing/qfc-stopwatch-red.TS.md`,
       `FF/evidence/regression-testing/qfc-flush-red.TS.md`, and
       `FF/evidence/regression-testing/fail-before-exception.TS.md`. Acceptance: the AC-1 checkbox
       reads `[x]` and every root cause RC-1 through RC-9 is covered by a named red observation or by
       the fail-before exception dossier.
-- [ ] [P7-T10] Check off AC-2 in `FF/spec.md` with the evidence pointer
+- [ ] [P7-T10] Check off AC-2 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointer is recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointer
       `FF/evidence/regression-testing/qfc-flush-green.TS.md` and the test name
       `WriteMetricsAsync_InvokesInjectedMetricsFileWriterOnce`. Acceptance: the AC-2 checkbox reads
       `[x]`.
-- [ ] [P7-T11] Check off AC-3 in `FF/spec.md` with the evidence pointers
+- [ ] [P7-T11] Check off AC-3 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointers are recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointers
       `FF/evidence/regression-testing/qfc-flush-green.TS.md` and
       `FF/evidence/qa-gates/qfc-flush-search-census.TS.md`, and the test name
       `WriteMetricsAsync_CompletesWriterTaskBeforeReturning`. Acceptance: the AC-3 checkbox reads
       `[x]`.
-- [ ] [P7-T12] Check off AC-4 in `FF/spec.md` with the evidence pointer
+- [ ] [P7-T12] Check off AC-4 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointer is recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointer
       `FF/evidence/regression-testing/qfc-flush-green.TS.md` and the test name
       `WriteMetricsAsync_PassesUncancelledTokenToWriter`. Acceptance: the AC-4 checkbox reads `[x]`.
-- [ ] [P7-T13] Check off AC-5 in `FF/spec.md` with the evidence pointer
+- [ ] [P7-T13] Check off AC-5 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointer is recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointer
       `FF/evidence/regression-testing/qfc-flush-green.TS.md` and the test name
       `WriteMetricsAsync_FiltersNullDiagnosticLinesBeforeWriting`. Acceptance: the AC-5 checkbox
       reads `[x]`.
-- [ ] [P7-T14] Check off AC-6 in `FF/spec.md` with the evidence pointer
+- [ ] [P7-T14] Check off AC-6 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointer is recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointer
       `FF/evidence/regression-testing/qfc-stopwatch-green.TS.md` and the test name
       `WriteMetricsAsync_ReadsMovedStopwatchForDuration`. Acceptance: the AC-6 checkbox reads `[x]`.
-- [ ] [P7-T15] Check off AC-7 in `FF/spec.md` with the evidence pointers
+- [ ] [P7-T15] Check off AC-7 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointers are recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointers
       `FF/evidence/qa-gates/qfc-stopwatch-search-census.TS.md` and
       `FF/evidence/regression-testing/efc-metrics-green.TS.md`, and the test name
       `BuildQuickFileMetricLines_WithNinetySeconds_RendersUntruncatedDuration`. Acceptance: the AC-7
       checkbox reads `[x]`.
-- [ ] [P7-T16] Check off AC-8 in `FF/spec.md` with the evidence pointer
+- [ ] [P7-T16] Check off AC-8 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointer is recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointer
       `FF/evidence/qa-gates/qfc-stopwatch-search-census.TS.md`. Acceptance: the AC-8 checkbox reads
       `[x]`.
-- [ ] [P7-T17] Check off AC-9 in `FF/spec.md` with the evidence pointers
+- [ ] [P7-T17] Check off AC-9 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointers are recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointers
       `FF/evidence/regression-testing/efc-metrics-green.TS.md`,
       `FF/evidence/qa-gates/efc-search-census.TS.md`, and
       `FF/evidence/qa-gates/efc-stopwatch-site-reachability.TS.md`, and the test name
       `StopWatch_AfterControllerConstruction_IsRunning`. Acceptance: the AC-9 checkbox reads `[x]`.
-- [ ] [P7-T18] Check off AC-10 in `FF/spec.md` with the evidence pointers
+- [ ] [P7-T18] Check off AC-10 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointers are recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointers
       `FF/evidence/qa-gates/efc-search-census.TS.md` and
       `FF/evidence/qa-gates/msbuild-nullable.TS.md`. Acceptance: the AC-10 checkbox reads `[x]`.
-- [ ] [P7-T19] Check off AC-11 in `FF/spec.md` with the evidence pointers
+- [ ] [P7-T19] Check off AC-11 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointers are recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointers
       `FF/evidence/regression-testing/efc-metrics-green.TS.md` and
       `FF/evidence/other/pr-body-statements.TS.md`, and the test name
       `BuildQuickFileMetricLines_WithMultipleMovedItems_PinsRealDivisionRounding`. Acceptance: the
       AC-11 checkbox reads `[x]`.
-- [ ] [P7-T20] Check off AC-12 in `FF/spec.md` with the evidence pointers
+- [ ] [P7-T20] Check off AC-12 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointers are recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointers
       `FF/evidence/regression-testing/efc-metrics-green.TS.md` and
       `FF/evidence/qa-gates/efc-search-census.TS.md`, and the test names
       `BuildQuickFileMetricLines_WithMovedMailItems_FormatsMetricLine` and
       `BuildQuickFileMetricLines_RendersTwelveCommaSeparatedFields`. Acceptance: the AC-12 checkbox
       reads `[x]`.
-- [ ] [P7-T21] Check off AC-13 in `FF/spec.md` with the evidence pointer
+- [ ] [P7-T21] Check off AC-13 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointer is recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointer
       `FF/evidence/regression-testing/efc-metrics-green.TS.md` and the test name
       `BuildQuickFileMetricLines_WithEmbeddedCommas_StillRendersTwelveFields`. Acceptance: the AC-13
       checkbox reads `[x]`.
-- [ ] [P7-T22] Check off AC-14 in `FF/spec.md` with the evidence pointers
+- [ ] [P7-T22] Check off AC-14 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointers are recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointers
       `FF/evidence/regression-testing/efc-reentrancy-green.TS.md` and
       `FF/evidence/regression-testing/fail-before-exception.TS.md`, and the test names
       `TryBeginExecuteMoves_SecondCallBeforeReset_ReturnsFalse` and
       `TryBeginExecuteMoves_AfterResetExecuteMovesState_ReturnsTrue`. Acceptance: the AC-14 checkbox
       reads `[x]`.
-- [ ] [P7-T23] Check off AC-15 in `FF/spec.md` with the evidence pointers
+- [ ] [P7-T23] Check off AC-15 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointers are recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointers
       `FF/evidence/qa-gates/efc-search-census.TS.md` and
       `FF/evidence/regression-testing/efc-metrics-green.TS.md`, and the test names
       `QuickFileMetricsWriteFilenameOnly_WithAbsentPrerequisites_DoesNotThrow` and
       `QuickFileMetricsWriteFilenameOnly_WithPrerequisites_DelegatesToThreeArgumentOverload`.
       Acceptance: the AC-15 checkbox reads `[x]`.
-- [ ] [P7-T24] Check off AC-16 in `FF/spec.md` with the evidence pointers
+- [ ] [P7-T24] Check off AC-16 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointers are recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointers
       `FF/evidence/regression-testing/efc-metrics-green.TS.md` and
       `FF/evidence/regression-testing/qfc-stopwatch-green.TS.md`, and the test names
       `BuildQuickFileMetricLines_UnderGermanCulture_RendersInvariantDecimalSeparator` and
       `WriteMetricsAsync_UnderGermanCulture_RendersInvariantDecimalSeparator`. Acceptance: the AC-16
       checkbox reads `[x]`.
-- [ ] [P7-T25] Check off AC-17 in `FF/spec.md` with the evidence pointer
+- [ ] [P7-T25] Check off AC-17 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointer is recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointer
       `FF/evidence/qa-gates/test-determinism.TS.md`. Acceptance: the AC-17 checkbox reads `[x]`.
-- [ ] [P7-T26] Check off AC-18 in `FF/spec.md` with the evidence pointer
+- [ ] [P7-T26] Check off AC-18 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointer is recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointer
       `FF/evidence/other/pr-body-statements.TS.md`. Acceptance: the AC-18 checkbox reads `[x]` and
       the referenced artifact names all four deliberately broken tests with their dispositions.
-- [ ] [P7-T27] Check off AC-19 in `FF/spec.md` with the evidence pointers
+- [ ] [P7-T27] Check off AC-19 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointers are recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointers
       `FF/evidence/qa-gates/ownership-gate.TS.md` and
       `FF/evidence/qa-gates/changed-file-inventory.TS.md`. Acceptance: the AC-19 checkbox reads
       `[x]`.
-- [ ] [P7-T28] Check off AC-20 in `FF/spec.md` with the evidence pointer
+- [ ] [P7-T28] Check off AC-20 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointer is recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointer
       `FF/evidence/qa-gates/project-file-gate.TS.md`. Acceptance: the AC-20 checkbox reads `[x]`.
-- [ ] [P7-T29] Check off AC-21 in `FF/spec.md` with the evidence pointers
+- [ ] [P7-T29] Check off AC-21 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointers are recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointers
       `FF/evidence/qa-gates/owned-file-line-counts.TS.md` and
       `FF/evidence/qa-gates/qfc-test-file-size.TS.md`. Acceptance: the AC-21 checkbox reads `[x]`.
-- [ ] [P7-T30] Check off AC-22 in `FF/spec.md` with the evidence pointers
+- [ ] [P7-T30] Check off AC-22 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointers are recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointers
       `FF/evidence/baseline/mstest-coverage.TS.md`, `FF/evidence/qa-gates/mstest-coverage.TS.md`,
       and `FF/evidence/qa-gates/coverage-delta.TS.md`. Acceptance: the AC-22 checkbox reads `[x]`.
-- [ ] [P7-T31] Check off AC-23 in `FF/spec.md` with the evidence pointers
+- [ ] [P7-T31] Check off AC-23 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointers are recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointers
       `FF/evidence/qa-gates/csharpier-check.TS.md`,
       `FF/evidence/qa-gates/msbuild-analyzers.TS.md`,
       `FF/evidence/qa-gates/msbuild-nullable.TS.md`,
       `FF/evidence/qa-gates/mstest-coverage.TS.md`, and
       `FF/evidence/qa-gates/toolchain-loop.TS.md`. Acceptance: the AC-23 checkbox reads `[x]`.
-- [ ] [P7-T32] Check off AC-24 in `FF/spec.md` with the evidence pointer
+- [ ] [P7-T32] Check off AC-24 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointer is recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointer
       `FF/evidence/other/pr-body-statements.TS.md`. Acceptance: the AC-24 checkbox reads `[x]`.
-- [ ] [P7-T33] Check off AC-25 in `FF/spec.md` with the evidence pointers
+- [ ] [P7-T33] Check off AC-25 in `FF/spec.md`. The only edit made to `FF/spec.md` is flipping that criterion's checkbox from `- [ ]` to `- [x]`; the criterion text is not touched, and the evidence pointers are recorded in `FF/evidence/qa-gates/acceptance-criteria-status.TS.md`, the artifact P7-T34 produces, not in `FF/spec.md`. For that status artifact, record the evidence pointers
       `FF/evidence/issue-updates/cross-feature-notes-handoff.TS.md` and the CFN-4 disposition
       written by task P7-T4. Acceptance: the AC-25 checkbox reads `[x]` if and only if CFN-4 carries
       a GitHub issue number; if CFN-4 carries `PROMOTION BLOCKED`, leave the AC-25 checkbox unchecked
@@ -825,8 +859,12 @@ phase.
       records 25 checked, or 24 checked with AC-25 named as the single outstanding item together
       with its blocker artifact path.
 - [ ] [P7-T35] Commit every source, test, and evidence change on the feature branch with a message
-      naming issues #442, #443, and #451, then run `git status --porcelain` from `WS`. Write no
-      artifact after this task. Acceptance: `git status --porcelain` produces no output lines.
+      naming issues #442, #443, and #451, then run
+      `git status --porcelain -- QuickFiler QuickFiler.Test docs/features/active/quickfiler-home-controller-metrics-442`
+      from `WS`. The status check is scoped to the feature's owned surface so that a write
+      elsewhere in the tree (for example under `.claude/agent-memory/`, which holds tracked files
+      this feature does not own) does not fail the gate. Write no artifact after this task.
+      Acceptance: the scoped `git status --porcelain` command produces no output lines.
 
 ---
 
