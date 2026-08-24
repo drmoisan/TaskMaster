@@ -1,6 +1,7 @@
 # Atomic Executor Memory Index
 
 ## Plan validation & gates
+- [Plan feature-folder slug vs disk path](project_plan_feature_folder_slug_vs_disk_path.md) — 45 evidence paths named a folder that does not exist; the MCP plan validator passes it, so `ls` + occurrence count is preflight check #1
 - [Verify line citations with numbered output](feedback_verify_line_citations_with_numbered_output.md) — never hand-count from a `sed` window; a wrong #438 advisory got applied and corrupted 3 correct citations in plan + spec
 - [Self-derived gate thresholds are blind](project_preflight_selfderived_gate_thresholds_are_blind.md) — a "count >= floor" gate whose floor comes from the runs it validates is deflation-blind + scope-incommensurable; use
 - [Multi-pattern gates detach shared qualifiers](project_multipattern_gate_shared_qualifier_detachment.md) — rewriting one clause re-scopes the trailing allowlist to the last pattern only; restate the carve-out per pattern +
@@ -93,6 +94,7 @@
 - [#349 breadcrumb WebView2 gotchas](project_349_breadcrumb_webview2_gotchas.md) — retyped Designer field breaks reflection-injected tests; aggregate async d__ classes for >=90%
 - QuickFiler #227 cycle notes: [cycle-4 ToggleFocus](project_qfc227_cycle4_toggle_focus_genuine_test_gotchas.md), [cycle-3 Theme/FolderPredictor seam](project_theme_folderpredictor_seam_retrofit_gotchas.md)
 - [ObjectListView TreeListView headless selection](project_objectlistview_treelistview_headless_selection.md) — selection needs a native handle; cache the node via SelectionChanged
+- [QFC high-confidence dequeue is COM-bound](project_qfc_highconfidence_dequeue_is_com_bound.md) — a datamodel test with HighConfidenceModeEnabled=true reaches FolderScoringService/live Outlook; order the ScoringServiceFactory seam task first
 - [QfcDatamodel BackgroundWorker async-void IsBusy race](project_qfc_backgroundworker_async_void_race.md) — IsBusy flips false instantly; assert WorkerSupportsCancellation
 - [QfcItemController pump harness needs SaveParameters](project_qfcitemcontroller_pump_harness_needs_saveparameters.md) — SetField-only injection leaves `??=` factory defaults null (NRE in LoadFolderHandlerAsync)
 - [TaskController (#297) unit-test gotchas](project_taskvisualization_taskcontroller_test_gotchas.md) — ApplyChanges hangs over Moq; get-only MailItem.TaskSubject throws; STA harness needs TableLayoutPanel parenting
