@@ -1,6 +1,7 @@
 # Atomic Executor Memory Index
 
 ## Plan validation & gates
+- [Directory-scoped format breaks ownership gates](project_directory_scoped_format_breaks_ownership_gates.md) — a scoped csharpier pass naming DIRECTORIES rewrites must-not-write files the same plan asserts are unmodified; require file paths
 - [Verify line citations with numbered output](feedback_verify_line_citations_with_numbered_output.md) — never hand-count from a `sed` window; a wrong #438 advisory got applied and corrupted 3 correct citations in plan + spec
 - [Self-derived gate thresholds are blind](project_preflight_selfderived_gate_thresholds_are_blind.md) — a "count >= floor" gate whose floor comes from the runs it validates is deflation-blind + scope-incommensurable; use
 - [Multi-pattern gates detach shared qualifiers](project_multipattern_gate_shared_qualifier_detachment.md) — rewriting one clause re-scopes the trailing allowlist to the last pattern only; restate the carve-out per pattern +
