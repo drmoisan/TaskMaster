@@ -5,7 +5,7 @@ metadata:
   type: feedback
 ---
 
-Epic-child atomic plans are authored during epic planning in a different (planning-time) git worktree. Their Phase 0 policy-read tasks (P0-T1..T4) hard-code that worktree's absolute paths, e.g. `C:\Users\DanMoisan\repos\TaskMaster-wt-2026-07-07-13-21\CLAUDE.md`, which do not exist when the feature is later executed in a fresh session worktree.
+Epic-child atomic plans are authored during epic planning in a different (planning-time) git worktree. Their Phase 0 policy-read tasks (P0-T1..T4) hard-code that worktree's absolute paths, e.g. `<repo-root>-wt-2026-07-07-13-21\CLAUDE.md`, which do not exist when the feature is later executed in a fresh session worktree.
 
 **Why:** the plan is frozen at planning time; the execution worktree is created later with a different `agent-<hash>` path. An executor that reads the cited paths verbatim fails P0 and can wrongly report BLOCKED.
 

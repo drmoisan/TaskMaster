@@ -8,7 +8,7 @@ metadata:
 The `epic-plan` and `epic-orchestrate` skills cite
 `scripts/dev_tools/epic_wave_computation.py` as the tested wave-assignment reference and imply an
 epic-manifest schema validator. In the TaskMaster repo (worktrees under
-`C:/Users/DanMoisan/repos/TaskMaster-wt/`) neither is vendored: `find scripts -name "*epic*"`
+`<repo-root>-wt/`) neither is vendored: `find scripts -name "*epic*"`
 returns nothing, and the MCP validator's `artifact_type` enum has no epic-manifest type (only
 `epic-planner-state`, `epic-orchestrator-state`, `epic-kickoff`, `plan`, etc.).
 

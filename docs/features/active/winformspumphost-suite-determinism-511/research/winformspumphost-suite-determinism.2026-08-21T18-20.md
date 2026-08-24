@@ -8,7 +8,7 @@ Feature: `winformspumphost-suite-determinism-511` (epic child 1 of 4,
 Scope of this document: research only. No source file, project file, configuration file, or
 `.claude/**` file was modified. No build and no test run was executed. Every claim below is
 grounded in a file read or a grep against the worktree at
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a5bd77000d205e542`, or is explicitly
+`<repo-root>\.claude\worktrees\agent-a5bd77000d205e542`, or is explicitly
 labelled as documented framework behaviour or as an open question.
 
 Paths in this document are repository-relative for readability. The absolute root for every one of

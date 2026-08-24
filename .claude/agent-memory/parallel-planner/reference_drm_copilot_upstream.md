@@ -1,11 +1,11 @@
 ---
 name: drm-copilot-is-claude-governance-upstream
-description: C:\Users\DanMoisan\repos\drm-copilot is the upstream source for TaskMaster's .claude governance surface (rules, skills, agents, hooks, orchestration libraries) and the MCP server
+description: <user-profile>\repos\drm-copilot is the upstream source for TaskMaster's .claude governance surface (rules, skills, agents, hooks, orchestration libraries) and the MCP server
 metadata:
   type: reference
 ---
 
-`C:\Users\DanMoisan\repos\drm-copilot` is the upstream repository for TaskMaster's `.claude`
+`<user-profile>\repos\drm-copilot` is the upstream repository for TaskMaster's `.claude`
 governance surface and for the `drm-copilot` MCP server itself.
 
 Useful locations there when a TaskMaster governance file seems missing or stale:

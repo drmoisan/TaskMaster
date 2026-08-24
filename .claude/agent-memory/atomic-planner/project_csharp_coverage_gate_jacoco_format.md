@@ -1,6 +1,6 @@
 ---
 name: project-csharp-coverage-gate-jacoco-format
-description: The feature-review coverage hook expects JaCoCo XML at artifacts/csharp/coverage.xml, but executors emit Cobertura — a conversion is required, not Cobertura-as-is
+description: The feature-review hook parses artifacts/csharp/coverage.xml as JaCoCo, but repo precedent also accepts Cobertura there (hook nulls out, reviewer parses Cobertura directly) — follow whichever format the remediation delta names
 metadata:
   type: project
 ---
@@ -15,8 +15,18 @@ attributes), and feature evidence is stored as `*.cobertura.xml`. The hook canno
 missing/absent `artifacts/csharp/coverage.xml` is graded a mandatory coverage FAIL even when coverage
 was in fact produced (this triggered the #328 R1 remediation).
 
-**How to apply:** When a coverage-artifact remediation asks to "place coverage at the canonical path,"
-plan a Cobertura -> JaCoCo **conversion**, not a copy. Scope the JaCoCo aggregate to first-party
+**Both formats are accepted precedent — check what the caller/delta names.** #503 shipped JaCoCo at
+the canonical path (hook-readable). #230 and #438 shipped **Cobertura** there: their policy audits
+explicitly record that the hook's JaCoCo query computes null and "does not itself gate the
+percentages," and the reviewer's direct Cobertura parse (root `line-rate`/`branch-rate`) is the
+authoritative measurement. #511 R1 (2026-08-23) had an executor preflight delta that mandated the
+Cobertura copy with `line-rate >= 85` / `branch-rate >= 75` acceptance — do not "correct" such a
+delta to JaCoCo; the Cobertura route is valid because the reviewer, not the hook, computes the figures.
+
+**How to apply:** When a coverage-artifact remediation asks to "place coverage at the canonical path"
+and does not name a format, plan a Cobertura -> JaCoCo **conversion**, not a copy, so the hook itself
+can read it. When the delta names Cobertura and cites `line-rate`/`branch-rate` gates, plan the copy
+verbatim. Scope the JaCoCo aggregate to first-party
 production packages (exclude vendored Deedle/FSharp.Core/Swordfish/SVGControl and `*.Test` assemblies)
 so the readable repo-wide line number reflects the first-party denominator, not the nondeterministic
 whole-process denominator (the whole-process line-rate mixes vendored modules and reads ~62-63%).

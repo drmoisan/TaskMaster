@@ -3,6 +3,9 @@
 - [Agent worktrees need SDK + NuGet + analyzer-backfill bootstrap](agent-worktrees-need-sdk-and-nuget-bootstrap.md) — no `.dotnet-sdk`, no `packages/`, and a clean restore still misses the skewed analyzer versions (CS0006, not a warning); three Phase 0 tasks
 - [/Logger:trx needs /ResultsDirectory](trx-needs-resultsdirectory.md) — TRX lands in `TestResults\` relative to cwd; TRX-existence-under-evidence acceptance is unsatisfiable without it, and the clean-tree gate won't catch it
 - [Per-task TRX subdirectory](trx-needs-resultsdirectory.md) — a shared `/ResultsDirectory:` makes "ten distinct TRX files" ambiguous once `[expect-fail]` runs deposit earlier TRX there; give each task a `p#-t#` segment
+- [Spec corrections sweep sibling sections](feedback_spec_corrections_sweep_sibling_sections.md) — falsified-premise fixes must cover Scope/Out-of-scope/Rollout, not AC only; denial text must dodge closing-keyword scans (#511 R1 Part 6)
+- [#511 R1 preflight delta seams](project_511_r1_preflight_delta_seams.md) — mid-cycle raw-evidence deletion breaks resolves gates; git-log scans post-commit only; absolute MSBuild path; Start-Process mechanic for 20-min runs; per-class coverage noise -0.50pp
+- [CSharpier "Formatted N files" is processed count](csharpier-formatted-n-is-processed-count.md) — restart-on-rewrite loops keyed on it never terminate; define rewritten-count via before/after SHA-256
 - [Terminal-phase planner traps](terminal-phase-planner-traps.md) — sweep the last phase for an unowned "a follow-up issue should carry it", artifacts written after the clean-tree commit task, and a false "clarification against the spec's wording"
 - [#553 CI parallel-split plan seams](project_553_ci_parallel_split_plan_seams.md) — workflow-only scope: no C# toolchain; Phase 0 snapshot for byte-identity; ruleset PUT + gh pr create orchestrator-gated; no jq (ConvertTo-Json -Depth 20); pathspec anchoring; BRANCH/SCRATCH conventions
 
@@ -55,7 +58,7 @@
 - [STA last-resort control-identity plan pattern](project_sta_last_resort_control_identity_pattern.md) — epic #295: measure control-identity partials via companion interface (real Label/Control) + *.StaTests.cs ([STATestClass], MSTest 4.2.2); never construct Form; handle/pump residue stays method-level exempt
 - [#307 F2 ScoCollection deletion gate](project_307_f2_scocollection_deletion_gate.md) — full first-party ScoCollection/ScoStack reference set incl. tests beyond spec §7; ISubjectMapSco/IScoCollection F5 boundary; FS/Prompt seams live in ScoCollection.cs
 - [#328 store-exclusion seams](project_328_store_exclusion_seams.md) — StoresWrapper(469)/TreeOfToDoItems(481) near 500-limit, ToDoEvents(594) pre-existing over-limit; new test .cs need csproj wiring; four inclusion surfaces lockstep; adopted persisted StoreWrapper.StoreId
-- [C# coverage gate expects JaCoCo](project_csharp_coverage_gate_jacoco_format.md) — validate-feature-review-coverage.ps1 reads artifacts/csharp/coverage.xml as JaCoCo, not Cobertura; plan a conversion scoped to first-party
+- [C# coverage gate: JaCoCo hook, Cobertura also accepted](project_csharp_coverage_gate_jacoco_format.md) — hook parses JaCoCo, but #230/#438/#511-R1 shipped Cobertura (reviewer parses directly); follow the format the delta names
 - [Durable script copy into feature folder](durable-script-copy-into-feature-folder.md) — copy scratchpad-supplied scripts into `<FEATURE>/scripts/` before referencing them in plan tasks (session-scoped temp paths aren't durable)
 - [#351 QuickFiler breadcrumb plan seams](project_351_quickfiler_breadcrumb_plan_seams.md) — JSON code in UtilitiesCS only (QuickFiler lacks Newtonsoft); P2-T1 blocked-if-9101-absent; evidence/repro/ rejected; coordinator pattern
 - [Dispatcher repro hang trap](dispatcher-repro-hang-trap.md) — a repro that touches Dispatcher.CurrentDispatcher on a pooled worker hangs on awaited InvokeAsync instead of failing; use an owned pumping STA thread
@@ -72,3 +75,6 @@
 - [One AC per check-off task](feedback_ac_checkoff_one_per_task.md) — preflight rejects batched AC check-offs; one checkbox + own evidence pointer per task (#230 B4)
 - [Post-format file-size audit + async-tail asymmetry](feedback_postformat_file_size_audit.md) — 500-line audit goes AFTER final csharpier format; awaited vs fire-and-forget tails decide completion-vs-fault test shape (#230 B2/B3)
 - [Wiring gates must be wiring-sensitive](feedback_wiring_gates_must_be_wiring_sensitive.md) — count floors deflate with the defect they guard; use static [TestMethod] enumeration vs /ListTests discovery (#230 rev3)
+
+## Artifact hygiene
+- [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.

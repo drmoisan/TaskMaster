@@ -20,6 +20,7 @@
 ## Build / toolchain environment
 - [pwsh/git/gh CLI gotchas](project_pwsh_git_gh_cli_gotchas.md) — jq NOT installed (only `gh --jq`); pwsh won't concatenate `$(git merge-base ...)..HEAD`; bare `packages.config`
 - [Project Build/Test Env](project_build_test_env.md) — git-bash quirks (MSBuild switches, MSYS_NO_PATHCONV), csharpier v1 syntax, legacy csproj Compile includes, IVT for Moq
+- [Start-Process -ArgumentList array strips quoting](project_startprocess_arglist_array_strips_quoting.md) — a detached msbuild launch loses `"/p:Platform=Any CPU"` and dies MSB1008 having compiled nothing; pass ONE pre-quoted string
 - [VS18 build/test toolchain paths](project_vs18_build_toolchain_paths.md) — use VS **18** full-framework msbuild.exe (not .dotnet-sdk, dies on binary resx MSB3822); nuget.exe restore
 - [Repo-local SDK install + nullable Rebuild](project_repo_sdk_and_nullable_rebuild.md) — .dotnet-sdk install needs pwsh7; csharpier check/format subcommands; nullable debt scope NOT stable across sessions —
 - [vstest TestCaseFilter OR-vs-pipe + fresh-worktree bootstrap](project_vstest_testcasefilter_or_operator_and_env_setup.md) — vstest rejects `OR`, needs `|`; fresh worktree needs restore + global `dotnet-coverage`
@@ -46,6 +47,7 @@
 - [Compile-time red needs body-level refs](project_compile_red_needs_body_level_references.md) — a missing type in a method SIGNATURE suppresses body binding, so an `[expect-fail]` task requiring N named CS0246s
 
 ## Test execution & isolation
+- [Long runs need a detached process](project_long_runs_need_detached_process.md) — Bash `run_in_background` runners get killed after ~1h, taking `Start-Job` load generators with them; use `Start-Process -PassThru` + foreground `sleep 570` to advance real time
 - [Tests must mock GUI; no visible window](feedback_tests_must_mock_gui_no_visible_window.md) — use headless seams (mocked viewers, injected show/focus delegates), never Form.Show/Application.Run
 - [#511 is a test-host crash, not N failing tests](project_511_is_a_testhost_crash_not_n_failing_tests.md) — load-driven abort with `Total tests: Unknown` (no readable verdict); `/InIsolation` loop gave 0 failed; never gate on a
 - [WinFormsPumpHost tests are load-flaky](project_winformspumphost_tests_load_flaky.md) — QfcItemController_InitializationTests fail with "window handle has been created"/60s timeouts when the box is
@@ -87,6 +89,7 @@
 - [Outlook `Action`/`Exception` ambiguity](project_outlook_action_ambiguity.md) — bare `Action` AND bare `Exception` are CS0104-ambiguous in Outlook-interop files; use
 
 ## Component-specific gotchas
+- [WebView2 EndInit already creates child handles](project_webview2_endinit_creates_handles.md) — `new ItemViewer()` alone leaves BOTH WebView2 children handle-created, so a `IsHandleCreated == false` assertion is unsatisfiable; also 3 pre-existing UtilitiesCS.Test flakes (shared Console.Out) that break any all-assembly `failed == 0` gate
 - [#349 breadcrumb WebView2 gotchas](project_349_breadcrumb_webview2_gotchas.md) — retyped Designer field breaks reflection-injected tests; aggregate async d__ classes for >=90%
 - QuickFiler #227 cycle notes: [cycle-4 ToggleFocus](project_qfc227_cycle4_toggle_focus_genuine_test_gotchas.md), [cycle-3 Theme/FolderPredictor seam](project_theme_folderpredictor_seam_retrofit_gotchas.md)
 - [ObjectListView TreeListView headless selection](project_objectlistview_treelistview_headless_selection.md) — selection needs a native handle; cache the node via SelectionChanged
@@ -97,4 +100,7 @@
 - [IApplicationGlobals member forces implementers](project_iapplicationglobals_member_forces_implementers.md) — adding a member breaks 7 hand-written test-double stubs beyond scope lock; Moq mocks auto-implement
 - [TimeProvider seam gotchas](project_timeprovider_seam_gotchas.md) — Moq can't mock non-virtual GetLocalNow (use FakeTimeProvider); an optional TimeProvider param forces a Bcl.TimeProvider
 - [ScoDictionaryNew needs TryAdd not Add](project_scodictionarynew_tryadd_not_add.md) — retargeting Sco* tests: `.Add(k,v)` won't compile (CS1061); the base exposes `.TryAdd`; swap in the same edit
-- [FluentAssertions Equal(params) has no because](project_fluentassertions_equal_params_no_because.md) — a trailing reason on `.Equal(...)` becomes an extra expected element; use `.Equal(new[]{...})` or move the reason to
+- [FluentAssertions Equal(params) has no because](project_fluentassertions_equal_params_no_because.md) — a trailing reason on `.Equal(...)` becomes an extra expected element; use `.Equal(new[]{...})` or move the reason to `.HaveCount(n, reason)`
+
+## Artifact hygiene
+- [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.

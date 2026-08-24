@@ -433,6 +433,13 @@ namespace QuickFiler.Controllers.Tests
                         new QuickFiler.ItemViewer()
                     )
                     .ConfigureAwait(false);
+                // #571 (measured 2026-08-22): both WebView2 children, and therefore the parent
+                // ItemViewer, are already handle-created when construction returns, via the
+                // Designer-emitted ISupportInitialize.EndInit() calls. This read is redundant
+                // today and is retained deliberately as a defensive measure, so the fixture does
+                // not silently depend on a third-party side effect this repository does not
+                // control.
+                _ = await host.InvokeAsync(() => viewer.Handle).ConfigureAwait(false);
                 HarnessController controller = new HarnessController();
                 QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer);
                 controller.Token = CancellationToken.None;

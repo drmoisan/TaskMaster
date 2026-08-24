@@ -286,5 +286,113 @@ namespace QuickFiler.Controllers.Tests
                 await host.StopAsync().ConfigureAwait(false);
             }
         }
+
+        /// <summary>
+        /// #511/#571 regression probe: the shared pump harness must hand back an
+        /// <c>ItemViewer</c> whose window handle already exists, created on the pump thread.
+        /// Every pump-hosted test in this class marshals work through the viewer, and
+        /// <c>Control.Invoke</c> throws on a handle-less control, so a harness that returns a
+        /// viewer with no handle makes those tests fail. This probe reports the harness viewer's
+        /// handle state directly, so a run in which the end-to-end tests happen to pass still
+        /// records whether the handle was present.
+        /// </summary>
+        [TestMethod]
+        [Timeout(PumpTimeoutMs)]
+        public async Task BuildPumpHarness_ForcesTheViewerWindowHandleOnThePumpThread()
+        {
+            // Arrange
+            WinFormsPumpHost host = new WinFormsPumpHost();
+            PumpHarness harness = null;
+            try
+            {
+                harness = await BuildPumpHarnessAsync(host, darkMode: false).ConfigureAwait(false);
+
+                // Act — read the marshalling predicate on the pump thread that owns the viewer.
+                bool invokeRequiredOnPumpThread = await host.InvokeAsync(() =>
+                        harness.Viewer.InvokeRequired
+                    )
+                    .ConfigureAwait(false);
+
+                // Assert — the handle exists, so Control.Invoke cannot throw for want of one.
+                harness
+                    .Viewer.IsHandleCreated.Should()
+                    .BeTrue(
+                        because: "the harness must create the viewer's window handle on the pump thread"
+                    );
+                invokeRequiredOnPumpThread
+                    .Should()
+                    .BeFalse(
+                        because: "the pump thread owns the viewer's handle, so no marshalling is required there"
+                    );
+            }
+            finally
+            {
+                if (harness != null)
+                {
+                    harness.Restore();
+                }
+
+                await host.StopAsync().ConfigureAwait(false);
+            }
+        }
+
+        /// <summary>
+        /// #571 minimality pin: the harness must not itself create either
+        /// <c>Microsoft.Web.WebView2.WinForms.WebView2</c> child's window handle. It forces only the
+        /// viewer's own handle, by reading <c>.Handle</c>, which is non-recursive.
+        /// </summary>
+        /// <remarks>
+        /// Measured, not predicted. A bare <c>new ItemViewer()</c> constructed on the pump with no
+        /// harness, no <c>SaveParameters</c>, and no <c>.Handle</c> read already reports both
+        /// children as handle-created, so the handles originate in <c>InitializeComponent</c>'s
+        /// third-party <c>ISupportInitialize.EndInit()</c> call, not in the harness. That is also
+        /// why the viewer's own handle was already present on every pre-fix run: WinForms creates a
+        /// parent's handle when a child's handle is created. This test therefore pins the state the
+        /// harness inherits rather than a state it produces, and it fails if a future change makes
+        /// the children handle-less at construction and so invalidates that assumption.
+        /// </remarks>
+        [TestMethod]
+        [Timeout(PumpTimeoutMs)]
+        public async Task BuildPumpHarness_DoesNotCreateTheWebViewChildHandles()
+        {
+            // Arrange
+            WinFormsPumpHost host = new WinFormsPumpHost();
+            PumpHarness harness = null;
+            try
+            {
+                harness = await BuildPumpHarnessAsync(host, darkMode: false).ConfigureAwait(false);
+
+                // Act - read both child handle states on the pump thread that owns the viewer.
+                bool bodyWebViewHandleCreated = await host.InvokeAsync(() =>
+                        harness.Viewer.L0v2h2_WebView2.IsHandleCreated
+                    )
+                    .ConfigureAwait(false);
+                bool breadcrumbWebViewHandleCreated = await host.InvokeAsync(() =>
+                        harness.Viewer.L0vhBreadcrumb_WebView2.IsHandleCreated
+                    )
+                    .ConfigureAwait(false);
+
+                // Assert - both children carry the handle state ItemViewer construction gave them.
+                bodyWebViewHandleCreated
+                    .Should()
+                    .BeTrue(
+                        because: "ItemViewer construction creates the body WebView2 child's handle through ISupportInitialize.EndInit, so the harness inherits it rather than creating it"
+                    );
+                breadcrumbWebViewHandleCreated
+                    .Should()
+                    .BeTrue(
+                        because: "ItemViewer construction creates the breadcrumb WebView2 child's handle through ISupportInitialize.EndInit, so the harness inherits it rather than creating it"
+                    );
+            }
+            finally
+            {
+                if (harness != null)
+                {
+                    harness.Restore();
+                }
+
+                await host.StopAsync().ConfigureAwait(false);
+            }
+        }
     }
 }

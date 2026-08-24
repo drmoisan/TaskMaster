@@ -13,7 +13,7 @@ Running msbuild directly through the Bash tool fails with `MSBUILD : error MSB10
 
 - msbuild: `C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe`
 - vstest: `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe`
-- csharpier: `C:\Users\DanMoisan\.dotnet\tools\csharpier.exe` (global tool; there is no `.config/dotnet-tools.json`, so `dotnet tool run csharpier` does not work)
+- csharpier: `<user-profile>\.dotnet\tools\csharpier.exe` (global tool; there is no `.config/dotnet-tools.json`, so `dotnet tool run csharpier` does not work)
 - test + coverage: `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -Configuration Debug`
 
 **A fresh worktree needs `nuget restore TaskMaster.sln` first.** Without it the build fails with CS0246 on `log4net` and `SvgDocument` — misleading errors that look like broken source rather than a missing restore.

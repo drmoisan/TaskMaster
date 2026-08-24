@@ -27,6 +27,14 @@ execute it once before trusting it. `-File` invocations are unaffected (no shell
 `$` in the payload). Related: [[project_build_test_env]],
 [[project_poshqc_pester_mcp_exit_minus1]].
 
+**Backtick corollary (measured 2026-08-23):** inside a *double-quoted* PowerShell string the
+backtick is the escape character, so a byte-exact string replacement whose literal contains a
+Markdown or C# backtick silently finds **0 matches** rather than erroring. Replacing
+``- [ ] `BuildPumpHarness_...` `` in a spec file reported `match=0` until the literal was moved
+into a single-quoted string. Any exact-block replace against Markdown or C# must use
+single-quoted PowerShell strings (doubling `''` for apostrophes), and must assert the
+match count is exactly 1 before writing.
+
 Corollary measured at the same time: Pester 5.6.1 creates `CodeCoverage.OutputPath`'s
 parent directory (`New-Item -Force -ItemType Container`), so redirecting coverage into a
 not-yet-existing evidence folder is safe. Pester also ignores `Run.Exit` by default, so a
