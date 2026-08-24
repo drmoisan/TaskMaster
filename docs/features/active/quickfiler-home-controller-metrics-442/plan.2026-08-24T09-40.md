@@ -229,12 +229,21 @@ Test method names asserted by this plan:
 - [ ] [P0-T9] Capture the coverage baseline. Run
       `pwsh -NoProfile -File "scripts\vscode\Invoke-MSTestWithCoverage.ps1" -Configuration Debug -CoverageOutput "coverage\coverage.cobertura.xml"`
       from `WS`. The run takes roughly 20 minutes; allow a timeout of at least 45 minutes. The
-      runner has no coverage-floor assertion. Its only run-related throw
-      (`scripts/vscode/Invoke-MSTestWithCoverage.ps1:236`) is raised when the underlying
-      dotnet-coverage/vstest process itself exits non-zero, which happens when tests fail or when
-      the tooling fails. A non-zero exit caused by failing tests is a baseline observation to
-      record; a run the tooling could not complete (vstest crashed, or no Cobertura file was
-      produced) is a blocker that must be investigated, not recorded as expected. Write
+      runner raises two distinct run-related throws.
+      `scripts/vscode/Invoke-MSTestWithCoverage.ps1:236` fires when the underlying
+      dotnet-coverage/vstest process exits non-zero (tests failed or tooling failed).
+      `scripts/vscode/Invoke-MSTestWithCoverage.ps1:341` calls
+      `Assert-CoberturaLineCoverageThreshold`
+      (`scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1:459`), which throws when the
+      repository-wide line-rate is under 80 percent. That second throw fires after
+      `ConvertTo-KoverageCoberturaXml` at `:340` but before the `Set-Content` at `:344`, so when
+      it fires, the Cobertura file left on disk is the raw dotnet-coverage output with absolute
+      paths and third-party packages still present, not the post-processed form. When that occurs,
+      read per-file line-rates by matching the raw absolute `filename` attributes for the five
+      owned production files, and state in the artifact that the file on disk is
+      un-post-processed. A non-zero exit caused by failing tests, and a non-zero exit caused by
+      the 80 percent floor, are both baseline observations to record; only a run the tooling could
+      not complete at all (vstest crashed, or no Cobertura file was produced) is a blocker. Write
       `FF/evidence/baseline/mstest-coverage.TS.md` with `Timestamp:`, `Command:`, `EXIT_CODE:` (as
       observed), and an `Output Summary:` recording: the passed and failed test counts, the
       repository-wide `line-rate` and `branch-rate` read from the root `coverage` element of
@@ -242,11 +251,12 @@ Test method names asserted by this plan:
       line-rate for each of the five owned production files, aggregated across every `class` element
       sharing the same `filename` attribute so that compiler-generated async and lambda classes are
       not counted as separate denominators, and a `RunDisposition:` line reading exactly one of
-      `CLEAN`, `TESTS_FAILED` (with the failed-test count), or `TOOLING_FAILURE`. Acceptance: the
+      `CLEAN`, `TESTS_FAILED` (with the failed-test count), `COVERAGE_FLOOR_TRIPPED` (with the
+      reported percentage), or `TOOLING_FAILURE`. Acceptance: the
       artifact records a numeric repository-wide line-rate percentage, five numeric per-file
       line-rate percentages, and a `RunDisposition:` line; a `TOOLING_FAILURE` disposition is a
       blocker requiring investigation, and this task is not complete until the recorded disposition
-      is `CLEAN` or `TESTS_FAILED`.
+      is `CLEAN`, `TESTS_FAILED`, or `COVERAGE_FLOOR_TRIPPED`.
 - [ ] [P0-T10] Record the pre-change line count of each of the seven owned files (five production,
       two test) into `FF/evidence/baseline/owned-file-line-counts.TS.md` with `Timestamp:`,
       `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: the artifact lists seven paths, each
@@ -641,7 +651,9 @@ phase.
       percentages to two decimals, and the per-file line-rate for each of the five owned production
       files aggregated across every `class` element sharing the same `filename` attribute.
       Acceptance: zero failed tests and the artifact records a numeric repository-wide line-rate and
-      five numeric per-file line-rates.
+      five numeric per-file line-rates. Record the same four-member `RunDisposition:` line defined
+      by P0-T9. A `COVERAGE_FLOOR_TRIPPED` disposition does not by itself fail this task; the
+      zero-failed-tests condition and the numeric-line-rate conditions are the gate.
 - [ ] [P6-T6] Compute the coverage delta. Write `FF/evidence/qa-gates/coverage-delta.TS.md`
       comparing the P0-T9 baseline against the P6-T5 result: the baseline repository-wide line-rate,
       the post-change repository-wide line-rate, their signed difference, and for each of the five
@@ -656,7 +668,10 @@ phase.
       condition; the per-file and per-member figures carry the gate. Acceptance: the artifact
       records every value named above as a number, and each of the six named members reports at
       least 90.00 percent line coverage or carries a named, member-specific justification for why
-      the residual lines are unreachable without a live Outlook process.
+      the residual lines are unreachable without a live Outlook process. If either the P0-T9 or
+      the P6-T5 run recorded `COVERAGE_FLOOR_TRIPPED`, state in the artifact which of the two
+      Cobertura documents was un-post-processed and confirm that both sides of every comparison
+      were read using the same `filename` form.
 - [ ] [P6-T7] Audit file sizes after formatting. Record the post-format line count of each of the
       seven owned files into `FF/evidence/qa-gates/owned-file-line-counts.TS.md` alongside the
       P0-T10 pre-change counts. Acceptance: every one of the seven counts is at most 499, and
@@ -737,12 +752,13 @@ phase.
       the first two commands. Write `FF/evidence/qa-gates/project-file-gate.TS.md`. Acceptance: all
       three commands produce no output lines.
 - [ ] [P7-T8] Record the full changed-file inventory. From `WS`, run
-      `git diff --name-only BASELINE_SHA -- QuickFiler QuickFiler.Test docs/features/active/quickfiler-home-controller-metrics-442`
+      `git diff --name-only BASELINE_SHA -- . ":(exclude).claude/agent-memory"`
       and
-      `git status --porcelain -- QuickFiler QuickFiler.Test docs/features/active/quickfiler-home-controller-metrics-442`.
-      Both commands are scoped to the feature's owned surface so that a write elsewhere in the tree
-      (for example under `.claude/agent-memory/`, which holds tracked files this feature does not
-      own) cannot fail this gate. Write
+      `git status --porcelain -- . ":(exclude).claude/agent-memory"`.
+      Both commands cover the whole worktree and exclude only `.claude/agent-memory`, which holds
+      428 tracked files this feature does not own and which the executing agent writes to during
+      the run. Every other path in the tree remains observable, so a write outside the owned
+      surface fails this gate. Write
       `FF/evidence/qa-gates/changed-file-inventory.TS.md` listing every path. Acceptance: every
       listed path is one of the five owned production files, one of the two owned test files, or a
       path under `docs/features/active/quickfiler-home-controller-metrics-442/`.
@@ -860,10 +876,11 @@ phase.
       with its blocker artifact path.
 - [ ] [P7-T35] Commit every source, test, and evidence change on the feature branch with a message
       naming issues #442, #443, and #451, then run
-      `git status --porcelain -- QuickFiler QuickFiler.Test docs/features/active/quickfiler-home-controller-metrics-442`
-      from `WS`. The status check is scoped to the feature's owned surface so that a write
-      elsewhere in the tree (for example under `.claude/agent-memory/`, which holds tracked files
-      this feature does not own) does not fail the gate. Write no artifact after this task.
+      `git status --porcelain -- . ":(exclude).claude/agent-memory"`
+      from `WS`. The command covers the whole worktree and excludes only `.claude/agent-memory`,
+      which holds 428 tracked files this feature does not own and which the executing agent writes
+      to during the run. Every other path in the tree remains observable, so a write outside the
+      owned surface fails this gate. Write no artifact after this task.
       Acceptance: the scoped `git status --porcelain` command produces no output lines.
 
 ---
