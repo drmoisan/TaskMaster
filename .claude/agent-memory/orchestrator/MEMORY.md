@@ -88,3 +88,4 @@
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
+- [Closing keyword fires inside a negation](closing-keyword-fires-inside-negation.md) — `does NOT fix #511` still auto-closes #511; scan commit messages and PR bodies, never file contents
