@@ -41,8 +41,8 @@ Logs / Screenshots:
 
 
 ## Scope & Non-Goals
-- In scope: Preserve the archive-relative filing value across Efc row selection, typed segment activation, and immediate-child activation; prove the full lookup and filing-construction boundaries with deterministic C# tests.
-- Out of scope / non-goals: Redesigning search-result generation, persisting full hierarchy paths, changing Outlook COM integration, or introducing a new destination-path representation.
+- In scope: Preserve the archive-relative filing value across Efc row selection, typed segment activation, and immediate-child activation; prove the full lookup and filing-construction boundaries with deterministic C# tests. If a direct fail-before `FolderPredictor.FolderArray` test establishes that an in-root persisted full Outlook value reaches startup presentation verbatim, apply the smallest archive-root-aware startup projection: remove only the matching archive root plus one separator, and project the aligned `FolderScore` key in the same scope.
+- Out of scope / non-goals: Redesigning search-result generation, generic source-map normalization, persisting full hierarchy paths, changing Outlook COM integration, or introducing a new destination-path representation. The exact persisted source record remains unchanged; this scope permits only the proven startup presentation/filing projection.
 - Explicitly excluded systems, integrations, or datasets: `Store.FilePath`, mailbox-name parsing around `@`, filesystem API redesign, and external Outlook, WebView2, network, or temporary-file test dependencies.
 
 ## Root Cause Analysis
@@ -52,7 +52,7 @@ Logs / Screenshots:
 ## Proposed Fix
 
 ### Design summary (what changes where):
-Add regression coverage first. Retain the router's dual-representation boundary and retain `EmailFilerConfig` as the only filing-time full-path constructor. If the new tests expose a failure, apply the smallest correction local to `BreadcrumbBridgeRouter` path conversion; do not propagate full hierarchy paths downstream.
+Add regression coverage first. Retain the router's dual-representation boundary and retain `EmailFilerConfig` as the only filing-time full-path constructor. If a direct `FolderPredictor.FolderArray` fail-before test proves that a persisted in-root full Outlook path reaches startup presentation verbatim, apply the smallest correction at the archive-root-aware `FolderPredictor` startup projection: remove exactly the matching root plus one separator, keep already-relative and out-of-root values unchanged, and project the matching `FolderScore` key with the display value. Do not alter `BreadcrumbBridgeRouter`, `EmailFilerConfig`, source-map storage, or propagate full hierarchy paths downstream.
 
 ### Boundaries and invariants to preserve:
 - `ResolveLeafKeyAsync` receives the complete Outlook `FolderPath`.
@@ -67,24 +67,26 @@ The existing `IFolderHierarchyProvider`, `IBreadcrumbWebHost`, `BreadcrumbBridge
 ### Implementation strategy (what changes, not sequencing):
 
 #### Files/modules to change:
-- `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` for the primary router regressions.
+- `UtilitiesCS.Test/OutlookObjects/Folder/FolderPredictorTests.cs` for the direct fail-before startup-projection regression and its aligned-score, already-relative, and out-of-root cases.
+- `UtilitiesCS/OutlookObjects/Folder/FolderPredictor.cs` only if that direct regression proves the startup projection is incorrect.
+- `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` for router compatibility regressions.
 - `UtilitiesCS.Test/EmailIntelligence/EmailFilerConfig_Tests.cs` for the destination-construction regression.
-- `QuickFiler/Controllers/BreadcrumbBridgeRouter.cs` only if a new regression test demonstrates that its current conversion is incorrect.
 
 #### Functions/classes/CLI commands impacted:
-- `BreadcrumbBridgeRouter.BindRowsAsync`, its hierarchy-path conversion, direct-row selection, typed segment activation, and immediate-child activation.
+- `FolderPredictor.FolderArray` and its startup suggestion projection, with the paired `FolderScore` projection kept aligned to the displayed row.
+- `BreadcrumbBridgeRouter.BindRowsAsync`, its hierarchy-path conversion, direct-row selection, typed segment activation, and immediate-child activation as unchanged compatibility boundaries.
 - `IFolderHierarchyProvider.ResolveLeafKeyAsync` as the full-path lookup contract.
 - `EfcDataModel` and `EfcHomeController.ExecuteMoves` as unchanged consumers of an archive-relative selection.
 - `EmailFilerConfig.ResolvePaths` and `DestinationOlStem` as the single-prefixing filing contract.
 
 #### Data flow and validation changes:
-For `Clients\North`, derive `\\mailbox@example.com\Archive\Clients\North` only for hierarchy lookup. Convert hierarchy-navigation output back to `Clients\North` before the form and data model consume it. Assert that `EmailFilerConfig` constructs `\\mailbox@example.com\Archive\Clients\North`, not a duplicated-root variant.
+For `Clients\North`, derive `\\mailbox@example.com\Archive\Clients\North` only for hierarchy lookup. When the direct fail-before test proves that startup input is instead `\\mailbox@example.com\Archive\Clients\North`, `FolderPredictor` projects it and its corresponding score key to `Clients\North` only when the archive root and following separator match; it leaves already-relative and out-of-root values unchanged. Convert hierarchy-navigation output back to `Clients\North` before the form and data model consume it. Assert that `EmailFilerConfig` constructs `\\mailbox@example.com\Archive\Clients\North`, not a duplicated-root variant.
 
 #### Error handling and logging updates:
 No new logging is required for the tested representation-preserving path. Do not silently normalize an already-full `DestinationOlStem`; that would conceal an upstream contract breach. If a production guard is proposed after a failing regression, its error behavior must be specified and tested before implementation.
 
 #### Rollback/feature-flag considerations (if applicable):
-No feature flag is required. If a production correction is needed, it is limited to the router conversion boundary and can be reverted independently of search, persistence, Outlook COM, and filesystem behavior.
+No feature flag is required. If a production correction is needed, it is limited to the proven `FolderPredictor` startup projection and can be reverted independently of router behavior, persistence, Outlook COM, and filesystem behavior.
 
 ### Technical specifications (interfaces/contracts):
 
@@ -134,9 +136,9 @@ Seeded from issue:
 - [x] Direct row selection for that row returns `Clients\North` to the Efc filing flow and never returns a full Outlook hierarchy path.
 - [x] Typed ancestor-segment activation and immediate-child activation for that row return archive-relative filing targets only.
 - [x] `EmailFilerConfig_Tests.cs` verifies that an `@` mailbox root plus a relative `DestinationOlStem` produces exactly one archive-root prefix and the expected save-path mapping.
-- [ ] Existing banner, trash, root-boundary, and relative search/suggestion behavior remains covered and unchanged.
+- [x] Existing banner, trash, root-boundary, and relative search/suggestion behavior remains covered and unchanged.
 - [x] No implementation parses `@` as a mailbox delimiter or substitutes `Store.FilePath` for Outlook `FolderPath` in this flow.
-- [x] If a regression test fails, any production correction is limited to the router representation boundary; `EfcDataModel`, `EfcHomeController`, search generation, Outlook COM calls, and persistence remain unchanged.
+- [x] If a direct `FolderPredictor.FolderArray` fail-before test proves an in-root persisted full Outlook value reaches startup presentation verbatim, any production correction is limited to an archive-root-aware `FolderPredictor` projection that removes only the matching root plus one separator and projects the aligned score key; `BreadcrumbBridgeRouter`, `EmailFilerConfig`, `EfcDataModel`, `EfcHomeController`, generic source-map normalization, `@` parsing, `Store.FilePath`, Outlook COM calls, persistence, and filesystem behavior remain unchanged.
 - [x] The final C# formatting, analyzer, nullable-analysis, and coverage-enabled MSTest pass completes without new failures, with evidence written only under this feature's `evidence/<kind>/` folders.
 
 ## Risks & Mitigations

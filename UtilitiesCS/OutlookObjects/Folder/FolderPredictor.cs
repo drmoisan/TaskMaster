@@ -804,7 +804,7 @@ namespace UtilitiesCS
         public void AddSuggestions(ref List<string> folderList) // internal
         {
             folderList.Add("========= SUGGESTIONS =========");
-            folderList.AddRange(Suggestions.ToArray(5));
+            folderList.AddRange(Suggestions.ToArray(5).Select(ProjectSuggestionPath));
         }
 
         // Row-model mirror of AddMatches: the SEARCH RESULTS separator (Separator, no score)
@@ -836,8 +836,25 @@ namespace UtilitiesCS
             );
             foreach (var score in Suggestions.ToScoredArray(5))
             {
-                rows.Add(new FolderRow(score.FolderPath, FolderRowKind.Suggestion, score));
+                var folderPath = ProjectSuggestionPath(score.FolderPath);
+                var projectedScore = new FolderScore(folderPath, score.Score, score.Probability);
+                rows.Add(new FolderRow(folderPath, FolderRowKind.Suggestion, projectedScore));
             }
+        }
+
+        private string ProjectSuggestionPath(string folderPath)
+        {
+            if (_globals is null)
+            {
+                return folderPath;
+            }
+
+            var archivePrefix = _globals.Ol.ArchiveRootPath + "\\";
+            return
+                folderPath.StartsWith(archivePrefix, StringComparison.Ordinal)
+                && folderPath.Length > archivePrefix.Length
+                ? folderPath.Substring(archivePrefix.Length)
+                : folderPath;
         }
 
         // Row-model mirror of AddRecents: the RECENT SELECTIONS separator (Separator, no score)
