@@ -31,3 +31,8 @@ task-ID segment goes underneath it, so the canonical `<FEATURE>/evidence/<kind>/
 holds. Renumbering a task means renaming its segment — re-check after any Delta that shifts IDs. A
 stray `TestResults\` from an omission does not break a clean-tree acceptance — `.gitignore:39` is
 `[Tt]est[Rr]esult*/` — so the clean-tree gate will NOT catch the missing-flag defect for you.
+
+**Confirmed instance.** #464 round 3 inserted a task into Phase 5 and renumbered its tail; the
+renamed `[P5-T12]` kept the segment `p5-t11` and round 4 caught it. The cheap audit is two `-o`
+greps over the plan — one for `ResultsDirectory:[^ \`]*`, one for `^- \[[ x]\] \[P\d+-T\d+\]` — then
+compare the two line-number-keyed lists pairwise. See [[project_464_efc_controller_plan_seams]].
