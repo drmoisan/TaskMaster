@@ -189,6 +189,64 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         }
 
         [TestMethod]
+        public void Issue609_FolderPredictor_ProjectsOnlyInRootFullSuggestionPaths()
+        {
+            const string archiveRootPath = @"\\mailbox@example.com\Archive";
+            const string inRootFullPath = @"\\mailbox@example.com\Archive\Clients\North";
+            const string relativePath = @"Clients\North";
+            const string outOfRootFullPath = @"\\other@example.com\Archive\Clients\North";
+            var archiveRoot = CreateFolder(archiveRootPath);
+            var globals = CreateGlobals(new Mock<Outlook.Application>(), archiveRoot.Object);
+            var predictor = new FolderPredictor(globals.Object);
+            predictor.Suggestions.AddSuggestion(inRootFullPath, 30);
+            predictor.Suggestions.AddSuggestion(relativePath, 20);
+            predictor.Suggestions.AddSuggestion(outOfRootFullPath, 10);
+
+            var folderArray = predictor.FolderArray;
+            var folderRows = predictor.FolderRowArray;
+            var inRootSuggestionRow = folderRows[1];
+            var relativeSuggestionRow = folderRows[2];
+            var outOfRootSuggestionRow = folderRows.Single(row => row.Text == outOfRootFullPath);
+
+            folderArray.Should().Contain("========= SUGGESTIONS =========");
+            folderArray.Should().NotContain(inRootFullPath);
+            folderArray.Count(path => path == relativePath).Should().Be(2);
+            folderArray.Should().Contain(outOfRootFullPath);
+            inRootSuggestionRow.Text.Should().Be(relativePath);
+            inRootSuggestionRow.Score.Should().NotBeNull();
+            inRootSuggestionRow.Score!.Value.FolderPath.Should().Be(relativePath);
+            relativeSuggestionRow.Text.Should().Be(relativePath);
+            relativeSuggestionRow.Score.Should().NotBeNull();
+            relativeSuggestionRow.Score!.Value.FolderPath.Should().Be(relativePath);
+            outOfRootSuggestionRow.Score.Should().NotBeNull();
+            outOfRootSuggestionRow.Score!.Value.FolderPath.Should().Be(outOfRootFullPath);
+        }
+
+        [TestMethod]
+        public void Issue609_FolderPredictor_ProjectsCaseVariantInRootFullSuggestionPath()
+        {
+            const string archiveRootPath = @"\\mailbox@example.com\Archive";
+            const string caseVariantInRootFullPath = @"\\MAILBOX@EXAMPLE.COM\archive\Clients\North";
+            const string relativePath = @"Clients\North";
+            var archiveRoot = CreateFolder(archiveRootPath);
+            var globals = CreateGlobals(new Mock<Outlook.Application>(), archiveRoot.Object);
+            var predictor = new FolderPredictor(globals.Object);
+            predictor.Suggestions.AddSuggestion(caseVariantInRootFullPath, 30);
+
+            var folderArray = predictor.FolderArray;
+            var folderRows = predictor.FolderRowArray;
+            var suggestionRow = folderRows[1];
+
+            folderArray.Should().Equal("========= SUGGESTIONS =========", relativePath);
+            folderRows
+                .Select(row => row.Text)
+                .Should()
+                .Equal("========= SUGGESTIONS =========", relativePath);
+            suggestionRow.Score.Should().NotBeNull();
+            suggestionRow.Score!.Value.FolderPath.Should().Be(relativePath);
+        }
+
+        [TestMethod]
         public void AddRecents_WhenRecentsExist_AppendsHeaderAndEntries()
         {
             var globals = CreateGlobals(
