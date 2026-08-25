@@ -1,5 +1,4 @@
 Timestamp: 2026-08-24T22-25
-Command: `dotnet tool run csharpier .`
-EXIT_CODE: 1
-Output Summary: The installed CSharpier version rejected the plan's required command because it requires an explicit `format <directoryOrFile>` subcommand. No formatter changes were made.
-Failure Detail: `'.' was not matched.`; `Required command was not provided.`; `Unrecognized command or argument '.'.`
+Command: `dotnet tool run csharpier format .`
+EXIT_CODE: 0
+Output Summary: CSharpier processed 1520 files in 2384ms and made no working-tree changes.
