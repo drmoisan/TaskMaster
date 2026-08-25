@@ -60,7 +60,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         /// <summary>
         /// Deserializes an inbound bridge payload, validating the discriminator and the
-        /// per-type required fields (<c>segmentDoubleClick</c> requires <c>segmentIndex</c>;
+        /// per-type required fields (<c>segmentDoubleClick</c> and <c>segmentActivate</c> require
+        /// <c>segmentIndex</c>; <c>renderedChildActivate</c> requires <c>childIndex</c>;
         /// <c>arrowKey</c> requires <c>key</c>; every type requires <c>rowId</c>).
         /// </summary>
         /// <param name="json">The raw JSON payload from the hosted document.</param>
@@ -98,11 +99,22 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
             string rowId = RequireString(root, "rowId");
             int? segmentIndex = OptionalInt(root, "segmentIndex");
+            int? childIndex = OptionalInt(root, "childIndex");
             string? key = OptionalString(root, "key");
 
-            if (type == BreadcrumbMessageTypes.SegmentDoubleClick && !segmentIndex.HasValue)
+            if (
+                (
+                    type == BreadcrumbMessageTypes.SegmentDoubleClick
+                    || type == BreadcrumbMessageTypes.SegmentActivate
+                ) && !segmentIndex.HasValue
+            )
             {
-                throw Fail("segmentDoubleClick requires an integer 'segmentIndex' field.");
+                throw Fail($"{type} requires an integer 'segmentIndex' field.");
+            }
+
+            if (type == BreadcrumbMessageTypes.RenderedChildActivate && !childIndex.HasValue)
+            {
+                throw Fail("renderedChildActivate requires an integer 'childIndex' field.");
             }
 
             if (type == BreadcrumbMessageTypes.ArrowKey && string.IsNullOrEmpty(key))
@@ -110,12 +122,14 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 throw Fail("arrowKey requires a non-empty 'key' field.");
             }
 
-            return new BreadcrumbInboundMessage(type, rowId, segmentIndex, key);
+            return new BreadcrumbInboundMessage(type, rowId, segmentIndex, childIndex, key);
         }
 
         private static bool IsKnownInboundType(string type)
         {
             return type == BreadcrumbMessageTypes.SegmentDoubleClick
+                || type == BreadcrumbMessageTypes.SegmentActivate
+                || type == BreadcrumbMessageTypes.RenderedChildActivate
                 || type == BreadcrumbMessageTypes.LeafExpandToggle
                 || type == BreadcrumbMessageTypes.ArrowKey
                 || type == BreadcrumbMessageTypes.RowSelected;

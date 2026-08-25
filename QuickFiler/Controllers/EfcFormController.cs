@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -24,7 +23,6 @@ using UtilitiesCS.Threading;
 
 namespace QuickFiler.Controllers
 {
-    [ExcludeFromCodeCoverage]
     internal class EfcFormController : IFilerFormController
     {
         #region Constructors
@@ -883,14 +881,14 @@ namespace QuickFiler.Controllers
         }
 
         // Async bind boundary: joins the feature-324 score projection and delegates to the router.
-        private async Task BindBreadcrumbRowsAsync(string[] rows)
+        internal async Task BindBreadcrumbRowsAsync(string[] rows)
         {
             try
             {
                 var scores =
                     _dataModel?.FolderHelper?.Suggestions?.ToScoredArray()
                     ?? Array.Empty<FolderScore>();
-                await _router.BindRowsAsync(rows, scores, Token);
+                await _router.BindRowsAsync(rows, scores, _globals.Ol.ArchiveRootPath, Token);
             }
             catch (OperationCanceledException)
             {
