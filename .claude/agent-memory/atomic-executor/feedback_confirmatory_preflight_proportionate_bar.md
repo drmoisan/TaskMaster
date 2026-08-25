@@ -26,6 +26,19 @@ so it is an observation, not a blocker. Contrast with the genuinely blocking sha
 [[project_preflight_absolute_zero_gate_on_sibling_owned_assembly]], where a gate is
 *unsatisfiable* or *unwaivable*.
 
+**Same bar on the FINAL round of an N-round bound**, where not clearing means the child is
+reported `NOT CLEARED WITHIN BOUND`. The test to apply to a formal-contract nit is: *could an
+executor reading this task verbatim be misled into a wrong action?* On #488 round 5, `[P6-T6]`
+produced the seventh fail-before artifact and required `EXIT_CODE:` non-zero with
+`ExpectedExitCode: 1`, yet its header carried no `[expect-fail]` tag while its own body said
+"this task's `[expect-fail]` acceptance"; the six sibling fail-before tasks were tagged. Not a
+blocker: the header had been untagged since original authoring, survived four rounds *including
+one that rewrote that task's body and introduced the phrase*, the acceptance text is unambiguous,
+and no downstream consumer keys off the header tag (the fail-before index reads the artifact's
+`ExpectedExitCode` field). Two signals that a nit is settled rather than missed: `git log -p
+--follow` shows it present since authoring, and the round that most recently edited that exact
+task left it alone.
+
 Cheap mechanical confirmations that make a confirmatory pass fast and defensible: diff the two
 committed plan revisions with `git diff -U0` and read only the hunk headers (a fifth undisclosed
 hunk is itself a finding); compare the `file:line` citation MULTISET across revisions to prove
