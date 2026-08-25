@@ -1,86 +1,106 @@
 # Atomic Planner Memory Index
 
-- [#468 preflight revision seams](project_468_preflight_revision_seams.md) — seam before red test or full-suite `failed==0` gates die; [expect-fail] on run tasks only; epic-child merge-base vs integration branch; pre-commit diff gates use working-tree form + non-zero count
+## Preflight revision seams (per-issue)
 
-- [Agent worktrees need SDK + NuGet + analyzer-backfill bootstrap](agent-worktrees-need-sdk-and-nuget-bootstrap.md) — no `.dotnet-sdk`, no `packages/`, and a clean restore still misses the skewed analyzer versions (CS0006, not a warning); three Phase 0 tasks
-- [/Logger:trx needs /ResultsDirectory](trx-needs-resultsdirectory.md) — TRX lands in `TestResults\` relative to cwd; TRX-existence-under-evidence acceptance is unsatisfiable without it, and the clean-tree gate won't catch it
-- [Per-task TRX subdirectory](trx-needs-resultsdirectory.md) — a shared `/ResultsDirectory:` makes "ten distinct TRX files" ambiguous once `[expect-fail]` runs deposit earlier TRX there; give each task a `p#-t#` segment
-- [Spec corrections sweep sibling sections](feedback_spec_corrections_sweep_sibling_sections.md) — falsified-premise fixes must cover Scope/Out-of-scope/Rollout, not AC only; denial text must dodge closing-keyword scans (#511 R1 Part 6)
-- [#501 R3 preflight seams](project_501_r3_preflight_seams.md) — repo-wide 0-skipped gates unsatisfiable (5 sibling `[Ignore]`s); BASELINE_FAILURE_SET subset pattern; Task.CompletedTask singleton breaks reference-inequality asserts
-- [Untracked-file + line-count gate seams](untracked-file-and-linecount-gate-seams.md) — `git add -N` before grepping plan-created files; `(Get-Content).Count` not `Measure-Object -Line` (436 vs 487); pre-commit diffs use single-commit `BASELINE_SHA` form, never two-dot (#501 R1)
-- [#511 R1 preflight delta seams](project_511_r1_preflight_delta_seams.md) — mid-cycle raw-evidence deletion breaks resolves gates; git-log scans post-commit only; absolute MSBuild path; Start-Process mechanic for 20-min runs; per-class coverage noise -0.50pp
-- [CSharpier "Formatted N files" is processed count](csharpier-formatted-n-is-processed-count.md) — restart-on-rewrite loops keyed on it never terminate; define rewritten-count via before/after SHA-256
-- [Terminal-phase planner traps](terminal-phase-planner-traps.md) — sweep the last phase for an unowned "a follow-up issue should carry it", artifacts written after the clean-tree commit task, and a false "clarification against the spec's wording"
-- [#553 CI parallel-split plan seams](project_553_ci_parallel_split_plan_seams.md) — workflow-only scope: no C# toolchain; Phase 0 snapshot for byte-identity; ruleset PUT + gh pr create orchestrator-gated; no jq (ConvertTo-Json -Depth 20); pathspec anchoring; BRANCH/SCRATCH conventions
+- [#468](project_468_preflight_revision_seams.md) — seam before red test; `[expect-fail]` on run tasks only; epic-child merge-base
+- [#501 R1](untracked-file-and-linecount-gate-seams.md) — `git add -N` before grepping plan-created files; `(Get-Content).Count`, not `Measure-Object -Line`
+- [#501 R3](project_501_r3_preflight_seams.md) — repo-wide 0-skipped gates unsatisfiable; BASELINE_FAILURE_SET subset; `Task.CompletedTask` singleton
+- [#511 R1](project_511_r1_preflight_delta_seams.md) — mid-cycle evidence deletion; git-log scans post-commit; Start-Process for 20-min runs
+- [#484](project_484_qfc_revision_seams.md) — ownership change sweeps plan→issue.md→spec.md (spec is the AC source); old-cardinal grep sweep
+- [#494](project_494_threshold_reconciliation_plan_seams.md) — coverage runner throws before post-processing; reported-floor must not become hook-Blocking
+- [#498](conditional-ladder-and-unowned-class-gates.md) — gate EVERY rung of a recorded-selector ladder incl. rung 1; scope failing-identifier clauses to owned test classes; 0/0 changed-line figure → NOT APPLICABLE
+- [#503](project_503_ribbon_readiness_plan_seams.md) — RibbonViewer 487/500 forces a region move; 6+4 Compile entries; compile-time red + dossier
+- [#505](project_505_toggle_state_guards_plan_seams.md) — runtime red (no dossier); raw cobertura to gitignored `coverage/`; manual-verification kind accepted
+- [#512](project_512_toolchain_gate_fidelity_plan_seams.md) — same-line `/t:Build`+`Nullable=enable` grep; `-EnableNullable` no-op proved by EXIT 0
+- [#553](project_553_ci_parallel_split_plan_seams.md) — workflow-only scope, no C# toolchain; no jq; pathspec anchoring
 
-- [#484 QfcItemController revision seams](project_484_qfc_revision_seams.md) — ownership-list change sweeps plan→issue.md→spec.md (spec is the AC source, missed until R4); old-cardinal grep sweep; named-exception method for unreachable detach; additive-only needs CSharpier exemption
-- [#445 keyboard-action plan seams](project_445_keyboard_action_plan_seams.md) — prepared-in-one-worktree plans must resolve WS at execution time; scope epic-child pass/fail gates to owned test classes (sibling-owned flaky tests share the assembly); retention gates need their own justification
-- [Dead-code removal vs coverage exclusion](project_deadcode_removal_vs_coverage_exclusion.md) — coverage gate blocked by unreachable dead prod code → plan removal (shrink denominator), never exclusion/carve-out/forced-rethrow
-- [Coverage gate on CLR-invoked private members](coverage-gate-clr-invoked-private-members.md) — never gate AssemblyResolve-style private members at >=90%; split newly-added vs changed per the AC's own wording
-- [Nullable context mismatch: prod vs test](project_nullable_context_mismatch_prod_vs_test.md) — check `#nullable enable` in the prod file AND missing `<LangVersion>` (C# 7.3) in the test csproj; adding `<LangVersion>latest</LangVersion>` is never "one property"
-- [C# pure-move extraction pattern](csharp-pure-move-extraction-pattern.md) — moving members out of a 497/500-line file: keep the static-ctor install trigger, route testable members to an existing covered class, declare relocation-not-new-module
-- [Research claims as acceptance clauses](research-claims-as-acceptance-clauses.md) — never encode an unmeasured third-party null-vs-throw claim as a literal AC clause; #418 §1.4 empty-bytes claim cost a revision pass
-- [Enumerate condition outcomes before the case list](enumerate-condition-outcomes-before-case-list.md) — 100% branch-rate tasks: 2 outcomes per condition in every ||/&& clause; a null-pairing guard needs all four orderings, not three
-- [Named coverage exception: verify the member body](named-coverage-exception-verify-member-body.md) — read the member before writing "untestable branch"; put gap-closure BEFORE the toolchain-clean-pass task; pin line-rate vs branch-rate
-- [Acceptance edits must be false-before/true-after](acceptance-edits-must-be-false-before-true-after.md) — a revised acceptance clause already true at branch head is a no-op gate (#494 P3-T7); anchor a region by the heading that OPENS it, not the next one
-- [Zero-hit grep gates need carve-outs](zero-hit-grep-gates-need-carveouts.md) — denial-sentence replacement text and non-coverage numerals (mutation 75%, determinism, format 100%) make "grep returns no hits" unsatisfiable by construction
-- [PoshQC MCP + msbuild invocation facts](poshqc-mcp-and-msbuild-invocation-facts.md) — MCP tools return no counts/severities/coverage (#536 zero-line artifact); pair unconditionally with direct runs, never "fallback"; Invoke-VSBuild DOES take -Target Rebuild
-- [#494 threshold reconciliation plan seams](project_494_threshold_reconciliation_plan_seams.md) — coverage runner throws before Koverage post-processing (out-of-band per-run rewrite); reported-and-tracked floor must not become hook-Blocking; dangling-citation dispositions valid
-- [Never plan a mid-plan halt on MCP availability](never-plan-a-mid-plan-halt-on-mcp-availability.md) — executor and orchestrator tool surfaces differ; Phase 0 probe + record-blocker-and-continue, never "halt", never a different route
-- [Single-numeral gates must name the role](single-numeral-gates-must-name-the-role.md) — count "enforced repo-wide line floor compared against in executable code", enumerate doc/policy-constant occurrences; inventory patterns need prose alternations
-- [Thread granted discharges through consumers](thread-granted-discharges-through-consumers.md) — softening one task's measurement clause without the intermediate producer task makes the discharge unreachable and the middle task uncheckable
-- [pwsh -Command payload quoting](pwsh-command-payload-quoting.md) — `-Command "...$c..."` expands in the parent shell; single-quote the payload, double the inner literals, and say so at the command site
-- [Pester exits 0 on failing It blocks](pester-invoke-does-not-exit-nonzero.md) — 5.6.1 defaults Run.Exit/Run.Throw to False; scope every exit-code clause to a named channel in two-channel [expect-fail] tasks
+## Plan-structure traps
 
-- [#457 closure-filter plan seams](project_457_closure_filter_plan_seams.md) — pipeline overwrites raw Cobertura in place; post-processed artifacts cannot answer `d__`/`b__` name questions; pre-merge insertion is a correctness constraint
-- [PowerShell gate observables](powershell-gate-observables.md) — no Invoke-Pester exit code; explicit `scan_folders`; `git status` can't count edits; outer-single/inner-double quoting; repo-root `coverage.xml`; aggregate-only `CoveragePercent`; no Pester 5 branch counter; `iter<N>` filename collisions
-- [Coverage Evidence Path Normalization](evidence-path-normalization.md) — specs sometimes name evidence/coverage/; normalize to canonical baseline/ + qa-gates/
-- [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — obj/ cache filenames outlive tear-down commits; verify project/source files with git ls-files or a glob before writing an existence claim into acceptance text
-- [Diff gates need a commit task](diff-gates-need-a-commit-task.md) — `git diff <MERGE_BASE>..HEAD` gates pass vacuously with no commit task; Phase 0 porcelain is non-empty by construction; whitelist docs/ + agent-memory in scope-lock diff gates
-- [.claude/agent-memory is tracked — scope every git gate](agent-memory-is-tracked-scope-git-gates.md) — unscoped diff/status/grep gates are unsatisfiable; MEMORY.md prose even trips prohibited-token greps
-- [Never pin a HEAD SHA as a plan expectation](never-pin-head-sha-as-plan-expectation.md) — record HEAD, gate on tree invariants (clean porcelain + no .cs/.csproj/packages.config/app.config diff vs the baseline-capture sha)
-- [.csharpierignore scope: packages.config is NOT exempt](csharpierignore-scope-packages-config.md) — only *.csproj/*.props/*.targets are excluded; justify single-line package entries by character width, never by formatter exemption
-- [Repo-wide csharpier format breaks zero-diff ACs](csharpier-repowide-format-breaks-zero-diff-acs.md) — scope the mutating pass to the plan's own path list; keep `check .` read-only; re-verify the zero-line diff AFTER formatting
-- [Embedded-resource fail-proof needs a rebuild gate](embedded-resource-failproof-rebuild-gate.md) — edit → rebuild → assert embedded bytes → `[expect-fail]` run; skipping the assert makes the fail-proof itself vacuous
-- [#503 ribbon readiness plan seams](project_503_ribbon_readiness_plan_seams.md) — RibbonViewer 487/500 forces a 26-member region move; 6+4 Compile entries; compile-time red + dossier; #504-#508 already promoted
-- [#512 toolchain gate fidelity plan seams](project_512_toolchain_gate_fidelity_plan_seams.md) — AC6 needs a same-line `/t:Build`+`Nullable=enable` grep; PoshQC red at 16; `-EnableNullable` no-op proved by EXIT 0; zero-skip non-vacuity
-- [#505 toggle-state guards plan seams](project_505_toggle_state_guards_plan_seams.md) — runtime red (no dossier); R4 red between catalog and XML tasks; raw cobertura to gitignored coverage/; #522 CI type-check cmd; manual-verification kind accepted
-- [CSharpier gate: format not pipe-files](csharpier-format-not-pipe-files-gate.md) — formatting tasks must use `csharpier format` + scoped `csharpier check` exit 0; `pipe-files` is stdout-only/non-enforcing and masked a 500-line overflow in #400
-- [#400 partial-class headroom placement](project_400_partial_class_headroom_placement.md) — put new coverage cases in existing `.Part2.cs` `[TestClass] partial` files to keep the 17-class filter/count assertions stable
-- [Manager AsyncLazy shared seam](project_manager_asynclazy_shared_seam.md) — Globals.AF.Manager is shared across all classifier subsystems; use a key-specific accessor, never retype the dictionary value for one key
-- [Folder predictor AF holder seam](project_folder_predictor_af_holder_seam.md) — #177 F1: route flag-on LCPPN predictor through a Folder-only holder on IAppAutoFileObjects (globals.AF), not per-instance OlFolderClassifierGroup state
-- [#441 Cobertura arithmetic plan seams](project_441_cobertura_arithmetic_plan_seams.md) — AC-18 two-file pin vs 500-line ceiling; defect-invariant branch ratio; StrictMode throws on any missing fixture attribute (branch AND complexity); blanket EXIT_CODE AC breaks narrative artifacts
-- [Fenced `#` comments look like headings](plan-fenced-powershell-comments-look-like-headings.md) — indent column-0 `#` comments inside plan code fences; grep `^#{1,6} ` and confirm every hit is a real heading
-- [Plan validator phase-heading constraint](plan-validator-phase-heading-constraint.md) — MCP plan validator requires exact `### Phase N — <Title>`; no tokens between Phase N and em-dash; H1 title line is exempt
-- [Plan validator task-ID sequential constraint](plan-validator-task-id-sequential-constraint.md) — task IDs must be digit-only and sequential-by-appearance; mid-phase insertion forces renumbering all later tasks + cross-refs
-- [Legacy csproj wiring](project_legacy_csproj_explicit_compile_include.md) — packages.config projects need `Compile Include` wiring and their own `Reference`; ProjectReference gives no compile-time flow (CS0012)
-- [C# Phase 0 toolchain bootstrap](project_csharp_phase0_toolchain_bootstrap.md) — `dotnet tool run` is broken (no .config manifest, no .dotnet-sdk); use global csharpier.exe/dotnet-coverage.exe + a mandatory NuGet restore task
-- [Worktree root breaks the `\.claude\` exclusion](worktree-root-breaks-dotclaude-exclusion.md) — the agent worktree IS under .claude\worktrees\, so a substring assertion is unsatisfiable; assert a workspace-root prefix instead
-- [Async state machines split the coverage denominator](async-state-machine-coverage-aggregation.md) — `<Method>d__N` and `<>c*` are separate Cobertura `<class>` elements; aggregate by `filename` or a >=90% gate fails for measurement reasons
-- [#211 startup-lifetime heartbeat seam](project_211_startup_lifetime_heartbeat_seam.md) — Phase 3.3 [startup-lifetime-heartbeat] DispatcherTimer in ThisAddIn.cs (exempt), pure logic in StartupDiagnosticsProbe; AC15
-- [#292 CurrentStoreContext parallel seam](project_292_currentstorecontext_parallel_seam.md) — process-global static; scope-opening store test classes must be [DoNotParallelize] or they pollute reader-baseline tests under UtilitiesCS.Test ClassLevel parallelization
-- [WinForms STA-refinement exemption rule](project_winforms_sta_refinement_exemption_rule.md) — epic #295 STA refinement: remove HWND-only default-body + PerformClick-wiring exemptions via dedicated *.StaTests.cs; keep dialog/Form/launcher exemptions
-- [STA last-resort control-identity plan pattern](project_sta_last_resort_control_identity_pattern.md) — epic #295: measure control-identity partials via companion interface (real Label/Control) + *.StaTests.cs ([STATestClass], MSTest 4.2.2); never construct Form; handle/pump residue stays method-level exempt
-- [#307 F2 ScoCollection deletion gate](project_307_f2_scocollection_deletion_gate.md) — full first-party ScoCollection/ScoStack reference set incl. tests beyond spec §7; ISubjectMapSco/IScoCollection F5 boundary; FS/Prompt seams live in ScoCollection.cs
-- [#328 store-exclusion seams](project_328_store_exclusion_seams.md) — StoresWrapper(469)/TreeOfToDoItems(481) near 500-limit, ToDoEvents(594) pre-existing over-limit; new test .cs need csproj wiring; four inclusion surfaces lockstep; adopted persisted StoreWrapper.StoreId
-- [C# coverage gate: JaCoCo hook, Cobertura also accepted](project_csharp_coverage_gate_jacoco_format.md) — hook parses JaCoCo, but #230/#438/#511-R1 shipped Cobertura (reviewer parses directly); follow the format the delta names
-- [Durable script copy into feature folder](durable-script-copy-into-feature-folder.md) — copy scratchpad-supplied scripts into `<FEATURE>/scripts/` before referencing them in plan tasks (session-scoped temp paths aren't durable)
-- [#446 QuickFiler bug-family plan seams](project_446_quickfiler_bug_family_plan_seams.md) — folder slug vs descriptive slug; ScoringServiceFactory seam before COM-path tests; AC28/AC18 conflict → unchecked box + REMEDIATION-REQUIRED
-- [#351 QuickFiler breadcrumb plan seams](project_351_quickfiler_breadcrumb_plan_seams.md) — JSON code in UtilitiesCS only (QuickFiler lacks Newtonsoft); P2-T1 blocked-if-9101-absent; evidence/repro/ rejected; coordinator pattern
-- [Dispatcher repro hang trap](dispatcher-repro-hang-trap.md) — a repro that touches Dispatcher.CurrentDispatcher on a pooled worker hangs on awaited InvokeAsync instead of failing; use an owned pumping STA thread
-- [Invoke-MSTestWithCoverage.ps1 canonical coverage runner](reference_invoke_mstest_with_coverage_script.md) — full-suite *.Test.dll → Cobertura XML via dotnet-coverage+vstest /InIsolation; cite for baseline/final-QC coverage tasks
-- [Invoke-MSTest.ps1 single-SearchRoot defect](reference_invoke_mstest_single_searchroot_defect.md) — scalar `.Count` under StrictMode throws when one assembly matches; always cite `-SearchRoot .`
-- [Literal-call clauses block file-size tightening](literal-call-clauses-block-file-size-tightening.md) — clauses pinning a call in 2+ places + a near-500-line file = unsatisfiable; plan the type split up front (no waiver for .cs)
-- [Coverage threshold conflict: CLAUDE.md vs general-unit-test.md](project_coverage_threshold_conflict_claude_md_vs_general_unit_test.md) — 80/90 vs 85/75; repo baseline 70.19/58.30 → repo-wide figure reported non-blocking on fixes (#424 precedent), change-scoped gates blocking
-- [Planner may lack the MCP plan validator](project_planner_mcp_validator_not_in_tool_surface.md) — file-only tool surface (no Bash/no mcp__drm-copilot__*); never claim the gate passed, report VALIDATOR NOT RUN + structural self-check
-- [#349 breadcrumb plan seams](project_349_efcviewer_breadcrumb_plan_seams.md) — P0-T6 halt-gate on 9101 provider; evidence/repro/ authorized; EfcViewer3 mechanical swap only; Newtonsoft in UtilitiesCS only
-- [#438 search-focus plan seams](project_438_search_focus_plan_seams.md) — near-500 files → partial headroom; additive interface overload broke 7 test files (3 fakes + 4 loose mocks) → dispatch default path on old overload; git diff misses untracked files in size audits
-- [#424 QuickFiler deadline plan seams](project_424_quickfiler_deadline_plan_seams.md) — 12s const; Part2 partial no-[TestClass]; overload migration breaks loose-mock Setup/Verify (Issue218 "dormant" misclassification); grep old overload shape in ALL test files
-- [vstest scoped-run + csharpier 1.2.6 commands](reference_vstest_scoped_run_command.md) — vswhere-resolved vstest.console.exe + /InIsolation + /TestCaseFilter (join `|`); every run task needs an explicit command; csharpier needs format/check subcommands
-- [#230 WinForms pump seam plan facts](project_230_winforms_pump_seam_plan_facts.md) — 19 census sites verified; Initialization.cs 466/500; test-file headroom; factory seam params before SaveParameters; CreateAsync awaited-tail faults; 19→11 target
-- [One AC per check-off task](feedback_ac_checkoff_one_per_task.md) — preflight rejects batched AC check-offs; one checkbox + own evidence pointer per task (#230 B4)
-- [Post-format file-size audit + async-tail asymmetry](feedback_postformat_file_size_audit.md) — 500-line audit goes AFTER final csharpier format; awaited vs fire-and-forget tails decide completion-vs-fault test shape (#230 B2/B3)
-- [Wiring gates must be wiring-sensitive](feedback_wiring_gates_must_be_wiring_sensitive.md) — count floors deflate with the defect they guard; use static [TestMethod] enumeration vs /ListTests discovery (#230 rev3)
+- [Validator phase-heading constraint](plan-validator-phase-heading-constraint.md) — exact `### Phase N — <Title>`; nothing between N and the em dash
+- [Validator task-ID sequential constraint](plan-validator-task-id-sequential-constraint.md) — digit-only, sequential by appearance; insertion forces full renumber
+- [Planner may lack the MCP validator](project_planner_mcp_validator_not_in_tool_surface.md) — report VALIDATOR NOT RUN + structural self-check; never claim a pass
+- [Fenced `#` comments look like headings](plan-fenced-powershell-comments-look-like-headings.md) — indent column-0 `#` inside code fences
+- [One AC per check-off task](feedback_ac_checkoff_one_per_task.md) — preflight rejects batched AC check-offs
+- [Terminal-phase planner traps](terminal-phase-planner-traps.md) — unowned "a follow-up issue should carry it"; artifacts written after the clean-tree commit task
+- [Never plan a mid-plan halt on MCP availability](never-plan-a-mid-plan-halt-on-mcp-availability.md) — Phase 0 probe + record-blocker-and-continue
+- [Thread granted discharges through consumers](thread-granted-discharges-through-consumers.md) — softening one task without its producer makes the discharge unreachable
+- [Durable script copy into feature folder](durable-script-copy-into-feature-folder.md) — copy scratchpad scripts into `<FEATURE>/scripts/` first
+- [Evidence path normalization](evidence-path-normalization.md) — normalize spec-named `evidence/coverage/` to `baseline/` + `qa-gates/`
 
-## Artifact hygiene
-- [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
+## Acceptance-condition authoring
+
+- [Acceptance edits must be false-before/true-after](acceptance-edits-must-be-false-before-true-after.md) — a clause already true at branch head is a no-op gate
+- [Zero-hit grep gates need carve-outs](zero-hit-grep-gates-need-carveouts.md) — denial text and non-coverage numerals make "no hits" unsatisfiable
+- [Single-numeral gates must name the role](single-numeral-gates-must-name-the-role.md) — count the *enforced* occurrence; enumerate doc/policy ones
+- [Wiring gates must be wiring-sensitive](feedback_wiring_gates_must_be_wiring_sensitive.md) — count floors deflate with the defect they guard
+- [Research claims as acceptance clauses](research-claims-as-acceptance-clauses.md) — never encode an unmeasured third-party claim as a literal AC clause
+- [Literal-call clauses block file-size tightening](literal-call-clauses-block-file-size-tightening.md) — pinning a call in 2+ places near a 500-line file is unsatisfiable
+- [Diff gates need a commit task](diff-gates-need-a-commit-task.md) — `git diff <BASE>..HEAD` passes vacuously with no commit task
+- [Never pin a HEAD SHA as a plan expectation](never-pin-head-sha-as-plan-expectation.md) — gate on tree invariants instead
+- [.claude/agent-memory is tracked](agent-memory-is-tracked-scope-git-gates.md) — scope every diff/status/grep gate or it is unsatisfiable
+- [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — verify with `git ls-files`, not `obj/`
+
+## C# toolchain and test mechanics
+
+- [Phase 0 toolchain bootstrap](project_csharp_phase0_toolchain_bootstrap.md) — global csharpier/dotnet-coverage exe + mandatory NuGet restore
+- [Agent worktrees need SDK + NuGet + analyzer backfill](agent-worktrees-need-sdk-and-nuget-bootstrap.md) — four Phase 0 steps; CS0006 is an error, not a warning
+- [vstest scoped-run + csharpier 1.2.6 commands](reference_vstest_scoped_run_command.md) — vswhere + `/InIsolation` + `/TestCaseFilter`; csharpier needs a subcommand
+- [CSharpier gate: format not pipe-files](csharpier-format-not-pipe-files-gate.md) — `pipe-files` is stdout-only and non-enforcing
+- [CSharpier "Formatted N files" is processed count](csharpier-formatted-n-is-processed-count.md) — define rewritten-count via before/after SHA-256
+- [Repo-wide csharpier format breaks zero-diff ACs](csharpier-repowide-format-breaks-zero-diff-acs.md) — scope the mutating pass to the plan's own path list
+- [.csharpierignore scope](csharpierignore-scope-packages-config.md) — only `*.csproj`/`*.props`/`*.targets` are excluded; `packages.config` is NOT
+- [`/Logger:trx` needs `/ResultsDirectory`](trx-needs-resultsdirectory.md) — plus a per-task `p#-t#` segment so `[expect-fail]` TRX cannot be mistaken
+- [`[expect-fail]` needs a synchronous seam](expect-fail-needs-a-synchronous-seam.md) — async-void boundaries false-GREEN; re-run RED analysis after scoping `Times.Never()`
+- [Invoke-MSTestWithCoverage.ps1](reference_invoke_mstest_with_coverage_script.md) — canonical full-suite Cobertura runner
+- [Invoke-MSTest.ps1 single-SearchRoot defect](reference_invoke_mstest_single_searchroot_defect.md) — always pass `-SearchRoot .`
+- [PoshQC MCP + msbuild facts](poshqc-mcp-and-msbuild-invocation-facts.md) — MCP returns no counts; pair unconditionally with direct runs
+- [pwsh -Command payload quoting](pwsh-command-payload-quoting.md) — outer single quotes, inner doubles
+- [Pester exits 0 on failing It blocks](pester-invoke-does-not-exit-nonzero.md) — scope every exit-code clause to a named channel
+- [PowerShell gate observables](powershell-gate-observables.md) — no Invoke-Pester exit code; explicit `scan_folders`; aggregate-only `CoveragePercent`
+- [Legacy csproj wiring](project_legacy_csproj_explicit_compile_include.md) — `Compile Include` + own `Reference`; ProjectReference gives no compile-time flow
+- [net48 / nullable context mismatch](project_nullable_context_mismatch_prod_vs_test.md) — check `#nullable enable` in prod AND missing `<LangVersion>` in the test csproj
+- [Worktree root breaks the `\.claude\` exclusion](worktree-root-breaks-dotclaude-exclusion.md) — assert a workspace-root prefix instead
+
+## Coverage
+
+- [Threshold conflict: CLAUDE.md vs general-unit-test.md](project_coverage_threshold_conflict_claude_md_vs_general_unit_test.md) — 80/90 vs 85/75; repo-wide figure non-blocking, change-scoped gates blocking
+- [JaCoCo hook, Cobertura also accepted](project_csharp_coverage_gate_jacoco_format.md) — follow the format the delta names
+- [Async state machines split the denominator](async-state-machine-coverage-aggregation.md) — aggregate by `filename` or a >=90% gate fails for measurement reasons
+- [Dead-code removal vs coverage exclusion](project_deadcode_removal_vs_coverage_exclusion.md) — shrink the denominator, never exclude
+- [CLR-invoked private members](coverage-gate-clr-invoked-private-members.md) — never gate AssemblyResolve-style members at >=90%
+- [Named coverage exception: verify the member body](named-coverage-exception-verify-member-body.md) — gap-closure goes BEFORE the clean-pass task
+- [Enumerate condition outcomes before the case list](enumerate-condition-outcomes-before-case-list.md) — 2 outcomes per condition in every `||`/`&&` clause
+- [#441 Cobertura arithmetic](project_441_cobertura_arithmetic_plan_seams.md) — two-file pin vs 500-line ceiling; StrictMode throws on any missing fixture attribute
+- [#457 closure-filter](project_457_closure_filter_plan_seams.md) — the pipeline overwrites raw Cobertura in place; pre-merge insertion is a correctness constraint
+
+## File-size and refactor mechanics
+
+- [C# pure-move extraction pattern](csharp-pure-move-extraction-pattern.md) — keep the static-ctor install trigger; declare relocation-not-new-module
+- [Re-scoping a plan after a sibling landed the fix](plan-rescope-after-sibling-landed-the-fix.md) — split the file's contiguous TAIL so upstream citations survive
+- [#400 partial-class headroom placement](project_400_partial_class_headroom_placement.md) — put new cases in existing `.Part2.cs` partials
+- [Post-format file-size audit](feedback_postformat_file_size_audit.md) — the 500-line audit goes AFTER the final csharpier format
+- [Embedded-resource fail-proof needs a rebuild gate](embedded-resource-failproof-rebuild-gate.md) — edit → rebuild → assert bytes → `[expect-fail]`
+
+## Domain seams (TaskMaster)
+
+- [#445 keyboard-action](project_445_keyboard_action_plan_seams.md) — resolve WS at execution time; scope epic-child gates to owned test classes
+- [#446 QuickFiler bug family](project_446_quickfiler_bug_family_plan_seams.md) — ScoringServiceFactory seam before COM-path tests; AC conflict → unchecked + REMEDIATION-REQUIRED
+- [#438 search-focus](project_438_search_focus_plan_seams.md) — additive interface overload broke 7 test files; dispatch the default path on the old overload
+- [#424 QuickFiler deadline](project_424_quickfiler_deadline_plan_seams.md) — overload migration breaks loose-mock Setup/Verify; grep the old shape in ALL test files
+- [#351 QuickFiler breadcrumb](project_351_quickfiler_breadcrumb_plan_seams.md) — JSON code in UtilitiesCS only; coordinator pattern
+- [#349 EfcViewer breadcrumb](project_349_efcviewer_breadcrumb_plan_seams.md) — P0 halt-gate on the 9101 provider; mechanical swap only
+- [#230 WinForms pump seam](project_230_winforms_pump_seam_plan_facts.md) — factory seam params before SaveParameters; CreateAsync awaited-tail faults
+- [#211 startup-lifetime heartbeat](project_211_startup_lifetime_heartbeat_seam.md) — DispatcherTimer in ThisAddIn.cs; pure logic in StartupDiagnosticsProbe
+- [#292 CurrentStoreContext](project_292_currentstorecontext_parallel_seam.md) — process-global static; scope-opening store test classes need `[DoNotParallelize]`
+- [#307 F2 ScoCollection deletion gate](project_307_f2_scocollection_deletion_gate.md) — full first-party reference set incl. tests; ISubjectMapSco/IScoCollection boundary
+- [#328 store exclusion](project_328_store_exclusion_seams.md) — near-limit files; new test `.cs` need csproj wiring; four inclusion surfaces lockstep
+- [#295 WinForms STA exemptions](project_winforms_sta_refinement_exemption_rule.md) — remove HWND-only/PerformClick exemptions; keep dialog/Form/launcher
+- [#295 STA control-identity pattern](project_sta_last_resort_control_identity_pattern.md) — companion interface + `*.StaTests.cs`; never construct a Form
+- [Manager AsyncLazy shared seam](project_manager_asynclazy_shared_seam.md) — key-specific accessor, never retype the dictionary value
+- [Folder predictor AF holder seam](project_folder_predictor_af_holder_seam.md) — Folder-only holder on IAppAutoFileObjects, not per-instance state
+- [Dispatcher repro hang trap](dispatcher-repro-hang-trap.md) — use an owned pumping STA thread, not `Dispatcher.CurrentDispatcher` on a pooled worker
+
+## Spec and artifact hygiene
+
+- [Spec corrections sweep sibling sections](feedback_spec_corrections_sweep_sibling_sections.md) — cover Scope/Out-of-scope/Rollout, not AC only
+- [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — use `<repo-root>` / `<user>` / `<host>`; vstest TRX names carry the account and host
