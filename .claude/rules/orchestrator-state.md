@@ -82,6 +82,22 @@ These invariants apply only when a caller passes `require_model_routing=True` an
 
 The completion hook (`.claude/hooks/validate-orchestrator-output.ps1`) passes `--require-model-routing` alongside `--require-complete` and surfaces a gate failure as the `MODEL_ROUTING_BLOCKED:` block reason. The PreToolUse deterrent (`.claude/hooks/enforce-model-routing-receipt.ps1`) performs presence-only gating before a delegation. The MCP TypeScript surface performs the existence check only (delegated-agent set ⊆ routing-receipt-agent set); the Python validator remains authoritative for per-receipt correctness.
 
+## Epic Launch-Binding Activation Scope
+
+This section governs when the epic child launch-binding gate runs. It exists because the gate admitted the generic `require_complete` flag into an otherwise Codex-specific activation set, which made Codex-only launch evidence a universal completion requirement (issue #524).
+
+The evidence the gate demands — `launch_receipt_path`, `launch_status_path`, `delegation_receipt`, and `model_routing_receipt` on each feature — has exactly one production writer, `.codex/scripts/launch-epic-child-wave.ps1`, on the Codex runtime. No Claude-runtime producer writes it, so an epic executed on the Claude runtime could never satisfy an unconditional gate.
+
+1. **Unconditional under the two Codex enforcement flags.** When a caller passes `require_codex_model_routing` or `require_codex_topology`, launch-binding validation runs for every feature exactly as before, including the existing `skip_not_started` filter. Behaviour under either Codex flag is unchanged.
+
+2. **Key-gated per feature under `require_complete` alone.** When `require_complete` is the only flag passed, the gate validates a feature only when that feature carries `launch_receipt_path` or `launch_status_path`. A feature carrying neither key is skipped and contributes zero errors.
+
+3. **The presence test is deliberately either-key, so a partial binding still fails.** Presence means key membership, not value truthiness: a key present with an empty or null value still arms the gate. A feature carrying one launch path key and not the other is therefore validated, and the absent key produces its error. The test is never "both keys"; that spelling would let a half-written binding pass unexamined, and the partial-binding failure is the property that distinguishes this scope rule from deleting the gate.
+
+The rest of the completion gate is unchanged. An epic whose feature is not merged, or whose `epic_merge_pr.merge_commit_sha` is missing or empty, still fails under `require_complete`.
+
+Enforcement is validator logic plus this prose, never an imported JSON Schema. The activation scope lives in `scripts/dev_tools/_epic_orchestrator_state_launch_binding.py`, and the TypeScript parity port at `extensions/drm-copilot/src/lib/validate/epic-orchestrator-state-launch-binding.ts` reproduces it with byte-identical error strings. No schema file is authored, imported, or read for it.
+
 ## Enforcement
 
 - `scripts/dev_tools/validate_orchestrator_state.py` appends one error per violated invariant when a `remediation_loop` is present, using the existing validator message style (literal, checkpoint-context prefixed). The validator returns a list of error strings and does not mutate its input.
