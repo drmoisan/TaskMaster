@@ -97,3 +97,4 @@
 - [prd-feature hook picks the LONGEST active path](prd-feature-hook-picks-longest-active-path.md) — a deep evidence path in an atomic-planner prompt resolves the feature folder to `evidence/other` and denies the delegation
 - [Promotion hook matches commit-message text](promotion-hook-matches-commit-message-text.md) — describing the GitHub-CLI issue-creation phrase inside a `git commit -m` body is denied; paraphrase it
 - [Closing keyword fires inside a negation](closing-keyword-fires-inside-negation.md) — `does NOT fix #511` still auto-closes #511; scan commit messages and PR bodies, never file contents
+- [Stale-figure sweep by changed-file set](stale-figure-sweep-by-changed-file-set.md) — sweep the upstream PR's FULL changed-file set and both count spellings; the directive's named list missed a fifth figure
