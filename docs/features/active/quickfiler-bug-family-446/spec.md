@@ -14,10 +14,13 @@
 > acceptance-criteria source for this feature. No `user-story.md` exists for it and none is to be
 > created. The `## Acceptance Criteria` section below is what the executor and the reviewer check off.
 
-**Primary evidence source.** `research/2026-08-24T09-50-quickfiler-queue-datamodel-defects-research.md`,
-re-verified against worktree HEAD `988e819b`. The four promoted potential documents were captured at
-`fb32b923`; where they disagree with the research, the research is authoritative. Three of their claims
-are corrected in this specification (Root Cause Analysis §4.4, §2.5 and §4.5 of the research).
+**Primary evidence source.** `research/2026-08-24T09-50-quickfiler-queue-datamodel-defects-research.md`, whose
+citations were verified against `988e819b` and have NOT been re-verified since. PR #610 shifted every line number in
+`QuickFiler/Controllers/QfcStreamingDequeueConfidenceGate.cs`, so a gate line number read from the research must be
+re-resolved against this specification, whose every citation was re-verified against branch HEAD (PR #610, `507a40a5`).
+The four promoted potential documents were captured at `fb32b923`; where they disagree with the research, the research
+is authoritative on FINDINGS but not on line numbers. Three of their claims are corrected in this specification
+(Root Cause Analysis §4.4, §2.5 and §4.5 of the research).
 
 ---
 
@@ -50,13 +53,13 @@ error shown and no recovery short of relaunching QuickFiler.
   in 2026-08 (#426 and #427 during the issue #424 investigation; #446 and #448 during epic #136 coverage
   research). #446 was **introduced** by issue #424, which gave the two-argument dequeue overload a
   first-batch deadline the post-UI iteration call site was not written for. #426, #427 and #448 predate it.
-  All four are live at HEAD `988e819b`; nothing in the intervening work fixed any of them.
+  All four are live at branch HEAD, which carries PR #610 (`507a40a5`); nothing in the intervening work, including PR #610, fixed any of them.
 
 ---
 
 ## Repro & Evidence
 
-All citations below are the research's corrected file:line values at `988e819b`. Where a promoted
+All citations below are file:line values at branch HEAD, which carries PR #610 (`507a40a5`). Where a promoted
 potential document cited a different location, the correction is noted.
 
 ### #446 — deadline-expired empty batch closes the queue
@@ -93,7 +96,7 @@ mode, which routes through `DequeueDirectAsync` (`QfcDatamodel.QueueProcessing.c
 a deadline.
 
 **Logs.** The deadline path emits a `logger.Debug` line via `LogDeadlineExpiry`
-(`QfcStreamingDequeueConfidenceGate.cs:151-159`), but the production wiring passes `null` for `debugLog`
+(`QfcStreamingDequeueConfidenceGate.cs:157-165`), but the production wiring passes `null` for `debugLog`
 (`QfcDatamodel.QueueProcessing.cs:122`) and the caller cannot read log4net output. The failure therefore
 presents as QuickFiler ending the session early, with no error.
 
@@ -160,11 +163,11 @@ candidate for the life of the session, each holding a live `MailItem` COM refere
   `_moveMonitor.UnhookItem(node)` at `:44` (**moved** from `:33`).
 - The gate takes candidates through the bare delegate `() => _masterQueue.TryTakeFirst()` at
   `QuickFiler/Controllers/QfcDatamodel.QueueProcessing.cs:118` (**moved** from `:82`).
-- `QuickFiler/Controllers/QfcStreamingDequeueConfidenceGate.cs:133-145` has **no `else`** on the accept
+- `QuickFiler/Controllers/QfcStreamingDequeueConfidenceGate.cs:139-151` has **no `else`** on the accept
   decision. A below-cutoff item has already been removed from `_masterQueue` by `_tryTakeNext()` at
-  `:116`, is never added to `accepted`, and therefore never reaches `UnhookDequeuedNodes`.
+  `:122`, is never added to `accepted`, and therefore never reaches `UnhookDequeuedNodes`.
 - `EmailMoveMonitor.HookItem` (`QuickFiler/Helper Classes/EmailMoveMonitor.cs:46-61`, **corrected** from
-  `:46-58`) subscribes `folder.BeforeItemMove` at `:57` and adds to `_hookedItems` (`:44`). Nothing removes
+  `:46-58`) subscribes `folder.BeforeItemMove` at `:57` and adds to `_hookedItems` (`:58`). Nothing removes
   an entry except `UnhookItem` (`:63-88`) or `UnhookAll` (`:185-200`), and the datamodel's `UnhookAll` runs
   only from `QuickFiler/Controllers/QfcDatamodel.cs:80` at cleanup.
 
@@ -211,9 +214,9 @@ high-confidence mode.
 
 No sibling epic child writes these:
 
-| File | Lines at `988e819b` | Role in this change |
+| File | Lines at branch HEAD (post-PR #610) | Role in this change |
 | --- | --- | --- |
-| `QuickFiler/Controllers/QfcStreamingDequeueConfidenceGate.cs` | 171 | gate result shape, `onRejected` callback, widened score loader, `QfcGateBatch` |
+| `QuickFiler/Controllers/QfcStreamingDequeueConfidenceGate.cs` | 177 | gate result shape, `onRejected` callback, widened score loader, `QfcGateBatch` |
 | `QuickFiler/Controllers/QfcDatamodel.QueueProcessing.cs` | 177 | datamodel-side wiring, rejection release, outcome-bearing dequeue |
 | `QuickFiler/Controllers/QfcDatamodel.cs` | **496** | `ScoreRemainingQueueMailItemAsync` tuple return plus the adapter lambda at `:355` |
 | `QuickFiler/Controllers/QfcFormController.Actions.cs` | 302 | `TimeProvider` and `UndoConsumerStarter` seams, corrected `UndoConsumer` loop |
@@ -304,18 +307,18 @@ and `QfcHomeControllerRunAsyncHighConfidenceTests.cs:246`/`:277`.
 ### #446 — the dequeue result carries no reason field
 
 **Confirmed root cause.** `QfcStreamingDequeueConfidenceGate.DequeueAsync`
-(`QuickFiler/Controllers/QfcStreamingDequeueConfidenceGate.cs:87-91`) returns
+(`QuickFiler/Controllers/QfcStreamingDequeueConfidenceGate.cs:89-93`) returns
 `Task<IList<MailItem>>`. Its return type carries no reason field, and every exit returns the same
 `accepted` list:
 
 | Line | Exit | Meaning |
 | --- | --- | --- |
-| `:98` | `return accepted;` (empty) | `quantity <= 0` — degenerate |
-| `:113` | `return accepted;` | **deadline expired** (guarded at `:110`, logged at `:112`) |
-| `:122` | `return accepted;` | take returned null and (`timeOut <= 0`) or (already waited once and `_sourceActive()` false) — **source exhausted** |
-| `:148` | `return accepted;` | `accepted.Count == quantity` — quantity satisfied |
+| `:100` | `return accepted;` (empty) | `quantity <= 0` — degenerate |
+| `:119` | `return accepted;` | **deadline expired** (guarded at `:112-116`, logged at `:118`) — after PR #610 this exit is reachable only when `accepted.Count == 0` |
+| `:128` | `return accepted;` | take returned null and (`timeOut <= 0`) or (already waited once and `_sourceActive()` false) — **source exhausted** |
+| `:154` | `return accepted;` | `accepted.Count == quantity` — quantity satisfied |
 
-`IterateQueueAsync` observes only `listObjects.Count`. `Count == 0` is produced by both `:113` and `:122`,
+`IterateQueueAsync` observes only `listObjects.Count`. `Count == 0` is produced by both `:119` and `:128`,
 and there is no other observable difference on the production path. The caller therefore cannot
 distinguish a bounded scan from an exhausted source by any means, and infers exhaustion.
 
@@ -371,9 +374,9 @@ production constructs must be replaced before a compliant test can exist.
 
 ### #426 — the gate has no rejection path
 
-**Confirmed root cause.** `QfcStreamingDequeueConfidenceGate.cs:133-145` has no `else` on the
+**Confirmed root cause.** `QfcStreamingDequeueConfidenceGate.cs:139-151` has no `else` on the
 `score >= _cutoff` decision. The candidate has already been removed from `_masterQueue` by `_tryTakeNext()`
-at `:116`; if it is not added to `accepted` it is simply dropped, so it never reaches
+at `:122`; if it is not added to `accepted` it is simply dropped, so it never reaches
 `UnhookDequeuedNodes` and its `EmailMoveAction` stays in `_hookedItems` for the session.
 
 **Extra finding not in the potential document: three independent monitor instances exist.**
@@ -412,11 +415,11 @@ files. Scope 427-A closes the producer half only.
 reflection using a **descending fallback chain** of `GetConstructor` lookups: 8-type with progress
 (`:45-76`), 7-type with deadline (`:78-107`), 6-type with sourceActive (`:109-136`), 5-type base
 (`:138-155`). Only two constructors are actually declared — the 8-parameter one at
-`QfcStreamingDequeueConfidenceGate.cs:55-64` and the 5-parameter convenience overload at `:33-40`.
+`QfcStreamingDequeueConfidenceGate.cs:57-66` and the 5-parameter convenience overload at `:33-40`.
 
 Adding a ninth parameter makes the 8-type lookup return `null`; the 7-type and 6-type lookups also return
 `null`; and the chain then **succeeds** on the 5-type lookup, silently constructing a gate with
-`sourceActive = null`, the default deadline and no progress callback. Twenty-one test methods across the
+`sourceActive = null`, the default deadline and no progress callback. Twenty-three test methods across the
 three parts consume these helpers, so every deadline and source-active test would exercise a
 differently-configured gate while still passing or failing for the wrong reason. The helper must be made
 fail-closed as part of this work.
@@ -454,8 +457,8 @@ private readonly Action<MailItem> _onRejected;
 internal async Task<QfcGateBatch> DequeueAsync(int quantity, int timeOut, CancellationToken token)
 ```
 
-Return-site mapping: `:98` -> `QuantitySatisfied` (degenerate, empty); `:113` -> `DeadlineExpired`;
-`:122` -> `SourceExhausted`; `:148` -> `QuantitySatisfied`.
+Return-site mapping: `:100` -> `QuantitySatisfied` (degenerate, empty); `:119` -> `DeadlineExpired`;
+`:128` -> `SourceExhausted`; `:154` -> `QuantitySatisfied`.
 
 The `onRejected` invocation is wrapped so a monitor failure cannot abort the scan:
 `try { _onRejected?.Invoke(item); } catch (System.Exception e) { logger.Error(...); }`. Do **not** reuse
@@ -585,7 +588,7 @@ internal async Task UndoConsumer()
 `UndoConsumerIdleTimeout` is a private constant of ten seconds, preserving the current threshold.
 `TimeProvider` is chosen over a separate `IClock` plus `Func<TimeSpan, Task>` delay delegate because it is
 the repo-wide convention and is already proven in this exact subsystem
-(`QfcStreamingDequeueConfidenceGate.cs:102`, `:110`, `:126-128`; `QfcDatamodel.QueueProcessing.cs:173`;
+(`QfcStreamingDequeueConfidenceGate.cs:104`, `:115`, `:132-134`; `QfcDatamodel.QueueProcessing.cs:173`;
 `QfcHomeController.Metrics.cs:222`), and because both packages are already referenced
 (`QuickFiler.Test/packages.config:18` and `:85`).
 
@@ -635,7 +638,7 @@ must not grow.
 
 #### Functions/classes/CLI commands impacted
 
-`QfcStreamingDequeueConfidenceGate` (both constructors, `DequeueAsync`, the accept decision at `:133-145`);
+`QfcStreamingDequeueConfidenceGate` (both constructors, `DequeueAsync`, the accept decision at `:144-147`);
 `QfcDatamodel.ScoreRemainingQueueMailItemAsync`; `QfcDatamodel.DequeueWithHighConfidenceGateAsync`; a new
 private `TryReleaseRejectedHook`; `IQfcDatamodel`; `QfcHomeController.IterateQueueAsync`;
 `QfcFormController.UndoConsumer` and `QfcFormController.UndoDialog`. New types: `QfcDequeueStop`,
@@ -654,7 +657,7 @@ closing the queue. Rejected candidates gain a release step that was previously a
   scan, so a monitor failure cannot abort a batch.
 - `UndoConsumer`'s reset is moved into a `finally` so it runs on the exception path too.
 - Existing `logger.Debug` output is preserved: `LogDeadlineExpiry`
-  (`QfcStreamingDequeueConfidenceGate.cs:151-159`), `LogScore` (`:136`), and the two `Probability debug`
+  (`QfcStreamingDequeueConfidenceGate.cs:157-165`), `LogScore` (`:167-175`, invoked at `:142`), and the two `Probability debug`
   lines. No log message text is changed, so no log-parsing consumer is affected.
 
 #### Rollback/feature-flag considerations
@@ -676,7 +679,7 @@ three legacy `IQfcDatamodel` overloads keep their current behaviour, so a partia
 #### Required configuration keys and defaults
 
 None added. Existing behaviour retained: `QfcStreamingDequeueConfidenceGate.DefaultFirstBatchDeadline`
-= 12 seconds (`:22`); `Timeout.InfiniteTimeSpan` disables the deadline (`:75`);
+= 12 seconds (`:22`); `Timeout.InfiniteTimeSpan` disables the deadline (`:77`);
 `QfSettings.HighConfidenceThreshold` selects the cutoff; the `UndoConsumer` idle threshold stays at ten
 seconds and the idle poll interval at 200 ms.
 
@@ -707,7 +710,7 @@ seconds and the idle poll interval at 200 ms.
 
 **Assumptions**
 
-- HEAD `988e819b` is the base; every citation in this document was verified against it.
+- Branch HEAD, which carries PR #610 (`507a40a5`), is the base; every citation in this document was verified against it.
 - No sibling epic child modifies the eight owned files during this work.
 - `QfcRemainingQueueAdmission.scoreLoader` remains dead (declared, null-checked, never invoked). Verified
   at `QfcRemainingQueueAdmission.cs:17`, `:23-26`, `:34-46`.
@@ -717,7 +720,7 @@ seconds and the idle poll interval at 200 ms.
 - `.claude/rules/general-code-change.md` 500-line cap applies to every production and test file touched.
   `QfcDatamodel.cs` is at 496 (4 lines of headroom, decision D3);
   `QfcHomeControllerIterationTests.cs` is at 464 (36 lines, decision D4);
-  `QfcStreamingDequeueConfidenceGateTests.Part2.cs` is at 455 and
+  `QfcStreamingDequeueConfidenceGateTests.Part2.cs` is at 460 and
   `QfcHomeControllerRunAsyncHighConfidenceTests.cs` at 473 — neither is to be grown;
   `QfcFormControllerTests.cs` is at 827, already over the cap, and must only shrink if touched at all.
 - `net481` has no `IsExternalInit`, so `record`, `record struct` and `init` accessors are unavailable. All
@@ -763,7 +766,7 @@ and `EmailMoveMonitorTests.cs:72-85`.
 | #446 gate | `DequeueAsync_DeadlineExpiresWithZeroAccepted_ReportsDeadlineExpiredStop`; `DequeueAsync_SourceDrained_ReportsSourceExhaustedStop` | `QfcStreamingDequeueConfidenceGateTests.Part3.cs` (152 / 348) |
 | #446 caller | `IterateQueueAsync_EmptyBatchWithDeadlineExpired_DoesNotCompleteAdding`; `IterateQueueAsync_EmptyBatchWithSourceExhausted_CompletesAddingOnce` | `QfcHomeControllerIterationTests.cs` (464 / 36 — dedup first) |
 | #448 | `UndoConsumer_EveryIdleIteration_InvokesTimeProviderDelay` (the failing-first shape assertion); `UndoConsumer_IdleBeyondThreshold_Completes`; `UndoConsumer_SuccessfulTake_ResetsIdleTimer`; `UndoConsumer_OnExit_ResetsUndoConsumerTask` | `QfcFormControllerSeamTests.cs` (378 / 122) |
-| #426 gate | `DequeueAsync_BelowThresholdCandidate_InvokesOnRejectedOnce`; `DequeueAsync_AcceptedCandidate_DoesNotInvokeOnRejected`; `DequeueAsync_OnRejectedThrows_ScanContinues` | `QfcStreamingDequeueConfidenceGateTests.cs` (373 / 127) |
+| #426 gate | `DequeueAsync_BelowThresholdCandidate_InvokesOnRejectedOnce`; `DequeueAsync_AcceptedCandidate_DoesNotInvokeOnRejected`; `DequeueAsync_OnRejectedThrows_ScanContinues` | `QfcStreamingDequeueConfidenceGateTests.cs` (424 / 76) |
 | #426 datamodel | `DequeueNextItemGroupAsync_HighConfidenceRejectedItem_UnhooksFromMoveMonitor` | `QfcQueuePurePathsTests.cs` (136 / 364) |
 | #427-A | `ScoreRemainingQueueMailItemAsync_ReturnsScoreAndTopFolder`; `DequeueAsync_AcceptedCandidate_CarriesTopFolderInPreScoredResult` | `QfcDatamodelTests.cs` (317 / 183) and `...GateTests.Part3.cs` |
 
@@ -848,7 +851,8 @@ no regression on changed lines, and `>= 90%` line coverage on the three non-excl
 4. `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`
 
 Use `/t:Rebuild`, never `/t:Build` — MSBuild's up-to-date check does not invalidate on a command-line
-`/p:` change, so a warm `/t:Build` returns exit 0 with `CoreCompile` skipped and the gate cannot fail.
+`/p:` change, so a warm `/t:Build` returns exit 0 with `CoreCompile` skipped and the gate cannot fail; a
+compile that carries no `/p:` gate property is not a toolchain gate and may use `/t:Build`.
 **Never add `/p:Nullable=enable`**; it is not in CI's command and it conscripts files that never adopted
 the pragma.
 
@@ -877,7 +881,7 @@ of this branch against its integration branch.
 **Fixed behaviour**
 
 - [ ] AC6 — `QuickFiler/Controllers/QfcHomeController.Iteration.cs` calls `CompleteAddingAsync` only inside a branch guarded by `Stop == QfcDequeueStop.SourceExhausted`. Verified by AC2 plus reading the diff of that file.
-- [ ] AC7 — `QuickFiler/Controllers/QfcStreamingDequeueConfidenceGate.cs` returns a stop reason from all four exits, mapped `:98`/`:148` -> `QuantitySatisfied`, `:113` -> `DeadlineExpired`, `:122` -> `SourceExhausted`. Verified by AC1.
+- [ ] AC7 — `QuickFiler/Controllers/QfcStreamingDequeueConfidenceGate.cs` returns a stop reason from all four exits, mapped `:100`/`:154` -> `QuantitySatisfied`, `:119` -> `DeadlineExpired`, `:128` -> `SourceExhausted`. Verified by AC1.
 - [ ] AC8 — `UndoConsumer` terminates once the queue is drained and the idle threshold elapses. Verified by `UndoConsumer_IdleBeyondThreshold_Completes` completing without a `[Timeout]` trip on a `FakeTimeProvider`.
 - [ ] AC9 — the `UndoConsumer` idle timer is **reset after every successful take**. Verified by `UndoConsumer_SuccessfulTake_ResetsIdleTimer`, which advances the fake clock past the threshold in aggregate while keeping every idle gap below it and asserts the loop kept draining.
 - [ ] AC10 — `_undoConsumerTask` is reset to `null` on every exit path, including the exception path, so a subsequent `UndoDialog()` starts a fresh consumer. Verified by `UndoConsumer_OnExit_ResetsUndoConsumerTask` and by the reset sitting in a `finally` block in `QuickFiler/Controllers/QfcFormController.Actions.cs`.
@@ -899,7 +903,7 @@ of this branch against its integration branch.
 
 **Quality gates**
 
-- [ ] AC23 — the reflective gate helper is **fail-closed**. The descending `GetConstructor` fallback chain at `QuickFiler.Test/Controllers/QfcStreamingDequeueConfidenceGateTests.cs:26-156` is replaced by a single exact lookup guarded by a `Should().NotBeNull()` assertion. Verified by `git grep -c "GetConstructor" -- "QuickFiler.Test/Controllers/QfcStreamingDequeueConfidenceGateTests.cs"` reporting `1`, and by all 21 gate test methods passing.
+- [ ] AC23 — the reflective gate helper is **fail-closed**. The descending `GetConstructor` fallback chain at `QuickFiler.Test/Controllers/QfcStreamingDequeueConfidenceGateTests.cs:26-156` is replaced by a single exact lookup guarded by a `Should().NotBeNull()` assertion. Verified by `git grep -c "GetConstructor" -- "QuickFiler.Test/Controllers/QfcStreamingDequeueConfidenceGateTests.cs"` reporting `1`, and by all 29 gate test methods passing (the 23 present on the tree that carries PR #610, plus the six added by `[P1-T2]`, `[P1-T3]`, `[P1-T4]`, `[P1-T9]`, `[P1-T10]` and `[P1-T13]`).
 - [ ] AC24 — the 500-line cap holds on every file this change touches. For each path in `git diff --name-only <mb>...HEAD -- "*.cs"`, the post-change line count is `<= 500`. The single permitted exception is `QuickFiler.Test/Controllers/QfcFormControllerTests.cs` (pre-existing 827); if it is touched at all its post-change line count must be strictly less than 827. `QuickFiler/Controllers/QfcDatamodel.cs` must be `<= 500` (its pre-change count is 496).
 - [ ] AC25 — the source-text signature-order test survives formatting: `LoadItemsAsync_MailItemPath_DoesNotApplyPostDisplayHighConfidenceRemoval` (`QuickFiler.Test/Controllers/QfcFormControllerSeamTests.cs:352-374`) passes **after** `dotnet tool run csharpier format .` has run, not before.
 - [ ] AC26 — determinism: no test file added or modified by this change set contains `Thread.Sleep`, `Task.Delay`, `DateTime.Now`, `DateTime.UtcNow`, `Path.GetTempPath` or `Path.GetTempFileName`. Verified by grepping the changed test paths from `git diff --name-only <mb>...HEAD -- "QuickFiler.Test/**/*.cs"`.
@@ -912,7 +916,7 @@ of this branch against its integration branch.
 
 | # | Risk | Likelihood / impact | Mitigation |
 | --- | --- | --- | --- |
-| R1 | **The reflective `CreateGate` helper fails open.** Adding a ninth constructor parameter makes the 8-, 7- and 6-type lookups all return `null`; the chain succeeds on the 5-type lookup and silently builds a gate with `sourceActive = null`, the default deadline and no progress callback. Twenty-one tests would then pass or fail for the wrong reason. | High / high — silent, and it defeats the very tests that gate this change | Migrate the helper in the same task that changes the constructor, and trim it to a **single exact lookup** with `Should().NotBeNull()` so it fails closed (AC23). The `DequeueAsync` return-type cast at `:192-205` already fails loudly with `InvalidCastException`. |
+| R1 | **The reflective `CreateGate` helper fails open.** Adding a ninth constructor parameter makes the 8-, 7- and 6-type lookups all return `null`; the chain succeeds on the 5-type lookup and silently builds a gate with `sourceActive = null`, the default deadline and no progress callback. Twenty-three tests would then pass or fail for the wrong reason. | High / high — silent, and it defeats the very tests that gate this change | Migrate the helper in the same task that changes the constructor, and trim it to a **single exact lookup** with `Should().NotBeNull()` so it fails closed (AC23). The `DequeueAsync` return-type cast at `:192-205` already fails loudly with `InvalidCastException`. |
 | R2 | **CSharpier reflow breaks the source-text test.** `QfcFormControllerSeamTests.cs:352-374` reads `QfcFormController.Actions.cs` from disk and requires two exact single-line signature literals in order. CSharpier reflows a signature when it exceeds the print width; both are currently within it. | Medium / medium | Do not add parameters to either `LoadItemsAsync` signature and do not reorder the overloads (Scope 427-A requires neither). Run the format step **before** judging that test green (AC25). |
 | R3 | **`QfcDatamodel.cs` is at 496 of the 500-line cap.** A four-line overrun is easy to produce. | Medium / medium | Decision D3: net growth there is at most 4 lines; no new type goes into that file. Relocate anything larger into `QfcDatamodel.QueueProcessing.cs` (177 / 323 headroom). Verified by AC24. |
 | R4 | **`QfcHomeControllerIterationTests.cs` is at 464/500** and must absorb two new tests plus four retargeted setups. | High / medium | Deduplicate first by extracting a shared `ArrangeIterate(...)` helper from the four `IterateQueueAsync_*` setups (research §6.1 mitigation 1), which frees roughly 80-100 lines. Do not add a `Part2` partial, which would require a `.csproj` edit (AC19, AC22). |
@@ -970,5 +974,3 @@ of this branch against its integration branch.
   `docs/features/potential/promoted/2026-08-07-quickfiler-undoconsumer-nonterminating-loop.md`,
   `docs/features/potential/promoted/2026-08-07-emailmovemonitor-rejected-item-hook-retention.md`,
   `docs/features/potential/promoted/2026-08-07-quickfiler-post-show-duplicate-scoring.md`
-</content>
-</invoke>
