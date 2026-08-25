@@ -80,6 +80,7 @@
 - [Bash tool rejects complex commands in isolated worktrees](bash-tool-rejects-complex-commands-in-isolated-worktree.md) — heredoc+redirect+git compounds are refused as unverifiable; gather with plain chained commands, then author via Write
 - [#457 coverage moved UP, and the kickoff figure was wrong](project_457_coverage_moved_up_not_down.md) — the denominator fix raised the rate 85.3514%→85.5355%; kickoff's 85.0317% matched no measurement, so #494 must re-measure
 - [atomic-planner has no MCP validator tool](atomic-planner-lacks-mcp-validator-tool.md) — it cannot run the mandatory plan gate; run it yourself and tell the planner not to fabricate a result
+- [Preflight defect-trend scope confound](preflight-defect-trend-scope-confound.md) — a rising count isn't divergence if you widened scope that round; hold scope fixed one round, and track re-introductions not raw counts
 - [C# agent worktree needs three bootstrap steps](csharp-agent-worktree-needs-three-bootstrap-steps.md) — no `.dotnet-sdk`, no `packages/`, and a clean restore still hits `error CS0006` on skewed analyzer versions; green CI is cache-explained, not tolerance
 - [potential_to_issue keeps ONLY the Summary section](potential-to-issue-keeps-only-summary-section.md) — every other section becomes "(not provided in potential file)"; verify the issue body, post the rest as a comment
 - [Epic kickoff facts need independent measurement](epic-kickoff-facts-need-independent-measurement.md) — a kickoff predicted a 500-line cap finding from a conflated file; the named file was 323 lines, not 1,065
