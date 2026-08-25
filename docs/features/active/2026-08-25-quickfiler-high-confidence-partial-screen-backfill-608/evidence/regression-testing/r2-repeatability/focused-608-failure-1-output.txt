@@ -1,0 +1,54 @@
+VSTest version 18.8.0 (x64)
+
+Starting test discovery, please wait...
+A total of 1 test files matched the specified pattern.
+Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-25T11-36\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)
+  Failed DequeueAsync_DeadlineExpiresDuringInFlightScore_IncludesFinalAcceptedItem [336 ms]
+  Error Message:
+   Expected result to contain a single item because the final in-flight acceptance is included, but found {Mock<MailItem:1>.Object, Mock<MailItem:2>.Object}.
+  Stack Trace:
+     at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277
+   at FluentAssertions.Collections.GenericCollectionAssertions`3.ContainSingle(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Collections/GenericCollectionAssertions.cs:line 1214
+   at QuickFiler.Controllers.Tests.QfcStreamingDequeueConfidenceGateTests.<DequeueAsync_DeadlineExpiresDuringInFlightScore_IncludesFinalAcceptedItem>d__21.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-25T11-36\QuickFiler.Test\Controllers\QfcStreamingDequeueConfidenceGateTests.Part2.cs:line 184
+--- End of stack trace from previous location where exception was thrown ---
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.<ExecuteInternalAsync>d__58.MoveNext()
+  Standard Output Messages:
+      Warning:
+      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
+      the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
+      non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
+ 
+      Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
+ 
+      A paid commercial license supports the development and continued increasing support of
+      Fluent Assertions users under both commercial and community licenses. Help us
+      keep Fluent Assertions at the forefront of unit testing.
+ 
+      For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
+ 
+ 
+ Debug Trace:
+      Warning:
+      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and
+      the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for
+      non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.
+ 
+      Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.
+ 
+      A paid commercial license supports the development and continued increasing support of
+      Fluent Assertions users under both commercial and community licenses. Help us
+      keep Fluent Assertions at the forefront of unit testing.
+ 
+      For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/
+
+
+WARNING: Overwriting results file: C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-25T11-36\TestResults\docs/features/active/2026-08-25-quickfiler-high-confidence-partial-screen-backfill-608/evidence/regression-testing/r2-repeatability/focused-608-failure-1.trx
+Results File: C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-25T11-36\TestResults\docs/features/active/2026-08-25-quickfiler-high-confidence-partial-screen-backfill-608/evidence/regression-testing/r2-repeatability/focused-608-failure-1.trx
+
+Total tests: 1
+     Failed: 1
+Test Run Failed.
+ Total time: 1.2974 Seconds
