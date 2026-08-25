@@ -90,6 +90,7 @@
 - [Bootstrapping orchestrator-state.json's first write](bootstrapping-orchestrator-state-json-first-write.md) — Write tool can't create it (absolute path never matches the gate's relative constant); use single-line `python3 -c`, and split forbidden MCP tool-name literals across string concatenation
 - [PRD_FEATURE_BLOCKED can be a prompt-parsing false positive](prd-feature-hook-parses-prompt-paths.md) — the hook reads `docs/features/active/...` out of your PROMPT; a quoted deep evidence path becomes the "feature folder"
 - [Multi-location fact residuals drive preflight rounds](multi-location-fact-residuals-drive-preflight-rounds.md) — nearly every blocking preflight defect is one fact corrected in SOME locations; enumerate every location per fact
+- [expect-fail tests break substring scoped-run gates](expect-fail-tests-break-substring-scoped-run-gates.md) — a "0 failed" gate under `FullyQualifiedName~Class` dies once an earlier task adds an expect-fail test there; carve out by exact name
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
