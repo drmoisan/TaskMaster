@@ -27,7 +27,7 @@ concurrent branches editing the same four files.
 | Issue | Title | Primary file | Severity |
 |---|---|---|---|
 | #480 | `ToggleNavigation(bool)` toggles twice, so the feature is inert | `QfcItemController.FocusAndTheme.cs` | Medium |
-| #481 | No event unwiring path; ~22 subscriptions are never detached | `QfcItemController.EventWiring.cs`, `.ViewerSetup.cs` | Medium |
+| #481 | No event unwiring path; 23 subscriptions are never detached | `QfcItemController.EventWiring.cs`, `.ViewerSetup.cs` | Medium |
 | #483 | `MoveMailAsync` swallows every exception; missing cancellation checks | `QfcItemController.MailActions.cs` | Medium-High |
 | #484 | `Cleanup()` nulls an armed `System.Threading.Timer` without disposing it | `QfcItemController.ViewerSetup.cs` | Medium |
 | #485 | `WebResourceRequested` handler dereferences unguarded external inputs | `QfcItemController.ViewerSetup.cs` | Low-Medium |

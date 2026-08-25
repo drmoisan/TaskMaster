@@ -12,7 +12,16 @@ feature. `user-story.md` is intentionally absent.
 
 Authoritative technical input: `docs/features/active/qfc-item-controller-defects-484/research/research.2026-08-24T09-45.md`.
 Where that research corrects a promoted potential's "Suspected Fix", the research governs; research §0
-tabulates all five corrections and each is carried forward below.
+tabulates all five corrections and each is carried forward below. In every other respect this document
+governs: the research is a point-in-time technical input captured before the design was finalised, so
+where the two disagree on a figure, a design detail, or a line citation, this document is authoritative
+and the research is not to be treated as a correction of it. One known divergence of that kind: the
+`Cleanup()` row of research §7.2 states that the method detaches **22** additional subscriptions, a
+figure that predates the decision to reach the `WebResourceRequested` subscription through
+`DetachWebResourceRequestedHandler()`. The delivered figure is **23**, as stated in the CHANGED-members
+table below. Research §2.1's "22 `+=` in `EventWiring.cs`", §2.4's "22 of 24 unwired symmetrically and
+testably", and §9.1's "22/24 yes" are not divergences: each counts a different quantity and each agrees
+with this document.
 
 ---
 
@@ -611,10 +620,14 @@ cross-test timing coupling.
 ### Regression tests to add or update, by issue
 
 - **#480.** Tighten `FocusAndThemeTests.cs:323` from `Times.AtLeastOnce()` to `Times.Once()` in place;
-  add the currently-untested `async: true` branch with the same exact-count assertion, placed in
-  `EventWiringTests.cs`. `BuildExecutingViewer()` (`FocusAndThemeTests.cs:99-115`) executes both `Invoke`
-  and `BeginInvoke` delegates synchronously, so both branches produce a countable `Toggle(false)` call on
-  the `Mock<IQfcTipsDetails>`.
+  add the currently-untested `async: true` branch with the same exact-count assertion, routed to the
+  owned test file named by the plan's constraint C2 capacity table per governing constraint 6 above.
+  No file is named for it here: the capacity table is the binding routing, and a file named in this
+  bullet would contradict it. The new test arranges its own executing `Mock<IItemViewer>` inline,
+  mirroring `BuildExecutingViewer()` (`FocusAndThemeTests.cs:99-115`), which executes both `Invoke` and
+  `BeginInvoke` delegates synchronously so that both branches produce a countable `Toggle(false)` call
+  on the `Mock<IQfcTipsDetails>`; that helper is `private static` to `FocusAndThemeTests.cs` and is
+  therefore not reachable from another test file.
 - **#481 intent half.** `Mock<IItemViewer>` with
   `VerifyRemove(v => v.ConversationModeChanged -= It.IsAny<EventHandler>(), Times.Once())` for each of
   the 16 intent events, or a representative subset plus a "no subscription remains" assertion. `VerifyAdd`
@@ -837,9 +850,14 @@ regression test. The one exception is verified by source inspection and is recor
 ### File-size, toolchain, and coverage
 
 - [ ] Every production and test file touched by this feature is at most 500 lines after the change.
-      Specifically: `QfcItemController.ViewerSetup.cs`, `QfcItemController.EventWiring.cs`,
-      `QfcItemController.FocusAndThemeTests.cs`, and `QfcItemController.ViewerSetupTests.cs` are each
-      verified at or under 500 lines.
+      All nine owned files are recorded with their post-change line counts. Specifically, the seven
+      files that receive added lines under the plan's constraint C2 assignment —
+      `QfcItemController.ViewerSetup.cs`, `QfcItemController.EventWiring.cs`,
+      `QfcItemController.MailActions.cs`, `QfcItemController.FocusAndTheme.cs`,
+      `QfcItemController.EventWiringTests.cs`, `QfcItemController.MailActionsTests.cs`, and
+      `QfcItemController.TestSupport.cs` — are each verified at or under 500 lines, and the two owned
+      test files that receive no added lines, `QfcItemController.FocusAndThemeTests.cs` and
+      `QfcItemController.ViewerSetupTests.cs`, are verified at their unchanged 497 and 474 lines.
 - [ ] Every new test uses MSTest, Moq, and FluentAssertions, and no new test contains `Thread.Sleep`,
       `Task.Delay`, a wall-clock wait, or a temporary file.
 - [ ] Exactly one new test constructs a real `QuickFiler.ItemViewer` (the #481 control-tree unwire test),

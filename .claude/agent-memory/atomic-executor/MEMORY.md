@@ -2,6 +2,7 @@
 
 ## Plan validation & gates
 - [Directory-scoped format breaks ownership gates](project_directory_scoped_format_breaks_ownership_gates.md) — a scoped csharpier pass naming DIRECTORIES rewrites must-not-write files the same plan asserts are unmodified; require file paths
+- [Supersede clause leaves a hard routing residual](project_supersede_clause_leaves_hard_routing_residual.md) — a "the plan's table supersedes this" clause does not neutralise a THIRD location naming a concrete file; re-derive the arithmetic of obeying it
 - [Verify line citations with numbered output](feedback_verify_line_citations_with_numbered_output.md) — never hand-count from a `sed` window; a wrong #438 advisory got applied and corrupted 3 correct citations in plan + spec
 - [Four recurring C# plan defect classes](project_preflight_recurring_csharp_plan_defect_classes.md) — omitted `.claude/rules/csharp.md` read, exact `dotnet --version` equality vs global.json rollForward, absolute `Failed: 0`, and a `Select-String -LineNumber` switch that does not exist
 - [Self-derived gate thresholds are blind](project_preflight_selfderived_gate_thresholds_are_blind.md) — a "count >= floor" gate whose floor comes from the runs it validates is deflation-blind + scope-incommensurable; use
