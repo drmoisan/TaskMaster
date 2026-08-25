@@ -20,10 +20,12 @@ tabulates all five corrections and each is carried forward below.
 
 - **Summary of the bug and its impact.** This feature closes five pre-existing defects in the
   `QfcItemController` partial classes. Four are teardown/lifecycle defects and one is a failure-path
-  defect. Together they cause: a navigation-tips affordance that does nothing; approximately 22 event
-  subscriptions that are never detached, so a torn-down controller keeps receiving events from a pooled
-  viewer; an armed 4-second `System.Threading.Timer` that survives `Cleanup()` and fires against nulled
-  fields; a mail-move failure that is swallowed so the caller treats a failed file as successful; and an
+  defect. Together they cause: a navigation-tips affordance that does nothing; 23 event
+  subscriptions that are never detached (the 22 in `EventWiring.cs` plus the `WebResourceRequested`
+  subscription at `ViewerSetup.cs:84`; the 24th, `BreadcrumbUnhandledArrow`, is already detached),
+  so a torn-down controller keeps receiving events from a pooled viewer; an armed 4-second
+  `System.Threading.Timer` that survives `Cleanup()` and fires against nulled fields; a mail-move
+  failure that is swallowed so the caller treats a failed file as successful; and an
   inline-image handler that dereferences unguarded external input on a WebView2 callback thread.
 
 - **Observed environment(s).** VSTO add-in hosted in Microsoft Outlook on Windows; `QuickFiler`
@@ -223,13 +225,15 @@ in the plan.
 4. **Feature 444 (`Navigation.cs`, `KbdActions.cs`) — timer-seam opportunity.** `Navigation.cs:223-224`
    hard-constructs a `System.Threading.Timer` with a 4000 ms literal. A
    `Func<TimerCallback, System.Threading.Timer>` factory seam defaulted in `SaveParameters` (mirroring
-   the six factory-delegate seams already at `QfcItemController.cs:69-89`) would make the arming branch
+   the five factory-delegate seams already at `QfcItemController.cs:69-89`) would make the arming branch
    deterministically testable without this feature's callback guard. This feature does not do it and
    does not depend on it.
 
 5. **Feature 489 (`ItemViewer*.cs`) — viewer-side WebView2 detachment.** An
    `ItemViewer.ResetWebResourceInterception()` intent member on `IItemViewer`, called from
-   `QfcItemController.Cleanup()`, would replace the two capture fields this feature adds
+   `QfcItemController.UnwireEvents()`, which is where this feature places
+   `DetachWebResourceRequestedHandler()` (third statement), reached from `Cleanup()`, would replace the
+   two capture fields this feature adds
    (`_coreWebView2`, `_webResourceRequestedHandler`) with one mockable interface call, converting the
    single untestable residue of #481 into a covered assertion. This feature does not create that member
    because it would require writing `ItemViewer*.cs` and `IItemViewer.cs`.
@@ -302,7 +306,7 @@ following is the complete surface delta.
 | `TryResolveCidResource` | `QfcItemController.ViewerSetup.cs` | `internal` | **yes** | `static bool TryResolveCidResource(string requestedUri, IReadOnlyDictionary<string, IAttachment> contentIdMap, out byte[] payload, out string mimeType)` |
 | `_webResourceRequestedHandler` | `QfcItemController.ViewerSetup.cs` | `private` field | no | `EventHandler<CoreWebView2WebResourceRequestedEventArgs>` |
 | `_coreWebView2` | `QfcItemController.ViewerSetup.cs` | `private` field | no | `CoreWebView2` |
-| `DetachWebResourceRequestedHandler` | `QfcItemController.ViewerSetup.cs` | `private` | no | `void DetachWebResourceRequestedHandler()` — detaches `_webResourceRequestedHandler` from `_coreWebView2` when both are non-null and nulls both fields; not part of the consumable surface |
+| `DetachWebResourceRequestedHandler` | `QfcItemController.ViewerSetup.cs` | `private` | no | `void DetachWebResourceRequestedHandler()` — detaches `_webResourceRequestedHandler` from `_coreWebView2` inside a guard requiring both fields to be non-null, then nulls both fields unconditionally in statements placed after and outside that guard; not part of the consumable surface |
 
 `UnwireEvents`, `UnwireControlTreeEvents`, `UnwireIntentEvents`, `MoveFailureNotifier`, and
 `TryResolveCidResource` are visible to `QuickFiler.Test` through
@@ -313,7 +317,7 @@ following is the complete surface delta.
 | Member | File:line | Behavioural delta | Downstream consequence |
 |---|---|---|---|
 | `ToggleNavigation(bool async)` | `FocusAndTheme.cs:168-179` | One `_itemPositionTips.Toggle(false)` call instead of two. The dispatch count on `_itemViewer` drops from 2 to 1. | A downstream assertion of `Times.Exactly(2)` on `Invoke`/`BeginInvoke` or on `Toggle(false)` for this member would break. None exists today. |
-| `Cleanup()` | `ViewerSetup.cs:396-425` | (a) Detaches 22 additional event subscriptions before nulling. (b) Disposes `_emailIsReadTimer` before nulling it. (c) Nulls `_mailActions`. (d) Must tolerate a null `_itemViewer`, a null `_kbdHandler`, a null `Buttons`, and an `_itemViewer` that is not a concrete `ItemViewer`. Signature `public void Cleanup()` unchanged; still declared on `IQfcItemController.cs:77`. | **The most significant item for downstream.** See the lifecycle invariant below. `_mailActions` becomes null after `Cleanup()`; `SaveParameters`' `??=` (`Initialization.cs:395`) rebinds it on reuse. |
+| `Cleanup()` | `ViewerSetup.cs:396-425` | (a) Detaches 23 additional event subscriptions before nulling: 6 control-tree and 16 intent through `UnwireEvents()`, plus the `WebResourceRequested` subscription through `DetachWebResourceRequestedHandler()`. (b) Disposes `_emailIsReadTimer` before nulling it. (c) Nulls `_mailActions`. (d) Must tolerate a null `_itemViewer`, a null `_kbdHandler`, a null `Buttons`, and an `_itemViewer` that is not a concrete `ItemViewer`. Signature `public void Cleanup()` unchanged; still declared on `IQfcItemController.cs:77`. | **The most significant item for downstream.** See the lifecycle invariant below. `_mailActions` becomes null after `Cleanup()`; `SaveParameters`' `??=` (`Initialization.cs:395`) rebinds it on reuse. |
 | `MoveMailAsync()` | `MailActions.cs:83-126` | (a) Wraps and rethrows (`InvalidOperationException` carrying the subject and destination folder, with the original as inner) instead of swallowing. (b) `Token.ThrowIfCancellationRequested()` becomes the first statement, so `OperationCanceledException` can escape. (c) The user-facing message is routed through `MoveFailureNotifier` on `_uiDispatcher` instead of a direct `MessageBox.Show`. Return type stays `Task`. | **Behavioural contract change.** Any caller must handle a faulted task. The sole production caller already does (`QfcCollectionController.cs:2238-2257`), so the bulk loop `MoveEmailsAsync` (`:2206-2228`) cannot be aborted by the rethrow. Feature 464 must not copy the swallow-and-continue shape into `EfcItemController`. |
 | `FlagAsTaskAsync()` | `MailActions.cs:183-200` | Adds `Token.ThrowIfCancellationRequested()` as the first statement, before the `Mail` COM read. | Can now throw `OperationCanceledException`. |
 | `EnumerateConversationAsync()` | `MailActions.cs:49-52` | Adds `Token.ThrowIfCancellationRequested()` as the first statement. | Can now throw `OperationCanceledException`. Reachable via `RightKeyActionsAsync["&Expand"]` (`MailActions.cs:78`). |
@@ -333,10 +337,12 @@ they are exhaustively enumerated in the CHANGED table above.
 
 - **Wiring order is unchanged.** `WireEvents()` continues to call `WireControlTreeEvents()` then
   `WireIntentEvents()` (`EventWiring.cs:28-32`), and neither method's internal ordering changes.
-- **Unwiring order is newly defined.** `UnwireEvents()` calls `UnwireControlTreeEvents()` then
-  `UnwireIntentEvents()`, mirroring the wiring order. Detachment is order-independent across disjoint
-  event sources, so this is a convention rather than a correctness constraint, but downstream code that
-  mirrors the pattern should follow it.
+- **Unwiring order is newly defined.** `UnwireEvents()` calls `UnwireControlTreeEvents()`, then
+  `UnwireIntentEvents()`, then `DetachWebResourceRequestedHandler()`, in that order. The first two
+  mirror the wiring order; the third has no wiring counterpart because the `WebResourceRequested`
+  subscription is made inside `InitializeWebViewAsync` rather than in a wire method. Detachment is
+  order-independent across disjoint event sources, so this is a convention rather than a correctness
+  constraint, but downstream code that mirrors the pattern should follow it.
 
 #### `Cleanup()` statement-order constraints (three; all must be preserved by any downstream reordering)
 
@@ -375,7 +381,11 @@ and is rebound to the new `MailItem` by the next `SaveParameters` call.
     around the `FolderKeyDown` detach only.
   - `UnwireControlTreeEvents()` — `if (!(_itemViewer is ItemViewer viewer)) { return; }` for the
     `ForAllControls` walk, mirroring the existing `EnsureBreadcrumbPipeline` guard at
-    `ViewerSetup.cs:138-141`; the `Buttons` and `MenuItems` loops guarded against null.
+    `ViewerSetup.cs:138-141`; the `ForAllControls` keyboard-detach walk additionally guarded by
+    `if (_kbdHandler is not null)`, because `_kbdHandler` is the delegate target for both keyboard
+    detachments and `QfcItemControllerBreadcrumbDropDownTests.cs:125-153` calls `Cleanup()` with a
+    concrete `ItemViewer` and a null `_kbdHandler`, which the type guard does not catch; the `Buttons`
+    and `MenuItems` loops guarded against null.
   - The asymmetry with the unguarded `WireControlTreeEvents()` is intentional — wiring runs only on the
     initialized path, teardown must tolerate a partially-constructed controller — and must be commented
     in the source.
@@ -569,16 +579,16 @@ the existing `[ExcludeFromCodeCoverage]` member and in the two new private field
    message loop, no worker; events raised by reflecting onto `Control.OnPreviewKeyDown`, `OnKeyDown`, and
    `OnMouseEnter`, with a bare `SynchronizationContext` installed and restored in `try`/`finally`.
    Pre-existing real-`ItemViewer` and `WinFormsPumpHost` usages elsewhere in the owned test files
-   (`EventWiringTests.cs:236`, `:327`; `ViewerSetupTests.cs:395`, `:429`) are precedent for that single
+   (`EventWiringTests.cs:236`, `:327`; `ViewerSetupTests.cs:395`, `:433`, with the `WinFormsPumpHost` at
+   `ViewerSetupTests.cs:429`) are precedent for that single
    exception only and are not a licence for new tests.
 6. **File-size routing.** `QfcItemController.FocusAndThemeTests.cs` is at 497 lines (3 spare) and
-   `QfcItemController.ViewerSetupTests.cs` at 474 (26 spare). New #480 tests therefore route to
-   `QfcItemController.EventWiringTests.cs` (374 lines, 126 spare) with a comment cross-referencing #480;
-   the #480 assertion tightening itself is a zero-line, in-place edit to `FocusAndThemeTests.cs:323`.
-   #484 T1 fits in `ViewerSetupTests.cs`; #484 T2 and all #485 tests route to
-   `QfcItemController.MailActionsTests.cs` (184 lines, 316 spare) or `EventWiringTests.cs`, each with a
-   header comment naming the issue. All five owned test files already have `.csproj` entries, so **no
-   `.csproj` edit is required**.
+   `QfcItemController.ViewerSetupTests.cs` at 474 (26 spare), so neither can absorb a test group. New
+   tests are routed per the plan's constraint C2 capacity table, which supersedes the illustrative
+   routing recorded here; the binding requirement is only that no owned test file exceeds 500 lines.
+   The #480 assertion tightening itself is a zero-line, in-place edit to `FocusAndThemeTests.cs:323`
+   and is unaffected by routing. Each relocated test group carries a header comment naming its issue.
+   All five owned test files already have `.csproj` entries, so **no `.csproj` edit is required**.
 
 ### Deterministic timer test for #484 (no `Thread.Sleep`, no `Task.Delay`)
 
@@ -650,10 +660,15 @@ null `out` values, since the logger is a static field and is not seam-injected.
 
 - Repository-wide line coverage must remain `>= 80%`; new members must reach `>= 90%`; no reduction in
   coverage for changed lines.
-- Every added production member is fully coverable **except** the two-statement lambda adapter inside
-  `InitializeWebViewAsync`, which retains its pre-existing `[ExcludeFromCodeCoverage]`
+- Every added production member is fully coverable **except** the three carve-outs below, which are the
+  complete set and are restated in the acceptance criterion under "File-size, toolchain, and coverage":
+  (a) the two capture-field assignments and the two-statement lambda adapter added inside the
+  pre-existing `[ExcludeFromCodeCoverage]` `InitializeWebViewAsync`, which retains that attribute
   (`ViewerSetup.cs:41`) and its documented residual barrier (the `.CoreWebView2` property is null without
-  a live WebView2 runtime).
+  a live WebView2 runtime); (b) `DetachWebResourceRequestedHandler`, whose guarded `-=` statement is
+  unreachable for that same reason, so the member is partially rather than fully covered; and (c) the
+  default `MoveFailureNotifier` delegate `text => MessageBox.Show(text)`, whose body the headless
+  unit-test policy forbids executing because invoking it opens a modal dialog.
 - **No new `[ExcludeFromCodeCoverage]` attribute is introduced anywhere by this feature.**
 - `coverage.config` at repository root excludes only third-party modules; `QuickFiler` is not
   assembly-excluded, so exemption remains per-member.
@@ -723,7 +738,8 @@ regression test. The one exception is verified by source inspection and is recor
 - [ ] `internal void UnwireEvents()`, `internal void UnwireControlTreeEvents()`, and
       `internal void UnwireIntentEvents()` exist in
       `QuickFiler/Controllers/QfcItemController.EventWiring.cs`, with `UnwireEvents()` calling
-      `UnwireControlTreeEvents()` then `UnwireIntentEvents()`, mirroring `WireEvents()`.
+      `UnwireControlTreeEvents()` then `UnwireIntentEvents()`, mirroring `WireEvents()`, and
+      `UnwireEvents()` additionally calls `DetachWebResourceRequestedHandler()` as its third statement.
 - [ ] All 16 intent subscriptions made by `WireIntentEvents()` are detached by `UnwireIntentEvents()`,
       verified by `Mock<IItemViewer>.VerifyRemove` assertions.
 - [ ] All 6 control-tree subscriptions made by `WireControlTreeEvents()` are detached by
@@ -736,7 +752,8 @@ regression test. The one exception is verified by source inspection and is recor
       `_kbdHandler = null` (`:420`).
 - [ ] `UnwireIntentEvents()` returns early when `_itemViewer` is null and guards the `FolderKeyDown`
       detach against a null `_kbdHandler`; `UnwireControlTreeEvents()` returns early when `_itemViewer`
-      is not a concrete `ItemViewer` and guards the `Buttons` and `MenuItems` loops against null.
+      is not a concrete `ItemViewer`, skips the `ForAllControls` keyboard-detach walk when `_kbdHandler`
+      is null, and guards the `Buttons` and `MenuItems` loops against null.
 - [ ] A regression test asserts that `Cleanup()` does not throw on a controller whose `_kbdHandler` and
       `Buttons` are null and whose `_itemViewer` is a plain `Mock<IItemViewer>`.
 - [ ] The two pre-existing `Cleanup()` tests
@@ -840,11 +857,18 @@ regression test. The one exception is verified by source inspection and is recor
 - [ ] Repository-wide line coverage is `>= 80%`, and coverage for the changed lines is not reduced
       relative to the Phase 0 baseline.
 - [ ] Each new production member added by this feature reaches `>= 90%` line coverage, except the
-      two-statement lambda adapter inside the pre-existing `[ExcludeFromCodeCoverage]`
-      `InitializeWebViewAsync`, and except `DetachWebResourceRequestedHandler`, whose guarded `-=` statement is
-      unreachable without a live WebView2 runtime per research section 2.4, so its measured
-      per-method line rate is non-zero but below that figure for that reason alone, as verified by
-      the fail-before exception dossier.
+      two capture-field assignments and the two-statement lambda adapter added inside the pre-existing
+      `[ExcludeFromCodeCoverage]` `InitializeWebViewAsync`; except `DetachWebResourceRequestedHandler`,
+      whose guarded `-=` statement is unreachable without a live WebView2 runtime per research
+      section 2.4, so its measured per-method line rate is non-zero but below that figure for that
+      reason alone, as verified by the fail-before exception dossier; and except the default
+      `MoveFailureNotifier` delegate
+      `text => MessageBox.Show(text)`, whose body cannot be executed under the headless unit-test
+      policy because invoking it opens a modal dialog, and which every `MoveMailAsync` failure-path
+      test replaces with an injected notifier, so its measured line rate is zero. That statement is
+      the relocation of the pre-existing uncovered `MessageBox.Show` call at
+      `QfcItemController.MailActions.cs:119-121`, so no changed line loses coverage relative to the
+      Phase 0 baseline.
 - [ ] No new `[ExcludeFromCodeCoverage]` attribute is introduced anywhere by this feature.
 - [ ] For each of the five issues, evidence records the regression test failing against the unfixed code
       before the corresponding production change, per the CLAUDE.md Bugfix Workflow.
@@ -857,8 +881,10 @@ regression test. The one exception is verified by source inspection and is recor
 
 `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs` is **430 of 500 lines (70 spare)**. This
 feature adds the `TryResolveCidResource` extraction (roughly 28 lines including its doc comment), two
-capture fields (roughly 4 lines), and the `Cleanup()` changes (roughly 6 lines) — about 40 lines, leaving
-under 30 spare. `QuickFiler/Controllers/QfcItemController.EventWiring.cs` is **391 of 500 (109 spare)**
+capture fields (roughly 4 lines), the `DetachWebResourceRequestedHandler` method (roughly 12 lines), and
+the `Cleanup()` changes (roughly 6 lines), net of roughly 11 lines removed by reducing the
+`WebResourceRequested` lambda to an adapter — about 40 lines net, leaving about 30 spare.
+`QuickFiler/Controllers/QfcItemController.EventWiring.cs` is **391 of 500 (109 spare)**
 and must absorb three unwire methods with their guards.
 
 **Impact if breached.** Adding a new partial file (for example `QfcItemController.Teardown.cs`) would
@@ -875,8 +901,9 @@ every production edit, not only at the end.
 `QfcItemController.FocusAndThemeTests.cs` is at **497 of 500 lines (3 spare)** and
 `QfcItemController.ViewerSetupTests.cs` at **474 (26 spare)**.
 
-**Mitigation.** Route new #480 tests to `EventWiringTests.cs` (126 spare) and #484 T2 plus all #485 tests
-to `MailActionsTests.cs` (316 spare), each with a header comment naming the issue. The #480 assertion
+**Mitigation.** New tests are routed per the plan's constraint C2 capacity table, which supersedes the
+illustrative routing recorded here; the binding requirement is only that no owned test file exceeds 500
+lines. Each relocated test group carries a header comment naming its issue. The #480 assertion
 tightening is a zero-line in-place edit. Do not delete the `EnableHandlelessThemeInvoke` helper
 (`FocusAndThemeTests.cs:136-158` and following) to make room — it is load-bearing for four other tests.
 Do not create a `.Part2.cs` test file; that would require a `.csproj` edit.
