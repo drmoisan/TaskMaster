@@ -856,8 +856,9 @@ increase attributable to this feature's `QfcCollectionController.cs` changes;
 
 **Constraints.**
 
-- No production or test file **added** by this feature may exceed **500 lines**, and no
-  pre-existing file changed by this feature may grow beyond its Phase 0 baseline line count
+- No production or test file **added** by this feature may exceed **500 lines**, and every
+  pre-existing file changed by this feature must be either at or below **500 lines** or no larger
+  than its Phase 0 baseline line count
   (`.claude/rules/general-code-change.md`). `QuickFiler/Controllers/QfcCollectionController.cs`
   already exceeds the cap for pre-existing reasons (2349 lines at `988e819b`; roughly 2120-2180
   after #468 deletes `WireUpKeyboardHandler`). That excess is out of scope here: this feature
@@ -1147,7 +1148,7 @@ verbatim.
 
 ### File-size, toolchain, and coverage
 
-- [ ] No production or test file **added** by this feature exceeds **500 lines**, and no pre-existing file changed by this feature grows beyond its Phase 0 baseline line count (`.claude/rules/general-code-change.md`). `QuickFiler/Controllers/QfcCollectionController.cs` exceeds the cap for pre-existing reasons recorded in the atomic plan decision `D-P6` and in the #468 spec; this feature neither creates nor is permitted to remediate that excess. Verified by a line count of every file in the branch diff against the Phase 0 baseline.
+- [ ] No production or test file **added** by this feature exceeds **500 lines**, and every pre-existing file changed by this feature is either at or below **500 lines** or no larger than its Phase 0 baseline line count (`.claude/rules/general-code-change.md`). `QuickFiler/Controllers/QfcCollectionController.cs` exceeds the cap for pre-existing reasons recorded in the atomic plan decision `D-P6` and in the #468 spec; this feature neither creates nor is permitted to remediate that excess. Verified by a line count of every file in the branch diff against the Phase 0 baseline.
 - [ ] `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs` is unchanged by this feature: its line count and its `[TestMethod]` count are identical to the branch head, and the path is absent from the branch diff.
 - [ ] `dotnet tool run csharpier check .` reports zero unformatted files in the final toolchain pass.
 - [ ] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` completes with zero errors and no new analyzer warnings in the final pass.
@@ -1156,7 +1157,7 @@ verbatim.
 - [ ] All four toolchain steps passed in a single final pass with no step auto-fixing files, and the commands actually run are stated in the completion report.
 - [ ] `SyncExpandedRegistrations` reaches `>= 90%` line coverage as a new member (`CLAUDE.md` §UT2). Verified from the coverage report produced by the final `vstest.console.exe` run.
 - [ ] The new duplicate-guard branch in `QuickFiler/Controllers/KbdActions.cs` is covered on **both** the throwing and non-throwing paths. Verified from the same coverage report.
-- [ ] A Phase 0 coverage baseline was captured and recorded in `docs/features/active/quickfiler-keyboard-action-defects-444/evidence/coverage/`, and the final coverage figure shows **no regression** against that baseline in repo-wide line coverage, repo-wide branch coverage, or coverage of the lines this feature changed (`.claude/rules/general-unit-test.md`, `.claude/rules/quality-tiers.md`: line `>= 85%`, branch `>= 75%`, no regression on changed lines).
+- [ ] A Phase 0 coverage baseline was captured and recorded in `docs/features/active/quickfiler-keyboard-action-defects-444/evidence/baseline/`, and the final coverage figure shows **no regression** against that baseline in repo-wide line coverage, repo-wide branch coverage, or coverage of the lines this feature changed (`.claude/rules/general-unit-test.md`, `.claude/rules/quality-tiers.md`: line `>= 85%`, branch `>= 75%`, no regression on changed lines).
 - [ ] The coverage-policy conflict between `CLAUDE.md` §UT2 (`>= 80%` / `>= 90%`) and `.claude/rules/general-unit-test.md` plus `.claude/rules/quality-tiers.md` (`>= 85%` line / `>= 75%` branch) is recorded in the completion report as pre-existing and unresolved, not silently resolved.
 - [ ] No acceptance condition in the atomic plan claims a coverage increase attributable to changes in `QuickFiler/Controllers/QfcCollectionController.cs`, which carries `[ExcludeFromCodeCoverage]` at `:21` and is therefore outside every coverage denominator (`.claude/rules/plan-acceptance-gates.md`).
 - [ ] All evidence artifacts produced by this feature are written under `docs/features/active/quickfiler-keyboard-action-defects-444/evidence/<kind>/` per `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, and the working tree is clean at completion.
