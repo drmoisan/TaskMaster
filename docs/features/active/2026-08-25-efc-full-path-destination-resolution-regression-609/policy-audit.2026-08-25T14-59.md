@@ -1,6 +1,6 @@
 # Policy Compliance Audit: Efc full-path destination resolution regression (#609)
 
-**Audit Date:** 2026-08-25  
+**Audit Date:** 2026-08-25
 **Code Under Test:** `UtilitiesCS/OutlookObjects/Folder/FolderPredictor.cs`; `UtilitiesCS.Test/OutlookObjects/Folder/FolderPredictorTests.cs`; compatibility tests in `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` and `UtilitiesCS.Test/EmailIntelligence/EmailFilerConfig_Tests.cs`.
 
 | Language | Files Changed | Tests | Test Result | Baseline Coverage | Post-Change Coverage | New Code Coverage |
@@ -136,5 +136,5 @@ pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot .
 & 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe' UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /TestCaseFilter:"FullyQualifiedName~Issue609_FolderPredictor" /InIsolation
 ```
 
-**Audit Completed By:** feature-reviewer-c3  
+**Audit Completed By:** feature-reviewer-c3
 **Policy Version:** Current as of 2026-08-25

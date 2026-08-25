@@ -1,11 +1,11 @@
 # Code Review: Efc full-path destination resolution regression (#609)
 
-**Review Date:** 2026-08-25  
-**Reviewer:** feature-reviewer-c3  
-**Feature Folder:** `docs/features/active/2026-08-25-efc-full-path-destination-resolution-regression-609`  
-**Feature Folder Selection Rule:** Refreshed canonical PR context enumerates this active #609 folder and its `issue.md`/`spec.md`; no competing active folder is in scope.  
-**Base Branch:** `origin/main` at `507a40a549d573b221da0fb59c3e18af5ce8d473`  
-**Head Branch:** `bug/efc-full-path-destination-resolution-regression-609` at `67db82a928e6b0c023ed16bf42ca48e526f07a0e`  
+**Review Date:** 2026-08-25
+**Reviewer:** feature-reviewer-c3
+**Feature Folder:** `docs/features/active/2026-08-25-efc-full-path-destination-resolution-regression-609`
+**Feature Folder Selection Rule:** Refreshed canonical PR context enumerates this active #609 folder and its `issue.md`/`spec.md`; no competing active folder is in scope.
+**Base Branch:** `origin/main` at `507a40a549d573b221da0fb59c3e18af5ce8d473`
+**Head Branch:** `bug/efc-full-path-destination-resolution-regression-609` at `67db82a928e6b0c023ed16bf42ca48e526f07a0e`
 **Review Type:** Final post-remediation re-review
 
 ## Executive Summary

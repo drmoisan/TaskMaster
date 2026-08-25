@@ -1,10 +1,10 @@
 # Feature Audit: Efc full-path destination resolution regression (#609)
 
-**Audit Date:** 2026-08-25  
-**Feature Folder:** `docs/features/active/2026-08-25-efc-full-path-destination-resolution-regression-609`  
-**Base Branch:** `origin/main`  
-**Head Branch:** `bug/efc-full-path-destination-resolution-regression-609` at `67db82a928e6b0c023ed16bf42ca48e526f07a0e`  
-**Work Mode:** `full-bug`  
+**Audit Date:** 2026-08-25
+**Feature Folder:** `docs/features/active/2026-08-25-efc-full-path-destination-resolution-regression-609`
+**Base Branch:** `origin/main`
+**Head Branch:** `bug/efc-full-path-destination-resolution-regression-609` at `67db82a928e6b0c023ed16bf42ca48e526f07a0e`
+**Work Mode:** `full-bug`
 **Audit Type:** Final post-remediation acceptance verification
 
 ## Scope and Baseline
