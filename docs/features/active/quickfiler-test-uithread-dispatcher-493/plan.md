@@ -87,12 +87,29 @@ not exercised, and AC-7 gates it).
    `quickfiler-test-run-baseline`, and `quickfiler-test-coverage-baseline`. Every later task that
    depends on one of those values **cites the artifact** and compares against it. No later task
    restates a literal value, and no later task restates the comparison in different words.
+
+   One quantity is deliberately outside Phase 0 and is named here so the exception is not read as a
+   lapse: `AddedLineCount:`, the tolerance band `P3-T6` applies to the coverage denominator, is a
+   property of the post-change tree and cannot exist in Phase 0, since two of its four inputs are
+   files Phase 1 creates. `P3-T6` establishes it, records it in
+   `quickfiler-test-coverage.<TS>.md`, and is the only task that does so; `P4-T3` re-measures line
+   counts for a different purpose (the 500-line ceiling) and does not restate or consume it.
 2. **The unowned-file diagnostic comparison is stated exactly once, in `P4-T2`.** No other task in
    this plan states any condition — absolute or relative — about diagnostics naming
    `QuickFiler.Test/Controllers/QfcItemController.FocusAndThemeTests.cs` or
    `UtilitiesCS/Threading/UiThread.cs`. This plan never asserts an absolute diagnostic count for a
    file it does not create or own: `P4-T2` asserts set equality against the Phase 0 baseline, and
    `P5-T6` cites `P4-T2` rather than re-deriving it.
+
+   This is a disclosed reading of spec **AC-6**, not a silent substitution. AC-6's final sentence
+   reads "No analyzer diagnostic is raised at either call site under toolchain steps 2 and 3",
+   which is an absolute. This plan discharges it as **non-regression** against the Phase 0
+   baseline: if `unowned-file-diagnostics-baseline` is empty, set equality against it is exactly
+   the absolute AC-6 states; if it is non-empty, the pre-existing diagnostics belong to the
+   sibling-owned file and this feature can neither introduce nor remove them, so the strongest
+   claim it can honestly gate is that it added none. `P5-T6` therefore checks AC-6 off on the
+   non-regression result, and the executor records the baseline count in the `P5-T6` artifact so a
+   reviewer can see which of the two cases held.
 3. **Every field this plan instructs the executor to declare carries a stated initializer**, or is
    named as definitely assigned in a stated constructor. The declarations are written out verbatim
    in § Fixture Contract. `/p:TreatWarningsAsErrors=true` promotes `CS0649` and `CS0169` to build
@@ -178,10 +195,16 @@ not exercised, and AC-7 gates it).
   repository-wide coverage floor. `P0-T13` and `P3-T6` record numeric coverage; `P3-T6` gates only
   that the package-level line rate has not regressed beyond measurement noise.
 
-  This is a disclosed deviation, not an omission. `.claude/rules/csharp.md` § Testing Standards
-  states a repository-wide line-coverage floor of 80%, a 90% floor for any new module, class, or
-  method, and that a coverage regression on changed lines is a blocking finding. None of the three
-  is asserted as an acceptance condition here. The ratifying authority is
+  This is a disclosed deviation, not an omission. Three in-scope rule files state a coverage floor,
+  and this plan asserts none of them:
+  `.claude/rules/csharp.md` § Testing Standards states a repository-wide line-coverage floor of
+  80%, a 90% floor for any new module, class, or method, and that a coverage regression on changed
+  lines is a blocking finding; `.claude/rules/general-unit-test.md` § Coverage Requirements states
+  a line floor of >= 85% and a branch floor of >= 75% across all tiers; and
+  `.claude/rules/quality-tiers.md` § Uniform-vs-Tier-Dependent Gate Matrix restates the same
+  85%/75% pair as uniform across T1-T4. All three are named rather than one, because a disclosure
+  that cites the least demanding of the three would understate what is being set aside. The
+  ratifying authority is
   `<FEATURE>/spec.md` § Test Strategy, which records that this is a test-only change with no
   production line in the diff, that the new fixture is test infrastructure sitting inside the
   test-file exclusion, and that consequently there is no production coverage delta to defend. A
@@ -202,6 +225,25 @@ not exercised, and AC-7 gates it).
   restart-on-failure rule — gating on it unconditionally would produce a loop with no exit. `P3-T6`
   accordingly records `lines-valid` for both runs and gates the rate only when the denominators are
   comparable.
+
+- **D6 — the two new test files are placed beside their siblings, not under a `tests/` tree.**
+  `.claude/rules/general-unit-test.md` § Test File Location requires test files to live in a
+  `tests/` directory tree mirroring the production source, and states that colocation is not
+  permitted. This plan places both new files in `QuickFiler.Test/Controllers/`. The deviation is
+  disclosed here rather than left implicit, and it rests on three points. First, `CLAUDE.md` is
+  first in the reading order of `.claude/skills/policy-compliance-order/SKILL.md`, and its embedded
+  § C# Unit Test Policy specifies framework, mocking library, and assertion library but imposes no
+  location requirement, so the `tests/` requirement is not restated by the higher-precedence
+  document. Second, the repository's `tests/` tree exists but holds no C# whatever — its only child
+  is `tests/scripts/`, which carries Pester suites — while every C# test in the solution lives in a
+  sibling `<Assembly>.Test` project (`QuickFiler.Test`, `UtilitiesCS.Test`, `TaskMaster.Test`, and
+  six more). A conforming placement would therefore put these two files in a directory that no
+  `<Compile Include>` reaches and no test assembly builds; the change would not compile, let alone
+  run. Third, `<FEATURE>/spec.md` § Test Strategy and § Scope name
+  both paths explicitly, and § Scope Lock binds this plan to them. A reviewer should read the
+  placement as conformance to the repository's established C# layout rather than as an unnoticed
+  rule violation. Relocating the C# suite is out of scope for a test-isolation bug fix and is not
+  attempted here.
 
 ---
 
@@ -231,7 +273,7 @@ not exercised, and AC-7 gates it).
 
 - [ ] [P0-T12] Capture the **single source of truth** for the `QuickFiler.Test` pass/fail set, using the Debug output left in `QuickFiler.Test\bin\Debug` by the Phase 0 msbuild steps — that is, the output of `P0-T9`, which is the most recent `/t:Rebuild` at this point and which overwrote `P0-T8`'s output from the same sources: run `& $VSTEST QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCoverage /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook" /Logger:"trx;LogFileName=quickfiler-test-baseline.trx" /ResultsDirectory:TestResults\plan-logs\p0-t12`. Write `<FEATURE>/evidence/baseline/quickfiler-test-run-baseline.<TS>.md`. **Acceptance:** the artifact records `EXIT_CODE:`, the integer total, passed, failed, and skipped counts parsed from the run summary, and — under a heading `BaselineFailedTests` — the fully-qualified name of every failed test, one per line, with the explicit note that an empty list is a legitimate recorded value. This artifact is the only baseline for the comparison in `P3-T5`.
 
-- [ ] [P0-T13] Capture the **single source of truth** for coverage. Create `TestResults/plan-logs/p0-t13`, then run `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot QuickFiler.Test -Configuration Debug -CoverageOutput TestResults\plan-logs\p0-t13\coverage-baseline.cobertura.xml` from `WS`. Write `<FEATURE>/evidence/baseline/quickfiler-test-coverage-baseline.<TS>.md`. **Acceptance:** the artifact records `EXIT_CODE:` as observed; records, under a heading `CoverageBaselineFailedTests`, the fully-qualified name of every failed test, one per line, with the explicit note that an empty list is a legitimate recorded value; records in `Output Summary:` the numeric `line-rate`, `branch-rate`, and `lines-valid` attribute values read from the root `coverage` element of the emitted Cobertura file; and records the discovered test-assembly list, which must be exactly the single path `QuickFiler.Test\bin\Debug\QuickFiler.Test.dll`. Do **not** assert `EXIT_CODE: 0` here: `scripts/vscode/Invoke-MSTestWithCoverage.ps1` contains `if ($coverageExitCode -ne 0) { throw ... }`, so a non-zero exit means some test anywhere in the search root failed, including tests in files this plan does not own — the same possibility `P0-T12` is written to accommodate. When the script throws, the Cobertura file still exists at the requested `-CoverageOutput` path, so the three root attributes are read from it regardless. Additionally record `CoberturaPostProcessed:` as `true` when this task's `EXIT_CODE:` is `0` and `false` otherwise. That field is load-bearing and is not a convenience: `scripts/vscode/Invoke-MSTestWithCoverage.ps1` throws at its coverage-exit check **before** it calls `ConvertTo-KoverageCoberturaXml`, and that function is the step which removes third-party `<package>` elements and then rewrites the root `line-rate`, `branch-rate`, `lines-covered`, and `lines-valid` attributes from the surviving packages. A thrown run therefore leaves the raw all-modules-instrumented totals on the root element, while a clean run leaves recomputed first-party totals there. The two are different quantities, not two noisy samples of one quantity, so a triple recorded under one value of `CoberturaPostProcessed:` may not be compared against a triple recorded under the other. This artifact is the only baseline for the comparison in `P3-T6`.
+- [ ] [P0-T13] Capture the **single source of truth** for coverage. Create `TestResults/plan-logs/p0-t13`, then run `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot QuickFiler.Test -Configuration Debug -CoverageOutput TestResults\plan-logs\p0-t13\coverage-baseline.cobertura.xml` from `WS`. Write `<FEATURE>/evidence/baseline/quickfiler-test-coverage-baseline.<TS>.md`. **Acceptance:** the artifact records `EXIT_CODE:` as observed; records, under a heading `CoverageBaselineFailedTests`, the name of every failed test **exactly as the run's own console output spells it**, one per line, with the explicit note that an empty list is a legitimate recorded value; records in `Output Summary:` the numeric `line-rate`, `branch-rate`, and `lines-valid` attribute values read from the root `coverage` element of the emitted Cobertura file; and records the discovered test-assembly list, which must be exactly the single path `QuickFiler.Test\bin\Debug\QuickFiler.Test.dll`. The name form is the console spelling and not a fully-qualified name on purpose: `Get-DotnetCoverageArgumentList` (`scripts/vscode/Invoke-MSTestWithCoverage.ps1:70-76`) appends only `/Settings:`, `/InIsolation`, and `/TestCaseFilter:` to the inner `vstest.console` invocation and supplies **no** `/Logger:trx`, so no TRX is produced and no fully-qualified name is available from this pipeline. Requiring one here would be an acceptance no executor could satisfy. The comparison in `P3-T6` is a set comparison against this artifact, and `P3-T6` runs the identical command, so both sides carry the same spelling and the comparison remains exact; this differs from `P0-T12`/`P3-T5`, which do pass `/Logger:trx` and therefore do record fully-qualified names. Do **not** assert `EXIT_CODE: 0` here. `scripts/vscode/Invoke-MSTestWithCoverage.ps1` contains `if ($coverageExitCode -ne 0) { throw ... }`, so a non-zero exit may mean some test anywhere in the search root failed, including tests in files this plan does not own — the same possibility `P0-T12` is written to accommodate. That is not the only non-zero path: `Assert-CoberturaLineCoverageThreshold` (`scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1:487-490`) throws when the post-processed root `line-rate` is below 80%, so a run in which **every** test passed can still exit non-zero. That outcome is a live possibility rather than an anomaly here — see § Decisions Record D5, which records two measured runs of this same script on one unchanged tree landing on opposite sides of that threshold, at 47.16% and 81.02% — and it is why `CoverageBaselineFailedTests` may legitimately be empty on a non-zero exit. When the script throws on either path, the Cobertura file still exists at the requested `-CoverageOutput` path, so the three root attributes are read from it regardless. Additionally record `CoberturaPostProcessed:` as `true` when this task's `EXIT_CODE:` is `0` and `false` otherwise. That field is load-bearing and is not a convenience. `ConvertTo-KoverageCoberturaXml` is the step which removes third-party `<package>` elements and then rewrites the root `line-rate`, `branch-rate`, `lines-covered`, and `lines-valid` attributes from the surviving packages, and the rewritten document reaches disk only at the `Set-Content` call that follows it (`scripts/vscode/Invoke-MSTestWithCoverage.ps1:339-343`). Neither of the two throwing paths reaches that write: the coverage-exit check throws **before** `ConvertTo-KoverageCoberturaXml` is called at all, and the 80% threshold check throws **after** it but **before** `Set-Content`, discarding the recomputed document in memory. A run that exits non-zero for either reason therefore leaves the raw all-modules-instrumented totals on the root element of the file on disk, while a clean run leaves recomputed first-party totals there. The `EXIT_CODE: 0` test is consequently an exact test for which of the two quantities the file carries, not an approximation of one. The two are different quantities, not two noisy samples of one quantity, so a triple recorded under one value of `CoberturaPostProcessed:` may not be compared against a triple recorded under the other. This artifact is the only baseline for the comparison in `P3-T6`.
 
 - [ ] [P0-T14] Capture part 1 of the AC-10 fail-before evidence: copy the verbatim pre-change body of `EnsureUiThreadDispatcher` from `QuickFiler.Test/Controllers/QfcItemController.TestSupport.cs` lines 238-249 into `<FEATURE>/evidence/regression-testing/fail-before-exception.<TS>.md`, together with a statement of why a red *test run* cannot exist for this defect: the helper returns `void` at the base branch, so the regression tests cannot compile against it, per spec § Test Strategy "Fail-before evidence". The filename stem is `fail-before-exception` and not any other spelling, because `.claude/skills/evidence-and-timestamp-conventions/SKILL.md` names `fail-before-exception.*.md` as the minimum search pattern a reviewer must use before writing a negative claim that no fail-before evidence exists; a differently-named artifact would be invisible to that search. **Acceptance:** the artifact quotes those twelve source lines verbatim inside a fenced `csharp` block, carries a `WhyFailingRunImpossible:` field of one to three sentences, and names `P1-T4` as the task that supplies the compile-level half of the demonstration.
 
@@ -243,7 +285,7 @@ not exercised, and AC-7 gates it).
 
 - [ ] [P1-T2] Add exactly two `<Compile Include>` entries to `QuickFiler.Test/QuickFiler.Test.csproj`, immediately after the existing entry for `Controllers\QfcItemController.TestSupport.cs`, in this order: `QfcItemController.UiThreadDispatcherFixture.cs` then `QfcItemController.UiThreadDispatcherFixtureTests.cs`. Change nothing else in the file. **Acceptance:** let `L` be the 1-based number of the single line of that csproj containing the simple string `QfcItemController.TestSupport.cs`; line `L+1` contains the simple string `QfcItemController.UiThreadDispatcherFixture.cs` and line `L+2` contains the simple string `QfcItemController.UiThreadDispatcherFixtureTests.cs`. The artifact `<FEATURE>/evidence/other/csproj-compile-entries.<TS>.md` records those three line numbers with the three matched lines quoted.
 
-- [ ] [P1-T3] Create `QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs` in namespace `QuickFiler.Controllers.Tests`, hosting `[TestClass] public class QfcItemController_UiThreadDispatcherFixtureTests` with `private const int GateTimeoutMs = 60000;` and the six tests R1-R6 specified in § Regression Tests below. Every test method carries the attribute `[Timeout(GateTimeoutMs)]` on its own line. Use MSTest attributes and FluentAssertions assertions only; use `ManualResetEventSlim` or awaited `Task` completion for all cross-thread coordination; introduce no `Thread.Sleep`, no `Task.Delay`, no wall-clock wait, and no temporary file. **Acceptance:** the file exists at that path, `Select-String -SimpleMatch -Pattern '[TestMethod]'` against it returns exactly six matches, and `Select-String -SimpleMatch -Pattern '[Timeout(GateTimeoutMs)]'` against it returns exactly six matches; both counts are recorded in `<FEATURE>/evidence/other/regression-tests-created.<TS>.md`.
+- [ ] [P1-T3] Create `QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs` in namespace `QuickFiler.Controllers.Tests`, hosting `[TestClass] public class QfcItemController_UiThreadDispatcherFixtureTests` with `private const int GateTimeoutMs = 60000;` and the six tests R1-R6 specified in § Regression Tests below. Every test method carries the attribute `[Timeout(GateTimeoutMs)]` on its own line. Use MSTest attributes and FluentAssertions assertions only; use `ManualResetEventSlim` or awaited `Task` completion for all cross-thread coordination; introduce no `Thread.Sleep`, no `Task.Delay`, no wall-clock wait, and no temporary file. Give the test class an XML doc comment that names R1 as the primary deterministic regression assertion and R4 as the supporting probabilistic one, as § Regression Tests requires and as spec AC-3 gates. **Acceptance:** the file exists at that path, `Select-String -SimpleMatch -Pattern '[TestMethod]'` against it returns exactly six matches, and `Select-String -SimpleMatch -Pattern '[Timeout(GateTimeoutMs)]'` against it returns exactly six matches; both counts are recorded in `<FEATURE>/evidence/other/regression-tests-created.<TS>.md`, together with the class-level doc sentence quoted verbatim from the file under the field `PrimaryAssertionDoc:`. That quotation is recorded rather than searched for because the sentence is prose that CSharpier may rewrap across lines, which would make a line-oriented search return zero matches whatever the executor wrote.
 
 - [ ] [P1-T4] `[expect-fail]` Capture part 2 of the AC-10 fail-before evidence. With the fixture and the regression tests in place but `QfcItemControllerTestSupport.EnsureUiThreadDispatcher` still declared `void`, run `& $MSBUILD TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` with output redirected to `TestResults/plan-logs/p1-t4/msbuild-failbefore.log`. Write `<FEATURE>/evidence/regression-testing/fail-before-compile.<TS>.md`. **Acceptance:** the artifact records `ExpectedExitCode: 1`, records a non-zero `EXIT_CODE:`, and records `FailBeforeErrorLineCount:` as an integer greater than zero, being the number of lines in that log containing both the simple string `QfcItemController.UiThreadDispatcherFixtureTests.cs` and the simple string `error CS`; at least one such line is quoted verbatim in redacted form.
 
@@ -277,9 +319,9 @@ rewrites a file, restart the phase from `P3-T1`.
 
 - [ ] [P3-T4] Run the type-check gate: `& $MSBUILD TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true` with output redirected to `TestResults/plan-logs/p3-t4/msbuild-nullable.log`. Do not add `/p:Nullable=enable` and do not substitute `/t:Build`. Write `<FEATURE>/evidence/qa-gates/msbuild-nullable.<TS>.md`. **Acceptance:** the artifact records `EXIT_CODE: 0`, records the total warning count and total error count from the msbuild summary, and names the log path `TestResults/plan-logs/p3-t4/msbuild-nullable.log` for consumption by `P4-T2`.
 
-- [ ] [P3-T5] Run the CI-parity test gate: `& $VSTEST QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCoverage /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook" /Logger:"trx;LogFileName=quickfiler-test-final.trx" /ResultsDirectory:TestResults\plan-logs\p3-t5`, with no `/Settings:` argument, matching `.github/workflows/_mstest-coverage.yml`. Write `<FEATURE>/evidence/qa-gates/quickfiler-test-run.<TS>.md`. **Acceptance:** the artifact records `EXIT_CODE:` with the total, passed, failed, and skipped counts; records that the set of fully-qualified failed test names is a subset of the `BaselineFailedTests` set recorded by `P0-T12` in `<FEATURE>/evidence/baseline/quickfiler-test-run-baseline.<TS>.md`; and records that the six R1-R6 names plus `SetThemeDark_FromNormal_SelectsDarkNormalTheme` and `SetThemeLight_FromNormal_SelectsLightNormalTheme` all appear in the passed-test list.
+- [ ] [P3-T5] Run the CI-parity test gate: `& $VSTEST QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCoverage /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook" /Logger:"trx;LogFileName=quickfiler-test-final.trx" /ResultsDirectory:TestResults\plan-logs\p3-t5`, with no `/Settings:` argument, matching `.github/workflows/_mstest-coverage.yml`. Write `<FEATURE>/evidence/qa-gates/quickfiler-test-run.<TS>.md`. **Acceptance:** the artifact records `EXIT_CODE:` with the total, passed, failed, and skipped counts; records that the set of fully-qualified failed test names is a subset of the `BaselineFailedTests` set recorded by `P0-T12` in `<FEATURE>/evidence/baseline/quickfiler-test-run-baseline.<TS>.md`; and records that the six R1-R6 names plus `SetThemeDark_FromNormal_SelectsDarkNormalTheme` and `SetThemeLight_FromNormal_SelectsLightNormalTheme` all appear in the passed-test list. The two theme tests are the plan's **only** absolute pass assertions over a file this feature does not own, and they are stated here for the same reason `P2-T5` states them: spec AC-6 requires precisely that of those two tests by name. Everything else in this task is a baseline comparison. If either theme test is already failing in the `P0-T12` baseline, this feature cannot make it pass and the correct outcome is `BLOCKED: pre-existing failure in a sibling-owned test blocks AC-6`, reported to the orchestrator rather than absorbed by widening the assertion.
 
-- [ ] [P3-T6] Run the coverage gate under the class-level parallelized runsettings, which is also the supplementary evidence spec § Test Strategy asks for because the CI invocation is sequential. Spec § Test Strategy names `TaskMaster.runsettings` for that supplementary run; this task instead uses `scripts/vscode/TaskMaster.cli.runsettings`, which `scripts/vscode/Invoke-MSTestWithCoverage.ps1` resolves unconditionally from its own script directory and which cannot be overridden by a parameter. The substitution is sound and is recorded rather than silently made: both files declare `<Scope>ClassLevel</Scope>`, so the parallelization the spec asks to exercise is identical, and the CLI file additionally omits the Code Coverage `<DataCollector>` so the inner vstest run does not activate a second collector alongside the outer `dotnet-coverage` instrumentation. Create `TestResults/plan-logs/p3-t6`, then run `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot QuickFiler.Test -Configuration Debug -CoverageOutput TestResults\plan-logs\p3-t6\coverage-final.cobertura.xml`. Write `<FEATURE>/evidence/qa-gates/quickfiler-test-coverage.<TS>.md`. **Acceptance:** the artifact records `EXIT_CODE:` as observed and records that the set of fully-qualified failed test names is a subset of the `CoverageBaselineFailedTests` set recorded by `P0-T13` (an absolute `EXIT_CODE: 0` is not asserted here, for the reason stated in `P0-T13`); records in `Output Summary:` the numeric post-change `line-rate`, `branch-rate`, and `lines-valid` from the root `coverage` element; cites the `quickfiler-test-coverage-baseline` artifact produced by `P0-T13`, resolved per § Conventions, for the baseline triple; records `CoberturaPostProcessed:` by the same rule `P0-T13` states (`true` when this task's `EXIT_CODE:` is `0`, `false` otherwise); and gates the line-rate delta as follows. The rate gate runs only when this task's `CoberturaPostProcessed:` equals the value recorded by `P0-T13`; when the two differ, the artifact records `PipelineMismatch: true` and the rate gate is skipped, because the two root-attribute triples were produced by different post-processing paths and are not comparable at all. When they match, and when the post-change `lines-valid` differs from the baseline `lines-valid` by no more than the number of lines this feature's diff adds, the line-rate delta in percentage points must be at least `-0.50`. When they match but `lines-valid` differs by more, the run is recorded as `DenominatorAnomaly: true`. In either the `PipelineMismatch: true` or the `DenominatorAnomaly: true` case the coverage collection is repeated **once** and the second measurement is the one gated by the same rules; a second occurrence of either condition is recorded and reported to the orchestrator rather than retried further. See § Decisions Record D5 for why an unconditional delta gate has no exit under Phase 3's restart rule. Finally, the artifact records `ProductionSourcePathCount: PROVISIONAL — established by P4-T7`, using `P4-T7`'s own field name, because `P4-T7` has not yet run at this point and this task does not establish the value.
+- [ ] [P3-T6] Run the coverage gate under the class-level parallelized runsettings, which is also the supplementary evidence spec § Test Strategy asks for because the CI invocation is sequential. Spec § Test Strategy names `TaskMaster.runsettings` for that supplementary run; this task instead uses `scripts/vscode/TaskMaster.cli.runsettings`, which `scripts/vscode/Invoke-MSTestWithCoverage.ps1` resolves unconditionally from its own script directory and which cannot be overridden by a parameter. The substitution is sound and is recorded rather than silently made: both files declare `<Scope>ClassLevel</Scope>`, so the parallelization the spec asks to exercise is identical, and the CLI file additionally omits the Code Coverage `<DataCollector>` so the inner vstest run does not activate a second collector alongside the outer `dotnet-coverage` instrumentation. Create `TestResults/plan-logs/p3-t6`, then run `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot QuickFiler.Test -Configuration Debug -CoverageOutput TestResults\plan-logs\p3-t6\coverage-final.cobertura.xml`. Write `<FEATURE>/evidence/qa-gates/quickfiler-test-coverage.<TS>.md`. **Acceptance:** the artifact records `EXIT_CODE:` as observed and records that the set of failed test names — in the same console spelling `P0-T13` records, this task running the identical command — is a subset of the `CoverageBaselineFailedTests` set recorded by `P0-T13` (an absolute `EXIT_CODE: 0` is not asserted here, for the reason stated in `P0-T13`); records in `Output Summary:` the numeric post-change `line-rate`, `branch-rate`, and `lines-valid` from the root `coverage` element; cites the `quickfiler-test-coverage-baseline` artifact produced by `P0-T13`, resolved per § Conventions, for the baseline triple; records `CoberturaPostProcessed:` by the same rule `P0-T13` states (`true` when this task's `EXIT_CODE:` is `0`, `false` otherwise); records `AddedLineCount:` as defined in the next paragraph; and gates the line-rate delta as follows. The rate gate runs only when this task's `CoberturaPostProcessed:` equals the value recorded by `P0-T13`; when the two differ, the artifact records `PipelineMismatch: true` and the rate gate is skipped, because the two root-attribute triples were produced by different post-processing paths and are not comparable at all. When they match, and when the post-change `lines-valid` differs from the baseline `lines-valid` by no more than `AddedLineCount:`, the line-rate delta in percentage points must be at least `-0.50`. When they match but `lines-valid` differs by more, the run is recorded as `DenominatorAnomaly: true`. **`AddedLineCount:` is established by this task and by no other**, because no earlier artifact can hold it — `P0-T11` predates the two new files and `P4-T3` runs after this task. This task computes it as the sum of four measurements it takes itself and records in its own artifact: the line count of `QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixture.cs`, plus the line count of `QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs`, plus, for each of `QuickFiler.Test/Controllers/QfcItemController.TestSupport.cs` and `QuickFiler.Test/Controllers/QfcItemController.InitializationTests.Part2.cs`, the greater of zero and (its measured line count minus the line count `P0-T11` recorded for the same path). Every input is available at this point in the plan and none is restated from a projection. The figure is a deliberate over-estimate of the denominator's plausible movement: `ConvertTo-DerivedCoverageSettingsXml` adds the module exclusion `.*\.Test\.dll$` before collection, so every line this feature adds sits in an assembly that is not instrumented and the expected `lines-valid` delta is in fact zero. `AddedLineCount:` is therefore a tolerance band, not a prediction, and a `lines-valid` movement larger than it is by construction attributable to the tool rather than to this diff. In either the `PipelineMismatch: true` or the `DenominatorAnomaly: true` case the coverage collection is repeated **once** and the second measurement is the one gated by the same rules; a second occurrence of either condition is recorded and reported to the orchestrator rather than retried further. See § Decisions Record D5 for why an unconditional delta gate has no exit under Phase 3's restart rule. Finally, the artifact records `ProductionSourcePathCount: PROVISIONAL — established by P4-T7`, using `P4-T7`'s own field name, because `P4-T7` has not yet run at this point and this task does not establish the value.
 
 ---
 
@@ -303,8 +345,11 @@ rewrites a file, restart the phase from `P3-T1`.
 
 ### Phase 5 — Acceptance criteria check-off, follow-ups, and final commit
 
-Each task below verifies one acceptance criterion against evidence already produced, then changes
-that criterion's `- [ ]` to `- [x]` in `<FEATURE>/spec.md`, changing no other text.
+Tasks `P5-T1` through `P5-T10` each verify one acceptance criterion against evidence already
+produced, then change that criterion's `- [ ]` to `- [x]` in `<FEATURE>/spec.md`, changing no other
+text — one task per criterion, AC-1 through AC-10 in order. The remaining three tasks are not
+check-offs and are not governed by the counting rule below: `P5-T11` and `P5-T12` discharge the
+spec's follow-up items, and `P5-T13` commits.
 
 **How the "exactly one further checkbox changed state" condition is measured.** Let `pairs(N)` be
 the number of changed checkbox line pairs reported by
@@ -312,19 +357,21 @@ the number of changed checkbox line pairs reported by
 after task `P5-TN`. That count is cumulative across the phase, because none of these check-offs is
 committed until `P5-T13`. Each task therefore records both `pairs(N)` and the previously recorded
 `pairs(N-1)`, and its acceptance condition is `pairs(N) - pairs(N-1) == 1`. `P5-T1` uses
-`pairs(0) == 0`. This mechanism is stated once here and is not restated in the individual tasks.
+`pairs(0) == 0`. This mechanism is stated once here and is not restated in the individual tasks;
+each of `P5-T1` through `P5-T10` refers to it only by the phrase "exactly one further checkbox in
+`spec.md` changed state".
 
-- [ ] [P5-T1] Verify **AC-1**, restore exists and is idempotent, against the passing results for R2 and R3 in `<FEATURE>/evidence/regression-testing/regression-tests-pass.<TS>.md`, then check AC-1 off in `<FEATURE>/spec.md`. **Acceptance:** the cited artifact records both R2 and R3 as passed, and `pairs(1) - pairs(0) == 1` per the phase preamble, where `pairs(0)` is `0`.
+- [ ] [P5-T1] Verify **AC-1**, restore exists and is idempotent, against the passing results for R2 and R3 in `<FEATURE>/evidence/regression-testing/regression-tests-pass.<TS>.md`, then check AC-1 off in `<FEATURE>/spec.md`. **Acceptance:** the cited artifact records both R2 and R3 as passed, and exactly one further checkbox in `spec.md` changed state.
 
 - [ ] [P5-T2] Verify **AC-2**, concurrent callers cannot interleave install and restore, against the passing results for R1 and R4 in `<FEATURE>/evidence/regression-testing/regression-tests-pass.<TS>.md` and against `<FEATURE>/evidence/other/fixture-created.<TS>.md`, then check AC-2 off in `<FEATURE>/spec.md`. **Acceptance:** the cited artifacts record R1 and R4 as passed and record the fixture file's existence, and exactly one further checkbox in `spec.md` changed state.
 
-- [ ] [P5-T3] Verify **AC-3**, bounded regression tests, against `<FEATURE>/evidence/other/regression-tests-created.<TS>.md` and `<FEATURE>/evidence/regression-testing/regression-tests-pass.<TS>.md`, then check AC-3 off in `<FEATURE>/spec.md`. **Acceptance:** the cited artifacts record the six-attribute count and six passing tests, and exactly one further checkbox in `spec.md` changed state.
+- [ ] [P5-T3] Verify **AC-3**, bounded regression tests, against `<FEATURE>/evidence/other/regression-tests-created.<TS>.md` and `<FEATURE>/evidence/regression-testing/regression-tests-pass.<TS>.md`, then check AC-3 off in `<FEATURE>/spec.md`. **Acceptance:** the cited artifacts record the six-attribute count, six passing tests, and a non-empty `PrimaryAssertionDoc:` field naming R1 as primary and R4 as supporting — AC-3's third clause, which the other two artifacts do not cover — and exactly one further checkbox in `spec.md` changed state.
 
 - [ ] [P5-T4] Verify **AC-4**, the #230 local workaround is removed rather than duplicated, against `<FEATURE>/evidence/qa-gates/duplicate-swap-removal.<TS>.md` and `<FEATURE>/evidence/other/part2-migrated.<TS>.md`, then check AC-4 off in `<FEATURE>/spec.md`. **Acceptance:** the cited artifacts record all three matrix rows holding, and exactly one further checkbox in `spec.md` changed state.
 
 - [ ] [P5-T5] Verify **AC-5**, no `Thread.Sleep`, `Task.Delay`, wall-clock waits, or temporary files, against `<FEATURE>/evidence/qa-gates/determinism-audit.<TS>.md`, then check AC-5 off in `<FEATURE>/spec.md`. **Acceptance:** the cited artifact records zero matches for every audited combination, and exactly one further checkbox in `spec.md` changed state.
 
-- [ ] [P5-T6] Verify **AC-6**, `QfcItemController.FocusAndThemeTests.cs` unmodified and unregressed, by citing three artifacts without restating their conditions: `<FEATURE>/evidence/qa-gates/unowned-file-identity.<TS>.md` for byte-identity, `<FEATURE>/evidence/qa-gates/unowned-file-diagnostics-comparison.<TS>.md` for the comparison established by `P4-T2`, and `<FEATURE>/evidence/qa-gates/quickfiler-test-run.<TS>.md` for the two named theme tests passing. Then check AC-6 off in `<FEATURE>/spec.md`. **Acceptance:** all three cited artifacts exist and record a satisfied result, and exactly one further checkbox in `spec.md` changed state.
+- [ ] [P5-T6] Verify **AC-6**, `QfcItemController.FocusAndThemeTests.cs` unmodified and unregressed, by citing three artifacts without restating their conditions: `<FEATURE>/evidence/qa-gates/unowned-file-identity.<TS>.md` for byte-identity, `<FEATURE>/evidence/qa-gates/unowned-file-diagnostics-comparison.<TS>.md` for the comparison established by `P4-T2`, and `<FEATURE>/evidence/qa-gates/quickfiler-test-run.<TS>.md` for the two named theme tests passing. Then check AC-6 off in `<FEATURE>/spec.md`. **Acceptance:** all three cited artifacts exist and record a satisfied result; the artifact repeats the baseline diagnostic counts `P4-T2` compared against, so a reviewer can see whether AC-6's diagnostic clause held absolutely or as non-regression per § Notes rule 2; and exactly one further checkbox in `spec.md` changed state.
 
 - [ ] [P5-T7] Verify **AC-7**, `UtilitiesCS/Threading/UiThread.cs` unmodified and no production assembly changed, against `<FEATURE>/evidence/qa-gates/scope-lock.<TS>.md` and `<FEATURE>/evidence/qa-gates/unowned-file-identity.<TS>.md`, then check AC-7 off in `<FEATURE>/spec.md`. **Acceptance:** the cited artifacts record the five-path diff with `ProductionSourcePathCount: 0` and the unchanged `UiThread.cs` hash, and exactly one further checkbox in `spec.md` changed state.
 
@@ -346,7 +393,14 @@ committed until `P5-T13`. Each task therefore records both `pairs(N)` and the pr
 
 Namespace `QuickFiler.Controllers.Tests`. Required using directives: `System`,
 `System.Reflection`, `System.Threading`, `System.Threading.Tasks`, `System.Windows.Threading`,
-`FluentAssertions`, `UtilitiesCS.Threading`. The project targets net481
+`FluentAssertions`, and `UtilitiesCS` — the last of these is `UtilitiesCS`, **not**
+`UtilitiesCS.Threading`. The folder name is misleading: `UiThread` is declared in namespace
+`UtilitiesCS` (`UtilitiesCS/Threading/UiThread.cs:15` is `namespace UtilitiesCS`), while
+`UtilitiesCS.Threading` holds `IUiDispatcher` and `WpfUiDispatcher`
+(`UtilitiesCS/Threading/IUiDispatcher.cs:7`), neither of which this file references. Transcribing
+the folder-implied spelling would leave `typeof(UiThread)` unresolved with `CS0246`.
+`QfcItemController.TestSupport.cs` carries both directives today (`:13` and `:14`) only because it
+also uses `IUiDispatcher`; the new fixture file does not. The project targets net481
 (`QuickFiler.Test.csproj:18` is `<TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>`), so
 `init` accessors, `record`, and `record struct` must not be used — no framework in the 4.8.x line
 carries `IsExternalInit`, and this repository defines no polyfill.
@@ -363,11 +417,13 @@ carries `IsExternalInit`, and this repository defines no polyfill.
         private static Dispatcher _parkedDispatcher = null;
 ```
 
-`ResolveDispatcherField()` performs the
+`ResolveDispatcherField()` is declared `private static FieldInfo ResolveDispatcherField()`. It
+performs the
 `typeof(UiThread).GetField("_dispatcher", BindingFlags.NonPublic | BindingFlags.Static)` lookup and
 asserts the result with
 `field.Should().NotBeNull(because: "UiThread._dispatcher backing field must exist")` before
-returning it, preserving the intent of the pre-change assertion.
+returning it, preserving the intent of the pre-change assertion. A static field initializer may
+call a static method declared later in the same type, so its position in the file is free.
 
 **Members.**
 
@@ -398,9 +454,11 @@ returning it, preserving the intent of the pre-change assertion.
 - `private sealed class EnsureScope : IDisposable` with fields
   `private readonly Dispatcher _installed;` and `private bool _disposed = false;`. `_installed` is
   assigned in the single constructor `internal EnsureScope(Dispatcher installed)`, which also
-  assigns `_disposed = false`. `Dispose` returns immediately when `_disposed`; otherwise it sets
-  `_disposed = true` and, only when `_installed` is not `null`, calls
-  `UiThreadDispatcherFixture.CompareExchange(_installed, null)`.
+  assigns `_disposed = false`. Its disposer is declared `public void Dispose()` — the implicit
+  interface implementation of `IDisposable.Dispose` must be `public` even on a `private` nested
+  type, and a narrower accessibility would fail with `CS0737`. `Dispose` returns immediately when
+  `_disposed`; otherwise it sets `_disposed = true` and, only when `_installed` is not `null`,
+  calls `UiThreadDispatcherFixture.CompareExchange(_installed, null)`.
 
 **`internal sealed class UiThreadDispatcherTransaction : IDisposable`** — instance fields
 `private Dispatcher _previous;`, `private Dispatcher _installedValue;`,
@@ -425,6 +483,12 @@ while acquiring or awaiting `TransactionGate`, and nothing inside a `FieldLock` 
 creates a thread, or awaits.
 
 ## Part2 Migration (consumed by P2-T2)
+
+**Every line number in this section is a line number in the file as it stands at `HEAD`**, that is,
+before any edit `P2-T2` makes. They identify the members to change; they are not positions to be
+recomputed as the edits shift the file. `P2-T2` is the only task that edits this file, and
+`P1-T1` through `P1-T4` deliberately leave it untouched, so these numbers are valid at the moment
+`P2-T2` begins and are never invalidated by an earlier task.
 
 - Lines 36-51, the `UiThreadDispatcherGate` field and its doc block, are deleted and replaced by a
   two-to-three line comment stating that the #230 serialization now lives in
@@ -487,8 +551,13 @@ creates a thread, or awaits.
   the stated reason for deleting the other two directives.
 - Every other using directive is left unchanged. In particular `using System.Threading;` is retained
   even though the `SemaphoreSlim` this task deletes came from it, because `CancellationTokenSource`
-  and `CancellationToken` still do; and `using UtilitiesCS.Threading;` is retained even though the
-  `UiThread` reference this task deletes came from it, because `IUiDispatcher` still does.
+  and `CancellationToken` still do. `using UtilitiesCS;` (line 19) is retained even though the
+  `UiThread` reference this task deletes came from **it** — `UiThread` is declared in namespace
+  `UtilitiesCS`, not `UtilitiesCS.Threading`, despite its file path — because `IApplicationGlobals`
+  (used at lines 100, 165, 206, 361, 385, and 403) also comes from `UtilitiesCS` and survives every
+  edit in this task. `using UtilitiesCS.Threading;` (line 23) is likewise retained, because
+  `IUiDispatcher` comes from it. Neither directive becomes dead, so neither is deleted, and the
+  reason each survives is a live consumer rather than an oversight.
 
 ## Regression Tests (consumed by P1-T3)
 
@@ -504,13 +573,21 @@ made under the gate. Live dispatchers come from
 | # | Test name | Shape | Assertion |
 | --- | --- | --- | --- |
 | R1 | `EnsureDispatcher_WhileATransactionHoldsALiveDispatcher_DoesNotReplaceIt` | Begin transaction; capture `original`; `Install(liveA)`; call `QfcItemControllerTestSupport.EnsureUiThreadDispatcher()`; dispose that scope; dispose the transaction. | `Current` is `liveA` after the `Ensure` call and after disposing the `Ensure` scope; `Current` is `original` after disposing the transaction. |
-| R2 | `EnsureDispatcher_WhenTheFieldIsNull_InstallsAndRestoresOnDispose` | Begin transaction; capture `original`; `Install(null)`; `Ensure`; dispose the `Ensure` scope; dispose the transaction. | `Current` is non-null after `Ensure`; `null` after disposing the `Ensure` scope; `original` after disposing the transaction. |
-| R3 | `EnsureDispatcher_ScopeDisposedTwice_IsIdempotent` | R2's shape plus a second `Dispose()` on the `Ensure` scope. | The second `Dispose` does not throw; `Current` is unchanged between the two disposals. |
+| R2 | `EnsureDispatcher_WhenTheFieldIsNull_InstallsAndRestoresOnDispose` | Begin transaction; capture `original`; `Install(null)`; call `QfcItemControllerTestSupport.EnsureUiThreadDispatcher()`; dispose that scope; dispose the transaction. | `Current` is non-null after the `Ensure` call; `null` after disposing the `Ensure` scope; `original` after disposing the transaction. |
+| R3 | `EnsureDispatcher_ScopeDisposedTwice_IsIdempotent` | R2's shape, likewise entered through `QfcItemControllerTestSupport.EnsureUiThreadDispatcher()`, plus a second `Dispose()` on the `Ensure` scope. | The second `Dispose` does not throw; `Current` is unchanged between the two disposals. |
 | R4 | `Transaction_SecondCallerCannotInstallUntilTheFirstRestores` | Transaction A begins on the test thread, captures `original`, installs `liveA`; a `Task.Run` body begins transaction B, records `Current` immediately on acquisition before installing anything, then disposes B; the test thread disposes A and awaits the task. | B's recorded value is `original` and is never `liveA`. |
 | R5 | `Transaction_DisposedTwice_DoesNotOverReleaseTheGate` | Begin a transaction, `Install(liveA)`, dispose it, dispose it again, then complete one further `BeginTransactionAsync()` and `Dispose()` round trip. | The second `Dispose` does not throw, so no `SemaphoreFullException` occurs, and the subsequent round trip completes within the `[Timeout]`. |
 | R6 | `Install_CalledTwiceOnTheSameTransaction_ThrowsInvalidOperationException` | Begin a transaction; `Install(null)`; call `Install(liveA)` a second time; dispose in `finally`. | The second `Install` throws `InvalidOperationException`. |
 
+R1, R2, and R3 enter through `QfcItemControllerTestSupport.EnsureUiThreadDispatcher()` rather than
+through `UiThreadDispatcherFixture.EnsureDispatcher()` directly. This is required, not stylistic:
+spec § Test Strategy "Fail-before evidence" rests on R1 and R2 being unable to compile against the
+base branch, which is true only of the wrapper, whose return type is `void` at `HEAD`. Entering
+through the fixture would compile at `HEAD` and would silently void the premise `P0-T14` and
+`P1-T4` record. R3 follows R2's shape for the same reason.
+
 R1 is documented in the test file's own XML comment as the primary deterministic regression
 assertion and R4 as the supporting one, matching spec § Test Strategy "Honest limitation of R4":
 under a broken implementation R4 fails only probabilistically, whereas R1 proves the clobber is
-unreachable with no concurrency at all.
+unreachable with no concurrency at all. That documentation is an acceptance criterion in its own
+right (spec AC-3 requires it), so `P1-T3` records the sentence and `P5-T3` verifies the record.
