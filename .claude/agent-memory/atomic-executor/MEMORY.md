@@ -1,6 +1,7 @@
 # Atomic Executor Memory Index
 
 ## Plan validation & gates
+- [Confirmatory preflight: proportionate bar](feedback_confirmatory_preflight_proportionate_bar.md) — over a small delta to an already-cleared plan, an INCOMPLETE enumeration is an observation, not a blocker; plus the cheap mechanical diff checks
 - [Directory-scoped format breaks ownership gates](project_directory_scoped_format_breaks_ownership_gates.md) — a scoped csharpier pass naming DIRECTORIES rewrites must-not-write files the same plan asserts are unmodified; require file paths
 - [Supersede clause leaves a hard routing residual](project_supersede_clause_leaves_hard_routing_residual.md) — a "the plan's table supersedes this" clause does not neutralise a THIRD location naming a concrete file; re-derive the arithmetic of obeying it
 - [Verify line citations with numbered output](feedback_verify_line_citations_with_numbered_output.md) — never hand-count from a `sed` window; a wrong #438 advisory got applied and corrupted 3 correct citations in plan + spec
