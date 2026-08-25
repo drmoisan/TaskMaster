@@ -867,7 +867,7 @@ increase attributable to this feature's `QfcCollectionController.cs` changes;
   decision `D-P6`.
 - `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs` is **exactly 500 lines** with zero
   spare, and #468 `D12` / `[P4-T5]` freezes its `[TestMethod]` count (re-verified by #468's
-  `[P14-T11]`). **No test may be added to it.** Spare capacity elsewhere, measured at `988e819b`:
+  `[P14-T11]`). **No test may be added to it.** Current size (not spare capacity) elsewhere, measured at `988e819b`:
   `KbdActionsTests.cs` 88; `KbdActionsRemainingBranchesTests.cs` 181;
   `QfcItemController.NavigationTests.cs` 391; `QfcCollectionControllerDarkModeTests.cs` 155.
 - Framework: **MSTest**; mocking: **Moq**; assertions: **FluentAssertions**.
