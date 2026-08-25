@@ -17,6 +17,15 @@
 - Technical input: `docs/features/active/qfc-item-controller-defects-484/research/research.2026-08-24T09-45.md`.
   Section 9.1 fixes the selected approach for each of the five defects. No alternative approach may be
   substituted.
+- **Research is subordinate to `spec.md`.** `spec.md` carries a superseding clause at the top of the
+  document. Where the research and `spec.md` disagree on a figure, a design detail, or a line citation,
+  `spec.md` governs and the research must not be treated as a correction of it. Two divergences are
+  named there: the research's **22** additional `Cleanup()` detachments against the delivered **23**,
+  and the research's description of the `QuickFiler.Test.csproj` item group as alphabetically ordered.
+  Research §8.5 additionally illustrates routing the #480 `async: true` test into
+  `QfcItemController.EventWiringTests.cs`; that illustration is superseded by constraint C2's capacity
+  table, which routes it to `QfcItemController.MailActionsTests.cs`. Obeying the research illustration
+  would project `QfcItemController.EventWiringTests.cs` to 506 lines, over the 500-line ceiling.
 
 ## Fail-closed rules
 
@@ -184,6 +193,22 @@ file receiving added lines):
    against `<BASE_SHA>` in `[P7-T9]`. `spec.md` is the delivered upstream contract for features 464
    and 489, so a citation it carries that the executor's own edit invalidates is a defect in the
    contract, not a formatting detail.
+
+   **Scope of this rule, and what covers the rest.** This rule preserves exactly the two citations
+   named above, and it is the only rule that preserves any citation. It cannot be extended to the
+   other citations `spec.md` carries into files this plan edits, because several of this plan's own
+   edits necessarily move them: `[P1-T5]` deletes `QfcItemController.FocusAndTheme.cs:170`, which
+   shifts `ApplyReadEmailFormat` at `:318-324` up one line, and `[P4-T7]` then adds a guard inside it;
+   `[P5-T4]` inserts the `UnwireEvents()` call into `Cleanup()` above
+   `QfcItemController.ViewerSetup.cs:407`, `:420` and `:424`, `[P4-T5]` inserts the timer disposal
+   immediately above `:424`, and `[P4-T6]` inserts the mail-actions nulling statement inside the same
+   method; `[P2-T1]` and `[P2-T5]` restructure
+   `QfcItemController.ViewerSetup.cs:84-105`; and `[P3-T5]` and `[P3-T6]` restructure
+   `QfcItemController.MailActions.cs:83-126`. Those citations are therefore **pre-change locators
+   anchored to `<BASE_SHA>`**, which is what the "Line-citation anchor" paragraph at the top of
+   `spec.md` states. The executor must not renumber, delete, or "correct" any `spec.md` citation to
+   match the delivered source: `spec.md` criterion text is unmodifiable under `[P8-T13]`, and the
+   delivered line numbers for the `Cleanup()` statements are recorded separately by `[P6-T4]`.
 
 ### C3 — Test policy
 
@@ -448,6 +473,6 @@ no intervening file modification.
 - [ ] [P8-T10] Check off the single criterion beginning "Each new production member added by this feature reaches". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/coverage-delta.md`.
 - [ ] [P8-T11] Check off the single criterion beginning "No new `[ExcludeFromCodeCoverage]` attribute is introduced". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/exemption-audit.md`.
 - [ ] [P8-T12] Check off the single criterion beginning "For each of the five issues, evidence records the regression test failing". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites the five fail-before artifacts `480-sync-tightened-fail.md`, `481-empty-bodies-fail.md`, `483-fail.md`, `484-fail.md`, and `485-fail.md` under `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/`.
-- [ ] [P8-T13] Reconcile the acceptance-criteria state in `docs/features/active/qfc-item-controller-defects-484/spec.md`. Acceptance: the file contains exactly 50 acceptance-criterion checkboxes and no criterion text was modified. The pass outcome for this task is all 50 reading `- [x]`. A criterion whose evidence is incomplete is left unchecked — never checked without evidence — and the artifact records its verbatim text, the reason, and the evidence artifact that documents the gap; in that case this task's outcome is recorded as remediation-required and must not be reported as a pass. The only branch that authorizes an unchecked criterion is the pre-existing-unformatted-file branch stated in `[P8-T4]`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/other/ac-reconciliation.md`.
+- [ ] [P8-T13] Reconcile the acceptance-criteria state in `docs/features/active/qfc-item-controller-defects-484/spec.md`. Acceptance: the file contains exactly 50 acceptance-criterion checkboxes and no criterion text was modified. The pass outcome for this task is all 50 reading `- [x]`, with exactly one authorized exception, stated below. A criterion whose evidence is incomplete is left unchecked — never checked without evidence — and the artifact records its verbatim text, the reason, and the evidence artifact that documents the gap; in that case this task's outcome is recorded as remediation-required and must not be reported as a pass. The single authorized exception is the pre-existing-unformatted-file branch stated in `[P8-T4]`: if and only if the `[P0-T9]` baseline unformatted set was non-empty and the `[P7-T2]` reported set is exactly that same baseline set and contains none of the nine owned files, then the one criterion beginning "`dotnet tool run csharpier check .` reports no formatting differences" is left unchecked, this task's outcome is 49 of 50 checked, and that outcome is a pass rather than remediation-required, because the gap is a pre-existing repository condition this feature neither caused nor is permitted to fix. Any other unchecked criterion, and any unchecked criterion arising from any other cause, is remediation-required. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/other/ac-reconciliation.md`.
 - [ ] [P8-T14] Write the acceptance-criteria status summary. Acceptance: the artifact records the source file `docs/features/active/qfc-item-controller-defects-484/spec.md`, the total acceptance-criterion count, the checked-off count, the remaining count, and the text of any remaining item. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/other/ac-status-summary.md`.
 - [ ] [P8-T15] Commit every source and evidence change produced by this plan on the working branch. `.claude/agent-memory/**` is excluded from both the changed-file-set criterion and the clean-tree criterion because it is agent-session state, not feature output. Acceptance: `git status --porcelain` produces no output lines other than paths under `.claude/agent-memory/`, and `git diff --name-only <BASE_SHA> -- . ':(exclude).claude/agent-memory'` lists only the nine owned files and paths under `docs/features/active/qfc-item-controller-defects-484/`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/other/final-commit.md`.

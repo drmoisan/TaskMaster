@@ -15,13 +15,42 @@ Where that research corrects a promoted potential's "Suspected Fix", the researc
 tabulates all five corrections and each is carried forward below. In every other respect this document
 governs: the research is a point-in-time technical input captured before the design was finalised, so
 where the two disagree on a figure, a design detail, or a line citation, this document is authoritative
-and the research is not to be treated as a correction of it. One known divergence of that kind: the
-`Cleanup()` row of research §7.2 states that the method detaches **22** additional subscriptions, a
-figure that predates the decision to reach the `WebResourceRequested` subscription through
-`DetachWebResourceRequestedHandler()`. The delivered figure is **23**, as stated in the CHANGED-members
-table below. Research §2.1's "22 `+=` in `EventWiring.cs`", §2.4's "22 of 24 unwired symmetrically and
-testably", and §9.1's "22/24 yes" are not divergences: each counts a different quantity and each agrees
-with this document.
+and the research is not to be treated as a correction of it. Two known divergences of that kind:
+
+1. **Subscription count.** The `Cleanup()` row of research §7.2 states that the method detaches **22**
+   additional subscriptions, a figure that predates the decision to reach the `WebResourceRequested`
+   subscription through `DetachWebResourceRequestedHandler()`. The delivered figure is **23**, as stated
+   in the CHANGED-members table below. Research §2.1's "22 `+=` in `EventWiring.cs`", §2.4's "22 of 24
+   unwired symmetrically and testably", and §9.1's "22/24 yes" are not divergences: each counts a
+   different quantity and each agrees with this document.
+2. **`QuickFiler.Test.csproj` item-group ordering.** Research §8.4 describes the `Compile Include` item
+   group at `QuickFiler.Test/QuickFiler.Test.csproj:57-175` as alphabetically ordered. It is not: the
+   group is ordered by area and by insertion history (for example `Controllers\QfcItemController.EventWiringTests.cs`
+   at `:142` precedes `Controllers\QfcItemController.NavigationTests.cs` at `:143` and
+   `Controllers\QfcItemController.MailActionsTests.cs` at `:144`). The delivered statement is under
+   Constraints below. The ordering claim is not load-bearing for any decision in this document: the
+   `.csproj` prohibition rests on the item group being shared with sibling epic children, which is
+   independently true.
+
+Additionally, research §8.5 illustrates routing the new #480 `async: true` test into
+`QfcItemController.EventWiringTests.cs`. That is an illustrative recommendation, not a divergence in
+this document's sense, because this document names no file for that test: routing is delegated to the
+plan's constraint C2 capacity table (see Test Strategy governing constraint 6), which is binding.
+
+**Line-citation anchor (read this before resolving any `file:line` reference).** Every `file:line`
+citation in this document is anchored to the **pre-change** source at the plan's `<BASE_SHA>`, not to
+the delivered post-change source, unless the citation is one of the two the plan's capacity rule C2.7
+explicitly preserves (`QuickFiler/Controllers/QfcItemController.EventWiring.cs:50` and
+`QuickFiler.Test/Controllers/QfcItemController.EventWiringTests.cs:229-309`). This feature edits nine
+files, and several of its own edits — the deletion at `QfcItemController.FocusAndTheme.cs:170`, the
+statements inserted into `Cleanup()`, the `TryResolveCidResource` extraction, and the
+`MoveMailAsync` catch replacement — shift the lines that follow them. Features 464 and 489 branch from
+an integration branch that already carries this change and will therefore read this document against
+post-change source: **resolve every citation by the member name it accompanies, not by the line number.**
+Each citation names its member or statement in prose for exactly that reason. In particular, the
+`Cleanup()` acceptance criteria below cite `ViewerSetup.cs:407`, `:420`, and `:424` as pre-change
+locators for `_itemViewer = null`, `_kbdHandler = null`, and `_emailIsReadTimer = null`; the delivered
+line numbers differ and are recorded by the plan's `[P6-T4]` from the delivered source.
 
 ---
 
@@ -531,8 +560,11 @@ risk (`ApplyReadEmailFormat` calls `Theme.SetMailRead(async: true)`, which itsel
 - **No `.csproj` edit.** All nine owned files already carry `Compile Include` entries — the four
   production partials in `QuickFiler/QuickFiler.csproj` and the five test files in
   `QuickFiler.Test/QuickFiler.Test.csproj`. The
-  `QuickFiler.Test.csproj` item group is alphabetically ordered (lines 57-175) and is shared with sibling
-  epic children, so an edit risks a merge conflict.
+  `QuickFiler.Test.csproj` `Compile Include` item group (lines 57-175) is shared with sibling epic
+  children and is appended to by each of them, so an edit risks a merge conflict. The group is ordered
+  by area and by insertion history, not alphabetically — research §8.4's "alphabetically-ordered item
+  group" is superseded here (see the divergence list at the top of this document) — so there is no
+  stable insertion position that would avoid such a conflict.
 - **No forbidden-file write** (Scope & Non-Goals).
 - **Test policy**: MSTest, Moq, FluentAssertions only; no `Thread.Sleep`, no `Task.Delay`, no wall-clock
   wait, no temporary file.

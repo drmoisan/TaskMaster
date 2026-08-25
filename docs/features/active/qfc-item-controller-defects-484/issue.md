@@ -61,9 +61,12 @@ at lines 142, 144, 146, 150, and 153):
 - `QuickFiler.Test/Controllers/QfcItemController.ViewerSetupTests.cs`
 - `QuickFiler.Test/Controllers/QfcItemController.MailActionsTests.cs`
 - `QuickFiler.Test/Controllers/QfcItemController.TestSupport.cs` — shared arrange helpers only; no test
-  method may be added. This file is consumed by 16 other `QfcItemController` test files, including
-  `QuickFiler.Test/Controllers/QfcItemController.NavigationTests.cs`, so this feature only appends new
-  private helpers and modifies no existing member.
+  method may be added. Seventeen other test files in `QuickFiler.Test` consume `QfcItemControllerTestSupport`
+  or `HarnessController` from this file — fifteen of them named `QfcItemController*`, including
+  `QuickFiler.Test/Controllers/QfcItemController.NavigationTests.cs`, plus
+  `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` and
+  `QuickFiler.Test/Viewers/BreadcrumbDropDownSearchIntegrationTests.Part2.cs` — so this feature only
+  appends new private helpers and modifies no existing member.
 
 ## Files This Feature Must Not Write
 
