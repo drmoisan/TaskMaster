@@ -223,6 +223,30 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         }
 
         [TestMethod]
+        public void Issue609_FolderPredictor_ProjectsCaseVariantInRootFullSuggestionPath()
+        {
+            const string archiveRootPath = @"\\mailbox@example.com\Archive";
+            const string caseVariantInRootFullPath = @"\\MAILBOX@EXAMPLE.COM\archive\Clients\North";
+            const string relativePath = @"Clients\North";
+            var archiveRoot = CreateFolder(archiveRootPath);
+            var globals = CreateGlobals(new Mock<Outlook.Application>(), archiveRoot.Object);
+            var predictor = new FolderPredictor(globals.Object);
+            predictor.Suggestions.AddSuggestion(caseVariantInRootFullPath, 30);
+
+            var folderArray = predictor.FolderArray;
+            var folderRows = predictor.FolderRowArray;
+            var suggestionRow = folderRows[1];
+
+            folderArray.Should().Equal("========= SUGGESTIONS =========", relativePath);
+            folderRows
+                .Select(row => row.Text)
+                .Should()
+                .Equal("========= SUGGESTIONS =========", relativePath);
+            suggestionRow.Score.Should().NotBeNull();
+            suggestionRow.Score!.Value.FolderPath.Should().Be(relativePath);
+        }
+
+        [TestMethod]
         public void AddRecents_WhenRecentsExist_AppendsHeaderAndEntries()
         {
             var globals = CreateGlobals(

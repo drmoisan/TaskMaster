@@ -851,7 +851,7 @@ namespace UtilitiesCS
 
             var archivePrefix = _globals.Ol.ArchiveRootPath + "\\";
             return
-                folderPath.StartsWith(archivePrefix, StringComparison.Ordinal)
+                folderPath.StartsWith(archivePrefix, StringComparison.OrdinalIgnoreCase)
                 && folderPath.Length > archivePrefix.Length
                 ? folderPath.Substring(archivePrefix.Length)
                 : folderPath;
