@@ -80,11 +80,14 @@
 - [Bash tool rejects complex commands in isolated worktrees](bash-tool-rejects-complex-commands-in-isolated-worktree.md) — heredoc+redirect+git compounds are refused as unverifiable; gather with plain chained commands, then author via Write
 - [#457 coverage moved UP, and the kickoff figure was wrong](project_457_coverage_moved_up_not_down.md) — the denominator fix raised the rate 85.3514%→85.5355%; kickoff's 85.0317% matched no measurement, so #494 must re-measure
 - [atomic-planner has no MCP validator tool](atomic-planner-lacks-mcp-validator-tool.md) — it cannot run the mandatory plan gate; run it yourself and tell the planner not to fabricate a result
+- [Preflight defect-trend scope confound](preflight-defect-trend-scope-confound.md) — a rising count isn't divergence if you widened scope that round; hold scope fixed one round, and track re-introductions not raw counts
 - [C# agent worktree needs three bootstrap steps](csharp-agent-worktree-needs-three-bootstrap-steps.md) — no `.dotnet-sdk`, no `packages/`, and a clean restore still hits `error CS0006` on skewed analyzer versions; green CI is cache-explained, not tolerance
 - [potential_to_issue keeps ONLY the Summary section](potential-to-issue-keeps-only-summary-section.md) — every other section becomes "(not provided in potential file)"; verify the issue body, post the rest as a comment
 - [Epic kickoff facts need independent measurement](epic-kickoff-facts-need-independent-measurement.md) — a kickoff predicted a 500-line cap finding from a conflated file; the named file was 323 lines, not 1,065
 - [WebView2 EndInit creates handles at construction](webview2-endinit-creates-handles-at-construction.md) — a bare ItemViewer already has both child handles AND its own; any "force the handle" remedy is a measured no-op
 - [blocked_reason enum can't express a substantive halt](blocked-reason-enum-cannot-express-substantive-halt.md) — 7 mechanical members only; use "none" plus free-form halt/blocking_findings keys, never a wrong member
+- [Bootstrapping orchestrator-state.json's first write](bootstrapping-orchestrator-state-json-first-write.md) — Write tool can't create it (absolute path never matches the gate's relative constant); use single-line `python3 -c`, and split forbidden MCP tool-name literals across string concatenation
+- [Multi-location fact residuals drive preflight rounds](multi-location-fact-residuals-drive-preflight-rounds.md) — nearly every blocking preflight defect is one fact corrected in SOME locations; enumerate every location per fact
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
