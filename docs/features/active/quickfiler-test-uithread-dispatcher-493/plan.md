@@ -88,12 +88,17 @@ not exercised, and AC-7 gates it).
    depends on one of those values **cites the artifact** and compares against it. No later task
    restates a literal value, and no later task restates the comparison in different words.
 
-   One quantity is deliberately outside Phase 0 and is named here so the exception is not read as a
-   lapse: `AddedLineCount:`, the tolerance band `P3-T6` applies to the coverage denominator, is a
-   property of the post-change tree and cannot exist in Phase 0, since two of its four inputs are
-   files Phase 1 creates. `P3-T6` establishes it, records it in
+   Two quantities are deliberately outside Phase 0 and are named here so the exceptions are not read
+   as lapses. The first is `AddedLineCount:`, the tolerance band `P3-T6` applies to the coverage
+   denominator: it is a property of the post-change tree and cannot exist in Phase 0, since two of
+   its four inputs are files Phase 1 creates. `P3-T6` establishes it, records it in
    `quickfiler-test-coverage.<TS>.md`, and is the only task that does so; `P4-T3` re-measures line
-   counts for a different purpose (the 500-line ceiling) and does not restate or consume it.
+   counts for a different purpose (the 500-line ceiling) and does not restate or consume it. The
+   second is `pairs(N)`, the cumulative `spec.md` checkbox-pair count defined in the § Phase 5
+   preamble: it measures an edit Phase 5 is in the middle of making, so no Phase 0 value for it can
+   exist. Each of `P5-T1` through `P5-T10` establishes its own `pairs(N)` once, records it in that
+   task's `ac-checkoff-ac<N>` artifact, and reads `pairs(N-1)` by citing the preceding task's
+   artifact rather than by re-deriving it.
 2. **The unowned-file diagnostic comparison is stated exactly once, in `P4-T2`.** No other task in
    this plan states any condition — absolute or relative — about diagnostics naming
    `QuickFiler.Test/Controllers/QfcItemController.FocusAndThemeTests.cs` or
@@ -361,6 +366,19 @@ committed until `P5-T13`. Each task therefore records both `pairs(N)` and the pr
 each of `P5-T1` through `P5-T10` refers to it only by the phrase "exactly one further checkbox in
 `spec.md` changed state".
 
+**Where each check-off task records its result.** Each of `P5-T1` through `P5-T10` writes exactly
+one evidence artifact at `<FEATURE>/evidence/other/ac-checkoff-ac<N>.<TS>.md`, where `<N>` is the
+number of the acceptance criterion that task checks off, so the ten stems are `ac-checkoff-ac1`
+through `ac-checkoff-ac10` and each is unique. Every one of those artifacts carries `Timestamp:`,
+`Command:` (the `git diff` named in the preceding paragraph), `EXIT_CODE:`, `Output Summary:`, the
+resolved filename of each artifact the task cites — resolved per § Conventions — and the two fields
+`PairsN:` and `PairsNMinus1:` holding `pairs(N)` and `pairs(N-1)`. That artifact is what the
+counting rule above means by "records", and it is the artifact referred to by `P5-T6`'s acceptance
+condition and by § Notes rule 2. This location is stated once here and is not restated in the
+individual tasks. `P5-T11`, `P5-T12`, and `P5-T13` write their own separately named artifacts and
+are outside this paragraph. All ten artifacts are committed by `P5-T13`, whose step-1 pathspec
+already covers the whole feature folder.
+
 - [ ] [P5-T1] Verify **AC-1**, restore exists and is idempotent, against the passing results for R2 and R3 in `<FEATURE>/evidence/regression-testing/regression-tests-pass.<TS>.md`, then check AC-1 off in `<FEATURE>/spec.md`. **Acceptance:** the cited artifact records both R2 and R3 as passed, and exactly one further checkbox in `spec.md` changed state.
 
 - [ ] [P5-T2] Verify **AC-2**, concurrent callers cannot interleave install and restore, against the passing results for R1 and R4 in `<FEATURE>/evidence/regression-testing/regression-tests-pass.<TS>.md` and against `<FEATURE>/evidence/other/fixture-created.<TS>.md`, then check AC-2 off in `<FEATURE>/spec.md`. **Acceptance:** the cited artifacts record R1 and R4 as passed and record the fixture file's existence, and exactly one further checkbox in `spec.md` changed state.
@@ -371,7 +389,7 @@ each of `P5-T1` through `P5-T10` refers to it only by the phrase "exactly one fu
 
 - [ ] [P5-T5] Verify **AC-5**, no `Thread.Sleep`, `Task.Delay`, wall-clock waits, or temporary files, against `<FEATURE>/evidence/qa-gates/determinism-audit.<TS>.md`, then check AC-5 off in `<FEATURE>/spec.md`. **Acceptance:** the cited artifact records zero matches for every audited combination, and exactly one further checkbox in `spec.md` changed state.
 
-- [ ] [P5-T6] Verify **AC-6**, `QfcItemController.FocusAndThemeTests.cs` unmodified and unregressed, by citing three artifacts without restating their conditions: `<FEATURE>/evidence/qa-gates/unowned-file-identity.<TS>.md` for byte-identity, `<FEATURE>/evidence/qa-gates/unowned-file-diagnostics-comparison.<TS>.md` for the comparison established by `P4-T2`, and `<FEATURE>/evidence/qa-gates/quickfiler-test-run.<TS>.md` for the two named theme tests passing. Then check AC-6 off in `<FEATURE>/spec.md`. **Acceptance:** all three cited artifacts exist and record a satisfied result; the artifact repeats the baseline diagnostic counts `P4-T2` compared against, so a reviewer can see whether AC-6's diagnostic clause held absolutely or as non-regression per § Notes rule 2; and exactly one further checkbox in `spec.md` changed state.
+- [ ] [P5-T6] Verify **AC-6**, `QfcItemController.FocusAndThemeTests.cs` unmodified and unregressed, by citing three artifacts without restating their conditions: `<FEATURE>/evidence/qa-gates/unowned-file-identity.<TS>.md` for byte-identity, `<FEATURE>/evidence/qa-gates/unowned-file-diagnostics-comparison.<TS>.md` for the comparison established by `P4-T2`, and `<FEATURE>/evidence/qa-gates/quickfiler-test-run.<TS>.md` for the two named theme tests passing. Then check AC-6 off in `<FEATURE>/spec.md`. **Acceptance:** all three cited artifacts exist and record a satisfied result; this task's own `ac-checkoff-ac6` artifact repeats the baseline diagnostic counts `P4-T2` compared against, so a reviewer can see whether AC-6's diagnostic clause held absolutely or as non-regression per § Notes rule 2; and exactly one further checkbox in `spec.md` changed state.
 
 - [ ] [P5-T7] Verify **AC-7**, `UtilitiesCS/Threading/UiThread.cs` unmodified and no production assembly changed, against `<FEATURE>/evidence/qa-gates/scope-lock.<TS>.md` and `<FEATURE>/evidence/qa-gates/unowned-file-identity.<TS>.md`, then check AC-7 off in `<FEATURE>/spec.md`. **Acceptance:** the cited artifacts record the five-path diff with `ProductionSourcePathCount: 0` and the unchanged `UiThread.cs` hash, and exactly one further checkbox in `spec.md` changed state.
 
