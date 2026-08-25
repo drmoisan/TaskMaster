@@ -252,6 +252,26 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         [TestMethod]
+        public void Issue609_ResolvePaths_PrefixesAtMailboxArchiveRootExactlyOnce()
+        {
+            // Arrange: this is a pure configuration seam with no Outlook, filesystem, or store access.
+            var config = new EmailFilerConfig
+            {
+                Globals = null,
+                OlAncestor = @"\\mailbox@example.com\Archive",
+                DestinationOlStem = @"Clients\North",
+                FsAncestorEquivalent = @"C:\Mail",
+            };
+
+            // Act
+            config.ResolvePaths();
+
+            // Assert
+            config.DestinationOlPath.Should().Be(@"\\mailbox@example.com\Archive\Clients\North");
+            config.SaveFsPath.Should().Be(@"C:\Mail\Clients\North");
+        }
+
+        [TestMethod]
         public void TryResolveDestinationFolder_WhenGlobalsAreMissing_ReturnsNull()
         {
             // Arrange
