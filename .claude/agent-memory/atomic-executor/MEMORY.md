@@ -9,6 +9,7 @@
 - [Merge-base diff gates need a commit cadence](project_preflight_mergebase_diff_gates_need_commit_cadence.md) — `<MERGE_BASE>..HEAD` gates are vacuous while HEAD == merge-base; plan an explicit commit task
 - [Inserted plan tasks force renumbering](project_plan_task_ids_digit_only_forces_renumbering.md) — suffixed IDs (`P3-T5a`) fail validation; say "insert + renumber downstream", then verify defs-vs-mentions mechanically
 - [Plan rationale clauses are evidence](project_418_plan_rationale_clauses_are_evidence.md) — #418 needed 3 preflight passes; all blockers were unmeasured world-state claims in prose, never in the fix
+- ["Make the citation exist" deltas propagate false facts](project_preflight_citation_match_propagates_false_fact.md) — a fix that copies A's prose into B corroborates A's error in two documents; also, an epic child's issue.md promise to siblings needs a C-constraint AND a verification task
 - [AC check-off "inline pointer" + artifacts/ tool-output paths](project_preflight_ac_checkoff_and_tooloutput_paths.md) — inline evidence pointer in an AC task violates the tracking skill; artifacts/*/coverage XML is a producer path
 - [Exact-count gate vs remediation loop](project_exact_count_gate_vs_remediation_loop.md) — a pinned `TotalCount = 19` collides with an "add tests and restart" remediation path; use `B + N` and re-scan count
 - [Tracked agent-memory breaks unscoped git gates](project_agent_memory_tracked_breaks_unscoped_git_gates.md) — `.claude/agent-memory/**` is tracked + dirty; every git diff/status gate needs an explicit pathspec
