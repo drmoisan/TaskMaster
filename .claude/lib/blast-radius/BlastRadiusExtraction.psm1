@@ -44,6 +44,16 @@ Set-StrictMode -Version Latest
 # imports no sibling.
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusGlob.psm1') -Force
 
+# Test-MultipleFeatureFolderSpan moved to BlastRadiusTokenShape.psm1, joining the
+# new Test-PlaceholderMarker predicate that could not be added here: this module
+# had two lines of headroom against the 500-line limit (issue #502). Both
+# predicates are context-free shape tests, so they form one cohesive leaf. The
+# import keeps every pre-existing call site and test source-compatible and
+# introduces no cycle, because the TokenShape module imports no sibling. This
+# follows the same re-import-and-re-export pattern used above for the relocated
+# ordinal-sort helper.
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusTokenShape.psm1') -Force
+
 # Plan-structure patterns. The regex text mirrors the Python constants so radius
 # derivation and the plan validator can never disagree about which lines are
 # phase headings and which are tasks.
@@ -70,12 +80,6 @@ $script:KnownTopLevelSegment = @(
 # stripped before the extension test so a line-anchored citation keeps the
 # acceptance its unanchored form has; the token itself is recorded verbatim.
 $script:LineSuffixPattern = [regex]::new(':\d+$')
-
-# Documentation-corpus root and the index, counted after that prefix, of the
-# segment that names one feature folder. A glob whose wildcard reaches this
-# segment or any earlier one claims every feature folder in the corpus.
-$script:FeatureCorpusPrefix = 'docs/features/'
-$script:FeatureFolderSegmentIndex = 1
 
 # Fallback acceptance rule: a token shaped <segment>/.../<name>.<ext> counts as a
 # repository path when its final component carries one of these extensions.
@@ -233,60 +237,6 @@ function Get-InlineCodeToken {
     return @($token.ToArray())
 }
 
-function Test-MultipleFeatureFolderSpan {
-    <#
-    .SYNOPSIS
-        Report whether a glob claims more than one documentation feature folder.
-
-    .DESCRIPTION
-        Port of spans_multiple_feature_folders. The documentation corpus is laid
-        out as docs/features/<bucket>/<feature-folder>/..., so a glob whose
-        wildcard occupies or truncates the feature-folder segment claims every
-        feature folder in the corpus. That made two unrelated work items contend
-        purely because both wrote documentation (issue #489). A glob carrying a
-        complete, wildcard-free feature-folder segment claims one folder and is
-        retained.
-
-    .PARAMETER Token
-        A wildcard-bearing token already accepted by the shape rules of
-        Get-PathTokenKind.
-
-    .OUTPUTS
-        System.Boolean. True when the token is rooted in the documentation corpus
-        and its wildcard reaches the feature-folder segment or any earlier one.
-    #>
-    [CmdletBinding()]
-    [OutputType([bool])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [AllowEmptyString()]
-        [string] $Token
-    )
-
-    if (-not $Token.StartsWith($script:FeatureCorpusPrefix,
-            [System.StringComparison]::Ordinal)) {
-        return $false
-    }
-
-    $segment = @($Token.Substring($script:FeatureCorpusPrefix.Length) -split '/')
-
-    # A token that stops at or before the feature-folder segment has had that
-    # segment truncated away by the wildcard, so it spans the whole corpus.
-    if ($segment.Count -le $script:FeatureFolderSegmentIndex) {
-        return $true
-    }
-
-    # Every segment up to and including the feature-folder name must be a literal
-    # for the claim to resolve to exactly one folder.
-    for ($index = 0; $index -le $script:FeatureFolderSegmentIndex; $index++) {
-        if ($segment[$index].IndexOf('*') -ge 0) {
-            return $true
-        }
-    }
-
-    return $false
-}
-
 function Get-PathTokenKind {
     <#
     .SYNOPSIS
@@ -299,6 +249,13 @@ function Get-PathTokenKind {
         path and a colon in the leading segment marks a URL scheme or a Windows
         drive. Acceptance then requires one of the two documented shape rules, a
         known top-level segment or a recognized final extension.
+
+        A token carrying any configured placeholder or interpolation marker is
+        rejected wherever the marker sits, because it documents a shape rather
+        than naming a file (issue #502). The rejection is silent and returns the
+        same null value the sibling rejections return: there is no diagnostic
+        channel and no finding rule, because a shape citation is not an error on
+        the author's part and reporting one would fire on almost every plan.
 
     .PARAMETER Token
         A single whitespace-free inline-code token.
@@ -335,6 +292,22 @@ function Get-PathTokenKind {
         if ([string]::Equals($Token, $surface, [System.StringComparison]::Ordinal)) {
             return $script:PathKindConcrete
         }
+    }
+
+    # A token carrying a placeholder or interpolation marker documents a shape
+    # rather than naming a file, so it is not a write claim (issue #502).
+    #
+    # Ordering, both directions. This runs AFTER the root-surface loop because
+    # that loop is exact ordinal equality against a configured surface name: a
+    # configured surface cannot contain a marker, so the two tests can never
+    # disagree, and putting the cheaper marker scan first would only add work to
+    # the common accepted case. It runs BEFORE the separator guard because a
+    # marker-bearing token frequently does carry a separator and would otherwise
+    # sail past that guard and reach the extension rule, which accepts it: the
+    # dominant corpus shape is an angle-bracketed leading segment followed by a
+    # real .md tail, and that is exactly the token this guard exists to reject.
+    if (Test-PlaceholderMarker -Token $Token) {
+        return $null
     }
 
     $separatorIndex = $Token.IndexOf('/')
@@ -492,6 +465,7 @@ Export-ModuleMember -Function `
     ConvertTo-NormalizedLine, `
     Get-PlanLineScan, `
     Get-InlineCodeToken, `
+    Test-PlaceholderMarker, `
     Test-MultipleFeatureFolderSpan, `
     Get-PathTokenKind, `
     Get-PathFromLine, `

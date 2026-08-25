@@ -522,6 +522,34 @@ Validate the artifact through `mcp__drm-copilot__validate_orchestration_artifact
 `artifact_type: "parallel-kickoff"`. That artifact type dispatches to
 `scripts/dev_tools/parallel_kickoff_contract.py`, which this feature delivers.
 
+### Integration Commit Form (issue #539)
+
+The parallel planner's own version-control operations — committing the run manifest
+`docs/features/parallel/<slug>/parallel.md`, each item's prepared feature folder and approved
+plan-path, and the durable kickoff copy `docs/features/parallel/<slug>/parallel-kickoff.md` — are
+orchestration bookkeeping, not implementation. The preimplementation gate
+(`.claude/hooks/enforce-orchestration-preimplementation-gate.ps1`) exempts them only when the
+invocation is **pathspec-bearing**: every staging or integration invocation must name at least one
+explicit path operand, and every operand must resolve inside one of the five exempt
+orchestration-bookkeeping trees:
+
+- `docs/features/epics/`
+- `docs/features/parallel/`
+- `docs/features/active/`
+- `docs/features/potential/`
+- `artifacts/orchestration/`
+
+Use one of the two pathspec-bearing spellings:
+
+- the message option followed by a double-dash separator and then the exempt path operands, or
+- the exempt path operands named directly before the message option.
+
+A pathless integration invocation — a message option with no path operand — is denied (D4 row 4),
+as are whole-tree operands, tree-wide flags, pathspec-from-file options, history-rewriting or
+content-widening options, and any operand that resolves outside the five exempt trees. Mixing one
+exempt operand with one production operand denies the whole invocation. Name each exempt path
+explicitly; the exemption is allow-side only and every parse ambiguity denies.
+
 ## Completion Report
 
 The final report to the operator must include:

@@ -173,6 +173,33 @@ integration-to-main PR.
 The `## Invocation Prompt` section is the exact text the user replays (from the main session,
 never from an `orchestrator` agent) to launch execution.
 
+### Integration Commit Form (issue #539)
+
+The epic planner's own version-control operations — committing the epic manifest, the fanned-in
+child feature folders and approved plans, and the durable kickoff copy — are orchestration
+bookkeeping, not implementation. The preimplementation gate
+(`.claude/hooks/enforce-orchestration-preimplementation-gate.ps1`) exempts them only when the
+invocation is **pathspec-bearing**: every staging or integration invocation must name at least one
+explicit path operand, and every operand must resolve inside one of the five exempt
+orchestration-bookkeeping trees:
+
+- `docs/features/epics/`
+- `docs/features/parallel/`
+- `docs/features/active/`
+- `docs/features/potential/`
+- `artifacts/orchestration/`
+
+Use one of the two pathspec-bearing spellings:
+
+- the message option followed by a double-dash separator and then the exempt path operands, or
+- the exempt path operands named directly before the message option.
+
+A pathless integration invocation — a message option with no path operand — is denied (D4 row 4),
+as are whole-tree operands, tree-wide flags, pathspec-from-file options, history-rewriting or
+content-widening options, and any operand that resolves outside the five exempt trees. Mixing one
+exempt operand with one production operand denies the whole invocation. Name each exempt path
+explicitly; the exemption is allow-side only and every parse ambiguity denies.
+
 ## Checkpoint Handling
 
 Persist `artifacts/orchestration/epic-planner-state.json` after every completed step with the
