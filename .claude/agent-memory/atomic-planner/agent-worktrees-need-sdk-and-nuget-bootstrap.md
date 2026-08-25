@@ -1,11 +1,11 @@
 ---
 name: agent-worktrees-need-sdk-and-nuget-bootstrap
-description: A fresh agent worktree has neither .dotnet-sdk nor packages/, and a clean nuget restore still leaves the analyzer version skew unresolved, so a C# plan needs THREE explicit Phase 0 bootstrap tasks
+description: A fresh agent worktree has neither .dotnet-sdk nor packages/, a clean nuget restore still leaves the analyzer version skew unresolved, and dotnet-coverage is a global tool tool-restore never supplies — a C# plan needs FOUR explicit Phase 0 bootstrap steps
 metadata:
   type: project
 ---
 
-A C# plan executing inside a `.claude/worktrees/<agent-id>` worktree needs THREE Phase 0 bootstrap tasks
+A C# plan executing inside a `.claude/worktrees/<agent-id>` worktree needs FOUR Phase 0 bootstrap steps
 before the first `dotnet tool restore` and before the first `msbuild`, in this order:
 
 1. **Provision `.dotnet-sdk`.** `global.json` pins `sdk.version 8.0.205` with `rollForward: latestFeature`
@@ -29,6 +29,19 @@ before the first `dotnet tool restore` and before the first `msbuild`, in this o
    A missing `Analyzer` path is `error CS0006`, NOT a warning — the compile FAILS. Remedy:
    `nuget install <id> -Version <v> -OutputDirectory packages`, or copy the folders from the main
    checkout. Both versions exist there and are verifiable with a glob before you write the claim.
+
+4. **Provision the `dotnet-coverage` GLOBAL tool** when any task uses
+   `scripts/vscode/Invoke-MSTestWithCoverage.ps1`. That script throws
+   `dotnet-coverage not found. Install it with: dotnet tool install --global dotnet-coverage` at
+   `:292-293` BEFORE it runs anything, so a baseline coverage task dies without it and no numeric
+   coverage value is ever recorded. It is a global tool, NOT in `dotnet-tools.json`, so
+   `dotnet tool restore` does not supply it. Guarded form:
+   `if (-not (Get-Command dotnet-coverage -ErrorAction SilentlyContinue)) { dotnet tool install --global dotnet-coverage }`.
+
+Note also that `Install-RepoDotNetSdk.ps1` must run under **pwsh 7**, not Windows PowerShell 5.1, and
+that `scripts/vscode/Invoke-Restore.ps1` takes `-SolutionPath`, `-Configuration` and `-Platform`
+(defaults `TaskMaster.sln` / `Debug` / `Any CPU`) — verify the parameter names before writing a
+command into an acceptance clause.
 
 **Do not conclude from green CI that the compile tolerates the skew.**
 `_build-analyzers.yml:38` caches `path: packages` with a PREFIX `restore-keys` fallback (lines 40-41).
