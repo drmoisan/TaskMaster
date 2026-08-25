@@ -26,6 +26,15 @@ so it is an observation, not a blocker. Contrast with the genuinely blocking sha
 [[project_preflight_absolute_zero_gate_on_sibling_owned_assembly]], where a gate is
 *unsatisfiable* or *unwaivable*.
 
+**Polarity test for a clause an earlier task invalidates.** When phase N asserts a fact about a
+file that phases 1..N-1 change, ask which way the clause breaks. A clause that becomes FALSE at its
+own point strands the executor — it counts literally, records a mismatch, and leaves the task
+unchecked under the fail-closed rule (#464 `[P5-T11]`: "the two timer arming sites still bind" after
+`[P1-T6]` deleted the method holding one of them). A clause that becomes TRIVIALLY TRUE only loses
+gating power (#464 `[P6-T13]`: a zero-match search for `throw (e.InitializationException)` that
+`[P6-T10]` had already driven to zero). The first is blocking; the second is an observation, provided
+the task carries at least one other clause that can still fail. Same defect family, opposite cost.
+
 Cheap mechanical confirmations that make a confirmatory pass fast and defensible: diff the two
 committed plan revisions with `git diff -U0` and read only the hunk headers (a fifth undisclosed
 hunk is itself a finding); compare the `file:line` citation MULTISET across revisions to prove
