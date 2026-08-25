@@ -232,7 +232,7 @@ Ownership confirmed reciprocally in research §Q11.1. Every path below is forbid
 | `QuickFiler/Interfaces/IQfcCollectionController.cs`, `QuickFiler/Controllers/QfcCollectionController.cs` | **#468** |
 | `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs` — **exactly 500 lines; `[TestMethod]` count frozen** | **#468** |
 | `QuickFiler.Test/Controllers/QfcItemController.*Tests.cs` (11 files) | **#484**, **#489** |
-| `QuickFiler/Viewers/ItemViewer*.cs`, `QuickFiler/Interfaces/IItemViewer.cs` | **#489** |
+| `QuickFiler/Viewers/ItemViewer*.cs`, `QuickFiler/Viewers/IItemViewer.cs` | **#489** |
 | `QuickFiler/Viewers/WebView2BreadcrumbHost.cs`, `WebView2CoreInitializer.cs` | **#476** |
 | `UtilitiesCS/OutlookObjects/Folder/BreadcrumbRowBuilder.cs` — **read-only reference for RC7** | **#498** (its AC asserts the file is unmodified) |
 | `UtilitiesCS/HelperClasses/Initializer.cs` | unowned; repo-wide consumer, do not extend |
@@ -1008,7 +1008,7 @@ files this feature does not own.**
 - [ ] `vstest.console.exe` reports no failure that is not in the Phase 0 `BASELINE_FAILED` set, and the passing-test count is **greater than the Phase 0 baseline count** by at least the number of tests this feature adds.
 - [ ] No pre-existing `[TestMethod]` is deleted or renamed, and no assertion in a pre-existing test is weakened.
 - [ ] Each test file this feature **creates** is under 500 lines. (The ceiling is asserted only over created files; `EfcFormController.cs` and `EfcItemController.cs` are pre-existing violations and are explicitly out of scope.)
-- [ ] `EfcFormController.cs` has **fewer** lines after the change than its 1084-line merge-base count.
+- [ ] `EfcFormController.cs` has at most 1204 lines after the change — its 1084-line merge-base count plus at most 120 net lines for the RC1 guards, the five RC3 boundary extractions, the RC3 `PopulateFolderCombobox` try/catch, and the RC7/RC8/RC9 pure helpers — and the file-size evidence artifact itemises the delivered net delta per remedy against the merge-base count. (The 500-line ceiling is not asserted: this file is a pre-existing violation whose splitting is out of scope.)
 - [ ] `EfcItemController.cs` has **fewer** lines after the change than its 1170-line merge-base count.
 - [ ] The diff for `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs` is **exactly one changed line**, at the incognito literal.
 - [ ] `git diff --name-only` for the feature branch intersected with the sibling-owned path set in §`Scope & Non-Goals` is **empty**.
