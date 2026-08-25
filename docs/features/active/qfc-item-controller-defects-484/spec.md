@@ -138,7 +138,7 @@ WebView2 runtime, which is why the fix is extracted into a directly callable mem
 
 ### In scope
 
-The five defects above, confined to four production files and four test files.
+The five defects above, confined to four production files and five test files.
 
 **Production files this feature owns and may write:**
 
@@ -147,14 +147,15 @@ The five defects above, confined to four production files and four test files.
 - `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`
 - `QuickFiler/Controllers/QfcItemController.MailActions.cs`
 
-**Test files this feature owns and may write** (all four already carry `Compile Include` entries in
-`QuickFiler.Test/QuickFiler.Test.csproj` at lines 142, 144, 150, and 153 respectively, so no `.csproj`
+**Test files this feature owns and may write** (all five already carry `Compile Include` entries in
+`QuickFiler.Test/QuickFiler.Test.csproj` at lines 142, 144, 146, 150, and 153, so no `.csproj`
 edit is required):
 
 - `QuickFiler.Test/Controllers/QfcItemController.FocusAndThemeTests.cs`
 - `QuickFiler.Test/Controllers/QfcItemController.EventWiringTests.cs`
 - `QuickFiler.Test/Controllers/QfcItemController.ViewerSetupTests.cs`
 - `QuickFiler.Test/Controllers/QfcItemController.MailActionsTests.cs`
+- `QuickFiler.Test/Controllers/QfcItemController.TestSupport.cs` (shared arrange helpers only; no test method may be added; edits are additive only)
 
 ### Out of scope / non-goals
 
@@ -175,9 +176,8 @@ Additionally out of scope, and not to be written by this feature:
   already catches, logs with subject context, and continues (`:2236-2258`); it needs no change.
 - `QuickFiler/Controllers/QfcItemController.Initialization.cs` — `SaveParameters`' `??=` rebinding
   (`:395-397`) already produces the correct behaviour once `Cleanup()` nulls `_mailActions`.
-- `QuickFiler.Test/Controllers/QfcItemController.SeamFactoryTests.cs` and
-  `QfcItemController.TestSupport.cs` — left untouched to minimise the sibling-conflict surface; their
-  existing tests are cited as the pattern source only.
+- `QuickFiler.Test/Controllers/QfcItemController.SeamFactoryTests.cs` — left untouched to minimise
+  the sibling-conflict surface; its existing tests are cited as the pattern source only.
 - `QuickFiler.Test/QuickFiler.Test.csproj` and `QuickFiler/QuickFiler.csproj` — no `.csproj` edit.
 
 **Excluded behaviour changes:**
@@ -412,7 +412,7 @@ integration branch that already carries this change.
 
 #### Files/modules to change
 
-Production: the four owned partials listed in Scope & Non-Goals. Tests: the four owned test files.
+Production: the four owned partials listed in Scope & Non-Goals. Tests: the five owned test files.
 Nothing else.
 
 #### Functions/classes/CLI commands impacted
@@ -508,7 +508,9 @@ risk (`ApplyReadEmailFormat` calls `Theme.SetMailRead(async: true)`, which itsel
 
 - **File-size ceiling of 500 lines** (General Code Change Policy §4.1) applies to every production and
   test file touched. Current sizes and headroom are recorded under Risks & Mitigations.
-- **No `.csproj` edit.** All eight target files already carry `Compile Include` entries. The
+- **No `.csproj` edit.** All nine owned files already carry `Compile Include` entries — the four
+  production partials in `QuickFiler/QuickFiler.csproj` and the five test files in
+  `QuickFiler.Test/QuickFiler.Test.csproj`. The
   `QuickFiler.Test.csproj` item group is alphabetically ordered (lines 57-175) and is shared with sibling
   epic children, so an edit risks a merge conflict.
 - **No forbidden-file write** (Scope & Non-Goals).
@@ -553,7 +555,7 @@ the existing `[ExcludeFromCodeCoverage]` member and in the two new private field
    the tightened form must be demonstrated to fail against the unfixed code (`Times.Once()` against two
    actual invocations).
 2. **Framework and libraries.** MSTest (`[TestClass]`, `[TestMethod]`, `[Timeout]`), Moq for every
-   collaborator, FluentAssertions for every assertion. This matches all four owned test files today; none
+   collaborator, FluentAssertions for every assertion. This matches all five owned test files today; none
    of them uses an MSTest `Assert.*` call.
 3. **Banned APIs.** `Thread.Sleep`, `Task.Delay`, and any real wall-clock wait are prohibited in test
    code (`.claude/rules/general-unit-test.md`). The #484 timer test must use the deterministic approach
@@ -574,7 +576,7 @@ the existing `[ExcludeFromCodeCoverage]` member and in the two new private field
    the #480 assertion tightening itself is a zero-line, in-place edit to `FocusAndThemeTests.cs:323`.
    #484 T1 fits in `ViewerSetupTests.cs`; #484 T2 and all #485 tests route to
    `QfcItemController.MailActionsTests.cs` (184 lines, 316 spare) or `EventWiringTests.cs`, each with a
-   header comment naming the issue. All four target files already have `.csproj` entries, so **no
+   header comment naming the issue. All five owned test files already have `.csproj` entries, so **no
    `.csproj` edit is required**.
 
 ### Deterministic timer test for #484 (no `Thread.Sleep`, no `Task.Delay`)
@@ -804,7 +806,7 @@ regression test. The one exception is verified by source inspection and is recor
 - [ ] `QuickFiler/Interfaces/IQfcItemController.cs` and `QuickFiler/Viewers/IItemViewer.cs` are byte-identical
       to their pre-change state.
 - [ ] The set of files changed by this feature is a subset of the four owned production files plus the
-      four owned test files. In particular `QfcItemController.Navigation.cs`, `QuickFiler/Viewers/ItemViewer*.cs`,
+      five owned test files. In particular `QfcItemController.Navigation.cs`, `QuickFiler/Viewers/ItemViewer*.cs`,
       `QuickFiler/Controllers/KbdActions.cs`, `QuickFiler/QuickFiler.csproj`, and
       `QuickFiler.Test/QuickFiler.Test.csproj` are unmodified.
 - [ ] All three `Cleanup()` statement-order constraints hold in the delivered source: unwire before
@@ -838,7 +840,10 @@ regression test. The one exception is verified by source inspection and is recor
       relative to the Phase 0 baseline.
 - [ ] Each new production member added by this feature reaches `>= 90%` line coverage, except the
       two-statement lambda adapter inside the pre-existing `[ExcludeFromCodeCoverage]`
-      `InitializeWebViewAsync`.
+      `InitializeWebViewAsync`, and except `DetachWebResourceRequestedHandler`, whose guarded `-=` statement is
+      unreachable without a live WebView2 runtime per research section 2.4, so its measured
+      per-method line rate is non-zero but below that figure for that reason alone, as verified by
+      the fail-before exception dossier.
 - [ ] No new `[ExcludeFromCodeCoverage]` attribute is introduced anywhere by this feature.
 - [ ] For each of the five issues, evidence records the regression test failing against the unfixed code
       before the corresponding production change, per the CLAUDE.md Bugfix Workflow.

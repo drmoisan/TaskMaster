@@ -53,12 +53,17 @@ Production files this feature may write:
 - `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`
 - `QuickFiler/Controllers/QfcItemController.MailActions.cs`
 
-Test files (all four already carry `Compile Include` entries in `QuickFiler.Test/QuickFiler.Test.csproj`):
+Test files (all five already carry `Compile Include` entries in `QuickFiler.Test/QuickFiler.Test.csproj`
+at lines 142, 144, 146, 150, and 153):
 
 - `QuickFiler.Test/Controllers/QfcItemController.FocusAndThemeTests.cs`
 - `QuickFiler.Test/Controllers/QfcItemController.EventWiringTests.cs`
 - `QuickFiler.Test/Controllers/QfcItemController.ViewerSetupTests.cs`
 - `QuickFiler.Test/Controllers/QfcItemController.MailActionsTests.cs`
+- `QuickFiler.Test/Controllers/QfcItemController.TestSupport.cs` — shared arrange helpers only; no test
+  method may be added. This file is consumed by 16 other `QfcItemController` test files, including
+  `QuickFiler.Test/Controllers/QfcItemController.NavigationTests.cs`, so this feature only appends new
+  private helpers and modifies no existing member.
 
 ## Files This Feature Must Not Write
 
@@ -82,6 +87,8 @@ integration branch that already carries this change:
 Any change to the public or internal surface of the four owned partials, to event-wiring order, or
 to the lifecycle contract must be stated explicitly in `spec.md` because those two features will be
 authored against it.
+
+This feature appends private arrange helpers to QuickFiler.Test/Controllers/QfcItemController.TestSupport.cs. The change is additive: no existing helper is renamed, removed, or altered, so tests owned by other epic children that consume that file are unaffected.
 
 ## Acceptance Criteria Source
 
