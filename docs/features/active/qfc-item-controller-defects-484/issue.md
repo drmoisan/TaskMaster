@@ -27,7 +27,7 @@ concurrent branches editing the same four files.
 | Issue | Title | Primary file | Severity |
 |---|---|---|---|
 | #480 | `ToggleNavigation(bool)` toggles twice, so the feature is inert | `QfcItemController.FocusAndTheme.cs` | Medium |
-| #481 | No event unwiring path; ~22 subscriptions are never detached | `QfcItemController.EventWiring.cs`, `.ViewerSetup.cs` | Medium |
+| #481 | No event unwiring path; 23 subscriptions are never detached | `QfcItemController.EventWiring.cs`, `.ViewerSetup.cs` | Medium |
 | #483 | `MoveMailAsync` swallows every exception; missing cancellation checks | `QfcItemController.MailActions.cs` | Medium-High |
 | #484 | `Cleanup()` nulls an armed `System.Threading.Timer` without disposing it | `QfcItemController.ViewerSetup.cs` | Medium |
 | #485 | `WebResourceRequested` handler dereferences unguarded external inputs | `QfcItemController.ViewerSetup.cs` | Low-Medium |
@@ -61,9 +61,12 @@ at lines 142, 144, 146, 150, and 153):
 - `QuickFiler.Test/Controllers/QfcItemController.ViewerSetupTests.cs`
 - `QuickFiler.Test/Controllers/QfcItemController.MailActionsTests.cs`
 - `QuickFiler.Test/Controllers/QfcItemController.TestSupport.cs` — shared arrange helpers only; no test
-  method may be added. This file is consumed by 16 other `QfcItemController` test files, including
-  `QuickFiler.Test/Controllers/QfcItemController.NavigationTests.cs`, so this feature only appends new
-  private helpers and modifies no existing member.
+  method may be added. Seventeen other test files in `QuickFiler.Test` consume `QfcItemControllerTestSupport`
+  or `HarnessController` from this file — fifteen of them named `QfcItemController*`, including
+  `QuickFiler.Test/Controllers/QfcItemController.NavigationTests.cs`, plus
+  `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` and
+  `QuickFiler.Test/Viewers/BreadcrumbDropDownSearchIntegrationTests.Part2.cs` — so this feature only
+  appends new private helpers and modifies no existing member.
 
 ## Files This Feature Must Not Write
 
