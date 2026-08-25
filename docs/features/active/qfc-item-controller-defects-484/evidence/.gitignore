@@ -1,0 +1,25 @@
+# Raw machine test and coverage output is never committed under this evidence tree.
+#
+# The evidence of record is the distilled per-command markdown alongside these paths, each
+# carrying Timestamp:, Command:, EXIT_CODE:, and Output Summary: with the numeric headline
+# figures extracted. The raw artifacts are large and the repository's standing convention is
+# against committing them; the maintainer removes committed raw Cobertura on sight.
+#
+# The repository-root .gitignore already excludes *.coverage and *.coveragexml, and excludes
+# coverage/* at the root. It does NOT exclude *.trx or *.cobertura.xml, and this plan writes
+# Cobertura into this tree at P0-T14 and P7-T6, so a `git add -A` in this worktree would
+# otherwise stage them. The two patterns below close that gap.
+#
+# Mirrors the convention established at
+# docs/features/active/winformspumphost-suite-determinism-511/evidence/.gitignore.
+
+*.trx
+*.coverage
+*.coveragexml
+*.cobertura.xml
+
+# vstest per-run scratch directories. The date-stamped form is the default results layout; the
+# Deploy_* form is the deployment scratch directory, whose default name embeds the account and
+# host name and is therefore also a host-identifier leak.
+Deploy_*/
+20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]_*/
