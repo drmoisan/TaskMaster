@@ -32,5 +32,24 @@ round-1 correction that had never landed. Round 5's own findings (D23, D24) were
 - Bound the pass (five rounds worked here) and require an explicit CONVERGING-vs-CHURNING judgement
   at the bound. Converging looks like: severity falls, findings move into newer text, and the last
   round's findings change no figure, file assignment, member table, or gate.
+- **The residuals are MANUFACTURED by the correction directive, not just missed by the executor.**
+  A correction prompt written as site-specific edits ("in P0-T10, change X") gets exactly that: the
+  planner fixes P0-T10 and the identical fact at P11-T2 survives untouched, becoming next round's
+  "residual". Child 489 round 3 produced three residual classes this way, all of them corrections
+  rounds 1-2 had already made at the sites those rounds happened to notice. Site-specific phrasing
+  is still correct — it is what stops a planner renumbering tasks and invalidating cross-references —
+  so do not loosen it. Instead PAIR every site-specific edit with a mandatory sweep clause: "apply
+  this at the named site, then re-derive every other site in the plan exhibiting the same underlying
+  fact, apply it there too, and report the full site list you found." Arming only the executor with
+  the sweep mandate catches residuals one round LATE; arming the planner prevents them.
+
+**Diagnosing a rising defect count.** A round-over-round increase is not automatically divergence.
+Separate the causes before judging the planner: (a) scope you widened this round (adding a defect
+ledger, G1-G6, or a citation-verification mandate raises the count by construction — see
+[[preflight-defect-trend-scope-confound]]); (b) environment facts only a probe finds, such as a
+missing repo-local SDK, which no amount of planning prose detects; (c) staleness the WORLD caused,
+e.g. a cited integration head that a mid-session merge moved; and only then (d) genuine planner
+residuals. In 489 round 3, twelve defects decomposed as 2 non-planner, 4 routine hygiene, 3 true
+residuals — with blockers still falling 6 → 1 → 3 and zero re-introductions throughout.
 
 Related: [[remediation-loop-strict-handoff]], [[epic-kickoff-facts-need-independent-measurement]].
