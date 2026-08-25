@@ -105,7 +105,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
                         rowId,
                         BreadcrumbRowKind.Banner,
                         new[] { new BreadcrumbSegment(presentedText, presentedText, false) },
-                        null
+                        null,
+                        presentedText
                     );
 
                 case BreadcrumbRowKind.TrashPseudoRow:
@@ -113,7 +114,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
                         rowId,
                         BreadcrumbRowKind.TrashPseudoRow,
                         Array.Empty<BreadcrumbSegment>(),
-                        null
+                        null,
+                        presentedText
                     );
 
                 default:
@@ -128,15 +130,15 @@ namespace UtilitiesCS.OutlookObjects.Folder
                         };
                     }
 
-                    string joinPath = segments[segments.Count - 1].FullPath;
-                    double? probability = probabilityByPath.TryGetValue(joinPath, out double p)
+                    double? probability = probabilityByPath.TryGetValue(presentedText, out double p)
                         ? p
                         : (double?)null;
                     return new BreadcrumbRow(
                         rowId,
                         BreadcrumbRowKind.Suggestion,
                         segments,
-                        probability
+                        probability,
+                        presentedText
                     );
             }
         }

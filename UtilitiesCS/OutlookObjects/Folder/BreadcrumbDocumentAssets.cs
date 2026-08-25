@@ -41,9 +41,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
             + ".affordance { color: #6cb6ff; }\n";
 
         /// <summary>
-        /// Bridge JS: emitters for segment double-click, leaf affordance activation,
-        /// left/right/up/down arrow keys, and row selection; plus the inbound listener applying
-        /// <c>render</c> and <c>subfolderResult</c> updates. Child names are inserted via
+        /// Bridge JS: emitters for segment double-click, typed non-leaf/child activation, leaf
+        /// affordance activation, left/right/up/down arrow keys, and row selection; plus the
+        /// inbound listener applying <c>render</c> and <c>subfolderResult</c> updates. Child names are inserted via
         /// <c>textContent</c> (never markup) so provider data cannot inject HTML.
         /// </summary>
         public const string BridgeJs =
@@ -66,6 +66,26 @@ namespace UtilitiesCS.OutlookObjects.Folder
             + "    }\n"
             + "  });\n"
             + "  document.addEventListener('click', function (e) {\n"
+            + "    var seg = e.target.closest('.seg[data-segment-activate=\"true\"]');\n"
+            + "    if (seg) {\n"
+            + "      var segId = rowIdOf(seg);\n"
+            + "      var segIdx = seg.getAttribute('data-segment-index');\n"
+            + "      if (segId !== null && segIdx !== null) {\n"
+            + "        post({ type: 'segmentActivate', rowId: segId, segmentIndex: parseInt(segIdx, 10) });\n"
+            + "      }\n"
+            + "      e.stopPropagation();\n"
+            + "      return;\n"
+            + "    }\n"
+            + "    var child = e.target.closest('.child[data-child-index]');\n"
+            + "    if (child) {\n"
+            + "      var childId = rowIdOf(child);\n"
+            + "      var childIdx = child.getAttribute('data-child-index');\n"
+            + "      if (childId !== null && childIdx !== null) {\n"
+            + "        post({ type: 'renderedChildActivate', rowId: childId, childIndex: parseInt(childIdx, 10) });\n"
+            + "      }\n"
+            + "      e.stopPropagation();\n"
+            + "      return;\n"
+            + "    }\n"
             + "    var aff = e.target.closest('.affordance');\n"
             + "    if (aff) {\n"
             + "      var affId = rowIdOf(aff);\n"

@@ -35,6 +35,11 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             );
         }
 
+        private static FolderTreeNodeKey Key(string path)
+        {
+            return new FolderTreeNodeKey("archive-store", path, path);
+        }
+
         private static BreadcrumbRow BannerRow()
         {
             return new BreadcrumbRow(
@@ -69,6 +74,46 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             row.IsCollapsed.Should().BeTrue();
             row.CollapsedAfterIndex.Should().Be(0);
             row.VisibleSegments().Select(s => s.DisplayName).Should().Equal("Root");
+        }
+
+        [TestMethod]
+        public void ActivateSegment_ValidAncestorRetainsKeyAndRejectsInvalidStateChanges()
+        {
+            // Arrange
+            var row = SuggestionRow(leafHasSubfolders: false);
+            FolderTreeNodeKey middleKey = Key(@"\Archive\Clients");
+            row.SetSegmentKey(1, middleKey);
+
+            // Act / Assert: leaf, missing-key, and repeated activation cannot mutate state.
+            row.ActivateSegment(2).Should().BeFalse();
+            row.ActiveSegmentIndex.Should().Be(2);
+            row.ActivateSegment(0).Should().BeFalse();
+            row.ActiveSegmentIndex.Should().Be(2);
+
+            // A valid keyed ancestor becomes active and owns child state.
+            row.ActivateSegment(1).Should().BeTrue();
+            row.ActiveSegmentIndex.Should().Be(1);
+            row.ActiveSegmentKey.Should().Be(middleKey);
+            row.SetLeafChildren(new[] { Segment("Sibling", false) }).Should().BeTrue();
+            row.ToggleLeafExpanded().Should().BeTrue();
+            row.GetActiveChild(0)!.FullPath.Should().Be(@"Inbox\Sibling");
+            row.GetActiveChild(1).Should().BeNull();
+            row.ActivateSegment(1).Should().BeFalse();
+        }
+
+        [TestMethod]
+        public void SetSegmentKey_InvalidInputPreservesUnkeyedState()
+        {
+            // Arrange: only valid suggestion-row indexes may gain hierarchy keys.
+            var row = SuggestionRow(leafHasSubfolders: false);
+
+            // Act
+            row.SetSegmentKey(-1, Key(@"\Archive\Invalid"));
+
+            // Assert
+            row.ActivateSegment(0).Should().BeFalse();
+            row.ActiveSegmentIndex.Should().Be(2);
+            row.ActiveSegmentKey.Should().BeNull();
         }
 
         [TestMethod]

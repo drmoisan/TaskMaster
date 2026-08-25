@@ -79,6 +79,26 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             message.RowId.Should().Be("row-7");
         }
 
+        [TestMethod]
+        public void DeserializeInbound_SegmentActivateAndRenderedChildActivate_RoundTripTypedIndexes()
+        {
+            // Act
+            BreadcrumbInboundMessage segment = _codec.DeserializeInbound(
+                "{\"type\":\"segmentActivate\",\"rowId\":\"row-3\",\"segmentIndex\":1}"
+            );
+            BreadcrumbInboundMessage child = _codec.DeserializeInbound(
+                "{\"type\":\"renderedChildActivate\",\"rowId\":\"row-3\",\"childIndex\":2}"
+            );
+
+            // Assert
+            segment.Type.Should().Be(BreadcrumbMessageTypes.SegmentActivate);
+            segment.SegmentIndex.Should().Be(1);
+            segment.ChildIndex.Should().BeNull();
+            child.Type.Should().Be(BreadcrumbMessageTypes.RenderedChildActivate);
+            child.ChildIndex.Should().Be(2);
+            child.SegmentIndex.Should().BeNull();
+        }
+
         // ---- Outbound round-trips (one per outbound type) ----
 
         [TestMethod]
@@ -220,6 +240,21 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
 
             // Assert
             act.Should().Throw<BreadcrumbMessageException>().WithMessage("*segmentIndex*");
+        }
+
+        [TestMethod]
+        public void DeserializeInbound_TypedActivationWithoutRequiredIndex_ThrowsBreadcrumbMessageException()
+        {
+            // Act / Assert
+            Action segment = () =>
+                _codec.DeserializeInbound("{\"type\":\"segmentActivate\",\"rowId\":\"row-1\"}");
+            Action child = () =>
+                _codec.DeserializeInbound(
+                    "{\"type\":\"renderedChildActivate\",\"rowId\":\"row-1\"}"
+                );
+
+            segment.Should().Throw<BreadcrumbMessageException>().WithMessage("*segmentIndex*");
+            child.Should().Throw<BreadcrumbMessageException>().WithMessage("*childIndex*");
         }
 
         [TestMethod]
