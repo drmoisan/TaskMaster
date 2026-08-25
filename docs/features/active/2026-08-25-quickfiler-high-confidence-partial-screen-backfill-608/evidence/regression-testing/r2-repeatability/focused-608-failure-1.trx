@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="b0bdf7b3-48f7-47d2-8564-e361d94f86fd" name="DanMoisan@MEGALODON4 2026-08-25 13:27:29" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-25T13:27:29.5833579-04:00" queuing="2026-08-25T13:27:29.5833579-04:00" start="2026-08-25T13:27:28.2886967-04:00" finish="2026-08-25T13:27:29.6361216-04:00" />
+  <TestSettings name="default" id="47137d4d-090b-4003-8d16-13c576fc5d0a">
+    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-25_13_27_29" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="fb1e4ea0-8936-4a2f-9ec2-0dd233bb1964" testId="130b0d31-09d7-8bdc-a2b0-2b5de25a661c" testName="DequeueAsync_DeadlineExpiresDuringInFlightScore_IncludesFinalAcceptedItem" computerName="MEGALODON4" duration="00:00:00.3362460" startTime="2026-08-25T13:27:28.9938299-04:00" endTime="2026-08-25T13:27:29.4709549-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fb1e4ea0-8936-4a2f-9ec2-0dd233bb1964">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Expected result to contain a single item because the final in-flight acceptance is included, but found {Mock&lt;MailItem:1&gt;.Object, Mock&lt;MailItem:2&gt;.Object}.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Collections.GenericCollectionAssertions`3.ContainSingle(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Collections/GenericCollectionAssertions.cs:line 1214&#xD;
+   at QuickFiler.Controllers.Tests.QfcStreamingDequeueConfidenceGateTests.&lt;DequeueAsync_DeadlineExpiresDuringInFlightScore_IncludesFinalAcceptedItem&gt;d__21.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-25T11-36\QuickFiler.Test\Controllers\QfcStreamingDequeueConfidenceGateTests.Part2.cs:line 184&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.&lt;ExecuteInternalAsync&gt;d__58.MoveNext()</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="DequeueAsync_DeadlineExpiresDuringInFlightScore_IncludesFinalAcceptedItem" storage="c:\users\danmoisan\repos\taskmaster-wt\2026-08-25t11-36\quickfiler.test\bin\debug\quickfiler.test.dll" id="130b0d31-09d7-8bdc-a2b0-2b5de25a661c">
+      <Execution id="fb1e4ea0-8936-4a2f-9ec2-0dd233bb1964" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-25T11-36\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcStreamingDequeueConfidenceGateTests" name="DequeueAsync_DeadlineExpiresDuringInFlightScore_IncludesFinalAcceptedItem" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="130b0d31-09d7-8bdc-a2b0-2b5de25a661c" executionId="fb1e4ea0-8936-4a2f-9ec2-0dd233bb1964" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster-wt\2026-08-25T11-36\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
