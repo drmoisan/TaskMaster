@@ -302,6 +302,7 @@ following is the complete surface delta.
 | `TryResolveCidResource` | `QfcItemController.ViewerSetup.cs` | `internal` | **yes** | `static bool TryResolveCidResource(string requestedUri, IReadOnlyDictionary<string, IAttachment> contentIdMap, out byte[] payload, out string mimeType)` |
 | `_webResourceRequestedHandler` | `QfcItemController.ViewerSetup.cs` | `private` field | no | `EventHandler<CoreWebView2WebResourceRequestedEventArgs>` |
 | `_coreWebView2` | `QfcItemController.ViewerSetup.cs` | `private` field | no | `CoreWebView2` |
+| `DetachWebResourceRequestedHandler` | `QfcItemController.ViewerSetup.cs` | `private` | no | `void DetachWebResourceRequestedHandler()` — detaches `_webResourceRequestedHandler` from `_coreWebView2` when both are non-null and nulls both fields; not part of the consumable surface |
 
 `UnwireEvents`, `UnwireControlTreeEvents`, `UnwireIntentEvents`, `MoveFailureNotifier`, and
 `TryResolveCidResource` are visible to `QuickFiler.Test` through
@@ -418,7 +419,7 @@ Nothing else.
 #### Functions/classes/CLI commands impacted
 
 `ToggleNavigation(bool)`, `ApplyReadEmailFormat(object)`, `Cleanup()`, `InitializeWebViewAsync()`,
-`MoveMailAsync()`, `FlagAsTaskAsync()`, `EnumerateConversationAsync()`, plus the eight added members
+`MoveMailAsync()`, `FlagAsTaskAsync()`, `EnumerateConversationAsync()`, plus the nine added members
 tabulated above. No CLI surface exists for this assembly.
 
 #### Data flow and validation changes
