@@ -32,6 +32,14 @@
 - Impact: the re-launched research delegation is invalid and cannot supply a lifecycle receipt.
 - Corrective action: preserve this failure and inspect the hook's expected receipt-to-runtime mapping before further launch attempts.
 
+## 2026-08-25T12:14:08-04:00
+
+- Attempted action/path: nested validation-only plan preflight launched by the initial Issue #608 atomic planner.
+- Hook: SubagentStart model-routing attestation.
+- Exact failure output/reason: `MODEL_ROUTING_ATTESTATION_BLOCKED` because the launched `atomic-executor` agent had no exact matching routing receipt; the authority record contains blank expected-model and expected-reasoning fields even though the actual runtime and checked-in profile were `gpt-5.6-terra` with `high` reasoning.
+- Impact: the start hook supplied the no-mutation instruction, and the nested preflight was aborted before any tool call, file read, file mutation, or Stop-hook report.
+- Corrective action: persist the generated receipt before launch and delegate the exact `atomic-executor-c3` profile rather than the generic `atomic-executor` alias.
+
 ## 2026-08-25T13:32:00-04:00
 
 - Attempted action/path: delegated cycle-3 atomic planning for Issue #608 at `docs/features/active/2026-08-25-quickfiler-high-confidence-partial-screen-backfill-608/correction-and-qa-plan.2026-08-25T13-32.md`.
