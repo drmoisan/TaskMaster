@@ -39,6 +39,61 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         }
 
         [TestMethod]
+        public void Issue439ResolvedLineageUsesUnicodeArrowSeparators()
+        {
+            // Arrange: a pure row model with an encoded display-name boundary.
+            var row = new BreadcrumbRow(
+                "row-issue-439",
+                BreadcrumbRowKind.Suggestion,
+                new[]
+                {
+                    new BreadcrumbSegment(@"\Archive", "<Archive>", true),
+                    new BreadcrumbSegment(@"\Archive\Clients", "Clients", true),
+                    new BreadcrumbSegment(@"\Archive\Clients\North", "North", false),
+                },
+                null
+            );
+
+            // Act
+            string html = _renderer.RenderRowFragment(row, isSelected: false);
+
+            // Assert
+            Regex.Matches(html, "→").Count.Should().Be(2);
+            html.Should().Contain("&lt;Archive&gt;");
+            html.Should().NotContain("><Archive><");
+        }
+
+        [TestMethod]
+        public void Issue439ActiveAncestorChildrenAndEmbeddedBridgeUseTypedStoppedActivation()
+        {
+            // Arrange
+            var row = SuggestionRow(leafHasSubfolders: false, probability: null);
+            row.SetSegmentKey(
+                1,
+                new FolderTreeNodeKey("archive", @"\Archive\Mid", @"\Archive\Mid")
+            );
+            row.ActivateSegment(1).Should().BeTrue();
+            row.SetLeafChildren(new[] { Segment("Sibling", false) }).Should().BeTrue();
+            row.ToggleLeafExpanded().Should().BeTrue();
+
+            // Act
+            string fragment = _renderer.RenderRowFragment(row, isSelected: false);
+            string document = _renderer.RenderDocument(
+                new[] { row },
+                darkMode: false,
+                selectedRowId: null
+            );
+
+            // Assert
+            fragment.Should().Contain("data-segment-activate=\"true\"");
+            fragment.Should().Contain("class=\"child\" data-child-index=\"0\"");
+            document.Should().Contain("type: 'segmentActivate'");
+            document.Should().Contain("type: 'renderedChildActivate'");
+            document.Should().Contain("e.stopPropagation();");
+            document.Should().NotContain("ItemViewer");
+        }
+
+        [TestMethod]
         public void RenderRowFragment_EveryRowKind_EmitsTrailingPctFlexItem()
         {
             // Arrange

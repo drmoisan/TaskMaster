@@ -35,6 +35,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
     {
         private readonly List<BreadcrumbSegment> _segments;
         private List<BreadcrumbSegment> _leafChildren = new List<BreadcrumbSegment>();
+        private readonly Dictionary<int, FolderTreeNodeKey> _segmentKeys =
+            new Dictionary<int, FolderTreeNodeKey>();
 
         /// <summary>
         /// Creates a breadcrumb row.
@@ -48,7 +50,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
             string rowId,
             BreadcrumbRowKind kind,
             IEnumerable<BreadcrumbSegment> segments,
-            double? probability
+            double? probability,
+            string? filingTarget = null
         )
         {
             RowId = rowId ?? throw new ArgumentNullException(nameof(rowId));
@@ -57,6 +60,13 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 segments ?? throw new ArgumentNullException(nameof(segments))
             );
             Probability = probability;
+            FilingTarget =
+                filingTarget
+                ?? (_segments.Count == 0 ? string.Empty : _segments[_segments.Count - 1].FullPath);
+            ActiveSegmentIndex =
+                kind == BreadcrumbRowKind.Suggestion && _segments.Count > 0
+                    ? _segments.Count - 1
+                    : (int?)null;
         }
 
         /// <summary>Stable identifier used to correlate bridge messages.</summary>
@@ -70,6 +80,29 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         /// <summary>Prediction probability, or null when no score was joined.</summary>
         public double? Probability { get; }
+
+        /// <summary>
+        /// Original presented filing target. This is independent of the full hierarchy paths
+        /// carried by <see cref="Segments"/> and is used for normal folder selection.
+        /// </summary>
+        public string FilingTarget { get; }
+
+        /// <summary>
+        /// Current expand/select segment index. Suggestion rows begin with the predicted leaf
+        /// active, while a typed non-leaf activation replaces it after validation.
+        /// </summary>
+        public int? ActiveSegmentIndex { get; private set; }
+
+        /// <summary>Current active segment, or null for banner and pseudo rows.</summary>
+        public BreadcrumbSegment? ActiveSegment =>
+            ActiveSegmentIndex.HasValue ? _segments[ActiveSegmentIndex.Value] : null;
+
+        /// <summary>Stable hierarchy key for the active segment, or null until provider-bound.</summary>
+        public FolderTreeNodeKey? ActiveSegmentKey =>
+            ActiveSegmentIndex.HasValue
+            && _segmentKeys.TryGetValue(ActiveSegmentIndex.Value, out FolderTreeNodeKey key)
+                ? key
+                : null;
 
         /// <summary>
         /// Index of the segment after which the breadcrumb is collapsed, or null when fully
@@ -90,6 +123,69 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// <summary>The anchored predicted leaf segment, or null when the row has no segments.</summary>
         public BreadcrumbSegment? LeafSegment =>
             _segments.Count > 0 ? _segments[_segments.Count - 1] : null;
+
+        /// <summary>
+        /// Associates a root-to-leaf provider identity with a segment. Invalid or non-suggestion
+        /// indexes are ignored so malformed bridge state cannot create a selectable key.
+        /// </summary>
+        public void SetSegmentKey(int segmentIndex, FolderTreeNodeKey key)
+        {
+            if (
+                Kind != BreadcrumbRowKind.Suggestion
+                || key == null
+                || segmentIndex < 0
+                || segmentIndex >= _segments.Count
+            )
+            {
+                return;
+            }
+
+            _segmentKeys[segmentIndex] = key;
+        }
+
+        /// <summary>
+        /// Activates a validated non-leaf segment. The active segment owns subsequent expansion
+        /// and its immediate-child projection; invalid, leaf, banner, and pseudo-row requests are
+        /// deterministic no-ops.
+        /// </summary>
+        public bool ActivateSegment(int segmentIndex)
+        {
+            if (
+                Kind != BreadcrumbRowKind.Suggestion
+                || segmentIndex < 0
+                || segmentIndex >= _segments.Count - 1
+                || !_segmentKeys.ContainsKey(segmentIndex)
+            )
+            {
+                return false;
+            }
+
+            if (ActiveSegmentIndex == segmentIndex)
+            {
+                return false;
+            }
+
+            ActiveSegmentIndex = segmentIndex;
+            _leafChildren = new List<BreadcrumbSegment>();
+            IsLeafExpanded = false;
+            return true;
+        }
+
+        /// <summary>Returns the active child at the validated index, or null for an invalid request.</summary>
+        public BreadcrumbSegment? GetActiveChild(int childIndex)
+        {
+            if (
+                Kind != BreadcrumbRowKind.Suggestion
+                || !IsLeafExpanded
+                || childIndex < 0
+                || childIndex >= _leafChildren.Count
+            )
+            {
+                return null;
+            }
+
+            return _leafChildren[childIndex];
+        }
 
         /// <summary>
         /// Collapses the breadcrumb after the non-leaf segment at <paramref name="segmentIndex"/>:
@@ -161,7 +257,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 throw new ArgumentNullException(nameof(children));
             }
 
-            if (!CanExpandLeaf())
+            if (!CanExpandActiveSegment())
             {
                 return false;
             }
@@ -177,7 +273,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// <returns>True when the view state changed.</returns>
         public bool ToggleLeafExpanded()
         {
-            if (!CanExpandLeaf() || IsCollapsed)
+            if (!CanExpandActiveSegment() || IsCollapsed)
             {
                 return false;
             }
@@ -233,7 +329,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 return ReExpand();
             }
 
-            if (CanExpandLeaf() && !IsLeafExpanded)
+            if (CanExpandActiveSegment() && !IsLeafExpanded)
             {
                 IsLeafExpanded = true;
                 return true;
@@ -257,9 +353,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
             return _segments.GetRange(0, CollapsedAfterIndex.Value + 1);
         }
 
-        private bool CanExpandLeaf()
+        private bool CanExpandActiveSegment()
         {
-            return Kind == BreadcrumbRowKind.Suggestion && LeafSegment?.HasSubfolders == true;
+            return Kind == BreadcrumbRowKind.Suggestion && ActiveSegment?.HasSubfolders == true;
         }
     }
 }

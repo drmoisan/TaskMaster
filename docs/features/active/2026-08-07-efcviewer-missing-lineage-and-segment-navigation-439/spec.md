@@ -209,20 +209,20 @@ Research-established coverage must be added before the implementation is conside
 
 ## Acceptance Criteria
 
-- [ ] Given an archive-relative suggestion or search target and `ArchiveRootPath`, the Efc boundary sends the correctly root-expanded full path to `IFolderHierarchyProvider.ResolveLeafKeyAsync` while retaining the original target as the row's filing target.
-- [ ] Given a target already rooted at `ArchiveRootPath` under ordinal-ignore-case comparison, the boundary sends that full path unchanged and does not duplicate the root.
-- [ ] Given a resolved three-node ancestor chain for a suggestion or search row, the Efc-generated renderer displays those nodes in root-to-leaf order with exactly one `→` between each adjacent pair.
-- [ ] Given a resolved row with a `FolderScore` keyed by its original archive-relative target, the row displays that score after hierarchy resolution and normal row selection returns that original target.
-- [ ] Given a null resolution key, empty ancestor chain, or hierarchy-provider failure, the row remains selectable as one segment and the fallback cause is sent to the existing logging boundary.
-- [ ] Given an ordinary archive-relative suggestion or search target that resolves after root expansion, the row does not use the one-segment fallback.
-- [ ] Given a malformed, missing, banner, pseudo-row, out-of-range row, out-of-range segment, or invalid child activation message, the codec/router rejects it without changing selected or expanded state.
-- [ ] Given activation of a valid non-leaf segment, the router selects that ancestor's archive-relative target and prevents the row-level handler from reselecting the original leaf.
-- [ ] Given a valid activated non-leaf ancestor, expansion requests its immediate children using that ancestor's stable `FolderTreeNodeKey`, not the original leaf key.
-- [ ] Given rendered immediate children for an expanded ancestor, activation of a valid child selects that child or sibling's archive-relative target.
-- [ ] Existing segment double-click collapses trailing segments, while keyboard Left/Right behavior remains unchanged.
-- [ ] `====` banner rows and `Trash to Delete` retain their existing behavior and do not gain lineage, hierarchy resolution, or child activation.
-- [ ] No ItemViewer `FolderBreadcrumb.html` behavior, Issue #400 behavior, score-model calculation, public configuration, or external API changes are included.
-- [ ] The required C# formatter, analyzer, nullable, MSTest, and coverage comparison pass in one final ordered toolchain pass, with canonical Issue #439 evidence artifacts present.
+- [x] Given an archive-relative suggestion or search target and `ArchiveRootPath`, the Efc boundary sends the correctly root-expanded full path to `IFolderHierarchyProvider.ResolveLeafKeyAsync` while retaining the original target as the row's filing target.
+- [x] Given a target already rooted at `ArchiveRootPath` under ordinal-ignore-case comparison, the boundary sends that full path unchanged and does not duplicate the root.
+- [x] Given a resolved three-node ancestor chain for a suggestion or search row, the Efc-generated renderer displays those nodes in root-to-leaf order with exactly one `→` between each adjacent pair.
+- [x] Given a resolved row with a `FolderScore` keyed by its original archive-relative target, the row displays that score after hierarchy resolution and normal row selection returns that original target.
+- [x] Given a null resolution key, empty ancestor chain, or hierarchy-provider failure, the row remains selectable as one segment and the fallback cause is sent to the existing logging boundary.
+- [x] Given an ordinary archive-relative suggestion or search target that resolves after root expansion, the row does not use the one-segment fallback.
+- [x] Given a malformed, missing, banner, pseudo-row, out-of-range row, out-of-range segment, or invalid child activation message, the codec/router rejects it without changing selected or expanded state.
+- [x] Given activation of a valid non-leaf segment, the router selects that ancestor's archive-relative target and prevents the row-level handler from reselecting the original leaf.
+- [x] Given a valid activated non-leaf ancestor, expansion requests its immediate children using that ancestor's stable `FolderTreeNodeKey`, not the original leaf key.
+- [x] Given rendered immediate children for an expanded ancestor, activation of a valid child selects that child or sibling's archive-relative target.
+- [x] Existing segment double-click collapses trailing segments, while keyboard Left/Right behavior remains unchanged.
+- [x] `====` banner rows and `Trash to Delete` retain their existing behavior and do not gain lineage, hierarchy resolution, or child activation.
+- [x] No ItemViewer `FolderBreadcrumb.html` behavior, Issue #400 behavior, score-model calculation, public configuration, or external API changes are included.
+- [x] The required C# formatter, analyzer, nullable, MSTest, and coverage comparison pass in one final ordered toolchain pass, with canonical Issue #439 evidence artifacts present.
 
 ## Risks & Mitigations
 

@@ -362,5 +362,36 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             // Assert
             rows.Single().Probability.Should().BeNull();
         }
+
+        [TestMethod]
+        public void Issue439ResolvedFullHierarchyRetainsOriginalFilingTargetAndScore()
+        {
+            // Arrange: hierarchy paths are archive-rooted while the presented filing target and
+            // score key remain archive-relative.
+            const string filingTarget = @"Clients\North";
+            var builder = new BreadcrumbRowBuilder();
+            var chain = new[]
+            {
+                ProviderSegment(@"\Archive", "Archive", true),
+                ProviderSegment(@"\Archive\Clients", "Clients", true),
+                ProviderSegment(@"\Archive\Clients\North", "North", false),
+            };
+
+            // Act
+            var row = builder.BuildRow(
+                "row-439",
+                filingTarget,
+                chain,
+                new Dictionary<string, double> { [filingTarget] = 0.73 }
+            );
+
+            // Assert
+            row.FilingTarget.Should().Be(filingTarget);
+            row.Probability.Should().Be(0.73);
+            row.Segments.Select(segment => segment.DisplayName)
+                .Should()
+                .ContainInOrder("Archive", "Clients", "North");
+            row.LeafSegment.FullPath.Should().Be(@"\Archive\Clients\North");
+        }
     }
 }

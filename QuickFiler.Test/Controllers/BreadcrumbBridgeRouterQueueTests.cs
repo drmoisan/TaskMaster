@@ -349,9 +349,10 @@ namespace QuickFiler.Test.Controllers
         }
 
         [TestMethod]
-        public void Bind_WhenProviderCanceled_PropagatesCancellation()
+        public void Bind_WhenProviderCanceled_RendersSingleSegmentFallback()
         {
-            // Arrange: cancellation during binding propagates to the caller.
+            // Arrange: a provider cancellation is a diagnosable binding fallback.
+            _initialized = true;
             _provider
                 .Setup(p =>
                     p.ResolveLeafKeyAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())
@@ -359,37 +360,52 @@ namespace QuickFiler.Test.Controllers
                 .ThrowsAsync(new OperationCanceledException());
 
             // Act
-            Action act = () => Bind();
+            Bind();
 
-            // Assert
-            act.Should().Throw<OperationCanceledException>();
+            // Assert: binding preserves the selectable presented target without hierarchy data.
+            _navigated.Should().ContainSingle().Which.Should().Contain(">Alpha<");
+            _provider.Verify(
+                p =>
+                    p.GetAncestorChainAsync(
+                        It.IsAny<FolderTreeNodeKey>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never
+            );
         }
 
         [TestMethod]
-        public void LeafExpand_WhenKeyUnresolvedAtExpandTime_LeavesStateUnchanged()
+        public void LeafExpand_UsesBoundActiveSegmentKeyWithoutResolvingAgain()
         {
-            // Arrange: bind resolves normally, but the expand-time key lookup returns null.
+            // Arrange: binding captures the hierarchy key for the active leaf segment.
             _initialized = true;
             Bind();
             _provider
                 .Setup(p =>
-                    p.ResolveLeafKeyAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())
+                    p.GetImmediateSubfoldersAsync(
+                        It.Is<FolderTreeNodeKey>(key => key.FolderPath == LeafPath),
+                        It.IsAny<CancellationToken>()
+                    )
                 )
-                .ReturnsAsync((FolderTreeNodeKey)null);
+                .ReturnsAsync(Array.Empty<FolderBreadcrumbSegment>());
             int postedBefore = _posted.Count;
 
             // Act
             Inbound("{\"type\":\"leafExpandToggle\",\"rowId\":\"row-0\"}");
 
-            // Assert
-            _posted.Count.Should().Be(postedBefore);
+            // Assert: expansion uses the key captured at bind time and emits its two updates.
+            _posted.Count.Should().Be(postedBefore + 2);
+            _provider.Verify(
+                p => p.ResolveLeafKeyAsync(LeafPath, It.IsAny<CancellationToken>()),
+                Times.Once
+            );
             _provider.Verify(
                 p =>
                     p.GetImmediateSubfoldersAsync(
-                        It.IsAny<FolderTreeNodeKey>(),
+                        It.Is<FolderTreeNodeKey>(key => key.FolderPath == LeafPath),
                         It.IsAny<CancellationToken>()
                     ),
-                Times.Never
+                Times.Once
             );
         }
 

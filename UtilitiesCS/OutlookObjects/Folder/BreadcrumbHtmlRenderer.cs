@@ -146,7 +146,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             {
                 if (i > 0)
                 {
-                    sb.Append("<span class=\"sep\"> &gt; </span>");
+                    sb.Append("<span class=\"sep\">→</span>");
                 }
 
                 bool isCollapsedTerminal = row.IsCollapsed && i == visible.Count - 1;
@@ -158,7 +158,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
                     );
                 }
 
-                AppendSegment(sb, visible[i], i);
+                AppendSegment(sb, visible[i], i, i < row.Segments.Count - 1);
             }
 
             if (!row.IsCollapsed)
@@ -172,10 +172,16 @@ namespace UtilitiesCS.OutlookObjects.Folder
             AppendChildren(sb, row);
         }
 
-        private static void AppendSegment(StringBuilder sb, BreadcrumbSegment segment, int index)
+        private static void AppendSegment(
+            StringBuilder sb,
+            BreadcrumbSegment segment,
+            int index,
+            bool isNonLeaf
+        )
         {
             sb.Append("<span class=\"seg\" data-segment-index=\"")
                 .Append(index)
+                .Append(isNonLeaf ? "\" data-segment-activate=\"true" : string.Empty)
                 .Append("\" title=\"")
                 .Append(WebUtility.HtmlEncode(segment.FullPath))
                 .Append("\">")
@@ -185,8 +191,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         private static void AppendLeafAffordance(StringBuilder sb, BreadcrumbRow row)
         {
-            // Emitted only when the leaf has subfolders: plus collapsed, minus expanded.
-            if (row.LeafSegment?.HasSubfolders != true)
+            // Emitted only when the active segment has subfolders: plus collapsed, minus expanded.
+            if (row.ActiveSegment?.HasSubfolders != true)
             {
                 return;
             }
@@ -209,9 +215,12 @@ namespace UtilitiesCS.OutlookObjects.Folder
             sb.Append("<div class=\"children\">");
             if (row.IsLeafExpanded)
             {
-                foreach (BreadcrumbSegment child in row.LeafChildren)
+                for (int i = 0; i < row.LeafChildren.Count; i++)
                 {
-                    sb.Append("<div class=\"child\" title=\"")
+                    BreadcrumbSegment child = row.LeafChildren[i];
+                    sb.Append("<div class=\"child\" data-child-index=\"")
+                        .Append(i)
+                        .Append("\" title=\"")
                         .Append(WebUtility.HtmlEncode(child.FullPath))
                         .Append("\">")
                         .Append(WebUtility.HtmlEncode(child.DisplayName))

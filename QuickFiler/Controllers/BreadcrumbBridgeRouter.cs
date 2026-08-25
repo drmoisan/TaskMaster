@@ -32,6 +32,7 @@ namespace QuickFiler.Controllers
         private IReadOnlyList<BreadcrumbRow> _rows = Array.Empty<BreadcrumbRow>();
         private string? _selectedRowId;
         private string? _pendingDocument;
+        private string _archiveRootPath = string.Empty;
         private bool _darkMode;
         private int _requestSequence;
 
@@ -77,6 +78,24 @@ namespace QuickFiler.Controllers
             CancellationToken cancellationToken
         )
         {
+            await BindRowsAsync(presentedRows, scores, string.Empty, cancellationToken);
+        }
+
+        /// <summary>
+        /// Builds breadcrumb rows while using the archive root only for hierarchy lookups. The
+        /// displayed and selected filing targets remain the original presented values.
+        /// </summary>
+        /// <param name="presentedRows">Presented row texts in display order.</param>
+        /// <param name="scores">Score projections joined by presented filing-target equality.</param>
+        /// <param name="archiveRootPath">The full Outlook archive root used by the hierarchy provider.</param>
+        /// <param name="cancellationToken">Token observed by the provider calls.</param>
+        internal async Task BindRowsAsync(
+            IReadOnlyList<string> presentedRows,
+            IEnumerable<FolderScore> scores,
+            string archiveRootPath,
+            CancellationToken cancellationToken
+        )
+        {
             if (presentedRows == null)
             {
                 throw new ArgumentNullException(nameof(presentedRows));
@@ -85,6 +104,7 @@ namespace QuickFiler.Controllers
             var chains = new Dictionary<string, IReadOnlyList<FolderBreadcrumbSegment>>(
                 StringComparer.OrdinalIgnoreCase
             );
+            _archiveRootPath = archiveRootPath ?? string.Empty;
             foreach (string text in presentedRows)
             {
                 if (
@@ -96,8 +116,9 @@ namespace QuickFiler.Controllers
                     continue;
                 }
 
+                string hierarchyPath = ToHierarchyPath(text, _archiveRootPath);
                 IReadOnlyList<FolderBreadcrumbSegment>? chain = await FetchChainAsync(
-                    text,
+                    hierarchyPath,
                     cancellationToken
                 );
                 if (chain != null)
@@ -111,8 +132,60 @@ namespace QuickFiler.Controllers
                 text => chains.TryGetValue(text, out var chain) ? chain : null,
                 scores
             );
+            AttachSegmentKeys(presentedRows, chains);
             _selectedRowId = null;
             DeliverDocument();
+        }
+
+        private static string ToHierarchyPath(string presentedTarget, string archiveRootPath)
+        {
+            if (string.IsNullOrWhiteSpace(archiveRootPath))
+            {
+                return presentedTarget;
+            }
+
+            string root = archiveRootPath.TrimEnd('\\', '/');
+            if (root.Length == 0)
+            {
+                return presentedTarget;
+            }
+
+            if (
+                string.Equals(presentedTarget, root, StringComparison.OrdinalIgnoreCase)
+                || presentedTarget.StartsWith(root + "\\", StringComparison.OrdinalIgnoreCase)
+                || presentedTarget.StartsWith(root + "/", StringComparison.OrdinalIgnoreCase)
+            )
+            {
+                return presentedTarget;
+            }
+
+            return root + "\\" + presentedTarget.TrimStart('\\', '/');
+        }
+
+        private void AttachSegmentKeys(
+            IReadOnlyList<string> presentedRows,
+            IReadOnlyDictionary<string, IReadOnlyList<FolderBreadcrumbSegment>> chains
+        )
+        {
+            for (int rowIndex = 0; rowIndex < _rows.Count; rowIndex++)
+            {
+                string? text = presentedRows[rowIndex];
+                BreadcrumbRow row = _rows[rowIndex];
+                if (
+                    text == null
+                    || row.Kind != BreadcrumbRowKind.Suggestion
+                    || !chains.TryGetValue(text, out IReadOnlyList<FolderBreadcrumbSegment> chain)
+                )
+                {
+                    continue;
+                }
+
+                int segmentCount = Math.Min(row.Segments.Count, chain.Count);
+                for (int segmentIndex = 0; segmentIndex < segmentCount; segmentIndex++)
+                {
+                    row.SetSegmentKey(segmentIndex, chain[segmentIndex].Key);
+                }
+            }
         }
 
         /// <summary>Selects the first selectable (non-banner) row and posts the updated render.</summary>
@@ -171,6 +244,12 @@ namespace QuickFiler.Controllers
                         PostRowRender(row);
                     }
 
+                    break;
+                case BreadcrumbMessageTypes.SegmentActivate:
+                    ActivateSegment(row, message.SegmentIndex!.Value);
+                    break;
+                case BreadcrumbMessageTypes.RenderedChildActivate:
+                    ActivateChild(row, message.ChildIndex!.Value);
                     break;
                 case BreadcrumbMessageTypes.LeafExpandToggle:
                     await HandleLeafToggleAsync(row);
@@ -284,23 +363,20 @@ namespace QuickFiler.Controllers
 
         private async Task ExpandLeafAsync(BreadcrumbRow row)
         {
-            BreadcrumbSegment? leaf = row.LeafSegment;
-            if (row.Kind != BreadcrumbRowKind.Suggestion || leaf?.HasSubfolders != true)
+            BreadcrumbSegment? activeSegment = row.ActiveSegment;
+            if (row.Kind != BreadcrumbRowKind.Suggestion || activeSegment?.HasSubfolders != true)
             {
-                return; // Leaf without subfolders (or non-suggestion row): documented no-op.
+                return; // Active segment without subfolders (or non-suggestion row): no-op.
             }
 
             string requestId = "req-" + (++_requestSequence);
             try
             {
-                FolderTreeNodeKey? key = await _provider.ResolveLeafKeyAsync(
-                    leaf.FullPath,
-                    CancellationToken.None
-                );
+                FolderTreeNodeKey? key = row.ActiveSegmentKey;
                 if (key == null)
                 {
                     log.Error(
-                        $"Breadcrumb expand {requestId}: no provider key for '{leaf.FullPath}'; row '{row.RowId}' left unchanged."
+                        $"Breadcrumb expand {requestId}: no provider key for '{activeSegment.FullPath}'; row '{row.RowId}' left unchanged."
                     );
                     return;
                 }
@@ -331,6 +407,39 @@ namespace QuickFiler.Controllers
             }
         }
 
+        private void ActivateSegment(BreadcrumbRow row, int segmentIndex)
+        {
+            if (!row.ActivateSegment(segmentIndex))
+            {
+                log.Error(
+                    $"Breadcrumb segment activation rejected for row '{row.RowId}' and index '{segmentIndex}'."
+                );
+                return;
+            }
+
+            BreadcrumbSegment? activeSegment = row.ActiveSegment;
+            if (activeSegment == null)
+            {
+                return;
+            }
+
+            SelectHierarchyPath(row, activeSegment.FullPath);
+        }
+
+        private void ActivateChild(BreadcrumbRow row, int childIndex)
+        {
+            BreadcrumbSegment? child = row.GetActiveChild(childIndex);
+            if (child == null)
+            {
+                log.Error(
+                    $"Breadcrumb child activation rejected for row '{row.RowId}' and index '{childIndex}'."
+                );
+                return;
+            }
+
+            SelectHierarchyPath(row, child.FullPath);
+        }
+
         private async Task<IReadOnlyList<FolderBreadcrumbSegment>?> FetchChainAsync(
             string folderPath,
             CancellationToken cancellationToken
@@ -351,7 +460,10 @@ namespace QuickFiler.Controllers
             }
             catch (OperationCanceledException)
             {
-                throw; // Binding cancellation propagates to the caller.
+                log.Error(
+                    $"Breadcrumb chain fetch canceled for '{folderPath}'; rendering fallback."
+                );
+                return null;
             }
             catch (Exception ex)
             {
@@ -372,11 +484,45 @@ namespace QuickFiler.Controllers
             SelectedFolderPath =
                 row.Kind == BreadcrumbRowKind.TrashPseudoRow
                     ? BreadcrumbRowBuilder.TrashRowText
-                    : row.LeafSegment?.FullPath ?? string.Empty;
+                    : row.FilingTarget;
             PostOutbound(
                 new BreadcrumbRenderMessage(_renderer.RenderRows(_rows, _selectedRowId), null)
             );
             SelectedFolderPathChanged?.Invoke(this, SelectedFolderPath);
+        }
+
+        private void SelectHierarchyPath(BreadcrumbRow row, string fullPath)
+        {
+            _selectedRowId = row.RowId;
+            SelectedFolderPath = ToArchiveRelativePath(fullPath);
+            PostOutbound(
+                new BreadcrumbRenderMessage(_renderer.RenderRows(_rows, _selectedRowId), null)
+            );
+            SelectedFolderPathChanged?.Invoke(this, SelectedFolderPath);
+        }
+
+        private string ToArchiveRelativePath(string fullPath)
+        {
+            string root = _archiveRootPath.TrimEnd('\\', '/');
+            if (root.Length == 0)
+            {
+                return fullPath;
+            }
+
+            if (string.Equals(fullPath, root, StringComparison.OrdinalIgnoreCase))
+            {
+                return string.Empty;
+            }
+
+            if (
+                fullPath.StartsWith(root + "\\", StringComparison.OrdinalIgnoreCase)
+                || fullPath.StartsWith(root + "/", StringComparison.OrdinalIgnoreCase)
+            )
+            {
+                return fullPath.Substring(root.Length).TrimStart('\\', '/');
+            }
+
+            return fullPath;
         }
 
         private void PostRowRender(BreadcrumbRow row)

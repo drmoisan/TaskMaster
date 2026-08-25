@@ -12,6 +12,12 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// <summary>Inbound: double-click on a non-leaf breadcrumb segment.</summary>
         public const string SegmentDoubleClick = "segmentDoubleClick";
 
+        /// <summary>Inbound: activation of a non-leaf breadcrumb segment.</summary>
+        public const string SegmentActivate = "segmentActivate";
+
+        /// <summary>Inbound: activation of a rendered child of the active segment.</summary>
+        public const string RenderedChildActivate = "renderedChildActivate";
+
         /// <summary>Inbound: activation of the leaf (or re-expand) affordance.</summary>
         public const string LeafExpandToggle = "leafExpandToggle";
 
@@ -33,7 +39,8 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
     /// <summary>
     /// Inbound bridge message (JS -&gt; .NET), discriminated by <see cref="Type"/>:
-    /// <c>{ type, rowId, segmentIndex?, key? }</c>. net48-safe plain class (no record/init).
+    /// <c>{ type, rowId, segmentIndex?, childIndex?, key? }</c>. net48-safe plain class (no
+    /// record/init).
     /// </summary>
     public sealed class BreadcrumbInboundMessage
     {
@@ -43,13 +50,21 @@ namespace UtilitiesCS.OutlookObjects.Folder
         /// <param name="type">Message discriminator (an inbound <see cref="BreadcrumbMessageTypes"/> value).</param>
         /// <param name="rowId">Target row identifier. Required.</param>
         /// <param name="segmentIndex">Segment index for segment-scoped messages, or null.</param>
+        /// <param name="childIndex">Child index for rendered-child activation messages, or null.</param>
         /// <param name="key">Arrow-key name (<c>Left</c>/<c>Right</c>/<c>Up</c>/<c>Down</c>), or null.</param>
         /// <exception cref="ArgumentNullException"><paramref name="type"/> or <paramref name="rowId"/> is null.</exception>
-        public BreadcrumbInboundMessage(string type, string rowId, int? segmentIndex, string? key)
+        public BreadcrumbInboundMessage(
+            string type,
+            string rowId,
+            int? segmentIndex,
+            int? childIndex,
+            string? key
+        )
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
             RowId = rowId ?? throw new ArgumentNullException(nameof(rowId));
             SegmentIndex = segmentIndex;
+            ChildIndex = childIndex;
             Key = key;
         }
 
@@ -61,6 +76,9 @@ namespace UtilitiesCS.OutlookObjects.Folder
 
         /// <summary>Segment index for segment-scoped messages; null otherwise.</summary>
         public int? SegmentIndex { get; }
+
+        /// <summary>Child index for rendered-child activation messages; null otherwise.</summary>
+        public int? ChildIndex { get; }
 
         /// <summary>Arrow-key name for <see cref="BreadcrumbMessageTypes.ArrowKey"/>; null otherwise.</summary>
         public string? Key { get; }
