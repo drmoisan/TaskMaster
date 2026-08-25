@@ -233,11 +233,69 @@ Three constraints bound the mandate-read exclusion:
    detection compares the declared radius against the paths a diff actually touched, so an item that
    wrote an excluded path is caught against observed evidence rather than against prose.
 
-The extractor additionally rejects three token shapes that were never write claims: a wildcard-free
+The extractor additionally rejects four token shapes that were never write claims: a wildcard-free
 token whose final component names a directory rather than a file, a `docs/features/` glob whose
-wildcard occupies or truncates the feature-folder segment, and a contract token carrying no ASCII
-letter. `artifacts/` is not a known top-level segment, so a bare `artifacts/**` subtree claim no
-longer satisfies the shape rules.
+wildcard occupies or truncates the feature-folder segment, a contract token carrying no ASCII
+letter, and a token containing a placeholder or interpolation marker. `artifacts/` is not a known
+top-level segment, so a bare `artifacts/**` subtree claim no longer satisfies the shape rules.
+
+### Placeholder-shape rejection (issue #502)
+
+The fourth shape is a token containing any member of the marker set
+
+```text
+<    >    ${    $(    %
+```
+
+The set is not a configuration key and is not read from `config/blast-radius.json`. It originates in
+the checkable-literal placeholder guard defined in `.claude/rules/plan-acceptance-gates.md`, which
+uses the identical five markers to decide that a plan operand documents a command *shape* rather
+than stating a real assertion. Both subsystems answer the same question about the same text, so the
+two vocabularies are pinned equal by test rather than left to convention.
+
+**A marker-bearing token never matches a tracked path.** A placeholder or interpolation form
+resolves at run time to text that is not in the token, so the token as written names nothing. For
+the two angle brackets the claim is stronger than a heuristic: Windows forbids both characters in a
+filename outright, so an angle-bracketed token cannot name a file on the platform this repository is
+developed on. Admitting such a token recorded a `paths` entry that no diff could ever touch, and two
+items citing the identical shape then acquired a `path_overlap` edge on a string that resolves to
+nothing.
+
+**The dominant token is a mandated artifact shape, which is why the exposure was corpus-wide rather
+than incidental.** Every agent in this repository is instructed to write its evidence to the
+canonical scheme defined in `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, and that
+scheme is non-overridable, so a well-formed plan quotes the same feature-relative artifact shape
+that every other well-formed plan quotes. The shape is therefore the most widely shared token in the
+corpus, and admitting it made compliance with the evidence-path scheme a source of contention. The
+same reasoning applies to the feature-document shapes and to the session-keyed state-file shape.
+
+**The planner remains obliged to enumerate a genuine write explicitly.** This rejection describes a
+plan that documents a shape, not a permanent ban on the paths a shape resembles. When an item's plan
+will actually write a path it expressed as a shape, the planner appends that exact concrete path to
+the declared radius after normalization. This is the same obligation constraint 1 of the
+mandate-read exclusion imposes, and `detect_escaped_paths` is the same backstop: drift detection
+compares the declared radius against the paths a diff actually touched, so an item that wrote a path
+it expressed only as a shape is caught against observed evidence rather than against prose.
+
+**Accepted fail-open trade.** The rejection runs inside the classifier, upstream of shared-surface
+resolution, so a marker-bearing token whose shape matches a configured `shared_surface_globs`
+pattern is dropped before it can be reported as a touched shared surface. The trade is inherent to
+that placement: a guard downstream of surface resolution would leave the token in `paths` and
+reintroduce the path-level false edge it exists to remove. Corpus exposure was measured empty — no
+plan in the 58-plan corpus examined for issue #502 cited a marker-bearing token whose shape matched a
+configured shared-surface glob — and the planner obligation above is what keeps a genuine write
+visible. A later change that widens the marker set must re-take that measurement.
+
+**Known residual: the whitespace split.** Extraction harvests whitespace-free inline-code tokens, so
+a placeholder form written with internal whitespace is split into fragments before the marker test
+ever runs. Each fragment is then judged on its own shape and is normally rejected for an unrelated
+reason, most often for carrying no separator. The residual is therefore benign in the accepting
+direction but is recorded here because it means the rejection is not a complete guard against every
+way a shape can be written; it is a guard against the whitespace-free forms the extractor actually
+admits.
+
+Enforcement of this rejection is prose plus validator logic, exactly as for the three shapes above.
+No JSON Schema is authored, imported, or read for it, and `config/blast-radius.json` gains no key.
 
 ### Module-map granularity criterion
 
