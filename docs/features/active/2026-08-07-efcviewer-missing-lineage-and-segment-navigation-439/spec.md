@@ -222,7 +222,7 @@ Research-established coverage must be added before the implementation is conside
 - [x] Existing segment double-click collapses trailing segments, while keyboard Left/Right behavior remains unchanged.
 - [x] `====` banner rows and `Trash to Delete` retain their existing behavior and do not gain lineage, hierarchy resolution, or child activation.
 - [x] No ItemViewer `FolderBreadcrumb.html` behavior, Issue #400 behavior, score-model calculation, public configuration, or external API changes are included.
-- [x] The required C# formatter, analyzer, nullable, MSTest, and coverage comparison pass in one final ordered toolchain pass, with canonical Issue #439 evidence artifacts present.
+- [ ] The required C# formatter, analyzer, nullable, MSTest, and coverage comparison pass in one final ordered toolchain pass, with canonical Issue #439 evidence artifacts present.
 
 ## Risks & Mitigations
 
