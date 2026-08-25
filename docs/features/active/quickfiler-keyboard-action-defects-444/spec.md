@@ -856,8 +856,14 @@ increase attributable to this feature's `QfcCollectionController.cs` changes;
 
 **Constraints.**
 
-- No production or test file may exceed **500 lines**
-  (`.claude/rules/general-code-change.md`).
+- No production or test file **added** by this feature may exceed **500 lines**, and no
+  pre-existing file changed by this feature may grow beyond its Phase 0 baseline line count
+  (`.claude/rules/general-code-change.md`). `QuickFiler/Controllers/QfcCollectionController.cs`
+  already exceeds the cap for pre-existing reasons (2349 lines at `988e819b`; roughly 2120-2180
+  after #468 deletes `WireUpKeyboardHandler`). That excess is out of scope here: this feature
+  neither creates nor is permitted to remediate it, exactly as #468 records the same excess as a
+  pre-existing finding rather than a work item. The plan carries the same disposition under its
+  decision `D-P6`.
 - `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs` is **exactly 500 lines** with zero
   spare, and #468 `D12` / `[P4-T5]` freezes its `[TestMethod]` count (re-verified by #468's
   `[P14-T11]`). **No test may be added to it.** Spare capacity elsewhere, measured at `988e819b`:
@@ -1141,7 +1147,7 @@ verbatim.
 
 ### File-size, toolchain, and coverage
 
-- [ ] No production or test file changed or added by this feature exceeds **500 lines** (`.claude/rules/general-code-change.md`). Verified by a line count of every file in the branch diff.
+- [ ] No production or test file **added** by this feature exceeds **500 lines**, and no pre-existing file changed by this feature grows beyond its Phase 0 baseline line count (`.claude/rules/general-code-change.md`). `QuickFiler/Controllers/QfcCollectionController.cs` exceeds the cap for pre-existing reasons recorded in the atomic plan decision `D-P6` and in the #468 spec; this feature neither creates nor is permitted to remediate that excess. Verified by a line count of every file in the branch diff against the Phase 0 baseline.
 - [ ] `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs` is unchanged by this feature: its line count and its `[TestMethod]` count are identical to the branch head, and the path is absent from the branch diff.
 - [ ] `dotnet tool run csharpier check .` reports zero unformatted files in the final toolchain pass.
 - [ ] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` completes with zero errors and no new analyzer warnings in the final pass.
