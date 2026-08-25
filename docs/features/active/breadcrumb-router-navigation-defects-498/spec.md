@@ -109,8 +109,9 @@ this section was established by reading the current files.
   referenced by the router at all.
 - **Cancellation.** `FetchChainAsync` no longer rethrows `OperationCanceledException`; it logs at `Error` and
   returns null so binding renders the fallback (`:461-467`).
-- **Regression coverage.** `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` (531 lines,
-  7 `[TestMethod]`s), registered at `QuickFiler.Test.csproj:60`.
+- **Regression coverage.** `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` (694 lines,
+  10 `[TestMethod]`s), registered at `QuickFiler.Test.csproj:60`. Pull request #611 (issue #609) added the
+  three `Issue609_*` methods; the file remains READ-ONLY for this feature.
 
 ### Research sections superseded by the landed work
 
@@ -226,7 +227,7 @@ criterion here.
 - Unifying the two surfaces' boundary behavior (decision D2).
 - Restoring the prior selection on re-bind, and any `SelectFirstRow` auto-selection side effect (decision D4).
 - Changing the presented-row path form in `FolderPredictor` (decision D5).
-- Any repair of the pre-existing 500-line violations in `FolderPredictor.cs` (983 lines) and
+- Any repair of the pre-existing 500-line violations in `FolderPredictor.cs` (1000 lines) and
   `EfcFormController.cs` (1084 lines) (decision D8).
 
 ### Explicitly excluded systems, integrations, or datasets
@@ -349,8 +350,8 @@ Landed mechanism, verified in the current worktree:
   (`BreadcrumbBridgeRouter.cs:410-427`, `:429-441`).
 - **Glyph** — `BreadcrumbHtmlRenderer` emits `<span class="sep">→</span>` at `:149`.
 
-Inherited regression coverage: `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` (531 lines,
-7 `[TestMethod]`s, registered at `QuickFiler.Test.csproj:60`).
+Inherited regression coverage: `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` (694 lines,
+10 `[TestMethod]`s, registered at `QuickFiler.Test.csproj:60`).
 
 The two files D3 refused to write — `UtilitiesCS/OutlookObjects/Folder/BreadcrumbDocumentAssets.cs` and
 `UtilitiesCS/OutlookObjects/Folder/BreadcrumbHtmlRenderer.cs` — were written by that workstream, NOT by this
@@ -407,7 +408,7 @@ the Efc surface, because PR #605 took exactly that route. The current reasoning 
   `ResolveLeafKeyAsync` (`:53`), and the fallback is what makes that stem resolve.
 
 `FolderPredictor` remains rejected as a fix site: it would change the filing contract, and the file is already
-983 lines, over the 500 limit.
+1000 lines, over the 500 limit.
 
 **Added requirement.** A test must prove the fallback does NOT alter the Efc path — specifically, that a caller
 supplying a full Outlook path still resolves through the exact first pass and never reaches the fallback. This
@@ -474,7 +475,7 @@ reachable from owned Qfc files.
 | File | Lines | Was (§Q6c) | Status |
 |---|---|---|---|
 | `QuickFiler/Controllers/BreadcrumbBridgeRouter.cs` | **596** | 450 | **OVER the 500 limit already.** Receives #498, #499, and the #440 Efc transitions. |
-| `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` | **531** | (did not exist) | **OVER the 500 limit already.** Landed with PR #605; not owned, not written, not worsened here. |
+| `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` | **694** | (did not exist) | **OVER the 500 limit already.** Landed with PR #605, grew 531 to 694 with PR #611 (issue #609); not owned, not written, not worsened here. |
 | `UtilitiesCS/OutlookObjects/Folder/FolderBreadcrumbBridgeRouter.cs` | 485 | 485 | Unchanged. 15 lines of headroom; split pre-authorized. |
 | `UtilitiesCS/OutlookObjects/Folder/BreadcrumbStateModel.cs` | 457 | 457 | Unchanged. 43 lines of headroom; split pre-authorized. |
 | `QuickFiler/Resources/FolderBreadcrumb.html` | 489 | 489 | Unchanged. 11 lines of headroom; **cannot be split**. |
@@ -485,7 +486,7 @@ reachable from owned Qfc files.
 | `UtilitiesCS/OutlookObjects/Folder/BreadcrumbHtmlRenderer.cs` | 234 | — | Unowned. |
 | `UtilitiesCS/OutlookObjects/Folder/BreadcrumbDocumentAssets.cs` | 138 | — | Unowned. |
 | `QuickFiler/Controllers/EfcFormController.cs` | 1084 | 1086 | Unowned. Pre-existing violation. |
-| `UtilitiesCS/OutlookObjects/Folder/FolderPredictor.cs` | 983 | 983 | Owned but not written (D5). Pre-existing violation. |
+| `UtilitiesCS/OutlookObjects/Folder/FolderPredictor.cs` | 1000 | 983 | Owned but not written (D5). Pre-existing violation; grew 983 to 1000 with PR #611 (issue #609). |
 | `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterQueueTests.cs` | 462 | — | 38 lines of headroom. |
 | `UtilitiesCS/OutlookObjects/Folder/BreadcrumbSelectionMap.cs` | 120 | — | Unowned. |
 
@@ -504,8 +505,8 @@ reachable from owned Qfc files.
   alphabetical order — see RISK-5, which records that the item group is no longer strictly alphabetical.
 - `FolderBreadcrumb.html` cannot be split; its 11 lines of headroom is a hard constraint on the #440 `onArrow`
   change.
-- `FolderPredictor.cs` (983 lines), `EfcFormController.cs` (1084 lines), and the inherited
-  `BreadcrumbBridgeRouterIssue439Tests.cs` (531 lines) are PRE-EXISTING 500-line violations that this feature
+- `FolderPredictor.cs` (1000 lines), `EfcFormController.cs` (1084 lines), and the inherited
+  `BreadcrumbBridgeRouterIssue439Tests.cs` (694 lines) are PRE-EXISTING 500-line violations that this feature
   neither inherits responsibility for nor worsens. `FolderPredictor.cs` should not be written at all under D5.
 
 ### D9 — #440's Efc half consumes the landed active-segment seams
@@ -725,7 +726,7 @@ the minimal targeted fix, then verification. The Qfc prerequisite carries the sa
 | `UtilitiesCS/OutlookObjects/Folder/FolderBreadcrumbBridgeRouter.cs` | #440 Qfc routing (`ArrowAsync` `:378-406`); D7 rung 1 stem preservation in `CreateFallbackRow` (`:245`) / `ReplaceRowsPreservingSession` (`:474`) | 485/500 — VERY HIGH risk; partial split pre-authorized |
 | `QuickFiler/Resources/FolderBreadcrumb.html` | #440 `onArrow` gating (`:395-404`), message shapes unchanged | 489/500 — HIGH risk; **cannot be split**, 11 lines of headroom is a hard constraint |
 | `QuickFiler/Controllers/KeyboardHandler.cs` | No change expected. Owned so that the D2 fall-through (`:288-315`) can be verified unchanged. | 414/500 — low risk |
-| `UtilitiesCS/OutlookObjects/Folder/FolderPredictor.cs` | **No change** (D5). Listed as owned only; writing it is rejected. | 983 — pre-existing violation |
+| `UtilitiesCS/OutlookObjects/Folder/FolderPredictor.cs` | **No change** (D5). Listed as owned only; writing it is rejected. | 1000 — pre-existing violation |
 
 #### Functions/classes/CLI commands impacted:
 
@@ -922,7 +923,7 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
   | **#498** | `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterQueueTests.cs` (462 lines) | The only file with the async-void-boundary seam `_host.Raise(h => h.MessageReceived += null, _host.Object, "<json>")` (`:201`, pattern at `:194-205`). `Setup()` at `:34-74` plus the `Segment` / `Bind` helpers at `:76-96` produces a two-segment `row-0` via `Bind()`, so `segmentIndex: 99` and `segmentIndex: -1` are both out of range and `segmentIndex: 0` is the valid control. RED assertion: `Action act = () => _host.Raise(...); act.Should().NotThrow();` — deterministic because Moq's `Raise` is synchronous and every awaited task is already completed. "State unchanged" asserts `_posted.Count.Should().Be(postedBefore)`, the idiom already used at `:140`/`:146`, `:164`/`:170`, `:314`/`:320`, `:391`/`:397`, `:426`/`:432`. |
   | **#499** | `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterQueueTests.cs` | Same `Setup()`; `Bind()`, then `Inbound("{\"type\":\"rowSelected\",\"rowId\":\"row-0\"}")` (idiom at `:111`, `:189`, `:448`), then a second `Bind()`, then `_router.SelectedFolderPath.Should().BeNull()`. **Citation correction:** the "double-`Bind` pattern at `:428-444`" that version 1.0 cited NO LONGER EXISTS in this file; the test that occupied that range is now `LeafExpand_OnLeafWithoutSubfolders_IsNoOpWithoutProviderQuery` (`:412-441`), which binds once. The #499 test must introduce the second `Bind()` itself; the `Bind()` helper (`:86-96`) is re-entrant. Event assertion reuses `BreadcrumbBridgeRouterTests.cs:219`: `string observed = "sentinel"; _router.SelectedFolderPathChanged += (s, path) => observed = path;`. Existing test `MalformedInboundJson_ThrowsCodecExceptionWithoutCorruptingState` (`:175-191`) must be read and confirmed still passing; it is unaffected because nothing was selected before its bind. |
   | **D5 — provider resolution** | `UtilitiesCS.Test/OutlookObjects/Folder/OutlookFolderHierarchyProviderTests.cs` (282 lines) | Owns `ResolveLeafKeyAsync` coverage (`:100-192`). Real provider over a mocked `IOutlookFolderTreeService` (`ServiceReturning`, `:231-280`). **Caution (research §Q5c):** the existing `Node` helper passes `displayName` as the `relativePath` argument (`:275`), which is not a realistic relative path. The D5 test must construct nodes with a realistic full path (`\\store\Archive\Projects\Alpha`) and must include a **decoy** node (`\\store\Inbox\Projects\Alpha`) to pin the uniqueness requirement. It must also assert the Efc no-regression case of AC-7: a full-path caller resolves through the exact first pass. |
-  | **Efc bind/join/selection** | `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterTests.cs` (435 lines) **and** `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` (531 lines) | The first owns the bind-to-document assertions including the `"90%"` join (`:126-136`) and `SelectedFolderPath` (`:214-227`); its `SetupProviderChain` mock (`:77-106`) returns `Key(path)` for **any** input. The second is the LANDED #439 regression file and already covers lineage, filing target, and probability preservation; **it is read-only for this feature** and must be confirmed still passing, not extended. |
+  | **Efc bind/join/selection** | `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterTests.cs` (435 lines) **and** `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` (694 lines) | The first owns the bind-to-document assertions including the `"90%"` join (`:126-136`) and `SelectedFolderPath` (`:214-227`); its `SetupProviderChain` mock (`:77-106`) returns `Key(path)` for **any** input. The second is the LANDED #439 regression file and, after PR #611 (issue #609) added its three `Issue609_*` methods, already covers lineage, filing target, probability preservation, and full-path destination resolution; **it is read-only for this feature** and must be confirmed still passing, not extended. |
   | **D5 — Qfc bind** | `UtilitiesCS.Test/OutlookObjects/Folder/FolderBreadcrumbBridgeRouterTests.cs` (314 lines) | Owns `SetSuggestionsAsync` → chain resolution (`PopulatedRouterAsync` `:72-85`). Its `ProviderMock` (`:51-70`) uses `MockBehavior.Strict` with per-path setups — the right pattern here, because resolving the wrong path form throws rather than silently succeeding, making the RED test fail for the intended reason. |
   | **#440 — Efc transitions** | `UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbRowStateTests.cs` (379 lines) **and** `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterTests.cs` | The state machine and its routing are separately covered today; that split is kept. The landed `ActivateSegment` / `GetActiveChild` behavior is already covered in the state-model file (it grew from 334 to 379 lines with PR #605); #440's tests are additive. |
   | **#440 — Qfc transitions** | `UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbStateModelTests.cs` (320 lines) **and** `UtilitiesCS.Test/OutlookObjects/Folder/FolderBreadcrumbBridgeRouterTests.cs` | `BreadcrumbStateModelSelectorTests.cs` / `BreadcrumbStateModelSequenceTests.cs` are the #400 selector-session and sequence files; per D1 the selector session is not touched, so they are used only for confirming no regression. |
@@ -1129,8 +1130,8 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
       placed adjacent to the existing router entry at `:290`. Every other file written by this feature is also
       at or under 500 lines, and `QuickFiler/Resources/FolderBreadcrumb.html` remains at or under 500 lines
       without being split. This criterion asserts NOTHING about
-      `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` (531 lines) beyond recording it as
-      an inherited pre-existing 500-line violation that arrived with PR #605, that this feature does not own,
+      `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` (694 lines) beyond recording it as
+      an inherited pre-existing 500-line violation that arrived with PR #605 and grew with PR #611, that this feature does not own,
       does not write, and does not worsen.
 
 ## Risks & Mitigations
@@ -1186,7 +1187,7 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
   - **RISK-4 (decision D8) — the 500-line breach has ALREADY OCCURRED.** This is no longer a risk of discovery
     mid-execution; it is a present condition. `QuickFiler/Controllers/BreadcrumbBridgeRouter.cs` stands at
     **596** lines, 96 over the limit, and receives #498, #499, and the #440 Efc transitions.
-    `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` stands at 531 lines but is neither
+    `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` stands at 694 lines but is neither
     owned nor written here. Three further owned files remain within 50 lines of the limit
     (`FolderBreadcrumbBridgeRouter.cs` 485, `BreadcrumbStateModel.cs` 457) or cannot be split at all
     (`FolderBreadcrumb.html` 489). *Response, not mitigation:* the partial-class split of
@@ -1239,9 +1240,9 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
     landed under #439's own workstream (PR #605). Neither requires a follow-up potential entry.
   - **Issue #439 is open on GitHub but fixed in code.** Whoever closes out this feature should reconcile that,
     citing PR #605 and feature commit `c39db103`. This spec does not change issue state.
-  - **Pre-existing 500-line violations (D8)** — `FolderPredictor.cs` (983 lines) and `EfcFormController.cs`
-    (1084 lines), plus the test files `FolderPredictorTests.cs` (985 lines) and the newly inherited
-    `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` (531 lines). None is inherited as a
+  - **Pre-existing 500-line violations (D8)** — `FolderPredictor.cs` (1000 lines) and `EfcFormController.cs`
+    (1084 lines), plus the test files `FolderPredictorTests.cs` (1043 lines) and the newly inherited
+    `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` (694 lines). None is inherited as a
     responsibility or worsened by this feature.
   - **`EfcFormController` coverage denominator.** PR #605 removed its `[ExcludeFromCodeCoverage]` attribute,
     putting 1084 unowned lines into the coverage denominator. Recorded as an inherited condition; addressing it
