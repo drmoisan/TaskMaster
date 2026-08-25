@@ -38,6 +38,7 @@
 - [Literal-call clauses block file-size tightening](literal-call-clauses-block-file-size-tightening.md) — pinning a call in 2+ places near a 500-line file is unsatisfiable
 - [Diff gates need a commit task](diff-gates-need-a-commit-task.md) — `git diff <BASE>..HEAD` passes vacuously with no commit task
 - [Never pin a HEAD SHA as a plan expectation](never-pin-head-sha-as-plan-expectation.md) — gate on tree invariants instead
+- [Absolute counts in shared files go stale](absolute-counts-in-shared-files-go-stale.md) — lower-bound/baseline-relative for co-owned files; keep exact the count the task changes
 - [.claude/agent-memory is tracked](agent-memory-is-tracked-scope-git-gates.md) — scope every diff/status/grep gate or it is unsatisfiable
 - [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — verify with `git ls-files`, not `obj/`
 
@@ -85,7 +86,7 @@
 ## Domain seams (TaskMaster)
 
 - [#445 keyboard-action](project_445_keyboard_action_plan_seams.md) — resolve WS at execution time; scope epic-child gates to owned test classes
-- [#446 QuickFiler bug family](project_446_quickfiler_bug_family_plan_seams.md) — ScoringServiceFactory seam before COM-path tests; AC conflict → unchecked + REMEDIATION-REQUIRED
+- [#446 QuickFiler bug family](project_446_quickfiler_bug_family_plan_seams.md) — ScoringServiceFactory seam before COM-path tests; AC conflict → unchecked + REMEDIATION-REQUIRED; `gh issue create` denied by the promotion hook
 - [#438 search-focus](project_438_search_focus_plan_seams.md) — additive interface overload broke 7 test files; dispatch the default path on the old overload
 - [#424 QuickFiler deadline](project_424_quickfiler_deadline_plan_seams.md) — overload migration breaks loose-mock Setup/Verify; grep the old shape in ALL test files
 - [#351 QuickFiler breadcrumb](project_351_quickfiler_breadcrumb_plan_seams.md) — JSON code in UtilitiesCS only; coordinator pattern

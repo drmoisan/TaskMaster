@@ -14,10 +14,13 @@
 > acceptance-criteria source for this feature. No `user-story.md` exists for it and none is to be
 > created. The `## Acceptance Criteria` section below is what the executor and the reviewer check off.
 
-**Primary evidence source.** `research/2026-08-24T09-50-quickfiler-queue-datamodel-defects-research.md`,
-re-verified against branch HEAD, which carries PR #610 (`507a40a5`). The four promoted potential documents were captured at
-`fb32b923`; where they disagree with the research, the research is authoritative. Three of their claims
-are corrected in this specification (Root Cause Analysis §4.4, §2.5 and §4.5 of the research).
+**Primary evidence source.** `research/2026-08-24T09-50-quickfiler-queue-datamodel-defects-research.md`, whose
+citations were verified against `988e819b` and have NOT been re-verified since. PR #610 shifted every line number in
+`QuickFiler/Controllers/QfcStreamingDequeueConfidenceGate.cs`, so a gate line number read from the research must be
+re-resolved against this specification, whose every citation was re-verified against branch HEAD (PR #610, `507a40a5`).
+The four promoted potential documents were captured at `fb32b923`; where they disagree with the research, the research
+is authoritative on FINDINGS but not on line numbers. Three of their claims are corrected in this specification
+(Root Cause Analysis §4.4, §2.5 and §4.5 of the research).
 
 ---
 
@@ -654,7 +657,7 @@ closing the queue. Rejected candidates gain a release step that was previously a
   scan, so a monitor failure cannot abort a batch.
 - `UndoConsumer`'s reset is moved into a `finally` so it runs on the exception path too.
 - Existing `logger.Debug` output is preserved: `LogDeadlineExpiry`
-  (`QfcStreamingDequeueConfidenceGate.cs:157-165`), `LogScore` (`:142`), and the two `Probability debug`
+  (`QfcStreamingDequeueConfidenceGate.cs:157-165`), `LogScore` (`:167-175`, invoked at `:142`), and the two `Probability debug`
   lines. No log message text is changed, so no log-parsing consumer is affected.
 
 #### Rollback/feature-flag considerations
