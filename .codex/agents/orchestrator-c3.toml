@@ -142,6 +142,10 @@ Update it after every completed step with:
 - `completed_steps`, `next_step`, `last_updated`
 - `step5_status` through `step10_status`
 - `delegation_receipts`, `blocked_reason`
+- New checkpoints must store `delegation_receipts` as an object with a strict
+  `agents` list and an opaque `promotion` object. Strict receipt fields remain
+  unchanged, promotion payload values remain opaque, and readers retain
+  legacy top-level-list and promotion-only compatibility.
 - `skill_receipts`, `mcp_call_receipts`
 - `local_execution_overrides`, `delegation_bypasses`, `lifecycle_operations`
 - raw promotion MCP receipts under `delegation_receipts.promotion.potential_entry`, `delegation_receipts.promotion.issue`, and `delegation_receipts.promotion.feature_folder`

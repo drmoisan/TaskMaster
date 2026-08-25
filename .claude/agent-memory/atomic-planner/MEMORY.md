@@ -13,6 +13,7 @@
 - [#505](project_505_toggle_state_guards_plan_seams.md) — runtime red (no dossier); raw cobertura to gitignored `coverage/`; manual-verification kind accepted
 - [#512](project_512_toolchain_gate_fidelity_plan_seams.md) — same-line `/t:Build`+`Nullable=enable` grep; `-EnableNullable` no-op proved by EXIT 0
 - [#553](project_553_ci_parallel_split_plan_seams.md) — workflow-only scope, no C# toolchain; no jq; pathspec anchoring
+- [#464 R3/R4](project_464_efc_controller_plan_seams.md) — additive-only file grows, budget a ceiling not a shrink; non-comment literal counts; a phase-N count must survive phases 1..N-1 deletions
 
 ## Plan-structure traps
 
