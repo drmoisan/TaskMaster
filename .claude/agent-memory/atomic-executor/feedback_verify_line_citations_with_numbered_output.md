@@ -29,3 +29,15 @@ line citation against line-numbered output before asserting it."
   numbered read is far below the cost of a corrupted plan revision cycle.
 - Related: [[project_418_plan_rationale_clauses_are_evidence]] — unmeasured world-state claims in
   plan prose are the other recurring source of preflight churn.
+
+## Corollary: never assert a file LOCATION you have not listed (#498 preflight cycle 2)
+
+The same rule governs *where* a file lives, not only which line. In #498 preflight cycle 2 I
+reported that the CSharpier tool manifest is at `.config/dotnet-tools.json` and asked the planner
+to "correct" a plan sentence that was already right. `.config/` does not exist in this repository
+at all; the manifest is at the repo root as `dotnet-tools.json` with `"isRoot": true`, which
+CLAUDE.md also states. The planner independently verified and correctly REJECTED the observation.
+
+**How to apply:** before writing "the file is at X", run `ls X` or `find . -maxdepth 2 -name <f>`.
+Ecosystem defaults are the trap — `.config/dotnet-tools.json` is the .NET convention and this repo
+deviates from it. A plausible-by-convention location is a hypothesis, not a fact.
