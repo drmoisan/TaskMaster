@@ -369,5 +369,56 @@ namespace QuickFiler.Controllers.Tests
 
             result.Should().ContainSingle().Which.Should().BeSameAs(item);
         }
+
+        [TestMethod]
+        public async Task DequeueAsync_InitialScreenNonEmptyAcceptedPrefixPastDeadline_ReturnsSevenInQueueOrder()
+        {
+            IList<MailItem> result = await DequeuePastDeadlineQualifiersAsync(7);
+
+            result
+                .Select(mail => mail.Subject)
+                .Should()
+                .Equal(Enumerable.Range(1, 7).Select(i => $"high-{i}"));
+        }
+
+        [TestMethod]
+        public async Task DequeueAsync_SubsequentScreenNonEmptyAcceptedPrefixPastDeadline_ReturnsEightInQueueOrder()
+        {
+            IList<MailItem> result = await DequeuePastDeadlineQualifiersAsync(8);
+
+            result
+                .Select(mail => mail.Subject)
+                .Should()
+                .Equal(Enumerable.Range(1, 8).Select(i => $"high-{i}"));
+        }
+
+        private static async Task<IList<MailItem>> DequeuePastDeadlineQualifiersAsync(int quantity)
+        {
+            var qualifiers = Enumerable
+                .Range(1, quantity)
+                .Select(i => CreateMailItem($"high-{i}", $"entry-high-{i}"))
+                .ToList();
+            var rejected = Enumerable
+                .Range(1, 40)
+                .Select(i => CreateMailItem($"low-{i}", $"entry-low-{i}"));
+            var source = new Queue<MailItem>(
+                new[] { qualifiers[0] }.Concat(rejected).Concat(qualifiers.Skip(1))
+            );
+            var fakeTime = new FakeTimeProvider();
+            object gate = CreateGate(
+                () => source.Dequeue(),
+                (mail, token) =>
+                {
+                    fakeTime.Advance(TimeSpan.FromSeconds(1));
+                    return Task.FromResult(qualifiers.Contains(mail) ? 950L : 100L);
+                },
+                threshold: 0.90,
+                timeProvider: fakeTime,
+                sourceActive: () => source.Count > 0,
+                firstBatchDeadline: TimeSpan.FromSeconds(3)
+            );
+
+            return await DequeueAsync(gate, quantity, 0, CancellationToken.None);
+        }
     }
 }

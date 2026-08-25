@@ -40,9 +40,11 @@ namespace QuickFiler.Controllers
             : this(tryTakeNext, scoreLoader, threshold, timeProvider, debugLog, null) { }
 
         /// <param name="firstBatchDeadline">
-        /// Overall budget for the first batch. <see langword="null"/> selects
+        /// Overall budget for an empty first-batch result. <see langword="null"/> selects
         /// <see cref="DefaultFirstBatchDeadline"/>; <see cref="Timeout.InfiniteTimeSpan"/> disables the
-        /// deadline and reproduces the pre-#424 unbounded behavior. Any other non-positive value is
+        /// deadline. Issue #608 restores #233 fill-or-exhaust behavior after a non-empty prefix while
+        /// retaining #424's empty deadline result; #446 continues to own empty-result interpretation.
+        /// Deadline expiry cannot authorize a non-empty undersized batch. Any other non-positive value is
         /// rejected.
         /// </param>
         /// <param name="progressCallback">
@@ -107,7 +109,11 @@ namespace QuickFiler.Controllers
             {
                 token.ThrowIfCancellationRequested();
 
-                if (deadlineEnabled && _timeProvider.GetElapsedTime(start) >= _firstBatchDeadline)
+                if (
+                    deadlineEnabled
+                    && accepted.Count == 0
+                    && _timeProvider.GetElapsedTime(start) >= _firstBatchDeadline
+                )
                 {
                     LogDeadlineExpiry(accepted.Count, scanned);
                     return accepted;

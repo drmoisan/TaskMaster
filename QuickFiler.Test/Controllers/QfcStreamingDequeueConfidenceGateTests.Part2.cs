@@ -183,10 +183,15 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             result
                 .Should()
-                .ContainSingle("the final in-flight acceptance is included")
-                .Which.Should()
-                .BeSameAs(inFlight);
-            takeCount.Should().Be(1, "no further candidate may be taken after expiry");
+                .HaveCount(
+                    2,
+                    "the final in-flight acceptance is included and scanning continues until source exhaustion"
+                );
+            result[0].Should().BeSameAs(inFlight);
+            result[1].Should().BeSameAs(never);
+            takeCount
+                .Should()
+                .Be(3, "the gate takes the remaining candidate and confirms source exhaustion");
         }
 
         /// <summary>

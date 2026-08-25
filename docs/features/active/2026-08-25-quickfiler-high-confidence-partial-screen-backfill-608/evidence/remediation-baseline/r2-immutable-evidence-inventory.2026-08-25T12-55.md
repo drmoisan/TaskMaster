@@ -1,0 +1,42 @@
+Timestamp: 2026-08-25T12-55
+Command: `Get-FileHash -Algorithm SHA256` over the explicitly required paths and every pre-existing file under `evidence/`
+EXIT_CODE: 0
+Output Summary: 35 pre-existing evidence files and four explicitly required immutable inputs were hashed. The original plan and Cycle-1 plan are immutable. No write occurred to an inventoried path.
+
+Immutable Files:
+- `docs/features/active/2026-08-25-quickfiler-high-confidence-partial-screen-backfill-608/plan.2026-08-25T11-53.md` — `6C0BBCE13D903E25E9A329459A0DEF4A3777994EB38EB5A16E1C4B5AC0EFF2FD` (original plan; immutable)
+- `docs/features/active/2026-08-25-quickfiler-high-confidence-partial-screen-backfill-608/remediation-plan.2026-08-25T12-33.md` — `74CB2A598016839590B22051C7B6310F99B8A20A4AAE91B1C5133D86917370AC` (Cycle-1 plan; immutable)
+- `docs/features/active/2026-08-25-quickfiler-high-confidence-partial-screen-backfill-608/remediation-inputs.2026-08-25T12-33.md` — `550C0E20BF79B2314C98BE0B302E3C4C18D83D73E668191D6604A467DE80EBB3`
+- `docs/features/active/2026-08-25-quickfiler-high-confidence-partial-screen-backfill-608/evidence/qa-gates/r1-csharp-tests-coverage.2026-08-25T12-33.md` — `6269F0F80BF4CD42F938EFF282AB3406B6E12EBAF4A34400FE227FE3DCD59F8F`
+
+Pre-existing Evidence Inventory:
+- `evidence/baseline/csharp-analyzers.2026-08-25T12-23.md` — `A5B3E7649BE612ECC3E49E0CCA99CEBD56D0E0F78024D4387ED27C4C847BCBD3`
+- `evidence/baseline/csharp-coverage.2026-08-25T12-26.cobertura.xml` — `F5B6736A281516B7B432B3CD2809DCD5B4DD2796E1D09001B902763F19804CA7`
+- `evidence/baseline/csharp-format-check.2026-08-25T12-22.md` — `AE9D9ADC97815C3A2925C5721F3B8C021B80B5CE33905F01F0322E969D80B344`
+- `evidence/baseline/csharp-format-check.2026-08-25T12-25.md` — `27E0F727CA9C58ACDFBE9862937B58F0EC876FDFE77A5A97F7E5065A518277EE`
+- `evidence/baseline/csharp-nullable.2026-08-25T12-23.md` — `84C27DC4E5C3E549655F77408F138648B25C2B9EB4A2A88A929D674FC2679771`
+- `evidence/baseline/csharp-tests-coverage.2026-08-25T12-27.md` — `C46A2CA2A4E7FF275E2AB3416C548312A0588DC83FB59D0BC6EACD4E4782E60B`
+- `evidence/baseline/phase0-instructions-read.2026-08-25T12-22.md` — `590AF54422CE3E2887E3746C098BD3910B2ED133B0AC89A4327D8D6A4B2528DC`
+- `evidence/baseline/repository-scope.2026-08-25T12-22.md` — `FB2BE56A8880BA4955D2B92CC3B879C4CC787F04B6D2CE47EA819D55AE07B399`
+- `evidence/issue-updates/acceptance-criteria-status.2026-08-25T12-32.md` — `46B7AD3E4F5FB6CA4463EE6FB63336E86596DFD98A592E5BDEF4429F9B5D3C3B`
+- `evidence/other/execution-sequence-deviation.2026-08-25T12-31.md` — `1C34634AC75B50971BC36E143EE718CFA2483BA9BACE08450E502A90D87FF40A`
+- `evidence/other/implementation-scope.2026-08-25T12-30.md` — `47EF766FF699C80ACEB1DD19D8942B55B25420BB399ABADD65361A9E58831E58`
+- `evidence/qa-gates/csharp-analyzers.2026-08-25T12-33.md` — `CEFC5983F7B3BBA35B357996BC094C8E34F84948A215AE1D0567997555703618`
+- `evidence/qa-gates/csharp-format.2026-08-25T12-33.md` — `0097148C216BD7780A75514768113605FE448DDEBB54246C0EE33C9B548787D7`
+- `evidence/qa-gates/csharp-nullable.2026-08-25T12-33.md` — `EBB9893A2DF462E9583BC6B0B0E6689131A6E08AA840B824796062B0DB95D0A1`
+- `evidence/qa-gates/r1-csharp-analyzers.2026-08-25T12-33.md` — `65F84089C59BB71BACA94E9EB872829DE12CD6C7D82E7848381B6CF435F198C4`
+- `evidence/qa-gates/r1-csharp-coverage.2026-08-25T12-33.cobertura.xml` — `EB68278068131B2C92F42EB5BDA79ABC047E095A67A1C651DB865B9E9E719266`
+- `evidence/qa-gates/r1-csharp-format.2026-08-25T12-33.md` — `7AB2F2159512E4E24A61CC5572716D2118A67E753178943340CE2D78C88A6382`
+- `evidence/qa-gates/r1-csharp-nullable.2026-08-25T12-33.md` — `98F37AF006F4388D983DC6B85756ED876B1C216E89E14AF03D6AEB24C0164DF0`
+- `evidence/qa-gates/r1-csharp-tests-coverage.2026-08-25T12-33.md` — `6269F0F80BF4CD42F938EFF282AB3406B6E12EBAF4A34400FE227FE3DCD59F8F`
+- `evidence/regression-testing/controller-quantity-pins.2026-08-25T12-32.md` — `DC8C2165A11FF62549E40C81DE7AFEA742802E9EF4578EC27075F03EACB9A1DB`
+- `evidence/regression-testing/gate-invariants-pass.2026-08-25T12-31.md` — `DF2A868ECFB8B8B0A460E7537BE7F031033ADF5D66CE29F3B9E0AF4CB38FB2E0`
+- `evidence/regression-testing/initial-seven-fail-before.2026-08-25T12-29.md` — `E624C202C3EB0D2EEF8013E7A8B1A28593010440FDA8716BCC087CECA3B54982`
+- `evidence/regression-testing/initial-seven-pass-after.2026-08-25T12-30.md` — `46DBF433BD9EC59081B33AD504770373D4865F4811943BAC6261B22E403EF4B5`
+- `evidence/regression-testing/subsequent-eight-fail-before.2026-08-25T12-29.md` — `A984674BD9B4DEF2EB74B64A420232B238C59743F648C6627B615DEBB75A8F22`
+- `evidence/regression-testing/subsequent-eight-pass-after.2026-08-25T12-30.md` — `78F324372B65A3655D9DA480508348718343F97D69D23CFE84E645065C21C3D8`
+- `evidence/remediation-baseline/r1-csharp-policy-conflict-reconciliation.2026-08-25T12-33.md` — `B01F2E5496A8C0AEFC276B700E6433E9086E674F83A7123CC7AD80788455B138`
+- `evidence/remediation-baseline/r1-immutable-evidence-inventory.2026-08-25T12-33.md` — `CC698F180E0818A4AE153172C28B5B09F3805EDA16366238AFE6A0F595F752B8`
+- `evidence/remediation-baseline/r1-policy-read.2026-08-25T12-33.md` — `42973A370F39FF908BDCDA214FD9A1C7F61255CE58DB3E28FE2082502F22311D`
+- `evidence/remediation-baseline/r1-qa-baseline-provenance.2026-08-25T12-33.md` — `91BCF77377DD425795F9CB7E2D07EB1E95A403FC11B0124BDD3EF0BDFDBCF292`
+- `evidence/remediation-baseline/r2-policy-read.2026-08-25T12-55.md` — `E74E3ED452BC358DC8083BD15D9CEFE1E320F9AD9748FA98310135AE37FA89BD`
