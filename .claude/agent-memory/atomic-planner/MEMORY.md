@@ -33,6 +33,8 @@
 - [Acceptance edits must be false-before/true-after](acceptance-edits-must-be-false-before-true-after.md) — a clause already true at branch head is a no-op gate
 - [Zero-hit grep gates need carve-outs](zero-hit-grep-gates-need-carveouts.md) — denial text and non-coverage numerals make "no hits" unsatisfiable
 - [Single-numeral gates must name the role](single-numeral-gates-must-name-the-role.md) — count the *enforced* occurrence; enumerate doc/policy ones
+- [Superseding a floor must name CLAUDE.md](superseding-a-coverage-floor-must-name-claude-md.md) — an enumeration omitting it implies its rank-1 floor survives
+- [MCP promotion route seams](mcp-promotion-route-plan-seams.md) — separate bug entry point; `promotion_type`+`work_mode`; stage `docs/features/potential`; return shape undocumented
 - [Wiring gates must be wiring-sensitive](feedback_wiring_gates_must_be_wiring_sensitive.md) — count floors deflate with the defect they guard
 - [Research claims as acceptance clauses](research-claims-as-acceptance-clauses.md) — never encode an unmeasured third-party claim as a literal AC clause
 - [Literal-call clauses block file-size tightening](literal-call-clauses-block-file-size-tightening.md) — pinning a call in 2+ places near a 500-line file is unsatisfiable
@@ -86,7 +88,7 @@
 ## Domain seams (TaskMaster)
 
 - [#445 keyboard-action](project_445_keyboard_action_plan_seams.md) — resolve WS at execution time; scope epic-child gates to owned test classes
-- [#446 QuickFiler bug family](project_446_quickfiler_bug_family_plan_seams.md) — ScoringServiceFactory seam before COM-path tests; AC conflict → unchecked + REMEDIATION-REQUIRED; `gh issue create` denied by the promotion hook
+- [#446 QuickFiler bug family](project_446_quickfiler_bug_family_plan_seams.md) — ScoringServiceFactory seam before COM-path tests; AC conflict → unchecked + REMEDIATION-REQUIRED; R3 unreachable coverage gate in an unbounded restart loop
 - [#438 search-focus](project_438_search_focus_plan_seams.md) — additive interface overload broke 7 test files; dispatch the default path on the old overload
 - [#424 QuickFiler deadline](project_424_quickfiler_deadline_plan_seams.md) — overload migration breaks loose-mock Setup/Verify; grep the old shape in ALL test files
 - [#351 QuickFiler breadcrumb](project_351_quickfiler_breadcrumb_plan_seams.md) — JSON code in UtilitiesCS only; coordinator pattern
