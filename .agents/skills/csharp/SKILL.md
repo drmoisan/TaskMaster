@@ -14,9 +14,9 @@ This rule file summarizes the C#-specific policies for this repository.
 
 ## Toolchain
 
-1. **Formatting — CSharpier**: All C# source files must be formatted with CSharpier. Do not use `dotnet format`. Command: `dotnet tool run csharpier .` or `csharpier .`
-2. **Linting — .NET Analyzers**: C# code must pass Roslyn/.NET analyzer diagnostics. Command: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
-3. **Type Checking — Nullable Analysis**: Enable nullable reference types and fail on warnings. Command: `msbuild TaskMaster.sln /t:Build /p:Configuration=Debug /p:Platform="Any CPU" /p:Nullable=enable /p:TreatWarningsAsErrors=true`
+1. **Formatting — CSharpier**: All C# source files must be formatted with CSharpier. Do not use `dotnet format`. Run `dotnet tool restore` first when the manifest tool has not been restored. Apply formatting with `dotnet tool run csharpier format .` and verify read-only with `dotnet tool run csharpier check .`. Always invoke through `dotnet tool run` so the manifest-pinned CSharpier version is used.
+2. **Linting — .NET Analyzers**: C# code must pass Roslyn/.NET analyzer diagnostics. Command: `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`. `/t:Rebuild` is intentional for a warm local worktree: `/t:Build` can skip `CoreCompile` through MSBuild incrementality and exit 0 without running analyzers. CI may retain `/t:Build` on a cold checkout.
+3. **Type Checking — Nullable Analysis**: Compiler and nullable-flow diagnostics must pass with warnings as errors. Command: `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`. `/t:Rebuild` is required locally so compiler and nullable-flow diagnostics actually run. Projects opt into nullable per file with `#nullable enable`; do not pass `/p:Nullable=enable`, which opts every unannotated file in at once.
 4. **Testing — MSTest + Moq + FluentAssertions**: Run tests with: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`
 
 Run the toolchain in order: format → lint → type-check → test. Restart from step 1 if any step fails or changes files.
