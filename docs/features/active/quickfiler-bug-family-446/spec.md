@@ -967,8 +967,8 @@ of this branch against its integration branch.
 
 - Issue: https://github.com/drmoisan/TaskMaster/issues/446
 - Related issues: #448, #426, #427 (partially addressed; remains open)
-- Feature issue record: `docs/features/active/quickfiler-queue-datamodel-defects-446/issue.md`
-- Research: `docs/features/active/quickfiler-queue-datamodel-defects-446/research/2026-08-24T09-50-quickfiler-queue-datamodel-defects-research.md`
+- Feature issue record: `docs/features/active/quickfiler-bug-family-446/issue.md`
+- Research: `docs/features/active/quickfiler-bug-family-446/research/2026-08-24T09-50-quickfiler-queue-datamodel-defects-research.md`
 - Promoted potential documents:
   `docs/features/potential/promoted/2026-08-07-iteratequeueasync-deadline-closes-queue-early.md`,
   `docs/features/potential/promoted/2026-08-07-quickfiler-undoconsumer-nonterminating-loop.md`,
