@@ -276,6 +276,7 @@
     <Compile Include="OutlookObjects\Folder\BreadcrumbHtmlRendererTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbMessageCodecTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRowBuilderTests.cs" />
+    <Compile Include="OutlookObjects\Folder\ArchiveStemContractTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRowStateTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeNodeKeyTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbBridgeMessagesTests.cs" />

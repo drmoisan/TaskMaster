@@ -32,7 +32,7 @@ namespace QuickFiler.Controllers
         private IReadOnlyList<BreadcrumbRow> _rows = Array.Empty<BreadcrumbRow>();
         private string? _selectedRowId;
         private string? _pendingDocument;
-        private string _archiveRootPath = string.Empty;
+        private string _boundRoot = string.Empty;
         private bool _darkMode;
         private int _requestSequence;
 
@@ -104,7 +104,9 @@ namespace QuickFiler.Controllers
             var chains = new Dictionary<string, IReadOnlyList<FolderBreadcrumbSegment>>(
                 StringComparer.OrdinalIgnoreCase
             );
-            _archiveRootPath = archiveRootPath ?? string.Empty;
+            _boundRoot = string.IsNullOrWhiteSpace(archiveRootPath)
+                ? string.Empty
+                : archiveRootPath.TrimEnd('\\', '/');
             foreach (string text in presentedRows)
             {
                 if (
@@ -116,11 +118,11 @@ namespace QuickFiler.Controllers
                     continue;
                 }
 
-                string hierarchyPath = ToHierarchyPath(text, _archiveRootPath);
-                IReadOnlyList<FolderBreadcrumbSegment>? chain = await FetchChainAsync(
-                    hierarchyPath,
-                    cancellationToken
-                );
+                string? hierarchyPath = ToHierarchyPath(text);
+                IReadOnlyList<FolderBreadcrumbSegment>? chain =
+                    hierarchyPath == null
+                        ? null
+                        : await FetchChainAsync(hierarchyPath, cancellationToken);
                 if (chain != null)
                 {
                     chains[text] = chain;
@@ -137,29 +139,21 @@ namespace QuickFiler.Controllers
             DeliverDocument();
         }
 
-        private static string ToHierarchyPath(string presentedTarget, string archiveRootPath)
+        private string? ToHierarchyPath(string presentedTarget)
         {
-            if (string.IsNullOrWhiteSpace(archiveRootPath))
+            // #609 preserved: a RELATIVE presented target stays root-prefixed for the lookup.
+            // #614 D3: an out-of-root full path is not fabricated into a hierarchy identity;
+            // null keeps the row on the existing single-segment fallback rendering.
+            if (_boundRoot.Length == 0 || !ArchiveStemContract.IsFullOutlookPath(presentedTarget))
             {
-                return presentedTarget;
+                return _boundRoot.Length == 0
+                    ? presentedTarget
+                    : _boundRoot + "\\" + presentedTarget;
             }
 
-            string root = archiveRootPath.TrimEnd('\\', '/');
-            if (root.Length == 0)
-            {
-                return presentedTarget;
-            }
-
-            if (
-                string.Equals(presentedTarget, root, StringComparison.OrdinalIgnoreCase)
-                || presentedTarget.StartsWith(root + "\\", StringComparison.OrdinalIgnoreCase)
-                || presentedTarget.StartsWith(root + "/", StringComparison.OrdinalIgnoreCase)
-            )
-            {
-                return presentedTarget;
-            }
-
-            return root + "\\" + presentedTarget.TrimStart('\\', '/');
+            return ArchiveStemContract.TryMakeArchiveRelative(presentedTarget, _boundRoot, out _)
+                ? presentedTarget
+                : null;
         }
 
         private void AttachSegmentKeys(
@@ -480,49 +474,55 @@ namespace QuickFiler.Controllers
                 return; // Banner rows are never selectable.
             }
 
-            _selectedRowId = row.RowId;
-            SelectedFolderPath =
+            string selection =
                 row.Kind == BreadcrumbRowKind.TrashPseudoRow
                     ? BreadcrumbRowBuilder.TrashRowText
                     : row.FilingTarget;
-            PostOutbound(
-                new BreadcrumbRenderMessage(_renderer.RenderRows(_rows, _selectedRowId), null)
-            );
-            SelectedFolderPathChanged?.Invoke(this, SelectedFolderPath);
+            // #614 D2: reject only an out-of-root FULL Outlook target; a rooted target at or
+            // under the root passes verbatim (#439) and no bound root leaves the row unguarded.
+            if (
+                _boundRoot.Length != 0
+                && ArchiveStemContract.IsFullOutlookPath(selection)
+                && !ArchiveStemContract.TryMakeArchiveRelative(selection, _boundRoot, out _)
+            )
+            {
+                log.Error("Breadcrumb row rejected: target is outside the archive root.");
+                return;
+            }
+
+            CommitSelection(row, selection);
         }
 
         private void SelectHierarchyPath(BreadcrumbRow row, string fullPath)
         {
+            if (_boundRoot.Length == 0)
+            {
+                CommitSelection(row, fullPath); // Preserved no-archive-root binding mode.
+                return;
+            }
+
+            // #614 D1/D9: a path outside the archive root, and the root itself, are deterministic
+            // non-selections; the prior selection stays unchanged and is never nulled (#499).
+            if (
+                !ArchiveStemContract.TryMakeArchiveRelative(fullPath, _boundRoot, out string stem)
+                || stem.Length == 0
+            )
+            {
+                log.Error("Breadcrumb selection rejected: not a folder inside the archive root.");
+                return;
+            }
+
+            CommitSelection(row, stem);
+        }
+
+        private void CommitSelection(BreadcrumbRow row, string selection)
+        {
             _selectedRowId = row.RowId;
-            SelectedFolderPath = ToArchiveRelativePath(fullPath);
+            SelectedFolderPath = selection;
             PostOutbound(
                 new BreadcrumbRenderMessage(_renderer.RenderRows(_rows, _selectedRowId), null)
             );
             SelectedFolderPathChanged?.Invoke(this, SelectedFolderPath);
-        }
-
-        private string ToArchiveRelativePath(string fullPath)
-        {
-            string root = _archiveRootPath.TrimEnd('\\', '/');
-            if (root.Length == 0)
-            {
-                return fullPath;
-            }
-
-            if (string.Equals(fullPath, root, StringComparison.OrdinalIgnoreCase))
-            {
-                return string.Empty;
-            }
-
-            if (
-                fullPath.StartsWith(root + "\\", StringComparison.OrdinalIgnoreCase)
-                || fullPath.StartsWith(root + "/", StringComparison.OrdinalIgnoreCase)
-            )
-            {
-                return fullPath.Substring(root.Length).TrimStart('\\', '/');
-            }
-
-            return fullPath;
         }
 
         private void PostRowRender(BreadcrumbRow row)

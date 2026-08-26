@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="Controllers\BreadcrumbBridgeRouterQueueTests.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterTests.cs" />
+    <Compile Include="Controllers\BreadcrumbBridgeRouterIssue614Tests.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterIssue439Tests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorTests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorProbabilityTests.cs" />
@@ -191,6 +192,9 @@
     </Reference>
     <Reference Include="Deedle, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Deedle.3.0.0\lib\netstandard2.0\Deedle.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=3.3.2.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.3.3.2\lib\net462\log4net.dll</HintPath>
     </Reference>
     <Reference Include="FluentAssertions, Version=8.10.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentAssertions.8.10.0\lib\net47\FluentAssertions.dll</HintPath>
