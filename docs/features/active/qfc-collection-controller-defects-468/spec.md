@@ -1185,7 +1185,7 @@ individually verifiable from evidence.
       `_itemGroupsToMove.Count` and which contains no `null` element. Verified by named MSTest tests
       for a one-group and a three-group arrangement, asserting `Length` and
       `Should().NotContainNulls()`.
-- [ ] **AC-6 (#469 defect 3).** The `_itemGroupsToMove` field's declared type is an ordered contract
+- [x] **AC-6 (#469 defect 3).** The `_itemGroupsToMove` field's declared type is an ordered contract
       (`IReadOnlyList<QfcItemGroup>` or an equivalent `IList`-assignable type), and
       `TryGetItemGroupByIndex` performs an explicit bounds check rather than catching
       `System.Exception`. Verified by (a) a named structural MSTest test asserting the field's

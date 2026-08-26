@@ -67,7 +67,13 @@ namespace QuickFiler.Controllers
         private Panel _itemPanel;
         private TableLayoutPanel _itemTlp;
         private TableLayoutPanel _itemTlpToMove;
-        private ConcurrentDictionary<QfcItemGroup, int> _itemGroupsToMove;
+
+        // Issue #469 defect 3: an ordered contract, not a hash-based one. TryGetItemGroupByIndex,
+        // MoveEmailsAsync and GetMoveDiagnostics all resolve a group by position, so the cached
+        // snapshot must preserve the order of _itemGroups. A ConcurrentDictionary's enumeration
+        // order is unspecified and can change on rehash, which silently paired one message's move
+        // with another message's diagnostics.
+        private IReadOnlyList<QfcItemGroup> _itemGroupsToMove;
         private bool _darkMode;
         private RowStyle _template;
         private RowStyle _templateExpanded;
@@ -668,9 +674,9 @@ namespace QuickFiler.Controllers
 
         internal void CacheItemGroupsForMove()
         {
-            _itemGroupsToMove = _itemGroups
-                .Select(group => new KeyValuePair<QfcItemGroup, int>(group, 1))
-                .ToConcurrentDictionary();
+            // Snapshot in list order (issue #469 defect 3). ToList copies, so later mutation of
+            // _itemGroups does not disturb the cached move order.
+            _itemGroupsToMove = _itemGroups.ToList();
         }
 
         internal void ActivateQueuedItemGroups(List<QfcItemGroup> itemGroups)
@@ -807,8 +813,16 @@ namespace QuickFiler.Controllers
         {
             if (_itemGroupsToMove is not null)
             {
-                _itemGroupsToMove.ForEach(kvp => kvp.Key.ItemController.Cleanup());
-                _itemGroupsToMove.Clear();
+                foreach (var group in _itemGroupsToMove)
+                {
+                    group.ItemController?.Cleanup();
+                }
+
+                // The cached snapshot is read-only, so it is released by resetting the field
+                // rather than by mutating the collection in place. An empty list rather than null
+                // preserves the post-Clear() semantics the previous code had: EmailsToMove and
+                // GetMoveDiagnostics continue to observe a non-null, zero-length collection.
+                _itemGroupsToMove = Array.Empty<QfcItemGroup>();
             }
             if (_itemTlpToMove is not null)
                 _itemTlpToMove.Dispose();
@@ -2026,16 +2040,24 @@ namespace QuickFiler.Controllers
             }
         }
 
+        /// <summary>
+        /// Resolves the cached move group at <paramref name="index"/>, or <see langword="null"/>
+        /// when the cache is absent or the index falls outside it.
+        /// </summary>
+        /// <remarks>
+        /// Issue #469 defect 3: an explicit null-and-bounds check replaces a broad
+        /// <c>catch (System.Exception)</c>. The old form also swallowed genuine faults raised by a
+        /// collaborator and reported them as a missing group, which is indistinguishable from a
+        /// legitimately out-of-range index.
+        /// </remarks>
         private QfcItemGroup TryGetItemGroupByIndex(int index)
         {
-            try
-            {
-                return _itemGroupsToMove.ElementAt(index).Key;
-            }
-            catch (System.Exception)
+            if (_itemGroupsToMove is null || index < 0 || index >= _itemGroupsToMove.Count)
             {
                 return null;
             }
+
+            return _itemGroupsToMove[index];
         }
 
         public string[] GetMoveDiagnostics(
