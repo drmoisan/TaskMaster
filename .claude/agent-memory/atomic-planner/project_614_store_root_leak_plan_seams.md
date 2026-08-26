@@ -28,5 +28,16 @@ R1 preflight revision (2026-08-26, applied in place; 11 phases / 80 tasks unchan
 - **P10-T28 commits `.claude/agent-memory/**`** (tracked, agent-written; clean porcelain unachievable otherwise). AC22 check-off has a real qa-gates artifact with six banned-API zero-hit searches (no "check-off comment" — the tracking skill permits only checkbox flips).
 - **IOlObjects.ArchiveRootPath has 19 production call sites**; getter-throw is verified at P9-T4, not assumed. P2-T2 uses no Moq (pure static class).
 
+R2 preflight revision (2026-08-26, B7-B8 + NB1-NB6; 11 phases / 80 tasks unchanged):
+
+- **Six pre-plan branch paths are allowlisted in P8-T2/P9-T6** (`.gitignore` + five `docs/features/potential/promoted/2026-08-26-*.md`): commits `b8776b58`/`34350f45`/`a8a96561`/`aec3f18f`/`5a429486` sit ahead of merge-base `c279d40b`, so `git diff --name-only "$base"` necessarily reports them. Allowlisted only as pre-existing state; a fourth statement `git diff --name-only HEAD` proves the change did not modify them. General lesson: a working-tree-vs-merge-base diff gate on a branch with pre-plan commits needs a pre-existing-paths allowlist plus a `diff HEAD` non-modification proof.
+- **P8-T3 redaction sweep carries a recorded exception**: `FolderConverterTests.cs:22-23` contains the fabricated `first.last@company.com` (untouched lines; only `:329` is edited). `@`-string negative claim scoped to changed hunks; account-name claim scoped to whole changed files.
+- **Invoke-MSTestWithCoverage.ps1 has NO `\.claude\` exclusion** — its filter is `\bin\<Config>\` minus `\obj\`/`\ref\` only. Global rule 6 and P9-T4 now state this truthfully (this worktree has no nested agent worktrees, so no exclusion is needed).
+- **P5-T7 filter needs a third alternation** `FullyQualifiedName~FolderConverter_Tests`: `UtilitiesCS.Test/OutlookExtensions/FolderConverter_Tests.cs` exercises `ToFsFolderpath` but `FolderConverter_Tests` does not contain the substring `FolderConverterTests`.
+- **P5-T3 must keep `paramName` = `nameof(fsPath)`** — `FolderConverterTests.cs:63` asserts `.WithParameterName("fsPath")`.
+- **P1-T3 Helpers extraction requires `public partial class` at `:23`** ([TestClass] stays only on the original file).
+- **P9-T5 `>= 84.80` miss is re-measured once** before being read as a regression (dotnet-coverage denominator nondeterminism).
+- **P10-T24 restates the AC24 fourth-command substitution** (literal `vstest.console.exe ... /EnableCodeCoverage` executed via the canonical coverage runner).
+
 **Why:** these were all judgment calls resolving spec-vs-reality conflicts; a naive revision pass re-reading spec.md literally would reintroduce unsatisfiable gates.
 **How to apply:** on any #614 preflight revision, keep these seams unless the orchestrator explicitly overrules a recorded decision.
