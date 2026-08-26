@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Interfaces;
 
 namespace QuickFiler.Controllers
 {
@@ -18,10 +19,13 @@ namespace QuickFiler.Controllers
             }
             try
             {
-                var listObjects = await _datamodel.DequeueNextItemGroupAsync(
+                QfcDequeueBatch batch = await _datamodel.DequeueNextItemGroupWithOutcomeAsync(
                     _formController.ItemsPerIteration,
-                    2000
+                    2000,
+                    QfcStreamingDequeueConfidenceGate.DefaultFirstBatchDeadline,
+                    null
                 );
+                IList<MailItem> listObjects = batch.Items;
                 if (listObjects.Count > 0)
                 {
                     //await UiThread.Dispatcher.InvokeAsync(async () => await QfcQueue.EnqueueAsync(listObjects, _formController.Groups));

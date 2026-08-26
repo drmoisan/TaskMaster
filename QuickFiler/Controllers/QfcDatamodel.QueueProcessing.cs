@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Interfaces;
 
 namespace QuickFiler.Controllers
 {
@@ -98,6 +99,31 @@ namespace QuickFiler.Controllers
             return await DequeueDirectAsync(quantity);
         }
 
+        /// <summary>
+        /// Issue #446. Outcome-bearing dequeue. The items come from the existing four-argument
+        /// path; the stop reason is hard-coded to
+        /// <see cref="QfcDequeueStop.QuantitySatisfied"/> here and is discriminated in Phase 2.
+        /// </summary>
+        public async Task<QfcDequeueBatch> DequeueNextItemGroupWithOutcomeAsync(
+            int quantity,
+            int timeOut,
+            TimeSpan firstBatchDeadline,
+            Action<int, int, int> progress
+        )
+        {
+            IList<MailItem> items = await DequeueNextItemGroupAsync(
+                quantity,
+                timeOut,
+                firstBatchDeadline,
+                progress
+            );
+            return new QfcDequeueBatch(
+                items,
+                new List<QfcPreScoredItem>(),
+                QfcDequeueStop.QuantitySatisfied
+            );
+        }
+
         private async Task<IList<MailItem>> DequeueDirectAsync(int quantity)
         {
             if (_masterQueue.Count < quantity)
@@ -125,7 +151,8 @@ namespace QuickFiler.Controllers
                 progress
             );
 
-            var nodes = (await gate.DequeueAsync(quantity, timeOut, _token)).ToList();
+            QfcGateBatch batch = await gate.DequeueAsync(quantity, timeOut, _token);
+            var nodes = batch.Accepted.Select(x => x.MailItem).ToList();
             return UnhookDequeuedNodes(nodes);
         }
 
@@ -163,6 +190,32 @@ namespace QuickFiler.Controllers
                 throw;
             }
             return nodes;
+        }
+
+        /// <summary>
+        /// Injectable factory for the master-queue admission scorer. Defaults to a fresh
+        /// <see cref="FolderScoringService"/> so production behaviour is unchanged; tests assign a
+        /// factory returning a mock so <see cref="ScoreRemainingQueueMailItemAsync"/> can be driven
+        /// without a live Outlook session, which
+        /// <c>.claude/rules/general-unit-test.md</c> UT4 requires.
+        /// </summary>
+        internal Func<IFolderScoringService> ScoringServiceFactory { get; set; } =
+            () => new FolderScoringService();
+
+        private async Task<(long Score, string TopFolder)> ScoreRemainingQueueMailItemAsync(
+            MailItem mailItem,
+            CancellationToken cancel
+        )
+        {
+            var scoringService = ScoringServiceFactory();
+            var score = await scoringService
+                .ScoreAsync(mailItem, _globals, cancel)
+                .ConfigureAwait(false);
+            logger.Debug(
+                $"Probability debug [QfcDatamodel.ScoreRemainingQueueMailItemAsync (master-queue admission)] "
+                    + $"Subject='{mailItem.Subject}' EntryID='{mailItem.EntryID}' Score={score.Score}"
+            );
+            return (score.Score, string.Empty);
         }
 
         internal async Task WaitForQueue(int quantity, CancellationToken token)

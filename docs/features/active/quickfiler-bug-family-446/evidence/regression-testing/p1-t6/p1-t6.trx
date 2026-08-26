@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="6169e7b3-cd37-4dbf-9404-d004f8aa84cd" name="DanMoisan@MEGALODON4 2026-08-26 08:51:02" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T08:51:02.9579772-04:00" queuing="2026-08-26T08:51:02.9579772-04:00" start="2026-08-26T08:51:01.6046378-04:00" finish="2026-08-26T08:51:02.9744856-04:00" />
+  <TestSettings name="default" id="569b02dd-9aa0-4f46-8d6f-688dd963f676">
+    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_08_51_02" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="ae4178a4-d6a9-4571-92ea-a2ea246caa4b" testId="153ead0e-82df-89fb-b5f2-db08890df4be" testName="DequeueNextItemGroupAsync_HighConfidenceRejectedItem_UnhooksFromMoveMonitor" computerName="MEGALODON4" duration="00:00:00.2675769" startTime="2026-08-26T08:51:02.5129670-04:00" endTime="2026-08-26T08:51:02.8925067-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ae4178a4-d6a9-4571-92ea-a2ea246caa4b">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Test method QuickFiler.Controllers.Tests.QfcQueuePurePathsTests.DequeueNextItemGroupAsync_HighConfidenceRejectedItem_UnhooksFromMoveMonitor threw exception:&#xD;
+Moq.MockException: the datamodel must release the rejected candidate's monitor hook exactly once&#xD;
+Expected invocation on the mock once, but was 0 times: x =&gt; x.UnhookItem(Mock&lt;MailItem:1&gt;.Object)&#xD;
+&#xD;
+Performed invocations:&#xD;
+&#xD;
+   Mock&lt;IEmailMoveMonitor:1&gt; (x):&#xD;
+   No invocations performed.&#xD;
+</Message>
+          <StackTrace>   at Moq.Mock.Verify(Mock mock, LambdaExpression expression, Times times, String failMessage) in /_/src/Moq/Mock.cs:line 332&#xD;
+   at Moq.Mock`1.Verify(Expression`1 expression, Func`1 times, String failMessage) in /_/src/Moq/Mock`1.cs:line 787&#xD;
+   at QuickFiler.Controllers.Tests.QfcQueuePurePathsTests.&lt;DequeueNextItemGroupAsync_HighConfidenceRejectedItem_UnhooksFromMoveMonitor&gt;d__9.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\Controllers\QfcQueuePurePathsTests.cs:line 185&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.&lt;ExecuteInternalAsync&gt;d__58.MoveNext()&#xD;
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="DequeueNextItemGroupAsync_HighConfidenceRejectedItem_UnhooksFromMoveMonitor" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="153ead0e-82df-89fb-b5f2-db08890df4be">
+      <Execution id="ae4178a4-d6a9-4571-92ea-a2ea246caa4b" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcQueuePurePathsTests" name="DequeueNextItemGroupAsync_HighConfidenceRejectedItem_UnhooksFromMoveMonitor" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="153ead0e-82df-89fb-b5f2-db08890df4be" executionId="ae4178a4-d6a9-4571-92ea-a2ea246caa4b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

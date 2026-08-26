@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
@@ -313,5 +313,79 @@ namespace QuickFiler.Controllers.Tests
         }
 
         #endregion Issue #222 — Injectable time/delay seam
+
+        #region Issue #446 — Top-folder propagation from the master-queue admission scorer
+
+        /// <summary>
+        /// Issue #446. <c>ScoreRemainingQueueMailItemAsync</c> must surface BOTH halves of the
+        /// scorer result. The scoring service already returns a <c>(Score, TopFolder)</c> pair, but
+        /// the datamodel discards the folder, so a later consumer has to re-score the same item.
+        /// Scoring is driven through the <c>ScoringServiceFactory</c> seam added by [P1-T5] so no
+        /// live Outlook COM is touched, as .claude/rules/general-unit-test.md UT4 requires.
+        /// </summary>
+        [TestMethod]
+        public async Task ScoreRemainingQueueMailItemAsync_ReturnsScoreAndTopFolder()
+        {
+            // Arrange
+            var model = CreateUninitializedDatamodel();
+            var mailItem = new Mock<MailItem>().Object;
+            var globals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
+
+            const long ExpectedScore = 875L;
+            const string ExpectedTopFolder = @"Inbox\Projects\Alpha";
+
+            var scoringService = new Mock<IFolderScoringService>(MockBehavior.Strict);
+            scoringService
+                .Setup(x =>
+                    x.ScoreAsync(
+                        mailItem,
+                        It.IsAny<IApplicationGlobals>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync((ExpectedScore, ExpectedTopFolder));
+
+            SetPrivateField(model, "_globals", globals.Object);
+            model.ScoringServiceFactory = () => scoringService.Object;
+
+            // Act
+            (long Score, string TopFolder) result = await InvokeScoreRemainingQueueMailItemAsync(
+                model,
+                mailItem
+            );
+
+            // Assert
+            result
+                .Score.Should()
+                .Be(ExpectedScore, "the score half of the scorer result is already propagated");
+            result
+                .TopFolder.Should()
+                .Be(
+                    ExpectedTopFolder,
+                    "the top-ranked folder the scorer already computed must reach the caller "
+                        + "instead of being discarded and re-derived downstream"
+                );
+        }
+
+        private static Task<(long Score, string TopFolder)> InvokeScoreRemainingQueueMailItemAsync(
+            QfcDatamodel model,
+            MailItem mailItem
+        )
+        {
+            var method = typeof(QfcDatamodel).GetMethod(
+                "ScoreRemainingQueueMailItemAsync",
+                NonPublicInstance
+            );
+            method
+                .Should()
+                .NotBeNull(
+                    "ScoreRemainingQueueMailItemAsync should exist on QfcDatamodel as a private "
+                        + "instance method"
+                );
+            return (Task<(long Score, string TopFolder)>)
+                method.Invoke(model, new object[] { mailItem, CancellationToken.None });
+        }
+
+        #endregion Issue #446 — Top-folder propagation from the master-queue admission scorer
     }
 }

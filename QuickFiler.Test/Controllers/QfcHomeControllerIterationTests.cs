@@ -1,10 +1,12 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -74,20 +76,59 @@ namespace QuickFiler.Controllers.Tests
             this._mockApplicationGlobals.SetupGet(x => x.QfSettings).Returns(qfSettings.Object);
         }
 
-        [TestMethod]
-        public async Task IterateQueueAsync_DataModelComplete()
+        /// <summary>Matcher accepting any value; the default for <c>ArrangeIterate</c>.</summary>
+        private static Expression<Func<int, bool>> AnyValue => x => true;
+
+        /// <summary>
+        /// Shared arrangement for the queue-iteration tests; returns the mocks it wires into
+        /// <c>_controller</c>. The dequeue matchers are expressions, not values, so a pinned call
+        /// site stays pinned (<c>q =&gt; q == 8</c>) instead of widening to <c>It.IsAny</c>;
+        /// <c>outcome</c> replaces the dequeue result and is how the exception tests throw.
+        /// </summary>
+        private (
+            Mock<IQfcDatamodel> DataModel,
+            Mock<IQfcQueue> Queue,
+            Mock<IQfcFormController> FormController,
+            Mock<IQfcCollectionController> Groups
+        ) ArrangeIterate(
+            Expression<Func<int, bool>> quantity = null,
+            Expression<Func<int, bool>> timeOut = null,
+            bool complete = false,
+            IList<MailItem> dequeued = null,
+            int itemsPerIteration = 8,
+            QfcDequeueStop stop = QfcDequeueStop.QuantitySatisfied,
+            Func<Task<QfcDequeueBatch>> outcome = null
+        )
         {
-            // Arrange
-            var mockDataModel = new Mock<IQfcDatamodel>();
-            mockDataModel.Setup(m => m.Complete).Returns(true);
-            mockDataModel
-                .Setup(m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()))
-                .Returns(Task.FromResult((IList<MailItem>)new List<MailItem>()));
-            var mockQfcQueue = new Mock<IQfcQueue>();
-            mockQfcQueue
+            IList<MailItem> batch = dequeued ?? new List<MailItem>();
+            quantity = quantity ?? AnyValue;
+            timeOut = timeOut ?? AnyValue;
+            if (outcome == null)
+            {
+                outcome = () => Task.FromResult(new QfcDequeueBatch(batch, null, stop));
+            }
+
+            var dataModel = new Mock<IQfcDatamodel>();
+            dataModel.Setup(m => m.Complete).Returns(complete);
+            dataModel
+                .Setup(m => m.DequeueNextItemGroupAsync(It.Is(quantity), It.Is(timeOut)))
+                .Returns(Task.FromResult(batch));
+            dataModel
+                .Setup(m =>
+                    m.DequeueNextItemGroupWithOutcomeAsync(
+                        It.Is(quantity),
+                        It.Is(timeOut),
+                        It.IsAny<TimeSpan>(),
+                        It.IsAny<Action<int, int, int>>()
+                    )
+                )
+                .Returns(outcome);
+
+            var queue = new Mock<IQfcQueue>();
+            queue
                 .Setup(m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()))
                 .Returns(Task.CompletedTask);
-            mockQfcQueue
+            queue
                 .Setup(m =>
                     m.EnqueueAsync(
                         It.IsAny<IList<MailItem>>(),
@@ -95,100 +136,101 @@ namespace QuickFiler.Controllers.Tests
                     )
                 )
                 .Returns(Task.CompletedTask);
-            _controller.DataModel = mockDataModel.Object;
-            _controller.QfcQueue = mockQfcQueue.Object;
+
+            var groups = new Mock<IQfcCollectionController>();
+            var formController = new Mock<IQfcFormController>();
+            formController.SetupGet(m => m.ItemsPerIteration).Returns(itemsPerIteration);
+            formController.Setup(m => m.Groups).Returns(groups.Object);
+
+            _controller.DataModel = dataModel.Object;
+            _controller.QfcQueue = queue.Object;
+            SetPrivateField("_formController", formController.Object);
+
+            return (dataModel, queue, formController, groups);
+        }
+
+        /// <summary>Assigns a private instance field on the controller under test.</summary>
+        private void SetPrivateField(string name, object value) =>
+            _controller
+                .GetType()
+                .GetField(name, BindingFlags.NonPublic | BindingFlags.Instance)
+                .SetValue(_controller, value);
+
+        /// <summary>Verifies the complete-adding invocation count on the queue mock.</summary>
+        private static void VerifyCompleteAdding(
+            Mock<IQfcQueue> queue,
+            Func<Times> times,
+            string because = null
+        ) =>
+            queue.Verify(
+                m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()),
+                times,
+                because
+            );
+
+        /// <summary>Verifies the unconstrained enqueue invocation count on the queue mock.</summary>
+        private static void VerifyEnqueue(Mock<IQfcQueue> queue, Func<Times> times) =>
+            queue.Verify(
+                m =>
+                    m.EnqueueAsync(
+                        It.IsAny<IList<MailItem>>(),
+                        It.IsAny<IQfcCollectionController>()
+                    ),
+                times
+            );
+
+        [TestMethod]
+        public async Task IterateQueueAsync_DataModelComplete()
+        {
+            // Arrange
+            var (mockDataModel, mockQfcQueue, _, _) = ArrangeIterate(complete: true);
 
             // Act
             await _controller.IterateQueueAsync();
 
             // Assert
             mockDataModel.Verify(
-                m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()),
-                Times.Never
-            );
-            mockQfcQueue.Verify(
-                m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()),
-                Times.Never
-            );
-            mockQfcQueue.Verify(
                 m =>
-                    m.EnqueueAsync(
-                        It.IsAny<IList<MailItem>>(),
-                        It.IsAny<IQfcCollectionController>()
+                    m.DequeueNextItemGroupWithOutcomeAsync(
+                        It.IsAny<int>(),
+                        It.IsAny<int>(),
+                        It.IsAny<TimeSpan>(),
+                        It.IsAny<Action<int, int, int>>()
                     ),
                 Times.Never
             );
+            VerifyCompleteAdding(mockQfcQueue, Times.Never);
+            VerifyEnqueue(mockQfcQueue, Times.Never);
         }
 
         [TestMethod]
         public async Task IterateQueueAsync_QueueEmpty()
         {
             // Arrange
-            var mockDataModel = new Mock<IQfcDatamodel>();
-            mockDataModel.Setup(m => m.Complete).Returns(false);
-            mockDataModel
-                .Setup(m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()))
-                .Returns(Task.FromResult((IList<MailItem>)new List<MailItem>()));
-            _controller.DataModel = mockDataModel.Object;
-
-            var mockQfcQueue = new Mock<IQfcQueue>();
-            mockQfcQueue
-                .Setup(m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()))
-                .Returns(Task.CompletedTask);
-            mockQfcQueue
-                .Setup(m =>
-                    m.EnqueueAsync(
-                        It.IsAny<IList<MailItem>>(),
-                        It.IsAny<IQfcCollectionController>()
-                    )
-                )
-                .Returns(Task.CompletedTask);
-            _controller.QfcQueue = mockQfcQueue.Object;
-
-            // Mock the QfcFormController
-            var mockFormController = new Mock<IQfcFormController>();
-            mockFormController.Setup(m => m.ItemsPerIteration).Returns(8);
-            var mockQfcCollectionController = new Mock<IQfcCollectionController>();
-            mockFormController.Setup(m => m.Groups).Returns(mockQfcCollectionController.Object);
-            _controller
-                .GetType()
-                .GetField(
-                    "_formController",
-                    System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance
-                )
-                .SetValue(_controller, mockFormController.Object);
+            var (mockDataModel, mockQfcQueue, _, _) = ArrangeIterate();
 
             // Act
             await _controller.IterateQueueAsync();
 
             // Assert
             mockDataModel.Verify(
-                m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()),
-                Times.Once
-            );
-            mockQfcQueue.Verify(
-                m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()),
-                Times.Once
-            );
-            mockQfcQueue.Verify(
                 m =>
-                    m.EnqueueAsync(
-                        It.IsAny<IList<MailItem>>(),
-                        It.IsAny<IQfcCollectionController>()
+                    m.DequeueNextItemGroupWithOutcomeAsync(
+                        It.IsAny<int>(),
+                        It.IsAny<int>(),
+                        It.IsAny<TimeSpan>(),
+                        It.IsAny<Action<int, int, int>>()
                     ),
-                Times.Never
+                Times.Once
             );
+            VerifyCompleteAdding(mockQfcQueue, Times.Once);
+            VerifyEnqueue(mockQfcQueue, Times.Never);
         }
 
         [TestMethod]
         public async Task IterateQueueAsync_Queue2()
         {
             // Arrange
-
-            // Mock DataModel
-            var mockDataModel = new Mock<IQfcDatamodel>();
-            mockDataModel.Setup(m => m.Complete).Returns(false);
 
             // Setup DequeueNextItemGroupAsync to return 2 mail items
             var mockMailItem = new Mock<MailItem>();
@@ -197,101 +239,38 @@ namespace QuickFiler.Controllers.Tests
                 mockMailItem.Object,
                 mockMailItem.Object,
             };
-            mockDataModel
-                .Setup(m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()))
-                .Returns(Task.FromResult(mailItems));
-
-            // Set the DataModel in the controller to the mock
-            _controller.DataModel = mockDataModel.Object;
-
-            // Mock the QfcQueue
-            var mockQfcQueue = new Mock<IQfcQueue>();
-            mockQfcQueue
-                .Setup(m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()))
-                .Returns(Task.CompletedTask);
-            mockQfcQueue
-                .Setup(m =>
-                    m.EnqueueAsync(
-                        It.IsAny<IList<MailItem>>(),
-                        It.IsAny<IQfcCollectionController>()
-                    )
-                )
-                .Returns(Task.CompletedTask);
-            _controller.QfcQueue = mockQfcQueue.Object;
-
-            // Mock the QfcFormController
-            var mockFormController = new Mock<IQfcFormController>();
-            mockFormController.Setup(m => m.ItemsPerIteration).Returns(8);
-            var mockQfcCollectionController = new Mock<IQfcCollectionController>();
-            mockFormController.Setup(m => m.Groups).Returns(mockQfcCollectionController.Object);
-            _controller
-                .GetType()
-                .GetField(
-                    "_formController",
-                    System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance
-                )
-                .SetValue(_controller, mockFormController.Object);
+            var (mockDataModel, mockQfcQueue, _, _) = ArrangeIterate(dequeued: mailItems);
 
             // Act
             await _controller.IterateQueueAsync();
 
             // Assert
             mockDataModel.Verify(
-                m => m.DequeueNextItemGroupAsync(It.IsAny<int>(), It.IsAny<int>()),
-                Times.Once
-            );
-            mockQfcQueue.Verify(
-                m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()),
-                Times.Never
-            );
-            mockQfcQueue.Verify(
                 m =>
-                    m.EnqueueAsync(
-                        It.IsAny<IList<MailItem>>(),
-                        It.IsAny<IQfcCollectionController>()
+                    m.DequeueNextItemGroupWithOutcomeAsync(
+                        It.IsAny<int>(),
+                        It.IsAny<int>(),
+                        It.IsAny<TimeSpan>(),
+                        It.IsAny<Action<int, int, int>>()
                     ),
                 Times.Once
             );
+            VerifyCompleteAdding(mockQfcQueue, Times.Never);
+            VerifyEnqueue(mockQfcQueue, Times.Once);
         }
 
         [TestMethod]
         public async Task IterateQueueAsync_WhenDequeueReturnsFullQualifiedPage_EnqueuesAllItems()
         {
-            var mockDataModel = new Mock<IQfcDatamodel>();
-            mockDataModel.Setup(m => m.Complete).Returns(false);
             var mailItems = Enumerable
                 .Range(0, 8)
                 .Select(_ => new Mock<MailItem>().Object)
                 .ToList();
-            mockDataModel
-                .Setup(m => m.DequeueNextItemGroupAsync(8, 2000))
-                .Returns(Task.FromResult((IList<MailItem>)mailItems));
-            _controller.DataModel = mockDataModel.Object;
-
-            var mockQfcQueue = new Mock<IQfcQueue>();
-            mockQfcQueue
-                .Setup(m =>
-                    m.EnqueueAsync(
-                        It.Is<IList<MailItem>>(items => items.SequenceEqual(mailItems)),
-                        It.IsAny<IQfcCollectionController>()
-                    )
-                )
-                .Returns(Task.CompletedTask);
-            _controller.QfcQueue = mockQfcQueue.Object;
-
-            var mockFormController = new Mock<IQfcFormController>();
-            mockFormController.Setup(m => m.ItemsPerIteration).Returns(8);
-            var mockQfcCollectionController = new Mock<IQfcCollectionController>();
-            mockFormController.Setup(m => m.Groups).Returns(mockQfcCollectionController.Object);
-            _controller
-                .GetType()
-                .GetField(
-                    "_formController",
-                    System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance
-                )
-                .SetValue(_controller, mockFormController.Object);
+            var (_, mockQfcQueue, _, mockQfcCollectionController) = ArrangeIterate(
+                q => q == 8,
+                t => t == 2000,
+                dequeued: mailItems
+            );
 
             await _controller.IterateQueueAsync();
 
@@ -303,10 +282,7 @@ namespace QuickFiler.Controllers.Tests
                     ),
                 Times.Once
             );
-            mockQfcQueue.Verify(
-                m => m.CompleteAddingAsync(It.IsAny<CancellationToken>(), It.IsAny<int>()),
-                Times.Never
-            );
+            VerifyCompleteAdding(mockQfcQueue, Times.Never);
         }
 
         [TestMethod]
@@ -327,14 +303,7 @@ namespace QuickFiler.Controllers.Tests
             SetupQfSettings(highConfidenceEnabled: false, threshold: 0.90);
 
             var mockFormController = new Mock<IQfcFormController>();
-            _controller
-                .GetType()
-                .GetField(
-                    "_formController",
-                    System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance
-                )
-                .SetValue(_controller, mockFormController.Object);
+            SetPrivateField("_formController", mockFormController.Object);
 
             // Act
             _controller.Iterate();
@@ -366,24 +335,12 @@ namespace QuickFiler.Controllers.Tests
 
             SetupQfSettings(highConfidenceEnabled: true, threshold: 0.90);
 
-            var mockDataModel = new Mock<IQfcDatamodel>();
+            var (mockDataModel, _, mockFormController, _) = ArrangeIterate(
+                q => q == itemsPerIteration,
+                itemsPerIteration: itemsPerIteration
+            );
             mockDataModel.Setup(m => m.DequeueNextItemGroup(It.IsAny<int>())).Returns(directBatch);
-            mockDataModel
-                .Setup(m => m.DequeueNextItemGroupAsync(itemsPerIteration, It.IsAny<int>()))
-                .ReturnsAsync(new List<MailItem>());
-            _controller.DataModel = mockDataModel.Object;
-
-            var mockFormController = new Mock<IQfcFormController>();
-            mockFormController.SetupGet(m => m.ItemsPerIteration).Returns(itemsPerIteration);
             mockFormController.Setup(m => m.LoadItems(It.IsAny<IList<MailItem>>()));
-            _controller
-                .GetType()
-                .GetField(
-                    "_formController",
-                    System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance
-                )
-                .SetValue(_controller, mockFormController.Object);
 
             // Act
             _controller.Iterate();
@@ -410,14 +367,7 @@ namespace QuickFiler.Controllers.Tests
             var mockQfcQueue = new Mock<IQfcQueue>();
             var mockFormController = new Mock<IQfcFormController>();
             _controller.QfcQueue = mockQfcQueue.Object;
-            _controller
-                .GetType()
-                .GetField(
-                    "_formController",
-                    System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance
-                )
-                .SetValue(_controller, mockFormController.Object);
+            SetPrivateField("_formController", mockFormController.Object);
             _controller.DataModel = mockDataModel.Object;
 
             // Act
@@ -436,14 +386,7 @@ namespace QuickFiler.Controllers.Tests
         {
             // Arrange
             var stopWatch = new Stopwatch();
-            _controller
-                .GetType()
-                .GetField(
-                    "_stopWatch",
-                    System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance
-                )
-                .SetValue(_controller, stopWatch);
+            SetPrivateField("_stopWatch", stopWatch);
 
             // Act
             _controller.SwapStopWatch();
@@ -459,6 +402,93 @@ namespace QuickFiler.Controllers.Tests
                     )
                     .GetValue(_controller) as Stopwatch;
             Assert.AreEqual(stopWatch, actual);
+        }
+
+        /// <summary>
+        /// Issue #446. A deadline-expired empty batch is not source exhaustion — the master queue
+        /// may still hold unscanned items — so it must not irreversibly close the UI queue.
+        /// </summary>
+        [TestMethod]
+        public async Task IterateQueueAsync_EmptyBatchWithDeadlineExpired_DoesNotCompleteAdding()
+        {
+            var (_, queue, _, _) = ArrangeIterate(stop: QfcDequeueStop.DeadlineExpired);
+
+            await _controller.IterateQueueAsync();
+
+            VerifyCompleteAdding(
+                queue,
+                Times.Never,
+                "a deadline-bounded empty batch must not close the queue"
+            );
+        }
+
+        /// <summary>
+        /// Issue #446 negative control for AC2: a genuinely drained source SHOULD close the queue,
+        /// so a fix that merely stopped calling <c>CompleteAddingAsync</c> would break this test.
+        /// </summary>
+        [TestMethod]
+        public async Task IterateQueueAsync_EmptyBatchWithSourceExhausted_CompletesAddingOnce()
+        {
+            var (_, queue, _, _) = ArrangeIterate(stop: QfcDequeueStop.SourceExhausted);
+
+            await _controller.IterateQueueAsync();
+
+            VerifyCompleteAdding(
+                queue,
+                Times.Once,
+                "a drained source is the one empty-batch case that may close the queue"
+            );
+        }
+
+        /// <summary>
+        /// Issue #446 coverage: an <c>OperationCanceledException</c> from the dequeue is swallowed.
+        /// </summary>
+        [TestMethod]
+        public async Task IterateQueueAsync_DequeueThrowsOperationCanceled_SwallowsAndReturns()
+        {
+            ArrangeIterate(outcome: () => throw new OperationCanceledException());
+
+            Func<Task> act = () => _controller.IterateQueueAsync();
+
+            await act.Should().NotThrowAsync("a cancelled dequeue must not surface to the caller");
+        }
+
+        /// <summary>
+        /// Issue #446 coverage: a fault raised while cancellation is pending is swallowed. The
+        /// token is cancelled from INSIDE the dequeue callback because the entry-guard
+        /// <c>Token.ThrowIfCancellationRequested()</c> sits outside the try block, so a token
+        /// already cancelled at entry escapes uncaught and never reaches this branch.
+        /// </summary>
+        [TestMethod]
+        public async Task IterateQueueAsync_DequeueThrowsWhenTokenCancelled_SwallowsAndReturns()
+        {
+            var source = new CancellationTokenSource();
+            SetPrivateField("_token", source.Token);
+            ArrangeIterate(outcome: () =>
+            {
+                source.Cancel();
+                throw new InvalidOperationException("dequeue failed");
+            });
+
+            Func<Task> act = () => _controller.IterateQueueAsync();
+
+            await act.Should().NotThrowAsync("a fault raised after cancellation is a cancellation");
+        }
+
+        /// <summary>
+        /// Issue #446 coverage: a fault with no cancellation pending is rethrown, not swallowed.
+        /// </summary>
+        [TestMethod]
+        public async Task IterateQueueAsync_DequeueThrowsWhenTokenNotCancelled_Rethrows()
+        {
+            var fault = new InvalidOperationException("dequeue failed");
+            ArrangeIterate(outcome: () => throw fault);
+
+            Func<Task> act = () => _controller.IterateQueueAsync();
+
+            (await act.Should().ThrowAsync<InvalidOperationException>())
+                .Which.Should()
+                .BeSameAs(fault);
         }
     }
 }
