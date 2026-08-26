@@ -1,6 +1,6 @@
 # Atomic Planner Memory Index
 
-- [#614 store-root leak plan seams](project_614_store_root_leak_plan_seams.md) — AC25 vs pre-existing over-limit files (net non-growth + new EfcSelectionGuard.cs); Issue614 companion test files; evidence-path normalization; raw TRX/coverage is host-identifying (summaries only under evidence); ExpectedExitCode:1 for #594
+- [#614 store-root leak plan seams](project_614_store_root_leak_plan_seams.md) — AC25 net non-growth RATIFIED; R1 verified-token gates (`.Substring(3)` wrap); pwsh scope diff `"$base"` no `..HEAD`; raw-vs-filtered Cobertura naming; ExpectedExitCode:1 for #594
 - [Agent worktrees need SDK + NuGet + analyzer-backfill bootstrap](agent-worktrees-need-sdk-and-nuget-bootstrap.md) — no `.dotnet-sdk`, no `packages/`, and a clean restore still misses the skewed analyzer versions (CS0006, not a warning); three Phase 0 tasks
 - [/Logger:trx needs /ResultsDirectory](trx-needs-resultsdirectory.md) — TRX lands in `TestResults\` relative to cwd; TRX-existence-under-evidence acceptance is unsatisfiable without it, and the clean-tree gate won't catch it
 - [Per-task TRX subdirectory](trx-needs-resultsdirectory.md) — a shared `/ResultsDirectory:` makes "ten distinct TRX files" ambiguous once `[expect-fail]` runs deposit earlier TRX there; give each task a `p#-t#` segment

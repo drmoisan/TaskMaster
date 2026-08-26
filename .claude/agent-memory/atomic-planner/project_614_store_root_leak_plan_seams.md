@@ -17,5 +17,16 @@ Key seams a revision loop must not undo:
 - **#499 boundary:** router rejection leaves SelectedFolderPath unchanged, never null; BindRowsAsync clearing semantics untouched. Empty-archive-root binding mode pass-through preserved (public overload consumers outside EFC chain).
 - **Planner decisions recorded in plan:** IsFullOutlookPath also rejects drive-rooted input; `ask` parameter removed (not Obsolete) after a call-site search task.
 
+R1 preflight revision (2026-08-26, applied in place; 11 phases / 80 tasks unchanged):
+
+- **AC25 ratified.** Orchestrator APPROVED the net-non-growth reading (EfcFormController <= 1084, BreadcrumbBridgeRouter <= 596), persisted in `artifacts/orchestration/orchestrator-state.json` under `orchestrator_adjudications` dated 2026-08-26T10:38:00Z. P10-T25 now cites the ratification; no longer "flagged for review".
+- **CSharpier wrapped the chain**: `fsPath.Substring(3)` is NOT on one line (:157-159); the P5-T2 token is `.Substring(3)` (1 hit at :158). Companion gates: `olBranchPath.Replace(olAncestorPath, fsAncestorEquivalent)` (:155), `has a value of {fsPathExDividers}` (:164), full `:329` assertion line + `illegalFolderName.Replace(illegalFolderName, "")` (:112) for P5-T4's production half.
+- **Scope diff form**: `git diff --name-only $(git merge-base HEAD origin/main)..HEAD` fails under pwsh (usage block, exit 0) AND is blind pre-commit. Canonical form: separate pwsh statements, `git diff --name-only "$base"` (working tree vs merge-base, no `..HEAD`), used in P8-T2 and P9-T6.
+- **Coverage figure derivation**: runner throws on vstest exit 1 BEFORE its in-place Koverage rewrite, so with the #594 flake the on-disk `coverage\coverage.cobertura.xml` stays raw; plan copies it to `coverage.cobertura.raw.p#-t#.xml` and saves out-of-band filtered output as `coverage.cobertura.filtered.p#-t#.xml` (P9-T5 inputs). Fully-green run consumes the raw in place; unfiltered figure then recorded unavailable (informational only).
+- **Invoke-MSTestWithCoverage.ps1 accepts no /Logger** — Global rule 6 carve-out for P0-T9/P9-T4 (no TRX emitted, no redaction hazard).
+- **Nullable split** (Global rule 11): BreadcrumbBridgeRouter/EmailFilerConfig/FolderConverter carry `#nullable enable`; EfcDataModel/EfcFormController/AppOlObjects/AppFileSystemFolderPaths do not.
+- **P10-T28 commits `.claude/agent-memory/**`** (tracked, agent-written; clean porcelain unachievable otherwise). AC22 check-off has a real qa-gates artifact with six banned-API zero-hit searches (no "check-off comment" — the tracking skill permits only checkbox flips).
+- **IOlObjects.ArchiveRootPath has 19 production call sites**; getter-throw is verified at P9-T4, not assumed. P2-T2 uses no Moq (pure static class).
+
 **Why:** these were all judgment calls resolving spec-vs-reality conflicts; a naive revision pass re-reading spec.md literally would reintroduce unsatisfiable gates.
 **How to apply:** on any #614 preflight revision, keep these seams unless the orchestrator explicitly overrules a recorded decision.
