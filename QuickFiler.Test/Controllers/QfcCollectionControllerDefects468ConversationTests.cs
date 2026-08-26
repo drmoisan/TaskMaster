@@ -17,13 +17,10 @@ namespace QuickFiler.Controllers.Tests
     /// defects 1, 2 and 3. None of these tests needs COM, a live Outlook, a WinForms control, or an
     /// STA apartment.
     /// <para>
-    /// <c>ToggleUnGroupConv</c> itself cannot be driven COM-free: its first two statements are
-    /// <c>SafeSetTlpLayout(false)</c> and <c>UnregisterNavigation()</c>, and <c>MakeSpaceForItems</c>
-    /// reaches <c>TableLayoutHelper.InsertSpecificRow</c> on the WinForms item panel. The
-    /// reconciliation contract is therefore asserted against the pure static helpers the fix
-    /// extracts, per decision D7 of the plan. The behavioural pre-fix red states that have no
-    /// permanent post-fix counterpart at the <c>ToggleUnGroupConv</c> level are recorded in the
-    /// fail-before dossier with that reason.
+    /// <c>ToggleUnGroupConv</c> cannot be driven COM-free, so per decision D7 the reconciliation
+    /// contract is asserted against the pure static helpers the fix extracts. The behavioural
+    /// pre-fix states with no permanent post-fix counterpart are recorded, with that reason, in
+    /// the fail-before dossier and in the P7-T12 evidence artifact.
     /// </para>
     /// </summary>
     [TestClass]
@@ -33,14 +30,9 @@ namespace QuickFiler.Controllers.Tests
             BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
 
         /// <summary>
-        /// Issue #470 defect 2. Structural test asserting that the two pure static reconciliation
-        /// helpers exist on <see cref="QfcCollectionController"/>.
-        /// <para>
-        /// Scenario: look both members up by reflection. Expected outcome: both are found and both
-        /// are static. Before the fix neither exists, because the member-resolution expression is
-        /// inline in <c>EnumerateConversationMembers</c> and the count disagreement is never
-        /// detected at all.
-        /// </para>
+        /// Issue #470 defect 2. Structural test: both pure reconciliation helpers exist and are
+        /// static. Before the fix neither exists, because the member-resolution expression is inline
+        /// in <c>EnumerateConversationMembers</c> and the count disagreement is never detected.
         /// </summary>
         [TestMethod]
         public void ConversationReconciliationHelpersExist()
@@ -53,41 +45,17 @@ namespace QuickFiler.Controllers.Tests
             MethodInfo reconcile = controller.GetMethod("ReconcileInsertionCount", AnyStatic);
 
             // Assert
-            resolve
-                .Should()
-                .NotBeNull(
-                    because: "issue #470 defect 2 extracts the conversation member-resolution "
-                        + "expression into a pure static helper so it can be resolved once, before "
-                        + "MakeSpaceForItems, instead of being re-resolved inside the loop"
-                );
-            resolve
-                .IsStatic.Should()
-                .BeTrue(because: "the helper must not touch controller instance state");
-            reconcile
-                .Should()
-                .NotBeNull(
-                    because: "issue #470 defect 2 requires a single source of truth for the "
-                        + "insertion count, and a pure helper is the only part of that path that "
-                        + "can be asserted without COM"
-                );
-            reconcile
-                .IsStatic.Should()
-                .BeTrue(because: "the helper must not touch controller instance state");
+            resolve.Should().NotBeNull(because: "the members must be resolved once, up front");
+            resolve.IsStatic.Should().BeTrue(because: "the helper must touch no instance state");
+            reconcile.Should().NotBeNull(because: "the insertion count needs one source of truth");
+            reconcile.IsStatic.Should().BeTrue(because: "the helper must touch no instance state");
         }
 
         /// <summary>
-        /// Issue #470 defect 2. Contract test for the extracted member-resolution helper.
-        /// <para>
-        /// Scenario: a resolver whose same-folder conversation items are the base email plus three
-        /// others with distinct sent times, injected through the public <c>ConversationItems</c>
-        /// setter. Expected outcome: the base entry is excluded and the remainder is ordered by
-        /// sent time descending.
-        /// </para>
-        /// <para>
-        /// The ordering is not incidental. <c>EnumerateConversationMembers</c> assigns
-        /// <c>insertions[i]</c> to the group at <c>insertionIndex + i</c>, so the order of this list
-        /// is the on-screen order of the expanded conversation.
-        /// </para>
+        /// Issue #470 defect 2. The extracted resolution helper excludes the base entry and orders
+        /// the remainder newest first. The order is the on-screen order, because
+        /// <c>EnumerateConversationMembers</c> writes <c>insertions[i]</c> to
+        /// <c>insertionIndex + i</c>.
         /// </summary>
         [TestMethod]
         public void ResolveConversationInsertions_ExcludesBaseEntryAndOrdersBySentOnDescending()
@@ -108,37 +76,16 @@ namespace QuickFiler.Controllers.Tests
 
             // Assert
             List<string> entryIds = insertions.Select(mailItem => mailItem.EntryID).ToList();
-            entryIds
-                .Should()
-                .NotContain(
-                    "base",
-                    because: "the base email already occupies its own row; re-inserting it would "
-                        + "duplicate the message the expansion hangs beneath"
-                );
-            entryIds
-                .Should()
-                .HaveCount(
-                    3,
-                    because: "three of the four conversation items are members other than the base"
-                );
+            entryIds.Should().NotContain("base", because: "the base email keeps its existing row");
+            entryIds.Should().HaveCount(3, because: "three of the four items are not the base");
             entryIds.Should().Equal(new[] { "newest", "middle", "oldest" });
         }
 
         /// <summary>
-        /// Issue #470 defect 2, above-reservation case. More members resolved than the caller
-        /// reserved rows for.
-        /// <para>
-        /// Scenario: the caller reserves <c>conversationCount - 1 == 2</c> rows while four members
-        /// resolve. Expected outcome: the resolved count of four is returned as the single source of
-        /// truth, and the warning delegate is invoked exactly once with a message naming all six
-        /// values.
-        /// </para>
-        /// <para>
-        /// This is the case that previously threw <c>ArgumentOutOfRangeException</c> inside
-        /// <c>EnumerateConversationMembers</c>, because the loop ran to the resolved count while only
-        /// the reserved rows existed. Per decision D5 the production behaviour is log-and-proceed,
-        /// not throw: this member sits on the VSTO UI event path and the state is recoverable.
-        /// </para>
+        /// Issue #470 defect 2, above-reservation case: four members resolve while the caller
+        /// reserved two rows. The resolved count wins and one warning is emitted. This is the case
+        /// that previously threw <c>ArgumentOutOfRangeException</c> from the insertion loop; per D5
+        /// the production response is log-and-proceed, not throw.
         /// </summary>
         [TestMethod]
         public void ReconcileInsertionCount_AboveReservation_ReturnsInsertionsCountAndWarnsOnce()
@@ -160,17 +107,8 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             reconciled
                 .Should()
-                .Be(
-                    4,
-                    because: "the resolved member list is the only count that describes the rows "
-                        + "actually about to be written, so it is the single source of truth"
-                );
-            sink.Messages.Should()
-                .HaveCount(
-                    1,
-                    because: "one disagreement must produce exactly one log entry, not one per "
-                        + "surplus member"
-                );
+                .Be(4, because: "only the resolved list describes the rows written");
+            sink.Messages.Should().HaveCount(1, because: "one disagreement means one log entry");
             sink.Messages[0].Should().Contain("entryID=entry-7");
             sink.Messages[0].Should().Contain("conversationCount=3");
             sink.Messages[0].Should().Contain("insertionsCount=4");
@@ -180,16 +118,9 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Issue #470 defect 2, equal case. The reservation and the resolved count agree.
-        /// <para>
-        /// Scenario: the caller reserves <c>conversationCount - 1 == 2</c> rows and two members
-        /// resolve. Expected outcome: two is returned and the warning delegate is never invoked.
-        /// </para>
-        /// <para>
-        /// This is the normal path and it carries the negative half of the contract. Without it a
-        /// reconciliation that warned unconditionally would still satisfy the two disagreement
-        /// tests while flooding the log on every conversation expansion.
-        /// </para>
+        /// Issue #470 defect 2, equal case: the reservation and the resolved count agree, so no
+        /// warning is emitted. This carries the negative half of the contract; without it a helper
+        /// that warned unconditionally would still satisfy both disagreement tests.
         /// </summary>
         [TestMethod]
         public void ReconcileInsertionCount_EqualToReservation_ReturnsInsertionsCountAndDoesNotWarn()
@@ -209,33 +140,15 @@ namespace QuickFiler.Controllers.Tests
             );
 
             // Assert
-            reconciled
-                .Should()
-                .Be(
-                    2,
-                    because: "the return value is the resolved count in every case, agreement "
-                        + "included"
-                );
+            reconciled.Should().Be(2, because: "the resolved count is returned in every case");
             sink.Messages.Should()
-                .BeEmpty(
-                    because: "the counts agree, and a warning on the normal path would make the "
-                        + "log useless for spotting the abnormal one"
-                );
+                .BeEmpty(because: "warning on the normal path buries the abnormal");
         }
 
         /// <summary>
-        /// Issue #470 defect 2, below-reservation case. Fewer members resolved than the caller
-        /// reserved rows for.
-        /// <para>
-        /// Scenario: the caller reserves <c>conversationCount - 1 == 4</c> rows while one member
-        /// resolves. Expected outcome: one is returned, and the warning delegate is invoked exactly
-        /// once.
-        /// </para>
-        /// <para>
-        /// This direction is the quieter defect: no exception is raised, the surplus reserved rows
-        /// are simply left as empty item groups in the collection. Returning the resolved count is
-        /// what stops those rows being reserved in the first place.
-        /// </para>
+        /// Issue #470 defect 2, below-reservation case: one member resolves while the caller
+        /// reserved four rows. The quieter direction of the defect, which raises nothing and simply
+        /// leaves surplus empty item groups behind.
         /// </summary>
         [TestMethod]
         public void ReconcileInsertionCount_BelowReservation_ReturnsInsertionsCountAndWarnsOnce()
@@ -257,38 +170,17 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             reconciled
                 .Should()
-                .Be(
-                    1,
-                    because: "reserving four rows for one member leaves three empty groups; the "
-                        + "resolved count is what the caller must reserve against"
-                );
-            sink.Messages.Should()
-                .HaveCount(
-                    1,
-                    because: "a shortfall is as much a snapshot disagreement as a surplus and must "
-                        + "be logged once"
-                );
+                .Be(1, because: "four reserved rows for one member leaves three empty");
+            sink.Messages.Should().HaveCount(1, because: "a shortfall is a disagreement too");
             sink.Messages[0].Should().Contain("insertionsCount=1");
             sink.Messages[0].Should().Contain("conversationCount=5");
         }
 
         /// <summary>
-        /// Issue #470 defect 2. Proves the retyped <c>EnumerateConversationMembers</c> consumes the
-        /// caller-supplied list and performs no resolver query of its own.
-        /// <para>
-        /// Scenario: an uninitialized controller and an empty insertions list, so the body's single
-        /// loop executes zero iterations and no COM-bound group initialization runs. Expected
-        /// outcome: no exception.
-        /// </para>
-        /// <para>
-        /// This is the only assertion the method admits without COM. Every statement inside the loop
-        /// reaches <c>_itemGroups</c>, <c>LoadItemViewer_03</c> or a live
-        /// <c>QfcItemController</c>. With the pre-fix signature the method would still have queried
-        /// <c>resolver.ConversationItems</c> before the loop and produced a non-empty list from the
-        /// injected snapshot, so an empty-list arrangement was not expressible at all: the argument
-        /// did not exist. That the method now runs to completion on an empty caller-supplied list is
-        /// the observable proof that the resolver query is gone.
-        /// </para>
+        /// Issue #470 defect 2. The retyped <c>EnumerateConversationMembers</c> consumes the
+        /// caller-supplied list and issues no resolver query. An empty list executes zero loop
+        /// iterations, so nothing COM-bound runs. With the pre-fix signature this arrangement was
+        /// not expressible: the argument did not exist and the method re-resolved its own list.
         /// </summary>
         [TestMethod]
         public void EnumerateConversationMembers_WithNoInsertions_DoesNotThrow()
@@ -311,16 +203,73 @@ namespace QuickFiler.Controllers.Tests
                 );
 
             // Assert
+            act.Should().NotThrow(because: "an empty list is a complete, side-effect-free run");
+        }
+
+        /// <summary>
+        /// Issue #470 defect 1. A promotion request that matches no child returns the sentinel
+        /// <c>-1</c> and leaves the caller's child count alone. Before the fix the method evaluated
+        /// <c>_itemGroups[indexOriginal].ItemViewer</c> immediately after the lookup, so a miss
+        /// subscripted with <c>-1</c> and threw onto the VSTO UI thread. Per D4 the contract is a
+        /// sentinel return, not a typed throw, because the caller can recover.
+        /// </summary>
+        [TestMethod]
+        public void PromoteFirstChild_WithNoMatchingChild_ReturnsMinusOneWithoutSubscripting()
+        {
+            // Arrange
+            QfcCollectionController controller = BuildControllerWithGroups(
+                BuildItemController(null, "other-1"),
+                BuildItemController(null, "other-2")
+            );
+            int observedChildCount = int.MinValue;
+            int promoted = int.MinValue;
+
+            // Act
+            System.Action act = () =>
+            {
+                int childCount = 2;
+                promoted = controller.PromoteFirstChild("missing-original", ref childCount);
+                observedChildCount = childCount;
+            };
+
+            // Assert
+            act.Should().NotThrow(because: "a missing original must be handled, not subscripted");
+            promoted.Should().Be(-1, because: "D4 fixes the contract as a sentinel return");
+            observedChildCount
+                .Should()
+                .Be(2, because: "no child was promoted, so none was consumed");
+        }
+
+        /// <summary>
+        /// Issue #470 defect 1, end to end through the string overload of <c>ToggleGroupConv</c>.
+        /// No group carries the requested identifier as its own entry or as its conversation
+        /// origin, so the child count is zero and the collapse branch is never entered. Before the
+        /// fix the <c>-1</c> from the lookup reached <c>PromoteFirstChild</c> and then
+        /// <c>ChangeConversationSilently(-1, true)</c>, either of which subscripts the group list
+        /// with a negative index.
+        /// </summary>
+        [TestMethod]
+        public void ToggleGroupConv_WithNoMatchingOriginal_DoesNotSubscriptWithMinusOne()
+        {
+            // Arrange
+            QfcCollectionController controller = BuildControllerWithGroups(
+                BuildItemController(null, "other-1")
+            );
+
+            // Act
+            System.Action act = () => controller.ToggleGroupConv("missing-original");
+
+            // Assert
             act.Should()
                 .NotThrow(
-                    because: "the method now iterates the caller-supplied list and nothing else, so "
-                        + "an empty list is a complete, side-effect-free execution"
+                    because: "a conversation whose original is gone must be a no-op on the UI "
+                        + "event path, not an ArgumentOutOfRangeException raised into VSTO"
                 );
         }
 
         /// <summary>
-        /// Builds a mocked <see cref="MailItem"/> carrying only the two members the resolution
-        /// helper reads.
+        /// Builds a mocked <see cref="MailItem"/> carrying only the two members the conversation
+        /// helpers read.
         /// </summary>
         private static MailItem BuildMailItem(string entryId, DateTime sentOn)
         {
@@ -331,15 +280,53 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
+        /// Builds a mocked <see cref="IQfcItemController"/> reporting the supplied conversation
+        /// origin identifier and a mail item with the supplied entry identifier.
+        /// </summary>
+        /// <remarks>
+        /// Both members must be set up explicitly: a loose mock returns <see langword="null"/> for
+        /// <c>Mail</c>, and the conversation lookups dereference <c>Mail.EntryID</c>, so an
+        /// unconfigured mock would fail with <see cref="NullReferenceException"/> and mask the index
+        /// defect these tests target.
+        /// </remarks>
+        private static IQfcItemController BuildItemController(string convOriginId, string entryId)
+        {
+            Mock<IQfcItemController> itemController = new Mock<IQfcItemController>(
+                MockBehavior.Loose
+            );
+            itemController.SetupGet(item => item.ConvOriginID).Returns(convOriginId);
+            itemController
+                .SetupGet(item => item.Mail)
+                .Returns(BuildMailItem(entryId, new DateTime(2026, 1, 1)));
+            return itemController.Object;
+        }
+
+        /// <summary>
+        /// Builds an uninitialized controller whose live group list holds one group per supplied
+        /// item controller.
+        /// </summary>
+        private static QfcCollectionController BuildControllerWithGroups(
+            params IQfcItemController[] itemControllers
+        )
+        {
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            List<QfcItemGroup> groups = itemControllers
+                .Select(itemController => new QfcItemGroup { ItemController = itemController })
+                .ToList();
+            QfcCollectionControllerTestSupport.SetField(controller, "_itemGroups", groups);
+            return controller;
+        }
+
+        /// <summary>
         /// Builds a <see cref="ConversationResolver"/> whose conversation items are injected through
         /// the public setter, with no COM, no dataframe load and no globals.
         /// </summary>
         /// <remarks>
         /// The mail item passed to the constructor must be non-null. The <c>ConversationItems</c>
-        /// getter routes through <c>Initializer.GetOrLoad(ref field, loader, callback, strict,
-        /// dependencies)</c> with the resolver's own mail item as the dependency, and that overload
-        /// returns <c>default</c> — a pair of nulls — rather than the injected value when any
-        /// dependency is null. A null mail item would therefore silently discard the injection.
+        /// getter routes through the <c>Initializer.GetOrLoad</c> overload that takes dependencies,
+        /// and that overload returns <c>default</c> — a pair of nulls — rather than the injected
+        /// value when any dependency is null. A null mail item would silently discard the injection.
         /// </remarks>
         private static ConversationResolver BuildResolverWithConversationItems(
             IList<MailItem> items

@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="36def4bc-2256-4b45-bf37-b4f8c8cafccb" name="<user>@<host> 2026-08-26 10:48:50" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T10:48:50.6163798-04:00" queuing="2026-08-26T10:48:50.6163798-04:00" start="2026-08-26T10:48:49.1025761-04:00" finish="2026-08-26T10:48:50.6313948-04:00" />
+  <TestSettings name="default" id="2248c654-c2be-438d-9e39-4552df883761">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-26_10_48_50" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="3534d44d-9916-44ff-8642-5e3315647f1e" testId="1c51a1d3-fc75-8ab6-bcce-77d4c054e003" testName="PromoteFirstChild_WithNoMatchingChild_ReturnsMinusOneWithoutSubscripting" computerName="<host>" duration="00:00:00.1802316" startTime="2026-08-26T10:48:50.2548027-04:00" endTime="2026-08-26T10:48:50.5441450-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3534d44d-9916-44ff-8642-5e3315647f1e">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="59330c28-448b-459a-b47c-06ae5cfd754d" testId="1765592e-ef99-8695-84bc-f1349064a57b" testName="ToggleGroupConv_WithNoMatchingOriginal_DoesNotSubscriptWithMinusOne" computerName="<host>" duration="00:00:00.0016585" startTime="2026-08-26T10:48:50.5491504-04:00" endTime="2026-08-26T10:48:50.5551964-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="59330c28-448b-459a-b47c-06ae5cfd754d" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="PromoteFirstChild_WithNoMatchingChild_ReturnsMinusOneWithoutSubscripting" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c51a1d3-fc75-8ab6-bcce-77d4c054e003">
+      <Execution id="3534d44d-9916-44ff-8642-5e3315647f1e" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468ConversationTests" name="PromoteFirstChild_WithNoMatchingChild_ReturnsMinusOneWithoutSubscripting" />
+    </UnitTest>
+    <UnitTest name="ToggleGroupConv_WithNoMatchingOriginal_DoesNotSubscriptWithMinusOne" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1765592e-ef99-8695-84bc-f1349064a57b">
+      <Execution id="59330c28-448b-459a-b47c-06ae5cfd754d" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468ConversationTests" name="ToggleGroupConv_WithNoMatchingOriginal_DoesNotSubscriptWithMinusOne" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1c51a1d3-fc75-8ab6-bcce-77d4c054e003" executionId="3534d44d-9916-44ff-8642-5e3315647f1e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1765592e-ef99-8695-84bc-f1349064a57b" executionId="59330c28-448b-459a-b47c-06ae5cfd754d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="2" executed="2" passed="2" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

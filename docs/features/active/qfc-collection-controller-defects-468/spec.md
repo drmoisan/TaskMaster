@@ -1200,7 +1200,7 @@ individually verifiable from evidence.
       test asserting `MoveEmailsAsync(null)` and `MoveEmailsAsync(stack)` behave identically for an
       empty `_itemGroupsToMove`. The parameter is **not** removed and
       `QfcFormController.EventHandlers.cs` is **not** edited.
-- [ ] **AC-8 (#470 defect 1).** `PromoteFirstChild` and `ChangeConversationSilently` handle a `-1`
+- [x] **AC-8 (#470 defect 1).** `PromoteFirstChild` and `ChangeConversationSilently` handle a `-1`
       index explicitly and never use it to subscript `_itemGroups`. Verified by two named MSTest
       tests — one calling `PromoteFirstChild` directly and one driving `ToggleGroupConv(string)`
       end-to-end with no matching `ConvOriginID` — each of which throws

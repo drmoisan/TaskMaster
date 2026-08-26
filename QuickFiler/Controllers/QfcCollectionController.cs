@@ -1503,6 +1503,18 @@ namespace QuickFiler.Controllers
         /// <param name="desiredState">Checked is true or false</param>
         public void ChangeConversationSilently(int indexOriginal, bool desiredState)
         {
+            // Issue #470 defect 1: guard this overload's own subscript too. It is public and
+            // reachable from callers other than ToggleGroupConv, so relying on every caller to
+            // filter the -1 sentinel would leave the same defect one call site away.
+            if (_itemGroups is null || indexOriginal < 0 || indexOriginal >= _itemGroups.Count)
+            {
+                logger.Warn(
+                    $"Cannot change the conversation state at index {indexOriginal}: the index is "
+                        + "outside the item group collection. Skipping."
+                );
+                return;
+            }
+
             ChangeConversationSilently(_itemGroups[indexOriginal], desiredState);
         }
 
@@ -1533,6 +1545,14 @@ namespace QuickFiler.Controllers
             if (indexOriginal == -1)
             {
                 indexOriginal = PromoteFirstChild(originalId, ref childCount);
+            }
+
+            // Issue #470 defect 1: PromoteFirstChild returns the -1 sentinel when the conversation
+            // has neither its original nor a promotable child. Nothing remains to check or
+            // collapse, so return instead of carrying -1 into the subscripts below.
+            if (indexOriginal == -1)
+            {
+                return;
             }
 
             // ensure the original is checked
@@ -1869,6 +1889,20 @@ namespace QuickFiler.Controllers
             int indexOriginal = _itemGroups.FindIndex(itemGroup =>
                 itemGroup.ItemController.ConvOriginID == originalId
             );
+
+            // Issue #470 defect 1: FindIndex returns -1 when no group carries this conversation
+            // origin, and the next statement subscripted the list with it. Per D4 the contract is
+            // a sentinel return rather than a throw, because this sits on the VSTO UI event path
+            // and the state is recoverable. The child count is left alone: none was promoted.
+            if (indexOriginal == -1)
+            {
+                logger.Warn(
+                    $"No conversation child carries originalId={originalId}. Nothing to promote; "
+                        + "leaving the caller's child count unchanged."
+                );
+                return -1;
+            }
+
             var itemViewer = _itemGroups[indexOriginal].ItemViewer;
             _itemTlp.SetCellPosition(
                 itemViewer,
