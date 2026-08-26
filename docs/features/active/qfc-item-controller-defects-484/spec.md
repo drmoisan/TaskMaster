@@ -765,17 +765,17 @@ regression test. The one exception is verified by source inspection and is recor
 
 ### Issue #480 — `ToggleNavigation(bool)` double toggle
 
-- [ ] The unconditional `_itemPositionTips.Toggle(false)` dispatch at
+- [x] The unconditional `_itemPositionTips.Toggle(false)` dispatch at
       `QuickFiler/Controllers/QfcItemController.FocusAndTheme.cs:170` is deleted, leaving exactly one
       `Toggle(false)` dispatch per branch of `ToggleNavigation(bool async)`.
-- [ ] `ToggleNavigation(async: false)` invokes `IQfcTipsDetails.Toggle(false)` exactly once, asserted
+- [x] `ToggleNavigation(async: false)` invokes `IQfcTipsDetails.Toggle(false)` exactly once, asserted
       with Moq `Times.Once()` (not `Times.AtLeastOnce()`).
-- [ ] `ToggleNavigation(async: true)` invokes `IQfcTipsDetails.Toggle(false)` exactly once, asserted
+- [x] `ToggleNavigation(async: true)` invokes `IQfcTipsDetails.Toggle(false)` exactly once, asserted
       with Moq `Times.Once()`, in a test that did not exist before this feature.
-- [ ] The existing assertion at `QuickFiler.Test/Controllers/QfcItemController.FocusAndThemeTests.cs:323`
+- [x] The existing assertion at `QuickFiler.Test/Controllers/QfcItemController.FocusAndThemeTests.cs:323`
       is tightened in place from `Times.AtLeastOnce()` to `Times.Once()`, and evidence records that the
       tightened assertion failed against the unfixed code.
-- [ ] `ToggleNavigation(bool async)` is still declared and implemented; it is not removed, and
+- [x] `ToggleNavigation(bool async)` is still declared and implemented; it is not removed, and
       `QuickFiler/Interfaces/IQfcItemController.cs` is unmodified.
 
 ### Issue #481 — event unwiring path

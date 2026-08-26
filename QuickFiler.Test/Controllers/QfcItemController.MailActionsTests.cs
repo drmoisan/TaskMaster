@@ -180,5 +180,35 @@ namespace QuickFiler.Controllers.Tests
                 Times.Once()
             );
         }
+
+        // ---------------------------------------------------------------------------------------
+        // Issue #480 — ToggleNavigation(bool) must dispatch IQfcTipsDetails.Toggle(false) exactly
+        // once per branch. Routed here from QfcItemController.FocusAndThemeTests.cs by the plan's
+        // constraint C2 capacity table: that file is at its 497-line baseline with 3 spare lines.
+        // ---------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Issue #480: the previously-untested <c>async: true</c> branch of
+        /// <c>ToggleNavigation(bool)</c> must produce exactly one <c>Toggle(false)</c> dispatch.
+        /// <c>QfcTipsDetails.Toggle(bool)</c> is a flip, not an idempotent set, so two dispatches
+        /// restore the starting state and the affordance does nothing.
+        /// </summary>
+        [TestMethod]
+        public void ToggleNavigation_Asynchronous_TogglesPositionTipsExactlyOnce()
+        {
+            // Arrange — an executing viewer so the BeginInvoke delegate runs synchronously and the
+            // Toggle(false) call reaches the tips mock where it can be counted.
+            var tips = new Mock<IQfcTipsDetails>();
+            Mock<IItemViewer> viewer = QfcItemControllerTestSupport.BuildExecutingViewer();
+            var controller = new MailController();
+            SetField(controller, "_itemPositionTips", tips.Object);
+            SetField(controller, "_itemViewer", viewer.Object);
+
+            // Act
+            controller.ToggleNavigation(async: true);
+
+            // Assert
+            tips.Verify(t => t.Toggle(false), Times.Once());
+        }
     }
 }

@@ -324,6 +324,31 @@ namespace QuickFiler.Controllers.Tests
         {
             dispatcher?.InvokeShutdown();
         }
+
+        /// <summary>
+        /// Issue #480 shared arrange helper. Builds a viewer mock whose <c>Invoke</c> and
+        /// <c>BeginInvoke</c> execute the supplied delegate synchronously, so a dispatch made through
+        /// either path produces a countable call on whatever collaborator the delegate targets. Mirrors
+        /// the <c>private static BuildExecutingViewer()</c> in
+        /// <c>QfcItemController.FocusAndThemeTests.cs</c>, which is not reachable from another test file.
+        /// </summary>
+        internal static Mock<IItemViewer> BuildExecutingViewer()
+        {
+            Mock<IItemViewer> viewer = new Mock<IItemViewer>();
+            viewer
+                .Setup(v => v.Invoke(It.IsAny<Delegate>()))
+                .Returns((Delegate d) => d.DynamicInvoke());
+            viewer
+                .Setup(v => v.BeginInvoke(It.IsAny<Delegate>()))
+                .Returns(
+                    (Delegate d) =>
+                    {
+                        d.DynamicInvoke();
+                        return Mock.Of<IAsyncResult>();
+                    }
+                );
+            return viewer;
+        }
     }
 
     /// <summary>

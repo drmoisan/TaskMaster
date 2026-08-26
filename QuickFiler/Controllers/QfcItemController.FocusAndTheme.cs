@@ -167,7 +167,6 @@ namespace QuickFiler.Controllers
 
         public void ToggleNavigation(bool async)
         {
-            _itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(false)));
             if (async)
             {
                 _itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(false)));
