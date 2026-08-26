@@ -1945,17 +1945,39 @@ namespace QuickFiler.Controllers
         }
 
         /// <summary>
-        /// Awaits every task currently queued in <see cref="BackgroundLoadingTasks"/> and then
-        /// clears the collection.
+        /// Awaits every task queued in <see cref="BackgroundLoadingTasks"/>, including any task
+        /// added while the drain is already in flight, and leaves the collection empty.
         /// </summary>
         /// <remarks>
-        /// Extracted from two byte-identical statement pairs on the two load paths so that the
-        /// drain has a single definition. Both former sites now call this member.
+        /// <para>
+        /// The bag is taken with a single <see cref="Interlocked.Exchange{T}(ref T, T)"/> that
+        /// installs a fresh bag in the same instant it hands the old one back, so no producer can
+        /// add to a bag that has already been snapshotted and then discarded. The loop repeats
+        /// while the bag it swapped out was non-empty, which is what makes a late arrival — added
+        /// after the previous swap but before this one — still get awaited.
+        /// </para>
+        /// <para>
+        /// The replacement bag is built with an explicit constructor call rather than a
+        /// target-typed collection expression because the generic <c>Interlocked.Exchange</c>
+        /// overload infers its type argument from the arguments and cannot bind an expression that
+        /// has no type of its own.
+        /// </para>
+        /// <para>
+        /// Extracted from two byte-identical statement pairs on the two load paths, so the drain
+        /// has a single definition. Both former sites call this member.
+        /// </para>
         /// </remarks>
         internal async Task DrainBackgroundLoadingTasksAsync()
         {
-            await Task.WhenAll(BackgroundLoadingTasks);
-            BackgroundLoadingTasks = [];
+            ConcurrentBag<Task> drained;
+            do
+            {
+                drained = Interlocked.Exchange(
+                    ref BackgroundLoadingTasks,
+                    new ConcurrentBag<Task>()
+                );
+                await Task.WhenAll(drained);
+            } while (!drained.IsEmpty);
         }
 
         /// <summary>

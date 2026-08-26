@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -361,6 +362,59 @@ namespace QuickFiler.Controllers.Tests
                         + "-20 and 200 px becomes 220 px, the exact mirror of the 180 px produced "
                         + "by a row count of +1"
                 );
+        }
+
+        /// <summary>
+        /// Issue #473 defect 1. A task added to <c>BackgroundLoadingTasks</c> while the drain is in
+        /// flight must still be awaited. Before the fix the drain snapshotted the bag once and then
+        /// replaced the field, so a late arrival was silently discarded and the drain reported
+        /// completion while work was still outstanding.
+        /// </summary>
+        /// <remarks>
+        /// The test is fully deterministic and uses no wall-clock wait, no <c>Thread.Sleep</c> and
+        /// no <c>Task.Delay</c>. Two <see cref="TaskCompletionSource{TResult}"/> instances stand in
+        /// for the two background tasks. The continuation that performs the late add is registered
+        /// on the gate <em>before</em> the drain starts and carries
+        /// <see cref="TaskContinuationOptions.ExecuteSynchronously"/>, so it runs on the thread
+        /// that completes the gate and ahead of the drain's own continuation. An MTA MSTest method
+        /// installs no <see cref="System.Threading.SynchronizationContext"/>, so every await in the
+        /// chain resumes synchronously on that same thread; by the time
+        /// <c>gate.SetResult</c> returns, the drain has either completed or committed to waiting,
+        /// and reading <c>IsCompleted</c> is therefore a settled observation rather than a race.
+        /// </remarks>
+        [TestMethod]
+        public async Task DrainBackgroundLoadingTasksAsync_AwaitsATaskAddedDuringTheDrainWindow()
+        {
+            // Arrange
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            var gate = new TaskCompletionSource<bool>();
+            var lateArrival = new TaskCompletionSource<bool>();
+            controller.BackgroundLoadingTasks = new ConcurrentBag<Task>();
+            controller.BackgroundLoadingTasks.Add(gate.Task);
+            // The continuation itself is never awaited; it exists only to mutate the bag at the
+            // exact moment the gate completes. Discarding the returned task documents that.
+            _ = gate.Task.ContinueWith(
+                completedGate => controller.BackgroundLoadingTasks.Add(lateArrival.Task),
+                TaskContinuationOptions.ExecuteSynchronously
+            );
+            Task drain = controller.DrainBackgroundLoadingTasksAsync();
+
+            // Act
+            gate.SetResult(true);
+
+            // Assert
+            drain
+                .IsCompleted.Should()
+                .BeFalse(
+                    because: "a task added to BackgroundLoadingTasks during the drain window is "
+                        + "still outstanding work, so the drain must not report completion until "
+                        + "that task has also finished"
+                );
+
+            // Release the outstanding work so the test leaves no pending task behind.
+            lateArrival.SetResult(true);
+            await drain;
         }
     }
 }

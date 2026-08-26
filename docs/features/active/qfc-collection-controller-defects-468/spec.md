@@ -1226,7 +1226,7 @@ individually verifiable from evidence.
       Verified by named MSTest tests against the pure `ShrinkByRows` helper (MTA) and, if taken, one
       `[STATestClass]` call-site test in `QfcCollectionControllerLayout.StaTests.cs`. The inversion is
       removed in exactly one place, not both.
-- [ ] **AC-12 (#473 defect 1).** A task added to `BackgroundLoadingTasks` during the drain window is
+- [x] **AC-12 (#473 defect 1).** A task added to `BackgroundLoadingTasks` during the drain window is
       still awaited. Verified by a named MSTest test using two `TaskCompletionSource` instances and an
       `ExecuteSynchronously` continuation (no `Thread.Sleep`, `Task.Delay`, or wall-clock wait), which
       asserts `drain.IsCompleted == false` after the gate completes — false before the fix, true
