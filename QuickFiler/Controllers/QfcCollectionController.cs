@@ -412,8 +412,7 @@ namespace QuickFiler.Controllers
 
             // Wait until Background Loading Tasks finish and then clear the collection
 
-            await Task.WhenAll(BackgroundLoadingTasks);
-            BackgroundLoadingTasks = [];
+            await DrainBackgroundLoadingTasksAsync();
 
             // Load the Item Viewers, Item Controllers, and Initialize
             WireUpAsyncKeyboardHandler();
@@ -505,8 +504,7 @@ namespace QuickFiler.Controllers
             }
 
             // Wait until Background Loading Tasks finish and then clear the collection
-            await Task.WhenAll(BackgroundLoadingTasks);
-            BackgroundLoadingTasks = [];
+            await DrainBackgroundLoadingTasksAsync();
 
             WireUpAsyncKeyboardHandler();
 
@@ -1944,6 +1942,20 @@ namespace QuickFiler.Controllers
                 var grp = new QfcItemGroup();
                 _itemGroups.Insert(insertionIndex, grp);
             }
+        }
+
+        /// <summary>
+        /// Awaits every task currently queued in <see cref="BackgroundLoadingTasks"/> and then
+        /// clears the collection.
+        /// </summary>
+        /// <remarks>
+        /// Extracted from two byte-identical statement pairs on the two load paths so that the
+        /// drain has a single definition. Both former sites now call this member.
+        /// </remarks>
+        internal async Task DrainBackgroundLoadingTasksAsync()
+        {
+            await Task.WhenAll(BackgroundLoadingTasks);
+            BackgroundLoadingTasks = [];
         }
 
         /// <summary>
