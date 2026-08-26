@@ -1319,5 +1319,5 @@ individually verifiable from evidence.
       coverage delta.
 - [ ] **AC-28 (issue closure).** All seven issues — #286, #468, #469, #470, #471, #473, #474 — are
       closed by the merge, each with its corresponding acceptance criteria above checked off.
-- [ ] **AC-29 (follow-ups filed).** Every entry in `## Follow-up Candidates` is promoted through the
+- [x] **AC-29 (follow-ups filed).** Every entry in `## Follow-up Candidates` is promoted through the
       potential-to-issue lifecycle, with the resulting issue numbers recorded in the feature folder.

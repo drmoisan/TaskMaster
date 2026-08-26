@@ -1,14 +1,17 @@
-# qfc-unsynchronized-plain-read-reentrancy-counter (Potential Bug)
+# qfc-unsynchronized-plain-read-reentrancy-counter (Issue #634)
 
 - Date captured: 2026-08-26
 - Author: Dan Moisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/qfc-unsynchronized-plain-read-reentrancy-counter/ (Issue #634)
 - Captures: **follow-up candidate 8** of `## Follow-up Candidates` in
   `docs/features/active/qfc-collection-controller-defects-468/spec.md`
 - Origin: issue **#468** defect family, task `[P14-T5]`
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
+- Issue: #634
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/634
+- Last Updated: 2026-08-26
 ## Summary
 
 `QfcCollectionController` guards `RemoveSpecificControlGroupAsync` with a private static reentrancy

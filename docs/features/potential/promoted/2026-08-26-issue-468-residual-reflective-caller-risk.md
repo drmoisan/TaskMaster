@@ -1,13 +1,16 @@
-# Settle the issue #468 residual reflective-caller risk repository-wide
+# Settle the issue #468 residual reflective-caller risk repository-wide (Issue #635)
 
 - Date captured: 2026-08-26
 - Author: Dan Moisan
-- Status: Potential — not promoted (conditional)
+- Status: Promoted -> docs/features/active/Settle_the_issue_468_residual_reflective-caller_risk_repository-wide/ (Issue #635)
 - Captures: **follow-up candidate 9** of `## Follow-up Candidates` in
   `docs/features/active/qfc-collection-controller-defects-468/spec.md`
 - Origin: issue **#468**, task `[P14-T5]`
 - Origin feature folder: `docs/features/active/qfc-collection-controller-defects-468`
 
+- Issue: #635
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/635
+- Last Updated: 2026-08-26
 ## Summary
 
 Issue #468 removed twelve dead members from `QuickFiler/Controllers/QfcCollectionController.cs`.

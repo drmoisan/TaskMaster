@@ -1,13 +1,16 @@
-# Consolidate `IFilerFormController` and `IQfcFormController`
+# Consolidate `IFilerFormController` and `IQfcFormController` (Issue #631)
 
 - Date captured: 2026-08-26
 - Author: Dan Moisan
-- Status: Potential — not promoted
+- Status: Promoted -> docs/features/active/Consolidate_IFilerFormController_and_IQfcFormController/ (Issue #631)
 - Captures: **follow-up candidate 4** of `## Follow-up Candidates` in
   `docs/features/active/qfc-collection-controller-defects-468/spec.md`
 - Origin: issue **#474** defect 1, task `[P14-T5]`
 - Origin feature folder: `docs/features/active/qfc-collection-controller-defects-468`
 
+- Issue: #631
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/631
+- Last Updated: 2026-08-26
 ## Summary
 
 `QuickFiler.Controllers.IQfcFormController` derives from `QuickFiler.Interfaces.IFilerFormController`

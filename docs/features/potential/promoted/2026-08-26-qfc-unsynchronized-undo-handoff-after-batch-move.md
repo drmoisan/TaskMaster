@@ -1,14 +1,17 @@
-# qfc-unsynchronized-undo-handoff-after-batch-move (Potential Bug)
+# qfc-unsynchronized-undo-handoff-after-batch-move (Issue #633)
 
 - Date captured: 2026-08-26
 - Author: Dan Moisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/qfc-unsynchronized-undo-handoff-after-batch-move/ (Issue #633)
 - Captures: **follow-up candidate 7** of `## Follow-up Candidates` in
   `docs/features/active/qfc-collection-controller-defects-468/spec.md`
 - Origin: issue **#468** defect family, task `[P14-T5]`
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
+- Issue: #633
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/633
+- Last Updated: 2026-08-26
 ## Summary
 
 The batch-move path treats the undo stack as populated by the time the move completes, but the push is

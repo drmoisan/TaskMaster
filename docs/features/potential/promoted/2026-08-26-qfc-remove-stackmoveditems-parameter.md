@@ -1,13 +1,16 @@
-# Remove the `stackMovedItems` parameter from `MoveEmailsAsync`
+# Remove the `stackMovedItems` parameter from `MoveEmailsAsync` (Issue #629)
 
 - Date captured: 2026-08-26
 - Author: Dan Moisan
-- Status: Potential — not promoted
+- Status: Promoted -> docs/features/active/Remove_the_stackMovedItems_parameter_from_MoveEmailsAsync/ (Issue #629)
 - Captures: **follow-up candidate 2** of `## Follow-up Candidates` in
   `docs/features/active/qfc-collection-controller-defects-468/spec.md`
 - Origin: issue **#468** defect family, task `[P14-T5]`
 - Origin feature folder: `docs/features/active/qfc-collection-controller-defects-468`
 
+- Issue: #629
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/629
+- Last Updated: 2026-08-26
 ## Summary
 
 `MoveEmailsAsync` declares a `SloStack<IMovedMailInfo>` parameter that its body does not use to
