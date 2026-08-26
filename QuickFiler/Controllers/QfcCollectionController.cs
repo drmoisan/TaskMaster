@@ -67,7 +67,6 @@ namespace QuickFiler.Controllers
         private Panel _itemPanel;
         private TableLayoutPanel _itemTlp;
         private TableLayoutPanel _itemTlpToMove;
-        private TableLayoutPanel _templateTlp;
         private ConcurrentDictionary<QfcItemGroup, int> _itemGroupsToMove;
         private bool _darkMode;
         private RowStyle _template;
@@ -399,7 +398,6 @@ namespace QuickFiler.Controllers
             BackgroundLoadingTasks = [];
 
             // Load the Item Viewers, Item Controllers, and Initialize
-            //await LoadGroups_02bAsync(items, template, _tlpStates);
             WireUpAsyncKeyboardHandler();
 
             // Restore state of window
@@ -584,26 +582,6 @@ namespace QuickFiler.Controllers
             _kbdHandler.CharActionsAsync = new KbdActions<char, KaCharAsync, Func<char, Task>>();
         }
 
-        public async Task LoadGroups_02cAsync(
-            IList<MailItem> items,
-            RowStyle template,
-            TlpCellStates tlpStates
-        )
-        {
-            Token.ThrowIfCancellationRequested();
-
-            var digits = items.Count >= 10 ? 2 : 1;
-
-            _itemGroups =
-            [
-                .. items.Select(
-                    (mailItem, i) => EncapsulateItemGroup(template, mailItem, i, digits, tlpStates)
-                ),
-            ];
-
-            await Task.CompletedTask;
-        }
-
         internal QfcItemGroup EncapsulateItemGroup(
             RowStyle template,
             MailItem mailItem,
@@ -632,111 +610,6 @@ namespace QuickFiler.Controllers
             return grp;
         }
 
-        public async Task LoadGroups_02bAsync(
-            IList<MailItem> items,
-            RowStyle template,
-            TlpCellStates tlpStates
-        )
-        {
-            Token.ThrowIfCancellationRequested();
-
-            var digits = items.Count >= 10 ? 2 : 1;
-
-            var grpTasks = items
-                .Select(
-                    (mailItem, i) => LoadGroup_03bAsync(template, mailItem, i, digits, tlpStates)
-                )
-                .ToList();
-
-            _itemGroups = [.. (await Task.WhenAll(grpTasks))];
-        }
-
-        private async Task<QfcItemGroup> LoadGroup_03bAsync(
-            RowStyle template,
-            MailItem mailItem,
-            int i,
-            int digits,
-            TlpCellStates tlpStates
-        )
-        {
-            var ui = TaskScheduler.FromCurrentSynchronizationContext();
-
-            var grpTask = Task.Factory.StartNew(
-                () =>
-                {
-                    var grp = new QfcItemGroup(mailItem);
-                    grp.ItemViewer = LoadItemViewer_03(i, template, true);
-                    return grp;
-                },
-                Token,
-                TaskCreationOptions.None,
-                ui
-            );
-
-            var grpTask2 = grpTask
-                .ContinueWith(
-                    async x =>
-                    {
-                        var grp = x.Result;
-                        grp.ItemController = new QfcItemController(
-                            _globals,
-                            _homeController,
-                            this,
-                            grp.ItemViewer,
-                            i + 1,
-                            digits,
-                            grp.MailItem,
-                            tlpStates
-                        );
-                        grp.ItemController.Token = Token;
-                        await grp.ItemController.InitializeSequentialAsync();
-                        return grp;
-                    },
-                    Token,
-                    TaskContinuationOptions.OnlyOnRanToCompletion,
-                    ui
-                )
-                .Unwrap();
-
-            var grpTask3 = grpTask2
-                .ContinueWith(
-                    async x =>
-                    {
-                        var grp = x.Result;
-
-                        var subTasks = new List<Task>()
-                        {
-                            Task.Factory.StartNew(
-                                () =>
-                                    grp.ItemController.PopulateConversationAsync(
-                                        TokenSource,
-                                        Token,
-                                        false
-                                    ),
-                                Token,
-                                TaskCreationOptions.AttachedToParent,
-                                ui
-                            ),
-                            Task.Factory.StartNew(
-                                () => grp.ItemController.PopulateFolderComboBoxAsync(Token),
-                                Token,
-                                TaskCreationOptions.AttachedToParent,
-                                ui
-                            ),
-                        };
-                        await Task.WhenAll(subTasks);
-
-                        return grp;
-                    },
-                    Token,
-                    TaskContinuationOptions.OnlyOnRanToCompletion,
-                    ui
-                )
-                .Unwrap();
-
-            return await grpTask3;
-        }
-
         public void LoadItemGroupsAndViewers_02(IList<MailItem> items, RowStyle template)
         {
             _itemGroups = new List<QfcItemGroup>();
@@ -756,43 +629,6 @@ namespace QuickFiler.Controllers
         public void LoadConversationsAndFolders_04()
         {
             LoadSequential_5();
-        }
-
-        public async Task LoadConversationsAndFoldersAsync()
-        {
-            // ForEachAsync (System.Linq.Async) is obsolete (CS0618) per the framework's migration
-            // guidance ("Use the language support for async foreach instead"), but replacing it
-            // with `await foreach` here is a control-flow change to a production async method,
-            // not an annotation-only edit. Suppressing narrowly preserves the exact pre-existing
-            // behavior (no behavior change per AC7).
-#pragma warning disable CS0618
-            await AsyncEnumerable
-                .Range(0, _itemGroups.Count)
-                .Select(i => (i, grp: _itemGroups[i]))
-                .ForEachAsync(async x => await LoadItemGroup(x.i, x.grp));
-#pragma warning restore CS0618
-        }
-
-        internal async Task LoadItemGroup(int i, QfcItemGroup group)
-        {
-            group.ItemController = new QfcItemController(
-                appGlobals: _globals,
-                homeController: _homeController,
-                parent: this,
-                itemViewer: group.ItemViewer,
-                viewerPosition: i + 1,
-                itemNumberDigits: _itemGroups.Count >= 10 ? 2 : 1,
-                group.MailItem,
-                _tlpStates
-            );
-            var tasks = new List<Task>
-            {
-                group.ItemController.InitializeAsync(),
-                Task.Run(() => group.ItemController.PopulateConversation()),
-                Task.Run(() => group.ItemController.PopulateFolderComboBox()),
-            };
-
-            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
         public void LoadSequential_5()
@@ -824,53 +660,10 @@ namespace QuickFiler.Controllers
             }
         }
 
-        public async Task LoadSequentialAsync()
-        {
-            // ForEachAsync (System.Linq.Async) is obsolete (CS0618) per the framework's migration
-            // guidance ("Use the language support for async foreach instead"), but replacing it
-            // with `await foreach` here is a control-flow change to a production async method,
-            // not an annotation-only edit. Suppressing narrowly preserves the exact pre-existing
-            // behavior (no behavior change per AC7).
-#pragma warning disable CS0618
-            await AsyncEnumerable
-                .Range(0, _itemGroups.Count)
-                .Select(i => (i, grp: _itemGroups[i]))
-                .ForEachAsync(async x => await LoadGroupSequential(x.i, x.grp));
-#pragma warning restore CS0618
-        }
-
-        public async Task LoadGroupSequential(int i, QfcItemGroup grp)
-        {
-            grp.ItemController = new QfcItemController(
-                appGlobals: _globals,
-                homeController: _homeController,
-                parent: this,
-                itemViewer: grp.ItemViewer,
-                viewerPosition: i + 1,
-                itemNumberDigits: _itemGroups.Count >= 10 ? 2 : 1,
-                grp.MailItem,
-                _tlpStates
-            );
-            await grp.ItemController.InitializeAsync();
-            await Task.Run(() => grp.ItemController.PopulateConversation());
-            await Task.Run(() => grp.ItemController.PopulateFolderComboBox());
-        }
-
         internal void ActivateQueuedTlp(TableLayoutPanel tlp)
         {
             _formViewer.SwapItemTableLayout(tlp);
             _itemTlp = _formViewer.L1v0L2L3v_TableLayout;
-        }
-
-        internal void CacheTlpForMove()
-        {
-            _itemTlpToMove = _formViewer.L1v0L2L3v_TableLayout;
-        }
-
-        internal void SwapTlp(TableLayoutPanel tlp)
-        {
-            CacheTlpForMove();
-            ActivateQueuedTlp(tlp);
         }
 
         internal void CacheItemGroupsForMove()
@@ -1251,27 +1044,6 @@ namespace QuickFiler.Controllers
 
         #region Event Wiring
 
-        public void WireUpKeyboardHandler()
-        {
-            // Treatment as char limits to 9 numbered items and 26 character items
-            for (int i = 0; i < _itemGroups.Count && i < 10; i++)
-            {
-                _kbdHandler.CharActions.Add(
-                    "Collection",
-                    (i + 1).ToString()[0],
-                    (c) => ChangeByIndex(int.Parse(c.ToString()) - 1)
-                );
-            }
-            _kbdHandler.KeyActions = new KbdActions<Keys, KaKey, Action<Keys>>(
-                new List<KaKey>
-                {
-                    new KaKey("Collection", Keys.Up, (k) => SelectPreviousItem()),
-                    new KaKey("Collection", Keys.Down, (k) => SelectNextItem()),
-                    new KaKey("Collection", Keys.Down, (k) => _parent.ActionOkAsync()),
-                }
-            );
-        }
-
         public void WireUpAsyncKeyboardHandler()
         {
             RegisterNavigation();
@@ -1319,12 +1091,6 @@ namespace QuickFiler.Controllers
         internal bool AnyOpenDropDowns(bool close, CancellationToken token)
         {
             return false;
-        }
-
-        internal async Task<bool> AnyOpenDropDownsAsync(bool close, CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            return await Task.FromResult(false);
         }
 
         public void RegisterNavigation()
@@ -1987,13 +1753,6 @@ namespace QuickFiler.Controllers
         #endregion
 
         #region Helper Functions
-
-        internal void CaptureTlpTemplate()
-        {
-            //logger.Debug($"Current Thread Id: {Thread.CurrentThread.ManagedThreadId}");
-            _templateTlp = _formViewer.L1v0L2L3v_TableLayout.Clone();
-            _templateTlp.Name = "TemplateTableLayout";
-        }
 
         /// <summary>
         /// Creates empty item groups and inserts them into the

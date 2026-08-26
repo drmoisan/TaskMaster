@@ -51,7 +51,7 @@ assembly, so a per-assembly passed count is directly derivable.
 
 | Assembly | Passed | Failed |
 |---|---|---|
-| **`QuickFiler.Test.dll`** | **937** | **0** |
+| **`QuickFiler.Test.dll`** | **938** (see correction note) | **0** |
 | `SVGControl.Test.dll` | (segment 950-1022) | 0 |
 | `Tags.Test.dll` | (segment 1024-1090) | 0 |
 | `TaskMaster.Test.dll` | (segment 1092-1455) | 0 |
@@ -79,9 +79,49 @@ A QuickFiler.Test-only passed count can never reach the nine-assembly aggregate 
 condition as literally worded can never be satisfied by any correct execution.
 
 **Resolution (recorded, not a plan edit):** the comparable baseline is the QuickFiler.Test-only
-subset of this same run: **937 passed, 0 failed**. P1-T8, and every later QuickFiler.Test-only suite
-gate, is measured against **937**, not 6482. Both figures are recorded here so a reviewer can audit
+subset of this same run: **938 passed, 0 failed**. P1-T8, and every later QuickFiler.Test-only suite
+gate, is measured against **938**, not 6482. Both figures are recorded here so a reviewer can audit
 the substitution. The plan file is not modified.
+
+#### CORRECTION applied 2026-08-26T08-45 — the subset figure is 938, not 937
+
+This artifact originally recorded the QuickFiler.Test subset as **937**. That was an artifact of the
+line-window segmentation used to derive it, not a real count. The correct figure is **938**.
+
+Cause: vstest's per-assembly console output is not strictly ordered at assembly boundaries when nine
+assemblies run in one invocation. The QuickFiler.Test result line
+
+```
+950:  Passed ItemViewerQueue_ResetCoreForTesting_UsesResettableProductionDefaults [< 1 ms]
+```
+
+was emitted at log line **950**, one line *after* the SVGControl.Test marker at line 949:
+
+```
+948:  Passed EfcViewerQueue_ResetCoreForTesting_UsesResettableProductionDefaults [< 1 ms]
+949:Test Parallelization enabled for <WS>\SVGControl.Test\bin\Debug\SVGControl.Test.dll (Workers: 24, Scope: ClassLevel)
+950:  Passed ItemViewerQueue_ResetCoreForTesting_UsesResettableProductionDefaults [< 1 ms]
+951:  Passed DocumentSetter_AssignedNull_SucceedsAndLeavesDocumentNull [38 ms]
+```
+
+The window `sed -n '12,948p'` therefore excluded exactly one QuickFiler.Test result.
+
+Confirmed by set comparison against the P1-T8 single-assembly run, which is free of any boundary
+ambiguity: the two test-name sets differ by exactly this one name and nothing else.
+
+```
+$ comm -13 qf-base.txt qf-p1t8.txt     # in P1-T8 but not in the 12-948 window
+ItemViewerQueue_ResetCoreForTesting_UsesResettableProductionDefaults
+$ comm -23 qf-base.txt qf-p1t8.txt     # in the window but not in P1-T8
+(none)
+```
+
+The aggregate figures (6482 total, 6482 passed, 0 failed) are unaffected — that test was always
+counted in the total; only its attribution to an assembly by line window was wrong. The
+`UtilitiesCS.Test` figure of 4699 is likewise a window-derived approximation and is not used as a
+gate baseline anywhere in this plan.
+
+**The comparable QuickFiler.Test baseline for every later suite gate is 938 passed, 0 failed.**
 
 ### Coverage
 

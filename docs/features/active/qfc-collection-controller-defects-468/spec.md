@@ -1165,14 +1165,14 @@ individually verifiable from evidence.
       the first statement after the increment (`UnregisterNavigation()` on a `null` `_itemGroups`) and
       one forcing a throw later in the body, each reading the static field by reflection and each
       resetting it in `[TestInitialize]`/`[TestCleanup]`.
-- [ ] **AC-2 (#468).** The twelve members `WireUpKeyboardHandler`, `AnyOpenDropDownsAsync`,
+- [x] **AC-2 (#468).** The twelve members `WireUpKeyboardHandler`, `AnyOpenDropDownsAsync`,
       `LoadGroups_02cAsync`, `LoadGroups_02bAsync`, `LoadGroup_03bAsync`,
       `LoadConversationsAndFoldersAsync`, `LoadItemGroup`, `LoadSequentialAsync`,
       `LoadGroupSequential`, `CacheTlpForMove`, `SwapTlp`, `CaptureTlpTemplate`, plus the field
       `_templateTlp` and the commented reference at `:402`, are absent from
       `QuickFiler/Controllers/QfcCollectionController.cs`. Verified by a source search returning zero
       hits for each identifier in that file.
-- [ ] **AC-3 (#468, non-regression).** The live members `AnyOpenDropDowns` (non-async),
+- [x] **AC-3 (#468, non-regression).** The live members `AnyOpenDropDowns` (non-async),
       `LoadItemGroupsAndViewers_02`, `LoadConversationsAndFolders_04`, `LoadSequential_5`, and
       `ActivateQueuedTlp` are still present and unmodified. Verified by a source search plus an
       empty diff hunk for each.
@@ -1251,7 +1251,7 @@ individually verifiable from evidence.
 
 ### Verification, scope, and process
 
-- [ ] **AC-16 (#468 residual risk).** A build-input-file search plus an enumerated reflective-call
+- [x] **AC-16 (#468 residual risk).** A build-input-file search plus an enumerated reflective-call
       review returns no reference to any removed member: (a) a search of build-input file types only
       (`*.csproj`, `*.resx`, `*.config`, `*.xaml`, `*.json`, `*.settings`, excluding `docs/`,
       `.claude/`, `packages/`, and `TestResults/`) for the twelve removed identifiers returns zero
