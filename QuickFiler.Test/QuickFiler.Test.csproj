@@ -104,6 +104,7 @@
     <Compile Include="Controllers\FilerQueueTests.cs" />
     <Compile Include="Controllers\QfcQueueCoverageExpansionTests.cs" />
     <Compile Include="Controllers\QfcQueuePurePathsTests.cs" />
+    <Compile Include="Controllers\EfcDataModelIssue614Tests.cs" />
     <Compile Include="Controllers\EfcDataModelTests.cs" />
     <Compile Include="Controllers\EfcFormControllerTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerDependenciesTests.cs" />

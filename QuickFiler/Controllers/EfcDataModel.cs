@@ -14,6 +14,7 @@ using ToDoModel;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence.EmailParsingSorting;
 using UtilitiesCS.Extensions;
+using UtilitiesCS.OutlookObjects.Folder;
 
 namespace QuickFiler.Controllers
 {
@@ -341,11 +342,7 @@ namespace QuickFiler.Controllers
             bool moveConversation
         )
         {
-            var folderpath = folder.FolderPath.Replace(olAncestor, "");
-            if (folderpath.StartsWith(@"\"))
-            {
-                folderpath = folderpath.Substring(1);
-            }
+            var folderpath = ToArchiveRelativeStem(folder.FolderPath, olAncestor);
             var result = await MoveToFolderAsync(
                 folderpath,
                 saveAttachments,
@@ -357,6 +354,35 @@ namespace QuickFiler.Controllers
             {
                 MessageBox.Show($"Cannot move to folderpath {folderpath}");
             }
+        }
+
+        /// <summary>
+        /// Returns the archive-relative filing stem for <paramref name="folderPath"/> (#614 D8).
+        /// The previous implementation used an unanchored Replace plus a single Substring(1),
+        /// which removed the ancestor wherever it recurred and, for a folder outside the
+        /// ancestor, produced a mangled stem that was then filed. This helper fails explicitly
+        /// through the shared contract instead of returning a mangled value.
+        /// </summary>
+        /// <param name="folderPath">The full Outlook path of the destination folder.</param>
+        /// <param name="olAncestor">The configured Outlook archive root.</param>
+        /// <returns>The archive-relative stem with no leading separator.</returns>
+        /// <exception cref="ArgumentException"><paramref name="folderPath"/> is not at or under
+        /// <paramref name="olAncestor"/>, or resolves to the ancestor itself. The message names
+        /// the rule only; the path is withheld because it can carry a mailbox address.</exception>
+        internal static string ToArchiveRelativeStem(string folderPath, string olAncestor)
+        {
+            if (
+                !ArchiveStemContract.TryMakeArchiveRelative(folderPath, olAncestor, out string stem)
+            )
+            {
+                throw new ArgumentException(
+                    "The destination folder is not inside the configured Outlook archive root. The path is withheld from this message because it can contain a mailbox address.",
+                    nameof(folderPath)
+                );
+            }
+
+            ArchiveStemContract.RequireArchiveRelativeStem(stem, nameof(folderPath));
+            return stem;
         }
 
         public IList<MailItem> PackageItems(bool moveConversation)

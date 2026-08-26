@@ -12,8 +12,28 @@ namespace TaskMaster
 {
     public class AppFileSystemFolderPaths : IFileSystemFolderPaths
     {
+        /// <summary>
+        /// Environment-variable read seam (#614 D7). Defaults to
+        /// <see cref="Environment.GetEnvironmentVariable(string)"/>. Tests inject a delegate so
+        /// that no test mutates process environment state. No NEW environment variable is read.
+        /// </summary>
+        private Func<string, string> _readEnvironmentVariable = Environment.GetEnvironmentVariable;
+
         public AppFileSystemFolderPaths()
         {
+            LoadFolders();
+            _filenames = new AppStagingFilenames();
+        }
+
+        /// <summary>Test seam constructor: supplies the environment reader used by LoadFolders.</summary>
+        /// <param name="readEnvironmentVariable">Environment reader; null selects the default.</param>
+        internal AppFileSystemFolderPaths(Func<string, string> readEnvironmentVariable)
+        {
+            if (readEnvironmentVariable != null)
+            {
+                _readEnvironmentVariable = readEnvironmentVariable;
+            }
+
             LoadFolders();
             _filenames = new AppStagingFilenames();
         }
@@ -148,6 +168,48 @@ namespace TaskMaster
             }
         }
 
+        /// <summary>Environment variables consulted for the OneDrive root, in priority order.</summary>
+        internal static readonly string[] OneDriveVariablesInPriorityOrder =
+        {
+            "OneDriveCommercial",
+            "OneDrive",
+            "OneDrivePersonal",
+        };
+
+        /// <summary>The redacted diagnostic raised when no OneDrive root is set (#614 D7).</summary>
+        internal const string OneDriveUnresolvableRule =
+            "No OneDrive root is set in the environment: OneDriveCommercial, OneDrive and OneDrivePersonal are all unset or empty, so there is no filesystem root to mirror the Outlook archive into. The values are withheld from this message because they contain a user-profile path.";
+
+        /// <summary>
+        /// Resolves the OneDrive root by reading the environment variables in priority order and
+        /// returning the first non-empty value (#614 D7). Pure apart from the injected reader, so
+        /// it is unit-testable without mutating process environment state.
+        /// </summary>
+        /// <param name="readEnvironmentVariable">The environment reader seam.</param>
+        /// <returns>The highest-priority non-empty OneDrive root.</returns>
+        /// <exception cref="InvalidOperationException">No variable yields a value. The message
+        /// names the rule only; the values are withheld because they carry a user-profile path.
+        /// </exception>
+        internal static string ResolveOneDriveRoot(Func<string, string> readEnvironmentVariable)
+        {
+            if (readEnvironmentVariable is null)
+            {
+                throw new ArgumentNullException(nameof(readEnvironmentVariable));
+            }
+
+            foreach (string variable in OneDriveVariablesInPriorityOrder)
+            {
+                string value = readEnvironmentVariable(variable);
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    return value;
+                }
+            }
+
+            logger.Error(OneDriveUnresolvableRule);
+            throw new InvalidOperationException(OneDriveUnresolvableRule);
+        }
+
         private void LoadFolders()
         {
             SpecialFolders = [];
@@ -194,56 +256,20 @@ namespace TaskMaster
             if (
                 !TryAddSpecialFolder(
                     "OneDrivePersonal",
-                    () => [Environment.GetEnvironmentVariable("OneDriveConsumer")]
+                    () => [_readEnvironmentVariable("OneDriveConsumer")]
                 )
             )
             {
                 TryAddSpecialFolder(
                     "OneDrivePersonal",
-                    () => [Environment.GetEnvironmentVariable("OneDrivePersonal")]
+                    () => [_readEnvironmentVariable("OneDrivePersonal")]
                 );
             }
-            if (
-                !TryAddSpecialFolder(
-                    "OneDrive",
-                    () => [Environment.GetEnvironmentVariable("OneDriveCommercial")]
-                )
-            )
-            {
-                if (
-                    !TryAddSpecialFolder(
-                        "OneDrive",
-                        () => [Environment.GetEnvironmentVariable("OneDrive")]
-                    )
-                )
-                {
-                    if (
-                        !TryAddSpecialFolder(
-                            "OneDrive",
-                            () => [Environment.GetEnvironmentVariable("OneDrivePersonal")]
-                        )
-                    )
-                    {
-                        if (SpecialFolders.Count > 0)
-                        {
-                            if (SpecialFolders.TryGetValue("AppData", out var appData))
-                            {
-                                TryAddSpecialFolder("OneDrive", [appData]);
-                            }
-                            else
-                            {
-                                TryAddSpecialFolder("OneDrive", [SpecialFolders.First().Value]);
-                            }
-                        }
-                        else
-                        {
-                            throw new InvalidOperationException(
-                                "No know network or local folders set in environment variables"
-                            );
-                        }
-                    }
-                }
-            }
+
+            // #614 D7: the OneDrive root is resolved from the environment in priority order and
+            // fails EXPLICITLY when none is set. The previous AppData and first-arbitrary-entry
+            // fallbacks silently produced a filing root that had nothing to do with OneDrive.
+            TryAddSpecialFolder("OneDrive", [ResolveOneDriveRoot(_readEnvironmentVariable)]);
             SpecialFolders.TryGetValue("OneDrive", out var oneDrive);
             TryAddSpecialFolder("Flow", [oneDrive, "Email attachments from Flow"]);
             SpecialFolders.TryGetValue("Flow", out var flow);
