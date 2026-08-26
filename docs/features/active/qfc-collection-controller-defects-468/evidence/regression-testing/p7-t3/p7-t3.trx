@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="845ff659-bd18-4bcd-b5a2-e8c0c7258b1e" name="<user>@<host> 2026-08-26 10:33:07" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T10:33:07.5980656-04:00" queuing="2026-08-26T10:33:07.5980656-04:00" start="2026-08-26T10:33:05.9424166-04:00" finish="2026-08-26T10:33:07.6188203-04:00" />
+  <TestSettings name="default" id="f22e4d1a-255d-43d5-93e6-739a080546f5">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-26_10_33_07" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="7793f683-25f6-4363-82df-750359c02143" testId="1312438b-c118-8fc0-ab16-204665eb1263" testName="ConversationReconciliationHelpersExist" computerName="<host>" duration="00:00:00.1481385" startTime="2026-08-26T10:33:07.2510556-04:00" endTime="2026-08-26T10:33:07.5291555-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7793f683-25f6-4363-82df-750359c02143">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Expected resolve not to be &lt;null&gt; because issue #470 defect 2 extracts the conversation member-resolution expression into a pure static helper so it can be resolved once, before MakeSpaceForItems, instead of being re-resolved inside the loop.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Primitives.ReferenceTypeAssertions`2.NotBeNull(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/ReferenceTypeAssertions.cs:line 71&#xD;
+   at QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468ConversationTests.ConversationReconciliationHelpersExist() in <repo-root>\QuickFiler.Test\Controllers\QfcCollectionControllerDefects468ConversationTests.cs:line 55</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="ConversationReconciliationHelpersExist" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1312438b-c118-8fc0-ab16-204665eb1263">
+      <Execution id="7793f683-25f6-4363-82df-750359c02143" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468ConversationTests" name="ConversationReconciliationHelpersExist" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1312438b-c118-8fc0-ab16-204665eb1263" executionId="7793f683-25f6-4363-82df-750359c02143" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

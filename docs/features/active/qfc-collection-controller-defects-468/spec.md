@@ -1205,7 +1205,7 @@ individually verifiable from evidence.
       tests — one calling `PromoteFirstChild` directly and one driving `ToggleGroupConv(string)`
       end-to-end with no matching `ConvOriginID` — each of which throws
       `ArgumentOutOfRangeException` before the fix and does not after.
-- [ ] **AC-9 (#470 defect 2).** `ToggleUnGroupConv` resolves the insertion list exactly once before
+- [x] **AC-9 (#470 defect 2).** `ToggleUnGroupConv` resolves the insertion list exactly once before
       `MakeSpaceForItems`, derives `insertCount` from `insertions.Count` as the single source of
       truth, and emits one `Warn` log carrying `entryID`, `conversationCount`, `insertions.Count`,
       `resolver.Count.SameFolder`, `resolver.Count.Expanded`, and `baseEmailIndex` when the

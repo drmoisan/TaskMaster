@@ -1609,8 +1609,39 @@ namespace QuickFiler.Controllers
             int baseEmailIndex = _itemGroups.FindIndex(itemGroup =>
                 itemGroup.ItemController.Mail.EntryID == entryID
             );
+
+            // Issue #470 defect 2: FindIndex returns -1 when the base email is no longer in the
+            // collection, and every downstream index derives from it. Expanding from -1 reserved
+            // rows at index 0 and then subscripted _itemGroups[insertionIndex - 1] with -1.
+            // Restore the navigation and layout state this method turned off, then return.
+            if (baseEmailIndex == -1)
+            {
+                logger.Warn(
+                    $"Cannot expand the conversation for entryID={entryID}: the base email is no "
+                        + "longer in the item group collection. Skipping the expansion."
+                );
+                RegisterNavigation();
+                TlpLayout = tlpState;
+                return;
+            }
+
             int insertionIndex = baseEmailIndex + 1;
-            int insertCount = conversationCount - 1;
+
+            // Issue #470 defect 2: resolve the conversation members exactly once, here, and
+            // derive the insertion count from the resolved list. The caller-supplied
+            // conversationCount is only a reservation hint; when the two disagree the resolved
+            // count wins and the disagreement is logged once. The loop is deliberately not
+            // clamped, because clamping would silently drop conversation members.
+            IReadOnlyList<MailItem> insertions = ResolveConversationInsertions(resolver, entryID);
+            int insertCount = ReconcileInsertionCount(
+                entryID,
+                conversationCount,
+                insertions.Count,
+                resolver.Count.SameFolder,
+                resolver.Count.Expanded,
+                baseEmailIndex,
+                message => logger.Warn(message)
+            );
 
             if (insertCount > 0)
             {
@@ -1623,7 +1654,7 @@ namespace QuickFiler.Controllers
                     entryID,
                     resolver,
                     insertionIndex,
-                    conversationCount,
+                    insertions,
                     folderList
                 );
                 if (_digitRefreshNeeded)
@@ -1654,27 +1685,103 @@ namespace QuickFiler.Controllers
         }
 
         /// <summary>
+        /// Resolves the conversation members that must be expanded beneath the base email,
+        /// newest first, excluding the base email itself.
+        /// </summary>
+        /// <param name="resolver">Resolver holding the conversation snapshot.</param>
+        /// <param name="entryID">Entry identifier of the base email, which is excluded.</param>
+        /// <returns>The members to insert, ordered by sent time descending.</returns>
+        /// <remarks>
+        /// Issue #470 defect 2. This is the member-resolution expression that previously lived
+        /// inline in <see cref="EnumerateConversationMembers"/>, extracted unchanged. Extracting it
+        /// lets <c>ToggleUnGroupConv</c> resolve the list once, before it reserves rows, so the
+        /// count it reserves and the count it fills come from the same evaluation. The method is
+        /// pure: it reads no field and touches no WinForms control.
+        /// </remarks>
+        internal static IReadOnlyList<MailItem> ResolveConversationInsertions(
+            ConversationResolver resolver,
+            string entryID
+        )
+        {
+            return resolver
+                .ConversationItems.SameFolder.Where(mailItem => mailItem.EntryID != entryID)
+                .OrderByDescending(mailItem => mailItem.SentOn)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Reconciles the caller-supplied conversation count against the resolved insertion count
+        /// and returns the insertion count as the single source of truth.
+        /// </summary>
+        /// <param name="entryID">Entry identifier of the base email.</param>
+        /// <param name="conversationCount">Caller-supplied count, used only as a reservation.</param>
+        /// <param name="insertionsCount">Count of members actually resolved for insertion.</param>
+        /// <param name="sameFolderCount">Resolver same-folder count, for diagnosis.</param>
+        /// <param name="expandedCount">Resolver expanded count, for diagnosis.</param>
+        /// <param name="baseEmailIndex">Index of the base email, for diagnosis.</param>
+        /// <param name="warn">Warning sink, invoked once on disagreement.</param>
+        /// <returns><paramref name="insertionsCount"/>, always.</returns>
+        /// <remarks>
+        /// Issue #470 defect 2. The reservation was derived from <paramref name="conversationCount"/>
+        /// while the loop was driven by the independently resolved member list, and nothing
+        /// compared them. A disagreement is recoverable and this method sits on the VSTO UI event
+        /// path, so the resolution is log-and-proceed rather than throw, matching the precedent in
+        /// <c>ConversationResolver.Loading</c>. The message carries all six values because the two
+        /// counts alone do not identify which snapshot moved.
+        /// </remarks>
+        internal static int ReconcileInsertionCount(
+            string entryID,
+            int conversationCount,
+            int insertionsCount,
+            int sameFolderCount,
+            int expandedCount,
+            int baseEmailIndex,
+            System.Action<string> warn
+        )
+        {
+            if (insertionsCount != conversationCount - 1)
+            {
+                warn?.Invoke(
+                    $"Conversation insertion count disagreement for entryID={entryID}: "
+                        + $"conversationCount={conversationCount}, "
+                        + $"insertionsCount={insertionsCount}, "
+                        + $"sameFolderCount={sameFolderCount}, "
+                        + $"expandedCount={expandedCount}, "
+                        + $"baseEmailIndex={baseEmailIndex}. "
+                        + "Proceeding with insertionsCount as the single source of truth."
+                );
+            }
+
+            return insertionsCount;
+        }
+
+        /// <summary>
         /// Parallel function to expand each member of a conversation into individual ItemViewers/Controllers.
         /// Expanded members are inserted into the base collection and conversation count and folder suggestions
         /// are replicated from the base member. This enables distinct actions to be taken with each member
         /// </summary>
-        /// <param name="mailInfoList">List of MailItems in a conversation</param>
+        /// <param name="entryID">
+        /// Entry identifier of the base email. Since issue #470 defect 2 moved member filtering into
+        /// <see cref="ResolveConversationInsertions"/>, this method no longer reads the parameter.
+        /// It is retained because the scoped signature change for that defect replaces
+        /// <c>conversationCount</c> with <paramref name="insertions"/> only; removing a second
+        /// parameter is a separate change.
+        /// </param>
+        /// <param name="resolver">Resolver replicated onto each expanded member.</param>
         /// <param name="insertionIndex">Location of the Item Group collection where the base member is stored</param>
-        /// <param name="conversationCount">Number of qualifying conversation members</param>
+        /// <param name="insertions">
+        /// The members to expand, already resolved and ordered by the caller. Passing them in is what
+        /// guarantees the rows reserved and the rows filled come from one evaluation.
+        /// </param>
         /// <param name="folderList">Folder suggestions for the first email</param>
         public void EnumerateConversationMembers(
             string entryID,
             ConversationResolver resolver,
             int insertionIndex,
-            int conversationCount,
+            IReadOnlyList<MailItem> insertions,
             object folderList
         )
         {
-            var insertions = resolver
-                .ConversationItems.SameFolder.Where(mailItem => mailItem.EntryID != entryID)
-                .OrderByDescending(mailItem => mailItem.SentOn)
-                .ToList();
-
             Enumerable
                 .Range(0, insertions.Count)
                 .ForEach(i =>
