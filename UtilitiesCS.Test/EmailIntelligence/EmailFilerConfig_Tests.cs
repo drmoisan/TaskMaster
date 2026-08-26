@@ -287,5 +287,51 @@ namespace UtilitiesCS.Test.EmailIntelligence
             // Assert
             result.Should().BeNull();
         }
+
+        [TestMethod]
+        public void Issue614_ResolvePaths_WithStoreRootStem_RejectsNonRelativeStemWithoutLeakingIdentifiers()
+        {
+            // Arrange: the pure configuration seam (no Outlook, filesystem, or store access).
+            // DestinationOlStem carries a store-root Outlook path instead of an archive-relative
+            // stem, which is the #614 leak shape reported from the field. All identifiers are
+            // fabricated placeholders (#602 redaction).
+            const string olAncestor = @"\\mailbox@example.com\Archive";
+            const string storeRootStem = @"\\mailbox@example.com";
+            const string fsAncestor = @"C:\Users\testuser\OneDrive - Contoso";
+            var config = new EmailFilerConfig
+            {
+                Globals = null,
+                OlAncestor = olAncestor,
+                DestinationOlStem = storeRootStem,
+                FsAncestorEquivalent = fsAncestor,
+            };
+
+            // Act
+            System.Action act = () => config.ResolvePaths();
+
+            // Assert: the contract exception must name the offending parameter and the
+            // archive-relative rule, and must leak neither the mailbox address nor the
+            // filesystem ancestor.
+            System.ArgumentException thrown = act.Should()
+                .Throw<System.ArgumentException>(
+                    "a non-relative DestinationOlStem must be rejected before concatenation"
+                )
+                .Which;
+
+            thrown
+                .Message.Should()
+                .Contain(
+                    nameof(EmailFilerConfig.DestinationOlStem),
+                    "the diagnostic must identify the offending parameter"
+                )
+                .And.Contain(
+                    "archive-relative",
+                    "the diagnostic must state the violated archive-relative stem rule"
+                );
+            thrown
+                .Message.Should()
+                .NotContain("mailbox@example.com", "the message must not leak a mailbox address")
+                .And.NotContain(fsAncestor, "the message must not leak a user-profile path");
+        }
     }
 }
