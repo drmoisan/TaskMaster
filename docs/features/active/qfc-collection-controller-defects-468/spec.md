@@ -1231,7 +1231,7 @@ individually verifiable from evidence.
       `ExecuteSynchronously` continuation (no `Thread.Sleep`, `Task.Delay`, or wall-clock wait), which
       asserts `drain.IsCompleted == false` after the gate completes — false before the fix, true
       after. The drain logic exists in exactly one place (`DrainBackgroundLoadingTasksAsync`), not two.
-- [ ] **AC-13 (#473 defect 2).** `OperationCanceledException` propagates out of `MoveEmailsAsync`
+- [x] **AC-13 (#473 defect 2).** `OperationCanceledException` propagates out of `MoveEmailsAsync`
       rather than being swallowed by the broad catch, and a single root failure produces a single log
       entry — proven by `mockMail.VerifyGet(x => x.Subject, Times.Never())` after the first catch.
       Verified by two named MSTest tests, each red before the fix.

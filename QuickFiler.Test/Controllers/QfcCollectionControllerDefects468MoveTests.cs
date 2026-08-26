@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler.Controllers;
@@ -119,6 +121,151 @@ namespace QuickFiler.Controllers.Tests
                 .BeNull(
                     because: "an index equal to the count is one past the end and must be reported "
                         + "as a missing group rather than throwing"
+                );
+        }
+
+        /// <summary>
+        /// Issue #473 defect 2. Regression test proving that a cancellation raised while a message
+        /// is being moved reaches the caller instead of being recorded as a move failure.
+        /// <para>
+        /// Scenario: one cached move group whose mocked item controller faults
+        /// <c>MoveMailAsync()</c> with <see cref="OperationCanceledException"/>. Expected outcome:
+        /// that exception propagates out of <c>MoveEmailsAsync</c>.
+        /// </para>
+        /// <para>
+        /// Before the fix the broad <c>catch (System.Exception)</c> in
+        /// <c>TryMoveEmailByGroupAsync</c> swallows it, logs it as an error, and lets the batch
+        /// continue moving the remaining messages â€” the opposite of what a cancellation requests.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public async Task MoveEmailsAsync_WhenMoveIsCancelled_PropagatesOperationCanceledException()
+        {
+            // Arrange
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            Mock<IQfcItemController> itemController = new Mock<IQfcItemController>(
+                MockBehavior.Loose
+            );
+            itemController
+                .Setup(item => item.MoveMailAsync())
+                .ThrowsAsync(new OperationCanceledException("the move batch was cancelled"));
+            QfcCollectionControllerTestSupport.SetField(
+                controller,
+                "_itemGroupsToMove",
+                new List<QfcItemGroup>
+                {
+                    new QfcItemGroup { ItemController = itemController.Object },
+                }
+            );
+
+            // Act
+            Func<Task> act = () => controller.MoveEmailsAsync(null);
+
+            // Assert
+            await act.Should()
+                .ThrowAsync<OperationCanceledException>(
+                    because: "issue #473 defect 2 requires cancellation to reach the caller so an "
+                        + "aborted batch stops, instead of being swallowed by the broad catch and "
+                        + "logged as a move error"
+                );
+        }
+
+        /// <summary>
+        /// Issue #473 defect 2. Regression test proving that one root failure produces one log
+        /// entry rather than two.
+        /// <para>
+        /// Scenario: one cached move group whose <c>ItemController</c> is <see langword="null"/>
+        /// and whose <c>MailItem</c> is a mock whose <c>Subject</c> getter throws. Expected
+        /// outcome: <c>MoveEmailsAsync</c> completes without throwing, and <c>Subject</c> is never
+        /// read.
+        /// </para>
+        /// <para>
+        /// Before the fix the broad catch handled the first dereference and then fell through to
+        /// <c>group.MailItem.Subject</c> inside that same catch, dereferencing a second time and
+        /// raising a second exception into the nested catch, so a single root cause emitted two
+        /// misleading <c>logger.Error</c> entries. Asserting <c>Times.Never()</c> on the
+        /// <c>Subject</c> getter is the observable proof that the second dereference no longer
+        /// happens.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public async Task MoveEmailsAsync_AfterFirstFailure_DoesNotReadSubjectASecondTime()
+        {
+            // Arrange
+            Mock<MailItem> mailItem = new Mock<MailItem>(MockBehavior.Loose);
+            mailItem
+                .SetupGet(mail => mail.Subject)
+                .Throws(
+                    new InvalidOperationException("Subject is unavailable in this arrangement")
+                );
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            QfcCollectionControllerTestSupport.SetField(
+                controller,
+                "_itemGroupsToMove",
+                new List<QfcItemGroup>
+                {
+                    new QfcItemGroup { ItemController = null, MailItem = mailItem.Object },
+                }
+            );
+
+            // Act
+            Func<Task> act = () => controller.MoveEmailsAsync(null);
+
+            // Assert
+            await act.Should()
+                .NotThrowAsync(
+                    because: "a failed move for one message must not abort the batch; issue #473 "
+                        + "defect 2 keeps the log-and-proceed behaviour and changes only the number "
+                        + "of log entries"
+                );
+            mailItem.VerifyGet(
+                mail => mail.Subject,
+                Times.Never(),
+                "issue #473 defect 2 requires the catch to log once and return rather than "
+                    + "dereferencing the same failed group a second time to look up its subject"
+            );
+        }
+
+        /// <summary>
+        /// Issue #473 defect 2. Covers the genuine null-group path through the boundary guard in
+        /// <c>TryMoveEmailByGroupIndexAsync</c>.
+        /// <para>
+        /// Scenario: the cached move collection holds a single <see langword="null"/> element, so
+        /// <c>TryGetItemGroupByIndex</c> resolves an in-range index to <see langword="null"/> â€”
+        /// exactly what the index lookup is contracted to return for a missing group. Expected
+        /// outcome: <c>MoveEmailsAsync</c> completes without throwing.
+        /// </para>
+        /// <para>
+        /// This is the case the boundary guard exists for. Without it the null reaches
+        /// <c>group.ItemController</c> inside <c>TryMoveEmailByGroupAsync</c> and is only contained
+        /// by the broad catch, which is precisely the "catch instead of guard" shape the fix
+        /// removes. A null element cannot be produced through <c>CacheItemGroupsForMove</c>, so it
+        /// is injected directly.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public async Task MoveEmailsAsync_WithNullGroupFromIndexLookup_DoesNotThrow()
+        {
+            // Arrange
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            QfcCollectionControllerTestSupport.SetField(
+                controller,
+                "_itemGroupsToMove",
+                new List<QfcItemGroup> { null }
+            );
+
+            // Act
+            Func<Task> act = () => controller.MoveEmailsAsync(null);
+
+            // Assert
+            await act.Should()
+                .NotThrowAsync(
+                    because: "issue #473 defect 2 guards the possibly-null group at the "
+                        + "TryMoveEmailByGroupIndexAsync boundary rather than letting it reach the "
+                        + "dereference and be contained by a broad catch"
                 );
         }
 

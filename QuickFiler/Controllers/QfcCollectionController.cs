@@ -2013,30 +2013,47 @@ namespace QuickFiler.Controllers
         private async Task TryMoveEmailByGroupIndexAsync(int i)
         {
             var group = TryGetItemGroupByIndex(i);
+            if (group is null)
+            {
+                // Issue #473 defect 2: TryGetItemGroupByIndex reports a missing group as null.
+                // Guarding at this boundary keeps that null from reaching the dereference inside
+                // TryMoveEmailByGroupAsync, where it previously produced two log entries for one
+                // root cause. One entry is emitted here instead, and the batch continues.
+                logger.Error($"No cached item group at index {i}. Continuing execution.");
+                return;
+            }
+
             await TryMoveEmailByGroupAsync(group);
         }
 
+        /// <summary>
+        /// Moves the message owned by <paramref name="group"/>, logging and continuing when the
+        /// move fails, and letting a cancellation reach the caller.
+        /// </summary>
         private static async Task TryMoveEmailByGroupAsync(QfcItemGroup group)
         {
             try
             {
                 await group.ItemController.MoveMailAsync();
             }
+            catch (OperationCanceledException)
+            {
+                // Issue #473 defect 2: a cancellation is a control-flow signal, not a move
+                // failure. It must reach the caller so an aborted batch actually stops, and it
+                // must not be recorded as an error. This clause has to precede the broad clause
+                // below, because OperationCanceledException derives from System.Exception and the
+                // first matching clause wins.
+                throw;
+            }
             catch (System.Exception e)
             {
-                var subject = "";
-                try
-                {
-                    subject = group.MailItem.Subject;
-                }
-                catch (System.Exception e2)
-                {
-                    logger.Error($"Unable to retrieve subject {e2.Message}", e2);
-                }
-                logger.Error(
-                    $"Error moving message {subject}. Continuing execution.\n{e.Message}",
-                    e
-                );
+                // Issue #473 defect 2: log once, then return. The previous body went on to read
+                // group.MailItem.Subject from inside this catch, which dereferenced the same
+                // failed group a second time and raised a second exception into a nested catch, so
+                // a single root cause emitted two misleading log entries. Log-and-proceed is
+                // retained: the caller continues with the remaining cached groups.
+                logger.Error($"Error moving message. Continuing execution.\n{e.Message}", e);
+                return;
             }
         }
 

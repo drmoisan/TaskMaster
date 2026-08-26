@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="f901d92e-c8d7-4ce7-b7aa-fbd1fd17c744" name="<user>@<host> 2026-08-26 09:45:42" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T09:45:42.9365466-04:00" queuing="2026-08-26T09:45:42.9365466-04:00" start="2026-08-26T09:45:41.0947123-04:00" finish="2026-08-26T09:45:42.9583650-04:00" />
+  <TestSettings name="default" id="5b638f87-bb83-42ff-ba56-97ccb4e87666">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-26_09_45_42" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="4d246e5a-52ff-4458-8d6c-5ee2ade034b6" testId="16b3ca18-f862-8df9-9c05-cf9e06d97ea0" testName="MoveEmailsAsync_WhenMoveIsCancelled_PropagatesOperationCanceledException" computerName="<host>" duration="00:00:00.3655436" startTime="2026-08-26T09:45:42.3212771-04:00" endTime="2026-08-26T09:45:42.8470124-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4d246e5a-52ff-4458-8d6c-5ee2ade034b6">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Expected a &lt;System.OperationCanceledException&gt; to be thrown because issue #473 defect 2 requires cancellation to reach the caller so an aborted batch stops, instead of being swallowed by the broad catch and logged as a move error, but no exception was thrown.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Specialized.DelegateAssertionsBase`2.&lt;&gt;c__DisplayClass8_0`1.&lt;ThrowInternal&gt;b__0(AssertionChain chain) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 47&#xD;
+   at FluentAssertions.Execution.AssertionChain.WithExpectation(String message, Action`1 chain, Object[] args) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 192&#xD;
+   at FluentAssertions.Specialized.DelegateAssertionsBase`2.ThrowInternal[TException](Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 56&#xD;
+   at FluentAssertions.Specialized.AsyncFunctionAssertions`2.&lt;ThrowAsync&gt;d__7`1.MoveNext()&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()&#xD;
+   at QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests.&lt;MoveEmailsAsync_WhenMoveIsCancelled_PropagatesOperationCanceledException&gt;d__2.MoveNext() in <repo-root>\QuickFiler.Test\Controllers\QfcCollectionControllerDefects468MoveTests.cs:line 165&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.&lt;ExecuteInternalAsync&gt;d__58.MoveNext()</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="MoveEmailsAsync_WhenMoveIsCancelled_PropagatesOperationCanceledException" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a21a3b3e3120ed6de\quickfiler.test\bin\debug\quickfiler.test.dll" id="16b3ca18-f862-8df9-9c05-cf9e06d97ea0">
+      <Execution id="4d246e5a-52ff-4458-8d6c-5ee2ade034b6" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests" name="MoveEmailsAsync_WhenMoveIsCancelled_PropagatesOperationCanceledException" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="16b3ca18-f862-8df9-9c05-cf9e06d97ea0" executionId="4d246e5a-52ff-4458-8d6c-5ee2ade034b6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
