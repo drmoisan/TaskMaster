@@ -1,6 +1,6 @@
 ---
 name: project-614-store-root-leak-plan-seams
-description: "#614 plan seams: AC25 conflicts with pre-existing over-limit EfcFormController(1084)/BreadcrumbBridgeRouter(596); near-limit test files get Issue614 companion files; spec's evidence/coverage+evidence/qa normalized; TRX/coverage raw output is host-identifying so summaries-only under evidence"
+description: "#614 plan seams: AC25 net non-growth (3 over-limit files incl. Issue439Tests 695); E1 spec-corrects the D1-codifying Issue439 boundary test (P3-T4, run task now P3-T5); SelectRow guard scope pinned (out-of-root only); evidence-path normalization; host-identifying raw TRX stays out of evidence"
 metadata:
   type: project
 ---
@@ -38,6 +38,14 @@ R2 preflight revision (2026-08-26, B7-B8 + NB1-NB6; 11 phases / 80 tasks unchang
 - **P1-T3 Helpers extraction requires `public partial class` at `:23`** ([TestClass] stays only on the original file).
 - **P9-T5 `>= 84.80` miss is re-measured once** before being read as a regression (dotnet-coverage denominator nondeterminism).
 - **P10-T24 restates the AC24 fourth-command substitution** (literal `vstest.console.exe ... /EnableCodeCoverage` executed via the canonical coverage runner).
+
+E1 execution delta (2026-08-26, v1.3; Phase 3 now 5 tasks, 81 total; P0 + P1-T1/T2 committed and frozen):
+
+- **`Issue439ArchiveRootBoundarySelectionAndHostEventRemainDeterministic` (:542-616) codified D1/D9** (asserted selecting out-of-root `\External\Clients` and a `string.Empty` root-exact selection). New P3-T4 updates it: post-fix both activations are non-selections — `selected` empty, `SelectedFolderPath` null, `PostMessageJson` `Times.Exactly(2)` → `Times.Never` (rejection returns before the render post). Former P3-T4 run task renumbered P3-T5 (trx/artifact names follow). Carve-outs added in P3-T5, P9-T4, P10-T19 (AC19's enumerated scenarios do NOT include this test), P8-T1 item (h).
+- **The Issue439 test file is itself a THIRD pre-existing over-limit file (695 lines)** — added to the AC25 net-non-growth handling (P9-T6 gate <= 695, P10-T25 flags it: the 10:38Z adjudication predates E1).
+- **`Issue439AlreadyRootedTargetRemainsUnchangedWithCaseInsensitiveArchiveMatch:165` asserts the rooted-but-UNDER-root `\aRcHiVe\Clients\North`** — stays green only if the P3-T2 SelectRow guard rejects out-of-root full paths ONLY (relative stems and under-root rooted targets pass verbatim; empty-root mode unguarded). P3-T2 now pins this scope; also pins that ToHierarchyPath keeps root-prefixing RELATIVE targets (the #609 mock contracts depend on it) and that the surviving prefix branch drops the dead `TrimStart` so the zero-hit literal gate stays satisfiable.
+- **Corrected-line gates count occurrences**: `router.SelectedFolderPath.Should().BeNull();` already exists at :537, so the gate is "exactly two hits", not one. Always count pre-existing occurrences of a corrected assertion line before writing an exactly-one-hit gate.
+- Verified green (do not re-open): `Issue439SlashOnlyArchiveRootPreservesFullHierarchySelection` (binds `\` → trims to empty → preserved pass-through mode) and the three `Issue609_*` tests (under-root stems only).
 
 **Why:** these were all judgment calls resolving spec-vs-reality conflicts; a naive revision pass re-reading spec.md literally would reintroduce unsatisfiable gates.
 **How to apply:** on any #614 preflight revision, keep these seams unless the orchestrator explicitly overrules a recorded decision.
