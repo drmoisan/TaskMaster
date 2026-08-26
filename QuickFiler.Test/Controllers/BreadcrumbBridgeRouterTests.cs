@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -20,7 +20,7 @@ namespace QuickFiler.Test.Controllers
     /// (QuickFiler.Test deliberately carries no Newtonsoft reference).
     /// </summary>
     [TestClass]
-    public class BreadcrumbBridgeRouterTests
+    public partial class BreadcrumbBridgeRouterTests
     {
         private const string LeafPath = "Inbox\\Projects\\Alpha";
 
@@ -194,193 +194,85 @@ namespace QuickFiler.Test.Controllers
             renders[1].Should().Contain(JsonEscaped("data-role=\"leaf\">+</span>"));
         }
 
+        /// <summary>
+        /// #440 Efc Left: on a multi-segment row the Left arrow attempts the tree transition
+        /// first, moving the active segment exactly one step toward the root. The subsequent
+        /// expansion is keyed on the parent segment, which is only true when the active index
+        /// moved from the leaf to the segment immediately below it.
+        /// </summary>
         [TestMethod]
-        public void ArrowKeyUp_AtTopSelectableRow_PostsFocusSearchAndRaisesEvent()
+        public void HandleArrowKey_LeftOnMultiSegmentRow_ActivatesParentSegment()
         {
-            // Arrange: row-1 is the top selectable row (row-0 is a banner).
+            // Arrange: row-1 carries Inbox -> Projects -> Alpha with the leaf active after bind.
             Bind();
-            bool raised = false;
-            _router.FocusSearchRequested += (s, e) => raised = true;
+            _provider.Invocations.Clear();
 
             // Act
-            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Up\"}");
-
-            // Assert
-            _posted.Should().Contain(p => p.Contains("\"type\":\"focusSearch\""));
-            raised.Should().BeTrue();
-        }
-
-        [TestMethod]
-        public void RowSelected_UpdatesSelectedFolderPathAndRaisesEvent()
-        {
-            // Arrange
-            Bind();
-            string observed = null;
-            _router.SelectedFolderPathChanged += (s, path) => observed = path;
-
-            // Act
-            Inbound("{\"type\":\"rowSelected\",\"rowId\":\"row-1\"}");
-
-            // Assert
-            _router.SelectedFolderPath.Should().Be(LeafPath);
-            observed.Should().Be(LeafPath);
-        }
-
-        [TestMethod]
-        public void RowSelected_OnBannerRow_IsIgnored()
-        {
-            // Arrange
-            Bind();
-            bool raised = false;
-            _router.SelectedFolderPathChanged += (s, path) => raised = true;
-
-            // Act: row-0 is the banner row.
-            Inbound("{\"type\":\"rowSelected\",\"rowId\":\"row-0\"}");
-
-            // Assert: banner rows are never selectable.
-            _router.SelectedFolderPath.Should().BeNull();
-            raised.Should().BeFalse();
-        }
-
-        [TestMethod]
-        public void SelectFirstRow_SelectsTopSelectableRowAndPostsRender()
-        {
-            // Arrange
-            Bind();
-
-            // Act
-            _router.SelectFirstRow();
-
-            // Assert: the first selectable (non-banner) row is selected and re-rendered.
-            _router.SelectedFolderPath.Should().Be(LeafPath);
-            string render = _posted.Single(p => p.Contains("\"type\":\"render\""));
-            render.Should().Contain(JsonEscaped("rowwrap selected"));
-        }
-
-        [TestMethod]
-        public void ApplyTheme_Dark_ReDeliversDarkDocument()
-        {
-            // Arrange
-            Bind();
-
-            // Act
-            _router.ApplyTheme(true);
-
-            // Assert: a second navigation carrying the dark theme block.
-            _navigated.Should().HaveCount(2);
-            _navigated[1].Should().Contain("background: #1e1e1e");
-        }
-
-        private void BindThreeRows()
-        {
-            // Second suggestion resolves to an unknown chain -> single-segment fallback.
-            _provider
-                .Setup(p =>
-                    p.GetAncestorChainAsync(
-                        It.IsAny<FolderTreeNodeKey>(),
-                        It.IsAny<CancellationToken>()
-                    )
-                )
-                .ReturnsAsync(
-                    (FolderTreeNodeKey k, CancellationToken ct) =>
-                        k.FolderPath == LeafPath
-                            ? new[]
-                            {
-                                ProviderSegment("Inbox", "Inbox", true),
-                                ProviderSegment(LeafPath, "Alpha", true),
-                            }
-                            : (IReadOnlyList<FolderBreadcrumbSegment>)new FolderBreadcrumbSegment[0]
-                );
-            _router
-                .BindRowsAsync(
-                    new[] { "==== SUGGESTIONS ====", LeafPath, "Inbox\\Beta" },
-                    new FolderScore[0],
-                    CancellationToken.None
-                )
-                .GetAwaiter()
-                .GetResult();
-        }
-
-        [TestMethod]
-        public void ArrowKeyDown_SelectsNextSelectableRow()
-        {
-            // Arrange
-            BindThreeRows();
-
-            // Act
-            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Down\"}");
-
-            // Assert
-            _router.SelectedFolderPath.Should().Be("Inbox\\Beta");
-        }
-
-        [TestMethod]
-        public void ArrowKeyUp_OnNonTopRow_SelectsPreviousRowWithoutFocusSearch()
-        {
-            // Arrange
-            BindThreeRows();
-
-            // Act
-            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-2\",\"key\":\"Up\"}");
-
-            // Assert: selection moves up; focusSearch is reserved for the top row.
-            _router.SelectedFolderPath.Should().Be(LeafPath);
-            _posted.Should().NotContain(p => p.Contains("\"type\":\"focusSearch\""));
-        }
-
-        [TestMethod]
-        public void LeafExpandToggle_OnCollapsedRow_ReExpandsWithoutProviderQuery()
-        {
-            // Arrange: collapse the row first.
-            Bind();
-            Inbound("{\"type\":\"segmentDoubleClick\",\"rowId\":\"row-1\",\"segmentIndex\":0}");
-
-            // Act: the affordance now re-expands the full breadcrumb.
+            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Left\"}");
             Inbound("{\"type\":\"leafExpandToggle\",\"rowId\":\"row-1\"}");
 
             // Assert
             _provider.Verify(
                 p =>
                     p.GetImmediateSubfoldersAsync(
-                        It.IsAny<FolderTreeNodeKey>(),
-                        It.IsAny<CancellationToken>()
-                    ),
-                Times.Never
-            );
-            _posted.Last(p => p.Contains("\"type\":\"render\"")).Should().Contain(">Alpha<");
-        }
-
-        [TestMethod]
-        public void LeafExpandToggle_OnExpandedLeaf_CollapsesWithoutSecondQuery()
-        {
-            // Arrange: expand the leaf once (one provider query).
-            Bind();
-            Inbound("{\"type\":\"leafExpandToggle\",\"rowId\":\"row-1\"}");
-
-            // Act: toggling again collapses the children.
-            Inbound("{\"type\":\"leafExpandToggle\",\"rowId\":\"row-1\"}");
-
-            // Assert: still exactly one query; last render shows the plus affordance again.
-            _provider.Verify(
-                p =>
-                    p.GetImmediateSubfoldersAsync(
-                        It.IsAny<FolderTreeNodeKey>(),
+                        It.Is<FolderTreeNodeKey>(k => k.FolderPath == "Inbox\\Projects"),
                         It.IsAny<CancellationToken>()
                     ),
                 Times.Once
             );
-            _posted
-                .Last(p => p.Contains("\"type\":\"render\""))
-                .Should()
-                .Contain(JsonEscaped("data-role=\"leaf\">+</span>"));
+            _provider.Verify(
+                p =>
+                    p.GetImmediateSubfoldersAsync(
+                        It.Is<FolderTreeNodeKey>(k => k.FolderPath == LeafPath),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never
+            );
         }
 
+        /// <summary>
+        /// #440 Efc Left: repeated Left presses walk the active segment to the root, and the
+        /// press that ActivateSegment refuses falls through (decision D1) to the pre-existing
+        /// row.LeftArrow() collapse behavior.
+        /// </summary>
         [TestMethod]
-        public void ArrowKeyRight_WhenCollapsed_ReExpandsWithoutProviderQuery()
+        public void HandleArrowKey_RepeatedLeft_WalksToRootThenFallsThroughToExistingBehavior()
         {
             // Arrange
             Bind();
-            Inbound("{\"type\":\"segmentDoubleClick\",\"rowId\":\"row-1\",\"segmentIndex\":0}");
+
+            // Act: two presses walk 2 -> 1 -> 0; the third is refused and falls through.
+            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Left\"}");
+            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Left\"}");
+            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Left\"}");
+
+            // Assert: only the third render carries the collapse (re-expand) affordance.
+            List<string> renders = _posted
+                .Where(p => p.Contains("\"type\":\"render\"") && p.Contains("\"rowId\":\"row-1\""))
+                .ToList();
+            renders.Should().HaveCount(3);
+            renders[0].Should().NotContain(JsonEscaped("data-role=\"reexpand\""));
+            renders[1].Should().NotContain(JsonEscaped("data-role=\"reexpand\""));
+            renders[2].Should().Contain(JsonEscaped("data-role=\"reexpand\""));
+            renders[2].Should().NotContain(">Alpha<");
+        }
+
+        /// <summary>
+        /// #440 Efc Right on a COLLAPSED row whose activated segment is a non-leaf parent: the
+        /// tree transition is attempted before row.ReExpand(), so exactly one
+        /// GetImmediateSubfoldersAsync call keyed on the active segment is issued and no
+        /// ResolveLeafKeyAsync call is added on the expansion path.
+        /// </summary>
+        [TestMethod]
+        public void HandleArrowKey_RightOnActivatedParent_ExpandsViaSingleImmediateSubfolderCall()
+        {
+            // Arrange: collapse after segment 1, then activate segment 1. ActivateSegment leaves
+            // CollapsedAfterIndex untouched, so the row is still collapsed when Right arrives.
+            Bind();
+            _provider.Invocations.Clear();
+            Inbound("{\"type\":\"segmentDoubleClick\",\"rowId\":\"row-1\",\"segmentIndex\":1}");
+            Inbound("{\"type\":\"segmentActivate\",\"rowId\":\"row-1\",\"segmentIndex\":1}");
+            _provider.Invocations.Clear();
 
             // Act
             Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Right\"}");
@@ -389,47 +281,55 @@ namespace QuickFiler.Test.Controllers
             _provider.Verify(
                 p =>
                     p.GetImmediateSubfoldersAsync(
-                        It.IsAny<FolderTreeNodeKey>(),
+                        It.Is<FolderTreeNodeKey>(k => k.FolderPath == "Inbox\\Projects"),
                         It.IsAny<CancellationToken>()
                     ),
-                Times.Never
+                Times.Once()
             );
-            _posted.Last(p => p.Contains("\"type\":\"render\"")).Should().Contain(">Alpha<");
+            _provider.Verify(
+                p => p.ResolveLeafKeyAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()),
+                Times.Never()
+            );
         }
 
+        /// <summary>
+        /// #440 Efc Right after the active segment is already expanded: the descent mechanism
+        /// chosen by decision D9 selects child index 0 through BreadcrumbRow.GetActiveChild(0).
+        /// When GetActiveChild(0) returns null the descent is unavailable and the decision-D1
+        /// fall-through runs, leaving the selection unchanged.
+        /// </summary>
         [TestMethod]
-        public void ArrowKey_UnknownKey_IsLoggedNoOp()
+        public void HandleArrowKey_RightAfterExpansion_DescendsByChildActivation()
         {
-            // Arrange
+            // Arrange: activate the non-leaf parent, then expand it.
             Bind();
-            int postedBefore = _posted.Count;
+            Inbound("{\"type\":\"segmentActivate\",\"rowId\":\"row-1\",\"segmentIndex\":1}");
+            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Right\"}");
 
-            // Act
-            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Home\"}");
-
-            // Assert: no state change and no outbound payloads.
-            _posted.Count.Should().Be(postedBefore);
-            _router.SelectedFolderPath.Should().BeNull();
-        }
-
-        [TestMethod]
-        public void RowSelected_OnTrashPseudoRow_SelectsTrashPath()
-        {
-            // Arrange
-            _router
-                .BindRowsAsync(
-                    new[] { "Trash to Delete", LeafPath },
-                    new FolderScore[0],
-                    CancellationToken.None
-                )
-                .GetAwaiter()
-                .GetResult();
-
-            // Act
-            Inbound("{\"type\":\"rowSelected\",\"rowId\":\"row-0\"}");
+            // Act: the next Right descends to child index 0.
+            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Right\"}");
 
             // Assert
-            _router.SelectedFolderPath.Should().Be("Trash to Delete");
+            _router.SelectedFolderPath.Should().Be("Inbox\\Projects\\Alpha\\Kid");
+
+            // Arrange: same gesture where the active segment expands to no children at all.
+            _provider
+                .Setup(p =>
+                    p.GetImmediateSubfoldersAsync(
+                        It.IsAny<FolderTreeNodeKey>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(new FolderBreadcrumbSegment[0]);
+            Bind();
+            Inbound("{\"type\":\"segmentActivate\",\"rowId\":\"row-1\",\"segmentIndex\":1}");
+            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Right\"}");
+
+            // Act
+            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Right\"}");
+
+            // Assert: GetActiveChild(0) returned null, so the selection is unchanged.
+            _router.SelectedFolderPath.Should().Be("Inbox\\Projects");
         }
     }
 }

@@ -1047,7 +1047,7 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
       behavior is byte-identical to today because the router does not consume the newly-resolved chain for the
       filing path, and the deliberate limitation is recorded in this spec; rung 3 — execution halted and
       reported the blocking dependency on `BreadcrumbSelectionMap.cs:109` without writing it.
-- [ ] **AC-15 (#440)** — On the Efc surface, Left on a row whose resolved chain has more than one segment
+- [x] **AC-15 (#440)** — On the Efc surface, Left on a row whose resolved chain has more than one segment
       selects that row's parent node, and repeated Left presses walk up the ancestor chain. The transition is
       expressed through the landed `BreadcrumbRow.ActivateSegment(int)` (`BreadcrumbRow.cs:151-172`), not
       through a newly added parallel selected-node index (D9). A test asserts `ActiveSegmentIndex` decreases by

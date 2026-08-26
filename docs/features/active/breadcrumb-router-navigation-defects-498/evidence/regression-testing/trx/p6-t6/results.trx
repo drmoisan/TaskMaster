@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="c15ac664-edcd-4330-92d3-e8ece603bc42" name="DanMoisan@MEGALODON4 2026-08-26 10:17:23" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T10:17:23.1952636-04:00" queuing="2026-08-26T10:17:23.1952636-04:00" start="2026-08-26T10:17:20.8785183-04:00" finish="2026-08-26T10:17:23.2143059-04:00" />
+  <TestSettings name="default" id="5560cfa5-e5a3-483f-8211-de97977a09d3">
+    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_10_17_23" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="5a5cc426-4ea3-4da9-9af3-2b9bc63e9b8f" testId="1fa7bcb6-b724-8ac9-ba56-c0ab6270cdbb" testName="HandleArrowKey_RightAfterExpansion_DescendsByChildActivation" computerName="MEGALODON4" duration="00:00:00.1224175" startTime="2026-08-26T10:17:23.0109929-04:00" endTime="2026-08-26T10:17:23.1381068-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5a5cc426-4ea3-4da9-9af3-2b9bc63e9b8f">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Expected _router.SelectedFolderPath to be "Inbox\Projects\Alpha\Kid" with a length of 24, but "Inbox\Projects" has a length of 14, differs near "s" (index 13).</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Primitives.StringEqualityStrategy.ValidateAgainstLengthDifferences(AssertionChain assertion, String subject, String expected)&#xD;
+   at FluentAssertions.Primitives.StringValidator.Validate(String subject, String expected) in /_/Src/FluentAssertions/Primitives/StringValidator.cs:line 37&#xD;
+   at FluentAssertions.Primitives.StringAssertions`1.Be(String expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/StringAssertions.cs:line 67&#xD;
+   at QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests.HandleArrowKey_RightAfterExpansion_DescendsByChildActivation() in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\Controllers\BreadcrumbBridgeRouterTests.cs:line 313</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="3dac62dc-4ef7-48d3-96b2-18f6442cb863" testId="11b2051a-504f-8b3e-87f7-c80fab346910" testName="HandleArrowKey_RightOnActivatedParent_ExpandsViaSingleImmediateSubfolderCall" computerName="MEGALODON4" duration="00:00:00.5127721" startTime="2026-08-26T10:17:22.3084531-04:00" endTime="2026-08-26T10:17:23.0039607-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3dac62dc-4ef7-48d3-96b2-18f6442cb863">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests.HandleArrowKey_RightOnActivatedParent_ExpandsViaSingleImmediateSubfolderCall threw exception:&#xD;
+Moq.MockException: &#xD;
+Expected invocation on the mock once, but was 0 times: p =&gt; p.GetImmediateSubfoldersAsync(It.Is&lt;FolderTreeNodeKey&gt;(k =&gt; k.FolderPath == "Inbox\Projects"), It.IsAny&lt;CancellationToken&gt;())&#xD;
+&#xD;
+Performed invocations:&#xD;
+&#xD;
+   Mock&lt;IFolderHierarchyProvider:1&gt; (p):&#xD;
+   No invocations performed.&#xD;
+</Message>
+          <StackTrace>   at Moq.Mock.Verify(Mock mock, LambdaExpression expression, Times times, String failMessage) in /_/src/Moq/Mock.cs:line 332&#xD;
+   at Moq.Mock`1.Verify[TResult](Expression`1 expression, Times times) in /_/src/Moq/Mock`1.cs:line 826&#xD;
+   at QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests.HandleArrowKey_RightOnActivatedParent_ExpandsViaSingleImmediateSubfolderCall() in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\Controllers\BreadcrumbBridgeRouterTests.cs:line 281&#xD;
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="HandleArrowKey_RightOnActivatedParent_ExpandsViaSingleImmediateSubfolderCall" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\quickfiler.test\bin\debug\quickfiler.test.dll" id="11b2051a-504f-8b3e-87f7-c80fab346910">
+      <Execution id="3dac62dc-4ef7-48d3-96b2-18f6442cb863" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests" name="HandleArrowKey_RightOnActivatedParent_ExpandsViaSingleImmediateSubfolderCall" />
+    </UnitTest>
+    <UnitTest name="HandleArrowKey_RightAfterExpansion_DescendsByChildActivation" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\quickfiler.test\bin\debug\quickfiler.test.dll" id="1fa7bcb6-b724-8ac9-ba56-c0ab6270cdbb">
+      <Execution id="5a5cc426-4ea3-4da9-9af3-2b9bc63e9b8f" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests" name="HandleArrowKey_RightAfterExpansion_DescendsByChildActivation" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1fa7bcb6-b724-8ac9-ba56-c0ab6270cdbb" executionId="5a5cc426-4ea3-4da9-9af3-2b9bc63e9b8f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11b2051a-504f-8b3e-87f7-c80fab346910" executionId="3dac62dc-4ef7-48d3-96b2-18f6442cb863" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="2" executed="2" passed="0" failed="2" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+</TestRun>
