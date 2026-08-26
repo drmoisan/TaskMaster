@@ -1946,27 +1946,55 @@ namespace QuickFiler.Controllers
             }
         }
 
+        /// <summary>
+        /// Returns <paramref name="current"/> with its height reduced by
+        /// <paramref name="removalCount"/> template rows.
+        /// </summary>
+        /// <param name="current">The size to adjust. It is not mutated.</param>
+        /// <param name="templateHeight">Height of a single template row, in pixels.</param>
+        /// <param name="removalCount">
+        /// Number of template rows to remove. A <em>negative</em> row count grows the size instead
+        /// of shrinking it, which is how the insertion path expresses "make room for N rows".
+        /// </param>
+        /// <remarks>
+        /// This is pure arithmetic on a value type: it reads no field and touches no WinForms
+        /// control, so the rounding contract shared by the removal and insertion paths can be
+        /// asserted directly by a unit test that needs no message pump.
+        /// </remarks>
+        internal static System.Drawing.Size ShrinkByRows(
+            System.Drawing.Size current,
+            float templateHeight,
+            int removalCount
+        )
+        {
+            return new System.Drawing.Size(
+                current.Width,
+                current.Height - (int)Math.Round(templateHeight * removalCount, 0)
+            );
+        }
+
         public void EliminateSpaceForItems(int removalInex, int removalCount)
         {
             TableLayoutHelper.RemoveSpecificRow(_itemTlp, removalInex, removalCount);
 
-            var heightChange = -(int)Math.Round(_template.Height * removalCount, 0);
-            _itemTlp.MinimumSize = new System.Drawing.Size(
-                _itemTlp.MinimumSize.Width,
-                _itemTlp.MinimumSize.Height - heightChange
+            var rowsToShrinkBy = -removalCount;
+            _itemTlp.MinimumSize = ShrinkByRows(
+                _itemTlp.MinimumSize,
+                _template.Height,
+                rowsToShrinkBy
             );
 
-            _itemTlp.Size = new System.Drawing.Size(
-                _itemTlp.Size.Width,
-                _itemTlp.Size.Height - heightChange
-            );
+            _itemTlp.Size = ShrinkByRows(_itemTlp.Size, _template.Height, rowsToShrinkBy);
         }
 
         public void MakeSpaceForItems(int insertionIndex, int insertCount)
         {
-            _itemTlp.MinimumSize = new System.Drawing.Size(
-                _itemTlp.MinimumSize.Width,
-                _itemTlp.MinimumSize.Height + (int)Math.Round(_template.Height * insertCount, 0)
+            // A negative row count grows the panel, so an insertion of N rows is expressed as a
+            // shrink by -N rows.
+            _itemTlp.MinimumSize = ShrinkByRows(
+                _itemTlp.MinimumSize,
+                _template.Height,
+                -insertCount
             );
 
             TableLayoutHelper.InsertSpecificRow(
