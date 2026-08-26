@@ -1,3 +1,27 @@
+---
+paths:
+  - "artifacts/orchestration/*orchestrator-state.json"
+  - "artifacts/orchestration/*planner-state.json"
+  - "scripts/dev_tools/*orchestrator_state*"
+  - "extensions/drm-copilot/src/lib/validate/orchestrator-state-*"
+  - "scripts/dev_tools/compute_complexity_floor.py"
+  - "scripts/dev_tools/resolve_delegation_model.py"
+  - ".claude/hooks/validate-orchestrator-output.ps1"
+  - ".claude/hooks/enforce-model-routing-receipt.ps1"
+  - "config/orchestration-routing.json"
+  - ".claude/agents/orchestrator.md"
+  - ".claude/agents/epic-orchestrator.md"
+  - ".claude/agents/parallel-orchestrator.md"
+  - ".claude/agents/epic-planner.md"
+  - ".claude/agents/parallel-planner.md"
+  - ".claude/skills/orchestrate/SKILL.md"
+  - ".claude/skills/epic-orchestrate/SKILL.md"
+  - ".claude/skills/parallel-orchestrate/SKILL.md"
+  - ".claude/skills/epic-plan/SKILL.md"
+  - ".claude/skills/parallel-plan/SKILL.md"
+description: Checkpoint invariants for the orchestration state artifact and the surfaces that write or validate it.
+---
+
 # Orchestrator-State Remediation-Cycle and Human-Interaction Invariants
 
 This rule governs remediation-cycle records and the optional `human_interaction` block in the orchestrator-state checkpoint at `artifacts/orchestration/orchestrator-state.json`. It documents three invariants that must hold for each remediation cycle, plus three invariants for the `human_interaction` block, so that resume and review workflows do not depend on a structurally invalid checkpoint.
