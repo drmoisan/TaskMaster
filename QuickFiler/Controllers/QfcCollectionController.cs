@@ -166,47 +166,84 @@ namespace QuickFiler.Controllers
 
         public int EmailsToMove => _itemGroupsToMove?.Count ?? 0;
 
+        /// <summary>
+        /// Seam used by <see cref="ReadyForMove"/> to present the "not ready" notification.
+        /// Defaults to the exact modal call the getter previously made inline, with the same
+        /// message, caption, buttons and icon. Tests inject a recording delegate so the readiness
+        /// evaluation can be asserted without presenting a dialog, which a unit test cannot do.
+        /// </summary>
+        private Action<string> _notifyNotReady;
+
+        private Action<string> NotifyNotReady =>
+            _notifyNotReady ??= notifications =>
+                MessageBox.Show(
+                    notifications,
+                    "Error Notification",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+
+        /// <summary>
+        /// Evaluates whether every loaded item group has a real destination folder assigned,
+        /// presenting nothing. This is the evaluation half of <see cref="ReadyForMove"/>, split out
+        /// so the decision can be inspected independently of the notification.
+        /// </summary>
+        /// <param name="notifications">
+        /// Receives the text describing every unassigned group when the method returns
+        /// <see langword="false"/>, and <see cref="string.Empty"/> when it returns
+        /// <see langword="true"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when every group has a destination folder that is not one of the
+        /// three list-header sentinel strings.
+        /// </returns>
+        internal bool TryGetMoveReadiness(out string notifications)
+        {
+            bool blReadyForMove = true;
+            string strNotifications =
+                "Can't complete actions! Not all emails assigned to folder"
+                + System.Environment.NewLine;
+
+            foreach (var grp in _itemGroups)
+            {
+                string[] headers =
+                {
+                    "======= SEARCH RESULTS =======",
+                    "======= RECENT SELECTIONS ========",
+                    "========= SUGGESTIONS =========",
+                };
+                if (
+                    (grp.ItemController.SelectedFolder is null)
+                    || headers.Contains(grp.ItemController.SelectedFolder)
+                )
+                {
+                    blReadyForMove = false;
+                    strNotifications =
+                        strNotifications
+                        + grp.ItemController.ItemNumber
+                        + "  "
+                        + grp.ItemController.Mail.SentOn.ToString("MM/dd/yyyy")
+                        + "  "
+                        + grp.ItemController.Mail.Subject
+                        + Environment.NewLine;
+                }
+            }
+
+            notifications = blReadyForMove ? string.Empty : strNotifications;
+            return blReadyForMove;
+        }
+
         public bool ReadyForMove
         {
             get
             {
-                bool blReadyForMove = true;
-                string strNotifications =
-                    "Can't complete actions! Not all emails assigned to folder"
-                    + System.Environment.NewLine;
-
-                foreach (var grp in _itemGroups)
+                if (TryGetMoveReadiness(out string notifications))
                 {
-                    string[] headers =
-                    {
-                        "======= SEARCH RESULTS =======",
-                        "======= RECENT SELECTIONS ========",
-                        "========= SUGGESTIONS =========",
-                    };
-                    if (
-                        (grp.ItemController.SelectedFolder is null)
-                        || headers.Contains(grp.ItemController.SelectedFolder)
-                    )
-                    {
-                        blReadyForMove = false;
-                        strNotifications =
-                            strNotifications
-                            + grp.ItemController.ItemNumber
-                            + "  "
-                            + grp.ItemController.Mail.SentOn.ToString("MM/dd/yyyy")
-                            + "  "
-                            + grp.ItemController.Mail.Subject
-                            + Environment.NewLine;
-                    }
+                    return true;
                 }
-                if (!blReadyForMove)
-                    MessageBox.Show(
-                        strNotifications,
-                        "Error Notification",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error
-                    );
-                return blReadyForMove;
+
+                NotifyNotReady(notifications);
+                return false;
             }
         }
 
