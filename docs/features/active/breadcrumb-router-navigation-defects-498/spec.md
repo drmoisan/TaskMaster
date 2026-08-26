@@ -1040,7 +1040,7 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
       (`BreadcrumbBridgeRouter.cs:484-487`). Verified by the assertion that `SelectedFolderPath` equals the
       presented stem at `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs:115`, so the
       `DestinationOlStem` contract at `EfcDataModel.cs:286`, `:307`, `:325` is unbroken. No work item here.
-- [ ] **AC-14 (#440 Qfc prerequisite, decision D7 — Qfc filing target)** — The D7 ladder rung actually taken is
+- [x] **AC-14 (#440 Qfc prerequisite, decision D7 — Qfc filing target)** — The D7 ladder rung actually taken is
       recorded in this spec's RISK-1 entry with the read-only evidence that selected it, and that rung's stated
       criterion is met: rung 1 — a test shows the Qfc selected-folder value is still the presented stem after
       the chain resolves, with `BreadcrumbSelectionMap.cs` unmodified; rung 2 — a test shows Qfc filing
@@ -1161,7 +1161,30 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
        `BreadcrumbSelectionMap.cs` and execution stops and reports it rather than writing an unowned file.
        *Criterion:* execution halted, the blocking dependency reported with the `BreadcrumbSelectionMap.cs:109`
        citation, and no unowned file written.
-    **Rung taken:** _to be recorded during execution._
+    **Rung taken: RUNG 1 (PREFERRED), delivered.** The presented stem is preserved entirely within
+    owned files and `UtilitiesCS/OutlookObjects/Folder/BreadcrumbSelectionMap.cs` is unmodified.
+    **Read-only evidence that selected the rung:** `BreadcrumbSelectionMap.RowValue` (`:109`) reads
+    `row.Chain[row.Chain.Count - 1].FolderPath`; that leaf segment is constructed by the OWNED
+    `FolderBreadcrumbBridgeRouter.SetSuggestionsAsync` from the public immutable
+    `FolderBreadcrumbSegment` constructor (`FolderBreadcrumbSegment.cs:29-40`), which separates
+    `Key` (navigation identity) from `FolderPath` (the selection value); and the only other readers
+    of `BreadcrumbStateRow.Chain` in `UtilitiesCS/OutlookObjects/Folder` and `QuickFiler` read
+    `DisplayName` (`BreadcrumbRenderProjection.cs:177`) or `Key`
+    (`FolderBreadcrumbBridgeRouter.cs:416`), never the leaf `FolderPath`. The substitution is
+    therefore observationally confined to the filing value. **Evidence artifact:**
+    `docs/features/active/breadcrumb-router-navigation-defects-498/evidence/other/p4-t1-d7-rung-verification.md`,
+    which records the line `D7 RUNG SELECTED: 1`.
+    **Delivery.** `BreadcrumbStateRow` gained an internal constructor overload taking the presented
+    filing target, with a private static `WithFilingTarget` that replaces the leaf segment's
+    `FolderPath` while keeping its `Key`, `DisplayName` and `HasChildren`
+    (`UtilitiesCS/OutlookObjects/Folder/BreadcrumbStateModel.cs`), and `SetSuggestionsAsync` now
+    constructs resolved suggestion rows through it. Rung-1 criterion met:
+    `SelectedFolder_ChainResolvedToFullPath_RemainsPresentedStem` fails before the change
+    (`evidence/regression-testing/p5-t2-d7-red.md`) and passes after
+    (`evidence/regression-testing/p5-t3-d7-rung1-green.md`), with
+    `git status --porcelain --untracked-files=all -- UtilitiesCS/OutlookObjects/Folder/BreadcrumbSelectionMap.cs`
+    producing no output. Rungs 2 and 3 do not apply and are recorded NOT APPLICABLE in
+    `evidence/regression-testing/p5-t4-d7-rung2.md` and `evidence/other/p5-t5-d7-rung3-halt.md`.
 
   - **RISK-2 (former decision D6a) — RESOLVED BY INHERITANCE.** The risk was that the suggestion-row
     percentage would be silently lost, because it worked only while the lineage was broken

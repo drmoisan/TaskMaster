@@ -140,6 +140,39 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             );
         }
 
+        /// <summary>
+        /// Decision D7: resolving the chain must not change what the row files into. The leaf
+        /// segment of the resolved chain carries the store-qualified path, but the selected-folder
+        /// value must remain the presented archive-relative stem, which is the value the QuickFiler
+        /// filing path consumes.
+        /// </summary>
+        [TestMethod]
+        public async Task SelectedFolder_ChainResolvedToFullPath_RemainsPresentedStem()
+        {
+            // Arrange: the strict provider resolves the stem to a chain whose leaf carries the full
+            // store-qualified path "\Inbox\Projects\Apollo".
+            var provider = StemProviderMock();
+            var router = new FolderBreadcrumbBridgeRouter(provider.Object);
+            var suggestion = new FolderRow(
+                StemPath,
+                FolderRowKind.Suggestion,
+                new FolderScore(StemPath, 1000, 0.73)
+            );
+            await router.SetSuggestionsAsync(new[] { suggestion }, CancellationToken.None);
+
+            // Act
+            router.SelectRow(0);
+
+            // Assert
+            router
+                .GetSelectedFolder()
+                .Should()
+                .Be(
+                    StemPath,
+                    "the filing target is the presented stem, not the resolved leaf path"
+                );
+        }
+
         // --- Positive routing ---
 
         [TestMethod]

@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="8f4cbf31-284e-4131-a9e5-f7e1a887a944" name="DanMoisan@MEGALODON4 2026-08-26 10:00:00" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T10:00:00.6059767-04:00" queuing="2026-08-26T10:00:00.6059767-04:00" start="2026-08-26T09:59:58.3336112-04:00" finish="2026-08-26T10:00:00.6281223-04:00" />
+  <TestSettings name="default" id="cf959cd1-3ad9-4145-92bc-f18cba5f919d">
+    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_10_00_00" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="00b170f2-3813-4cdd-9862-55804d47ee9d" testId="11fb8e9b-b1fa-8c1b-8a07-5ec84fc1ed84" testName="SelectedFolder_ChainResolvedToFullPath_RemainsPresentedStem" computerName="MEGALODON4" duration="00:00:00.3989162" startTime="2026-08-26T09:59:59.9363785-04:00" endTime="2026-08-26T10:00:00.5305610-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="00b170f2-3813-4cdd-9862-55804d47ee9d">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="SelectedFolder_ChainResolvedToFullPath_RemainsPresentedStem" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="11fb8e9b-b1fa-8c1b-8a07-5ec84fc1ed84">
+      <Execution id="00b170f2-3813-4cdd-9862-55804d47ee9d" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.FolderBreadcrumbBridgeRouterTests" name="SelectedFolder_ChainResolvedToFullPath_RemainsPresentedStem" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="11fb8e9b-b1fa-8c1b-8a07-5ec84fc1ed84" executionId="00b170f2-3813-4cdd-9862-55804d47ee9d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="1" executed="1" passed="1" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

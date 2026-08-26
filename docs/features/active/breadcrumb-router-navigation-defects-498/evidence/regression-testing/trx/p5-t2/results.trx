@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="8fe8843c-6b6b-4c3f-944d-e2a137e51a99" name="DanMoisan@MEGALODON4 2026-08-26 09:55:41" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T09:55:41.1796501-04:00" queuing="2026-08-26T09:55:41.1796501-04:00" start="2026-08-26T09:55:39.3850768-04:00" finish="2026-08-26T09:55:41.1957408-04:00" />
+  <TestSettings name="default" id="3f68951f-4a7e-4c29-95d0-2276c7ecc2a7">
+    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_09_55_41" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="2d9963ac-f7da-4871-abed-34af32308443" testId="11fb8e9b-b1fa-8c1b-8a07-5ec84fc1ed84" testName="SelectedFolder_ChainResolvedToFullPath_RemainsPresentedStem" computerName="MEGALODON4" duration="00:00:00.2770158" startTime="2026-08-26T09:55:40.7039140-04:00" endTime="2026-08-26T09:55:41.1177569-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2d9963ac-f7da-4871-abed-34af32308443">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Expected router.GetSelectedFolder() to be a match with the expectation because the filing target is the presented stem, not the resolved leaf path, but it differs at index 0:&#xD;
+   ↓ (actual)&#xD;
+  "\Inbox\Projects\Apollo"&#xD;
+  "Projects\Apollo"&#xD;
+   ↑ (expected)</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Primitives.StringEqualityStrategy.AssertForEquality(AssertionChain assertionChain, String subject, String expected) in /_/Src/FluentAssertions/Primitives/StringEqualityStrategy.cs:line 76&#xD;
+   at FluentAssertions.Primitives.StringValidator.Validate(String subject, String expected) in /_/Src/FluentAssertions/Primitives/StringValidator.cs:line 37&#xD;
+   at FluentAssertions.Primitives.StringAssertions`1.Be(String expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/StringAssertions.cs:line 67&#xD;
+   at UtilitiesCS.Test.OutlookObjects.Folder.FolderBreadcrumbBridgeRouterTests.&lt;SelectedFolder_ChainResolvedToFullPath_RemainsPresentedStem&gt;d__12.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\UtilitiesCS.Test\OutlookObjects\Folder\FolderBreadcrumbBridgeRouterTests.cs:line 167&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.&lt;ExecuteInternalAsync&gt;d__58.MoveNext()</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="SelectedFolder_ChainResolvedToFullPath_RemainsPresentedStem" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="11fb8e9b-b1fa-8c1b-8a07-5ec84fc1ed84">
+      <Execution id="2d9963ac-f7da-4871-abed-34af32308443" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.FolderBreadcrumbBridgeRouterTests" name="SelectedFolder_ChainResolvedToFullPath_RemainsPresentedStem" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="11fb8e9b-b1fa-8c1b-8a07-5ec84fc1ed84" executionId="2d9963ac-f7da-4871-abed-34af32308443" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

@@ -52,6 +52,49 @@ namespace UtilitiesCS.OutlookObjects.Folder
             Subfolders = EmptySegments;
         }
 
+        /// <summary>
+        /// Creates a suggestion row whose selection value stays the presented filing target even
+        /// though the chain resolved to store-qualified paths (decision D7).
+        /// </summary>
+        internal BreadcrumbStateRow(
+            string identity,
+            IReadOnlyList<FolderBreadcrumbSegment> chain,
+            double? probability,
+            string filingTarget
+        )
+            : this(identity, WithFilingTarget(chain, filingTarget), probability) { }
+
+        /// <summary>
+        /// Returns the chain with the leaf segment's <c>FolderPath</c> replaced by the presented
+        /// filing target, keeping the leaf's key, display name and child affordance. That
+        /// <c>FolderPath</c> is the value <c>BreadcrumbSelectionMap</c> reports as the selected
+        /// folder, while rendering reads <c>DisplayName</c> and navigation reads <c>Key</c>, so the
+        /// substitution is confined to the filing value, mirroring the immutable
+        /// <see cref="BreadcrumbRow.FilingTarget"/> on the other breadcrumb surface.
+        /// </summary>
+        private static IReadOnlyList<FolderBreadcrumbSegment> WithFilingTarget(
+            IReadOnlyList<FolderBreadcrumbSegment> chain,
+            string filingTarget
+        )
+        {
+            if (chain == null || chain.Count == 0 || filingTarget == null)
+            {
+                // Leave validation of a null or empty chain to the chained constructor.
+                return chain!;
+            }
+
+            var preserved = new List<FolderBreadcrumbSegment>(chain);
+            int leafIndex = preserved.Count - 1;
+            FolderBreadcrumbSegment leaf = preserved[leafIndex];
+            preserved[leafIndex] = new FolderBreadcrumbSegment(
+                leaf.Key,
+                leaf.DisplayName,
+                filingTarget,
+                leaf.HasChildren
+            );
+            return preserved;
+        }
+
         internal BreadcrumbStateRow(string verbatimText)
             : this(
                 DefaultPlainIdentity(verbatimText),

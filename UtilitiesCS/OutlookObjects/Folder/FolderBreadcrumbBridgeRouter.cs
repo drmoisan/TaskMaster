@@ -60,10 +60,12 @@ namespace UtilitiesCS.OutlookObjects.Folder
                                     .ConfigureAwait(false);
                         built.Add(
                             chain != null && chain.Count > 0
+                                // Decision D7: the row still files into the presented path.
                                 ? new BreadcrumbStateRow(
                                     fallback.Identity,
                                     chain,
-                                    row.Score.Value.Probability
+                                    row.Score.Value.Probability,
+                                    path
                                 )
                                 : fallback
                         );
