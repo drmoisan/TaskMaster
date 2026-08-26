@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="3867cceb-070a-43e8-b889-58c218113371" name="<user>@<host> 2026-08-26 11:20:34" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T11:20:34.9728572-04:00" queuing="2026-08-26T11:20:34.9728572-04:00" start="2026-08-26T11:20:33.4931583-04:00" finish="2026-08-26T11:20:34.9873695-04:00" />
+  <TestSettings name="default" id="7d412eca-815d-4fa7-b88d-692f0b933723">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-26_11_20_34" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="5bab4e54-e0f0-4f96-ad31-8fc0ee37f52e" testId="1194c128-3258-8551-b3e1-ad8ec56fbc8c" testName="EliminateSpaceForItems_ReducesMinimumHeightByTemplateHeightTimesRemovalCount" computerName="<host>" duration="00:00:00.1047086" startTime="2026-08-26T11:20:34.6726053-04:00" endTime="2026-08-26T11:20:34.8902982-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5bab4e54-e0f0-4f96-ad31-8fc0ee37f52e">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="f49f55ce-d9f9-4182-8a34-ff91f5d3805e" testId="101811b2-676b-88db-a39e-17539abdd060" testName="MakeSpaceThenEliminateSpace_IsMinimumHeightNeutral" computerName="<host>" duration="00:00:00.0028280" startTime="2026-08-26T11:20:34.8968056-04:00" endTime="2026-08-26T11:20:34.9048244-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f49f55ce-d9f9-4182-8a34-ff91f5d3805e" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="MakeSpaceThenEliminateSpace_IsMinimumHeightNeutral" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="101811b2-676b-88db-a39e-17539abdd060">
+      <Execution id="f49f55ce-d9f9-4182-8a34-ff91f5d3805e" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerLayoutStaTests" name="MakeSpaceThenEliminateSpace_IsMinimumHeightNeutral" />
+    </UnitTest>
+    <UnitTest name="EliminateSpaceForItems_ReducesMinimumHeightByTemplateHeightTimesRemovalCount" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1194c128-3258-8551-b3e1-ad8ec56fbc8c">
+      <Execution id="5bab4e54-e0f0-4f96-ad31-8fc0ee37f52e" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerLayoutStaTests" name="EliminateSpaceForItems_ReducesMinimumHeightByTemplateHeightTimesRemovalCount" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1194c128-3258-8551-b3e1-ad8ec56fbc8c" executionId="5bab4e54-e0f0-4f96-ad31-8fc0ee37f52e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="101811b2-676b-88db-a39e-17539abdd060" executionId="f49f55ce-d9f9-4182-8a34-ff91f5d3805e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="2" executed="2" passed="2" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

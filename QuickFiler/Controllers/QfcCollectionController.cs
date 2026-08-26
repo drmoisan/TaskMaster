@@ -1977,7 +1977,7 @@ namespace QuickFiler.Controllers
         {
             TableLayoutHelper.RemoveSpecificRow(_itemTlp, removalInex, removalCount);
 
-            var rowsToShrinkBy = -removalCount;
+            var rowsToShrinkBy = removalCount;
             _itemTlp.MinimumSize = ShrinkByRows(
                 _itemTlp.MinimumSize,
                 _template.Height,

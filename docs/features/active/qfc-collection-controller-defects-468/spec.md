@@ -1217,7 +1217,7 @@ individually verifiable from evidence.
       (or `ItemViewer`) is `null` and does not throw. Verified by a named MSTest test that throws
       `NullReferenceException` (wrapped in `TargetInvocationException`) before the fix and asserts no
       throw and no viewer text written after.
-- [ ] **AC-11 (#471).** `EliminateSpaceForItems` reduces `_itemTlp.MinimumSize.Height` and
+- [x] **AC-11 (#471).** `EliminateSpaceForItems` reduces `_itemTlp.MinimumSize.Height` and
       `_itemTlp.Size.Height` by exactly `_template.Height * removalCount`, and
       `MakeSpaceForItems(i, n)` followed by `EliminateSpaceForItems(i, n)` returns
       `_itemTlp.MinimumSize.Height` to its starting value. `MakeSpaceForItems` adjusts `MinimumSize`

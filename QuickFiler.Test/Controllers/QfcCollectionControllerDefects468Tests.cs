@@ -277,5 +277,90 @@ namespace QuickFiler.Controllers.Tests
                         + "between the increment and the normal exit, not merely the first statement"
                 );
         }
+
+        /// <summary>
+        /// Issue #471. <c>ShrinkByRows</c> with a positive row count must reduce the height by the
+        /// template row height times that count, rounded once, leaving the width untouched.
+        /// </summary>
+        /// <remarks>
+        /// Two cases are asserted. The first is a whole-pixel row height. The second is a
+        /// half-pixel row height, which pins the rounding mode: <c>Math.Round</c> defaults to
+        /// <c>MidpointRounding.ToEven</c>, so 20.5 rounds to 20, not to 21.
+        /// </remarks>
+        [TestMethod]
+        public void ShrinkByRows_WithPositiveRemovalCount_ReducesHeight()
+        {
+            // Arrange
+            var start = new System.Drawing.Size(300, 200);
+
+            // Act
+            System.Drawing.Size wholePixelRows = QfcCollectionController.ShrinkByRows(
+                start,
+                25f,
+                3
+            );
+            System.Drawing.Size midpointRow = QfcCollectionController.ShrinkByRows(start, 20.5f, 1);
+
+            // Assert
+            wholePixelRows
+                .Height.Should()
+                .Be(125, because: "three 25 px rows removed from 200 px must leave exactly 125 px");
+            wholePixelRows
+                .Width.Should()
+                .Be(300, because: "the row arithmetic must never disturb the width");
+            midpointRow
+                .Height.Should()
+                .Be(
+                    180,
+                    because: "Math.Round defaults to MidpointRounding.ToEven, so one 20.5 px row "
+                        + "rounds to 20 px and 200 px becomes 180 px, not 179 px"
+                );
+        }
+
+        /// <summary>
+        /// Issue #471. <c>ShrinkByRows</c> with a negative row count must <em>increase</em> the
+        /// height by the same amount. This sign-agnostic contract is what the insertion path relies
+        /// on, and it is also why the helper alone cannot prove the removal call site passes the
+        /// right sign — that is covered by the STA test in
+        /// <c>QfcCollectionControllerLayout.StaTests.cs</c>.
+        /// </summary>
+        [TestMethod]
+        public void ShrinkByRows_WithNegativeRemovalCount_IncreasesHeight()
+        {
+            // Arrange
+            var start = new System.Drawing.Size(300, 200);
+
+            // Act
+            System.Drawing.Size wholePixelRows = QfcCollectionController.ShrinkByRows(
+                start,
+                25f,
+                -3
+            );
+            System.Drawing.Size midpointRow = QfcCollectionController.ShrinkByRows(
+                start,
+                20.5f,
+                -1
+            );
+
+            // Assert
+            wholePixelRows
+                .Height.Should()
+                .Be(
+                    275,
+                    because: "a row count of -3 at 25 px must grow 200 px to exactly 275 px, the "
+                        + "exact mirror of the 125 px produced by a row count of +3"
+                );
+            wholePixelRows
+                .Width.Should()
+                .Be(300, because: "the row arithmetic must never disturb the width");
+            midpointRow
+                .Height.Should()
+                .Be(
+                    220,
+                    because: "MidpointRounding.ToEven is symmetric about zero, so -20.5 rounds to "
+                        + "-20 and 200 px becomes 220 px, the exact mirror of the 180 px produced "
+                        + "by a row count of +1"
+                );
+        }
     }
 }
