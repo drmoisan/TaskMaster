@@ -206,8 +206,11 @@ namespace QuickFiler.Controllers.Tests
         [TestMethod]
         public async Task IterateQueueAsync_QueueEmpty()
         {
-            // Arrange
-            var (mockDataModel, mockQfcQueue, _, _) = ArrangeIterate();
+            // Arrange — issue #446 made an empty batch insufficient on its own to close the queue,
+            // so the drained-source stop is now stated explicitly. The assertions are unchanged.
+            var (mockDataModel, mockQfcQueue, _, _) = ArrangeIterate(
+                stop: QfcDequeueStop.SourceExhausted
+            );
 
             // Act
             await _controller.IterateQueueAsync();

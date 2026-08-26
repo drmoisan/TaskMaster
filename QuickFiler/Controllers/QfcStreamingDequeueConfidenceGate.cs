@@ -164,7 +164,7 @@ namespace QuickFiler.Controllers
                 )
                 {
                     LogDeadlineExpiry(accepted.Count, scanned);
-                    return new QfcGateBatch(accepted, QfcDequeueStop.QuantitySatisfied, scanned);
+                    return new QfcGateBatch(accepted, QfcDequeueStop.DeadlineExpired, scanned);
                 }
 
                 MailItem mailItem = _tryTakeNext();
@@ -173,11 +173,7 @@ namespace QuickFiler.Controllers
                     bool sourceCanStillProduce = _sourceActive?.Invoke() == true;
                     if (timeOut <= 0 || (alreadyWaitedForEmptySource && !sourceCanStillProduce))
                     {
-                        return new QfcGateBatch(
-                            accepted,
-                            QfcDequeueStop.QuantitySatisfied,
-                            scanned
-                        );
+                        return new QfcGateBatch(accepted, QfcDequeueStop.SourceExhausted, scanned);
                     }
 
                     alreadyWaitedForEmptySource = true;
@@ -196,7 +192,26 @@ namespace QuickFiler.Controllers
 
                 if (score >= _cutoff)
                 {
-                    accepted.Add(new QfcPreScoredItem(mailItem, string.Empty));
+                    accepted.Add(new QfcPreScoredItem(mailItem, topFolder));
+                }
+                else
+                {
+                    // Issue #426. The discarded candidate is already out of the source queue and
+                    // never reaches the accepted-path unhook, so it is reported here. A monitor
+                    // failure must not abort the scan, hence the catch: the candidate is still
+                    // dropped either way, and aborting would strand the rest of the batch.
+                    try
+                    {
+                        _onRejected?.Invoke(mailItem);
+                    }
+                    catch (System.Exception e)
+                    {
+                        logger.Error(
+                            "Rejection sink threw [QfcStreamingDequeueConfidenceGate.DequeueAsync]; "
+                                + "the candidate is still discarded and the scan continues.",
+                            e
+                        );
+                    }
                 }
 
                 // Report after the accept decision so `accepted` reflects this candidate. Exceptions
