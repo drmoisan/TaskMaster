@@ -1241,7 +1241,7 @@ individually verifiable from evidence.
       zero hits for `(QfcFormController)_parent` plus a named reflection-based MSTest test asserting
       both declared types. `EfcFormController.cs` and all three production construction sites are
       unmodified.
-- [ ] **AC-15 (#474 defect 2).** `TryGetMoveReadiness(out string notifications)` returns `false` with a
+- [x] **AC-15 (#474 defect 2).** `TryGetMoveReadiness(out string notifications)` returns `false` with a
       non-empty notification string for a group with a `null` `SelectedFolder` and `true` with an
       empty string otherwise, **without presenting any dialog**, and the `ReadyForMove` getter still
       invokes the notification in production via a delegate defaulting to the exact prior
@@ -1262,50 +1262,50 @@ individually verifiable from evidence.
       feature's own documents quote every identifier, so a repository-wide zero-hit condition would be
       unsatisfiable by construction. The search commands and their verbatim output are recorded in the
       feature's evidence folder.
-- [ ] **AC-17 (fix order).** The commit sequence follows the fix order in `## Proposed Fix`
+- [x] **AC-17 (fix order).** The commit sequence follows the fix order in `## Proposed Fix`
       (#468 dead-code removal first, then #474-1, then #286, then #469-3, then the remainder), with
       the dead-code removal isolated in its own commit so the file renumbering is a single reviewable
       hunk.
-- [ ] **AC-18 (bugfix workflow).** Every defect with a Tier-1 or Tier-2 regression test has that test
+- [x] **AC-18 (bugfix workflow).** Every defect with a Tier-1 or Tier-2 regression test has that test
       committed and demonstrated failing **before** its production fix, per CLAUDE.md's Bugfix
       Workflow. The fail-before evidence is recorded in the feature's evidence folder.
-- [ ] **AC-19 (fail-before dossier).** A fail-before exception dossier records, with reasons, the four
+- [x] **AC-19 (fail-before dossier).** A fail-before exception dossier records, with reasons, the four
       items that have no deterministic pre-fix red state: #469 defect 3's behavioural ordering test
       (`ConcurrentDictionary` enumeration order is unspecified), #468 (removal, verified by compilation
       and the existing green suite), #474 defect 1 (call site unreachable without `UiThread.Init()`,
       which shows a form), and #469 defect 4 (a contract-documentation change with no behavioural
       delta).
-- [ ] **AC-20 (seams are behaviour-preserving).** Each of the three seams —
+- [x] **AC-20 (seams are behaviour-preserving).** Each of the three seams —
       `DrainBackgroundLoadingTasksAsync`, `TryGetMoveReadiness` + `_notifyNotReady`, and
       `ShrinkByRows` — was landed in a commit that changed no observable production behaviour, with
       the pre-existing `QuickFiler.Test` suite passing unchanged at that commit.
-- [ ] **AC-21 (owned-file discipline).** The diff touches only the files listed under "Files this
+- [x] **AC-21 (owned-file discipline).** The diff touches only the files listed under "Files this
       feature owns" in `## Scope & Non-Goals`. In particular
       `QuickFiler/Controllers/KbdActions.cs`, `QuickFiler/Controllers/QfcFormController.EventHandlers.cs`,
       and `QuickFiler/Controllers/EfcFormController.cs` are **not** modified. Verified by
       `git diff --name-only` against the merge base.
-- [ ] **AC-22 (test-file constraints).** No new test method is added to
+- [x] **AC-22 (test-file constraints).** No new test method is added to
       `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs` (it is at the 500-line cap; its
       only change is the `_itemGroupsToMove` injection type at `:66-71`), every new test file is under
       500 lines, and each new file's `Compile Include` entry sits between the existing
       `Controllers\QfcCollectionControllerDarkModeTests.cs` and `Controllers\QfcDatamodelTests.cs`
       entries in `QuickFiler.Test/QuickFiler.Test.csproj`.
-- [ ] **AC-23 (test policy).** Every new test uses MSTest, Moq, and FluentAssertions; creates no
+- [x] **AC-23 (test policy).** Every new test uses MSTest, Moq, and FluentAssertions; creates no
       temporary file; requires no live Outlook; displays no UI; never calls `UiThread.Init()`; and
       contains no `Thread.Sleep`, `Task.Delay`, or wall-clock wait. Any STA test lives in a
       `*.StaTests.cs` file marked `[STATestClass]`, disposes its `TableLayoutPanel` per test, and calls
       neither `Show()` nor `ShowDialog()`.
-- [ ] **AC-24 (toolchain).** A single clean toolchain pass completes in order —
+- [x] **AC-24 (toolchain).** A single clean toolchain pass completes in order —
       `dotnet tool run csharpier format .` (and `check .`), the analyzer `msbuild … /t:Rebuild …
       /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`, the nullable `msbuild … /t:Rebuild
       … /p:TreatWarningsAsErrors=true`, then `vstest.console.exe … /EnableCodeCoverage` — with zero
       errors in the final pass and the full `QuickFiler.Test` suite green. The exact commands and
       their results are reported.
-- [ ] **AC-25 (no scope creep).** `QfcCollectionController.cs` is **not** split into partial classes,
+- [x] **AC-25 (no scope creep).** `QfcCollectionController.cs` is **not** split into partial classes,
       `[ExcludeFromCodeCoverage]` at `:21` is **not** removed, no NuGet package is added to any
       project, and the `stackMovedItems` parameter is **not** removed. Each is recorded in
       `## Follow-up Candidates` instead.
-- [ ] **AC-26 (downstream handoff).** `## Downstream Notes for Sibling Issues` records for #444 that
+- [x] **AC-26 (downstream handoff).** `## Downstream Notes for Sibling Issues` records for #444 that
       `WireUpKeyboardHandler` is removed by this feature (resolving the duplicate-`KaKey` registration
       as a side effect), that `KbdActions(IEnumerable<UClass>)` at `KbdActions.cs:26-29` skips the
       duplicate check both `Add` overloads perform, and that `EnumerateConversationMembers` never read

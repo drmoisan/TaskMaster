@@ -356,41 +356,41 @@ These are planner decisions the spec explicitly delegates. They are binding on t
 - [x] [P15-T6] Record the restart discipline: if any of P15-T1 through P15-T5 failed or rewrote a file, restart the loop from P15-T1 and record each pass. Artifact `<FEATURE>/evidence/qa-gates/p15-t6-loop-record.<ts>.md`. Acceptance: the artifact enumerates every pass performed and shows that the final pass completed all five steps with no failure and no file rewritten.
 - [x] [P15-T7] Re-audit file sizes **after** the final formatting pass, because formatting can change line counts. Artifact `<FEATURE>/evidence/qa-gates/p15-t7-file-size-audit.<ts>.md` recording the post-format line count of `<CTRL>`, of the two changed existing test files, and of the five new test files, plus the statement that Markdown documentation is exempt from the 500-line cap. Acceptance: the artifact exists, every test file is at most 500 lines, `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs` is at most 500 lines, and the artifact records the post-feature size of `<CTRL>` together with the statement that its excess over the cap is a pre-existing condition this feature reduces rather than creates.
 - [x] [P15-T8] Write the coverage comparison at `<FEATURE>/evidence/qa-gates/p15-t8-coverage-delta.<ts>.md` recording the numeric baseline line and branch rates from P0-T14, the numeric post-change rates from P15-T5, and the delta for each. State plainly that `<CTRL>` carries `ExcludeFromCodeCoverage` and contributes nothing to either denominator, so no part of the delta is attributable to this feature's tests, and that per-defect proof is carried by the named tests indexed in P14-T8. The artifact additionally records a third, explicit changed-code line: "Changed-line coverage: 0 changed production lines lie in the coverage denominator. `QuickFiler/Controllers/QfcCollectionController.cs` carries [ExcludeFromCodeCoverage] at :21, and QuickFiler/Interfaces/IQfcCollectionController.cs gains only XML documentation with no executable line. Changed-code coverage is therefore undefined rather than unmeasured." Acceptance: the artifact exists and records six numeric values (two baseline, two post-change, two deltas) plus the changed-code statement, with no placeholder.
-- [ ] [P15-T9] Commit the final QA evidence with message `docs(468): final QA loop evidence and coverage comparison`. Artifact `<FEATURE>/evidence/qa-gates/p15-t9-commit.<ts>.md`. Acceptance: `EXIT_CODE: 0`.
+- [x] [P15-T9] Commit the final QA evidence with message `docs(468): final QA loop evidence and coverage comparison`. Artifact `<FEATURE>/evidence/qa-gates/p15-t9-commit.<ts>.md`. Acceptance: `EXIT_CODE: 0`.
 
 ### Phase 16 — Acceptance-criteria check-off and closeout
 
 Each check-off task below (P16-T1 through P16-T26) flips exactly one checkbox in the `## Acceptance Criteria` section of `<FEATURE>/spec.md` and records that AC's own evidence pointer alongside it. P16-T27 through P16-T29 record orchestrator deferrals instead of flipping checkboxes: their criteria are satisfied only by orchestrator-owned work (PR-body authorship, the closing merge, issue promotion), so their boxes stay unchecked per the acceptance-criteria-tracking rule that evidence precedes check-off.
 
-- [ ] [P16-T1] Check off AC-1 with pointers to the P3-T2, P3-T3, and P3-T5 artifacts.
-- [ ] [P16-T2] Check off AC-2 with a pointer to the P1-T3 artifact.
-- [ ] [P16-T3] Check off AC-3 with a pointer to the P1-T4 artifact.
-- [ ] [P16-T4] Check off AC-4 with pointers to the P6-T3 and P6-T5 artifacts.
-- [ ] [P16-T5] Check off AC-5 with pointers to the P6-T1, P6-T2, and P6-T5 artifacts.
-- [ ] [P16-T6] Check off AC-6 with pointers to the P4-T3 and P4-T7 artifacts.
-- [ ] [P16-T7] Check off AC-7 with pointers to the P12-T1, P12-T2, and P12-T3 artifacts.
-- [ ] [P16-T8] Check off AC-8 with pointers to the P8-T1, P8-T2, and P8-T4 artifacts.
-- [ ] [P16-T9] Check off AC-9 with pointers to the P7-T7 through P7-T12 artifacts and to the D5, D6, and D7 entries of this plan's Decisions Record.
-- [ ] [P16-T10] Check off AC-10 with pointers to the P9-T1 and P9-T3 artifacts.
-- [ ] [P16-T11] Check off AC-11 with pointers to the P10-T6, P10-T9, and P10-T10 artifacts and to the D10 entry recording the size-height asymmetry.
-- [ ] [P16-T12] Check off AC-12 with pointers to the P11-T4 and P11-T6 artifacts.
-- [ ] [P16-T13] Check off AC-13 with pointers to the P5-T1, P5-T2, and P5-T5 artifacts.
-- [ ] [P16-T14] Check off AC-14 with pointers to the P2-T6, P2-T9, and P2-T10 artifacts.
-- [ ] [P16-T15] Check off AC-15 with pointers to the P13-T4, P13-T5, and P13-T6 artifacts.
-- [ ] [P16-T16] Check off AC-16 with a pointer to the P1-T1 artifact.
-- [ ] [P16-T17] Check off AC-17 with a pointer to the P14-T7 artifact.
-- [ ] [P16-T18] Check off AC-18 with a pointer to the P14-T8 artifact.
-- [ ] [P16-T19] Check off AC-19 with a pointer to the P14-T1 dossier.
-- [ ] [P16-T20] Check off AC-20 with a pointer to the P14-T9 artifact.
-- [ ] [P16-T21] Check off AC-21 with a pointer to the P14-T10 artifact.
-- [ ] [P16-T22] Check off AC-22 with pointers to the P14-T11 and P15-T7 artifacts.
-- [ ] [P16-T23] Check off AC-23 with a pointer to the P14-T12 artifact.
-- [ ] [P16-T24] Check off AC-24 with pointers to the P15-T1 through P15-T6 artifacts.
-- [ ] [P16-T25] Check off AC-25 with a pointer to the P14-T13 artifact.
-- [ ] [P16-T26] Check off AC-26 with a pointer to the P14-T2 artifact.
-- [ ] [P16-T27] Record AC-27 as DEFERRED-TO-ORCHESTRATOR in `<FEATURE>/evidence/qa-gates/p16-t30-ac-reconciliation.<ts>.md`, pointing to the P14-T3 constraints record. Leave AC-27's checkbox in spec.md unchecked: PR-body authorship is orchestrator-owned and this plan produces no PR body, so the criterion is not satisfied by this plan's work.
-- [ ] [P16-T28] Record AC-28 as DEFERRED-TO-ORCHESTRATOR in the same reconciliation artifact, pointing to the P14-T4 closure-set record. Leave AC-28's checkbox unchecked: the merge that actually closes the seven issues is orchestrator-owned and no merge occurs in this plan.
-- [ ] [P16-T29] Record AC-29 as DEFERRED-TO-ORCHESTRATOR in the same reconciliation artifact, pointing to the P14-T6 handoff. Leave AC-29's checkbox unchecked unless P14-T6 records a real issue number for every one of the nine candidates; a `PROMOTION_DEFERRED` disposition on any row keeps the box unchecked.
-- [ ] [P16-T30] Reconcile the checklist: verify that AC-1 through AC-26 are checked, that AC-27, AC-28, and AC-29 are unchecked and each carries a DEFERRED-TO-ORCHESTRATOR row naming the artifact the orchestrator must consume, and that every recorded evidence pointer resolves to a file that exists. Artifact `<FEATURE>/evidence/qa-gates/p16-t30-ac-reconciliation.<ts>.md`. Acceptance: the artifact records twenty-six checked boxes, three deferred rows, and zero unresolved pointers.
+- [x] [P16-T1] Check off AC-1 with pointers to the P3-T2, P3-T3, and P3-T5 artifacts.
+- [x] [P16-T2] Check off AC-2 with a pointer to the P1-T3 artifact.
+- [x] [P16-T3] Check off AC-3 with a pointer to the P1-T4 artifact.
+- [x] [P16-T4] Check off AC-4 with pointers to the P6-T3 and P6-T5 artifacts.
+- [x] [P16-T5] Check off AC-5 with pointers to the P6-T1, P6-T2, and P6-T5 artifacts.
+- [x] [P16-T6] Check off AC-6 with pointers to the P4-T3 and P4-T7 artifacts.
+- [x] [P16-T7] Check off AC-7 with pointers to the P12-T1, P12-T2, and P12-T3 artifacts.
+- [x] [P16-T8] Check off AC-8 with pointers to the P8-T1, P8-T2, and P8-T4 artifacts.
+- [x] [P16-T9] Check off AC-9 with pointers to the P7-T7 through P7-T12 artifacts and to the D5, D6, and D7 entries of this plan's Decisions Record.
+- [x] [P16-T10] Check off AC-10 with pointers to the P9-T1 and P9-T3 artifacts.
+- [x] [P16-T11] Check off AC-11 with pointers to the P10-T6, P10-T9, and P10-T10 artifacts and to the D10 entry recording the size-height asymmetry.
+- [x] [P16-T12] Check off AC-12 with pointers to the P11-T4 and P11-T6 artifacts.
+- [x] [P16-T13] Check off AC-13 with pointers to the P5-T1, P5-T2, and P5-T5 artifacts.
+- [x] [P16-T14] Check off AC-14 with pointers to the P2-T6, P2-T9, and P2-T10 artifacts.
+- [x] [P16-T15] Check off AC-15 with pointers to the P13-T4, P13-T5, and P13-T6 artifacts.
+- [x] [P16-T16] Check off AC-16 with a pointer to the P1-T1 artifact.
+- [x] [P16-T17] Check off AC-17 with a pointer to the P14-T7 artifact.
+- [x] [P16-T18] Check off AC-18 with a pointer to the P14-T8 artifact.
+- [x] [P16-T19] Check off AC-19 with a pointer to the P14-T1 dossier.
+- [x] [P16-T20] Check off AC-20 with a pointer to the P14-T9 artifact.
+- [x] [P16-T21] Check off AC-21 with a pointer to the P14-T10 artifact.
+- [x] [P16-T22] Check off AC-22 with pointers to the P14-T11 and P15-T7 artifacts.
+- [x] [P16-T23] Check off AC-23 with a pointer to the P14-T12 artifact.
+- [x] [P16-T24] Check off AC-24 with pointers to the P15-T1 through P15-T6 artifacts.
+- [x] [P16-T25] Check off AC-25 with a pointer to the P14-T13 artifact.
+- [x] [P16-T26] Check off AC-26 with a pointer to the P14-T2 artifact.
+- [x] [P16-T27] Record AC-27 as DEFERRED-TO-ORCHESTRATOR in `<FEATURE>/evidence/qa-gates/p16-t30-ac-reconciliation.<ts>.md`, pointing to the P14-T3 constraints record. Leave AC-27's checkbox in spec.md unchecked: PR-body authorship is orchestrator-owned and this plan produces no PR body, so the criterion is not satisfied by this plan's work.
+- [x] [P16-T28] Record AC-28 as DEFERRED-TO-ORCHESTRATOR in the same reconciliation artifact, pointing to the P14-T4 closure-set record. Leave AC-28's checkbox unchecked: the merge that actually closes the seven issues is orchestrator-owned and no merge occurs in this plan.
+- [x] [P16-T29] Record AC-29 as DEFERRED-TO-ORCHESTRATOR in the same reconciliation artifact, pointing to the P14-T6 handoff. Leave AC-29's checkbox unchecked unless P14-T6 records a real issue number for every one of the nine candidates; a `PROMOTION_DEFERRED` disposition on any row keeps the box unchecked.
+- [x] [P16-T30] Reconcile the checklist: verify that AC-1 through AC-26 are checked, that AC-27, AC-28, and AC-29 are unchecked and each carries a DEFERRED-TO-ORCHESTRATOR row naming the artifact the orchestrator must consume, and that every recorded evidence pointer resolves to a file that exists. Artifact `<FEATURE>/evidence/qa-gates/p16-t30-ac-reconciliation.<ts>.md`. Acceptance: the artifact records twenty-six checked boxes, three deferred rows, and zero unresolved pointers.
 - [ ] [P16-T31] Commit the acceptance-criteria check-off with message `docs(468): check off AC-1 through AC-26 and record orchestrator deferrals for AC-27 through AC-29`. Artifact `<FEATURE>/evidence/qa-gates/p16-t31-commit.<ts>.md`. Acceptance: `EXIT_CODE: 0`.
 - [ ] [P16-T32] Verify the working tree is clean: run `git status --porcelain` and record the verbatim output. Artifact `<FEATURE>/evidence/qa-gates/p16-t32-clean-tree.<ts>.md`. Acceptance: the output is empty, or every remaining line is under `.claude/agent-memory/` and is recorded as such with its reason.
