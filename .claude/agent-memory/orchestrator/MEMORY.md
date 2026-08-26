@@ -73,6 +73,7 @@
 - [Bash tool mangles MSBuild switches](bash-tool-mangles-msbuild-switches.md) — `/m` becomes `M:/` (MSB1008); run C# tools via `pwsh -NoProfile` with absolute paths
 - [Analyzer gate is vacuous without /t:Rebuild](msbuild-analyzer-gate-vacuous-without-rebuild.md) — `/t:Build` after any earlier build skips CoreCompile and compiles NOTHING at EXIT 0; assert a ZERO `Skipping target "CoreCompile"` count, NOT a csc.exe count (csc is 0 even on real compiles)
 - [Aggregate vstest crash: isolate per assembly](vstest-aggregate-crash-isolate-per-assembly.md) — "Test host process crashed" is environmental; re-run per assembly with /InIsolation
+- [Bare vstest omits the LiveOutlook filter](bare-vstest-omits-liveoutlook-filter.md) — a direct call runs a real-Outlook test the wrapper excludes; launches Outlook and breaks baseline comparability
 - [Direct-csproj build facts (AnyCPU; CS2002)](csharp-direct-csproj-build-facts.md) — a single project needs `AnyCPU` (no space) while the .sln needs `"Any CPU"`; TWAE doesn't promote CS2002
 - [Model-routing hook reads the canonical path only](model-routing-hook-reads-canonical-path-only.md) — it hardcodes artifacts/orchestration/orchestrator-state.json; a child-scoped file alone is blocked
 - [No helper scripts under evidence/](feedback_no_helper_scripts_under_evidence.md) — feature-review's language match is extension-only and path-blind; one retained `.ps1` forces a coverage FAIL
