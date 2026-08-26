@@ -3,9 +3,9 @@
 - **Issue:** #614
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-26T11-00
-- **Status:** Ready for Planning
-- **Version:** 1.0
+- **Last Updated:** 2026-08-26T20-10
+- **Status:** Implemented - all 26 acceptance criteria verified and checked off
+- **Version:** 1.1 (acceptance criteria checked off after implementation)
 - **Work Mode:** `full-bug`
 
 > **Authoritative acceptance-criteria source.** Work mode for this issue is `full-bug`. Per
@@ -997,7 +997,7 @@ Manual validation results are recorded in `<FEATURE>/evidence/qa/` with an ISO-8
 Each criterion below is checkable by an executor or reviewer against named evidence. This section is
 the sole authoritative AC source for this `full-bug` issue.
 
-- [ ] **AC1 (contract type).** A new pure static class `ArchiveStemContract` exists at
+- [x] **AC1 (contract type).** A new pure static class `ArchiveStemContract` exists at
       `UtilitiesCS/OutlookObjects/Folder/ArchiveStemContract.cs`, is registered in
       `UtilitiesCS/UtilitiesCS.csproj` as an explicit `<Compile Include>` item, exposes
       `IsFullOutlookPath(string)`, `RequireArchiveRelativeStem(string, string)`, and
@@ -1005,68 +1005,68 @@ the sole authoritative AC source for this `full-bug` issue.
       environment access, uses no `init` accessor, `record`, or `record struct`, and its file is
       under 500 lines. The decision on whether `IsFullOutlookPath` also rejects drive-rooted input is
       recorded explicitly with its rationale.
-- [ ] **AC2 (D1).** `BreadcrumbBridgeRouter.SelectHierarchyPath`
+- [x] **AC2 (D1).** `BreadcrumbBridgeRouter.SelectHierarchyPath`
       (`BreadcrumbBridgeRouter.cs:494-502`) no longer stores a value produced by the verbatim
       pass-through at `:525`. A unit test asserts that activating a segment not at or under the
       archive root leaves `SelectedFolderPath` unchanged and emits a diagnostic.
-- [ ] **AC3 (D2).** Unit tests assert that store-root segment activation, cross-store segment
+- [x] **AC3 (D2).** Unit tests assert that store-root segment activation, cross-store segment
       activation, and at-or-above-archive-root ancestor activation each leave `SelectedFolderPath`
       unchanged, while a valid under-root ancestor activation and a valid child activation continue
       to set it correctly. Leaf segments remain non-activatable (`BreadcrumbRow.cs:156` unchanged).
-- [ ] **AC4 (D3).** `SelectRow`'s `row.FilingTarget` pass-through (`BreadcrumbBridgeRouter.cs:484-487`)
+- [x] **AC4 (D3).** `SelectRow`'s `row.FilingTarget` pass-through (`BreadcrumbBridgeRouter.cs:484-487`)
       is guarded by the same contract, and a unit test asserts that selecting an out-of-root
       suggestion row does not place a full Outlook path into `SelectedFolderPath`. `ToHierarchyPath`
       (`:140-163`) no longer fabricates an out-of-root hierarchy path by prefixing at `:162`.
-- [ ] **AC5 (D4).** Both `EmailFilerConfig.ResolvePaths` overloads
+- [x] **AC5 (D4).** Both `EmailFilerConfig.ResolvePaths` overloads
       (`EmailFilerConfig.cs:187-188` and `:203-204`) call
       `RequireArchiveRelativeStem(DestinationOlStem, nameof(DestinationOlStem))` **before**
       concatenation. `GetStem` (`:232-235`) and `IsDeleteRelevant` (`:171`) use prefix-anchored,
       `OrdinalIgnoreCase`, separator-terminated comparisons instead of unanchored
       `Replace` / `Contains`.
-- [ ] **AC6 (D5a).** `ToFsFolderpath` validates only the segments it derives and never the
+- [x] **AC6 (D5a).** `ToFsFolderpath` validates only the segments it derives and never the
       caller-supplied `fsAncestorEquivalent`. A test proves that a filesystem ancestor of the shape
       `C:\Users\<user>\OneDrive - <Org>` (containing `.`, a space, and `-`) succeeds for a valid
       relative stem.
-- [ ] **AC7 (D5b).** `IllegalFolderCharacters` (`FolderConverter.cs:39-42`) is replaced by per-segment
+- [x] **AC7 (D5b).** `IllegalFolderCharacters` (`FolderConverter.cs:39-42`) is replaced by per-segment
       Windows name validation covering `Path.GetInvalidFileNameChars()`, trailing dot, trailing
       space, and reserved device names, and no longer bans `.`, `[`, or `]`. Tests cover each of
       those four rules positively and negatively.
-- [ ] **AC8 (D5c).** The `fsPath.Substring(3)` drive-prefix assumption (`FolderConverter.cs:158`) is
+- [x] **AC8 (D5c).** The `fsPath.Substring(3)` drive-prefix assumption (`FolderConverter.cs:158`) is
       removed. Tests prove a UNC ancestor and an ancestor shorter than three characters neither
       throw `ArgumentOutOfRangeException` nor silently mangle the path.
-- [ ] **AC9 (D5d).** The ancestor strip (`FolderConverter.cs:155`) is prefix-anchored, separator-aware,
+- [x] **AC9 (D5d).** The ancestor strip (`FolderConverter.cs:155`) is prefix-anchored, separator-aware,
       and `OrdinalIgnoreCase`. Tests prove a repeated ancestor substring is stripped only at the
       prefix and a case-differing ancestor still matches.
-- [ ] **AC10 (D5e).** The `ArgumentException` raised at `FolderConverter.cs:161-167` no longer embeds
+- [x] **AC10 (D5e).** The `ArgumentException` raised at `FolderConverter.cs:161-167` no longer embeds
       `fsPathExDividers`. A test asserts the message contains neither the mailbox address nor the
       filesystem ancestor.
-- [ ] **AC11 (D5f).** `BuildAlternativesDictionary`'s "Remove illegal characters" option
+- [x] **AC11 (D5f).** `BuildAlternativesDictionary`'s "Remove illegal characters" option
       (`FolderConverter.cs:110-113`) removes only the illegal characters, and the assertion at
       `UtilitiesCS.Test/OutlookObjects/Folder/FolderConverterTests.cs:329` — which currently codifies
       the defect by asserting an empty result — is updated to assert the corrected semantics.
-- [ ] **AC12 (D5g and dead parameter).** `ResolveOlRoot` (`FolderConverter.cs:226-242`) selects the
+- [x] **AC12 (D5g and dead parameter).** `ResolveOlRoot` (`FolderConverter.cs:226-242`) selects the
       root by separator-terminated prefix rather than `Contains`, proven by an `Archive2`-style
       near-miss test. The never-read `bool ask = true` parameter (`:145`) is removed, or marked
       `[Obsolete]` with its dead status documented in code; whichever is chosen is stated explicitly
       in the change description.
-- [ ] **AC13 (D6).** `AppOlObjects.ArchiveRootPath` (`AppOlObjects.cs:237-248`) no longer returns an
+- [x] **AC13 (D6).** `AppOlObjects.ArchiveRootPath` (`AppOlObjects.cs:237-248`) no longer returns an
       unverified, default-store-scoped string combine silently; an unresolvable or cross-store
       archive root produces an explicit, redacted diagnostic. The validation adds no per-filed-item
       COM round-trip. Verified through the mockable `IOlObjects` seam, not against live Outlook.
-- [ ] **AC14 (D7 fallback half).** `AppFileSystemFolderPaths.LoadFolders` (`:206-235`) no longer falls
+- [x] **AC14 (D7 fallback half).** `AppFileSystemFolderPaths.LoadFolders` (`:206-235`) no longer falls
       back for the `OneDrive` key to `AppData` or to `SpecialFolders.First().Value` silently; an
       unresolvable `OneDrive` root fails explicitly with a redacted diagnostic. Any environment
       access introduced for testability uses an injectable delegate seam; no test mutates process
       environment state. `MatchBestSpecialFolder` (`:77-91`) is **not** modified.
-- [ ] **AC15 (D8).** `EfcDataModel.MoveToFolderAsync(MAPIFolder, olAncestor, ...)` (`:344-348`) derives
+- [x] **AC15 (D8).** `EfcDataModel.MoveToFolderAsync(MAPIFolder, olAncestor, ...)` (`:344-348`) derives
       its stem via `TryMakeArchiveRelative` through an extracted pure helper instead of
       `Replace` + `Substring(1)`. Unit tests cover under-root, store-root, cross-store, and
       case-differing-ancestor inputs. Both live callers
       (`EfcFormController.cs:500-507` and `:778-787`) continue to work.
-- [ ] **AC16 (D9).** `EfcFormController.ActionOkAsync` (`:706`) and `IsValidSelection` (`:1038-1050`)
+- [x] **AC16 (D9).** `EfcFormController.ActionOkAsync` (`:706`) and `IsValidSelection` (`:1038-1050`)
       share one predicate. Tests prove OK rejects `null`, `string.Empty`, a `"===="`-prefixed
       sentinel, and a non-relative selection, and accepts a valid relative stem.
-- [ ] **AC17 (primary regression test, fails before and passes after).**
+- [x] **AC17 (primary regression test, fails before and passes after).**
       `UtilitiesCS.Test/EmailIntelligence/EmailFilerConfig_Tests.cs` contains
       `Issue614_ResolvePaths_WithStoreRootStem_RejectsNonRelativeStemWithoutLeakingIdentifiers` with
       inputs `OlAncestor = @"\\mailbox@example.com\Archive"`,
@@ -1075,42 +1075,42 @@ the sole authoritative AC source for this `full-bug` issue.
       parameterless `ResolvePaths()`). Captured evidence shows it **failing** on the pre-fix tree and
       **passing** after the fix. It asserts both that the contract exception is thrown and that the
       message leaks no host identifier.
-- [ ] **AC18 (producer-side companion test).**
+- [x] **AC18 (producer-side companion test).**
       `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterTests.cs` contains a test that binds with
       `archiveRootPath = @"\\mailbox@example.com\Archive"` and a provider chain whose segment 0 is
       `\\mailbox@example.com`, sends `segmentActivate` for index 0, and asserts `SelectedFolderPath`
       is not the store-root full path. Evidence shows it failing pre-fix.
-- [ ] **AC19 (no regression of the #609 / #439 scenarios).** All of the following remain green with
+- [x] **AC19 (no regression of the #609 / #439 scenarios).** All of the following remain green with
       unchanged behaviour: `BreadcrumbBridgeRouterIssue439Tests` (direct row selection, ancestor
       activation, child activation, banner and trash pseudo-rows, mailbox roots containing `@`,
       case-insensitive root match); `Issue609_ResolvePaths_PrefixesAtMailboxArchiveRootExactlyOnce`
       (`EmailFilerConfig_Tests.cs:255-272`); and the `Issue609_FolderPredictor*` projection tests in
       `FolderPredictorTests.cs`. `UtilitiesCS/OutlookObjects/Folder/FolderPredictor.cs` is not
       modified by this change.
-- [ ] **AC20 (explicit, non-absorbing interaction with open issue #499).** The change does not modify
+- [x] **AC20 (explicit, non-absorbing interaction with open issue #499).** The change does not modify
       `BindRowsAsync`'s selection-clearing semantics (`BreadcrumbBridgeRouter.cs:59, :136`), and on
       rejecting an out-of-root activation it leaves `SelectedFolderPath` unchanged rather than
       setting it to `null`. A test asserts the non-null, unchanged behaviour. The change description
       states in one paragraph how #614 interacts with #499 and that #499 remains open and
       unregressed.
-- [ ] **AC21 (redaction).** No production message, log line, diagnostic, test literal, evidence
+- [x] **AC21 (redaction).** No production message, log line, diagnostic, test literal, evidence
       artifact, or document added or modified by this change contains a real mailbox address,
       user-profile path, host name, or organization name. Placeholders of the
       `\\mailbox@example.com` and `C:\Users\<user>\OneDrive - <Org>` shape, or fabricated
       equivalents, are used throughout (open issue #602).
-- [ ] **AC22 (test-policy compliance).** Every new or modified test uses MSTest with Moq and
+- [x] **AC22 (test-policy compliance).** Every new or modified test uses MSTest with Moq and
       FluentAssertions in Arrange–Act–Assert form, is independent, isolated, and deterministic,
       creates no temporary file, and contains no `Thread.Sleep`, `Task.Delay`, `DateTime.Now`,
       `Random.Shared`, or wall-clock wait. Test files live in the mirrored `*.Test` project trees, not
       alongside production source.
-- [ ] **AC23 (coverage).** `ArchiveStemContract` and every new or changed method reach `>= 90%` line
+- [x] **AC23 (coverage).** `ArchiveStemContract` and every new or changed method reach `>= 90%` line
       coverage (CLAUDE.md § UT2). No changed line loses coverage relative to the merge-base baseline.
       A merge-base baseline artifact and a post-change coverage artifact are both captured, and the
       repository-wide testable-denominator figure is recorded with an explicit statement that this
       change does not lower it. All artifacts are written under `<FEATURE>/evidence/baseline/` and
       `<FEATURE>/evidence/coverage/`; none is written to `artifacts/baselines/`,
       `artifacts/coverage/`, or `artifacts/qa/`.
-- [ ] **AC24 (full four-step toolchain).** A single clean pass of all four steps, in order, is
+- [x] **AC24 (full four-step toolchain).** A single clean pass of all four steps, in order, is
       recorded with the exact commands and their exit codes: `dotnet tool run csharpier check .`;
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`;
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`;
@@ -1118,13 +1118,13 @@ the sole authoritative AC source for this `full-bug` issue.
       added and `/t:Build` is not substituted for `/t:Rebuild`. Non-vacuity is demonstrated for both
       MSBuild steps (the build did not skip `CoreCompile` on every project). Evidence is written to
       `<FEATURE>/evidence/qa/`.
-- [ ] **AC25 (scope isolation and file-size limit).** No file outside the in-scope list is modified.
+- [x] **AC25 (scope isolation and file-size limit).** No file outside the in-scope list is modified.
       Specifically unmodified: `UtilitiesCS/OutlookObjects/Folder/FolderPredictor.cs`,
       `UtilitiesCS/EmailIntelligence/FolderConverter.cs` (the uncompiled duplicate), and
       `AppFileSystemFolderPaths.MatchBestSpecialFolder` (`:77-91`). No production, test, or script
       file exceeds 500 lines after the change; the executor records the post-change line count of
       every edited file.
-- [ ] **AC26 (manual validation).** The five manual validation steps in `## Test Strategy` are
+- [x] **AC26 (manual validation).** The five manual validation steps in `## Test Strategy` are
       executed against a live Outlook profile and their results — including the redaction check —
       are recorded in a timestamped artifact under `<FEATURE>/evidence/qa/`. Any step that cannot be
       executed is recorded as not executed, with the reason; it is not silently omitted.
