@@ -1,0 +1,21 @@
+---
+name: project-614-store-root-leak-plan-seams
+description: "#614 plan seams: AC25 conflicts with pre-existing over-limit EfcFormController(1084)/BreadcrumbBridgeRouter(596); near-limit test files get Issue614 companion files; spec's evidence/coverage+evidence/qa normalized; TRX/coverage raw output is host-identifying so summaries-only under evidence"
+metadata:
+  type: project
+---
+
+Plan `plan.2026-08-26T09-59.md` for issue #614 (store-root path leak, work mode full-bug, 26 ACs, 11 phases / 70 tasks).
+
+Key seams a revision loop must not undo:
+
+- **AC25 is unsatisfiable as written.** `QuickFiler/Controllers/EfcFormController.cs` (1084 lines) and `BreadcrumbBridgeRouter.cs` (596) exceed 500 pre-change. Plan encodes net non-growth for those two + <=500 for everything else, and places the D9 shared predicate in a NEW file `QuickFiler/Controllers/EfcSelectionGuard.cs` so EfcFormController does not grow. Flagged for orchestrator review in P10-T25.
+- **Near-limit test files** (FolderConverterTests 446, BreadcrumbBridgeRouterTests 435, EfcDataModelTests 409): new matrices go to `*Issue614Tests.cs` companion files; spec-pinned placements kept (AC17 test in EmailFilerConfig_Tests.cs, AC18 test in BreadcrumbBridgeRouterTests.cs, AC11 `:329` update in place).
+- **Spec names non-canonical evidence paths** `evidence/coverage/` and `evidence/qa/`; plan records two EVIDENCE_LOCATION_OVERRIDE_REJECTED lines normalizing to `evidence/baseline/` + `evidence/qa-gates/`.
+- **Raw TRX and raw coverage output embed account/host names** — AC21 (redaction, issue #602) forbids them under evidence/. Plan sends raw output to gitignored `coverage/trx/<task-id>/` and puts hand-authored redacted Markdown summaries under evidence/. See [[terminal-phase-planner-traps]] and the shared no-absolute-host-paths rule.
+- **Baseline vstest exit code is 1** (pre-existing #594 Console.Out race, 6481/6482): baseline and final test artifacts must declare `ExpectedExitCode: 1` when the flake fires; a suite-wide Failed:0 gate is forbidden by the caller.
+- **#499 boundary:** router rejection leaves SelectedFolderPath unchanged, never null; BindRowsAsync clearing semantics untouched. Empty-archive-root binding mode pass-through preserved (public overload consumers outside EFC chain).
+- **Planner decisions recorded in plan:** IsFullOutlookPath also rejects drive-rooted input; `ask` parameter removed (not Obsolete) after a call-site search task.
+
+**Why:** these were all judgment calls resolving spec-vs-reality conflicts; a naive revision pass re-reading spec.md literally would reintroduce unsatisfiable gates.
+**How to apply:** on any #614 preflight revision, keep these seams unless the orchestrator explicitly overrules a recorded decision.
