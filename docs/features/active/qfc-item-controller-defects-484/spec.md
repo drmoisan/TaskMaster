@@ -881,7 +881,7 @@ regression test. The one exception is verified by source inspection and is recor
 
 ### File-size, toolchain, and coverage
 
-- [ ] Every production and test file touched by this feature is at most 500 lines after the change.
+- [x] Every production and test file touched by this feature is at most 500 lines after the change.
       All nine owned files are recorded with their post-change line counts. Specifically, the seven
       files that receive added lines under the plan's constraint C2 assignment —
       `QfcItemController.ViewerSetup.cs`, `QfcItemController.EventWiring.cs`,
@@ -890,23 +890,23 @@ regression test. The one exception is verified by source inspection and is recor
       `QfcItemController.TestSupport.cs` — are each verified at or under 500 lines, and the two owned
       test files that receive no added lines, `QfcItemController.FocusAndThemeTests.cs` and
       `QfcItemController.ViewerSetupTests.cs`, are verified at their unchanged 497 and 474 lines.
-- [ ] Every new test uses MSTest, Moq, and FluentAssertions, and no new test contains `Thread.Sleep`,
+- [x] Every new test uses MSTest, Moq, and FluentAssertions, and no new test contains `Thread.Sleep`,
       `Task.Delay`, a wall-clock wait, or a temporary file.
-- [ ] Exactly one new test constructs a real `QuickFiler.ItemViewer` (the #481 control-tree unwire test),
+- [x] Exactly one new test constructs a real `QuickFiler.ItemViewer` (the #481 control-tree unwire test),
       it starts no message pump and calls no `Show()`, and it saves and restores the
       `SynchronizationContext` in `try`/`finally`.
-- [ ] `dotnet tool run csharpier check .` reports no formatting differences.
-- [ ] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+- [x] `dotnet tool run csharpier check .` reports no formatting differences.
+- [x] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
       completes with zero errors.
-- [ ] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
+- [x] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
       completes with zero errors.
-- [ ] `vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCoverage /InIsolation`
+- [x] `vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCoverage /InIsolation`
       reports zero failures, and the pass count is greater than or equal to the recorded Phase 0 baseline
       pass count plus the number of tests added.
-- [ ] All four toolchain stages pass in a single consecutive pass with no intervening file modification.
-- [ ] Repository-wide line coverage is `>= 80%`, and coverage for the changed lines is not reduced
+- [x] All four toolchain stages pass in a single consecutive pass with no intervening file modification.
+- [x] Repository-wide line coverage is `>= 80%`, and coverage for the changed lines is not reduced
       relative to the Phase 0 baseline.
-- [ ] Each new production member added by this feature reaches `>= 90%` line coverage, except the
+- [x] Each new production member added by this feature reaches `>= 90%` line coverage, except the
       two capture-field assignments and the two-statement lambda adapter added inside the pre-existing
       `[ExcludeFromCodeCoverage]` `InitializeWebViewAsync`; except `DetachWebResourceRequestedHandler`,
       whose guarded `-=` statement is unreachable without a live WebView2 runtime per research
@@ -919,8 +919,8 @@ regression test. The one exception is verified by source inspection and is recor
       the relocation of the pre-existing uncovered `MessageBox.Show` call at
       `QfcItemController.MailActions.cs:119-121`, so no changed line loses coverage relative to the
       Phase 0 baseline.
-- [ ] No new `[ExcludeFromCodeCoverage]` attribute is introduced anywhere by this feature.
-- [ ] For each of the five issues, evidence records the regression test failing against the unfixed code
+- [x] No new `[ExcludeFromCodeCoverage]` attribute is introduced anywhere by this feature.
+- [x] For each of the five issues, evidence records the regression test failing against the unfixed code
       before the corresponding production change, per the CLAUDE.md Bugfix Workflow.
 
 ---
