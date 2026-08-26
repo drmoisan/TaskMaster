@@ -39,3 +39,30 @@ classifier miss, not a fix.
 - Upstream fix belongs in drm-copilot (mirrored to `.codex/hooks/`), per
   [[claude-files-are-pushdown-owned]]: make the readiness source polymorphic on the epic-mode
   kickoff literals. Widening the keyword regex would re-block epics without making the gate correct.
+
+**The legitimate remedy (established 2026-08-26T19-52Z, feature 468).** The gate can be passed
+*on its merits* rather than by a classifier miss, and this is the way to handle it:
+
+Seed `artifacts/orchestration/orchestrator-state.json` with a truthful per-feature record for the
+one child you are about to delegate — `issue-num`, `feature-folder` under `docs/features/active/`,
+`route_id`, `lifecycle_ready: true` — after verifying each of those four against disk and GitHub
+(issue OPEN, folder present with issue.md/spec.md/plan, `epic-planner-state.json` recording
+preflight clear). Then delegate with a prompt written naturally; it will contain `execute` /
+`atomic-executor`, the classifier will fire, the readiness predicate will actually run, and it
+will pass because the feature really is ready.
+
+This is not evasion and is categorically different from planting preparation-mode literals: you
+are answering the gate's real question honestly rather than arranging for it not to be asked.
+The distinction is the same one drawn in
+[[feedback_merged_child_worktree_still_locked_defer_removal]] — record what is true, never
+fabricate a run that did not happen.
+
+Two operational consequences:
+- That path is singular, so **children take turns owning it**. Archive the incumbent record to a
+  suffixed filename first (e.g. `orchestrator-state.<issue>-completed.<ts>.json`) and add an
+  `authorship_disclosure` block naming who wrote the replacement and why. See
+  [[feedback_fan_in_hook_paths_resolve_to_session_cwd]], which hits the same shared-file problem
+  from the merge-gate side.
+- The underlying defect is untouched: an epic still cannot express N concurrent children in a
+  one-feature schema, so this remedy serialises the gate. The polymorphic-readiness upstream fix
+  remains the real answer.

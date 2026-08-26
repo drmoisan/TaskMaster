@@ -20,7 +20,19 @@ hard-coded `'evidence'` member regardless of the array. Truthy-but-not-`$true` f
 (`1`, `"true"`) deliberately do not count.
 
 `delegation_receipts[]` is separate and needs `agent_name`, `agent_id`, `step`, `phase`,
-`skill_source`, `result_signal`, `artifact_paths` (list). It is a LIST, not an object.
+`skill_source`, `result_signal`, `artifact_paths` (list), **`started_at` and `completed_at`**. It is a
+LIST, not an object. The two timestamps are enforced per-entry (`delegation receipt #N missing key:
+started_at`), so a retrospectively recorded preparation-run receipt still needs them — supply the
+artifact-derived preparation window and say so in a `timestamp_basis` note rather than omitting them.
+
+### Every required agent also needs routing + complexity entries
+
+`--require-model-routing` builds the delegated-agent set from `delegation_receipts[].agent_name`, so
+the moment you add receipts for `task-researcher` / `prd-feature` / `atomic-planner` / `pr-author` to
+satisfy the route contract, you must also add a `model_routing_receipts[]` entry per agent AND a
+`complexity_assessments[]` entry for each phase those receipts name. Under `fable_policy: preferred`
+the C3 cell is `fable` for the four overlay agents (`atomic-planner`, `prd-feature`, `feature-review`,
+`task-researcher`) and stays `opus` for `atomic-executor` and `pr-author`.
 
 ### Bug-promotion tool-name swap, and the divergence it creates
 

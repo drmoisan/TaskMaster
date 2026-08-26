@@ -42,3 +42,28 @@ valuable, and (verify this) touch disjoint file sets. Report the epic as
 delivered-with-one-child-descoped and say plainly that `require_complete=True` fails by design —
 never fabricate a terminal `merge_status` to make the gate pass. The `merge_status` enum has no
 member for this, which is itself worth an issue.
+
+**Sequel (2026-08-26, feature 468): a falsified-premise halt is often REPAIRABLE, not terminal.**
+Earlier guidance here was "descope that child, deliver the rest." That is right when the premise
+failure is a wrong root cause. It is *wrong* when the premise failure is merely incomplete
+execution — a child that died mid-plan is not a poisoned child, just an unfinished one.
+
+468 was halted at 120/180 plan tasks, 15/29 ACs, P13 stopped at T3, P14/P15/P16 unrun, no feature
+review. Rather than descoping it, it was re-delegated to `Agent(orchestrator)` to **resume in
+place at the first unchecked task** (no new worktree, no new branch, explicit "do NOT restart the
+plan and do NOT re-do P0 through P13-T3"). It came back at 180/180 tasks, 28/29 ACs, three audit
+artifacts with zero blocking findings, a green CI run on the PR head, and merged.
+
+**How to tell the two cases apart:** read the plan's checkbox distribution by phase. Contiguous
+early phases complete and a clean cliff at some P#-T# means *interrupted execution* — resume it.
+Findings scattered across phases, or a spec whose root cause the evidence contradicts, means
+*falsified premise* — descope it.
+
+Two details that made the resume safe:
+- Diagnose from the plan and AC checkboxes on disk, never from a completion claim. Both the
+  briefing and the child's own earlier report said 468 was done; the checkboxes said otherwise.
+- Expect the honest residual. 468 finished 28/29 because AC-28 requires the issues be "closed by
+  the merge", and an integration-branch merge cannot close anything — GitHub registers closing
+  references only for PRs targeting the default branch. A child that leaves that box unchecked is
+  behaving correctly; a child that checks it is lying. Verify the referenced issues are still
+  OPEN and treat the unchecked box as a pass.

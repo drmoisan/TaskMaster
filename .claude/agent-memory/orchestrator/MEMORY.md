@@ -57,7 +57,7 @@
 - [Unplanned epic-child worktree mechanics](unplanned-epic-child-worktree-mechanics.md) — cross-worktree delegation works via absolute paths; C# tools need pwsh + explicit paths
 - [Epic generic-constraint cascades across children](epic-generic-constraint-cascades-multiple-children.md) — a `where TKey : notnull` emits CS8714 in EVERY consumer; enumerate all of them first
 - [Parallel epic children name collisions](parallel-epic-children-name-collisions.md) — siblings coin identical type names; CS0101/CS0104 surface only at rebase; rename YOUR types
-- [Model-routing scripts absent on epic integration base](model-routing-scripts-absent-on-epic-integration-base.md) — compute the floor/model by hand; the MCP validator still gates
+- [Model-routing: use the portable PS modules](model-routing-scripts-absent-on-epic-integration-base.md) — when scripts/dev_tools is absent, .claude/lib/model-routing/ModelRouting.psm1 has Get-ComplexityFloor / Resolve-DelegationModel (param is -Band)
 - [Swordfish epic F5 ScoDictionary blocker (RESOLVED)](project_swordfish_epic_f5_blocked_on_old_scodictionary.md) — grep the OLD class base and using, not just the *New replacement
 - [Epic-child stale local integration ref](project_epic_child_stale_local_integration_ref.md) — `git fetch` and branch from `origin/<branch>`, never the bare local name
 - [Portable completion gate allows blocked child](portable-completion-gate-allows-blocked-child.md) — no Python validator here, so a blocked child can still terminate and open a PR

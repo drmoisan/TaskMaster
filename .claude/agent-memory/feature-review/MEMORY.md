@@ -64,6 +64,7 @@
 - [511-rescope-review-residuals](project_511-rescope-review-residuals.md) — 2026-08-24 re-audit PASS/0 blocking; residuals CR-1 stale RCA narrative + CR-2 AC-vs-deleted-TRX wording; PR must not close #511/#571 (#592/#594/#597 carry the real defects)
 - [review worktree differs from session cwd](project_review-worktree-differs-from-session-cwd-mirror-artifacts.md) — hook Test-Paths relative to its cwd; mirror the 3 artifacts into the session cwd's docs/features/active/<feature>/ and simulate from BOTH cwds
 - [484-review-residuals](project_484-review-residuals.md) — PASS/0 blocking; F1 ApplyReadEmailFormat TOCTOU (promote), F4 OneDrive silent-skip; D-1/D-2 plan-provision AC divergences accepted; 4 owned files at 498-499 lines
+- [468-review-residuals](project_468-review-residuals.md) — PASS/0 blocking; dual-floor coverage rows (80 PASS / 85 FAIL non-blocking) hook-verified; #623 baseline stale (2437), AC-27/28 deferred to default-branch merge
 - [446-review-residuals](project_446-review-residuals.md) — PASS/0 blocking; AC28 whole-type-vs-AC18 contradiction owed maintainer amendment (71.0% arithmetic ceiling); issue.md "Also closes #427" hazard; Actions.cs carve-out bound by COM loaders not MessageBox
 
 - [614-review-residuals](project_614-review-residuals.md) — cycle-2 exit NO-GO/1 blocking: RC-1 widened filing guard admits archive-root-exact row that RequireArchiveRelativeStem throws on, post-Hide async-void crash; CR-1 closed
