@@ -63,5 +63,7 @@
 - [449-review-residuals](project_449-review-residuals.md) — PASS/0 blocking; untracked #584 promotion doc owed a non-child route; unused usings in base test file; AC-supersession-via-plan-provision pattern validated
 - [511-rescope-review-residuals](project_511-rescope-review-residuals.md) — 2026-08-24 re-audit PASS/0 blocking; residuals CR-1 stale RCA narrative + CR-2 AC-vs-deleted-TRX wording; PR must not close #511/#571 (#592/#594/#597 carry the real defects)
 
+- [614-review-residuals](project_614-review-residuals.md) — PASS/0 blocking; CR-1 OK-path Length>=3 filing regression, CR-2 router/guard rooted-value disagreement, FolderConverter alt-name cluster is unreachable dead code, SortEmail.ResolvePaths unmigrated; coverage 84.8696% => FAIL row required
+
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
