@@ -32,7 +32,7 @@ namespace QuickFiler.Controllers
             IQfcFormViewer viewerInstance,
             QfEnums.InitTypeEnum InitType,
             IFilerHomeController homeController,
-            IFilerFormController parent,
+            IQfcFormController parent,
             CancellationTokenSource tokenSource,
             CancellationToken token,
             TlpCellStates tlpStates
@@ -61,7 +61,7 @@ namespace QuickFiler.Controllers
         private QfEnums.InitTypeEnum _initType;
         private IApplicationGlobals _globals;
         private IFilerHomeController _homeController;
-        private IFilerFormController _parent;
+        private IQfcFormController _parent;
 
         //private int _itemHeight;
         private Panel _itemPanel;
@@ -1022,7 +1022,7 @@ namespace QuickFiler.Controllers
                 ResetPanelHeight();
                 if (_itemGroups.Count == 0)
                 {
-                    await ((QfcFormController)_parent).SkipGroupAsync();
+                    await _parent.SkipGroupAsync();
                     swapAlreadyRegistered = true;
                     //_parent.ActionOkAsync();
                 }

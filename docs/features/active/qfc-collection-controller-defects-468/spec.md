@@ -1235,7 +1235,7 @@ individually verifiable from evidence.
       rather than being swallowed by the broad catch, and a single root failure produces a single log
       entry — proven by `mockMail.VerifyGet(x => x.Subject, Times.Never())` after the first catch.
       Verified by two named MSTest tests, each red before the fix.
-- [ ] **AC-14 (#474 defect 1).** `QfcCollectionController`'s constructor parameter 5 and its `_parent`
+- [x] **AC-14 (#474 defect 1).** `QfcCollectionController`'s constructor parameter 5 and its `_parent`
       field are both typed `QuickFiler.Controllers.IQfcFormController`, and the expression
       `(QfcFormController)_parent` appears nowhere in the file. Verified by a source search returning
       zero hits for `(QfcFormController)_parent` plus a named reflection-based MSTest test asserting

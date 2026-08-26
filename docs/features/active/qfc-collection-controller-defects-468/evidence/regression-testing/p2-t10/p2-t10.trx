@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="8c654f9f-d740-4976-bf6c-a14231202ca6" name="<user>@<host> 2026-08-26 09:17:51" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T09:17:51.6264899-04:00" queuing="2026-08-26T09:17:51.6264899-04:00" start="2026-08-26T09:17:50.4587793-04:00" finish="2026-08-26T09:17:51.6412651-04:00" />
+  <TestSettings name="default" id="14c2ede0-b620-4c68-bc94-874af552ad53">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-26_09_17_51" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="9822cff4-9b41-45ae-8d09-8393199bdfa7" testId="129c97a6-f2d2-80c0-8525-6caf12e10309" testName="ParentFieldAndConstructorParameterAreTypedIQfcFormController" computerName="<host>" duration="00:00:00.0453458" startTime="2026-08-26T09:17:51.3802871-04:00" endTime="2026-08-26T09:17:51.5648366-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9822cff4-9b41-45ae-8d09-8393199bdfa7">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="ParentFieldAndConstructorParameterAreTypedIQfcFormController" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a21a3b3e3120ed6de\quickfiler.test\bin\debug\quickfiler.test.dll" id="129c97a6-f2d2-80c0-8525-6caf12e10309">
+      <Execution id="9822cff4-9b41-45ae-8d09-8393199bdfa7" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468Tests" name="ParentFieldAndConstructorParameterAreTypedIQfcFormController" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="129c97a6-f2d2-80c0-8525-6caf12e10309" executionId="9822cff4-9b41-45ae-8d09-8393199bdfa7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="1" executed="1" passed="1" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
