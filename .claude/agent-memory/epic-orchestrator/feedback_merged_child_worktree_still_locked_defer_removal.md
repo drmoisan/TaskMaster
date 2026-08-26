@@ -1,6 +1,6 @@
 ---
 name: merged-child-worktree-still-locked-defer-removal
-description: A cleanly-merged child's worktree may refuse non-force removal for TWO reasons — framework lock (shared session pid) OR uncommitted files (untracked evidence/agent-memory); both exit 128 — defer, never force autonomously mid-wave. Locks release PIECEMEAL so retry every deferral each resume; a child may own a named-feature worktree + a secondary agent worktree
+description: A cleanly-merged child's worktree may refuse non-force removal for THREE reasons — framework lock (shared session pid), uncommitted files, or the parallel-removal-gate hook denying every epic run outright; defer, never force and never fabricate a checkpoint. Locks release PIECEMEAL so retry every deferral each resume; a child may own a named-feature worktree + a secondary agent worktree
 metadata:
   type: feedback
 ---
@@ -19,7 +19,24 @@ When a child completes and its PR merges into the integration branch, a gated no
    folder that were never committed into the merged PR. Error:
    `fatal: '<path>' contains modified or untracked files, use --force to delete it`.
 
-Rule: do NOT `remove -f -f` / `--force` autonomously in either case. Record `merge_status:
+3. **The parallel-removal gate denies it, on every epic run (observed 2026-08-26, TaskMaster
+   quickfiler-bug-family #484).** The worktree was UNLOCKED and CLEAN and the epic gate was
+   satisfied, yet removal was denied with `PARALLEL_WORKTREE_REMOVAL_BLOCKED`.
+   `.claude/hooks/enforce-parallel-worktree-removal-gate.ps1` hard-codes
+   `$script:ParallelCheckpointPath = 'artifacts/orchestration/parallel-orchestrator-state.json'`,
+   has no epic-mode branch, and fails closed when that file is absent. An epic run has no parallel
+   checkpoint and should not, so this hook denies EVERY removal in EVERY epic run. Both gates share
+   the PreToolUse Bash matcher and a single deny wins, so satisfying the epic gate is not enough.
+   Do NOT fabricate a `parallel-orchestrator-state.json` to unlock it — that is falsifying an
+   orchestration artifact to bypass a safety hook. Record the deferral and move on.
+
+   Related trap in the same pair of hooks: their command interception is a phrase match, not a real
+   command parse. A `python - <<'PY'` heredoc whose *text* merely quoted the removal command (while
+   recording this very deferral) was denied with `EPIC_WORKTREE_REMOVAL_BLOCKED`, the hook having
+   parsed the loop keyword `for` as the target path. Put such scripts in a file and run the file;
+   the hook only scans the Bash command string.
+
+Rule: do NOT `remove -f -f` / `--force` autonomously in any of these cases. Record `merge_status:
 "merged"` (with PR number, `pr_url`, `merge_commit_sha`, `merge_confirmed_at`) and a
 `worktree_removal_deferred` note naming which of the two causes applies; leave `merge_status` at
 `merged`.

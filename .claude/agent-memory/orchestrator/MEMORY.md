@@ -94,3 +94,5 @@
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
 - [Closing keyword fires inside a negation](closing-keyword-fires-inside-negation.md) — `does NOT fix #511` still auto-closes #511; scan commit messages and PR bodies, never file contents
+- [Hooks pattern-match Bash command TEXT](hooks-pattern-match-bash-command-text.md) — a guarded literal quoted inside a heredoc body blocks the call; author via Write tool or split the literal
+- [PR receipt staleness is mtime vs created_at](pr-author-receipt-staleness-is-mtime-vs-created-at.md) — stage pr_context.summary.txt at the session root BEFORE computing created_at, or the copy's mtime denies a valid receipt

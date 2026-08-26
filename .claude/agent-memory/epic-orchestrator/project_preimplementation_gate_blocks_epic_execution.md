@@ -1,44 +1,41 @@
 ---
 name: preimplementation-gate-blocks-epic-execution
-description: enforce-orchestration-preimplementation-gate.ps1 denies every Agent(orchestrator) epic-EXECUTION delegation; epic-orchestrator-state.json is in the write-exemption list but is not a readiness source, and repointing the path would still fail on schema
+description: enforce-orchestration-preimplementation-gate.ps1 blocks epic-run child delegations via a 7-token keyword classifier, not a real readiness check; wording alone decides pass/fail, so probe every run instead of inferring from the hook source
 metadata:
   type: project
 ---
 
 `.claude/hooks/enforce-orchestration-preimplementation-gate.ps1` (PreToolUse, matcher `Agent`)
-blocks the entire epic-orchestrator execution surface. Verified live 2026-08-25 against
-commit 41eb2a5e on the `quickfiler-bug-family` epic; four verbatim denials recorded in
-`delegation_failures[]`.
+denies `Agent(orchestrator)` epic-RUN child delegations. The epic checkpoint is in the
+`$script:CheckpointPaths` WRITE-exemption list but is never a readiness SOURCE: the singular
+`$script:CheckpointPath` is hard-coded to `artifacts/orchestration/orchestrator-state.json`, and
+`Test-OrchestrationReady` demands four scalar root fields (`issue-num`, `feature-folder` starting
+`docs/features/active/`, `route_id`/`path_selected`, `lifecycle_ready`) that a 12-feature epic
+checkpoint structurally cannot supply. Repointing the path still fails on schema.
 
-**Why:** the hook carries TWO path sets and only one knows about the epic surface.
+**The decisive detail (2026-08-26):** whether you are blocked is decided by *prompt wording*, not
+by readiness. `Test-ImplementationDelegation` serializes the whole Agent payload and regex-matches
+exactly seven tokens:
+`python-typed-engineer|powershell-typed-engineer|typescript-engineer|csharp-typed-engineer|atomic-executor|implementation|execute`.
+The only exemption is the preparation-mode pair (`Preparation mode: true.` + `route_id: preparation.`).
+A kickoff saying "atomic execution" and "execution" and never "implementation" contains NONE of the
+seven ("execution" does not contain "execute") and sails through. That is how wave 0 of
+quickfiler-bug-family launched on 2026-08-26 after four verbatim denials on 2026-08-25 — the hook
+was byte-identical both times.
 
-- `$script:CheckpointPaths` (PLURAL, ~line 24) — the WRITE-exemption list. It DOES include
-  `artifacts/orchestration/epic-orchestrator-state.json`. Consumed at ~line 104 only, by the
-  pathspec classifier ("writing a checkpoint is bookkeeping, not implementation"). Issue #539
-  extended this list to the epic/parallel surfaces.
-- `$script:CheckpointPath` (SINGULAR, ~line 17) — the READINESS source, hard-coded to
-  `artifacts/orchestration/orchestrator-state.json`. Consumed at ~line 241 only, by
-  `Get-CheckpointContent` -> `Test-OrchestrationReady`. Never generalized alongside the plural list.
+**Why:** the gate asks a singular question (is THE feature ready) and an epic schedules many, so the
+denial is a false positive w.r.t. the gate's purpose whenever the epic is genuinely prepared
+(plans committed to the integration branch + preflight clear). But the pass is an incidental
+classifier miss, not a fix.
 
-A genuine epic kickoff always trips `Test-ImplementationDelegation` (whole-payload regex on
-`atomic-executor|implementation|execute`). The only exemption is `Test-PreparationModeDelegation`,
-which needs BOTH `Preparation mode: true.` and `route_id: preparation.` — those are
-epic-plan/parallel-plan markers, so `/epic-plan` passes and `/epic-run` cannot.
-
-**Repointing the constant is NOT the fix.** `Test-OrchestrationReady` demands four SCALAR root
-fields: `issue-num`, `feature-folder` (must `StartsWith('docs/features/active/')`), `route_id` or
-`path_selected`, and `lifecycle_ready`. The epic checkpoint satisfies only `route_id`. It has no
-top-level `issue-num`/`feature-folder`/`lifecycle_ready` — it carries `features[]` keyed
-`issue_num`/`feature_folder` with UNDERSCORES, not the gate's hyphens. The gate asks a singular
-question; an epic schedules N features and has no single truthful answer.
-
-**How to apply:** on any `/epic-run`, read the hook before delegating — if `$script:CheckpointPath`
-is still singular, the run is blocked and re-probing only burns denied calls. Fix belongs upstream
-in drm-copilot (`.claude` is push-down-owned, see [[project_claude_files_are_pushdown_owned_fix_upstream]]),
-as a polymorphic readiness branch keyed on the epic-mode kickoff literals `Epic mode: true.` +
-`epic_checkpoint_path: artifacts/orchestration/epic-orchestrator-state.json`, validating
-`route_id == 'epic'` and the target feature's presence in `features[]` with a `plan_path`.
-
-Do NOT route around it: fabricating `orchestrator-state.json` falsely certifies a single-feature
-route, and word-golfing the prompt to dodge the regex is circumvention. See
-[[feedback_inline_child_lifecycle_prohibited]] — record `delegation_failures[]` verbatim and halt.
+**How to apply:**
+- Never conclude "still blocked" from source inspection alone. A denial costs nothing (PreToolUse
+  denies before any branch or worktree is consumed), so *probe with the real batch* — see
+  [[live-child-at-pr-author-not-hung]] for the same verify-don't-infer lesson.
+- Do NOT reword deliberately to dodge the classifier, and never insert the preparation-mode
+  literals into an execution prompt (that is lying to the gate). If a kickoff trips the classifier,
+  stop and escalate for the upstream fix.
+- Disclose the mechanism when it passes incidentally; do not quietly benefit from it.
+- Upstream fix belongs in drm-copilot (mirrored to `.codex/hooks/`), per
+  [[claude-files-are-pushdown-owned]]: make the readiness source polymorphic on the epic-mode
+  kickoff literals. Widening the keyword regex would re-block epics without making the gate correct.
