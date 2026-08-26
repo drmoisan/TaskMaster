@@ -17,12 +17,12 @@ ExpectedExitCode: 1
 - Recorded failure message (redaction-safe; the mailbox literal is the fabricated
   `mailbox@example.com` placeholder used by the test):
 
-  `Expected _router.SelectedFolderPath not to be "\mailbox@example.com".`
+  `Expected _router.SelectedFolderPath not to be "\\mailbox@example.com".`
 
 - Interpretation: the D1 verbatim pass-through is observed. The test binds the router through
   the internal `BindRowsAsync(rows, scores, archiveRootPath, ct)` overload with
-  `archiveRootPath = @"\mailbox@example.com\Archive"` and a provider ancestor chain whose
-  segment 0 is the mailbox store root `@"\mailbox@example.com"`, then sends
+  `archiveRootPath = @"\\mailbox@example.com\Archive"` and a provider ancestor chain whose
+  segment 0 is the mailbox store root `@"\\mailbox@example.com"`, then sends
   `{"type":"segmentActivate","rowId":"row-0","segmentIndex":0}`. Pre-fix,
   `BreadcrumbBridgeRouter.ToArchiveRelativePath` finds the activated full path is neither equal
   to nor under the bound archive root and returns it unchanged, so `SelectHierarchyPath` stores

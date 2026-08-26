@@ -72,8 +72,7 @@ namespace QuickFiler.Test.Controllers
             // Assert: unchanged, non-null, and diagnosed without leaking the path.
             _router.SelectedFolderPath.Should().Be(RelativeTarget);
             _router.SelectedFolderPath.Should().NotBeNull();
-            RenderedMessages().Should().ContainSingle(message => message.Contains("rejected"));
-            RenderedMessages().Should().NotContain(message => message.Contains("mailbox@"));
+            AssertRejectionDiagnosticWithoutIdentifiers("rejected");
         }
 
         [TestMethod]
@@ -95,7 +94,7 @@ namespace QuickFiler.Test.Controllers
 
             // Assert
             _router.SelectedFolderPath.Should().Be(RelativeTarget);
-            RenderedMessages().Should().ContainSingle(message => message.Contains("rejected"));
+            AssertRejectionDiagnosticWithoutIdentifiers("rejected");
         }
 
         [TestMethod]
@@ -111,7 +110,7 @@ namespace QuickFiler.Test.Controllers
 
             // Assert
             _router.SelectedFolderPath.Should().Be(RelativeTarget);
-            RenderedMessages().Should().ContainSingle(message => message.Contains("rejected"));
+            AssertRejectionDiagnosticWithoutIdentifiers("rejected");
         }
 
         [TestMethod]
@@ -163,9 +162,7 @@ namespace QuickFiler.Test.Controllers
 
             // Assert: rejected by the row itself, so the selection is untouched.
             _router.SelectedFolderPath.Should().Be(RelativeTarget);
-            RenderedMessages()
-                .Should()
-                .ContainSingle(message => message.Contains("activation rejected"));
+            AssertRejectionDiagnosticWithoutIdentifiers("activation rejected");
         }
 
         [TestMethod]
@@ -293,9 +290,39 @@ namespace QuickFiler.Test.Controllers
             return "{\"type\":\"rowSelected\",\"rowId\":\"row-" + rowIndex + "\"}";
         }
 
+        /// <summary>
+        /// Messages captured from the router's logger during this test.
+        /// <para>
+        /// log4net binds one logger per TYPE, so the appender is shared with any router test
+        /// running concurrently in another class. Concurrency can only ADD events, never remove
+        /// them, so assertions here are existence claims ("a value-free rejection was logged")
+        /// rather than exact counts. The behavioural half of each test - that the selection is
+        /// unchanged - is what proves the rejection came from THIS router: had it not rejected,
+        /// the selection would have changed.
+        /// </para>
+        /// </summary>
         private string[] RenderedMessages()
         {
             return _appender.GetEvents().Select(entry => entry.RenderedMessage).ToArray();
+        }
+
+        /// <summary>Asserts a value-free rejection diagnostic was logged (AC2, AC3, AC21).</summary>
+        private void AssertRejectionDiagnosticWithoutIdentifiers(string fragment)
+        {
+            string[] messages = RenderedMessages();
+            messages
+                .Should()
+                .Contain(
+                    message => message.Contains(fragment),
+                    "the rejection must be diagnosable"
+                );
+            messages
+                .Where(message => message.Contains(fragment))
+                .Should()
+                .OnlyContain(
+                    message => !message.Contains("@"),
+                    "a rejection diagnostic must never embed the rejected path"
+                );
         }
 
         private static FolderTreeNodeKey Key(string path)

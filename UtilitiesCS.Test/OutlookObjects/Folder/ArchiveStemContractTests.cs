@@ -296,6 +296,22 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         }
 
         [TestMethod]
+        public void TryMakeArchiveRelative_SeparatorOnlyRoot_ReturnsFalse()
+        {
+            // Arrange / Act: a root consisting only of separators is not whitespace, so it passes
+            // the emptiness guard, but it trims to length zero and names no folder.
+            bool outputValue = ArchiveStemContract.TryMakeArchiveRelative(
+                ArchiveRoot,
+                @"\\",
+                out string stem
+            );
+
+            // Assert
+            outputValue.Should().BeFalse("a separator-only root anchors nothing");
+            stem.Should().BeEmpty();
+        }
+
+        [TestMethod]
         public void TryMakeArchiveRelative_EmptyOrNullInputs_ReturnFalse()
         {
             // Arrange / Act / Assert
