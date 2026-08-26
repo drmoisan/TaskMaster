@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="664b6ccf-c1ef-4558-a4b9-664dfeacfbbb" name="REDACTED-USER@REDACTED-HOST 2026-08-26 09:50:06" runUser="REDACTED-HOST\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T09:50:06.2570630-04:00" queuing="2026-08-26T09:50:06.2570630-04:00" start="2026-08-26T09:50:04.1455183-04:00" finish="2026-08-26T09:50:06.2771056-04:00" />
+  <TestSettings name="default" id="ce1faa15-ded6-4b25-8fcf-068036172c6e">
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-26_09_50_06" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="8d19e40f-893c-4ee8-ad3b-428a7e7573b6" testId="136b8157-d28b-859a-8a7f-08a1e6c5017a" testName="ResolveLeafKeyAsync_EfcFullHierarchyPath_ResolvesByExactFirstPassWithoutSuffixFallback" computerName="REDACTED-HOST" duration="00:00:00.2346600" startTime="2026-08-26T09:50:05.7475028-04:00" endTime="2026-08-26T09:50:06.1767820-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8d19e40f-893c-4ee8-ad3b-428a7e7573b6">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="c9c1fe39-d903-4207-8256-cab7c4af7c59" testId="19e99eca-f9c1-8b08-ab54-f05ec3f28e06" testName="ResolveLeafKeyAsync_AmbiguousStemWithDecoyNode_ReturnsNullAndLogsError" computerName="REDACTED-HOST" duration="00:00:00.0039662" startTime="2026-08-26T09:50:06.1838022-04:00" endTime="2026-08-26T09:50:06.1928211-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c9c1fe39-d903-4207-8256-cab7c4af7c59" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="ResolveLeafKeyAsync_EfcFullHierarchyPath_ResolvesByExactFirstPassWithoutSuffixFallback" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="136b8157-d28b-859a-8a7f-08a1e6c5017a">
+      <Execution id="8d19e40f-893c-4ee8-ad3b-428a7e7573b6" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.OutlookFolderHierarchyProviderTests" name="ResolveLeafKeyAsync_EfcFullHierarchyPath_ResolvesByExactFirstPassWithoutSuffixFallback" />
+    </UnitTest>
+    <UnitTest name="ResolveLeafKeyAsync_AmbiguousStemWithDecoyNode_ReturnsNullAndLogsError" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="19e99eca-f9c1-8b08-ab54-f05ec3f28e06">
+      <Execution id="c9c1fe39-d903-4207-8256-cab7c4af7c59" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.OutlookFolderHierarchyProviderTests" name="ResolveLeafKeyAsync_AmbiguousStemWithDecoyNode_ReturnsNullAndLogsError" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="136b8157-d28b-859a-8a7f-08a1e6c5017a" executionId="8d19e40f-893c-4ee8-ad3b-428a7e7573b6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19e99eca-f9c1-8b08-ab54-f05ec3f28e06" executionId="c9c1fe39-d903-4207-8256-cab7c4af7c59" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="2" executed="2" passed="2" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

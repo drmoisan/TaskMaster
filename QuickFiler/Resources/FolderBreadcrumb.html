@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <!--
   QuickFiler breadcrumb page (#351, #400). Self-contained: inline CSS + JS, no external fetches or
   third-party libraries. Rendering is driven by host bridge messages over window.chrome.webview.
@@ -393,11 +393,12 @@
   }
 
   function onArrow(direction) {
+    // #440: the C# router owns the Left/Right tree transitions and reports unhandledArrow itself
+    // when none applies, so the page must not pre-filter a suggestion row by its view state.
     var row = selectedRow();
-    var canRight =
-      row !== null && (row.collapsed || (!row.leafExpanded && rowHasOpenAffordance(row)));
-    var canLeft = row !== null && row.leafExpanded;
-    var can = direction === "right" ? canRight : canLeft;
+    var can =
+      row !== null &&
+      (row.isSuggestion || row.collapsed || row.leafExpanded || rowHasOpenAffordance(row));
     post(can
       ? { type: "arrowKey", direction: direction }
       : { type: "unhandledArrow", direction: direction });

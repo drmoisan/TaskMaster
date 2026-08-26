@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="c81bb922-ed4d-4c26-9ed2-cad320feafc2" name="REDACTED-USER@REDACTED-HOST 2026-08-26 10:26:58" runUser="REDACTED-HOST\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T10:26:58.6306837-04:00" queuing="2026-08-26T10:26:58.6306837-04:00" start="2026-08-26T10:26:56.8892360-04:00" finish="2026-08-26T10:26:58.6490051-04:00" />
+  <TestSettings name="default" id="fc49bd66-ff40-43b6-ab79-c8c5a2f41a50">
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-26_10_26_58" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="5b3808ff-8006-416b-87ae-2f5cb002fdac" testId="12c0e890-7881-8496-8d28-5fb84da1c09e" testName="RightArrow_QfcSelectedParentNode_ExpandsIntoChildren" computerName="REDACTED-HOST" duration="00:00:00.0019704" startTime="2026-08-26T10:26:58.5580237-04:00" endTime="2026-08-26T10:26:58.5645316-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5b3808ff-8006-416b-87ae-2f5cb002fdac">
+      <Output>
+        <ErrorInfo>
+          <Message>Expected handled to be True because the descent transition selects the first child, but found False.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Primitives.BooleanAssertions`1.BeTrue(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/BooleanAssertions.cs:line 82&#xD;
+   at UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests.RightArrow_QfcSelectedParentNode_ExpandsIntoChildren() in REDACTED-REPO-ROOT\UtilitiesCS.Test\OutlookObjects\Folder\BreadcrumbStateModelTests.cs:line 366</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="05ed8e88-7fc5-4301-b5b7-16e128075ffb" testId="1d025953-30cd-8dcc-b577-4f460947009d" testName="LeftArrow_QfcMultiSegmentRow_SelectsParentNode" computerName="REDACTED-HOST" duration="00:00:00.1483781" startTime="2026-08-26T10:26:58.2556871-04:00" endTime="2026-08-26T10:26:58.5515128-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="05ed8e88-7fc5-4301-b5b7-16e128075ffb">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Expected handled to be True because Left selects the parent node before the pre-existing path, but found False.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Primitives.BooleanAssertions`1.BeTrue(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/BooleanAssertions.cs:line 82&#xD;
+   at UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests.LeftArrow_QfcMultiSegmentRow_SelectsParentNode() in REDACTED-REPO-ROOT\UtilitiesCS.Test\OutlookObjects\Folder\BreadcrumbStateModelTests.cs:line 338</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="RightArrow_QfcSelectedParentNode_ExpandsIntoChildren" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="12c0e890-7881-8496-8d28-5fb84da1c09e">
+      <Execution id="5b3808ff-8006-416b-87ae-2f5cb002fdac" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="RightArrow_QfcSelectedParentNode_ExpandsIntoChildren" />
+    </UnitTest>
+    <UnitTest name="LeftArrow_QfcMultiSegmentRow_SelectsParentNode" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1d025953-30cd-8dcc-b577-4f460947009d">
+      <Execution id="05ed8e88-7fc5-4301-b5b7-16e128075ffb" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="LeftArrow_QfcMultiSegmentRow_SelectsParentNode" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="12c0e890-7881-8496-8d28-5fb84da1c09e" executionId="5b3808ff-8006-416b-87ae-2f5cb002fdac" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d025953-30cd-8dcc-b577-4f460947009d" executionId="05ed8e88-7fc5-4301-b5b7-16e128075ffb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="2" executed="2" passed="0" failed="2" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

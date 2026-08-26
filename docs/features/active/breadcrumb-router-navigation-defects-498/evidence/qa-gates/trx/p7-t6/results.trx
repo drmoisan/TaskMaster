@@ -1,0 +1,247 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="29b902c0-93c9-4e62-a5d4-8becbd640ac1" name="REDACTED-USER@REDACTED-HOST 2026-08-26 11:00:20" runUser="REDACTED-HOST\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T11:00:20.4904658-04:00" queuing="2026-08-26T11:00:20.4904658-04:00" start="2026-08-26T11:00:18.4122664-04:00" finish="2026-08-26T11:00:20.6887341-04:00" />
+  <TestSettings name="default" id="a3a0a1ab-d48a-4889-b608-3fea448f5fec">
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-26_11_00_20" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="58c005d6-60ff-4287-816e-24842fef3171" testId="137a2070-f4b3-874b-a4ca-d30e708c4d04" testName="CollapseAfter_OutOfRangeSegmentIndex_Throws" computerName="REDACTED-HOST" duration="00:00:00.0005653" startTime="2026-08-26T11:00:20.4587547-04:00" endTime="2026-08-26T11:00:20.4597557-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="58c005d6-60ff-4287-816e-24842fef3171" />
+    <UnitTestResult executionId="a0e9eb75-b928-4d2c-bbaa-44530534def1" testId="1da80581-ca80-80b5-810f-919d21a6e4ac" testName="CollapseAfter_NonLeafSegment_HidesDownstreamAndClosesLeafExpansion" computerName="REDACTED-HOST" duration="00:00:00.0478517" startTime="2026-08-26T11:00:20.1675047-04:00" endTime="2026-08-26T11:00:20.3915094-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a0e9eb75-b928-4d2c-bbaa-44530534def1">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="513c0c0f-ee3a-4c17-8603-71f3e99ad90c" testId="1b22a322-3130-8118-a1bd-3b441b679d21" testName="LeafHasSubfolders_TrueOnlyWhenLeafSegmentHasChildren" computerName="REDACTED-HOST" duration="00:00:00.0004285" startTime="2026-08-26T11:00:20.4000214-04:00" endTime="2026-08-26T11:00:20.4015258-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="513c0c0f-ee3a-4c17-8603-71f3e99ad90c" />
+    <UnitTestResult executionId="1264ad68-b73d-4156-81d3-2ba54e687439" testId="1e4a4fb2-b4be-8f20-827a-ce55de308725" testName="AddSuggestionRow_EmptyOrNullChain_Throws" computerName="REDACTED-HOST" duration="00:00:00.0005416" startTime="2026-08-26T11:00:20.4689267-04:00" endTime="2026-08-26T11:00:20.4699267-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1264ad68-b73d-4156-81d3-2ba54e687439" />
+    <UnitTestResult executionId="d1c37a11-57f9-4fa2-a453-74df79a77c7d" testId="1280d8a2-1355-833b-9b37-511253bdd23b" testName="SelectSubfolder_OutOfRangeIndex_Throws" computerName="REDACTED-HOST" duration="00:00:00.0004114" startTime="2026-08-26T11:00:20.4744346-04:00" endTime="2026-08-26T11:00:20.4749392-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d1c37a11-57f9-4fa2-a453-74df79a77c7d" />
+    <UnitTestResult executionId="f4325b83-60d0-4654-af1a-76bc465dd890" testId="1dc7f291-fc55-8f05-8ff8-7c51507bbfe3" testName="SelectRow_OutOfRange_Throws" computerName="REDACTED-HOST" duration="00:00:00.0003740" startTime="2026-08-26T11:00:20.4689267-04:00" endTime="2026-08-26T11:00:20.4689267-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f4325b83-60d0-4654-af1a-76bc465dd890" />
+    <UnitTestResult executionId="2b80044b-36fd-4c1f-942a-de7085cbba41" testId="1c9d1b32-e86a-8f8c-8685-b8b8869fa5b7" testName="SetSubfolders_WhenNotExpanded_Throws" computerName="REDACTED-HOST" duration="00:00:00.0003493" startTime="2026-08-26T11:00:20.4679274-04:00" endTime="2026-08-26T11:00:20.4689267-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2b80044b-36fd-4c1f-942a-de7085cbba41" />
+    <UnitTestResult executionId="9ea0a4a6-b37f-4569-8798-e881ac64bc7c" testId="1dc4a875-969f-8198-aef6-e1a53c7c1738" testName="SelectRow_TracksSelectionAndResetsSubfolderSelection" computerName="REDACTED-HOST" duration="00:00:00.0018115" startTime="2026-08-26T11:00:20.4457055-04:00" endTime="2026-08-26T11:00:20.4467077-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9ea0a4a6-b37f-4569-8798-e881ac64bc7c" />
+    <UnitTestResult executionId="45f980c8-60f7-4f9d-9fe4-b58c362f2ee9" testId="1d2442b4-59e6-8333-bd62-46e1853d2cce" testName="SingleSegmentChain_HasNoCollapsePivotAndObeysAffordanceGate" computerName="REDACTED-HOST" duration="00:00:00.0003213" startTime="2026-08-26T11:00:20.4699267-04:00" endTime="2026-08-26T11:00:20.4699267-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="45f980c8-60f7-4f9d-9fe4-b58c362f2ee9" />
+    <UnitTestResult executionId="b7629a5c-363a-4042-8dd7-51d59ac9ba3e" testId="12c0e890-7881-8496-8d28-5fb84da1c09e" testName="RightArrow_QfcSelectedParentNode_ExpandsIntoChildren" computerName="REDACTED-HOST" duration="00:00:00.0002215" startTime="2026-08-26T11:00:20.4724367-04:00" endTime="2026-08-26T11:00:20.4724367-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b7629a5c-363a-4042-8dd7-51d59ac9ba3e" />
+    <UnitTestResult executionId="a2193485-6ddb-4544-a7e5-ef0f8c2c04be" testId="16f0ff7e-0883-8fce-9531-c151036f7487" testName="ArrowKey_QfcSingleSegmentRow_TakesPreExistingCollapsePath" computerName="REDACTED-HOST" duration="00:00:00.0002745" startTime="2026-08-26T11:00:20.4724367-04:00" endTime="2026-08-26T11:00:20.4724367-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a2193485-6ddb-4544-a7e5-ef0f8c2c04be" />
+    <UnitTestResult executionId="384d5c4c-3184-45f3-99ff-0cf8ed752944" testId="1faac2fe-97cf-8cbb-8db4-89002c228f22" testName="RightArrow_OnCollapsedRow_ReExpandsBeforeLeafExpansion" computerName="REDACTED-HOST" duration="00:00:00.0001342" startTime="2026-08-26T11:00:20.4734344-04:00" endTime="2026-08-26T11:00:20.4734344-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="384d5c4c-3184-45f3-99ff-0cf8ed752944" />
+    <UnitTestResult executionId="a84782a2-05d8-41cb-8b23-446ebbd36041" testId="1f36b27a-ee28-8d90-bada-8abc50ef9d22" testName="SelectSubfolder_WithoutOpenExpansion_Throws" computerName="REDACTED-HOST" duration="00:00:00.0002185" startTime="2026-08-26T11:00:20.4689267-04:00" endTime="2026-08-26T11:00:20.4689267-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a84782a2-05d8-41cb-8b23-446ebbd36041" />
+    <UnitTestResult executionId="8242a808-139e-47b0-97e9-bb2991d62b16" testId="193476b1-b1fb-8334-885f-d99d32629069" testName="Arrows_RightExpandsThenLeftCollapses_UnhandledWhenNothingChanges" computerName="REDACTED-HOST" duration="00:00:00.0001611" startTime="2026-08-26T11:00:20.4734344-04:00" endTime="2026-08-26T11:00:20.4734344-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8242a808-139e-47b0-97e9-bb2991d62b16" />
+    <UnitTestResult executionId="d0a6263e-89e3-4fb4-ad1b-d3947e4130f0" testId="19f9735b-6183-85db-8b7f-1ae712faeb20" testName="AddPlainRow_CarriesVerbatimTextWithoutProbability" computerName="REDACTED-HOST" duration="00:00:00.0040538" startTime="2026-08-26T11:00:20.4467077-04:00" endTime="2026-08-26T11:00:20.4517198-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d0a6263e-89e3-4fb4-ad1b-d3947e4130f0" />
+    <UnitTestResult executionId="82f12983-a2f0-424a-a48d-976cf6d0a0f6" testId="191ad090-ccf4-8d35-9656-a631786bbe54" testName="Sequence_CollapseReExpandCollapse_TransitionsDeterministically" computerName="REDACTED-HOST" duration="00:00:00.0001537" startTime="2026-08-26T11:00:20.4724367-04:00" endTime="2026-08-26T11:00:20.4734344-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="82f12983-a2f0-424a-a48d-976cf6d0a0f6" />
+    <UnitTestResult executionId="0f087155-bfa9-4019-89e9-be077d983ddb" testId="1c50b773-0aa7-880a-9c8a-a58e772420ab" testName="ReExpand_AfterCollapse_RestoresTheFullChain" computerName="REDACTED-HOST" duration="00:00:00.0010627" startTime="2026-08-26T11:00:20.3990226-04:00" endTime="2026-08-26T11:00:20.4000214-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0f087155-bfa9-4019-89e9-be077d983ddb" />
+    <UnitTestResult executionId="68601ad8-b764-448a-947b-ea2b13cb8dfd" testId="1d025953-30cd-8dcc-b577-4f460947009d" testName="LeftArrow_QfcMultiSegmentRow_SelectsParentNode" computerName="REDACTED-HOST" duration="00:00:00.0007153" startTime="2026-08-26T11:00:20.4699267-04:00" endTime="2026-08-26T11:00:20.4714303-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="68601ad8-b764-448a-947b-ea2b13cb8dfd" />
+    <UnitTestResult executionId="3e9cd1c5-8047-4792-9695-10311a1b559b" testId="147ec77a-da4d-8472-aa45-9cf74e6f74cc" testName="Arrows_WithNoSelection_AreUnhandled" computerName="REDACTED-HOST" duration="00:00:00.0001140" startTime="2026-08-26T11:00:20.4734344-04:00" endTime="2026-08-26T11:00:20.4744346-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3e9cd1c5-8047-4792-9695-10311a1b559b" />
+    <UnitTestResult executionId="acc887c7-4563-400a-8972-5b03b50a931b" testId="12b90a66-627b-8322-88c6-ed8808a4becc" testName="ReplaceRows_NullRows_Throws" computerName="REDACTED-HOST" duration="00:00:00.0008938" startTime="2026-08-26T11:00:20.5325817-04:00" endTime="2026-08-26T11:00:20.5381001-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="acc887c7-4563-400a-8972-5b03b50a931b" />
+    <UnitTestResult executionId="5d290b95-0e89-468a-99df-6ca29703d8bd" testId="15a937db-56a3-822f-b1eb-99d691b16dd5" testName="Sequence_ExpandListSubfoldersThenCollapse_ClearsTheList" computerName="REDACTED-HOST" duration="00:00:00.0002225" startTime="2026-08-26T11:00:20.4734344-04:00" endTime="2026-08-26T11:00:20.4734344-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5d290b95-0e89-468a-99df-6ca29703d8bd" />
+    <UnitTestResult executionId="c9218abe-85aa-491e-acbe-db566c2de8ea" testId="1997091d-8106-8532-9a88-0e037e88e3cc" testName="LeftArrow_WithSubfolderSelected_ResetsSubfolderSelectionAndCollapses" computerName="REDACTED-HOST" duration="00:00:00.0003700" startTime="2026-08-26T11:00:20.4749392-04:00" endTime="2026-08-26T11:00:20.4749392-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c9218abe-85aa-491e-acbe-db566c2de8ea" />
+    <UnitTestResult executionId="87268a51-9781-4268-878c-3c425a4f6790" testId="1f9b61cb-649a-85ab-b8cc-6194cdaefd4f" testName="ReplaceRows_ClearsSelectionWhenIndexBeyondNewCount" computerName="REDACTED-HOST" duration="00:00:00.0011309" startTime="2026-08-26T11:00:20.5381001-04:00" endTime="2026-08-26T11:00:20.5436208-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="87268a51-9781-4268-878c-3c425a4f6790" />
+    <UnitTestResult executionId="355c8216-7f34-43cb-be62-16520db9a2f6" testId="1c0b93e7-3534-85d9-8df8-e8ab1dc70b03" testName="Reset_RestoresInitialRowState" computerName="REDACTED-HOST" duration="00:00:00.0002334" startTime="2026-08-26T11:00:20.4699267-04:00" endTime="2026-08-26T11:00:20.4699267-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="355c8216-7f34-43cb-be62-16520db9a2f6" />
+    <UnitTestResult executionId="de91d5fb-d2af-4610-a94e-f6db49ffcdf0" testId="1496588f-158e-82f8-8609-8cebd2946dbd" testName="TryExpandLeaf_WithAffordance_OpensExpansionAndAcceptsSubfolders" computerName="REDACTED-HOST" duration="00:00:00.0439820" startTime="2026-08-26T11:00:20.4015258-04:00" endTime="2026-08-26T11:00:20.4457055-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="de91d5fb-d2af-4610-a94e-f6db49ffcdf0" />
+    <UnitTestResult executionId="841c3604-c8da-4d94-a5e7-801d9d29ab33" testId="17cb975d-b4a1-8cc5-acfc-07c658cadee5" testName="TryExpandLeaf_WithoutAffordance_IsRejectedNoOp" computerName="REDACTED-HOST" duration="00:00:00.0001508" startTime="2026-08-26T11:00:20.4679274-04:00" endTime="2026-08-26T11:00:20.4679274-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="841c3604-c8da-4d94-a5e7-801d9d29ab33" />
+    <UnitTestResult executionId="fa60eade-86c6-485f-85ab-aeacdd748905" testId="1565568a-0536-8da2-a060-0a5ec3d599ce" testName="CollapseAfter_WhenAlreadyCollapsed_MovesThePivot" computerName="REDACTED-HOST" duration="00:00:00.0000984" startTime="2026-08-26T11:00:20.4699267-04:00" endTime="2026-08-26T11:00:20.4699267-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fa60eade-86c6-485f-85ab-aeacdd748905" />
+    <UnitTestResult executionId="77a90f1e-9069-401c-aa16-5c73db2f4ec9" testId="1d9a7177-2683-897a-943d-34a107f2a2c9" testName="CollapseAfter_OnPlainRow_ThrowsInvalidOperation" computerName="REDACTED-HOST" duration="00:00:00.0003941" startTime="2026-08-26T11:00:20.4597557-04:00" endTime="2026-08-26T11:00:20.4607560-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="77a90f1e-9069-401c-aa16-5c73db2f4ec9" />
+    <UnitTestResult executionId="fabef54b-32c7-4aef-8adf-8d893b227957" testId="1a18632c-a8e8-8fb3-8ce6-8be0408a085e" testName="Clear_RemovesRowsAndSelection" computerName="REDACTED-HOST" duration="00:00:00.0009157" startTime="2026-08-26T11:00:20.5300708-04:00" endTime="2026-08-26T11:00:20.5325817-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fabef54b-32c7-4aef-8adf-8d893b227957" />
+    <UnitTestResult executionId="f3836fe4-02a6-49f4-adfa-5710e26843ca" testId="1051b78b-efe9-811f-b0f7-f2f592948e60" testName="ReplaceRows_PreservesSelectionWhenIndexStillValid" computerName="REDACTED-HOST" duration="00:00:00.0005995" startTime="2026-08-26T11:00:20.5381001-04:00" endTime="2026-08-26T11:00:20.5381001-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f3836fe4-02a6-49f4-adfa-5710e26843ca" />
+    <UnitTestResult executionId="1fefcbfb-560e-48ed-8ea9-6604e4ba7a16" testId="1435b663-bb0d-877a-b1a1-43be880af083" testName="AddSuggestionRow_NullSegmentInChain_Throws" computerName="REDACTED-HOST" duration="00:00:00.0554666" startTime="2026-08-26T11:00:20.4749392-04:00" endTime="2026-08-26T11:00:20.5300708-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1fefcbfb-560e-48ed-8ea9-6604e4ba7a16" />
+    <UnitTestResult executionId="7dda8b39-4cd4-4032-955d-10c70dd761ea" testId="1e0e2337-9e1b-8f47-9dc6-949879e4d589" testName="CollapseAfter_OnTheLeafIndex_Throws" computerName="REDACTED-HOST" duration="00:00:00.0071785" startTime="2026-08-26T11:00:20.4517198-04:00" endTime="2026-08-26T11:00:20.4587547-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7dda8b39-4cd4-4032-955d-10c70dd761ea" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="SelectRow_TracksSelectionAndResetsSubfolderSelection" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1dc4a875-969f-8198-aef6-e1a53c7c1738">
+      <Execution id="9ea0a4a6-b37f-4569-8798-e881ac64bc7c" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="SelectRow_TracksSelectionAndResetsSubfolderSelection" />
+    </UnitTest>
+    <UnitTest name="SelectSubfolder_WithoutOpenExpansion_Throws" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1f36b27a-ee28-8d90-bada-8abc50ef9d22">
+      <Execution id="a84782a2-05d8-41cb-8b23-446ebbd36041" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="SelectSubfolder_WithoutOpenExpansion_Throws" />
+    </UnitTest>
+    <UnitTest name="TryExpandLeaf_WithAffordance_OpensExpansionAndAcceptsSubfolders" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1496588f-158e-82f8-8609-8cebd2946dbd">
+      <Execution id="de91d5fb-d2af-4610-a94e-f6db49ffcdf0" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="TryExpandLeaf_WithAffordance_OpensExpansionAndAcceptsSubfolders" />
+    </UnitTest>
+    <UnitTest name="SelectRow_OutOfRange_Throws" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1dc7f291-fc55-8f05-8ff8-7c51507bbfe3">
+      <Execution id="f4325b83-60d0-4654-af1a-76bc465dd890" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="SelectRow_OutOfRange_Throws" />
+    </UnitTest>
+    <UnitTest name="AddSuggestionRow_EmptyOrNullChain_Throws" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1e4a4fb2-b4be-8f20-827a-ce55de308725">
+      <Execution id="1264ad68-b73d-4156-81d3-2ba54e687439" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="AddSuggestionRow_EmptyOrNullChain_Throws" />
+    </UnitTest>
+    <UnitTest name="CollapseAfter_OutOfRangeSegmentIndex_Throws" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="137a2070-f4b3-874b-a4ca-d30e708c4d04">
+      <Execution id="58c005d6-60ff-4287-816e-24842fef3171" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="CollapseAfter_OutOfRangeSegmentIndex_Throws" />
+    </UnitTest>
+    <UnitTest name="ReplaceRows_NullRows_Throws" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="12b90a66-627b-8322-88c6-ed8808a4becc">
+      <Execution id="acc887c7-4563-400a-8972-5b03b50a931b" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="ReplaceRows_NullRows_Throws" />
+    </UnitTest>
+    <UnitTest name="ReExpand_AfterCollapse_RestoresTheFullChain" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1c50b773-0aa7-880a-9c8a-a58e772420ab">
+      <Execution id="0f087155-bfa9-4019-89e9-be077d983ddb" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="ReExpand_AfterCollapse_RestoresTheFullChain" />
+    </UnitTest>
+    <UnitTest name="CollapseAfter_NonLeafSegment_HidesDownstreamAndClosesLeafExpansion" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1da80581-ca80-80b5-810f-919d21a6e4ac">
+      <Execution id="a0e9eb75-b928-4d2c-bbaa-44530534def1" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="CollapseAfter_NonLeafSegment_HidesDownstreamAndClosesLeafExpansion" />
+    </UnitTest>
+    <UnitTest name="CollapseAfter_WhenAlreadyCollapsed_MovesThePivot" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1565568a-0536-8da2-a060-0a5ec3d599ce">
+      <Execution id="fa60eade-86c6-485f-85ab-aeacdd748905" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="CollapseAfter_WhenAlreadyCollapsed_MovesThePivot" />
+    </UnitTest>
+    <UnitTest name="SelectSubfolder_OutOfRangeIndex_Throws" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1280d8a2-1355-833b-9b37-511253bdd23b">
+      <Execution id="d1c37a11-57f9-4fa2-a453-74df79a77c7d" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="SelectSubfolder_OutOfRangeIndex_Throws" />
+    </UnitTest>
+    <UnitTest name="CollapseAfter_OnPlainRow_ThrowsInvalidOperation" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1d9a7177-2683-897a-943d-34a107f2a2c9">
+      <Execution id="77a90f1e-9069-401c-aa16-5c73db2f4ec9" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="CollapseAfter_OnPlainRow_ThrowsInvalidOperation" />
+    </UnitTest>
+    <UnitTest name="ReplaceRows_PreservesSelectionWhenIndexStillValid" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1051b78b-efe9-811f-b0f7-f2f592948e60">
+      <Execution id="f3836fe4-02a6-49f4-adfa-5710e26843ca" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="ReplaceRows_PreservesSelectionWhenIndexStillValid" />
+    </UnitTest>
+    <UnitTest name="RightArrow_QfcSelectedParentNode_ExpandsIntoChildren" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="12c0e890-7881-8496-8d28-5fb84da1c09e">
+      <Execution id="b7629a5c-363a-4042-8dd7-51d59ac9ba3e" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="RightArrow_QfcSelectedParentNode_ExpandsIntoChildren" />
+    </UnitTest>
+    <UnitTest name="SetSubfolders_WhenNotExpanded_Throws" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1c9d1b32-e86a-8f8c-8685-b8b8869fa5b7">
+      <Execution id="2b80044b-36fd-4c1f-942a-de7085cbba41" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="SetSubfolders_WhenNotExpanded_Throws" />
+    </UnitTest>
+    <UnitTest name="CollapseAfter_OnTheLeafIndex_Throws" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1e0e2337-9e1b-8f47-9dc6-949879e4d589">
+      <Execution id="7dda8b39-4cd4-4032-955d-10c70dd761ea" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="CollapseAfter_OnTheLeafIndex_Throws" />
+    </UnitTest>
+    <UnitTest name="Clear_RemovesRowsAndSelection" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1a18632c-a8e8-8fb3-8ce6-8be0408a085e">
+      <Execution id="fabef54b-32c7-4aef-8adf-8d893b227957" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="Clear_RemovesRowsAndSelection" />
+    </UnitTest>
+    <UnitTest name="Reset_RestoresInitialRowState" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1c0b93e7-3534-85d9-8df8-e8ab1dc70b03">
+      <Execution id="355c8216-7f34-43cb-be62-16520db9a2f6" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="Reset_RestoresInitialRowState" />
+    </UnitTest>
+    <UnitTest name="Arrows_WithNoSelection_AreUnhandled" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="147ec77a-da4d-8472-aa45-9cf74e6f74cc">
+      <Execution id="3e9cd1c5-8047-4792-9695-10311a1b559b" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="Arrows_WithNoSelection_AreUnhandled" />
+    </UnitTest>
+    <UnitTest name="TryExpandLeaf_WithoutAffordance_IsRejectedNoOp" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="17cb975d-b4a1-8cc5-acfc-07c658cadee5">
+      <Execution id="841c3604-c8da-4d94-a5e7-801d9d29ab33" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="TryExpandLeaf_WithoutAffordance_IsRejectedNoOp" />
+    </UnitTest>
+    <UnitTest name="ArrowKey_QfcSingleSegmentRow_TakesPreExistingCollapsePath" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="16f0ff7e-0883-8fce-9531-c151036f7487">
+      <Execution id="a2193485-6ddb-4544-a7e5-ef0f8c2c04be" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="ArrowKey_QfcSingleSegmentRow_TakesPreExistingCollapsePath" />
+    </UnitTest>
+    <UnitTest name="AddPlainRow_CarriesVerbatimTextWithoutProbability" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="19f9735b-6183-85db-8b7f-1ae712faeb20">
+      <Execution id="d0a6263e-89e3-4fb4-ad1b-d3947e4130f0" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="AddPlainRow_CarriesVerbatimTextWithoutProbability" />
+    </UnitTest>
+    <UnitTest name="LeafHasSubfolders_TrueOnlyWhenLeafSegmentHasChildren" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1b22a322-3130-8118-a1bd-3b441b679d21">
+      <Execution id="513c0c0f-ee3a-4c17-8603-71f3e99ad90c" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="LeafHasSubfolders_TrueOnlyWhenLeafSegmentHasChildren" />
+    </UnitTest>
+    <UnitTest name="AddSuggestionRow_NullSegmentInChain_Throws" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1435b663-bb0d-877a-b1a1-43be880af083">
+      <Execution id="1fefcbfb-560e-48ed-8ea9-6604e4ba7a16" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="AddSuggestionRow_NullSegmentInChain_Throws" />
+    </UnitTest>
+    <UnitTest name="LeftArrow_WithSubfolderSelected_ResetsSubfolderSelectionAndCollapses" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1997091d-8106-8532-9a88-0e037e88e3cc">
+      <Execution id="c9218abe-85aa-491e-acbe-db566c2de8ea" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="LeftArrow_WithSubfolderSelected_ResetsSubfolderSelectionAndCollapses" />
+    </UnitTest>
+    <UnitTest name="Arrows_RightExpandsThenLeftCollapses_UnhandledWhenNothingChanges" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="193476b1-b1fb-8334-885f-d99d32629069">
+      <Execution id="8242a808-139e-47b0-97e9-bb2991d62b16" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="Arrows_RightExpandsThenLeftCollapses_UnhandledWhenNothingChanges" />
+    </UnitTest>
+    <UnitTest name="RightArrow_OnCollapsedRow_ReExpandsBeforeLeafExpansion" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1faac2fe-97cf-8cbb-8db4-89002c228f22">
+      <Execution id="384d5c4c-3184-45f3-99ff-0cf8ed752944" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="RightArrow_OnCollapsedRow_ReExpandsBeforeLeafExpansion" />
+    </UnitTest>
+    <UnitTest name="SingleSegmentChain_HasNoCollapsePivotAndObeysAffordanceGate" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1d2442b4-59e6-8333-bd62-46e1853d2cce">
+      <Execution id="45f980c8-60f7-4f9d-9fe4-b58c362f2ee9" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="SingleSegmentChain_HasNoCollapsePivotAndObeysAffordanceGate" />
+    </UnitTest>
+    <UnitTest name="Sequence_ExpandListSubfoldersThenCollapse_ClearsTheList" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="15a937db-56a3-822f-b1eb-99d691b16dd5">
+      <Execution id="5d290b95-0e89-468a-99df-6ca29703d8bd" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="Sequence_ExpandListSubfoldersThenCollapse_ClearsTheList" />
+    </UnitTest>
+    <UnitTest name="LeftArrow_QfcMultiSegmentRow_SelectsParentNode" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1d025953-30cd-8dcc-b577-4f460947009d">
+      <Execution id="68601ad8-b764-448a-947b-ea2b13cb8dfd" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="LeftArrow_QfcMultiSegmentRow_SelectsParentNode" />
+    </UnitTest>
+    <UnitTest name="Sequence_CollapseReExpandCollapse_TransitionsDeterministically" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="191ad090-ccf4-8d35-9656-a631786bbe54">
+      <Execution id="82f12983-a2f0-424a-a48d-976cf6d0a0f6" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="Sequence_CollapseReExpandCollapse_TransitionsDeterministically" />
+    </UnitTest>
+    <UnitTest name="ReplaceRows_ClearsSelectionWhenIndexBeyondNewCount" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1f9b61cb-649a-85ab-b8cc-6194cdaefd4f">
+      <Execution id="87268a51-9781-4268-878c-3c425a4f6790" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="ReplaceRows_ClearsSelectionWhenIndexBeyondNewCount" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="137a2070-f4b3-874b-a4ca-d30e708c4d04" executionId="58c005d6-60ff-4287-816e-24842fef3171" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1da80581-ca80-80b5-810f-919d21a6e4ac" executionId="a0e9eb75-b928-4d2c-bbaa-44530534def1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b22a322-3130-8118-a1bd-3b441b679d21" executionId="513c0c0f-ee3a-4c17-8603-71f3e99ad90c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e4a4fb2-b4be-8f20-827a-ce55de308725" executionId="1264ad68-b73d-4156-81d3-2ba54e687439" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1280d8a2-1355-833b-9b37-511253bdd23b" executionId="d1c37a11-57f9-4fa2-a453-74df79a77c7d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1dc7f291-fc55-8f05-8ff8-7c51507bbfe3" executionId="f4325b83-60d0-4654-af1a-76bc465dd890" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c9d1b32-e86a-8f8c-8685-b8b8869fa5b7" executionId="2b80044b-36fd-4c1f-942a-de7085cbba41" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1dc4a875-969f-8198-aef6-e1a53c7c1738" executionId="9ea0a4a6-b37f-4569-8798-e881ac64bc7c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d2442b4-59e6-8333-bd62-46e1853d2cce" executionId="45f980c8-60f7-4f9d-9fe4-b58c362f2ee9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12c0e890-7881-8496-8d28-5fb84da1c09e" executionId="b7629a5c-363a-4042-8dd7-51d59ac9ba3e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16f0ff7e-0883-8fce-9531-c151036f7487" executionId="a2193485-6ddb-4544-a7e5-ef0f8c2c04be" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1faac2fe-97cf-8cbb-8db4-89002c228f22" executionId="384d5c4c-3184-45f3-99ff-0cf8ed752944" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f36b27a-ee28-8d90-bada-8abc50ef9d22" executionId="a84782a2-05d8-41cb-8b23-446ebbd36041" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="193476b1-b1fb-8334-885f-d99d32629069" executionId="8242a808-139e-47b0-97e9-bb2991d62b16" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19f9735b-6183-85db-8b7f-1ae712faeb20" executionId="d0a6263e-89e3-4fb4-ad1b-d3947e4130f0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="191ad090-ccf4-8d35-9656-a631786bbe54" executionId="82f12983-a2f0-424a-a48d-976cf6d0a0f6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c50b773-0aa7-880a-9c8a-a58e772420ab" executionId="0f087155-bfa9-4019-89e9-be077d983ddb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d025953-30cd-8dcc-b577-4f460947009d" executionId="68601ad8-b764-448a-947b-ea2b13cb8dfd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="147ec77a-da4d-8472-aa45-9cf74e6f74cc" executionId="3e9cd1c5-8047-4792-9695-10311a1b559b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12b90a66-627b-8322-88c6-ed8808a4becc" executionId="acc887c7-4563-400a-8972-5b03b50a931b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15a937db-56a3-822f-b1eb-99d691b16dd5" executionId="5d290b95-0e89-468a-99df-6ca29703d8bd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1997091d-8106-8532-9a88-0e037e88e3cc" executionId="c9218abe-85aa-491e-acbe-db566c2de8ea" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f9b61cb-649a-85ab-b8cc-6194cdaefd4f" executionId="87268a51-9781-4268-878c-3c425a4f6790" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c0b93e7-3534-85d9-8df8-e8ab1dc70b03" executionId="355c8216-7f34-43cb-be62-16520db9a2f6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1496588f-158e-82f8-8609-8cebd2946dbd" executionId="de91d5fb-d2af-4610-a94e-f6db49ffcdf0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17cb975d-b4a1-8cc5-acfc-07c658cadee5" executionId="841c3604-c8da-4d94-a5e7-801d9d29ab33" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1565568a-0536-8da2-a060-0a5ec3d599ce" executionId="fa60eade-86c6-485f-85ab-aeacdd748905" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d9a7177-2683-897a-943d-34a107f2a2c9" executionId="77a90f1e-9069-401c-aa16-5c73db2f4ec9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a18632c-a8e8-8fb3-8ce6-8be0408a085e" executionId="fabef54b-32c7-4aef-8adf-8d893b227957" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1051b78b-efe9-811f-b0f7-f2f592948e60" executionId="f3836fe4-02a6-49f4-adfa-5710e26843ca" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1435b663-bb0d-877a-b1a1-43be880af083" executionId="1fefcbfb-560e-48ed-8ea9-6604e4ba7a16" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e0e2337-9e1b-8f47-9dc6-949879e4d589" executionId="7dda8b39-4cd4-4032-955d-10c70dd761ea" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="32" executed="32" passed="32" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

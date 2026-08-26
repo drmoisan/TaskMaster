@@ -7,22 +7,25 @@ The checkpoint JSON remains the machine-authoritative source.
 
 - Integration branch: `epic/quickfiler-bug-family-integration`
 - Manifest: `docs/features/epics/quickfiler-bug-family/epic.md`
+- Integration branch tip: `8c8f7695bbc71d8f2cff13eb8f7fac8845ce5253`
 - Current wave: 0
 - Max parallel features: 4
-- Next step: `E8_monitor_wave_0_then_launch_remaining_batch_b`
-- Last updated: 2026-08-26T10-39
+- Last updated: 2026-08-26T19-38Z
 
-**Progress: 1 of 12 features merged.**
+**Progress: 3 of 12 features merged into the integration branch.**
+
+> This epic is **not complete**. The final integration-to-`main` pull request has not been
+> opened, so none of the child `Closes` lines have taken effect and no child issue is closed.
 
 ## Feature Status
 
 | Feature folder | Issue | Wave | Depends on | merge_status | PR | Merge commit | worktree_created_at | pr_opened_at | merge_confirmed_at | worktree_removed_at |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `breadcrumb-coordinator-hub-defects-501` | 501 | 0 | - | `not_started` | - | - | - | - | - | - |
-| `breadcrumb-router-navigation-defects-498` | 498 | 0 | - | `worktree_created` | - | - | 2026-08-26T08-30 | - | - | - |
+| `breadcrumb-router-navigation-defects-498` | 498 | 0 | - | `merged` | [#626](https://github.com/drmoisan/TaskMaster/pull/626) | 8c8f7695bbc7 | 2026-08-26T08-30 | 2026-08-26T19-28Z | 2026-08-26T19-37Z | - |
 | `qfc-collection-controller-defects-468` | 468 | 0 | - | `worktree_created` | - | - | 2026-08-26T08-30 | - | - | - |
 | `qfc-item-controller-defects-484` | 484 | 0 | - | `merged` | [#619](https://github.com/drmoisan/TaskMaster/pull/619) | 363bfcdd4da5 | 2026-08-26T08-30 | 2026-08-26T14-32Z | 2026-08-26T14-33Z | - |
-| `quickfiler-bug-family-446` | 446 | 0 | - | `worktree_created` | - | - | 2026-08-26T08-30 | - | - | - |
+| `quickfiler-bug-family-446` | 446 | 0 | - | `merged` | [#625](https://github.com/drmoisan/TaskMaster/pull/625) | 902e5ce2bf5d | 2026-08-26T08-30 | - | 2026-08-26T19-14Z | - |
 | `quickfiler-home-controller-metrics-442` | 442 | 0 | - | `worktree_created` | - | - | 2026-08-26T10-39 | - | - | - |
 | `quickfiler-test-uithread-dispatcher-493` | 493 | 0 | - | `not_started` | - | - | - | - | - | - |
 | `webview2-host-initializer-defects-476` | 476 | 0 | - | `not_started` | - | - | - | - | - | - |
@@ -38,43 +41,35 @@ The checkpoint JSON remains the machine-authoritative source.
 - Wave 2: `efc-controller-surface-defects-464`, `itemviewer-surface-defects-489`
 - Wave 3: `itemviewer-breadcrumb-lifecycle-defects-488`
 
-## Integration PR
+## Integration Branch History
 
-- PR: -
-- CI gate: -
-- Merge commit: -
-- Merged at: -
+`61edc19b (prepared) -> 363bfcdd (484, PR #619) -> 902e5ce2 (446, PR #625) -> 8c8f7695 (498, PR #626)`
 
-## Incident Log
+## Session Notes (fan-in-only run, 2026-08-26)
 
-### Host process crash - detected 2026-08-26T09-10
+This run was scoped to fan-in only: land the in-flight children into the integration
+branch and stop. No new feature was launched, prepared, or given a worktree, and the final
+integration-to-`main` pull request was deliberately not opened.
 
-The host process (pid 21368) hosting the wave-0 batch-A child orchestrators died. All four affected children were at `S5_atomic_execution` with no PR opened and no branch pushed.
+- **484** merged as PR #619 before this session.
+- **446** merged as PR #625 before this session; the resume briefing's claim that it still
+  needed the full fan-in sequence was stale and was corrected against `gh pr view`.
+- **498** merged in this session as PR #626. Its stale-base guard passed with zero
+  pure-deletion files, and its CI gate was a genuine green run of `ci.yml`.
+- **468** is **halted, not merged**. Its stale-base merge is committed and pushed and its
+  CI run is green, but its atomic plan is 120 of 180 tasks complete: phases P14, P15 and
+  P16 never ran, phase P13 stopped at T3, and 14 of 29 acceptance criteria in `spec.md`
+  are unchecked. No feature review was performed. Opening a pull request would assert an
+  autoclose set of seven issues against half-unverified acceptance criteria, so it was not
+  opened. See `features[].fan_in_halted` in the checkpoint.
 
-- **Briefing correction:** The resume briefing stated the crash occurred at ~08:45. Re-derived filesystem evidence contradicts that: all four batch-A worktrees show source-file writes through 09:00:26-09:01:11, and 446 wrote docs/features/active/quickfiler-bug-family-446/evidence/regression-testing/p1-t11/p1-t11.trx at 09:01:11. Actual loss of the host process was therefore ~09:01-09:02, roughly 16 minutes later than briefed. More child progress survives than the briefing assumed; none of it is lost.
-- **Stale locks:** All four worktrees remain git-locked naming dead pid 21368. Locks are stale over LIVE work. They are deliberately NOT cleared: leaving them locked protects the uncommitted work from prune. No worktree is removed, reset, or recreated, and no child branch is deleted.
-- **Orphaned build processes:** 17 MSBuild worker processes (started 08:27:36 and 08:33:14) and one VBCSCompiler (08:30:32) survived the host crash and are still resident. They are MSBuild node-reuse workers, not agent sessions. They are NOT killed here (out of mandate, and a shared machine may have unrelated builds). Relaunched children should expect possible stale obj/bin locks and, if a build fails on a locked output, report it rather than force-killing shared processes.
-- **Recovery:** Each batch-A child is relaunched as a FRESH Agent(orchestrator) delegation that reuses its EXISTING worktree and branch IN PLACE (no isolation:'worktree', which would strand the uncommitted work in a new worktree, and no new branch, which would collide). Precedent: the 2026-07-19 API-500 abandoned-child recovery. This sidesteps both the worktree-removal gate and the branch-collision failure mode because nothing is removed or recreated.
+### Known Gaps Carried Forward
 
-| Issue | Surviving HEAD | Commits ahead | Uncommitted entries | Last worktree write |
-|---|---|---|---|---|
-| 446 | `3d4e8e9d` | 1 | 12 | 2026-08-26T09:01:11 |
-| 468 | `63eebd47` | 2 | 8 | 2026-08-26T09:00:50 |
-| 484 | `70bf3c88` | 4 | 3 | 2026-08-26T09:01:02 |
-| 498 | `8c255ac1` | 1 | 0 | 2026-08-26T09:00:26 |
-
-### Deferred worktree cleanup
-
-Worktree cleanup for merged children is blocked by a hook that has no jurisdiction over epic runs. This does not affect epic completion, which accepts `merge_status` in {merged, worktree_removed}.
-
-- Issue 484: `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-affdfd7eaf314dd6c` deferred 2026-08-26T10-38.
-  - Blocking hook: `.claude/hooks/enforce-parallel-worktree-removal-gate.ps1`
-  - Diagnosis: Hook misfire, not a real safety stop. The parallel gate hard-codes $script:ParallelCheckpointPath = 'artifacts/orchestration/parallel-orchestrator-state.json' (line 33), has no epic-mode branch, and fails closed when that file is absent. This is an EPIC run, so no parallel checkpoint exists and none should. The gate therefore denies every worktree-removal command in any epic run. The sibling enforce-epic-worktree-removal-gate.ps1 was satisfied - the epic checkpoint records 484 as merged - but both hooks run on the same PreToolUse Bash matcher and a single deny wins.
-  - Fix: In drm-copilot (push-down source, mirrored to .codex/hooks/): (1) make enforce-parallel-worktree-removal-gate.ps1 abstain - return an allow decision - when artifacts/orchestration/parallel-orchestrator-state.json does not exist, so it does not adjudicate runs it has no jurisdiction over; fail-closed is correct WITHIN a parallel run and wrong outside one. (2) Tighten both gates' command interception so they match only a real leading git invocation, not any occurrence of the phrase inside a quoted string or heredoc body.
-
-## Known Constraints
-
-- **child_pr_ci_gap** - ci.yml on the integration ref triggers pull_request only on [main, development], so every child PR based on the integration branch receives ZERO CI checks. Each child kickoff mandates local CI-equivalent verification recorded as evidence; epic-orchestrator runs 'gh workflow run ci.yml --ref <integration>' at each wave boundary to gate the integrated tree; the final main-based PR is the authoritative gate.
-- **preimplementation_gate_blocks_epic_orchestrator_commits** - PARTIALLY RESOLVED by the staged change: docs/features/epics/ is now one of five exempt orchestration-bookkeeping staging trees, so a staging-plus-commit pair scoped to the epic folder is permitted. Unscoped staging remains denied. The Agent-delegation denial is the live blocker and is recorded under 'blocked'.
-- **member_name_collision_488_489** - Re-verified on the integration ref 61edc19b by read-only inspection: BOTH identifiers 'ThrowIfOffUiBoundary' and '_breadcrumbProvider' are declared ZERO times anywhere under QuickFiler/ today, including all eight ItemViewer.* partials plus ItemViewerExpanded* and ItemViewerQueue.cs. They appear only in feature 488's plan (P3-T3 adds the field, P4-T4 adds the helper, both to ItemViewer.Breadcrumb.cs), spec, and research. The hazard is therefore forward-looking and conditional: it materializes only if feature 489 independently introduces either name into a partial it owns. Because 489 (wave 2) merges before 488 (wave 3), epic-orchestrator must grep the integrated tree for both identifiers after 489 merges and before 488 launches, and relay any hit to 488 as upstream context. A collision merges cleanly in git and fails only at compile time.
-- **agent_memory_fanin_conflicts** - Child branches carry .claude/agent-memory/** churn. A fan-in conflict there is memory churn, not a decomposition defect; resolve by keeping both entries.
+- Child pull requests based on the integration branch receive **zero** automatic checks,
+  because `.github/workflows/ci.yml` declares its `pull_request` trigger for
+  `[main, development]` only. This session obtained real CI by dispatching `ci.yml` against
+  each child branch head via `workflow_dispatch`. No workflow file was modified.
+- No feature-review artifacts exist for **446**'s siblings **498** or **468**.
+- Merged children's worktrees are retained on disk. Removal is denied in every epic run by
+  `enforce-parallel-worktree-removal-gate.ps1`, which hard-codes the parallel checkpoint
+  path and fails closed. No parallel checkpoint was fabricated to work around it.
