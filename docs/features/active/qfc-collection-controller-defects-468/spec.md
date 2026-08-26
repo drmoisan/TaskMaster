@@ -1310,7 +1310,7 @@ individually verifiable from evidence.
       as a side effect), that `KbdActions(IEnumerable<UClass>)` at `KbdActions.cs:26-29` skips the
       duplicate check both `Add` overloads perform, and that `EnumerateConversationMembers` never read
       its `conversationCount` parameter.
-- [ ] **AC-27 (PR accuracy).** The PR body does **not** repeat #468's coverage-denominator rationale
+- [x] **AC-27 (PR accuracy).** The PR body does **not** repeat #468's coverage-denominator rationale
       (invalid because of `[ExcludeFromCodeCoverage]` at `:21`) and does **not** repeat #474's premise
       that the two form-controller interfaces are unrelated siblings (false: `IQfcFormController :
       IFilerFormController` at `QuickFiler/Controllers/IQfcFormController.cs:13`). It states that #473
