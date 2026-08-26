@@ -413,6 +413,35 @@ namespace QuickFiler.Controllers.Tests
             source.Cancel();
             return source.Token;
         }
+
+        /// <summary>
+        /// Issue #484 shared arrange helper: a timer armed with <c>Timeout.Infinite</c> for both due
+        /// time and period, so its callback can never fire and disposal is the only observable state
+        /// change. No wall-clock wait is involved.
+        /// </summary>
+        internal static System.Threading.Timer BuildNeverFiringTimer() =>
+            new System.Threading.Timer(_ => { }, null, Timeout.Infinite, Timeout.Infinite);
+
+        /// <summary>
+        /// Issue #484 shared arrange helper: runs the production <c>SaveParameters</c> path with the
+        /// supplied mail item so a test can observe the seam defaults it re-applies. Plain
+        /// <c>Mock.Of</c> collaborators suffice because <c>SaveParameters</c> only stores their
+        /// references.
+        /// </summary>
+        internal static void DriveSaveParameters(
+            QfcItemController controller,
+            Microsoft.Office.Interop.Outlook.MailItem mailItem
+        ) =>
+            controller.SaveParameters(
+                Mock.Of<IApplicationGlobals>(),
+                Mock.Of<IFilerHomeController>(),
+                Mock.Of<IQfcCollectionController>(),
+                Mock.Of<IItemViewer>(),
+                viewerPosition: 1,
+                itemNumberDigits: 1,
+                mailItem: mailItem,
+                tlpStates: null
+            );
     }
 
     /// <summary>

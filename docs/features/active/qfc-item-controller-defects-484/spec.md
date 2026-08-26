@@ -832,18 +832,18 @@ regression test. The one exception is verified by source inspection and is recor
 
 ### Issue #484 — `Cleanup()` timer disposal and stale `_mailActions`
 
-- [ ] `Cleanup()` disposes `_emailIsReadTimer` before nulling it
+- [x] `Cleanup()` disposes `_emailIsReadTimer` before nulling it
       (`_emailIsReadTimer?.Dispose(); _emailIsReadTimer = null;` at `ViewerSetup.cs:424`).
-- [ ] Test T1 injects a `Timer` armed with `Timeout.Infinite`, calls `Cleanup()`, and asserts that the
+- [x] Test T1 injects a `Timer` armed with `Timeout.Infinite`, calls `Cleanup()`, and asserts that the
       field is null and that `timer.Change(0, Timeout.Infinite)` throws `ObjectDisposedException`. The
       test contains no `Thread.Sleep`, no `Task.Delay`, and no wall-clock wait.
-- [ ] `ApplyReadEmailFormat(object state)` returns early when `ItemHelper`, `_themes`, `_activeTheme`, or
+- [x] `ApplyReadEmailFormat(object state)` returns early when `ItemHelper`, `_themes`, `_activeTheme`, or
       `_mailActions` is null, and its signature is unchanged.
-- [ ] Test T2 calls `ApplyReadEmailFormat(null)` on a `Cleanup()`ed controller and asserts it does not
+- [x] Test T2 calls `ApplyReadEmailFormat(null)` on a `Cleanup()`ed controller and asserts it does not
       throw and that `IMailItemActions.Save()` is never called.
-- [ ] `Cleanup()` nulls `_mailActions`, and a regression test asserts that a `SaveParameters` call after
+- [x] `Cleanup()` nulls `_mailActions`, and a regression test asserts that a `SaveParameters` call after
       `Cleanup()` rebinds `_mailActions` to the new `MailItem`.
-- [ ] `QuickFiler/Controllers/QfcItemController.Navigation.cs` is not modified.
+- [x] `QuickFiler/Controllers/QfcItemController.Navigation.cs` is not modified.
 
 ### Issue #485 — WebView2 handler unguarded inputs
 

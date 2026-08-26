@@ -472,7 +472,13 @@ namespace QuickFiler.Controllers
             _itemPositionTips = null;
             ItemHelper = null;
             _itemViewer = null;
+            // #484: dispose before releasing the reference. Nulling the field alone leaks the
+            // thread-pool timer and leaves its callback able to run against a torn-down controller.
+            _emailIsReadTimer?.Dispose();
             _emailIsReadTimer = null;
+            // #484: release the mail-actions adapter with the mail item it wraps. SaveParameters
+            // rebinds it on the next reuse of this pooled controller via its ??= default.
+            _mailActions = null;
         }
 
         internal string GetItemSummary() =>

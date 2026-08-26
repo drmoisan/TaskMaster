@@ -455,5 +455,44 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             await act.Should().ThrowAsync<System.OperationCanceledException>();
         }
+
+        private static object GetField(QfcItemController controller, string name) =>
+            QfcItemControllerTestSupport.GetField(controller, name);
+
+        /// <summary>Issue #484: Cleanup() disposes the read timer before nulling the field.</summary>
+        [TestMethod]
+        public void Cleanup_DisposesEmailIsReadTimerBeforeNullingIt()
+        {
+            // Arrange - armed with Timeout.Infinite so the callback can never fire.
+            var controller = new MailController();
+            var timer = QfcItemControllerTestSupport.BuildNeverFiringTimer();
+            SetField(controller, "_emailIsReadTimer", timer);
+
+            // Act
+            controller.Cleanup();
+
+            // Assert
+            GetField(controller, "_emailIsReadTimer").Should().BeNull();
+            System.Action rearm = () => timer.Change(0, System.Threading.Timeout.Infinite);
+            rearm.Should().Throw<System.ObjectDisposedException>();
+        }
+
+        /// <summary>Issue #484: a callback in flight when the timer is disposed must be inert.</summary>
+        [TestMethod]
+        public void ApplyReadEmailFormat_AfterCleanup_IsInertAndDoesNotSave()
+        {
+            // Arrange
+            var controller = new MailController();
+            var actions = new Mock<IMailItemActions>();
+            SetField(controller, "_mailActions", actions.Object);
+
+            // Act
+            controller.Cleanup();
+            System.Action callback = () => controller.ApplyReadEmailFormat(null);
+
+            // Assert
+            callback.Should().NotThrow();
+            actions.Verify(a => a.Save(), Times.Never());
+        }
     }
 }
