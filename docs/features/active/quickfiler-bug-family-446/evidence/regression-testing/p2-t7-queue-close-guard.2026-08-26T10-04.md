@@ -41,8 +41,8 @@ Counters: total 2, executed 2, **passed 2**, failed 0, error 0, timeout 0, abort
   (`[P1-T17]` negative control; it forecloses the degenerate fix of never closing the queue).
 
 TRX hygiene: scrubbed of the absolute worktree path, account name and machine name, then re-parsed
-as XML; `<Counters .../>`, test names and outcomes unchanged. No `danmoisan` or `megalodon4` match
-anywhere under the feature folder.
+as XML; `<Counters .../>`, test names and outcomes unchanged. A case-insensitive search for the
+account name and the machine name across the feature folder returns no match.
 
 ## Output Summary
 

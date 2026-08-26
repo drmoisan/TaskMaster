@@ -39,8 +39,8 @@ Counters: total 1, executed 1, **passed 1**, failed 0, error 0, timeout 0, abort
   (was Failed at `[P1-T13]`).
 
 TRX hygiene: scrubbed of the absolute worktree path, account name and machine name, then re-parsed
-as XML; `<Counters .../>`, test name and outcome unchanged. No `danmoisan` or `megalodon4` match
-anywhere under the feature folder.
+as XML; `<Counters .../>`, test name and outcome unchanged. A case-insensitive search for the
+account name and the machine name across the feature folder returns no match.
 
 ## Output Summary
 

@@ -49,8 +49,8 @@ EXIT_CODE: 0
 
 TRX hygiene: the recorded TRX is the second (green) run. It was scrubbed of the absolute worktree
 path, the account name and the machine name, then re-parsed as XML; `<Counters .../>`, all test
-names and all outcomes survive unchanged. No `danmoisan` or `megalodon4` match anywhere under the
-feature folder. The empty `Deploy_*` scratch directories `vstest /InIsolation` leaves behind contain
+names and all outcomes survive unchanged. A case-insensitive search for the account name and the
+machine name across the feature folder returns no match. The empty `Deploy_*` scratch directories `vstest /InIsolation` leaves behind contain
 no files and are therefore untracked by git.
 
 ## Output Summary

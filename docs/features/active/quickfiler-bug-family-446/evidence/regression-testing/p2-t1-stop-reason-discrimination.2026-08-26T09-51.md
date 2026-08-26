@@ -46,8 +46,8 @@ Counters: total 2, executed 2, **passed 2**, failed 0, error 0, timeout 0, abort
 
 TRX hygiene: the TRX was scrubbed of the absolute worktree path, the account name and the machine
 name, then re-parsed as XML; `<Counters .../>`, all test names and all outcomes survive the scrub
-unchanged. A case-insensitive search for `danmoisan` or `megalodon4` across the feature folder
-returns no match.
+unchanged. A case-insensitive search for the account name and the machine name across the feature
+folder returns no match.
 
 ## Output Summary
 

@@ -50,8 +50,8 @@ Counters: total 4, executed 4, **passed 4**, failed 0, error 0, timeout 0, abort
 - `DequeueAsync_BelowThresholdItemsAreDiscarded` = **Passed** (pre-existing drop-on-reject contract).
 
 TRX hygiene: scrubbed of the absolute worktree path, account name and machine name, then re-parsed
-as XML; `<Counters .../>`, test names and outcomes unchanged. No `danmoisan` or `megalodon4` match
-anywhere under the feature folder.
+as XML; `<Counters .../>`, test names and outcomes unchanged. A case-insensitive search for the
+account name and the machine name across the feature folder returns no match.
 
 ## Output Summary
 
