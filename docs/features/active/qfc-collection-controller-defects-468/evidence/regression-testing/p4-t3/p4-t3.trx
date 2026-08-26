@@ -46,7 +46,7 @@ Debug Trace:&#xD;
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="ItemGroupsToMoveFieldDeclaresAnOrderedContract" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a21a3b3e3120ed6de\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c623b0a-4238-8280-b40e-da5826e89bfd">
+    <UnitTest name="ItemGroupsToMoveFieldDeclaresAnOrderedContract" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c623b0a-4238-8280-b40e-da5826e89bfd">
       <Execution id="2bdb9276-a2cc-4c63-9f6f-e5a683dd2ec0" />
       <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests" name="ItemGroupsToMoveFieldDeclaresAnOrderedContract" />
     </UnitTest>

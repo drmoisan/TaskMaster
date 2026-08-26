@@ -50,7 +50,7 @@ Debug Trace:&#xD;
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="RemoveSpecificControlGroupAsync_ThrowAtFirstStatement_RestoresReentrancyCounter" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a21a3b3e3120ed6de\quickfiler.test\bin\debug\quickfiler.test.dll" id="17203060-9287-8f27-91b8-113f3cce890e">
+    <UnitTest name="RemoveSpecificControlGroupAsync_ThrowAtFirstStatement_RestoresReentrancyCounter" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="17203060-9287-8f27-91b8-113f3cce890e">
       <Execution id="b835bd0a-911b-4508-9683-13bf5d7e5def" />
       <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468Tests" name="RemoveSpecificControlGroupAsync_ThrowAtFirstStatement_RestoresReentrancyCounter" />
     </UnitTest>

@@ -90,25 +90,32 @@ originally undercounted by one. The single-assembly P1-T8 run has no such ambigu
 ### TRX host-path sanitisation (mandatory before commit)
 
 vstest embeds the operator's account and machine name in a TRX. All of it was removed before commit.
+This section names the *class* of token each substitution targeted instead of quoting the raw values.
+Quoting them here would reintroduce into a committed artifact exactly the identifiers the
+sanitisation removed from the TRX, which the repository's artifact-hygiene rule forbids outright.
 
 Substitutions applied, case-insensitively, in this order:
 
-| From | To | Rationale |
-|---|---|---|
-| `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a21a3b3e3120ed6de` | `<repo-root>` | workspace-root prefix in `<TestRun>`, `<Deployment>`, and every `<UnitTest storage="...">` |
-| `C:\Users\DanMoisan` | `<user-profile>` | any residual profile path |
-| `MEGALODON4` | `<host>` | `computerName` attribute and the run `name` |
-| `DanMoisan` | `<user>` | `runUser`, run `name`, `runDeploymentRoot` |
+| # | Token class replaced | To | Rationale |
+|---|---|---|---|
+| 1 | the absolute workspace-root prefix of this worktree: drive letter, user-profile path, `repos\TaskMaster\.claude\worktrees\`, and the agent worktree identifier | `<repo-root>` | workspace-root prefix in `<TestRun>`, `<Deployment>`, and every `<UnitTest storage="...">` |
+| 2 | the absolute user-profile path: drive letter, `Users`, and the account name | `<user-profile>` | any residual profile path |
+| 3 | the machine name, matched in every case spelling it appears in | `<host>` | `computerName` attribute, the run `name`, and the domain component of `runUser` |
+| 4 | the account name, standing alone | `<user>` | `runUser`, run `name`, `runDeploymentRoot` |
 
-Header before and after:
+The order is load-bearing: 1 must precede 2, and 2 must precede 4. Applied in any other order, the
+shorter token consumes the leading portion of the longer one and leaves a malformed remainder that
+no later substitution matches.
+
+Header, after sanitisation. The pre-sanitisation spellings are deliberately not reproduced; each
+`AFTER` line below shows every placeholder that replaced a raw identifier at that position, so the
+substitution remains auditable without the raw value being present.
 
 ```
-BEFORE: <TestRun id="..." name="DanMoisan@MEGALODON4 2026-08-26 08:53:51" runUser="Megalodon4\DanMoisan" ...>
 AFTER:  <TestRun id="..." name="<user>@<host> 2026-08-26 08:53:51" runUser="<host>\<user>" ...>
 ```
 
 ```
-BEFORE: <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_08_53_51" />
 AFTER:  <Deployment runDeploymentRoot="<user>_<host>_2026-08-26_08_53_51" />
 ```
 
@@ -116,14 +123,15 @@ AFTER:  <Deployment runDeploymentRoot="<user>_<host>_2026-08-26_08_53_51" />
 AFTER:  <UnitTest name="..." storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" ...
 ```
 
-Residual scan of the committed file:
+Residual scan of the committed file. Each pattern was applied case-insensitively. The patterns are
+described by class rather than quoted, for the same reason given above:
 
 | Pattern (case-insensitive) | Hits |
 |---|---|
-| `danmoisan` | **0** |
-| `megalodon` | **0** |
-| `c:\users` | **0** |
-| `danmoi` (8.3 short-name form) | **0** |
+| the account name | **0** |
+| the machine name with its trailing digit dropped, so the match is a superset of the machine name itself | **0** |
+| the drive-letter-plus-`Users` absolute-path prefix | **0** |
+| the 8.3 short-name form of the account name | **0** |
 | `<repo-root>` | 939 |
 
 File: 1,222,587 bytes, UTF-8 with BOM, CRLF preserved.

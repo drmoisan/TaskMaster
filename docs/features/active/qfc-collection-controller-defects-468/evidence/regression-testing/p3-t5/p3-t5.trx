@@ -40,11 +40,11 @@ Debug Trace:&#xD;
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="RemoveSpecificControlGroupAsync_ThrowLaterInBody_RestoresReentrancyCounter" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a21a3b3e3120ed6de\quickfiler.test\bin\debug\quickfiler.test.dll" id="1328923f-3762-89e1-a56a-b675fa316321">
+    <UnitTest name="RemoveSpecificControlGroupAsync_ThrowLaterInBody_RestoresReentrancyCounter" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1328923f-3762-89e1-a56a-b675fa316321">
       <Execution id="e5e0d2cd-3b91-499a-81df-9f02ac4d506f" />
       <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468Tests" name="RemoveSpecificControlGroupAsync_ThrowLaterInBody_RestoresReentrancyCounter" />
     </UnitTest>
-    <UnitTest name="RemoveSpecificControlGroupAsync_ThrowAtFirstStatement_RestoresReentrancyCounter" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a21a3b3e3120ed6de\quickfiler.test\bin\debug\quickfiler.test.dll" id="17203060-9287-8f27-91b8-113f3cce890e">
+    <UnitTest name="RemoveSpecificControlGroupAsync_ThrowAtFirstStatement_RestoresReentrancyCounter" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="17203060-9287-8f27-91b8-113f3cce890e">
       <Execution id="5ec673dd-2f5f-4ce0-a6a3-122bae49c8f6" />
       <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468Tests" name="RemoveSpecificControlGroupAsync_ThrowAtFirstStatement_RestoresReentrancyCounter" />
     </UnitTest>

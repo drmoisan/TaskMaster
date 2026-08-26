@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler.Controllers;
 using QuickFiler.Interfaces;
+using UtilitiesCS;
 
 namespace QuickFiler.Controllers.Tests
 {
@@ -270,6 +271,133 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
+        /// Issue #469 defect 1. Regression test proving that the diagnostics array carries exactly
+        /// one line per cached move group.
+        /// <para>
+        /// Scenario: one cached move group with a fully mocked item controller and a null
+        /// appointment. Expected outcome: the returned array length equals the cached group count.
+        /// </para>
+        /// <para>
+        /// Before the fix the array is allocated as <c>Count + 1</c>, so the caller receives one
+        /// more element than there are groups and the trailing element is never assigned. The
+        /// consumer in <c>QfcHomeController.Metrics</c> writes every element to the metrics file,
+        /// so the surplus element becomes a blank diagnostics row for a message that does not
+        /// exist.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public void GetMoveDiagnostics_WithOneGroup_ReturnsExactlyOneLine()
+        {
+            // Arrange
+            QfcCollectionController controller = CreateControllerWithMockedMoveGroups(1);
+            IReadOnlyList<QfcItemGroup> cached =
+                (IReadOnlyList<QfcItemGroup>)
+                    QfcCollectionControllerTestSupport.GetField(controller, "_itemGroupsToMove");
+
+            // Act
+            string[] lines = InvokeMoveDiagnostics(controller);
+
+            // Assert
+            lines
+                .Should()
+                .HaveCount(
+                    cached.Count,
+                    because: "issue #469 defect 1 requires one diagnostics line per cached move "
+                        + "group; a length greater than the group count is the surplus unassigned "
+                        + "element produced by the off-by-one allocation"
+                );
+        }
+
+        /// <summary>
+        /// Issue #469 defect 1. Regression test proving the off-by-one is a length defect at every
+        /// group count, and that the surplus element is an unassigned null rather than a harmless
+        /// duplicate.
+        /// <para>
+        /// Scenario: three cached move groups, each with a fully mocked item controller, and a null
+        /// appointment. Expected outcome: exactly three returned lines, none of them null.
+        /// </para>
+        /// <para>
+        /// The null assertion is the part that matters to the consumer. A surplus element that
+        /// merely repeated the last line would be redundant; an unassigned element is a null that
+        /// the metrics writer emits as a blank row.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public void GetMoveDiagnostics_WithThreeGroups_ReturnsThreeLinesAndNoNulls()
+        {
+            // Arrange
+            QfcCollectionController controller = CreateControllerWithMockedMoveGroups(3);
+
+            // Act
+            string[] lines = InvokeMoveDiagnostics(controller);
+
+            // Assert
+            lines
+                .Should()
+                .HaveCount(
+                    3,
+                    because: "issue #469 defect 1 requires exactly one diagnostics line per cached "
+                        + "move group, and three groups were cached"
+                );
+            lines
+                .Should()
+                .NotContainNulls(
+                    because: "every element of the returned array is written to the metrics "
+                        + "output, so an element the loop never assigns becomes a blank row"
+                );
+        }
+
+        /// <summary>
+        /// Issue #469 defect 2. Regression test proving that the item-controller null guard runs
+        /// before the first dereference, so its "Unknown" branch is reachable.
+        /// <para>
+        /// Scenario: one cached move group whose <c>ItemController</c> is <see langword="null"/>,
+        /// and a null appointment. Expected outcome: no exception, and the first returned line
+        /// carries the "Unknown" diagnostic text.
+        /// </para>
+        /// <para>
+        /// Before the fix the loop reads <c>qf.ItemHelper</c> and then interpolates
+        /// <c>qf.ItemHelper.Subject</c> into the data line, both above the
+        /// <c>if (qf is not null)</c> test. The guard is therefore dominated by two unconditional
+        /// dereferences of the very reference it guards: a null controller raises
+        /// <see cref="NullReferenceException"/> and the "Unknown" branch is dead code that can
+        /// never execute.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public void GetMoveDiagnostics_WithNullItemController_ReturnsUnknownLineWithoutThrowing()
+        {
+            // Arrange
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            QfcCollectionControllerTestSupport.SetField(
+                controller,
+                "_itemGroupsToMove",
+                new List<QfcItemGroup> { new QfcItemGroup { ItemController = null } }
+            );
+            string[] lines = null;
+
+            // Act
+            System.Action act = () => lines = InvokeMoveDiagnostics(controller);
+
+            // Assert
+            act.Should()
+                .NotThrow(
+                    because: "issue #469 defect 2 requires the null guard to run before the first "
+                        + "dereference, so a group with no item controller degrades to an Unknown "
+                        + "diagnostics line instead of raising NullReferenceException"
+                );
+            lines.Should().NotBeNull();
+            lines[0]
+                .Should()
+                .Contain(
+                    "To Unknown,Sender Unknown,Email,Folder Unknown",
+                    because: "the guard's else branch is the only producer of that text, so its "
+                        + "presence is the proof that the previously unreachable branch now runs"
+                );
+        }
+
+        /// <summary>
         /// Invokes the private <c>TryGetItemGroupByIndex</c> and returns its result.
         /// </summary>
         private static QfcItemGroup ResolveByIndex(QfcCollectionController controller, int index)
@@ -280,6 +408,54 @@ namespace QuickFiler.Controllers.Tests
                     "TryGetItemGroupByIndex",
                     index
                 );
+        }
+
+        /// <summary>
+        /// Builds an uninitialized controller whose cached move collection holds
+        /// <paramref name="count"/> groups, each with a fully mocked item controller and mail-item
+        /// helper, so <c>GetMoveDiagnostics</c> can run without COM or a live Outlook.
+        /// </summary>
+        private static QfcCollectionController CreateControllerWithMockedMoveGroups(int count)
+        {
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            List<QfcItemGroup> groups = new List<QfcItemGroup>();
+            for (int index = 0; index < count; index++)
+            {
+                Mock<MailItemHelper> helper = new Mock<MailItemHelper>(MockBehavior.Loose);
+                helper.SetupGet(item => item.Subject).Returns("Subject " + index);
+                helper.SetupGet(item => item.SenderName).Returns("Sender " + index);
+                helper.SetupGet(item => item.ToRecipientsName).Returns("Recipient " + index);
+                helper.SetupGet(item => item.SentDate).Returns(new DateTime(2026, 1, 1));
+
+                Mock<IQfcItemController> itemController = new Mock<IQfcItemController>(
+                    MockBehavior.Loose
+                );
+                itemController.SetupGet(item => item.ItemHelper).Returns(helper.Object);
+                itemController.SetupGet(item => item.SelectedFolder).Returns("Inbox");
+
+                groups.Add(new QfcItemGroup { ItemController = itemController.Object });
+            }
+
+            QfcCollectionControllerTestSupport.SetField(controller, "_itemGroupsToMove", groups);
+            return controller;
+        }
+
+        /// <summary>
+        /// Calls <c>GetMoveDiagnostics</c> with a null appointment and fixed, deterministic inputs.
+        /// The appointment must be a local because the parameter is passed by reference.
+        /// </summary>
+        private static string[] InvokeMoveDiagnostics(QfcCollectionController controller)
+        {
+            AppointmentItem appointment = null;
+            return controller.GetMoveDiagnostics(
+                durationText: "5",
+                durationMinutesText: "0.08",
+                duration: 5.0,
+                dataLineBeg: "01/01/2026,12:00,",
+                endTime: new DateTime(2026, 1, 1, 12, 0, 0),
+                olAppointment: ref appointment
+            );
         }
     }
 }

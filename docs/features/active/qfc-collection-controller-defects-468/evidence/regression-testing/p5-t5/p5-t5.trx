@@ -41,15 +41,15 @@ Debug Trace:&#xD;
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="MoveEmailsAsync_WithNullGroupFromIndexLookup_DoesNotThrow" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a21a3b3e3120ed6de\quickfiler.test\bin\debug\quickfiler.test.dll" id="1caaad64-a318-808b-8946-128f80ef28d5">
+    <UnitTest name="MoveEmailsAsync_WithNullGroupFromIndexLookup_DoesNotThrow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1caaad64-a318-808b-8946-128f80ef28d5">
       <Execution id="fc8a5d59-9f75-4e7f-acf6-d48847938e93" />
       <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests" name="MoveEmailsAsync_WithNullGroupFromIndexLookup_DoesNotThrow" />
     </UnitTest>
-    <UnitTest name="MoveEmailsAsync_AfterFirstFailure_DoesNotReadSubjectASecondTime" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a21a3b3e3120ed6de\quickfiler.test\bin\debug\quickfiler.test.dll" id="15d8c54a-483a-8d3a-84b7-b3ec554bb867">
+    <UnitTest name="MoveEmailsAsync_AfterFirstFailure_DoesNotReadSubjectASecondTime" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="15d8c54a-483a-8d3a-84b7-b3ec554bb867">
       <Execution id="7da68c22-5cbd-4563-bd3a-bcb5a51d5743" />
       <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests" name="MoveEmailsAsync_AfterFirstFailure_DoesNotReadSubjectASecondTime" />
     </UnitTest>
-    <UnitTest name="MoveEmailsAsync_WhenMoveIsCancelled_PropagatesOperationCanceledException" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a21a3b3e3120ed6de\quickfiler.test\bin\debug\quickfiler.test.dll" id="16b3ca18-f862-8df9-9c05-cf9e06d97ea0">
+    <UnitTest name="MoveEmailsAsync_WhenMoveIsCancelled_PropagatesOperationCanceledException" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="16b3ca18-f862-8df9-9c05-cf9e06d97ea0">
       <Execution id="16c772c7-05b0-4ce5-bb5d-2af455618c72" />
       <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests" name="MoveEmailsAsync_WhenMoveIsCancelled_PropagatesOperationCanceledException" />
     </UnitTest>

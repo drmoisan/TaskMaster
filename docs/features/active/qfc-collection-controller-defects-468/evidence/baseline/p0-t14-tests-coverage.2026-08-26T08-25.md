@@ -199,7 +199,9 @@ specified pattern.` The nine discovered paths, with the `<WS>` prefix elided, ar
 - The wrapper post-processed the Cobertura XML for Koverage compatibility, rewriting absolute paths
   to workspace-relative form and injecting `<sources><source>.</source></sources>`.
 - **Host-path hygiene verified**: the committed coverage XML contains **0** occurrences of
-  `C:\Users` and **0** occurrences of the operator's account name. No sanitisation was required.
+  the drive-letter-plus-`Users` absolute-path prefix and **0** occurrences of the operator's
+  account name. No sanitisation was required. Both patterns are named by class rather than quoted,
+  so that recording the check does not itself reintroduce a host identifier into a committed file.
 
 ### Plan-accuracy note — `-SearchRoot` argument form
 

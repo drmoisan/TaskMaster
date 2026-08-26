@@ -60,7 +60,7 @@ Performed invocations:&#xD;
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="MoveEmailsAsync_AfterFirstFailure_DoesNotReadSubjectASecondTime" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a21a3b3e3120ed6de\quickfiler.test\bin\debug\quickfiler.test.dll" id="15d8c54a-483a-8d3a-84b7-b3ec554bb867">
+    <UnitTest name="MoveEmailsAsync_AfterFirstFailure_DoesNotReadSubjectASecondTime" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="15d8c54a-483a-8d3a-84b7-b3ec554bb867">
       <Execution id="618f982f-c78d-4312-a2dc-f2ffe20e7822" />
       <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests" name="MoveEmailsAsync_AfterFirstFailure_DoesNotReadSubjectASecondTime" />
     </UnitTest>

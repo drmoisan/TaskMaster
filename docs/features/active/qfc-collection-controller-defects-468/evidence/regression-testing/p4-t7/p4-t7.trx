@@ -40,11 +40,11 @@ Debug Trace:&#xD;
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="TryGetItemGroupByIndexResolvesInsertionOrderAfterMutation" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a21a3b3e3120ed6de\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d143aba-2b01-851e-92c7-81129c16b25d">
+    <UnitTest name="TryGetItemGroupByIndexResolvesInsertionOrderAfterMutation" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d143aba-2b01-851e-92c7-81129c16b25d">
       <Execution id="3b71c69a-90f6-4fe1-b723-2d7ac7a6349f" />
       <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests" name="TryGetItemGroupByIndexResolvesInsertionOrderAfterMutation" />
     </UnitTest>
-    <UnitTest name="ItemGroupsToMoveFieldDeclaresAnOrderedContract" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a21a3b3e3120ed6de\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c623b0a-4238-8280-b40e-da5826e89bfd">
+    <UnitTest name="ItemGroupsToMoveFieldDeclaresAnOrderedContract" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c623b0a-4238-8280-b40e-da5826e89bfd">
       <Execution id="ca38fa2b-7a1c-4717-a63d-152605ccb874" />
       <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests" name="ItemGroupsToMoveFieldDeclaresAnOrderedContract" />
     </UnitTest>

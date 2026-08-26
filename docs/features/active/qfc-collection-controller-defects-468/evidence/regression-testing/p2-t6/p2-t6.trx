@@ -52,7 +52,7 @@ Debug Trace:&#xD;
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="ParentFieldAndConstructorParameterAreTypedIQfcFormController" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a21a3b3e3120ed6de\quickfiler.test\bin\debug\quickfiler.test.dll" id="129c97a6-f2d2-80c0-8525-6caf12e10309">
+    <UnitTest name="ParentFieldAndConstructorParameterAreTypedIQfcFormController" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="129c97a6-f2d2-80c0-8525-6caf12e10309">
       <Execution id="69f69b10-adaa-4b5d-86d3-7e7a9987b8b0" />
       <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468Tests" name="ParentFieldAndConstructorParameterAreTypedIQfcFormController" />
     </UnitTest>

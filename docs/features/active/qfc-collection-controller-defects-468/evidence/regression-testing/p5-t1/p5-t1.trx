@@ -57,7 +57,7 @@ Debug Trace:&#xD;
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="MoveEmailsAsync_WhenMoveIsCancelled_PropagatesOperationCanceledException" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a21a3b3e3120ed6de\quickfiler.test\bin\debug\quickfiler.test.dll" id="16b3ca18-f862-8df9-9c05-cf9e06d97ea0">
+    <UnitTest name="MoveEmailsAsync_WhenMoveIsCancelled_PropagatesOperationCanceledException" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="16b3ca18-f862-8df9-9c05-cf9e06d97ea0">
       <Execution id="4d246e5a-52ff-4458-8d6c-5ee2ade034b6" />
       <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests" name="MoveEmailsAsync_WhenMoveIsCancelled_PropagatesOperationCanceledException" />
     </UnitTest>

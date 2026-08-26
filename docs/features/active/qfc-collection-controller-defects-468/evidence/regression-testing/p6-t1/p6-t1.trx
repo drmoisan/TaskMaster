@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="a77578c6-6535-4a13-9ec2-846a64372fa6" name="<user>@<host> 2026-08-26 09:34:23" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
-  <Times creation="2026-08-26T09:34:23.3581100-04:00" queuing="2026-08-26T09:34:23.3581100-04:00" start="2026-08-26T09:34:22.0169676-04:00" finish="2026-08-26T09:34:23.3761176-04:00" />
-  <TestSettings name="default" id="aa768a96-ebfd-4d24-b334-ccbb8109e0a0">
-    <Deployment runDeploymentRoot="<user>_<host>_2026-08-26_09_34_23" />
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="e4b89d2f-4cea-4cfb-8159-9b80f629582b" name="<user>@<host> 2026-08-26 10:17:08" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T10:17:08.6336042-04:00" queuing="2026-08-26T10:17:08.6336042-04:00" start="2026-08-26T10:17:06.2091216-04:00" finish="2026-08-26T10:17:08.6536502-04:00" />
+  <TestSettings name="default" id="be8676c4-0dc2-4cf4-8b4c-4fa4ecce9fb2">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-26_10_17_08" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="36ee29c5-a61a-46fa-a35f-9fa600d9defc" testId="1328923f-3762-89e1-a56a-b675fa316321" testName="RemoveSpecificControlGroupAsync_ThrowLaterInBody_RestoresReentrancyCounter" computerName="<host>" duration="00:00:00.2522847" startTime="2026-08-26T09:34:22.9273956-04:00" endTime="2026-08-26T09:34:23.2914175-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="36ee29c5-a61a-46fa-a35f-9fa600d9defc">
+    <UnitTestResult executionId="81a85371-6517-44ae-88f3-ada5341ab969" testId="1ef908be-90a7-8cec-ab30-73dee33c23bb" testName="GetMoveDiagnostics_WithOneGroup_ReturnsExactlyOneLine" computerName="<host>" duration="00:00:00.3600814" startTime="2026-08-26T10:17:08.0285202-04:00" endTime="2026-08-26T10:17:08.5627832-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="81a85371-6517-44ae-88f3-ada5341ab969">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -36,27 +36,23 @@ Debug Trace:&#xD;
 &#xD;
      For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
         <ErrorInfo>
-          <Message>Expected ReadReentrancyCounter() to be 0 because issue #286 requires the Interlocked.Decrement to cover the whole body between the increment and the normal exit, not merely the first statement, but found 1 (difference of 1).</Message>
+          <Message>Expected lines to contain 1 item(s) because issue #469 defect 1 requires one diagnostics line per cached move group; a length greater than the group count is the surplus unassigned element produced by the off-by-one allocation, but found 2: {"01/01/2026,12:00, Subject 0,QuickFiled,5,0.08,Recipient 0,Sender 0,Email,Inbox,01/01/2026,00:00", &lt;null&gt;}.</Message>
           <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
    at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
-   at FluentAssertions.Numeric.NumericAssertionsBase`3.Be(T expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Numeric/NumericAssertionsBase.cs:line 45&#xD;
-   at QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468Tests.&lt;RemoveSpecificControlGroupAsync_ThrowLaterInBody_RestoresReentrancyCounter&gt;d__6.MoveNext() in <repo-root>\QuickFiler.Test\Controllers\QfcCollectionControllerDefects468Tests.cs:line 272&#xD;
---- End of stack trace from previous location where exception was thrown ---&#xD;
-   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
-   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
-   at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.&lt;ExecuteInternalAsync&gt;d__58.MoveNext()</StackTrace>
+   at FluentAssertions.Collections.GenericCollectionAssertions`3.HaveCount(Int32 expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Collections/GenericCollectionAssertions.cs:line 1497&#xD;
+   at QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests.GetMoveDiagnostics_WithOneGroup_ReturnsExactlyOneLine() in <repo-root>\QuickFiler.Test\Controllers\QfcCollectionControllerDefects468MoveTests.cs:line 300</StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="RemoveSpecificControlGroupAsync_ThrowLaterInBody_RestoresReentrancyCounter" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1328923f-3762-89e1-a56a-b675fa316321">
-      <Execution id="36ee29c5-a61a-46fa-a35f-9fa600d9defc" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468Tests" name="RemoveSpecificControlGroupAsync_ThrowLaterInBody_RestoresReentrancyCounter" />
+    <UnitTest name="GetMoveDiagnostics_WithOneGroup_ReturnsExactlyOneLine" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ef908be-90a7-8cec-ab30-73dee33c23bb">
+      <Execution id="81a85371-6517-44ae-88f3-ada5341ab969" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests" name="GetMoveDiagnostics_WithOneGroup_ReturnsExactlyOneLine" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
-    <TestEntry testId="1328923f-3762-89e1-a56a-b675fa316321" executionId="36ee29c5-a61a-46fa-a35f-9fa600d9defc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ef908be-90a7-8cec-ab30-73dee33c23bb" executionId="81a85371-6517-44ae-88f3-ada5341ab969" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
   </TestEntries>
   <TestLists>
     <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />

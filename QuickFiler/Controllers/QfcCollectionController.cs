@@ -2089,11 +2089,29 @@ namespace QuickFiler.Controllers
             //TraceUtility.LogMethodCall(durationText, durationMinutesText, Duration, dataLineBeg, OlEndTime, OlAppointment);
 
             int k;
-            string[] strOutput = new string[_itemGroupsToMove.Count + 1];
+            // Issue #469 defect 1: exactly one diagnostics line per cached move group. The array
+            // was allocated as Count + 1 while the loop bound stayed Count, so the trailing
+            // element was never assigned and QfcHomeController.Metrics wrote it out as a blank
+            // diagnostics row for a message that does not exist.
+            string[] strOutput = new string[_itemGroupsToMove.Count];
             var loopTo = _itemGroupsToMove.Count;
             for (k = 0; k < loopTo; k++)
             {
                 var qf = TryGetItemGroupByIndex(k)?.ItemController;
+
+                // Issue #469 defect 2: the null test must dominate every dereference of qf. It
+                // previously sat below this ItemHelper read and below the interpolation of
+                // qf.ItemHelper.Subject into the data line, so a group with no controller raised
+                // NullReferenceException and the Unknown branch below was unreachable. The empty
+                // subject column keeps the data line at its pre-existing column count.
+                if (qf is null)
+                {
+                    strOutput[k] =
+                        $"{dataLineBeg} ,QuickFiled,{durationText},{durationMinutesText},"
+                        + "To Unknown,Sender Unknown,Email,Folder Unknown,Sent Date Unknown,Sent Time Unknown";
+                    continue;
+                }
+
                 var helper = qf.ItemHelper;
 
                 var minutes = Math.Floor(duration / 60d);
@@ -2118,16 +2136,8 @@ namespace QuickFiler.Controllers
 
                 var dataLine =
                     $"{dataLineBeg} {xComma(qf.ItemHelper.Subject)},QuickFiled,{durationText},{durationMinutesText},";
-                if (qf is not null)
-                {
-                    dataLine +=
-                        $"{xComma(qf.ItemHelper.ToRecipientsName)},{xComma(qf.ItemHelper.SenderName)},Email,{xComma(qf.SelectedFolder)},{qf.ItemHelper.SentDate.ToString("MM/dd/yyyy")},{qf.ItemHelper.SentDate.ToString("HH:mm")}";
-                }
-                else
-                {
-                    dataLine +=
-                        $"To Unknown,Sender Unknown,Email,Folder Unknown,Sent Date Unknown,Sent Time Unknown";
-                }
+                dataLine +=
+                    $"{xComma(qf.ItemHelper.ToRecipientsName)},{xComma(qf.ItemHelper.SenderName)},Email,{xComma(qf.SelectedFolder)},{qf.ItemHelper.SentDate.ToString("MM/dd/yyyy")},{qf.ItemHelper.SentDate.ToString("HH:mm")}";
 
                 strOutput[k] = dataLine;
             }

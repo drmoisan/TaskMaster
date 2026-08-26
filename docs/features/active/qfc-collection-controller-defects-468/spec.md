@@ -1176,12 +1176,12 @@ individually verifiable from evidence.
       `LoadItemGroupsAndViewers_02`, `LoadConversationsAndFolders_04`, `LoadSequential_5`, and
       `ActivateQueuedTlp` are still present and unmodified. Verified by a source search plus an
       empty diff hunk for each.
-- [ ] **AC-4 (#469 defect 1).** `GetMoveDiagnostics` returns without throwing when a group's
+- [x] **AC-4 (#469 defect 1).** `GetMoveDiagnostics` returns without throwing when a group's
       `ItemController` is `null`, and the returned line for that group contains the
       `"To Unknown,Sender Unknown,Email,Folder Unknown"` text — proving the previously dead branch is
       now reachable. Verified by a named MSTest test that throws `NullReferenceException` before the
       fix.
-- [ ] **AC-5 (#469 defect 2).** `GetMoveDiagnostics` returns an array whose `Length` equals
+- [x] **AC-5 (#469 defect 2).** `GetMoveDiagnostics` returns an array whose `Length` equals
       `_itemGroupsToMove.Count` and which contains no `null` element. Verified by named MSTest tests
       for a one-group and a three-group arrangement, asserting `Length` and
       `Should().NotContainNulls()`.
