@@ -1,67 +1,71 @@
 ---
 name: 614-review-residuals
-description: "#614 EFC store-root leak review: PASS/0 blocking; residuals CR-1 (OK-path Length>=3 regression), CR-2 (router/guard rooted-value disagreement), FolderConverter's alternative-folder-name cluster is unreachable dead code, SortEmail.ResolvePaths not migrated"
+description: "#614 EFC store-root leak: cycle-2 exit re-audit is NO-GO/1 blocking (RC-1, the CR-2 remedy widened the filing guard without normalizing, so the archive-root-exact suggestion row now crashes post-Hide); CR-1 closed; residuals unchanged"
 metadata:
   type: project
 ---
 
-Cycle-1 review of `bug/efc-store-root-selection-leaks-full-outlook-path-into-filing-boundary-614`
-(head `02092504`, base `main` @ `c279d40b`, 2026-08-26). Verdict **PASS, 0 blocking**, 26/26 AC
-(25 PASS, AC25 PARTIAL). Artifacts at
-`docs/features/active/2026-08-26-efc-store-root-selection-leaks-full-outlook-path-into-filing-boundary-614/{policy-audit,code-review,feature-audit}.2026-08-26T16-55.md`.
+Branch `bug/efc-store-root-selection-leaks-full-outlook-path-into-filing-boundary-614`, base `main`
+@ `c279d40b`.
 
-**Residuals that a later reviewer or maintainer should re-check:**
+## Cycle-1 exit re-audit (head `b45e2a2d`, artifacts `*.2026-08-26T22-12.md`) — **NO-GO, 1 blocking**
 
-1. **CR-1 — real functional regression, unaddressed.** `EfcSelectionGuard.IsValidFilingSelection`
-   carries `value.Length >= 3`, and `EfcFormController.ActionOkAsync:706` now delegates to it. The
-   old OK guard was only `selectedFolder is null || StartsWith("====")`; the `Length < 3` rule came
-   from `IsValidSelection`, which gated ONLY folder creation (`:468`, `:752`). So filing to an
-   archive subfolder named `HR`/`IT`/`PR`/`Q1` now fails with "Please select a valid folder."
-   `EfcSelectionGuardTests.IsValidFilingSelection_TwoCharacterSelection_IsRejected` locks the
-   regression in. spec AC16 never asked for a length rule.
-2. **CR-2 — guard disagreement.** `BreadcrumbBridgeRouter.SelectRow` deliberately passes a
-   rooted-AT-OR-UNDER-root `FilingTarget` through verbatim (preserving the #439 contract asserted by
-   the untouched `Issue439AlreadyRootedTargetRemainsUnchangedWithCaseInsensitiveArchiveMatch`,
-   `:165`, `@"\aRcHiVe\Clients\North"`), but `IsValidFilingSelection` rejects EVERY rooted value via
-   `IsFullOutlookPath`. That value class is therefore selectable but unfilable. Fix is to normalize
-   in `SelectRow` (`CommitSelection(row, stem)`), which requires updating the #439 assertion.
-3. **`FolderConverter`'s alternative-folder-name cluster is unreachable dead code.**
-   `AlternativeFolderPrompt` -> `AskUserForAlternatives` -> `IsLegalFolderName(string,bool)` ->
-   `AlternativeFolderPrompt` is a closed cycle with no production entry point; it was already closed
-   at the merge base, and #614 removed the last external caller of the one-arg `IsLegalFolderName`
-   (baseline `:161` inside `ToFsFolderpath`). Consequence: AC11 / D5f (`RemoveIllegalCharacters`)
-   repairs a dialog option that cannot appear, and the corrected `FolderConverterTests.cs:329`
-   assertion tests unreachable behaviour. ~9 tests exercise the cluster. The defect census did NOT
-   find this. Adjacent to the promoted
-   `2026-08-26-orphaned-duplicate-folderconverter-dead-file-with-always-false-guards.md`.
-4. **`SortEmail.ResolvePaths` (both overloads, `:1000` and `:1035`, 3 live call sites) was not
-   migrated.** It still concatenates `olAncestor + stem` with no `RequireArchiveRelativeStem`, and
-   still uses the unanchored case-sensitive `FolderPath.Contains(olAncestor)` that
-   `EmailFilerConfig.IsDeleteRelevant` was changed away from. Both carry `[ExcludeFromCodeCoverage]`.
-   Out of the D1–D9 census; the leak itself is still stopped downstream by the new
-   `TryMakeArchiveRelative` gate inside `ToFsFolderpath`.
-5. **Dead test seam.** `internal AppFileSystemFolderPaths(Func<string,string>)` is called by nothing;
-   `_readEnvironmentVariable` can only ever hold the default. Real testability comes from
-   `ResolveOneDriveRoot` being `internal static`. Contributes 9 of the 18 uncovered changed lines.
-6. **Two intended hard-failure changes need live validation.** `AppOlObjects.ArchiveRootPath` (a
-   property getter) and `AppFileSystemFolderPaths.LoadFolders` (runs during add-in startup) now
-   throw `InvalidOperationException` where they previously returned a wrong value / fell back. No
-   consumer catches it. All five AC26 manual steps are recorded NOT EXECUTED.
+**CR-1 closed.** `IsValidFilingSelection` lost `Length >= 3`; the rule moved to the new
+`IsValidCreationSelection`, which is now the sole delegate of the `IsValidSelection` property.
+Verified at all three call sites.
 
-**Coverage:** `artifacts/csharp/coverage.xml` is the `<report>` JaCoCo-summary shape. Repo-wide line
-**84.8696%** (53972/63594) -> below the 85% hook floor -> policy audit MUST carry an explicit C#
-coverage FAIL row. Branch 78.8331% (12741/16162) clears 75%. Baseline was 84.7797%, so the change
-improves by +0.0899 — record the FAIL, disposition it non-blocking, and do NOT open remediation
-(the workflow's own numeric remediation trigger is <80%, which is cleared).
+**CR-2 NOT closed — superseded by blocking finding RC-1.** The remedy widened
+`IsValidFilingSelection(selection, archiveRoot)` to accept any rooted value that passes
+`TryMakeArchiveRelative`, but normalized nothing. `SelectedFolder` is carried verbatim through
+`ExecuteMovesCoreAsync` -> `EfcDataModel.cs:286` (`DestinationOlStem = folderpath`) ->
+`EmailFilerConfig.ResolvePaths` -> `RequireArchiveRelativeStem`, which **throws** on any rooted
+value. Not caught; `ButtonOK_Click` is `async void` and **rethrows** -> unhandled, and it happens
+*after* `_formViewer.Hide()`. Before the cycle the same value produced a benign "Please select a
+valid folder." dialog.
 
-**AC25 note:** three files stay over the 500-line ceiling (`EfcFormController.cs` 1072,
-`BreadcrumbBridgeRouter.cs` 596, `BreadcrumbBridgeRouterIssue439Tests.cs` 694), all pre-existing,
-none grown. Ratified as "net non-growth" in the **gitignored**
-`artifacts/orchestration/orchestrator-state.json` -> `orchestrator_adjudications`
-(2026-08-26T10:38:00Z and 2026-08-26T15:25:00Z). Ratification is by the orchestrator agent, not the
-human maintainer, and will not survive merge — it needs transcribing into `issue.md` or the PR body.
+**Reachability (traced, not assumed):** `BreadcrumbRowBuilder` sets `FilingTarget = presentedText`
+in all three branches. `FolderPredictor.ProjectSuggestionPath` (`:845-858`) strips the archive
+prefix ONLY when `folderPath.Length > archivePrefix.Length`, so a suggestion whose folder **is** the
+archive root is returned as a full rooted path verbatim -> `SelectRow` admits -> OK guard admits ->
+boundary throws. Search results (`GetOlSubpath`) and recents (`DestinationOlStem`) are stems, so the
+exact-root suggestion is the reachable case.
 
-**Both PR context artifacts were entirely ABSENT** (not merely misclassified — see
-[[pr-context-summary-misclassifies-cs]]); hand-authored from `git diff --numstat` in the
-`- <path> (+N/-N)` shape, after which `Get-ChangedLanguageSet` enumerated `CSharp` and the
-end-to-end `Invoke-FeatureReviewCoverageValidation` simulation returned Ok.
+**Three guards, three answers for `\<root>`:** `SelectHierarchyPath` rejects (`stem.Length == 0`),
+`SelectRow` admits verbatim, `IsValidFilingSelection` admits (pinned by
+`IsValidFilingSelection_ArchiveRootExactTarget_IsAccepted`, whose own comment calls it a "CR-2
+recorded consequence"), `RequireArchiveRelativeStem` throws.
+
+**Fix direction (in `remediation-inputs.2026-08-26T22-12.md`):** normalize at the producer —
+`SelectRow` should `CommitSelection(row, stem)` and reject the empty-stem case; then restore the
+filing guard's rootedness rejection and drop the `archiveRoot` parameter and
+`ResolveArchiveRootOrEmpty` with it; update `BreadcrumbBridgeRouterIssue439Tests.cs:165`; delete the
+two tests pinning the current behaviour; add a **composition** test (a value the predicate accepts
+must survive `RequireArchiveRelativeStem`) — its absence is why 100%-covered unit tests missed this.
+
+## Other cycle-2 findings
+
+- **RC-2.** spec AC16 ("share one predicate"; "OK rejects a non-relative selection") is now false on both clauses and was never amended; still checked `[x]`. AC16 evaluated **PARTIAL**.
+- **RC-3.** `ResolveArchiveRootOrEmpty` guards 1 of 9 `ArchiveRootPath` reads reachable from `EfcFormController`; `:777`/`:787` run after `Hide()`. It is only effective at all because `BindBreadcrumbRowsAsync` swallows the earlier failure, leaving no rows to select.
+- **RC-4.** `EmailFilerConfig.GetStem`'s new ternary (`:252`) has an untested out-of-ancestor arm — file branch coverage 70.0% -> 60.0%, the only branch decrease attributable to added code on the whole branch.
+- **AC26 downgraded PASS -> PARTIAL:** the cycle added new OK-path behaviour with no new manual-validation record; the existing artifact predates it.
+
+## Unchanged residuals (re-verified at `b45e2a2d`)
+
+`FolderConverter` alternative-folder-name cluster is unreachable dead code; `ArchiveRootPath` /
+`LoadFolders` fail-fast throws (intended, AC13/AC14); inert
+`AppFileSystemFolderPaths(Func<string,string>)` seam; `SortEmail.ResolvePaths` unmigrated;
+`FolderConverter.cs:265` `nameof(fsPath)` names a local, not a parameter.
+
+## Measurements (this head)
+
+- Repo-wide line **84.8790%** (54000/63620) -> below the 85% hook floor -> policy audit MUST carry an explicit FAIL row (non-blocking; merge base was 84.7797%, so +0.0993). Branch **78.8523%** (12752/16172), clears 75%.
+- New files: `ArchiveStemContract` 100/100, `EfcSelectionGuard` 100/100 (31 instrumented lines, up from 9), `ArchiveRootPathGuard` 100 line / 90 branch.
+- Modified files below the 85% line floor: `EfcDataModel` 52.7%, `EfcFormController` 11.3%, `AppOlObjects` 32.7%, `AppFileSystemFolderPaths` 69.0% — all sub-floor at the merge base too, all improved except `AppOlObjects` (covered count unchanged at 71; 4 instrumented lines added).
+- Toolchain re-run green: csharpier 1530 files, analyzer rebuild 0, nullable rebuild 0, 6111/6111 tests across the 3 changed assemblies (was 6093 at `02092504`; +18 guard tests).
+- File sizes: `EfcFormController.cs` 1079 (merge base 1084), `BreadcrumbBridgeRouter.cs` 596, `BreadcrumbBridgeRouterIssue439Tests.cs` 694 — all pre-existing, none grown.
+
+## Process notes
+
+- **PR context artifacts were STALE, not absent** this time (head ref `02092504`, four commits behind). Always compare `git rev-parse HEAD` against the summary's `Head ref`. Regenerated by hand from `git diff --numstat` in the `- <path> (+N/-N)` shape; the prior summary also miscounted `.cs` files as 22 (actual 21).
+- The `<report>` JaCoCo-summary shape of `artifacts/csharp/coverage.xml` has package-level LINE counters only, so **per-file** figures must come from the gitignored `coverage/coverage.cobertura.filtered.*.xml` pair (`p0-t9` = merge base, `p5-t4` = head). Dedup `<class>` nodes by `filename`, max hits per line, max condition-coverage numerator per line — summing them double-counts.
+- Long heredocs fail with `ENAMETOOLONG` / unmatched-quote errors through the Bash tool; use the Write tool for multi-page artifacts and avoid double backslashes in the content.
