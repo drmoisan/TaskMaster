@@ -988,15 +988,15 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
 
 ## Acceptance Criteria
 
-- [ ] **AC-1 (#498)** — A `segmentDoubleClick` message with `segmentIndex` outside `[0, segments.Count - 1]`
+- [x] **AC-1 (#498)** — A `segmentDoubleClick` message with `segmentIndex` outside `[0, segments.Count - 1]`
       is rejected by a range guard in the `SegmentDoubleClick` arm of
       `BreadcrumbBridgeRouter.ProcessInboundAsync` (`:241-247`); no exception escapes
       `_host.Raise(h => h.MessageReceived += null, ...)`, and the outbound posted-message count is unchanged.
-- [ ] **AC-2 (#498)** — The rejected index is logged at `Error` using the existing `log4net` pattern in the
+- [x] **AC-2 (#498)** — The rejected index is logged at `Error` using the existing `log4net` pattern in the
       same file (`BreadcrumbBridgeRouter.cs:235`, `:336`), and `BreadcrumbRow.CollapseAfter`
       (`BreadcrumbRow.cs:200-229`) is unmodified: its documented throw contract (`:197-199`, `:207-214`)
       still holds when called directly.
-- [ ] **AC-3 (#498)** — A valid `segmentIndex` still collapses the row and posts a render, and the
+- [x] **AC-3 (#498)** — A valid `segmentIndex` still collapses the row and posts a render, and the
       `catch (BreadcrumbMessageException)` at `BreadcrumbBridgeRouter.cs:266-277` is still the only catch at
       the `async void` host-message boundary (no broad `catch (Exception)` added there).
 - [ ] **AC-4 (#499)** — `BindRowsAsync` sets `SelectedFolderPath` to `null` alongside `_selectedRowId = null`
@@ -1098,7 +1098,7 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
       Asserted at the `BreadcrumbArrowFallThrough` call site (precedent
       `QuickFiler.Test/Controllers/QfcItemControllerBreadcrumbDropDownTests.cs:156-168`), never by invoking the
       modal `MyBox.ShowDialog` (`:304-309`).
-- [ ] **AC-25 (#498 — RED first)** — A regression test for #498 in
+- [x] **AC-25 (#498 — RED first)** — A regression test for #498 in
       `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterQueueTests.cs` is demonstrated **failing before the
       fix** and passing after, with the failing run recorded in the feature's evidence directory.
 - [ ] **AC-26 (#499 — RED first)** — A regression test for #499 in

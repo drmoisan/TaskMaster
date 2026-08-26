@@ -239,12 +239,33 @@ namespace QuickFiler.Controllers
             switch (message.Type)
             {
                 case BreadcrumbMessageTypes.SegmentDoubleClick:
-                    if (row.CollapseAfter(message.SegmentIndex!.Value))
+                {
+                    // #498: the bridge is an untrusted boundary, so the segment index is validated
+                    // here rather than relying on BreadcrumbRow.CollapseAfter to throw. An index
+                    // that escaped this arm reached the async void host-event seam as an unhandled
+                    // exception, which the single catch (BreadcrumbMessageException) cannot contain.
+                    int? requestedIndex = message.SegmentIndex;
+                    if (
+                        !requestedIndex.HasValue
+                        || requestedIndex.Value < 0
+                        || requestedIndex.Value >= row.Segments.Count
+                    )
+                    {
+                        log.Error(
+                            $"Inbound segmentDoubleClick for row '{row.RowId}' carries segment index "
+                                + $"'{requestedIndex}', which is outside the valid range "
+                                + $"[0, {row.Segments.Count - 1}]; rejected without a transition."
+                        );
+                        break;
+                    }
+
+                    if (row.CollapseAfter(requestedIndex.Value))
                     {
                         PostRowRender(row);
                     }
 
                     break;
+                }
                 case BreadcrumbMessageTypes.SegmentActivate:
                     ActivateSegment(row, message.SegmentIndex!.Value);
                     break;
