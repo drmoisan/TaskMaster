@@ -67,5 +67,13 @@ Remediation cycle 2 (2026-08-26, `remediation-plan.2026-08-26T22-12.md`, 6 phase
 - **AC16 spec edit (the one authorized spec edit):** rewrite text + clear checkbox in one early task (gates: `share one predicate` 1→0, `two scope-specific predicates` 0→1 kept on a single line for G6), re-check `[x]` in a dedicated final-phase task after the full-suite run — checkbox-flip-only, one AC per task.
 - **Suite gate as baseline-minus-delta:** 6587 baseline, net -2 (remove 6 / add 4), gate "P0-T9 total minus 2" — never a bare absolute or suite-wide Failed:0.
 
+Cycle-2 R1 preflight revision (2026-08-26, applied in place; 6 phases / 33 tasks unchanged):
+
+- **Raw-rate coverage no-regression gate replaced by the deletion-adjusted gate** (see [[deletion-adjusted-coverage-no-regression-gate]]): the revert deletes 14 fully-covered lines + 1 uncovered line, so `rate_post >= rate_base` misses by -0.0020 pp by arithmetic alone. New P5-T5(b) gates on counters: `valid_post <= valid_base` AND `covered_post >= covered_base - (valid_base - valid_post)`, lines and branches separately; raw rates reported informationally with the projection 53986/63605 = 84.8770% / 12749/16168 = 78.8525%.
+- **EfcSelectionGuardTests.cs baseline is 316, not 317** — transcription slip caught against cycle 1's own final-size-scope artifact. Re-measure every baseline count with the exact P0 command; do not transcribe from prior plan prose.
+- **Composition test carries an `int evaluated` vacuity counter** asserted `> 0` after the loop, added in P1-T1 (not P2) so it is byte-identical across the P2-T3 argument-drop and does not disturb the fail-before outcome.
+- **P2-T4 illustrative grep carries `-- '*.cs'`** — without the pathspec the token search hits feature docs and agent memory (~14 hits, not 0) even though the prose scope was already correct.
+- Preflight confirmed `EmailFilerConfig.cs:210-213` (not 206-209) as the `RequireArchiveRelativeStem` call site.
+
 **Why:** these were all judgment calls resolving spec-vs-reality conflicts; a naive revision pass re-reading spec.md literally would reintroduce unsatisfiable gates.
 **How to apply:** on any #614 preflight revision, keep these seams unless the orchestrator explicitly overrules a recorded decision.

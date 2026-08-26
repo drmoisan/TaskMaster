@@ -85,6 +85,7 @@
 - [Epic kickoff facts need independent measurement](epic-kickoff-facts-need-independent-measurement.md) — a kickoff predicted a 500-line cap finding from a conflated file; the named file was 323 lines, not 1,065
 - [WebView2 EndInit creates handles at construction](webview2-endinit-creates-handles-at-construction.md) — a bare ItemViewer already has both child handles AND its own; any "force the handle" remedy is a measured no-op
 - [blocked_reason enum can't express a substantive halt](blocked-reason-enum-cannot-express-substantive-halt.md) — 7 mechanical members only; use "none" plus free-form halt/blocking_findings keys, never a wrong member
+- [CR-pattern grep falsely reports 100% CRLF](grep-cr-empty-pattern-false-crlf.md) — the shell strips the CR, leaving an empty pattern matching every line; re-measure with a binary read
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
