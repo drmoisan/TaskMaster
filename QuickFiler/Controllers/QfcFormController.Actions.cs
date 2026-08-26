@@ -201,6 +201,62 @@ namespace QuickFiler.Controllers
             );
         }
 
+        /// <summary>
+        /// Issue #448. Clock seam for <see cref="UndoConsumer"/>. Defaults to
+        /// <see cref="System.TimeProvider.System"/> so production behaviour is unchanged; tests
+        /// assign a <c>FakeTimeProvider</c> so the ten-second idle threshold can be driven without
+        /// a real wall-clock wait, which `.claude/rules/general-unit-test.md` requires.
+        /// </summary>
+        internal TimeProvider TimeProvider { get; set; } = TimeProvider.System;
+
+        /// <summary>
+        /// Issue #448. Start seam for the undo consumer. Defaults to <c>Task.Run</c> so production
+        /// behaviour is unchanged; tests assign <c>body =&gt; body()</c> to run the consumer inline
+        /// and observe its completion deterministically.
+        /// </summary>
+        internal Func<Func<Task>, Task> UndoConsumerStarter { get; set; } = body => Task.Run(body);
+
+        private Func<IMovedMailInfo, Task> _undoItemProcessor;
+
+        /// <summary>
+        /// Issue #448. Per-item seam for the undo consumer's successful-take branch. Defaults to
+        /// <see cref="ProcessUndoItemAsync"/>, which holds that branch verbatim, so production
+        /// behaviour is byte-for-byte unchanged. The default is resolved lazily rather than in a
+        /// property initializer because an instance initializer cannot reference an instance method
+        /// (CS0236). Tests assign a fake so no live Outlook COM call and no WinForms dispatcher
+        /// call is made, which `.claude/rules/general-unit-test.md` UT4 prohibits in unit tests.
+        /// </summary>
+        internal Func<IMovedMailInfo, Task> UndoItemProcessor
+        {
+            get => _undoItemProcessor ??= ProcessUndoItemAsync;
+            set => _undoItemProcessor = value;
+        }
+
+        /// <summary>
+        /// The undo consumer's successful-take branch, extracted verbatim so it can be replaced
+        /// wholesale by a test double. Untrains the folder classifier on the moved item, moves the
+        /// mail back, and re-adds it to the on-screen group on the UI thread.
+        /// </summary>
+        private async Task ProcessUndoItemAsync(IMovedMailInfo item)
+        {
+            var helper = await MailItemHelper.FromMailItemAsync(
+                item.MailItem,
+                _globals,
+                default,
+                true
+            );
+            (await _globals.AF.Manager["Folder"]).UnTrain(
+                helper.FolderInfo.RelativePath,
+                helper.Tokens,
+                1
+            );
+            var mail = item.UndoMove();
+            await UiThread.Dispatcher.InvokeAsync(
+                () => _groups.AddItemGroup(mail),
+                System.Windows.Threading.DispatcherPriority.ContextIdle
+            );
+        }
+
         internal void UndoDialog()
         {
             if (_movedItems is null || _globals?.Ol?.App is null)
@@ -208,7 +264,7 @@ namespace QuickFiler.Controllers
                 return;
             }
 
-            _undoConsumerTask ??= Task.Run(UndoConsumer);
+            _undoConsumerTask ??= UndoConsumerStarter(UndoConsumer);
             var olApp = _globals.Ol.App;
             DialogResult repeatResponse = DialogResult.Yes;
             var i = 0;
@@ -250,43 +306,45 @@ namespace QuickFiler.Controllers
             _movedItems.Serialize();
         }
 
+        /// <summary>
+        /// Issue #448. How long the undo consumer stays alive with nothing to take before it exits.
+        /// Preserves the previous ten-second threshold; the change is that it now measures idle time
+        /// rather than total session time.
+        /// </summary>
+        private static readonly TimeSpan UndoConsumerIdleTimeout = TimeSpan.FromSeconds(10);
+
         internal async Task UndoConsumer()
         {
-            var sw = new Stopwatch();
-            sw.Start();
-            bool exit = false;
-            while (!_undoQueue.IsCompleted || exit)
+            long start = TimeProvider.GetTimestamp();
+            try
             {
-                if (_undoQueue.TryTake(out var item))
+                while (!_undoQueue.IsCompleted)
                 {
-                    var helper = await MailItemHelper.FromMailItemAsync(
-                        item.MailItem,
-                        _globals,
-                        default,
-                        true
-                    );
-                    (await _globals.AF.Manager["Folder"]).UnTrain(
-                        helper.FolderInfo.RelativePath,
-                        helper.Tokens,
-                        1
-                    );
-                    var mail = item.UndoMove();
-                    await UiThread.Dispatcher.InvokeAsync(
-                        () => _groups.AddItemGroup(mail),
-                        System.Windows.Threading.DispatcherPriority.ContextIdle
-                    );
-                }
-                else if (sw.ElapsedMilliseconds > 10000)
-                {
-                    exit = true;
-                }
-                else
-                {
-                    await Task.Delay(200);
+                    if (_undoQueue.TryTake(out var item))
+                    {
+                        await UndoItemProcessor(item).ConfigureAwait(false);
+
+                        // Reset on every successful take so the threshold measures idle time. The
+                        // previous code started one stopwatch for the whole session, so a consumer
+                        // busy for ten seconds exited while items were still arriving.
+                        start = TimeProvider.GetTimestamp();
+                    }
+                    else if (TimeProvider.GetElapsedTime(start) > UndoConsumerIdleTimeout)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        await TimeProvider
+                            .Delay(TimeSpan.FromMilliseconds(200))
+                            .ConfigureAwait(false);
+                    }
                 }
             }
-            if (exit)
+            finally
             {
+                // Unconditional so a later UndoDialog() starts a fresh consumer even when this one
+                // exited by exception, which disposing _undoQueue mid-take can produce.
                 _undoConsumerTask = null;
             }
         }

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="5388ddf9-ba69-4e8f-affa-7010b0983496" name="REDACTED-USER@REDACTED-HOST 2026-08-26 08:55:43" runUser="REDACTED-HOST\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T08:55:43.6285652-04:00" queuing="2026-08-26T08:55:43.6285652-04:00" start="2026-08-26T08:55:42.2904751-04:00" finish="2026-08-26T08:55:43.6448305-04:00" />
+  <TestSettings name="default" id="93954d22-a539-4a40-8e6e-d4ffd0e5943e">
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-26_08_55_43" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="5da43a88-3819-4df7-bd66-ae3fa67b8ef6" testId="10dc18de-c804-8081-ac59-08ac3f1b6c8b" testName="DequeueAsync_SourceDrained_ReportsSourceExhaustedStop" computerName="REDACTED-HOST" duration="00:00:00.1580833" startTime="2026-08-26T08:55:43.2880519-04:00" endTime="2026-08-26T08:55:43.5614098-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5da43a88-3819-4df7-bd66-ae3fa67b8ef6">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Expected batch.Stop to be QfcDequeueStop.SourceExhausted {value: 1} because a drained source with no active producer is genuine exhaustion, but found QfcDequeueStop.QuantitySatisfied {value: 0}.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Primitives.EnumAssertions`2.Be(TEnum expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/EnumAssertions.cs:line 68&#xD;
+   at QuickFiler.Controllers.Tests.QfcStreamingDequeueConfidenceGateTests.&lt;DequeueAsync_SourceDrained_ReportsSourceExhaustedStop&gt;d__37.MoveNext() in C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\Controllers\QfcStreamingDequeueConfidenceGateTests.Part3.cs:line 217&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.&lt;ExecuteInternalAsync&gt;d__58.MoveNext()</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="DequeueAsync_SourceDrained_ReportsSourceExhaustedStop" storage="c:\users\REDACTED-USER\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="10dc18de-c804-8081-ac59-08ac3f1b6c8b">
+      <Execution id="5da43a88-3819-4df7-bd66-ae3fa67b8ef6" />
+      <TestMethod codeBase="C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcStreamingDequeueConfidenceGateTests" name="DequeueAsync_SourceDrained_ReportsSourceExhaustedStop" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="10dc18de-c804-8081-ac59-08ac3f1b6c8b" executionId="5da43a88-3819-4df7-bd66-ae3fa67b8ef6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
