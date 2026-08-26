@@ -1,310 +1,10 @@
-#nullable enable
+﻿#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace UtilitiesCS.OutlookObjects.Folder
 {
-    /// <summary>
-    /// One visible row of the QuickFiler breadcrumb control: either a Path A suggestion row carrying
-    /// a root-to-leaf ancestor chain of <see cref="FolderBreadcrumbSegment"/> plus an optional
-    /// probability, or a Path B plain-string row carried verbatim without probability. Holds the
-    /// per-row collapse/expand state; all transitions validate their preconditions and fail fast.
-    /// </summary>
-    public sealed class BreadcrumbStateRow
-    {
-        private static readonly IReadOnlyList<FolderBreadcrumbSegment> EmptySegments =
-            new FolderBreadcrumbSegment[0];
-
-        internal BreadcrumbStateRow(
-            IReadOnlyList<FolderBreadcrumbSegment> chain,
-            double? probability
-        )
-            : this(IdentityFromChain(chain), chain, probability) { }
-
-        internal BreadcrumbStateRow(
-            string identity,
-            IReadOnlyList<FolderBreadcrumbSegment> chain,
-            double? probability
-        )
-        {
-            if (chain == null || chain.Count == 0)
-            {
-                throw new ArgumentException(
-                    "A suggestion row requires a non-empty ancestor chain.",
-                    nameof(chain)
-                );
-            }
-            if (chain.Any(segment => segment == null))
-            {
-                throw new ArgumentException(
-                    "The ancestor chain must not contain null segments.",
-                    nameof(chain)
-                );
-            }
-
-            Identity = RequireIdentity(identity);
-            Chain = chain.ToArray();
-            Probability = probability;
-            VerbatimText = null;
-            IsSelectable = true;
-            IsScoredFallback = false;
-            Subfolders = EmptySegments;
-        }
-
-        /// <summary>
-        /// Creates a suggestion row whose selection value stays the presented filing target even
-        /// though the chain resolved to store-qualified paths (decision D7).
-        /// </summary>
-        internal BreadcrumbStateRow(
-            string identity,
-            IReadOnlyList<FolderBreadcrumbSegment> chain,
-            double? probability,
-            string filingTarget
-        )
-            : this(identity, WithFilingTarget(chain, filingTarget), probability) { }
-
-        /// <summary>
-        /// Returns the chain with the leaf segment's <c>FolderPath</c> replaced by the presented
-        /// filing target, keeping the leaf's key, display name and child affordance. That
-        /// <c>FolderPath</c> is the value <c>BreadcrumbSelectionMap</c> reports as the selected
-        /// folder, while rendering reads <c>DisplayName</c> and navigation reads <c>Key</c>, so the
-        /// substitution is confined to the filing value, mirroring the immutable
-        /// <see cref="BreadcrumbRow.FilingTarget"/> on the other breadcrumb surface.
-        /// </summary>
-        private static IReadOnlyList<FolderBreadcrumbSegment> WithFilingTarget(
-            IReadOnlyList<FolderBreadcrumbSegment> chain,
-            string filingTarget
-        )
-        {
-            if (chain == null || chain.Count == 0 || filingTarget == null)
-            {
-                // Leave validation of a null or empty chain to the chained constructor.
-                return chain!;
-            }
-
-            var preserved = new List<FolderBreadcrumbSegment>(chain);
-            int leafIndex = preserved.Count - 1;
-            FolderBreadcrumbSegment leaf = preserved[leafIndex];
-            preserved[leafIndex] = new FolderBreadcrumbSegment(
-                leaf.Key,
-                leaf.DisplayName,
-                filingTarget,
-                leaf.HasChildren
-            );
-            return preserved;
-        }
-
-        internal BreadcrumbStateRow(string verbatimText)
-            : this(
-                DefaultPlainIdentity(verbatimText),
-                verbatimText,
-                !IsBanner(verbatimText),
-                null,
-                false
-            ) { }
-
-        internal BreadcrumbStateRow(string identity, string verbatimText, bool isSelectable)
-            : this(identity, verbatimText, isSelectable, null, false) { }
-
-        internal BreadcrumbStateRow(string identity, string fallbackText, double? probability)
-            : this(identity, fallbackText, true, probability, true) { }
-
-        private BreadcrumbStateRow(
-            string identity,
-            string verbatimText,
-            bool isSelectable,
-            double? probability,
-            bool isScoredFallback
-        )
-        {
-            Identity = RequireIdentity(identity);
-            VerbatimText = verbatimText ?? throw new ArgumentNullException(nameof(verbatimText));
-            Chain = EmptySegments;
-            Probability = probability;
-            IsSelectable = isSelectable;
-            IsScoredFallback = isScoredFallback;
-            Subfolders = EmptySegments;
-        }
-
-        /// <summary>Stable row identity retained while fallback display data is upgraded.</summary>
-        public string Identity { get; }
-
-        /// <summary>True for a Path A suggestion row; false for a Path B plain-string row.</summary>
-        public bool IsSuggestion => VerbatimText == null;
-
-        /// <summary>True for an unresolved scored suggestion carrying fallback display text.</summary>
-        public bool IsScoredFallback { get; }
-
-        /// <summary>True when selector navigation and activation may choose this row.</summary>
-        public bool IsSelectable { get; }
-
-        /// <summary>Fallback display text for an unresolved scored suggestion; otherwise null.</summary>
-        public string? FallbackText => IsScoredFallback ? VerbatimText : null;
-
-        /// <summary>Root-first ancestor chain for a suggestion row; empty for a plain row.</summary>
-        public IReadOnlyList<FolderBreadcrumbSegment> Chain { get; }
-
-        /// <summary>The consumed prediction probability, or null when the row carries none.</summary>
-        public double? Probability { get; }
-
-        /// <summary>The exact Path B string (returned verbatim on selection), or null for Path A rows.</summary>
-        public string? VerbatimText { get; }
-
-        /// <summary>
-        /// The segment index after which the row is collapsed (that segment is the visible terminal),
-        /// or null when the full chain is visible.
-        /// </summary>
-        public int? CollapsedAfterIndex { get; private set; }
-
-        /// <summary>True while the leaf's subfolder list is expanded.</summary>
-        public bool LeafExpanded { get; private set; }
-
-        /// <summary>The fetched immediate subfolders shown while <see cref="LeafExpanded"/>.</summary>
-        public IReadOnlyList<FolderBreadcrumbSegment> Subfolders { get; private set; }
-
-        /// <summary>
-        /// True when the leaf carries the plus/minus affordance: a fully-expanded suggestion row
-        /// whose leaf segment has real subfolders (FR-2).
-        /// </summary>
-        public bool LeafHasSubfolders =>
-            IsSuggestion && CollapsedAfterIndex == null && Chain[Chain.Count - 1].HasChildren;
-
-        /// <summary>
-        /// Collapses the row after the non-leaf segment at <paramref name="segmentIndex"/> (FR-3):
-        /// downstream segments and the leaf are hidden and the segment becomes the visible terminal.
-        /// Any open leaf expansion is closed.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">The row is a plain (Path B) row.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="segmentIndex"/> is negative, beyond the chain, or the leaf index (the
-        /// leaf cannot be collapsed-after).
-        /// </exception>
-        public void CollapseAfter(int segmentIndex)
-        {
-            if (!IsSuggestion)
-            {
-                throw new InvalidOperationException(
-                    "Collapse is defined only for suggestion rows with an ancestor chain."
-                );
-            }
-            if (segmentIndex < 0 || segmentIndex >= Chain.Count - 1)
-            {
-                throw new ArgumentOutOfRangeException(
-                    nameof(segmentIndex),
-                    segmentIndex,
-                    $"Collapse-after requires a non-leaf segment index in [0, {Chain.Count - 2}]."
-                );
-            }
-
-            CollapsedAfterIndex = segmentIndex;
-            LeafExpanded = false;
-            Subfolders = EmptySegments;
-        }
-
-        /// <summary>Restores the full chain after a collapse; a no-op when not collapsed (FR-3).</summary>
-        public void ReExpand()
-        {
-            CollapsedAfterIndex = null;
-        }
-
-        /// <summary>
-        /// Opens the leaf subfolder expansion when the affordance is available (FR-2); returns false
-        /// (no-op by contract) for plain rows, collapsed rows, affordance-less leaves, or when
-        /// already expanded, so the caller can fall through to legacy behavior.
-        /// </summary>
-        public bool TryExpandLeaf()
-        {
-            if (!LeafHasSubfolders || LeafExpanded)
-            {
-                return false;
-            }
-
-            LeafExpanded = true;
-            return true;
-        }
-
-        /// <summary>
-        /// Closes the leaf subfolder expansion; returns false (no-op) when nothing is expanded.
-        /// </summary>
-        public bool TryCollapseLeaf()
-        {
-            if (!LeafExpanded)
-            {
-                return false;
-            }
-
-            LeafExpanded = false;
-            Subfolders = EmptySegments;
-            return true;
-        }
-
-        /// <summary>
-        /// Stores the fetched immediate subfolders for the open expansion (FR-4).
-        /// </summary>
-        /// <exception cref="InvalidOperationException">The leaf is not expanded.</exception>
-        public void SetSubfolders(IReadOnlyList<FolderBreadcrumbSegment> subfolders)
-        {
-            if (!LeafExpanded)
-            {
-                throw new InvalidOperationException(
-                    "Subfolders can be attached only while the leaf expansion is open."
-                );
-            }
-
-            Subfolders = (subfolders ?? EmptySegments).ToArray();
-        }
-
-        /// <summary>Resets collapse, expansion, and subfolder state to the initial full chain.</summary>
-        public void Reset()
-        {
-            CollapsedAfterIndex = null;
-            LeafExpanded = false;
-            Subfolders = EmptySegments;
-        }
-
-        internal static string IdentityFromChain(IReadOnlyList<FolderBreadcrumbSegment> chain)
-        {
-            if (chain == null || chain.Count == 0)
-            {
-                throw new ArgumentException(
-                    "A suggestion row requires a non-empty ancestor chain.",
-                    nameof(chain)
-                );
-            }
-            return chain[chain.Count - 1]?.Key.ToString()
-                ?? throw new ArgumentException(
-                    "The ancestor chain must not contain null segments.",
-                    nameof(chain)
-                );
-        }
-
-        internal static string DefaultPlainIdentity(string verbatimText)
-        {
-            if (verbatimText == null)
-            {
-                throw new ArgumentNullException(nameof(verbatimText));
-            }
-            return string.IsNullOrWhiteSpace(verbatimText) ? "plain-empty" : verbatimText;
-        }
-
-        internal static bool IsBanner(string verbatimText) =>
-            verbatimText?.StartsWith(BreadcrumbRowBuilder.BannerPrefix, StringComparison.Ordinal)
-            == true;
-
-        private static string RequireIdentity(string identity)
-        {
-            if (string.IsNullOrWhiteSpace(identity))
-            {
-                throw new ArgumentException(
-                    "A non-empty stable identity is required.",
-                    nameof(identity)
-                );
-            }
-            return identity;
-        }
-    }
-
     /// <summary>
     /// Pure, host-neutral collapse/expand state machine for the QuickFiler WebView2 breadcrumb
     /// (#351): ordered rows, selected-row/subfolder tracking, and keyboard transitions. Mirrors the
@@ -471,12 +171,46 @@ namespace UtilitiesCS.OutlookObjects.Folder
             {
                 return false;
             }
+            // #440: attempt the tree transition first (decision D1 handling order).
+            if (TryRightTreeTransition(row))
+            {
+                return true;
+            }
             if (row.CollapsedAfterIndex != null)
             {
                 row.ReExpand();
                 return true;
             }
             return row.TryExpandLeaf();
+        }
+
+        /// <summary>
+        /// #440 Right tree transition. Available only once a non-leaf node has been selected:
+        /// expands that node when its expansion is closed, and otherwise descends into child
+        /// index 0 of the fetched subfolders. Returns false when no transition applies, so the
+        /// caller falls through to the pre-existing behavior.
+        /// </summary>
+        private bool TryRightTreeTransition(BreadcrumbStateRow row)
+        {
+            int? activeIndex = row.ActiveSegmentIndex;
+            if (!activeIndex.HasValue || activeIndex.Value >= row.Chain.Count - 1)
+            {
+                return false; // Leaf-anchored: no node has been selected yet.
+            }
+            if (!row.LeafExpanded)
+            {
+                // The collapse is cleared as PART of the transition, because the expansion of the
+                // selected node is not visible while downstream segments are hidden.
+                row.ReExpand();
+                return row.TryExpandActiveSegment();
+            }
+            if (row.GetActiveChild(0) == null)
+            {
+                return false; // Nothing to descend into.
+            }
+
+            SelectSubfolder(0);
+            return true;
         }
 
         /// <summary>
@@ -489,6 +223,20 @@ namespace UtilitiesCS.OutlookObjects.Folder
             if (row == null)
             {
                 return false;
+            }
+            // #440: attempt the tree transition first (decision D1 handling order). It selects the
+            // parent of the leaf-anchored node; once a non-leaf node is selected, or while a child
+            // of the open expansion is selected, no parent-select is available and the pre-existing
+            // behavior runs unchanged.
+            int? activeIndex = row.ActiveSegmentIndex;
+            if (
+                _selectedSubfolderIndex < 0
+                && activeIndex.HasValue
+                && activeIndex.Value == row.Chain.Count - 1
+                && row.ActivateSegment(activeIndex.Value - 1)
+            )
+            {
+                return true;
             }
             if (_selectedSubfolderIndex >= 0)
             {

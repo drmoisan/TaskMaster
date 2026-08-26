@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="da706f0f-f5c7-4f45-9030-d44a2dadd7a5" name="DanMoisan@MEGALODON4 2026-08-26 10:30:10" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T10:30:10.8104498-04:00" queuing="2026-08-26T10:30:10.8104498-04:00" start="2026-08-26T10:30:08.8056941-04:00" finish="2026-08-26T10:30:10.8286487-04:00" />
+  <TestSettings name="default" id="6e66e025-ce00-441c-888e-4c3f095e4003">
+    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_10_30_10" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="99dcc158-2e01-4864-8c0a-7cf7dc014c27" testId="12c0e890-7881-8496-8d28-5fb84da1c09e" testName="RightArrow_QfcSelectedParentNode_ExpandsIntoChildren" computerName="MEGALODON4" duration="00:00:00.0019947" startTime="2026-08-26T10:30:10.7319374-04:00" endTime="2026-08-26T10:30:10.7389858-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="99dcc158-2e01-4864-8c0a-7cf7dc014c27" />
+    <UnitTestResult executionId="ff6b3919-9db8-49b7-8644-819e252f847b" testId="1d025953-30cd-8dcc-b577-4f460947009d" testName="LeftArrow_QfcMultiSegmentRow_SelectsParentNode" computerName="MEGALODON4" duration="00:00:00.0427097" startTime="2026-08-26T10:30:10.5066497-04:00" endTime="2026-08-26T10:30:10.7254285-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ff6b3919-9db8-49b7-8644-819e252f847b">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="RightArrow_QfcSelectedParentNode_ExpandsIntoChildren" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="12c0e890-7881-8496-8d28-5fb84da1c09e">
+      <Execution id="99dcc158-2e01-4864-8c0a-7cf7dc014c27" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="RightArrow_QfcSelectedParentNode_ExpandsIntoChildren" />
+    </UnitTest>
+    <UnitTest name="LeftArrow_QfcMultiSegmentRow_SelectsParentNode" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1d025953-30cd-8dcc-b577-4f460947009d">
+      <Execution id="ff6b3919-9db8-49b7-8644-819e252f847b" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="LeftArrow_QfcMultiSegmentRow_SelectsParentNode" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="12c0e890-7881-8496-8d28-5fb84da1c09e" executionId="99dcc158-2e01-4864-8c0a-7cf7dc014c27" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d025953-30cd-8dcc-b577-4f460947009d" executionId="ff6b3919-9db8-49b7-8644-819e252f847b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="2" executed="2" passed="2" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

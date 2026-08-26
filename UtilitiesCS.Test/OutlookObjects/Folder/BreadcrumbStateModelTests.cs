@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -315,6 +315,56 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             row.CollapsedAfterIndex.Should().BeNull();
             row.LeafExpanded.Should().BeFalse();
             row.Subfolders.Should().BeEmpty();
+        }
+
+        // --- #440 Qfc tree navigation ---
+
+        /// <summary>
+        /// #440 Qfc Left: on a multi-segment row Left selects the row's parent node before any
+        /// pre-existing view transition is considered (decision D1). The parent is proven to be
+        /// the selected node because a following Right expands it even though the leaf segment
+        /// carries no expansion affordance of its own.
+        /// </summary>
+        [TestMethod]
+        public void LeftArrow_QfcMultiSegmentRow_SelectsParentNode()
+        {
+            // Arrange: Inbox -> Projects -> Apollo where only the non-leaf segments have children.
+            var model = ModelWithSuggestion(leafHasChildren: false);
+
+            // Act
+            var handled = model.LeftArrow();
+
+            // Assert: the tree transition handled the key without collapsing the view.
+            handled.Should().BeTrue("Left selects the parent node before the pre-existing path");
+            model.SelectedRow.CollapsedAfterIndex.Should().BeNull();
+            model.SelectedRow.LeafExpanded.Should().BeFalse();
+
+            // Assert: the selected node is the parent, not the leaf.
+            model.RightArrow().Should().BeTrue("the selected parent node carries children");
+            model.SelectedRow.LeafExpanded.Should().BeTrue();
+        }
+
+        /// <summary>
+        /// #440 Qfc Right: once the selected parent node is expanded and its children are
+        /// attached, the next Right descends into child index 0.
+        /// </summary>
+        [TestMethod]
+        public void RightArrow_QfcSelectedParentNode_ExpandsIntoChildren()
+        {
+            // Arrange: select the parent node, expand it, and attach one child.
+            var model = ModelWithSuggestion();
+            model.LeftArrow();
+            model.RightArrow();
+            model.SelectedRow.SetSubfolders(
+                new[] { Segment("kid", "\\Inbox\\Projects\\Kid", "Kid", false) }
+            );
+
+            // Act
+            var handled = model.RightArrow();
+
+            // Assert
+            handled.Should().BeTrue("the descent transition selects the first child");
+            model.SelectedSubfolderIndex.Should().Be(0);
         }
     }
 }

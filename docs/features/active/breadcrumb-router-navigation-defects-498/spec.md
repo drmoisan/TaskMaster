@@ -1108,7 +1108,7 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
       `UtilitiesCS.Test/OutlookObjects/Folder/OutlookFolderHierarchyProviderTests.cs` (realistic full paths
       plus a decoy node) is demonstrated failing before the fix and passing after, with the failing run
       recorded. The test home is unchanged from version 1.0; only the attribution changed.
-- [ ] **AC-28 (#440 — RED first)** — A regression test for #440 in
+- [x] **AC-28 (#440 — RED first)** — A regression test for #440 in
       `UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbRowStateTests.cs` and/or
       `BreadcrumbStateModelTests.cs` is demonstrated failing before the fix and passing after, with the failing
       run recorded.

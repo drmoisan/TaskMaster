@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -364,8 +364,13 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         [TestMethod]
         public async Task Route_LeftArrow_NothingToCollapse_ReportsUnhandledLeft()
         {
-            // Arrange
+            // Arrange: the first Left consumes the one available #440 parent-select transition,
+            // after which nothing remains to collapse and no further tree transition applies.
             var router = await PopulatedRouterAsync(ProviderMock());
+            await router.RouteAsync(
+                "{\"type\":\"arrowKey\",\"direction\":\"left\"}",
+                CancellationToken.None
+            );
 
             // Act
             var outputs = await router.RouteAsync(
