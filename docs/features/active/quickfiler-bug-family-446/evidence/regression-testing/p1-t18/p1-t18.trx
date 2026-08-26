@@ -1,11 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="115fe3bc-d615-4f58-8c24-b82fac2e7d13" name="DanMoisan@MEGALODON4 2026-08-26 09:41:16" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="115fe3bc-d615-4f58-8c24-b82fac2e7d13" name="REDACTED-USER@REDACTED-HOST 2026-08-26 09:41:16" runUser="REDACTED-HOST\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-26T09:41:16.3387321-04:00" queuing="2026-08-26T09:41:16.3387321-04:00" start="2026-08-26T09:41:14.7176722-04:00" finish="2026-08-26T09:41:16.3682616-04:00" />
   <TestSettings name="default" id="e4e39b02-ad31-40a7-8393-888713a9313b">
-    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_09_41_16" />
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-26_09_41_16" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="df0a7b50-8c00-42db-bc77-d46af02a8a15" testId="13756668-9676-8070-a07e-4661389d1750" testName="DequeueNextItemGroupWithOutcomeAsync_DeadlineExpiredGate_ReportsDeadlineExpiredStop" computerName="MEGALODON4" duration="00:00:00.3863036" startTime="2026-08-26T09:41:15.7019203-04:00" endTime="2026-08-26T09:41:16.2306237-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="df0a7b50-8c00-42db-bc77-d46af02a8a15">
+    <UnitTestResult executionId="df0a7b50-8c00-42db-bc77-d46af02a8a15" testId="13756668-9676-8070-a07e-4661389d1750" testName="DequeueNextItemGroupWithOutcomeAsync_DeadlineExpiredGate_ReportsDeadlineExpiredStop" computerName="REDACTED-HOST" duration="00:00:00.3863036" startTime="2026-08-26T09:41:15.7019203-04:00" endTime="2026-08-26T09:41:16.2306237-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="df0a7b50-8c00-42db-bc77-d46af02a8a15">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -40,7 +40,7 @@ Debug Trace:&#xD;
           <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
    at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
    at FluentAssertions.Primitives.EnumAssertions`2.Be(TEnum expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/EnumAssertions.cs:line 68&#xD;
-   at QuickFiler.Controllers.Tests.QfcQueuePurePathsTests.&lt;DequeueNextItemGroupWithOutcomeAsync_DeadlineExpiredGate_ReportsDeadlineExpiredStop&gt;d__10.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\Controllers\QfcQueuePurePathsTests.cs:line 254&#xD;
+   at QuickFiler.Controllers.Tests.QfcQueuePurePathsTests.&lt;DequeueNextItemGroupWithOutcomeAsync_DeadlineExpiredGate_ReportsDeadlineExpiredStop&gt;d__10.MoveNext() in C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\Controllers\QfcQueuePurePathsTests.cs:line 254&#xD;
 --- End of stack trace from previous location where exception was thrown ---&#xD;
    at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
    at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
@@ -50,9 +50,9 @@ Debug Trace:&#xD;
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="DequeueNextItemGroupWithOutcomeAsync_DeadlineExpiredGate_ReportsDeadlineExpiredStop" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="13756668-9676-8070-a07e-4661389d1750">
+    <UnitTest name="DequeueNextItemGroupWithOutcomeAsync_DeadlineExpiredGate_ReportsDeadlineExpiredStop" storage="c:\users\REDACTED-USER\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="13756668-9676-8070-a07e-4661389d1750">
       <Execution id="df0a7b50-8c00-42db-bc77-d46af02a8a15" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcQueuePurePathsTests" name="DequeueNextItemGroupWithOutcomeAsync_DeadlineExpiredGate_ReportsDeadlineExpiredStop" />
+      <TestMethod codeBase="C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcQueuePurePathsTests" name="DequeueNextItemGroupWithOutcomeAsync_DeadlineExpiredGate_ReportsDeadlineExpiredStop" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
@@ -65,7 +65,7 @@ Debug Trace:&#xD;
   <ResultSummary outcome="Failed">
     <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
-      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+      <StdOut>Test Parallelization enabled for C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
 </StdOut>
     </Output>
   </ResultSummary>

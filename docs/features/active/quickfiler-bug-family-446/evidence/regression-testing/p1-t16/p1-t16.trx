@@ -1,11 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="4b3e79be-c43e-430b-ab0a-339bf2ae6984" name="DanMoisan@MEGALODON4 2026-08-26 09:38:55" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="4b3e79be-c43e-430b-ab0a-339bf2ae6984" name="REDACTED-USER@REDACTED-HOST 2026-08-26 09:38:55" runUser="REDACTED-HOST\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-26T09:38:55.5715886-04:00" queuing="2026-08-26T09:38:55.5715886-04:00" start="2026-08-26T09:38:53.9861301-04:00" finish="2026-08-26T09:38:55.5880826-04:00" />
   <TestSettings name="default" id="f6db9551-8df3-46d2-96ca-4bd83ddf659e">
-    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_09_38_55" />
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-26_09_38_55" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="cc3cf91b-c1cb-480a-8cb3-f624e1f116ad" testId="1b7135c5-291b-8476-83fc-d51610b235c2" testName="IterateQueueAsync_EmptyBatchWithDeadlineExpired_DoesNotCompleteAdding" computerName="MEGALODON4" duration="00:00:00.3057923" startTime="2026-08-26T09:38:55.0875795-04:00" endTime="2026-08-26T09:38:55.5044650-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cc3cf91b-c1cb-480a-8cb3-f624e1f116ad">
+    <UnitTestResult executionId="cc3cf91b-c1cb-480a-8cb3-f624e1f116ad" testId="1b7135c5-291b-8476-83fc-d51610b235c2" testName="IterateQueueAsync_EmptyBatchWithDeadlineExpired_DoesNotCompleteAdding" computerName="REDACTED-HOST" duration="00:00:00.3057923" startTime="2026-08-26T09:38:55.0875795-04:00" endTime="2026-08-26T09:38:55.5044650-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cc3cf91b-c1cb-480a-8cb3-f624e1f116ad">
       <Output>
         <StdOut>Debug Trace:&#xD;
 ﻿</StdOut>
@@ -22,8 +22,8 @@ Performed invocations:&#xD;
 </Message>
           <StackTrace>   at Moq.Mock.Verify(Mock mock, LambdaExpression expression, Times times, String failMessage) in /_/src/Moq/Mock.cs:line 332&#xD;
    at Moq.Mock`1.Verify[TResult](Expression`1 expression, Func`1 times, String failMessage) in /_/src/Moq/Mock`1.cs:line 857&#xD;
-   at QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests.VerifyCompleteAdding(Mock`1 queue, Func`1 times, String because) in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\Controllers\QfcHomeControllerIterationTests.cs:line 165&#xD;
-   at QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests.&lt;IterateQueueAsync_EmptyBatchWithDeadlineExpired_DoesNotCompleteAdding&gt;d__23.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\Controllers\QfcHomeControllerIterationTests.cs:line 418&#xD;
+   at QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests.VerifyCompleteAdding(Mock`1 queue, Func`1 times, String because) in C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\Controllers\QfcHomeControllerIterationTests.cs:line 165&#xD;
+   at QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests.&lt;IterateQueueAsync_EmptyBatchWithDeadlineExpired_DoesNotCompleteAdding&gt;d__23.MoveNext() in C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\Controllers\QfcHomeControllerIterationTests.cs:line 418&#xD;
 --- End of stack trace from previous location where exception was thrown ---&#xD;
    at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
    at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
@@ -34,9 +34,9 @@ Performed invocations:&#xD;
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="IterateQueueAsync_EmptyBatchWithDeadlineExpired_DoesNotCompleteAdding" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="1b7135c5-291b-8476-83fc-d51610b235c2">
+    <UnitTest name="IterateQueueAsync_EmptyBatchWithDeadlineExpired_DoesNotCompleteAdding" storage="c:\users\REDACTED-USER\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="1b7135c5-291b-8476-83fc-d51610b235c2">
       <Execution id="cc3cf91b-c1cb-480a-8cb3-f624e1f116ad" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests" name="IterateQueueAsync_EmptyBatchWithDeadlineExpired_DoesNotCompleteAdding" />
+      <TestMethod codeBase="C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests" name="IterateQueueAsync_EmptyBatchWithDeadlineExpired_DoesNotCompleteAdding" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
@@ -49,7 +49,7 @@ Performed invocations:&#xD;
   <ResultSummary outcome="Failed">
     <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
-      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+      <StdOut>Test Parallelization enabled for C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
 </StdOut>
     </Output>
   </ResultSummary>

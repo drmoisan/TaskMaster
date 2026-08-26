@@ -1,11 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="e64292a4-aaae-4875-b0ac-9b2aab5c50e7" name="DanMoisan@MEGALODON4 2026-08-26 09:19:24" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="e64292a4-aaae-4875-b0ac-9b2aab5c50e7" name="REDACTED-USER@REDACTED-HOST 2026-08-26 09:19:24" runUser="REDACTED-HOST\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-26T09:19:24.0449095-04:00" queuing="2026-08-26T09:19:24.0449095-04:00" start="2026-08-26T09:19:22.6857882-04:00" finish="2026-08-26T09:19:24.0605611-04:00" />
   <TestSettings name="default" id="3573eef7-0071-4c64-b107-b0261b4e57d7">
-    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_09_19_24" />
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-26_09_19_24" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="bd084661-d954-48ec-b32b-470619692c21" testId="1a3a6049-36a2-8fc5-a5a7-8a82b6ba4e75" testName="DequeueAsync_AcceptedCandidate_CarriesTopFolderInPreScoredResult" computerName="MEGALODON4" duration="00:00:00.2744086" startTime="2026-08-26T09:19:23.5923889-04:00" endTime="2026-08-26T09:19:23.9798246-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bd084661-d954-48ec-b32b-470619692c21">
+    <UnitTestResult executionId="bd084661-d954-48ec-b32b-470619692c21" testId="1a3a6049-36a2-8fc5-a5a7-8a82b6ba4e75" testName="DequeueAsync_AcceptedCandidate_CarriesTopFolderInPreScoredResult" computerName="REDACTED-HOST" duration="00:00:00.2744086" startTime="2026-08-26T09:19:23.5923889-04:00" endTime="2026-08-26T09:19:23.9798246-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bd084661-d954-48ec-b32b-470619692c21">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -42,7 +42,7 @@ Debug Trace:&#xD;
    at FluentAssertions.Primitives.StringEqualityStrategy.ValidateAgainstLengthDifferences(AssertionChain assertion, String subject, String expected)&#xD;
    at FluentAssertions.Primitives.StringValidator.Validate(String subject, String expected) in /_/Src/FluentAssertions/Primitives/StringValidator.cs:line 37&#xD;
    at FluentAssertions.Primitives.StringAssertions`1.Be(String expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/StringAssertions.cs:line 67&#xD;
-   at QuickFiler.Controllers.Tests.QfcStreamingDequeueConfidenceGateTests.&lt;DequeueAsync_AcceptedCandidate_CarriesTopFolderInPreScoredResult&gt;d__38.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\Controllers\QfcStreamingDequeueConfidenceGateTests.Part3.cs:line 261&#xD;
+   at QuickFiler.Controllers.Tests.QfcStreamingDequeueConfidenceGateTests.&lt;DequeueAsync_AcceptedCandidate_CarriesTopFolderInPreScoredResult&gt;d__38.MoveNext() in C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\Controllers\QfcStreamingDequeueConfidenceGateTests.Part3.cs:line 261&#xD;
 --- End of stack trace from previous location where exception was thrown ---&#xD;
    at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
    at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
@@ -52,9 +52,9 @@ Debug Trace:&#xD;
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="DequeueAsync_AcceptedCandidate_CarriesTopFolderInPreScoredResult" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a3a6049-36a2-8fc5-a5a7-8a82b6ba4e75">
+    <UnitTest name="DequeueAsync_AcceptedCandidate_CarriesTopFolderInPreScoredResult" storage="c:\users\REDACTED-USER\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a3a6049-36a2-8fc5-a5a7-8a82b6ba4e75">
       <Execution id="bd084661-d954-48ec-b32b-470619692c21" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcStreamingDequeueConfidenceGateTests" name="DequeueAsync_AcceptedCandidate_CarriesTopFolderInPreScoredResult" />
+      <TestMethod codeBase="C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcStreamingDequeueConfidenceGateTests" name="DequeueAsync_AcceptedCandidate_CarriesTopFolderInPreScoredResult" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
@@ -67,7 +67,7 @@ Debug Trace:&#xD;
   <ResultSummary outcome="Failed">
     <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
-      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+      <StdOut>Test Parallelization enabled for C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
 </StdOut>
     </Output>
   </ResultSummary>

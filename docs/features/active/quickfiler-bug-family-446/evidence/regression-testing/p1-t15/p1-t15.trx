@@ -1,53 +1,53 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="c0721784-387b-4dd1-8a1f-f699ae47faac" name="DanMoisan@MEGALODON4 2026-08-26 09:26:01" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="c0721784-387b-4dd1-8a1f-f699ae47faac" name="REDACTED-USER@REDACTED-HOST 2026-08-26 09:26:01" runUser="REDACTED-HOST\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-26T09:26:01.4380549-04:00" queuing="2026-08-26T09:26:01.4380549-04:00" start="2026-08-26T09:25:59.3870972-04:00" finish="2026-08-26T09:26:01.4568014-04:00" />
   <TestSettings name="default" id="17613b70-dd93-4c3a-bff6-f611ebd7d8a3">
-    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_09_26_01" />
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-26_09_26_01" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="0580650b-8b49-4be4-abc7-b5c6529ae0f3" testId="1e789027-fad2-8f0b-b82e-a97c27764ac4" testName="Iterate_HighConfidenceEnabled_DoesNotLoadDirectSynchronousBatch" computerName="MEGALODON4" duration="00:00:00.0047124" startTime="2026-08-26T09:26:01.3143499-04:00" endTime="2026-08-26T09:26:01.3193529-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0580650b-8b49-4be4-abc7-b5c6529ae0f3">
+    <UnitTestResult executionId="0580650b-8b49-4be4-abc7-b5c6529ae0f3" testId="1e789027-fad2-8f0b-b82e-a97c27764ac4" testName="Iterate_HighConfidenceEnabled_DoesNotLoadDirectSynchronousBatch" computerName="REDACTED-HOST" duration="00:00:00.0047124" startTime="2026-08-26T09:26:01.3143499-04:00" endTime="2026-08-26T09:26:01.3193529-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0580650b-8b49-4be4-abc7-b5c6529ae0f3">
       <Output>
         <StdOut>Debug Trace:&#xD;
 ﻿</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="1934eec1-479f-49a7-a737-e7bbcc990596" testId="1d940e3b-898b-895a-94c8-4ec6835282de" testName="Iterate_ExecutesCorrectly" computerName="MEGALODON4" duration="00:00:00.0105669" startTime="2026-08-26T09:26:01.3028299-04:00" endTime="2026-08-26T09:26:01.3143499-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1934eec1-479f-49a7-a737-e7bbcc990596">
+    <UnitTestResult executionId="1934eec1-479f-49a7-a737-e7bbcc990596" testId="1d940e3b-898b-895a-94c8-4ec6835282de" testName="Iterate_ExecutesCorrectly" computerName="REDACTED-HOST" duration="00:00:00.0105669" startTime="2026-08-26T09:26:01.3028299-04:00" endTime="2026-08-26T09:26:01.3143499-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1934eec1-479f-49a7-a737-e7bbcc990596">
       <Output>
         <StdOut>Debug Trace:&#xD;
 ﻿</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="6689a42a-d088-4f89-9de5-353bf53ea482" testId="1d8fcf27-02bb-87ee-b127-5046d17a5b34" testName="IterateQueueAsync_Queue2" computerName="MEGALODON4" duration="00:00:00.0789699" startTime="2026-08-26T09:26:01.2074870-04:00" endTime="2026-08-26T09:26:01.2867935-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6689a42a-d088-4f89-9de5-353bf53ea482">
+    <UnitTestResult executionId="6689a42a-d088-4f89-9de5-353bf53ea482" testId="1d8fcf27-02bb-87ee-b127-5046d17a5b34" testName="IterateQueueAsync_Queue2" computerName="REDACTED-HOST" duration="00:00:00.0789699" startTime="2026-08-26T09:26:01.2074870-04:00" endTime="2026-08-26T09:26:01.2867935-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6689a42a-d088-4f89-9de5-353bf53ea482">
       <Output>
         <StdOut>Debug Trace:&#xD;
 ﻿</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="dad6e0e2-1f3c-4a0b-9650-254279d06a17" testId="16f6d77a-4b41-8e49-a9e7-609c57be7a21" testName="SwapStopWatch_ExecutesCorrectly" computerName="MEGALODON4" duration="00:00:00.0036674" startTime="2026-08-26T09:26:01.3213538-04:00" endTime="2026-08-26T09:26:01.3296823-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dad6e0e2-1f3c-4a0b-9650-254279d06a17">
+    <UnitTestResult executionId="dad6e0e2-1f3c-4a0b-9650-254279d06a17" testId="16f6d77a-4b41-8e49-a9e7-609c57be7a21" testName="SwapStopWatch_ExecutesCorrectly" computerName="REDACTED-HOST" duration="00:00:00.0036674" startTime="2026-08-26T09:26:01.3213538-04:00" endTime="2026-08-26T09:26:01.3296823-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dad6e0e2-1f3c-4a0b-9650-254279d06a17">
       <Output>
         <StdOut>Debug Trace:&#xD;
 ﻿</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="a3a0cbde-443e-4445-9e66-1dfedf3274cf" testId="165e925c-f872-8f76-8ad7-6c0f702b279e" testName="Iterate2_ExecutesCorrectly" computerName="MEGALODON4" duration="00:00:00.0019881" startTime="2026-08-26T09:26:01.3193529-04:00" endTime="2026-08-26T09:26:01.3213538-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a3a0cbde-443e-4445-9e66-1dfedf3274cf">
+    <UnitTestResult executionId="a3a0cbde-443e-4445-9e66-1dfedf3274cf" testId="165e925c-f872-8f76-8ad7-6c0f702b279e" testName="Iterate2_ExecutesCorrectly" computerName="REDACTED-HOST" duration="00:00:00.0019881" startTime="2026-08-26T09:26:01.3193529-04:00" endTime="2026-08-26T09:26:01.3213538-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a3a0cbde-443e-4445-9e66-1dfedf3274cf">
       <Output>
         <StdOut>Debug Trace:&#xD;
 ﻿</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="85ff91ce-7007-4d2b-a699-ca457ffb1489" testId="1e300675-b004-8e4d-9b4e-7a3defba6be2" testName="IterateQueueAsync_QueueEmpty" computerName="MEGALODON4" duration="00:00:00.0341796" startTime="2026-08-26T09:26:01.1722077-04:00" endTime="2026-08-26T09:26:01.2074870-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="85ff91ce-7007-4d2b-a699-ca457ffb1489">
+    <UnitTestResult executionId="85ff91ce-7007-4d2b-a699-ca457ffb1489" testId="1e300675-b004-8e4d-9b4e-7a3defba6be2" testName="IterateQueueAsync_QueueEmpty" computerName="REDACTED-HOST" duration="00:00:00.0341796" startTime="2026-08-26T09:26:01.1722077-04:00" endTime="2026-08-26T09:26:01.2074870-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="85ff91ce-7007-4d2b-a699-ca457ffb1489">
       <Output>
         <StdOut>Debug Trace:&#xD;
 ﻿</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="ca3c8565-3c3e-41d1-962d-a8ad9a6290a1" testId="18d44ca7-7d81-8243-8ed8-08a83caf2347" testName="IterateQueueAsync_WhenDequeueReturnsFullQualifiedPage_EnqueuesAllItems" computerName="MEGALODON4" duration="00:00:00.0161948" startTime="2026-08-26T09:26:01.2877930-04:00" endTime="2026-08-26T09:26:01.3028299-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ca3c8565-3c3e-41d1-962d-a8ad9a6290a1">
+    <UnitTestResult executionId="ca3c8565-3c3e-41d1-962d-a8ad9a6290a1" testId="18d44ca7-7d81-8243-8ed8-08a83caf2347" testName="IterateQueueAsync_WhenDequeueReturnsFullQualifiedPage_EnqueuesAllItems" computerName="REDACTED-HOST" duration="00:00:00.0161948" startTime="2026-08-26T09:26:01.2877930-04:00" endTime="2026-08-26T09:26:01.3028299-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ca3c8565-3c3e-41d1-962d-a8ad9a6290a1">
       <Output>
         <StdOut>Debug Trace:&#xD;
 ﻿</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="c5ea7102-63fd-435b-83ca-e41a2f0c2817" testId="134bf8b6-ac79-82f1-b693-b5bd2c55a1a8" testName="IterateQueueAsync_DataModelComplete" computerName="MEGALODON4" duration="00:00:00.3875913" startTime="2026-08-26T09:26:00.6431494-04:00" endTime="2026-08-26T09:26:01.1651439-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c5ea7102-63fd-435b-83ca-e41a2f0c2817">
+    <UnitTestResult executionId="c5ea7102-63fd-435b-83ca-e41a2f0c2817" testId="134bf8b6-ac79-82f1-b693-b5bd2c55a1a8" testName="IterateQueueAsync_DataModelComplete" computerName="REDACTED-HOST" duration="00:00:00.3875913" startTime="2026-08-26T09:26:00.6431494-04:00" endTime="2026-08-26T09:26:01.1651439-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c5ea7102-63fd-435b-83ca-e41a2f0c2817">
       <Output>
         <StdOut>Debug Trace:&#xD;
 ﻿</StdOut>
@@ -55,37 +55,37 @@
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="IterateQueueAsync_WhenDequeueReturnsFullQualifiedPage_EnqueuesAllItems" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="18d44ca7-7d81-8243-8ed8-08a83caf2347">
+    <UnitTest name="IterateQueueAsync_WhenDequeueReturnsFullQualifiedPage_EnqueuesAllItems" storage="c:\users\REDACTED-USER\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="18d44ca7-7d81-8243-8ed8-08a83caf2347">
       <Execution id="ca3c8565-3c3e-41d1-962d-a8ad9a6290a1" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests" name="IterateQueueAsync_WhenDequeueReturnsFullQualifiedPage_EnqueuesAllItems" />
+      <TestMethod codeBase="C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests" name="IterateQueueAsync_WhenDequeueReturnsFullQualifiedPage_EnqueuesAllItems" />
     </UnitTest>
-    <UnitTest name="Iterate_ExecutesCorrectly" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d940e3b-898b-895a-94c8-4ec6835282de">
+    <UnitTest name="Iterate_ExecutesCorrectly" storage="c:\users\REDACTED-USER\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d940e3b-898b-895a-94c8-4ec6835282de">
       <Execution id="1934eec1-479f-49a7-a737-e7bbcc990596" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests" name="Iterate_ExecutesCorrectly" />
+      <TestMethod codeBase="C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests" name="Iterate_ExecutesCorrectly" />
     </UnitTest>
-    <UnitTest name="IterateQueueAsync_Queue2" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d8fcf27-02bb-87ee-b127-5046d17a5b34">
+    <UnitTest name="IterateQueueAsync_Queue2" storage="c:\users\REDACTED-USER\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d8fcf27-02bb-87ee-b127-5046d17a5b34">
       <Execution id="6689a42a-d088-4f89-9de5-353bf53ea482" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests" name="IterateQueueAsync_Queue2" />
+      <TestMethod codeBase="C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests" name="IterateQueueAsync_Queue2" />
     </UnitTest>
-    <UnitTest name="IterateQueueAsync_QueueEmpty" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e300675-b004-8e4d-9b4e-7a3defba6be2">
+    <UnitTest name="IterateQueueAsync_QueueEmpty" storage="c:\users\REDACTED-USER\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e300675-b004-8e4d-9b4e-7a3defba6be2">
       <Execution id="85ff91ce-7007-4d2b-a699-ca457ffb1489" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests" name="IterateQueueAsync_QueueEmpty" />
+      <TestMethod codeBase="C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests" name="IterateQueueAsync_QueueEmpty" />
     </UnitTest>
-    <UnitTest name="IterateQueueAsync_DataModelComplete" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="134bf8b6-ac79-82f1-b693-b5bd2c55a1a8">
+    <UnitTest name="IterateQueueAsync_DataModelComplete" storage="c:\users\REDACTED-USER\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="134bf8b6-ac79-82f1-b693-b5bd2c55a1a8">
       <Execution id="c5ea7102-63fd-435b-83ca-e41a2f0c2817" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests" name="IterateQueueAsync_DataModelComplete" />
+      <TestMethod codeBase="C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests" name="IterateQueueAsync_DataModelComplete" />
     </UnitTest>
-    <UnitTest name="Iterate_HighConfidenceEnabled_DoesNotLoadDirectSynchronousBatch" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e789027-fad2-8f0b-b82e-a97c27764ac4">
+    <UnitTest name="Iterate_HighConfidenceEnabled_DoesNotLoadDirectSynchronousBatch" storage="c:\users\REDACTED-USER\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e789027-fad2-8f0b-b82e-a97c27764ac4">
       <Execution id="0580650b-8b49-4be4-abc7-b5c6529ae0f3" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests" name="Iterate_HighConfidenceEnabled_DoesNotLoadDirectSynchronousBatch" />
+      <TestMethod codeBase="C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests" name="Iterate_HighConfidenceEnabled_DoesNotLoadDirectSynchronousBatch" />
     </UnitTest>
-    <UnitTest name="SwapStopWatch_ExecutesCorrectly" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="16f6d77a-4b41-8e49-a9e7-609c57be7a21">
+    <UnitTest name="SwapStopWatch_ExecutesCorrectly" storage="c:\users\REDACTED-USER\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="16f6d77a-4b41-8e49-a9e7-609c57be7a21">
       <Execution id="dad6e0e2-1f3c-4a0b-9650-254279d06a17" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests" name="SwapStopWatch_ExecutesCorrectly" />
+      <TestMethod codeBase="C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests" name="SwapStopWatch_ExecutesCorrectly" />
     </UnitTest>
-    <UnitTest name="Iterate2_ExecutesCorrectly" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="165e925c-f872-8f76-8ad7-6c0f702b279e">
+    <UnitTest name="Iterate2_ExecutesCorrectly" storage="c:\users\REDACTED-USER\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="165e925c-f872-8f76-8ad7-6c0f702b279e">
       <Execution id="a3a0cbde-443e-4445-9e66-1dfedf3274cf" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests" name="Iterate2_ExecutesCorrectly" />
+      <TestMethod codeBase="C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcHomeControllerIterationTests" name="Iterate2_ExecutesCorrectly" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
@@ -105,7 +105,7 @@
   <ResultSummary outcome="Completed">
     <Counters total="8" executed="8" passed="8" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
-      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+      <StdOut>Test Parallelization enabled for C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
 </StdOut>
     </Output>
   </ResultSummary>

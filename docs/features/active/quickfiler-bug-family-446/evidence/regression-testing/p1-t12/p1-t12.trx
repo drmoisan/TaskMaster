@@ -1,11 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="36ef975a-181e-4575-9133-b8f554f27df6" name="DanMoisan@MEGALODON4 2026-08-26 09:17:39" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="36ef975a-181e-4575-9133-b8f554f27df6" name="REDACTED-USER@REDACTED-HOST 2026-08-26 09:17:39" runUser="REDACTED-HOST\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-26T09:17:39.9719866-04:00" queuing="2026-08-26T09:17:39.9719866-04:00" start="2026-08-26T09:17:38.4229648-04:00" finish="2026-08-26T09:17:39.9880824-04:00" />
   <TestSettings name="default" id="5b213c2f-95cd-4c62-9807-ca87e633905b">
-    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_09_17_39" />
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-26_09_17_39" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="8f3f208d-463d-4e45-86db-15a7faf9d533" testId="10b0bd4f-303b-8684-b7f0-8da9348ccb4e" testName="ScoreRemainingQueueMailItemAsync_ReturnsScoreAndTopFolder" computerName="MEGALODON4" duration="00:00:00.3053441" startTime="2026-08-26T09:17:39.3995382-04:00" endTime="2026-08-26T09:17:39.8164796-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8f3f208d-463d-4e45-86db-15a7faf9d533">
+    <UnitTestResult executionId="8f3f208d-463d-4e45-86db-15a7faf9d533" testId="10b0bd4f-303b-8684-b7f0-8da9348ccb4e" testName="ScoreRemainingQueueMailItemAsync_ReturnsScoreAndTopFolder" computerName="REDACTED-HOST" duration="00:00:00.3053441" startTime="2026-08-26T09:17:39.3995382-04:00" endTime="2026-08-26T09:17:39.8164796-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8f3f208d-463d-4e45-86db-15a7faf9d533">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -42,7 +42,7 @@ Debug Trace:&#xD;
    at FluentAssertions.Primitives.StringEqualityStrategy.ValidateAgainstLengthDifferences(AssertionChain assertion, String subject, String expected)&#xD;
    at FluentAssertions.Primitives.StringValidator.Validate(String subject, String expected) in /_/Src/FluentAssertions/Primitives/StringValidator.cs:line 37&#xD;
    at FluentAssertions.Primitives.StringAssertions`1.Be(String expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/StringAssertions.cs:line 67&#xD;
-   at QuickFiler.Controllers.Tests.QfcDatamodelTests.&lt;ScoreRemainingQueueMailItemAsync_ReturnsScoreAndTopFolder&gt;d__12.MoveNext() in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\Controllers\QfcDatamodelTests.cs:line 361&#xD;
+   at QuickFiler.Controllers.Tests.QfcDatamodelTests.&lt;ScoreRemainingQueueMailItemAsync_ReturnsScoreAndTopFolder&gt;d__12.MoveNext() in C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\Controllers\QfcDatamodelTests.cs:line 361&#xD;
 --- End of stack trace from previous location where exception was thrown ---&#xD;
    at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
    at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
@@ -52,9 +52,9 @@ Debug Trace:&#xD;
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="ScoreRemainingQueueMailItemAsync_ReturnsScoreAndTopFolder" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="10b0bd4f-303b-8684-b7f0-8da9348ccb4e">
+    <UnitTest name="ScoreRemainingQueueMailItemAsync_ReturnsScoreAndTopFolder" storage="c:\users\REDACTED-USER\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="10b0bd4f-303b-8684-b7f0-8da9348ccb4e">
       <Execution id="8f3f208d-463d-4e45-86db-15a7faf9d533" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcDatamodelTests" name="ScoreRemainingQueueMailItemAsync_ReturnsScoreAndTopFolder" />
+      <TestMethod codeBase="C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcDatamodelTests" name="ScoreRemainingQueueMailItemAsync_ReturnsScoreAndTopFolder" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
@@ -67,7 +67,7 @@ Debug Trace:&#xD;
   <ResultSummary outcome="Failed">
     <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
-      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+      <StdOut>Test Parallelization enabled for C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
 </StdOut>
     </Output>
   </ResultSummary>

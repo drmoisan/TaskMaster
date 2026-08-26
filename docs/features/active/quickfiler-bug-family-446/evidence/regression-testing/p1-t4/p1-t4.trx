@@ -1,11 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="29f2e854-f1ad-4ba6-9564-1ec1c9e0f5ae" name="DanMoisan@MEGALODON4 2026-08-26 08:48:34" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="29f2e854-f1ad-4ba6-9564-1ec1c9e0f5ae" name="REDACTED-USER@REDACTED-HOST 2026-08-26 08:48:34" runUser="REDACTED-HOST\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-26T08:48:34.1563781-04:00" queuing="2026-08-26T08:48:34.1563781-04:00" start="2026-08-26T08:48:32.6155826-04:00" finish="2026-08-26T08:48:34.1718236-04:00" />
   <TestSettings name="default" id="1bbb8715-b3bd-4e28-a36c-1eb54be30049">
-    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_08_48_34" />
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-26_08_48_34" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="3e1a559c-e663-4d0c-aed5-6d5a703a045c" testId="1f39ab22-39c1-8fc5-9715-9e204448169a" testName="DequeueAsync_AcceptedCandidate_DoesNotInvokeOnRejected" computerName="MEGALODON4" duration="00:00:00.2489333" startTime="2026-08-26T08:48:33.5515114-04:00" endTime="2026-08-26T08:48:33.9979298-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3e1a559c-e663-4d0c-aed5-6d5a703a045c">
+    <UnitTestResult executionId="3e1a559c-e663-4d0c-aed5-6d5a703a045c" testId="1f39ab22-39c1-8fc5-9715-9e204448169a" testName="DequeueAsync_AcceptedCandidate_DoesNotInvokeOnRejected" computerName="REDACTED-HOST" duration="00:00:00.2489333" startTime="2026-08-26T08:48:33.5515114-04:00" endTime="2026-08-26T08:48:33.9979298-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3e1a559c-e663-4d0c-aed5-6d5a703a045c">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -39,9 +39,9 @@ Debug Trace:&#xD;
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="DequeueAsync_AcceptedCandidate_DoesNotInvokeOnRejected" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="1f39ab22-39c1-8fc5-9715-9e204448169a">
+    <UnitTest name="DequeueAsync_AcceptedCandidate_DoesNotInvokeOnRejected" storage="c:\users\REDACTED-USER\repos\taskmaster\.claude\worktrees\agent-ab67db189e5df1287\quickfiler.test\bin\debug\quickfiler.test.dll" id="1f39ab22-39c1-8fc5-9715-9e204448169a">
       <Execution id="3e1a559c-e663-4d0c-aed5-6d5a703a045c" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcStreamingDequeueConfidenceGateTests" name="DequeueAsync_AcceptedCandidate_DoesNotInvokeOnRejected" />
+      <TestMethod codeBase="C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcStreamingDequeueConfidenceGateTests" name="DequeueAsync_AcceptedCandidate_DoesNotInvokeOnRejected" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
@@ -54,7 +54,7 @@ Debug Trace:&#xD;
   <ResultSummary outcome="Completed">
     <Counters total="1" executed="1" passed="1" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
-      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+      <StdOut>Test Parallelization enabled for C:\Users\REDACTED-USER\repos\TaskMaster\.claude\worktrees\agent-ab67db189e5df1287\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
 </StdOut>
     </Output>
   </ResultSummary>
