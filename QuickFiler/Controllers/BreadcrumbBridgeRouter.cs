@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -16,7 +16,7 @@ namespace QuickFiler.Controllers
     /// the <see cref="IBreadcrumbWebHost"/> seam. Contains no WebView2/WinForms/COM types and
     /// derives no hierarchy from suggestion-row prefix matching.
     /// </summary>
-    public sealed class BreadcrumbBridgeRouter
+    public sealed partial class BreadcrumbBridgeRouter
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
@@ -134,6 +134,16 @@ namespace QuickFiler.Controllers
             );
             AttachSegmentKeys(presentedRows, chains);
             _selectedRowId = null;
+
+            // #499: the rows just rebuilt are a new set, so a folder path selected against the
+            // previous set is stale. Clear it with the row id and notify subscribers, but only
+            // when the value actually changed, so a re-bind with no prior selection is silent.
+            if (SelectedFolderPath != null)
+            {
+                SelectedFolderPath = null;
+                SelectedFolderPathChanged?.Invoke(this, null);
+            }
+
             DeliverDocument();
         }
 
@@ -239,12 +249,33 @@ namespace QuickFiler.Controllers
             switch (message.Type)
             {
                 case BreadcrumbMessageTypes.SegmentDoubleClick:
-                    if (row.CollapseAfter(message.SegmentIndex!.Value))
+                {
+                    // #498: the bridge is an untrusted boundary, so the segment index is validated
+                    // here rather than relying on BreadcrumbRow.CollapseAfter to throw. An index
+                    // that escaped this arm reached the async void host-event seam as an unhandled
+                    // exception, which the single catch (BreadcrumbMessageException) cannot contain.
+                    int? requestedIndex = message.SegmentIndex;
+                    if (
+                        !requestedIndex.HasValue
+                        || requestedIndex.Value < 0
+                        || requestedIndex.Value >= row.Segments.Count
+                    )
+                    {
+                        log.Error(
+                            $"Inbound segmentDoubleClick for row '{row.RowId}' carries segment index "
+                                + $"'{requestedIndex}', which is outside the valid range "
+                                + $"[0, {row.Segments.Count - 1}]; rejected without a transition."
+                        );
+                        break;
+                    }
+
+                    if (row.CollapseAfter(requestedIndex.Value))
                     {
                         PostRowRender(row);
                     }
 
                     break;
+                }
                 case BreadcrumbMessageTypes.SegmentActivate:
                     ActivateSegment(row, message.SegmentIndex!.Value);
                     break;
@@ -274,323 +305,6 @@ namespace QuickFiler.Controllers
                 // Boundary: the codec already logged the specific malformed-payload error; the
                 // router state is unchanged and the UI message pump must not be crashed.
             }
-        }
-
-        private async Task HandleLeafToggleAsync(BreadcrumbRow row)
-        {
-            if (row.IsCollapsed)
-            {
-                if (row.ReExpand())
-                {
-                    PostRowRender(row);
-                }
-
-                return;
-            }
-
-            if (row.IsLeafExpanded)
-            {
-                if (row.ToggleLeafExpanded())
-                {
-                    PostRowRender(row);
-                }
-
-                return;
-            }
-
-            await ExpandLeafAsync(row);
-        }
-
-        private async Task HandleArrowKeyAsync(BreadcrumbRow row, string key)
-        {
-            switch (key)
-            {
-                case "Right":
-                    if (row.IsCollapsed)
-                    {
-                        if (row.ReExpand())
-                        {
-                            PostRowRender(row);
-                        }
-                    }
-                    else if (!row.IsLeafExpanded)
-                    {
-                        await ExpandLeafAsync(row);
-                    }
-
-                    break;
-                case "Left":
-                    if (row.LeftArrow())
-                    {
-                        PostRowRender(row);
-                    }
-
-                    break;
-                case "Up":
-                    HandleUpArrow(row);
-                    break;
-                case "Down":
-                    MoveSelection(row, step: 1);
-                    break;
-                default:
-                    log.Error($"Unknown breadcrumb arrow key '{key}' for row '{row.RowId}'.");
-                    break;
-            }
-        }
-
-        private void HandleUpArrow(BreadcrumbRow row)
-        {
-            BreadcrumbRow? previous = FindSelectable(IndexOf(row) - 1, step: -1);
-            if (previous == null)
-            {
-                // Up at the top row: hand focus back to the search box.
-                PostOutbound(new BreadcrumbFocusSearchMessage());
-                FocusSearchRequested?.Invoke(this, EventArgs.Empty);
-                return;
-            }
-
-            SelectRow(previous);
-        }
-
-        private void MoveSelection(BreadcrumbRow row, int step)
-        {
-            BreadcrumbRow? next = FindSelectable(IndexOf(row) + step, step);
-            if (next != null)
-            {
-                SelectRow(next);
-            }
-        }
-
-        private async Task ExpandLeafAsync(BreadcrumbRow row)
-        {
-            BreadcrumbSegment? activeSegment = row.ActiveSegment;
-            if (row.Kind != BreadcrumbRowKind.Suggestion || activeSegment?.HasSubfolders != true)
-            {
-                return; // Active segment without subfolders (or non-suggestion row): no-op.
-            }
-
-            string requestId = "req-" + (++_requestSequence);
-            try
-            {
-                FolderTreeNodeKey? key = row.ActiveSegmentKey;
-                if (key == null)
-                {
-                    log.Error(
-                        $"Breadcrumb expand {requestId}: no provider key for '{activeSegment.FullPath}'; row '{row.RowId}' left unchanged."
-                    );
-                    return;
-                }
-
-                IReadOnlyList<FolderBreadcrumbSegment> children =
-                    await _provider.GetImmediateSubfoldersAsync(key, CancellationToken.None);
-                IReadOnlyList<BreadcrumbSegment> mapped = BreadcrumbRowBuilder.MapSegments(
-                    children
-                );
-                row.SetLeafChildren(mapped);
-                row.ToggleLeafExpanded();
-                PostOutbound(new BreadcrumbSubfolderResultMessage(requestId, row.RowId, mapped));
-                PostRowRender(row);
-            }
-            catch (OperationCanceledException)
-            {
-                log.Error(
-                    $"Breadcrumb expand {requestId} canceled for row '{row.RowId}'; state unchanged."
-                );
-            }
-            catch (Exception ex)
-            {
-                // Provider I/O boundary: log the specific failure and leave row state unchanged.
-                log.Error(
-                    $"Breadcrumb expand {requestId} failed for row '{row.RowId}': {ex.Message}",
-                    ex
-                );
-            }
-        }
-
-        private void ActivateSegment(BreadcrumbRow row, int segmentIndex)
-        {
-            if (!row.ActivateSegment(segmentIndex))
-            {
-                log.Error(
-                    $"Breadcrumb segment activation rejected for row '{row.RowId}' and index '{segmentIndex}'."
-                );
-                return;
-            }
-
-            BreadcrumbSegment? activeSegment = row.ActiveSegment;
-            if (activeSegment == null)
-            {
-                return;
-            }
-
-            SelectHierarchyPath(row, activeSegment.FullPath);
-        }
-
-        private void ActivateChild(BreadcrumbRow row, int childIndex)
-        {
-            BreadcrumbSegment? child = row.GetActiveChild(childIndex);
-            if (child == null)
-            {
-                log.Error(
-                    $"Breadcrumb child activation rejected for row '{row.RowId}' and index '{childIndex}'."
-                );
-                return;
-            }
-
-            SelectHierarchyPath(row, child.FullPath);
-        }
-
-        private async Task<IReadOnlyList<FolderBreadcrumbSegment>?> FetchChainAsync(
-            string folderPath,
-            CancellationToken cancellationToken
-        )
-        {
-            try
-            {
-                FolderTreeNodeKey? key = await _provider.ResolveLeafKeyAsync(
-                    folderPath,
-                    cancellationToken
-                );
-                if (key == null)
-                {
-                    return null;
-                }
-
-                return await _provider.GetAncestorChainAsync(key, cancellationToken);
-            }
-            catch (OperationCanceledException)
-            {
-                log.Error(
-                    $"Breadcrumb chain fetch canceled for '{folderPath}'; rendering fallback."
-                );
-                return null;
-            }
-            catch (Exception ex)
-            {
-                // Provider I/O boundary: fall back to the builder's single-segment rendering.
-                log.Error($"Breadcrumb chain fetch failed for '{folderPath}': {ex.Message}", ex);
-                return null;
-            }
-        }
-
-        private void SelectRow(BreadcrumbRow row)
-        {
-            if (row.Kind == BreadcrumbRowKind.Banner)
-            {
-                return; // Banner rows are never selectable.
-            }
-
-            _selectedRowId = row.RowId;
-            SelectedFolderPath =
-                row.Kind == BreadcrumbRowKind.TrashPseudoRow
-                    ? BreadcrumbRowBuilder.TrashRowText
-                    : row.FilingTarget;
-            PostOutbound(
-                new BreadcrumbRenderMessage(_renderer.RenderRows(_rows, _selectedRowId), null)
-            );
-            SelectedFolderPathChanged?.Invoke(this, SelectedFolderPath);
-        }
-
-        private void SelectHierarchyPath(BreadcrumbRow row, string fullPath)
-        {
-            _selectedRowId = row.RowId;
-            SelectedFolderPath = ToArchiveRelativePath(fullPath);
-            PostOutbound(
-                new BreadcrumbRenderMessage(_renderer.RenderRows(_rows, _selectedRowId), null)
-            );
-            SelectedFolderPathChanged?.Invoke(this, SelectedFolderPath);
-        }
-
-        private string ToArchiveRelativePath(string fullPath)
-        {
-            string root = _archiveRootPath.TrimEnd('\\', '/');
-            if (root.Length == 0)
-            {
-                return fullPath;
-            }
-
-            if (string.Equals(fullPath, root, StringComparison.OrdinalIgnoreCase))
-            {
-                return string.Empty;
-            }
-
-            if (
-                fullPath.StartsWith(root + "\\", StringComparison.OrdinalIgnoreCase)
-                || fullPath.StartsWith(root + "/", StringComparison.OrdinalIgnoreCase)
-            )
-            {
-                return fullPath.Substring(root.Length).TrimStart('\\', '/');
-            }
-
-            return fullPath;
-        }
-
-        private void PostRowRender(BreadcrumbRow row)
-        {
-            PostOutbound(
-                new BreadcrumbRenderMessage(
-                    _renderer.RenderRowFragment(row, row.RowId == _selectedRowId),
-                    row.RowId
-                )
-            );
-        }
-
-        private void PostOutbound(BreadcrumbOutboundMessage message)
-        {
-            _outboundQueue.PostOrQueue(_codec.SerializeOutbound(message));
-        }
-
-        private void DeliverDocument()
-        {
-            string document = _renderer.RenderDocument(_rows, _darkMode, _selectedRowId);
-            if (_host.IsCoreInitialized)
-            {
-                _host.NavigateToString(document);
-                _pendingDocument = null;
-            }
-            else
-            {
-                _pendingDocument = document;
-            }
-        }
-
-        private BreadcrumbRow? FindRow(string rowId)
-        {
-            foreach (BreadcrumbRow row in _rows)
-            {
-                if (row.RowId == rowId)
-                {
-                    return row;
-                }
-            }
-
-            return null;
-        }
-
-        private int IndexOf(BreadcrumbRow row)
-        {
-            for (int i = 0; i < _rows.Count; i++)
-            {
-                if (ReferenceEquals(_rows[i], row))
-                {
-                    return i;
-                }
-            }
-
-            return -1;
-        }
-
-        private BreadcrumbRow? FindSelectable(int startIndex, int step)
-        {
-            for (int i = startIndex; i >= 0 && i < _rows.Count; i += step)
-            {
-                if (_rows[i].Kind != BreadcrumbRowKind.Banner)
-                {
-                    return _rows[i];
-                }
-            }
-
-            return null;
         }
     }
 }

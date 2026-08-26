@@ -1,6 +1,6 @@
 ---
 name: sln-csproj-edit-crlf-preserve
-description: git-bash sed strips CRLF when editing TaskMaster.sln/.csproj; use perl -0777 with explicit \r\n to preserve line endings on VS solution/project files
+description: git-bash sed strips CRLF when editing TaskMaster.sln/.csproj AND CRLF plan .md files; use perl -0777 with explicit \r\n, or re-add \r after the sed pass
 metadata:
   type: project
 ---
@@ -20,3 +20,10 @@ terminators") and `git diff --stat` (expect only the intended N-line delta, not 
 Note the many `.csproj` files here are actually LF already, so a simple `sed` start-address using
 `.` for the literal backslash works for `<ProjectReference Include=..\X\Y.csproj>` deletions —
 but always re-check the `file` type before trusting sed on a CRLF file.
+
+**This also bites plan `.md` files.** Atomic plans written by `atomic-planner` are CRLF, and every
+`[P#-T#]` check-off is a `sed -i` pass, so the first check-off silently converts the whole plan to LF and
+turns a 9-line change into whole-file churn. Cheapest reliable idiom, run immediately after each check-off
+sed: `sed -i 's/$/\r/' <plan>.md`, then confirm with `file <plan>.md` (expect "with CRLF line terminators")
+and `git diff --stat` (expect insertions == deletions == number of boxes ticked). Doing this per check-off
+rather than once at the end keeps the diff readable if the run is interrupted.
