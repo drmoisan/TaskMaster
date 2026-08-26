@@ -3,6 +3,7 @@
 ## Plan validation & gates
 - [CSharpier chain-wrap defeats single-line search gates](project_csharpier_chain_wrap_defeats_singleline_search_gates.md) — a zero-hit gate on `fsPath.Substring(3)` returns 0 hits BEFORE any work because the chain wraps; grep every gate literal at preflight
 - [Verify line citations with numbered output](feedback_verify_line_citations_with_numbered_output.md) — never hand-count from a `sed` window; a wrong #438 advisory got applied and corrupted 3 correct citations in plan + spec
+- [Extract gate literals from the plan, never re-type them](project_preflight_gate_literal_extract_from_plan_not_retype.md) — bash/pwsh quoting layers silently eat backslashes; a re-typed literal gave a false 0-hit "unfailable gate" blocker on a correct plan
 - [Self-derived gate thresholds are blind](project_preflight_selfderived_gate_thresholds_are_blind.md) — a "count >= floor" gate whose floor comes from the runs it validates is deflation-blind + scope-incommensurable; use
 - [Multi-pattern gates detach shared qualifiers](project_multipattern_gate_shared_qualifier_detachment.md) — rewriting one clause re-scopes the trailing allowlist to the last pattern only; restate the carve-out per pattern +
 - [Merge-base diff gates need a commit cadence](project_preflight_mergebase_diff_gates_need_commit_cadence.md) — `<MERGE_BASE>..HEAD` gates are vacuous while HEAD == merge-base; plan an explicit commit task
