@@ -391,5 +391,64 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             // Act + Assert: a further Left is the pre-existing unhandled fall-through.
             model.LeftArrow().Should().BeFalse();
         }
+
+        /// <summary>
+        /// #440/D7 negative path: the filing-target constructor overload leaves validation of a
+        /// null or empty ancestor chain to the chained constructor rather than throwing its own
+        /// error, so an empty chain still fails fast with the chain message.
+        /// </summary>
+        [TestMethod]
+        public void SuggestionRowWithFilingTarget_EmptyChain_DefersValidationToChainedConstructor()
+        {
+            // Arrange
+            var emptyChain = Array.Empty<FolderBreadcrumbSegment>();
+
+            // Act
+            Action act = () =>
+                new BreadcrumbStateRow("folder-a", emptyChain, 0.4, @"\Inbox\Clients");
+
+            // Assert
+            act.Should().Throw<ArgumentException>().WithMessage("*non-empty ancestor chain*");
+        }
+
+        /// <summary>
+        /// #440 negative path: with no open expansion there is no fetched child to descend into,
+        /// so GetActiveChild reports null and the caller takes the decision-D1 fall-through.
+        /// </summary>
+        [TestMethod]
+        public void GetActiveChild_WithoutAnOpenExpansion_ReturnsNull()
+        {
+            // Arrange
+            var row = ModelWithSuggestion().Rows[0];
+
+            // Act + Assert
+            row.LeafExpanded.Should().BeFalse();
+            row.GetActiveChild(0).Should().BeNull();
+        }
+
+        /// <summary>
+        /// #440 negative path (no-op by contract): TryExpandActiveSegment returns false without
+        /// changing state both when the active segment has no child affordance and when an
+        /// expansion is already open, so the caller falls through to legacy behavior.
+        /// </summary>
+        [TestMethod]
+        public void TryExpandActiveSegment_WithoutAnAffordance_ReturnsFalseAndLeavesTheRowClosed()
+        {
+            // Arrange: a leaf with no children has no affordance to open.
+            var childlessRow = ModelWithSuggestion(leafHasChildren: false).Rows[0];
+
+            // Act + Assert
+            childlessRow.ActiveSegmentHasSubfolders.Should().BeFalse();
+            childlessRow.TryExpandActiveSegment().Should().BeFalse();
+            childlessRow.LeafExpanded.Should().BeFalse();
+
+            // Arrange: an already-open expansion is the second refusal condition.
+            var openRow = ModelWithSuggestion().Rows[0];
+            openRow.TryExpandLeaf().Should().BeTrue();
+
+            // Act + Assert
+            openRow.TryExpandActiveSegment().Should().BeFalse();
+            openRow.LeafExpanded.Should().BeTrue();
+        }
     }
 }

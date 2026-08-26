@@ -1087,19 +1087,19 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
       (1) the new parent-select / expand-node transition when one is available for this row, else (2) the
       existing breadcrumb expand/collapse behavior, else (3) the existing `unhandledArrow` fall-through
       unchanged. A test asserts a row with a single-segment chain still takes the pre-existing path.
-- [ ] **AC-19 (decision D1 — message shapes)** — The `arrowKey` and `unhandledArrow` message shapes are
+- [x] **AC-19 (decision D1 — message shapes)** — The `arrowKey` and `unhandledArrow` message shapes are
       unchanged, and `QuickFiler.Test/Viewers/FolderBreadcrumbAssetContractTests.cs`
       `LeftAndRightBreadcrumbMessages_RemainSupported` (`:359-367`) passes **unmodified**; that file does not
       appear in the feature diff.
-- [ ] **AC-20 (decision D1 — selector session)** — `UtilitiesCS/OutlookObjects/Folder/BreadcrumbSelectionSession.cs`
+- [x] **AC-20 (decision D1 — selector session)** — `UtilitiesCS/OutlookObjects/Folder/BreadcrumbSelectionSession.cs`
       is unmodified, and the #400 selector-session tests
       (`UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbStateModelSelectorTests.cs`) pass unmodified, so
       #400 AC-9's committed/original/pending clause survives.
-- [ ] **AC-21 (decision D1 — supersession record)** — This spec contains a reviewer-findable record (section
+- [x] **AC-21 (decision D1 — supersession record)** — This spec contains a reviewer-findable record (section
       "#400 AC-9 supersession record") naming exactly which clause of #400 AC-9
       (`docs/features/archive/2026-07-21-quickfiler-folder-selector-dropdown-400/spec.md:247`) is retracted and
       which clauses survive.
-- [ ] **AC-22 (decision D1 — #400 residual contract)** — #400 AC-5 through AC-8 (`spec.md:243-246`), the
+- [x] **AC-22 (decision D1 — #400 residual contract)** — #400 AC-5 through AC-8 (`spec.md:243-246`), the
       Up/Down/Enter/Escape selector contract, are unchanged, demonstrated by the corresponding #400 tests
       passing unmodified.
 - [x] **AC-23 (decision D2 — Efc boundaries)** — Efc boundary behavior is unchanged: Left at the root and
@@ -1129,18 +1129,18 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
       `UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbRowStateTests.cs` and/or
       `BreadcrumbStateModelTests.cs` is demonstrated failing before the fix and passing after, with the failing
       run recorded.
-- [ ] **AC-29 (policy — toolchain)** — The full C# toolchain passes in one clean pass, in order:
+- [x] **AC-29 (policy — toolchain)** — The full C# toolchain passes in one clean pass, in order:
       `dotnet tool run csharpier format .` (verified by `dotnet tool run csharpier check .`), the
       `EnableNETAnalyzers`/`EnforceCodeStyleInBuild` rebuild, the `TreatWarningsAsErrors` rebuild, and
       `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`, with the commands and their results
       reported.
-- [ ] **AC-30 (policy — ownership)** — No file outside the owned set listed under "Scope & Non-Goals" is
+- [x] **AC-30 (policy — ownership)** — No file outside the owned set listed under "Scope & Non-Goals" is
       modified. In particular `EfcFormController.cs`, `KbdActions.cs`,
       `QuickFiler/Viewers/BreadcrumbBridgeCoordinator.cs` (**sibling epic child 501 owns it**),
       `BreadcrumbRowBuilder.cs`, `BreadcrumbDocumentAssets.cs`, `BreadcrumbHtmlRenderer.cs`,
       `BreadcrumbSelectionMap.cs`, `IFolderHierarchyProvider.cs`, `FolderBreadcrumbAssetContractTests.cs`, and
       `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` are absent from the diff.
-- [ ] **AC-31 (policy — file size, decision D8)** — `QuickFiler/Controllers/BreadcrumbBridgeRouter.cs`
+- [x] **AC-31 (policy — file size, decision D8)** — `QuickFiler/Controllers/BreadcrumbBridgeRouter.cs`
       finishes at or under 500 lines. It starts at **596** lines, already in breach, so the mandatory D8
       partial-class split is performed FIRST and must bring the file to <= 500 INCLUDING this feature's
       additions; the new partial file carries a `<Compile Include>` entry in `QuickFiler/QuickFiler.csproj`
