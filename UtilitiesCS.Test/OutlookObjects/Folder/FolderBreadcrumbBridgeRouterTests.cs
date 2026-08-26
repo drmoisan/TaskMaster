@@ -28,6 +28,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         // The archive-relative form the QuickFiler surface presents for the same folder.
         private const string StemPath = "Projects\\Apollo";
 
+        // Full path of the PARENT node's first immediate subfolder (#440 descent target).
+        private const string MidChildPath = "\\Inbox\\Projects\\Alpha";
+
         private static readonly FolderTreeNodeKey RootKey = Key("root", "\\Inbox");
         private static readonly FolderTreeNodeKey MidKey = Key("mid", "\\Inbox\\Projects");
         private static readonly FolderTreeNodeKey LeafKey = Key("leaf", LeafPath);
@@ -403,6 +406,90 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
                 .Theme.Should()
                 .Be("dark");
             BreadcrumbBridgeSerializer.Parse(outputs[1]).Should().BeOfType<RenderMessage>();
+        }
+
+        // --- #440 Qfc router tree navigation ---
+
+        /// <summary>
+        /// A strict provider that serves the immediate subfolders of the PARENT node only. A fetch
+        /// keyed on the leaf is an unmatched strict invocation, so the test cannot pass while the
+        /// router still expands the leaf instead of the selected node.
+        /// </summary>
+        private static Mock<IFolderHierarchyProvider> ParentSubfolderProviderMock()
+        {
+            var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+            provider
+                .Setup(p => p.ResolveLeafKeyAsync(LeafPath, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(LeafKey);
+            provider
+                .Setup(p => p.GetAncestorChainAsync(LeafKey, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(LeafChain());
+            provider
+                .Setup(p => p.GetImmediateSubfoldersAsync(MidKey, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[] { Segment(Key("m1", MidChildPath), "Alpha", false) });
+            return provider;
+        }
+
+        private static Task<IReadOnlyList<string>> ArrowAsync(
+            FolderBreadcrumbBridgeRouter router,
+            string direction
+        ) =>
+            router.RouteAsync(
+                "{\"type\":\"arrowKey\",\"direction\":\"" + direction + "\"}",
+                CancellationToken.None
+            );
+
+        /// <summary>
+        /// #440 Qfc Left is routed as the parent-select tree transition rather than reported as an
+        /// unhandled arrow, and the node the router subsequently expands is the parent.
+        /// </summary>
+        [TestMethod]
+        public async Task ArrowAsync_QfcLeftOnMultiSegmentRow_RoutesParentSelectTransition()
+        {
+            // Arrange
+            var provider = ParentSubfolderProviderMock();
+            var router = await PopulatedRouterAsync(provider);
+
+            // Act
+            var left = await ArrowAsync(router, "left");
+            var right = await ArrowAsync(router, "right");
+
+            // Assert: Left produced a render, not an unhandled-arrow fall-through.
+            left.Should().ContainSingle();
+            BreadcrumbBridgeSerializer.Parse(left[0]).Should().BeOfType<RenderMessage>();
+
+            // Assert: the expansion that follows is keyed on the selected PARENT node.
+            provider.Verify(
+                p => p.GetImmediateSubfoldersAsync(MidKey, It.IsAny<CancellationToken>()),
+                Times.Once()
+            );
+            right.Should().HaveCount(2);
+            BreadcrumbBridgeSerializer
+                .Parse(right[1])
+                .Should()
+                .BeOfType<SubfolderResponseMessage>();
+        }
+
+        /// <summary>
+        /// #440 Qfc Right on the already-expanded selected parent node descends into child index 0,
+        /// which the router reports through the selected-folder value of its render payload.
+        /// </summary>
+        [TestMethod]
+        public async Task ArrowAsync_QfcRightOnSelectedParentNode_RoutesChildExpansion()
+        {
+            // Arrange: select the parent node and expand it.
+            var provider = ParentSubfolderProviderMock();
+            var router = await PopulatedRouterAsync(provider);
+            await ArrowAsync(router, "left");
+            await ArrowAsync(router, "right");
+
+            // Act
+            var outputs = await ArrowAsync(router, "right");
+
+            // Assert
+            outputs.Should().ContainSingle();
+            BreadcrumbBridgeSerializer.Parse(outputs[0]).Should().BeOfType<RenderMessage>();
+            router.GetSelectedFolder().Should().Be(MidChildPath);
         }
     }
 }

@@ -564,6 +564,23 @@ choice:
 
 Either choice must preserve the D1 handling order and the D2 boundary behavior.
 
+**D9 DESCENT MECHANISM SELECTED: descend by child activation**
+
+Rationale. `ActivateSegment` refuses the leaf index (`UtilitiesCS/OutlookObjects/Folder/BreadcrumbRow.cs:156`)
+and therefore cannot express a downward transition, so a descent must be routed elsewhere. The child-activation
+route adds no member to `BreadcrumbRow`: it reuses the landed `GetActiveChild(int)` together with the router's
+`SelectHierarchyPath`, which is exactly how the landed mouse gesture descends via `ActivateChild`. Because a
+Right key press carries no child index where the mouse gesture supplies one, the choice is fixed at child
+index `0` (`row.GetActiveChild(0)`); when that returns null the descent is not available and the decision-D1
+fall-through runs. The rejected alternative — a new owned transition on `BreadcrumbRow` — is the larger change
+for no additional capability, and it would put pressure on `ActivateSegment`'s guard.
+
+Implementing task: `P6-T7` (`TryRightTreeTransitionAsync` in
+`QuickFiler/Controllers/BreadcrumbBridgeRouter.Arrows.cs`). Pinning test: `P6-T5`
+(`HandleArrowKey_RightAfterExpansion_DescendsByChildActivation` in
+`QuickFiler.Test/Controllers/BreadcrumbBridgeRouterTests.cs`), which asserts the descent targets child index
+`0` and that a null result falls through instead.
+
 ## Root Cause Analysis
 
 - Current hypothesis or confirmed root cause: **every root cause below is confirmed by code read in the
@@ -1052,7 +1069,7 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
       expressed through the landed `BreadcrumbRow.ActivateSegment(int)` (`BreadcrumbRow.cs:151-172`), not
       through a newly added parallel selected-node index (D9). A test asserts `ActiveSegmentIndex` decreases by
       one per Left press until `ActivateSegment` refuses at the root, at which point the D1 fall-through runs.
-- [ ] **AC-16 (#440)** — On the Efc surface, Right on a selected node expands it into its children, retrieved
+- [x] **AC-16 (#440)** — On the Efc surface, Right on a selected node expands it into its children, retrieved
       through the existing `IFolderHierarchyProvider.GetImmediateSubfoldersAsync`
       (`IFolderHierarchyProvider.cs:46-49`) in a SINGLE call keyed on `row.ActiveSegmentKey`
       (`BreadcrumbRow.cs:101-105`), matching the landed `ExpandLeafAsync`
@@ -1063,10 +1080,10 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
       back toward the leaf is implemented and tested — `ActivateSegment` refuses the leaf index
       (`BreadcrumbRow.cs:156`) and cannot express it — and the spec's D9 entry records which of the two
       permitted mechanisms was chosen.
-- [ ] **AC-17 (#440)** — The Qfc surface implements the same Left/Right tree contract through
+- [x] **AC-17 (#440)** — The Qfc surface implements the same Left/Right tree contract through
       `BreadcrumbStateModel` (`:424-455`) and `FolderBreadcrumbBridgeRouter.ArrowAsync` (`:378-406`), asserted
       by tests on both the state model and the router.
-- [ ] **AC-18 (#440, decision D1 — handling order)** — On both surfaces the handling order is exactly:
+- [x] **AC-18 (#440, decision D1 — handling order)** — On both surfaces the handling order is exactly:
       (1) the new parent-select / expand-node transition when one is available for this row, else (2) the
       existing breadcrumb expand/collapse behavior, else (3) the existing `unhandledArrow` fall-through
       unchanged. A test asserts a row with a single-segment chain still takes the pre-existing path.
@@ -1085,13 +1102,13 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
 - [ ] **AC-22 (decision D1 — #400 residual contract)** — #400 AC-5 through AC-8 (`spec.md:243-246`), the
       Up/Down/Enter/Escape selector contract, are unchanged, demonstrated by the corresponding #400 tests
       passing unmodified.
-- [ ] **AC-23 (decision D2 — Efc boundaries)** — Efc boundary behavior is unchanged: Left at the root and
+- [x] **AC-23 (decision D2 — Efc boundaries)** — Efc boundary behavior is unchanged: Left at the root and
       Right on a childless node remain silent no-ops emitting no message. **The Efc boundary code moved with
       PR #605 and is re-cited here:** the `LeftArrow` root refusal is at `BreadcrumbRow.cs:304-308`; the arrow
       routing is at `BreadcrumbBridgeRouter.cs:304-339` (Right branch `:308-321`, Left branch `:322-328`); and
       the childless-node early return, which now tests the ACTIVE segment rather than the leaf, is at
       `ExpandLeafAsync` `:366-370`.
-- [ ] **AC-24 (decision D2 — Qfc boundaries)** — Qfc boundary behavior is unchanged: an unhandled transition
+- [x] **AC-24 (decision D2 — Qfc boundaries)** — Qfc boundary behavior is unchanged: an unhandled transition
       still emits `UnhandledArrowMessage` (`FolderBreadcrumbBridgeRouter.cs:387-393`) and still reaches
       `KeyboardHandler.BreadcrumbArrowFallThrough` (`:288-315`, Right branch `:302-310`), so Right still opens
       the Pop Out / Enumerate Conversation dialog and Left still calls `SetFolderDroppedDown(false)` (`:313`).

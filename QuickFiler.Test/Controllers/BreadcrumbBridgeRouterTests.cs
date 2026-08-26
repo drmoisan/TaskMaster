@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler.Controllers;
+using QuickFiler.Controllers.Tests;
+using QuickFiler.Interfaces;
 using QuickFiler.Viewers;
 using UtilitiesCS;
 using UtilitiesCS.OutlookObjects.Folder;
@@ -330,6 +333,130 @@ namespace QuickFiler.Test.Controllers
 
             // Assert: GetActiveChild(0) returned null, so the selection is unchanged.
             _router.SelectedFolderPath.Should().Be("Inbox\\Projects");
+        }
+
+        /// <summary>
+        /// #440 decision D1 (handling order): a row whose resolved chain has exactly one segment
+        /// has no tree transition available, so Right and Left both take the pre-existing expand
+        /// and collapse path and, where none applies, the pre-existing unhandled fall-through.
+        /// </summary>
+        [TestMethod]
+        public void ArrowKey_SingleSegmentRow_TakesPreExistingCollapsePath()
+        {
+            // Arrange: row-2 resolves to an unknown chain, so it renders as one segment.
+            BindThreeRows();
+            _provider.Invocations.Clear();
+
+            // Act
+            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-2\",\"key\":\"Right\"}");
+            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-2\",\"key\":\"Left\"}");
+
+            // Assert: no tree transition, so no provider expansion and no state change to render.
+            _provider.Verify(
+                p =>
+                    p.GetImmediateSubfoldersAsync(
+                        It.IsAny<FolderTreeNodeKey>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never()
+            );
+            _posted
+                .Should()
+                .NotContain(p =>
+                    p.Contains("\"type\":\"render\"") && p.Contains("\"rowId\":\"row-2\"")
+                );
+        }
+
+        /// <summary>
+        /// #440 decision D2 (Efc boundaries): Left at the root and Right on a childless active
+        /// node remain silent no-ops. The childless early return in ExpandLeafAsync now tests the
+        /// ACTIVE segment rather than the leaf, and ActivateSegment's root refusal is unchanged.
+        /// </summary>
+        [TestMethod]
+        public void Boundary_EfcLeftAtRootAndRightOnChildlessNode_RemainSilentNoOps()
+        {
+            // Arrange: the predicted leaf has no subfolders, so the active node is childless.
+            SetupProviderChain(LeafPath, leafHasChildren: false);
+            Bind();
+            _provider.Invocations.Clear();
+            int postedBeforeRight = _posted.Count;
+
+            // Act + Assert: Right on the childless active node issues no query and no render.
+            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Right\"}");
+            _provider.Verify(
+                p =>
+                    p.GetImmediateSubfoldersAsync(
+                        It.IsAny<FolderTreeNodeKey>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never()
+            );
+            _posted.Count.Should().Be(postedBeforeRight);
+
+            // Act: four Lefts walk the active node to the root and then collapse to the root.
+            for (int i = 0; i < 4; i++)
+            {
+                Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Left\"}");
+            }
+            int postedAfterWalk = _posted.Count;
+
+            // Act + Assert: the fifth Left is refused at the root and posts nothing.
+            Inbound("{\"type\":\"arrowKey\",\"rowId\":\"row-1\",\"key\":\"Left\"}");
+            _posted.Count.Should().Be(postedAfterWalk);
+        }
+
+        /// <summary>
+        /// #440 decision D2 (Qfc boundaries): an unhandled arrow still reaches
+        /// IQfcKeyboardHandler.BreadcrumbArrowFallThrough at the QfcItemController call site. Only
+        /// the interface is mocked, so the modal MyBox.ShowDialog inside the concrete
+        /// KeyboardHandler is never constructed and cannot block the run.
+        /// </summary>
+        [TestMethod]
+        public void Boundary_QfcUnhandledArrow_StillReachesBreadcrumbArrowFallThrough()
+        {
+            // Arrange
+            SynchronizationContext previous = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+            try
+            {
+                using (var viewer = new QuickFiler.ItemViewer())
+                {
+                    var keyboard = new Mock<IQfcKeyboardHandler>(MockBehavior.Strict);
+                    keyboard.Setup(handler =>
+                        handler.BreadcrumbArrowFallThrough(viewer, BreadcrumbArrowDirection.Left)
+                    );
+                    var controller = new HarnessController();
+                    QfcItemControllerTestSupport.SetField(
+                        controller,
+                        "_kbdHandler",
+                        keyboard.Object
+                    );
+                    MethodInfo method = typeof(QfcItemController).GetMethod(
+                        "OnBreadcrumbUnhandledArrow",
+                        BindingFlags.Instance | BindingFlags.NonPublic
+                    );
+
+                    // Act
+                    method.Invoke(
+                        controller,
+                        new object[] { viewer, BreadcrumbArrowDirection.Left }
+                    );
+
+                    // Assert
+                    keyboard.Verify(
+                        handler =>
+                            handler.BreadcrumbArrowFallThrough(
+                                viewer,
+                                BreadcrumbArrowDirection.Left
+                            ),
+                        Times.Once()
+                    );
+                }
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previous);
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -415,9 +415,11 @@ namespace UtilitiesCS.OutlookObjects.Folder
         {
             try
             {
-                var leafKey = row.Chain[row.Chain.Count - 1].Key;
+                // #440: the expansion belongs to the row's ACTIVE node, which is the leaf until a
+                // parent has been selected by the Left tree transition.
+                var nodeKey = (row.ActiveSegment ?? row.Chain[row.Chain.Count - 1]).Key;
                 var subfolders = await _provider
-                    .GetImmediateSubfoldersAsync(leafKey, cancellationToken)
+                    .GetImmediateSubfoldersAsync(nodeKey, cancellationToken)
                     .ConfigureAwait(false);
                 row.SetSubfolders(subfolders);
             }

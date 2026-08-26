@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="527d748d-e261-4cf9-948c-cf8fa75a93b0" name="DanMoisan@MEGALODON4 2026-08-26 10:37:06" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T10:37:06.2590190-04:00" queuing="2026-08-26T10:37:06.2590190-04:00" start="2026-08-26T10:37:04.6409261-04:00" finish="2026-08-26T10:37:06.2735382-04:00" />
+  <TestSettings name="default" id="892ff65a-1271-404b-afd7-da65e0a072f6">
+    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_10_37_06" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="a4e7c259-46c1-43dd-bb4b-8015886f6af3" testId="169eca8e-743e-84d4-b662-cfb85cb8b1ca" testName="ArrowAsync_QfcRightOnSelectedParentNode_RoutesChildExpansion" computerName="MEGALODON4" duration="00:00:00.0082105" startTime="2026-08-26T10:37:06.1903975-04:00" endTime="2026-08-26T10:37:06.2023948-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a4e7c259-46c1-43dd-bb4b-8015886f6af3" />
+    <UnitTestResult executionId="bdfe429a-ee1d-46c3-a4b3-0dc4e5c238dc" testId="1a7b3a46-b79d-8efc-bb63-07e0dfeed43f" testName="ArrowAsync_QfcLeftOnMultiSegmentRow_RoutesParentSelectTransition" computerName="MEGALODON4" duration="00:00:00.2133788" startTime="2026-08-26T10:37:05.8334197-04:00" endTime="2026-08-26T10:37:06.1848851-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bdfe429a-ee1d-46c3-a4b3-0dc4e5c238dc">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="ArrowAsync_QfcLeftOnMultiSegmentRow_RoutesParentSelectTransition" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="1a7b3a46-b79d-8efc-bb63-07e0dfeed43f">
+      <Execution id="bdfe429a-ee1d-46c3-a4b3-0dc4e5c238dc" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.FolderBreadcrumbBridgeRouterTests" name="ArrowAsync_QfcLeftOnMultiSegmentRow_RoutesParentSelectTransition" />
+    </UnitTest>
+    <UnitTest name="ArrowAsync_QfcRightOnSelectedParentNode_RoutesChildExpansion" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="169eca8e-743e-84d4-b662-cfb85cb8b1ca">
+      <Execution id="a4e7c259-46c1-43dd-bb4b-8015886f6af3" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.FolderBreadcrumbBridgeRouterTests" name="ArrowAsync_QfcRightOnSelectedParentNode_RoutesChildExpansion" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="169eca8e-743e-84d4-b662-cfb85cb8b1ca" executionId="a4e7c259-46c1-43dd-bb4b-8015886f6af3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a7b3a46-b79d-8efc-bb63-07e0dfeed43f" executionId="bdfe429a-ee1d-46c3-a4b3-0dc4e5c238dc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="2" executed="2" passed="2" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

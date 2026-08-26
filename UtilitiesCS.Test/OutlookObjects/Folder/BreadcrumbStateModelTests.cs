@@ -366,5 +366,30 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             handled.Should().BeTrue("the descent transition selects the first child");
             model.SelectedSubfolderIndex.Should().Be(0);
         }
+
+        /// <summary>
+        /// #440 decision D1 (handling order): a one-segment suggestion row has no parent to
+        /// select, so Right and Left take the pre-existing expand and collapse path and, where
+        /// none applies, report the pre-existing unhandled fall-through.
+        /// </summary>
+        [TestMethod]
+        public void ArrowKey_QfcSingleSegmentRow_TakesPreExistingCollapsePath()
+        {
+            // Arrange
+            var model = new BreadcrumbStateModel();
+            model.AddSuggestionRow(new[] { Segment("root", "\\Inbox", "Inbox", true) }, 0.5);
+            model.SelectRow(0);
+
+            // Act + Assert: Right opens the pre-existing leaf expansion.
+            model.RightArrow().Should().BeTrue();
+            model.SelectedRow.LeafExpanded.Should().BeTrue();
+
+            // Act + Assert: Left closes it through the pre-existing collapse path.
+            model.LeftArrow().Should().BeTrue();
+            model.SelectedRow.LeafExpanded.Should().BeFalse();
+
+            // Act + Assert: a further Left is the pre-existing unhandled fall-through.
+            model.LeftArrow().Should().BeFalse();
+        }
     }
 }
