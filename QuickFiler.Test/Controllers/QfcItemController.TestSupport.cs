@@ -385,7 +385,8 @@ namespace QuickFiler.Controllers.Tests
             Func<EmailFilerConfig, EmailFiler> filerFactory
         )
         {
-            ConcurrentDictionary<string, string> special = new ConcurrentDictionary<string, string>();
+            ConcurrentDictionary<string, string> special =
+                new ConcurrentDictionary<string, string>();
             special["OneDrive"] = @"C:\OneDrive";
             Mock<IFileSystemFolderPaths> fs = new Mock<IFileSystemFolderPaths>();
             fs.SetupGet(f => f.SpecialFolders).Returns(special);

@@ -228,7 +228,12 @@ namespace QuickFiler.Controllers.Tests
             IReadOnlyDictionary<string, IAttachment> map
         )
         {
-            bool resolved = QfcItemController.TryResolveCidResource(uri, map, out var pay, out var mime);
+            bool resolved = QfcItemController.TryResolveCidResource(
+                uri,
+                map,
+                out var pay,
+                out var mime
+            );
             resolved.Should().BeFalse();
             pay.Should().BeNull();
             mime.Should().BeNull();
@@ -347,8 +352,9 @@ namespace QuickFiler.Controllers.Tests
             System.Func<Task> act = () => controller.MoveMailAsync();
 
             // Assert
-            (await act.Should().ThrowAsync<System.InvalidOperationException>())
-                .WithInnerException<System.InvalidTimeZoneException>();
+            (
+                await act.Should().ThrowAsync<System.InvalidOperationException>()
+            ).WithInnerException<System.InvalidTimeZoneException>();
             notifications.Should().Be(1);
         }
 
@@ -374,8 +380,9 @@ namespace QuickFiler.Controllers.Tests
             System.Func<Task> act = () => controller.MoveMailAsync();
 
             // Assert
-            (await act.Should().ThrowAsync<System.InvalidOperationException>())
-                .WithInnerException<System.ArgumentNullException>();
+            (
+                await act.Should().ThrowAsync<System.InvalidOperationException>()
+            ).WithInnerException<System.ArgumentNullException>();
         }
 
         /// <summary>Issue #483: the notification is marshalled through the injected UI dispatcher.</summary>

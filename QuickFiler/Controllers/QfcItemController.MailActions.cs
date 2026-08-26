@@ -27,8 +27,8 @@ namespace QuickFiler.Controllers
         // #483: injectable seam for the user-facing move-failure notification. The default forwards
         // to the modal WinForms dialog, which cannot run in a headless unit test. Mirrors
         // EfcHomeController.MoveFailureMessageAction and QfcExplorerController.NotInViewDialogInvoker.
-        internal System.Action<string> MoveFailureNotifier { get; set; } = text =>
-            MessageBox.Show(text);
+        internal System.Action<string> MoveFailureNotifier { get; set; } =
+            text => MessageBox.Show(text);
 
         // #483: composes the two seams. _uiDispatcher is null in the existing SeamFactoryTests
         // MoveMailAsync tests, so the notifier is invoked directly when there is no dispatcher.
