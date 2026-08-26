@@ -952,92 +952,102 @@ namespace QuickFiler.Controllers
         public async Task RemoveSpecificControlGroupAsync(int selection)
         {
             Interlocked.Increment(ref removespecificcontrolgroupcounter);
-            UnregisterNavigation();
-
-            // If the group is active, turn off the active item and select a new item
-            bool activeUI = _itemGroups[selection - 1].ItemController.IsActiveUI;
-            bool expanded = _itemGroups[selection - 1].ItemController.IsExpanded;
-            if (activeUI)
+            try
             {
-                await ToggleOffActiveItemAsync(false);
-            }
+                UnregisterNavigation();
 
-            UpdateSelectionNumberForRemoval(selection);
-
-            bool tlpState = TlpLayout;
-
-            //Removed dispatcher call because synchronization context should be set
-            //await UiThread.Dispatcher.InvokeAsync(() =>
-            //{
-            tlpState = TlpLayout;
-            TlpLayout = false;
-
-            // Remove the controls from the form
-            TableLayoutHelper.RemoveSpecificRow(_itemTlp, selection - 1);
-            //});
-
-            // Unhook the email from the move monitor
-            _moveMonitor.UnhookItem(_itemGroups[selection - 1].MailItem);
-
-            // Remove the group from the list of groups
-            _itemGroups.RemoveAt(selection - 1);
-
-            if (_itemGroups.Count > 0)
-            {
-                // Renumber the remaining groups
-                await UiThread.Dispatcher.InvokeAsync(() =>
-                {
-                    var digits = Digits;
-                    if (_digitRefreshNeeded)
-                    {
-                        SetVisualDigits(digits);
-                    }
-                    RenumberGroups();
-                });
-
-                // Restore UI to previous state with newly selected item
+                // If the group is active, turn off the active item and select a new item
+                bool activeUI = _itemGroups[selection - 1].ItemController.IsActiveUI;
+                bool expanded = _itemGroups[selection - 1].ItemController.IsExpanded;
                 if (activeUI)
                 {
-                    await _itemGroups[ActiveIndex]
-                        .ItemController.ToggleFocusAsync(Enums.ToggleState.On);
-                    if (expanded)
+                    await ToggleOffActiveItemAsync(false);
+                }
+
+                UpdateSelectionNumberForRemoval(selection);
+
+                bool tlpState = TlpLayout;
+
+                //Removed dispatcher call because synchronization context should be set
+                //await UiThread.Dispatcher.InvokeAsync(() =>
+                //{
+                tlpState = TlpLayout;
+                TlpLayout = false;
+
+                // Remove the controls from the form
+                TableLayoutHelper.RemoveSpecificRow(_itemTlp, selection - 1);
+                //});
+
+                // Unhook the email from the move monitor
+                _moveMonitor.UnhookItem(_itemGroups[selection - 1].MailItem);
+
+                // Remove the group from the list of groups
+                _itemGroups.RemoveAt(selection - 1);
+
+                if (_itemGroups.Count > 0)
+                {
+                    // Renumber the remaining groups
+                    await UiThread.Dispatcher.InvokeAsync(() =>
                     {
-                        await _itemGroups[ActiveIndex].ItemController.ToggleExpansionAsync();
+                        var digits = Digits;
+                        if (_digitRefreshNeeded)
+                        {
+                            SetVisualDigits(digits);
+                        }
+                        RenumberGroups();
+                    });
+
+                    // Restore UI to previous state with newly selected item
+                    if (activeUI)
+                    {
+                        await _itemGroups[ActiveIndex]
+                            .ItemController.ToggleFocusAsync(Enums.ToggleState.On);
+                        if (expanded)
+                        {
+                            await _itemGroups[ActiveIndex].ItemController.ToggleExpansionAsync();
+                        }
                     }
                 }
-            }
-            else if (_itemGroups.Count == 0 && _kbdHandler.KbdActive)
-            {
-                await _kbdHandler.ToggleKeyboardDialogAsync();
-            }
-
-            // Guards against double-registration: when the zero-item branch skips to the next page,
-            // SkipGroupAsync -> LoadControlsAndHandlers_01 -> SwapItemGroups already registers the
-            // incoming page's navigation keys. Registering again below would re-add the same keys and
-            // throw ArgumentException from KbdActions.Add (Issue #232).
-            bool swapAlreadyRegistered = false;
-            await UiThread.Dispatcher.InvokeAsync(async () =>
-            {
-                TlpLayout = tlpState;
-                ResetPanelHeight();
-                if (_itemGroups.Count == 0)
+                else if (_itemGroups.Count == 0 && _kbdHandler.KbdActive)
                 {
-                    await _parent.SkipGroupAsync();
-                    swapAlreadyRegistered = true;
-                    //_parent.ActionOkAsync();
+                    await _kbdHandler.ToggleKeyboardDialogAsync();
                 }
-            });
-            if (removespecificcontrolgroupcounter > 1)
-            {
-                logger.Error(
-                    "RemoveSpecificControlGroupAsync: Counter is greater than 1. Race Condition Exists"
-                );
+
+                // Guards against double-registration: when the zero-item branch skips to the next page,
+                // SkipGroupAsync -> LoadControlsAndHandlers_01 -> SwapItemGroups already registers the
+                // incoming page's navigation keys. Registering again below would re-add the same keys and
+                // throw ArgumentException from KbdActions.Add (Issue #232).
+                bool swapAlreadyRegistered = false;
+                await UiThread.Dispatcher.InvokeAsync(async () =>
+                {
+                    TlpLayout = tlpState;
+                    ResetPanelHeight();
+                    if (_itemGroups.Count == 0)
+                    {
+                        await _parent.SkipGroupAsync();
+                        swapAlreadyRegistered = true;
+                        //_parent.ActionOkAsync();
+                    }
+                });
+                if (removespecificcontrolgroupcounter > 1)
+                {
+                    logger.Error(
+                        "RemoveSpecificControlGroupAsync: Counter is greater than 1. Race Condition Exists"
+                    );
+                }
+                if (!swapAlreadyRegistered)
+                {
+                    RegisterNavigation();
+                }
             }
-            if (!swapAlreadyRegistered)
+            finally
             {
-                RegisterNavigation();
+                // Issue #286: the decrement must also run when the body throws. Before this
+                // change it was the method's last statement, so any exception left the
+                // process-wide counter permanently one higher and eventually tripped the
+                // race-condition error branch above on a later, legitimate call.
+                Interlocked.Decrement(ref removespecificcontrolgroupcounter);
             }
-            Interlocked.Decrement(ref removespecificcontrolgroupcounter);
         }
 
         #endregion

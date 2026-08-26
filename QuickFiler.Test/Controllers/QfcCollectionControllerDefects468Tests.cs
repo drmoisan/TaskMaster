@@ -1,8 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using QuickFiler.Controllers;
+using QuickFiler.Interfaces;
 
 namespace QuickFiler.Controllers.Tests
 {
@@ -18,6 +22,79 @@ namespace QuickFiler.Controllers.Tests
     [TestClass]
     public class QfcCollectionControllerDefects468Tests
     {
+        /// <summary>
+        /// Name of the private static reentrancy counter guarded by issue #286.
+        /// </summary>
+        private const string ReentrancyCounterField = "removespecificcontrolgroupcounter";
+
+        /// <summary>
+        /// Resets the process-wide reentrancy counter before every test in this class.
+        /// </summary>
+        /// <remarks>
+        /// <c>QfcCollectionController.removespecificcontrolgroupcounter</c> is a private
+        /// <em>static</em> field, so its value survives between tests and between test classes. The
+        /// General Unit Test Policy requires tests to run in any order without affecting each other,
+        /// so the counter is reset both before and after every test rather than only once.
+        /// </remarks>
+        [TestInitialize]
+        public void ResetReentrancyCounterBeforeTest()
+        {
+            FieldInfo counter = typeof(QfcCollectionController).GetField(
+                ReentrancyCounterField,
+                BindingFlags.NonPublic | BindingFlags.Static
+            );
+            counter
+                .Should()
+                .NotBeNull(
+                    because: "the private static field '"
+                        + ReentrancyCounterField
+                        + "' must exist on QfcCollectionController for the issue #286 tests to be "
+                        + "able to observe the reentrancy counter"
+                );
+            counter.SetValue(null, 0);
+        }
+
+        /// <summary>
+        /// Resets the process-wide reentrancy counter after every test in this class, so a test that
+        /// deliberately leaks the counter cannot contaminate any later test.
+        /// </summary>
+        [TestCleanup]
+        public void ResetReentrancyCounterAfterTest()
+        {
+            FieldInfo counter = typeof(QfcCollectionController).GetField(
+                ReentrancyCounterField,
+                BindingFlags.NonPublic | BindingFlags.Static
+            );
+            counter
+                .Should()
+                .NotBeNull(
+                    because: "the private static field '"
+                        + ReentrancyCounterField
+                        + "' must exist on QfcCollectionController so a leaked counter cannot "
+                        + "contaminate a later test"
+                );
+            counter.SetValue(null, 0);
+        }
+
+        /// <summary>
+        /// Reads the private static reentrancy counter, asserting first that the field was found.
+        /// </summary>
+        private static int ReadReentrancyCounter()
+        {
+            FieldInfo counter = typeof(QfcCollectionController).GetField(
+                ReentrancyCounterField,
+                BindingFlags.NonPublic | BindingFlags.Static
+            );
+            counter
+                .Should()
+                .NotBeNull(
+                    because: "the private static field '"
+                        + ReentrancyCounterField
+                        + "' must exist on QfcCollectionController"
+                );
+            return (int)counter.GetValue(null);
+        }
+
         /// <summary>
         /// Issue #474 defect 1. Structural regression test asserting that
         /// <c>QfcCollectionController</c> holds its parent by the wider
@@ -78,6 +155,126 @@ namespace QuickFiler.Controllers.Tests
                     because: "issue #474 defect 1 requires constructor parameter 5 to be declared as "
                         + "QuickFiler.Controllers.IQfcFormController so the widening is enforced at "
                         + "every construction site"
+                );
+        }
+
+        /// <summary>
+        /// Issue #286. Regression test proving the reentrancy counter is restored when
+        /// <c>RemoveSpecificControlGroupAsync</c> throws at the very first statement after the
+        /// <c>Interlocked.Increment</c>.
+        /// <para>
+        /// Scenario: an uninitialized controller leaves <c>_itemGroups</c> <c>null</c>, so
+        /// <c>UnregisterNavigation()</c> â€” the statement immediately following the increment â€”
+        /// dereferences <c>null</c> and raises <see cref="NullReferenceException"/>. Expected
+        /// outcome: the exception propagates, and the private static counter is back at its
+        /// pre-call value because the decrement runs on the exceptional path too.
+        /// </para>
+        /// <para>
+        /// Before the fix the decrement is the method's last statement and is unreachable after a
+        /// throw, so the counter is left one higher than its pre-call value. The leak is permanent
+        /// for the life of the process and eventually trips the
+        /// <c>"Counter is greater than 1. Race Condition Exists"</c> error branch on a subsequent
+        /// legitimate call.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public async Task RemoveSpecificControlGroupAsync_ThrowAtFirstStatement_RestoresReentrancyCounter()
+        {
+            // Arrange
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            int before = ReadReentrancyCounter();
+
+            // Act
+            Func<Task> act = () => controller.RemoveSpecificControlGroupAsync(1);
+
+            // Assert
+            await act.Should()
+                .ThrowAsync<NullReferenceException>(
+                    because: "UnregisterNavigation() is the first statement after the increment and "
+                        + "it dereferences the null _itemGroups field"
+                );
+            ReadReentrancyCounter()
+                .Should()
+                .Be(
+                    before,
+                    because: "issue #286 requires the Interlocked.Decrement to run on the "
+                        + "exceptional exit path, so the counter must return to its pre-call value"
+                );
+        }
+
+        /// <summary>
+        /// Issue #286. Companion to
+        /// <see cref="RemoveSpecificControlGroupAsync_ThrowAtFirstStatement_RestoresReentrancyCounter"/>,
+        /// proving the restored decrement covers the <em>whole</em> body rather than only the first
+        /// statement.
+        /// <para>
+        /// Scenario: the controller is arranged so <c>UnregisterNavigation()</c> completes
+        /// successfully â€” a real empty <c>KbdActions</c> collection is supplied to the mocked
+        /// keyboard handler and a single item group is injected â€” and the throw is instead raised
+        /// several statements later, by the mocked <c>IsActiveUI</c> getter. Expected outcome: the
+        /// exception propagates and the private static counter is back at its pre-call value.
+        /// </para>
+        /// <para>
+        /// A fix that guarded only the first statement would pass the companion test and fail this
+        /// one, so the pair together pin the <c>finally</c> to the full span between the increment
+        /// and the decrement.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public async Task RemoveSpecificControlGroupAsync_ThrowLaterInBody_RestoresReentrancyCounter()
+        {
+            // Arrange
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+
+            // A real (empty) KbdActions instance rather than a mock: UnregisterNavigation calls
+            // Remove(...) on it directly, and it must succeed so the throw lands later in the body.
+            Mock<IQfcKeyboardHandler> keyboardHandler = new Mock<IQfcKeyboardHandler>(
+                MockBehavior.Loose
+            );
+            keyboardHandler
+                .SetupGet(handler => handler.StringActionsAsync)
+                .Returns(new KbdActions<string, KaStringAsync, Func<string, Task>>());
+            QfcCollectionControllerTestSupport.SetField(
+                controller,
+                "_kbdHandler",
+                keyboardHandler.Object
+            );
+
+            Mock<IQfcItemController> itemController = new Mock<IQfcItemController>(
+                MockBehavior.Loose
+            );
+            InvalidOperationException expected = new InvalidOperationException(
+                "IsActiveUI is deliberately unavailable in this arrangement"
+            );
+            itemController.SetupGet(item => item.IsActiveUI).Throws(expected);
+            QfcCollectionControllerTestSupport.SetField(
+                controller,
+                "_itemGroups",
+                new List<QfcItemGroup>
+                {
+                    new QfcItemGroup { ItemController = itemController.Object },
+                }
+            );
+
+            int before = ReadReentrancyCounter();
+
+            // Act
+            Func<Task> act = () => controller.RemoveSpecificControlGroupAsync(1);
+
+            // Assert
+            await act.Should()
+                .ThrowAsync<InvalidOperationException>(
+                    because: "the mocked IsActiveUI getter is reached several statements after the "
+                        + "Interlocked.Increment, once UnregisterNavigation has already completed"
+                );
+            ReadReentrancyCounter()
+                .Should()
+                .Be(
+                    before,
+                    because: "issue #286 requires the Interlocked.Decrement to cover the whole body "
+                        + "between the increment and the normal exit, not merely the first statement"
                 );
         }
     }

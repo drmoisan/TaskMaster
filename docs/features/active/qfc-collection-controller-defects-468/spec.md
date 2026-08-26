@@ -1159,7 +1159,7 @@ individually verifiable from evidence.
 
 ### Per-defect behaviour
 
-- [ ] **AC-1 (#286).** `RemoveSpecificControlGroupAsync`'s `Interlocked.Decrement` executes on the
+- [x] **AC-1 (#286).** `RemoveSpecificControlGroupAsync`'s `Interlocked.Decrement` executes on the
       exceptional exit path as well as the normal one, so `removespecificcontrolgroupcounter` returns
       to its pre-call value after a throw. Verified by two named MSTest tests: one forcing a throw at
       the first statement after the increment (`UnregisterNavigation()` on a `null` `_itemGroups`) and
