@@ -1008,15 +1008,15 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
       actually changed**; a re-bind with no prior selection raises no event.
 - [x] **AC-6 (#499)** — No auto-selection side effect is introduced: `SelectFirstRow`
       (`BreadcrumbBridgeRouter.cs:192-199`) is still not called from `BindRowsAsync` (`:92-138`).
-- [ ] **AC-7 (#440 Qfc prerequisite)** — `OutlookFolderHierarchyProvider.ResolveLeafKeyAsync` (`:52-71`) keeps
+- [x] **AC-7 (#440 Qfc prerequisite)** — `OutlookFolderHierarchyProvider.ResolveLeafKeyAsync` (`:52-71`) keeps
       its exact `OrdinalIgnoreCase` first pass (`:66-68`): a caller supplying a full Outlook path resolves
       exactly as it does today. A test asserts EXPLICITLY that the landed Efc full-path caller — the value
       produced by `BreadcrumbBridgeRouter.ToHierarchyPath` (`:140-163`) — resolves through the exact first pass
       and NEVER reaches the suffix fallback, so the D5 change is a strict no-op for the Efc surface.
-- [ ] **AC-8 (#440 Qfc prerequisite)** — When the exact pass misses, a segment-boundary suffix match resolves
+- [x] **AC-8 (#440 Qfc prerequisite)** — When the exact pass misses, a segment-boundary suffix match resolves
       an archive-root-relative stem (for example `Projects\Alpha`) to the unique node whose `FolderPath` ends
       with `\Projects\Alpha`.
-- [ ] **AC-9 (#440 Qfc prerequisite)** — The suffix fallback is accepted **only when unique**: with a decoy
+- [x] **AC-9 (#440 Qfc prerequisite)** — The suffix fallback is accepted **only when unique**: with a decoy
       node (`\\store\Inbox\Projects\Alpha` alongside `\\store\Archive\Projects\Alpha`) the method returns
       `null`, logs at `Error`, and the row keeps today's single-segment fallback rendering
       (`BreadcrumbRowBuilder.cs:121-142`, fallback segment constructed at `:123-131`, which is not modified).
@@ -1026,7 +1026,7 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
       `Issue439ArchiveRelativeRowsRenderLineagePreserveFilingTargetAndProbability` in
       `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs:20-116`, whose root-to-leaf ordering
       assertion is at `:108-113`. No work item here; the test file is read-only for this feature.
-- [ ] **AC-11 (#440 Qfc prerequisite)** — On the Qfc surface, the D5 resolution produces a multi-segment chain,
+- [x] **AC-11 (#440 Qfc prerequisite)** — On the Qfc surface, the D5 resolution produces a multi-segment chain,
       asserted in `UtilitiesCS.Test/OutlookObjects/Folder/FolderBreadcrumbBridgeRouterTests.cs` against a
       `MockBehavior.Strict` provider (`ProviderMock`, `:51-70`).
 - [x] **AC-12 (#439 / former decision D6a — INHERITED-AND-VERIFIED, retired)** — The suggestion-row
@@ -1104,7 +1104,7 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
 - [x] **AC-26 (#499 — RED first)** — A regression test for #499 in
       `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterQueueTests.cs` is demonstrated failing before the fix
       and passing after, with the failing run recorded.
-- [ ] **AC-27 (#440 Qfc prerequisite — RED first)** — A regression test for the D5 suffix fallback in
+- [x] **AC-27 (#440 Qfc prerequisite — RED first)** — A regression test for the D5 suffix fallback in
       `UtilitiesCS.Test/OutlookObjects/Folder/OutlookFolderHierarchyProviderTests.cs` (realistic full paths
       plus a decoy node) is demonstrated failing before the fix and passing after, with the failing run
       recorded. The test home is unchanged from version 1.0; only the attribution changed.

@@ -25,6 +25,9 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
     {
         private const string LeafPath = "\\Inbox\\Projects\\Apollo";
 
+        // The archive-relative form the QuickFiler surface presents for the same folder.
+        private const string StemPath = "Projects\\Apollo";
+
         private static readonly FolderTreeNodeKey RootKey = Key("root", "\\Inbox");
         private static readonly FolderTreeNodeKey MidKey = Key("mid", "\\Inbox\\Projects");
         private static readonly FolderTreeNodeKey LeafKey = Key("leaf", LeafPath);
@@ -82,6 +85,59 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             await router.SetSuggestionsAsync(new[] { suggestion }, CancellationToken.None);
             router.SelectRow(0);
             return router;
+        }
+
+        /// <summary>
+        /// A strict provider set up for the presented archive-relative stem only: any call with a
+        /// different path form is an unmatched strict invocation and throws, so the test cannot pass
+        /// by resolving the wrong value.
+        /// </summary>
+        private static Mock<IFolderHierarchyProvider> StemProviderMock()
+        {
+            var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+            provider
+                .Setup(p => p.ResolveLeafKeyAsync(StemPath, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(LeafKey);
+            provider
+                .Setup(p => p.GetAncestorChainAsync(LeafKey, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(LeafChain());
+            return provider;
+        }
+
+        // --- Qfc ancestor-chain prerequisite (#440) ---
+
+        /// <summary>
+        /// With the decision-D5 provider resolution in place, a Qfc suggestion row presenting an
+        /// archive-relative stem resolves to a multi-segment ancestor chain in root-to-leaf order,
+        /// which is what gives Left and Right a parent to navigate to.
+        /// </summary>
+        [TestMethod]
+        public async Task SetSuggestionsAsync_StrictProvider_ResolvesMultiSegmentChain()
+        {
+            // Arrange
+            var provider = StemProviderMock();
+            var router = new FolderBreadcrumbBridgeRouter(provider.Object);
+            var suggestion = new FolderRow(
+                StemPath,
+                FolderRowKind.Suggestion,
+                new FolderScore(StemPath, 1000, 0.73)
+            );
+
+            // Act
+            await router.SetSuggestionsAsync(new[] { suggestion }, CancellationToken.None);
+
+            // Assert: a resolved suggestion row, not the single-segment scored fallback.
+            var row = router.Model.Rows[0];
+            row.IsSuggestion.Should()
+                .BeTrue("the stem resolved, so the row is no longer a fallback");
+            row.Chain.Count.Should().BeGreaterThan(1, "navigation needs a parent segment");
+            row.Chain[0].DisplayName.Should().Be("Inbox");
+            row.Chain[1].DisplayName.Should().Be("Projects");
+            row.Chain[row.Chain.Count - 1].DisplayName.Should().Be("Apollo");
+            provider.Verify(
+                p => p.ResolveLeafKeyAsync(StemPath, It.IsAny<CancellationToken>()),
+                Times.Once
+            );
         }
 
         // --- Positive routing ---
