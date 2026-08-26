@@ -7,12 +7,12 @@ The checkpoint JSON remains the machine-authoritative source.
 
 - Integration branch: `epic/quickfiler-bug-family-integration`
 - Manifest: `docs/features/epics/quickfiler-bug-family/epic.md`
-- Integration branch tip: `8c8f7695bbc71d8f2cff13eb8f7fac8845ce5253`
+- Integration branch tip: `808bf460fb4ad34b38268fd14cb103c7756c7e7a`
 - Current wave: 0
 - Max parallel features: 4
-- Last updated: 2026-08-26T19-38Z
+- Last updated: 2026-08-26T21-40Z
 
-**Progress: 3 of 12 features merged into the integration branch.**
+**Progress: 4 of 12 features merged into the integration branch.**
 
 > This epic is **not complete**. The final integration-to-`main` pull request has not been
 > opened, so none of the child `Closes` lines have taken effect and no child issue is closed.
@@ -23,9 +23,9 @@ The checkpoint JSON remains the machine-authoritative source.
 |---|---|---|---|---|---|---|---|---|---|---|
 | `breadcrumb-coordinator-hub-defects-501` | 501 | 0 | - | `not_started` | - | - | - | - | - | - |
 | `breadcrumb-router-navigation-defects-498` | 498 | 0 | - | `merged` | [#626](https://github.com/drmoisan/TaskMaster/pull/626) | 8c8f7695bbc7 | 2026-08-26T08-30 | 2026-08-26T19-28Z | 2026-08-26T19-37Z | - |
-| `qfc-collection-controller-defects-468` | 468 | 0 | - | `worktree_created` | - | - | 2026-08-26T08-30 | - | - | - |
+| `qfc-collection-controller-defects-468` | 468 | 0 | - | `merged` | [#636](https://github.com/drmoisan/TaskMaster/pull/636) | 808bf460fb4a | 2026-08-26T08-30 | 2026-08-26T21-29Z | 2026-08-26T21-36Z | - |
 | `qfc-item-controller-defects-484` | 484 | 0 | - | `merged` | [#619](https://github.com/drmoisan/TaskMaster/pull/619) | 363bfcdd4da5 | 2026-08-26T08-30 | 2026-08-26T14-32Z | 2026-08-26T14-33Z | - |
-| `quickfiler-bug-family-446` | 446 | 0 | - | `merged` | [#625](https://github.com/drmoisan/TaskMaster/pull/625) | 902e5ce2bf5d | 2026-08-26T08-30 | - | 2026-08-26T19-14Z | - |
+| `quickfiler-bug-family-446` | 446 | 0 | - | `merged` | [#625](https://github.com/drmoisan/TaskMaster/pull/625) | 902e5ce2bf5d | 2026-08-26T08-30 | 2026-08-26T19-12Z | 2026-08-26T19-14Z | - |
 | `quickfiler-home-controller-metrics-442` | 442 | 0 | - | `worktree_created` | - | - | 2026-08-26T10-39 | - | - | - |
 | `quickfiler-test-uithread-dispatcher-493` | 493 | 0 | - | `not_started` | - | - | - | - | - | - |
 | `webview2-host-initializer-defects-476` | 476 | 0 | - | `not_started` | - | - | - | - | - | - |
@@ -43,7 +43,7 @@ The checkpoint JSON remains the machine-authoritative source.
 
 ## Integration Branch History
 
-`61edc19b (prepared) -> 363bfcdd (484, PR #619) -> 902e5ce2 (446, PR #625) -> 8c8f7695 (498, PR #626)`
+`61edc19b (prepared) -> 363bfcdd (484, PR #619) -> 902e5ce2 (446, PR #625) -> 8c8f7695 (498, PR #626) -> 141efcb8 (epic-status.md, docs-only) -> 808bf460 (468, PR #636)`
 
 ## Session Notes (fan-in-only run, 2026-08-26)
 
@@ -56,12 +56,13 @@ integration-to-`main` pull request was deliberately not opened.
   needed the full fan-in sequence was stale and was corrected against `gh pr view`.
 - **498** merged in this session as PR #626. Its stale-base guard passed with zero
   pure-deletion files, and its CI gate was a genuine green run of `ci.yml`.
-- **468** is **halted, not merged**. Its stale-base merge is committed and pushed and its
-  CI run is green, but its atomic plan is 120 of 180 tasks complete: phases P14, P15 and
-  P16 never ran, phase P13 stopped at T3, and 14 of 29 acceptance criteria in `spec.md`
-  are unchecked. No feature review was performed. Opening a pull request would assert an
-  autoclose set of seven issues against half-unverified acceptance criteria, so it was not
-  opened. See `features[].fan_in_halted` in the checkpoint.
+- **468** merged in this session as PR #636, on a second pass. It was first halted here:
+  its atomic plan was only 120 of 180 tasks complete, phase P13 stopped at T3, P14/P15/P16
+  had never run, 14 of 29 acceptance criteria were unchecked, and no feature review
+  existed. It was re-delegated to resume at P13-T4 and is now 180 of 180 tasks and 28 of
+  29 criteria, with `feature-audit`, `policy-audit` and `code-review` artifacts carrying
+  zero blocking findings. AC-28 is deliberately left unchecked: it requires the seven
+  issues to be closed *by the merge*, which an integration-branch merge cannot do.
 
 ### Known Gaps Carried Forward
 
@@ -69,7 +70,10 @@ integration-to-`main` pull request was deliberately not opened.
   because `.github/workflows/ci.yml` declares its `pull_request` trigger for
   `[main, development]` only. This session obtained real CI by dispatching `ci.yml` against
   each child branch head via `workflow_dispatch`. No workflow file was modified.
-- No feature-review artifacts exist for **446**'s siblings **498** or **468**.
+- No feature-review artifacts exist for **498**. 446, 468 and 484 have them; 498 does not.
+- Repo-wide C# line coverage is 84.9435%: it passes the CLAUDE.md floor of >= 80% but
+  misses the `.claude/rules/general-unit-test.md` floor of >= 85% by 0.0565 pp. The
+  shortfall is pre-existing and repository-wide; feature 468 improved it by +0.1732 pp.
 - Merged children's worktrees are retained on disk. Removal is denied in every epic run by
   `enforce-parallel-worktree-removal-gate.ps1`, which hard-codes the parallel checkpoint
   path and fails closed. No parallel checkpoint was fabricated to work around it.
