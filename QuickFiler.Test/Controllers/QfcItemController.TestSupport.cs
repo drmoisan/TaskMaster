@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
@@ -10,7 +11,9 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler.Controllers;
+using QuickFiler.Interfaces;
 using UtilitiesCS;
+using UtilitiesCS.EmailIntelligence.EmailParsingSorting;
 using UtilitiesCS.Threading;
 
 namespace QuickFiler.Controllers.Tests
@@ -368,6 +371,46 @@ namespace QuickFiler.Controllers.Tests
             attachment.SetupGet(a => a.AttachmentData).Returns(attachmentData);
             attachment.SetupGet(a => a.FileExtension).Returns(fileExtension);
             return CidImageResolver.BuildContentIdMap(new[] { attachment.Object });
+        }
+
+        /// <summary>
+        /// Issue #483 shared arrange helper. Injects the collaborators <c>MoveMailAsync</c> reads
+        /// before it reaches the filer factory — an <c>IApplicationGlobals</c> whose OneDrive special
+        /// folder resolves, an archive root, an <c>IFilerHomeController</c> carrying a real
+        /// <see cref="FilerQueue"/>, and a non-null <c>ItemHelper</c> — so the only failure source in
+        /// a test is the supplied <paramref name="filerFactory"/> or the queue itself.
+        /// </summary>
+        internal static void InjectFilingCollaborators(
+            QfcItemController controller,
+            Func<EmailFilerConfig, EmailFiler> filerFactory
+        )
+        {
+            ConcurrentDictionary<string, string> special = new ConcurrentDictionary<string, string>();
+            special["OneDrive"] = @"C:\OneDrive";
+            Mock<IFileSystemFolderPaths> fs = new Mock<IFileSystemFolderPaths>();
+            fs.SetupGet(f => f.SpecialFolders).Returns(special);
+            Mock<IOlObjects> ol = new Mock<IOlObjects>();
+            ol.SetupGet(o => o.ArchiveRootPath).Returns("archive-root");
+            Mock<IApplicationGlobals> globals = new Mock<IApplicationGlobals>();
+            globals.SetupGet(g => g.FS).Returns(fs.Object);
+            globals.SetupGet(g => g.Ol).Returns(ol.Object);
+            Mock<IFilerHomeController> home = new Mock<IFilerHomeController>();
+            home.SetupGet(h => h.FilerQueue).Returns(new FilerQueue());
+            controller.ItemHelper = new MailItemHelper();
+            SetField(controller, "_globals", globals.Object);
+            SetField(controller, "_homeController", home.Object);
+            SetField(controller, "_emailFilerFactory", filerFactory);
+        }
+
+        /// <summary>
+        /// Issue #483 shared arrange helper: an already-cancelled token, so
+        /// <c>Token.ThrowIfCancellationRequested()</c> throws on its first evaluation.
+        /// </summary>
+        internal static CancellationToken CancelledToken()
+        {
+            CancellationTokenSource source = new CancellationTokenSource();
+            source.Cancel();
+            return source.Token;
         }
     }
 

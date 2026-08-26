@@ -9,6 +9,7 @@ using QuickFiler.Controllers;
 using QuickFiler.Helper_Classes;
 using QuickFiler.Interfaces;
 using UtilitiesCS;
+using UtilitiesCS.EmailIntelligence.EmailParsingSorting;
 
 namespace QuickFiler.Controllers.Tests
 {
@@ -316,5 +317,136 @@ namespace QuickFiler.Controllers.Tests
             byte[] data,
             string extension
         ) => QfcItemControllerTestSupport.BuildContentIdMap(contentId, data, extension);
+
+        // ---------------------------------------------------------------------------------------
+        // Issue #483 — MoveMailAsync must propagate instead of swallowing, must route its user
+        // message through the MoveFailureNotifier seam on the UI dispatcher, and the three async
+        // members must honour a cancelled Token. Every collaborator is a Moq mock or an injected
+        // delegate, and every test replaces the notifier seam, so no modal dialog is reachable.
+        // ---------------------------------------------------------------------------------------
+
+        private static MailController Filing(System.Func<EmailFilerConfig, EmailFiler> filerFactory)
+        {
+            var controller = new MailController();
+            QfcItemControllerTestSupport.InjectFilingCollaborators(controller, filerFactory);
+            controller.MoveFailureNotifier = _ => { };
+            return controller;
+        }
+
+        /// <summary>Issue #483: the catch must propagate with added context, not return normally.</summary>
+        [TestMethod]
+        public async Task MoveMailAsync_WhenFilerFactoryThrows_WrapsAndRethrowsWithInnerException()
+        {
+            // Arrange
+            var fault = new System.InvalidTimeZoneException("filer factory refused the config");
+            MailController controller = Filing(_ => throw fault);
+            int notifications = 0;
+            controller.MoveFailureNotifier = _ => notifications++;
+
+            // Act
+            System.Func<Task> act = () => controller.MoveMailAsync();
+
+            // Assert
+            (await act.Should().ThrowAsync<System.InvalidOperationException>())
+                .WithInnerException<System.InvalidTimeZoneException>();
+            notifications.Should().Be(1);
+        }
+
+        /// <summary>
+        /// Issue #483: a fault raised inside FilerQueue.Enqueue is wrapped too. A conversation-mode
+        /// package holding a null helper makes the FilerQueueItem constructor throw
+        /// ArgumentNullException (FilerQueue.cs:70-78).
+        /// </summary>
+        [TestMethod]
+        public async Task MoveMailAsync_WhenEnqueueThrows_WrapsArgumentNullException()
+        {
+            // Arrange
+            MailController controller = Filing(c => new EmailFiler(c));
+            ConversationResolver resolver = BuildResolverWithCount(1);
+            resolver.ConversationInfo = new Pair<List<MailItemHelper>>(
+                sameFolder: new List<MailItemHelper> { null },
+                expanded: new List<MailItemHelper>()
+            );
+            SetField(controller, "_conversationResolver", resolver);
+            SetField(controller, "_optionConversationChecked", true);
+
+            // Act
+            System.Func<Task> act = () => controller.MoveMailAsync();
+
+            // Assert
+            (await act.Should().ThrowAsync<System.InvalidOperationException>())
+                .WithInnerException<System.ArgumentNullException>();
+        }
+
+        /// <summary>Issue #483: the notification is marshalled through the injected UI dispatcher.</summary>
+        [TestMethod]
+        public async Task MoveMailAsync_WithUiDispatcher_MarshalsNotificationThroughDispatcher()
+        {
+            // Arrange
+            MailController controller = Filing(_ => throw new System.InvalidTimeZoneException("x"));
+            bool notified = false;
+            controller.MoveFailureNotifier = _ => notified = true;
+            var dispatcher = QfcItemControllerTestSupport.BuildSyncDispatcher();
+            SetField(controller, "_uiDispatcher", dispatcher.Object);
+
+            // Act
+            System.Func<Task> act = () => controller.MoveMailAsync();
+
+            // Assert
+            await act.Should().ThrowAsync<System.InvalidOperationException>();
+            dispatcher.Verify(d => d.Invoke(It.IsAny<System.Action>()), Times.Once());
+            notified.Should().BeTrue();
+        }
+
+        /// <summary>Issue #483: a cancelled Token aborts MoveMailAsync before any filing work.</summary>
+        [TestMethod]
+        public async Task MoveMailAsync_WhenTokenAlreadyCancelled_ThrowsAndNeverInvokesFilerFactory()
+        {
+            // Arrange
+            bool factoryCalled = false;
+            MailController controller = Filing(c =>
+            {
+                factoryCalled = true;
+                return new EmailFiler(c);
+            });
+            controller.Token = QfcItemControllerTestSupport.CancelledToken();
+
+            // Act
+            System.Func<Task> act = () => controller.MoveMailAsync();
+
+            // Assert
+            await act.Should().ThrowAsync<System.OperationCanceledException>();
+            factoryCalled.Should().BeFalse();
+        }
+
+        /// <summary>Issue #483: FlagAsTaskAsync checks cancellation before its COM Mail read.</summary>
+        [TestMethod]
+        public async Task FlagAsTaskAsync_WhenTokenAlreadyCancelled_Throws()
+        {
+            // Arrange
+            var controller = new MailController();
+            controller.Token = QfcItemControllerTestSupport.CancelledToken();
+
+            // Act
+            System.Func<Task> act = () => controller.FlagAsTaskAsync();
+
+            // Assert
+            await act.Should().ThrowAsync<System.OperationCanceledException>();
+        }
+
+        /// <summary>Issue #483: EnumerateConversationAsync checks cancellation before dispatching.</summary>
+        [TestMethod]
+        public async Task EnumerateConversationAsync_WhenTokenAlreadyCancelled_Throws()
+        {
+            // Arrange
+            var controller = new MailController();
+            controller.Token = QfcItemControllerTestSupport.CancelledToken();
+
+            // Act
+            System.Func<Task> act = () => controller.EnumerateConversationAsync();
+
+            // Assert
+            await act.Should().ThrowAsync<System.OperationCanceledException>();
+        }
     }
 }

@@ -813,21 +813,21 @@ regression test. The one exception is verified by source inspection and is recor
 
 ### Issue #483 — `MoveMailAsync` error handling and cancellation
 
-- [ ] The `catch` block in `MoveMailAsync` (`QfcItemController.MailActions.cs:115-122`) logs at error
+- [x] The `catch` block in `MoveMailAsync` (`QfcItemController.MailActions.cs:115-122`) logs at error
       level, invokes the failure notification, and then propagates — it does not return normally.
-- [ ] A regression test drives a faulting `_emailFilerFactory` and asserts that `MoveMailAsync` faults
+- [x] A regression test drives a faulting `_emailFilerFactory` and asserts that `MoveMailAsync` faults
       with an exception whose `InnerException` is the original fault.
-- [ ] `internal Action<string> MoveFailureNotifier { get; set; }` exists in `MailActions.cs` with the
+- [x] `internal Action<string> MoveFailureNotifier { get; set; }` exists in `MailActions.cs` with the
       default `text => MessageBox.Show(text)`, and a regression test asserts it is invoked exactly once
       on the failure path with no modal dialog reached.
-- [ ] The failure notification is marshalled through `_uiDispatcher` when the dispatcher is non-null, and
+- [x] The failure notification is marshalled through `_uiDispatcher` when the dispatcher is non-null, and
       is invoked directly when it is null (so existing tests that leave `_uiDispatcher` unset still pass).
-- [ ] `Token.ThrowIfCancellationRequested()` is the first statement of `MoveMailAsync` (outside the
+- [x] `Token.ThrowIfCancellationRequested()` is the first statement of `MoveMailAsync` (outside the
       `try`), of `FlagAsTaskAsync`, and of `EnumerateConversationAsync`.
-- [ ] For each of the three methods, a regression test with a pre-cancelled `Token` asserts
+- [x] For each of the three methods, a regression test with a pre-cancelled `Token` asserts
       `OperationCanceledException` and asserts that the downstream collaborator (for `MoveMailAsync`, the
       `_emailFilerFactory`) was never invoked.
-- [ ] `Task MoveMailAsync()`'s return type is unchanged and
+- [x] `Task MoveMailAsync()`'s return type is unchanged and
       `QuickFiler/Controllers/QfcCollectionController.cs` is not modified.
 
 ### Issue #484 — `Cleanup()` timer disposal and stale `_mailActions`
