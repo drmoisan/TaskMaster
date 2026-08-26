@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
@@ -10,7 +11,9 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler.Controllers;
+using QuickFiler.Interfaces;
 using UtilitiesCS;
+using UtilitiesCS.EmailIntelligence.EmailParsingSorting;
 using UtilitiesCS.Threading;
 
 namespace QuickFiler.Controllers.Tests
@@ -324,6 +327,127 @@ namespace QuickFiler.Controllers.Tests
         {
             dispatcher?.InvokeShutdown();
         }
+
+        /// <summary>
+        /// Issue #480 shared arrange helper. Builds a viewer mock whose <c>Invoke</c> and
+        /// <c>BeginInvoke</c> execute the supplied delegate synchronously, so a dispatch made through
+        /// either path produces a countable call on whatever collaborator the delegate targets. Mirrors
+        /// the <c>private static BuildExecutingViewer()</c> in
+        /// <c>QfcItemController.FocusAndThemeTests.cs</c>, which is not reachable from another test file.
+        /// </summary>
+        internal static Mock<IItemViewer> BuildExecutingViewer()
+        {
+            Mock<IItemViewer> viewer = new Mock<IItemViewer>();
+            viewer
+                .Setup(v => v.Invoke(It.IsAny<Delegate>()))
+                .Returns((Delegate d) => d.DynamicInvoke());
+            viewer
+                .Setup(v => v.BeginInvoke(It.IsAny<Delegate>()))
+                .Returns(
+                    (Delegate d) =>
+                    {
+                        d.DynamicInvoke();
+                        return Mock.Of<IAsyncResult>();
+                    }
+                );
+            return viewer;
+        }
+
+        /// <summary>
+        /// Issue #485 shared arrange helper. Builds a single-entry content-id map through the real
+        /// <see cref="CidImageResolver.BuildContentIdMap"/> so the production map builder is
+        /// exercised, from a <c>Mock&lt;IAttachment&gt;</c> carrying the supplied payload and file
+        /// extension. Pass a null <paramref name="attachmentData"/> to reproduce the map-hit-without-
+        /// payload case: the resolver does not filter on <c>AttachmentData</c>.
+        /// </summary>
+        internal static IReadOnlyDictionary<string, IAttachment> BuildContentIdMap(
+            string contentId,
+            byte[] attachmentData,
+            string fileExtension
+        )
+        {
+            Mock<IAttachment> attachment = new Mock<IAttachment>();
+            attachment.SetupGet(a => a.ContentId).Returns(contentId);
+            attachment.SetupGet(a => a.AttachmentData).Returns(attachmentData);
+            attachment.SetupGet(a => a.FileExtension).Returns(fileExtension);
+            return CidImageResolver.BuildContentIdMap(new[] { attachment.Object });
+        }
+
+        /// <summary>
+        /// Issue #483 shared arrange helper. Injects the collaborators <c>MoveMailAsync</c> reads
+        /// before it reaches the filer factory — an <c>IApplicationGlobals</c> whose OneDrive special
+        /// folder resolves, an archive root, an <c>IFilerHomeController</c> carrying a real
+        /// <see cref="FilerQueue"/>, and a non-null <c>ItemHelper</c> — so the only failure source in
+        /// a test is the supplied <paramref name="filerFactory"/> or the queue itself.
+        /// </summary>
+        internal static void InjectFilingCollaborators(
+            QfcItemController controller,
+            Func<EmailFilerConfig, EmailFiler> filerFactory
+        )
+        {
+            ConcurrentDictionary<string, string> special =
+                new ConcurrentDictionary<string, string>();
+            special["OneDrive"] = @"C:\OneDrive";
+            Mock<IFileSystemFolderPaths> fs = new Mock<IFileSystemFolderPaths>();
+            fs.SetupGet(f => f.SpecialFolders).Returns(special);
+            Mock<IOlObjects> ol = new Mock<IOlObjects>();
+            ol.SetupGet(o => o.ArchiveRootPath).Returns("archive-root");
+            Mock<IApplicationGlobals> globals = new Mock<IApplicationGlobals>();
+            globals.SetupGet(g => g.FS).Returns(fs.Object);
+            globals.SetupGet(g => g.Ol).Returns(ol.Object);
+            Mock<IFilerHomeController> home = new Mock<IFilerHomeController>();
+            home.SetupGet(h => h.FilerQueue).Returns(new FilerQueue());
+            controller.ItemHelper = new MailItemHelper();
+            SetField(controller, "_globals", globals.Object);
+            SetField(controller, "_homeController", home.Object);
+            SetField(controller, "_emailFilerFactory", filerFactory);
+        }
+
+        /// <summary>
+        /// Issue #483 shared arrange helper: an already-cancelled token, so
+        /// <c>Token.ThrowIfCancellationRequested()</c> throws on its first evaluation.
+        /// </summary>
+        internal static CancellationToken CancelledToken()
+        {
+            CancellationTokenSource source = new CancellationTokenSource();
+            source.Cancel();
+            return source.Token;
+        }
+
+        /// <summary>
+        /// Issue #484 shared arrange helper: a timer armed with <c>Timeout.Infinite</c> for both due
+        /// time and period, so its callback can never fire and disposal is the only observable state
+        /// change. No wall-clock wait is involved.
+        /// </summary>
+        internal static System.Threading.Timer BuildNeverFiringTimer() =>
+            new System.Threading.Timer(_ => { }, null, Timeout.Infinite, Timeout.Infinite);
+
+        /// <summary>
+        /// Issue #484 shared arrange helper: runs the production <c>SaveParameters</c> path with the
+        /// supplied mail item so a test can observe the seam defaults it re-applies. Plain
+        /// <c>Mock.Of</c> collaborators suffice because <c>SaveParameters</c> only stores their
+        /// references.
+        /// </summary>
+        internal static void DriveSaveParameters(
+            QfcItemController controller,
+            Microsoft.Office.Interop.Outlook.MailItem mailItem
+        ) =>
+            controller.SaveParameters(
+                Mock.Of<IApplicationGlobals>(),
+                Mock.Of<IFilerHomeController>(),
+                Mock.Of<IQfcCollectionController>(),
+                Mock.Of<IItemViewer>(),
+                viewerPosition: 1,
+                itemNumberDigits: 1,
+                mailItem: mailItem,
+                tlpStates: null
+            );
+
+        /// <summary>Raises a protected Control.On* method by reflection (no live message pump).</summary>
+        internal static void RaiseProtected(Control control, string handler, object args) =>
+            typeof(Control)
+                .GetMethod(handler, BindingFlags.NonPublic | BindingFlags.Instance)
+                .Invoke(control, new object[] { args });
     }
 
     /// <summary>

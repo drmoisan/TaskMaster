@@ -320,7 +320,7 @@ namespace QuickFiler.Controllers.Tests
             controller.ToggleNavigation(async: false);
 
             // Assert
-            tips.Verify(t => t.Toggle(false), Times.AtLeastOnce());
+            tips.Verify(t => t.Toggle(false), Times.Once());
         }
 
         [TestMethod]

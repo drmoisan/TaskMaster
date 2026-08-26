@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Web.WebView2.Core;
 using Moq;
 using QuickFiler;
 using QuickFiler.Controllers;
@@ -369,6 +370,130 @@ namespace QuickFiler.Controllers.Tests
             {
                 SynchronizationContext.SetSynchronizationContext(previousContext);
             }
+        }
+
+        /// <summary>Issue #481: all sixteen intent subscriptions are detached by the unwire method.</summary>
+        [TestMethod]
+        public void UnwireIntentEvents_DetachesAllSixteenIntentSubscriptions()
+        {
+            // Arrange
+            var viewer = new Mock<IItemViewer>();
+            var mockKbd = new Mock<IQfcKeyboardHandler>();
+            var controller = new HarnessController();
+            QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer.Object);
+            QfcItemControllerTestSupport.SetField(controller, "_kbdHandler", mockKbd.Object);
+            QfcItemControllerTestSupport.InvokeNonPublic(controller, "WireIntentEvents");
+
+            // Act
+            QfcItemControllerTestSupport.InvokeNonPublic(controller, "UnwireIntentEvents");
+
+            // Assert - sixteen VerifyRemove assertions with Times.Once(), one per subscription made
+            // by WireIntentEvents(), routed through the local Off helper so each fits one line
+            // (constraint C2 capacity rule 2: compaction before relocation).
+            void Off(Action<IItemViewer> detach) => viewer.VerifyRemove(detach, Times.Once());
+
+            Off(v => v.ConversationModeChanged -= It.IsAny<EventHandler>());
+            Off(v => v.FlagTaskClicked -= It.IsAny<EventHandler>());
+            Off(v => v.PopOutClicked -= It.IsAny<EventHandler>());
+            Off(v => v.DeleteItemClicked -= It.IsAny<EventHandler>());
+            Off(v => v.ReplyClicked -= It.IsAny<EventHandler>());
+            Off(v => v.ReplyAllClicked -= It.IsAny<EventHandler>());
+            Off(v => v.ForwardClicked -= It.IsAny<EventHandler>());
+            Off(v => v.BodyDoubleClick -= It.IsAny<EventHandler>());
+            Off(v => v.SearchTextChanged -= It.IsAny<EventHandler>());
+            Off(v => v.FolderKeyDown -= It.IsAny<KeyEventHandler>());
+            Off(v => v.FolderSelectionChanged -= It.IsAny<EventHandler>());
+            Off(v =>
+                v.WebViewInitializationCompleted -= It.IsAny<
+                    EventHandler<CoreWebView2InitializationCompletedEventArgs>
+                >()
+            );
+            Off(v =>
+                v.ConversationItemSelectionChanged -=
+                    It.IsAny<ListViewItemSelectionChangedEventHandler>()
+            );
+            Off(v => v.SearchKeyDown -= It.IsAny<KeyEventHandler>());
+            Off(v => v.EmailCopyChanged -= It.IsAny<EventHandler>());
+            Off(v => v.AttachmentsChanged -= It.IsAny<EventHandler>());
+        }
+
+        /// <summary>
+        /// Issue #481: <c>UnwireControlTreeEvents()</c> detaches every handler that
+        /// <c>WireControlTreeEvents()</c> attached. Mirrors the headless fixture above: one real
+        /// ItemViewer, no Show(), no message pump, no worker thread, context restored in finally.
+        /// </summary>
+        [TestMethod]
+        public void UnwireControlTreeEvents_WithHeadlessItemViewer_DetachesKeyboardAndMouseHandlers()
+        {
+            // Arrange
+            var previousContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+            try
+            {
+                var viewer = new QuickFiler.ItemViewer();
+                var mockKbd = new Mock<IQfcKeyboardHandler>();
+                var controller = new HarnessController();
+                QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer);
+                QfcItemControllerTestSupport.SetField(controller, "_kbdHandler", mockKbd.Object);
+                QfcItemControllerTestSupport.InvokeNonPublic(
+                    controller,
+                    "ResolveControlGroups",
+                    viewer
+                );
+                Control btnDelItem = (Control)
+                    typeof(ItemViewer).GetProperty("BtnDelItem").GetValue(viewer);
+                Color originalBackColor = btnDelItem.BackColor;
+                QfcItemControllerTestSupport.InvokeNonPublic(controller, "WireControlTreeEvents");
+
+                // Act
+                QfcItemControllerTestSupport.InvokeNonPublic(controller, "UnwireControlTreeEvents");
+
+                // Assert - no detached handler runs when its event is raised.
+                void Raise(Control c, string handler, object args) =>
+                    QfcItemControllerTestSupport.RaiseProtected(c, handler, args);
+
+                Raise(viewer.LblAcOpen, "OnPreviewKeyDown", new PreviewKeyDownEventArgs(Keys.A));
+                Raise(viewer.LblAcOpen, "OnKeyDown", new KeyEventArgs(Keys.A));
+                Raise(btnDelItem, "OnMouseEnter", EventArgs.Empty);
+                mockKbd.Verify(
+                    k =>
+                        k.KeyboardHandler_PreviewKeyDownAsync(
+                            It.IsAny<object>(),
+                            It.IsAny<PreviewKeyDownEventArgs>()
+                        ),
+                    Times.Never()
+                );
+                mockKbd.Verify(
+                    k =>
+                        k.KeyboardHandler_KeyDownAsync(
+                            It.IsAny<object>(),
+                            It.IsAny<KeyEventArgs>()
+                        ),
+                    Times.Never()
+                );
+                btnDelItem.BackColor.Should().Be(originalBackColor);
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previousContext);
+            }
+        }
+
+        [TestMethod]
+        public void Cleanup_WithNullKeyboardHandlerAndNonItemViewerViewer_DoesNotThrow()
+        {
+            // Arrange - issue #481: _kbdHandler and Buttons are null and the viewer is a plain mock
+            // that cannot be cast to the concrete ItemViewer, which is the state of a controller
+            // torn down before initialization completed.
+            var controller = new HarnessController();
+            var viewer = Mock.Of<IItemViewer>();
+            QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer);
+
+            // Act
+            Action teardown = () => controller.Cleanup();
+
+            // Assert
+            teardown.Should().NotThrow();
         }
     }
 }
