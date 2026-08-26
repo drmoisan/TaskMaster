@@ -1213,7 +1213,7 @@ individually verifiable from evidence.
       `_itemGroups[insertionIndex - 1]`. Verified by named MSTest tests for the above-, equal-, and
       below-reservation cases, each arranged so no loop iteration executes, plus a direct test of the
       extracted pure `ResolveConversationInsertions` helper. The loop is **not** clamped.
-- [ ] **AC-10 (#470 defect 3).** `SetVisualDigits` skips a group entirely when its `ItemController`
+- [x] **AC-10 (#470 defect 3).** `SetVisualDigits` skips a group entirely when its `ItemController`
       (or `ItemViewer`) is `null` and does not throw. Verified by a named MSTest test that throws
       `NullReferenceException` (wrapped in `TargetInvocationException`) before the fix and asserts no
       throw and no viewer text written after.

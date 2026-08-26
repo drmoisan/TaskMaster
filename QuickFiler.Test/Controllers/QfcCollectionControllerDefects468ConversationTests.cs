@@ -268,6 +268,78 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
+        /// Issue #470 defect 3. <c>SetVisualDigits</c> must skip a group whole when either its item
+        /// controller or its item viewer is missing.
+        /// <para>
+        /// Two groups, both with a null <c>ItemViewer</c>: a default group whose controller is also
+        /// null, and one carrying a mocked controller. The loaded-email guard still passes because
+        /// it counts groups. Before the fix the first group throws
+        /// <see cref="NullReferenceException"/> on <c>grp.ItemController.ItemNumberDigits</c>.
+        /// </para>
+        /// <para>
+        /// The second group is what makes a controller-only guard visibly insufficient: with one,
+        /// execution reaches <c>grp.ItemViewer.LblItemNumber</c> on the next line and throws on the
+        /// same arrangement. Because every group's viewer is null here, any attempt to write viewer
+        /// text would throw, so completing without an exception is itself the proof that none was
+        /// written; <c>VerifySet</c> on the live controller confirms the group was skipped before
+        /// the write rather than after it.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public void SetVisualDigits_WithNullItemController_SkipsTheGroupWithoutThrowing()
+        {
+            // Arrange
+            Mock<IQfcItemController> liveController = new Mock<IQfcItemController>(
+                MockBehavior.Loose
+            );
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            QfcCollectionControllerTestSupport.SetField(
+                controller,
+                "_itemGroups",
+                new List<QfcItemGroup>
+                {
+                    new QfcItemGroup(),
+                    new QfcItemGroup { ItemController = liveController.Object },
+                }
+            );
+
+            // Act
+            System.Exception captured = null;
+            try
+            {
+                QfcCollectionControllerTestSupport.InvokeNonPublic(
+                    controller,
+                    "SetVisualDigits",
+                    1
+                );
+            }
+            catch (TargetInvocationException wrapper)
+            {
+                // Reflection wraps the real failure; assert on the inner exception.
+                captured = wrapper.InnerException;
+            }
+
+            // Assert
+            captured
+                .Should()
+                .BeNull(
+                    because: "issue #470 defect 3 requires a group with no controller or no viewer "
+                        + "to be skipped rather than dereferenced"
+                );
+            QfcCollectionControllerTestSupport
+                .GetField(controller, "_digitRefreshNeeded")
+                .Should()
+                .Be(false, because: "the method must reach its final statement, not abort midway");
+            liveController.VerifySet(
+                item => item.ItemNumberDigits = It.IsAny<int>(),
+                Times.Never(),
+                "a group whose viewer is null must be skipped whole; writing the controller first "
+                    + "and only then failing on the viewer is the defect, not the fix"
+            );
+        }
+
+        /// <summary>
         /// Builds a mocked <see cref="MailItem"/> carrying only the two members the conversation
         /// helpers read.
         /// </summary>

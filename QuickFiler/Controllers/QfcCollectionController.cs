@@ -142,9 +142,21 @@ namespace QuickFiler.Controllers
                 );
                 _itemGroups.ForEach(grp =>
                 {
+                    // Issue #470 defect 3: skip the group whole. The controller was dereferenced
+                    // unguarded on the first line and null-conditionally on the third, while the
+                    // viewer was dereferenced unguarded on the second, so the null-conditional
+                    // protected nothing. Guarding only the controller is also insufficient:
+                    // execution would then reach the viewer dereference on the next line with the
+                    // same arrangement. Both members must dominate every dereference below.
+                    if (grp?.ItemController is null || grp.ItemViewer is null)
+                    {
+                        return;
+                    }
+
                     grp.ItemController.ItemNumberDigits = digits;
-                    grp.ItemViewer.LblItemNumber.Text =
-                        grp.ItemController?.ItemNumber.ToString(format) ?? 0.ToString(format);
+                    grp.ItemViewer.LblItemNumber.Text = grp.ItemController.ItemNumber.ToString(
+                        format
+                    );
                 });
             }
             _digitRefreshNeeded = false;
