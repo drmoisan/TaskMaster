@@ -865,17 +865,17 @@ regression test. The one exception is verified by source inspection and is recor
 
 ### Upstream contract and scope discipline
 
-- [ ] No public member is added, and no member is removed, from any of the four owned partials.
-- [ ] `QuickFiler/Interfaces/IQfcItemController.cs` and `QuickFiler/Viewers/IItemViewer.cs` are byte-identical
+- [x] No public member is added, and no member is removed, from any of the four owned partials.
+- [x] `QuickFiler/Interfaces/IQfcItemController.cs` and `QuickFiler/Viewers/IItemViewer.cs` are byte-identical
       to their pre-change state.
-- [ ] The set of files changed by this feature is a subset of the four owned production files plus the
+- [x] The set of files changed by this feature is a subset of the four owned production files plus the
       five owned test files. In particular `QfcItemController.Navigation.cs`, `QuickFiler/Viewers/ItemViewer*.cs`,
       `QuickFiler/Controllers/KbdActions.cs`, `QuickFiler/QuickFiler.csproj`, and
       `QuickFiler.Test/QuickFiler.Test.csproj` are unmodified.
-- [ ] All three `Cleanup()` statement-order constraints hold in the delivered source: unwire before
+- [x] All three `Cleanup()` statement-order constraints hold in the delivered source: unwire before
       `_itemViewer` and `_kbdHandler` are nulled; timer disposal before `_emailIsReadTimer` is nulled;
       the existing `BreadcrumbUnhandledArrow` detach before `_breadcrumbViewer` is nulled.
-- [ ] The post-`Cleanup()` lifecycle invariant is demonstrated: a pooled viewer carries zero
+- [x] The post-`Cleanup()` lifecycle invariant is demonstrated: a pooled viewer carries zero
       subscriptions from the released controller, with the single documented `WebResourceRequested`
       exception.
 
