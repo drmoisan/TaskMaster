@@ -454,6 +454,8 @@ namespace QuickFiler.Controllers
                 _breadcrumbViewer.BreadcrumbUnhandledArrow -= OnBreadcrumbUnhandledArrow;
                 _breadcrumbViewer = null;
             }
+            // #481: detach while _itemViewer and _kbdHandler are still resolvable; both null below.
+            UnwireEvents();
             _globals = null;
             _itemViewer = null;
             _parent = null;
@@ -472,13 +474,23 @@ namespace QuickFiler.Controllers
             _itemPositionTips = null;
             ItemHelper = null;
             _itemViewer = null;
-            // #484: dispose before releasing the reference. Nulling the field alone leaks the
-            // thread-pool timer and leaves its callback able to run against a torn-down controller.
+            // #484: dispose first; nulling alone leaks the timer and lets its callback still run.
             _emailIsReadTimer?.Dispose();
             _emailIsReadTimer = null;
-            // #484: release the mail-actions adapter with the mail item it wraps. SaveParameters
-            // rebinds it on the next reuse of this pooled controller via its ??= default.
+            // #484: release the adapter with its mail item; SaveParameters rebinds it on reuse.
             _mailActions = null;
+        }
+
+        // #481: detaches the WebResourceRequested subscription made in InitializeWebViewAsync. The
+        // nulling statements sit outside the guard, so the never-initialized path also releases.
+        private void DetachWebResourceRequestedHandler()
+        {
+            if (_coreWebView2 != null && _webResourceRequestedHandler != null)
+            {
+                _coreWebView2.WebResourceRequested -= _webResourceRequestedHandler;
+            }
+            _webResourceRequestedHandler = null;
+            _coreWebView2 = null;
         }
 
         internal string GetItemSummary() =>

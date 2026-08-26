@@ -780,32 +780,32 @@ regression test. The one exception is verified by source inspection and is recor
 
 ### Issue #481 — event unwiring path
 
-- [ ] `internal void UnwireEvents()`, `internal void UnwireControlTreeEvents()`, and
+- [x] `internal void UnwireEvents()`, `internal void UnwireControlTreeEvents()`, and
       `internal void UnwireIntentEvents()` exist in
       `QuickFiler/Controllers/QfcItemController.EventWiring.cs`, with `UnwireEvents()` calling
       `UnwireControlTreeEvents()` then `UnwireIntentEvents()`, mirroring `WireEvents()`, and
       `UnwireEvents()` additionally calls `DetachWebResourceRequestedHandler()` as its third statement.
-- [ ] All 16 intent subscriptions made by `WireIntentEvents()` are detached by `UnwireIntentEvents()`,
+- [x] All 16 intent subscriptions made by `WireIntentEvents()` are detached by `UnwireIntentEvents()`,
       verified by `Mock<IItemViewer>.VerifyRemove` assertions.
-- [ ] All 6 control-tree subscriptions made by `WireControlTreeEvents()` are detached by
+- [x] All 6 control-tree subscriptions made by `WireControlTreeEvents()` are detached by
       `UnwireControlTreeEvents()`, verified by a wire-unwire-raise test asserting `Times.Never()` on the
       keyboard-handler mock and an unchanged `BackColor`, mirroring the fixture at
       `QfcItemController.EventWiringTests.cs:229-309`.
-- [ ] `UnwireControlTreeEvents()` passes the same `ForAllControls` exclusion list as
+- [x] `UnwireControlTreeEvents()` passes the same `ForAllControls` exclusion list as
       `WireControlTreeEvents()` (`EventWiring.cs:50`).
-- [ ] `Cleanup()` calls `UnwireEvents()` before `_itemViewer = null` (`ViewerSetup.cs:407`) and before
+- [x] `Cleanup()` calls `UnwireEvents()` before `_itemViewer = null` (`ViewerSetup.cs:407`) and before
       `_kbdHandler = null` (`:420`).
-- [ ] `UnwireIntentEvents()` returns early when `_itemViewer` is null and guards the `FolderKeyDown`
+- [x] `UnwireIntentEvents()` returns early when `_itemViewer` is null and guards the `FolderKeyDown`
       detach against a null `_kbdHandler`; `UnwireControlTreeEvents()` returns early when `_itemViewer`
       is not a concrete `ItemViewer`, skips the `ForAllControls` keyboard-detach walk when `_kbdHandler`
       is null, and guards the `Buttons` and `MenuItems` loops against null.
-- [ ] A regression test asserts that `Cleanup()` does not throw on a controller whose `_kbdHandler` and
+- [x] A regression test asserts that `Cleanup()` does not throw on a controller whose `_kbdHandler` and
       `Buttons` are null and whose `_itemViewer` is a plain `Mock<IItemViewer>`.
-- [ ] The two pre-existing `Cleanup()` tests
+- [x] The two pre-existing `Cleanup()` tests
       (`QfcItemController.ViewerSetupTests.cs:347-376` `Cleanup_NullsTrackedPrivateFields` and
       `QfcItemControllerBreadcrumbDropDownTests.cs:125-153`
       `Cleanup_ResetsInjectedHostForPooledViewerReuse`) both pass unchanged after the fix.
-- [ ] The `WebResourceRequested` delegate and its `CoreWebView2` source are captured into the private
+- [x] The `WebResourceRequested` delegate and its `CoreWebView2` source are captured into the private
       fields `_webResourceRequestedHandler` and `_coreWebView2` in `ViewerSetup.cs`, and the subscription
       is detached during teardown. Its verification is recorded as inspection-only, with the reason
       (`InitializeWebViewAsync` is `[ExcludeFromCodeCoverage]` at `ViewerSetup.cs:41` and requires a live

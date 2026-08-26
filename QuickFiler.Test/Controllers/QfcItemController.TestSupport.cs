@@ -442,6 +442,12 @@ namespace QuickFiler.Controllers.Tests
                 mailItem: mailItem,
                 tlpStates: null
             );
+
+        /// <summary>Raises a protected Control.On* method by reflection (no live message pump).</summary>
+        internal static void RaiseProtected(Control control, string handler, object args) =>
+            typeof(Control)
+                .GetMethod(handler, BindingFlags.NonPublic | BindingFlags.Instance)
+                .Invoke(control, new object[] { args });
     }
 
     /// <summary>
