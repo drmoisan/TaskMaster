@@ -349,6 +349,26 @@ namespace QuickFiler.Controllers.Tests
                 );
             return viewer;
         }
+
+        /// <summary>
+        /// Issue #485 shared arrange helper. Builds a single-entry content-id map through the real
+        /// <see cref="CidImageResolver.BuildContentIdMap"/> so the production map builder is
+        /// exercised, from a <c>Mock&lt;IAttachment&gt;</c> carrying the supplied payload and file
+        /// extension. Pass a null <paramref name="attachmentData"/> to reproduce the map-hit-without-
+        /// payload case: the resolver does not filter on <c>AttachmentData</c>.
+        /// </summary>
+        internal static IReadOnlyDictionary<string, IAttachment> BuildContentIdMap(
+            string contentId,
+            byte[] attachmentData,
+            string fileExtension
+        )
+        {
+            Mock<IAttachment> attachment = new Mock<IAttachment>();
+            attachment.SetupGet(a => a.ContentId).Returns(contentId);
+            attachment.SetupGet(a => a.AttachmentData).Returns(attachmentData);
+            attachment.SetupGet(a => a.FileExtension).Returns(fileExtension);
+            return CidImageResolver.BuildContentIdMap(new[] { attachment.Object });
+        }
     }
 
     /// <summary>

@@ -847,20 +847,20 @@ regression test. The one exception is verified by source inspection and is recor
 
 ### Issue #485 — WebView2 handler unguarded inputs
 
-- [ ] `internal static bool TryResolveCidResource(string requestedUri, IReadOnlyDictionary<string, IAttachment> contentIdMap, out byte[] payload, out string mimeType)`
+- [x] `internal static bool TryResolveCidResource(string requestedUri, IReadOnlyDictionary<string, IAttachment> contentIdMap, out byte[] payload, out string mimeType)`
       exists in `ViewerSetup.cs` and carries the URI, map, match, and `AttachmentData` guards.
-- [ ] `TryResolveCidResource` uses `Uri.TryCreate(..., UriKind.Absolute, ...)` and returns `false` with
+- [x] `TryResolveCidResource` uses `Uri.TryCreate(..., UriKind.Absolute, ...)` and returns `false` with
       null `out` values for a malformed URI, for a relative URI, and for an absolute URI whose final
       segment is empty. Each case has its own regression test.
-- [ ] `TryResolveCidResource` returns `false` with null `out` values for a map miss, for a null map, and
+- [x] `TryResolveCidResource` returns `false` with null `out` values for a map miss, for a null map, and
       for a map hit whose `AttachmentData` is null. Each case has its own regression test.
-- [ ] `TryResolveCidResource` returns `true` with the exact payload reference and the expected MIME type
+- [x] `TryResolveCidResource` returns `true` with the exact payload reference and the expected MIME type
       for a map hit with real bytes and a known file extension, and returns
       `"application/octet-stream"` for an unrecognised extension. Both cases have regression tests.
-- [ ] The `WebResourceRequested` lambda is reduced to an adapter that builds the map from
+- [x] The `WebResourceRequested` lambda is reduced to an adapter that builds the map from
       `ItemHelper?.AttachmentsInfo` (null-safe) and constructs the response only when
       `TryResolveCidResource` returns `true`.
-- [ ] Every #485 regression test runs without constructing a controller, an `ItemViewer`, a
+- [x] Every #485 regression test runs without constructing a controller, an `ItemViewer`, a
       `MailItemHelper`, or any `CoreWebView2*` type.
 
 ### Upstream contract and scope discipline

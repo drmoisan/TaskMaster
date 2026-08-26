@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -210,5 +210,111 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             tips.Verify(t => t.Toggle(false), Times.Once());
         }
+
+        // ---------------------------------------------------------------------------------------
+        // Issue #485 — TryResolveCidResource must guard every externally-supplied input. No test in
+        // this group constructs a controller, an ItemViewer, a MailItemHelper, or any CoreWebView2
+        // type: the extracted member is internal static and is called with plain values and
+        // Mock<IAttachment> objects.
+        // ---------------------------------------------------------------------------------------
+
+        /// <summary>
+        /// Shared assert helper for the issue #485 "ignore this request" cases: the call must return
+        /// false and must leave both <c>out</c> values null.
+        /// </summary>
+        private static void AssertRequestIgnored(
+            string uri,
+            IReadOnlyDictionary<string, IAttachment> map
+        )
+        {
+            bool resolved = QfcItemController.TryResolveCidResource(uri, map, out var pay, out var mime);
+            resolved.Should().BeFalse();
+            pay.Should().BeNull();
+            mime.Should().BeNull();
+        }
+
+        /// <summary>
+        /// Issue #485: an unusable requested URI is ignored rather than throwing. A malformed URI
+        /// previously threw <c>UriFormatException</c> from the unguarded <c>new Uri(...)</c>; a
+        /// relative URI would throw <c>InvalidOperationException</c> from <c>Uri.Segments</c>; an
+        /// absolute URI whose final segment is empty carries no content id.
+        /// </summary>
+        [DataTestMethod]
+        [DataRow("::not a uri::", DisplayName = "malformed URI")]
+        [DataRow("/x/y", DisplayName = "relative URI")]
+        [DataRow("https://cid.quickfiler.local/", DisplayName = "empty final segment")]
+        public void TryResolveCidResource_RejectsUnusableUri_ReturnsFalseWithNullOutputs(string uri)
+        {
+            // Arrange a populated map, so a false result can only come from the URI itself; Act+Assert
+            AssertRequestIgnored(uri, MapWith("logo", new byte[] { 1 }, ".png"));
+        }
+
+        /// <summary>
+        /// Issue #485: a null map is ignored rather than throwing from the unguarded lookup.
+        /// </summary>
+        [TestMethod]
+        public void TryResolveCidResource_WithNullMap_ReturnsFalse() =>
+            AssertRequestIgnored("https://cid.quickfiler.local/logo", null);
+
+        /// <summary>
+        /// Issue #485: a content id absent from the map yields no response and null outputs.
+        /// </summary>
+        [TestMethod]
+        public void TryResolveCidResource_WithMapMiss_ReturnsFalse() =>
+            AssertRequestIgnored(
+                "https://cid.quickfiler.local/absent",
+                MapWith("logo", new byte[] { 1 }, ".png")
+            );
+
+        /// <summary>
+        /// Issue #485: a map hit does not imply a payload. <c>BuildContentIdMap</c> does not filter on
+        /// <c>AttachmentData</c>, so a matched attachment can carry a null byte array; serving it
+        /// previously threw <c>ArgumentNullException</c> from <c>new MemoryStream</c>.
+        /// </summary>
+        [TestMethod]
+        public void TryResolveCidResource_WithNullAttachmentData_ReturnsFalse() =>
+            AssertRequestIgnored(
+                "https://cid.quickfiler.local/logo",
+                MapWith("logo", null, ".png")
+            );
+
+        /// <summary>
+        /// Issue #485 happy path: a map hit with real bytes and a known extension returns the exact
+        /// payload reference and the matching MIME type.
+        /// </summary>
+        [TestMethod]
+        public void TryResolveCidResource_WithKnownExtension_ReturnsPayloadAndMimeType() =>
+            AssertRequestServed(new byte[] { 7, 8, 9 }, ".png", "image/png");
+
+        /// <summary>
+        /// Issue #485: an unrecognised extension still serves the payload, falling back to the
+        /// generic octet stream rather than failing the intercepted request.
+        /// </summary>
+        [TestMethod]
+        public void TryResolveCidResource_WithUnrecognisedExtension_ReturnsOctetStream() =>
+            AssertRequestServed(new byte[] { 4, 2 }, ".zzz", "application/octet-stream");
+
+        /// <summary>
+        /// Shared assert helper for the issue #485 "serve this request" cases: the call must return
+        /// true, hand back the exact payload reference, and report the expected MIME type.
+        /// </summary>
+        private static void AssertRequestServed(byte[] bytes, string extension, string expectedMime)
+        {
+            bool resolved = QfcItemController.TryResolveCidResource(
+                "https://cid.quickfiler.local/logo",
+                MapWith("logo", bytes, extension),
+                out var payload,
+                out var mimeType
+            );
+            resolved.Should().BeTrue();
+            payload.Should().BeSameAs(bytes);
+            mimeType.Should().Be(expectedMime);
+        }
+
+        private static IReadOnlyDictionary<string, IAttachment> MapWith(
+            string contentId,
+            byte[] data,
+            string extension
+        ) => QfcItemControllerTestSupport.BuildContentIdMap(contentId, data, extension);
     }
 }
