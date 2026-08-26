@@ -9,6 +9,7 @@ using Moq;
 using QuickFiler.Controllers;
 using QuickFiler.Interfaces;
 using UtilitiesCS;
+using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 
 namespace QuickFiler.Controllers.Tests
 {
@@ -457,5 +458,40 @@ namespace QuickFiler.Controllers.Tests
                 olAppointment: ref appointment
             );
         }
+
+        /// <summary>
+        /// Issue #469 defect 4. The retained <c>stackMovedItems</c> parameter must not influence
+        /// the outcome. With an empty cached move collection, passing <see langword="null"/> and
+        /// passing an in-memory stack are observationally identical: neither throws and neither
+        /// leaves a record on the supplied stack, because undo records reach the stack through the
+        /// email filer's push path onto the same globals instance, never through this argument.
+        /// The stack is constructed in memory and is never serialized, so no file is touched.
+        /// </summary>
+        [TestMethod]
+        public async Task MoveEmailsAsync_WithNullStack_BehavesIdenticallyToAnEmptyStack()
+        {
+            // Arrange
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            QfcCollectionControllerTestSupport.SetField(
+                controller,
+                "_itemGroupsToMove",
+                new List<QfcItemGroup>()
+            );
+            var stack = new SloStack<IMovedMailInfo>();
+
+            // Act
+            Func<Task> withNullStack = () => controller.MoveEmailsAsync(null);
+            Func<Task> withSuppliedStack = () => controller.MoveEmailsAsync(stack);
+
+            // Assert
+            await withNullStack.Should().NotThrowAsync(because: NoStackEffect);
+            await withSuppliedStack.Should().NotThrowAsync(because: NoStackEffect);
+            stack.Count.Should().Be(0, because: NoStackEffect);
+        }
+
+        private const string NoStackEffect =
+            "the stackMovedItems parameter is retained for source compatibility only, so a null "
+            + "argument and a supplied argument must produce the same observable outcome";
     }
 }
