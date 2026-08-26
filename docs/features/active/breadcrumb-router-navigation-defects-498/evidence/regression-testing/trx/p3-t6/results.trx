@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="500f0918-780d-4ad5-b554-78114795f5a5" name="DanMoisan@MEGALODON4 2026-08-26 09:32:01" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T09:32:01.4672997-04:00" queuing="2026-08-26T09:32:01.4672997-04:00" start="2026-08-26T09:31:59.2459910-04:00" finish="2026-08-26T09:32:01.4842998-04:00" />
+  <TestSettings name="default" id="1b05facd-58fb-455e-a883-9b49f356f8f4">
+    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_09_32_01" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="d624672c-96ae-43d9-8320-7175a0f3af9b" testId="13754bcd-d5de-8dec-b1a9-774e1c6f1428" testName="BindRowsAsync_DoesNotAutoSelectAnyRow" computerName="MEGALODON4" duration="00:00:00.0023218" startTime="2026-08-26T09:32:01.3977774-04:00" endTime="2026-08-26T09:32:01.4044540-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d624672c-96ae-43d9-8320-7175a0f3af9b" />
+    <UnitTestResult executionId="dda15d2a-5d27-4b05-95a1-3e092b923912" testId="12050483-d644-831d-8a20-1760e7eeb956" testName="BindRowsAsync_WithNoPriorSelection_RaisesNoSelectedFolderPathChangedEvent" computerName="MEGALODON4" duration="00:00:00.2338991" startTime="2026-08-26T09:32:01.0237237-04:00" endTime="2026-08-26T09:32:01.3917614-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dda15d2a-5d27-4b05-95a1-3e092b923912">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="BindRowsAsync_WithNoPriorSelection_RaisesNoSelectedFolderPathChangedEvent" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\quickfiler.test\bin\debug\quickfiler.test.dll" id="12050483-d644-831d-8a20-1760e7eeb956">
+      <Execution id="dda15d2a-5d27-4b05-95a1-3e092b923912" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests" name="BindRowsAsync_WithNoPriorSelection_RaisesNoSelectedFolderPathChangedEvent" />
+    </UnitTest>
+    <UnitTest name="BindRowsAsync_DoesNotAutoSelectAnyRow" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\quickfiler.test\bin\debug\quickfiler.test.dll" id="13754bcd-d5de-8dec-b1a9-774e1c6f1428">
+      <Execution id="d624672c-96ae-43d9-8320-7175a0f3af9b" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests" name="BindRowsAsync_DoesNotAutoSelectAnyRow" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="13754bcd-d5de-8dec-b1a9-774e1c6f1428" executionId="d624672c-96ae-43d9-8320-7175a0f3af9b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12050483-d644-831d-8a20-1760e7eeb956" executionId="dda15d2a-5d27-4b05-95a1-3e092b923912" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="2" executed="2" passed="2" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+</TestRun>

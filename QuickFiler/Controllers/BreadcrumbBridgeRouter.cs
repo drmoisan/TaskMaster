@@ -134,6 +134,16 @@ namespace QuickFiler.Controllers
             );
             AttachSegmentKeys(presentedRows, chains);
             _selectedRowId = null;
+
+            // #499: the rows just rebuilt are a new set, so a folder path selected against the
+            // previous set is stale. Clear it with the row id and notify subscribers, but only
+            // when the value actually changed, so a re-bind with no prior selection is silent.
+            if (SelectedFolderPath != null)
+            {
+                SelectedFolderPath = null;
+                SelectedFolderPathChanged?.Invoke(this, null);
+            }
+
             DeliverDocument();
         }
 

@@ -3,7 +3,9 @@ using System.Linq;
 using System.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using UtilitiesCS;
+using UtilitiesCS.OutlookObjects.Folder;
 
 namespace QuickFiler.Test.Controllers
 {
@@ -190,6 +192,177 @@ namespace QuickFiler.Test.Controllers
             // Assert: no throw, and the banner produced no render post.
             act.Should().NotThrow();
             _posted.Count.Should().Be(postedBefore, "banner rows never collapse");
+        }
+
+        /// <summary>
+        /// #499: a re-bind must not leave the previously selected folder path behind. After a
+        /// selection sets <c>SelectedFolderPath</c>, binding a fresh row set clears it alongside
+        /// the row-id reset, so a caller reading the property after a re-bind does not act on a
+        /// folder the user can no longer see.
+        /// </summary>
+        [TestMethod]
+        public void BindRowsAsync_AfterSelection_ClearsSelectedFolderPath()
+        {
+            // Arrange: bind, then select row-0 so that SelectedFolderPath carries a value.
+            Bind();
+            Inbound("{\"type\":\"rowSelected\",\"rowId\":\"row-0\"}");
+            _router
+                .SelectedFolderPath.Should()
+                .Be(LeafPath, "the arrange step must establish a non-null selection");
+
+            // Act: re-bind.
+            Bind();
+
+            // Assert: the stale selection is gone.
+            _router
+                .SelectedFolderPath.Should()
+                .BeNull("a re-bind invalidates the previous selection");
+        }
+
+        /// <summary>
+        /// #499: clearing the stale selection is observable. Subscribers of
+        /// <c>SelectedFolderPathChanged</c> receive a null payload when a re-bind discards a
+        /// previously non-null selection, so downstream consumers can react to the invalidation.
+        /// </summary>
+        [TestMethod]
+        public void BindRowsAsync_AfterSelection_RaisesSelectedFolderPathChangedWithNull()
+        {
+            // Arrange: establish a non-null selection, then subscribe before the second bind so
+            // that only the re-bind's notification can be observed.
+            Bind();
+            Inbound("{\"type\":\"rowSelected\",\"rowId\":\"row-0\"}");
+            string observed = "sentinel";
+            _router.SelectedFolderPathChanged += (s, path) => observed = path;
+
+            // Act: re-bind.
+            Bind();
+
+            // Assert: the sentinel was overwritten with the null payload.
+            observed
+                .Should()
+                .BeNull("the re-bind must notify subscribers that the selection was cleared");
+        }
+
+        /// <summary>
+        /// #499 preservation guard: the re-bind clear must not disturb the first of the two
+        /// existing <c>SelectedFolderPath</c> write sites. A direct row selection still assigns the
+        /// row's filing target, which is the presented row text for a suggestion row.
+        /// </summary>
+        [TestMethod]
+        public void SelectRow_StillAssignsFilingTargetToSelectedFolderPath()
+        {
+            // Arrange
+            Bind();
+            string observed = "sentinel";
+            _router.SelectedFolderPathChanged += (s, path) => observed = path;
+
+            // Act: select the suggestion row.
+            Inbound("{\"type\":\"rowSelected\",\"rowId\":\"row-0\"}");
+
+            // Assert: the filing target is assigned and published, exactly as before #499.
+            _router
+                .SelectedFolderPath.Should()
+                .Be(LeafPath, "SelectRow assigns row.FilingTarget for a suggestion row");
+            observed.Should().Be(LeafPath, "the selection is still published to subscribers");
+        }
+
+        /// <summary>
+        /// #499 preservation guard: the re-bind clear must not disturb the second of the two
+        /// existing <c>SelectedFolderPath</c> write sites. Activating an ancestor segment still
+        /// assigns the archive-relative form of that segment's full hierarchy path.
+        /// </summary>
+        [TestMethod]
+        public void SelectHierarchyPath_StillAssignsArchiveRelativePathToSelectedFolderPath()
+        {
+            // Arrange: an ancestor chain rooted under a non-empty archive root, so that the
+            // archive-relative projection is actually exercised rather than short-circuited.
+            const string ArchiveRoot = @"\\mailbox\Archive";
+            const string ClientsPath = @"\\mailbox\Archive\Clients";
+            const string NorthPath = @"\\mailbox\Archive\Clients\North";
+            _provider
+                .Setup(p =>
+                    p.GetAncestorChainAsync(
+                        It.IsAny<FolderTreeNodeKey>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(
+                    new[]
+                    {
+                        Segment(ClientsPath, "Clients", true),
+                        Segment(NorthPath, "North", true),
+                    }
+                );
+            _router
+                .BindRowsAsync(
+                    new[] { @"Clients\North" },
+                    Enumerable.Empty<FolderScore>(),
+                    ArchiveRoot,
+                    CancellationToken.None
+                )
+                .GetAwaiter()
+                .GetResult();
+
+            // Act: activate the non-leaf ancestor segment.
+            Inbound("{\"type\":\"segmentActivate\",\"rowId\":\"row-0\",\"segmentIndex\":0}");
+
+            // Assert: the archive root is stripped, exactly as before #499.
+            _router
+                .SelectedFolderPath.Should()
+                .Be(
+                    "Clients",
+                    "SelectHierarchyPath assigns the archive-relative form of the activated segment"
+                )
+                .And.NotBe(ClientsPath);
+        }
+
+        /// <summary>
+        /// #499 / AC-5: the clear notifies only on an actual change. A re-bind that follows no
+        /// selection leaves <c>SelectedFolderPath</c> null and raises no
+        /// <c>SelectedFolderPathChanged</c> event at all, so subscribers are not woken by a
+        /// no-op.
+        /// </summary>
+        [TestMethod]
+        public void BindRowsAsync_WithNoPriorSelection_RaisesNoSelectedFolderPathChangedEvent()
+        {
+            // Arrange: bind once, make no selection, then subscribe.
+            Bind();
+            int raised = 0;
+            _router.SelectedFolderPathChanged += (s, path) => raised++;
+
+            // Act: re-bind while the selection is still null.
+            Bind();
+
+            // Assert: silent, and the property is still null.
+            raised
+                .Should()
+                .Be(0, "the clear must notify only when the previous value was non-null");
+            _router.SelectedFolderPath.Should().BeNull();
+        }
+
+        /// <summary>
+        /// #499 / AC-6: the clear introduces no auto-selection side effect. A bind renders the
+        /// document with no row marked selected and leaves <c>SelectedFolderPath</c> null;
+        /// <c>SelectFirstRow</c> is not invoked from <c>BindRowsAsync</c>.
+        /// </summary>
+        [TestMethod]
+        public void BindRowsAsync_DoesNotAutoSelectAnyRow()
+        {
+            // Arrange: an initialized core so the rendered document is delivered and observable.
+            _initialized = true;
+
+            // Act
+            Bind();
+
+            // Assert: a document was delivered, and it marks no row selected.
+            _navigated.Should().HaveCount(1);
+            _navigated[0]
+                .Should()
+                .NotContain(
+                    "rowwrap selected",
+                    "binding must not select a row on the user's behalf"
+                );
+            _router.SelectedFolderPath.Should().BeNull();
         }
     }
 }

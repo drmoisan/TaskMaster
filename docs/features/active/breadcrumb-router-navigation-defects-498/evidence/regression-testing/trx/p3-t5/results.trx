@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="a2b5b064-c4e4-4da7-9600-8bcb69529409" name="DanMoisan@MEGALODON4 2026-08-26 09:30:54" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T09:30:54.9112811-04:00" queuing="2026-08-26T09:30:54.9112811-04:00" start="2026-08-26T09:30:53.5406652-04:00" finish="2026-08-26T09:30:54.9265687-04:00" />
+  <TestSettings name="default" id="96f203f8-8a21-4bc8-ace0-0b1ce18e19f8">
+    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_09_30_54" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="df808f64-2d97-4caf-bf2b-dead88306324" testId="1d8515d9-349a-89d1-afe4-a949dada31b9" testName="SelectRow_StillAssignsFilingTargetToSelectedFolderPath" computerName="MEGALODON4" duration="00:00:00.2958163" startTime="2026-08-26T09:30:54.4286014-04:00" endTime="2026-08-26T09:30:54.8319705-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="df808f64-2d97-4caf-bf2b-dead88306324">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="1f9a7d4d-9420-4d85-a802-8aeead1f0712" testId="1323f6b0-b412-82ae-8a25-c5c3d076f240" testName="SelectHierarchyPath_StillAssignsArchiveRelativePathToSelectedFolderPath" computerName="MEGALODON4" duration="00:00:00.0098161" startTime="2026-08-26T09:30:54.8374727-04:00" endTime="2026-08-26T09:30:54.8510986-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1f9a7d4d-9420-4d85-a802-8aeead1f0712" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="SelectHierarchyPath_StillAssignsArchiveRelativePathToSelectedFolderPath" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\quickfiler.test\bin\debug\quickfiler.test.dll" id="1323f6b0-b412-82ae-8a25-c5c3d076f240">
+      <Execution id="1f9a7d4d-9420-4d85-a802-8aeead1f0712" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests" name="SelectHierarchyPath_StillAssignsArchiveRelativePathToSelectedFolderPath" />
+    </UnitTest>
+    <UnitTest name="SelectRow_StillAssignsFilingTargetToSelectedFolderPath" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d8515d9-349a-89d1-afe4-a949dada31b9">
+      <Execution id="df808f64-2d97-4caf-bf2b-dead88306324" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests" name="SelectRow_StillAssignsFilingTargetToSelectedFolderPath" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1d8515d9-349a-89d1-afe4-a949dada31b9" executionId="df808f64-2d97-4caf-bf2b-dead88306324" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1323f6b0-b412-82ae-8a25-c5c3d076f240" executionId="1f9a7d4d-9420-4d85-a802-8aeead1f0712" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="2" executed="2" passed="2" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+</TestRun>

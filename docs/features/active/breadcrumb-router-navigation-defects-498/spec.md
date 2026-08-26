@@ -999,14 +999,14 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
 - [x] **AC-3 (#498)** — A valid `segmentIndex` still collapses the row and posts a render, and the
       `catch (BreadcrumbMessageException)` at `BreadcrumbBridgeRouter.cs:266-277` is still the only catch at
       the `async void` host-message boundary (no broad `catch (Exception)` added there).
-- [ ] **AC-4 (#499)** — `BindRowsAsync` sets `SelectedFolderPath` to `null` alongside `_selectedRowId = null`
+- [x] **AC-4 (#499)** — `BindRowsAsync` sets `SelectedFolderPath` to `null` alongside `_selectedRowId = null`
       (`BreadcrumbBridgeRouter.cs:136`), so after a re-bind that follows a selection `SelectedFolderPath` is
       `null` rather than the pre-rebind folder. The two existing `SelectedFolderPath` write sites — `SelectRow`
       (`:484-487`) and `SelectHierarchyPath` (`:497`) — are unchanged, and a test confirms each still assigns
       the value it assigns today.
-- [ ] **AC-5 (#499)** — `SelectedFolderPathChanged(this, null)` is raised on that clear **only when the value
+- [x] **AC-5 (#499)** — `SelectedFolderPathChanged(this, null)` is raised on that clear **only when the value
       actually changed**; a re-bind with no prior selection raises no event.
-- [ ] **AC-6 (#499)** — No auto-selection side effect is introduced: `SelectFirstRow`
+- [x] **AC-6 (#499)** — No auto-selection side effect is introduced: `SelectFirstRow`
       (`BreadcrumbBridgeRouter.cs:192-199`) is still not called from `BindRowsAsync` (`:92-138`).
 - [ ] **AC-7 (#440 Qfc prerequisite)** — `OutlookFolderHierarchyProvider.ResolveLeafKeyAsync` (`:52-71`) keeps
       its exact `OrdinalIgnoreCase` first pass (`:66-68`): a caller supplying a full Outlook path resolves
@@ -1101,7 +1101,7 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
 - [x] **AC-25 (#498 — RED first)** — A regression test for #498 in
       `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterQueueTests.cs` is demonstrated **failing before the
       fix** and passing after, with the failing run recorded in the feature's evidence directory.
-- [ ] **AC-26 (#499 — RED first)** — A regression test for #499 in
+- [x] **AC-26 (#499 — RED first)** — A regression test for #499 in
       `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterQueueTests.cs` is demonstrated failing before the fix
       and passing after, with the failing run recorded.
 - [ ] **AC-27 (#440 Qfc prerequisite — RED first)** — A regression test for the D5 suffix fallback in
