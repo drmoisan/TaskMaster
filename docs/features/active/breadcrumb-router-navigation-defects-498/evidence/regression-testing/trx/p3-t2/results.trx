@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="f8bc8d0a-baa0-4f44-b391-bc10a40fb8df" name="DanMoisan@MEGALODON4 2026-08-26 09:27:24" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="f8bc8d0a-baa0-4f44-b391-bc10a40fb8df" name="REDACTED-USER@REDACTED-HOST 2026-08-26 09:27:24" runUser="REDACTED-HOST\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-26T09:27:24.9904818-04:00" queuing="2026-08-26T09:27:24.9904818-04:00" start="2026-08-26T09:27:23.4904293-04:00" finish="2026-08-26T09:27:25.0077820-04:00" />
   <TestSettings name="default" id="4af9bc93-d815-4e66-8b72-5f5b2df56572">
-    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_09_27_24" />
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-26_09_27_24" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="8a495e54-d7e9-47d4-9fd7-466b6ed18b48" testId="16eb424c-6c4b-8ddc-a1ac-a4e53be42dbb" testName="BindRowsAsync_AfterSelection_ClearsSelectedFolderPath" computerName="MEGALODON4" duration="00:00:00.4036400" startTime="2026-08-26T09:27:24.4070574-04:00" endTime="2026-08-26T09:27:24.9160550-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8a495e54-d7e9-47d4-9fd7-466b6ed18b48">
+    <UnitTestResult executionId="8a495e54-d7e9-47d4-9fd7-466b6ed18b48" testId="16eb424c-6c4b-8ddc-a1ac-a4e53be42dbb" testName="BindRowsAsync_AfterSelection_ClearsSelectedFolderPath" computerName="REDACTED-HOST" duration="00:00:00.4036400" startTime="2026-08-26T09:27:24.4070574-04:00" endTime="2026-08-26T09:27:24.9160550-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8a495e54-d7e9-47d4-9fd7-466b6ed18b48">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -40,30 +40,30 @@ Debug Trace:&#xD;
           <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
    at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
    at FluentAssertions.Primitives.ReferenceTypeAssertions`2.BeNull(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/ReferenceTypeAssertions.cs:line 49&#xD;
-   at QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests.BindRowsAsync_AfterSelection_ClearsSelectedFolderPath() in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\Controllers\BreadcrumbBridgeRouterQueueTests.Part2.cs:line 215</StackTrace>
+   at QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests.BindRowsAsync_AfterSelection_ClearsSelectedFolderPath() in REDACTED-REPO-ROOT\QuickFiler.Test\Controllers\BreadcrumbBridgeRouterQueueTests.Part2.cs:line 215</StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="79e2ff77-336d-4b99-a5e0-d483105fdcc5" testId="172763cb-725b-8e34-a918-a78dd9c00041" testName="BindRowsAsync_AfterSelection_RaisesSelectedFolderPathChangedWithNull" computerName="MEGALODON4" duration="00:00:00.0021847" startTime="2026-08-26T09:27:24.9214060-04:00" endTime="2026-08-26T09:27:24.9271079-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="79e2ff77-336d-4b99-a5e0-d483105fdcc5">
+    <UnitTestResult executionId="79e2ff77-336d-4b99-a5e0-d483105fdcc5" testId="172763cb-725b-8e34-a918-a78dd9c00041" testName="BindRowsAsync_AfterSelection_RaisesSelectedFolderPathChangedWithNull" computerName="REDACTED-HOST" duration="00:00:00.0021847" startTime="2026-08-26T09:27:24.9214060-04:00" endTime="2026-08-26T09:27:24.9271079-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="79e2ff77-336d-4b99-a5e0-d483105fdcc5">
       <Output>
         <ErrorInfo>
           <Message>Expected observed to be &lt;null&gt; because the re-bind must notify subscribers that the selection was cleared, but found "sentinel".</Message>
           <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
    at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
    at FluentAssertions.Primitives.ReferenceTypeAssertions`2.BeNull(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/ReferenceTypeAssertions.cs:line 49&#xD;
-   at QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests.BindRowsAsync_AfterSelection_RaisesSelectedFolderPathChangedWithNull() in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\Controllers\BreadcrumbBridgeRouterQueueTests.Part2.cs:line 239</StackTrace>
+   at QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests.BindRowsAsync_AfterSelection_RaisesSelectedFolderPathChangedWithNull() in REDACTED-REPO-ROOT\QuickFiler.Test\Controllers\BreadcrumbBridgeRouterQueueTests.Part2.cs:line 239</StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="BindRowsAsync_AfterSelection_RaisesSelectedFolderPathChangedWithNull" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\quickfiler.test\bin\debug\quickfiler.test.dll" id="172763cb-725b-8e34-a918-a78dd9c00041">
+    <UnitTest name="BindRowsAsync_AfterSelection_RaisesSelectedFolderPathChangedWithNull" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="172763cb-725b-8e34-a918-a78dd9c00041">
       <Execution id="79e2ff77-336d-4b99-a5e0-d483105fdcc5" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests" name="BindRowsAsync_AfterSelection_RaisesSelectedFolderPathChangedWithNull" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests" name="BindRowsAsync_AfterSelection_RaisesSelectedFolderPathChangedWithNull" />
     </UnitTest>
-    <UnitTest name="BindRowsAsync_AfterSelection_ClearsSelectedFolderPath" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\quickfiler.test\bin\debug\quickfiler.test.dll" id="16eb424c-6c4b-8ddc-a1ac-a4e53be42dbb">
+    <UnitTest name="BindRowsAsync_AfterSelection_ClearsSelectedFolderPath" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="16eb424c-6c4b-8ddc-a1ac-a4e53be42dbb">
       <Execution id="8a495e54-d7e9-47d4-9fd7-466b6ed18b48" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests" name="BindRowsAsync_AfterSelection_ClearsSelectedFolderPath" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests" name="BindRowsAsync_AfterSelection_ClearsSelectedFolderPath" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>

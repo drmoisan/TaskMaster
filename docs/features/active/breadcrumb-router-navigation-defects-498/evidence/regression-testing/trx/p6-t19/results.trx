@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="a32ba99d-12d6-4a93-9597-7917cff2935a" name="DanMoisan@MEGALODON4 2026-08-26 10:42:25" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="a32ba99d-12d6-4a93-9597-7917cff2935a" name="REDACTED-USER@REDACTED-HOST 2026-08-26 10:42:25" runUser="REDACTED-HOST\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-26T10:42:25.6214811-04:00" queuing="2026-08-26T10:42:25.6214811-04:00" start="2026-08-26T10:42:23.7328057-04:00" finish="2026-08-26T10:42:25.9404813-04:00" />
   <TestSettings name="default" id="9ade7840-7516-4005-b1f3-ef70a397c21a">
-    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_10_42_25" />
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-26_10_42_25" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="2c5fcae0-aa88-4a44-91d9-669c0f4954bd" testId="13bfe9ed-92b6-866e-8413-58044c1fdf26" testName="Boundary_QfcUnhandledArrow_StillReachesBreadcrumbArrowFallThrough" computerName="MEGALODON4" duration="00:00:00.8203095" startTime="2026-08-26T10:42:25.0590105-04:00" endTime="2026-08-26T10:42:25.8826462-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2c5fcae0-aa88-4a44-91d9-669c0f4954bd">
+    <UnitTestResult executionId="2c5fcae0-aa88-4a44-91d9-669c0f4954bd" testId="13bfe9ed-92b6-866e-8413-58044c1fdf26" testName="Boundary_QfcUnhandledArrow_StillReachesBreadcrumbArrowFallThrough" computerName="REDACTED-HOST" duration="00:00:00.8203095" startTime="2026-08-26T10:42:25.0590105-04:00" endTime="2026-08-26T10:42:25.8826462-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2c5fcae0-aa88-4a44-91d9-669c0f4954bd">
       <Output>
         <StdOut>Debug Trace:&#xD;
 testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
@@ -20,7 +20,7 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
 testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="68b5e236-8dd8-41dc-9a19-30a24d099f9a" testId="1ddebd8a-db38-86a4-9b27-e2be35a39a28" testName="Boundary_EfcLeftAtRootAndRightOnChildlessNode_RemainSilentNoOps" computerName="MEGALODON4" duration="00:00:00.3105387" startTime="2026-08-26T10:42:24.6369195-04:00" endTime="2026-08-26T10:42:25.0530103-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="68b5e236-8dd8-41dc-9a19-30a24d099f9a">
+    <UnitTestResult executionId="68b5e236-8dd8-41dc-9a19-30a24d099f9a" testId="1ddebd8a-db38-86a4-9b27-e2be35a39a28" testName="Boundary_EfcLeftAtRootAndRightOnChildlessNode_RemainSilentNoOps" computerName="REDACTED-HOST" duration="00:00:00.3105387" startTime="2026-08-26T10:42:24.6369195-04:00" endTime="2026-08-26T10:42:25.0530103-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="68b5e236-8dd8-41dc-9a19-30a24d099f9a">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -54,13 +54,13 @@ Debug Trace:&#xD;
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="Boundary_QfcUnhandledArrow_StillReachesBreadcrumbArrowFallThrough" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\quickfiler.test\bin\debug\quickfiler.test.dll" id="13bfe9ed-92b6-866e-8413-58044c1fdf26">
+    <UnitTest name="Boundary_QfcUnhandledArrow_StillReachesBreadcrumbArrowFallThrough" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="13bfe9ed-92b6-866e-8413-58044c1fdf26">
       <Execution id="2c5fcae0-aa88-4a44-91d9-669c0f4954bd" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests" name="Boundary_QfcUnhandledArrow_StillReachesBreadcrumbArrowFallThrough" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests" name="Boundary_QfcUnhandledArrow_StillReachesBreadcrumbArrowFallThrough" />
     </UnitTest>
-    <UnitTest name="Boundary_EfcLeftAtRootAndRightOnChildlessNode_RemainSilentNoOps" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ddebd8a-db38-86a4-9b27-e2be35a39a28">
+    <UnitTest name="Boundary_EfcLeftAtRootAndRightOnChildlessNode_RemainSilentNoOps" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ddebd8a-db38-86a4-9b27-e2be35a39a28">
       <Execution id="68b5e236-8dd8-41dc-9a19-30a24d099f9a" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests" name="Boundary_EfcLeftAtRootAndRightOnChildlessNode_RemainSilentNoOps" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests" name="Boundary_EfcLeftAtRootAndRightOnChildlessNode_RemainSilentNoOps" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>

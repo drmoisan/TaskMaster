@@ -96,7 +96,7 @@ attributes, and vstest exposes no switch to suppress them.
 
 Measured scope: **50** TRX files are already tracked in this repository and carry these attributes, across
 `docs/features/archive/**` and `docs/features/active/**`. One is even named
-`docs/features/archive/2026-06-08-csharp-analyzer-stack-hardening-181/evidence/qa-gates/trx/DanMoisan_MEGALODON4_2026-06-08_19_57_49_net481.trx`.
+`docs/features/archive/2026-06-08-csharp-analyzer-stack-hardening-181/evidence/qa-gates/trx/<user>_<host>_2026-06-08_19_57_49_net481.trx`.
 
 Decision taken for this feature: leave TRX bodies unmodified. Hand-editing tool-generated evidence would
 falsify the artifact that the plan's gates read, and redacting two files out of fifty-two would produce an

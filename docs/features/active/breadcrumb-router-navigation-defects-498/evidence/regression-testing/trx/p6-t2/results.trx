@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="23930d16-22ea-4949-9ed6-4c9dff8dfee7" name="DanMoisan@MEGALODON4 2026-08-26 10:11:53" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="23930d16-22ea-4949-9ed6-4c9dff8dfee7" name="REDACTED-USER@REDACTED-HOST 2026-08-26 10:11:53" runUser="REDACTED-HOST\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-26T10:11:53.8008842-04:00" queuing="2026-08-26T10:11:53.8008842-04:00" start="2026-08-26T10:11:51.7540039-04:00" finish="2026-08-26T10:11:53.8238985-04:00" />
   <TestSettings name="default" id="387d9b5b-36db-4a8d-a939-a2d461058384">
-    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_10_11_53" />
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-26_10_11_53" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="42fea07c-f2bf-4eb9-a1b2-5537ffb24f24" testId="10d6633d-0e65-89e4-8f37-57e712b09022" testName="HandleArrowKey_LeftOnMultiSegmentRow_ActivatesParentSegment" computerName="MEGALODON4" duration="00:00:00.4361011" startTime="2026-08-26T10:11:53.0161001-04:00" endTime="2026-08-26T10:11:53.5962543-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="42fea07c-f2bf-4eb9-a1b2-5537ffb24f24">
+    <UnitTestResult executionId="42fea07c-f2bf-4eb9-a1b2-5537ffb24f24" testId="10d6633d-0e65-89e4-8f37-57e712b09022" testName="HandleArrowKey_LeftOnMultiSegmentRow_ActivatesParentSegment" computerName="REDACTED-HOST" duration="00:00:00.4361011" startTime="2026-08-26T10:11:53.0161001-04:00" endTime="2026-08-26T10:11:53.5962543-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="42fea07c-f2bf-4eb9-a1b2-5537ffb24f24">
       <Output>
         <ErrorInfo>
           <Message>Test method QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests.HandleArrowKey_LeftOnMultiSegmentRow_ActivatesParentSegment threw exception:&#xD;
@@ -19,12 +19,12 @@ Performed invocations:&#xD;
 </Message>
           <StackTrace>   at Moq.Mock.Verify(Mock mock, LambdaExpression expression, Times times, String failMessage) in /_/src/Moq/Mock.cs:line 332&#xD;
    at Moq.Mock`1.Verify[TResult](Expression`1 expression, Func`1 times) in /_/src/Moq/Mock`1.cs:line 841&#xD;
-   at QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests.HandleArrowKey_LeftOnMultiSegmentRow_ActivatesParentSegment() in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\Controllers\BreadcrumbBridgeRouterTests.cs:line 453&#xD;
+   at QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests.HandleArrowKey_LeftOnMultiSegmentRow_ActivatesParentSegment() in REDACTED-REPO-ROOT\QuickFiler.Test\Controllers\BreadcrumbBridgeRouterTests.cs:line 453&#xD;
 </StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="dd903cb5-eb5b-41a6-9ca5-958d144bbf50" testId="1d918fe1-96a0-8000-9153-8ad8ef2c6ac0" testName="HandleArrowKey_RepeatedLeft_WalksToRootThenFallsThroughToExistingBehavior" computerName="MEGALODON4" duration="00:00:00.1150980" startTime="2026-08-26T10:11:53.6050827-04:00" endTime="2026-08-26T10:11:53.7247461-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dd903cb5-eb5b-41a6-9ca5-958d144bbf50">
+    <UnitTestResult executionId="dd903cb5-eb5b-41a6-9ca5-958d144bbf50" testId="1d918fe1-96a0-8000-9153-8ad8ef2c6ac0" testName="HandleArrowKey_RepeatedLeft_WalksToRootThenFallsThroughToExistingBehavior" computerName="REDACTED-HOST" duration="00:00:00.1150980" startTime="2026-08-26T10:11:53.6050827-04:00" endTime="2026-08-26T10:11:53.7247461-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dd903cb5-eb5b-41a6-9ca5-958d144bbf50">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -59,19 +59,19 @@ Debug Trace:&#xD;
           <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
    at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
    at FluentAssertions.Collections.GenericCollectionAssertions`3.HaveCount(Int32 expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Collections/GenericCollectionAssertions.cs:line 1497&#xD;
-   at QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests.HandleArrowKey_RepeatedLeft_WalksToRootThenFallsThroughToExistingBehavior() in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\Controllers\BreadcrumbBridgeRouterTests.cs:line 491</StackTrace>
+   at QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests.HandleArrowKey_RepeatedLeft_WalksToRootThenFallsThroughToExistingBehavior() in REDACTED-REPO-ROOT\QuickFiler.Test\Controllers\BreadcrumbBridgeRouterTests.cs:line 491</StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="HandleArrowKey_RepeatedLeft_WalksToRootThenFallsThroughToExistingBehavior" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d918fe1-96a0-8000-9153-8ad8ef2c6ac0">
+    <UnitTest name="HandleArrowKey_RepeatedLeft_WalksToRootThenFallsThroughToExistingBehavior" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d918fe1-96a0-8000-9153-8ad8ef2c6ac0">
       <Execution id="dd903cb5-eb5b-41a6-9ca5-958d144bbf50" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests" name="HandleArrowKey_RepeatedLeft_WalksToRootThenFallsThroughToExistingBehavior" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests" name="HandleArrowKey_RepeatedLeft_WalksToRootThenFallsThroughToExistingBehavior" />
     </UnitTest>
-    <UnitTest name="HandleArrowKey_LeftOnMultiSegmentRow_ActivatesParentSegment" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\quickfiler.test\bin\debug\quickfiler.test.dll" id="10d6633d-0e65-89e4-8f37-57e712b09022">
+    <UnitTest name="HandleArrowKey_LeftOnMultiSegmentRow_ActivatesParentSegment" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="10d6633d-0e65-89e4-8f37-57e712b09022">
       <Execution id="42fea07c-f2bf-4eb9-a1b2-5537ffb24f24" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests" name="HandleArrowKey_LeftOnMultiSegmentRow_ActivatesParentSegment" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests" name="HandleArrowKey_LeftOnMultiSegmentRow_ActivatesParentSegment" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>

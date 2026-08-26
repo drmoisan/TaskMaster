@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="7a3aaafb-caa3-4f3c-9d80-4bde4c382ac4" name="DanMoisan@MEGALODON4 2026-08-26 09:32:48" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="7a3aaafb-caa3-4f3c-9d80-4bde4c382ac4" name="REDACTED-USER@REDACTED-HOST 2026-08-26 09:32:48" runUser="REDACTED-HOST\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-26T09:32:48.6671635-04:00" queuing="2026-08-26T09:32:48.6671635-04:00" start="2026-08-26T09:32:47.3114282-04:00" finish="2026-08-26T09:32:48.6821634-04:00" />
   <TestSettings name="default" id="462d968f-b98b-446c-8229-423dcff60852">
-    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_09_32_48" />
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-26_09_32_48" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="3d1f9a8e-2ead-4fd2-a93b-b961087abdaa" testId="11e0b115-948d-8570-a157-c5c4fd010061" testName="MalformedInboundJson_ThrowsCodecExceptionWithoutCorruptingState" computerName="MEGALODON4" duration="00:00:00.3053492" startTime="2026-08-26T09:32:48.1785872-04:00" endTime="2026-08-26T09:32:48.5885434-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3d1f9a8e-2ead-4fd2-a93b-b961087abdaa">
+    <UnitTestResult executionId="3d1f9a8e-2ead-4fd2-a93b-b961087abdaa" testId="11e0b115-948d-8570-a157-c5c4fd010061" testName="MalformedInboundJson_ThrowsCodecExceptionWithoutCorruptingState" computerName="REDACTED-HOST" duration="00:00:00.3053492" startTime="2026-08-26T09:32:48.1785872-04:00" endTime="2026-08-26T09:32:48.5885434-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3d1f9a8e-2ead-4fd2-a93b-b961087abdaa">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -37,16 +37,16 @@ Debug Trace:&#xD;
      For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="7ee62797-4f75-4d3e-a7e8-12660ad9ad18" testId="1eac2a92-1eb5-8be8-92f1-ec79e5dc1400" testName="MalformedInboundJson_ViaHostEvent_IsContainedAtTheBoundary" computerName="MEGALODON4" duration="00:00:00.0086080" startTime="2026-08-26T09:32:48.5945429-04:00" endTime="2026-08-26T09:32:48.6070507-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7ee62797-4f75-4d3e-a7e8-12660ad9ad18" />
+    <UnitTestResult executionId="7ee62797-4f75-4d3e-a7e8-12660ad9ad18" testId="1eac2a92-1eb5-8be8-92f1-ec79e5dc1400" testName="MalformedInboundJson_ViaHostEvent_IsContainedAtTheBoundary" computerName="REDACTED-HOST" duration="00:00:00.0086080" startTime="2026-08-26T09:32:48.5945429-04:00" endTime="2026-08-26T09:32:48.6070507-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7ee62797-4f75-4d3e-a7e8-12660ad9ad18" />
   </Results>
   <TestDefinitions>
-    <UnitTest name="MalformedInboundJson_ThrowsCodecExceptionWithoutCorruptingState" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\quickfiler.test\bin\debug\quickfiler.test.dll" id="11e0b115-948d-8570-a157-c5c4fd010061">
+    <UnitTest name="MalformedInboundJson_ThrowsCodecExceptionWithoutCorruptingState" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="11e0b115-948d-8570-a157-c5c4fd010061">
       <Execution id="3d1f9a8e-2ead-4fd2-a93b-b961087abdaa" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests" name="MalformedInboundJson_ThrowsCodecExceptionWithoutCorruptingState" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests" name="MalformedInboundJson_ThrowsCodecExceptionWithoutCorruptingState" />
     </UnitTest>
-    <UnitTest name="MalformedInboundJson_ViaHostEvent_IsContainedAtTheBoundary" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\quickfiler.test\bin\debug\quickfiler.test.dll" id="1eac2a92-1eb5-8be8-92f1-ec79e5dc1400">
+    <UnitTest name="MalformedInboundJson_ViaHostEvent_IsContainedAtTheBoundary" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1eac2a92-1eb5-8be8-92f1-ec79e5dc1400">
       <Execution id="7ee62797-4f75-4d3e-a7e8-12660ad9ad18" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests" name="MalformedInboundJson_ViaHostEvent_IsContainedAtTheBoundary" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests" name="MalformedInboundJson_ViaHostEvent_IsContainedAtTheBoundary" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>

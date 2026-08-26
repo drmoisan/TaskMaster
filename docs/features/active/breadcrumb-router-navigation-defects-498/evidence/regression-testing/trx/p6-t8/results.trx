@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="1f964e3d-324f-4bb8-a7a9-7ef5c5970ba7" name="DanMoisan@MEGALODON4 2026-08-26 10:20:52" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="1f964e3d-324f-4bb8-a7a9-7ef5c5970ba7" name="REDACTED-USER@REDACTED-HOST 2026-08-26 10:20:52" runUser="REDACTED-HOST\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-26T10:20:52.7084383-04:00" queuing="2026-08-26T10:20:52.7084383-04:00" start="2026-08-26T10:20:50.6288259-04:00" finish="2026-08-26T10:20:52.7285279-04:00" />
   <TestSettings name="default" id="00b7c6e9-cf51-4564-ad94-ad6f6a9d0c6c">
-    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-26_10_20_52" />
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-26_10_20_52" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="3a0ca1d4-f22b-4745-989f-918cbb3e268c" testId="1fa7bcb6-b724-8ac9-ba56-c0ab6270cdbb" testName="HandleArrowKey_RightAfterExpansion_DescendsByChildActivation" computerName="MEGALODON4" duration="00:00:00.0448832" startTime="2026-08-26T10:20:52.5761763-04:00" endTime="2026-08-26T10:20:52.6272698-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3a0ca1d4-f22b-4745-989f-918cbb3e268c">
+    <UnitTestResult executionId="3a0ca1d4-f22b-4745-989f-918cbb3e268c" testId="1fa7bcb6-b724-8ac9-ba56-c0ab6270cdbb" testName="HandleArrowKey_RightAfterExpansion_DescendsByChildActivation" computerName="REDACTED-HOST" duration="00:00:00.0448832" startTime="2026-08-26T10:20:52.5761763-04:00" endTime="2026-08-26T10:20:52.6272698-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3a0ca1d4-f22b-4745-989f-918cbb3e268c">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -37,16 +37,16 @@ Debug Trace:&#xD;
      For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="c96af1ea-d8f1-471e-bd4f-4f10bb838ef8" testId="11b2051a-504f-8b3e-87f7-c80fab346910" testName="HandleArrowKey_RightOnActivatedParent_ExpandsViaSingleImmediateSubfolderCall" computerName="MEGALODON4" duration="00:00:00.5341864" startTime="2026-08-26T10:20:51.9185520-04:00" endTime="2026-08-26T10:20:52.5671565-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c96af1ea-d8f1-471e-bd4f-4f10bb838ef8" />
+    <UnitTestResult executionId="c96af1ea-d8f1-471e-bd4f-4f10bb838ef8" testId="11b2051a-504f-8b3e-87f7-c80fab346910" testName="HandleArrowKey_RightOnActivatedParent_ExpandsViaSingleImmediateSubfolderCall" computerName="REDACTED-HOST" duration="00:00:00.5341864" startTime="2026-08-26T10:20:51.9185520-04:00" endTime="2026-08-26T10:20:52.5671565-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c96af1ea-d8f1-471e-bd4f-4f10bb838ef8" />
   </Results>
   <TestDefinitions>
-    <UnitTest name="HandleArrowKey_RightOnActivatedParent_ExpandsViaSingleImmediateSubfolderCall" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\quickfiler.test\bin\debug\quickfiler.test.dll" id="11b2051a-504f-8b3e-87f7-c80fab346910">
+    <UnitTest name="HandleArrowKey_RightOnActivatedParent_ExpandsViaSingleImmediateSubfolderCall" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="11b2051a-504f-8b3e-87f7-c80fab346910">
       <Execution id="c96af1ea-d8f1-471e-bd4f-4f10bb838ef8" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests" name="HandleArrowKey_RightOnActivatedParent_ExpandsViaSingleImmediateSubfolderCall" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests" name="HandleArrowKey_RightOnActivatedParent_ExpandsViaSingleImmediateSubfolderCall" />
     </UnitTest>
-    <UnitTest name="HandleArrowKey_RightAfterExpansion_DescendsByChildActivation" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-ac716b765074febc7\quickfiler.test\bin\debug\quickfiler.test.dll" id="1fa7bcb6-b724-8ac9-ba56-c0ab6270cdbb">
+    <UnitTest name="HandleArrowKey_RightAfterExpansion_DescendsByChildActivation" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1fa7bcb6-b724-8ac9-ba56-c0ab6270cdbb">
       <Execution id="3a0ca1d4-f22b-4745-989f-918cbb3e268c" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-ac716b765074febc7\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests" name="HandleArrowKey_RightAfterExpansion_DescendsByChildActivation" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterTests" name="HandleArrowKey_RightAfterExpansion_DescendsByChildActivation" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
