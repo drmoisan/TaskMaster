@@ -2,12 +2,16 @@
 
 Timestamp: 2026-08-26T20-10
 
-PostedAs: unknown
+PostedAs: comment
 
-POSTING BLOCKED
+POSTING RESOLVED BY ORCHESTRATOR
 
-Reason: this executor has no verified GitHub authentication in this session and the plan does not
-authorize a `gh issue` write. The text below is the intended issue update. It has been mirrored
+Original executor note: the executor had no verified GitHub authentication in its session and the
+plan did not authorize a `gh issue` write, so it correctly recorded the update as blocked rather
+than claiming it was posted. The orchestrator has verified `gh` authentication and posted it at
+https://github.com/drmoisan/TaskMaster/issues/614#issuecomment-5430792742 on 2026-08-26.
+
+Superseded reason: The text below is the intended issue update. It has been mirrored
 into the local feature `issue.md` (appended as its `## Outcome (2026-08-26)` section) so the local
 record and the intended remote record match. A maintainer, or the orchestrator's PR step, should
 post it to https://github.com/drmoisan/TaskMaster/issues/614 and then change `PostedAs:` above to
