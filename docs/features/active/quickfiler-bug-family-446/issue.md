@@ -2,7 +2,10 @@
 
 - Issue: #446
 - Issue URL: https://github.com/drmoisan/TaskMaster/issues/446
-- Also closes: #426, #427, #448
+- Also closes: #426, #448
+- Advances (must remain open): #427 - only the 427-A producer side is delivered here, so no
+  closing keyword may precede #427 in any commit message or pull-request body (see
+  `evidence/issue-updates/p4-t17-pr-closing-keyword-constraint.2026-08-26T10-41.md`)
 - Type: bug
 - Work Mode: full-bug
 - Epic: quickfiler-bug-family
