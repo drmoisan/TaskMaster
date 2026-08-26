@@ -190,3 +190,75 @@ optional, and it must be a genuine fail-before/pass-after test.
 CR-3, CR-4, the Minor findings from the `2026-08-26T16-55` review, the pre-existing repo-wide
 coverage shortfall, and the unexecutable live-Outlook AC26 steps all remain out of scope and retain
 their recorded dispositions.
+
+---
+
+## SUPERSEDING DECISION — cycle 2 is a PARTIAL REVERT, not a producer-side normalization
+
+Recorded by the orchestrator on the maintainer's explicit instruction. This section **supersedes**
+the reviewer's "Required outcome" items 1, 3 and 6 above, and the orchestrator addendum's binding
+constraint 1. Items 2, 4 and 5 of the reviewer's required outcome survive, restated below.
+
+### Decision and rationale
+
+The maintainer independently verified RC-1 before deciding, and sharpened the diagnosis: the D8
+normalizer `EfcDataModel.ToArchiveRelativeStem` (defined `:372`) is wired **only** to the
+`MAPIFolder` overload at `:345`. The `string` overload assigns `DestinationOlStem = folderpath`
+verbatim at `:287`, so an accepted rooted value reaches `RequireArchiveRelativeStem` and throws out
+through an `async void` handler after `Hide()`. Verified independently by the orchestrator.
+
+Producer-side normalization is the architecturally correct fix — the router should never emit a
+rooted value, which is D1 only half-closed — but it is a full plan, preflight, execute and re-audit
+round spent converting a benign dialog into a marginally nicer benign outcome. The partial revert
+removes the crash now, keeps the fix that matters, and leaves every path better than `main`: before
+remediation a rooted under-root selection produced a dialog; on `main` it produced the #614 crash.
+
+A full revert was rejected because it reintroduces CR-1, a real user-facing regression this feature
+created.
+
+### Cycle 2 scope — exactly this, nothing more
+
+1. Restore `EfcSelectionGuard.IsValidFilingSelection` to the **single-argument** form, rejecting any
+   `ArchiveStemContract.IsFullOutlookPath` value alongside the null, empty, whitespace and banner
+   rejections. It carries **no** minimum-length rule.
+2. Keep `IsValidCreationSelection` exactly as it is. The CR-1 predicate split is retained.
+3. Revert the `ActionOkAsync` call site to match by dropping the `archiveRoot` argument. Remove
+   `ResolveArchiveRootOrEmpty` and `RootUnavailableDiagnostic` **only if** nothing else consumes them
+   after the revert — check, do not assume.
+4. Remove or invert the CR-2 pass-after tests asserting rooted under-root acceptance
+   (`IsValidFilingSelection_RootedTargetUnderArchiveRoot_IsAccepted`,
+   `IsValidFilingSelection_ArchiveRootExactTarget_IsAccepted`). Every D1/D4/D9 rejection test must
+   survive; the rooted-rejection tests are the ones that stay.
+5. Resolve RC-2, RC-3 and RC-4. On **AC16 specifically**: make the criterion text and its checkbox
+   tell the truth about what the code now does. Do not leave a criterion checked whose text no longer
+   matches the implementation. Editing `spec.md` AC text is IN SCOPE for this cycle for AC16 only.
+
+### The composition test remains mandatory
+
+Reviewer required-outcome item 5 stands and is the most important task in this cycle: a genuine
+fail-before/pass-after test asserting that a value `IsValidFilingSelection` accepts does not cause
+`EmailFilerConfig.ResolvePaths` to throw. Use the pure-config seam (`Globals = null`, parameterless
+`ResolvePaths()`); no COM needed. Its absence is what permitted RC-1, and it must survive the revert
+so the same class of defect cannot recur silently.
+
+### Assessed and deliberately NOT folded in
+
+`EfcDataModel.MoveToFolderAsync(string, ...)` reads `Globals.Ol.ArchiveRootPath` at `:289`, which
+after the #614 D6 change can throw `InvalidOperationException`. The orchestrator verified the chain:
+`ExecuteMovesAsync` wraps `ExecuteMovesCoreAsync` in `try`/`finally` with **no catch**
+(`EfcHomeController.ExecuteMoves.cs:38-45`), so the exception reaches `ButtonOK_Click`, which is
+`async void` and rethrows — the same UI-thread crash mechanism as RC-1. It is reachable.
+
+Removing `ResolveArchiveRootOrEmpty` does not create this exposure; that helper only ever guarded the
+guard's own read inside `ActionOkAsync`.
+
+It is NOT folded into this cycle. A benign degrade is not a single localized change: it requires
+deciding what aborting a filing operation should look like to the user, touches a file otherwise
+outside the revert scope, and needs its own tests. Improvising a small change on exactly this path is
+what produced RC-1. It goes to the follow-up issue.
+
+### Net-effect statement required
+
+The change description must state explicitly, path by path, that no path is left worse than head
+`02092504`, and must record that remediation cycle 1 introduced a crash on the rooted-selection path
+which re-audit caught and this cycle reverts.
