@@ -1159,40 +1159,40 @@ individually verifiable from evidence.
 
 ### Per-defect behaviour
 
-- [ ] **AC-1 (#286).** `RemoveSpecificControlGroupAsync`'s `Interlocked.Decrement` executes on the
+- [x] **AC-1 (#286).** `RemoveSpecificControlGroupAsync`'s `Interlocked.Decrement` executes on the
       exceptional exit path as well as the normal one, so `removespecificcontrolgroupcounter` returns
       to its pre-call value after a throw. Verified by two named MSTest tests: one forcing a throw at
       the first statement after the increment (`UnregisterNavigation()` on a `null` `_itemGroups`) and
       one forcing a throw later in the body, each reading the static field by reflection and each
       resetting it in `[TestInitialize]`/`[TestCleanup]`.
-- [ ] **AC-2 (#468).** The twelve members `WireUpKeyboardHandler`, `AnyOpenDropDownsAsync`,
+- [x] **AC-2 (#468).** The twelve members `WireUpKeyboardHandler`, `AnyOpenDropDownsAsync`,
       `LoadGroups_02cAsync`, `LoadGroups_02bAsync`, `LoadGroup_03bAsync`,
       `LoadConversationsAndFoldersAsync`, `LoadItemGroup`, `LoadSequentialAsync`,
       `LoadGroupSequential`, `CacheTlpForMove`, `SwapTlp`, `CaptureTlpTemplate`, plus the field
       `_templateTlp` and the commented reference at `:402`, are absent from
       `QuickFiler/Controllers/QfcCollectionController.cs`. Verified by a source search returning zero
       hits for each identifier in that file.
-- [ ] **AC-3 (#468, non-regression).** The live members `AnyOpenDropDowns` (non-async),
+- [x] **AC-3 (#468, non-regression).** The live members `AnyOpenDropDowns` (non-async),
       `LoadItemGroupsAndViewers_02`, `LoadConversationsAndFolders_04`, `LoadSequential_5`, and
       `ActivateQueuedTlp` are still present and unmodified. Verified by a source search plus an
       empty diff hunk for each.
-- [ ] **AC-4 (#469 defect 1).** `GetMoveDiagnostics` returns without throwing when a group's
+- [x] **AC-4 (#469 defect 1).** `GetMoveDiagnostics` returns without throwing when a group's
       `ItemController` is `null`, and the returned line for that group contains the
       `"To Unknown,Sender Unknown,Email,Folder Unknown"` text — proving the previously dead branch is
       now reachable. Verified by a named MSTest test that throws `NullReferenceException` before the
       fix.
-- [ ] **AC-5 (#469 defect 2).** `GetMoveDiagnostics` returns an array whose `Length` equals
+- [x] **AC-5 (#469 defect 2).** `GetMoveDiagnostics` returns an array whose `Length` equals
       `_itemGroupsToMove.Count` and which contains no `null` element. Verified by named MSTest tests
       for a one-group and a three-group arrangement, asserting `Length` and
       `Should().NotContainNulls()`.
-- [ ] **AC-6 (#469 defect 3).** The `_itemGroupsToMove` field's declared type is an ordered contract
+- [x] **AC-6 (#469 defect 3).** The `_itemGroupsToMove` field's declared type is an ordered contract
       (`IReadOnlyList<QfcItemGroup>` or an equivalent `IList`-assignable type), and
       `TryGetItemGroupByIndex` performs an explicit bounds check rather than catching
       `System.Exception`. Verified by (a) a named structural MSTest test asserting the field's
       `FieldType` is assignable to an ordered contract, which fails before the fix, and (b) a named
       behavioural MSTest test asserting that for `[A, B, C]` with `B` removed and `D` added, index
       resolution yields `A, C, D`.
-- [ ] **AC-7 (#469 defect 4).** `IQfcCollectionController.MoveEmailsAsync`'s `stackMovedItems`
+- [x] **AC-7 (#469 defect 4).** `IQfcCollectionController.MoveEmailsAsync`'s `stackMovedItems`
       parameter carries an XML doc comment stating that the undo stack is populated by
       `EmailFiler.PushToUndoStack` onto the same instance the caller passes and that the parameter is
       retained for source compatibility, and the parameter is genuinely consumed in the body (discard
@@ -1200,12 +1200,12 @@ individually verifiable from evidence.
       test asserting `MoveEmailsAsync(null)` and `MoveEmailsAsync(stack)` behave identically for an
       empty `_itemGroupsToMove`. The parameter is **not** removed and
       `QfcFormController.EventHandlers.cs` is **not** edited.
-- [ ] **AC-8 (#470 defect 1).** `PromoteFirstChild` and `ChangeConversationSilently` handle a `-1`
+- [x] **AC-8 (#470 defect 1).** `PromoteFirstChild` and `ChangeConversationSilently` handle a `-1`
       index explicitly and never use it to subscript `_itemGroups`. Verified by two named MSTest
       tests — one calling `PromoteFirstChild` directly and one driving `ToggleGroupConv(string)`
       end-to-end with no matching `ConvOriginID` — each of which throws
       `ArgumentOutOfRangeException` before the fix and does not after.
-- [ ] **AC-9 (#470 defect 2).** `ToggleUnGroupConv` resolves the insertion list exactly once before
+- [x] **AC-9 (#470 defect 2).** `ToggleUnGroupConv` resolves the insertion list exactly once before
       `MakeSpaceForItems`, derives `insertCount` from `insertions.Count` as the single source of
       truth, and emits one `Warn` log carrying `entryID`, `conversationCount`, `insertions.Count`,
       `resolver.Count.SameFolder`, `resolver.Count.Expanded`, and `baseEmailIndex` when the
@@ -1213,11 +1213,11 @@ individually verifiable from evidence.
       `_itemGroups[insertionIndex - 1]`. Verified by named MSTest tests for the above-, equal-, and
       below-reservation cases, each arranged so no loop iteration executes, plus a direct test of the
       extracted pure `ResolveConversationInsertions` helper. The loop is **not** clamped.
-- [ ] **AC-10 (#470 defect 3).** `SetVisualDigits` skips a group entirely when its `ItemController`
+- [x] **AC-10 (#470 defect 3).** `SetVisualDigits` skips a group entirely when its `ItemController`
       (or `ItemViewer`) is `null` and does not throw. Verified by a named MSTest test that throws
       `NullReferenceException` (wrapped in `TargetInvocationException`) before the fix and asserts no
       throw and no viewer text written after.
-- [ ] **AC-11 (#471).** `EliminateSpaceForItems` reduces `_itemTlp.MinimumSize.Height` and
+- [x] **AC-11 (#471).** `EliminateSpaceForItems` reduces `_itemTlp.MinimumSize.Height` and
       `_itemTlp.Size.Height` by exactly `_template.Height * removalCount`, and
       `MakeSpaceForItems(i, n)` followed by `EliminateSpaceForItems(i, n)` returns
       `_itemTlp.MinimumSize.Height` to its starting value. `MakeSpaceForItems` adjusts `MinimumSize`
@@ -1226,22 +1226,22 @@ individually verifiable from evidence.
       Verified by named MSTest tests against the pure `ShrinkByRows` helper (MTA) and, if taken, one
       `[STATestClass]` call-site test in `QfcCollectionControllerLayout.StaTests.cs`. The inversion is
       removed in exactly one place, not both.
-- [ ] **AC-12 (#473 defect 1).** A task added to `BackgroundLoadingTasks` during the drain window is
+- [x] **AC-12 (#473 defect 1).** A task added to `BackgroundLoadingTasks` during the drain window is
       still awaited. Verified by a named MSTest test using two `TaskCompletionSource` instances and an
       `ExecuteSynchronously` continuation (no `Thread.Sleep`, `Task.Delay`, or wall-clock wait), which
       asserts `drain.IsCompleted == false` after the gate completes — false before the fix, true
       after. The drain logic exists in exactly one place (`DrainBackgroundLoadingTasksAsync`), not two.
-- [ ] **AC-13 (#473 defect 2).** `OperationCanceledException` propagates out of `MoveEmailsAsync`
+- [x] **AC-13 (#473 defect 2).** `OperationCanceledException` propagates out of `MoveEmailsAsync`
       rather than being swallowed by the broad catch, and a single root failure produces a single log
       entry — proven by `mockMail.VerifyGet(x => x.Subject, Times.Never())` after the first catch.
       Verified by two named MSTest tests, each red before the fix.
-- [ ] **AC-14 (#474 defect 1).** `QfcCollectionController`'s constructor parameter 5 and its `_parent`
+- [x] **AC-14 (#474 defect 1).** `QfcCollectionController`'s constructor parameter 5 and its `_parent`
       field are both typed `QuickFiler.Controllers.IQfcFormController`, and the expression
       `(QfcFormController)_parent` appears nowhere in the file. Verified by a source search returning
       zero hits for `(QfcFormController)_parent` plus a named reflection-based MSTest test asserting
       both declared types. `EfcFormController.cs` and all three production construction sites are
       unmodified.
-- [ ] **AC-15 (#474 defect 2).** `TryGetMoveReadiness(out string notifications)` returns `false` with a
+- [x] **AC-15 (#474 defect 2).** `TryGetMoveReadiness(out string notifications)` returns `false` with a
       non-empty notification string for a group with a `null` `SelectedFolder` and `true` with an
       empty string otherwise, **without presenting any dialog**, and the `ReadyForMove` getter still
       invokes the notification in production via a delegate defaulting to the exact prior
@@ -1251,7 +1251,7 @@ individually verifiable from evidence.
 
 ### Verification, scope, and process
 
-- [ ] **AC-16 (#468 residual risk).** A build-input-file search plus an enumerated reflective-call
+- [x] **AC-16 (#468 residual risk).** A build-input-file search plus an enumerated reflective-call
       review returns no reference to any removed member: (a) a search of build-input file types only
       (`*.csproj`, `*.resx`, `*.config`, `*.xaml`, `*.json`, `*.settings`, excluding `docs/`,
       `.claude/`, `packages/`, and `TestResults/`) for the twelve removed identifiers returns zero
@@ -1262,55 +1262,55 @@ individually verifiable from evidence.
       feature's own documents quote every identifier, so a repository-wide zero-hit condition would be
       unsatisfiable by construction. The search commands and their verbatim output are recorded in the
       feature's evidence folder.
-- [ ] **AC-17 (fix order).** The commit sequence follows the fix order in `## Proposed Fix`
+- [x] **AC-17 (fix order).** The commit sequence follows the fix order in `## Proposed Fix`
       (#468 dead-code removal first, then #474-1, then #286, then #469-3, then the remainder), with
       the dead-code removal isolated in its own commit so the file renumbering is a single reviewable
       hunk.
-- [ ] **AC-18 (bugfix workflow).** Every defect with a Tier-1 or Tier-2 regression test has that test
+- [x] **AC-18 (bugfix workflow).** Every defect with a Tier-1 or Tier-2 regression test has that test
       committed and demonstrated failing **before** its production fix, per CLAUDE.md's Bugfix
       Workflow. The fail-before evidence is recorded in the feature's evidence folder.
-- [ ] **AC-19 (fail-before dossier).** A fail-before exception dossier records, with reasons, the four
+- [x] **AC-19 (fail-before dossier).** A fail-before exception dossier records, with reasons, the four
       items that have no deterministic pre-fix red state: #469 defect 3's behavioural ordering test
       (`ConcurrentDictionary` enumeration order is unspecified), #468 (removal, verified by compilation
       and the existing green suite), #474 defect 1 (call site unreachable without `UiThread.Init()`,
       which shows a form), and #469 defect 4 (a contract-documentation change with no behavioural
       delta).
-- [ ] **AC-20 (seams are behaviour-preserving).** Each of the three seams —
+- [x] **AC-20 (seams are behaviour-preserving).** Each of the three seams —
       `DrainBackgroundLoadingTasksAsync`, `TryGetMoveReadiness` + `_notifyNotReady`, and
       `ShrinkByRows` — was landed in a commit that changed no observable production behaviour, with
       the pre-existing `QuickFiler.Test` suite passing unchanged at that commit.
-- [ ] **AC-21 (owned-file discipline).** The diff touches only the files listed under "Files this
+- [x] **AC-21 (owned-file discipline).** The diff touches only the files listed under "Files this
       feature owns" in `## Scope & Non-Goals`. In particular
       `QuickFiler/Controllers/KbdActions.cs`, `QuickFiler/Controllers/QfcFormController.EventHandlers.cs`,
       and `QuickFiler/Controllers/EfcFormController.cs` are **not** modified. Verified by
       `git diff --name-only` against the merge base.
-- [ ] **AC-22 (test-file constraints).** No new test method is added to
+- [x] **AC-22 (test-file constraints).** No new test method is added to
       `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs` (it is at the 500-line cap; its
       only change is the `_itemGroupsToMove` injection type at `:66-71`), every new test file is under
       500 lines, and each new file's `Compile Include` entry sits between the existing
       `Controllers\QfcCollectionControllerDarkModeTests.cs` and `Controllers\QfcDatamodelTests.cs`
       entries in `QuickFiler.Test/QuickFiler.Test.csproj`.
-- [ ] **AC-23 (test policy).** Every new test uses MSTest, Moq, and FluentAssertions; creates no
+- [x] **AC-23 (test policy).** Every new test uses MSTest, Moq, and FluentAssertions; creates no
       temporary file; requires no live Outlook; displays no UI; never calls `UiThread.Init()`; and
       contains no `Thread.Sleep`, `Task.Delay`, or wall-clock wait. Any STA test lives in a
       `*.StaTests.cs` file marked `[STATestClass]`, disposes its `TableLayoutPanel` per test, and calls
       neither `Show()` nor `ShowDialog()`.
-- [ ] **AC-24 (toolchain).** A single clean toolchain pass completes in order —
+- [x] **AC-24 (toolchain).** A single clean toolchain pass completes in order —
       `dotnet tool run csharpier format .` (and `check .`), the analyzer `msbuild … /t:Rebuild …
       /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`, the nullable `msbuild … /t:Rebuild
       … /p:TreatWarningsAsErrors=true`, then `vstest.console.exe … /EnableCodeCoverage` — with zero
       errors in the final pass and the full `QuickFiler.Test` suite green. The exact commands and
       their results are reported.
-- [ ] **AC-25 (no scope creep).** `QfcCollectionController.cs` is **not** split into partial classes,
+- [x] **AC-25 (no scope creep).** `QfcCollectionController.cs` is **not** split into partial classes,
       `[ExcludeFromCodeCoverage]` at `:21` is **not** removed, no NuGet package is added to any
       project, and the `stackMovedItems` parameter is **not** removed. Each is recorded in
       `## Follow-up Candidates` instead.
-- [ ] **AC-26 (downstream handoff).** `## Downstream Notes for Sibling Issues` records for #444 that
+- [x] **AC-26 (downstream handoff).** `## Downstream Notes for Sibling Issues` records for #444 that
       `WireUpKeyboardHandler` is removed by this feature (resolving the duplicate-`KaKey` registration
       as a side effect), that `KbdActions(IEnumerable<UClass>)` at `KbdActions.cs:26-29` skips the
       duplicate check both `Add` overloads perform, and that `EnumerateConversationMembers` never read
       its `conversationCount` parameter.
-- [ ] **AC-27 (PR accuracy).** The PR body does **not** repeat #468's coverage-denominator rationale
+- [x] **AC-27 (PR accuracy).** The PR body does **not** repeat #468's coverage-denominator rationale
       (invalid because of `[ExcludeFromCodeCoverage]` at `:21`) and does **not** repeat #474's premise
       that the two form-controller interfaces are unrelated siblings (false: `IQfcFormController :
       IFilerFormController` at `QuickFiler/Controllers/IQfcFormController.cs:13`). It states that #473
@@ -1319,5 +1319,5 @@ individually verifiable from evidence.
       coverage delta.
 - [ ] **AC-28 (issue closure).** All seven issues — #286, #468, #469, #470, #471, #473, #474 — are
       closed by the merge, each with its corresponding acceptance criteria above checked off.
-- [ ] **AC-29 (follow-ups filed).** Every entry in `## Follow-up Candidates` is promoted through the
+- [x] **AC-29 (follow-ups filed).** Every entry in `## Follow-up Candidates` is promoted through the
       potential-to-issue lifecycle, with the resulting issue numbers recorded in the feature folder.

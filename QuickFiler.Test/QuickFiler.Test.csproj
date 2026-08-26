@@ -118,6 +118,11 @@
     <Compile Include="Controllers\EfcHomeControllerSeamTests.cs" />
     <Compile Include="Controllers\QfcCollectionControllerTests.cs" />
     <Compile Include="Controllers\QfcCollectionControllerDarkModeTests.cs" />
+    <Compile Include="Controllers\QfcCollectionController.TestSupport.cs" />
+    <Compile Include="Controllers\QfcCollectionControllerDefects468Tests.cs" />
+    <Compile Include="Controllers\QfcCollectionControllerDefects468MoveTests.cs" />
+    <Compile Include="Controllers\QfcCollectionControllerDefects468ConversationTests.cs" />
+    <Compile Include="Controllers\QfcCollectionControllerLayout.StaTests.cs" />
     <Compile Include="Controllers\QfcDatamodelTests.cs" />
     <Compile Include="Controllers\QfcDatamodelLivenessTests.cs" />
     <Compile Include="Controllers\QfcExplorerController.ConversationViewTests.cs" />

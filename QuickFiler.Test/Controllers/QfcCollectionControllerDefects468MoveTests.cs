@@ -1,0 +1,497 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Threading.Tasks;
+using FluentAssertions;
+using Microsoft.Office.Interop.Outlook;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using QuickFiler.Controllers;
+using QuickFiler.Interfaces;
+using UtilitiesCS;
+using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
+
+namespace QuickFiler.Controllers.Tests
+{
+    /// <summary>
+    /// Regression tests for the move-path defects in the issue #468 family: issue #469 defects 1,
+    /// 2, 3 and 4, and issue #473 defect 2. None of these tests needs COM, a live Outlook, a
+    /// WinForms control, or an STA apartment.
+    /// <para>
+    /// A companion file, <c>QfcCollectionController.TestSupport.cs</c>, carries the shared asserting
+    /// reflection helpers and the uninitialized-controller builder.
+    /// </para>
+    /// </summary>
+    [TestClass]
+    public class QfcCollectionControllerDefects468MoveTests
+    {
+        /// <summary>
+        /// Issue #469 defect 3. Structural regression test asserting that the move collection is
+        /// declared as an <em>ordered</em> contract.
+        /// <para>
+        /// Scenario: read the declared type of the private <c>_itemGroupsToMove</c> field. Expected
+        /// outcome: it is assignable to <see cref="IReadOnlyList{T}"/> of <c>QfcItemGroup</c>.
+        /// </para>
+        /// <para>
+        /// Before the fix the field is a <c>ConcurrentDictionary&lt;QfcItemGroup, int&gt;</c>, whose
+        /// enumeration order is unspecified. <c>TryGetItemGroupByIndex</c> nevertheless resolves a
+        /// group positionally with <c>ElementAt(index)</c>, and <c>MoveEmailsAsync</c> and
+        /// <c>GetMoveDiagnostics</c> both drive that positional lookup, so a rehash can silently
+        /// pair one message's move with another message's diagnostics. The declared type is the
+        /// proof that a positional contract is now backed by an ordered collection.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public void ItemGroupsToMoveFieldDeclaresAnOrderedContract()
+        {
+            // Arrange
+            FieldInfo field = QfcCollectionControllerTestSupport.GetFieldInfo("_itemGroupsToMove");
+
+            // Act
+            Type declared = field.FieldType;
+
+            // Assert
+            declared
+                .Should()
+                .BeAssignableTo<IReadOnlyList<QfcItemGroup>>(
+                    because: "issue #469 defect 3 requires the move collection to guarantee the "
+                        + "insertion order that TryGetItemGroupByIndex, MoveEmailsAsync and "
+                        + "GetMoveDiagnostics all depend on when they resolve a group by position"
+                );
+        }
+
+        /// <summary>
+        /// Issue #469 defect 3. Behavioural contract test for positional resolution after the live
+        /// group list has been mutated.
+        /// <para>
+        /// Scenario: cache three groups, remove the middle one, append a fourth, then re-cache.
+        /// Expected outcome: index <c>0</c>, <c>1</c> and <c>2</c> resolve to the first, third and
+        /// fourth group in that order, and both an index of <c>-1</c> and an index equal to the
+        /// count return <see langword="null"/> rather than throwing.
+        /// </para>
+        /// <para>
+        /// This test has no deterministic pre-fix red state: a <c>ConcurrentDictionary</c>'s
+        /// enumeration order is unspecified rather than guaranteed-wrong, so a pre-fix run could
+        /// happen to return the right order and the assertion would be flaky by construction. The
+        /// structural assertion in
+        /// <see cref="ItemGroupsToMoveFieldDeclaresAnOrderedContract"/> carries the deterministic
+        /// fail-before proof; this test carries the permanent post-fix behavioural contract. The
+        /// exception is recorded in the fail-before dossier.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public void TryGetItemGroupByIndexResolvesInsertionOrderAfterMutation()
+        {
+            // Arrange
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            QfcItemGroup first = new QfcItemGroup();
+            QfcItemGroup second = new QfcItemGroup();
+            QfcItemGroup third = new QfcItemGroup();
+            QfcItemGroup fourth = new QfcItemGroup();
+            List<QfcItemGroup> groups = new List<QfcItemGroup> { first, second, third };
+            QfcCollectionControllerTestSupport.SetField(controller, "_itemGroups", groups);
+            controller.CacheItemGroupsForMove();
+
+            groups.Remove(second);
+            groups.Add(fourth);
+
+            // Act
+            controller.CacheItemGroupsForMove();
+
+            // Assert
+            ResolveByIndex(controller, 0)
+                .Should()
+                .BeSameAs(first, because: "the first group keeps position 0 after the mutation");
+            ResolveByIndex(controller, 1)
+                .Should()
+                .BeSameAs(
+                    third,
+                    because: "removing the middle group promotes the third group to position 1"
+                );
+            ResolveByIndex(controller, 2)
+                .Should()
+                .BeSameAs(fourth, because: "the appended group takes the last position");
+            ResolveByIndex(controller, -1)
+                .Should()
+                .BeNull(
+                    because: "a negative index is outside the collection and must be reported as a "
+                        + "missing group rather than throwing"
+                );
+            ResolveByIndex(controller, 3)
+                .Should()
+                .BeNull(
+                    because: "an index equal to the count is one past the end and must be reported "
+                        + "as a missing group rather than throwing"
+                );
+        }
+
+        /// <summary>
+        /// Issue #473 defect 2. Regression test proving that a cancellation raised while a message
+        /// is being moved reaches the caller instead of being recorded as a move failure.
+        /// <para>
+        /// Scenario: one cached move group whose mocked item controller faults
+        /// <c>MoveMailAsync()</c> with <see cref="OperationCanceledException"/>. Expected outcome:
+        /// that exception propagates out of <c>MoveEmailsAsync</c>.
+        /// </para>
+        /// <para>
+        /// Before the fix the broad <c>catch (System.Exception)</c> in
+        /// <c>TryMoveEmailByGroupAsync</c> swallows it, logs it as an error, and lets the batch
+        /// continue moving the remaining messages â€” the opposite of what a cancellation requests.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public async Task MoveEmailsAsync_WhenMoveIsCancelled_PropagatesOperationCanceledException()
+        {
+            // Arrange
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            Mock<IQfcItemController> itemController = new Mock<IQfcItemController>(
+                MockBehavior.Loose
+            );
+            itemController
+                .Setup(item => item.MoveMailAsync())
+                .ThrowsAsync(new OperationCanceledException("the move batch was cancelled"));
+            QfcCollectionControllerTestSupport.SetField(
+                controller,
+                "_itemGroupsToMove",
+                new List<QfcItemGroup>
+                {
+                    new QfcItemGroup { ItemController = itemController.Object },
+                }
+            );
+
+            // Act
+            Func<Task> act = () => controller.MoveEmailsAsync(null);
+
+            // Assert
+            await act.Should()
+                .ThrowAsync<OperationCanceledException>(
+                    because: "issue #473 defect 2 requires cancellation to reach the caller so an "
+                        + "aborted batch stops, instead of being swallowed by the broad catch and "
+                        + "logged as a move error"
+                );
+        }
+
+        /// <summary>
+        /// Issue #473 defect 2. Regression test proving that one root failure produces one log
+        /// entry rather than two.
+        /// <para>
+        /// Scenario: one cached move group whose <c>ItemController</c> is <see langword="null"/>
+        /// and whose <c>MailItem</c> is a mock whose <c>Subject</c> getter throws. Expected
+        /// outcome: <c>MoveEmailsAsync</c> completes without throwing, and <c>Subject</c> is never
+        /// read.
+        /// </para>
+        /// <para>
+        /// Before the fix the broad catch handled the first dereference and then fell through to
+        /// <c>group.MailItem.Subject</c> inside that same catch, dereferencing a second time and
+        /// raising a second exception into the nested catch, so a single root cause emitted two
+        /// misleading <c>logger.Error</c> entries. Asserting <c>Times.Never()</c> on the
+        /// <c>Subject</c> getter is the observable proof that the second dereference no longer
+        /// happens.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public async Task MoveEmailsAsync_AfterFirstFailure_DoesNotReadSubjectASecondTime()
+        {
+            // Arrange
+            Mock<MailItem> mailItem = new Mock<MailItem>(MockBehavior.Loose);
+            mailItem
+                .SetupGet(mail => mail.Subject)
+                .Throws(
+                    new InvalidOperationException("Subject is unavailable in this arrangement")
+                );
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            QfcCollectionControllerTestSupport.SetField(
+                controller,
+                "_itemGroupsToMove",
+                new List<QfcItemGroup>
+                {
+                    new QfcItemGroup { ItemController = null, MailItem = mailItem.Object },
+                }
+            );
+
+            // Act
+            Func<Task> act = () => controller.MoveEmailsAsync(null);
+
+            // Assert
+            await act.Should()
+                .NotThrowAsync(
+                    because: "a failed move for one message must not abort the batch; issue #473 "
+                        + "defect 2 keeps the log-and-proceed behaviour and changes only the number "
+                        + "of log entries"
+                );
+            mailItem.VerifyGet(
+                mail => mail.Subject,
+                Times.Never(),
+                "issue #473 defect 2 requires the catch to log once and return rather than "
+                    + "dereferencing the same failed group a second time to look up its subject"
+            );
+        }
+
+        /// <summary>
+        /// Issue #473 defect 2. Covers the genuine null-group path through the boundary guard in
+        /// <c>TryMoveEmailByGroupIndexAsync</c>.
+        /// <para>
+        /// Scenario: the cached move collection holds a single <see langword="null"/> element, so
+        /// <c>TryGetItemGroupByIndex</c> resolves an in-range index to <see langword="null"/> â€”
+        /// exactly what the index lookup is contracted to return for a missing group. Expected
+        /// outcome: <c>MoveEmailsAsync</c> completes without throwing.
+        /// </para>
+        /// <para>
+        /// This is the case the boundary guard exists for. Without it the null reaches
+        /// <c>group.ItemController</c> inside <c>TryMoveEmailByGroupAsync</c> and is only contained
+        /// by the broad catch, which is precisely the "catch instead of guard" shape the fix
+        /// removes. A null element cannot be produced through <c>CacheItemGroupsForMove</c>, so it
+        /// is injected directly.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public async Task MoveEmailsAsync_WithNullGroupFromIndexLookup_DoesNotThrow()
+        {
+            // Arrange
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            QfcCollectionControllerTestSupport.SetField(
+                controller,
+                "_itemGroupsToMove",
+                new List<QfcItemGroup> { null }
+            );
+
+            // Act
+            Func<Task> act = () => controller.MoveEmailsAsync(null);
+
+            // Assert
+            await act.Should()
+                .NotThrowAsync(
+                    because: "issue #473 defect 2 guards the possibly-null group at the "
+                        + "TryMoveEmailByGroupIndexAsync boundary rather than letting it reach the "
+                        + "dereference and be contained by a broad catch"
+                );
+        }
+
+        /// <summary>
+        /// Issue #469 defect 1. Regression test proving that the diagnostics array carries exactly
+        /// one line per cached move group.
+        /// <para>
+        /// Scenario: one cached move group with a fully mocked item controller and a null
+        /// appointment. Expected outcome: the returned array length equals the cached group count.
+        /// </para>
+        /// <para>
+        /// Before the fix the array is allocated as <c>Count + 1</c>, so the caller receives one
+        /// more element than there are groups and the trailing element is never assigned. The
+        /// consumer in <c>QfcHomeController.Metrics</c> writes every element to the metrics file,
+        /// so the surplus element becomes a blank diagnostics row for a message that does not
+        /// exist.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public void GetMoveDiagnostics_WithOneGroup_ReturnsExactlyOneLine()
+        {
+            // Arrange
+            QfcCollectionController controller = CreateControllerWithMockedMoveGroups(1);
+            IReadOnlyList<QfcItemGroup> cached =
+                (IReadOnlyList<QfcItemGroup>)
+                    QfcCollectionControllerTestSupport.GetField(controller, "_itemGroupsToMove");
+
+            // Act
+            string[] lines = InvokeMoveDiagnostics(controller);
+
+            // Assert
+            lines
+                .Should()
+                .HaveCount(
+                    cached.Count,
+                    because: "issue #469 defect 1 requires one diagnostics line per cached move "
+                        + "group; a length greater than the group count is the surplus unassigned "
+                        + "element produced by the off-by-one allocation"
+                );
+        }
+
+        /// <summary>
+        /// Issue #469 defect 1. Regression test proving the off-by-one is a length defect at every
+        /// group count, and that the surplus element is an unassigned null rather than a harmless
+        /// duplicate.
+        /// <para>
+        /// Scenario: three cached move groups, each with a fully mocked item controller, and a null
+        /// appointment. Expected outcome: exactly three returned lines, none of them null.
+        /// </para>
+        /// <para>
+        /// The null assertion is the part that matters to the consumer. A surplus element that
+        /// merely repeated the last line would be redundant; an unassigned element is a null that
+        /// the metrics writer emits as a blank row.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public void GetMoveDiagnostics_WithThreeGroups_ReturnsThreeLinesAndNoNulls()
+        {
+            // Arrange
+            QfcCollectionController controller = CreateControllerWithMockedMoveGroups(3);
+
+            // Act
+            string[] lines = InvokeMoveDiagnostics(controller);
+
+            // Assert
+            lines
+                .Should()
+                .HaveCount(
+                    3,
+                    because: "issue #469 defect 1 requires exactly one diagnostics line per cached "
+                        + "move group, and three groups were cached"
+                );
+            lines
+                .Should()
+                .NotContainNulls(
+                    because: "every element of the returned array is written to the metrics "
+                        + "output, so an element the loop never assigns becomes a blank row"
+                );
+        }
+
+        /// <summary>
+        /// Issue #469 defect 2. Regression test proving that the item-controller null guard runs
+        /// before the first dereference, so its "Unknown" branch is reachable.
+        /// <para>
+        /// Scenario: one cached move group whose <c>ItemController</c> is <see langword="null"/>,
+        /// and a null appointment. Expected outcome: no exception, and the first returned line
+        /// carries the "Unknown" diagnostic text.
+        /// </para>
+        /// <para>
+        /// Before the fix the loop reads <c>qf.ItemHelper</c> and then interpolates
+        /// <c>qf.ItemHelper.Subject</c> into the data line, both above the
+        /// <c>if (qf is not null)</c> test. The guard is therefore dominated by two unconditional
+        /// dereferences of the very reference it guards: a null controller raises
+        /// <see cref="NullReferenceException"/> and the "Unknown" branch is dead code that can
+        /// never execute.
+        /// </para>
+        /// </summary>
+        [TestMethod]
+        public void GetMoveDiagnostics_WithNullItemController_ReturnsUnknownLineWithoutThrowing()
+        {
+            // Arrange
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            QfcCollectionControllerTestSupport.SetField(
+                controller,
+                "_itemGroupsToMove",
+                new List<QfcItemGroup> { new QfcItemGroup { ItemController = null } }
+            );
+            string[] lines = null;
+
+            // Act
+            System.Action act = () => lines = InvokeMoveDiagnostics(controller);
+
+            // Assert
+            act.Should()
+                .NotThrow(
+                    because: "issue #469 defect 2 requires the null guard to run before the first "
+                        + "dereference, so a group with no item controller degrades to an Unknown "
+                        + "diagnostics line instead of raising NullReferenceException"
+                );
+            lines.Should().NotBeNull();
+            lines[0]
+                .Should()
+                .Contain(
+                    "To Unknown,Sender Unknown,Email,Folder Unknown",
+                    because: "the guard's else branch is the only producer of that text, so its "
+                        + "presence is the proof that the previously unreachable branch now runs"
+                );
+        }
+
+        /// <summary>
+        /// Invokes the private <c>TryGetItemGroupByIndex</c> and returns its result.
+        /// </summary>
+        private static QfcItemGroup ResolveByIndex(QfcCollectionController controller, int index)
+        {
+            return (QfcItemGroup)
+                QfcCollectionControllerTestSupport.InvokeNonPublic(
+                    controller,
+                    "TryGetItemGroupByIndex",
+                    index
+                );
+        }
+
+        /// <summary>
+        /// Builds an uninitialized controller whose cached move collection holds
+        /// <paramref name="count"/> groups, each with a fully mocked item controller and mail-item
+        /// helper, so <c>GetMoveDiagnostics</c> can run without COM or a live Outlook.
+        /// </summary>
+        private static QfcCollectionController CreateControllerWithMockedMoveGroups(int count)
+        {
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            List<QfcItemGroup> groups = new List<QfcItemGroup>();
+            for (int index = 0; index < count; index++)
+            {
+                Mock<MailItemHelper> helper = new Mock<MailItemHelper>(MockBehavior.Loose);
+                helper.SetupGet(item => item.Subject).Returns("Subject " + index);
+                helper.SetupGet(item => item.SenderName).Returns("Sender " + index);
+                helper.SetupGet(item => item.ToRecipientsName).Returns("Recipient " + index);
+                helper.SetupGet(item => item.SentDate).Returns(new DateTime(2026, 1, 1));
+
+                Mock<IQfcItemController> itemController = new Mock<IQfcItemController>(
+                    MockBehavior.Loose
+                );
+                itemController.SetupGet(item => item.ItemHelper).Returns(helper.Object);
+                itemController.SetupGet(item => item.SelectedFolder).Returns("Inbox");
+
+                groups.Add(new QfcItemGroup { ItemController = itemController.Object });
+            }
+
+            QfcCollectionControllerTestSupport.SetField(controller, "_itemGroupsToMove", groups);
+            return controller;
+        }
+
+        /// <summary>
+        /// Calls <c>GetMoveDiagnostics</c> with a null appointment and fixed, deterministic inputs.
+        /// The appointment must be a local because the parameter is passed by reference.
+        /// </summary>
+        private static string[] InvokeMoveDiagnostics(QfcCollectionController controller)
+        {
+            AppointmentItem appointment = null;
+            return controller.GetMoveDiagnostics(
+                durationText: "5",
+                durationMinutesText: "0.08",
+                duration: 5.0,
+                dataLineBeg: "01/01/2026,12:00,",
+                endTime: new DateTime(2026, 1, 1, 12, 0, 0),
+                olAppointment: ref appointment
+            );
+        }
+
+        /// <summary>
+        /// Issue #469 defect 4. The retained <c>stackMovedItems</c> parameter must not influence
+        /// the outcome. With an empty cached move collection, passing <see langword="null"/> and
+        /// passing an in-memory stack are observationally identical: neither throws and neither
+        /// leaves a record on the supplied stack, because undo records reach the stack through the
+        /// email filer's push path onto the same globals instance, never through this argument.
+        /// The stack is constructed in memory and is never serialized, so no file is touched.
+        /// </summary>
+        [TestMethod]
+        public async Task MoveEmailsAsync_WithNullStack_BehavesIdenticallyToAnEmptyStack()
+        {
+            // Arrange
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            QfcCollectionControllerTestSupport.SetField(
+                controller,
+                "_itemGroupsToMove",
+                new List<QfcItemGroup>()
+            );
+            var stack = new SloStack<IMovedMailInfo>();
+
+            // Act
+            Func<Task> withNullStack = () => controller.MoveEmailsAsync(null);
+            Func<Task> withSuppliedStack = () => controller.MoveEmailsAsync(stack);
+
+            // Assert
+            await withNullStack.Should().NotThrowAsync(because: NoStackEffect);
+            await withSuppliedStack.Should().NotThrowAsync(because: NoStackEffect);
+            stack.Count.Should().Be(0, because: NoStackEffect);
+        }
+
+        private const string NoStackEffect =
+            "the stackMovedItems parameter is retained for source compatibility only, so a null "
+            + "argument and a supplied argument must produce the same observable outcome";
+    }
+}

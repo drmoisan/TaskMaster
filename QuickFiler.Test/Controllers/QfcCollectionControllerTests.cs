@@ -63,12 +63,12 @@ namespace QuickFiler.Controllers.Tests
                     ?.SetValue(itemGroup, mockItemController.Object);
             }
 
-            var dict = new ConcurrentDictionary<QfcItemGroup, int>();
-            dict.TryAdd(itemGroup, 0);
+            // Issue #469 defect 3: _itemGroupsToMove is now an ordered list, not a dictionary.
+            var groupsToMove = new List<QfcItemGroup> { itemGroup };
 
             typeof(QfcCollectionController)
                 .GetField("_itemGroupsToMove", BindingFlags.NonPublic | BindingFlags.Instance)
-                ?.SetValue(controller, dict);
+                ?.SetValue(controller, groupsToMove);
 
             return controller;
         }

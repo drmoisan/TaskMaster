@@ -7,7 +7,7 @@
   carries a `file:line` citation verified by reading the file.
 
 All paths are relative to the worktree root
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-aae5cc929932e2647`.
+`<repo-root>`, an isolated agent worktree under `<user-profile>\repos\TaskMaster\.claude\worktrees\`.
 
 ---
 
