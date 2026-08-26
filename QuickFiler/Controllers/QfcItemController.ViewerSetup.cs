@@ -27,6 +27,12 @@ namespace QuickFiler.Controllers
     {
         private ItemViewer _breadcrumbViewer;
 
+        // #481: the WebResourceRequested subscription is made inside InitializeWebViewAsync, not in a
+        // wire method, so the delegate and its source are captured for the matching -= at teardown.
+        // Cleanup() nulls _itemViewer, so the source cannot be re-derived after that point.
+        private EventHandler<CoreWebView2WebResourceRequestedEventArgs> _webResourceRequestedHandler;
+        private CoreWebView2 _coreWebView2;
+
         // Residual, retained. #230 resolved the pump barrier: the `await _itemViewer.UiSyncContext`
         // on line 55 is now drainable by the WinFormsPumpHost test seam, and tests do reach the
         // IWebViewCoreInitializer seam call. The RESIDUAL barrier is the
@@ -76,33 +82,29 @@ namespace QuickFiler.Controllers
             // attachment's bytes from memory. The attachment map is rebuilt at request time (not at
             // registration time) so it always reflects whichever mail item is currently loaded into
             // this pooled ItemViewer.
-            var coreWebView2 = ((ItemViewer)_itemViewer).L0v2h2_WebView2.CoreWebView2;
-            coreWebView2.AddWebResourceRequestedFilter(
+            _coreWebView2 = ((ItemViewer)_itemViewer).L0v2h2_WebView2.CoreWebView2;
+            _coreWebView2.AddWebResourceRequestedFilter(
                 $"https://{CidImageResolver.DefaultVirtualHost}/*",
                 CoreWebView2WebResourceContext.Image
             );
-            coreWebView2.WebResourceRequested += (sender, e) =>
+            // #485 defect 3: ItemHelper is null after Cleanup() and the subscription outlived the
+            // controller before #481, so the null-conditional read is load-bearing here.
+            _webResourceRequestedHandler = (sender, e) =>
             {
-                var requestedId = new Uri(e.Request.Uri).Segments.LastOrDefault()?.Trim('/');
-                if (string.IsNullOrEmpty(requestedId))
+                var map = CidImageResolver.BuildContentIdMap(ItemHelper?.AttachmentsInfo);
+                if (!TryResolveCidResource(e.Request.Uri, map, out var payload, out var mimeType))
                 {
                     return;
                 }
 
-                var contentIdMap = CidImageResolver.BuildContentIdMap(ItemHelper.AttachmentsInfo);
-                if (!contentIdMap.TryGetValue(requestedId, out var match))
-                {
-                    return;
-                }
-
-                var mimeType = ResolveImageMimeType(match.FileExtension);
                 e.Response = _webViewEnvironment.CreateWebResourceResponse(
-                    new MemoryStream(match.AttachmentData),
+                    new MemoryStream(payload),
                     200,
                     "OK",
                     $"Content-Type: {mimeType}"
                 );
             };
+            _coreWebView2.WebResourceRequested += _webResourceRequestedHandler;
 
             // #351: initialize the breadcrumb WebView2 through the same injected seam and the
             // same CoreWebView2Environment/options object created above for the message-body
@@ -203,6 +205,55 @@ namespace QuickFiler.Controllers
                 ".bmp" => "image/bmp",
                 _ => "application/octet-stream",
             };
+
+        /// <summary>
+        /// Pure decision half of the <c>WebResourceRequested</c> handler (issue #485): resolves an
+        /// intercepted URI to the bytes and MIME type to serve, or returns false to ignore the
+        /// request with both <c>out</c> values null. Takes plain values so it is unit-testable
+        /// without a WebView2 runtime; the SDK response construction stays in the lambda adapter.
+        /// </summary>
+        internal static bool TryResolveCidResource(
+            string requestedUri,
+            IReadOnlyDictionary<string, IAttachment> contentIdMap,
+            out byte[] payload,
+            out string mimeType
+        )
+        {
+            payload = null;
+            mimeType = null;
+
+            // #485 defect 1: the URI is untrusted external input. UriKind must be Absolute, not
+            // RelativeOrAbsolute: Uri.Segments throws InvalidOperationException on a relative Uri,
+            // which would move the throw one line later rather than removing it.
+            if (!Uri.TryCreate(requestedUri, UriKind.Absolute, out var uri))
+            {
+                logger.Debug($"Ignoring cid: request with unparsable URI '{requestedUri}'.");
+                return false;
+            }
+
+            var requestedId = uri.Segments.LastOrDefault()?.Trim('/');
+            if (string.IsNullOrEmpty(requestedId) || contentIdMap is null)
+            {
+                return false;
+            }
+
+            if (!contentIdMap.TryGetValue(requestedId, out var match) || match is null)
+            {
+                return false;
+            }
+
+            // #485 defect 2: BuildContentIdMap does not filter on AttachmentData, so a map hit does
+            // not imply a payload. Logged so this is diagnosable rather than an ArgumentNullException.
+            if (match.AttachmentData is null)
+            {
+                logger.Debug($"Attachment '{requestedId}' has no data payload; skipping.");
+                return false;
+            }
+
+            payload = match.AttachmentData;
+            mimeType = ResolveImageMimeType(match.FileExtension);
+            return true;
+        }
 
         // De-exempted cycle-5 (R1): covered by a headless real-ItemViewer test, QfcItemController.ViewerSetupTests.cs.
         internal void ResolveControlGroups(ItemViewer itemViewer)
@@ -403,6 +454,8 @@ namespace QuickFiler.Controllers
                 _breadcrumbViewer.BreadcrumbUnhandledArrow -= OnBreadcrumbUnhandledArrow;
                 _breadcrumbViewer = null;
             }
+            // #481: detach while _itemViewer and _kbdHandler are still resolvable; both null below.
+            UnwireEvents();
             _globals = null;
             _itemViewer = null;
             _parent = null;
@@ -421,7 +474,23 @@ namespace QuickFiler.Controllers
             _itemPositionTips = null;
             ItemHelper = null;
             _itemViewer = null;
+            // #484: dispose first; nulling alone leaks the timer and lets its callback still run.
+            _emailIsReadTimer?.Dispose();
             _emailIsReadTimer = null;
+            // #484: release the adapter with its mail item; SaveParameters rebinds it on reuse.
+            _mailActions = null;
+        }
+
+        // #481: detaches the WebResourceRequested subscription made in InitializeWebViewAsync. The
+        // nulling statements sit outside the guard, so the never-initialized path also releases.
+        private void DetachWebResourceRequestedHandler()
+        {
+            if (_coreWebView2 != null && _webResourceRequestedHandler != null)
+            {
+                _coreWebView2.WebResourceRequested -= _webResourceRequestedHandler;
+            }
+            _webResourceRequestedHandler = null;
+            _coreWebView2 = null;
         }
 
         internal string GetItemSummary() =>
