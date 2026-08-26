@@ -1,3 +1,10 @@
+---
+paths:
+  - "scripts/benchmarks/**"
+  - "**/baseline*.json"
+description: Runner-environment parity and provenance rules for committed benchmark baselines.
+---
+
 # Benchmark Baseline Provenance
 
 This rule governs performance baselines used by benchmark regression gates. It exists because a baseline captured on a developer workstation was compared against a `windows-latest` runner, producing deterministic latency regressions that the benchmark gate could not survive (issue #26, PR #30).
