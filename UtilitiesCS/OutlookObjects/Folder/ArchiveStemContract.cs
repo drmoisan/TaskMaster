@@ -71,7 +71,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             {
                 throw new ArgumentException(
                     paramName
-                        + " must be a non-empty path relative to the Outlook archive root; it was null, empty, or whitespace.",
+                        + " must be a non-empty archive-relative path (relative to the Outlook archive root); it was null, empty, or whitespace.",
                     paramName
                 );
             }
@@ -80,7 +80,7 @@ namespace UtilitiesCS.OutlookObjects.Folder
             {
                 throw new ArgumentException(
                     paramName
-                        + " must be a path relative to the Outlook archive root, but a full (rooted) Outlook or filesystem path was supplied. The value is withheld from this message because it can contain a mailbox address or user-profile path.",
+                        + " must be an archive-relative path (relative to the Outlook archive root), but a full (rooted) Outlook or filesystem path was supplied. The value is withheld from this message because it can contain a mailbox address or user-profile path.",
                     paramName
                 );
             }

@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
 using SDILReader;
+using UtilitiesCS.OutlookObjects.Folder;
 
 namespace UtilitiesCS
 {
@@ -36,9 +37,82 @@ namespace UtilitiesCS
         > AlternativeFolderInputDialog { get; set; } =
             (prompt, title, defaultValue) => InputBox.ShowDialog(prompt, title, defaultValue)!;
 
-        private static char[] IllegalFolderCharacters
+        private static readonly char[] IllegalFolderCharacters = Path.GetInvalidFileNameChars();
+
+        private static readonly char[] SegmentSeparators = { '\\', '/' };
+
+        private static readonly string[] ReservedDeviceNames =
         {
-            get => @"[\/:*?""<>|].".ToCharArray();
+            "CON",
+            "PRN",
+            "AUX",
+            "NUL",
+            "COM1",
+            "COM2",
+            "COM3",
+            "COM4",
+            "COM5",
+            "COM6",
+            "COM7",
+            "COM8",
+            "COM9",
+            "LPT1",
+            "LPT2",
+            "LPT3",
+            "LPT4",
+            "LPT5",
+            "LPT6",
+            "LPT7",
+            "LPT8",
+            "LPT9",
+        };
+
+        /// <summary>
+        /// Validates each DERIVED path segment as a Windows folder name and returns the violated
+        /// rule, or null when every segment is valid (#614 D5a/D5b). Only segments this converter
+        /// derives from the Outlook branch are passed here. The caller-supplied filesystem
+        /// ancestor is never validated, because a legitimate root of the OneDrive-for-business
+        /// shape contains a dot, a space, and a hyphen and is not this converter's to reject.
+        /// </summary>
+        private static string? FindInvalidSegmentRule(string derivedRelativePath)
+        {
+            foreach (
+                string segment in derivedRelativePath.Split(
+                    SegmentSeparators,
+                    StringSplitOptions.RemoveEmptyEntries
+                )
+            )
+            {
+                if (segment.IndexOfAny(IllegalFolderCharacters) >= 0)
+                {
+                    return "a folder name contains a character Windows forbids";
+                }
+
+                if (segment.EndsWith(".", StringComparison.Ordinal))
+                {
+                    return "a folder name ends with a dot";
+                }
+
+                if (segment.EndsWith(" ", StringComparison.Ordinal))
+                {
+                    return "a folder name ends with a space";
+                }
+
+                if (IsReservedDeviceName(segment))
+                {
+                    return "a folder name is a reserved Windows device name";
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>Reports whether a single segment is a reserved Windows device name.</summary>
+        private static bool IsReservedDeviceName(string segment)
+        {
+            int dot = segment.IndexOf('.');
+            string stem = dot < 0 ? segment : segment.Substring(0, dot);
+            return Array.IndexOf(ReservedDeviceNames, stem.ToUpperInvariant()) >= 0;
         }
 
         private static bool IsLegalFolderName(string folderName)
@@ -109,7 +183,7 @@ namespace UtilitiesCS
             );
             dict.Add(
                 "Remove illegal characters",
-                async () => await Task.Run(() => illegalFolderName.Replace(illegalFolderName, ""))
+                async () => await Task.Run(() => RemoveIllegalCharacters(illegalFolderName))
             );
             dict.Add(
                 "Enter new folder name",
@@ -123,6 +197,18 @@ namespace UtilitiesCS
                     )
             );
             return dict;
+        }
+
+        /// <summary>
+        /// Removes only the characters Windows forbids in a folder name (#614 D5f). The previous
+        /// implementation replaced the whole name with the empty string, so the "Remove illegal
+        /// characters" option silently produced an empty folder name.
+        /// </summary>
+        private static string RemoveIllegalCharacters(string folderName)
+        {
+            return new string(
+                folderName.Where(c => !IllegalFolderCharacters.Contains(c)).ToArray()
+            );
         }
 
         private static char[] GetIllegalFolderChars(string folderName)
@@ -141,8 +227,7 @@ namespace UtilitiesCS
         public static string ToFsFolderpath(
             this string olBranchPath,
             string olAncestorPath,
-            string fsAncestorEquivalent,
-            bool ask = true
+            string fsAncestorEquivalent
         )
         {
             if (string.IsNullOrEmpty(olBranchPath))
@@ -152,16 +237,34 @@ namespace UtilitiesCS
             if (string.IsNullOrEmpty(fsAncestorEquivalent))
                 throw new ArgumentNullException(nameof(fsAncestorEquivalent));
 
-            var fsPath = olBranchPath.Replace(olAncestorPath, fsAncestorEquivalent);
-
-            var fsPathExDividers = fsPath
-                .Substring(3)
-                .Replace($"{Path.DirectorySeparatorChar}", "");
-
-            if (!IsLegalFolderName(fsPathExDividers))
+            if (
+                !ArchiveStemContract.TryMakeArchiveRelative(
+                    olBranchPath,
+                    olAncestorPath,
+                    out string fsPathExDividers
+                )
+            )
             {
                 throw new ArgumentException(
-                    $"{nameof(fsPathExDividers)} has a value of {fsPathExDividers} which contains illegal characters {GetIllegalFolderChars(fsPathExDividers).SentenceJoin()}",
+                    $"{nameof(olBranchPath)} is not a branch of {nameof(olAncestorPath)}. The values are withheld from this message because they can contain a mailbox address or user-profile path.",
+                    nameof(olBranchPath)
+                );
+            }
+
+            var fsPath =
+                fsPathExDividers.Length == 0
+                    ? fsAncestorEquivalent
+                    : fsAncestorEquivalent.TrimEnd(SegmentSeparators)
+                        + Path.DirectorySeparatorChar
+                        + fsPathExDividers;
+
+            string? invalidSegmentRule = FindInvalidSegmentRule(fsPathExDividers);
+            if (invalidSegmentRule != null)
+            {
+                throw new ArgumentException(
+                    "The Outlook branch maps to an invalid Windows folder path because "
+                        + invalidSegmentRule
+                        + ". The value is withheld from this message because it can contain a mailbox address or user-profile path.",
                     nameof(fsPath)
                 );
             }
@@ -225,20 +328,31 @@ namespace UtilitiesCS
 
         public static string ResolveOlRoot(string olBranchPath, IApplicationGlobals appGlobals)
         {
-            if (olBranchPath.Contains(appGlobals.Ol.ArchiveRootPath))
+            if (
+                ArchiveStemContract.TryMakeArchiveRelative(
+                    olBranchPath,
+                    appGlobals.Ol.ArchiveRootPath,
+                    out _
+                )
+            )
             {
                 return appGlobals.Ol.ArchiveRootPath;
             }
-            else if (olBranchPath.Contains(appGlobals.Ol.InboxPath))
+
+            if (
+                ArchiveStemContract.TryMakeArchiveRelative(
+                    olBranchPath,
+                    appGlobals.Ol.InboxPath,
+                    out _
+                )
+            )
             {
                 return appGlobals.Ol.InboxPath;
             }
-            else
-            {
-                throw new ArgumentException(
-                    $"Folder {olBranchPath} is not a branch of any known root folder"
-                );
-            }
+
+            throw new ArgumentException(
+                "The folder is not a branch of any known root folder. The path is withheld from this message because it can contain a mailbox address."
+            );
         }
     }
 }
