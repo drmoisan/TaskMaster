@@ -31,7 +31,7 @@
 - [VS18 build/test toolchain paths](project_vs18_build_toolchain_paths.md) — use VS **18** full-framework msbuild.exe (not .dotnet-sdk, dies on
 - [Repo-local SDK install + nullable Rebuild](project_repo_sdk_and_nullable_rebuild.md) — .dotnet-sdk install needs pwsh7; csharpier check/format
 - [vstest TestCaseFilter OR-vs-pipe + fresh-worktree bootstrap](project_vstest_testcasefilter_or_operator_and_env_setup.md) — vstest rejects `OR`,
-- [Analyzer version skew on fresh worktree](project_analyzer_version_skew_fresh_worktree.md) — analyzer build can fail CS0006 when csproj `<Analyzer
+- [Analyzer version skew on fresh worktree](project_analyzer_version_skew_fresh_worktree.md) — CS0006 kills EVERY build (not just the analyzer gate), empties `<Test>/bin/Debug`, and a caller may forbid the fix
 - [SecurityCodeScan incompatible with Roslyn 5.6](project_securitycodescan_roslyn56_incompat.md) — SecurityCodeScan.VS2019 5.6.7 throws
 - [Missing VSTO runtime breaks baseline gates](project_missing_vsto_runtime_breaks_baseline_gates.md) — HISTORICAL, not reproducing 2026-08-08; build
 - [New sln member surfaces MSB3277](project_new_sln_member_surfaces_msb3277_pin_divergence.md) — wiring an unbuilt legacy test project into the sln

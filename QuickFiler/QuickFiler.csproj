@@ -288,6 +288,7 @@
     <Compile Include="Controllers\BayesianPerformanceController.cs" />
     <Compile Include="Controllers\EfcDataModel.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouter.cs" />
+    <Compile Include="Controllers\BreadcrumbBridgeRouter.Selection.cs" />
     <Compile Include="Controllers\BreadcrumbOutboundQueue.cs" />
     <Compile Include="Controllers\EfcFormController.cs" />
     <Compile Include="Controllers\EfcHomeController.cs" />
