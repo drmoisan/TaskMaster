@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler.Controllers;
 using QuickFiler.Interfaces;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace QuickFiler.Controllers.Tests
 {
@@ -97,24 +98,13 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Issue #474 defect 1. Structural regression test asserting that
-        /// <c>QfcCollectionController</c> holds its parent by the wider
-        /// <see cref="QuickFiler.Controllers.IQfcFormController"/> contract rather than by
-        /// <c>QuickFiler.Interfaces.IFilerFormController</c>.
-        /// <para>
-        /// Scenario: read the declared type of the private <c>_parent</c> field and the declared
-        /// type of the fifth parameter of the controller's only public constructor. Expected
-        /// outcome: both are <c>QuickFiler.Controllers.IQfcFormController</c>.
-        /// </para>
-        /// <para>
-        /// This is a structural assertion rather than a behavioural one because the defect's
-        /// observable symptom — the <c>(QfcFormController)_parent</c> downcast throwing
-        /// <c>InvalidCastException</c> — sits behind <c>await UiThread.Dispatcher.InvokeAsync(...)</c>,
-        /// and <c>UiThread.Init()</c> shows a window, which the repository unit-test policy
-        /// prohibits. The declared types are the proof that the runtime cast was replaced by a
-        /// compile-time constraint. The same species of structural guard is established repository
-        /// practice in <c>QuickFiler.Test/NoLiveFormInTestAssemblyTests.cs</c>.
-        /// </para>
+        /// Issue #474 defect 1. Structural test: the private <c>_parent</c> field and the fifth
+        /// constructor parameter are both declared
+        /// <see cref="QuickFiler.Controllers.IQfcFormController"/>, not
+        /// <c>QuickFiler.Interfaces.IFilerFormController</c>. The assertion is structural because
+        /// the defect's symptom, an <c>InvalidCastException</c> from the
+        /// <c>(QfcFormController)_parent</c> downcast, sits behind <c>UiThread.Init()</c>, which
+        /// shows a window the unit-test policy prohibits.
         /// </summary>
         [TestMethod]
         public void ParentFieldAndConstructorParameterAreTypedIQfcFormController()
@@ -160,23 +150,14 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Issue #286. Regression test proving the reentrancy counter is restored when
+        /// Issue #286. The reentrancy counter must be restored when
         /// <c>RemoveSpecificControlGroupAsync</c> throws at the very first statement after the
-        /// <c>Interlocked.Increment</c>.
-        /// <para>
-        /// Scenario: an uninitialized controller leaves <c>_itemGroups</c> <c>null</c>, so
-        /// <c>UnregisterNavigation()</c> â€” the statement immediately following the increment â€”
-        /// dereferences <c>null</c> and raises <see cref="NullReferenceException"/>. Expected
-        /// outcome: the exception propagates, and the private static counter is back at its
-        /// pre-call value because the decrement runs on the exceptional path too.
-        /// </para>
-        /// <para>
-        /// Before the fix the decrement is the method's last statement and is unreachable after a
-        /// throw, so the counter is left one higher than its pre-call value. The leak is permanent
-        /// for the life of the process and eventually trips the
-        /// <c>"Counter is greater than 1. Race Condition Exists"</c> error branch on a subsequent
-        /// legitimate call.
-        /// </para>
+        /// <c>Interlocked.Increment</c>. An uninitialized controller leaves <c>_itemGroups</c>
+        /// <c>null</c>, so <c>UnregisterNavigation()</c> raises
+        /// <see cref="NullReferenceException"/> there. Expected outcome: the exception propagates
+        /// and the private static counter is back at its pre-call value. Before the fix the
+        /// decrement was the method's last statement and unreachable after a throw, leaking the
+        /// counter for the life of the process.
         /// </summary>
         [TestMethod]
         public async Task RemoveSpecificControlGroupAsync_ThrowAtFirstStatement_RestoresReentrancyCounter()
@@ -206,21 +187,11 @@ namespace QuickFiler.Controllers.Tests
 
         /// <summary>
         /// Issue #286. Companion to
-        /// <see cref="RemoveSpecificControlGroupAsync_ThrowAtFirstStatement_RestoresReentrancyCounter"/>,
-        /// proving the restored decrement covers the <em>whole</em> body rather than only the first
-        /// statement.
-        /// <para>
-        /// Scenario: the controller is arranged so <c>UnregisterNavigation()</c> completes
-        /// successfully â€” a real empty <c>KbdActions</c> collection is supplied to the mocked
-        /// keyboard handler and a single item group is injected â€” and the throw is instead raised
-        /// several statements later, by the mocked <c>IsActiveUI</c> getter. Expected outcome: the
-        /// exception propagates and the private static counter is back at its pre-call value.
-        /// </para>
-        /// <para>
-        /// A fix that guarded only the first statement would pass the companion test and fail this
-        /// one, so the pair together pin the <c>finally</c> to the full span between the increment
-        /// and the decrement.
-        /// </para>
+        /// <see cref="RemoveSpecificControlGroupAsync_ThrowAtFirstStatement_RestoresReentrancyCounter"/>:
+        /// the restored decrement must cover the whole body, not only the first statement.
+        /// <c>UnregisterNavigation()</c> is arranged to succeed and the throw is raised several
+        /// statements later by the mocked <c>IsActiveUI</c> getter. A fix guarding only the first
+        /// statement would pass the companion test and fail this one.
         /// </summary>
         [TestMethod]
         public async Task RemoveSpecificControlGroupAsync_ThrowLaterInBody_RestoresReentrancyCounter()
@@ -415,6 +386,109 @@ namespace QuickFiler.Controllers.Tests
             // Release the outstanding work so the test leaves no pending task behind.
             lateArrival.SetResult(true);
             await drain;
+        }
+
+        /// <summary>The three list-header sentinels that must count as "no folder assigned".</summary>
+        private static readonly string[] HeaderSentinels =
+        {
+            "======= SEARCH RESULTS =======",
+            "======= RECENT SELECTIONS ========",
+            "========= SUGGESTIONS =========",
+        };
+
+        private const string NotAssignedReason =
+            "a group whose SelectedFolder is null or is one of the three list-header sentinels has "
+            + "no real destination, so the collection is not ready to move";
+
+        /// <summary>
+        /// Builds an item group whose controller reports <paramref name="selectedFolder"/> and
+        /// carries just enough mocked mail detail for the notification text to be built.
+        /// </summary>
+        private static QfcItemGroup GroupWithFolder(int itemNumber, string selectedFolder)
+        {
+            var mail = new Mock<Outlook.MailItem>(MockBehavior.Loose);
+            mail.SetupGet(m => m.SentOn).Returns(new DateTime(2026, 1, 1));
+            mail.SetupGet(m => m.Subject).Returns("Subject " + itemNumber);
+            var item = new Mock<IQfcItemController>(MockBehavior.Loose);
+            item.SetupGet(i => i.SelectedFolder).Returns(selectedFolder);
+            item.SetupGet(i => i.ItemNumber).Returns(itemNumber);
+            item.SetupGet(i => i.Mail).Returns(mail.Object);
+            return new QfcItemGroup { ItemController = item.Object };
+        }
+
+        /// <summary>
+        /// Issue #474 defect 2. Readiness must be inspectable without presenting a dialog. One
+        /// group has a null destination and one group carries each of the three header sentinels,
+        /// so all four "not assigned" shapes are covered. A recording delegate replaces the modal
+        /// notification, so no dialog is presented: before the seam the only way to evaluate
+        /// readiness was to read the property, which showed a modal a unit test cannot dismiss.
+        /// </summary>
+        [TestMethod]
+        public void TryGetMoveReadiness_WithUnassignedDestination_ReturnsFalseAndProducesNotificationText()
+        {
+            // Arrange
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            var groups = new List<QfcItemGroup> { GroupWithFolder(1, null) };
+            for (int i = 0; i < HeaderSentinels.Length; i++)
+            {
+                groups.Add(GroupWithFolder(i + 2, HeaderSentinels[i]));
+            }
+            QfcCollectionControllerTestSupport.SetField(controller, "_itemGroups", groups);
+            string captured = null;
+            QfcCollectionControllerTestSupport.SetField(
+                controller,
+                "_notifyNotReady",
+                (Action<string>)(text => captured = text)
+            );
+
+            // Act
+            bool ready = controller.TryGetMoveReadiness(out string notifications);
+            bool readyViaProperty = controller.ReadyForMove;
+
+            // Assert
+            ready.Should().BeFalse(because: NotAssignedReason);
+            readyViaProperty.Should().BeFalse(because: NotAssignedReason);
+            notifications
+                .Should()
+                .StartWith(
+                    "Can't complete actions! Not all emails assigned to folder",
+                    because: "the notification opens with the fixed banner"
+                )
+                .And.ContainAll("Subject 1", "Subject 2", "Subject 3", "Subject 4");
+            captured
+                .Should()
+                .Be(
+                    notifications,
+                    because: "the getter must hand the predicate's text to the notification "
+                        + "delegate unchanged, which is what keeps production behaviour identical"
+                );
+        }
+
+        /// <summary>
+        /// Issue #474 defect 2. With every destination assigned, the predicate reports readiness
+        /// and produces no notification text at all.
+        /// </summary>
+        [TestMethod]
+        public void TryGetMoveReadiness_WithAllDestinationsAssigned_ReturnsTrueAndEmptyNotification()
+        {
+            // Arrange
+            QfcCollectionController controller =
+                QfcCollectionControllerTestSupport.CreateUninitializedController();
+            QfcCollectionControllerTestSupport.SetField(
+                controller,
+                "_itemGroups",
+                new List<QfcItemGroup> { GroupWithFolder(1, @"Inbox\Projects") }
+            );
+
+            // Act
+            bool ready = controller.TryGetMoveReadiness(out string notifications);
+
+            // Assert
+            ready.Should().BeTrue(because: "every group has a real destination folder");
+            notifications
+                .Should()
+                .BeEmpty(because: "there is nothing to notify when the collection is ready");
         }
     }
 }

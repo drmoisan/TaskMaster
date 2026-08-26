@@ -19,8 +19,23 @@ A receipt counts **only when all three hold together**:
 hard-coded `'evidence'` member regardless of the array. Truthy-but-not-`$true` flags
 (`1`, `"true"`) deliberately do not count.
 
-`delegation_receipts[]` is separate and needs `agent_name`, `agent_id`, `step`, `phase`,
-`skill_source`, `result_signal`, `artifact_paths` (list). It is a LIST, not an object.
+`delegation_receipts` is separate. Two forms are accepted (`OrchestratorStateReceipts.psm1`): a bare
+LIST, or an OBJECT namespace whose only permitted keys are `agents` (a list) and `promotion` (an
+object with only `potential_entry` / `issue` / `feature_folder`). The object form is what lets a run
+carry BOTH the promotion receipts the orchestrator agent spec demands and the routing-contract
+`agent_name` list — use it.
+
+Each entry in the list (or in `agents`) needs **exactly these eight keys**, confirmed 2026-08-26 by
+reading the MCP validator's own error output on epic child #468:
+`agent_name`, `step`, `agent_id`, `skill_source`, `started_at`, `completed_at`, `result_signal`,
+`artifact_paths`. There is **no `phase` key** (an earlier note here claimed one; it is wrong).
+
+**Only record agents THIS run delegated.** Naming an upstream-prepared agent (`task-researcher`,
+`prd-feature`, `atomic-planner` from an epic-planner preparation run) in `agents` immediately forces
+`model_routing_receipts is missing a receipt for delegated agent: <name>` under
+`require_model_routing` — and you would have to invent a model choice you never made. Leave
+`agents: []` until your first delegation returns, and record the upstream work in `notes` and
+`delegation_receipts.promotion` instead.
 
 ### Bug-promotion tool-name swap, and the divergence it creates
 

@@ -1192,7 +1192,7 @@ individually verifiable from evidence.
       `FieldType` is assignable to an ordered contract, which fails before the fix, and (b) a named
       behavioural MSTest test asserting that for `[A, B, C]` with `B` removed and `D` added, index
       resolution yields `A, C, D`.
-- [ ] **AC-7 (#469 defect 4).** `IQfcCollectionController.MoveEmailsAsync`'s `stackMovedItems`
+- [x] **AC-7 (#469 defect 4).** `IQfcCollectionController.MoveEmailsAsync`'s `stackMovedItems`
       parameter carries an XML doc comment stating that the undo stack is populated by
       `EmailFiler.PushToUndoStack` onto the same instance the caller passes and that the parameter is
       retained for source compatibility, and the parameter is genuinely consumed in the body (discard
