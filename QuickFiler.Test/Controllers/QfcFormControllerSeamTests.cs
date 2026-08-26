@@ -1,10 +1,14 @@
-using System;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FluentAssertions;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler.Controllers;
@@ -34,53 +38,27 @@ namespace QuickFiler.Controllers.Tests
         private CancellationToken _token;
         private QfcFormController _controller;
 
-        private T GetPrivateField<T>(object obj, string fieldName)
-        {
-            var field = obj.GetType()
-                .GetField(
-                    fieldName,
-                    System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance
-                );
-            return (T)field.GetValue(obj);
-        }
+        private const BindingFlags PrivateInstance = BindingFlags.NonPublic | BindingFlags.Instance;
 
-        private void SetPrivateField<T>(object obj, string fieldName, T value)
-        {
-            var field = obj.GetType()
-                .GetField(
-                    fieldName,
-                    System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance
-                );
-            field.SetValue(obj, value);
-        }
+        private T GetPrivateField<T>(object obj, string fieldName) =>
+            (T)obj.GetType().GetField(fieldName, PrivateInstance).GetValue(obj);
 
-        private static string ReadControllerSource(string fileName)
-        {
-            return File.ReadAllText(ResolveRepositoryPath("QuickFiler", "Controllers", fileName));
-        }
+        private void SetPrivateField<T>(object obj, string fieldName, T value) =>
+            obj.GetType().GetField(fieldName, PrivateInstance).SetValue(obj, value);
+
+        private static string ReadControllerSource(string fileName) =>
+            File.ReadAllText(ResolveRepositoryPath("QuickFiler", "Controllers", fileName));
 
         private static string ResolveRepositoryPath(params string[] pathParts)
         {
-            var directory = new DirectoryInfo(AppContext.BaseDirectory);
-            while (
-                directory != null
-                && !Directory.Exists(Path.Combine(directory.FullName, "QuickFiler"))
-            )
+            var dir = new DirectoryInfo(AppContext.BaseDirectory);
+            while (dir != null && !Directory.Exists(Path.Combine(dir.FullName, "QuickFiler")))
             {
-                directory = directory.Parent;
+                dir = dir.Parent;
             }
 
-            directory.Should().NotBeNull("source-inspection tests must run under the repository");
-
-            var resolvedPath = directory.FullName;
-            foreach (var pathPart in pathParts)
-            {
-                resolvedPath = Path.Combine(resolvedPath, pathPart);
-            }
-
-            return resolvedPath;
+            dir.Should().NotBeNull("source-inspection tests must run under the repository");
+            return pathParts.Aggregate(dir.FullName, Path.Combine);
         }
 
         private QfcFormController CreateQfcFormController()
@@ -374,5 +352,145 @@ namespace QuickFiler.Controllers.Tests
         }
 
         #endregion Seam D — CaptureItemSettings via CaptureTlpCellStates
+
+        #region Issue #448 — undo-consumer termination and idle timer
+
+        /// <summary>A <see cref="FakeTimeProvider"/> that counts the delays it is asked for.</summary>
+        private sealed class CountingTimeProvider : FakeTimeProvider
+        {
+            public int DelayRequests { get; private set; }
+
+            public override ITimer CreateTimer(TimerCallback cb, object s, TimeSpan due, TimeSpan p)
+            {
+                DelayRequests++;
+                return base.CreateTimer(cb, s, due, p);
+            }
+        }
+
+        /// <summary>
+        /// Runs the undo consumer inline against <paramref name="clock"/>, with a processor seam so
+        /// no live COM or dispatcher call is made (UT4, D-Plan-3), and optional pre-queued items.
+        /// </summary>
+        private QfcFormController ArrangeUndoConsumer(
+            TimeProvider clock,
+            Func<IMovedMailInfo, Task> processor = null,
+            int queuedItems = 0
+        )
+        {
+            QfcFormController c = CreateQfcFormController();
+            c.TimeProvider = clock;
+            c.UndoConsumerStarter = body => body();
+            c.UndoItemProcessor = processor ?? (_ => Task.CompletedTask);
+            var q = GetPrivateField<BlockingCollection<IMovedMailInfo>>(c, "_undoQueue");
+            while (queuedItems-- > 0)
+            {
+                q.Add(new Mock<IMovedMailInfo>().Object);
+            }
+            return c;
+        }
+
+        /// <summary>
+        /// Issue #448. Idle iterations must wait through the injected clock, or the threshold cannot
+        /// be driven. The task is deliberately not awaited: the pre-fix loop never ends (D5).
+        /// </summary>
+        [TestMethod]
+        public void UndoConsumer_EveryIdleIteration_InvokesTimeProviderDelay()
+        {
+            // Arrange
+            var clock = new CountingTimeProvider();
+            QfcFormController controller = ArrangeUndoConsumer(clock);
+            // Act — runs inline until the first idle wait, then returns.
+            _ = controller.UndoConsumerStarter(controller.UndoConsumer);
+            // Assert
+            clock.DelayRequests.Should().BeGreaterThanOrEqualTo(1, "idle waits use the seam");
+        }
+
+        /// <summary>
+        /// Issue #448. An idle consumer past the threshold must terminate; before the rewrite the
+        /// exit flag fed a disjunction that kept the loop alive for the session.
+        /// </summary>
+        [TestMethod]
+        [Timeout(10000)]
+        public async Task UndoConsumer_IdleBeyondThreshold_Completes()
+        {
+            // Arrange
+            var clock = new FakeTimeProvider();
+            QfcFormController controller = ArrangeUndoConsumer(clock);
+            // Act
+            Task consumer = controller.UndoConsumerStarter(controller.UndoConsumer);
+            clock.Advance(TimeSpan.FromSeconds(11));
+            await consumer.ConfigureAwait(false);
+            // Assert
+            consumer.Status.Should().Be(TaskStatus.RanToCompletion, "an idle consumer must exit");
+        }
+
+        /// <summary>
+        /// Issue #448. The threshold measures time since the last take, not since start. Three takes
+        /// advance the clock six seconds each (eighteen in aggregate, past the ten-second threshold)
+        /// while every idle gap stays at zero, so the consumer drains and then waits; a session timer
+        /// exits instead, which the completion flag and the delay count detect.
+        /// </summary>
+        [TestMethod]
+        [Timeout(10000)]
+        public async Task UndoConsumer_SuccessfulTake_ResetsIdleTimer()
+        {
+            // Arrange — the fake processor keeps live COM and the dispatcher out (UT4).
+            var clock = new CountingTimeProvider();
+            var processed = new List<IMovedMailInfo>();
+            QfcFormController controller = ArrangeUndoConsumer(
+                clock,
+                item =>
+                {
+                    processed.Add(item);
+                    clock.Advance(TimeSpan.FromSeconds(6));
+                    return Task.CompletedTask;
+                },
+                queuedItems: 3
+            );
+            // Act — drains all three takes inline, then parks on its first idle wait.
+            Task consumer = controller.UndoConsumerStarter(controller.UndoConsumer);
+            // Assert
+            processed.Should().HaveCount(3, "18 s of takes must not end the consumer");
+            consumer.IsCompleted.Should().BeFalse("the consumer parked instead of exiting");
+            clock.DelayRequests.Should().Be(1, "it took the idle branch, not the exit branch");
+            // Idle past the threshold measured from the last take does end it.
+            clock.Advance(TimeSpan.FromSeconds(11));
+            await consumer.ConfigureAwait(false);
+            consumer.Status.Should().Be(TaskStatus.RanToCompletion);
+        }
+
+        /// <summary>
+        /// Issue #448. Every exit path must clear <c>_undoConsumerTask</c> so a later
+        /// <c>UndoDialog()</c> starts a fresh consumer. A sentinel is planted first, so a path that
+        /// fails to clear the field leaves the sentinel behind and the assertion fails.
+        /// </summary>
+        [TestMethod]
+        [Timeout(10000)]
+        public async Task UndoConsumer_OnExit_ResetsUndoConsumerTask()
+        {
+            // Arrange — one consumer per exit path; the throwing processor stands in for the
+            // exception disposing _undoQueue mid-take produces. The sentinel makes the assertion
+            // real: without it the field starts null and every path would pass vacuously.
+            var idleClock = new FakeTimeProvider();
+            QfcFormController idle = ArrangeUndoConsumer(idleClock);
+            QfcFormController bad = ArrangeUndoConsumer(
+                new FakeTimeProvider(),
+                _ => throw new InvalidOperationException("undo failed"),
+                queuedItems: 1
+            );
+            SetPrivateField(idle, "_undoConsumerTask", Task.CompletedTask);
+            SetPrivateField(bad, "_undoConsumerTask", Task.CompletedTask);
+            // Act — the idle exit, then the exception exit.
+            Task idleConsumer = idle.UndoConsumerStarter(idle.UndoConsumer);
+            idleClock.Advance(TimeSpan.FromSeconds(11));
+            await idleConsumer.ConfigureAwait(false);
+            Func<Task> act = () => bad.UndoConsumerStarter(bad.UndoConsumer);
+            await act.Should().ThrowAsync<InvalidOperationException>().ConfigureAwait(false);
+            // Assert — both exit paths cleared the planted sentinel.
+            GetPrivateField<Task>(idle, "_undoConsumerTask").Should().BeNull("idle path clears");
+            GetPrivateField<Task>(bad, "_undoConsumerTask").Should().BeNull("throw path clears");
+        }
+
+        #endregion Issue #448 — undo-consumer termination and idle timer
     }
 }

@@ -765,47 +765,47 @@ regression test. The one exception is verified by source inspection and is recor
 
 ### Issue #480 — `ToggleNavigation(bool)` double toggle
 
-- [ ] The unconditional `_itemPositionTips.Toggle(false)` dispatch at
+- [x] The unconditional `_itemPositionTips.Toggle(false)` dispatch at
       `QuickFiler/Controllers/QfcItemController.FocusAndTheme.cs:170` is deleted, leaving exactly one
       `Toggle(false)` dispatch per branch of `ToggleNavigation(bool async)`.
-- [ ] `ToggleNavigation(async: false)` invokes `IQfcTipsDetails.Toggle(false)` exactly once, asserted
+- [x] `ToggleNavigation(async: false)` invokes `IQfcTipsDetails.Toggle(false)` exactly once, asserted
       with Moq `Times.Once()` (not `Times.AtLeastOnce()`).
-- [ ] `ToggleNavigation(async: true)` invokes `IQfcTipsDetails.Toggle(false)` exactly once, asserted
+- [x] `ToggleNavigation(async: true)` invokes `IQfcTipsDetails.Toggle(false)` exactly once, asserted
       with Moq `Times.Once()`, in a test that did not exist before this feature.
-- [ ] The existing assertion at `QuickFiler.Test/Controllers/QfcItemController.FocusAndThemeTests.cs:323`
+- [x] The existing assertion at `QuickFiler.Test/Controllers/QfcItemController.FocusAndThemeTests.cs:323`
       is tightened in place from `Times.AtLeastOnce()` to `Times.Once()`, and evidence records that the
       tightened assertion failed against the unfixed code.
-- [ ] `ToggleNavigation(bool async)` is still declared and implemented; it is not removed, and
+- [x] `ToggleNavigation(bool async)` is still declared and implemented; it is not removed, and
       `QuickFiler/Interfaces/IQfcItemController.cs` is unmodified.
 
 ### Issue #481 — event unwiring path
 
-- [ ] `internal void UnwireEvents()`, `internal void UnwireControlTreeEvents()`, and
+- [x] `internal void UnwireEvents()`, `internal void UnwireControlTreeEvents()`, and
       `internal void UnwireIntentEvents()` exist in
       `QuickFiler/Controllers/QfcItemController.EventWiring.cs`, with `UnwireEvents()` calling
       `UnwireControlTreeEvents()` then `UnwireIntentEvents()`, mirroring `WireEvents()`, and
       `UnwireEvents()` additionally calls `DetachWebResourceRequestedHandler()` as its third statement.
-- [ ] All 16 intent subscriptions made by `WireIntentEvents()` are detached by `UnwireIntentEvents()`,
+- [x] All 16 intent subscriptions made by `WireIntentEvents()` are detached by `UnwireIntentEvents()`,
       verified by `Mock<IItemViewer>.VerifyRemove` assertions.
-- [ ] All 6 control-tree subscriptions made by `WireControlTreeEvents()` are detached by
+- [x] All 6 control-tree subscriptions made by `WireControlTreeEvents()` are detached by
       `UnwireControlTreeEvents()`, verified by a wire-unwire-raise test asserting `Times.Never()` on the
       keyboard-handler mock and an unchanged `BackColor`, mirroring the fixture at
       `QfcItemController.EventWiringTests.cs:229-309`.
-- [ ] `UnwireControlTreeEvents()` passes the same `ForAllControls` exclusion list as
+- [x] `UnwireControlTreeEvents()` passes the same `ForAllControls` exclusion list as
       `WireControlTreeEvents()` (`EventWiring.cs:50`).
-- [ ] `Cleanup()` calls `UnwireEvents()` before `_itemViewer = null` (`ViewerSetup.cs:407`) and before
+- [x] `Cleanup()` calls `UnwireEvents()` before `_itemViewer = null` (`ViewerSetup.cs:407`) and before
       `_kbdHandler = null` (`:420`).
-- [ ] `UnwireIntentEvents()` returns early when `_itemViewer` is null and guards the `FolderKeyDown`
+- [x] `UnwireIntentEvents()` returns early when `_itemViewer` is null and guards the `FolderKeyDown`
       detach against a null `_kbdHandler`; `UnwireControlTreeEvents()` returns early when `_itemViewer`
       is not a concrete `ItemViewer`, skips the `ForAllControls` keyboard-detach walk when `_kbdHandler`
       is null, and guards the `Buttons` and `MenuItems` loops against null.
-- [ ] A regression test asserts that `Cleanup()` does not throw on a controller whose `_kbdHandler` and
+- [x] A regression test asserts that `Cleanup()` does not throw on a controller whose `_kbdHandler` and
       `Buttons` are null and whose `_itemViewer` is a plain `Mock<IItemViewer>`.
-- [ ] The two pre-existing `Cleanup()` tests
+- [x] The two pre-existing `Cleanup()` tests
       (`QfcItemController.ViewerSetupTests.cs:347-376` `Cleanup_NullsTrackedPrivateFields` and
       `QfcItemControllerBreadcrumbDropDownTests.cs:125-153`
       `Cleanup_ResetsInjectedHostForPooledViewerReuse`) both pass unchanged after the fix.
-- [ ] The `WebResourceRequested` delegate and its `CoreWebView2` source are captured into the private
+- [x] The `WebResourceRequested` delegate and its `CoreWebView2` source are captured into the private
       fields `_webResourceRequestedHandler` and `_coreWebView2` in `ViewerSetup.cs`, and the subscription
       is detached during teardown. Its verification is recorded as inspection-only, with the reason
       (`InitializeWebViewAsync` is `[ExcludeFromCodeCoverage]` at `ViewerSetup.cs:41` and requires a live
@@ -813,75 +813,75 @@ regression test. The one exception is verified by source inspection and is recor
 
 ### Issue #483 — `MoveMailAsync` error handling and cancellation
 
-- [ ] The `catch` block in `MoveMailAsync` (`QfcItemController.MailActions.cs:115-122`) logs at error
+- [x] The `catch` block in `MoveMailAsync` (`QfcItemController.MailActions.cs:115-122`) logs at error
       level, invokes the failure notification, and then propagates — it does not return normally.
-- [ ] A regression test drives a faulting `_emailFilerFactory` and asserts that `MoveMailAsync` faults
+- [x] A regression test drives a faulting `_emailFilerFactory` and asserts that `MoveMailAsync` faults
       with an exception whose `InnerException` is the original fault.
-- [ ] `internal Action<string> MoveFailureNotifier { get; set; }` exists in `MailActions.cs` with the
+- [x] `internal Action<string> MoveFailureNotifier { get; set; }` exists in `MailActions.cs` with the
       default `text => MessageBox.Show(text)`, and a regression test asserts it is invoked exactly once
       on the failure path with no modal dialog reached.
-- [ ] The failure notification is marshalled through `_uiDispatcher` when the dispatcher is non-null, and
+- [x] The failure notification is marshalled through `_uiDispatcher` when the dispatcher is non-null, and
       is invoked directly when it is null (so existing tests that leave `_uiDispatcher` unset still pass).
-- [ ] `Token.ThrowIfCancellationRequested()` is the first statement of `MoveMailAsync` (outside the
+- [x] `Token.ThrowIfCancellationRequested()` is the first statement of `MoveMailAsync` (outside the
       `try`), of `FlagAsTaskAsync`, and of `EnumerateConversationAsync`.
-- [ ] For each of the three methods, a regression test with a pre-cancelled `Token` asserts
+- [x] For each of the three methods, a regression test with a pre-cancelled `Token` asserts
       `OperationCanceledException` and asserts that the downstream collaborator (for `MoveMailAsync`, the
       `_emailFilerFactory`) was never invoked.
-- [ ] `Task MoveMailAsync()`'s return type is unchanged and
+- [x] `Task MoveMailAsync()`'s return type is unchanged and
       `QuickFiler/Controllers/QfcCollectionController.cs` is not modified.
 
 ### Issue #484 — `Cleanup()` timer disposal and stale `_mailActions`
 
-- [ ] `Cleanup()` disposes `_emailIsReadTimer` before nulling it
+- [x] `Cleanup()` disposes `_emailIsReadTimer` before nulling it
       (`_emailIsReadTimer?.Dispose(); _emailIsReadTimer = null;` at `ViewerSetup.cs:424`).
-- [ ] Test T1 injects a `Timer` armed with `Timeout.Infinite`, calls `Cleanup()`, and asserts that the
+- [x] Test T1 injects a `Timer` armed with `Timeout.Infinite`, calls `Cleanup()`, and asserts that the
       field is null and that `timer.Change(0, Timeout.Infinite)` throws `ObjectDisposedException`. The
       test contains no `Thread.Sleep`, no `Task.Delay`, and no wall-clock wait.
-- [ ] `ApplyReadEmailFormat(object state)` returns early when `ItemHelper`, `_themes`, `_activeTheme`, or
+- [x] `ApplyReadEmailFormat(object state)` returns early when `ItemHelper`, `_themes`, `_activeTheme`, or
       `_mailActions` is null, and its signature is unchanged.
-- [ ] Test T2 calls `ApplyReadEmailFormat(null)` on a `Cleanup()`ed controller and asserts it does not
+- [x] Test T2 calls `ApplyReadEmailFormat(null)` on a `Cleanup()`ed controller and asserts it does not
       throw and that `IMailItemActions.Save()` is never called.
-- [ ] `Cleanup()` nulls `_mailActions`, and a regression test asserts that a `SaveParameters` call after
+- [x] `Cleanup()` nulls `_mailActions`, and a regression test asserts that a `SaveParameters` call after
       `Cleanup()` rebinds `_mailActions` to the new `MailItem`.
-- [ ] `QuickFiler/Controllers/QfcItemController.Navigation.cs` is not modified.
+- [x] `QuickFiler/Controllers/QfcItemController.Navigation.cs` is not modified.
 
 ### Issue #485 — WebView2 handler unguarded inputs
 
-- [ ] `internal static bool TryResolveCidResource(string requestedUri, IReadOnlyDictionary<string, IAttachment> contentIdMap, out byte[] payload, out string mimeType)`
+- [x] `internal static bool TryResolveCidResource(string requestedUri, IReadOnlyDictionary<string, IAttachment> contentIdMap, out byte[] payload, out string mimeType)`
       exists in `ViewerSetup.cs` and carries the URI, map, match, and `AttachmentData` guards.
-- [ ] `TryResolveCidResource` uses `Uri.TryCreate(..., UriKind.Absolute, ...)` and returns `false` with
+- [x] `TryResolveCidResource` uses `Uri.TryCreate(..., UriKind.Absolute, ...)` and returns `false` with
       null `out` values for a malformed URI, for a relative URI, and for an absolute URI whose final
       segment is empty. Each case has its own regression test.
-- [ ] `TryResolveCidResource` returns `false` with null `out` values for a map miss, for a null map, and
+- [x] `TryResolveCidResource` returns `false` with null `out` values for a map miss, for a null map, and
       for a map hit whose `AttachmentData` is null. Each case has its own regression test.
-- [ ] `TryResolveCidResource` returns `true` with the exact payload reference and the expected MIME type
+- [x] `TryResolveCidResource` returns `true` with the exact payload reference and the expected MIME type
       for a map hit with real bytes and a known file extension, and returns
       `"application/octet-stream"` for an unrecognised extension. Both cases have regression tests.
-- [ ] The `WebResourceRequested` lambda is reduced to an adapter that builds the map from
+- [x] The `WebResourceRequested` lambda is reduced to an adapter that builds the map from
       `ItemHelper?.AttachmentsInfo` (null-safe) and constructs the response only when
       `TryResolveCidResource` returns `true`.
-- [ ] Every #485 regression test runs without constructing a controller, an `ItemViewer`, a
+- [x] Every #485 regression test runs without constructing a controller, an `ItemViewer`, a
       `MailItemHelper`, or any `CoreWebView2*` type.
 
 ### Upstream contract and scope discipline
 
-- [ ] No public member is added, and no member is removed, from any of the four owned partials.
-- [ ] `QuickFiler/Interfaces/IQfcItemController.cs` and `QuickFiler/Viewers/IItemViewer.cs` are byte-identical
+- [x] No public member is added, and no member is removed, from any of the four owned partials.
+- [x] `QuickFiler/Interfaces/IQfcItemController.cs` and `QuickFiler/Viewers/IItemViewer.cs` are byte-identical
       to their pre-change state.
-- [ ] The set of files changed by this feature is a subset of the four owned production files plus the
+- [x] The set of files changed by this feature is a subset of the four owned production files plus the
       five owned test files. In particular `QfcItemController.Navigation.cs`, `QuickFiler/Viewers/ItemViewer*.cs`,
       `QuickFiler/Controllers/KbdActions.cs`, `QuickFiler/QuickFiler.csproj`, and
       `QuickFiler.Test/QuickFiler.Test.csproj` are unmodified.
-- [ ] All three `Cleanup()` statement-order constraints hold in the delivered source: unwire before
+- [x] All three `Cleanup()` statement-order constraints hold in the delivered source: unwire before
       `_itemViewer` and `_kbdHandler` are nulled; timer disposal before `_emailIsReadTimer` is nulled;
       the existing `BreadcrumbUnhandledArrow` detach before `_breadcrumbViewer` is nulled.
-- [ ] The post-`Cleanup()` lifecycle invariant is demonstrated: a pooled viewer carries zero
+- [x] The post-`Cleanup()` lifecycle invariant is demonstrated: a pooled viewer carries zero
       subscriptions from the released controller, with the single documented `WebResourceRequested`
       exception.
 
 ### File-size, toolchain, and coverage
 
-- [ ] Every production and test file touched by this feature is at most 500 lines after the change.
+- [x] Every production and test file touched by this feature is at most 500 lines after the change.
       All nine owned files are recorded with their post-change line counts. Specifically, the seven
       files that receive added lines under the plan's constraint C2 assignment —
       `QfcItemController.ViewerSetup.cs`, `QfcItemController.EventWiring.cs`,
@@ -890,23 +890,23 @@ regression test. The one exception is verified by source inspection and is recor
       `QfcItemController.TestSupport.cs` — are each verified at or under 500 lines, and the two owned
       test files that receive no added lines, `QfcItemController.FocusAndThemeTests.cs` and
       `QfcItemController.ViewerSetupTests.cs`, are verified at their unchanged 497 and 474 lines.
-- [ ] Every new test uses MSTest, Moq, and FluentAssertions, and no new test contains `Thread.Sleep`,
+- [x] Every new test uses MSTest, Moq, and FluentAssertions, and no new test contains `Thread.Sleep`,
       `Task.Delay`, a wall-clock wait, or a temporary file.
-- [ ] Exactly one new test constructs a real `QuickFiler.ItemViewer` (the #481 control-tree unwire test),
+- [x] Exactly one new test constructs a real `QuickFiler.ItemViewer` (the #481 control-tree unwire test),
       it starts no message pump and calls no `Show()`, and it saves and restores the
       `SynchronizationContext` in `try`/`finally`.
-- [ ] `dotnet tool run csharpier check .` reports no formatting differences.
-- [ ] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+- [x] `dotnet tool run csharpier check .` reports no formatting differences.
+- [x] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
       completes with zero errors.
-- [ ] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
+- [x] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
       completes with zero errors.
-- [ ] `vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCoverage /InIsolation`
+- [x] `vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCoverage /InIsolation`
       reports zero failures, and the pass count is greater than or equal to the recorded Phase 0 baseline
       pass count plus the number of tests added.
-- [ ] All four toolchain stages pass in a single consecutive pass with no intervening file modification.
-- [ ] Repository-wide line coverage is `>= 80%`, and coverage for the changed lines is not reduced
+- [x] All four toolchain stages pass in a single consecutive pass with no intervening file modification.
+- [x] Repository-wide line coverage is `>= 80%`, and coverage for the changed lines is not reduced
       relative to the Phase 0 baseline.
-- [ ] Each new production member added by this feature reaches `>= 90%` line coverage, except the
+- [x] Each new production member added by this feature reaches `>= 90%` line coverage, except the
       two capture-field assignments and the two-statement lambda adapter added inside the pre-existing
       `[ExcludeFromCodeCoverage]` `InitializeWebViewAsync`; except `DetachWebResourceRequestedHandler`,
       whose guarded `-=` statement is unreachable without a live WebView2 runtime per research
@@ -919,8 +919,8 @@ regression test. The one exception is verified by source inspection and is recor
       the relocation of the pre-existing uncovered `MessageBox.Show` call at
       `QfcItemController.MailActions.cs:119-121`, so no changed line loses coverage relative to the
       Phase 0 baseline.
-- [ ] No new `[ExcludeFromCodeCoverage]` attribute is introduced anywhere by this feature.
-- [ ] For each of the five issues, evidence records the regression test failing against the unfixed code
+- [x] No new `[ExcludeFromCodeCoverage]` attribute is introduced anywhere by this feature.
+- [x] For each of the five issues, evidence records the regression test failing against the unfixed code
       before the corresponding production change, per the CLAUDE.md Bugfix Workflow.
 
 ---

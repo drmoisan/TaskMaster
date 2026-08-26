@@ -167,7 +167,6 @@ namespace QuickFiler.Controllers
 
         public void ToggleNavigation(bool async)
         {
-            _itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(false)));
             if (async)
             {
                 _itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(false)));
@@ -317,6 +316,19 @@ namespace QuickFiler.Controllers
 
         public void ApplyReadEmailFormat(object state)
         {
+            // #484: this runs on a thread-pool timer callback. A callback already in flight when the
+            // timer is disposed still executes, and it can therefore observe a controller that
+            // Cleanup() has already torn down. Return instead of dereferencing released state.
+            if (
+                ItemHelper is null
+                || _themes is null
+                || _activeTheme is null
+                || _mailActions is null
+            )
+            {
+                return;
+            }
+
             ItemHelper.UnRead = false;
             _themes[_activeTheme].SetMailRead(async: true);
             _mailActions.UnRead = false;

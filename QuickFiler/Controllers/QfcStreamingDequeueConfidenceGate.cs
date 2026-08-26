@@ -3,9 +3,42 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Interfaces;
 
 namespace QuickFiler.Controllers
 {
+    /// <summary>
+    /// Issue #446 and Scope 427-A. The gate's own result: the accepted candidates with the folder
+    /// each was already scored against, the reason the scan stopped, and how many candidates were
+    /// scanned. Declared as a <c>readonly struct</c> with get-only properties because
+    /// <c>net481</c> has no <c>IsExternalInit</c> and therefore no <c>record</c>,
+    /// <c>record struct</c> or <c>init</c> accessor.
+    /// </summary>
+    internal readonly struct QfcGateBatch
+    {
+        private readonly IList<QfcPreScoredItem> _accepted;
+
+        /// <summary>
+        /// Creates a gate result. A null accepted collection surfaces as an empty list so a
+        /// defaulted struct is inert rather than a null-reference trap.
+        /// </summary>
+        public QfcGateBatch(IList<QfcPreScoredItem> accepted, QfcDequeueStop stop, int scanned)
+        {
+            _accepted = accepted;
+            Stop = stop;
+            Scanned = scanned;
+        }
+
+        /// <summary>The accepted candidates, each carrying its predetermined folder.</summary>
+        public IList<QfcPreScoredItem> Accepted => _accepted ?? new List<QfcPreScoredItem>();
+
+        /// <summary>Why the scan stopped.</summary>
+        public QfcDequeueStop Stop { get; }
+
+        /// <summary>How many candidates were scored during the scan.</summary>
+        public int Scanned { get; }
+    }
+
     internal sealed class QfcStreamingDequeueConfidenceGate
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
@@ -22,17 +55,22 @@ namespace QuickFiler.Controllers
         internal static readonly TimeSpan DefaultFirstBatchDeadline = TimeSpan.FromSeconds(12);
 
         private readonly Func<MailItem> _tryTakeNext;
-        private readonly Func<MailItem, CancellationToken, Task<long>> _scoreLoader;
+        private readonly Func<
+            MailItem,
+            CancellationToken,
+            Task<(long Score, string TopFolder)>
+        > _scoreLoader;
         private readonly long _cutoff;
         private readonly TimeProvider _timeProvider;
         private readonly Action<string> _debugLog;
         private readonly Func<bool> _sourceActive;
         private readonly TimeSpan _firstBatchDeadline;
         private readonly Action<int, int, int> _progressCallback;
+        private readonly Action<MailItem> _onRejected;
 
         internal QfcStreamingDequeueConfidenceGate(
             Func<MailItem> tryTakeNext,
-            Func<MailItem, CancellationToken, Task<long>> scoreLoader,
+            Func<MailItem, CancellationToken, Task<(long Score, string TopFolder)>> scoreLoader,
             double threshold,
             TimeProvider timeProvider = null,
             Action<string> debugLog = null
@@ -54,15 +92,24 @@ namespace QuickFiler.Controllers
         /// callback must not touch UI directly — callers route reports through <c>ProgressTracker</c>,
         /// which marshals to the UI thread.
         /// </param>
+        /// <param name="onRejected">
+        /// Issue #426. Optional sink invoked once for every candidate the gate discards because its
+        /// score is below the cutoff. A rejected candidate has already been removed from the source
+        /// queue and never reaches the accepted-path unhook, so without this sink its
+        /// <c>EmailMoveMonitor</c> hook and its live COM reference are retained for the session.
+        /// <see langword="null"/> disables the sink. The drop-on-reject contract is unchanged: the
+        /// candidate is still discarded and is still absent from the result.
+        /// </param>
         internal QfcStreamingDequeueConfidenceGate(
             Func<MailItem> tryTakeNext,
-            Func<MailItem, CancellationToken, Task<long>> scoreLoader,
+            Func<MailItem, CancellationToken, Task<(long Score, string TopFolder)>> scoreLoader,
             double threshold,
             TimeProvider timeProvider,
             Action<string> debugLog,
             Func<bool> sourceActive,
             TimeSpan? firstBatchDeadline = null,
-            Action<int, int, int> progressCallback = null
+            Action<int, int, int> progressCallback = null,
+            Action<MailItem> onRejected = null
         )
         {
             _tryTakeNext = tryTakeNext ?? throw new ArgumentNullException(nameof(tryTakeNext));
@@ -72,6 +119,7 @@ namespace QuickFiler.Controllers
             _debugLog = debugLog;
             _sourceActive = sourceActive;
             _progressCallback = progressCallback;
+            _onRejected = onRejected;
 
             TimeSpan deadline = firstBatchDeadline ?? DefaultFirstBatchDeadline;
             if (deadline != Timeout.InfiniteTimeSpan && deadline <= TimeSpan.Zero)
@@ -86,7 +134,7 @@ namespace QuickFiler.Controllers
             _firstBatchDeadline = deadline;
         }
 
-        internal async Task<IList<MailItem>> DequeueAsync(
+        internal async Task<QfcGateBatch> DequeueAsync(
             int quantity,
             int timeOut,
             CancellationToken token
@@ -94,15 +142,15 @@ namespace QuickFiler.Controllers
         {
             token.ThrowIfCancellationRequested();
 
-            var accepted = new List<MailItem>();
+            var accepted = new List<QfcPreScoredItem>();
+            int scanned = 0;
             if (quantity <= 0)
             {
-                return accepted;
+                return new QfcGateBatch(accepted, QfcDequeueStop.QuantitySatisfied, scanned);
             }
 
             bool deadlineEnabled = _firstBatchDeadline != Timeout.InfiniteTimeSpan;
             long start = _timeProvider.GetTimestamp();
-            int scanned = 0;
 
             bool alreadyWaitedForEmptySource = false;
             while (accepted.Count < quantity)
@@ -116,7 +164,7 @@ namespace QuickFiler.Controllers
                 )
                 {
                     LogDeadlineExpiry(accepted.Count, scanned);
-                    return accepted;
+                    return new QfcGateBatch(accepted, QfcDequeueStop.DeadlineExpired, scanned);
                 }
 
                 MailItem mailItem = _tryTakeNext();
@@ -125,7 +173,7 @@ namespace QuickFiler.Controllers
                     bool sourceCanStillProduce = _sourceActive?.Invoke() == true;
                     if (timeOut <= 0 || (alreadyWaitedForEmptySource && !sourceCanStillProduce))
                     {
-                        return accepted;
+                        return new QfcGateBatch(accepted, QfcDequeueStop.SourceExhausted, scanned);
                     }
 
                     alreadyWaitedForEmptySource = true;
@@ -136,14 +184,34 @@ namespace QuickFiler.Controllers
                 }
 
                 alreadyWaitedForEmptySource = false;
-                long score = await _scoreLoader(mailItem, token).ConfigureAwait(false);
+                (long score, string topFolder) = await _scoreLoader(mailItem, token)
+                    .ConfigureAwait(false);
                 token.ThrowIfCancellationRequested();
                 scanned++;
                 LogScore(mailItem, score);
 
                 if (score >= _cutoff)
                 {
-                    accepted.Add(mailItem);
+                    accepted.Add(new QfcPreScoredItem(mailItem, topFolder));
+                }
+                else
+                {
+                    // Issue #426. The discarded candidate is already out of the source queue and
+                    // never reaches the accepted-path unhook, so it is reported here. A monitor
+                    // failure must not abort the scan, hence the catch: the candidate is still
+                    // dropped either way, and aborting would strand the rest of the batch.
+                    try
+                    {
+                        _onRejected?.Invoke(mailItem);
+                    }
+                    catch (System.Exception e)
+                    {
+                        logger.Error(
+                            "Rejection sink threw [QfcStreamingDequeueConfidenceGate.DequeueAsync]; "
+                                + "the candidate is still discarded and the scan continues.",
+                            e
+                        );
+                    }
                 }
 
                 // Report after the accept decision so `accepted` reflects this candidate. Exceptions
@@ -151,7 +219,7 @@ namespace QuickFiler.Controllers
                 _progressCallback?.Invoke(scanned, accepted.Count, quantity);
             }
 
-            return accepted;
+            return new QfcGateBatch(accepted, QfcDequeueStop.QuantitySatisfied, scanned);
         }
 
         private void LogDeadlineExpiry(int acceptedCount, int scannedCount)

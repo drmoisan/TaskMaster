@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
+using QuickFiler.Interfaces;
 
 namespace QuickFiler.Controllers
 {
@@ -98,6 +99,43 @@ namespace QuickFiler.Controllers
             return await DequeueDirectAsync(quantity);
         }
 
+        /// <summary>
+        /// Issue #446. Outcome-bearing dequeue. In high-confidence mode the gate's own stop reason
+        /// and accepted carriers are propagated verbatim. In normal mode nothing is scored, so
+        /// <see cref="QfcDequeueBatch.PreScored"/> is empty and a short batch is reported as
+        /// <see cref="QfcDequeueStop.SourceExhausted"/>: the direct path takes whatever the master
+        /// queue holds after <see cref="WaitForQueue"/>, so fewer items than requested means the
+        /// source could not supply them.
+        /// </summary>
+        public async Task<QfcDequeueBatch> DequeueNextItemGroupWithOutcomeAsync(
+            int quantity,
+            int timeOut,
+            TimeSpan firstBatchDeadline,
+            Action<int, int, int> progress
+        )
+        {
+            _token.ThrowIfCancellationRequested();
+
+            if (_globals?.QfSettings?.HighConfidenceModeEnabled == true)
+            {
+                return await DequeueWithHighConfidenceGateWithOutcomeAsync(
+                    quantity,
+                    timeOut,
+                    firstBatchDeadline,
+                    progress
+                );
+            }
+
+            IList<MailItem> items = await DequeueDirectAsync(quantity);
+            return new QfcDequeueBatch(
+                items,
+                new List<QfcPreScoredItem>(),
+                (items?.Count ?? 0) < quantity
+                    ? QfcDequeueStop.SourceExhausted
+                    : QfcDequeueStop.QuantitySatisfied
+            );
+        }
+
         private async Task<IList<MailItem>> DequeueDirectAsync(int quantity)
         {
             if (_masterQueue.Count < quantity)
@@ -114,6 +152,28 @@ namespace QuickFiler.Controllers
             Action<int, int, int> progress = null
         )
         {
+            QfcDequeueBatch batch = await DequeueWithHighConfidenceGateWithOutcomeAsync(
+                quantity,
+                timeOut,
+                firstBatchDeadline,
+                progress
+            );
+            return batch.Items;
+        }
+
+        /// <summary>
+        /// Issue #446 and Scope 427-A. The high-confidence dequeue with the gate's outcome intact.
+        /// <see cref="QfcDequeueBatch.Items"/> is taken from the same accepted set as
+        /// <see cref="QfcDequeueBatch.PreScored"/>, after <see cref="UnhookDequeuedNodes"/> has run
+        /// over it, so the two collections describe one dequeue rather than two.
+        /// </summary>
+        private async Task<QfcDequeueBatch> DequeueWithHighConfidenceGateWithOutcomeAsync(
+            int quantity,
+            int timeOut,
+            TimeSpan? firstBatchDeadline = null,
+            Action<int, int, int> progress = null
+        )
+        {
             var gate = new QfcStreamingDequeueConfidenceGate(
                 () => _masterQueue.TryTakeFirst(),
                 ScoreRemainingQueueMailItemAsync,
@@ -122,11 +182,36 @@ namespace QuickFiler.Controllers
                 null,
                 () => _remainingLoadActive,
                 firstBatchDeadline,
-                progress
+                progress,
+                onRejected: TryReleaseRejectedHook
             );
 
-            var nodes = (await gate.DequeueAsync(quantity, timeOut, _token)).ToList();
-            return UnhookDequeuedNodes(nodes);
+            QfcGateBatch batch = await gate.DequeueAsync(quantity, timeOut, _token);
+            IList<QfcPreScoredItem> accepted = batch.Accepted;
+            var nodes = accepted.Select(x => x.MailItem).ToList();
+            return new QfcDequeueBatch(UnhookDequeuedNodes(nodes), accepted, batch.Stop);
+        }
+
+        /// <summary>
+        /// Issue #426. Releases the <c>EmailMoveMonitor</c> hook of a candidate the high-confidence
+        /// gate discarded. The rejected candidate is already out of the master queue and never
+        /// reaches <see cref="UnhookDequeuedNodes"/>, so without this its hook and its live COM
+        /// reference are retained for the session. Exactly one <c>UnhookItem</c> call per rejected
+        /// item preserves the one-marshal-hop-per-operation contract. A monitor failure is logged
+        /// and swallowed: the candidate is discarded either way and aborting the scan would strand
+        /// the rest of the batch.
+        /// </summary>
+        private void TryReleaseRejectedHook(MailItem item)
+        {
+            try
+            {
+                _moveMonitor.UnhookItem(item);
+            }
+            catch (System.Exception e)
+            {
+                logger.Error("Error unhooking rejected item from move monitor", e);
+                return;
+            }
         }
 
         public IList<MailItem> DequeueNextItemGroup(int quantity)
@@ -163,6 +248,32 @@ namespace QuickFiler.Controllers
                 throw;
             }
             return nodes;
+        }
+
+        /// <summary>
+        /// Injectable factory for the master-queue admission scorer. Defaults to a fresh
+        /// <see cref="FolderScoringService"/> so production behaviour is unchanged; tests assign a
+        /// factory returning a mock so <see cref="ScoreRemainingQueueMailItemAsync"/> can be driven
+        /// without a live Outlook session, which
+        /// <c>.claude/rules/general-unit-test.md</c> UT4 requires.
+        /// </summary>
+        internal Func<IFolderScoringService> ScoringServiceFactory { get; set; } =
+            () => new FolderScoringService();
+
+        private async Task<(long Score, string TopFolder)> ScoreRemainingQueueMailItemAsync(
+            MailItem mailItem,
+            CancellationToken cancel
+        )
+        {
+            var scoringService = ScoringServiceFactory();
+            var score = await scoringService
+                .ScoreAsync(mailItem, _globals, cancel)
+                .ConfigureAwait(false);
+            logger.Debug(
+                $"Probability debug [QfcDatamodel.ScoreRemainingQueueMailItemAsync (master-queue admission)] "
+                    + $"Subject='{mailItem.Subject}' EntryID='{mailItem.EntryID}' Score={score.Score}"
+            );
+            return (score.Score, score.TopFolder);
         }
 
         internal async Task WaitForQueue(int quantity, CancellationToken token)

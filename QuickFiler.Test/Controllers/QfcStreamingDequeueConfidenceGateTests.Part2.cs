@@ -59,7 +59,7 @@ namespace QuickFiler.Controllers.Tests
                 (mail, token) =>
                 {
                     fakeTime.Advance(TimeSpan.FromSeconds(1));
-                    return Task.FromResult(100L);
+                    return Task.FromResult((100L, ""));
                 },
                 threshold: 0.90,
                 timeProvider: fakeTime,
@@ -104,7 +104,7 @@ namespace QuickFiler.Controllers.Tests
 
                     // Each score costs a full second of the first-batch budget.
                     fakeTime.Advance(TimeSpan.FromSeconds(1));
-                    return Task.FromResult(score);
+                    return Task.FromResult((score, ""));
                 },
                 threshold: 0.90,
                 timeProvider: fakeTime,
@@ -153,7 +153,7 @@ namespace QuickFiler.Controllers.Tests
             MailItem never = CreateMailItem("never-scanned", "entry-never-scanned");
             var source = new Queue<MailItem>(new[] { inFlight, never });
             var fakeTime = new FakeTimeProvider();
-            var scoreGate = new TaskCompletionSource<long>();
+            var scoreGate = new TaskCompletionSource<(long Score, string TopFolder)>();
             var takeCount = 0;
 
             object gate = CreateGate(
@@ -163,7 +163,7 @@ namespace QuickFiler.Controllers.Tests
                     return source.Count == 0 ? null : source.Dequeue();
                 },
                 (mail, token) =>
-                    ReferenceEquals(mail, inFlight) ? scoreGate.Task : Task.FromResult(950L),
+                    ReferenceEquals(mail, inFlight) ? scoreGate.Task : Task.FromResult((950L, "")),
                 threshold: 0.90,
                 timeProvider: fakeTime,
                 sourceActive: () => false,
@@ -177,7 +177,7 @@ namespace QuickFiler.Controllers.Tests
             fakeTime.Advance(TimeSpan.FromSeconds(6));
             pending.IsCompleted.Should().BeFalse("expiry must not abandon the in-flight score");
 
-            scoreGate.SetResult(950L);
+            scoreGate.SetResult((950L, ""));
             IList<MailItem> result = await pending;
 
             // Assert
@@ -242,7 +242,7 @@ namespace QuickFiler.Controllers.Tests
                     takeCount++;
                     return source.Count == 0 ? null : source.Dequeue();
                 },
-                (mail, token) => Task.FromResult(950L),
+                (mail, token) => Task.FromResult((950L, "")),
                 threshold: 0.90,
                 timeProvider: fakeTime,
                 sourceActive: () => false
@@ -286,7 +286,7 @@ namespace QuickFiler.Controllers.Tests
                 (mail, token) =>
                 {
                     fakeTime.Advance(TimeSpan.FromSeconds(1));
-                    return Task.FromResult(ReferenceEquals(mail, qualifying) ? 950L : 100L);
+                    return Task.FromResult((ReferenceEquals(mail, qualifying) ? 950L : 100L, ""));
                 },
                 threshold: 0.90,
                 timeProvider: fakeTime,
@@ -321,7 +321,7 @@ namespace QuickFiler.Controllers.Tests
                 System.Action act = () =>
                     CreateGate(
                         () => null,
-                        (mail, token) => Task.FromResult(0L),
+                        (mail, token) => Task.FromResult((0L, "")),
                         threshold: 0.90,
                         firstBatchDeadline: invalid
                     );
@@ -353,7 +353,7 @@ namespace QuickFiler.Controllers.Tests
                 (mail, token) =>
                 {
                     fakeTime.Advance(TimeSpan.FromSeconds(1));
-                    return Task.FromResult(100L);
+                    return Task.FromResult((100L, ""));
                 },
                 threshold: 0.90,
                 timeProvider: fakeTime,
@@ -393,7 +393,7 @@ namespace QuickFiler.Controllers.Tests
                 var fakeTime = new FakeTimeProvider();
                 object gate = CreateGate(
                     () => null,
-                    (mail, token) => Task.FromResult(950L),
+                    (mail, token) => Task.FromResult((950L, "")),
                     threshold: 0.90,
                     timeProvider: fakeTime,
                     sourceActive: () => true,
@@ -439,7 +439,7 @@ namespace QuickFiler.Controllers.Tests
                         {
                             // The score completes, but was cancelled while in flight.
                             cts.Cancel();
-                            return Task.FromResult(950L);
+                            return Task.FromResult((950L, ""));
                         },
                         threshold: 0.90,
                         timeProvider: fakeTime,

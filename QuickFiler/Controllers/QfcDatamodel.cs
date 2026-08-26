@@ -352,28 +352,12 @@ namespace QuickFiler.Controllers
         {
             var admission = new QfcRemainingQueueAdmission(
                 _globals,
-                ScoreRemainingQueueMailItemAsync,
+                async (m, t) => (await ScoreRemainingQueueMailItemAsync(m, t)).Score,
                 _masterQueue.AddLast,
                 _moveMonitor.HookItem,
                 x => _masterQueue.Remove(x)
             );
             return await admission.TryQueueAsync(mailItem, cancel).ConfigureAwait(false);
-        }
-
-        private async Task<long> ScoreRemainingQueueMailItemAsync(
-            MailItem mailItem,
-            CancellationToken cancel
-        )
-        {
-            var scoringService = new FolderScoringService();
-            var score = await scoringService
-                .ScoreAsync(mailItem, _globals, cancel)
-                .ConfigureAwait(false);
-            logger.Debug(
-                $"Probability debug [QfcDatamodel.ScoreRemainingQueueMailItemAsync (master-queue admission)] "
-                    + $"Subject='{mailItem.Subject}' EntryID='{mailItem.EntryID}' Score={score.Score}"
-            );
-            return score.Score;
         }
 
         private bool LoadRemainingEmailsToQueue(BackgroundWorker bw, CancellationToken token)
