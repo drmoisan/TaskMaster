@@ -1,6 +1,6 @@
 ---
 name: project-614-store-root-leak-plan-seams
-description: "#614 plan seams: AC25 net non-growth (3 over-limit files incl. Issue439Tests 695); E1 spec-corrects the D1-codifying Issue439 boundary test (P3-T4, run task now P3-T5); SelectRow guard scope pinned (out-of-root only); evidence-path normalization; host-identifying raw TRX stays out of evidence"
+description: "#614 plan seams: AC25 net non-growth (3 over-limit files incl. Issue439Tests 695); E1 SelectRow out-of-root-only pinning; cycle-1 resolver seam; cycle-2 PARTIAL REVERT seams (fail-before-in-old-call-shape, invert-not-remove, consumer-enumeration removals, AC16 one-edit spec exception, baseline-minus-delta suite gate)"
 metadata:
   type: project
 ---
@@ -56,6 +56,16 @@ Remediation cycle 1 (2026-08-26, `remediation-plan.2026-08-26T21-00.md`, 6 phase
 - **Line-budget arithmetic done in-plan:** resolver-call form costs +7 (incl. the csharpier wrap of the :1038 property line, which exceeds 100 chars with `IsValidCreationSelection`) → 1079 <= 1084. The inline-try/catch alternative computed to 1084-1085 (zero/negative margin) and was rejected partly on that.
 - **Root-exact consequence recorded:** post-CR-2-fix, a value equal to the archive root passes the filing guard (TryMakeArchiveRelative returns true root-exact; SelectRow admits it). SelectHierarchyPath's root-exact non-selection is a different surface, untouched. AC16's "reject a full Outlook path" is read as "reject a full path not resolvable against the root" — documented in change-description, spec.md NOT edited.
 - **Scope-lock uses `git diff --name-only HEAD`** (all work uncommitted until the final commit task), avoiding the merge-base allowlist problem entirely for a remediation cycle that commits once at the end.
+
+Remediation cycle 2 (2026-08-26, `remediation-plan.2026-08-26T22-12.md`, 6 phases / 33 tasks; PARTIAL REVERT of the cycle-1 CR-2 widening per maintainer SUPERSEDING DECISION — reviewer items 1/3/6 + addendum constraint 1 superseded, producer-side SelectRow normalization deferred to #637):
+
+- **Fail-before for a revert is run BEFORE the revert, in the old call shape.** The mandatory composition test (guard-accepted value must survive `EmailFilerConfig.ResolvePaths()`, pure seam `Globals = null`) plus the two INVERTED rooted-rejection tests are added in Phase 1 calling the two-arg guard; they genuinely fail at the cycle-1 head (guard accepts rooted, boundary throws). Phase 2 reverts to single-arg and mechanically drops the second argument everywhere; the plan states the matrix/assertions are byte-identical and quotes both call shapes. No exception dossier needed.
+- **"Remove or invert" → invert:** replacing `_IsAccepted` with `_IsRejected` names (same inputs) keeps the value class pinned AND supplies the fail-before pair; the old acceptance tests are deleted in the revert task, giving a brief deliberate contradictory-test window for the expect-fail run (30 tests / 3 failures, then 24 / 0).
+- **"Only if unconsumed" removals get a pre-change consumer enumeration + a post-change zero-hit task.** `ResolveArchiveRootOrEmpty` had 8 case-sensitive *.cs hits (1 decl, 1 prod call, 6 test) and `RootUnavailableDiagnostic` 3; after the call-site revert only their own tests/comments consumed them, so helper+const+tests+comments go together and RC-3 closes with the deleted controller comment.
+- **`archiveRoot` grep gates must be file-scoped:** `BreadcrumbBridgeRouter.cs` contains `archiveRootPath` (superstring hit) and is a zero-headroom no-touch file.
+- **Two root-parameter tests (root `null` / root `string.Empty`) are removed, not adapted** — they pinned exactly the two-arg degrade semantics being deleted and collapse into duplicates under a single-arg guard; justification recorded as a plan decision.
+- **AC16 spec edit (the one authorized spec edit):** rewrite text + clear checkbox in one early task (gates: `share one predicate` 1→0, `two scope-specific predicates` 0→1 kept on a single line for G6), re-check `[x]` in a dedicated final-phase task after the full-suite run — checkbox-flip-only, one AC per task.
+- **Suite gate as baseline-minus-delta:** 6587 baseline, net -2 (remove 6 / add 4), gate "P0-T9 total minus 2" — never a bare absolute or suite-wide Failed:0.
 
 **Why:** these were all judgment calls resolving spec-vs-reality conflicts; a naive revision pass re-reading spec.md literally would reintroduce unsatisfiable gates.
 **How to apply:** on any #614 preflight revision, keep these seams unless the orchestrator explicitly overrules a recorded decision.
