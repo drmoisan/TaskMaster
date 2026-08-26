@@ -177,3 +177,127 @@ guard is scoped to out-of-root full paths only; `Issue439SlashOnlyArchiveRootPre
 whose `@"\"` root trims to length 0 and therefore runs in the preserved empty-root pass-through
 mode; and the three `Issue609_*` tests, which bind `\\mailbox@example.com\Archive` and select
 only relative filing targets or activate only at-or-under-root chain paths.
+
+---
+
+## Remediation cycle 1 (2026-08-26T21-00) - review findings CR-1 and CR-2
+
+The feature review recorded CR-1 and CR-2 as Major but non-blocking. The orchestrator overrode that
+disposition and promoted both to blocking, because both are regressions this change itself
+introduced on the filing chain and their effect is to make a correct destination unreachable. This
+cycle fixes exactly those two findings. CR-3, CR-4, all Minor findings, the pre-existing repo-wide
+coverage shortfall, AC26 manual validation, and `spec.md` edits are explicitly out of scope.
+
+Three files were modified: `QuickFiler/Controllers/EfcSelectionGuard.cs`,
+`QuickFiler/Controllers/EfcFormController.cs`, and
+`QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs`. No other file was touched; in particular
+`BreadcrumbBridgeRouter.cs` and `BreadcrumbBridgeRouterIssue439Tests.cs` are unmodified.
+
+### CR-1 - the filing path applied a folder-creation rule
+
+`IsValidFilingSelection` carried a minimum-length conjunct requiring three characters. That rule came
+from `IsValidSelection`, which before #614 gated folder *creation* only; consolidating the two guards
+onto the stricter of them silently narrowed the filing path so that filing to an archive folder named
+`HR`, `IT`, `PR`, `QA` or `Q1` failed with "Please select a valid folder."
+
+Resolution: the predicate is **split in two** rather than shared.
+
+- `IsValidFilingSelection(string? selection, string? archiveRoot)` carries NO minimum-length rule.
+- A new `IsValidCreationSelection(string? selection)` keeps the full pre-existing rule set -
+  null/whitespace, banner prefix, the three-character minimum via a named `MinimumCreationLength`
+  constant, and full-path rejection - and is what the `IsValidSelection` property now delegates to.
+
+Recorded consequence: the creation path retains its full-path rejection, because a rooted value is
+never a valid creation stem for `CreateFolderAsync`, which concatenates the selection beneath the
+archive root. The CR-2 router-agreement requirement is therefore scoped to the filing/OK path only.
+
+Fail-before evidence: `evidence/regression-testing/cr1-expect-fail.2026-08-26T21-46.md`
+(exit 1, exactly `IsValidFilingSelection_TwoCharacterRelativeStem_IsAccepted` and
+`IsValidFilingSelection_SingleCharacterRelativeStem_IsAccepted` failing on assertion, everything
+else green). Pass-after: `evidence/regression-testing/cr1-pass-after.2026-08-26T21-50.md`.
+
+### CR-2 - the router and the filing guard disagreed about rooted targets
+
+`BreadcrumbBridgeRouter.SelectRow` was scope-pinned during plan delta E1 so that a rooted filing
+target at or under the bound archive root passes through verbatim - the behaviour
+`Issue439AlreadyRootedTargetRemainsUnchangedWithCaseInsensitiveArchiveMatch` requires. The filing
+guard rejected every value for which `ArchiveStemContract.IsFullOutlookPath` is true, which is true
+of any single-separator-leading value including such a target. That class was selectable in the
+breadcrumb surface and unfilable at the OK button.
+
+Resolution: `IsValidFilingSelection` is restructured to apply the **same `TryMakeArchiveRelative`
+scope-pinning the router already applies** (the delivery plan P3-T2 pattern). After the
+null/whitespace guard it rejects the banner, accepts any non-rooted value outright, and finishes by
+requiring a non-blank archive root and a successful `ArchiveStemContract.TryMakeArchiveRelative`
+resolution. A rooted value is now rejected only when it genuinely fails to resolve against the
+archive root.
+
+**D1, D4 and D9 are preserved, not weakened.** The resolution test is prefix-anchored,
+separator-terminated, and ordinal case-insensitive, so a store-root value, a cross-store value, an
+above-root value, a drive-rooted value, and a sibling that merely extends the root name all still
+fail it. Each is pinned by a named passing guard-rail test:
+`IsValidFilingSelection_StoreRootedSelection_IsRejected`,
+`IsValidFilingSelection_CrossStoreRootedTarget_IsRejected`,
+`IsValidFilingSelection_RootedTargetAboveArchiveRoot_IsRejected`,
+`IsValidFilingSelection_DriveRootedSelection_IsRejected`, and
+`IsValidFilingSelection_SeparatorBoundaryNearMiss_IsRejected`.
+
+Fail-before evidence: `evidence/regression-testing/cr2-expect-fail.2026-08-26T21-56.md`
+(exit 1, exactly `IsValidFilingSelection_RootedTargetUnderArchiveRoot_IsAccepted` and
+`IsValidFilingSelection_ArchiveRootExactTarget_IsAccepted` failing on assertion). Pass-after plus
+router agreement across all three `BreadcrumbBridgeRouter*` test classes:
+`evidence/regression-testing/cr2-pass-after.2026-08-26T22-02.md`.
+
+### Design decision - how the filing guard obtains the archive root
+
+The archive root is passed to the predicate as a second parameter, resolved in `ActionOkAsync`
+through a new throw-tolerant helper on the guard,
+`EfcSelectionGuard.ResolveArchiveRootOrEmpty`, which takes two delegate seams: a `Func<string>`
+accessor for the root and an `Action<string>` diagnostic sink. Delegates rather than an interface
+(DI-seam preference 2), because the two call paths are a single property read and a single log call.
+
+`_globals.Ol.ArchiveRootPath` throws after the #614 D6 fix when the archive root is unresolvable or
+cross-store. On the OK-button path an unhandled throw would tear the form down, so the helper
+catches that one documented failure, invokes the diagnostic sink with the fixed redaction-safe
+`RootUnavailableDiagnostic` message, and returns `string.Empty`. Every other exception propagates -
+the catch is narrow - and the underlying cause is not lost, because `AppOlObjects` logs it through
+its own sink before throwing.
+
+**Degrade behaviour:** an empty root makes the guard reject every rooted selection while relative
+stems continue to file normally, which is the conservative direction. This is pinned by
+`IsValidFilingSelection_RootedTargetWithUnavailableRoot_IsRejected`.
+
+Alternatives rejected: an inline try/catch in `ActionOkAsync` (adds about 12 permanently uncoverable
+lines to a file with 5 lines of headroom, and puts the catch branch beyond unit-test reach); and
+resolving the root inside the predicate (couples a pure predicate to exception handling and to the
+globals object graph). Placing the resolver on the guard keeps it 100% unit-coverable including its
+catch branch, and holds the new logic in `EfcFormController.cs` to 7 lines.
+
+### Root-exact consequence (recorded)
+
+With the CR-2 fix, a rooted value exactly equal to the archive root passes the filing guard, because
+`TryMakeArchiveRelative` returns true for the exact root and `SelectRow` - the agreement target -
+admits at-or-under-root rooted targets verbatim. This is pinned by
+`IsValidFilingSelection_ArchiveRootExactTarget_IsAccepted`. The `SelectHierarchyPath` root-exact
+non-selection is a different surface and is untouched by this cycle.
+
+### Spec AC16 reading (recorded; no spec edit this cycle)
+
+The AC16 phrase "reject a full Outlook path" now reads as "reject a full Outlook path that is not
+resolvable against the archive root". The narrowing is mandated by the CR-2 required outcome under
+the orchestrator disposition override, and it preserves the D1/D4/D9 protection because store-root,
+cross-store and above-root values all still fail the resolution test. `spec.md` is not edited: spec
+edits are out of scope for this cycle, and this paragraph is the recorded reading.
+
+### Verification
+
+| Gate | Result |
+| --- | --- |
+| `dotnet tool run csharpier check .` | exit 0, `Checked 1530 files` |
+| analyzer `/t:Rebuild` | exit 0, 0 errors, 5 pre-existing System.Reactive advisories |
+| nullable `/t:Rebuild` (no `/p:Nullable=enable`) | exit 0, 0 errors, 0 CS86xx |
+| full suite with coverage | exit 0, 6587 total / 6587 passed / 0 failed (baseline 6569/6569/0; delta +18 new tests) |
+| filtered line coverage | 84.8790% against an 84.8712% baseline - no regression |
+| filtered branch coverage | 78.8523% against a 78.8454% baseline - no regression |
+| `EfcSelectionGuard.cs` coverage | 100% line, 100% branch |
+| file sizes | `EfcFormController.cs` 1079 of 1084; `EfcSelectionGuard.cs` 147 of 500; `EfcSelectionGuardTests.cs` 316 of 500 |

@@ -703,7 +703,13 @@ namespace QuickFiler.Controllers
                 SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
 
             var selectedFolder = SelectedFolder;
-            if (!EfcSelectionGuard.IsValidFilingSelection(selectedFolder))
+            // The D6-validated archive root read can throw; the OK button must degrade to
+            // rejecting rooted selections rather than tearing the form down.
+            string archiveRoot = EfcSelectionGuard.ResolveArchiveRootOrEmpty(
+                () => _globals.Ol.ArchiveRootPath,
+                message => logger.Error(message)
+            );
+            if (!EfcSelectionGuard.IsValidFilingSelection(selectedFolder, archiveRoot))
             {
                 MessageBox.Show("Please select a valid folder.");
                 return;
@@ -1035,7 +1041,8 @@ namespace QuickFiler.Controllers
             BindFolderRows(_dataModel.FolderHelper.FolderArray);
         }
 
-        internal bool IsValidSelection => EfcSelectionGuard.IsValidFilingSelection(SelectedFolder);
+        internal bool IsValidSelection =>
+            EfcSelectionGuard.IsValidCreationSelection(SelectedFolder);
 
         #endregion
 

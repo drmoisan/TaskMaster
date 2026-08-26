@@ -37,6 +37,18 @@ result to confirm the backslashes are right before building. The same sentinel t
 `.ps1` scripts you generate, which is more reliable than any level of inline `pwsh -Command`
 quoting.
 
+**Simpler variant, confirmed working on the #614 remediation cycle (2026-08-26):** author the file
+with the Write tool using a literal placeholder such as `@@BS@@` for EVERY backslash (so the written
+content contains zero backslashes and there is nothing to collapse), then run a tiny reusable
+`.ps1` in the scratchpad that does `$txt.Replace('@@BS@@', [string][char]92)` and rewrites the file
+with a BOM-less `UTF8Encoding($false)`. It reported the replacement count each time (20, 2, 6, 13),
+which doubles as a check that no sentinel was missed. This survives repeated `Edit` calls on the
+same file — edit with sentinels, re-run the desentinel script, done — and needs no Python.
+
+The same hazard bit a large Markdown append: a `cat > file <<'EOF'` heredoc carrying ~110 lines of
+prose died with ``unexpected EOF while looking for matching `'``. Write the body with the Write tool
+to the scratchpad and `cat` it onto the target instead of embedding prose in a heredoc.
+
 Related: [[preflight-gate-literal-extract-from-plan-not-retype]] covers the read side (extract gate
 literals programmatically); this note covers the write side. Verify with Python `str.count()` on a
 fixed string rather than `grep -F`, which returned 0 for a literal Python counted as 1.
