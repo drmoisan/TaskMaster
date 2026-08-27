@@ -29,7 +29,11 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var mockRepo = new MockRepository(MockBehavior.Loose);
             var mockApp = mockRepo.Create<Microsoft.Office.Interop.Outlook.Application>();
-            var globals = new TaskMaster.ApplicationGlobals(mockApp.Object, true);
+            var globals = new TaskMaster.ApplicationGlobals(
+                mockApp.Object,
+                true,
+                variable => variable == "OneDriveCommercial" ? @"C:\OneDrive" : null
+            );
 
             // Act
             var loader = new SmartSerializableLoader(globals);
@@ -37,6 +41,26 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Assert
             loader.Should().NotBeNull();
             loader.Config.Should().NotBeNull();
+        }
+
+        [TestMethod]
+        public void ApplicationGlobals_WithInjectedEnvironmentReader_LoadsOneDriveWithoutProcessEnvironment()
+        {
+            // Arrange
+            var mockRepo = new MockRepository(MockBehavior.Loose);
+            var mockApp = mockRepo.Create<Microsoft.Office.Interop.Outlook.Application>();
+            const string oneDriveRoot = @"C:\OneDrive";
+
+            // Act
+            var globals = new TaskMaster.ApplicationGlobals(
+                mockApp.Object,
+                loadBasic: true,
+                readEnvironmentVariable: variable =>
+                    variable == "OneDriveCommercial" ? oneDriveRoot : null
+            );
+
+            // Assert
+            globals.FS.SpecialFolders["OneDrive"].Should().Be(oneDriveRoot);
         }
 
         [TestMethod]
@@ -95,7 +119,11 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var mockRepo = new MockRepository(MockBehavior.Loose);
             var mockApp = mockRepo.Create<Microsoft.Office.Interop.Outlook.Application>();
-            var globals = new TaskMaster.ApplicationGlobals(mockApp.Object, true);
+            var globals = new TaskMaster.ApplicationGlobals(
+                mockApp.Object,
+                true,
+                variable => variable == "OneDriveCommercial" ? @"C:\OneDrive" : null
+            );
             var loader = new SmartSerializableLoader(globals);
             var json = "{\"Name\":\"test\"}";
             var binary = Encoding.UTF8.GetBytes(json);
@@ -113,7 +141,11 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var mockRepo = new MockRepository(MockBehavior.Loose);
             var mockApp = mockRepo.Create<Microsoft.Office.Interop.Outlook.Application>();
-            var globals = new TaskMaster.ApplicationGlobals(mockApp.Object, true);
+            var globals = new TaskMaster.ApplicationGlobals(
+                mockApp.Object,
+                true,
+                variable => variable == "OneDriveCommercial" ? @"C:\OneDrive" : null
+            );
             var loader = new SmartSerializableLoader(globals);
             var binary = new byte[0];
 
@@ -130,7 +162,11 @@ namespace UtilitiesCS.Test.ReusableTypeClasses
             // Arrange
             var mockRepo = new MockRepository(MockBehavior.Loose);
             var mockApp = mockRepo.Create<Microsoft.Office.Interop.Outlook.Application>();
-            var globals = new TaskMaster.ApplicationGlobals(mockApp.Object, true);
+            var globals = new TaskMaster.ApplicationGlobals(
+                mockApp.Object,
+                true,
+                variable => variable == "OneDriveCommercial" ? @"C:\OneDrive" : null
+            );
             var cts = new CancellationTokenSource();
             cts.Cancel();
 

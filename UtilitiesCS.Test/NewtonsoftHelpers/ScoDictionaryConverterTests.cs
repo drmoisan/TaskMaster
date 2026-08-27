@@ -25,7 +25,11 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             Console.SetOut(new DebugTextWriter());
             this.mockRepository = new MockRepository(MockBehavior.Strict);
             mockApplication = mockRepository.Create<Microsoft.Office.Interop.Outlook.Application>();
-            globals = new TaskMaster.ApplicationGlobals(mockApplication.Object, true);
+            globals = new TaskMaster.ApplicationGlobals(
+                mockApplication.Object,
+                true,
+                variable => variable == "OneDriveCommercial" ? @"C:\OneDrive" : null
+            );
         }
 
         internal class TestDerived : ScoDictionaryNew<string, int>
