@@ -1106,15 +1106,15 @@ verbatim.
 
 ### Issue #472 — navigation register/unregister digit-width desync
 
-- [ ] `QfcCollectionController` records the digit width used at registration in a new `private int _registeredDigits` field, assigned inside `RegisterNavigation` from the value that method already captures.
-- [ ] `UnregisterNavigation` selects its key format from `_registeredDigits` and contains **zero** reads of the `Digits` property. Verified by a source search of `QuickFiler/Controllers/QfcCollectionController.cs` showing no occurrence of `Digits` within the `UnregisterNavigation` body.
-- [ ] The format selection is written as `_registeredDigits == 2 ? "00" : ""` so that a controller built via `FormatterServices.GetUninitializedObject` (`_registeredDigits == 0`) behaves as single-digit. Verified by code review and by the four pre-existing navigation tests below continuing to pass.
-- [ ] Registering at 10 items and unregistering at 9 leaves no orphaned `"0"`-prefixed navigation key other than the single `"10"` entry the loop bound cannot reach. Verified by the named width-fidelity test in the new file `QuickFiler.Test/Controllers/QfcCollectionControllerNavigationDigitsTests.cs`.
-- [ ] The width-fidelity test carries an XML documentation comment attributing the residual `"10"` entry to the separately-promoted count-mismatch defect and stating that it is out of this feature's scope.
-- [ ] The mirror-direction test (register at 9 items with `_digits = 1`, grow to 10, unregister) asserts the same width-fidelity property and passes.
-- [ ] The four pre-existing navigation tests in `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs` (at `:409`, `:430`, `:452`, `:474` as of base commit `988e819b`) pass unmodified, and that file's `[TestMethod]` count is unchanged from its state at the branch head.
-- [ ] `QuickFiler/Interfaces/IQfcCollectionController.cs` is not modified. Verified by `git status` / the branch diff showing the path absent.
-- [ ] The #472 regression test was observed **failing before** the `QfcCollectionController.cs` change and **passing after**, with both runs recorded in `docs/features/active/quickfiler-keyboard-action-defects-444/evidence/qa-gates/`.
+- [x] `QfcCollectionController` records the digit width used at registration in a new `private int _registeredDigits` field, assigned inside `RegisterNavigation` from the value that method already captures.
+- [x] `UnregisterNavigation` selects its key format from `_registeredDigits` and contains **zero** reads of the `Digits` property. Verified by a source search of `QuickFiler/Controllers/QfcCollectionController.cs` showing no occurrence of `Digits` within the `UnregisterNavigation` body.
+- [x] The format selection is written as `_registeredDigits == 2 ? "00" : ""` so that a controller built via `FormatterServices.GetUninitializedObject` (`_registeredDigits == 0`) behaves as single-digit. Verified by code review and by the four pre-existing navigation tests below continuing to pass.
+- [x] Registering at 10 items and unregistering at 9 leaves no orphaned `"0"`-prefixed navigation key other than the single `"10"` entry the loop bound cannot reach. Verified by the named width-fidelity test in the new file `QuickFiler.Test/Controllers/QfcCollectionControllerNavigationDigitsTests.cs`.
+- [x] The width-fidelity test carries an XML documentation comment attributing the residual `"10"` entry to the separately-promoted count-mismatch defect and stating that it is out of this feature's scope.
+- [x] The mirror-direction test (register at 9 items with `_digits = 1`, grow to 10, unregister) asserts the same width-fidelity property and passes.
+- [x] The four pre-existing navigation tests in `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs` (at `:409`, `:430`, `:452`, `:474` as of base commit `988e819b`) pass unmodified, and that file's `[TestMethod]` count is unchanged from its state at the branch head.
+- [x] `QuickFiler/Interfaces/IQfcCollectionController.cs` is not modified. Verified by `git status` / the branch diff showing the path absent.
+- [x] The #472 regression test was observed **failing before** the `QfcCollectionController.cs` change and **passing after**, with both runs recorded in `docs/features/active/quickfiler-keyboard-action-defects-444/evidence/qa-gates/`.
 - [ ] The unbracketed-removal count-mismatch defect described in `### Downstream notes` item 3 is promoted through the feature-promotion lifecycle into a new potential entry **and** a new GitHub issue, and the issue number is recorded in this feature's PR body. Prose in this folder alone does not satisfy this criterion.
 
 ### Issue #482 — expansion registry divergence
