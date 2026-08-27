@@ -7,10 +7,10 @@ The checkpoint JSON remains the machine-authoritative source.
 
 - Integration branch: `epic/quickfiler-bug-family-integration`
 - Manifest: `docs/features/epics/quickfiler-bug-family/epic.md`
-- Integration branch tip: `808bf460fb4ad34b38268fd14cb103c7756c7e7a`
-- Current wave: 0
+- Integration branch tip: `b697a2bd`
+- Current wave: 1
 - Max parallel features: 4
-- Last updated: 2026-08-26T21-40Z
+- Last updated: 2026-08-26T21-52Z
 
 **Progress: 4 of 12 features merged into the integration branch.**
 
@@ -26,10 +26,10 @@ The checkpoint JSON remains the machine-authoritative source.
 | `qfc-collection-controller-defects-468` | 468 | 0 | - | `merged` | [#636](https://github.com/drmoisan/TaskMaster/pull/636) | 808bf460fb4a | 2026-08-26T08-30 | 2026-08-26T21-29Z | 2026-08-26T21-36Z | - |
 | `qfc-item-controller-defects-484` | 484 | 0 | - | `merged` | [#619](https://github.com/drmoisan/TaskMaster/pull/619) | 363bfcdd4da5 | 2026-08-26T08-30 | 2026-08-26T14-32Z | 2026-08-26T14-33Z | - |
 | `quickfiler-bug-family-446` | 446 | 0 | - | `merged` | [#625](https://github.com/drmoisan/TaskMaster/pull/625) | 902e5ce2bf5d | 2026-08-26T08-30 | 2026-08-26T19-12Z | 2026-08-26T19-14Z | - |
-| `quickfiler-home-controller-metrics-442` | 442 | 0 | - | `worktree_created` | - | - | 2026-08-26T10-39 | - | - | - |
-| `quickfiler-test-uithread-dispatcher-493` | 493 | 0 | - | `not_started` | - | - | - | - | - | - |
-| `webview2-host-initializer-defects-476` | 476 | 0 | - | `not_started` | - | - | - | - | - | - |
-| `quickfiler-keyboard-action-defects-444` | 444 | 1 | 468 | `not_started` | - | - | - | - | - | - |
+| `quickfiler-home-controller-metrics-442` | 442 | 0 | - | `worktree_created` | - | - | 2026-08-26T21-52Z | - | - | - |
+| `quickfiler-test-uithread-dispatcher-493` | 493 | 0 | - | `worktree_created` | - | - | 2026-08-26T21-52Z | - | - | - |
+| `webview2-host-initializer-defects-476` | 476 | 0 | - | `worktree_created` | - | - | 2026-08-26T21-52Z | - | - | - |
+| `quickfiler-keyboard-action-defects-444` | 444 | 1 | 468 | `worktree_created` | - | - | 2026-08-26T21-52Z | - | - | - |
 | `efc-controller-surface-defects-464` | 464 | 2 | 484, 444 | `not_started` | - | - | - | - | - | - |
 | `itemviewer-surface-defects-489` | 489 | 2 | 484, 444 | `not_started` | - | - | - | - | - | - |
 | `itemviewer-breadcrumb-lifecycle-defects-488` | 488 | 3 | 489 | `not_started` | - | - | - | - | - | - |
@@ -43,13 +43,21 @@ The checkpoint JSON remains the machine-authoritative source.
 
 ## Integration Branch History
 
-`61edc19b (prepared) -> 363bfcdd (484, PR #619) -> 902e5ce2 (446, PR #625) -> 8c8f7695 (498, PR #626) -> 141efcb8 (epic-status.md, docs-only) -> 808bf460 (468, PR #636)`
+`61edc19b (prepared) -> 363bfcdd (484, PR #619) -> 902e5ce2 (446, PR #625) -> 8c8f7695 (498, PR #626) -> 141efcb8 (epic-status.md, docs-only) -> 808bf460 (468, PR #636) -> b697a2bd (epic-status.md regeneration, docs-only)`
 
-## Session Notes (fan-in-only run, 2026-08-26)
+## Session Notes (2026-08-26)
 
-This run was scoped to fan-in only: land the in-flight children into the integration
-branch and stop. No new feature was launched, prepared, or given a worktree, and the final
-integration-to-`main` pull request was deliberately not opened.
+The run began under a fan-in-only mandate — land the in-flight children and stop. That
+mandate was lifted once the four in-flight features landed, and normal wave-scheduled
+execution resumed. The final integration-to-`main` pull request remains deliberately
+unopened while features are still unmerged.
+
+**In flight now:** 444, 442, 476 and 493, launched 2026-08-26T21-52Z against integration
+tip `125c36b0` (which already contains `origin/main`). 501 is ready and held back only
+because `max_parallel_features` is 4; it has no downstream dependents, so holding it does
+not extend the critical path. 464 and 489 remain barrier-blocked until 444 merges, and 488
+until 489 merges. 442 is a resume-in-place: the crashed session left it zero commits but
+twelve uncommitted entries of real work, which are being preserved rather than restarted.
 
 - **484** merged as PR #619 before this session.
 - **446** merged as PR #625 before this session; the resume briefing's claim that it still
