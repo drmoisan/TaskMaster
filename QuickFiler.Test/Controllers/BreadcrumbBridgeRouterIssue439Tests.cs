@@ -587,8 +587,8 @@ namespace QuickFiler.Test.Controllers
                 .GetAwaiter()
                 .GetResult();
 
-            // Act: the host event selects the exact archive root; direct typed activation then
-            // selects a verified hierarchy path outside that root.
+            // Act: the host event targets the exact archive root and the direct typed
+            // activation targets a path outside it; both are now deterministic non-selections.
             host.Raise(
                 value => value.MessageReceived += null,
                 host.Object,
@@ -602,9 +602,9 @@ namespace QuickFiler.Test.Controllers
                 .GetResult();
 
             // Assert
-            selected.Should().Equal(string.Empty, @"\External\Clients");
-            router.SelectedFolderPath.Should().Be(@"\External\Clients");
-            host.Verify(value => value.PostMessageJson(It.IsAny<string>()), Times.Exactly(2));
+            selected.Should().BeEmpty();
+            router.SelectedFolderPath.Should().BeNull();
+            host.Verify(value => value.PostMessageJson(It.IsAny<string>()), Times.Never);
             provider.Verify(
                 value => value.ResolveLeafKeyAsync(hierarchyTarget, It.IsAny<CancellationToken>()),
                 Times.Once

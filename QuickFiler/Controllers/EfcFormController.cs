@@ -703,7 +703,7 @@ namespace QuickFiler.Controllers
                 SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
 
             var selectedFolder = SelectedFolder;
-            if (selectedFolder is null || selectedFolder.StartsWith("===="))
+            if (!EfcSelectionGuard.IsValidFilingSelection(selectedFolder))
             {
                 MessageBox.Show("Please select a valid folder.");
                 return;
@@ -1035,19 +1035,8 @@ namespace QuickFiler.Controllers
             BindFolderRows(_dataModel.FolderHelper.FolderArray);
         }
 
-        internal bool IsValidSelection
-        {
-            get
-            {
-                var selectedFolder = SelectedFolder;
-                return !(
-                    selectedFolder is null
-                    || selectedFolder == ""
-                    || selectedFolder.Length < 3
-                    || selectedFolder.Substring(0, 3) == "==="
-                );
-            }
-        }
+        internal bool IsValidSelection =>
+            EfcSelectionGuard.IsValidCreationSelection(SelectedFolder);
 
         #endregion
 

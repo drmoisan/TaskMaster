@@ -622,6 +622,7 @@
     <Compile Include="OutlookObjects\Folder\BreadcrumbHtmlRenderer.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbMessageCodec.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbMessages.cs" />
+    <Compile Include="OutlookObjects\Folder\ArchiveStemContract.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRow.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRowBuilder.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbSegment.cs" />

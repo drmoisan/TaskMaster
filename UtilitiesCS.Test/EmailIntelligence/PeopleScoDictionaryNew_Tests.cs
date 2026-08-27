@@ -24,7 +24,11 @@ namespace UtilitiesCS.Test.EmailIntelligence
         public void Constructor_WithGlobals_ShouldSetGlobals()
         {
             var mockApp = new Mock<Microsoft.Office.Interop.Outlook.Application>();
-            var globals = new TaskMaster.ApplicationGlobals(mockApp.Object, true);
+            var globals = new TaskMaster.ApplicationGlobals(
+                mockApp.Object,
+                true,
+                variable => variable == "OneDriveCommercial" ? @"C:\OneDrive" : null
+            );
 
             var dict = new PeopleScoDictionaryNew(globals);
 

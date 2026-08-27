@@ -21,6 +21,7 @@ namespace TaskMaster
         );
 
         private Application _outlookApp;
+        private readonly Func<string, string> _readEnvironmentVariable;
 
         // Diagnostic startup-timing instrumentation (issue #202). The recorder is selected in
         // LoadAsync from Settings.Default.StartupTimingEnabled: the concrete recorder when
@@ -31,18 +32,19 @@ namespace TaskMaster
         private TimeSpan _loadBasicElapsed;
 
         public ApplicationGlobals(Application olApp)
-        {
-            _outlookApp = olApp;
-            BasicLoaded = new Lazy<bool>(() =>
-            {
-                LoadBasicMethod();
-                return true;
-            });
-        }
+            : this(olApp, false, null) { }
 
         public ApplicationGlobals(Application olApp, bool loadBasic)
+            : this(olApp, loadBasic, null) { }
+
+        public ApplicationGlobals(
+            Application olApp,
+            bool loadBasic,
+            Func<string, string> readEnvironmentVariable
+        )
         {
             _outlookApp = olApp;
+            _readEnvironmentVariable = readEnvironmentVariable;
             BasicLoaded = new Lazy<bool>(() =>
             {
                 LoadBasicMethod();
@@ -106,7 +108,10 @@ namespace TaskMaster
             // negligible overhead, satisfying the "negligible overhead when flag off" constraint.
             // Stopwatch (hardware-counter based) is used instead of DateTime.Now/UtcNow.
             var stopwatch = Stopwatch.StartNew();
-            _fs = new AppFileSystemFolderPaths();
+            _fs =
+                _readEnvironmentVariable == null
+                    ? new AppFileSystemFolderPaths()
+                    : new AppFileSystemFolderPaths(_readEnvironmentVariable);
             _olObjects = new AppOlObjects(_outlookApp, this);
             _toDoObjects = new AppToDoObjects(this);
             _autoFileObjects = new AppAutoFileObjects(this);

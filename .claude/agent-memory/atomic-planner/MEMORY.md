@@ -1,5 +1,9 @@
 # Atomic Planner Memory Index
 
+- [Deletion-adjusted coverage no-regression gate](deletion-adjusted-coverage-no-regression-gate.md) — deleting covered lines makes `rate_post >= rate_base` unsatisfiable; gate on covered/valid counters
+
+- [Verify test provenance before planning a deletion](verify-test-provenance-before-planning-deletion.md) — in a revert plan, read the test at the pre-cycle commit; a two-arg call shape doesn't prove the cycle added it
+- [#614 store-root leak plan seams](project_614_store_root_leak_plan_seams.md) — AC25 net non-growth (3 over-limit files); E1 SelectRow out-of-root-only pinning; remediation C1: behavior-preserving seam phase reconciles fail-before with a signature change, resolver-in-guard beats inline try/catch on line budget + coverage, net48 IsNullOrWhiteSpace doesn't narrow (`archiveRoot!`)
 - [Agent worktrees need SDK + NuGet + analyzer-backfill bootstrap](agent-worktrees-need-sdk-and-nuget-bootstrap.md) — no `.dotnet-sdk`, no `packages/`, and a clean restore still misses the skewed analyzer versions (CS0006, not a warning); three Phase 0 tasks
 - [/Logger:trx needs /ResultsDirectory](trx-needs-resultsdirectory.md) — TRX lands in `TestResults\` relative to cwd; TRX-existence-under-evidence acceptance is unsatisfiable without it, and the clean-tree gate won't catch it
 - [Per-task TRX subdirectory](trx-needs-resultsdirectory.md) — a shared `/ResultsDirectory:` makes "ten distinct TRX files" ambiguous once `[expect-fail]` runs deposit earlier TRX there; give each task a `p#-t#` segment

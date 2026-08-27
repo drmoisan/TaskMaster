@@ -21,7 +21,11 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             Console.SetOut(new DebugTextWriter());
             mockRepository = new MockRepository(MockBehavior.Loose);
             mockApplication = mockRepository.Create<Microsoft.Office.Interop.Outlook.Application>();
-            globals = new TaskMaster.ApplicationGlobals(mockApplication.Object, true);
+            globals = new TaskMaster.ApplicationGlobals(
+                mockApplication.Object,
+                true,
+                variable => variable == "OneDriveCommercial" ? @"C:\OneDrive" : null
+            );
         }
 
         [TestMethod]

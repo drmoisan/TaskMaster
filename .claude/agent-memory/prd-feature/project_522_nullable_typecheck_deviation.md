@@ -1,11 +1,13 @@
 ---
 name: nullable-typecheck-deviation-522
-description: CLAUDE.md's type-check command with /p:Nullable=enable is known-defective (issue #522); specs must bind verification to CI's command and record the deviation explicitly
+description: RESOLVED in-repo as of 2026-08-26 — CLAUDE.md now documents the CI-parity type-check command and forbids /p:Nullable=enable and /t:Build; quote CLAUDE.md directly, no deviation note needed
 metadata:
   type: project
 ---
 
-The `CLAUDE.md` type-check command `msbuild ... /p:Nullable=enable /p:TreatWarningsAsErrors=true` is known-defective and tracked as issue #522. Nullable is per-file opt-in in this solution (no `TaskMaster/Ribbon/` file carries a `#nullable` pragma; only five `AppGlobals` files do), so forcing `/p:Nullable=enable` solution-wide reports 200-414 errors that are red on `main` regardless of any change. CI (`.github/workflows/ci.yml`) deliberately omits the flag.
+**Status update (verified 2026-08-26, worktree `2026-08-26T09-44`).** CLAUDE.md § C#1.2 and § C#1.3 have been fixed. They now prescribe `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true` and state in-line that `/p:Nullable=enable` must **not** be added and `/t:Build` must **not** be substituted for `/t:Rebuild`, each with the reason. A spec's toolchain AC can therefore quote CLAUDE.md verbatim and no longer needs a "deliberate deviation from CLAUDE.md, see #522" note — writing one now would confuse a reviewer. Keep the *reasons* below: they are still the substance a spec should assert (non-vacuity of the MSBuild steps).
+
+**Historical record (why the commands are shaped this way).** The `CLAUDE.md` type-check command `msbuild ... /p:Nullable=enable /p:TreatWarningsAsErrors=true` was known-defective and tracked as issue #522. Nullable is per-file opt-in in this solution (no `TaskMaster/Ribbon/` file carries a `#nullable` pragma; only five `AppGlobals` files do), so forcing `/p:Nullable=enable` solution-wide reports 200-414 errors that are red on `main` regardless of any change. CI (`.github/workflows/ci.yml`) deliberately omits the flag.
 
 **Why:** Encoding the CLAUDE.md command verbatim into a spec's toolchain AC creates an unsatisfiable dead gate (same failure class as [[ac-gates-verify-satisfiability]]). First recorded in the #505/#506/#518 spec (2026-08-08).
 
