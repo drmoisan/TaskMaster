@@ -1,17 +1,14 @@
-using System;
-using System.Collections.Generic;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuickFiler.Controllers;
+using UtilitiesCS.EmailIntelligence.EmailParsingSorting;
 
 namespace QuickFiler.Test.Controllers
 {
     /// <summary>
     /// Issue #614 tests for <see cref="EfcSelectionGuard"/> (defect D9) and its remediation
-    /// cycle 1 corrections: the filing predicate, the folder-creation predicate, and the
-    /// throw-tolerant archive-root resolver. The predicates are pure and the resolver takes
-    /// delegate seams supplied inline, so no collaborator requires mocking and Moq is
-    /// deliberately not used here.
+    /// cycle corrections: the filing predicate and the folder-creation predicate. Both predicates
+    /// are pure, so no collaborator requires mocking and Moq is deliberately not used here.
     /// </summary>
     [TestClass]
     public class EfcSelectionGuardTests
@@ -22,31 +19,28 @@ namespace QuickFiler.Test.Controllers
         public void IsValidFilingSelection_NullSelection_IsRejected()
         {
             // Arrange / Act / Assert
-            EfcSelectionGuard.IsValidFilingSelection(null, @"\Archive").Should().BeFalse();
+            EfcSelectionGuard.IsValidFilingSelection(null).Should().BeFalse();
         }
 
         [TestMethod]
         public void IsValidFilingSelection_EmptySelection_IsRejected()
         {
             // Arrange / Act / Assert
-            EfcSelectionGuard.IsValidFilingSelection(string.Empty, @"\Archive").Should().BeFalse();
+            EfcSelectionGuard.IsValidFilingSelection(string.Empty).Should().BeFalse();
         }
 
         [TestMethod]
         public void IsValidFilingSelection_WhitespaceSelection_IsRejected()
         {
             // Arrange / Act / Assert
-            EfcSelectionGuard.IsValidFilingSelection("    ", @"\Archive").Should().BeFalse();
+            EfcSelectionGuard.IsValidFilingSelection("    ").Should().BeFalse();
         }
 
         [TestMethod]
         public void IsValidFilingSelection_BannerSentinel_IsRejected()
         {
             // Arrange / Act / Assert: the suggestion banner is not a filing destination.
-            EfcSelectionGuard
-                .IsValidFilingSelection("==== SUGGESTIONS ====", @"\Archive")
-                .Should()
-                .BeFalse();
+            EfcSelectionGuard.IsValidFilingSelection("==== SUGGESTIONS ====").Should().BeFalse();
         }
 
         [TestMethod]
@@ -54,20 +48,20 @@ namespace QuickFiler.Test.Controllers
         {
             // Arrange / Act / Assert: D1/D9 protection - a store root is not under the archive.
             EfcSelectionGuard
-                .IsValidFilingSelection(@"\\mailbox@example.com", @"\Archive")
+                .IsValidFilingSelection(@"\\mailbox@example.com")
                 .Should()
-                .BeFalse("a store-rooted Outlook path is not resolvable against the archive root");
+                .BeFalse("a store-rooted Outlook path is not an archive-relative filing stem");
         }
 
         [TestMethod]
         public void IsValidFilingSelection_SingleSeparatorLeadingSelection_IsRejected()
         {
-            // Arrange / Act / Assert: with no resolvable root every rooted value is rejected,
-            // which is the ResolveArchiveRootOrEmpty degrade path.
+            // Arrange / Act / Assert: a leading separator makes the value a full Outlook path,
+            // which is rejected as such at the filing guard.
             EfcSelectionGuard
-                .IsValidFilingSelection(@"\Archive\Clients", null)
+                .IsValidFilingSelection(@"\Archive\Clients")
                 .Should()
-                .BeFalse("a rooted value cannot be resolved when no archive root is available");
+                .BeFalse("a rooted value is not an archive-relative filing stem");
         }
 
         [TestMethod]
@@ -75,7 +69,7 @@ namespace QuickFiler.Test.Controllers
         {
             // Arrange / Act / Assert
             EfcSelectionGuard
-                .IsValidFilingSelection(@"C:\Users\testuser\OneDrive - Contoso", @"\Archive")
+                .IsValidFilingSelection(@"C:\Users\testuser\OneDrive - Contoso")
                 .Should()
                 .BeFalse("a drive-rooted filesystem path is not an archive-relative stem");
         }
@@ -84,10 +78,7 @@ namespace QuickFiler.Test.Controllers
         public void IsValidFilingSelection_ValidRelativeStem_IsAccepted()
         {
             // Arrange / Act / Assert
-            EfcSelectionGuard
-                .IsValidFilingSelection(@"Clients\North", @"\Archive")
-                .Should()
-                .BeTrue();
+            EfcSelectionGuard.IsValidFilingSelection(@"Clients\North").Should().BeTrue();
         }
 
         [TestMethod]
@@ -99,7 +90,7 @@ namespace QuickFiler.Test.Controllers
             {
                 // Arrange / Act / Assert
                 EfcSelectionGuard
-                    .IsValidFilingSelection(name, @"\Archive")
+                    .IsValidFilingSelection(name)
                     .Should()
                     .BeTrue($"filing to the archive folder '{name}' must remain possible");
             }
@@ -111,35 +102,9 @@ namespace QuickFiler.Test.Controllers
             // CR-1 regression: the shortest possible relative stem is still a valid destination.
             // Arrange / Act / Assert
             EfcSelectionGuard
-                .IsValidFilingSelection("A", @"\Archive")
+                .IsValidFilingSelection("A")
                 .Should()
                 .BeTrue("filing to the archive folder 'A' must remain possible");
-        }
-
-        [TestMethod]
-        public void IsValidFilingSelection_RootedTargetUnderArchiveRoot_IsAccepted()
-        {
-            // CR-2 regression: the guard must agree with BreadcrumbBridgeRouter.SelectRow, which
-            // is scope-pinned to pass an at-or-under-root rooted target through verbatim. This is
-            // the same case-insensitive value asserted by
-            // Issue439AlreadyRootedTargetRemainsUnchangedWithCaseInsensitiveArchiveMatch.
-            // Arrange / Act / Assert
-            EfcSelectionGuard
-                .IsValidFilingSelection(@"\aRcHiVe\Clients\North", @"\Archive")
-                .Should()
-                .BeTrue("a rooted target under the archive root resolves and is selectable");
-        }
-
-        [TestMethod]
-        public void IsValidFilingSelection_ArchiveRootExactTarget_IsAccepted()
-        {
-            // CR-2 recorded consequence: TryMakeArchiveRelative returns true for the exact root,
-            // so the root itself is a resolvable filing target at this surface.
-            // Arrange / Act / Assert
-            EfcSelectionGuard
-                .IsValidFilingSelection(@"\Archive", @"\Archive")
-                .Should()
-                .BeTrue("the archive root resolves against itself");
         }
 
         [TestMethod]
@@ -148,9 +113,9 @@ namespace QuickFiler.Test.Controllers
             // D1 guard rail: narrowing the guard for CR-2 must not admit an above-root path.
             // Arrange / Act / Assert
             EfcSelectionGuard
-                .IsValidFilingSelection(@"\External\Clients", @"\Archive")
+                .IsValidFilingSelection(@"\External\Clients")
                 .Should()
-                .BeFalse("a path outside the archive root does not resolve against it");
+                .BeFalse("a rooted path is not an archive-relative filing stem");
         }
 
         [TestMethod]
@@ -159,33 +124,93 @@ namespace QuickFiler.Test.Controllers
             // D4 guard rail: a cross-store path still fails the resolution test.
             // Arrange / Act / Assert
             EfcSelectionGuard
-                .IsValidFilingSelection(@"\\other-mailbox@example.com\Archive\Clients", @"\Archive")
+                .IsValidFilingSelection(@"\\other-mailbox@example.com\Archive\Clients")
                 .Should()
-                .BeFalse("a cross-store path does not resolve against the local archive root");
+                .BeFalse("a cross-store rooted path is not an archive-relative filing stem");
         }
 
         [TestMethod]
         public void IsValidFilingSelection_SeparatorBoundaryNearMiss_IsRejected()
         {
-            // D9 guard rail: the resolution test is separator-terminated, so a sibling that
-            // merely extends the root name is not under the root.
+            // D9 guard rail: a separator-leading sibling value remains a full Outlook path.
             // Arrange / Act / Assert
             EfcSelectionGuard
-                .IsValidFilingSelection(@"\Archive2\Clients", @"\Archive")
+                .IsValidFilingSelection(@"\Archive2\Clients")
                 .Should()
-                .BeFalse("Archive2 is a sibling of Archive, not a child of it");
+                .BeFalse("a separator-leading value is not an archive-relative filing stem");
         }
 
         [TestMethod]
-        public void IsValidFilingSelection_RootedTargetWithUnavailableRoot_IsRejected()
+        public void IsValidFilingSelection_RootedTargetUnderArchiveRoot_IsRejected()
         {
-            // Degrade-path guard rail: an empty root is what ResolveArchiveRootOrEmpty yields
-            // when the archive root cannot be resolved, and it must reject every rooted value.
+            // RC-1 inversion: rooted values are never filing stems here; normalization is deferred to issue #637.
             // Arrange / Act / Assert
             EfcSelectionGuard
-                .IsValidFilingSelection(@"\Archive\Clients", string.Empty)
+                .IsValidFilingSelection(@"\aRcHiVe\Clients\North")
                 .Should()
-                .BeFalse("no rooted value can be resolved without an archive root");
+                .BeFalse(
+                    "a rooted value is never a filing stem at this surface and producer-side normalization is deferred to issue #637"
+                );
+        }
+
+        [TestMethod]
+        public void IsValidFilingSelection_ArchiveRootExactTarget_IsRejected()
+        {
+            // RC-1 inversion: the archive root itself is not an archive-relative filing stem.
+            // Arrange / Act / Assert
+            EfcSelectionGuard
+                .IsValidFilingSelection(@"\Archive")
+                .Should()
+                .BeFalse("the archive root itself is not an archive-relative filing stem");
+        }
+
+        [TestMethod]
+        public void Issue614_GuardAcceptedSelection_DoesNotThrowAtFilingBoundary()
+        {
+            // RC-1 composition guard: every accepted filing value must survive the D4 ResolvePaths boundary.
+            // Arrange
+            string[] candidates =
+            {
+                @"Clients\North",
+                "HR",
+                "A",
+                @"\aRcHiVe\Clients\North",
+                @"\Archive",
+                @"\Archive\Clients",
+                @"\External\Clients",
+                @"\\mailbox@example.com",
+                @"C:\Users\testuser\OneDrive - Contoso",
+                "==== SUGGESTIONS ====",
+            };
+            int evaluated = 0;
+
+            foreach (string candidate in candidates)
+            {
+                if (!EfcSelectionGuard.IsValidFilingSelection(candidate))
+                {
+                    continue;
+                }
+
+                var config = new EmailFilerConfig
+                {
+                    Globals = null,
+                    OlAncestor = @"\\mailbox@example.com\Archive",
+                    DestinationOlStem = candidate,
+                    FsAncestorEquivalent = @"C:\Mail",
+                };
+                evaluated++;
+
+                // Act
+                System.Action act = () => config.ResolvePaths();
+
+                // Assert
+                act.Should()
+                    .NotThrow($"the filing predicate accepted '{candidate}' as a filing stem");
+            }
+
+            evaluated
+                .Should()
+                .BeGreaterThan(0, "the candidate matrix must exercise at least one accepted value");
         }
 
         #endregion
@@ -264,51 +289,6 @@ namespace QuickFiler.Test.Controllers
         {
             // Arrange / Act / Assert
             EfcSelectionGuard.IsValidCreationSelection(@"Clients\North").Should().BeTrue();
-        }
-
-        #endregion
-
-        #region Archive-root resolver
-
-        [TestMethod]
-        public void ResolveArchiveRootOrEmpty_AccessorSucceeds_ReturnsRootAndLogsNothing()
-        {
-            // A resolvable archive root is returned verbatim and emits no degrade diagnostic.
-            // Arrange
-            var diagnostics = new List<string>();
-
-            // Act
-            string root = EfcSelectionGuard.ResolveArchiveRootOrEmpty(
-                () => @"\Archive",
-                message => diagnostics.Add(message)
-            );
-
-            // Assert
-            root.Should().Be(@"\Archive");
-            diagnostics.Should().BeEmpty("a successful read must not emit a degrade diagnostic");
-        }
-
-        [TestMethod]
-        public void ResolveArchiveRootOrEmpty_AccessorThrowsInvalidOperation_DegradesToEmpty()
-        {
-            // The one documented accessor failure degrades to an empty root plus a fixed,
-            // value-free diagnostic instead of tearing down the OK-button path.
-            // Arrange
-            var diagnostics = new List<string>();
-
-            // Act
-            string root = EfcSelectionGuard.ResolveArchiveRootOrEmpty(
-                () => throw new InvalidOperationException("archive root unresolvable"),
-                message => diagnostics.Add(message)
-            );
-
-            // Assert
-            root.Should().BeEmpty("the degrade path yields an empty root");
-            diagnostics
-                .Should()
-                .ContainSingle()
-                .Which.Should()
-                .Be(EfcSelectionGuard.RootUnavailableDiagnostic);
         }
 
         #endregion

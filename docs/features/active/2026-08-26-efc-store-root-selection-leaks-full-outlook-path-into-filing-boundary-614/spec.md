@@ -1063,9 +1063,12 @@ the sole authoritative AC source for this `full-bug` issue.
       `Replace` + `Substring(1)`. Unit tests cover under-root, store-root, cross-store, and
       case-differing-ancestor inputs. Both live callers
       (`EfcFormController.cs:500-507` and `:778-787`) continue to work.
-- [x] **AC16 (D9).** `EfcFormController.ActionOkAsync` (`:706`) and `IsValidSelection` (`:1038-1050`)
-      share one predicate. Tests prove OK rejects `null`, `string.Empty`, a `"===="`-prefixed
-      sentinel, and a non-relative selection, and accepts a valid relative stem.
+- [x] **AC16 (D9).** `EfcFormController.ActionOkAsync` and the `IsValidSelection` property delegate to
+      two scope-specific predicates in one shared guard type (`EfcSelectionGuard`): the filing predicate
+      `IsValidFilingSelection` rejects `null`, `string.Empty`, whitespace, a `"===="`-prefixed sentinel,
+      and any full Outlook path, and carries no minimum-length rule; the creation predicate
+      `IsValidCreationSelection` additionally enforces the three-character minimum. Tests prove each
+      rejection and that a valid relative stem is accepted.
 - [x] **AC17 (primary regression test, fails before and passes after).**
       `UtilitiesCS.Test/EmailIntelligence/EmailFilerConfig_Tests.cs` contains
       `Issue614_ResolvePaths_WithStoreRootStem_RejectsNonRelativeStemWithoutLeakingIdentifiers` with

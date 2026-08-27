@@ -301,3 +301,28 @@ edits are out of scope for this cycle, and this paragraph is the recorded readin
 | filtered branch coverage | 78.8523% against a 78.8454% baseline - no regression |
 | `EfcSelectionGuard.cs` coverage | 100% line, 100% branch |
 | file sizes | `EfcFormController.cs` 1079 of 1084; `EfcSelectionGuard.cs` 147 of 500; `EfcSelectionGuardTests.cs` 316 of 500 |
+
+## Remediation cycle 2 — partial revert
+
+### Net effect against pre-remediation head `02092504`
+
+- **Rooted-selection OK path:** at `02092504`, the guard rejected the rooted selection and retained the dialog. Remediation cycle 1 widened the guard, allowing the rooted value to reach `EmailFilerConfig.ResolvePaths` after `_formViewer.Hide()` and produce an unhandled `ArgumentException`. Cycle 2 restores rejection and the dialog. This path is no worse than `02092504` and is better than `main`, where the same input class produced the original #614 filing-boundary crash.
+- **Relative-stem filing path:** unchanged across `02092504`, cycle 1, and cycle 2. Valid archive-relative stems continue to file.
+- **Short-name filing path:** improved relative to `02092504`. The CR-1 behavior remains: one- and two-character relative stems pass `IsValidFilingSelection` and can file.
+- **Folder-creation path:** the cycle-1 tightening remains through `IsValidCreationSelection`, including its three-character minimum.
+- **Root-unresolvable OK path:** identical to `02092504`; the filing guard no longer reads the archive root. The separate `EfcDataModel.MoveToFolderAsync` string-overload read remains unchanged across all three heads and is deferred to issue #637.
+
+Remediation cycle 1 introduced a crash on the rooted-selection path. Re-audit identified the regression, and cycle 2 reverts the guard widening that caused it. The producer-side CR-2 normalization remains deferred to issue #637.
+
+### RC closures and acceptance-criteria correction
+
+- **RC-1:** `QuickFiler/Controllers/EfcSelectionGuard.cs` again rejects every full Outlook path with its single-argument filing predicate. `QuickFiler/Controllers/EfcFormController.cs` again calls that predicate without resolving an archive root. `QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs` pins both rooted-selection inversions and the filing-boundary composition contract.
+- **RC-2:** `spec.md` AC16 was amended. The old criterion said the call sites “share one predicate” and that OK rejects “a non-relative selection.” The new criterion states that they delegate to “two scope-specific predicates” in one `EfcSelectionGuard`; the filing predicate rejects any full Outlook path without a minimum-length rule, while the creation predicate additionally enforces the three-character minimum.
+- **RC-3:** the throw-tolerant resolver, its diagnostic constant, and the `ActionOkAsync` comment/call site were removed. `evidence/other/resolver-consumer-check.2026-08-26T22-19.md` confirms there are no remaining C# consumers.
+- **RC-4:** `UtilitiesCS.Test/EmailIntelligence/EmailFilerConfig_Tests.cs` adds `GetStem_FolderPathOutsideAncestor_ReturnsInputTrimmedOfLeadingSeparators`, covering the fallback ternary without changing `EmailFilerConfig.cs`.
+
+The four modified code/test files are `QuickFiler/Controllers/EfcSelectionGuard.cs`, `QuickFiler/Controllers/EfcFormController.cs`, `QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs`, and `UtilitiesCS.Test/EmailIntelligence/EmailFilerConfig_Tests.cs`; the requirements amendment is confined to AC16 in `spec.md`.
+
+### Fail-before and pass-after mechanics
+
+The composition regression is recorded in `evidence/regression-testing/revert-expect-fail.2026-08-26T22-18.md` and `evidence/regression-testing/revert-pass-after.2026-08-26T22-20.md`. In the fail-before run, only the invocation shape reflected the cycle-1 two-argument guard; the rooted values were accepted and the accepted rooted value threw at `EmailFilerConfig.ResolvePaths`. In the pass-after run, the test data and boundary assertion were unchanged and only the invocation shape returned to the single-argument predicate. Both rooted inputs were rejected, every accepted candidate crossed the filing boundary without throwing, and all 60 focused tests passed.

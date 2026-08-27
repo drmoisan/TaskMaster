@@ -1,18 +1,16 @@
-# Phase 0 — Instructions Read (remediation cycle 1, issue #614)
+# Phase 0 — Instructions Read (remediation cycle 2, issue #614)
 
-Timestamp: 2026-08-26T21-05
-
-Timestamp convention note: this feature folder's existing artifact series (`...T18-40`,
-`...T19-50`, `...T20-05`, plan `...T21-00`) runs on the agent-session clock, which is offset
-approximately +3h30m from the host wall clock. This cycle continues that series so the audit
-trail stays monotonic. Host wall-clock at the time of this artifact: 2026-08-26 17:30 local.
+Timestamp: 2026-08-26T22-13
 
 Policy Order: `CLAUDE.md` -> `.claude/rules/general-code-change.md` ->
-`.claude/rules/general-unit-test.md` -> `.claude/rules/csharp.md` -> cycle requirements
-(`remediation-inputs.2026-08-26T21-00.md`, `code-review.2026-08-26T16-55.md` CR-1/CR-2,
-`spec.md` AC16, `plan.2026-08-26T09-59.md` P3-T2).
+`.claude/rules/general-unit-test.md` -> `.claude/rules/csharp.md` -> cycle requirements.
 
-## Files read (8 documents)
+Codex policy mapping: the repository-local shared skills under `.agents/skills/` and the
+current `.github/instructions/` policy sources are authoritative for this Codex execution.
+The equivalent Claude-era files named by the inherited remediation plan are also read as
+historical plan inputs.
+
+## Files read
 
 | # | Path | Scope read | Task |
 | --- | --- | --- | --- |
@@ -20,29 +18,20 @@ Policy Order: `CLAUDE.md` -> `.claude/rules/general-code-change.md` ->
 | 2 | `.claude/rules/general-code-change.md` (80 lines) | full | P0-T2 |
 | 3 | `.claude/rules/general-unit-test.md` (105 lines) | full | P0-T3 |
 | 4 | `.claude/rules/csharp.md` (96 lines) | full | P0-T4 |
-| 5 | `docs/features/active/2026-08-26-efc-store-root-selection-leaks-full-outlook-path-into-filing-boundary-614/remediation-inputs.2026-08-26T21-00.md` | full (111 lines) | P0-T5 |
-| 6 | `.../code-review.2026-08-26T16-55.md` | CR-1 and CR-2 findings rows plus executive summary, toolchain table, severity rollup and recommendation (lines 1-110) | P0-T5 |
-| 7 | `.../spec.md` | AC16 (line 1066-1068) plus surrounding AC15/AC17 context | P0-T5 |
-| 8 | `.../plan.2026-08-26T09-59.md` | P3-T2 task text (line 119) plus the E1 scope-pinning delta record (line 52) | P0-T5 |
-
-Supporting policy files additionally loaded by the session as project instructions and applied:
-`.claude/rules/quality-tiers.md`, `.claude/rules/tonality.md`,
-`.claude/rules/plan-acceptance-gates.md`.
+| 5 | `docs/features/active/2026-08-26-efc-store-root-selection-leaks-full-outlook-path-into-filing-boundary-614/remediation-inputs.2026-08-26T22-12.md` (264 lines) | full; SUPERSEDING DECISION governs | P0-T5 |
+| 6 | `docs/features/active/2026-08-26-efc-store-root-selection-leaks-full-outlook-path-into-filing-boundary-614/code-review.2026-08-26T22-12.md` | RC-1 through RC-4 rows and surrounding findings context | P0-T5 |
+| 7 | `docs/features/active/2026-08-26-efc-store-root-selection-leaks-full-outlook-path-into-filing-boundary-614/spec.md` | AC16 and adjacent AC15/AC17 context | P0-T5 |
+| 8 | `docs/features/active/2026-08-26-efc-store-root-selection-leaks-full-outlook-path-into-filing-boundary-614/remediation-plan.2026-08-26T21-00.md` | Phase 1 through Phase 3 task texts | P0-T5 |
 
 ## Controlling constraints extracted
 
-1. Toolchain order format -> lint -> type-check -> test; restart from step 1 on any failure or
-   formatter rewrite (`CLAUDE.md`, `.claude/rules/general-code-change.md`).
-2. MSBuild gates use `/t:Rebuild`; `/p:Nullable=enable` is never added (`.claude/rules/csharp.md`
-   items 2 and 3).
-3. MSTest + Moq + FluentAssertions; Arrange-Act-Assert; no temp files; no `Thread.Sleep`,
-   `Task.Delay`, `DateTime.Now`, `Random.Shared` (`.claude/rules/general-unit-test.md`,
-   `.claude/rules/csharp.md`).
-4. 500-line file ceiling for production and test code (`general-code-change.md`).
-5. DI seam preference: interface, then injectable delegate, then adapter. This cycle uses
-   preference 2 (`Func<string>` / `Action<string>`) per `.claude/rules/csharp.md` DI Seams.
-6. Cycle scope is CR-1 and CR-2 only. CR-3, CR-4, all Minor findings, the pre-existing repo-wide
-   coverage shortfall, AC26 manual validation, and `spec.md` edits are out of scope
-   (`remediation-inputs.2026-08-26T21-00.md`).
-7. D1/D4/D9 must not be weakened: store-root, cross-store, and above-archive values must still be
-   rejected. The fix narrows over-rejection only.
+1. The cycle-2 superseding decision requires a partial revert: restore strict single-argument
+   filing validation, retain the creation predicate and CR-1 short-stem behavior, and defer
+   producer-side router normalization to issue #637.
+2. The composition regression must provide genuine fail-before/pass-after proof without COM.
+3. RC-2 amends AC16, RC-3 removes the now-unused resolver only after a consumer search, and RC-4
+   adds an out-of-ancestor `GetStem` behavior-pinning test.
+4. C# verification runs format, analyzer rebuild, nullable/type-check rebuild, then coverage tests;
+   both rebuild gates omit `/p:Nullable=enable`.
+5. Evidence remains under the feature's canonical `evidence/<kind>/` folders and must be redacted
+   per issue #602.

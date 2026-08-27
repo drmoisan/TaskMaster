@@ -196,6 +196,26 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         [TestMethod]
+        public void GetStem_FolderPathOutsideAncestor_ReturnsInputTrimmedOfLeadingSeparators()
+        {
+            // Arrange: RC-4 pins the fallback arm at EmailFilerConfig.cs:252-258.
+            var config = new EmailFilerConfig();
+
+            // Act
+            var stem = config.GetStem(
+                @"\\mailbox@example.com\Archive",
+                @"\\other-mailbox@example.com\Projects"
+            );
+
+            // Assert
+            stem.Should()
+                .Be(
+                    @"other-mailbox@example.com\Projects",
+                    "the out-of-ancestor fallback trims leading separators and does not throw"
+                );
+        }
+
+        [TestMethod]
         public void ResolvePaths_WithCurrentFolder_SetsDerivedPropertiesAndLeavesDestinationNullWhenUnresolved()
         {
             // Arrange

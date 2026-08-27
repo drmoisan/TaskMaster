@@ -703,13 +703,7 @@ namespace QuickFiler.Controllers
                 SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
 
             var selectedFolder = SelectedFolder;
-            // The D6-validated archive root read can throw; the OK button must degrade to
-            // rejecting rooted selections rather than tearing the form down.
-            string archiveRoot = EfcSelectionGuard.ResolveArchiveRootOrEmpty(
-                () => _globals.Ol.ArchiveRootPath,
-                message => logger.Error(message)
-            );
-            if (!EfcSelectionGuard.IsValidFilingSelection(selectedFolder, archiveRoot))
+            if (!EfcSelectionGuard.IsValidFilingSelection(selectedFolder))
             {
                 MessageBox.Show("Please select a valid folder.");
                 return;
