@@ -144,7 +144,9 @@ namespace QuickFiler.Controllers.Tests
                 );
             createForward
                 .Should()
-                .NotBeNull(because: "the environment SDK call must be extracted into its own method");
+                .NotBeNull(
+                    because: "the environment SDK call must be extracted into its own method"
+                );
             ensureForward
                 .Should()
                 .NotBeNull(because: "the ensure SDK call must be extracted into its own method");

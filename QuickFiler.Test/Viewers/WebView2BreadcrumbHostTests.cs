@@ -161,7 +161,9 @@ namespace QuickFiler.Test.Viewers
                         );
                     second
                         .IsAttached.Should()
-                        .BeTrue(because: "the most recently constructed host is the registered owner");
+                        .BeTrue(
+                            because: "the most recently constructed host is the registered owner"
+                        );
                 }
                 finally
                 {
@@ -327,9 +329,7 @@ namespace QuickFiler.Test.Viewers
                             1,
                             because: "the injected dispatcher must still be the one routing SDK touches after InitializeAsync, otherwise it was replaced by one built from uiSyncContext"
                         );
-                    errors
-                        .Should()
-                        .BeEmpty(because: "no dispatch failure should be reported");
+                    errors.Should().BeEmpty(because: "no dispatch failure should be reported");
                 }
                 finally
                 {

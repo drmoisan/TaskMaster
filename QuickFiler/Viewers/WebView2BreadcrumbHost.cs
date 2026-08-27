@@ -43,10 +43,8 @@ namespace QuickFiler.Viewers
         // to the instance under construction and delegate equality is pairwise over (target, method).
         // Entries are keyed on control identity through a dependent handle, so an entry is
         // collectible once the control is and the table adds no edge outliving the control.
-        private static readonly ConditionalWeakTable<
-            WebView2,
-            WebView2BreadcrumbHost
-        > _owners = new ConditionalWeakTable<WebView2, WebView2BreadcrumbHost>();
+        private static readonly ConditionalWeakTable<WebView2, WebView2BreadcrumbHost> _owners =
+            new ConditionalWeakTable<WebView2, WebView2BreadcrumbHost>();
 
         // Individual ConditionalWeakTable operations are thread-safe but a read-then-write sequence
         // is not atomic, so the compound lookup-detach-replace is taken under an explicit gate.
@@ -54,6 +52,7 @@ namespace QuickFiler.Viewers
 
         private readonly WebView2 _control;
         private readonly IWebViewCoreInitializer _initializer;
+
         // Not readonly: InitializeAsync installs the dispatcher under capture variant V1, and only
         // when none was supplied through the internal constructor.
         private BreadcrumbUiDispatcher? _dispatcher;

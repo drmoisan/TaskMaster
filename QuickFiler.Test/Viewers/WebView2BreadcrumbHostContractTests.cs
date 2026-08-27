@@ -59,9 +59,13 @@ namespace QuickFiler.Test.Viewers
                 .NotBeNull(
                     because: "IsCoreInitialized must be backed by an explicit private field so Volatile.Read and Volatile.Write can be applied to it"
                 );
-            explicitField.IsPublic.Should()
-                .BeFalse(because: "the backing field is an implementation detail and must stay non-public");
-            explicitField.FieldType.Should()
+            explicitField
+                .IsPublic.Should()
+                .BeFalse(
+                    because: "the backing field is an implementation detail and must stay non-public"
+                );
+            explicitField
+                .FieldType.Should()
                 .Be(typeof(bool), because: "the initialization flag is a boolean state");
             explicitField
                 .GetCustomAttribute<CompilerGeneratedAttribute>()
@@ -167,9 +171,7 @@ namespace QuickFiler.Test.Viewers
                         | BindingFlags.NonPublic
                         | BindingFlags.DeclaredOnly
                 );
-                members
-                    .Should()
-                    .NotBeEmpty(because: $"{name} must exist to be asserted measured");
+                members.Should().NotBeEmpty(because: $"{name} must exist to be asserted measured");
                 foreach (MemberInfo member in members)
                 {
                     member
