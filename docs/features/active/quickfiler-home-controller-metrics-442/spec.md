@@ -704,48 +704,48 @@ duration and an EFC row with 12 fields. Not gating, because it requires a live O
 Each criterion is independently verifiable by the named test or the stated command. All `git grep`
 commands are run from the repository root.
 
-- [ ] **AC-1 (bugfix workflow, regression-test-first).** For each defect RC-1 through RC-9, a
+- [x] **AC-1 (bugfix workflow, regression-test-first).** For each defect RC-1 through RC-9, a
       regression test was written and observed **failing** against the pre-fix source before the
       corresponding fix was made, and observed passing after. The red observation for each is
       recorded in `docs/features/active/quickfiler-home-controller-metrics-442/evidence/regression/`
       with the test name and the verbatim failure message. A defect with no recorded red
       observation does not satisfy this criterion.
-- [ ] **AC-2 (#442 flush occurs).** `WriteMetricsAsync` invokes the injected `MetricsFileWriter`
+- [x] **AC-2 (#442 flush occurs).** `WriteMetricsAsync` invokes the injected `MetricsFileWriter`
       exactly once with the supplied filename, the `MyDocuments` folder root, and the diagnostic
       lines, asserted by a new test in `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`
       that captures the delegate's arguments. The test fails on the pre-fix source because the
       capture list is empty.
-- [ ] **AC-3 (#442 flush-timing invariant).** The writer's returned `Task` completes before the
+- [x] **AC-3 (#442 flush-timing invariant).** The writer's returned `Task` completes before the
       `Task` returned by `WriteMetricsAsync` completes, asserted by a test whose injected delegate
       sets a flag that is `true` immediately after the `await`. Additionally,
       `git grep -nE "NonBlockingProducer|TimedConsumerAsync|_metricsConsumers|_lockObject|_fileName" QuickFiler/Controllers/`
       returns no match, proving no part of the flush was left on a timer, a background consumer, or
       residual controller state. (The same command matches multiple sites on the pre-fix source.)
-- [ ] **AC-4 (#442 flush survives session cancellation).** The token passed to `MetricsFileWriter`
+- [x] **AC-4 (#442 flush survives session cancellation).** The token passed to `MetricsFileWriter`
       is not the controller's `Token`: a test that cancels `TokenSource` before invoking
       `WriteMetricsAsync` asserts the captured `CancellationToken.IsCancellationRequested` is
       `false`. This preserves the `QfcHomeController.cs:376` precedent and keeps the flush
       unaffected by `ActionCancelAsync`'s cancel at `EventHandlers.cs:86`.
-- [ ] **AC-5 (#442 no blank CSV line).** When `GetMoveDiagnostics` returns an array whose trailing
+- [x] **AC-5 (#442 no blank CSV line).** When `GetMoveDiagnostics` returns an array whose trailing
       element is `null`, the lines reaching `MetricsFileWriter` contain no `null` or whitespace-only
       entry, asserted by a dedicated test with a mocked `GetMoveDiagnostics` returning such an array.
-- [ ] **AC-6 (#443 correct stopwatch).** With `_stopWatchMoved` populated to a non-zero interval and
+- [x] **AC-6 (#443 correct stopwatch).** With `_stopWatchMoved` populated to a non-zero interval and
       `_stopWatch` freshly constructed, the `duration` argument reaching the mocked
       `GetMoveDiagnostics` is greater than zero, asserted with
       `It.Is<double>(d => d > 0)`. The test fails on the pre-fix source, where the argument is `0`.
-- [ ] **AC-7 (#443 and #451 no seconds truncation).**
+- [x] **AC-7 (#443 and #451 no seconds truncation).**
       `git grep -n "Elapsed.Seconds" QuickFiler/Controllers/` returns no match, and
       `BuildQuickFileMetricLines` invoked with `elapsedSeconds = 90` and a single moved item renders
       a `durationText` of `90`, not `30`, asserted by a named test in
       `QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs`.
-- [ ] **AC-8 (#443 calendar span agrees with the duration).**
+- [x] **AC-8 (#443 calendar span agrees with the duration).**
       `QfcHomeController.Metrics.cs` reconstructs the appointment start as
       `OlEndTime.Subtract(_stopWatchMoved.Elapsed)` and contains no `(int)Duration` cast, verified by
       `git grep -n "OlEndTime.Subtract" QuickFiler/Controllers/QfcHomeController.Metrics.cs` showing
       the `_stopWatchMoved.Elapsed` form. This criterion is verified by inspection rather than by a
       test, because `UtilitiesCS.Calendar.GetCalendar` returns `null` in every unit fixture; the
       boundary is recorded in Test Strategy.
-- [ ] **AC-9 (#451 EFC stopwatch is started).** `EfcHomeController.StopWatch.IsRunning` is `true`
+- [x] **AC-9 (#451 EFC stopwatch is started).** `EfcHomeController.StopWatch.IsRunning` is `true`
       after construction, asserted by a named test in
       `QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs` following the
       `QfcHomeControllerRunAsyncTests.cs:303` precedent, and
@@ -754,47 +754,47 @@ commands are run from the repository root.
       without a live Outlook `MailItem`, that limitation is recorded in
       `docs/features/active/quickfiler-home-controller-metrics-442/evidence/qa-gates/` naming the
       blocker, and the site remains covered by the `git grep` assertion.
-- [ ] **AC-10 (#451 signature widening).** `EfcHomeController.Metrics.cs:35` and `:57` declare
+- [x] **AC-10 (#451 signature widening).** `EfcHomeController.Metrics.cs:35` and `:57` declare
       `double elapsedSeconds`, and `git grep -n "int elapsedSeconds" QuickFiler/` returns no match.
       The solution compiles clean under toolchain step 3.
-- [ ] **AC-11 (#451 rounding pinned deliberately).** A named test invokes
+- [x] **AC-11 (#451 rounding pinned deliberately).** A named test invokes
       `BuildQuickFileMetricLines` with `moved.Count > 1` and asserts the exact rendered
       `durationText`, pinning the behavior change from integer to real division at
       `EfcHomeController.Metrics.cs:72`. The change is also stated explicitly in the PR body.
-- [ ] **AC-12 (#451 CSV separator).** The line produced by `BuildQuickFileMetricLines` splits on
+- [x] **AC-12 (#451 CSV separator).** The line produced by `BuildQuickFileMetricLines` splits on
       `,` into exactly **12** fields and contains the substring `,Recipient,Sender,`, asserted by
       the updated `BuildQuickFileMetricLines_WithMovedMailItems_FormatsMetricLine`. The substring
       `RecipientSender` appears nowhere in
       `QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs`, verified by
       `git grep -n "RecipientSender" QuickFiler.Test/` returning no match.
-- [ ] **AC-13 (#451 CSV sanitization).** With a comma embedded in each of `ToRecipientsName`,
+- [x] **AC-13 (#451 CSV sanitization).** With a comma embedded in each of `ToRecipientsName`,
       `SenderName`, and `selectedFolder`, the rendered line still splits into exactly 12 fields,
       asserted by a named test. `QfcCollectionController.xComma(...)` is applied to all four
       free-text fields in `EfcHomeController.Metrics.cs`.
-- [ ] **AC-14 (#451 atomic re-entrancy).** `TryBeginExecuteMoves()` returns `true` on the first
+- [x] **AC-14 (#451 atomic re-entrancy).** `TryBeginExecuteMoves()` returns `true` on the first
       call, `false` on a second call before reset, and `true` again after
       `ResetExecuteMovesState()`, asserted by named sequential tests; `_isExecuting` is declared
       `private int` and
       `git grep -n "volatile" QuickFiler/Controllers/EfcHomeController.cs` returns no match. No
       concurrent assertion is attempted, as it would be non-deterministic.
-- [ ] **AC-15 (#451 interface overload implemented).**
+- [x] **AC-15 (#451 interface overload implemented).**
       `git grep -n "NotImplementedException" QuickFiler/Controllers/EfcHomeController.Metrics.cs`
       returns no match; `QuickFileMetrics_WRITE(string filename)` returns without throwing when
       `_formController`, `DataModel`, or `DataModel.Mail` is absent, and delegates to the
       3-argument overload when they are present, asserted by two named tests replacing
       `QuickFileMetricsWriteFilenameOnly_PreservesNotImplementedContract`. The interface member
       `IFilerHomeController.cs:41` is left unchanged.
-- [ ] **AC-16 (culture invariance).** The six numeric format sites
+- [x] **AC-16 (culture invariance).** The six numeric format sites
       (`QfcHomeController.Metrics.cs:53, 56, 132, 135` and `EfcHomeController.Metrics.cs:73, 74`)
       pass `CultureInfo.InvariantCulture`, and a named test that temporarily sets
       `CultureInfo.CurrentCulture` to `de-DE` inside a `try`/`finally` asserts the rendered numeric
       fields use `.` as the decimal separator and that the row splits into the expected field count.
       The test restores the original culture in the `finally` block.
-- [ ] **AC-17 (test determinism).**
+- [x] **AC-17 (test determinism).**
       `git grep -nE "Thread\.Sleep|Task\.Delay|DateTime\.Now|Path\.GetTempPath|GetTempFileName" QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs`
       returns no match. No test in either file touches the filesystem; every clock read goes through
       `FakeTimeProvider` or an injected factory.
-- [ ] **AC-18 (deliberate test updates recorded).** All four tests named in Test Strategy
+- [x] **AC-18 (deliberate test updates recorded).** All four tests named in Test Strategy
       ("Tests that will break") are updated, replaced, or deleted, and the disposition of each —
       including the choice made for
       `NonBlockingProducer_DelaySeam_HonorsInjectedTwentyMillisecondDelay` — is stated in the change
@@ -805,14 +805,14 @@ commands are run from the repository root.
       `QfcHomeController.Iteration.cs`, `QfcFormController.EventHandlers.cs`,
       `QfcCollectionController.cs`, `EfcFormController.cs`,
       `IFilerHomeController.cs`, and `EfcHomeControllerDependencies.cs` are unmodified.
-- [ ] **AC-20 (no project-file edit, no new source file).** The diff contains no change to any
+- [x] **AC-20 (no project-file edit, no new source file).** The diff contains no change to any
       `*.csproj`, `*.props`, or `*.targets` file and adds no new `.cs` file. All new production and
       test code lands in the seven existing owned files.
-- [ ] **AC-21 (file-size cap).** Every file touched by the change is under 500 lines. Specifically
+- [x] **AC-21 (file-size cap).** Every file touched by the change is under 500 lines. Specifically
       `QuickFiler/Controllers/QfcHomeController.cs` is at or below its pre-change 487 lines (target
       approximately 454) and `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs` is under
       500.
-- [ ] **AC-22 (coverage).** Toolchain step 4 runs with `/EnableCodeCoverage`; no line changed by
+- [x] **AC-22 (coverage).** Toolchain step 4 runs with `/EnableCodeCoverage`; no line changed by
       this feature loses coverage relative to the merge-base baseline, and the members named in Test
       Strategy ("Coverage impact and targets") reach `>= 90%`. The repository-wide line-coverage
       figure against the testable denominator per CLAUDE.md § UT2 is **recorded** in
@@ -820,16 +820,16 @@ commands are run from the repository root.
       the merge-base baseline, and the change does not lower it. The repository-wide figure is a
       record-and-report obligation, not a blocking threshold for this feature, because no merge-base
       baseline had been captured at spec time.
-- [ ] **AC-23 (full toolchain pass).** The four commands in Test Strategy ran in order and the
+- [x] **AC-23 (full toolchain pass).** The four commands in Test Strategy ran in order and the
       final pass completed with zero errors and no file modified by the formatter. The transcript
       (commands, exit codes, and the passed/failed test counts) is recorded in
       `docs/features/active/quickfiler-home-controller-metrics-442/evidence/qa-gates/`.
-- [ ] **AC-24 (backward-compatibility decision stated).** The PR body states that the EFC metrics
+- [x] **AC-24 (backward-compatibility decision stated).** The PR body states that the EFC metrics
       row moves from 11 to 12 fields, that EFC durations change from `0` to real values, that all
       durations become untruncated and culture-invariant, and that a repository-wide search found
       **no in-repo reader** of the session-metrics CSV — only the three writers and the three
       settings-plumbing declarations enumerated in Data / API / Config Impact.
-- [ ] **AC-25 (cross-feature notes filed).** All four items in `## Cross-Feature Notes` are
+- [x] **AC-25 (cross-feature notes filed).** All four items in `## Cross-Feature Notes` are
       recorded in this file, none of them is fixed in this feature's diff, and CFN-4 (`"hh:mm"`) is
       promoted to its own GitHub issue via the promotion lifecycle with the issue number written
       back into CFN-4. CFN-1, CFN-2, and CFN-3 are communicated to the owning sibling children (446
@@ -901,14 +901,15 @@ fixing them requires writing a file owned by a sibling epic child. None is fixed
   rather than a shape defect, it breaks three currently passing tests on their asserted literals
   (`QfcHomeControllerMetricsTests.cs:336-337`, `:371-372`,
   `EfcHomeControllerMetricsTests.cs:59`), and no issue lists it as an acceptance criterion.
-- **Disposition:** `PROMOTION BLOCKED`. The promotion could not be completed from the executing
-  session. A repository policy hook rejects direct `gh issue create` and requires the drm-copilot
-  MCP promotion path (`new_potential_entry` -> `potential_to_issue` -> `new_active_feature_folder`);
-  those MCP tools are not present in the executing agent's tool surface. `gh` itself is installed
-  and authenticated, so this is a policy restriction rather than a missing tool. The exact issue
-  title and body to be filed, and the required follow-up, are recorded in the blocker artifact
-  `docs/features/active/quickfiler-home-controller-metrics-442/evidence/issue-updates/cfn4-promotion-blocked.2026-08-26T11-32.md`.
-  AC-25 is left unchecked until the issue number is written here in place of `PROMOTION BLOCKED`.
+- **Disposition:** promoted to **issue #645**
+  (https://github.com/drmoisan/TaskMaster/issues/645), verified `OPEN` with `gh issue view`. The
+  promotion ran the approved drm-copilot MCP promotion lifecycle in `full-bug` mode. The earlier
+  `PROMOTION BLOCKED` disposition recorded in
+  `docs/features/active/quickfiler-home-controller-metrics-442/evidence/issue-updates/cfn4-promotion-blocked.2026-08-26T11-32.md`
+  reflected an executing session whose tool surface did not carry the required MCP tools, and is
+  superseded. The completed promotion, the lifecycle record paths, and the issue verification are
+  recorded in
+  `docs/features/active/quickfiler-home-controller-metrics-442/evidence/issue-updates/cfn4-promotion-complete.2026-08-27T13-59.md`.
 
 ---
 
