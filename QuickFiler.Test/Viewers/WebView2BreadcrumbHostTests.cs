@@ -339,6 +339,58 @@ namespace QuickFiler.Test.Viewers
         }
 
         /// <summary>
+        /// Pins the documented pre-initialization behaviour: before a dispatcher exists there is
+        /// nothing to marshal through, so the callback executes inline on the calling thread and the
+        /// payload is still dropped with the existing log message, exactly as before this change.
+        /// The fix is deliberately not total, and this test records that boundary.
+        /// </summary>
+        [TestMethod]
+        [Timeout(PumpTimeoutMs)]
+        public async Task PostMessageJson_WithNoDispatcher_ExecutesInlineAndDropsThePayload()
+        {
+            // Arrange
+            using (var pump = new WinFormsPumpHost())
+            {
+                WebView2 control = await pump.InvokeAsync(() => new WebView2())
+                    .ConfigureAwait(false);
+                try
+                {
+                    WebView2BreadcrumbHost subject = await pump.InvokeAsync(() =>
+                            new WebView2BreadcrumbHost(
+                                control,
+                                Mock.Of<IWebViewCoreInitializer>(),
+                                null
+                            )
+                        )
+                        .ConfigureAwait(false);
+                    subject
+                        .HasUiDispatcher.Should()
+                        .BeFalse(
+                            because: "no dispatcher was supplied and InitializeAsync has not run"
+                        );
+
+                    // Act
+                    Action act = () => subject.PostMessageJson("{\"kind\":\"probe\"}");
+
+                    // Assert
+                    act.Should()
+                        .NotThrow(
+                            because: "the pre-dispatcher window must still execute inline and drop the payload rather than fail"
+                        );
+                    subject
+                        .IsCoreInitialized.Should()
+                        .BeFalse(
+                            because: "dropping the payload must not be mistaken for a completed initialization"
+                        );
+                }
+                finally
+                {
+                    await pump.InvokeAsync(() => control.Dispose()).ConfigureAwait(false);
+                }
+            }
+        }
+
+        /// <summary>
         /// A loose mock whose two seam members return already-completed tasks, so
         /// <c>InitializeAsync</c> runs end-to-end without reaching the WebView2 SDK. The environment
         /// result is null because <see cref="CoreWebView2Environment"/> cannot be constructed without

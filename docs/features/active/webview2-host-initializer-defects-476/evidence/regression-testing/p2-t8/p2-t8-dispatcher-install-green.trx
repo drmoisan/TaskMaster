@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="3bd588d5-f0a1-4e88-a720-18202f4a32d2" name="USER@HOST 2026-08-27 16:30:28" runUser="HOST\USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T16:30:28.0759582-04:00" queuing="2026-08-27T16:30:28.0759582-04:00" start="2026-08-27T16:30:26.5697345-04:00" finish="2026-08-27T16:30:28.0910994-04:00" />
+  <TestSettings name="default" id="4d314437-025d-4d8e-ac6c-ecef8d201a37">
+    <Deployment runDeploymentRoot="USER_HOST_2026-08-27_16_30_28" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="a5ef3a60-1f06-48e7-a674-9c9ebd68b7d8" testId="1cf76064-a864-8034-b442-970923f6ef7e" testName="InitializeAsync_InstallsUiDispatcherFromUiSyncContext" computerName="HOST" duration="00:00:00.2196111" startTime="2026-08-27T16:30:27.5615520-04:00" endTime="2026-08-27T16:30:27.8975138-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a5ef3a60-1f06-48e7-a674-9c9ebd68b7d8">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="0156973e-0a93-4913-8112-086e3d825694" testId="1794fd07-6d8e-8fb1-864b-513975734b94" testName="InitializeAsync_PreservesAnInjectedDispatcher" computerName="HOST" duration="00:00:00.0106623" startTime="2026-08-27T16:30:27.9040970-04:00" endTime="2026-08-27T16:30:27.9181332-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0156973e-0a93-4913-8112-086e3d825694" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="InitializeAsync_PreservesAnInjectedDispatcher" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1794fd07-6d8e-8fb1-864b-513975734b94">
+      <Execution id="0156973e-0a93-4913-8112-086e3d825694" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.WebView2BreadcrumbHostTests" name="InitializeAsync_PreservesAnInjectedDispatcher" />
+    </UnitTest>
+    <UnitTest name="InitializeAsync_InstallsUiDispatcherFromUiSyncContext" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1cf76064-a864-8034-b442-970923f6ef7e">
+      <Execution id="a5ef3a60-1f06-48e7-a674-9c9ebd68b7d8" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.WebView2BreadcrumbHostTests" name="InitializeAsync_InstallsUiDispatcherFromUiSyncContext" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1cf76064-a864-8034-b442-970923f6ef7e" executionId="a5ef3a60-1f06-48e7-a674-9c9ebd68b7d8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1794fd07-6d8e-8fb1-864b-513975734b94" executionId="0156973e-0a93-4913-8112-086e3d825694" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="2" executed="2" passed="2" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
