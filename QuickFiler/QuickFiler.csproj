@@ -393,6 +393,7 @@
     <Compile Include="Viewers\IItemViewer.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinator.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinator.Search.cs" />
+    <Compile Include="Viewers\BreadcrumbBridgeCoordinator.Suggestions.cs" />
     <Compile Include="Viewers\BreadcrumbCoordinatorUpgradeLifetime.cs" />
     <Compile Include="Viewers\BreadcrumbItemViewerLifecycleCoordinator.cs" />
     <Compile Include="Viewers\BreadcrumbItemViewerLifecycleCoordinator.Search.cs" />

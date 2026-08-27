@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="b477537e-477a-447e-8305-ded15f70f306" name="<account>@<host> 2026-08-27 16:07:49" runUser="Megalodon4\<account>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T16:07:49.2518416-04:00" queuing="2026-08-27T16:07:49.2518416-04:00" start="2026-08-27T16:07:48.0042672-04:00" finish="2026-08-27T16:07:49.2694581-04:00" />
+  <TestSettings name="default" id="11c81087-93e6-4855-bbd7-d5f053a1e6c9">
+    <Deployment runDeploymentRoot="<account>_<host>_2026-08-27_16_07_49" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="0ef43997-54ca-456e-8383-4eb6a61abb2d" testId="1be4a048-caa5-8a42-9421-263bbc5fb431" testName="Attach_ReplayFailureRollsBackSubscriptionAndAllowsRetry" computerName="<host>" duration="00:00:00.0564874" startTime="2026-08-27T16:07:48.9846935-04:00" endTime="2026-08-27T16:07:49.1607109-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0ef43997-54ca-456e-8383-4eb6a61abb2d">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="baf0cc26-b948-405a-b458-215b97f195db" testId="16db256a-b835-8a42-bf11-30d971395e9c" testName="SelectorStateTransitions_RequestOpenThenCloseOnlyWhenRequired" computerName="<host>" duration="00:00:00.0031515" startTime="2026-08-27T16:07:49.1676441-04:00" endTime="2026-08-27T16:07:49.1737382-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="baf0cc26-b948-405a-b458-215b97f195db" />
+    <UnitTestResult executionId="27de0321-f8dd-411b-accb-5420df0c817a" testId="15cee12b-3271-8170-9114-7932ff72a0d8" testName="PendingToggleClose_HostOwnershipSuppressesFallbackAndRepeatedClose" computerName="<host>" duration="00:00:00.0552648" startTime="2026-08-27T16:07:48.9856937-04:00" endTime="2026-08-27T16:07:49.1607109-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="27de0321-f8dd-411b-accb-5420df0c817a" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Attach_ReplayFailureRollsBackSubscriptionAndAllowsRetry" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1be4a048-caa5-8a42-9421-263bbc5fb431">
+      <Execution id="0ef43997-54ca-456e-8383-4eb6a61abb2d" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubTests" name="Attach_ReplayFailureRollsBackSubscriptionAndAllowsRetry" />
+    </UnitTest>
+    <UnitTest name="SelectorStateTransitions_RequestOpenThenCloseOnlyWhenRequired" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="16db256a-b835-8a42-bf11-30d971395e9c">
+      <Execution id="baf0cc26-b948-405a-b458-215b97f195db" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownOpenCoordinatorTests" name="SelectorStateTransitions_RequestOpenThenCloseOnlyWhenRequired" />
+    </UnitTest>
+    <UnitTest name="PendingToggleClose_HostOwnershipSuppressesFallbackAndRepeatedClose" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="15cee12b-3271-8170-9114-7932ff72a0d8">
+      <Execution id="27de0321-f8dd-411b-accb-5420df0c817a" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownOpenCoordinatorTests" name="PendingToggleClose_HostOwnershipSuppressesFallbackAndRepeatedClose" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1be4a048-caa5-8a42-9421-263bbc5fb431" executionId="0ef43997-54ca-456e-8383-4eb6a61abb2d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16db256a-b835-8a42-bf11-30d971395e9c" executionId="baf0cc26-b948-405a-b458-215b97f195db" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15cee12b-3271-8170-9114-7932ff72a0d8" executionId="27de0321-f8dd-411b-accb-5420df0c817a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="3" executed="3" passed="3" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

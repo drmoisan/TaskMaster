@@ -331,6 +331,84 @@ namespace QuickFiler.Test.Viewers
             surface.Posted.Should().Equal(escapedMode);
         }
 
+        /// <summary>
+        /// Issue #501, consolidated: one broadcast in which a surface throws must not starve the other
+        /// surfaces (I-501.1, AC-08), must still deliver to the recording surface (I-501.2, AC-09),
+        /// must not propagate the surface throw to the caller (SR-3, AC-11 containment half), and must
+        /// leave a replay cache that a later attach can trust (I-501.3, AC-10).
+        /// <para>
+        /// The starvation assertion is ORDER-INDEPENDENT by construction. <c>Dictionary.Values</c>
+        /// enumeration order is not contractual, so a test attaching "throwing first, recording second"
+        /// would pass vacuously whenever the runtime happened to enumerate the recording surface first.
+        /// Two surfaces that BOTH increment the attempt counter BEFORE throwing make the expected total
+        /// 2 in every enumeration order, while the pre-fix behaviour yields 1 in every order.
+        /// </para>
+        /// Deterministic: one thread, no timer, no wait, no temp file.
+        /// </summary>
+        [TestMethod]
+        public void PostJson_SurfaceFailureDoesNotStarveOtherSurfacesOrFalsifyReplayCache()
+        {
+            // Arrange
+            var hub = new BreadcrumbMessengerHub();
+            int attempts = 0;
+            var first = new CountingThrowingMessenger(() => attempts++);
+            var second = new CountingThrowingMessenger(() => attempts++);
+            var recording = new TrackingMessenger();
+            hub.Attach(first, BreadcrumbSelectorViewMode.Collapsed).Should().BeTrue();
+            hub.Attach(second, BreadcrumbSelectorViewMode.Expanded).Should().BeTrue();
+            hub.Attach(recording, BreadcrumbSelectorViewMode.Collapsed).Should().BeTrue();
+            const string render = "{\"type\":\"render\",\"rows\":[]}";
+
+            // Act
+            Action post = () => hub.PostJson(render);
+
+            // Assert containment (SR-3), then no starvation, delivery, and cache truthfulness.
+            post.Should().NotThrow("PostJson must not propagate a surface throw to its caller");
+            attempts
+                .Should()
+                .Be(2, "every live attachment must receive exactly one delivery attempt (I-501.1)");
+            recording
+                .Posted.Should()
+                .Contain(render, "a throwing sibling must not prevent delivery (I-501.2)");
+
+            var late = new TrackingMessenger();
+            hub.Attach(late, BreadcrumbSelectorViewMode.Collapsed).Should().BeTrue();
+            late.Posted.Should()
+                .Contain(
+                    render,
+                    "the replay cache must hold a state a live surface received (I-501.3)"
+                );
+        }
+
+        /// <summary>
+        /// Records one delivery ATTEMPT before failing, which is what I-501.1 counts. The existing
+        /// <c>TrackingMessenger</c> cannot serve: its <c>ThrowOnPost</c> path throws without recording,
+        /// so it counts successes only.
+        /// </summary>
+        private sealed class CountingThrowingMessenger : IWebViewMessenger, IDisposable
+        {
+            private readonly Action _onAttempt;
+
+            internal CountingThrowingMessenger(Action onAttempt)
+            {
+                _onAttempt = onAttempt;
+            }
+
+            public event EventHandler<string> MessageReceived
+            {
+                add { }
+                remove { }
+            }
+
+            public void PostJson(string json)
+            {
+                _onAttempt();
+                throw new InvalidOperationException("Surface delivery rejected");
+            }
+
+            public void Dispose() { }
+        }
+
         private static object CreateHub()
         {
             Type type = typeof(BreadcrumbBridgeCoordinator).Assembly.GetType(

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="0f54481d-4820-494b-87b2-2202fd73659a" name="<account>@<host> 2026-08-27 16:40:12" runUser="Megalodon4\<account>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T16:40:12.7555311-04:00" queuing="2026-08-27T16:40:12.7555311-04:00" start="2026-08-27T16:40:11.0908327-04:00" finish="2026-08-27T16:40:12.7765383-04:00" />
+  <TestSettings name="default" id="1f7c0cd5-1818-4ffc-afdb-2880da0e44a8">
+    <Deployment runDeploymentRoot="<account>_<host>_2026-08-27_16_40_12" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="b0ebebcd-4f99-42da-9bf3-378c9bb48416" testId="14e0839b-5c3e-895e-b49d-d82c8527b9b7" testName="PostJson_SurfaceFailureDoesNotStarveOtherSurfacesOrFalsifyReplayCache" computerName="<host>" duration="00:00:00.1766253" startTime="2026-08-27T16:40:12.3556693-04:00" endTime="2026-08-27T16:40:12.6790164-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b0ebebcd-4f99-42da-9bf3-378c9bb48416">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Did not expect any exception because PostJson must not propagate a surface throw to its caller, but found System.InvalidOperationException: Surface delivery rejected&#xD;
+   at QuickFiler.Test.Viewers.BreadcrumbMessengerHubTests.CountingThrowingMessenger.PostJson(String json) in WS\QuickFiler.Test\Viewers\BreadcrumbMessengerHubTests.cs:line 406&#xD;
+   at QuickFiler.Viewers.BreadcrumbMessengerHub.PostToSurface(Attachment attachment, String json, String type) in WS\QuickFiler\Viewers\BreadcrumbMessengerHub.cs:line 206&#xD;
+   at QuickFiler.Viewers.BreadcrumbMessengerHub.PostJson(String json) in WS\QuickFiler\Viewers\BreadcrumbMessengerHub.cs:line 133&#xD;
+   at QuickFiler.Test.Viewers.BreadcrumbMessengerHubTests.&lt;&gt;c__DisplayClass12_0.&lt;PostJson_SurfaceFailureDoesNotStarveOtherSurfacesOrFalsifyReplayCache&gt;b__2() in WS\QuickFiler.Test\Viewers\BreadcrumbMessengerHubTests.cs:line 363&#xD;
+   at FluentAssertions.Specialized.DelegateAssertions`2.InvokeSubjectWithInterception() in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 173.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Specialized.DelegateAssertionsBase`2.NotThrowInternal(Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 72&#xD;
+   at QuickFiler.Test.Viewers.BreadcrumbMessengerHubTests.PostJson_SurfaceFailureDoesNotStarveOtherSurfacesOrFalsifyReplayCache() in WS\QuickFiler.Test\Viewers\BreadcrumbMessengerHubTests.cs:line 366</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="PostJson_SurfaceFailureDoesNotStarveOtherSurfacesOrFalsifyReplayCache" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="14e0839b-5c3e-895e-b49d-d82c8527b9b7">
+      <Execution id="b0ebebcd-4f99-42da-9bf3-378c9bb48416" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubTests" name="PostJson_SurfaceFailureDoesNotStarveOtherSurfacesOrFalsifyReplayCache" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="14e0839b-5c3e-895e-b49d-d82c8527b9b7" executionId="b0ebebcd-4f99-42da-9bf3-378c9bb48416" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

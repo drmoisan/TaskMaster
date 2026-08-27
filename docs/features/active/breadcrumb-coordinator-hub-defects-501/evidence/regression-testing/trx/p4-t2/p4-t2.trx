@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="766395da-77a7-4c74-ad94-ff6bff8bc254" name="<account>@<host> 2026-08-27 16:29:40" runUser="Megalodon4\<account>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T16:29:40.1105444-04:00" queuing="2026-08-27T16:29:40.1105444-04:00" start="2026-08-27T16:29:38.5543186-04:00" finish="2026-08-27T16:29:40.1279168-04:00" />
+  <TestSettings name="default" id="ddbf5d09-c66c-4eb5-a89e-0bcdaedea5f3">
+    <Deployment runDeploymentRoot="<account>_<host>_2026-08-27_16_29_40" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="9eb98dea-1e9e-427f-9a57-3868df4d9dce" testId="1c7fba7a-9ad1-86bd-865c-90b23ecb10b7" testName="RunSynchronous_SupersededLeaseSettlesAndDisposesItsSource" computerName="<host>" duration="00:00:00.1358028" startTime="2026-08-27T16:29:39.7909903-04:00" endTime="2026-08-27T16:29:40.0478854-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9eb98dea-1e9e-427f-9a57-3868df4d9dce">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Expected lease.Settled to be True because a skipped lease must still be settled (I-502.3), but found False.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Primitives.BooleanAssertions`1.BeTrue(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/BooleanAssertions.cs:line 82&#xD;
+   at QuickFiler.Test.Viewers.BreadcrumbCoordinatorUpgradeLifetimeTests.RunSynchronous_SupersededLeaseSettlesAndDisposesItsSource() in WS\QuickFiler.Test\Viewers\BreadcrumbCoordinatorUpgradeLifetimeTests.cs:line 191</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="RunSynchronous_SupersededLeaseSettlesAndDisposesItsSource" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c7fba7a-9ad1-86bd-865c-90b23ecb10b7">
+      <Execution id="9eb98dea-1e9e-427f-9a57-3868df4d9dce" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorUpgradeLifetimeTests" name="RunSynchronous_SupersededLeaseSettlesAndDisposesItsSource" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1c7fba7a-9ad1-86bd-865c-90b23ecb10b7" executionId="9eb98dea-1e9e-427f-9a57-3868df4d9dce" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

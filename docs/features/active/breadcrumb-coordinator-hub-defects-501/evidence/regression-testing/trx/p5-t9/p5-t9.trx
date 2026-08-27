@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="bdbd59b1-ef07-4b81-a1f5-f8d0cc4319fd" name="<account>@<host> 2026-08-27 16:48:47" runUser="Megalodon4\<account>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T16:48:47.4439101-04:00" queuing="2026-08-27T16:48:47.4439101-04:00" start="2026-08-27T16:48:46.2411202-04:00" finish="2026-08-27T16:48:47.6871224-04:00" />
+  <TestSettings name="default" id="b1af9e75-04ea-4f5d-83d3-ffafff1cb239">
+    <Deployment runDeploymentRoot="<account>_<host>_2026-08-27_16_48_47" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="5c816712-cecb-4cfa-8172-ddd8a1613abd" testId="1301c242-d356-8e8f-9901-a27afc517077" testName="Attachment_PendingDisposeIsIdempotentAndBlocksLaterAttach" computerName="<host>" duration="00:00:00.0010653" startTime="2026-08-27T16:48:47.4472259-04:00" endTime="2026-08-27T16:48:47.4487327-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5c816712-cecb-4cfa-8172-ddd8a1613abd" />
+    <UnitTestResult executionId="fe5ed9ca-8d95-4e67-8edb-c98cadc34cc1" testId="1cadbf1c-c8dc-8cb1-9c4a-b203378d30e3" testName="OpenDown_ChangesPendingOnlyThenEnterCommitsAndCloses" computerName="<host>" duration="00:00:00.0022623" startTime="2026-08-27T16:48:47.4634344-04:00" endTime="2026-08-27T16:48:47.4669491-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fe5ed9ca-8d95-4e67-8edb-c98cadc34cc1" />
+    <UnitTestResult executionId="3ee8dd62-eee6-4785-a87d-ce5d8fc93fc4" testId="1c67f2f1-fedd-8b8d-97f1-b5d36e3d15b1" testName="SelectorView_WithEscapedModeProperty_IsParsedAndPreservedVerbatim" computerName="<host>" duration="00:00:00.0031417" startTime="2026-08-27T16:48:47.4383948-04:00" endTime="2026-08-27T16:48:47.4419074-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3ee8dd62-eee6-4785-a87d-ce5d8fc93fc4" />
+    <UnitTestResult executionId="1871ca1e-07d5-4613-9e1f-0a3ee6cb9243" testId="18708b8b-6ed5-851e-8dca-321ffb442930" testName="InboundValidSelectorMessages_RouteToggleKeyAndActivationBranches" computerName="<host>" duration="00:00:00.0009420" startTime="2026-08-27T16:48:47.4944426-04:00" endTime="2026-08-27T16:48:47.4956442-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1871ca1e-07d5-4613-9e1f-0a3ee6cb9243" />
+    <UnitTestResult executionId="c74225e2-9aa6-4110-bb10-137cfec4c930" testId="1a669ad5-3ad4-8cee-85ad-c81023c34a75" testName="ExistingLeftAndRightMessages_StillForwardOnce" computerName="<host>" duration="00:00:00.0039743" startTime="2026-08-27T16:48:47.4785274-04:00" endTime="2026-08-27T16:48:47.4835383-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c74225e2-9aa6-4110-bb10-137cfec4c930" />
+    <UnitTestResult executionId="583231ae-649f-4aa6-b738-6f999859dc3a" testId="165d7562-39e7-8df1-954b-76b306980293" testName="ActivateSelector_SecondPublishedIdentityCommitsExactDuplicateOccurrence" computerName="<host>" duration="00:00:00.0017411" startTime="2026-08-27T16:48:47.5449864-04:00" endTime="2026-08-27T16:48:47.5469938-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="583231ae-649f-4aa6-b738-6f999859dc3a" />
+    <UnitTestResult executionId="ba52058d-e4c1-4f1d-804c-6939a0369641" testId="13cef974-2c23-889f-8c48-a4e8a1adf673" testName="Hub_NullDuplicateAndDisposedOperations_FollowExactContracts" computerName="<host>" duration="00:00:00.0460707" startTime="2026-08-27T16:48:47.2067978-04:00" endTime="2026-08-27T16:48:47.3796099-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ba52058d-e4c1-4f1d-804c-6939a0369641" />
+    <UnitTestResult executionId="2f07059d-e520-43ed-9cc6-1fb5f429b1a4" testId="1cc5bae3-d9e5-8cb1-961f-b3f8ad6e3995" testName="Attach_AfterPendingUpdates_ReplaysOnlyCurrentStateOncePerSurface" computerName="<host>" duration="00:00:00.0003456" startTime="2026-08-27T16:48:47.4285652-04:00" endTime="2026-08-27T16:48:47.4285652-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2f07059d-e520-43ed-9cc6-1fb5f429b1a4" />
+    <UnitTestResult executionId="b5bd77e3-1d5d-43ee-b2ea-acb1ee005c41" testId="12853b84-59c0-817d-aaba-ed8c0dd3e3ef" testName="EscapeAndUncommittedClose_RestoreOpeningSelectionWithoutNotification" computerName="<host>" duration="00:00:00.0006508" startTime="2026-08-27T16:48:47.4669491-04:00" endTime="2026-08-27T16:48:47.4669491-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b5bd77e3-1d5d-43ee-b2ea-acb1ee005c41" />
+    <UnitTestResult executionId="c152e23f-0a37-4c57-b4c1-d0501f07a5bf" testId="17c9f7a0-0de2-82a3-bb7b-6d06eae09641" testName="AttachDetachReattach_IsIdempotentAndDoesNotDuplicateSubscriptions" computerName="<host>" duration="00:00:00.0014481" startTime="2026-08-27T16:48:47.4250517-04:00" endTime="2026-08-27T16:48:47.4270534-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c152e23f-0a37-4c57-b4c1-d0501f07a5bf" />
+    <UnitTestResult executionId="8a9e643d-80eb-4917-b387-934503060373" testId="1c674e26-11f0-8155-a95d-5e9eda0c5c0c" testName="ClosedDown_DuplicateSuggestionAndRecentCommitsRecentOccurrence" computerName="<host>" duration="00:00:00.1646102" startTime="2026-08-27T16:48:47.2093056-04:00" endTime="2026-08-27T16:48:47.4956442-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8a9e643d-80eb-4917-b387-934503060373" />
+    <UnitTestResult executionId="3fb827e0-4cc7-43f0-b6c9-3203c3790c16" testId="175fe5d7-1e4f-8681-8194-5cc30c12ebb8" testName="InvalidSelectorMessage_IsNoOpAndDoesNotRaiseTransitions" computerName="<host>" duration="00:00:00.0106712" startTime="2026-08-27T16:48:47.4684560-04:00" endTime="2026-08-27T16:48:47.4785274-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3fb827e0-4cc7-43f0-b6c9-3203c3790c16" />
+    <UnitTestResult executionId="00d59b71-4dfc-4d41-a90c-f597adbf6317" testId="134ba2c9-2fce-8715-8601-28e82144ee80" testName="Hub_InvalidUnknownAndStaleInboundSenders_AreIgnoredExactly" computerName="<host>" duration="00:00:00.0004105" startTime="2026-08-27T16:48:47.4270534-04:00" endTime="2026-08-27T16:48:47.4270534-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="00d59b71-4dfc-4d41-a90c-f597adbf6317" />
+    <UnitTestResult executionId="41e53ae0-66b6-413d-9df2-acce82e0f5eb" testId="14f5a345-2aeb-8041-bd67-c15be757828d" testName="PostJson_ReentrantAttachFromSurfaceDoesNotThrowCollectionModified" computerName="<host>" duration="00:00:00.0016782" startTime="2026-08-27T16:48:47.4891699-04:00" endTime="2026-08-27T16:48:47.4912764-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="41e53ae0-66b6-413d-9df2-acce82e0f5eb" />
+    <UnitTestResult executionId="38bebdf0-0d6b-4d03-b344-17d24dd57237" testId="1be4a048-caa5-8a42-9421-263bbc5fb431" testName="Attach_ReplayFailureRollsBackSubscriptionAndAllowsRetry" computerName="<host>" duration="00:00:00.0005307" startTime="2026-08-27T16:48:47.4285652-04:00" endTime="2026-08-27T16:48:47.4295736-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="38bebdf0-0d6b-4d03-b344-17d24dd57237" />
+    <UnitTestResult executionId="8de09bd1-ed48-4e3f-abb7-eae0712e340d" testId="10d1c2c8-687a-8274-8e5b-2c62f6053260" testName="Attach_WithDifferentMode_PreservesOriginalModeWithoutReplayOrSecondSubscription" computerName="<host>" duration="00:00:00.0002591" startTime="2026-08-27T16:48:47.4270534-04:00" endTime="2026-08-27T16:48:47.4285652-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8de09bd1-ed48-4e3f-abb7-eae0712e340d" />
+    <UnitTestResult executionId="c52ba773-aa48-4362-a360-04636e199f00" testId="19485975-a3ab-844c-b433-a1e7d51f1c99" testName="CollapsedReadback_SecondDuplicateSuggestionRetainsItsProbability" computerName="<host>" duration="00:00:00.0010992" startTime="2026-08-27T16:48:47.5469938-04:00" endTime="2026-08-27T16:48:47.5505069-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c52ba773-aa48-4362-a360-04636e199f00" />
+    <UnitTestResult executionId="eb7792fd-8143-4388-b65e-5c06754be7ab" testId="1268ccfc-cc0e-8467-9e5b-d10952c453d1" testName="Hub_CachedAndNoncachedPosts_ReplayOnlyLatestStateInSequence" computerName="<host>" duration="00:00:00.0051938" startTime="2026-08-27T16:48:47.4130179-04:00" endTime="2026-08-27T16:48:47.4185329-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="eb7792fd-8143-4388-b65e-5c06754be7ab" />
+    <UnitTestResult executionId="60d8905d-74ec-40f1-8646-c399639d7f1c" testId="19627d89-bdcd-8b81-b96c-85990e54bccb" testName="Attachment_SharedPendingAndReadyBypass_ReuseOneCandidate" computerName="<host>" duration="00:00:00.0046339" startTime="2026-08-27T16:48:47.4383948-04:00" endTime="2026-08-27T16:48:47.4449082-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="60d8905d-74ec-40f1-8646-c399639d7f1c" />
+    <UnitTestResult executionId="a8fa71c6-50a6-4a2e-8046-765906e1ac3d" testId="131f70ad-e78a-8c7f-88d6-037fe5f48f8d" testName="PostJson_SurfaceInvocationRunsAfterHubLockIsReleased" computerName="<host>" duration="00:00:00.0046359" startTime="2026-08-27T16:48:47.4835383-04:00" endTime="2026-08-27T16:48:47.4891699-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a8fa71c6-50a6-4a2e-8046-765906e1ac3d" />
+    <UnitTestResult executionId="c45be6cd-2aea-4049-8cf0-2f1ee659a7df" testId="13270e12-8d9d-83b8-865c-41f7b0204eb4" testName="Attachment_StaleFactoryCandidateAndReadyReset_CleanExactlyOnce" computerName="<host>" duration="00:00:00.0007527" startTime="2026-08-27T16:48:47.4449082-04:00" endTime="2026-08-27T16:48:47.4459091-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c45be6cd-2aea-4049-8cf0-2f1ee659a7df" />
+    <UnitTestResult executionId="06fbe4ff-d414-47ed-8979-6427204533d2" testId="176de608-593b-81bf-ae37-2ccfb4117d7e" testName="BoundaryAndInvalidOperations_AreDeterministicNoOps" computerName="<host>" duration="00:00:00.0003493" startTime="2026-08-27T16:48:47.4928630-04:00" endTime="2026-08-27T16:48:47.4928630-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="06fbe4ff-d414-47ed-8979-6427204533d2" />
+    <UnitTestResult executionId="716e3faa-1497-4f30-a234-6f2abcff159f" testId="1a46b707-2bf7-8843-8e4d-252c33b32f9b" testName="SelectorView_IsSpecializedForClosedAndExpandedSurfaceModes" computerName="<host>" duration="00:00:00.0312987" startTime="2026-08-27T16:48:47.3871241-04:00" endTime="2026-08-27T16:48:47.4185329-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="716e3faa-1497-4f30-a234-6f2abcff159f" />
+    <UnitTestResult executionId="08dba552-3fc5-4ad0-a97b-3f500982f2cb" testId="1193a61c-f291-8841-b84a-784090543c62" testName="CollapsedAttachment_ReplayFailureAndDisposeDetachBeforeMessengerCleanup" computerName="<host>" duration="00:00:00.0081377" startTime="2026-08-27T16:48:47.4295736-04:00" endTime="2026-08-27T16:48:47.4368881-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="08dba552-3fc5-4ad0-a97b-3f500982f2cb" />
+    <UnitTestResult executionId="fcb8f17e-bdba-4cd3-9901-84636b604529" testId="10d3d57a-07e7-8ce7-8e41-9bfe80d63735" testName="PostJson_BroadcastsOneLogicalRenderAndThemeOncePerSurface" computerName="<host>" duration="00:00:00.0466917" startTime="2026-08-27T16:48:47.2067978-04:00" endTime="2026-08-27T16:48:47.3796099-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fcb8f17e-bdba-4cd3-9901-84636b604529">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="b27cdd53-5509-4725-a1cf-d21689bd21c7" testId="12eb8df2-8ab2-828d-bf2d-1fb8c0121011" testName="DetachAndDispose_HandleUnknownSurfacesAndStaleCallbacksSafely" computerName="<host>" duration="00:00:00.0003467" startTime="2026-08-27T16:48:47.4368881-04:00" endTime="2026-08-27T16:48:47.4383948-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b27cdd53-5509-4725-a1cf-d21689bd21c7" />
+    <UnitTestResult executionId="f1e5c8a9-4c83-467a-b31e-e25d7abcc3c2" testId="179b9d85-bff2-878f-b6f2-e2785eb4e91b" testName="PostJson_PreservesUnknownAndMalformedSelectorMessagesVerbatim" computerName="<host>" duration="00:00:00.0001993" startTime="2026-08-27T16:48:47.4383948-04:00" endTime="2026-08-27T16:48:47.4383948-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f1e5c8a9-4c83-467a-b31e-e25d7abcc3c2" />
+    <UnitTestResult executionId="c8448382-9fa7-4d00-9f52-73561a181834" testId="15d80365-c61d-86b5-ab92-40de918ae4f6" testName="Attachment_ConstructorFactoryAndCandidateGuards_AllowRetry" computerName="<host>" duration="00:00:00.0098715" startTime="2026-08-27T16:48:47.4270534-04:00" endTime="2026-08-27T16:48:47.4368881-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c8448382-9fa7-4d00-9f52-73561a181834" />
+    <UnitTestResult executionId="ad188424-6306-479f-8672-f731c5d6d54b" testId="1ce90094-c06c-885e-a43d-01bd641cba97" testName="Hub_SubscribeAndUnsubscribeFailures_RollBackWithoutStaleInbound" computerName="<host>" duration="00:00:00.0258999" startTime="2026-08-27T16:48:47.3861241-04:00" endTime="2026-08-27T16:48:47.4130179-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ad188424-6306-479f-8672-f731c5d6d54b" />
+    <UnitTestResult executionId="c7c78db2-a0dc-4771-ba4e-3a824e7a8d6d" testId="1ebfec5d-924e-8c73-befe-c0befae1461b" testName="InboundSelectorKeyUp_MovesPendingPastSeparatorAndClampsWithoutDuplicatePublication" computerName="<host>" duration="00:00:00.0026222" startTime="2026-08-27T16:48:47.4956442-04:00" endTime="2026-08-27T16:48:47.4972508-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c7c78db2-a0dc-4771-ba4e-3a824e7a8d6d" />
+    <UnitTestResult executionId="d8a3f53f-c171-4533-8211-c7b5052114ed" testId="1ddce490-507d-8f56-874c-4135d59006a3" testName="OpenDownThenEnter_DuplicateSuggestionAndRecentCommitsPendingOccurrence" computerName="<host>" duration="00:00:00.0497404" startTime="2026-08-27T16:48:47.4956442-04:00" endTime="2026-08-27T16:48:47.5449864-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d8a3f53f-c171-4533-8211-c7b5052114ed" />
+    <UnitTestResult executionId="60e90844-f3ab-4343-9807-3ddf9d42dedb" testId="1d617ed3-e017-8852-bb06-9fa25d39d4ad" testName="SelectorView_ContainsRowAlignedStableIdentityAndSelectabilityOptions" computerName="<host>" duration="00:00:00.0011587" startTime="2026-08-27T16:48:47.4912764-04:00" endTime="2026-08-27T16:48:47.4923344-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="60e90844-f3ab-4343-9807-3ddf9d42dedb" />
+    <UnitTestResult executionId="820da1af-a1c2-47a8-9a20-f626e2ea69ec" testId="1ceef542-4c04-8645-8118-db5df416a456" testName="MouseActivation_CommitsStableIdentityExactlyOnce" computerName="<host>" duration="00:00:00.0008027" startTime="2026-08-27T16:48:47.4669491-04:00" endTime="2026-08-27T16:48:47.4684560-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="820da1af-a1c2-47a8-9a20-f626e2ea69ec" />
+    <UnitTestResult executionId="bd1a8b9b-fe19-42e1-81b9-b534c4b127e4" testId="13be86d8-e503-8879-94ff-02cd93dfa03c" testName="PublicOperations_RejectNullArgumentsAndUseAfterDispose" computerName="<host>" duration="00:00:00.0009278" startTime="2026-08-27T16:48:47.4270534-04:00" endTime="2026-08-27T16:48:47.4270534-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bd1a8b9b-fe19-42e1-81b9-b534c4b127e4" />
+    <UnitTestResult executionId="3d2101b9-1aa2-42fb-aecb-ef429916fb28" testId="10efe4ae-fe71-8e9f-8564-29da98437ca3" testName="Attachment_ControllerAndHubFailures_ResetAndPermitRetry" computerName="<host>" duration="00:00:00.0012138" startTime="2026-08-27T16:48:47.4459091-04:00" endTime="2026-08-27T16:48:47.4472259-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3d2101b9-1aa2-42fb-aecb-ef429916fb28" />
+    <UnitTestResult executionId="f4643c0f-cb0a-4a86-9b2f-2a0ea1336c29" testId="134f4a20-69da-839d-a79f-0468f2efb2a5" testName="Hub_MalformedMissingAndSameModeMessages_AreParsedWithoutMutation" computerName="<host>" duration="00:00:00.0021048" startTime="2026-08-27T16:48:47.4185329-04:00" endTime="2026-08-27T16:48:47.4205433-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f4643c0f-cb0a-4a86-9b2f-2a0ea1336c29" />
+    <UnitTestResult executionId="0db26330-d682-48ff-9904-daff202b1682" testId="1fd6057f-10fb-8391-9f2e-26a2a642ad09" testName="InboundMessage_FromEitherSurface_IsRoutedOnce" computerName="<host>" duration="00:00:00.0003715" startTime="2026-08-27T16:48:47.4185329-04:00" endTime="2026-08-27T16:48:47.4185329-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0db26330-d682-48ff-9904-daff202b1682" />
+    <UnitTestResult executionId="24a80aec-782d-4dad-979e-3736517ebd9d" testId="1eb40bf1-2087-8be7-bcd0-52f0ae278490" testName="TransitionPublicationsAndEvents_RunAfterRouterLockIsReleased" computerName="<host>" duration="00:00:00.0010148" startTime="2026-08-27T16:48:47.4835383-04:00" endTime="2026-08-27T16:48:47.4835383-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="24a80aec-782d-4dad-979e-3736517ebd9d" />
+    <UnitTestResult executionId="b5c88422-9048-4b0d-93a6-e92242fa85cc" testId="1ab5f3b8-e580-8fc7-bd8e-e6ae455ae532" testName="ClosedDown_CommitsNextSelectableAndRaisesOneSelection" computerName="<host>" duration="00:00:00.1330631" startTime="2026-08-27T16:48:47.2067978-04:00" endTime="2026-08-27T16:48:47.4634344-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b5c88422-9048-4b0d-93a6-e92242fa85cc" />
+    <UnitTestResult executionId="bf95f21f-fd18-4e6e-90f9-05a6a95f9aa8" testId="1d768e9a-376c-8513-9d80-ec9cd71f0df9" testName="OpenTwiceThenClear_RejectsSecondOpenAndPublishesOneCloseTransition" computerName="<host>" duration="00:00:00.0012381" startTime="2026-08-27T16:48:47.4928630-04:00" endTime="2026-08-27T16:48:47.4944426-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bf95f21f-fd18-4e6e-90f9-05a6a95f9aa8" />
+    <UnitTestResult executionId="9178191a-82b7-46ef-ab4d-c4d936f11eca" testId="14e0839b-5c3e-895e-b49d-d82c8527b9b7" testName="PostJson_SurfaceFailureDoesNotStarveOtherSurfacesOrFalsifyReplayCache" computerName="<host>" duration="00:00:00.0028459" startTime="2026-08-27T16:48:47.4419074-04:00" endTime="2026-08-27T16:48:47.4472259-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9178191a-82b7-46ef-ab4d-c4d936f11eca" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="OpenTwiceThenClear_RejectsSecondOpenAndPublishesOneCloseTransition" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d768e9a-376c-8513-9d80-ec9cd71f0df9">
+      <Execution id="bf95f21f-fd18-4e6e-90f9-05a6a95f9aa8" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSelectorCoordinatorTests" name="OpenTwiceThenClear_RejectsSecondOpenAndPublishesOneCloseTransition" />
+    </UnitTest>
+    <UnitTest name="OpenDown_ChangesPendingOnlyThenEnterCommitsAndCloses" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1cadbf1c-c8dc-8cb1-9c4a-b203378d30e3">
+      <Execution id="fe5ed9ca-8d95-4e67-8edb-c98cadc34cc1" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSelectorCoordinatorTests" name="OpenDown_ChangesPendingOnlyThenEnterCommitsAndCloses" />
+    </UnitTest>
+    <UnitTest name="PostJson_ReentrantAttachFromSurfaceDoesNotThrowCollectionModified" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="14f5a345-2aeb-8041-bd67-c15be757828d">
+      <Execution id="41e53ae0-66b6-413d-9df2-acce82e0f5eb" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSelectorCoordinatorTests" name="PostJson_ReentrantAttachFromSurfaceDoesNotThrowCollectionModified" />
+    </UnitTest>
+    <UnitTest name="AttachDetachReattach_IsIdempotentAndDoesNotDuplicateSubscriptions" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="17c9f7a0-0de2-82a3-bb7b-6d06eae09641">
+      <Execution id="c152e23f-0a37-4c57-b4c1-d0501f07a5bf" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubTests" name="AttachDetachReattach_IsIdempotentAndDoesNotDuplicateSubscriptions" />
+    </UnitTest>
+    <UnitTest name="InboundMessage_FromEitherSurface_IsRoutedOnce" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1fd6057f-10fb-8391-9f2e-26a2a642ad09">
+      <Execution id="0db26330-d682-48ff-9904-daff202b1682" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubTests" name="InboundMessage_FromEitherSurface_IsRoutedOnce" />
+    </UnitTest>
+    <UnitTest name="InvalidSelectorMessage_IsNoOpAndDoesNotRaiseTransitions" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="175fe5d7-1e4f-8681-8194-5cc30c12ebb8">
+      <Execution id="3fb827e0-4cc7-43f0-b6c9-3203c3790c16" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSelectorCoordinatorTests" name="InvalidSelectorMessage_IsNoOpAndDoesNotRaiseTransitions" />
+    </UnitTest>
+    <UnitTest name="Attachment_SharedPendingAndReadyBypass_ReuseOneCandidate" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="19627d89-bdcd-8b81-b96c-85990e54bccb">
+      <Execution id="60d8905d-74ec-40f1-8646-c399639d7f1c" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubCoverageTests" name="Attachment_SharedPendingAndReadyBypass_ReuseOneCandidate" />
+    </UnitTest>
+    <UnitTest name="PostJson_SurfaceInvocationRunsAfterHubLockIsReleased" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="131f70ad-e78a-8c7f-88d6-037fe5f48f8d">
+      <Execution id="a8fa71c6-50a6-4a2e-8046-765906e1ac3d" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSelectorCoordinatorTests" name="PostJson_SurfaceInvocationRunsAfterHubLockIsReleased" />
+    </UnitTest>
+    <UnitTest name="PublicOperations_RejectNullArgumentsAndUseAfterDispose" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="13be86d8-e503-8879-94ff-02cd93dfa03c">
+      <Execution id="bd1a8b9b-fe19-42e1-81b9-b534c4b127e4" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubTests" name="PublicOperations_RejectNullArgumentsAndUseAfterDispose" />
+    </UnitTest>
+    <UnitTest name="SelectorView_ContainsRowAlignedStableIdentityAndSelectabilityOptions" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d617ed3-e017-8852-bb06-9fa25d39d4ad">
+      <Execution id="60e90844-f3ab-4343-9807-3ddf9d42dedb" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSelectorCoordinatorTests" name="SelectorView_ContainsRowAlignedStableIdentityAndSelectabilityOptions" />
+    </UnitTest>
+    <UnitTest name="EscapeAndUncommittedClose_RestoreOpeningSelectionWithoutNotification" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="12853b84-59c0-817d-aaba-ed8c0dd3e3ef">
+      <Execution id="b5bd77e3-1d5d-43ee-b2ea-acb1ee005c41" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSelectorCoordinatorTests" name="EscapeAndUncommittedClose_RestoreOpeningSelectionWithoutNotification" />
+    </UnitTest>
+    <UnitTest name="TransitionPublicationsAndEvents_RunAfterRouterLockIsReleased" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1eb40bf1-2087-8be7-bcd0-52f0ae278490">
+      <Execution id="24a80aec-782d-4dad-979e-3736517ebd9d" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSelectorCoordinatorTests" name="TransitionPublicationsAndEvents_RunAfterRouterLockIsReleased" />
+    </UnitTest>
+    <UnitTest name="Attachment_PendingDisposeIsIdempotentAndBlocksLaterAttach" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1301c242-d356-8e8f-9901-a27afc517077">
+      <Execution id="5c816712-cecb-4cfa-8172-ddd8a1613abd" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubCoverageTests" name="Attachment_PendingDisposeIsIdempotentAndBlocksLaterAttach" />
+    </UnitTest>
+    <UnitTest name="DetachAndDispose_HandleUnknownSurfacesAndStaleCallbacksSafely" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="12eb8df2-8ab2-828d-bf2d-1fb8c0121011">
+      <Execution id="b27cdd53-5509-4725-a1cf-d21689bd21c7" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubTests" name="DetachAndDispose_HandleUnknownSurfacesAndStaleCallbacksSafely" />
+    </UnitTest>
+    <UnitTest name="ClosedDown_CommitsNextSelectableAndRaisesOneSelection" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ab5f3b8-e580-8fc7-bd8e-e6ae455ae532">
+      <Execution id="b5c88422-9048-4b0d-93a6-e92242fa85cc" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSelectorCoordinatorTests" name="ClosedDown_CommitsNextSelectableAndRaisesOneSelection" />
+    </UnitTest>
+    <UnitTest name="Attachment_ControllerAndHubFailures_ResetAndPermitRetry" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="10efe4ae-fe71-8e9f-8564-29da98437ca3">
+      <Execution id="3d2101b9-1aa2-42fb-aecb-ef429916fb28" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubCoverageTests" name="Attachment_ControllerAndHubFailures_ResetAndPermitRetry" />
+    </UnitTest>
+    <UnitTest name="Hub_NullDuplicateAndDisposedOperations_FollowExactContracts" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="13cef974-2c23-889f-8c48-a4e8a1adf673">
+      <Execution id="ba52058d-e4c1-4f1d-804c-6939a0369641" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubCoverageTests" name="Hub_NullDuplicateAndDisposedOperations_FollowExactContracts" />
+    </UnitTest>
+    <UnitTest name="Hub_SubscribeAndUnsubscribeFailures_RollBackWithoutStaleInbound" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ce90094-c06c-885e-a43d-01bd641cba97">
+      <Execution id="ad188424-6306-479f-8672-f731c5d6d54b" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubCoverageTests" name="Hub_SubscribeAndUnsubscribeFailures_RollBackWithoutStaleInbound" />
+    </UnitTest>
+    <UnitTest name="Hub_MalformedMissingAndSameModeMessages_AreParsedWithoutMutation" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="134f4a20-69da-839d-a79f-0468f2efb2a5">
+      <Execution id="f4643c0f-cb0a-4a86-9b2f-2a0ea1336c29" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubCoverageTests" name="Hub_MalformedMissingAndSameModeMessages_AreParsedWithoutMutation" />
+    </UnitTest>
+    <UnitTest name="ExistingLeftAndRightMessages_StillForwardOnce" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a669ad5-3ad4-8cee-85ad-c81023c34a75">
+      <Execution id="c74225e2-9aa6-4110-bb10-137cfec4c930" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSelectorCoordinatorTests" name="ExistingLeftAndRightMessages_StillForwardOnce" />
+    </UnitTest>
+    <UnitTest name="PostJson_SurfaceFailureDoesNotStarveOtherSurfacesOrFalsifyReplayCache" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="14e0839b-5c3e-895e-b49d-d82c8527b9b7">
+      <Execution id="9178191a-82b7-46ef-ab4d-c4d936f11eca" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubTests" name="PostJson_SurfaceFailureDoesNotStarveOtherSurfacesOrFalsifyReplayCache" />
+    </UnitTest>
+    <UnitTest name="InboundSelectorKeyUp_MovesPendingPastSeparatorAndClampsWithoutDuplicatePublication" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ebfec5d-924e-8c73-befe-c0befae1461b">
+      <Execution id="c7c78db2-a0dc-4771-ba4e-3a824e7a8d6d" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSelectorCoordinatorTests" name="InboundSelectorKeyUp_MovesPendingPastSeparatorAndClampsWithoutDuplicatePublication" />
+    </UnitTest>
+    <UnitTest name="Attachment_StaleFactoryCandidateAndReadyReset_CleanExactlyOnce" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="13270e12-8d9d-83b8-865c-41f7b0204eb4">
+      <Execution id="c45be6cd-2aea-4049-8cf0-2f1ee659a7df" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubCoverageTests" name="Attachment_StaleFactoryCandidateAndReadyReset_CleanExactlyOnce" />
+    </UnitTest>
+    <UnitTest name="BoundaryAndInvalidOperations_AreDeterministicNoOps" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="176de608-593b-81bf-ae37-2ccfb4117d7e">
+      <Execution id="06fbe4ff-d414-47ed-8979-6427204533d2" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSelectorCoordinatorTests" name="BoundaryAndInvalidOperations_AreDeterministicNoOps" />
+    </UnitTest>
+    <UnitTest name="SelectorView_IsSpecializedForClosedAndExpandedSurfaceModes" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a46b707-2bf7-8843-8e4d-252c33b32f9b">
+      <Execution id="716e3faa-1497-4f30-a234-6f2abcff159f" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubTests" name="SelectorView_IsSpecializedForClosedAndExpandedSurfaceModes" />
+    </UnitTest>
+    <UnitTest name="ClosedDown_DuplicateSuggestionAndRecentCommitsRecentOccurrence" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c674e26-11f0-8155-a95d-5e9eda0c5c0c">
+      <Execution id="8a9e643d-80eb-4917-b387-934503060373" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDuplicateIdentityIntegrationTests" name="ClosedDown_DuplicateSuggestionAndRecentCommitsRecentOccurrence" />
+    </UnitTest>
+    <UnitTest name="CollapsedReadback_SecondDuplicateSuggestionRetainsItsProbability" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="19485975-a3ab-844c-b433-a1e7d51f1c99">
+      <Execution id="c52ba773-aa48-4362-a360-04636e199f00" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDuplicateIdentityIntegrationTests" name="CollapsedReadback_SecondDuplicateSuggestionRetainsItsProbability" />
+    </UnitTest>
+    <UnitTest name="OpenDownThenEnter_DuplicateSuggestionAndRecentCommitsPendingOccurrence" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ddce490-507d-8f56-874c-4135d59006a3">
+      <Execution id="d8a3f53f-c171-4533-8211-c7b5052114ed" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDuplicateIdentityIntegrationTests" name="OpenDownThenEnter_DuplicateSuggestionAndRecentCommitsPendingOccurrence" />
+    </UnitTest>
+    <UnitTest name="MouseActivation_CommitsStableIdentityExactlyOnce" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ceef542-4c04-8645-8118-db5df416a456">
+      <Execution id="820da1af-a1c2-47a8-9a20-f626e2ea69ec" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSelectorCoordinatorTests" name="MouseActivation_CommitsStableIdentityExactlyOnce" />
+    </UnitTest>
+    <UnitTest name="ActivateSelector_SecondPublishedIdentityCommitsExactDuplicateOccurrence" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="165d7562-39e7-8df1-954b-76b306980293">
+      <Execution id="583231ae-649f-4aa6-b738-6f999859dc3a" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDuplicateIdentityIntegrationTests" name="ActivateSelector_SecondPublishedIdentityCommitsExactDuplicateOccurrence" />
+    </UnitTest>
+    <UnitTest name="PostJson_BroadcastsOneLogicalRenderAndThemeOncePerSurface" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="10d3d57a-07e7-8ce7-8e41-9bfe80d63735">
+      <Execution id="fcb8f17e-bdba-4cd3-9901-84636b604529" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubTests" name="PostJson_BroadcastsOneLogicalRenderAndThemeOncePerSurface" />
+    </UnitTest>
+    <UnitTest name="Hub_CachedAndNoncachedPosts_ReplayOnlyLatestStateInSequence" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1268ccfc-cc0e-8467-9e5b-d10952c453d1">
+      <Execution id="eb7792fd-8143-4388-b65e-5c06754be7ab" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubCoverageTests" name="Hub_CachedAndNoncachedPosts_ReplayOnlyLatestStateInSequence" />
+    </UnitTest>
+    <UnitTest name="CollapsedAttachment_ReplayFailureAndDisposeDetachBeforeMessengerCleanup" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1193a61c-f291-8841-b84a-784090543c62">
+      <Execution id="08dba552-3fc5-4ad0-a97b-3f500982f2cb" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubTests" name="CollapsedAttachment_ReplayFailureAndDisposeDetachBeforeMessengerCleanup" />
+    </UnitTest>
+    <UnitTest name="Attach_WithDifferentMode_PreservesOriginalModeWithoutReplayOrSecondSubscription" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="10d1c2c8-687a-8274-8e5b-2c62f6053260">
+      <Execution id="8de09bd1-ed48-4e3f-abb7-eae0712e340d" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubTests" name="Attach_WithDifferentMode_PreservesOriginalModeWithoutReplayOrSecondSubscription" />
+    </UnitTest>
+    <UnitTest name="Attach_AfterPendingUpdates_ReplaysOnlyCurrentStateOncePerSurface" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1cc5bae3-d9e5-8cb1-961f-b3f8ad6e3995">
+      <Execution id="2f07059d-e520-43ed-9cc6-1fb5f429b1a4" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubTests" name="Attach_AfterPendingUpdates_ReplaysOnlyCurrentStateOncePerSurface" />
+    </UnitTest>
+    <UnitTest name="InboundValidSelectorMessages_RouteToggleKeyAndActivationBranches" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="18708b8b-6ed5-851e-8dca-321ffb442930">
+      <Execution id="1871ca1e-07d5-4613-9e1f-0a3ee6cb9243" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSelectorCoordinatorTests" name="InboundValidSelectorMessages_RouteToggleKeyAndActivationBranches" />
+    </UnitTest>
+    <UnitTest name="Attach_ReplayFailureRollsBackSubscriptionAndAllowsRetry" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1be4a048-caa5-8a42-9421-263bbc5fb431">
+      <Execution id="38bebdf0-0d6b-4d03-b344-17d24dd57237" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubTests" name="Attach_ReplayFailureRollsBackSubscriptionAndAllowsRetry" />
+    </UnitTest>
+    <UnitTest name="Attachment_ConstructorFactoryAndCandidateGuards_AllowRetry" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="15d80365-c61d-86b5-ab92-40de918ae4f6">
+      <Execution id="c8448382-9fa7-4d00-9f52-73561a181834" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubCoverageTests" name="Attachment_ConstructorFactoryAndCandidateGuards_AllowRetry" />
+    </UnitTest>
+    <UnitTest name="PostJson_PreservesUnknownAndMalformedSelectorMessagesVerbatim" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="179b9d85-bff2-878f-b6f2-e2785eb4e91b">
+      <Execution id="f1e5c8a9-4c83-467a-b31e-e25d7abcc3c2" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubTests" name="PostJson_PreservesUnknownAndMalformedSelectorMessagesVerbatim" />
+    </UnitTest>
+    <UnitTest name="SelectorView_WithEscapedModeProperty_IsParsedAndPreservedVerbatim" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c67f2f1-fedd-8b8d-97f1-b5d36e3d15b1">
+      <Execution id="3ee8dd62-eee6-4785-a87d-ce5d8fc93fc4" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubTests" name="SelectorView_WithEscapedModeProperty_IsParsedAndPreservedVerbatim" />
+    </UnitTest>
+    <UnitTest name="Hub_InvalidUnknownAndStaleInboundSenders_AreIgnoredExactly" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="134ba2c9-2fce-8715-8601-28e82144ee80">
+      <Execution id="00d59b71-4dfc-4d41-a90c-f597adbf6317" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbMessengerHubCoverageTests" name="Hub_InvalidUnknownAndStaleInboundSenders_AreIgnoredExactly" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1301c242-d356-8e8f-9901-a27afc517077" executionId="5c816712-cecb-4cfa-8172-ddd8a1613abd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1cadbf1c-c8dc-8cb1-9c4a-b203378d30e3" executionId="fe5ed9ca-8d95-4e67-8edb-c98cadc34cc1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c67f2f1-fedd-8b8d-97f1-b5d36e3d15b1" executionId="3ee8dd62-eee6-4785-a87d-ce5d8fc93fc4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18708b8b-6ed5-851e-8dca-321ffb442930" executionId="1871ca1e-07d5-4613-9e1f-0a3ee6cb9243" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a669ad5-3ad4-8cee-85ad-c81023c34a75" executionId="c74225e2-9aa6-4110-bb10-137cfec4c930" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="165d7562-39e7-8df1-954b-76b306980293" executionId="583231ae-649f-4aa6-b738-6f999859dc3a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13cef974-2c23-889f-8c48-a4e8a1adf673" executionId="ba52058d-e4c1-4f1d-804c-6939a0369641" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1cc5bae3-d9e5-8cb1-961f-b3f8ad6e3995" executionId="2f07059d-e520-43ed-9cc6-1fb5f429b1a4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12853b84-59c0-817d-aaba-ed8c0dd3e3ef" executionId="b5bd77e3-1d5d-43ee-b2ea-acb1ee005c41" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17c9f7a0-0de2-82a3-bb7b-6d06eae09641" executionId="c152e23f-0a37-4c57-b4c1-d0501f07a5bf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c674e26-11f0-8155-a95d-5e9eda0c5c0c" executionId="8a9e643d-80eb-4917-b387-934503060373" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="175fe5d7-1e4f-8681-8194-5cc30c12ebb8" executionId="3fb827e0-4cc7-43f0-b6c9-3203c3790c16" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="134ba2c9-2fce-8715-8601-28e82144ee80" executionId="00d59b71-4dfc-4d41-a90c-f597adbf6317" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14f5a345-2aeb-8041-bd67-c15be757828d" executionId="41e53ae0-66b6-413d-9df2-acce82e0f5eb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1be4a048-caa5-8a42-9421-263bbc5fb431" executionId="38bebdf0-0d6b-4d03-b344-17d24dd57237" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10d1c2c8-687a-8274-8e5b-2c62f6053260" executionId="8de09bd1-ed48-4e3f-abb7-eae0712e340d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19485975-a3ab-844c-b433-a1e7d51f1c99" executionId="c52ba773-aa48-4362-a360-04636e199f00" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1268ccfc-cc0e-8467-9e5b-d10952c453d1" executionId="eb7792fd-8143-4388-b65e-5c06754be7ab" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19627d89-bdcd-8b81-b96c-85990e54bccb" executionId="60d8905d-74ec-40f1-8646-c399639d7f1c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="131f70ad-e78a-8c7f-88d6-037fe5f48f8d" executionId="a8fa71c6-50a6-4a2e-8046-765906e1ac3d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13270e12-8d9d-83b8-865c-41f7b0204eb4" executionId="c45be6cd-2aea-4049-8cf0-2f1ee659a7df" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="176de608-593b-81bf-ae37-2ccfb4117d7e" executionId="06fbe4ff-d414-47ed-8979-6427204533d2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a46b707-2bf7-8843-8e4d-252c33b32f9b" executionId="716e3faa-1497-4f30-a234-6f2abcff159f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1193a61c-f291-8841-b84a-784090543c62" executionId="08dba552-3fc5-4ad0-a97b-3f500982f2cb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10d3d57a-07e7-8ce7-8e41-9bfe80d63735" executionId="fcb8f17e-bdba-4cd3-9901-84636b604529" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12eb8df2-8ab2-828d-bf2d-1fb8c0121011" executionId="b27cdd53-5509-4725-a1cf-d21689bd21c7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="179b9d85-bff2-878f-b6f2-e2785eb4e91b" executionId="f1e5c8a9-4c83-467a-b31e-e25d7abcc3c2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15d80365-c61d-86b5-ab92-40de918ae4f6" executionId="c8448382-9fa7-4d00-9f52-73561a181834" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ce90094-c06c-885e-a43d-01bd641cba97" executionId="ad188424-6306-479f-8672-f731c5d6d54b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ebfec5d-924e-8c73-befe-c0befae1461b" executionId="c7c78db2-a0dc-4771-ba4e-3a824e7a8d6d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ddce490-507d-8f56-874c-4135d59006a3" executionId="d8a3f53f-c171-4533-8211-c7b5052114ed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d617ed3-e017-8852-bb06-9fa25d39d4ad" executionId="60e90844-f3ab-4343-9807-3ddf9d42dedb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ceef542-4c04-8645-8118-db5df416a456" executionId="820da1af-a1c2-47a8-9a20-f626e2ea69ec" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13be86d8-e503-8879-94ff-02cd93dfa03c" executionId="bd1a8b9b-fe19-42e1-81b9-b534c4b127e4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10efe4ae-fe71-8e9f-8564-29da98437ca3" executionId="3d2101b9-1aa2-42fb-aecb-ef429916fb28" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="134f4a20-69da-839d-a79f-0468f2efb2a5" executionId="f4643c0f-cb0a-4a86-9b2f-2a0ea1336c29" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1fd6057f-10fb-8391-9f2e-26a2a642ad09" executionId="0db26330-d682-48ff-9904-daff202b1682" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1eb40bf1-2087-8be7-bcd0-52f0ae278490" executionId="24a80aec-782d-4dad-979e-3736517ebd9d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ab5f3b8-e580-8fc7-bd8e-e6ae455ae532" executionId="b5c88422-9048-4b0d-93a6-e92242fa85cc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d768e9a-376c-8513-9d80-ec9cd71f0df9" executionId="bf95f21f-fd18-4e6e-90f9-05a6a95f9aa8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14e0839b-5c3e-895e-b49d-d82c8527b9b7" executionId="9178191a-82b7-46ef-ab4d-c4d936f11eca" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="41" executed="41" passed="41" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
