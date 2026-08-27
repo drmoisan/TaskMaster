@@ -168,6 +168,8 @@
     <Compile Include="Controllers\MailItemActionsAdapterTests.cs" />
     <Compile Include="Controllers\WpfUiDispatcherTests.cs" />
     <Compile Include="Controllers\WebView2CoreInitializerTests.cs" />
+    <Compile Include="Viewers\WebView2BreadcrumbHostContractTests.cs" />
+    <Compile Include="Viewers\WebView2BreadcrumbHostTests.cs" />
     <Compile Include="Controllers\QfcQueueTests.cs" />
     <Compile Include="TestSupport\WinFormsPumpHost.cs" />
     <Compile Include="TestSupport\WinFormsPumpHostTests.cs" />
