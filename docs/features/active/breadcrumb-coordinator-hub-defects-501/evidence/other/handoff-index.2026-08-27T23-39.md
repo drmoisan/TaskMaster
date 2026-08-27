@@ -11,11 +11,11 @@ Base: `epic/quickfiler-bug-family-integration` (tip `69e83171` merged in; 0 behi
 
 | Question | Artifact |
 | --- | --- |
-| Did the base merge lose anything? | `docs/features/active/breadcrumb-coordinator-hub-defects-501/evidence/qa-gates/post-merge-base-reconciliation.2026-08-27T23-39.md` |
-| Did the toolchain pass on the merged tree? | `docs/features/active/breadcrumb-coordinator-hub-defects-501/evidence/qa-gates/post-merge-toolchain-attestation.2026-08-27T23-39.md` |
-| Did coverage regress? | `docs/features/active/breadcrumb-coordinator-hub-defects-501/evidence/qa-gates/coverage-delta.2026-08-27T23-39.md` |
-| Are all 32 criteria met? | `docs/features/active/breadcrumb-coordinator-hub-defects-501/evidence/issue-updates/ac-status-summary.2026-08-27T23-39.md` |
-| What changed outside the original plan? | `docs/features/active/breadcrumb-coordinator-hub-defects-501/evidence/qa-gates/addItemsCore-seam.2026-08-27T23-39.md` |
+| Did the base merge lose anything? | `docs/features/active/breadcrumb-coordinator-hub-defects-501/evidence/qa-gates/post-merge-base-reconciliation.2026-08-27T23-31.md` |
+| Did the toolchain pass on the merged tree? | `docs/features/active/breadcrumb-coordinator-hub-defects-501/evidence/qa-gates/post-merge-toolchain-attestation.2026-08-27T23-31.md` |
+| Did coverage regress? | `docs/features/active/breadcrumb-coordinator-hub-defects-501/evidence/qa-gates/coverage-delta.2026-08-27T23-31.md` |
+| Are all 32 criteria met? | `docs/features/active/breadcrumb-coordinator-hub-defects-501/evidence/issue-updates/ac-status-summary.2026-08-27T23-31.md` |
+| What changed outside the original plan? | `docs/features/active/breadcrumb-coordinator-hub-defects-501/evidence/qa-gates/addItemsCore-seam.2026-08-27T23-31.md` |
 | What is knowingly unfinished? | `docs/features/active/breadcrumb-coordinator-hub-defects-501/evidence/qa-gates/logging-verification-501.2026-08-27T20-48.md` |
 | Was scope respected? | `docs/features/active/breadcrumb-coordinator-hub-defects-501/evidence/qa-gates/scope-lock.2026-08-27T23-39.md` |
 
@@ -124,7 +124,7 @@ Artifacts listed but missing from disk: **0**.
 
 All 32 criteria in `docs/features/active/breadcrumb-coordinator-hub-defects-501/spec.md` are checked off, each against a named artifact
 in the table above. The AC-to-artifact mapping is in
-`docs/features/active/breadcrumb-coordinator-hub-defects-501/evidence/issue-updates/ac-status-summary.2026-08-27T23-39.md`.
+`docs/features/active/breadcrumb-coordinator-hub-defects-501/evidence/issue-updates/ac-status-summary.2026-08-27T23-31.md`.
 
 ## Follow-ups filed rather than deferred as prose
 
