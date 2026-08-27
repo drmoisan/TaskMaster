@@ -77,6 +77,7 @@
 - [Model-routing hook reads the canonical path only](model-routing-hook-reads-canonical-path-only.md) — it hardcodes artifacts/orchestration/orchestrator-state.json; a child-scoped file alone is blocked
 - [No helper scripts under evidence/](feedback_no_helper_scripts_under_evidence.md) — feature-review's language match is extension-only and path-blind; one retained `.ps1` forces a coverage FAIL
 - [One executor per worktree](one-executor-per-worktree.md) — a stale checkpoint is NOT a dead delegation; never launch a second executor into a live worktree
+- [Agent() cannot course-correct a running subagent](agent-tool-cannot-course-correct-running-subagent.md) — it starts a SECOND agent; SendMessage may be absent, so front-load the first prompt
 - [Removing a halt requires branch propagation](removing-a-halt-requires-branch-propagation.md) — converting a HALT into a recorded blocker strands downstream tasks; propagate to ALL consumers
 - [Bash tool rejects complex commands in isolated worktrees](bash-tool-rejects-complex-commands-in-isolated-worktree.md) — heredoc+redirect+git compounds are refused as unverifiable; gather with plain chained commands, then author via Write
 - [#457 coverage moved UP, and the kickoff figure was wrong](project_457_coverage_moved_up_not_down.md) — the denominator fix raised the rate 85.3514%→85.5355%; kickoff's 85.0317% matched no measurement, so #494 must re-measure
