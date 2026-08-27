@@ -91,6 +91,57 @@ namespace QuickFiler.Test.Viewers
             }
         }
 
+        /// <summary>
+        /// Issue #502 (I-502.4): a superseded <c>AddItems</c> must skip the append entirely and settle
+        /// its lease rather than leak the cancellation source. Unlike <c>SetSuggestionsCore</c> the skip
+        /// exposes no replaced handle, so the settled lease and the untouched collaborators are the only
+        /// observable evidence. Reaches the body through the <c>AddItemsCore</c> seam (SR-5) because a
+        /// lease taken by the public entry point is current by construction. Deterministic: one thread,
+        /// no timer, no wall-clock wait, no temporary file.
+        /// </summary>
+        [TestMethod]
+        public void AddItemsCore_SupersededLeaseSkipsAppendAndSettlesTheLease()
+        {
+            SynchronizationContext previous = SynchronizationContext.Current;
+            var context = new CapturingSynchronizationContext();
+            SynchronizationContext.SetSynchronizationContext(context);
+            try
+            {
+                // Arrange
+                var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+                var messenger = new Mock<IWebViewMessenger>();
+                var coordinator = new BreadcrumbBridgeCoordinator(
+                    messenger.Object,
+                    provider.Object
+                );
+
+                BreadcrumbCoordinatorUpgradeLifetime lifetime = GetLifetime(coordinator);
+                BreadcrumbUpgradeLease dead = lifetime.BeginPopulation();
+                lifetime
+                    .Invalidate()
+                    .Should()
+                    .BeTrue("the arrangement must actually supersede the lease before the act");
+                messenger.Invocations.Clear();
+
+                // Act
+                coordinator.AddItemsCore(new[] { "Alpha" }, dead);
+
+                // Assert
+                dead.Settled.Should()
+                    .BeTrue(
+                        "a superseded AddItems must settle its lease so no CancellationTokenSource leaks (I-502.3)"
+                    );
+                messenger
+                    .Invocations.Should()
+                    .BeEmpty("the skipped append must not render or post to the surface (I-502.4)");
+                provider.VerifyNoOtherCalls();
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previous);
+            }
+        }
+
         private static BreadcrumbCoordinatorUpgradeLifetime GetLifetime(
             BreadcrumbBridgeCoordinator coordinator
         )

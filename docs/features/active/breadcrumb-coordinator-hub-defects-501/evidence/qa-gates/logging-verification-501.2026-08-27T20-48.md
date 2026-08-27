@@ -98,3 +98,39 @@ What is NOT delivered is a runtime `MemoryAppender` assertion on the log call it
 without any project-file edit — PD-2's stated obstacle does not exist. Authoring one is nonetheless work
 no task in this plan describes, and the atomic-execution contract forbids performing work outside the
 plan. This is recorded as a plan defect for the reviewer rather than silently worked around.
+
+---
+
+## Resumed-run reconciliation (P5-T8 closed)
+
+Timestamp: 2026-08-27T23-29
+
+Command: `git grep -F -n 'Breadcrumb surface delivery failed.' -- QuickFiler/Viewers/BreadcrumbMessengerHub.cs`
+
+EXIT_CODE: 0
+
+Output Summary: re-verified after the base merge of `epic/quickfiler-bug-family-integration`.
+Still exactly one matched line, now at `QuickFiler/Viewers/BreadcrumbMessengerHub.cs:167`, still inside
+the per-surface `catch (Exception exception)` of the `Broadcast` helper that `PostJson` delegates to,
+and the enclosing statement still calls `log4net.LogManager.GetLogger(typeof(BreadcrumbMessengerHub))`.
+Conjuncts 1 and 2 remain SATISFIED.
+
+Conjunct 3 was resolved by AMENDING THE PLAN, not by writing a false claim. The plan task P5-T8 now
+records the true reason the assertion is source-level, and explicitly labels the original wording as a
+corrected false premise. The correction is recorded inline in `plan.2026-08-24T09-40.md`.
+
+Why the assertion stays source-level (the TRUE reason):
+
+| Constraint | Instrument | Observed | Effect |
+| --- | --- | --- | --- |
+| 500-line file budget (AC-25) | `(Get-Content -LiteralPath ...).Count` | `QuickFiler.Test/Viewers/BreadcrumbMessengerHubTests.cs` = 492 | 8 lines of headroom; a `MemoryAppender` fixture needs ~25+ |
+| No third new test file (AC-24) | spec.md AC-24 | forbids adding another test file | the natural alternative placement is prohibited |
+| Cohesion (general code policy §4.1) | n/a | a hub-logging test in the supersession or upgrade-lifetime file is unrelated content | relocation is not an acceptable substitute |
+
+PD-2's stated obstacle (an absent `log4net` reference) does not exist; the reference is present at
+`QuickFiler.Test/QuickFiler.Test.csproj:209-210`. The obstacle that DOES exist is the file budget.
+Both facts are recorded so the reviewer can weigh them directly.
+
+AC-11 verification is unchanged and complete on both halves: the logging half by the source inspection
+above, and the non-propagation half by a real red-to-green runtime test
+(`red-501-starvation.2026-08-27T20-40.md` to `green-500-hub-and-501.2026-08-27T20-47.md`).

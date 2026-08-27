@@ -3,8 +3,8 @@
 - **Issue:** #501 (also closes #462, #500, #502)
 - **Parent (optional):** epic `quickfiler-bug-family`
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-24T10-05
-- **Status:** Ready for planning
+- **Last Updated:** 2026-08-27T23-31
+- **Status:** Implemented
 - **Version:** 1.0
 - **Work Mode:** `full-bug` — this file is the authoritative acceptance-criteria source. There is no
   `user-story.md`: the change is a four-defect internal correctness fix with no new user-facing
@@ -881,111 +881,111 @@ Each item is independently verifiable and traceable to a numbered invariant or a
 
 **Defect fixes**
 
-- [ ] AC-01 (#462, I-462.1) `_closePending` is replaced by `_closeInFlight` and `_closeCompleted` with
+- [x] AC-01 (#462, I-462.1) `_closePending` is replaced by `_closeInFlight` and `_closeCompleted` with
       distinct documented meanings; `_closeInFlight` is cleared in a `finally` around the
       `_host.Close(reason)` call and reads `false` on every exit from `CloseCore` — success,
       not-closed, throw, and released.
-- [ ] AC-02 (#462, I-462.2) After a `CloseCore` that returned `true`, with the host open again and the
+- [x] AC-02 (#462, I-462.2) After a `CloseCore` that returned `true`, with the host open again and the
       coordinator not released, `RequestOpen()` reaches `_host.OpenAsync` and returns a task that is
       not the `ClosedTask` sentinel.
-- [ ] AC-03 (#462, I-462.3/I-462.4/I-462.5) Idempotent close, generation monotonicity, and released
+- [x] AC-03 (#462, I-462.3/I-462.4/I-462.5) Idempotent close, generation monotonicity, and released
       terminality are all preserved: two closes with no intervening reopen reach `_host.Close` exactly
       once; a close returning `false` does not increment `_generation`; after `Release()`,
       `RequestOpen` returns the sentinel and `CloseCore` returns `false` without touching `_host`.
-- [ ] AC-04 (#500, I-500.1) At the moment the guarded action executes,
+- [x] AC-04 (#500, I-500.1) At the moment the guarded action executes,
       `Monitor.IsEntered(BreadcrumbCoordinatorUpgradeLifetime._sync)` observed from inside the action
       is `false`.
-- [ ] AC-05 (#500, I-500.2) At the moment `IWebViewMessenger.PostJson` is invoked on an attached
+- [x] AC-05 (#500, I-500.2) At the moment `IWebViewMessenger.PostJson` is invoked on an attached
       surface, `Monitor.IsEntered(BreadcrumbMessengerHub._sync)` observed from inside that surface is
       `false`.
-- [ ] AC-06 (#500, I-500.3) `TryRunCurrent` returns `true` for an action that re-entrantly calls
+- [x] AC-06 (#500, I-500.3) `TryRunCurrent` returns `true` for an action that re-entrantly calls
       `lifetime.Invalidate()`, and `lifetime.IsCurrent(lease)` is `false` immediately afterwards; the
       return value is not retro-actively falsified.
-- [ ] AC-07 (#500, I-500.4) A re-entrant `Attach` or `Detach` performed from inside a surface's
+- [x] AC-07 (#500, I-500.4) A re-entrant `Attach` or `Detach` performed from inside a surface's
       `PostJson` does not throw `InvalidOperationException: Collection was modified`; the broadcast
       completes and the re-entrant call takes effect.
-- [ ] AC-08 (#501, I-501.1) With two attached surfaces that both increment an attempt counter before
+- [x] AC-08 (#501, I-501.1) With two attached surfaces that both increment an attempt counter before
       throwing, a single `hub.PostJson` produces a total attempt count of exactly 2. The assertion is
       order-independent and does not rely on `Dictionary.Values` enumeration order.
-- [ ] AC-09 (#501, I-501.2) With one throwing surface and one recording surface attached, the
+- [x] AC-09 (#501, I-501.2) With one throwing surface and one recording surface attached, the
       recording surface's `Posted` collection contains the payload after `PostJson` returns.
-- [ ] AC-10 (#501, I-501.3) After a partially failed broadcast, a freshly attached surface replays a
+- [x] AC-10 (#501, I-501.3) After a partially failed broadcast, a freshly attached surface replays a
       state that the surviving surface already received.
-- [ ] AC-11 (#501, I-501.4 + SR-3) A per-surface delivery failure is logged through the hub's existing
+- [x] AC-11 (#501, I-501.4 + SR-3) A per-surface delivery failure is logged through the hub's existing
       `log4net` logger, and `PostJson` does not propagate the surface throw to its caller.
-- [ ] AC-12 (#502, I-502.1) `RunSynchronous` returns `bool`, returning `false` when and only when the
+- [x] AC-12 (#502, I-502.1) `RunSynchronous` returns `bool`, returning `false` when and only when the
       guarded action did not run, and both `SetSuggestions` and `AddItems` consume the value.
-- [ ] AC-13 (#502, I-502.2) After a `SetSuggestions` whose lease was superseded, `SuggestionsUpgrade`
+- [x] AC-13 (#502, I-502.2) After a `SetSuggestions` whose lease was superseded, `SuggestionsUpgrade`
       is not reference-equal to the previously captured incomplete task; it is `Task.CompletedTask`.
-- [ ] AC-14 (#502, I-502.4) A superseded `AddItems` settles its lease via `Abandon`, and the
+- [x] AC-14 (#502, I-502.4) A superseded `AddItems` settles its lease via `Abandon`, and the
       deliberate discard of the unobservable handle is documented in an XML comment.
 
 **Companion defect**
 
-- [ ] AC-15 (companion, I-502.3) Every lease returned by `BeginPopulation` reaches `Settled == true`
+- [x] AC-15 (companion, I-502.3) Every lease returned by `BeginPopulation` reaches `Settled == true`
       and `SourceDisposed == true`, including a lease whose guarded action was skipped; no
       `CancellationTokenSource` is leaked per superseded population.
 
 **Failing-first regression tests (one per defect, RED before the fix)**
 
-- [ ] AC-16 (#462) A regression test in
+- [x] AC-16 (#462) A regression test in
       `QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.Part2.cs` asserts I-462.2 using
       `CoordinatorHarness`, `ControlledHost.SetOpen`, and explicit `DrainUntil`; it is demonstrated
       RED against HEAD before the fix and green after.
-- [ ] AC-17 (#500) A regression test in
+- [x] AC-17 (#500) A regression test in
       `QuickFiler.Test/Viewers/BreadcrumbCoordinatorUpgradeLifetimeTests.cs` asserts I-500.1 via
       `Monitor.IsEntered` against the reflected `_sync`; it is demonstrated RED against HEAD before the
       fix and green after.
-- [ ] AC-18 (#501) A regression test in `QuickFiler.Test/Viewers/BreadcrumbMessengerHubTests.cs`
+- [x] AC-18 (#501) A regression test in `QuickFiler.Test/Viewers/BreadcrumbMessengerHubTests.cs`
       asserts I-501.1 with two counting-and-throwing surfaces; it is demonstrated RED against HEAD
       (total attempts 1) before the fix and green after (total attempts 2).
-- [ ] AC-19 (#502 companion) The lease-leak regression test in
+- [x] AC-19 (#502 companion) The lease-leak regression test in
       `QuickFiler.Test/Viewers/BreadcrumbCoordinatorUpgradeLifetimeTests.cs` compiles against HEAD,
       is demonstrated RED there, and is green after the fix. It is authored **first** among the #502
       tests, since it is the only #502 assertion that is RED without a signature or seam change.
 
 **Existing tests that must pass unmodified**
 
-- [ ] AC-20 `PendingToggleClose_HostOwnershipSuppressesFallbackAndRepeatedClose`
+- [x] AC-20 `PendingToggleClose_HostOwnershipSuppressesFallbackAndRepeatedClose`
       (`BreadcrumbDropDownOpenCoordinatorTests.cs:262-280`) passes with no edit to the test file.
-- [ ] AC-21 `SelectorStateTransitions_RequestOpenThenCloseOnlyWhenRequired`
+- [x] AC-21 `SelectorStateTransitions_RequestOpenThenCloseOnlyWhenRequired`
       (`BreadcrumbDropDownOpenCoordinatorTests.Part2.cs:120-140`) passes with no edit to the test file.
       Together with AC-20 this is what rules out the naive #462 fix.
-- [ ] AC-22 (I-501.5) `Attach_ReplayFailureRollsBackSubscriptionAndAllowsRetry`
+- [x] AC-22 (I-501.5) `Attach_ReplayFailureRollsBackSubscriptionAndAllowsRetry`
       (`BreadcrumbMessengerHubTests.cs:198-217`) passes with no edit to the test file.
 
 **Structure, ownership, and budget**
 
-- [ ] AC-23 (SR-1) `QuickFiler/Viewers/BreadcrumbBridgeCoordinator.Suggestions.cs` exists and contains
+- [x] AC-23 (SR-1) `QuickFiler/Viewers/BreadcrumbBridgeCoordinator.Suggestions.cs` exists and contains
       `SetSuggestions`, `SetSuggestionsCore`, `SuggestionsUpgrade`, `PopulateSuggestionsAsync` and
       `AddItems`; `QuickFiler/QuickFiler.csproj` gains **exactly one**
       `<Compile Include="Viewers\BreadcrumbBridgeCoordinator.Suggestions.cs" />` line and no other
       edit.
-- [ ] AC-24 `QuickFiler.Test/Viewers/BreadcrumbBridgeCoordinatorSupersessionTests.cs` exists and
+- [x] AC-24 `QuickFiler.Test/Viewers/BreadcrumbBridgeCoordinatorSupersessionTests.cs` exists and
       `QuickFiler.Test/QuickFiler.Test.csproj` gains **exactly one** `<Compile Include>` line for it,
       inserted adjacent to the sibling `BreadcrumbBridgeCoordinatorTests` entry (not by alphabetical
       order, which that item group does not follow). No third new test file is added.
-- [ ] AC-25 No file in the change set exceeds 500 lines after the change, verified by line count on
+- [x] AC-25 No file in the change set exceeds 500 lines after the change, verified by line count on
       every added and modified `.cs` file.
-- [ ] AC-26 The diff writes none of `WebView2Messenger.cs`, `WebView2BreadcrumbHost.cs`,
+- [x] AC-26 The diff writes none of `WebView2Messenger.cs`, `WebView2BreadcrumbHost.cs`,
       `BreadcrumbItemViewerLifecycleCoordinator.cs`, `BreadcrumbPopupUiOperations.cs`,
       `BreadcrumbDropDownHost.cs`, or `ItemViewer.Breadcrumb.cs`.
-- [ ] AC-27 No test added or modified by this change uses `Thread.Sleep`, `Task.Delay`, a real
+- [x] AC-27 No test added or modified by this change uses `Thread.Sleep`, `Task.Delay`, a real
       wall-clock wait, a temporary file, or a second thread for ordering; every ordering is driven by
       an injected delegate, a reflected `Monitor.IsEntered` probe, or an explicit
       synchronization-context drain.
-- [ ] AC-28 (cross-cutting NFR) `TryRunCurrent`'s `bool` is the entry-time currency verdict only; no
+- [x] AC-28 (cross-cutting NFR) `TryRunCurrent`'s `bool` is the entry-time currency verdict only; no
       post-action currency re-check is folded into the return value, and AC-06's test guards this.
 
 **Toolchain**
 
-- [ ] AC-29 `dotnet tool run csharpier format .` applied and `dotnet tool run csharpier check .`
+- [x] AC-29 `dotnet tool run csharpier format .` applied and `dotnet tool run csharpier check .`
       reports no differences.
-- [ ] AC-30 `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+- [x] AC-30 `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
       completes with no analyzer errors.
-- [ ] AC-31 `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
+- [x] AC-31 `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
       completes clean, with no `/p:Nullable=enable` added and `/t:Rebuild` (not `/t:Build`) used.
-- [ ] AC-32 `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage` passes with the full
+- [x] AC-32 `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage` passes with the full
       `QuickFiler.Test` suite green and no coverage regression on changed lines; all four toolchain
       steps pass in a single uninterrupted final pass.
 
@@ -1035,3 +1035,44 @@ Each item is independently verifiable and traceable to a numbered invariant or a
     - `docs/features/potential/promoted/2026-08-08-breadcrumb-webview-post-executes-under-upgrade-lifetime-lock.md`
     - `docs/features/potential/promoted/2026-08-08-breadcrumb-hub-postjson-caches-before-broadcast-starves-attachments.md`
     - `docs/features/potential/promoted/2026-08-08-breadcrumb-suggestions-upgrade-silently-stale-on-superseded-lease.md`
+
+## Implementation Notes
+
+Recorded at 2026-08-27T23-31, after the full toolchain passed on the merged tree.
+
+### Ruling PD-1 — upheld as written
+
+`RunSynchronous` settles the lease on its own skip path: every `return false` is preceded by
+`Abandon(lease)`, and the `catch` path abandons before rethrowing. AC-19's lease-leak assertion is
+therefore satisfiable without a caller-side settle, and this is the route the implementation took.
+
+### Ruling PD-2 — premise FALSE, ruling corrected
+
+PD-2 justified verifying AC-11's logging half by source inspection on the grounds that
+`QuickFiler.Test/QuickFiler.Test.csproj` carries no `log4net` reference. That premise is false: the
+reference exists at `QuickFiler.Test/QuickFiler.Test.csproj:209-210`, and
+`QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue614Tests.cs` already drives a `MemoryAppender`.
+
+The conclusion still holds, for a different and true reason:
+`QuickFiler.Test/Viewers/BreadcrumbMessengerHubTests.cs` stands at 492 of the 500-line budget (AC-25),
+leaving too little headroom for an appender fixture, and AC-24 forbids a third new test file. Plan task
+P5-T8 was amended to state the true reason. AC-11's non-propagation half is verified at runtime by a
+red-to-green test; only the logging half rests on source inspection.
+
+### SR-4 known limitation, shipped as designed
+
+`_closeCompleted` stays `true` when the host is reopened by a path that reaches neither `RequestOpen`
+nor `Invalidate`. The two-flag form was chosen because the naive alternative (clearing the close flag on
+the successful-close path) makes `PendingToggleClose_HostOwnershipSuppressesFallbackAndRepeatedClose`
+and `SelectorStateTransitions_RequestOpenThenCloseOnlyWhenRequired` fail. The residual is filed as a
+follow-up against feature 488's host paths rather than worked around here.
+
+### Deviation recorded during execution — the `AddItemsCore` seam
+
+The P7-T6 coverage gate showed the superseded-`AddItems` skip path (`if (!ran)`) was never executed by
+any test, dropping the SR-1 split pair 1.03 percentage points below its floor. An `internal AddItemsCore`
+seam was extracted, mirroring the already-ratified `SetSuggestionsCore` seam (SR-5), and a deterministic
+supersession test now drives the skip. The redundant-looking `Abandon` call in that branch was KEPT, not
+deleted, because `RunSynchronous`'s XML contract documents the double call as intentional and idempotent.
+No file, no test file and no project-file entry was added. See
+`evidence/qa-gates/addItemsCore-seam.2026-08-27T23-31.md`.

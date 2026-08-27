@@ -90,6 +90,18 @@ namespace QuickFiler.Viewers
         {
             _ = items ?? throw new ArgumentNullException(nameof(items));
             BreadcrumbUpgradeLease lease = _upgradeLifetime.BeginPopulation();
+            AddItemsCore(items, lease);
+        }
+
+        /// <summary>
+        /// The append body, separated from <see cref="AddItems"/> so a superseded lease can be driven
+        /// through the skip path directly (SR-5, mirroring <see cref="SetSuggestionsCore"/>). Because a
+        /// fresh lease taken by <see cref="AddItems"/> is current by construction, the <c>false</c>
+        /// branch is otherwise reachable only under a concurrent supersession race, which no
+        /// deterministic single-threaded test may provoke.
+        /// </summary>
+        internal void AddItemsCore(IReadOnlyList<string> items, BreadcrumbUpgradeLease lease)
+        {
             bool ran = _upgradeLifetime.RunSynchronous(
                 lease,
                 () =>
