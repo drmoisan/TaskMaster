@@ -64,6 +64,7 @@
 - [511-rescope-review-residuals](project_511-rescope-review-residuals.md) — 2026-08-24 re-audit PASS/0 blocking; residuals CR-1 stale RCA narrative + CR-2 AC-vs-deleted-TRX wording; PR must not close #511/#571 (#592/#594/#597 carry the real defects)
 
 - [614-review-residuals](project_614-review-residuals.md) — cycle-2 exit NO-GO/1 blocking: RC-1 widened filing guard admits archive-root-exact row that RequireArchiveRelativeStem throws on, post-Hide async-void crash; CR-1 closed
+- [493-review-residuals + msbuild-log gate adjudication](project_493-review-residuals-and-msbuild-log-gate-adjudication.md) — PASS/0 blocking; how a structurally unsatisfiable msbuild-log byte-equality gate was adjudicated without downgrading the AC
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
