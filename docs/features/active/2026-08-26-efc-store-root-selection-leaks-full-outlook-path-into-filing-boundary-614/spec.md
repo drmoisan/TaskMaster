@@ -1113,7 +1113,7 @@ the sole authoritative AC source for this `full-bug` issue.
       change does not lower it. All artifacts are written under `<FEATURE>/evidence/baseline/` and
       `<FEATURE>/evidence/coverage/`; none is written to `artifacts/baselines/`,
       `artifacts/coverage/`, or `artifacts/qa/`.
-- [x] **AC24 (full four-step toolchain).** A single clean pass of all four steps, in order, is
+- [ ] **AC24 (full four-step toolchain).** A single clean pass of all four steps, in order, is
       recorded with the exact commands and their exit codes: `dotnet tool run csharpier check .`;
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`;
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`;
