@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Interfaces;
@@ -347,41 +344,6 @@ namespace QuickFiler.Controllers
                 });
                 //_ = IterateQueueAsync();
                 WorkerComplete = true;
-            }
-        }
-
-        private BlockingCollection<string> _metrics = new BlockingCollection<string>(
-            new ConcurrentQueue<string>()
-        );
-        private int _metricsConsumers = 0;
-        private static object _lockObject = new object();
-        private static string _fileName;
-
-        //private static string _folderPath;
-
-        private async void TimedConsumerAsync(object source, ElapsedEventArgs e)
-        {
-            try
-            {
-                Interlocked.Decrement(ref _metricsConsumers);
-                var strOutput = _metrics.GetConsumingEnumerable().ToArray();
-                if (strOutput.Length > 0)
-                {
-                    if (Globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var myDocuments))
-                    {
-                        await FileIO2.WriteTextFileAsync(
-                            Globals.FS.Filenames.EmailSession,
-                            strOutput,
-                            myDocuments,
-                            default
-                        );
-                    }
-                }
-            }
-            catch (System.Exception ex)
-            {
-                logger.Error(ex.Message, ex);
-                throw;
             }
         }
 
