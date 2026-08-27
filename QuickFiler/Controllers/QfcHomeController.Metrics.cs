@@ -1,5 +1,7 @@
 using System;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
@@ -15,6 +17,21 @@ namespace QuickFiler.Controllers
         /// time-dependent output and async delays deterministic.
         /// </summary>
         internal TimeProvider TimeProvider { get; set; } = TimeProvider.System;
+
+        /// <summary>
+        /// Injectable seam for the session-metrics file write. Parameter order is filename, lines,
+        /// folder root, cancellation token. Defaults to <see cref="FileIO2.WriteTextFileAsync"/> so
+        /// production behaviour is unchanged; tests assign a capturing delegate to observe the
+        /// flush without touching the filesystem. Mirrors the EmailFiler precedent at
+        /// <c>EfcHomeControllerDependencies.cs:78</c>.
+        /// </summary>
+        internal Func<
+            string,
+            string[],
+            string,
+            CancellationToken,
+            Task
+        > MetricsFileWriter { get; set; } = FileIO2.WriteTextFileAsync;
 
         public void QuickFileMetrics_WRITE(string filename)
         {
@@ -39,7 +56,7 @@ namespace QuickFiler.Controllers
             }
             var filepath = Path.Combine(folderRoot, filename);
 
-            double duration = _stopWatchMoved.Elapsed.Seconds;
+            double duration = _stopWatchMoved.Elapsed.TotalSeconds;
             var endTime = now;
             var startTime = endTime.Subtract(_stopWatchMoved.Elapsed);
 
@@ -50,10 +67,10 @@ namespace QuickFiler.Controllers
                 duration /= emailsLoaded;
             }
 
-            durationText = duration.ToString("##0");
+            durationText = duration.ToString("##0", CultureInfo.InvariantCulture);
             // If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable durationText = " & durationText
 
-            durationMinutesText = (duration / 60d).ToString("##0.00");
+            durationMinutesText = (duration / 60d).ToString("##0.00", CultureInfo.InvariantCulture);
 
             var olEmailCalendar = UtilitiesCS.Calendar.GetCalendar(
                 "Email Time",
@@ -117,10 +134,11 @@ namespace QuickFiler.Controllers
             }
             LOC_TXT_FILE = Path.Combine(myDocuments, filename);
 
-            //Duration = _stopWatchMoved.Elapsed.Seconds;
-            Duration = StopWatch.Elapsed.Seconds;
+            Duration = _stopWatchMoved.Elapsed.TotalSeconds;
             OlEndTime = now;
-            OlStartTime = OlEndTime.Subtract(new TimeSpan(0, 0, 0, (int)Duration));
+            // Subtract the measured interval directly rather than reconstructing it from a
+            // truncated integer cast, so the calendar span agrees with the reported duration.
+            OlStartTime = OlEndTime.Subtract(_stopWatchMoved.Elapsed);
 
             var emailsLoaded = _formController.Groups.EmailsToMove;
 
@@ -129,10 +147,10 @@ namespace QuickFiler.Controllers
                 Duration /= emailsLoaded;
             }
 
-            durationText = Duration.ToString("##0");
+            durationText = Duration.ToString("##0", CultureInfo.InvariantCulture);
             // If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable durationText = " & durationText
 
-            durationMinutesText = (Duration / 60d).ToString("##0.00");
+            durationMinutesText = (Duration / 60d).ToString("##0.00", CultureInfo.InvariantCulture);
             WriteMoveToCalendar(
                 OlEndTime,
                 OlStartTime,
@@ -150,8 +168,15 @@ namespace QuickFiler.Controllers
                 ref OlAppointment
             );
 
-            _fileName = filename;
-            await NonBlockingProducer(strOutput, Token);
+            // GetMoveDiagnostics returns an array one element longer than it fills, so its trailing
+            // element is null; dropping null and whitespace-only entries keeps blank rows out of
+            // the CSV.
+            var lines = strOutput.Where(line => !string.IsNullOrWhiteSpace(line)).ToArray();
+
+            // CancellationToken.None, never the session Token: the dispatcher continuation that
+            // carries this write is not awaited to completion, so a session cancellation can be
+            // raised while the write is in flight and must not destroy the metrics.
+            await MetricsFileWriter(filename, lines, myDocuments, CancellationToken.None);
         }
 
         private void WriteMoveToCalendar(
@@ -184,50 +209,6 @@ namespace QuickFiler.Controllers
                     OlAppointment.Sensitivity = OlSensitivity.olPrivate;
                     OlAppointment.Save();
                 }
-            }
-        }
-
-        private async Task NonBlockingProducer(string[] lines, CancellationToken ct)
-        {
-            //TraceUtility.LogMethodCall(lines, ct);
-
-            foreach (string line in lines)
-            {
-                ct.ThrowIfCancellationRequested();
-                await NonBlockingProducer(line, ct);
-            }
-        }
-
-        private async Task NonBlockingProducer(string line, CancellationToken ct)
-        {
-            bool success = false;
-
-            do
-            {
-                // Cancellation causes OCE. We know how to handle it.
-                try
-                {
-                    // A shorter timeout causes more failures.
-                    success = _metrics.TryAdd(line, 20, ct);
-                }
-                catch (OperationCanceledException)
-                {
-                    if (ct.IsCancellationRequested)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        //logger.Debug($"Timeout adding {line}");
-                        await TimeProvider.Delay(TimeSpan.FromMilliseconds(20));
-                    }
-                }
-            } while (!success);
-            if (Interlocked.CompareExchange(ref _metricsConsumers, 0, 2) == 2)
-            {
-                Interlocked.Decrement(ref _metricsConsumers);
-                var timer = new System.Timers.Timer(2000);
-                timer.Elapsed += TimedConsumerAsync;
             }
         }
     }

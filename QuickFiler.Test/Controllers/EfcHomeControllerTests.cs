@@ -61,7 +61,7 @@ namespace QuickFiler.Controllers.Tests
             var controller = CreateMinimalController();
 
             // Simulate a concurrent invocation already in progress.
-            SetField(controller, "_isExecuting", true);
+            SetField(controller, "_isExecuting", 1);
 
             // _formController is null from the private constructor.
             // If the guard were absent, the very first line of ExecuteMovesAsync would throw

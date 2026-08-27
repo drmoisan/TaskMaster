@@ -73,7 +73,7 @@ namespace QuickFiler
             if (DataModel.Mail is not null)
             {
                 InitType = QfEnums.InitTypeEnum.Sort | QfEnums.InitTypeEnum.SortConv;
-                _stopWatch = new Stopwatch();
+                _stopWatch = Stopwatch.StartNew();
                 FormViewer = _dependencies.ViewerFactory();
                 _uiSyncContext = FormViewer.UiSyncContext;
                 _keyboardHandler = _dependencies.KeyboardHandlerFactory(FormViewer, this);
@@ -222,7 +222,7 @@ namespace QuickFiler
 
             // Initialize the rest of the home controller
             InitType = initType;
-            _stopWatch = new Stopwatch();
+            _stopWatch = Stopwatch.StartNew();
             FormViewer = _dependencies.ViewerFactory();
             _uiSyncContext = FormViewer.UiSyncContext;
             _keyboardHandler = _dependencies.KeyboardHandlerFactory(FormViewer, this);
@@ -386,7 +386,11 @@ namespace QuickFiler
             get => _stopWatch;
         }
 
-        private volatile bool _isExecuting;
+        // Single-move guard, taken and released through Interlocked in ExecuteMoves.cs. A memory
+        // barrier on a bool would order the read and the write but leave them two operations, so
+        // two callers could both observe the unset state and both proceed. 0 means no move is in
+        // flight, 1 means one is.
+        private int _isExecuting;
 
         public bool Loaded => throw new NotImplementedException();
 
