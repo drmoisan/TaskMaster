@@ -87,7 +87,7 @@
 - [atomic-planner has no MCP validator tool](atomic-planner-lacks-mcp-validator-tool.md) — it cannot run the mandatory plan gate; run it yourself and tell the planner not to fabricate a result
 - [Preflight defect-trend scope confound](preflight-defect-trend-scope-confound.md) — a rising count isn't divergence if you widened scope that round; hold scope fixed one round, and track re-introductions not raw counts
 - [C# agent worktree needs three bootstrap steps](csharp-agent-worktree-needs-three-bootstrap-steps.md) — no `.dotnet-sdk`, no `packages/`, and a clean restore still hits `error CS0006` on skewed analyzer versions; green CI is cache-explained, not tolerance
-- [potential_to_issue keeps ONLY the Summary section](potential-to-issue-keeps-only-summary-section.md) — every other section becomes "(not provided in potential file)"; verify the issue body, post the rest as a comment
+- [potential_to_issue maps sections by heading name](potential-to-issue-keeps-only-summary-section.md) — template headings survive INTACT; only your own invented headings get dropped. Keep the scaffold's headings
 - [Epic kickoff facts need independent measurement](epic-kickoff-facts-need-independent-measurement.md) — a kickoff predicted a 500-line cap finding from a conflated file; the named file was 323 lines, not 1,065
 - [WebView2 EndInit creates handles at construction](webview2-endinit-creates-handles-at-construction.md) — a bare ItemViewer already has both child handles AND its own; any "force the handle" remedy is a measured no-op
 - [blocked_reason enum can't express a substantive halt](blocked-reason-enum-cannot-express-substantive-halt.md) — 7 mechanical members only; use "none" plus free-form halt/blocking_findings keys, never a wrong member
