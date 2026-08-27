@@ -1,11 +1,8 @@
 using System;
 using System.Collections;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Threading;
-using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.Web.WebView2.Core;
@@ -33,22 +30,11 @@ namespace QuickFiler.Controllers.Tests
     {
         // ------------------------- #230 pump-hosted initialization tests -------------------------
 
-        /// <summary>
-        /// Serializes the <c>UiThread.Dispatcher</c> swap across every pump-hosted test in this
-        /// assembly. Two separate test classes consume <see cref="BuildPumpHarnessAsync"/> — this
-        /// one and <c>QfcItemController_SeamFactoryTests</c> — and MSTest class-level
-        /// parallelization runs them concurrently. Without this gate one class's
-        /// <c>PumpHarness.Restore</c> can revert the process-wide static to the parked dispatcher
-        /// seeded by <c>QfcItemControllerTestSupport.EnsureUiThreadDispatcher</c> while the other
-        /// class's member under test is still awaiting a dispatcher operation; the parked
-        /// dispatcher never runs a frame, so that await never completes and the test fails on its
-        /// <c>[Timeout]</c> instead of on an assertion.
-        /// </summary>
-        /// <remarks>
-        /// The gate is a deterministic completion signal, not a wall-clock wait: <c>WaitAsync</c>
-        /// is released by the preceding test's <c>Restore</c>, never by elapsed time.
-        /// </remarks>
-        private static readonly SemaphoreSlim UiThreadDispatcherGate = new SemaphoreSlim(1, 1);
+        // The #230 serialization of the process-wide UiThread dispatcher now lives in
+        // UiThreadDispatcherFixture. It exists because two test classes consume the pump fixture and
+        // MSTest class-level parallelization runs them concurrently, so without it one class's restore
+        // can revert the static to a parked, never-pumped dispatcher while the other class is still
+        // awaiting a dispatcher operation, producing a timeout rather than an assertion failure.
 
         /// <summary>
         /// #230: builds a controller wired for a full initialization run against a real
@@ -64,21 +50,25 @@ namespace QuickFiler.Controllers.Tests
         {
             // Held until PumpHarness.Restore, so only one pump fixture owns the static
             // UiThread.Dispatcher at a time across all test classes in this assembly.
-            await UiThreadDispatcherGate.WaitAsync().ConfigureAwait(false);
+            UiThreadDispatcherTransaction transaction = await UiThreadDispatcherFixture
+                .BeginTransactionAsync()
+                .ConfigureAwait(false);
             try
             {
-                return await BuildPumpHarnessCoreAsync(host, darkMode).ConfigureAwait(false);
+                return await BuildPumpHarnessCoreAsync(host, darkMode, transaction)
+                    .ConfigureAwait(false);
             }
             catch
             {
-                UiThreadDispatcherGate.Release();
+                transaction.Dispose();
                 throw;
             }
         }
 
         private static async Task<PumpHarness> BuildPumpHarnessCoreAsync(
             WinFormsPumpHost host,
-            bool darkMode
+            bool darkMode,
+            UiThreadDispatcherTransaction transaction
         )
         {
             QuickFiler.ItemViewer viewer = await host.InvokeAsync(() => new QuickFiler.ItemViewer())
@@ -135,26 +125,9 @@ namespace QuickFiler.Controllers.Tests
             // complete an InvokeAsync. Point it at the pump thread's dispatcher (serviced by the
             // WinForms loop, proven by WinFormsPumpHostTests.BothMarshalRoutes_*) for the duration
             // of the test, and restore the previous value in PumpHarness.Restore so no state leaks.
-            Dispatcher previousUiThreadDispatcher = SwapUiThreadDispatcher(viewer.UiDispatcher);
+            transaction.Install(viewer.UiDispatcher);
 
-            return new PumpHarness(controller, viewer, cts, webView, previousUiThreadDispatcher);
-        }
-
-        /// <summary>
-        /// Replaces the static <c>UiThread._dispatcher</c> backing field and returns the previous
-        /// value, mirroring the reflection pattern in
-        /// <c>QfcItemControllerTestSupport.EnsureUiThreadDispatcher</c>.
-        /// </summary>
-        private static Dispatcher SwapUiThreadDispatcher(Dispatcher replacement)
-        {
-            FieldInfo field = typeof(UiThread).GetField(
-                "_dispatcher",
-                BindingFlags.NonPublic | BindingFlags.Static
-            );
-            field.Should().NotBeNull(because: "UiThread._dispatcher backing field must exist");
-            Dispatcher previous = (Dispatcher)field.GetValue(null);
-            field.SetValue(null, replacement);
-            return previous;
+            return new PumpHarness(controller, viewer, cts, webView, transaction);
         }
 
         /// <summary>
@@ -305,7 +278,7 @@ namespace QuickFiler.Controllers.Tests
         /// </summary>
         internal sealed class PumpHarness
         {
-            private readonly Dispatcher _previousUiThreadDispatcher;
+            private readonly UiThreadDispatcherTransaction _transaction;
             private bool _restored;
 
             internal PumpHarness(
@@ -313,14 +286,14 @@ namespace QuickFiler.Controllers.Tests
                 QuickFiler.ItemViewer viewer,
                 CancellationTokenSource tokenSource,
                 Mock<IWebViewCoreInitializer> webViewInitializer,
-                Dispatcher previousUiThreadDispatcher
+                UiThreadDispatcherTransaction transaction
             )
             {
                 Controller = controller;
                 Viewer = viewer;
                 TokenSource = tokenSource;
                 WebViewInitializer = webViewInitializer;
-                _previousUiThreadDispatcher = previousUiThreadDispatcher;
+                _transaction = transaction;
             }
 
             internal HarnessController Controller { get; }
@@ -345,9 +318,11 @@ namespace QuickFiler.Controllers.Tests
                 }
 
                 _restored = true;
-                SwapUiThreadDispatcher(_previousUiThreadDispatcher);
                 TokenSource.Dispose();
-                UiThreadDispatcherGate.Release();
+
+                // Disposing the transaction restores the captured previous value and only then
+                // releases the gate, so a waiter can never observe the pre-restore value.
+                _transaction.Dispose();
             }
         }
 
