@@ -23,9 +23,45 @@ namespace QuickFiler.Controllers
             _list = new List<UClass>();
         }
 
+        /// <summary>
+        /// Seeds the registry from <paramref name="list"/>, enforcing the same
+        /// (SourceId, stored Key) uniqueness invariant both <c>Add</c> overloads enforce.
+        /// </summary>
+        /// <param name="list">
+        /// The seed sequence. Materialised first and enumerated exactly once, so a null argument
+        /// still produces <see cref="ArgumentNullException"/> rather than
+        /// <see cref="NullReferenceException"/>, and a one-shot sequence is not consumed twice.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when two or more elements share a <c>SourceId</c> and a
+        /// <see cref="StoredKeyEquals"/>-equal <c>Key</c>. Comparison uses
+        /// <see cref="StoredKeyEquals"/>, never the element-defined <c>KeyEquals</c>: the latter may
+        /// match on a substring and carry observable side effects, so it would both reject legally
+        /// coexisting keys and fire those side effects during construction.
+        /// </exception>
         public KbdActions(IEnumerable<UClass> list)
         {
             _list = new List<UClass>(list);
+
+            // O(n^2) over the seed, consistent with Add's existing _list.Any(...) scan. Seed lists
+            // in this repository hold at most eight entries, so a hash set would be premature and
+            // would require an IEqualityComparer<TKey>.
+            for (int i = 0; i < _list.Count; i++)
+            {
+                for (int j = i + 1; j < _list.Count; j++)
+                {
+                    if (
+                        _list[i].SourceId == _list[j].SourceId
+                        && StoredKeyEquals(_list[i].Key, _list[j].Key)
+                    )
+                    {
+                        string message =
+                            $"Cannot add key because it already exists. Key {_list[j].Key} SourceId {_list[j].SourceId}";
+                        logger.Error(message);
+                        throw new ArgumentException(message, nameof(list));
+                    }
+                }
+            }
         }
 
         private List<UClass> _list = new();

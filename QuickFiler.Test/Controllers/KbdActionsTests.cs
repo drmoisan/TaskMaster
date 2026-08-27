@@ -46,6 +46,43 @@ namespace QuickFiler.Controllers.Tests
                 .WithMessage("*already exists*");
         }
 
+        /// <summary>
+        /// Issue #444: pins the enumerable constructor's duplicate guard to StoredKeyEquals rather
+        /// than the element-defined KeyEquals. KaStringAsync.KeyEquals matches on a substring, so a
+        /// KeyEquals-based guard would reject the legally coexisting "10" and "1" pair this file
+        /// already characterises for Add, and would fire that method's gated side effects during
+        /// construction. This test fails if a future edit swaps the guard to KeyEquals.
+        /// </summary>
+        [TestMethod]
+        public void EnumerableConstructor_WhenStoredKeysDifferButKeyEqualsOverlaps_DoesNotThrow()
+        {
+            // Arrange
+            var seed = new[]
+            {
+                new KaStringAsync
+                {
+                    SourceId = "Collection",
+                    Key = "10",
+                    Delegate = _ => Task.CompletedTask,
+                },
+                new KaStringAsync
+                {
+                    SourceId = "Collection",
+                    Key = "1",
+                    Delegate = _ => Task.CompletedTask,
+                },
+            };
+
+            // Act
+            Action act = () => new KbdActions<string, KaStringAsync, Func<string, Task>>(seed);
+
+            // Assert
+            act.Should()
+                .NotThrow(
+                    because: "the constructor guard compares stored keys, so substring-overlapping distinct keys remain legal"
+                );
+        }
+
         [TestMethod]
         public void FilterKeys_WhenDistinctStoredKeysCoexist_PreservesKeyboardMatchingSemantics()
         {
