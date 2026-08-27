@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -72,6 +74,126 @@ namespace QuickFiler.Test.Viewers
                 .BeNull(
                     because: "the presence of <IsCoreInitialized>k__BackingField would prove IsCoreInitialized is still an auto-property"
                 );
+        }
+
+        /// <summary>
+        /// #477: the class-level coverage exemption became false once the internal constructor, the
+        /// dispatcher-routing decisions, the registry detach path and the state accessor became
+        /// reachable from tests. Keeping it would recreate the exact false-rationale defect #477
+        /// reports against the sibling initializer.
+        /// </summary>
+        [TestMethod]
+        public void WebView2BreadcrumbHost_CarriesNoClassLevelCoverageExemption()
+        {
+            // Arrange
+            Type subject = typeof(WebView2BreadcrumbHost);
+
+            // Act
+            ExcludeFromCodeCoverageAttribute exemption =
+                subject.GetCustomAttribute<ExcludeFromCodeCoverageAttribute>(inherit: false);
+
+            // Assert
+            exemption
+                .Should()
+                .BeNull(
+                    because: "a class-level exemption would suppress measurement of the whole type, including the seams this feature makes testable"
+                );
+        }
+
+        /// <summary>
+        /// #477: member-level coverage exemptions must fall only on the genuinely host-bound members.
+        /// The two SDK event handlers cannot be invoked with a valid argument because their
+        /// event-argument types have no public constructor, and the two extracted forwards reach the
+        /// SDK directly. Everything else — including <c>InitializeAsync</c>, whose only SDK-reaching
+        /// statements go through the mockable seam — must be measured.
+        /// </summary>
+        [TestMethod]
+        public void WebView2BreadcrumbHost_ExemptsOnlyHostBoundMembers()
+        {
+            // Arrange
+            Type subject = typeof(WebView2BreadcrumbHost);
+            string[] expectedExempt = new[]
+            {
+                "OnCoreInitializationCompleted",
+                "OnWebMessageReceived",
+                "ForwardNavigateToString",
+                "ForwardWebMessage",
+            };
+            string[] expectedMeasured = new[]
+            {
+                "IsAttached",
+                "HasUiDispatcher",
+                "IsCoreInitialized",
+                "NavigateToString",
+                "PostMessageJson",
+                "InitializeAsync",
+                "DetachCore",
+            };
+
+            // Act
+            string[] actualExempt = subject
+                .GetMethods(
+                    BindingFlags.Instance
+                        | BindingFlags.Static
+                        | BindingFlags.Public
+                        | BindingFlags.NonPublic
+                        | BindingFlags.DeclaredOnly
+                )
+                .Where(method =>
+                    method.GetCustomAttribute<ExcludeFromCodeCoverageAttribute>(inherit: false)
+                    != null
+                )
+                .Select(method => method.Name)
+                .Where(name => !name.StartsWith("<", StringComparison.Ordinal))
+                .Distinct()
+                .OrderBy(name => name, StringComparer.Ordinal)
+                .ToArray();
+
+            // Assert
+            actualExempt
+                .Should()
+                .BeEquivalentTo(
+                    expectedExempt,
+                    because: "exactly the four genuinely host-bound members may carry the exemption"
+                );
+
+            foreach (string name in expectedMeasured)
+            {
+                MemberInfo[] members = subject.GetMember(
+                    name,
+                    BindingFlags.Instance
+                        | BindingFlags.Static
+                        | BindingFlags.Public
+                        | BindingFlags.NonPublic
+                        | BindingFlags.DeclaredOnly
+                );
+                members
+                    .Should()
+                    .NotBeEmpty(because: $"{name} must exist to be asserted measured");
+                foreach (MemberInfo member in members)
+                {
+                    member
+                        .GetCustomAttribute<ExcludeFromCodeCoverageAttribute>(inherit: false)
+                        .Should()
+                        .BeNull(
+                            because: $"{name} is reachable from unit tests and must therefore be measured"
+                        );
+                }
+            }
+
+            foreach (
+                ConstructorInfo constructor in subject.GetConstructors(
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic
+                )
+            )
+            {
+                constructor
+                    .GetCustomAttribute<ExcludeFromCodeCoverageAttribute>(inherit: false)
+                    .Should()
+                    .BeNull(
+                        because: "both constructors are exercised by the regression tests and must be measured"
+                    );
+            }
         }
     }
 }

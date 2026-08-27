@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuickFiler.Viewers;
@@ -101,6 +103,69 @@ namespace QuickFiler.Controllers.Tests
                 )
                 .And.ParamName.Should()
                 .Be("control");
+        }
+
+        /// <summary>
+        /// #477: the coverage exemption must fall only on the two SDK forwards. The argument guards
+        /// are pure validation with no SDK dependency, so under the repository rule they are a
+        /// testable seam and must be measured.
+        /// </summary>
+        [TestMethod]
+        public void WebView2CoreInitializer_ExemptsOnlyTheSdkForwards()
+        {
+            // Arrange
+            Type subject = typeof(WebView2CoreInitializer);
+            const BindingFlags AllDeclared =
+                BindingFlags.Instance
+                | BindingFlags.Static
+                | BindingFlags.Public
+                | BindingFlags.NonPublic
+                | BindingFlags.DeclaredOnly;
+
+            // Act
+            ExcludeFromCodeCoverageAttribute classLevel =
+                subject.GetCustomAttribute<ExcludeFromCodeCoverageAttribute>(inherit: false);
+            MethodInfo createForward = subject.GetMethod(
+                "ForwardCreateEnvironmentAsync",
+                AllDeclared
+            );
+            MethodInfo ensureForward = subject.GetMethod(
+                "ForwardEnsureCoreWebView2Async",
+                AllDeclared
+            );
+            MethodInfo createGuarded = subject.GetMethod("CreateEnvironmentAsync", AllDeclared);
+            MethodInfo ensureGuarded = subject.GetMethod("EnsureCoreWebView2Async", AllDeclared);
+
+            // Assert
+            classLevel
+                .Should()
+                .BeNull(
+                    because: "a class-level exemption would suppress measurement of the argument guards as well as the forwards"
+                );
+            createForward
+                .Should()
+                .NotBeNull(because: "the environment SDK call must be extracted into its own method");
+            ensureForward
+                .Should()
+                .NotBeNull(because: "the ensure SDK call must be extracted into its own method");
+            createForward
+                .GetCustomAttribute<ExcludeFromCodeCoverageAttribute>(inherit: false)
+                .Should()
+                .NotBeNull(
+                    because: "the environment forward needs the Evergreen runtime and creates a user-data folder on disk"
+                );
+            ensureForward
+                .GetCustomAttribute<ExcludeFromCodeCoverageAttribute>(inherit: false)
+                .Should()
+                .NotBeNull(because: "the ensure forward needs the Evergreen runtime");
+            createGuarded
+                .GetCustomAttribute<ExcludeFromCodeCoverageAttribute>(inherit: false)
+                .Should()
+                .BeNull(because: "the cacheFolder guards are measured, not exempt");
+            ensureGuarded
+                .GetCustomAttribute<ExcludeFromCodeCoverageAttribute>(inherit: false)
+                .Should()
+                .BeNull(because: "the control guard is measured, not exempt");
         }
     }
 }

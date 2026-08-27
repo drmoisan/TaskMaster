@@ -29,7 +29,6 @@ namespace QuickFiler.Viewers
     /// added for issue #477 are pure validation with no SDK dependency, so they are a testable seam,
     /// are not exempt, and are measured; only the two extracted SDK forwards carry the attribute.
     /// </remarks>
-    [ExcludeFromCodeCoverage]
     public sealed class WebView2CoreInitializer : IWebViewCoreInitializer
     {
         /// <inheritdoc />
@@ -53,6 +52,23 @@ namespace QuickFiler.Viewers
 
             // options is forwarded unguarded: whether the SDK tolerates null is unverified, and
             // guarding an unverified contract would narrow behaviour on unmeasured grounds.
+            return ForwardCreateEnvironmentAsync(cacheFolder, options);
+        }
+
+        /// <summary>The unavoidable SDK call behind <see cref="CreateEnvironmentAsync"/>.</summary>
+        /// <remarks>
+        /// Exempt from coverage because it requires the external Evergreen WebView2 runtime, a
+        /// separate process, and additionally creates a user-data folder on disk; a unit test may do
+        /// neither. Extracted so the argument guards stay measured. The SDK's
+        /// <c>browserExecutableFolder</c> argument is passed as null unconditionally, which is the
+        /// deliberate Evergreen-only decision documented on the interface.
+        /// </remarks>
+        [ExcludeFromCodeCoverage]
+        private static Task<CoreWebView2Environment> ForwardCreateEnvironmentAsync(
+            string cacheFolder,
+            CoreWebView2EnvironmentOptions options
+        )
+        {
             return CoreWebView2Environment.CreateAsync(null, cacheFolder, options);
         }
 
@@ -66,6 +82,21 @@ namespace QuickFiler.Viewers
 
             // environment is deliberately not guarded: null is a valid SDK input meaning "create a
             // default environment".
+            return ForwardEnsureCoreWebView2Async(control, environment);
+        }
+
+        /// <summary>The unavoidable SDK call behind <see cref="EnsureCoreWebView2Async"/>.</summary>
+        /// <remarks>
+        /// Exempt from coverage because it requires the external Evergreen WebView2 runtime, a
+        /// separate process, which a unit test may not depend on. Extracted so the argument guard
+        /// stays measured.
+        /// </remarks>
+        [ExcludeFromCodeCoverage]
+        private static Task ForwardEnsureCoreWebView2Async(
+            WebView2 control,
+            CoreWebView2Environment environment
+        )
+        {
             return control.EnsureCoreWebView2Async(environment);
         }
     }

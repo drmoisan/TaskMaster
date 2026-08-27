@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="af876202-7b16-4ba1-9835-7a15300f1c40" name="USER@HOST 2026-08-27 16:47:17" runUser="HOST\USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T16:47:17.1332471-04:00" queuing="2026-08-27T16:47:17.1332471-04:00" start="2026-08-27T16:47:15.7306807-04:00" finish="2026-08-27T16:47:17.3260687-04:00" />
+  <TestSettings name="default" id="fb85acdf-4643-45d9-b07e-30749ee2ff6a">
+    <Deployment runDeploymentRoot="USER_HOST_2026-08-27_16_47_17" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="835353c1-34d6-42d2-a97a-48803dd0b17c" testId="1cf76064-a864-8034-b442-970923f6ef7e" testName="InitializeAsync_InstallsUiDispatcherFromUiSyncContext" computerName="HOST" duration="00:00:00.0471732" startTime="2026-08-27T16:47:17.1259953-04:00" endTime="2026-08-27T16:47:17.1740638-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="835353c1-34d6-42d2-a97a-48803dd0b17c" />
+    <UnitTestResult executionId="a2c6b0a7-1507-4a82-95f6-b2bbe4493b17" testId="1a0b7ee0-3860-8919-b7b6-e3f8120e76ab" testName="PostMessageJson_WithNoDispatcher_ExecutesInlineAndDropsThePayload" computerName="HOST" duration="00:00:00.0038760" startTime="2026-08-27T16:47:17.1790509-04:00" endTime="2026-08-27T16:47:17.1847621-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a2c6b0a7-1507-4a82-95f6-b2bbe4493b17" />
+    <UnitTestResult executionId="371d9097-99ae-480a-93b9-d2215102aa2a" testId="1794fd07-6d8e-8fb1-864b-513975734b94" testName="InitializeAsync_PreservesAnInjectedDispatcher" computerName="HOST" duration="00:00:00.0039115" startTime="2026-08-27T16:47:17.1740638-04:00" endTime="2026-08-27T16:47:17.1790509-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="371d9097-99ae-480a-93b9-d2215102aa2a" />
+    <UnitTestResult executionId="18a10568-8e8b-4d62-8e73-9dcc7522798f" testId="13a8d422-a3e2-8184-ad7d-69074dd14a3e" testName="WebView2BreadcrumbHost_ExemptsOnlyHostBoundMembers" computerName="HOST" duration="00:00:00.0627615" startTime="2026-08-27T16:47:16.9884058-04:00" endTime="2026-08-27T16:47:17.0515468-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="18a10568-8e8b-4d62-8e73-9dcc7522798f" />
+    <UnitTestResult executionId="30d1bb0c-6391-482d-9a22-602912304f40" testId="1b195767-4edd-8b3f-a4eb-0291ceaa00c3" testName="CreateEnvironmentAsync_NullCacheFolder_ThrowsArgumentNullException" computerName="HOST" duration="00:00:00.0416201" startTime="2026-08-27T16:47:16.8185605-04:00" endTime="2026-08-27T16:47:16.9825388-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="30d1bb0c-6391-482d-9a22-602912304f40">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="f9313d85-a81c-4bd9-887b-6108e3939cf9" testId="1ff2cf93-b43b-8413-a17b-d404cef62a34" testName="WebView2BreadcrumbHost_CarriesNoClassLevelCoverageExemption" computerName="HOST" duration="00:00:00.0001860" startTime="2026-08-27T16:47:16.9873673-04:00" endTime="2026-08-27T16:47:16.9884058-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f9313d85-a81c-4bd9-887b-6108e3939cf9" />
+    <UnitTestResult executionId="b4dc59aa-f4fe-4784-8682-576259271ee1" testId="17b82603-b6c0-8766-b66e-df7e26209ce5" testName="PredecessorDetach_ToleratesNullCoreWebView2" computerName="HOST" duration="00:00:00.0041050" startTime="2026-08-27T16:47:17.1194822-04:00" endTime="2026-08-27T16:47:17.1229920-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b4dc59aa-f4fe-4784-8682-576259271ee1" />
+    <UnitTestResult executionId="b2fed70e-7411-4cc1-a526-0de5dbab5368" testId="1ec46aa5-d095-89d6-9732-0f2cdcfb1df1" testName="WebView2CoreInitializer_ExemptsOnlyTheSdkForwards" computerName="HOST" duration="00:00:00.0006674" startTime="2026-08-27T16:47:16.9910273-04:00" endTime="2026-08-27T16:47:16.9941023-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b2fed70e-7411-4cc1-a526-0de5dbab5368" />
+    <UnitTestResult executionId="c0e8c867-d0f6-42e2-a865-d67360fb9bdd" testId="1fdffeab-57dd-8cf9-99d3-aaa9532e9305" testName="CreateEnvironmentAsync_WhitespaceCacheFolder_ThrowsArgumentException" computerName="HOST" duration="00:00:00.0021553" startTime="2026-08-27T16:47:16.9884058-04:00" endTime="2026-08-27T16:47:16.9905098-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c0e8c867-d0f6-42e2-a865-d67360fb9bdd" />
+    <UnitTestResult executionId="673531c9-69c9-4bf0-8538-a44d0924b45d" testId="124402b4-1fc2-853b-92fa-c74906568b12" testName="EnsureCoreWebView2Async_NullControl_ThrowsArgumentNullException" computerName="HOST" duration="00:00:00.0004559" startTime="2026-08-27T16:47:16.9905098-04:00" endTime="2026-08-27T16:47:16.9910273-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="673531c9-69c9-4bf0-8538-a44d0924b45d" />
+    <UnitTestResult executionId="56a7215c-e47a-47b3-8dfb-516dab900fce" testId="18adb801-0318-8bc9-a660-62f030efb091" testName="IsCoreInitialized_HasAnExplicitBackingField" computerName="HOST" duration="00:00:00.0365162" startTime="2026-08-27T16:47:16.8185605-04:00" endTime="2026-08-27T16:47:16.9804298-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="56a7215c-e47a-47b3-8dfb-516dab900fce" />
+    <UnitTestResult executionId="973d5554-d2b6-46f0-841c-2da0034cdea3" testId="13ab7178-f2b8-8d4c-a5d1-df83ab4c9bc4" testName="ControlDisposed_DetachesTheHost" computerName="HOST" duration="00:00:00.0035515" startTime="2026-08-27T16:47:17.1229920-04:00" endTime="2026-08-27T16:47:17.1259953-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="973d5554-d2b6-46f0-841c-2da0034cdea3" />
+    <UnitTestResult executionId="f369bc44-e7f2-409f-b5ad-df204c7cfbf8" testId="18303c3e-59c1-8f4f-baea-02f7be8d3976" testName="NavigateToString_PostsExactlyOnceToTheUiContext" computerName="HOST" duration="00:00:00.0044386" startTime="2026-08-27T16:47:17.1049339-04:00" endTime="2026-08-27T16:47:17.1094452-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f369bc44-e7f2-409f-b5ad-df204c7cfbf8" />
+    <UnitTestResult executionId="059ddd4a-e012-4642-9b2b-8717ec1b4d0b" testId="10f77080-372c-8685-9cfa-2a1bd32168a5" testName="SecondHost_DetachesThePredecessorAndTakesOwnership" computerName="HOST" duration="00:00:00.0040706" startTime="2026-08-27T16:47:17.1149670-04:00" endTime="2026-08-27T16:47:17.1194822-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="059ddd4a-e012-4642-9b2b-8717ec1b4d0b" />
+    <UnitTestResult executionId="d72c5938-ac15-4cd6-907a-4e73e7b789e1" testId="11c2a8c8-9f02-8146-b002-fa6d474580a4" testName="PostMessageJson_PostsExactlyOnceToTheUiContext" computerName="HOST" duration="00:00:00.1644465" startTime="2026-08-27T16:47:16.8190650-04:00" endTime="2026-08-27T16:47:17.1049339-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d72c5938-ac15-4cd6-907a-4e73e7b789e1" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="NavigateToString_PostsExactlyOnceToTheUiContext" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="18303c3e-59c1-8f4f-baea-02f7be8d3976">
+      <Execution id="f369bc44-e7f2-409f-b5ad-df204c7cfbf8" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.WebView2BreadcrumbHostTests" name="NavigateToString_PostsExactlyOnceToTheUiContext" />
+    </UnitTest>
+    <UnitTest name="PostMessageJson_PostsExactlyOnceToTheUiContext" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="11c2a8c8-9f02-8146-b002-fa6d474580a4">
+      <Execution id="d72c5938-ac15-4cd6-907a-4e73e7b789e1" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.WebView2BreadcrumbHostTests" name="PostMessageJson_PostsExactlyOnceToTheUiContext" />
+    </UnitTest>
+    <UnitTest name="ControlDisposed_DetachesTheHost" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="13ab7178-f2b8-8d4c-a5d1-df83ab4c9bc4">
+      <Execution id="973d5554-d2b6-46f0-841c-2da0034cdea3" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.WebView2BreadcrumbHostTests" name="ControlDisposed_DetachesTheHost" />
+    </UnitTest>
+    <UnitTest name="PredecessorDetach_ToleratesNullCoreWebView2" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="17b82603-b6c0-8766-b66e-df7e26209ce5">
+      <Execution id="b4dc59aa-f4fe-4784-8682-576259271ee1" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.WebView2BreadcrumbHostTests" name="PredecessorDetach_ToleratesNullCoreWebView2" />
+    </UnitTest>
+    <UnitTest name="CreateEnvironmentAsync_NullCacheFolder_ThrowsArgumentNullException" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1b195767-4edd-8b3f-a4eb-0291ceaa00c3">
+      <Execution id="30d1bb0c-6391-482d-9a22-602912304f40" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.WebView2CoreInitializerTests" name="CreateEnvironmentAsync_NullCacheFolder_ThrowsArgumentNullException" />
+    </UnitTest>
+    <UnitTest name="IsCoreInitialized_HasAnExplicitBackingField" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="18adb801-0318-8bc9-a660-62f030efb091">
+      <Execution id="56a7215c-e47a-47b3-8dfb-516dab900fce" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.WebView2BreadcrumbHostContractTests" name="IsCoreInitialized_HasAnExplicitBackingField" />
+    </UnitTest>
+    <UnitTest name="PostMessageJson_WithNoDispatcher_ExecutesInlineAndDropsThePayload" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a0b7ee0-3860-8919-b7b6-e3f8120e76ab">
+      <Execution id="a2c6b0a7-1507-4a82-95f6-b2bbe4493b17" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.WebView2BreadcrumbHostTests" name="PostMessageJson_WithNoDispatcher_ExecutesInlineAndDropsThePayload" />
+    </UnitTest>
+    <UnitTest name="EnsureCoreWebView2Async_NullControl_ThrowsArgumentNullException" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="124402b4-1fc2-853b-92fa-c74906568b12">
+      <Execution id="673531c9-69c9-4bf0-8538-a44d0924b45d" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.WebView2CoreInitializerTests" name="EnsureCoreWebView2Async_NullControl_ThrowsArgumentNullException" />
+    </UnitTest>
+    <UnitTest name="CreateEnvironmentAsync_WhitespaceCacheFolder_ThrowsArgumentException" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1fdffeab-57dd-8cf9-99d3-aaa9532e9305">
+      <Execution id="c0e8c867-d0f6-42e2-a865-d67360fb9bdd" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.WebView2CoreInitializerTests" name="CreateEnvironmentAsync_WhitespaceCacheFolder_ThrowsArgumentException" />
+    </UnitTest>
+    <UnitTest name="WebView2BreadcrumbHost_ExemptsOnlyHostBoundMembers" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="13a8d422-a3e2-8184-ad7d-69074dd14a3e">
+      <Execution id="18a10568-8e8b-4d62-8e73-9dcc7522798f" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.WebView2BreadcrumbHostContractTests" name="WebView2BreadcrumbHost_ExemptsOnlyHostBoundMembers" />
+    </UnitTest>
+    <UnitTest name="SecondHost_DetachesThePredecessorAndTakesOwnership" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="10f77080-372c-8685-9cfa-2a1bd32168a5">
+      <Execution id="059ddd4a-e012-4642-9b2b-8717ec1b4d0b" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.WebView2BreadcrumbHostTests" name="SecondHost_DetachesThePredecessorAndTakesOwnership" />
+    </UnitTest>
+    <UnitTest name="WebView2BreadcrumbHost_CarriesNoClassLevelCoverageExemption" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ff2cf93-b43b-8413-a17b-d404cef62a34">
+      <Execution id="f9313d85-a81c-4bd9-887b-6108e3939cf9" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.WebView2BreadcrumbHostContractTests" name="WebView2BreadcrumbHost_CarriesNoClassLevelCoverageExemption" />
+    </UnitTest>
+    <UnitTest name="InitializeAsync_InstallsUiDispatcherFromUiSyncContext" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1cf76064-a864-8034-b442-970923f6ef7e">
+      <Execution id="835353c1-34d6-42d2-a97a-48803dd0b17c" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.WebView2BreadcrumbHostTests" name="InitializeAsync_InstallsUiDispatcherFromUiSyncContext" />
+    </UnitTest>
+    <UnitTest name="InitializeAsync_PreservesAnInjectedDispatcher" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1794fd07-6d8e-8fb1-864b-513975734b94">
+      <Execution id="371d9097-99ae-480a-93b9-d2215102aa2a" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.WebView2BreadcrumbHostTests" name="InitializeAsync_PreservesAnInjectedDispatcher" />
+    </UnitTest>
+    <UnitTest name="WebView2CoreInitializer_ExemptsOnlyTheSdkForwards" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ec46aa5-d095-89d6-9732-0f2cdcfb1df1">
+      <Execution id="b2fed70e-7411-4cc1-a526-0de5dbab5368" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.WebView2CoreInitializerTests" name="WebView2CoreInitializer_ExemptsOnlyTheSdkForwards" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1cf76064-a864-8034-b442-970923f6ef7e" executionId="835353c1-34d6-42d2-a97a-48803dd0b17c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a0b7ee0-3860-8919-b7b6-e3f8120e76ab" executionId="a2c6b0a7-1507-4a82-95f6-b2bbe4493b17" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1794fd07-6d8e-8fb1-864b-513975734b94" executionId="371d9097-99ae-480a-93b9-d2215102aa2a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13a8d422-a3e2-8184-ad7d-69074dd14a3e" executionId="18a10568-8e8b-4d62-8e73-9dcc7522798f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b195767-4edd-8b3f-a4eb-0291ceaa00c3" executionId="30d1bb0c-6391-482d-9a22-602912304f40" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ff2cf93-b43b-8413-a17b-d404cef62a34" executionId="f9313d85-a81c-4bd9-887b-6108e3939cf9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17b82603-b6c0-8766-b66e-df7e26209ce5" executionId="b4dc59aa-f4fe-4784-8682-576259271ee1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ec46aa5-d095-89d6-9732-0f2cdcfb1df1" executionId="b2fed70e-7411-4cc1-a526-0de5dbab5368" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1fdffeab-57dd-8cf9-99d3-aaa9532e9305" executionId="c0e8c867-d0f6-42e2-a865-d67360fb9bdd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="124402b4-1fc2-853b-92fa-c74906568b12" executionId="673531c9-69c9-4bf0-8538-a44d0924b45d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18adb801-0318-8bc9-a660-62f030efb091" executionId="56a7215c-e47a-47b3-8dfb-516dab900fce" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13ab7178-f2b8-8d4c-a5d1-df83ab4c9bc4" executionId="973d5554-d2b6-46f0-841c-2da0034cdea3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18303c3e-59c1-8f4f-baea-02f7be8d3976" executionId="f369bc44-e7f2-409f-b5ad-df204c7cfbf8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10f77080-372c-8685-9cfa-2a1bd32168a5" executionId="059ddd4a-e012-4642-9b2b-8717ec1b4d0b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11c2a8c8-9f02-8146-b002-fa6d474580a4" executionId="d72c5938-ac15-4cd6-907a-4e73e7b789e1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="15" executed="15" passed="15" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

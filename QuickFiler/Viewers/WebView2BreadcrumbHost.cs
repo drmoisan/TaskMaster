@@ -12,22 +12,26 @@ using UtilitiesCS;
 namespace QuickFiler.Viewers
 {
     /// <summary>
-    /// 1:1 SDK-forwarding adapter implementing <see cref="IBreadcrumbWebHost"/> over the
-    /// Designer-owned <see cref="WebView2"/> control (#349). Initialization awaits the form's
-    /// UI SynchronizationContext BEFORE EnsureCoreWebView2Async (pattern
-    /// QfcItemController.ViewerSetup), uses the shared %LocalAppData%\WindowsFormsWebView2 cache
-    /// folder through the existing <see cref="IWebViewCoreInitializer"/> seam, and hooks
-    /// CoreWebView2 events idempotently for pooled-viewer re-initialization (EfcViewerQueue).
-    /// Waiting is event-driven (CoreWebView2InitializationCompleted) — no polling, no delays.
+    /// Adapter implementing <see cref="IBreadcrumbWebHost"/> over the Designer-owned
+    /// <see cref="WebView2"/> control (#349). Initialization awaits the form's UI
+    /// SynchronizationContext BEFORE EnsureCoreWebView2Async, and uses the shared
+    /// %LocalAppData%\WindowsFormsWebView2 cache folder through the existing
+    /// <see cref="IWebViewCoreInitializer"/> seam. Waiting is event-driven
+    /// (CoreWebView2InitializationCompleted) — no polling, no delays. Every SDK touch outside the
+    /// SDK's own event callbacks is marshalled through one <see cref="BreadcrumbUiDispatcher"/>
+    /// callback, and exactly one host owns a given control at a time.
     /// </summary>
     /// <remarks>
-    /// Coverage exemption justification (precedent <see cref="WebView2CoreInitializer"/>): every
-    /// member forwards 1:1 to the WebView2 SDK or reacts to its events on a live control that
-    /// cannot exist in a unit-test host; all routing/decision logic lives in the non-exempt
-    /// <c>BreadcrumbBridgeRouter</c>/<c>BreadcrumbOutboundQueue</c>, tested via
-    /// Mock&lt;IBreadcrumbWebHost&gt;.
+    /// Coverage measurement. This type carries no class-level coverage exemption: the constructors,
+    /// the marshalling decision in <see cref="NavigateToString"/> and
+    /// <see cref="PostMessageJson"/>, the owner-registry detach path, the state accessor, and
+    /// <see cref="InitializeAsync"/> are all reachable from unit tests and are measured. Only the
+    /// members that cannot execute without the live WebView2 SDK are exempt at member level, each
+    /// carrying its own rationale: the two SDK event handlers, whose event-argument types have no
+    /// public constructor and which only the live SDK raises, and the two extracted private SDK
+    /// forwards. <see cref="InitializeAsync"/> is deliberately NOT exempt, because its only
+    /// SDK-reaching statements go through the mockable <see cref="IWebViewCoreInitializer"/> seam.
     /// </remarks>
-    [ExcludeFromCodeCoverage]
     public sealed class WebView2BreadcrumbHost : IBreadcrumbWebHost
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(
@@ -156,11 +160,24 @@ namespace QuickFiler.Viewers
             BreadcrumbUiDispatcher? dispatcher = _dispatcher;
             if (dispatcher == null)
             {
-                _control.NavigateToString(html);
+                ForwardNavigateToString(html);
                 return;
             }
 
-            _ = dispatcher.Dispatch(() => _control.NavigateToString(html));
+            _ = dispatcher.Dispatch(() => ForwardNavigateToString(html));
+        }
+
+        /// <summary>The unavoidable SDK call behind <see cref="NavigateToString"/>.</summary>
+        /// <remarks>
+        /// Exempt from coverage because <c>WebView2.NavigateToString</c> throws
+        /// <see cref="InvalidOperationException"/> unless a live CoreWebView2 exists, which requires
+        /// the external Evergreen WebView2 runtime. Extracted so the marshalling decision in
+        /// <see cref="NavigateToString"/> stays measured.
+        /// </remarks>
+        [ExcludeFromCodeCoverage]
+        private void ForwardNavigateToString(string html)
+        {
+            _control.NavigateToString(html);
         }
 
         /// <inheritdoc />
@@ -188,7 +205,7 @@ namespace QuickFiler.Viewers
                     return;
                 }
 
-                core.PostWebMessageAsJson(json);
+                ForwardWebMessage(core, json);
             }
 
             BreadcrumbUiDispatcher? dispatcher = _dispatcher;
@@ -199,6 +216,19 @@ namespace QuickFiler.Viewers
             }
 
             _ = dispatcher.Dispatch(PostCore);
+        }
+
+        /// <summary>The unavoidable SDK call behind <see cref="PostMessageJson"/>.</summary>
+        /// <remarks>
+        /// Exempt from coverage because <c>CoreWebView2.PostWebMessageAsJson</c> can only be reached
+        /// through a live CoreWebView2, which requires the external Evergreen WebView2 runtime.
+        /// Extracted so the read, the null guard and the log-and-drop in
+        /// <see cref="PostMessageJson"/> stay measured.
+        /// </remarks>
+        [ExcludeFromCodeCoverage]
+        private static void ForwardWebMessage(CoreWebView2 core, string json)
+        {
+            core.PostWebMessageAsJson(json);
         }
 
         /// <summary>
@@ -291,6 +321,13 @@ namespace QuickFiler.Viewers
             _isAttached = false;
         }
 
+        /// <summary>Handles the SDK's initialization-completed notification.</summary>
+        /// <remarks>
+        /// Exempt from coverage because it is raised only by the live WebView2 SDK and its
+        /// event-argument type <c>CoreWebView2InitializationCompletedEventArgs</c> has no public
+        /// constructor, so a unit test cannot invoke it with a valid argument.
+        /// </remarks>
+        [ExcludeFromCodeCoverage]
         private void OnCoreInitializationCompleted(
             object? sender,
             CoreWebView2InitializationCompletedEventArgs e
@@ -317,6 +354,13 @@ namespace QuickFiler.Viewers
             CoreInitialized?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <summary>Re-raises an inbound web message from the SDK.</summary>
+        /// <remarks>
+        /// Exempt from coverage because it is raised only by the live WebView2 SDK and its
+        /// event-argument type <c>CoreWebView2WebMessageReceivedEventArgs</c> has no public
+        /// constructor, so a unit test cannot invoke it with a valid argument.
+        /// </remarks>
+        [ExcludeFromCodeCoverage]
         private void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
         {
             MessageReceived?.Invoke(this, e.WebMessageAsJson);
