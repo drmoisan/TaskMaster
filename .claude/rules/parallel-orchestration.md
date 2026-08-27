@@ -1,3 +1,24 @@
+---
+paths:
+  - "artifacts/orchestration/parallel-*"
+  - "docs/features/parallel/**"
+  - "scripts/dev_tools/*parallel*"
+  - "extensions/drm-copilot/src/lib/validate/parallel-*"
+  - "scripts/dev_tools/*blast_radius*"
+  - "config/blast-radius.json"
+  - "**/config/blast-radius.json"
+  - "extensions/drm-copilot/src/lib/push-down/claude-blast-radius-derive-core.ts"
+  - ".claude/lib/blast-radius/**"
+  - ".claude/lib/bash/parallel-yaml-scan.sh"
+  - "scripts/dev_tools/validate_orchestration_artifacts.py"
+  - "extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts"
+  - ".claude/hooks/enforce-epic-merge-gate.ps1"
+  - ".claude/agents/parallel-orchestrator.md"
+  - ".claude/agents/parallel-planner.md"
+  - ".claude/skills/parallel-*/SKILL.md"
+description: Artifact invariants and blast-radius contention doctrine for the parallel orchestration surface.
+---
+
 # Parallel Orchestration Artifact Invariants
 
 This rule governs the three artifacts of the `parallel` orchestration surface: the parallel-run manifest at `docs/features/parallel/<slug>/parallel.md`, the parallel-orchestrator checkpoint at `artifacts/orchestration/parallel-orchestrator-state.json`, and the parallel-planner checkpoint at `artifacts/orchestration/parallel-planner-state.json`. It records the invariants those artifacts must satisfy as numbered prose so that downstream features consume a fixed schema and add behavior only.

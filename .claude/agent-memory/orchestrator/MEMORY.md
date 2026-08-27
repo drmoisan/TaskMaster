@@ -18,6 +18,7 @@
 - [new_active_feature_folder date prefix](new-active-feature-folder-date-prefix.md) — standalone folders get the YYYY-MM-DD- prefix automatically; epic-child folders don't
 - [orchestrator-state validator divergence](orchestrator-state-validator-divergence.md) — the MCP check is stricter than the real SubagentStop hook; conform to the canonical schema
 - [orchestrator-state flat keys + step-status enum](orchestrator-state-flat-keys-and-enum.md) — FLAT top-level variable keys and enum step statuses (in_progress, not in-progress)
+- [step_status "completed" write-locks the checkpoint](step-status-completed-write-locks-checkpoint.md) — step8/9/10 "completed" without a ci_gate makes EVERY later checkpoint edit fail COMPLETION_CONSISTENCY_BLOCKED
 - [C# analyzer packages.config quirks](csharp-analyzer-packages-config-quirks.md) — non-SDK analyzer wiring needs manual roslyn subfolder choice; SecurityCodeScan breaks Roslyn 5.6
 - [Whole-repo CI gate is not out-of-scope](whole-repo-ci-gate-not-out-of-scope.md) — a pre-existing repo-wide csharpier/lint failure blocks the PR's required check; fix it
 - [Honor user's per-cycle folder layout](feedback_verify_flat_artifact_layout_after_executor.md) — follow the user's own reorg; only revert UNDIRECTED agent relocations
@@ -68,11 +69,14 @@
 - [Epic-child agent-memory merge conflicts](epic-child-agent-memory-merge-conflicts.md) — CONFLICTING solely on shared MEMORY.md index files; union, then re-verify post-merge
 - [Epic-child nullable fan-in debt is deferred](project_epic_child_nullable_fanin_debt_deferred.md) — cross-child CS86xx fan-in is the capstone's job; don't over-remediate sibling files
 - [C# coverage has two denominators](csharp-coverage-denominator-two-figures.md) — filtered first-party ~85.9% clears the gate, unfiltered ~70.4% doesn't; measure before trusting
+- [lines-covered is nondeterministic; lines-valid is not](coverage-lines-covered-is-nondeterministic.md) — same-tree runs drift up to 4 lines per file, so a per-file covered-line gate fails on correct work
 - [Preflight catches vacuous gates](preflight-catches-vacuous-gates.md) — MCP `ok:true` is not enough; executor preflight found 6 gates that passed while verifying nothing
 - [Preflight: sweep task ordering + citation arity](preflight-sweep-task-ordering-and-citation-arity.md) — name both sweeps early; a check-off citing a LATER task's artifact is unsatisfiable in plan order
+- [Revert plans must check test provenance](revert-plans-must-check-test-provenance.md) — verify each test against the pre-change sha; a test that predates the change must survive
 - [Bash tool mangles MSBuild switches](bash-tool-mangles-msbuild-switches.md) — `/m` becomes `M:/` (MSB1008); run C# tools via `pwsh -NoProfile` with absolute paths
 - [Analyzer gate is vacuous without /t:Rebuild](msbuild-analyzer-gate-vacuous-without-rebuild.md) — `/t:Build` after any earlier build skips CoreCompile and compiles NOTHING at EXIT 0; assert a ZERO `Skipping target "CoreCompile"` count, NOT a csc.exe count (csc is 0 even on real compiles)
 - [Aggregate vstest crash: isolate per assembly](vstest-aggregate-crash-isolate-per-assembly.md) — "Test host process crashed" is environmental; re-run per assembly with /InIsolation
+- [Bare vstest omits the LiveOutlook filter](bare-vstest-omits-liveoutlook-filter.md) — a direct call runs a real-Outlook test the wrapper excludes; launches Outlook and breaks baseline comparability
 - [Direct-csproj build facts (AnyCPU; CS2002)](csharp-direct-csproj-build-facts.md) — a single project needs `AnyCPU` (no space) while the .sln needs `"Any CPU"`; TWAE doesn't promote CS2002
 - [Model-routing hook reads the canonical path only](model-routing-hook-reads-canonical-path-only.md) — it hardcodes artifacts/orchestration/orchestrator-state.json; a child-scoped file alone is blocked
 - [No helper scripts under evidence/](feedback_no_helper_scripts_under_evidence.md) — feature-review's language match is extension-only and path-blind; one retained `.ps1` forces a coverage FAIL
@@ -91,6 +95,7 @@
 - [PRD_FEATURE_BLOCKED can be a prompt-parsing false positive](prd-feature-hook-parses-prompt-paths.md) — the hook reads `docs/features/active/...` out of your PROMPT; a quoted deep evidence path becomes the "feature folder"
 - [Multi-location fact residuals drive preflight rounds](multi-location-fact-residuals-drive-preflight-rounds.md) — nearly every blocking preflight defect is one fact corrected in SOME locations; enumerate every location per fact
 - [expect-fail tests break substring scoped-run gates](expect-fail-tests-break-substring-scoped-run-gates.md) — a "0 failed" gate under `FullyQualifiedName~Class` dies once an earlier task adds an expect-fail test there; carve out by exact name
+- [CR-pattern grep falsely reports 100% CRLF](grep-cr-empty-pattern-false-crlf.md) — the shell strips the CR, leaving an empty pattern matching every line; re-measure with a binary read
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.

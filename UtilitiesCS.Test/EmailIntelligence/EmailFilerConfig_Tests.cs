@@ -196,6 +196,26 @@ namespace UtilitiesCS.Test.EmailIntelligence
         }
 
         [TestMethod]
+        public void GetStem_FolderPathOutsideAncestor_ReturnsInputTrimmedOfLeadingSeparators()
+        {
+            // Arrange: RC-4 pins the fallback arm at EmailFilerConfig.cs:252-258.
+            var config = new EmailFilerConfig();
+
+            // Act
+            var stem = config.GetStem(
+                @"\\mailbox@example.com\Archive",
+                @"\\other-mailbox@example.com\Projects"
+            );
+
+            // Assert
+            stem.Should()
+                .Be(
+                    @"other-mailbox@example.com\Projects",
+                    "the out-of-ancestor fallback trims leading separators and does not throw"
+                );
+        }
+
+        [TestMethod]
         public void ResolvePaths_WithCurrentFolder_SetsDerivedPropertiesAndLeavesDestinationNullWhenUnresolved()
         {
             // Arrange
@@ -286,6 +306,168 @@ namespace UtilitiesCS.Test.EmailIntelligence
 
             // Assert
             result.Should().BeNull();
+        }
+
+        [TestMethod]
+        public void Issue614_ResolvePaths_WithStoreRootStem_RejectsNonRelativeStemWithoutLeakingIdentifiers()
+        {
+            // Arrange: the pure configuration seam (no Outlook, filesystem, or store access).
+            // DestinationOlStem carries a store-root Outlook path instead of an archive-relative
+            // stem, which is the #614 leak shape reported from the field. All identifiers are
+            // fabricated placeholders (#602 redaction).
+            const string olAncestor = @"\\mailbox@example.com\Archive";
+            const string storeRootStem = @"\\mailbox@example.com";
+            const string fsAncestor = @"C:\Users\testuser\OneDrive - Contoso";
+            var config = new EmailFilerConfig
+            {
+                Globals = null,
+                OlAncestor = olAncestor,
+                DestinationOlStem = storeRootStem,
+                FsAncestorEquivalent = fsAncestor,
+            };
+
+            // Act
+            System.Action act = () => config.ResolvePaths();
+
+            // Assert: the contract exception must name the offending parameter and the
+            // archive-relative rule, and must leak neither the mailbox address nor the
+            // filesystem ancestor.
+            System.ArgumentException thrown = act.Should()
+                .Throw<System.ArgumentException>(
+                    "a non-relative DestinationOlStem must be rejected before concatenation"
+                )
+                .Which;
+
+            thrown
+                .Message.Should()
+                .Contain(
+                    nameof(EmailFilerConfig.DestinationOlStem),
+                    "the diagnostic must identify the offending parameter"
+                )
+                .And.Contain(
+                    "archive-relative",
+                    "the diagnostic must state the violated archive-relative stem rule"
+                );
+            thrown
+                .Message.Should()
+                .NotContain("mailbox@example.com", "the message must not leak a mailbox address")
+                .And.NotContain(fsAncestor, "the message must not leak a user-profile path");
+        }
+
+        [TestMethod]
+        public void Issue614_ResolvePathsWithFolder_RejectsStoreRootStemThroughTheFolderOverload()
+        {
+            // Arrange: the same #614 rejection must hold on the ResolvePaths(Folder) overload.
+            var mockGlobals = new Mock<IApplicationGlobals>();
+            var mockOl = new Mock<IOlObjects>();
+            mockOl.Setup(globals => globals.InboxPath).Returns(@"\\mailbox@example.com\Inbox");
+            mockGlobals.Setup(globals => globals.Ol).Returns(mockOl.Object);
+            var currentFolder = new Mock<Folder>();
+            currentFolder
+                .Setup(folder => folder.FolderPath)
+                .Returns(@"\\mailbox@example.com\Archive\Clients");
+            var config = new EmailFilerConfig
+            {
+                Globals = mockGlobals.Object,
+                OlAncestor = @"\\mailbox@example.com\Archive",
+                DestinationOlStem = @"\\mailbox@example.com",
+                FsAncestorEquivalent = @"C:\Users\testuser\OneDrive - Contoso",
+            };
+
+            // Act
+            System.Action act = () => config.ResolvePaths(currentFolder.Object);
+
+            // Assert
+            act.Should()
+                .Throw<System.ArgumentException>()
+                .WithParameterName(nameof(EmailFilerConfig.DestinationOlStem))
+                .And.Message.Should()
+                .NotContain("mailbox@example.com");
+        }
+
+        [TestMethod]
+        public void Issue614_ResolvePaths_RejectsSingleSeparatorLeadingStem()
+        {
+            // Arrange: the D8 stem derivation currently emits single-separator-leading values.
+            var config = new EmailFilerConfig
+            {
+                Globals = null,
+                OlAncestor = @"\\mailbox@example.com\Archive",
+                DestinationOlStem = @"\Clients\North",
+                FsAncestorEquivalent = @"C:\Mail",
+            };
+
+            // Act
+            System.Action act = () => config.ResolvePaths();
+
+            // Assert
+            act.Should()
+                .Throw<System.ArgumentException>()
+                .WithParameterName(nameof(EmailFilerConfig.DestinationOlStem));
+        }
+
+        [TestMethod]
+        public void Issue614_ResolvePaths_RejectsEmptyStem()
+        {
+            // Arrange: an empty stem would resolve filing to the archive root itself.
+            var config = new EmailFilerConfig
+            {
+                Globals = null,
+                OlAncestor = @"\\mailbox@example.com\Archive",
+                DestinationOlStem = string.Empty,
+                FsAncestorEquivalent = @"C:\Mail",
+            };
+
+            // Act
+            System.Action act = () => config.ResolvePaths();
+
+            // Assert
+            act.Should()
+                .Throw<System.ArgumentException>()
+                .WithParameterName(nameof(EmailFilerConfig.DestinationOlStem));
+        }
+
+        [TestMethod]
+        public void Issue614_IsDeleteRelevant_NonPrefixAncestorSubstring_ReturnsFalse()
+        {
+            // Arrange: the ancestor name occurs DEEPER in the path, never as its prefix.
+            var config = ConfigForDeleteRelevance(@"\\mailbox@example.com\Archive");
+            var mockFolder = new Mock<Folder>();
+            mockFolder
+                .Setup(folder => folder.FolderPath)
+                .Returns(@"\\mailbox@example.com\Inbox\Archive");
+
+            // Act
+            bool result = config.IsDeleteRelevant(mockFolder.Object);
+
+            // Assert
+            result.Should().BeFalse("the ancestor match must be prefix-anchored, not a substring");
+        }
+
+        [TestMethod]
+        public void Issue614_IsDeleteRelevant_SeparatorBoundaryNearMiss_ReturnsFalse()
+        {
+            // Arrange: Archive2 is a SIBLING of Archive, not a folder inside it.
+            var config = ConfigForDeleteRelevance(@"\\mailbox@example.com\Archive");
+            var mockFolder = new Mock<Folder>();
+            mockFolder
+                .Setup(folder => folder.FolderPath)
+                .Returns(@"\\mailbox@example.com\Archive2\Clients");
+
+            // Act
+            bool result = config.IsDeleteRelevant(mockFolder.Object);
+
+            // Assert
+            result.Should().BeFalse("the prefix match must be separator-terminated");
+        }
+
+        private static EmailFilerConfig ConfigForDeleteRelevance(string olAncestor)
+        {
+            var mockGlobals = new Mock<IApplicationGlobals>();
+            var mockOl = new Mock<IOlObjects>();
+            mockOl.Setup(globals => globals.InboxPath).Returns(@"\\mailbox@example.com\Inbox");
+            mockGlobals.Setup(globals => globals.Ol).Returns(mockOl.Object);
+            return new EmailFilerConfig { Globals = mockGlobals.Object, OlAncestor = olAncestor };
         }
     }
 }

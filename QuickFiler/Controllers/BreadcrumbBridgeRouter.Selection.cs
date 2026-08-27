@@ -9,9 +9,8 @@ namespace QuickFiler.Controllers
 {
     /// <summary>
     /// Selection, chain-fetch and outbound-delivery members of the breadcrumb bridge router,
-    /// relocated verbatim from <c>BreadcrumbBridgeRouter.cs</c> under decision D8 so that neither
-    /// part of the type exceeds the 500-line file limit. This is a pure mechanical relocation:
-    /// every member below is byte-identical to its pre-split form, in its pre-split order.
+    /// separated from <c>BreadcrumbBridgeRouter.cs</c> so that each part of the type remains below
+    /// the 500-line file limit. Selection methods enforce the archive-relative filing contract.
     /// </summary>
     public sealed partial class BreadcrumbBridgeRouter
     {
@@ -88,49 +87,55 @@ namespace QuickFiler.Controllers
                 return; // Banner rows are never selectable.
             }
 
-            _selectedRowId = row.RowId;
-            SelectedFolderPath =
+            string selection =
                 row.Kind == BreadcrumbRowKind.TrashPseudoRow
                     ? BreadcrumbRowBuilder.TrashRowText
                     : row.FilingTarget;
-            PostOutbound(
-                new BreadcrumbRenderMessage(_renderer.RenderRows(_rows, _selectedRowId), null)
-            );
-            SelectedFolderPathChanged?.Invoke(this, SelectedFolderPath);
+            // #614 D2: reject only an out-of-root FULL Outlook target; a rooted target at or
+            // under the root passes verbatim (#439) and no bound root leaves the row unguarded.
+            if (
+                _boundRoot.Length != 0
+                && ArchiveStemContract.IsFullOutlookPath(selection)
+                && !ArchiveStemContract.TryMakeArchiveRelative(selection, _boundRoot, out _)
+            )
+            {
+                log.Error("Breadcrumb row rejected: target is outside the archive root.");
+                return;
+            }
+
+            CommitSelection(row, selection);
         }
 
         private void SelectHierarchyPath(BreadcrumbRow row, string fullPath)
         {
+            if (_boundRoot.Length == 0)
+            {
+                CommitSelection(row, fullPath); // Preserved no-archive-root binding mode.
+                return;
+            }
+
+            // #614 D1/D9: a path outside the archive root, and the root itself, are deterministic
+            // non-selections; the prior selection stays unchanged and is never nulled (#499).
+            if (
+                !ArchiveStemContract.TryMakeArchiveRelative(fullPath, _boundRoot, out string stem)
+                || stem.Length == 0
+            )
+            {
+                log.Error("Breadcrumb selection rejected: not a folder inside the archive root.");
+                return;
+            }
+
+            CommitSelection(row, stem);
+        }
+
+        private void CommitSelection(BreadcrumbRow row, string selection)
+        {
             _selectedRowId = row.RowId;
-            SelectedFolderPath = ToArchiveRelativePath(fullPath);
+            SelectedFolderPath = selection;
             PostOutbound(
                 new BreadcrumbRenderMessage(_renderer.RenderRows(_rows, _selectedRowId), null)
             );
             SelectedFolderPathChanged?.Invoke(this, SelectedFolderPath);
-        }
-
-        private string ToArchiveRelativePath(string fullPath)
-        {
-            string root = _archiveRootPath.TrimEnd('\\', '/');
-            if (root.Length == 0)
-            {
-                return fullPath;
-            }
-
-            if (string.Equals(fullPath, root, StringComparison.OrdinalIgnoreCase))
-            {
-                return string.Empty;
-            }
-
-            if (
-                fullPath.StartsWith(root + "\\", StringComparison.OrdinalIgnoreCase)
-                || fullPath.StartsWith(root + "/", StringComparison.OrdinalIgnoreCase)
-            )
-            {
-                return fullPath.Substring(root.Length).TrimStart('\\', '/');
-            }
-
-            return fullPath;
         }
 
         private void PostRowRender(BreadcrumbRow row)

@@ -1,3 +1,9 @@
+---
+paths:
+  - ".github/workflows/**"
+description: Exit-code rules for GitHub Actions workflow steps that run pwsh.
+---
+
 # CI Workflow Authoring
 
 This rule governs GitHub Actions workflow steps that run PowerShell (`pwsh`). It exists because a `pwsh` step that intentionally invoked a failing nested command left `$LASTEXITCODE == 1` after its verification logic had already succeeded, leaking a failure to GitHub Actions even though the step's intent was satisfied (issue #26, PR #30).

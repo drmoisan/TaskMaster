@@ -326,7 +326,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
 
             result["Skip"]().GetAwaiter().GetResult().Should().BeEmpty();
             result["Replace with underscore"]().GetAwaiter().GetResult().Should().Be("Bad_Name");
-            result["Remove illegal characters"]().GetAwaiter().GetResult().Should().BeEmpty();
+            result["Remove illegal characters"]().GetAwaiter().GetResult().Should().Be("BadName");
         }
 
         [TestMethod]

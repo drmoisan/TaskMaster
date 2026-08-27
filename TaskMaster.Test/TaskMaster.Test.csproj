@@ -294,7 +294,9 @@
     <Compile Include="AppGlobals\AppEventsStoreRehookTests.cs" />
     <Compile Include="AppGlobals\StoreRehookCoordinatorTests.cs" />
     <Compile Include="AppGlobals\AppEventsTests.Helpers.cs" />
+    <Compile Include="AppGlobals\AppFileSystemFolderPathsOneDriveResolutionTests.cs" />
     <Compile Include="AppGlobals\AppFileSystemFolderPathsMatchBestSpecialFolderTests.cs" />
+    <Compile Include="AppGlobals\AppOlObjectsArchiveRootValidationTests.cs" />
     <Compile Include="AppGlobals\AppOlObjectsCoverageTests.cs" />
     <Compile Include="AppGlobals\AppOlObjectsFolderTreeServiceTests.cs" />
     <Compile Include="AppGlobals\AppOlObjectsFolderTreeServiceLifecycleTests.cs" />

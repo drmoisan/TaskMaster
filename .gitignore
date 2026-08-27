@@ -351,3 +351,7 @@ logs/
 # .claude/ agentic environment is tracked so it materializes in git worktrees (Issue #166).
 # Keep per-developer and per-agent state out of version control (Issue #149).
 .claude/settings.local.json
+# enforce-powershell-batch-budget.ps1 writes per-session state to
+# .claude/state/powershell-batch-budget.<session_id>.json. It is session-scoped and records
+# absolute local paths, so it must never be committed.
+.claude/state/

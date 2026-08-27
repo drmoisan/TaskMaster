@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using log4net.Repository.Hierarchy;
 using Microsoft.Office.Interop.Outlook;
 using UtilitiesCS.Extensions;
+using ArchiveStemContract = UtilitiesCS.OutlookObjects.Folder.ArchiveStemContract;
 
 namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
 {
@@ -166,24 +167,29 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         {
             currentFolder.ThrowIfNull();
 
-            if (
-                (currentFolder.FolderPath != Globals!.Ol.InboxPath)
-                && (currentFolder.FolderPath.Contains(OlAncestor))
-                && (currentFolder.FolderPath != OlAncestor)
-            )
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            // #614 D4: "inside the archive ancestor" is a prefix-anchored, separator-terminated,
+            // OrdinalIgnoreCase relationship, not an unanchored substring match. An empty stem
+            // means the folder IS the ancestor, which is not itself a delete-relevant folder.
+            return currentFolder.FolderPath != Globals!.Ol.InboxPath
+                && ArchiveStemContract.TryMakeArchiveRelative(
+                    currentFolder.FolderPath,
+                    OlAncestor,
+                    out string stem
+                )
+                && stem.Length != 0;
         }
 
         public void ResolvePaths(Folder currentFolder)
         {
             //TraceUtility.LogMethodCall(currentFolder, DestinationOlStem, Globals, OlAncestor, FsAncestorEquivalent);
 
+            // #614 D4: the filing boundary. A non-relative stem is rejected BEFORE it can be
+            // concatenated onto the ancestor and carried into folder resolution or the
+            // filesystem projection.
+            ArchiveStemContract.RequireArchiveRelativeStem(
+                DestinationOlStem,
+                nameof(DestinationOlStem)
+            );
             DestinationOlPath = $"{OlAncestor}\\{DestinationOlStem}";
             SaveFsPath = DestinationOlPath.ToFsFolderpath(OlAncestor, FsAncestorEquivalent!);
             DeleteAndUnTrain = IsDeleteRelevant(currentFolder);
@@ -200,6 +206,11 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
         {
             //TraceUtility.LogMethodCall(DestinationOlStem, Globals, OlAncestor, FsAncestorEquivalent);
 
+            // #614 D4: the filing boundary, enforced identically on both overloads.
+            ArchiveStemContract.RequireArchiveRelativeStem(
+                DestinationOlStem,
+                nameof(DestinationOlStem)
+            );
             DestinationOlPath = $"{OlAncestor}\\{DestinationOlStem}";
             SaveFsPath = DestinationOlPath.ToFsFolderpath(OlAncestor, FsAncestorEquivalent!);
             DestinationOlFolder = TryResolveDestinationFolder();
@@ -229,9 +240,22 @@ namespace UtilitiesCS.EmailIntelligence.EmailParsingSorting
             }
         }
 
+        /// <summary>
+        /// Returns <paramref name="folderPath"/> relative to <paramref name="olAncestor"/> when it
+        /// is at or under that ancestor. #614 D4: the strip is prefix-anchored,
+        /// separator-terminated, and OrdinalIgnoreCase, so an ancestor name recurring deeper in
+        /// the path is no longer removed. A path outside the ancestor is returned unchanged apart
+        /// from its leading separators, preserving the pre-existing out-of-ancestor behaviour.
+        /// </summary>
         public string GetStem(string olAncestor, string folderPath)
         {
-            return folderPath.Replace(olAncestor, "").TrimStart('\\');
+            return ArchiveStemContract.TryMakeArchiveRelative(
+                folderPath,
+                olAncestor,
+                out string stem
+            )
+                ? stem
+                : folderPath.TrimStart('\\');
         }
 
         #endregion Public Methods

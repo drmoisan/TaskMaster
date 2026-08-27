@@ -102,7 +102,11 @@ namespace UtilitiesCS.Test.NewtonsoftHelpers
             var dt = new DerivedTest2();
             dt.TryAdd("key1", "value1");
             dt.TryAdd("key2", "value2");
-            globals = new TaskMaster.ApplicationGlobals(mockApplication.Object, true);
+            globals = new TaskMaster.ApplicationGlobals(
+                mockApplication.Object,
+                true,
+                variable => variable == "OneDriveCommercial" ? @"C:\OneDrive" : null
+            );
             dt.Config = ConfigInitializer.InitConfig(new NewSmartSerializableConfig(), globals);
             return dt;
         }

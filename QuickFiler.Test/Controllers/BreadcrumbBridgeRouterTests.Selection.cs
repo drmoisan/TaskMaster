@@ -257,5 +257,51 @@ namespace QuickFiler.Test.Controllers
             // Assert
             _router.SelectedFolderPath.Should().Be("Trash to Delete");
         }
+
+        /// <summary>
+        /// Issue #614 producer-side regression: activating the mailbox store-root segment, which
+        /// sits ABOVE the bound archive root, must not place a full Outlook path into
+        /// <c>SelectedFolderPath</c>. The filing boundary downstream accepts only archive-relative
+        /// stems, so a verbatim store-root pass-through leaks a non-relative path into filing.
+        /// </summary>
+        [TestMethod]
+        public void Issue614_SegmentActivate_StoreRootSegment_DoesNotStoreFullOutlookPath()
+        {
+            // Arrange: bind through the internal archive-root overload with a provider chain whose
+            // segment 0 is the mailbox store root above the bound archive root.
+            const string storeRoot = @"\\mailbox@example.com";
+            const string archiveRoot = @"\\mailbox@example.com\Archive";
+            const string target = @"Clients\North";
+            const string hierarchyTarget = @"\\mailbox@example.com\Archive\Clients\North";
+            FolderTreeNodeKey leafKey = Key(hierarchyTarget);
+            _provider
+                .Setup(p => p.ResolveLeafKeyAsync(hierarchyTarget, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(leafKey);
+            _provider
+                .Setup(p => p.GetAncestorChainAsync(leafKey, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(
+                    new[]
+                    {
+                        ProviderSegment(storeRoot, "Mailbox", true),
+                        ProviderSegment(archiveRoot, "Archive", true),
+                        ProviderSegment(hierarchyTarget, "North", false),
+                    }
+                );
+            _router
+                .BindRowsAsync(
+                    new[] { target },
+                    new[] { new FolderScore(target, 730, 0.73) },
+                    archiveRoot,
+                    CancellationToken.None
+                )
+                .GetAwaiter()
+                .GetResult();
+
+            // Act: activate segment 0 (the store root above the bound archive root).
+            Inbound("{\"type\":\"segmentActivate\",\"rowId\":\"row-0\",\"segmentIndex\":0}");
+
+            // Assert: the store-root full Outlook path is never stored as the filing selection.
+            _router.SelectedFolderPath.Should().NotBe(storeRoot);
+        }
     }
 }

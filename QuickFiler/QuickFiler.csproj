@@ -291,6 +291,7 @@
     <Compile Include="Controllers\BreadcrumbBridgeRouter.Arrows.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouter.Selection.cs" />
     <Compile Include="Controllers\BreadcrumbOutboundQueue.cs" />
+    <Compile Include="Controllers\EfcSelectionGuard.cs" />
     <Compile Include="Controllers\EfcFormController.cs" />
     <Compile Include="Controllers\EfcHomeController.cs" />
     <Compile Include="Controllers\EfcHomeController.Metrics.cs" />
