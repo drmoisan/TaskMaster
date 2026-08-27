@@ -32,7 +32,7 @@ Work Mode: `full-bug`. The sole acceptance-criteria source is `FF/spec.md` under
 | AC-23 | `FF/evidence/qa-gates/line-counts-after-split.2026-08-27T20-22.md; FF/evidence/qa-gates/project-file-budget.2026-08-27T20-52.md; FF/evidence/qa-gates/post-merge-base-reconciliation.2026-08-27T23-31.md` |
 | AC-24 | `FF/evidence/qa-gates/new-test-file-budget.2026-08-27T20-54.md; FF/evidence/qa-gates/project-file-budget.2026-08-27T20-52.md; FF/evidence/qa-gates/post-merge-base-reconciliation.2026-08-27T23-31.md` |
 | AC-25 | `FF/evidence/qa-gates/line-count-audit.2026-08-27T20-49.md; FF/evidence/qa-gates/line-count-audit-postmerge.2026-08-27T23-31.md` |
-| AC-26 | `FF/evidence/qa-gates/ownership-precommit.2026-08-27T20-51.md; FF/evidence/qa-gates/post-merge-base-reconciliation.2026-08-27T23-31.md; FF/evidence/qa-gates/scope-lock.2026-08-27T23-31.md` |
+| AC-26 | `FF/evidence/qa-gates/ownership-precommit.2026-08-27T20-51.md; FF/evidence/qa-gates/post-merge-base-reconciliation.2026-08-27T23-31.md; FF/evidence/qa-gates/scope-lock.2026-08-27T23-39.md` |
 | AC-27 | `FF/evidence/qa-gates/determinism-scan.2026-08-27T20-50.md` |
 | AC-28 | `FF/evidence/qa-gates/nfr-entry-time-verdict.2026-08-27T20-54.md; FF/evidence/regression-testing/green-500-lifetime.2026-08-27T20-27.md` |
 | AC-29 | `FF/evidence/qa-gates/post-merge-csharpier.2026-08-27T23-31.md` |
