@@ -2,12 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.Office.Interop.Outlook;
@@ -15,8 +14,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler.Interfaces;
 using UtilitiesCS;
-using UtilitiesCS.EmailIntelligence;
-using UtilitiesCS.ReusableTypeClasses;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace QuickFiler.Controllers.Tests
@@ -24,219 +21,35 @@ namespace QuickFiler.Controllers.Tests
     [TestClass]
     public class QfcHomeControllerMetricsTests
     {
-        private MockRepository _mockRepository;
-        private Mock<IApplicationGlobals> _mockApplicationGlobals;
-        private Mock<System.Action> _mockParentCleanup;
-        private QfcHomeController _controller;
-        private Mock<Outlook.Application> _mockOlApp;
-        private Mock<Explorer> _mockExplorer;
-
-        [TestInitialize]
-        public void Setup()
-        {
-            Console.SetOut(new DebugTextWriter());
-            this._mockRepository = new MockRepository(MockBehavior.Strict);
-            this._mockApplicationGlobals = this._mockRepository.Create<IApplicationGlobals>();
-            this._mockApplicationGlobals.SetupGet(x => x.AF.CancelToken)
-                .Returns(CancellationToken.None);
-
-            this._mockOlApp = this._mockRepository.Create<Outlook.Application>();
-            this._mockExplorer = this._mockRepository.Create<Explorer>();
-            this._mockOlApp.Setup(x => x.ActiveExplorer()).Returns(_mockExplorer.Object);
-            this._mockApplicationGlobals.SetupGet(x => x.Ol.App).Returns(_mockOlApp.Object);
-
-            _ = SetUpMockIntelRes(_mockApplicationGlobals);
-
-            _mockParentCleanup = new Mock<System.Action>();
-            _controller = new QfcHomeController(
-                _mockApplicationGlobals.Object,
-                _mockParentCleanup.Object
-            );
-        }
-
-        private Mock<IntelligenceConfig> SetUpMockIntelRes(Mock<IApplicationGlobals> mockGlobals)
-        {
-            var intel = this._mockRepository.Create<IntelligenceConfig>(mockGlobals.Object);
-            var config = new Dictionary<string, SmartSerializableLoader>
-            {
-                { "Folder", new SmartSerializableLoader() },
-            }.ToConcurrentDictionary();
-            intel.SetupGet(x => x.Config).Returns(config);
-            mockGlobals.SetupGet(x => x.IntelRes).Returns(intel.Object);
-
-            return intel;
-        }
-
         /// <summary>
         /// Regression test for Issue #97: QuickFileMetrics_WRITE must not throw a
-        /// NullReferenceException when GetCalendar returns null because the "Email Time"
-        /// Outlook calendar subfolder does not exist.
+        /// NullReferenceException when GetCalendar returns null because the "Email Time" Outlook
+        /// calendar subfolder does not exist. The fixture's calendar root enumerates no subfolders,
+        /// so GetCalendar returns null, and GetMoveDiagnostics returns an empty array so the write
+        /// iterates zero items and touches no file.
         /// </summary>
         [TestMethod]
         public void QuickFileMetrics_WRITE_WhenGetCalendarReturnsNull_DoesNotThrow()
         {
-            // Arrange
-            // Build a fresh controller with loose mocks independent of the strict mock repository.
-            var mockGlobals = new Mock<IApplicationGlobals>(MockBehavior.Loose);
+            var (controller, _) = BuildLooseMetricsController();
 
-            // FS: TryGetValue("MyDocuments") returns true but with a path that produces no
-            // file writes because GetMoveDiagnostics (mocked below) returns an empty array,
-            // causing WriteTextFile to iterate 0 items.
-            var specialFolders = new ConcurrentDictionary<string, string>();
-            specialFolders["MyDocuments"] = @"C:\FakeDocs";
-            var mockFs = new Mock<IFileSystemFolderPaths>(MockBehavior.Loose);
-            mockFs.SetupGet(x => x.SpecialFolders).Returns(specialFolders);
-            mockGlobals.SetupGet(x => x.FS).Returns(mockFs.Object);
-
-            // Ol.App.Session: return a NameSpace whose GetDefaultFolder().Folders is empty
-            // so that Calendar.GetCalendar("Email Time", ...) returns null.
-            var mockFolders = new Mock<Folders>(MockBehavior.Loose);
-            mockFolders
-                .Setup(x => x.GetEnumerator())
-                .Returns(() => new ArrayList().GetEnumerator());
-            var mockCalendarRoot = new Mock<Folder>(MockBehavior.Loose);
-            mockCalendarRoot.SetupGet(x => x.Folders).Returns(mockFolders.Object);
-            var mockSession = new Mock<NameSpace>(MockBehavior.Loose);
-            mockSession
-                .Setup(x => x.GetDefaultFolder(OlDefaultFolders.olFolderCalendar))
-                .Returns(mockCalendarRoot.Object);
-            var mockOlApp = new Mock<Outlook.Application>(MockBehavior.Loose);
-            mockOlApp.SetupGet(x => x.Session).Returns(mockSession.Object);
-            var mockOl = new Mock<IOlObjects>(MockBehavior.Loose);
-            mockOl.SetupGet(x => x.App).Returns(mockOlApp.Object);
-            mockGlobals.SetupGet(x => x.Ol).Returns(mockOl.Object);
-
-            // FormController.Groups: EmailsToMove = 1; GetMoveDiagnostics returns empty array.
-            AppointmentItem refAppointment = null;
-            var mockGroups = new Mock<IQfcCollectionController>(MockBehavior.Loose);
-            mockGroups.SetupGet(x => x.EmailsToMove).Returns(1);
-            mockGroups
-                .Setup(x =>
-                    x.GetMoveDiagnostics(
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
-                        It.IsAny<double>(),
-                        It.IsAny<string>(),
-                        It.IsAny<DateTime>(),
-                        ref refAppointment
-                    )
-                )
-                .Returns(Array.Empty<string>());
-            var mockFormController = new Mock<IQfcFormController>(MockBehavior.Loose);
-            mockFormController.SetupGet(x => x.Groups).Returns(mockGroups.Object);
-
-            // Also set up IntelRes to avoid NullRef from mock chains.
-            mockGlobals.SetupGet(x => x.AF.CancelToken).Returns(CancellationToken.None);
-
-            var controller = new QfcHomeController(mockGlobals.Object, () => { });
-
-            // Inject _formController and _stopWatchMoved via reflection.
-            var type = controller.GetType();
-            type.GetField(
-                    "_formController",
-                    System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance
-                )
-                .SetValue(controller, mockFormController.Object);
-            type.GetField(
-                    "_stopWatchMoved",
-                    System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance
-                )
-                .SetValue(controller, new Stopwatch());
-
-            // Act & Assert — must not throw NullReferenceException.
-            // Before the fix, (AppointmentItem)olEmailCalendar.Items.Add() throws because
-            // olEmailCalendar is null. After the fix, the null is handled gracefully.
             System.Action act = () => controller.QuickFileMetrics_WRITE("test-metrics.txt");
+
             act.Should().NotThrow();
         }
 
         /// <summary>
-        /// Regression test for Issue #97: GetMoveDiagnostics must not throw a
-        /// NullReferenceException when the olAppointment ref parameter is null.
-        /// Tested via WriteMetricsAsync which calls WriteMoveToCalendar (sets null appointment
-        /// when calendar is absent) then passes it to GetMoveDiagnostics.
+        /// Regression test for Issue #97: the metrics path must not throw a NullReferenceException
+        /// when the olAppointment ref parameter is null. The fixture supplies no MyDocuments entry,
+        /// which is the arrange the original form of this test used.
         /// </summary>
         [TestMethod]
         public void GetMoveDiagnostics_NullAppointment_DoesNotThrow()
         {
-            // Arrange
-            // Build a fresh controller with loose mocks independent of the strict mock repository.
-            var mockGlobals = new Mock<IApplicationGlobals>(MockBehavior.Loose);
+            var (controller, _) = BuildLooseMetricsController(withMyDocuments: false);
 
-            // FS: TryGetValue("MyDocuments") returns false so WriteMetricsAsync returns early
-            // after WriteMoveToCalendar, avoiding file-write and queue complexity.
-            var specialFolders = new ConcurrentDictionary<string, string>();
-            var mockFs = new Mock<IFileSystemFolderPaths>(MockBehavior.Loose);
-            mockFs.SetupGet(x => x.SpecialFolders).Returns(specialFolders);
-            mockGlobals.SetupGet(x => x.FS).Returns(mockFs.Object);
-
-            // Ol.App.Session: NameSpace with empty Folders → GetCalendar returns null
-            // → WriteMoveToCalendar sets OlAppointment = null.
-            var mockFolders = new Mock<Folders>(MockBehavior.Loose);
-            mockFolders
-                .Setup(x => x.GetEnumerator())
-                .Returns(() => new ArrayList().GetEnumerator());
-            var mockCalendarRoot = new Mock<Folder>(MockBehavior.Loose);
-            mockCalendarRoot.SetupGet(x => x.Folders).Returns(mockFolders.Object);
-            var mockSession = new Mock<NameSpace>(MockBehavior.Loose);
-            mockSession
-                .Setup(x => x.GetDefaultFolder(OlDefaultFolders.olFolderCalendar))
-                .Returns(mockCalendarRoot.Object);
-            var mockOlApp = new Mock<Outlook.Application>(MockBehavior.Loose);
-            mockOlApp.SetupGet(x => x.Session).Returns(mockSession.Object);
-            var mockOl = new Mock<IOlObjects>(MockBehavior.Loose);
-            mockOl.SetupGet(x => x.App).Returns(mockOlApp.Object);
-            mockGlobals.SetupGet(x => x.Ol).Returns(mockOl.Object);
-
-            // FormController.Groups: EmailsToMove = 1; GetMoveDiagnostics returns empty array.
-            // This mock simulates GetMoveDiagnostics receiving a null appointment and verifies
-            // it does not throw — the real GetMoveDiagnostics fix guards olAppointment != null.
-            AppointmentItem refAppointment = null;
-            var mockGroups = new Mock<IQfcCollectionController>(MockBehavior.Loose);
-            mockGroups.SetupGet(x => x.EmailsToMove).Returns(1);
-            mockGroups
-                .Setup(x =>
-                    x.GetMoveDiagnostics(
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
-                        It.IsAny<double>(),
-                        It.IsAny<string>(),
-                        It.IsAny<DateTime>(),
-                        ref refAppointment
-                    )
-                )
-                .Returns(Array.Empty<string>());
-            var mockFormController = new Mock<IQfcFormController>(MockBehavior.Loose);
-            mockFormController.SetupGet(x => x.Groups).Returns(mockGroups.Object);
-
-            mockGlobals.SetupGet(x => x.AF.CancelToken).Returns(CancellationToken.None);
-
-            var controller = new QfcHomeController(mockGlobals.Object, () => { });
-
-            var type = controller.GetType();
-            type.GetField(
-                    "_formController",
-                    System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance
-                )
-                .SetValue(controller, mockFormController.Object);
-            type.GetField(
-                    "_stopWatchMoved",
-                    System.Reflection.BindingFlags.NonPublic
-                        | System.Reflection.BindingFlags.Instance
-                )
-                .SetValue(controller, new Stopwatch());
-
-            // Act & Assert — must not throw NullReferenceException.
-            // Before the fix in GetMoveDiagnostics, olAppointment.Body throws when appointment
-            // is null. After the fix, the null appointment is skipped gracefully.
-            // Note: this test exercises the WriteMoveToCalendar → null appointment path, then
-            // the GetMoveDiagnostics call path. The actual null guard in GetMoveDiagnostics is
-            // exercised by the real implementation when called from WriteMetricsAsync. The mock
-            // verifies the integration boundary is preserved correctly.
             System.Action act = () => controller.QuickFileMetrics_WRITE("test-metrics-2.txt");
+
             act.Should().NotThrow();
         }
 
@@ -259,12 +72,15 @@ namespace QuickFiler.Controllers.Tests
         private static (
             QfcHomeController controller,
             Mock<IQfcCollectionController> groups
-        ) BuildLooseMetricsController()
+        ) BuildLooseMetricsController(string[] diagnostics = null, bool withMyDocuments = true)
         {
             var mockGlobals = new Mock<IApplicationGlobals>(MockBehavior.Loose);
 
             var specialFolders = new ConcurrentDictionary<string, string>();
-            specialFolders["MyDocuments"] = @"C:\FakeDocs";
+            if (withMyDocuments)
+            {
+                specialFolders["MyDocuments"] = FakeDocumentsRoot;
+            }
             var mockFs = new Mock<IFileSystemFolderPaths>(MockBehavior.Loose);
             mockFs.SetupGet(x => x.SpecialFolders).Returns(specialFolders);
             mockGlobals.SetupGet(x => x.FS).Returns(mockFs.Object);
@@ -298,15 +114,102 @@ namespace QuickFiler.Controllers.Tests
                         ref It.Ref<AppointmentItem>.IsAny
                     )
                 )
-                .Returns(Array.Empty<string>());
+                .Returns(diagnostics ?? Array.Empty<string>());
             var mockFormController = new Mock<IQfcFormController>(MockBehavior.Loose);
             mockFormController.SetupGet(x => x.Groups).Returns(mockGroups.Object);
 
             mockGlobals.SetupGet(x => x.AF.CancelToken).Returns(CancellationToken.None);
 
             var controller = new QfcHomeController(mockGlobals.Object, () => { });
+            controller.CreateCancellationToken();
+            // Replace the production file writer with a no-op. The default seam value is
+            // FileIO2.WriteTextFileAsync, which probes a real path and retries 100 times over ten
+            // seconds when the folder is absent; a unit test must not touch the filesystem or wait
+            // on wall-clock time. Tests that assert on the flush override this with a capturing
+            // delegate of their own.
+            controller.MetricsFileWriter = (filename, lines, folderRoot, token) =>
+                Task.CompletedTask;
             SetPrivateField(controller, "_formController", mockFormController.Object);
+            SetPrivateField(controller, "_stopWatchMoved", new Stopwatch());
             return (controller, mockGroups);
+        }
+
+        /// <summary>
+        /// Builds a stopped stopwatch reporting a fixed, explicitly set elapsed interval. The
+        /// internal tick field is assigned directly rather than started and then stopped, because a
+        /// wall-clock start/stop pair does not guarantee a non-zero elapsed value and would make
+        /// every assertion derived from it time-dependent.
+        /// </summary>
+        private static Stopwatch StoppedStopwatchWithElapsed(int seconds)
+        {
+            var stopwatch = new Stopwatch();
+            SetPrivateField(stopwatch, "elapsed", Stopwatch.Frequency * (long)seconds);
+            return stopwatch;
+        }
+
+        /// <summary>
+        /// The duration must come from the moved-items stopwatch, not from the session stopwatch.
+        /// The pre-fix source reads the freshly constructed session stopwatch and passes zero.
+        /// </summary>
+        [TestMethod]
+        public async Task WriteMetricsAsync_ReadsMovedStopwatchForDuration()
+        {
+            var (controller, groups) = BuildLooseMetricsController();
+            SetPrivateField(controller, "_stopWatchMoved", StoppedStopwatchWithElapsed(30));
+            SetPrivateField(controller, "_stopWatch", new Stopwatch());
+
+            await controller.WriteMetricsAsync("metrics.csv");
+
+            groups.Verify(
+                x =>
+                    x.GetMoveDiagnostics(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.Is<double>(d => d > 0),
+                        It.IsAny<string>(),
+                        It.IsAny<DateTime>(),
+                        ref It.Ref<AppointmentItem>.IsAny
+                    ),
+                Times.Once
+            );
+        }
+
+        /// <summary>
+        /// The metrics file is machine-read, so its numeric fields must not follow the operator's
+        /// locale. Under de-DE the pre-fix source renders the minutes field with a decimal comma,
+        /// which would add a field to the CSV row. The assertion is independent of the elapsed
+        /// value, so it needs no clock read.
+        /// </summary>
+        [TestMethod]
+        public async Task WriteMetricsAsync_UnderGermanCulture_RendersInvariantDecimalSeparator()
+        {
+            var originalCulture = CultureInfo.CurrentCulture;
+            try
+            {
+                CultureInfo.CurrentCulture = new CultureInfo("de-DE");
+                var (controller, groups) = BuildLooseMetricsController();
+                SetPrivateField(controller, "_stopWatchMoved", StoppedStopwatchWithElapsed(30));
+                SetPrivateField(controller, "_stopWatch", new Stopwatch());
+
+                await controller.WriteMetricsAsync("metrics.csv");
+
+                groups.Verify(
+                    x =>
+                        x.GetMoveDiagnostics(
+                            It.IsAny<string>(),
+                            It.Is<string>(text => !text.Contains(",")),
+                            It.IsAny<double>(),
+                            It.IsAny<string>(),
+                            It.IsAny<DateTime>(),
+                            ref It.Ref<AppointmentItem>.IsAny
+                        ),
+                    Times.Once
+                );
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = originalCulture;
+            }
         }
 
         /// <summary>
@@ -330,6 +233,9 @@ namespace QuickFiler.Controllers.Tests
             // Arrange
             var (controller, groups) = BuildLooseMetricsController();
             SetPrivateField(controller, "_stopWatch", new Stopwatch());
+            // The duration read moves to the moved-items stopwatch, so this field must be
+            // populated or the production path dereferences null.
+            SetPrivateField(controller, "_stopWatchMoved", new Stopwatch());
             var fake = FixedClock();
             controller.TimeProvider = fake;
             var expectedLocal = fake.GetLocalNow().LocalDateTime;
@@ -389,33 +295,159 @@ namespace QuickFiler.Controllers.Tests
             );
         }
 
-        /// <summary>
-        /// Issue #222 site 8: the 20 ms retry delay in <c>NonBlockingProducer</c> is routed through
-        /// the injected <see cref="TimeProvider"/> (<c>await TimeProvider.Delay(...)</c>). This test
-        /// proves the controller's injected provider gates that exact delay: a 20 ms delay obtained
-        /// from the controller's seam does not complete until the fake clock is advanced by 20 ms.
-        /// The surrounding catch branch is defensive and not deterministically reachable through
-        /// BlockingCollection; see evidence/regression-testing for the scope note.
-        /// </summary>
-        [TestMethod]
-        public async Task NonBlockingProducer_DelaySeam_HonorsInjectedTwentyMillisecondDelay()
+        #endregion Issue #222 — Injectable time/delay seam tests
+
+        #region Issue #442 — metrics flush tests
+
+        private const string FakeDocumentsRoot = @"C:\FakeDocs";
+
+        private sealed class MetricsWrite
         {
-            // Arrange
-            var fake = new FakeTimeProvider();
-            _controller.TimeProvider = fake;
+            internal MetricsWrite(
+                string filename,
+                string[] lines,
+                string folderRoot,
+                CancellationToken token
+            )
+            {
+                Filename = filename;
+                Lines = lines;
+                FolderRoot = folderRoot;
+                Token = token;
+            }
 
-            // Act — the exact production expression at the 20 ms retry site.
-            var delayTask = _controller.TimeProvider.Delay(TimeSpan.FromMilliseconds(20));
-
-            // Assert — gated by the injected clock, not wall-clock.
-            delayTask
-                .IsCompleted.Should()
-                .BeFalse("the injected delay must not elapse via wall-clock");
-            fake.Advance(TimeSpan.FromMilliseconds(20));
-            await delayTask;
-            delayTask.IsCompleted.Should().BeTrue();
+            internal string Filename { get; }
+            internal string[] Lines { get; }
+            internal string FolderRoot { get; }
+            internal CancellationToken Token { get; }
         }
 
-        #endregion Issue #222 — Injectable time/delay seam tests
+        /// <summary>
+        /// The flush must actually reach the writer. On the pre-fix source the diagnostic lines are
+        /// handed to a queue whose consumer can never start, so the capture list stays empty.
+        /// </summary>
+        [TestMethod]
+        public async Task WriteMetricsAsync_InvokesInjectedMetricsFileWriterOnce()
+        {
+            var lines = new[] { "line-one", "line-two" };
+            var (controller, _) = BuildLooseMetricsController(lines);
+            var captures = new List<MetricsWrite>();
+            controller.MetricsFileWriter = (filename, written, folderRoot, token) =>
+            {
+                captures.Add(new MetricsWrite(filename, written, folderRoot, token));
+                return Task.CompletedTask;
+            };
+
+            await controller.WriteMetricsAsync("metrics.csv");
+
+            captures.Should().ContainSingle("the flush must invoke the writer exactly once");
+            captures[0].Filename.Should().Be("metrics.csv");
+            captures[0].FolderRoot.Should().Be(FakeDocumentsRoot);
+            captures[0].Lines.Should().Equal(lines);
+        }
+
+        /// <summary>
+        /// The flush-timing invariant: the writer's Task must complete before the Task returned by
+        /// WriteMetricsAsync completes, with nothing deferred to a timer, a background consumer, or
+        /// Cleanup(). Task.Yield is used so the delegate genuinely suspends without a wall-clock wait.
+        /// </summary>
+        [TestMethod]
+        public async Task WriteMetricsAsync_CompletesWriterTaskBeforeReturning()
+        {
+            var (controller, _) = BuildLooseMetricsController(new[] { "line-one" });
+            var writerCompleted = false;
+            controller.MetricsFileWriter = async (filename, written, folderRoot, token) =>
+            {
+                await Task.Yield();
+                writerCompleted = true;
+            };
+
+            await controller.WriteMetricsAsync("metrics.csv");
+
+            writerCompleted
+                .Should()
+                .BeTrue("the writer must complete before WriteMetricsAsync returns");
+        }
+
+        /// <summary>
+        /// The flush must survive session cancellation. The dispatcher continuation that carries it
+        /// is not awaited to completion, so a cancel raised while the write is in flight must not
+        /// abort it. The writer therefore receives an uncancelled token, never the session token.
+        /// </summary>
+        [TestMethod]
+        public async Task WriteMetricsAsync_PassesUncancelledTokenToWriter()
+        {
+            var (controller, _) = BuildLooseMetricsController(new[] { "line-one" });
+            var captured = new List<CancellationToken>();
+            controller.MetricsFileWriter = (filename, written, folderRoot, token) =>
+            {
+                captured.Add(token);
+                return Task.CompletedTask;
+            };
+            controller.TokenSource.Cancel();
+
+            await controller.WriteMetricsAsync("metrics.csv");
+
+            captured.Should().ContainSingle();
+            captured[0]
+                .IsCancellationRequested.Should()
+                .BeFalse("a cancelled session must not abort the metrics flush");
+        }
+
+        /// <summary>
+        /// GetMoveDiagnostics returns an array one element longer than it fills, so its trailing
+        /// element is null. Null and whitespace-only entries must be dropped before the write rather
+        /// than producing a blank CSV line.
+        /// </summary>
+        [TestMethod]
+        public async Task WriteMetricsAsync_FiltersNullDiagnosticLinesBeforeWriting()
+        {
+            var (controller, _) = BuildLooseMetricsController(
+                new[] { "line-one", "   ", null, "line-two" }
+            );
+            var captures = new List<MetricsWrite>();
+            controller.MetricsFileWriter = (filename, written, folderRoot, token) =>
+            {
+                captures.Add(new MetricsWrite(filename, written, folderRoot, token));
+                return Task.CompletedTask;
+            };
+
+            await controller.WriteMetricsAsync("metrics.csv");
+
+            captures.Should().ContainSingle();
+            captures[0]
+                .Lines.Should()
+                .Equal(
+                    new[] { "line-one", "line-two" },
+                    "null and whitespace-only entries must not reach the file"
+                );
+        }
+
+        /// <summary>
+        /// Guards the MyDocuments guard: with no MyDocuments entry the method must return before any
+        /// write. This test passes both before and after the fix by design.
+        /// </summary>
+        [TestMethod]
+        public async Task WriteMetricsAsync_WithoutMyDocumentsFolder_DoesNotInvokeWriter()
+        {
+            var (controller, _) = BuildLooseMetricsController(
+                new[] { "line-one" },
+                withMyDocuments: false
+            );
+            var invoked = false;
+            controller.MetricsFileWriter = (filename, written, folderRoot, token) =>
+            {
+                invoked = true;
+                return Task.CompletedTask;
+            };
+
+            await controller.WriteMetricsAsync("metrics.csv");
+
+            invoked
+                .Should()
+                .BeFalse("the guard must abort before any write when MyDocuments is absent");
+        }
+
+        #endregion Issue #442 — metrics flush tests
     }
 }
