@@ -901,8 +901,14 @@ fixing them requires writing a file owned by a sibling epic child. None is fixed
   rather than a shape defect, it breaks three currently passing tests on their asserted literals
   (`QfcHomeControllerMetricsTests.cs:336-337`, `:371-372`,
   `EfcHomeControllerMetricsTests.cs:59`), and no issue lists it as an acceptance criterion.
-- **Disposition:** promoted to its own tracked GitHub issue via the promotion lifecycle, per AC-25.
-  Issue number: _to be recorded on promotion._
+- **Disposition:** `PROMOTION BLOCKED`. The promotion could not be completed from the executing
+  session. A repository policy hook rejects direct `gh issue create` and requires the drm-copilot
+  MCP promotion path (`new_potential_entry` -> `potential_to_issue` -> `new_active_feature_folder`);
+  those MCP tools are not present in the executing agent's tool surface. `gh` itself is installed
+  and authenticated, so this is a policy restriction rather than a missing tool. The exact issue
+  title and body to be filed, and the required follow-up, are recorded in the blocker artifact
+  `docs/features/active/quickfiler-home-controller-metrics-442/evidence/issue-updates/cfn4-promotion-blocked.2026-08-26T11-32.md`.
+  AC-25 is left unchecked until the issue number is written here in place of `PROMOTION BLOCKED`.
 
 ---
 

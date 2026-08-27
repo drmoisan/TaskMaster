@@ -165,7 +165,7 @@ Test method names asserted by this plan:
 
 ### Phase 0 — Baseline capture and environment bootstrap
 
-- [ ] [P0-T1] Read, in the `policy-compliance-order` sequence, `CLAUDE.md`,
+- [x] [P0-T1] Read, in the `policy-compliance-order` sequence, `CLAUDE.md`,
       `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`,
       `.claude/rules/csharp.md`, `.claude/rules/plan-acceptance-gates.md`,
       `.claude/rules/quality-tiers.md`, and `.claude/rules/tonality.md`. The C#-specific rule file
@@ -174,7 +174,7 @@ Test method names asserted by this plan:
       carrying `Timestamp:`, `Policy Order:` (the sequence above, in order), and an explicit list of
       every file read with its repository-relative path. Acceptance: the artifact exists and its
       file list contains all seven paths.
-- [ ] [P0-T2] Record the git baseline and resolve `WS`. Run `git rev-parse --show-toplevel`,
+- [x] [P0-T2] Record the git baseline and resolve `WS`. Run `git rev-parse --show-toplevel`,
       `git rev-parse HEAD`, `git rev-parse --abbrev-ref HEAD`, and `git status --porcelain`. The
       value returned by `git rev-parse --show-toplevel` is `WS` for every remaining task in this
       plan; do not read `WS` from any literal path written in this document. Write
@@ -186,7 +186,7 @@ Test method names asserted by this plan:
       it carries the host user-account name. Acceptance: the artifact contains a 40-character
       `BASELINE_SHA:` value, its `WS:` line is exactly `<repo-root>`, and a case-insensitive search
       of the artifact for `Users` returns no match.
-- [ ] [P0-T3] Probe the toolchain. Resolve `msbuild.exe` and `vstest.console.exe` through
+- [x] [P0-T3] Probe the toolchain. Resolve `msbuild.exe` and `vstest.console.exe` through
       `C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe`, and probe for
       `dotnet`, `dotnet-coverage`, `nuget`, and `gh` with `Get-Command`. Write
       `FF/evidence/baseline/toolchain-probe.TS.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`,
@@ -200,33 +200,33 @@ Test method names asserted by this plan:
       artifact for `Users` returns no match. A `NOT_FOUND` value is recorded as a blocker for the
       tasks that consume it and execution continues; it is never a reason to halt the plan or to
       substitute a different route.
-- [ ] [P0-T4] Restore the CSharpier manifest tool. Run
+- [x] [P0-T4] Restore the CSharpier manifest tool. Run
       `pwsh -NoProfile -Command 'dotnet tool restore; Write-Host "EXIT_CODE=$LASTEXITCODE"'` from
       `WS`. The manifest is at the repository root file `dotnet-tools.json`, not under `.config/`.
       Write `FF/evidence/baseline/dotnet-tool-restore.TS.md`. Acceptance: `EXIT_CODE: 0` and
       `dotnet tool run csharpier --version` reports `1.2.6`.
-- [ ] [P0-T5] Restore NuGet packages for the solution. Run
+- [x] [P0-T5] Restore NuGet packages for the solution. Run
       `pwsh -NoProfile -Command 'nuget restore "TaskMaster.sln"; Write-Host "EXIT_CODE=$LASTEXITCODE"'`
       from `WS`. This worktree has no `packages/` directory, so every later msbuild and vstest task
       fails without this step. Write `FF/evidence/baseline/nuget-restore.TS.md`. Acceptance:
       `EXIT_CODE: 0` and the directory `packages` exists at `WS`.
-- [ ] [P0-T6] Capture the formatting baseline. Run
+- [x] [P0-T6] Capture the formatting baseline. Run
       `pwsh -NoProfile -Command 'dotnet tool run csharpier check .; Write-Host "EXIT_CODE=$LASTEXITCODE"'`
       from `WS`. Write `FF/evidence/baseline/csharpier-check.TS.md` with `Timestamp:`, `Command:`,
       `EXIT_CODE:`, `Output Summary:` recording the number of files reported unformatted.
       Acceptance: the artifact exists and records a numeric unformatted-file count.
-- [ ] [P0-T7] Capture the analyzer baseline. Run
+- [x] [P0-T7] Capture the analyzer baseline. Run
       `pwsh -NoProfile -Command '$vsw = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe"; $mb = & $vsw -latest -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe" | Select-Object -First 1; & $mb "TaskMaster.sln" /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true; Write-Host "EXIT_CODE=$LASTEXITCODE"'`
       from `WS`. `/t:Rebuild` is mandatory; a warm `/t:Build` skips `CoreCompile` and runs no
       analyzers. Do not add `/p:Nullable=enable`. Write
       `FF/evidence/baseline/msbuild-analyzers.TS.md` with the error and warning counts in
       `Output Summary:`. Acceptance: the artifact records numeric error and warning counts.
-- [ ] [P0-T8] Capture the nullable/type-check baseline. Run the same resolved msbuild with
+- [x] [P0-T8] Capture the nullable/type-check baseline. Run the same resolved msbuild with
       `"TaskMaster.sln" /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
       from `WS`. Do not add `/p:Nullable=enable`. Write
       `FF/evidence/baseline/msbuild-nullable.TS.md` with the error count in `Output Summary:`.
       Acceptance: the artifact records a numeric error count.
-- [ ] [P0-T9] Capture the coverage baseline. Run
+- [x] [P0-T9] Capture the coverage baseline. Run
       `pwsh -NoProfile -File "scripts\vscode\Invoke-MSTestWithCoverage.ps1" -Configuration Debug -CoverageOutput "coverage\coverage.cobertura.xml"`
       from `WS`. The run takes roughly 20 minutes; allow a timeout of at least 45 minutes. The
       runner raises two distinct run-related throws.
@@ -257,11 +257,11 @@ Test method names asserted by this plan:
       line-rate percentages, and a `RunDisposition:` line; a `TOOLING_FAILURE` disposition is a
       blocker requiring investigation, and this task is not complete until the recorded disposition
       is `CLEAN`, `TESTS_FAILED`, or `COVERAGE_FLOOR_TRIPPED`.
-- [ ] [P0-T10] Record the pre-change line count of each of the seven owned files (five production,
+- [x] [P0-T10] Record the pre-change line count of each of the seven owned files (five production,
       two test) into `FF/evidence/baseline/owned-file-line-counts.TS.md` with `Timestamp:`,
       `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: the artifact lists seven paths, each
       with a numeric line count.
-- [ ] [P0-T11] Record the pre-fix defect-site census. Run `git grep -n` for each of these patterns
+- [x] [P0-T11] Record the pre-fix defect-site census. Run `git grep -n` for each of these patterns
       and record every hit with file and line: `Elapsed.Seconds` under `QuickFiler/Controllers/`;
       `int elapsedSeconds` under `QuickFiler/`; `NotImplementedException` in
       `QuickFiler/Controllers/EfcHomeController.Metrics.cs`; `volatile` in
@@ -276,7 +276,7 @@ Test method names asserted by this plan:
       call, unrelated to `_stopWatch`). This artifact
       is the pre-fix half of the grep-based acceptance criteria AC-7, AC-10, AC-12, AC-14, and
       AC-15.
-- [ ] [P0-T12] Resolve the two unverified points carried from research. Read
+- [x] [P0-T12] Resolve the two unverified points carried from research. Read
       `QuickFiler.Test/Controllers/EfcHomeControllerTests.cs` in full and confirm that
       `QuickFileMetrics_WRITE_WithNullList_SkipsBodyAndDoesNotThrow` and
       `QuickFileMetrics_WRITE_WithEmptyList_SkipsBodyAndDoesNotThrow` return through the
@@ -293,28 +293,28 @@ Test method names asserted by this plan:
 
 ### Phase 1 — EFC metrics regression tests, red state (#451)
 
-- [ ] [P1-T1] [expect-fail] In `QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs`,
+- [x] [P1-T1] [expect-fail] In `QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs`,
       update the expected literal of `BuildQuickFileMetricLines_WithMovedMailItems_FormatsMetricLine`
       (declared at line 35, literal at lines 56-60) so the concatenated substring `RecipientSender`
       is replaced by the separated substring `,Recipient,Sender,` and the expected line carries 12
       comma-separated fields. Acceptance: the file compiles and the literal
       `RecipientSender` no longer appears in that test method.
-- [ ] [P1-T2] [expect-fail] Add `BuildQuickFileMetricLines_RendersTwelveCommaSeparatedFields` to
+- [x] [P1-T2] [expect-fail] Add `BuildQuickFileMetricLines_RendersTwelveCommaSeparatedFields` to
       `QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs`. It invokes
       `BuildQuickFileMetricLines` with one moved item and asserts the single rendered line splits on
       the comma character into exactly 12 fields. Acceptance: the method exists, compiles, and is
       decorated `[TestMethod]`.
-- [ ] [P1-T3] [expect-fail] Add `BuildQuickFileMetricLines_WithEmbeddedCommas_StillRendersTwelveFields`
+- [x] [P1-T3] [expect-fail] Add `BuildQuickFileMetricLines_WithEmbeddedCommas_StillRendersTwelveFields`
       to the same file. It embeds a comma in each of `ToRecipientsName`, `SenderName`, and
       `selectedFolder` and asserts the rendered line still splits into exactly 12 fields.
       Acceptance: the method exists, compiles, and is decorated `[TestMethod]`.
-- [ ] [P1-T4] [expect-fail] Add `BuildQuickFileMetricLines_WithMultipleMovedItems_PinsRealDivisionRounding`
+- [x] [P1-T4] [expect-fail] Add `BuildQuickFileMetricLines_WithMultipleMovedItems_PinsRealDivisionRounding`
       to the same file. It invokes `BuildQuickFileMetricLines` with `elapsedSeconds` of 8 and three
       moved items and asserts each rendered line contains the substring `,3,0.04,`. Under the
       current integer division `8 / 3` yields 2 and the line contains `,2,0.03,`; under real
       division it yields 2.6666… which renders as `3` and `0.04`. Acceptance: the method exists,
       compiles, and is decorated `[TestMethod]`.
-- [ ] [P1-T5] Add `BuildQuickFileMetricLines_WithNinetySeconds_RendersUntruncatedDuration` to the
+- [x] [P1-T5] Add `BuildQuickFileMetricLines_WithNinetySeconds_RendersUntruncatedDuration` to the
       same file. It invokes `BuildQuickFileMetricLines` with `elapsedSeconds` of 90 and one moved
       item and asserts the rendered line contains the substring `,90,1.50,`. This test is a
       deliberate pin, not a regression: it passes both before and after the fix, because the 0-59
@@ -322,14 +322,14 @@ Test method names asserted by this plan:
       `TimeSpan` component is read, not inside `BuildQuickFileMetricLines`. The falsifiable half of
       AC-7 is carried by the `Elapsed.Seconds` search gate in task P2-T10. Acceptance: the method
       exists, compiles, is decorated `[TestMethod]`, and passes on the pre-fix source.
-- [ ] [P1-T6] [expect-fail] Add `BuildQuickFileMetricLines_UnderGermanCulture_RendersInvariantDecimalSeparator`
+- [x] [P1-T6] [expect-fail] Add `BuildQuickFileMetricLines_UnderGermanCulture_RendersInvariantDecimalSeparator`
       to the same file. It sets `CultureInfo.CurrentCulture` to `de-DE` inside a `try` block whose
       `finally` restores the original culture, invokes `BuildQuickFileMetricLines` with
       `elapsedSeconds` of 120 and one moved item, and asserts the rendered line contains the
       substring `,2.00,` and splits into exactly 12 fields. Under `de-DE` the pre-fix source renders
       `,2,00,`. Acceptance: the method exists, compiles, is decorated `[TestMethod]`, and its
       `finally` block restores `CultureInfo.CurrentCulture`.
-- [ ] [P1-T7] [expect-fail] Add `StopWatch_AfterControllerConstruction_IsRunning` to the same file.
+- [x] [P1-T7] [expect-fail] Add `StopWatch_AfterControllerConstruction_IsRunning` to the same file.
       It builds a controller through the existing `CreateController` helper and asserts
       `StopWatch.IsRunning` is `true`, following the `QfcHomeControllerRunAsyncTests.cs:303`
       precedent. If the helper's `EfcDataModel` (built through
@@ -339,18 +339,18 @@ Test method names asserted by this plan:
       unowned file, assert the `InitAsync` site at line 225 instead and record the limitation in
       task P7-T2. Acceptance: the method exists, compiles, is decorated `[TestMethod]`, and asserts
       `IsRunning`.
-- [ ] [P1-T8] [expect-fail] Delete `QuickFileMetricsWriteFilenameOnly_PreservesNotImplementedContract`
+- [x] [P1-T8] [expect-fail] Delete `QuickFileMetricsWriteFilenameOnly_PreservesNotImplementedContract`
       (lines 138-148) from the same file and add
       `QuickFileMetricsWriteFilenameOnly_WithAbsentPrerequisites_DoesNotThrow` in its place. The new
       test invokes the single-argument `QuickFileMetrics_WRITE` on a controller whose
       `_formController`, `DataModel`, or `DataModel.Mail` is absent and asserts the call does not
       throw. Acceptance: the deleted method name no longer appears in the file and the new method
       exists, compiles, and is decorated `[TestMethod]`.
-- [ ] [P1-T9] [expect-fail] Add `QuickFileMetricsWriteFilenameOnly_WithPrerequisites_DelegatesToThreeArgumentOverload`
+- [x] [P1-T9] [expect-fail] Add `QuickFileMetricsWriteFilenameOnly_WithPrerequisites_DelegatesToThreeArgumentOverload`
       to the same file. It supplies the prerequisites and asserts the injected
       `metricsLineWriter` seam is invoked, proving delegation to the three-argument overload.
       Acceptance: the method exists, compiles, and is decorated `[TestMethod]`.
-- [ ] [P1-T10] [expect-fail] Build and run the EFC scoped suite to record the red state. Run
+- [x] [P1-T10] [expect-fail] Build and run the EFC scoped suite to record the red state. Run
       `pwsh -NoProfile -Command '$vsw = "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe"; $mb = & $vsw -latest -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe" | Select-Object -First 1; & $mb "TaskMaster.sln" /t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"; $vt = & $vsw -latest -products * -find "Common7\IDE\Extensions\TestPlatform\vstest.console.exe" | Select-Object -First 1; & $vt "QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" /InIsolation "/TestCaseFilter:FullyQualifiedName~EfcHomeControllerMetricsTests" /Logger:trx "/ResultsDirectory:TestResults\p1-t10"; Write-Host "EXIT_CODE=$LASTEXITCODE"'`
       from `WS`. This is a build-for-test step, not the analyzer gate; the analyzer gate uses
       `/t:Rebuild` and runs in Phase 6. Write
@@ -363,36 +363,36 @@ Test method names asserted by this plan:
 
 ### Phase 2 — EFC metrics minimal fixes (#451)
 
-- [ ] [P2-T1] Add `using System.Globalization;` to
+- [x] [P2-T1] Add `using System.Globalization;` to
       `QuickFiler/Controllers/EfcHomeController.Metrics.cs` in the existing using block.
       Acceptance: the directive is present and the solution compiles.
-- [ ] [P2-T2] In `QuickFiler/Controllers/EfcHomeController.cs`, replace the two-statement
+- [x] [P2-T2] In `QuickFiler/Controllers/EfcHomeController.cs`, replace the two-statement
       construct-then-nothing pattern at lines 76 and 225 with the single form
       `_stopWatch = Stopwatch.StartNew();`. `System.Diagnostics` is already imported at line 3.
       Acceptance: a search for `Stopwatch.StartNew` in that file returns exactly three hits, at
       lines 76, 176, and 225 — line 176 is the pre-existing `selectionStopwatch` call, unrelated to
       `_stopWatch` — and the solution compiles.
-- [ ] [P2-T3] In `QuickFiler/Controllers/EfcHomeController.Metrics.cs` line 23, change the argument
+- [x] [P2-T3] In `QuickFiler/Controllers/EfcHomeController.Metrics.cs` line 23, change the argument
       from the 0-59 `Seconds` component to `TotalSeconds`. Acceptance: a search for
       `Elapsed.Seconds` in that file returns no match and the solution compiles.
-- [ ] [P2-T4] Widen the two `int elapsedSeconds` parameters at
+- [x] [P2-T4] Widen the two `int elapsedSeconds` parameters at
       `QuickFiler/Controllers/EfcHomeController.Metrics.cs:35` and `:57` to `double elapsedSeconds`.
       Both members are `internal`, so no public API breaks. Acceptance: a search for
       `int elapsedSeconds` under `QuickFiler/` returns no match and the solution compiles.
-- [ ] [P2-T5] Insert the missing comma field separator between the interpolated
+- [x] [P2-T5] Insert the missing comma field separator between the interpolated
       `ToRecipientsName` at the end of `QuickFiler/Controllers/EfcHomeController.Metrics.cs:80` and
       the interpolated `SenderName` at the start of line 81. Acceptance:
       `BuildQuickFileMetricLines_RendersTwelveCommaSeparatedFields` passes.
-- [ ] [P2-T6] Wrap `ToRecipientsName`, `SenderName`, and `selectedFolder` in
+- [x] [P2-T6] Wrap `ToRecipientsName`, `SenderName`, and `selectedFolder` in
       `QfcCollectionController.xComma(...)` in the same interpolated block, so all four free-text
       fields are sanitized as the QFC writer already does. `xComma` is `public static` and is
       already called from line 79, so no unowned file is written. Acceptance:
       `BuildQuickFileMetricLines_WithEmbeddedCommas_StillRendersTwelveFields` passes.
-- [ ] [P2-T7] Pass `CultureInfo.InvariantCulture` to the two numeric format calls at
+- [x] [P2-T7] Pass `CultureInfo.InvariantCulture` to the two numeric format calls at
       `QuickFiler/Controllers/EfcHomeController.Metrics.cs:73` and `:74`. Do not change the date or
       time format calls. Acceptance:
       `BuildQuickFileMetricLines_UnderGermanCulture_RendersInvariantDecimalSeparator` passes.
-- [ ] [P2-T8] Implement `QuickFileMetrics_WRITE(string filename)` at
+- [x] [P2-T8] Implement `QuickFileMetrics_WRITE(string filename)` at
       `QuickFiler/Controllers/EfcHomeController.Metrics.cs:26-29` as guarded delegation to the
       three-argument overload. Derive `selectedFolder` from `_formController.SelectedFolder` and
       `moved` from the owned `internal static SelectMoveMetricsItems(...)` at
@@ -404,12 +404,12 @@ Test method names asserted by this plan:
       search for `NotImplementedException` in
       `QuickFiler/Controllers/EfcHomeController.Metrics.cs` returns no match and both tests from
       P1-T8 and P1-T9 pass.
-- [ ] [P2-T9] Build and run the EFC scoped suite green. Use the same command as P1-T10 with
+- [x] [P2-T9] Build and run the EFC scoped suite green. Use the same command as P1-T10 with
       `"/ResultsDirectory:TestResults\p2-t9"`. Write `FF/evidence/regression-testing/efc-metrics-green.TS.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE: 0`, and an `Output Summary:` recording the passed,
       failed, and skipped counts. Acceptance: `EXIT_CODE: 0`, zero failed, zero skipped, and every
       test named in P1-T1 through P1-T9 passing.
-- [ ] [P2-T10] Record the EFC post-fix search census. Run `git grep -n` for `Elapsed.Seconds` under
+- [x] [P2-T10] Record the EFC post-fix search census. Run `git grep -n` for `Elapsed.Seconds` under
       `QuickFiler/Controllers/EfcHomeController.Metrics.cs`, for `int elapsedSeconds` under
       `QuickFiler/`, for `NotImplementedException` in
       `QuickFiler/Controllers/EfcHomeController.Metrics.cs`, for `RecipientSender` under
@@ -421,23 +421,23 @@ Test method names asserted by this plan:
 
 ### Phase 3 — EFC re-entrancy guard (#451 defect 3)
 
-- [ ] [P3-T1] Add `TryBeginExecuteMoves_SecondCallBeforeReset_ReturnsFalse` to
+- [x] [P3-T1] Add `TryBeginExecuteMoves_SecondCallBeforeReset_ReturnsFalse` to
       `QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs`. It calls
       `TryBeginExecuteMoves()` twice in sequence on one controller and asserts the first returns
       `true` and the second returns `false`. The assertion is deliberately sequential; a genuinely
       concurrent assertion on a compare-and-swap is not deterministic and must not be attempted.
       Acceptance: the method exists, compiles, and is decorated `[TestMethod]`.
-- [ ] [P3-T2] Add `TryBeginExecuteMoves_AfterResetExecuteMovesState_ReturnsTrue` to the same file.
+- [x] [P3-T2] Add `TryBeginExecuteMoves_AfterResetExecuteMovesState_ReturnsTrue` to the same file.
       It calls `TryBeginExecuteMoves()`, then `ResetExecuteMovesState()`, then
       `TryBeginExecuteMoves()` again, and asserts the third call returns `true`. Acceptance: the
       method exists, compiles, and is decorated `[TestMethod]`.
-- [ ] [P3-T3] Run both re-entrancy tests against the pre-change `volatile` primitive using the
+- [x] [P3-T3] Run both re-entrancy tests against the pre-change `volatile` primitive using the
       P1-T10 command shape with `"/TestCaseFilter:FullyQualifiedName~TryBeginExecuteMoves"` and
       `"/ResultsDirectory:TestResults\p3-t3"`. Write
       `FF/evidence/regression-testing/efc-reentrancy-pin.TS.md`. Acceptance: `EXIT_CODE: 0` and
       both tests recorded as passing. They pass before the change by design; they exist to pin the
       observable contract across the primitive swap.
-- [ ] [P3-T4] Write the fail-before exception dossier
+- [x] [P3-T4] Write the fail-before exception dossier
       `FF/evidence/regression-testing/fail-before-exception.TS.md` for root cause RC-6. It must
       carry `Timestamp:`, `WhyFailingRunImpossible:` explaining that the non-atomic read-then-write
       at `QuickFiler/Controllers/EfcHomeController.ExecuteMoves.cs:48-57` is only observable under a
@@ -445,20 +445,20 @@ Test method names asserted by this plan:
       deterministically, and an alternative-proof section citing the source form before and after
       the change plus the two pinning tests from P3-T1 and P3-T2. Acceptance: the artifact exists
       and carries a non-empty `WhyFailingRunImpossible:` value.
-- [ ] [P3-T5] Change `_isExecuting` at `QuickFiler/Controllers/EfcHomeController.cs:389` from
+- [x] [P3-T5] Change `_isExecuting` at `QuickFiler/Controllers/EfcHomeController.cs:389` from
       `private volatile bool` to `private int`, rewrite `TryBeginExecuteMoves` at
       `QuickFiler/Controllers/EfcHomeController.ExecuteMoves.cs:48-57` to return the result of an
       `Interlocked.CompareExchange` against the field, and rewrite `ResetExecuteMovesState` at
       `:59-62` as `Interlocked.Exchange(ref _isExecuting, 0)`. Acceptance: a search for `volatile`
       in `QuickFiler/Controllers/EfcHomeController.cs` returns no match and the solution compiles.
-- [ ] [P3-T6] Re-run the two re-entrancy tests after the primitive change using the P3-T3 command
+- [x] [P3-T6] Re-run the two re-entrancy tests after the primitive change using the P3-T3 command
       shape with `"/ResultsDirectory:TestResults\p3-t6"`. Write
       `FF/evidence/regression-testing/efc-reentrancy-green.TS.md`. Acceptance: `EXIT_CODE: 0` and
       both tests recorded as passing.
 
 ### Phase 4 — QFC stopwatch, duration, and culture (#443)
 
-- [ ] [P4-T1] [expect-fail] Add `WriteMetricsAsync_ReadsMovedStopwatchForDuration` to
+- [x] [P4-T1] [expect-fail] Add `WriteMetricsAsync_ReadsMovedStopwatchForDuration` to
       `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`. Build the controller through
       the existing `BuildLooseMetricsController()` helper, set `_stopWatchMoved` by reflection to a
       stopped stopwatch whose internal elapsed-tick field is itself set by reflection to a fixed,
@@ -469,19 +469,19 @@ Test method names asserted by this plan:
       mocked `GetMoveDiagnostics` was called with a `duration` argument matched by
       `It.Is<double>(d => d > 0)`. The pre-fix source reads the fresh stopwatch and passes zero.
       Acceptance: the method exists, compiles, and is decorated `[TestMethod]`.
-- [ ] [P4-T2] [expect-fail] Add `WriteMetricsAsync_UnderGermanCulture_RendersInvariantDecimalSeparator`
+- [x] [P4-T2] [expect-fail] Add `WriteMetricsAsync_UnderGermanCulture_RendersInvariantDecimalSeparator`
       to the same file. It sets `CultureInfo.CurrentCulture` to `de-DE` inside a `try` whose
       `finally` restores the original culture, sets `_stopWatchMoved` by reflection, awaits
       `WriteMetricsAsync`, and asserts the `durationMinutesText` argument captured from the mocked
       `GetMoveDiagnostics` contains no comma character. The assertion is independent of the actual
       elapsed value, so it is deterministic without any clock read. Acceptance: the method exists,
       compiles, is decorated `[TestMethod]`, and its `finally` restores `CultureInfo.CurrentCulture`.
-- [ ] [P4-T3] Update `WriteMetricsAsync_UsesInjectedClock_ForDateAndTimeStamps` (declared at line
+- [x] [P4-T3] Update `WriteMetricsAsync_UsesInjectedClock_ForDateAndTimeStamps` (declared at line
       328, currently setting only `_stopWatch` at line 332) so it also sets `_stopWatchMoved` by
       reflection. Without this the test dereferences a null field once line 121 reads the moved
       stopwatch. Record the disposition in task P7-T1. Acceptance: the method sets `_stopWatchMoved`
       and compiles.
-- [ ] [P4-T4] [expect-fail] Build and run the QFC scoped suite to record the red state. Use the
+- [x] [P4-T4] [expect-fail] Build and run the QFC scoped suite to record the red state. Use the
       P1-T10 command shape with
       `"/TestCaseFilter:FullyQualifiedName~QfcHomeControllerMetricsTests"` and
       `"/ResultsDirectory:TestResults\p4-t4"`. Write
@@ -490,36 +490,36 @@ Test method names asserted by this plan:
       artifact records `WriteMetricsAsync_ReadsMovedStopwatchForDuration` and
       `WriteMetricsAsync_UnderGermanCulture_RendersInvariantDecimalSeparator` as failing, and the
       TRX file exists under `TestResults\p4-t4`.
-- [ ] [P4-T5] Add `using System.Globalization;` to
+- [x] [P4-T5] Add `using System.Globalization;` to
       `QuickFiler/Controllers/QfcHomeController.Metrics.cs`. Acceptance: the directive is present
       and the solution compiles.
-- [ ] [P4-T6] Change `QuickFiler/Controllers/QfcHomeController.Metrics.cs:42` to read
+- [x] [P4-T6] Change `QuickFiler/Controllers/QfcHomeController.Metrics.cs:42` to read
       `_stopWatchMoved.Elapsed.TotalSeconds`. Acceptance: the line reads the total-seconds form and
       the solution compiles.
-- [ ] [P4-T7] Change `QuickFiler/Controllers/QfcHomeController.Metrics.cs:121` to read
+- [x] [P4-T7] Change `QuickFiler/Controllers/QfcHomeController.Metrics.cs:121` to read
       `_stopWatchMoved.Elapsed.TotalSeconds`, and delete the commented-out line 120 which reads
       `//Duration = _stopWatchMoved.Elapsed.Seconds;`. Deleting the comment is required: AC-7
       asserts a search for `Elapsed.Seconds` under `QuickFiler/Controllers/` returns no match, and a
       commented occurrence is still a match. Acceptance: a search for `Elapsed.Seconds` under
       `QuickFiler/Controllers/` returns no match and
       `WriteMetricsAsync_ReadsMovedStopwatchForDuration` passes.
-- [ ] [P4-T8] Change `QuickFiler/Controllers/QfcHomeController.Metrics.cs:123` to
+- [x] [P4-T8] Change `QuickFiler/Controllers/QfcHomeController.Metrics.cs:123` to
       `OlStartTime = OlEndTime.Subtract(_stopWatchMoved.Elapsed);`, removing the reconstruction from
       the truncated integer cast. The read must remain positioned before the
       `Duration /= emailsLoaded` division at line 129, which the current line position already
       satisfies. Acceptance: a search for `OlEndTime.Subtract` in that file returns exactly one hit
       whose text contains `_stopWatchMoved.Elapsed`, and a search for the cast form `(int)Duration`
       in that file returns no match.
-- [ ] [P4-T9] Pass `CultureInfo.InvariantCulture` to the four numeric format calls at
+- [x] [P4-T9] Pass `CultureInfo.InvariantCulture` to the four numeric format calls at
       `QuickFiler/Controllers/QfcHomeController.Metrics.cs:53`, `:56`, `:132`, and `:135`. Do not
       change the date or time format calls; the `"hh:mm"` defect is CFN-4 and out of scope.
       Acceptance: `WriteMetricsAsync_UnderGermanCulture_RendersInvariantDecimalSeparator` passes.
-- [ ] [P4-T10] Build and run the QFC scoped suite green. Use the P4-T4 command shape with
+- [x] [P4-T10] Build and run the QFC scoped suite green. Use the P4-T4 command shape with
       `"/ResultsDirectory:TestResults\p4-t10"`. Write
       `FF/evidence/regression-testing/qfc-stopwatch-green.TS.md`. Acceptance: `EXIT_CODE: 0`, zero
       failed, zero skipped, and both tests from P4-T1 and P4-T2 plus the updated test from P4-T3
       recorded as passing.
-- [ ] [P4-T11] Record the QFC #443 post-fix search census. Run `git grep -n` for `Elapsed.Seconds`
+- [x] [P4-T11] Record the QFC #443 post-fix search census. Run `git grep -n` for `Elapsed.Seconds`
       under `QuickFiler/Controllers/` and for `OlEndTime.Subtract` in
       `QuickFiler/Controllers/QfcHomeController.Metrics.cs`. Write
       `FF/evidence/qa-gates/qfc-stopwatch-search-census.TS.md`. Acceptance: the first search returns
@@ -527,14 +527,14 @@ Test method names asserted by this plan:
 
 ### Phase 5 — QFC metrics flush redesign (#442)
 
-- [ ] [P5-T1] Declare the writer seam in `QuickFiler/Controllers/QfcHomeController.Metrics.cs` as
+- [x] [P5-T1] Declare the writer seam in `QuickFiler/Controllers/QfcHomeController.Metrics.cs` as
       `internal Func<string, string[], string, CancellationToken, Task> MetricsFileWriter { get; set; } = FileIO2.WriteTextFileAsync;`
       with an XML doc comment recording that it mirrors the EFC precedent at
       `EfcHomeControllerDependencies.cs:78`. Parameter order is filename, lines, folder root,
       cancellation token. Do not yet change `WriteMetricsAsync`; this task only makes the seam
       exist so the Phase 5 regression tests compile and fail for the right reason. Acceptance: the
       solution compiles and the identifier `MetricsFileWriter` is present in that file.
-- [ ] [P5-T2] [expect-fail] Add `WriteMetricsAsync_InvokesInjectedMetricsFileWriterOnce` to
+- [x] [P5-T2] [expect-fail] Add `WriteMetricsAsync_InvokesInjectedMetricsFileWriterOnce` to
       `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`. It builds a controller through
       `BuildLooseMetricsController()` whose mocked `GetMoveDiagnostics` returns a known non-empty
       array, assigns a capturing delegate to `MetricsFileWriter` that returns
@@ -543,72 +543,72 @@ Test method names asserted by this plan:
       lines. Extend `BuildLooseMetricsController()` with an optional diagnostics-array parameter
       rather than duplicating the helper. Acceptance: the method exists, compiles, and is decorated
       `[TestMethod]`.
-- [ ] [P5-T3] [expect-fail] Add `WriteMetricsAsync_CompletesWriterTaskBeforeReturning` to the same
+- [x] [P5-T3] [expect-fail] Add `WriteMetricsAsync_CompletesWriterTaskBeforeReturning` to the same
       file. Its injected delegate yields once and then sets a boolean flag; the test asserts the
       flag is `true` immediately after awaiting `WriteMetricsAsync`. This is the happens-before half
       of the flush invariant. Use `Task.Yield`, never `Task.Delay` and never `Thread.Sleep`.
       Acceptance: the method exists, compiles, and is decorated `[TestMethod]`.
-- [ ] [P5-T4] [expect-fail] Add `WriteMetricsAsync_PassesUncancelledTokenToWriter` to the same file.
+- [x] [P5-T4] [expect-fail] Add `WriteMetricsAsync_PassesUncancelledTokenToWriter` to the same file.
       It cancels the controller's `TokenSource` before awaiting `WriteMetricsAsync` and asserts the
       captured `CancellationToken` reports `IsCancellationRequested` as `false`. Acceptance: the
       method exists, compiles, and is decorated `[TestMethod]`.
-- [ ] [P5-T5] [expect-fail] Add `WriteMetricsAsync_FiltersNullDiagnosticLinesBeforeWriting` to the
+- [x] [P5-T5] [expect-fail] Add `WriteMetricsAsync_FiltersNullDiagnosticLinesBeforeWriting` to the
       same file. Its mocked `GetMoveDiagnostics` returns an array whose trailing element is `null`,
       mirroring the allocation defect at `QfcCollectionController.cs:2284`, and it asserts the lines
       reaching the writer contain no null and no whitespace-only entry. Acceptance: the method
       exists, compiles, and is decorated `[TestMethod]`.
-- [ ] [P5-T6] Add `WriteMetricsAsync_WithoutMyDocumentsFolder_DoesNotInvokeWriter` to the same file.
+- [x] [P5-T6] Add `WriteMetricsAsync_WithoutMyDocumentsFolder_DoesNotInvokeWriter` to the same file.
       It supplies a `SpecialFolders` collection with no `MyDocuments` entry and asserts the writer
       is never invoked, guarding the guard at
       `QuickFiler/Controllers/QfcHomeController.Metrics.cs:114`. This test passes both before and
       after the fix by design. Acceptance: the method exists, compiles, is decorated `[TestMethod]`,
       and passes on the pre-fix source.
-- [ ] [P5-T7] [expect-fail] Build and run the QFC scoped suite to record the red state. Use the
+- [x] [P5-T7] [expect-fail] Build and run the QFC scoped suite to record the red state. Use the
       P4-T4 command shape with `"/ResultsDirectory:TestResults\p5-t7"`. Write
       `FF/evidence/regression-testing/qfc-flush-red.TS.md` with `ExpectedExitCode: 1` and an
       `Output Summary:` naming each failing test with its verbatim failure message. Acceptance: the
       artifact records the four tests from P5-T2 through P5-T5 as failing with an empty capture
       list, records `WriteMetricsAsync_WithoutMyDocumentsFolder_DoesNotInvokeWriter` as passing, and
       the TRX file exists under `TestResults\p5-t7`.
-- [ ] [P5-T8] Replace `QuickFiler/Controllers/QfcHomeController.Metrics.cs:153-154` with a filtered
+- [x] [P5-T8] Replace `QuickFiler/Controllers/QfcHomeController.Metrics.cs:153-154` with a filtered
       awaited write: drop every null and whitespace-only entry from the `GetMoveDiagnostics` result,
       then `await MetricsFileWriter(filename, lines, myDocuments, CancellationToken.None)`. The
       token must be `CancellationToken.None`, never the controller's `Token`, because the dispatcher
       continuation at `QfcFormController.EventHandlers.cs:228-231` is not awaited to completion and a
       session cancellation can be raised while the write is in flight. Acceptance: the four tests
       from P5-T2 through P5-T5 pass and the identifier `_fileName` no longer appears in that file.
-- [ ] [P5-T9] Delete both `NonBlockingProducer` overloads and the unreachable consumer-scheduling
+- [x] [P5-T9] Delete both `NonBlockingProducer` overloads and the unreachable consumer-scheduling
       block from `QuickFiler/Controllers/QfcHomeController.Metrics.cs:190-232`. Acceptance: a search
       for `NonBlockingProducer` in that file returns no match and the solution compiles.
-- [ ] [P5-T10] Delete `_metrics`, `_metricsConsumers`, `_lockObject`, and `_fileName` at
+- [x] [P5-T10] Delete `_metrics`, `_metricsConsumers`, `_lockObject`, and `_fileName` at
       `QuickFiler/Controllers/QfcHomeController.cs:353-358`, and delete `TimedConsumerAsync` at
       `:362-386`. Acceptance: a search for the alternation
       `NonBlockingProducer|TimedConsumerAsync|_metricsConsumers|_lockObject|_fileName` under
       `QuickFiler/Controllers/` returns no match and the solution compiles.
-- [ ] [P5-T11] Delete `NonBlockingProducer_DelaySeam_HonorsInjectedTwentyMillisecondDelay` (declared
+- [x] [P5-T11] Delete `NonBlockingProducer_DelaySeam_HonorsInjectedTwentyMillisecondDelay` (declared
       at line 401, body at 404-416) from
       `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`. Its body never calls
       `NonBlockingProducer`; it exercises the time provider's delay directly, and after P5-T9 that
       seam has no production call site, so the test would assert only that the fake time provider
       works. Deletion also recovers line budget for the 500-line cap. Record the disposition in task
       P7-T1. Acceptance: the method name no longer appears in the file and the file compiles.
-- [ ] [P5-T12] Remove the now-unused `using System.Collections.Concurrent;` at
+- [x] [P5-T12] Remove the now-unused `using System.Collections.Concurrent;` at
       `QuickFiler/Controllers/QfcHomeController.cs:2` and `using System.Timers;` at `:11`, using the
       A-11 finding recorded by task P0-T12 to confirm no other member of the partial consumes those
       namespaces. Re-evaluate `using System.Linq;` at `:7` the same way and remove it only if the
       analyzer pass reports it unused. The compiler and analyzer are the authority: a removal that
       produces a missing-type error must be reverted in this task, not deferred. Acceptance: the
       solution compiles with zero new errors under the analyzer command from P0-T7.
-- [ ] [P5-T13] Build and run the QFC scoped suite green. Use the P4-T4 command shape with
+- [x] [P5-T13] Build and run the QFC scoped suite green. Use the P4-T4 command shape with
       `"/ResultsDirectory:TestResults\p5-t13"`. Write
       `FF/evidence/regression-testing/qfc-flush-green.TS.md`. Acceptance: `EXIT_CODE: 0`, zero
       failed, zero skipped, and every test named in P5-T2 through P5-T6 recorded as passing.
-- [ ] [P5-T14] Record the #442 post-fix search census. Run `git grep -n` for the alternation
+- [x] [P5-T14] Record the #442 post-fix search census. Run `git grep -n` for the alternation
       `NonBlockingProducer|TimedConsumerAsync|_metricsConsumers|_lockObject|_fileName` under
       `QuickFiler/Controllers/`. Write `FF/evidence/qa-gates/qfc-flush-search-census.TS.md`
       recording the pre-fix hit count from the P0-T11 census alongside the post-fix count.
       Acceptance: the post-fix count is zero and the recorded pre-fix count is greater than zero.
-- [ ] [P5-T15] Measure and, if necessary, compact
+- [x] [P5-T15] Measure and, if necessary, compact
       `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs` so its line count is at most
       499. The file began at 421 lines with roughly 79 lines of headroom; P5-T11 recovers roughly 25
       more. If the count exceeds 499, shorten the new test methods by reusing
@@ -628,20 +628,20 @@ file, restart this phase from P6-T1. This phase is unconditional: every task exe
 command and records its artifact. `EXIT_CODE: SKIPPED` is not a valid outcome for any task in this
 phase.
 
-- [ ] [P6-T1] Format the changed files. Run
+- [x] [P6-T1] Format the changed files. Run
       `pwsh -NoProfile -Command 'dotnet tool run csharpier format "QuickFiler\Controllers\QfcHomeController.cs" "QuickFiler\Controllers\QfcHomeController.Metrics.cs" "QuickFiler\Controllers\EfcHomeController.cs" "QuickFiler\Controllers\EfcHomeController.Metrics.cs" "QuickFiler\Controllers\EfcHomeController.ExecuteMoves.cs" "QuickFiler.Test\Controllers\QfcHomeControllerMetricsTests.cs" "QuickFiler.Test\Controllers\EfcHomeControllerMetricsTests.cs"; Write-Host "EXIT_CODE=$LASTEXITCODE"'`
       from `WS`. The mutating pass is scoped to the seven owned files so it cannot rewrite an
       unowned file and break the ownership gates in Phase 7. Write
       `FF/evidence/qa-gates/csharpier-format.TS.md`. Acceptance: `EXIT_CODE: 0` and the artifact
       records which of the seven files, if any, were rewritten, determined by comparing each file's
       SHA-256 before and after the command rather than by reading the tool's processed-file count.
-- [ ] [P6-T2] Verify formatting repository-wide, read-only. Run
+- [x] [P6-T2] Verify formatting repository-wide, read-only. Run
       `pwsh -NoProfile -Command 'dotnet tool run csharpier check .; Write-Host "EXIT_CODE=$LASTEXITCODE"'`
       from `WS`. Write `FF/evidence/qa-gates/csharpier-check.TS.md`. Acceptance: `EXIT_CODE: 0`.
-- [ ] [P6-T3] Run the analyzer gate. Use the exact command from P0-T7. Write
+- [x] [P6-T3] Run the analyzer gate. Use the exact command from P0-T7. Write
       `FF/evidence/qa-gates/msbuild-analyzers.TS.md` recording the error and warning counts.
       Acceptance: `EXIT_CODE: 0` and the error count is zero.
-- [ ] [P6-T4] Run the nullable/type-check gate. Use the exact command from P0-T8. Write
+- [x] [P6-T4] Run the nullable/type-check gate. Use the exact command from P0-T8. Write
       `FF/evidence/qa-gates/msbuild-nullable.TS.md` recording the error count. Acceptance:
       `EXIT_CODE: 0` and the error count is zero.
 - [ ] [P6-T5] Run the full coverage-enabled test suite. Use the exact command from P0-T9 and allow
@@ -654,7 +654,7 @@ phase.
       five numeric per-file line-rates. Record the same four-member `RunDisposition:` line defined
       by P0-T9. A `COVERAGE_FLOOR_TRIPPED` disposition does not by itself fail this task; the
       zero-failed-tests condition and the numeric-line-rate conditions are the gate.
-- [ ] [P6-T6] Compute the coverage delta. Write `FF/evidence/qa-gates/coverage-delta.TS.md`
+- [x] [P6-T6] Compute the coverage delta. Write `FF/evidence/qa-gates/coverage-delta.TS.md`
       comparing the P0-T9 baseline against the P6-T5 result: the baseline repository-wide line-rate,
       the post-change repository-wide line-rate, their signed difference, and for each of the five
       owned production files the baseline line-rate, the post-change line-rate, and their signed
@@ -672,11 +672,11 @@ phase.
       the P6-T5 run recorded `COVERAGE_FLOOR_TRIPPED`, state in the artifact which of the two
       Cobertura documents was un-post-processed and confirm that both sides of every comparison
       were read using the same `filename` form.
-- [ ] [P6-T7] Audit file sizes after formatting. Record the post-format line count of each of the
+- [x] [P6-T7] Audit file sizes after formatting. Record the post-format line count of each of the
       seven owned files into `FF/evidence/qa-gates/owned-file-line-counts.TS.md` alongside the
       P0-T10 pre-change counts. Acceptance: every one of the seven counts is at most 499, and
       `QuickFiler/Controllers/QfcHomeController.cs` is at or below its pre-change count of 487.
-- [ ] [P6-T8] Audit test determinism. Run `git grep -nE` for the alternation
+- [x] [P6-T8] Audit test determinism. Run `git grep -nE` for the alternation
       `Thread\.Sleep|Task\.Delay|DateTime\.Now|Path\.GetTempPath|GetTempFileName` restricted to
       `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs` and
       `QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs`. Write
