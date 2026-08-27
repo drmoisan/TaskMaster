@@ -235,13 +235,32 @@ namespace TaskMaster
         }
 
         private string _archiveRootPath;
+
+        /// <summary>
+        /// Full Outlook path of the archive root.
+        /// <para>
+        /// #614 D6: this previously returned an UNVERIFIED default-store-scoped string combine,
+        /// so a profile whose archive lives in another store, or which has no Archive folder at
+        /// all, silently produced a path no folder answers to, which every downstream consumer
+        /// then treated as authoritative. The value is now cross-checked ONCE, at resolution
+        /// time, against the folder that actually resolves for it, and the validated result is
+        /// cached; the check therefore adds no per-filed-item COM round-trip.
+        /// </para>
+        /// </summary>
+        /// <exception cref="InvalidOperationException">The archive root is unresolvable or lies
+        /// outside the composed path. The diagnostic names the rule only; the path is withheld
+        /// because it carries a mailbox address (#602).</exception>
         public string ArchiveRootPath
         {
             get
             {
                 if (_archiveRootPath is null)
                 {
-                    _archiveRootPath = Path.Combine(Root.FolderPath, "Archive");
+                    _archiveRootPath = ArchiveRootPathGuard.RequireResolvedArchiveRoot(
+                        Path.Combine(Root.FolderPath, "Archive"),
+                        ArchiveRoot?.FolderPath,
+                        message => logger.Error(message)
+                    );
                 }
                 return _archiveRootPath;
             }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\Meziantou.Analyzer.3.0.174\build\Meziantou.Analyzer.props" Condition="Exists('..\packages\Meziantou.Analyzer.3.0.174\build\Meziantou.Analyzer.props')" />
   <Import Project="..\packages\Microsoft.ML.5.0.0\build\netstandard2.0\Microsoft.ML.props" Condition="Exists('..\packages\Microsoft.ML.5.0.0\build\netstandard2.0\Microsoft.ML.props')" />
@@ -622,6 +622,7 @@
     <Compile Include="OutlookObjects\Folder\BreadcrumbHtmlRenderer.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbMessageCodec.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbMessages.cs" />
+    <Compile Include="OutlookObjects\Folder\ArchiveStemContract.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRow.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRowBuilder.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbSegment.cs" />
@@ -635,6 +636,7 @@
     <Compile Include="OutlookObjects\Folder\BreadcrumbRowIdentity.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRenderProjection.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbStateModel.cs" />
+    <Compile Include="OutlookObjects\Folder\BreadcrumbStateModel.Row.cs" />
     <Compile Include="OutlookObjects\Folder\FolderBreadcrumbSegment.cs" />
     <Compile Include="OutlookObjects\Folder\IFolderHierarchyProvider.cs" />
     <Compile Include="OutlookObjects\Folder\OutlookFolderHierarchyProvider.cs" />

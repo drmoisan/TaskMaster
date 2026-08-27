@@ -19,10 +19,7 @@ tools:
 skills:
   - policy-compliance-order
   - epic-orchestrate
-  - feature-promotion-lifecycle
-  - atomic-plan-contract
   - acceptance-criteria-tracking
-  - evidence-and-timestamp-conventions
 memory: project
 hooks:
   SubagentStop:
@@ -54,15 +51,13 @@ maintenance. This agent frames the *who* and *when*; the skill documents the *ho
 
 On every invocation:
 
-1. Read `CLAUDE.md` for repository tone policy and architecture context.
-2. Read applicable `.claude/rules/` files for languages in scope.
-3. Read `artifacts/orchestration/epic-orchestrator-state.json` to check for existing epic
+1. Read `artifacts/orchestration/epic-orchestrator-state.json` to check for existing epic
    checkpoint state.
-4. If a valid epic checkpoint exists with a matching `epic_feature_folder`, resume from the
+2. If a valid epic checkpoint exists with a matching `epic_feature_folder`, resume from the
    recorded `next_step` (re-deriving durable ground truth via `git worktree list --porcelain`,
    `git branch`, and `gh pr view --json state,mergedAt,headRefOid` per the `epic-orchestrate`
    skill's resume procedure, not from in-memory notifications alone).
-5. If no checkpoint exists or the objective is new, begin from manifest parsing
+3. If no checkpoint exists or the objective is new, begin from manifest parsing
    (`docs/features/epics/<epic-slug>/epic.md`).
 
 ## Invocation Origin
@@ -104,7 +99,8 @@ You delegate exclusively through two channels:
 
 - `Agent(orchestrator)` — one delegation per child feature in the manifest, carrying the epic-mode
   kickoff line and, for dependent features, the upstream-context citation lines (both defined in
-  `spec.md` §4 and §10 of this feature and restated procedurally in the `epic-orchestrate` skill).
+  `.claude/skills/epic-orchestrate/SKILL.md` under `## Merge-on-Green Kickoff Parameter` and
+  `## Context Handoff to Dependent Features`).
   Each child `orchestrator` runs its own full small/large route (including its own delegation to
   `atomic-planner`, `atomic-executor`, `feature-review`, and, on CI-green in epic mode, the
   merge-on-green S9 step 6 extension) inside its own isolated worktree
@@ -133,7 +129,9 @@ at your own `SubagentStop` time.
 ## Checkpoint Persistence
 
 Update `artifacts/orchestration/epic-orchestrator-state.json` after every completed step, per the
-full schema defined in `spec.md` §6: `objective`, `route_id: "epic"`, `epic_feature_folder`,
+full schema enforced by `validate_epic_orchestrator_state_text`, implemented in
+`scripts/dev_tools/validate_epic_orchestrator_state.py`: `objective`, `route_id: "epic"`,
+`epic_feature_folder`,
 `epic_manifest_path`, `epic_status_doc_path`, `integration_branch`, `completed_steps`, `next_step`,
 `last_updated`, `current_wave`, `waves[]`, `features[]` (including `merge_status` and the four
 lifecycle timestamps), `epic_merge_pr`, and the three receipt arrays

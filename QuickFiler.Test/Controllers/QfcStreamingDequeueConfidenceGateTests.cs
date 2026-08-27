@@ -25,13 +25,14 @@ namespace QuickFiler.Controllers.Tests
 
         private static object CreateGate(
             Func<MailItem> tryTakeNext,
-            Func<MailItem, CancellationToken, Task<long>> scoreLoader,
+            Func<MailItem, CancellationToken, Task<(long Score, string TopFolder)>> scoreLoader,
             double threshold,
             TimeProvider timeProvider = null,
             Action<string> debugLog = null,
             Func<bool> sourceActive = null,
             TimeSpan? firstBatchDeadline = null,
-            Action<int, int, int> progressCallback = null
+            Action<int, int, int> progressCallback = null,
+            Action<MailItem> onRejected = null
         )
         {
             Type gateType = typeof(QfcDatamodel).Assembly.GetType(
@@ -39,119 +40,45 @@ namespace QuickFiler.Controllers.Tests
             );
             gateType.Should().NotBeNull("the dequeue-layer confidence gate must exist");
 
-            // Issue #424: the gate gained an optional first-batch deadline and an optional progress
-            // callback. Prefer the widest constructor; fall back to the older shapes so this helper
-            // keeps compiling against a pre-#424 gate.
-            ConstructorInfo constructorWithProgress = gateType.GetConstructor(
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                binder: null,
-                types: new[]
-                {
-                    typeof(Func<MailItem>),
-                    typeof(Func<MailItem, CancellationToken, Task<long>>),
-                    typeof(double),
-                    typeof(TimeProvider),
-                    typeof(Action<string>),
-                    typeof(Func<bool>),
-                    typeof(TimeSpan?),
-                    typeof(Action<int, int, int>),
-                },
-                modifiers: null
-            );
-            if (constructorWithProgress != null)
-            {
-                return constructorWithProgress.Invoke(
-                    new object[]
-                    {
-                        tryTakeNext,
-                        scoreLoader,
-                        threshold,
-                        timeProvider,
-                        debugLog,
-                        sourceActive,
-                        firstBatchDeadline,
-                        progressCallback,
-                    }
-                );
-            }
-
-            ConstructorInfo constructorWithDeadline = gateType.GetConstructor(
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                binder: null,
-                types: new[]
-                {
-                    typeof(Func<MailItem>),
-                    typeof(Func<MailItem, CancellationToken, Task<long>>),
-                    typeof(double),
-                    typeof(TimeProvider),
-                    typeof(Action<string>),
-                    typeof(Func<bool>),
-                    typeof(TimeSpan?),
-                },
-                modifiers: null
-            );
-            if (constructorWithDeadline != null)
-            {
-                return constructorWithDeadline.Invoke(
-                    new object[]
-                    {
-                        tryTakeNext,
-                        scoreLoader,
-                        threshold,
-                        timeProvider,
-                        debugLog,
-                        sourceActive,
-                        firstBatchDeadline,
-                    }
-                );
-            }
-
-            ConstructorInfo constructorWithSourceState = gateType.GetConstructor(
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                binder: null,
-                types: new[]
-                {
-                    typeof(Func<MailItem>),
-                    typeof(Func<MailItem, CancellationToken, Task<long>>),
-                    typeof(double),
-                    typeof(TimeProvider),
-                    typeof(Action<string>),
-                    typeof(Func<bool>),
-                },
-                modifiers: null
-            );
-            if (constructorWithSourceState != null)
-            {
-                return constructorWithSourceState.Invoke(
-                    new object[]
-                    {
-                        tryTakeNext,
-                        scoreLoader,
-                        threshold,
-                        timeProvider,
-                        debugLog,
-                        sourceActive,
-                    }
-                );
-            }
-
+            // Issue #446: one exact lookup for the widest declared constructor, guarded so the
+            // helper fails CLOSED. The former four-step descending fallback chain failed OPEN:
+            // when the wider lookups missed it silently succeeded on the five-type shape and
+            // constructed a gate with sourceActive null, the default deadline and no progress
+            // callback, across every consuming test method in this class.
             ConstructorInfo constructor = gateType.GetConstructor(
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
                 binder: null,
                 types: new[]
                 {
                     typeof(Func<MailItem>),
-                    typeof(Func<MailItem, CancellationToken, Task<long>>),
+                    typeof(Func<MailItem, CancellationToken, Task<(long Score, string TopFolder)>>),
                     typeof(double),
                     typeof(TimeProvider),
                     typeof(Action<string>),
+                    typeof(Func<bool>),
+                    typeof(TimeSpan?),
+                    typeof(Action<int, int, int>),
+                    typeof(Action<MailItem>),
                 },
                 modifiers: null
             );
-            constructor.Should().NotBeNull("the gate must expose the planned testable seam");
+            constructor
+                .Should()
+                .NotBeNull("the gate must expose the nine-parameter testable constructor seam");
 
             return constructor.Invoke(
-                new object[] { tryTakeNext, scoreLoader, threshold, timeProvider, debugLog }
+                new object[]
+                {
+                    tryTakeNext,
+                    scoreLoader,
+                    threshold,
+                    timeProvider,
+                    debugLog,
+                    sourceActive,
+                    firstBatchDeadline,
+                    progressCallback,
+                    onRejected,
+                }
             );
         }
 
@@ -163,7 +90,8 @@ namespace QuickFiler.Controllers.Tests
             Action<string> debugLog = null,
             Func<bool> sourceActive = null,
             TimeSpan? firstBatchDeadline = null,
-            Action<int, int, int> progressCallback = null
+            Action<int, int, int> progressCallback = null,
+            Action<MailItem> onRejected = null
         )
         {
             return CreateGate(
@@ -171,18 +99,34 @@ namespace QuickFiler.Controllers.Tests
                 (mail, token) =>
                 {
                     token.ThrowIfCancellationRequested();
-                    return Task.FromResult(scores[mail]);
+                    return Task.FromResult((scores[mail], ""));
                 },
                 threshold,
                 timeProvider,
                 debugLog,
                 sourceActive,
                 firstBatchDeadline,
-                progressCallback
+                progressCallback,
+                onRejected
             );
         }
 
         private static async Task<IList<MailItem>> DequeueAsync(
+            object gate,
+            int quantity,
+            int timeOut,
+            CancellationToken token
+        )
+        {
+            // Issue #446: the gate now returns a QfcGateBatch. Project Accepted back to
+            // IList<MailItem> so the pre-existing gate tests keep their current shape; the
+            // stop-reason and folder-carrying assertions use DequeueBatchAsync instead.
+            QfcGateBatch batch = await DequeueBatchAsync(gate, quantity, timeOut, token)
+                .ConfigureAwait(false);
+            return batch.Accepted.Select(x => x.MailItem).ToList();
+        }
+
+        private static async Task<QfcGateBatch> DequeueBatchAsync(
             object gate,
             int quantity,
             int timeOut,
@@ -200,8 +144,7 @@ namespace QuickFiler.Controllers.Tests
             method.Should().NotBeNull("the gate must expose the planned dequeue operation");
 
             var task =
-                (Task<IList<MailItem>>)
-                    method.Invoke(gate, new object[] { quantity, timeOut, token });
+                (Task<QfcGateBatch>)method.Invoke(gate, new object[] { quantity, timeOut, token });
             return await task.ConfigureAwait(false);
         }
 
@@ -282,7 +225,7 @@ namespace QuickFiler.Controllers.Tests
         {
             object gate = CreateGate(
                 () => throw new AssertFailedException("source must not be read after cancellation"),
-                (mail, token) => Task.FromResult(1000L),
+                (mail, token) => Task.FromResult((1000L, "")),
                 threshold: 0.90
             );
             using (var cts = new CancellationTokenSource())
@@ -321,7 +264,7 @@ namespace QuickFiler.Controllers.Tests
                     takeCount++;
                     return takeCount == 1 ? null : item;
                 },
-                (mail, token) => Task.FromResult(950L),
+                (mail, token) => Task.FromResult((950L, "")),
                 threshold: 0.90,
                 timeProvider: fakeTime
             );
@@ -347,7 +290,7 @@ namespace QuickFiler.Controllers.Tests
                     takeCount++;
                     return takeCount < 3 ? null : item;
                 },
-                (mail, token) => Task.FromResult(950L),
+                (mail, token) => Task.FromResult((950L, "")),
                 threshold: 0.90,
                 timeProvider: fakeTime,
                 sourceActive: () => takeCount < 3
@@ -392,6 +335,107 @@ namespace QuickFiler.Controllers.Tests
                 .Equal(Enumerable.Range(1, 8).Select(i => $"high-{i}"));
         }
 
+        /// <summary>
+        /// Issue #426. A candidate the gate discards has already been removed from the source
+        /// queue and never reaches the accepted-path unhook, so the gate must report it exactly
+        /// once through the rejection sink. Asserting the invocation count is what makes this a
+        /// real gate: a test that only asserted the item was discarded would pass vacuously.
+        /// </summary>
+        [TestMethod]
+        public async Task DequeueAsync_BelowThresholdCandidate_InvokesOnRejectedOnce()
+        {
+            // Arrange
+            var item = CreateMailItem("reject", "entry-reject");
+            var rejected = new List<MailItem>();
+            object gate = CreateGate(
+                new Queue<MailItem>(new[] { item }),
+                new Dictionary<MailItem, long> { [item] = 899 },
+                onRejected: rejected.Add
+            );
+
+            // Act
+            IList<MailItem> result = await DequeueAsync(gate, 1, 0, CancellationToken.None);
+
+            // Assert
+            result.Should().BeEmpty("the drop-on-reject contract is unchanged");
+            rejected
+                .Should()
+                .ContainSingle("the gate must report each discarded candidate exactly once")
+                .Which.Should()
+                .BeSameAs(item);
+        }
+
+        /// <summary>
+        /// Issue #426. A failing move monitor must not abort the dequeue scan. Drives one
+        /// below-cutoff candidate whose rejection sink throws, followed by an above-cutoff
+        /// candidate, and asserts both that the sink was invoked exactly once and that the scan
+        /// went on to accept the second candidate. Asserting the invocation count is what makes
+        /// this a real gate; a test that only asserted the scan continued would pass vacuously
+        /// while no sink exists.
+        /// </summary>
+        [TestMethod]
+        public async Task DequeueAsync_OnRejectedThrows_ScanContinues()
+        {
+            // Arrange
+            var low = CreateMailItem("low", "entry-low");
+            var high = CreateMailItem("high", "entry-high");
+            var invocations = new List<MailItem>();
+            object gate = CreateGate(
+                new Queue<MailItem>(new[] { low, high }),
+                new Dictionary<MailItem, long> { [low] = 899, [high] = 950 },
+                onRejected: mail =>
+                {
+                    invocations.Add(mail);
+                    throw new InvalidOperationException("monitor unavailable");
+                }
+            );
+
+            // Act
+            IList<MailItem> result = await DequeueAsync(gate, 1, 0, CancellationToken.None);
+
+            // Assert
+            invocations
+                .Should()
+                .ContainSingle("the throwing sink must still be invoked once for the rejected item")
+                .Which.Should()
+                .BeSameAs(low);
+            result
+                .Should()
+                .ContainSingle("a sink failure must not abort the scan")
+                .Which.Should()
+                .BeSameAs(high);
+        }
+
+        /// <summary>
+        /// Issue #426 negative control (AC13). An accepted candidate is unhooked on the accepted
+        /// path by <c>UnhookDequeuedNodes</c>, so the rejection sink must not fire for it; a
+        /// second release would be a double unhook. Green in both the pre-fix and post-fix states
+        /// by construction, so it is not tagged expect-fail.
+        /// </summary>
+        [TestMethod]
+        public async Task DequeueAsync_AcceptedCandidate_DoesNotInvokeOnRejected()
+        {
+            // Arrange
+            var item = CreateMailItem("accept", "entry-accept");
+            var rejected = new List<MailItem>();
+            object gate = CreateGate(
+                new Queue<MailItem>(new[] { item }),
+                new Dictionary<MailItem, long> { [item] = 950 },
+                onRejected: rejected.Add
+            );
+
+            // Act
+            IList<MailItem> result = await DequeueAsync(gate, 1, 0, CancellationToken.None);
+
+            // Assert
+            result.Should().ContainSingle().Which.Should().BeSameAs(item);
+            rejected
+                .Should()
+                .BeEmpty(
+                    "an accepted candidate is released on the accepted path, not the rejection path"
+                );
+        }
+
         private static async Task<IList<MailItem>> DequeuePastDeadlineQualifiersAsync(int quantity)
         {
             var qualifiers = Enumerable
@@ -410,7 +454,7 @@ namespace QuickFiler.Controllers.Tests
                 (mail, token) =>
                 {
                     fakeTime.Advance(TimeSpan.FromSeconds(1));
-                    return Task.FromResult(qualifiers.Contains(mail) ? 950L : 100L);
+                    return Task.FromResult((qualifiers.Contains(mail) ? 950L : 100L, ""));
                 },
                 threshold: 0.90,
                 timeProvider: fakeTime,

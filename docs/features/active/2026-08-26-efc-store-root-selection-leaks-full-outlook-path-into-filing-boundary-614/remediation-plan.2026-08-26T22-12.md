@@ -1,0 +1,311 @@
+# efc-store-root-selection-leaks-full-outlook-path-into-filing-boundary — Remediation Plan (cycle 2, PARTIAL REVERT)
+
+- **Issue:** #614 (remediation cycle 2)
+- **Owner:** drmoisan
+- **Last Updated:** 2026-08-26T22-12
+- **Status:** Ready for Preflight
+- **Version:** 1.0
+- **Work Mode:** `full-bug` (remediation cycle; requirements source below)
+- **Requirements source:** `<FEATURE>/remediation-inputs.2026-08-26T22-12.md`. That file has three layers; the **SUPERSEDING DECISION** section governs. It supersedes reviewer required-outcome items 1, 3 and 6 and the orchestrator addendum's binding constraint 1. Reviewer items 2, 4 and 5 survive. Supporting context: `<FEATURE>/code-review.2026-08-26T22-12.md` (RC-1..RC-4), `<FEATURE>/spec.md` (AC16), `<FEATURE>/remediation-plan.2026-08-26T21-00.md` (cycle 1, whose CR-2 half this cycle reverts).
+- **Feature folder (referred to below as `<FEATURE>`):** `docs/features/active/2026-08-26-efc-store-root-selection-leaks-full-outlook-path-into-filing-boundary-614`
+- **Branch:** `bug/efc-store-root-selection-leaks-full-outlook-path-into-filing-boundary-614`
+- **Entry HEAD:** `0805766f`, working tree clean (recorded, not gated on; gates use tree invariants)
+
+## What this cycle is and is not
+
+Cycle 1 fixed CR-1 correctly and CR-2 incorrectly: it widened `EfcSelectionGuard.IsValidFilingSelection` to accept rooted under-root values without normalizing them, so an accepted rooted value reaches `ArchiveStemContract.RequireArchiveRelativeStem` inside `EmailFilerConfig.ResolvePaths` and throws `ArgumentException` out through the `async void` `ButtonOK_Click` after `_formViewer.Hide()` — an unhandled UI-thread crash where the pre-remediation head `02092504` produced only the "Please select a valid folder." dialog. This cycle **reverts the CR-2 half** (guard back to the strict single-argument form) and **keeps the CR-1 half** (predicate split, no minimum-length rule on filing). The architecturally correct fix — normalizing at the producer, `BreadcrumbBridgeRouter.SelectRow` — is deferred to **issue #637**, already opened. The reviewer's required-outcome items 1 (SelectRow normalization), 3 (`Issue439AlreadyRootedTargetRemainsUnchangedWithCaseInsensitiveArchiveMatch` assertion change) and 6 (router root-exact test) are therefore NOT implemented in this cycle; they belong to #637. `BreadcrumbBridgeRouter.cs` and `BreadcrumbBridgeRouterIssue439Tests.cs` are gated as unmodified.
+
+## Evidence locations (non-overridable)
+
+All evidence resolves under `<FEATURE>/evidence/<kind>/`: Phase 0 baselines under `<FEATURE>/evidence/remediation-baseline/`, fail-before and test-run artifacts under `<FEATURE>/evidence/regression-testing/`, final-QC artifacts under `<FEATURE>/evidence/qa-gates/`, the resolver consumer-check record under `<FEATURE>/evidence/other/`. No artifact may be written under any `artifacts/` path. No `.ps1` or other script file may be placed anywhere under `<FEATURE>/evidence/`.
+
+## Global execution rules
+
+1. **Evidence artifact schema.** Every command-step artifact contains `Timestamp:` (ISO-8601 `yyyy-MM-ddTHH-mm`), `Command:` (exact command), `EXIT_CODE:`, and `Output Summary:` (1-20 lines). Baseline and final-QC test artifacts additionally carry numeric coverage headline values. A gate whose expected exit code is non-zero declares `ExpectedExitCode: <int>` (exact spelling) in its OWN artifact file — one artifact per non-zero-expectation gate.
+2. **Redaction (issue #602).** No source hunk, test literal, log message, evidence file, or commit message may contain a real mailbox address, user-profile path, host name, or organization name. Use fabricated placeholders only (`\\mailbox@example.com`, `testuser`, `Contoso`, `<repo-root>`). Raw TRX and raw coverage output embed the machine account and host name; they are written only to the gitignored `coverage/` tree (per-task `coverage/trx/<task-id>/`), never under `<FEATURE>/evidence/`. Evidence artifacts are hand-authored Markdown summaries quoting only redaction-safe output.
+3. **Shell discipline.** Run all C# tool commands through `pwsh -NoProfile` with absolute tool paths; the Bash tool mangles MSBuild switches. When passing a payload with `pwsh -Command`, single-quote the payload and double the inner literals so the parent shell does not expand it.
+4. **Tool paths.** msbuild: `C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe`. vstest: `$vstest = Join-Path (& "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath) "Common7\IDE\Extensions\TestPlatform\vstest.console.exe"`. Interim (non-gate) builds may use `/t:Build`; the two final-QC MSBuild gates MUST use `/t:Rebuild` and MUST NOT add `/p:Nullable=enable`.
+5. **vstest discovery.** Full-suite runs execute through `pwsh -NoProfile -File scripts\vscode\Invoke-MSTestWithCoverage.ps1 -SearchRoot .` (coverage-enabled, `/InIsolation`, `TestCategory!=LiveOutlook`; it accepts no `/Logger`, so no account/host-named TRX is produced). Scoped runs use `& $vstest <assembly> /InIsolation "/TestCaseFilter:FullyQualifiedName~<Class>"` (join alternates with `|`) plus `"/Logger:trx;LogFileName=<task-id>.trx" "/ResultsDirectory:coverage\trx\<task-id>"` (per-task ResultsDirectory so TRX counts stay unambiguous). Full-assembly runs (P4-T1) additionally carry `"/TestCaseFilter:TestCategory!=LiveOutlook"`. `TaskMaster.Test` contains one `[TestCategory("LiveOutlook")]` test that constructs a live `Outlook.Application`; every suite figure in this plan is measured with that category excluded, so any run compared against a baseline figure must exclude it too.
+6. **Suite gate form.** The recorded pre-cycle-2 suite state is **6587 total / 6587 passed / 0 failed** (caller-recorded; P0-T9 records its own baseline run). This cycle removes 5 tests and adds 4, so the expected post-change total is the **P0-T9 baseline total minus 1** (reference: 6586). A suite-wide `Failed: 0` absolute is NOT an acceptance condition anywhere in this plan. The gate everywhere is: no NEW failure relative to the P0-T9 baseline, plus zero failures among the test classes this cycle touches and among the must-stay-green set (rule 8). Pre-existing flakes #594/#592/#586/#584, if observed, are recorded by issue number; if one makes an exit code 1, the affected artifact declares `ExpectedExitCode: 1` with the flake identification.
+7. **Toolchain restart rule.** In Phase 5, if any of P5-T1..P5-T4 fails or the formatter rewrites any file, restart from P5-T1. `EXIT_CODE: SKIPPED` is never a passing outcome for any command task in this plan.
+8. **Must-stay-green set.** Every remaining test in `EfcSelectionGuardTests` (in its cycle-2 form), explicitly including the D1/D4/D9 rejection tests `IsValidFilingSelection_StoreRootedSelection_IsRejected`, `IsValidFilingSelection_DriveRootedSelection_IsRejected`, `IsValidFilingSelection_RootedTargetAboveArchiveRoot_IsRejected`, `IsValidFilingSelection_CrossStoreRootedTarget_IsRejected`, `IsValidFilingSelection_SeparatorBoundaryNearMiss_IsRejected`, `IsValidFilingSelection_SingleSeparatorLeadingSelection_IsRejected`, and the CR-1 tests `IsValidFilingSelection_TwoCharacterRelativeStem_IsAccepted` / `IsValidFilingSelection_SingleCharacterRelativeStem_IsAccepted`; the entire `IsValidCreationSelection` region unchanged; `Issue439AlreadyRootedTargetRemainsUnchangedWithCaseInsensitiveArchiveMatch` and every other `BreadcrumbBridgeRouterIssue439Tests` test (file unmodified); the six `Issue609_*` tests; `ArchiveStemContractTests`; `BreadcrumbBridgeRouterIssue614Tests`; `EfcDataModelIssue614Tests`; `FolderConverterIssue614Tests`; `AppFileSystemFolderPathsOneDriveResolutionTests`; `AppOlObjectsArchiveRootValidationTests`; all of `EmailFilerConfig_Tests` (as extended by this cycle).
+9. **Files this cycle may modify (production/test/spec):** `QuickFiler/Controllers/EfcSelectionGuard.cs`, `QuickFiler/Controllers/EfcFormController.cs`, `QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs`, `UtilitiesCS.Test/EmailIntelligence/EmailFilerConfig_Tests.cs`, and `<FEATURE>/spec.md` (AC16 only — the one authorized spec edit). Also permitted: `<FEATURE>/**` (docs and evidence) and `.claude/agent-memory/**` (tracked agent memory). `QuickFiler/Controllers/BreadcrumbBridgeRouter.cs` (596/596 lines, zero headroom) and `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` (694/694, zero headroom) MUST NOT be modified. `UtilitiesCS/EmailIntelligence/EmailParsingSorting/EmailFilerConfig.cs` and `UtilitiesCS/OutlookObjects/Folder/FolderPredictor.cs` MUST NOT be modified (RC-4 is closed by a test only; the `EfcDataModel.MoveToFolderAsync(string, ...)` `:289` root read is deliberately deferred to #637 and MUST NOT be touched). No new `.cs` files are created, so no `<Compile Include>` edits are needed.
+10. **File-size gates (post-format):** `EfcFormController.cs` <= 1084 lines (baseline 1079; the revert removes lines, so growth over 1079 is unexpected and must be explained in the P5-T6 artifact); `EfcSelectionGuard.cs` <= 500 (baseline 147, expected to shrink); `EfcSelectionGuardTests.cs` <= 500 (baseline 316); `EmailFilerConfig_Tests.cs` <= 500 (baseline 453); `BreadcrumbBridgeRouter.cs` and `BreadcrumbBridgeRouterIssue439Tests.cs` unmodified (absent from the change diff).
+11. **Out of scope (do not touch):** producer-side normalization in `SelectRow` (deferred to #637); the `Globals.Ol.ArchiveRootPath` read in the `string` overload of `EfcDataModel.MoveToFolderAsync` (`:289`, deferred to #637); prior CR-3/CR-4 and all Minor findings from the `16-55` review; the pre-existing repo-wide coverage shortfall (reported, not gated to 85%); AC26 live-Outlook validation; issues #499/#609 behavior; the flakes in rule 6. If a NEW finding surfaces during execution, record it and continue; do not extend this cycle — cycle 3 or a promoted issue carries it.
+12. **Nullable contexts.** `EfcSelectionGuard.cs` and `ArchiveStemContract.cs` carry `#nullable enable`; `EfcFormController.cs` does not. net48 reference assemblies carry no `[NotNullWhen]`, so `string.IsNullOrWhiteSpace` does NOT narrow `string?`; the restored guard body keeps the file's existing `string value = selection!;` precedent. No `init`, `record`, or `record struct` (net48, CS0518).
+13. **Determinism.** No temp files in tests; no `Thread.Sleep`, `Task.Delay`, `DateTime.Now`, `Random.Shared`, or wall-clock waits. All new tests are pure: the composition test uses the pure configuration seam (`Globals = null`, parameterless `ResolvePaths()`; `TryResolveDestinationFolder` catches its own failure and returns null, so no COM is reached); the RC-4 test calls the pure `GetStem`. MSTest + FluentAssertions; Moq is not required for any test added this cycle.
+14. **All grep gates are case-sensitive fixed-string searches** in the stated scope. Repo-wide scopes mean tracked `*.cs` files. Note `archiveRoot` gates are scoped to named files because `BreadcrumbBridgeRouter.cs` legitimately contains `archiveRootPath` (a superstring hit) and is out of scope.
+
+## Recorded decisions (cycle 2)
+
+**D-A. Superseding decision governs.** Reviewer required-outcome items 1, 3, 6 and addendum binding constraint 1 are NOT implemented; the five-item superseding scope is the whole scope. Deferred work is cited as issue #637 wherever the plan or change description explains what is not done.
+
+**D-B. Item 4 is satisfied by inversion, not deletion.** The two cycle-1 tests asserting rooted acceptance are replaced by rooted-REJECTION tests `IsValidFilingSelection_RootedTargetUnderArchiveRoot_IsRejected` and `IsValidFilingSelection_ArchiveRootExactTarget_IsRejected` (same inputs `@"\aRcHiVe\Clients\North"` and `@"\Archive"`, flipped expectation, new names). Inversion keeps the value class pinned and gives the revert its fail-before/pass-after pair. The old `_IsAccepted` tests are removed in Phase 2; a test asserting a rooted value is filable asserts the defect.
+
+**D-C. Composition-test fail-before is genuinely possible; no exception dossier is needed.** The mandatory composition test (reviewer item 5) is added in Phase 1 BEFORE the revert, calling the guard in its current two-argument shape: `EfcSelectionGuard.IsValidFilingSelection(candidate, @"\Archive")`. At the current cycle-1 head that guard accepts `@"\aRcHiVe\Clients\North"`, `@"\Archive"` and `@"\Archive\Clients"`, and `EmailFilerConfig.ResolvePaths()` throws `ArgumentException` on each, so `act.Should().NotThrow(...)` genuinely fails — established by tracing the current guard body (`EfcSelectionGuard.cs:75-81` returns true for values `TryMakeArchiveRelative` resolves) against the boundary (`EmailFilerConfig.cs:210-213` calls `RequireArchiveRelativeStem`, which throws on any rooted value, `ArchiveStemContract.cs:79-86`). Phase 2 then reverts the guard to the single-argument signature; because the two-argument call no longer compiles, P2-T3 mechanically drops the second argument at every `IsValidFilingSelection` call site in the test file, composition test included. The candidate matrix and every assertion are byte-identical across the two runs; only the invocation shape changes, and both shapes are quoted in P1-T1/P2-T3. The fail-before run is captured under `<FEATURE>/evidence/regression-testing/` with `ExpectedExitCode: 1`.
+
+**D-D. Resolver removal ("check, do not assume").** Pre-change, `ResolveArchiveRootOrEmpty` has exactly 8 case-sensitive hits in tracked `*.cs`: `EfcSelectionGuard.cs:131` (declaration), `EfcFormController.cs:708` (the one production call site, removed by this revert), and 6 in `EfcSelectionGuardTests.cs` (`:66`, `:182` comments; `:274/:281/:292/:300` the two resolver unit tests). `RootUnavailableDiagnostic` has exactly 3 (`EfcSelectionGuard.cs:30/:142`, `EfcSelectionGuardTests.cs:311`). No other consumer exists, so after the call-site revert the helper, the constant, their two unit tests, the `:182` comment, and the resolver mention in the two-line comment at `:65-66` are removed together (that comment itself survives with its test, but BOTH of its lines are reworded off root-resolution semantics per P2-T3(d): the `ResolveArchiveRootOrEmpty` token sits on `:66`, while `:65` — "with no resolvable root every rooted value is rejected," — carries root-resolution semantics of its own and would be left stale by a `:66`-only rewording); RC-3 closes with the removal (the misleading one-of-nine-reads comment at `EfcFormController.cs:706-707` is deleted in the same edit). P2-T4 re-verifies both tokens at 0 hits post-change and records the check.
+
+**D-E. One cycle-1 root-parameter test is removed; the pre-existing rejection test is restored.** `IsValidFilingSelection_RootedTargetWithUnavailableRoot_IsRejected` (`:180`, passes root `string.Empty`) is a cycle-1 addition that exists solely to pin the degrade semantics this cycle deletes; with the second argument dropped it becomes a duplicate of `IsValidFilingSelection_SingleSeparatorLeadingSelection_IsRejected` — identical input, identical expectation, byte-identical act expression — so it is removed. `IsValidFilingSelection_SingleSeparatorLeadingSelection_IsRejected` (`:63`) is NOT removed: it predates cycle 1 (present at `cee78979`), cycle 1 merely appended `, null` to it, and it is a D1/D9 rooted-rejection test that requirements item 4 requires to survive. It is restored to its pre-cycle-1 single-argument form by the P2-T3(a) argument drop, with its comment and because-message reworded off root-resolution semantics. Every D1/D4/D9 rejection test (rule 8 list) survives with the second argument dropped.
+
+**D-F. Test-count arithmetic.** `EfcSelectionGuardTests` currently has 27 tests (16 filing, 9 creation, 2 resolver). Phase 1 raises it to 30 (adds 2 inverted + 1 composition; the 3 additions fail). Phase 2 lowers it to 25 (removes 2 `_IsAccepted`, 2 resolver, 1 root-parameter test), all passing. `EmailFilerConfig_Tests` gains 1 (RC-4). Net suite delta: **-1** (reference final total 6586 against the 6587 baseline).
+
+**D-G. RC-4 has no fail-before obligation.** The `GetStem` out-of-ancestor test pins behavior that already exists and is not changed by this cycle (`EmailFilerConfig.cs:250-259` is not edited); the fail-before rule applies to new or changed behavior only. The test closes the untested ternary arm at `:252-258` (the branch-coverage decrease RC-4 measured; the span matches the one P5-T5(c) reads) and must pass on first run.
+
+**D-H. AC16 replacement text (RC-2).** The criterion is rewritten to tell the truth about the delivered design and its checkbox is cleared while work is in progress (P3-T1), then re-checked only after the final full-suite run passes (P5-T10). Replacement text (six spec lines, checkbox initially cleared):
+
+> - [ ] **AC16 (D9).** `EfcFormController.ActionOkAsync` and the `IsValidSelection` property delegate to
+>       two scope-specific predicates in one shared guard type (`EfcSelectionGuard`): the filing predicate
+>       `IsValidFilingSelection` rejects `null`, `string.Empty`, whitespace, a `"===="`-prefixed sentinel,
+>       and any full Outlook path, and carries no minimum-length rule; the creation predicate
+>       `IsValidCreationSelection` additionally enforces the three-character minimum. Tests prove each
+>       rejection and that a valid relative stem is accepted.
+
+The phrase `two scope-specific predicates` must land on a single line (wrap-tolerant token). The stale line references `(:706)` and `(:1038-1050)` are dropped rather than updated.
+
+## Verified pre-change literal-gate table
+
+Every fixed-string acceptance token below was extracted from the current tree and its hit count verified on 2026-08-26 at entry HEAD `0805766f`. A zero-hit (post-change) gate currently returns >= 1; an at-least-one-hit gate for content the executor will create currently returns 0 and is quoted in this plan's prose (D-B, D-C, D-H, task texts).
+
+| Token (verbatim) | Scope | Pre-change hits | Post-change gate |
+| --- | --- | --- | --- |
+| `IsValidFilingSelection(selectedFolder, archiveRoot)` | `QuickFiler/Controllers/EfcFormController.cs` | 1 (line 712) | 0 after P2-T2 |
+| `IsValidFilingSelection(selectedFolder)` | `QuickFiler/Controllers/EfcFormController.cs` | 0 | exactly 1 after P2-T2 |
+| `D6-validated` | `QuickFiler/Controllers/EfcFormController.cs` | 1 (line 706) | 0 after P2-T2 |
+| `message => logger.Error(message)` | `QuickFiler/Controllers/EfcFormController.cs` | 1 (line 710) | 0 after P2-T2 |
+| `archiveRoot` | `QuickFiler/Controllers/EfcFormController.cs` | 2 (lines 708, 712) | 0 after P2-T2 |
+| `archiveRoot` | `QuickFiler/Controllers/EfcSelectionGuard.cs` | 5 (lines 47, 59, 62, 80, 81) | 0 after P2-T1 |
+| `IsValidFilingSelection(string? selection)` | `QuickFiler/Controllers/EfcSelectionGuard.cs` | 0 | exactly 1 after P2-T1 |
+| `TryMakeArchiveRelative` | `QuickFiler/Controllers/EfcSelectionGuard.cs` | 1 (line 81) | 0 after P2-T1 |
+| `InvalidOperationException` | `QuickFiler/Controllers/EfcSelectionGuard.cs` | 1 (line 140) | 0 after P2-T1 |
+| `ResolveArchiveRootOrEmpty` | repo-wide `*.cs` | 8 (guard 1, controller 1, tests 6) | 0 after P2 (verified at P2-T4) |
+| `RootUnavailableDiagnostic` | repo-wide `*.cs` | 3 (guard 2, tests 1) | 0 after P2 (verified at P2-T4) |
+| `MinimumCreationLength` | `QuickFiler/Controllers/EfcSelectionGuard.cs` | 2 (lines 23, 105) | still exactly 2 (CR-1 retention anchor) |
+| `IsValidCreationSelection` | `QuickFiler/Controllers/EfcSelectionGuard.cs` | 2 (lines 42, 97) | still exactly 2 (CR-1 retention anchor) |
+| `IsValidCreationSelection(SelectedFolder)` | `QuickFiler/Controllers/EfcFormController.cs` | 1 (line 1045) | still exactly 1 (CR-1 retention anchor) |
+| `IsValidFilingSelection_RootedTargetUnderArchiveRoot_IsAccepted` | repo-wide `*.cs` | 1 (`EfcSelectionGuardTests.cs:120`) | 0 after P2-T3 |
+| `IsValidFilingSelection_ArchiveRootExactTarget_IsAccepted` | repo-wide `*.cs` | 1 (`EfcSelectionGuardTests.cs:134`) | 0 after P2-T3 |
+| `IsValidFilingSelection_SingleSeparatorLeadingSelection_IsRejected` | repo-wide `*.cs` | 1 (`EfcSelectionGuardTests.cs:63`) | still exactly 1 after P2-T3 (restored to its pre-cycle-1 single-argument form; D-E) |
+| `IsValidFilingSelection_RootedTargetWithUnavailableRoot_IsRejected` | repo-wide `*.cs` | 1 (`EfcSelectionGuardTests.cs:180`) | 0 after P2-T3 (D-E removal) |
+| `IsValidFilingSelection_RootedTargetUnderArchiveRoot_IsRejected` | repo-wide `*.cs` | 0 | exactly 1 after P1-T1 |
+| `IsValidFilingSelection_ArchiveRootExactTarget_IsRejected` | repo-wide `*.cs` | 0 | exactly 1 after P1-T1 |
+| `Issue614_GuardAcceptedSelection_DoesNotThrowAtFilingBoundary` | repo-wide `*.cs` | 0 | exactly 1 after P1-T1 |
+| `GetStem_FolderPathOutsideAncestor_ReturnsInputTrimmedOfLeadingSeparators` | repo-wide `*.cs` | 0 | exactly 1 after P3-T2 |
+| `share one predicate` | `<FEATURE>/spec.md` | 1 (line 1067) | 0 after P3-T1 |
+| `two scope-specific predicates` | `<FEATURE>/spec.md` | 0 | exactly 1 after P3-T1 |
+| `- [x] **AC16` | `<FEATURE>/spec.md` | 1 (line 1066) | 0 after P3-T1; exactly 1 again after P5-T10 |
+| `- [ ] **AC16` | `<FEATURE>/spec.md` | 0 | exactly 1 after P3-T1; 0 after P5-T10 |
+
+## Finding coverage map
+
+| Phase | Delivers |
+| --- | --- |
+| 0 | policy reads; cycle-2 baselines (format, analyzer, nullable, full-suite coverage); pre-change fact capture |
+| 1 | fail-before proofs: mandatory composition test + inverted rooted-rejection tests, failing at the cycle-1 head (scope items 4 and 5-composition) |
+| 2 | the partial revert: guard single-argument form (item 1), CR-1 split untouched (item 2), call-site revert + resolver removal with consumer check (item 3, RC-3), test inversions/removals (item 4), pass-after proof |
+| 3 | RC-2 (AC16 rewrite + honest checkbox) and RC-4 (GetStem out-of-ancestor test) — scope item 5 |
+| 4 | integration verification and scope lock |
+| 5 | full four-step toolchain QC, coverage delta, size/scope audit, redaction, net-effect change description, AC16 check-off, commit |
+
+---
+
+### Phase 0 — Policy Reads and Cycle-2 Baseline Capture
+
+- [x] [P0-T1] Read `CLAUDE.md` (repo root) in full.
+  Acceptance: file read; listed in the P0-T5 artifact.
+- [x] [P0-T2] Read `.claude/rules/general-code-change.md` in full.
+  Acceptance: file read; listed in the P0-T5 artifact.
+- [x] [P0-T3] Read `.claude/rules/general-unit-test.md` in full.
+  Acceptance: file read; listed in the P0-T5 artifact.
+- [x] [P0-T4] Read `.claude/rules/csharp.md` in full.
+  Acceptance: file read; listed in the P0-T5 artifact.
+- [x] [P0-T5] Read the cycle requirements: `<FEATURE>/remediation-inputs.2026-08-26T22-12.md` in full (all three layers; the SUPERSEDING DECISION governs), the RC-1..RC-4 rows of `<FEATURE>/code-review.2026-08-26T22-12.md`, AC16 in `<FEATURE>/spec.md`, and the Phase 1-3 task texts of `<FEATURE>/remediation-plan.2026-08-26T21-00.md` (what is being reverted). Write `<FEATURE>/evidence/remediation-baseline/phase0-instructions-read.md` with `Timestamp:`, `Policy Order:` (CLAUDE.md, general-code-change, general-unit-test, csharp.md, then cycle inputs), and the explicit list of files read.
+  Acceptance: artifact exists with all three required fields and lists all eight documents.
+- [x] [P0-T6] Baseline formatting gate: `dotnet tool run csharpier check .` from the repo root (run `dotnet tool restore` first if the manifest tool is not restored).
+  Acceptance: `<FEATURE>/evidence/remediation-baseline/format-check.<timestamp>.md` records Timestamp, Command, EXIT_CODE 0, Output Summary.
+- [x] [P0-T7] Baseline analyzer gate: `& "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe" TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`.
+  Acceptance: `<FEATURE>/evidence/remediation-baseline/analyzer-build.<timestamp>.md` records Timestamp, Command, EXIT_CODE 0, Output Summary.
+- [x] [P0-T8] Baseline nullable/type-check gate: `& "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe" TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`. Do NOT add `/p:Nullable=enable`; do NOT substitute `/t:Build`.
+  Acceptance: `<FEATURE>/evidence/remediation-baseline/nullable-build.<timestamp>.md` records Timestamp, Command, EXIT_CODE 0, Output Summary.
+- [x] [P0-T9] Baseline full-suite test-and-coverage run: `pwsh -NoProfile -File scripts\vscode\Invoke-MSTestWithCoverage.ps1 -SearchRoot .`. Copy the raw Cobertura (`coverage\coverage.cobertura.xml`, left raw if a flake makes the runner throw before its in-place rewrite) to `coverage\coverage.cobertura.raw.p0-t9c2.xml`, and save the out-of-band `ConvertTo-KoverageCoberturaXml` output as `coverage\coverage.cobertura.filtered.p0-t9c2.xml`; record the filtered top-level line rate AND branch rate. Reference values: 6587/6587/0; filtered line 84.8790%, branch 78.8523%.
+  Acceptance: `<FEATURE>/evidence/remediation-baseline/full-suite-coverage.<timestamp>.md` records Timestamp, Command, EXIT_CODE, Output Summary with total/passed/failed counts and both numeric filtered coverage figures; any failure is identified against rule 6 (flake by issue number, with `ExpectedExitCode: 1` declared in this artifact if the exit code is 1); no NEW failure vs the 6587/6587/0 reference.
+- [x] [P0-T10] Capture pre-change facts in `<FEATURE>/evidence/remediation-baseline/pre-change-facts.<timestamp>.md`: current HEAD sha (`git rev-parse HEAD`), recorded verbatim as an informational fact and NOT compared against any expected value (the plan was committed after this reference was written, so any hard-coded sha is stale by construction), `git status --porcelain` output (expected: empty, or only `.claude/agent-memory/**` and `<FEATURE>/**` entries), measured line counts via `(Get-Content <path>).Count` for the six rule-9/rule-10 files (expected 147 / 1079 / 316 / 453 / 596 / 694 for guard, controller, guard tests, `EmailFilerConfig_Tests.cs`, router, Issue439 tests), and a re-verification of every row of the "Verified pre-change literal-gate table" (each token searched case-sensitively in its stated scope with its hit count). If any count disagrees with the table, STOP and report the discrepancy as remediation-required rather than proceeding on a stale premise.
+  Acceptance: artifact exists with all four sections and every literal count confirmed.
+
+### Phase 1 — Fail-Before Proofs at the Cycle-1 Head
+
+Phase intent: land the discriminating tests BEFORE the revert so they demonstrably fail against the state they must discriminate against (D-C). All three additions call the guard in its CURRENT two-argument shape; the old `_IsAccepted` tests remain in place during this phase, so the file briefly holds contradictory expectations — that is the point of the expect-fail run.
+
+- [x] [P1-T1] [expect-fail] Edit `QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs`, adding three tests to the filing-predicate region (MSTest + FluentAssertions, Arrange-Act-Assert, one-line intent comment each, no Moq):
+  (a) `IsValidFilingSelection_RootedTargetUnderArchiveRoot_IsRejected` — asserts `EfcSelectionGuard.IsValidFilingSelection(@"\aRcHiVe\Clients\North", @"\Archive").Should().BeFalse(...)` with a because-message stating that a rooted value is never a filing stem at this surface and that producer-side normalization is deferred to issue #637 (inversion of the cycle-1 acceptance test, D-B);
+  (b) `IsValidFilingSelection_ArchiveRootExactTarget_IsRejected` — asserts `EfcSelectionGuard.IsValidFilingSelection(@"\Archive", @"\Archive").Should().BeFalse(...)` (inversion of the root-exact acceptance test);
+  (c) `Issue614_GuardAcceptedSelection_DoesNotThrowAtFilingBoundary` — the mandatory composition test (reviewer item 5). A `string[] candidates` matrix of exactly ten values: `@"Clients\North"`, `"HR"`, `"A"`, `@"\aRcHiVe\Clients\North"`, `@"\Archive"`, `@"\Archive\Clients"`, `@"\External\Clients"`, `@"\\mailbox@example.com"`, `@"C:\Users\testuser\OneDrive - Contoso"`, `"==== SUGGESTIONS ===="`. For each candidate accepted by `EfcSelectionGuard.IsValidFilingSelection(candidate, @"\Archive")` (rejected candidates are skipped with `continue`), construct `new EmailFilerConfig { Globals = null, OlAncestor = @"\\mailbox@example.com\Archive", DestinationOlStem = candidate, FsAncestorEquivalent = @"C:\Mail" }` (add `using UtilitiesCS.EmailIntelligence.EmailParsingSorting;`), then `System.Action act = () => config.ResolvePaths();` and `act.Should().NotThrow(...)` with the candidate in the because-message. Declare `int evaluated = 0;` before the loop and increment it inside the accepted branch; after the loop assert `evaluated.Should().BeGreaterThan(0, ...)` so a future guard that rejected every candidate could not leave this test vacuously green (the `continue` skip would otherwise make it pass with zero assertions). At the cycle-1 head the guard accepts multiple candidates, so this counter does not change the fail-before outcome, and because it is added here it is byte-identical across the P2-T3 argument-drop. The comment states this is the RC-1 composition guard: any value the filing predicate accepts must survive `EmailFilerConfig.ResolvePaths`, the D4 filing boundary; its absence is what let RC-1 through.
+  Acceptance: the three test-name tokens `IsValidFilingSelection_RootedTargetUnderArchiveRoot_IsRejected`, `IsValidFilingSelection_ArchiveRootExactTarget_IsRejected`, `Issue614_GuardAcceptedSelection_DoesNotThrowAtFilingBoundary` each have exactly 1 hit in the file (were 0); the file compiles (P1-T2 build); file <= 500 lines.
+- [x] [P1-T2] [expect-fail] Prove fail-before: `& "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe" TaskMaster.sln /t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"` (exit 0), then `& $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation "/TestCaseFilter:FullyQualifiedName~EfcSelectionGuardTests" "/Logger:trx;LogFileName=p1-t2.trx" "/ResultsDirectory:coverage\trx\p1-t2"`.
+  Acceptance: `<FEATURE>/evidence/regression-testing/revert-expect-fail.<timestamp>.md` (its own file; no other gate recorded in it) records Timestamp, both Commands, EXIT_CODE 1, `ExpectedExitCode: 1`, Output Summary naming EXACTLY the three P1-T1 tests as failed (30 total, 27 passed, 3 failed — D-F) with the composition test's failure being `ArgumentException`-driven at `ResolvePaths`, and all other `EfcSelectionGuardTests` tests as passed.
+
+### Phase 2 — Partial Revert (guard, call site, resolver, tests)
+
+- [x] [P2-T1] Revert `QuickFiler/Controllers/EfcSelectionGuard.cs` (keep `#nullable enable`):
+  (a) restore the single-argument filing predicate — signature `internal static bool IsValidFilingSelection(string? selection)`; body: the null/whitespace guard, `string value = selection!;`, then `return !value.StartsWith(BannerPrefix, System.StringComparison.Ordinal) && !ArchiveStemContract.IsFullOutlookPath(value);` — rejecting null/empty/whitespace, banner-prefixed values, and ANY full Outlook path, with NO minimum-length rule; rewrite the XML doc to state that a rooted value is rejected as such at this surface (agreeing with `ArchiveStemContract.RequireArchiveRelativeStem`), that the minimum-length rule lives only in `IsValidCreationSelection` (CR-1), and that producer-side normalization in `BreadcrumbBridgeRouter.SelectRow` is deferred to issue #637;
+  (b) delete `ResolveArchiveRootOrEmpty`, the `RootUnavailableDiagnostic` constant, and the now-unused `using System;` (D-D);
+  (c) leave `IsValidCreationSelection`, `MinimumCreationLength`, `BannerPrefix`, and the class-level doc's predicate-split rationale byte-identical apart from removing any resolver mention (item 2: the CR-1 split is retained and NOT reopened).
+  Acceptance: in `EfcSelectionGuard.cs` — `IsValidFilingSelection(string? selection)` exactly 1 hit (was 0); `archiveRoot` 0 hits (was 5); `TryMakeArchiveRelative` 0 hits (was 1); `InvalidOperationException` 0 hits (was 1); `MinimumCreationLength` still exactly 2 hits; `IsValidCreationSelection` still exactly 2 hits; file <= 500 lines.
+- [x] [P2-T2] Revert `QuickFiler/Controllers/EfcFormController.cs` at the single `ActionOkAsync` site (currently lines 705-712): keep `var selectedFolder = SelectedFolder;`, delete the two comment lines beginning `// The D6-validated archive root read can throw` and the four-line `string archiveRoot = EfcSelectionGuard.ResolveArchiveRootOrEmpty(...)` block (RC-3 closes with this deletion, D-D), and restore the guard call to `if (!EfcSelectionGuard.IsValidFilingSelection(selectedFolder))`. Make no other edit in this file; the `IsValidSelection` property at line 1044-1045 stays on `IsValidCreationSelection(SelectedFolder)` (item 2).
+  Acceptance: in `EfcFormController.cs` — `IsValidFilingSelection(selectedFolder)` exactly 1 hit (was 0); `IsValidFilingSelection(selectedFolder, archiveRoot)` 0 hits (was 1); `archiveRoot` 0 hits (was 2); `D6-validated` 0 hits (was 1); `message => logger.Error(message)` 0 hits (was 1); `IsValidCreationSelection(SelectedFolder)` still exactly 1 hit; file <= 1084 lines.
+- [x] [P2-T3] Revert `QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs` to the single-argument world:
+  (a) mechanically drop the second argument from EVERY `IsValidFilingSelection` call in the file, including the three P1-T1 additions (the composition test's guard call becomes `EfcSelectionGuard.IsValidFilingSelection(candidate)`; its candidate matrix and assertions are byte-identical to P1-T1 — D-C);
+  (b) delete the two cycle-1 acceptance tests `IsValidFilingSelection_RootedTargetUnderArchiveRoot_IsAccepted` and `IsValidFilingSelection_ArchiveRootExactTarget_IsAccepted` (item 4; superseded by the D-B inversions);
+  (c) delete the one cycle-1 root-parameter test `IsValidFilingSelection_RootedTargetWithUnavailableRoot_IsRejected` (D-E); `IsValidFilingSelection_SingleSeparatorLeadingSelection_IsRejected` is RETAINED and reverts to its pre-cycle-1 form via the (a) argument drop;
+  (d) delete the whole "Archive-root resolver" region (both `ResolveArchiveRootOrEmpty_*` tests) and reword BOTH lines of the two-line comment at current lines 65-66 to rootedness-as-such semantics, removing the `ResolveArchiveRootOrEmpty` mention on line 66 and the "with no resolvable root every rooted value is rejected," root-resolution wording on line 65 (a line-66-only rewording leaves line 65 stale), and reword the because-message at line 70 ("a rooted value cannot be resolved when no archive root is available") the same way; the comment at line 182 goes with its deleted test; remove the resolver mention from the file-header doc; reword any surviving because-message or comment that describes root-resolution semantics (for example "not resolvable against the archive root") to rootedness-as-such semantics; remove any using directive left unused;
+  (e) every D1/D4/D9 rejection test and both CR-1 acceptance tests survive with the second argument dropped (rule 8 list); the creation-predicate region is untouched.
+  Acceptance: in `EfcSelectionGuardTests.cs` — the three deleted-test tokens from the literal table each 0 hits (were 1 each); `ResolveArchiveRootOrEmpty` 0 hits (was 6); `RootUnavailableDiagnostic` 0 hits (was 1); the three P1-T1 test-name tokens still exactly 1 hit each; the eight rule-8 `EfcSelectionGuardTests` names each still >= 1 hit; file <= 500 lines.
+- [x] [P2-T4] Resolver consumer check ("check, do not assume", item 3): run case-sensitive searches for `ResolveArchiveRootOrEmpty` and `RootUnavailableDiagnostic` across tracked `*.cs` files (for example `git grep -n --untracked -e <token> -- '*.cs'` executed once per token from the repo root, with the token spelled out literally; the `-- '*.cs'` pathspec is required — without it the search also hits feature documents and agent memory, returning nonzero counts that do not bear on the consumer question).
+  Acceptance: `<FEATURE>/evidence/other/resolver-consumer-check.<timestamp>.md` records Timestamp, the exact commands, `SearchScope:`, `SearchPatterns:`, `SearchResult: none` (0 hits each, down from the 8 and 3 pre-change hits enumerated in D-D), and the conclusion that nothing consumed either symbol after the revert, so their removal was proper.
+- [x] [P2-T5] Prove pass-after: rebuild (`/t:Build` as in P1-T2), then `& $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation "/TestCaseFilter:FullyQualifiedName~EfcSelectionGuardTests|FullyQualifiedName~BreadcrumbBridgeRouterIssue439Tests|FullyQualifiedName~BreadcrumbBridgeRouterIssue614Tests|FullyQualifiedName~BreadcrumbBridgeRouterTests" "/Logger:trx;LogFileName=p2-t5.trx" "/ResultsDirectory:coverage\trx\p2-t5"`.
+  Acceptance: `<FEATURE>/evidence/regression-testing/revert-pass-after.<timestamp>.md` records Timestamp, Commands, EXIT_CODE 0, Output Summary; `EfcSelectionGuardTests` contributes exactly 25 tests, all passing (D-F), the summary explicitly naming both D-B inversions, the composition test, both CR-1 tests, and `Issue439AlreadyRootedTargetRemainsUnchangedWithCaseInsensitiveArchiveMatch` as passing; zero failures across all four filtered classes.
+
+### Phase 3 — RC-2 (AC16 truth) and RC-4 (GetStem branch test)
+
+- [x] [P3-T1] Amend AC16 in `<FEATURE>/spec.md` (the ONE authorized spec edit, AC16 only): replace the three-line criterion at lines 1066-1068 with the D-H replacement text exactly as quoted (checkbox cleared to `[ ]`; the phrase `two scope-specific predicates` on a single line; no stale line references). No other spec line is touched.
+  Acceptance: in `spec.md` — `share one predicate` 0 hits (was 1); `two scope-specific predicates` exactly 1 hit (was 0); `- [ ] **AC16` exactly 1 hit (was 0); `- [x] **AC16` 0 hits (was 1); `git diff -- <FEATURE>/spec.md` touches only the AC16 block.
+- [x] [P3-T2] Add the RC-4 test to `UtilitiesCS.Test/EmailIntelligence/EmailFilerConfig_Tests.cs`: `GetStem_FolderPathOutsideAncestor_ReturnsInputTrimmedOfLeadingSeparators` — Arrange `var config = new EmailFilerConfig();`; Act `var stem = config.GetStem(@"\\mailbox@example.com\Archive", @"\\other-mailbox@example.com\Projects");`; Assert `stem.Should().Be(@"other-mailbox@example.com\Projects", ...)` with a because-message noting the out-of-ancestor fallback trims leading separators and does not throw, and a comment citing RC-4 (the untested ternary arm at `EmailFilerConfig.cs:252-258`, the same span P5-T5(c) reads). Behavior-pinning only; no fail-before obligation (D-G); `EmailFilerConfig.cs` is NOT modified.
+  Acceptance: `GetStem_FolderPathOutsideAncestor_ReturnsInputTrimmedOfLeadingSeparators` exactly 1 hit in the file (was 0 repo-wide); file <= 500 lines.
+- [x] [P3-T3] Run the RC-4 and boundary tests: rebuild (`/t:Build`), then `& $vstest UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /InIsolation "/TestCaseFilter:FullyQualifiedName~EmailFilerConfig_Tests|FullyQualifiedName~ArchiveStemContractTests" "/Logger:trx;LogFileName=p3-t3.trx" "/ResultsDirectory:coverage\trx\p3-t3"`.
+  Acceptance: `<FEATURE>/evidence/regression-testing/rc4-getstem.<timestamp>.md` records Timestamp, Commands, EXIT_CODE 0, Output Summary; zero failures; the new RC-4 test and the four `Issue614_ResolvePaths*` boundary tests are explicitly named as passing.
+
+### Phase 4 — Integration Verification and Scope Lock
+
+- [x] [P4-T1] Cross-assembly regression run: rebuild (`/t:Build`), then three commands — `& $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation "/TestCaseFilter:TestCategory!=LiveOutlook" "/Logger:trx;LogFileName=p4-t1-qf.trx" "/ResultsDirectory:coverage\trx\p4-t1-qf"` (full assembly), `& $vstest TaskMaster.Test\bin\Debug\TaskMaster.Test.dll /InIsolation "/TestCaseFilter:TestCategory!=LiveOutlook" "/Logger:trx;LogFileName=p4-t1-tm.trx" "/ResultsDirectory:coverage\trx\p4-t1-tm"` (full assembly), and `& $vstest UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll /InIsolation "/TestCaseFilter:TestCategory!=LiveOutlook" "/Logger:trx;LogFileName=p4-t1-ut.trx" "/ResultsDirectory:coverage\trx\p4-t1-ut"` (full assembly). The `TestCategory!=LiveOutlook` filter is mandatory and matches the filter `Invoke-MSTestWithCoverage.ps1` applies at P0-T9 and P5-T4, so the three runs share the baseline's population. Without it `TaskMaster.Test` executes `LiveHookup_OnSta_CompletesAndDoesNotBlockStaBeyondThreshold`, which constructs a real `Outlook.Application` and polls a live store for up to 120 seconds; that test is excluded from every other run in this plan and its result is not comparable to the P0-T9 baseline.
+  Acceptance: `<FEATURE>/evidence/regression-testing/p4-t1-integration.<timestamp>.md` records Timestamp, the three Commands, EXIT_CODEs, Output Summary with per-run counts; zero NEW failures vs the P0-T9 baseline and zero failures in the rule-8 set (a rule-6 flake, if observed, is recorded by issue number and, if it drives an exit code 1, that run's gate lives in its own artifact declaring `ExpectedExitCode: 1`).
+- [x] [P4-T2] Scope lock: run as separate pwsh statements `git status --porcelain` and `git diff --name-only HEAD` (all cycle-2 work is uncommitted until P5-T11, so a HEAD diff sees every change).
+  Acceptance: `<FEATURE>/evidence/qa-gates/p4-t2-scope-lock.<timestamp>.md` records both outputs; the modified-file set contains `QuickFiler/Controllers/EfcSelectionGuard.cs`, `QuickFiler/Controllers/EfcFormController.cs`, `QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs`, `UtilitiesCS.Test/EmailIntelligence/EmailFilerConfig_Tests.cs` and otherwise only `<FEATURE>/**` (including `spec.md`) and `.claude/agent-memory/**` paths; `QuickFiler/Controllers/BreadcrumbBridgeRouter.cs`, `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs`, `UtilitiesCS/EmailIntelligence/EmailParsingSorting/EmailFilerConfig.cs`, `QuickFiler/Controllers/EfcDataModel.cs` and `UtilitiesCS/OutlookObjects/Folder/FolderPredictor.cs` are ABSENT from the diff output; any other path is a gate failure.
+
+### Phase 5 — Final QC Loop and Completion
+
+If any step P5-T1 through P5-T4 fails or the formatter rewrites any file, fix and restart from P5-T1; repeat until one clean pass covers all four steps.
+
+- [x] [P5-T1] Formatting: `dotnet tool run csharpier format .` then verify `dotnet tool run csharpier check .` (both via `dotnet tool run`; never a global install). Because P0-T6 exited 0, the format pass may rewrite only files this cycle touched; confirm via `git status --porcelain` that no out-of-scope file was rewritten.
+  Acceptance: `<FEATURE>/evidence/qa-gates/final-csharpier.<timestamp>.md` records Timestamp, both Commands, EXIT_CODE 0 for the check, Output Summary; porcelain shows no out-of-scope modification.
+- [x] [P5-T2] Analyzer gate: `& "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe" TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`. `/t:Build` must not be substituted.
+  Acceptance: `<FEATURE>/evidence/qa-gates/final-analyzer-build.<timestamp>.md` records Timestamp, Command, EXIT_CODE 0, Output Summary noting compilation occurred (not an up-to-date skip).
+- [x] [P5-T3] Nullable/type-check gate: `& "C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\MSBuild.exe" TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`. `/p:Nullable=enable` must NOT be added.
+  Acceptance: `<FEATURE>/evidence/qa-gates/final-nullable-build.<timestamp>.md` records Timestamp, Command, EXIT_CODE 0, Output Summary.
+- [x] [P5-T4] Full test-and-coverage run: `pwsh -NoProfile -File scripts\vscode\Invoke-MSTestWithCoverage.ps1 -SearchRoot .` with the same raw/filtered Cobertura derivation as P0-T9 (task-id `p5-t4c2`; filtered file `coverage\coverage.cobertura.filtered.p5-t4c2.xml`).
+  Acceptance: `<FEATURE>/evidence/qa-gates/final-test-coverage.<timestamp>.md` records Timestamp, Command, EXIT_CODE, Output Summary with total/passed/failed counts and both numeric filtered figures (line and branch). Gate: the total equals the P0-T9 baseline total minus 1 (D-F; reference 6586); zero failures among `EfcSelectionGuardTests`, `EmailFilerConfig_Tests`, and the rule-8 must-stay-green set; no NEW failure relative to the P0-T9 baseline; a failure is acceptable only as a rule-6 flake, recorded by issue number, with `ExpectedExitCode: 1` declared in this artifact if it drives the exit code.
+- [x] [P5-T5] Coverage delta and thresholds, from the P0-T9 and P5-T4 filtered Cobertura files, in `<FEATURE>/evidence/qa-gates/coverage-delta.<timestamp>.md` with five sections:
+  (a) baseline filtered line and branch figures (reference 84.8790% / 78.8523% — every percentage
+  and every line/branch count labelled "reference" or "reference projection" in this task is an
+  illustrative projection carried over from the cycle-1 measurement, not a measured cycle-2
+  baseline. These reference figures are not internally reconciled with one another and none of them
+  is gated. P0-T9 supplies the authoritative measured baseline values, and every gate in this task
+  is computed from the P0-T9 and P5-T4 filtered Cobertura files, never from these references);
+  (b) post-change filtered line and branch figures, and a deletion-adjusted no-regression
+  comparison. This cycle deletes fully-covered production lines (`ResolveArchiveRootOrEmpty`
+  and the narrowed `IsValidFilingSelection` body in `EfcSelectionGuard.cs`, an illustrative figure of roughly 31
+  covered lines and 14 covered branches at the cycle-1 head, recorded to motivate why the raw
+  rate falls; like the section-(a) references it is NOT internally reconciled and is NOT
+  consumed by any gate, since section (e) forbids hand-derived counts and every gated number is
+  read from the P0-T9 and P5-T4 Cobertura files) plus one uncovered line in
+  `EfcFormController.cs`. Deleting 100%-covered lines from a pool at ~84.88% lowers the raw
+  repository rate by arithmetic alone, so the raw rate is reported but is NOT the gate.
+  Record six numbers from the P0-T9 and P5-T4 filtered Cobertura roots: `lines-covered` and
+  `lines-valid` before and after, and `branches-covered` and `branches-valid` before and after.
+  Gates:
+    - lines: `lines-valid_post <= lines-valid_base` AND
+      `lines-covered_post >= lines-covered_base - (lines-valid_base - lines-valid_post)`;
+    - branches: `branches-valid_post <= branches-valid_base` AND
+      `branches-covered_post >= branches-covered_base - (branches-valid_base - branches-valid_post)`.
+  Together these bound the coverage lost to at most the covered-line count removed from the
+  denominator. Neither gate is exact: the line gate carries slack equal to the number of deleted
+  lines that were uncovered, which is FOUR and not one (`EfcFormController.cs` measures 717/81
+  deduplicated at the cycle-1 head against 713/81 before it, so the revert removes four uncovered
+  lines). Section (e) is what closes that slack; section (d) covers changed lines only and cannot
+  bear on retained lines. Also report the raw rates and show the
+  arithmetic tying any raw decrease to the deleted covered lines (reference projection:
+  53986/63605 = 84.8770% line, 12749/16168 = 78.8525% branch). If a raw rate instead rises, that
+  also satisfies this gate. If either gate misses, re-run the P5-T4 measurement ONCE (known
+  dotnet-coverage denominator nondeterminism) and compare again; only a reproduced miss is a
+  failure. The pre-existing shortfall against the repo-wide 85% floor is reported as pre-existing
+  and is explicitly NOT gated to 85% this cycle.
+  (c) changed-method coverage — gate: 100% line AND 100% branch for `QuickFiler/Controllers/EfcSelectionGuard.cs` as a file (methods `IsValidFilingSelection`, `IsValidCreationSelection`), aggregating Cobertura `<class>` entries by `filename`; `UtilitiesCS/OutlookObjects/Folder/ArchiveStemContract.cs` remains at 100% line; the `EmailFilerConfig.cs` `GetStem` ternary (source lines 252-258; read whichever line in that span carries the Cobertura `<line branch="true">` entry) now reports both branch outcomes covered (RC-4 closed), and the file's branch figure is >= its P0-T9 baseline value;
+  (d) changed lines in `EfcFormController.cs` (the reverted `ActionOkAsync` guard call): per-line listing — the filtered Cobertura DOES carry per-line entries in this range (measured: 701-703, 705, 708-715, 718-720), so read the per-line listing from the filtered Cobertura (`coverage\coverage.cobertura.filtered.p5-t4c2.xml`); the cycle-1 coverage-delta artifact's claim that only line 709 is present was a misreading and is not to be reproduced. Consult the raw Cobertura (`coverage\coverage.cobertura.raw.p5-t4c2.xml`) only for a line the filtered file genuinely omits, and say so explicitly where you do. The surviving lines are WinForms UI event glue (the method reads `SynchronizationContext.Current`, drives `_formViewer`, and shows `MessageBox`), and each uncovered changed line carries that one-line justification, mirroring the ratified section-(d) convention of the cycle-1 coverage-delta artifact;
+  (e) explicit statement that no changed line AND no retained line lost coverage relative to the
+  baseline. The retained-line claim is established arithmetically, not from the section-(d) listing.
+  This cycle edits exactly two production files, `QuickFiler/Controllers/EfcSelectionGuard.cs` and
+  `QuickFiler/Controllers/EfcFormController.cs`; every measured line in every other production file
+  is a retained line.
+  **Counting rule (mandatory, applies to every per-file figure in this section).** Cobertura emits
+  MORE THAN ONE `<class>` entry per `filename`, and the same source line appears in several of
+  them. Per-file figures are therefore computed by DEDUPLICATION, never by summation: for a given
+  `filename`, take the union of `<line number=...>` entries across all `<class>` entries carrying
+  that `filename`, keyed on the line number; `lines-valid` for the file is the count of DISTINCT
+  line numbers, and `lines-covered` is the count of DISTINCT line numbers whose maximum `hits`
+  across the duplicate entries is greater than zero. Naive summation overstates both figures by
+  roughly 1.65x to 2.00x (measured on the cycle-1 head: `EfcSelectionGuard.cs` 31/31 deduplicated
+  versus 62/62 naive; `EfcFormController.cs` 717/81 versus 1185/151; `EmailFilerConfig.cs` 124/117
+  versus 254/240), which breaks the identities below. **Self-check on the counting rule, evaluated
+  before any identity:** the sum of deduplicated `lines-valid` over ALL `filename` values in the
+  filtered Cobertura must equal that file's root `lines-valid` attribute exactly (this reduction
+  reproduced the root attribute exactly at 63594 when measured). Record both numbers. If they
+  differ, the counting is wrong; report remediation-required and do NOT evaluate the identities.
+  From the P0-T9 and P5-T4 filtered Cobertura, applying the counting rule above,
+  read `lines-valid` and `lines-covered` for each of those two files before and after
+  and record all eight numbers. Set `D_valid` = the sum over the two files of
+  (`lines-valid` base minus post) and `D_covered` = the sum over the two files of
+  (`lines-covered` base minus post). Both are NET figures read from the two Cobertura files, so the
+  measured lines the restored single-argument guard body contributes are already netted against the
+  deleted `ResolveArchiveRootOrEmpty`, the deleted cycle-1 `IsValidFilingSelection` body lines and
+  the deleted `EfcFormController.cs` lines; do not derive either number by counting deleted source
+  lines by hand.
+  **E1 — hard gate on the deterministic quantity.** Assert
+  `lines-valid_base - lines-valid_post == D_valid`. `lines-valid` is deterministic: two runs over
+  an identical tree produced identical `lines-valid` for all 550 files and an identical root value
+  of 63594. A miss on E1 is therefore a FAILURE on the first measurement, with no re-run tolerance;
+  name the files whose deduplicated `lines-valid` moved unexpectedly and report
+  remediation-required.
+  **E2 — candidate detection on the nondeterministic quantity.** Compute
+  `S = (lines-covered_base - lines-covered_post) - D_covered`, and record the signed
+  per-`filename` `lines-covered` delta for every RETAINED file whose value differs between the two
+  filtered Cobertura files. `S > 0` and any negative per-file delta are CANDIDATE findings, NOT
+  failures. `lines-covered` is nondeterministic: two runs over an identical tree differed by up to
+  4 covered lines per file in both directions (`SubjectMapSco.Orchestration.cs` -4,
+  `PropertyStore.cs` +4, `EfcHomeController.cs` +1) and by 1 at the root (53972 versus 53973), so a
+  single measurement cannot distinguish ambient drift from a one-line regression. A strict excess
+  (`S < 0`) means retained lines GAINED coverage and is not a regression; record the amount and the
+  source. An excess is expected in this cycle because the P3-T2 RC-4 test newly exercises the
+  `GetStem` out-of-ancestor arm in the retained file
+  `UtilitiesCS/EmailIntelligence/EmailParsingSorting/EmailFilerConfig.cs`.
+  **E3 — confirmation by reproduction.** If and only if E2 produced at least one candidate, re-run
+  the P5-T4 measurement once more to produce a SECOND, independent post-change measurement
+  (task-id `p5-t4c2b`, filtered file `coverage\coverage.cobertura.filtered.p5-t4c2b.xml`) against
+  the SAME P0-T9 baseline, and recompute E2 from it. A candidate is CONFIRMED only when it
+  reproduces in the same direction in BOTH post-change measurements. The per-`filename` comparison
+  is authoritative: if `S > 0` reproduces but no per-file negative delta reproduces, record `S` and
+  the discrepancy and the gate PASSES, because no named retained file lost coverage twice.
+  **E4 — adjudication of a confirmed per-file negative delta.** A confirmed negative per-file
+  `lines-covered` delta on a retained file FAILS (e) and reports remediation-required, naming the
+  file and the two measured magnitudes — with one exception, and only one: a file already carried
+  by a hard 100% gate in section (c) (`QuickFiler/Controllers/EfcSelectionGuard.cs` and
+  `UtilitiesCS/OutlookObjects/Folder/ArchiveStemContract.cs`) is adjudicated by that section-(c)
+  gate instead, which is strictly stronger than a delta comparison. No other file is exempt, and no
+  magnitude threshold exempts any file: the reproduction requirement in E3, not a tolerance band,
+  is what separates drift from regression.
+  If any required numeric value is unavailable, the outcome is remediation-required, not PASS.
+  Acceptance: artifact exists with all five sections and all stated gates met.
+- [x] [P5-T6] Post-format file-size and scope re-audit (runs AFTER P5-T1): `(Get-Content <path>).Count` for the four modified code files, then re-run the P4-T2 statements.
+  Acceptance: `<FEATURE>/evidence/qa-gates/final-size-scope.<timestamp>.md` records baseline and post-change counts — gates: `EfcFormController.cs` <= 1084 (any count above the 1079 baseline is explained line-by-line), `EfcSelectionGuard.cs` <= 500, `EfcSelectionGuardTests.cs` <= 500, `EmailFilerConfig_Tests.cs` <= 500; `git diff --name-only HEAD` still contains none of the five prohibited paths listed in P4-T2; the modified-path set is unchanged from P4-T2 apart from evidence additions.
+- [x] [P5-T7] Toolchain single-clean-pass declaration: confirm P5-T1 through P5-T4 passed in one uninterrupted sequence with no file rewritten between them.
+  Acceptance: `<FEATURE>/evidence/qa-gates/toolchain-clean-pass.<timestamp>.md` lists the four exact commands verbatim, their EXIT_CODEs (0, 0, 0, and the P5-T4 result under its declared expectation), the restart count, and the statement that `/t:Rebuild` was used for both MSBuild gates and `/p:Nullable=enable` was not added.
+- [x] [P5-T8] Redaction sweep (#602): review every changed source hunk (`git diff HEAD -- QuickFiler QuickFiler.Test UtilitiesCS.Test`), the `spec.md` hunk, and every evidence artifact this cycle created for real mailbox addresses, account names, host names, or organization names; confirm the only address-shaped strings are the fabricated `example.com` placeholders and that no `C:\Users\<real account>` path appears anywhere (raw TRX under gitignored `coverage/trx/` is exempt because untracked; the fabricated `C:\Users\testuser\OneDrive - Contoso` literal is an authorized placeholder).
+  Acceptance: `<FEATURE>/evidence/qa-gates/redaction-sweep.<timestamp>.md` records Timestamp, the search commands used, `SearchScope:`, `SearchPatterns:`, `SearchResult:` and a pass verdict.
+- [x] [P5-T9] Update `<FEATURE>/change-description.2026-08-26.md` with a "Remediation cycle 2 — partial revert" section containing, at minimum:
+  (a) the **net-effect statement, path by path, against pre-remediation head `02092504`**: rooted-selection OK path (at `02092504` a dialog; after cycle 1 an unhandled `ArgumentException` crash after `Hide()`; after cycle 2 the dialog again — no path worse than `02092504`, and better than `main`, where the same value class produced the original #614 crash at the filing boundary); relative-stem filing path (unchanged throughout); short-name filing path (better than `02092504`: CR-1 retained, one- and two-character stems file); folder-creation path (cycle-1 tightenings retained via `IsValidCreationSelection`); root-unresolvable OK path (identical to `02092504`: the guard no longer reads the archive root at all; the deferred `EfcDataModel.MoveToFolderAsync:289` read is unchanged across all heads and carried by #637);
+  (b) the plain record that **remediation cycle 1 introduced a crash on the rooted-selection path, that re-audit caught it, and that this cycle reverts it** with the CR-2 producer-side fix deferred to issue #637;
+  (c) the RC-2 AC16 amendment, quoting the old and new criterion text; the RC-3 closure (resolver and its comment removed with the call site, consumer check recorded); the RC-4 test addition;
+  (d) the fail-before mechanics for the composition test (D-C), naming the `revert-expect-fail` and `revert-pass-after` artifact filenames and stating that only the invocation shape changed between the runs.
+  Acceptance: the section exists and contains all four items; it names the four modified code files, `spec.md`, and issue #637.
+- [x] [P5-T10] Check off AC16: after P5-T4 passed, set the AC16 checkbox in `<FEATURE>/spec.md` to `[x]` (checkbox flip only; the D-H text is already in place from P3-T1). This is the only acceptance-criterion state change in this cycle; no other checkbox is touched.
+  Acceptance: in `spec.md` — `- [x] **AC16` exactly 1 hit; `- [ ] **AC16` 0 hits; `two scope-specific predicates` still exactly 1 hit.
+- [x] [P5-T11] Commit and clean-tree gate: stage and commit all cycle-2 changes — the four source/test files, `<FEATURE>/**` (this plan, spec.md, evidence, change-description update), and `.claude/agent-memory/**` — with a redacted message of the form `fix(quickfiler): remediate #614 RC-1 by partial revert of the cycle-1 CR-2 widening (rooted filing selections rejected again; producer fix deferred to #637)`. Then verify `git status --porcelain` is empty.
+  Acceptance: `<FEATURE>/evidence/qa-gates/final-commit.<timestamp>.md` records Timestamp, the commit sha, the committed path list, and empty porcelain output; nothing under `coverage/` was force-added.

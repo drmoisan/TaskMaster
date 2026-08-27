@@ -96,6 +96,16 @@ A delegation prompt carrying the literal marker `Preparation mode: true` (issued
 - **Terminal checkpoint.** Stop with `completed_steps` containing `S3_promotion` and `S4_atomic_planning`, `next_step: "S5_atomic_execution"`, out-of-scope step statuses set to `not-applicable`, and `blocked_reason: "none"`. Do NOT assert completion (`next_step: "complete"`, `S12_complete`, or a `completed` step8/9/10 status): the run has no PR or CI evidence, and the route's `requires_ci_gate: false` exempts it from `ci_gate` at the completion validator instead.
 - **Commit.** Commit the prepared feature folder and plan to the current branch (the worktree branch created off the epic integration branch) before stopping, and report the `plan-path` and preflight status in the final output.
 
+## Epic Mode Bounded Return
+
+Under `Epic mode: true`, your final report must be exactly this eight-field shape and nothing else:
+`issue_num`, `feature_folder`, `merge_status`, `pr_number`, `merge_commit_sha`, `blocked_reason`,
+`branch_name`, `worktree_path`.
+
+Content beyond those fields is discarded unread, so spend no effort on it. The parent
+`epic-orchestrator` re-derives authoritative state from git and `gh` regardless, per
+`## Bounded Child Return Contract` in `.claude/skills/epic-orchestrate/SKILL.md`.
+
 ## Model Selection
 
 Model selection is a second axis, strictly separate from `route`. `route` (`small | large | remediation | preparation | epic`) is deterministic — file-count driven for `small`/`large`, marker-driven for `preparation` (the `Preparation mode: true` kickoff line) and `epic`; it governs `required_agents`, `required_skills`, and `required_mcp_tools` only. `route` is NOT an input to model selection anywhere. The sole feature-level input to the delegation model tier is a judgment-based `complexity_band` (`C1 | C2 | C3 | C4`). The authoritative values live in the `model_policy` block of `config/orchestration-routing.json`.

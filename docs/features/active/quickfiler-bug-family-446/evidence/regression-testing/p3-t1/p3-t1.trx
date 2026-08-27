@@ -1,0 +1,630 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="9af814de-4154-47c3-aaae-0839347194a6" name="REDACTED-USER@REDACTED-HOST 2026-08-26 10:04:34" runUser="REDACTED-HOST\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T10:04:34.8394699-04:00" queuing="2026-08-26T10:04:34.8394699-04:00" start="2026-08-26T10:04:33.3545729-04:00" finish="2026-08-26T10:04:34.9983866-04:00" />
+  <TestSettings name="default" id="9d9f0fd8-a830-4280-839e-bf93ccc0124a">
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-26_10_04_34" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="a4821ca9-bf72-434e-961d-6d4e823a1aea" testId="1e9ab114-156a-8641-8d81-47ae564c8140" testName="SkipClicked_WhenRaised_TogglesSkipButtonTextAndEnabled" computerName="REDACTED-HOST" duration="00:00:00.0081373" startTime="2026-08-26T10:04:34.8257570-04:00" endTime="2026-08-26T10:04:34.8343964-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a4821ca9-bf72-434e-961d-6d4e823a1aea">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="2e920ea9-af22-47e2-83e3-dc2c085e9e65" testId="18d1c45c-6763-8cc9-9b3f-d726f33b6f30" testName="RegisterFormEventHandlers_ShouldRegisterHandlers" computerName="REDACTED-HOST" duration="00:00:00.0003428" startTime="2026-08-26T10:04:34.8361369-04:00" endTime="2026-08-26T10:04:34.8366590-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2e920ea9-af22-47e2-83e3-dc2c085e9e65">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="c8cdaa68-8bc4-47a4-845a-4910aa245215" testId="1f376eb7-362f-892d-9baf-4cb79c0aa65d" testName="LoadItemsAsync_PreScored_DoesNotInvokePostUiRemoval" computerName="REDACTED-HOST" duration="00:00:00.0309200" startTime="2026-08-26T10:04:34.9116835-04:00" endTime="2026-08-26T10:04:34.9443516-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c8cdaa68-8bc4-47a4-845a-4910aa245215">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="192924d8-891e-4729-8a2f-1793c5ce9374" testId="1f5e112b-3334-8c36-9681-99c7f4c05b33" testName="UnregisterFormEventHandlers_ShouldUnregisterHandlers" computerName="REDACTED-HOST" duration="00:00:00.0002268" startTime="2026-08-26T10:04:34.8366590-04:00" endTime="2026-08-26T10:04:34.8366590-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="192924d8-891e-4729-8a2f-1793c5ce9374">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="fedc587c-526a-406d-9b73-0f83751e9efa" testId="11bf31c8-6e85-8f2b-aba9-df1ae714572c" testName="MaximizeFormViewer_ShouldMaximizeForm" computerName="REDACTED-HOST" duration="00:00:00.0036347" startTime="2026-08-26T10:04:34.8961649-04:00" endTime="2026-08-26T10:04:34.8996740-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fedc587c-526a-406d-9b73-0f83751e9efa">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="8d08d50b-77dc-4ac7-92ac-0c24585b72a4" testId="169d9c33-45ff-880e-b964-607bf67be5eb" testName="RemoveTemplatesAndSetupTlp_ShouldSetupTlp" computerName="REDACTED-HOST" duration="00:00:00.0007194" startTime="2026-08-26T10:04:34.7969593-04:00" endTime="2026-08-26T10:04:34.7980143-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8d08d50b-77dc-4ac7-92ac-0c24585b72a4">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="e90c692a-624e-4e7d-b928-154b833eea4e" testId="12087308-12ab-81e7-8ee9-9d9dfebb954e" testName="MoveAndIterate_ShouldMoveAndIterate" computerName="REDACTED-HOST" duration="00:00:00.0017816" startTime="2026-08-26T10:04:34.8619014-04:00" endTime="2026-08-26T10:04:34.8636942-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e90c692a-624e-4e7d-b928-154b833eea4e">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="75c6f2a7-4171-4847-874a-71df724aa474" testId="1a28995c-c491-8d3f-bca6-740c6f59e961" testName="SpnEmailPerLoad_ValueChanged_ShouldChangeValue_GreaterItemPerIteration" computerName="REDACTED-HOST" duration="00:00:00.0124685" startTime="2026-08-26T10:04:34.8667074-04:00" endTime="2026-08-26T10:04:34.8786222-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="75c6f2a7-4171-4847-874a-71df724aa474">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="4f8f661c-bede-4950-8a03-e59bf8ff8057" testId="1220ddcc-089f-8bde-8816-09629bebbf36" testName="Cleanup_ShouldCleanupResources" computerName="REDACTED-HOST" duration="00:00:00.0002366" startTime="2026-08-26T10:04:34.8366590-04:00" endTime="2026-08-26T10:04:34.8371803-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4f8f661c-bede-4950-8a03-e59bf8ff8057">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="ee0f8188-bb85-40fb-b9ce-e42a20e2e97d" testId="18602f54-c254-81f9-bded-4b4af53e6a04" testName="SetupLightDark_ShouldSetupThemes" computerName="REDACTED-HOST" duration="00:00:00.0009360" startTime="2026-08-26T10:04:34.7980143-04:00" endTime="2026-08-26T10:04:34.7990484-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ee0f8188-bb85-40fb-b9ce-e42a20e2e97d">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="5885a2e0-abb3-4986-a5ea-f6f25f720e40" testId="1c62f5eb-d211-8b26-8ef1-1fb2c8a3fb2e" testName="CaptureItemSettings_WhenRowStylesNull_ReturnsEarly" computerName="REDACTED-HOST" duration="00:00:00.0004968" startTime="2026-08-26T10:04:34.8406112-04:00" endTime="2026-08-26T10:04:34.8411576-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5885a2e0-abb3-4986-a5ea-f6f25f720e40">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="2d0cac68-d056-4e25-a99e-48e10253a867" testId="19e0e5f5-732b-86cc-95d9-015aec357df2" testName="LoadItemsAsync_ShouldLoadMailItemsAsync" computerName="REDACTED-HOST" duration="00:00:00.0009847" startTime="2026-08-26T10:04:34.8946606-04:00" endTime="2026-08-26T10:04:34.8961649-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2d0cac68-d056-4e25-a99e-48e10253a867">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="0cbb674f-5887-415d-8cdd-d2723e84267c" testId="106167e3-1854-81c8-9108-76cf37eedebf" testName="ButtonSkip_Click_ShouldSkipGroup" computerName="REDACTED-HOST" duration="00:00:00.0061716" startTime="2026-08-26T10:04:34.8804760-04:00" endTime="2026-08-26T10:04:34.8861342-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0cbb674f-5887-415d-8cdd-d2723e84267c">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="c1a59855-ff1c-48a0-a0db-bfa253b4a1a8" testId="1c2f88db-f193-880d-aa7d-b09b00dc8708" testName="Token_ShouldReturnCorrectValue" computerName="REDACTED-HOST" duration="00:00:00.0002500" startTime="2026-08-26T10:04:34.8490966-04:00" endTime="2026-08-26T10:04:34.8490966-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c1a59855-ff1c-48a0-a0db-bfa253b4a1a8">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="38f32399-e172-458d-8c55-7a251139735f" testId="12324074-583b-8db3-ab19-c65fcaa339d3" testName="DarkMode_ShouldGetAndSetCorrectly" computerName="REDACTED-HOST" duration="00:00:00.0005665" startTime="2026-08-26T10:04:34.8446935-04:00" endTime="2026-08-26T10:04:34.8456876-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="38f32399-e172-458d-8c55-7a251139735f">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="825eb8ce-dc30-41c4-8190-0d30d4deaa94" testId="1277ab21-43ac-8b33-bc95-6a0bb684bb41" testName="Viewer_Activate_ShouldThrowNotImplementedException" computerName="REDACTED-HOST" duration="00:00:00.0011605" startTime="2026-08-26T10:04:34.9016744-04:00" endTime="2026-08-26T10:04:34.9026755-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="825eb8ce-dc30-41c4-8190-0d30d4deaa94">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="c8930558-82f1-4ed4-8d52-323b54092ce4" testId="19140b67-94b5-8c75-b0bc-0eb8669b9707" testName="ButtonCancel_Click_ShouldCancelAction" computerName="REDACTED-HOST" duration="00:00:00.0006969" startTime="2026-08-26T10:04:34.8580886-04:00" endTime="2026-08-26T10:04:34.8586128-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c8930558-82f1-4ed4-8d52-323b54092ce4">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="59d31c95-11c0-43af-acb0-f17c09be2386" testId="197d4ff2-ce1d-8918-990b-e2dc5c70706a" testName="UndoClicked_WhenRaised_RoutesToControllerWithoutThrowing" computerName="REDACTED-HOST" duration="00:00:00.0014641" startTime="2026-08-26T10:04:34.8187490-04:00" endTime="2026-08-26T10:04:34.8197528-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="59d31c95-11c0-43af-acb0-f17c09be2386">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="48c9f4ef-c7ec-425b-9ed9-ea0e28604c9e" testId="12978c1e-e640-8bc0-83de-a6e2416c1784" testName="ItemsPerIteration_ShouldGetAndSetCorrectly" computerName="REDACTED-HOST" duration="00:00:00.0020189" startTime="2026-08-26T10:04:34.8376896-04:00" endTime="2026-08-26T10:04:34.8394699-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="48c9f4ef-c7ec-425b-9ed9-ea0e28604c9e">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="34c40295-84b3-426b-b216-968c53c95afc" testId="112933b8-ca85-806c-9409-0d8c5cfa3092" testName="SkipGroupAsync_ShouldSkipGroup" computerName="REDACTED-HOST" duration="00:00:00.0018607" startTime="2026-08-26T10:04:34.8861342-04:00" endTime="2026-08-26T10:04:34.8936577-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="34c40295-84b3-426b-b216-968c53c95afc">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="16009195-9d0e-490c-b739-043e917d6fbb" testId="18a9b02a-7d24-8d2c-9ee1-92a92a2ea216" testName="ApplyHighConfidenceFilterAsync_WhenModeEnabled_RemovesBelowThresholdOnce" computerName="REDACTED-HOST" duration="00:00:00.0042500" startTime="2026-08-26T10:04:34.9026755-04:00" endTime="2026-08-26T10:04:34.9061768-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="16009195-9d0e-490c-b739-043e917d6fbb">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="57430a6d-4745-41f6-83fe-0baa0a070f54" testId="18c33db4-8c93-84bb-8da7-a1c772c1af0f" testName="CaptureItemSettings_WhenCellStatesPopulated_StoresStates" computerName="REDACTED-HOST" duration="00:00:00.0031159" startTime="2026-08-26T10:04:34.8361369-04:00" endTime="2026-08-26T10:04:34.8394699-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="57430a6d-4745-41f6-83fe-0baa0a070f54">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="7938a8bc-c454-430f-98bc-888628f182a0" testId="1dff0aa3-e8f0-8e34-a181-2dde6c8f8213" testName="LoadItems_ShouldLoadMailItems" computerName="REDACTED-HOST" duration="00:00:00.0005608" startTime="2026-08-26T10:04:34.8936577-04:00" endTime="2026-08-26T10:04:34.8946606-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7938a8bc-c454-430f-98bc-888628f182a0">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="9662138d-9b3c-4809-954f-cba7b755ea08" testId="14423bb5-1cf9-859b-aff5-ca46d00dec96" testName="LoadItems_ShouldLoadItems" computerName="REDACTED-HOST" duration="00:00:00.0002177" startTime="2026-08-26T10:04:34.8936577-04:00" endTime="2026-08-26T10:04:34.8936577-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9662138d-9b3c-4809-954f-cba7b755ea08">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="3c4f280c-c3b2-4709-84b7-3cfdddb44786" testId="1f3367a9-defd-847e-a5d6-8d1c14c97bbe" testName="CaptureItemSettings_ShouldCaptureSettings" computerName="REDACTED-HOST" duration="00:00:00.0270753" startTime="2026-08-26T10:04:34.7689469-04:00" endTime="2026-08-26T10:04:34.7969593-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3c4f280c-c3b2-4709-84b7-3cfdddb44786">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="6e2509e5-bf1b-45fa-bd41-3cdbba171c97" testId="10138c2b-500b-8d4a-9c13-ed72b70cc87b" testName="RegisterFormEventHandlers_WiresAllIntentCommandEvents" computerName="REDACTED-HOST" duration="00:00:00.2696462" startTime="2026-08-26T10:04:34.4192009-04:00" endTime="2026-08-26T10:04:34.7996712-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6e2509e5-bf1b-45fa-bd41-3cdbba171c97">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="dabd73a0-f69e-4e8b-9d9e-ffef6890cb26" testId="16560e7e-980b-8092-8f00-8daa57345369" testName="LoadUiFromQueue_ShouldLoadUi" computerName="REDACTED-HOST" duration="00:00:00.0026866" startTime="2026-08-26T10:04:34.8596575-04:00" endTime="2026-08-26T10:04:34.8619014-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dabd73a0-f69e-4e8b-9d9e-ffef6890cb26">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="6224111f-d071-4596-91d6-99c4a0a7bc84" testId="15fdb242-1e75-83c8-b215-bf11f8152c24" testName="ButtonOK_Click_ShouldPerformAction" computerName="REDACTED-HOST" duration="00:00:00.0004608" startTime="2026-08-26T10:04:34.8586128-04:00" endTime="2026-08-26T10:04:34.8596575-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6224111f-d071-4596-91d6-99c4a0a7bc84">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="8035eb6f-7622-4dcd-9262-13ea78c879e5" testId="13b51183-d94b-8728-a157-e4befd47eb13" testName="TokenSource_ShouldReturnCorrectValue" computerName="REDACTED-HOST" duration="00:00:00.0002387" startTime="2026-08-26T10:04:34.8490966-04:00" endTime="2026-08-26T10:04:34.8496185-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8035eb6f-7622-4dcd-9262-13ea78c879e5">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="3f49a8fb-1a3a-42a5-a93f-92802df4803d" testId="177d5595-e87f-8c20-a8ce-09236457da5c" testName="FormHandle_ShouldReturnCorrectValue" computerName="REDACTED-HOST" duration="00:00:00.0012938" startTime="2026-08-26T10:04:34.8468207-04:00" endTime="2026-08-26T10:04:34.8480231-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3f49a8fb-1a3a-42a5-a93f-92802df4803d">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="8ca609e8-ab37-481f-a0b2-4947aba5cd8c" testId="106e4b7b-f565-86eb-9129-f6ebf5c4aeb3" testName="ItemsPerLoadValueChanged_WhenRaised_RoutesToSpinnerHandler" computerName="REDACTED-HOST" duration="00:00:00.0054704" startTime="2026-08-26T10:04:34.8197528-04:00" endTime="2026-08-26T10:04:34.8257570-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8ca609e8-ab37-481f-a0b2-4947aba5cd8c">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="5a00782a-4829-4d7e-a73e-2afd9ff1841b" testId="1c078a91-fd1d-8653-8878-ff58e60c82e4" testName="Groups_ShouldReturnCorrectValue" computerName="REDACTED-HOST" duration="00:00:00.0004557" startTime="2026-08-26T10:04:34.8456876-04:00" endTime="2026-08-26T10:04:34.8468207-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5a00782a-4829-4d7e-a73e-2afd9ff1841b">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="0de898cc-023c-435d-8936-e1315f7e1bf2" testId="1b20f7f9-e12b-896f-988e-97ff843f5ae4" testName="LoadItemsAsync_MailItemPath_DoesNotApplyPostDisplayHighConfidenceRemoval" computerName="REDACTED-HOST" duration="00:00:00.0031499" startTime="2026-08-26T10:04:34.8411576-04:00" endTime="2026-08-26T10:04:34.8468207-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0de898cc-023c-435d-8936-e1315f7e1bf2">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="108b24bf-30de-4aaf-954d-cd9387b0580c" testId="1a800c53-d828-834d-8a64-17657424d933" testName="ApplyHighConfidenceFilterAsync_WhenGroupsIsNull_DoesNothing" computerName="REDACTED-HOST" duration="00:00:00.0014958" startTime="2026-08-26T10:04:34.9061768-04:00" endTime="2026-08-26T10:04:34.9086854-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="108b24bf-30de-4aaf-954d-cd9387b0580c">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="b627da3c-b490-477f-91ae-34906a4bdbf1" testId="1752f116-dfb8-8e83-8f13-d932b7f0db3a" testName="MinimizeFormViewer_ShouldMinimizeForm" computerName="REDACTED-HOST" duration="00:00:00.0007747" startTime="2026-08-26T10:04:34.8996740-04:00" endTime="2026-08-26T10:04:34.9006752-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b627da3c-b490-477f-91ae-34906a4bdbf1">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="ede9927d-beff-45b1-a13f-647d7cef2360" testId="1e5b8eb3-7afc-87e1-81fa-66536f45be31" testName="ApplyHighConfidenceFilterAsync_WhenQfSettingsIsNull_DoesNotRemove" computerName="REDACTED-HOST" duration="00:00:00.0014351" startTime="2026-08-26T10:04:34.9086854-04:00" endTime="2026-08-26T10:04:34.9096889-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ede9927d-beff-45b1-a13f-647d7cef2360">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="b071c51b-bfee-44b8-84fc-6dafef1f3a9f" testId="1d2af459-190a-8577-b01e-f388d019be26" testName="ButtonUndo_Click_ShouldUndoAction" computerName="REDACTED-HOST" duration="00:00:00.0002774" startTime="2026-08-26T10:04:34.8657039-04:00" endTime="2026-08-26T10:04:34.8657039-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b071c51b-bfee-44b8-84fc-6dafef1f3a9f">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="9e7d18e9-c528-4d59-80f2-6b74f1418715" testId="188274c4-be27-876a-901c-d731e451473d" testName="FormViewer_ShouldReturnCorrectValue" computerName="REDACTED-HOST" duration="00:00:00.0003035" startTime="2026-08-26T10:04:34.8485739-04:00" endTime="2026-08-26T10:04:34.8490966-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9e7d18e9-c528-4d59-80f2-6b74f1418715">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="f00250e0-1fce-4c7f-b225-5fa1e0e2302e" testId="1d5b0c73-0e8b-8417-b3d4-dc19bdb50e15" testName="ActiveTheme_ShouldGetAndSetCorrectly" computerName="REDACTED-HOST" duration="00:00:00.0050124" startTime="2026-08-26T10:04:34.8394699-04:00" endTime="2026-08-26T10:04:34.8446935-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f00250e0-1fce-4c7f-b225-5fa1e0e2302e">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="cfe1aa4e-e88a-4ac2-a5d4-9e804b5f52c3" testId="1815ec11-d7cd-8d47-a429-45b071c8214a" testName="OkClicked_WhenRaised_RoutesToControllerWithoutThrowing" computerName="REDACTED-HOST" duration="00:00:00.0045630" startTime="2026-08-26T10:04:34.8012537-04:00" endTime="2026-08-26T10:04:34.8059086-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cfe1aa4e-e88a-4ac2-a5d4-9e804b5f52c3">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="037b8830-98b6-4502-a980-117895b5abe4" testId="1c2a6d6a-1c7e-8e34-aefa-01148867e87b" testName="ButtonSkipHandler_WhenInvoked_TogglesSkipButtonTextAndEnabled" computerName="REDACTED-HOST" duration="00:00:00.0017144" startTime="2026-08-26T10:04:34.8343964-04:00" endTime="2026-08-26T10:04:34.8361369-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="037b8830-98b6-4502-a980-117895b5abe4">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="ee82e4ea-5976-48cd-8713-2206be038703" testId="1a6012a1-7ea6-81d0-8a77-49c923f99658" testName="UndoConsumer_ShouldConsumeUndoQueue" computerName="REDACTED-HOST" duration="00:00:00.0003645" startTime="2026-08-26T10:04:34.9006752-04:00" endTime="2026-08-26T10:04:34.9016744-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ee82e4ea-5976-48cd-8713-2206be038703">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="fefa5292-37ca-49bf-9073-06566fa332db" testId="19fb3866-816d-8d7f-9950-24332071f99f" testName="CancelClicked_WhenRaised_CancelsParentTokenSource" computerName="REDACTED-HOST" duration="00:00:00.0056047" startTime="2026-08-26T10:04:34.8059086-04:00" endTime="2026-08-26T10:04:34.8119681-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fefa5292-37ca-49bf-9073-06566fa332db">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="fa399082-05f6-4957-8e83-6c1beea86a85" testId="1635eeea-fbdb-832e-9a5e-d18f7f88a174" testName="SpnEmailPerLoad_ValueChanged_ShouldChangeValue_EqualsItemPerIteration" computerName="REDACTED-HOST" duration="00:00:00.0008128" startTime="2026-08-26T10:04:34.8657039-04:00" endTime="2026-08-26T10:04:34.8667074-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fa399082-05f6-4957-8e83-6c1beea86a85">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="f2930847-b97a-4bc2-9be5-bc162754203f" testId="1cb9e442-a3bb-89a8-9dbb-811a3b15e76c" testName="ApplyHighConfidenceFilterAsync_WhenModeDisabled_NeverRemoves" computerName="REDACTED-HOST" duration="00:00:00.0008689" startTime="2026-08-26T10:04:34.9096889-04:00" endTime="2026-08-26T10:04:34.9106831-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f2930847-b97a-4bc2-9be5-bc162754203f">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="81da6106-edae-4884-9237-4f7e897e15f2" testId="138b0628-a7b0-8f82-bdff-a5e8a1bc43c7" testName="CaptureItemSettings_WhenCellStatesNull_StoresNullAndHides" computerName="REDACTED-HOST" duration="00:00:00.0008940" startTime="2026-08-26T10:04:34.8394699-04:00" endTime="2026-08-26T10:04:34.8406112-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="81da6106-edae-4884-9237-4f7e897e15f2">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="29af8d1c-7b9d-464e-a1dc-a6d9dfe7467f" testId="1a44cb20-f6f0-8557-b2b8-b933a93311c8" testName="RegisterFormEventHandlers_UsesExclusionControlsFromFormViewer" computerName="REDACTED-HOST" duration="00:00:00.0015027" startTime="2026-08-26T10:04:34.7996712-04:00" endTime="2026-08-26T10:04:34.8012537-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="29af8d1c-7b9d-464e-a1dc-a6d9dfe7467f">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="761f8931-f47a-4b37-b9a2-ea510e0766ec" testId="1d925623-909c-8785-8245-967fd92fc3ca" testName="BackGroundMoveAsync_ShouldMoveEmails" computerName="REDACTED-HOST" duration="00:00:00.0010575" startTime="2026-08-26T10:04:34.8636942-04:00" endTime="2026-08-26T10:04:34.8646998-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="761f8931-f47a-4b37-b9a2-ea510e0766ec">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="27426edf-587b-4b36-a5ea-35f5fa16d1e3" testId="1e2ba11c-1400-8195-9084-2980fee203c3" testName="QfcFormController_ShouldConstruct" computerName="REDACTED-HOST" duration="00:00:00.2290419" startTime="2026-08-26T10:04:34.4161585-04:00" endTime="2026-08-26T10:04:34.7620232-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="27426edf-587b-4b36-a5ea-35f5fa16d1e3">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="813f50a4-f3c5-4641-90b3-5fbea780e7fe" testId="16aa3c45-e97a-811c-985d-7c4bc9d2e66a" testName="DarkMode_CheckedChanged_ShouldUpdateTheme" computerName="REDACTED-HOST" duration="00:00:00.0081385" startTime="2026-08-26T10:04:34.8496185-04:00" endTime="2026-08-26T10:04:34.8580886-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="813f50a4-f3c5-4641-90b3-5fbea780e7fe">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="35ea4fc9-cbc4-4712-b50d-93d370743d75" testId="15b7945f-65de-8e30-ab66-75fa235b3dd1" testName="AdjustTlp_ShouldAdjustTlp" computerName="REDACTED-HOST" duration="00:00:00.0005090" startTime="2026-08-26T10:04:34.8786222-04:00" endTime="2026-08-26T10:04:34.8804760-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="35ea4fc9-cbc4-4712-b50d-93d370743d75">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="ac1b1a3b-a8e1-4ad7-977c-d98d569c164e" testId="1967b393-1357-8e8b-a384-65bad32a13d3" testName="UndoDialog_ShouldUndoMoves" computerName="REDACTED-HOST" duration="00:00:00.0001961" startTime="2026-08-26T10:04:34.9006752-04:00" endTime="2026-08-26T10:04:34.9006752-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ac1b1a3b-a8e1-4ad7-977c-d98d569c164e">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="62242e42-ebae-4657-9a79-d605cae13daf" testId="156836c0-5ed7-88c8-aa9d-6b905c245c4a" testName="SpaceForEmail_ShouldReturnCorrectValue" computerName="REDACTED-HOST" duration="00:00:00.0368184" startTime="2026-08-26T10:04:34.7990484-04:00" endTime="2026-08-26T10:04:34.8361369-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="62242e42-ebae-4657-9a79-d605cae13daf">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+﻿</StdOut>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="ActiveTheme_ShouldGetAndSetCorrectly" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d5b0c73-0e8b-8417-b3d4-dc19bdb50e15">
+      <Execution id="f00250e0-1fce-4c7f-b225-5fa1e0e2302e" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="ActiveTheme_ShouldGetAndSetCorrectly" />
+    </UnitTest>
+    <UnitTest name="SpaceForEmail_ShouldReturnCorrectValue" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="156836c0-5ed7-88c8-aa9d-6b905c245c4a">
+      <Execution id="62242e42-ebae-4657-9a79-d605cae13daf" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="SpaceForEmail_ShouldReturnCorrectValue" />
+    </UnitTest>
+    <UnitTest name="LoadItemsAsync_ShouldLoadMailItemsAsync" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="19e0e5f5-732b-86cc-95d9-015aec357df2">
+      <Execution id="2d0cac68-d056-4e25-a99e-48e10253a867" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="LoadItemsAsync_ShouldLoadMailItemsAsync" />
+    </UnitTest>
+    <UnitTest name="UnregisterFormEventHandlers_ShouldUnregisterHandlers" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1f5e112b-3334-8c36-9681-99c7f4c05b33">
+      <Execution id="192924d8-891e-4729-8a2f-1793c5ce9374" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="UnregisterFormEventHandlers_ShouldUnregisterHandlers" />
+    </UnitTest>
+    <UnitTest name="SkipClicked_WhenRaised_TogglesSkipButtonTextAndEnabled" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e9ab114-156a-8641-8d81-47ae564c8140">
+      <Execution id="a4821ca9-bf72-434e-961d-6d4e823a1aea" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerSeamTests" name="SkipClicked_WhenRaised_TogglesSkipButtonTextAndEnabled" />
+    </UnitTest>
+    <UnitTest name="QfcFormController_ShouldConstruct" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e2ba11c-1400-8195-9084-2980fee203c3">
+      <Execution id="27426edf-587b-4b36-a5ea-35f5fa16d1e3" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="QfcFormController_ShouldConstruct" />
+    </UnitTest>
+    <UnitTest name="BackGroundMoveAsync_ShouldMoveEmails" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d925623-909c-8785-8245-967fd92fc3ca">
+      <Execution id="761f8931-f47a-4b37-b9a2-ea510e0766ec" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="BackGroundMoveAsync_ShouldMoveEmails" />
+    </UnitTest>
+    <UnitTest name="LoadItemsAsync_MailItemPath_DoesNotApplyPostDisplayHighConfidenceRemoval" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1b20f7f9-e12b-896f-988e-97ff843f5ae4">
+      <Execution id="0de898cc-023c-435d-8936-e1315f7e1bf2" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerSeamTests" name="LoadItemsAsync_MailItemPath_DoesNotApplyPostDisplayHighConfidenceRemoval" />
+    </UnitTest>
+    <UnitTest name="MoveAndIterate_ShouldMoveAndIterate" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="12087308-12ab-81e7-8ee9-9d9dfebb954e">
+      <Execution id="e90c692a-624e-4e7d-b928-154b833eea4e" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="MoveAndIterate_ShouldMoveAndIterate" />
+    </UnitTest>
+    <UnitTest name="MinimizeFormViewer_ShouldMinimizeForm" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1752f116-dfb8-8e83-8f13-d932b7f0db3a">
+      <Execution id="b627da3c-b490-477f-91ae-34906a4bdbf1" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="MinimizeFormViewer_ShouldMinimizeForm" />
+    </UnitTest>
+    <UnitTest name="RemoveTemplatesAndSetupTlp_ShouldSetupTlp" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="169d9c33-45ff-880e-b964-607bf67be5eb">
+      <Execution id="8d08d50b-77dc-4ac7-92ac-0c24585b72a4" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="RemoveTemplatesAndSetupTlp_ShouldSetupTlp" />
+    </UnitTest>
+    <UnitTest name="RegisterFormEventHandlers_ShouldRegisterHandlers" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="18d1c45c-6763-8cc9-9b3f-d726f33b6f30">
+      <Execution id="2e920ea9-af22-47e2-83e3-dc2c085e9e65" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="RegisterFormEventHandlers_ShouldRegisterHandlers" />
+    </UnitTest>
+    <UnitTest name="CaptureItemSettings_ShouldCaptureSettings" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1f3367a9-defd-847e-a5d6-8d1c14c97bbe">
+      <Execution id="3c4f280c-c3b2-4709-84b7-3cfdddb44786" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="CaptureItemSettings_ShouldCaptureSettings" />
+    </UnitTest>
+    <UnitTest name="ButtonSkipHandler_WhenInvoked_TogglesSkipButtonTextAndEnabled" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c2a6d6a-1c7e-8e34-aefa-01148867e87b">
+      <Execution id="037b8830-98b6-4502-a980-117895b5abe4" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerSeamTests" name="ButtonSkipHandler_WhenInvoked_TogglesSkipButtonTextAndEnabled" />
+    </UnitTest>
+    <UnitTest name="LoadItems_ShouldLoadMailItems" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1dff0aa3-e8f0-8e34-a181-2dde6c8f8213">
+      <Execution id="7938a8bc-c454-430f-98bc-888628f182a0" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="LoadItems_ShouldLoadMailItems" />
+    </UnitTest>
+    <UnitTest name="SkipGroupAsync_ShouldSkipGroup" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="112933b8-ca85-806c-9409-0d8c5cfa3092">
+      <Execution id="34c40295-84b3-426b-b216-968c53c95afc" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="SkipGroupAsync_ShouldSkipGroup" />
+    </UnitTest>
+    <UnitTest name="CaptureItemSettings_WhenRowStylesNull_ReturnsEarly" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c62f5eb-d211-8b26-8ef1-1fb2c8a3fb2e">
+      <Execution id="5885a2e0-abb3-4986-a5ea-f6f25f720e40" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerSeamTests" name="CaptureItemSettings_WhenRowStylesNull_ReturnsEarly" />
+    </UnitTest>
+    <UnitTest name="SpnEmailPerLoad_ValueChanged_ShouldChangeValue_EqualsItemPerIteration" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1635eeea-fbdb-832e-9a5e-d18f7f88a174">
+      <Execution id="fa399082-05f6-4957-8e83-6c1beea86a85" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="SpnEmailPerLoad_ValueChanged_ShouldChangeValue_EqualsItemPerIteration" />
+    </UnitTest>
+    <UnitTest name="OkClicked_WhenRaised_RoutesToControllerWithoutThrowing" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1815ec11-d7cd-8d47-a429-45b071c8214a">
+      <Execution id="cfe1aa4e-e88a-4ac2-a5d4-9e804b5f52c3" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerSeamTests" name="OkClicked_WhenRaised_RoutesToControllerWithoutThrowing" />
+    </UnitTest>
+    <UnitTest name="UndoClicked_WhenRaised_RoutesToControllerWithoutThrowing" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="197d4ff2-ce1d-8918-990b-e2dc5c70706a">
+      <Execution id="59d31c95-11c0-43af-acb0-f17c09be2386" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerSeamTests" name="UndoClicked_WhenRaised_RoutesToControllerWithoutThrowing" />
+    </UnitTest>
+    <UnitTest name="ApplyHighConfidenceFilterAsync_WhenModeEnabled_RemovesBelowThresholdOnce" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="18a9b02a-7d24-8d2c-9ee1-92a92a2ea216">
+      <Execution id="16009195-9d0e-490c-b739-043e917d6fbb" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="ApplyHighConfidenceFilterAsync_WhenModeEnabled_RemovesBelowThresholdOnce" />
+    </UnitTest>
+    <UnitTest name="CaptureItemSettings_WhenCellStatesPopulated_StoresStates" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="18c33db4-8c93-84bb-8da7-a1c772c1af0f">
+      <Execution id="57430a6d-4745-41f6-83fe-0baa0a070f54" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerSeamTests" name="CaptureItemSettings_WhenCellStatesPopulated_StoresStates" />
+    </UnitTest>
+    <UnitTest name="LoadItems_ShouldLoadItems" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="14423bb5-1cf9-859b-aff5-ca46d00dec96">
+      <Execution id="9662138d-9b3c-4809-954f-cba7b755ea08" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="LoadItems_ShouldLoadItems" />
+    </UnitTest>
+    <UnitTest name="UndoDialog_ShouldUndoMoves" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1967b393-1357-8e8b-a384-65bad32a13d3">
+      <Execution id="ac1b1a3b-a8e1-4ad7-977c-d98d569c164e" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="UndoDialog_ShouldUndoMoves" />
+    </UnitTest>
+    <UnitTest name="FormHandle_ShouldReturnCorrectValue" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="177d5595-e87f-8c20-a8ce-09236457da5c">
+      <Execution id="3f49a8fb-1a3a-42a5-a93f-92802df4803d" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="FormHandle_ShouldReturnCorrectValue" />
+    </UnitTest>
+    <UnitTest name="Cleanup_ShouldCleanupResources" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1220ddcc-089f-8bde-8816-09629bebbf36">
+      <Execution id="4f8f661c-bede-4950-8a03-e59bf8ff8057" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="Cleanup_ShouldCleanupResources" />
+    </UnitTest>
+    <UnitTest name="LoadUiFromQueue_ShouldLoadUi" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="16560e7e-980b-8092-8f00-8daa57345369">
+      <Execution id="dabd73a0-f69e-4e8b-9d9e-ffef6890cb26" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="LoadUiFromQueue_ShouldLoadUi" />
+    </UnitTest>
+    <UnitTest name="RegisterFormEventHandlers_UsesExclusionControlsFromFormViewer" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a44cb20-f6f0-8557-b2b8-b933a93311c8">
+      <Execution id="29af8d1c-7b9d-464e-a1dc-a6d9dfe7467f" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerSeamTests" name="RegisterFormEventHandlers_UsesExclusionControlsFromFormViewer" />
+    </UnitTest>
+    <UnitTest name="ApplyHighConfidenceFilterAsync_WhenModeDisabled_NeverRemoves" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1cb9e442-a3bb-89a8-9dbb-811a3b15e76c">
+      <Execution id="f2930847-b97a-4bc2-9be5-bc162754203f" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="ApplyHighConfidenceFilterAsync_WhenModeDisabled_NeverRemoves" />
+    </UnitTest>
+    <UnitTest name="ItemsPerIteration_ShouldGetAndSetCorrectly" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="12978c1e-e640-8bc0-83de-a6e2416c1784">
+      <Execution id="48c9f4ef-c7ec-425b-9ed9-ea0e28604c9e" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="ItemsPerIteration_ShouldGetAndSetCorrectly" />
+    </UnitTest>
+    <UnitTest name="CaptureItemSettings_WhenCellStatesNull_StoresNullAndHides" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="138b0628-a7b0-8f82-bdff-a5e8a1bc43c7">
+      <Execution id="81da6106-edae-4884-9237-4f7e897e15f2" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerSeamTests" name="CaptureItemSettings_WhenCellStatesNull_StoresNullAndHides" />
+    </UnitTest>
+    <UnitTest name="CancelClicked_WhenRaised_CancelsParentTokenSource" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="19fb3866-816d-8d7f-9950-24332071f99f">
+      <Execution id="fefa5292-37ca-49bf-9073-06566fa332db" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerSeamTests" name="CancelClicked_WhenRaised_CancelsParentTokenSource" />
+    </UnitTest>
+    <UnitTest name="Groups_ShouldReturnCorrectValue" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c078a91-fd1d-8653-8878-ff58e60c82e4">
+      <Execution id="5a00782a-4829-4d7e-a73e-2afd9ff1841b" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="Groups_ShouldReturnCorrectValue" />
+    </UnitTest>
+    <UnitTest name="LoadItemsAsync_PreScored_DoesNotInvokePostUiRemoval" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1f376eb7-362f-892d-9baf-4cb79c0aa65d">
+      <Execution id="c8cdaa68-8bc4-47a4-845a-4910aa245215" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="LoadItemsAsync_PreScored_DoesNotInvokePostUiRemoval" />
+    </UnitTest>
+    <UnitTest name="DarkMode_ShouldGetAndSetCorrectly" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="12324074-583b-8db3-ab19-c65fcaa339d3">
+      <Execution id="38f32399-e172-458d-8c55-7a251139735f" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="DarkMode_ShouldGetAndSetCorrectly" />
+    </UnitTest>
+    <UnitTest name="ApplyHighConfidenceFilterAsync_WhenQfSettingsIsNull_DoesNotRemove" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e5b8eb3-7afc-87e1-81fa-66536f45be31">
+      <Execution id="ede9927d-beff-45b1-a13f-647d7cef2360" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="ApplyHighConfidenceFilterAsync_WhenQfSettingsIsNull_DoesNotRemove" />
+    </UnitTest>
+    <UnitTest name="DarkMode_CheckedChanged_ShouldUpdateTheme" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="16aa3c45-e97a-811c-985d-7c4bc9d2e66a">
+      <Execution id="813f50a4-f3c5-4641-90b3-5fbea780e7fe" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="DarkMode_CheckedChanged_ShouldUpdateTheme" />
+    </UnitTest>
+    <UnitTest name="AdjustTlp_ShouldAdjustTlp" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="15b7945f-65de-8e30-ab66-75fa235b3dd1">
+      <Execution id="35ea4fc9-cbc4-4712-b50d-93d370743d75" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="AdjustTlp_ShouldAdjustTlp" />
+    </UnitTest>
+    <UnitTest name="RegisterFormEventHandlers_WiresAllIntentCommandEvents" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="10138c2b-500b-8d4a-9c13-ed72b70cc87b">
+      <Execution id="6e2509e5-bf1b-45fa-bd41-3cdbba171c97" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerSeamTests" name="RegisterFormEventHandlers_WiresAllIntentCommandEvents" />
+    </UnitTest>
+    <UnitTest name="UndoConsumer_ShouldConsumeUndoQueue" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a6012a1-7ea6-81d0-8a77-49c923f99658">
+      <Execution id="ee82e4ea-5976-48cd-8713-2206be038703" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="UndoConsumer_ShouldConsumeUndoQueue" />
+    </UnitTest>
+    <UnitTest name="TokenSource_ShouldReturnCorrectValue" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="13b51183-d94b-8728-a157-e4befd47eb13">
+      <Execution id="8035eb6f-7622-4dcd-9262-13ea78c879e5" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="TokenSource_ShouldReturnCorrectValue" />
+    </UnitTest>
+    <UnitTest name="MaximizeFormViewer_ShouldMaximizeForm" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="11bf31c8-6e85-8f2b-aba9-df1ae714572c">
+      <Execution id="fedc587c-526a-406d-9b73-0f83751e9efa" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="MaximizeFormViewer_ShouldMaximizeForm" />
+    </UnitTest>
+    <UnitTest name="Token_ShouldReturnCorrectValue" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c2f88db-f193-880d-aa7d-b09b00dc8708">
+      <Execution id="c1a59855-ff1c-48a0-a0db-bfa253b4a1a8" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="Token_ShouldReturnCorrectValue" />
+    </UnitTest>
+    <UnitTest name="SpnEmailPerLoad_ValueChanged_ShouldChangeValue_GreaterItemPerIteration" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a28995c-c491-8d3f-bca6-740c6f59e961">
+      <Execution id="75c6f2a7-4171-4847-874a-71df724aa474" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="SpnEmailPerLoad_ValueChanged_ShouldChangeValue_GreaterItemPerIteration" />
+    </UnitTest>
+    <UnitTest name="SetupLightDark_ShouldSetupThemes" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="18602f54-c254-81f9-bded-4b4af53e6a04">
+      <Execution id="ee0f8188-bb85-40fb-b9ce-e42a20e2e97d" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="SetupLightDark_ShouldSetupThemes" />
+    </UnitTest>
+    <UnitTest name="FormViewer_ShouldReturnCorrectValue" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="188274c4-be27-876a-901c-d731e451473d">
+      <Execution id="9e7d18e9-c528-4d59-80f2-6b74f1418715" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="FormViewer_ShouldReturnCorrectValue" />
+    </UnitTest>
+    <UnitTest name="ButtonUndo_Click_ShouldUndoAction" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d2af459-190a-8577-b01e-f388d019be26">
+      <Execution id="b071c51b-bfee-44b8-84fc-6dafef1f3a9f" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="ButtonUndo_Click_ShouldUndoAction" />
+    </UnitTest>
+    <UnitTest name="ButtonCancel_Click_ShouldCancelAction" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="19140b67-94b5-8c75-b0bc-0eb8669b9707">
+      <Execution id="c8930558-82f1-4ed4-8d52-323b54092ce4" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="ButtonCancel_Click_ShouldCancelAction" />
+    </UnitTest>
+    <UnitTest name="ItemsPerLoadValueChanged_WhenRaised_RoutesToSpinnerHandler" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="106e4b7b-f565-86eb-9129-f6ebf5c4aeb3">
+      <Execution id="8ca609e8-ab37-481f-a0b2-4947aba5cd8c" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerSeamTests" name="ItemsPerLoadValueChanged_WhenRaised_RoutesToSpinnerHandler" />
+    </UnitTest>
+    <UnitTest name="ButtonSkip_Click_ShouldSkipGroup" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="106167e3-1854-81c8-9108-76cf37eedebf">
+      <Execution id="0cbb674f-5887-415d-8cdd-d2723e84267c" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="ButtonSkip_Click_ShouldSkipGroup" />
+    </UnitTest>
+    <UnitTest name="ButtonOK_Click_ShouldPerformAction" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="15fdb242-1e75-83c8-b215-bf11f8152c24">
+      <Execution id="6224111f-d071-4596-91d6-99c4a0a7bc84" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="ButtonOK_Click_ShouldPerformAction" />
+    </UnitTest>
+    <UnitTest name="ApplyHighConfidenceFilterAsync_WhenGroupsIsNull_DoesNothing" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a800c53-d828-834d-8a64-17657424d933">
+      <Execution id="108b24bf-30de-4aaf-954d-cd9387b0580c" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="ApplyHighConfidenceFilterAsync_WhenGroupsIsNull_DoesNothing" />
+    </UnitTest>
+    <UnitTest name="Viewer_Activate_ShouldThrowNotImplementedException" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1277ab21-43ac-8b33-bc95-6a0bb684bb41">
+      <Execution id="825eb8ce-dc30-41c4-8190-0d30d4deaa94" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerTests" name="Viewer_Activate_ShouldThrowNotImplementedException" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1e9ab114-156a-8641-8d81-47ae564c8140" executionId="a4821ca9-bf72-434e-961d-6d4e823a1aea" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18d1c45c-6763-8cc9-9b3f-d726f33b6f30" executionId="2e920ea9-af22-47e2-83e3-dc2c085e9e65" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f376eb7-362f-892d-9baf-4cb79c0aa65d" executionId="c8cdaa68-8bc4-47a4-845a-4910aa245215" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f5e112b-3334-8c36-9681-99c7f4c05b33" executionId="192924d8-891e-4729-8a2f-1793c5ce9374" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11bf31c8-6e85-8f2b-aba9-df1ae714572c" executionId="fedc587c-526a-406d-9b73-0f83751e9efa" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="169d9c33-45ff-880e-b964-607bf67be5eb" executionId="8d08d50b-77dc-4ac7-92ac-0c24585b72a4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12087308-12ab-81e7-8ee9-9d9dfebb954e" executionId="e90c692a-624e-4e7d-b928-154b833eea4e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a28995c-c491-8d3f-bca6-740c6f59e961" executionId="75c6f2a7-4171-4847-874a-71df724aa474" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1220ddcc-089f-8bde-8816-09629bebbf36" executionId="4f8f661c-bede-4950-8a03-e59bf8ff8057" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18602f54-c254-81f9-bded-4b4af53e6a04" executionId="ee0f8188-bb85-40fb-b9ce-e42a20e2e97d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c62f5eb-d211-8b26-8ef1-1fb2c8a3fb2e" executionId="5885a2e0-abb3-4986-a5ea-f6f25f720e40" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19e0e5f5-732b-86cc-95d9-015aec357df2" executionId="2d0cac68-d056-4e25-a99e-48e10253a867" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="106167e3-1854-81c8-9108-76cf37eedebf" executionId="0cbb674f-5887-415d-8cdd-d2723e84267c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c2f88db-f193-880d-aa7d-b09b00dc8708" executionId="c1a59855-ff1c-48a0-a0db-bfa253b4a1a8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12324074-583b-8db3-ab19-c65fcaa339d3" executionId="38f32399-e172-458d-8c55-7a251139735f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1277ab21-43ac-8b33-bc95-6a0bb684bb41" executionId="825eb8ce-dc30-41c4-8190-0d30d4deaa94" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19140b67-94b5-8c75-b0bc-0eb8669b9707" executionId="c8930558-82f1-4ed4-8d52-323b54092ce4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="197d4ff2-ce1d-8918-990b-e2dc5c70706a" executionId="59d31c95-11c0-43af-acb0-f17c09be2386" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12978c1e-e640-8bc0-83de-a6e2416c1784" executionId="48c9f4ef-c7ec-425b-9ed9-ea0e28604c9e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="112933b8-ca85-806c-9409-0d8c5cfa3092" executionId="34c40295-84b3-426b-b216-968c53c95afc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18a9b02a-7d24-8d2c-9ee1-92a92a2ea216" executionId="16009195-9d0e-490c-b739-043e917d6fbb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18c33db4-8c93-84bb-8da7-a1c772c1af0f" executionId="57430a6d-4745-41f6-83fe-0baa0a070f54" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1dff0aa3-e8f0-8e34-a181-2dde6c8f8213" executionId="7938a8bc-c454-430f-98bc-888628f182a0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14423bb5-1cf9-859b-aff5-ca46d00dec96" executionId="9662138d-9b3c-4809-954f-cba7b755ea08" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f3367a9-defd-847e-a5d6-8d1c14c97bbe" executionId="3c4f280c-c3b2-4709-84b7-3cfdddb44786" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10138c2b-500b-8d4a-9c13-ed72b70cc87b" executionId="6e2509e5-bf1b-45fa-bd41-3cdbba171c97" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16560e7e-980b-8092-8f00-8daa57345369" executionId="dabd73a0-f69e-4e8b-9d9e-ffef6890cb26" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15fdb242-1e75-83c8-b215-bf11f8152c24" executionId="6224111f-d071-4596-91d6-99c4a0a7bc84" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13b51183-d94b-8728-a157-e4befd47eb13" executionId="8035eb6f-7622-4dcd-9262-13ea78c879e5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="177d5595-e87f-8c20-a8ce-09236457da5c" executionId="3f49a8fb-1a3a-42a5-a93f-92802df4803d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="106e4b7b-f565-86eb-9129-f6ebf5c4aeb3" executionId="8ca609e8-ab37-481f-a0b2-4947aba5cd8c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c078a91-fd1d-8653-8878-ff58e60c82e4" executionId="5a00782a-4829-4d7e-a73e-2afd9ff1841b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b20f7f9-e12b-896f-988e-97ff843f5ae4" executionId="0de898cc-023c-435d-8936-e1315f7e1bf2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a800c53-d828-834d-8a64-17657424d933" executionId="108b24bf-30de-4aaf-954d-cd9387b0580c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1752f116-dfb8-8e83-8f13-d932b7f0db3a" executionId="b627da3c-b490-477f-91ae-34906a4bdbf1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e5b8eb3-7afc-87e1-81fa-66536f45be31" executionId="ede9927d-beff-45b1-a13f-647d7cef2360" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d2af459-190a-8577-b01e-f388d019be26" executionId="b071c51b-bfee-44b8-84fc-6dafef1f3a9f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="188274c4-be27-876a-901c-d731e451473d" executionId="9e7d18e9-c528-4d59-80f2-6b74f1418715" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d5b0c73-0e8b-8417-b3d4-dc19bdb50e15" executionId="f00250e0-1fce-4c7f-b225-5fa1e0e2302e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1815ec11-d7cd-8d47-a429-45b071c8214a" executionId="cfe1aa4e-e88a-4ac2-a5d4-9e804b5f52c3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c2a6d6a-1c7e-8e34-aefa-01148867e87b" executionId="037b8830-98b6-4502-a980-117895b5abe4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a6012a1-7ea6-81d0-8a77-49c923f99658" executionId="ee82e4ea-5976-48cd-8713-2206be038703" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19fb3866-816d-8d7f-9950-24332071f99f" executionId="fefa5292-37ca-49bf-9073-06566fa332db" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1635eeea-fbdb-832e-9a5e-d18f7f88a174" executionId="fa399082-05f6-4957-8e83-6c1beea86a85" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1cb9e442-a3bb-89a8-9dbb-811a3b15e76c" executionId="f2930847-b97a-4bc2-9be5-bc162754203f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="138b0628-a7b0-8f82-bdff-a5e8a1bc43c7" executionId="81da6106-edae-4884-9237-4f7e897e15f2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a44cb20-f6f0-8557-b2b8-b933a93311c8" executionId="29af8d1c-7b9d-464e-a1dc-a6d9dfe7467f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d925623-909c-8785-8245-967fd92fc3ca" executionId="761f8931-f47a-4b37-b9a2-ea510e0766ec" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e2ba11c-1400-8195-9084-2980fee203c3" executionId="27426edf-587b-4b36-a5ea-35f5fa16d1e3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16aa3c45-e97a-811c-985d-7c4bc9d2e66a" executionId="813f50a4-f3c5-4641-90b3-5fbea780e7fe" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15b7945f-65de-8e30-ab66-75fa235b3dd1" executionId="35ea4fc9-cbc4-4712-b50d-93d370743d75" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1967b393-1357-8e8b-a384-65bad32a13d3" executionId="ac1b1a3b-a8e1-4ad7-977c-d98d569c164e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="156836c0-5ed7-88c8-aa9d-6b905c245c4a" executionId="62242e42-ebae-4657-9a79-d605cae13daf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="53" executed="53" passed="53" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

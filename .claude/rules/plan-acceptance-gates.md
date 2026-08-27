@@ -1,3 +1,15 @@
+---
+paths:
+  - "scripts/dev_tools/plan_gate_*"
+  - "scripts/dev_tools/validate_orchestration_artifacts.py"
+  - "extensions/drm-copilot/src/lib/validate/plan-gate-*"
+  - "extensions/drm-copilot/src/lib/validate/orchestration-artifacts.ts"
+  - "docs/features/**/plan.*.md"
+  - "docs/features/**/remediation-plan.*.md"
+  - ".claude/skills/atomic-plan-contract/SKILL.md"
+description: Acceptance-gate rules G1 through G6 applied to the shell commands an atomic plan states as acceptance conditions.
+---
+
 # Atomic-Plan Acceptance Gates (G1 through G6)
 
 This rule governs the acceptance-gate rules the plan validator applies to the shell commands an atomic plan states as acceptance conditions. It exists because a plan can state an acceptance condition that cannot fail: a coverage argument that collects no data, or a search for a literal that returns zero matches whatever the executor does. Such a condition reads as a verification step and gates nothing (issue #486).

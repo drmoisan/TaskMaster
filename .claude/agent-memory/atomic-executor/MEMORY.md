@@ -1,6 +1,9 @@
 # Atomic Executor Memory Index
 
 ## Plan validation & gates
+- [CSharpier chain-wrap defeats single-line search gates](project_csharpier_chain_wrap_defeats_singleline_search_gates.md) — a zero-hit gate on
+- [Extract gate literals from the plan, never re-type them](project_preflight_gate_literal_extract_from_plan_not_retype.md) — bash/pwsh quoting
+- [Tool layer collapses `\` in file content](project_tool_layer_collapses_double_backslash_in_file_content.md) — heredocs and Write silently halve
 - [Confirmatory preflight: proportionate bar](feedback_confirmatory_preflight_proportionate_bar.md) — over a small delta to an already-cleared plan, an INCOMPLETE enumeration is an observation, not a blocker; plus the cheap mechanical diff checks
 - [Directory-scoped format breaks ownership gates](project_directory_scoped_format_breaks_ownership_gates.md) — a scoped csharpier pass naming DIRECTORIES rewrites must-not-write files the same plan asserts are unmodified; require file paths
 - [Supersede clause leaves a hard routing residual](project_supersede_clause_leaves_hard_routing_residual.md) — a "the plan's table supersedes this" clause does not neutralise a THIRD location naming a concrete file; re-derive the arithmetic of obeying it
@@ -31,7 +34,7 @@
 - [VS18 build/test toolchain paths](project_vs18_build_toolchain_paths.md) — use VS **18** full-framework msbuild.exe (not .dotnet-sdk, dies on
 - [Repo-local SDK install + nullable Rebuild](project_repo_sdk_and_nullable_rebuild.md) — .dotnet-sdk install needs pwsh7; csharpier check/format
 - [vstest TestCaseFilter OR-vs-pipe + fresh-worktree bootstrap](project_vstest_testcasefilter_or_operator_and_env_setup.md) — vstest rejects `OR`,
-- [Analyzer version skew on fresh worktree](project_analyzer_version_skew_fresh_worktree.md) — analyzer build can fail CS0006 when csproj `<Analyzer
+- [Analyzer version skew on fresh worktree](project_analyzer_version_skew_fresh_worktree.md) — CS0006 kills EVERY build (not just the analyzer gate), empties `<Test>/bin/Debug`, and a caller may forbid the fix
 - [SecurityCodeScan incompatible with Roslyn 5.6](project_securitycodescan_roslyn56_incompat.md) — SecurityCodeScan.VS2019 5.6.7 throws
 - [Missing VSTO runtime breaks baseline gates](project_missing_vsto_runtime_breaks_baseline_gates.md) — HISTORICAL, not reproducing 2026-08-08; build
 - [New sln member surfaces MSB3277](project_new_sln_member_surfaces_msb3277_pin_divergence.md) — wiring an unbuilt legacy test project into the sln
@@ -51,6 +54,7 @@
 - [StrictMode Latest + missing XML attribute throws](project_pester_strictmode_xml_attribute_property_access.md) — a fixture missing
 - [Pester 5 result shape: no container .Tests, no -CI + -CodeCoverage](project_pester5_result_shape_container_tests_and_ci_codecoverage.md) —
 - [pwsh -Command needs single-quoted outer](project_pwsh_command_quoting_from_bash.md) — a double-quoted outer wrapper lets bash eat `$` → empty
+- [pwsh -File binds a list as ONE string](project_pwsh_file_array_param_from_bash.md) — `-Tokens a,b,c` gives a 1-element array, so a gate counter
 
 - [Compile-time red needs body-level refs](project_compile_red_needs_body_level_references.md) — a missing type in a method SIGNATURE suppresses body
 
@@ -67,6 +71,7 @@
 - [Concurrent executor in same worktree](project_concurrent_executor_same_worktree.md) — two executors on one worktree corrupt shared files; detect
 - [UtilitiesCS.Test parallelism flakiness](project_utilitiescs_test_parallelism_flakiness.md) — timing tests time out (~22s) under default
 - [MSTest [DoNotParallelize] overlaps the parallel bucket](project_mstest_donotparallelize_overlaps_parallel_bucket.md) — a [DoNotParallelize]
+- [log4net MemoryAppender is shared per TYPE](project_log4net_memoryappender_shared_per_type_across_parallel_classes.md) — concurrent test classes
 - [UiThread.Dispatcher static-swap race](project_uithread_dispatcher_static_swap_race.md) — two classes swapping the shared static deadlock on the
 - [runsettings DataCollector default-enabled](project_runsettings_datacollector_default_enabled.md) — a declared Code Coverage `<DataCollector>`
 - [dotnet-coverage Deedle/FSharp instrumentation breaks tests](project_dotnet_coverage_deedle_fsharp_instrumentation.md) — pass a module-exclude
@@ -84,7 +89,7 @@
 - [QFC #227 coverage tooling](project_qfc227_coverage_tooling.md) — vstest + Cobertura runsettings (Format under Configuration + attribute-exclude)
 - [#398 test-split gate gotchas](project_398_test_split_gate_gotchas.md) — pre-existing CS2002 duplicate Compile (latent, out of scope);
 - [ExcludeFromCodeCoverage on partial class = CS0579](project_excludefromcodecoverage_partial_class_cs0579.md) — annotate a partial type ONCE, not
-- Closed one-offs (low reuse): [#400](project_400_completeopenasync_unreachable_recovery_catch.md), [Swordfish
+- Closed one-offs (low reuse): [#400 dead recovery catch](project_400_completeopenasync_unreachable_recovery_catch.md), [Swordfish vendored-coverage side effect](project_swordfish_removal_epic_incidental_coverage_sideeffect.md), [#298 ScoCollection/live-bridge exemptions](project_taskvis_scocollection_and_livebridge_exemptions.md), [#328 OlObjectsProxy](project_328_rebuild_threading_olobjectsproxy_conflict.md)
 
 ## Nullable / C# language
 - [Nullable per-file pragma gate mechanics](project_nullable_pragma_gate_mechanics.md) — CI's command (`/t:Rebuild`, TWAE, NO `/p:Nullable=enable`)
@@ -93,13 +98,13 @@
 - [Nullable annotation CS8632 scoping](project_nullable_annotation_cs8632_scoping.md) — `Type?` in nullable-disabled projects emits CS8632; wrap in
 - [init/record struct fails CS0518 on net48](project_record_struct_isexternalinit_netfx.md) — no IsExternalInit polyfill; use a ctor-initialized
 - [CS8714 does not fire on net481](project_nullable_cs8714_not_on_net481.md) — net481 BCL lacks notnull, so `where TKey : notnull` is forward-looking
-- Nullable-epic per-issue notes (closed, low reuse): [#366a](project_366_notnull_cascades_beyond_wrapperscodictionary.md),
+- Nullable-epic per-issue notes (closed epic, low reuse): [#366 notnull cascade](project_366_notnull_cascades_beyond_wrapperscodictionary.md), [#366 4th file](project_366_scdictionary_constraint_cascades_to_fourth_file.md), [#366 CS8766](project_366_batch7_tnullable_return_cs8766.md), [#372](project_372_email_classifier_nullable_patterns.md), [#371](project_371_outlookobjects_nullable_lessons.md), [#375](project_375_residuals_nullable_gotchas.md)
 - [Outlook `Action`/`Exception` ambiguity](project_outlook_action_ambiguity.md) — bare `Action` AND bare `Exception` are CS0104-ambiguous in
 
 ## Component-specific gotchas
 - [WebView2 EndInit already creates child handles](project_webview2_endinit_creates_handles.md) — `new ItemViewer()` alone leaves BOTH WebView2
 - [#349 breadcrumb WebView2 gotchas](project_349_breadcrumb_webview2_gotchas.md) — retyped Designer field breaks reflection-injected tests; aggregate
-- QuickFiler #227 cycle notes: [cycle-4 ToggleFocus](project_qfc227_cycle4_toggle_focus_genuine_test_gotchas.md), [cycle-3 Theme/FolderPredictor
+- QuickFiler #227 cycle notes: [cycle-4 ToggleFocus](project_qfc227_cycle4_toggle_focus_genuine_test_gotchas.md), [cycle-3 Theme/FolderPredictor seam](project_theme_folderpredictor_seam_retrofit_gotchas.md)
 - [ObjectListView TreeListView headless selection](project_objectlistview_treelistview_headless_selection.md) — selection needs a native handle;
 - [QfcDatamodel BackgroundWorker async-void IsBusy race](project_qfc_backgroundworker_async_void_race.md) — IsBusy flips false instantly; assert
 - [QfcItemController pump harness needs SaveParameters](project_qfcitemcontroller_pump_harness_needs_saveparameters.md) — SetField-only injection

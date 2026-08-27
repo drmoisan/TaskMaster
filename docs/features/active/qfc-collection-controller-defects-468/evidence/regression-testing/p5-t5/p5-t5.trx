@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="6fe18808-0be0-424f-9475-92c07c75f7cf" name="<user>@<host> 2026-08-26 09:48:38" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T09:48:38.3681069-04:00" queuing="2026-08-26T09:48:38.3681069-04:00" start="2026-08-26T09:48:36.7286821-04:00" finish="2026-08-26T09:48:38.3838168-04:00" />
+  <TestSettings name="default" id="fb927951-5b30-4a01-b956-bdd60dfb7dc5">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-26_09_48_38" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="fc8a5d59-9f75-4e7f-acf6-d48847938e93" testId="1caaad64-a318-808b-8946-128f80ef28d5" testName="MoveEmailsAsync_WithNullGroupFromIndexLookup_DoesNotThrow" computerName="<host>" duration="00:00:00.0005453" startTime="2026-08-26T09:48:38.3000484-04:00" endTime="2026-08-26T09:48:38.3050488-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fc8a5d59-9f75-4e7f-acf6-d48847938e93" />
+    <UnitTestResult executionId="7da68c22-5cbd-4563-bd3a-bcb5a51d5743" testId="15d8c54a-483a-8d3a-84b7-b3ec554bb867" testName="MoveEmailsAsync_AfterFirstFailure_DoesNotReadSubjectASecondTime" computerName="<host>" duration="00:00:00.0449141" startTime="2026-08-26T09:48:38.2542972-04:00" endTime="2026-08-26T09:48:38.3000484-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7da68c22-5cbd-4563-bd3a-bcb5a51d5743" />
+    <UnitTestResult executionId="16c772c7-05b0-4ce5-bb5d-2af455618c72" testId="16b3ca18-f862-8df9-9c05-cf9e06d97ea0" testName="MoveEmailsAsync_WhenMoveIsCancelled_PropagatesOperationCanceledException" computerName="<host>" duration="00:00:00.1997773" startTime="2026-08-26T09:48:37.9010267-04:00" endTime="2026-08-26T09:48:38.2477637-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="16c772c7-05b0-4ce5-bb5d-2af455618c72">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="MoveEmailsAsync_WithNullGroupFromIndexLookup_DoesNotThrow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1caaad64-a318-808b-8946-128f80ef28d5">
+      <Execution id="fc8a5d59-9f75-4e7f-acf6-d48847938e93" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests" name="MoveEmailsAsync_WithNullGroupFromIndexLookup_DoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="MoveEmailsAsync_AfterFirstFailure_DoesNotReadSubjectASecondTime" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="15d8c54a-483a-8d3a-84b7-b3ec554bb867">
+      <Execution id="7da68c22-5cbd-4563-bd3a-bcb5a51d5743" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests" name="MoveEmailsAsync_AfterFirstFailure_DoesNotReadSubjectASecondTime" />
+    </UnitTest>
+    <UnitTest name="MoveEmailsAsync_WhenMoveIsCancelled_PropagatesOperationCanceledException" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="16b3ca18-f862-8df9-9c05-cf9e06d97ea0">
+      <Execution id="16c772c7-05b0-4ce5-bb5d-2af455618c72" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests" name="MoveEmailsAsync_WhenMoveIsCancelled_PropagatesOperationCanceledException" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1caaad64-a318-808b-8946-128f80ef28d5" executionId="fc8a5d59-9f75-4e7f-acf6-d48847938e93" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15d8c54a-483a-8d3a-84b7-b3ec554bb867" executionId="7da68c22-5cbd-4563-bd3a-bcb5a51d5743" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16b3ca18-f862-8df9-9c05-cf9e06d97ea0" executionId="16c772c7-05b0-4ce5-bb5d-2af455618c72" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="3" executed="3" passed="3" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

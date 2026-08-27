@@ -413,6 +413,7 @@
     <Compile Include="AppGlobals\StoreRehookCoordinator.cs" />
     <Compile Include="AppGlobals\IStartupTimingRecorder.cs" />
     <Compile Include="AppGlobals\StartupTimingRecorder.cs" />
+    <Compile Include="AppGlobals\ArchiveRootPathGuard.cs" />
     <Compile Include="AppGlobals\AppOlObjects.cs" />
     <Compile Include="AppGlobals\AppOlObjects.FolderTreeService.cs" />
     <Compile Include="AppGlobals\AppOlObjects.JunkFolders.cs" />

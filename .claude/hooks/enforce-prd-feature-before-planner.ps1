@@ -14,12 +14,30 @@
     Feature folder resolution order:
       1. Scan the prompt text for any path matching
          docs/features/active/<token>, accepting both forward-slash and
-         backslash separators. The longest match wins; when it points at a
-         file (ends with .md), use its parent directory.
-      2. If no candidate was found in the prompt, read the feature-folder field
+         backslash separators. Truncate every match to two segments past the
+         docs/features/active/ prefix -- that is, to exactly four path segments:
+         docs, features, active, and the feature-folder name. Truncation is
+         depth-insensitive, so the feature folder itself, a spec.md path, a
+         research/ artifact path, and an evidence/ artifact path all resolve to
+         the same folder. A match that truncates to fewer than four segments is
+         rejected. Candidates are deduplicated preserving first-occurrence
+         order.
+      2. Select among the distinct candidates: one candidate is used directly;
+         otherwise the candidate equal to the checkpoint's feature-folder field
+         is preferred, because the checkpoint is the orchestrator's own record of
+         which feature is in flight; otherwise the earliest-occurring candidate
+         in the prompt wins, because the orchestrator names the active feature
+         folder before citing artifacts inside it.
+      3. If no candidate was found in the prompt, read the feature-folder field
          from artifacts/orchestration/orchestrator-state.json.
-      3. If neither yields a folder, block with a reason instructing the caller
+      4. If neither yields a folder, block with a reason instructing the caller
          to reference a feature folder explicitly.
+
+    Known limitation: resolution stops at the feature-folder segment, so it does
+    not descend into a version folder (v1/, v2/). No versioned folder exists
+    under docs/features/active/ today, and issue.md sits at the feature root in
+    every case, so the limitation is inert; it is recorded here rather than coded
+    around.
 
     Once the folder is resolved, the hook reads the persisted work-mode marker
     (`- Work Mode: minor-audit|full-feature|full-bug|full`) from that folder's
@@ -30,11 +48,16 @@
       - full-bug     -> spec.md only is required.
       - minor-audit  -> neither is required; issue.md carries the acceptance
                         criteria for this mode.
-      - marker absent, unreadable, or unrecognized -> fail closed to the
-        strictest set (spec.md and user-story.md), and the block reason states
-        that the work mode could not be determined so the operator can tell
-        this case apart from a genuine missing prerequisite. The legacy `full`
-        marker normalizes to full-feature's requirement set.
+      - marker absent, unreadable, or unrecognized -> deny on a distinct
+        decision path that names the resolved folder and the issue.md path it
+        probed and states adding or correcting the marker as the remedy. That
+        path does not run the required-file probe and names neither prerequisite
+        document, because when the mode is unknown no prerequisite set is
+        knowable: a set containing user-story.md cannot be satisfied by full-bug
+        or minor-audit work without violating the lifecycle contract, and the
+        empty set would fail open. The delegation is still denied, so the gate
+        remains fail-closed. The legacy `full` marker normalizes to
+        full-feature's requirement set.
 
     If any required file is missing, the script emits a PreToolUse JSON
     response with hookSpecificOutput.permissionDecision='deny' and a reason
@@ -137,9 +160,14 @@ function Get-PrdFeatureRequiredFile {
         allowed.
     .DESCRIPTION
         full-feature requires spec.md and user-story.md; full-bug requires
-        spec.md only; minor-audit requires neither. A $null or unrecognized
-        mode fails closed to the strictest set (spec.md and user-story.md) so
-        an undeterminable mode never becomes permissive.
+        spec.md only; minor-audit requires neither.
+
+        The default arm returns spec.md alone. It is not reached from the
+        decision path for an undeterminable mode, which denies on its own branch
+        without probing at all; the arm exists so a direct caller passing a $null
+        or unrecognized mode never receives a permissive empty set, and it must
+        not name user-story.md, because that document is required to be ABSENT
+        for full-bug and minor-audit work.
     #>
     [CmdletBinding()]
     [OutputType([string[]])]
@@ -154,7 +182,7 @@ function Get-PrdFeatureRequiredFile {
         'full-feature' { return [string[]]@('spec.md', 'user-story.md') }
         'full-bug' { return [string[]]@('spec.md') }
         'minor-audit' { return [string[]]@() }
-        default { return [string[]]@('spec.md', 'user-story.md') }
+        default { return [string[]]@('spec.md') }
     }
 }
 
@@ -191,9 +219,22 @@ function Get-PrdFeatureCheckpointFolder {
 function Find-PrdFeatureFolderFromPrompt {
     <#
     .SYNOPSIS
-        Scans a prompt string for docs/features/active/<...> path tokens and
-        returns the longest unique match resolved to a folder path. Returns
-        $null when no match is found.
+        Scans a prompt string for docs/features/active/<...> path tokens,
+        truncates each to exactly four path segments, and returns the selected
+        feature folder. Returns $null when no token truncates to four segments.
+    .DESCRIPTION
+        Truncation to four segments -- docs, features, active, and the
+        feature-folder name -- is two segments past the docs/features/active/
+        prefix, so the depth at which an artifact is cited cannot change which
+        folder is resolved. Candidates are deduplicated preserving
+        first-occurrence order; selection among two or more distinct candidates
+        prefers the checkpoint's feature-folder field and otherwise takes the
+        earliest occurrence in the prompt.
+
+        The return value is a repo-relative path normalized to forward slashes,
+        or $null. The function reads no file except through the existing
+        checkpoint seam, and it is deterministic for a given prompt and
+        checkpoint value.
     #>
     [CmdletBinding()]
     [OutputType([string])]
@@ -214,22 +255,56 @@ function Find-PrdFeatureFolderFromPrompt {
         return $null
     }
 
-    $unique = @{}
+    # Deduplicate preserving FIRST-OCCURRENCE order. A [hashtable] must not be
+    # used here: PowerShell hashtable key enumeration order is unspecified, so a
+    # first-occurrence selection rule fed by a hashtable is not deterministic.
+    [System.Collections.Generic.List[string]] $candidates = [System.Collections.Generic.List[string]]::new()
     foreach ($m in $matchList) {
         $normalized = ($m.Value -replace '\\', '/').TrimEnd('/')
-        $unique[$normalized] = $true
+
+        # Truncate to exactly two segments past the docs/features/active/ prefix,
+        # that is, to the four segments docs, features, active, and the feature
+        # folder name. Truncation is depth-insensitive, so a folder path, a
+        # spec.md path, a research/ artifact path, and an evidence/ artifact path
+        # all reduce to the same value. A '.' component is a path no-op and is
+        # discarded first, so a degenerate token such as docs/features/active/.
+        # yields three segments and is rejected rather than resolved.
+        $segments = @($normalized -split '/' | Where-Object { $_ -ne '' -and $_ -ne '.' })
+        if ($segments.Count -lt 4) {
+            continue
+        }
+
+        $truncated = ($segments[0..3] -join '/')
+        if (-not $candidates.Contains($truncated)) {
+            $candidates.Add($truncated)
+        }
     }
 
-    $candidates = @(@($unique.Keys) | Sort-Object -Property Length -Descending)
-    $best = $candidates[0]
-
-    # If the longest match ends in .md, treat it as a file and use its parent.
-    if ($best -match '\.md$') {
-        $parent = $best -replace '/[^/]+\.md$', ''
-        return $parent
+    if ($candidates.Count -eq 0) {
+        return $null
     }
 
-    return $best
+    # One distinct candidate is used directly, so the common case never consults
+    # the checkpoint.
+    if ($candidates.Count -eq 1) {
+        return $candidates[0]
+    }
+
+    # More than one distinct feature folder was cited. Prefer the folder the
+    # orchestrator itself records as in flight: the checkpoint is the
+    # authoritative disambiguator, and it reuses a seam this hook already owns.
+    $checkpointFolder = Get-PrdFeatureCheckpointFolder
+    if ($checkpointFolder) {
+        $checkpointNormalized = ($checkpointFolder -replace '\\', '/').TrimEnd('/')
+        if ($candidates.Contains($checkpointNormalized)) {
+            return $checkpointNormalized
+        }
+    }
+
+    # Tiebreak of last resort: the orchestrator supplies the active feature folder
+    # among its delegation inputs and names it before citing artifacts inside it,
+    # so a cross-reference to another feature appears later in the prompt.
+    return $candidates[0]
 }
 
 function Get-PrdFeatureMissingFile {
@@ -308,10 +383,32 @@ function Invoke-PrdFeatureBeforePlannerDecision {
 
     # Derive the prerequisite set from the persisted work-mode marker rather
     # than a fixed spec.md/user-story.md pair. A marker that cannot be read or
-    # recognized must fail closed to the strictest set, not fail open.
+    # recognized must fail closed, not fail open: it denies on its own branch
+    # below, naming no prerequisite set and probing for no required file.
     $issueContent = Get-PrdFeatureIssueContent -FeatureFolder $folderNormalized
     $workMode = Resolve-PrdFeatureWorkMode -IssueContent $issueContent
-    $modeDetermined = [bool]$workMode
+
+    # An indeterminate mode is its own decision path, and it deliberately does NOT
+    # run the required-file probe. When the mode is unknown no prerequisite set is
+    # knowable, so any set the gate named would be wrong for at least one mode:
+    # a set containing user-story.md is unsatisfiable for full-bug and minor-audit
+    # without violating the lifecycle contract, and the empty set fails open. The
+    # only remedy true in all three modes is repairing the marker, so that is what
+    # the reason states. This still DENIES, so the gate remains fail-closed.
+    if (-not $workMode) {
+        return [ordered]@{
+            hookSpecificOutput = [ordered]@{
+                hookEventName            = 'PreToolUse'
+                permissionDecision       = 'deny'
+                permissionDecisionReason = "PRD_FEATURE_BLOCKED: resolved feature folder '$folderNormalized', " +
+                "but its work mode could not be determined from '$folderNormalized/issue.md' " +
+                '(the ''- Work Mode:'' marker is absent, unreadable, or unrecognized). ' +
+                'Confirm that is the intended feature folder, then add or correct the ' +
+                '''- Work Mode:'' marker in that file so the prerequisite set can be derived.'
+            }
+        }
+    }
+
     # Force array wrapping: PowerShell unravels a zero-element array return down
     # the pipeline to $null, which would otherwise fail the Mandatory
     # -RequiredFile parameter on Get-PrdFeatureMissingFile for minor-audit mode.
@@ -322,13 +419,13 @@ function Invoke-PrdFeatureBeforePlannerDecision {
         return [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'allow' } }
     }
 
+    # Lead with the resolved folder, not with the remedy: a reader who sees a
+    # folder they did not intend diagnoses a path problem immediately instead of
+    # re-running a step that has already completed correctly.
     $list = ($missing -join ', ')
-    if ($modeDetermined) {
-        $reason = "PRD_FEATURE_BLOCKED: cannot delegate to atomic-planner before prd-feature outputs are present in '$folderNormalized'. Missing: $list (work mode: $workMode). Invoke the prd-feature subagent first."
-    }
-    else {
-        $reason = "PRD_FEATURE_BLOCKED: cannot delegate to atomic-planner before prd-feature outputs are present in '$folderNormalized'. Missing: $list. Work mode could not be determined from '$folderNormalized/issue.md' (marker absent, unreadable, or unrecognized); failing closed to the strictest prerequisite set (spec.md, user-story.md). Invoke the prd-feature subagent first."
-    }
+    $reason = "PRD_FEATURE_BLOCKED: resolved feature folder '$folderNormalized' is missing: " +
+    "$list (work mode: $workMode). Confirm that is the intended feature folder, then " +
+    'invoke the prd-feature subagent to produce the missing output(s).'
 
     return [ordered]@{
         hookSpecificOutput = [ordered]@{

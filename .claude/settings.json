@@ -9,9 +9,8 @@
       "Bash(bash .claude/lib/bash/compute-concurrency-batches.sh*)",
       "Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)",
       "Read",
-      "Edit(/docs/**)",
-      "Write(/docs/**)",
-      "Write(/artifacts/**)",
+      "Edit(docs/**)",
+      "Edit(artifacts/**)",
       "mcp__drm-copilot__run_poshqc_format",
       "mcp__drm-copilot__run_poshqc_analyze",
       "mcp__drm-copilot__run_poshqc_test",
@@ -64,17 +63,13 @@
       "Skill(execute-hard-lock *)",
       "Skill(identify-session-id *)",
       "Skill(show-my-agent-tree *)",
-      "Skill(mermaid-diagram *)",
-      "Edit(/.claude/skills/execute-hard-lock/**)",
-      "Edit(/.claude/skills/feature-review-workflow/**)",
-      "Edit(/.claude/skills/csharp-qa-gate/**)"
+      "Skill(mermaid-diagram *)"
     ],
     "deny": [
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(./secrets/**)",
-      "Edit(./secrets/**)",
-      "Write(./secrets/**)"
+      "Edit(./secrets/**)"
     ],
     "additionalDirectories": [
       "c:\\Users\\DanMoisan\\repos\\drm-copilot\\.claude\\skills\\execute-hard-lock"

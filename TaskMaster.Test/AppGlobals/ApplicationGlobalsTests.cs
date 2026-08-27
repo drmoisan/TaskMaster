@@ -48,7 +48,12 @@ namespace TaskMaster.Test.AppGlobals
             // verifies that the lazy basic-load boundary remains deferred until the private
             // force method is invoked explicitly.
             var application = CreateOutlookApplicationStub();
-            var sut = new ApplicationGlobals(application);
+            var sut = new ApplicationGlobals(
+                application,
+                loadBasic: false,
+                readEnvironmentVariable: variable =>
+                    variable == "OneDriveCommercial" ? @"C:\OneDrive" : null
+            );
             var basicLoaded =
                 (Lazy<bool>)
                     typeof(ApplicationGlobals)

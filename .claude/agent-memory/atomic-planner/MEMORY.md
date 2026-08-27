@@ -13,9 +13,11 @@
 - [#505](project_505_toggle_state_guards_plan_seams.md) — runtime red (no dossier); raw cobertura to gitignored `coverage/`; manual-verification kind accepted
 - [#512](project_512_toolchain_gate_fidelity_plan_seams.md) — same-line `/t:Build`+`Nullable=enable` grep; `-EnableNullable` no-op proved by EXIT 0
 - [#553](project_553_ci_parallel_split_plan_seams.md) — workflow-only scope, no C# toolchain; no jq; pathspec anchoring
+- [#614 store-root leak plan seams](project_614_store_root_leak_plan_seams.md) — AC25 net non-growth (3 over-limit files); E1 SelectRow out-of-root-only pinning; remediation C1: behavior-preserving seam phase reconciles fail-before with a signature change, resolver-in-guard beats inline try/catch on line budget + coverage, net48 IsNullOrWhiteSpace doesn't narrow (`archiveRoot!`)
 - [#464 R3/R4](project_464_efc_controller_plan_seams.md) — additive-only file grows, budget a ceiling not a shrink; non-comment literal counts; a phase-N count must survive phases 1..N-1 deletions
 
 ## Plan-structure traps
+- [Verify test provenance before planning a deletion](verify-test-provenance-before-planning-deletion.md) — in a revert plan, read the test at the pre-cycle commit; a two-arg call shape doesn't prove the cycle added it
 
 - [Validator phase-heading constraint](plan-validator-phase-heading-constraint.md) — exact `### Phase N — <Title>`; nothing between N and the em dash
 - [Validator task-ID sequential constraint](plan-validator-task-id-sequential-constraint.md) — digit-only, sequential by appearance; insertion forces full renumber
@@ -66,6 +68,7 @@
 - [Worktree root breaks the `\.claude\` exclusion](worktree-root-breaks-dotclaude-exclusion.md) — assert a workspace-root prefix instead
 
 ## Coverage
+- [Deletion-adjusted coverage no-regression gate](deletion-adjusted-coverage-no-regression-gate.md) — deleting covered lines makes `rate_post >= rate_base` unsatisfiable; gate on covered/valid counters
 
 - [Threshold conflict: CLAUDE.md vs general-unit-test.md](project_coverage_threshold_conflict_claude_md_vs_general_unit_test.md) — 80/90 vs 85/75; repo-wide figure non-blocking, change-scoped gates blocking
 - [JaCoCo hook, Cobertura also accepted](project_csharp_coverage_gate_jacoco_format.md) — follow the format the delta names

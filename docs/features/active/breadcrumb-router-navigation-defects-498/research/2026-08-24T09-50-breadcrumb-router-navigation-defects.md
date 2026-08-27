@@ -1,7 +1,7 @@
 # Research — breadcrumb-router-navigation-defects (#439, #440, #498, #499)
 
 - Timestamp: 2026-08-24T09-50
-- Worktree: `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a59a23ef71f13e33a`
+- Worktree: `<repo-root>`
 - Verified against HEAD `988e819b`
 - Scope: one feature closing four pre-existing bug issues in the breadcrumb bridge router and folder navigation.
 

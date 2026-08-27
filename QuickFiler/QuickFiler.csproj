@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\Meziantou.Analyzer.3.0.174\build\Meziantou.Analyzer.props" Condition="Exists('..\packages\Meziantou.Analyzer.3.0.174\build\Meziantou.Analyzer.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -288,7 +288,10 @@
     <Compile Include="Controllers\BayesianPerformanceController.cs" />
     <Compile Include="Controllers\EfcDataModel.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouter.cs" />
+    <Compile Include="Controllers\BreadcrumbBridgeRouter.Arrows.cs" />
+    <Compile Include="Controllers\BreadcrumbBridgeRouter.Selection.cs" />
     <Compile Include="Controllers\BreadcrumbOutboundQueue.cs" />
+    <Compile Include="Controllers\EfcSelectionGuard.cs" />
     <Compile Include="Controllers\EfcFormController.cs" />
     <Compile Include="Controllers\EfcHomeController.cs" />
     <Compile Include="Controllers\EfcHomeController.Metrics.cs" />

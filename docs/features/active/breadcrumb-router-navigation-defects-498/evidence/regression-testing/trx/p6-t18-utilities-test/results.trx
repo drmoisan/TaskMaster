@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="aab10612-1cab-4b56-abf6-cba0aa9da288" name="REDACTED-USER@REDACTED-HOST 2026-08-26 10:40:27" runUser="REDACTED-HOST\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T10:40:27.4047254-04:00" queuing="2026-08-26T10:40:27.4047254-04:00" start="2026-08-26T10:40:25.8580161-04:00" finish="2026-08-26T10:40:27.4192301-04:00" />
+  <TestSettings name="default" id="14071bc8-ef34-472d-9dbc-ea7cd77dda15">
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-26_10_40_27" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="bbd3b7c9-9d74-4ebe-a48b-24e0733c94b4" testId="16f0ff7e-0883-8fce-9531-c151036f7487" testName="ArrowKey_QfcSingleSegmentRow_TakesPreExistingCollapsePath" computerName="REDACTED-HOST" duration="00:00:00.0331085" startTime="2026-08-26T10:40:27.1649479-04:00" endTime="2026-08-26T10:40:27.3430853-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bbd3b7c9-9d74-4ebe-a48b-24e0733c94b4">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="ArrowKey_QfcSingleSegmentRow_TakesPreExistingCollapsePath" storage="REDACTED-REPO-ROOT\utilitiescs.test\bin\debug\utilitiescs.test.dll" id="16f0ff7e-0883-8fce-9531-c151036f7487">
+      <Execution id="bbd3b7c9-9d74-4ebe-a48b-24e0733c94b4" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="UtilitiesCS.Test.OutlookObjects.Folder.BreadcrumbStateModelTests" name="ArrowKey_QfcSingleSegmentRow_TakesPreExistingCollapsePath" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="16f0ff7e-0883-8fce-9531-c151036f7487" executionId="bbd3b7c9-9d74-4ebe-a48b-24e0733c94b4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="1" executed="1" passed="1" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for REDACTED-REPO-ROOT\UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

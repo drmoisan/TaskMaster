@@ -564,6 +564,23 @@ choice:
 
 Either choice must preserve the D1 handling order and the D2 boundary behavior.
 
+**D9 DESCENT MECHANISM SELECTED: descend by child activation**
+
+Rationale. `ActivateSegment` refuses the leaf index (`UtilitiesCS/OutlookObjects/Folder/BreadcrumbRow.cs:156`)
+and therefore cannot express a downward transition, so a descent must be routed elsewhere. The child-activation
+route adds no member to `BreadcrumbRow`: it reuses the landed `GetActiveChild(int)` together with the router's
+`SelectHierarchyPath`, which is exactly how the landed mouse gesture descends via `ActivateChild`. Because a
+Right key press carries no child index where the mouse gesture supplies one, the choice is fixed at child
+index `0` (`row.GetActiveChild(0)`); when that returns null the descent is not available and the decision-D1
+fall-through runs. The rejected alternative — a new owned transition on `BreadcrumbRow` — is the larger change
+for no additional capability, and it would put pressure on `ActivateSegment`'s guard.
+
+Implementing task: `P6-T7` (`TryRightTreeTransitionAsync` in
+`QuickFiler/Controllers/BreadcrumbBridgeRouter.Arrows.cs`). Pinning test: `P6-T5`
+(`HandleArrowKey_RightAfterExpansion_DescendsByChildActivation` in
+`QuickFiler.Test/Controllers/BreadcrumbBridgeRouterTests.cs`), which asserts the descent targets child index
+`0` and that a null result falls through instead.
+
 ## Root Cause Analysis
 
 - Current hypothesis or confirmed root cause: **every root cause below is confirmed by code read in the
@@ -988,35 +1005,35 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
 
 ## Acceptance Criteria
 
-- [ ] **AC-1 (#498)** — A `segmentDoubleClick` message with `segmentIndex` outside `[0, segments.Count - 1]`
+- [x] **AC-1 (#498)** — A `segmentDoubleClick` message with `segmentIndex` outside `[0, segments.Count - 1]`
       is rejected by a range guard in the `SegmentDoubleClick` arm of
       `BreadcrumbBridgeRouter.ProcessInboundAsync` (`:241-247`); no exception escapes
       `_host.Raise(h => h.MessageReceived += null, ...)`, and the outbound posted-message count is unchanged.
-- [ ] **AC-2 (#498)** — The rejected index is logged at `Error` using the existing `log4net` pattern in the
+- [x] **AC-2 (#498)** — The rejected index is logged at `Error` using the existing `log4net` pattern in the
       same file (`BreadcrumbBridgeRouter.cs:235`, `:336`), and `BreadcrumbRow.CollapseAfter`
       (`BreadcrumbRow.cs:200-229`) is unmodified: its documented throw contract (`:197-199`, `:207-214`)
       still holds when called directly.
-- [ ] **AC-3 (#498)** — A valid `segmentIndex` still collapses the row and posts a render, and the
+- [x] **AC-3 (#498)** — A valid `segmentIndex` still collapses the row and posts a render, and the
       `catch (BreadcrumbMessageException)` at `BreadcrumbBridgeRouter.cs:266-277` is still the only catch at
       the `async void` host-message boundary (no broad `catch (Exception)` added there).
-- [ ] **AC-4 (#499)** — `BindRowsAsync` sets `SelectedFolderPath` to `null` alongside `_selectedRowId = null`
+- [x] **AC-4 (#499)** — `BindRowsAsync` sets `SelectedFolderPath` to `null` alongside `_selectedRowId = null`
       (`BreadcrumbBridgeRouter.cs:136`), so after a re-bind that follows a selection `SelectedFolderPath` is
       `null` rather than the pre-rebind folder. The two existing `SelectedFolderPath` write sites — `SelectRow`
       (`:484-487`) and `SelectHierarchyPath` (`:497`) — are unchanged, and a test confirms each still assigns
       the value it assigns today.
-- [ ] **AC-5 (#499)** — `SelectedFolderPathChanged(this, null)` is raised on that clear **only when the value
+- [x] **AC-5 (#499)** — `SelectedFolderPathChanged(this, null)` is raised on that clear **only when the value
       actually changed**; a re-bind with no prior selection raises no event.
-- [ ] **AC-6 (#499)** — No auto-selection side effect is introduced: `SelectFirstRow`
+- [x] **AC-6 (#499)** — No auto-selection side effect is introduced: `SelectFirstRow`
       (`BreadcrumbBridgeRouter.cs:192-199`) is still not called from `BindRowsAsync` (`:92-138`).
-- [ ] **AC-7 (#440 Qfc prerequisite)** — `OutlookFolderHierarchyProvider.ResolveLeafKeyAsync` (`:52-71`) keeps
+- [x] **AC-7 (#440 Qfc prerequisite)** — `OutlookFolderHierarchyProvider.ResolveLeafKeyAsync` (`:52-71`) keeps
       its exact `OrdinalIgnoreCase` first pass (`:66-68`): a caller supplying a full Outlook path resolves
       exactly as it does today. A test asserts EXPLICITLY that the landed Efc full-path caller — the value
       produced by `BreadcrumbBridgeRouter.ToHierarchyPath` (`:140-163`) — resolves through the exact first pass
       and NEVER reaches the suffix fallback, so the D5 change is a strict no-op for the Efc surface.
-- [ ] **AC-8 (#440 Qfc prerequisite)** — When the exact pass misses, a segment-boundary suffix match resolves
+- [x] **AC-8 (#440 Qfc prerequisite)** — When the exact pass misses, a segment-boundary suffix match resolves
       an archive-root-relative stem (for example `Projects\Alpha`) to the unique node whose `FolderPath` ends
       with `\Projects\Alpha`.
-- [ ] **AC-9 (#440 Qfc prerequisite)** — The suffix fallback is accepted **only when unique**: with a decoy
+- [x] **AC-9 (#440 Qfc prerequisite)** — The suffix fallback is accepted **only when unique**: with a decoy
       node (`\\store\Inbox\Projects\Alpha` alongside `\\store\Archive\Projects\Alpha`) the method returns
       `null`, logs at `Error`, and the row keeps today's single-segment fallback rendering
       (`BreadcrumbRowBuilder.cs:121-142`, fallback segment constructed at `:123-131`, which is not modified).
@@ -1026,7 +1043,7 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
       `Issue439ArchiveRelativeRowsRenderLineagePreserveFilingTargetAndProbability` in
       `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs:20-116`, whose root-to-leaf ordering
       assertion is at `:108-113`. No work item here; the test file is read-only for this feature.
-- [ ] **AC-11 (#440 Qfc prerequisite)** — On the Qfc surface, the D5 resolution produces a multi-segment chain,
+- [x] **AC-11 (#440 Qfc prerequisite)** — On the Qfc surface, the D5 resolution produces a multi-segment chain,
       asserted in `UtilitiesCS.Test/OutlookObjects/Folder/FolderBreadcrumbBridgeRouterTests.cs` against a
       `MockBehavior.Strict` provider (`ProviderMock`, `:51-70`).
 - [x] **AC-12 (#439 / former decision D6a — INHERITED-AND-VERIFIED, retired)** — The suggestion-row
@@ -1040,19 +1057,19 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
       (`BreadcrumbBridgeRouter.cs:484-487`). Verified by the assertion that `SelectedFolderPath` equals the
       presented stem at `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs:115`, so the
       `DestinationOlStem` contract at `EfcDataModel.cs:286`, `:307`, `:325` is unbroken. No work item here.
-- [ ] **AC-14 (#440 Qfc prerequisite, decision D7 — Qfc filing target)** — The D7 ladder rung actually taken is
+- [x] **AC-14 (#440 Qfc prerequisite, decision D7 — Qfc filing target)** — The D7 ladder rung actually taken is
       recorded in this spec's RISK-1 entry with the read-only evidence that selected it, and that rung's stated
       criterion is met: rung 1 — a test shows the Qfc selected-folder value is still the presented stem after
       the chain resolves, with `BreadcrumbSelectionMap.cs` unmodified; rung 2 — a test shows Qfc filing
       behavior is byte-identical to today because the router does not consume the newly-resolved chain for the
       filing path, and the deliberate limitation is recorded in this spec; rung 3 — execution halted and
       reported the blocking dependency on `BreadcrumbSelectionMap.cs:109` without writing it.
-- [ ] **AC-15 (#440)** — On the Efc surface, Left on a row whose resolved chain has more than one segment
+- [x] **AC-15 (#440)** — On the Efc surface, Left on a row whose resolved chain has more than one segment
       selects that row's parent node, and repeated Left presses walk up the ancestor chain. The transition is
       expressed through the landed `BreadcrumbRow.ActivateSegment(int)` (`BreadcrumbRow.cs:151-172`), not
       through a newly added parallel selected-node index (D9). A test asserts `ActiveSegmentIndex` decreases by
       one per Left press until `ActivateSegment` refuses at the root, at which point the D1 fall-through runs.
-- [ ] **AC-16 (#440)** — On the Efc surface, Right on a selected node expands it into its children, retrieved
+- [x] **AC-16 (#440)** — On the Efc surface, Right on a selected node expands it into its children, retrieved
       through the existing `IFolderHierarchyProvider.GetImmediateSubfoldersAsync`
       (`IFolderHierarchyProvider.cs:46-49`) in a SINGLE call keyed on `row.ActiveSegmentKey`
       (`BreadcrumbRow.cs:101-105`), matching the landed `ExpandLeafAsync`
@@ -1063,67 +1080,67 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
       back toward the leaf is implemented and tested — `ActivateSegment` refuses the leaf index
       (`BreadcrumbRow.cs:156`) and cannot express it — and the spec's D9 entry records which of the two
       permitted mechanisms was chosen.
-- [ ] **AC-17 (#440)** — The Qfc surface implements the same Left/Right tree contract through
+- [x] **AC-17 (#440)** — The Qfc surface implements the same Left/Right tree contract through
       `BreadcrumbStateModel` (`:424-455`) and `FolderBreadcrumbBridgeRouter.ArrowAsync` (`:378-406`), asserted
       by tests on both the state model and the router.
-- [ ] **AC-18 (#440, decision D1 — handling order)** — On both surfaces the handling order is exactly:
+- [x] **AC-18 (#440, decision D1 — handling order)** — On both surfaces the handling order is exactly:
       (1) the new parent-select / expand-node transition when one is available for this row, else (2) the
       existing breadcrumb expand/collapse behavior, else (3) the existing `unhandledArrow` fall-through
       unchanged. A test asserts a row with a single-segment chain still takes the pre-existing path.
-- [ ] **AC-19 (decision D1 — message shapes)** — The `arrowKey` and `unhandledArrow` message shapes are
+- [x] **AC-19 (decision D1 — message shapes)** — The `arrowKey` and `unhandledArrow` message shapes are
       unchanged, and `QuickFiler.Test/Viewers/FolderBreadcrumbAssetContractTests.cs`
       `LeftAndRightBreadcrumbMessages_RemainSupported` (`:359-367`) passes **unmodified**; that file does not
       appear in the feature diff.
-- [ ] **AC-20 (decision D1 — selector session)** — `UtilitiesCS/OutlookObjects/Folder/BreadcrumbSelectionSession.cs`
+- [x] **AC-20 (decision D1 — selector session)** — `UtilitiesCS/OutlookObjects/Folder/BreadcrumbSelectionSession.cs`
       is unmodified, and the #400 selector-session tests
       (`UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbStateModelSelectorTests.cs`) pass unmodified, so
       #400 AC-9's committed/original/pending clause survives.
-- [ ] **AC-21 (decision D1 — supersession record)** — This spec contains a reviewer-findable record (section
+- [x] **AC-21 (decision D1 — supersession record)** — This spec contains a reviewer-findable record (section
       "#400 AC-9 supersession record") naming exactly which clause of #400 AC-9
       (`docs/features/archive/2026-07-21-quickfiler-folder-selector-dropdown-400/spec.md:247`) is retracted and
       which clauses survive.
-- [ ] **AC-22 (decision D1 — #400 residual contract)** — #400 AC-5 through AC-8 (`spec.md:243-246`), the
+- [x] **AC-22 (decision D1 — #400 residual contract)** — #400 AC-5 through AC-8 (`spec.md:243-246`), the
       Up/Down/Enter/Escape selector contract, are unchanged, demonstrated by the corresponding #400 tests
       passing unmodified.
-- [ ] **AC-23 (decision D2 — Efc boundaries)** — Efc boundary behavior is unchanged: Left at the root and
+- [x] **AC-23 (decision D2 — Efc boundaries)** — Efc boundary behavior is unchanged: Left at the root and
       Right on a childless node remain silent no-ops emitting no message. **The Efc boundary code moved with
       PR #605 and is re-cited here:** the `LeftArrow` root refusal is at `BreadcrumbRow.cs:304-308`; the arrow
       routing is at `BreadcrumbBridgeRouter.cs:304-339` (Right branch `:308-321`, Left branch `:322-328`); and
       the childless-node early return, which now tests the ACTIVE segment rather than the leaf, is at
       `ExpandLeafAsync` `:366-370`.
-- [ ] **AC-24 (decision D2 — Qfc boundaries)** — Qfc boundary behavior is unchanged: an unhandled transition
+- [x] **AC-24 (decision D2 — Qfc boundaries)** — Qfc boundary behavior is unchanged: an unhandled transition
       still emits `UnhandledArrowMessage` (`FolderBreadcrumbBridgeRouter.cs:387-393`) and still reaches
       `KeyboardHandler.BreadcrumbArrowFallThrough` (`:288-315`, Right branch `:302-310`), so Right still opens
       the Pop Out / Enumerate Conversation dialog and Left still calls `SetFolderDroppedDown(false)` (`:313`).
       Asserted at the `BreadcrumbArrowFallThrough` call site (precedent
       `QuickFiler.Test/Controllers/QfcItemControllerBreadcrumbDropDownTests.cs:156-168`), never by invoking the
       modal `MyBox.ShowDialog` (`:304-309`).
-- [ ] **AC-25 (#498 — RED first)** — A regression test for #498 in
+- [x] **AC-25 (#498 — RED first)** — A regression test for #498 in
       `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterQueueTests.cs` is demonstrated **failing before the
       fix** and passing after, with the failing run recorded in the feature's evidence directory.
-- [ ] **AC-26 (#499 — RED first)** — A regression test for #499 in
+- [x] **AC-26 (#499 — RED first)** — A regression test for #499 in
       `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterQueueTests.cs` is demonstrated failing before the fix
       and passing after, with the failing run recorded.
-- [ ] **AC-27 (#440 Qfc prerequisite — RED first)** — A regression test for the D5 suffix fallback in
+- [x] **AC-27 (#440 Qfc prerequisite — RED first)** — A regression test for the D5 suffix fallback in
       `UtilitiesCS.Test/OutlookObjects/Folder/OutlookFolderHierarchyProviderTests.cs` (realistic full paths
       plus a decoy node) is demonstrated failing before the fix and passing after, with the failing run
       recorded. The test home is unchanged from version 1.0; only the attribution changed.
-- [ ] **AC-28 (#440 — RED first)** — A regression test for #440 in
+- [x] **AC-28 (#440 — RED first)** — A regression test for #440 in
       `UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbRowStateTests.cs` and/or
       `BreadcrumbStateModelTests.cs` is demonstrated failing before the fix and passing after, with the failing
       run recorded.
-- [ ] **AC-29 (policy — toolchain)** — The full C# toolchain passes in one clean pass, in order:
+- [x] **AC-29 (policy — toolchain)** — The full C# toolchain passes in one clean pass, in order:
       `dotnet tool run csharpier format .` (verified by `dotnet tool run csharpier check .`), the
       `EnableNETAnalyzers`/`EnforceCodeStyleInBuild` rebuild, the `TreatWarningsAsErrors` rebuild, and
       `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`, with the commands and their results
       reported.
-- [ ] **AC-30 (policy — ownership)** — No file outside the owned set listed under "Scope & Non-Goals" is
+- [x] **AC-30 (policy — ownership)** — No file outside the owned set listed under "Scope & Non-Goals" is
       modified. In particular `EfcFormController.cs`, `KbdActions.cs`,
       `QuickFiler/Viewers/BreadcrumbBridgeCoordinator.cs` (**sibling epic child 501 owns it**),
       `BreadcrumbRowBuilder.cs`, `BreadcrumbDocumentAssets.cs`, `BreadcrumbHtmlRenderer.cs`,
       `BreadcrumbSelectionMap.cs`, `IFolderHierarchyProvider.cs`, `FolderBreadcrumbAssetContractTests.cs`, and
       `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` are absent from the diff.
-- [ ] **AC-31 (policy — file size, decision D8)** — `QuickFiler/Controllers/BreadcrumbBridgeRouter.cs`
+- [x] **AC-31 (policy — file size, decision D8)** — `QuickFiler/Controllers/BreadcrumbBridgeRouter.cs`
       finishes at or under 500 lines. It starts at **596** lines, already in breach, so the mandatory D8
       partial-class split is performed FIRST and must bring the file to <= 500 INCLUDING this feature's
       additions; the new partial file carries a `<Compile Include>` entry in `QuickFiler/QuickFiler.csproj`
@@ -1161,7 +1178,30 @@ Mocking: **Moq**. Assertions: **FluentAssertions**. No live Outlook or COM depen
        `BreadcrumbSelectionMap.cs` and execution stops and reports it rather than writing an unowned file.
        *Criterion:* execution halted, the blocking dependency reported with the `BreadcrumbSelectionMap.cs:109`
        citation, and no unowned file written.
-    **Rung taken:** _to be recorded during execution._
+    **Rung taken: RUNG 1 (PREFERRED), delivered.** The presented stem is preserved entirely within
+    owned files and `UtilitiesCS/OutlookObjects/Folder/BreadcrumbSelectionMap.cs` is unmodified.
+    **Read-only evidence that selected the rung:** `BreadcrumbSelectionMap.RowValue` (`:109`) reads
+    `row.Chain[row.Chain.Count - 1].FolderPath`; that leaf segment is constructed by the OWNED
+    `FolderBreadcrumbBridgeRouter.SetSuggestionsAsync` from the public immutable
+    `FolderBreadcrumbSegment` constructor (`FolderBreadcrumbSegment.cs:29-40`), which separates
+    `Key` (navigation identity) from `FolderPath` (the selection value); and the only other readers
+    of `BreadcrumbStateRow.Chain` in `UtilitiesCS/OutlookObjects/Folder` and `QuickFiler` read
+    `DisplayName` (`BreadcrumbRenderProjection.cs:177`) or `Key`
+    (`FolderBreadcrumbBridgeRouter.cs:416`), never the leaf `FolderPath`. The substitution is
+    therefore observationally confined to the filing value. **Evidence artifact:**
+    `docs/features/active/breadcrumb-router-navigation-defects-498/evidence/other/p4-t1-d7-rung-verification.md`,
+    which records the line `D7 RUNG SELECTED: 1`.
+    **Delivery.** `BreadcrumbStateRow` gained an internal constructor overload taking the presented
+    filing target, with a private static `WithFilingTarget` that replaces the leaf segment's
+    `FolderPath` while keeping its `Key`, `DisplayName` and `HasChildren`
+    (`UtilitiesCS/OutlookObjects/Folder/BreadcrumbStateModel.cs`), and `SetSuggestionsAsync` now
+    constructs resolved suggestion rows through it. Rung-1 criterion met:
+    `SelectedFolder_ChainResolvedToFullPath_RemainsPresentedStem` fails before the change
+    (`evidence/regression-testing/p5-t2-d7-red.md`) and passes after
+    (`evidence/regression-testing/p5-t3-d7-rung1-green.md`), with
+    `git status --porcelain --untracked-files=all -- UtilitiesCS/OutlookObjects/Folder/BreadcrumbSelectionMap.cs`
+    producing no output. Rungs 2 and 3 do not apply and are recorded NOT APPLICABLE in
+    `evidence/regression-testing/p5-t4-d7-rung2.md` and `evidence/other/p5-t5-d7-rung3-halt.md`.
 
   - **RISK-2 (former decision D6a) — RESOLVED BY INHERITANCE.** The risk was that the suggestion-row
     percentage would be silently lost, because it worked only while the lineage was broken

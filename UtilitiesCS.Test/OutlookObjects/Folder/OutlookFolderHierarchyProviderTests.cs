@@ -33,6 +33,42 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             "\\Root\\Clients\\Beta"
         );
 
+        // Realistic store-qualified Outlook paths under an Archive root, used by the decision-D5
+        // suffix-match tests. The Qfc surface presents ArchiveStem, never these full paths.
+        private const string ArchiveStem = "Projects\\Alpha";
+        private static readonly FolderTreeNodeKey ArchiveRootKey = Key(
+            "store-b",
+            "archive-root",
+            "\\\\Mailbox - User\\Archive"
+        );
+        private static readonly FolderTreeNodeKey ArchiveProjectsKey = Key(
+            "store-b",
+            "archive-projects",
+            "\\\\Mailbox - User\\Archive\\Projects"
+        );
+        private static readonly FolderTreeNodeKey ArchiveAlphaKey = Key(
+            "store-b",
+            "archive-alpha",
+            "\\\\Mailbox - User\\Archive\\Projects\\Alpha"
+        );
+
+        // A decoy sharing the last two segments with the Archive leaf, under a different root.
+        private static readonly FolderTreeNodeKey InboxRootKey = Key(
+            "store-b",
+            "inbox-root",
+            "\\\\Mailbox - User\\Inbox"
+        );
+        private static readonly FolderTreeNodeKey InboxProjectsKey = Key(
+            "store-b",
+            "inbox-projects",
+            "\\\\Mailbox - User\\Inbox\\Projects"
+        );
+        private static readonly FolderTreeNodeKey InboxAlphaKey = Key(
+            "store-b",
+            "inbox-alpha",
+            "\\\\Mailbox - User\\Inbox\\Projects\\Alpha"
+        );
+
         [TestMethod]
         public async Task GetAncestorChainAsync_HappyPath_ReturnsRootToLeafSegments()
         {
@@ -191,6 +227,88 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             resolved.Should().Be(firstKey);
         }
 
+        /// <summary>
+        /// The QuickFiler surface presents an archive-relative stem rather than a store-qualified
+        /// full path. Exactly one snapshot node's path ends with that stem, so resolution must
+        /// return that node's key; without it the row renders leaf-only and has no parent to
+        /// navigate to.
+        /// </summary>
+        [TestMethod]
+        public async Task ResolveLeafKeyAsync_ArchiveRelativeStem_ResolvesToUniqueSuffixMatchNode()
+        {
+            // Arrange
+            var provider = new OutlookFolderHierarchyProvider(
+                ServiceReturning(BuildArchiveSnapshot()).Object
+            );
+
+            // Act
+            var resolved = await provider.ResolveLeafKeyAsync(ArchiveStem, CancellationToken.None);
+
+            // Assert
+            resolved
+                .Should()
+                .NotBeNull("exactly one snapshot node path ends with the presented stem");
+            resolved.FolderPath.Should().Be(ArchiveAlphaKey.FolderPath);
+        }
+
+        /// <summary>
+        /// The Efc surface supplies the store-qualified path produced by
+        /// <c>BreadcrumbBridgeRouter.ToHierarchyPath</c>. That value must resolve through the exact
+        /// first pass, so the decision-D5 suffix fallback is a strict no-op for the Efc surface.
+        /// The snapshot is arranged so the suffix fallback, if it were reached, would find no
+        /// candidate at all and return null; a non-null exact key therefore proves the first pass
+        /// produced the answer.
+        /// </summary>
+        [TestMethod]
+        public async Task ResolveLeafKeyAsync_EfcFullHierarchyPath_ResolvesByExactFirstPassWithoutSuffixFallback()
+        {
+            // Arrange: "\\Mailbox - User\Archive" joined to the presented stem "Projects\Alpha",
+            // which is exactly what ToHierarchyPath returns for an archive-relative Efc row.
+            string hierarchyPath = ArchiveRootKey.FolderPath + "\\" + ArchiveStem;
+            var snapshot = BuildArchiveSnapshot();
+            var provider = new OutlookFolderHierarchyProvider(ServiceReturning(snapshot).Object);
+            snapshot
+                .NodesByKey.Values.Where(node =>
+                    node.FolderPath.EndsWith(
+                        "\\" + hierarchyPath,
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
+                .Should()
+                .BeEmpty("the suffix fallback must have no candidate for a full hierarchy path");
+
+            // Act
+            var resolved = await provider.ResolveLeafKeyAsync(
+                hierarchyPath,
+                CancellationToken.None
+            );
+
+            // Assert: a key came back, so the exact pass answered and the fallback was not reached.
+            resolved.Should().Be(ArchiveAlphaKey);
+        }
+
+        /// <summary>
+        /// The suffix fallback is accepted only when exactly one node qualifies. With a decoy under
+        /// a different root sharing the last two segments, the method returns null and logs at
+        /// Error, so the row keeps today's single-segment fallback rendering.
+        /// </summary>
+        [TestMethod]
+        public async Task ResolveLeafKeyAsync_AmbiguousStemWithDecoyNode_ReturnsNullAndLogsError()
+        {
+            // Arrange
+            var provider = new OutlookFolderHierarchyProvider(
+                ServiceReturning(BuildArchiveSnapshotWithDecoy()).Object
+            );
+
+            // Act
+            var resolved = await provider.ResolveLeafKeyAsync(ArchiveStem, CancellationToken.None);
+
+            // Assert
+            resolved
+                .Should()
+                .BeNull("an ambiguous stem must not be resolved to either candidate folder");
+        }
+
         [TestMethod]
         public void Constructor_WithNullService_ThrowsArgumentNullException()
         {
@@ -253,9 +371,88 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             );
         }
 
+        /// <summary>
+        /// A three-level Archive tree carrying realistic store-qualified paths and realistic
+        /// relative paths, so that a suffix match on <see cref="ArchiveStem"/> is unique.
+        /// </summary>
+        private static FolderTreeSnapshot BuildArchiveSnapshot()
+        {
+            return new FolderTreeSnapshot(new[] { ArchiveRootKey }, ArchiveNodes());
+        }
+
+        /// <summary>
+        /// The Archive tree plus an Inbox tree whose leaf shares the last two segments, so a suffix
+        /// match on <see cref="ArchiveStem"/> is ambiguous.
+        /// </summary>
+        private static FolderTreeSnapshot BuildArchiveSnapshotWithDecoy()
+        {
+            return new FolderTreeSnapshot(
+                new[] { ArchiveRootKey, InboxRootKey },
+                ArchiveNodes()
+                    .Concat(BranchNodes(InboxRootKey, InboxProjectsKey, InboxAlphaKey, "Inbox"))
+            );
+        }
+
+        private static IEnumerable<FolderTreeSnapshotNode> ArchiveNodes()
+        {
+            return BranchNodes(ArchiveRootKey, ArchiveProjectsKey, ArchiveAlphaKey, "Archive");
+        }
+
+        /// <summary>
+        /// A root/Projects/Alpha branch whose nodes carry explicit, realistic relative paths.
+        /// </summary>
+        private static IEnumerable<FolderTreeSnapshotNode> BranchNodes(
+            FolderTreeNodeKey rootKey,
+            FolderTreeNodeKey projectsKey,
+            FolderTreeNodeKey alphaKey,
+            string rootName
+        )
+        {
+            yield return NodeWithRelativePath(rootKey, rootName, rootName, null, projectsKey);
+            yield return NodeWithRelativePath(
+                projectsKey,
+                "Projects",
+                rootName + "\\Projects",
+                rootKey,
+                alphaKey
+            );
+            yield return NodeWithRelativePath(
+                alphaKey,
+                "Alpha",
+                rootName + "\\Projects\\Alpha",
+                projectsKey
+            );
+        }
+
         private static FolderTreeNodeKey Key(string storeId, string entryId, string folderPath)
         {
             return new FolderTreeNodeKey(storeId, entryId, folderPath);
+        }
+
+        /// <summary>
+        /// Builds a node whose relative path is supplied explicitly, rather than the display-name
+        /// shorthand used by <see cref="Node"/>.
+        /// </summary>
+        private static FolderTreeSnapshotNode NodeWithRelativePath(
+            FolderTreeNodeKey key,
+            string displayName,
+            string relativePath,
+            FolderTreeNodeKey parentKey,
+            params FolderTreeNodeKey[] childKeys
+        )
+        {
+            return new FolderTreeSnapshotNode(
+                key,
+                displayName,
+                key.StoreId,
+                key.EntryId,
+                parentKey,
+                key.FolderPath,
+                relativePath,
+                childKeys,
+                false,
+                string.Empty
+            );
         }
 
         private static FolderTreeSnapshotNode Node(

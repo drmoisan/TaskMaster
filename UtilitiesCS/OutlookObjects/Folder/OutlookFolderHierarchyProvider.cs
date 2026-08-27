@@ -14,6 +14,10 @@ namespace UtilitiesCS.OutlookObjects.Folder
     /// </summary>
     public sealed class OutlookFolderHierarchyProvider : IFolderHierarchyProvider
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
+            System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
+        );
+
         private readonly IOutlookFolderTreeService _treeService;
 
         /// <summary>
@@ -67,7 +71,46 @@ namespace UtilitiesCS.OutlookObjects.Folder
                 string.Equals(node.FolderPath, folderPath, StringComparison.OrdinalIgnoreCase)
             );
 
-            return match?.Key;
+            if (match != null)
+            {
+                return match.Key;
+            }
+
+            return ResolveByUniqueSuffix(snapshot, folderPath);
+        }
+
+        /// <summary>
+        /// Second resolution pass for a relative stem such as <c>Projects\Alpha</c>, which the
+        /// QuickFiler surface presents in place of a store-qualified path. Accepts a node whose
+        /// full path ends with a directory separator followed by the requested path, and only when
+        /// exactly one node qualifies: uniqueness is the safety property that prevents filing into
+        /// a same-named folder under a different root. Zero or multiple candidates return null, so
+        /// the caller keeps today's single-segment fallback rendering.
+        /// </summary>
+        private static FolderTreeNodeKey? ResolveByUniqueSuffix(
+            FolderTreeSnapshot snapshot,
+            string folderPath
+        )
+        {
+            string suffix = "\\" + folderPath;
+            var candidates = snapshot
+                .NodesByKey.Values.Where(node =>
+                    node.FolderPath.EndsWith(suffix, StringComparison.OrdinalIgnoreCase)
+                )
+                .Take(2)
+                .ToArray();
+
+            if (candidates.Length == 1)
+            {
+                return candidates[0].Key;
+            }
+
+            logger.Error(
+                candidates.Length == 0
+                    ? $"No snapshot node path ends with '{suffix}'; leaving '{folderPath}' unresolved."
+                    : $"Multiple snapshot node paths end with '{suffix}'; leaving '{folderPath}' unresolved."
+            );
+            return null;
         }
 
         private Task<FolderTreeSnapshot> AcquireSnapshotAsync(CancellationToken cancellationToken)

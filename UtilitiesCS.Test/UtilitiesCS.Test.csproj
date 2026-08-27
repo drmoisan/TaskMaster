@@ -276,6 +276,7 @@
     <Compile Include="OutlookObjects\Folder\BreadcrumbHtmlRendererTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbMessageCodecTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRowBuilderTests.cs" />
+    <Compile Include="OutlookObjects\Folder\ArchiveStemContractTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbRowStateTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderTreeNodeKeyTests.cs" />
     <Compile Include="OutlookObjects\Folder\BreadcrumbBridgeMessagesTests.cs" />
@@ -346,6 +347,7 @@
     <Compile Include="OutlookObjects\Item\OutlookItemTests.cs" />
     <Compile Include="OutlookObjects\Item\OutlookItemTryTests.cs" />
     <Compile Include="OutlookObjects\Item\OutlookItemTryGetTests.cs" />
+    <Compile Include="OutlookObjects\Folder\FolderConverterIssue614Tests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderConverterTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderMinimalWrapperTests.cs" />
     <Compile Include="OutlookObjects\Folder\FolderNavigatorTests.cs" />

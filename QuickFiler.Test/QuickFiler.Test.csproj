@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\Meziantou.Analyzer.3.0.174\build\Meziantou.Analyzer.props" Condition="Exists('..\packages\Meziantou.Analyzer.3.0.174\build\Meziantou.Analyzer.props')" />
   <Import Project="..\packages\MSTest.TestAdapter.4.3.3\build\net462\MSTest.TestAdapter.props" Condition="Exists('..\packages\MSTest.TestAdapter.4.3.3\build\net462\MSTest.TestAdapter.props')" />
@@ -56,7 +56,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Controllers\BreadcrumbBridgeRouterQueueTests.cs" />
+    <Compile Include="Controllers\BreadcrumbBridgeRouterQueueTests.Part2.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterTests.cs" />
+    <Compile Include="Controllers\BreadcrumbBridgeRouterTests.Selection.cs" />
+    <Compile Include="Controllers\BreadcrumbBridgeRouterIssue614Tests.cs" />
+    <Compile Include="Controllers\EfcSelectionGuardTests.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterIssue439Tests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorTests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorProbabilityTests.cs" />
@@ -102,6 +106,7 @@
     <Compile Include="Controllers\FilerQueueTests.cs" />
     <Compile Include="Controllers\QfcQueueCoverageExpansionTests.cs" />
     <Compile Include="Controllers\QfcQueuePurePathsTests.cs" />
+    <Compile Include="Controllers\EfcDataModelIssue614Tests.cs" />
     <Compile Include="Controllers\EfcDataModelTests.cs" />
     <Compile Include="Controllers\EfcFormControllerTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerDependenciesTests.cs" />
@@ -116,6 +121,11 @@
     <Compile Include="Controllers\EfcHomeControllerSeamTests.cs" />
     <Compile Include="Controllers\QfcCollectionControllerTests.cs" />
     <Compile Include="Controllers\QfcCollectionControllerDarkModeTests.cs" />
+    <Compile Include="Controllers\QfcCollectionController.TestSupport.cs" />
+    <Compile Include="Controllers\QfcCollectionControllerDefects468Tests.cs" />
+    <Compile Include="Controllers\QfcCollectionControllerDefects468MoveTests.cs" />
+    <Compile Include="Controllers\QfcCollectionControllerDefects468ConversationTests.cs" />
+    <Compile Include="Controllers\QfcCollectionControllerLayout.StaTests.cs" />
     <Compile Include="Controllers\QfcDatamodelTests.cs" />
     <Compile Include="Controllers\QfcDatamodelLivenessTests.cs" />
     <Compile Include="Controllers\QfcExplorerController.ConversationViewTests.cs" />
@@ -191,6 +201,9 @@
     </Reference>
     <Reference Include="Deedle, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Deedle.3.0.0\lib\netstandard2.0\Deedle.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=3.3.2.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.3.3.2\lib\net462\log4net.dll</HintPath>
     </Reference>
     <Reference Include="FluentAssertions, Version=8.10.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentAssertions.8.10.0\lib\net47\FluentAssertions.dll</HintPath>
