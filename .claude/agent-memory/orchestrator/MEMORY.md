@@ -91,6 +91,8 @@
 - [blocked_reason enum can't express a substantive halt](blocked-reason-enum-cannot-express-substantive-halt.md) — 7 mechanical members only; use "none" plus free-form halt/blocking_findings keys, never a wrong member
 - [CR-pattern grep falsely reports 100% CRLF](grep-cr-empty-pattern-false-crlf.md) — the shell strips the CR, leaving an empty pattern matching every line; re-measure with a binary read
 
+- [Resumed child orchestrator shares your worktree](resumed-child-orchestrator-shares-worktree.md) — duplicate evidence sets + UTC-vs-local labels mean a live owner; cede, do not race to PR
+
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
 - [Closing keyword fires inside a negation](closing-keyword-fires-inside-negation.md) — `does NOT fix #511` still auto-closes #511; scan commit messages and PR bodies, never file contents
