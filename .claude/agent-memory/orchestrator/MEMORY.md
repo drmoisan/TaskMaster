@@ -18,6 +18,7 @@
 - [new_active_feature_folder date prefix](new-active-feature-folder-date-prefix.md) — standalone folders get the YYYY-MM-DD- prefix automatically; epic-child folders don't
 - [orchestrator-state validator divergence](orchestrator-state-validator-divergence.md) — the MCP check is stricter than the real SubagentStop hook; conform to the canonical schema
 - [orchestrator-state flat keys + step-status enum](orchestrator-state-flat-keys-and-enum.md) — FLAT top-level variable keys and enum step statuses (in_progress, not in-progress)
+- [step_status "completed" write-locks the checkpoint](step-status-completed-write-locks-checkpoint.md) — step8/9/10 "completed" without a ci_gate makes EVERY later checkpoint edit fail COMPLETION_CONSISTENCY_BLOCKED
 - [C# analyzer packages.config quirks](csharp-analyzer-packages-config-quirks.md) — non-SDK analyzer wiring needs manual roslyn subfolder choice; SecurityCodeScan breaks Roslyn 5.6
 - [Whole-repo CI gate is not out-of-scope](whole-repo-ci-gate-not-out-of-scope.md) — a pre-existing repo-wide csharpier/lint failure blocks the PR's required check; fix it
 - [Honor user's per-cycle folder layout](feedback_verify_flat_artifact_layout_after_executor.md) — follow the user's own reorg; only revert UNDIRECTED agent relocations
@@ -68,6 +69,7 @@
 - [Epic-child agent-memory merge conflicts](epic-child-agent-memory-merge-conflicts.md) — CONFLICTING solely on shared MEMORY.md index files; union, then re-verify post-merge
 - [Epic-child nullable fan-in debt is deferred](project_epic_child_nullable_fanin_debt_deferred.md) — cross-child CS86xx fan-in is the capstone's job; don't over-remediate sibling files
 - [C# coverage has two denominators](csharp-coverage-denominator-two-figures.md) — filtered first-party ~85.9% clears the gate, unfiltered ~70.4% doesn't; measure before trusting
+- [lines-covered is nondeterministic; lines-valid is not](coverage-lines-covered-is-nondeterministic.md) — same-tree runs drift up to 4 lines per file, so a per-file covered-line gate fails on correct work
 - [Preflight catches vacuous gates](preflight-catches-vacuous-gates.md) — MCP `ok:true` is not enough; executor preflight found 6 gates that passed while verifying nothing
 - [Revert plans must check test provenance](revert-plans-must-check-test-provenance.md) — verify each test against the pre-change sha; a test that predates the change must survive
 - [Bash tool mangles MSBuild switches](bash-tool-mangles-msbuild-switches.md) — `/m` becomes `M:/` (MSB1008); run C# tools via `pwsh -NoProfile` with absolute paths

@@ -217,10 +217,11 @@ If any step P5-T1 through P5-T4 fails or the formatter rewrites any file, fix an
     - branches: `branches-valid_post <= branches-valid_base` AND
       `branches-covered_post >= branches-covered_base - (branches-valid_base - branches-valid_post)`.
   Together these bound the coverage lost to at most the covered-line count removed from the
-  denominator. The branch gate is exact (all 14 deleted branches were covered, so any branch
-  regression fails it); the line gate carries exactly one line of slack, because one deleted line
-  (`EfcFormController.cs`) was uncovered. Section (e) closes that slack arithmetically; section (d)
-  covers changed lines only and cannot bear on retained lines. Also report the raw rates and show the
+  denominator. Neither gate is exact: the line gate carries slack equal to the number of deleted
+  lines that were uncovered, which is FOUR and not one (`EfcFormController.cs` measures 717/81
+  deduplicated at the cycle-1 head against 713/81 before it, so the revert removes four uncovered
+  lines). Section (e) is what closes that slack; section (d) covers changed lines only and cannot
+  bear on retained lines. Also report the raw rates and show the
   arithmetic tying any raw decrease to the deleted covered lines (reference projection:
   53986/63605 = 84.8770% line, 12749/16168 = 78.8525% branch). If a raw rate instead rises, that
   also satisfies this gate. If either gate misses, re-run the P5-T4 measurement ONCE (known
@@ -228,37 +229,69 @@ If any step P5-T1 through P5-T4 fails or the formatter rewrites any file, fix an
   failure. The pre-existing shortfall against the repo-wide 85% floor is reported as pre-existing
   and is explicitly NOT gated to 85% this cycle.
   (c) changed-method coverage — gate: 100% line AND 100% branch for `QuickFiler/Controllers/EfcSelectionGuard.cs` as a file (methods `IsValidFilingSelection`, `IsValidCreationSelection`), aggregating Cobertura `<class>` entries by `filename`; `UtilitiesCS/OutlookObjects/Folder/ArchiveStemContract.cs` remains at 100% line; the `EmailFilerConfig.cs` `GetStem` ternary (source lines 252-258; read whichever line in that span carries the Cobertura `<line branch="true">` entry) now reports both branch outcomes covered (RC-4 closed), and the file's branch figure is >= its P0-T9 baseline value;
-  (d) changed lines in `EfcFormController.cs` (the reverted `ActionOkAsync` guard call): per-line listing — note the filtered Cobertura carries only line 709 in this range, so read the raw Cobertura (`coverage\coverage.cobertura.raw.p5-t4c2.xml`) for the per-line listing, following the cycle-1 coverage-delta artifact's convention; the surviving lines are WinForms UI event glue (the method reads `SynchronizationContext.Current`, drives `_formViewer`, and shows `MessageBox`), and each uncovered changed line carries that one-line justification, mirroring the ratified section-(d) convention of the cycle-1 coverage-delta artifact;
+  (d) changed lines in `EfcFormController.cs` (the reverted `ActionOkAsync` guard call): per-line listing — the filtered Cobertura DOES carry per-line entries in this range (measured: 701-703, 705, 708-715, 718-720), so read the per-line listing from the filtered Cobertura (`coverage\coverage.cobertura.filtered.p5-t4c2.xml`); the cycle-1 coverage-delta artifact's claim that only line 709 is present was a misreading and is not to be reproduced. Consult the raw Cobertura (`coverage\coverage.cobertura.raw.p5-t4c2.xml`) only for a line the filtered file genuinely omits, and say so explicitly where you do. The surviving lines are WinForms UI event glue (the method reads `SynchronizationContext.Current`, drives `_formViewer`, and shows `MessageBox`), and each uncovered changed line carries that one-line justification, mirroring the ratified section-(d) convention of the cycle-1 coverage-delta artifact;
   (e) explicit statement that no changed line AND no retained line lost coverage relative to the
   baseline. The retained-line claim is established arithmetically, not from the section-(d) listing.
   This cycle edits exactly two production files, `QuickFiler/Controllers/EfcSelectionGuard.cs` and
   `QuickFiler/Controllers/EfcFormController.cs`; every measured line in every other production file
-  is a retained line. From the P0-T9 and P5-T4 filtered Cobertura, aggregating `<class>` entries by
-  `filename`, read `lines-valid` and `lines-covered` for each of those two files before and after
+  is a retained line.
+  **Counting rule (mandatory, applies to every per-file figure in this section).** Cobertura emits
+  MORE THAN ONE `<class>` entry per `filename`, and the same source line appears in several of
+  them. Per-file figures are therefore computed by DEDUPLICATION, never by summation: for a given
+  `filename`, take the union of `<line number=...>` entries across all `<class>` entries carrying
+  that `filename`, keyed on the line number; `lines-valid` for the file is the count of DISTINCT
+  line numbers, and `lines-covered` is the count of DISTINCT line numbers whose maximum `hits`
+  across the duplicate entries is greater than zero. Naive summation overstates both figures by
+  roughly 1.65x to 2.00x (measured on the cycle-1 head: `EfcSelectionGuard.cs` 31/31 deduplicated
+  versus 62/62 naive; `EfcFormController.cs` 717/81 versus 1185/151; `EmailFilerConfig.cs` 124/117
+  versus 254/240), which breaks the identities below. **Self-check on the counting rule, evaluated
+  before any identity:** the sum of deduplicated `lines-valid` over ALL `filename` values in the
+  filtered Cobertura must equal that file's root `lines-valid` attribute exactly (this reduction
+  reproduced the root attribute exactly at 63594 when measured). Record both numbers. If they
+  differ, the counting is wrong; report remediation-required and do NOT evaluate the identities.
+  From the P0-T9 and P5-T4 filtered Cobertura, applying the counting rule above,
+  read `lines-valid` and `lines-covered` for each of those two files before and after
   and record all eight numbers. Set `D_valid` = the sum over the two files of
   (`lines-valid` base minus post) and `D_covered` = the sum over the two files of
   (`lines-covered` base minus post). Both are NET figures read from the two Cobertura files, so the
   measured lines the restored single-argument guard body contributes are already netted against the
   deleted `ResolveArchiveRootOrEmpty`, the deleted cycle-1 `IsValidFilingSelection` body lines and
   the deleted `EfcFormController.cs` lines; do not derive either number by counting deleted source
-  lines by hand. Then assert `lines-valid_base - lines-valid_post == D_valid` AND
-  `lines-covered_base - lines-covered_post == D_covered`. Equality on the second identity is what
-  proves no retained line lost coverage: the two edited files then account for the entire
-  covered-line movement, leaving none of it for any retained line. A shortfall of N covered lines
-  (`lines-covered_base - lines-covered_post` exceeding `D_covered` by N) means N retained lines
-  regressed and the statement in (e) may not be made. A strict excess in the other direction means
-  retained lines GAINED coverage, which is not a regression: record the amount and the source and
-  the gate still passes — an excess is expected in this cycle because the P3-T2 RC-4 test newly
-  exercises the `GetStem` out-of-ancestor arm in the retained file
-  `UtilitiesCS/EmailIntelligence/EmailParsingSorting/EmailFilerConfig.cs`. Because an equal and
-  opposite gain elsewhere could otherwise mask a single-line regression, additionally record the
-  signed per-`filename` `lines-covered` delta for every retained file whose value differs between
-  the two filtered Cobertura files; any retained file with a negative delta fails (e) whether or not
-  the two identities balance. If either identity misses in the failing direction, or any retained
-  file shows a negative delta, re-run the P5-T4 measurement ONCE per the section-(b)
-  nondeterminism rule; if a miss reproduces, name the file that regressed from that per-`filename`
-  comparison and report remediation-required. If any required numeric value is unavailable, the
-  outcome is remediation-required, not PASS.
+  lines by hand.
+  **E1 — hard gate on the deterministic quantity.** Assert
+  `lines-valid_base - lines-valid_post == D_valid`. `lines-valid` is deterministic: two runs over
+  an identical tree produced identical `lines-valid` for all 550 files and an identical root value
+  of 63594. A miss on E1 is therefore a FAILURE on the first measurement, with no re-run tolerance;
+  name the files whose deduplicated `lines-valid` moved unexpectedly and report
+  remediation-required.
+  **E2 — candidate detection on the nondeterministic quantity.** Compute
+  `S = (lines-covered_base - lines-covered_post) - D_covered`, and record the signed
+  per-`filename` `lines-covered` delta for every RETAINED file whose value differs between the two
+  filtered Cobertura files. `S > 0` and any negative per-file delta are CANDIDATE findings, NOT
+  failures. `lines-covered` is nondeterministic: two runs over an identical tree differed by up to
+  4 covered lines per file in both directions (`SubjectMapSco.Orchestration.cs` -4,
+  `PropertyStore.cs` +4, `EfcHomeController.cs` +1) and by 1 at the root (53972 versus 53973), so a
+  single measurement cannot distinguish ambient drift from a one-line regression. A strict excess
+  (`S < 0`) means retained lines GAINED coverage and is not a regression; record the amount and the
+  source. An excess is expected in this cycle because the P3-T2 RC-4 test newly exercises the
+  `GetStem` out-of-ancestor arm in the retained file
+  `UtilitiesCS/EmailIntelligence/EmailParsingSorting/EmailFilerConfig.cs`.
+  **E3 — confirmation by reproduction.** If and only if E2 produced at least one candidate, re-run
+  the P5-T4 measurement once more to produce a SECOND, independent post-change measurement
+  (task-id `p5-t4c2b`, filtered file `coverage\coverage.cobertura.filtered.p5-t4c2b.xml`) against
+  the SAME P0-T9 baseline, and recompute E2 from it. A candidate is CONFIRMED only when it
+  reproduces in the same direction in BOTH post-change measurements. The per-`filename` comparison
+  is authoritative: if `S > 0` reproduces but no per-file negative delta reproduces, record `S` and
+  the discrepancy and the gate PASSES, because no named retained file lost coverage twice.
+  **E4 — adjudication of a confirmed per-file negative delta.** A confirmed negative per-file
+  `lines-covered` delta on a retained file FAILS (e) and reports remediation-required, naming the
+  file and the two measured magnitudes — with one exception, and only one: a file already carried
+  by a hard 100% gate in section (c) (`QuickFiler/Controllers/EfcSelectionGuard.cs` and
+  `UtilitiesCS/OutlookObjects/Folder/ArchiveStemContract.cs`) is adjudicated by that section-(c)
+  gate instead, which is strictly stronger than a delta comparison. No other file is exempt, and no
+  magnitude threshold exempts any file: the reproduction requirement in E3, not a tolerance band,
+  is what separates drift from regression.
+  If any required numeric value is unavailable, the outcome is remediation-required, not PASS.
   Acceptance: artifact exists with all five sections and all stated gates met.
 - [ ] [P5-T6] Post-format file-size and scope re-audit (runs AFTER P5-T1): `(Get-Content <path>).Count` for the four modified code files, then re-run the P4-T2 statements.
   Acceptance: `<FEATURE>/evidence/qa-gates/final-size-scope.<timestamp>.md` records baseline and post-change counts — gates: `EfcFormController.cs` <= 1084 (any count above the 1079 baseline is explained line-by-line), `EfcSelectionGuard.cs` <= 500, `EfcSelectionGuardTests.cs` <= 500, `EmailFilerConfig_Tests.cs` <= 500; `git diff --name-only HEAD` still contains none of the five prohibited paths listed in P4-T2; the modified-path set is unchanged from P4-T2 apart from evidence additions.
