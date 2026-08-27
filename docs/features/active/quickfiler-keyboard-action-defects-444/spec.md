@@ -1134,17 +1134,17 @@ verbatim.
 
 ### Upstream contract and scope discipline
 
-- [ ] The `### Upstream contract (exhaustive) — required by features 464 and 489` section of this spec matches the delivered code exactly: every ADDED, CHANGED, and REMOVED member listed for `QuickFiler/Controllers/KbdActions.cs` and `QuickFiler/Controllers/QfcItemController.Navigation.cs` is present as described, with the stated accessibility and static-ness, and no member outside those tables changed. Verified by reviewing the branch diff for those two files against the tables.
-- [ ] `QuickFiler/Controllers/KeyboardHandler.cs` is not modified.
-- [ ] `QuickFiler/Interfaces/IQfcCollectionController.cs` is not modified.
-- [ ] None of the following nine `QfcItemController` partials is modified: `QfcItemController.cs`, `QfcItemController.Conversation.cs`, `QfcItemController.EventHandlers.cs`, `QfcItemController.EventWiring.cs`, `QfcItemController.FocusAndTheme.cs`, `QfcItemController.FolderHandling.cs`, `QfcItemController.Initialization.cs`, `QfcItemController.MailActions.cs`, `QfcItemController.ViewerSetup.cs`. Verified by the branch diff file list containing none of these nine paths.
-- [ ] The branch diff's production-file list is a subset of exactly three paths: `QuickFiler/Controllers/KbdActions.cs`, `QuickFiler/Controllers/QfcItemController.Navigation.cs`, `QuickFiler/Controllers/QfcCollectionController.cs`. Verified by the branch diff file list.
-- [ ] `KbdActions.Remove` retains its `bool` return and its silent `false` for an absent pair, and no `TryRemove`-style member is added. Verified by the branch diff for `QuickFiler/Controllers/KbdActions.cs`.
-- [ ] No member is added to, removed from, or re-signed on any `public` type, so this feature contributes no public-API change. Verified by the branch diff for the three production files.
-- [ ] Sibling #484's downstream note proposing a timer-factory seam at `QfcItemController.Navigation.cs:223-224` is explicitly declined in this spec, and no timer-factory seam appears in the delivered diff.
-- [ ] Phase 0 re-derived every `QfcCollectionController.cs` and `QuickFiler.Test.csproj` anchor by member name or element text against the actual branch head, and no post-#468 line number was transcribed into the atomic plan. Verified by inspecting the plan for hard-coded line numbers in those two files.
-- [ ] `QuickFiler.Test/NoLiveFormInTestAssemblyTests.cs` passes: no `System.Windows.Forms.Form`-derived type was added to the test assembly.
-- [ ] The new test file is registered in `QuickFiler.Test/QuickFiler.Test.csproj` by a single `<Compile Include>` line inserted between the `Controllers\QfcCollectionControllerTests.cs` and `Controllers\QfcCollectionControllerDarkModeTests.cs` entries, and no other line of that file changed. Verified by the branch diff for the `.csproj`.
+- [x] The `### Upstream contract (exhaustive) — required by features 464 and 489` section of this spec matches the delivered code exactly: every ADDED, CHANGED, and REMOVED member listed for `QuickFiler/Controllers/KbdActions.cs` and `QuickFiler/Controllers/QfcItemController.Navigation.cs` is present as described, with the stated accessibility and static-ness, and no member outside those tables changed. Verified by reviewing the branch diff for those two files against the tables.
+- [x] `QuickFiler/Controllers/KeyboardHandler.cs` is not modified.
+- [x] `QuickFiler/Interfaces/IQfcCollectionController.cs` is not modified.
+- [x] None of the following nine `QfcItemController` partials is modified: `QfcItemController.cs`, `QfcItemController.Conversation.cs`, `QfcItemController.EventHandlers.cs`, `QfcItemController.EventWiring.cs`, `QfcItemController.FocusAndTheme.cs`, `QfcItemController.FolderHandling.cs`, `QfcItemController.Initialization.cs`, `QfcItemController.MailActions.cs`, `QfcItemController.ViewerSetup.cs`. Verified by the branch diff file list containing none of these nine paths.
+- [x] The branch diff's production-file list is a subset of exactly three paths: `QuickFiler/Controllers/KbdActions.cs`, `QuickFiler/Controllers/QfcItemController.Navigation.cs`, `QuickFiler/Controllers/QfcCollectionController.cs`. Verified by the branch diff file list.
+- [x] `KbdActions.Remove` retains its `bool` return and its silent `false` for an absent pair, and no `TryRemove`-style member is added. Verified by the branch diff for `QuickFiler/Controllers/KbdActions.cs`.
+- [x] No member is added to, removed from, or re-signed on any `public` type, so this feature contributes no public-API change. Verified by the branch diff for the three production files.
+- [x] Sibling #484's downstream note proposing a timer-factory seam at `QfcItemController.Navigation.cs:223-224` is explicitly declined in this spec, and no timer-factory seam appears in the delivered diff.
+- [x] Phase 0 re-derived every `QfcCollectionController.cs` and `QuickFiler.Test.csproj` anchor by member name or element text against the actual branch head, and no post-#468 line number was transcribed into the atomic plan. Verified by inspecting the plan for hard-coded line numbers in those two files.
+- [x] `QuickFiler.Test/NoLiveFormInTestAssemblyTests.cs` passes: no `System.Windows.Forms.Form`-derived type was added to the test assembly.
+- [x] The new test file is registered in `QuickFiler.Test/QuickFiler.Test.csproj` by a single `<Compile Include>` line inserted between the `Controllers\QfcCollectionControllerTests.cs` and `Controllers\QfcCollectionControllerDarkModeTests.cs` entries, and no other line of that file changed. Verified by the branch diff for the `.csproj`.
 
 ### File-size, toolchain, and coverage
 
@@ -1154,13 +1154,13 @@ verbatim.
 - [x] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` completes with zero errors and no new analyzer warnings in the final pass.
 - [x] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true` completes with zero errors in the final pass, and `/p:Nullable=enable` was **not** added to that command.
 - [x] `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage /InIsolation /Logger:trx /TestCaseFilter:"TestCategory!=LiveOutlook"` completes with zero failed tests in the final pass, with every assembly path whose relative path contains `\.claude\` excluded from the run.
-- [ ] All four toolchain steps passed in a single final pass with no step auto-fixing files, and the commands actually run are stated in the completion report.
+- [x] All four toolchain steps passed in a single final pass with no step auto-fixing files, and the commands actually run are stated in the completion report.
 - [x] `SyncExpandedRegistrations` reaches `>= 90%` line coverage as a new member (`CLAUDE.md` §UT2). Verified from the coverage report produced by the final `vstest.console.exe` run.
 - [x] The new duplicate-guard branch in `QuickFiler/Controllers/KbdActions.cs` is covered on **both** the throwing and non-throwing paths. Verified from the same coverage report.
 - [x] A Phase 0 coverage baseline was captured and recorded in `docs/features/active/quickfiler-keyboard-action-defects-444/evidence/baseline/`, and the final coverage figure shows **no regression** against that baseline in repo-wide line coverage, repo-wide branch coverage, or coverage of the lines this feature changed (`.claude/rules/general-unit-test.md`, `.claude/rules/quality-tiers.md`: line `>= 85%`, branch `>= 75%`, no regression on changed lines).
-- [ ] The coverage-policy conflict between `CLAUDE.md` §UT2 (`>= 80%` / `>= 90%`) and `.claude/rules/general-unit-test.md` plus `.claude/rules/quality-tiers.md` (`>= 85%` line / `>= 75%` branch) is recorded in the completion report as pre-existing and unresolved, not silently resolved.
-- [ ] No acceptance condition in the atomic plan claims a coverage increase attributable to changes in `QuickFiler/Controllers/QfcCollectionController.cs`, which carries `[ExcludeFromCodeCoverage]` at `:21` and is therefore outside every coverage denominator (`.claude/rules/plan-acceptance-gates.md`).
-- [ ] All evidence artifacts produced by this feature are written under `docs/features/active/quickfiler-keyboard-action-defects-444/evidence/<kind>/` per `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, and the working tree is clean at completion.
+- [x] The coverage-policy conflict between `CLAUDE.md` §UT2 (`>= 80%` / `>= 90%`) and `.claude/rules/general-unit-test.md` plus `.claude/rules/quality-tiers.md` (`>= 85%` line / `>= 75%` branch) is recorded in the completion report as pre-existing and unresolved, not silently resolved.
+- [x] No acceptance condition in the atomic plan claims a coverage increase attributable to changes in `QuickFiler/Controllers/QfcCollectionController.cs`, which carries `[ExcludeFromCodeCoverage]` at `:21` and is therefore outside every coverage denominator (`.claude/rules/plan-acceptance-gates.md`).
+- [x] All evidence artifacts produced by this feature are written under `docs/features/active/quickfiler-keyboard-action-defects-444/evidence/<kind>/` per `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, and the working tree is clean at completion.
 
 ---
 
