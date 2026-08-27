@@ -1115,7 +1115,7 @@ verbatim.
 - [x] The four pre-existing navigation tests in `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs` (at `:409`, `:430`, `:452`, `:474` as of base commit `988e819b`) pass unmodified, and that file's `[TestMethod]` count is unchanged from its state at the branch head.
 - [x] `QuickFiler/Interfaces/IQfcCollectionController.cs` is not modified. Verified by `git status` / the branch diff showing the path absent.
 - [x] The #472 regression test was observed **failing before** the `QfcCollectionController.cs` change and **passing after**, with both runs recorded in `docs/features/active/quickfiler-keyboard-action-defects-444/evidence/qa-gates/`.
-- [ ] The unbracketed-removal count-mismatch defect described in `### Downstream notes` item 3 is promoted through the feature-promotion lifecycle into a new potential entry **and** a new GitHub issue, and the issue number is recorded in this feature's PR body. Prose in this folder alone does not satisfy this criterion.
+- [x] The unbracketed-removal count-mismatch defect described in `### Downstream notes` item 3 is promoted through the feature-promotion lifecycle into a new potential entry **and** a new GitHub issue, and the issue number is recorded in this feature's PR body. Prose in this folder alone does not satisfy this criterion.
 
 ### Issue #482 — expansion registry divergence
 
@@ -1129,8 +1129,8 @@ verbatim.
 - [x] `SyncExpandedRegistrations` is exercised directly for both `true` and `false` through `QfcItemControllerTestSupport.InvokeNonPublic` by a named test, and reaches `>= 90%` line coverage as a new member.
 - [x] The #482 end-to-end test constructs no `System.Threading.Timer`: `ItemHelper.UnRead` is `false` in the arrangement, established explicitly rather than by relying on a default. Verified by inspection of the test arrangement and by the absence of any wall-clock wait in the test.
 - [x] The #482 regression test was observed **failing before** the `QfcItemController.Navigation.cs` change (as `ArgumentException` on the third step) and **passing after**, with both runs recorded in `docs/features/active/quickfiler-keyboard-action-defects-444/evidence/qa-gates/`.
-- [ ] The deliberate behaviour widening — `'B'`/`'D'` responding after a synchronous expansion and Alt+`B`/Alt+`D` after an asynchronous one — is stated in the PR body.
-- [ ] The correction to #482's filed trigger and severity (the filed `QfcCollectionController.cs:1439` trigger is unreachable; the live trigger is Right → Down → Right; the exception is caught and logged at `KeyboardHandler.cs:141-147` so the symptom is a dead key, not a crash) is stated in this spec and repeated in the PR body, so the PR does not restate an unsupported claim.
+- [x] The deliberate behaviour widening — `'B'`/`'D'` responding after a synchronous expansion and Alt+`B`/Alt+`D` after an asynchronous one — is stated in the PR body.
+- [x] The correction to #482's filed trigger and severity (the filed `QfcCollectionController.cs:1439` trigger is unreachable; the live trigger is Right → Down → Right; the exception is caught and logged at `KeyboardHandler.cs:141-147` so the symptom is a dead key, not a crash) is stated in this spec and repeated in the PR body, so the PR does not restate an unsupported claim.
 
 ### Upstream contract and scope discipline
 
