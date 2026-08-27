@@ -120,6 +120,7 @@
     <Compile Include="Controllers\BayesianPerformanceController.TestSupport.cs" />
     <Compile Include="Controllers\EfcHomeControllerSeamTests.cs" />
     <Compile Include="Controllers\QfcCollectionControllerTests.cs" />
+    <Compile Include="Controllers\QfcCollectionControllerNavigationDigitsTests.cs" />
     <Compile Include="Controllers\QfcCollectionControllerDarkModeTests.cs" />
     <Compile Include="Controllers\QfcCollectionController.TestSupport.cs" />
     <Compile Include="Controllers\QfcCollectionControllerDefects468Tests.cs" />

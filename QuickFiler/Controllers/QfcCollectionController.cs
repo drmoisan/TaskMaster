@@ -116,6 +116,9 @@ namespace QuickFiler.Controllers
 
         private bool _digitRefreshNeeded = false;
         private int _digits = 1;
+
+        // Issue #472: the width the last RegisterNavigation actually used, replayed at unregister.
+        private int _registeredDigits;
         internal int Digits
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
@@ -1167,6 +1170,7 @@ namespace QuickFiler.Controllers
         public void RegisterNavigation()
         {
             var digits = Digits;
+            _registeredDigits = digits;
             if (_digitRefreshNeeded)
             {
                 SetVisualDigits(digits);
@@ -1179,16 +1183,12 @@ namespace QuickFiler.Controllers
 
         public void UnregisterNavigation()
         {
+            // Issue #472: replay the recorded registration width; re-reading the live width property
+            // would remove keys this page never registered. Non-2 means width 1, so a field of 0 does.
+            var format = _registeredDigits == 2 ? "00" : "";
             for (int i = 0; i < _itemGroups.Count; i++)
             {
-                if (Digits == 1)
-                {
-                    _kbdHandler.StringActionsAsync.Remove("Collection", (i + 1).ToString());
-                }
-                else
-                {
-                    _kbdHandler.StringActionsAsync.Remove("Collection", (i + 1).ToString("00"));
-                }
+                _kbdHandler.StringActionsAsync.Remove("Collection", (i + 1).ToString(format));
             }
         }
 
