@@ -214,17 +214,6 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Deterministically pumps <paramref name="dispatcher"/> until <paramref name="task"/>
-        /// completes, then observes the task (rethrowing any fault). Used to exercise members that
-        /// route through a real <c>_itemViewer.UiDispatcher</c> (a sealed WPF Dispatcher that cannot
-        /// be mocked) without a running WinForms/WPF message loop. The frame is stopped by posting
-        /// its termination back onto the same dispatcher when the task finishes, so there is no
-        /// polling, sleeping, or timing dependency.
-        /// </summary>
-        private static Dispatcher _dedicatedDispatcher;
-        private static readonly object _dedicatedDispatcherLock = new object();
-
-        /// <summary>
         /// Ensures the static <c>UiThread.Dispatcher</c> is non-null by seeding it (only when unset)
         /// with a dedicated dispatcher hosted on a parked background thread that is never pumped.
         /// Needed for members that still delegate to a callee using the static
@@ -237,55 +226,17 @@ namespace QuickFiler.Controllers.Tests
         /// later test that pumps <c>Dispatcher.CurrentDispatcher</c>. Becomes moot once the callee
         /// routes through the injectable dispatcher seam.
         /// </para>
+        /// <para>
+        /// The returned value is a scope whose <c>Dispose</c> conditionally reverts the seeding: it
+        /// writes <c>null</c> back only when the static still holds the exact instance this call
+        /// installed, and a call that installed nothing returns a no-op scope. Discarding the scope is
+        /// permitted and leaks exactly as the pre-issue-#493 <c>void</c> helper did, no more. The
+        /// implementation lives in <see cref="UiThreadDispatcherFixture"/>, which is the single owner
+        /// of every mutation of that static made from this assembly's owned files.
+        /// </para>
         /// </summary>
-        internal static void EnsureUiThreadDispatcher()
-        {
-            FieldInfo field = typeof(UiThread).GetField(
-                "_dispatcher",
-                BindingFlags.NonPublic | BindingFlags.Static
-            );
-            field.Should().NotBeNull(because: "UiThread._dispatcher backing field must exist");
-            if (field.GetValue(null) == null)
-            {
-                field.SetValue(null, GetDedicatedDispatcher());
-            }
-        }
-
-        /// <summary>
-        /// Lazily creates a single dispatcher hosted on a background thread that grabs its dispatcher
-        /// and then parks indefinitely without ever running a dispatcher frame, so any operation posted
-        /// to it stays queued and never executes. The thread is a background thread reclaimed at process
-        /// exit; no message loop, WinForms form, or timing dependency is created.
-        /// </summary>
-        private static Dispatcher GetDedicatedDispatcher()
-        {
-            lock (_dedicatedDispatcherLock)
-            {
-                if (_dedicatedDispatcher == null)
-                {
-                    using (var ready = new ManualResetEventSlim(false))
-                    {
-                        // Parked forever; keeps the thread (and its dispatcher) alive without pumping.
-                        var park = new ManualResetEventSlim(false);
-                        var thread = new Thread(() =>
-                        {
-                            _dedicatedDispatcher = Dispatcher.CurrentDispatcher;
-                            ready.Set();
-                            park.Wait();
-                        })
-                        {
-                            IsBackground = true,
-                            Name = "QfcItemControllerTestSupport.ParkedDispatcher",
-                        };
-                        thread.SetApartmentState(ApartmentState.STA);
-                        thread.Start();
-                        ready.Wait();
-                    }
-                }
-
-                return _dedicatedDispatcher;
-            }
-        }
+        internal static IDisposable EnsureUiThreadDispatcher() =>
+            UiThreadDispatcherFixture.EnsureDispatcher();
 
         /// <summary>
         /// Creates a dispatcher hosted on a dedicated, running STA background thread and returns it.

@@ -156,6 +156,8 @@
     <Compile Include="Controllers\QfcItemController.MailActionsTests.cs" />
     <Compile Include="Controllers\QfcItemController.PropertiesTests.cs" />
     <Compile Include="Controllers\QfcItemController.TestSupport.cs" />
+    <Compile Include="Controllers\QfcItemController.UiThreadDispatcherFixture.cs" />
+    <Compile Include="Controllers\QfcItemController.UiThreadDispatcherFixtureTests.cs" />
     <Compile Include="Controllers\QfcItemController.InitializationTests.cs" />
     <Compile Include="Controllers\QfcItemController.InitializationTests.Part2.cs" />
     <Compile Include="Controllers\QfcItemController.InitializationTests.Part3.cs" />

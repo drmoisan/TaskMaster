@@ -646,27 +646,27 @@ Every item below is traceable to the early-draft criteria in
 and to the traceability table in research §10. Items marked **[spec addition]** are added by this
 spec and carry a stated justification.
 
-- [ ] **AC-1 — Restore exists and is idempotent.** `EnsureUiThreadDispatcher` returns an
+- [x] **AC-1 — Restore exists and is idempotent.** `EnsureUiThreadDispatcher` returns an
   `IDisposable` scope whose `Dispose` restores the previous `UiThread._dispatcher` value, and a
   second `Dispose` neither re-writes the field nor throws. Restores are conditional
   (`ReferenceEquals` compare-then-write), and a call that performed no install returns a no-op
   scope. Evidenced by tests R2 and R3.
   *(Promoted doc criterion 1; research §2.4, §2.5 items 3/4/6.)*
-- [ ] **AC-2 — Concurrent callers cannot interleave install and restore against the shared static.**
+- [x] **AC-2 — Concurrent callers cannot interleave install and restore against the shared static.**
   Every mutation of `UiThread._dispatcher` inside `QuickFiler.Test`'s owned files goes through
   `UiThreadDispatcherFixture` and holds `FieldLock` for the whole read-modify-write; long
   install→test-body→restore transactions additionally hold `TransactionGate`. `EnsureDispatcher`
   never acquires `TransactionGate`. Lock ordering is `TransactionGate` → `FieldLock`, never the
   reverse. Evidenced by tests R1 and R4.
   *(Promoted doc criterion 2; research §2.2, §2.3.)*
-- [ ] **AC-3 — A bounded regression test demonstrates the #230 deadlock scenario is unreachable.**
+- [x] **AC-3 — A bounded regression test demonstrates the #230 deadlock scenario is unreachable.**
   Regression tests R1-R5 exist in
   `QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs`, each carrying
   `[Timeout(GateTimeoutMs)]` with `GateTimeoutMs = 60000`, so a regression fails rather than hangs.
   R1 is recorded in the test's own documentation as the primary deterministic assertion and R4 as
   the supporting probabilistic one.
   *(Promoted doc criterion 3; research §5.)*
-- [ ] **AC-4 — The #230 local workaround is removed, not duplicated.**
+- [x] **AC-4 — The #230 local workaround is removed, not duplicated.**
   `QfcItemController.InitializationTests.Part2.cs` no longer declares its own
   `SemaphoreSlim UiThreadDispatcherGate` (`:51`) and no longer declares its own
   `SwapUiThreadDispatcher` (`:143-158`); both are replaced by calls into the shared fixture. Exactly
@@ -674,22 +674,22 @@ spec and carry a stated justification.
   `BeginTransactionAsync` … `Install` shape is preserved so the gate is still acquired at build
   start, and `PumpHarness.Restore()` remains idempotent with restore-before-release ordering.
   *(Promoted doc criterion 4; research §2.6.)*
-- [ ] **AC-5 — No `Thread.Sleep`, `Task.Delay`, or wall-clock waits are introduced.** All
+- [x] **AC-5 — No `Thread.Sleep`, `Task.Delay`, or wall-clock waits are introduced.** All
   cross-thread coordination in the new and modified files uses `ManualResetEventSlim` or awaited
   `Task` completion. No temporary files are created.
   *(Promoted doc criterion 5; `.claude/rules/general-unit-test.md`; research §5.)*
-- [ ] **AC-6 — `QfcItemController.FocusAndThemeTests.cs` is unmodified and unregressed.** The file
+- [x] **AC-6 — `QfcItemController.FocusAndThemeTests.cs` is unmodified and unregressed.** The file
   is byte-identical to its base-branch version (still 497 lines), both call sites at `:452` and
   `:468` compile unchanged against the new `IDisposable` return type, and both
   `SetThemeDark_FromNormal_SelectsDarkNormalTheme` and
   `SetThemeLight_FromNormal_SelectsLightNormalTheme` pass. No analyzer diagnostic is raised at
   either call site under toolchain steps 2 and 3.
   *(Promoted doc "existing callers must be audited" constraint; issue.md § Constraints; research §1.5, §3.)*
-- [ ] **AC-7 — `UtilitiesCS/Threading/UiThread.cs` is unmodified.** The file does not appear in the
+- [x] **AC-7 — `UtilitiesCS/Threading/UiThread.cs` is unmodified.** The file does not appear in the
   feature's diff, no `InternalsVisibleTo("QuickFiler.Test")` grant is added to `UtilitiesCS`, and no
   production assembly is changed by this feature.
   *(Research §6; issue.md § Constraints — the conditional permission is deliberately not exercised.)*
-- [ ] **AC-8 — Every owned and new file is at or under 500 lines.** Measured after implementation:
+- [x] **AC-8 — Every owned and new file is at or under 500 lines.** Measured after implementation:
   `QfcItemController.TestSupport.cs`, `QfcItemController.InitializationTests.Part2.cs`,
   `QfcItemController.UiThreadDispatcherFixture.cs`, and
   `QfcItemController.UiThreadDispatcherFixtureTests.cs`. The two `<Compile Include>` entries are
@@ -698,7 +698,7 @@ spec and carry a stated justification.
   *(Research §8; `.claude/rules/general-code-change.md` § File Size Limit. **[spec addition]** —
   justification: research §8 identifies the ceiling as a live constraint on this specific change,
   with `FocusAndThemeTests.cs` already at 497/500, so it must be gated rather than assumed.)*
-- [ ] **AC-9 — Full C# toolchain passes in a single final pass, in order.**
+- [x] **AC-9 — Full C# toolchain passes in a single final pass, in order.**
   `dotnet tool run csharpier check .` clean; the analyzer msbuild step clean; the
   `TreatWarningsAsErrors` msbuild step clean (without `/p:Nullable=enable`); and
   `vstest.console.exe ... /EnableCodeCoverage /InIsolation` green for `QuickFiler.Test`, using
@@ -707,7 +707,7 @@ spec and carry a stated justification.
   *(CLAUDE.md § CUT3 and § C# Toolchain; promoted doc's implicit delivery bar. **[spec addition]** —
   justification: the repository's mandatory toolchain loop is a delivery precondition for any code
   change and must be checkable as an acceptance item.)*
-- [ ] **AC-10 — Fail-before evidence is captured in the form the defect permits.** The evidence
+- [x] **AC-10 — Fail-before evidence is captured in the form the defect permits.** The evidence
   artifact records the pre-change source excerpt at `TestSupport.cs:238-249` and a compile-level
   demonstration that R1/R2 cannot build against the base branch, rather than asserting a red test
   run that cannot exist. Written to `<FEATURE>/evidence/<kind>/` per
