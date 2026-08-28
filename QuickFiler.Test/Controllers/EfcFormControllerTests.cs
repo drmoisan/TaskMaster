@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -157,9 +158,8 @@ namespace QuickFiler.Controllers.Tests
             globals.VerifyGet(value => value.Ol, Times.Once);
         }
 
-        // RC1 (issues #460 A/C, #464 A, #465 A): the three theme/dark-mode accessors must be
-        // readable on a post-Cleanup() controller, whose fields are all null. CreateMinimalController
-        // reproduces exactly that state without a live Outlook COM context.
+        // RC1 (#460 A/C, #464 A, #465 A): the theme/dark-mode accessors must be readable on the
+        // all-fields-null post-Cleanup() state that CreateMinimalController reproduces.
         [TestMethod]
         public void FormDarkMode_OnAllFieldsNullController_ReturnsFalseAndDoesNotThrow()
         {
@@ -170,11 +170,7 @@ namespace QuickFiler.Controllers.Tests
             Func<bool> act = () => controller.DarkMode;
 
             // Assert
-            act.Should()
-                .NotThrow(
-                    "DarkMode must be readable after Cleanup has nulled _globals, instead of"
-                        + " eagerly materialising a dependency array over a null reference"
-                );
+            act.Should().NotThrow("DarkMode must be readable after Cleanup nulled _globals");
             controller.DarkMode.Should().BeFalse("the _darkMode backing field defaults to false");
         }
 
@@ -189,18 +185,8 @@ namespace QuickFiler.Controllers.Tests
             Func<string> act = () => controller.ActiveTheme;
 
             // Assert
-            act.Should()
-                .NotThrow(
-                    "ActiveTheme must be readable after Cleanup has nulled _themes, instead of"
-                        + " failing the strict dependency check with ArgumentNullException"
-                );
-            controller
-                .ActiveTheme.Should()
-                .Be(
-                    backingField,
-                    "the guarded getter returns the _activeTheme backing field verbatim when"
-                        + " _themes is null"
-                );
+            act.Should().NotThrow("ActiveTheme must be readable after Cleanup nulled _themes");
+            controller.ActiveTheme.Should().Be(backingField, "the getter returns the field");
         }
 
         [TestMethod]
@@ -213,11 +199,7 @@ namespace QuickFiler.Controllers.Tests
             Func<string> act = () => controller.LoadTheme();
 
             // Assert
-            act.Should()
-                .NotThrow(
-                    "LoadTheme must compute and return a theme name without applying it when"
-                        + " _themes is null, so a torn-down controller cannot fault"
-                );
+            act.Should().NotThrow("LoadTheme must not apply a theme when _themes is null");
         }
 
         // RC1: Cleanup() must be idempotent and must not double-invoke the parent callback.
@@ -235,11 +217,7 @@ namespace QuickFiler.Controllers.Tests
             };
 
             // Assert
-            act.Should()
-                .NotThrow(
-                    "Cleanup must be callable on a partially constructed controller and must be"
-                        + " idempotent, so a second teardown pass cannot fault"
-                );
+            act.Should().NotThrow("Cleanup must be idempotent on a partial controller");
         }
 
         [TestMethod]
@@ -255,24 +233,15 @@ namespace QuickFiler.Controllers.Tests
             controller.Cleanup();
 
             // Assert
-            parentCleanup.Verify(
-                callback => callback(),
-                Times.Once(),
-                "the parent teardown callback must run exactly once no matter how many times"
-                    + " Cleanup is called"
-            );
+            parentCleanup.Verify(c => c(), Times.Once(), "the parent runs exactly once");
             GetPrivateField(controller, "_parentCleanup")
                 .Should()
-                .BeNull(
-                    "Cleanup nulls the field before invoking the captured local, which is what"
-                        + " makes the single invocation structural rather than incidental"
-                );
+                .BeNull("the field is cleared before the captured local is invoked");
         }
 
-        // #464 B (RC3). Each of the five extracted boundary members must log through the
-        // injectable sink and contain the fault, instead of rethrowing it out of an async void
-        // rim where it becomes an unhandled UI-thread crash. Under decision D9 each [DataRow] is
-        // a distinct named test result with its own name and outcome in the TRX.
+        // #464 B (RC3). Each extracted boundary member must log through the sink and contain the
+        // fault rather than rethrow it out of an async void rim. Per D9 each [DataRow] is a
+        // distinct named result.
         [DataTestMethod]
         [DataRow("ButtonCancelClickAsync")]
         [DataRow("ButtonOkClickAsync")]
@@ -281,10 +250,8 @@ namespace QuickFiler.Controllers.Tests
         [DataRow("ButtonDeleteClickAsync")]
         public async Task AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow(string memberName)
         {
-            // Arrange
-            // The fault is injected by the all-fields-null state itself: the first statement each
-            // extracted member reaches dereferences the null _formViewer, or awaits its null
-            // UiSyncContext, which throws because _formViewer is itself null.
+            // Arrange: the all-fields-null state is the fault injection. The first statement each
+            // member reaches dereferences the null _formViewer or awaits its null UiSyncContext.
             SynchronizationContext previousContext = SynchronizationContext.Current;
             SynchronizationContext.SetSynchronizationContext(null);
             try
@@ -296,28 +263,15 @@ namespace QuickFiler.Controllers.Tests
                     memberName,
                     BindingFlags.Instance | BindingFlags.NonPublic
                 );
-                member
-                    .Should()
-                    .NotBeNull(
-                        $"{memberName} must exist as an extracted internal async Task member"
-                    );
+                member.Should().NotBeNull($"{memberName} must exist as an internal async Task");
 
                 // Act
                 Func<Task> act = () => (Task)member.Invoke(controller, Array.Empty<object>());
 
                 // Assert
                 await act.Should()
-                    .NotThrowAsync(
-                        $"{memberName} is the fault boundary for an async void rim, so it must"
-                            + " contain the fault rather than rethrow it into the UI message loop"
-                    );
-                sinkCallCount
-                    .Should()
-                    .Be(
-                        1,
-                        $"{memberName} must report the contained fault through the boundary error"
-                            + " sink exactly once"
-                    );
+                    .NotThrowAsync($"{memberName} must contain the fault, not rethrow it");
+                sinkCallCount.Should().Be(1, $"{memberName} must report the fault exactly once");
             }
             finally
             {
@@ -328,31 +282,20 @@ namespace QuickFiler.Controllers.Tests
         [TestMethod]
         public void BoundaryErrorSink_DefaultDelegate_InvokesWithoutThrowing()
         {
-            // Arrange
-            // The default delegate is left in place, so this covers its body: a single
-            // logger.Error(message, exception) call on the pre-existing static logger.
+            // Arrange: the default delegate is left in place, so this covers its body.
             var controller = CreateMinimalController();
 
             // Act
             Action act = () =>
-                controller.BoundaryErrorSink(
-                    "boundary sink smoke",
-                    new InvalidOperationException()
-                );
+                controller.BoundaryErrorSink("smoke", new InvalidOperationException());
 
             // Assert
-            act.Should()
-                .NotThrow(
-                    "the default sink delegate must be safe to invoke on a controller whose"
-                        + " collaborators have all been released"
-                );
+            act.Should().NotThrow("the default sink must be safe on a released controller");
         }
 
-        // #464 C (RC3). PopulateFolderCombobox is invoked fire-and-forget from two call sites, so
-        // a fault inside it becomes an unobserved faulted Task with no catch anywhere on the path.
-        // The uninitialized EfcViewer gets past the pre-existing null-viewer early return without
-        // running a constructor, so it has no handle, no controls and no message pump; _dataModel
-        // is left null so the first collaborator call inside the method faults.
+        // #464 C (RC3). Both call sites discard the result, so a fault becomes an unobserved
+        // faulted Task. The uninitialized EfcViewer clears the null-viewer early return while
+        // running no constructor; _dataModel stays null so the first collaborator call faults.
         [TestMethod]
         public async Task PopulateFolderCombobox_WhenDataModelFaults_LogsOnceAndDoesNotFault()
         {
@@ -382,6 +325,143 @@ namespace QuickFiler.Controllers.Tests
                     "the contained fault must be reported through the boundary error sink exactly"
                         + " once"
                 );
+        }
+
+        // #465 B (RC8). The extracted pure matching helper is exercised with no EfcViewer and no
+        // controller, which is what makes the relocated read testable at all.
+        [TestMethod]
+        public void MatchesForSearchText_WithRepresentativeInput_ReturnsExpectedMatches()
+        {
+            // Arrange
+            const string searchText = "north";
+            var expected = new[] { @"Clients\North", @"Clients\Northeast", @"Archive\Northwind" };
+            string observedArgument = null;
+            Func<string, string[]> findMatches = text =>
+            {
+                observedArgument = text;
+                return text == searchText ? expected : Array.Empty<string>();
+            };
+
+            // Act / Assert
+            EfcFormController
+                .MatchesForSearchText(findMatches, searchText)
+                .Should()
+                .Equal(expected, "the helper returns the delegate result verbatim");
+            EfcFormController
+                .MatchesForSearchText(null, searchText)
+                .Should()
+                .BeEmpty("a null delegate yields an empty array rather than a null dereference");
+            EfcFormController
+                .MatchesForSearchText(findMatches, null)
+                .Should()
+                .BeEmpty("a null search text yields no matches");
+            observedArgument
+                .Should()
+                .BeEmpty("a null search text is passed through to the delegate as an empty string");
+        }
+
+        // #465 C (RC9). WithTrashRow is the pure half of the delete gesture.
+        [TestMethod]
+        public void WithTrashRow_AppliedTwice_YieldsExactlyOneTrashRow()
+        {
+            // Arrange
+            var rows = new[] { @"Clients\North", @"Clients\South" };
+
+            // Act
+            string[] once = EfcFormController.WithTrashRow(rows);
+            string[] twice = EfcFormController.WithTrashRow(once);
+
+            // Assert
+            twice
+                .Where(row => row == EfcFormController.TrashRowText)
+                .Should()
+                .HaveCount(1, "the trash row must not accumulate on a repeated delete gesture");
+            twice
+                .Should()
+                .BeSameAs(once, "an input already carrying the trash row is returned as-is");
+            twice.Should().Contain(rows, "the presented rows survive the gesture");
+        }
+
+        // #465 C (RC9). Drives the criterion's literal instrument, ActionDeleteAsync itself.
+        // Injecting any non-null SynchronizationContext satisfies the SynchronizationContextAwaiter
+        // null guard, so the awaited UI-thread marshal completes headlessly; the uninitialized
+        // EfcViewer runs no constructor so it has no handle, no controls and no message pump; and
+        // with _router left null BindFolderRows returns at its guard without touching the
+        // breadcrumb host, while ApplyDeleteGesture has already assigned _folderRows.
+        [TestMethod]
+        public async Task ActionDeleteAsync_AwaitedTwice_LeavesExactlyOneTrashRowInFolderRows()
+        {
+            // Arrange
+            var rows = new[] { @"Clients\North", @"Clients\South" };
+            var controller = CreateMinimalController();
+            var viewer = (EfcViewer)
+                System.Runtime.Serialization.FormatterServices.GetUninitializedObject(
+                    typeof(EfcViewer)
+                );
+            SetPrivateField(viewer, "_context", new SynchronizationContext());
+            SetPrivateField(controller, "_formViewer", viewer);
+            SetPrivateField(controller, "_folderRows", rows);
+
+            // Act
+            await controller.ActionDeleteAsync();
+            await controller.ActionDeleteAsync();
+
+            // Assert
+            var folderRows = (string[])GetPrivateField(controller, "_folderRows");
+            folderRows
+                .Where(row => row == EfcFormController.TrashRowText)
+                .Should()
+                .HaveCount(1, "a repeated delete gesture must not accumulate trash rows");
+            folderRows.Should().Contain(rows, "both original rows survive the gesture");
+        }
+
+        // #465 D (RC7). The producers emit a four-character banner prefix
+        // (BreadcrumbRowBuilder.BannerPrefix), so a three-equals row is shorter than the prefix.
+        [TestMethod]
+        public void IsBannerRow_ClassifiesByTheFourCharacterPrefix()
+        {
+            // Act / Assert
+            EfcFormController
+                .IsBannerRow("===")
+                .Should()
+                .BeFalse("a three-equals row is shorter than the producer prefix");
+            EfcFormController
+                .IsBannerRow("====")
+                .Should()
+                .BeTrue("a four-equals row carries the producer prefix");
+            BreadcrumbRowBuilder
+                .BannerPrefix.Should()
+                .Be("====", "IsBannerRow classifies by the prefix the row producers emit");
+        }
+
+        [TestMethod]
+        public void IsBannerRow_NullOrShortRow_ReturnsFalseWithoutThrowing()
+        {
+            // Act / Assert
+            foreach (var row in new[] { null, string.Empty, "=" })
+            {
+                Func<bool> act = () => EfcFormController.IsBannerRow(row);
+                act.Should().NotThrow($"a row of length {row?.Length ?? -1} must not throw");
+                act().Should().BeFalse("a row shorter than the prefix is not a banner");
+            }
+        }
+
+        // Both EFC classification sites must agree. The creation path is IsValidSelection, which is
+        // IsSelectableFolder; the filing path is the guard expression ActionOkAsync composes. The
+        // guard is reproduced rather than driven, because ActionOkAsync shows a MessageBox.
+        [TestMethod]
+        public void IsSelectableFolder_AndIsBannerRow_ClassifyThreeAndFourEqualsRowsIdentically()
+        {
+            // Act / Assert
+            foreach (var row in new[] { "===", "====" })
+            {
+                bool creationPath = EfcFormController.IsSelectableFolder(row);
+                bool filingPath =
+                    !EfcFormController.IsBannerRow(row)
+                    && EfcSelectionGuard.IsValidFilingSelection(row);
+                creationPath.Should().Be(filingPath, $"both sites must classify {row} alike");
+                creationPath.Should().BeFalse($"{row} is rejected at both sites");
+            }
         }
 
         private static void SetPrivateField(object target, string fieldName, object value)

@@ -968,14 +968,14 @@ files this feature does not own.**
 
 - [x] A named test calls `EfcFormController.Cleanup()` twice and asserts no exception is thrown.
 - [x] A named test asserts `_parentCleanup` is invoked exactly once across two consecutive `Cleanup()` calls (`Times.Once()` on an injected `System.Action`), and that the field is null after the first call.
-- [ ] `RefreshSuggestionsAsync` evaluates `_formViewer.SearchText.Text` on the UI thread before entering `Task.Run`; no member access on `_formViewer` appears inside the `Task.Run` lambda.
-- [ ] A named test exercises the extracted pure matching helper for the search path with no `EfcViewer` instance and asserts the expected matches for a representative input.
-- [ ] `EfcFormController` declares `internal static string[] WithTrashRow(string[] rows)`, and a named test asserts that applying it twice yields exactly one trash row.
-- [ ] A named test drives `ActionDeleteAsync` twice against an injected `_folderRows` and asserts the resulting row set contains exactly one `"Trash to Delete"` entry.
-- [ ] `BindFolderRows` no longer writes its result back into `_folderRows`; the write-back previously at `:879` is absent.
-- [ ] `EfcFormController` declares `internal static bool IsBannerRow(string row)`, and both `IsValidSelection` and `ActionOkAsync` classify through it.
-- [ ] A named test asserts a row of exactly three `=` characters and a row of exactly four `=` characters classify identically in `IsValidSelection` and in `ActionOkAsync`'s guard.
-- [ ] A named test asserts `IsBannerRow` returns `false` for null and for a row shorter than the prefix, without throwing.
+- [x] `RefreshSuggestionsAsync` evaluates `_formViewer.SearchText.Text` on the UI thread before entering `Task.Run`; no member access on `_formViewer` appears inside the `Task.Run` lambda.
+- [x] A named test exercises the extracted pure matching helper for the search path with no `EfcViewer` instance and asserts the expected matches for a representative input.
+- [x] `EfcFormController` declares `internal static string[] WithTrashRow(string[] rows)`, and a named test asserts that applying it twice yields exactly one trash row.
+- [x] A named test drives `ActionDeleteAsync` twice against an injected `_folderRows` and asserts the resulting row set contains exactly one `"Trash to Delete"` entry.
+- [x] `BindFolderRows` no longer writes its result back into `_folderRows`; the write-back previously at `:879` is absent.
+- [x] `EfcFormController` declares `internal static bool IsBannerRow(string row)`, and both `IsValidSelection` and `ActionOkAsync` classify through it.
+- [x] A named test asserts a row of exactly three `=` characters and a row of exactly four `=` characters classify identically in `IsValidSelection` and in `ActionOkAsync`'s guard.
+- [x] A named test asserts `IsBannerRow` returns `false` for null and for a row shorter than the prefix, without throwing.
 - [ ] `IsBannerRow`'s prefix agrees with `BreadcrumbRowBuilder.BannerPrefix`, and `git diff --name-only` contains no path matching `BreadcrumbRowBuilder`.
 
 ### #466 — dead code and latent NRE traps (latent; remedy DELETION)
