@@ -160,6 +160,17 @@ namespace QuickFiler.Controllers
 
         #region Item Setup and Disposal Methods
 
+        /// <summary>
+        /// The additional browser argument handed to <see cref="CoreWebView2EnvironmentOptions"/>
+        /// so that the item preview keeps no browsing data.
+        /// </summary>
+        /// <remarks>
+        /// Hoisted to a constant so the value has exactly one owner and can be asserted directly.
+        /// A direct assertion is the only instrument available for it: the enclosing member needs
+        /// the real WebView2 runtime, so it cannot be executed under the unit-test policy.
+        /// </remarks>
+        internal const string IncognitoArgument = "--incognito ";
+
         internal async Task InitializeWebViewAsync()
         {
             // Create the cache directory
@@ -170,7 +181,7 @@ namespace QuickFiler.Controllers
 
             // CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("--disk-cache-size=1 ");
             CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions(
-                "–incognito "
+                IncognitoArgument
             );
 
             await _itemViewer.UiSyncContext;

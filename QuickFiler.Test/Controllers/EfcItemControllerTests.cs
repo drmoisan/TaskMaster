@@ -357,6 +357,44 @@ namespace QuickFiler.Controllers.Tests
             }
         }
 
+        /// <summary>
+        /// #463. The additional-browser-arguments literal opened with U+2013 EN DASH rather than two
+        /// ASCII hyphen-minus characters, so Chromium silently ignored the unrecognised token and the
+        /// preview WebView2 was never incognito.
+        /// </summary>
+        /// <remarks>
+        /// The value is asserted directly against the hoisted constant. That is the only instrument
+        /// available: the enclosing member requires the real WebView2 runtime. This test performs no
+        /// file input or output and reads no <c>.cs</c> file from disk — an assertion about file bytes
+        /// would be about the source text rather than about the value the program actually uses.
+        /// </remarks>
+        [TestMethod]
+        public void IncognitoArgument_IsAsciiDoubleHyphenIncognitoWithTrailingSpace()
+        {
+            // Arrange
+            const string expected = "--incognito ";
+
+            // Act
+            string actual = EfcItemController.IncognitoArgument;
+
+            // Assert
+            actual
+                .Should()
+                .Be(
+                    expected,
+                    "Chromium command-line switches are introduced by two ASCII hyphen-minus characters"
+                );
+            actual
+                .ToCharArray()
+                .Should()
+                .OnlyContain(
+                    character => character <= 0x7F,
+                    "a non-ASCII character in a machine-parsed switch is silently ignored"
+                );
+            actual[0].Should().Be('-', "the first character must be ASCII HYPHEN-MINUS");
+            actual[1].Should().Be('-', "the second character must be ASCII HYPHEN-MINUS");
+        }
+
         private static void SetPrivateField(object target, string fieldName, object value)
         {
             FieldInfo field = target

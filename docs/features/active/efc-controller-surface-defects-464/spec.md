@@ -944,9 +944,9 @@ files this feature does not own.**
 
 ### #463 — WebView2 incognito argument (live at 2 of 3 sites; remedies CORRECTION + DELETION)
 
-- [ ] `EfcItemController` declares `internal const string IncognitoArgument` and `InitializeWebViewAsync` passes that constant rather than a string literal.
-- [ ] A named test asserts `EfcItemController.IncognitoArgument` equals `"--incognito "`, that every character satisfies `c <= 0x7F`, and that the first two characters are both U+002D.
-- [ ] `QfcItemController.ViewerSetup.cs:55` uses two U+002D characters; confirmed by review and by the one-line-diff criterion below.
+- [x] `EfcItemController` declares `internal const string IncognitoArgument` and `InitializeWebViewAsync` passes that constant rather than a string literal.
+- [x] A named test asserts `EfcItemController.IncognitoArgument` equals `"--incognito "`, that every character satisfies `c <= 0x7F`, and that the first two characters are both U+002D.
+- [x] `QfcItemController.ViewerSetup.cs:55` uses two U+002D characters; confirmed by review and by the one-line-diff criterion below.
 - [x] The EN DASH site at `EfcItemController.cs:184` is removed together with its containing method rather than edited in place.
 
 ### #464 — null-guard and async-void boundary defects (primary; A/B/C/E live, D latent)

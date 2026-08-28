@@ -58,7 +58,7 @@ namespace QuickFiler.Controllers
             string cacheFolder = Path.Combine(localAppData, "WindowsFormsWebView2");
 
             // CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("--disk-cache-size=1 ");
-            CoreWebView2EnvironmentOptions options = new("–incognito ");
+            CoreWebView2EnvironmentOptions options = new("--incognito ");
 
             // Switch to UI Thread
             await _itemViewer.UiSyncContext;
