@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="710220cc-3ad1-4e8e-bd76-bde066cccca2" name="USER@HOST 2026-08-27 16:44:32" runUser="HOST\USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T16:44:32.6435207-04:00" queuing="2026-08-27T16:44:32.6435207-04:00" start="2026-08-27T16:44:31.3016125-04:00" finish="2026-08-27T16:44:32.6651050-04:00" />
+  <TestSettings name="default" id="e032ef9b-4b1f-4ca6-831c-593a4a6a21c4">
+    <Deployment runDeploymentRoot="USER_HOST_2026-08-27_16_44_32" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="3a9989d6-b021-4c89-9c85-3f0467c40608" testId="13a8d422-a3e2-8184-ad7d-69074dd14a3e" testName="WebView2BreadcrumbHost_ExemptsOnlyHostBoundMembers" computerName="HOST" duration="00:00:00.0846992" startTime="2026-08-27T16:44:32.2732571-04:00" endTime="2026-08-27T16:44:32.4803909-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3a9989d6-b021-4c89-9c85-3f0467c40608">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="WebView2BreadcrumbHost_ExemptsOnlyHostBoundMembers" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="13a8d422-a3e2-8184-ad7d-69074dd14a3e">
+      <Execution id="3a9989d6-b021-4c89-9c85-3f0467c40608" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.WebView2BreadcrumbHostContractTests" name="WebView2BreadcrumbHost_ExemptsOnlyHostBoundMembers" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="13a8d422-a3e2-8184-ad7d-69074dd14a3e" executionId="3a9989d6-b021-4c89-9c85-3f0467c40608" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="1" executed="1" passed="1" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

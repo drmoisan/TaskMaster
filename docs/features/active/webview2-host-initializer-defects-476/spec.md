@@ -943,70 +943,70 @@ work satisfying it is implemented **and** verified.
 
 **#458 — predecessor detach via a per-control owner registry**
 
-- [ ] `QuickFiler/Viewers/WebView2BreadcrumbHost.cs` declares a `private static readonly ConditionalWeakTable<WebView2, WebView2BreadcrumbHost>` owner registry and a `private static readonly object` gate, and the constructor performs its lookup-detach-replace sequence under that gate using only `TryGetValue`, `Add`, and `Remove`.
-- [ ] The dead `_control.CoreWebView2InitializationCompleted -= OnCoreInitializationCompleted;` at `WebView2BreadcrumbHost.cs:49` no longer exists; the predecessor's subscription is removed by invoking a detach on the **predecessor instance**, and the misleading comment at `:48` is corrected or removed.
-- [ ] A regression test in `QuickFiler.Test` constructs one `WebView2` on `WinFormsPumpHost`, constructs host A then host B over it, and asserts through an `internal` attachment-state member on `WebView2BreadcrumbHost` that A is detached and B is the registered owner. The test fails against the pre-fix code and passes after. Its primary assertion is about the host's attachment state, not about a reflected SDK handler count.
-- [ ] The detach path tolerates `_control.CoreWebView2 == null` (a predecessor that never completed initialization) without throwing, and a test covers that case.
-- [ ] A `_control.Disposed` subscription detaches the host and removes its registry entry.
+- [x] `QuickFiler/Viewers/WebView2BreadcrumbHost.cs` declares a `private static readonly ConditionalWeakTable<WebView2, WebView2BreadcrumbHost>` owner registry and a `private static readonly object` gate, and the constructor performs its lookup-detach-replace sequence under that gate using only `TryGetValue`, `Add`, and `Remove`.
+- [x] The dead `_control.CoreWebView2InitializationCompleted -= OnCoreInitializationCompleted;` at `WebView2BreadcrumbHost.cs:49` no longer exists; the predecessor's subscription is removed by invoking a detach on the **predecessor instance**, and the misleading comment at `:48` is corrected or removed.
+- [x] A regression test in `QuickFiler.Test` constructs one `WebView2` on `WinFormsPumpHost`, constructs host A then host B over it, and asserts through an `internal` attachment-state member on `WebView2BreadcrumbHost` that A is detached and B is the registered owner. The test fails against the pre-fix code and passes after. Its primary assertion is about the host's attachment state, not about a reflected SDK handler count.
+- [x] The detach path tolerates `_control.CoreWebView2 == null` (a predecessor that never completed initialization) without throwing, and a test covers that case.
+- [x] A `_control.Disposed` subscription detaches the host and removes its registry entry.
 
 **#476 defect 1 — UI marshalling of every SDK touch**
 
-- [ ] `WebView2BreadcrumbHost` declares an `internal` three-argument constructor `(WebView2, IWebViewCoreInitializer, BreadcrumbUiDispatcher)`, and the existing **public** two-argument constructor chains to it with an unchanged signature, so `QuickFiler/Controllers/EfcFormController.cs:836-839` requires no edit.
-- [ ] `NavigateToString` executes `_control.NavigateToString(html)` inside a single `BreadcrumbUiDispatcher.Dispatch(...)` callback.
-- [ ] `PostMessageJson` performs the `_control.CoreWebView2` read, the null guard with its existing log-and-drop message, and `core.PostWebMessageAsJson(json)` inside **one** `Dispatch` callback.
-- [ ] `BreadcrumbUiDispatcher.DispatchValue` is not used anywhere in `WebView2BreadcrumbHost.cs`.
-- [ ] The dispatcher is constructed in `InitializeAsync` from the `uiSyncContext` argument (variant V1) using `new BreadcrumbUiDispatcher(uiSyncContext, sink)`; `BreadcrumbUiDispatcher.CaptureCurrent()` is not called from `WebView2BreadcrumbHost.cs`, and the constructor gains no new throwing precondition.
-- [ ] `QuickFiler/Viewers/BreadcrumbUiDispatcher.cs` is unmodified.
-- [ ] A regression test constructs the host through the internal three-argument constructor with a **recording** `SynchronizationContext` and a recording error sink, calls `PostMessageJson` and `NavigateToString` from the test thread, and asserts the recording context observed exactly one `Post` per call. The recording context never drains the posted action, so no WebView2 runtime is involved. The test fails against the pre-fix code.
+- [x] `WebView2BreadcrumbHost` declares an `internal` three-argument constructor `(WebView2, IWebViewCoreInitializer, BreadcrumbUiDispatcher)`, and the existing **public** two-argument constructor chains to it with an unchanged signature, so `QuickFiler/Controllers/EfcFormController.cs:836-839` requires no edit.
+- [x] `NavigateToString` executes `_control.NavigateToString(html)` inside a single `BreadcrumbUiDispatcher.Dispatch(...)` callback.
+- [x] `PostMessageJson` performs the `_control.CoreWebView2` read, the null guard with its existing log-and-drop message, and `core.PostWebMessageAsJson(json)` inside **one** `Dispatch` callback.
+- [x] `BreadcrumbUiDispatcher.DispatchValue` is not used anywhere in `WebView2BreadcrumbHost.cs`.
+- [x] The dispatcher is constructed in `InitializeAsync` from the `uiSyncContext` argument (variant V1) using `new BreadcrumbUiDispatcher(uiSyncContext, sink)`; `BreadcrumbUiDispatcher.CaptureCurrent()` is not called from `WebView2BreadcrumbHost.cs`, and the constructor gains no new throwing precondition.
+- [x] `QuickFiler/Viewers/BreadcrumbUiDispatcher.cs` is unmodified.
+- [x] A regression test constructs the host through the internal three-argument constructor with a **recording** `SynchronizationContext` and a recording error sink, calls `PostMessageJson` and `NavigateToString` from the test thread, and asserts the recording context observed exactly one `Post` per call. The recording context never drains the posted action, so no WebView2 runtime is involved. The test fails against the pre-fix code.
 
 **#476 defect 2 — synchronized state publication (structural evidence only)**
 
-- [ ] `IsCoreInitialized` is backed by an explicit private field read through `Volatile.Read`; the auto-property at `WebView2BreadcrumbHost.cs:54` no longer exists.
-- [ ] The write uses `Volatile.Write` and remains strictly **after** the `core.WebMessageReceived` subscription (currently `:131-132`) and **before** `CoreInitialized?.Invoke(...)` (currently `:135`).
-- [ ] A structural test asserts by reflection that `WebView2BreadcrumbHost` declares an explicit backing field for the initialization flag and that no `[CompilerGenerated]` `<IsCoreInitialized>k__BackingField` exists. **This evidence is a structural proxy for the memory-ordering fix and is explicitly NOT a proof that the race is eliminated**; no deterministic race test is possible without violating the determinism requirement in `.claude/rules/general-unit-test.md`.
+- [x] `IsCoreInitialized` is backed by an explicit private field read through `Volatile.Read`; the auto-property at `WebView2BreadcrumbHost.cs:54` no longer exists.
+- [x] The write uses `Volatile.Write` and remains strictly **after** the `core.WebMessageReceived` subscription (currently `:131-132`) and **before** `CoreInitialized?.Invoke(...)` (currently `:135`).
+- [x] A structural test asserts by reflection that `WebView2BreadcrumbHost` declares an explicit backing field for the initialization flag and that no `[CompilerGenerated]` `<IsCoreInitialized>k__BackingField` exists. **This evidence is a structural proxy for the memory-ordering fix and is explicitly NOT a proof that the race is eliminated**; no deterministic race test is possible without violating the determinism requirement in `.claude/rules/general-unit-test.md`.
 
 **#477 defect 1 — interface contract documentation (Option B)**
 
-- [ ] `QuickFiler/Viewers/IWebViewCoreInitializer.cs` no longer claims a 1:1 forward to the WebView2 SDK, and its `CreateEnvironmentAsync` documentation states that `browserExecutableFolder` is passed as `null` unconditionally as a deliberate Evergreen-only decision, with `<exception>` documentation for the guards.
-- [ ] The `CreateEnvironmentAsync` and `EnsureCoreWebView2Async` **member signatures on `IWebViewCoreInitializer` are unchanged**, and no in-repo caller of either member and no Moq `Setup` expression is modified.
-- [ ] The coverage-exemption rationale at `QuickFiler/Viewers/WebView2CoreInitializer.cs:8-14` is restated on the accurate ground — external Evergreen runtime plus user-data-folder creation on disk — with no residual "1:1 forwarding" claim.
+- [x] `QuickFiler/Viewers/IWebViewCoreInitializer.cs` no longer claims a 1:1 forward to the WebView2 SDK, and its `CreateEnvironmentAsync` documentation states that `browserExecutableFolder` is passed as `null` unconditionally as a deliberate Evergreen-only decision, with `<exception>` documentation for the guards.
+- [x] The `CreateEnvironmentAsync` and `EnsureCoreWebView2Async` **member signatures on `IWebViewCoreInitializer` are unchanged**, and no in-repo caller of either member and no Moq `Setup` expression is modified.
+- [x] The coverage-exemption rationale at `QuickFiler/Viewers/WebView2CoreInitializer.cs:8-14` is restated on the accurate ground — external Evergreen runtime plus user-data-folder creation on disk — with no residual "1:1 forwarding" claim.
 
 **#477 defect 2 — argument guards**
 
-- [ ] `WebView2CoreInitializer.CreateEnvironmentAsync` throws `ArgumentNullException(nameof(cacheFolder))` for a null `cacheFolder` and `ArgumentException` for a whitespace `cacheFolder`, before any SDK call.
-- [ ] `WebView2CoreInitializer.EnsureCoreWebView2Async` throws `ArgumentNullException(nameof(control))` for a null `control`, before any SDK call, and does **not** guard `environment` (null is a valid SDK input meaning "default environment").
-- [ ] Guard tests are added to the existing `QuickFiler.Test/Controllers/WebView2CoreInitializerTests.cs`, assert the exception type **and** `ParamName`, and require no `QuickFiler.Test.csproj` edit.
-- [ ] All eleven Moq mock sites listed in the Interface Contract Change section, including the eight `MockBehavior.Strict` sites, pass unmodified.
+- [x] `WebView2CoreInitializer.CreateEnvironmentAsync` throws `ArgumentNullException(nameof(cacheFolder))` for a null `cacheFolder` and `ArgumentException` for a whitespace `cacheFolder`, before any SDK call.
+- [x] `WebView2CoreInitializer.EnsureCoreWebView2Async` throws `ArgumentNullException(nameof(control))` for a null `control`, before any SDK call, and does **not** guard `environment` (null is a valid SDK input meaning "default environment").
+- [x] Guard tests are added to the existing `QuickFiler.Test/Controllers/WebView2CoreInitializerTests.cs`, assert the exception type **and** `ParamName`, and require no `QuickFiler.Test.csproj` edit.
+- [x] All eleven Moq mock sites listed in the Interface Contract Change section, including the eight `MockBehavior.Strict` sites, pass unmodified.
 
 **Scope containment**
 
-- [ ] None of the following files is modified: `QuickFiler/Controllers/EfcFormController.cs`, `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`, `QuickFiler/Controllers/EfcItemController.cs`, `QuickFiler/Viewers/WebView2Messenger.cs`, `QuickFiler/Viewers/BreadcrumbMessengerHub.cs`, `QuickFiler/Viewers/BreadcrumbPopupUiOperations.cs`, `QuickFiler/Viewers/BreadcrumbBridgeCoordinator.cs`, `QuickFiler/Viewers/BreadcrumbUiDispatcher.cs`, `QuickFiler/QuickFiler.csproj`.
-- [ ] The production diff is confined to `QuickFiler/Viewers/WebView2BreadcrumbHost.cs`, `QuickFiler/Viewers/WebView2CoreInitializer.cs`, and `QuickFiler/Viewers/IWebViewCoreInitializer.cs`.
-- [ ] The follow-up defect at `QuickFiler/Controllers/EfcItemController.cs:223-227` (direct `CoreWebView2Environment.CreateAsync` call bypassing the seam) is **not** fixed by this feature, is recorded in this spec's Cross-Feature Notes, and is handed to the orchestrator for promotion through the promotion lifecycle. The executor does not create the issue; the promotion tooling is orchestrator-only, and the promotion is deliberately deferred out of the epic-preparation run because the issue-promotion tool has no idempotent path.
-- [ ] If a new test file is added, its `Compile Include` entry is inserted immediately after `QuickFiler.Test/QuickFiler.Test.csproj:159` and the surrounding ItemGroup is not re-sorted.
+- [x] None of the following files is modified: `QuickFiler/Controllers/EfcFormController.cs`, `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`, `QuickFiler/Controllers/EfcItemController.cs`, `QuickFiler/Viewers/WebView2Messenger.cs`, `QuickFiler/Viewers/BreadcrumbMessengerHub.cs`, `QuickFiler/Viewers/BreadcrumbPopupUiOperations.cs`, `QuickFiler/Viewers/BreadcrumbBridgeCoordinator.cs`, `QuickFiler/Viewers/BreadcrumbUiDispatcher.cs`, `QuickFiler/QuickFiler.csproj`.
+- [x] The production diff is confined to `QuickFiler/Viewers/WebView2BreadcrumbHost.cs`, `QuickFiler/Viewers/WebView2CoreInitializer.cs`, and `QuickFiler/Viewers/IWebViewCoreInitializer.cs`.
+- [x] The follow-up defect at `QuickFiler/Controllers/EfcItemController.cs:223-227` (direct `CoreWebView2Environment.CreateAsync` call bypassing the seam) is **not** fixed by this feature, is recorded in this spec's Cross-Feature Notes, and is handed to the orchestrator for promotion through the promotion lifecycle. The executor does not create the issue; the promotion tooling is orchestrator-only, and the promotion is deliberately deferred out of the epic-preparation run because the issue-promotion tool has no idempotent path.
+- [x] If a new test file is added, its `Compile Include` entry is inserted immediately after `QuickFiler.Test/QuickFiler.Test.csproj:159` and the surrounding ItemGroup is not re-sorted.
 
 **Nullable participation**
 
-- [ ] Neither `QuickFiler/Viewers/WebView2CoreInitializer.cs` nor `QuickFiler/Viewers/IWebViewCoreInitializer.cs` contains a `#nullable enable` directive after the change; nullability in those two files is expressed only through runtime `ArgumentNullException` / `ArgumentException` guards.
-- [ ] All new code in `QuickFiler/Viewers/WebView2BreadcrumbHost.cs` is nullable-clean, producing no `CS86xx` diagnostic under `/p:TreatWarningsAsErrors=true`.
+- [x] Neither `QuickFiler/Viewers/WebView2CoreInitializer.cs` nor `QuickFiler/Viewers/IWebViewCoreInitializer.cs` contains a `#nullable enable` directive after the change; nullability in those two files is expressed only through runtime `ArgumentNullException` / `ArgumentException` guards.
+- [x] All new code in `QuickFiler/Viewers/WebView2BreadcrumbHost.cs` is nullable-clean, producing no `CS86xx` diagnostic under `/p:TreatWarningsAsErrors=true`.
 
 **Coverage exemption correctness**
 
-- [ ] The class-level `[ExcludeFromCodeCoverage]` at `QuickFiler/Viewers/WebView2BreadcrumbHost.cs:29` is removed, and the class remarks no longer assert that every member forwards 1:1 to the WebView2 SDK.
-- [ ] Member-level `[ExcludeFromCodeCoverage]` with an accurate, member-specific rationale is applied only to the genuinely host-bound members of `WebView2BreadcrumbHost`; the internal constructor, the dispatcher-routing decisions, the registry detach path, and the `Volatile` state accessor are all measured.
-- [ ] Wherever a member combines a testable decision with a host-bound SDK forward, the SDK forward is extracted into a small private method that carries the member-level attribute, so the testable decision is measured.
-- [ ] In `WebView2CoreInitializer`, the argument guards are measured (not exempt) and the two SDK forwards carry an exemption whose rationale is the external Evergreen runtime plus user-data-folder creation on disk.
-- [ ] The repository coverage figure before and after the change is captured and the delta is recorded in the feature evidence folder. The baseline figure is recorded under `docs/features/active/webview2-host-initializer-defects-476/evidence/baseline/` and the post-change figure and delta under `docs/features/active/webview2-host-initializer-defects-476/evidence/qa-gates/`. These are the canonical evidence sub-paths; `evidence/coverage/` is not a canonical sub-path and must not be used.
+- [x] The class-level `[ExcludeFromCodeCoverage]` at `QuickFiler/Viewers/WebView2BreadcrumbHost.cs:29` is removed, and the class remarks no longer assert that every member forwards 1:1 to the WebView2 SDK.
+- [x] Member-level `[ExcludeFromCodeCoverage]` with an accurate, member-specific rationale is applied only to the genuinely host-bound members of `WebView2BreadcrumbHost`; the internal constructor, the dispatcher-routing decisions, the registry detach path, and the `Volatile` state accessor are all measured.
+- [x] Wherever a member combines a testable decision with a host-bound SDK forward, the SDK forward is extracted into a small private method that carries the member-level attribute, so the testable decision is measured.
+- [x] In `WebView2CoreInitializer`, the argument guards are measured (not exempt) and the two SDK forwards carry an exemption whose rationale is the external Evergreen runtime plus user-data-folder creation on disk.
+- [x] The repository coverage figure before and after the change is captured and the delta is recorded in the feature evidence folder. The baseline figure is recorded under `docs/features/active/webview2-host-initializer-defects-476/evidence/baseline/` and the post-change figure and delta under `docs/features/active/webview2-host-initializer-defects-476/evidence/qa-gates/`. These are the canonical evidence sub-paths; `evidence/coverage/` is not a canonical sub-path and must not be used.
 
 **Test policy conformance**
 
-- [ ] Every new test uses MSTest `[TestClass]`/`[TestMethod]`, Moq for mocks, and FluentAssertions `.Should()` with a `because:` argument on non-obvious assertions, and carries explicit `// Arrange` / `// Act` / `// Assert` comments.
-- [ ] No new test creates a temporary file, uses `Task.Delay` or `Thread.Sleep`, waits on wall-clock time, or depends on an external process, network, or the WebView2 Evergreen runtime.
-- [ ] Each host regression test uses a distinct `WebView2` control instance so the process-wide owner registry cannot couple tests, and the tests pass in any order.
+- [x] Every new test uses MSTest `[TestClass]`/`[TestMethod]`, Moq for mocks, and FluentAssertions `.Should()` with a `because:` argument on non-obvious assertions, and carries explicit `// Arrange` / `// Act` / `// Assert` comments.
+- [x] No new test creates a temporary file, uses `Task.Delay` or `Thread.Sleep`, waits on wall-clock time, or depends on an external process, network, or the WebView2 Evergreen runtime.
+- [x] Each host regression test uses a distinct `WebView2` control instance so the process-wide owner registry cannot couple tests, and the tests pass in any order.
 
 **Toolchain**
 
-- [ ] A single clean toolchain pass completed in this exact order with no failures and no file rewrites: `dotnet tool run csharpier format .`; then `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`; then `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`; then `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`.
+- [x] A single clean toolchain pass completed in this exact order with no failures and no file rewrites: `dotnet tool run csharpier format .`; then `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`; then `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`; then `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`.
 
 ---
 
