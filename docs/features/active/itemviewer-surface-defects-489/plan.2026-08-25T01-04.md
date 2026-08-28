@@ -408,20 +408,20 @@ artifact that discharges it.
 - [x] [P12-T9] Check off AC9 (line 777, `WireIntentEvents_SubscribesToPicturesChanged` passes); evidence `FEATURE/evidence/regression-testing/p2-t8-green-486.<ISO-8601>.md`.
 - [x] [P12-T10] Check off AC10 (line 778, `PicturesChanged_WhenRaised_RefreshesOptionsPictures` passes); evidence `FEATURE/evidence/regression-testing/p2-t8-green-486.<ISO-8601>.md`.
 - [x] [P12-T11] Check off AC11 (line 779, the 16 to 17 `WireIntentEvents` handoff is recorded in `evidence/other/`); evidence `FEATURE/evidence/other/wireintentevents-16-to-17-handoff.<ISO-8601>.md`.
-- [ ] [P12-T12] Check off AC12 (line 783, both `ParentChanged` metadata tests pass); evidence `FEATURE/evidence/regression-testing/p4-t6-green-487.<ISO-8601>.md`.
-- [ ] [P12-T13] Check off AC13 (line 784, the `Parent Changed` search returns zero matches); evidence `FEATURE/evidence/regression-testing/p4-t7-parent-changed-after.<ISO-8601>.md` against the two-match record in `p3-t4-parent-changed-before.<ISO-8601>.md`.
-- [ ] [P12-T14] Check off AC14 (line 785, both designer wirings deleted, proved by a clean analyzer build); evidence `FEATURE/evidence/regression-testing/p4-t5-build.<ISO-8601>.md`.
-- [ ] [P12-T15] Check off AC15 (line 786, no replacement logger or diagnostic introduced); evidence `FEATURE/evidence/regression-testing/p4-t8-no-replacement-logging.<ISO-8601>.md`.
-- [ ] [P12-T16] Check off AC16 (line 787, neither `.Designer.cs` reformatted wholesale); evidence `FEATURE/evidence/regression-testing/p4-t9-designer-diffstat.<ISO-8601>.md`.
-- [ ] [P12-T17] Check off AC17 (line 791, `ThemeMarshallingTests.cs` exists and `HtmlDarkConverter_WhenInvokeRequired_MarshalsThroughInvoke` passes); evidence `FEATURE/evidence/regression-testing/p6-t5-green-489.<ISO-8601>.md`.
-- [ ] [P12-T18] Check off AC18 (line 792, the other two `HtmlDarkConverter` tests pass); evidence `FEATURE/evidence/regression-testing/p6-t5-green-489.<ISO-8601>.md`.
-- [ ] [P12-T19] Check off AC19 (line 793, no #489 D2 test added to `QfcItemController.FocusAndThemeTests.cs` and its line count unchanged); evidence `FEATURE/evidence/regression-testing/p5-t8-focusandtheme-untouched.<ISO-8601>.md`.
-- [ ] [P12-T20] Check off AC20 (line 794, the #489 D3 dossier exists and names the two must-stay-green tests); evidence `FEATURE/evidence/regression-testing/fail-before-exception-489-d3-set-then-sort.<ISO-8601>.md`.
-- [ ] [P12-T21] Check off AC21 (line 795, `IItemViewer.cs` documents the set-then-sort ordering with unchanged signatures); evidence `FEATURE/evidence/other/p9-t10-iitemviewer-surface-delta.<ISO-8601>.md`.
-- [ ] [P12-T22] Check off AC22 (line 796, `IItemViewer_DeclaresNoUiSchedulerMember` passes); evidence `FEATURE/evidence/regression-testing/p6-t5-green-489.<ISO-8601>.md`.
-- [ ] [P12-T23] Check off AC23 (line 797, the `UiDispatcher` and `UiSyncContext` pins pass); evidence `FEATURE/evidence/regression-testing/p6-t5-green-489.<ISO-8601>.md`.
-- [ ] [P12-T24] Check off AC24 (line 798, the unrelated `UiScheduler` members are unchanged); evidence `FEATURE/evidence/regression-testing/p6-t6-unrelated-uischeduler.<ISO-8601>.md`.
-- [ ] [P12-T25] Check off AC25 (line 799, `MenuDropDown_ShowsMoveOptionsMenuThroughDispatcher` still passes and is unchanged); evidence `FEATURE/evidence/regression-testing/p6-t7-489-d1-standing-regression.<ISO-8601>.md`.
+- [x] [P12-T12] Check off AC12 (line 783, both `ParentChanged` metadata tests pass); evidence `FEATURE/evidence/regression-testing/p4-t6-green-487.<ISO-8601>.md`.
+- [x] [P12-T13] Check off AC13 (line 784, the `Parent Changed` search returns zero matches); evidence `FEATURE/evidence/regression-testing/p4-t7-parent-changed-after.<ISO-8601>.md` against the two-match record in `p3-t4-parent-changed-before.<ISO-8601>.md`.
+- [x] [P12-T14] Check off AC14 (line 785, both designer wirings deleted, proved by a clean analyzer build); evidence `FEATURE/evidence/regression-testing/p4-t5-build.<ISO-8601>.md`.
+- [x] [P12-T15] Check off AC15 (line 786, no replacement logger or diagnostic introduced); evidence `FEATURE/evidence/regression-testing/p4-t8-no-replacement-logging.<ISO-8601>.md`.
+- [x] [P12-T16] Check off AC16 (line 787, neither `.Designer.cs` reformatted wholesale); evidence `FEATURE/evidence/regression-testing/p4-t9-designer-diffstat.<ISO-8601>.md`.
+- [x] [P12-T17] Check off AC17 (line 791, `ThemeMarshallingTests.cs` exists and `HtmlDarkConverter_WhenInvokeRequired_MarshalsThroughInvoke` passes); evidence `FEATURE/evidence/regression-testing/p6-t5-green-489.<ISO-8601>.md`.
+- [x] [P12-T18] Check off AC18 (line 792, the other two `HtmlDarkConverter` tests pass); evidence `FEATURE/evidence/regression-testing/p6-t5-green-489.<ISO-8601>.md`.
+- [x] [P12-T19] Check off AC19 (line 793, no #489 D2 test added to `QfcItemController.FocusAndThemeTests.cs` and its line count unchanged); evidence `FEATURE/evidence/regression-testing/p5-t8-focusandtheme-untouched.<ISO-8601>.md`.
+- [x] [P12-T20] Check off AC20 (line 794, the #489 D3 dossier exists and names the two must-stay-green tests); evidence `FEATURE/evidence/regression-testing/fail-before-exception-489-d3-set-then-sort.<ISO-8601>.md`.
+- [x] [P12-T21] Check off AC21 (line 795, `IItemViewer.cs` documents the set-then-sort ordering with unchanged signatures); evidence `FEATURE/evidence/other/p9-t10-iitemviewer-surface-delta.<ISO-8601>.md`.
+- [x] [P12-T22] Check off AC22 (line 796, `IItemViewer_DeclaresNoUiSchedulerMember` passes); evidence `FEATURE/evidence/regression-testing/p6-t5-green-489.<ISO-8601>.md`.
+- [x] [P12-T23] Check off AC23 (line 797, the `UiDispatcher` and `UiSyncContext` pins pass); evidence `FEATURE/evidence/regression-testing/p6-t5-green-489.<ISO-8601>.md`.
+- [x] [P12-T24] Check off AC24 (line 798, the unrelated `UiScheduler` members are unchanged); evidence `FEATURE/evidence/regression-testing/p6-t6-unrelated-uischeduler.<ISO-8601>.md`.
+- [x] [P12-T25] Check off AC25 (line 799, `MenuDropDown_ShowsMoveOptionsMenuThroughDispatcher` still passes and is unchanged); evidence `FEATURE/evidence/regression-testing/p6-t7-489-d1-standing-regression.<ISO-8601>.md`.
 - [ ] [P12-T26] Check off AC26 (line 803, `IItemViewer_DeclaresAddFolderItemsAndNotSetFolderItems` passes); evidence `FEATURE/evidence/regression-testing/p8-t10-green-490.<ISO-8601>.md`.
 - [ ] [P12-T27] Check off AC27 (line 804, every production and test call site of the renamed member updated); evidence `FEATURE/evidence/regression-testing/p8-t9-build.<ISO-8601>.md` and `FEATURE/evidence/qa-gates/p11-t7-vstest-quickfiler.<ISO-8601>.md`.
 - [ ] [P12-T28] Check off AC28 (line 805, the two protected test method names still exist and pass); evidence `FEATURE/evidence/regression-testing/p8-t11-protected-test-names.<ISO-8601>.md`.

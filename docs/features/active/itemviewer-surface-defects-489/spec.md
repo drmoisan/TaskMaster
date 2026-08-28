@@ -791,23 +791,23 @@ criterion was weakened — each was only made locationally exact.
 
 ### Issue #487 — `Console.WriteLine` and unguarded cast
 
-- [ ] `ItemViewer_DeclaresNoParentChangedHandler` and `ItemViewerExpanded_DeclaresNoParentChangedHandler` in `ItemViewerBreadcrumbDropDownContractTests.cs` pass, proving `L0v2h2_WebView2_ParentChanged` is absent from both types.
-- [ ] `git grep -F -n "Parent Changed" -- QuickFiler/Viewers/` returns **zero** matches. (It returns two today, at `ItemViewer.cs:168` and `ItemViewerExpanded.cs:160`. The asserted token is the exact single-line, non-interpolated literal `Parent Changed`.)
-- [ ] The two designer wirings at `ItemViewer.Designer.cs:256` and `ItemViewerExpanded.Designer.cs:274` are deleted. Proof: the analyzer build succeeds, which is only possible if both `+=` statements are gone.
-- [ ] No logger, `Debug.WriteLine`, or replacement diagnostic call is introduced in `ItemViewer.cs` or `ItemViewerExpanded.cs` in place of the deleted `Console.WriteLine` statements. Proof: `git diff` for those two files shows deletions only, no added statement.
-- [ ] Neither `.Designer.cs` file is reformatted wholesale: each shows only the single deleted wiring line in `git diff --stat` against the Phase 0 base commit, consistent with the U1 answer recorded in the Phase 0 baseline.
+- [x] `ItemViewer_DeclaresNoParentChangedHandler` and `ItemViewerExpanded_DeclaresNoParentChangedHandler` in `ItemViewerBreadcrumbDropDownContractTests.cs` pass, proving `L0v2h2_WebView2_ParentChanged` is absent from both types.
+- [x] `git grep -F -n "Parent Changed" -- QuickFiler/Viewers/` returns **zero** matches. (It returns two today, at `ItemViewer.cs:168` and `ItemViewerExpanded.cs:160`. The asserted token is the exact single-line, non-interpolated literal `Parent Changed`.)
+- [x] The two designer wirings at `ItemViewer.Designer.cs:256` and `ItemViewerExpanded.Designer.cs:274` are deleted. Proof: the analyzer build succeeds, which is only possible if both `+=` statements are gone.
+- [x] No logger, `Debug.WriteLine`, or replacement diagnostic call is introduced in `ItemViewer.cs` or `ItemViewerExpanded.cs` in place of the deleted `Console.WriteLine` statements. Proof: `git diff` for those two files shows deletions only, no added statement.
+- [x] Neither `.Designer.cs` file is reformatted wholesale: each shows only the single deleted wiring line in `git diff --stat` against the Phase 0 base commit, consistent with the U1 answer recorded in the Phase 0 baseline.
 
 ### Issue #489 — UI-thread marshalling
 
-- [ ] `QuickFiler.Test/Controllers/QfcItemController.ThemeMarshallingTests.cs` exists and `HtmlDarkConverter_WhenInvokeRequired_MarshalsThroughInvoke` passes, asserting `viewer.Verify(v => v.Invoke(It.IsAny<Delegate>()), Times.Once())`.
-- [ ] `HtmlDarkConverter_WhenInvokeRequired_DoesNotNavigateWithoutMarshalling` and `HtmlDarkConverter_WhenNotInvokeRequired_NavigatesDirectly` in the same file pass.
-- [ ] No test for #489 D2 is added to `QuickFiler.Test/Controllers/QfcItemController.FocusAndThemeTests.cs`, and that file's line count is unchanged from its Phase 0 baseline (497).
-- [ ] The dossier `evidence/regression-testing/fail-before-exception-489-d3-set-then-sort.<ISO-8601>.md` exists, records why documenting the set-then-sort ordering admits no RED, and names `SetTopicThread_WhenNotInvokeRequired_SetsItemsAndSortsDescending` (`ConversationTests.cs:249`) and `SetTopicThread_WhenInvokeRequired_MarshalsViaInvoke` (`:266`) as the tests that must stay green.
-- [ ] `IItemViewer.cs` carries XML documentation on `SetConversationItems` and `SortConversationByDate` stating the same-UI-thread-turn ordering requirement, and both members retain their existing signatures.
-- [ ] `IItemViewer_DeclaresNoUiSchedulerMember` in `ItemViewerBreadcrumbDropDownContractTests.cs` passes, proving `IItemViewer` no longer declares `UiScheduler`.
-- [ ] `IItemViewer_StillDeclaresUiDispatcher` and `IItemViewer_StillDeclaresUiSyncContext` in the same file pass, proving the two seams that still have production consumers were not deleted.
-- [ ] The unrelated `UiScheduler` members on `ItemViewerExpanded.cs:63-67`, `EfcViewer.cs`, `QfcItemViewer.cs`, `QfcFormViewer.cs`, `QfcHomeController.cs` and `IQfcFormViewer.cs` are unchanged. Proof: `git diff --name-only` against the Phase 0 base commit lists none of `QuickFiler/Viewers/EfcViewer.cs`, `QuickFiler/Viewers/QfcItemViewer.cs`, `QuickFiler/Viewers/QfcFormViewer.cs`, `QuickFiler/Controllers/QfcHomeController.cs`, `QuickFiler/Interfaces/IQfcFormViewer.cs`.
-- [ ] `MenuDropDown_ShowsMoveOptionsMenuThroughDispatcher` (`QuickFiler.Test/Controllers/QfcItemController.SeamDispatcherTests.cs:99`) still passes and is unchanged; it is the standing regression for #489 D1, which is closed by citation with no work item.
+- [x] `QuickFiler.Test/Controllers/QfcItemController.ThemeMarshallingTests.cs` exists and `HtmlDarkConverter_WhenInvokeRequired_MarshalsThroughInvoke` passes, asserting `viewer.Verify(v => v.Invoke(It.IsAny<Delegate>()), Times.Once())`.
+- [x] `HtmlDarkConverter_WhenInvokeRequired_DoesNotNavigateWithoutMarshalling` and `HtmlDarkConverter_WhenNotInvokeRequired_NavigatesDirectly` in the same file pass.
+- [x] No test for #489 D2 is added to `QuickFiler.Test/Controllers/QfcItemController.FocusAndThemeTests.cs`, and that file's line count is unchanged from its Phase 0 baseline (497).
+- [x] The dossier `evidence/regression-testing/fail-before-exception-489-d3-set-then-sort.<ISO-8601>.md` exists, records why documenting the set-then-sort ordering admits no RED, and names `SetTopicThread_WhenNotInvokeRequired_SetsItemsAndSortsDescending` (`ConversationTests.cs:249`) and `SetTopicThread_WhenInvokeRequired_MarshalsViaInvoke` (`:266`) as the tests that must stay green.
+- [x] `IItemViewer.cs` carries XML documentation on `SetConversationItems` and `SortConversationByDate` stating the same-UI-thread-turn ordering requirement, and both members retain their existing signatures.
+- [x] `IItemViewer_DeclaresNoUiSchedulerMember` in `ItemViewerBreadcrumbDropDownContractTests.cs` passes, proving `IItemViewer` no longer declares `UiScheduler`.
+- [x] `IItemViewer_StillDeclaresUiDispatcher` and `IItemViewer_StillDeclaresUiSyncContext` in the same file pass, proving the two seams that still have production consumers were not deleted.
+- [x] The unrelated `UiScheduler` members on `ItemViewerExpanded.cs:63-67`, `EfcViewer.cs`, `QfcItemViewer.cs`, `QfcFormViewer.cs`, `QfcHomeController.cs` and `IQfcFormViewer.cs` are unchanged. Proof: `git diff --name-only` against the Phase 0 base commit lists none of `QuickFiler/Viewers/EfcViewer.cs`, `QuickFiler/Viewers/QfcItemViewer.cs`, `QuickFiler/Viewers/QfcFormViewer.cs`, `QuickFiler/Controllers/QfcHomeController.cs`, `QuickFiler/Interfaces/IQfcFormViewer.cs`.
+- [x] `MenuDropDown_ShowsMoveOptionsMenuThroughDispatcher` (`QuickFiler.Test/Controllers/QfcItemController.SeamDispatcherTests.cs:99`) still passes and is unchanged; it is the standing regression for #489 D1, which is closed by citation with no work item.
 
 ### Issue #490 — display and folder contract
 
