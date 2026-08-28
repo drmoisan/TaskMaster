@@ -1,11 +1,14 @@
-# qfc-initializewebviewasync-fault-is-unobserved (Potential Bug)
+# qfc-initializewebviewasync-fault-is-unobserved (Issue #670)
 
 - Date captured: 2026-08-28
 - Author: Dan Moisan
-- Status: Draft
+- Status: Promoted -> docs/features/active/qfc-initializewebviewasync-fault-is-unobserved/ (Issue #670)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
+- Issue: #670
+- Issue URL: https://github.com/drmoisan/TaskMaster/issues/670
+- Last Updated: 2026-08-28
 ## Summary
 
 `QfcItemController.InitializeWebViewAsync` (`QuickFiler/Controllers/QfcItemController.ViewerSetup.cs:48`)

@@ -8,7 +8,12 @@ Command: checkbox counts over
 compared.
 EXIT_CODE: 0
 
-## Outcome: 53 of 54 checked — REMEDIATION-REQUIRED, not a pass
+> **Superseded at 2026-08-28T06-40.** The remediation this artifact requested was performed by the
+> orchestrator; the outcome is now **54 of 54 checked — PASS**. See "Remediation performed" at the end
+> of this artifact. Everything between here and that section is the executor's record as written at
+> 2026-08-28T06-35 and is retained unaltered.
+
+## Outcome as recorded by the executor: 53 of 54 checked — REMEDIATION-REQUIRED, not a pass
 
 | Measure | Value |
 | --- | --- |
@@ -107,3 +112,48 @@ unchecked criterion is the research §3.5 item: its discharge and its guard-not-
 delivered, but the GitHub issue it requires could not be opened because the MCP-only promotion tools are
 unavailable to this executor and the `gh` path is hook-forbidden. The authorized
 pre-existing-unformatted-file exception was not used and does not apply.
+
+---
+
+## Remediation performed — outcome revised to 54 of 54, PASS
+
+Timestamp: 2026-08-28T06-40
+
+Command: `mcp__drm-copilot__potential_to_issue` with `promotion_type=bug`, `work_mode=full-bug`, and an
+absolute `potential_path` to the executor's prepared entry.
+EXIT_CODE: 0
+
+The orchestrator holds the MCP promotion tool set the executor lacked, so it ran exactly the approved
+path the executor identified. `gh issue create` was not used and no wording was altered to evade
+`enforce-promotion-mcp-only.ps1`.
+
+| Measure | Executor | After remediation |
+| --- | --- | --- |
+| Total acceptance-criterion checkboxes | 54 | **54** |
+| Checked `- [x]` | 53 | **54** |
+| Remaining `- [ ]` | 1 | **0** |
+| Plan tasks checked | 143 of 145 | **145 of 145** |
+| Outcome | remediation-required | **PASS** |
+
+The third clause of the research §3.5 criterion is now delivered: GitHub issue
+**[#670](https://github.com/drmoisan/TaskMaster/issues/670)** — "Bug:
+qfc-initializewebviewasync-fault-is-unobserved" — is OPEN against
+`QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`, verified with
+`gh issue view 670 --json number,title,state,url`. It is referenced by number and URL in the D5 section
+of `spec.md` and in `evidence/qa-gates/d5-faulted-task-observation.md`. The promoted record is at
+`docs/features/potential/promoted/2026-08-28-qfc-initializewebviewasync-fault-is-unobserved.md`.
+
+The other two clauses were already delivered and were not revisited: the D5 guard remains unweakened and
+`QfcItemController.ViewerSetup.cs` remains unedited.
+
+The check-off changed only the single character inside the brackets on `spec.md`'s research §3.5
+criterion. No criterion text was modified, added, removed, or reordered, and the total remains exactly
+54. Separately, a non-criterion paragraph was added to the spec's D5 design section recording the
+discharge and the #670 reference, because the criterion requires the issue to be "referenced here"; that
+paragraph is prose, not a checkbox, and does not alter the criterion count.
+
+Output Summary (revised): `spec.md` contains exactly **54** acceptance-criterion checkboxes, **54
+checked** and **0 remaining**, with **no criterion text modified**. The plan is **145 of 145** tasks
+complete. The single blocking gap — the GitHub issue for the research §3.5 follow-up — was closed by
+promoting the executor's prepared entry through the approved MCP path to issue **#670**. The outcome of
+`[P9-T15]` is **PASS**.

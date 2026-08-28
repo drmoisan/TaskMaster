@@ -62,9 +62,12 @@ viewer reports `IsDisposed` or `Disposing`, before any container is created and 
 `BreadcrumbResourceOwner` is added. No silent early return was substituted, no severity was reduced,
 and `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs` was not edited.
 
-## Follow-up potential entry — CREATED
+## Follow-up potential entry — CREATED, THEN PROMOTED
 
-`docs/features/potential/2026-08-28-qfc-initializewebviewasync-fault-is-unobserved.md`
+Created by the executor at
+`docs/features/potential/2026-08-28-qfc-initializewebviewasync-fault-is-unobserved.md`, and moved by the
+promotion tooling to its promoted location
+`docs/features/potential/promoted/2026-08-28-qfc-initializewebviewasync-fault-is-unobserved.md`.
 
 It is filed against `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`, names the mechanism (the
 returned `Task` is discarded at three of four call sites), names the trigger (a fault inside
@@ -72,9 +75,11 @@ returned `Task` is discarded at three of four call sites), names the trigger (a 
 carries the standard potential-entry front matter and section headings the promotion tooling maps into
 the GitHub bug issue template.
 
-## Promotion to a GitHub issue — BLOCKED
+## Promotion to a GitHub issue — BLOCKED IN THE EXECUTOR, THEN COMPLETED BY THE ORCHESTRATOR
 
-**No GitHub issue was opened, and the criterion `[P5-T11]` addresses is therefore left unchecked.**
+**Outcome: GitHub issue [#670](https://github.com/drmoisan/TaskMaster/issues/670) is OPEN.** The record
+of the executor's blocker is retained below rather than deleted, because it documents a real tool-set
+boundary that a future executor on this repository will hit again.
 
 The repository enforces an MCP-only promotion path. `.claude/hooks/enforce-promotion-mcp-only.ps1` is a
 `PreToolUse` hook that blocks, by its own documentation:
@@ -111,6 +116,41 @@ The approved path was therefore not available and the forbidden path was **not**
 made to reword a `gh` invocation to evade the hook. This is reported to the caller, who holds the MCP
 promotion tools.
 
+### Resolution by the orchestrator
+
+Timestamp: 2026-08-28T06-40
+
+The orchestrator holds the promotion tool set and completed the approved path. It did not use `gh issue
+create` and did not reword anything to evade the hook.
+
+Command: `mcp__drm-copilot__potential_to_issue` with
+`potential_path=<worktree>/docs/features/potential/2026-08-28-qfc-initializewebviewasync-fault-is-unobserved.md`,
+`promotion_type=bug`, `work_mode=full-bug`
+
+EXIT_CODE: 0
+
+Receipt:
+
+| Field | Value |
+| --- | --- |
+| Issue | **#670** |
+| URL | https://github.com/drmoisan/TaskMaster/issues/670 |
+| Title | Bug: qfc-initializewebviewasync-fault-is-unobserved |
+| State | OPEN (verified with `gh issue view 670 --json number,title,state,url`) |
+| Target repository | `drmoisan/TaskMaster` |
+| Promoted record | `docs/features/potential/promoted/2026-08-28-qfc-initializewebviewasync-fault-is-unobserved.md` (verified present on disk) |
+
+Two details worth recording for a future run. First, `potential_to_issue` rejected the
+workspace-relative `potential_path` and required an absolute path. Second, it **moved** the source out
+of `docs/features/potential/` rather than copying it, which is the documented behaviour for a source
+resolved directly from `docs/features/potential/`; the promoted record was confirmed present
+afterwards.
+
+No active feature folder was created for #670. The acceptance criterion requires an issue to be opened
+and referenced, not a delivery workflow, and #670 is filed against a `qfc-item-controller-defects-484`
+owned file that this feature must not edit. Creating an active folder would have left a dangling
+delivery scaffold for work nobody is executing.
+
 ### Consequence for the acceptance criterion
 
 The criterion `[P5-T11]` flips reads, in part: "If it is not observed, a new issue is opened against
@@ -119,15 +159,26 @@ that clause is live, and it names an **issue** specifically — unlike the three
 `[P7-T14]` flips, which accepts "a potential entry or GitHub issue". A potential entry alone does not
 satisfy it.
 
-Half the criterion is delivered: the open item is discharged with recorded evidence, and the guard is
-not weakened. The issue half is not. The criterion is left `- [ ]` rather than checked, and the gap is
-carried into `[P9-T15]`'s reconciliation as remediation-required.
+All three clauses are now delivered:
+
+1. **The open item is discharged with recorded evidence.** The task is not observed; the per-call-site
+   table above is the evidence.
+2. **A new issue is opened against `QfcItemController.ViewerSetup.cs` and referenced here.** Issue
+   **#670**, OPEN, referenced by number and URL in this artifact and in the D5 section of `spec.md`.
+3. **The guard is not weakened in response.** `EnsureBreadcrumbResourceOwnership` throws
+   `ObjectDisposedException` as its first action, unchanged from the delivered D5 design.
+
+The criterion is therefore checked `- [x]`. `[P9-T15]`'s reconciliation moves from
+remediation-required to pass, with 54 of 54 criteria delivered.
 
 Output Summary: A faulted `QfcItemController.InitializeWebViewAsync` task is **NOT observed** — three
 of its four production call sites discard it (`Initialization.cs:192`, `:288`, `:324`), only `:256`
 awaits it, and the two `EfcItemController` sites discard theirs as well. The D5 guard is **not**
-weakened in response. The follow-up potential entry
-`docs/features/potential/2026-08-28-qfc-initializewebviewasync-fault-is-unobserved.md` was created, but
-**promotion to a GitHub issue is blocked**: the repository's `enforce-promotion-mcp-only.ps1` hook
-forbids `gh issue create` and requires MCP promotion tools that are not in this executor's tool set. No
-issue number or URL can be recorded, so `[P5-T11]`'s criterion is left unchecked.
+weakened in response. The follow-up potential entry was created by the executor and promoted through the
+approved MCP path by the orchestrator to GitHub issue **#670**
+(https://github.com/drmoisan/TaskMaster/issues/670, OPEN), whose promoted record now lives at
+`docs/features/potential/promoted/2026-08-28-qfc-initializewebviewasync-fault-is-unobserved.md`.
+Promotion was initially blocked inside the executor because `enforce-promotion-mcp-only.ps1` forbids
+`gh issue create` and the three required MCP promotion tools are absent from the executor's tool set;
+the forbidden path was not used and nothing was reworded to evade the hook. All three clauses of
+`[P5-T11]`'s criterion are delivered and the criterion is checked.

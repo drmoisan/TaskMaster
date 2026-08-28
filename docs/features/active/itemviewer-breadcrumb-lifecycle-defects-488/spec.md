@@ -414,6 +414,15 @@ faulted `InitializeWebViewAsync` task is observed by its caller** and does not b
 `TaskException`. If it is not observed, the correct response is a new issue against `ViewerSetup.cs`
 (484-owned), **not** a weakening of this guard. This is a blocking acceptance criterion below.
 
+**Discharged (2026-08-28).** The task is **not** observed: three of its four production call sites
+discard it (`QfcItemController.Initialization.cs:192`, `:288`, `:324`); only `:256` awaits it. The two
+`EfcItemController` sites discard theirs as well. Per the rule above, the response is a new issue and
+not a weakened guard, so the D5 guard is delivered unweakened and the defect is filed as
+**issue [#670](https://github.com/drmoisan/TaskMaster/issues/670)** — "Bug:
+qfc-initializewebviewasync-fault-is-unobserved", filed against
+`QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`. Evidence:
+`evidence/qa-gates/d5-faulted-task-observation.md`.
+
 ### #475 — delete the ambient-probing selector, in three parts
 
 All three parts are **required** and must land as one change-set.
@@ -878,7 +887,7 @@ against the Phase 0 baseline rather than as an absolute count.
 - [x] A regression test disposes a real `ItemViewer`, calls `InitializeBreadcrumbPipeline`, asserts
       `ObjectDisposedException`, and additionally asserts `viewer.BreadcrumbCoordinator` is null.
 - [x] `QuickFiler/Viewers/ItemViewer.Designer.cs` is byte-identical to its pre-change state.
-- [ ] The research §3.5 open item is discharged with recorded evidence: it is confirmed whether a faulted
+- [x] The research §3.5 open item is discharged with recorded evidence: it is confirmed whether a faulted
       `QfcItemController.InitializeWebViewAsync` task is observed by its caller. If it is not observed, a
       new issue is opened against `QfcItemController.ViewerSetup.cs` (484-owned) and referenced here —
       **the guard is not weakened in response.**
