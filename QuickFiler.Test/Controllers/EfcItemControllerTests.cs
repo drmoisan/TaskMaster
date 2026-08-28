@@ -7,6 +7,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using QuickFiler.Controllers;
+using QuickFiler.Helper_Classes;
 using QuickFiler.Interfaces;
 
 namespace QuickFiler.Controllers.Tests
@@ -266,6 +267,89 @@ namespace QuickFiler.Controllers.Tests
                     .Should()
                     .BeSameAs(jumpToTopicThread, "the seeded 'D' delegate is not replaced");
                 mockKbd.VerifyNoOtherCalls();
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previousContext);
+            }
+        }
+
+        /// <summary>
+        /// #461. The dead handler guarded on <c>nameof(...Expanded)</c>, which compiles to the
+        /// literal <c>"Expanded"</c>, a name <c>ConversationResolver</c> never raises. The remedy
+        /// is removal rather than retargeting, so the member must be absent from type metadata.
+        /// </summary>
+        [TestMethod]
+        public void ConversationResolverPropertyChanged_IsAbsentFromEfcItemControllerMetadata()
+        {
+            // Arrange / Act
+            MethodInfo handler = typeof(EfcItemController).GetMethod(
+                "ConversationResolverPropertyChanged",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
+            );
+
+            // Assert
+            handler
+                .Should()
+                .BeNull(
+                    "the handler guards on a property name the resolver never raises and #461 closes it by removal"
+                );
+        }
+
+        /// <summary>
+        /// #461, stated positively. Removing the dead handler costs nothing because the intended
+        /// behaviour is already delivered by a different, live route: <c>PopulateConversation</c>
+        /// assigns <c>SetTopicThread</c> to the resolver's <c>UpdateUI</c> delegate, which the
+        /// resolver invokes on the UI thread after a background conversation load. Pinning that
+        /// route means a future regression that removes it fails loudly.
+        /// </summary>
+        [TestMethod]
+        public void PopulateConversation_AssignsSetTopicThreadToConversationResolverUpdateUi()
+        {
+            // Arrange
+            SynchronizationContext previousContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+            try
+            {
+                var controller = (EfcItemController)
+                    FormatterServices.GetUninitializedObject(typeof(EfcItemController));
+                var viewer = new QuickFiler.ItemViewer();
+                var dataModel = (EfcDataModel)
+                    FormatterServices.GetUninitializedObject(typeof(EfcDataModel));
+                var resolver = (ConversationResolver)
+                    FormatterServices.GetUninitializedObject(typeof(ConversationResolver));
+
+                // Expanded must be >= 0 so the Count getter's isInitialized predicate
+                // short-circuits and LoadCount() is never invoked.
+                // Fully qualified: an unrelated two-parameter Pair<,> is also in scope here.
+                SetPrivateField(
+                    resolver,
+                    "_count",
+                    new QuickFiler.Helper_Classes.Pair<int>(sameFolder: 0, expanded: 0)
+                );
+
+                // The ConversationResolver property setter is protected, so the resolver is placed
+                // on the data model through its backing field instead.
+                SetPrivateField(dataModel, "_conversationResolver", resolver);
+                SetPrivateField(controller, "_itemViewer", viewer);
+                SetPrivateField(controller, "_dataModel", dataModel);
+
+                // Act
+                controller.PopulateConversation();
+
+                // Assert
+                resolver
+                    .UpdateUI.Should()
+                    .NotBeNull("PopulateConversation must install the live topic-thread route");
+                resolver
+                    .UpdateUI.Method.Name.Should()
+                    .Be(
+                        "SetTopicThread",
+                        "SetTopicThread is the surviving route that delivers background-loaded conversation rows"
+                    );
+                resolver
+                    .UpdateUI.Target.Should()
+                    .BeSameAs(controller, "the delegate must be bound to this controller instance");
             }
             finally
             {

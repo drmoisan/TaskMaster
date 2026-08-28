@@ -618,10 +618,6 @@ namespace QuickFiler.Controllers
 
             _itemViewer.L0v2h2_WebView2.CoreWebView2InitializationCompleted +=
                 WebView2Control_CoreWebView2InitializationCompleted;
-            if (_dataModel.ConversationResolver is not null)
-                _dataModel.ConversationResolver.PropertyChanged += new PropertyChangedEventHandler(
-                    ConversationResolverPropertyChanged
-                );
             _itemViewer.TopicThread.ItemSelectionChanged +=
                 new ListViewItemSelectionChangedEventHandler(this.TopicThread_ItemSelectionChanged);
             _globals.Ol.PropertyChanged += DarkMode_Changed;
@@ -678,22 +674,6 @@ namespace QuickFiler.Controllers
         #endregion
 
         #region Event Handlers
-
-        public async void ConversationResolverPropertyChanged(
-            object sender,
-            PropertyChangedEventArgs e
-        )
-        {
-            if (e.PropertyName == nameof(_dataModel.ConversationResolver.ConversationInfo.Expanded))
-            {
-                // Switch to UI Thread
-                await _itemViewer.UiSyncContext;
-                _itemViewer.TopicThread.SetObjects(
-                    _dataModel.ConversationResolver.ConversationInfo.Expanded
-                );
-                _itemViewer.TopicThread.Sort(_itemViewer.SentDate, SortOrder.Descending);
-            }
-        }
 
         private void TopicThread_ItemSelectionChanged(
             object sender,

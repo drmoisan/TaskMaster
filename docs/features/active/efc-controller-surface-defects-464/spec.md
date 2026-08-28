@@ -937,10 +937,10 @@ files this feature does not own.**
 
 ### #461 — dead conversation-expanded handler (live; remedy DELETION)
 
-- [ ] A named test asserts `typeof(EfcItemController).GetMethod("ConversationResolverPropertyChanged", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)` is null.
-- [ ] A named test asserts `PopulateConversation` assigns `SetTopicThread` to `ConversationResolver.UpdateUI`, pinning the surviving live route.
-- [ ] No `PropertyChanged +=` subscription to a conversation resolver remains in `EfcItemController.cs`; the block previously at `:666-669` is absent.
-- [ ] The guard literal is not retargeted: `EfcItemController.cs` contains no occurrence of the token `nameof(_dataModel.ConversationResolver.ConversationInfo.Expanded)`.
+- [x] A named test asserts `typeof(EfcItemController).GetMethod("ConversationResolverPropertyChanged", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)` is null.
+- [x] A named test asserts `PopulateConversation` assigns `SetTopicThread` to `ConversationResolver.UpdateUI`, pinning the surviving live route.
+- [x] No `PropertyChanged +=` subscription to a conversation resolver remains in `EfcItemController.cs`; the block previously at `:666-669` is absent.
+- [x] The guard literal is not retargeted: `EfcItemController.cs` contains no occurrence of the token `nameof(_dataModel.ConversationResolver.ConversationInfo.Expanded)`.
 
 ### #463 — WebView2 incognito argument (live at 2 of 3 sites; remedies CORRECTION + DELETION)
 
