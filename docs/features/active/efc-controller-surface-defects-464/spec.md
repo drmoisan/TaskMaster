@@ -980,13 +980,13 @@ files this feature does not own.**
 
 ### #466 — dead code and latent NRE traps (latent; remedy DELETION)
 
-- [ ] A named test asserts `typeof(EfcViewer).GetMethod("SetController", BindingFlags.NonPublic | BindingFlags.Instance)` is null and `typeof(EfcViewer).GetField("_formController", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
-- [ ] A named test asserts `typeof(EfcViewer)` declares no method named `EditFiltersMenuItem_Click`.
-- [ ] The Edit Filters subscription at `EfcFormController.cs:398` and its target `EfcFormController.EditFiltersMenuItem_Click` are unchanged; a named test asserts `typeof(EfcFormController)` still declares `EditFiltersMenuItem_Click`.
+- [x] A named test asserts `typeof(EfcViewer).GetMethod("SetController", BindingFlags.NonPublic | BindingFlags.Instance)` is null and `typeof(EfcViewer).GetField("_formController", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
+- [x] A named test asserts `typeof(EfcViewer)` declares no method named `EditFiltersMenuItem_Click`.
+- [x] The Edit Filters subscription at `EfcFormController.cs:398` and its target `EfcFormController.EditFiltersMenuItem_Click` are unchanged; a named test asserts `typeof(EfcFormController)` still declares `EditFiltersMenuItem_Click`.
 - [x] A named test asserts `typeof(EfcItemController).GetMethod("InitializeWebView", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
 - [x] A named test asserts `typeof(EfcItemController)` declares no 7-parameter instance constructor.
 - [x] A named test asserts `typeof(EfcItemController).GetField("_selectorsCtrls", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
-- [ ] The files `QuickFiler/Viewers/EfcViewer3.cs`, `EfcViewer3.Designer.cs` and `EfcViewer3.resx` are absent from the working tree.
+- [x] The files `QuickFiler/Viewers/EfcViewer3.cs`, `EfcViewer3.Designer.cs` and `EfcViewer3.resx` are absent from the working tree.
 - [ ] `git diff --name-only` for the feature branch contains no entry for `QuickFiler/QuickFiler.csproj`.
 
 ### #467 — `ProcessCmdKey` swallows Alt mnemonics (live; remedy GUARD)

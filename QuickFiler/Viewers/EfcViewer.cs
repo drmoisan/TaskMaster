@@ -45,13 +45,6 @@ namespace QuickFiler
             get => _uiScheduler;
         }
 
-        private EfcFormController _formController;
-
-        internal void SetController(EfcFormController controller)
-        {
-            _formController = controller;
-        }
-
         private IQfcKeyboardHandler _keyboardHandler;
         internal IQfcKeyboardHandler KeyboardHandler
         {
@@ -153,10 +146,5 @@ namespace QuickFiler
         //    var menuItem = (ToolStripMenuItem)sender;
         //    menuItem.Checked = !menuItem.Checked;
         //}
-
-        private void EditFiltersMenuItem_Click(object sender, EventArgs e)
-        {
-            _formController.EditFiltersMenuItem_Click(sender, e);
-        }
     }
 }

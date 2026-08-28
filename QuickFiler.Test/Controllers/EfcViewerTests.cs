@@ -1,4 +1,8 @@
+using System.Linq;
+using System.Reflection;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using QuickFiler.Controllers;
 
 namespace QuickFiler.Controllers.Tests
 {
@@ -18,5 +22,83 @@ namespace QuickFiler.Controllers.Tests
     /// the deviation from the mirrored test layout is recorded in the plan task that created it.
     /// </remarks>
     [TestClass]
-    public class EfcViewerTests { }
+    public class EfcViewerTests
+    {
+        /// <summary>
+        /// #466 A. <c>EfcFormController</c> never calls <c>SetController</c>, unlike its QuickFiler
+        /// twin, so <c>_formController</c> is permanently null. Both are removed rather than wired
+        /// up, which disarms the trap without adding behaviour.
+        /// </summary>
+        [TestMethod]
+        public void SetControllerAndFormControllerField_AreAbsentFromEfcViewerMetadata()
+        {
+            // Arrange / Act
+            MethodInfo setController = typeof(EfcViewer).GetMethod(
+                "SetController",
+                BindingFlags.NonPublic | BindingFlags.Instance
+            );
+            FieldInfo formController = typeof(EfcViewer).GetField(
+                "_formController",
+                BindingFlags.NonPublic | BindingFlags.Instance
+            );
+
+            // Assert
+            setController
+                .Should()
+                .BeNull("SetController has no call site, so #466 A closes it by removal");
+            formController
+                .Should()
+                .BeNull(
+                    "_formController is permanently null once SetController is gone and is removed with it"
+                );
+        }
+
+        /// <summary>
+        /// #466 A. The viewer-side handler dereferenced the permanently null
+        /// <c>_formController</c>. It is unreachable today only because the Designer never wires
+        /// <c>EditFiltersMenuItem.Click</c>; a routine Designer regeneration would arm it.
+        /// </summary>
+        [TestMethod]
+        public void EditFiltersMenuItemClick_IsAbsentFromEfcViewerMetadata()
+        {
+            // Arrange
+            MethodInfo[] declared = typeof(EfcViewer).GetMethods(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
+            );
+
+            // Act
+            MethodInfo[] viewerSideHandlers = declared
+                .Where(candidate => candidate.Name == "EditFiltersMenuItem_Click")
+                .ToArray();
+
+            // Assert
+            viewerSideHandlers
+                .Should()
+                .BeEmpty(
+                    "the viewer-side Edit Filters handler is a latent null-dereference trap and #466 A removes it"
+                );
+        }
+
+        /// <summary>
+        /// #466 A, stated positively. The Edit Filters command is not broken and is not being
+        /// repaired: the form controller subscribes to the Designer control directly and its own
+        /// handler is the live route. Removing the viewer-side duplicate must not disturb it.
+        /// </summary>
+        [TestMethod]
+        public void FormEditFiltersMenuItemClick_IsStillDeclaredOnEfcFormController()
+        {
+            // Arrange / Act
+            MethodInfo liveHandler = typeof(EfcFormController).GetMethod(
+                "EditFiltersMenuItem_Click",
+                BindingFlags.Public | BindingFlags.Instance
+            );
+
+            // Assert
+            liveHandler
+                .Should()
+                .NotBeNull(
+                    "EfcFormController.EditFiltersMenuItem_Click is the live Edit Filters route and must survive #466 A"
+                );
+        }
+    }
 }
