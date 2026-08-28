@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="737551a0-8bd6-4f32-a41a-869c82453f67" name="<user>@<host> 2026-08-27 21:29:07" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T21:29:07.4235216-04:00" queuing="2026-08-27T21:29:07.4235216-04:00" start="2026-08-27T21:29:06.1086914-04:00" finish="2026-08-27T21:29:07.4400321-04:00" />
+  <TestSettings name="default" id="e02f0673-7e97-408d-8fe4-9945bad041c3">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-27_21_29_07" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="e5210778-ef6d-4de3-b3a8-c5c6190dd518" testId="1c8816ff-344b-82cd-bd19-55e11259680d" testName="ClaimsAltChord_WithAltM_ReturnsFalse" computerName="<host>" duration="00:00:00.0011792" startTime="2026-08-27T21:29:07.3549280-04:00" endTime="2026-08-27T21:29:07.3559276-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e5210778-ef6d-4de3-b3a8-c5c6190dd518">
+      <Output>
+        <ErrorInfo>
+          <Message>Expected EfcViewer.ClaimsAltChord(handler.Object, Keys.Alt | Keys.M) to be False because Alt+M is the Move Options menu mnemonic and must not be swallowed, but found True.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Primitives.BooleanAssertions`1.BeFalse(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/BooleanAssertions.cs:line 62&#xD;
+   at QuickFiler.Controllers.Tests.EfcViewerTests.ClaimsAltChord_WithAltM_ReturnsFalse() in <repo-root>\QuickFiler.Test\Controllers\EfcViewerTests.cs:line 138</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="19770c70-380c-420a-8512-2b0a294d1fce" testId="1d613ffd-071e-8759-a53c-5e85f226d985" testName="ClaimsAltChord_WithBareAltAndHandler_ReturnsTrue" computerName="<host>" duration="00:00:00.1128744" startTime="2026-08-27T21:29:07.0221229-04:00" endTime="2026-08-27T21:29:07.2469829-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="19770c70-380c-420a-8512-2b0a294d1fce">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="8734a826-30bb-4efa-997e-abbc5d5f8dac" testId="161c698e-f59f-8d13-a190-7295a4fbf762" testName="ClaimsAltChord_WithNonAltChord_ReturnsFalse" computerName="<host>" duration="00:00:00.0000896" startTime="2026-08-27T21:29:07.3559276-04:00" endTime="2026-08-27T21:29:07.3559276-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8734a826-30bb-4efa-997e-abbc5d5f8dac" />
+    <UnitTestResult executionId="2a36fbc6-5356-4929-a1af-86b8677f1230" testId="1d7948a9-4bf3-8328-b0e2-852fd76262dc" testName="ClaimsAltChord_WithNullHandler_ReturnsFalse" computerName="<host>" duration="00:00:00.0000489" startTime="2026-08-27T21:29:07.3559276-04:00" endTime="2026-08-27T21:29:07.3599272-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2a36fbc6-5356-4929-a1af-86b8677f1230" />
+    <UnitTestResult executionId="206741f7-5028-479d-904d-84a93af29ca2" testId="1dbb61d6-a428-8d07-bdfa-48049e7f1e28" testName="ClaimsAltChord_WithAltF_ReturnsFalse" computerName="<host>" duration="00:00:00.1006044" startTime="2026-08-27T21:29:07.2529820-04:00" endTime="2026-08-27T21:29:07.3549280-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="206741f7-5028-479d-904d-84a93af29ca2">
+      <Output>
+        <ErrorInfo>
+          <Message>Expected EfcViewer.ClaimsAltChord(handler.Object, Keys.Alt | Keys.F) to be False because Alt+F is the Filters menu mnemonic and must reach base.ProcessCmdKey, but found True.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Primitives.BooleanAssertions`1.BeFalse(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/BooleanAssertions.cs:line 62&#xD;
+   at QuickFiler.Controllers.Tests.EfcViewerTests.ClaimsAltChord_WithAltF_ReturnsFalse() in <repo-root>\QuickFiler.Test\Controllers\EfcViewerTests.cs:line 127</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="ClaimsAltChord_WithNullHandler_ReturnsFalse" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d7948a9-4bf3-8328-b0e2-852fd76262dc">
+      <Execution id="2a36fbc6-5356-4929-a1af-86b8677f1230" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcViewerTests" name="ClaimsAltChord_WithNullHandler_ReturnsFalse" />
+    </UnitTest>
+    <UnitTest name="ClaimsAltChord_WithNonAltChord_ReturnsFalse" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="161c698e-f59f-8d13-a190-7295a4fbf762">
+      <Execution id="8734a826-30bb-4efa-997e-abbc5d5f8dac" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcViewerTests" name="ClaimsAltChord_WithNonAltChord_ReturnsFalse" />
+    </UnitTest>
+    <UnitTest name="ClaimsAltChord_WithAltM_ReturnsFalse" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c8816ff-344b-82cd-bd19-55e11259680d">
+      <Execution id="e5210778-ef6d-4de3-b3a8-c5c6190dd518" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcViewerTests" name="ClaimsAltChord_WithAltM_ReturnsFalse" />
+    </UnitTest>
+    <UnitTest name="ClaimsAltChord_WithAltF_ReturnsFalse" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1dbb61d6-a428-8d07-bdfa-48049e7f1e28">
+      <Execution id="206741f7-5028-479d-904d-84a93af29ca2" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcViewerTests" name="ClaimsAltChord_WithAltF_ReturnsFalse" />
+    </UnitTest>
+    <UnitTest name="ClaimsAltChord_WithBareAltAndHandler_ReturnsTrue" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d613ffd-071e-8759-a53c-5e85f226d985">
+      <Execution id="19770c70-380c-420a-8512-2b0a294d1fce" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcViewerTests" name="ClaimsAltChord_WithBareAltAndHandler_ReturnsTrue" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1c8816ff-344b-82cd-bd19-55e11259680d" executionId="e5210778-ef6d-4de3-b3a8-c5c6190dd518" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d613ffd-071e-8759-a53c-5e85f226d985" executionId="19770c70-380c-420a-8512-2b0a294d1fce" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="161c698e-f59f-8d13-a190-7295a4fbf762" executionId="8734a826-30bb-4efa-997e-abbc5d5f8dac" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d7948a9-4bf3-8328-b0e2-852fd76262dc" executionId="2a36fbc6-5356-4929-a1af-86b8677f1230" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1dbb61d6-a428-8d07-bdfa-48049e7f1e28" executionId="206741f7-5028-479d-904d-84a93af29ca2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="5" executed="5" passed="3" failed="2" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

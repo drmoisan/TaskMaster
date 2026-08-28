@@ -346,7 +346,7 @@ namespace QuickFiler.Controllers.Tests
 
             controller.PopulateFolderComboBox();
 
-            viewer.Verify(v => v.SetFolderItems(It.IsAny<string[]>()), Times.Once());
+            viewer.Verify(v => v.AddFolderItems(It.IsAny<string[]>()), Times.Once());
         }
 
         [TestMethod]
@@ -404,7 +404,7 @@ namespace QuickFiler.Controllers.Tests
 
                 await controller.PopulateFolderComboBoxAsync(CancellationToken.None, varList);
 
-                viewer.Verify(v => v.SetFolderItems(It.IsAny<string[]>()), Times.Once());
+                viewer.Verify(v => v.AddFolderItems(It.IsAny<string[]>()), Times.Once());
             }
             finally
             {
@@ -430,7 +430,7 @@ namespace QuickFiler.Controllers.Tests
 
             controller.AssignFolderComboBox();
 
-            mock.Verify(v => v.SetFolderItems(It.IsAny<string[]>()), Times.Once());
+            mock.Verify(v => v.AddFolderItems(It.IsAny<string[]>()), Times.Once());
             mock.Verify(v => v.SetFolderSelectedIndex(1), Times.Once());
             mock.Verify(v => v.SetFolderSelectedItem(It.IsAny<string>()), Times.Never());
             controller.SelectedFolder.Should().Be(@"\\A\top");
@@ -473,7 +473,7 @@ namespace QuickFiler.Controllers.Tests
 
             controller.AssignFolderComboBox();
 
-            mock.Verify(v => v.SetFolderItems(It.IsAny<string[]>()), Times.Never());
+            mock.Verify(v => v.AddFolderItems(It.IsAny<string[]>()), Times.Never());
             mock.Verify(v => v.SetFolderSelectedIndex(It.IsAny<int>()), Times.Never());
         }
 

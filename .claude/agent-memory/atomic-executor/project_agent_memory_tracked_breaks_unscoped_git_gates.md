@@ -32,5 +32,14 @@ untracked) — neither alone proves "no file was added or removed". Note also th
 `git diff --name-only` is worktree-vs-index; if anything gets staged mid-execution, switch to
 `git diff --name-only HEAD -- <pathspec>`.
 
+**Re-check Phase 0 after a revision pass fixes the late phases.** On issue #501 the planner was told
+to scope the clean-tree checks and scoped only the two *commit-time* tasks (P9-T4, P9-T6), leaving
+the **Phase 0 baseline** task's `git status --porcelain` "produced zero output lines" acceptance
+unscoped. That one is the *most* certain to fail: at execution start the planner's own dirty
+agent-memory files and the not-yet-committed plan file are still in the tree (measured: three
+entries). When you accept a fix for this defect class, re-grep the whole plan — the natural mental
+model is "clean tree at the end", so authors patch the end and miss the baseline capture.
+
 Related: [[project_preflight_selfderived_gate_thresholds_are_blind]],
-[[project_418_plan_rationale_clauses_are_evidence]].
+[[project_418_plan_rationale_clauses_are_evidence]],
+[[project_preflight_ac_checkoff_and_tooloutput_paths]].

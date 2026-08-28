@@ -67,6 +67,7 @@
 - [468-review-residuals](project_468-review-residuals.md) — PASS/0 blocking; dual-floor coverage rows (80 PASS / 85 FAIL non-blocking) hook-verified; #623 baseline stale (2437), AC-27/28 deferred to default-branch merge
 - [446-review-residuals](project_446-review-residuals.md) — PASS/0 blocking; AC28 whole-type-vs-AC18 contradiction owed maintainer amendment (71.0% arithmetic ceiling); issue.md "Also closes #427" hazard; Actions.cs carve-out bound by COM loaders not MessageBox
 
+- [488-review-residuals](project_488-review-residuals.md) — PASS/0 blocking; TRX host tokens (runUser+storage) partial-sanitize precedent non-blocking; 21.4MB Cobertura + C6-stale promotions owed at fan-in; #670 filed
 - [614-review-residuals](project_614-review-residuals.md) — cycle-2 exit NO-GO/1 blocking: RC-1 widened filing guard admits archive-root-exact row that RequireArchiveRelativeStem throws on, post-Hide async-void crash; CR-1 closed
 - [444-review-residuals](project_444-review-residuals.md) — PASS/0 blocking; 3 ACs deferred-pending-PR-body (472-10/482-11/482-12); OB-1 merge-up owed vs #493 fan-in; NavigationTests 498/500 lines; raw Cobertura XMLs survive in executor worktree for re-parse
 - [442-review-residuals](project_442-review-residuals.md) — PASS/0 blocking; AC-19 stays unchecked (ratified deviation); residuals CR-1 empty-lines guard, CR-2 FileIO2 silent-failure promotion, CR-3 date-separator gap (#645), PA-2 agent-memory paths; post-442 baseline 85.1255/79.2096
@@ -75,6 +76,7 @@
 - [501-review-residuals](project_501-review-residuals.md) — PASS/0 blocking; "no compliant test placement" premise failed (HubCoverageTests 478/500 unexamined); redundant Abandon = coverage without assertion power; full-suite logs uncommitted; post-501 baseline 85.1448/79.2202
 - [464-review-residuals](project_464-review-residuals.md) — PASS/0 blocking; 7 promotions owed (RC7 EfcSelectionGuard "===" arity); Cobertura deleted-but-verified; shared info/exclude trap → commit artifacts on feature branch
 - [489-review-residuals](project_489-review-residuals.md) — cycle-1 reaudit GO/0 blocking; RC-1 cured (RED TRX committed with test, fix next commit = provable RED-first); commit-per-phase vs single-commit plan text judged on intent; amend the referenced table when an AC delegates to it
+- [493-review-residuals + msbuild-log gate adjudication](project_493-review-residuals-and-msbuild-log-gate-adjudication.md) — PASS/0 blocking; how a structurally unsatisfiable msbuild-log byte-equality gate was adjudicated without downgrading the AC
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.

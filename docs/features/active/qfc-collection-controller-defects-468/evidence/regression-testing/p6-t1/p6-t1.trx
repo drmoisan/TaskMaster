@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="e4b89d2f-4cea-4cfb-8159-9b80f629582b" name="<user>@<host> 2026-08-26 10:17:08" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T10:17:08.6336042-04:00" queuing="2026-08-26T10:17:08.6336042-04:00" start="2026-08-26T10:17:06.2091216-04:00" finish="2026-08-26T10:17:08.6536502-04:00" />
+  <TestSettings name="default" id="be8676c4-0dc2-4cf4-8b4c-4fa4ecce9fb2">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-26_10_17_08" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="81a85371-6517-44ae-88f3-ada5341ab969" testId="1ef908be-90a7-8cec-ab30-73dee33c23bb" testName="GetMoveDiagnostics_WithOneGroup_ReturnsExactlyOneLine" computerName="<host>" duration="00:00:00.3600814" startTime="2026-08-26T10:17:08.0285202-04:00" endTime="2026-08-26T10:17:08.5627832-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="81a85371-6517-44ae-88f3-ada5341ab969">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Expected lines to contain 1 item(s) because issue #469 defect 1 requires one diagnostics line per cached move group; a length greater than the group count is the surplus unassigned element produced by the off-by-one allocation, but found 2: {"01/01/2026,12:00, Subject 0,QuickFiled,5,0.08,Recipient 0,Sender 0,Email,Inbox,01/01/2026,00:00", &lt;null&gt;}.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Collections.GenericCollectionAssertions`3.HaveCount(Int32 expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Collections/GenericCollectionAssertions.cs:line 1497&#xD;
+   at QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests.GetMoveDiagnostics_WithOneGroup_ReturnsExactlyOneLine() in <repo-root>\QuickFiler.Test\Controllers\QfcCollectionControllerDefects468MoveTests.cs:line 300</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="GetMoveDiagnostics_WithOneGroup_ReturnsExactlyOneLine" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ef908be-90a7-8cec-ab30-73dee33c23bb">
+      <Execution id="81a85371-6517-44ae-88f3-ada5341ab969" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests" name="GetMoveDiagnostics_WithOneGroup_ReturnsExactlyOneLine" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1ef908be-90a7-8cec-ab30-73dee33c23bb" executionId="81a85371-6517-44ae-88f3-ada5341ab969" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

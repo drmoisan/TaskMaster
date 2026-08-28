@@ -167,7 +167,6 @@ namespace QuickFiler.Controllers
 
         public void ToggleNavigation(bool async)
         {
-            _itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(false)));
             if (async)
             {
                 _itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(false)));
@@ -290,12 +289,32 @@ namespace QuickFiler.Controllers
         {
             if (_isWebViewerInitialized)
             {
-                _itemViewer.NavigateToString(ItemHelper.ToggleDark(desiredState));
-                if (ConversationResolver.Count.Expanded > 0)
+                // #489 D2: this runs from theme toggles that can originate off the UI thread, and
+                // NavigateToString touches the WebView2 control directly. Guard the write the same
+                // way the CoreWebView2 initialization handler already does in
+                // QfcItemController.EventWiring.cs.
+                if (_itemViewer.InvokeRequired)
                 {
-                    ConversationResolver.ConversationInfo.Expanded.ForEach(item =>
-                        item.ToggleDark(desiredState)
-                    );
+                    _itemViewer.Invoke(() =>
+                    {
+                        _itemViewer.NavigateToString(ItemHelper.ToggleDark(desiredState));
+                        if (ConversationResolver.Count.Expanded > 0)
+                        {
+                            ConversationResolver.ConversationInfo.Expanded.ForEach(item =>
+                                item.ToggleDark(desiredState)
+                            );
+                        }
+                    });
+                }
+                else
+                {
+                    _itemViewer.NavigateToString(ItemHelper.ToggleDark(desiredState));
+                    if (ConversationResolver.Count.Expanded > 0)
+                    {
+                        ConversationResolver.ConversationInfo.Expanded.ForEach(item =>
+                            item.ToggleDark(desiredState)
+                        );
+                    }
                 }
             }
         }
@@ -317,6 +336,19 @@ namespace QuickFiler.Controllers
 
         public void ApplyReadEmailFormat(object state)
         {
+            // #484: this runs on a thread-pool timer callback. A callback already in flight when the
+            // timer is disposed still executes, and it can therefore observe a controller that
+            // Cleanup() has already torn down. Return instead of dereferencing released state.
+            if (
+                ItemHelper is null
+                || _themes is null
+                || _activeTheme is null
+                || _mailActions is null
+            )
+            {
+                return;
+            }
+
             ItemHelper.UnRead = false;
             _themes[_activeTheme].SetMailRead(async: true);
             _mailActions.UnRead = false;

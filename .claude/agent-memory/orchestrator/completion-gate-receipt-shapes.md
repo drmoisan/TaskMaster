@@ -19,20 +19,36 @@ A receipt counts **only when all three hold together**:
 hard-coded `'evidence'` member regardless of the array. Truthy-but-not-`$true` flags
 (`1`, `"true"`) deliberately do not count.
 
-`delegation_receipts[]` is separate and needs `agent_name`, `agent_id`, `step`, `phase`,
-`skill_source`, `result_signal`, `artifact_paths` (list), **`started_at` and `completed_at`**. It is a
-LIST, not an object. The two timestamps are enforced per-entry (`delegation receipt #N missing key:
-started_at`), so a retrospectively recorded preparation-run receipt still needs them — supply the
-artifact-derived preparation window and say so in a `timestamp_basis` note rather than omitting them.
+`delegation_receipts` is separate. Two forms are accepted (`OrchestratorStateReceipts.psm1`): a bare
+LIST, or an OBJECT namespace whose only permitted keys are `agents` (a list) and `promotion` (an
+object with only `potential_entry` / `issue` / `feature_folder`). The object form is what lets a run
+carry BOTH the promotion receipts the orchestrator agent spec demands and the routing-contract
+`agent_name` list — use it.
 
-### Every required agent also needs routing + complexity entries
+Each entry in the list (or in `agents`) needs **exactly these eight keys**, confirmed 2026-08-26 by
+reading the MCP validator's own error output on epic child #468:
+`agent_name`, `step`, `agent_id`, `skill_source`, `started_at`, `completed_at`, `result_signal`,
+`artifact_paths`. There is **no `phase` key** (an earlier note here claimed one; it is wrong).
+
+The two timestamps are enforced per-entry (`delegation receipt #N missing key: started_at`), so a
+retrospectively recorded preparation-run receipt still needs them — supply the artifact-derived
+preparation window and say so in a `timestamp_basis` note rather than omitting them.
+
+**Only record agents THIS run delegated.** Naming an upstream-prepared agent (`task-researcher`,
+`prd-feature`, `atomic-planner` from an epic-planner preparation run) in `agents` immediately forces
+`model_routing_receipts is missing a receipt for delegated agent: <name>` under
+`require_model_routing` — and you would have to invent a model choice you never made. Leave
+`agents: []` until your first delegation returns, and record the upstream work in `notes` and
+`delegation_receipts.promotion` instead.
+
+### Every agent you DO name needs routing + complexity entries
 
 `--require-model-routing` builds the delegated-agent set from `delegation_receipts[].agent_name`, so
-the moment you add receipts for `task-researcher` / `prd-feature` / `atomic-planner` / `pr-author` to
-satisfy the route contract, you must also add a `model_routing_receipts[]` entry per agent AND a
-`complexity_assessments[]` entry for each phase those receipts name. Under `fable_policy: preferred`
-the C3 cell is `fable` for the four overlay agents (`atomic-planner`, `prd-feature`, `feature-review`,
-`task-researcher`) and stays `opus` for `atomic-executor` and `pr-author`.
+every agent named there must also carry a `model_routing_receipts[]` entry AND a
+`complexity_assessments[]` entry for each phase those receipts name. That coupling is the mechanism
+behind the rule above. Under `fable_policy: preferred` the C3 cell is `fable` for the four overlay
+agents (`atomic-planner`, `prd-feature`, `feature-review`, `task-researcher`) and stays `opus` for
+`atomic-executor` and `pr-author`.
 
 ### Bug-promotion tool-name swap, and the divergence it creates
 

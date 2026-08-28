@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using QuickFiler.Helper_Classes;
@@ -45,20 +46,22 @@ namespace QuickFiler
             }
         }
 
+        /// <summary>
+        /// Takes the single-move guard, returning true to exactly one caller. The compare and the
+        /// assignment are one indivisible operation, so competing callers cannot both observe the
+        /// unset state and both proceed.
+        /// </summary>
         internal bool TryBeginExecuteMoves()
         {
-            if (_isExecuting)
-            {
-                return false;
-            }
-
-            _isExecuting = true;
-            return true;
+            return Interlocked.CompareExchange(ref _isExecuting, 1, 0) == 0;
         }
 
+        /// <summary>
+        /// Releases the single-move guard so a later move can begin.
+        /// </summary>
         internal void ResetExecuteMovesState()
         {
-            _isExecuting = false;
+            Interlocked.Exchange(ref _isExecuting, 0);
         }
 
         internal async Task ExecuteMovesCoreAsync()

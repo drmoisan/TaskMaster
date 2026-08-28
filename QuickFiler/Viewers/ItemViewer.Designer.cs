@@ -253,7 +253,6 @@ namespace QuickFiler
             this._l0v2h2_WebView2.Size = new System.Drawing.Size(1144, 358);
             this._l0v2h2_WebView2.TabIndex = 40;
             this._l0v2h2_WebView2.ZoomFactor = 1D;
-            this._l0v2h2_WebView2.ParentChanged += new System.EventHandler(this.L0v2h2_WebView2_ParentChanged);
             // 
             // LblConvCt
             // 

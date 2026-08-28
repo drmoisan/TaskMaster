@@ -27,7 +27,15 @@
 - [ApplicationGlobalsTests.cs at 500-line ceiling](project_appglobalstests_at_500_line_ceiling.md) — extraction first
 - [#376 capstone scope-expansion layers](project_376_capstone_scope_expansion_layers.md) — 5 layers, 3 authorized patterns
 - [Swordfish F5 test misclassification](project_swordfish_f5_test_misclassification.md) — check using/namespace before removal
-
+- [Confirmatory preflight: proportionate bar](feedback_confirmatory_preflight_proportionate_bar.md) — over a small delta to an already-cleared plan, an INCOMPLETE enumeration is an observation, not a blocker; plus the cheap mechanical diff checks
+- [Directory-scoped format breaks ownership gates](project_directory_scoped_format_breaks_ownership_gates.md) — a scoped csharpier pass naming DIRECTORIES rewrites must-not-write files the same plan asserts are unmodified; require file paths
+- [Supersede clause leaves a hard routing residual](project_supersede_clause_leaves_hard_routing_residual.md) — a "the plan's table supersedes this" clause does not neutralise a THIRD location naming a concrete file; re-derive the arithmetic of obeying it
+- [Four recurring C# plan defect classes](project_preflight_recurring_csharp_plan_defect_classes.md) — omitted `.claude/rules/csharp.md` read, exact `dotnet --version` equality vs global.json rollForward, absolute `Failed: 0`, and a `Select-String -LineNumber` switch that does not exist
+- [msbuild-log filename grep matches the csc command line](project_msbuild_log_token_search_matches_csc_command_line.md) — a byte-exact log line-set gate measures the compiler invocation, not diagnostics, and breaks on any added `<Compile Include>`
+- [Epic integration base invalidates research line counts](project_epic_integration_base_invalidates_research_line_counts.md) — TestSupport.cs was 489 not 365 lines and every citation into it shifted +3; measure, never restate
+- ["Make the citation exist" deltas propagate false facts](project_preflight_citation_match_propagates_false_fact.md) — a fix that copies A's prose into B corroborates A's error in two documents; also, an epic child's issue.md promise to siblings needs a C-constraint AND a verification task
+- [Check-off cites an artifact a LATER task writes](project_preflight_checkoff_cites_later_task_artifact.md) — unsatisfiable in plan order; also covers a phase-5 criterion needing an issue phase-7 opens; fix by body swap, not renumbering
+- [Conjunctive criteria break the one-artifact citation rule](project_preflight_conjunctive_criterion_citation_gap.md) — "cites exactly one artifact" makes every AC that conjoins facts from two command steps uncheckable; sweep for the second conjunct ("passes unmodified", "anywhere", "either figure")
 ## Build / toolchain environment
 - [pwsh/git/gh CLI gotchas](project_pwsh_git_gh_cli_gotchas.md) — no jq; pwsh won't concatenate `$(git merge-base ...)..HEAD`
 - [Project Build/Test Env](project_build_test_env.md) — git-bash MSBuild switches, MSYS_NO_PATHCONV, csharpier v1
@@ -63,7 +71,7 @@
 - [pwsh -Command quoting + backtick stripping](project_pwsh_command_quoting_from_bash.md) — backticks vanish; `-split "\r\n"` gives 1 element
 - [pwsh -File binds a list as ONE string](project_pwsh_file_array_param_from_bash.md) — `-Tokens a,b,c` is a 1-element array
 - [Compile-time red needs body-level refs](project_compile_red_needs_body_level_references.md) — a missing type in a SIGNATURE hides body errors
-
+- [Shared evidence artifact + floating <ts>](project_shared_evidence_artifact_floating_ts.md) — N tasks told to append to "the same" artifact whose
 ## Test execution & isolation
 - [Long runs need a detached process](project_long_runs_need_detached_process.md) — background runners die at ~1h
 - [Tests must mock GUI; no visible window](feedback_tests_must_mock_gui_no_visible_window.md) — headless seams, never Form.Show

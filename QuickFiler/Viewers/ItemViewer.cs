@@ -24,7 +24,6 @@ namespace QuickFiler
         {
             InitializeComponent();
             _context = SynchronizationContext.Current;
-            _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             _uiDispatcher = Dispatcher.CurrentDispatcher;
             InitControlGroups();
         }
@@ -60,12 +59,6 @@ namespace QuickFiler
         public SynchronizationContext UiSyncContext
         {
             get => _context;
-        }
-
-        private TaskScheduler _uiScheduler;
-        public TaskScheduler UiScheduler
-        {
-            get => _uiScheduler;
         }
 
         private Dispatcher _uiDispatcher;
@@ -163,29 +156,6 @@ namespace QuickFiler
                 .ToList();
         }
 
-        private void L0v2h2_WebView2_ParentChanged(object sender, EventArgs e)
-        {
-            Console.WriteLine("Parent Changed");
-        }
-
-        private void MenuItem_CheckedChanged(object sender, EventArgs e)
-        {
-            var menuItem = (ToolStripMenuItem)sender;
-            MenuItem_CheckedChanged(menuItem);
-        }
-
-        private void MenuItem_CheckedChanged(ToolStripMenuItem menuItem)
-        {
-            if (menuItem.Checked)
-            {
-                menuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
-            }
-            else
-            {
-                menuItem.Image = null;
-            }
-        }
-
         public List<Component> MenuItems => Initializer.GetOrLoad(ref _menuItems, LoadMenuItems);
         private List<Component> _menuItems;
 
@@ -201,8 +171,6 @@ namespace QuickFiler
             };
             return menuItems;
         }
-
-        private void MoveOptionsMenu_Click(object sender, EventArgs e) { }
 
         #region Field to Property for Interface
 

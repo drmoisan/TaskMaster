@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -131,6 +132,131 @@ namespace QuickFiler.Controllers.Tests
             masterQueue.Count.Should().Be(0);
             moveMonitor.Verify(x => x.UnhookItem(first), Times.Once);
             moveMonitor.Verify(x => x.UnhookItem(second), Times.Once);
+        }
+
+        /// <summary>
+        /// Issue #426. A candidate the high-confidence dequeue gate discards has already been
+        /// removed from the master queue and never reaches <c>UnhookDequeuedNodes</c>, so its
+        /// <c>EmailMoveMonitor</c> hook and its live COM reference are retained for the session.
+        /// The datamodel must release the hook through its OWN monitor instance exactly once.
+        /// Scoring is driven through the <c>ScoringServiceFactory</c> seam so no live Outlook COM
+        /// is touched.
+        /// </summary>
+        [TestMethod]
+        public async Task DequeueNextItemGroupAsync_HighConfidenceRejectedItem_UnhooksFromMoveMonitor()
+        {
+            // Arrange
+            var model = CreateUninitializedDatamodel();
+            var rejectedItem = new Mock<MailItem>().Object;
+            var masterQueue = new LockingLinkedList<MailItem>();
+            masterQueue.AddLast(rejectedItem);
+
+            var settings = new Mock<IAppQuickFilerSettings>(MockBehavior.Strict);
+            settings.SetupGet(x => x.HighConfidenceModeEnabled).Returns(true);
+            settings.SetupGet(x => x.HighConfidenceThreshold).Returns(0.90);
+            var globals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
+            globals.SetupGet(x => x.QfSettings).Returns(settings.Object);
+
+            var scoringService = new Mock<IFolderScoringService>(MockBehavior.Strict);
+            scoringService
+                .Setup(x =>
+                    x.ScoreAsync(
+                        rejectedItem,
+                        It.IsAny<IApplicationGlobals>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync((100L, string.Empty));
+
+            var moveMonitor = new Mock<IEmailMoveMonitor>(MockBehavior.Strict);
+            moveMonitor.Setup(x => x.UnhookItem(rejectedItem));
+
+            SetPrivateField(model, "_globals", globals.Object);
+            SetPrivateField(model, "_masterQueue", masterQueue);
+            SetPrivateField(model, "_moveMonitor", moveMonitor.Object);
+            SetPrivateField(model, "_worker", new BackgroundWorker());
+            model.ScoringServiceFactory = () => scoringService.Object;
+
+            // Act
+            IList<MailItem> result = await model.DequeueNextItemGroupAsync(1, 0);
+
+            // Assert
+            result.Should().BeEmpty("the drop-on-reject contract is unchanged");
+            masterQueue.Count.Should().Be(0, "the rejected candidate is still removed from source");
+            moveMonitor.Verify(
+                x => x.UnhookItem(rejectedItem),
+                Times.Once,
+                "the datamodel must release the rejected candidate's monitor hook exactly once"
+            );
+        }
+
+        /// <summary>
+        /// Issue #446. A gate result produced by first-batch deadline expiry must be projected
+        /// through the datamodel as <c>QfcDequeueStop.DeadlineExpired</c> rather than folded into
+        /// the generic quantity-satisfied outcome, otherwise the caller cannot tell a
+        /// deadline-bounded empty batch from genuine exhaustion. Driven by
+        /// <see cref="FakeTimeProvider"/>: every score consumes one second of a three-second budget
+        /// and nothing qualifies, so the deadline exit is the one the gate takes.
+        /// </summary>
+        [TestMethod]
+        public async Task DequeueNextItemGroupWithOutcomeAsync_DeadlineExpiredGate_ReportsDeadlineExpiredStop()
+        {
+            // Arrange
+            var model = CreateUninitializedDatamodel();
+            var fake = new FakeTimeProvider();
+            model.TimeProvider = fake;
+
+            var masterQueue = new LockingLinkedList<MailItem>();
+            for (int i = 0; i < 10; i++)
+            {
+                masterQueue.AddLast(new Mock<MailItem>().Object);
+            }
+
+            var settings = new Mock<IAppQuickFilerSettings>(MockBehavior.Strict);
+            settings.SetupGet(x => x.HighConfidenceModeEnabled).Returns(true);
+            settings.SetupGet(x => x.HighConfidenceThreshold).Returns(0.90);
+            var globals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
+            globals.SetupGet(x => x.QfSettings).Returns(settings.Object);
+
+            var scoringService = new Mock<IFolderScoringService>(MockBehavior.Strict);
+            scoringService
+                .Setup(x =>
+                    x.ScoreAsync(
+                        It.IsAny<MailItem>(),
+                        It.IsAny<IApplicationGlobals>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .Returns(() =>
+                {
+                    fake.Advance(TimeSpan.FromSeconds(1));
+                    return Task.FromResult((100L, string.Empty));
+                });
+
+            var moveMonitor = new Mock<IEmailMoveMonitor>(MockBehavior.Strict);
+            SetPrivateField(model, "_globals", globals.Object);
+            SetPrivateField(model, "_masterQueue", masterQueue);
+            SetPrivateField(model, "_moveMonitor", moveMonitor.Object);
+            SetPrivateField(model, "_worker", new BackgroundWorker());
+            SetPrivateField(model, "_remainingLoadActive", true);
+            model.ScoringServiceFactory = () => scoringService.Object;
+
+            // Act
+            QfcDequeueBatch batch = await model.DequeueNextItemGroupWithOutcomeAsync(
+                1,
+                0,
+                TimeSpan.FromSeconds(3),
+                null
+            );
+
+            // Assert
+            batch.Items.Should().BeEmpty("no candidate qualified before the deadline");
+            batch
+                .Stop.Should()
+                .Be(
+                    QfcDequeueStop.DeadlineExpired,
+                    "a deadline-bounded empty batch must not be reported as quantity satisfaction"
+                );
         }
     }
 }

@@ -258,7 +258,7 @@ namespace QuickFiler.Test.Viewers
                     new BreadcrumbUiDispatcher(Context, _errors.Add)
                 );
                 Viewer.InitializeBreadcrumbPipeline(provider.Object, operations);
-                Viewer.SetFolderItems(new[] { "A", "B" });
+                Viewer.AddFolderItems(new[] { "A", "B" });
                 Viewer.SetFolderSelectedIndex(0);
                 Host = new RecordingDropDownHost(openResults, CancelSelection);
                 Viewer.ConfigureBreadcrumbDropDown(Host, () => AnchorBounds, () => WorkingArea);

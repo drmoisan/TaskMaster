@@ -1,0 +1,470 @@
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Threading;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using QuickFiler.Controllers;
+using QuickFiler.Helper_Classes;
+using QuickFiler.Interfaces;
+
+namespace QuickFiler.Controllers.Tests
+{
+    /// <summary>
+    /// Regression tests for the <c>EfcItemController</c> surface defects closed by issues
+    /// #459, #461, #463, #464 D and E, and the <c>EfcItemController</c> half of #466.
+    /// </summary>
+    /// <remarks>
+    /// Several of the defects covered here are latent: the members they sit on have no
+    /// reachable call path, so the regression test pins the post-change contract by direct
+    /// invocation or by a type-metadata assertion rather than reproducing a user-visible
+    /// failure. Cleanup and timer behaviour for #460 lives in
+    /// <c>EfcItemController.CleanupTests.cs</c>, not here.
+    /// </remarks>
+    [TestClass]
+    public class EfcItemControllerTests
+    {
+        private const BindingFlags DeclaredInstance =
+            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+
+        /// <summary>
+        /// #459 A. <c>RegisterActions</c> misused the <c>KbdActions&lt;&gt;</c> indexer setter,
+        /// which is assign-if-present and never inserts, so its <c>overwriteDuplicates: false</c>
+        /// path registered nothing. It had zero call sites, so the remedy is removal; this test
+        /// pins that the member is gone rather than repaired.
+        /// </summary>
+        [TestMethod]
+        public void RegisterActions_IsAbsentFromEfcItemControllerMetadata()
+        {
+            // Arrange / Act
+            MethodInfo registerActions = typeof(EfcItemController).GetMethod(
+                "RegisterActions",
+                BindingFlags.NonPublic | BindingFlags.Instance
+            );
+
+            // Assert
+            registerActions
+                .Should()
+                .BeNull(
+                    "RegisterActions is dead code that misuses the KbdActions<> indexer setter and #459 A closes it by removal"
+                );
+        }
+
+        /// <summary>
+        /// #459 B and C, and #464 D. Both synchronous expansion overloads are removed: they were
+        /// the sole writers of the <c>'B'</c> and <c>'D'</c> <c>CharActions</c> entries and the
+        /// sole home of the two genuine <c>async void</c> lambdas. The surviving asynchronous
+        /// expansion path must remain declared, which is what makes the deletion behaviour-neutral.
+        /// </summary>
+        [TestMethod]
+        public void ToggleExpansion_IsAbsentAtEveryArity()
+        {
+            // Arrange
+            MethodInfo[] declared = typeof(EfcItemController).GetMethods(DeclaredInstance);
+
+            // Act
+            MethodInfo[] synchronousOverloads = declared
+                .Where(candidate => candidate.Name == "ToggleExpansion")
+                .ToArray();
+            MethodInfo[] asynchronousOverloads = declared
+                .Where(candidate => candidate.Name == "ToggleExpansionAsync")
+                .ToArray();
+
+            // Assert
+            synchronousOverloads
+                .Should()
+                .BeEmpty(
+                    "the dead synchronous expansion path is removed at every arity by #459 B/C, which also closes #464 D"
+                );
+            asynchronousOverloads
+                .Should()
+                .HaveCount(
+                    2,
+                    "the live asynchronous expansion path keeps both ToggleExpansionAsync overloads"
+                );
+        }
+
+        /// <summary>
+        /// #466 B, and the dead third site of #463. <c>InitializeWebView()</c> had zero call sites,
+        /// so the EN DASH incognito literal it contained is removed with its container rather than
+        /// edited in place.
+        /// </summary>
+        [TestMethod]
+        public void InitializeWebView_IsAbsentFromEfcItemControllerMetadata()
+        {
+            // Arrange / Act
+            MethodInfo initializeWebView = typeof(EfcItemController).GetMethod(
+                "InitializeWebView",
+                BindingFlags.NonPublic | BindingFlags.Instance
+            );
+
+            // Assert
+            initializeWebView
+                .Should()
+                .BeNull(
+                    "InitializeWebView has zero call sites and #466 B closes it by removal, taking the dead EN DASH literal with it"
+                );
+        }
+
+        /// <summary>
+        /// #466 C. The seven-parameter constructor had zero call sites. The two overloads that are
+        /// actually constructed, from <c>EfcFormController</c>, must survive.
+        /// </summary>
+        [TestMethod]
+        public void SevenParameterConstructor_IsAbsentFromEfcItemControllerMetadata()
+        {
+            // Arrange
+            ConstructorInfo[] constructors = typeof(EfcItemController).GetConstructors(
+                DeclaredInstance
+            );
+
+            // Act
+            int[] parameterCounts = constructors
+                .Select(candidate => candidate.GetParameters().Length)
+                .ToArray();
+
+            // Assert
+            parameterCounts
+                .Should()
+                .NotContain(
+                    7,
+                    "the seven-parameter constructor has zero call sites and #466 C removes it"
+                );
+            parameterCounts
+                .Should()
+                .Contain(
+                    5,
+                    "the five-parameter constructor is called from EfcFormController and is retained"
+                );
+            parameterCounts
+                .Should()
+                .Contain(
+                    6,
+                    "the six-parameter constructor is called from EfcFormController and is retained"
+                );
+        }
+
+        /// <summary>
+        /// #466 B. <c>_selectorsCtrls</c> was initialised to null, never assigned, and passed to
+        /// <c>SetupThemes</c> at two call sites. Removing it and passing an explicit null is
+        /// behaviour-identical and makes the contract visible instead of concealed.
+        /// </summary>
+        [TestMethod]
+        public void SelectorsCtrlsField_IsAbsentFromEfcItemControllerMetadata()
+        {
+            // Arrange / Act
+            FieldInfo selectorsCtrls = typeof(EfcItemController).GetField(
+                "_selectorsCtrls",
+                BindingFlags.NonPublic | BindingFlags.Instance
+            );
+
+            // Assert
+            selectorsCtrls
+                .Should()
+                .BeNull(
+                    "_selectorsCtrls is never assigned and #466 B removes it in favour of an explicit null at both SetupThemes call sites"
+                );
+        }
+
+        /// <summary>
+        /// #459 C. Pins the post-change contract of the surviving asynchronous expansion path:
+        /// driving it On, Off, On must neither throw nor touch the <c>CharActions</c> registry.
+        /// The deleted synchronous path added <c>'B'</c> and <c>'D'</c> on expand and removed them
+        /// on collapse, which is what made a sync-On / async-Off / sync-On sequence leave stale
+        /// entries behind.
+        /// </summary>
+        /// <remarks>
+        /// <c>ToggleExpansionAsync(ToggleState)</c> itself is not awaited. It marshals through
+        /// <c>ItemViewer.UiDispatcher</c>, a WPF <c>Dispatcher</c> that queues rather than runs on
+        /// an unpumped thread, so an await of it can never complete under a test policy that
+        /// forbids a message loop. The two dispatched bodies are therefore invoked directly.
+        ///
+        /// Two mechanisms keep the registry assertion falsifiable rather than tautological:
+        /// <c>MockBehavior.Strict</c> throws on any member invoked without a set-up, and
+        /// <c>VerifyNoOtherCalls()</c> fails on any unverified invocation. A dispatched body that
+        /// touched the keyboard handler at all therefore fails this test. The registry is read
+        /// from a local, never through the mock, so no arrange-time invocation is charged against
+        /// <c>VerifyNoOtherCalls()</c>.
+        /// </remarks>
+        [TestMethod]
+        public void AsyncExpansionPath_OnOffOn_LeavesCharActionsKeysUnchanged()
+        {
+            // Arrange
+            SynchronizationContext previousContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+            try
+            {
+                var controller = (EfcItemController)
+                    FormatterServices.GetUninitializedObject(typeof(EfcItemController));
+                var viewer = new QuickFiler.ItemViewer();
+
+                // The viewer's own window handle is already created by the time its constructor
+                // returns, because the WebView2 children force it. A visibility write against a
+                // child that is still parented to it therefore triggers CreateControl(), and
+                // creating a FastObjectListView handle never completes in a host with no message
+                // pump. Substituting a real, parentless FastObjectListView keeps the control type
+                // and the observable writes identical while leaving the native handle uncreated.
+                viewer.TopicThread = new BrightIdeasSoftware.FastObjectListView();
+
+                Action<char> jumpToWebView = _ => { };
+                Action<char> jumpToTopicThread = _ => { };
+                var registry = new KbdActions<char, KaChar, Action<char>>();
+                registry.Add("Item", 'B', jumpToWebView);
+                registry.Add("Item", 'D', jumpToTopicThread);
+
+                var mockKbd = new Mock<IQfcKeyboardHandler>(MockBehavior.Strict);
+                mockKbd.SetupGet(handler => handler.CharActions).Returns(registry);
+
+                SetPrivateField(controller, "_itemViewer", viewer);
+                SetPrivateField(controller, "_keyboardHandler", mockKbd.Object);
+
+                // Read the pre-state from the local, never through the mock.
+                int countBefore = registry.Count();
+                char[] keysBefore = registry.Keys.ToArray();
+
+                MethodInfo toggleOn = typeof(EfcItemController).GetMethod(
+                    "ToggleExpansionOn",
+                    BindingFlags.NonPublic | BindingFlags.Instance
+                );
+                MethodInfo toggleOff = typeof(EfcItemController).GetMethod(
+                    "ToggleExpansionOff",
+                    BindingFlags.NonPublic | BindingFlags.Instance
+                );
+                toggleOn
+                    .Should()
+                    .NotBeNull("the live async expansion path dispatches to ToggleExpansionOn");
+                toggleOff
+                    .Should()
+                    .NotBeNull("the live async expansion path dispatches to ToggleExpansionOff");
+
+                // Act
+                Action driveOnOffOn = () =>
+                {
+                    toggleOn.Invoke(controller, Array.Empty<object>());
+                    toggleOff.Invoke(controller, Array.Empty<object>());
+                    toggleOn.Invoke(controller, Array.Empty<object>());
+                };
+
+                // Assert
+                driveOnOffOn
+                    .Should()
+                    .NotThrow(
+                        "the surviving asynchronous expansion path must run headlessly without a keyboard registry"
+                    );
+                registry
+                    .Count()
+                    .Should()
+                    .Be(countBefore, "the async expansion path registers and unregisters nothing");
+                registry
+                    .Keys.Should()
+                    .Equal(keysBefore, "no CharActions key is added or removed by the async path");
+                registry['B']
+                    .Should()
+                    .BeSameAs(jumpToWebView, "the seeded 'B' delegate is not replaced");
+                registry['D']
+                    .Should()
+                    .BeSameAs(jumpToTopicThread, "the seeded 'D' delegate is not replaced");
+                mockKbd.VerifyNoOtherCalls();
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previousContext);
+            }
+        }
+
+        /// <summary>
+        /// #461. The dead handler guarded on <c>nameof(...Expanded)</c>, which compiles to the
+        /// literal <c>"Expanded"</c>, a name <c>ConversationResolver</c> never raises. The remedy
+        /// is removal rather than retargeting, so the member must be absent from type metadata.
+        /// </summary>
+        [TestMethod]
+        public void ConversationResolverPropertyChanged_IsAbsentFromEfcItemControllerMetadata()
+        {
+            // Arrange / Act
+            MethodInfo handler = typeof(EfcItemController).GetMethod(
+                "ConversationResolverPropertyChanged",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance
+            );
+
+            // Assert
+            handler
+                .Should()
+                .BeNull(
+                    "the handler guards on a property name the resolver never raises and #461 closes it by removal"
+                );
+        }
+
+        /// <summary>
+        /// #461, stated positively. Removing the dead handler costs nothing because the intended
+        /// behaviour is already delivered by a different, live route: <c>PopulateConversation</c>
+        /// assigns <c>SetTopicThread</c> to the resolver's <c>UpdateUI</c> delegate, which the
+        /// resolver invokes on the UI thread after a background conversation load. Pinning that
+        /// route means a future regression that removes it fails loudly.
+        /// </summary>
+        [TestMethod]
+        public void PopulateConversation_AssignsSetTopicThreadToConversationResolverUpdateUi()
+        {
+            // Arrange
+            SynchronizationContext previousContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+            try
+            {
+                var controller = (EfcItemController)
+                    FormatterServices.GetUninitializedObject(typeof(EfcItemController));
+                var viewer = new QuickFiler.ItemViewer();
+                var dataModel = (EfcDataModel)
+                    FormatterServices.GetUninitializedObject(typeof(EfcDataModel));
+                var resolver = (ConversationResolver)
+                    FormatterServices.GetUninitializedObject(typeof(ConversationResolver));
+
+                // Expanded must be >= 0 so the Count getter's isInitialized predicate
+                // short-circuits and LoadCount() is never invoked.
+                // Fully qualified: an unrelated two-parameter Pair<,> is also in scope here.
+                SetPrivateField(
+                    resolver,
+                    "_count",
+                    new QuickFiler.Helper_Classes.Pair<int>(sameFolder: 0, expanded: 0)
+                );
+
+                // The ConversationResolver property setter is protected, so the resolver is placed
+                // on the data model through its backing field instead.
+                SetPrivateField(dataModel, "_conversationResolver", resolver);
+                SetPrivateField(controller, "_itemViewer", viewer);
+                SetPrivateField(controller, "_dataModel", dataModel);
+
+                // Act
+                controller.PopulateConversation();
+
+                // Assert
+                resolver
+                    .UpdateUI.Should()
+                    .NotBeNull("PopulateConversation must install the live topic-thread route");
+                resolver
+                    .UpdateUI.Method.Name.Should()
+                    .Be(
+                        "SetTopicThread",
+                        "SetTopicThread is the surviving route that delivers background-loaded conversation rows"
+                    );
+                resolver
+                    .UpdateUI.Target.Should()
+                    .BeSameAs(controller, "the delegate must be bound to this controller instance");
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previousContext);
+            }
+        }
+
+        /// <summary>
+        /// #463. The additional-browser-arguments literal opened with U+2013 EN DASH rather than two
+        /// ASCII hyphen-minus characters, so Chromium silently ignored the unrecognised token and the
+        /// preview WebView2 was never incognito.
+        /// </summary>
+        /// <remarks>
+        /// The value is asserted directly against the hoisted constant. That is the only instrument
+        /// available: the enclosing member requires the real WebView2 runtime. This test performs no
+        /// file input or output and reads no <c>.cs</c> file from disk — an assertion about file bytes
+        /// would be about the source text rather than about the value the program actually uses.
+        /// </remarks>
+        [TestMethod]
+        public void IncognitoArgument_IsAsciiDoubleHyphenIncognitoWithTrailingSpace()
+        {
+            // Arrange
+            const string expected = "--incognito ";
+
+            // Act
+            string actual = EfcItemController.IncognitoArgument;
+
+            // Assert
+            actual
+                .Should()
+                .Be(
+                    expected,
+                    "Chromium command-line switches are introduced by two ASCII hyphen-minus characters"
+                );
+            actual
+                .ToCharArray()
+                .Should()
+                .OnlyContain(
+                    character => character <= 0x7F,
+                    "a non-ASCII character in a machine-parsed switch is silently ignored"
+                );
+            actual[0].Should().Be('-', "the first character must be ASCII HYPHEN-MINUS");
+            actual[1].Should().Be('-', "the second character must be ASCII HYPHEN-MINUS");
+        }
+
+        /// <summary>
+        /// A named helper whose frame appears in the stack trace of the exception it throws. The
+        /// frame name is the observable that distinguishes a preserved trace from a reset one.
+        /// </summary>
+        private static void ThrowFromOriginatingHelper() =>
+            throw new System.InvalidOperationException("WebView2 core initialization failed");
+
+        /// <summary>
+        /// #464 E. A plain <c>throw expression;</c> rethrow overwrites the exception's stack trace
+        /// with the rethrow site, discarding the frames that identify where the failure actually
+        /// originated. Capturing through <c>ExceptionDispatchInfo</c> preserves them.
+        /// </summary>
+        [TestMethod]
+        public void ThrowInitializationFailure_PreservesOriginalStackTrace()
+        {
+            // Arrange
+            System.Exception original = null;
+            try
+            {
+                ThrowFromOriginatingHelper();
+            }
+            catch (System.Exception caught)
+            {
+                original = caught;
+            }
+            original
+                .Should()
+                .NotBeNull("the arrange step must produce a thrown exception to rethrow");
+            original
+                .StackTrace.Should()
+                .Contain(
+                    nameof(ThrowFromOriginatingHelper),
+                    "the originating frame must be present before the rethrow, otherwise the test"
+                        + " could not detect its loss"
+                );
+
+            // Act
+            System.Exception rethrown = null;
+            try
+            {
+                EfcItemController.ThrowInitializationFailure(original);
+            }
+            catch (System.Exception caught)
+            {
+                rethrown = caught;
+            }
+
+            // Assert
+            rethrown
+                .Should()
+                .BeSameAs(
+                    original,
+                    "the supplied exception instance must be rethrown, not wrapped or replaced"
+                );
+            rethrown
+                .StackTrace.Should()
+                .Contain(
+                    nameof(ThrowFromOriginatingHelper),
+                    "the rethrow must preserve the originating frame, so a diagnostic reader can"
+                        + " still see where the WebView2 initialization actually failed"
+                );
+        }
+
+        private static void SetPrivateField(object target, string fieldName, object value)
+        {
+            FieldInfo field = target
+                .GetType()
+                .GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
+            field.Should().NotBeNull($"{fieldName} must remain available for this headless seam");
+            field.SetValue(target, value);
+        }
+    }
+}

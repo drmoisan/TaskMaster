@@ -74,6 +74,7 @@
 - [C# coverage has two denominators](csharp-coverage-denominator-two-figures.md) — filtered first-party ~85.9% clears the gate, unfiltered ~70.4% doesn't; measure before trusting
 - [lines-covered is nondeterministic; lines-valid is not](coverage-lines-covered-is-nondeterministic.md) — same-tree runs drift up to 4 lines per file, so a per-file covered-line gate fails on correct work
 - [Preflight catches vacuous gates](preflight-catches-vacuous-gates.md) — MCP `ok:true` is not enough; executor preflight found 6 gates that passed while verifying nothing
+- [Preflight: sweep task ordering + citation arity](preflight-sweep-task-ordering-and-citation-arity.md) — name both sweeps early; a check-off citing a LATER task's artifact is unsatisfiable in plan order
 - [Revert plans must check test provenance](revert-plans-must-check-test-provenance.md) — verify each test against the pre-change sha; a test that predates the change must survive
 - [Bash tool collapses `\` before sed sees it](bash-tool-collapses-double-backslash-in-sed.md) — a `\` pattern is a silent no-op exiting 0; use `.` per separator and always re-grep a match count
 - [Bash tool mangles MSBuild switches](bash-tool-mangles-msbuild-switches.md) — `/m` becomes `M:/` (MSB1008); run C# tools via `pwsh -NoProfile` with absolute paths
@@ -86,15 +87,21 @@
 - [Model-routing hook reads the canonical path only](model-routing-hook-reads-canonical-path-only.md) — it hardcodes artifacts/orchestration/orchestrator-state.json; a child-scoped file alone is blocked
 - [No helper scripts under evidence/](feedback_no_helper_scripts_under_evidence.md) — feature-review's language match is extension-only and path-blind; one retained `.ps1` forces a coverage FAIL
 - [One executor per worktree](one-executor-per-worktree.md) — a stale checkpoint is NOT a dead delegation; never launch a second executor into a live worktree
+- [Agent() cannot course-correct a running subagent](agent-tool-cannot-course-correct-running-subagent.md) — it starts a SECOND agent; SendMessage may be absent, so front-load the first prompt
 - [Removing a halt requires branch propagation](removing-a-halt-requires-branch-propagation.md) — converting a HALT into a recorded blocker strands downstream tasks; propagate to ALL consumers
 - [Bash tool rejects complex commands in isolated worktrees](bash-tool-rejects-complex-commands-in-isolated-worktree.md) — heredoc+redirect+git compounds are refused as unverifiable; gather with plain chained commands, then author via Write
 - [#457 coverage moved UP, and the kickoff figure was wrong](project_457_coverage_moved_up_not_down.md) — the denominator fix raised the rate 85.3514%→85.5355%; kickoff's 85.0317% matched no measurement, so #494 must re-measure
 - [atomic-planner has no MCP validator tool](atomic-planner-lacks-mcp-validator-tool.md) — it cannot run the mandatory plan gate; run it yourself and tell the planner not to fabricate a result
+- [Preflight defect-trend scope confound](preflight-defect-trend-scope-confound.md) — a rising count isn't divergence if you widened scope that round; hold scope fixed one round, and track re-introductions not raw counts
 - [C# agent worktree needs three bootstrap steps](csharp-agent-worktree-needs-three-bootstrap-steps.md) — no `.dotnet-sdk`, no `packages/`, and a clean restore still hits `error CS0006` on skewed analyzer versions; green CI is cache-explained, not tolerance
-- [potential_to_issue keeps ONLY the Summary section](potential-to-issue-keeps-only-summary-section.md) — every other section becomes "(not provided in potential file)"; verify the issue body, post the rest as a comment
+- [potential_to_issue maps sections by heading name](potential-to-issue-keeps-only-summary-section.md) — template headings survive INTACT; only your own invented headings get dropped. Keep the scaffold's headings
 - [Epic kickoff facts need independent measurement](epic-kickoff-facts-need-independent-measurement.md) — a kickoff predicted a 500-line cap finding from a conflated file; the named file was 323 lines, not 1,065
 - [WebView2 EndInit creates handles at construction](webview2-endinit-creates-handles-at-construction.md) — a bare ItemViewer already has both child handles AND its own; any "force the handle" remedy is a measured no-op
 - [blocked_reason enum can't express a substantive halt](blocked-reason-enum-cannot-express-substantive-halt.md) — 7 mechanical members only; use "none" plus free-form halt/blocking_findings keys, never a wrong member
+- [Bootstrapping orchestrator-state.json's first write](bootstrapping-orchestrator-state-json-first-write.md) — Write tool can't create it (absolute path never matches the gate's relative constant); use single-line `python3 -c`, and split forbidden MCP tool-name literals across string concatenation
+- [PRD_FEATURE_BLOCKED can be a prompt-parsing false positive](prd-feature-hook-parses-prompt-paths.md) — the hook reads `docs/features/active/...` out of your PROMPT; a quoted deep evidence path becomes the "feature folder"
+- [Multi-location fact residuals drive preflight rounds](multi-location-fact-residuals-drive-preflight-rounds.md) — nearly every blocking preflight defect is one fact corrected in SOME locations; enumerate every location per fact
+- [expect-fail tests break substring scoped-run gates](expect-fail-tests-break-substring-scoped-run-gates.md) — a "0 failed" gate under `FullyQualifiedName~Class` dies once an earlier task adds an expect-fail test there; carve out by exact name
 - [CR-pattern grep falsely reports 100% CRLF](grep-cr-empty-pattern-false-crlf.md) — the shell strips the CR, leaving an empty pattern matching every line; re-measure with a binary read
 
 - [Resumed child orchestrator shares your worktree](resumed-child-orchestrator-shares-worktree.md) — a checkpoint mtime you did not author means a live co-owner; cede, verify independently, do not race the PR or merge
@@ -104,6 +111,8 @@
 ## Artifact hygiene
 - [Angle-bracket redaction breaks TRX XML](angle-bracket-redaction-breaks-trx-xml.md) — a `<placeholder>` in an XML attribute makes the file unparseable; vstest lowercases `storage=`, so sweep case-insensitively
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
+- [prd-feature hook picks the LONGEST active path](prd-feature-hook-picks-longest-active-path.md) — a deep evidence path in an atomic-planner prompt resolves the feature folder to `evidence/other` and denies the delegation
+- [Promotion hook matches commit-message text](promotion-hook-matches-commit-message-text.md) — describing the GitHub-CLI issue-creation phrase inside a `git commit -m` body is denied; paraphrase it
 - [Closing keyword fires inside a negation](closing-keyword-fires-inside-negation.md) — `does NOT fix #511` still auto-closes #511; scan commit messages and PR bodies, never file contents
 - [feature-review edits SHARED .git/info/exclude](feature-review-edits-shared-git-info-exclude.md) — one line there hides untracked files in EVERY worktree sharing the git dir; revert BEFORE any clean-tree check, not after merge
 - [Hooks pattern-match Bash command TEXT](hooks-pattern-match-bash-command-text.md) — a guarded literal quoted inside a heredoc body blocks the call; author via Write tool or split the literal
@@ -113,3 +122,4 @@
 - [Edit tool CRLF-ifies LF markdown](edit-tool-crlf-ifies-lf-markdown.md) — under core.autocrlf=true it flips the WHOLE file; measure with a binary read, script mechanical edits in Python instead
 - [grep-count wrapper does not clear $LASTEXITCODE](grep-count-wrapper-does-not-clear-lastexitcode.md) — git grep exits 1 on zero matches and the Measure-Object wrapper does not reset it; plans citing this to omit ExpectedExitCode are wrong
 - [Session-root shims are deleted by siblings](session-root-shims-are-deleted-by-siblings.md) — PRD_FEATURE_BLOCKED is a session-cwd path artifact; seed truthful copies AND re-seed before every delegation, siblings delete them mid-run
+- [Stale-figure sweep by changed-file set](stale-figure-sweep-by-changed-file-set.md) — sweep the upstream PR's FULL changed-file set and both count spellings; the directive's named list missed a fifth figure

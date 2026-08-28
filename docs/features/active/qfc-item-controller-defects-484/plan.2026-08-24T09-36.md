@@ -1,0 +1,478 @@
+# qfc-item-controller-defects (Atomic Plan)
+
+- **Issue:** #484 (closes #480, #481, #483, #484, #485)
+- **Parent:** epic `quickfiler-bug-family`; integration branch `epic/quickfiler-bug-family-integration`
+- **Owner:** drmoisan
+- **Last Updated:** 2026-08-24T09-36
+- **Status:** Draft
+- **Version:** 1.0
+- **Work Mode:** `full-bug` (per `docs/features/active/qfc-item-controller-defects-484/issue.md`)
+
+## Requirement and acceptance sources
+
+- Sole acceptance-criteria source: `docs/features/active/qfc-item-controller-defects-484/spec.md`
+  (50 checkbox criteria, seven `###` sections). `user-story.md` is intentionally absent and its
+  absence is not a blocker under `full-bug`.
+- Scope and file ownership: `docs/features/active/qfc-item-controller-defects-484/issue.md`.
+- Technical input: `docs/features/active/qfc-item-controller-defects-484/research/research.2026-08-24T09-45.md`.
+  Section 9.1 fixes the selected approach for each of the five defects. No alternative approach may be
+  substituted.
+- **Research is subordinate to `spec.md`.** `spec.md` carries a superseding clause at the top of the
+  document. Where the research and `spec.md` disagree on a figure, a design detail, or a line citation,
+  `spec.md` governs and the research must not be treated as a correction of it. Two divergences are
+  named there: the research's **22** additional `Cleanup()` detachments against the delivered **23**,
+  and the research's description of the `QuickFiler.Test.csproj` item group as alphabetically ordered.
+  Research §8.5 additionally illustrates routing the #480 `async: true` test into
+  `QfcItemController.EventWiringTests.cs`; that illustration is superseded by constraint C2's capacity
+  table, which routes it to `QfcItemController.MailActionsTests.cs`. Obeying the research illustration
+  would project `QfcItemController.EventWiringTests.cs` to 506 lines, over the 500-line ceiling.
+
+## Fail-closed rules
+
+- **Evidence rule.** Every command-bearing task writes an artifact under
+  `docs/features/active/qfc-item-controller-defects-484/evidence/<kind>/`, where `<kind>` is one of
+  `baseline`, `regression-testing`, `qa-gates`, `other`. Each command-step artifact records
+  `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. A task with a missing or
+  field-incomplete artifact stays unchecked. Paths under `artifacts/baseline/`, `artifacts/qa/`,
+  `artifacts/qa-gates/`, `artifacts/coverage/`, `artifacts/regression-testing/`, or
+  `artifacts/evidence/` are forbidden and must not be used by any task in this plan.
+- **No-SKIPPED rule.** Every command task in this plan executes its stated command.
+  `EXIT_CODE: SKIPPED` is not a passing outcome for any task here.
+- **Expect-fail rule.** Tasks tagged `[expect-fail]` must record a non-zero `EXIT_CODE:` together with
+  `ExpectedExitCode: 1` and the named failing test result. A task tagged `[expect-fail]` that records a
+  pass is a failure of that task.
+
+---
+
+## Constraints (binding on every task)
+
+### C1 — File ownership
+
+Production files this plan may write, and no others:
+
+- `QuickFiler/Controllers/QfcItemController.FocusAndTheme.cs`
+- `QuickFiler/Controllers/QfcItemController.EventWiring.cs`
+- `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`
+- `QuickFiler/Controllers/QfcItemController.MailActions.cs`
+
+Test files this plan may write, and no others:
+
+- `QuickFiler.Test/Controllers/QfcItemController.FocusAndThemeTests.cs`
+- `QuickFiler.Test/Controllers/QfcItemController.EventWiringTests.cs`
+- `QuickFiler.Test/Controllers/QfcItemController.ViewerSetupTests.cs`
+- `QuickFiler.Test/Controllers/QfcItemController.MailActionsTests.cs`
+- `QuickFiler.Test/Controllers/QfcItemController.TestSupport.cs` (shared arrange helpers only; no test method may be added to this file)
+
+Edits to `QuickFiler.Test/Controllers/QfcItemController.TestSupport.cs` are additive only. This plan may append new private helper members to it. No task may rename, remove, reorder, or change the signature or body of any member that exists in that file at `<BASE_SHA>`. Seventeen other test files in `QuickFiler.Test` consume `QfcItemControllerTestSupport` or `HarnessController`, including `QuickFiler.Test/Controllers/QfcItemController.NavigationTests.cs`, which is adjacent to sibling feature 444. This constraint is the guarantee `issue.md`'s Downstream Consumers section states to those siblings. A formatting-only rewrite produced by the [P7-T1] CSharpier pass is not a violation of this clause; the [P7-T9] comparison is made on whitespace-normalized declarations.
+
+Files no task may create, modify, or delete:
+
+- `QuickFiler/Controllers/QfcItemController.Navigation.cs`
+- `QuickFiler/Viewers/ItemViewer.cs` and every other `QuickFiler/Viewers/ItemViewer*.cs`
+- `QuickFiler/Controllers/KbdActions.cs`
+- `QuickFiler/Interfaces/IQfcItemController.cs`
+- `QuickFiler/Viewers/IItemViewer.cs`
+- `QuickFiler/Controllers/EfcItemController.cs`
+- `QuickFiler/Controllers/QfcCollectionController.cs`
+- `QuickFiler/QuickFiler.csproj` and `QuickFiler.Test/QuickFiler.Test.csproj`
+
+No `.csproj` edit is permitted. All five owned test files already carry `Compile Include` entries in
+`QuickFiler.Test/QuickFiler.Test.csproj` at lines 142, 144, 146, 150, and 153 (research section 8.4;
+`QfcItemController.TestSupport.cs` at line 146), so no project-file wiring is needed. No new source
+file may be created in either project.
+
+### C2 — File-size ceiling (500 lines) and the test-capacity budget
+
+Measured baselines (verified 2026-08-24; the first eight rows are identical to research section 8.5, whose table predates the addition of the ninth file; the 365-line QfcItemController.TestSupport.cs row was measured for this revision):
+
+| File | Lines now | Headroom to 500 |
+|---|---|---|
+| `QuickFiler/Controllers/QfcItemController.FocusAndTheme.cs` | 326 | 174 |
+| `QuickFiler/Controllers/QfcItemController.EventWiring.cs` | 391 | 109 |
+| `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs` | 430 | 70 |
+| `QuickFiler/Controllers/QfcItemController.MailActions.cs` | 224 | 276 |
+| `QuickFiler.Test/Controllers/QfcItemController.FocusAndThemeTests.cs` | 497 | 3 |
+| `QuickFiler.Test/Controllers/QfcItemController.EventWiringTests.cs` | 374 | 126 |
+| `QuickFiler.Test/Controllers/QfcItemController.ViewerSetupTests.cs` | 474 | 26 |
+| `QuickFiler.Test/Controllers/QfcItemController.MailActionsTests.cs` | 184 | 316 |
+| `QuickFiler.Test/Controllers/QfcItemController.TestSupport.cs` | 365 | 135 |
+
+`QfcItemController.TestSupport.cs` receives shared arrange helpers only, never test methods. It
+already carries a `Compile Include` entry at `QuickFiler.Test/QuickFiler.Test.csproj:146`, so no
+`.csproj` edit is needed to use it.
+
+Across the four original test files, total headroom is 471 lines, of which the 3 lines in
+`QfcItemController.FocusAndThemeTests.cs` are unusable for a new test, leaving 468 usable lines. The
+superseded assignment placed 458 added lines on those four files, leaving a 10-line margin, and put 336
+of them on `QfcItemController.MailActionsTests.cs` (184-line baseline, projecting 520 lines — over the
+500-line ceiling). The assignment below therefore redistributes the groups and extracts shared arrange
+helpers into `QfcItemController.TestSupport.cs`. Under it the four original test files receive 400 added
+lines, a 68-line margin against the 468 usable, and `QfcItemController.TestSupport.cs` receives 88, for
+488 added lines in total; no test file receiving added lines is projected above 480 lines, leaving a
+20-line safety margin under the 500 ceiling for CSharpier reflow.
+(`QfcItemController.FocusAndThemeTests.cs` receives zero added lines and remains at its 497-line
+baseline.) The following rules are binding rather than advisory.
+
+**Planned home for each test group** (starting assignment, not a per-file mandate; the per-group
+in-file figures assume the shared arrange blocks for the #480, #481 intent-detach, #483, #484, and
+#485 groups are extracted into helpers in `QfcItemController.TestSupport.cs`):
+
+| Test group | Planned home | Approx. added lines in home |
+|---|---|---|
+| #480 assertion tightening (in place) | `QfcItemController.FocusAndThemeTests.cs` | 0 |
+| #480 `async: true` exact-count test | `QfcItemController.MailActionsTests.cs` | 26 |
+| #481 intent-detach test (16 `VerifyRemove`) | `QfcItemController.MailActionsTests.cs` | 48 |
+| #481 control-tree unwire test | `QfcItemController.EventWiringTests.cs` | 80 |
+| #481 teardown robustness test | `QfcItemController.EventWiringTests.cs` | 26 |
+| #483 error-handling and cancellation tests | `QfcItemController.MailActionsTests.cs` | 96 |
+| #484 T1 timer-disposal test | `QfcItemController.MailActionsTests.cs` | 14 |
+| #484 T2 callback-inertness test | `QfcItemController.MailActionsTests.cs` | 16 |
+| #484 `_mailActions` rebind test | `QfcItemController.MailActionsTests.cs` | 26 |
+| #485 `TryResolveCidResource` tests | `QfcItemController.MailActionsTests.cs` | 68 |
+| Shared arrange helpers (all groups) | `QfcItemController.TestSupport.cs` (helpers only) | 88 |
+
+**Per-file projection under this assignment** (every projected value must stay at most 480 for a
+file receiving added lines):
+
+| File | Baseline | Planned additions | Projected |
+|---|---|---|---|
+| `QfcItemController.FocusAndThemeTests.cs` | 497 | 0 | 497 |
+| `QfcItemController.EventWiringTests.cs` | 374 | 106 | 480 |
+| `QfcItemController.ViewerSetupTests.cs` | 474 | 0 | 474 |
+| `QfcItemController.MailActionsTests.cs` | 184 | 294 | 478 |
+| `QfcItemController.TestSupport.cs` | 365 | 88 | 453 |
+
+**Capacity rules.**
+
+1. Every test-adding task's acceptance includes: all five owned test files are at most 500 lines.
+   Where an individual task's own acceptance text names four test files, this rule extends that check
+   to include `QuickFiler.Test/Controllers/QfcItemController.TestSupport.cs`.
+2. Compaction techniques the executor must use before considering relocation: one shared private
+   arrange helper per test group instead of repeated arrange blocks; a `[DataTestMethod]` with one
+   `[DataRow]` per case where every case asserts the same outcome shape; folding a second assertion
+   into an existing test rather than adding a near-duplicate test method.
+3. If a planned home would exceed 500 lines after compaction, the test group may be relocated to a
+   different owned test file (never `QfcItemController.TestSupport.cs`, which receives shared arrange
+   helpers only), with a header comment naming the issue number. Relocation is permitted; file
+   creation is not.
+4. If no allocation across the five owned test files fits, the executor must stop, write a blocker
+   artifact to `docs/features/active/qfc-item-controller-defects-484/evidence/other/capacity-blocker.md`,
+   and report. It must not edit a `.csproj`, create a new file, write a forbidden file, or leave any
+   file above 500 lines.
+5. The two pre-existing headless real-`ItemViewer` tests in
+   `QuickFiler.Test/Controllers/QfcItemController.EventWiringTests.cs` (at lines 229-309 and 319-372)
+   must not be refactored, renamed, or shortened. Preserving them keeps the real-`ItemViewer`
+   construction count arithmetic in P7-T10 deterministic.
+6. In `QuickFiler.Test/Controllers/QfcItemController.MailActionsTests.cs`, `System` is not imported
+   and `Microsoft.Office.Interop.Outlook` is, so a bare `Action` silently binds
+   `Microsoft.Office.Interop.Outlook.Action` and a bare `Exception` silently binds
+   `Microsoft.Office.Interop.Outlook.Exception`. Do not add `using System;` to that file, and do not
+   add any other `System` namespace import to it. Instead write every `System`-namespace type fully
+   qualified there. This is a general rule, not a three-name list: besides `System.Action`,
+   `System.Func<Task>`, and `System.Exception`, the test groups routed to this file need whichever of
+   `System.Threading.Timer`, `System.Threading.Timeout`, `System.Threading.CancellationToken`,
+   `System.Threading.CancellationTokenSource`, `System.ObjectDisposedException`,
+   `System.InvalidOperationException`, `System.OperationCanceledException`, `System.EventHandler`,
+   `System.Delegate`, `System.IAsyncResult`, `System.Uri`, `System.UriKind`, and
+   `System.Windows.Forms.KeyEventHandler` their arrange and assert blocks actually use. The generic arities differ from the non-generic Outlook
+   types, so `Action<string>` and `Func<Task>` are unambiguous in the production file
+   `QuickFiler/Controllers/QfcItemController.MailActions.cs`, which does import `System`; that file
+   nonetheless already writes `System.Action` (`:54`) and `System.Exception` (`:115`) for the
+   arity-zero names and new code there must follow the same convention.
+   `EventWiringTests.cs` and `TestSupport.cs` have no such constraint.
+7. **Append-below-the-citation rule.** Two acceptance conditions cite a line number inside a file this
+   plan edits: `spec.md`'s #481 criteria cite the `ForAllControls` exclusion list at
+   `QuickFiler/Controllers/QfcItemController.EventWiring.cs:50` and the headless fixture at
+   `QuickFiler.Test/Controllers/QfcItemController.EventWiringTests.cs:229-309`, and `[P5-T7]` and
+   `[P5-T2]` repeat those citations. Every member this plan adds to
+   `QuickFiler/Controllers/QfcItemController.EventWiring.cs` and every test method it adds to
+   `QuickFiler.Test/Controllers/QfcItemController.EventWiringTests.cs` must therefore be appended
+   **after** the last existing member of the containing type, never inserted above it, so those cited
+   line numbers still resolve to the same source in the delivered file. The same rule applies to
+   `QuickFiler.Test/Controllers/QfcItemController.TestSupport.cs`, whose members are enumerated
+   against `<BASE_SHA>` in `[P7-T9]`. `spec.md` is the delivered upstream contract for features 464
+   and 489, so a citation it carries that the executor's own edit invalidates is a defect in the
+   contract, not a formatting detail.
+
+   **Scope of this rule, and what covers the rest.** This rule preserves exactly the two citations
+   named above, and it is the only rule that preserves any citation. It cannot be extended to the
+   other citations `spec.md` carries into files this plan edits, because several of this plan's own
+   edits necessarily move them: `[P1-T5]` deletes `QfcItemController.FocusAndTheme.cs:170`, which
+   shifts `ApplyReadEmailFormat` at `:318-324` up one line, and `[P4-T7]` then adds a guard inside it;
+   `[P5-T4]` inserts the `UnwireEvents()` call into `Cleanup()` above
+   `QfcItemController.ViewerSetup.cs:407`, `:420` and `:424`, `[P4-T5]` inserts the timer disposal
+   immediately above `:424`, and `[P4-T6]` inserts the mail-actions nulling statement inside the same
+   method; `[P2-T1]` and `[P2-T5]` restructure
+   `QfcItemController.ViewerSetup.cs:84-105`; and `[P3-T5]` and `[P3-T6]` restructure
+   `QfcItemController.MailActions.cs:83-126`. Those citations are therefore **pre-change locators
+   anchored to `<BASE_SHA>`**, which is what the "Line-citation anchor" paragraph at the top of
+   `spec.md` states. The executor must not renumber, delete, or "correct" any `spec.md` citation to
+   match the delivered source: `spec.md` criterion text is unmodifiable under `[P8-T13]`, and the
+   delivered line numbers for the `Cleanup()` statements are recorded separately by `[P6-T4]`.
+
+### C3 — Test policy
+
+MSTest, Moq, and FluentAssertions only. No MSTest `Assert.*` call. `Thread.Sleep`, `Task.Delay`, any
+real wall-clock wait, and any temporary file are prohibited in every new test. The #484 timer test uses
+the deterministic approach of research section 4.4: a timer armed with `Timeout.Infinite` so it can
+never fire, with disposal observed through an `ObjectDisposedException` from `Timer.Change`. Every new
+test is seam-and-inject, with exactly one exception: the #481 control-tree unwire test constructs a real
+headless `QuickFiler.ItemViewer`, mirroring the existing fixture at
+`QuickFiler.Test/Controllers/QfcItemController.EventWiringTests.cs:229-309` — no `Show()` call, no
+message pump, no worker thread, and the `SynchronizationContext` saved and restored in `try`/`finally`.
+
+### C4 — `Cleanup()` statement-order constraints (research section 2.5)
+
+1. The `UnwireEvents()` call must precede `_itemViewer = null` and must precede `_kbdHandler = null`.
+2. `_emailIsReadTimer?.Dispose()` must precede `_emailIsReadTimer = null`.
+3. The existing `BreadcrumbUnhandledArrow` detach must continue to precede `_breadcrumbViewer = null`.
+
+### C5 — Coverage-exemption constraint
+
+No new `[ExcludeFromCodeCoverage]` attribute may be introduced anywhere. Measured baseline across the
+four owned production files: `QfcItemController.EventWiring.cs` 1 occurrence,
+`QfcItemController.ViewerSetup.cs` 2 occurrences, `QfcItemController.FocusAndTheme.cs` 0,
+`QfcItemController.MailActions.cs` 0. Total 3. That total and distribution must be unchanged at P7-T11.
+
+---
+
+## Decisions Record
+
+- **D1 — Toolchain gate commands are the CLAUDE.md commands verbatim, with `/t:Rebuild`.** The two
+  msbuild gate tasks (P7-T3, P7-T4) use `/t:Rebuild`. A warm `/t:Build` skips `CoreCompile` on every
+  project and the analyzer and nullable gates then cannot fail.
+- **D2 — Intermediate builds are not gates.** Tasks that only need a fresh `QuickFiler.Test.dll` in
+  order to run a test use `/t:Build` against `QuickFiler.Test\QuickFiler.Test.csproj`. Those tasks are
+  never cited as an analyzer or nullable gate, and their artifacts state that explicitly.
+- **D3 — No solution-wide nullable property.** `/p:Nullable=enable` must not be added to any command.
+  Nullable enforcement in this repository is per-file opt-in via `#nullable enable`.
+- **D4 — MSBuild and vstest are invoked from PowerShell.** Every `msbuild` and `vstest.console.exe`
+  invocation runs under `pwsh -NoProfile` with absolute executable paths resolved in P0-T4. A bash shell
+  mangles the parallel-build switch into a drive-letter path and fails with MSB1008. Neither
+  `msbuild` nor `vstest.console.exe` nor `vswhere.exe` is on `PATH` in this environment.
+- **D5 — CSharpier 1.2.6 requires a subcommand.** `dotnet tool run csharpier format .` and
+  `dotnet tool run csharpier check .`. The bare-path form and `pipe-files` are not enforcement commands.
+- **D6 — The mutating format pass is scope-locked.** P7-T1 runs `csharpier format` against the explicit
+  nine owned file paths, not `format .`. A repo-wide mutating pass would rewrite files that were
+  already unformatted at the baseline and break the changed-file-set criterion. The repo-wide read-only
+  `csharpier check .` remains the gate in P7-T2, compared against the baseline unformatted set recorded
+  in P0-T9.
+- **D7 — Compile-enabling seam introduction precedes the failing-test observation.** Three regression
+  tests cannot compile before a new member exists (`TryResolveCidResource`, `MoveFailureNotifier`, the
+  three `Unwire*` methods). For each, the member is introduced first in a **defect-preserving** form
+  that changes no behaviour, the test is then built and observed failing, and only then is the defect
+  corrected. Each such pair of tasks records both artifacts, so the fail-before evidence remains
+  auditable.
+- **D8 — Guard non-vacuity for #481 is proved, not assumed.** The unwire method bodies are implemented
+  unguarded first (P5-T6, P5-T7) and the teardown robustness test plus the two pre-existing `Cleanup()`
+  tests are observed failing in that state (P5-T8), before the guards are added (P5-T9). This is the
+  evidence that the guards are load-bearing.
+- **D9 — `[DataRow]` rows count as individual regression tests.** Where `spec.md` states that each case
+  has its own regression test, a `[DataTestMethod]` with one `[DataRow]` per case satisfies it: MSTest
+  reports each row as a distinct test result with its own name and outcome in the TRX. The executor must
+  enumerate the distinct result names in the corresponding evidence artifact.
+- **D10 — Coverage is captured as Cobertura.** `scripts/vscode/Invoke-MSTestWithCoverage.ps1` emits
+  Cobertura. The repository-wide figure is the root `<coverage>` element's `line-rate`; per-member
+  figures come from the `<method>` elements' `line-rate`.
+- **D11 — One acceptance criterion per check-off task.** Each check-off task flips exactly one
+  `spec.md` checkbox and cites exactly one evidence artifact.
+
+## Literals this plan instructs the executor to create
+
+The following identifiers do not exist in the tree today. This plan instructs the executor to create
+them, and later tasks assert their presence. Each is quoted here verbatim, one per line, outside any
+command span:
+
+- `UnwireEvents`
+- `UnwireControlTreeEvents`
+- `UnwireIntentEvents`
+- `MoveFailureNotifier`
+- `NotifyMoveFailure`
+- `TryResolveCidResource`
+- `_webResourceRequestedHandler`
+- `_coreWebView2`
+- `DetachWebResourceRequestedHandler`
+- `ToggleNavigation_Asynchronous_TogglesPositionTipsExactlyOnce`
+- `UnwireIntentEvents_DetachesAllSixteenIntentSubscriptions`
+- `UnwireControlTreeEvents_WithHeadlessItemViewer_DetachesKeyboardAndMouseHandlers`
+- `Cleanup_WithNullKeyboardHandlerAndNonItemViewerViewer_DoesNotThrow`
+- `MoveMailAsync_WhenFilerFactoryThrows_WrapsAndRethrowsWithInnerException`
+- `MoveMailAsync_WhenEnqueueThrows_WrapsArgumentNullException`
+- `MoveMailAsync_WithUiDispatcher_MarshalsNotificationThroughDispatcher`
+- `MoveMailAsync_WhenTokenAlreadyCancelled_ThrowsAndNeverInvokesFilerFactory`
+- `FlagAsTaskAsync_WhenTokenAlreadyCancelled_Throws`
+- `EnumerateConversationAsync_WhenTokenAlreadyCancelled_Throws`
+- `Cleanup_DisposesEmailIsReadTimerBeforeNullingIt`
+- `ApplyReadEmailFormat_AfterCleanup_IsInertAndDoesNotSave`
+- `Cleanup_NullsMailActions_AndSaveParametersRebindsIt`
+- `TryResolveCidResource_RejectsUnusableUri_ReturnsFalseWithNullOutputs`
+- `TryResolveCidResource_WithNullMap_ReturnsFalse`
+- `TryResolveCidResource_WithMapMiss_ReturnsFalse`
+- `TryResolveCidResource_WithNullAttachmentData_ReturnsFalse`
+- `TryResolveCidResource_WithKnownExtension_ReturnsPayloadAndMimeType`
+- `TryResolveCidResource_WithUnrecognisedExtension_ReturnsOctetStream`
+
+---
+
+### Phase 0 — Baseline capture and worktree bootstrap
+
+- [x] [P0-T1] Read, in this order, `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/csharp.md`, `.claude/rules/plan-acceptance-gates.md`, `.claude/rules/quality-tiers.md`, and `.claude/rules/tonality.md`. Acceptance: the artifact records `Timestamp:`, a `Policy Order:` list naming those seven paths in that order, and one line per file confirming it was read. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/baseline/phase0-instructions-read.md`.
+- [x] [P0-T2] Read the three feature documents `docs/features/active/qfc-item-controller-defects-484/issue.md`, `docs/features/active/qfc-item-controller-defects-484/spec.md`, and `docs/features/active/qfc-item-controller-defects-484/research/research.2026-08-24T09-45.md`. Acceptance: the artifact records `Timestamp:`, the resolved work mode `full-bug`, the statement that `spec.md` is the sole acceptance-criteria source, and the total acceptance-criterion count 50. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/baseline/phase0-feature-documents-read.md`.
+- [x] [P0-T3] Record the repository baseline: run `git rev-parse HEAD`, `git rev-parse --abbrev-ref HEAD`, and `git status --porcelain`. Acceptance: the artifact records the 40-character HEAD SHA under the label `BASE_SHA`, the branch name, and a `git status --porcelain` output that is empty apart from paths under `.claude/agent-memory/**`, which are tolerated because they are agent-session state, not feature output. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/baseline/repo-state.md`.
+- [x] [P0-T4] Resolve the absolute paths of `MSBuild.exe` and `vstest.console.exe` through `vswhere.exe` at `${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe`, using `-latest -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\MSBuild.exe'` and `-latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe'`. Acceptance: the artifact records both resolved paths and both files exist; no absolute path containing a user account name or machine name is written into the artifact beyond the resolved tool paths themselves. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/baseline/toolchain-paths.md`.
+- [x] [P0-T5] Verify the .NET SDK resolves in this worktree by running `dotnet --version` and `dotnet --list-sdks` from the worktree root. If `dotnet --version` prints the `global.json` error message instead of a version, run `pwsh -NoProfile -File .\scripts\vscode\Install-RepoDotNetSdk.ps1` from the worktree root and re-run the probe. Acceptance: `dotnet --version` exits 0 and prints a version satisfying `global.json` (`8.0.205` under `rollForward: latestFeature`). Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/baseline/dotnet-sdk.md`.
+- [x] [P0-T6] Restore NuGet packages by running `pwsh -NoProfile -File .\scripts\vscode\Invoke-Restore.ps1` from the worktree root (the `packages.config`-aware equivalent of `nuget restore TaskMaster.sln`; `packages/` is absent in this worktree). Acceptance: `EXIT_CODE: 0` and `packages\Meziantou.Analyzer.3.0.174\build\Meziantou.Analyzer.props` exists. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/baseline/nuget-restore.md`.
+- [x] [P0-T7] Back-fill the two analyzer packages whose versions are skewed from `packages.config`: `Meziantou.Analyzer` 3.0.156 and `Roslynator.Analyzers` 4.16.0, both named by unconditional `Analyzer Include` items at `QuickFiler.Test/QuickFiler.Test.csproj:466-470`. Use `nuget install <id> -Version <version> -OutputDirectory packages`, or copy the two package folders from the primary checkout's `packages` directory. Acceptance: both `packages\Meziantou.Analyzer.3.0.156\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll` and `packages\Roslynator.Analyzers.4.16.0\analyzers\dotnet\roslyn4.7\cs\Roslynator.CSharp.Analyzers.dll` exist. A missing analyzer path is compile error CS0006, not a warning. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/baseline/analyzer-backfill.md`.
+- [x] [P0-T8] Run `dotnet tool restore` from the worktree root. Acceptance: `EXIT_CODE: 0` and `dotnet tool run csharpier --version` prints `1.2.6`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/baseline/dotnet-tool-restore.md`.
+- [x] [P0-T9] Capture the baseline formatting state with the read-only command `dotnet tool run csharpier check .` from the worktree root. Acceptance: the artifact records `EXIT_CODE:` and the complete list of files reported as unformatted (an empty list is a valid result). This list is the comparison basis for P7-T2. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/baseline/csharpier-check.md`.
+- [x] [P0-T10] Capture the baseline analyzer build by running, under `pwsh -NoProfile`, the resolved MSBuild against `TaskMaster.sln` with `/t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`. Acceptance: the artifact records `EXIT_CODE:`, the error count, and the warning count. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/baseline/msbuild-analyzers.md`.
+- [x] [P0-T11] Capture the baseline nullable build by running, under `pwsh -NoProfile`, the resolved MSBuild against `TaskMaster.sln` with `/t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`. Do not add `/p:Nullable=enable`. Acceptance: the artifact records `EXIT_CODE:` and the error count. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/baseline/msbuild-nullable.md`.
+- [x] [P0-T12] Capture the baseline `QuickFiler.Test` result by running, under `pwsh -NoProfile`, the resolved `vstest.console.exe` against `QuickFiler.Test\bin\Debug\QuickFiler.Test.dll` with `/Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /Logger:trx;LogFileName=baseline-quickfiler-test.trx /ResultsDirectory:docs\features\active\qfc-item-controller-defects-484\evidence\baseline\trx-baseline`. Acceptance: the artifact records `EXIT_CODE:`, the total, passed, failed, and skipped counts, and the TRX file `baseline-quickfiler-test.trx` exists in that results directory. The passed count recorded here is the `BASELINE_PASSED` figure referenced by P7-T5. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/baseline/quickfiler-test.md`.
+- [x] [P0-T13] Record the baseline outcome of the three named existing tests this feature tightens or must keep green, read from the P0-T12 TRX: `QfcItemController_FocusAndThemeTests.ToggleNavigation_Synchronous_TogglesPositionTips`, `QfcItemController_ViewerSetupTests.Cleanup_NullsTrackedPrivateFields`, and `QfcItemControllerBreadcrumbDropDownTests.Cleanup_ResetsInjectedHostForPooledViewerReuse`. Acceptance: the artifact contains one result row per name and each row records outcome `Passed`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/baseline/named-tests.md`.
+- [x] [P0-T14] Capture the baseline repository-wide coverage by running, under `pwsh -NoProfile`, `.\scripts\vscode\Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput docs\features\active\qfc-item-controller-defects-484\evidence\baseline\coverage-baseline.cobertura.xml` from this worktree root. Acceptance: the Cobertura file exists; the artifact records the root `<coverage>` element `line-rate` and `branch-rate` as numeric values, the total number of discovered test assemblies, and the verbatim discovered-assembly list, in which every entry is a path under this worktree root and no entry contains a nested `worktrees` segment below it. Note that this run can take twenty minutes or more; start it with a correspondingly long timeout. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/baseline/coverage.md`.
+- [x] [P0-T15] Record the baseline line count of each of the nine owned files listed in constraint C2. Acceptance: the artifact contains nine rows and the recorded values are 326, 391, 430, 224, 497, 374, 474, 184, and 365 respectively; any deviation is recorded as a discrepancy and reported before Phase 1 begins. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/baseline/file-sizes.md`.
+- [x] [P0-T16] Record two baseline counts across the owned files: the number of `ExcludeFromCodeCoverage` occurrences in the four owned production files (expected: EventWiring 1, ViewerSetup 2, FocusAndTheme 0, MailActions 0, total 3), and the number of real `ItemViewer` constructions in the five owned test files (expected: EventWiringTests 2, ViewerSetupTests 2, TestSupport 0, total 4). Acceptance: the artifact records both per-file breakdowns and both totals. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/baseline/exemption-and-viewer-counts.md`.
+- [x] [P0-T17] Record the test-capacity budget for this feature: the per-file headroom from P0-T15, the planned home and approximate size of each test group from constraint C2, the aggregate headroom, and the aggregate planned addition. Acceptance: the artifact states the aggregate headroom in lines, the aggregate planned addition in lines, and the resulting margin, and states every numbered capacity rule of constraint C2, of which there are seven. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/baseline/test-capacity-budget.md`.
+
+### Phase 1 — Issue #480 ToggleNavigation double toggle
+
+- [x] [P1-T1] In `QuickFiler.Test/Controllers/QfcItemController.FocusAndThemeTests.cs`, change the assertion at line 323 in place from `Times.AtLeastOnce()` to `Times.Once()`. Change nothing else in that file. Acceptance: the file is still 497 lines, and the test method `ToggleNavigation_Synchronous_TogglesPositionTips` now asserts with `Times.Once()`.
+- [x] [P1-T2] [expect-fail] Build `QuickFiler.Test\QuickFiler.Test.csproj` with `/t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`, then run the resolved `vstest.console.exe` against `QuickFiler.Test\bin\Debug\QuickFiler.Test.dll` with `/Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~ToggleNavigation_Synchronous_TogglesPositionTips" /Logger:trx;LogFileName=480-sync-tightened-fail.trx /ResultsDirectory:docs\features\active\qfc-item-controller-defects-484\evidence\regression-testing\480-sync-tightened-fail`. Acceptance: `EXIT_CODE:` is non-zero, `ExpectedExitCode: 1` is recorded, and the artifact records the test `ToggleNavigation_Synchronous_TogglesPositionTips` with outcome `Failed`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/480-sync-tightened-fail.md`.
+- [x] [P1-T3] Add the test method `ToggleNavigation_Asynchronous_TogglesPositionTipsExactlyOnce` to an owned test file, per the planned home in constraint C2. It arranges a `Mock<IQfcTipsDetails>` and an executing `Mock<IItemViewer>` whose `Invoke` and `BeginInvoke` synchronously invoke the supplied delegate, calls `ToggleNavigation(async: true)`, and asserts `Toggle(false)` with `Times.Once()`. It contains a comment naming issue #480. Acceptance: the method exists with that exact name, uses MSTest, Moq and FluentAssertions only, contains no `Thread.Sleep`, `Task.Delay`, wall-clock wait or temporary file, and all four owned test files are at most 500 lines.
+- [x] [P1-T4] [expect-fail] Build `QuickFiler.Test\QuickFiler.Test.csproj` with `/t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`, then run the resolved `vstest.console.exe` with `/Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~ToggleNavigation_Asynchronous_TogglesPositionTipsExactlyOnce" /Logger:trx;LogFileName=480-async-fail.trx /ResultsDirectory:docs\features\active\qfc-item-controller-defects-484\evidence\regression-testing\480-async-fail`. Acceptance: `EXIT_CODE:` is non-zero, `ExpectedExitCode: 1` is recorded, and the artifact records that test with outcome `Failed`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/480-async-fail.md`.
+- [x] [P1-T5] In `QuickFiler/Controllers/QfcItemController.FocusAndTheme.cs`, delete the single unconditional `_itemViewer.BeginInvoke(new System.Action(() => _itemPositionTips.Toggle(false)));` statement at line 170, which precedes the `if (async)` branch in `ToggleNavigation(bool async)`. Change nothing else in the method. Acceptance: `ToggleNavigation(bool async)` contains exactly two dispatch statements, one per branch; the method is still declared and implemented; the file is at most 500 lines.
+- [x] [P1-T6] Build `QuickFiler.Test\QuickFiler.Test.csproj` with `/t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`, then run the resolved `vstest.console.exe` with `/Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~ToggleNavigation" /Logger:trx;LogFileName=480-pass.trx /ResultsDirectory:docs\features\active\qfc-item-controller-defects-484\evidence\regression-testing\480-pass`. Acceptance: `EXIT_CODE: 0`, failed count 0, and the artifact records both `ToggleNavigation_Synchronous_TogglesPositionTips` and `ToggleNavigation_Asynchronous_TogglesPositionTipsExactlyOnce` with outcome `Passed`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/480-pass.md`.
+- [x] [P1-T7] Record the current line count of `QuickFiler/Controllers/QfcItemController.FocusAndTheme.cs` and of all five owned test files. Acceptance: every recorded value is at most 500. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/file-sizes-after-480.md`.
+- [x] [P1-T8] Check off in `docs/features/active/qfc-item-controller-defects-484/spec.md` the single criterion beginning "The unconditional `_itemPositionTips.Toggle(false)` dispatch at". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites the P1-T5 outcome as its evidence.
+- [x] [P1-T9] Check off the single criterion beginning "`ToggleNavigation(async: false)` invokes `IQfcTipsDetails.Toggle(false)` exactly once". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/480-pass.md`.
+- [x] [P1-T10] Check off the single criterion beginning "`ToggleNavigation(async: true)` invokes `IQfcTipsDetails.Toggle(false)` exactly once". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/480-pass.md`.
+- [x] [P1-T11] Check off the single criterion beginning "The existing assertion at". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/480-sync-tightened-fail.md`.
+- [x] [P1-T12] Check off the single criterion beginning "`ToggleNavigation(bool async)` is still declared and implemented", after recording the evidence for it: the declaration line of `ToggleNavigation(bool async)` in `QuickFiler/Controllers/QfcItemController.FocusAndTheme.cs`, and the empty output of `git diff --name-only <BASE_SHA> -- QuickFiler/Interfaces/IQfcItemController.cs`. Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the artifact records both facts. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/480-overload-retained.md`.
+
+### Phase 2 — Issue #485 WebResourceRequested unguarded inputs
+
+- [x] [P2-T1] In `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`, perform the defect-preserving extraction: add `internal static bool TryResolveCidResource(string requestedUri, IReadOnlyDictionary<string, IAttachment> contentIdMap, out byte[] payload, out string mimeType)` containing the current unguarded decision logic of the `WebResourceRequested` lambda (unguarded `new Uri(...)`, the empty-segment test, the map `TryGetValue`, and `ResolveImageMimeType`), add the private fields `_webResourceRequestedHandler` and `_coreWebView2`, assign the lambda to `_webResourceRequestedHandler` and the event source to `_coreWebView2` before the subscription, and reduce the lambda to an adapter that builds the map and calls the extracted method. Add no guard in this task. Acceptance: the file compiles, contains a member named `TryResolveCidResource`, contains both new field names, is at most 500 lines, and adds no `[ExcludeFromCodeCoverage]` attribute.
+- [x] [P2-T2] Build the solution with `/t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"` to confirm the extraction compiles. Acceptance: `EXIT_CODE: 0`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/485-extraction-build.md`.
+- [x] [P2-T3] Add the #485 regression tests to an owned test file per constraint C2, constructing no controller, no `ItemViewer`, no `MailItemHelper`, and no `CoreWebView2` type: `TryResolveCidResource_RejectsUnusableUri_ReturnsFalseWithNullOutputs` as a `[DataTestMethod]` with one `[DataRow]` per case for the malformed URI `"::not a uri::"`, the relative URI `"/x/y"`, and the empty-final-segment URI `"https://cid.quickfiler.local/"`; plus `TryResolveCidResource_WithNullMap_ReturnsFalse`, `TryResolveCidResource_WithMapMiss_ReturnsFalse`, `TryResolveCidResource_WithNullAttachmentData_ReturnsFalse`, `TryResolveCidResource_WithKnownExtension_ReturnsPayloadAndMimeType`, and `TryResolveCidResource_WithUnrecognisedExtension_ReturnsOctetStream`. Attachments are `Mock<IAttachment>` objects. Acceptance: all six method names exist, the data-driven method carries exactly three `[DataRow]` attributes, no test in the group references a controller instance or a `CoreWebView2` type, and all four owned test files are at most 500 lines.
+- [x] [P2-T4] [expect-fail] Build `QuickFiler.Test\QuickFiler.Test.csproj` with `/t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`, then run the resolved `vstest.console.exe` with `/Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~TryResolveCidResource" /Logger:trx;LogFileName=485-fail.trx /ResultsDirectory:docs\features\active\qfc-item-controller-defects-484\evidence\regression-testing\485-fail`. Acceptance: `EXIT_CODE:` is non-zero, `ExpectedExitCode: 1` is recorded, and the artifact enumerates every distinct test result name in the group with its outcome, including at least the malformed-URI row and `TryResolveCidResource_WithNullAttachmentData_ReturnsFalse` with outcome `Failed`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/485-fail.md`.
+- [x] [P2-T5] In `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`, add the guards to `TryResolveCidResource`: `Uri.TryCreate` with `UriKind.Absolute` returning false on failure with a debug log line, an empty-final-segment early return, a null-map early return, a null-match early return, and a null `AttachmentData` early return with a debug log line; and change the lambda adapter to build the map from a null-conditional read of `ItemHelper`'s attachments so a null `ItemHelper` cannot be dereferenced. `ResolveImageMimeType` stays `static`. Both `out` values are null on every false return. Acceptance: the file is at most 500 lines, `UriKind.Absolute` is used (not `UriKind.RelativeOrAbsolute`), and no new `[ExcludeFromCodeCoverage]` attribute is added.
+- [x] [P2-T6] Build `QuickFiler.Test\QuickFiler.Test.csproj` with `/t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`, then run the resolved `vstest.console.exe` with `/Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~TryResolveCidResource" /Logger:trx;LogFileName=485-pass.trx /ResultsDirectory:docs\features\active\qfc-item-controller-defects-484\evidence\regression-testing\485-pass`. Acceptance: `EXIT_CODE: 0`, failed count 0, and the artifact enumerates at least eight distinct passing test result names in the group. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/485-pass.md`.
+- [x] [P2-T7] Record the current line count of `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs` and of all five owned test files. Acceptance: every recorded value is at most 500. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/file-sizes-after-485.md`.
+- [x] [P2-T8] Check off the single criterion beginning "`internal static bool TryResolveCidResource(". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites the P2-T5 outcome.
+- [x] [P2-T9] Check off the single criterion beginning "`TryResolveCidResource` uses `Uri.TryCreate(..., UriKind.Absolute, ...)`". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/485-pass.md`.
+- [x] [P2-T10] Check off the single criterion beginning "`TryResolveCidResource` returns `false` with null `out` values for a map miss". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/485-pass.md`.
+- [x] [P2-T11] Check off the single criterion beginning "`TryResolveCidResource` returns `true` with the exact payload reference". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/485-pass.md`.
+- [x] [P2-T12] Check off the single criterion beginning "The `WebResourceRequested` lambda is reduced to an adapter". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites the P2-T5 outcome.
+- [x] [P2-T13] Check off the single criterion beginning "Every #485 regression test runs without constructing a controller", after recording the evidence for it: an inspection of every test method in the #485 group confirming that none constructs a controller, an `ItemViewer`, a `MailItemHelper`, or any `CoreWebView2` type. Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the artifact lists each #485 test method with that confirmation. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/485-test-isolation.md`.
+
+### Phase 3 — Issue #483 MoveMailAsync error handling and cancellation
+
+- [x] [P3-T1] In `QuickFiler/Controllers/QfcItemController.MailActions.cs`, add the defect-preserving seam: `internal Action<string> MoveFailureNotifier { get; set; }` defaulted to a delegate that forwards to the modal WinForms dialog, and `private void NotifyMoveFailure(string message)` which invokes the notifier directly when the UI dispatcher field is null and marshals it through the dispatcher's `Invoke` when it is not. Replace the direct dialog call inside the existing `catch` with a `NotifyMoveFailure` call. Do not add a rethrow and do not add any cancellation check in this task. Acceptance: both member names exist, the file is at most 500 lines, and `MoveMailAsync` still returns normally from the `catch`.
+- [x] [P3-T2] Build the solution with `/t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"` to confirm the seam compiles. Acceptance: `EXIT_CODE: 0`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/483-seam-build.md`.
+- [x] [P3-T3] Add the #483 regression tests to an owned test file per constraint C2: `MoveMailAsync_WhenFilerFactoryThrows_WrapsAndRethrowsWithInnerException` (also asserting exactly one `MoveFailureNotifier` invocation), `MoveMailAsync_WhenEnqueueThrows_WrapsArgumentNullException`, `MoveMailAsync_WithUiDispatcher_MarshalsNotificationThroughDispatcher`, `MoveMailAsync_WhenTokenAlreadyCancelled_ThrowsAndNeverInvokesFilerFactory`, `FlagAsTaskAsync_WhenTokenAlreadyCancelled_Throws`, and `EnumerateConversationAsync_WhenTokenAlreadyCancelled_Throws`. Every collaborator is a Moq mock or an injected delegate; no modal dialog is reachable because the notifier seam is replaced in every test. Acceptance: all six method names exist, they use MSTest, Moq and FluentAssertions only, none contains `Thread.Sleep`, `Task.Delay`, a wall-clock wait or a temporary file, and all four owned test files are at most 500 lines.
+- [x] [P3-T4] [expect-fail] Build `QuickFiler.Test\QuickFiler.Test.csproj` with `/t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`, then run the resolved `vstest.console.exe` with `/Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~MoveMailAsync_When|FullyQualifiedName~MoveMailAsync_With|FullyQualifiedName~FlagAsTaskAsync_When|FullyQualifiedName~EnumerateConversationAsync_When" /Logger:trx;LogFileName=483-fail.trx /ResultsDirectory:docs\features\active\qfc-item-controller-defects-484\evidence\regression-testing\483-fail`. Acceptance: `EXIT_CODE:` is non-zero, `ExpectedExitCode: 1` is recorded, and the artifact records `MoveMailAsync_WhenFilerFactoryThrows_WrapsAndRethrowsWithInnerException` and all three cancellation tests with outcome `Failed`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/483-fail.md`.
+- [x] [P3-T5] In `QuickFiler/Controllers/QfcItemController.MailActions.cs`, replace the swallowing `catch` body in `MoveMailAsync` with: an error-level log through the existing static logger, a `NotifyMoveFailure` call, and a wrapped rethrow of a new `InvalidOperationException` carrying the item subject and the destination folder in its message and the caught exception as `InnerException`. Acceptance: the `catch` block ends in a `throw` statement, the method's return type is still `Task`, and the file is at most 500 lines.
+- [x] [P3-T6] In `QuickFiler/Controllers/QfcItemController.MailActions.cs`, add `Token.ThrowIfCancellationRequested();` as the first statement of the body of `MoveMailAsync` (outside and before the `try`, and before the `ItemHelper` null test), of `FlagAsTaskAsync` (before the item-list construction), and of `EnumerateConversationAsync` (before the dispatcher call). Acceptance: each of the three methods has that call as its first body statement, in `MoveMailAsync` it is outside the `try` block, and the file is at most 500 lines.
+- [x] [P3-T7] Build `QuickFiler.Test\QuickFiler.Test.csproj` with `/t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`, then run the resolved `vstest.console.exe` with `/Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~MoveMailAsync|FullyQualifiedName~FlagAsTaskAsync|FullyQualifiedName~EnumerateConversation" /Logger:trx;LogFileName=483-pass.trx /ResultsDirectory:docs\features\active\qfc-item-controller-defects-484\evidence\regression-testing\483-pass`. Acceptance: `EXIT_CODE: 0`, failed count 0, the artifact records all six new tests with outcome `Passed`, and it also records the three pre-existing `MoveMailAsync` tests in `QfcItemController.SeamFactoryTests.cs` with outcome `Passed`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/483-pass.md`.
+- [x] [P3-T8] Record the current line count of `QuickFiler/Controllers/QfcItemController.MailActions.cs` and of all five owned test files. Acceptance: every recorded value is at most 500. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/file-sizes-after-483.md`.
+- [x] [P3-T9] Check off the single criterion beginning "The `catch` block in `MoveMailAsync`". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites the P3-T5 outcome.
+- [x] [P3-T10] Check off the single criterion beginning "A regression test drives a faulting `_emailFilerFactory`". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/483-pass.md`.
+- [x] [P3-T11] Check off the single criterion beginning "`internal Action<string> MoveFailureNotifier { get; set; }` exists". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/483-pass.md`.
+- [x] [P3-T12] Check off the single criterion beginning "The failure notification is marshalled through `_uiDispatcher`". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/483-pass.md`.
+- [x] [P3-T13] Check off the single criterion beginning "`Token.ThrowIfCancellationRequested()` is the first statement". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites the P3-T6 outcome.
+- [x] [P3-T14] Check off the single criterion beginning "For each of the three methods, a regression test with a pre-cancelled `Token`". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/483-pass.md`.
+- [x] [P3-T15] Check off the single criterion beginning "`Task MoveMailAsync()`'s return type is unchanged", after recording the evidence for it: the declaration line of `MoveMailAsync` in `QuickFiler/Controllers/QfcItemController.MailActions.cs` showing the return type `Task`, and the empty output of `git diff --name-only <BASE_SHA> -- QuickFiler/Controllers/QfcCollectionController.cs`. Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the artifact records both facts. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/483-signature-and-caller.md`.
+
+### Phase 4 — Issue #484 Cleanup timer disposal and stale collaborators
+
+- [x] [P4-T1] Add the test method `Cleanup_DisposesEmailIsReadTimerBeforeNullingIt` to an owned test file per constraint C2. It reflection-injects a `System.Threading.Timer` armed with `Timeout.Infinite` for both due time and period so it can never fire, calls `Cleanup()`, then asserts the private timer field is null and that calling `Change(0, Timeout.Infinite)` on the captured timer throws `ObjectDisposedException`. Acceptance: the method exists with that exact name, contains no `Thread.Sleep`, `Task.Delay` or wall-clock wait, and all four owned test files are at most 500 lines.
+- [x] [P4-T2] Add the test method `ApplyReadEmailFormat_AfterCleanup_IsInertAndDoesNotSave` to an owned test file per constraint C2. It captures a `Mock<IMailItemActions>` injected before teardown, calls `Cleanup()`, then calls `ApplyReadEmailFormat(null)` and asserts it does not throw and that the mock's save member was never called. Acceptance: the method exists with that exact name and all four owned test files are at most 500 lines.
+- [x] [P4-T3] Add the test method `Cleanup_NullsMailActions_AndSaveParametersRebindsIt` to an owned test file per constraint C2. It asserts the private mail-actions field is null immediately after `Cleanup()`, then drives a `SaveParameters` call with a new mail item and asserts the field is rebound to an adapter over that new item. Acceptance: the method exists with that exact name and all four owned test files are at most 500 lines.
+- [x] [P4-T4] [expect-fail] Build `QuickFiler.Test\QuickFiler.Test.csproj` with `/t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`, then run the resolved `vstest.console.exe` with `/Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~Cleanup_DisposesEmailIsReadTimerBeforeNullingIt|FullyQualifiedName~ApplyReadEmailFormat_AfterCleanup_IsInertAndDoesNotSave|FullyQualifiedName~Cleanup_NullsMailActions_AndSaveParametersRebindsIt" /Logger:trx;LogFileName=484-fail.trx /ResultsDirectory:docs\features\active\qfc-item-controller-defects-484\evidence\regression-testing\484-fail`. Acceptance: `EXIT_CODE:` is non-zero, `ExpectedExitCode: 1` is recorded, and the artifact records all three tests with outcome `Failed`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/484-fail.md`.
+- [x] [P4-T5] In `Cleanup()` in `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`, dispose the read timer with a null-conditional `Dispose()` call immediately before the existing statement that nulls the timer field. Acceptance: the disposal statement precedes the nulling statement in source order, `QuickFiler/Controllers/QfcItemController.Navigation.cs` is unmodified, and the file is at most 500 lines.
+- [x] [P4-T6] In `Cleanup()` in `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`, add a statement nulling the mail-actions field. Acceptance: the statement exists inside `Cleanup()`, `QuickFiler/Controllers/QfcItemController.Initialization.cs` is unmodified, and the file is at most 500 lines.
+- [x] [P4-T7] In `ApplyReadEmailFormat(object state)` in `QuickFiler/Controllers/QfcItemController.FocusAndTheme.cs`, add an early-return guard that returns when the item helper, the themes dictionary, the active theme, or the mail-actions field is null, with a comment explaining that the method runs on a thread-pool timer callback and that a callback already in flight when the timer is disposed still executes. Acceptance: the method signature is unchanged, the guard is the first statement of the body, and the file is at most 500 lines.
+- [x] [P4-T8] Build `QuickFiler.Test\QuickFiler.Test.csproj` with `/t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`, then run the resolved `vstest.console.exe` with `/Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~Cleanup|FullyQualifiedName~ApplyReadEmailFormat" /Logger:trx;LogFileName=484-pass.trx /ResultsDirectory:docs\features\active\qfc-item-controller-defects-484\evidence\regression-testing\484-pass`. Acceptance: `EXIT_CODE: 0`, failed count 0, the artifact records the three new tests with outcome `Passed`, and it also records `Cleanup_NullsTrackedPrivateFields` and `Cleanup_ResetsInjectedHostForPooledViewerReuse` with outcome `Passed`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/484-pass.md`.
+- [x] [P4-T9] Record the current line count of `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`, `QuickFiler/Controllers/QfcItemController.FocusAndTheme.cs`, and all five owned test files. Acceptance: every recorded value is at most 500. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/file-sizes-after-484.md`.
+- [x] [P4-T10] Check off the single criterion beginning "`Cleanup()` disposes `_emailIsReadTimer` before nulling it". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites the P4-T5 outcome.
+- [x] [P4-T11] Check off the single criterion beginning "Test T1 injects a `Timer` armed with `Timeout.Infinite`". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/484-pass.md`.
+- [x] [P4-T12] Check off the single criterion beginning "`ApplyReadEmailFormat(object state)` returns early". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites the P4-T7 outcome.
+- [x] [P4-T13] Check off the single criterion beginning "Test T2 calls `ApplyReadEmailFormat(null)`". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/484-pass.md`.
+- [x] [P4-T14] Check off the single criterion beginning "`Cleanup()` nulls `_mailActions`". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/484-pass.md`.
+- [x] [P4-T15] Check off the single criterion beginning "`QuickFiler/Controllers/QfcItemController.Navigation.cs` is not modified", after recording the evidence for it: the empty output of `git diff --name-only <BASE_SHA> -- QuickFiler/Controllers/QfcItemController.Navigation.cs`. Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the artifact records the command and its empty output. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/484-navigation-untouched.md`.
+
+### Phase 5 — Issue #481 event unwiring path
+
+- [x] [P5-T1] Add the test method `UnwireIntentEvents_DetachesAllSixteenIntentSubscriptions` to an owned test file per constraint C2. It arranges a `Mock<IItemViewer>`, wires the intent events, calls the unwire method, and asserts detachment of all sixteen intent subscriptions with `Mock<IItemViewer>.VerifyRemove` and `Times.Once()` for each. Acceptance: the method exists with that exact name, contains sixteen `VerifyRemove` assertions, and all four owned test files are at most 500 lines.
+- [x] [P5-T2] Add the test method `UnwireControlTreeEvents_WithHeadlessItemViewer_DetachesKeyboardAndMouseHandlers` to `QuickFiler.Test/Controllers/QfcItemController.EventWiringTests.cs`. It mirrors the existing fixture at lines 229-309 of that file: it constructs one real headless `QuickFiler.ItemViewer`, calls no `Show()`, starts no message pump and no worker, saves and restores the `SynchronizationContext` in `try`/`finally`, wires and then unwires the control-tree events, raises the preview-key-down, key-down and mouse-enter events by reflection, and asserts `Times.Never()` on the keyboard-handler mock and an unchanged button background colour. Acceptance: the method exists with that exact name, it is the only test added by this feature that constructs a real `ItemViewer`, and all four owned test files are at most 500 lines.
+- [x] [P5-T3] Add the test method `Cleanup_WithNullKeyboardHandlerAndNonItemViewerViewer_DoesNotThrow` to an owned test file per constraint C2. It calls `Cleanup()` on a controller whose keyboard handler is null, whose buttons collection is null, and whose item viewer is a plain `Mock<IItemViewer>` that cannot be cast to the concrete `ItemViewer`, and asserts that the call does not throw. Acceptance: the method exists with that exact name and all four owned test files are at most 500 lines.
+- [x] [P5-T4] In `QuickFiler/Controllers/QfcItemController.EventWiring.cs`, add `internal void UnwireEvents()`, `internal void UnwireControlTreeEvents()`, and `internal void UnwireIntentEvents()` with empty bodies, where `UnwireEvents()` calls `UnwireControlTreeEvents()` then `UnwireIntentEvents()`; and in `Cleanup()` in `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`, insert the `UnwireEvents()` call immediately after the existing breadcrumb detach block, which places it before the statements that null the item viewer and the keyboard handler. Acceptance: all three method names exist, the call site in `Cleanup()` precedes both nulling statements in source order, and both files are at most 500 lines.
+- [x] [P5-T5] [expect-fail] Build `QuickFiler.Test\QuickFiler.Test.csproj` with `/t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`, then run the resolved `vstest.console.exe` with `/Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~UnwireIntentEvents_DetachesAllSixteenIntentSubscriptions|FullyQualifiedName~UnwireControlTreeEvents_WithHeadlessItemViewer_DetachesKeyboardAndMouseHandlers|FullyQualifiedName~Cleanup_WithNullKeyboardHandlerAndNonItemViewerViewer_DoesNotThrow" /Logger:trx;LogFileName=481-empty-bodies-fail.trx /ResultsDirectory:docs\features\active\qfc-item-controller-defects-484\evidence\regression-testing\481-empty-bodies-fail`. Acceptance: `EXIT_CODE:` is non-zero, `ExpectedExitCode: 1` is recorded, the two unwire tests are recorded with outcome `Failed`, and `Cleanup_WithNullKeyboardHandlerAndNonItemViewerViewer_DoesNotThrow` is recorded with outcome `Passed`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/481-empty-bodies-fail.md`.
+- [x] [P5-T6] Implement the body of `UnwireIntentEvents()` in `QuickFiler/Controllers/QfcItemController.EventWiring.cs` as the exact mirror of `WireIntentEvents()`: sixteen detachments, each re-forming the delegate at the unwire site so that delegate identity matches, in the same order as the wiring method. Add no guard in this task. Acceptance: the method contains sixteen detachment statements, the file is at most 500 lines, and no forbidden file is written.
+- [x] [P5-T7] Implement the body of `UnwireControlTreeEvents()` in `QuickFiler/Controllers/QfcItemController.EventWiring.cs` as the exact mirror of `WireControlTreeEvents()`: the same `ForAllControls` walk detaching the preview-key-down and key-down handlers and passing the same exclusion list containing the breadcrumb WebView2 control, plus the button and menu-item mouse-enter and mouse-leave detachments. Add no guard in this task. Acceptance: the exclusion-list expression matches the one at `QuickFiler/Controllers/QfcItemController.EventWiring.cs:50`, the file is at most 500 lines, and no forbidden file is written.
+- [x] [P5-T8] [expect-fail] Build `QuickFiler.Test\QuickFiler.Test.csproj` with `/t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`, then run the resolved `vstest.console.exe` with `/Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~UnwireIntentEvents_DetachesAllSixteenIntentSubscriptions|FullyQualifiedName~UnwireControlTreeEvents_WithHeadlessItemViewer_DetachesKeyboardAndMouseHandlers|FullyQualifiedName~Cleanup_WithNullKeyboardHandlerAndNonItemViewerViewer_DoesNotThrow|FullyQualifiedName~Cleanup_NullsTrackedPrivateFields|FullyQualifiedName~Cleanup_ResetsInjectedHostForPooledViewerReuse" /Logger:trx;LogFileName=481-unguarded-fail.trx /ResultsDirectory:docs\features\active\qfc-item-controller-defects-484\evidence\regression-testing\481-unguarded-fail`. Acceptance: `EXIT_CODE:` is non-zero, `ExpectedExitCode: 1` is recorded, the two unwire tests are recorded with outcome `Passed`, and `Cleanup_WithNullKeyboardHandlerAndNonItemViewerViewer_DoesNotThrow`, `Cleanup_NullsTrackedPrivateFields`, and `Cleanup_ResetsInjectedHostForPooledViewerReuse` are recorded with outcome `Failed`. This is the evidence that the guards added in P5-T9 are load-bearing. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/481-unguarded-fail.md`.
+- [x] [P5-T9] Add the defensive guards in `QuickFiler/Controllers/QfcItemController.EventWiring.cs`: `UnwireIntentEvents()` returns early when the item viewer is null and guards the folder-key-down detach against a null keyboard handler; `UnwireControlTreeEvents()` returns early when the item viewer is not a concrete `ItemViewer`, mirroring the existing type guard at `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs:138-141`, guards the `ForAllControls` keyboard-detach walk against a null keyboard handler so that a concrete `ItemViewer` with a null `_kbdHandler` does not throw, and guards the button and menu-item loops against null. Add a comment recording that the asymmetry with the unguarded wiring methods is intentional, because wiring runs only on the initialized path while teardown must tolerate a partially-constructed controller. Acceptance: both guards exist, the comment exists, and the file is at most 500 lines.
+- [x] [P5-T10] Add `private void DetachWebResourceRequestedHandler()` to `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`: its body detaches `_webResourceRequestedHandler` from `_coreWebView2` inside a guard that requires both fields to be non-null, then nulls both fields unconditionally in statements placed after and outside that guard, so the two nulling statements execute even when the guard is not taken. In `UnwireEvents()` in `QuickFiler/Controllers/QfcItemController.EventWiring.cs`, call `DetachWebResourceRequestedHandler()` as the third statement, after `UnwireControlTreeEvents()` and `UnwireIntentEvents()`. Acceptance: the method `DetachWebResourceRequestedHandler` exists in `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs` and contains the guarded detach plus both field-nulling statements, with the two nulling statements outside the guard block; `UnwireEvents()` calls `UnwireControlTreeEvents()`, then `UnwireIntentEvents()`, then `DetachWebResourceRequestedHandler()`, in that order; no new `[ExcludeFromCodeCoverage]` attribute is added; and both edited files are at most 500 lines.
+- [x] [P5-T11] Build `QuickFiler.Test\QuickFiler.Test.csproj` with `/t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`, then run the resolved `vstest.console.exe` with the same test-case filter as P5-T8 and `/Logger:trx;LogFileName=481-pass.trx /ResultsDirectory:docs\features\active\qfc-item-controller-defects-484\evidence\regression-testing\481-pass`. Acceptance: `EXIT_CODE: 0`, failed count 0, and all five named tests are recorded with outcome `Passed`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/481-pass.md`.
+- [x] [P5-T12] Write the fail-before exception dossier for the one subscription whose detachment cannot carry a regression test. Acceptance: the dossier records `Timestamp:`, a `WhyFailingRunImpossible:` statement naming the enclosing `InitializeWebViewAsync` member, its pre-existing `[ExcludeFromCodeCoverage]` attribute at `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs:41`, and the live-WebView2-runtime requirement; and an inspection proof quoting the capture assignments and the detach statement with their file and line numbers. It also records `SearchScope:`, `SearchPatterns:`, and `SearchResult:` for the failing-run search. The dossier also names `DetachWebResourceRequestedHandler` as the enclosing method of the detach statement introduced by P5-T10, and records that the guarded `-=` statement inside it is unreachable under unit test because `_coreWebView2` and `_webResourceRequestedHandler` are assigned only inside `InitializeWebViewAsync`, whose `.CoreWebView2` value is null without a live WebView2 runtime (research section 2.4). It also records that the method's entry, its null guard, and its field-nulling statements do execute under unit test, because `Cleanup()` calls `UnwireEvents()`, which calls `DetachWebResourceRequestedHandler()` as its third statement, so the method is partially rather than zero covered. This is the fact P7-T7 cites for carve-out (b). Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/fail-before-exception.webresourcerequested-detach.md`.
+- [x] [P5-T13] Record the current line count of `QuickFiler/Controllers/QfcItemController.EventWiring.cs`, `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`, and all five owned test files. Acceptance: every recorded value is at most 500. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/file-sizes-after-481.md`.
+- [x] [P5-T14] Check off the single criterion beginning "`internal void UnwireEvents()`, `internal void UnwireControlTreeEvents()`". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites the P5-T10 outcome.
+- [x] [P5-T15] Check off the single criterion beginning "All 16 intent subscriptions made by `WireIntentEvents()`". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/481-pass.md`.
+- [x] [P5-T16] Check off the single criterion beginning "All 6 control-tree subscriptions made by `WireControlTreeEvents()`". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/481-pass.md`.
+- [x] [P5-T17] Check off the single criterion beginning "`UnwireControlTreeEvents()` passes the same `ForAllControls` exclusion list". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites the P5-T7 outcome.
+- [x] [P5-T18] Check off the single criterion beginning "`Cleanup()` calls `UnwireEvents()` before", after recording the evidence for it: the source line number of the `UnwireEvents()` call in the delivered `Cleanup()` body, together with the source line numbers of the statement that nulls the item viewer and the statement that nulls the keyboard handler. Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the artifact records all three line numbers with the call preceding both nulling statements. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/481-unwire-call-order.md`.
+- [x] [P5-T19] Check off the single criterion beginning "`UnwireIntentEvents()` returns early when `_itemViewer` is null". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites the P5-T9 outcome.
+- [x] [P5-T20] Check off the single criterion beginning "A regression test asserts that `Cleanup()` does not throw". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/481-unguarded-fail.md` together with `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/481-pass.md`.
+- [x] [P5-T21] Check off the single criterion beginning "The two pre-existing `Cleanup()` tests". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/481-pass.md`.
+- [x] [P5-T22] Check off the single criterion beginning "The `WebResourceRequested` delegate and its `CoreWebView2` source are captured". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/fail-before-exception.webresourcerequested-detach.md`.
+
+### Phase 6 — Scope, contract, and teardown-order verification
+
+- [x] [P6-T1] Verify the changed-file set by running `git diff --name-only <BASE_SHA> -- . ':(exclude).claude/agent-memory'` and `git status --porcelain` from the worktree root, where `<BASE_SHA>` is the value recorded in P0-T3. `.claude/agent-memory/**` is excluded from both the changed-file-set criterion and the clean-tree criterion because it is agent-session state, not feature output. Acceptance: every path reported by the diff command is either one of the nine owned files listed in constraint C1 or is under `docs/features/active/qfc-item-controller-defects-484/`, and every path reported by `git status --porcelain` is likewise one of those or under `.claude/agent-memory/`; no other path appears. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/changed-file-set.md`.
+- [x] [P6-T2] Verify interface stability by running `git diff --name-only <BASE_SHA> -- QuickFiler/Interfaces/IQfcItemController.cs QuickFiler/Viewers/IItemViewer.cs`. Acceptance: the command produces no output lines, establishing that both files are byte-identical to their pre-change state. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/interface-stability.md`.
+- [x] [P6-T3] Verify that no forbidden file was written by running `git diff --name-only <BASE_SHA> -- QuickFiler/Controllers/QfcItemController.Navigation.cs QuickFiler/Viewers QuickFiler/Controllers/KbdActions.cs QuickFiler/Controllers/EfcItemController.cs QuickFiler/Controllers/QfcCollectionController.cs QuickFiler/QuickFiler.csproj QuickFiler.Test/QuickFiler.Test.csproj`. Acceptance: the command produces no output lines. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/forbidden-files-untouched.md`.
+- [x] [P6-T4] Verify the three `Cleanup()` statement-order constraints of constraint C4 by reading the delivered `Cleanup()` body and recording the source line number of the unwire call, the item-viewer nulling statement, the keyboard-handler nulling statement, the timer disposal statement, the timer nulling statement, the breadcrumb detach statement, and the breadcrumb-viewer nulling statement. Acceptance: the artifact records all seven line numbers and states that the unwire call precedes both the item-viewer and keyboard-handler nulling statements, the timer disposal precedes the timer nulling, and the breadcrumb detach precedes the breadcrumb-viewer nulling. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/cleanup-statement-order.md`.
+- [x] [P6-T5] Verify the public-surface stability of the four owned production files by enumerating every member added or removed and its declared accessibility. Acceptance: the artifact lists exactly the nine added members named in the "Literals this plan instructs the executor to create" section that are production members, records each as `internal` or `private`, records that no member was removed, and records that no `public` member was added. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/public-surface.md`.
+- [x] [P6-T6] Record the post-`Cleanup()` lifecycle invariant dossier: a pooled item viewer handed back after `Cleanup()` carries zero event subscriptions from the released controller, with the single documented `WebResourceRequested` exception. Acceptance: the artifact cites the sixteen `VerifyRemove` assertions and the control-tree `Times.Never()` assertions from `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/481-pass.md`, cites the already-detached breadcrumb subscription, and cites the fail-before exception dossier for the one inspection-verified subscription. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/lifecycle-invariant.md`.
+- [x] [P6-T7] Check off the single criterion beginning "No public member is added, and no member is removed". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/public-surface.md`.
+- [x] [P6-T8] Check off the single criterion beginning "`QuickFiler/Interfaces/IQfcItemController.cs` and `QuickFiler/Viewers/IItemViewer.cs` are byte-identical". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/interface-stability.md`.
+- [x] [P6-T9] Check off the single criterion beginning "The set of files changed by this feature is a subset". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/changed-file-set.md`.
+- [x] [P6-T10] Check off the single criterion beginning "All three `Cleanup()` statement-order constraints hold". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/cleanup-statement-order.md`.
+- [x] [P6-T11] Check off the single criterion beginning "The post-`Cleanup()` lifecycle invariant is demonstrated". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/lifecycle-invariant.md`.
+
+### Phase 7 — Final QC toolchain loop
+
+The four stages run in order: format, lint, type-check, test. If any stage fails or changes a file, the
+loop restarts at P7-T1. P7-T12 confirms that the recorded final pass was a single consecutive pass with
+no intervening file modification.
+
+- [x] [P7-T1] Run `dotnet tool run csharpier format` with the nine owned file paths listed in constraint C1 supplied explicitly as arguments, not with a repository-wide `.` argument. Acceptance: `EXIT_CODE: 0`, and the artifact records, for each of the nine files, whether its content changed, determined by comparing its SHA-256 before and after the command. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/csharpier-format.md`.
+- [x] [P7-T2] Run the read-only verification `dotnet tool run csharpier check .` from the worktree root. Acceptance: either `EXIT_CODE: 0`, or the reported unformatted-file set is exactly the baseline set recorded in P0-T9 and contains none of the nine owned files. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/csharpier-check.md`.
+- [x] [P7-T3] Run, under `pwsh -NoProfile`, the resolved MSBuild against `TaskMaster.sln` with `/t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`. Acceptance: `EXIT_CODE: 0` and zero errors. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/msbuild-analyzers.md`.
+- [x] [P7-T4] Run, under `pwsh -NoProfile`, the resolved MSBuild against `TaskMaster.sln` with `/t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`. Do not add `/p:Nullable=enable`. Acceptance: `EXIT_CODE: 0` and zero errors. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/msbuild-nullable.md`.
+- [x] [P7-T5] Run, under `pwsh -NoProfile`, the resolved `vstest.console.exe` against `QuickFiler.Test\bin\Debug\QuickFiler.Test.dll` with `/EnableCodeCoverage /InIsolation /Settings:scripts\vscode\TaskMaster.cli.runsettings /Logger:trx;LogFileName=final-quickfiler-test.trx /ResultsDirectory:docs\features\active\qfc-item-controller-defects-484\evidence\qa-gates\trx-final`. Acceptance: `EXIT_CODE: 0`, failed count 0, and the passed count is greater than or equal to the `BASELINE_PASSED` figure recorded in P0-T12 plus 21; the figure 21 is the 19 added test methods with the three-row `[DataTestMethod]` counted as three results per decision D9; the artifact enumerates the new test result names contributing to the increase. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/quickfiler-test-final.md`.
+- [x] [P7-T6] Run, under `pwsh -NoProfile`, `.\scripts\vscode\Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput docs\features\active\qfc-item-controller-defects-484\evidence\qa-gates\coverage-final.cobertura.xml` from this worktree root. Acceptance: the Cobertura file exists and the artifact records the root `<coverage>` element `line-rate` and `branch-rate` as numeric values, together with the verbatim discovered-assembly list. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/coverage-final.md`.
+- [x] [P7-T7] Compare coverage against the baseline. Acceptance: the artifact records the P0-T14 baseline repository-wide line rate, the P7-T6 post-change repository-wide line rate, and states that the post-change repository-wide line coverage is at least 80 percent; it records the per-method line rate for each of `TryResolveCidResource`, `NotifyMoveFailure`, `UnwireEvents`, `UnwireControlTreeEvents`, and `UnwireIntentEvents`, each at least 90 percent, and records that the only production lines added by this feature below that figure are (a) the two capture-field assignments and the two-statement lambda adapter added inside the pre-existing `[ExcludeFromCodeCoverage]` `InitializeWebViewAsync`, (b) `DetachWebResourceRequestedHandler`, whose guarded `-=` statement is unreachable without a live WebView2 runtime per research section 2.4, so its measured per-method line rate is recorded verbatim and is expected to fall below 90 percent for that reason alone while remaining non-zero, as verified by the P5-T12 fail-before exception dossier, and (c) the default `MoveFailureNotifier` delegate `text => MessageBox.Show(text)`, whose body cannot be executed under the headless unit-test policy of constraint C3 because invoking it opens a modal dialog, and which every `MoveMailAsync` failure-path test replaces with an injected notifier, so its measured line rate is recorded verbatim and is expected to be zero; the artifact records that this statement is the relocation of the pre-existing uncovered `MessageBox.Show` call at `QuickFiler/Controllers/QfcItemController.MailActions.cs:119-121` and therefore reduces no changed line's coverage; and it records that coverage for the changed lines is not reduced relative to the baseline. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/coverage-delta.md`.
+- [x] [P7-T8] Audit file size after the final formatting pass by recording the line count of each of the nine owned files (four production, five test). Acceptance: every recorded value is at most 500, and the artifact names all nine owned files explicitly with their values — `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`, `QuickFiler/Controllers/QfcItemController.EventWiring.cs`, `QuickFiler/Controllers/QfcItemController.MailActions.cs`, `QuickFiler/Controllers/QfcItemController.FocusAndTheme.cs`, `QuickFiler.Test/Controllers/QfcItemController.FocusAndThemeTests.cs`, `QuickFiler.Test/Controllers/QfcItemController.ViewerSetupTests.cs`, `QuickFiler.Test/Controllers/QfcItemController.EventWiringTests.cs`, `QuickFiler.Test/Controllers/QfcItemController.MailActionsTests.cs`, and `QuickFiler.Test/Controllers/QfcItemController.TestSupport.cs`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/file-sizes-final.md`.
+- [x] [P7-T9] Audit the test policy across the five owned test files: search each for the fixed strings `Thread.Sleep` and `Task.Delay`, and record the assertion and mocking libraries used by every test added by this feature. Acceptance: both searches return zero matching lines across all five files, and the artifact records that every added test uses MSTest attributes, Moq mocks, and FluentAssertions assertions, and that no added test creates a temporary file. The artifact also records the list of member declarations in `QuickFiler.Test/Controllers/QfcItemController.TestSupport.cs` at `<BASE_SHA>` and in the delivered file, and states that every member present at `<BASE_SHA>` is still present with an unchanged signature and that the only differences are added members, satisfying the additive-only clause of constraint C1. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/test-policy-audit.md`.
+- [x] [P7-T10] Audit real `ItemViewer` construction across the five owned test files by counting the constructions of `QuickFiler.ItemViewer`. Acceptance: the total is exactly 5, which is the P0-T16 baseline of 4 plus one, and the artifact identifies the single added construction as being inside `UnwireControlTreeEvents_WithHeadlessItemViewer_DetachesKeyboardAndMouseHandlers`, which calls no `Show()`, starts no message pump, and saves and restores the `SynchronizationContext` in `try`/`finally`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/real-itemviewer-audit.md`.
+- [x] [P7-T11] Audit coverage exemptions by counting `ExcludeFromCodeCoverage` occurrences in the four owned production files. Acceptance: the per-file counts are EventWiring 1, ViewerSetup 2, FocusAndTheme 0, MailActions 0, total 3, matching the P0-T16 baseline exactly. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/exemption-audit.md`.
+- [x] [P7-T12] Confirm the four stages completed as one consecutive clean pass. Acceptance: the artifact records the ordered timestamps of P7-T1 through P7-T5 for the final pass, records that no owned file's SHA-256 changed between the P7-T1 format pass and the P7-T5 test run, and records the number of loop restarts that occurred before the final pass. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/toolchain-consecutive-pass.md`.
+
+### Phase 8 — Acceptance-criteria completion and handoff
+
+- [x] [P8-T1] Check off the single criterion beginning "Every production and test file touched by this feature is at most 500 lines". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/file-sizes-final.md`.
+- [x] [P8-T2] Check off the single criterion beginning "Every new test uses MSTest, Moq, and FluentAssertions". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/test-policy-audit.md`.
+- [x] [P8-T3] Check off the single criterion beginning "Exactly one new test constructs a real `QuickFiler.ItemViewer`". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/real-itemviewer-audit.md`.
+- [x] [P8-T4] Check off the single criterion beginning "`dotnet tool run csharpier check .` reports no formatting differences". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/csharpier-check.md`. If the P0-T9 baseline unformatted set was non-empty, record the pre-existing set in `csharpier-check.md`, leave this criterion unchecked, and document the gap in `[P8-T13]`'s reconciliation artifact rather than checking it off.
+- [x] [P8-T5] Check off the single criterion whose text names the analyzer msbuild command and ends "completes with zero errors", specifically the one containing `EnableNETAnalyzers`. Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/msbuild-analyzers.md`.
+- [x] [P8-T6] Check off the single criterion whose text names the nullable msbuild command and ends "completes with zero errors", specifically the one containing `TreatWarningsAsErrors`. Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/msbuild-nullable.md`.
+- [x] [P8-T7] Check off the single criterion beginning "`vstest.console.exe QuickFiler.Test". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/quickfiler-test-final.md`.
+- [x] [P8-T8] Check off the single criterion beginning "All four toolchain stages pass in a single consecutive pass". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/toolchain-consecutive-pass.md`.
+- [x] [P8-T9] Check off the single criterion beginning "Repository-wide line coverage is". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/coverage-delta.md`.
+- [x] [P8-T10] Check off the single criterion beginning "Each new production member added by this feature reaches". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/coverage-delta.md`.
+- [x] [P8-T11] Check off the single criterion beginning "No new `[ExcludeFromCodeCoverage]` attribute is introduced". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites `docs/features/active/qfc-item-controller-defects-484/evidence/qa-gates/exemption-audit.md`.
+- [x] [P8-T12] Check off the single criterion beginning "For each of the five issues, evidence records the regression test failing". Acceptance: that one checkbox reads `- [x]`, its text is unmodified, and the task cites the five fail-before artifacts `480-sync-tightened-fail.md`, `481-empty-bodies-fail.md`, `483-fail.md`, `484-fail.md`, and `485-fail.md` under `docs/features/active/qfc-item-controller-defects-484/evidence/regression-testing/`.
+- [x] [P8-T13] Reconcile the acceptance-criteria state in `docs/features/active/qfc-item-controller-defects-484/spec.md`. Acceptance: the file contains exactly 50 acceptance-criterion checkboxes and no criterion text was modified. The pass outcome for this task is all 50 reading `- [x]`, with exactly one authorized exception, stated below. A criterion whose evidence is incomplete is left unchecked — never checked without evidence — and the artifact records its verbatim text, the reason, and the evidence artifact that documents the gap; in that case this task's outcome is recorded as remediation-required and must not be reported as a pass. The single authorized exception is the pre-existing-unformatted-file branch stated in `[P8-T4]`: if and only if the `[P0-T9]` baseline unformatted set was non-empty and the `[P7-T2]` reported set is exactly that same baseline set and contains none of the nine owned files, then the one criterion beginning "`dotnet tool run csharpier check .` reports no formatting differences" is left unchecked, this task's outcome is 49 of 50 checked, and that outcome is a pass rather than remediation-required, because the gap is a pre-existing repository condition this feature neither caused nor is permitted to fix. Any other unchecked criterion, and any unchecked criterion arising from any other cause, is remediation-required. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/other/ac-reconciliation.md`.
+- [x] [P8-T14] Write the acceptance-criteria status summary. Acceptance: the artifact records the source file `docs/features/active/qfc-item-controller-defects-484/spec.md`, the total acceptance-criterion count, the checked-off count, the remaining count, and the text of any remaining item. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/other/ac-status-summary.md`.
+- [x] [P8-T15] Commit every source and evidence change produced by this plan on the working branch. `.claude/agent-memory/**` is excluded from both the changed-file-set criterion and the clean-tree criterion because it is agent-session state, not feature output. Acceptance: `git status --porcelain` produces no output lines other than paths under `.claude/agent-memory/`, and `git diff --name-only <BASE_SHA> -- . ':(exclude).claude/agent-memory'` lists only the nine owned files and paths under `docs/features/active/qfc-item-controller-defects-484/`. Evidence: `docs/features/active/qfc-item-controller-defects-484/evidence/other/final-commit.md`.

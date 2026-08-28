@@ -252,6 +252,38 @@ namespace QuickFiler.Test.Viewers
             }
         }
 
+        /// <summary>
+        /// Issue #488 defect D2: a theme set while the host-configuration post is still queued must
+        /// not be lost. The coordinator retains the last theme and replays it onto the host in
+        /// <c>ConfigureHost</c>'s newly-adopted branch, so the theme reaches the host that is
+        /// ultimately adopted rather than the null host that was current when it was set.
+        /// </summary>
+        /// <remarks>
+        /// Deterministic and single-threaded. <c>ConfigureHost</c> is queued and deliberately not
+        /// drained before <c>SetTheme</c> runs, which is the state that makes the defect observable:
+        /// at that moment <c>DropDownHost</c> is null, so the coordinator's direct forward reaches
+        /// nothing. The assertion is an exact-sequence equality rather than a containment check, so a
+        /// duplicated or additional replay would also fail it. No second thread, no sleep, no timer
+        /// delay, and no wall-clock wait is used.
+        /// </remarks>
+        [TestMethod]
+        public void ConfigureHostQueued_SetThemeBeforeDrain_ReplaysThemeOntoAdoptedHost()
+        {
+            // Arrange
+            using (var fixture = new LifecycleFixture())
+            {
+                var host = new RecordingHost();
+                fixture.Coordinator.ConfigureHost(host, FixtureAnchor, FixtureWorkingArea);
+
+                // Act
+                fixture.Coordinator.SetTheme("dark");
+                fixture.Queue.DrainOnCreatorThread();
+
+                // Assert
+                host.ThemesApplied.Should().Equal("dark");
+            }
+        }
+
         private static Rectangle FixtureAnchor() => new Rectangle(10, 20, 30, 40);
 
         private static Rectangle FixtureWorkingArea() => new Rectangle(0, 0, 1920, 1080);
@@ -298,6 +330,11 @@ namespace QuickFiler.Test.Viewers
             internal List<string> EventOperations { get; } = new List<string>();
             internal IWebViewMessenger PopupMessengerValue { get; set; }
 
+            /// <summary>
+            /// Issue #488 defect D2: the themes this host received, in the order received.
+            /// </summary>
+            internal List<string> ThemesApplied { get; } = new List<string>();
+
             public bool IsOpen => false;
             public IWebViewMessenger PopupMessenger => PopupMessengerValue;
 
@@ -341,7 +378,7 @@ namespace QuickFiler.Test.Viewers
 
             public bool Close(BreadcrumbDropDownCloseReason reason) => true;
 
-            public void SetTheme(string theme) { }
+            public void SetTheme(string theme) => ThemesApplied.Add(theme);
 
             public void Reset() { }
 

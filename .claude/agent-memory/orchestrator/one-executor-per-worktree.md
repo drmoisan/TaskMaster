@@ -32,5 +32,27 @@ reproduced every recorded figure exactly (18 `csc.exe`, 0 errors, 6435 passed), 
 provenance question moot for delivery. Record the incident in the checkpoint honestly instead of
 erasing it; also keep the superseded evidence series, explicitly marked superseded.
 
+**The commonest way to cause this accidentally: there is no `SendMessage` tool.** The Agent tool's own
+description tells you to "use SendMessage with the agent's ID to continue a previously spawned agent",
+but `SendMessage` is NOT in the orchestrator's function list in this repo. Reaching for it to send a
+mid-flight correction to a running executor and falling back to `Agent(...)` **launches a second
+executor into the live worktree**. Confirmed 2026-08-27 on epic child #501: an `Agent(atomic-executor)`
+call carrying the literal prompt `SendMessage placeholder - not used` started a real second agent while
+the incumbent was in Phase 0.
+
+**Consequence: you cannot correct a running executor at all.** Front-load every correction into the
+INITIAL delegation prompt. On #501 the plan's Phase 9 required `git commit` and `gh issue create`,
+while the delegation prompt had forbidden both — and that contradiction could no longer be repaired,
+so the orchestrator had to complete those four tasks itself afterwards. Read the plan's LAST phase
+before writing the delegation prompt, not after.
+
+**Reassuring finding:** a second `atomic-executor` reliably self-detects and blocks harmlessly. On
+#501 it sampled the plan sha256 / `[x]` count / evidence-file count four times, observed
+`.dotnet-sdk/` growing to 764 MB and `packages/` appearing between samples, concluded "a single
+synchronous agent turn cannot write files in the background", returned `BLOCKED at preflight`, and
+wrote nothing but one agent-memory note. It also explicitly declined `git stash push -u`/`pop` as a
+remedy, because that three-way-merges the live writer's in-flight edits back into the popped files.
+Let the incumbent run; the duplicate costs a few minutes of reads, not a corrupted tree.
+
 Related: [[preflight-catches-vacuous-gates]], [[vstest-aggregate-crash-isolate-per-assembly]],
 [[feedback_reverify_ground_truth_after_user_midcycle_commit]].

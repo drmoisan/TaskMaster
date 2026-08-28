@@ -21,10 +21,6 @@ namespace QuickFiler
             _context = SynchronizationContext.Current;
             _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             InitControlGroups();
-            MenuItem_CheckedChanged(this.ConversationMenuItem);
-            MenuItem_CheckedChanged(this.SaveAttachmentsMenuItem);
-            MenuItem_CheckedChanged(this.SaveEmailMenuItem);
-            MenuItem_CheckedChanged(this.SavePicturesMenuItem);
         }
 
         //private IList<Control> _rightControls;
@@ -153,29 +149,6 @@ namespace QuickFiler
                 .Where(tup => tup.Point.X > limit.X)
                 .Select(tup => tup.Control)
                 .ToList();
-        }
-
-        private void L0v2h2_WebView2_ParentChanged(object sender, EventArgs e)
-        {
-            Console.WriteLine("Parent Changed");
-        }
-
-        private void MenuItem_CheckedChanged(object sender, EventArgs e)
-        {
-            var menuItem = (ToolStripMenuItem)sender;
-            MenuItem_CheckedChanged(menuItem);
-        }
-
-        private void MenuItem_CheckedChanged(ToolStripMenuItem menuItem)
-        {
-            if (menuItem.Checked)
-            {
-                menuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
-            }
-            else
-            {
-                menuItem.Image = null;
-            }
         }
     }
 }

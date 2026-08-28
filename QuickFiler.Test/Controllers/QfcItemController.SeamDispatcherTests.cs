@@ -190,7 +190,7 @@ namespace QuickFiler.Controllers.Tests
             dispatcher.Verify(d => d.InvokeAsync(It.IsAny<Action>()), Times.Once());
             viewer.Verify(
                 v =>
-                    v.SetFolderItems(
+                    v.AddFolderItems(
                         It.Is<string[]>(a => a.Length == 1 && a[0] == "Trash to Delete")
                     ),
                 Times.Once()

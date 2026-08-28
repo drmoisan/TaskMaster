@@ -42,7 +42,7 @@ namespace QuickFiler.Controllers.Tests
             var mockHomeController = new Mock<IFilerHomeController>();
             mockHomeController.SetupGet(h => h.KeyboardHandler).Returns(mockKeyboardHandler.Object);
 
-            var mockParent = new Mock<IFilerFormController>();
+            var mockParent = new Mock<IQfcFormController>();
 
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;

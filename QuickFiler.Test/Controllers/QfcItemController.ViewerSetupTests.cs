@@ -470,5 +470,29 @@ namespace QuickFiler.Controllers.Tests
                 await host.StopAsync().ConfigureAwait(false);
             }
         }
+
+        // Issue #484 - relocated here under constraint C2 rule 3 (MailActionsTests is at capacity).
+        /// <summary>Issue #484: Cleanup() nulls _mailActions; SaveParameters rebinds the adapter.</summary>
+        [TestMethod]
+        public void Cleanup_NullsMailActions_AndSaveParametersRebindsIt()
+        {
+            // Arrange
+            var controller = new HarnessController();
+            var actions = Mock.Of<QuickFiler.Interfaces.IMailItemActions>();
+            QfcItemControllerTestSupport.SetField(controller, "_mailActions", actions);
+
+            // Act
+            controller.Cleanup();
+            object afterCleanup = QfcItemControllerTestSupport.GetField(controller, "_mailActions");
+            var replacement = new Mock<MailItem>();
+            QfcItemControllerTestSupport.DriveSaveParameters(controller, replacement.Object);
+
+            // Assert
+            afterCleanup.Should().BeNull();
+            object rebound = QfcItemControllerTestSupport.GetField(controller, "_mailActions");
+            rebound.Should().BeOfType<QuickFiler.Interfaces.MailItemActionsAdapter>();
+            ((QuickFiler.Interfaces.IMailItemActions)rebound).Save();
+            replacement.Verify(m => m.Save(), Times.Once());
+        }
     }
 }

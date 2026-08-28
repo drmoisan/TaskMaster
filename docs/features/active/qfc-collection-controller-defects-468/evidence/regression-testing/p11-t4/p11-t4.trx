@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="e254e16b-b9ec-4597-9de9-bdfbe1636698" name="<user>@<host> 2026-08-26 11:27:45" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T11:27:45.8951485-04:00" queuing="2026-08-26T11:27:45.8951485-04:00" start="2026-08-26T11:27:44.4064121-04:00" finish="2026-08-26T11:27:45.9244441-04:00" />
+  <TestSettings name="default" id="4d12fcda-1654-4163-b600-aa254d7bf502">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-26_11_27_45" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="eeb07323-baa3-42f9-904d-06265f49ceb6" testId="1c4ece85-5895-8b2f-a285-368596ac46c8" testName="DrainBackgroundLoadingTasksAsync_AwaitsATaskAddedDuringTheDrainWindow" computerName="<host>" duration="00:00:00.1610673" startTime="2026-08-26T11:27:45.5325471-04:00" endTime="2026-08-26T11:27:45.8182874-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="eeb07323-baa3-42f9-904d-06265f49ceb6">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Expected drain.IsCompleted to be False because a task added to BackgroundLoadingTasks during the drain window is still outstanding work, so the drain must not report completion until that task has also finished, but found True.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Primitives.BooleanAssertions`1.BeFalse(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/BooleanAssertions.cs:line 62&#xD;
+   at QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468Tests.&lt;DrainBackgroundLoadingTasksAsync_AwaitsATaskAddedDuringTheDrainWindow&gt;d__9.MoveNext() in <repo-root>\QuickFiler.Test\Controllers\QfcCollectionControllerDefects468Tests.cs:line 407&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.&lt;ExecuteInternalAsync&gt;d__58.MoveNext()</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="DrainBackgroundLoadingTasksAsync_AwaitsATaskAddedDuringTheDrainWindow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c4ece85-5895-8b2f-a285-368596ac46c8">
+      <Execution id="eeb07323-baa3-42f9-904d-06265f49ceb6" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468Tests" name="DrainBackgroundLoadingTasksAsync_AwaitsATaskAddedDuringTheDrainWindow" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1c4ece85-5895-8b2f-a285-368596ac46c8" executionId="eeb07323-baa3-42f9-904d-06265f49ceb6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="8a7ffe92-0d01-4e4d-8660-ced9ed4fd17d" name="<user>@<host> 2026-08-26 10:23:22" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T10:23:22.7809940-04:00" queuing="2026-08-26T10:23:22.7809940-04:00" start="2026-08-26T10:23:21.0058235-04:00" finish="2026-08-26T10:23:22.8096242-04:00" />
+  <TestSettings name="default" id="a38ebe87-1978-453f-bc2d-83adfa019677">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-26_10_23_22" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="da7f53d6-3448-48e8-ba9c-9fea0c0ecb93" testId="1d67354a-6d31-83bf-b8b2-1e929a3a7470" testName="GetMoveDiagnostics_WithNullItemController_ReturnsUnknownLineWithoutThrowing" computerName="<host>" duration="00:00:00.0091386" startTime="2026-08-26T10:23:22.5986952-04:00" endTime="2026-08-26T10:23:22.6167602-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="da7f53d6-3448-48e8-ba9c-9fea0c0ecb93" />
+    <UnitTestResult executionId="b4c98a6c-b0df-467d-a617-d385a234a09a" testId="1ef908be-90a7-8cec-ab30-73dee33c23bb" testName="GetMoveDiagnostics_WithOneGroup_ReturnsExactlyOneLine" computerName="<host>" duration="00:00:00.3999882" startTime="2026-08-26T10:23:22.0439211-04:00" endTime="2026-08-26T10:23:22.5690076-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b4c98a6c-b0df-467d-a617-d385a234a09a">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="24a55591-7990-4c92-a2f5-5a07c018dbbd" testId="1127e60f-4510-8411-b7b8-e1a46d901ab2" testName="GetMoveDiagnostics_WithThreeGroups_ReturnsThreeLinesAndNoNulls" computerName="<host>" duration="00:00:00.0122976" startTime="2026-08-26T10:23:22.5835676-04:00" endTime="2026-08-26T10:23:22.5981873-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="24a55591-7990-4c92-a2f5-5a07c018dbbd" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="GetMoveDiagnostics_WithOneGroup_ReturnsExactlyOneLine" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ef908be-90a7-8cec-ab30-73dee33c23bb">
+      <Execution id="b4c98a6c-b0df-467d-a617-d385a234a09a" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests" name="GetMoveDiagnostics_WithOneGroup_ReturnsExactlyOneLine" />
+    </UnitTest>
+    <UnitTest name="GetMoveDiagnostics_WithNullItemController_ReturnsUnknownLineWithoutThrowing" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d67354a-6d31-83bf-b8b2-1e929a3a7470">
+      <Execution id="da7f53d6-3448-48e8-ba9c-9fea0c0ecb93" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests" name="GetMoveDiagnostics_WithNullItemController_ReturnsUnknownLineWithoutThrowing" />
+    </UnitTest>
+    <UnitTest name="GetMoveDiagnostics_WithThreeGroups_ReturnsThreeLinesAndNoNulls" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1127e60f-4510-8411-b7b8-e1a46d901ab2">
+      <Execution id="24a55591-7990-4c92-a2f5-5a07c018dbbd" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcCollectionControllerDefects468MoveTests" name="GetMoveDiagnostics_WithThreeGroups_ReturnsThreeLinesAndNoNulls" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1d67354a-6d31-83bf-b8b2-1e929a3a7470" executionId="da7f53d6-3448-48e8-ba9c-9fea0c0ecb93" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ef908be-90a7-8cec-ab30-73dee33c23bb" executionId="b4c98a6c-b0df-467d-a617-d385a234a09a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1127e60f-4510-8411-b7b8-e1a46d901ab2" executionId="24a55591-7990-4c92-a2f5-5a07c018dbbd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="3" executed="3" passed="3" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

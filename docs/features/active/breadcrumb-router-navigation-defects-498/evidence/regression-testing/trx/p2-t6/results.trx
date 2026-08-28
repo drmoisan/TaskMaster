@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="63cdef83-3d9f-4d51-b6a6-36ffb026a41f" name="REDACTED-USER@REDACTED-HOST 2026-08-26 09:23:35" runUser="REDACTED-HOST\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-26T09:23:35.1165231-04:00" queuing="2026-08-26T09:23:35.1165231-04:00" start="2026-08-26T09:23:33.3866527-04:00" finish="2026-08-26T09:23:35.1335256-04:00" />
+  <TestSettings name="default" id="ee50b7d6-842c-4cf6-a3a5-d6bdaf898ec6">
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-26_09_23_35" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="6eff6597-00f7-4048-b3b2-98759f259ca1" testId="1e4a72dc-5f18-82c5-a736-e723b632e7d2" testName="SegmentDoubleClick_IndexAboveRange_ViaHostEvent_DoesNotThrowAndLeavesStateUnchanged" computerName="REDACTED-HOST" duration="00:00:00.3671073" startTime="2026-08-26T09:23:34.3865533-04:00" endTime="2026-08-26T09:23:34.9026178-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6eff6597-00f7-4048-b3b2-98759f259ca1">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="2183e6b6-c55f-4efd-91bd-5b2da136b5e8" testId="1a76cbd3-cbd0-83e1-a454-35f25cdb8d4e" testName="SegmentDoubleClick_NegativeIndex_ViaHostEvent_DoesNotThrowAndLeavesStateUnchanged" computerName="REDACTED-HOST" duration="00:00:00.0014586" startTime="2026-08-26T09:23:34.9106167-04:00" endTime="2026-08-26T09:23:34.9136187-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2183e6b6-c55f-4efd-91bd-5b2da136b5e8" />
+    <UnitTestResult executionId="a73a13eb-cb30-4823-85a7-557ae4946f96" testId="11a7b77d-abc0-8ad3-a037-566136931fb9" testName="SegmentDoubleClick_BannerRow_ViaHostEvent_ShortCircuitsBeforeRangeCheck" computerName="REDACTED-HOST" duration="00:00:00.0011865" startTime="2026-08-26T09:23:35.0330829-04:00" endTime="2026-08-26T09:23:35.0390831-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a73a13eb-cb30-4823-85a7-557ae4946f96" />
+    <UnitTestResult executionId="95303ea9-63a0-403e-931a-6bc42e1b2900" testId="1a21b9a0-87e3-88e9-b002-b6c758dcfc2d" testName="SegmentDoubleClick_ValidIndex_ViaHostEvent_CollapsesRowAndPostsRender" computerName="REDACTED-HOST" duration="00:00:00.1196918" startTime="2026-08-26T09:23:34.9136187-04:00" endTime="2026-08-26T09:23:35.0330829-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="95303ea9-63a0-403e-931a-6bc42e1b2900" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="SegmentDoubleClick_IndexAboveRange_ViaHostEvent_DoesNotThrowAndLeavesStateUnchanged" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e4a72dc-5f18-82c5-a736-e723b632e7d2">
+      <Execution id="6eff6597-00f7-4048-b3b2-98759f259ca1" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests" name="SegmentDoubleClick_IndexAboveRange_ViaHostEvent_DoesNotThrowAndLeavesStateUnchanged" />
+    </UnitTest>
+    <UnitTest name="SegmentDoubleClick_ValidIndex_ViaHostEvent_CollapsesRowAndPostsRender" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a21b9a0-87e3-88e9-b002-b6c758dcfc2d">
+      <Execution id="95303ea9-63a0-403e-931a-6bc42e1b2900" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests" name="SegmentDoubleClick_ValidIndex_ViaHostEvent_CollapsesRowAndPostsRender" />
+    </UnitTest>
+    <UnitTest name="SegmentDoubleClick_BannerRow_ViaHostEvent_ShortCircuitsBeforeRangeCheck" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="11a7b77d-abc0-8ad3-a037-566136931fb9">
+      <Execution id="a73a13eb-cb30-4823-85a7-557ae4946f96" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests" name="SegmentDoubleClick_BannerRow_ViaHostEvent_ShortCircuitsBeforeRangeCheck" />
+    </UnitTest>
+    <UnitTest name="SegmentDoubleClick_NegativeIndex_ViaHostEvent_DoesNotThrowAndLeavesStateUnchanged" storage="REDACTED-REPO-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a76cbd3-cbd0-83e1-a454-35f25cdb8d4e">
+      <Execution id="2183e6b6-c55f-4efd-91bd-5b2da136b5e8" />
+      <TestMethod codeBase="REDACTED-REPO-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.BreadcrumbBridgeRouterQueueTests" name="SegmentDoubleClick_NegativeIndex_ViaHostEvent_DoesNotThrowAndLeavesStateUnchanged" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1e4a72dc-5f18-82c5-a736-e723b632e7d2" executionId="6eff6597-00f7-4048-b3b2-98759f259ca1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a76cbd3-cbd0-83e1-a454-35f25cdb8d4e" executionId="2183e6b6-c55f-4efd-91bd-5b2da136b5e8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11a7b77d-abc0-8ad3-a037-566136931fb9" executionId="a73a13eb-cb30-4823-85a7-557ae4946f96" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a21b9a0-87e3-88e9-b002-b6c758dcfc2d" executionId="95303ea9-63a0-403e-931a-6bc42e1b2900" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="4" executed="4" passed="4" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+</TestRun>

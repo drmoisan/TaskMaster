@@ -26,6 +26,10 @@ namespace QuickFiler.Viewers
         private int _generation;
         private bool _disposed;
 
+        // Issue #488 defect D2: the last theme requested, retained so that a theme set while the
+        // ConfigureHost post is still queued is replayed onto the host that is ultimately adopted.
+        private string? _retainedTheme;
+
         internal BreadcrumbItemViewerLifecycleCoordinator(
             BreadcrumbMessengerHub hub,
             BreadcrumbCollapsedAttachment collapsedAttachment,
@@ -139,6 +143,17 @@ namespace QuickFiler.Viewers
                         DetachPopupMessenger
                     );
                     host.PopupMessengerReady += _popupMessengerReadyHandler;
+
+                    // Issue #488 defect D2: replay the retained theme onto the newly adopted host.
+                    // Guarded because BreadcrumbDropDownHost.SetTheme rejects null or whitespace.
+                    // The UpdateRequestProviders branch below deliberately performs no theme call:
+                    // that host already holds the theme, and a redundant SetTheme there would be
+                    // observable to the mock-host tests that pin the replacement contract.
+                    string? retained = _retainedTheme;
+                    if (retained != null && !string.IsNullOrWhiteSpace(retained))
+                    {
+                        host.SetTheme(retained);
+                    }
                 }
                 else
                 {
@@ -155,6 +170,7 @@ namespace QuickFiler.Viewers
         internal void SetTheme(string theme)
         {
             ThrowIfDisposed();
+            _retainedTheme = theme;
             _bridgeCoordinator?.SetTheme(theme);
             DropDownHost?.SetTheme(theme);
         }

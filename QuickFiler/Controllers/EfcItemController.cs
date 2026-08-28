@@ -46,21 +46,6 @@ namespace QuickFiler.Controllers
             IFilerHomeController homeController,
             EfcFormController parent,
             ItemViewer itemViewer,
-            EfcDataModel dataModel,
-            bool async,
-            CancellationToken token
-        )
-            : this(globals, homeController, parent, itemViewer, token)
-        {
-            _dataModel = dataModel;
-            Initialize(async);
-        }
-
-        public EfcItemController(
-            IApplicationGlobals globals,
-            IFilerHomeController homeController,
-            EfcFormController parent,
-            ItemViewer itemViewer,
             CancellationToken token
         )
         {
@@ -94,7 +79,9 @@ namespace QuickFiler.Controllers
                 _navCtrls,
                 _tipsCtrls,
                 _dflt2Ctrls,
-                _selectorsCtrls,
+                // The EFC surface has no selector controls; the field this argument used to
+                // carry was declared null and never assigned, so an explicit null is identical.
+                null,
                 _mailCtrls,
                 () => !_dataModel.Mail?.UnRead ?? false,
                 _itemViewer.TopicThread.Columns.Cast<object>().ToList(),
@@ -141,7 +128,9 @@ namespace QuickFiler.Controllers
                 _navCtrls,
                 _tipsCtrls,
                 _dflt2Ctrls,
-                _selectorsCtrls,
+                // The EFC surface has no selector controls; the field this argument used to
+                // carry was declared null and never assigned, so an explicit null is identical.
+                null,
                 _mailCtrls,
                 () => !_dataModel.Mail.UnRead,
                 _itemViewer.TopicThread.Columns.Cast<object>().ToList(),
@@ -171,38 +160,16 @@ namespace QuickFiler.Controllers
 
         #region Item Setup and Disposal Methods
 
-        internal void InitializeWebView()
-        {
-            // Create the cache directory
-            string localAppData = Environment.GetFolderPath(
-                Environment.SpecialFolder.LocalApplicationData
-            );
-            string cacheFolder = Path.Combine(localAppData, "WindowsFormsWebView2");
-
-            // CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("--disk-cache-size=1 ");
-            CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions(
-                "–incognito "
-            );
-
-            // Create the environment manually
-            Task<CoreWebView2Environment> task = CoreWebView2Environment.CreateAsync(
-                null,
-                cacheFolder,
-                options
-            );
-
-            // Do this so the task is continued on the UI Thread
-            TaskScheduler ui = TaskScheduler.FromCurrentSynchronizationContext();
-
-            task.ContinueWith(
-                t =>
-                {
-                    _webViewEnvironment = task.Result;
-                    _itemViewer.L0v2h2_WebView2.EnsureCoreWebView2Async(_webViewEnvironment);
-                },
-                ui
-            );
-        }
+        /// <summary>
+        /// The additional browser argument handed to <see cref="CoreWebView2EnvironmentOptions"/>
+        /// so that the item preview keeps no browsing data.
+        /// </summary>
+        /// <remarks>
+        /// Hoisted to a constant so the value has exactly one owner and can be asserted directly.
+        /// A direct assertion is the only instrument available for it: the enclosing member needs
+        /// the real WebView2 runtime, so it cannot be executed under the unit-test policy.
+        /// </remarks>
+        internal const string IncognitoArgument = "--incognito ";
 
         internal async Task InitializeWebViewAsync()
         {
@@ -214,7 +181,7 @@ namespace QuickFiler.Controllers
 
             // CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("--disk-cache-size=1 ");
             CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions(
-                "–incognito "
+                IncognitoArgument
             );
 
             await _itemViewer.UiSyncContext;
@@ -252,14 +219,31 @@ namespace QuickFiler.Controllers
             _itemViewer.L0vh_Tlp.ColumnStyles[columnNumber].Width -= widthAdjustment;
         }
 
+        /// <summary>
+        /// Releases the collaborators this controller holds. Callable on a partially constructed
+        /// controller whose <c>Initialize</c> never ran, and idempotent: a second call detaches
+        /// nothing and releases nothing further.
+        /// </summary>
         public void Cleanup()
         {
-            Buttons.ForEach(x =>
+            // Every detach precedes the nulling of the field it detaches from, so a subscription
+            // is always released before its owner becomes unreachable.
+            var buttons = _buttons;
+            if (buttons is not null)
             {
-                x.MouseEnter -= new EventHandler(this.Button_MouseEnter);
-                x.MouseLeave -= new EventHandler(this.Button_MouseLeave);
-            });
-            _globals.Ol.PropertyChanged -= DarkMode_Changed;
+                foreach (var button in buttons)
+                {
+                    button.MouseEnter -= new EventHandler(this.Button_MouseEnter);
+                    button.MouseLeave -= new EventHandler(this.Button_MouseLeave);
+                }
+            }
+            _buttons = null;
+
+            var globals = _globals;
+            if (globals?.Ol is not null)
+            {
+                globals.Ol.PropertyChanged -= DarkMode_Changed;
+            }
             _globals = null;
             _itemViewer = null;
             _parent = null;
@@ -273,7 +257,10 @@ namespace QuickFiler.Controllers
             _keyboardHandler = null;
             _itemPositionTips = null;
             _itemInfo = null;
-            _itemViewer = null;
+
+            // Disposal precedes the nulling, otherwise the thread pool retains a live callback
+            // into a torn-down controller with no remaining reference through which to stop it.
+            _timer?.Dispose();
             _timer = null;
         }
 
@@ -378,7 +365,6 @@ namespace QuickFiler.Controllers
         private List<Control> _navCtrls;
         private List<Control> _tipsCtrls;
         private List<Control> _dflt2Ctrls;
-        private List<Control> _selectorsCtrls = null;
         private List<Control> _mailCtrls;
 
         #endregion
@@ -392,7 +378,13 @@ namespace QuickFiler.Controllers
         private string _activeTheme;
         public string ActiveTheme
         {
-            get => Initializer.GetOrLoad(ref _activeTheme, LoadTheme, strict: true, _themes);
+            // The theme dictionary is released by Cleanup(), and Initializer.GetOrLoad throws
+            // under strict: true once a dependency is null. Testing at the call site returns the
+            // backing field on the torn-down path instead, and keeps the loaded path unchanged.
+            get =>
+                _themes is null
+                    ? _activeTheme
+                    : Initializer.GetOrLoad(ref _activeTheme, LoadTheme, strict: true, _themes);
             set =>
                 Initializer.SetAndSave<string>(
                     ref _activeTheme,
@@ -404,7 +396,10 @@ namespace QuickFiler.Controllers
         internal string LoadTheme()
         {
             var activeTheme = DarkMode ? "DarkNormal" : "LightNormal";
-            _themes[activeTheme].SetTheme();
+            if (_themes is not null && _themes.ContainsKey(activeTheme))
+            {
+                _themes[activeTheme].SetTheme();
+            }
             return activeTheme;
         }
 
@@ -438,14 +433,20 @@ namespace QuickFiler.Controllers
         private bool _darkMode;
         public bool DarkMode
         {
+            // The dependency array is a params object[], so every argument is materialised before
+            // Initializer.GetOrLoad is entered and _globals.Ol would be dereferenced even on the
+            // path that exists to reject a null dependency. Testing at the call site means the
+            // array is never built once the controller has been torn down.
             get =>
-                Initializer.GetOrLoad(
-                    ref _darkMode,
-                    () => _globals.Ol.DarkMode,
-                    false,
-                    _globals,
-                    _globals.Ol
-                );
+                _globals?.Ol is null
+                    ? _darkMode
+                    : Initializer.GetOrLoad(
+                        ref _darkMode,
+                        () => _globals.Ol.DarkMode,
+                        false,
+                        _globals,
+                        _globals.Ol
+                    );
             set => Initializer.SetAndSave(ref _darkMode, value, (x) => _globals.Ol.DarkMode = x);
         }
 
@@ -594,7 +595,7 @@ namespace QuickFiler.Controllers
 
         public string Sender
         {
-            get => _itemInfo.SenderName;
+            get => _itemInfo?.SenderName;
         }
 
         public string SentDate
@@ -609,7 +610,9 @@ namespace QuickFiler.Controllers
 
         public string Subject
         {
-            get => _itemViewer.LblSubject.Text;
+            // #464 A: read the cached mail-item model like Sender and To, not the label text of
+            // a control that Cleanup() has already released.
+            get => _itemInfo?.Subject;
         }
 
         public bool SuppressEvents
@@ -620,7 +623,7 @@ namespace QuickFiler.Controllers
 
         public string To
         {
-            get => _itemInfo.ToRecipientsName;
+            get => _itemInfo?.ToRecipientsName;
         }
 
         public IList<TableLayoutPanel> TableLayoutPanels
@@ -663,10 +666,6 @@ namespace QuickFiler.Controllers
 
             _itemViewer.L0v2h2_WebView2.CoreWebView2InitializationCompleted +=
                 WebView2Control_CoreWebView2InitializationCompleted;
-            if (_dataModel.ConversationResolver is not null)
-                _dataModel.ConversationResolver.PropertyChanged += new PropertyChangedEventHandler(
-                    ConversationResolverPropertyChanged
-                );
             _itemViewer.TopicThread.ItemSelectionChanged +=
                 new ListViewItemSelectionChangedEventHandler(this.TopicThread_ItemSelectionChanged);
             _globals.Ol.PropertyChanged += DarkMode_Changed;
@@ -675,20 +674,6 @@ namespace QuickFiler.Controllers
                 x.MouseEnter += new EventHandler(this.Button_MouseEnter);
                 x.MouseLeave += new EventHandler(this.Button_MouseLeave);
             });
-        }
-
-        internal void RegisterActions(
-            Dictionary<char, Action<char>> actions,
-            bool overwriteDuplicates
-        )
-        {
-            if (!overwriteDuplicates)
-            {
-                actions = actions
-                    .Where(action => !_keyboardHandler.CharActions.ContainsKey(action.Key))
-                    .ToDictionary();
-            }
-            actions.ForEach(action => _keyboardHandler.CharActions[action.Key] = action.Value);
         }
 
         internal void RegisterAsyncFocusActions()
@@ -738,22 +723,6 @@ namespace QuickFiler.Controllers
 
         #region Event Handlers
 
-        public async void ConversationResolverPropertyChanged(
-            object sender,
-            PropertyChangedEventArgs e
-        )
-        {
-            if (e.PropertyName == nameof(_dataModel.ConversationResolver.ConversationInfo.Expanded))
-            {
-                // Switch to UI Thread
-                await _itemViewer.UiSyncContext;
-                _itemViewer.TopicThread.SetObjects(
-                    _dataModel.ConversationResolver.ConversationInfo.Expanded
-                );
-                _itemViewer.TopicThread.Sort(_itemViewer.SentDate, SortOrder.Descending);
-            }
-        }
-
         private void TopicThread_ItemSelectionChanged(
             object sender,
             ListViewItemSelectionChangedEventArgs e
@@ -767,6 +736,23 @@ namespace QuickFiler.Controllers
             }
         }
 
+        /// <summary>
+        /// Rethrows the exception that a failed WebView2 core initialization reported.
+        /// </summary>
+        /// <param name="initializationException">
+        /// The exception carried by the initialization-completed event argument.
+        /// </param>
+        internal static void ThrowInitializationFailure(System.Exception initializationException)
+        {
+            // #464 E: a plain `throw expression;` overwrites StackTrace with this rethrow site,
+            // discarding the frames that identify where the initialization actually failed.
+            // Capturing first and calling Throw() rethrows the same instance with its original
+            // trace intact.
+            System
+                .Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(initializationException)
+                .Throw();
+        }
+
         internal void WebView2Control_CoreWebView2InitializationCompleted(
             object sender,
             CoreWebView2InitializationCompletedEventArgs e
@@ -774,7 +760,7 @@ namespace QuickFiler.Controllers
         {
             if (!e.IsSuccess)
             {
-                throw (e.InitializationException);
+                ThrowInitializationFailure(e.InitializationException);
             }
             _isWebViewerInitialized = true;
             // Do not initialize if there is no item
@@ -835,18 +821,6 @@ namespace QuickFiler.Controllers
 
         #region UI Navigation Methods
 
-        public void ToggleExpansion()
-        {
-            if (_expanded)
-            {
-                ToggleExpansion(Enums.ToggleState.Off);
-            }
-            else
-            {
-                ToggleExpansion(Enums.ToggleState.On);
-            }
-        }
-
         public async Task ToggleExpansionAsync()
         {
             if (_expanded)
@@ -856,51 +830,6 @@ namespace QuickFiler.Controllers
             else
             {
                 await ToggleExpansionAsync(Enums.ToggleState.On);
-            }
-        }
-
-        public void ToggleExpansion(Enums.ToggleState desiredState)
-        {
-            _parent.ToggleExpansionStyle(desiredState);
-            if (desiredState == Enums.ToggleState.On)
-            {
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 0;
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 100;
-                _itemViewer.TopicThread.Visible = true;
-                //_itemViewer.L0v2h2_Panel.Visible = true;
-                _itemViewer.L0v2h2_WebView2.Visible = true;
-                _expanded = true;
-                if ((_itemInfo is not null) && _itemInfo.UnRead == true)
-                {
-                    _timer = new System.Threading.Timer(ApplyReadEmailFormat);
-                    _timer.Change(4000, System.Threading.Timeout.Infinite);
-                }
-                // Register the keyboard actions and overwrite any others silently
-                _keyboardHandler.CharActions.Add(
-                    "Item",
-                    'B',
-                    async (x) => await JumpToAsync(_itemViewer.L0v2h2_WebView2)
-                );
-                _keyboardHandler.CharActions.Add(
-                    "Item",
-                    'D',
-                    async (x) => await JumpToAsync(_itemViewer.TopicThread)
-                );
-            }
-            else
-            {
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 100;
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 0;
-                _itemViewer.TopicThread.Visible = false;
-                //_itemViewer.L0v2h2_Panel.Visible = false;
-                _itemViewer.L0v2h2_WebView2.Visible = false;
-                _expanded = false;
-                if (_timer is not null)
-                {
-                    _timer.Dispose();
-                }
-                _keyboardHandler.CharActions.Remove("Item", 'B');
-                _keyboardHandler.CharActions.Remove("Item", 'D');
             }
         }
 
@@ -1122,8 +1051,26 @@ namespace QuickFiler.Controllers
             _darkMode = false;
         }
 
+        /// <summary>
+        /// Thread-pool timer callback that marks the displayed mail read and reapplies the
+        /// mail-related theme group.
+        /// </summary>
+        /// <remarks>
+        /// The callback can still be in flight when <c>Cleanup()</c> runs. A post-teardown
+        /// invocation is the expected steady state rather than an error, so it returns silently
+        /// without logging once any collaborator it needs has been released.
+        /// </remarks>
         public void ApplyReadEmailFormat(object state)
         {
+            if (
+                _itemInfo is null
+                || _themes is null
+                || _activeTheme is null
+                || !_themes.ContainsKey(_activeTheme)
+            )
+            {
+                return;
+            }
             _itemInfo.UnRead = false;
             _themes[_activeTheme].ControlGroups["MailRelated"].ApplyTheme(async: true);
         }

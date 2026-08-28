@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="e1916a6b-cba2-419a-a475-f37f2b1b7156" name="&lt;user&gt;@&lt;host&gt; 2026-08-27 21:26:34" runUser="&lt;host&gt;\&lt;user&gt;" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T21:26:34.5420049-04:00" queuing="2026-08-27T21:26:34.5420049-04:00" start="2026-08-27T21:26:33.1541058-04:00" finish="2026-08-27T21:26:34.5574048-04:00" />
+  <TestSettings name="default" id="eaf79830-4c4f-4f3f-8103-2cce79d2a5a1">
+    <Deployment runDeploymentRoot="&lt;user&gt;_&lt;host&gt;_2026-08-27_21_26_34" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="e1a1b5d6-be0e-466f-a6a8-a0bc248e92d5" testId="10f106fa-9667-8bba-95ca-971cbb1b5d63" testName="FlagAsTask_DoesNotReadBackFlagTaskDialogResult" computerName="&lt;host&gt;" duration="00:00:00.2058710" startTime="2026-08-27T21:26:34.0746682-04:00" endTime="2026-08-27T21:26:34.3877045-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e1a1b5d6-be0e-466f-a6a8-a0bc248e92d5" />
+    <UnitTestResult executionId="8a5de57a-778c-45ea-9d61-d7c3713101e5" testId="18bd90b8-e3da-8a5f-b947-873c1a68250b" testName="Expand_WhenFocusSubjectReturnsFalse_StillEnumeratesConversation" computerName="&lt;host&gt;" duration="00:00:00.0198237" startTime="2026-08-27T21:26:34.4315169-04:00" endTime="2026-08-27T21:26:34.4530279-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8a5de57a-778c-45ea-9d61-d7c3713101e5" />
+    <UnitTestResult executionId="0977ca9c-692b-4a94-8844-04391e15f95b" testId="129e0d61-67d3-8f11-9511-bccc69c4d7cc" testName="IItemViewer_DeclaresAddFolderItemsAndNotSetFolderItems" computerName="&lt;host&gt;" duration="00:00:00.0231786" startTime="2026-08-27T21:26:34.4530279-04:00" endTime="2026-08-27T21:26:34.4765451-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0977ca9c-692b-4a94-8844-04391e15f95b">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="b099064c-1d42-4ca7-bc83-d99860dcd428" testId="17a2ba46-ac91-8efb-9b45-5329bfb14eea" testName="FlagAsTaskAsync_DoesNotReadBackFlagTaskDialogResult" computerName="&lt;host&gt;" duration="00:00:00.0374736" startTime="2026-08-27T21:26:34.3937045-04:00" endTime="2026-08-27T21:26:34.4315169-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b099064c-1d42-4ca7-bc83-d99860dcd428" />
+    <UnitTestResult executionId="58c1c70b-11da-49dc-bf2e-9f81f78b8b26" testId="1233e7d0-837b-85d6-a6a5-bb585447832c" testName="IItemViewer_FocusSubjectReturnsBool" computerName="&lt;host&gt;" duration="00:00:00.0005038" startTime="2026-08-27T21:26:34.4765451-04:00" endTime="2026-08-27T21:26:34.4785397-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="58c1c70b-11da-49dc-bf2e-9f81f78b8b26" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="FlagAsTaskAsync_DoesNotReadBackFlagTaskDialogResult" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="17a2ba46-ac91-8efb-9b45-5329bfb14eea">
+      <Execution id="b099064c-1d42-4ca7-bc83-d99860dcd428" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_MailActionsTests" name="FlagAsTaskAsync_DoesNotReadBackFlagTaskDialogResult" />
+    </UnitTest>
+    <UnitTest name="IItemViewer_DeclaresAddFolderItemsAndNotSetFolderItems" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="129e0d61-67d3-8f11-9511-bccc69c4d7cc">
+      <Execution id="0977ca9c-692b-4a94-8844-04391e15f95b" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbDropDownContractTests" name="IItemViewer_DeclaresAddFolderItemsAndNotSetFolderItems" />
+    </UnitTest>
+    <UnitTest name="IItemViewer_FocusSubjectReturnsBool" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1233e7d0-837b-85d6-a6a5-bb585447832c">
+      <Execution id="58c1c70b-11da-49dc-bf2e-9f81f78b8b26" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbDropDownContractTests" name="IItemViewer_FocusSubjectReturnsBool" />
+    </UnitTest>
+    <UnitTest name="Expand_WhenFocusSubjectReturnsFalse_StillEnumeratesConversation" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="18bd90b8-e3da-8a5f-b947-873c1a68250b">
+      <Execution id="8a5de57a-778c-45ea-9d61-d7c3713101e5" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_MailActionsTests" name="Expand_WhenFocusSubjectReturnsFalse_StillEnumeratesConversation" />
+    </UnitTest>
+    <UnitTest name="FlagAsTask_DoesNotReadBackFlagTaskDialogResult" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="10f106fa-9667-8bba-95ca-971cbb1b5d63">
+      <Execution id="e1a1b5d6-be0e-466f-a6a8-a0bc248e92d5" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_MailActionsTests" name="FlagAsTask_DoesNotReadBackFlagTaskDialogResult" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="10f106fa-9667-8bba-95ca-971cbb1b5d63" executionId="e1a1b5d6-be0e-466f-a6a8-a0bc248e92d5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18bd90b8-e3da-8a5f-b947-873c1a68250b" executionId="8a5de57a-778c-45ea-9d61-d7c3713101e5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="129e0d61-67d3-8f11-9511-bccc69c4d7cc" executionId="0977ca9c-692b-4a94-8844-04391e15f95b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17a2ba46-ac91-8efb-9b45-5329bfb14eea" executionId="b099064c-1d42-4ca7-bc83-d99860dcd428" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1233e7d0-837b-85d6-a6a5-bb585447832c" executionId="58c1c70b-11da-49dc-bf2e-9f81f78b8b26" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="5" executed="5" passed="5" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+</TestRun>
