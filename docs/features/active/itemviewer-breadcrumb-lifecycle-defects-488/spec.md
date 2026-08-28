@@ -809,19 +809,19 @@ against the Phase 0 baseline rather than as an absolute count.
 
 ### D2 — `SetBreadcrumbTheme` lost when the host post is deferred
 
-- [ ] `BreadcrumbItemViewerLifecycleCoordinator` carries a private retained-theme field that `SetTheme`
+- [x] `BreadcrumbItemViewerLifecycleCoordinator` carries a private retained-theme field that `SetTheme`
       assigns before forwarding to the bridge coordinator and the drop-down host.
-- [ ] `ConfigureHost`'s posted lambda replays the retained theme onto the host **in the newly-adopted
+- [x] `ConfigureHost`'s posted lambda replays the retained theme onto the host **in the newly-adopted
       branch only**, guarded against null or whitespace. The `UpdateRequestProviders` branch performs no
       `SetTheme` call.
-- [ ] A regression test in `BreadcrumbItemViewerLifecycleCoordinatorTests.cs` queues `ConfigureHost`
+- [x] A regression test in `BreadcrumbItemViewerLifecycleCoordinatorTests.cs` queues `ConfigureHost`
       without draining, calls `SetTheme("dark")`, drains, and asserts the recording host received exactly
       `"dark"`. The test contains no second thread, no `Thread.Sleep`, no `Task.Delay`, and no wall-clock
       wait.
-- [ ] `QfcItemControllerBreadcrumbDropDownTests.ConfigureAndAttachBreadcrumbAsync_CachesCurrentThemeAndCreatesOneCandidatePerSession`
+- [x] `QfcItemControllerBreadcrumbDropDownTests.ConfigureAndAttachBreadcrumbAsync_CachesCurrentThemeAndCreatesOneCandidatePerSession`
       passes unmodified, and evidence records the explicit reasoning for why its "no stale pooled theme is
       replayed" assertion survives the retained-theme replay.
-- [ ] `QfcItemControllerBreadcrumbDropDownTests.ConfigureBreadcrumbDropDown_PassesExistingEnvironmentAndDarkThemeLazily`
+- [x] `QfcItemControllerBreadcrumbDropDownTests.ConfigureBreadcrumbDropDown_PassesExistingEnvironmentAndDarkThemeLazily`
       and `..._LightThemeUsesSameControllerSetupSeam` both pass unmodified.
 
 ### D3 — a second, different `IFolderHierarchyProvider`
