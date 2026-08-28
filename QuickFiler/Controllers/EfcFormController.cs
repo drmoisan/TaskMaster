@@ -184,13 +184,32 @@ namespace QuickFiler.Controllers
             _formViewer.Size = _formViewer.MinimumSize;
         }
 
+        /// <summary>
+        /// Releases the collaborators this controller holds. Callable on a partially constructed
+        /// controller and idempotent: a second call detaches nothing, releases nothing further,
+        /// and does not re-invoke the parent teardown callback.
+        /// </summary>
         public void Cleanup()
         {
-            _globals.Ol.PropertyChanged -= DarkMode_Changed;
+            // The detach precedes the nulling of the field it detaches from, so the subscription
+            // is always released before its owner becomes unreachable.
+            var globals = _globals;
+            if (globals?.Ol is not null)
+            {
+                globals.Ol.PropertyChanged -= DarkMode_Changed;
+            }
             _globals = null;
             _formViewer = null;
             _dataModel = null;
-            _parentCleanup.Invoke();
+
+            // Capturing and clearing the field before invoking it is what makes the single
+            // invocation structural: a re-entrant or repeated Cleanup finds a null field.
+            var parentCleanup = _parentCleanup;
+            _parentCleanup = null;
+            if (parentCleanup is not null)
+            {
+                parentCleanup.Invoke();
+            }
         }
 
         public void ConfigureFind()
@@ -252,7 +271,13 @@ namespace QuickFiler.Controllers
         private string _activeTheme;
         public string ActiveTheme
         {
-            get => Initializer.GetOrLoad(ref _activeTheme, LoadTheme, strict: true, _themes);
+            // The theme dictionary is released by Cleanup(), and Initializer.GetOrLoad throws
+            // under strict: true once a dependency is null. Testing at the call site returns the
+            // backing field on the torn-down path instead, and keeps the loaded path unchanged.
+            get =>
+                _themes is null
+                    ? _activeTheme
+                    : Initializer.GetOrLoad(ref _activeTheme, LoadTheme, strict: true, _themes);
             set =>
                 Initializer.SetAndSave<string>(
                     ref _activeTheme,
@@ -264,21 +289,30 @@ namespace QuickFiler.Controllers
         internal string LoadTheme()
         {
             var activeTheme = DarkMode ? "DarkNormal" : "LightNormal";
-            _themes[activeTheme].SetTheme();
+            if (_themes is not null && _themes.ContainsKey(activeTheme))
+            {
+                _themes[activeTheme].SetTheme();
+            }
             return activeTheme;
         }
 
         private bool _darkMode;
         public bool DarkMode
         {
+            // The dependency array is a params object[], so every argument is materialised before
+            // Initializer.GetOrLoad is entered and _globals.Ol would be dereferenced even on the
+            // path that exists to reject a null dependency. Testing at the call site means the
+            // array is never built once the controller has been torn down.
             get =>
-                Initializer.GetOrLoad(
-                    ref _darkMode,
-                    () => _globals.Ol.DarkMode,
-                    false,
-                    _globals,
-                    _globals.Ol
-                );
+                _globals?.Ol is null
+                    ? _darkMode
+                    : Initializer.GetOrLoad(
+                        ref _darkMode,
+                        () => _globals.Ol.DarkMode,
+                        false,
+                        _globals,
+                        _globals.Ol
+                    );
             set => Initializer.SetAndSave(ref _darkMode, value, (x) => _globals.Ol.DarkMode = x);
         }
 

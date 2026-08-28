@@ -219,14 +219,31 @@ namespace QuickFiler.Controllers
             _itemViewer.L0vh_Tlp.ColumnStyles[columnNumber].Width -= widthAdjustment;
         }
 
+        /// <summary>
+        /// Releases the collaborators this controller holds. Callable on a partially constructed
+        /// controller whose <c>Initialize</c> never ran, and idempotent: a second call detaches
+        /// nothing and releases nothing further.
+        /// </summary>
         public void Cleanup()
         {
-            Buttons.ForEach(x =>
+            // Every detach precedes the nulling of the field it detaches from, so a subscription
+            // is always released before its owner becomes unreachable.
+            var buttons = _buttons;
+            if (buttons is not null)
             {
-                x.MouseEnter -= new EventHandler(this.Button_MouseEnter);
-                x.MouseLeave -= new EventHandler(this.Button_MouseLeave);
-            });
-            _globals.Ol.PropertyChanged -= DarkMode_Changed;
+                foreach (var button in buttons)
+                {
+                    button.MouseEnter -= new EventHandler(this.Button_MouseEnter);
+                    button.MouseLeave -= new EventHandler(this.Button_MouseLeave);
+                }
+            }
+            _buttons = null;
+
+            var globals = _globals;
+            if (globals?.Ol is not null)
+            {
+                globals.Ol.PropertyChanged -= DarkMode_Changed;
+            }
             _globals = null;
             _itemViewer = null;
             _parent = null;
@@ -240,7 +257,10 @@ namespace QuickFiler.Controllers
             _keyboardHandler = null;
             _itemPositionTips = null;
             _itemInfo = null;
-            _itemViewer = null;
+
+            // Disposal precedes the nulling, otherwise the thread pool retains a live callback
+            // into a torn-down controller with no remaining reference through which to stop it.
+            _timer?.Dispose();
             _timer = null;
         }
 
@@ -358,7 +378,13 @@ namespace QuickFiler.Controllers
         private string _activeTheme;
         public string ActiveTheme
         {
-            get => Initializer.GetOrLoad(ref _activeTheme, LoadTheme, strict: true, _themes);
+            // The theme dictionary is released by Cleanup(), and Initializer.GetOrLoad throws
+            // under strict: true once a dependency is null. Testing at the call site returns the
+            // backing field on the torn-down path instead, and keeps the loaded path unchanged.
+            get =>
+                _themes is null
+                    ? _activeTheme
+                    : Initializer.GetOrLoad(ref _activeTheme, LoadTheme, strict: true, _themes);
             set =>
                 Initializer.SetAndSave<string>(
                     ref _activeTheme,
@@ -370,7 +396,10 @@ namespace QuickFiler.Controllers
         internal string LoadTheme()
         {
             var activeTheme = DarkMode ? "DarkNormal" : "LightNormal";
-            _themes[activeTheme].SetTheme();
+            if (_themes is not null && _themes.ContainsKey(activeTheme))
+            {
+                _themes[activeTheme].SetTheme();
+            }
             return activeTheme;
         }
 
@@ -404,14 +433,20 @@ namespace QuickFiler.Controllers
         private bool _darkMode;
         public bool DarkMode
         {
+            // The dependency array is a params object[], so every argument is materialised before
+            // Initializer.GetOrLoad is entered and _globals.Ol would be dereferenced even on the
+            // path that exists to reject a null dependency. Testing at the call site means the
+            // array is never built once the controller has been torn down.
             get =>
-                Initializer.GetOrLoad(
-                    ref _darkMode,
-                    () => _globals.Ol.DarkMode,
-                    false,
-                    _globals,
-                    _globals.Ol
-                );
+                _globals?.Ol is null
+                    ? _darkMode
+                    : Initializer.GetOrLoad(
+                        ref _darkMode,
+                        () => _globals.Ol.DarkMode,
+                        false,
+                        _globals,
+                        _globals.Ol
+                    );
             set => Initializer.SetAndSave(ref _darkMode, value, (x) => _globals.Ol.DarkMode = x);
         }
 
@@ -560,7 +595,7 @@ namespace QuickFiler.Controllers
 
         public string Sender
         {
-            get => _itemInfo.SenderName;
+            get => _itemInfo?.SenderName;
         }
 
         public string SentDate
@@ -575,7 +610,9 @@ namespace QuickFiler.Controllers
 
         public string Subject
         {
-            get => _itemViewer.LblSubject.Text;
+            // #464 A: read the cached mail-item model like Sender and To, not the label text of
+            // a control that Cleanup() has already released.
+            get => _itemInfo?.Subject;
         }
 
         public bool SuppressEvents
@@ -586,7 +623,7 @@ namespace QuickFiler.Controllers
 
         public string To
         {
-            get => _itemInfo.ToRecipientsName;
+            get => _itemInfo?.ToRecipientsName;
         }
 
         public IList<TableLayoutPanel> TableLayoutPanels
@@ -997,8 +1034,26 @@ namespace QuickFiler.Controllers
             _darkMode = false;
         }
 
+        /// <summary>
+        /// Thread-pool timer callback that marks the displayed mail read and reapplies the
+        /// mail-related theme group.
+        /// </summary>
+        /// <remarks>
+        /// The callback can still be in flight when <c>Cleanup()</c> runs. A post-teardown
+        /// invocation is the expected steady state rather than an error, so it returns silently
+        /// without logging once any collaborator it needs has been released.
+        /// </remarks>
         public void ApplyReadEmailFormat(object state)
         {
+            if (
+                _itemInfo is null
+                || _themes is null
+                || _activeTheme is null
+                || !_themes.ContainsKey(_activeTheme)
+            )
+            {
+                return;
+            }
             _itemInfo.UnRead = false;
             _themes[_activeTheme].ControlGroups["MailRelated"].ApplyTheme(async: true);
         }

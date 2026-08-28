@@ -156,6 +156,118 @@ namespace QuickFiler.Controllers.Tests
             globals.VerifyGet(value => value.Ol, Times.Once);
         }
 
+        // RC1 (issues #460 A/C, #464 A, #465 A): the three theme/dark-mode accessors must be
+        // readable on a post-Cleanup() controller, whose fields are all null. CreateMinimalController
+        // reproduces exactly that state without a live Outlook COM context.
+        [TestMethod]
+        public void FormDarkMode_OnAllFieldsNullController_ReturnsFalseAndDoesNotThrow()
+        {
+            // Arrange
+            var controller = CreateMinimalController();
+
+            // Act
+            Func<bool> act = () => controller.DarkMode;
+
+            // Assert
+            act.Should()
+                .NotThrow(
+                    "DarkMode must be readable after Cleanup has nulled _globals, instead of"
+                        + " eagerly materialising a dependency array over a null reference"
+                );
+            controller.DarkMode.Should().BeFalse("the _darkMode backing field defaults to false");
+        }
+
+        [TestMethod]
+        public void FormActiveTheme_OnAllFieldsNullController_ReturnsBackingFieldAndDoesNotThrow()
+        {
+            // Arrange
+            var controller = CreateMinimalController();
+            var backingField = (string)GetPrivateField(controller, "_activeTheme");
+
+            // Act
+            Func<string> act = () => controller.ActiveTheme;
+
+            // Assert
+            act.Should()
+                .NotThrow(
+                    "ActiveTheme must be readable after Cleanup has nulled _themes, instead of"
+                        + " failing the strict dependency check with ArgumentNullException"
+                );
+            controller
+                .ActiveTheme.Should()
+                .Be(
+                    backingField,
+                    "the guarded getter returns the _activeTheme backing field verbatim when"
+                        + " _themes is null"
+                );
+        }
+
+        [TestMethod]
+        public void FormLoadTheme_OnAllFieldsNullController_DoesNotThrow()
+        {
+            // Arrange
+            var controller = CreateMinimalController();
+
+            // Act
+            Func<string> act = () => controller.LoadTheme();
+
+            // Assert
+            act.Should()
+                .NotThrow(
+                    "LoadTheme must compute and return a theme name without applying it when"
+                        + " _themes is null, so a torn-down controller cannot fault"
+                );
+        }
+
+        // RC1: Cleanup() must be idempotent and must not double-invoke the parent callback.
+        [TestMethod]
+        public void FormCleanup_CalledTwice_DoesNotThrow()
+        {
+            // Arrange
+            var controller = CreateMinimalController();
+
+            // Act
+            Action act = () =>
+            {
+                controller.Cleanup();
+                controller.Cleanup();
+            };
+
+            // Assert
+            act.Should()
+                .NotThrow(
+                    "Cleanup must be callable on a partially constructed controller and must be"
+                        + " idempotent, so a second teardown pass cannot fault"
+                );
+        }
+
+        [TestMethod]
+        public void FormCleanup_InvokesParentCleanupExactlyOnce()
+        {
+            // Arrange
+            var controller = CreateMinimalController();
+            var parentCleanup = new Mock<Action>();
+            SetPrivateField(controller, "_parentCleanup", parentCleanup.Object);
+
+            // Act
+            controller.Cleanup();
+            controller.Cleanup();
+
+            // Assert
+            parentCleanup.Verify(
+                callback => callback(),
+                Times.Once(),
+                "the parent teardown callback must run exactly once no matter how many times"
+                    + " Cleanup is called"
+            );
+            GetPrivateField(controller, "_parentCleanup")
+                .Should()
+                .BeNull(
+                    "Cleanup nulls the field before invoking the captured local, which is what"
+                        + " makes the single invocation structural rather than incidental"
+                );
+        }
+
         private static void SetPrivateField(object target, string fieldName, object value)
         {
             var field = target
@@ -163,6 +275,15 @@ namespace QuickFiler.Controllers.Tests
                 .GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
             field.Should().NotBeNull($"{fieldName} must remain available for this headless seam");
             field.SetValue(target, value);
+        }
+
+        private static object GetPrivateField(object target, string fieldName)
+        {
+            var field = target
+                .GetType()
+                .GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
+            field.Should().NotBeNull($"{fieldName} must remain available for this headless seam");
+            return field.GetValue(target);
         }
     }
 }

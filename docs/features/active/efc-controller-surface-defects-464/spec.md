@@ -927,13 +927,13 @@ files this feature does not own.**
 
 ### #460 — cleanup NRE and timer leak (latent; remedies GUARD + CORRECTION)
 
-- [ ] A named test constructs `EfcItemController` through the 5-argument constructor without calling `Initialize()`, calls `Cleanup()`, and asserts no exception is thrown.
-- [ ] A named test asserts `Cleanup()` is idempotent on `EfcItemController`: a second consecutive call throws no exception.
-- [ ] A named test asserts the `_buttons` field is null after `Cleanup()` returns.
-- [ ] `Cleanup()` contains exactly one assignment of `_itemViewer`; the duplicate previously at `EfcItemController.cs:276` is absent from the post-change method body.
-- [ ] A named test injects `new Timer(_ => { }, null, Timeout.Infinite, Timeout.Infinite)` into `_timer`, calls `Cleanup()`, asserts the field is null, and asserts `timer.Change(0, Timeout.Infinite)` throws `ObjectDisposedException`.
-- [ ] A named test calls `ApplyReadEmailFormat(null)` on a freshly-`Cleanup()`ed controller and asserts no exception is thrown.
-- [ ] A named test asserts `Subject`, `Sender` and `To` all read from `_itemInfo`: with `_itemInfo` injected, all three return the injected values; after `Cleanup()`, all three behave uniformly and none throws.
+- [x] A named test constructs `EfcItemController` through the 5-argument constructor without calling `Initialize()`, calls `Cleanup()`, and asserts no exception is thrown.
+- [x] A named test asserts `Cleanup()` is idempotent on `EfcItemController`: a second consecutive call throws no exception.
+- [x] A named test asserts the `_buttons` field is null after `Cleanup()` returns.
+- [x] `Cleanup()` contains exactly one assignment of `_itemViewer`; the duplicate previously at `EfcItemController.cs:276` is absent from the post-change method body.
+- [x] A named test injects `new Timer(_ => { }, null, Timeout.Infinite, Timeout.Infinite)` into `_timer`, calls `Cleanup()`, asserts the field is null, and asserts `timer.Change(0, Timeout.Infinite)` throws `ObjectDisposedException`.
+- [x] A named test calls `ApplyReadEmailFormat(null)` on a freshly-`Cleanup()`ed controller and asserts no exception is thrown.
+- [x] A named test asserts `Subject`, `Sender` and `To` all read from `_itemInfo`: with `_itemInfo` injected, all three return the injected values; after `Cleanup()`, all three behave uniformly and none throws.
 
 ### #461 — dead conversation-expanded handler (live; remedy DELETION)
 
@@ -951,11 +951,11 @@ files this feature does not own.**
 
 ### #464 — null-guard and async-void boundary defects (primary; A/B/C/E live, D latent)
 
-- [ ] A named test asserts `EfcFormController.DarkMode` on an all-fields-null controller returns `false` and does not throw.
-- [ ] A named test asserts `EfcFormController.ActiveTheme` on an all-fields-null controller returns its backing-field value and does not throw.
-- [ ] A named test asserts `EfcFormController.LoadTheme` on an all-fields-null controller does not throw.
-- [ ] A named test asserts `EfcItemController.DarkMode` on a null-`_globals` controller returns `false` and does not throw.
-- [ ] A named test asserts `EfcItemController.ActiveTheme` and `EfcItemController.LoadTheme` on a null-`_themes` controller do not throw. **(R1 — the two members `issue.md` omits.)**
+- [x] A named test asserts `EfcFormController.DarkMode` on an all-fields-null controller returns `false` and does not throw.
+- [x] A named test asserts `EfcFormController.ActiveTheme` on an all-fields-null controller returns its backing-field value and does not throw.
+- [x] A named test asserts `EfcFormController.LoadTheme` on an all-fields-null controller does not throw.
+- [x] A named test asserts `EfcItemController.DarkMode` on a null-`_globals` controller returns `false` and does not throw.
+- [x] A named test asserts `EfcItemController.ActiveTheme` and `EfcItemController.LoadTheme` on a null-`_themes` controller do not throw. **(R1 — the two members `issue.md` omits.)**
 - [ ] Each of the five `async void` handlers in `EfcFormController.cs` delegates to an `internal async Task` member; a named test per handler faults the collaborator, asserts the extracted member does not throw, and verifies exactly one invocation of the controller's boundary error sink, whose default delegate is verified by source inspection to be exactly one `logger.Error(message, exception)` call on the pre-existing static logger.
 - [ ] The token `throw;` does not appear inside any `async void` member of `EfcFormController.cs`; the five occurrences previously at `:425`, `:441`, `:457`, `:517` and `:530` are absent.
 - [ ] A named test faults `PopulateFolderCombobox`'s collaborator and asserts the returned task does not fault and one error is logged.
@@ -966,8 +966,8 @@ files this feature does not own.**
 
 ### #465 — form-controller lifecycle and selection defects (live; remedies GUARD + CORRECTION)
 
-- [ ] A named test calls `EfcFormController.Cleanup()` twice and asserts no exception is thrown.
-- [ ] A named test asserts `_parentCleanup` is invoked exactly once across two consecutive `Cleanup()` calls (`Times.Once()` on an injected `System.Action`), and that the field is null after the first call.
+- [x] A named test calls `EfcFormController.Cleanup()` twice and asserts no exception is thrown.
+- [x] A named test asserts `_parentCleanup` is invoked exactly once across two consecutive `Cleanup()` calls (`Times.Once()` on an injected `System.Action`), and that the field is null after the first call.
 - [ ] `RefreshSuggestionsAsync` evaluates `_formViewer.SearchText.Text` on the UI thread before entering `Task.Run`; no member access on `_formViewer` appears inside the `Task.Run` lambda.
 - [ ] A named test exercises the extracted pure matching helper for the search path with no `EfcViewer` instance and asserts the expected matches for a representative input.
 - [ ] `EfcFormController` declares `internal static string[] WithTrashRow(string[] rows)`, and a named test asserts that applying it twice yields exactly one trash row.
