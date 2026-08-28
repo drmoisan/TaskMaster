@@ -435,7 +435,7 @@ Research §8.2 enumerates four. A fifth is added here, discovered while enumerat
 
 | # | Edit | File | Owner | Disposition |
 |---|---|---|---|---|
-| 1 | Add one wire line `_itemViewer.PicturesChanged += this.CbxPictures_CheckedChanged;` to `WireIntentEvents()` | `QfcItemController.EventWiring.cs` | **484** | **Proceed as an agreed cross-child edit.** The handler itself lands in 489-owned `EventHandlers.cs`; only the single wire statement is cross-child. 484 adds `UnwireIntentEvents()` with a documented count of **16** intent detachments (484 spec lines 358, 664). Adding a 17th wire obligates a 17th unwire: the plan must record the 16 → 17 hand-off to 484 explicitly, and Phase 0 must re-check whether 484 has landed. Defect is user-visible, diff is two lines. |
+| 1 | Add one wire line `_itemViewer.PicturesChanged += this.CbxPictures_CheckedChanged;` to `WireIntentEvents()` | `QfcItemController.EventWiring.cs` | **484** | **Proceed as an agreed cross-child edit.** The handler itself lands in 489-owned `EventHandlers.cs`; only the single wire statement is cross-child. 484 adds `UnwireIntentEvents()` with a documented count of **16** intent detachments (484 spec lines 358, 664). Adding a 17th wire obligates a 17th unwire: the plan must record the 16 → 17 hand-off to 484 explicitly, and Phase 0 must re-check whether 484 has landed. Defect is user-visible, diff is two lines. **Amended 2026-08-28 (remediation cycle 1):** this agreed cross-child `EventWiring.cs` edit covers `WireIntentEvents` **and the single matching `UnwireIntentEvents` detachment** `_itemViewer.PicturesChanged -= this.CbxPictures_CheckedChanged;`. Phase 0 re-checked and found 484 already landed (`Upstream484Landed: true`), so the recorded hand-off had no live owner and the detachment was discharged in this branch after review finding RC-1. The `EventWiring.cs` diff is still two lines: one wire, one detachment. |
 | 2 | Add the `InvokeRequired` re-entry guard to `HtmlDarkConverter` | `QfcItemController.FocusAndTheme.cs` | **484** | **Proceed as an agreed cross-child edit.** 484 changes `ToggleNavigation` (`:168-179`) and `ApplyReadEmailFormat` (`:318-324`). `HtmlDarkConverter` is `:289-301`, textually disjoint from both, and is in neither of 484's tables. Anchor on the member name. |
 | 3 | `_ = _itemViewer.FocusSubject();` discard at the sole caller | `QfcItemController.MailActions.cs:64` | **484** | **Proceed.** The `void` → `bool` signature change does **not** make this edit compiler-forced: the sole caller is the expression statement `_itemViewer.FocusSubject();`, and a `bool`-returning invocation is a legal expression statement, so the build succeeds with the caller untouched. The discard is adopted deliberately, to make the ignored result explicit; its proof is a `git grep` for the discard form, never the clean build. Zero semantic change, so no 484 assertion is affected. |
 | 4 | Insert `ClearFolderItems()` before `SetFolderItems` at `AssignFolderComboBox()` | `QfcItemController.FolderHandling.cs:182` | **446** | **DEFER.** Recorded as an out-of-scope finding. The rename alone closes the contract defect; the clear is a behaviour change in 446's file and belongs to 446 or to a follow-up issue. |
@@ -772,6 +772,49 @@ locations. Only the file-path token was corrected in each, pointing to the `.Par
 files above; the test names, node IDs, assertion text, and owning partial class are unchanged, so no
 criterion was weakened — each was only made locationally exact.
 
+**Amendment (2026-08-28).** Remediation cycle 1, after feature-review finding **RC-1**. Two
+passages are amended in place and one criterion is strengthened; the criterion count is
+**unchanged at 62** and **no criterion is weakened**.
+
+*The amended disposition clause.* Row 1 of the table in § Sibling-collision resolution
+originally ended: "Adding a 17th wire obligates a 17th unwire: the plan must record the 16
+→ 17 hand-off to 484 explicitly, and Phase 0 must re-check whether 484 has landed. Defect is
+user-visible, diff is two lines." The agreed cross-child `EventWiring.cs` edit now covers
+`WireIntentEvents` and the single matching `UnwireIntentEvents` detachment as well.
+
+*The amended criterion.* The Issue #486 criterion originally read: "The plan or the executor's
+handoff record states the `WireIntentEvents` / `UnwireIntentEvents` count change from 16 to 17
+and names it as an obligation on upstream 484. Recorded in `evidence/other/`." Its original
+requirement is retained verbatim as the historical record and the criterion now *additionally*
+requires the handoff record to carry a dated addendum marking the obligation discharged in this
+branch. The criterion is therefore strengthened, not weakened, and its checkbox state remains
+`[x]` with that addendum as its evidence pointer.
+
+*The reason.* Feature review measured 17 live subscriptions in `WireIntentEvents()` against 16
+live detachments in `UnwireIntentEvents()`: the 17th subscription, `PicturesChanged`, had no
+counterpart, so a controller that had been wired and then passed through `Cleanup()` retained one
+live subscription on a pooled viewer. Phase 0 of the feature had already recorded
+`Upstream484Landed: true`, so 484 was merged when the hand-off was written and had no in-flight
+work left to absorb the obligation — the recorded hand-off had no live owner. The detachment was
+therefore supplied in this branch, together with the RED-first regression test
+`UnwireIntentEvents_DetachesPicturesChanged` in `QfcItemController.EventWiringTests.Part2.cs`.
+
+*Superseded risk row.* The § Risks & Mitigations row reading "The `WireIntentEvents` 16 → 17
+change is not mirrored by a 17th `UnwireIntentEvents` detachment once 484 lands, leaking one
+subscription on `Cleanup()`" is **superseded**: the mitigation it names (a hand-off record plus an
+acceptance criterion) proved insufficient because the recipient had already merged, and the risk
+is now closed by the in-branch fix rather than mitigated by a record. The row is left in place as
+the historical statement of the risk.
+
+*Deliberate non-rename.* The merged sibling's test
+`UnwireIntentEvents_DetachesAllSixteenIntentSubscriptions`
+(`QuickFiler.Test/Controllers/QfcItemController.EventWiringTests.cs:377`) is **not** renamed and
+**not** edited. It pins sixteen individual `VerifyRemove(..., Times.Once())` calls and no total —
+there is no `VerifyNoOtherCalls` in that file — so it passes unmodified against the 17-detachment
+code, as the remediation's GREEN run confirms. Its "Sixteen" is now a slightly stale name for a
+still-true assertion set; renaming a merged sibling's stable test node ID would be churn with no
+behavioural gain.
+
 ### Phase 0 baseline (prerequisite for every comparison below)
 
 - [x] A Phase 0 baseline exists under `docs/features/active/itemviewer-surface-defects-489/evidence/baseline/` recording, at minimum: the `dotnet tool run csharpier check .` result on the untouched worktree; the analyzer-build warning count; the nullable-build warning count; the `vstest` passed / failed / skipped counts; the repository-wide line-coverage percentage; the line count of every file this feature will touch; and the repository-wide occurrence count of `[ExcludeFromCodeCoverage]`.
@@ -787,7 +830,7 @@ criterion was weakened — each was only made locationally exact.
 - [x] `ItemViewer_DeclaresNoMenuItemCheckedChangedMembers` and `ItemViewer_DeclaresNoMoveOptionsMenuClickHandler` in `QuickFiler.Test/Viewers/ItemViewerBreadcrumbDropDownContractTests.cs` pass, proving the three dead `ItemViewer.cs` members are deleted.
 - [x] `WireIntentEvents_SubscribesToPicturesChanged` in `QuickFiler.Test/Controllers/QfcItemController.EventWiringTests.Part2.cs` passes, asserting `VerifyAdd(v => v.PicturesChanged += It.IsAny<EventHandler>(), Times.Once())` after `WireIntentEvents()`.
 - [x] `PicturesChanged_WhenRaised_RefreshesOptionsPictures` in the same file passes, proving `_optionsPictures` follows the menu state rather than remaining the value captured at `ViewerSetup.cs:392`.
-- [x] The plan or the executor's handoff record states the `WireIntentEvents` / `UnwireIntentEvents` count change from 16 to 17 and names it as an obligation on upstream 484. Recorded in `evidence/other/`.
+- [x] The plan or the executor's handoff record states the `WireIntentEvents` / `UnwireIntentEvents` count change from 16 to 17 and names it as an obligation on upstream 484, **and** that same handoff record carries a dated addendum recording the obligation as discharged in this branch, marked by the field `ObligationDischargedInBranch: true`. Recorded in `evidence/other/`.
 
 ### Issue #487 — `Console.WriteLine` and unguarded cast
 
