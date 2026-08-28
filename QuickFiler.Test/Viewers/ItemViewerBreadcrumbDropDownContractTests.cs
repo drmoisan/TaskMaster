@@ -185,5 +185,47 @@ namespace QuickFiler.Test.Viewers
                     "the empty MoveOptionsMenu_Click body has no caller and no designer wiring"
                 );
         }
+
+        [TestMethod]
+        public void ItemViewer_DeclaresNoParentChangedHandler()
+        {
+            // Arrange
+            const BindingFlags Flags =
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
+            // Act
+            MemberInfo[] members = typeof(QuickFiler.ItemViewer).GetMember(
+                "L0v2h2_WebView2_ParentChanged",
+                Flags
+            );
+
+            // Assert
+            members
+                .Should()
+                .BeEmpty(
+                    "the ParentChanged handler only wrote a console diagnostic and has no caller"
+                );
+        }
+
+        [TestMethod]
+        public void ItemViewerExpanded_DeclaresNoParentChangedHandler()
+        {
+            // Arrange
+            const BindingFlags Flags =
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
+            // Act
+            MemberInfo[] members = typeof(QuickFiler.ItemViewerExpanded).GetMember(
+                "L0v2h2_WebView2_ParentChanged",
+                Flags
+            );
+
+            // Assert
+            members
+                .Should()
+                .BeEmpty(
+                    "the expanded viewer's ParentChanged handler is the same dead console diagnostic"
+                );
+        }
     }
 }
