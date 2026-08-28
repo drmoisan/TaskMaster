@@ -95,7 +95,7 @@ namespace QuickFiler.Viewers
                 focusAnchor,
                 cancelSelection,
                 showPopup,
-                BreadcrumbPopupUiOperations.CaptureCurrentOrTests()
+                BreadcrumbPopupUiOperations.CaptureCurrent()
             ) { }
 
         internal BreadcrumbDropDownHost(
@@ -115,7 +115,7 @@ namespace QuickFiler.Viewers
                 focusAnchor,
                 cancelSelection,
                 showPopup,
-                BreadcrumbPopupUiOperations.CaptureCurrentOrTests()
+                BreadcrumbPopupUiOperations.CaptureCurrent()
             ) { }
 
         internal BreadcrumbDropDownHost(

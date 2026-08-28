@@ -414,6 +414,15 @@ faulted `InitializeWebViewAsync` task is observed by its caller** and does not b
 `TaskException`. If it is not observed, the correct response is a new issue against `ViewerSetup.cs`
 (484-owned), **not** a weakening of this guard. This is a blocking acceptance criterion below.
 
+**Discharged (2026-08-28).** The task is **not** observed: three of its four production call sites
+discard it (`QfcItemController.Initialization.cs:192`, `:288`, `:324`); only `:256` awaits it. The two
+`EfcItemController` sites discard theirs as well. Per the rule above, the response is a new issue and
+not a weakened guard, so the D5 guard is delivered unweakened and the defect is filed as
+**issue [#670](https://github.com/drmoisan/TaskMaster/issues/670)** — "Bug:
+qfc-initializewebviewasync-fault-is-unobserved", filed against
+`QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`. Evidence:
+`evidence/qa-gates/d5-faulted-task-observation.md`.
+
 ### #475 — delete the ambient-probing selector, in three parts
 
 All three parts are **required** and must land as one change-set.
@@ -778,159 +787,159 @@ against the Phase 0 baseline rather than as an absolute count.
 
 ### Process (applies to every defect unit)
 
-- [ ] Phase 0 evidence records the pre-change `QuickFiler.Test` pass/fail counts and the pre-change
+- [x] Phase 0 evidence records the pre-change `QuickFiler.Test` pass/fail counts and the pre-change
       coverage figures, captured before any production file is edited, under
       `docs/features/active/itemviewer-breadcrumb-lifecycle-defects-488/evidence/baseline/`.
-- [ ] For each of the six defect units (D1, D2, D3, D4, D5, #475), evidence records the unit's regression
+- [x] For each of the six defect units (D1, D2, D3, D4, D5, #475), evidence records the unit's regression
       test **failing against the unfixed code** before the corresponding production change lands, per the
       CLAUDE.md Bugfix Workflow.
 
 ### D1 — host replacement on WebView2 environment change
 
-- [ ] `ItemViewer.ConfigureBreadcrumbDropDown(CoreWebView2Environment, IWebViewCoreInitializer)` disposes
+- [x] `ItemViewer.ConfigureBreadcrumbDropDown(CoreWebView2Environment, IWebViewCoreInitializer)` disposes
       the outgoing host **between** the same-environment early return and the construction of the
       replacement, so that the ordering is guaranteed by statement order and not by dispatcher behaviour.
-- [ ] The disposal is guarded by a type test for the **concrete** `BreadcrumbDropDownHost` (not for
+- [x] The disposal is guarded by a type test for the **concrete** `BreadcrumbDropDownHost` (not for
       `IBreadcrumbDropDownHost`), using a pattern variable distinct from the one bound in the
       same-environment guard.
-- [ ] A regression test configures with environment A, captures the host, configures with environment B
+- [x] A regression test configures with environment A, captures the host, configures with environment B
       under a **drainable** (non-inline) synchronization context, and asserts the first host is disposed —
       observing `host1.DropDown.IsDisposed` and, as a secondary assertion, that
       `host1.Close(reason)` returns `false`.
-- [ ] `BreadcrumbDropDownIntegrationTests.ItemViewerDisposal_OwnsHostAndDetachesBothSurfaces` passes
+- [x] `BreadcrumbDropDownIntegrationTests.ItemViewerDisposal_OwnsHostAndDetachesBothSurfaces` passes
       unmodified, with its `host.Dispose()` `Times.Once()` assertion intact, and
       `QuickFiler.Test/Viewers/BreadcrumbDropDownIntegrationTests.cs` is byte-identical to its pre-change
       state.
-- [ ] `QfcItemControllerBreadcrumbDropDownTests.ConfigureBreadcrumbDropDown_RepeatedSameEnvironmentReusesPopupHost`
+- [x] `QfcItemControllerBreadcrumbDropDownTests.ConfigureBreadcrumbDropDown_RepeatedSameEnvironmentReusesPopupHost`
       passes unmodified.
-- [ ] The spec's recorded D1 limitations are honoured in the delivered source: the 3-arg injected
+- [x] The spec's recorded D1 limitations are honoured in the delivered source: the 3-arg injected
       `ConfigureBreadcrumbDropDown` overload is **not** given an equivalent disposal, and
       `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs` is unmodified.
 
 ### D2 — `SetBreadcrumbTheme` lost when the host post is deferred
 
-- [ ] `BreadcrumbItemViewerLifecycleCoordinator` carries a private retained-theme field that `SetTheme`
+- [x] `BreadcrumbItemViewerLifecycleCoordinator` carries a private retained-theme field that `SetTheme`
       assigns before forwarding to the bridge coordinator and the drop-down host.
-- [ ] `ConfigureHost`'s posted lambda replays the retained theme onto the host **in the newly-adopted
+- [x] `ConfigureHost`'s posted lambda replays the retained theme onto the host **in the newly-adopted
       branch only**, guarded against null or whitespace. The `UpdateRequestProviders` branch performs no
       `SetTheme` call.
-- [ ] A regression test in `BreadcrumbItemViewerLifecycleCoordinatorTests.cs` queues `ConfigureHost`
+- [x] A regression test in `BreadcrumbItemViewerLifecycleCoordinatorTests.cs` queues `ConfigureHost`
       without draining, calls `SetTheme("dark")`, drains, and asserts the recording host received exactly
       `"dark"`. The test contains no second thread, no `Thread.Sleep`, no `Task.Delay`, and no wall-clock
       wait.
-- [ ] `QfcItemControllerBreadcrumbDropDownTests.ConfigureAndAttachBreadcrumbAsync_CachesCurrentThemeAndCreatesOneCandidatePerSession`
+- [x] `QfcItemControllerBreadcrumbDropDownTests.ConfigureAndAttachBreadcrumbAsync_CachesCurrentThemeAndCreatesOneCandidatePerSession`
       passes unmodified, and evidence records the explicit reasoning for why its "no stale pooled theme is
       replayed" assertion survives the retained-theme replay.
-- [ ] `QfcItemControllerBreadcrumbDropDownTests.ConfigureBreadcrumbDropDown_PassesExistingEnvironmentAndDarkThemeLazily`
+- [x] `QfcItemControllerBreadcrumbDropDownTests.ConfigureBreadcrumbDropDown_PassesExistingEnvironmentAndDarkThemeLazily`
       and `..._LightThemeUsesSameControllerSetupSeam` both pass unmodified.
 
 ### D3 — a second, different `IFolderHierarchyProvider`
 
-- [ ] `InitializeBreadcrumbPipeline` throws `InvalidOperationException` when `BreadcrumbCoordinator` is
+- [x] `InitializeBreadcrumbPipeline` throws `InvalidOperationException` when `BreadcrumbCoordinator` is
       non-null and the supplied provider is not reference-equal to the retained one, and returns without
       effect when it is reference-equal — matching `BreadcrumbItemViewerLifecycleCoordinator.SetBridgeCoordinator`'s
       reference comparison.
-- [ ] The retained provider is stored in a private `ItemViewer` field assigned on the successful
+- [x] The retained provider is stored in a private `ItemViewer` field assigned on the successful
       initialization path, and is nulled by `DisposeBreadcrumbResources` so a pipeline re-created after
       disposal is not blocked by a stale reference.
-- [ ] Two regression tests exist: a negative case asserting `InvalidOperationException` for a second,
+- [x] Two regression tests exist: a negative case asserting `InvalidOperationException` for a second,
       distinct `Mock<IFolderHierarchyProvider>(MockBehavior.Strict)`, and a positive case asserting
       `NotThrow` and an unchanged `BreadcrumbCoordinator` (`BeSameAs`) for a repeat call with the same
       provider.
-- [ ] No re-initialization branch is added. `BreadcrumbBridgeCoordinator`,
+- [x] No re-initialization branch is added. `BreadcrumbBridgeCoordinator`,
       `BreadcrumbItemViewerLifecycleCoordinator.SetBridgeCoordinator`, and `UnsubscribeBridge` are
       unmodified.
-- [ ] The change description and this spec both state that D3 **changes no production behaviour**, with
+- [x] The change description and this spec both state that D3 **changes no production behaviour**, with
       the reason (`QfcItemController.ViewerSetup.cs:143` guards the only two production callers on
       `viewer.BreadcrumbCoordinator == null`), so no reviewer expects a user-visible repair.
-- [ ] The fail-fast/`SetBridgeCoordinator` coupling is recorded in the delivered spec: the
+- [x] The fail-fast/`SetBridgeCoordinator` coupling is recorded in the delivered spec: the
       `SetBridgeCoordinator` replace-without-dispose defect is out of scope **because** D3 fails fast, and
       adopting explicit re-initialization instead would require pulling that defect into scope.
 
 ### D4 — UI-thread affinity
 
-- [ ] A private `ItemViewer` helper enforces UI-thread affinity by comparing
+- [x] A private `ItemViewer` helper enforces UI-thread affinity by comparing
       `SynchronizationContext.Current` for **reference equality** against `UiSyncContext`, throwing
       `InvalidOperationException` whose message names the operation, and returning without effect when
       `UiSyncContext` is null.
-- [ ] The helper is invoked as the first statement of `InitializeBreadcrumbPipeline(provider, operations)`,
+- [x] The helper is invoked as the first statement of `InitializeBreadcrumbPipeline(provider, operations)`,
       of both `ConfigureBreadcrumbDropDown` overloads, and of `EnsureBreadcrumbResourceOwnership`.
-- [ ] A regression test invokes `InitializeBreadcrumbPipeline` through the existing
+- [x] A regression test invokes `InitializeBreadcrumbPipeline` through the existing
       `BreadcrumbSelectorToggleUiBoundaryTests.InvokeAmbientNull` helper — **same thread, ambient context
       nulled, no second thread and no timing construct** — and asserts `InvalidOperationException`. A
       second case installs a *different non-null* context and asserts the same, proving the comparison is
       reference equality rather than a null check.
-- [ ] The spec, the change description, and the test's own documentation each state that this proxy
+- [x] The spec, the change description, and the test's own documentation each state that this proxy
       **proves the guard fires and does not prove the race is absent**, and that a true two-thread data
       race cannot be reproduced deterministically under the repository's ban on sleeps and wall-clock
       waits. **No criterion in this document asserts that the race is eliminated.**
-- [ ] No `Interlocked`, `lock`, `Monitor`, `Volatile`, or `Mutex` construct is introduced by this feature.
-- [ ] The three unconfirmed harnesses (`BreadcrumbCollapsedSurfaceReadinessTests.cs`,
+- [x] No `Interlocked`, `lock`, `Monitor`, `Volatile`, or `Mutex` construct is introduced by this feature.
+- [x] The three unconfirmed harnesses (`BreadcrumbCollapsedSurfaceReadinessTests.cs`,
       `BreadcrumbPendingOpenCloseTests.cs`, `BreadcrumbCoordinatorLifecycleTests.cs`) are each confirmed
       to install their synchronization context **before** constructing the `ItemViewer`, and the
       confirmation is recorded in evidence.
 
 ### D5 — `Container` created during teardown
 
-- [ ] `EnsureBreadcrumbResourceOwnership` throws `ObjectDisposedException` as its first action when the
+- [x] `EnsureBreadcrumbResourceOwnership` throws `ObjectDisposedException` as its first action when the
       viewer `IsDisposed` **or** `Disposing`, so no `Container` is created and no `BreadcrumbResourceOwner`
       is added after teardown has begun.
-- [ ] A regression test disposes a real `ItemViewer`, calls `InitializeBreadcrumbPipeline`, asserts
+- [x] A regression test disposes a real `ItemViewer`, calls `InitializeBreadcrumbPipeline`, asserts
       `ObjectDisposedException`, and additionally asserts `viewer.BreadcrumbCoordinator` is null.
-- [ ] `QuickFiler/Viewers/ItemViewer.Designer.cs` is byte-identical to its pre-change state.
-- [ ] The research §3.5 open item is discharged with recorded evidence: it is confirmed whether a faulted
+- [x] `QuickFiler/Viewers/ItemViewer.Designer.cs` is byte-identical to its pre-change state.
+- [x] The research §3.5 open item is discharged with recorded evidence: it is confirmed whether a faulted
       `QfcItemController.InitializeWebViewAsync` task is observed by its caller. If it is not observed, a
       new issue is opened against `QfcItemController.ViewerSetup.cs` (484-owned) and referenced here —
       **the guard is not weakened in response.**
 
 ### #475 — `CaptureCurrentOrTests()`
 
-- [ ] `BreadcrumbPopupUiOperations.CaptureCurrentOrTests()` no longer exists, and a repository-wide search
+- [x] `BreadcrumbPopupUiOperations.CaptureCurrentOrTests()` no longer exists, and a repository-wide search
       for the identifier returns no hit in any `.cs` file.
-- [ ] `BreadcrumbPopupUiOperations.CreateForCurrentThreadTests()` and
+- [x] `BreadcrumbPopupUiOperations.CreateForCurrentThreadTests()` and
       `BreadcrumbUiDispatcher.CreateForCurrentThreadTests()` both still exist and are unmodified; only the
       ambient-probing selector is removed.
-- [ ] Both `BreadcrumbDropDownHost` constructor chains that previously supplied
+- [x] Both `BreadcrumbDropDownHost` constructor chains that previously supplied
       `CaptureCurrentOrTests()` now supply `CaptureCurrent()`, and the constructor argument order is
       unchanged, so `BreadcrumbDropDownIntegrationTests.Constructor_NullLegacySurfaceFactory_ThrowsForSurfaceFactory`
       still passes without an ambient context.
-- [ ] `ItemViewer.EnsureBreadcrumbLifecycle` takes a `Func<BreadcrumbPopupUiOperations>` and evaluates it
+- [x] `ItemViewer.EnsureBreadcrumbLifecycle` takes a `Func<BreadcrumbPopupUiOperations>` and evaluates it
       **only after** the already-initialized early return, and all three of its call sites are updated
       accordingly.
-- [ ] `CaptureCurrentOrTests_NullAndControlledContexts_SelectExpectedBoundaries` is deleted and replaced
+- [x] `CaptureCurrentOrTests_NullAndControlledContexts_SelectExpectedBoundaries` is deleted and replaced
       in `BreadcrumbPopupBoundaryCoverageTests.Part2.cs` with a test asserting that
       `CaptureCurrent` under a null ambient context throws `InvalidOperationException`, retaining the
       controlled-context half against `CaptureCurrent`.
-- [ ] A seam-preservation regression test calls the 3-arg `ConfigureBreadcrumbDropDown` inside
+- [x] A seam-preservation regression test calls the 3-arg `ConfigureBreadcrumbDropDown` inside
       `InvokeAmbientNull` on a viewer whose lifecycle was already seeded with injected operations, and
       asserts `NotThrow`. Evidence records this test red before the laziness change and green after.
-- [ ] No test file other than `BreadcrumbPopupBoundaryCoverageTests.Part2.cs` and the new regression file
+- [x] No test file other than `BreadcrumbPopupBoundaryCoverageTests.Part2.cs` and the new regression file
       is modified in service of #475; specifically, no existing test's injected
       `BreadcrumbPopupUiOperations` seam is removed or replaced.
 
 ### Scope, ownership, and the 489 dependency
 
-- [ ] The set of files changed by this feature is a subset of: the four owned production files
+- [x] The set of files changed by this feature is a subset of: the four owned production files
       (`ItemViewer.Breadcrumb.cs`, `BreadcrumbItemViewerLifecycleCoordinator.cs`,
       `BreadcrumbPopupUiOperations.cs`, `BreadcrumbDropDownHost.cs`), the two owned test files
       (`BreadcrumbItemViewerLifecycleCoordinatorTests.cs`, `BreadcrumbPopupBoundaryCoverageTests.Part2.cs`),
       the one new test file, and `QuickFiler.Test/QuickFiler.Test.csproj`.
-- [ ] `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs`,
+- [x] `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs`,
       `QuickFiler/Viewers/BreadcrumbMessengerHub.cs`, `QuickFiler/Viewers/BreadcrumbBridgeCoordinator.cs`,
       `QuickFiler/Viewers/ItemViewer.cs`, `QuickFiler/Viewers/ItemViewer.Designer.cs`,
       `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`, and `QuickFiler/QuickFiler.csproj` are all
       byte-identical to their pre-change state.
-- [ ] No public member is added, removed, or re-signed in any changed file, and
+- [x] No public member is added, removed, or re-signed in any changed file, and
       `QuickFiler/Viewers/IBreadcrumbDropDownHost.cs` and `QuickFiler/Viewers/IItemViewer.cs` are
       unmodified.
-- [ ] The `QuickFiler.Test.csproj` diff is exactly one added `<Compile Include>` line for the new test
+- [x] The `QuickFiler.Test.csproj` diff is exactly one added `<Compile Include>` line for the new test
       file, positioned adjacent to the existing `Viewers\ItemViewerBreadcrumbDropDownContractTests.cs`
       entry, with no reordering of any other entry.
-- [ ] The three out-of-scope follow-up candidates (D1c; `SetBridgeCoordinator` replace-without-dispose;
+- [x] The three out-of-scope follow-up candidates (D1c; `SetBridgeCoordinator` replace-without-dispose;
       `Reset()` surface-detach synchrony) are each recorded as a potential entry or GitHub issue, with the
       mechanism and triggers carried forward so the follow-up does not have to re-derive them. No fix for
       any of the three appears in this feature's diff.
-- [ ] The `## Dependencies on 489` section of this spec is re-checked against 489's finalised spec before
+- [x] The `## Dependencies on 489` section of this spec is re-checked against 489's finalised spec before
       integration, and each of D489-1 through D489-6 is recorded as confirmed or as requiring a named
       adjustment. **D489-4 is checked explicitly**, because a member-name collision across `ItemViewer`
       partials is a compile error at integration rather than a merge conflict and will not surface at
@@ -938,37 +947,37 @@ against the Phase 0 baseline rather than as an absolute count.
 
 ### File size, toolchain, coverage, and document integrity
 
-- [ ] Every production and test file touched by this feature is at most **500 lines** after the change.
+- [x] Every production and test file touched by this feature is at most **500 lines** after the change.
       The post-change line counts of all four owned production files, both owned test files, and the new
       test file are recorded in evidence. In particular
       `BreadcrumbItemViewerLifecycleCoordinator.cs` (pre-change 481) and
       `BreadcrumbPopupUiOperations.cs` (pre-change 494) are each verified at or under 500.
-- [ ] `QuickFiler.Test/Viewers/BreadcrumbDropDownIntegrationTests.cs` remains at exactly 500 lines and is
+- [x] `QuickFiler.Test/Viewers/BreadcrumbDropDownIntegrationTests.cs` remains at exactly 500 lines and is
       unmodified.
-- [ ] Every new test uses MSTest, Moq, and FluentAssertions, and no new test contains `Thread.Sleep`,
+- [x] Every new test uses MSTest, Moq, and FluentAssertions, and no new test contains `Thread.Sleep`,
       `Task.Delay`, a wall-clock wait, or a temporary file.
-- [ ] `dotnet tool run csharpier check .` reports no formatting differences.
-- [ ] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+- [x] `dotnet tool run csharpier check .` reports no formatting differences.
+- [x] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
       completes with zero errors, and the analyzer warning count for the four owned production files is
       no greater than the Phase 0 baseline count for those same files.
-- [ ] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
+- [x] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
       completes with zero errors. `/p:Nullable=enable` is **not** added to this command.
-- [ ] `vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCoverage /InIsolation`
+- [x] `vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCoverage /InIsolation`
       reports zero failures, and the pass count is greater than or equal to the Phase 0 baseline pass
       count plus the number of tests added, minus the one deleted test.
-- [ ] All four toolchain stages pass in a single consecutive pass with no intervening file modification.
-- [ ] Coverage for the changed lines is not reduced relative to the Phase 0 baseline, and each new or
+- [x] All four toolchain stages pass in a single consecutive pass with no intervening file modification.
+- [x] Coverage for the changed lines is not reduced relative to the Phase 0 baseline, and each new or
       changed **measured** production member — that is, members in
       `BreadcrumbItemViewerLifecycleCoordinator.cs`, `BreadcrumbPopupUiOperations.cs`, and
       `BreadcrumbDropDownHost.cs` — reaches `>= 90%` line coverage.
-- [ ] Repository-wide line coverage is `>= 80%` against the testable denominator defined in CLAUDE.md
+- [x] Repository-wide line coverage is `>= 80%` against the testable denominator defined in CLAUDE.md
       § UT2. Both the testable-denominator figure and the raw uninstrumented figure are recorded in
       evidence together with the Phase 0 baseline values, and the delivered change does not lower either.
-- [ ] Evidence records that all fixes in `ItemViewer.Breadcrumb.cs` (D1, D3, D4, D5, and #475 part 3) are
+- [x] Evidence records that all fixes in `ItemViewer.Breadcrumb.cs` (D1, D3, D4, D5, and #475 part 3) are
       **coverage-exempt** because `ItemViewer.cs:20` carries `[ExcludeFromCodeCoverage]` on the partial
       type, so their regression tests move no coverage number. **No new `[ExcludeFromCodeCoverage]`
       attribute is introduced anywhere by this feature, and none is removed.**
-- [ ] `docs/features/active/itemviewer-breadcrumb-lifecycle-defects-488/user-story.md` **does not exist**.
+- [x] `docs/features/active/itemviewer-breadcrumb-lifecycle-defects-488/user-story.md` **does not exist**.
       This is a `full-bug` feature; `spec.md` is the sole acceptance-criteria source, and a second
       checkbox-bearing document in this folder is an integrity failure.
 

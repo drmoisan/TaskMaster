@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="86818321-fd07-4001-afa6-6f67b7aec516" name="REDACTED-USER@REDACTED-HOST 2026-08-28 01:33:01" runUser="REDACTED-DOMAIN-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-28T01:33:01.5573949-04:00" queuing="2026-08-28T01:33:01.5573949-04:00" start="2026-08-28T01:33:00.2218902-04:00" finish="2026-08-28T01:33:01.5739784-04:00" />
+  <TestSettings name="default" id="4f476e48-4de8-486d-a144-b0fd782cd18f">
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-28_01_33_01" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="ba35c5a9-b92c-4ab8-9fb5-47cbbcb0cfdb" testId="1eba9b3c-9ba5-8aa1-a6f1-084238706c7d" testName="ConfigureHostQueued_SetThemeBeforeDrain_ReplaysThemeOntoAdoptedHost" computerName="REDACTED-HOST" duration="00:00:00.1540874" startTime="2026-08-28T01:33:01.1217078-04:00" endTime="2026-08-28T01:33:01.3914829-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ba35c5a9-b92c-4ab8-9fb5-47cbbcb0cfdb">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Expected host.ThemesApplied to be equal to {"dark"}, but found empty collection.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Execution.GivenSelector`1.FailWith(String message, Object[] args) in /_/Src/FluentAssertions/Execution/GivenSelector.cs:line 75&#xD;
+   at FluentAssertions.Execution.GivenSelectorExtensions.AssertEitherCollectionIsNotEmpty[T](GivenSelector`1 givenSelector, Int32 length) in /_/Src/FluentAssertions/Execution/GivenSelectorExtensions.cs:line 23&#xD;
+   at FluentAssertions.Execution.GivenSelectorExtensions.AssertCollectionsHaveSameCount[T](GivenSelector`1 givenSelector, Int32 length) in /_/Src/FluentAssertions/Execution/GivenSelectorExtensions.cs:line 58&#xD;
+   at FluentAssertions.Collections.GenericCollectionAssertions`3.&lt;&gt;c__DisplayClass106_0`1.&lt;AssertSubjectEquality&gt;b__0(AssertionChain chain) in /_/Src/FluentAssertions/Collections/GenericCollectionAssertions.cs:line 3521&#xD;
+   at FluentAssertions.Execution.AssertionChain.WithExpectation(String message, Action`1 chain, Object[] args) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 192&#xD;
+   at FluentAssertions.Collections.GenericCollectionAssertions`3.Equal(IEnumerable`1 expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Collections/GenericCollectionAssertions.cs:line 1419&#xD;
+   at QuickFiler.Test.Viewers.BreadcrumbItemViewerLifecycleCoordinatorTests.ConfigureHostQueued_SetThemeBeforeDrain_ReplaysThemeOntoAdoptedHost() in REDACTED-WORKTREE-ROOT\QuickFiler.Test\Viewers\BreadcrumbItemViewerLifecycleCoordinatorTests.cs:line 283</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="ConfigureHostQueued_SetThemeBeforeDrain_ReplaysThemeOntoAdoptedHost" storage="REDACTED-WORKTREE-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1eba9b3c-9ba5-8aa1-a6f1-084238706c7d">
+      <Execution id="ba35c5a9-b92c-4ab8-9fb5-47cbbcb0cfdb" />
+      <TestMethod codeBase="REDACTED-WORKTREE-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbItemViewerLifecycleCoordinatorTests" name="ConfigureHostQueued_SetThemeBeforeDrain_ReplaysThemeOntoAdoptedHost" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1eba9b3c-9ba5-8aa1-a6f1-084238706c7d" executionId="ba35c5a9-b92c-4ab8-9fb5-47cbbcb0cfdb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for REDACTED-WORKTREE-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

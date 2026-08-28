@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Web.WebView2.Core;
@@ -14,6 +15,11 @@ namespace QuickFiler
     {
         private BreadcrumbItemViewerLifecycleCoordinator _breadcrumbLifecycleCoordinator;
         private BreadcrumbResourceOwner _breadcrumbResourceOwner;
+
+        // Issue #488 defect D3: the provider the pipeline was initialized with. Retained because
+        // BreadcrumbBridgeCoordinator does not expose its provider — the constructor passes it
+        // straight into the router and there is no Provider member to read it back from.
+        private IFolderHierarchyProvider _breadcrumbProvider;
 
         /// <summary>The Designer-declared breadcrumb WebView2 occupying the old CboFolders cell.</summary>
         public Microsoft.Web.WebView2.WinForms.WebView2 L0vhBreadcrumb_WebView2
@@ -42,12 +48,30 @@ namespace QuickFiler
             BreadcrumbPopupUiOperations operations
         )
         {
+            ThrowIfOffUiBoundary(nameof(InitializeBreadcrumbPipeline));
+
+            // Issue #488 defect D3: fail fast on a second, different provider rather than discarding
+            // it silently. The comparison is reference equality, matching what the collaborator this
+            // wrapper wraps already does in
+            // BreadcrumbItemViewerLifecycleCoordinator.SetBridgeCoordinator. No re-initialization
+            // branch is built: keeping this fail-fast is what holds the out-of-scope
+            // SetBridgeCoordinator replace-without-dispose defect dormant, because
+            // InitializeBreadcrumbPipeline then never constructs a second bridge coordinator.
             if (BreadcrumbCoordinator != null)
             {
+                if (!ReferenceEquals(_breadcrumbProvider, provider))
+                {
+                    throw new InvalidOperationException(
+                        "The breadcrumb pipeline is already initialized with a different folder "
+                            + "hierarchy provider. Dispose the viewer's breadcrumb resources before "
+                            + "initializing it with another provider."
+                    );
+                }
+
                 return;
             }
 
-            BreadcrumbItemViewerLifecycleCoordinator lifecycle = EnsureBreadcrumbLifecycle(
+            BreadcrumbItemViewerLifecycleCoordinator lifecycle = EnsureBreadcrumbLifecycle(() =>
                 operations
             );
             var bridgeCoordinator = new BreadcrumbBridgeCoordinator(
@@ -57,6 +81,7 @@ namespace QuickFiler
             );
             lifecycle.SetBridgeCoordinator(bridgeCoordinator);
             BreadcrumbCoordinator = bridgeCoordinator;
+            _breadcrumbProvider = provider;
         }
 
         internal Task<bool> AttachBreadcrumbWebViewAsync() =>
@@ -144,6 +169,8 @@ namespace QuickFiler
             IWebViewCoreInitializer initializer
         )
         {
+            ThrowIfOffUiBoundary(nameof(ConfigureBreadcrumbDropDown));
+
             if (
                 BreadcrumbDropDownHost is BreadcrumbDropDownHost existing
                 && ReferenceEquals(existing.Environment, environment)
@@ -152,8 +179,20 @@ namespace QuickFiler
                 return;
             }
 
+            // Issue #488 defect D1: dispose the outgoing host here, between the same-environment
+            // early return and the construction of its replacement, so the ordering is guaranteed by
+            // statement order rather than by dispatcher behaviour. The type test names the concrete
+            // BreadcrumbDropDownHost rather than IBreadcrumbDropDownHost, so a mock host installed by
+            // the injected 3-arg overload is not disposed here and that overload's Times.Once()
+            // disposal assertion is unaffected. A fresh pattern variable is required: the one bound in
+            // the same-environment guard above is definitely assigned only on the branch that returns.
+            if (BreadcrumbDropDownHost is BreadcrumbDropDownHost outgoing)
+            {
+                outgoing.Dispose();
+            }
+
             BreadcrumbItemViewerLifecycleCoordinator lifecycle = EnsureBreadcrumbLifecycle(
-                BreadcrumbPopupUiOperations.CaptureCurrentOrTests()
+                BreadcrumbPopupUiOperations.CaptureCurrent
             );
             BreadcrumbDropDownHost host = null;
             host = new BreadcrumbDropDownHost(
@@ -182,6 +221,8 @@ namespace QuickFiler
             Func<Rectangle> workingArea
         )
         {
+            ThrowIfOffUiBoundary(nameof(ConfigureBreadcrumbDropDown));
+
             if (host == null)
             {
                 throw new ArgumentNullException(nameof(host));
@@ -189,7 +230,7 @@ namespace QuickFiler
             _ = anchorBounds ?? throw new ArgumentNullException(nameof(anchorBounds));
             _ = workingArea ?? throw new ArgumentNullException(nameof(workingArea));
             BreadcrumbItemViewerLifecycleCoordinator lifecycle = EnsureBreadcrumbLifecycle(
-                BreadcrumbPopupUiOperations.CaptureCurrentOrTests()
+                BreadcrumbPopupUiOperations.CaptureCurrent
             );
             lifecycle.ConfigureHost(host, anchorBounds, workingArea);
         }
@@ -271,8 +312,20 @@ namespace QuickFiler
         private void OnBreadcrumbUnhandledArrow(BreadcrumbArrowDirection direction) =>
             BreadcrumbUnhandledArrow?.Invoke(this, direction);
 
+        /// <summary>
+        /// Issue #475 part 3: the operations argument is a factory rather than a value, and is
+        /// invoked exactly once and only <em>after</em> the already-initialized early return.
+        /// </summary>
+        /// <remarks>
+        /// Laziness is required, not opportunistic. This member discards its operations argument
+        /// whenever the coordinator already exists, so with an eagerly evaluated argument the swap
+        /// from the deleted ambient-probing selector to the fail-fast
+        /// <see cref="BreadcrumbPopupUiOperations.CaptureCurrent"/> would make a pure no-op call throw
+        /// on any thread without a synchronization context, removing the injected seam that existing
+        /// tests rely on.
+        /// </remarks>
         private BreadcrumbItemViewerLifecycleCoordinator EnsureBreadcrumbLifecycle(
-            BreadcrumbPopupUiOperations operations
+            Func<BreadcrumbPopupUiOperations> operationsFactory
         )
         {
             if (_breadcrumbLifecycleCoordinator != null)
@@ -280,6 +333,7 @@ namespace QuickFiler
                 return _breadcrumbLifecycleCoordinator;
             }
 
+            BreadcrumbPopupUiOperations operations = operationsFactory();
             EnsureBreadcrumbResourceOwnership();
             var hub = new BreadcrumbMessengerHub();
             var attachment = new BreadcrumbCollapsedAttachment(
@@ -299,6 +353,22 @@ namespace QuickFiler
 
         private void EnsureBreadcrumbResourceOwnership()
         {
+            // Statement order here is fixed by decision D-15 and must not be reversed. The affinity
+            // guard is the FIRST STATEMENT, but it is a precondition check that returns without
+            // effect on the UI boundary and when UiSyncContext is null, so on every path that reaches
+            // this member's own logic it has performed no action. Issue #488 defect D5's
+            // ObjectDisposedException throw immediately follows and is therefore the FIRST ACTION: it
+            // is the first statement that inspects this member's own subject, the viewer's teardown
+            // state, and it precedes the already-owned early return, every container creation, and
+            // every BreadcrumbResourceOwner addition. Reversing the two would place a
+            // SynchronizationContext comparison after a throw that is supposed to run first.
+            ThrowIfOffUiBoundary(nameof(EnsureBreadcrumbResourceOwnership));
+
+            if (IsDisposed || Disposing)
+            {
+                throw new ObjectDisposedException(nameof(ItemViewer));
+            }
+
             if (_breadcrumbResourceOwner != null)
             {
                 return;
@@ -309,11 +379,47 @@ namespace QuickFiler
             components.Add(_breadcrumbResourceOwner);
         }
 
+        /// <summary>
+        /// Issue #488 defect D4: declares and enforces this viewer's UI-thread affinity for the
+        /// breadcrumb pipeline members, throwing when <paramref name="operation"/> is attempted from
+        /// off the boundary the viewer captured in its constructor.
+        /// </summary>
+        /// <remarks>
+        /// The comparison is <em>reference equality</em> against <see cref="UiSyncContext"/>, not a
+        /// managed thread-identity comparison: a continuation resumed without the captured context can
+        /// land on a recycled pool thread whose id matches, so a thread id is not a boundary proof.
+        /// The null-context escape keeps a viewer constructed without an ambient context — a test
+        /// shape — from throwing.
+        /// This declares and enforces the contract; it does not make the read-then-write atomic. A
+        /// caller that violates the contract now receives a diagnostic instead of a silent leak.
+        /// </remarks>
+        private void ThrowIfOffUiBoundary(string operation)
+        {
+            SynchronizationContext owning = UiSyncContext;
+            if (owning == null)
+            {
+                return;
+            }
+
+            if (!ReferenceEquals(SynchronizationContext.Current, owning))
+            {
+                throw new InvalidOperationException(
+                    $"{operation} must be called on the thread that owns this ItemViewer. The "
+                        + "current synchronization context is not the one captured when the viewer "
+                        + "was constructed."
+                );
+            }
+        }
+
         private void DisposeBreadcrumbResources()
         {
             _breadcrumbLifecycleCoordinator?.Dispose();
             _breadcrumbLifecycleCoordinator = null;
             BreadcrumbCoordinator = null;
+
+            // Issue #488 defect D3: clear the retained provider so a pipeline re-created after
+            // disposal is not blocked by a stale reference.
+            _breadcrumbProvider = null;
         }
     }
 }

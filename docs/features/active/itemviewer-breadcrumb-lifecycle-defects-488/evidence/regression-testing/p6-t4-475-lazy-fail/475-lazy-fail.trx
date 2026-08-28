@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="75951de3-325b-4dda-9bd0-b15824951a95" name="REDACTED-USER@REDACTED-HOST 2026-08-28 02:04:59" runUser="REDACTED-DOMAIN-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-28T02:04:59.5939503-04:00" queuing="2026-08-28T02:04:59.5939503-04:00" start="2026-08-28T02:04:57.3885943-04:00" finish="2026-08-28T02:04:59.6107279-04:00" />
+  <TestSettings name="default" id="0ad1e8e5-f771-436f-8175-e0012c003048">
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-28_02_04_59" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="c968521b-5d93-4335-929e-37b8e409916d" testId="17249edd-fe0c-8b9e-9c79-85a4a56cbf3b" testName="ConfigureBreadcrumbDropDown_SeededLifecycleNullUiContext_DoesNotThrow" computerName="REDACTED-HOST" duration="00:00:01.0332969" startTime="2026-08-28T02:04:58.3785419-04:00" endTime="2026-08-28T02:04:59.5274143-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c968521b-5d93-4335-929e-37b8e409916d">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Did not expect any exception because the already-seeded lifecycle discards the operations argument, so it must never be evaluated on a thread without an ambient context, but found System.InvalidOperationException: Breadcrumb UI components must be constructed on an owning UI synchronization context.&#xD;
+   at QuickFiler.Viewers.BreadcrumbUiDispatcher.CaptureCurrent() in REDACTED-WORKTREE-ROOT\QuickFiler\Viewers\BreadcrumbUiDispatcher.cs:line 46&#xD;
+   at QuickFiler.Viewers.BreadcrumbPopupUiOperations.CaptureCurrent() in REDACTED-WORKTREE-ROOT\QuickFiler\Viewers\BreadcrumbPopupUiOperations.cs:line 81&#xD;
+   at QuickFiler.ItemViewer.ConfigureBreadcrumbDropDown(IBreadcrumbDropDownHost host, Func`1 anchorBounds, Func`1 workingArea) in REDACTED-WORKTREE-ROOT\QuickFiler\Viewers\ItemViewer.Breadcrumb.cs:line 232&#xD;
+   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.&lt;&gt;c__DisplayClass7_1.&lt;ConfigureBreadcrumbDropDown_SeededLifecycleNullUiContext_DoesNotThrow&gt;b__2() in REDACTED-WORKTREE-ROOT\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 346&#xD;
+   at QuickFiler.Test.Viewers.BreadcrumbSelectorToggleUiBoundaryTests.InvokeAmbientNull[T](Func`1 operation) in REDACTED-WORKTREE-ROOT\QuickFiler.Test\Viewers\BreadcrumbSelectorToggleUiBoundaryTests.cs:line 331&#xD;
+   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.&lt;&gt;c__DisplayClass7_1.&lt;ConfigureBreadcrumbDropDown_SeededLifecycleNullUiContext_DoesNotThrow&gt;b__1() in REDACTED-WORKTREE-ROOT\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 344&#xD;
+   at FluentAssertions.Specialized.DelegateAssertions`2.InvokeSubjectWithInterception() in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 173.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Specialized.DelegateAssertionsBase`2.NotThrowInternal(Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 72&#xD;
+   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.ConfigureBreadcrumbDropDown_SeededLifecycleNullUiContext_DoesNotThrow() in REDACTED-WORKTREE-ROOT\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 355</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="ConfigureBreadcrumbDropDown_SeededLifecycleNullUiContext_DoesNotThrow" storage="REDACTED-WORKTREE-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="17249edd-fe0c-8b9e-9c79-85a4a56cbf3b">
+      <Execution id="c968521b-5d93-4335-929e-37b8e409916d" />
+      <TestMethod codeBase="REDACTED-WORKTREE-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="ConfigureBreadcrumbDropDown_SeededLifecycleNullUiContext_DoesNotThrow" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="17249edd-fe0c-8b9e-9c79-85a4a56cbf3b" executionId="c968521b-5d93-4335-929e-37b8e409916d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for REDACTED-WORKTREE-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
