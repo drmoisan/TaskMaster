@@ -84,9 +84,28 @@ namespace QuickFiler
         /// </summary>
         internal Microsoft.Web.WebView2.WinForms.WebView2 BreadcrumbWebView => FolderListBox;
 
+        /// <summary>
+        /// Reports whether this viewer claims <paramref name="keyData"/> for the keyboard dialog.
+        /// </summary>
+        /// <remarks>
+        /// #467: the claim is bare Alt only. <c>ToggleKeyboardDialogAsync</c> never inspects the
+        /// key data, so an Alt-plus-key chord is a WinForms mnemonic (Alt+F, Alt+M) and must reach
+        /// <c>base.ProcessCmdKey</c>. Masking with <c>Keys.KeyCode</c> strips the modifier bits,
+        /// leaving <c>Keys.Menu</c> or <c>Keys.None</c> when nothing but Alt was pressed.
+        /// </remarks>
+        internal static bool ClaimsAltChord(IQfcKeyboardHandler handler, Keys keyData)
+        {
+            if (handler is null || !keyData.HasFlag(Keys.Alt))
+            {
+                return false;
+            }
+            Keys keyCode = keyData & Keys.KeyCode;
+            return keyCode == Keys.Menu || keyCode == Keys.None;
+        }
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if ((_keyboardHandler is not null) && (keyData.HasFlag(Keys.Alt)))
+            if (ClaimsAltChord(_keyboardHandler, keyData))
             {
                 object sender = FromHandle(msg.HWnd);
                 var e = new KeyEventArgs(keyData);

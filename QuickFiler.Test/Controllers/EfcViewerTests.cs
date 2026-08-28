@@ -1,8 +1,11 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
+using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using QuickFiler.Controllers;
+using QuickFiler.Interfaces;
 
 namespace QuickFiler.Controllers.Tests
 {
@@ -99,6 +102,63 @@ namespace QuickFiler.Controllers.Tests
                 .NotBeNull(
                     "EfcFormController.EditFiltersMenuItem_Click is the live Edit Filters route and must survive #466 A"
                 );
+        }
+
+        // #467 (RC10). ToggleKeyboardDialogAsync never inspects the key data, so the claim the
+        // handler actually services is bare Alt. Any Alt-plus-key chord is a WinForms mnemonic and
+        // must reach base.ProcessCmdKey. The predicate is scoped to EfcViewer and narrows only
+        // what EfcViewer claims; the Alt-mnemonic route to CharActions stays reachable.
+        [TestMethod]
+        public void ClaimsAltChord_WithBareAltAndHandler_ReturnsTrue()
+        {
+            var handler = new Mock<IQfcKeyboardHandler>();
+
+            EfcViewer
+                .ClaimsAltChord(handler.Object, Keys.Alt)
+                .Should()
+                .BeTrue("bare Alt is the chord the keyboard dialog services");
+        }
+
+        [TestMethod]
+        public void ClaimsAltChord_WithAltF_ReturnsFalse()
+        {
+            var handler = new Mock<IQfcKeyboardHandler>();
+
+            EfcViewer
+                .ClaimsAltChord(handler.Object, Keys.Alt | Keys.F)
+                .Should()
+                .BeFalse("Alt+F is the Filters menu mnemonic and must reach base.ProcessCmdKey");
+        }
+
+        [TestMethod]
+        public void ClaimsAltChord_WithAltM_ReturnsFalse()
+        {
+            var handler = new Mock<IQfcKeyboardHandler>();
+
+            EfcViewer
+                .ClaimsAltChord(handler.Object, Keys.Alt | Keys.M)
+                .Should()
+                .BeFalse("Alt+M is the Move Options menu mnemonic and must not be swallowed");
+        }
+
+        [TestMethod]
+        public void ClaimsAltChord_WithNonAltChord_ReturnsFalse()
+        {
+            var handler = new Mock<IQfcKeyboardHandler>();
+
+            EfcViewer
+                .ClaimsAltChord(handler.Object, Keys.F)
+                .Should()
+                .BeFalse("a chord without the Alt flag is not the keyboard dialog gesture");
+        }
+
+        [TestMethod]
+        public void ClaimsAltChord_WithNullHandler_ReturnsFalse()
+        {
+            EfcViewer
+                .ClaimsAltChord(null, Keys.Alt)
+                .Should()
+                .BeFalse("with no handler wired there is nothing to claim the chord for");
         }
     }
 }

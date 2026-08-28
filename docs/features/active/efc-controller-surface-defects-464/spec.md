@@ -991,12 +991,12 @@ files this feature does not own.**
 
 ### #467 — `ProcessCmdKey` swallows Alt mnemonics (live; remedy GUARD)
 
-- [ ] `EfcViewer` declares `internal static bool ClaimsAltChord(IQfcKeyboardHandler handler, Keys keyData)`, and `ProcessCmdKey` returns `true` only when it returns `true`.
-- [ ] A named test asserts `ClaimsAltChord` returns `true` for a bare Alt chord with a non-null handler.
-- [ ] A named test asserts `ClaimsAltChord` returns `false` for `Keys.Alt | Keys.F` and for `Keys.Alt | Keys.M`, so both mnemonics reach `base.ProcessCmdKey`.
-- [ ] A named test asserts `ClaimsAltChord` returns `false` for a non-Alt chord.
-- [ ] A named test asserts `ClaimsAltChord` returns `false` when the handler is null.
-- [ ] No test in `EfcViewerTests.cs` constructs, shows, or derives from a `System.Windows.Forms.Form`.
+- [x] `EfcViewer` declares `internal static bool ClaimsAltChord(IQfcKeyboardHandler handler, Keys keyData)`, and `ProcessCmdKey` returns `true` only when it returns `true`.
+- [x] A named test asserts `ClaimsAltChord` returns `true` for a bare Alt chord with a non-null handler.
+- [x] A named test asserts `ClaimsAltChord` returns `false` for `Keys.Alt | Keys.F` and for `Keys.Alt | Keys.M`, so both mnemonics reach `base.ProcessCmdKey`.
+- [x] A named test asserts `ClaimsAltChord` returns `false` for a non-Alt chord.
+- [x] A named test asserts `ClaimsAltChord` returns `false` when the handler is null.
+- [x] No test in `EfcViewerTests.cs` constructs, shows, or derives from a `System.Windows.Forms.Form`.
 - [ ] The QFC twin is unchanged: `git diff --name-only` contains no entry for `QuickFiler/Viewers/QfcFormViewer.cs` or `QuickFiler/Controllers/QfcFormKeyHandler.cs`.
 
 ### Cross-cutting
