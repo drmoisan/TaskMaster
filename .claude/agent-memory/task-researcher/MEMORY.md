@@ -34,6 +34,7 @@
 - [cobertura-root-attrs-raw-vs-postprocessed](project_cobertura_root_attrs_raw_vs_postprocessed.md) — #441/#478: raw dotnet-coverage root totals are class-level-only; the Koverage post-processor overwrites them with a doubled both-axes sum — never compare the two (2026-08-10)
 - [toolchain-gate-fidelity-512](project_toolchain_gate_fidelity_512.md) — #512/#492/#509/#522: AGENTS.md/.agents/.github-instructions are externally owned (generator absent); Invoke-VSBuild.ps1 is an unenumerated executable carrier; ~1.2s vs ~17s = vacuity tell (2026-08-10)
 - [webview2-host-initializer-defects-476](project_webview2_host_initializer_defects_476.md) — #476/#458/#477: EfcViewerQueue is NOT a recycle pool (#458 latent); real WebView2 controls ARE built in QuickFiler tests; CaptureProductionDispatcher captures nothing from the control (2026-08-24)
+- [uithread-dispatcher-restore-scope-493](project_uithread_dispatcher_restore_scope_493.md) — #493: never share ONE semaphore between a brief helper and a long fixture swap (2-lock split); editorconfig analyzer catch-all makes IDisposable returns safe; CI runs QuickFiler.Test serially, runsettings do not (2026-08-24)
 - [efc614-store-root-stem-leak](project_efc614_store_root_stem_leak.md) — #614: verbatim ToArchiveRelativePath + unvalidated DestinationOlStem; #609 fix is FolderPredictor-only by design; FolderConverterTests.cs:329 codifies a bug (2026-08-26)
 
 ## Artifact hygiene
