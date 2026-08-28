@@ -778,10 +778,10 @@ against the Phase 0 baseline rather than as an absolute count.
 
 ### Process (applies to every defect unit)
 
-- [ ] Phase 0 evidence records the pre-change `QuickFiler.Test` pass/fail counts and the pre-change
+- [x] Phase 0 evidence records the pre-change `QuickFiler.Test` pass/fail counts and the pre-change
       coverage figures, captured before any production file is edited, under
       `docs/features/active/itemviewer-breadcrumb-lifecycle-defects-488/evidence/baseline/`.
-- [ ] For each of the six defect units (D1, D2, D3, D4, D5, #475), evidence records the unit's regression
+- [x] For each of the six defect units (D1, D2, D3, D4, D5, #475), evidence records the unit's regression
       test **failing against the unfixed code** before the corresponding production change lands, per the
       CLAUDE.md Bugfix Workflow.
 
@@ -938,33 +938,33 @@ against the Phase 0 baseline rather than as an absolute count.
 
 ### File size, toolchain, coverage, and document integrity
 
-- [ ] Every production and test file touched by this feature is at most **500 lines** after the change.
+- [x] Every production and test file touched by this feature is at most **500 lines** after the change.
       The post-change line counts of all four owned production files, both owned test files, and the new
       test file are recorded in evidence. In particular
       `BreadcrumbItemViewerLifecycleCoordinator.cs` (pre-change 481) and
       `BreadcrumbPopupUiOperations.cs` (pre-change 494) are each verified at or under 500.
-- [ ] `QuickFiler.Test/Viewers/BreadcrumbDropDownIntegrationTests.cs` remains at exactly 500 lines and is
+- [x] `QuickFiler.Test/Viewers/BreadcrumbDropDownIntegrationTests.cs` remains at exactly 500 lines and is
       unmodified.
-- [ ] Every new test uses MSTest, Moq, and FluentAssertions, and no new test contains `Thread.Sleep`,
+- [x] Every new test uses MSTest, Moq, and FluentAssertions, and no new test contains `Thread.Sleep`,
       `Task.Delay`, a wall-clock wait, or a temporary file.
-- [ ] `dotnet tool run csharpier check .` reports no formatting differences.
-- [ ] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+- [x] `dotnet tool run csharpier check .` reports no formatting differences.
+- [x] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
       completes with zero errors, and the analyzer warning count for the four owned production files is
       no greater than the Phase 0 baseline count for those same files.
-- [ ] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
+- [x] `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
       completes with zero errors. `/p:Nullable=enable` is **not** added to this command.
-- [ ] `vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCoverage /InIsolation`
+- [x] `vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCoverage /InIsolation`
       reports zero failures, and the pass count is greater than or equal to the Phase 0 baseline pass
       count plus the number of tests added, minus the one deleted test.
-- [ ] All four toolchain stages pass in a single consecutive pass with no intervening file modification.
-- [ ] Coverage for the changed lines is not reduced relative to the Phase 0 baseline, and each new or
+- [x] All four toolchain stages pass in a single consecutive pass with no intervening file modification.
+- [x] Coverage for the changed lines is not reduced relative to the Phase 0 baseline, and each new or
       changed **measured** production member — that is, members in
       `BreadcrumbItemViewerLifecycleCoordinator.cs`, `BreadcrumbPopupUiOperations.cs`, and
       `BreadcrumbDropDownHost.cs` — reaches `>= 90%` line coverage.
-- [ ] Repository-wide line coverage is `>= 80%` against the testable denominator defined in CLAUDE.md
+- [x] Repository-wide line coverage is `>= 80%` against the testable denominator defined in CLAUDE.md
       § UT2. Both the testable-denominator figure and the raw uninstrumented figure are recorded in
       evidence together with the Phase 0 baseline values, and the delivered change does not lower either.
-- [ ] Evidence records that all fixes in `ItemViewer.Breadcrumb.cs` (D1, D3, D4, D5, and #475 part 3) are
+- [x] Evidence records that all fixes in `ItemViewer.Breadcrumb.cs` (D1, D3, D4, D5, and #475 part 3) are
       **coverage-exempt** because `ItemViewer.cs:20` carries `[ExcludeFromCodeCoverage]` on the partial
       type, so their regression tests move no coverage number. **No new `[ExcludeFromCodeCoverage]`
       attribute is introduced anywhere by this feature, and none is removed.**
