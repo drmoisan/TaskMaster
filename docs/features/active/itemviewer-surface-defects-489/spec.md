@@ -517,7 +517,7 @@ Three principles govern every fix below.
 
 **Test:** two new files plus the rename-only edits enumerated in § Scope.
 
-**Project files:** `QuickFiler.Test/QuickFiler.Test.csproj` only, two appended `<Compile Include>`
+**Project files:** `QuickFiler.Test/QuickFiler.Test.csproj` only, four appended `<Compile Include>`
 entries. Neither `.csproj` region is alphabetical — both are grouped by area and insertion history
 (484 spec `:561-567`). Append at the **tail** of the block; do not reorder.
 
@@ -748,6 +748,26 @@ comparison against the Phase 0 baseline recorded in
 "must be under 500 lines" condition over `ItemViewer.Designer.cs` or `ItemViewerExpanded.Designer.cs`,
 both of which are already over that ceiling.
 
+**Amendment (2026-08-27).** One criterion under § Scope discipline is amended in place. It
+originally read: "`QuickFiler/QuickFiler.csproj` is absent from the diff (no new production file is
+added). `QuickFiler.Test/QuickFiler.Test.csproj` gains exactly two `<Compile Include>` entries, each
+appended at the tail of its existing block, with no reordering of any pre-existing entry." The
+two-entry count became unsatisfiable after merged siblings 484, 444 and 493 grew the two test files
+this feature routes new tests into: `QuickFiler.Test/Controllers/QfcItemController.EventWiringTests.cs`
+now measures 499 lines (1 spare against the 500-line ceiling; 374 when the plan was authored) and
+`QfcItemController.MailActionsTests.cs` now measures 498 lines (2 spare; 184 at authoring), so the
+five new tests cannot be appended to those files. The remedy is this repository's established `PartN`
+partial-class continuation convention (precedent: `QfcItemController.InitializationTests.Part2.cs`
+and `.Part3.cs`): the new tests land in two new continuation files and the project file gains four
+appended entries instead of two. The no-reordering guarantee is unchanged and not weakened.
+In a second correction pass on the same date, four criteria (the `WireIntentEvents_SubscribesToPicturesChanged`
+and `PicturesChanged_WhenRaised_RefreshesOptionsPictures` pair under Issue #486, and the
+`Expand_WhenFocusSubjectReturnsFalse_StillEnumeratesConversation` and the two `FlagAsTask*_DoesNotReadBackFlagTaskDialogResult`
+criteria under Issue #490) and one prose line in § Change surface still named the pre-amendment file
+locations. Only the file-path token was corrected in each, pointing to the `.Part2.cs` continuation
+files above; the test names, node IDs, assertion text, and owning partial class are unchanged, so no
+criterion was weakened — each was only made locationally exact.
+
 ### Phase 0 baseline (prerequisite for every comparison below)
 
 - [ ] A Phase 0 baseline exists under `docs/features/active/itemviewer-surface-defects-489/evidence/baseline/` recording, at minimum: the `dotnet tool run csharpier check .` result on the untouched worktree; the analyzer-build warning count; the nullable-build warning count; the `vstest` passed / failed / skipped counts; the repository-wide line-coverage percentage; the line count of every file this feature will touch; and the repository-wide occurrence count of `[ExcludeFromCodeCoverage]`.
@@ -761,7 +781,7 @@ both of which are already over that ceiling.
 - [ ] The tests `Checked_WhenSetTrue_AssignsCheckedCheckBoxImage`, `Checked_WhenSetFalse_AssignsNullImage`, `Checked_WhenSetTrue_RaisesShadowedCheckedChangedExactlyOnce` and `ToolStripMenuItemCb_IsNotDerivedFromControl` pass, pinning `ToolStripMenuItemCb.Checked`'s setter as the sole owner of the check image.
 - [ ] `QuickFiler/Viewers/ToolStripMenuItemCb.cs` contains no assignment to `base.Checked`, and the `base.Click -= …; base.Click += …;` pattern in the `CheckOnClick` setter is unchanged. Proof: `git diff` against the Phase 0 base commit shows no change to `ToolStripMenuItemCb.cs`.
 - [ ] `ItemViewer_DeclaresNoMenuItemCheckedChangedMembers` and `ItemViewer_DeclaresNoMoveOptionsMenuClickHandler` in `QuickFiler.Test/Viewers/ItemViewerBreadcrumbDropDownContractTests.cs` pass, proving the three dead `ItemViewer.cs` members are deleted.
-- [ ] `WireIntentEvents_SubscribesToPicturesChanged` in `QuickFiler.Test/Controllers/QfcItemController.EventWiringTests.cs` passes, asserting `VerifyAdd(v => v.PicturesChanged += It.IsAny<EventHandler>(), Times.Once())` after `WireIntentEvents()`.
+- [ ] `WireIntentEvents_SubscribesToPicturesChanged` in `QuickFiler.Test/Controllers/QfcItemController.EventWiringTests.Part2.cs` passes, asserting `VerifyAdd(v => v.PicturesChanged += It.IsAny<EventHandler>(), Times.Once())` after `WireIntentEvents()`.
 - [ ] `PicturesChanged_WhenRaised_RefreshesOptionsPictures` in the same file passes, proving `_optionsPictures` follows the menu state rather than remaining the value captured at `ViewerSetup.cs:392`.
 - [ ] The plan or the executor's handoff record states the `WireIntentEvents` / `UnwireIntentEvents` count change from 16 to 17 and names it as an obligation on upstream 484. Recorded in `evidence/other/`.
 
@@ -795,9 +815,9 @@ both of which are already over that ceiling.
 - [ ] `ItemViewer.FolderSearch.cs`'s `FocusSearch()` is a bare forward containing no `Invoke` call, and `IItemViewer.cs` documents one threading contract covering both `FocusSearch` and `FocusSubject`. Proof: `git grep -F -n "TxtboxSearch.Invoke" -- QuickFiler/Viewers/` returns zero matches (it returns one today, at `ItemViewer.FolderSearch.cs:79`).
 - [ ] `viewer.Verify(v => v.FocusSearch(), Times.Once())` at `QuickFiler.Test/Controllers/QfcItemController.NavigationTests.cs:198` still passes and `QuickFiler/Controllers/QfcItemController.Navigation.cs` is absent from `git diff --name-only`.
 - [ ] `IItemViewer_FocusSubjectReturnsBool` in `ItemViewerBreadcrumbDropDownContractTests.cs` passes, asserting `typeof(IItemViewer).GetMethod("FocusSubject").ReturnType == typeof(bool)`.
-- [ ] `Expand_WhenFocusSubjectReturnsFalse_StillEnumeratesConversation` in `QuickFiler.Test/Controllers/QfcItemController.MailActionsTests.cs` passes. Its `Setup(v => v.FocusSubject()).Returns(false)` does not compile against the pre-change `void` member, which is the RED.
+- [ ] `Expand_WhenFocusSubjectReturnsFalse_StillEnumeratesConversation` in `QuickFiler.Test/Controllers/QfcItemController.MailActionsTests.Part2.cs` passes. Its `Setup(v => v.FocusSubject()).Returns(false)` does not compile against the pre-change `void` member, which is the RED.
 - [ ] `LblSubject`'s `TabStop`, `ControlStyles`, and selectability are unchanged, and no new focus target is introduced. Proof: `git diff` for `ItemViewer.DisplayState.cs` shows only the `FocusSubject` return-type change, and `QuickFiler/Viewers/ItemViewer.Designer.cs` shows only the deleted `ParentChanged` wiring.
-- [ ] `FlagAsTask_DoesNotReadBackFlagTaskDialogResult` and `FlagAsTaskAsync_DoesNotReadBackFlagTaskDialogResult` in `QfcItemController.MailActionsTests.cs` pass, asserting `VerifyGet(v => v.FlagTaskDialogResult, Times.Never())`.
+- [ ] `FlagAsTask_DoesNotReadBackFlagTaskDialogResult` and `FlagAsTaskAsync_DoesNotReadBackFlagTaskDialogResult` in `QfcItemController.MailActionsTests.Part2.cs` pass, asserting `VerifyGet(v => v.FlagTaskDialogResult, Times.Never())`.
 - [ ] `FlagTaskDialogResult` remains declared on `IItemViewer` and on `ItemViewer.Commands.cs`, and the existing setter assertions at `QuickFiler.Test/Controllers/QfcItemController.ViewerSetupTests.cs:258` and `:283` still pass unchanged.
 
 ### Scope discipline
@@ -809,7 +829,7 @@ both of which are already over that ceiling.
 - [ ] `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs` is absent from the diff; its line count (500) and `[TestMethod]` count (13) are unchanged from the Phase 0 baseline.
 - [ ] `QuickFiler.Test/Controllers/QfcItemController.TestSupport.cs` is absent from the diff; `BuildSyncDispatcher` is consumed, not edited.
 - [ ] No `UtilitiesCS` file appears in the diff.
-- [ ] `QuickFiler/QuickFiler.csproj` is absent from the diff (no new production file is added). `QuickFiler.Test/QuickFiler.Test.csproj` gains exactly two `<Compile Include>` entries, each appended at the tail of its existing block, with no reordering of any pre-existing entry.
+- [ ] `QuickFiler/QuickFiler.csproj` is absent from the diff (no new production file is added). `QuickFiler.Test/QuickFiler.Test.csproj` gains exactly four `<Compile Include>` entries — `Viewers\ToolStripMenuItemCbTests.cs`, `Controllers\QfcItemController.EventWiringTests.Part2.cs`, `Controllers\QfcItemController.ThemeMarshallingTests.cs`, and `Controllers\QfcItemController.MailActionsTests.Part2.cs` — each appended at the tail of its block as that tail stood at insertion time, with no reordering of any pre-existing entry.
 - [ ] § Out-of-Scope Findings lists, with an evidence pointer for each, the #489 D4 residual, #490 D5, the deferred #490 D1 clear-insertion, and O1 through O8, satisfying `issue.md` § Scope Restrictions.
 
 ### File size, toolchain, coverage, and evidence
