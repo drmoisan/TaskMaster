@@ -88,6 +88,75 @@ namespace QuickFiler.Test.Viewers
         }
 
         /// <summary>
+        /// Issue #488 defect D3: a second, <em>different</em> <see cref="IFolderHierarchyProvider"/>
+        /// must not be silently discarded. Once the pipeline is initialized,
+        /// <c>InitializeBreadcrumbPipeline</c> fails fast on a provider that is not reference-equal to
+        /// the retained one, matching the reference comparison
+        /// <c>BreadcrumbItemViewerLifecycleCoordinator.SetBridgeCoordinator</c> already performs.
+        /// </summary>
+        /// <remarks>
+        /// The thrown instance is additionally asserted <em>not</em> to be an
+        /// <see cref="ObjectDisposedException"/>. That type derives from
+        /// <see cref="InvalidOperationException"/>, so without the exclusion a D5 disposal throw would
+        /// satisfy this D3 assertion and the test would stop discriminating.
+        /// </remarks>
+        [TestMethod]
+        public void InitializeBreadcrumbPipeline_SecondDifferentProvider_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            using (var scope = new ViewerScope())
+            {
+                var operations = new BreadcrumbPopupUiOperations(
+                    new BreadcrumbUiDispatcher(new DrainableSynchronizationContext(), _ => { })
+                );
+                var first = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+                var second = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+                scope.Viewer.InitializeBreadcrumbPipeline(first.Object, operations);
+
+                // Act
+                Action act = () =>
+                    scope.Viewer.InitializeBreadcrumbPipeline(second.Object, operations);
+
+                // Assert
+                act.Should()
+                    .Throw<InvalidOperationException>(
+                        "a second, different provider must be refused rather than silently discarded"
+                    )
+                    .Which.Should()
+                    .NotBeOfType<ObjectDisposedException>();
+            }
+        }
+
+        /// <summary>
+        /// Issue #488 defect D3, positive case: repeating the call with the <em>same</em> provider
+        /// reference must return without effect, leaving the existing breadcrumb coordinator in place.
+        /// This is what keeps the fail-fast guard from breaking an idempotent re-initialization.
+        /// </summary>
+        [TestMethod]
+        public void InitializeBreadcrumbPipeline_RepeatSameProvider_DoesNotThrowAndKeepsCoordinator()
+        {
+            // Arrange
+            using (var scope = new ViewerScope())
+            {
+                var operations = new BreadcrumbPopupUiOperations(
+                    new BreadcrumbUiDispatcher(new DrainableSynchronizationContext(), _ => { })
+                );
+                var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+                scope.Viewer.InitializeBreadcrumbPipeline(provider.Object, operations);
+                object before = scope.Viewer.BreadcrumbCoordinator;
+                before.Should().NotBeNull("the first call must build a breadcrumb coordinator");
+
+                // Act
+                Action act = () =>
+                    scope.Viewer.InitializeBreadcrumbPipeline(provider.Object, operations);
+
+                // Assert
+                act.Should().NotThrow();
+                scope.Viewer.BreadcrumbCoordinator.Should().BeSameAs(before);
+            }
+        }
+
+        /// <summary>
         /// Produces a <see cref="CoreWebView2Environment"/> identity token without any WebView2 SDK
         /// call. The environment is only ever compared by reference, so an uninitialized instance is
         /// sufficient and keeps the test free of an external dependency.

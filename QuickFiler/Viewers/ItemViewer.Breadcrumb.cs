@@ -15,6 +15,11 @@ namespace QuickFiler
         private BreadcrumbItemViewerLifecycleCoordinator _breadcrumbLifecycleCoordinator;
         private BreadcrumbResourceOwner _breadcrumbResourceOwner;
 
+        // Issue #488 defect D3: the provider the pipeline was initialized with. Retained because
+        // BreadcrumbBridgeCoordinator does not expose its provider — the constructor passes it
+        // straight into the router and there is no Provider member to read it back from.
+        private IFolderHierarchyProvider _breadcrumbProvider;
+
         /// <summary>The Designer-declared breadcrumb WebView2 occupying the old CboFolders cell.</summary>
         public Microsoft.Web.WebView2.WinForms.WebView2 L0vhBreadcrumb_WebView2
         {
@@ -42,8 +47,24 @@ namespace QuickFiler
             BreadcrumbPopupUiOperations operations
         )
         {
+            // Issue #488 defect D3: fail fast on a second, different provider rather than discarding
+            // it silently. The comparison is reference equality, matching what the collaborator this
+            // wrapper wraps already does in
+            // BreadcrumbItemViewerLifecycleCoordinator.SetBridgeCoordinator. No re-initialization
+            // branch is built: keeping this fail-fast is what holds the out-of-scope
+            // SetBridgeCoordinator replace-without-dispose defect dormant, because
+            // InitializeBreadcrumbPipeline then never constructs a second bridge coordinator.
             if (BreadcrumbCoordinator != null)
             {
+                if (!ReferenceEquals(_breadcrumbProvider, provider))
+                {
+                    throw new InvalidOperationException(
+                        "The breadcrumb pipeline is already initialized with a different folder "
+                            + "hierarchy provider. Dispose the viewer's breadcrumb resources before "
+                            + "initializing it with another provider."
+                    );
+                }
+
                 return;
             }
 
@@ -57,6 +78,7 @@ namespace QuickFiler
             );
             lifecycle.SetBridgeCoordinator(bridgeCoordinator);
             BreadcrumbCoordinator = bridgeCoordinator;
+            _breadcrumbProvider = provider;
         }
 
         internal Task<bool> AttachBreadcrumbWebViewAsync() =>
@@ -326,6 +348,10 @@ namespace QuickFiler
             _breadcrumbLifecycleCoordinator?.Dispose();
             _breadcrumbLifecycleCoordinator = null;
             BreadcrumbCoordinator = null;
+
+            // Issue #488 defect D3: clear the retained provider so a pipeline re-created after
+            // disposal is not blocked by a stale reference.
+            _breadcrumbProvider = null;
         }
     }
 }

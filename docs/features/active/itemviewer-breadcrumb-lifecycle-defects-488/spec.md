@@ -826,24 +826,24 @@ against the Phase 0 baseline rather than as an absolute count.
 
 ### D3 — a second, different `IFolderHierarchyProvider`
 
-- [ ] `InitializeBreadcrumbPipeline` throws `InvalidOperationException` when `BreadcrumbCoordinator` is
+- [x] `InitializeBreadcrumbPipeline` throws `InvalidOperationException` when `BreadcrumbCoordinator` is
       non-null and the supplied provider is not reference-equal to the retained one, and returns without
       effect when it is reference-equal — matching `BreadcrumbItemViewerLifecycleCoordinator.SetBridgeCoordinator`'s
       reference comparison.
-- [ ] The retained provider is stored in a private `ItemViewer` field assigned on the successful
+- [x] The retained provider is stored in a private `ItemViewer` field assigned on the successful
       initialization path, and is nulled by `DisposeBreadcrumbResources` so a pipeline re-created after
       disposal is not blocked by a stale reference.
-- [ ] Two regression tests exist: a negative case asserting `InvalidOperationException` for a second,
+- [x] Two regression tests exist: a negative case asserting `InvalidOperationException` for a second,
       distinct `Mock<IFolderHierarchyProvider>(MockBehavior.Strict)`, and a positive case asserting
       `NotThrow` and an unchanged `BreadcrumbCoordinator` (`BeSameAs`) for a repeat call with the same
       provider.
-- [ ] No re-initialization branch is added. `BreadcrumbBridgeCoordinator`,
+- [x] No re-initialization branch is added. `BreadcrumbBridgeCoordinator`,
       `BreadcrumbItemViewerLifecycleCoordinator.SetBridgeCoordinator`, and `UnsubscribeBridge` are
       unmodified.
 - [ ] The change description and this spec both state that D3 **changes no production behaviour**, with
       the reason (`QfcItemController.ViewerSetup.cs:143` guards the only two production callers on
       `viewer.BreadcrumbCoordinator == null`), so no reviewer expects a user-visible repair.
-- [ ] The fail-fast/`SetBridgeCoordinator` coupling is recorded in the delivered spec: the
+- [x] The fail-fast/`SetBridgeCoordinator` coupling is recorded in the delivered spec: the
       `SetBridgeCoordinator` replace-without-dispose defect is out of scope **because** D3 fails fast, and
       adopting explicit re-initialization instead would require pulling that defect into scope.
 
