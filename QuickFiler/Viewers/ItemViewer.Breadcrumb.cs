@@ -72,7 +72,7 @@ namespace QuickFiler
             }
 
             BreadcrumbItemViewerLifecycleCoordinator lifecycle = EnsureBreadcrumbLifecycle(
-                operations
+                () => operations
             );
             var bridgeCoordinator = new BreadcrumbBridgeCoordinator(
                 lifecycle.Hub,
@@ -192,7 +192,7 @@ namespace QuickFiler
             }
 
             BreadcrumbItemViewerLifecycleCoordinator lifecycle = EnsureBreadcrumbLifecycle(
-                BreadcrumbPopupUiOperations.CaptureCurrentOrTests()
+                BreadcrumbPopupUiOperations.CaptureCurrent
             );
             BreadcrumbDropDownHost host = null;
             host = new BreadcrumbDropDownHost(
@@ -230,7 +230,7 @@ namespace QuickFiler
             _ = anchorBounds ?? throw new ArgumentNullException(nameof(anchorBounds));
             _ = workingArea ?? throw new ArgumentNullException(nameof(workingArea));
             BreadcrumbItemViewerLifecycleCoordinator lifecycle = EnsureBreadcrumbLifecycle(
-                BreadcrumbPopupUiOperations.CaptureCurrentOrTests()
+                BreadcrumbPopupUiOperations.CaptureCurrent
             );
             lifecycle.ConfigureHost(host, anchorBounds, workingArea);
         }
@@ -312,8 +312,20 @@ namespace QuickFiler
         private void OnBreadcrumbUnhandledArrow(BreadcrumbArrowDirection direction) =>
             BreadcrumbUnhandledArrow?.Invoke(this, direction);
 
+        /// <summary>
+        /// Issue #475 part 3: the operations argument is a factory rather than a value, and is
+        /// invoked exactly once and only <em>after</em> the already-initialized early return.
+        /// </summary>
+        /// <remarks>
+        /// Laziness is required, not opportunistic. This member discards its operations argument
+        /// whenever the coordinator already exists, so with an eagerly evaluated argument the swap
+        /// from the deleted ambient-probing selector to the fail-fast
+        /// <see cref="BreadcrumbPopupUiOperations.CaptureCurrent"/> would make a pure no-op call throw
+        /// on any thread without a synchronization context, removing the injected seam that existing
+        /// tests rely on.
+        /// </remarks>
         private BreadcrumbItemViewerLifecycleCoordinator EnsureBreadcrumbLifecycle(
-            BreadcrumbPopupUiOperations operations
+            Func<BreadcrumbPopupUiOperations> operationsFactory
         )
         {
             if (_breadcrumbLifecycleCoordinator != null)
@@ -321,6 +333,7 @@ namespace QuickFiler
                 return _breadcrumbLifecycleCoordinator;
             }
 
+            BreadcrumbPopupUiOperations operations = operationsFactory();
             EnsureBreadcrumbResourceOwnership();
             var hub = new BreadcrumbMessengerHub();
             var attachment = new BreadcrumbCollapsedAttachment(

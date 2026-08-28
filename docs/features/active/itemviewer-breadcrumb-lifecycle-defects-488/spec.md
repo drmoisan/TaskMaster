@@ -885,26 +885,26 @@ against the Phase 0 baseline rather than as an absolute count.
 
 ### #475 — `CaptureCurrentOrTests()`
 
-- [ ] `BreadcrumbPopupUiOperations.CaptureCurrentOrTests()` no longer exists, and a repository-wide search
+- [x] `BreadcrumbPopupUiOperations.CaptureCurrentOrTests()` no longer exists, and a repository-wide search
       for the identifier returns no hit in any `.cs` file.
-- [ ] `BreadcrumbPopupUiOperations.CreateForCurrentThreadTests()` and
+- [x] `BreadcrumbPopupUiOperations.CreateForCurrentThreadTests()` and
       `BreadcrumbUiDispatcher.CreateForCurrentThreadTests()` both still exist and are unmodified; only the
       ambient-probing selector is removed.
-- [ ] Both `BreadcrumbDropDownHost` constructor chains that previously supplied
+- [x] Both `BreadcrumbDropDownHost` constructor chains that previously supplied
       `CaptureCurrentOrTests()` now supply `CaptureCurrent()`, and the constructor argument order is
       unchanged, so `BreadcrumbDropDownIntegrationTests.Constructor_NullLegacySurfaceFactory_ThrowsForSurfaceFactory`
       still passes without an ambient context.
-- [ ] `ItemViewer.EnsureBreadcrumbLifecycle` takes a `Func<BreadcrumbPopupUiOperations>` and evaluates it
+- [x] `ItemViewer.EnsureBreadcrumbLifecycle` takes a `Func<BreadcrumbPopupUiOperations>` and evaluates it
       **only after** the already-initialized early return, and all three of its call sites are updated
       accordingly.
-- [ ] `CaptureCurrentOrTests_NullAndControlledContexts_SelectExpectedBoundaries` is deleted and replaced
+- [x] `CaptureCurrentOrTests_NullAndControlledContexts_SelectExpectedBoundaries` is deleted and replaced
       in `BreadcrumbPopupBoundaryCoverageTests.Part2.cs` with a test asserting that
       `CaptureCurrent` under a null ambient context throws `InvalidOperationException`, retaining the
       controlled-context half against `CaptureCurrent`.
-- [ ] A seam-preservation regression test calls the 3-arg `ConfigureBreadcrumbDropDown` inside
+- [x] A seam-preservation regression test calls the 3-arg `ConfigureBreadcrumbDropDown` inside
       `InvokeAmbientNull` on a viewer whose lifecycle was already seeded with injected operations, and
       asserts `NotThrow`. Evidence records this test red before the laziness change and green after.
-- [ ] No test file other than `BreadcrumbPopupBoundaryCoverageTests.Part2.cs` and the new regression file
+- [x] No test file other than `BreadcrumbPopupBoundaryCoverageTests.Part2.cs` and the new regression file
       is modified in service of #475; specifically, no existing test's injected
       `BreadcrumbPopupUiOperations` seam is removed or replaced.
 

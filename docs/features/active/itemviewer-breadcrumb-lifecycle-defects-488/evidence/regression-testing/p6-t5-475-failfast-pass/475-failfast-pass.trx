@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="cfae2184-80fc-4e0d-9ac6-836244bb1815" name="DanMoisan@MEGALODON4 2026-08-28 02:05:40" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-28T02:05:40.1296596-04:00" queuing="2026-08-28T02:05:40.1296596-04:00" start="2026-08-28T02:05:38.9784287-04:00" finish="2026-08-28T02:05:40.1452308-04:00" />
+  <TestSettings name="default" id="6760eedd-a501-4f33-b558-98a8f81b5acb">
+    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-28_02_05_40" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="220e4b30-7afe-462e-ada8-cfaad564a22c" testId="19a7e53a-ac6a-8f45-93f3-b129d8c7e213" testName="LegacySurfaceFactoryConstructor_AmbientContextNull_ThrowsInvalidOperationException" computerName="MEGALODON4" duration="00:00:00.0495220" startTime="2026-08-28T02:05:39.8952129-04:00" endTime="2026-08-28T02:05:40.0608559-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="220e4b30-7afe-462e-ada8-cfaad564a22c">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="3276bf15-3504-4c24-9a75-cda5255118ef" testId="1ce2e99d-f169-8be4-86a8-78e206c7ba7b" testName="CaptureCurrent_NullAndControlledContexts_FailFastAndCapture" computerName="MEGALODON4" duration="00:00:00.0513278" startTime="2026-08-28T02:05:39.8972130-04:00" endTime="2026-08-28T02:05:40.0645165-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3276bf15-3504-4c24-9a75-cda5255118ef" />
+    <UnitTestResult executionId="a94cdefb-519b-4655-8d38-d1b494006a4d" testId="1e9e2327-b110-80a7-b896-04967c2acd8c" testName="Constructor_NullLegacySurfaceFactory_ThrowsForSurfaceFactory" computerName="MEGALODON4" duration="00:00:00.0407452" startTime="2026-08-28T02:05:39.8982156-04:00" endTime="2026-08-28T02:05:40.0571117-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a94cdefb-519b-4655-8d38-d1b494006a4d" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="LegacySurfaceFactoryConstructor_AmbientContextNull_ThrowsInvalidOperationException" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="19a7e53a-ac6a-8f45-93f3-b129d8c7e213">
+      <Execution id="220e4b30-7afe-462e-ada8-cfaad564a22c" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="LegacySurfaceFactoryConstructor_AmbientContextNull_ThrowsInvalidOperationException" />
+    </UnitTest>
+    <UnitTest name="CaptureCurrent_NullAndControlledContexts_FailFastAndCapture" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ce2e99d-f169-8be4-86a8-78e206c7ba7b">
+      <Execution id="3276bf15-3504-4c24-9a75-cda5255118ef" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbPopupBoundaryCoverageTests" name="CaptureCurrent_NullAndControlledContexts_FailFastAndCapture" />
+    </UnitTest>
+    <UnitTest name="Constructor_NullLegacySurfaceFactory_ThrowsForSurfaceFactory" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e9e2327-b110-80a7-b896-04967c2acd8c">
+      <Execution id="a94cdefb-519b-4655-8d38-d1b494006a4d" />
+      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownIntegrationTests" name="Constructor_NullLegacySurfaceFactory_ThrowsForSurfaceFactory" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="19a7e53a-ac6a-8f45-93f3-b129d8c7e213" executionId="220e4b30-7afe-462e-ada8-cfaad564a22c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ce2e99d-f169-8be4-86a8-78e206c7ba7b" executionId="3276bf15-3504-4c24-9a75-cda5255118ef" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e9e2327-b110-80a7-b896-04967c2acd8c" executionId="a94cdefb-519b-4655-8d38-d1b494006a4d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="3" executed="3" passed="3" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
