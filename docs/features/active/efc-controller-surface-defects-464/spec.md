@@ -1001,23 +1001,23 @@ files this feature does not own.**
 
 ### Cross-cutting
 
-- [ ] A Phase 0 baseline exists under `docs/features/active/efc-controller-surface-defects-464/evidence/baseline/` recording pre-change analyzer diagnostics, nullable/type-check results, `QuickFiler.Test` pass/fail tally, and coverage.
-- [ ] `dotnet tool run csharpier check .` reports no formatting differences.
-- [ ] The analyzer build introduces **no new diagnostics relative to the Phase 0 baseline**.
-- [ ] The nullable/type-check build (CI's exact command, without `/p:Nullable=enable`) introduces **no new errors relative to the Phase 0 baseline**.
-- [ ] `vstest.console.exe` reports no failure that is not in the Phase 0 `BASELINE_FAILED` set, and the passing-test count is **greater than the Phase 0 baseline count** by at least the number of tests this feature adds.
+- [x] A Phase 0 baseline exists under `docs/features/active/efc-controller-surface-defects-464/evidence/baseline/` recording pre-change analyzer diagnostics, nullable/type-check results, `QuickFiler.Test` pass/fail tally, and coverage.
+- [x] `dotnet tool run csharpier check .` reports no formatting differences.
+- [x] The analyzer build introduces **no new diagnostics relative to the Phase 0 baseline**.
+- [x] The nullable/type-check build (CI's exact command, without `/p:Nullable=enable`) introduces **no new errors relative to the Phase 0 baseline**.
+- [x] `vstest.console.exe` reports no failure that is not in the Phase 0 `BASELINE_FAILED` set, and the passing-test count is **greater than the Phase 0 baseline count** by at least the number of tests this feature adds.
 - [x] No pre-existing `[TestMethod]` is deleted or renamed, and no assertion in a pre-existing test is weakened.
-- [ ] Each test file this feature **creates** is under 500 lines. (The ceiling is asserted only over created files; `EfcFormController.cs` and `EfcItemController.cs` are pre-existing violations and are explicitly out of scope.)
-- [ ] `EfcFormController.cs` has at most 1204 lines after the change — its 1084-line merge-base count plus at most 120 net lines for the RC1 guards, the five RC3 boundary extractions, the RC3 `PopulateFolderCombobox` try/catch, and the RC7/RC8/RC9 pure helpers — and the file-size evidence artifact itemises the delivered net delta per remedy against the merge-base count. (The 500-line ceiling is not asserted: this file is a pre-existing violation whose splitting is out of scope.)
-- [ ] `EfcItemController.cs` has **fewer** lines after the change than its 1170-line merge-base count.
+- [x] Each test file this feature **creates** is under 500 lines. (The ceiling is asserted only over created files; `EfcFormController.cs` and `EfcItemController.cs` are pre-existing violations and are explicitly out of scope.)
+- [x] `EfcFormController.cs` has at most 1204 lines after the change — its 1084-line merge-base count plus at most 120 net lines for the RC1 guards, the five RC3 boundary extractions, the RC3 `PopulateFolderCombobox` try/catch, and the RC7/RC8/RC9 pure helpers — and the file-size evidence artifact itemises the delivered net delta per remedy against the merge-base count. (The 500-line ceiling is not asserted: this file is a pre-existing violation whose splitting is out of scope.)
+- [x] `EfcItemController.cs` has **fewer** lines after the change than its 1170-line merge-base count.
 - [x] The diff for `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs` is **exactly one changed line**, at the incognito literal.
 - [x] `git diff --name-only` for the feature branch intersected with the sibling-owned path set in §`Scope & Non-Goals` is **empty**.
 - [x] `EfcFormController.cs:834-837` (the `new WebView2BreadcrumbHost(...)` construction feature #476 depends on) is not moved or reshaped.
-- [ ] No new `[ExcludeFromCodeCoverage]` attribute is added anywhere in the diff.
+- [x] No new `[ExcludeFromCodeCoverage]` attribute is added anywhere in the diff.
 - [x] No interface file is modified: the diff contains no path under `QuickFiler/Interfaces/`.
-- [ ] The tokens `Thread.Sleep` and `Task.Delay` appear in no test file this feature writes.
-- [ ] No test this feature writes creates a temporary file, contacts a live Outlook instance, starts a `BackgroundWorker`, or shows a WinForms form.
-- [ ] `docs/features/active/efc-controller-surface-defects-464/user-story.md` does not exist. (Work mode is `full-bug`; this spec is the sole AC source.)
+- [x] The tokens `Thread.Sleep` and `Task.Delay` appear in no test file this feature writes.
+- [x] No test this feature writes creates a temporary file, contacts a live Outlook instance, starts a `BackgroundWorker`, or shows a WinForms form.
+- [x] `docs/features/active/efc-controller-surface-defects-464/user-story.md` does not exist. (Work mode is `full-bug`; this spec is the sole AC source.)
 
 ---
 
