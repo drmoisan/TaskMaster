@@ -105,6 +105,14 @@ C# coverage verdict: **PASS** — repository-wide line coverage 85.2830 percent 
   `488-d4-fail` 0/2, `488-d5-fail` 0/1, `475-lazy-fail` 0/1, `475-ctor-fail` 0/1). The evidence is
   strictly better after remediation than before: previously unparseable, now machine-readable.
 
+  **The repo-wide half of PA-1, and PA-2, are now tracked as issue
+  [#671](https://github.com/drmoisan/TaskMaster/issues/671)** — "Bug:
+  trx-evidence-host-tokens-and-malformed-xml" — covering the pre-existing tokens in features 501, 608
+  and 439, the angle-bracket placeholder trap that breaks TRX well-formedness, and the raw-Cobertura
+  size convention. It is filed rather than left as prose because a finding recorded only in a feature
+  folder stops being visible once the feature merges. **#671 is a follow-up and is deliberately NOT in
+  this pull request's `Closes` list.**
+
 - **PA-2 (Info) — 21.4 MB of committed raw Cobertura.** Ruling 1 above; maintainer decision owed at fan-in.
 - **PA-3 (Info) — C6 enumeration stale; one construction site installs no context.** Ruling 2 above; recorded and reported per the constraint's own rule; recommend promoting the `EfcItemController.CleanupTests.cs` ambient-context dependence as a test-hygiene note to that surface's owner.
 - **PA-4 (Info) — repository threshold-wording conflict persists.** CLAUDE.md § UT2 states 80 percent repo-wide / 90 percent new-code line floors while `.claude/rules/quality-tiers.md` states uniform 85 line / 75 branch. This branch clears the stricter of each pair (85.28 line, 79.23 branch, per-measured-file >= 90), so no gate outcome depends on the conflict. Carried from the sibling reviews; owed to the governance sync, not this feature.
