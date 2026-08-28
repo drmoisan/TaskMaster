@@ -71,6 +71,7 @@
 - [pwsh -Command quoting + backtick stripping](project_pwsh_command_quoting_from_bash.md) — backticks vanish; `-split "\r\n"` gives 1 element
 - [pwsh -File binds a list as ONE string](project_pwsh_file_array_param_from_bash.md) — `-Tokens a,b,c` is a 1-element array
 - [Compile-time red needs body-level refs](project_compile_red_needs_body_level_references.md) — a missing type in a SIGNATURE hides body errors
+- [Cross-task shell-variable splat gates](project_cross_task_shell_variable_splat_gate.md) — a bare `@assemblies` in a fresh session runs zero assemblies and still reports zero failures; require same-payload enumeration + a `>= 1` count floor
 - [Shared evidence artifact + floating <ts>](project_shared_evidence_artifact_floating_ts.md) — N tasks told to append to "the same" artifact whose
 ## Test execution & isolation
 - [Long runs need a detached process](project_long_runs_need_detached_process.md) — background runners die at ~1h
