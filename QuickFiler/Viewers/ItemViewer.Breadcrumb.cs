@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Web.WebView2.Core;
@@ -47,6 +48,8 @@ namespace QuickFiler
             BreadcrumbPopupUiOperations operations
         )
         {
+            ThrowIfOffUiBoundary(nameof(InitializeBreadcrumbPipeline));
+
             // Issue #488 defect D3: fail fast on a second, different provider rather than discarding
             // it silently. The comparison is reference equality, matching what the collaborator this
             // wrapper wraps already does in
@@ -166,6 +169,8 @@ namespace QuickFiler
             IWebViewCoreInitializer initializer
         )
         {
+            ThrowIfOffUiBoundary(nameof(ConfigureBreadcrumbDropDown));
+
             if (
                 BreadcrumbDropDownHost is BreadcrumbDropDownHost existing
                 && ReferenceEquals(existing.Environment, environment)
@@ -216,6 +221,8 @@ namespace QuickFiler
             Func<Rectangle> workingArea
         )
         {
+            ThrowIfOffUiBoundary(nameof(ConfigureBreadcrumbDropDown));
+
             if (host == null)
             {
                 throw new ArgumentNullException(nameof(host));
@@ -333,6 +340,8 @@ namespace QuickFiler
 
         private void EnsureBreadcrumbResourceOwnership()
         {
+            ThrowIfOffUiBoundary(nameof(EnsureBreadcrumbResourceOwnership));
+
             if (_breadcrumbResourceOwner != null)
             {
                 return;
@@ -341,6 +350,38 @@ namespace QuickFiler
             components ??= new Container();
             _breadcrumbResourceOwner = new BreadcrumbResourceOwner(DisposeBreadcrumbResources);
             components.Add(_breadcrumbResourceOwner);
+        }
+
+        /// <summary>
+        /// Issue #488 defect D4: declares and enforces this viewer's UI-thread affinity for the
+        /// breadcrumb pipeline members, throwing when <paramref name="operation"/> is attempted from
+        /// off the boundary the viewer captured in its constructor.
+        /// </summary>
+        /// <remarks>
+        /// The comparison is <em>reference equality</em> against <see cref="UiSyncContext"/>, not a
+        /// managed thread-identity comparison: a continuation resumed without the captured context can
+        /// land on a recycled pool thread whose id matches, so a thread id is not a boundary proof.
+        /// The null-context escape keeps a viewer constructed without an ambient context — a test
+        /// shape — from throwing.
+        /// This declares and enforces the contract; it does not make the read-then-write atomic. A
+        /// caller that violates the contract now receives a diagnostic instead of a silent leak.
+        /// </remarks>
+        private void ThrowIfOffUiBoundary(string operation)
+        {
+            SynchronizationContext owning = UiSyncContext;
+            if (owning == null)
+            {
+                return;
+            }
+
+            if (!ReferenceEquals(SynchronizationContext.Current, owning))
+            {
+                throw new InvalidOperationException(
+                    $"{operation} must be called on the thread that owns this ItemViewer. The "
+                        + "current synchronization context is not the one captured when the viewer "
+                        + "was constructed."
+                );
+            }
         }
 
         private void DisposeBreadcrumbResources()

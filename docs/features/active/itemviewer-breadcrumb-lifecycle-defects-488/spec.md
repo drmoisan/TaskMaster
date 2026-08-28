@@ -849,13 +849,13 @@ against the Phase 0 baseline rather than as an absolute count.
 
 ### D4 — UI-thread affinity
 
-- [ ] A private `ItemViewer` helper enforces UI-thread affinity by comparing
+- [x] A private `ItemViewer` helper enforces UI-thread affinity by comparing
       `SynchronizationContext.Current` for **reference equality** against `UiSyncContext`, throwing
       `InvalidOperationException` whose message names the operation, and returning without effect when
       `UiSyncContext` is null.
-- [ ] The helper is invoked as the first statement of `InitializeBreadcrumbPipeline(provider, operations)`,
+- [x] The helper is invoked as the first statement of `InitializeBreadcrumbPipeline(provider, operations)`,
       of both `ConfigureBreadcrumbDropDown` overloads, and of `EnsureBreadcrumbResourceOwnership`.
-- [ ] A regression test invokes `InitializeBreadcrumbPipeline` through the existing
+- [x] A regression test invokes `InitializeBreadcrumbPipeline` through the existing
       `BreadcrumbSelectorToggleUiBoundaryTests.InvokeAmbientNull` helper — **same thread, ambient context
       nulled, no second thread and no timing construct** — and asserts `InvalidOperationException`. A
       second case installs a *different non-null* context and asserts the same, proving the comparison is
@@ -864,8 +864,8 @@ against the Phase 0 baseline rather than as an absolute count.
       **proves the guard fires and does not prove the race is absent**, and that a true two-thread data
       race cannot be reproduced deterministically under the repository's ban on sleeps and wall-clock
       waits. **No criterion in this document asserts that the race is eliminated.**
-- [ ] No `Interlocked`, `lock`, `Monitor`, `Volatile`, or `Mutex` construct is introduced by this feature.
-- [ ] The three unconfirmed harnesses (`BreadcrumbCollapsedSurfaceReadinessTests.cs`,
+- [x] No `Interlocked`, `lock`, `Monitor`, `Volatile`, or `Mutex` construct is introduced by this feature.
+- [x] The three unconfirmed harnesses (`BreadcrumbCollapsedSurfaceReadinessTests.cs`,
       `BreadcrumbPendingOpenCloseTests.cs`, `BreadcrumbCoordinatorLifecycleTests.cs`) are each confirmed
       to install their synchronization context **before** constructing the `ItemViewer`, and the
       confirmation is recorded in evidence.
