@@ -171,6 +171,7 @@
     <Compile Include="Controllers\QfcItemController.SeamFactoryTests.cs" />
     <Compile Include="Controllers\QfcItemController.EventWiringTests.Part2.cs" />
     <Compile Include="Controllers\QfcItemController.ThemeMarshallingTests.cs" />
+    <Compile Include="Controllers\QfcItemController.MailActionsTests.Part2.cs" />
     <Compile Include="Controllers\MailItemActionsAdapterTests.cs" />
     <Compile Include="Controllers\WpfUiDispatcherTests.cs" />
     <Compile Include="Controllers\WebView2CoreInitializerTests.cs" />

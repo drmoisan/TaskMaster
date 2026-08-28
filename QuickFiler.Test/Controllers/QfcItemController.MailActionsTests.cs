@@ -19,7 +19,7 @@ namespace QuickFiler.Controllers.Tests
     /// IItemViewer folder intent members.
     /// </summary>
     [TestClass]
-    public class QfcItemController_MailActionsTests
+    public partial class QfcItemController_MailActionsTests
     {
         private sealed class MailController : QfcItemController
         {

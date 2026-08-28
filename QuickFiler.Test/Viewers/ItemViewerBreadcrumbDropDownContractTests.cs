@@ -275,5 +275,51 @@ namespace QuickFiler.Test.Viewers
                 .Should()
                 .NotBeEmpty("UiSyncContext still has production consumers and must survive");
         }
+
+        [TestMethod]
+        public void IItemViewer_DeclaresAddFolderItemsAndNotSetFolderItems()
+        {
+            // Arrange
+            Type interfaceType = typeof(IItemViewer);
+
+            // Act
+            MethodInfo added = interfaceType.GetMethod(
+                "AddFolderItems",
+                new[] { typeof(string[]) }
+            );
+            MethodInfo renamed = interfaceType.GetMethod(
+                "SetFolderItems",
+                new[] { typeof(string[]) }
+            );
+
+            // Assert
+            using (new AssertionScope())
+            {
+                added
+                    .Should()
+                    .NotBeNull("the additive folder-list member must be named for what it does");
+                renamed
+                    .Should()
+                    .BeNull("the misleading SetFolderItems name must not survive the rename");
+            }
+        }
+
+        [TestMethod]
+        public void IItemViewer_FocusSubjectReturnsBool()
+        {
+            // Arrange
+            Type interfaceType = typeof(IItemViewer);
+
+            // Act
+            MethodInfo focusSubject = interfaceType.GetMethod("FocusSubject");
+
+            // Assert
+            focusSubject
+                .ReturnType.Should()
+                .Be(
+                    typeof(bool),
+                    "a caller cannot observe a failed subject focus through a void member"
+                );
+        }
     }
 }

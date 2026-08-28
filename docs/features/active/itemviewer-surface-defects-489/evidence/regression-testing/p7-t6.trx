@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="918aa4c6-eb69-4198-a241-569904babf36" name="&lt;user&gt;@&lt;host&gt; 2026-08-27 21:17:59" runUser="&lt;host&gt;\&lt;user&gt;" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T21:17:59.9332212-04:00" queuing="2026-08-27T21:17:59.9332212-04:00" start="2026-08-27T21:17:58.2953380-04:00" finish="2026-08-27T21:17:59.9500785-04:00" />
+  <TestSettings name="default" id="5682fb93-6b7c-45cd-8d3d-e7840dd145e5">
+    <Deployment runDeploymentRoot="&lt;user&gt;_&lt;host&gt;_2026-08-27_21_17_59" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="e0135f80-8a4a-4eb2-806c-066c403247a7" testId="10f106fa-9667-8bba-95ca-971cbb1b5d63" testName="FlagAsTask_DoesNotReadBackFlagTaskDialogResult" computerName="&lt;host&gt;" duration="00:00:00.2599056" startTime="2026-08-27T21:17:59.4481804-04:00" endTime="2026-08-27T21:17:59.8190381-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e0135f80-8a4a-4eb2-806c-066c403247a7">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method QuickFiler.Controllers.Tests.QfcItemController_MailActionsTests.FlagAsTask_DoesNotReadBackFlagTaskDialogResult threw exception:&#xD;
+Moq.MockException: &#xD;
+Expected invocation on the mock should never have been performed, but was 1 times: v =&gt; v.FlagTaskDialogResult&#xD;
+&#xD;
+Performed invocations:&#xD;
+&#xD;
+   Mock&lt;IItemViewer:1&gt; (v):&#xD;
+&#xD;
+      IItemViewer.FlagTaskDialogResult = DialogResult.None&#xD;
+      IItemViewer.FlagTaskDialogResult&#xD;
+</Message>
+          <StackTrace>   at Moq.Mock.Verify(Mock mock, LambdaExpression expression, Times times, String failMessage) in /_/src/Moq/Mock.cs:line 332&#xD;
+   at Moq.Mock.VerifyGet(Mock mock, LambdaExpression expression, Times times, String failMessage) in /_/src/Moq/Mock.cs:line 347&#xD;
+   at Moq.Mock`1.VerifyGet[TProperty](Expression`1 expression, Times times) in /_/src/Moq/Mock`1.cs:line 940&#xD;
+   at QuickFiler.Controllers.Tests.QfcItemController_MailActionsTests.FlagAsTask_DoesNotReadBackFlagTaskDialogResult() in &lt;repo-root&gt;\QuickFiler.Test\Controllers\QfcItemController.MailActionsTests.Part2.cs:line 81&#xD;
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="bff227fc-7cb3-44ca-8d7f-2cae13ff0f02" testId="17a2ba46-ac91-8efb-9b45-5329bfb14eea" testName="FlagAsTaskAsync_DoesNotReadBackFlagTaskDialogResult" computerName="&lt;host&gt;" duration="00:00:00.0381327" startTime="2026-08-27T21:17:59.8240529-04:00" endTime="2026-08-27T21:17:59.8656177-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bff227fc-7cb3-44ca-8d7f-2cae13ff0f02">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method QuickFiler.Controllers.Tests.QfcItemController_MailActionsTests.FlagAsTaskAsync_DoesNotReadBackFlagTaskDialogResult threw exception:&#xD;
+Moq.MockException: &#xD;
+Expected invocation on the mock should never have been performed, but was 1 times: v =&gt; v.FlagTaskDialogResult&#xD;
+&#xD;
+Performed invocations:&#xD;
+&#xD;
+   Mock&lt;IItemViewer:2&gt; (v):&#xD;
+&#xD;
+      IItemViewer.FlagTaskDialogResult = DialogResult.None&#xD;
+      IItemViewer.FlagTaskDialogResult&#xD;
+</Message>
+          <StackTrace>   at Moq.Mock.Verify(Mock mock, LambdaExpression expression, Times times, String failMessage) in /_/src/Moq/Mock.cs:line 332&#xD;
+   at Moq.Mock.VerifyGet(Mock mock, LambdaExpression expression, Times times, String failMessage) in /_/src/Moq/Mock.cs:line 347&#xD;
+   at Moq.Mock`1.VerifyGet[TProperty](Expression`1 expression, Times times) in /_/src/Moq/Mock`1.cs:line 940&#xD;
+   at QuickFiler.Controllers.Tests.QfcItemController_MailActionsTests.&lt;FlagAsTaskAsync_DoesNotReadBackFlagTaskDialogResult&gt;d__33.MoveNext() in &lt;repo-root&gt;\QuickFiler.Test\Controllers\QfcItemController.MailActionsTests.Part2.cs:line 104&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.&lt;ExecuteInternalAsync&gt;d__58.MoveNext()&#xD;
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="FlagAsTaskAsync_DoesNotReadBackFlagTaskDialogResult" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="17a2ba46-ac91-8efb-9b45-5329bfb14eea">
+      <Execution id="bff227fc-7cb3-44ca-8d7f-2cae13ff0f02" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_MailActionsTests" name="FlagAsTaskAsync_DoesNotReadBackFlagTaskDialogResult" />
+    </UnitTest>
+    <UnitTest name="FlagAsTask_DoesNotReadBackFlagTaskDialogResult" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="10f106fa-9667-8bba-95ca-971cbb1b5d63">
+      <Execution id="e0135f80-8a4a-4eb2-806c-066c403247a7" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_MailActionsTests" name="FlagAsTask_DoesNotReadBackFlagTaskDialogResult" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="10f106fa-9667-8bba-95ca-971cbb1b5d63" executionId="e0135f80-8a4a-4eb2-806c-066c403247a7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17a2ba46-ac91-8efb-9b45-5329bfb14eea" executionId="bff227fc-7cb3-44ca-8d7f-2cae13ff0f02" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="2" executed="2" passed="0" failed="2" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+</TestRun>
