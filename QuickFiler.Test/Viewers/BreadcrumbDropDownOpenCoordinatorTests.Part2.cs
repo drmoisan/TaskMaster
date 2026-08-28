@@ -323,6 +323,80 @@ namespace QuickFiler.Test.Viewers
         }
 
         /// <summary>
+        /// Issue #462 (I-462.2): after a <c>CloseCore</c> that returned <c>true</c>, with the host
+        /// open again by a path that reaches neither <c>CloseCore</c> nor <c>RequestOpen</c> and the
+        /// coordinator not released, a legitimate reopen must reach <c>_host.OpenAsync</c> rather
+        /// than returning the already-completed <c>ClosedTask</c> sentinel. Deterministic: one
+        /// thread, explicit drain, no timers, no sleeps, no second thread, no temp files.
+        /// </summary>
+        [TestMethod]
+        public void RequestOpen_AfterSuccessfulCloseAndHostReopen_ReachesHostOpenAsync()
+        {
+            // Arrange: open the drop-down, then drive a close that the host accepts.
+            var harness = new CoordinatorHarness();
+            harness.Host.Enqueue(Task.FromResult(true));
+            Task<bool> opening = harness.Coordinator.RequestOpen();
+            harness.Context.DrainUntil(opening);
+            opening.Result.Should().BeTrue();
+            harness.Host.Requests.Should().ContainSingle();
+
+            harness.Coordinator.SetDroppedDown(false);
+            harness.Context.DrainAll();
+            harness.Host.CloseReasons.Should().Equal(BreadcrumbDropDownCloseReason.Uncommitted);
+            harness.Host.IsOpen.Should().BeFalse("the host accepted the close");
+
+            // The host becomes open again by a path that bypasses CloseCore and RequestOpen.
+            harness.Host.SetOpen(true);
+            harness.SelectorOpen = true;
+            harness.Host.Enqueue(Task.FromResult(true));
+
+            // Act
+            Task<bool> reopen = harness.Coordinator.RequestOpen();
+            harness.Context.DrainUntil(reopen);
+
+            // Assert
+            harness
+                .Host.Requests.Should()
+                .HaveCount(2, "the reopen must reach _host.OpenAsync a second time");
+            reopen
+                .Result.Should()
+                .BeTrue("the returned task must not be the completed ClosedTask sentinel");
+        }
+
+        /// <summary>
+        /// Issue #462 (I-462.3): idempotent close must be preserved. Two consecutive
+        /// <c>SetDroppedDown(false)</c> drives with no intervening reopen must reach
+        /// <c>_host.Close</c> exactly once. This test is green on HEAD by design: it is the standing
+        /// guard that rules out research section 6.1 option A (clearing the flag on the
+        /// successful-close path), which would let the second close reach the host. Deterministic:
+        /// one thread, explicit drain, no timers, no sleeps, no second thread, no temp files.
+        /// </summary>
+        [TestMethod]
+        public void CloseCore_RepeatedCloseWithoutReopen_ClosesHostExactlyOnce()
+        {
+            // Arrange: open the drop-down so a close has something to close.
+            var harness = new CoordinatorHarness();
+            harness.Host.Enqueue(Task.FromResult(true));
+            Task<bool> opening = harness.Coordinator.RequestOpen();
+            harness.Context.DrainUntil(opening);
+            opening.Result.Should().BeTrue();
+
+            // Act: two consecutive close drives, no intervening reopen and no host reopen.
+            harness.Coordinator.SetDroppedDown(false);
+            harness.Context.DrainAll();
+            harness.Coordinator.SetDroppedDown(false);
+            harness.Context.DrainAll();
+
+            // Assert
+            harness
+                .Host.CloseReasons.Should()
+                .Equal(
+                    new[] { BreadcrumbDropDownCloseReason.Uncommitted },
+                    "the repeated close must be suppressed, so _host.Close is reached exactly once"
+                );
+        }
+
+        /// <summary>
         /// Coordinator harness whose selector-open, open-selector, cancel, and detach seams are counted and
         /// individually faultable, so a guarded body can be proven to consult no seam at all. Deterministic;
         /// no Outlook, WebView2, timers, sleeps, or temp files.

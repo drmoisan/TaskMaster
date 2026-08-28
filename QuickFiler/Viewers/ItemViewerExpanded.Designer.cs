@@ -168,7 +168,6 @@
             this.ConversationMenuItem.Overflow = System.Windows.Forms.ToolStripItemOverflow.AsNeeded;
             this.ConversationMenuItem.Size = new System.Drawing.Size(355, 44);
             this.ConversationMenuItem.Text = "Move &Conversation";
-            this.ConversationMenuItem.CheckedChanged += new System.EventHandler(this.MenuItem_CheckedChanged);
             // 
             // SaveAttachmentsMenuItem
             // 
@@ -177,7 +176,6 @@
             this.SaveAttachmentsMenuItem.Name = "SaveAttachmentsMenuItem";
             this.SaveAttachmentsMenuItem.Size = new System.Drawing.Size(355, 44);
             this.SaveAttachmentsMenuItem.Text = "Save &Attachments";
-            this.SaveAttachmentsMenuItem.CheckedChanged += new System.EventHandler(this.MenuItem_CheckedChanged);
             // 
             // SaveEmailMenuItem
             // 
@@ -186,7 +184,6 @@
             this.SaveEmailMenuItem.Name = "SaveEmailMenuItem";
             this.SaveEmailMenuItem.Size = new System.Drawing.Size(355, 44);
             this.SaveEmailMenuItem.Text = "Save E&mail Copy";
-            this.SaveEmailMenuItem.CheckedChanged += new System.EventHandler(this.MenuItem_CheckedChanged);
             // 
             // SavePicturesMenuItem
             // 
@@ -195,7 +192,6 @@
             this.SavePicturesMenuItem.Name = "SavePicturesMenuItem";
             this.SavePicturesMenuItem.Size = new System.Drawing.Size(355, 44);
             this.SavePicturesMenuItem.Text = "Save &Pictures";
-            this.SavePicturesMenuItem.CheckedChanged += new System.EventHandler(this.MenuItem_CheckedChanged);
             // 
             // LblAcSearch
             // 
@@ -271,7 +267,6 @@
             this.L0v2h2_WebView2.Size = new System.Drawing.Size(2174, 635);
             this.L0v2h2_WebView2.TabIndex = 40;
             this.L0v2h2_WebView2.ZoomFactor = 1D;
-            this.L0v2h2_WebView2.ParentChanged += new System.EventHandler(this.L0v2h2_WebView2_ParentChanged);
             // 
             // LblConvCt
             // 

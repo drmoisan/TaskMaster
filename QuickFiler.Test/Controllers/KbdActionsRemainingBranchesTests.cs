@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using FluentAssertions;
@@ -161,6 +162,96 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             enumerated.Should().HaveCount(2, "the enumerator yields every registered instance");
             registry.Keys.Should().BeEquivalentTo(new[] { Keys.Enter, Keys.Escape });
+        }
+
+        /// <summary>
+        /// Issue #444: the enumerable constructor must enforce the same (SourceId, stored Key)
+        /// duplicate guard both Add overloads enforce, so an inconsistent registry cannot be seeded
+        /// past the invariant and surface later as an ambiguous Find.
+        /// </summary>
+        [TestMethod]
+        public void EnumerableConstructor_WhenSeedContainsDuplicateSourceAndStoredKey_ThrowsArgumentException()
+        {
+            // Arrange
+            var seed = new List<KaKey>
+            {
+                new KaKey("src", Keys.Down, _ => { }),
+                new KaKey("src", Keys.Down, _ => { }),
+            };
+
+            // Act
+            Action act = () => new KbdActions<Keys, KaKey, Action<Keys>>(seed);
+
+            // Assert
+            act.Should()
+                .Throw<ArgumentException>(
+                    "a seed sequence repeating one source and stored key violates the registry invariant"
+                )
+                .WithMessage("*already exists*");
+        }
+
+        /// <summary>
+        /// Issue #444: the duplicate guard materialises the seed before scanning it, so a null
+        /// sequence must still surface as ArgumentNullException from the List copy constructor and
+        /// never as NullReferenceException from the scan.
+        /// </summary>
+        [TestMethod]
+        public void EnumerableConstructor_WhenListIsNull_ThrowsArgumentNullException()
+        {
+            // Arrange
+            List<KaKey> seed = null;
+
+            // Act
+            Action act = () => new KbdActions<Keys, KaKey, Action<Keys>>(seed);
+
+            // Assert
+            act.Should()
+                .Throw<ArgumentNullException>(
+                    "the seed is materialised before it is scanned, so the null check is unchanged"
+                );
+            act.Should().NotThrow<NullReferenceException>();
+        }
+
+        /// <summary>
+        /// Issue #444: a duplicate-free seed is still accepted, so the guard rejects only genuine
+        /// invariant violations.
+        /// </summary>
+        [TestMethod]
+        public void EnumerableConstructor_WhenSeedIsDuplicateFree_DoesNotThrow()
+        {
+            // Arrange
+            var seed = new List<KaKey>
+            {
+                new KaKey("src", Keys.Up, _ => { }),
+                new KaKey("src", Keys.Down, _ => { }),
+            };
+
+            // Act
+            Action act = () => new KbdActions<Keys, KaKey, Action<Keys>>(seed);
+
+            // Assert
+            act.Should().NotThrow("two distinct keys under one source do not collide");
+        }
+
+        /// <summary>
+        /// Issue #444: the guard keys on the (SourceId, Key) pair, not on the key alone, so one key
+        /// repeated under two different sources remains legal exactly as it is through Add.
+        /// </summary>
+        [TestMethod]
+        public void EnumerableConstructor_WhenSameKeyUnderDifferentSourceIds_DoesNotThrow()
+        {
+            // Arrange
+            var seed = new List<KaKey>
+            {
+                new KaKey("sourceA", Keys.Down, _ => { }),
+                new KaKey("sourceB", Keys.Down, _ => { }),
+            };
+
+            // Act
+            Action act = () => new KbdActions<Keys, KaKey, Action<Keys>>(seed);
+
+            // Assert
+            act.Should().NotThrow("the guard compares the source and the key together");
         }
 
         [TestMethod]

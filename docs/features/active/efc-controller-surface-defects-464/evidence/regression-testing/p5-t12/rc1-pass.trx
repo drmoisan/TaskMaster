@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="215dbf76-c210-4c06-8145-b9def3f43e2d" name="<user>@<host> 2026-08-27 21:00:06" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T21:00:06.3192202-04:00" queuing="2026-08-27T21:00:06.3192202-04:00" start="2026-08-27T21:00:04.4196018-04:00" finish="2026-08-27T21:00:06.8973021-04:00" />
+  <TestSettings name="default" id="895dfdfc-8d54-4cdb-99c9-f6aaa36aad6d">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-27_21_00_06" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="0c278763-fb55-4c76-8f01-9c8e28fd3e57" testId="1e7eb9b5-4908-8450-9478-7aab26ea588a" testName="FormCleanup_CalledTwice_DoesNotThrow" computerName="<host>" duration="00:00:00.0032738" startTime="2026-08-27T21:00:05.5287098-04:00" endTime="2026-08-27T21:00:05.5317141-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0c278763-fb55-4c76-8f01-9c8e28fd3e57" />
+    <UnitTestResult executionId="9980a55c-f776-413e-aa3c-fed360f7315c" testId="11b514fa-8f0a-8eff-b7b5-33f96a32140e" testName="ItemDarkMode_OnNullGlobalsController_ReturnsFalseAndDoesNotThrow" computerName="<host>" duration="00:00:00.0002984" startTime="2026-08-27T21:00:06.8214167-04:00" endTime="2026-08-27T21:00:06.8224150-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9980a55c-f776-413e-aa3c-fed360f7315c" />
+    <UnitTestResult executionId="9821ca58-3c6b-4842-9a45-35fe26f77425" testId="1cdfafb1-bc79-8436-8f6c-80e5b466a779" testName="FormActiveTheme_OnAllFieldsNullController_ReturnsBackingFieldAndDoesNotThrow" computerName="<host>" duration="00:00:00.0019771" startTime="2026-08-27T21:00:05.5251913-04:00" endTime="2026-08-27T21:00:05.5277016-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9821ca58-3c6b-4842-9a45-35fe26f77425" />
+    <UnitTestResult executionId="d738fb3d-b465-403a-ab88-32c33f1dda83" testId="190f383b-3c90-81ed-95a6-96f33f1441e3" testName="FormCleanup_InvokesParentCleanupExactlyOnce" computerName="<host>" duration="00:00:00.1004832" startTime="2026-08-27T21:00:05.5317141-04:00" endTime="2026-08-27T21:00:05.6344765-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d738fb3d-b465-403a-ab88-32c33f1dda83" />
+    <UnitTestResult executionId="54a43245-0552-4798-a10d-3b4ae7a5f4c0" testId="15af3d3c-ba54-88df-8d94-d4a1df962a6c" testName="SubjectSenderAndTo_ReadFromItemInfo_AndAreInertAfterCleanup" computerName="<host>" duration="00:00:00.0997168" startTime="2026-08-27T21:00:06.7216279-04:00" endTime="2026-08-27T21:00:06.8214167-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="54a43245-0552-4798-a10d-3b4ae7a5f4c0">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="839ffc7b-eeb2-4cc3-b72c-922b861ee04a" testId="1ae8632c-d1f0-8402-bc0a-999ee1ec6deb" testName="Cleanup_NullsButtonsField" computerName="<host>" duration="00:00:00.0508668" startTime="2026-08-27T21:00:06.5538840-04:00" endTime="2026-08-27T21:00:06.6053312-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="839ffc7b-eeb2-4cc3-b72c-922b861ee04a">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="ffc5f963-74c8-4c6c-931e-0f26a28bd64b" testId="1a4428e2-7d0e-89a3-b6d0-4231f3646473" testName="Cleanup_DisposesTimerBeforeNullingIt" computerName="<host>" duration="00:00:00.0610067" startTime="2026-08-27T21:00:06.6053312-04:00" endTime="2026-08-27T21:00:06.6661381-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ffc5f963-74c8-4c6c-931e-0f26a28bd64b">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="88486162-3e6b-45b3-8e14-8bc6f585e3eb" testId="19022e9d-e677-885e-b3cd-a11f4c85cd35" testName="Cleanup_CalledTwice_DoesNotThrow" computerName="<host>" duration="00:00:00.0608698" startTime="2026-08-27T21:00:06.4925729-04:00" endTime="2026-08-27T21:00:06.5538840-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="88486162-3e6b-45b3-8e14-8bc6f585e3eb">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="5dddf0b1-4d52-4af9-a5cf-45299d2854fe" testId="1cbef776-6ac6-8597-a153-70cbc1f50c56" testName="FormLoadTheme_OnAllFieldsNullController_DoesNotThrow" computerName="<host>" duration="00:00:00.0002805" startTime="2026-08-27T21:00:05.5287098-04:00" endTime="2026-08-27T21:00:05.5287098-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5dddf0b1-4d52-4af9-a5cf-45299d2854fe" />
+    <UnitTestResult executionId="1b8047d4-eb2b-495f-bb01-bc723220c272" testId="1d3dcb83-5c11-83f8-92b8-169983b92ac9" testName="Cleanup_OnFiveArgumentConstructedController_DoesNotThrow" computerName="<host>" duration="00:00:01.0244681" startTime="2026-08-27T21:00:05.3549974-04:00" endTime="2026-08-27T21:00:06.4925729-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1b8047d4-eb2b-495f-bb01-bc723220c272">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="5ea547b1-d008-43af-9c30-debcbf0d629f" testId="1c14705d-2147-877b-9b4d-4bf837686096" testName="ItemActiveThemeAndLoadTheme_OnNullThemesController_DoNotThrow" computerName="<host>" duration="00:00:00.0002789" startTime="2026-08-27T21:00:06.8224150-04:00" endTime="2026-08-27T21:00:06.8234155-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5ea547b1-d008-43af-9c30-debcbf0d629f" />
+    <UnitTestResult executionId="8ca09c3e-ea2e-47d2-a4b5-b217798c93bb" testId="12905a65-5e20-80dd-8c82-5cd4919215e6" testName="FormDarkMode_OnAllFieldsNullController_ReturnsFalseAndDoesNotThrow" computerName="<host>" duration="00:00:00.0484024" startTime="2026-08-27T21:00:05.3529978-04:00" endTime="2026-08-27T21:00:05.5191930-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8ca09c3e-ea2e-47d2-a4b5-b217798c93bb">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="be505774-4b93-4cf4-b9e0-ed183f6d3a35" testId="1de86bb9-7d96-8c0b-b990-1d248f835732" testName="ApplyReadEmailFormat_AfterCleanup_DoesNotThrow" computerName="<host>" duration="00:00:00.0550907" startTime="2026-08-27T21:00:06.6661381-04:00" endTime="2026-08-27T21:00:06.7216279-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="be505774-4b93-4cf4-b9e0-ed183f6d3a35">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Cleanup_CalledTwice_DoesNotThrow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="19022e9d-e677-885e-b3cd-a11f4c85cd35">
+      <Execution id="88486162-3e6b-45b3-8e14-8bc6f585e3eb" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests" name="Cleanup_CalledTwice_DoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="FormCleanup_InvokesParentCleanupExactlyOnce" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="190f383b-3c90-81ed-95a6-96f33f1441e3">
+      <Execution id="d738fb3d-b465-403a-ab88-32c33f1dda83" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="FormCleanup_InvokesParentCleanupExactlyOnce" />
+    </UnitTest>
+    <UnitTest name="Cleanup_NullsButtonsField" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ae8632c-d1f0-8402-bc0a-999ee1ec6deb">
+      <Execution id="839ffc7b-eeb2-4cc3-b72c-922b861ee04a" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests" name="Cleanup_NullsButtonsField" />
+    </UnitTest>
+    <UnitTest name="ItemActiveThemeAndLoadTheme_OnNullThemesController_DoNotThrow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c14705d-2147-877b-9b4d-4bf837686096">
+      <Execution id="5ea547b1-d008-43af-9c30-debcbf0d629f" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests" name="ItemActiveThemeAndLoadTheme_OnNullThemesController_DoNotThrow" />
+    </UnitTest>
+    <UnitTest name="ApplyReadEmailFormat_AfterCleanup_DoesNotThrow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1de86bb9-7d96-8c0b-b990-1d248f835732">
+      <Execution id="be505774-4b93-4cf4-b9e0-ed183f6d3a35" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests" name="ApplyReadEmailFormat_AfterCleanup_DoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="FormLoadTheme_OnAllFieldsNullController_DoesNotThrow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1cbef776-6ac6-8597-a153-70cbc1f50c56">
+      <Execution id="5dddf0b1-4d52-4af9-a5cf-45299d2854fe" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="FormLoadTheme_OnAllFieldsNullController_DoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="ItemDarkMode_OnNullGlobalsController_ReturnsFalseAndDoesNotThrow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="11b514fa-8f0a-8eff-b7b5-33f96a32140e">
+      <Execution id="9980a55c-f776-413e-aa3c-fed360f7315c" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests" name="ItemDarkMode_OnNullGlobalsController_ReturnsFalseAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="Cleanup_OnFiveArgumentConstructedController_DoesNotThrow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d3dcb83-5c11-83f8-92b8-169983b92ac9">
+      <Execution id="1b8047d4-eb2b-495f-bb01-bc723220c272" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests" name="Cleanup_OnFiveArgumentConstructedController_DoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="FormActiveTheme_OnAllFieldsNullController_ReturnsBackingFieldAndDoesNotThrow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1cdfafb1-bc79-8436-8f6c-80e5b466a779">
+      <Execution id="9821ca58-3c6b-4842-9a45-35fe26f77425" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="FormActiveTheme_OnAllFieldsNullController_ReturnsBackingFieldAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="Cleanup_DisposesTimerBeforeNullingIt" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a4428e2-7d0e-89a3-b6d0-4231f3646473">
+      <Execution id="ffc5f963-74c8-4c6c-931e-0f26a28bd64b" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests" name="Cleanup_DisposesTimerBeforeNullingIt" />
+    </UnitTest>
+    <UnitTest name="FormCleanup_CalledTwice_DoesNotThrow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e7eb9b5-4908-8450-9478-7aab26ea588a">
+      <Execution id="0c278763-fb55-4c76-8f01-9c8e28fd3e57" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="FormCleanup_CalledTwice_DoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="SubjectSenderAndTo_ReadFromItemInfo_AndAreInertAfterCleanup" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="15af3d3c-ba54-88df-8d94-d4a1df962a6c">
+      <Execution id="54a43245-0552-4798-a10d-3b4ae7a5f4c0" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests" name="SubjectSenderAndTo_ReadFromItemInfo_AndAreInertAfterCleanup" />
+    </UnitTest>
+    <UnitTest name="FormDarkMode_OnAllFieldsNullController_ReturnsFalseAndDoesNotThrow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="12905a65-5e20-80dd-8c82-5cd4919215e6">
+      <Execution id="8ca09c3e-ea2e-47d2-a4b5-b217798c93bb" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="FormDarkMode_OnAllFieldsNullController_ReturnsFalseAndDoesNotThrow" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1e7eb9b5-4908-8450-9478-7aab26ea588a" executionId="0c278763-fb55-4c76-8f01-9c8e28fd3e57" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11b514fa-8f0a-8eff-b7b5-33f96a32140e" executionId="9980a55c-f776-413e-aa3c-fed360f7315c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1cdfafb1-bc79-8436-8f6c-80e5b466a779" executionId="9821ca58-3c6b-4842-9a45-35fe26f77425" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="190f383b-3c90-81ed-95a6-96f33f1441e3" executionId="d738fb3d-b465-403a-ab88-32c33f1dda83" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15af3d3c-ba54-88df-8d94-d4a1df962a6c" executionId="54a43245-0552-4798-a10d-3b4ae7a5f4c0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ae8632c-d1f0-8402-bc0a-999ee1ec6deb" executionId="839ffc7b-eeb2-4cc3-b72c-922b861ee04a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a4428e2-7d0e-89a3-b6d0-4231f3646473" executionId="ffc5f963-74c8-4c6c-931e-0f26a28bd64b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19022e9d-e677-885e-b3cd-a11f4c85cd35" executionId="88486162-3e6b-45b3-8e14-8bc6f585e3eb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1cbef776-6ac6-8597-a153-70cbc1f50c56" executionId="5dddf0b1-4d52-4af9-a5cf-45299d2854fe" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d3dcb83-5c11-83f8-92b8-169983b92ac9" executionId="1b8047d4-eb2b-495f-bb01-bc723220c272" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c14705d-2147-877b-9b4d-4bf837686096" executionId="5ea547b1-d008-43af-9c30-debcbf0d629f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12905a65-5e20-80dd-8c82-5cd4919215e6" executionId="8ca09c3e-ea2e-47d2-a4b5-b217798c93bb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1de86bb9-7d96-8c0b-b990-1d248f835732" executionId="be505774-4b93-4cf4-b9e0-ed183f6d3a35" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="13" executed="13" passed="13" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

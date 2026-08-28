@@ -83,11 +83,6 @@ namespace QuickFiler.Viewers
         internal static BreadcrumbPopupUiOperations CreateForCurrentThreadTests() =>
             new BreadcrumbPopupUiOperations(BreadcrumbUiDispatcher.CreateForCurrentThreadTests());
 
-        internal static BreadcrumbPopupUiOperations CaptureCurrentOrTests() =>
-            SynchronizationContext.Current == null
-                ? CreateForCurrentThreadTests()
-                : CaptureCurrent();
-
         internal static Func<WebEnvironment, Task<ReadySurface>> NormalizeFactory(
             Func<WebEnvironment, Task<LegacySurface>> factory
         )

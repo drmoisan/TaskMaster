@@ -1,0 +1,39 @@
+# Code Review — itemviewer-breadcrumb-lifecycle-defects (Issue #488; also closes #475)
+
+- Timestamp: 2026-08-28T06-44 (UTC)
+- Branch: `bug/itemviewer-breadcrumb-lifecycle-defects-488` at `d9ed9eb2`; full production and test diff against merge base `12465043` reviewed line by line (8 code/project paths, +662/−24).
+
+## Findings Summary
+
+| ID | Severity | Blocking | File / location | Finding |
+|---|---|---|---|---|
+| CR-1 | Minor | No | `evidence/**/*.trx` (19 files) | Committed TRX evidence embeds the absolute worktree assembly path in `storage`/`codeBase` and the machine token in `runUser`, while name/user/computer fields were sanitized. Pre-existing pattern across merged siblings on the integration branch; recommend one sanitization pass before fan-in. Same finding as PA-1 in the policy audit. |
+| CR-2 | Info | No | `evidence/baseline/coverage-baseline.cobertura.xml`, `evidence/qa-gates/coverage-final.cobertura.xml` | Two 10.7 MB raw Cobertura documents committed, plan-faithfully (P0-T14/P8-T6). They enabled this review's independent figure re-derivation; permanent history cost owed a maintainer decision at fan-in (policy audit § 7 ruling 1). |
+| CR-3 | Info | No | `QuickFiler.Test/Controllers/EfcItemController.CleanupTests.cs:41` | The one `ItemViewer` construction site that installs no synchronization context (C6 site 18). Correctly left unedited per C6's escalation rule; file names no guarded member; full suite green. Promotion of a test-hygiene note to the owning surface recommended. |
+| CR-4 | Info | No | `BreadcrumbPopupBoundaryCoverageTests.Part2.cs` (`CaptureCurrent_NullAndControlledContexts_FailFastAndCapture`) | One `Task.Run` retained in the controlled-context half, carried over verbatim per plan P6-T3. Deterministic: completion is signal-based via `context.Drain(post)`, no timeout, no banned construct (`Thread.Sleep`/`Task.Delay`/wall-clock wait/temp file all absent). Acceptable under the unit-test rules. |
+| CR-5 | Info | No | `QuickFiler/Viewers/BreadcrumbItemViewerLifecycleCoordinator.cs` | File at 497/500 after absorbing D2 (+16 against 19 headroom, within R1's budget). Three lines of headroom remain for all future work; the next edit to this file likely requires a split. |
+| CR-6 | Info | No | same file, `ConfigureHost` replay guard | `retained != null && !string.IsNullOrWhiteSpace(retained)` — the null conjunct looks redundant but is load-bearing: the file carries `#nullable enable` and net481 reference assemblies lack the `NotNullWhen(false)` annotation on `IsNullOrWhiteSpace`, so the explicit check is what discharges the nullable-flow warning (the CS8604 found and fixed at P2-T5 per the toolchain evidence). Correct as delivered; no change requested. |
+
+Blocking findings: **0**.
+
+## Production diff, reviewed line by line
+
+**`ItemViewer.Breadcrumb.cs` (+110/−4, 425/500).** All five units land exactly as the spec designs them. D1's dispose sits between the same-environment early return and the replacement construction, type-tests the concrete `BreadcrumbDropDownHost` with a fresh pattern variable (`outgoing`), so mock hosts from the 3-arg overload are untouched and the integration test's `Times.Once()` survives — both verified green unmodified. D3's fail-fast throws only when the retained provider is reference-unequal, returns silently when equal, and `DisposeBreadcrumbResources` nulls the retained field so a post-disposal rebuild is not blocked. D4's `ThrowIfOffUiBoundary` compares `SynchronizationContext.Current` by reference against `UiSyncContext`, names the operation in the message, escapes on a null captured context, and is the first statement of all four guarded members. D5's `ObjectDisposedException` tests both `IsDisposed` and `Disposing` and precedes the already-owned early return and any `Container` creation; the D-15 ordering (guard first statement, throw first action) is stated in-source with the decision cited, resolving the two criteria's apparent conflict exactly as the plan adjudicated. #475 part 3's laziness (`Func<BreadcrumbPopupUiOperations>`, evaluated once after the early return) is what keeps the injected seam alive for the seventeen seam-consuming test files enumerated in the seam audit. Comment density is high but every comment is a why-comment carrying a decision or issue reference; the file has 75 lines of headroom.
+
+**`BreadcrumbItemViewerLifecycleCoordinator.cs` (+16, 497/500).** The only edit is D2: the `_retainedTheme` field, its assignment in `SetTheme` before the two forwards, and the guarded replay in `ConfigureHost`'s newly-adopted branch only. The `UpdateRequestProviders` branch performs no theme call, preserving the mock-observable contract the spec pins. Replay placement after the messenger attach mirrors the adopted-host sequence. CR-5/CR-6 above.
+
+**`BreadcrumbPopupUiOperations.cs` (−5, 489/500).** Pure deletion of the ambient-probing `CaptureCurrentOrTests` selector plus its separator line; nothing added, exactly as the R2 constraint demands. `CreateForCurrentThreadTests` survives unmodified in both this file and `BreadcrumbUiDispatcher.cs`; a repository-wide search for the deleted identifier returns zero `.cs` hits.
+
+**`BreadcrumbDropDownHost.cs` (+2/−2, 463/500).** Two identifier swaps to `CaptureCurrent()` in the 7-param constructor chains, argument order untouched — which is why `Constructor_NullLegacySurfaceFactory_ThrowsForSurfaceFactory` still passes without an ambient context (the `surfaceFactory ?? throw` evaluates first), verified in the committed pass TRX.
+
+## Test diff
+
+The new regression file (480/500) is self-contained as the spec requires: its own `ViewerScope` (context installed before construction — itself C6-order-correct), its own reflection accessors, its own `DrainableSynchronizationContext` with a creator-thread assertion in `Drain()`, and a `SeamProbeDropDownHost` stub. The only cross-file reuse is the genuinely `internal` `InvokeAmbientNull`; no other file's accessibility was widened. The D1 test's documentation is candid that the two AC-named observations (`DropDown.IsDisposed`, `Close` returning false) also hold pre-fix and that the discriminating assertion is the `SetTheme` `ObjectDisposedException` — and the committed fail-before TRX confirms the test was genuinely red on exactly that assertion. The D3 negative test excludes `ObjectDisposedException` so a D5 throw cannot satisfy a D3 assertion. The D2 test extends `RecordingHost` with an ordered `ThemesApplied` recorder and asserts exact sequence equality, so a duplicated replay would fail it. The replaced #475 boundary test converts the deleted selector's null-context half into a fail-fast assertion and keeps the controlled-context half against `CaptureCurrent` (CR-4).
+
+## New defects introduced by this change-set
+
+None found. Specifically checked: the D1/D2 `ObjectDisposedException` window (a `SetTheme` landing between D1's synchronous dispose and the `ConfigureHost` post) is the spec's accepted, documented residual — a diagnostic on a contract violation D4 now rejects at entry, unreachable on the production inline-post UI thread; the D5 guard ordering cannot mask the D4 guard or vice versa (disjoint conditions, and the D5 test runs on the owning context so its throw is attributable); the #475 constructor swap changes no production behavior (no in-repo production caller reaches either 7-param chain); no formatting, analyzer, nullable, or test-count regression (all gates re-verified in the policy audit); no sync primitive, banned timing API, or temporary file anywhere in the diff.
+
+## Verdict
+
+**Approve.** Six-unit bugfix delivered RED-first with minimal, spec-exact production changes, honest documentation of every limitation (D4 proxy, D1 non-discriminating observations, D3 no-production-behavior-change), and disciplined scope. No finding above Minor, none blocking.

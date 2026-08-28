@@ -168,6 +168,32 @@ namespace QuickFiler.Controllers
             }
         }
 
+        /// <summary>
+        /// Issue #482: the single owner of expansion keyboard registration, keyed on the actual
+        /// current state rather than on which code path performed the toggle.
+        /// </summary>
+        /// <param name="expanded">
+        /// The value of <c>_expanded</c> after the toggle. When true both registries are populated;
+        /// when false both are left empty.
+        /// </param>
+        /// <remarks>
+        /// The two unregister calls are unconditional and are safe when the entries are absent,
+        /// because <c>KbdActions.Remove</c> returns <c>false</c> rather than throwing. That is what
+        /// makes repeated and interleaved toggles idempotent without changing <c>Add</c>'s contract.
+        /// Both registries are maintained together so a later focus-path cleanup removes from a
+        /// registry that genuinely holds the entries.
+        /// </remarks>
+        private void SyncExpandedRegistrations(bool expanded)
+        {
+            UnregisterExpandedActions();
+            UnregisterExpandedAsyncActions();
+            if (expanded)
+            {
+                RegisterExpandedActions();
+                RegisterExpandedAsyncActions();
+            }
+        }
+
         // Made virtual so tests can override the (TlpCellSnapShot-bound, out-of-scope) state-taking
         // body and verify the parameterless-overload routing without the control-tree collaborator.
         [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
@@ -177,13 +203,12 @@ namespace QuickFiler.Controllers
             if (desiredState == Enums.ToggleState.On)
             {
                 ToggleExpansionOn();
-                RegisterExpandedActions();
             }
             else
             {
                 ToggleExpansionOff();
-                UnregisterExpandedActions();
             }
+            SyncExpandedRegistrations(_expanded);
         }
 
         // Made virtual so tests can override the (TlpCellSnapShot-bound, out-of-scope) state-taking
@@ -195,13 +220,12 @@ namespace QuickFiler.Controllers
             if (desiredState == Enums.ToggleState.On)
             {
                 await _uiDispatcher.InvokeAsync(() => ToggleExpansionOn());
-                RegisterExpandedAsyncActions();
             }
             else
             {
                 await _uiDispatcher.InvokeAsync(() => ToggleExpansionOff());
-                UnregisterExpandedAsyncActions();
             }
+            SyncExpandedRegistrations(_expanded);
         }
 
         private void ToggleExpansionOff()

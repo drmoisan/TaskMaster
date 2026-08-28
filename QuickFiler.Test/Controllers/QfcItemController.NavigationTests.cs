@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -386,6 +387,112 @@ namespace QuickFiler.Controllers.Tests
             label.Enabled.Should().BeFalse();
             label.Visible.Should().BeFalse();
             QfcItemControllerTestSupport.GetField(controller, "_expanded").Should().Be(true);
+        }
+
+        /// <summary>
+        /// Issue #482 shared arrangement: one keyboard handler wired to BOTH expansion registries, a
+        /// Loose parent whose async style call returns a real Task, empty snapshot lists so ApplyState
+        /// is a no-op, and a synchronous dispatcher. ItemHelper.UnRead is established false by
+        /// assertion, not assignment: the setter writes through to Item.Save() and would dereference a
+        /// null Outlook item. False UnRead is what keeps ToggleExpansionOn out of the 4000 ms timer.
+        /// </summary>
+        private static HarnessController BuildExpansionHarness(
+            out KbdActions<char, KaChar, Action<char>> sync,
+            out KbdActions<char, KaCharAsync, Func<char, Task>> async,
+            out string id
+        )
+        {
+            id = "expansion-entry";
+            var s = new KbdActions<char, KaChar, Action<char>>();
+            var a = new KbdActions<char, KaCharAsync, Func<char, Task>>();
+            sync = s;
+            async = a;
+            var kbd = new Mock<IQfcKeyboardHandler>(MockBehavior.Loose);
+            kbd.SetupGet(k => k.CharActions).Returns(() => s);
+            kbd.SetupGet(k => k.CharActionsAsync).Returns(() => a);
+            var parent = new Mock<IQfcCollectionController>(MockBehavior.Loose);
+            parent
+                .Setup(p =>
+                    p.ToggleExpansionStyleAsync(It.IsAny<int>(), It.IsAny<Enums.ToggleState>())
+                )
+                .Returns(Task.CompletedTask);
+            var tlp = new TlpCellStates();
+            tlp.TryAddState("Expanded", new List<TlpCellSnapShot>());
+            tlp.TryAddState("Compressed", new List<TlpCellSnapShot>());
+            var helper = new MailItemHelper { EntryId = id };
+            helper.UnRead.Should().BeFalse("a false UnRead avoids the 4000 ms timer branch");
+            var c = new HarnessController();
+            var set =
+                (Action<string, object>)((n, v) => QfcItemControllerTestSupport.SetField(c, n, v));
+            set("_kbdHandler", kbd.Object);
+            set("_parent", parent.Object);
+            set("_itemViewer", new Mock<IItemViewer>(MockBehavior.Loose).Object);
+            set("_tlpStates", tlp);
+            set("_uiDispatcher", QfcItemControllerTestSupport.BuildSyncDispatcher().Object);
+            c.ItemHelper = helper;
+            return c;
+        }
+
+        /// <summary>Asserts both expansion registries hold exactly <paramref name="n"/> 'B' and 'D' entries.</summary>
+        private static void BothRegistriesShouldHold(
+            KbdActions<char, KaChar, Action<char>> sync,
+            KbdActions<char, KaCharAsync, Func<char, Task>> async,
+            string id,
+            int n
+        ) =>
+            new[]
+            {
+                sync.Count(x => x.SourceId == id && x.Key == 'B'),
+                sync.Count(x => x.SourceId == id && x.Key == 'D'),
+                async.Count(x => x.SourceId == id && x.Key == 'B'),
+                async.Count(x => x.SourceId == id && x.Key == 'D'),
+            }
+                .Should()
+                .AllBeEquivalentTo(n, "both registries track the expansion flag together");
+
+        /// <summary>Issue #482: async-On, sync-Off, async-On (production Right, Down, Right) no longer throws.</summary>
+        [TestMethod]
+        public async Task ToggleExpansion_WhenAsyncOnThenSyncOffThenAsyncOn_DoesNotThrowAndBothRegistriesHoldOneBAndOneD()
+        {
+            var c = BuildExpansionHarness(out var sync, out var async, out var id);
+            await c.ToggleExpansionAsync(Enums.ToggleState.On);
+            c.ToggleExpansion(Enums.ToggleState.Off);
+            Func<Task> third = () => c.ToggleExpansionAsync(Enums.ToggleState.On);
+            await third.Should().NotThrowAsync<ArgumentException>();
+            BothRegistriesShouldHold(sync, async, id, 1);
+        }
+
+        /// <summary>Issue #482: collapsing through the other overload empties both registries.</summary>
+        [TestMethod]
+        public async Task ToggleExpansion_WhenCollapsedByEitherOverload_BothRegistriesHoldNoExpansionEntries()
+        {
+            var c = BuildExpansionHarness(out var sync, out var async, out var id);
+            await c.ToggleExpansionAsync(Enums.ToggleState.On);
+            BothRegistriesShouldHold(sync, async, id, 1);
+            c.ToggleExpansion(Enums.ToggleState.Off);
+            BothRegistriesShouldHold(sync, async, id, 0);
+        }
+
+        /// <summary>Issue #482: two consecutive On calls on one overload are idempotent.</summary>
+        [TestMethod]
+        public async Task ToggleExpansion_WhenOnCalledTwiceOnTheSameOverload_DoesNotThrow()
+        {
+            var c = BuildExpansionHarness(out var sync, out var async, out var id);
+            await c.ToggleExpansionAsync(Enums.ToggleState.On);
+            Func<Task> again = () => c.ToggleExpansionAsync(Enums.ToggleState.On);
+            await again.Should().NotThrowAsync();
+            BothRegistriesShouldHold(sync, async, id, 1);
+        }
+
+        /// <summary>Issue #482: the private owner adds then removes both registries when driven directly.</summary>
+        [TestMethod]
+        public void SyncExpandedRegistrations_WhenInvokedWithTrueThenFalse_AddsThenRemovesBothRegistries()
+        {
+            var c = BuildExpansionHarness(out var sync, out var async, out var id);
+            QfcItemControllerTestSupport.InvokeNonPublic(c, "SyncExpandedRegistrations", true);
+            BothRegistriesShouldHold(sync, async, id, 1);
+            QfcItemControllerTestSupport.InvokeNonPublic(c, "SyncExpandedRegistrations", false);
+            BothRegistriesShouldHold(sync, async, id, 0);
         }
     }
 }

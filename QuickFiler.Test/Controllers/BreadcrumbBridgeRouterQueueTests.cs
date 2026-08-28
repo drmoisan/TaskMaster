@@ -20,7 +20,7 @@ namespace QuickFiler.Test.Controllers
     /// No timers, sleeps, or temp files are used.
     /// </summary>
     [TestClass]
-    public class BreadcrumbBridgeRouterQueueTests
+    public partial class BreadcrumbBridgeRouterQueueTests
     {
         private const string LeafPath = "Inbox\\Projects\\Alpha";
 

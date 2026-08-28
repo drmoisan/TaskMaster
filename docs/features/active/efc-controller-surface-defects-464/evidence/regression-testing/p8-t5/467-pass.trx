@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="f4816ce7-96a5-4be1-af82-59c522ab0282" name="<user>@<host> 2026-08-27 21:29:57" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T21:29:57.7386526-04:00" queuing="2026-08-27T21:29:57.7386526-04:00" start="2026-08-27T21:29:56.5197114-04:00" finish="2026-08-27T21:29:57.7536597-04:00" />
+  <TestSettings name="default" id="e1d5fc76-cfd4-4817-a02b-d124e5c5915c">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-27_21_29_57" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="e9ab853e-e9c8-48fe-8502-ec1f9d9e89a3" testId="1890617f-6733-8340-bd56-4153b7ddb900" testName="FormEditFiltersMenuItemClick_IsStillDeclaredOnEfcFormController" computerName="<host>" duration="00:00:00.0004246" startTime="2026-08-27T21:29:57.5889776-04:00" endTime="2026-08-27T21:29:57.5889776-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e9ab853e-e9c8-48fe-8502-ec1f9d9e89a3" />
+    <UnitTestResult executionId="b5da51c4-4d3c-40d6-97d2-ffafd701d782" testId="1dbb61d6-a428-8d07-bdfa-48049e7f1e28" testName="ClaimsAltChord_WithAltF_ReturnsFalse" computerName="<host>" duration="00:00:00.0005456" startTime="2026-08-27T21:29:57.6709845-04:00" endTime="2026-08-27T21:29:57.6719908-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b5da51c4-4d3c-40d6-97d2-ffafd701d782" />
+    <UnitTestResult executionId="8f791b98-6631-48f0-a0da-11fc8691cac5" testId="18fe4a37-a25c-8377-9f10-474f51ba3709" testName="EditFiltersMenuItemClick_IsAbsentFromEfcViewerMetadata" computerName="<host>" duration="00:00:00.0038693" startTime="2026-08-27T21:29:57.5844671-04:00" endTime="2026-08-27T21:29:57.5889776-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8f791b98-6631-48f0-a0da-11fc8691cac5" />
+    <UnitTestResult executionId="c722aa69-ff35-4a87-b2ad-02094d151ca2" testId="1e97a8fe-cf88-8f33-bf3d-010a57c3f243" testName="SetControllerAndFormControllerField_AreAbsentFromEfcViewerMetadata" computerName="<host>" duration="00:00:00.0304409" startTime="2026-08-27T21:29:57.4373015-04:00" endTime="2026-08-27T21:29:57.5789383-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c722aa69-ff35-4a87-b2ad-02094d151ca2">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="2d220740-b258-452e-9dcd-cd208f54b261" testId="1c8816ff-344b-82cd-bd19-55e11259680d" testName="ClaimsAltChord_WithAltM_ReturnsFalse" computerName="<host>" duration="00:00:00.0000889" startTime="2026-08-27T21:29:57.6719908-04:00" endTime="2026-08-27T21:29:57.6719908-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2d220740-b258-452e-9dcd-cd208f54b261" />
+    <UnitTestResult executionId="c83276a4-a0c5-4180-91e8-b68c6297abdf" testId="1d613ffd-071e-8759-a53c-5e85f226d985" testName="ClaimsAltChord_WithBareAltAndHandler_ReturnsTrue" computerName="<host>" duration="00:00:00.0816041" startTime="2026-08-27T21:29:57.5889776-04:00" endTime="2026-08-27T21:29:57.6709845-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c83276a4-a0c5-4180-91e8-b68c6297abdf" />
+    <UnitTestResult executionId="cc7b524c-c3be-4e32-a8e7-a269419378ef" testId="1d7948a9-4bf3-8328-b0e2-852fd76262dc" testName="ClaimsAltChord_WithNullHandler_ReturnsFalse" computerName="<host>" duration="00:00:00.0000446" startTime="2026-08-27T21:29:57.6719908-04:00" endTime="2026-08-27T21:29:57.6749995-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cc7b524c-c3be-4e32-a8e7-a269419378ef" />
+    <UnitTestResult executionId="e10efc07-e869-4378-861a-8c50f70fd9d9" testId="161c698e-f59f-8d13-a190-7295a4fbf762" testName="ClaimsAltChord_WithNonAltChord_ReturnsFalse" computerName="<host>" duration="00:00:00.0000673" startTime="2026-08-27T21:29:57.6719908-04:00" endTime="2026-08-27T21:29:57.6719908-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e10efc07-e869-4378-861a-8c50f70fd9d9" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="ClaimsAltChord_WithNullHandler_ReturnsFalse" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d7948a9-4bf3-8328-b0e2-852fd76262dc">
+      <Execution id="cc7b524c-c3be-4e32-a8e7-a269419378ef" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcViewerTests" name="ClaimsAltChord_WithNullHandler_ReturnsFalse" />
+    </UnitTest>
+    <UnitTest name="EditFiltersMenuItemClick_IsAbsentFromEfcViewerMetadata" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="18fe4a37-a25c-8377-9f10-474f51ba3709">
+      <Execution id="8f791b98-6631-48f0-a0da-11fc8691cac5" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcViewerTests" name="EditFiltersMenuItemClick_IsAbsentFromEfcViewerMetadata" />
+    </UnitTest>
+    <UnitTest name="ClaimsAltChord_WithNonAltChord_ReturnsFalse" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="161c698e-f59f-8d13-a190-7295a4fbf762">
+      <Execution id="e10efc07-e869-4378-861a-8c50f70fd9d9" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcViewerTests" name="ClaimsAltChord_WithNonAltChord_ReturnsFalse" />
+    </UnitTest>
+    <UnitTest name="ClaimsAltChord_WithAltM_ReturnsFalse" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c8816ff-344b-82cd-bd19-55e11259680d">
+      <Execution id="2d220740-b258-452e-9dcd-cd208f54b261" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcViewerTests" name="ClaimsAltChord_WithAltM_ReturnsFalse" />
+    </UnitTest>
+    <UnitTest name="ClaimsAltChord_WithAltF_ReturnsFalse" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1dbb61d6-a428-8d07-bdfa-48049e7f1e28">
+      <Execution id="b5da51c4-4d3c-40d6-97d2-ffafd701d782" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcViewerTests" name="ClaimsAltChord_WithAltF_ReturnsFalse" />
+    </UnitTest>
+    <UnitTest name="ClaimsAltChord_WithBareAltAndHandler_ReturnsTrue" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d613ffd-071e-8759-a53c-5e85f226d985">
+      <Execution id="c83276a4-a0c5-4180-91e8-b68c6297abdf" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcViewerTests" name="ClaimsAltChord_WithBareAltAndHandler_ReturnsTrue" />
+    </UnitTest>
+    <UnitTest name="FormEditFiltersMenuItemClick_IsStillDeclaredOnEfcFormController" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1890617f-6733-8340-bd56-4153b7ddb900">
+      <Execution id="e9ab853e-e9c8-48fe-8502-ec1f9d9e89a3" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcViewerTests" name="FormEditFiltersMenuItemClick_IsStillDeclaredOnEfcFormController" />
+    </UnitTest>
+    <UnitTest name="SetControllerAndFormControllerField_AreAbsentFromEfcViewerMetadata" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e97a8fe-cf88-8f33-bf3d-010a57c3f243">
+      <Execution id="c722aa69-ff35-4a87-b2ad-02094d151ca2" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcViewerTests" name="SetControllerAndFormControllerField_AreAbsentFromEfcViewerMetadata" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1890617f-6733-8340-bd56-4153b7ddb900" executionId="e9ab853e-e9c8-48fe-8502-ec1f9d9e89a3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1dbb61d6-a428-8d07-bdfa-48049e7f1e28" executionId="b5da51c4-4d3c-40d6-97d2-ffafd701d782" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18fe4a37-a25c-8377-9f10-474f51ba3709" executionId="8f791b98-6631-48f0-a0da-11fc8691cac5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e97a8fe-cf88-8f33-bf3d-010a57c3f243" executionId="c722aa69-ff35-4a87-b2ad-02094d151ca2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c8816ff-344b-82cd-bd19-55e11259680d" executionId="2d220740-b258-452e-9dcd-cd208f54b261" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d613ffd-071e-8759-a53c-5e85f226d985" executionId="c83276a4-a0c5-4180-91e8-b68c6297abdf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d7948a9-4bf3-8328-b0e2-852fd76262dc" executionId="cc7b524c-c3be-4e32-a8e7-a269419378ef" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="161c698e-f59f-8d13-a190-7295a4fbf762" executionId="e10efc07-e869-4378-861a-8c50f70fd9d9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="8" executed="8" passed="8" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

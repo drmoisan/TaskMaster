@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="8ab28dcc-9524-44b4-8e2e-946c6b0f221d" name="&lt;user&gt;@&lt;host&gt; 2026-08-27 20:45:41" runUser="&lt;host&gt;\&lt;user&gt;" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T20:45:41.0640318-04:00" queuing="2026-08-27T20:45:41.0640318-04:00" start="2026-08-27T20:45:39.8480804-04:00" finish="2026-08-27T20:45:41.0790545-04:00" />
+  <TestSettings name="default" id="a0956381-3caf-4977-bcad-c3162254d349">
+    <Deployment runDeploymentRoot="&lt;user&gt;_&lt;host&gt;_2026-08-27_20_45_41" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="1ffd01c4-a6d0-4101-abea-337d677c3a70" testId="19cd7f5a-e67a-84d4-9eea-e72565a706b2" testName="ItemViewerExpanded_DeclaresNoParentChangedHandler" computerName="&lt;host&gt;" duration="00:00:00.0003479" startTime="2026-08-27T20:45:40.9151949-04:00" endTime="2026-08-27T20:45:40.9202014-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1ffd01c4-a6d0-4101-abea-337d677c3a70" />
+    <UnitTestResult executionId="4a9d161b-08fe-4e0a-998f-220ea04ae9c3" testId="1065859f-98c9-8f10-b4ef-1faad3929d2b" testName="ItemViewer_DeclaresNoParentChangedHandler" computerName="&lt;host&gt;" duration="00:00:00.0325088" startTime="2026-08-27T20:45:40.7679507-04:00" endTime="2026-08-27T20:45:40.9105414-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4a9d161b-08fe-4e0a-998f-220ea04ae9c3">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="ItemViewer_DeclaresNoParentChangedHandler" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1065859f-98c9-8f10-b4ef-1faad3929d2b">
+      <Execution id="4a9d161b-08fe-4e0a-998f-220ea04ae9c3" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbDropDownContractTests" name="ItemViewer_DeclaresNoParentChangedHandler" />
+    </UnitTest>
+    <UnitTest name="ItemViewerExpanded_DeclaresNoParentChangedHandler" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="19cd7f5a-e67a-84d4-9eea-e72565a706b2">
+      <Execution id="1ffd01c4-a6d0-4101-abea-337d677c3a70" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbDropDownContractTests" name="ItemViewerExpanded_DeclaresNoParentChangedHandler" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="19cd7f5a-e67a-84d4-9eea-e72565a706b2" executionId="1ffd01c4-a6d0-4101-abea-337d677c3a70" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1065859f-98c9-8f10-b4ef-1faad3929d2b" executionId="4a9d161b-08fe-4e0a-998f-220ea04ae9c3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="2" executed="2" passed="2" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+</TestRun>

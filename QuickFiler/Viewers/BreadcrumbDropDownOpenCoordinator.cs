@@ -25,7 +25,26 @@ namespace QuickFiler.Viewers
         private Func<Rectangle> _workingArea;
         private Task<bool>? _currentOpenTask;
         private int _generation;
-        private bool _closePending;
+
+        /// <summary>
+        /// Issue #462 (I-462.1): true only while <c>_host.Close(reason)</c> is executing, i.e. a close
+        /// is in flight on this coordinator. It is cleared in a <c>finally</c> around that call, so it
+        /// reads <c>false</c> on every exit from <see cref="CloseCore"/> — success, not-closed, throw,
+        /// and released. Its sole purpose is to suppress a concurrent second close of the same
+        /// in-flight operation; it must never outlive the call.
+        /// </summary>
+        private bool _closeInFlight;
+
+        /// <summary>
+        /// Issue #462 (I-462.1): true after a close that returned <c>true</c>, i.e. the host has been
+        /// closed and no reopen has been requested since. It suppresses a repeated close of an
+        /// already-closed host (I-462.3), and is cleared by <see cref="RequestOpen"/> and by
+        /// <c>Invalidate</c>. Separating it from <see cref="_closeInFlight"/> is what lets a
+        /// legitimate reopen through while still suppressing the repeated close: the single close flag
+        /// these two replace was doing both jobs at once and could not distinguish them.
+        /// </summary>
+        private bool _closeCompleted;
+
         private bool _released;
         private bool _nextOpenTakesNoFocus;
 
@@ -90,9 +109,9 @@ namespace QuickFiler.Viewers
                     return ClosedTask;
                 if (_currentOpenTask != null && !_currentOpenTask.IsCompleted)
                     return _currentOpenTask;
-                if (_closePending && _host.IsOpen)
+                if (_closeInFlight && _host.IsOpen)
                     return ClosedTask;
-                _closePending = false;
+                _closeCompleted = false;
                 _currentOpenTask = OpenCoreAsync(_generation);
                 return _currentOpenTask;
             }
@@ -280,42 +299,46 @@ namespace QuickFiler.Viewers
             }
         }
 
+        /// <summary>
+        /// Issue #462: the guard order is released, then in-flight, then completed. The two flags have
+        /// distinct meanings (see <see cref="_closeInFlight"/> and <see cref="_closeCompleted"/>), and
+        /// <see cref="_closeInFlight"/> is cleared in a <c>finally</c> so it reads <c>false</c> on the
+        /// success, not-closed, throw and released exits alike (I-462.1).
+        /// </summary>
         private bool CloseCore(BreadcrumbDropDownCloseReason reason)
         {
             lock (_sync)
             {
                 if (_released)
                     return false;
-                if (_closePending)
+                if (_closeInFlight)
                     return true;
-                _closePending = true;
+                if (_closeCompleted)
+                    return true;
+                _closeInFlight = true;
             }
             bool closed;
             try
             {
                 closed = _host.Close(reason);
             }
-            catch
+            finally
             {
-                ClearClosePending();
-                throw;
+                lock (_sync)
+                    _closeInFlight = false;
             }
             if (closed)
             {
                 lock (_sync)
+                {
                     _generation++;
+                    _closeCompleted = true;
+                }
                 return true;
             }
-            ClearClosePending();
             if (reason == BreadcrumbDropDownCloseReason.Uncommitted && _isSelectorOpen())
                 _cancelSelector();
             return false;
-        }
-
-        private void ClearClosePending()
-        {
-            lock (_sync)
-                _closePending = false;
         }
 
         private bool Invalidate(bool release)
@@ -326,7 +349,7 @@ namespace QuickFiler.Viewers
                     return false;
                 _generation++;
                 _currentOpenTask = null;
-                _closePending = false;
+                _closeCompleted = false;
                 _released = release;
                 return true;
             }

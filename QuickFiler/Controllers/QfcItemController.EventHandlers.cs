@@ -219,5 +219,10 @@ namespace QuickFiler.Controllers
         {
             _optionAttachments = _itemViewer.AttachmentsChecked;
         }
+
+        private void CbxPictures_CheckedChanged(object sender, EventArgs e)
+        {
+            _optionsPictures = _itemViewer.PicturesChecked;
+        }
     }
 }

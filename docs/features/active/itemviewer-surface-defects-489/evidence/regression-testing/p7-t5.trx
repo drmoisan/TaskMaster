@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="a2380a97-d9b0-453f-8960-c86c403931a2" name="&lt;user&gt;@&lt;host&gt; 2026-08-27 21:16:57" runUser="&lt;host&gt;\&lt;user&gt;" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T21:16:57.4660117-04:00" queuing="2026-08-27T21:16:57.4660117-04:00" start="2026-08-27T21:16:56.2389780-04:00" finish="2026-08-27T21:16:57.4831165-04:00" />
+  <TestSettings name="default" id="17cc0bd3-b7ba-49dc-a902-c5704d974d82">
+    <Deployment runDeploymentRoot="&lt;user&gt;_&lt;host&gt;_2026-08-27_21_16_57" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="106e10ea-5336-4e54-8c89-a883f97a0d9e" testId="129e0d61-67d3-8f11-9511-bccc69c4d7cc" testName="IItemViewer_DeclaresAddFolderItemsAndNotSetFolderItems" computerName="&lt;host&gt;" duration="00:00:00.1311653" startTime="2026-08-27T21:16:57.1524837-04:00" endTime="2026-08-27T21:16:57.3979967-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="106e10ea-5336-4e54-8c89-a883f97a0d9e">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Expected added not to be &lt;null&gt; because the additive folder-list member must be named for what it does.&#xD;
+Expected renamed to be &lt;null&gt; because the misleading SetFolderItems name must not survive the rename, but found IItemViewer.SetFolderItems.&#xD;
+</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.CollectingAssertionStrategy.ThrowIfAny(IDictionary`2 context) in /_/Src/FluentAssertions/Execution/CollectingAssertionStrategy.cs:line 49&#xD;
+   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbDropDownContractTests.IItemViewer_DeclaresAddFolderItemsAndNotSetFolderItems() in &lt;repo-root&gt;\QuickFiler.Test\Viewers\ItemViewerBreadcrumbDropDownContractTests.cs:line 304</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="63c15ca0-4b08-4a9b-8b1f-aa8c70921096" testId="1233e7d0-837b-85d6-a6a5-bb585447832c" testName="IItemViewer_FocusSubjectReturnsBool" computerName="&lt;host&gt;" duration="00:00:00.0012661" startTime="2026-08-27T21:16:57.4040399-04:00" endTime="2026-08-27T21:16:57.4100593-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="63c15ca0-4b08-4a9b-8b1f-aa8c70921096">
+      <Output>
+        <ErrorInfo>
+          <Message>Expected type to be System.Boolean because a caller cannot observe a failed subject focus through a void member, but found System.Void.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Types.TypeAssertions.Be(Type expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Types/TypeAssertions.cs:line 67&#xD;
+   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbDropDownContractTests.IItemViewer_FocusSubjectReturnsBool() in &lt;repo-root&gt;\QuickFiler.Test\Viewers\ItemViewerBreadcrumbDropDownContractTests.cs:line 317</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="IItemViewer_DeclaresAddFolderItemsAndNotSetFolderItems" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="129e0d61-67d3-8f11-9511-bccc69c4d7cc">
+      <Execution id="106e10ea-5336-4e54-8c89-a883f97a0d9e" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbDropDownContractTests" name="IItemViewer_DeclaresAddFolderItemsAndNotSetFolderItems" />
+    </UnitTest>
+    <UnitTest name="IItemViewer_FocusSubjectReturnsBool" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1233e7d0-837b-85d6-a6a5-bb585447832c">
+      <Execution id="63c15ca0-4b08-4a9b-8b1f-aa8c70921096" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbDropDownContractTests" name="IItemViewer_FocusSubjectReturnsBool" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="129e0d61-67d3-8f11-9511-bccc69c4d7cc" executionId="106e10ea-5336-4e54-8c89-a883f97a0d9e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1233e7d0-837b-85d6-a6a5-bb585447832c" executionId="63c15ca0-4b08-4a9b-8b1f-aa8c70921096" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="2" executed="2" passed="0" failed="2" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+</TestRun>

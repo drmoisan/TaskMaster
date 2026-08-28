@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +24,12 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
     public sealed partial class FolderBreadcrumbBridgeRouterTests
     {
         private const string LeafPath = "\\Inbox\\Projects\\Apollo";
+
+        // The archive-relative form the QuickFiler surface presents for the same folder.
+        private const string StemPath = "Projects\\Apollo";
+
+        // Full path of the PARENT node's first immediate subfolder (#440 descent target).
+        private const string MidChildPath = "\\Inbox\\Projects\\Alpha";
 
         private static readonly FolderTreeNodeKey RootKey = Key("root", "\\Inbox");
         private static readonly FolderTreeNodeKey MidKey = Key("mid", "\\Inbox\\Projects");
@@ -82,6 +88,92 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             await router.SetSuggestionsAsync(new[] { suggestion }, CancellationToken.None);
             router.SelectRow(0);
             return router;
+        }
+
+        /// <summary>
+        /// A strict provider set up for the presented archive-relative stem only: any call with a
+        /// different path form is an unmatched strict invocation and throws, so the test cannot pass
+        /// by resolving the wrong value.
+        /// </summary>
+        private static Mock<IFolderHierarchyProvider> StemProviderMock()
+        {
+            var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+            provider
+                .Setup(p => p.ResolveLeafKeyAsync(StemPath, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(LeafKey);
+            provider
+                .Setup(p => p.GetAncestorChainAsync(LeafKey, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(LeafChain());
+            return provider;
+        }
+
+        // --- Qfc ancestor-chain prerequisite (#440) ---
+
+        /// <summary>
+        /// With the decision-D5 provider resolution in place, a Qfc suggestion row presenting an
+        /// archive-relative stem resolves to a multi-segment ancestor chain in root-to-leaf order,
+        /// which is what gives Left and Right a parent to navigate to.
+        /// </summary>
+        [TestMethod]
+        public async Task SetSuggestionsAsync_StrictProvider_ResolvesMultiSegmentChain()
+        {
+            // Arrange
+            var provider = StemProviderMock();
+            var router = new FolderBreadcrumbBridgeRouter(provider.Object);
+            var suggestion = new FolderRow(
+                StemPath,
+                FolderRowKind.Suggestion,
+                new FolderScore(StemPath, 1000, 0.73)
+            );
+
+            // Act
+            await router.SetSuggestionsAsync(new[] { suggestion }, CancellationToken.None);
+
+            // Assert: a resolved suggestion row, not the single-segment scored fallback.
+            var row = router.Model.Rows[0];
+            row.IsSuggestion.Should()
+                .BeTrue("the stem resolved, so the row is no longer a fallback");
+            row.Chain.Count.Should().BeGreaterThan(1, "navigation needs a parent segment");
+            row.Chain[0].DisplayName.Should().Be("Inbox");
+            row.Chain[1].DisplayName.Should().Be("Projects");
+            row.Chain[row.Chain.Count - 1].DisplayName.Should().Be("Apollo");
+            provider.Verify(
+                p => p.ResolveLeafKeyAsync(StemPath, It.IsAny<CancellationToken>()),
+                Times.Once
+            );
+        }
+
+        /// <summary>
+        /// Decision D7: resolving the chain must not change what the row files into. The leaf
+        /// segment of the resolved chain carries the store-qualified path, but the selected-folder
+        /// value must remain the presented archive-relative stem, which is the value the QuickFiler
+        /// filing path consumes.
+        /// </summary>
+        [TestMethod]
+        public async Task SelectedFolder_ChainResolvedToFullPath_RemainsPresentedStem()
+        {
+            // Arrange: the strict provider resolves the stem to a chain whose leaf carries the full
+            // store-qualified path "\Inbox\Projects\Apollo".
+            var provider = StemProviderMock();
+            var router = new FolderBreadcrumbBridgeRouter(provider.Object);
+            var suggestion = new FolderRow(
+                StemPath,
+                FolderRowKind.Suggestion,
+                new FolderScore(StemPath, 1000, 0.73)
+            );
+            await router.SetSuggestionsAsync(new[] { suggestion }, CancellationToken.None);
+
+            // Act
+            router.SelectRow(0);
+
+            // Assert
+            router
+                .GetSelectedFolder()
+                .Should()
+                .Be(
+                    StemPath,
+                    "the filing target is the presented stem, not the resolved leaf path"
+                );
         }
 
         // --- Positive routing ---
@@ -275,8 +367,13 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         [TestMethod]
         public async Task Route_LeftArrow_NothingToCollapse_ReportsUnhandledLeft()
         {
-            // Arrange
+            // Arrange: the first Left consumes the one available #440 parent-select transition,
+            // after which nothing remains to collapse and no further tree transition applies.
             var router = await PopulatedRouterAsync(ProviderMock());
+            await router.RouteAsync(
+                "{\"type\":\"arrowKey\",\"direction\":\"left\"}",
+                CancellationToken.None
+            );
 
             // Act
             var outputs = await router.RouteAsync(
@@ -309,6 +406,90 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
                 .Theme.Should()
                 .Be("dark");
             BreadcrumbBridgeSerializer.Parse(outputs[1]).Should().BeOfType<RenderMessage>();
+        }
+
+        // --- #440 Qfc router tree navigation ---
+
+        /// <summary>
+        /// A strict provider that serves the immediate subfolders of the PARENT node only. A fetch
+        /// keyed on the leaf is an unmatched strict invocation, so the test cannot pass while the
+        /// router still expands the leaf instead of the selected node.
+        /// </summary>
+        private static Mock<IFolderHierarchyProvider> ParentSubfolderProviderMock()
+        {
+            var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+            provider
+                .Setup(p => p.ResolveLeafKeyAsync(LeafPath, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(LeafKey);
+            provider
+                .Setup(p => p.GetAncestorChainAsync(LeafKey, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(LeafChain());
+            provider
+                .Setup(p => p.GetImmediateSubfoldersAsync(MidKey, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[] { Segment(Key("m1", MidChildPath), "Alpha", false) });
+            return provider;
+        }
+
+        private static Task<IReadOnlyList<string>> ArrowAsync(
+            FolderBreadcrumbBridgeRouter router,
+            string direction
+        ) =>
+            router.RouteAsync(
+                "{\"type\":\"arrowKey\",\"direction\":\"" + direction + "\"}",
+                CancellationToken.None
+            );
+
+        /// <summary>
+        /// #440 Qfc Left is routed as the parent-select tree transition rather than reported as an
+        /// unhandled arrow, and the node the router subsequently expands is the parent.
+        /// </summary>
+        [TestMethod]
+        public async Task ArrowAsync_QfcLeftOnMultiSegmentRow_RoutesParentSelectTransition()
+        {
+            // Arrange
+            var provider = ParentSubfolderProviderMock();
+            var router = await PopulatedRouterAsync(provider);
+
+            // Act
+            var left = await ArrowAsync(router, "left");
+            var right = await ArrowAsync(router, "right");
+
+            // Assert: Left produced a render, not an unhandled-arrow fall-through.
+            left.Should().ContainSingle();
+            BreadcrumbBridgeSerializer.Parse(left[0]).Should().BeOfType<RenderMessage>();
+
+            // Assert: the expansion that follows is keyed on the selected PARENT node.
+            provider.Verify(
+                p => p.GetImmediateSubfoldersAsync(MidKey, It.IsAny<CancellationToken>()),
+                Times.Once()
+            );
+            right.Should().HaveCount(2);
+            BreadcrumbBridgeSerializer
+                .Parse(right[1])
+                .Should()
+                .BeOfType<SubfolderResponseMessage>();
+        }
+
+        /// <summary>
+        /// #440 Qfc Right on the already-expanded selected parent node descends into child index 0,
+        /// which the router reports through the selected-folder value of its render payload.
+        /// </summary>
+        [TestMethod]
+        public async Task ArrowAsync_QfcRightOnSelectedParentNode_RoutesChildExpansion()
+        {
+            // Arrange: select the parent node and expand it.
+            var provider = ParentSubfolderProviderMock();
+            var router = await PopulatedRouterAsync(provider);
+            await ArrowAsync(router, "left");
+            await ArrowAsync(router, "right");
+
+            // Act
+            var outputs = await ArrowAsync(router, "right");
+
+            // Assert
+            outputs.Should().ContainSingle();
+            BreadcrumbBridgeSerializer.Parse(outputs[0]).Should().BeOfType<RenderMessage>();
+            router.GetSelectedFolder().Should().Be(MidChildPath);
         }
     }
 }

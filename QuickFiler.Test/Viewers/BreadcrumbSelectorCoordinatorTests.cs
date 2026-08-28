@@ -17,6 +17,7 @@ namespace QuickFiler.Test.Viewers
     {
         private const string AIdentity = "plain:0:A";
         private const string BIdentity = "plain:2:B";
+        private const string Render = "{\"type\":\"render\",\"rows\":[]}";
 
         [TestMethod]
         public void ClosedDown_CommitsNextSelectableAndRaisesOneSelection()
@@ -190,6 +191,71 @@ namespace QuickFiler.Test.Viewers
             postObservedLockHeld.Should().BeFalse();
             selectionObservedLockHeld.Should().BeFalse();
         }
+
+        /// <summary>
+        /// Issue #500 (I-500.2): a surface's <c>PostJson</c> must not be invoked while
+        /// <c>BreadcrumbMessengerHub._sync</c> is held. Uses the <c>Monitor.IsEntered</c> template this
+        /// file owns; one thread, no timer, no wait.
+        /// </summary>
+        [TestMethod]
+        public void PostJson_SurfaceInvocationRunsAfterHubLockIsReleased()
+        {
+            using (var hub = new BreadcrumbMessengerHub())
+            {
+                object hubSync = HubSync(hub);
+                var surface = new Mock<IWebViewMessenger>();
+                bool held = false;
+                surface
+                    .Setup(value => value.PostJson(It.IsAny<string>()))
+                    .Callback(() => held |= Monitor.IsEntered(hubSync));
+                hub.Attach(surface.Object, BreadcrumbSelectorViewMode.Collapsed);
+
+                hub.PostJson(Render);
+                surface.Verify(value => value.PostJson(It.IsAny<string>()), Times.Once());
+                held.Should().BeFalse("no surface call may run under the hub's _sync (I-500.2)");
+            }
+        }
+
+        /// <summary>
+        /// Issue #500 (I-500.4): a re-entrant <c>Attach</c> from inside a surface's <c>PostJson</c> must
+        /// not throw <c>InvalidOperationException: Collection was modified</c>, and must take effect.
+        /// Before the fix the broadcast enumerated the live dictionary under the hub monitor. Driven by
+        /// an injected callback on one thread; no second thread, no wait.
+        /// </summary>
+        [TestMethod]
+        public void PostJson_ReentrantAttachFromSurfaceDoesNotThrowCollectionModified()
+        {
+            using (var hub = new BreadcrumbMessengerHub())
+            {
+                var other = new Mock<IWebViewMessenger>();
+                var surface = new Mock<IWebViewMessenger>();
+                bool attached = false;
+                bool reentered = false;
+                surface
+                    .Setup(value => value.PostJson(It.IsAny<string>()))
+                    .Callback(() =>
+                    {
+                        if (reentered)
+                            return;
+                        reentered = true;
+                        attached = hub.Attach(other.Object, BreadcrumbSelectorViewMode.Expanded);
+                    });
+                hub.Attach(surface.Object, BreadcrumbSelectorViewMode.Collapsed);
+
+                Action post = () => hub.PostJson(Render);
+
+                post.Should()
+                    .NotThrow<InvalidOperationException>(
+                        "a re-entrant Attach must not invalidate the broadcast enumeration"
+                    );
+                attached.Should().BeTrue("the re-entrant attach must take effect (I-500.4)");
+            }
+        }
+
+        private static object HubSync(BreadcrumbMessengerHub hub) =>
+            typeof(BreadcrumbMessengerHub)
+                .GetField("_sync", BindingFlags.Instance | BindingFlags.NonPublic)
+                .GetValue(hub);
 
         [TestMethod]
         public void SelectorView_ContainsRowAlignedStableIdentityAndSelectabilityOptions()

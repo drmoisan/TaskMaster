@@ -124,6 +124,10 @@ namespace QuickFiler.Controllers
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
         );
 
+        /// <summary>Fault-boundary sink; an injectable seam over the static logger above.</summary>
+        internal System.Action<string, System.Exception> BoundaryErrorSink { get; set; } =
+            (message, exception) => logger.Error(message, exception);
+
         private IApplicationGlobals _globals;
         private System.Action _parentCleanup;
         private EfcDataModel _dataModel;
@@ -184,13 +188,26 @@ namespace QuickFiler.Controllers
             _formViewer.Size = _formViewer.MinimumSize;
         }
 
+        /// <summary>Releases collaborators. Safe on a partial controller and idempotent.</summary>
         public void Cleanup()
         {
-            _globals.Ol.PropertyChanged -= DarkMode_Changed;
+            // Detach before nulling: release the subscription before dropping its owner.
+            var globals = _globals;
+            if (globals?.Ol is not null)
+            {
+                globals.Ol.PropertyChanged -= DarkMode_Changed;
+            }
             _globals = null;
             _formViewer = null;
             _dataModel = null;
-            _parentCleanup.Invoke();
+
+            // Clearing before invoking is what makes the single invocation structural.
+            var parentCleanup = _parentCleanup;
+            _parentCleanup = null;
+            if (parentCleanup is not null)
+            {
+                parentCleanup.Invoke();
+            }
         }
 
         public void ConfigureFind()
@@ -252,7 +269,12 @@ namespace QuickFiler.Controllers
         private string _activeTheme;
         public string ActiveTheme
         {
-            get => Initializer.GetOrLoad(ref _activeTheme, LoadTheme, strict: true, _themes);
+            // GetOrLoad throws under strict: true once _themes is null, so test at the call
+            // site and return the backing field on the torn-down path.
+            get =>
+                _themes is null
+                    ? _activeTheme
+                    : Initializer.GetOrLoad(ref _activeTheme, LoadTheme, strict: true, _themes);
             set =>
                 Initializer.SetAndSave<string>(
                     ref _activeTheme,
@@ -264,21 +286,28 @@ namespace QuickFiler.Controllers
         internal string LoadTheme()
         {
             var activeTheme = DarkMode ? "DarkNormal" : "LightNormal";
-            _themes[activeTheme].SetTheme();
+            if (_themes is not null && _themes.ContainsKey(activeTheme))
+            {
+                _themes[activeTheme].SetTheme();
+            }
             return activeTheme;
         }
 
         private bool _darkMode;
         public bool DarkMode
         {
+            // The params object[] dependency array is materialised before GetOrLoad is entered,
+            // so _globals.Ol must be tested at the call site or the null path still dereferences.
             get =>
-                Initializer.GetOrLoad(
-                    ref _darkMode,
-                    () => _globals.Ol.DarkMode,
-                    false,
-                    _globals,
-                    _globals.Ol
-                );
+                _globals?.Ol is null
+                    ? _darkMode
+                    : Initializer.GetOrLoad(
+                        ref _darkMode,
+                        () => _globals.Ol.DarkMode,
+                        false,
+                        _globals,
+                        _globals.Ol
+                    );
             set => Initializer.SetAndSave(ref _darkMode, value, (x) => _globals.Ol.DarkMode = x);
         }
 
@@ -410,7 +439,10 @@ namespace QuickFiler.Controllers
             }
         }
 
-        public async void ButtonCancel_Click(object sender, EventArgs e)
+        public async void ButtonCancel_Click(object sender, EventArgs e) =>
+            await ButtonCancelClickAsync();
+
+        internal async Task ButtonCancelClickAsync()
         {
             try
             {
@@ -421,12 +453,13 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                logger.Error(ex.Message, ex);
-                throw;
+                BoundaryErrorSink(ex.Message, ex);
             }
         }
 
-        public async void ButtonOK_Click(object sender, EventArgs e)
+        public async void ButtonOK_Click(object sender, EventArgs e) => await ButtonOkClickAsync();
+
+        internal async Task ButtonOkClickAsync()
         {
             try
             {
@@ -437,12 +470,14 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                logger.Error(ex.Message, ex);
-                throw;
+                BoundaryErrorSink(ex.Message, ex);
             }
         }
 
-        public async void ButtonRefresh_Click(object sender, EventArgs e)
+        public async void ButtonRefresh_Click(object sender, EventArgs e) =>
+            await ButtonRefreshClickAsync();
+
+        internal async Task ButtonRefreshClickAsync()
         {
             try
             {
@@ -453,12 +488,14 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                logger.Error(ex.Message, ex);
-                throw;
+                BoundaryErrorSink(ex.Message, ex);
             }
         }
 
-        public async void ButtonCreate_Click(object sender, EventArgs e)
+        public async void ButtonCreate_Click(object sender, EventArgs e) =>
+            await ButtonCreateClickAsync();
+
+        internal async Task ButtonCreateClickAsync()
         {
             try
             {
@@ -513,12 +550,14 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                logger.Error(ex.Message, ex);
-                throw;
+                BoundaryErrorSink(ex.Message, ex);
             }
         }
 
-        public async void ButtonDelete_Click(object sender, EventArgs e)
+        public async void ButtonDelete_Click(object sender, EventArgs e) =>
+            await ButtonDeleteClickAsync();
+
+        internal async Task ButtonDeleteClickAsync()
         {
             try
             {
@@ -526,8 +565,7 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                logger.Error(ex.Message, ex);
-                throw;
+                BoundaryErrorSink(ex.Message, ex);
             }
         }
 
@@ -553,7 +591,7 @@ namespace QuickFiler.Controllers
 
         private void SearchText_TextChanged(object sender, EventArgs e)
         {
-            BindFolderRows(_dataModel.FindMatches(_formViewer.SearchText.Text));
+            BindSourceFolderRows(_dataModel.FindMatches(_formViewer.SearchText.Text));
         }
 
         public void EditFiltersMenuItem_Click(object sender, EventArgs e)
@@ -703,7 +741,12 @@ namespace QuickFiler.Controllers
                 SynchronizationContext.SetSynchronizationContext(_formViewer.UiSyncContext);
 
             var selectedFolder = SelectedFolder;
-            if (!EfcSelectionGuard.IsValidFilingSelection(selectedFolder))
+            // Classifies through the single owner and retains #614's rooted-path rejection.
+            if (
+                selectedFolder is null
+                || IsBannerRow(selectedFolder)
+                || !EfcSelectionGuard.IsValidFilingSelection(selectedFolder)
+            )
             {
                 MessageBox.Show("Please select a valid folder.");
                 return;
@@ -737,14 +780,36 @@ namespace QuickFiler.Controllers
             Cleanup();
         }
 
+        /// <summary>The pseudo-row that marks the delete target.</summary>
+        internal const string TrashRowText = "Trash to Delete";
+
+        /// <summary>Prepends the trash pseudo-row, idempotently.</summary>
+        internal static string[] WithTrashRow(string[] rows)
+        {
+            if (rows is null)
+            {
+                return new[] { TrashRowText };
+            }
+            if (rows.Length > 0 && rows[0] == TrashRowText)
+            {
+                return rows;
+            }
+            var itemList = rows.ToList();
+            itemList.Insert(0, TrashRowText);
+            return itemList.ToArray();
+        }
+
+        /// <summary>Retains the delete-gesture rows, then binds them.</summary>
+        internal void ApplyDeleteGesture()
+        {
+            _folderRows = WithTrashRow(_folderRows);
+            BindFolderRows(_folderRows);
+        }
+
         public async Task ActionDeleteAsync()
         {
             await _formViewer.UiSyncContext;
-            // Prepend the "Trash to Delete" pseudo-row to the current presented rows and rebind, so the
-            // user can select it as the delete target (preserving the pre-TreeListView delete path).
-            var itemList = _folderRows.ToList();
-            itemList.Insert(0, "Trash to Delete");
-            BindFolderRows(itemList.ToArray());
+            ApplyDeleteGesture();
         }
 
         public async Task CreateFolderAsync()
@@ -792,15 +857,34 @@ namespace QuickFiler.Controllers
             }
         }
 
+        /// <summary>Applies a match delegate to a search string; never returns null.</summary>
+        internal static string[] MatchesForSearchText(
+            System.Func<string, string[]> findMatches,
+            string searchText
+        )
+        {
+            if (findMatches is null)
+            {
+                return Array.Empty<string>();
+            }
+            return findMatches(searchText ?? string.Empty) ?? Array.Empty<string>();
+        }
+
+        /// <summary>
+        /// #465 B (RC8): the control read happens here, on the UI thread, before any
+        /// <c>Task.Run</c>, carrying an unchanged value into the worker.
+        /// </summary>
         public async Task RefreshSuggestionsAsync()
         {
+            var searchText = _formViewer.SearchText.Text;
+
             await Task.Run(() => _dataModel.RefreshSuggestions(), Token);
             var matches = await Task.Run(
-                () => _dataModel.FindMatches(_formViewer.SearchText.Text),
+                () => MatchesForSearchText(_dataModel.FindMatches, searchText),
                 Token
             );
 
-            BindFolderRows(matches);
+            BindSourceFolderRows(matches);
         }
 
         #endregion
@@ -865,9 +949,8 @@ namespace QuickFiler.Controllers
             }
         }
 
-        // Routes the presented rows through the breadcrumb router (delete-path trash rebind,
-        // RefreshSuggestionsAsync, and SearchText_TextChanged all land here). Uses a local viewer
-        // reference so a concurrent Cleanup() cannot cause a NullReferenceException.
+        // Presentation only. #465 C (RC9) removed the _folderRows write-back: neither assigns
+        // nor reads the field.
         private void BindFolderRows(string[] rows)
         {
             var formViewer = _formViewer;
@@ -876,8 +959,21 @@ namespace QuickFiler.Controllers
                 return;
             }
 
+            _ = BindBreadcrumbRowsAsync(rows ?? Array.Empty<string>());
+        }
+
+        // Retention plus presentation for the three source paths; retaining here rather than in
+        // BindFolderRows is what stops the delete gesture accumulating.
+        private void BindSourceFolderRows(string[] rows)
+        {
+            var formViewer = _formViewer;
+            if (formViewer == null || _router == null)
+            {
+                return;
+            }
+
             _folderRows = rows ?? Array.Empty<string>();
-            _ = BindBreadcrumbRowsAsync(_folderRows);
+            BindFolderRows(_folderRows);
         }
 
         // Async bind boundary: joins the feature-324 score projection and delegates to the router.
@@ -1019,24 +1115,44 @@ namespace QuickFiler.Controllers
             _formViewer.ConversationMenuItem.Checked = _moveConversation;
         }
 
+        /// <summary>#464 C: both call sites discard the result, so the boundary is here.</summary>
         public async Task PopulateFolderCombobox(object folderList = null)
         {
-            // Capture _formViewer in a local variable before the first await. Cleanup() may set
-            // _formViewer to null while InitFolderHandlerAsync is executing (e.g. the user
-            // dismisses the form), so all post-await access must go through this local reference.
-            var formViewer = _formViewer;
-            if (formViewer == null)
-                return;
+            try
+            {
+                // Capture _formViewer in a local variable before the first await. Cleanup() may set
+                // _formViewer to null while InitFolderHandlerAsync is executing (e.g. the user
+                // dismisses the form), so all post-await access must go through this local reference.
+                var formViewer = _formViewer;
+                if (formViewer == null)
+                    return;
 
-            await _dataModel.InitFolderHandlerAsync(folderList);
+                await _dataModel.InitFolderHandlerAsync(folderList);
 
-            await formViewer.UiSyncContext;
+                await formViewer.UiSyncContext;
 
-            BindFolderRows(_dataModel.FolderHelper.FolderArray);
+                BindSourceFolderRows(_dataModel.FolderHelper.FolderArray);
+            }
+            catch (System.Exception ex)
+            {
+                BoundaryErrorSink(ex.Message, ex);
+            }
         }
 
-        internal bool IsValidSelection =>
-            EfcSelectionGuard.IsValidCreationSelection(SelectedFolder);
+        // #465 D (RC7): single classification owner. StartsWith, never Substring, over the
+        internal static bool IsBannerRow(string row) =>
+            row is not null
+            && row.StartsWith(
+                UtilitiesCS.OutlookObjects.Folder.BreadcrumbRowBuilder.BannerPrefix,
+                StringComparison.Ordinal
+            );
+
+        // The rest of IsValidSelection's pure logic, routed through the owner above.
+        internal static bool IsSelectableFolder(string selectedFolder) =>
+            !IsBannerRow(selectedFolder)
+            && EfcSelectionGuard.IsValidCreationSelection(selectedFolder);
+
+        internal bool IsValidSelection => IsSelectableFolder(SelectedFolder);
 
         #endregion
 

@@ -116,6 +116,18 @@ namespace QuickFiler.Viewers
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// Issues #500 (I-500.2, I-500.4) and #501 (I-501.1 to I-501.4) are ONE edit: containing a
+        /// surface throw inside the lock would leave I-500.2 unsatisfied, and narrowing the lock without
+        /// containment would leave I-501.1 unsatisfied. The cache write stays INSIDE the lock and before
+        /// the broadcast — once the broadcast is contained every live surface receives the message, so
+        /// the cache's claim is true for all of them, and the surface that threw is stale by its own
+        /// failure (I-501.3). The snapshot is what makes a re-entrant <c>Attach</c>/<c>Detach</c> from a
+        /// surface callback safe: mutating the live dictionary cannot invalidate it (I-500.4). Per SR-3
+        /// a surface throw is logged and swallowed, not propagated; the <see cref="ArgumentNullException"/>
+        /// on a null <paramref name="json"/> and the <see cref="ObjectDisposedException"/> from
+        /// <c>ThrowIfDisposed</c> are preserved.
+        /// </remarks>
         public void PostJson(string json)
         {
             if (json == null)
@@ -123,14 +135,36 @@ namespace QuickFiler.Viewers
                 throw new ArgumentNullException(nameof(json));
             }
 
+            string? type;
+            Attachment[] snapshot;
             lock (_sync)
             {
                 ThrowIfDisposed();
-                string? type = MessageType(json);
+                type = MessageType(json);
                 CacheState(type, json);
-                foreach (Attachment attachment in _attachments.Values)
+                snapshot = _attachments.Values.ToArray();
+            }
+            Broadcast(snapshot, json, type);
+        }
+
+        /// <summary>
+        /// Delivers one payload to every attachment in <paramref name="snapshot"/>, outside
+        /// <c>_sync</c>, making exactly one attempt per attachment regardless of earlier failures
+        /// (I-501.1) and logging each failure rather than discarding it (I-501.4).
+        /// </summary>
+        private static void Broadcast(Attachment[] snapshot, string json, string? type)
+        {
+            foreach (Attachment attachment in snapshot)
+            {
+                try
                 {
                     PostToSurface(attachment, json, type);
+                }
+                catch (Exception exception)
+                {
+                    log4net
+                        .LogManager.GetLogger(typeof(BreadcrumbMessengerHub))
+                        .Error("Breadcrumb surface delivery failed.", exception);
                 }
             }
         }

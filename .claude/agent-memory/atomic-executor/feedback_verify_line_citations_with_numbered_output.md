@@ -29,3 +29,34 @@ line citation against line-numbered output before asserting it."
   numbered read is far below the cost of a corrupted plan revision cycle.
 - Related: [[project_418_plan_rationale_clauses_are_evidence]] — unmeasured world-state claims in
   plan prose are the other recurring source of preflight churn.
+
+## Corollary: never assert a file LOCATION you have not listed (#498 preflight cycle 2)
+
+The same rule governs *where* a file lives, not only which line. In #498 preflight cycle 2 I
+reported that the CSharpier tool manifest is at `.config/dotnet-tools.json` and asked the planner
+to "correct" a plan sentence that was already right. `.config/` does not exist in this repository
+at all; the manifest is at the repo root as `dotnet-tools.json` with `"isRoot": true`, which
+CLAUDE.md also states. The planner independently verified and correctly REJECTED the observation.
+
+**How to apply:** before writing "the file is at X", run `ls X` or `find . -maxdepth 2 -name <f>`.
+Ecosystem defaults are the trap — `.config/dotnet-tools.json` is the .NET convention and this repo
+deviates from it. A plausible-by-convention location is a hypothesis, not a fact. (Re-confirmed
+independently during #488 preflight round 2: still root-level, still no `.config/`.)
+
+## Corollary: verify the citation ANCHOR SHA, not only the numbers (#488 preflight round 2)
+
+A plan that declares "line citations are anchored to `<SHA>`" is making a second, separate claim
+that is easy to miss once the numbers themselves check out. In #488 the plan anchored to the
+then-tip-of-main `988e819b`, but the branch had advanced to `0a6aaa31`, and in between
+`QuickFiler.Test/QuickFiler.Test.csproj` gained one `<Compile Include>` line near the top. Every
+citation below that insertion shifted by one: the plan's `line 82` and `467-471` were correct at
+HEAD (where the executor works) and off by one at the declared anchor. Round 1 verified the
+numbers against HEAD and passed them, without noticing the anchor label had gone stale.
+
+**How to apply:**
+- Run `git merge-base --is-ancestor <ANCHOR> HEAD` and then `git diff --name-only <ANCHOR> HEAD`,
+  and intersect that list with every file the plan cites by line. A hit means the anchor is
+  load-bearing and must be re-derived or re-labelled.
+- The *numbers* being right at HEAD does not clear the *anchor*; an executor told to resolve
+  against the anchor will mislocate. Re-anchor to the current branch HEAD and say so.
+- Cheap and mechanical — do it once per preflight round, before checking any individual citation.

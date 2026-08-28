@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="e7d45fe7-7221-4211-96eb-e1a7eca5dc54" name="<account>@<host> 2026-08-27 16:37:14" runUser="Megalodon4\<account>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T16:37:14.7342861-04:00" queuing="2026-08-27T16:37:14.7342861-04:00" start="2026-08-27T16:37:13.4610270-04:00" finish="2026-08-27T16:37:15.9853668-04:00" />
+  <TestSettings name="default" id="babc5b11-1596-41c8-bd3d-9e0681a2fe4c">
+    <Deployment runDeploymentRoot="<account>_<host>_2026-08-27_16_37_14" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="e8355626-408c-48a1-ac89-e187a038cd08" testId="1416c6bb-2748-805d-b97b-159c8a72531b" testName="SetTheme_PostsThemeChangeMessage" computerName="<host>" duration="00:00:00.0011432" startTime="2026-08-27T16:37:14.8211555-04:00" endTime="2026-08-27T16:37:14.8221548-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e8355626-408c-48a1-ac89-e187a038cd08" />
+    <UnitTestResult executionId="895c5a0d-cc62-423c-a6c0-20383439973f" testId="17f45e05-3a26-833a-af06-bec9bdf0fdf3" testName="AddItems_InvalidatesLateUpgradeBeforeDuplicatePost" computerName="<host>" duration="00:00:00.0015561" startTime="2026-08-27T16:37:15.5703505-04:00" endTime="2026-08-27T16:37:15.5713613-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="895c5a0d-cc62-423c-a6c0-20383439973f" />
+    <UnitTestResult executionId="6c33d380-f268-4c44-a9b5-695625462581" testId="17f33569-4c48-84d7-a7ab-58b979c9056a" testName="DisposedCoordinator_RejectsPopulationAndClearRemainsSafe" computerName="<host>" duration="00:00:00.0006800" startTime="2026-08-27T16:37:15.5642699-04:00" endTime="2026-08-27T16:37:15.5642699-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6c33d380-f268-4c44-a9b5-695625462581" />
+    <UnitTestResult executionId="2756be0c-4dea-4cbc-aa0d-dfd27abf7c8d" testId="1f3def40-a282-8c95-95ec-6754afd4db00" testName="SetSuggestions_SyncFacade_PopulatesImmediatelyThenUpgradesPreservingSelection" computerName="<host>" duration="00:00:00.0008098" startTime="2026-08-27T16:37:14.8179439-04:00" endTime="2026-08-27T16:37:14.8189511-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2756be0c-4dea-4cbc-aa0d-dfd27abf7c8d" />
+    <UnitTestResult executionId="7ac7c89a-4cfe-470c-a85f-0e138a0d1c1a" testId="1011ad50-916b-85e5-aa7d-eec791a682ab" testName="ViewerResetThenReuse_InvalidatesLateFailureWithoutDuplicatingCurrentState" computerName="<host>" duration="00:00:00.7784130" startTime="2026-08-27T16:37:14.7790035-04:00" endTime="2026-08-27T16:37:15.5577070-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7ac7c89a-4cfe-470c-a85f-0e138a0d1c1a">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="c2030f6f-d6dc-4d80-b63b-31a9363ee537" testId="1ddb7218-f95e-8fd6-b930-28dcba30cc52" testName="AsyncPopulation_SupersededCompletionDoesNotPublishAgain" computerName="<host>" duration="00:00:00.0050882" startTime="2026-08-27T16:37:15.5642699-04:00" endTime="2026-08-27T16:37:15.5703505-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c2030f6f-d6dc-4d80-b63b-31a9363ee537" />
+    <UnitTestResult executionId="eadae59a-7715-4143-acdd-43f7405327b3" testId="1f2da4cf-e917-8bd4-9d8a-16a285dd4763" testName="OpenSelector_SubfolderActivationThenEnter_PublishesAndClosesExactlyOnce" computerName="<host>" duration="00:00:01.0169405" startTime="2026-08-27T16:37:14.4167728-04:00" endTime="2026-08-27T16:37:15.5592663-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="eadae59a-7715-4143-acdd-43f7405327b3">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="7131845f-ed24-4856-a64e-95ca8ee7ee41" testId="1d7d1d6c-42d0-828a-93d5-293c3cd24a94" testName="Clear_InvalidatesLateSuccessfulUpgradeBeforeAnyPostOrCallback" computerName="<host>" duration="00:00:00.0062049" startTime="2026-08-27T16:37:14.7729844-04:00" endTime="2026-08-27T16:37:14.7790035-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7131845f-ed24-4856-a64e-95ca8ee7ee41" />
+    <UnitTestResult executionId="03861ae0-7b49-4dc1-8609-8794be1012ed" testId="171becd5-0629-86fb-9904-8e64375437e5" testName="OpenSelector_SubfolderActivation_PublishesOneDurableRenderAndNoLegacySelectionChange" computerName="<host>" duration="00:00:00.1144886" startTime="2026-08-27T16:37:15.8021722-04:00" endTime="2026-08-27T16:37:15.9182900-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="03861ae0-7b49-4dc1-8609-8794be1012ed">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="2aaee8d8-ef44-4728-b13f-11025779b793" testId="18c23fda-8277-84ba-ae40-cdbf84185311" testName="PostRenderAndSelectorAsync_StaleLeaseReturnsCompletedWithoutPublishing" computerName="<host>" duration="00:00:00.0006828" startTime="2026-08-27T16:37:15.5743506-04:00" endTime="2026-08-27T16:37:15.5753524-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2aaee8d8-ef44-4728-b13f-11025779b793" />
+    <UnitTestResult executionId="0a53e53e-63b3-4da2-baa8-26f083b47341" testId="13f5ad84-f9d9-8749-85b9-3b3fb211ca26" testName="ProviderFailure_SurfacesExplicitErrorResponse" computerName="<host>" duration="00:00:00.0024916" startTime="2026-08-27T16:37:14.8030980-04:00" endTime="2026-08-27T16:37:14.8056212-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0a53e53e-63b3-4da2-baa8-26f083b47341" />
+    <UnitTestResult executionId="21a90757-5acc-46d9-8cd5-6f524a22ba4b" testId="1c7fba7a-9ad1-86bd-865c-90b23ecb10b7" testName="RunSynchronous_SupersededLeaseSettlesAndDisposesItsSource" computerName="<host>" duration="00:00:00.0002638" startTime="2026-08-27T16:37:14.7177528-04:00" endTime="2026-08-27T16:37:14.7177528-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="21a90757-5acc-46d9-8cd5-6f524a22ba4b" />
+    <UnitTestResult executionId="a99724b5-5117-4972-bf2b-ffedad5ee742" testId="1457fe3f-0f94-8f1a-bc84-5dbe086cd5f4" testName="InboundExpand_PostsRenderAndSubfolderResponse" computerName="<host>" duration="00:00:00.0059303" startTime="2026-08-27T16:37:14.7905471-04:00" endTime="2026-08-27T16:37:14.7965810-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a99724b5-5117-4972-bf2b-ffedad5ee742" />
+    <UnitTestResult executionId="1c42e95f-42bf-493e-a3c8-94725408717d" testId="1f1fda4e-4c7c-808c-8526-c68645d96356" testName="TryRunCurrent_GuardedActionRunsWithoutHoldingLifetimeSync" computerName="<host>" duration="00:00:00.0004024" startTime="2026-08-27T16:37:14.7102386-04:00" endTime="2026-08-27T16:37:14.7102386-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1c42e95f-42bf-493e-a3c8-94725408717d" />
+    <UnitTestResult executionId="188cfa4a-9c04-4c0d-a95b-e3e44d5666f2" testId="11072bc3-480e-8ebb-941c-265a7f2ea186" testName="SelectItem_KnownItemSelects_UnknownItemIsNoOp" computerName="<host>" duration="00:00:00.0011475" startTime="2026-08-27T16:37:14.8201603-04:00" endTime="2026-08-27T16:37:14.8211555-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="188cfa4a-9c04-4c0d-a95b-e3e44d5666f2" />
+    <UnitTestResult executionId="9a06fb64-322f-4eb3-84ee-7e69ba2a45cb" testId="12f1233d-7967-80f3-a03a-cebadd1bf0e2" testName="MalformedInboundMessage_PostsRouterErrorResponse" computerName="<host>" duration="00:00:00.0045803" startTime="2026-08-27T16:37:14.7975807-04:00" endTime="2026-08-27T16:37:14.8030980-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9a06fb64-322f-4eb3-84ee-7e69ba2a45cb" />
+    <UnitTestResult executionId="ae71776f-7b4c-4769-9f97-72658917e366" testId="1599e110-347c-8b1b-99d4-158493de32b1" testName="SelectRow_WhileSuggestionsUpgradeInFlight_DoesNotThrowAndAppliesSelection" computerName="<host>" duration="00:00:00.0036390" startTime="2026-08-27T16:37:14.8231481-04:00" endTime="2026-08-27T16:37:14.8266575-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ae71776f-7b4c-4769-9f97-72658917e366" />
+    <UnitTestResult executionId="3d6d2ae4-c78d-4caf-b35d-90c7b1bae18c" testId="176b0270-6983-8b01-85dd-f061326aeaad" testName="InboundDoubleClick_PostsCollapsedRenderJson" computerName="<host>" duration="00:00:00.2486192" startTime="2026-08-27T16:37:14.4167728-04:00" endTime="2026-08-27T16:37:14.7905471-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3d6d2ae4-c78d-4caf-b35d-90c7b1bae18c" />
+    <UnitTestResult executionId="fe3e20eb-3f9d-4ade-9c08-cbdee29abcef" testId="15fbebc1-1fcc-8db5-8316-bdb6ba94e9bc" testName="SetSuggestions_UnresolvedEmptyAndFailureRetainFallbackProbability" computerName="<host>" duration="00:00:00.0035917" startTime="2026-08-27T16:37:14.7975807-04:00" endTime="2026-08-27T16:37:14.8010929-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fe3e20eb-3f9d-4ade-9c08-cbdee29abcef" />
+    <UnitTestResult executionId="a822bec8-e830-4911-a8dc-9f7bb5e7eb1c" testId="15819378-7203-82e2-8417-3dbbe03f9e06" testName="ArrowMessages_RaiseSyntheticFolderKeyDown" computerName="<host>" duration="00:00:00.0011162" startTime="2026-08-27T16:37:14.8137272-04:00" endTime="2026-08-27T16:37:14.8147278-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a822bec8-e830-4911-a8dc-9f7bb5e7eb1c" />
+    <UnitTestResult executionId="1664c9e1-41ad-4d9d-bceb-0bdb6d65480f" testId="1b3fb12e-bc64-86d7-9363-f9010c064ccb" testName="OpenSelector_SubfolderActivationThenNativeClose_PublishesAndClosesExactlyOnce" computerName="<host>" duration="00:00:00.0562194" startTime="2026-08-27T16:37:15.6170593-04:00" endTime="2026-08-27T16:37:15.6734435-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1664c9e1-41ad-4d9d-bceb-0bdb6d65480f">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="96a3cbe7-2308-4ead-83c7-0a0af50b7172" testId="150ea95c-afc9-860a-a385-f7288e28c67d" testName="RunSynchronous_SupersededLeaseReportsSkipToCaller" computerName="<host>" duration="00:00:00.0003342" startTime="2026-08-27T16:37:14.7177528-04:00" endTime="2026-08-27T16:37:14.7212667-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="96a3cbe7-2308-4ead-83c7-0a0af50b7172" />
+    <UnitTestResult executionId="f5c5cdb9-2467-4c32-89b0-566ef5832ea3" testId="12842f96-de1e-8388-8dcc-7f84a3bb90c4" testName="Dispose_InvalidatesLateFailureWithoutPostCallbackOrErrorMutation" computerName="<host>" duration="00:00:00.0013700" startTime="2026-08-27T16:37:15.5602789-04:00" endTime="2026-08-27T16:37:15.5622717-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f5c5cdb9-2467-4c32-89b0-566ef5832ea3" />
+    <UnitTestResult executionId="648d174b-963b-4f95-ac79-cb8df602cf44" testId="17cdc29f-e8f8-8ea8-8e32-cabf70bf4fb7" testName="RunSynchronous_FailureAbandonsLinkedLeaseAndReportsCancellationFailure" computerName="<host>" duration="00:00:00.1096159" startTime="2026-08-27T16:37:14.5973080-04:00" endTime="2026-08-27T16:37:14.7077334-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="648d174b-963b-4f95-ac79-cb8df602cf44" />
+    <UnitTestResult executionId="c85a46fe-0a0d-4a66-b7a9-071150902479" testId="196be754-6f10-80de-b92a-89eda7c863c7" testName="SetSuggestions_NullRows_Throws" computerName="<host>" duration="00:00:00.0006506" startTime="2026-08-27T16:37:14.8189511-04:00" endTime="2026-08-27T16:37:14.8201603-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c85a46fe-0a0d-4a66-b7a9-071150902479" />
+    <UnitTestResult executionId="f03063d4-f4a4-4703-960c-8eeb2b7caf52" testId="19690c51-15c3-8926-abce-eb94dd6e3c81" testName="Disposal_RepeatedLifetimeDisposeIsSafeAndLeaseDisposeFailureIsReported" computerName="<host>" duration="00:00:00.0014897" startTime="2026-08-27T16:37:14.7077334-04:00" endTime="2026-08-27T16:37:14.7102386-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f03063d4-f4a4-4703-960c-8eeb2b7caf52" />
+    <UnitTestResult executionId="8a5c090a-2b89-4edc-b0e1-15e96a26d320" testId="129af76c-fed3-888f-878e-c8f82bba8230" testName="OpenSelector_SubfolderActivationThenEscape_PublishesAndClosesExactlyOnce" computerName="<host>" duration="00:00:00.0576781" startTime="2026-08-27T16:37:15.5592663-04:00" endTime="2026-08-27T16:37:15.6170593-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8a5c090a-2b89-4edc-b0e1-15e96a26d320">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="05d83450-0f6f-44a8-bb92-8dbc66e5f12b" testId="12554ac9-5c43-89fe-bda1-5dc667247c64" testName="OverlappingUpgrades_CurrentCompletionPostsOnceAndStaleCompletionPostsNothing" computerName="<host>" duration="00:00:00.2313770" startTime="2026-08-27T16:37:14.4192823-04:00" endTime="2026-08-27T16:37:14.7729844-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="05d83450-0f6f-44a8-bb92-8dbc66e5f12b" />
+    <UnitTestResult executionId="25431dc8-7d0a-4c2a-b0b3-3c93087d9e34" testId="1c098037-7cb7-8a54-93e7-9fa0c63b54d2" testName="Clear_EmptiesSelectionStateAndPostsEmptyRender" computerName="<host>" duration="00:00:00.0013783" startTime="2026-08-27T16:37:14.8157283-04:00" endTime="2026-08-27T16:37:14.8167278-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="25431dc8-7d0a-4c2a-b0b3-3c93087d9e34" />
+    <UnitTestResult executionId="c8b1249d-2cf0-432f-88b7-317442c9fcc6" testId="1e64824c-dd74-8f7b-9b81-2dfa73bd1cef" testName="UnhandledRightArrow_RaisesUnhandledArrowRight" computerName="<host>" duration="00:00:00.0075107" startTime="2026-08-27T16:37:14.8056212-04:00" endTime="2026-08-27T16:37:14.8127274-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c8b1249d-2cf0-432f-88b7-317442c9fcc6" />
+    <UnitTestResult executionId="47881385-01bd-4463-80d5-a88c0d4d025a" testId="1e7960b9-4971-8b8b-8f9f-a21f079bce61" testName="OpenSelector_InvalidIdentityAndIndexes_DoNotPublishCloseFocusOrMutate" computerName="<host>" duration="00:00:00.0626282" startTime="2026-08-27T16:37:15.6734435-04:00" endTime="2026-08-27T16:37:15.7354642-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="47881385-01bd-4463-80d5-a88c0d4d025a">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="a8337520-4f43-41a5-8a63-219bd76cef4e" testId="1b30327b-b9e2-8faf-8a3f-5290575c2de1" testName="ArgumentGuards_NullInputsThrowArgumentNullException" computerName="<host>" duration="00:00:00.0450328" startTime="2026-08-27T16:37:14.4192823-04:00" endTime="2026-08-27T16:37:14.5898002-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a8337520-4f43-41a5-8a63-219bd76cef4e">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="43953d64-aab9-48a5-a993-53b8fb83cdc7" testId="1a5d57a9-560c-86bd-9625-df271e91a7a5" testName="InboundSelectionMessage_RaisesSelectionChangedWithMappedPath" computerName="<host>" duration="00:00:00.0013139" startTime="2026-08-27T16:37:14.7965810-04:00" endTime="2026-08-27T16:37:14.7975807-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="43953d64-aab9-48a5-a993-53b8fb83cdc7" />
+    <UnitTestResult executionId="9341451a-f0a0-4b43-ad70-91ddcb59f569" testId="14972e94-2e70-8f3b-a99d-4bf7985a9197" testName="SetSuggestions_ImmediatelyPostsScoredFallbackBeforeProviderCompletes" computerName="<host>" duration="00:00:00.2492959" startTime="2026-08-27T16:37:14.4192823-04:00" endTime="2026-08-27T16:37:14.7915485-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9341451a-f0a0-4b43-ad70-91ddcb59f569" />
+    <UnitTestResult executionId="2b8c6a05-465d-469c-a752-588b9e3af551" testId="1fec98ad-2f15-80bb-bf03-5ebdf72c0018" testName="CurrentProviderCancellation_PropagatesWithoutPublishingAnUpgrade" computerName="<host>" duration="00:00:00.0016691" startTime="2026-08-27T16:37:15.5622717-04:00" endTime="2026-08-27T16:37:15.5642699-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2b8c6a05-465d-469c-a752-588b9e3af551" />
+    <UnitTestResult executionId="e4616115-6ec2-43bb-baf6-87a75988340f" testId="1285c3f1-61ef-86f9-996a-674d6f280235" testName="SetSuggestions_SuccessfulUpgradeRetainsScoreAndLatestSelection" computerName="<host>" duration="00:00:00.0062041" startTime="2026-08-27T16:37:14.7915485-04:00" endTime="2026-08-27T16:37:14.7975807-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e4616115-6ec2-43bb-baf6-87a75988340f" />
+    <UnitTestResult executionId="3fa82e20-f58b-4812-8219-65ced16ae190" testId="1d6020df-ca68-8254-aa2f-8c8323d03f7a" testName="AddItems_AppendsPlainRowsAndContainsFindsThem" computerName="<host>" duration="00:00:00.0012467" startTime="2026-08-27T16:37:14.8167278-04:00" endTime="2026-08-27T16:37:14.8179439-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3fa82e20-f58b-4812-8219-65ced16ae190" />
+    <UnitTestResult executionId="8ce8f6c4-8b96-4b07-8396-679ad01b6279" testId="1df3345e-f8e3-8e24-ac7c-e2b97455b6a7" testName="RunAsync_SupersededCancellationIsSwallowedAndSettled" computerName="<host>" duration="00:00:00.0006641" startTime="2026-08-27T16:37:14.7077334-04:00" endTime="2026-08-27T16:37:14.7077334-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8ce8f6c4-8b96-4b07-8396-679ad01b6279" />
+    <UnitTestResult executionId="1f7e64db-61ad-4591-9bc0-aaaf3156aac7" testId="1e47ab1f-6512-8920-b37a-5f3dab5cef14" testName="Dispose_InvalidatesLateSuccessAndUnsubscribesBeforePostOrCallback" computerName="<host>" duration="00:00:00.0020384" startTime="2026-08-27T16:37:15.5577070-04:00" endTime="2026-08-27T16:37:15.5602789-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1f7e64db-61ad-4591-9bc0-aaaf3156aac7" />
+    <UnitTestResult executionId="c7b734e4-195d-435f-978c-ec1f76ed3c61" testId="1d069a46-626f-888b-bbbb-1f9f85bc1584" testName="UnhandledLeftArrow_RaisesUnhandledArrowLeft" computerName="<host>" duration="00:00:00.0007718" startTime="2026-08-27T16:37:14.8127274-04:00" endTime="2026-08-27T16:37:14.8137272-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c7b734e4-195d-435f-978c-ec1f76ed3c61" />
+    <UnitTestResult executionId="a616fde6-56e0-434b-a00c-27b386ba144d" testId="11abe1c5-36fe-8ed5-91f5-545f4288ce2c" testName="QueuedCompletion_DisposedBeforeOwnerDrain_DoesNotPublish" computerName="<host>" duration="00:00:00.0023228" startTime="2026-08-27T16:37:15.5713613-04:00" endTime="2026-08-27T16:37:15.5743506-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a616fde6-56e0-434b-a00c-27b386ba144d" />
+    <UnitTestResult executionId="29838555-1ac9-420a-90d0-a2e9f9b10033" testId="121e5723-a62d-895d-b924-3e100fe1c825" testName="TryRunCurrent_ReentrantInvalidateStillReportsEntryTimeInvocation" computerName="<host>" duration="00:00:00.0005235" startTime="2026-08-27T16:37:14.7167545-04:00" endTime="2026-08-27T16:37:14.7177528-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="29838555-1ac9-420a-90d0-a2e9f9b10033" />
+    <UnitTestResult executionId="4e822d89-267c-41b9-bc2c-8751d201966b" testId="11dad5c8-1ece-82d4-aa4a-cdaca9d5f8d5" testName="OpenSelector_SubfolderActivationForPlainRow_IsDeterministicNoOp" computerName="<host>" duration="00:00:00.0656638" startTime="2026-08-27T16:37:15.7364701-04:00" endTime="2026-08-27T16:37:15.8021722-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4e822d89-267c-41b9-bc2c-8751d201966b">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="e1e39488-cba7-4272-a7b0-5e65680fc5d4" testId="18bc9405-cb95-86e0-84d8-5993396caece" testName="Constructor_NullArguments_Throw" computerName="<host>" duration="00:00:00.0004826" startTime="2026-08-27T16:37:14.8221548-04:00" endTime="2026-08-27T16:37:14.8231481-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e1e39488-cba7-4272-a7b0-5e65680fc5d4" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="CurrentProviderCancellation_PropagatesWithoutPublishingAnUpgrade" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1fec98ad-2f15-80bb-bf03-5ebdf72c0018">
+      <Execution id="2b8c6a05-465d-469c-a752-588b9e3af551" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorLifecycleTests" name="CurrentProviderCancellation_PropagatesWithoutPublishingAnUpgrade" />
+    </UnitTest>
+    <UnitTest name="RunSynchronous_SupersededLeaseReportsSkipToCaller" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="150ea95c-afc9-860a-a385-f7288e28c67d">
+      <Execution id="96a3cbe7-2308-4ead-83c7-0a0af50b7172" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorUpgradeLifetimeTests" name="RunSynchronous_SupersededLeaseReportsSkipToCaller" />
+    </UnitTest>
+    <UnitTest name="AddItems_InvalidatesLateUpgradeBeforeDuplicatePost" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="17f45e05-3a26-833a-af06-bec9bdf0fdf3">
+      <Execution id="895c5a0d-cc62-423c-a6c0-20383439973f" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorLifecycleTests" name="AddItems_InvalidatesLateUpgradeBeforeDuplicatePost" />
+    </UnitTest>
+    <UnitTest name="SetSuggestions_SuccessfulUpgradeRetainsScoreAndLatestSelection" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1285c3f1-61ef-86f9-996a-674d6f280235">
+      <Execution id="e4616115-6ec2-43bb-baf6-87a75988340f" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorProbabilityTests" name="SetSuggestions_SuccessfulUpgradeRetainsScoreAndLatestSelection" />
+    </UnitTest>
+    <UnitTest name="RunSynchronous_FailureAbandonsLinkedLeaseAndReportsCancellationFailure" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="17cdc29f-e8f8-8ea8-8e32-cabf70bf4fb7">
+      <Execution id="648d174b-963b-4f95-ac79-cb8df602cf44" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorUpgradeLifetimeTests" name="RunSynchronous_FailureAbandonsLinkedLeaseAndReportsCancellationFailure" />
+    </UnitTest>
+    <UnitTest name="RunAsync_SupersededCancellationIsSwallowedAndSettled" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1df3345e-f8e3-8e24-ac7c-e2b97455b6a7">
+      <Execution id="8ce8f6c4-8b96-4b07-8396-679ad01b6279" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorUpgradeLifetimeTests" name="RunAsync_SupersededCancellationIsSwallowedAndSettled" />
+    </UnitTest>
+    <UnitTest name="OpenSelector_SubfolderActivationThenNativeClose_PublishesAndClosesExactlyOnce" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1b3fb12e-bc64-86d7-9363-f9010c064ccb">
+      <Execution id="1664c9e1-41ad-4d9d-bceb-0bdb6d65480f" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSubfolderActivationTests" name="OpenSelector_SubfolderActivationThenNativeClose_PublishesAndClosesExactlyOnce" />
+    </UnitTest>
+    <UnitTest name="AsyncPopulation_SupersededCompletionDoesNotPublishAgain" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ddb7218-f95e-8fd6-b930-28dcba30cc52">
+      <Execution id="c2030f6f-d6dc-4d80-b63b-31a9363ee537" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorLifecycleTests" name="AsyncPopulation_SupersededCompletionDoesNotPublishAgain" />
+    </UnitTest>
+    <UnitTest name="ViewerResetThenReuse_InvalidatesLateFailureWithoutDuplicatingCurrentState" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1011ad50-916b-85e5-aa7d-eec791a682ab">
+      <Execution id="7ac7c89a-4cfe-470c-a85f-0e138a0d1c1a" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorLifecycleTests" name="ViewerResetThenReuse_InvalidatesLateFailureWithoutDuplicatingCurrentState" />
+    </UnitTest>
+    <UnitTest name="TryRunCurrent_GuardedActionRunsWithoutHoldingLifetimeSync" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1f1fda4e-4c7c-808c-8526-c68645d96356">
+      <Execution id="1c42e95f-42bf-493e-a3c8-94725408717d" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorUpgradeLifetimeTests" name="TryRunCurrent_GuardedActionRunsWithoutHoldingLifetimeSync" />
+    </UnitTest>
+    <UnitTest name="ArrowMessages_RaiseSyntheticFolderKeyDown" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="15819378-7203-82e2-8417-3dbbe03f9e06">
+      <Execution id="a822bec8-e830-4911-a8dc-9f7bb5e7eb1c" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorTests" name="ArrowMessages_RaiseSyntheticFolderKeyDown" />
+    </UnitTest>
+    <UnitTest name="SetSuggestions_NullRows_Throws" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="196be754-6f10-80de-b92a-89eda7c863c7">
+      <Execution id="c85a46fe-0a0d-4a66-b7a9-071150902479" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorTests" name="SetSuggestions_NullRows_Throws" />
+    </UnitTest>
+    <UnitTest name="QueuedCompletion_DisposedBeforeOwnerDrain_DoesNotPublish" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="11abe1c5-36fe-8ed5-91f5-545f4288ce2c">
+      <Execution id="a616fde6-56e0-434b-a00c-27b386ba144d" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorLifecycleTests" name="QueuedCompletion_DisposedBeforeOwnerDrain_DoesNotPublish" />
+    </UnitTest>
+    <UnitTest name="Dispose_InvalidatesLateSuccessAndUnsubscribesBeforePostOrCallback" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e47ab1f-6512-8920-b37a-5f3dab5cef14">
+      <Execution id="1f7e64db-61ad-4591-9bc0-aaaf3156aac7" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorLifecycleTests" name="Dispose_InvalidatesLateSuccessAndUnsubscribesBeforePostOrCallback" />
+    </UnitTest>
+    <UnitTest name="OverlappingUpgrades_CurrentCompletionPostsOnceAndStaleCompletionPostsNothing" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="12554ac9-5c43-89fe-bda1-5dc667247c64">
+      <Execution id="05d83450-0f6f-44a8-bb92-8dbc66e5f12b" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorLifecycleTests" name="OverlappingUpgrades_CurrentCompletionPostsOnceAndStaleCompletionPostsNothing" />
+    </UnitTest>
+    <UnitTest name="InboundExpand_PostsRenderAndSubfolderResponse" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1457fe3f-0f94-8f1a-bc84-5dbe086cd5f4">
+      <Execution id="a99724b5-5117-4972-bf2b-ffedad5ee742" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorTests" name="InboundExpand_PostsRenderAndSubfolderResponse" />
+    </UnitTest>
+    <UnitTest name="RunSynchronous_SupersededLeaseSettlesAndDisposesItsSource" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c7fba7a-9ad1-86bd-865c-90b23ecb10b7">
+      <Execution id="21a90757-5acc-46d9-8cd5-6f524a22ba4b" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorUpgradeLifetimeTests" name="RunSynchronous_SupersededLeaseSettlesAndDisposesItsSource" />
+    </UnitTest>
+    <UnitTest name="Clear_EmptiesSelectionStateAndPostsEmptyRender" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c098037-7cb7-8a54-93e7-9fa0c63b54d2">
+      <Execution id="25431dc8-7d0a-4c2a-b0b3-3c93087d9e34" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorTests" name="Clear_EmptiesSelectionStateAndPostsEmptyRender" />
+    </UnitTest>
+    <UnitTest name="SetSuggestions_SyncFacade_PopulatesImmediatelyThenUpgradesPreservingSelection" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1f3def40-a282-8c95-95ec-6754afd4db00">
+      <Execution id="2756be0c-4dea-4cbc-aa0d-dfd27abf7c8d" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorTests" name="SetSuggestions_SyncFacade_PopulatesImmediatelyThenUpgradesPreservingSelection" />
+    </UnitTest>
+    <UnitTest name="TryRunCurrent_ReentrantInvalidateStillReportsEntryTimeInvocation" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="121e5723-a62d-895d-b924-3e100fe1c825">
+      <Execution id="29838555-1ac9-420a-90d0-a2e9f9b10033" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorUpgradeLifetimeTests" name="TryRunCurrent_ReentrantInvalidateStillReportsEntryTimeInvocation" />
+    </UnitTest>
+    <UnitTest name="OpenSelector_SubfolderActivationForPlainRow_IsDeterministicNoOp" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="11dad5c8-1ece-82d4-aa4a-cdaca9d5f8d5">
+      <Execution id="4e822d89-267c-41b9-bc2c-8751d201966b" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSubfolderActivationTests" name="OpenSelector_SubfolderActivationForPlainRow_IsDeterministicNoOp" />
+    </UnitTest>
+    <UnitTest name="UnhandledLeftArrow_RaisesUnhandledArrowLeft" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d069a46-626f-888b-bbbb-1f9f85bc1584">
+      <Execution id="c7b734e4-195d-435f-978c-ec1f76ed3c61" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorTests" name="UnhandledLeftArrow_RaisesUnhandledArrowLeft" />
+    </UnitTest>
+    <UnitTest name="InboundSelectionMessage_RaisesSelectionChangedWithMappedPath" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a5d57a9-560c-86bd-9625-df271e91a7a5">
+      <Execution id="43953d64-aab9-48a5-a993-53b8fb83cdc7" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorTests" name="InboundSelectionMessage_RaisesSelectionChangedWithMappedPath" />
+    </UnitTest>
+    <UnitTest name="OpenSelector_InvalidIdentityAndIndexes_DoNotPublishCloseFocusOrMutate" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e7960b9-4971-8b8b-8f9f-a21f079bce61">
+      <Execution id="47881385-01bd-4463-80d5-a88c0d4d025a" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSubfolderActivationTests" name="OpenSelector_InvalidIdentityAndIndexes_DoNotPublishCloseFocusOrMutate" />
+    </UnitTest>
+    <UnitTest name="MalformedInboundMessage_PostsRouterErrorResponse" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="12f1233d-7967-80f3-a03a-cebadd1bf0e2">
+      <Execution id="9a06fb64-322f-4eb3-84ee-7e69ba2a45cb" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorTests" name="MalformedInboundMessage_PostsRouterErrorResponse" />
+    </UnitTest>
+    <UnitTest name="UnhandledRightArrow_RaisesUnhandledArrowRight" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e64824c-dd74-8f7b-9b81-2dfa73bd1cef">
+      <Execution id="c8b1249d-2cf0-432f-88b7-317442c9fcc6" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorTests" name="UnhandledRightArrow_RaisesUnhandledArrowRight" />
+    </UnitTest>
+    <UnitTest name="OpenSelector_SubfolderActivationThenEnter_PublishesAndClosesExactlyOnce" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1f2da4cf-e917-8bd4-9d8a-16a285dd4763">
+      <Execution id="eadae59a-7715-4143-acdd-43f7405327b3" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSubfolderActivationTests" name="OpenSelector_SubfolderActivationThenEnter_PublishesAndClosesExactlyOnce" />
+    </UnitTest>
+    <UnitTest name="ProviderFailure_SurfacesExplicitErrorResponse" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="13f5ad84-f9d9-8749-85b9-3b3fb211ca26">
+      <Execution id="0a53e53e-63b3-4da2-baa8-26f083b47341" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorTests" name="ProviderFailure_SurfacesExplicitErrorResponse" />
+    </UnitTest>
+    <UnitTest name="Clear_InvalidatesLateSuccessfulUpgradeBeforeAnyPostOrCallback" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d7d1d6c-42d0-828a-93d5-293c3cd24a94">
+      <Execution id="7131845f-ed24-4856-a64e-95ca8ee7ee41" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorLifecycleTests" name="Clear_InvalidatesLateSuccessfulUpgradeBeforeAnyPostOrCallback" />
+    </UnitTest>
+    <UnitTest name="ArgumentGuards_NullInputsThrowArgumentNullException" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1b30327b-b9e2-8faf-8a3f-5290575c2de1">
+      <Execution id="a8337520-4f43-41a5-8a63-219bd76cef4e" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorUpgradeLifetimeTests" name="ArgumentGuards_NullInputsThrowArgumentNullException" />
+    </UnitTest>
+    <UnitTest name="SelectRow_WhileSuggestionsUpgradeInFlight_DoesNotThrowAndAppliesSelection" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1599e110-347c-8b1b-99d4-158493de32b1">
+      <Execution id="ae71776f-7b4c-4769-9f97-72658917e366" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorTests" name="SelectRow_WhileSuggestionsUpgradeInFlight_DoesNotThrowAndAppliesSelection" />
+    </UnitTest>
+    <UnitTest name="InboundDoubleClick_PostsCollapsedRenderJson" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="176b0270-6983-8b01-85dd-f061326aeaad">
+      <Execution id="3d6d2ae4-c78d-4caf-b35d-90c7b1bae18c" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorTests" name="InboundDoubleClick_PostsCollapsedRenderJson" />
+    </UnitTest>
+    <UnitTest name="PostRenderAndSelectorAsync_StaleLeaseReturnsCompletedWithoutPublishing" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="18c23fda-8277-84ba-ae40-cdbf84185311">
+      <Execution id="2aaee8d8-ef44-4728-b13f-11025779b793" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorLifecycleTests" name="PostRenderAndSelectorAsync_StaleLeaseReturnsCompletedWithoutPublishing" />
+    </UnitTest>
+    <UnitTest name="SelectItem_KnownItemSelects_UnknownItemIsNoOp" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="11072bc3-480e-8ebb-941c-265a7f2ea186">
+      <Execution id="188cfa4a-9c04-4c0d-a95b-e3e44d5666f2" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorTests" name="SelectItem_KnownItemSelects_UnknownItemIsNoOp" />
+    </UnitTest>
+    <UnitTest name="SetSuggestions_UnresolvedEmptyAndFailureRetainFallbackProbability" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="15fbebc1-1fcc-8db5-8316-bdb6ba94e9bc">
+      <Execution id="fe3e20eb-3f9d-4ade-9c08-cbdee29abcef" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorProbabilityTests" name="SetSuggestions_UnresolvedEmptyAndFailureRetainFallbackProbability" />
+    </UnitTest>
+    <UnitTest name="Constructor_NullArguments_Throw" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="18bc9405-cb95-86e0-84d8-5993396caece">
+      <Execution id="e1e39488-cba7-4272-a7b0-5e65680fc5d4" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorTests" name="Constructor_NullArguments_Throw" />
+    </UnitTest>
+    <UnitTest name="OpenSelector_SubfolderActivationThenEscape_PublishesAndClosesExactlyOnce" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="129af76c-fed3-888f-878e-c8f82bba8230">
+      <Execution id="8a5c090a-2b89-4edc-b0e1-15e96a26d320" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSubfolderActivationTests" name="OpenSelector_SubfolderActivationThenEscape_PublishesAndClosesExactlyOnce" />
+    </UnitTest>
+    <UnitTest name="DisposedCoordinator_RejectsPopulationAndClearRemainsSafe" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="17f33569-4c48-84d7-a7ab-58b979c9056a">
+      <Execution id="6c33d380-f268-4c44-a9b5-695625462581" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorLifecycleTests" name="DisposedCoordinator_RejectsPopulationAndClearRemainsSafe" />
+    </UnitTest>
+    <UnitTest name="SetTheme_PostsThemeChangeMessage" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1416c6bb-2748-805d-b97b-159c8a72531b">
+      <Execution id="e8355626-408c-48a1-ac89-e187a038cd08" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorTests" name="SetTheme_PostsThemeChangeMessage" />
+    </UnitTest>
+    <UnitTest name="SetSuggestions_ImmediatelyPostsScoredFallbackBeforeProviderCompletes" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="14972e94-2e70-8f3b-a99d-4bf7985a9197">
+      <Execution id="9341451a-f0a0-4b43-ad70-91ddcb59f569" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorProbabilityTests" name="SetSuggestions_ImmediatelyPostsScoredFallbackBeforeProviderCompletes" />
+    </UnitTest>
+    <UnitTest name="Dispose_InvalidatesLateFailureWithoutPostCallbackOrErrorMutation" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="12842f96-de1e-8388-8dcc-7f84a3bb90c4">
+      <Execution id="f5c5cdb9-2467-4c32-89b0-566ef5832ea3" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorLifecycleTests" name="Dispose_InvalidatesLateFailureWithoutPostCallbackOrErrorMutation" />
+    </UnitTest>
+    <UnitTest name="Disposal_RepeatedLifetimeDisposeIsSafeAndLeaseDisposeFailureIsReported" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="19690c51-15c3-8926-abce-eb94dd6e3c81">
+      <Execution id="f03063d4-f4a4-4703-960c-8eeb2b7caf52" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorUpgradeLifetimeTests" name="Disposal_RepeatedLifetimeDisposeIsSafeAndLeaseDisposeFailureIsReported" />
+    </UnitTest>
+    <UnitTest name="OpenSelector_SubfolderActivation_PublishesOneDurableRenderAndNoLegacySelectionChange" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="171becd5-0629-86fb-9904-8e64375437e5">
+      <Execution id="03861ae0-7b49-4dc1-8609-8794be1012ed" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbSubfolderActivationTests" name="OpenSelector_SubfolderActivation_PublishesOneDurableRenderAndNoLegacySelectionChange" />
+    </UnitTest>
+    <UnitTest name="AddItems_AppendsPlainRowsAndContainsFindsThem" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d6020df-ca68-8254-aa2f-8c8323d03f7a">
+      <Execution id="3fa82e20-f58b-4812-8219-65ced16ae190" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbBridgeCoordinatorTests" name="AddItems_AppendsPlainRowsAndContainsFindsThem" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1416c6bb-2748-805d-b97b-159c8a72531b" executionId="e8355626-408c-48a1-ac89-e187a038cd08" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17f45e05-3a26-833a-af06-bec9bdf0fdf3" executionId="895c5a0d-cc62-423c-a6c0-20383439973f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17f33569-4c48-84d7-a7ab-58b979c9056a" executionId="6c33d380-f268-4c44-a9b5-695625462581" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f3def40-a282-8c95-95ec-6754afd4db00" executionId="2756be0c-4dea-4cbc-aa0d-dfd27abf7c8d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1011ad50-916b-85e5-aa7d-eec791a682ab" executionId="7ac7c89a-4cfe-470c-a85f-0e138a0d1c1a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ddb7218-f95e-8fd6-b930-28dcba30cc52" executionId="c2030f6f-d6dc-4d80-b63b-31a9363ee537" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f2da4cf-e917-8bd4-9d8a-16a285dd4763" executionId="eadae59a-7715-4143-acdd-43f7405327b3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d7d1d6c-42d0-828a-93d5-293c3cd24a94" executionId="7131845f-ed24-4856-a64e-95ca8ee7ee41" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="171becd5-0629-86fb-9904-8e64375437e5" executionId="03861ae0-7b49-4dc1-8609-8794be1012ed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18c23fda-8277-84ba-ae40-cdbf84185311" executionId="2aaee8d8-ef44-4728-b13f-11025779b793" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13f5ad84-f9d9-8749-85b9-3b3fb211ca26" executionId="0a53e53e-63b3-4da2-baa8-26f083b47341" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c7fba7a-9ad1-86bd-865c-90b23ecb10b7" executionId="21a90757-5acc-46d9-8cd5-6f524a22ba4b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1457fe3f-0f94-8f1a-bc84-5dbe086cd5f4" executionId="a99724b5-5117-4972-bf2b-ffedad5ee742" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f1fda4e-4c7c-808c-8526-c68645d96356" executionId="1c42e95f-42bf-493e-a3c8-94725408717d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11072bc3-480e-8ebb-941c-265a7f2ea186" executionId="188cfa4a-9c04-4c0d-a95b-e3e44d5666f2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12f1233d-7967-80f3-a03a-cebadd1bf0e2" executionId="9a06fb64-322f-4eb3-84ee-7e69ba2a45cb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1599e110-347c-8b1b-99d4-158493de32b1" executionId="ae71776f-7b4c-4769-9f97-72658917e366" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="176b0270-6983-8b01-85dd-f061326aeaad" executionId="3d6d2ae4-c78d-4caf-b35d-90c7b1bae18c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15fbebc1-1fcc-8db5-8316-bdb6ba94e9bc" executionId="fe3e20eb-3f9d-4ade-9c08-cbdee29abcef" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15819378-7203-82e2-8417-3dbbe03f9e06" executionId="a822bec8-e830-4911-a8dc-9f7bb5e7eb1c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b3fb12e-bc64-86d7-9363-f9010c064ccb" executionId="1664c9e1-41ad-4d9d-bceb-0bdb6d65480f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="150ea95c-afc9-860a-a385-f7288e28c67d" executionId="96a3cbe7-2308-4ead-83c7-0a0af50b7172" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12842f96-de1e-8388-8dcc-7f84a3bb90c4" executionId="f5c5cdb9-2467-4c32-89b0-566ef5832ea3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17cdc29f-e8f8-8ea8-8e32-cabf70bf4fb7" executionId="648d174b-963b-4f95-ac79-cb8df602cf44" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="196be754-6f10-80de-b92a-89eda7c863c7" executionId="c85a46fe-0a0d-4a66-b7a9-071150902479" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19690c51-15c3-8926-abce-eb94dd6e3c81" executionId="f03063d4-f4a4-4703-960c-8eeb2b7caf52" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="129af76c-fed3-888f-878e-c8f82bba8230" executionId="8a5c090a-2b89-4edc-b0e1-15e96a26d320" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12554ac9-5c43-89fe-bda1-5dc667247c64" executionId="05d83450-0f6f-44a8-bb92-8dbc66e5f12b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c098037-7cb7-8a54-93e7-9fa0c63b54d2" executionId="25431dc8-7d0a-4c2a-b0b3-3c93087d9e34" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e64824c-dd74-8f7b-9b81-2dfa73bd1cef" executionId="c8b1249d-2cf0-432f-88b7-317442c9fcc6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e7960b9-4971-8b8b-8f9f-a21f079bce61" executionId="47881385-01bd-4463-80d5-a88c0d4d025a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b30327b-b9e2-8faf-8a3f-5290575c2de1" executionId="a8337520-4f43-41a5-8a63-219bd76cef4e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a5d57a9-560c-86bd-9625-df271e91a7a5" executionId="43953d64-aab9-48a5-a993-53b8fb83cdc7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14972e94-2e70-8f3b-a99d-4bf7985a9197" executionId="9341451a-f0a0-4b43-ad70-91ddcb59f569" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1fec98ad-2f15-80bb-bf03-5ebdf72c0018" executionId="2b8c6a05-465d-469c-a752-588b9e3af551" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1285c3f1-61ef-86f9-996a-674d6f280235" executionId="e4616115-6ec2-43bb-baf6-87a75988340f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d6020df-ca68-8254-aa2f-8c8323d03f7a" executionId="3fa82e20-f58b-4812-8219-65ced16ae190" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1df3345e-f8e3-8e24-ac7c-e2b97455b6a7" executionId="8ce8f6c4-8b96-4b07-8396-679ad01b6279" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e47ab1f-6512-8920-b37a-5f3dab5cef14" executionId="1f7e64db-61ad-4591-9bc0-aaaf3156aac7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d069a46-626f-888b-bbbb-1f9f85bc1584" executionId="c7b734e4-195d-435f-978c-ec1f76ed3c61" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11abe1c5-36fe-8ed5-91f5-545f4288ce2c" executionId="a616fde6-56e0-434b-a00c-27b386ba144d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="121e5723-a62d-895d-b924-3e100fe1c825" executionId="29838555-1ac9-420a-90d0-a2e9f9b10033" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11dad5c8-1ece-82d4-aa4a-cdaca9d5f8d5" executionId="4e822d89-267c-41b9-bc2c-8751d201966b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18bc9405-cb95-86e0-84d8-5993396caece" executionId="e1e39488-cba7-4272-a7b0-5e65680fc5d4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="44" executed="44" passed="44" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

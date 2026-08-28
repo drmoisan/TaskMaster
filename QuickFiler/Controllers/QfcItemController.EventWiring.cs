@@ -91,6 +91,7 @@ namespace QuickFiler.Controllers
             _itemViewer.SearchKeyDown += this.TextBoxSearch_KeyDown;
             _itemViewer.EmailCopyChanged += this.CbxEmailCopy_CheckedChanged;
             _itemViewer.AttachmentsChanged += this.CbxAttachments_CheckedChanged;
+            _itemViewer.PicturesChanged += this.CbxPictures_CheckedChanged;
         }
 
         // Thin async-void shell (research §3.5): WinForms-event-signature boilerplate forwarding to the
@@ -386,6 +387,98 @@ namespace QuickFiler.Controllers
         {
             _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'B');
             _kbdHandler.CharActionsAsync.Remove(ItemHelper.EntryId, 'D');
+        }
+
+        // #481: the teardown counterparts of WireEvents()/WireControlTreeEvents()/WireIntentEvents().
+        internal void UnwireEvents()
+        {
+            UnwireControlTreeEvents();
+            UnwireIntentEvents();
+            DetachWebResourceRequestedHandler();
+        }
+
+        internal void UnwireControlTreeEvents()
+        {
+            // #481: the guards below are deliberately asymmetric with the unguarded wiring methods.
+            // Wiring runs only on the fully initialized path, where every collaborator is resolved.
+            // Teardown must also tolerate a partially constructed controller — a pooled or mocked
+            // viewer that is not the concrete ItemViewer, a null keyboard handler, and null control
+            // collections — because Cleanup() is reachable from an aborted initialization.
+            if (!(_itemViewer is ItemViewer viewer))
+            {
+                return;
+            }
+
+            if (_kbdHandler != null)
+            {
+                viewer.ForAllControls(
+                    x =>
+                    {
+                        x.PreviewKeyDown -= new System.Windows.Forms.PreviewKeyDownEventHandler(
+                            _kbdHandler.KeyboardHandler_PreviewKeyDownAsync
+                        );
+                        x.KeyDown -= new System.Windows.Forms.KeyEventHandler(
+                            _kbdHandler.KeyboardHandler_KeyDownAsync
+                        );
+                    },
+                    // Same exclusion list as WireControlTreeEvents(): the breadcrumb WebView2 was
+                    // never wired, so it must not be walked here either.
+                    new List<Control> { viewer.L0vhBreadcrumb_WebView2 }
+                );
+            }
+
+            foreach (var btn in Buttons ?? (IList<Button>)new List<Button>())
+            {
+                btn.MouseEnter -= this.Button_MouseEnter;
+                btn.MouseLeave -= this.Button_MouseLeave;
+            }
+
+            if (_itemViewer.MenuItems != null)
+            {
+                foreach (ToolStripMenuItem menuItem in _itemViewer.MenuItems)
+                {
+                    menuItem.MouseEnter -= this.MenuItem_MouseEnter;
+                    menuItem.MouseLeave -= this.MenuItem_MouseLeave;
+                }
+            }
+        }
+
+        internal void UnwireIntentEvents()
+        {
+            // #481: same intentional asymmetry as UnwireControlTreeEvents() — teardown tolerates a
+            // controller whose viewer or keyboard handler was never resolved; wiring does not need to.
+            if (_itemViewer is null)
+            {
+                return;
+            }
+
+            _itemViewer.ConversationModeChanged -= this.CbxConversation_CheckedChanged;
+            _itemViewer.FlagTaskClicked -= this.BtnFlagTask_Click;
+            _itemViewer.PopOutClicked -= this.BtnPopOut_Click;
+            _itemViewer.DeleteItemClicked -= this.BtnDelItem_Click;
+            _itemViewer.ReplyClicked -= this.BtnReply_Click;
+            _itemViewer.ReplyAllClicked -= this.BtnReplyAll_Click;
+            _itemViewer.ForwardClicked -= this.BtnForward_Click;
+            _itemViewer.BodyDoubleClick -= this.TxtboxBody_DoubleClick;
+
+            _itemViewer.SearchTextChanged -= new System.EventHandler(
+                this.TextBoxSearch_TextChanged
+            );
+            if (_kbdHandler != null)
+            {
+                _itemViewer.FolderKeyDown -= new System.Windows.Forms.KeyEventHandler(
+                    _kbdHandler.CboFolders_KeyDownAsync
+                );
+            }
+            _itemViewer.FolderSelectionChanged -= this.CboFolders_SelectedIndexChanged;
+            _itemViewer.WebViewInitializationCompleted -=
+                WebView2Control_CoreWebView2InitializationCompleted;
+            _itemViewer.ConversationItemSelectionChanged -=
+                new ListViewItemSelectionChangedEventHandler(this.TopicThread_ItemSelectionChanged);
+            _itemViewer.SearchKeyDown -= this.TextBoxSearch_KeyDown;
+            _itemViewer.EmailCopyChanged -= this.CbxEmailCopy_CheckedChanged;
+            _itemViewer.AttachmentsChanged -= this.CbxAttachments_CheckedChanged;
+            _itemViewer.PicturesChanged -= this.CbxPictures_CheckedChanged;
         }
     }
 }

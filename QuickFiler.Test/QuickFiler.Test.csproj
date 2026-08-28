@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\Meziantou.Analyzer.3.0.174\build\Meziantou.Analyzer.props" Condition="Exists('..\packages\Meziantou.Analyzer.3.0.174\build\Meziantou.Analyzer.props')" />
   <Import Project="..\packages\MSTest.TestAdapter.4.3.3\build\net462\MSTest.TestAdapter.props" Condition="Exists('..\packages\MSTest.TestAdapter.4.3.3\build\net462\MSTest.TestAdapter.props')" />
@@ -56,11 +56,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Controllers\BreadcrumbBridgeRouterQueueTests.cs" />
+    <Compile Include="Controllers\BreadcrumbBridgeRouterQueueTests.Part2.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterTests.cs" />
+    <Compile Include="Controllers\BreadcrumbBridgeRouterTests.Selection.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterIssue614Tests.cs" />
     <Compile Include="Controllers\EfcSelectionGuardTests.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterIssue439Tests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorTests.cs" />
+    <Compile Include="Viewers\BreadcrumbBridgeCoordinatorSupersessionTests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorProbabilityTests.cs" />
     <Compile Include="Viewers\BreadcrumbCoordinatorLifecycleTests.cs" />
     <Compile Include="Viewers\BreadcrumbCoordinatorUpgradeLifetimeTests.cs" />
@@ -82,6 +85,7 @@
     <Compile Include="Viewers\BreadcrumbPendingOpenCloseTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownLifecycleTests.cs" />
     <Compile Include="Viewers\ItemViewerBreadcrumbDropDownContractTests.cs" />
+    <Compile Include="Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinatorTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinatorTests.Part2.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinatorTests.Part3.cs" />
@@ -96,6 +100,7 @@
     <Compile Include="Viewers\BreadcrumbDropDownCoverageThresholdTests.cs" />
     <Compile Include="Controllers\QfcItemControllerBreadcrumbDropDownTests.cs" />
     <Compile Include="Viewers\FolderBreadcrumbAssetContractTests.cs" />
+    <Compile Include="Viewers\ToolStripMenuItemCbTests.cs" />
     <Compile Include="Controllers\KbdActionsTests.cs" />
     <Compile Include="Controllers\KbdActionsRemainingBranchesTests.cs" />
     <Compile Include="Controllers\KaCharTests.cs" />
@@ -113,12 +118,21 @@
     <Compile Include="Controllers\EfcHomeControllerLifecycleTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerMetricsTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerTests.cs" />
+    <Compile Include="Controllers\EfcItemController.CleanupTests.cs" />
+    <Compile Include="Controllers\EfcItemControllerTests.cs" />
+    <Compile Include="Controllers\EfcViewerTests.cs" />
     <Compile Include="Controllers\EmailSorterTests.cs" />
     <Compile Include="Controllers\BayesianPerformanceControllerTests.cs" />
     <Compile Include="Controllers\BayesianPerformanceController.TestSupport.cs" />
     <Compile Include="Controllers\EfcHomeControllerSeamTests.cs" />
     <Compile Include="Controllers\QfcCollectionControllerTests.cs" />
+    <Compile Include="Controllers\QfcCollectionControllerNavigationDigitsTests.cs" />
     <Compile Include="Controllers\QfcCollectionControllerDarkModeTests.cs" />
+    <Compile Include="Controllers\QfcCollectionController.TestSupport.cs" />
+    <Compile Include="Controllers\QfcCollectionControllerDefects468Tests.cs" />
+    <Compile Include="Controllers\QfcCollectionControllerDefects468MoveTests.cs" />
+    <Compile Include="Controllers\QfcCollectionControllerDefects468ConversationTests.cs" />
+    <Compile Include="Controllers\QfcCollectionControllerLayout.StaTests.cs" />
     <Compile Include="Controllers\QfcDatamodelTests.cs" />
     <Compile Include="Controllers\QfcDatamodelLivenessTests.cs" />
     <Compile Include="Controllers\QfcExplorerController.ConversationViewTests.cs" />
@@ -148,6 +162,8 @@
     <Compile Include="Controllers\QfcItemController.MailActionsTests.cs" />
     <Compile Include="Controllers\QfcItemController.PropertiesTests.cs" />
     <Compile Include="Controllers\QfcItemController.TestSupport.cs" />
+    <Compile Include="Controllers\QfcItemController.UiThreadDispatcherFixture.cs" />
+    <Compile Include="Controllers\QfcItemController.UiThreadDispatcherFixtureTests.cs" />
     <Compile Include="Controllers\QfcItemController.InitializationTests.cs" />
     <Compile Include="Controllers\QfcItemController.InitializationTests.Part2.cs" />
     <Compile Include="Controllers\QfcItemController.InitializationTests.Part3.cs" />
@@ -158,9 +174,14 @@
     <Compile Include="Controllers\QfcItemController.SeamDispatcherTests.cs" />
     <Compile Include="Controllers\QfcItemController.SeamCoreTests.cs" />
     <Compile Include="Controllers\QfcItemController.SeamFactoryTests.cs" />
+    <Compile Include="Controllers\QfcItemController.EventWiringTests.Part2.cs" />
+    <Compile Include="Controllers\QfcItemController.ThemeMarshallingTests.cs" />
+    <Compile Include="Controllers\QfcItemController.MailActionsTests.Part2.cs" />
     <Compile Include="Controllers\MailItemActionsAdapterTests.cs" />
     <Compile Include="Controllers\WpfUiDispatcherTests.cs" />
     <Compile Include="Controllers\WebView2CoreInitializerTests.cs" />
+    <Compile Include="Viewers\WebView2BreadcrumbHostContractTests.cs" />
+    <Compile Include="Viewers\WebView2BreadcrumbHostTests.cs" />
     <Compile Include="Controllers\QfcQueueTests.cs" />
     <Compile Include="TestSupport\WinFormsPumpHost.cs" />
     <Compile Include="TestSupport\WinFormsPumpHostTests.cs" />

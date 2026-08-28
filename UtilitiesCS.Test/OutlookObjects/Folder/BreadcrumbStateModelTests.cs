@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -315,6 +315,140 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             row.CollapsedAfterIndex.Should().BeNull();
             row.LeafExpanded.Should().BeFalse();
             row.Subfolders.Should().BeEmpty();
+        }
+
+        // --- #440 Qfc tree navigation ---
+
+        /// <summary>
+        /// #440 Qfc Left: on a multi-segment row Left selects the row's parent node before any
+        /// pre-existing view transition is considered (decision D1). The parent is proven to be
+        /// the selected node because a following Right expands it even though the leaf segment
+        /// carries no expansion affordance of its own.
+        /// </summary>
+        [TestMethod]
+        public void LeftArrow_QfcMultiSegmentRow_SelectsParentNode()
+        {
+            // Arrange: Inbox -> Projects -> Apollo where only the non-leaf segments have children.
+            var model = ModelWithSuggestion(leafHasChildren: false);
+
+            // Act
+            var handled = model.LeftArrow();
+
+            // Assert: the tree transition handled the key without collapsing the view.
+            handled.Should().BeTrue("Left selects the parent node before the pre-existing path");
+            model.SelectedRow.CollapsedAfterIndex.Should().BeNull();
+            model.SelectedRow.LeafExpanded.Should().BeFalse();
+
+            // Assert: the selected node is the parent, not the leaf.
+            model.RightArrow().Should().BeTrue("the selected parent node carries children");
+            model.SelectedRow.LeafExpanded.Should().BeTrue();
+        }
+
+        /// <summary>
+        /// #440 Qfc Right: once the selected parent node is expanded and its children are
+        /// attached, the next Right descends into child index 0.
+        /// </summary>
+        [TestMethod]
+        public void RightArrow_QfcSelectedParentNode_ExpandsIntoChildren()
+        {
+            // Arrange: select the parent node, expand it, and attach one child.
+            var model = ModelWithSuggestion();
+            model.LeftArrow();
+            model.RightArrow();
+            model.SelectedRow.SetSubfolders(
+                new[] { Segment("kid", "\\Inbox\\Projects\\Kid", "Kid", false) }
+            );
+
+            // Act
+            var handled = model.RightArrow();
+
+            // Assert
+            handled.Should().BeTrue("the descent transition selects the first child");
+            model.SelectedSubfolderIndex.Should().Be(0);
+        }
+
+        /// <summary>
+        /// #440 decision D1 (handling order): a one-segment suggestion row has no parent to
+        /// select, so Right and Left take the pre-existing expand and collapse path and, where
+        /// none applies, report the pre-existing unhandled fall-through.
+        /// </summary>
+        [TestMethod]
+        public void ArrowKey_QfcSingleSegmentRow_TakesPreExistingCollapsePath()
+        {
+            // Arrange
+            var model = new BreadcrumbStateModel();
+            model.AddSuggestionRow(new[] { Segment("root", "\\Inbox", "Inbox", true) }, 0.5);
+            model.SelectRow(0);
+
+            // Act + Assert: Right opens the pre-existing leaf expansion.
+            model.RightArrow().Should().BeTrue();
+            model.SelectedRow.LeafExpanded.Should().BeTrue();
+
+            // Act + Assert: Left closes it through the pre-existing collapse path.
+            model.LeftArrow().Should().BeTrue();
+            model.SelectedRow.LeafExpanded.Should().BeFalse();
+
+            // Act + Assert: a further Left is the pre-existing unhandled fall-through.
+            model.LeftArrow().Should().BeFalse();
+        }
+
+        /// <summary>
+        /// #440/D7 negative path: the filing-target constructor overload leaves validation of a
+        /// null or empty ancestor chain to the chained constructor rather than throwing its own
+        /// error, so an empty chain still fails fast with the chain message.
+        /// </summary>
+        [TestMethod]
+        public void SuggestionRowWithFilingTarget_EmptyChain_DefersValidationToChainedConstructor()
+        {
+            // Arrange
+            var emptyChain = Array.Empty<FolderBreadcrumbSegment>();
+
+            // Act
+            Action act = () =>
+                new BreadcrumbStateRow("folder-a", emptyChain, 0.4, @"\Inbox\Clients");
+
+            // Assert
+            act.Should().Throw<ArgumentException>().WithMessage("*non-empty ancestor chain*");
+        }
+
+        /// <summary>
+        /// #440 negative path: with no open expansion there is no fetched child to descend into,
+        /// so GetActiveChild reports null and the caller takes the decision-D1 fall-through.
+        /// </summary>
+        [TestMethod]
+        public void GetActiveChild_WithoutAnOpenExpansion_ReturnsNull()
+        {
+            // Arrange
+            var row = ModelWithSuggestion().Rows[0];
+
+            // Act + Assert
+            row.LeafExpanded.Should().BeFalse();
+            row.GetActiveChild(0).Should().BeNull();
+        }
+
+        /// <summary>
+        /// #440 negative path (no-op by contract): TryExpandActiveSegment returns false without
+        /// changing state both when the active segment has no child affordance and when an
+        /// expansion is already open, so the caller falls through to legacy behavior.
+        /// </summary>
+        [TestMethod]
+        public void TryExpandActiveSegment_WithoutAnAffordance_ReturnsFalseAndLeavesTheRowClosed()
+        {
+            // Arrange: a leaf with no children has no affordance to open.
+            var childlessRow = ModelWithSuggestion(leafHasChildren: false).Rows[0];
+
+            // Act + Assert
+            childlessRow.ActiveSegmentHasSubfolders.Should().BeFalse();
+            childlessRow.TryExpandActiveSegment().Should().BeFalse();
+            childlessRow.LeafExpanded.Should().BeFalse();
+
+            // Arrange: an already-open expansion is the second refusal condition.
+            var openRow = ModelWithSuggestion().Rows[0];
+            openRow.TryExpandLeaf().Should().BeTrue();
+
+            // Act + Assert
+            openRow.TryExpandActiveSegment().Should().BeFalse();
+            openRow.LeafExpanded.Should().BeTrue();
         }
     }
 }

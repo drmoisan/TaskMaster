@@ -32,7 +32,7 @@ namespace QuickFiler.Controllers
             IQfcFormViewer viewerInstance,
             QfEnums.InitTypeEnum InitType,
             IFilerHomeController homeController,
-            IFilerFormController parent,
+            IQfcFormController parent,
             CancellationTokenSource tokenSource,
             CancellationToken token,
             TlpCellStates tlpStates
@@ -61,14 +61,19 @@ namespace QuickFiler.Controllers
         private QfEnums.InitTypeEnum _initType;
         private IApplicationGlobals _globals;
         private IFilerHomeController _homeController;
-        private IFilerFormController _parent;
+        private IQfcFormController _parent;
 
         //private int _itemHeight;
         private Panel _itemPanel;
         private TableLayoutPanel _itemTlp;
         private TableLayoutPanel _itemTlpToMove;
-        private TableLayoutPanel _templateTlp;
-        private ConcurrentDictionary<QfcItemGroup, int> _itemGroupsToMove;
+
+        // Issue #469 defect 3: an ordered contract, not a hash-based one. TryGetItemGroupByIndex,
+        // MoveEmailsAsync and GetMoveDiagnostics all resolve a group by position, so the cached
+        // snapshot must preserve the order of _itemGroups. A ConcurrentDictionary's enumeration
+        // order is unspecified and can change on rehash, which silently paired one message's move
+        // with another message's diagnostics.
+        private IReadOnlyList<QfcItemGroup> _itemGroupsToMove;
         private bool _darkMode;
         private RowStyle _template;
         private RowStyle _templateExpanded;
@@ -111,6 +116,9 @@ namespace QuickFiler.Controllers
 
         private bool _digitRefreshNeeded = false;
         private int _digits = 1;
+
+        // Issue #472: the width the last RegisterNavigation actually used, replayed at unregister.
+        private int _registeredDigits;
         internal int Digits
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
@@ -137,9 +145,21 @@ namespace QuickFiler.Controllers
                 );
                 _itemGroups.ForEach(grp =>
                 {
+                    // Issue #470 defect 3: skip the group whole. The controller was dereferenced
+                    // unguarded on the first line and null-conditionally on the third, while the
+                    // viewer was dereferenced unguarded on the second, so the null-conditional
+                    // protected nothing. Guarding only the controller is also insufficient:
+                    // execution would then reach the viewer dereference on the next line with the
+                    // same arrangement. Both members must dominate every dereference below.
+                    if (grp?.ItemController is null || grp.ItemViewer is null)
+                    {
+                        return;
+                    }
+
                     grp.ItemController.ItemNumberDigits = digits;
-                    grp.ItemViewer.LblItemNumber.Text =
-                        grp.ItemController?.ItemNumber.ToString(format) ?? 0.ToString(format);
+                    grp.ItemViewer.LblItemNumber.Text = grp.ItemController.ItemNumber.ToString(
+                        format
+                    );
                 });
             }
             _digitRefreshNeeded = false;
@@ -149,47 +169,84 @@ namespace QuickFiler.Controllers
 
         public int EmailsToMove => _itemGroupsToMove?.Count ?? 0;
 
+        /// <summary>
+        /// Seam used by <see cref="ReadyForMove"/> to present the "not ready" notification.
+        /// Defaults to the exact modal call the getter previously made inline, with the same
+        /// message, caption, buttons and icon. Tests inject a recording delegate so the readiness
+        /// evaluation can be asserted without presenting a dialog, which a unit test cannot do.
+        /// </summary>
+        private Action<string> _notifyNotReady;
+
+        private Action<string> NotifyNotReady =>
+            _notifyNotReady ??= notifications =>
+                MessageBox.Show(
+                    notifications,
+                    "Error Notification",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
+
+        /// <summary>
+        /// Evaluates whether every loaded item group has a real destination folder assigned,
+        /// presenting nothing. This is the evaluation half of <see cref="ReadyForMove"/>, split out
+        /// so the decision can be inspected independently of the notification.
+        /// </summary>
+        /// <param name="notifications">
+        /// Receives the text describing every unassigned group when the method returns
+        /// <see langword="false"/>, and <see cref="string.Empty"/> when it returns
+        /// <see langword="true"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when every group has a destination folder that is not one of the
+        /// three list-header sentinel strings.
+        /// </returns>
+        internal bool TryGetMoveReadiness(out string notifications)
+        {
+            bool blReadyForMove = true;
+            string strNotifications =
+                "Can't complete actions! Not all emails assigned to folder"
+                + System.Environment.NewLine;
+
+            foreach (var grp in _itemGroups)
+            {
+                string[] headers =
+                {
+                    "======= SEARCH RESULTS =======",
+                    "======= RECENT SELECTIONS ========",
+                    "========= SUGGESTIONS =========",
+                };
+                if (
+                    (grp.ItemController.SelectedFolder is null)
+                    || headers.Contains(grp.ItemController.SelectedFolder)
+                )
+                {
+                    blReadyForMove = false;
+                    strNotifications =
+                        strNotifications
+                        + grp.ItemController.ItemNumber
+                        + "  "
+                        + grp.ItemController.Mail.SentOn.ToString("MM/dd/yyyy")
+                        + "  "
+                        + grp.ItemController.Mail.Subject
+                        + Environment.NewLine;
+                }
+            }
+
+            notifications = blReadyForMove ? string.Empty : strNotifications;
+            return blReadyForMove;
+        }
+
         public bool ReadyForMove
         {
             get
             {
-                bool blReadyForMove = true;
-                string strNotifications =
-                    "Can't complete actions! Not all emails assigned to folder"
-                    + System.Environment.NewLine;
-
-                foreach (var grp in _itemGroups)
+                if (TryGetMoveReadiness(out string notifications))
                 {
-                    string[] headers =
-                    {
-                        "======= SEARCH RESULTS =======",
-                        "======= RECENT SELECTIONS ========",
-                        "========= SUGGESTIONS =========",
-                    };
-                    if (
-                        (grp.ItemController.SelectedFolder is null)
-                        || headers.Contains(grp.ItemController.SelectedFolder)
-                    )
-                    {
-                        blReadyForMove = false;
-                        strNotifications =
-                            strNotifications
-                            + grp.ItemController.ItemNumber
-                            + "  "
-                            + grp.ItemController.Mail.SentOn.ToString("MM/dd/yyyy")
-                            + "  "
-                            + grp.ItemController.Mail.Subject
-                            + Environment.NewLine;
-                    }
+                    return true;
                 }
-                if (!blReadyForMove)
-                    MessageBox.Show(
-                        strNotifications,
-                        "Error Notification",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error
-                    );
-                return blReadyForMove;
+
+                NotifyNotReady(notifications);
+                return false;
             }
         }
 
@@ -395,11 +452,9 @@ namespace QuickFiler.Controllers
 
             // Wait until Background Loading Tasks finish and then clear the collection
 
-            await Task.WhenAll(BackgroundLoadingTasks);
-            BackgroundLoadingTasks = [];
+            await DrainBackgroundLoadingTasksAsync();
 
             // Load the Item Viewers, Item Controllers, and Initialize
-            //await LoadGroups_02bAsync(items, template, _tlpStates);
             WireUpAsyncKeyboardHandler();
 
             // Restore state of window
@@ -489,8 +544,7 @@ namespace QuickFiler.Controllers
             }
 
             // Wait until Background Loading Tasks finish and then clear the collection
-            await Task.WhenAll(BackgroundLoadingTasks);
-            BackgroundLoadingTasks = [];
+            await DrainBackgroundLoadingTasksAsync();
 
             WireUpAsyncKeyboardHandler();
 
@@ -584,26 +638,6 @@ namespace QuickFiler.Controllers
             _kbdHandler.CharActionsAsync = new KbdActions<char, KaCharAsync, Func<char, Task>>();
         }
 
-        public async Task LoadGroups_02cAsync(
-            IList<MailItem> items,
-            RowStyle template,
-            TlpCellStates tlpStates
-        )
-        {
-            Token.ThrowIfCancellationRequested();
-
-            var digits = items.Count >= 10 ? 2 : 1;
-
-            _itemGroups =
-            [
-                .. items.Select(
-                    (mailItem, i) => EncapsulateItemGroup(template, mailItem, i, digits, tlpStates)
-                ),
-            ];
-
-            await Task.CompletedTask;
-        }
-
         internal QfcItemGroup EncapsulateItemGroup(
             RowStyle template,
             MailItem mailItem,
@@ -632,111 +666,6 @@ namespace QuickFiler.Controllers
             return grp;
         }
 
-        public async Task LoadGroups_02bAsync(
-            IList<MailItem> items,
-            RowStyle template,
-            TlpCellStates tlpStates
-        )
-        {
-            Token.ThrowIfCancellationRequested();
-
-            var digits = items.Count >= 10 ? 2 : 1;
-
-            var grpTasks = items
-                .Select(
-                    (mailItem, i) => LoadGroup_03bAsync(template, mailItem, i, digits, tlpStates)
-                )
-                .ToList();
-
-            _itemGroups = [.. (await Task.WhenAll(grpTasks))];
-        }
-
-        private async Task<QfcItemGroup> LoadGroup_03bAsync(
-            RowStyle template,
-            MailItem mailItem,
-            int i,
-            int digits,
-            TlpCellStates tlpStates
-        )
-        {
-            var ui = TaskScheduler.FromCurrentSynchronizationContext();
-
-            var grpTask = Task.Factory.StartNew(
-                () =>
-                {
-                    var grp = new QfcItemGroup(mailItem);
-                    grp.ItemViewer = LoadItemViewer_03(i, template, true);
-                    return grp;
-                },
-                Token,
-                TaskCreationOptions.None,
-                ui
-            );
-
-            var grpTask2 = grpTask
-                .ContinueWith(
-                    async x =>
-                    {
-                        var grp = x.Result;
-                        grp.ItemController = new QfcItemController(
-                            _globals,
-                            _homeController,
-                            this,
-                            grp.ItemViewer,
-                            i + 1,
-                            digits,
-                            grp.MailItem,
-                            tlpStates
-                        );
-                        grp.ItemController.Token = Token;
-                        await grp.ItemController.InitializeSequentialAsync();
-                        return grp;
-                    },
-                    Token,
-                    TaskContinuationOptions.OnlyOnRanToCompletion,
-                    ui
-                )
-                .Unwrap();
-
-            var grpTask3 = grpTask2
-                .ContinueWith(
-                    async x =>
-                    {
-                        var grp = x.Result;
-
-                        var subTasks = new List<Task>()
-                        {
-                            Task.Factory.StartNew(
-                                () =>
-                                    grp.ItemController.PopulateConversationAsync(
-                                        TokenSource,
-                                        Token,
-                                        false
-                                    ),
-                                Token,
-                                TaskCreationOptions.AttachedToParent,
-                                ui
-                            ),
-                            Task.Factory.StartNew(
-                                () => grp.ItemController.PopulateFolderComboBoxAsync(Token),
-                                Token,
-                                TaskCreationOptions.AttachedToParent,
-                                ui
-                            ),
-                        };
-                        await Task.WhenAll(subTasks);
-
-                        return grp;
-                    },
-                    Token,
-                    TaskContinuationOptions.OnlyOnRanToCompletion,
-                    ui
-                )
-                .Unwrap();
-
-            return await grpTask3;
-        }
-
         public void LoadItemGroupsAndViewers_02(IList<MailItem> items, RowStyle template)
         {
             _itemGroups = new List<QfcItemGroup>();
@@ -756,43 +685,6 @@ namespace QuickFiler.Controllers
         public void LoadConversationsAndFolders_04()
         {
             LoadSequential_5();
-        }
-
-        public async Task LoadConversationsAndFoldersAsync()
-        {
-            // ForEachAsync (System.Linq.Async) is obsolete (CS0618) per the framework's migration
-            // guidance ("Use the language support for async foreach instead"), but replacing it
-            // with `await foreach` here is a control-flow change to a production async method,
-            // not an annotation-only edit. Suppressing narrowly preserves the exact pre-existing
-            // behavior (no behavior change per AC7).
-#pragma warning disable CS0618
-            await AsyncEnumerable
-                .Range(0, _itemGroups.Count)
-                .Select(i => (i, grp: _itemGroups[i]))
-                .ForEachAsync(async x => await LoadItemGroup(x.i, x.grp));
-#pragma warning restore CS0618
-        }
-
-        internal async Task LoadItemGroup(int i, QfcItemGroup group)
-        {
-            group.ItemController = new QfcItemController(
-                appGlobals: _globals,
-                homeController: _homeController,
-                parent: this,
-                itemViewer: group.ItemViewer,
-                viewerPosition: i + 1,
-                itemNumberDigits: _itemGroups.Count >= 10 ? 2 : 1,
-                group.MailItem,
-                _tlpStates
-            );
-            var tasks = new List<Task>
-            {
-                group.ItemController.InitializeAsync(),
-                Task.Run(() => group.ItemController.PopulateConversation()),
-                Task.Run(() => group.ItemController.PopulateFolderComboBox()),
-            };
-
-            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
         public void LoadSequential_5()
@@ -824,60 +716,17 @@ namespace QuickFiler.Controllers
             }
         }
 
-        public async Task LoadSequentialAsync()
-        {
-            // ForEachAsync (System.Linq.Async) is obsolete (CS0618) per the framework's migration
-            // guidance ("Use the language support for async foreach instead"), but replacing it
-            // with `await foreach` here is a control-flow change to a production async method,
-            // not an annotation-only edit. Suppressing narrowly preserves the exact pre-existing
-            // behavior (no behavior change per AC7).
-#pragma warning disable CS0618
-            await AsyncEnumerable
-                .Range(0, _itemGroups.Count)
-                .Select(i => (i, grp: _itemGroups[i]))
-                .ForEachAsync(async x => await LoadGroupSequential(x.i, x.grp));
-#pragma warning restore CS0618
-        }
-
-        public async Task LoadGroupSequential(int i, QfcItemGroup grp)
-        {
-            grp.ItemController = new QfcItemController(
-                appGlobals: _globals,
-                homeController: _homeController,
-                parent: this,
-                itemViewer: grp.ItemViewer,
-                viewerPosition: i + 1,
-                itemNumberDigits: _itemGroups.Count >= 10 ? 2 : 1,
-                grp.MailItem,
-                _tlpStates
-            );
-            await grp.ItemController.InitializeAsync();
-            await Task.Run(() => grp.ItemController.PopulateConversation());
-            await Task.Run(() => grp.ItemController.PopulateFolderComboBox());
-        }
-
         internal void ActivateQueuedTlp(TableLayoutPanel tlp)
         {
             _formViewer.SwapItemTableLayout(tlp);
             _itemTlp = _formViewer.L1v0L2L3v_TableLayout;
         }
 
-        internal void CacheTlpForMove()
-        {
-            _itemTlpToMove = _formViewer.L1v0L2L3v_TableLayout;
-        }
-
-        internal void SwapTlp(TableLayoutPanel tlp)
-        {
-            CacheTlpForMove();
-            ActivateQueuedTlp(tlp);
-        }
-
         internal void CacheItemGroupsForMove()
         {
-            _itemGroupsToMove = _itemGroups
-                .Select(group => new KeyValuePair<QfcItemGroup, int>(group, 1))
-                .ToConcurrentDictionary();
+            // Snapshot in list order (issue #469 defect 3). ToList copies, so later mutation of
+            // _itemGroups does not disturb the cached move order.
+            _itemGroupsToMove = _itemGroups.ToList();
         }
 
         internal void ActivateQueuedItemGroups(List<QfcItemGroup> itemGroups)
@@ -1014,8 +863,16 @@ namespace QuickFiler.Controllers
         {
             if (_itemGroupsToMove is not null)
             {
-                _itemGroupsToMove.ForEach(kvp => kvp.Key.ItemController.Cleanup());
-                _itemGroupsToMove.Clear();
+                foreach (var group in _itemGroupsToMove)
+                {
+                    group.ItemController?.Cleanup();
+                }
+
+                // The cached snapshot is read-only, so it is released by resetting the field
+                // rather than by mutating the collection in place. An empty list rather than null
+                // preserves the post-Clear() semantics the previous code had: EmailsToMove and
+                // GetMoveDiagnostics continue to observe a non-null, zero-length collection.
+                _itemGroupsToMove = Array.Empty<QfcItemGroup>();
             }
             if (_itemTlpToMove is not null)
                 _itemTlpToMove.Dispose();
@@ -1159,118 +1016,107 @@ namespace QuickFiler.Controllers
         public async Task RemoveSpecificControlGroupAsync(int selection)
         {
             Interlocked.Increment(ref removespecificcontrolgroupcounter);
-            UnregisterNavigation();
-
-            // If the group is active, turn off the active item and select a new item
-            bool activeUI = _itemGroups[selection - 1].ItemController.IsActiveUI;
-            bool expanded = _itemGroups[selection - 1].ItemController.IsExpanded;
-            if (activeUI)
+            try
             {
-                await ToggleOffActiveItemAsync(false);
-            }
+                UnregisterNavigation();
 
-            UpdateSelectionNumberForRemoval(selection);
-
-            bool tlpState = TlpLayout;
-
-            //Removed dispatcher call because synchronization context should be set
-            //await UiThread.Dispatcher.InvokeAsync(() =>
-            //{
-            tlpState = TlpLayout;
-            TlpLayout = false;
-
-            // Remove the controls from the form
-            TableLayoutHelper.RemoveSpecificRow(_itemTlp, selection - 1);
-            //});
-
-            // Unhook the email from the move monitor
-            _moveMonitor.UnhookItem(_itemGroups[selection - 1].MailItem);
-
-            // Remove the group from the list of groups
-            _itemGroups.RemoveAt(selection - 1);
-
-            if (_itemGroups.Count > 0)
-            {
-                // Renumber the remaining groups
-                await UiThread.Dispatcher.InvokeAsync(() =>
-                {
-                    var digits = Digits;
-                    if (_digitRefreshNeeded)
-                    {
-                        SetVisualDigits(digits);
-                    }
-                    RenumberGroups();
-                });
-
-                // Restore UI to previous state with newly selected item
+                // If the group is active, turn off the active item and select a new item
+                bool activeUI = _itemGroups[selection - 1].ItemController.IsActiveUI;
+                bool expanded = _itemGroups[selection - 1].ItemController.IsExpanded;
                 if (activeUI)
                 {
-                    await _itemGroups[ActiveIndex]
-                        .ItemController.ToggleFocusAsync(Enums.ToggleState.On);
-                    if (expanded)
+                    await ToggleOffActiveItemAsync(false);
+                }
+
+                UpdateSelectionNumberForRemoval(selection);
+
+                bool tlpState = TlpLayout;
+
+                //Removed dispatcher call because synchronization context should be set
+                //await UiThread.Dispatcher.InvokeAsync(() =>
+                //{
+                tlpState = TlpLayout;
+                TlpLayout = false;
+
+                // Remove the controls from the form
+                TableLayoutHelper.RemoveSpecificRow(_itemTlp, selection - 1);
+                //});
+
+                // Unhook the email from the move monitor
+                _moveMonitor.UnhookItem(_itemGroups[selection - 1].MailItem);
+
+                // Remove the group from the list of groups
+                _itemGroups.RemoveAt(selection - 1);
+
+                if (_itemGroups.Count > 0)
+                {
+                    // Renumber the remaining groups
+                    await UiThread.Dispatcher.InvokeAsync(() =>
                     {
-                        await _itemGroups[ActiveIndex].ItemController.ToggleExpansionAsync();
+                        var digits = Digits;
+                        if (_digitRefreshNeeded)
+                        {
+                            SetVisualDigits(digits);
+                        }
+                        RenumberGroups();
+                    });
+
+                    // Restore UI to previous state with newly selected item
+                    if (activeUI)
+                    {
+                        await _itemGroups[ActiveIndex]
+                            .ItemController.ToggleFocusAsync(Enums.ToggleState.On);
+                        if (expanded)
+                        {
+                            await _itemGroups[ActiveIndex].ItemController.ToggleExpansionAsync();
+                        }
                     }
                 }
-            }
-            else if (_itemGroups.Count == 0 && _kbdHandler.KbdActive)
-            {
-                await _kbdHandler.ToggleKeyboardDialogAsync();
-            }
-
-            // Guards against double-registration: when the zero-item branch skips to the next page,
-            // SkipGroupAsync -> LoadControlsAndHandlers_01 -> SwapItemGroups already registers the
-            // incoming page's navigation keys. Registering again below would re-add the same keys and
-            // throw ArgumentException from KbdActions.Add (Issue #232).
-            bool swapAlreadyRegistered = false;
-            await UiThread.Dispatcher.InvokeAsync(async () =>
-            {
-                TlpLayout = tlpState;
-                ResetPanelHeight();
-                if (_itemGroups.Count == 0)
+                else if (_itemGroups.Count == 0 && _kbdHandler.KbdActive)
                 {
-                    await ((QfcFormController)_parent).SkipGroupAsync();
-                    swapAlreadyRegistered = true;
-                    //_parent.ActionOkAsync();
+                    await _kbdHandler.ToggleKeyboardDialogAsync();
                 }
-            });
-            if (removespecificcontrolgroupcounter > 1)
-            {
-                logger.Error(
-                    "RemoveSpecificControlGroupAsync: Counter is greater than 1. Race Condition Exists"
-                );
+
+                // Guards against double-registration: when the zero-item branch skips to the next page,
+                // SkipGroupAsync -> LoadControlsAndHandlers_01 -> SwapItemGroups already registers the
+                // incoming page's navigation keys. Registering again below would re-add the same keys and
+                // throw ArgumentException from KbdActions.Add (Issue #232).
+                bool swapAlreadyRegistered = false;
+                await UiThread.Dispatcher.InvokeAsync(async () =>
+                {
+                    TlpLayout = tlpState;
+                    ResetPanelHeight();
+                    if (_itemGroups.Count == 0)
+                    {
+                        await _parent.SkipGroupAsync();
+                        swapAlreadyRegistered = true;
+                        //_parent.ActionOkAsync();
+                    }
+                });
+                if (removespecificcontrolgroupcounter > 1)
+                {
+                    logger.Error(
+                        "RemoveSpecificControlGroupAsync: Counter is greater than 1. Race Condition Exists"
+                    );
+                }
+                if (!swapAlreadyRegistered)
+                {
+                    RegisterNavigation();
+                }
             }
-            if (!swapAlreadyRegistered)
+            finally
             {
-                RegisterNavigation();
+                // Issue #286: the decrement must also run when the body throws. Before this
+                // change it was the method's last statement, so any exception left the
+                // process-wide counter permanently one higher and eventually tripped the
+                // race-condition error branch above on a later, legitimate call.
+                Interlocked.Decrement(ref removespecificcontrolgroupcounter);
             }
-            Interlocked.Decrement(ref removespecificcontrolgroupcounter);
         }
 
         #endregion
 
         #region Event Wiring
-
-        public void WireUpKeyboardHandler()
-        {
-            // Treatment as char limits to 9 numbered items and 26 character items
-            for (int i = 0; i < _itemGroups.Count && i < 10; i++)
-            {
-                _kbdHandler.CharActions.Add(
-                    "Collection",
-                    (i + 1).ToString()[0],
-                    (c) => ChangeByIndex(int.Parse(c.ToString()) - 1)
-                );
-            }
-            _kbdHandler.KeyActions = new KbdActions<Keys, KaKey, Action<Keys>>(
-                new List<KaKey>
-                {
-                    new KaKey("Collection", Keys.Up, (k) => SelectPreviousItem()),
-                    new KaKey("Collection", Keys.Down, (k) => SelectNextItem()),
-                    new KaKey("Collection", Keys.Down, (k) => _parent.ActionOkAsync()),
-                }
-            );
-        }
 
         public void WireUpAsyncKeyboardHandler()
         {
@@ -1321,15 +1167,10 @@ namespace QuickFiler.Controllers
             return false;
         }
 
-        internal async Task<bool> AnyOpenDropDownsAsync(bool close, CancellationToken token)
-        {
-            token.ThrowIfCancellationRequested();
-            return await Task.FromResult(false);
-        }
-
         public void RegisterNavigation()
         {
             var digits = Digits;
+            _registeredDigits = digits;
             if (_digitRefreshNeeded)
             {
                 SetVisualDigits(digits);
@@ -1342,16 +1183,12 @@ namespace QuickFiler.Controllers
 
         public void UnregisterNavigation()
         {
+            // Issue #472: replay the recorded registration width; re-reading the live width property
+            // would remove keys this page never registered. Non-2 means width 1, so a field of 0 does.
+            var format = _registeredDigits == 2 ? "00" : "";
             for (int i = 0; i < _itemGroups.Count; i++)
             {
-                if (Digits == 1)
-                {
-                    _kbdHandler.StringActionsAsync.Remove("Collection", (i + 1).ToString());
-                }
-                else
-                {
-                    _kbdHandler.StringActionsAsync.Remove("Collection", (i + 1).ToString("00"));
-                }
+                _kbdHandler.StringActionsAsync.Remove("Collection", (i + 1).ToString(format));
             }
         }
 
@@ -1713,6 +1550,18 @@ namespace QuickFiler.Controllers
         /// <param name="desiredState">Checked is true or false</param>
         public void ChangeConversationSilently(int indexOriginal, bool desiredState)
         {
+            // Issue #470 defect 1: guard this overload's own subscript too. It is public and
+            // reachable from callers other than ToggleGroupConv, so relying on every caller to
+            // filter the -1 sentinel would leave the same defect one call site away.
+            if (_itemGroups is null || indexOriginal < 0 || indexOriginal >= _itemGroups.Count)
+            {
+                logger.Warn(
+                    $"Cannot change the conversation state at index {indexOriginal}: the index is "
+                        + "outside the item group collection. Skipping."
+                );
+                return;
+            }
+
             ChangeConversationSilently(_itemGroups[indexOriginal], desiredState);
         }
 
@@ -1743,6 +1592,14 @@ namespace QuickFiler.Controllers
             if (indexOriginal == -1)
             {
                 indexOriginal = PromoteFirstChild(originalId, ref childCount);
+            }
+
+            // Issue #470 defect 1: PromoteFirstChild returns the -1 sentinel when the conversation
+            // has neither its original nor a promotable child. Nothing remains to check or
+            // collapse, so return instead of carrying -1 into the subscripts below.
+            if (indexOriginal == -1)
+            {
+                return;
             }
 
             // ensure the original is checked
@@ -1819,8 +1676,39 @@ namespace QuickFiler.Controllers
             int baseEmailIndex = _itemGroups.FindIndex(itemGroup =>
                 itemGroup.ItemController.Mail.EntryID == entryID
             );
+
+            // Issue #470 defect 2: FindIndex returns -1 when the base email is no longer in the
+            // collection, and every downstream index derives from it. Expanding from -1 reserved
+            // rows at index 0 and then subscripted _itemGroups[insertionIndex - 1] with -1.
+            // Restore the navigation and layout state this method turned off, then return.
+            if (baseEmailIndex == -1)
+            {
+                logger.Warn(
+                    $"Cannot expand the conversation for entryID={entryID}: the base email is no "
+                        + "longer in the item group collection. Skipping the expansion."
+                );
+                RegisterNavigation();
+                TlpLayout = tlpState;
+                return;
+            }
+
             int insertionIndex = baseEmailIndex + 1;
-            int insertCount = conversationCount - 1;
+
+            // Issue #470 defect 2: resolve the conversation members exactly once, here, and
+            // derive the insertion count from the resolved list. The caller-supplied
+            // conversationCount is only a reservation hint; when the two disagree the resolved
+            // count wins and the disagreement is logged once. The loop is deliberately not
+            // clamped, because clamping would silently drop conversation members.
+            IReadOnlyList<MailItem> insertions = ResolveConversationInsertions(resolver, entryID);
+            int insertCount = ReconcileInsertionCount(
+                entryID,
+                conversationCount,
+                insertions.Count,
+                resolver.Count.SameFolder,
+                resolver.Count.Expanded,
+                baseEmailIndex,
+                message => logger.Warn(message)
+            );
 
             if (insertCount > 0)
             {
@@ -1833,7 +1721,7 @@ namespace QuickFiler.Controllers
                     entryID,
                     resolver,
                     insertionIndex,
-                    conversationCount,
+                    insertions,
                     folderList
                 );
                 if (_digitRefreshNeeded)
@@ -1864,27 +1752,103 @@ namespace QuickFiler.Controllers
         }
 
         /// <summary>
+        /// Resolves the conversation members that must be expanded beneath the base email,
+        /// newest first, excluding the base email itself.
+        /// </summary>
+        /// <param name="resolver">Resolver holding the conversation snapshot.</param>
+        /// <param name="entryID">Entry identifier of the base email, which is excluded.</param>
+        /// <returns>The members to insert, ordered by sent time descending.</returns>
+        /// <remarks>
+        /// Issue #470 defect 2. This is the member-resolution expression that previously lived
+        /// inline in <see cref="EnumerateConversationMembers"/>, extracted unchanged. Extracting it
+        /// lets <c>ToggleUnGroupConv</c> resolve the list once, before it reserves rows, so the
+        /// count it reserves and the count it fills come from the same evaluation. The method is
+        /// pure: it reads no field and touches no WinForms control.
+        /// </remarks>
+        internal static IReadOnlyList<MailItem> ResolveConversationInsertions(
+            ConversationResolver resolver,
+            string entryID
+        )
+        {
+            return resolver
+                .ConversationItems.SameFolder.Where(mailItem => mailItem.EntryID != entryID)
+                .OrderByDescending(mailItem => mailItem.SentOn)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Reconciles the caller-supplied conversation count against the resolved insertion count
+        /// and returns the insertion count as the single source of truth.
+        /// </summary>
+        /// <param name="entryID">Entry identifier of the base email.</param>
+        /// <param name="conversationCount">Caller-supplied count, used only as a reservation.</param>
+        /// <param name="insertionsCount">Count of members actually resolved for insertion.</param>
+        /// <param name="sameFolderCount">Resolver same-folder count, for diagnosis.</param>
+        /// <param name="expandedCount">Resolver expanded count, for diagnosis.</param>
+        /// <param name="baseEmailIndex">Index of the base email, for diagnosis.</param>
+        /// <param name="warn">Warning sink, invoked once on disagreement.</param>
+        /// <returns><paramref name="insertionsCount"/>, always.</returns>
+        /// <remarks>
+        /// Issue #470 defect 2. The reservation was derived from <paramref name="conversationCount"/>
+        /// while the loop was driven by the independently resolved member list, and nothing
+        /// compared them. A disagreement is recoverable and this method sits on the VSTO UI event
+        /// path, so the resolution is log-and-proceed rather than throw, matching the precedent in
+        /// <c>ConversationResolver.Loading</c>. The message carries all six values because the two
+        /// counts alone do not identify which snapshot moved.
+        /// </remarks>
+        internal static int ReconcileInsertionCount(
+            string entryID,
+            int conversationCount,
+            int insertionsCount,
+            int sameFolderCount,
+            int expandedCount,
+            int baseEmailIndex,
+            System.Action<string> warn
+        )
+        {
+            if (insertionsCount != conversationCount - 1)
+            {
+                warn?.Invoke(
+                    $"Conversation insertion count disagreement for entryID={entryID}: "
+                        + $"conversationCount={conversationCount}, "
+                        + $"insertionsCount={insertionsCount}, "
+                        + $"sameFolderCount={sameFolderCount}, "
+                        + $"expandedCount={expandedCount}, "
+                        + $"baseEmailIndex={baseEmailIndex}. "
+                        + "Proceeding with insertionsCount as the single source of truth."
+                );
+            }
+
+            return insertionsCount;
+        }
+
+        /// <summary>
         /// Parallel function to expand each member of a conversation into individual ItemViewers/Controllers.
         /// Expanded members are inserted into the base collection and conversation count and folder suggestions
         /// are replicated from the base member. This enables distinct actions to be taken with each member
         /// </summary>
-        /// <param name="mailInfoList">List of MailItems in a conversation</param>
+        /// <param name="entryID">
+        /// Entry identifier of the base email. Since issue #470 defect 2 moved member filtering into
+        /// <see cref="ResolveConversationInsertions"/>, this method no longer reads the parameter.
+        /// It is retained because the scoped signature change for that defect replaces
+        /// <c>conversationCount</c> with <paramref name="insertions"/> only; removing a second
+        /// parameter is a separate change.
+        /// </param>
+        /// <param name="resolver">Resolver replicated onto each expanded member.</param>
         /// <param name="insertionIndex">Location of the Item Group collection where the base member is stored</param>
-        /// <param name="conversationCount">Number of qualifying conversation members</param>
+        /// <param name="insertions">
+        /// The members to expand, already resolved and ordered by the caller. Passing them in is what
+        /// guarantees the rows reserved and the rows filled come from one evaluation.
+        /// </param>
         /// <param name="folderList">Folder suggestions for the first email</param>
         public void EnumerateConversationMembers(
             string entryID,
             ConversationResolver resolver,
             int insertionIndex,
-            int conversationCount,
+            IReadOnlyList<MailItem> insertions,
             object folderList
         )
         {
-            var insertions = resolver
-                .ConversationItems.SameFolder.Where(mailItem => mailItem.EntryID != entryID)
-                .OrderByDescending(mailItem => mailItem.SentOn)
-                .ToList();
-
             Enumerable
                 .Range(0, insertions.Count)
                 .ForEach(i =>
@@ -1972,6 +1936,20 @@ namespace QuickFiler.Controllers
             int indexOriginal = _itemGroups.FindIndex(itemGroup =>
                 itemGroup.ItemController.ConvOriginID == originalId
             );
+
+            // Issue #470 defect 1: FindIndex returns -1 when no group carries this conversation
+            // origin, and the next statement subscripted the list with it. Per D4 the contract is
+            // a sentinel return rather than a throw, because this sits on the VSTO UI event path
+            // and the state is recoverable. The child count is left alone: none was promoted.
+            if (indexOriginal == -1)
+            {
+                logger.Warn(
+                    $"No conversation child carries originalId={originalId}. Nothing to promote; "
+                        + "leaving the caller's child count unchanged."
+                );
+                return -1;
+            }
+
             var itemViewer = _itemGroups[indexOriginal].ItemViewer;
             _itemTlp.SetCellPosition(
                 itemViewer,
@@ -1988,13 +1966,6 @@ namespace QuickFiler.Controllers
 
         #region Helper Functions
 
-        internal void CaptureTlpTemplate()
-        {
-            //logger.Debug($"Current Thread Id: {Thread.CurrentThread.ManagedThreadId}");
-            _templateTlp = _formViewer.L1v0L2L3v_TableLayout.Clone();
-            _templateTlp.Name = "TemplateTableLayout";
-        }
-
         /// <summary>
         /// Creates empty item groups and inserts them into the
         /// collection at the targeted location
@@ -2010,27 +1981,91 @@ namespace QuickFiler.Controllers
             }
         }
 
+        /// <summary>
+        /// Awaits every task queued in <see cref="BackgroundLoadingTasks"/>, including any task
+        /// added while the drain is already in flight, and leaves the collection empty.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The bag is taken with a single <see cref="Interlocked.Exchange{T}(ref T, T)"/> that
+        /// installs a fresh bag in the same instant it hands the old one back, so no producer can
+        /// add to a bag that has already been snapshotted and then discarded. The loop repeats
+        /// while the bag it swapped out was non-empty, which is what makes a late arrival — added
+        /// after the previous swap but before this one — still get awaited.
+        /// </para>
+        /// <para>
+        /// The replacement bag is built with an explicit constructor call rather than a
+        /// target-typed collection expression because the generic <c>Interlocked.Exchange</c>
+        /// overload infers its type argument from the arguments and cannot bind an expression that
+        /// has no type of its own.
+        /// </para>
+        /// <para>
+        /// Extracted from two byte-identical statement pairs on the two load paths, so the drain
+        /// has a single definition. Both former sites call this member.
+        /// </para>
+        /// </remarks>
+        internal async Task DrainBackgroundLoadingTasksAsync()
+        {
+            ConcurrentBag<Task> drained;
+            do
+            {
+                drained = Interlocked.Exchange(
+                    ref BackgroundLoadingTasks,
+                    new ConcurrentBag<Task>()
+                );
+                await Task.WhenAll(drained);
+            } while (!drained.IsEmpty);
+        }
+
+        /// <summary>
+        /// Returns <paramref name="current"/> with its height reduced by
+        /// <paramref name="removalCount"/> template rows.
+        /// </summary>
+        /// <param name="current">The size to adjust. It is not mutated.</param>
+        /// <param name="templateHeight">Height of a single template row, in pixels.</param>
+        /// <param name="removalCount">
+        /// Number of template rows to remove. A <em>negative</em> row count grows the size instead
+        /// of shrinking it, which is how the insertion path expresses "make room for N rows".
+        /// </param>
+        /// <remarks>
+        /// This is pure arithmetic on a value type: it reads no field and touches no WinForms
+        /// control, so the rounding contract shared by the removal and insertion paths can be
+        /// asserted directly by a unit test that needs no message pump.
+        /// </remarks>
+        internal static System.Drawing.Size ShrinkByRows(
+            System.Drawing.Size current,
+            float templateHeight,
+            int removalCount
+        )
+        {
+            return new System.Drawing.Size(
+                current.Width,
+                current.Height - (int)Math.Round(templateHeight * removalCount, 0)
+            );
+        }
+
         public void EliminateSpaceForItems(int removalInex, int removalCount)
         {
             TableLayoutHelper.RemoveSpecificRow(_itemTlp, removalInex, removalCount);
 
-            var heightChange = -(int)Math.Round(_template.Height * removalCount, 0);
-            _itemTlp.MinimumSize = new System.Drawing.Size(
-                _itemTlp.MinimumSize.Width,
-                _itemTlp.MinimumSize.Height - heightChange
+            var rowsToShrinkBy = removalCount;
+            _itemTlp.MinimumSize = ShrinkByRows(
+                _itemTlp.MinimumSize,
+                _template.Height,
+                rowsToShrinkBy
             );
 
-            _itemTlp.Size = new System.Drawing.Size(
-                _itemTlp.Size.Width,
-                _itemTlp.Size.Height - heightChange
-            );
+            _itemTlp.Size = ShrinkByRows(_itemTlp.Size, _template.Height, rowsToShrinkBy);
         }
 
         public void MakeSpaceForItems(int insertionIndex, int insertCount)
         {
-            _itemTlp.MinimumSize = new System.Drawing.Size(
-                _itemTlp.MinimumSize.Width,
-                _itemTlp.MinimumSize.Height + (int)Math.Round(_template.Height * insertCount, 0)
+            // A negative row count grows the panel, so an insertion of N rows is expressed as a
+            // shrink by -N rows.
+            _itemTlp.MinimumSize = ShrinkByRows(
+                _itemTlp.MinimumSize,
+                _template.Height,
+                -insertCount
             );
 
             TableLayoutHelper.InsertSpecificRow(
@@ -2203,9 +2238,27 @@ namespace QuickFiler.Controllers
             _itemGroups = null;
         }
 
+        /// <summary>
+        /// Moves every cached item group's message to its assigned destination folder.
+        /// </summary>
+        /// <param name="stackMovedItems">
+        /// The undo stack. This parameter does not carry the undo records: the stack is populated
+        /// by the email filer's push-to-undo-stack path, which pushes onto
+        /// <c>Globals.AF.MovedMails</c>. That is the same instance the caller passes here, because
+        /// the caller reads it from the same globals object. Passing a different instance would not
+        /// redirect the undo records, and passing <c>null</c> does not suppress them. The parameter
+        /// is retained only for source compatibility with existing callers; removing it is a
+        /// follow-up candidate, not part of this change.
+        /// </param>
         public async Task MoveEmailsAsync(SloStack<IMovedMailInfo> stackMovedItems)
         {
             //TraceUtility.LogMethodCall(stackMovedItems);
+
+            // The parameter is deliberately discarded rather than left untouched. The undo records
+            // reach the stack through the email filer, not through this argument, and the discard
+            // states that at the point of use so the parameter cannot be read as an oversight.
+            _ = stackMovedItems;
+
             var count = _itemGroupsToMove?.Count() ?? 0;
             if (count <= 0)
             {
@@ -2230,43 +2283,68 @@ namespace QuickFiler.Controllers
         private async Task TryMoveEmailByGroupIndexAsync(int i)
         {
             var group = TryGetItemGroupByIndex(i);
+            if (group is null)
+            {
+                // Issue #473 defect 2: TryGetItemGroupByIndex reports a missing group as null.
+                // Guarding at this boundary keeps that null from reaching the dereference inside
+                // TryMoveEmailByGroupAsync, where it previously produced two log entries for one
+                // root cause. One entry is emitted here instead, and the batch continues.
+                logger.Error($"No cached item group at index {i}. Continuing execution.");
+                return;
+            }
+
             await TryMoveEmailByGroupAsync(group);
         }
 
+        /// <summary>
+        /// Moves the message owned by <paramref name="group"/>, logging and continuing when the
+        /// move fails, and letting a cancellation reach the caller.
+        /// </summary>
         private static async Task TryMoveEmailByGroupAsync(QfcItemGroup group)
         {
             try
             {
                 await group.ItemController.MoveMailAsync();
             }
+            catch (OperationCanceledException)
+            {
+                // Issue #473 defect 2: a cancellation is a control-flow signal, not a move
+                // failure. It must reach the caller so an aborted batch actually stops, and it
+                // must not be recorded as an error. This clause has to precede the broad clause
+                // below, because OperationCanceledException derives from System.Exception and the
+                // first matching clause wins.
+                throw;
+            }
             catch (System.Exception e)
             {
-                var subject = "";
-                try
-                {
-                    subject = group.MailItem.Subject;
-                }
-                catch (System.Exception e2)
-                {
-                    logger.Error($"Unable to retrieve subject {e2.Message}", e2);
-                }
-                logger.Error(
-                    $"Error moving message {subject}. Continuing execution.\n{e.Message}",
-                    e
-                );
+                // Issue #473 defect 2: log once, then return. The previous body went on to read
+                // group.MailItem.Subject from inside this catch, which dereferenced the same
+                // failed group a second time and raised a second exception into a nested catch, so
+                // a single root cause emitted two misleading log entries. Log-and-proceed is
+                // retained: the caller continues with the remaining cached groups.
+                logger.Error($"Error moving message. Continuing execution.\n{e.Message}", e);
+                return;
             }
         }
 
+        /// <summary>
+        /// Resolves the cached move group at <paramref name="index"/>, or <see langword="null"/>
+        /// when the cache is absent or the index falls outside it.
+        /// </summary>
+        /// <remarks>
+        /// Issue #469 defect 3: an explicit null-and-bounds check replaces a broad
+        /// <c>catch (System.Exception)</c>. The old form also swallowed genuine faults raised by a
+        /// collaborator and reported them as a missing group, which is indistinguishable from a
+        /// legitimately out-of-range index.
+        /// </remarks>
         private QfcItemGroup TryGetItemGroupByIndex(int index)
         {
-            try
-            {
-                return _itemGroupsToMove.ElementAt(index).Key;
-            }
-            catch (System.Exception)
+            if (_itemGroupsToMove is null || index < 0 || index >= _itemGroupsToMove.Count)
             {
                 return null;
             }
+
+            return _itemGroupsToMove[index];
         }
 
         public string[] GetMoveDiagnostics(
@@ -2281,11 +2359,29 @@ namespace QuickFiler.Controllers
             //TraceUtility.LogMethodCall(durationText, durationMinutesText, Duration, dataLineBeg, OlEndTime, OlAppointment);
 
             int k;
-            string[] strOutput = new string[_itemGroupsToMove.Count + 1];
+            // Issue #469 defect 1: exactly one diagnostics line per cached move group. The array
+            // was allocated as Count + 1 while the loop bound stayed Count, so the trailing
+            // element was never assigned and QfcHomeController.Metrics wrote it out as a blank
+            // diagnostics row for a message that does not exist.
+            string[] strOutput = new string[_itemGroupsToMove.Count];
             var loopTo = _itemGroupsToMove.Count;
             for (k = 0; k < loopTo; k++)
             {
                 var qf = TryGetItemGroupByIndex(k)?.ItemController;
+
+                // Issue #469 defect 2: the null test must dominate every dereference of qf. It
+                // previously sat below this ItemHelper read and below the interpolation of
+                // qf.ItemHelper.Subject into the data line, so a group with no controller raised
+                // NullReferenceException and the Unknown branch below was unreachable. The empty
+                // subject column keeps the data line at its pre-existing column count.
+                if (qf is null)
+                {
+                    strOutput[k] =
+                        $"{dataLineBeg} ,QuickFiled,{durationText},{durationMinutesText},"
+                        + "To Unknown,Sender Unknown,Email,Folder Unknown,Sent Date Unknown,Sent Time Unknown";
+                    continue;
+                }
+
                 var helper = qf.ItemHelper;
 
                 var minutes = Math.Floor(duration / 60d);
@@ -2310,16 +2406,8 @@ namespace QuickFiler.Controllers
 
                 var dataLine =
                     $"{dataLineBeg} {xComma(qf.ItemHelper.Subject)},QuickFiled,{durationText},{durationMinutesText},";
-                if (qf is not null)
-                {
-                    dataLine +=
-                        $"{xComma(qf.ItemHelper.ToRecipientsName)},{xComma(qf.ItemHelper.SenderName)},Email,{xComma(qf.SelectedFolder)},{qf.ItemHelper.SentDate.ToString("MM/dd/yyyy")},{qf.ItemHelper.SentDate.ToString("HH:mm")}";
-                }
-                else
-                {
-                    dataLine +=
-                        $"To Unknown,Sender Unknown,Email,Folder Unknown,Sent Date Unknown,Sent Time Unknown";
-                }
+                dataLine +=
+                    $"{xComma(qf.ItemHelper.ToRecipientsName)},{xComma(qf.ItemHelper.SenderName)},Email,{xComma(qf.SelectedFolder)},{qf.ItemHelper.SentDate.ToString("MM/dd/yyyy")},{qf.ItemHelper.SentDate.ToString("HH:mm")}";
 
                 strOutput[k] = dataLine;
             }

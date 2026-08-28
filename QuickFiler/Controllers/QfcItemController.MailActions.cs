@@ -24,6 +24,27 @@ namespace QuickFiler.Controllers
 {
     internal partial class QfcItemController
     {
+        // #483: injectable seam for the user-facing move-failure notification. The default forwards
+        // to the modal WinForms dialog, which cannot run in a headless unit test. Mirrors
+        // EfcHomeController.MoveFailureMessageAction and QfcExplorerController.NotInViewDialogInvoker.
+        internal System.Action<string> MoveFailureNotifier { get; set; } =
+            text => MessageBox.Show(text);
+
+        // #483: composes the two seams. _uiDispatcher is null in the existing SeamFactoryTests
+        // MoveMailAsync tests, so the notifier is invoked directly when there is no dispatcher.
+        private void NotifyMoveFailure(string message)
+        {
+            var notifier = MoveFailureNotifier;
+            var dispatcher = _uiDispatcher;
+            if (dispatcher is null)
+            {
+                notifier(message);
+                return;
+            }
+
+            dispatcher.Invoke(() => notifier(message));
+        }
+
         internal void CollapseConversation()
         {
             //TraceUtility.LogMethodCall();
@@ -48,6 +69,7 @@ namespace QuickFiler.Controllers
 
         internal async Task EnumerateConversationAsync()
         {
+            Token.ThrowIfCancellationRequested();
             await _uiDispatcher.InvokeAsync(EnumerateConversation);
         }
 
@@ -61,7 +83,7 @@ namespace QuickFiler.Controllers
                         "&Expand",
                         () =>
                         {
-                            _itemViewer.FocusSubject();
+                            _ = _itemViewer.FocusSubject();
                             this.EnumerateConversation();
                         }
                     },
@@ -83,6 +105,9 @@ namespace QuickFiler.Controllers
         public async Task MoveMailAsync()
         {
             //TraceUtility.LogMethodCall();
+
+            // #483: outside the try, so the catch below cannot swallow or re-wrap the cancellation.
+            Token.ThrowIfCancellationRequested();
 
             if (ItemHelper is not null)
             {
@@ -114,10 +139,17 @@ namespace QuickFiler.Controllers
                 }
                 catch (System.Exception e)
                 {
-                    //logger.Debug($"Error moving mail {Subject} from {Sender} on {SentDate}. Skipping");
+                    // #483: a broad catch is permitted only when it propagates with added context.
+                    // The caller (QfcCollectionController.TryMoveEmailByGroupAsync) already catches,
+                    // logs with subject context and continues, so the bulk loop is unaffected; what
+                    // changes is that a failed file is no longer reported to it as a success.
                     logger.Error($"{e}");
-                    MessageBox.Show(
+                    NotifyMoveFailure(
                         $"Error moving mail {ItemHelper.Subject} from {ItemHelper.Sender} on {ItemHelper.SentDate}. Skipping"
+                    );
+                    throw new System.InvalidOperationException(
+                        $"Failed to file mail '{ItemHelper.Subject}' to '{SelectedFolder}'.",
+                        e
                     );
                 }
 
@@ -173,8 +205,9 @@ namespace QuickFiler.Controllers
                 false,
                 _homeController.FormController.FormHandle
             );
-            _itemViewer.FlagTaskDialogResult = flagTask.Run(modal: true);
-            if (_itemViewer.FlagTaskDialogResult == DialogResult.OK)
+            DialogResult flagTaskResult = flagTask.Run(modal: true);
+            _itemViewer.FlagTaskDialogResult = flagTaskResult;
+            if (flagTaskResult == DialogResult.OK)
             {
                 _itemViewer.FlagTaskBackColor = _themes[_activeTheme].ButtonClickedColor;
             }
@@ -182,6 +215,7 @@ namespace QuickFiler.Controllers
 
         public async Task FlagAsTaskAsync()
         {
+            Token.ThrowIfCancellationRequested();
             List<MailItem> itemList = [Mail];
             await _uiDispatcher.InvokeAsync(() =>
             {
@@ -191,8 +225,9 @@ namespace QuickFiler.Controllers
                     false,
                     _homeController.FormController.FormHandle
                 );
-                _itemViewer.FlagTaskDialogResult = flagTask.Run(modal: true);
-                if (_itemViewer.FlagTaskDialogResult == DialogResult.OK)
+                DialogResult flagTaskResult = flagTask.Run(modal: true);
+                _itemViewer.FlagTaskDialogResult = flagTaskResult;
+                if (flagTaskResult == DialogResult.OK)
                 {
                     _itemViewer.FlagTaskBackColor = _themes[_activeTheme].ButtonClickedColor;
                 }
@@ -203,7 +238,7 @@ namespace QuickFiler.Controllers
         {
             if (!_itemViewer.FolderContains("Trash to Delete"))
             {
-                _itemViewer.SetFolderItems(new[] { "Trash to Delete" });
+                _itemViewer.AddFolderItems(new[] { "Trash to Delete" });
             }
             _itemViewer.SetFolderSelectedItem("Trash to Delete");
         }
@@ -215,7 +250,7 @@ namespace QuickFiler.Controllers
             {
                 if (!_itemViewer.FolderContains("Trash to Delete"))
                 {
-                    _itemViewer.SetFolderItems(new[] { "Trash to Delete" });
+                    _itemViewer.AddFolderItems(new[] { "Trash to Delete" });
                 }
                 _itemViewer.SetFolderSelectedItem("Trash to Delete");
             });

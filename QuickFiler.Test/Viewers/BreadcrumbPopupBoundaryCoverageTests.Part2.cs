@@ -167,29 +167,32 @@ namespace QuickFiler.Test.Viewers
             readiness.Dispose();
         }
 
+        /// <summary>
+        /// Issue #475: <c>CaptureCurrent</c> fails fast under a null ambient context instead of
+        /// silently substituting a test dispatcher, and still captures a controlled context normally.
+        /// Replaces the deleted ambient-probing selector's boundary test, retaining its
+        /// controlled-context half.
+        /// </summary>
         [TestMethod]
-        public void CaptureCurrentOrTests_NullAndControlledContexts_SelectExpectedBoundaries()
+        public void CaptureCurrent_NullAndControlledContexts_FailFastAndCapture()
         {
             var context = new PumpSynchronizationContext();
-            int testThread = 0;
             int capturedThread = 0;
-            BreadcrumbPopupUiOperations testOperations = WithContext(
-                null,
-                BreadcrumbPopupUiOperations.CaptureCurrentOrTests
-            );
-            testOperations
-                .PostAsync(() => testThread = Environment.CurrentManagedThreadId)
-                .GetAwaiter()
-                .GetResult();
+            Action underNullContext = () =>
+                WithContext(null, BreadcrumbPopupUiOperations.CaptureCurrent);
+            underNullContext
+                .Should()
+                .Throw<InvalidOperationException>(
+                    "capturing without an owning boundary must fail fast rather than degrade"
+                );
             BreadcrumbPopupUiOperations captured = WithContext(
                 context,
-                BreadcrumbPopupUiOperations.CaptureCurrentOrTests
+                BreadcrumbPopupUiOperations.CaptureCurrent
             );
             Task post = Task.Run(() =>
                 captured.PostAsync(() => capturedThread = Environment.CurrentManagedThreadId)
             );
             context.Drain(post);
-            testThread.Should().Be(context.OwnerThreadId);
             capturedThread.Should().Be(context.OwnerThreadId);
             context.PostCount.Should().Be(1);
         }

@@ -17,7 +17,7 @@ namespace QuickFiler
     // is [ExcludeFromCodeCoverage] via its primary partial in ItemViewer.cs.
     public partial class ItemViewer
     {
-        public void SetFolderItems(string[] items) => BreadcrumbCoordinator?.AddItems(items);
+        public void AddFolderItems(string[] items) => BreadcrumbCoordinator?.AddItems(items);
 
         public void SetFolderSuggestions(IReadOnlyList<FolderRow> rows) =>
             BreadcrumbCoordinator?.SetSuggestions(rows);
@@ -76,6 +76,6 @@ namespace QuickFiler
             remove => TxtboxSearch.KeyDown -= value;
         }
 
-        public void FocusSearch() => TxtboxSearch.Invoke(new Action(() => TxtboxSearch.Focus()));
+        public void FocusSearch() => TxtboxSearch.Focus();
     }
 }
