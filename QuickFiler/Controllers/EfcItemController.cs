@@ -46,21 +46,6 @@ namespace QuickFiler.Controllers
             IFilerHomeController homeController,
             EfcFormController parent,
             ItemViewer itemViewer,
-            EfcDataModel dataModel,
-            bool async,
-            CancellationToken token
-        )
-            : this(globals, homeController, parent, itemViewer, token)
-        {
-            _dataModel = dataModel;
-            Initialize(async);
-        }
-
-        public EfcItemController(
-            IApplicationGlobals globals,
-            IFilerHomeController homeController,
-            EfcFormController parent,
-            ItemViewer itemViewer,
             CancellationToken token
         )
         {
@@ -94,7 +79,9 @@ namespace QuickFiler.Controllers
                 _navCtrls,
                 _tipsCtrls,
                 _dflt2Ctrls,
-                _selectorsCtrls,
+                // The EFC surface has no selector controls; the field this argument used to
+                // carry was declared null and never assigned, so an explicit null is identical.
+                null,
                 _mailCtrls,
                 () => !_dataModel.Mail?.UnRead ?? false,
                 _itemViewer.TopicThread.Columns.Cast<object>().ToList(),
@@ -141,7 +128,9 @@ namespace QuickFiler.Controllers
                 _navCtrls,
                 _tipsCtrls,
                 _dflt2Ctrls,
-                _selectorsCtrls,
+                // The EFC surface has no selector controls; the field this argument used to
+                // carry was declared null and never assigned, so an explicit null is identical.
+                null,
                 _mailCtrls,
                 () => !_dataModel.Mail.UnRead,
                 _itemViewer.TopicThread.Columns.Cast<object>().ToList(),
@@ -170,39 +159,6 @@ namespace QuickFiler.Controllers
         #endregion
 
         #region Item Setup and Disposal Methods
-
-        internal void InitializeWebView()
-        {
-            // Create the cache directory
-            string localAppData = Environment.GetFolderPath(
-                Environment.SpecialFolder.LocalApplicationData
-            );
-            string cacheFolder = Path.Combine(localAppData, "WindowsFormsWebView2");
-
-            // CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions("--disk-cache-size=1 ");
-            CoreWebView2EnvironmentOptions options = new CoreWebView2EnvironmentOptions(
-                "–incognito "
-            );
-
-            // Create the environment manually
-            Task<CoreWebView2Environment> task = CoreWebView2Environment.CreateAsync(
-                null,
-                cacheFolder,
-                options
-            );
-
-            // Do this so the task is continued on the UI Thread
-            TaskScheduler ui = TaskScheduler.FromCurrentSynchronizationContext();
-
-            task.ContinueWith(
-                t =>
-                {
-                    _webViewEnvironment = task.Result;
-                    _itemViewer.L0v2h2_WebView2.EnsureCoreWebView2Async(_webViewEnvironment);
-                },
-                ui
-            );
-        }
 
         internal async Task InitializeWebViewAsync()
         {
@@ -378,7 +334,6 @@ namespace QuickFiler.Controllers
         private List<Control> _navCtrls;
         private List<Control> _tipsCtrls;
         private List<Control> _dflt2Ctrls;
-        private List<Control> _selectorsCtrls = null;
         private List<Control> _mailCtrls;
 
         #endregion
@@ -677,20 +632,6 @@ namespace QuickFiler.Controllers
             });
         }
 
-        internal void RegisterActions(
-            Dictionary<char, Action<char>> actions,
-            bool overwriteDuplicates
-        )
-        {
-            if (!overwriteDuplicates)
-            {
-                actions = actions
-                    .Where(action => !_keyboardHandler.CharActions.ContainsKey(action.Key))
-                    .ToDictionary();
-            }
-            actions.ForEach(action => _keyboardHandler.CharActions[action.Key] = action.Value);
-        }
-
         internal void RegisterAsyncFocusActions()
         {
             _keyboardHandler.CharActionsAsync.Add(
@@ -835,18 +776,6 @@ namespace QuickFiler.Controllers
 
         #region UI Navigation Methods
 
-        public void ToggleExpansion()
-        {
-            if (_expanded)
-            {
-                ToggleExpansion(Enums.ToggleState.Off);
-            }
-            else
-            {
-                ToggleExpansion(Enums.ToggleState.On);
-            }
-        }
-
         public async Task ToggleExpansionAsync()
         {
             if (_expanded)
@@ -856,51 +785,6 @@ namespace QuickFiler.Controllers
             else
             {
                 await ToggleExpansionAsync(Enums.ToggleState.On);
-            }
-        }
-
-        public void ToggleExpansion(Enums.ToggleState desiredState)
-        {
-            _parent.ToggleExpansionStyle(desiredState);
-            if (desiredState == Enums.ToggleState.On)
-            {
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 0;
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 100;
-                _itemViewer.TopicThread.Visible = true;
-                //_itemViewer.L0v2h2_Panel.Visible = true;
-                _itemViewer.L0v2h2_WebView2.Visible = true;
-                _expanded = true;
-                if ((_itemInfo is not null) && _itemInfo.UnRead == true)
-                {
-                    _timer = new System.Threading.Timer(ApplyReadEmailFormat);
-                    _timer.Change(4000, System.Threading.Timeout.Infinite);
-                }
-                // Register the keyboard actions and overwrite any others silently
-                _keyboardHandler.CharActions.Add(
-                    "Item",
-                    'B',
-                    async (x) => await JumpToAsync(_itemViewer.L0v2h2_WebView2)
-                );
-                _keyboardHandler.CharActions.Add(
-                    "Item",
-                    'D',
-                    async (x) => await JumpToAsync(_itemViewer.TopicThread)
-                );
-            }
-            else
-            {
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[0].Width = 100;
-                _itemViewer.L1h0L2hv3h_TlpBodyToggle.ColumnStyles[1].Width = 0;
-                _itemViewer.TopicThread.Visible = false;
-                //_itemViewer.L0v2h2_Panel.Visible = false;
-                _itemViewer.L0v2h2_WebView2.Visible = false;
-                _expanded = false;
-                if (_timer is not null)
-                {
-                    _timer.Dispose();
-                }
-                _keyboardHandler.CharActions.Remove("Item", 'B');
-                _keyboardHandler.CharActions.Remove("Item", 'D');
             }
         }
 

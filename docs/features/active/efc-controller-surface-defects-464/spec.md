@@ -920,9 +920,9 @@ files this feature does not own.**
 
 ### #459 — `KbdActions<>` contract misuse (latent; remedy DELETION)
 
-- [ ] A named test asserts `typeof(EfcItemController).GetMethod("RegisterActions", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
-- [ ] A named test asserts `typeof(EfcItemController)` declares no method named `ToggleExpansion` at any arity.
-- [ ] A named test invokes the dispatched bodies of the surviving async expansion path in the order On → Off → On against a `Mock<IQfcKeyboardHandler>` backed by a real `KbdActions<char, KaChar, Action<char>>`, asserts no exception is thrown, and asserts the registry is not touched. The `ToggleExpansionAsync(ToggleState)` marshal itself is not awaited, because `ItemViewer.UiDispatcher` is an unpumped WPF dispatcher.
+- [x] A named test asserts `typeof(EfcItemController).GetMethod("RegisterActions", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
+- [x] A named test asserts `typeof(EfcItemController)` declares no method named `ToggleExpansion` at any arity.
+- [x] A named test invokes the dispatched bodies of the surviving async expansion path in the order On → Off → On against a `Mock<IQfcKeyboardHandler>` backed by a real `KbdActions<char, KaChar, Action<char>>`, asserts no exception is thrown, and asserts the registry is not touched. The `ToggleExpansionAsync(ToggleState)` marshal itself is not awaited, because `ItemViewer.UiDispatcher` is an unpumped WPF dispatcher.
 - [ ] The `KbdActions<>` indexer-setter contract (assign-if-present, never insert) and the `overwriteDuplicates` truth table are documented in this spec's §RC4, and `git diff --name-only` for the feature branch contains no path matching `KbdActions`.
 
 ### #460 — cleanup NRE and timer leak (latent; remedies GUARD + CORRECTION)
@@ -947,7 +947,7 @@ files this feature does not own.**
 - [ ] `EfcItemController` declares `internal const string IncognitoArgument` and `InitializeWebViewAsync` passes that constant rather than a string literal.
 - [ ] A named test asserts `EfcItemController.IncognitoArgument` equals `"--incognito "`, that every character satisfies `c <= 0x7F`, and that the first two characters are both U+002D.
 - [ ] `QfcItemController.ViewerSetup.cs:55` uses two U+002D characters; confirmed by review and by the one-line-diff criterion below.
-- [ ] The EN DASH site at `EfcItemController.cs:184` is removed together with its containing method rather than edited in place.
+- [x] The EN DASH site at `EfcItemController.cs:184` is removed together with its containing method rather than edited in place.
 
 ### #464 — null-guard and async-void boundary defects (primary; A/B/C/E live, D latent)
 
@@ -962,7 +962,7 @@ files this feature does not own.**
 - [ ] `EfcItemController` declares `internal static void ThrowInitializationFailure(System.Exception)`, and the failure branch of `WebView2Control_CoreWebView2InitializationCompleted` is a one-line adapter over it.
 - [ ] A named test asserts `ThrowInitializationFailure` rethrows the supplied exception with its original stack trace preserved (the rethrown exception's `StackTrace` contains the originating frame).
 - [ ] The token `throw (e.InitializationException)` does not appear in `EfcItemController.cs`.
-- [ ] #464 D is closed by the deletion asserted under #459: no `async void` lambda is registered into `CharActions` anywhere in `EfcItemController.cs`.
+- [x] #464 D is closed by the deletion asserted under #459: no `async void` lambda is registered into `CharActions` anywhere in `EfcItemController.cs`.
 
 ### #465 — form-controller lifecycle and selection defects (live; remedies GUARD + CORRECTION)
 
@@ -983,9 +983,9 @@ files this feature does not own.**
 - [ ] A named test asserts `typeof(EfcViewer).GetMethod("SetController", BindingFlags.NonPublic | BindingFlags.Instance)` is null and `typeof(EfcViewer).GetField("_formController", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
 - [ ] A named test asserts `typeof(EfcViewer)` declares no method named `EditFiltersMenuItem_Click`.
 - [ ] The Edit Filters subscription at `EfcFormController.cs:398` and its target `EfcFormController.EditFiltersMenuItem_Click` are unchanged; a named test asserts `typeof(EfcFormController)` still declares `EditFiltersMenuItem_Click`.
-- [ ] A named test asserts `typeof(EfcItemController).GetMethod("InitializeWebView", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
-- [ ] A named test asserts `typeof(EfcItemController)` declares no 7-parameter instance constructor.
-- [ ] A named test asserts `typeof(EfcItemController).GetField("_selectorsCtrls", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
+- [x] A named test asserts `typeof(EfcItemController).GetMethod("InitializeWebView", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
+- [x] A named test asserts `typeof(EfcItemController)` declares no 7-parameter instance constructor.
+- [x] A named test asserts `typeof(EfcItemController).GetField("_selectorsCtrls", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
 - [ ] The files `QuickFiler/Viewers/EfcViewer3.cs`, `EfcViewer3.Designer.cs` and `EfcViewer3.resx` are absent from the working tree.
 - [ ] `git diff --name-only` for the feature branch contains no entry for `QuickFiler/QuickFiler.csproj`.
 
