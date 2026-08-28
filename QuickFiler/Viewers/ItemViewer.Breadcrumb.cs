@@ -340,7 +340,21 @@ namespace QuickFiler
 
         private void EnsureBreadcrumbResourceOwnership()
         {
+            // Statement order here is fixed by decision D-15 and must not be reversed. The affinity
+            // guard is the FIRST STATEMENT, but it is a precondition check that returns without
+            // effect on the UI boundary and when UiSyncContext is null, so on every path that reaches
+            // this member's own logic it has performed no action. Issue #488 defect D5's
+            // ObjectDisposedException throw immediately follows and is therefore the FIRST ACTION: it
+            // is the first statement that inspects this member's own subject, the viewer's teardown
+            // state, and it precedes the already-owned early return, every container creation, and
+            // every BreadcrumbResourceOwner addition. Reversing the two would place a
+            // SynchronizationContext comparison after a throw that is supposed to run first.
             ThrowIfOffUiBoundary(nameof(EnsureBreadcrumbResourceOwnership));
+
+            if (IsDisposed || Disposing)
+            {
+                throw new ObjectDisposedException(nameof(ItemViewer));
+            }
 
             if (_breadcrumbResourceOwner != null)
             {

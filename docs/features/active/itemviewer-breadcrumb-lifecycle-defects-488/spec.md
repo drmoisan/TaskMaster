@@ -872,12 +872,12 @@ against the Phase 0 baseline rather than as an absolute count.
 
 ### D5 — `Container` created during teardown
 
-- [ ] `EnsureBreadcrumbResourceOwnership` throws `ObjectDisposedException` as its first action when the
+- [x] `EnsureBreadcrumbResourceOwnership` throws `ObjectDisposedException` as its first action when the
       viewer `IsDisposed` **or** `Disposing`, so no `Container` is created and no `BreadcrumbResourceOwner`
       is added after teardown has begun.
-- [ ] A regression test disposes a real `ItemViewer`, calls `InitializeBreadcrumbPipeline`, asserts
+- [x] A regression test disposes a real `ItemViewer`, calls `InitializeBreadcrumbPipeline`, asserts
       `ObjectDisposedException`, and additionally asserts `viewer.BreadcrumbCoordinator` is null.
-- [ ] `QuickFiler/Viewers/ItemViewer.Designer.cs` is byte-identical to its pre-change state.
+- [x] `QuickFiler/Viewers/ItemViewer.Designer.cs` is byte-identical to its pre-change state.
 - [ ] The research §3.5 open item is discharged with recorded evidence: it is confirmed whether a faulted
       `QfcItemController.InitializeWebViewAsync` task is observed by its caller. If it is not observed, a
       new issue is opened against `QfcItemController.ViewerSetup.cs` (484-owned) and referenced here —

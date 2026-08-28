@@ -263,6 +263,38 @@ namespace QuickFiler.Test.Viewers
         }
 
         /// <summary>
+        /// Issue #488 defect D5: once teardown has begun, <c>EnsureBreadcrumbResourceOwnership</c>
+        /// must refuse to create a <c>Container</c> or add a breadcrumb resource owner, so no
+        /// pipeline is built against a dead viewer. The disposed viewer is called on the same ambient
+        /// context it was constructed under, so the D4 affinity guard passes and the
+        /// <see cref="ObjectDisposedException"/> is attributable to the disposal guard alone.
+        /// </summary>
+        [TestMethod]
+        public void InitializeBreadcrumbPipeline_AfterViewerDisposed_ThrowsObjectDisposedException()
+        {
+            // Arrange
+            using (var scope = new ViewerScope())
+            {
+                var operations = new BreadcrumbPopupUiOperations(
+                    new BreadcrumbUiDispatcher(new DrainableSynchronizationContext(), _ => { })
+                );
+                var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
+                scope.Viewer.Dispose();
+
+                // Act
+                Action act = () =>
+                    scope.Viewer.InitializeBreadcrumbPipeline(provider.Object, operations);
+
+                // Assert
+                act.Should()
+                    .Throw<ObjectDisposedException>(
+                        "no breadcrumb resource may be created after teardown has begun"
+                    );
+                scope.Viewer.BreadcrumbCoordinator.Should().BeNull();
+            }
+        }
+
+        /// <summary>
         /// Produces a <see cref="CoreWebView2Environment"/> identity token without any WebView2 SDK
         /// call. The environment is only ever compared by reference, so an uninitialized instance is
         /// sufficient and keeps the test free of an external dependency.
