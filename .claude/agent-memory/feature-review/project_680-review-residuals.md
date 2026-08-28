@@ -1,6 +1,6 @@
 ---
 name: 680-review-residuals
-description: '#680 cycle 1 NO-GO (rebase pushed file to 514>500); cycle 2 (17-48) closed R1/CR-1/CR-2 but found NEW blocking R2: remediation execution committed 5 unsanitized TRX (runUser + 1240 host paths) — re-run the host-token sweep EVERY cycle; remediation P#-T# reuse overwrote the feature plan red-run TRX'
+description: '#680 closed GO at cycle 3 (19-30): c1 NO-GO 514>500 (re-measure after rebase); c2 NEW blocking R2 5 unsanitized TRX (re-run host sweep EVERY cycle); c3 verified R2/RC-2 cured — but the pass-2 QA loop itself minted 2 MORE leaking TRX (vstest computerName), orchestrator-sanitized post-hoc: fresh vstest output is born unsanitized, pair every repo-internal ResultsDirectory run with an in-task sanitize step'
 metadata:
   type: project
 ---
@@ -53,3 +53,22 @@ Near-ceiling watch: `BreadcrumbDropDownHost.cs` 498/500, `BreadcrumbDropDownHost
 
 **Tooling:** hook sim needs `-ExecutionPolicy Bypass` when dot-sourcing from Windows PowerShell.
 pr_context summary misclassified C# as docs-only AGAIN (corrected in place again).
+
+## Cycle 3 (2026-08-28T19-30): GO, 0 blocking — branch cleared
+
+R2 CLOSED (independent diff-wide sweep at head `4cf822e8`: 0 real account/host tokens across all
+132 changed files, content + filenames; 12/12 TRX escaped-placeholder + well-formed). RC-2 CLOSED
+(red TRX restored 27/25/2 at original path; green preserved at `r-p2-t3/`). R1 holds (498/107).
+Composition test re-run green (36/36).
+
+**The leak class recurred a THIRD time inside the pass-2 remediation itself:** its final QA loop's
+two fresh vstest TRX (`r2-p5-t4/t5`) carried the machine name via the native `computerName`
+attribute; the orchestrator sanitized them directly (unplanned) before commit `d4af21b8`. Rule
+recorded as CR4-3: every vstest invocation with a repo-internal `/ResultsDirectory:` must carry an
+in-task sanitize-and-verify step, or write outside the repo and copy in sanitized.
+
+RC-3 future-dated stamps recurred in pass 2 (artifacts 22-45..00-05 vs commit 19:15 local) —
+consistent sandbox-clock offset, treated non-blocking again. Fabricated-approval Provenance Note
+verified: fix real (not deferred), zero residue in changed memory files. Residuals at close: AC-1/2
+HV-pending (runbook committed), AC-6 twelve-vs-thirteen enumeration prose stale, EventHandlers
+82.41% dual-floor row carried non-blocking, #685 carries the pre-existing main-side memory leaks.
