@@ -179,7 +179,7 @@ namespace QuickFiler.Controllers
                 // high-confidence folder is preselected when present; otherwise the index-1 top
                 // suggestion is selected. The standalone static PopulateAndSelectFolder is retained
                 // unchanged for its existing unit tests.
-                _itemViewer.SetFolderItems(_folderHandler.FolderArray);
+                _itemViewer.AddFolderItems(_folderHandler.FolderArray);
 
                 // #325: additionally hand the row model (folder identity + prediction probability)
                 // to the tree/percentage population path. Sourced verbatim from the #324 contract

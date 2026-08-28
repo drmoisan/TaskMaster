@@ -76,6 +76,6 @@ namespace QuickFiler
             remove => TxtboxBody.DoubleClick -= value;
         }
 
-        public void FocusSubject() => LblSubject.Focus();
+        public bool FocusSubject() => LblSubject.Focus();
     }
 }

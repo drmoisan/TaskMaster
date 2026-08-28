@@ -167,7 +167,7 @@ namespace QuickFiler.Test.Viewers
             // Arrange
             using (var harness = new ItemViewerDropDownHarness())
             {
-                harness.Viewer.SetFolderItems(new[] { "A", "B", "C" });
+                harness.Viewer.AddFolderItems(new[] { "A", "B", "C" });
                 harness.Viewer.SetFolderSelectedIndex(1);
                 harness.SetTheme("dark");
                 harness.AttachClosedSurface();
@@ -245,7 +245,7 @@ namespace QuickFiler.Test.Viewers
                 harness.ConfigureAgain();
                 harness.RaisePopupReady();
                 harness.PopupMessenger.SubscriberCount.Should().Be(1);
-                harness.Viewer.SetFolderItems(new[] { "A", "B" });
+                harness.Viewer.AddFolderItems(new[] { "A", "B" });
                 harness.Viewer.SetFolderSelectedIndex(0);
                 harness.Viewer.SetFolderDroppedDown(true);
                 harness.Host.Verify(
@@ -338,7 +338,7 @@ namespace QuickFiler.Test.Viewers
             Viewer = new QuickFiler.ItemViewer();
             var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
             Viewer.InitializeBreadcrumbPipeline(provider.Object);
-            Viewer.SetFolderItems(new[] { "A", "B" });
+            Viewer.AddFolderItems(new[] { "A", "B" });
             Viewer.SetFolderSelectedIndex(0);
 
             Host = new Mock<IBreadcrumbDropDownHost>();

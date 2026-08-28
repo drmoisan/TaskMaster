@@ -83,7 +83,7 @@ namespace QuickFiler.Controllers
                         "&Expand",
                         () =>
                         {
-                            _itemViewer.FocusSubject();
+                            _ = _itemViewer.FocusSubject();
                             this.EnumerateConversation();
                         }
                     },
@@ -205,8 +205,9 @@ namespace QuickFiler.Controllers
                 false,
                 _homeController.FormController.FormHandle
             );
-            _itemViewer.FlagTaskDialogResult = flagTask.Run(modal: true);
-            if (_itemViewer.FlagTaskDialogResult == DialogResult.OK)
+            DialogResult flagTaskResult = flagTask.Run(modal: true);
+            _itemViewer.FlagTaskDialogResult = flagTaskResult;
+            if (flagTaskResult == DialogResult.OK)
             {
                 _itemViewer.FlagTaskBackColor = _themes[_activeTheme].ButtonClickedColor;
             }
@@ -224,8 +225,9 @@ namespace QuickFiler.Controllers
                     false,
                     _homeController.FormController.FormHandle
                 );
-                _itemViewer.FlagTaskDialogResult = flagTask.Run(modal: true);
-                if (_itemViewer.FlagTaskDialogResult == DialogResult.OK)
+                DialogResult flagTaskResult = flagTask.Run(modal: true);
+                _itemViewer.FlagTaskDialogResult = flagTaskResult;
+                if (flagTaskResult == DialogResult.OK)
                 {
                     _itemViewer.FlagTaskBackColor = _themes[_activeTheme].ButtonClickedColor;
                 }
@@ -236,7 +238,7 @@ namespace QuickFiler.Controllers
         {
             if (!_itemViewer.FolderContains("Trash to Delete"))
             {
-                _itemViewer.SetFolderItems(new[] { "Trash to Delete" });
+                _itemViewer.AddFolderItems(new[] { "Trash to Delete" });
             }
             _itemViewer.SetFolderSelectedItem("Trash to Delete");
         }
@@ -248,7 +250,7 @@ namespace QuickFiler.Controllers
             {
                 if (!_itemViewer.FolderContains("Trash to Delete"))
                 {
-                    _itemViewer.SetFolderItems(new[] { "Trash to Delete" });
+                    _itemViewer.AddFolderItems(new[] { "Trash to Delete" });
                 }
                 _itemViewer.SetFolderSelectedItem("Trash to Delete");
             });

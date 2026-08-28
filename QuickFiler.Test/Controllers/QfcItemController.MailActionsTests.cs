@@ -64,7 +64,7 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             mock.Verify(
                 v =>
-                    v.SetFolderItems(
+                    v.AddFolderItems(
                         It.Is<string[]>(a => a.Length == 1 && a[0] == "Trash to Delete")
                     ),
                 Times.Once()
@@ -85,7 +85,7 @@ namespace QuickFiler.Controllers.Tests
             controller.MarkItemForDeletion();
 
             // Assert
-            mock.Verify(v => v.SetFolderItems(It.IsAny<string[]>()), Times.Never());
+            mock.Verify(v => v.AddFolderItems(It.IsAny<string[]>()), Times.Never());
             mock.Verify(v => v.SetFolderSelectedItem("Trash to Delete"), Times.Once());
         }
 

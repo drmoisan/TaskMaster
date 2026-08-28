@@ -50,7 +50,7 @@ namespace QuickFiler
         string ConversationCountText { get; set; }
         System.Drawing.Color ConversationCountBackColor { get; set; }
         event System.EventHandler BodyDoubleClick;
-        void FocusSubject();
+        bool FocusSubject();
 
         // Button command events and menu intent members (Seam B, Cluster 2b) replacing the raw
         // ButtonSVG click events and ToolStripMenuItemCb check-state members. The concrete ItemViewer
@@ -76,12 +76,12 @@ namespace QuickFiler
         // CboFolders and TextBox TxtboxSearch. GetFolderItems() exposes the current combo items as a
         // string[] so the controller can read the folder list (EnumerateConversation) without the raw
         // ComboBox; the underlying controls remain public on the concrete ItemViewer.
-        void SetFolderItems(string[] items);
+        void AddFolderItems(string[] items);
 
         // Additive intent member (#325): populates the folder dropdown from the ordered FolderRow
         // contract (FolderPredictor.FolderRowArray / FindFolderRows), building the expandable folder
         // tree and the right-aligned prediction percentages. Additive alongside — not a replacement
-        // for — SetFolderItems(string[]), which live controller call sites still use.
+        // for — AddFolderItems(string[]), which live controller call sites still use.
         void SetFolderSuggestions(IReadOnlyList<UtilitiesCS.FolderRow> rows);
         string GetSelectedFolder();
         void SetFolderSelectedIndex(int index);
