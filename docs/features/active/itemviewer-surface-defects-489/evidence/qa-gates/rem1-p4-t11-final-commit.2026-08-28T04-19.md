@@ -29,7 +29,7 @@ cycle's work.
 | 6 | `77596b58c65e2231594a323554219ea7ae990718` | Phase 3: the handoff-record addendum, the three `spec.md` amendments, and both gate artifacts |
 | 7 | this task's commit | Phase 4: all eleven QC artifacts, the analyzer and nullable `.msbuild.txt` logs, `rem1-p4-t6.trx`, and the P4-T1..T11 plan check-offs |
 
-**This task's commit SHA:** `PENDING-SUBSTITUTED-BY-THE-P4-T12-COMMIT`
+**This task's commit SHA:** `2a7521da4d8887c458a238ce195b58eaec20b71e`
 
 That value was written into this artifact after the commit was created, by a follow-up commit — a
 commit cannot record its own hash, so the alternative would have been to leave the field blank. The
@@ -105,13 +105,13 @@ name, the machine name and the 8.3 account form returns **zero** matches.
 
 | P4-T11 condition | Result |
 |---|---|
-| The commit exists on `bug/itemviewer-surface-defects-489` | **Yes** — `PENDING-SUBSTITUTED-BY-THE-P4-T12-COMMIT`, plus the six earlier cycle commits listed above |
+| The commit exists on `bug/itemviewer-surface-defects-489` | **Yes** — `2a7521da4d8887c458a238ce195b58eaec20b71e`, plus the six earlier cycle commits listed above |
 | Its file list contains the four required paths | **Yes** — all four present in the cycle's cumulative file list, each attributed to its commit above |
 | It contains no path outside the scope lock plus `FEATURE/` documentation and evidence | **Yes** — two scope-locked source files and the feature folder only |
 
 Output Summary: Every change this remediation produced is committed on
 `bug/itemviewer-surface-defects-489`. This task's commit is
-**`PENDING-SUBSTITUTED-BY-THE-P4-T12-COMMIT`**, the seventh and last content commit of a series that
+**`2a7521da4d8887c458a238ce195b58eaec20b71e`**, the seventh and last content commit of a series that
 begins at `899000d3`; the series shape follows the briefing's commit-after-each-phase instruction,
 which cannot be reconciled literally with the plan's single-commit wording, and the whole series is
 recorded above rather than implied. All four required paths are present in the cumulative file list —
