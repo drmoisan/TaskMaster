@@ -48,7 +48,7 @@
 
 ## C# toolchain and test mechanics
 
-- [Phase 0 toolchain bootstrap](project_csharp_phase0_toolchain_bootstrap.md) — global csharpier/dotnet-coverage exe + mandatory NuGet restore
+- [Phase 0 toolchain bootstrap](project_csharp_phase0_toolchain_bootstrap.md) — `dotnet tool run csharpier` works once the SDK is bootstrapped (global.json's missing .dotnet-sdk was the real blocker, not the manifest); mandatory NuGet restore
 - [Agent worktrees need SDK + NuGet + analyzer backfill](agent-worktrees-need-sdk-and-nuget-bootstrap.md) — four Phase 0 steps; CS0006 is an error, not a warning
 - [vstest scoped-run + csharpier 1.2.6 commands](reference_vstest_scoped_run_command.md) — vswhere + `/InIsolation` + `/TestCaseFilter`; csharpier needs a subcommand
 - [CSharpier gate: format not pipe-files](csharpier-format-not-pipe-files-gate.md) — `pipe-files` is stdout-only and non-enforcing
@@ -64,6 +64,8 @@
 - [Pester exits 0 on failing It blocks](pester-invoke-does-not-exit-nonzero.md) — scope every exit-code clause to a named channel
 - [PowerShell gate observables](powershell-gate-observables.md) — no Invoke-Pester exit code; explicit `scan_folders`; aggregate-only `CoveragePercent`
 - [Legacy csproj wiring](project_legacy_csproj_explicit_compile_include.md) — `Compile Include` + own `Reference`; ProjectReference gives no compile-time flow
+- [Invoke-VSBuild rewrites csproj HintPaths](invoke-vsbuild-rewrites-csproj-hintpaths.md) — the wrapper runs Sync-PackageReferences over EVERY csproj; with a forbidden .csproj the build itself commits the scope violation — use vswhere-resolved MSBuild
+- [Declaration-only seam task for fail-before](declaration-only-seam-task-for-fail-before.md) — tests citing not-yet-existing internals redden the whole assembly; order compile-clean tests first, open the fix phase with a no-behaviour seam task + whole-set assertion-time red run
 - [net48 / nullable context mismatch](project_nullable_context_mismatch_prod_vs_test.md) — check `#nullable enable` in prod AND missing `<LangVersion>` in the test csproj
 - [Worktree root breaks the `\.claude\` exclusion](worktree-root-breaks-dotclaude-exclusion.md) — assert a workspace-root prefix instead
 

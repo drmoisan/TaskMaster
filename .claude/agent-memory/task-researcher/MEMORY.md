@@ -33,6 +33,7 @@
 - [coverage-threshold-reconciliation-494](project_coverage_threshold_reconciliation_494.md) — #494: 85/75 is foreign-import leakage reintroduced after #178 rejected it; the only numeric coverage gate is evadable by withholding its input; repo-wide coverage has a +/-15pt run-to-run spread (2026-08-10)
 - [cobertura-root-attrs-raw-vs-postprocessed](project_cobertura_root_attrs_raw_vs_postprocessed.md) — #441/#478: raw dotnet-coverage root totals are class-level-only; the Koverage post-processor overwrites them with a doubled both-axes sum — never compare the two (2026-08-10)
 - [toolchain-gate-fidelity-512](project_toolchain_gate_fidelity_512.md) — #512/#492/#509/#522: AGENTS.md/.agents/.github-instructions are externally owned (generator absent); Invoke-VSBuild.ps1 is an unenumerated executable carrier; ~1.2s vs ~17s = vacuity tell (2026-08-10)
+- [webview2-host-initializer-defects-476](project_webview2_host_initializer_defects_476.md) — #476/#458/#477: EfcViewerQueue is NOT a recycle pool (#458 latent); real WebView2 controls ARE built in QuickFiler tests; CaptureProductionDispatcher captures nothing from the control (2026-08-24)
 - [efc614-store-root-stem-leak](project_efc614_store_root_stem_leak.md) — #614: verbatim ToArchiveRelativePath + unvalidated DestinationOlStem; #609 fix is FolderPredictor-only by design; FolderConverterTests.cs:329 codifies a bug (2026-08-26)
 
 ## Artifact hygiene
