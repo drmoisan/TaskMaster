@@ -18,3 +18,16 @@ Before "recovering" a stalled feature worktree, establish whether a session alre
 - When the owner is live and ahead, **stop before PR** and report. Committed work is safe; a raced PR is not.
 
 Related: [[one-executor-per-worktree]], [[feedback_stale_checkpoint_is_not_a_dead_agent]], [[csharp-coverage-denominator-two-figures]].
+
+## Second confirmation on #444 (2026-08-27) — the tell is a checkpoint mtime you did not author
+
+The parent relaunched a 444 child to "finish the CI gate and merge", having verified the worktree idle at 20:44:10Z. At 20:52:01Z — before this run had written anything — `artifacts/orchestration/orchestrator-state.json` gained a complete, correct `ci_gate` plus `step9_status: "passed"` and `next_step: "S10_merge"`. Twenty seconds later the owner merged PR #654 and flipped `step9_status` to `"verified"`.
+
+**Why:** a parent's idleness check has a shelf life of minutes. The checkpoint is the cheapest ownership probe available, because you know exactly which writes are yours: **any `last_updated` or mtime on the shared checkpoint that postdates your own last write, while your feature number is still in `issue-num`, is a live co-owner** — not the parent handing you a baton, and not a stale record. On #444 the co-owner was ~1 step ahead, exactly as on #442.
+
+**How to apply:**
+
+- Read the shared checkpoint's mtime and `last_updated` *before* your first write, and again immediately before any irreversible call (`gh pr merge`, `git push`). A value you cannot account for means cede.
+- Cede, then **verify independently rather than relaying**. Every load-bearing claim in the co-owner's record was re-derived here from `gh` and `git`: run conclusion + per-job conclusions, `headSha == PR headRefOid`, `git merge-base --is-ancestor <head> <tip>`, zero `awk '$1==0 && $2>0'` numstat rows across `base_before..tip`, and both siblings' `.csproj` include counts on the tip. All matched. Reporting a co-owner's merge you have verified is a complete result, not a halt.
+- Do not race a merge just because the parent addressed the instruction to you. `gh pr merge` is not idempotent in its side effects (branch deletion, epic barrier state), and the merge had already satisfied the objective.
+

@@ -35,3 +35,40 @@ needs more substitutions than a passing one of the same size.
   `AFTER:` lines.
 
 See [[_shared_no_absolute_host_paths]].
+
+## The `<repo-root>` placeholder must be XML-escaped inside the TRX
+
+A plan task that says "replace every absolute filesystem path prefix with the literal `<repo-root>`"
+produces **invalid XML** if followed literally. XML forbids a raw `<` in text nodes *and* in
+attribute values, so writing the five characters `<repo-root>` into a `<StdOut>` body or into a
+`storage="..."` attribute makes the document unparseable.
+
+**Why:** On 2026-08-27 (feature 444, `[P4-T7]`) the raw substitution produced 13444 occurrences and
+`ElementTree` reported `mismatched tag: line 638` — the parser had read the placeholder as an
+element start tag (`</StdOut> closes <repo-root>`). The four host-value assertions the task gates on
+(`:\Users\`, `$env:COMPUTERNAME`, `$env:USERNAME`, `computerName="host"`) all still passed, so the
+gate did not catch it and an unparseable 8 MB TRX would have been committed.
+
+**How to apply:** write the placeholder as `&lt;repo-root&gt;`. An XML reader decodes that back to
+the literal `<repo-root>`, so the required substitution is satisfied and the document still parses.
+Verify with a strict parser (`xml.etree.ElementTree.parse`), not with `[xml]` in PowerShell — the
+`[xml]` cast's failure message is truncated and does not name the offending tag. After the fix,
+confirm the decoded attribute value: `storage` should read `<repo-root>\...`, and the
+`<UnitTestResult>` count should equal the run's test total.
+
+## `/EnableCodeCoverage` drops a host-named binary INTO the evidence tree
+
+A vstest run that combines `/EnableCodeCoverage` with an explicit `/ResultsDirectory:` pointing at
+`<FEATURE>/evidence/<kind>/` writes two extra directories there, and one holds a `.coverage` binary
+whose **filename** is `<account>_<MACHINE>_<date>.<time>.coverage`. The sibling directory is named
+`<account>_<MACHINE>_<timestamp>` outright.
+
+**Why:** sanitisation operates on file *contents*. A filename carrying the account and machine name
+defeats every content sweep, and a `.coverage` file is an opaque binary that cannot be redacted at all.
+On 2026-08-28 (feature 489, `[P0-T13]`) both directories landed inside `evidence/baseline/` and would
+have been committed by the next `git add -A` on the feature folder.
+
+**How to apply:** after any coverage-enabled vstest run that targets an evidence directory, delete the
+attachment directories before staging. The plan's acceptance for such a task is normally the TRX plus
+recorded integers, so nothing references them. If a plan genuinely needs the coverage data, direct
+`/ResultsDirectory:` at a scratch path and copy only the TRX into evidence.

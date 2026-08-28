@@ -1,13 +1,17 @@
 # Atomic Executor Memory Index
 
 ## Plan validation & gates
+- [A blocked Bash command drops a chained check-off](project_blocked_bash_command_silently_drops_chained_checkoff.md) — the guard aborts the WHOLE line before anything runs; [P7-T4] stayed unchecked with no error naming it
 - [CSharpier chain-wrap defeats single-line search gates](project_csharpier_chain_wrap_defeats_singleline_search_gates.md) — a zero-hit gate on
 - [Verify line citations with numbered output](feedback_verify_line_citations_with_numbered_output.md) — never hand-count from a `sed` window; a wrong #438 advisory got applied and corrupted 3 correct
 - [Extract gate literals from the plan, never re-type them](project_preflight_gate_literal_extract_from_plan_not_retype.md) — bash/pwsh quoting
 - [Tool layer collapses `\` in file content](project_tool_layer_collapses_double_backslash_in_file_content.md) — heredocs and Write silently halve
 - [Self-derived gate thresholds are blind](project_preflight_selfderived_gate_thresholds_are_blind.md) — a "count >= floor" gate whose floor comes from the runs it validates is deflation-blind
 - [Multi-pattern gates detach shared qualifiers](project_multipattern_gate_shared_qualifier_detachment.md) — rewriting one clause re-scopes the trailing allowlist to the last pattern only; restate the
+- [Follow-up promotion task is unexecutable by the executor](project_followup_promotion_task_is_unexecutable_by_executor.md) — no MCP tool, the intake doc breaches the scope gate, and "promote" in a commit message aborts the whole Bash line
+- [Plan check-off fixpoint breaks terminal clean-tree gates](project_plan_checkoff_fixpoint_breaks_terminal_clean_tree_gate.md) — a commit task's own check-off post-dates its commit; flip the last checkboxes BEFORE the final commit
 - [Merge-base diff gates need a commit cadence](project_preflight_mergebase_diff_gates_need_commit_cadence.md) — `<MERGE_BASE>..HEAD` gates are vacuous while HEAD == merge-base; plan an explicit commit task
+- [BASELINE_SHA diff conflates the merged base](project_baseline_sha_diff_conflates_merged_base.md) — after an integration merge use `<base>..HEAD` for scope gates; 250 paths vs 78, 6 production vs 3
 - [Inserted plan tasks force renumbering](project_plan_task_ids_digit_only_forces_renumbering.md) — suffixed IDs (`P3-T5a`) fail validation; say "insert + renumber downstream", then verify
 - [Plan rationale clauses are evidence](project_418_plan_rationale_clauses_are_evidence.md) — #418 needed 3 preflight passes; all blockers were unmeasured world-state claims in prose, never in
 - [Bugfix phase grows the file anyway](project_bugfix_phase_grows_the_file_despite_dead_code_removal.md) — a dead-code removal opens the plan, but guards + helpers + XML docs add more back; a "feature reduces the excess" clause is unsatisfiable
@@ -32,14 +36,17 @@
 - [QuickFiler.Test coverage hang + build flags](project_quickfiler_test_coverage_hang_and_build_flags.md) — full-assembly /EnableCodeCoverage can hang the testhost (retry works); project-level msbuild needs
 - [vstest TestCaseFilter OR-vs-pipe + fresh-worktree bootstrap](project_vstest_testcasefilter_or_operator_and_env_setup.md) — vstest rejects `OR`, needs `|`; fresh worktree needs restore + global `dotnet-coverage`
 - [Test file name != partial class name](project_test_file_name_vs_partial_class_name.md) — a `*Tests.cs` split for the 500-line limit often declares a partial of ANOTHER type; a `FullyQualifiedName~<FileName>` filter matches 0 tests and exits 0
+- [Analyzer HintPath skew breaks all four gates](project_analyzer_hintpath_skew_breaks_all_four_gates.md) — a NuGet bump updates packages.config but not `<Analyzer Include>`; CS0006 + `/t:Rebuild` clean cascades into the nullable, vstest AND coverage baselines
 - [Analyzer version skew on fresh worktree](project_analyzer_version_skew_fresh_worktree.md) — analyzer build can fail CS0006 when csproj `<Analyzer Include>` HintPaths diverge from
 - [SecurityCodeScan incompatible with Roslyn 5.6](project_securitycodescan_roslyn56_incompat.md) — SecurityCodeScan.VS2019 5.6.7 throws CS8032/YamlDotNet under VS18, breaking TWAE;
 - [Missing VSTO runtime breaks baseline gates](project_missing_vsto_runtime_breaks_baseline_gates.md) — HISTORICAL, not reproducing 2026-08-08; build before citing
 - [New sln member surfaces MSB3277](project_new_sln_member_surfaces_msb3277_pin_divergence.md) — wiring an unbuilt legacy test project into the sln emits a new MSB3277 when packages.config pins
 - [Legacy csproj: no transitive compile refs](project_legacy_csproj_no_transitive_compile_refs.md) — non-SDK ProjectReference doesn't flow package types to csc (CS0012 despite copy-local DLL); tests
 - [sln/csproj edits: preserve CRLF](project_sln_csproj_edit_crlf_preserve.md) — git-bash `sed -i` strips CRLF from TaskMaster.sln (churn + BOM loss); use Edit or `perl -0777` w/
+- [Relative paths in pwsh helpers hit the wrong worktree](project_relative_path_in_pwsh_dotnet_io_hits_wrong_worktree.md) — Set-Location does not move .NET's CurrentDirectory; a helper script silently read the SESSION worktree's csproj
 - [Incremental build makes a vacuous baseline](project_incremental_build_vacuous_baseline.md) — Invoke-VSBuild's /t:Build up-to-date check ignores /p: changes → EXIT 0 with 0 CoreCompile; add
 - [Nullable /t:Build gate is vacuous](project_nullable_build_gate_is_vacuous_incremental.md) — standard nullable gate passes without type-checking; isolated `/t:Rebuild` exposed 223 errors (no
+- [CSharpier skips *.Designer.cs by filename](project_csharpier_skips_designer_cs_by_filename.md) — generated-file detection, not `.csharpierignore`; prove it with a single-file check printing `Checked 0 files`
 - [CSharpier 1.3.0 formats XML at 100 cols](project_csharpier_formats_xml_print_width.md) — a "reformatting churn" finding on an XML resource can be formatter-mandated; measure line length +
 - [Evidence <TS> collision clobbers committed artifacts](project_evidence_timestamp_collision_clobbers_artifacts.md) — same-day remediation silently overwrites implementation evidence; a ` M` under evidence/ means
 - [csharpier pipe-files is a non-enforcing gate](project_csharpier_pipefiles_nonenforcing_gate.md) — use `csharpier check`/`format`; tests balloon past 500 lines under genuine format (size new files
@@ -77,10 +84,11 @@
 - [ConfigController STA pump deadlock](project_configcontroller_sta_pump_deadlock.md) — SaveAsync posts its continuation to the WinForms STA queue; an STA test must pump (DoEvents +
 
 ## Coverage measurement
+- [Exempt-forward extraction leaves the call site uncovered](project_exempt_forward_extraction_leaves_call_site_uncovered.md) — a per-member >=90% gate on host-bound code is structurally unsatisfiable
 - [Coverage delta: reproduce the baseline's counting method](project_coverage_delta_reproduce_baseline_counting_method.md) — Cobertura repeats lines under `<method>` AND class `<lines>`; deduped vs all-descendant give ~2x
 - [First-party coverage denominator method (#197)](project_coverage_firstparty_denominator_method.md) — production-only rate = per-`<line>` count across ALL deduped packages INCLUDING vendored
 - [dotnet-coverage denominator nondeterminism](project_dotnet_coverage_denominator_nondeterminism.md) — repo line-rate swings (47% vs 81%) from double-counted denominator; re-baseline via git-stash,
-- [Koverage Cobertura post-processing shape](project_koverage_cobertura_postprocessing_shape.md) — rewrites filenames with `\`, pre-merges per-file `<class>`, strips test packages; forward-slash
+- [Koverage Cobertura post-processing shape](project_koverage_cobertura_postprocessing_shape.md) — runs ONLY when every test passes, so a failing-run baseline is raw (~70% at 82070) vs processed (~85% at 63901); convert the saved baseline with the repo helper
 - [C# canonical coverage artifact conversion](project_csharp_canonical_coverage_artifact_conversion.md) — hook reads artifacts/csharp/coverage.xml as JaCoCo (85% floor); defer repo-wide to PR CI
 - [Cobertura runsettings `<Attributes>` override](project_cobertura_runsettings_attributes_override.md) — a custom `<CodeCoverage>` block replaces the default `<Attributes>` excludes, silently disabling
 - [Changed-line coverage: Cobertura hits vs MS-coverage partial](project_changed_line_coverage_cobertura_vs_mscoverage_partial.md) — null-guard throws read "partially covered" in MS.CodeCoverage XML but hits=1 in Cobertura; use

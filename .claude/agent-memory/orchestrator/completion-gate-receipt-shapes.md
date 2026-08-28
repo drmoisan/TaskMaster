@@ -56,3 +56,46 @@ every receipt before changing anything else. Prove the result with the hook, inv
 `$env:CLAUDE_HOOK_INPUT = '{"output":"<summary>"}'` (top-level `.output`) and asserting `EXIT_CODE=0`
 — not with the MCP tool. See [[orchestrator-state-flat-keys-and-enum]] and
 [[epic-child-self-merge-step9-passed-vs-verified]].
+
+### The MCP validator wants the OPPOSITE shape from the PowerShell contract (verified 2026-08-27, epic child #493)
+
+The two validators disagree structurally. Do not try to satisfy both with one shape.
+
+- The PS routing contract above wants `delegation_receipts` as a **LIST** of per-agent receipts
+  (`agent_name`, `started_at`, …).
+- `mcp__drm-copilot__validate_orchestration_artifacts --artifact-type orchestrator-state` wants
+  `delegation_receipts` as an **OBJECT whose only accepted key is `promotion`**. It fails closed both
+  ways: omit the key entirely and you get `Checkpoint missing required key: delegation_receipts`; add
+  `atomic_planner` / `atomic_executor` / `feature_review` / anything else and each is rejected as
+  `delegation_receipts object contains unsupported key: <name>`.
+
+Workaround that passed: keep `delegation_receipts` as `{"promotion": {...}}` only, and move the
+per-phase receipts to a sibling top-level key (`phase_delegations`) with a one-line note saying why.
+Plain validation plus `--require-model-routing` then returns `ok:true`.
+
+### `--require-complete` is NOT the operative gate for an epic child
+
+It demands the full route-large matrix: agent receipts for `task-researcher`, `prd-feature`,
+`atomic-planner`, `atomic-executor`, `feature-review` AND `pr-author`; six named skill receipts;
+successful MCP receipts for `new_potential_entry`, the potential-promotion tool,
+`new_active_feature_folder`, `collect_pr_context`, `validate_orchestration_artifacts`; `pr_gate`
+carrying `pr_number` + `pr_url`; `ci_gate` carrying `verified_at`; and `local_execution_overrides` +
+`delegation_bypasses` present as empty lists.
+
+**An epic child cannot satisfy it honestly.** Two structural reasons:
+
+1. A child whose issue already existed must NOT call the promotion tool (no idempotent path — it
+   always creates a duplicate issue), so the two promotion MCP receipts can never be truthfully
+   produced. Do not repurpose a follow-up promotion's receipts to fill them; label them with their
+   real subject.
+2. A resumed child did not itself run the research / spec / planning phases — the epic-planner
+   preparation run did. Re-attributing them to the resume session would be false.
+
+**Proof it is inoperative, not merely hard:** run the gate against an already-MERGED sibling's
+archived checkpoint. Child #442 (merged as PR #649) fails `--require-complete` with a
+**byte-identical** error list to #493's. No child in the epic has ever passed it.
+
+The gates that actually govern an epic child are `enforce-pr-author-skill.ps1` (PreToolUse, on PR
+creation) and `enforce-epic-merge-gate.ps1` (on PR merge) — both of which pass on the plain schema.
+Record a `completion_gate_divergence` block explaining the refusal and move on; never fabricate a
+receipt to clear it.

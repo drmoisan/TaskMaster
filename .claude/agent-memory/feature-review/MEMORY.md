@@ -68,6 +68,12 @@
 - [446-review-residuals](project_446-review-residuals.md) — PASS/0 blocking; AC28 whole-type-vs-AC18 contradiction owed maintainer amendment (71.0% arithmetic ceiling); issue.md "Also closes #427" hazard; Actions.cs carve-out bound by COM loaders not MessageBox
 
 - [614-review-residuals](project_614-review-residuals.md) — cycle-2 exit NO-GO/1 blocking: RC-1 widened filing guard admits archive-root-exact row that RequireArchiveRelativeStem throws on, post-Hide async-void crash; CR-1 closed
+- [444-review-residuals](project_444-review-residuals.md) — PASS/0 blocking; 3 ACs deferred-pending-PR-body (472-10/482-11/482-12); OB-1 merge-up owed vs #493 fan-in; NavigationTests 498/500 lines; raw Cobertura XMLs survive in executor worktree for re-parse
+- [442-review-residuals](project_442-review-residuals.md) — PASS/0 blocking; AC-19 stays unchecked (ratified deviation); residuals CR-1 empty-lines guard, CR-2 FileIO2 silent-failure promotion, CR-3 date-separator gap (#645), PA-2 agent-memory paths; post-442 baseline 85.1255/79.2096
+- [476-review-residuals](project_476-review-residuals.md) — PASS/0 blocking; 90% floor non-binding for exemption-narrowing entrants (verify lines structurally; wrapper throws in-process); CR-1 Disposed-subscription retention promotion candidate; post-476 baseline 85.1435/79.2018
+
+- [501-review-residuals](project_501-review-residuals.md) — PASS/0 blocking; "no compliant test placement" premise failed (HubCoverageTests 478/500 unexamined); redundant Abandon = coverage without assertion power; full-suite logs uncommitted; post-501 baseline 85.1448/79.2202
+- [464-review-residuals](project_464-review-residuals.md) — PASS/0 blocking; 7 promotions owed (RC7 EfcSelectionGuard "===" arity); Cobertura deleted-but-verified; shared info/exclude trap → commit artifacts on feature branch
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
