@@ -71,8 +71,8 @@ namespace QuickFiler
                 return;
             }
 
-            BreadcrumbItemViewerLifecycleCoordinator lifecycle = EnsureBreadcrumbLifecycle(
-                () => operations
+            BreadcrumbItemViewerLifecycleCoordinator lifecycle = EnsureBreadcrumbLifecycle(() =>
+                operations
             );
             var bridgeCoordinator = new BreadcrumbBridgeCoordinator(
                 lifecycle.Hub,

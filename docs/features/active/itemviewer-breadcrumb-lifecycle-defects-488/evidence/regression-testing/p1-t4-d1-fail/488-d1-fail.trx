@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="a08dd122-2bca-4880-9551-b5b26118d362" name="DanMoisan@MEGALODON4 2026-08-28 01:27:32" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="a08dd122-2bca-4880-9551-b5b26118d362" name="REDACTED-USER@REDACTED-HOST 2026-08-28 01:27:32" runUser="Megalodon4\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-28T01:27:32.2022264-04:00" queuing="2026-08-28T01:27:32.2022264-04:00" start="2026-08-28T01:27:30.0524867-04:00" finish="2026-08-28T01:27:32.2192294-04:00" />
   <TestSettings name="default" id="8a5bf510-a468-4b00-b2dd-dd4fdf66190f">
-    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-28_01_27_32" />
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-28_01_27_32" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="a712030c-64f0-4ce0-87cc-ca0e210f8dfc" testId="195b8d66-9b1b-8669-92f4-4dc7360cc892" testName="ConfigureBreadcrumbDropDown_EnvironmentChange_DisposesOutgoingHostBeforeReplacement" computerName="MEGALODON4" duration="00:00:01.0501416" startTime="2026-08-28T01:27:30.9698226-04:00" endTime="2026-08-28T01:27:32.1335399-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a712030c-64f0-4ce0-87cc-ca0e210f8dfc">
+    <UnitTestResult executionId="a712030c-64f0-4ce0-87cc-ca0e210f8dfc" testId="195b8d66-9b1b-8669-92f4-4dc7360cc892" testName="ConfigureBreadcrumbDropDown_EnvironmentChange_DisposesOutgoingHostBeforeReplacement" computerName="REDACTED-HOST" duration="00:00:01.0501416" startTime="2026-08-28T01:27:30.9698226-04:00" endTime="2026-08-28T01:27:32.1335399-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a712030c-64f0-4ce0-87cc-ca0e210f8dfc">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -53,7 +53,7 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
    at FluentAssertions.Execution.AssertionChain.WithExpectation(String message, Action`1 chain, Object[] args) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 192&#xD;
    at FluentAssertions.Specialized.DelegateAssertionsBase`2.ThrowInternal[TException](Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 56&#xD;
    at FluentAssertions.Specialized.DelegateAssertions`2.Throw[TException](String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 74&#xD;
-   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.ConfigureBreadcrumbDropDown_EnvironmentChange_DisposesOutgoingHostBeforeReplacement() in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 80</StackTrace>
+   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.ConfigureBreadcrumbDropDown_EnvironmentChange_DisposesOutgoingHostBeforeReplacement() in <worktree-root>\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 80</StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
@@ -61,7 +61,7 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
   <TestDefinitions>
     <UnitTest name="ConfigureBreadcrumbDropDown_EnvironmentChange_DisposesOutgoingHostBeforeReplacement" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="195b8d66-9b1b-8669-92f4-4dc7360cc892">
       <Execution id="a712030c-64f0-4ce0-87cc-ca0e210f8dfc" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="ConfigureBreadcrumbDropDown_EnvironmentChange_DisposesOutgoingHostBeforeReplacement" />
+      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="ConfigureBreadcrumbDropDown_EnvironmentChange_DisposesOutgoingHostBeforeReplacement" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
@@ -74,7 +74,7 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
   <ResultSummary outcome="Failed">
     <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
-      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+      <StdOut>Test Parallelization enabled for <worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
 </StdOut>
     </Output>
   </ResultSummary>

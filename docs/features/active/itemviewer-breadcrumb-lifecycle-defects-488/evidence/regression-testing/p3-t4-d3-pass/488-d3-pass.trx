@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="9ab2a27c-8833-4f02-9ee5-0f10a3d86875" name="DanMoisan@MEGALODON4 2026-08-28 01:39:46" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="9ab2a27c-8833-4f02-9ee5-0f10a3d86875" name="REDACTED-USER@REDACTED-HOST 2026-08-28 01:39:46" runUser="Megalodon4\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-28T01:39:46.1997518-04:00" queuing="2026-08-28T01:39:46.1997518-04:00" start="2026-08-28T01:39:44.3243652-04:00" finish="2026-08-28T01:39:46.3166864-04:00" />
   <TestSettings name="default" id="8c62d040-854a-45a1-987e-845cff0eb280">
-    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-28_01_39_46" />
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-28_01_39_46" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="da0ded6a-8805-4848-8189-1eab12c50a91" testId="1bbd6e35-c7ce-8cf9-8d02-2952347a2a5a" testName="SetBridgeCoordinator_SameReference_DoesNotDuplicateSubscriptions" computerName="MEGALODON4" duration="00:00:00.1872172" startTime="2026-08-28T01:39:45.2381421-04:00" endTime="2026-08-28T01:39:45.5452443-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="da0ded6a-8805-4848-8189-1eab12c50a91">
+    <UnitTestResult executionId="da0ded6a-8805-4848-8189-1eab12c50a91" testId="1bbd6e35-c7ce-8cf9-8d02-2952347a2a5a" testName="SetBridgeCoordinator_SameReference_DoesNotDuplicateSubscriptions" computerName="REDACTED-HOST" duration="00:00:00.1872172" startTime="2026-08-28T01:39:45.2381421-04:00" endTime="2026-08-28T01:39:45.5452443-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="da0ded6a-8805-4848-8189-1eab12c50a91">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -37,7 +37,7 @@ Debug Trace:&#xD;
      For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="fbbd6854-07d2-43dd-b97c-03886b9ef282" testId="1f54a4e4-e8f3-8e83-9b4c-63ec437d80b6" testName="InitializeBreadcrumbPipeline_RepeatSameProvider_DoesNotThrowAndKeepsCoordinator" computerName="MEGALODON4" duration="00:00:00.0535528" startTime="2026-08-28T01:39:46.2007515-04:00" endTime="2026-08-28T01:39:46.2563385-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fbbd6854-07d2-43dd-b97c-03886b9ef282">
+    <UnitTestResult executionId="fbbd6854-07d2-43dd-b97c-03886b9ef282" testId="1f54a4e4-e8f3-8e83-9b4c-63ec437d80b6" testName="InitializeBreadcrumbPipeline_RepeatSameProvider_DoesNotThrowAndKeepsCoordinator" computerName="REDACTED-HOST" duration="00:00:00.0535528" startTime="2026-08-28T01:39:46.2007515-04:00" endTime="2026-08-28T01:39:46.2563385-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fbbd6854-07d2-43dd-b97c-03886b9ef282">
       <Output>
         <StdOut>Debug Trace:&#xD;
 testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
@@ -46,7 +46,7 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
 testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="56f7d743-abb9-420d-9aa1-dcf920de02f6" testId="1d4a04b2-b683-8c85-a8cb-ebb9487ca481" testName="InitializeBreadcrumbPipeline_SecondDifferentProvider_ThrowsInvalidOperationException" computerName="MEGALODON4" duration="00:00:00.8488671" startTime="2026-08-28T01:39:45.2401389-04:00" endTime="2026-08-28T01:39:46.2007515-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="56f7d743-abb9-420d-9aa1-dcf920de02f6">
+    <UnitTestResult executionId="56f7d743-abb9-420d-9aa1-dcf920de02f6" testId="1d4a04b2-b683-8c85-a8cb-ebb9487ca481" testName="InitializeBreadcrumbPipeline_SecondDifferentProvider_ThrowsInvalidOperationException" computerName="REDACTED-HOST" duration="00:00:00.8488671" startTime="2026-08-28T01:39:45.2401389-04:00" endTime="2026-08-28T01:39:46.2007515-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="56f7d743-abb9-420d-9aa1-dcf920de02f6">
       <Output>
         <StdOut>Debug Trace:&#xD;
 testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
@@ -65,15 +65,15 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
   <TestDefinitions>
     <UnitTest name="InitializeBreadcrumbPipeline_RepeatSameProvider_DoesNotThrowAndKeepsCoordinator" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="1f54a4e4-e8f3-8e83-9b4c-63ec437d80b6">
       <Execution id="fbbd6854-07d2-43dd-b97c-03886b9ef282" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="InitializeBreadcrumbPipeline_RepeatSameProvider_DoesNotThrowAndKeepsCoordinator" />
+      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="InitializeBreadcrumbPipeline_RepeatSameProvider_DoesNotThrowAndKeepsCoordinator" />
     </UnitTest>
     <UnitTest name="InitializeBreadcrumbPipeline_SecondDifferentProvider_ThrowsInvalidOperationException" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d4a04b2-b683-8c85-a8cb-ebb9487ca481">
       <Execution id="56f7d743-abb9-420d-9aa1-dcf920de02f6" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="InitializeBreadcrumbPipeline_SecondDifferentProvider_ThrowsInvalidOperationException" />
+      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="InitializeBreadcrumbPipeline_SecondDifferentProvider_ThrowsInvalidOperationException" />
     </UnitTest>
     <UnitTest name="SetBridgeCoordinator_SameReference_DoesNotDuplicateSubscriptions" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="1bbd6e35-c7ce-8cf9-8d02-2952347a2a5a">
       <Execution id="da0ded6a-8805-4848-8189-1eab12c50a91" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbItemViewerLifecycleCoordinatorTests" name="SetBridgeCoordinator_SameReference_DoesNotDuplicateSubscriptions" />
+      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbItemViewerLifecycleCoordinatorTests" name="SetBridgeCoordinator_SameReference_DoesNotDuplicateSubscriptions" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
@@ -88,7 +88,7 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
   <ResultSummary outcome="Completed">
     <Counters total="3" executed="3" passed="3" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
-      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+      <StdOut>Test Parallelization enabled for <worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
 </StdOut>
     </Output>
   </ResultSummary>

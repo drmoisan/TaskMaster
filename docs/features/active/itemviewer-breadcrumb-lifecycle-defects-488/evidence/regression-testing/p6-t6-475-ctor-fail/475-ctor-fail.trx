@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="60ef00b6-e515-4296-a483-c64a31e046b3" name="DanMoisan@MEGALODON4 2026-08-28 02:07:13" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="60ef00b6-e515-4296-a483-c64a31e046b3" name="REDACTED-USER@REDACTED-HOST 2026-08-28 02:07:13" runUser="Megalodon4\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-28T02:07:13.7863103-04:00" queuing="2026-08-28T02:07:13.7863103-04:00" start="2026-08-28T02:07:12.5351407-04:00" finish="2026-08-28T02:07:13.8043169-04:00" />
   <TestSettings name="default" id="e97b43cb-bce0-4a43-aac1-acf0f033cf72">
-    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-28_02_07_13" />
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-28_02_07_13" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="bced975f-eee4-4620-af68-edec2316741d" testId="19a7e53a-ac6a-8f45-93f3-b129d8c7e213" testName="LegacySurfaceFactoryConstructor_AmbientContextNull_ThrowsInvalidOperationException" computerName="MEGALODON4" duration="00:00:00.1559261" startTime="2026-08-28T02:07:13.4432885-04:00" endTime="2026-08-28T02:07:13.7155116-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bced975f-eee4-4620-af68-edec2316741d">
+    <UnitTestResult executionId="bced975f-eee4-4620-af68-edec2316741d" testId="19a7e53a-ac6a-8f45-93f3-b129d8c7e213" testName="LegacySurfaceFactoryConstructor_AmbientContextNull_ThrowsInvalidOperationException" computerName="REDACTED-HOST" duration="00:00:00.1559261" startTime="2026-08-28T02:07:13.4432885-04:00" endTime="2026-08-28T02:07:13.7155116-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bced975f-eee4-4620-af68-edec2316741d">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -39,19 +39,19 @@ Debug Trace:&#xD;
           <Message>Expected a &lt;System.InvalidOperationException&gt; to be thrown because the public constructor must refuse to run without an owning boundary, but found &lt;System.ArgumentNullException&gt;:&#xD;
 System.ArgumentNullException: Value cannot be null.&#xD;
 Parameter name: anchor&#xD;
-   at QuickFiler.Viewers.BreadcrumbDropDownHost..ctor(Control anchor, CoreWebView2Environment environment, Func`2 surfaceFactory, Action focusPending, Action focusAnchor, Action cancelSelection, Action`3 showPopup, BreadcrumbPopupUiOperations operations, Action`2 closePopup) in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler\Viewers\BreadcrumbDropDownHost.cs:line 155&#xD;
-   at QuickFiler.Viewers.BreadcrumbDropDownHost..ctor(Control anchor, CoreWebView2Environment environment, Func`2 surfaceFactory, Action focusPending, Action focusAnchor, Action cancelSelection, Action`3 showPopup, BreadcrumbPopupUiOperations operations) in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler\Viewers\BreadcrumbDropDownHost.cs:line 131&#xD;
-   at QuickFiler.Viewers.BreadcrumbDropDownHost..ctor(Control anchor, CoreWebView2Environment environment, Func`2 surfaceFactory, Action focusPending, Action focusAnchor, Action cancelSelection, Action`3 showPopup) in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler\Viewers\BreadcrumbDropDownHost.cs:line 88&#xD;
-   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.&lt;&gt;c__DisplayClass6_0.&lt;LegacySurfaceFactoryConstructor_AmbientContextNull_ThrowsInvalidOperationException&gt;b__2() in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 295&#xD;
-   at QuickFiler.Test.Viewers.BreadcrumbSelectorToggleUiBoundaryTests.InvokeAmbientNull[T](Func`1 operation) in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\Viewers\BreadcrumbSelectorToggleUiBoundaryTests.cs:line 331&#xD;
-   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.&lt;&gt;c__DisplayClass6_0.&lt;LegacySurfaceFactoryConstructor_AmbientContextNull_ThrowsInvalidOperationException&gt;b__1() in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 293&#xD;
+   at QuickFiler.Viewers.BreadcrumbDropDownHost..ctor(Control anchor, CoreWebView2Environment environment, Func`2 surfaceFactory, Action focusPending, Action focusAnchor, Action cancelSelection, Action`3 showPopup, BreadcrumbPopupUiOperations operations, Action`2 closePopup) in <worktree-root>\QuickFiler\Viewers\BreadcrumbDropDownHost.cs:line 155&#xD;
+   at QuickFiler.Viewers.BreadcrumbDropDownHost..ctor(Control anchor, CoreWebView2Environment environment, Func`2 surfaceFactory, Action focusPending, Action focusAnchor, Action cancelSelection, Action`3 showPopup, BreadcrumbPopupUiOperations operations) in <worktree-root>\QuickFiler\Viewers\BreadcrumbDropDownHost.cs:line 131&#xD;
+   at QuickFiler.Viewers.BreadcrumbDropDownHost..ctor(Control anchor, CoreWebView2Environment environment, Func`2 surfaceFactory, Action focusPending, Action focusAnchor, Action cancelSelection, Action`3 showPopup) in <worktree-root>\QuickFiler\Viewers\BreadcrumbDropDownHost.cs:line 88&#xD;
+   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.&lt;&gt;c__DisplayClass6_0.&lt;LegacySurfaceFactoryConstructor_AmbientContextNull_ThrowsInvalidOperationException&gt;b__2() in <worktree-root>\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 295&#xD;
+   at QuickFiler.Test.Viewers.BreadcrumbSelectorToggleUiBoundaryTests.InvokeAmbientNull[T](Func`1 operation) in <worktree-root>\QuickFiler.Test\Viewers\BreadcrumbSelectorToggleUiBoundaryTests.cs:line 331&#xD;
+   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.&lt;&gt;c__DisplayClass6_0.&lt;LegacySurfaceFactoryConstructor_AmbientContextNull_ThrowsInvalidOperationException&gt;b__1() in <worktree-root>\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 293&#xD;
    at FluentAssertions.Specialized.DelegateAssertions`2.InvokeSubjectWithInterception() in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 173.</Message>
           <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
    at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
    at FluentAssertions.Execution.AssertionChain.WithExpectation(String message, Action`1 chain, Object[] args) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 192&#xD;
    at FluentAssertions.Specialized.DelegateAssertionsBase`2.ThrowInternal[TException](Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 56&#xD;
    at FluentAssertions.Specialized.DelegateAssertions`2.Throw[TException](String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 74&#xD;
-   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.LegacySurfaceFactoryConstructor_AmbientContextNull_ThrowsInvalidOperationException() in C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 309</StackTrace>
+   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.LegacySurfaceFactoryConstructor_AmbientContextNull_ThrowsInvalidOperationException() in <worktree-root>\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 309</StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
@@ -59,7 +59,7 @@ Parameter name: anchor&#xD;
   <TestDefinitions>
     <UnitTest name="LegacySurfaceFactoryConstructor_AmbientContextNull_ThrowsInvalidOperationException" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="19a7e53a-ac6a-8f45-93f3-b129d8c7e213">
       <Execution id="bced975f-eee4-4620-af68-edec2316741d" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="LegacySurfaceFactoryConstructor_AmbientContextNull_ThrowsInvalidOperationException" />
+      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="LegacySurfaceFactoryConstructor_AmbientContextNull_ThrowsInvalidOperationException" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
@@ -72,7 +72,7 @@ Parameter name: anchor&#xD;
   <ResultSummary outcome="Failed">
     <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
-      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+      <StdOut>Test Parallelization enabled for <worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
 </StdOut>
     </Output>
   </ResultSummary>

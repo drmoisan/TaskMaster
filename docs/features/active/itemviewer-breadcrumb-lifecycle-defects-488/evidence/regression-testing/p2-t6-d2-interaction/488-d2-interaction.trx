@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="fa199171-6c53-426b-8ef4-6f41f649d9aa" name="DanMoisan@MEGALODON4 2026-08-28 01:35:58" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="fa199171-6c53-426b-8ef4-6f41f649d9aa" name="REDACTED-USER@REDACTED-HOST 2026-08-28 01:35:58" runUser="Megalodon4\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-28T01:35:58.7427028-04:00" queuing="2026-08-28T01:35:58.7427028-04:00" start="2026-08-28T01:35:56.5017726-04:00" finish="2026-08-28T01:35:58.7557454-04:00" />
   <TestSettings name="default" id="b53fbd82-9459-4e42-bb02-a007f4704682">
-    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-28_01_35_58" />
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-28_01_35_58" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="af659d87-fbec-4692-b29b-15631f21a5d2" testId="110e559b-ba32-80d3-adb0-286c626272d0" testName="ConfigureAndAttachBreadcrumbAsync_CachesCurrentThemeAndCreatesOneCandidatePerSession" computerName="MEGALODON4" duration="00:00:00.0902405" startTime="2026-08-28T01:35:58.5846985-04:00" endTime="2026-08-28T01:35:58.6785802-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="af659d87-fbec-4692-b29b-15631f21a5d2">
+    <UnitTestResult executionId="af659d87-fbec-4692-b29b-15631f21a5d2" testId="110e559b-ba32-80d3-adb0-286c626272d0" testName="ConfigureAndAttachBreadcrumbAsync_CachesCurrentThemeAndCreatesOneCandidatePerSession" computerName="REDACTED-HOST" duration="00:00:00.0902405" startTime="2026-08-28T01:35:58.5846985-04:00" endTime="2026-08-28T01:35:58.6785802-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="af659d87-fbec-4692-b29b-15631f21a5d2">
       <Output>
         <StdOut>Debug Trace:&#xD;
 testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
@@ -14,7 +14,7 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
 testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="2a0a98f9-9e06-424a-b6a7-84a8e1cfa905" testId="1545bb10-ad34-880a-9622-f284e7444aa6" testName="ConfigureBreadcrumbDropDown_PassesExistingEnvironmentAndDarkThemeLazily" computerName="MEGALODON4" duration="00:00:01.0047249" startTime="2026-08-28T01:35:57.4159968-04:00" endTime="2026-08-28T01:35:58.5275610-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2a0a98f9-9e06-424a-b6a7-84a8e1cfa905">
+    <UnitTestResult executionId="2a0a98f9-9e06-424a-b6a7-84a8e1cfa905" testId="1545bb10-ad34-880a-9622-f284e7444aa6" testName="ConfigureBreadcrumbDropDown_PassesExistingEnvironmentAndDarkThemeLazily" computerName="REDACTED-HOST" duration="00:00:01.0047249" startTime="2026-08-28T01:35:57.4159968-04:00" endTime="2026-08-28T01:35:58.5275610-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2a0a98f9-9e06-424a-b6a7-84a8e1cfa905">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -56,7 +56,7 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
      For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="ff3c6120-6f82-47d3-b37a-1aaca8826563" testId="1c847c66-3f53-8bea-b4c6-bd1836eb0958" testName="ConfigureBreadcrumbDropDown_LightThemeUsesSameControllerSetupSeam" computerName="MEGALODON4" duration="00:00:00.0512375" startTime="2026-08-28T01:35:58.5327623-04:00" endTime="2026-08-28T01:35:58.5846985-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ff3c6120-6f82-47d3-b37a-1aaca8826563">
+    <UnitTestResult executionId="ff3c6120-6f82-47d3-b37a-1aaca8826563" testId="1c847c66-3f53-8bea-b4c6-bd1836eb0958" testName="ConfigureBreadcrumbDropDown_LightThemeUsesSameControllerSetupSeam" computerName="REDACTED-HOST" duration="00:00:00.0512375" startTime="2026-08-28T01:35:58.5327623-04:00" endTime="2026-08-28T01:35:58.5846985-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ff3c6120-6f82-47d3-b37a-1aaca8826563">
       <Output>
         <StdOut>Debug Trace:&#xD;
 testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
@@ -69,15 +69,15 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
   <TestDefinitions>
     <UnitTest name="ConfigureAndAttachBreadcrumbAsync_CachesCurrentThemeAndCreatesOneCandidatePerSession" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="110e559b-ba32-80d3-adb0-286c626272d0">
       <Execution id="af659d87-fbec-4692-b29b-15631f21a5d2" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemControllerBreadcrumbDropDownTests" name="ConfigureAndAttachBreadcrumbAsync_CachesCurrentThemeAndCreatesOneCandidatePerSession" />
+      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemControllerBreadcrumbDropDownTests" name="ConfigureAndAttachBreadcrumbAsync_CachesCurrentThemeAndCreatesOneCandidatePerSession" />
     </UnitTest>
     <UnitTest name="ConfigureBreadcrumbDropDown_PassesExistingEnvironmentAndDarkThemeLazily" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="1545bb10-ad34-880a-9622-f284e7444aa6">
       <Execution id="2a0a98f9-9e06-424a-b6a7-84a8e1cfa905" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemControllerBreadcrumbDropDownTests" name="ConfigureBreadcrumbDropDown_PassesExistingEnvironmentAndDarkThemeLazily" />
+      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemControllerBreadcrumbDropDownTests" name="ConfigureBreadcrumbDropDown_PassesExistingEnvironmentAndDarkThemeLazily" />
     </UnitTest>
     <UnitTest name="ConfigureBreadcrumbDropDown_LightThemeUsesSameControllerSetupSeam" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c847c66-3f53-8bea-b4c6-bd1836eb0958">
       <Execution id="ff3c6120-6f82-47d3-b37a-1aaca8826563" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemControllerBreadcrumbDropDownTests" name="ConfigureBreadcrumbDropDown_LightThemeUsesSameControllerSetupSeam" />
+      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemControllerBreadcrumbDropDownTests" name="ConfigureBreadcrumbDropDown_LightThemeUsesSameControllerSetupSeam" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
@@ -92,7 +92,7 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
   <ResultSummary outcome="Completed">
     <Counters total="3" executed="3" passed="3" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
-      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+      <StdOut>Test Parallelization enabled for <worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
 </StdOut>
     </Output>
   </ResultSummary>

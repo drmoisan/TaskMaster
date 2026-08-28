@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="03159b88-9939-48d9-8697-0feec4b741e1" name="DanMoisan@MEGALODON4 2026-08-28 01:47:23" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="03159b88-9939-48d9-8697-0feec4b741e1" name="REDACTED-USER@REDACTED-HOST 2026-08-28 01:47:23" runUser="Megalodon4\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-28T01:47:23.2853924-04:00" queuing="2026-08-28T01:47:23.2853924-04:00" start="2026-08-28T01:47:21.1158007-04:00" finish="2026-08-28T01:47:23.2995997-04:00" />
   <TestSettings name="default" id="6c056c1c-5ef8-4b16-b7bd-51491957af77">
-    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-08-28_01_47_23" />
+    <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-28_01_47_23" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="37b25376-db7f-47a1-b5e1-7436290df615" testId="18ce6dbf-f47e-8b77-b4ed-8451c808b4e8" testName="InitializeBreadcrumbPipeline_DifferentNonNullContext_ThrowsBoundaryDiagnostic" computerName="MEGALODON4" duration="00:00:00.0556473" startTime="2026-08-28T01:47:23.1641181-04:00" endTime="2026-08-28T01:47:23.2239500-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="37b25376-db7f-47a1-b5e1-7436290df615">
+    <UnitTestResult executionId="37b25376-db7f-47a1-b5e1-7436290df615" testId="18ce6dbf-f47e-8b77-b4ed-8451c808b4e8" testName="InitializeBreadcrumbPipeline_DifferentNonNullContext_ThrowsBoundaryDiagnostic" computerName="REDACTED-HOST" duration="00:00:00.0556473" startTime="2026-08-28T01:47:23.1641181-04:00" endTime="2026-08-28T01:47:23.2239500-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="37b25376-db7f-47a1-b5e1-7436290df615">
       <Output>
         <StdOut>Debug Trace:&#xD;
 testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
@@ -14,7 +14,7 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
 testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="0fd9afb0-7c4f-4ed6-aecc-612a357bf3a7" testId="1fd74340-a234-8b70-9a66-0979d3a91db3" testName="InitializeBreadcrumbPipeline_AmbientContextNull_ThrowsBoundaryDiagnostic" computerName="MEGALODON4" duration="00:00:01.0239777" startTime="2026-08-28T01:47:22.0272977-04:00" endTime="2026-08-28T01:47:23.1591120-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0fd9afb0-7c4f-4ed6-aecc-612a357bf3a7">
+    <UnitTestResult executionId="0fd9afb0-7c4f-4ed6-aecc-612a357bf3a7" testId="1fd74340-a234-8b70-9a66-0979d3a91db3" testName="InitializeBreadcrumbPipeline_AmbientContextNull_ThrowsBoundaryDiagnostic" computerName="REDACTED-HOST" duration="00:00:01.0239777" startTime="2026-08-28T01:47:22.0272977-04:00" endTime="2026-08-28T01:47:23.1591120-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0fd9afb0-7c4f-4ed6-aecc-612a357bf3a7">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -60,11 +60,11 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
   <TestDefinitions>
     <UnitTest name="InitializeBreadcrumbPipeline_AmbientContextNull_ThrowsBoundaryDiagnostic" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="1fd74340-a234-8b70-9a66-0979d3a91db3">
       <Execution id="0fd9afb0-7c4f-4ed6-aecc-612a357bf3a7" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="InitializeBreadcrumbPipeline_AmbientContextNull_ThrowsBoundaryDiagnostic" />
+      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="InitializeBreadcrumbPipeline_AmbientContextNull_ThrowsBoundaryDiagnostic" />
     </UnitTest>
     <UnitTest name="InitializeBreadcrumbPipeline_DifferentNonNullContext_ThrowsBoundaryDiagnostic" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="18ce6dbf-f47e-8b77-b4ed-8451c808b4e8">
       <Execution id="37b25376-db7f-47a1-b5e1-7436290df615" />
-      <TestMethod codeBase="C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="InitializeBreadcrumbPipeline_DifferentNonNullContext_ThrowsBoundaryDiagnostic" />
+      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="InitializeBreadcrumbPipeline_DifferentNonNullContext_ThrowsBoundaryDiagnostic" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
@@ -78,7 +78,7 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
   <ResultSummary outcome="Completed">
     <Counters total="2" executed="2" passed="2" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
-      <StdOut>Test Parallelization enabled for C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+      <StdOut>Test Parallelization enabled for <worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
 </StdOut>
     </Output>
   </ResultSummary>
