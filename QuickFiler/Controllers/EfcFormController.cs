@@ -124,6 +124,19 @@ namespace QuickFiler.Controllers
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
         );
 
+        /// <summary>
+        /// Receives every fault contained at one of this controller's fault boundaries. The
+        /// default delegate writes the message and the exception to the static logger above.
+        /// </summary>
+        /// <remarks>
+        /// An injectable seam rather than a direct <c>logger.Error</c> call, because
+        /// <c>QuickFiler.Test</c> carries no log4net reference and so cannot attach an appender
+        /// or assert on <c>log4net.ILog</c>. A test replaces this with a counting delegate to
+        /// observe that a boundary logged exactly once and contained the fault.
+        /// </remarks>
+        internal System.Action<string, System.Exception> BoundaryErrorSink { get; set; } =
+            (message, exception) => logger.Error(message, exception);
+
         private IApplicationGlobals _globals;
         private System.Action _parentCleanup;
         private EfcDataModel _dataModel;
@@ -444,7 +457,10 @@ namespace QuickFiler.Controllers
             }
         }
 
-        public async void ButtonCancel_Click(object sender, EventArgs e)
+        public async void ButtonCancel_Click(object sender, EventArgs e) =>
+            await ButtonCancelClickAsync();
+
+        internal async Task ButtonCancelClickAsync()
         {
             try
             {
@@ -455,12 +471,13 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                logger.Error(ex.Message, ex);
-                throw;
+                BoundaryErrorSink(ex.Message, ex);
             }
         }
 
-        public async void ButtonOK_Click(object sender, EventArgs e)
+        public async void ButtonOK_Click(object sender, EventArgs e) => await ButtonOkClickAsync();
+
+        internal async Task ButtonOkClickAsync()
         {
             try
             {
@@ -471,12 +488,14 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                logger.Error(ex.Message, ex);
-                throw;
+                BoundaryErrorSink(ex.Message, ex);
             }
         }
 
-        public async void ButtonRefresh_Click(object sender, EventArgs e)
+        public async void ButtonRefresh_Click(object sender, EventArgs e) =>
+            await ButtonRefreshClickAsync();
+
+        internal async Task ButtonRefreshClickAsync()
         {
             try
             {
@@ -487,12 +506,14 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                logger.Error(ex.Message, ex);
-                throw;
+                BoundaryErrorSink(ex.Message, ex);
             }
         }
 
-        public async void ButtonCreate_Click(object sender, EventArgs e)
+        public async void ButtonCreate_Click(object sender, EventArgs e) =>
+            await ButtonCreateClickAsync();
+
+        internal async Task ButtonCreateClickAsync()
         {
             try
             {
@@ -547,12 +568,14 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                logger.Error(ex.Message, ex);
-                throw;
+                BoundaryErrorSink(ex.Message, ex);
             }
         }
 
-        public async void ButtonDelete_Click(object sender, EventArgs e)
+        public async void ButtonDelete_Click(object sender, EventArgs e) =>
+            await ButtonDeleteClickAsync();
+
+        internal async Task ButtonDeleteClickAsync()
         {
             try
             {
@@ -560,8 +583,7 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                logger.Error(ex.Message, ex);
-                throw;
+                BoundaryErrorSink(ex.Message, ex);
             }
         }
 
@@ -1053,20 +1075,36 @@ namespace QuickFiler.Controllers
             _formViewer.ConversationMenuItem.Checked = _moveConversation;
         }
 
+        /// <summary>
+        /// Loads the folder suggestions and binds them to the breadcrumb surface.
+        /// </summary>
+        /// <remarks>
+        /// #464 C: both call sites invoke this fire-and-forget with a discarded result, so nothing
+        /// on the call path can observe a faulted task. The boundary is therefore inside the
+        /// method, mirroring <c>InitializeBreadcrumbHostAsync</c>: log through the sink and
+        /// return, never rethrow.
+        /// </remarks>
         public async Task PopulateFolderCombobox(object folderList = null)
         {
-            // Capture _formViewer in a local variable before the first await. Cleanup() may set
-            // _formViewer to null while InitFolderHandlerAsync is executing (e.g. the user
-            // dismisses the form), so all post-await access must go through this local reference.
-            var formViewer = _formViewer;
-            if (formViewer == null)
-                return;
+            try
+            {
+                // Capture _formViewer in a local variable before the first await. Cleanup() may set
+                // _formViewer to null while InitFolderHandlerAsync is executing (e.g. the user
+                // dismisses the form), so all post-await access must go through this local reference.
+                var formViewer = _formViewer;
+                if (formViewer == null)
+                    return;
 
-            await _dataModel.InitFolderHandlerAsync(folderList);
+                await _dataModel.InitFolderHandlerAsync(folderList);
 
-            await formViewer.UiSyncContext;
+                await formViewer.UiSyncContext;
 
-            BindFolderRows(_dataModel.FolderHelper.FolderArray);
+                BindFolderRows(_dataModel.FolderHelper.FolderArray);
+            }
+            catch (System.Exception ex)
+            {
+                BoundaryErrorSink(ex.Message, ex);
+            }
         }
 
         internal bool IsValidSelection =>

@@ -395,6 +395,69 @@ namespace QuickFiler.Controllers.Tests
             actual[1].Should().Be('-', "the second character must be ASCII HYPHEN-MINUS");
         }
 
+        /// <summary>
+        /// A named helper whose frame appears in the stack trace of the exception it throws. The
+        /// frame name is the observable that distinguishes a preserved trace from a reset one.
+        /// </summary>
+        private static void ThrowFromOriginatingHelper() =>
+            throw new System.InvalidOperationException("WebView2 core initialization failed");
+
+        /// <summary>
+        /// #464 E. A plain <c>throw expression;</c> rethrow overwrites the exception's stack trace
+        /// with the rethrow site, discarding the frames that identify where the failure actually
+        /// originated. Capturing through <c>ExceptionDispatchInfo</c> preserves them.
+        /// </summary>
+        [TestMethod]
+        public void ThrowInitializationFailure_PreservesOriginalStackTrace()
+        {
+            // Arrange
+            System.Exception original = null;
+            try
+            {
+                ThrowFromOriginatingHelper();
+            }
+            catch (System.Exception caught)
+            {
+                original = caught;
+            }
+            original
+                .Should()
+                .NotBeNull("the arrange step must produce a thrown exception to rethrow");
+            original
+                .StackTrace.Should()
+                .Contain(
+                    nameof(ThrowFromOriginatingHelper),
+                    "the originating frame must be present before the rethrow, otherwise the test"
+                        + " could not detect its loss"
+                );
+
+            // Act
+            System.Exception rethrown = null;
+            try
+            {
+                EfcItemController.ThrowInitializationFailure(original);
+            }
+            catch (System.Exception caught)
+            {
+                rethrown = caught;
+            }
+
+            // Assert
+            rethrown
+                .Should()
+                .BeSameAs(
+                    original,
+                    "the supplied exception instance must be rethrown, not wrapped or replaced"
+                );
+            rethrown
+                .StackTrace.Should()
+                .Contain(
+                    nameof(ThrowFromOriginatingHelper),
+                    "the rethrow must preserve the originating frame, so a diagnostic reader can"
+                        + " still see where the WebView2 initialization actually failed"
+                );
+        }
+
         private static void SetPrivateField(object target, string fieldName, object value)
         {
             FieldInfo field = target

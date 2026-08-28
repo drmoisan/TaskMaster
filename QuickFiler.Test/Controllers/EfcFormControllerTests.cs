@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -265,6 +266,121 @@ namespace QuickFiler.Controllers.Tests
                 .BeNull(
                     "Cleanup nulls the field before invoking the captured local, which is what"
                         + " makes the single invocation structural rather than incidental"
+                );
+        }
+
+        // #464 B (RC3). Each of the five extracted boundary members must log through the
+        // injectable sink and contain the fault, instead of rethrowing it out of an async void
+        // rim where it becomes an unhandled UI-thread crash. Under decision D9 each [DataRow] is
+        // a distinct named test result with its own name and outcome in the TRX.
+        [DataTestMethod]
+        [DataRow("ButtonCancelClickAsync")]
+        [DataRow("ButtonOkClickAsync")]
+        [DataRow("ButtonRefreshClickAsync")]
+        [DataRow("ButtonCreateClickAsync")]
+        [DataRow("ButtonDeleteClickAsync")]
+        public async Task AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow(string memberName)
+        {
+            // Arrange
+            // The fault is injected by the all-fields-null state itself: the first statement each
+            // extracted member reaches dereferences the null _formViewer, or awaits its null
+            // UiSyncContext, which throws because _formViewer is itself null.
+            SynchronizationContext previousContext = SynchronizationContext.Current;
+            SynchronizationContext.SetSynchronizationContext(null);
+            try
+            {
+                var controller = CreateMinimalController();
+                var sinkCallCount = 0;
+                controller.BoundaryErrorSink = (message, exception) => sinkCallCount++;
+                MethodInfo member = typeof(EfcFormController).GetMethod(
+                    memberName,
+                    BindingFlags.Instance | BindingFlags.NonPublic
+                );
+                member
+                    .Should()
+                    .NotBeNull(
+                        $"{memberName} must exist as an extracted internal async Task member"
+                    );
+
+                // Act
+                Func<Task> act = () => (Task)member.Invoke(controller, Array.Empty<object>());
+
+                // Assert
+                await act.Should()
+                    .NotThrowAsync(
+                        $"{memberName} is the fault boundary for an async void rim, so it must"
+                            + " contain the fault rather than rethrow it into the UI message loop"
+                    );
+                sinkCallCount
+                    .Should()
+                    .Be(
+                        1,
+                        $"{memberName} must report the contained fault through the boundary error"
+                            + " sink exactly once"
+                    );
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previousContext);
+            }
+        }
+
+        [TestMethod]
+        public void BoundaryErrorSink_DefaultDelegate_InvokesWithoutThrowing()
+        {
+            // Arrange
+            // The default delegate is left in place, so this covers its body: a single
+            // logger.Error(message, exception) call on the pre-existing static logger.
+            var controller = CreateMinimalController();
+
+            // Act
+            Action act = () =>
+                controller.BoundaryErrorSink(
+                    "boundary sink smoke",
+                    new InvalidOperationException()
+                );
+
+            // Assert
+            act.Should()
+                .NotThrow(
+                    "the default sink delegate must be safe to invoke on a controller whose"
+                        + " collaborators have all been released"
+                );
+        }
+
+        // #464 C (RC3). PopulateFolderCombobox is invoked fire-and-forget from two call sites, so
+        // a fault inside it becomes an unobserved faulted Task with no catch anywhere on the path.
+        // The uninitialized EfcViewer gets past the pre-existing null-viewer early return without
+        // running a constructor, so it has no handle, no controls and no message pump; _dataModel
+        // is left null so the first collaborator call inside the method faults.
+        [TestMethod]
+        public async Task PopulateFolderCombobox_WhenDataModelFaults_LogsOnceAndDoesNotFault()
+        {
+            // Arrange
+            var controller = CreateMinimalController();
+            var viewer = (EfcViewer)
+                System.Runtime.Serialization.FormatterServices.GetUninitializedObject(
+                    typeof(EfcViewer)
+                );
+            SetPrivateField(controller, "_formViewer", viewer);
+            var sinkCallCount = 0;
+            controller.BoundaryErrorSink = (message, exception) => sinkCallCount++;
+
+            // Act
+            Func<Task> act = () => controller.PopulateFolderCombobox();
+
+            // Assert
+            await act.Should()
+                .NotThrowAsync(
+                    "a fire-and-forget call site cannot observe a faulted Task, so the method must"
+                        + " contain its own fault instead of returning one"
+                );
+            sinkCallCount
+                .Should()
+                .Be(
+                    1,
+                    "the contained fault must be reported through the boundary error sink exactly"
+                        + " once"
                 );
         }
 

@@ -736,6 +736,23 @@ namespace QuickFiler.Controllers
             }
         }
 
+        /// <summary>
+        /// Rethrows the exception that a failed WebView2 core initialization reported.
+        /// </summary>
+        /// <param name="initializationException">
+        /// The exception carried by the initialization-completed event argument.
+        /// </param>
+        internal static void ThrowInitializationFailure(System.Exception initializationException)
+        {
+            // #464 E: a plain `throw expression;` overwrites StackTrace with this rethrow site,
+            // discarding the frames that identify where the initialization actually failed.
+            // Capturing first and calling Throw() rethrows the same instance with its original
+            // trace intact.
+            System
+                .Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(initializationException)
+                .Throw();
+        }
+
         internal void WebView2Control_CoreWebView2InitializationCompleted(
             object sender,
             CoreWebView2InitializationCompletedEventArgs e
@@ -743,7 +760,7 @@ namespace QuickFiler.Controllers
         {
             if (!e.IsSuccess)
             {
-                throw (e.InitializationException);
+                ThrowInitializationFailure(e.InitializationException);
             }
             _isWebViewerInitialized = true;
             // Do not initialize if there is no item

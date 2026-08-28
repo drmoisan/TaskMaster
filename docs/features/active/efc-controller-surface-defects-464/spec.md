@@ -956,12 +956,12 @@ files this feature does not own.**
 - [x] A named test asserts `EfcFormController.LoadTheme` on an all-fields-null controller does not throw.
 - [x] A named test asserts `EfcItemController.DarkMode` on a null-`_globals` controller returns `false` and does not throw.
 - [x] A named test asserts `EfcItemController.ActiveTheme` and `EfcItemController.LoadTheme` on a null-`_themes` controller do not throw. **(R1 — the two members `issue.md` omits.)**
-- [ ] Each of the five `async void` handlers in `EfcFormController.cs` delegates to an `internal async Task` member; a named test per handler faults the collaborator, asserts the extracted member does not throw, and verifies exactly one invocation of the controller's boundary error sink, whose default delegate is verified by source inspection to be exactly one `logger.Error(message, exception)` call on the pre-existing static logger.
-- [ ] The token `throw;` does not appear inside any `async void` member of `EfcFormController.cs`; the five occurrences previously at `:425`, `:441`, `:457`, `:517` and `:530` are absent.
-- [ ] A named test faults `PopulateFolderCombobox`'s collaborator and asserts the returned task does not fault and one error is logged.
-- [ ] `EfcItemController` declares `internal static void ThrowInitializationFailure(System.Exception)`, and the failure branch of `WebView2Control_CoreWebView2InitializationCompleted` is a one-line adapter over it.
-- [ ] A named test asserts `ThrowInitializationFailure` rethrows the supplied exception with its original stack trace preserved (the rethrown exception's `StackTrace` contains the originating frame).
-- [ ] The token `throw (e.InitializationException)` does not appear in `EfcItemController.cs`.
+- [x] Each of the five `async void` handlers in `EfcFormController.cs` delegates to an `internal async Task` member; a named test per handler faults the collaborator, asserts the extracted member does not throw, and verifies exactly one invocation of the controller's boundary error sink, whose default delegate is verified by source inspection to be exactly one `logger.Error(message, exception)` call on the pre-existing static logger.
+- [x] The token `throw;` does not appear inside any `async void` member of `EfcFormController.cs`; the five occurrences previously at `:425`, `:441`, `:457`, `:517` and `:530` are absent.
+- [x] A named test faults `PopulateFolderCombobox`'s collaborator and asserts the returned task does not fault and one error is logged.
+- [x] `EfcItemController` declares `internal static void ThrowInitializationFailure(System.Exception)`, and the failure branch of `WebView2Control_CoreWebView2InitializationCompleted` is a one-line adapter over it.
+- [x] A named test asserts `ThrowInitializationFailure` rethrows the supplied exception with its original stack trace preserved (the rethrown exception's `StackTrace` contains the originating frame).
+- [x] The token `throw (e.InitializationException)` does not appear in `EfcItemController.cs`.
 - [x] #464 D is closed by the deletion asserted under #459: no `async void` lambda is registered into `CharActions` anywhere in `EfcItemController.cs`.
 
 ### #465 — form-controller lifecycle and selection defects (live; remedies GUARD + CORRECTION)
