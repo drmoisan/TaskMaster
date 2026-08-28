@@ -150,10 +150,5 @@ namespace QuickFiler
                 .Select(tup => tup.Control)
                 .ToList();
         }
-
-        private void L0v2h2_WebView2_ParentChanged(object sender, EventArgs e)
-        {
-            Console.WriteLine("Parent Changed");
-        }
     }
 }

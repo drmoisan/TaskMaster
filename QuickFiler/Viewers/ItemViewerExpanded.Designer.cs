@@ -267,7 +267,6 @@
             this.L0v2h2_WebView2.Size = new System.Drawing.Size(2174, 635);
             this.L0v2h2_WebView2.TabIndex = 40;
             this.L0v2h2_WebView2.ZoomFactor = 1D;
-            this.L0v2h2_WebView2.ParentChanged += new System.EventHandler(this.L0v2h2_WebView2_ParentChanged);
             // 
             // LblConvCt
             // 

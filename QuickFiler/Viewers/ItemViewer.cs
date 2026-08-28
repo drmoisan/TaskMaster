@@ -163,11 +163,6 @@ namespace QuickFiler
                 .ToList();
         }
 
-        private void L0v2h2_WebView2_ParentChanged(object sender, EventArgs e)
-        {
-            Console.WriteLine("Parent Changed");
-        }
-
         public List<Component> MenuItems => Initializer.GetOrLoad(ref _menuItems, LoadMenuItems);
         private List<Component> _menuItems;
 
