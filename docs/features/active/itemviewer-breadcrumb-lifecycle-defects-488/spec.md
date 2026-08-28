@@ -787,23 +787,23 @@ against the Phase 0 baseline rather than as an absolute count.
 
 ### D1 — host replacement on WebView2 environment change
 
-- [ ] `ItemViewer.ConfigureBreadcrumbDropDown(CoreWebView2Environment, IWebViewCoreInitializer)` disposes
+- [x] `ItemViewer.ConfigureBreadcrumbDropDown(CoreWebView2Environment, IWebViewCoreInitializer)` disposes
       the outgoing host **between** the same-environment early return and the construction of the
       replacement, so that the ordering is guaranteed by statement order and not by dispatcher behaviour.
-- [ ] The disposal is guarded by a type test for the **concrete** `BreadcrumbDropDownHost` (not for
+- [x] The disposal is guarded by a type test for the **concrete** `BreadcrumbDropDownHost` (not for
       `IBreadcrumbDropDownHost`), using a pattern variable distinct from the one bound in the
       same-environment guard.
-- [ ] A regression test configures with environment A, captures the host, configures with environment B
+- [x] A regression test configures with environment A, captures the host, configures with environment B
       under a **drainable** (non-inline) synchronization context, and asserts the first host is disposed —
       observing `host1.DropDown.IsDisposed` and, as a secondary assertion, that
       `host1.Close(reason)` returns `false`.
-- [ ] `BreadcrumbDropDownIntegrationTests.ItemViewerDisposal_OwnsHostAndDetachesBothSurfaces` passes
+- [x] `BreadcrumbDropDownIntegrationTests.ItemViewerDisposal_OwnsHostAndDetachesBothSurfaces` passes
       unmodified, with its `host.Dispose()` `Times.Once()` assertion intact, and
       `QuickFiler.Test/Viewers/BreadcrumbDropDownIntegrationTests.cs` is byte-identical to its pre-change
       state.
-- [ ] `QfcItemControllerBreadcrumbDropDownTests.ConfigureBreadcrumbDropDown_RepeatedSameEnvironmentReusesPopupHost`
+- [x] `QfcItemControllerBreadcrumbDropDownTests.ConfigureBreadcrumbDropDown_RepeatedSameEnvironmentReusesPopupHost`
       passes unmodified.
-- [ ] The spec's recorded D1 limitations are honoured in the delivered source: the 3-arg injected
+- [x] The spec's recorded D1 limitations are honoured in the delivered source: the 3-arg injected
       `ConfigureBreadcrumbDropDown` overload is **not** given an equivalent disposal, and
       `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs` is unmodified.
 

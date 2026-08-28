@@ -85,6 +85,7 @@
     <Compile Include="Viewers\BreadcrumbPendingOpenCloseTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownLifecycleTests.cs" />
     <Compile Include="Viewers\ItemViewerBreadcrumbDropDownContractTests.cs" />
+    <Compile Include="Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinatorTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinatorTests.Part2.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinatorTests.Part3.cs" />

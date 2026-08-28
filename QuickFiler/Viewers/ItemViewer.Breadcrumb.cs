@@ -152,6 +152,18 @@ namespace QuickFiler
                 return;
             }
 
+            // Issue #488 defect D1: dispose the outgoing host here, between the same-environment
+            // early return and the construction of its replacement, so the ordering is guaranteed by
+            // statement order rather than by dispatcher behaviour. The type test names the concrete
+            // BreadcrumbDropDownHost rather than IBreadcrumbDropDownHost, so a mock host installed by
+            // the injected 3-arg overload is not disposed here and that overload's Times.Once()
+            // disposal assertion is unaffected. A fresh pattern variable is required: the one bound in
+            // the same-environment guard above is definitely assigned only on the branch that returns.
+            if (BreadcrumbDropDownHost is BreadcrumbDropDownHost outgoing)
+            {
+                outgoing.Dispose();
+            }
+
             BreadcrumbItemViewerLifecycleCoordinator lifecycle = EnsureBreadcrumbLifecycle(
                 BreadcrumbPopupUiOperations.CaptureCurrentOrTests()
             );
