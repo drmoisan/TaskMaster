@@ -840,7 +840,7 @@ against the Phase 0 baseline rather than as an absolute count.
 - [x] No re-initialization branch is added. `BreadcrumbBridgeCoordinator`,
       `BreadcrumbItemViewerLifecycleCoordinator.SetBridgeCoordinator`, and `UnsubscribeBridge` are
       unmodified.
-- [ ] The change description and this spec both state that D3 **changes no production behaviour**, with
+- [x] The change description and this spec both state that D3 **changes no production behaviour**, with
       the reason (`QfcItemController.ViewerSetup.cs:143` guards the only two production callers on
       `viewer.BreadcrumbCoordinator == null`), so no reviewer expects a user-visible repair.
 - [x] The fail-fast/`SetBridgeCoordinator` coupling is recorded in the delivered spec: the
@@ -860,7 +860,7 @@ against the Phase 0 baseline rather than as an absolute count.
       nulled, no second thread and no timing construct** — and asserts `InvalidOperationException`. A
       second case installs a *different non-null* context and asserts the same, proving the comparison is
       reference equality rather than a null check.
-- [ ] The spec, the change description, and the test's own documentation each state that this proxy
+- [x] The spec, the change description, and the test's own documentation each state that this proxy
       **proves the guard fires and does not prove the race is absent**, and that a true two-thread data
       race cannot be reproduced deterministically under the repository's ban on sleeps and wall-clock
       waits. **No criterion in this document asserts that the race is eliminated.**
@@ -910,27 +910,27 @@ against the Phase 0 baseline rather than as an absolute count.
 
 ### Scope, ownership, and the 489 dependency
 
-- [ ] The set of files changed by this feature is a subset of: the four owned production files
+- [x] The set of files changed by this feature is a subset of: the four owned production files
       (`ItemViewer.Breadcrumb.cs`, `BreadcrumbItemViewerLifecycleCoordinator.cs`,
       `BreadcrumbPopupUiOperations.cs`, `BreadcrumbDropDownHost.cs`), the two owned test files
       (`BreadcrumbItemViewerLifecycleCoordinatorTests.cs`, `BreadcrumbPopupBoundaryCoverageTests.Part2.cs`),
       the one new test file, and `QuickFiler.Test/QuickFiler.Test.csproj`.
-- [ ] `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs`,
+- [x] `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs`,
       `QuickFiler/Viewers/BreadcrumbMessengerHub.cs`, `QuickFiler/Viewers/BreadcrumbBridgeCoordinator.cs`,
       `QuickFiler/Viewers/ItemViewer.cs`, `QuickFiler/Viewers/ItemViewer.Designer.cs`,
       `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs`, and `QuickFiler/QuickFiler.csproj` are all
       byte-identical to their pre-change state.
-- [ ] No public member is added, removed, or re-signed in any changed file, and
+- [x] No public member is added, removed, or re-signed in any changed file, and
       `QuickFiler/Viewers/IBreadcrumbDropDownHost.cs` and `QuickFiler/Viewers/IItemViewer.cs` are
       unmodified.
-- [ ] The `QuickFiler.Test.csproj` diff is exactly one added `<Compile Include>` line for the new test
+- [x] The `QuickFiler.Test.csproj` diff is exactly one added `<Compile Include>` line for the new test
       file, positioned adjacent to the existing `Viewers\ItemViewerBreadcrumbDropDownContractTests.cs`
       entry, with no reordering of any other entry.
-- [ ] The three out-of-scope follow-up candidates (D1c; `SetBridgeCoordinator` replace-without-dispose;
+- [x] The three out-of-scope follow-up candidates (D1c; `SetBridgeCoordinator` replace-without-dispose;
       `Reset()` surface-detach synchrony) are each recorded as a potential entry or GitHub issue, with the
       mechanism and triggers carried forward so the follow-up does not have to re-derive them. No fix for
       any of the three appears in this feature's diff.
-- [ ] The `## Dependencies on 489` section of this spec is re-checked against 489's finalised spec before
+- [x] The `## Dependencies on 489` section of this spec is re-checked against 489's finalised spec before
       integration, and each of D489-1 through D489-6 is recorded as confirmed or as requiring a named
       adjustment. **D489-4 is checked explicitly**, because a member-name collision across `ItemViewer`
       partials is a compile error at integration rather than a merge conflict and will not surface at
@@ -968,7 +968,7 @@ against the Phase 0 baseline rather than as an absolute count.
       **coverage-exempt** because `ItemViewer.cs:20` carries `[ExcludeFromCodeCoverage]` on the partial
       type, so their regression tests move no coverage number. **No new `[ExcludeFromCodeCoverage]`
       attribute is introduced anywhere by this feature, and none is removed.**
-- [ ] `docs/features/active/itemviewer-breadcrumb-lifecycle-defects-488/user-story.md` **does not exist**.
+- [x] `docs/features/active/itemviewer-breadcrumb-lifecycle-defects-488/user-story.md` **does not exist**.
       This is a `full-bug` feature; `spec.md` is the sole acceptance-criteria source, and a second
       checkbox-bearing document in this folder is an integrity failure.
 
