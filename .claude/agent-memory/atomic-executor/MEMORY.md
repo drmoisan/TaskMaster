@@ -63,6 +63,7 @@
 - [Evidence <TS> collision clobbers artifacts](project_evidence_timestamp_collision_clobbers_artifacts.md) — same-day remediation overwrites
 - [csharpier pipe-files is a non-enforcing gate](project_csharpier_pipefiles_nonenforcing_gate.md) — use `csharpier check`/`format`
 - [Count-idiom pitfalls: csharpier + Measure-Object](project_count_idiom_pitfalls_csharpier_and_measureobject.md) — "Formatted N" is a PROCESSED count
+- [New .cs files guarantee a format-loop restart](project_new_cs_files_guarantee_a_format_loop_restart.md) — Write emits LF; budget two passes, not one
 - [PowerShell new files need UTF-8 BOM](powershell-bom-required.md) — PSUseBOMForUnicodeEncodedFile
 - [poshqc test MCP carries no verdict/numbers](project_poshqc_pester_mcp_exit_minus1.md) — no exit code, so count gates can't run
 - [poshqc analyze exits 1 on a Warning](project_poshqc_analyze_exit1_on_warning.md) — "EXIT 0 + zero errors" is self-contradictory
