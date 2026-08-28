@@ -96,3 +96,52 @@ three usable quantities are the csharpier result (clean, 1543 files, empty unfor
 per-file line counts, and the exclusion-attribute count of 261. The AC2 U1 answer is recorded as
 Branch A with falsifiable proof, and the AC3 upstream-landing booleans are both true with every anchor
 re-derived. P0-T11, P0-T12, P0-T13 and P0-T14 are left unchecked under the fail-closed evidence rule.
+
+---
+
+## Amendment 2026-08-28T00-18 — the four deferred baselines were re-taken and now pass
+
+Timestamp: 2026-08-28T00-18
+
+The inherited analyzer version skew described above was cleared **for this worktree only**, by
+placing `Meziantou.Analyzer.3.0.156` and `Roslynator.Analyzers.4.16.0` under the worktree's
+gitignored `packages/` directory. No `.csproj`, no `packages.config` and no `<Analyzer Include>`
+entry was edited; zero tracked files changed and the skew itself remains pre-existing repository
+state that is out of scope for this feature. P0-T11 through P0-T14 were then re-run. All four now
+meet their acceptance and are checked off in the plan.
+
+| Task | Superseding artifact | Result |
+|---|---|---|
+| P0-T11 | `evidence/baseline/phase0-analyzer-build.2026-08-28T00-11.md` | `EXIT_CODE: 0`, `BaselineAnalyzerWarningCount: 5`, 0 errors |
+| P0-T11 log | `evidence/qa-gates/phase0-analyzer-build.2026-08-28T00-09.msbuild.txt` | 5728 lines, not gitignored |
+| P0-T12 | `evidence/baseline/phase0-nullable-build.2026-08-28T00-12.md` | `EXIT_CODE: 0`, `BaselineNullableWarningCount: 5`, 0 CS86xx |
+| P0-T13 | `evidence/baseline/phase0-vstest-quickfiler.2026-08-28T00-14.md` | `EXIT_CODE: 0`, 1099 passed, 0 failed, 0 skipped |
+| P0-T13 TRX | `evidence/baseline/p0-t13.trx` | sanitised; no account or machine name |
+| P0-T14 | `evidence/baseline/phase0-repo-coverage.2026-08-28T00-17.md` | 9 assemblies, line rate 0.7051419519922018 at `lines-valid=82070` |
+
+The six artifacts listed in the table above are added to the Phase 0 artifact inventory. The
+superseded artifacts (`phase0-analyzer-build.2026-08-27T23-26.md`,
+`phase0-nullable-build.2026-08-27T23-27.md`, `phase0-vstest-quickfiler.2026-08-27T23-28.md`,
+`phase0-repo-coverage.2026-08-27T23-30.md`, and the
+`evidence/qa-gates/phase0-analyzer-build.2026-08-27T23-22.msbuild.txt` log) are **retained** as the
+audit record of the blocked first attempt and are not deleted.
+
+### Revised AC1 quantity table
+
+| # | Quantity | Value now recorded | Usable as a baseline? |
+|---|---|---|---|
+| 1 | csharpier check result | `EXIT_CODE: 0`, empty unformatted set, 1543 files | **Yes** (unchanged) |
+| 2 | analyzer-build warning count | `BaselineAnalyzerWarningCount: 5` | **Yes** — build succeeded, 0 errors, 0 `Skipping target "CoreCompile"` |
+| 3 | nullable-build warning count | `BaselineNullableWarningCount: 5` | **Yes** — build succeeded, 0 errors, 0 CS86xx |
+| 4 | vstest passed / failed / skipped | 1099 / 0 / 0 | **Yes** |
+| 5 | repository-wide line coverage | `0.7051419519922018` at `lines-valid=82070`, 9 of 9 assemblies | **Yes** |
+| 6 | line count of every file this feature will touch | 26 integer rows | **Yes** (unchanged) |
+| 7 | repository-wide exclusion-attribute count | `261` | **Yes** (unchanged) |
+
+All seven AC1 quantities are now usable baselines. Two carry a caveat that Phase 11 must honour and
+that is stated in full in the artifacts themselves: the repo-wide coverage denominator is the raw
+`dotnet-coverage` merge, because the script threw at `Invoke-MSTestWithCoverage.ps1:236` on one
+pre-existing `UtilitiesCS.Test` failure before its Koverage post-processing step; and
+`BaselineRepoFailed:` is `1`, that same load-sensitive
+`ProgressTrackerAsync_Tests.InitializeAsync_WithCurrentDispatcher_InitializesAndReturnsTracker`
+failure in an assembly this feature is forbidden to touch.
