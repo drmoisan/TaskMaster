@@ -50,6 +50,14 @@ namespace QuickFiler
         string ConversationCountText { get; set; }
         System.Drawing.Color ConversationCountBackColor { get; set; }
         event System.EventHandler BodyDoubleClick;
+
+        /// <summary>
+        /// Moves keyboard focus to the subject field and reports whether the control took it.
+        /// Threading contract: the viewer forwards, the controller marshals. The implementation
+        /// calls straight through to the underlying control with no <c>InvokeRequired</c> check
+        /// and no handle guard, so every caller must already be on the UI thread.
+        /// </summary>
+        /// <returns><see langword="true"/> when focus was taken; otherwise <see langword="false"/>.</returns>
         bool FocusSubject();
 
         // Button command events and menu intent members (Seam B, Cluster 2b) replacing the raw
@@ -106,6 +114,13 @@ namespace QuickFiler
         string SearchText { get; }
         event System.EventHandler SearchTextChanged;
         event KeyEventHandler SearchKeyDown;
+
+        /// <summary>
+        /// Moves keyboard focus to the folder-search text box.
+        /// Threading contract: the viewer forwards, the controller marshals. The implementation
+        /// calls straight through to the underlying control with no <c>InvokeRequired</c> check
+        /// and no handle guard, so every caller must already be on the UI thread.
+        /// </summary>
         void FocusSearch();
 
         // WebView and topic-thread intent members (Seam D, Cluster 2d) replacing the raw WebView2,
@@ -115,7 +130,22 @@ namespace QuickFiler
         // targets stay concrete-bound (P2-T4 seam) and are not exposed here.
         void NavigateToString(string html);
         event System.EventHandler<Microsoft.Web.WebView2.Core.CoreWebView2InitializationCompletedEventArgs> WebViewInitializationCompleted;
+
+        /// <summary>
+        /// Replaces the topic-thread list contents with <paramref name="items"/> in the order
+        /// supplied. Ordering requirement: this call must be followed by
+        /// <see cref="SortConversationByDate"/> within the same UI-thread turn. Calling either
+        /// member alone leaves the list in source order, which is not the displayed contract.
+        /// </summary>
+        /// <param name="items">The conversation items to display, in source order.</param>
         void SetConversationItems(System.Collections.IList items);
+
+        /// <summary>
+        /// Sorts the topic-thread list by sent date. Ordering requirement: this call must follow
+        /// <see cref="SetConversationItems"/> within the same UI-thread turn. Calling either
+        /// member alone leaves the list in source order, which is not the displayed contract.
+        /// </summary>
+        /// <param name="order">The sort direction applied to the sent-date column.</param>
         void SortConversationByDate(SortOrder order);
         System.Collections.IList GetSelectedConversationItems();
         event ListViewItemSelectionChangedEventHandler ConversationItemSelectionChanged;

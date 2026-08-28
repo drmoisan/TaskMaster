@@ -76,6 +76,6 @@ namespace QuickFiler
             remove => TxtboxSearch.KeyDown -= value;
         }
 
-        public void FocusSearch() => TxtboxSearch.Invoke(new Action(() => TxtboxSearch.Focus()));
+        public void FocusSearch() => TxtboxSearch.Focus();
     }
 }
