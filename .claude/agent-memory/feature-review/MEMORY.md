@@ -77,7 +77,7 @@
 - [464-review-residuals](project_464-review-residuals.md) — PASS/0 blocking; 7 promotions owed (RC7 EfcSelectionGuard "===" arity); Cobertura deleted-but-verified; shared info/exclude trap → commit artifacts on feature branch
 - [489-review-residuals](project_489-review-residuals.md) — cycle-1 reaudit GO/0 blocking; RC-1 cured (RED TRX committed with test, fix next commit = provable RED-first); commit-per-phase vs single-commit plan text judged on intent; amend the referenced table when an AC delegates to it
 - [493-review-residuals + msbuild-log gate adjudication](project_493-review-residuals-and-msbuild-log-gate-adjudication.md) — PASS/0 blocking; how a structurally unsatisfiable msbuild-log byte-equality gate was adjudicated without downgrading the AC
-- [680-review-residuals](project_680-review-residuals.md) — NO-GO/1 blocking: rebase pushed BreadcrumbDropDownHost.cs to 514>500 (pre-rebase P6-T6 said 479) — ALWAYS re-measure file sizes at head after a rebase; composed-FocusPending 3-leg verification pattern; stale budget-hook state blocks .ps1 Writes (delete state file, git-restore after)
+- [680-review-residuals](project_680-review-residuals.md) — c1 NO-GO 514>500 (re-measure sizes after rebase); c2 NEW blocking: remediation committed 5 unsanitized TRX (re-run host-token sweep EVERY cycle, case-insensitive) + P#-T# reuse overwrote the red-run TRX
 - [677-review-residuals](project_677-review-residuals.md) — PASS/0 blocking; compile-red RED-first equivalence; 70.7% modified-file dispositioned non-blocking (below the #230 bar); owed: analyzer HintPath-skew + SetupDisposal-debt promotions; post-677 baseline 0.852804/0.792300
 
 ## Artifact hygiene
