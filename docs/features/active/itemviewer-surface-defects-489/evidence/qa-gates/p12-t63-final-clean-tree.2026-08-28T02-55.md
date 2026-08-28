@@ -74,7 +74,25 @@ Command: git add FEATURE/evidence/qa-gates/p12-t63-final-clean-tree.2026-08-28T0
 FEATURE/plan.2026-08-25T01-04.md && git commit ; then the same scoped `git status --porcelain`
 EXIT_CODE: 0
 
-FollowUpCommitSha: PENDING_SECOND_PASS
+FollowUpCommitSha: `6965bbbd1afb9dc28b06912c58c69988af491a85`
+FollowUpCommitSubject: `docs(489): record P12-T63 final clean-tree evidence and complete the plan`
+
+The follow-up commit took both entries listed above — this artifact and the plan file carrying
+`[P12-T63]`'s own check-off. The scoped porcelain re-run immediately after it returned **zero
+entries**:
+
+```
+(no output)
+```
+
+Residual entry count: **0**, which satisfies "at most this artifact itself" with room to spare. The
+task anticipated a residual of one, on the expectation that writing the follow-up SHA into this
+artifact would re-dirty it. That does happen: recording the two values above modifies this file
+again, making it the sole dirty entry under the pathspec. A third commit,
+`docs(489): record the P12-T63 follow-up commit sha`, commits that final edit so the branch ends with
+a genuinely clean tree rather than a permanently dirty evidence file. Its SHA cannot be recorded
+inside the file it commits; it is reported in the executor's completion summary and is visible in
+`git log`.
 
 ## Plan completion
 
