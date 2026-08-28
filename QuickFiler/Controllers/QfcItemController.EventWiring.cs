@@ -91,6 +91,7 @@ namespace QuickFiler.Controllers
             _itemViewer.SearchKeyDown += this.TextBoxSearch_KeyDown;
             _itemViewer.EmailCopyChanged += this.CbxEmailCopy_CheckedChanged;
             _itemViewer.AttachmentsChanged += this.CbxAttachments_CheckedChanged;
+            _itemViewer.PicturesChanged += this.CbxPictures_CheckedChanged;
         }
 
         // Thin async-void shell (research §3.5): WinForms-event-signature boilerplate forwarding to the
@@ -477,6 +478,7 @@ namespace QuickFiler.Controllers
             _itemViewer.SearchKeyDown -= this.TextBoxSearch_KeyDown;
             _itemViewer.EmailCopyChanged -= this.CbxEmailCopy_CheckedChanged;
             _itemViewer.AttachmentsChanged -= this.CbxAttachments_CheckedChanged;
+            _itemViewer.PicturesChanged -= this.CbxPictures_CheckedChanged;
         }
     }
 }

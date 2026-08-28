@@ -128,5 +128,198 @@ namespace QuickFiler.Test.Viewers
                     .BeNull("ItemViewer must delegate host-neutral popup-open orchestration");
             }
         }
+
+        [TestMethod]
+        public void ItemViewer_DeclaresNoMenuItemCheckedChangedMembers()
+        {
+            // Arrange
+            const BindingFlags Flags =
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
+            // Act
+            MethodInfo eventHandlerForm = typeof(QuickFiler.ItemViewer).GetMethod(
+                "MenuItem_CheckedChanged",
+                Flags,
+                null,
+                new[] { typeof(object), typeof(EventArgs) },
+                null
+            );
+            MethodInfo typedForm = typeof(QuickFiler.ItemViewer).GetMethod(
+                "MenuItem_CheckedChanged",
+                Flags,
+                null,
+                new[] { typeof(ToolStripMenuItem) },
+                null
+            );
+
+            // Assert
+            using (new AssertionScope())
+            {
+                eventHandlerForm
+                    .Should()
+                    .BeNull("the EventHandler-shaped overload is dead code on ItemViewer");
+                typedForm.Should().BeNull("the typed overload is dead code on ItemViewer");
+            }
+        }
+
+        [TestMethod]
+        public void ItemViewer_DeclaresNoMoveOptionsMenuClickHandler()
+        {
+            // Arrange
+            const BindingFlags Flags =
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
+            // Act
+            MethodInfo handler = typeof(QuickFiler.ItemViewer).GetMethod(
+                "MoveOptionsMenu_Click",
+                Flags,
+                null,
+                new[] { typeof(object), typeof(EventArgs) },
+                null
+            );
+
+            // Assert
+            handler
+                .Should()
+                .BeNull(
+                    "the empty MoveOptionsMenu_Click body has no caller and no designer wiring"
+                );
+        }
+
+        [TestMethod]
+        public void ItemViewer_DeclaresNoParentChangedHandler()
+        {
+            // Arrange
+            const BindingFlags Flags =
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
+            // Act
+            MemberInfo[] members = typeof(QuickFiler.ItemViewer).GetMember(
+                "L0v2h2_WebView2_ParentChanged",
+                Flags
+            );
+
+            // Assert
+            members
+                .Should()
+                .BeEmpty(
+                    "the ParentChanged handler only wrote a console diagnostic and has no caller"
+                );
+        }
+
+        [TestMethod]
+        public void ItemViewerExpanded_DeclaresNoParentChangedHandler()
+        {
+            // Arrange
+            const BindingFlags Flags =
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
+            // Act
+            MemberInfo[] members = typeof(QuickFiler.ItemViewerExpanded).GetMember(
+                "L0v2h2_WebView2_ParentChanged",
+                Flags
+            );
+
+            // Assert
+            members
+                .Should()
+                .BeEmpty(
+                    "the expanded viewer's ParentChanged handler is the same dead console diagnostic"
+                );
+        }
+
+        [TestMethod]
+        public void IItemViewer_DeclaresNoUiSchedulerMember()
+        {
+            // Arrange
+            const BindingFlags Flags =
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
+            // Act
+            MemberInfo[] members = typeof(IItemViewer).GetMember("UiScheduler", Flags);
+
+            // Assert
+            members
+                .Should()
+                .BeEmpty("no production consumer reaches UiScheduler through the viewer interface");
+        }
+
+        [TestMethod]
+        public void IItemViewer_StillDeclaresUiDispatcher()
+        {
+            // Arrange
+            const BindingFlags Flags =
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
+            // Act
+            MemberInfo[] members = typeof(IItemViewer).GetMember("UiDispatcher", Flags);
+
+            // Assert
+            members
+                .Should()
+                .NotBeEmpty("UiDispatcher still has production consumers and must survive");
+        }
+
+        [TestMethod]
+        public void IItemViewer_StillDeclaresUiSyncContext()
+        {
+            // Arrange
+            const BindingFlags Flags =
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
+            // Act
+            MemberInfo[] members = typeof(IItemViewer).GetMember("UiSyncContext", Flags);
+
+            // Assert
+            members
+                .Should()
+                .NotBeEmpty("UiSyncContext still has production consumers and must survive");
+        }
+
+        [TestMethod]
+        public void IItemViewer_DeclaresAddFolderItemsAndNotSetFolderItems()
+        {
+            // Arrange
+            Type interfaceType = typeof(IItemViewer);
+
+            // Act
+            MethodInfo added = interfaceType.GetMethod(
+                "AddFolderItems",
+                new[] { typeof(string[]) }
+            );
+            MethodInfo renamed = interfaceType.GetMethod(
+                "SetFolderItems",
+                new[] { typeof(string[]) }
+            );
+
+            // Assert
+            using (new AssertionScope())
+            {
+                added
+                    .Should()
+                    .NotBeNull("the additive folder-list member must be named for what it does");
+                renamed
+                    .Should()
+                    .BeNull("the misleading SetFolderItems name must not survive the rename");
+            }
+        }
+
+        [TestMethod]
+        public void IItemViewer_FocusSubjectReturnsBool()
+        {
+            // Arrange
+            Type interfaceType = typeof(IItemViewer);
+
+            // Act
+            MethodInfo focusSubject = interfaceType.GetMethod("FocusSubject");
+
+            // Assert
+            focusSubject
+                .ReturnType.Should()
+                .Be(
+                    typeof(bool),
+                    "a caller cannot observe a failed subject focus through a void member"
+                );
+        }
     }
 }

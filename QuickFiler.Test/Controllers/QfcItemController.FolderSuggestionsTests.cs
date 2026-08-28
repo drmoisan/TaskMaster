@@ -128,7 +128,7 @@ namespace QuickFiler.Controllers.Tests
             controller.AssignFolderComboBox();
 
             // Assert — the retained SetFolderItems(string[]) population and index-1 selection remain.
-            mock.Verify(v => v.SetFolderItems(It.IsAny<string[]>()), Times.Once());
+            mock.Verify(v => v.AddFolderItems(It.IsAny<string[]>()), Times.Once());
             mock.Verify(v => v.SetFolderSelectedIndex(1), Times.Once());
             mock.Verify(v => v.SetFolderSelectedItem(It.IsAny<string>()), Times.Never());
         }
@@ -156,7 +156,7 @@ namespace QuickFiler.Controllers.Tests
             controller.AssignFolderComboBox();
 
             // Assert — predetermined preselection retained alongside the new suggestion injection.
-            mock.Verify(v => v.SetFolderItems(It.IsAny<string[]>()), Times.Once());
+            mock.Verify(v => v.AddFolderItems(It.IsAny<string[]>()), Times.Once());
             mock.Verify(
                 v => v.SetFolderSuggestions(It.IsAny<IReadOnlyList<FolderRow>>()),
                 Times.Once()
@@ -180,7 +180,7 @@ namespace QuickFiler.Controllers.Tests
             // Assert — the retained "Trash to Delete" append path is unchanged.
             mock.Verify(
                 v =>
-                    v.SetFolderItems(
+                    v.AddFolderItems(
                         It.Is<string[]>(a => a.Length == 1 && a[0] == "Trash to Delete")
                     ),
                 Times.Once()

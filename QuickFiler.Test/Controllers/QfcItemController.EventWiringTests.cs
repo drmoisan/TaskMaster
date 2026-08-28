@@ -22,7 +22,7 @@ namespace QuickFiler.Controllers.Tests
     /// Lambda bodies are only evaluated when invoked, so registration runs without a live view.
     /// </summary>
     [TestClass]
-    public class QfcItemController_EventWiringTests
+    public partial class QfcItemController_EventWiringTests
     {
         private sealed class KbdController : QfcItemController
         {

@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="c92a1cbb-a040-40f9-a551-45ca17da4fb1" name="&lt;user&gt;@&lt;host&gt; 2026-08-27 21:27:16" runUser="&lt;host&gt;\&lt;user&gt;" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T21:27:16.2661627-04:00" queuing="2026-08-27T21:27:16.2661627-04:00" start="2026-08-27T21:27:14.8479214-04:00" finish="2026-08-27T21:27:16.2799102-04:00" />
+  <TestSettings name="default" id="b14e1a85-a6ba-4a88-9557-aa2821f13e22">
+    <Deployment runDeploymentRoot="&lt;user&gt;_&lt;host&gt;_2026-08-27_21_27_16" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="c240a28e-5124-4f90-b941-9537d6fddb10" testId="1433b412-7f63-87c4-adb8-ff61139e3ea4" testName="AssignFolderComboBox_RetainsSetFolderItemsAndIndexOneSelection" computerName="&lt;host&gt;" duration="00:00:00.2499109" startTime="2026-08-27T21:27:15.8136081-04:00" endTime="2026-08-27T21:27:16.1767710-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c240a28e-5124-4f90-b941-9537d6fddb10" />
+    <UnitTestResult executionId="3e5e9cf5-ced6-4e1e-9dcf-00c95cce3321" testId="165164f7-b417-873f-b05c-df37719952be" testName="MarkItemForDeletion_StillAppendsTrashToDeleteViaSetFolderItems" computerName="&lt;host&gt;" duration="00:00:00.0173556" startTime="2026-08-27T21:27:16.1826666-04:00" endTime="2026-08-27T21:27:16.2039327-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3e5e9cf5-ced6-4e1e-9dcf-00c95cce3321" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="AssignFolderComboBox_RetainsSetFolderItemsAndIndexOneSelection" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1433b412-7f63-87c4-adb8-ff61139e3ea4">
+      <Execution id="c240a28e-5124-4f90-b941-9537d6fddb10" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_FolderSuggestionsTests" name="AssignFolderComboBox_RetainsSetFolderItemsAndIndexOneSelection" />
+    </UnitTest>
+    <UnitTest name="MarkItemForDeletion_StillAppendsTrashToDeleteViaSetFolderItems" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="165164f7-b417-873f-b05c-df37719952be">
+      <Execution id="3e5e9cf5-ced6-4e1e-9dcf-00c95cce3321" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_FolderSuggestionsTests" name="MarkItemForDeletion_StillAppendsTrashToDeleteViaSetFolderItems" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1433b412-7f63-87c4-adb8-ff61139e3ea4" executionId="c240a28e-5124-4f90-b941-9537d6fddb10" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="165164f7-b417-873f-b05c-df37719952be" executionId="3e5e9cf5-ced6-4e1e-9dcf-00c95cce3321" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="2" executed="2" passed="2" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+</TestRun>
