@@ -161,7 +161,7 @@ As each preparation finishes:
 3. Backfill `issue_num` and `feature_folder` in `epic.md`.
 4. Record `preparation_status: "prepared"`, `research_path`, `plan_path`,
    `preflight_evidence_path`, and `preflight_status: "PREFLIGHT: ALL CLEAR"` in the planner
-   checkpoint. `research_path` must be under `artifacts/research/` or inside the feature folder.
+   checkpoint. `research_path` must be under `docs/features/<feature>/research/` inside the feature folder.
    Each child references its immutable receipt and the shared `wave.<wave_id>.status.json` path.
 5. Remove the worktree only after its preparation branch is merged.
 

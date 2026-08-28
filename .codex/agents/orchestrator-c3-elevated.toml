@@ -76,6 +76,13 @@ and reasoning effort. Spawn the generated deployment agent named by those receip
 standalone run whose ceiling is C3 uses Terra/High; C3 epic children and C3 work with a C4 sibling
 use Sol/High. Missing profiles or models block with `model_unavailable`; do not fall back silently.
 
+The transaction must resolve independently before every normal nested `spawn_agent` call, and validate the generated profile name, model, reasoning effort, path, and SHA-256. Append the exact validated receipt, with a non-empty phase and delegation identifier, to `codex_model_routing_receipts` in the selected checkpoint that `SubagentStart` reads. The process must durably flush selected-checkpoint persistence before launch, then call `spawn_agent` only with the resolver-returned `deployment_agent`.
+
+Reject generic aliases, ambiguous checkpoints, failed profile validation, failed persistence, late
+receipts, and invalid start attestations. When the start attestation returns `routing_valid: false`,
+reject child output and mutations; do not relax the recorder, authority-store, mutation-gate, or
+stop-gate enforcement.
+
 The production-file result and the model result are independent. File count selects small typed
 engineer versus large orchestrator topology. The C1-C4 result selects the suffix and pinned model
 for that already-selected family; it must not change the topology.

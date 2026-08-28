@@ -1,9 +1,5 @@
 ---
 name: powershell
-paths:
-  - "**/*.ps1"
-  - "**/*.psm1"
-  - "**/*.psd1"
 description: PowerShell-specific toolchain and coding standards.
 ---
 

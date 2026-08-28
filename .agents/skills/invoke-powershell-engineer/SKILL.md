@@ -1,6 +1,6 @@
 ---
 name: invoke-powershell-engineer
-description: Invoke the powershell-typed-engineer worker to design, implement, and verify PowerShell changes within typed repository boundaries. Applies PoshQC format -> analyze -> test toolchain, the 1-2 production-file direct-mode budget, the 3-production + 3-test per-batch cap, and zero-regression quality gates.
+description: Invoke the powershell-typed-engineer worker to design, implement, and verify PowerShell changes within typed repository boundaries. Applies PoshQC formatting, analysis, and testing with a one-to-two production-file direct-mode budget, a three-production plus three-test batch cap, and zero-regression quality gates.
 ---
 
 # Implement PowerShell Skill

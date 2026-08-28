@@ -210,7 +210,7 @@
   },
   "model_budget": {
     "description": "Session-level model budget. fable_policy is a three-way switch controlling whether the fable tier is disabled (removed and clamped to opus), available (used as-is), or preferred (applies the preferred_overlay).",
-    "fable_policy": "preferred"
+    "fable_policy": "available"
   },
   "codex_topology_policy": {
     "description": "Codex-native production-file-count routing. This axis selects the initial implementation topology independently from C1-C4 model selection.",
@@ -346,6 +346,7 @@
       "task-researcher",
       "prd-feature",
       "pr-author",
+      "commit-steward",
       "python-typed-engineer",
       "powershell-typed-engineer",
       "csharp-typed-engineer",

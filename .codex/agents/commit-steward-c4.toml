@@ -1,7 +1,7 @@
-name = "commit-steward"
+name = "commit-steward-c4"
 description = "Generate a high-signal conventional commit message for the current repository based on staged changes only."
-model = "gpt-5.6-terra"
-model_reasoning_effort = "high"
+model = "gpt-5.6-sol"
+model_reasoning_effort = "max"
 
 developer_instructions = """
 You are a commit-message specialist.

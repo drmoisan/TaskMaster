@@ -1,6 +1,6 @@
 ---
 name: powershell-qa-gate
-description: Final QA gate for PowerShell changes. Executes the full PoshQC format -> analyze -> test toolchain (with coverage where enforced), compares against a captured baseline, enforces zero-regression deltas, and produces the required reporting block before the agent declares the change complete.
+description: Final QA gate for PowerShell changes. Runs PoshQC formatting, analysis, and testing with coverage where enforced; compares a captured baseline, enforces zero-regression deltas, and produces the required reporting block before completion.
 ---
 
 # PowerShell QA Gate
