@@ -103,5 +103,39 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             viewer.VerifyGet(v => v.FlagTaskDialogResult, Times.Never());
         }
+
+        /// <summary>
+        /// Issue #490 D3: once <c>FocusSubject</c> reports failure, the <c>&amp;Expand</c> menu
+        /// action must still enumerate the conversation. The subject label is not selectable, so
+        /// the focus attempt always fails; swallowing that failure must not also swallow the
+        /// enumeration the gesture exists to perform.
+        /// </summary>
+        [TestMethod]
+        public void Expand_WhenFocusSubjectReturnsFalse_StillEnumeratesConversation()
+        {
+            // Arrange
+            string[] folderItems = new[] { "Archive" };
+            var viewer = new Mock<IItemViewer>();
+            viewer.Setup(v => v.FocusSubject()).Returns(false);
+            viewer.Setup(v => v.GetFolderItems()).Returns(folderItems);
+            var parent = new Mock<IQfcCollectionController>();
+            var mailActions = new Mock<IMailItemActions>();
+            mailActions.SetupGet(m => m.EntryID).Returns("entry-xyz");
+            ConversationResolver resolver = BuildResolverWithCount(4);
+            var controller = new MailController();
+            SetField(controller, "_itemViewer", viewer.Object);
+            SetField(controller, "_parent", parent.Object);
+            SetField(controller, "_conversationResolver", resolver);
+            SetField(controller, "_mailActions", mailActions.Object);
+
+            // Act
+            controller.RightKeyActions["&Expand"]();
+
+            // Assert
+            parent.Verify(
+                p => p.ToggleUnGroupConv(resolver, "entry-xyz", 4, folderItems),
+                Times.Once()
+            );
+        }
     }
 }
