@@ -35,6 +35,15 @@ gating power (#464 `[P6-T13]`: a zero-match search for `throw (e.InitializationE
 `[P6-T10]` had already driven to zero). The first is blocking; the second is an observation, provided
 the task carries at least one other clause that can still fail. Same defect family, opposite cost.
 
+**Convergence is a real terminal state; report it plainly.** A long defect streak is not evidence
+that the next round holds a defect. On #677 the caller framed round 9 as "8 consecutive rounds each
+found something real, so this determination carries weight — but a plan does converge, and
+manufacturing a marginal finding past that point is not useful." That framing is the correct bar:
+run the full pass, then say `ALL CLEAR` without inventing a hypothetical. The convergent round is
+also where a NEW finding is most likely to be a re-derived opinion rather than a defect, because the
+cheap real defects are already gone — so hold any late finding to "unsatisfiable, unreachable, or
+provably false against the file", not "I would have written it differently".
+
 Cheap mechanical confirmations that make a confirmatory pass fast and defensible: diff the two
 committed plan revisions with `git diff -U0` and read only the hunk headers (a fifth undisclosed
 hunk is itself a finding); compare the `file:line` citation MULTISET across revisions to prove

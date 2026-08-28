@@ -79,6 +79,7 @@
     <Compile Include="Viewers\BreadcrumbPopupPlacementTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownHostTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownHostTests.Part2.cs" />
+    <Compile Include="Viewers\BreadcrumbDropDownHostTests.Part3.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownReadinessTests.cs" />
     <Compile Include="Viewers\BreadcrumbCollapsedSurfaceReadinessTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownLifecycleConcurrencyTests.cs" />
@@ -140,6 +141,8 @@
     <Compile Include="Controllers\QfcInitEmailQueueZeroBatchTests.cs" />
     <Compile Include="Controllers\QfcFormControllerTests.cs" />
     <Compile Include="Controllers\QfcFormControllerSeamTests.cs" />
+    <Compile Include="Controllers\QfcFormControllerDeactivateTests.cs" />
+    <Compile Include="Controllers\QfcItemController.CancelBreadcrumbSelectorTests.cs" />
     <Compile Include="Controllers\QfcFormKeyHandlerTests.cs" />
     <Compile Include="Controllers\QfcHighConfidencePreFilterTests.cs" />
     <Compile Include="Controllers\QfcScanProgressBandMapperTests.cs" />

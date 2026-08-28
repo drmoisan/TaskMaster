@@ -38,6 +38,10 @@ namespace QuickFiler
         public void PresentFolderSearchResults(string[] items) =>
             PresentBreadcrumbSearchResults(items);
 
+        // #677: the deactivate-cancel intent. Thin forwarding to the existing #488-era cancel path
+        // so a breadcrumb popup cannot outlive the QuickFiler form losing activation.
+        public void CancelBreadcrumbSelector() => BreadcrumbCoordinator?.CancelSelector();
+
         public void ClearFolderItems() => BreadcrumbCoordinator?.Clear();
 
         public void FocusFolderDropDown() => FocusBreadcrumb();

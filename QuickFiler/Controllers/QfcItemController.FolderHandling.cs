@@ -130,6 +130,10 @@ namespace QuickFiler.Controllers
             }
         }
 
+        // #677: the deactivate fan-out hop. Forwards the cancel intent to the narrowed viewer seam;
+        // a released or not-yet-attached viewer makes this a no-op rather than a failure.
+        public void CancelBreadcrumbSelector() => _itemViewer?.CancelBreadcrumbSelector();
+
         public void PopulateFolderComboBox(object varList = null)
         {
             //TraceUtility.LogMethodCall(varList);

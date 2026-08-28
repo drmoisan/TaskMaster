@@ -172,6 +172,7 @@ namespace QuickFiler.Controllers
             _formViewer.UndoClicked += this.ButtonUndo_Click;
             _formViewer.ItemsPerLoadValueChanged += this.SpnEmailPerLoad_ValueChanged;
             _formViewer.SkipClicked += this.ButtonSkip_Click;
+            _formViewer.FormDeactivated += this.FormViewer_Deactivated;
         }
 
         public void UnregisterFormEventHandlers()
@@ -200,6 +201,7 @@ namespace QuickFiler.Controllers
             _formViewer.UndoClicked -= this.ButtonUndo_Click;
             _formViewer.ItemsPerLoadValueChanged -= this.SpnEmailPerLoad_ValueChanged;
             _formViewer.SkipClicked -= this.ButtonSkip_Click;
+            _formViewer.FormDeactivated -= this.FormViewer_Deactivated;
         }
 
         /// <summary>

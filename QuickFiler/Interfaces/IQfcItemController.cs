@@ -52,6 +52,12 @@ namespace QuickFiler.Interfaces
         void MarkItemForDeletion();
         void JumpToSearchTextbox();
         void JumpToFolderDropDown();
+
+        /// <summary>
+        /// Issue #677: cancels this item's breadcrumb selector, forwarding to the item viewer. Used
+        /// by the form controller's deactivate fan-out; a safe no-op when no viewer is attached.
+        /// </summary>
+        void CancelBreadcrumbSelector();
         void ToggleSaveCopyOfMail();
         void ToggleSaveAttachments();
         void ToggleConversationCheckbox();

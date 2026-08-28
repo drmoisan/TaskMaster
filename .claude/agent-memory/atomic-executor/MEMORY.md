@@ -7,6 +7,7 @@
 - [Extract gate literals from the plan, never re-type](project_preflight_gate_literal_extract_from_plan_not_retype.md) — quoting drift
 - [Tool layer collapses `\` in file content](project_tool_layer_collapses_double_backslash_in_file_content.md) — heredocs and Write halve it
 - [Self-derived gate thresholds are blind](project_preflight_selfderived_gate_thresholds_are_blind.md) — floor from the runs it validates
+- [Inline-dispatch harness citation makes an execution-time test vacuous](project_inline_dispatch_harness_citation_makes_execution_time_test_vacuous.md) — read the cited harness's `Post` before clearing an ordering pin
 - [Multi-pattern gates detach shared qualifiers](project_multipattern_gate_shared_qualifier_detachment.md) — allowlist re-scopes to last pattern
 - [Follow-up promotion task is unexecutable](project_followup_promotion_task_is_unexecutable_by_executor.md) — no MCP tool; "promote" kills the line
 - [Plan check-off fixpoint breaks clean-tree gates](project_plan_checkoff_fixpoint_breaks_terminal_clean_tree_gate.md) — flip last boxes BEFORE the commit
@@ -35,6 +36,7 @@
 - [Epic integration base invalidates research line counts](project_epic_integration_base_invalidates_research_line_counts.md) — TestSupport.cs was 489 not 365 lines and every citation into it shifted +3; measure, never restate
 - ["Make the citation exist" deltas propagate false facts](project_preflight_citation_match_propagates_false_fact.md) — a fix that copies A's prose into B corroborates A's error in two documents; also, an epic child's issue.md promise to siblings needs a C-constraint AND a verification task
 - [Check-off cites an artifact a LATER task writes](project_preflight_checkoff_cites_later_task_artifact.md) — unsatisfiable in plan order; also covers a phase-5 criterion needing an issue phase-7 opens; fix by body swap, not renumbering
+- ["Skip the pointless drain" note makes a negative test vacuous](project_preflight_drain_scope_optimization_note_makes_test_vacuous.md) — a cosmetic "path X is synchronous, don't drain" note is a behavioral claim; a synchronous callee says nothing about how its caller is reached
 - [Conjunctive criteria break the one-artifact citation rule](project_preflight_conjunctive_criterion_citation_gap.md) — "cites exactly one artifact" makes every AC that conjoins facts from two command steps uncheckable; sweep for the second conjunct ("passes unmodified", "anywhere", "either figure")
 ## Build / toolchain environment
 - [pwsh/git/gh CLI gotchas](project_pwsh_git_gh_cli_gotchas.md) — no jq; pwsh won't concatenate `$(git merge-base ...)..HEAD`

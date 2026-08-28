@@ -196,6 +196,25 @@ namespace QuickFiler.Viewers
         /// <summary>The latest initialization or open failure.</summary>
         public Exception? LastInitializationException { get; internal set; }
 
+        /// <summary>
+        /// Issue #677: permission to take or restore keyboard focus, defaulting to always-permitted
+        /// so unassigned callers keep the pre-fix behavior exactly.
+        /// <para>
+        /// Execution-time rule: this predicate is invoked inside the guard body at the moment the
+        /// scheduled focus action runs, never captured at scheduling time. The defect being fixed
+        /// lives precisely in the gap between scheduling a focus action and executing it —
+        /// <c>FinishClose</c> schedules the anchor re-focus asynchronously, and it lands after the
+        /// user's click into a native Outlook window. A predicate evaluated at scheduling time
+        /// would still hold a stale <c>true</c> and would reintroduce the focus steal.
+        /// </para>
+        /// <para>
+        /// Assigned by <c>ItemViewer</c> immediately after construction. It is a settable property
+        /// rather than a constructor parameter so every constructor keeps its baseline arity:
+        /// existing tests bind to the constructor set by reflection with arity/shape matching.
+        /// </para>
+        /// </summary>
+        internal Func<bool> MayTakeFocus { get; set; } = () => true;
+
         /// <inheritdoc />
         public event EventHandler? PopupMessengerReady;
 
@@ -264,7 +283,22 @@ namespace QuickFiler.Viewers
             GC.SuppressFinalize(this);
         }
 
-        internal void FocusPending() => _focusPending();
+        // Issue #677: the guard is inside the method body, so the predicate is read when the
+        // scheduled focus action executes rather than when it is scheduled.
+        internal void FocusPending()
+        {
+            if (MayTakeFocus())
+                _focusPending();
+        }
+
+        // Issue #677: the execution-time wrapper handed to CompleteAll in place of the raw
+        // _focusAnchor field, so a close that completes after the form has lost activation does
+        // not pull focus back into the anchor WebView2.
+        private void FocusAnchorIfPermitted()
+        {
+            if (MayTakeFocus())
+                _focusAnchor();
+        }
 
         internal void ShowPopup(Point location) => _showPopup(DropDown, Anchor, location);
 
@@ -415,7 +449,8 @@ namespace QuickFiler.Viewers
                     if (reason == BreadcrumbDropDownCloseReason.Uncommitted)
                         _cancelSelection();
                 },
-                _focusAnchor
+                // Issue #677: only the focus step is gated; the cancel step above always runs.
+                FocusAnchorIfPermitted
             );
         }
 
