@@ -7,6 +7,7 @@
 - [#501 R3](project_501_r3_preflight_seams.md) — repo-wide 0-skipped gates unsatisfiable; BASELINE_FAILURE_SET subset; `Task.CompletedTask` singleton
 - [#511 R1](project_511_r1_preflight_delta_seams.md) — mid-cycle evidence deletion; git-log scans post-commit; Start-Process for 20-min runs
 - [#484](project_484_qfc_revision_seams.md) — ownership change sweeps plan→issue.md→spec.md (spec is the AC source); old-cardinal grep sweep
+- [QfcItemController test-capacity squeeze](project_qfcitemcontroller_test_capacity_squeeze.md) — four owned test files hold only ~471 aggregate spare lines and `.csproj` edits are barred; budget in Phase 0, permit relocation, mandate DataRow/shared-arrange compaction
 - [#494](project_494_threshold_reconciliation_plan_seams.md) — coverage runner throws before post-processing; reported-floor must not become hook-Blocking
 - [#498](conditional-ladder-and-unowned-class-gates.md) — gate EVERY rung of a recorded-selector ladder incl. rung 1; scope failing-identifier clauses to owned test classes; 0/0 changed-line figure → NOT APPLICABLE
 - [#503](project_503_ribbon_readiness_plan_seams.md) — RibbonViewer 487/500 forces a region move; 6+4 Compile entries; compile-time red + dossier
@@ -40,6 +41,7 @@
 - [Wiring gates must be wiring-sensitive](feedback_wiring_gates_must_be_wiring_sensitive.md) — count floors deflate with the defect they guard
 - [Research claims as acceptance clauses](research-claims-as-acceptance-clauses.md) — never encode an unmeasured third-party claim as a literal AC clause
 - [Literal-call clauses block file-size tightening](literal-call-clauses-block-file-size-tightening.md) — pinning a call in 2+ places near a 500-line file is unsatisfiable
+- [Enumeration variable must match its consumer](enumeration-variable-must-match-consumer.md) — `$kept` produced vs `@assemblies` splatted = zero-assembly vstest run reporting zero failures; same-payload re-execution + a count-parity floor
 - [Diff gates need a commit task](diff-gates-need-a-commit-task.md) — `git diff <BASE>..HEAD` passes vacuously with no commit task
 - [Never pin a HEAD SHA as a plan expectation](never-pin-head-sha-as-plan-expectation.md) — gate on tree invariants instead
 - [Absolute counts in shared files go stale](absolute-counts-in-shared-files-go-stale.md) — lower-bound/baseline-relative for co-owned files; keep exact the count the task changes
@@ -48,7 +50,7 @@
 
 ## C# toolchain and test mechanics
 
-- [Phase 0 toolchain bootstrap](project_csharp_phase0_toolchain_bootstrap.md) — global csharpier/dotnet-coverage exe + mandatory NuGet restore
+- [Phase 0 toolchain bootstrap](project_csharp_phase0_toolchain_bootstrap.md) — `dotnet tool run csharpier` works once the SDK is bootstrapped (global.json's missing .dotnet-sdk was the real blocker, not the manifest); mandatory NuGet restore
 - [Agent worktrees need SDK + NuGet + analyzer backfill](agent-worktrees-need-sdk-and-nuget-bootstrap.md) — four Phase 0 steps; CS0006 is an error, not a warning
 - [vstest scoped-run + csharpier 1.2.6 commands](reference_vstest_scoped_run_command.md) — vswhere + `/InIsolation` + `/TestCaseFilter`; csharpier needs a subcommand
 - [CSharpier gate: format not pipe-files](csharpier-format-not-pipe-files-gate.md) — `pipe-files` is stdout-only and non-enforcing
@@ -64,6 +66,8 @@
 - [Pester exits 0 on failing It blocks](pester-invoke-does-not-exit-nonzero.md) — scope every exit-code clause to a named channel
 - [PowerShell gate observables](powershell-gate-observables.md) — no Invoke-Pester exit code; explicit `scan_folders`; aggregate-only `CoveragePercent`
 - [Legacy csproj wiring](project_legacy_csproj_explicit_compile_include.md) — `Compile Include` + own `Reference`; ProjectReference gives no compile-time flow
+- [Invoke-VSBuild rewrites csproj HintPaths](invoke-vsbuild-rewrites-csproj-hintpaths.md) — the wrapper runs Sync-PackageReferences over EVERY csproj; with a forbidden .csproj the build itself commits the scope violation — use vswhere-resolved MSBuild
+- [Declaration-only seam task for fail-before](declaration-only-seam-task-for-fail-before.md) — tests citing not-yet-existing internals redden the whole assembly; order compile-clean tests first, open the fix phase with a no-behaviour seam task + whole-set assertion-time red run
 - [net48 / nullable context mismatch](project_nullable_context_mismatch_prod_vs_test.md) — check `#nullable enable` in prod AND missing `<LangVersion>` in the test csproj
 - [Worktree root breaks the `\.claude\` exclusion](worktree-root-breaks-dotclaude-exclusion.md) — assert a workspace-root prefix instead
 
@@ -80,7 +84,10 @@
 - [#511 R1 preflight delta seams](project_511_r1_preflight_delta_seams.md) — mid-cycle raw-evidence deletion breaks resolves gates; git-log scans post-commit only; absolute MSBuild path; Start-Process mechanic for 20-min runs; per-class coverage noise -0.50pp
 - [CSharpier "Formatted N files" is processed count](csharpier-formatted-n-is-processed-count.md) — restart-on-rewrite loops keyed on it never terminate; define rewritten-count via before/after SHA-256
 - [Terminal-phase planner traps](terminal-phase-planner-traps.md) — sweep the last phase for an unowned "a follow-up issue should carry it", artifacts written after the clean-tree commit task, and a false "clarification against the spec's wording"
+- [#493 UiThread dispatcher plan seams](project_493_uithread_dispatcher_plan_seams.md) — signature-change fail-before gets a REAL red build by staging the two `<Compile Include>` lines; the coverage script IS the parallelized run; scope `SwapUiThreadDispatcher`/`UiThreadDispatcherGate` greps to `QuickFiler.Test/`
 - [#553 CI parallel-split plan seams](project_553_ci_parallel_split_plan_seams.md) — workflow-only scope: no C# toolchain; Phase 0 snapshot for byte-identity; ruleset PUT + gh pr create orchestrator-gated; no jq (ConvertTo-Json -Depth 20); pathspec anchoring; BRANCH/SCRATCH conventions
+- [#442 QuickFiler metrics plan seams](project_442_quickfiler_metrics_plan_seams.md) — commented-out code defeats zero-hit grep gates; an AC conjunct already green pre-fix; declare the seam BEFORE the red tests or they don't compile; Invoke-MSTestWithCoverage throws below 80%
+- [#468 QfcCollectionController plan seams](project_468_qfc_collection_controller_plan_seams.md) — ToggleUnGroupConv is not COM-free drivable; MakeSpaceForItems never touches Size; a sign-defect seam must land carrying the defect; `LoadItemGroup(` needs the paren
 - [Threshold conflict: CLAUDE.md vs general-unit-test.md](project_coverage_threshold_conflict_claude_md_vs_general_unit_test.md) — 80/90 vs 85/75; repo-wide figure non-blocking, change-scoped gates blocking
 - [JaCoCo hook, Cobertura also accepted](project_csharp_coverage_gate_jacoco_format.md) — follow the format the delta names
 - [Async state machines split the denominator](async-state-machine-coverage-aggregation.md) — aggregate by `filename` or a >=90% gate fails for measurement reasons

@@ -5,3 +5,4 @@
 - [full-bug means spec.md is the only AC source](feedback_full_bug_spec_only.md) — no user-story.md by default (Expected Outputs header vs AC-tracking skill); two exceptions (epic-prep route, cross-reference instruction) handled by making it checkbox-free narrative with a banner
 - [#522 nullable type-check — RESOLVED in CLAUDE.md](project_522_nullable_typecheck_deviation.md) — as of 2026-08-26 quote CLAUDE.md's msbuild commands directly; no deviation note; keep the /t:Rebuild non-vacuity reasoning
 - [MSBuild non-vacuity assertion](project_msbuild_nonvacuity_assertion.md) — prove a build compiled with zero `Skipping target "CoreCompile"`; csc.exe counts and CoreCompile headers both mislead
+- [UiThread seam conversion belongs to #584](project_uithread_static_seam_belongs_to_584.md) — don't open a new issue for the IUiDispatcher seam (~62 refs/29 files); #584 and #493 share the same static root
