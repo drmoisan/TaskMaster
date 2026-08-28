@@ -116,6 +116,9 @@
     <Compile Include="Controllers\EfcHomeControllerLifecycleTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerMetricsTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerTests.cs" />
+    <Compile Include="Controllers\EfcItemController.CleanupTests.cs" />
+    <Compile Include="Controllers\EfcItemControllerTests.cs" />
+    <Compile Include="Controllers\EfcViewerTests.cs" />
     <Compile Include="Controllers\EmailSorterTests.cs" />
     <Compile Include="Controllers\BayesianPerformanceControllerTests.cs" />
     <Compile Include="Controllers\BayesianPerformanceController.TestSupport.cs" />

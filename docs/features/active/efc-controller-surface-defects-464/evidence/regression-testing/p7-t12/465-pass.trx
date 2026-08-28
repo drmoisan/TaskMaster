@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="e34cbc8b-9d6d-4c51-a3f7-c927c1225e71" name="<user>@<host> 2026-08-27 21:23:47" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T21:23:47.8797240-04:00" queuing="2026-08-27T21:23:47.8797240-04:00" start="2026-08-27T21:23:46.5300277-04:00" finish="2026-08-27T21:23:47.8941882-04:00" />
+  <TestSettings name="default" id="ee254b53-dfd7-4aea-a37b-44116c10d4c9">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-27_21_23_47" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="8b8b3fc4-e248-44e4-9684-788c371a7507" testId="1ec6a617-0982-8837-a5a2-f16df74440bc" testName="ActionDeleteAsync_AwaitedTwice_LeavesExactlyOneTrashRowInFolderRows" computerName="<host>" duration="00:00:00.0030628" startTime="2026-08-27T21:23:47.8008864-04:00" endTime="2026-08-27T21:23:47.8058804-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8b8b3fc4-e248-44e4-9684-788c371a7507" />
+    <UnitTestResult executionId="0f5f5ba2-966a-4844-a526-085179d5e941" testId="10fa7ee1-1f59-89ec-bb6b-844b1b29f90a" testName="IsBannerRow_NullOrShortRow_ReturnsFalseWithoutThrowing" computerName="<host>" duration="00:00:00.0012356" startTime="2026-08-27T21:23:47.8078880-04:00" endTime="2026-08-27T21:23:47.8098865-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0f5f5ba2-966a-4844-a526-085179d5e941" />
+    <UnitTestResult executionId="913288c5-e245-4ed9-bf80-198b82483d41" testId="1f4a3747-df86-89ad-b49e-3fa103dee4b2" testName="WithTrashRow_AppliedTwice_YieldsExactlyOneTrashRow" computerName="<host>" duration="00:00:00.0026592" startTime="2026-08-27T21:23:47.7979662-04:00" endTime="2026-08-27T21:23:47.8008864-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="913288c5-e245-4ed9-bf80-198b82483d41" />
+    <UnitTestResult executionId="6a1463be-8f2e-454a-9419-15b68b734fd2" testId="1b805695-1246-8c0c-9730-5f571322b32c" testName="IsBannerRow_ClassifiesByTheFourCharacterPrefix" computerName="<host>" duration="00:00:00.0025241" startTime="2026-08-27T21:23:47.8058804-04:00" endTime="2026-08-27T21:23:47.8078880-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6a1463be-8f2e-454a-9419-15b68b734fd2" />
+    <UnitTestResult executionId="977b50a3-aad9-4daf-9d8a-9d7c929239f0" testId="12623ccd-9bf4-83e5-896e-c86572aa9cc6" testName="Issue439BindBreadcrumbRowsAsync_SubmitsArchiveRootToRealRouter" computerName="<host>" duration="00:00:00.2206251" startTime="2026-08-27T21:23:47.4503153-04:00" endTime="2026-08-27T21:23:47.7808767-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="977b50a3-aad9-4daf-9d8a-9d7c929239f0">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="96846508-b3b6-46ea-92b6-3fcf328726e6" testId="1fdcc729-bf9c-8c97-bca3-cd38bda6c807" testName="MatchesForSearchText_WithRepresentativeInput_ReturnsExpectedMatches" computerName="<host>" duration="00:00:00.0107418" startTime="2026-08-27T21:23:47.7869298-04:00" endTime="2026-08-27T21:23:47.7979662-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="96846508-b3b6-46ea-92b6-3fcf328726e6" />
+    <UnitTestResult executionId="4098bf3c-a477-43e4-a570-a50ab7e9a483" testId="1755b826-b33e-89bd-8cd7-ce316601291e" testName="IsSelectableFolder_AndIsBannerRow_ClassifyThreeAndFourEqualsRowsIdentically" computerName="<host>" duration="00:00:00.0004942" startTime="2026-08-27T21:23:47.8098865-04:00" endTime="2026-08-27T21:23:47.8139403-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4098bf3c-a477-43e4-a570-a50ab7e9a483" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="IsBannerRow_NullOrShortRow_ReturnsFalseWithoutThrowing" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="10fa7ee1-1f59-89ec-bb6b-844b1b29f90a">
+      <Execution id="0f5f5ba2-966a-4844-a526-085179d5e941" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="IsBannerRow_NullOrShortRow_ReturnsFalseWithoutThrowing" />
+    </UnitTest>
+    <UnitTest name="Issue439BindBreadcrumbRowsAsync_SubmitsArchiveRootToRealRouter" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="12623ccd-9bf4-83e5-896e-c86572aa9cc6">
+      <Execution id="977b50a3-aad9-4daf-9d8a-9d7c929239f0" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="Issue439BindBreadcrumbRowsAsync_SubmitsArchiveRootToRealRouter" />
+    </UnitTest>
+    <UnitTest name="IsBannerRow_ClassifiesByTheFourCharacterPrefix" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1b805695-1246-8c0c-9730-5f571322b32c">
+      <Execution id="6a1463be-8f2e-454a-9419-15b68b734fd2" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="IsBannerRow_ClassifiesByTheFourCharacterPrefix" />
+    </UnitTest>
+    <UnitTest name="IsSelectableFolder_AndIsBannerRow_ClassifyThreeAndFourEqualsRowsIdentically" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1755b826-b33e-89bd-8cd7-ce316601291e">
+      <Execution id="4098bf3c-a477-43e4-a570-a50ab7e9a483" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="IsSelectableFolder_AndIsBannerRow_ClassifyThreeAndFourEqualsRowsIdentically" />
+    </UnitTest>
+    <UnitTest name="WithTrashRow_AppliedTwice_YieldsExactlyOneTrashRow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1f4a3747-df86-89ad-b49e-3fa103dee4b2">
+      <Execution id="913288c5-e245-4ed9-bf80-198b82483d41" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="WithTrashRow_AppliedTwice_YieldsExactlyOneTrashRow" />
+    </UnitTest>
+    <UnitTest name="MatchesForSearchText_WithRepresentativeInput_ReturnsExpectedMatches" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1fdcc729-bf9c-8c97-bca3-cd38bda6c807">
+      <Execution id="96846508-b3b6-46ea-92b6-3fcf328726e6" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="MatchesForSearchText_WithRepresentativeInput_ReturnsExpectedMatches" />
+    </UnitTest>
+    <UnitTest name="ActionDeleteAsync_AwaitedTwice_LeavesExactlyOneTrashRowInFolderRows" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ec6a617-0982-8837-a5a2-f16df74440bc">
+      <Execution id="8b8b3fc4-e248-44e4-9684-788c371a7507" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="ActionDeleteAsync_AwaitedTwice_LeavesExactlyOneTrashRowInFolderRows" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1ec6a617-0982-8837-a5a2-f16df74440bc" executionId="8b8b3fc4-e248-44e4-9684-788c371a7507" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10fa7ee1-1f59-89ec-bb6b-844b1b29f90a" executionId="0f5f5ba2-966a-4844-a526-085179d5e941" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f4a3747-df86-89ad-b49e-3fa103dee4b2" executionId="913288c5-e245-4ed9-bf80-198b82483d41" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b805695-1246-8c0c-9730-5f571322b32c" executionId="6a1463be-8f2e-454a-9419-15b68b734fd2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12623ccd-9bf4-83e5-896e-c86572aa9cc6" executionId="977b50a3-aad9-4daf-9d8a-9d7c929239f0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1fdcc729-bf9c-8c97-bca3-cd38bda6c807" executionId="96846508-b3b6-46ea-92b6-3fcf328726e6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1755b826-b33e-89bd-8cd7-ce316601291e" executionId="4098bf3c-a477-43e4-a570-a50ab7e9a483" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="7" executed="7" passed="7" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

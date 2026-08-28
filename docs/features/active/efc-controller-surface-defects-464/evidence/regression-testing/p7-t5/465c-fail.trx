@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="ec1bef5d-e51e-4ff8-8c50-21e950b8d8c7" name="<user>@<host> 2026-08-27 21:17:26" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T21:17:26.8855537-04:00" queuing="2026-08-27T21:17:26.8855537-04:00" start="2026-08-27T21:17:25.4560112-04:00" finish="2026-08-27T21:17:26.9015537-04:00" />
+  <TestSettings name="default" id="4f3c6cf5-5c14-40c2-b030-922599401065">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-27_21_17_26" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="9fb7f886-1168-4b79-a2ef-d795765f2833" testId="1f4a3747-df86-89ad-b49e-3fa103dee4b2" testName="WithTrashRow_AppliedTwice_YieldsExactlyOneTrashRow" computerName="<host>" duration="00:00:00.1500679" startTime="2026-08-27T21:17:26.5388280-04:00" endTime="2026-08-27T21:17:26.7990332-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9fb7f886-1168-4b79-a2ef-d795765f2833">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Expected twice.Where(row =&gt; row == EfcFormController.TrashRowText) to contain 1 item(s) because the trash row must not accumulate on a repeated delete gesture, but found 2: {"Trash to Delete", "Trash to Delete"}.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Collections.GenericCollectionAssertions`3.HaveCount(Int32 expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Collections/GenericCollectionAssertions.cs:line 1497&#xD;
+   at QuickFiler.Controllers.Tests.EfcFormControllerTests.WithTrashRow_AppliedTwice_YieldsExactlyOneTrashRow() in <repo-root>\QuickFiler.Test\Controllers\EfcFormControllerTests.cs:line 374</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="739c3216-65e2-4270-87da-384066f806b4" testId="1ec6a617-0982-8837-a5a2-f16df74440bc" testName="ActionDeleteAsync_AwaitedTwice_LeavesExactlyOneTrashRowInFolderRows" computerName="<host>" duration="00:00:00.0094983" startTime="2026-08-27T21:17:26.8040327-04:00" endTime="2026-08-27T21:17:26.8176650-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="739c3216-65e2-4270-87da-384066f806b4">
+      <Output>
+        <ErrorInfo>
+          <Message>Expected folderRows.Where(row =&gt; row == EfcFormController.TrashRowText) to contain 1 item(s) because a repeated delete gesture must not accumulate trash rows, but found 2: {"Trash to Delete", "Trash to Delete"}.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Collections.GenericCollectionAssertions`3.HaveCount(Int32 expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Collections/GenericCollectionAssertions.cs:line 1497&#xD;
+   at QuickFiler.Controllers.Tests.EfcFormControllerTests.&lt;ActionDeleteAsync_AwaitedTwice_LeavesExactlyOneTrashRowInFolderRows&gt;d__13.MoveNext() in <repo-root>\QuickFiler.Test\Controllers\EfcFormControllerTests.cs:line 408&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.&lt;ExecuteInternalAsync&gt;d__58.MoveNext()</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="WithTrashRow_AppliedTwice_YieldsExactlyOneTrashRow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1f4a3747-df86-89ad-b49e-3fa103dee4b2">
+      <Execution id="9fb7f886-1168-4b79-a2ef-d795765f2833" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="WithTrashRow_AppliedTwice_YieldsExactlyOneTrashRow" />
+    </UnitTest>
+    <UnitTest name="ActionDeleteAsync_AwaitedTwice_LeavesExactlyOneTrashRowInFolderRows" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ec6a617-0982-8837-a5a2-f16df74440bc">
+      <Execution id="739c3216-65e2-4270-87da-384066f806b4" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="ActionDeleteAsync_AwaitedTwice_LeavesExactlyOneTrashRowInFolderRows" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1f4a3747-df86-89ad-b49e-3fa103dee4b2" executionId="9fb7f886-1168-4b79-a2ef-d795765f2833" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ec6a617-0982-8837-a5a2-f16df74440bc" executionId="739c3216-65e2-4270-87da-384066f806b4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="2" executed="2" passed="0" failed="2" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
