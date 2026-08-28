@@ -24,7 +24,6 @@ namespace QuickFiler
         {
             InitializeComponent();
             _context = SynchronizationContext.Current;
-            _uiScheduler = TaskScheduler.FromCurrentSynchronizationContext();
             _uiDispatcher = Dispatcher.CurrentDispatcher;
             InitControlGroups();
         }
@@ -60,12 +59,6 @@ namespace QuickFiler
         public SynchronizationContext UiSyncContext
         {
             get => _context;
-        }
-
-        private TaskScheduler _uiScheduler;
-        public TaskScheduler UiScheduler
-        {
-            get => _uiScheduler;
         }
 
         private Dispatcher _uiDispatcher;

@@ -34,7 +34,6 @@ namespace QuickFiler
         List<Component> MenuItems { get; }
         IList<Label> TipsLabels { get; }
         Dispatcher UiDispatcher { get; }
-        TaskScheduler UiScheduler { get; }
         SynchronizationContext UiSyncContext { get; }
 
         // Display-state intent members (Seam B, Cluster 2a) replacing the raw text-bearing Labels

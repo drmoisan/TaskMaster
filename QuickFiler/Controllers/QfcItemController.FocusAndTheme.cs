@@ -289,12 +289,32 @@ namespace QuickFiler.Controllers
         {
             if (_isWebViewerInitialized)
             {
-                _itemViewer.NavigateToString(ItemHelper.ToggleDark(desiredState));
-                if (ConversationResolver.Count.Expanded > 0)
+                // #489 D2: this runs from theme toggles that can originate off the UI thread, and
+                // NavigateToString touches the WebView2 control directly. Guard the write the same
+                // way the CoreWebView2 initialization handler already does in
+                // QfcItemController.EventWiring.cs.
+                if (_itemViewer.InvokeRequired)
                 {
-                    ConversationResolver.ConversationInfo.Expanded.ForEach(item =>
-                        item.ToggleDark(desiredState)
-                    );
+                    _itemViewer.Invoke(() =>
+                    {
+                        _itemViewer.NavigateToString(ItemHelper.ToggleDark(desiredState));
+                        if (ConversationResolver.Count.Expanded > 0)
+                        {
+                            ConversationResolver.ConversationInfo.Expanded.ForEach(item =>
+                                item.ToggleDark(desiredState)
+                            );
+                        }
+                    });
+                }
+                else
+                {
+                    _itemViewer.NavigateToString(ItemHelper.ToggleDark(desiredState));
+                    if (ConversationResolver.Count.Expanded > 0)
+                    {
+                        ConversationResolver.ConversationInfo.Expanded.ForEach(item =>
+                            item.ToggleDark(desiredState)
+                        );
+                    }
                 }
             }
         }
