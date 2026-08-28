@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="ded95a48-e521-4c71-866f-7a5ac33df336" name="<user>@<host> 2026-08-27 20:30:44" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T20:30:44.7542139-04:00" queuing="2026-08-27T20:30:44.7542139-04:00" start="2026-08-27T20:30:43.3232964-04:00" finish="2026-08-27T20:30:44.7696637-04:00" />
+  <TestSettings name="default" id="8484f6c6-970e-45c2-8ccf-3b2395733a51">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-27_20_30_44" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="a67c645c-95f8-424f-8fff-f5321a432e00" testId="16dd5bb9-2adf-8f9c-9075-444382ee9bb6" testName="ToolStripMenuItemCb_IsNotDerivedFromControl" computerName="<host>" duration="00:00:00.0007573" startTime="2026-08-27T20:30:44.6817772-04:00" endTime="2026-08-27T20:30:44.6827770-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a67c645c-95f8-424f-8fff-f5321a432e00" />
+    <UnitTestResult executionId="49d27233-8b40-4ffa-b972-7af87b750bec" testId="19e37be6-7fb8-8f51-abba-f046c4b6c4d1" testName="ItemViewer_DeclaresNoMenuItemCheckedChangedMembers" computerName="<host>" duration="00:00:00.0034348" startTime="2026-08-27T20:30:44.6105081-04:00" endTime="2026-08-27T20:30:44.6135500-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="49d27233-8b40-4ffa-b972-7af87b750bec" />
+    <UnitTestResult executionId="51b25848-156b-463f-92e9-62db35d24bed" testId="143f0559-f2cf-8396-aa9f-d3b5c619698a" testName="ItemViewer_DeclaresNoMoveOptionsMenuClickHandler" computerName="<host>" duration="00:00:00.0001892" startTime="2026-08-27T20:30:44.6135500-04:00" endTime="2026-08-27T20:30:44.6135500-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="51b25848-156b-463f-92e9-62db35d24bed" />
+    <UnitTestResult executionId="d5299893-fa23-4164-951f-82a9b54cf81e" testId="1e988019-4ef4-84ef-927f-dd356996a3d9" testName="Checked_WhenSetTrue_AssignsCheckedCheckBoxImage" computerName="<host>" duration="00:00:00.0656510" startTime="2026-08-27T20:30:44.6135500-04:00" endTime="2026-08-27T20:30:44.6797773-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d5299893-fa23-4164-951f-82a9b54cf81e" />
+    <UnitTestResult executionId="7b76128f-7121-4fb8-932f-2a302d595a10" testId="13f0c951-d974-8efd-88f9-aa4ce7708dc4" testName="WireIntentEvents_SubscribesToPicturesChanged" computerName="<host>" duration="00:00:00.2393128" startTime="2026-08-27T20:30:44.2425635-04:00" endTime="2026-08-27T20:30:44.5893013-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7b76128f-7121-4fb8-932f-2a302d595a10">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="d551fa87-06d6-498b-8b9f-60db743f4d00" testId="1d4cbd02-754b-89a3-a9fe-f0bf59aae2d9" testName="ItemViewerExpanded_DeclaresNoMenuItemCheckedChangedHandler" computerName="<host>" duration="00:00:00.0003535" startTime="2026-08-27T20:30:44.6827770-04:00" endTime="2026-08-27T20:30:44.6847744-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d551fa87-06d6-498b-8b9f-60db743f4d00" />
+    <UnitTestResult executionId="20c1ced0-6f81-434c-ba16-fc734762e0a5" testId="12328505-fc3f-837b-8a29-7e7005c1dee9" testName="PicturesChanged_WhenRaised_RefreshesOptionsPictures" computerName="<host>" duration="00:00:00.0122610" startTime="2026-08-27T20:30:44.5953171-04:00" endTime="2026-08-27T20:30:44.6105081-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="20c1ced0-6f81-434c-ba16-fc734762e0a5" />
+    <UnitTestResult executionId="a2b87e28-845d-413a-b204-96f74655bcea" testId="16217006-f678-883c-a671-f157c6a13259" testName="Checked_WhenSetTrue_RaisesShadowedCheckedChangedExactlyOnce" computerName="<host>" duration="00:00:00.0012878" startTime="2026-08-27T20:30:44.6797773-04:00" endTime="2026-08-27T20:30:44.6817772-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a2b87e28-845d-413a-b204-96f74655bcea" />
+    <UnitTestResult executionId="f5df090a-2ce4-46fe-bc58-05825db862b0" testId="1cffd91e-8928-8b13-b839-3d003262a780" testName="Checked_WhenSetFalse_AssignsNullImage" computerName="<host>" duration="00:00:00.0002274" startTime="2026-08-27T20:30:44.6797773-04:00" endTime="2026-08-27T20:30:44.6797773-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f5df090a-2ce4-46fe-bc58-05825db862b0" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="ItemViewerExpanded_DeclaresNoMenuItemCheckedChangedHandler" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d4cbd02-754b-89a3-a9fe-f0bf59aae2d9">
+      <Execution id="d551fa87-06d6-498b-8b9f-60db743f4d00" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ToolStripMenuItemCbTests" name="ItemViewerExpanded_DeclaresNoMenuItemCheckedChangedHandler" />
+    </UnitTest>
+    <UnitTest name="Checked_WhenSetFalse_AssignsNullImage" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1cffd91e-8928-8b13-b839-3d003262a780">
+      <Execution id="f5df090a-2ce4-46fe-bc58-05825db862b0" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ToolStripMenuItemCbTests" name="Checked_WhenSetFalse_AssignsNullImage" />
+    </UnitTest>
+    <UnitTest name="Checked_WhenSetTrue_AssignsCheckedCheckBoxImage" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e988019-4ef4-84ef-927f-dd356996a3d9">
+      <Execution id="d5299893-fa23-4164-951f-82a9b54cf81e" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ToolStripMenuItemCbTests" name="Checked_WhenSetTrue_AssignsCheckedCheckBoxImage" />
+    </UnitTest>
+    <UnitTest name="ItemViewer_DeclaresNoMenuItemCheckedChangedMembers" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="19e37be6-7fb8-8f51-abba-f046c4b6c4d1">
+      <Execution id="49d27233-8b40-4ffa-b972-7af87b750bec" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbDropDownContractTests" name="ItemViewer_DeclaresNoMenuItemCheckedChangedMembers" />
+    </UnitTest>
+    <UnitTest name="ToolStripMenuItemCb_IsNotDerivedFromControl" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="16dd5bb9-2adf-8f9c-9075-444382ee9bb6">
+      <Execution id="a67c645c-95f8-424f-8fff-f5321a432e00" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ToolStripMenuItemCbTests" name="ToolStripMenuItemCb_IsNotDerivedFromControl" />
+    </UnitTest>
+    <UnitTest name="PicturesChanged_WhenRaised_RefreshesOptionsPictures" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="12328505-fc3f-837b-8a29-7e7005c1dee9">
+      <Execution id="20c1ced0-6f81-434c-ba16-fc734762e0a5" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_EventWiringTests" name="PicturesChanged_WhenRaised_RefreshesOptionsPictures" />
+    </UnitTest>
+    <UnitTest name="ItemViewer_DeclaresNoMoveOptionsMenuClickHandler" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="143f0559-f2cf-8396-aa9f-d3b5c619698a">
+      <Execution id="51b25848-156b-463f-92e9-62db35d24bed" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbDropDownContractTests" name="ItemViewer_DeclaresNoMoveOptionsMenuClickHandler" />
+    </UnitTest>
+    <UnitTest name="Checked_WhenSetTrue_RaisesShadowedCheckedChangedExactlyOnce" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="16217006-f678-883c-a671-f157c6a13259">
+      <Execution id="a2b87e28-845d-413a-b204-96f74655bcea" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ToolStripMenuItemCbTests" name="Checked_WhenSetTrue_RaisesShadowedCheckedChangedExactlyOnce" />
+    </UnitTest>
+    <UnitTest name="WireIntentEvents_SubscribesToPicturesChanged" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="13f0c951-d974-8efd-88f9-aa4ce7708dc4">
+      <Execution id="7b76128f-7121-4fb8-932f-2a302d595a10" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_EventWiringTests" name="WireIntentEvents_SubscribesToPicturesChanged" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="16dd5bb9-2adf-8f9c-9075-444382ee9bb6" executionId="a67c645c-95f8-424f-8fff-f5321a432e00" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19e37be6-7fb8-8f51-abba-f046c4b6c4d1" executionId="49d27233-8b40-4ffa-b972-7af87b750bec" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="143f0559-f2cf-8396-aa9f-d3b5c619698a" executionId="51b25848-156b-463f-92e9-62db35d24bed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e988019-4ef4-84ef-927f-dd356996a3d9" executionId="d5299893-fa23-4164-951f-82a9b54cf81e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13f0c951-d974-8efd-88f9-aa4ce7708dc4" executionId="7b76128f-7121-4fb8-932f-2a302d595a10" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d4cbd02-754b-89a3-a9fe-f0bf59aae2d9" executionId="d551fa87-06d6-498b-8b9f-60db743f4d00" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12328505-fc3f-837b-8a29-7e7005c1dee9" executionId="20c1ced0-6f81-434c-ba16-fc734762e0a5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16217006-f678-883c-a671-f157c6a13259" executionId="a2b87e28-845d-413a-b204-96f74655bcea" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1cffd91e-8928-8b13-b839-3d003262a780" executionId="f5df090a-2ce4-46fe-bc58-05825db862b0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="9" executed="9" passed="9" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+</TestRun>

@@ -168,24 +168,6 @@ namespace QuickFiler
             Console.WriteLine("Parent Changed");
         }
 
-        private void MenuItem_CheckedChanged(object sender, EventArgs e)
-        {
-            var menuItem = (ToolStripMenuItem)sender;
-            MenuItem_CheckedChanged(menuItem);
-        }
-
-        private void MenuItem_CheckedChanged(ToolStripMenuItem menuItem)
-        {
-            if (menuItem.Checked)
-            {
-                menuItem.Image = global::QuickFiler.Properties.Resources.CheckBoxChecked;
-            }
-            else
-            {
-                menuItem.Image = null;
-            }
-        }
-
         public List<Component> MenuItems => Initializer.GetOrLoad(ref _menuItems, LoadMenuItems);
         private List<Component> _menuItems;
 
@@ -201,8 +183,6 @@ namespace QuickFiler
             };
             return menuItems;
         }
-
-        private void MoveOptionsMenu_Click(object sender, EventArgs e) { }
 
         #region Field to Property for Interface
 
