@@ -137,3 +137,5 @@
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no account or machine name in ANY artifact
 - [TRX sanitisation must be case-insensitive](project_trx_sanitisation_must_be_case_insensitive.md) — vstest writes lower-case `storage=`
+- [TRX/msbuild evidence needs a sanitisation micro-action](project_vstest_trx_evidence_needs_sanitisation_task.md) — no plan ever budgets it; rename the TRX too, the filename leaks
+- [PowerShell budget hook blocks scratch .ps1 helpers](project_powershell_scratch_script_budget_hook_blocks_helpers.md) — cap counts other worktrees; use pwsh -Command / perl / python, never reset the state file
