@@ -71,8 +71,11 @@ directory contained `p9-t9.trx` alone.
 `p9-t9.trx` was sanitised in place before being copied: 6 occurrences of the worktree root replaced
 with `<repo-root>`, 6 of the machine name with `<host>`, and 3 of the account name with `<user>`, all
 case-insensitively because vstest writes the `storage=` attribute in all-lower-case. A
-case-insensitive search of the committed TRX for `megalodon`, `danmoisan`, `danmoi`, a `C:` drive
-path or `appdata` returns **0** for each.
+case-insensitive search of the committed TRX for the machine name, the account name, the
+short (8.3) form of the account name, a drive-letter path prefix or the per-user application-data
+directory segment returns **0** for each. The identifiers themselves are deliberately not quoted
+here: naming them would reintroduce into this artifact exactly what the redaction removed from the
+TRX.
 
 **XML-escaping note.** Each placeholder is written into the TRX in entity form as `&lt;repo-root&gt;`,
 `&lt;host&gt;` and `&lt;user&gt;`. XML forbids a raw less-than character in a text node or an attribute
