@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="e7c29973-f04a-4d8f-b378-8fff84a64d3e" name="<user>@<host> 2026-08-27 20:56:31" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T20:56:31.8428868-04:00" queuing="2026-08-27T20:56:31.8428868-04:00" start="2026-08-27T20:56:29.3477722-04:00" finish="2026-08-27T20:56:31.8596818-04:00" />
+  <TestSettings name="default" id="d0aa60ee-cf9c-4abf-8478-8a163bfbdc68">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-27_20_56_31" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="93870c12-3287-4e7d-8886-fd942629a2fd" testId="1c14705d-2147-877b-9b4d-4bf837686096" testName="ItemActiveThemeAndLoadTheme_OnNullThemesController_DoNotThrow" computerName="<host>" duration="00:00:00.0059928" startTime="2026-08-27T20:56:31.6744082-04:00" endTime="2026-08-27T20:56:31.6838093-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="93870c12-3287-4e7d-8886-fd942629a2fd">
+      <Output>
+        <ErrorInfo>
+          <Message>Did not expect any exception because ActiveTheme must return its backing field once _themes is null, instead of failing the strict dependency check with ArgumentNullException, but found System.ArgumentNullException: Value cannot be null.&#xD;
+Parameter name: Method GetOrLoad failed the dependency check because dependencies contains a null value at position 0&#xD;
+   at UtilitiesCS.Initializer.DependenciesNotNull(Boolean strict, Object[] dependencies) in <repo-root>\UtilitiesCS\HelperClasses\Initializer.cs:line 321&#xD;
+   at UtilitiesCS.Initializer.GetOrLoad[T](T&amp; variable, Func`1 loader, Boolean strict, Object[] dependencies) in <repo-root>\UtilitiesCS\HelperClasses\Initializer.cs:line 131&#xD;
+   at QuickFiler.Controllers.EfcItemController.get_ActiveTheme() in <repo-root>\QuickFiler\Controllers\EfcItemController.cs:line 361&#xD;
+   at QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests.&lt;&gt;c__DisplayClass12_0.&lt;ItemActiveThemeAndLoadTheme_OnNullThemesController_DoNotThrow&gt;b__0() in <repo-root>\QuickFiler.Test\Controllers\EfcItemController.CleanupTests.cs:line 242&#xD;
+   at FluentAssertions.Specialized.FunctionAssertions`1.NotThrow(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/FunctionAssertions.cs:line 53.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Specialized.FunctionAssertions`1.NotThrow(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/FunctionAssertions.cs:line 67&#xD;
+   at QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests.ItemActiveThemeAndLoadTheme_OnNullThemesController_DoNotThrow() in <repo-root>\QuickFiler.Test\Controllers\EfcItemController.CleanupTests.cs:line 246</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="39563e24-983c-446f-9432-de1ba2214c87" testId="1a4428e2-7d0e-89a3-b6d0-4231f3646473" testName="Cleanup_DisposesTimerBeforeNullingIt" computerName="<host>" duration="00:00:00.0510645" startTime="2026-08-27T20:56:31.4801773-04:00" endTime="2026-08-27T20:56:31.5314507-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="39563e24-983c-446f-9432-de1ba2214c87">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+        <ErrorInfo>
+          <Message>Test method QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests.Cleanup_DisposesTimerBeforeNullingIt threw exception:&#xD;
+System.ArgumentNullException: Value cannot be null.&#xD;
+Parameter name: source</Message>
+          <StackTrace>   at System.Linq.EnumerableEx.ForEach[TSource](IEnumerable`1 source, Action`1 onNext) in /_/Ix.NET/Source/System.Interactive/System/Linq/Operators/ForEach.cs:line 22&#xD;
+   at QuickFiler.Controllers.EfcItemController.Cleanup() in <repo-root>\QuickFiler\Controllers\EfcItemController.cs:line 224&#xD;
+   at QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests.Cleanup_DisposesTimerBeforeNullingIt() in <repo-root>\QuickFiler.Test\Controllers\EfcItemController.CleanupTests.cs:line 140&#xD;
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="54ac9323-996c-43dc-9f8a-bec2fd5fdd9d" testId="15af3d3c-ba54-88df-8d94-d4a1df962a6c" testName="SubjectSenderAndTo_ReadFromItemInfo_AndAreInertAfterCleanup" computerName="<host>" duration="00:00:00.0941307" startTime="2026-08-27T20:56:31.5780667-04:00" endTime="2026-08-27T20:56:31.6724066-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="54ac9323-996c-43dc-9f8a-bec2fd5fdd9d">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+        <ErrorInfo>
+          <Message>Expected observedSubject to be a match with the expectation because Subject must read the cached mail-item model like Sender and To, not the label text of a control the teardown path has already released, but it differs at index 0:&#xD;
+   ↓ (actual)&#xD;
+  "[SUBJECT]"&#xD;
+  "cached subject"&#xD;
+   ↑ (expected)</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Primitives.StringEqualityStrategy.AssertForEquality(AssertionChain assertionChain, String subject, String expected) in /_/Src/FluentAssertions/Primitives/StringEqualityStrategy.cs:line 76&#xD;
+   at FluentAssertions.Primitives.StringValidator.Validate(String subject, String expected) in /_/Src/FluentAssertions/Primitives/StringValidator.cs:line 37&#xD;
+   at FluentAssertions.Primitives.StringAssertions`1.Be(String expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/StringAssertions.cs:line 67&#xD;
+   at QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests.SubjectSenderAndTo_ReadFromItemInfo_AndAreInertAfterCleanup() in <repo-root>\QuickFiler.Test\Controllers\EfcItemController.CleanupTests.cs:line 193</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="9a0feb7c-863b-4517-9b23-659a85a60b77" testId="11b514fa-8f0a-8eff-b7b5-33f96a32140e" testName="ItemDarkMode_OnNullGlobalsController_ReturnsFalseAndDoesNotThrow" computerName="<host>" duration="00:00:00.0015075" startTime="2026-08-27T20:56:31.6724066-04:00" endTime="2026-08-27T20:56:31.6744082-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9a0feb7c-863b-4517-9b23-659a85a60b77">
+      <Output>
+        <ErrorInfo>
+          <Message>Did not expect any exception because DarkMode must be readable once _globals is null, instead of eagerly materialising a dependency array over a null reference, but found System.NullReferenceException: Object reference not set to an instance of an object.&#xD;
+   at QuickFiler.Controllers.EfcItemController.get_DarkMode() in <repo-root>\QuickFiler\Controllers\EfcItemController.cs:line 408&#xD;
+   at QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests.&lt;&gt;c__DisplayClass11_0.&lt;ItemDarkMode_OnNullGlobalsController_ReturnsFalseAndDoesNotThrow&gt;b__0() in <repo-root>\QuickFiler.Test\Controllers\EfcItemController.CleanupTests.cs:line 224&#xD;
+   at FluentAssertions.Specialized.FunctionAssertions`1.NotThrow(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/FunctionAssertions.cs:line 53.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Specialized.FunctionAssertions`1.NotThrow(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/FunctionAssertions.cs:line 67&#xD;
+   at QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests.ItemDarkMode_OnNullGlobalsController_ReturnsFalseAndDoesNotThrow() in <repo-root>\QuickFiler.Test\Controllers\EfcItemController.CleanupTests.cs:line 227</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="20b99993-b7bd-4710-a420-0c68d605b43c" testId="1ae8632c-d1f0-8402-bc0a-999ee1ec6deb" testName="Cleanup_NullsButtonsField" computerName="<host>" duration="00:00:00.0522670" startTime="2026-08-27T20:56:31.4276354-04:00" endTime="2026-08-27T20:56:31.4801773-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="20b99993-b7bd-4710-a420-0c68d605b43c">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+        <ErrorInfo>
+          <Message>Test method QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests.Cleanup_NullsButtonsField threw exception:&#xD;
+System.ArgumentNullException: Value cannot be null.&#xD;
+Parameter name: source</Message>
+          <StackTrace>   at System.Linq.EnumerableEx.ForEach[TSource](IEnumerable`1 source, Action`1 onNext) in /_/Ix.NET/Source/System.Interactive/System/Linq/Operators/ForEach.cs:line 22&#xD;
+   at QuickFiler.Controllers.EfcItemController.Cleanup() in <repo-root>\QuickFiler\Controllers\EfcItemController.cs:line 224&#xD;
+   at QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests.Cleanup_NullsButtonsField() in <repo-root>\QuickFiler.Test\Controllers\EfcItemController.CleanupTests.cs:line 118&#xD;
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="aae1addf-3d89-425c-9b8d-8339b3f89954" testId="1d3dcb83-5c11-83f8-92b8-169983b92ac9" testName="Cleanup_OnFiveArgumentConstructedController_DoesNotThrow" computerName="<host>" duration="00:00:01.0006597" startTime="2026-08-27T20:56:30.2629248-04:00" endTime="2026-08-27T20:56:31.3737117-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="aae1addf-3d89-425c-9b8d-8339b3f89954">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Did not expect any exception because Cleanup must remain callable on a partially constructed controller whose Initialize was never run, so no field it touches may be dereferenced unguarded, but found System.ArgumentNullException: Value cannot be null.&#xD;
+Parameter name: source&#xD;
+   at System.Linq.EnumerableEx.ForEach[TSource](IEnumerable`1 source, Action`1 onNext) in /_/Ix.NET/Source/System.Interactive/System/Linq/Operators/ForEach.cs:line 22&#xD;
+   at QuickFiler.Controllers.EfcItemController.Cleanup() in <repo-root>\QuickFiler\Controllers\EfcItemController.cs:line 224&#xD;
+   at QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests.&lt;&gt;c__DisplayClass5_0.&lt;Cleanup_OnFiveArgumentConstructedController_DoesNotThrow&gt;b__0() in <repo-root>\QuickFiler.Test\Controllers\EfcItemController.CleanupTests.cs:line 82&#xD;
+   at FluentAssertions.Specialized.DelegateAssertions`2.InvokeSubjectWithInterception() in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 173.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Specialized.DelegateAssertionsBase`2.NotThrowInternal(Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 72&#xD;
+   at QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests.Cleanup_OnFiveArgumentConstructedController_DoesNotThrow() in <repo-root>\QuickFiler.Test\Controllers\EfcItemController.CleanupTests.cs:line 85</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="166df34b-09c4-42b9-8f29-6662398af320" testId="19022e9d-e677-885e-b3cd-a11f4c85cd35" testName="Cleanup_CalledTwice_DoesNotThrow" computerName="<host>" duration="00:00:00.0477394" startTime="2026-08-27T20:56:31.3793388-04:00" endTime="2026-08-27T20:56:31.4266273-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="166df34b-09c4-42b9-8f29-6662398af320">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+        <ErrorInfo>
+          <Message>Did not expect any exception because Cleanup must be idempotent, so a second teardown pass cannot fault, but found System.ArgumentNullException: Value cannot be null.&#xD;
+Parameter name: source&#xD;
+   at System.Linq.EnumerableEx.ForEach[TSource](IEnumerable`1 source, Action`1 onNext) in /_/Ix.NET/Source/System.Interactive/System/Linq/Operators/ForEach.cs:line 22&#xD;
+   at QuickFiler.Controllers.EfcItemController.Cleanup() in <repo-root>\QuickFiler\Controllers\EfcItemController.cs:line 224&#xD;
+   at QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests.&lt;&gt;c__DisplayClass6_0.&lt;Cleanup_CalledTwice_DoesNotThrow&gt;b__0() in <repo-root>\QuickFiler.Test\Controllers\EfcItemController.CleanupTests.cs:line 102&#xD;
+   at FluentAssertions.Specialized.DelegateAssertions`2.InvokeSubjectWithInterception() in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 173.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Specialized.DelegateAssertionsBase`2.NotThrowInternal(Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 72&#xD;
+   at QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests.Cleanup_CalledTwice_DoesNotThrow() in <repo-root>\QuickFiler.Test\Controllers\EfcItemController.CleanupTests.cs:line 107</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="a4c68727-0111-4262-b5d5-3a40560f0724" testId="1de86bb9-7d96-8c0b-b990-1d248f835732" testName="ApplyReadEmailFormat_AfterCleanup_DoesNotThrow" computerName="<host>" duration="00:00:00.0472363" startTime="2026-08-27T20:56:31.5314507-04:00" endTime="2026-08-27T20:56:31.5780667-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a4c68727-0111-4262-b5d5-3a40560f0724">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+        <ErrorInfo>
+          <Message>Test method QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests.ApplyReadEmailFormat_AfterCleanup_DoesNotThrow threw exception:&#xD;
+System.ArgumentNullException: Value cannot be null.&#xD;
+Parameter name: source</Message>
+          <StackTrace>   at System.Linq.EnumerableEx.ForEach[TSource](IEnumerable`1 source, Action`1 onNext) in /_/Ix.NET/Source/System.Interactive/System/Linq/Operators/ForEach.cs:line 22&#xD;
+   at QuickFiler.Controllers.EfcItemController.Cleanup() in <repo-root>\QuickFiler\Controllers\EfcItemController.cs:line 224&#xD;
+   at QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests.ApplyReadEmailFormat_AfterCleanup_DoesNotThrow() in <repo-root>\QuickFiler.Test\Controllers\EfcItemController.CleanupTests.cs:line 160&#xD;
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="SubjectSenderAndTo_ReadFromItemInfo_AndAreInertAfterCleanup" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="15af3d3c-ba54-88df-8d94-d4a1df962a6c">
+      <Execution id="54ac9323-996c-43dc-9f8a-bec2fd5fdd9d" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests" name="SubjectSenderAndTo_ReadFromItemInfo_AndAreInertAfterCleanup" />
+    </UnitTest>
+    <UnitTest name="Cleanup_DisposesTimerBeforeNullingIt" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a4428e2-7d0e-89a3-b6d0-4231f3646473">
+      <Execution id="39563e24-983c-446f-9432-de1ba2214c87" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests" name="Cleanup_DisposesTimerBeforeNullingIt" />
+    </UnitTest>
+    <UnitTest name="Cleanup_OnFiveArgumentConstructedController_DoesNotThrow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d3dcb83-5c11-83f8-92b8-169983b92ac9">
+      <Execution id="aae1addf-3d89-425c-9b8d-8339b3f89954" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests" name="Cleanup_OnFiveArgumentConstructedController_DoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="ApplyReadEmailFormat_AfterCleanup_DoesNotThrow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1de86bb9-7d96-8c0b-b990-1d248f835732">
+      <Execution id="a4c68727-0111-4262-b5d5-3a40560f0724" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests" name="ApplyReadEmailFormat_AfterCleanup_DoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="ItemDarkMode_OnNullGlobalsController_ReturnsFalseAndDoesNotThrow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="11b514fa-8f0a-8eff-b7b5-33f96a32140e">
+      <Execution id="9a0feb7c-863b-4517-9b23-659a85a60b77" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests" name="ItemDarkMode_OnNullGlobalsController_ReturnsFalseAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="ItemActiveThemeAndLoadTheme_OnNullThemesController_DoNotThrow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c14705d-2147-877b-9b4d-4bf837686096">
+      <Execution id="93870c12-3287-4e7d-8886-fd942629a2fd" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests" name="ItemActiveThemeAndLoadTheme_OnNullThemesController_DoNotThrow" />
+    </UnitTest>
+    <UnitTest name="Cleanup_NullsButtonsField" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ae8632c-d1f0-8402-bc0a-999ee1ec6deb">
+      <Execution id="20b99993-b7bd-4710-a420-0c68d605b43c" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests" name="Cleanup_NullsButtonsField" />
+    </UnitTest>
+    <UnitTest name="Cleanup_CalledTwice_DoesNotThrow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="19022e9d-e677-885e-b3cd-a11f4c85cd35">
+      <Execution id="166df34b-09c4-42b9-8f29-6662398af320" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcItemControllerCleanupTests" name="Cleanup_CalledTwice_DoesNotThrow" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1c14705d-2147-877b-9b4d-4bf837686096" executionId="93870c12-3287-4e7d-8886-fd942629a2fd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a4428e2-7d0e-89a3-b6d0-4231f3646473" executionId="39563e24-983c-446f-9432-de1ba2214c87" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15af3d3c-ba54-88df-8d94-d4a1df962a6c" executionId="54ac9323-996c-43dc-9f8a-bec2fd5fdd9d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11b514fa-8f0a-8eff-b7b5-33f96a32140e" executionId="9a0feb7c-863b-4517-9b23-659a85a60b77" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ae8632c-d1f0-8402-bc0a-999ee1ec6deb" executionId="20b99993-b7bd-4710-a420-0c68d605b43c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d3dcb83-5c11-83f8-92b8-169983b92ac9" executionId="aae1addf-3d89-425c-9b8d-8339b3f89954" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19022e9d-e677-885e-b3cd-a11f4c85cd35" executionId="166df34b-09c4-42b9-8f29-6662398af320" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1de86bb9-7d96-8c0b-b990-1d248f835732" executionId="a4c68727-0111-4262-b5d5-3a40560f0724" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="8" executed="8" passed="0" failed="8" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

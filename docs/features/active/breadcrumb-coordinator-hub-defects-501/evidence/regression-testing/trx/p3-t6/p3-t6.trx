@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="addfed59-444c-45f7-944f-d08b557463e5" name="<account>@<host> 2026-08-27 16:27:37" runUser="Megalodon4\<account>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T16:27:37.6269582-04:00" queuing="2026-08-27T16:27:37.6269582-04:00" start="2026-08-27T16:27:36.3246907-04:00" finish="2026-08-27T16:27:37.6416792-04:00" />
+  <TestSettings name="default" id="fbbfee60-0140-4c87-8933-ac272f92bebb">
+    <Deployment runDeploymentRoot="<account>_<host>_2026-08-27_16_27_37" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="88f1f123-d1bf-4a79-a145-6f6bc815ecbf" testId="1f1fda4e-4c7c-808c-8526-c68645d96356" testName="TryRunCurrent_GuardedActionRunsWithoutHoldingLifetimeSync" computerName="<host>" duration="00:00:00.0341345" startTime="2026-08-27T16:27:37.3839476-04:00" endTime="2026-08-27T16:27:37.5547067-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="88f1f123-d1bf-4a79-a145-6f6bc815ecbf">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="80fbe84b-e683-41fa-95ac-4912dcbbb1ba" testId="121e5723-a62d-895d-b924-3e100fe1c825" testName="TryRunCurrent_ReentrantInvalidateStillReportsEntryTimeInvocation" computerName="<host>" duration="00:00:00.0006356" startTime="2026-08-27T16:27:37.5613152-04:00" endTime="2026-08-27T16:27:37.5664514-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="80fbe84b-e683-41fa-95ac-4912dcbbb1ba" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="TryRunCurrent_GuardedActionRunsWithoutHoldingLifetimeSync" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1f1fda4e-4c7c-808c-8526-c68645d96356">
+      <Execution id="88f1f123-d1bf-4a79-a145-6f6bc815ecbf" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorUpgradeLifetimeTests" name="TryRunCurrent_GuardedActionRunsWithoutHoldingLifetimeSync" />
+    </UnitTest>
+    <UnitTest name="TryRunCurrent_ReentrantInvalidateStillReportsEntryTimeInvocation" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a5f370e5c08f8ddb0\quickfiler.test\bin\debug\quickfiler.test.dll" id="121e5723-a62d-895d-b924-3e100fe1c825">
+      <Execution id="80fbe84b-e683-41fa-95ac-4912dcbbb1ba" />
+      <TestMethod codeBase="WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbCoordinatorUpgradeLifetimeTests" name="TryRunCurrent_ReentrantInvalidateStillReportsEntryTimeInvocation" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1f1fda4e-4c7c-808c-8526-c68645d96356" executionId="88f1f123-d1bf-4a79-a145-6f6bc815ecbf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="121e5723-a62d-895d-b924-3e100fe1c825" executionId="80fbe84b-e683-41fa-95ac-4912dcbbb1ba" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="2" executed="2" passed="2" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for WS\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

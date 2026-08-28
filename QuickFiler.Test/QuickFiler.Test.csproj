@@ -63,6 +63,7 @@
     <Compile Include="Controllers\EfcSelectionGuardTests.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouterIssue439Tests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorTests.cs" />
+    <Compile Include="Viewers\BreadcrumbBridgeCoordinatorSupersessionTests.cs" />
     <Compile Include="Viewers\BreadcrumbBridgeCoordinatorProbabilityTests.cs" />
     <Compile Include="Viewers\BreadcrumbCoordinatorLifecycleTests.cs" />
     <Compile Include="Viewers\BreadcrumbCoordinatorUpgradeLifetimeTests.cs" />
@@ -116,6 +117,9 @@
     <Compile Include="Controllers\EfcHomeControllerLifecycleTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerMetricsTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerTests.cs" />
+    <Compile Include="Controllers\EfcItemController.CleanupTests.cs" />
+    <Compile Include="Controllers\EfcItemControllerTests.cs" />
+    <Compile Include="Controllers\EfcViewerTests.cs" />
     <Compile Include="Controllers\EmailSorterTests.cs" />
     <Compile Include="Controllers\BayesianPerformanceControllerTests.cs" />
     <Compile Include="Controllers\BayesianPerformanceController.TestSupport.cs" />
@@ -175,6 +179,8 @@
     <Compile Include="Controllers\MailItemActionsAdapterTests.cs" />
     <Compile Include="Controllers\WpfUiDispatcherTests.cs" />
     <Compile Include="Controllers\WebView2CoreInitializerTests.cs" />
+    <Compile Include="Viewers\WebView2BreadcrumbHostContractTests.cs" />
+    <Compile Include="Viewers\WebView2BreadcrumbHostTests.cs" />
     <Compile Include="Controllers\QfcQueueTests.cs" />
     <Compile Include="TestSupport\WinFormsPumpHost.cs" />
     <Compile Include="TestSupport\WinFormsPumpHostTests.cs" />

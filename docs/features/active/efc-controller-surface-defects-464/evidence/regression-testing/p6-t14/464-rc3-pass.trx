@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="4e34ead3-f494-493c-9c1d-7c587808e1d9" name="<user>@<host> 2026-08-27 21:09:29" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T21:09:29.8710864-04:00" queuing="2026-08-27T21:09:29.8710864-04:00" start="2026-08-27T21:09:28.6817303-04:00" finish="2026-08-27T21:09:30.1073186-04:00" />
+  <TestSettings name="default" id="f6b1d274-f15f-4c59-9fae-01e0cd8f5dc6">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-27_21_09_29" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="18d47cc6-b719-4a88-b391-b79e5d1f73df" testId="15f6bdcf-a6a4-8a38-b5bd-802734c1d035" testName="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonCancelClickAsync&quot;)" computerName="<host>" duration="00:00:00.0023820" startTime="2026-08-27T21:09:29.7862433-04:00" endTime="2026-08-27T21:09:29.8415744-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="18d47cc6-b719-4a88-b391-b79e5d1f73df" />
+    <UnitTestResult executionId="a85f32f6-59be-49f4-95f5-3c14b5d3a0f3" testId="1d537941-1382-8ef4-9782-f593d7951eed" testName="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonRefreshClickAsync&quot;)" computerName="<host>" duration="00:00:00.0003499" startTime="2026-08-27T21:09:29.8425740-04:00" endTime="2026-08-27T21:09:29.8425740-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a85f32f6-59be-49f4-95f5-3c14b5d3a0f3" />
+    <UnitTestResult executionId="3cd75b8c-59d3-4544-a6a3-b1a711a4da63" testId="16e12bb4-50e4-8f49-87a9-1e9a3da8812e" testName="PopulateFolderCombobox_WhenFormViewerIsNull_ReturnsWithoutTouchingDataModel" computerName="<host>" duration="00:00:00.0513423" startTime="2026-08-27T21:09:29.6091113-04:00" endTime="2026-08-27T21:09:29.7797297-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3cd75b8c-59d3-4544-a6a3-b1a711a4da63" />
+    <UnitTestResult executionId="927e4c6d-5ce6-4fe6-ade0-58fd31d1357e" testId="1aa7c8b3-26cf-83b2-9de1-f50217f93a9e" testName="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonDeleteClickAsync&quot;)" computerName="<host>" duration="00:00:00.0009035" startTime="2026-08-27T21:09:29.8435737-04:00" endTime="2026-08-27T21:09:29.8445722-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="927e4c6d-5ce6-4fe6-ade0-58fd31d1357e" />
+    <UnitTestResult executionId="af83c2e9-c544-423c-8326-86b32cfd5404" testId="15efe720-c5cf-88b6-a104-58a9060fed2e" testName="BoundaryErrorSink_DefaultDelegate_InvokesWithoutThrowing" computerName="<host>" duration="00:00:00.0032604" startTime="2026-08-27T21:09:29.8445722-04:00" endTime="2026-08-27T21:09:29.8485720-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="af83c2e9-c544-423c-8326-86b32cfd5404" />
+    <UnitTestResult executionId="fc9cbc97-eb52-4f2d-b174-cce7042fd9ef" testId="17e6b4d7-55cc-8815-892d-45fd8e2c5dfd" testName="ThrowInitializationFailure_PreservesOriginalStackTrace" computerName="<host>" duration="00:00:00.0618377" startTime="2026-08-27T21:09:29.6091113-04:00" endTime="2026-08-27T21:09:29.7902491-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fc9cbc97-eb52-4f2d-b174-cce7042fd9ef">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="30c2af61-aedc-4d08-84f2-71b32fb17774" testId="1adeb042-c861-85f9-b595-b937c1b63991" testName="PopulateFolderCombobox_WhenDataModelFaults_LogsOnceAndDoesNotFault" computerName="<host>" duration="00:00:00.0005847" startTime="2026-08-27T21:09:29.8535729-04:00" endTime="2026-08-27T21:09:29.8545757-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="30c2af61-aedc-4d08-84f2-71b32fb17774" />
+    <UnitTestResult executionId="44e78819-2ddf-4e1a-b43a-7eae85c4d447" testId="14c46de4-d0e2-873a-8867-1efecb62ffd2" testName="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonCreateClickAsync&quot;)" computerName="<host>" duration="00:00:00.0009037" startTime="2026-08-27T21:09:29.8425740-04:00" endTime="2026-08-27T21:09:29.8435737-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="44e78819-2ddf-4e1a-b43a-7eae85c4d447" />
+    <UnitTestResult executionId="89e404c0-a385-40d1-9073-7a280aeaf523" testId="15ad3b63-f33d-8476-b6c3-2a8c6b66d06b" testName="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonOkClickAsync&quot;)" computerName="<host>" duration="00:00:00.0003779" startTime="2026-08-27T21:09:29.8415744-04:00" endTime="2026-08-27T21:09:29.8425740-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="89e404c0-a385-40d1-9073-7a280aeaf523" />
+    <UnitTestResult executionId="5e1c3825-f911-424b-9511-79ec3e129de7" testId="112d4521-b902-88eb-a623-24aefe3c4a14" testName="PopulateFolderComboBoxAsync_WhenFactorySucceeds_DispatchesAssignFolderComboBoxThroughViewerDispatcher" computerName="<host>" duration="00:00:00.0368493" startTime="2026-08-27T21:09:29.9285145-04:00" endTime="2026-08-27T21:09:29.9677779-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5e1c3825-f911-424b-9511-79ec3e129de7" />
+    <UnitTestResult executionId="a41da657-2bcb-49bb-89fd-427477273499" testId="13c54365-b375-8a60-8bdb-ec40debf2c50" testName="PopulateFolderComboBox_WhenInvokeRequired_MarshalsAssignFolderComboBoxViaInvoke" computerName="<host>" duration="00:00:00.0012953" startTime="2026-08-27T21:09:29.9275144-04:00" endTime="2026-08-27T21:09:29.9285145-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a41da657-2bcb-49bb-89fd-427477273499" />
+    <UnitTestResult executionId="09633436-7c0f-4c08-9b85-9ddb65b9d2cd" testId="148ed2bc-c3ca-8498-bb33-a9bd48d7316f" testName="PopulateFolderComboBox_WhenFactorySucceeds_LoadsHandlerAndAssignsComboFromViewer" computerName="<host>" duration="00:00:00.2016221" startTime="2026-08-27T21:09:29.6091113-04:00" endTime="2026-08-27T21:09:29.9275144-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="09633436-7c0f-4c08-9b85-9ddb65b9d2cd" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="PopulateFolderCombobox_WhenDataModelFaults_LogsOnceAndDoesNotFault" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1adeb042-c861-85f9-b595-b937c1b63991">
+      <Execution id="30c2af61-aedc-4d08-84f2-71b32fb17774" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="PopulateFolderCombobox_WhenDataModelFaults_LogsOnceAndDoesNotFault" />
+    </UnitTest>
+    <UnitTest name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonOkClickAsync&quot;)" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="15ad3b63-f33d-8476-b6c3-2a8c6b66d06b">
+      <Execution id="89e404c0-a385-40d1-9073-7a280aeaf523" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="PopulateFolderComboBoxAsync_WhenFactorySucceeds_DispatchesAssignFolderComboBoxThroughViewerDispatcher" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="112d4521-b902-88eb-a623-24aefe3c4a14">
+      <Execution id="5e1c3825-f911-424b-9511-79ec3e129de7" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_FolderHandlingTests" name="PopulateFolderComboBoxAsync_WhenFactorySucceeds_DispatchesAssignFolderComboBoxThroughViewerDispatcher" />
+    </UnitTest>
+    <UnitTest name="PopulateFolderComboBox_WhenFactorySucceeds_LoadsHandlerAndAssignsComboFromViewer" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="148ed2bc-c3ca-8498-bb33-a9bd48d7316f">
+      <Execution id="09633436-7c0f-4c08-9b85-9ddb65b9d2cd" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_FolderHandlingTests" name="PopulateFolderComboBox_WhenFactorySucceeds_LoadsHandlerAndAssignsComboFromViewer" />
+    </UnitTest>
+    <UnitTest name="BoundaryErrorSink_DefaultDelegate_InvokesWithoutThrowing" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="15efe720-c5cf-88b6-a104-58a9060fed2e">
+      <Execution id="af83c2e9-c544-423c-8326-86b32cfd5404" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="BoundaryErrorSink_DefaultDelegate_InvokesWithoutThrowing" />
+    </UnitTest>
+    <UnitTest name="PopulateFolderComboBox_WhenInvokeRequired_MarshalsAssignFolderComboBoxViaInvoke" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="13c54365-b375-8a60-8bdb-ec40debf2c50">
+      <Execution id="a41da657-2bcb-49bb-89fd-427477273499" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_FolderHandlingTests" name="PopulateFolderComboBox_WhenInvokeRequired_MarshalsAssignFolderComboBoxViaInvoke" />
+    </UnitTest>
+    <UnitTest name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonDeleteClickAsync&quot;)" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1aa7c8b3-26cf-83b2-9de1-f50217f93a9e">
+      <Execution id="927e4c6d-5ce6-4fe6-ade0-58fd31d1357e" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonCreateClickAsync&quot;)" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="14c46de4-d0e2-873a-8867-1efecb62ffd2">
+      <Execution id="44e78819-2ddf-4e1a-b43a-7eae85c4d447" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="PopulateFolderCombobox_WhenFormViewerIsNull_ReturnsWithoutTouchingDataModel" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="16e12bb4-50e4-8f49-87a9-1e9a3da8812e">
+      <Execution id="3cd75b8c-59d3-4544-a6a3-b1a711a4da63" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="PopulateFolderCombobox_WhenFormViewerIsNull_ReturnsWithoutTouchingDataModel" />
+    </UnitTest>
+    <UnitTest name="ThrowInitializationFailure_PreservesOriginalStackTrace" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="17e6b4d7-55cc-8815-892d-45fd8e2c5dfd">
+      <Execution id="fc9cbc97-eb52-4f2d-b174-cce7042fd9ef" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcItemControllerTests" name="ThrowInitializationFailure_PreservesOriginalStackTrace" />
+    </UnitTest>
+    <UnitTest name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonCancelClickAsync&quot;)" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="15f6bdcf-a6a4-8a38-b5bd-802734c1d035">
+      <Execution id="18d47cc6-b719-4a88-b391-b79e5d1f73df" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonRefreshClickAsync&quot;)" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d537941-1382-8ef4-9782-f593d7951eed">
+      <Execution id="a85f32f6-59be-49f4-95f5-3c14b5d3a0f3" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="15f6bdcf-a6a4-8a38-b5bd-802734c1d035" executionId="18d47cc6-b719-4a88-b391-b79e5d1f73df" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d537941-1382-8ef4-9782-f593d7951eed" executionId="a85f32f6-59be-49f4-95f5-3c14b5d3a0f3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16e12bb4-50e4-8f49-87a9-1e9a3da8812e" executionId="3cd75b8c-59d3-4544-a6a3-b1a711a4da63" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1aa7c8b3-26cf-83b2-9de1-f50217f93a9e" executionId="927e4c6d-5ce6-4fe6-ade0-58fd31d1357e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15efe720-c5cf-88b6-a104-58a9060fed2e" executionId="af83c2e9-c544-423c-8326-86b32cfd5404" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17e6b4d7-55cc-8815-892d-45fd8e2c5dfd" executionId="fc9cbc97-eb52-4f2d-b174-cce7042fd9ef" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1adeb042-c861-85f9-b595-b937c1b63991" executionId="30c2af61-aedc-4d08-84f2-71b32fb17774" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14c46de4-d0e2-873a-8867-1efecb62ffd2" executionId="44e78819-2ddf-4e1a-b43a-7eae85c4d447" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15ad3b63-f33d-8476-b6c3-2a8c6b66d06b" executionId="89e404c0-a385-40d1-9073-7a280aeaf523" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="112d4521-b902-88eb-a623-24aefe3c4a14" executionId="5e1c3825-f911-424b-9511-79ec3e129de7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13c54365-b375-8a60-8bdb-ec40debf2c50" executionId="a41da657-2bcb-49bb-89fd-427477273499" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="148ed2bc-c3ca-8498-bb33-a9bd48d7316f" executionId="09633436-7c0f-4c08-9b85-9ddb65b9d2cd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="12" executed="12" passed="12" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

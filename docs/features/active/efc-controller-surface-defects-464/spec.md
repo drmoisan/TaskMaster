@@ -920,104 +920,104 @@ files this feature does not own.**
 
 ### #459 — `KbdActions<>` contract misuse (latent; remedy DELETION)
 
-- [ ] A named test asserts `typeof(EfcItemController).GetMethod("RegisterActions", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
-- [ ] A named test asserts `typeof(EfcItemController)` declares no method named `ToggleExpansion` at any arity.
-- [ ] A named test invokes the dispatched bodies of the surviving async expansion path in the order On → Off → On against a `Mock<IQfcKeyboardHandler>` backed by a real `KbdActions<char, KaChar, Action<char>>`, asserts no exception is thrown, and asserts the registry is not touched. The `ToggleExpansionAsync(ToggleState)` marshal itself is not awaited, because `ItemViewer.UiDispatcher` is an unpumped WPF dispatcher.
-- [ ] The `KbdActions<>` indexer-setter contract (assign-if-present, never insert) and the `overwriteDuplicates` truth table are documented in this spec's §RC4, and `git diff --name-only` for the feature branch contains no path matching `KbdActions`.
+- [x] A named test asserts `typeof(EfcItemController).GetMethod("RegisterActions", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
+- [x] A named test asserts `typeof(EfcItemController)` declares no method named `ToggleExpansion` at any arity.
+- [x] A named test invokes the dispatched bodies of the surviving async expansion path in the order On → Off → On against a `Mock<IQfcKeyboardHandler>` backed by a real `KbdActions<char, KaChar, Action<char>>`, asserts no exception is thrown, and asserts the registry is not touched. The `ToggleExpansionAsync(ToggleState)` marshal itself is not awaited, because `ItemViewer.UiDispatcher` is an unpumped WPF dispatcher.
+- [x] The `KbdActions<>` indexer-setter contract (assign-if-present, never insert) and the `overwriteDuplicates` truth table are documented in this spec's §RC4, and `git diff --name-only` for the feature branch contains no path matching `KbdActions`.
 
 ### #460 — cleanup NRE and timer leak (latent; remedies GUARD + CORRECTION)
 
-- [ ] A named test constructs `EfcItemController` through the 5-argument constructor without calling `Initialize()`, calls `Cleanup()`, and asserts no exception is thrown.
-- [ ] A named test asserts `Cleanup()` is idempotent on `EfcItemController`: a second consecutive call throws no exception.
-- [ ] A named test asserts the `_buttons` field is null after `Cleanup()` returns.
-- [ ] `Cleanup()` contains exactly one assignment of `_itemViewer`; the duplicate previously at `EfcItemController.cs:276` is absent from the post-change method body.
-- [ ] A named test injects `new Timer(_ => { }, null, Timeout.Infinite, Timeout.Infinite)` into `_timer`, calls `Cleanup()`, asserts the field is null, and asserts `timer.Change(0, Timeout.Infinite)` throws `ObjectDisposedException`.
-- [ ] A named test calls `ApplyReadEmailFormat(null)` on a freshly-`Cleanup()`ed controller and asserts no exception is thrown.
-- [ ] A named test asserts `Subject`, `Sender` and `To` all read from `_itemInfo`: with `_itemInfo` injected, all three return the injected values; after `Cleanup()`, all three behave uniformly and none throws.
+- [x] A named test constructs `EfcItemController` through the 5-argument constructor without calling `Initialize()`, calls `Cleanup()`, and asserts no exception is thrown.
+- [x] A named test asserts `Cleanup()` is idempotent on `EfcItemController`: a second consecutive call throws no exception.
+- [x] A named test asserts the `_buttons` field is null after `Cleanup()` returns.
+- [x] `Cleanup()` contains exactly one assignment of `_itemViewer`; the duplicate previously at `EfcItemController.cs:276` is absent from the post-change method body.
+- [x] A named test injects `new Timer(_ => { }, null, Timeout.Infinite, Timeout.Infinite)` into `_timer`, calls `Cleanup()`, asserts the field is null, and asserts `timer.Change(0, Timeout.Infinite)` throws `ObjectDisposedException`.
+- [x] A named test calls `ApplyReadEmailFormat(null)` on a freshly-`Cleanup()`ed controller and asserts no exception is thrown.
+- [x] A named test asserts `Subject`, `Sender` and `To` all read from `_itemInfo`: with `_itemInfo` injected, all three return the injected values; after `Cleanup()`, all three behave uniformly and none throws.
 
 ### #461 — dead conversation-expanded handler (live; remedy DELETION)
 
-- [ ] A named test asserts `typeof(EfcItemController).GetMethod("ConversationResolverPropertyChanged", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)` is null.
-- [ ] A named test asserts `PopulateConversation` assigns `SetTopicThread` to `ConversationResolver.UpdateUI`, pinning the surviving live route.
-- [ ] No `PropertyChanged +=` subscription to a conversation resolver remains in `EfcItemController.cs`; the block previously at `:666-669` is absent.
-- [ ] The guard literal is not retargeted: `EfcItemController.cs` contains no occurrence of the token `nameof(_dataModel.ConversationResolver.ConversationInfo.Expanded)`.
+- [x] A named test asserts `typeof(EfcItemController).GetMethod("ConversationResolverPropertyChanged", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)` is null.
+- [x] A named test asserts `PopulateConversation` assigns `SetTopicThread` to `ConversationResolver.UpdateUI`, pinning the surviving live route.
+- [x] No `PropertyChanged +=` subscription to a conversation resolver remains in `EfcItemController.cs`; the block previously at `:666-669` is absent.
+- [x] The guard literal is not retargeted: `EfcItemController.cs` contains no occurrence of the token `nameof(_dataModel.ConversationResolver.ConversationInfo.Expanded)`.
 
 ### #463 — WebView2 incognito argument (live at 2 of 3 sites; remedies CORRECTION + DELETION)
 
-- [ ] `EfcItemController` declares `internal const string IncognitoArgument` and `InitializeWebViewAsync` passes that constant rather than a string literal.
-- [ ] A named test asserts `EfcItemController.IncognitoArgument` equals `"--incognito "`, that every character satisfies `c <= 0x7F`, and that the first two characters are both U+002D.
-- [ ] `QfcItemController.ViewerSetup.cs:55` uses two U+002D characters; confirmed by review and by the one-line-diff criterion below.
-- [ ] The EN DASH site at `EfcItemController.cs:184` is removed together with its containing method rather than edited in place.
+- [x] `EfcItemController` declares `internal const string IncognitoArgument` and `InitializeWebViewAsync` passes that constant rather than a string literal.
+- [x] A named test asserts `EfcItemController.IncognitoArgument` equals `"--incognito "`, that every character satisfies `c <= 0x7F`, and that the first two characters are both U+002D.
+- [x] `QfcItemController.ViewerSetup.cs:55` uses two U+002D characters; confirmed by review and by the one-line-diff criterion below.
+- [x] The EN DASH site at `EfcItemController.cs:184` is removed together with its containing method rather than edited in place.
 
 ### #464 — null-guard and async-void boundary defects (primary; A/B/C/E live, D latent)
 
-- [ ] A named test asserts `EfcFormController.DarkMode` on an all-fields-null controller returns `false` and does not throw.
-- [ ] A named test asserts `EfcFormController.ActiveTheme` on an all-fields-null controller returns its backing-field value and does not throw.
-- [ ] A named test asserts `EfcFormController.LoadTheme` on an all-fields-null controller does not throw.
-- [ ] A named test asserts `EfcItemController.DarkMode` on a null-`_globals` controller returns `false` and does not throw.
-- [ ] A named test asserts `EfcItemController.ActiveTheme` and `EfcItemController.LoadTheme` on a null-`_themes` controller do not throw. **(R1 — the two members `issue.md` omits.)**
-- [ ] Each of the five `async void` handlers in `EfcFormController.cs` delegates to an `internal async Task` member; a named test per handler faults the collaborator, asserts the extracted member does not throw, and verifies exactly one invocation of the controller's boundary error sink, whose default delegate is verified by source inspection to be exactly one `logger.Error(message, exception)` call on the pre-existing static logger.
-- [ ] The token `throw;` does not appear inside any `async void` member of `EfcFormController.cs`; the five occurrences previously at `:425`, `:441`, `:457`, `:517` and `:530` are absent.
-- [ ] A named test faults `PopulateFolderCombobox`'s collaborator and asserts the returned task does not fault and one error is logged.
-- [ ] `EfcItemController` declares `internal static void ThrowInitializationFailure(System.Exception)`, and the failure branch of `WebView2Control_CoreWebView2InitializationCompleted` is a one-line adapter over it.
-- [ ] A named test asserts `ThrowInitializationFailure` rethrows the supplied exception with its original stack trace preserved (the rethrown exception's `StackTrace` contains the originating frame).
-- [ ] The token `throw (e.InitializationException)` does not appear in `EfcItemController.cs`.
-- [ ] #464 D is closed by the deletion asserted under #459: no `async void` lambda is registered into `CharActions` anywhere in `EfcItemController.cs`.
+- [x] A named test asserts `EfcFormController.DarkMode` on an all-fields-null controller returns `false` and does not throw.
+- [x] A named test asserts `EfcFormController.ActiveTheme` on an all-fields-null controller returns its backing-field value and does not throw.
+- [x] A named test asserts `EfcFormController.LoadTheme` on an all-fields-null controller does not throw.
+- [x] A named test asserts `EfcItemController.DarkMode` on a null-`_globals` controller returns `false` and does not throw.
+- [x] A named test asserts `EfcItemController.ActiveTheme` and `EfcItemController.LoadTheme` on a null-`_themes` controller do not throw. **(R1 — the two members `issue.md` omits.)**
+- [x] Each of the five `async void` handlers in `EfcFormController.cs` delegates to an `internal async Task` member; a named test per handler faults the collaborator, asserts the extracted member does not throw, and verifies exactly one invocation of the controller's boundary error sink, whose default delegate is verified by source inspection to be exactly one `logger.Error(message, exception)` call on the pre-existing static logger.
+- [x] The token `throw;` does not appear inside any `async void` member of `EfcFormController.cs`; the five occurrences previously at `:425`, `:441`, `:457`, `:517` and `:530` are absent.
+- [x] A named test faults `PopulateFolderCombobox`'s collaborator and asserts the returned task does not fault and one error is logged.
+- [x] `EfcItemController` declares `internal static void ThrowInitializationFailure(System.Exception)`, and the failure branch of `WebView2Control_CoreWebView2InitializationCompleted` is a one-line adapter over it.
+- [x] A named test asserts `ThrowInitializationFailure` rethrows the supplied exception with its original stack trace preserved (the rethrown exception's `StackTrace` contains the originating frame).
+- [x] The token `throw (e.InitializationException)` does not appear in `EfcItemController.cs`.
+- [x] #464 D is closed by the deletion asserted under #459: no `async void` lambda is registered into `CharActions` anywhere in `EfcItemController.cs`.
 
 ### #465 — form-controller lifecycle and selection defects (live; remedies GUARD + CORRECTION)
 
-- [ ] A named test calls `EfcFormController.Cleanup()` twice and asserts no exception is thrown.
-- [ ] A named test asserts `_parentCleanup` is invoked exactly once across two consecutive `Cleanup()` calls (`Times.Once()` on an injected `System.Action`), and that the field is null after the first call.
-- [ ] `RefreshSuggestionsAsync` evaluates `_formViewer.SearchText.Text` on the UI thread before entering `Task.Run`; no member access on `_formViewer` appears inside the `Task.Run` lambda.
-- [ ] A named test exercises the extracted pure matching helper for the search path with no `EfcViewer` instance and asserts the expected matches for a representative input.
-- [ ] `EfcFormController` declares `internal static string[] WithTrashRow(string[] rows)`, and a named test asserts that applying it twice yields exactly one trash row.
-- [ ] A named test drives `ActionDeleteAsync` twice against an injected `_folderRows` and asserts the resulting row set contains exactly one `"Trash to Delete"` entry.
-- [ ] `BindFolderRows` no longer writes its result back into `_folderRows`; the write-back previously at `:879` is absent.
-- [ ] `EfcFormController` declares `internal static bool IsBannerRow(string row)`, and both `IsValidSelection` and `ActionOkAsync` classify through it.
-- [ ] A named test asserts a row of exactly three `=` characters and a row of exactly four `=` characters classify identically in `IsValidSelection` and in `ActionOkAsync`'s guard.
-- [ ] A named test asserts `IsBannerRow` returns `false` for null and for a row shorter than the prefix, without throwing.
-- [ ] `IsBannerRow`'s prefix agrees with `BreadcrumbRowBuilder.BannerPrefix`, and `git diff --name-only` contains no path matching `BreadcrumbRowBuilder`.
+- [x] A named test calls `EfcFormController.Cleanup()` twice and asserts no exception is thrown.
+- [x] A named test asserts `_parentCleanup` is invoked exactly once across two consecutive `Cleanup()` calls (`Times.Once()` on an injected `System.Action`), and that the field is null after the first call.
+- [x] `RefreshSuggestionsAsync` evaluates `_formViewer.SearchText.Text` on the UI thread before entering `Task.Run`; no member access on `_formViewer` appears inside the `Task.Run` lambda.
+- [x] A named test exercises the extracted pure matching helper for the search path with no `EfcViewer` instance and asserts the expected matches for a representative input.
+- [x] `EfcFormController` declares `internal static string[] WithTrashRow(string[] rows)`, and a named test asserts that applying it twice yields exactly one trash row.
+- [x] A named test drives `ActionDeleteAsync` twice against an injected `_folderRows` and asserts the resulting row set contains exactly one `"Trash to Delete"` entry.
+- [x] `BindFolderRows` no longer writes its result back into `_folderRows`; the write-back previously at `:879` is absent.
+- [x] `EfcFormController` declares `internal static bool IsBannerRow(string row)`, and both `IsValidSelection` and `ActionOkAsync` classify through it.
+- [x] A named test asserts a row of exactly three `=` characters and a row of exactly four `=` characters classify identically in `IsValidSelection` and in `ActionOkAsync`'s guard.
+- [x] A named test asserts `IsBannerRow` returns `false` for null and for a row shorter than the prefix, without throwing.
+- [x] `IsBannerRow`'s prefix agrees with `BreadcrumbRowBuilder.BannerPrefix`, and `git diff --name-only` contains no path matching `BreadcrumbRowBuilder`.
 
 ### #466 — dead code and latent NRE traps (latent; remedy DELETION)
 
-- [ ] A named test asserts `typeof(EfcViewer).GetMethod("SetController", BindingFlags.NonPublic | BindingFlags.Instance)` is null and `typeof(EfcViewer).GetField("_formController", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
-- [ ] A named test asserts `typeof(EfcViewer)` declares no method named `EditFiltersMenuItem_Click`.
-- [ ] The Edit Filters subscription at `EfcFormController.cs:398` and its target `EfcFormController.EditFiltersMenuItem_Click` are unchanged; a named test asserts `typeof(EfcFormController)` still declares `EditFiltersMenuItem_Click`.
-- [ ] A named test asserts `typeof(EfcItemController).GetMethod("InitializeWebView", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
-- [ ] A named test asserts `typeof(EfcItemController)` declares no 7-parameter instance constructor.
-- [ ] A named test asserts `typeof(EfcItemController).GetField("_selectorsCtrls", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
-- [ ] The files `QuickFiler/Viewers/EfcViewer3.cs`, `EfcViewer3.Designer.cs` and `EfcViewer3.resx` are absent from the working tree.
-- [ ] `git diff --name-only` for the feature branch contains no entry for `QuickFiler/QuickFiler.csproj`.
+- [x] A named test asserts `typeof(EfcViewer).GetMethod("SetController", BindingFlags.NonPublic | BindingFlags.Instance)` is null and `typeof(EfcViewer).GetField("_formController", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
+- [x] A named test asserts `typeof(EfcViewer)` declares no method named `EditFiltersMenuItem_Click`.
+- [x] The Edit Filters subscription at `EfcFormController.cs:398` and its target `EfcFormController.EditFiltersMenuItem_Click` are unchanged; a named test asserts `typeof(EfcFormController)` still declares `EditFiltersMenuItem_Click`.
+- [x] A named test asserts `typeof(EfcItemController).GetMethod("InitializeWebView", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
+- [x] A named test asserts `typeof(EfcItemController)` declares no 7-parameter instance constructor.
+- [x] A named test asserts `typeof(EfcItemController).GetField("_selectorsCtrls", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
+- [x] The files `QuickFiler/Viewers/EfcViewer3.cs`, `EfcViewer3.Designer.cs` and `EfcViewer3.resx` are absent from the working tree.
+- [x] `git diff --name-only` for the feature branch contains no entry for `QuickFiler/QuickFiler.csproj`.
 
 ### #467 — `ProcessCmdKey` swallows Alt mnemonics (live; remedy GUARD)
 
-- [ ] `EfcViewer` declares `internal static bool ClaimsAltChord(IQfcKeyboardHandler handler, Keys keyData)`, and `ProcessCmdKey` returns `true` only when it returns `true`.
-- [ ] A named test asserts `ClaimsAltChord` returns `true` for a bare Alt chord with a non-null handler.
-- [ ] A named test asserts `ClaimsAltChord` returns `false` for `Keys.Alt | Keys.F` and for `Keys.Alt | Keys.M`, so both mnemonics reach `base.ProcessCmdKey`.
-- [ ] A named test asserts `ClaimsAltChord` returns `false` for a non-Alt chord.
-- [ ] A named test asserts `ClaimsAltChord` returns `false` when the handler is null.
-- [ ] No test in `EfcViewerTests.cs` constructs, shows, or derives from a `System.Windows.Forms.Form`.
-- [ ] The QFC twin is unchanged: `git diff --name-only` contains no entry for `QuickFiler/Viewers/QfcFormViewer.cs` or `QuickFiler/Controllers/QfcFormKeyHandler.cs`.
+- [x] `EfcViewer` declares `internal static bool ClaimsAltChord(IQfcKeyboardHandler handler, Keys keyData)`, and `ProcessCmdKey` returns `true` only when it returns `true`.
+- [x] A named test asserts `ClaimsAltChord` returns `true` for a bare Alt chord with a non-null handler.
+- [x] A named test asserts `ClaimsAltChord` returns `false` for `Keys.Alt | Keys.F` and for `Keys.Alt | Keys.M`, so both mnemonics reach `base.ProcessCmdKey`.
+- [x] A named test asserts `ClaimsAltChord` returns `false` for a non-Alt chord.
+- [x] A named test asserts `ClaimsAltChord` returns `false` when the handler is null.
+- [x] No test in `EfcViewerTests.cs` constructs, shows, or derives from a `System.Windows.Forms.Form`.
+- [x] The QFC twin is unchanged: `git diff --name-only` contains no entry for `QuickFiler/Viewers/QfcFormViewer.cs` or `QuickFiler/Controllers/QfcFormKeyHandler.cs`.
 
 ### Cross-cutting
 
-- [ ] A Phase 0 baseline exists under `docs/features/active/efc-controller-surface-defects-464/evidence/baseline/` recording pre-change analyzer diagnostics, nullable/type-check results, `QuickFiler.Test` pass/fail tally, and coverage.
-- [ ] `dotnet tool run csharpier check .` reports no formatting differences.
-- [ ] The analyzer build introduces **no new diagnostics relative to the Phase 0 baseline**.
-- [ ] The nullable/type-check build (CI's exact command, without `/p:Nullable=enable`) introduces **no new errors relative to the Phase 0 baseline**.
-- [ ] `vstest.console.exe` reports no failure that is not in the Phase 0 `BASELINE_FAILED` set, and the passing-test count is **greater than the Phase 0 baseline count** by at least the number of tests this feature adds.
-- [ ] No pre-existing `[TestMethod]` is deleted or renamed, and no assertion in a pre-existing test is weakened.
-- [ ] Each test file this feature **creates** is under 500 lines. (The ceiling is asserted only over created files; `EfcFormController.cs` and `EfcItemController.cs` are pre-existing violations and are explicitly out of scope.)
-- [ ] `EfcFormController.cs` has at most 1204 lines after the change — its 1084-line merge-base count plus at most 120 net lines for the RC1 guards, the five RC3 boundary extractions, the RC3 `PopulateFolderCombobox` try/catch, and the RC7/RC8/RC9 pure helpers — and the file-size evidence artifact itemises the delivered net delta per remedy against the merge-base count. (The 500-line ceiling is not asserted: this file is a pre-existing violation whose splitting is out of scope.)
-- [ ] `EfcItemController.cs` has **fewer** lines after the change than its 1170-line merge-base count.
-- [ ] The diff for `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs` is **exactly one changed line**, at the incognito literal.
-- [ ] `git diff --name-only` for the feature branch intersected with the sibling-owned path set in §`Scope & Non-Goals` is **empty**.
-- [ ] `EfcFormController.cs:834-837` (the `new WebView2BreadcrumbHost(...)` construction feature #476 depends on) is not moved or reshaped.
-- [ ] No new `[ExcludeFromCodeCoverage]` attribute is added anywhere in the diff.
-- [ ] No interface file is modified: the diff contains no path under `QuickFiler/Interfaces/`.
-- [ ] The tokens `Thread.Sleep` and `Task.Delay` appear in no test file this feature writes.
-- [ ] No test this feature writes creates a temporary file, contacts a live Outlook instance, starts a `BackgroundWorker`, or shows a WinForms form.
-- [ ] `docs/features/active/efc-controller-surface-defects-464/user-story.md` does not exist. (Work mode is `full-bug`; this spec is the sole AC source.)
+- [x] A Phase 0 baseline exists under `docs/features/active/efc-controller-surface-defects-464/evidence/baseline/` recording pre-change analyzer diagnostics, nullable/type-check results, `QuickFiler.Test` pass/fail tally, and coverage.
+- [x] `dotnet tool run csharpier check .` reports no formatting differences.
+- [x] The analyzer build introduces **no new diagnostics relative to the Phase 0 baseline**.
+- [x] The nullable/type-check build (CI's exact command, without `/p:Nullable=enable`) introduces **no new errors relative to the Phase 0 baseline**.
+- [x] `vstest.console.exe` reports no failure that is not in the Phase 0 `BASELINE_FAILED` set, and the passing-test count is **greater than the Phase 0 baseline count** by at least the number of tests this feature adds.
+- [x] No pre-existing `[TestMethod]` is deleted or renamed, and no assertion in a pre-existing test is weakened.
+- [x] Each test file this feature **creates** is under 500 lines. (The ceiling is asserted only over created files; `EfcFormController.cs` and `EfcItemController.cs` are pre-existing violations and are explicitly out of scope.)
+- [x] `EfcFormController.cs` has at most 1204 lines after the change — its 1084-line merge-base count plus at most 120 net lines for the RC1 guards, the five RC3 boundary extractions, the RC3 `PopulateFolderCombobox` try/catch, and the RC7/RC8/RC9 pure helpers — and the file-size evidence artifact itemises the delivered net delta per remedy against the merge-base count. (The 500-line ceiling is not asserted: this file is a pre-existing violation whose splitting is out of scope.)
+- [x] `EfcItemController.cs` has **fewer** lines after the change than its 1170-line merge-base count.
+- [x] The diff for `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs` is **exactly one changed line**, at the incognito literal.
+- [x] `git diff --name-only` for the feature branch intersected with the sibling-owned path set in §`Scope & Non-Goals` is **empty**.
+- [x] `EfcFormController.cs:834-837` (the `new WebView2BreadcrumbHost(...)` construction feature #476 depends on) is not moved or reshaped.
+- [x] No new `[ExcludeFromCodeCoverage]` attribute is added anywhere in the diff.
+- [x] No interface file is modified: the diff contains no path under `QuickFiler/Interfaces/`.
+- [x] The tokens `Thread.Sleep` and `Task.Delay` appear in no test file this feature writes.
+- [x] No test this feature writes creates a temporary file, contacts a live Outlook instance, starts a `BackgroundWorker`, or shows a WinForms form.
+- [x] `docs/features/active/efc-controller-surface-defects-464/user-story.md` does not exist. (Work mode is `full-bug`; this spec is the sole AC source.)
 
 ---
 

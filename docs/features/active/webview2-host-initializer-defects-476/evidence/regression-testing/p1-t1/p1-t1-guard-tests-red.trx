@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="d66e8dcf-bc78-4d24-9bb4-d17af029503e" name="USER@HOST 2026-08-27 16:08:48" runUser="HOST\USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T16:08:48.1511889-04:00" queuing="2026-08-27T16:08:48.1511889-04:00" start="2026-08-27T16:08:46.7390539-04:00" finish="2026-08-27T16:08:48.1677388-04:00" />
+  <TestSettings name="default" id="8122cd48-7507-41e6-8b57-c713bdc4926e">
+    <Deployment runDeploymentRoot="USER_HOST_2026-08-27_16_08_48" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="1df88750-2c81-4e0b-af6b-596c0c8a3d6d" testId="1fdffeab-57dd-8cf9-99d3-aaa9532e9305" testName="CreateEnvironmentAsync_WhitespaceCacheFolder_ThrowsArgumentException" computerName="HOST" duration="00:00:00.0046663" startTime="2026-08-27T16:08:47.9919659-04:00" endTime="2026-08-27T16:08:47.9959659-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1df88750-2c81-4e0b-af6b-596c0c8a3d6d">
+      <Output>
+        <ErrorInfo>
+          <Message>Expected System.ArgumentException because a whitespace cacheFolder cannot name a user-data folder, and ThrowExactly is required because ArgumentNullException derives from ArgumentException, but no exception was thrown.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Specialized.DelegateAssertions`2.ThrowExactly[TException](String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 135&#xD;
+   at QuickFiler.Controllers.Tests.WebView2CoreInitializerTests.CreateEnvironmentAsync_WhitespaceCacheFolder_ThrowsArgumentException() in C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\Controllers\WebView2CoreInitializerTests.cs:line 72</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="659db963-222a-4f49-819c-eb8915132b9a" testId="1b195767-4edd-8b3f-a4eb-0291ceaa00c3" testName="CreateEnvironmentAsync_NullCacheFolder_ThrowsArgumentNullException" computerName="HOST" duration="00:00:00.1450164" startTime="2026-08-27T16:08:47.7255803-04:00" endTime="2026-08-27T16:08:47.9853575-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="659db963-222a-4f49-819c-eb8915132b9a">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Expected a &lt;System.ArgumentNullException&gt; to be thrown because a null cacheFolder is a caller defect and must surface with its parameter name instead of a less specific SDK failure, but no exception was thrown.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Specialized.DelegateAssertionsBase`2.&lt;&gt;c__DisplayClass8_0`1.&lt;ThrowInternal&gt;b__0(AssertionChain chain) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 47&#xD;
+   at FluentAssertions.Execution.AssertionChain.WithExpectation(String message, Action`1 chain, Object[] args) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 192&#xD;
+   at FluentAssertions.Specialized.DelegateAssertionsBase`2.ThrowInternal[TException](Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 56&#xD;
+   at FluentAssertions.Specialized.DelegateAssertions`2.Throw[TException](String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 74&#xD;
+   at QuickFiler.Controllers.Tests.WebView2CoreInitializerTests.CreateEnvironmentAsync_NullCacheFolder_ThrowsArgumentNullException() in C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\Controllers\WebView2CoreInitializerTests.cs:line 45</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="1314197f-84a9-4997-aadd-9da90094da5a" testId="124402b4-1fc2-853b-92fa-c74906568b12" testName="EnsureCoreWebView2Async_NullControl_ThrowsArgumentNullException" computerName="HOST" duration="00:00:00.0029319" startTime="2026-08-27T16:08:47.9969669-04:00" endTime="2026-08-27T16:08:48.0039207-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1314197f-84a9-4997-aadd-9da90094da5a">
+      <Output>
+        <ErrorInfo>
+          <Message>Expected a &lt;System.ArgumentNullException&gt; to be thrown because a null control previously produced a bare NullReferenceException with no parameter name, against the convention of every sibling seam, but found &lt;System.NullReferenceException&gt;:&#xD;
+System.NullReferenceException: Object reference not set to an instance of an object.&#xD;
+   at QuickFiler.Viewers.WebView2CoreInitializer.EnsureCoreWebView2Async(WebView2 control, CoreWebView2Environment environment) in C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler\Viewers\WebView2CoreInitializer.cs:line 28&#xD;
+   at QuickFiler.Controllers.Tests.WebView2CoreInitializerTests.&lt;&gt;c__DisplayClass3_0.&lt;EnsureCoreWebView2Async_NullControl_ThrowsArgumentNullException&gt;b__0() in C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\Controllers\WebView2CoreInitializerTests.cs:line 94&#xD;
+   at FluentAssertions.Specialized.DelegateAssertions`2.InvokeSubjectWithInterception() in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 173.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Execution.AssertionChain.WithExpectation(String message, Action`1 chain, Object[] args) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 192&#xD;
+   at FluentAssertions.Specialized.DelegateAssertionsBase`2.ThrowInternal[TException](Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 56&#xD;
+   at FluentAssertions.Specialized.DelegateAssertions`2.Throw[TException](String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 74&#xD;
+   at QuickFiler.Controllers.Tests.WebView2CoreInitializerTests.EnsureCoreWebView2Async_NullControl_ThrowsArgumentNullException() in C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\Controllers\WebView2CoreInitializerTests.cs:line 98</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="CreateEnvironmentAsync_NullCacheFolder_ThrowsArgumentNullException" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1b195767-4edd-8b3f-a4eb-0291ceaa00c3">
+      <Execution id="659db963-222a-4f49-819c-eb8915132b9a" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.WebView2CoreInitializerTests" name="CreateEnvironmentAsync_NullCacheFolder_ThrowsArgumentNullException" />
+    </UnitTest>
+    <UnitTest name="EnsureCoreWebView2Async_NullControl_ThrowsArgumentNullException" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="124402b4-1fc2-853b-92fa-c74906568b12">
+      <Execution id="1314197f-84a9-4997-aadd-9da90094da5a" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.WebView2CoreInitializerTests" name="EnsureCoreWebView2Async_NullControl_ThrowsArgumentNullException" />
+    </UnitTest>
+    <UnitTest name="CreateEnvironmentAsync_WhitespaceCacheFolder_ThrowsArgumentException" storage="c:\users\USER\repos\taskmaster\.claude\worktrees\agent-addb1ac138c7882d0\quickfiler.test\bin\debug\quickfiler.test.dll" id="1fdffeab-57dd-8cf9-99d3-aaa9532e9305">
+      <Execution id="1df88750-2c81-4e0b-af6b-596c0c8a3d6d" />
+      <TestMethod codeBase="C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.WebView2CoreInitializerTests" name="CreateEnvironmentAsync_WhitespaceCacheFolder_ThrowsArgumentException" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1fdffeab-57dd-8cf9-99d3-aaa9532e9305" executionId="1df88750-2c81-4e0b-af6b-596c0c8a3d6d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b195767-4edd-8b3f-a4eb-0291ceaa00c3" executionId="659db963-222a-4f49-819c-eb8915132b9a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="124402b4-1fc2-853b-92fa-c74906568b12" executionId="1314197f-84a9-4997-aadd-9da90094da5a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="3" executed="3" passed="0" failed="3" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\USER\repos\TaskMaster\.claude\worktrees\agent-addb1ac138c7882d0\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

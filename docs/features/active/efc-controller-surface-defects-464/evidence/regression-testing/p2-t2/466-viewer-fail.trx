@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="ca6113b5-f970-4abf-a001-2097c16e2610" name="<user>@<host> 2026-08-27 20:17:27" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T20:17:27.5466972-04:00" queuing="2026-08-27T20:17:27.5466972-04:00" start="2026-08-27T20:17:26.3029957-04:00" finish="2026-08-27T20:17:27.5637293-04:00" />
+  <TestSettings name="default" id="285bc7df-528e-4943-93d1-a0447e552fbc">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-27_20_17_27" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="cedc7109-ae26-4814-9334-8944caf4b211" testId="1e97a8fe-cf88-8f33-bf3d-010a57c3f243" testName="SetControllerAndFormControllerField_AreAbsentFromEfcViewerMetadata" computerName="<host>" duration="00:00:00.1287916" startTime="2026-08-27T20:17:27.2329678-04:00" endTime="2026-08-27T20:17:27.4716207-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cedc7109-ae26-4814-9334-8944caf4b211">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Expected setController to be &lt;null&gt; because SetController has no call site, so #466 A closes it by removal, but found EfcViewer.SetController.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Primitives.ReferenceTypeAssertions`2.BeNull(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/ReferenceTypeAssertions.cs:line 49&#xD;
+   at QuickFiler.Controllers.Tests.EfcViewerTests.SetControllerAndFormControllerField_AreAbsentFromEfcViewerMetadata() in <repo-root>\QuickFiler.Test\Controllers\EfcViewerTests.cs:line 46</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="fb01dff5-e8ed-4ae5-9443-8806d60430c4" testId="1890617f-6733-8340-bd56-4153b7ddb900" testName="FormEditFiltersMenuItemClick_IsStillDeclaredOnEfcFormController" computerName="<host>" duration="00:00:00.0004417" startTime="2026-08-27T20:17:27.4876760-04:00" endTime="2026-08-27T20:17:27.4917253-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fb01dff5-e8ed-4ae5-9443-8806d60430c4" />
+    <UnitTestResult executionId="4bf6e8cb-6173-461f-83e3-797f0220c844" testId="18fe4a37-a25c-8377-9f10-474f51ba3709" testName="EditFiltersMenuItemClick_IsAbsentFromEfcViewerMetadata" computerName="<host>" duration="00:00:00.0097809" startTime="2026-08-27T20:17:27.4776212-04:00" endTime="2026-08-27T20:17:27.4876760-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4bf6e8cb-6173-461f-83e3-797f0220c844">
+      <Output>
+        <ErrorInfo>
+          <Message>Expected viewerSideHandlers to be empty because the viewer-side Edit Filters handler is a latent null-dereference trap and #466 A removes it, but found at least one item {EfcViewer.EditFiltersMenuItem_Click}.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Execution.GivenSelector`1.FailWith(String message, Object[] args) in /_/Src/FluentAssertions/Execution/GivenSelector.cs:line 75&#xD;
+   at FluentAssertions.Execution.AssertionChain.WithExpectation(String message, Action`1 chain, Object[] args) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 192&#xD;
+   at FluentAssertions.Collections.GenericCollectionAssertions`3.BeEmpty(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Collections/GenericCollectionAssertions.cs:line 300&#xD;
+   at QuickFiler.Controllers.Tests.EfcViewerTests.EditFiltersMenuItemClick_IsAbsentFromEfcViewerMetadata() in <repo-root>\QuickFiler.Test\Controllers\EfcViewerTests.cs:line 75</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="EditFiltersMenuItemClick_IsAbsentFromEfcViewerMetadata" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="18fe4a37-a25c-8377-9f10-474f51ba3709">
+      <Execution id="4bf6e8cb-6173-461f-83e3-797f0220c844" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcViewerTests" name="EditFiltersMenuItemClick_IsAbsentFromEfcViewerMetadata" />
+    </UnitTest>
+    <UnitTest name="FormEditFiltersMenuItemClick_IsStillDeclaredOnEfcFormController" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1890617f-6733-8340-bd56-4153b7ddb900">
+      <Execution id="fb01dff5-e8ed-4ae5-9443-8806d60430c4" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcViewerTests" name="FormEditFiltersMenuItemClick_IsStillDeclaredOnEfcFormController" />
+    </UnitTest>
+    <UnitTest name="SetControllerAndFormControllerField_AreAbsentFromEfcViewerMetadata" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e97a8fe-cf88-8f33-bf3d-010a57c3f243">
+      <Execution id="cedc7109-ae26-4814-9334-8944caf4b211" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcViewerTests" name="SetControllerAndFormControllerField_AreAbsentFromEfcViewerMetadata" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1e97a8fe-cf88-8f33-bf3d-010a57c3f243" executionId="cedc7109-ae26-4814-9334-8944caf4b211" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1890617f-6733-8340-bd56-4153b7ddb900" executionId="fb01dff5-e8ed-4ae5-9443-8806d60430c4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18fe4a37-a25c-8377-9f10-474f51ba3709" executionId="4bf6e8cb-6173-461f-83e3-797f0220c844" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="3" executed="3" passed="1" failed="2" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
