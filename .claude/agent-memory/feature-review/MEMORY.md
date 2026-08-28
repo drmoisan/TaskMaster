@@ -74,6 +74,7 @@
 
 - [501-review-residuals](project_501-review-residuals.md) — PASS/0 blocking; "no compliant test placement" premise failed (HubCoverageTests 478/500 unexamined); redundant Abandon = coverage without assertion power; full-suite logs uncommitted; post-501 baseline 85.1448/79.2202
 - [464-review-residuals](project_464-review-residuals.md) — PASS/0 blocking; 7 promotions owed (RC7 EfcSelectionGuard "===" arity); Cobertura deleted-but-verified; shared info/exclude trap → commit artifacts on feature branch
+- [489-review-residuals](project_489-review-residuals.md) — cycle-1 reaudit GO/0 blocking; RC-1 cured (RED TRX committed with test, fix next commit = provable RED-first); commit-per-phase vs single-commit plan text judged on intent; amend the referenced table when an AC delegates to it
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.

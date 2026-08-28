@@ -20,6 +20,14 @@ have produced a false verification result (the deliberate defect would have fail
 contradicting the P4-T5 acceptance criterion). Caught before the defect was introduced by
 re-checking with the Grep tool.
 
+**Sibling trap — grep strips CR, so it cannot measure line endings (measured 2026-08-28, #489):**
+`grep -c $'\r$' spec.md` returned **0** and `grep -vc $'\r$'` returned **879** on a file that is
+pure CRLF, because MSYS grep opens in text mode and discards the CR before matching. Reported
+naively this would have said "the file is LF-only" about a file the task required to STAY CRLF —
+and any 'fix' would have rewritten all 879 lines. Measure line endings from raw bytes only:
+`tr -cd '\r' < f | wc -c` against `tr -cd '\n' < f | wc -c` (879/879 = pure CRLF), and check the
+BOM with `head -c 3 f | xxd`.
+
 **How to apply:** always use the `Grep` tool (ripgrep-based), never bash/GNU `grep`, for any
 `^`-anchored line-start pattern search across this repo's `.cs` files — especially when the result
 selects a candidate file for a verification step whose correctness depends on the classification

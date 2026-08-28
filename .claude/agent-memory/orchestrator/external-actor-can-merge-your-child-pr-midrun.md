@@ -15,6 +15,16 @@ Discovering this only at `git push` time (the branch showed `1 behind / 2 ahead`
 base-only commit was literally `Merge pull request #659`) is late but recoverable; discovering it
 after opening a duplicate PR is not.
 
+**Recurrence (child 488, 2026-08-28) — the window is smaller than you think.** PR #672 was verified
+OPEN/MERGEABLE, CI run 33150408095 concluded `success` at 07:14:00Z, the base was re-confirmed
+0-behind at 07:14:31Z, and the owner merged at 07:15:20Z — inside the ~3 minutes between the gate
+check and the `gh pr merge` call. So re-read PR state *immediately before merging*, not only before
+the CI gate. Two things made this benign and are worth reproducing: the external merge landed AFTER
+the gate concluded green (check `mergedAt` against the run's completion time before claiming the merge
+was gated), and nothing was stranded because all evidence was committed before PR creation, so no
+follow-up PR was needed. The fidelity proof was a true two-parent merge whose tree hash equalled HEAD's
+exactly, with an empty `git diff <merge> HEAD`.
+
 **How to apply:**
 
 - When the base tip moves, always `git log --oneline origin/<base> ^HEAD` before re-merging. A single

@@ -1,127 +1,128 @@
 # Atomic Executor Memory Index
 
 ## Plan validation & gates
-- [A blocked Bash command drops a chained check-off](project_blocked_bash_command_silently_drops_chained_checkoff.md) — the guard aborts the WHOLE line before anything runs; [P7-T4] stayed unchecked with no error naming it
-- [CSharpier chain-wrap defeats single-line search gates](project_csharpier_chain_wrap_defeats_singleline_search_gates.md) — a zero-hit gate on
-- [Verify line citations with numbered output](feedback_verify_line_citations_with_numbered_output.md) — never hand-count from a `sed` window; a wrong #438 advisory got applied and corrupted 3 correct
-- [Extract gate literals from the plan, never re-type them](project_preflight_gate_literal_extract_from_plan_not_retype.md) — bash/pwsh quoting
-- [Tool layer collapses `\` in file content](project_tool_layer_collapses_double_backslash_in_file_content.md) — heredocs and Write silently halve
-- [Self-derived gate thresholds are blind](project_preflight_selfderived_gate_thresholds_are_blind.md) — a "count >= floor" gate whose floor comes from the runs it validates is deflation-blind
-- [Multi-pattern gates detach shared qualifiers](project_multipattern_gate_shared_qualifier_detachment.md) — rewriting one clause re-scopes the trailing allowlist to the last pattern only; restate the
-- [Follow-up promotion task is unexecutable by the executor](project_followup_promotion_task_is_unexecutable_by_executor.md) — no MCP tool, the intake doc breaches the scope gate, and "promote" in a commit message aborts the whole Bash line
-- [Plan check-off fixpoint breaks terminal clean-tree gates](project_plan_checkoff_fixpoint_breaks_terminal_clean_tree_gate.md) — a commit task's own check-off post-dates its commit; flip the last checkboxes BEFORE the final commit
-- [Merge-base diff gates need a commit cadence](project_preflight_mergebase_diff_gates_need_commit_cadence.md) — `<MERGE_BASE>..HEAD` gates are vacuous while HEAD == merge-base; plan an explicit commit task
-- [BASELINE_SHA diff conflates the merged base](project_baseline_sha_diff_conflates_merged_base.md) — after an integration merge use `<base>..HEAD` for scope gates; 250 paths vs 78, 6 production vs 3
-- [Inserted plan tasks force renumbering](project_plan_task_ids_digit_only_forces_renumbering.md) — suffixed IDs (`P3-T5a`) fail validation; say "insert + renumber downstream", then verify
-- [Plan rationale clauses are evidence](project_418_plan_rationale_clauses_are_evidence.md) — #418 needed 3 preflight passes; all blockers were unmeasured world-state claims in prose, never in
-- [Bugfix phase grows the file anyway](project_bugfix_phase_grows_the_file_despite_dead_code_removal.md) — a dead-code removal opens the plan, but guards + helpers + XML docs add more back; a "feature reduces the excess" clause is unsatisfiable
-- [Banned-API zero-hit gate hits doc comments](project_banned_api_zero_hit_gate_hits_doc_comments.md) — Thread.Sleep/ShowDialog literals appear in `///` lines saying the API is NOT used; measure comment-stripped and report both
-- [AC check-off "inline pointer" + artifacts/ tool-output paths](project_preflight_ac_checkoff_and_tooloutput_paths.md) — inline evidence pointer in an AC task violates the tracking skill; artifacts/*/coverage XML is a
-- [Exact-count gate vs remediation loop](project_exact_count_gate_vs_remediation_loop.md) — a pinned `TotalCount = 19` collides with an "add tests and restart" remediation path; use `B + N`
-- [Tracked agent-memory breaks unscoped git gates](project_agent_memory_tracked_breaks_unscoped_git_gates.md) — `.claude/agent-memory/**` is tracked + dirty; every git diff/status gate needs an explicit pathspec
-- [Absolute-zero gate on a sibling-owned assembly + pinned WS](project_preflight_absolute_zero_gate_on_sibling_owned_assembly.md) — `Failed 0` on an assembly a sibling owns is unsatisfiable; never pin an absolute WS in preparation
-- [#418 500-line gate vs mandated plan content](project_418_500line_gate_vs_plan_content.md) — P1-T19 unsatisfiable (193 new lines into 146 headroom); per-block logging clauses block
-- [#207 Hook() redesign breaks AppEventsTests](project_207_hook_redesign_breaks_appeventstests.md) — needs a plan revision, not a test weakening
-- [C2 capacity budget drifts mid-plan](project_c2_capacity_budget_drifts_mid_plan.md) — planning-time per-file line baselines are stale by later phases; allocate ALL remaining tests up
-- [ApplicationGlobalsTests.cs at 500-line ceiling](project_appglobalstests_at_500_line_ceiling.md) — exactly 500 lines; adding a Testable* override requires extraction first
-- [#376 capstone scope-expansion layers](project_376_capstone_scope_expansion_layers.md) — 5 escalated layers resolved via the 3 authorized patterns
-- [Swordfish F5 test misclassification](project_swordfish_f5_test_misclassification.md) — verify using/namespace before treating a removal as
+- [Blocked Bash command drops chained check-off](project_blocked_bash_command_silently_drops_chained_checkoff.md) — aborts the WHOLE line, silently
+- [CSharpier chain-wrap defeats single-line search gates](project_csharpier_chain_wrap_defeats_singleline_search_gates.md) — zero-hit gate goes vacuous
+- [Verify line citations with numbered output](feedback_verify_line_citations_with_numbered_output.md) — never hand-count from a `sed` window
+- [Extract gate literals from the plan, never re-type](project_preflight_gate_literal_extract_from_plan_not_retype.md) — quoting drift
+- [Tool layer collapses `\` in file content](project_tool_layer_collapses_double_backslash_in_file_content.md) — heredocs and Write halve it
+- [Self-derived gate thresholds are blind](project_preflight_selfderived_gate_thresholds_are_blind.md) — floor from the runs it validates
+- [Multi-pattern gates detach shared qualifiers](project_multipattern_gate_shared_qualifier_detachment.md) — allowlist re-scopes to last pattern
+- [Follow-up promotion task is unexecutable](project_followup_promotion_task_is_unexecutable_by_executor.md) — no MCP tool; "promote" kills the line
+- [Plan check-off fixpoint breaks clean-tree gates](project_plan_checkoff_fixpoint_breaks_terminal_clean_tree_gate.md) — flip last boxes BEFORE the commit
+- [Merge-base diff gates need a commit cadence](project_preflight_mergebase_diff_gates_need_commit_cadence.md) — vacuous while HEAD == merge-base
+- [BASELINE_SHA diff conflates the merged base](project_baseline_sha_diff_conflates_merged_base.md) — use `<base>..HEAD` after an integration merge
+- [Inserted plan tasks force renumbering](project_plan_task_ids_digit_only_forces_renumbering.md) — suffixed IDs (`P3-T5a`) fail validation
+- [Plan rationale clauses are evidence](project_418_plan_rationale_clauses_are_evidence.md) — blockers hide as prose world-state claims
+- [Bugfix phase grows the file anyway](project_bugfix_phase_grows_the_file_despite_dead_code_removal.md) — "reduces the excess" is unsatisfiable
+- [Banned-API zero-hit gate hits doc comments](project_banned_api_zero_hit_gate_hits_doc_comments.md) — measure comment-stripped, report both
+- [AC check-off + artifacts/ tool-output paths](project_preflight_ac_checkoff_and_tooloutput_paths.md) — inline AC pointer breaks the skill
+- [Exact-count gate vs remediation loop](project_exact_count_gate_vs_remediation_loop.md) — a pinned total blocks "add tests and restart"
+- [Artifact Output Summary breaks its own count gate](project_artifact_output_summary_breaks_its_own_exact_count_gate.md) — restating the literal makes `-c` report 2
+- [Tracked agent-memory breaks unscoped git gates](project_agent_memory_tracked_breaks_unscoped_git_gates.md) — every git gate needs a pathspec
+- [Absolute-zero gate on a sibling-owned assembly](project_preflight_absolute_zero_gate_on_sibling_owned_assembly.md) — unsatisfiable; never pin a WS
+- [#418 500-line gate vs mandated plan content](project_418_500line_gate_vs_plan_content.md) — 193 new lines into 146 headroom
+- [#207 Hook() redesign breaks AppEventsTests](project_207_hook_redesign_breaks_appeventstests.md) — revise the plan, don't weaken the test
+- [C2 capacity budget drifts mid-plan](project_c2_capacity_budget_drifts_mid_plan.md) — planning-time line baselines go stale
+- [ApplicationGlobalsTests.cs at 500-line ceiling](project_appglobalstests_at_500_line_ceiling.md) — extraction first
+- [#376 capstone scope-expansion layers](project_376_capstone_scope_expansion_layers.md) — 5 layers, 3 authorized patterns
+- [Swordfish F5 test misclassification](project_swordfish_f5_test_misclassification.md) — check using/namespace before removal
 
 ## Build / toolchain environment
-- [pwsh/git/gh CLI gotchas](project_pwsh_git_gh_cli_gotchas.md) — jq NOT installed (only `gh --jq`); pwsh won't concatenate `$(git merge-base ...)..HEAD`; bare
-- [Project Build/Test Env](project_build_test_env.md) — git-bash quirks (MSBuild switches, MSYS_NO_PATHCONV), csharpier v1 syntax, legacy csproj Compile
-- [Start-Process -ArgumentList array strips quoting](project_startprocess_arglist_array_strips_quoting.md) — a detached msbuild launch loses `"/p:Platform=Any CPU"` and dies MSB1008 having compiled nothing;
-- [VS18 build/test toolchain paths](project_vs18_build_toolchain_paths.md) — use VS **18** full-framework msbuild.exe (not .dotnet-sdk, dies on binary resx MSB3822); nuget.exe
-- [Repo-local SDK install + nullable Rebuild](project_repo_sdk_and_nullable_rebuild.md) — .dotnet-sdk install needs pwsh7; csharpier check/format subcommands; nullable debt scope NOT stable
-- [QuickFiler.Test coverage hang + build flags](project_quickfiler_test_coverage_hang_and_build_flags.md) — full-assembly /EnableCodeCoverage can hang the testhost (retry works); project-level msbuild needs
-- [vstest TestCaseFilter OR-vs-pipe + fresh-worktree bootstrap](project_vstest_testcasefilter_or_operator_and_env_setup.md) — vstest rejects `OR`, needs `|`; fresh worktree needs restore + global `dotnet-coverage`
-- [Test file name != partial class name](project_test_file_name_vs_partial_class_name.md) — a `*Tests.cs` split for the 500-line limit often declares a partial of ANOTHER type; a `FullyQualifiedName~<FileName>` filter matches 0 tests and exits 0
-- [Analyzer HintPath skew breaks all four gates](project_analyzer_hintpath_skew_breaks_all_four_gates.md) — a NuGet bump updates packages.config but not `<Analyzer Include>`; CS0006 + `/t:Rebuild` clean cascades into the nullable, vstest AND coverage baselines
-- [Analyzer version skew on fresh worktree](project_analyzer_version_skew_fresh_worktree.md) — analyzer build can fail CS0006 when csproj `<Analyzer Include>` HintPaths diverge from
-- [SecurityCodeScan incompatible with Roslyn 5.6](project_securitycodescan_roslyn56_incompat.md) — SecurityCodeScan.VS2019 5.6.7 throws CS8032/YamlDotNet under VS18, breaking TWAE;
-- [Missing VSTO runtime breaks baseline gates](project_missing_vsto_runtime_breaks_baseline_gates.md) — HISTORICAL, not reproducing 2026-08-08; build before citing
-- [New sln member surfaces MSB3277](project_new_sln_member_surfaces_msb3277_pin_divergence.md) — wiring an unbuilt legacy test project into the sln emits a new MSB3277 when packages.config pins
-- [Legacy csproj: no transitive compile refs](project_legacy_csproj_no_transitive_compile_refs.md) — non-SDK ProjectReference doesn't flow package types to csc (CS0012 despite copy-local DLL); tests
-- [sln/csproj edits: preserve CRLF](project_sln_csproj_edit_crlf_preserve.md) — git-bash `sed -i` strips CRLF from TaskMaster.sln (churn + BOM loss); use Edit or `perl -0777` w/
-- [Relative paths in pwsh helpers hit the wrong worktree](project_relative_path_in_pwsh_dotnet_io_hits_wrong_worktree.md) — Set-Location does not move .NET's CurrentDirectory; a helper script silently read the SESSION worktree's csproj
-- [Incremental build makes a vacuous baseline](project_incremental_build_vacuous_baseline.md) — Invoke-VSBuild's /t:Build up-to-date check ignores /p: changes → EXIT 0 with 0 CoreCompile; add
-- [Nullable /t:Build gate is vacuous](project_nullable_build_gate_is_vacuous_incremental.md) — standard nullable gate passes without type-checking; isolated `/t:Rebuild` exposed 223 errors (no
-- [CSharpier skips *.Designer.cs by filename](project_csharpier_skips_designer_cs_by_filename.md) — generated-file detection, not `.csharpierignore`; prove it with a single-file check printing `Checked 0 files`
-- [CSharpier 1.3.0 formats XML at 100 cols](project_csharpier_formats_xml_print_width.md) — a "reformatting churn" finding on an XML resource can be formatter-mandated; measure line length +
-- [Evidence <TS> collision clobbers committed artifacts](project_evidence_timestamp_collision_clobbers_artifacts.md) — same-day remediation silently overwrites implementation evidence; a ` M` under evidence/ means
-- [csharpier pipe-files is a non-enforcing gate](project_csharpier_pipefiles_nonenforcing_gate.md) — use `csharpier check`/`format`; tests balloon past 500 lines under genuine format (size new files
-- [Count-idiom pitfalls: csharpier + Measure-Object](project_count_idiom_pitfalls_csharpier_and_measureobject.md) — "Formatted N files" is a PROCESSED count (hash before/after for rewrites); `Measure-Object -Line`
-- [PowerShell new files need UTF-8 BOM](powershell-bom-required.md) — PSScriptAnalyzer enforces PSUseBOMForUnicodeEncodedFile; prepend BOM after Write or restart the
-- [poshqc test MCP carries no verdict and no numbers](project_poshqc_pester_mcp_exit_minus1.md) — returns only {ok,tool,workspace_root,summary} - no exit code/counts, so any EXIT_CODE or count gate
-- [poshqc analyze exits 1 on a Warning](project_poshqc_analyze_exit1_on_warning.md) — "EXIT_CODE 0 with zero error-severity" is self-contradictory; Helpers.ps1 carries a pre-existing
-- [BOM breaks grep ^ anchor](project_bom_grep_anchor_false_negative.md) — bash grep `^#nullable` misses BOM-prefixed files; use the Grep tool for opt-in classification,
-- [StrictMode Latest + missing XML attribute throws](project_pester_strictmode_xml_attribute_property_access.md) — a fixture missing `branch`/`complexity` throws PropertyNotFoundStrict; enumerate ALL bare
-- [Pester 5 result shape: no container .Tests, no -CI + -CodeCoverage](project_pester5_result_shape_container_tests_and_ci_codecoverage.md) — `$_.Tests.Count` renders 0 per file (use TotalCount); `-CI` and `-CodeCoverage` are different
-- [Bash heredoc collapses `\\` to `\`](project_bash_heredoc_collapses_doubled_backslashes.md) — even with a quoted delimiter; turned `"\\bin\\Debug\\"` into a word-boundary assertion (0
-- [pwsh -Command needs single-quoted outer](project_pwsh_command_quoting_from_bash.md) — a double-quoted outer wrapper lets bash eat `$` → empty counts + inverted exit gates or a hard
-- [pwsh -File binds a list as ONE string](project_pwsh_file_array_param_from_bash.md) — `-Tokens a,b,c` gives a 1-element array, so a gate counter
-
-- [Compile-time red needs body-level refs](project_compile_red_needs_body_level_references.md) — a missing type in a method SIGNATURE suppresses body binding, so an `[expect-fail]` task requiring
+- [pwsh/git/gh CLI gotchas](project_pwsh_git_gh_cli_gotchas.md) — no jq; pwsh won't concatenate `$(git merge-base ...)..HEAD`
+- [Project Build/Test Env](project_build_test_env.md) — git-bash MSBuild switches, MSYS_NO_PATHCONV, csharpier v1
+- [Start-Process -ArgumentList strips quoting](project_startprocess_arglist_array_strips_quoting.md) — loses `"/p:Platform=Any CPU"`, MSB1008
+- [VS18 build/test toolchain paths](project_vs18_build_toolchain_paths.md) — VS18 full-framework msbuild, not .dotnet-sdk
+- [Repo-local SDK install + nullable Rebuild](project_repo_sdk_and_nullable_rebuild.md) — .dotnet-sdk needs pwsh7
+- [QuickFiler.Test coverage hang + build flags](project_quickfiler_test_coverage_hang_and_build_flags.md) — testhost can hang; retry works
+- [vstest TestCaseFilter needs `|` not OR](project_vstest_testcasefilter_or_operator_and_env_setup.md) — plus fresh-worktree bootstrap
+- [Test file name != partial class name](project_test_file_name_vs_partial_class_name.md) — a name filter matches 0 tests and exits 0
+- [Analyzer HintPath skew breaks all four gates](project_analyzer_hintpath_skew_breaks_all_four_gates.md) — CS0006 cascades into every baseline
+- [Analyzer version skew on fresh worktree](project_analyzer_version_skew_fresh_worktree.md) — CS0006 from diverged HintPaths
+- [SecurityCodeScan incompatible with Roslyn 5.6](project_securitycodescan_roslyn56_incompat.md) — CS8032/YamlDotNet breaks TWAE
+- [Missing VSTO runtime breaks baseline gates](project_missing_vsto_runtime_breaks_baseline_gates.md) — HISTORICAL; build before citing
+- [New sln member surfaces MSB3277](project_new_sln_member_surfaces_msb3277_pin_divergence.md) — from packages.config pin divergence
+- [Legacy csproj: no transitive compile refs](project_legacy_csproj_no_transitive_compile_refs.md) — CS0012 despite a copy-local DLL
+- [sln/csproj edits: preserve CRLF](project_sln_csproj_edit_crlf_preserve.md) — `sed -i` strips CRLF; use Edit or `perl -0777`
+- [Relative paths in pwsh hit the wrong worktree](project_relative_path_in_pwsh_dotnet_io_hits_wrong_worktree.md) — Set-Location ≠ .NET CurrentDirectory
+- [Incremental build makes a vacuous baseline](project_incremental_build_vacuous_baseline.md) — /t:Build ignores /p: changes
+- [Nullable /t:Build gate is vacuous](project_nullable_build_gate_is_vacuous_incremental.md) — `/t:Rebuild` exposed 223 hidden errors
+- [CSharpier skips *.Designer.cs by filename](project_csharpier_skips_designer_cs_by_filename.md) — generated detection, not the ignore file
+- [CSharpier 1.3.0 formats XML at 100 cols](project_csharpier_formats_xml_print_width.md) — "churn" can be formatter-mandated
+- [Evidence <TS> collision clobbers artifacts](project_evidence_timestamp_collision_clobbers_artifacts.md) — same-day remediation overwrites
+- [csharpier pipe-files is a non-enforcing gate](project_csharpier_pipefiles_nonenforcing_gate.md) — use `csharpier check`/`format`
+- [Count-idiom pitfalls: csharpier + Measure-Object](project_count_idiom_pitfalls_csharpier_and_measureobject.md) — "Formatted N" is a PROCESSED count
+- [PowerShell new files need UTF-8 BOM](powershell-bom-required.md) — PSUseBOMForUnicodeEncodedFile
+- [poshqc test MCP carries no verdict/numbers](project_poshqc_pester_mcp_exit_minus1.md) — no exit code, so count gates can't run
+- [poshqc analyze exits 1 on a Warning](project_poshqc_analyze_exit1_on_warning.md) — "EXIT 0 + zero errors" is self-contradictory
+- [BOM breaks grep ^; grep also strips CR](project_bom_grep_anchor_false_negative.md) — reports pure-CRLF as LF-only; use `tr -cd`
+- [StrictMode + missing XML attribute throws](project_pester_strictmode_xml_attribute_property_access.md) — enumerate ALL bare accesses
+- [Pester 5 result shape](project_pester5_result_shape_container_tests_and_ci_codecoverage.md) — use TotalCount; `-CI` ≠ `-CodeCoverage`
+- [Bash heredoc collapses `\\` to `\`](project_bash_heredoc_collapses_doubled_backslashes.md) — even with a quoted delimiter
+- [Unquoted backslash in a bash ARG redirects output](project_unquoted_backslash_in_bash_arg_silently_redirects_output.md) — silent wrong path, exit 0
+- [pwsh -Command quoting + backtick stripping](project_pwsh_command_quoting_from_bash.md) — backticks vanish; `-split "\r\n"` gives 1 element
+- [pwsh -File binds a list as ONE string](project_pwsh_file_array_param_from_bash.md) — `-Tokens a,b,c` is a 1-element array
+- [Compile-time red needs body-level refs](project_compile_red_needs_body_level_references.md) — a missing type in a SIGNATURE hides body errors
 
 ## Test execution & isolation
-- [Long runs need a detached process](project_long_runs_need_detached_process.md) — Bash `run_in_background` runners get killed after ~1h, taking `Start-Job` load generators with
-- [Tests must mock GUI; no visible window](feedback_tests_must_mock_gui_no_visible_window.md) — use headless seams (mocked viewers, injected show/focus delegates), never Form.Show/Application.Run
-- [#511 is a test-host crash, not N failing tests](project_511_is_a_testhost_crash_not_n_failing_tests.md) — load-driven abort with `Total tests: Unknown` (no readable verdict); `/InIsolation` loop gave 0
-- [WinFormsPumpHost tests are load-flaky](project_winformspumphost_tests_load_flaky.md) — QfcItemController_InitializationTests fail with "window handle has been created"/60s timeouts when
-- [vstest /InIsolation + FilePathHelper serialization](project_vstest_isolation_and_filepathhelper_serialization.md) — Moq assemblies need /InIsolation (else STTE Setup FileNotFound); FilePathHelper.FilePath is ""
-- [Invoke-MSTest.ps1 dies on a single test assembly](project_418_invoke_mstest_single_assembly_bug.md) — StrictMode + `.Count` on a scalar String throws before vstest runs; call vstest.console.exe
-- [Timed-out MSTest leaves detached runner](project_timedout_mstest_leaves_detached_runner.md) — leaves a pwsh runner respawning testhosts → user.config hangs; kill the pwsh runner too, verify 0,
-- [Sibling-worktree shared-tooling hazard](project_sibling_worktree_shared_tooling_hazard.md) — a concurrent agent elsewhere crashes your testhost + clobbers /tmp logs; use the session scratchpad
-- [Concurrent dotnet-coverage deadlock + doc-comment retention gate](project_concurrent_dotnet_coverage_deadlock_and_doccomment_retention_gate.md) — sibling worktree's coverage run hangs yours (CPU-delta test, kill only your chain); an XML doc
-- [Concurrent executor in same worktree](project_concurrent_executor_same_worktree.md) — two executors on one worktree corrupt shared files; detect via mtime progression during your own
-- [UtilitiesCS.Test parallelism flakiness](project_utilitiescs_test_parallelism_flakiness.md) — timing tests time out (~22s) under default parallelism + coverage; lower MSTest Workers to 4 via
-- [MSTest [DoNotParallelize] overlaps the parallel bucket](project_mstest_donotparallelize_overlaps_parallel_bucket.md) — a [DoNotParallelize] null-baseline reader still sees parallel-bucket writers; mark every writer too
-- [log4net MemoryAppender is shared per TYPE](project_log4net_memoryappender_shared_per_type_across_parallel_classes.md) — concurrent test classes
-- [UiThread.Dispatcher static-swap race](project_uithread_dispatcher_static_swap_race.md) — two classes swapping the shared static deadlock on the parked dispatcher; serialize swap-to-restore
-- [runsettings DataCollector default-enabled](project_runsettings_datacollector_default_enabled.md) — a declared Code Coverage `<DataCollector>` activates under CLI vstest without /collect;
-- [dotnet-coverage Deedle/FSharp instrumentation breaks tests](project_dotnet_coverage_deedle_fsharp_instrumentation.md) — pass a module-exclude settings XML to dotnet-coverage (runsettings excludes don't propagate); pair
-- [DispatcherDelay hangs unit tests](project_dispatcherdelay_hangs_unit_tests.md) — WaitAsync never completes in the pump-less MSTest host and hangs the whole assembly; drive coverage
-- [ConfigController STA pump deadlock](project_configcontroller_sta_pump_deadlock.md) — SaveAsync posts its continuation to the WinForms STA queue; an STA test must pump (DoEvents +
+- [Long runs need a detached process](project_long_runs_need_detached_process.md) — background runners die at ~1h
+- [Tests must mock GUI; no visible window](feedback_tests_must_mock_gui_no_visible_window.md) — headless seams, never Form.Show
+- [#511 is a test-host crash, not N failures](project_511_is_a_testhost_crash_not_n_failing_tests.md) — `Total tests: Unknown` = no verdict
+- [WinFormsPumpHost tests are load-flaky](project_winformspumphost_tests_load_flaky.md) — handle/timeout failures under load
+- [vstest /InIsolation + FilePathHelper](project_vstest_isolation_and_filepathhelper_serialization.md) — Moq needs /InIsolation
+- [Invoke-MSTest.ps1 dies on one assembly](project_418_invoke_mstest_single_assembly_bug.md) — StrictMode `.Count` on a scalar throws
+- [Timed-out MSTest leaves a detached runner](project_timedout_mstest_leaves_detached_runner.md) — kill the pwsh runner too
+- [Sibling-worktree shared-tooling hazard](project_sibling_worktree_shared_tooling_hazard.md) — crashes your testhost, clobbers /tmp
+- [Concurrent dotnet-coverage deadlock](project_concurrent_dotnet_coverage_deadlock_and_doccomment_retention_gate.md) — kill only your own chain
+- [Concurrent executor in same worktree](project_concurrent_executor_same_worktree.md) — detect via mtime progression
+- [UtilitiesCS.Test parallelism flakiness](project_utilitiescs_test_parallelism_flakiness.md) — lower MSTest Workers to 4
+- [[DoNotParallelize] overlaps the parallel bucket](project_mstest_donotparallelize_overlaps_parallel_bucket.md) — mark every writer too
+- [log4net MemoryAppender is shared per TYPE](project_log4net_memoryappender_shared_per_type_across_parallel_classes.md) — cross-class bleed
+- [UiThread.Dispatcher static-swap race](project_uithread_dispatcher_static_swap_race.md) — serialize swap-to-restore
+- [runsettings DataCollector default-enabled](project_runsettings_datacollector_default_enabled.md) — activates without /collect
+- [dotnet-coverage Deedle/FSharp breaks tests](project_dotnet_coverage_deedle_fsharp_instrumentation.md) — pass a module-exclude XML
+- [DispatcherDelay hangs unit tests](project_dispatcherdelay_hangs_unit_tests.md) — WaitAsync never completes pump-less
+- [ConfigController STA pump deadlock](project_configcontroller_sta_pump_deadlock.md) — STA test must pump (DoEvents)
 
 ## Coverage measurement
-- [Exempt-forward extraction leaves the call site uncovered](project_exempt_forward_extraction_leaves_call_site_uncovered.md) — a per-member >=90% gate on host-bound code is structurally unsatisfiable
-- [Coverage delta: reproduce the baseline's counting method](project_coverage_delta_reproduce_baseline_counting_method.md) — Cobertura repeats lines under `<method>` AND class `<lines>`; deduped vs all-descendant give ~2x
-- [First-party coverage denominator method (#197)](project_coverage_firstparty_denominator_method.md) — production-only rate = per-`<line>` count across ALL deduped packages INCLUDING vendored
-- [dotnet-coverage denominator nondeterminism](project_dotnet_coverage_denominator_nondeterminism.md) — repo line-rate swings (47% vs 81%) from double-counted denominator; re-baseline via git-stash,
-- [Koverage Cobertura post-processing shape](project_koverage_cobertura_postprocessing_shape.md) — runs ONLY when every test passes, so a failing-run baseline is raw (~70% at 82070) vs processed (~85% at 63901); convert the saved baseline with the repo helper
-- [C# canonical coverage artifact conversion](project_csharp_canonical_coverage_artifact_conversion.md) — hook reads artifacts/csharp/coverage.xml as JaCoCo (85% floor); defer repo-wide to PR CI
-- [Cobertura runsettings `<Attributes>` override](project_cobertura_runsettings_attributes_override.md) — a custom `<CodeCoverage>` block replaces the default `<Attributes>` excludes, silently disabling
-- [Changed-line coverage: Cobertura hits vs MS-coverage partial](project_changed_line_coverage_cobertura_vs_mscoverage_partial.md) — null-guard throws read "partially covered" in MS.CodeCoverage XML but hits=1 in Cobertura; use
-- [QFC #227 coverage tooling](project_qfc227_coverage_tooling.md) — vstest + Cobertura runsettings (Format under Configuration + attribute-exclude) is the reliable
-- [#398 test-split gate gotchas](project_398_test_split_gate_gotchas.md) — pre-existing CS2002 duplicate Compile (latent, out of scope); /EnableCodeCoverage has no branch% +
-- [ExcludeFromCodeCoverage on partial class = CS0579](project_excludefromcodecoverage_partial_class_cs0579.md) — annotate a partial type ONCE, not both parts, or the build breaks with duplicate-attribute CS0579
-- Closed one-offs (low reuse): [#400 dead recovery catch](project_400_completeopenasync_unreachable_recovery_catch.md), [Swordfish vendored-coverage side effect](project_swordfish_removal_epic_incidental_coverage_sideeffect.md), [#298 ScoCollection/live-bridge exemptions](project_taskvis_scocollection_and_livebridge_exemptions.md), [#328 OlObjectsProxy](project_328_rebuild_threading_olobjectsproxy_conflict.md)
+- [Exempt-forward extraction leaves call site uncovered](project_exempt_forward_extraction_leaves_call_site_uncovered.md) — >=90% gate unsatisfiable
+- [Reproduce the baseline's counting method](project_coverage_delta_reproduce_baseline_counting_method.md) — deduped vs all-descendant ≈ 2x
+- [First-party coverage denominator (#197)](project_coverage_firstparty_denominator_method.md) — count per-`<line>` across deduped packages
+- [dotnet-coverage denominator nondeterminism](project_dotnet_coverage_denominator_nondeterminism.md) — 47% vs 81% from double counting
+- [Koverage Cobertura post-processing shape](project_koverage_cobertura_postprocessing_shape.md) — passing run = processed; convert with the repo helper
+- [C# canonical coverage artifact conversion](project_csharp_canonical_coverage_artifact_conversion.md) — hook reads JaCoCo at 85%
+- [Cobertura runsettings `<Attributes>` override](project_cobertura_runsettings_attributes_override.md) — silently disables default excludes
+- [Cobertura hits vs MS-coverage partial](project_changed_line_coverage_cobertura_vs_mscoverage_partial.md) — "partial" vs hits=1
+- [QFC #227 coverage tooling](project_qfc227_coverage_tooling.md) — vstest + Cobertura runsettings is the reliable path
+- [#398 test-split gate gotchas](project_398_test_split_gate_gotchas.md) — latent CS2002; /EnableCodeCoverage has no branch%
+- [ExcludeFromCodeCoverage on partial = CS0579](project_excludefromcodecoverage_partial_class_cs0579.md) — annotate the type ONCE
+- Closed one-offs: [#400](project_400_completeopenasync_unreachable_recovery_catch.md), [Swordfish](project_swordfish_removal_epic_incidental_coverage_sideeffect.md), [#298](project_taskvis_scocollection_and_livebridge_exemptions.md), [#328](project_328_rebuild_threading_olobjectsproxy_conflict.md)
 
 ## Nullable / C# language
-- [Nullable per-file pragma gate mechanics](project_nullable_pragma_gate_mechanics.md) — CI's command (`/t:Rebuild`, TWAE, NO `/p:Nullable=enable`) genuinely passes EXIT 0; the 195+219
-- [CLAUDE.md nullable command != the CI gate](project_507_nullconditional_return_triggers_cs8603_under_genuine_nullable_check.md) — ci.yml omits `/p:Nullable=enable`; forced-flag CS86xx in an unannotated file is NOT a blocker -
-- [Nullable remediation annotation patterns](project_nullable_remediation_annotation_patterns.md) — net481 has no post-condition attrs; struct `= default!`; `.ToString()!` for string cells;
-- [Nullable annotation CS8632 scoping](project_nullable_annotation_cs8632_scoping.md) — `Type?` in nullable-disabled projects emits CS8632; wrap in `#nullable enable annotations`, not
-- [init/record struct fails CS0518 on net48](project_record_struct_isexternalinit_netfx.md) — no IsExternalInit polyfill; use a ctor-initialized readonly struct with get-only props
-- [CS8714 does not fire on net481](project_nullable_cs8714_not_on_net481.md) — net481 BCL lacks notnull, so `where TKey : notnull` is forward-looking only
-- Nullable-epic per-issue notes (closed epic, low reuse): [#366 notnull cascade](project_366_notnull_cascades_beyond_wrapperscodictionary.md), [#366 4th file](project_366_scdictionary_constraint_cascades_to_fourth_file.md), [#366 CS8766](project_366_batch7_tnullable_return_cs8766.md), [#372](project_372_email_classifier_nullable_patterns.md), [#371](project_371_outlookobjects_nullable_lessons.md), [#375](project_375_residuals_nullable_gotchas.md)
-- [Outlook `Action`/`Exception` ambiguity](project_outlook_action_ambiguity.md) — bare `Action` AND bare `Exception` are CS0104-ambiguous in Outlook-interop files; use
+- [Nullable per-file pragma gate mechanics](project_nullable_pragma_gate_mechanics.md) — CI passes EXIT 0 without `/p:Nullable=enable`
+- [CLAUDE.md nullable command != the CI gate](project_507_nullconditional_return_triggers_cs8603_under_genuine_nullable_check.md) — forced-flag CS86xx is not a blocker
+- [Nullable remediation annotation patterns](project_nullable_remediation_annotation_patterns.md) — no post-condition attrs on net481
+- [Nullable annotation CS8632 scoping](project_nullable_annotation_cs8632_scoping.md) — wrap in `#nullable enable annotations`
+- [init/record struct fails CS0518 on net48](project_record_struct_isexternalinit_netfx.md) — use a readonly struct with get-only props
+- [CS8714 does not fire on net481](project_nullable_cs8714_not_on_net481.md) — `where TKey : notnull` is forward-looking only
+- Nullable-epic notes (closed): [#366a](project_366_notnull_cascades_beyond_wrapperscodictionary.md), [#366b](project_366_scdictionary_constraint_cascades_to_fourth_file.md), [#366c](project_366_batch7_tnullable_return_cs8766.md), [#372](project_372_email_classifier_nullable_patterns.md), [#371](project_371_outlookobjects_nullable_lessons.md), [#375](project_375_residuals_nullable_gotchas.md)
+- [Outlook `Action`/`Exception` ambiguity](project_outlook_action_ambiguity.md) — CS0104 in Outlook-interop files
 
 ## Component-specific gotchas
-- [WebView2 EndInit already creates child handles](project_webview2_endinit_creates_handles.md) — `new ItemViewer()` alone leaves BOTH WebView2 children handle-created, so a `IsHandleCreated ==
-- [#349 breadcrumb WebView2 gotchas](project_349_breadcrumb_webview2_gotchas.md) — retyped Designer field breaks reflection-injected tests; aggregate async d__ classes for >=90%
-- QuickFiler #227 cycle notes: [cycle-4 ToggleFocus](project_qfc227_cycle4_toggle_focus_genuine_test_gotchas.md), [cycle-3 Theme/FolderPredictor seam](project_theme_folderpredictor_seam_retrofit_gotchas.md)
-- [ObjectListView TreeListView headless selection](project_objectlistview_treelistview_headless_selection.md) — selection needs a native handle; cache the node via SelectionChanged
-- [QfcDatamodel BackgroundWorker async-void IsBusy race](project_qfc_backgroundworker_async_void_race.md) — IsBusy flips false instantly; assert WorkerSupportsCancellation
-- [QfcItemController pump harness needs SaveParameters](project_qfcitemcontroller_pump_harness_needs_saveparameters.md) — SetField-only injection leaves `??=` factory defaults null (NRE in LoadFolderHandlerAsync)
-- [TaskController (#297) unit-test gotchas](project_taskvisualization_taskcontroller_test_gotchas.md) — ApplyChanges hangs over Moq; get-only MailItem.TaskSubject throws; STA harness needs
-- [ProjectEntry setter raw MessageBox](project_projectentry_setter_raw_messagebox.md) — the ProjectID setter uses RAW un-seamed MessageBox.Show and hangs STA tests; CompareTo tie-break
-- [IApplicationGlobals member forces implementers](project_iapplicationglobals_member_forces_implementers.md) — adding a member breaks 7 hand-written test-double stubs beyond scope lock; Moq mocks auto-implement
-- [TimeProvider seam gotchas](project_timeprovider_seam_gotchas.md) — Moq can't mock non-virtual GetLocalNow (use FakeTimeProvider); an optional TimeProvider param
-- [Initializer.GetOrLoad discards a setter injection](project_initializer_getorload_discards_injection_when_dependency_null.md) — the dependency overload returns default(T) when any dependency is null; ConversationResolver needs
-- [ScoDictionaryNew needs TryAdd not Add](project_scodictionarynew_tryadd_not_add.md) — retargeting Sco* tests: `.Add(k,v)` won't compile (CS1061); the base exposes `.TryAdd`; swap in the
-- [FluentAssertions Equal(params) has no because](project_fluentassertions_equal_params_no_because.md) — a trailing reason on `.Equal(...)` becomes an extra expected element; use `.Equal(new[]{...})` or
+- [WebView2 EndInit already creates child handles](project_webview2_endinit_creates_handles.md) — `new ItemViewer()` handle-creates both
+- [#349 breadcrumb WebView2 gotchas](project_349_breadcrumb_webview2_gotchas.md) — retyped Designer field breaks reflection tests
+- QuickFiler #227: [cycle-4 ToggleFocus](project_qfc227_cycle4_toggle_focus_genuine_test_gotchas.md), [cycle-3 seam](project_theme_folderpredictor_seam_retrofit_gotchas.md)
+- [ObjectListView TreeListView headless selection](project_objectlistview_treelistview_headless_selection.md) — cache via SelectionChanged
+- [QfcDatamodel BackgroundWorker async-void race](project_qfc_backgroundworker_async_void_race.md) — IsBusy flips false instantly
+- [QfcItemController harness needs SaveParameters](project_qfcitemcontroller_pump_harness_needs_saveparameters.md) — `??=` defaults stay null
+- [TaskController (#297) unit-test gotchas](project_taskvisualization_taskcontroller_test_gotchas.md) — ApplyChanges hangs over Moq
+- [ProjectEntry setter raw MessageBox](project_projectentry_setter_raw_messagebox.md) — un-seamed MessageBox.Show hangs STA tests
+- [IApplicationGlobals member forces implementers](project_iapplicationglobals_member_forces_implementers.md) — breaks 7 hand-written stubs
+- [TimeProvider seam gotchas](project_timeprovider_seam_gotchas.md) — Moq can't mock non-virtual GetLocalNow
+- [Initializer.GetOrLoad discards setter injection](project_initializer_getorload_discards_injection_when_dependency_null.md) — returns default(T)
+- [ScoDictionaryNew needs TryAdd not Add](project_scodictionarynew_tryadd_not_add.md) — `.Add(k,v)` won't compile (CS1061)
+- [FluentAssertions Equal(params) has no because](project_fluentassertions_equal_params_no_because.md) — reason becomes an extra element
 
 ## Artifact hygiene
-- [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` /
-- [TRX sanitisation must be case-insensitive](project_trx_sanitisation_must_be_case_insensitive.md) — vstest writes `storage=` in all-lower-case, so a case-sensitive substitution clears the header and
+- [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no account or machine name in ANY artifact
+- [TRX sanitisation must be case-insensitive](project_trx_sanitisation_must_be_case_insensitive.md) — vstest writes lower-case `storage=`

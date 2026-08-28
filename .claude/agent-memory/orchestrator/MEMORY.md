@@ -75,6 +75,7 @@
 - [lines-covered is nondeterministic; lines-valid is not](coverage-lines-covered-is-nondeterministic.md) — same-tree runs drift up to 4 lines per file, so a per-file covered-line gate fails on correct work
 - [Preflight catches vacuous gates](preflight-catches-vacuous-gates.md) — MCP `ok:true` is not enough; executor preflight found 6 gates that passed while verifying nothing
 - [Revert plans must check test provenance](revert-plans-must-check-test-provenance.md) — verify each test against the pre-change sha; a test that predates the change must survive
+- [Bash tool collapses `\` before sed sees it](bash-tool-collapses-double-backslash-in-sed.md) — a `\` pattern is a silent no-op exiting 0; use `.` per separator and always re-grep a match count
 - [Bash tool mangles MSBuild switches](bash-tool-mangles-msbuild-switches.md) — `/m` becomes `M:/` (MSB1008); run C# tools via `pwsh -NoProfile` with absolute paths
 - [Analyzer gate is vacuous without /t:Rebuild](msbuild-analyzer-gate-vacuous-without-rebuild.md) — `/t:Build` after any earlier build skips CoreCompile and compiles NOTHING at EXIT 0; assert a ZERO `Skipping target "CoreCompile"` count, NOT a csc.exe count (csc is 0 even on real compiles)
 - [Which msbuild non-vacuity pattern to count](msbuild-non-vacuity-which-pattern-to-count.md) — resolves a contradiction: `Task "Csc"` reads 0 on a REAL compile; count `csc.exe` (53) and `CoreCompile:` headers (15) instead
@@ -101,6 +102,7 @@
 - [External actor can merge your child PR mid-run](external-actor-can-merge-your-child-pr-midrun.md) — re-read PR state before the CI gate; prove tree equality, then land stranded evidence via a docs-only follow-up PR
 
 ## Artifact hygiene
+- [Angle-bracket redaction breaks TRX XML](angle-bracket-redaction-breaks-trx-xml.md) — a `<placeholder>` in an XML attribute makes the file unparseable; vstest lowercases `storage=`, so sweep case-insensitively
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
 - [Closing keyword fires inside a negation](closing-keyword-fires-inside-negation.md) — `does NOT fix #511` still auto-closes #511; scan commit messages and PR bodies, never file contents
 - [feature-review edits SHARED .git/info/exclude](feature-review-edits-shared-git-info-exclude.md) — one line there hides untracked files in EVERY worktree sharing the git dir; revert BEFORE any clean-tree check, not after merge
@@ -109,3 +111,5 @@
 - [Parent session can commit into your worktree](parent-session-can-commit-into-child-worktree.md) — a path leaving `git status` unstaged by you means someone else committed; re-read HEAD before every commit/push/PR
 - [MSB3021-only failure = testhost lock](msbuild-msb3021-only-means-test-host-lock.md) — zero CS/CA/IDE diagnostics means contention, not code; prove the run is dead by CPU-vs-wall before killing it
 - [Edit tool CRLF-ifies LF markdown](edit-tool-crlf-ifies-lf-markdown.md) — under core.autocrlf=true it flips the WHOLE file; measure with a binary read, script mechanical edits in Python instead
+- [grep-count wrapper does not clear $LASTEXITCODE](grep-count-wrapper-does-not-clear-lastexitcode.md) — git grep exits 1 on zero matches and the Measure-Object wrapper does not reset it; plans citing this to omit ExpectedExitCode are wrong
+- [Session-root shims are deleted by siblings](session-root-shims-are-deleted-by-siblings.md) — PRD_FEATURE_BLOCKED is a session-cwd path artifact; seed truthful copies AND re-seed before every delegation, siblings delete them mid-run
