@@ -77,5 +77,29 @@ namespace QuickFiler.Controllers.Tests
                     "the handler must read the toggled value back from the viewer when the event fires"
                 );
         }
+
+        /// <summary>
+        /// RC-1 (remediation cycle 1): every event WireIntentEvents() subscribes must be detached
+        /// by UnwireIntentEvents(); after Cleanup() a controller holds zero live subscriptions on
+        /// its viewer. The 17th subscription (PicturesChanged, the #486 D3 fix) had no matching
+        /// detachment, leaking one live subscription per torn-down controller.
+        /// </summary>
+        [TestMethod]
+        public void UnwireIntentEvents_DetachesPicturesChanged()
+        {
+            // Arrange
+            var viewer = new Mock<IItemViewer>();
+            var kbd = new Mock<IQfcKeyboardHandler>();
+            var controller = new HarnessController();
+            QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer.Object);
+            QfcItemControllerTestSupport.SetField(controller, "_kbdHandler", kbd.Object);
+            controller.WireIntentEvents();
+
+            // Act
+            controller.UnwireIntentEvents();
+
+            // Assert
+            viewer.VerifyRemove(v => v.PicturesChanged -= It.IsAny<EventHandler>(), Times.Once());
+        }
     }
 }
