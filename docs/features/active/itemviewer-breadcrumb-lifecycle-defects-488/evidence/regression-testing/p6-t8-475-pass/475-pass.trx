@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="f8d2013e-93f4-4ae4-8960-82a5be956b5f" name="REDACTED-USER@REDACTED-HOST 2026-08-28 02:09:09" runUser="Megalodon4\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="f8d2013e-93f4-4ae4-8960-82a5be956b5f" name="REDACTED-USER@REDACTED-HOST 2026-08-28 02:09:09" runUser="REDACTED-DOMAIN-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-28T02:09:09.6735770-04:00" queuing="2026-08-28T02:09:09.6735770-04:00" start="2026-08-28T02:09:07.7618124-04:00" finish="2026-08-28T02:09:09.8791503-04:00" />
   <TestSettings name="default" id="a2a8d09f-10cc-4201-b734-8e88740f259f">
     <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-28_02_09_09" />
@@ -55,17 +55,17 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="LegacySurfaceFactoryConstructor_AmbientContextNull_ThrowsInvalidOperationException" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="19a7e53a-ac6a-8f45-93f3-b129d8c7e213">
+    <UnitTest name="LegacySurfaceFactoryConstructor_AmbientContextNull_ThrowsInvalidOperationException" storage="REDACTED-WORKTREE-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="19a7e53a-ac6a-8f45-93f3-b129d8c7e213">
       <Execution id="0a8826ba-0217-41c5-8f4a-a520faf66b6a" />
-      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="LegacySurfaceFactoryConstructor_AmbientContextNull_ThrowsInvalidOperationException" />
+      <TestMethod codeBase="REDACTED-WORKTREE-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="LegacySurfaceFactoryConstructor_AmbientContextNull_ThrowsInvalidOperationException" />
     </UnitTest>
-    <UnitTest name="CaptureCurrent_NullAndControlledContexts_FailFastAndCapture" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ce2e99d-f169-8be4-86a8-78e206c7ba7b">
+    <UnitTest name="CaptureCurrent_NullAndControlledContexts_FailFastAndCapture" storage="REDACTED-WORKTREE-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ce2e99d-f169-8be4-86a8-78e206c7ba7b">
       <Execution id="0a5ed9eb-8a48-4e59-8680-5ceccf21ca4f" />
-      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbPopupBoundaryCoverageTests" name="CaptureCurrent_NullAndControlledContexts_FailFastAndCapture" />
+      <TestMethod codeBase="REDACTED-WORKTREE-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbPopupBoundaryCoverageTests" name="CaptureCurrent_NullAndControlledContexts_FailFastAndCapture" />
     </UnitTest>
-    <UnitTest name="ConfigureBreadcrumbDropDown_SeededLifecycleNullUiContext_DoesNotThrow" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="17249edd-fe0c-8b9e-9c79-85a4a56cbf3b">
+    <UnitTest name="ConfigureBreadcrumbDropDown_SeededLifecycleNullUiContext_DoesNotThrow" storage="REDACTED-WORKTREE-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="17249edd-fe0c-8b9e-9c79-85a4a56cbf3b">
       <Execution id="ce0a7131-d69d-4ed9-a759-3c34514ffaef" />
-      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="ConfigureBreadcrumbDropDown_SeededLifecycleNullUiContext_DoesNotThrow" />
+      <TestMethod codeBase="REDACTED-WORKTREE-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="ConfigureBreadcrumbDropDown_SeededLifecycleNullUiContext_DoesNotThrow" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
@@ -80,7 +80,7 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
   <ResultSummary outcome="Completed">
     <Counters total="3" executed="3" passed="3" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
-      <StdOut>Test Parallelization enabled for <worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+      <StdOut>Test Parallelization enabled for REDACTED-WORKTREE-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
 </StdOut>
     </Output>
   </ResultSummary>

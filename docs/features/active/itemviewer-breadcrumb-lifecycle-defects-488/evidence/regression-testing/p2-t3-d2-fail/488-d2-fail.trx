@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="86818321-fd07-4001-afa6-6f67b7aec516" name="REDACTED-USER@REDACTED-HOST 2026-08-28 01:33:01" runUser="Megalodon4\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="86818321-fd07-4001-afa6-6f67b7aec516" name="REDACTED-USER@REDACTED-HOST 2026-08-28 01:33:01" runUser="REDACTED-DOMAIN-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-28T01:33:01.5573949-04:00" queuing="2026-08-28T01:33:01.5573949-04:00" start="2026-08-28T01:33:00.2218902-04:00" finish="2026-08-28T01:33:01.5739784-04:00" />
   <TestSettings name="default" id="4f476e48-4de8-486d-a144-b0fd782cd18f">
     <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-28_01_33_01" />
@@ -45,15 +45,15 @@ Debug Trace:&#xD;
    at FluentAssertions.Collections.GenericCollectionAssertions`3.&lt;&gt;c__DisplayClass106_0`1.&lt;AssertSubjectEquality&gt;b__0(AssertionChain chain) in /_/Src/FluentAssertions/Collections/GenericCollectionAssertions.cs:line 3521&#xD;
    at FluentAssertions.Execution.AssertionChain.WithExpectation(String message, Action`1 chain, Object[] args) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 192&#xD;
    at FluentAssertions.Collections.GenericCollectionAssertions`3.Equal(IEnumerable`1 expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Collections/GenericCollectionAssertions.cs:line 1419&#xD;
-   at QuickFiler.Test.Viewers.BreadcrumbItemViewerLifecycleCoordinatorTests.ConfigureHostQueued_SetThemeBeforeDrain_ReplaysThemeOntoAdoptedHost() in <worktree-root>\QuickFiler.Test\Viewers\BreadcrumbItemViewerLifecycleCoordinatorTests.cs:line 283</StackTrace>
+   at QuickFiler.Test.Viewers.BreadcrumbItemViewerLifecycleCoordinatorTests.ConfigureHostQueued_SetThemeBeforeDrain_ReplaysThemeOntoAdoptedHost() in REDACTED-WORKTREE-ROOT\QuickFiler.Test\Viewers\BreadcrumbItemViewerLifecycleCoordinatorTests.cs:line 283</StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="ConfigureHostQueued_SetThemeBeforeDrain_ReplaysThemeOntoAdoptedHost" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="1eba9b3c-9ba5-8aa1-a6f1-084238706c7d">
+    <UnitTest name="ConfigureHostQueued_SetThemeBeforeDrain_ReplaysThemeOntoAdoptedHost" storage="REDACTED-WORKTREE-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1eba9b3c-9ba5-8aa1-a6f1-084238706c7d">
       <Execution id="ba35c5a9-b92c-4ab8-9fb5-47cbbcb0cfdb" />
-      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbItemViewerLifecycleCoordinatorTests" name="ConfigureHostQueued_SetThemeBeforeDrain_ReplaysThemeOntoAdoptedHost" />
+      <TestMethod codeBase="REDACTED-WORKTREE-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbItemViewerLifecycleCoordinatorTests" name="ConfigureHostQueued_SetThemeBeforeDrain_ReplaysThemeOntoAdoptedHost" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
@@ -66,7 +66,7 @@ Debug Trace:&#xD;
   <ResultSummary outcome="Failed">
     <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
-      <StdOut>Test Parallelization enabled for <worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+      <StdOut>Test Parallelization enabled for REDACTED-WORKTREE-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
 </StdOut>
     </Output>
   </ResultSummary>

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="5c0ffa02-7187-4f9f-9dcf-a33291d731ef" name="REDACTED-USER@REDACTED-HOST 2026-08-28 01:51:21" runUser="Megalodon4\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="5c0ffa02-7187-4f9f-9dcf-a33291d731ef" name="REDACTED-USER@REDACTED-HOST 2026-08-28 01:51:21" runUser="REDACTED-DOMAIN-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-28T01:51:21.9199207-04:00" queuing="2026-08-28T01:51:21.9199207-04:00" start="2026-08-28T01:51:19.7955980-04:00" finish="2026-08-28T01:51:21.9367631-04:00" />
   <TestSettings name="default" id="b6d59aaf-5806-44c9-8965-d1eaa4ceff20">
     <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-28_01_51_21" />
@@ -53,15 +53,15 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
    at FluentAssertions.Execution.AssertionChain.WithExpectation(String message, Action`1 chain, Object[] args) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 192&#xD;
    at FluentAssertions.Specialized.DelegateAssertionsBase`2.ThrowInternal[TException](Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 56&#xD;
    at FluentAssertions.Specialized.DelegateAssertions`2.Throw[TException](String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 74&#xD;
-   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.InitializeBreadcrumbPipeline_AfterViewerDisposed_ThrowsObjectDisposedException() in <worktree-root>\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 289</StackTrace>
+   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.InitializeBreadcrumbPipeline_AfterViewerDisposed_ThrowsObjectDisposedException() in REDACTED-WORKTREE-ROOT\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 289</StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="InitializeBreadcrumbPipeline_AfterViewerDisposed_ThrowsObjectDisposedException" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c1b4966-22ec-8bbf-b611-9191805be4a0">
+    <UnitTest name="InitializeBreadcrumbPipeline_AfterViewerDisposed_ThrowsObjectDisposedException" storage="REDACTED-WORKTREE-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c1b4966-22ec-8bbf-b611-9191805be4a0">
       <Execution id="2e2e6b23-bdd0-4590-b16e-a4c3212ec92d" />
-      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="InitializeBreadcrumbPipeline_AfterViewerDisposed_ThrowsObjectDisposedException" />
+      <TestMethod codeBase="REDACTED-WORKTREE-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="InitializeBreadcrumbPipeline_AfterViewerDisposed_ThrowsObjectDisposedException" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
@@ -74,7 +74,7 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
   <ResultSummary outcome="Failed">
     <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
-      <StdOut>Test Parallelization enabled for <worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+      <StdOut>Test Parallelization enabled for REDACTED-WORKTREE-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
 </StdOut>
     </Output>
   </ResultSummary>

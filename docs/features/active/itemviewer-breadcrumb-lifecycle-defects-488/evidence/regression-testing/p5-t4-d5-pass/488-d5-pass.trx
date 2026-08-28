@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="984d6371-86b3-46ef-bb4e-b6553dbeafd2" name="REDACTED-USER@REDACTED-HOST 2026-08-28 01:52:25" runUser="Megalodon4\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="984d6371-86b3-46ef-bb4e-b6553dbeafd2" name="REDACTED-USER@REDACTED-HOST 2026-08-28 01:52:25" runUser="REDACTED-DOMAIN-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-28T01:52:25.7752298-04:00" queuing="2026-08-28T01:52:25.7752298-04:00" start="2026-08-28T01:52:23.9053470-04:00" finish="2026-08-28T01:52:25.9385043-04:00" />
   <TestSettings name="default" id="9b1ccd54-6bc4-4b0e-b88a-8bf5ad9ea2fa">
     <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-28_01_52_25" />
@@ -54,13 +54,13 @@ Debug Trace:&#xD;
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="InitializeBreadcrumbPipeline_AfterViewerDisposed_ThrowsObjectDisposedException" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c1b4966-22ec-8bbf-b611-9191805be4a0">
+    <UnitTest name="InitializeBreadcrumbPipeline_AfterViewerDisposed_ThrowsObjectDisposedException" storage="REDACTED-WORKTREE-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c1b4966-22ec-8bbf-b611-9191805be4a0">
       <Execution id="9b38952f-ff05-43a8-9bf4-904acc2f9f1b" />
-      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="InitializeBreadcrumbPipeline_AfterViewerDisposed_ThrowsObjectDisposedException" />
+      <TestMethod codeBase="REDACTED-WORKTREE-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="InitializeBreadcrumbPipeline_AfterViewerDisposed_ThrowsObjectDisposedException" />
     </UnitTest>
-    <UnitTest name="DisposedCoordinator_SetBridgeCoordinatorThrows" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="1bb6db9c-30d8-8073-8ffb-9c7037e17ae8">
+    <UnitTest name="DisposedCoordinator_SetBridgeCoordinatorThrows" storage="REDACTED-WORKTREE-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1bb6db9c-30d8-8073-8ffb-9c7037e17ae8">
       <Execution id="109868ec-b0b4-4788-b27a-e096ad775c73" />
-      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbItemViewerLifecycleCoordinatorTests" name="DisposedCoordinator_SetBridgeCoordinatorThrows" />
+      <TestMethod codeBase="REDACTED-WORKTREE-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbItemViewerLifecycleCoordinatorTests" name="DisposedCoordinator_SetBridgeCoordinatorThrows" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
@@ -74,7 +74,7 @@ Debug Trace:&#xD;
   <ResultSummary outcome="Completed">
     <Counters total="2" executed="2" passed="2" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
-      <StdOut>Test Parallelization enabled for <worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+      <StdOut>Test Parallelization enabled for REDACTED-WORKTREE-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
 </StdOut>
     </Output>
   </ResultSummary>

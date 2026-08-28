@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="7b9515c6-6214-4a03-b2e1-0ffe5ecc90d4" name="REDACTED-USER@REDACTED-HOST 2026-08-28 01:45:47" runUser="Megalodon4\REDACTED-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="7b9515c6-6214-4a03-b2e1-0ffe5ecc90d4" name="REDACTED-USER@REDACTED-HOST 2026-08-28 01:45:47" runUser="REDACTED-DOMAIN-USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-28T01:45:47.3882766-04:00" queuing="2026-08-28T01:45:47.3882766-04:00" start="2026-08-28T01:45:45.1560560-04:00" finish="2026-08-28T01:45:47.4053013-04:00" />
   <TestSettings name="default" id="44e24383-9c98-464e-bc33-fd29f34c9c26">
     <Deployment runDeploymentRoot="REDACTED-USER_REDACTED-HOST_2026-08-28_01_45_47" />
@@ -49,16 +49,16 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
           <Message>Expected exception where error.Message.Contains("InitializeBreadcrumbPipeline") because the diagnostic must name the operation that was refused, but the condition was not met by:&#xD;
 &#xD;
 {System.InvalidOperationException: Breadcrumb UI components must be constructed on an owning UI synchronization context.&#xD;
-   at QuickFiler.Viewers.BreadcrumbUiDispatcher.CaptureCurrent() in <worktree-root>\QuickFiler\Viewers\BreadcrumbUiDispatcher.cs:line 46&#xD;
-   at QuickFiler.ItemViewer.InitializeBreadcrumbPipeline(IFolderHierarchyProvider provider, BreadcrumbPopupUiOperations operations) in <worktree-root>\QuickFiler\Viewers\ItemViewer.Breadcrumb.cs:line 74&#xD;
-   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.&lt;&gt;c__DisplayClass3_1.&lt;InitializeBreadcrumbPipeline_AmbientContextNull_ThrowsBoundaryDiagnostic&gt;b__3() in <worktree-root>\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 194&#xD;
-   at QuickFiler.Test.Viewers.BreadcrumbSelectorToggleUiBoundaryTests.InvokeAmbientNull[T](Func`1 operation) in <worktree-root>\QuickFiler.Test\Viewers\BreadcrumbSelectorToggleUiBoundaryTests.cs:line 331&#xD;
-   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.&lt;&gt;c__DisplayClass3_1.&lt;InitializeBreadcrumbPipeline_AmbientContextNull_ThrowsBoundaryDiagnostic&gt;b__1() in <worktree-root>\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 192&#xD;
+   at QuickFiler.Viewers.BreadcrumbUiDispatcher.CaptureCurrent() in REDACTED-WORKTREE-ROOT\QuickFiler\Viewers\BreadcrumbUiDispatcher.cs:line 46&#xD;
+   at QuickFiler.ItemViewer.InitializeBreadcrumbPipeline(IFolderHierarchyProvider provider, BreadcrumbPopupUiOperations operations) in REDACTED-WORKTREE-ROOT\QuickFiler\Viewers\ItemViewer.Breadcrumb.cs:line 74&#xD;
+   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.&lt;&gt;c__DisplayClass3_1.&lt;InitializeBreadcrumbPipeline_AmbientContextNull_ThrowsBoundaryDiagnostic&gt;b__3() in REDACTED-WORKTREE-ROOT\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 194&#xD;
+   at QuickFiler.Test.Viewers.BreadcrumbSelectorToggleUiBoundaryTests.InvokeAmbientNull[T](Func`1 operation) in REDACTED-WORKTREE-ROOT\QuickFiler.Test\Viewers\BreadcrumbSelectorToggleUiBoundaryTests.cs:line 331&#xD;
+   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.&lt;&gt;c__DisplayClass3_1.&lt;InitializeBreadcrumbPipeline_AmbientContextNull_ThrowsBoundaryDiagnostic&gt;b__1() in REDACTED-WORKTREE-ROOT\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 192&#xD;
    at FluentAssertions.Specialized.DelegateAssertions`2.InvokeSubjectWithInterception() in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 173}.</Message>
           <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
    at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
    at FluentAssertions.Specialized.ExceptionAssertions`1.Where(Expression`1 exceptionExpression, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/ExceptionAssertions.cs:line 280&#xD;
-   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.InitializeBreadcrumbPipeline_AmbientContextNull_ThrowsBoundaryDiagnostic() in <worktree-root>\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 199</StackTrace>
+   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.InitializeBreadcrumbPipeline_AmbientContextNull_ThrowsBoundaryDiagnostic() in REDACTED-WORKTREE-ROOT\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 199</StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
@@ -77,19 +77,19 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
    at FluentAssertions.Execution.AssertionChain.WithExpectation(String message, Action`1 chain, Object[] args) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 192&#xD;
    at FluentAssertions.Specialized.DelegateAssertionsBase`2.ThrowInternal[TException](Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 56&#xD;
    at FluentAssertions.Specialized.DelegateAssertions`2.Throw[TException](String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 74&#xD;
-   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.InitializeBreadcrumbPipeline_DifferentNonNullContext_ThrowsBoundaryDiagnostic() in <worktree-root>\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 252</StackTrace>
+   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests.InitializeBreadcrumbPipeline_DifferentNonNullContext_ThrowsBoundaryDiagnostic() in REDACTED-WORKTREE-ROOT\QuickFiler.Test\Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs:line 252</StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="InitializeBreadcrumbPipeline_AmbientContextNull_ThrowsBoundaryDiagnostic" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="1fd74340-a234-8b70-9a66-0979d3a91db3">
+    <UnitTest name="InitializeBreadcrumbPipeline_AmbientContextNull_ThrowsBoundaryDiagnostic" storage="REDACTED-WORKTREE-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="1fd74340-a234-8b70-9a66-0979d3a91db3">
       <Execution id="16911ef5-85a0-42d9-a112-6a5881ebdd5e" />
-      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="InitializeBreadcrumbPipeline_AmbientContextNull_ThrowsBoundaryDiagnostic" />
+      <TestMethod codeBase="REDACTED-WORKTREE-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="InitializeBreadcrumbPipeline_AmbientContextNull_ThrowsBoundaryDiagnostic" />
     </UnitTest>
-    <UnitTest name="InitializeBreadcrumbPipeline_DifferentNonNullContext_ThrowsBoundaryDiagnostic" storage="c:\users\danmoisan\repos\taskmaster\.claude\worktrees\agent-a7a6ceda02fcdfc2d\quickfiler.test\bin\debug\quickfiler.test.dll" id="18ce6dbf-f47e-8b77-b4ed-8451c808b4e8">
+    <UnitTest name="InitializeBreadcrumbPipeline_DifferentNonNullContext_ThrowsBoundaryDiagnostic" storage="REDACTED-WORKTREE-ROOT\quickfiler.test\bin\debug\quickfiler.test.dll" id="18ce6dbf-f47e-8b77-b4ed-8451c808b4e8">
       <Execution id="8f280823-5e7f-449e-a725-139eacabe544" />
-      <TestMethod codeBase="<worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="InitializeBreadcrumbPipeline_DifferentNonNullContext_ThrowsBoundaryDiagnostic" />
+      <TestMethod codeBase="REDACTED-WORKTREE-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbLifecycleRegressionTests" name="InitializeBreadcrumbPipeline_DifferentNonNullContext_ThrowsBoundaryDiagnostic" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
@@ -103,7 +103,7 @@ testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.Fil
   <ResultSummary outcome="Failed">
     <Counters total="2" executed="2" passed="0" failed="2" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
-      <StdOut>Test Parallelization enabled for <worktree-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+      <StdOut>Test Parallelization enabled for REDACTED-WORKTREE-ROOT\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
 </StdOut>
     </Output>
   </ResultSummary>
