@@ -96,56 +96,6 @@ namespace QuickFiler.Viewers
             await PopulateSuggestionsAsync(rows, lease).ConfigureAwait(false);
         }
 
-        /// <summary>Publishes scored fallbacks immediately, then resolves current hierarchy chains.</summary>
-        public void SetSuggestions(IReadOnlyList<FolderRow> rows)
-        {
-            _ = rows ?? throw new ArgumentNullException(nameof(rows));
-
-            BreadcrumbUpgradeLease lease = _upgradeLifetime.BeginPopulation();
-            _upgradeLifetime.RunSynchronous(
-                lease,
-                () =>
-                {
-                    string renderJson = _router.SetSuggestionFallbacks(rows);
-                    BreadcrumbSelectorState selectorState = _router.GetSelectorState();
-                    _ = PostRenderAndSelectorAsync(renderJson, selectorState, lease);
-                    SuggestionsUpgrade = PopulateSuggestionsAsync(rows, lease);
-                }
-            );
-        }
-
-        /// <summary>The in-flight ancestor-chain upgrade of the latest <see cref="SetSuggestions"/> call.</summary>
-        public Task SuggestionsUpgrade { get; private set; } = Task.CompletedTask;
-
-        private Task PopulateSuggestionsAsync(
-            IReadOnlyList<FolderRow> rows,
-            BreadcrumbUpgradeLease lease
-        ) =>
-            _upgradeLifetime.RunAsync(
-                lease,
-                token => _router.SetSuggestionsAsync(rows, token),
-                render => PostRenderAndSelectorAsync(render, _router.GetSelectorState(), lease)
-            );
-
-        /// <summary>Appends Path B plain rows verbatim and re-renders (legacy AddRange semantics).</summary>
-        public void AddItems(IReadOnlyList<string> items)
-        {
-            _ = items ?? throw new ArgumentNullException(nameof(items));
-            BreadcrumbUpgradeLease lease = _upgradeLifetime.BeginPopulation();
-            _upgradeLifetime.RunSynchronous(
-                lease,
-                () =>
-                {
-                    string renderJson = _router.AddItems(items);
-                    BreadcrumbSelectorState selectorState = _router.GetSelectorState();
-                    _ = _upgradeLifetime.RunAsync(
-                        lease,
-                        _ => PostRenderAndSelectorAsync(renderJson, selectorState, lease)
-                    );
-                }
-            );
-        }
-
         /// <summary>Clears all rows and the selection, emptying the page (backs <c>ClearFolderItems</c>).</summary>
         public void Clear()
         {

@@ -108,11 +108,33 @@ namespace QuickFiler.Viewers
             }
         }
 
-        internal void RunSynchronous(BreadcrumbUpgradeLease lease, Action operation)
+        /// <summary>
+        /// Runs <paramref name="operation"/> under <paramref name="lease"/>'s currency guard and
+        /// reports whether it ran.
+        /// </summary>
+        /// <returns>
+        /// <c>true</c> when the guarded action was invoked at entry-time currency; <c>false</c> when it
+        /// was skipped because the lease was not current, in which case the lease HAS BEEN SETTLED via
+        /// <see cref="Abandon"/> before this method returns, so no
+        /// <see cref="System.Threading.CancellationTokenSource"/> is leaked (I-502.3).
+        /// </returns>
+        /// <remarks>
+        /// Issue #502: the caller must consume this value. `SetSuggestionsCore` replaces its stale
+        /// `SuggestionsUpgrade` handle on <c>false</c> and `AddItems` settles its lease on <c>false</c>.
+        /// The skip-path <see cref="Abandon"/> here is idempotent with respect to a caller that also
+        /// calls it: <see cref="Abandon"/> returns early once the lease's cancellation has started, and
+        /// both disposal predicates are guarded by <c>!lease.SourceDisposed</c>.
+        /// </remarks>
+        internal bool RunSynchronous(BreadcrumbUpgradeLease lease, Action operation)
         {
             try
             {
-                TryRunCurrent(lease, operation);
+                if (TryRunCurrent(lease, operation))
+                {
+                    return true;
+                }
+                Abandon(lease);
+                return false;
             }
             catch
             {
@@ -130,21 +152,43 @@ namespace QuickFiler.Viewers
             return lease == null ? action : new Action(() => TryRunCurrent(lease, action));
         }
 
+        /// <summary>
+        /// Runs <paramref name="action"/> if <paramref name="lease"/> is current, and reports whether
+        /// it was invoked.
+        /// </summary>
+        /// <returns>
+        /// The ENTRY-TIME currency verdict: <c>true</c> when the action was invoked because the lease
+        /// was current at entry, <c>false</c> when it was skipped. This verdict is captured under
+        /// <c>_sync</c> before the action runs and MUST NEVER be recomputed after the action returns.
+        /// Folding a post-action re-check into this value would make <c>false</c> ambiguous between
+        /// "did not run" and "ran but was superseded", which is what the #502 call sites branch on;
+        /// a caller that wants a post-action verdict must call <see cref="IsCurrent"/> separately.
+        /// </returns>
+        /// <remarks>
+        /// Issue #500 (I-500.1): the action is invoked with <c>_sync</c> RELEASED, so no foreign or
+        /// out-of-process call is ever made under the lifetime's monitor. Documented consequence: two
+        /// threads can now both pass the currency check and run their actions concurrently, where the
+        /// re-entrant monitor previously serialized them. That is not reachable on current wiring —
+        /// every guarded action runs on the captured <c>BreadcrumbUiDispatcher</c> boundary, and
+        /// <see cref="RunSynchronous"/> is reached only from the viewer thread.
+        /// </remarks>
         internal bool TryRunCurrent(BreadcrumbUpgradeLease lease, Action action)
         {
             if (action == null)
             {
                 throw new ArgumentNullException(nameof(action));
             }
+            bool current;
             lock (_sync)
             {
-                if (!IsGenerationCurrentCore(lease) || lease.Token.IsCancellationRequested)
-                {
-                    return false;
-                }
-                action();
-                return true;
+                current = IsGenerationCurrentCore(lease) && !lease.Token.IsCancellationRequested;
             }
+            if (!current)
+            {
+                return false;
+            }
+            action();
+            return true;
         }
 
         internal async Task RunAsync(
