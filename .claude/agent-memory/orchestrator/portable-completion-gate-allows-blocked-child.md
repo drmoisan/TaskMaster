@@ -1,12 +1,58 @@
 ---
 name: portable-completion-gate-allows-blocked-child
-description: This repo lacks the Python orchestrator-state validator, so the orchestrator SubagentStop completion hook uses the portable PowerShell path, which does NOT require full completion — a blocked/partial child orchestrator can terminate cleanly.
+description: CORRECTED 2026-08-24 — the portable PowerShell completion gate is now FULL --require-complete parity, not lenient; it also demands required_agents/required_skills/required_mcp_tools arrays inside the checkpoint matching the routing matrix, with a bug-route tool swap.
 metadata:
   type: project
 ---
 
-In TaskMaster, `python -c 'import scripts.dev_tools.validate_orchestration_artifacts'` fails (module not present). The orchestrator SubagentStop hook `validate-orchestrator-output.ps1` therefore falls back to the portable `Test-OrchestratorStateCompletionReadiness` (`.claude/lib/orchestrator-state/OrchestratorStateCompletion.psm1`) via the `Test-PythonOrchestratorValidatorAvailable` seam.
+**This memory previously said the portable gate was lenient. That is no longer true.** Issue #475
+rewrote `.claude/hooks/validate-orchestrator-output.ps1` so the portable PowerShell path is the ONLY
+path: the interpreter-subprocess leg and its capability probe are both gone. `scripts/dev_tools/`
+does not exist in TaskMaster, but that no longer buys any leniency.
 
-**Why this matters:** the portable path does NOT enforce full completion (no require-complete). It only checks: (a) base presence — all `REQUIRED_STATE_KEYS` present, every `step5..10_status` in the enum, `blocked_reason` in the enum; and (b) the model-routing existence gate — every delegated agent (`delegation_receipts[].agent_name` + a delegating `next_step`) has a matching `model_routing_receipts[].agent`. It does NOT recompute the model formula (Python-only, documented non-goal).
+For `artifact_type: orchestrator-state` the hook runs
+`Test-OrchestratorStateCompletionReadiness` (`.claude/lib/orchestrator-state/OrchestratorStateCompletion.psm1`),
+described in its own header as a row-by-row port of the Python surface
+`--require-complete --require-model-routing`. It composes step statuses, `blocked_reason`, the
+`pr_gate` and `ci_gate` contracts, phase completeness, the routing contract, the preparation
+terminal contract, and the model-routing gate. Only `epic-orchestrator-state` and
+`parallel-orchestrator-state` get the lenient structural check (exists / parses / object root).
 
-**How to apply:** a child orchestrator that legitimately halts (e.g. `blocked_pending_maintainer_ratification`) CAN terminate cleanly. To also open the PR past `enforce-pr-author-skill.ps1`, set `blocked_reason: "none"` and steps 5-8 to a non-`pending`/non-`blocked` status (e.g. `verified`/`not-applicable`), and keep `local_execution_overrides`/`delegation_bypasses` empty. Record the real halt state in `next_step` (a non-delegating label so it does not trip the routing gate), plus custom fields like `terminal_status`/`ratification_pending`. `blocked_reason`'s enum has no "maintainer ratification" value — the halt is expressed outside that field. See [[orchestrator-state-flat-keys-and-enum]] and [[pr-author-hook-blocks-gh-in-this-repo]].
+**The non-obvious requirement: the checkpoint must carry the route's required-* lists itself.**
+`Get-OrchestratorStateRoutingContractError` compares three checkpoint arrays against
+`config/orchestration-routing.json` and emits, for a mismatch or absence:
+
+```
+Checkpoint required_agents must match routing matrix for route <route>.
+Checkpoint required_skills must match routing matrix for route <route>.
+Checkpoint required_mcp_tools must match routing matrix for route <route>.
+```
+
+So `required_agents`, `required_skills`, and `required_mcp_tools` are top-level checkpoint keys, not
+just config. **Bug-route swap:** when `promotion-type` is exactly `"bug"`, every
+`new_potential_entry` occurrence in the route's `required_mcp_tools` is substituted with
+`new_potential_bug_entry`, preserving matrix order. The substituted list drives BOTH the exact-match
+check and the receipt-presence loop, so record `new_potential_bug_entry` in the checkpoint array and
+in `mcp_call_receipts` — never the feature-type name. See
+[[completion-gate-receipt-shapes]] for the `evidence` key that receipts also need
+(`skill_receipts` need `skill` + `required: true` + non-blank `evidence`; `mcp_call_receipts` need
+`tool` + `ok: true` + non-blank `evidence`).
+
+**Preparation route is explicitly modelled.** `Get-OrchestratorStatePreparationTerminalError` is
+value-gated on the RAW route value being exactly `preparation`
+(`route_id` when the KEY is present, else `path_selected`). It then requires `next_step` to equal the
+preparation sentinel and ALL SIX `step5..10_status` keys to read exactly `not-applicable`. A
+preparation run therefore passes the completion gate cleanly without asserting completion.
+
+**How to apply:** stop assuming a partial or halted child slides past this hook. Run the gate
+yourself before terminating — it is a two-line PowerShell call and it names each violated invariant:
+
+```
+Import-Module ./.claude/lib/orchestrator-state/OrchestratorStateCompletion.psm1 -Force
+Test-OrchestratorStateCompletionReadiness -CheckpointPath artifacts/orchestration/orchestrator-state.json
+```
+
+`ExitCode 0` with empty `Output` is the pass. Related:
+[[orchestrator-state-flat-keys-and-enum]], [[orchestrator-state-validator-divergence]],
+[[blocked-reason-enum-cannot-express-substantive-halt]],
+[[checkpoint-bootstrap-blocked-by-its-own-gate]].

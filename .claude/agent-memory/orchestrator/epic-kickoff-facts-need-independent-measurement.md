@@ -31,6 +31,21 @@ kickoff disagreed and the plan was right.
 - Record the correction in the checkpoint (a `plan_drift_notes`-style key) so the epic parent can see
   the kickoff defect rather than silently inheriting it.
 
+**Second instance, 2026-08-24 (#476 child of `quickfiler-bug-family`).** The kickoff asserted that
+the `Compile Include` ItemGroup at `QuickFiler.Test/QuickFiler.Test.csproj:57-175` "is alphabetically
+ordered", and instructed that any new test file's entry go "in the alphabetical WebView2*
+neighbourhood". The group is NOT alphabetically ordered — around the WebView2 entry it reads
+`...SeamFactoryTests`, `MailItemActionsAdapterTests`, `WpfUiDispatcherTests`,
+`WebView2CoreInitializerTests`, `QfcQueueTests`. Acting on the stated ordering would have meant
+re-sorting an ItemGroup the kickoff itself says is "shared with siblings" — a large gratuitous diff
+in exactly the file most likely to conflict at fan-in. The salvaged spec had already caught this and
+recorded it under a `### Premise correction` heading, and the plan's own decision (insert two
+contiguous lines immediately after the existing WebView2 entry, do not re-sort) was right.
+
+Note the shape: both instances are kickoff claims about a file's *structure* used to prescribe an
+action. `sed -n '57,175p'` settles it. When the kickoff and the salvaged/committed artifacts
+disagree, the artifacts were written against the tree — and both times they were correct.
+
 Related: [[feedback_plan_phase0_paths_are_stale_in_epic_children]] (the same kickoff also named a
 stale preparation worktree as WORKTREE), [[feedback_verify_subagent_capability_claims]],
-[[feedback_verify_child_preflight_clearance]].
+[[feedback_verify_child_preflight_clearance]], [[parallel-epic-children-name-collisions]].

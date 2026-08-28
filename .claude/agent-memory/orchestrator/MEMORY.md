@@ -63,7 +63,7 @@
 - [Model-routing: use the portable PS modules](model-routing-scripts-absent-on-epic-integration-base.md) — when scripts/dev_tools is absent, .claude/lib/model-routing/ModelRouting.psm1 has Get-ComplexityFloor / Resolve-DelegationModel (param is -Band)
 - [Swordfish epic F5 ScoDictionary blocker (RESOLVED)](project_swordfish_epic_f5_blocked_on_old_scodictionary.md) — grep the OLD class base and using, not just the *New replacement
 - [Epic-child stale local integration ref](project_epic_child_stale_local_integration_ref.md) — `git fetch` and branch from `origin/<branch>`, never the bare local name
-- [Portable completion gate allows blocked child](portable-completion-gate-allows-blocked-child.md) — no Python validator here, so a blocked child can still terminate and open a PR
+- [Portable completion gate is FULL parity (corrected)](portable-completion-gate-allows-blocked-child.md) — not lenient; needs required_agents/skills/mcp_tools arrays IN the checkpoint, with a bug-route tool swap
 - [Epic-child rebase shared-memory conflict](epic-child-rebase-shared-memory-conflict.md) — the only rebase conflict is the shared MEMORY.md index; union it, no rebuild needed
 - [Epic-child PR-gate gotchas](epic-child-pr-gate-gotchas.md) — isolated-worktree collect_pr_context writes to the wrong checkout; the hook reads nested epic_context
 - [Parallel preparation children share one worktree](parallel-preparation-children-shared-worktree.md) — prep-mode children run concurrently in ONE dir; use a child-scoped checkpoint path
