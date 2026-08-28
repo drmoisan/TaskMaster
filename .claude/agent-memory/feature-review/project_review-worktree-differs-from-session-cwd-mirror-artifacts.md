@@ -1,0 +1,28 @@
+---
+name: review-worktree-differs-from-session-cwd-mirror-artifacts
+description: When the reviewed branch lives in a caller worktree (not the session cwd), mirror the three audit artifacts into the session cwd's docs/features/active/<feature>/ too — the SubagentStop hook Test-Paths relative to its own cwd
+metadata:
+  type: project
+---
+
+`validate-feature-review-coverage.ps1` resolves every advertised artifact path AND
+`artifacts/pr_context.summary.txt` AND the canonical coverage artifacts with plain relative
+`Test-Path`, i.e. against whatever cwd the hook process runs in. On the #484 review (2026-08-26) the
+caller's worktree (`repos/TaskMaster/.claude/worktrees/agent-...`) held the feature folder but the
+session cwd (`repos/TaskMaster-wt/<ts>`) did not.
+
+**Why:** if the hook runs in the session cwd and the feature folder exists only in the caller
+worktree, the path check fails with "no file exists at that location" and blocks termination, even
+though the artifacts exist where the caller asked for them.
+
+**How to apply:**
+- Write the three artifacts into the caller worktree's feature folder (the deliverable), then `cp`
+  them to the identical relative path under the session cwd (`mkdir -p` the folder; the copies are
+  untracked collateral in the session worktree).
+- Regenerate `artifacts/pr_context.summary.txt`/`.appendix.txt` in the CALLER worktree only
+  (`artifacts/` is gitignored there). Leaving the session cwd without a summary means the language
+  checks skip there; in the worktree cwd they run — so still write hook-safe per-language
+  PASS/FAIL coverage rows, and confirm no stale `artifacts/csharp/coverage.xml` exists in either
+  cwd (see [[stale-untracked-coverage-xml-leftover-false-block]]).
+- Simulate the hook from BOTH cwds before finalizing (pwsh script that sets CLAUDE_HOOK_INPUT and
+  invokes the hook with Set-Location; both returned exit 0 on #484).

@@ -29,3 +29,20 @@ trigger list mid-epic — a `.github/workflows/**` diff is itself Blocking under
 
 Re-verified unchanged on 2026-08-22 against `origin/epic/quickfiler-suite-determinism-foundation-integration`:
 the trigger list is still `[main, development]` and `workflow_dispatch` is still declared.
+
+Re-verified again on 2026-08-26 on `epic/quickfiler-bug-family-integration`. Two refinements
+learned by doing it:
+
+- **Dispatch against the CHILD BRANCH HEAD, not just the integration branch.** When a child has
+  already merged the integration branch into itself (which the stale-base guard forces anyway),
+  its head *is* the post-merge tree, so `gh workflow run ci.yml --ref <child-branch>` gates
+  exactly what the PR will land. That upgrades a child's S9 from "compensating local run" to a
+  genuine green remote run on the exact PR head SHA. Feature 498 merged on that basis
+  (run 33005439742, success on head 4c54d418, PR #626).
+- Record it in the child checkpoint's `ci_gate` with `workflow_run_id`, `workflow_run_url` and
+  `head_sha`, and state plainly in `conclusion_basis` that it came from a dispatch rather than
+  from a `pull_request` event. Contrast 446, whose `ci_gate.conclusion: success` rested only on a
+  local toolchain re-run — both merged, but only one was actually gated by CI.
+- A green dispatch run is **not** a completeness signal. Feature 468's dispatch was also green
+  while a third of its atomic plan had never been executed; CI proves the tree builds and the
+  tests that exist pass, nothing more. See [[feedback_premise_falsified_child_halt]].

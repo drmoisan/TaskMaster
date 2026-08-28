@@ -1,0 +1,10 @@
+{
+  "prodCap": 3,
+  "testCap": 3,
+  "prodFiles": [
+    "C:/Users/DANMOI~1/AppData/Local/Temp/claude/C--Users-DanMoisan-repos-TaskMaster-wt-2026-08-23T22-51/e5144a19-118a-41f6-a11e-c9dafb67fee1/scratchpad/run-vstest.ps1",
+    "C:/Users/DANMOI~1/AppData/Local/Temp/claude/C--Users-DanMoisan-repos-TaskMaster-wt-2026-08-23T22-51/e5144a19-118a-41f6-a11e-c9dafb67fee1/scratchpad/postrebase_verify.ps1",
+    "C:/Users/DANMOI~1/AppData/Local/Temp/claude/C--Users-DanMoisan-repos-TaskMaster-wt-2026-08-23T22-51/e5144a19-118a-41f6-a11e-c9dafb67fee1/scratchpad/run-toolchain-442.ps1"
+  ],
+  "testFiles": []
+}

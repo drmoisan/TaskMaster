@@ -9,6 +9,12 @@ The repo coverage path `scripts/vscode/Invoke-MSTestWithCoverage.ps1` (dotnet-co
 
 Concrete #261 F1 observation: one baseline run reported 47.16% with `lines-valid=180246` (UtilitiesCS package showed an implausible 141,188 valid lines); a clean re-measure of the exact same pre-change tree reported 81.02% with `lines-valid=97933`. The ~98k denominator is the correct de-duplicated value; the 180k run was the double-count anomaly.
 
+**Second confirmed instance (#464, 2026-08-28), with a new correlate.** Phase 0 baseline: `line-rate=0.7032`, `lines-valid=82070`, 18 MB Cobertura, and the run had **15 failing tests** (WinFormsPumpHost/dispatcher-fixture timeouts at ~60 s each). Final QC run of the SAME command on the same 9 assemblies: `line-rate=0.8525`, `lines-valid=64124`, 10.7 MB Cobertura, **0 failures**. A 17,946-line denominator swing against a diff that adds ~150 production lines.
+
+The correlate worth checking next time: **the run with timing-out test hosts produced the LARGER denominator and the LOWER rate.** A killed/timed-out testhost appears to leave a different set of loaded modules in the merge. So a baseline captured during a flaky run is the deflated one, and a later clean run will look like a large phantom improvement.
+
+Practical consequence when you cannot re-baseline (the baseline Cobertura was deleted, and checking out the baseline commit is forbidden): assert only the direction the gate requires ("post-change line rate is not lower"), state both `lines-valid` figures side by side, and say explicitly that the delta is **not** claimed as a coverage improvement the feature delivered. Also record positively what the delivered file contains — package count, no duplicate package names, no test packages — so a reader can see the delivered denominator is complete even if the baseline's composition is unrecoverable.
+
 **Why:** dotnet-coverage merge nondeterminism inflates the denominator, halving the apparent coverage. The per-CLASS line-rate for touched files stays stable and correct regardless.
 
 **How to apply:**

@@ -70,6 +70,17 @@
 ## Coverage
 - [Deletion-adjusted coverage no-regression gate](deletion-adjusted-coverage-no-regression-gate.md) — deleting covered lines makes `rate_post >= rate_base` unsatisfiable; gate on covered/valid counters
 
+- [Verify test provenance before planning a deletion](verify-test-provenance-before-planning-deletion.md) — in a revert plan, read the test at the pre-cycle commit; a two-arg call shape doesn't prove the cycle added it
+- [#489 PartN reroute amendment seams](project_489_partn_reroute_amendment_seams.md) — verify parent `partial` before continuation-file tasks (it wasn't); spec amendment notes shift all AC line citations (+13, renumber descending); re-grep rename-site lines after sibling growth
+- [#614 store-root leak plan seams](project_614_store_root_leak_plan_seams.md) — AC25 net non-growth (3 over-limit files); E1 SelectRow out-of-root-only pinning; remediation C1: behavior-preserving seam phase reconciles fail-before with a signature change, resolver-in-guard beats inline try/catch on line budget + coverage, net48 IsNullOrWhiteSpace doesn't narrow (`archiveRoot!`)
+- [Agent worktrees need SDK + NuGet + analyzer-backfill bootstrap](agent-worktrees-need-sdk-and-nuget-bootstrap.md) — no `.dotnet-sdk`, no `packages/`, and a clean restore still misses the skewed analyzer versions (CS0006, not a warning); three Phase 0 tasks
+- [/Logger:trx needs /ResultsDirectory](trx-needs-resultsdirectory.md) — TRX lands in `TestResults\` relative to cwd; TRX-existence-under-evidence acceptance is unsatisfiable without it, and the clean-tree gate won't catch it
+- [Per-task TRX subdirectory](trx-needs-resultsdirectory.md) — a shared `/ResultsDirectory:` makes "ten distinct TRX files" ambiguous once `[expect-fail]` runs deposit earlier TRX there; give each task a `p#-t#` segment
+- [Spec corrections sweep sibling sections](feedback_spec_corrections_sweep_sibling_sections.md) — falsified-premise fixes must cover Scope/Out-of-scope/Rollout, not AC only; denial text must dodge closing-keyword scans (#511 R1 Part 6)
+- [#511 R1 preflight delta seams](project_511_r1_preflight_delta_seams.md) — mid-cycle raw-evidence deletion breaks resolves gates; git-log scans post-commit only; absolute MSBuild path; Start-Process mechanic for 20-min runs; per-class coverage noise -0.50pp
+- [CSharpier "Formatted N files" is processed count](csharpier-formatted-n-is-processed-count.md) — restart-on-rewrite loops keyed on it never terminate; define rewritten-count via before/after SHA-256
+- [Terminal-phase planner traps](terminal-phase-planner-traps.md) — sweep the last phase for an unowned "a follow-up issue should carry it", artifacts written after the clean-tree commit task, and a false "clarification against the spec's wording"
+- [#553 CI parallel-split plan seams](project_553_ci_parallel_split_plan_seams.md) — workflow-only scope: no C# toolchain; Phase 0 snapshot for byte-identity; ruleset PUT + gh pr create orchestrator-gated; no jq (ConvertTo-Json -Depth 20); pathspec anchoring; BRANCH/SCRATCH conventions
 - [Threshold conflict: CLAUDE.md vs general-unit-test.md](project_coverage_threshold_conflict_claude_md_vs_general_unit_test.md) — 80/90 vs 85/75; repo-wide figure non-blocking, change-scoped gates blocking
 - [JaCoCo hook, Cobertura also accepted](project_csharp_coverage_gate_jacoco_format.md) — follow the format the delta names
 - [Async state machines split the denominator](async-state-machine-coverage-aggregation.md) — aggregate by `filename` or a >=90% gate fails for measurement reasons

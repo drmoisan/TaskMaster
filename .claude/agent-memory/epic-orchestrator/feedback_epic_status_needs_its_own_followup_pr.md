@@ -38,3 +38,22 @@ as absent rather than skipping silently.
 Related: [[project_child_pr_ci_gap_integration_base]],
 [[project_require_complete_launch_binding_gate_unsatisfiable]],
 [[feedback_merged_child_worktree_still_locked_defer_removal]].
+
+## Update (quickfiler-bug-family, 2026-08-28): the follow-up PR is itself gate-blocked
+
+Confirmed again — the regeneration must come after the integration PR merges, on a branch cut from the
+resulting `main`, because the document asserts that the integration PR merged.
+
+**New finding: you will not be able to merge that follow-up.** `EPIC_MERGE_GATE_BLOCKED` offers three
+paths and none fits an epic-documentation follow-up:
+- per-feature `epic_mode == true` — false; `epic_mode` marks a *child feature* targeting the
+  integration branch, not the orchestrator's own docs PR targeting `main`;
+- epic checkpoint with a **matching `pr_number`** — `epic_merge_pr` is the *integration* PR (673 here),
+  and repointing it at the docs PR would falsify which PR integrated the epic;
+- parallel route — not applicable.
+
+Do **not** set `epic_mode` or repoint `epic_merge_pr` to pass it. Both are false statements written
+solely to satisfy a control, and the gate's actual purpose — a verified CI gate — was already met
+(run green on a head SHA equal to the PR head). Open the PR, verify its gate, record the blockage, and
+hand it to the maintainer for a manual merge or an upstream fix. Same shape as
+[[merged-child-worktree-still-locked-defer-removal]]: a push-down-owned hook with no jurisdiction path.

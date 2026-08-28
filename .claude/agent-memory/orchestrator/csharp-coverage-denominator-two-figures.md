@@ -24,3 +24,14 @@ Get-JacocoRepoCoverage -Path 'artifacts/csharp/coverage.xml'
 `artifacts/` is gitignored (`.gitignore:57`), so the gate artifact is local-only and regenerated, never committed.
 
 **Do not commit raw Cobertura as evidence.** Executors do this by default; two reports added ~20 MB and 374,000 lines to history on one bug fix. Commit a package-level JaCoCo projection instead and record the substitution.
+
+**What decides which figure you get (mechanism, confirmed on #442 2026-08-27):** it is not an invocation flag — it is whether the test run passed. `Invoke-MSTestWithCoverage.ps1` calls `Invoke-DotnetCoverageCollection` first, and that function `throw`s when the coverage exit code is non-zero (`scripts/vscode/Invoke-MSTestWithCoverage.ps1:236`). Post-processing — which is what strips the third-party `<package>` elements — runs only *after* that call returns. So **any run with a failing test aborts before filtering and leaves the unfiltered denominator on disk**, while a green run leaves the filtered one.
+
+Consequence: comparing a green baseline against a red post-change run compares post-processed against raw and manufactures a huge phantom regression. On #442 the prior session recorded "84.84% → 70.28%, **-14.56 pp**" and reasoned about it as a real regression; it was purely this artifact. Once the single failing test was fixed, the same tree measured 85.1255% — i.e. **+0.29 pp, coverage went up**.
+
+Cheap tells for an un-post-processed file, before you trust any delta:
+- file size roughly 17-18 MB vs roughly 10-11 MB for the filtered one;
+- `<package>` set contains third-party names;
+- note `<package ...>` puts `name` *after* `line-rate`, so `grep '<package name='` returns **zero matches** and looks like "no packages". Match `'<package [^>]*>'` and extract `name` instead.
+
+A green run also passes `Assert-CoberturaLineCoverageThreshold`, but that helper's floor is **80%** (`scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1:487`), not 85 — clearing it corroborates >= 80% only, so still compute the 85% line / 75% branch check yourself.
