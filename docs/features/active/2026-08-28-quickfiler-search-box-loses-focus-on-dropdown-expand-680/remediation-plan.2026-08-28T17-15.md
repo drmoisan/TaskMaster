@@ -123,13 +123,13 @@ appendix) and independently re-verified — see the Decisions Record.
 
 ### Phase 0 — Baseline Capture
 
-- [ ] [P0-T1] Read the policy documents in the `policy-compliance-order` sequence: `CLAUDE.md`,
+- [x] [P0-T1] Read the policy documents in the `policy-compliance-order` sequence: `CLAUDE.md`,
   `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/csharp.md`,
   `.claude/rules/quality-tiers.md`, `.claude/rules/tonality.md`. Write
   `<FEATURE>/evidence/remediation-baseline/phase0-instructions-read.md` containing `Timestamp:`,
   `Policy Order:`, and the explicit list of the six files read. Acceptance: the artifact exists and
   lists all six files.
-- [ ] [P0-T2] Record the remediation execution context and pre-edit line counts:
+- [x] [P0-T2] Record the remediation execution context and pre-edit line counts:
   `git rev-parse HEAD`, `git status --porcelain`,
   `(Get-Content QuickFiler\Viewers\BreadcrumbDropDownHost.cs).Count`,
   `(Get-Content QuickFiler\Viewers\BreadcrumbDropDownHost.Open.cs).Count`. Acceptance: `git status
@@ -141,32 +141,32 @@ appendix) and independently re-verified — see the Decisions Record.
   ~514, per D2) and `BASELINE_OPEN_COUNT` (expected ~90, per D2) — recorded as whatever is actually
   observed, not assumed. Artifact: `<FEATURE>/evidence/remediation-baseline/p0-t2-context.<ts>.md` with
   `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`.
-- [ ] [P0-T3] Baseline format check: `dotnet tool run csharpier check .`. Acceptance: `EXIT_CODE: 0` (a
+- [x] [P0-T3] Baseline format check: `dotnet tool run csharpier check .`. Acceptance: `EXIT_CODE: 0` (a
   non-zero baseline would mean pre-existing drift unrelated to this remediation; if non-zero, record
   the drifted file list verbatim and do not format in Phase 0). Artifact:
   `<FEATURE>/evidence/remediation-baseline/p0-t3-format.<ts>.md` with the four schema fields.
-- [ ] [P0-T4] Baseline analyzer build:
+- [x] [P0-T4] Baseline analyzer build:
   `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`.
   Acceptance: `EXIT_CODE: 0`; record the warning count and list as `BASELINE_ANALYZER_WARNINGS`.
   Artifact: `<FEATURE>/evidence/remediation-baseline/p0-t4-analyzers.<ts>.md` with the four schema
   fields.
-- [ ] [P0-T5] Baseline nullable/type-check build:
+- [x] [P0-T5] Baseline nullable/type-check build:
   `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`.
   Acceptance: `EXIT_CODE: 0`; record the warning count as `BASELINE_NULLABLE_WARNINGS`. Artifact:
   `<FEATURE>/evidence/remediation-baseline/p0-t5-nullable.<ts>.md` with the four schema fields.
-- [ ] [P0-T6] Baseline scoped `BreadcrumbDropDownHostTests` run (proves the pre-edit population and
+- [x] [P0-T6] Baseline scoped `BreadcrumbDropDownHostTests` run (proves the pre-edit population and
   pass state), using D4's resolution:
   `& $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~BreadcrumbDropDownHostTests" /Logger:"trx;LogFileName=p0-t6.trx" "/ResultsDirectory:<FEATURE>/evidence/remediation-baseline/p0-t6"`.
   Acceptance: `EXIT_CODE: 0`; failed = `0`; the total is recorded as `BASELINE_HOSTTESTS_COUNT`; the
   `p0-t6` subdirectory holds exactly one file, named exactly `p0-t6.trx`. Artifact:
   `<FEATURE>/evidence/remediation-baseline/p0-t6-hosttests-baseline.<ts>.md`.
-- [ ] [P0-T7] Baseline full `QuickFiler.Test` assembly run (fast checkpoint, no coverage), using D4's
+- [x] [P0-T7] Baseline full `QuickFiler.Test` assembly run (fast checkpoint, no coverage), using D4's
   resolution:
   `& $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook" /Logger:"trx;LogFileName=p0-t7.trx" "/ResultsDirectory:<FEATURE>/evidence/remediation-baseline/p0-t7"`.
   Acceptance: `EXIT_CODE: 0`; failed = `0`; the total is recorded as `BASELINE_QFT_COUNT`; the `p0-t7`
   subdirectory holds exactly one file, named exactly `p0-t7.trx`. Artifact:
   `<FEATURE>/evidence/remediation-baseline/p0-t7-qft-baseline.<ts>.md`.
-- [ ] [P0-T8] Baseline full-repo coverage run:
+- [x] [P0-T8] Baseline full-repo coverage run:
   `pwsh -NoProfile -File .\scripts\vscode\Invoke-MSTestWithCoverage.ps1 -SearchRoot . -CoverageOutput coverage\coverage-remediation-baseline-680.cobertura.xml`
   (per D4, may run detached with polling). Acceptance: `EXIT_CODE: 0`; the artifact records numeric root
   `line-rate` and `branch-rate` (no placeholders) as `BASELINE_LINE_RATE` / `BASELINE_BRANCH_RATE`,
@@ -176,7 +176,7 @@ appendix) and independently re-verified — see the Decisions Record.
 
 ### Phase 1 — Fix R1: Relocate `ShowPopup` and `PublishPopupMessengerReady`
 
-- [ ] [P1-T1] Edit both files per D2/D3, exactly:
+- [x] [P1-T1] Edit both files per D2/D3, exactly:
   1. In `QuickFiler/Viewers/BreadcrumbDropDownHost.Open.cs`, add `using System;` as a new line
      immediately before `using System.Drawing;` (alphabetical order, matching
      `BreadcrumbDropDownHost.cs`'s own using order).
@@ -203,10 +203,10 @@ appendix) and independently re-verified — see the Decisions Record.
   Artifact: `<FEATURE>/evidence/regression-testing/p1-t1-relocation-verified.<ts>.md` with `Timestamp:`,
   `Command:` (the full verification block above), `EXIT_CODE: 0`, `Output Summary:` (each hit count and
   each line count named above).
-- [ ] [P1-T2] Prove the relocation compiles: `msbuild TaskMaster.sln /t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`.
+- [x] [P1-T2] Prove the relocation compiles: `msbuild TaskMaster.sln /t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`.
   Acceptance: `EXIT_CODE: 0`; 0 compile errors. Artifact:
   `<FEATURE>/evidence/regression-testing/p1-t2-build.<ts>.md` with the four schema fields.
-- [ ] [P1-T3] Prove zero test deltas from the move, using D4's resolution:
+- [x] [P1-T3] Prove zero test deltas from the move, using D4's resolution:
   `& $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~BreadcrumbDropDownHostTests" /Logger:"trx;LogFileName=p1-t3.trx" "/ResultsDirectory:<FEATURE>/evidence/regression-testing/p1-t3"`.
   Acceptance: `EXIT_CODE: 0`; total = `BASELINE_HOSTTESTS_COUNT` (P0-T6) exactly; failed = `0`; the
   `p1-t3` subdirectory holds exactly one file, named exactly `p1-t3.trx`. Artifact:
@@ -214,7 +214,7 @@ appendix) and independently re-verified — see the Decisions Record.
 
 ### Phase 2 — Add the CR-2 Composition Test
 
-- [ ] [P2-T1] Add one new `[TestMethod]` to the `BreadcrumbDropDownHostTests` partial class in
+- [x] [P2-T1] Add one new `[TestMethod]` to the `BreadcrumbDropDownHostTests` partial class in
   `QuickFiler.Test/Viewers/BreadcrumbDropDownHostTests.Part3.cs`, named
   `OpenAsync_TakeFocusReopenAfterNonCapturingOpenWithPredicateFalse_RestoresAutoCloseButSuppressesFocus`,
   using the file's existing `PredicateHarness`. Follow the file's existing Arrange–Act–Assert comment
@@ -239,10 +239,10 @@ appendix) and independently re-verified — see the Decisions Record.
 
   Artifact: `<FEATURE>/evidence/regression-testing/p2-t1-test-added.<ts>.md` with the four schema
   fields.
-- [ ] [P2-T2] Prove the new test compiles: `msbuild TaskMaster.sln /t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`.
+- [x] [P2-T2] Prove the new test compiles: `msbuild TaskMaster.sln /t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`.
   Acceptance: `EXIT_CODE: 0`; 0 compile errors. Artifact:
   `<FEATURE>/evidence/regression-testing/p2-t2-build.<ts>.md` with the four schema fields.
-- [ ] [P2-T3] Prove the new test passes green, using D4's resolution:
+- [x] [P2-T3] Prove the new test passes green, using D4's resolution:
   `& $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~BreadcrumbDropDownHostTests" /Logger:"trx;LogFileName=p2-t3.trx" "/ResultsDirectory:<FEATURE>/evidence/regression-testing/p2-t3"`.
   Acceptance: `EXIT_CODE: 0`; total = `BASELINE_HOSTTESTS_COUNT` (P0-T6) `+ 1`; failed = `0`; the new
   test's fully-qualified name appears in the TRX with outcome `Passed`; the `p2-t3` subdirectory holds
@@ -251,7 +251,7 @@ appendix) and independently re-verified — see the Decisions Record.
 
 ### Phase 3 — CR-1: Correct the Two Stale Statements in the Delivery Report
 
-- [ ] [P3-T1] Read `delivery-report.2026-08-28T16-40.md` in full and append a new
+- [x] [P3-T1] Read `delivery-report.2026-08-28T16-40.md` in full and append a new
   `## Post-Rebase Addendum — <ts>` section at the end of the file (do not edit or delete any existing
   text) containing, verbatim, the following two bullet lines (each on its own single line, unwrapped)
   plus explanatory prose:
@@ -282,27 +282,27 @@ appendix) and independently re-verified — see the Decisions Record.
 Run this loop in order. If any step fails or the format step changes any file, restart the entire
 Phase 4 loop from P4-T1; a restarted pass does not count as final.
 
-- [ ] [P4-T1] Format gate: `dotnet tool run csharpier check .` (pre-check, recorded as
+- [x] [P4-T1] Format gate: `dotnet tool run csharpier check .` (pre-check, recorded as
   `PRE_FORMAT_CHECK_EXIT`), then `dotnet tool run csharpier format .`, then
   `dotnet tool run csharpier check .` again. Capture `git status --porcelain` immediately before and
   immediately after the format command. Acceptance: post-format `EXIT_CODE: 0`. If
   `PRE_FORMAT_CHECK_EXIT` is non-zero (the formatter rewrote a file), restart the full Phase 4 loop
   from P4-T1. Artifact: `<FEATURE>/evidence/qa-gates/p4-t1-format.<ts>.md`.
-- [ ] [P4-T2] Analyzer rebuild:
+- [x] [P4-T2] Analyzer rebuild:
   `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`.
   Acceptance: `EXIT_CODE: 0`; the warning set matches `BASELINE_ANALYZER_WARNINGS` (P0-T4) exactly (0
   new diagnostics). Artifact: `<FEATURE>/evidence/qa-gates/p4-t2-analyzers.<ts>.md`.
-- [ ] [P4-T3] Nullable/type-check rebuild:
+- [x] [P4-T3] Nullable/type-check rebuild:
   `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`.
   Acceptance: `EXIT_CODE: 0`; no `CS86xx` diagnostic; the warning set matches
   `BASELINE_NULLABLE_WARNINGS` (P0-T5) exactly. Artifact:
   `<FEATURE>/evidence/qa-gates/p4-t3-nullable.<ts>.md`.
-- [ ] [P4-T4] Full `QuickFiler.Test` assembly run (fast checkpoint, no coverage), using D4's resolution:
+- [x] [P4-T4] Full `QuickFiler.Test` assembly run (fast checkpoint, no coverage), using D4's resolution:
   `& $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook" /Logger:"trx;LogFileName=p4-t4.trx" "/ResultsDirectory:<FEATURE>/evidence/qa-gates/p4-t4"`.
   Acceptance: `EXIT_CODE: 0`; total = `BASELINE_QFT_COUNT` (P0-T7) `+ 1` (the new CR-2 test); failed =
   `0`; the `p4-t4` subdirectory holds exactly one file, named exactly `p4-t4.trx`. Artifact:
   `<FEATURE>/evidence/qa-gates/p4-t4-qft-full-run.<ts>.md`.
-- [ ] [P4-T5] Full-repo coverage-mode run:
+- [x] [P4-T5] Full-repo coverage-mode run:
   `pwsh -NoProfile -File .\scripts\vscode\Invoke-MSTestWithCoverage.ps1 -SearchRoot . -CoverageOutput coverage\coverage-remediation-final-680.cobertura.xml`
   (per D4, may run detached with polling). Acceptance: `EXIT_CODE: 0`; the final failing-test FQN set is
   a subset of `BASELINE_FAILURE_SET` (P0-T8, expected `none`); the artifact records numeric root
@@ -311,7 +311,7 @@ Phase 4 loop from P4-T1; a restarted pass does not count as final.
   new passing test, so no coverage regression is expected; and total/passed/failed counts, with total =
   `BASELINE_COVERAGE_TOTAL` (P0-T8) `+ 1`. Artifact:
   `<FEATURE>/evidence/qa-gates/p4-t5-coverage-final.<ts>.md`.
-- [ ] [P4-T6] Final file-size re-audit for both relocation-touched production files:
+- [x] [P4-T6] Final file-size re-audit for both relocation-touched production files:
   `(Get-Content QuickFiler\Viewers\BreadcrumbDropDownHost.cs).Count` and
   `(Get-Content QuickFiler\Viewers\BreadcrumbDropDownHost.Open.cs).Count`. Acceptance: both counts are
   `<= 500` (the R1 ceiling violation is closed, not deferred); `BreadcrumbDropDownHost.cs`'s count is
@@ -319,7 +319,7 @@ Phase 4 loop from P4-T1; a restarted pass does not count as final.
   greater than `BASELINE_OPEN_COUNT` (P0-T2). Artifact:
   `<FEATURE>/evidence/qa-gates/p4-t6-file-size-audit.<ts>.md` explicitly stating both final counts and
   that both are within the repository's 500-line ceiling.
-- [ ] [P4-T7] Commit-readiness check (no `git commit` is performed by this task): `git status
+- [x] [P4-T7] Commit-readiness check (no `git commit` is performed by this task): `git status
   --porcelain`. Acceptance: every listed entry is one of `QuickFiler/Viewers/BreadcrumbDropDownHost.cs`,
   `QuickFiler/Viewers/BreadcrumbDropDownHost.Open.cs`,
   `QuickFiler.Test/Viewers/BreadcrumbDropDownHostTests.Part3.cs`,

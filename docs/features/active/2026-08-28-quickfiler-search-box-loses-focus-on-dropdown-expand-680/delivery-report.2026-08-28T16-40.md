@@ -151,3 +151,29 @@ and a row click on a non-capturing popup).
 No feature flag. `AutoClose` retains its current `true` behaviour everywhere outside the
 `takeFocus: false` branch, so a revert is a **single-commit revert** with no data, config, or schema
 consequences.
+
+## Post-Rebase Addendum — 2026-08-28T19-30
+
+This addendum corrects two statements above that were accurate when this report was written but have
+since been overtaken by a rebase of this branch onto `main`. The existing text above is left unedited;
+these are corrections layered on top of it.
+
+- Correction 1: the scheduled action calls FocusPending(), not the raw _focusPending delegate.
+- Correction 2: issue #677 has since merged into this branch's base and the shipped code composes with its MayTakeFocus machinery.
+
+**Correction 1 detail.** The "Changed and created files" bullet for `BreadcrumbDropDownHost.Open.cs`
+states that the already-open `takeFocus` branch schedules "a restore of `AutoClose = true` before
+`_focusPending()`." At current `HEAD`, the shipped code instead calls the guarded wrapper
+`FocusPending()`, which itself checks `MayTakeFocus()` before invoking the raw `_focusPending` delegate
+field. The scheduled lambda reads `DropDown.AutoClose = true; FocusPending();`, not a call to the raw
+delegate field directly.
+
+**Correction 2 detail.** The "Discharge of issue #677's follow-up item" section states that "#677's own
+`MayTakeFocus` machinery has not merged into this branch's base ... this change was authored against,
+and composes with, the pre-#677 shape." That was accurate when written. This branch was later rebased
+onto `main`, which has since merged issue #677, and the shipped code in
+`QuickFiler/Viewers/BreadcrumbDropDownHost.cs` at current `HEAD` composes with its `MayTakeFocus`,
+`FocusPending`, and `FocusAnchorIfPermitted` machinery. A dedicated composition test,
+`OpenAsync_TakeFocusReopenAfterNonCapturingOpenWithPredicateFalse_RestoresAutoCloseButSuppressesFocus`
+in `QuickFiler.Test/Viewers/BreadcrumbDropDownHostTests.Part3.cs`, now pins issue #680's unconditional
+`AutoClose` restore composing correctly with issue #677's `MayTakeFocus` guard.

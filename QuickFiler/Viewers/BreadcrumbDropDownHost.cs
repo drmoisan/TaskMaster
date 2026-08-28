@@ -300,22 +300,6 @@ namespace QuickFiler.Viewers
                 _focusAnchor();
         }
 
-        // Issue #680: AutoClose == false is the WinForms framework's own opt-out from
-        // ModalMenuFilter menu-mode entry. Menu mode retargets every keystroke to the popup's window
-        // handle whenever the popup does not contain focus, which is exactly the state a
-        // search-driven (takeFocus: false) open produces — so typing a second character never
-        // reaches the search textbox. The write must precede the show call because menu mode is
-        // entered inside ToolStripDropDown.SetVisibleCore(true); placing it here guarantees that
-        // ordering by statement order.
-        internal void ShowPopup(Point location, bool takeFocus)
-        {
-            DropDown.AutoClose = takeFocus;
-            _showPopup(DropDown, Anchor, location);
-        }
-
-        internal void PublishPopupMessengerReady() =>
-            PopupMessengerReady?.Invoke(this, EventArgs.Empty);
-
         private async Task ResetCoreAsync()
         {
             try
