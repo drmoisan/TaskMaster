@@ -66,3 +66,29 @@ byte-identical to its pre-change text, and its target `EditFiltersMenuItem_Click
 Reserved for `[P9-T7]`, which re-reads the delivered subscription line number and re-checks byte-identity
 after Phases 5 through 7 have edited `EfcFormController.cs`, and appends its findings below. Until that
 task runs, the location recorded above is the Phase-2 location and may shift.
+
+### Appended by [P9-T7] — post-Phase-7 refresh
+
+Timestamp: 2026-08-28T01-51
+Task: [P9-T7] (second half)
+Command: `grep -n 'EditFiltersMenuItem' QuickFiler/Controllers/EfcFormController.cs` plus an exact-string
+comparison of the delivered subscription line against `git show BASELINE_SHA:QuickFiler/Controllers/EfcFormController.cs` line 398
+EXIT_CODE: 0
+
+| Measure | Phase 2 record | **Delivered, post-Phase-7** |
+|---|---|---|
+| Subscription line | `:398` | **`:427`** |
+| `EditFiltersMenuItem_Click` declaration | `:559` | **`:597`** |
+
+Both moved down because Phases 5 through 7 added members above them; neither was rewritten.
+
+Byte-identity of the subscription line against its pre-change text at `BASELINE_SHA:398`:
+
+```
+            _formViewer.EditFiltersMenuItem.Click += EditFiltersMenuItem_Click;
+```
+
+Exact-string comparison result: **True** — identical including leading whitespace. The subscription
+survived Phases 5 through 7 unchanged in text; only its line number moved.
+
+The Phase-2 location recorded above this section is therefore refreshed rather than left stale.

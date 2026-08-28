@@ -923,7 +923,7 @@ files this feature does not own.**
 - [x] A named test asserts `typeof(EfcItemController).GetMethod("RegisterActions", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
 - [x] A named test asserts `typeof(EfcItemController)` declares no method named `ToggleExpansion` at any arity.
 - [x] A named test invokes the dispatched bodies of the surviving async expansion path in the order On → Off → On against a `Mock<IQfcKeyboardHandler>` backed by a real `KbdActions<char, KaChar, Action<char>>`, asserts no exception is thrown, and asserts the registry is not touched. The `ToggleExpansionAsync(ToggleState)` marshal itself is not awaited, because `ItemViewer.UiDispatcher` is an unpumped WPF dispatcher.
-- [ ] The `KbdActions<>` indexer-setter contract (assign-if-present, never insert) and the `overwriteDuplicates` truth table are documented in this spec's §RC4, and `git diff --name-only` for the feature branch contains no path matching `KbdActions`.
+- [x] The `KbdActions<>` indexer-setter contract (assign-if-present, never insert) and the `overwriteDuplicates` truth table are documented in this spec's §RC4, and `git diff --name-only` for the feature branch contains no path matching `KbdActions`.
 
 ### #460 — cleanup NRE and timer leak (latent; remedies GUARD + CORRECTION)
 
@@ -976,7 +976,7 @@ files this feature does not own.**
 - [x] `EfcFormController` declares `internal static bool IsBannerRow(string row)`, and both `IsValidSelection` and `ActionOkAsync` classify through it.
 - [x] A named test asserts a row of exactly three `=` characters and a row of exactly four `=` characters classify identically in `IsValidSelection` and in `ActionOkAsync`'s guard.
 - [x] A named test asserts `IsBannerRow` returns `false` for null and for a row shorter than the prefix, without throwing.
-- [ ] `IsBannerRow`'s prefix agrees with `BreadcrumbRowBuilder.BannerPrefix`, and `git diff --name-only` contains no path matching `BreadcrumbRowBuilder`.
+- [x] `IsBannerRow`'s prefix agrees with `BreadcrumbRowBuilder.BannerPrefix`, and `git diff --name-only` contains no path matching `BreadcrumbRowBuilder`.
 
 ### #466 — dead code and latent NRE traps (latent; remedy DELETION)
 
@@ -987,7 +987,7 @@ files this feature does not own.**
 - [x] A named test asserts `typeof(EfcItemController)` declares no 7-parameter instance constructor.
 - [x] A named test asserts `typeof(EfcItemController).GetField("_selectorsCtrls", BindingFlags.NonPublic | BindingFlags.Instance)` is null.
 - [x] The files `QuickFiler/Viewers/EfcViewer3.cs`, `EfcViewer3.Designer.cs` and `EfcViewer3.resx` are absent from the working tree.
-- [ ] `git diff --name-only` for the feature branch contains no entry for `QuickFiler/QuickFiler.csproj`.
+- [x] `git diff --name-only` for the feature branch contains no entry for `QuickFiler/QuickFiler.csproj`.
 
 ### #467 — `ProcessCmdKey` swallows Alt mnemonics (live; remedy GUARD)
 
@@ -997,7 +997,7 @@ files this feature does not own.**
 - [x] A named test asserts `ClaimsAltChord` returns `false` for a non-Alt chord.
 - [x] A named test asserts `ClaimsAltChord` returns `false` when the handler is null.
 - [x] No test in `EfcViewerTests.cs` constructs, shows, or derives from a `System.Windows.Forms.Form`.
-- [ ] The QFC twin is unchanged: `git diff --name-only` contains no entry for `QuickFiler/Viewers/QfcFormViewer.cs` or `QuickFiler/Controllers/QfcFormKeyHandler.cs`.
+- [x] The QFC twin is unchanged: `git diff --name-only` contains no entry for `QuickFiler/Viewers/QfcFormViewer.cs` or `QuickFiler/Controllers/QfcFormKeyHandler.cs`.
 
 ### Cross-cutting
 
@@ -1006,15 +1006,15 @@ files this feature does not own.**
 - [ ] The analyzer build introduces **no new diagnostics relative to the Phase 0 baseline**.
 - [ ] The nullable/type-check build (CI's exact command, without `/p:Nullable=enable`) introduces **no new errors relative to the Phase 0 baseline**.
 - [ ] `vstest.console.exe` reports no failure that is not in the Phase 0 `BASELINE_FAILED` set, and the passing-test count is **greater than the Phase 0 baseline count** by at least the number of tests this feature adds.
-- [ ] No pre-existing `[TestMethod]` is deleted or renamed, and no assertion in a pre-existing test is weakened.
+- [x] No pre-existing `[TestMethod]` is deleted or renamed, and no assertion in a pre-existing test is weakened.
 - [ ] Each test file this feature **creates** is under 500 lines. (The ceiling is asserted only over created files; `EfcFormController.cs` and `EfcItemController.cs` are pre-existing violations and are explicitly out of scope.)
 - [ ] `EfcFormController.cs` has at most 1204 lines after the change — its 1084-line merge-base count plus at most 120 net lines for the RC1 guards, the five RC3 boundary extractions, the RC3 `PopulateFolderCombobox` try/catch, and the RC7/RC8/RC9 pure helpers — and the file-size evidence artifact itemises the delivered net delta per remedy against the merge-base count. (The 500-line ceiling is not asserted: this file is a pre-existing violation whose splitting is out of scope.)
 - [ ] `EfcItemController.cs` has **fewer** lines after the change than its 1170-line merge-base count.
-- [ ] The diff for `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs` is **exactly one changed line**, at the incognito literal.
-- [ ] `git diff --name-only` for the feature branch intersected with the sibling-owned path set in §`Scope & Non-Goals` is **empty**.
-- [ ] `EfcFormController.cs:834-837` (the `new WebView2BreadcrumbHost(...)` construction feature #476 depends on) is not moved or reshaped.
+- [x] The diff for `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs` is **exactly one changed line**, at the incognito literal.
+- [x] `git diff --name-only` for the feature branch intersected with the sibling-owned path set in §`Scope & Non-Goals` is **empty**.
+- [x] `EfcFormController.cs:834-837` (the `new WebView2BreadcrumbHost(...)` construction feature #476 depends on) is not moved or reshaped.
 - [ ] No new `[ExcludeFromCodeCoverage]` attribute is added anywhere in the diff.
-- [ ] No interface file is modified: the diff contains no path under `QuickFiler/Interfaces/`.
+- [x] No interface file is modified: the diff contains no path under `QuickFiler/Interfaces/`.
 - [ ] The tokens `Thread.Sleep` and `Task.Delay` appear in no test file this feature writes.
 - [ ] No test this feature writes creates a temporary file, contacts a live Outlook instance, starts a `BackgroundWorker`, or shows a WinForms form.
 - [ ] `docs/features/active/efc-controller-surface-defects-464/user-story.md` does not exist. (Work mode is `full-bug`; this spec is the sole AC source.)
