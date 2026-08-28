@@ -284,7 +284,7 @@ After reading `artifacts/orchestration/orchestrator-state.json`, the main sessio
 - `atomic-executor` — executes approved plans task-by-task
 - `feature-reviewer` — produces policy, code, and feature audit artifacts by
   applying the `feature-review` workflow skill
-- `task-researcher` — performs deep research and writes findings to `artifacts/research/`
+- `task-researcher` — performs deep research and writes findings to the applicable feature-associated `docs/features/<feature>/research/` or one-off `docs/research/` root
 - `prd-feature` — produces issue, specification, and user-story artifacts when required by the selected workflow
 - `staged-review` — reviews staged changes when a pre-commit review is required
 - `epic-review` — reviews epic-level artifacts when the work item is an epic
@@ -326,13 +326,14 @@ All evidence artifacts produced during orchestration MUST comply with the canoni
 
 Permitted `artifacts/`-rooted sub-paths (non-evidence orchestration use only):
 - `artifacts/orchestration/` — orchestrator state and checkpoints
-- `artifacts/research/` — research outputs from task-researcher
 - `artifacts/pr_context` — PR context artifacts
 - `artifacts/reviews/` — review staging artifacts
 - `artifacts/status/` — status update artifacts
 - `artifacts/python/` — Python coverage and lcov outputs
 - `artifacts/pester/` — Pester coverage outputs
 - `artifacts/csharp/` — C# coverage outputs
+
+Research outputs from `task-researcher` are written to `docs/features/<feature>/research/` for feature-associated work or `docs/research/` for one-off work.
 
 All other `artifacts/` sub-paths (e.g., `artifacts/baselines/`, `artifacts/qa/`, `artifacts/coverage/`, `artifacts/evidence/`) are FORBIDDEN for evidence output and will be blocked by the `enforce-evidence-locations.ps1` PreToolUse hook.
 

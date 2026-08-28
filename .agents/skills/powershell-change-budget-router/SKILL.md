@@ -1,6 +1,6 @@
 ---
 name: powershell-change-budget-router
-description: Budget-first routing contract for PowerShell work: estimate production-file scope, choose small vs large path, enforce direct-mode escalation to orchestrator, and use the VS Code extension command surface for promotion lifecycle steps when available.
+description: 'Budget-first routing contract for PowerShell work: estimate production-file scope, choose small vs large path, enforce direct-mode escalation to orchestrator, and use the VS Code extension command surface for promotion lifecycle steps when available.'
 ---
 
 # PowerShell Change Budget Router

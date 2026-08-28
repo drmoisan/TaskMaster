@@ -65,6 +65,16 @@ epic root personas are forced independently of file count.
 7. Spawn the generated agent profile. Do not spawn the base alias and claim that
    a different model was selected.
 
+## Normal routed-delegation launch binding
+
+Before every normal nested `spawn_agent` call, resolve independently for that delegation. Validate the generated profile name, model, reasoning effort, path, and SHA-256 against the resolver result and the generated profile on disk. Add
+the exact validated receipt to `codex_model_routing_receipts[]`, including its non-empty `phase` and delegation identifier, in the selected checkpoint that `SubagentStart` reads. Durably flush the selected checkpoint before launch, then launch only the resolver-returned `deployment_agent`.
+
+Reject the launch when the receipt is late, a generic alias is supplied, the
+checkpoint is ambiguous, profile validation fails, persistence or durable flush
+fails, or start attestation returns `routing_valid: false`. Do not accept child output or child mutations after `routing_valid: false`; retain downstream
+recorder, authority-store, mutation-gate, and stop-gate enforcement.
+
 The route name `feature-review` resolves to the native
 `feature-reviewer-<profile>` agent family; retain `feature-review` as the
 receipt's logical agent name.
