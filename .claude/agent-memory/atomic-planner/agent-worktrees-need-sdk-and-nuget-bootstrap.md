@@ -15,7 +15,11 @@ before the first `dotnet tool restore` and before the first `msbuild`, in this o
    `pwsh -NoProfile -File .\scripts\vscode\Install-RepoDotNetSdk.ps1`, or mirror the populated
    `.dotnet-sdk` tree from the main checkout. Falsifiable acceptance: `dotnet --version` prints
    `8.0.205` AND `dotnet --list-sdks` includes a path ending `.dotnet-sdk\sdk`.
-2. **`nuget restore TaskMaster.sln`.** A fresh worktree has no `packages/`. Every project declares
+2. **`nuget restore TaskMaster.sln`.** Prefer `pwsh -NoProfile -File .\scripts\vscode\Invoke-Restore.ps1`,
+   which resolves MSBuild through `vswhere` and runs `/t:Restore /p:RestorePackagesConfig=true /m` — the
+   `packages.config`-aware form. `nuget.exe` is not guaranteed to be on `PATH` in an agent worktree, so a
+   plan task whose only stated command is `nuget restore` can be unrunnable.
+   A fresh worktree has no `packages/`. Every project declares
    `<Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">` whose `<Error>`
    fires before compilation when the tree is missing (e.g. `QuickFiler.Test.csproj:452-466`), and every
    `Reference` `HintPath` under `..\packages\` is unresolvable. CI does not hit this because

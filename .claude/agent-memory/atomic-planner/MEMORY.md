@@ -7,6 +7,7 @@
 - [#501 R3](project_501_r3_preflight_seams.md) — repo-wide 0-skipped gates unsatisfiable; BASELINE_FAILURE_SET subset; `Task.CompletedTask` singleton
 - [#511 R1](project_511_r1_preflight_delta_seams.md) — mid-cycle evidence deletion; git-log scans post-commit; Start-Process for 20-min runs
 - [#484](project_484_qfc_revision_seams.md) — ownership change sweeps plan→issue.md→spec.md (spec is the AC source); old-cardinal grep sweep
+- [QfcItemController test-capacity squeeze](project_qfcitemcontroller_test_capacity_squeeze.md) — four owned test files hold only ~471 aggregate spare lines and `.csproj` edits are barred; budget in Phase 0, permit relocation, mandate DataRow/shared-arrange compaction
 - [#494](project_494_threshold_reconciliation_plan_seams.md) — coverage runner throws before post-processing; reported-floor must not become hook-Blocking
 - [#498](conditional-ladder-and-unowned-class-gates.md) — gate EVERY rung of a recorded-selector ladder incl. rung 1; scope failing-identifier clauses to owned test classes; 0/0 changed-line figure → NOT APPLICABLE
 - [#503](project_503_ribbon_readiness_plan_seams.md) — RibbonViewer 487/500 forces a region move; 6+4 Compile entries; compile-time red + dossier
