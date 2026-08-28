@@ -397,17 +397,17 @@ replacing `- [ ]` with `- [x]` on the named line and appending no text, so the l
 `spec.md` is unchanged and every later line number stays valid. Each task names the single evidence
 artifact that discharges it.
 
-- [ ] [P12-T1] Check off AC1 (spec.md line 766, Phase 0 baseline contents); evidence `FEATURE/evidence/baseline/phase0-baseline-index.<ISO-8601>.md`.
-- [ ] [P12-T2] Check off AC2 (line 767, U1 answer recorded before any Designer edit); evidence `FEATURE/evidence/baseline/phase0-u1-designer-format-gate.<ISO-8601>.md`.
-- [ ] [P12-T3] Check off AC3 (line 768, upstream-landing grep and anchor re-derivation); evidence `FEATURE/evidence/baseline/phase0-upstream-landing-check.<ISO-8601>.md` and `phase0-anchor-rederivation.<ISO-8601>.md`.
-- [ ] [P12-T4] Check off AC4 (line 772, `ToolStripMenuItemCbTests.cs` exists and its `ItemViewerExpanded_DeclaresNoMenuItemCheckedChangedHandler` passes); evidence `FEATURE/evidence/regression-testing/p2-t8-green-486.<ISO-8601>.md`.
-- [ ] [P12-T5] Check off AC5 (line 773, four constructor calls and four designer wirings deleted); evidence `FEATURE/evidence/regression-testing/p2-t7-build.<ISO-8601>.md` and `p2-t10-expanded-diff.<ISO-8601>.md`.
-- [ ] [P12-T6] Check off AC6 (line 774, the four `ToolStripMenuItemCb` pins pass); evidence `FEATURE/evidence/regression-testing/p2-t8-green-486.<ISO-8601>.md`.
-- [ ] [P12-T7] Check off AC7 (line 775, `ToolStripMenuItemCb.cs` unchanged, no `base.Checked` assignment); evidence `FEATURE/evidence/regression-testing/p2-t9-toolstrip-unchanged.<ISO-8601>.md`.
-- [ ] [P12-T8] Check off AC8 (line 776, the two dead-member metadata tests pass); evidence `FEATURE/evidence/regression-testing/p2-t8-green-486.<ISO-8601>.md`.
-- [ ] [P12-T9] Check off AC9 (line 777, `WireIntentEvents_SubscribesToPicturesChanged` passes); evidence `FEATURE/evidence/regression-testing/p2-t8-green-486.<ISO-8601>.md`.
-- [ ] [P12-T10] Check off AC10 (line 778, `PicturesChanged_WhenRaised_RefreshesOptionsPictures` passes); evidence `FEATURE/evidence/regression-testing/p2-t8-green-486.<ISO-8601>.md`.
-- [ ] [P12-T11] Check off AC11 (line 779, the 16 to 17 `WireIntentEvents` handoff is recorded in `evidence/other/`); evidence `FEATURE/evidence/other/wireintentevents-16-to-17-handoff.<ISO-8601>.md`.
+- [x] [P12-T1] Check off AC1 (spec.md line 766, Phase 0 baseline contents); evidence `FEATURE/evidence/baseline/phase0-baseline-index.<ISO-8601>.md`.
+- [x] [P12-T2] Check off AC2 (line 767, U1 answer recorded before any Designer edit); evidence `FEATURE/evidence/baseline/phase0-u1-designer-format-gate.<ISO-8601>.md`.
+- [x] [P12-T3] Check off AC3 (line 768, upstream-landing grep and anchor re-derivation); evidence `FEATURE/evidence/baseline/phase0-upstream-landing-check.<ISO-8601>.md` and `phase0-anchor-rederivation.<ISO-8601>.md`.
+- [x] [P12-T4] Check off AC4 (line 772, `ToolStripMenuItemCbTests.cs` exists and its `ItemViewerExpanded_DeclaresNoMenuItemCheckedChangedHandler` passes); evidence `FEATURE/evidence/regression-testing/p2-t8-green-486.<ISO-8601>.md`.
+- [x] [P12-T5] Check off AC5 (line 773, four constructor calls and four designer wirings deleted); evidence `FEATURE/evidence/regression-testing/p2-t7-build.<ISO-8601>.md` and `p2-t10-expanded-diff.<ISO-8601>.md`.
+- [x] [P12-T6] Check off AC6 (line 774, the four `ToolStripMenuItemCb` pins pass); evidence `FEATURE/evidence/regression-testing/p2-t8-green-486.<ISO-8601>.md`.
+- [x] [P12-T7] Check off AC7 (line 775, `ToolStripMenuItemCb.cs` unchanged, no `base.Checked` assignment); evidence `FEATURE/evidence/regression-testing/p2-t9-toolstrip-unchanged.<ISO-8601>.md`.
+- [x] [P12-T8] Check off AC8 (line 776, the two dead-member metadata tests pass); evidence `FEATURE/evidence/regression-testing/p2-t8-green-486.<ISO-8601>.md`.
+- [x] [P12-T9] Check off AC9 (line 777, `WireIntentEvents_SubscribesToPicturesChanged` passes); evidence `FEATURE/evidence/regression-testing/p2-t8-green-486.<ISO-8601>.md`.
+- [x] [P12-T10] Check off AC10 (line 778, `PicturesChanged_WhenRaised_RefreshesOptionsPictures` passes); evidence `FEATURE/evidence/regression-testing/p2-t8-green-486.<ISO-8601>.md`.
+- [x] [P12-T11] Check off AC11 (line 779, the 16 to 17 `WireIntentEvents` handoff is recorded in `evidence/other/`); evidence `FEATURE/evidence/other/wireintentevents-16-to-17-handoff.<ISO-8601>.md`.
 - [ ] [P12-T12] Check off AC12 (line 783, both `ParentChanged` metadata tests pass); evidence `FEATURE/evidence/regression-testing/p4-t6-green-487.<ISO-8601>.md`.
 - [ ] [P12-T13] Check off AC13 (line 784, the `Parent Changed` search returns zero matches); evidence `FEATURE/evidence/regression-testing/p4-t7-parent-changed-after.<ISO-8601>.md` against the two-match record in `p3-t4-parent-changed-before.<ISO-8601>.md`.
 - [ ] [P12-T14] Check off AC14 (line 785, both designer wirings deleted, proved by a clean analyzer build); evidence `FEATURE/evidence/regression-testing/p4-t5-build.<ISO-8601>.md`.
