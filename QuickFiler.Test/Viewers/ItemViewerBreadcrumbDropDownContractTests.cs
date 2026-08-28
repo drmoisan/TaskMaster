@@ -227,5 +227,53 @@ namespace QuickFiler.Test.Viewers
                     "the expanded viewer's ParentChanged handler is the same dead console diagnostic"
                 );
         }
+
+        [TestMethod]
+        public void IItemViewer_DeclaresNoUiSchedulerMember()
+        {
+            // Arrange
+            const BindingFlags Flags =
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
+            // Act
+            MemberInfo[] members = typeof(IItemViewer).GetMember("UiScheduler", Flags);
+
+            // Assert
+            members
+                .Should()
+                .BeEmpty("no production consumer reaches UiScheduler through the viewer interface");
+        }
+
+        [TestMethod]
+        public void IItemViewer_StillDeclaresUiDispatcher()
+        {
+            // Arrange
+            const BindingFlags Flags =
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
+            // Act
+            MemberInfo[] members = typeof(IItemViewer).GetMember("UiDispatcher", Flags);
+
+            // Assert
+            members
+                .Should()
+                .NotBeEmpty("UiDispatcher still has production consumers and must survive");
+        }
+
+        [TestMethod]
+        public void IItemViewer_StillDeclaresUiSyncContext()
+        {
+            // Arrange
+            const BindingFlags Flags =
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
+            // Act
+            MemberInfo[] members = typeof(IItemViewer).GetMember("UiSyncContext", Flags);
+
+            // Assert
+            members
+                .Should()
+                .NotBeEmpty("UiSyncContext still has production consumers and must survive");
+        }
     }
 }
