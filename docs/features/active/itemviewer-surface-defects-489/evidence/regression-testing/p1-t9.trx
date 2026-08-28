@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TestRun id="e4dc9ac3-f742-41e2-89e8-ec3f7e3257e6" name="<user>@<host> 2026-08-27 20:26:37" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="e4dc9ac3-f742-41e2-89e8-ec3f7e3257e6" name="&lt;user&gt;@&lt;host&gt; 2026-08-27 20:26:37" runUser="&lt;host&gt;\&lt;user&gt;" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-27T20:26:37.4089352-04:00" queuing="2026-08-27T20:26:37.4089352-04:00" start="2026-08-27T20:26:35.9677726-04:00" finish="2026-08-27T20:26:37.4264466-04:00" />
   <TestSettings name="default" id="d0ed3680-11cd-42cf-ac19-2cd5af739c6f">
-    <Deployment runDeploymentRoot="<user>_<host>_2026-08-27_20_26_37" />
+    <Deployment runDeploymentRoot="&lt;user&gt;_&lt;host&gt;_2026-08-27_20_26_37" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="371c384f-47b2-43af-89e1-79dd89af6ff8" testId="13f0c951-d974-8efd-88f9-aa4ce7708dc4" testName="WireIntentEvents_SubscribesToPicturesChanged" computerName="<host>" duration="00:00:00.2800491" startTime="2026-08-27T20:26:36.8648460-04:00" endTime="2026-08-27T20:26:37.2553963-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="371c384f-47b2-43af-89e1-79dd89af6ff8">
+    <UnitTestResult executionId="371c384f-47b2-43af-89e1-79dd89af6ff8" testId="13f0c951-d974-8efd-88f9-aa4ce7708dc4" testName="WireIntentEvents_SubscribesToPicturesChanged" computerName="&lt;host&gt;" duration="00:00:00.2800491" startTime="2026-08-27T20:26:36.8648460-04:00" endTime="2026-08-27T20:26:37.2553963-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="371c384f-47b2-43af-89e1-79dd89af6ff8">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -64,31 +64,31 @@ Performed invocations:&#xD;
           <StackTrace>   at Moq.Mock.Verify(Mock mock, LambdaExpression expression, Times times, String failMessage) in /_/src/Moq/Mock.cs:line 332&#xD;
    at Moq.Mock.VerifyAdd(Mock mock, LambdaExpression expression, Times times, String failMessage) in /_/src/Moq/Mock.cs:line 363&#xD;
    at Moq.Mock`1.VerifyAdd(Action`1 addExpression, Times times) in /_/src/Moq/Mock`1.cs:line 1163&#xD;
-   at QuickFiler.Controllers.Tests.QfcItemController_EventWiringTests.WireIntentEvents_SubscribesToPicturesChanged() in <repo-root>\QuickFiler.Test\Controllers\QfcItemController.EventWiringTests.Part2.cs:line 47&#xD;
+   at QuickFiler.Controllers.Tests.QfcItemController_EventWiringTests.WireIntentEvents_SubscribesToPicturesChanged() in &lt;repo-root&gt;\QuickFiler.Test\Controllers\QfcItemController.EventWiringTests.Part2.cs:line 47&#xD;
 </StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="adcb1980-9f6a-4064-824c-f05a84b1c020" testId="12328505-fc3f-837b-8a29-7e7005c1dee9" testName="PicturesChanged_WhenRaised_RefreshesOptionsPictures" computerName="<host>" duration="00:00:00.0803573" startTime="2026-08-27T20:26:37.2611609-04:00" endTime="2026-08-27T20:26:37.3454003-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="adcb1980-9f6a-4064-824c-f05a84b1c020">
+    <UnitTestResult executionId="adcb1980-9f6a-4064-824c-f05a84b1c020" testId="12328505-fc3f-837b-8a29-7e7005c1dee9" testName="PicturesChanged_WhenRaised_RefreshesOptionsPictures" computerName="&lt;host&gt;" duration="00:00:00.0803573" startTime="2026-08-27T20:26:37.2611609-04:00" endTime="2026-08-27T20:26:37.3454003-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="adcb1980-9f6a-4064-824c-f05a84b1c020">
       <Output>
         <ErrorInfo>
           <Message>Expected QfcItemControllerTestSupport.GetField(controller, "_optionsPictures") to be True because the handler must read the toggled value back from the viewer when the event fires, but found False.</Message>
           <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
    at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
    at FluentAssertions.Primitives.ObjectAssertions`2.Be(TSubject expected, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/ObjectAssertions.cs:line 153&#xD;
-   at QuickFiler.Controllers.Tests.QfcItemController_EventWiringTests.PicturesChanged_WhenRaised_RefreshesOptionsPictures() in <repo-root>\QuickFiler.Test\Controllers\QfcItemController.EventWiringTests.Part2.cs:line 72</StackTrace>
+   at QuickFiler.Controllers.Tests.QfcItemController_EventWiringTests.PicturesChanged_WhenRaised_RefreshesOptionsPictures() in &lt;repo-root&gt;\QuickFiler.Test\Controllers\QfcItemController.EventWiringTests.Part2.cs:line 72</StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="PicturesChanged_WhenRaised_RefreshesOptionsPictures" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="12328505-fc3f-837b-8a29-7e7005c1dee9">
+    <UnitTest name="PicturesChanged_WhenRaised_RefreshesOptionsPictures" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="12328505-fc3f-837b-8a29-7e7005c1dee9">
       <Execution id="adcb1980-9f6a-4064-824c-f05a84b1c020" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_EventWiringTests" name="PicturesChanged_WhenRaised_RefreshesOptionsPictures" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_EventWiringTests" name="PicturesChanged_WhenRaised_RefreshesOptionsPictures" />
     </UnitTest>
-    <UnitTest name="WireIntentEvents_SubscribesToPicturesChanged" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="13f0c951-d974-8efd-88f9-aa4ce7708dc4">
+    <UnitTest name="WireIntentEvents_SubscribesToPicturesChanged" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="13f0c951-d974-8efd-88f9-aa4ce7708dc4">
       <Execution id="371c384f-47b2-43af-89e1-79dd89af6ff8" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_EventWiringTests" name="WireIntentEvents_SubscribesToPicturesChanged" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_EventWiringTests" name="WireIntentEvents_SubscribesToPicturesChanged" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>

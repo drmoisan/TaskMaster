@@ -103,3 +103,9 @@ and `QfcItemController_NavigationTests` at 17 each — and marks the two classes
 `ABSENT`, which is correct because they do not yet exist. The unconditional `BaselineNamedPins:`
 block records all nine named pins as `passed`. This run supersedes the 2026-08-27T23-28 artifact,
 which recorded `UNMEASURED` because the analyzer skew left the test assembly absent.
+
+**XML-escaping note.** The placeholder is written into the TRX in entity form as `&lt;repo-root&gt;` (likewise `&lt;host&gt;` and `&lt;user&gt;`).
+XML forbids a raw less-than character in a text node or an attribute value, so writing the
+five literal characters would make the document unparseable; an XML reader decodes the
+entity form back to the required literal. Each sanitised TRX was re-verified with a strict
+parser and its UnitTestResult element count matches the test total recorded above.

@@ -48,3 +48,9 @@ assigns the checked check-box image, already clears it to `null`, and already ra
 `CheckedChanged` exactly once, so the redundant `MenuItem_CheckedChanged` machinery Phase 2 deletes
 carries no behaviour of its own. `p1-t6.trx` is written to the canonical regression-testing evidence
 directory and sanitised of every account, machine and absolute-path identifier.
+
+**XML-escaping note.** The placeholder is written into the TRX in entity form as `&lt;repo-root&gt;` (likewise `&lt;host&gt;` and `&lt;user&gt;`).
+XML forbids a raw less-than character in a text node or an attribute value, so writing the
+five literal characters would make the document unparseable; an XML reader decodes the
+entity form back to the required literal. Each sanitised TRX was re-verified with a strict
+parser and its UnitTestResult element count matches the test total recorded above.

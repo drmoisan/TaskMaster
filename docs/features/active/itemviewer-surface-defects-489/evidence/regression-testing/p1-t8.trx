@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TestRun id="33bd7386-c3ba-4f49-9eb8-6b1fd87d5f5b" name="<user>@<host> 2026-08-27 20:26:07" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="33bd7386-c3ba-4f49-9eb8-6b1fd87d5f5b" name="&lt;user&gt;@&lt;host&gt; 2026-08-27 20:26:07" runUser="&lt;host&gt;\&lt;user&gt;" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-27T20:26:07.0872429-04:00" queuing="2026-08-27T20:26:07.0872429-04:00" start="2026-08-27T20:26:05.8705497-04:00" finish="2026-08-27T20:26:07.1046413-04:00" />
   <TestSettings name="default" id="4f17e64e-f8fb-4ccc-8ab6-616a6b9989ad">
-    <Deployment runDeploymentRoot="<user>_<host>_2026-08-27_20_26_07" />
+    <Deployment runDeploymentRoot="&lt;user&gt;_&lt;host&gt;_2026-08-27_20_26_07" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="97f77662-c304-473d-adcb-274aa7ebad1f" testId="19e37be6-7fb8-8f51-abba-f046c4b6c4d1" testName="ItemViewer_DeclaresNoMenuItemCheckedChangedMembers" computerName="<host>" duration="00:00:00.1309702" startTime="2026-08-27T20:26:06.7784223-04:00" endTime="2026-08-27T20:26:07.0204559-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="97f77662-c304-473d-adcb-274aa7ebad1f">
+    <UnitTestResult executionId="97f77662-c304-473d-adcb-274aa7ebad1f" testId="19e37be6-7fb8-8f51-abba-f046c4b6c4d1" testName="ItemViewer_DeclaresNoMenuItemCheckedChangedMembers" computerName="&lt;host&gt;" duration="00:00:00.1309702" startTime="2026-08-27T20:26:06.7784223-04:00" endTime="2026-08-27T20:26:07.0204559-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="97f77662-c304-473d-adcb-274aa7ebad1f">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -41,30 +41,30 @@ Expected typedForm to be &lt;null&gt; because the typed overload is dead code on
 </Message>
           <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
    at FluentAssertions.Execution.CollectingAssertionStrategy.ThrowIfAny(IDictionary`2 context) in /_/Src/FluentAssertions/Execution/CollectingAssertionStrategy.cs:line 49&#xD;
-   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbDropDownContractTests.ItemViewer_DeclaresNoMenuItemCheckedChangedMembers() in <repo-root>\QuickFiler.Test\Viewers\ItemViewerBreadcrumbDropDownContractTests.cs:line 162</StackTrace>
+   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbDropDownContractTests.ItemViewer_DeclaresNoMenuItemCheckedChangedMembers() in &lt;repo-root&gt;\QuickFiler.Test\Viewers\ItemViewerBreadcrumbDropDownContractTests.cs:line 162</StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="e0c6b501-5084-46c8-9d3a-ab9c5ada1ce9" testId="143f0559-f2cf-8396-aa9f-d3b5c619698a" testName="ItemViewer_DeclaresNoMoveOptionsMenuClickHandler" computerName="<host>" duration="00:00:00.0008273" startTime="2026-08-27T20:26:07.0265498-04:00" endTime="2026-08-27T20:26:07.0304715-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e0c6b501-5084-46c8-9d3a-ab9c5ada1ce9">
+    <UnitTestResult executionId="e0c6b501-5084-46c8-9d3a-ab9c5ada1ce9" testId="143f0559-f2cf-8396-aa9f-d3b5c619698a" testName="ItemViewer_DeclaresNoMoveOptionsMenuClickHandler" computerName="&lt;host&gt;" duration="00:00:00.0008273" startTime="2026-08-27T20:26:07.0265498-04:00" endTime="2026-08-27T20:26:07.0304715-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e0c6b501-5084-46c8-9d3a-ab9c5ada1ce9">
       <Output>
         <ErrorInfo>
           <Message>Expected handler to be &lt;null&gt; because the empty MoveOptionsMenu_Click body has no caller and no designer wiring, but found ItemViewer.MoveOptionsMenu_Click.</Message>
           <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
    at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
    at FluentAssertions.Primitives.ReferenceTypeAssertions`2.BeNull(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Primitives/ReferenceTypeAssertions.cs:line 49&#xD;
-   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbDropDownContractTests.ItemViewer_DeclaresNoMoveOptionsMenuClickHandler() in <repo-root>\QuickFiler.Test\Viewers\ItemViewerBreadcrumbDropDownContractTests.cs:line 182</StackTrace>
+   at QuickFiler.Test.Viewers.ItemViewerBreadcrumbDropDownContractTests.ItemViewer_DeclaresNoMoveOptionsMenuClickHandler() in &lt;repo-root&gt;\QuickFiler.Test\Viewers\ItemViewerBreadcrumbDropDownContractTests.cs:line 182</StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="ItemViewer_DeclaresNoMenuItemCheckedChangedMembers" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="19e37be6-7fb8-8f51-abba-f046c4b6c4d1">
+    <UnitTest name="ItemViewer_DeclaresNoMenuItemCheckedChangedMembers" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="19e37be6-7fb8-8f51-abba-f046c4b6c4d1">
       <Execution id="97f77662-c304-473d-adcb-274aa7ebad1f" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbDropDownContractTests" name="ItemViewer_DeclaresNoMenuItemCheckedChangedMembers" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbDropDownContractTests" name="ItemViewer_DeclaresNoMenuItemCheckedChangedMembers" />
     </UnitTest>
-    <UnitTest name="ItemViewer_DeclaresNoMoveOptionsMenuClickHandler" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="143f0559-f2cf-8396-aa9f-d3b5c619698a">
+    <UnitTest name="ItemViewer_DeclaresNoMoveOptionsMenuClickHandler" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="143f0559-f2cf-8396-aa9f-d3b5c619698a">
       <Execution id="e0c6b501-5084-46c8-9d3a-ab9c5ada1ce9" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbDropDownContractTests" name="ItemViewer_DeclaresNoMoveOptionsMenuClickHandler" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerBreadcrumbDropDownContractTests" name="ItemViewer_DeclaresNoMoveOptionsMenuClickHandler" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>

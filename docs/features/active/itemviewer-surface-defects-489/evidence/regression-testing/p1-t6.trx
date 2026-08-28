@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TestRun id="b4e7e2ae-a9fe-42cc-b3ee-1c126eb536b3" name="<user>@<host> 2026-08-27 20:24:46" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="b4e7e2ae-a9fe-42cc-b3ee-1c126eb536b3" name="&lt;user&gt;@&lt;host&gt; 2026-08-27 20:24:46" runUser="&lt;host&gt;\&lt;user&gt;" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-27T20:24:46.4858126-04:00" queuing="2026-08-27T20:24:46.4858126-04:00" start="2026-08-27T20:24:45.2206838-04:00" finish="2026-08-27T20:24:46.5018381-04:00" />
   <TestSettings name="default" id="d4f6893d-d190-4354-b44f-ff08f3ae459d">
-    <Deployment runDeploymentRoot="<user>_<host>_2026-08-27_20_24_46" />
+    <Deployment runDeploymentRoot="&lt;user&gt;_&lt;host&gt;_2026-08-27_20_24_46" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="2be4fd6c-d888-43e8-b11f-695e4cbaa580" testId="1e988019-4ef4-84ef-927f-dd356996a3d9" testName="Checked_WhenSetTrue_AssignsCheckedCheckBoxImage" computerName="<host>" duration="00:00:00.1097675" startTime="2026-08-27T20:24:46.1896357-04:00" endTime="2026-08-27T20:24:46.4080789-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2be4fd6c-d888-43e8-b11f-695e4cbaa580">
+    <UnitTestResult executionId="2be4fd6c-d888-43e8-b11f-695e4cbaa580" testId="1e988019-4ef4-84ef-927f-dd356996a3d9" testName="Checked_WhenSetTrue_AssignsCheckedCheckBoxImage" computerName="&lt;host&gt;" duration="00:00:00.1097675" startTime="2026-08-27T20:24:46.1896357-04:00" endTime="2026-08-27T20:24:46.4080789-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2be4fd6c-d888-43e8-b11f-695e4cbaa580">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -37,26 +37,26 @@ Debug Trace:&#xD;
      For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="8c1d0d8c-6f8f-483e-aad8-2dcf975c362d" testId="16dd5bb9-2adf-8f9c-9075-444382ee9bb6" testName="ToolStripMenuItemCb_IsNotDerivedFromControl" computerName="<host>" duration="00:00:00.0008012" startTime="2026-08-27T20:24:46.4156897-04:00" endTime="2026-08-27T20:24:46.4212061-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8c1d0d8c-6f8f-483e-aad8-2dcf975c362d" />
-    <UnitTestResult executionId="3f0a18fc-0a2f-4288-a8d1-5eb168b3570a" testId="1cffd91e-8928-8b13-b839-3d003262a780" testName="Checked_WhenSetFalse_AssignsNullImage" computerName="<host>" duration="00:00:00.0005431" startTime="2026-08-27T20:24:46.4126626-04:00" endTime="2026-08-27T20:24:46.4141721-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3f0a18fc-0a2f-4288-a8d1-5eb168b3570a" />
-    <UnitTestResult executionId="5e6f9dda-6207-40cc-8b90-b448b93b43ec" testId="16217006-f678-883c-a671-f157c6a13259" testName="Checked_WhenSetTrue_RaisesShadowedCheckedChangedExactlyOnce" computerName="<host>" duration="00:00:00.0013001" startTime="2026-08-27T20:24:46.4141721-04:00" endTime="2026-08-27T20:24:46.4156897-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5e6f9dda-6207-40cc-8b90-b448b93b43ec" />
+    <UnitTestResult executionId="8c1d0d8c-6f8f-483e-aad8-2dcf975c362d" testId="16dd5bb9-2adf-8f9c-9075-444382ee9bb6" testName="ToolStripMenuItemCb_IsNotDerivedFromControl" computerName="&lt;host&gt;" duration="00:00:00.0008012" startTime="2026-08-27T20:24:46.4156897-04:00" endTime="2026-08-27T20:24:46.4212061-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8c1d0d8c-6f8f-483e-aad8-2dcf975c362d" />
+    <UnitTestResult executionId="3f0a18fc-0a2f-4288-a8d1-5eb168b3570a" testId="1cffd91e-8928-8b13-b839-3d003262a780" testName="Checked_WhenSetFalse_AssignsNullImage" computerName="&lt;host&gt;" duration="00:00:00.0005431" startTime="2026-08-27T20:24:46.4126626-04:00" endTime="2026-08-27T20:24:46.4141721-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3f0a18fc-0a2f-4288-a8d1-5eb168b3570a" />
+    <UnitTestResult executionId="5e6f9dda-6207-40cc-8b90-b448b93b43ec" testId="16217006-f678-883c-a671-f157c6a13259" testName="Checked_WhenSetTrue_RaisesShadowedCheckedChangedExactlyOnce" computerName="&lt;host&gt;" duration="00:00:00.0013001" startTime="2026-08-27T20:24:46.4141721-04:00" endTime="2026-08-27T20:24:46.4156897-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5e6f9dda-6207-40cc-8b90-b448b93b43ec" />
   </Results>
   <TestDefinitions>
-    <UnitTest name="Checked_WhenSetFalse_AssignsNullImage" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1cffd91e-8928-8b13-b839-3d003262a780">
+    <UnitTest name="Checked_WhenSetFalse_AssignsNullImage" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1cffd91e-8928-8b13-b839-3d003262a780">
       <Execution id="3f0a18fc-0a2f-4288-a8d1-5eb168b3570a" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ToolStripMenuItemCbTests" name="Checked_WhenSetFalse_AssignsNullImage" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ToolStripMenuItemCbTests" name="Checked_WhenSetFalse_AssignsNullImage" />
     </UnitTest>
-    <UnitTest name="Checked_WhenSetTrue_AssignsCheckedCheckBoxImage" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e988019-4ef4-84ef-927f-dd356996a3d9">
+    <UnitTest name="Checked_WhenSetTrue_AssignsCheckedCheckBoxImage" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e988019-4ef4-84ef-927f-dd356996a3d9">
       <Execution id="2be4fd6c-d888-43e8-b11f-695e4cbaa580" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ToolStripMenuItemCbTests" name="Checked_WhenSetTrue_AssignsCheckedCheckBoxImage" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ToolStripMenuItemCbTests" name="Checked_WhenSetTrue_AssignsCheckedCheckBoxImage" />
     </UnitTest>
-    <UnitTest name="ToolStripMenuItemCb_IsNotDerivedFromControl" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="16dd5bb9-2adf-8f9c-9075-444382ee9bb6">
+    <UnitTest name="ToolStripMenuItemCb_IsNotDerivedFromControl" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="16dd5bb9-2adf-8f9c-9075-444382ee9bb6">
       <Execution id="8c1d0d8c-6f8f-483e-aad8-2dcf975c362d" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ToolStripMenuItemCbTests" name="ToolStripMenuItemCb_IsNotDerivedFromControl" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ToolStripMenuItemCbTests" name="ToolStripMenuItemCb_IsNotDerivedFromControl" />
     </UnitTest>
-    <UnitTest name="Checked_WhenSetTrue_RaisesShadowedCheckedChangedExactlyOnce" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="16217006-f678-883c-a671-f157c6a13259">
+    <UnitTest name="Checked_WhenSetTrue_RaisesShadowedCheckedChangedExactlyOnce" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="16217006-f678-883c-a671-f157c6a13259">
       <Execution id="5e6f9dda-6207-40cc-8b90-b448b93b43ec" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ToolStripMenuItemCbTests" name="Checked_WhenSetTrue_RaisesShadowedCheckedChangedExactlyOnce" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ToolStripMenuItemCbTests" name="Checked_WhenSetTrue_RaisesShadowedCheckedChangedExactlyOnce" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
