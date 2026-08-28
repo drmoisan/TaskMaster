@@ -89,6 +89,7 @@ namespace QuickFiler.Controllers
             _itemViewer.ConversationItemSelectionChanged +=
                 new ListViewItemSelectionChangedEventHandler(this.TopicThread_ItemSelectionChanged);
             _itemViewer.SearchKeyDown += this.TextBoxSearch_KeyDown;
+            _itemViewer.SearchLeave += this.TextBoxSearch_Leave;
             _itemViewer.EmailCopyChanged += this.CbxEmailCopy_CheckedChanged;
             _itemViewer.AttachmentsChanged += this.CbxAttachments_CheckedChanged;
             _itemViewer.PicturesChanged += this.CbxPictures_CheckedChanged;
@@ -476,6 +477,7 @@ namespace QuickFiler.Controllers
             _itemViewer.ConversationItemSelectionChanged -=
                 new ListViewItemSelectionChangedEventHandler(this.TopicThread_ItemSelectionChanged);
             _itemViewer.SearchKeyDown -= this.TextBoxSearch_KeyDown;
+            _itemViewer.SearchLeave -= this.TextBoxSearch_Leave;
             _itemViewer.EmailCopyChanged -= this.CbxEmailCopy_CheckedChanged;
             _itemViewer.AttachmentsChanged -= this.CbxAttachments_CheckedChanged;
             _itemViewer.PicturesChanged -= this.CbxPictures_CheckedChanged;

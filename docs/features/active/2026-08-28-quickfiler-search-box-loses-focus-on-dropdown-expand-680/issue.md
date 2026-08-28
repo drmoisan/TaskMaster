@@ -2,7 +2,7 @@
 
 - Date captured: 2026-08-28
 - Author: Dan Moisan
-- Status: Promoted -> docs/features/active/quickfiler-search-box-loses-focus-on-dropdown-expand/ (Issue #680)
+- Status: Promoted -> docs/features/active/2026-08-28-quickfiler-search-box-loses-focus-on-dropdown-expand-680/ (Issue #680)
 
 > Automation note: Keep the section headings below unchanged; the promotion tooling maps each of them into the GitHub bug issue template.
 
@@ -56,9 +56,9 @@ Files likely relevant (not yet confirmed as root cause): `QuickFiler/Viewers/Ite
 
 ## Proposed Fix / Validation Ideas
 
-- [ ] Unit coverage areas: search-box keystroke handling while the results drop-down is open/auto-opening; focus retention/restoration on drop-down open.
-- [ ] Integration scenario to retest: type a multi-character search term (3+ chars) continuously without manual refocus; also retest the #438 acceptance criteria to confirm no regression.
-- [ ] Manual verification notes: confirm the drop-down still narrows/updates live as characters are typed, and that Escape/commit/selection behavior from #438 is unaffected.
+- [x] Unit coverage areas: search-box keystroke handling while the results drop-down is open/auto-opening; focus retention/restoration on drop-down open. (Discharged by the Phase 2 regression tests: six host-seam tests in `QuickFiler.Test/Viewers/BreadcrumbDropDownHostTests.Part2.cs`, six dismissal-ownership tests in `QuickFiler.Test/Controllers/QfcItemController.SearchDismissalTests.cs`, two wiring tests in `QuickFiler.Test/Controllers/QfcItemController.EventWiringTests.Part2.cs`, and four additive-contract tests in `QuickFiler.Test/Viewers/ItemViewerSearchDismissalContractTests.cs`.)
+- [ ] Integration scenario to retest: type a multi-character search term (3+ chars) continuously without manual refocus; also retest the #438 acceptance criteria to confirm no regression. (Second clause DISCHARGED — the #438/#400 acceptance retest ran green in plan task P4-T2, 75 tests, 0 failures, over suites proven byte-unmodified. First clause NOT dischargeable by any unit test: continuous multi-character typing without manual refocus is a live-typing scenario requiring a real message pump, a real popup window, and a live WebView2. It is carried by the P5-T8 HV runbook at `evidence/other/hv-runbook-680.2026-08-28T16-12.md` alongside spec AC-1, which is why this box stays unchecked.)
+- [ ] Manual verification notes: confirm the drop-down still narrows/updates live as characters are typed, and that Escape/commit/selection behavior from #438 is unaffected. (Carried by the P5-T8 HV runbook at `evidence/other/hv-runbook-680.2026-08-28T16-12.md` — items HV-2 for live narrowing and HV-3 through HV-9 for Escape/commit/selection.)
 
 ## Next Step
 

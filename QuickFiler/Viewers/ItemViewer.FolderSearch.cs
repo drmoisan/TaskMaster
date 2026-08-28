@@ -80,6 +80,18 @@ namespace QuickFiler
             remove => TxtboxSearch.KeyDown -= value;
         }
 
+        // #680: the search textbox's Leave event, forwarded verbatim. The controller owns the
+        // dismissal that WinForms menu mode used to provide for a non-capturing popup.
+        public event EventHandler SearchLeave
+        {
+            add => TxtboxSearch.Leave += value;
+            remove => TxtboxSearch.Leave -= value;
+        }
+
+        // #680: the Escape/Leave dismissal guard. Thin forwarding to the host-neutral, unit-tested
+        // bridge coordinator, exactly like every other member in this coverage-exempt partial.
+        public bool IsFolderDropDownOpen => BreadcrumbCoordinator?.IsSelectorOpen == true;
+
         public void FocusSearch() => TxtboxSearch.Focus();
     }
 }

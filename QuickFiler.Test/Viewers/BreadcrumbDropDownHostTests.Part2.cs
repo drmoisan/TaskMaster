@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Windows.Forms;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuickFiler.Viewers;
@@ -209,6 +212,154 @@ namespace QuickFiler.Test.Viewers
                 harness.CancelCount.Should().Be(1);
                 harness.FocusAnchorCount.Should().Be(1);
                 harness.FocusPendingCount.Should().Be(0);
+            }
+        }
+
+        /// <summary>
+        /// Issue #680: a non-focusing (search-driven) open must present the popup with
+        /// <c>AutoClose == false</c>, which is the WinForms framework's own opt-out from
+        /// <c>ModalMenuFilter</c> menu-mode entry. Menu mode is entered inside
+        /// <c>SetVisibleCore(true)</c>, so the property must already be false when the show delegate
+        /// runs — observing it at that instant is the only way to pin the ordering.
+        /// </summary>
+        [TestMethod]
+        public void ShowPopup_NonFocusingOpen_RunsTheShowDelegateWithAutoCloseFalse()
+        {
+            // Arrange
+            var observed = new List<bool>();
+            Action<ToolStripDropDown, Control, Point> show = (dropDown, owner, point) =>
+                observed.Add(dropDown.AutoClose);
+            using (Harness harness = CreateHarness(show))
+            {
+                // Act
+                OpenWithFocusIntent(harness.Host, Anchor, Work, Desired, false).Should().BeTrue();
+
+                // Assert
+                observed.Should().Equal(new[] { false });
+            }
+        }
+
+        /// <summary>
+        /// Issue #680 (gesture control): the pre-existing 3-parameter open is an explicit gesture and
+        /// keeps standard popup semantics, so the show delegate must see <c>AutoClose == true</c>.
+        /// </summary>
+        [TestMethod]
+        public void ShowPopup_GestureOpen_RunsTheShowDelegateWithAutoCloseTrue()
+        {
+            // Arrange
+            var observed = new List<bool>();
+            Action<ToolStripDropDown, Control, Point> show = (dropDown, owner, point) =>
+                observed.Add(dropDown.AutoClose);
+            using (Harness harness = CreateHarness(show))
+            {
+                // Act
+                Open(harness.Host, Anchor, Work, Desired).Should().BeTrue();
+
+                // Assert
+                observed.Should().Equal(new[] { true });
+            }
+        }
+
+        /// <summary>
+        /// Issue #680 (guard): close completion restores the <c>AutoClose = true</c> default, so the
+        /// next lifecycle always starts from standard popup semantics regardless of how the previous
+        /// one was opened.
+        /// </summary>
+        [TestMethod]
+        public void Close_AfterANonFocusingOpen_RestoresAutoCloseTrue()
+        {
+            // Arrange
+            using (Harness harness = CreateHarness())
+            {
+                OpenWithFocusIntent(harness.Host, Anchor, Work, Desired, false).Should().BeTrue();
+
+                // Act
+                Close(harness.Host, "Uncommitted").Should().BeTrue();
+
+                // Assert
+                Property<ToolStripDropDown>(harness.Host, "DropDown")
+                    .AutoClose.Should()
+                    .BeTrue("close completion must restore the default for the next lifecycle");
+            }
+        }
+
+        /// <summary>
+        /// Issue #680 (guard): a <c>takeFocus: true</c> reopen on a popup that was shown
+        /// non-capturing is the Down-arrow handoff. Standard popup semantics resume there, so
+        /// <c>AutoClose</c> returns to <c>true</c> and the focus-pending delegate runs exactly once.
+        /// </summary>
+        [TestMethod]
+        public void OpenAsync_TakeFocusReopenOnANonFocusingOpen_RestoresAutoCloseTrue()
+        {
+            // Arrange
+            using (Harness harness = CreateHarness())
+            {
+                OpenWithFocusIntent(harness.Host, Anchor, Work, Desired, false).Should().BeTrue();
+
+                // Act
+                OpenWithFocusIntent(harness.Host, Anchor, Work, Desired, true).Should().BeTrue();
+
+                // Assert
+                Property<ToolStripDropDown>(harness.Host, "DropDown")
+                    .AutoClose.Should()
+                    .BeTrue("the gesture handoff resumes standard popup semantics");
+                harness.FocusPendingCount.Should().Be(1);
+            }
+        }
+
+        /// <summary>
+        /// Issue #680 (edge): a gesture open issued immediately after a completed non-capturing cycle
+        /// must still show with <c>AutoClose == true</c>. Only the second show is asserted, because
+        /// the first show's value is already the subject of the non-focusing-open test above.
+        /// </summary>
+        [TestMethod]
+        public void ShowPopup_GestureOpenAfterANonFocusingCycle_RunsTheShowDelegateWithAutoCloseTrue()
+        {
+            // Arrange
+            var observed = new List<bool>();
+            Action<ToolStripDropDown, Control, Point> show = (dropDown, owner, point) =>
+                observed.Add(dropDown.AutoClose);
+            using (Harness harness = CreateHarness(show))
+            {
+                OpenWithFocusIntent(harness.Host, Anchor, Work, Desired, false).Should().BeTrue();
+                Close(harness.Host, "Uncommitted").Should().BeTrue();
+
+                // Act
+                Open(harness.Host, Anchor, Work, Desired).Should().BeTrue();
+
+                // Assert
+                harness
+                    .ShowCount.Should()
+                    .Be(2, "the closed popup is shown again for the gesture");
+                observed[1].Should().BeTrue("the gesture open restores standard popup semantics");
+            }
+        }
+
+        /// <summary>
+        /// Issue #680: two consecutive non-capturing opens ride the existing already-open latch, so
+        /// the popup is shown once, is never re-focused, and that single show sees
+        /// <c>AutoClose == false</c>. This is the host-level companion to the coordinator's
+        /// mocked-host refresh test, which cannot observe <c>AutoClose</c> at all.
+        /// </summary>
+        [TestMethod]
+        public void ShowPopup_TwoConsecutiveNonFocusingOpens_ShowOnceWithAutoCloseFalse()
+        {
+            // Arrange
+            var observed = new List<bool>();
+            Action<ToolStripDropDown, Control, Point> show = (dropDown, owner, point) =>
+                observed.Add(dropDown.AutoClose);
+            using (Harness harness = CreateHarness(show))
+            {
+                // Act
+                OpenWithFocusIntent(harness.Host, Anchor, Work, Desired, false).Should().BeTrue();
+                OpenWithFocusIntent(harness.Host, Anchor, Work, Desired, false).Should().BeTrue();
+
+                // Assert
+                harness
+                    .ShowCount.Should()
+                    .Be(1, "the already-open latch suppresses the second show");
+                harness.FocusPendingCount.Should().Be(0);
+                observed.Should().Equal(new[] { false });
             }
         }
 

@@ -37,6 +37,7 @@
 - ["Make the citation exist" deltas propagate false facts](project_preflight_citation_match_propagates_false_fact.md) — a fix that copies A's prose into B corroborates A's error in two documents; also, an epic child's issue.md promise to siblings needs a C-constraint AND a verification task
 - [Check-off cites an artifact a LATER task writes](project_preflight_checkoff_cites_later_task_artifact.md) — unsatisfiable in plan order; also covers a phase-5 criterion needing an issue phase-7 opens; fix by body swap, not renumbering
 - ["Skip the pointless drain" note makes a negative test vacuous](project_preflight_drain_scope_optimization_note_makes_test_vacuous.md) — a cosmetic "path X is synchronous, don't drain" note is a behavioral claim; a synchronous callee says nothing about how its caller is reached
+- [Sanitisation task cannot sweep its own record](project_sanitisation_task_cannot_sweep_its_own_record.md) — exactly one residual path always remains; check the record's content constraint, not the scope
 - [Conjunctive criteria break the one-artifact citation rule](project_preflight_conjunctive_criterion_citation_gap.md) — "cites exactly one artifact" makes every AC that conjoins facts from two command steps uncheckable; sweep for the second conjunct ("passes unmodified", "anywhere", "either figure")
 ## Build / toolchain environment
 - [pwsh/git/gh CLI gotchas](project_pwsh_git_gh_cli_gotchas.md) — no jq; pwsh won't concatenate `$(git merge-base ...)..HEAD`

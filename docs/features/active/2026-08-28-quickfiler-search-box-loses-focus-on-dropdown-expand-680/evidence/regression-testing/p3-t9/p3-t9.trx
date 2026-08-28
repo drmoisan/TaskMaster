@@ -1,0 +1,337 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="c852c315-1c4c-42cf-8d87-d7db88306f65" name="<user>@<host> 2026-08-28 15:17:00" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-28T15:17:00.6889612-04:00" queuing="2026-08-28T15:17:00.6889612-04:00" start="2026-08-28T15:16:59.3723631-04:00" finish="2026-08-28T15:17:01.0992734-04:00" />
+  <TestSettings name="default" id="8a0157ad-66cf-4ea9-b435-6c069fecc326">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-28_15_17_00" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="afafbdcb-8da7-4588-b774-304be88c67b3" testId="1b6efa0f-cf02-891d-a92e-25b806d7b4f6" testName="IItemViewer_ExistingSearchAndDropDownMemberShapes_AreUnchanged" computerName="<host>" duration="00:00:00.0006564" startTime="2026-08-28T15:17:00.5439389-04:00" endTime="2026-08-28T15:17:00.5454435-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="afafbdcb-8da7-4588-b774-304be88c67b3" />
+    <UnitTestResult executionId="3e2c8e66-55e0-410b-bdb7-373b7b038ebb" testId="1e5fd48d-e90c-8791-b008-875878520d9d" testName="WireIntentEvents_SubscribesSearchLeave" computerName="<host>" duration="00:00:00.2159088" startTime="2026-08-28T15:17:00.3803759-04:00" endTime="2026-08-28T15:17:00.7152181-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3e2c8e66-55e0-410b-bdb7-373b7b038ebb" />
+    <UnitTestResult executionId="1c064673-6652-4a1f-bc26-ddca4e9b6b74" testId="1d7434b3-d868-8217-9685-47e781903a66" testName="TextBoxSearchLeave_WhileDropDownOpen_RoutesExactlyOneCloseIntent" computerName="<host>" duration="00:00:00.0002754" startTime="2026-08-28T15:17:00.6773683-04:00" endTime="2026-08-28T15:17:00.6773683-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1c064673-6652-4a1f-bc26-ddca4e9b6b74" />
+    <UnitTestResult executionId="fe6e5cf1-42a9-4985-93d6-115070e4ce24" testId="18bfe6fe-f0e3-80f9-9eb2-b2c47afe8cc2" testName="TextBoxSearch_TextChanged_NeverCommitsAFolderSelection" computerName="<host>" duration="00:00:00.0012316" startTime="2026-08-28T15:17:00.6773683-04:00" endTime="2026-08-28T15:17:00.6783693-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fe6e5cf1-42a9-4985-93d6-115070e4ce24" />
+    <UnitTestResult executionId="d53e0a84-4f4b-4206-bc0e-3453d9baf6b1" testId="1d51101c-3522-81a5-8ed4-d64ac01587c2" testName="ItemViewer_ImplementsSearchLeaveAndIsFolderDropDownOpen" computerName="<host>" duration="00:00:00.0002604" startTime="2026-08-28T15:17:00.5454435-04:00" endTime="2026-08-28T15:17:00.5480928-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d53e0a84-4f4b-4206-bc0e-3453d9baf6b1" />
+    <UnitTestResult executionId="ca8795f0-087a-4859-958d-2aecf38f139d" testId="1acc9afd-2eab-8c79-a242-06b69b666342" testName="ShowPopup_TwoConsecutiveNonFocusingOpens_ShowOnceWithAutoCloseFalse" computerName="<host>" duration="00:00:00.0151720" startTime="2026-08-28T15:17:01.0270669-04:00" endTime="2026-08-28T15:17:01.0435174-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ca8795f0-087a-4859-958d-2aecf38f139d" />
+    <UnitTestResult executionId="8acebe6e-42fe-4f36-a152-4fc06082f849" testId="16e7e477-edc8-8e63-a9db-8ef5301744cb" testName="SearchThenCancel_LeavesTheCachedFolderAtThePreSearchCommittedValue" computerName="<host>" duration="00:00:00.0043406" startTime="2026-08-28T15:17:00.6828800-04:00" endTime="2026-08-28T15:17:00.6879611-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8acebe6e-42fe-4f36-a152-4fc06082f849" />
+    <UnitTestResult executionId="fa591414-499a-48a3-bc02-e3c7d99d53dc" testId="198fd0ea-0f17-89d1-b437-e1136bbaafb6" testName="OpenAndClose_TransferFocusIntoPendingOptionAndBackToAnchor" computerName="<host>" duration="00:00:00.0004657" startTime="2026-08-28T15:17:00.8602046-04:00" endTime="2026-08-28T15:17:00.8607072-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fa591414-499a-48a3-bc02-e3c7d99d53dc" />
+    <UnitTestResult executionId="4cc90a51-40bf-463b-9373-d109d090ac05" testId="162f79a5-47ca-8ff7-aabd-2444aa539a6c" testName="SetTheme_BlankTheme_RejectsExplicitly" computerName="<host>" duration="00:00:00.0057449" startTime="2026-08-28T15:17:00.8617100-04:00" endTime="2026-08-28T15:17:00.8673816-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4cc90a51-40bf-463b-9373-d109d090ac05" />
+    <UnitTestResult executionId="330fc84d-f065-4ea9-8160-4be8c8c0bbf2" testId="1c69e33a-72ce-8cc0-ac6b-5cc72fd8abf2" testName="OpenAsync_CreatesToolStripControlHostAndUsesCalculatedScreenPlacement" computerName="<host>" duration="00:00:00.0427634" startTime="2026-08-28T15:17:00.8164097-04:00" endTime="2026-08-28T15:17:00.8592062-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="330fc84d-f065-4ea9-8160-4be8c8c0bbf2" />
+    <UnitTestResult executionId="e205d444-3217-4e0c-92f0-48b26c5959fc" testId="193d61b9-aea0-89d6-be6e-4670e99f317b" testName="TextBoxSearch_TextChanged_IssuesThePresentationIntentExactlyOnce" computerName="<host>" duration="00:00:00.0024308" startTime="2026-08-28T15:17:00.6652788-04:00" endTime="2026-08-28T15:17:00.6672794-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e205d444-3217-4e0c-92f0-48b26c5959fc" />
+    <UnitTestResult executionId="904fdaf3-fe6b-4463-b65d-1e24f132e3e4" testId="1cce5da5-fecb-8ccc-9fa6-64873a34fa4a" testName="OpenAsync_ConsecutiveNonFocusingOpens_NeverFocusAndNeverReshow" computerName="<host>" duration="00:00:00.0143207" startTime="2026-08-28T15:17:00.9184238-04:00" endTime="2026-08-28T15:17:00.9322787-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="904fdaf3-fe6b-4463-b65d-1e24f132e3e4" />
+    <UnitTestResult executionId="e370d6f9-f4ba-4625-a234-90eecfdb1467" testId="1bf53a7c-a7ad-8be1-8f52-7b0a9597fdca" testName="Close_AfterANonFocusingOpen_RestoresAutoCloseTrue" computerName="<host>" duration="00:00:00.0145965" startTime="2026-08-28T15:17:00.9824547-04:00" endTime="2026-08-28T15:17:00.9962150-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e370d6f9-f4ba-4625-a234-90eecfdb1467" />
+    <UnitTestResult executionId="21311f85-16bf-49d0-812f-4f434015a88f" testId="1b5c4e15-4526-8bb4-8dff-730198bcd1b7" testName="OpenAsync_FreshOpenWithoutFocus_InvokesNeitherFocusDelegate" computerName="<host>" duration="00:00:00.0269061" startTime="2026-08-28T15:17:00.8777876-04:00" endTime="2026-08-28T15:17:00.9044052-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="21311f85-16bf-49d0-812f-4f434015a88f" />
+    <UnitTestResult executionId="53238cce-2aaa-4e97-85a2-40cce7fa9feb" testId="13927f46-0a96-8492-ab00-120d7a61981f" testName="Constructor_OwnsAutoClosingToolStripDropDownWithoutGlobalTopmostForm" computerName="<host>" duration="00:00:00.3163379" startTime="2026-08-28T15:17:00.3803759-04:00" endTime="2026-08-28T15:17:00.8164097-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="53238cce-2aaa-4e97-85a2-40cce7fa9feb" />
+    <UnitTestResult executionId="3012a2c1-e99b-40b9-8818-2be8c0ae5ba1" testId="11cbae25-8320-8623-8ab4-d7e5295d3cd7" testName="Close_AfterANonFocusingOpen_StillReturnsFocusToTheAnchorOnce" computerName="<host>" duration="00:00:00.0134264" startTime="2026-08-28T15:17:00.9480794-04:00" endTime="2026-08-28T15:17:00.9621507-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3012a2c1-e99b-40b9-8818-2be8c0ae5ba1" />
+    <UnitTestResult executionId="39c38a65-f393-405a-81a0-38032f5133f9" testId="10353649-1435-8821-a5e5-6815bbd06487" testName="ShowPopup_NonFocusingOpen_RunsTheShowDelegateWithAutoCloseFalse" computerName="<host>" duration="00:00:00.0186308" startTime="2026-08-28T15:17:00.9621507-04:00" endTime="2026-08-28T15:17:00.9814500-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="39c38a65-f393-405a-81a0-38032f5133f9" />
+    <UnitTestResult executionId="266256c7-3db2-4d24-abb2-e88f8fffa7ca" testId="13a6c163-adb4-89bd-afb3-4af4694a6854" testName="OpenAsync_NonFocusingThenGestureOpen_FocusesOnlyForTheGesture" computerName="<host>" duration="00:00:00.0140007" startTime="2026-08-28T15:17:00.9337845-04:00" endTime="2026-08-28T15:17:00.9480794-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="266256c7-3db2-4d24-abb2-e88f8fffa7ca" />
+    <UnitTestResult executionId="60c929d5-8866-4538-9849-7eb0efb11074" testId="178b0bdd-8239-837b-b44c-0dccf8fae2ad" testName="OpenAsync_FreshOpenWithFocus_InvokesFocusPendingExactlyOnce" computerName="<host>" duration="00:00:00.0005593" startTime="2026-08-28T15:17:00.9322787-04:00" endTime="2026-08-28T15:17:00.9337845-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="60c929d5-8866-4538-9849-7eb0efb11074" />
+    <UnitTestResult executionId="bed1ba81-afc5-4fa3-8d78-6c550d625c42" testId="154f498f-6aef-85cd-9548-75f1d150bb48" testName="ShowPopup_GestureOpen_RunsTheShowDelegateWithAutoCloseTrue" computerName="<host>" duration="00:00:00.0005796" startTime="2026-08-28T15:17:00.9814500-04:00" endTime="2026-08-28T15:17:00.9824547-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bed1ba81-afc5-4fa3-8d78-6c550d625c42" />
+    <UnitTestResult executionId="e8071757-b4b6-48e8-90e2-64532b63ac94" testId="1372c696-2c78-8120-bfd8-4aae8d450a1b" testName="TextBoxSearchKeyDown_DownArrow_StillOpensAndFocusesTheDropDown" computerName="<host>" duration="00:00:00.0003796" startTime="2026-08-28T15:17:00.6783693-04:00" endTime="2026-08-28T15:17:00.6793685-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e8071757-b4b6-48e8-90e2-64532b63ac94" />
+    <UnitTestResult executionId="1b7ecf81-1428-48fc-a02d-756540072acb" testId="17b1ce49-0dc5-8db9-8bc7-b69dd364097c" testName="OpenAsync_ReissuedWithoutFocusWhileOpen_DoesNotScheduleFocusPending" computerName="<host>" duration="00:00:00.0133985" startTime="2026-08-28T15:17:00.9044052-04:00" endTime="2026-08-28T15:17:00.9184238-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1b7ecf81-1428-48fc-a02d-756540072acb" />
+    <UnitTestResult executionId="1cfe6fdd-d0f1-47ac-90ba-17d549e02b65" testId="178ce869-be03-80b8-bd71-fabf99a0c833" testName="TextBoxSearch_TextChanged_SingleResult_StillTransfersNoFocusAndCommitsNothing" computerName="<host>" duration="00:00:00.0007183" startTime="2026-08-28T15:17:00.6783693-04:00" endTime="2026-08-28T15:17:00.6793685-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1cfe6fdd-d0f1-47ac-90ba-17d549e02b65" />
+    <UnitTestResult executionId="9a2fb6f3-1a9c-4c10-a139-09a39517888e" testId="1a9ce567-4955-86fb-a242-5251a0e2701b" testName="TextBoxSearchKeyDown_EscapeWhileDropDownClosed_RoutesNoIntentAndLeavesKeyUnhandled" computerName="<host>" duration="00:00:00.0055574" startTime="2026-08-28T15:17:00.6707859-04:00" endTime="2026-08-28T15:17:00.6773683-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9a2fb6f3-1a9c-4c10-a139-09a39517888e" />
+    <UnitTestResult executionId="1e490524-120b-4868-adfd-466a20048e2e" testId="136991b1-4940-86cc-a3af-2de0c12a52a2" testName="TextBoxSearch_TextChanged_EmptyResult_TransfersNoFocusAndDoesNotThrow" computerName="<host>" duration="00:00:00.0033545" startTime="2026-08-28T15:17:00.6793685-04:00" endTime="2026-08-28T15:17:00.6828800-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1e490524-120b-4868-adfd-466a20048e2e" />
+    <UnitTestResult executionId="e5940086-8a53-4879-9afb-d6c7b982960d" testId="15017f99-4696-8af7-bcde-64731a8c60d6" testName="TextBoxSearch_TextChanged_PerKeystroke_QueriesTheCompleteSearchTextEachTime" computerName="<host>" duration="00:00:00.0116416" startTime="2026-08-28T15:17:00.6879611-04:00" endTime="2026-08-28T15:17:00.6989803-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e5940086-8a53-4879-9afb-d6c7b982960d" />
+    <UnitTestResult executionId="75bd2a1e-25a1-42d0-8da8-2222f0591688" testId="19d270d0-c944-8c58-be70-0136a213d542" testName="TextBoxSearch_TextChanged_NeverFocusesTheFolderDropDown" computerName="<host>" duration="00:00:00.0006095" startTime="2026-08-28T15:17:00.6707859-04:00" endTime="2026-08-28T15:17:00.6773683-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="75bd2a1e-25a1-42d0-8da8-2222f0591688" />
+    <UnitTestResult executionId="9dfca0d5-5167-4382-81de-55a77f16b3bf" testId="1d2279e2-6bb6-833b-884d-bebf51a3bbdf" testName="ExplicitCommitAndUncommittedClose_HaveDistinctCallbacks" computerName="<host>" duration="00:00:00.0010213" startTime="2026-08-28T15:17:00.8592062-04:00" endTime="2026-08-28T15:17:00.8602046-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9dfca0d5-5167-4382-81de-55a77f16b3bf" />
+    <UnitTestResult executionId="52b98180-6ccb-4693-8a7a-13b149d456ab" testId="13522cc8-7cf8-8420-8556-60e947f3a4d8" testName="Reset_DisposesAnOrphanedPartialSurface" computerName="<host>" duration="00:00:00.0008450" startTime="2026-08-28T15:17:00.8747822-04:00" endTime="2026-08-28T15:17:00.8747822-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="52b98180-6ccb-4693-8a7a-13b149d456ab" />
+    <UnitTestResult executionId="21dfeedf-6b08-4bec-a7a5-91009784d00e" testId="11995b98-6ceb-8d1b-83bc-75728d94bf4c" testName="ResetAndDispose_HandleOpenOrPartialStateAndRejectLaterUse" computerName="<host>" duration="00:00:00.0024782" startTime="2026-08-28T15:17:00.8720098-04:00" endTime="2026-08-28T15:17:00.8742605-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="21dfeedf-6b08-4bec-a7a5-91009784d00e" />
+    <UnitTestResult executionId="31fc87d7-1ac1-48cf-aeb0-339a92b344b8" testId="144d8290-7dad-8194-8b4c-d04de9fa3219" testName="OpenAsync_TakeFocusReopenOnANonFocusingOpen_RestoresAutoCloseTrue" computerName="<host>" duration="00:00:00.0143517" startTime="2026-08-28T15:17:00.9977199-04:00" endTime="2026-08-28T15:17:01.0112964-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="31fc87d7-1ac1-48cf-aeb0-339a92b344b8" />
+    <UnitTestResult executionId="d78ba8c6-3fa8-45ff-89d2-4c567af82fb8" testId="159dfc12-d780-8a36-8709-295f8e19a234" testName="OpenAsync_ShowFailure_ClosesUncommittedAndRetainsTheFailure" computerName="<host>" duration="00:00:00.0005585" startTime="2026-08-28T15:17:00.8704454-04:00" endTime="2026-08-28T15:17:00.8709734-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d78ba8c6-3fa8-45ff-89d2-4c567af82fb8" />
+    <UnitTestResult executionId="beb6227e-8687-413a-adc2-3166ac7d6e54" testId="1317b103-0caa-822f-817b-ddcf15f08b3f" testName="ProductionConstructor_RejectsMissingInitializerOrHtml" computerName="<host>" duration="00:00:00.0020423" startTime="2026-08-28T15:17:00.8747822-04:00" endTime="2026-08-28T15:17:00.8777876-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="beb6227e-8687-413a-adc2-3166ac7d6e54" />
+    <UnitTestResult executionId="8a8d5eae-9c04-4159-a5ee-1bc8d1aebb6d" testId="1f55a4fe-f953-8954-a1de-1717cd3c1630" testName="TextBoxSearchLeave_AfterDownArrowHandoff_SuppressesExactlyOneClose" computerName="<host>" duration="00:00:00.0006486" startTime="2026-08-28T15:17:00.6783693-04:00" endTime="2026-08-28T15:17:00.6783693-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8a8d5eae-9c04-4159-a5ee-1bc8d1aebb6d" />
+    <UnitTestResult executionId="1a7ccaa6-7630-4bdc-9136-7b63f16fa000" testId="15c5e7bb-709d-8f20-8771-0ee3ae7f33b7" testName="TextBoxSearchLeave_WhileDropDownClosed_RoutesNoIntent" computerName="<host>" duration="00:00:00.0003183" startTime="2026-08-28T15:17:00.6773683-04:00" endTime="2026-08-28T15:17:00.6783693-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1a7ccaa6-7630-4bdc-9136-7b63f16fa000" />
+    <UnitTestResult executionId="56359400-b9b7-46d5-aa5e-92dc877df637" testId="15e356e9-f736-807b-ab10-6fecc6d69ccc" testName="SetTheme_RetainsLatestThemeForTheReusablePopupSurface" computerName="<host>" duration="00:00:00.0003189" startTime="2026-08-28T15:17:00.8607072-04:00" endTime="2026-08-28T15:17:00.8617100-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="56359400-b9b7-46d5-aa5e-92dc877df637" />
+    <UnitTestResult executionId="0366368e-5abf-4f19-9cf4-6e9c713ec2d3" testId="14313e90-3cd0-8316-9bdf-9279d6489a46" testName="OpenAsync_WhenAlreadyOpen_FocusesPendingWithoutRecreatingOrShowing" computerName="<host>" duration="00:00:00.0008272" startTime="2026-08-28T15:17:00.8673816-04:00" endTime="2026-08-28T15:17:00.8684115-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0366368e-5abf-4f19-9cf4-6e9c713ec2d3" />
+    <UnitTestResult executionId="70b73177-6030-4990-b70c-ae66b4b7a13f" testId="14b561a8-f406-849d-8a76-a8b464e36937" testName="TextBoxSearch_TextChanged_NeverRequestsADropDownStateChange" computerName="<host>" duration="00:00:00.1654521" startTime="2026-08-28T15:17:00.3803759-04:00" endTime="2026-08-28T15:17:00.6652788-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="70b73177-6030-4990-b70c-ae66b4b7a13f" />
+    <UnitTestResult executionId="1f6e3fa3-7e12-4852-b210-649e3bdfae65" testId="169eb37e-333f-84bf-a60f-fe55d16d5e0e" testName="NativeClosedEvent_CancelsOnceAndIgnoresLaterCloseNotifications" computerName="<host>" duration="00:00:00.0006522" startTime="2026-08-28T15:17:00.8709734-04:00" endTime="2026-08-28T15:17:00.8720098-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1f6e3fa3-7e12-4852-b210-649e3bdfae65" />
+    <UnitTestResult executionId="ca3352b2-be77-4a20-8d94-e764dc430809" testId="10dcd183-c320-8633-a0e0-ba5c79946dd6" testName="OpenAsync_ThreeParameterOverload_StillFocusesPendingExactlyOnce" computerName="<host>" duration="00:00:00.0002881" startTime="2026-08-28T15:17:00.9337845-04:00" endTime="2026-08-28T15:17:00.9337845-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ca3352b2-be77-4a20-8d94-e764dc430809" />
+    <UnitTestResult executionId="6f0080f0-c8ac-4949-8c2c-8d69eb51f4de" testId="1a4f368e-8b32-8eaf-8e7f-322608ec036d" testName="UnwireIntentEvents_DetachesSearchLeave" computerName="<host>" duration="00:00:00.0026091" startTime="2026-08-28T15:17:00.7152181-04:00" endTime="2026-08-28T15:17:00.7182241-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6f0080f0-c8ac-4949-8c2c-8d69eb51f4de" />
+    <UnitTestResult executionId="d8a368db-0154-4cd2-9cae-3d99d0f9bda3" testId="189983a8-9454-8289-b051-e82f9b956ce9" testName="IItemViewer_DeclaresIsFolderDropDownOpenAsReadOnlyBool" computerName="<host>" duration="00:00:00.0012787" startTime="2026-08-28T15:17:00.5419387-04:00" endTime="2026-08-28T15:17:00.5439389-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d8a368db-0154-4cd2-9cae-3d99d0f9bda3" />
+    <UnitTestResult executionId="d3ba567f-463e-42a0-8426-05d5ef31cffb" testId="1b51818f-24f0-8435-a496-550d1ef19049" testName="IItemViewer_DeclaresSearchLeaveAsPlainEventHandler" computerName="<host>" duration="00:00:00.0331238" startTime="2026-08-28T15:17:00.3803759-04:00" endTime="2026-08-28T15:17:00.5354241-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d3ba567f-463e-42a0-8426-05d5ef31cffb">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="244c8bed-2655-43e7-90d7-cea9dcfa2429" testId="17bd8a55-039f-8db9-b5e5-503393ce3664" testName="OpenAsync_ZeroWorkingArea_RestoresSelectionAndFocus" computerName="<host>" duration="00:00:00.0019100" startTime="2026-08-28T15:17:00.8684115-04:00" endTime="2026-08-28T15:17:00.8704454-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="244c8bed-2655-43e7-90d7-cea9dcfa2429" />
+    <UnitTestResult executionId="e135712f-e176-40e9-b3d9-2675d1efcbb3" testId="1003bf03-8531-8972-9c0e-f46fb88021de" testName="TextBoxSearchKeyDown_EscapeWhileDropDownOpen_RoutesExactlyOneCloseIntent" computerName="<host>" duration="00:00:00.1657426" startTime="2026-08-28T15:17:00.3803759-04:00" endTime="2026-08-28T15:17:00.6652788-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e135712f-e176-40e9-b3d9-2675d1efcbb3" />
+    <UnitTestResult executionId="c0f6821c-4b58-4db0-808f-d4f5639be57a" testId="1d65d613-da39-807b-a4c6-d14aaabf2863" testName="ShowPopup_GestureOpenAfterANonFocusingCycle_RunsTheShowDelegateWithAutoCloseTrue" computerName="<host>" duration="00:00:00.0150048" startTime="2026-08-28T15:17:01.0123019-04:00" endTime="2026-08-28T15:17:01.0270669-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c0f6821c-4b58-4db0-808f-d4f5639be57a" />
+    <UnitTestResult executionId="dc03d365-aa73-4aa0-8cec-e8d9b4bfbd83" testId="18ce25dd-2a10-85df-a2db-e528421802ab" testName="OpenAsync_NonFocusingOpenWithZeroWorkingArea_RollsBackUnchanged" computerName="<host>" duration="00:00:00.0005380" startTime="2026-08-28T15:17:00.9621507-04:00" endTime="2026-08-28T15:17:00.9621507-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dc03d365-aa73-4aa0-8cec-e8d9b4bfbd83" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="OpenAndClose_TransferFocusIntoPendingOptionAndBackToAnchor" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="198fd0ea-0f17-89d1-b437-e1136bbaafb6">
+      <Execution id="fa591414-499a-48a3-bc02-e3c7d99d53dc" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="OpenAndClose_TransferFocusIntoPendingOptionAndBackToAnchor" />
+    </UnitTest>
+    <UnitTest name="TextBoxSearchLeave_AfterDownArrowHandoff_SuppressesExactlyOneClose" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1f55a4fe-f953-8954-a1de-1717cd3c1630">
+      <Execution id="8a8d5eae-9c04-4159-a5ee-1bc8d1aebb6d" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests" name="TextBoxSearchLeave_AfterDownArrowHandoff_SuppressesExactlyOneClose" />
+    </UnitTest>
+    <UnitTest name="Close_AfterANonFocusingOpen_RestoresAutoCloseTrue" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1bf53a7c-a7ad-8be1-8f52-7b0a9597fdca">
+      <Execution id="e370d6f9-f4ba-4625-a234-90eecfdb1467" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="Close_AfterANonFocusingOpen_RestoresAutoCloseTrue" />
+    </UnitTest>
+    <UnitTest name="OpenAsync_NonFocusingThenGestureOpen_FocusesOnlyForTheGesture" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="13a6c163-adb4-89bd-afb3-4af4694a6854">
+      <Execution id="266256c7-3db2-4d24-abb2-e88f8fffa7ca" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="OpenAsync_NonFocusingThenGestureOpen_FocusesOnlyForTheGesture" />
+    </UnitTest>
+    <UnitTest name="UnwireIntentEvents_DetachesSearchLeave" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a4f368e-8b32-8eaf-8e7f-322608ec036d">
+      <Execution id="6f0080f0-c8ac-4949-8c2c-8d69eb51f4de" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_EventWiringTests" name="UnwireIntentEvents_DetachesSearchLeave" />
+    </UnitTest>
+    <UnitTest name="ItemViewer_ImplementsSearchLeaveAndIsFolderDropDownOpen" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d51101c-3522-81a5-8ed4-d64ac01587c2">
+      <Execution id="d53e0a84-4f4b-4206-bc0e-3453d9baf6b1" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerSearchDismissalContractTests" name="ItemViewer_ImplementsSearchLeaveAndIsFolderDropDownOpen" />
+    </UnitTest>
+    <UnitTest name="SetTheme_BlankTheme_RejectsExplicitly" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="162f79a5-47ca-8ff7-aabd-2444aa539a6c">
+      <Execution id="4cc90a51-40bf-463b-9373-d109d090ac05" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="SetTheme_BlankTheme_RejectsExplicitly" />
+    </UnitTest>
+    <UnitTest name="OpenAsync_TakeFocusReopenOnANonFocusingOpen_RestoresAutoCloseTrue" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="144d8290-7dad-8194-8b4c-d04de9fa3219">
+      <Execution id="31fc87d7-1ac1-48cf-aeb0-339a92b344b8" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="OpenAsync_TakeFocusReopenOnANonFocusingOpen_RestoresAutoCloseTrue" />
+    </UnitTest>
+    <UnitTest name="OpenAsync_FreshOpenWithoutFocus_InvokesNeitherFocusDelegate" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1b5c4e15-4526-8bb4-8dff-730198bcd1b7">
+      <Execution id="21311f85-16bf-49d0-812f-4f434015a88f" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="OpenAsync_FreshOpenWithoutFocus_InvokesNeitherFocusDelegate" />
+    </UnitTest>
+    <UnitTest name="OpenAsync_ConsecutiveNonFocusingOpens_NeverFocusAndNeverReshow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1cce5da5-fecb-8ccc-9fa6-64873a34fa4a">
+      <Execution id="904fdaf3-fe6b-4463-b65d-1e24f132e3e4" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="OpenAsync_ConsecutiveNonFocusingOpens_NeverFocusAndNeverReshow" />
+    </UnitTest>
+    <UnitTest name="TextBoxSearchKeyDown_EscapeWhileDropDownOpen_RoutesExactlyOneCloseIntent" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1003bf03-8531-8972-9c0e-f46fb88021de">
+      <Execution id="e135712f-e176-40e9-b3d9-2675d1efcbb3" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests" name="TextBoxSearchKeyDown_EscapeWhileDropDownOpen_RoutesExactlyOneCloseIntent" />
+    </UnitTest>
+    <UnitTest name="IItemViewer_DeclaresIsFolderDropDownOpenAsReadOnlyBool" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="189983a8-9454-8289-b051-e82f9b956ce9">
+      <Execution id="d8a368db-0154-4cd2-9cae-3d99d0f9bda3" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerSearchDismissalContractTests" name="IItemViewer_DeclaresIsFolderDropDownOpenAsReadOnlyBool" />
+    </UnitTest>
+    <UnitTest name="ExplicitCommitAndUncommittedClose_HaveDistinctCallbacks" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d2279e2-6bb6-833b-884d-bebf51a3bbdf">
+      <Execution id="9dfca0d5-5167-4382-81de-55a77f16b3bf" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="ExplicitCommitAndUncommittedClose_HaveDistinctCallbacks" />
+    </UnitTest>
+    <UnitTest name="NativeClosedEvent_CancelsOnceAndIgnoresLaterCloseNotifications" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="169eb37e-333f-84bf-a60f-fe55d16d5e0e">
+      <Execution id="1f6e3fa3-7e12-4852-b210-649e3bdfae65" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="NativeClosedEvent_CancelsOnceAndIgnoresLaterCloseNotifications" />
+    </UnitTest>
+    <UnitTest name="SearchThenCancel_LeavesTheCachedFolderAtThePreSearchCommittedValue" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="16e7e477-edc8-8e63-a9db-8ef5301744cb">
+      <Execution id="8acebe6e-42fe-4f36-a152-4fc06082f849" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchFocusRegressionTests" name="SearchThenCancel_LeavesTheCachedFolderAtThePreSearchCommittedValue" />
+    </UnitTest>
+    <UnitTest name="TextBoxSearch_TextChanged_NeverRequestsADropDownStateChange" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="14b561a8-f406-849d-8a76-a8b464e36937">
+      <Execution id="70b73177-6030-4990-b70c-ae66b4b7a13f" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchFocusRegressionTests" name="TextBoxSearch_TextChanged_NeverRequestsADropDownStateChange" />
+    </UnitTest>
+    <UnitTest name="OpenAsync_ShowFailure_ClosesUncommittedAndRetainsTheFailure" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="159dfc12-d780-8a36-8709-295f8e19a234">
+      <Execution id="d78ba8c6-3fa8-45ff-89d2-4c567af82fb8" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="OpenAsync_ShowFailure_ClosesUncommittedAndRetainsTheFailure" />
+    </UnitTest>
+    <UnitTest name="ShowPopup_NonFocusingOpen_RunsTheShowDelegateWithAutoCloseFalse" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="10353649-1435-8821-a5e5-6815bbd06487">
+      <Execution id="39c38a65-f393-405a-81a0-38032f5133f9" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="ShowPopup_NonFocusingOpen_RunsTheShowDelegateWithAutoCloseFalse" />
+    </UnitTest>
+    <UnitTest name="TextBoxSearch_TextChanged_NeverCommitsAFolderSelection" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="18bfe6fe-f0e3-80f9-9eb2-b2c47afe8cc2">
+      <Execution id="fe6e5cf1-42a9-4985-93d6-115070e4ce24" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchFocusRegressionTests" name="TextBoxSearch_TextChanged_NeverCommitsAFolderSelection" />
+    </UnitTest>
+    <UnitTest name="ResetAndDispose_HandleOpenOrPartialStateAndRejectLaterUse" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="11995b98-6ceb-8d1b-83bc-75728d94bf4c">
+      <Execution id="21dfeedf-6b08-4bec-a7a5-91009784d00e" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="ResetAndDispose_HandleOpenOrPartialStateAndRejectLaterUse" />
+    </UnitTest>
+    <UnitTest name="OpenAsync_ThreeParameterOverload_StillFocusesPendingExactlyOnce" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="10dcd183-c320-8633-a0e0-ba5c79946dd6">
+      <Execution id="ca3352b2-be77-4a20-8d94-e764dc430809" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="OpenAsync_ThreeParameterOverload_StillFocusesPendingExactlyOnce" />
+    </UnitTest>
+    <UnitTest name="OpenAsync_ReissuedWithoutFocusWhileOpen_DoesNotScheduleFocusPending" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="17b1ce49-0dc5-8db9-8bc7-b69dd364097c">
+      <Execution id="1b7ecf81-1428-48fc-a02d-756540072acb" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="OpenAsync_ReissuedWithoutFocusWhileOpen_DoesNotScheduleFocusPending" />
+    </UnitTest>
+    <UnitTest name="OpenAsync_FreshOpenWithFocus_InvokesFocusPendingExactlyOnce" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="178b0bdd-8239-837b-b44c-0dccf8fae2ad">
+      <Execution id="60c929d5-8866-4538-9849-7eb0efb11074" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="OpenAsync_FreshOpenWithFocus_InvokesFocusPendingExactlyOnce" />
+    </UnitTest>
+    <UnitTest name="IItemViewer_DeclaresSearchLeaveAsPlainEventHandler" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1b51818f-24f0-8435-a496-550d1ef19049">
+      <Execution id="d3ba567f-463e-42a0-8426-05d5ef31cffb" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerSearchDismissalContractTests" name="IItemViewer_DeclaresSearchLeaveAsPlainEventHandler" />
+    </UnitTest>
+    <UnitTest name="WireIntentEvents_SubscribesSearchLeave" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e5fd48d-e90c-8791-b008-875878520d9d">
+      <Execution id="3e2c8e66-55e0-410b-bdb7-373b7b038ebb" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_EventWiringTests" name="WireIntentEvents_SubscribesSearchLeave" />
+    </UnitTest>
+    <UnitTest name="TextBoxSearchLeave_WhileDropDownOpen_RoutesExactlyOneCloseIntent" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d7434b3-d868-8217-9685-47e781903a66">
+      <Execution id="1c064673-6652-4a1f-bc26-ddca4e9b6b74" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests" name="TextBoxSearchLeave_WhileDropDownOpen_RoutesExactlyOneCloseIntent" />
+    </UnitTest>
+    <UnitTest name="TextBoxSearch_TextChanged_IssuesThePresentationIntentExactlyOnce" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="193d61b9-aea0-89d6-be6e-4670e99f317b">
+      <Execution id="e205d444-3217-4e0c-92f0-48b26c5959fc" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchFocusRegressionTests" name="TextBoxSearch_TextChanged_IssuesThePresentationIntentExactlyOnce" />
+    </UnitTest>
+    <UnitTest name="IItemViewer_ExistingSearchAndDropDownMemberShapes_AreUnchanged" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1b6efa0f-cf02-891d-a92e-25b806d7b4f6">
+      <Execution id="afafbdcb-8da7-4588-b774-304be88c67b3" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerSearchDismissalContractTests" name="IItemViewer_ExistingSearchAndDropDownMemberShapes_AreUnchanged" />
+    </UnitTest>
+    <UnitTest name="OpenAsync_WhenAlreadyOpen_FocusesPendingWithoutRecreatingOrShowing" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="14313e90-3cd0-8316-9bdf-9279d6489a46">
+      <Execution id="0366368e-5abf-4f19-9cf4-6e9c713ec2d3" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="OpenAsync_WhenAlreadyOpen_FocusesPendingWithoutRecreatingOrShowing" />
+    </UnitTest>
+    <UnitTest name="ShowPopup_TwoConsecutiveNonFocusingOpens_ShowOnceWithAutoCloseFalse" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1acc9afd-2eab-8c79-a242-06b69b666342">
+      <Execution id="ca8795f0-087a-4859-958d-2aecf38f139d" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="ShowPopup_TwoConsecutiveNonFocusingOpens_ShowOnceWithAutoCloseFalse" />
+    </UnitTest>
+    <UnitTest name="OpenAsync_NonFocusingOpenWithZeroWorkingArea_RollsBackUnchanged" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="18ce25dd-2a10-85df-a2db-e528421802ab">
+      <Execution id="dc03d365-aa73-4aa0-8cec-e8d9b4bfbd83" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="OpenAsync_NonFocusingOpenWithZeroWorkingArea_RollsBackUnchanged" />
+    </UnitTest>
+    <UnitTest name="Constructor_OwnsAutoClosingToolStripDropDownWithoutGlobalTopmostForm" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="13927f46-0a96-8492-ab00-120d7a61981f">
+      <Execution id="53238cce-2aaa-4e97-85a2-40cce7fa9feb" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="Constructor_OwnsAutoClosingToolStripDropDownWithoutGlobalTopmostForm" />
+    </UnitTest>
+    <UnitTest name="Close_AfterANonFocusingOpen_StillReturnsFocusToTheAnchorOnce" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="11cbae25-8320-8623-8ab4-d7e5295d3cd7">
+      <Execution id="3012a2c1-e99b-40b9-8818-2be8c0ae5ba1" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="Close_AfterANonFocusingOpen_StillReturnsFocusToTheAnchorOnce" />
+    </UnitTest>
+    <UnitTest name="OpenAsync_ZeroWorkingArea_RestoresSelectionAndFocus" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="17bd8a55-039f-8db9-b5e5-503393ce3664">
+      <Execution id="244c8bed-2655-43e7-90d7-cea9dcfa2429" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="OpenAsync_ZeroWorkingArea_RestoresSelectionAndFocus" />
+    </UnitTest>
+    <UnitTest name="TextBoxSearchKeyDown_EscapeWhileDropDownClosed_RoutesNoIntentAndLeavesKeyUnhandled" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a9ce567-4955-86fb-a242-5251a0e2701b">
+      <Execution id="9a2fb6f3-1a9c-4c10-a139-09a39517888e" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests" name="TextBoxSearchKeyDown_EscapeWhileDropDownClosed_RoutesNoIntentAndLeavesKeyUnhandled" />
+    </UnitTest>
+    <UnitTest name="Reset_DisposesAnOrphanedPartialSurface" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="13522cc8-7cf8-8420-8556-60e947f3a4d8">
+      <Execution id="52b98180-6ccb-4693-8a7a-13b149d456ab" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="Reset_DisposesAnOrphanedPartialSurface" />
+    </UnitTest>
+    <UnitTest name="TextBoxSearch_TextChanged_EmptyResult_TransfersNoFocusAndDoesNotThrow" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="136991b1-4940-86cc-a3af-2de0c12a52a2">
+      <Execution id="1e490524-120b-4868-adfd-466a20048e2e" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchFocusRegressionTests" name="TextBoxSearch_TextChanged_EmptyResult_TransfersNoFocusAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="ShowPopup_GestureOpenAfterANonFocusingCycle_RunsTheShowDelegateWithAutoCloseTrue" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d65d613-da39-807b-a4c6-d14aaabf2863">
+      <Execution id="c0f6821c-4b58-4db0-808f-d4f5639be57a" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="ShowPopup_GestureOpenAfterANonFocusingCycle_RunsTheShowDelegateWithAutoCloseTrue" />
+    </UnitTest>
+    <UnitTest name="ProductionConstructor_RejectsMissingInitializerOrHtml" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1317b103-0caa-822f-817b-ddcf15f08b3f">
+      <Execution id="beb6227e-8687-413a-adc2-3166ac7d6e54" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="ProductionConstructor_RejectsMissingInitializerOrHtml" />
+    </UnitTest>
+    <UnitTest name="TextBoxSearchLeave_WhileDropDownClosed_RoutesNoIntent" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="15c5e7bb-709d-8f20-8771-0ee3ae7f33b7">
+      <Execution id="1a7ccaa6-7630-4bdc-9136-7b63f16fa000" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests" name="TextBoxSearchLeave_WhileDropDownClosed_RoutesNoIntent" />
+    </UnitTest>
+    <UnitTest name="SetTheme_RetainsLatestThemeForTheReusablePopupSurface" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="15e356e9-f736-807b-ab10-6fecc6d69ccc">
+      <Execution id="56359400-b9b7-46d5-aa5e-92dc877df637" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="SetTheme_RetainsLatestThemeForTheReusablePopupSurface" />
+    </UnitTest>
+    <UnitTest name="TextBoxSearch_TextChanged_SingleResult_StillTransfersNoFocusAndCommitsNothing" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="178ce869-be03-80b8-bd71-fabf99a0c833">
+      <Execution id="1cfe6fdd-d0f1-47ac-90ba-17d549e02b65" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchFocusRegressionTests" name="TextBoxSearch_TextChanged_SingleResult_StillTransfersNoFocusAndCommitsNothing" />
+    </UnitTest>
+    <UnitTest name="TextBoxSearch_TextChanged_PerKeystroke_QueriesTheCompleteSearchTextEachTime" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="15017f99-4696-8af7-bcde-64731a8c60d6">
+      <Execution id="e5940086-8a53-4879-9afb-d6c7b982960d" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchFocusRegressionTests" name="TextBoxSearch_TextChanged_PerKeystroke_QueriesTheCompleteSearchTextEachTime" />
+    </UnitTest>
+    <UnitTest name="OpenAsync_CreatesToolStripControlHostAndUsesCalculatedScreenPlacement" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c69e33a-72ce-8cc0-ac6b-5cc72fd8abf2">
+      <Execution id="330fc84d-f065-4ea9-8160-4be8c8c0bbf2" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="OpenAsync_CreatesToolStripControlHostAndUsesCalculatedScreenPlacement" />
+    </UnitTest>
+    <UnitTest name="ShowPopup_GestureOpen_RunsTheShowDelegateWithAutoCloseTrue" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="154f498f-6aef-85cd-9548-75f1d150bb48">
+      <Execution id="bed1ba81-afc5-4fa3-8d78-6c550d625c42" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.BreadcrumbDropDownHostTests" name="ShowPopup_GestureOpen_RunsTheShowDelegateWithAutoCloseTrue" />
+    </UnitTest>
+    <UnitTest name="TextBoxSearchKeyDown_DownArrow_StillOpensAndFocusesTheDropDown" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1372c696-2c78-8120-bfd8-4aae8d450a1b">
+      <Execution id="e8071757-b4b6-48e8-90e2-64532b63ac94" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests" name="TextBoxSearchKeyDown_DownArrow_StillOpensAndFocusesTheDropDown" />
+    </UnitTest>
+    <UnitTest name="TextBoxSearch_TextChanged_NeverFocusesTheFolderDropDown" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="19d270d0-c944-8c58-be70-0136a213d542">
+      <Execution id="75bd2a1e-25a1-42d0-8da8-2222f0591688" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchFocusRegressionTests" name="TextBoxSearch_TextChanged_NeverFocusesTheFolderDropDown" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1b6efa0f-cf02-891d-a92e-25b806d7b4f6" executionId="afafbdcb-8da7-4588-b774-304be88c67b3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e5fd48d-e90c-8791-b008-875878520d9d" executionId="3e2c8e66-55e0-410b-bdb7-373b7b038ebb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d7434b3-d868-8217-9685-47e781903a66" executionId="1c064673-6652-4a1f-bc26-ddca4e9b6b74" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18bfe6fe-f0e3-80f9-9eb2-b2c47afe8cc2" executionId="fe6e5cf1-42a9-4985-93d6-115070e4ce24" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d51101c-3522-81a5-8ed4-d64ac01587c2" executionId="d53e0a84-4f4b-4206-bc0e-3453d9baf6b1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1acc9afd-2eab-8c79-a242-06b69b666342" executionId="ca8795f0-087a-4859-958d-2aecf38f139d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16e7e477-edc8-8e63-a9db-8ef5301744cb" executionId="8acebe6e-42fe-4f36-a152-4fc06082f849" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="198fd0ea-0f17-89d1-b437-e1136bbaafb6" executionId="fa591414-499a-48a3-bc02-e3c7d99d53dc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="162f79a5-47ca-8ff7-aabd-2444aa539a6c" executionId="4cc90a51-40bf-463b-9373-d109d090ac05" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c69e33a-72ce-8cc0-ac6b-5cc72fd8abf2" executionId="330fc84d-f065-4ea9-8160-4be8c8c0bbf2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="193d61b9-aea0-89d6-be6e-4670e99f317b" executionId="e205d444-3217-4e0c-92f0-48b26c5959fc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1cce5da5-fecb-8ccc-9fa6-64873a34fa4a" executionId="904fdaf3-fe6b-4463-b65d-1e24f132e3e4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1bf53a7c-a7ad-8be1-8f52-7b0a9597fdca" executionId="e370d6f9-f4ba-4625-a234-90eecfdb1467" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b5c4e15-4526-8bb4-8dff-730198bcd1b7" executionId="21311f85-16bf-49d0-812f-4f434015a88f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13927f46-0a96-8492-ab00-120d7a61981f" executionId="53238cce-2aaa-4e97-85a2-40cce7fa9feb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11cbae25-8320-8623-8ab4-d7e5295d3cd7" executionId="3012a2c1-e99b-40b9-8818-2be8c0ae5ba1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10353649-1435-8821-a5e5-6815bbd06487" executionId="39c38a65-f393-405a-81a0-38032f5133f9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13a6c163-adb4-89bd-afb3-4af4694a6854" executionId="266256c7-3db2-4d24-abb2-e88f8fffa7ca" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="178b0bdd-8239-837b-b44c-0dccf8fae2ad" executionId="60c929d5-8866-4538-9849-7eb0efb11074" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="154f498f-6aef-85cd-9548-75f1d150bb48" executionId="bed1ba81-afc5-4fa3-8d78-6c550d625c42" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1372c696-2c78-8120-bfd8-4aae8d450a1b" executionId="e8071757-b4b6-48e8-90e2-64532b63ac94" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17b1ce49-0dc5-8db9-8bc7-b69dd364097c" executionId="1b7ecf81-1428-48fc-a02d-756540072acb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="178ce869-be03-80b8-bd71-fabf99a0c833" executionId="1cfe6fdd-d0f1-47ac-90ba-17d549e02b65" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a9ce567-4955-86fb-a242-5251a0e2701b" executionId="9a2fb6f3-1a9c-4c10-a139-09a39517888e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="136991b1-4940-86cc-a3af-2de0c12a52a2" executionId="1e490524-120b-4868-adfd-466a20048e2e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15017f99-4696-8af7-bcde-64731a8c60d6" executionId="e5940086-8a53-4879-9afb-d6c7b982960d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="19d270d0-c944-8c58-be70-0136a213d542" executionId="75bd2a1e-25a1-42d0-8da8-2222f0591688" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d2279e2-6bb6-833b-884d-bebf51a3bbdf" executionId="9dfca0d5-5167-4382-81de-55a77f16b3bf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13522cc8-7cf8-8420-8556-60e947f3a4d8" executionId="52b98180-6ccb-4693-8a7a-13b149d456ab" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11995b98-6ceb-8d1b-83bc-75728d94bf4c" executionId="21dfeedf-6b08-4bec-a7a5-91009784d00e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="144d8290-7dad-8194-8b4c-d04de9fa3219" executionId="31fc87d7-1ac1-48cf-aeb0-339a92b344b8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="159dfc12-d780-8a36-8709-295f8e19a234" executionId="d78ba8c6-3fa8-45ff-89d2-4c567af82fb8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1317b103-0caa-822f-817b-ddcf15f08b3f" executionId="beb6227e-8687-413a-adc2-3166ac7d6e54" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f55a4fe-f953-8954-a1de-1717cd3c1630" executionId="8a8d5eae-9c04-4159-a5ee-1bc8d1aebb6d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15c5e7bb-709d-8f20-8771-0ee3ae7f33b7" executionId="1a7ccaa6-7630-4bdc-9136-7b63f16fa000" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15e356e9-f736-807b-ab10-6fecc6d69ccc" executionId="56359400-b9b7-46d5-aa5e-92dc877df637" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14313e90-3cd0-8316-9bdf-9279d6489a46" executionId="0366368e-5abf-4f19-9cf4-6e9c713ec2d3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14b561a8-f406-849d-8a76-a8b464e36937" executionId="70b73177-6030-4990-b70c-ae66b4b7a13f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="169eb37e-333f-84bf-a60f-fe55d16d5e0e" executionId="1f6e3fa3-7e12-4852-b210-649e3bdfae65" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10dcd183-c320-8633-a0e0-ba5c79946dd6" executionId="ca3352b2-be77-4a20-8d94-e764dc430809" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a4f368e-8b32-8eaf-8e7f-322608ec036d" executionId="6f0080f0-c8ac-4949-8c2c-8d69eb51f4de" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="189983a8-9454-8289-b051-e82f9b956ce9" executionId="d8a368db-0154-4cd2-9cae-3d99d0f9bda3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b51818f-24f0-8435-a496-550d1ef19049" executionId="d3ba567f-463e-42a0-8426-05d5ef31cffb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17bd8a55-039f-8db9-b5e5-503393ce3664" executionId="244c8bed-2655-43e7-90d7-cea9dcfa2429" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1003bf03-8531-8972-9c0e-f46fb88021de" executionId="e135712f-e176-40e9-b3d9-2675d1efcbb3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d65d613-da39-807b-a4c6-d14aaabf2863" executionId="c0f6821c-4b58-4db0-808f-d4f5639be57a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18ce25dd-2a10-85df-a2db-e528421802ab" executionId="dc03d365-aa73-4aa0-8cec-e8d9b4bfbd83" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="47" executed="47" passed="47" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

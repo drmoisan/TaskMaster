@@ -181,15 +181,50 @@ namespace QuickFiler.Controllers
             _itemViewer.PresentFolderSearchResults(folders);
         }
 
+        // Issue #680: one-shot suppression latch for the Down-arrow focus handoff. Single producer:
+        // the Keys.Down branch of TextBoxSearch_KeyDown. Single consumer: TextBoxSearch_Leave, which
+        // reads and clears it. Moving focus onto the same-form breadcrumb control raises the search
+        // textbox's Leave, and that one leave must not dismiss the popup the gesture just claimed.
+        private bool _searchLeaveHandoffPending;
+
         internal void TextBoxSearch_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Down)
             {
                 _itemViewer.SetFolderDroppedDown(true);
+                _searchLeaveHandoffPending = true;
                 _itemViewer.FocusFolderDropDown();
                 e.SuppressKeyPress = true;
                 e.Handled = true;
             }
+            else if (e.KeyCode == Keys.Escape && _itemViewer.IsFolderDropDownOpen)
+            {
+                // A search-driven popup is shown non-capturing, so Escape no longer reaches it
+                // through WinForms menu mode. Route it to the existing cancel path. When the
+                // drop-down is not open the key falls through untouched, so Escape keeps whatever
+                // meaning it has elsewhere in the form.
+                _itemViewer.SetFolderDroppedDown(false);
+                e.SuppressKeyPress = true;
+                e.Handled = true;
+            }
+        }
+
+        // Issue #680: dismissal ownership for a non-capturing (search-driven) popup. The popup is
+        // shown with AutoClose == false, so WinForms menu mode never engages and never dismisses it
+        // on a focus change; the controller takes that responsibility here. The single close intent
+        // routes through the existing, already-tested cancel path (SetFolderDroppedDown(false) ->
+        // CancelSelector) rather than inventing new dismissal logic.
+        internal void TextBoxSearch_Leave(object sender, EventArgs e)
+        {
+            if (_searchLeaveHandoffPending)
+            {
+                // Read-and-clear: the Down-arrow handoff's own Leave is consumed exactly once.
+                _searchLeaveHandoffPending = false;
+                return;
+            }
+            if (!_itemViewer.IsFolderDropDownOpen)
+                return;
+            _itemViewer.SetFolderDroppedDown(false);
         }
 
         private void TopicThread_ItemSelectionChanged(
