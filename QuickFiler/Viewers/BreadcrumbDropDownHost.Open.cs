@@ -62,9 +62,12 @@ namespace QuickFiler.Viewers
                 // An open request on an already-open popup is defined as "focus the popup again".
                 // A search-driven refresh must not do that, or every keystroke would pull the caret
                 // out of the search textbox (issue #438 AC-2). The open result is unchanged.
+                // Issue #677: scheduling FocusPending rather than the raw _focusPending delegate
+                // moves the focus-permission check inside the scheduled action, so the predicate is
+                // read when the refocus executes rather than when it is queued.
                 if (takeFocus)
                 {
-                    _openLifetime.Schedule(_focusPending);
+                    _openLifetime.Schedule(FocusPending);
                 }
                 return Task.FromResult(true);
             }

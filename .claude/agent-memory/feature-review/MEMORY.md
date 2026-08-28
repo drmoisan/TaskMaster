@@ -77,6 +77,7 @@
 - [464-review-residuals](project_464-review-residuals.md) — PASS/0 blocking; 7 promotions owed (RC7 EfcSelectionGuard "===" arity); Cobertura deleted-but-verified; shared info/exclude trap → commit artifacts on feature branch
 - [489-review-residuals](project_489-review-residuals.md) — cycle-1 reaudit GO/0 blocking; RC-1 cured (RED TRX committed with test, fix next commit = provable RED-first); commit-per-phase vs single-commit plan text judged on intent; amend the referenced table when an AC delegates to it
 - [493-review-residuals + msbuild-log gate adjudication](project_493-review-residuals-and-msbuild-log-gate-adjudication.md) — PASS/0 blocking; how a structurally unsatisfiable msbuild-log byte-equality gate was adjudicated without downgrading the AC
+- [677-review-residuals](project_677-review-residuals.md) — PASS/0 blocking; compile-red RED-first equivalence; 70.7% modified-file dispositioned non-blocking (below the #230 bar); owed: analyzer HintPath-skew + SetupDisposal-debt promotions; post-677 baseline 0.852804/0.792300
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.

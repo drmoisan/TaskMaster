@@ -205,6 +205,11 @@ namespace QuickFiler
                 () => BreadcrumbCoordinator?.CancelSelector(),
                 lifecycle.Operations
             );
+            // Issue #677: supply the focus-permission predicate on the concrete host before the
+            // pipeline is configured. Assigning it on the concrete `host` local (not through
+            // IBreadcrumbDropDownHost) keeps the interface unchanged, so mock hosts installed by
+            // the injected 3-arg ConfigureBreadcrumbDropDown overload are unaffected.
+            host.MayTakeFocus = MayRestoreBreadcrumbFocus;
             ConfigureBreadcrumbDropDown(
                 host,
                 () =>
@@ -247,6 +252,25 @@ namespace QuickFiler
             }
 
             _breadcrumbLifecycleCoordinator.Focus(FocusBreadcrumbCore);
+        }
+
+        /// <summary>
+        /// Issue #677: whether the breadcrumb pipeline may take or restore keyboard focus right now.
+        /// True only while this viewer's own form still owns activation.
+        /// </summary>
+        /// <remarks>
+        /// <c>ContainsFocus</c> is deliberately NOT used here. The failure state this guard exists
+        /// to suppress is precisely a WebView2 child of the *deactivated* form still holding Win32
+        /// thread focus (MicrosoftEdge/WebView2Feedback #951), which keeps <c>ContainsFocus</c>
+        /// true and would make the guard a no-op. <c>Form.ActiveForm</c> becomes null — or names a
+        /// different form — as soon as activation leaves the QuickFiler form, so it is false
+        /// exactly when focus restoration must be suppressed and true on the in-form Escape and
+        /// commit paths, preserving the issue #438/#400 caret-return behavior.
+        /// </remarks>
+        private bool MayRestoreBreadcrumbFocus()
+        {
+            Form form = FindForm();
+            return form != null && ReferenceEquals(Form.ActiveForm, form);
         }
 
         private void FocusBreadcrumbCore()

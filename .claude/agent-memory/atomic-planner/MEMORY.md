@@ -16,6 +16,7 @@
 - [#553](project_553_ci_parallel_split_plan_seams.md) — workflow-only scope, no C# toolchain; no jq; pathspec anchoring
 - [#614 store-root leak plan seams](project_614_store_root_leak_plan_seams.md) — AC25 net non-growth (3 over-limit files); E1 SelectRow out-of-root-only pinning; remediation C1: behavior-preserving seam phase reconciles fail-before with a signature change, resolver-in-guard beats inline try/catch on line budget + coverage, net48 IsNullOrWhiteSpace doesn't narrow (`archiveRoot!`)
 - [#464 R3/R4](project_464_efc_controller_plan_seams.md) — additive-only file grows, budget a ceiling not a shrink; non-comment literal counts; a phase-N count must survive phases 1..N-1 deletions
+- [#677 R1–R8](project_677_keyboard_focus_leak_plan_seams.md) — ctor param REJECTED (5 reflection-arity tests); typed harness for compile-red; internal 9-arg ctor, never ambient SetSynchronizationContext; all eight tests drain; refocus tests pin the already-open branch; per-file (not uniform) non-vacuity floors; never null-guard the event source in its own handler
 
 ## Plan-structure traps
 - [Verify test provenance before planning a deletion](verify-test-provenance-before-planning-deletion.md) — in a revert plan, read the test at the pre-cycle commit; a two-arg call shape doesn't prove the cycle added it

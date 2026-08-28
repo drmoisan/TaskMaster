@@ -105,6 +105,14 @@ namespace QuickFiler
         // replacement for — SetFolderDroppedDown(bool), which every explicit gesture still uses.
         void PresentFolderSearchResults(string[] items);
 
+        /// <summary>
+        /// Issue #677 deactivate-cancel contract: closes any open breadcrumb selector by routing to
+        /// the breadcrumb coordinator's <c>CancelSelector</c>. A safe no-op when no breadcrumb
+        /// pipeline exists yet, because the deactivate fan-out reaches every item group regardless
+        /// of its lifecycle state.
+        /// </summary>
+        void CancelBreadcrumbSelector();
+
         void ClearFolderItems();
         void FocusFolderDropDown();
         bool FolderContains(string item);

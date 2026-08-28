@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="3e0a89da-883d-49cd-aac2-0d90ee299c5e" name="&lt;user&gt;@&lt;host&gt; 2026-08-28 12:04:02" runUser="&lt;host&gt;\&lt;user&gt;" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-28T12:04:02.7103722-04:00" queuing="2026-08-28T12:04:02.7103722-04:00" start="2026-08-28T12:04:01.2850675-04:00" finish="2026-08-28T12:04:02.7259173-04:00" />
+  <TestSettings name="default" id="7ca7dc69-ec53-42d7-8d14-bdd3a81c70c5">
+    <Deployment runDeploymentRoot="&lt;user&gt;_&lt;host&gt;_2026-08-28_12_04_02" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="d206f322-278e-4ad4-b5c1-bd11d7b24d5f" testId="199476cc-a28e-85a4-b4e5-fe586d9adf93" testName="FormDeactivated_WebView2Focused_ParksFocusOnce" computerName="&lt;host&gt;" duration="00:00:00.0042207" startTime="2026-08-28T12:04:02.6195626-04:00" endTime="2026-08-28T12:04:02.6238975-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d206f322-278e-4ad4-b5c1-bd11d7b24d5f" />
+    <UnitTestResult executionId="b75a46a0-2df9-466e-b058-4f41ddc70b14" testId="17ad3c68-5eb4-8345-99eb-5f390f5474f9" testName="RegisterFormEventHandlers_SubscribesFormDeactivated" computerName="&lt;host&gt;" duration="00:00:00.2893351" startTime="2026-08-28T12:04:02.2135316-04:00" endTime="2026-08-28T12:04:02.6163358-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b75a46a0-2df9-466e-b058-4f41ddc70b14" />
+    <UnitTestResult executionId="de86e712-2279-4c19-a3dd-71c53cdb82cf" testId="1586df1b-23cb-8bdc-ba7e-425ca986792f" testName="CancelBreadcrumbSelector_ForwardsToViewer" computerName="&lt;host&gt;" duration="00:00:00.1450248" startTime="2026-08-28T12:04:02.2155352-04:00" endTime="2026-08-28T12:04:02.4741305-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="de86e712-2279-4c19-a3dd-71c53cdb82cf" />
+    <UnitTestResult executionId="185ef590-3e00-4e6c-9ef3-ad972ae8ae53" testId="180fea81-dc04-8ab0-b2da-c4bcb953e4a2" testName="FormDeactivated_NullGroupsOrNullItemGroups_DoesNotThrow" computerName="&lt;host&gt;" duration="00:00:00.0008192" startTime="2026-08-28T12:04:02.6390401-04:00" endTime="2026-08-28T12:04:02.6401050-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="185ef590-3e00-4e6c-9ef3-ad972ae8ae53" />
+    <UnitTestResult executionId="4734a28a-18ac-435d-959b-0e1dbe89714a" testId="1189f036-c884-8776-891b-48148c290c15" testName="FormDeactivated_NoWebView2Focus_DoesNotPark" computerName="&lt;host&gt;" duration="00:00:00.0005024" startTime="2026-08-28T12:04:02.6238975-04:00" endTime="2026-08-28T12:04:02.6244178-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4734a28a-18ac-435d-959b-0e1dbe89714a" />
+    <UnitTestResult executionId="a90b784e-6e36-4ab8-b3e2-00f6f5dcb593" testId="1aa349c3-1579-850c-ae8e-ae07f6f4e09f" testName="UnregisterFormEventHandlers_UnsubscribesFormDeactivated" computerName="&lt;host&gt;" duration="00:00:00.0028352" startTime="2026-08-28T12:04:02.6168748-04:00" endTime="2026-08-28T12:04:02.6195626-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a90b784e-6e36-4ab8-b3e2-00f6f5dcb593" />
+    <UnitTestResult executionId="da0405b1-6eda-4600-ad47-fd0d4a07a658" testId="125b703a-b65f-8046-8841-3d0fbaf3c52e" testName="FormDeactivated_CancelsSelectorOnEveryItemController" computerName="&lt;host&gt;" duration="00:00:00.0144686" startTime="2026-08-28T12:04:02.6244178-04:00" endTime="2026-08-28T12:04:02.6390401-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="da0405b1-6eda-4600-ad47-fd0d4a07a658" />
+    <UnitTestResult executionId="57ded0a7-de10-4f1f-9a95-8e27ba00afe2" testId="1e9e43af-6fe0-86fc-abf6-715c78b8d2c1" testName="CancelBreadcrumbSelector_NullViewer_DoesNotThrow" computerName="&lt;host&gt;" duration="00:00:00.0237382" startTime="2026-08-28T12:04:02.4806479-04:00" endTime="2026-08-28T12:04:02.5102724-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="57ded0a7-de10-4f1f-9a95-8e27ba00afe2">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="5304bad5-71f8-48bb-ad36-07c666aeeeb0" testId="1d833ec9-2198-8be2-a693-1318fa5a6f9d" testName="FormDeactivated_ItemCancelThrows_DoesNotPropagateAndContinues" computerName="&lt;host&gt;" duration="00:00:00.0018930" startTime="2026-08-28T12:04:02.6401050-04:00" endTime="2026-08-28T12:04:02.6441112-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5304bad5-71f8-48bb-ad36-07c666aeeeb0" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="CancelBreadcrumbSelector_ForwardsToViewer" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1586df1b-23cb-8bdc-ba7e-425ca986792f">
+      <Execution id="de86e712-2279-4c19-a3dd-71c53cdb82cf" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemControllerCancelBreadcrumbSelectorTests" name="CancelBreadcrumbSelector_ForwardsToViewer" />
+    </UnitTest>
+    <UnitTest name="FormDeactivated_NoWebView2Focus_DoesNotPark" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1189f036-c884-8776-891b-48148c290c15">
+      <Execution id="4734a28a-18ac-435d-959b-0e1dbe89714a" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerDeactivateTests" name="FormDeactivated_NoWebView2Focus_DoesNotPark" />
+    </UnitTest>
+    <UnitTest name="FormDeactivated_WebView2Focused_ParksFocusOnce" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="199476cc-a28e-85a4-b4e5-fe586d9adf93">
+      <Execution id="d206f322-278e-4ad4-b5c1-bd11d7b24d5f" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerDeactivateTests" name="FormDeactivated_WebView2Focused_ParksFocusOnce" />
+    </UnitTest>
+    <UnitTest name="RegisterFormEventHandlers_SubscribesFormDeactivated" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="17ad3c68-5eb4-8345-99eb-5f390f5474f9">
+      <Execution id="b75a46a0-2df9-466e-b058-4f41ddc70b14" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerDeactivateTests" name="RegisterFormEventHandlers_SubscribesFormDeactivated" />
+    </UnitTest>
+    <UnitTest name="FormDeactivated_NullGroupsOrNullItemGroups_DoesNotThrow" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="180fea81-dc04-8ab0-b2da-c4bcb953e4a2">
+      <Execution id="185ef590-3e00-4e6c-9ef3-ad972ae8ae53" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerDeactivateTests" name="FormDeactivated_NullGroupsOrNullItemGroups_DoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="UnregisterFormEventHandlers_UnsubscribesFormDeactivated" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1aa349c3-1579-850c-ae8e-ae07f6f4e09f">
+      <Execution id="a90b784e-6e36-4ab8-b3e2-00f6f5dcb593" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerDeactivateTests" name="UnregisterFormEventHandlers_UnsubscribesFormDeactivated" />
+    </UnitTest>
+    <UnitTest name="FormDeactivated_ItemCancelThrows_DoesNotPropagateAndContinues" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d833ec9-2198-8be2-a693-1318fa5a6f9d">
+      <Execution id="5304bad5-71f8-48bb-ad36-07c666aeeeb0" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerDeactivateTests" name="FormDeactivated_ItemCancelThrows_DoesNotPropagateAndContinues" />
+    </UnitTest>
+    <UnitTest name="CancelBreadcrumbSelector_NullViewer_DoesNotThrow" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e9e43af-6fe0-86fc-abf6-715c78b8d2c1">
+      <Execution id="57ded0a7-de10-4f1f-9a95-8e27ba00afe2" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemControllerCancelBreadcrumbSelectorTests" name="CancelBreadcrumbSelector_NullViewer_DoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="FormDeactivated_CancelsSelectorOnEveryItemController" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="125b703a-b65f-8046-8841-3d0fbaf3c52e">
+      <Execution id="da0405b1-6eda-4600-ad47-fd0d4a07a658" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcFormControllerDeactivateTests" name="FormDeactivated_CancelsSelectorOnEveryItemController" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="199476cc-a28e-85a4-b4e5-fe586d9adf93" executionId="d206f322-278e-4ad4-b5c1-bd11d7b24d5f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17ad3c68-5eb4-8345-99eb-5f390f5474f9" executionId="b75a46a0-2df9-466e-b058-4f41ddc70b14" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1586df1b-23cb-8bdc-ba7e-425ca986792f" executionId="de86e712-2279-4c19-a3dd-71c53cdb82cf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="180fea81-dc04-8ab0-b2da-c4bcb953e4a2" executionId="185ef590-3e00-4e6c-9ef3-ad972ae8ae53" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1189f036-c884-8776-891b-48148c290c15" executionId="4734a28a-18ac-435d-959b-0e1dbe89714a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1aa349c3-1579-850c-ae8e-ae07f6f4e09f" executionId="a90b784e-6e36-4ab8-b3e2-00f6f5dcb593" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="125b703a-b65f-8046-8841-3d0fbaf3c52e" executionId="da0405b1-6eda-4600-ad47-fd0d4a07a658" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e9e43af-6fe0-86fc-abf6-715c78b8d2c1" executionId="57ded0a7-de10-4f1f-9a95-8e27ba00afe2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d833ec9-2198-8be2-a693-1318fa5a6f9d" executionId="5304bad5-71f8-48bb-ad36-07c666aeeeb0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="9" executed="9" passed="9" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for &lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

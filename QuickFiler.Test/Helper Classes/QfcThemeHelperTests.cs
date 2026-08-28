@@ -396,6 +396,10 @@ namespace QuickFiler.Test.HelperClasses
 
             public void JumpToFolderDropDown() => throw new NotImplementedException();
 
+            // Issue #677 structural enabler: completes IQfcItemController after the additive
+            // deactivate-cancel member. No test behavior in this file changes.
+            public void CancelBreadcrumbSelector() { }
+
             public void ToggleSaveCopyOfMail() => throw new NotImplementedException();
 
             public void ToggleSaveAttachments() => throw new NotImplementedException();

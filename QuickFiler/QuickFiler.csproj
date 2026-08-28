@@ -317,6 +317,7 @@
     <Compile Include="Controllers\QfcExplorerController.cs" />
     <Compile Include="Controllers\QfcFormController.cs" />
     <Compile Include="Controllers\QfcFormController.SetupDisposal.cs" />
+    <Compile Include="Controllers\QfcFormController.Deactivate.cs" />
     <Compile Include="Controllers\QfcFormController.EventHandlers.cs" />
     <Compile Include="Controllers\QfcFormController.Actions.cs" />
     <Compile Include="Controllers\QfcFormKeyHandler.cs" />

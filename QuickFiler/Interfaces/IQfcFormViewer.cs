@@ -47,5 +47,26 @@ namespace QuickFiler
         decimal ItemsPerLoadValue { get; set; }
         event EventHandler ItemsPerLoadValueChanged;
         bool ItemsPerLoadEnabled { get; set; }
+
+        // Seam B — issue #677 deactivation intents.
+
+        /// <summary>
+        /// Raised when the form loses activation. Mirrors <see cref="Form.Deactivate"/> and carries
+        /// no additional state; the controller decides what to do about the departure.
+        /// </summary>
+        event EventHandler FormDeactivated;
+
+        /// <summary>
+        /// Whether the leaf control currently active within this form is a WebView2 surface.
+        /// Reported so the controller can park focus off it before activation leaves the process's
+        /// shared UI thread (MicrosoftEdge/WebView2Feedback #951).
+        /// </summary>
+        bool IsWebView2Focused { get; }
+
+        /// <summary>
+        /// Moves WinForms focus onto a benign non-WebView2 control of this form, so no WebView2
+        /// child window is left holding the Outlook UI thread's Win32 keyboard focus.
+        /// </summary>
+        void ParkFocusOffWebView2();
     }
 }

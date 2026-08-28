@@ -175,6 +175,40 @@ namespace QuickFiler
             set => _l1v1L2h5_SpnEmailPerLoad.Enabled = value;
         }
 
+        // Seam B — issue #677 deactivation intents.
+
+        /// <summary>Forwards the WinForms <see cref="Form.Deactivate"/> event to the controller.</summary>
+        public event EventHandler FormDeactivated
+        {
+            add => this.Deactivate += value;
+            remove => this.Deactivate -= value;
+        }
+
+        /// <summary>
+        /// Walks the ActiveControl chain to its leaf and reports whether that leaf is a WebView2.
+        /// A container's ActiveControl is itself a container until the chain bottoms out, so the
+        /// walk — not a single-level check — is what identifies the control that actually holds
+        /// Win32 keyboard focus.
+        /// </summary>
+        public bool IsWebView2Focused
+        {
+            get
+            {
+                Control active = this.ActiveControl;
+                while (active is ContainerControl container && container.ActiveControl != null)
+                {
+                    active = container.ActiveControl;
+                }
+                return active is Microsoft.Web.WebView2.WinForms.WebView2;
+            }
+        }
+
+        /// <summary>
+        /// Parks focus on the OK button, a benign non-WebView2 Seam-B designer control, so no
+        /// WebView2 child window retains the shared Outlook UI thread's keyboard focus.
+        /// </summary>
+        public void ParkFocusOffWebView2() => this.ActiveControl = _l1v1L2h2_ButtonOK;
+
         // Seam D — collapsed item-viewer template margin
         public Padding ItemViewerTemplateMargin => _QfcItemViewerTemplate?.Margin ?? default;
 

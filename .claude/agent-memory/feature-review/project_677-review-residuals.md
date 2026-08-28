@@ -1,0 +1,15 @@
+---
+name: 677-review-residuals
+description: 'Issue #677 (QuickFiler WebView2 focus leak) review outcome: PASS/0 blocking; compile-red RED-first equivalence accepted; sub-80 modified-file disposition extended below the #230 bar; residual promotions owed (analyzer HintPath skew, SetupDisposal coverage debt)'
+metadata:
+  type: project
+---
+
+Review 2026-08-28 (`policy-audit.2026-08-28T12-31.md` et al.): PASS, 0 blocking, GO for PR. AC-1/AC-2/AC-3-manual left unchecked with runbook `runbooks/manual-live-outlook-verification.runbook.md` — adjudicated correct human-exception handling, no remediation triggered (unautomatable: live message pump + real WebView2 runtime + Win32 activation; WebView2Feedback #951).
+
+**Why:** several adjudications here are reusable precedent:
+- **Compile-red RED-first equivalence.** When regression tests reference a not-yet-existing surface via typed (non-reflection) references, a solution build failing with the exact missing-member CS1061 set located only in the new test files + `ExpectedExitCode: 1` + a `fail-before-exception.*.md` dossier + a byte-identical green-flip command is a valid substitute for a failing test run. Reflection-based access would have degraded the proof — check for that.
+- **Modified-file whole-file coverage 70.70% (< 80%) dispositioned non-blocking** — extends [[modified-file-subfloor-nonblocking-disposition-230]] below its >=80% bar. Grounds: CLAUDE.md (authority #1) has NO whole-file floor for modified files; all uncovered lines proven pre-existing by baseline-vs-final line-set identity; changed lines 100% covered; file improved; bugfix minimal-fix mandate bars widening. File: `QfcFormController.SetupDisposal.cs` (uncovered = live-control-tree WinForms wiring).
+- **Summary correction re-armed the hook.** Appending the `- <path> (+N/-N)` .cs bullets to pr_context.summary.txt made `Get-ChangedLanguageSet` return CSharp and the coverage-row checks actually ran (simulated Ok=True). The 'csharp' label regex matches inside "csharpier" — any line with csharpier/dotnet + "coverage" + a narrowing word trips a FAIL.
+
+**How to apply:** at fan-in / future QuickFiler reviews, check these owed residuals: (1) promotion of the 16-csproj analyzer HintPath skew (`<Analyzer Include>` names Meziantou 3.0.156 / Roslynator 4.16.0 while packages.config names 3.0.174/4.16.1 — blocks clean-worktree analyzer restores; executor cured via gitignored `nuget install` of the old versions, no tracked change); (2) promotion of SetupDisposal.cs coverage debt; (3) `BreadcrumbDropDownHost.cs` at 498/500 — D13 remedy is relocating `FocusAnchorIfPermitted` to the `.Open.cs` partial; (4) latent enumerator-mutation risk in `QfcFormController.Deactivate.cs` (live `ItemGroups` list enumerated; per-item catch does not cover the enumerator); (5) manual live-Outlook session also settles the secondary modal-menu-mode contributor. Post-677 committed-evidence baseline: line 0.852804 / branch 0.792300 (same-session Cobertura; do not gate cross-session per [[csharp-coverage-constants-nondeterministic]]).
