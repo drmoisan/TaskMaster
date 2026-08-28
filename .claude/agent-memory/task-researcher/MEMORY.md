@@ -38,6 +38,8 @@
 - [webview2-host-initializer-defects-476](project_webview2_host_initializer_defects_476.md) — #476/#458/#477: EfcViewerQueue is NOT a recycle pool (#458 latent); real WebView2 controls ARE built in QuickFiler tests; CaptureProductionDispatcher captures nothing from the control (2026-08-24)
 - [uithread-dispatcher-restore-scope-493](project_uithread_dispatcher_restore_scope_493.md) — #493: never share ONE semaphore between a brief helper and a long fixture swap (2-lock split); editorconfig analyzer catch-all makes IDisposable returns safe; CI runs QuickFiler.Test serially, runsettings do not (2026-08-24)
 - [qfc-efc-metrics-442](project_qfc_efc_metrics_442.md) — #442/#443/#451: QFC MoveAndIterate stopwatch race unfixable in owned files; legacy csproj blocks any new .cs; metrics CSV has zero in-repo readers (2026-08-24)
+- [qfc-collection-defects-468](project_qfc_collection_defects_468.md) — #468: MovedMails already pushed by EmailFiler (param redundant); no log4net ref in QuickFiler.Test; ConcurrentDictionary order blocks a deterministic pre-fix test (2026-08-24)
+- [qfc-collection-controller-defects-468](project_qfc_collection_controller_defects_468.md) — #468 family: #474 doc's "unrelated interfaces" claim is FALSE (IQfcFormController derives from IFilerFormController); #469-4 undo is NOT broken; #474-2 fix needs a non-owned file (2026-08-24)
 - [efc614-store-root-stem-leak](project_efc614_store_root_stem_leak.md) — #614: verbatim ToArchiveRelativePath + unvalidated DestinationOlStem; #609 fix is FolderPredictor-only by design; FolderConverterTests.cs:329 codifies a bug (2026-08-26)
 
 ## Artifact hygiene
