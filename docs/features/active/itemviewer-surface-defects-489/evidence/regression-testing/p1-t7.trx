@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="0370e068-ad38-4e74-b33c-6d8797ab82fa" name="<user>@<host> 2026-08-27 20:25:30" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-08-27T20:25:30.6459187-04:00" queuing="2026-08-27T20:25:30.6459187-04:00" start="2026-08-27T20:25:29.4363240-04:00" finish="2026-08-27T20:25:30.6634291-04:00" />
+  <TestSettings name="default" id="640d2100-5363-4d6c-a0aa-788dd12b1926">
+    <Deployment runDeploymentRoot="<user>_<host>_2026-08-27_20_25_30" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="ffca836f-78c4-4633-974d-036c10f1c492" testId="1d4cbd02-754b-89a3-a9fe-f0bf59aae2d9" testName="ItemViewerExpanded_DeclaresNoMenuItemCheckedChangedHandler" computerName="<host>" duration="00:00:00.1317223" startTime="2026-08-27T20:25:30.3394645-04:00" endTime="2026-08-27T20:25:30.5850413-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ffca836f-78c4-4633-974d-036c10f1c492">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Expected eventHandlerForm to be &lt;null&gt; because the EventHandler-shaped overload duplicates the ToolStripMenuItemCb setter and must be deleted, but found ItemViewerExpanded.MenuItem_CheckedChanged.&#xD;
+Expected typedForm to be &lt;null&gt; because the typed overload clears the image the setter just assigned and must be deleted, but found ItemViewerExpanded.MenuItem_CheckedChanged.&#xD;
+</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.CollectingAssertionStrategy.ThrowIfAny(IDictionary`2 context) in /_/Src/FluentAssertions/Execution/CollectingAssertionStrategy.cs:line 49&#xD;
+   at QuickFiler.Test.Viewers.ToolStripMenuItemCbTests.ItemViewerExpanded_DeclaresNoMenuItemCheckedChangedHandler() in <repo-root>\QuickFiler.Test\Viewers\ToolStripMenuItemCbTests.cs:line 162</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="ItemViewerExpanded_DeclaresNoMenuItemCheckedChangedHandler" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d4cbd02-754b-89a3-a9fe-f0bf59aae2d9">
+      <Execution id="ffca836f-78c4-4633-974d-036c10f1c492" />
+      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ToolStripMenuItemCbTests" name="ItemViewerExpanded_DeclaresNoMenuItemCheckedChangedHandler" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1d4cbd02-754b-89a3-a9fe-f0bf59aae2d9" executionId="ffca836f-78c4-4633-974d-036c10f1c492" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+</TestRun>

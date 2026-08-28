@@ -128,5 +128,62 @@ namespace QuickFiler.Test.Viewers
                     .BeNull("ItemViewer must delegate host-neutral popup-open orchestration");
             }
         }
+
+        [TestMethod]
+        public void ItemViewer_DeclaresNoMenuItemCheckedChangedMembers()
+        {
+            // Arrange
+            const BindingFlags Flags =
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
+            // Act
+            MethodInfo eventHandlerForm = typeof(QuickFiler.ItemViewer).GetMethod(
+                "MenuItem_CheckedChanged",
+                Flags,
+                null,
+                new[] { typeof(object), typeof(EventArgs) },
+                null
+            );
+            MethodInfo typedForm = typeof(QuickFiler.ItemViewer).GetMethod(
+                "MenuItem_CheckedChanged",
+                Flags,
+                null,
+                new[] { typeof(ToolStripMenuItem) },
+                null
+            );
+
+            // Assert
+            using (new AssertionScope())
+            {
+                eventHandlerForm
+                    .Should()
+                    .BeNull("the EventHandler-shaped overload is dead code on ItemViewer");
+                typedForm.Should().BeNull("the typed overload is dead code on ItemViewer");
+            }
+        }
+
+        [TestMethod]
+        public void ItemViewer_DeclaresNoMoveOptionsMenuClickHandler()
+        {
+            // Arrange
+            const BindingFlags Flags =
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
+            // Act
+            MethodInfo handler = typeof(QuickFiler.ItemViewer).GetMethod(
+                "MoveOptionsMenu_Click",
+                Flags,
+                null,
+                new[] { typeof(object), typeof(EventArgs) },
+                null
+            );
+
+            // Assert
+            handler
+                .Should()
+                .BeNull(
+                    "the empty MoveOptionsMenu_Click body has no caller and no designer wiring"
+                );
+        }
     }
 }
