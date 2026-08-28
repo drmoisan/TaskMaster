@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="2ac79dd8-40b4-458d-8c2d-b13ea2fab2b4" name="<user>@<host> 2026-08-28 15:13:10" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="2ac79dd8-40b4-458d-8c2d-b13ea2fab2b4" name="&lt;user&gt;@&lt;host&gt; 2026-08-28 15:13:10" runUser="&lt;host&gt;\&lt;user&gt;" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-08-28T15:13:10.4654022-04:00" queuing="2026-08-28T15:13:10.4654022-04:00" start="2026-08-28T15:13:09.1957803-04:00" finish="2026-08-28T15:13:10.4974060-04:00" />
   <TestSettings name="default" id="1e7a2282-dca4-4caa-ab14-307e0d09bc25">
-    <Deployment runDeploymentRoot="<user>_<host>_2026-08-28_15_13_10" />
+    <Deployment runDeploymentRoot="&lt;user&gt;_&lt;host&gt;_2026-08-28_15_13_10" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="4ffbb4b9-6f06-46e6-9775-99dae3b28927" testId="1372c696-2c78-8120-bfd8-4aae8d450a1b" testName="TextBoxSearchKeyDown_DownArrow_StillOpensAndFocusesTheDropDown" computerName="<host>" duration="00:00:00.0003618" startTime="2026-08-28T15:13:10.4508907-04:00" endTime="2026-08-28T15:13:10.4528944-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4ffbb4b9-6f06-46e6-9775-99dae3b28927" />
-    <UnitTestResult executionId="1f4cba70-c35b-4579-8e48-2794433e0dfe" testId="1f55a4fe-f953-8954-a1de-1717cd3c1630" testName="TextBoxSearchLeave_AfterDownArrowHandoff_SuppressesExactlyOneClose" computerName="<host>" duration="00:00:00.0018391" startTime="2026-08-28T15:13:10.4493352-04:00" endTime="2026-08-28T15:13:10.4508907-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1f4cba70-c35b-4579-8e48-2794433e0dfe">
+    <UnitTestResult executionId="4ffbb4b9-6f06-46e6-9775-99dae3b28927" testId="1372c696-2c78-8120-bfd8-4aae8d450a1b" testName="TextBoxSearchKeyDown_DownArrow_StillOpensAndFocusesTheDropDown" computerName="&lt;host&gt;" duration="00:00:00.0003618" startTime="2026-08-28T15:13:10.4508907-04:00" endTime="2026-08-28T15:13:10.4528944-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4ffbb4b9-6f06-46e6-9775-99dae3b28927" />
+    <UnitTestResult executionId="1f4cba70-c35b-4579-8e48-2794433e0dfe" testId="1f55a4fe-f953-8954-a1de-1717cd3c1630" testName="TextBoxSearchLeave_AfterDownArrowHandoff_SuppressesExactlyOneClose" computerName="&lt;host&gt;" duration="00:00:00.0018391" startTime="2026-08-28T15:13:10.4493352-04:00" endTime="2026-08-28T15:13:10.4508907-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1f4cba70-c35b-4579-8e48-2794433e0dfe">
       <Output>
         <ErrorInfo>
           <Message>Test method QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests.TextBoxSearchLeave_AfterDownArrowHandoff_SuppressesExactlyOneClose threw exception:&#xD;
@@ -22,15 +22,15 @@ Performed invocations:&#xD;
 </Message>
           <StackTrace>   at Moq.Mock.Verify(Mock mock, LambdaExpression expression, Times times, String failMessage) in /_/src/Moq/Mock.cs:line 332&#xD;
    at Moq.Mock`1.Verify(Expression`1 expression, Times times) in /_/src/Moq/Mock`1.cs:line 728&#xD;
-   at QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests.TextBoxSearchLeave_AfterDownArrowHandoff_SuppressesExactlyOneClose() in <repo-root>\QuickFiler.Test\Controllers\QfcItemController.SearchDismissalTests.cs:line 134&#xD;
+   at QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests.TextBoxSearchLeave_AfterDownArrowHandoff_SuppressesExactlyOneClose() in &lt;repo-root&gt;\QuickFiler.Test\Controllers\QfcItemController.SearchDismissalTests.cs:line 134&#xD;
 </StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="32d0cd46-45fa-4b0a-a257-3a3e9d4a1633" testId="1a4f368e-8b32-8eaf-8e7f-322608ec036d" testName="UnwireIntentEvents_DetachesSearchLeave" computerName="<host>" duration="00:00:00.0030067" startTime="2026-08-28T15:13:10.4258034-04:00" endTime="2026-08-28T15:13:10.4288030-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="32d0cd46-45fa-4b0a-a257-3a3e9d4a1633" />
-    <UnitTestResult executionId="ea404b5b-0569-4ad9-bb3e-1e0687cd51b8" testId="1d51101c-3522-81a5-8ed4-d64ac01587c2" testName="ItemViewer_ImplementsSearchLeaveAndIsFolderDropDownOpen" computerName="<host>" duration="00:00:00.0002607" startTime="2026-08-28T15:13:10.2640360-04:00" endTime="2026-08-28T15:13:10.2660352-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ea404b5b-0569-4ad9-bb3e-1e0687cd51b8" />
-    <UnitTestResult executionId="15d43e62-b645-4c71-abeb-d71eb0de94de" testId="1a9ce567-4955-86fb-a242-5251a0e2701b" testName="TextBoxSearchKeyDown_EscapeWhileDropDownClosed_RoutesNoIntentAndLeavesKeyUnhandled" computerName="<host>" duration="00:00:00.0193868" startTime="2026-08-28T15:13:10.4228032-04:00" endTime="2026-08-28T15:13:10.4427974-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="15d43e62-b645-4c71-abeb-d71eb0de94de" />
-    <UnitTestResult executionId="e98e0d3a-9357-402e-ba22-918b0ebf307d" testId="1003bf03-8531-8972-9c0e-f46fb88021de" testName="TextBoxSearchKeyDown_EscapeWhileDropDownOpen_RoutesExactlyOneCloseIntent" computerName="<host>" duration="00:00:00.2021016" startTime="2026-08-28T15:13:10.1108573-04:00" endTime="2026-08-28T15:13:10.4228032-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e98e0d3a-9357-402e-ba22-918b0ebf307d">
+    <UnitTestResult executionId="32d0cd46-45fa-4b0a-a257-3a3e9d4a1633" testId="1a4f368e-8b32-8eaf-8e7f-322608ec036d" testName="UnwireIntentEvents_DetachesSearchLeave" computerName="&lt;host&gt;" duration="00:00:00.0030067" startTime="2026-08-28T15:13:10.4258034-04:00" endTime="2026-08-28T15:13:10.4288030-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="32d0cd46-45fa-4b0a-a257-3a3e9d4a1633" />
+    <UnitTestResult executionId="ea404b5b-0569-4ad9-bb3e-1e0687cd51b8" testId="1d51101c-3522-81a5-8ed4-d64ac01587c2" testName="ItemViewer_ImplementsSearchLeaveAndIsFolderDropDownOpen" computerName="&lt;host&gt;" duration="00:00:00.0002607" startTime="2026-08-28T15:13:10.2640360-04:00" endTime="2026-08-28T15:13:10.2660352-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ea404b5b-0569-4ad9-bb3e-1e0687cd51b8" />
+    <UnitTestResult executionId="15d43e62-b645-4c71-abeb-d71eb0de94de" testId="1a9ce567-4955-86fb-a242-5251a0e2701b" testName="TextBoxSearchKeyDown_EscapeWhileDropDownClosed_RoutesNoIntentAndLeavesKeyUnhandled" computerName="&lt;host&gt;" duration="00:00:00.0193868" startTime="2026-08-28T15:13:10.4228032-04:00" endTime="2026-08-28T15:13:10.4427974-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="15d43e62-b645-4c71-abeb-d71eb0de94de" />
+    <UnitTestResult executionId="e98e0d3a-9357-402e-ba22-918b0ebf307d" testId="1003bf03-8531-8972-9c0e-f46fb88021de" testName="TextBoxSearchKeyDown_EscapeWhileDropDownOpen_RoutesExactlyOneCloseIntent" computerName="&lt;host&gt;" duration="00:00:00.2021016" startTime="2026-08-28T15:13:10.1108573-04:00" endTime="2026-08-28T15:13:10.4228032-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e98e0d3a-9357-402e-ba22-918b0ebf307d">
       <Output>
         <ErrorInfo>
           <Message>Test method QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests.TextBoxSearchKeyDown_EscapeWhileDropDownOpen_RoutesExactlyOneCloseIntent threw exception:&#xD;
@@ -44,12 +44,12 @@ Performed invocations:&#xD;
 </Message>
           <StackTrace>   at Moq.Mock.Verify(Mock mock, LambdaExpression expression, Times times, String failMessage) in /_/src/Moq/Mock.cs:line 332&#xD;
    at Moq.Mock`1.Verify(Expression`1 expression, Times times) in /_/src/Moq/Mock`1.cs:line 728&#xD;
-   at QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests.TextBoxSearchKeyDown_EscapeWhileDropDownOpen_RoutesExactlyOneCloseIntent() in <repo-root>\QuickFiler.Test\Controllers\QfcItemController.SearchDismissalTests.cs:line 44&#xD;
+   at QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests.TextBoxSearchKeyDown_EscapeWhileDropDownOpen_RoutesExactlyOneCloseIntent() in &lt;repo-root&gt;\QuickFiler.Test\Controllers\QfcItemController.SearchDismissalTests.cs:line 44&#xD;
 </StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="356d98b5-410d-4666-8714-65bb7958e2b3" testId="1b51818f-24f0-8435-a496-550d1ef19049" testName="IItemViewer_DeclaresSearchLeaveAsPlainEventHandler" computerName="<host>" duration="00:00:00.0304415" startTime="2026-08-28T15:13:10.1108573-04:00" endTime="2026-08-28T15:13:10.2550343-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="356d98b5-410d-4666-8714-65bb7958e2b3">
+    <UnitTestResult executionId="356d98b5-410d-4666-8714-65bb7958e2b3" testId="1b51818f-24f0-8435-a496-550d1ef19049" testName="IItemViewer_DeclaresSearchLeaveAsPlainEventHandler" computerName="&lt;host&gt;" duration="00:00:00.0304415" startTime="2026-08-28T15:13:10.1108573-04:00" endTime="2026-08-28T15:13:10.2550343-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="356d98b5-410d-4666-8714-65bb7958e2b3">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -81,11 +81,11 @@ Debug Trace:&#xD;
      For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="1cafd856-bcf2-44ea-b5f9-d0a2d62458ae" testId="189983a8-9454-8289-b051-e82f9b956ce9" testName="IItemViewer_DeclaresIsFolderDropDownOpenAsReadOnlyBool" computerName="<host>" duration="00:00:00.0010764" startTime="2026-08-28T15:13:10.2610349-04:00" endTime="2026-08-28T15:13:10.2630353-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1cafd856-bcf2-44ea-b5f9-d0a2d62458ae" />
-    <UnitTestResult executionId="710b033b-f3f2-4677-b7a6-559d83b11121" testId="1e5fd48d-e90c-8791-b008-875878520d9d" testName="WireIntentEvents_SubscribesSearchLeave" computerName="<host>" duration="00:00:00.2049267" startTime="2026-08-28T15:13:10.1108573-04:00" endTime="2026-08-28T15:13:10.4258034-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="710b033b-f3f2-4677-b7a6-559d83b11121" />
-    <UnitTestResult executionId="59c6d1bd-a1ad-4a8f-bea1-5ea6672fc79e" testId="15c5e7bb-709d-8f20-8771-0ee3ae7f33b7" testName="TextBoxSearchLeave_WhileDropDownClosed_RoutesNoIntent" computerName="<host>" duration="00:00:00.0003005" startTime="2026-08-28T15:13:10.4478236-04:00" endTime="2026-08-28T15:13:10.4493352-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="59c6d1bd-a1ad-4a8f-bea1-5ea6672fc79e" />
-    <UnitTestResult executionId="b0bfa274-2b36-41f3-aa6b-9e003f88e607" testId="1b6efa0f-cf02-891d-a92e-25b806d7b4f6" testName="IItemViewer_ExistingSearchAndDropDownMemberShapes_AreUnchanged" computerName="<host>" duration="00:00:00.0005350" startTime="2026-08-28T15:13:10.2630353-04:00" endTime="2026-08-28T15:13:10.2640360-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b0bfa274-2b36-41f3-aa6b-9e003f88e607" />
-    <UnitTestResult executionId="50c0709c-9dce-4523-ac56-63cead122244" testId="1d7434b3-d868-8217-9685-47e781903a66" testName="TextBoxSearchLeave_WhileDropDownOpen_RoutesExactlyOneCloseIntent" computerName="<host>" duration="00:00:00.0006983" startTime="2026-08-28T15:13:10.4427974-04:00" endTime="2026-08-28T15:13:10.4433112-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="50c0709c-9dce-4523-ac56-63cead122244">
+    <UnitTestResult executionId="1cafd856-bcf2-44ea-b5f9-d0a2d62458ae" testId="189983a8-9454-8289-b051-e82f9b956ce9" testName="IItemViewer_DeclaresIsFolderDropDownOpenAsReadOnlyBool" computerName="&lt;host&gt;" duration="00:00:00.0010764" startTime="2026-08-28T15:13:10.2610349-04:00" endTime="2026-08-28T15:13:10.2630353-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1cafd856-bcf2-44ea-b5f9-d0a2d62458ae" />
+    <UnitTestResult executionId="710b033b-f3f2-4677-b7a6-559d83b11121" testId="1e5fd48d-e90c-8791-b008-875878520d9d" testName="WireIntentEvents_SubscribesSearchLeave" computerName="&lt;host&gt;" duration="00:00:00.2049267" startTime="2026-08-28T15:13:10.1108573-04:00" endTime="2026-08-28T15:13:10.4258034-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="710b033b-f3f2-4677-b7a6-559d83b11121" />
+    <UnitTestResult executionId="59c6d1bd-a1ad-4a8f-bea1-5ea6672fc79e" testId="15c5e7bb-709d-8f20-8771-0ee3ae7f33b7" testName="TextBoxSearchLeave_WhileDropDownClosed_RoutesNoIntent" computerName="&lt;host&gt;" duration="00:00:00.0003005" startTime="2026-08-28T15:13:10.4478236-04:00" endTime="2026-08-28T15:13:10.4493352-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="59c6d1bd-a1ad-4a8f-bea1-5ea6672fc79e" />
+    <UnitTestResult executionId="b0bfa274-2b36-41f3-aa6b-9e003f88e607" testId="1b6efa0f-cf02-891d-a92e-25b806d7b4f6" testName="IItemViewer_ExistingSearchAndDropDownMemberShapes_AreUnchanged" computerName="&lt;host&gt;" duration="00:00:00.0005350" startTime="2026-08-28T15:13:10.2630353-04:00" endTime="2026-08-28T15:13:10.2640360-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b0bfa274-2b36-41f3-aa6b-9e003f88e607" />
+    <UnitTestResult executionId="50c0709c-9dce-4523-ac56-63cead122244" testId="1d7434b3-d868-8217-9685-47e781903a66" testName="TextBoxSearchLeave_WhileDropDownOpen_RoutesExactlyOneCloseIntent" computerName="&lt;host&gt;" duration="00:00:00.0006983" startTime="2026-08-28T15:13:10.4427974-04:00" endTime="2026-08-28T15:13:10.4433112-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="50c0709c-9dce-4523-ac56-63cead122244">
       <Output>
         <ErrorInfo>
           <Message>Test method QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests.TextBoxSearchLeave_WhileDropDownOpen_RoutesExactlyOneCloseIntent threw exception:&#xD;
@@ -99,60 +99,60 @@ Performed invocations:&#xD;
 </Message>
           <StackTrace>   at Moq.Mock.Verify(Mock mock, LambdaExpression expression, Times times, String failMessage) in /_/src/Moq/Mock.cs:line 332&#xD;
    at Moq.Mock`1.Verify(Expression`1 expression, Times times) in /_/src/Moq/Mock`1.cs:line 728&#xD;
-   at QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests.TextBoxSearchLeave_WhileDropDownOpen_RoutesExactlyOneCloseIntent() in <repo-root>\QuickFiler.Test\Controllers\QfcItemController.SearchDismissalTests.cs:line 84&#xD;
+   at QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests.TextBoxSearchLeave_WhileDropDownOpen_RoutesExactlyOneCloseIntent() in &lt;repo-root&gt;\QuickFiler.Test\Controllers\QfcItemController.SearchDismissalTests.cs:line 84&#xD;
 </StackTrace>
         </ErrorInfo>
       </Output>
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="UnwireIntentEvents_DetachesSearchLeave" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a4f368e-8b32-8eaf-8e7f-322608ec036d">
+    <UnitTest name="UnwireIntentEvents_DetachesSearchLeave" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a4f368e-8b32-8eaf-8e7f-322608ec036d">
       <Execution id="32d0cd46-45fa-4b0a-a257-3a3e9d4a1633" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_EventWiringTests" name="UnwireIntentEvents_DetachesSearchLeave" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_EventWiringTests" name="UnwireIntentEvents_DetachesSearchLeave" />
     </UnitTest>
-    <UnitTest name="IItemViewer_DeclaresIsFolderDropDownOpenAsReadOnlyBool" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="189983a8-9454-8289-b051-e82f9b956ce9">
+    <UnitTest name="IItemViewer_DeclaresIsFolderDropDownOpenAsReadOnlyBool" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="189983a8-9454-8289-b051-e82f9b956ce9">
       <Execution id="1cafd856-bcf2-44ea-b5f9-d0a2d62458ae" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerSearchDismissalContractTests" name="IItemViewer_DeclaresIsFolderDropDownOpenAsReadOnlyBool" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerSearchDismissalContractTests" name="IItemViewer_DeclaresIsFolderDropDownOpenAsReadOnlyBool" />
     </UnitTest>
-    <UnitTest name="ItemViewer_ImplementsSearchLeaveAndIsFolderDropDownOpen" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d51101c-3522-81a5-8ed4-d64ac01587c2">
+    <UnitTest name="ItemViewer_ImplementsSearchLeaveAndIsFolderDropDownOpen" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d51101c-3522-81a5-8ed4-d64ac01587c2">
       <Execution id="ea404b5b-0569-4ad9-bb3e-1e0687cd51b8" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerSearchDismissalContractTests" name="ItemViewer_ImplementsSearchLeaveAndIsFolderDropDownOpen" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerSearchDismissalContractTests" name="ItemViewer_ImplementsSearchLeaveAndIsFolderDropDownOpen" />
     </UnitTest>
-    <UnitTest name="TextBoxSearchKeyDown_EscapeWhileDropDownClosed_RoutesNoIntentAndLeavesKeyUnhandled" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a9ce567-4955-86fb-a242-5251a0e2701b">
+    <UnitTest name="TextBoxSearchKeyDown_EscapeWhileDropDownClosed_RoutesNoIntentAndLeavesKeyUnhandled" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a9ce567-4955-86fb-a242-5251a0e2701b">
       <Execution id="15d43e62-b645-4c71-abeb-d71eb0de94de" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests" name="TextBoxSearchKeyDown_EscapeWhileDropDownClosed_RoutesNoIntentAndLeavesKeyUnhandled" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests" name="TextBoxSearchKeyDown_EscapeWhileDropDownClosed_RoutesNoIntentAndLeavesKeyUnhandled" />
     </UnitTest>
-    <UnitTest name="TextBoxSearchLeave_WhileDropDownClosed_RoutesNoIntent" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="15c5e7bb-709d-8f20-8771-0ee3ae7f33b7">
+    <UnitTest name="TextBoxSearchLeave_WhileDropDownClosed_RoutesNoIntent" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="15c5e7bb-709d-8f20-8771-0ee3ae7f33b7">
       <Execution id="59c6d1bd-a1ad-4a8f-bea1-5ea6672fc79e" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests" name="TextBoxSearchLeave_WhileDropDownClosed_RoutesNoIntent" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests" name="TextBoxSearchLeave_WhileDropDownClosed_RoutesNoIntent" />
     </UnitTest>
-    <UnitTest name="IItemViewer_ExistingSearchAndDropDownMemberShapes_AreUnchanged" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1b6efa0f-cf02-891d-a92e-25b806d7b4f6">
+    <UnitTest name="IItemViewer_ExistingSearchAndDropDownMemberShapes_AreUnchanged" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1b6efa0f-cf02-891d-a92e-25b806d7b4f6">
       <Execution id="b0bfa274-2b36-41f3-aa6b-9e003f88e607" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerSearchDismissalContractTests" name="IItemViewer_ExistingSearchAndDropDownMemberShapes_AreUnchanged" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerSearchDismissalContractTests" name="IItemViewer_ExistingSearchAndDropDownMemberShapes_AreUnchanged" />
     </UnitTest>
-    <UnitTest name="TextBoxSearchKeyDown_EscapeWhileDropDownOpen_RoutesExactlyOneCloseIntent" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1003bf03-8531-8972-9c0e-f46fb88021de">
+    <UnitTest name="TextBoxSearchKeyDown_EscapeWhileDropDownOpen_RoutesExactlyOneCloseIntent" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1003bf03-8531-8972-9c0e-f46fb88021de">
       <Execution id="e98e0d3a-9357-402e-ba22-918b0ebf307d" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests" name="TextBoxSearchKeyDown_EscapeWhileDropDownOpen_RoutesExactlyOneCloseIntent" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests" name="TextBoxSearchKeyDown_EscapeWhileDropDownOpen_RoutesExactlyOneCloseIntent" />
     </UnitTest>
-    <UnitTest name="TextBoxSearchLeave_AfterDownArrowHandoff_SuppressesExactlyOneClose" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1f55a4fe-f953-8954-a1de-1717cd3c1630">
+    <UnitTest name="TextBoxSearchLeave_AfterDownArrowHandoff_SuppressesExactlyOneClose" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1f55a4fe-f953-8954-a1de-1717cd3c1630">
       <Execution id="1f4cba70-c35b-4579-8e48-2794433e0dfe" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests" name="TextBoxSearchLeave_AfterDownArrowHandoff_SuppressesExactlyOneClose" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests" name="TextBoxSearchLeave_AfterDownArrowHandoff_SuppressesExactlyOneClose" />
     </UnitTest>
-    <UnitTest name="TextBoxSearchKeyDown_DownArrow_StillOpensAndFocusesTheDropDown" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1372c696-2c78-8120-bfd8-4aae8d450a1b">
+    <UnitTest name="TextBoxSearchKeyDown_DownArrow_StillOpensAndFocusesTheDropDown" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1372c696-2c78-8120-bfd8-4aae8d450a1b">
       <Execution id="4ffbb4b9-6f06-46e6-9775-99dae3b28927" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests" name="TextBoxSearchKeyDown_DownArrow_StillOpensAndFocusesTheDropDown" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests" name="TextBoxSearchKeyDown_DownArrow_StillOpensAndFocusesTheDropDown" />
     </UnitTest>
-    <UnitTest name="WireIntentEvents_SubscribesSearchLeave" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e5fd48d-e90c-8791-b008-875878520d9d">
+    <UnitTest name="WireIntentEvents_SubscribesSearchLeave" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e5fd48d-e90c-8791-b008-875878520d9d">
       <Execution id="710b033b-f3f2-4677-b7a6-559d83b11121" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_EventWiringTests" name="WireIntentEvents_SubscribesSearchLeave" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_EventWiringTests" name="WireIntentEvents_SubscribesSearchLeave" />
     </UnitTest>
-    <UnitTest name="TextBoxSearchLeave_WhileDropDownOpen_RoutesExactlyOneCloseIntent" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d7434b3-d868-8217-9685-47e781903a66">
+    <UnitTest name="TextBoxSearchLeave_WhileDropDownOpen_RoutesExactlyOneCloseIntent" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d7434b3-d868-8217-9685-47e781903a66">
       <Execution id="50c0709c-9dce-4523-ac56-63cead122244" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests" name="TextBoxSearchLeave_WhileDropDownOpen_RoutesExactlyOneCloseIntent" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_SearchDismissalTests" name="TextBoxSearchLeave_WhileDropDownOpen_RoutesExactlyOneCloseIntent" />
     </UnitTest>
-    <UnitTest name="IItemViewer_DeclaresSearchLeaveAsPlainEventHandler" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1b51818f-24f0-8435-a496-550d1ef19049">
+    <UnitTest name="IItemViewer_DeclaresSearchLeaveAsPlainEventHandler" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1b51818f-24f0-8435-a496-550d1ef19049">
       <Execution id="356d98b5-410d-4666-8714-65bb7958e2b3" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerSearchDismissalContractTests" name="IItemViewer_DeclaresSearchLeaveAsPlainEventHandler" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Viewers.ItemViewerSearchDismissalContractTests" name="IItemViewer_DeclaresSearchLeaveAsPlainEventHandler" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
@@ -176,7 +176,7 @@ Performed invocations:&#xD;
   <ResultSummary outcome="Failed">
     <Counters total="12" executed="12" passed="9" failed="3" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
-      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+      <StdOut>Test Parallelization enabled for &lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
 </StdOut>
     </Output>
   </ResultSummary>
