@@ -177,3 +177,10 @@ onto `main`, which has since merged issue #677, and the shipped code in
 `OpenAsync_TakeFocusReopenAfterNonCapturingOpenWithPredicateFalse_RestoresAutoCloseButSuppressesFocus`
 in `QuickFiler.Test/Viewers/BreadcrumbDropDownHostTests.Part3.cs`, now pins issue #680's unconditional
 `AutoClose` restore composing correctly with issue #677's `MayTakeFocus` guard.
+
+## Remediation-Cycle Timestamp Accuracy Note — 2026-08-28T23-14
+
+- Note: the 2026-08-28T17-15 remediation cycle's evidence artifacts are self-stamped 2026-08-28T18-16 through 2026-08-28T20-12, which postdate both the commit that introduced them (c4e96b72) and the wall-clock time of the review that flagged this (2026-08-28T17-48).
+
+This offset is attributed to a sandbox/session clock artifact with no functional effect on evidence
+validity, ordering, or content; no committed artifact is renamed or rewritten to correct it.

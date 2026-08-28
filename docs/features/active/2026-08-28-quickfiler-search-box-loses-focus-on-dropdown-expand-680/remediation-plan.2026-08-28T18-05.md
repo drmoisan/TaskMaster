@@ -147,19 +147,19 @@ skill is recorded at the end of this document in place of a validator signal.
 
 ### Phase 0 — Baseline Capture
 
-- [ ] [P0-T1] Read the policy documents in the `policy-compliance-order` sequence: `CLAUDE.md`,
+- [x] [P0-T1] Read the policy documents in the `policy-compliance-order` sequence: `CLAUDE.md`,
   `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/csharp.md`,
   `.claude/rules/quality-tiers.md`, `.claude/rules/tonality.md`. Write
   `<FEATURE>/evidence/remediation-baseline/r2-phase0-instructions-read.<ts>.md` containing `Timestamp:`,
   `Policy Order:`, and the explicit list of the six files read. Acceptance: the artifact exists and
   lists all six files.
-- [ ] [P0-T2] Record remediation-pass context: `git rev-parse HEAD`, `git status --porcelain`.
+- [x] [P0-T2] Record remediation-pass context: `git rev-parse HEAD`, `git status --porcelain`.
   Acceptance: `git status --porcelain` output is empty at the moment this task runs (the orchestrator is
   expected to have committed any outstanding review artifacts before this plan's Phase 0 starts); the
   observed `HEAD` is recorded as `R2_BASE_COMMIT` (informational only, not asserted against a fixed
   hash). Artifact: `<FEATURE>/evidence/remediation-baseline/r2-p0-t2-context.<ts>.md` with `Timestamp:`,
   `Command:`, `EXIT_CODE:`, `Output Summary:`.
-- [ ] [P0-T3] Baseline (fail-before) host-identity sweep of the five named leaking files — for each of
+- [x] [P0-T3] Baseline (fail-before) host-identity sweep of the five named leaking files — for each of
   `evidence/remediation-baseline/p0-t6/p0-t6.trx`, `evidence/remediation-baseline/p0-t7/p0-t7.trx`,
   `evidence/regression-testing/p1-t3/p1-t3.trx`, `evidence/regression-testing/p2-t3/p2-t3.trx`,
   `evidence/qa-gates/p4-t4/p4-t4.trx`, run `rg -a -i -F -- '<literal>' <path>` for each of the three
@@ -169,14 +169,14 @@ skill is recorded at the end of this document in place of a validator signal.
   and the search mechanism can detect it — the positive control required by D8); record the full 5×3
   hit-count matrix as `R2_BEFORE_MATRIX`. Artifact:
   `<FEATURE>/evidence/remediation-baseline/r2-p0-t3-before-sweep.<ts>.md` with the four schema fields.
-- [ ] [P0-T4] Baseline XML well-formedness check of the same five files: for each, run
+- [x] [P0-T4] Baseline XML well-formedness check of the same five files: for each, run
   `[xml](Get-Content -Raw -Path <path>)` and record whether it throws. Acceptance: record the per-file
   PASS/FAIL result as `R2_BEFORE_XML_STATUS` (informational baseline; the leak does not itself break XML
   well-formedness, so this is expected to be PASS for all five and is recorded to give Phase 1/2 a
   same-file non-regression comparison point). Artifact:
   `<FEATURE>/evidence/remediation-baseline/r2-p0-t4-before-xml-check.<ts>.md` with the four schema
   fields.
-- [ ] [P0-T5] Distinguishing baseline for the RC-2 restore: count `outcome="Failed"` occurrences in the
+- [x] [P0-T5] Distinguishing baseline for the RC-2 restore: count `outcome="Failed"` occurrences in the
   current `evidence/regression-testing/p2-t3/p2-t3.trx` via
   `(Select-String -Path <path> -Pattern 'outcome="Failed"' -AllMatches).Matches.Count`. Acceptance: the
   count is `0` (the file currently holds the remediation's 36/36 green run, per
@@ -191,7 +191,7 @@ skill is recorded at the end of this document in place of a validator signal.
 this phase; it is fixed by content restoration in Phase 2, not by placeholder substitution, because
 restoring it also closes RC-2.
 
-- [ ] [P1-T1] Apply the D1 `Set-TrxSanitized` routine to each of these four files, in one script
+- [x] [P1-T1] Apply the D1 `Set-TrxSanitized` routine to each of these four files, in one script
   invocation that loops over the four paths and fails on the first exception:
   `evidence/remediation-baseline/p0-t6/p0-t6.trx`, `evidence/remediation-baseline/p0-t7/p0-t7.trx`,
   `evidence/regression-testing/p1-t3/p1-t3.trx`, `evidence/qa-gates/p4-t4/p4-t4.trx`. Acceptance: the
@@ -200,12 +200,12 @@ restoring it also closes RC-2.
   replaced are longer than the `&lt;repo-root&gt;`/`&lt;user&gt;`/`&lt;host&gt;` placeholders that
   replace them). Artifact: `<FEATURE>/evidence/qa-gates/r2-p1-t1-sanitize.<ts>.md` with the four schema
   fields and a before/after byte-count table for all four files.
-- [ ] [P1-T2] Re-run the same 4×3 sweep from P0-T3 (excluding `p2-t3.trx`) against the now-sanitized
+- [x] [P1-T2] Re-run the same 4×3 sweep from P0-T3 (excluding `p2-t3.trx`) against the now-sanitized
   files: `rg -a -i -F -- '<literal>' <path>` for each of the three D1 literal classes across the four
   files. Acceptance: total hit count across all twelve sub-checks is `0`; zero files produced a read
   error. Artifact: `<FEATURE>/evidence/qa-gates/r2-p1-t2-sweep.<ts>.md` with the four schema fields and
   the 4×3 hit-count matrix (all zero), quoted against P0-T3's nonzero matrix for the same four files.
-- [ ] [P1-T3] Verify well-formedness and escaped-only placeholder form for the same four files: (a)
+- [x] [P1-T3] Verify well-formedness and escaped-only placeholder form for the same four files: (a)
   `[xml](Get-Content -Raw -Path <path>)` throws no exception for any of the four; (b)
   `(Select-String -Path <path> -SimpleMatch -Pattern '<repo-root>','<user>','<host>' -AllMatches)` (the
   raw, unescaped spellings) returns `0` combined matches across all four files; (c)
@@ -219,16 +219,16 @@ restoring it also closes RC-2.
 This phase also closes R2 for the fifth file, because the commit being restored from (`72b4b7ed`)
 already carries the escaped-placeholder sanitization treatment.
 
-- [ ] [P2-T1] Verify the recovery source exists and is unambiguous: `git cat-file -e 72b4b7ed^{commit}`
+- [x] [P2-T1] Verify the recovery source exists and is unambiguous: `git cat-file -e 72b4b7ed^{commit}`
   and `git cat-file -e 72b4b7ed:docs/features/active/2026-08-28-quickfiler-search-box-loses-focus-on-dropdown-expand-680/evidence/regression-testing/p2-t3/p2-t3.trx`.
   Acceptance: both commands exit `0`. Artifact:
   `<FEATURE>/evidence/regression-testing/r2-p2-t1-source-verified.<ts>.md` with the four schema fields.
-- [ ] [P2-T2] Preserve the remediation's own green-run TRX before it is overwritten: create directory
+- [x] [P2-T2] Preserve the remediation's own green-run TRX before it is overwritten: create directory
   `evidence/regression-testing/r-p2-t3/` and `Copy-Item evidence/regression-testing/p2-t3/p2-t3.trx evidence/regression-testing/r-p2-t3/p2-t3.trx`.
   Acceptance: the destination file exists and `(Get-FileHash <source>).Hash -eq (Get-FileHash <dest>).Hash`
   immediately after the copy. Artifact:
   `<FEATURE>/evidence/regression-testing/r2-p2-t2-green-preserved.<ts>.md` with the four schema fields.
-- [ ] [P2-T3] Restore the original fail-before red-run TRX:
+- [x] [P2-T3] Restore the original fail-before red-run TRX:
   `git checkout 72b4b7ed -- docs/features/active/2026-08-28-quickfiler-search-box-loses-focus-on-dropdown-expand-680/evidence/regression-testing/p2-t3/p2-t3.trx`.
   Acceptance: `git hash-object evidence/regression-testing/p2-t3/p2-t3.trx` equals
   `git rev-parse 72b4b7ed:docs/features/active/2026-08-28-quickfiler-search-box-loses-focus-on-dropdown-expand-680/evidence/regression-testing/p2-t3/p2-t3.trx`
@@ -239,7 +239,7 @@ already carries the escaped-placeholder sanitization treatment.
   counting literal occurrences directly), strictly greater than `R2_BEFORE_FAILED_COUNT` (`0`,
   P0-T5) — the false-before/true-after pair required by D8. Artifact:
   `<FEATURE>/evidence/regression-testing/r2-p2-t3-restored.<ts>.md` with the four schema fields.
-- [ ] [P2-T4] Apply the D1 `Set-TrxSanitized` routine to the relocated green-run copy
+- [x] [P2-T4] Apply the D1 `Set-TrxSanitized` routine to the relocated green-run copy
   `evidence/regression-testing/r-p2-t3/p2-t3.trx`. Acceptance: the routine completes with no exception;
   `BytesAfter` is strictly less than `BytesBefore`; a follow-up `rg -a -i -F -- '<literal>' <path>` sweep
   for all three D1 literal classes returns `0` combined hits; `[xml](Get-Content -Raw -Path <path>)`
@@ -247,7 +247,7 @@ already carries the escaped-placeholder sanitization treatment.
   (`<repo-root>`, `<user>`, `<host>`) returns `0` matches, and for the escaped forms
   (`&lt;repo-root&gt;`, `&lt;user&gt;`, `&lt;host&gt;`) returns at least `1` match. Artifact:
   `<FEATURE>/evidence/qa-gates/r2-p2-t4-relocated-sanitized.<ts>.md` with the four schema fields.
-- [ ] [P2-T5] Append a relocation addendum to
+- [x] [P2-T5] Append a relocation addendum to
   `evidence/regression-testing/p2-t3-new-test-green.2026-08-28T19-27.md` (append-only; do not edit or
   delete any existing line), containing a new `## Relocation Addendum — <ts>` heading followed by
   prose stating, verbatim on its own line: `- Relocated TRX: evidence/regression-testing/r-p2-t3/p2-t3.trx`
@@ -263,7 +263,7 @@ already carries the escaped-placeholder sanitization treatment.
 
 ### Phase 3 — RC-3: Timestamp-Accuracy Documentation Note
 
-- [ ] [P3-T1] Append a new `## Remediation-Cycle Timestamp Accuracy Note — <ts>` section to
+- [x] [P3-T1] Append a new `## Remediation-Cycle Timestamp Accuracy Note — <ts>` section to
   `delivery-report.2026-08-28T16-40.md` (append-only; do not edit or delete any existing line,
   including the existing "Post-Rebase Addendum" section from the prior remediation cycle), stating,
   verbatim on its own line:
@@ -285,14 +285,14 @@ too narrowly scoped. Preflight round 1 found four already-leaking review/memory 
 original two tasks of this phase did not sanitize; `P4-T2` sanitizes those four files before `P4-T3`'s
 content sweep runs, so `P4-T3`'s own zero-hit acceptance condition holds against the real tree.
 
-- [ ] [P4-T1] Enumerate the sweep scope as the de-duplicated union of (a) every file under
+- [x] [P4-T1] Enumerate the sweep scope as the de-duplicated union of (a) every file under
   `docs/features/active/2026-08-28-quickfiler-search-box-loses-focus-on-dropdown-expand-680/` via
   `Get-ChildItem -Recurse -File`, and (b) every path reported by `git status --porcelain` at this
   moment (directory entries, if any, expanded to their contained files). Acceptance: the union count is
   recorded as `R2_SWEEP_SCOPE_COUNT` and is strictly greater than `0`; the full path list is persisted
   in the artifact. Artifact: `<FEATURE>/evidence/qa-gates/r2-p4-t1-sweep-scope.<ts>.md` with the four
   schema fields.
-- [ ] [P4-T2] Sanitize four review/memory artifacts that quoted the R2 leak verbatim while reporting on
+- [x] [P4-T2] Sanitize four review/memory artifacts that quoted the R2 leak verbatim while reporting on
   it — found by preflight round 1, not by the five-file list Phase 1-2 already cover:
   `code-review.2026-08-28T17-48.md`, `policy-audit.2026-08-28T17-48.md`, and
   `remediation-inputs.2026-08-28T17-48.md` (all three under `<FEATURE>/`), plus
@@ -306,14 +306,14 @@ content sweep runs, so `P4-T3`'s own zero-hit acceptance condition holds against
   control) and the after combined hit count is exactly `0`. Artifact:
   `<FEATURE>/evidence/qa-gates/r2-p4-t2-review-artifact-sanitize.<ts>.md` with the four schema fields and
   a before/after hit-count table for all four files.
-- [ ] [P4-T3] Content sweep (runs after `P4-T2` sanitizes the four review/memory artifacts it found): for
+- [x] [P4-T3] Content sweep (runs after `P4-T2` sanitizes the four review/memory artifacts it found): for
   every file in the P4-T1 union, run `rg -a -i -F -- '<literal>' <path>` for each of the three D1 literal
   classes (worktree-root prefix, `$env:USERNAME` value, `$env:COMPUTERNAME` value). Acceptance: the
   combined hit count for each of the three literal classes is exactly `0` across the entire union
   (`R2_WIDE_REPOROOT_HITS` = `R2_WIDE_USER_HITS` = `R2_WIDE_HOST_HITS` = `0`); `0` files produced a read
   error. Artifact: `<FEATURE>/evidence/qa-gates/r2-p4-t3-content-sweep.<ts>.md` with the four schema
   fields.
-- [ ] [P4-T4] Path-name sweep: for every file's repo-relative path in the P4-T1 union, case-insensitively
+- [x] [P4-T4] Path-name sweep: for every file's repo-relative path in the P4-T1 union, case-insensitively
   test for the `$env:USERNAME` and `$env:COMPUTERNAME` literal values (the worktree-root prefix is not
   part of any committed repo-relative path by construction and is excluded from this check, matching
   the reasoning already recorded in `evidence/other/trx-sanitisation.2026-08-28T16-45.md`). Acceptance:
@@ -325,31 +325,31 @@ content sweep runs, so `P4-T3`'s own zero-hit acceptance condition holds against
 Run this loop in order. If any step fails or the format step changes any tracked file, restart the
 entire Phase 5 loop from P5-T1; a restarted pass does not count as final.
 
-- [ ] [P5-T1] Format gate (verify-only; per D7 this plan makes no `.cs`/`.xml`/`packages.config` change,
+- [x] [P5-T1] Format gate (verify-only; per D7 this plan makes no `.cs`/`.xml`/`packages.config` change,
   so no `format` write step is required — only the read-only check): `dotnet tool run csharpier check .`.
   Acceptance: `EXIT_CODE: 0`. Artifact: `<FEATURE>/evidence/qa-gates/r2-p5-t1-format-check.<ts>.md`
   with the four schema fields.
-- [ ] [P5-T2] Analyzer rebuild:
+- [x] [P5-T2] Analyzer rebuild:
   `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`.
   Acceptance: `EXIT_CODE: 0`. Artifact: `<FEATURE>/evidence/qa-gates/r2-p5-t2-analyzers.<ts>.md` with
   the four schema fields.
-- [ ] [P5-T3] Nullable/type-check rebuild:
+- [x] [P5-T3] Nullable/type-check rebuild:
   `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`.
   Acceptance: `EXIT_CODE: 0`. Artifact: `<FEATURE>/evidence/qa-gates/r2-p5-t3-nullable.<ts>.md` with the
   four schema fields.
-- [ ] [P5-T4] Pinned-suite green run (spec AC-5), using D3's resolution:
+- [x] [P5-T4] Pinned-suite green run (spec AC-5), using D3's resolution:
   `& $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"FullyQualifiedName~QfcItemController_SearchFocusRegressionTests|FullyQualifiedName~BreadcrumbDropDownSearchIntegrationTests|FullyQualifiedName~BreadcrumbDropDownOpenCoordinatorTests|FullyQualifiedName~BreadcrumbItemViewerLifecycleCoordinatorTests|FullyQualifiedName~ItemViewerBreadcrumbDropDownContractTests" /Logger:"trx;LogFileName=r2-p5-t4.trx" "/ResultsDirectory:<FEATURE>/evidence/qa-gates/r2-p5-t4"`.
   Acceptance: `EXIT_CODE: 0`; total equals `75` and failed equals `0` (matching the total recorded in
   `evidence/qa-gates/p4-t2-pinned-suites.2026-08-28T16-07.md`); the `r2-p5-t4` subdirectory holds
   exactly one file, named exactly `r2-p5-t4.trx`. Artifact:
   `<FEATURE>/evidence/qa-gates/r2-p5-t4-pinned-suites.<ts>.md` with the four schema fields.
-- [ ] [P5-T5] Full `QuickFiler.Test` assembly run, using D3's resolution:
+- [x] [P5-T5] Full `QuickFiler.Test` assembly run, using D3's resolution:
   `& $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation /TestCaseFilter:"TestCategory!=LiveOutlook" /Logger:"trx;LogFileName=r2-p5-t5.trx" "/ResultsDirectory:<FEATURE>/evidence/qa-gates/r2-p5-t5"`.
   Acceptance: `EXIT_CODE: 0`; total equals `1237` and failed equals `0` (matching the total recorded in
   `evidence/qa-gates/p4-t4-qft-full-run.2026-08-28T19-50.md`); the `r2-p5-t5` subdirectory holds exactly
   one file, named exactly `r2-p5-t5.trx`. Artifact:
   `<FEATURE>/evidence/qa-gates/r2-p5-t5-full-suite.<ts>.md` with the four schema fields.
-- [ ] [P5-T6] Commit-readiness check (no `git commit` is performed by this task): `git status
+- [x] [P5-T6] Commit-readiness check (no `git commit` is performed by this task): `git status
   --porcelain`. Acceptance: every listed entry is one of: the five originally-leaking TRX paths (or
   their containing `p0-t6/`, `p0-t7/`, `p1-t3/`, `p2-t3/`, `p4-t4/` directories),
   `evidence/regression-testing/r-p2-t3/p2-t3.trx`,

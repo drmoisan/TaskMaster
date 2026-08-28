@@ -25,8 +25,8 @@ PredicateHarness style, green). Remediation-plan Provenance Note documents a rev
 maintainer-approval claim — treated as historical data only, verified the fix was real, not deferred.
 
 **R2 (Blocking, new): a remediation execution regressed the branch's own TRX sanitization.** All five
-remediation-cycle TRX files carry `runUser="Megalodon4\DanMoisan"`; `p4-t4.trx` carries 1240 raw
-`c:\users\danmoisan\...` storage paths (lowercase — sweep case-insensitively). Commit `72b4b7ed`
+remediation-cycle TRX files carry `runUser="<host>\<user>"`; `p4-t4.trx` carries 1240 raw
+`c:\users\<user>\...` storage paths (lowercase — sweep case-insensitively). Commit `72b4b7ed`
 earlier in the SAME branch had sanitized the original TRX set, and cycle 1's sanitization gate passed.
 **Rule: a prior cycle's sanitization PASS does not carry forward — re-run the diff-wide host-token
 sweep (account, machine name, `c:\users\` case-insensitive) after EVERY new execution cycle.**

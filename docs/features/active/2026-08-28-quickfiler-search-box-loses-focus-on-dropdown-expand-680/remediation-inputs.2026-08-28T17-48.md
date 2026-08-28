@@ -12,14 +12,14 @@
 
 - **Rule/standard**: committed evidence artifacts must not carry absolute host paths, the account name, or the machine name. This branch's own commit `72b4b7ed` ("fix(680): XML-escape sanitized placeholders in committed TRX evidence") established the exact required treatment, and the prior review cycle's sanitization gate (policy-audit 16-27 § 7) passed on that basis. The remediation plan's D6 restated host-path hygiene for its markdown artifacts but its TRX outputs were committed unsanitized.
 - **Measured state** (reviewer-verified, case-insensitive sweep of the full branch diff):
-  - `runUser="Megalodon4\DanMoisan"` (machine name + account name) in all five files:
+  - `runUser="<host>\<user>"` (machine name + account name) in all five files:
     - `evidence/remediation-baseline/p0-t6/p0-t6.trx`
     - `evidence/remediation-baseline/p0-t7/p0-t7.trx`
     - `evidence/regression-testing/p1-t3/p1-t3.trx`
     - `evidence/regression-testing/p2-t3/p2-t3.trx`
     - `evidence/qa-gates/p4-t4/p4-t4.trx`
-  - `p4-t4.trx` additionally carries **1240** occurrences of raw `c:\users\danmoisan\repos\taskmaster-wt\2026-08-28t08-42\...` paths (storage/codebase attributes).
-  - Attribution: `git log -S 'Megalodon4' b0c7fa18..HEAD` shows the tokens enter history only at `c4e96b72`. All earlier TRX files (sanitized by `72b4b7ed`) remain clean; no markdown artifact leaks.
+  - `p4-t4.trx` additionally carries **1240** occurrences of raw `<repo-root>\...` paths (storage/codebase attributes).
+  - Attribution: `git log -S '<host>' b0c7fa18..HEAD` shows the tokens enter history only at `c4e96b72`. All earlier TRX files (sanitized by `72b4b7ed`) remain clean; no markdown artifact leaks.
 - **Required remediation** (mechanical, no code change):
   1. Apply the `72b4b7ed` sanitization treatment to all five TRX files: replace the user-profile worktree prefix with the XML-escaped `&lt;repo-root&gt;` placeholder, and replace the `runUser` value with an escaped `&lt;user&gt;`-style placeholder (machine and account names must not survive in any form, including the lowercase path variants).
   2. Verify with the same checks the prior cycle used: each file parses as well-formed XML; zero case-insensitive matches for the account name, machine name, or `c:\users\` prefix; escaped placeholders only (no raw `<repo-root>` tokens inside XML attribute values).
