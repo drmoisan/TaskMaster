@@ -114,3 +114,22 @@ above with the scaffold headings preserved, then promoted with the issue-promoti
 promotion type bug and work mode full-bug. The promoted records are retained under
 docs/features/potential/promoted/. The numbers are recorded in the spec Rollout and Follow-up
 section and AC20 is checked off.
+
+### Clarification for review finding G5 (2026-08-29T13-20)
+
+The review noted that the promoted records for 696, 697 and 698 are not present in this
+worktree. That is correct and intended. The records were created in the orchestration session
+checkout, not on this branch, because AC18 pins this branch footprint to the three code files
+plus this feature folder; committing files under docs/features/potential/promoted/ here would
+have broken AC18 and the [P9-T2] footprint gate. Their existence was verified on disk in that
+checkout at 2026-08-29T12-56, and all three issues were confirmed OPEN on the remote. They are
+queued there for a separate documentation commit alongside other promotions from the same
+orchestration session, and that queue is the parent session responsibility rather than this
+branch.
+
+One further follow-up was filed from the code review of this change, and is recorded here for
+the same audit trail even though it is not one of the three spec non-goals:
+
+- Code-review finding CR-1, the success-path test that terminates on an incidental collaborator
+  crash rather than a deliberate stopping point: issue 699 -
+  https://github.com/drmoisan/TaskMaster/issues/699
