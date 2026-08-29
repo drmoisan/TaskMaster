@@ -73,6 +73,8 @@
 - [Epic-child nullable fan-in debt is deferred](project_epic_child_nullable_fanin_debt_deferred.md) — cross-child CS86xx fan-in is the
 - [C# coverage has two denominators](csharp-coverage-denominator-two-figures.md) — filtered first-party ~85.9% clears the gate, unfiltered
 - [lines-covered is nondeterministic; lines-valid is not](coverage-lines-covered-is-nondeterministic.md) — same-tree runs drift up to 4
+- [Verify an issue is open in SUBSTANCE](verify-issue-still-open-in-substance.md) — grep the source for the issue number before preparing; the residual may already be its own issue
+- [Reconcile plan numbers against your own measurements](reconcile-plan-numbers-against-your-own-measurements.md) — a stale line count passes a citation-only review and halts Phase 0
 - [Preflight catches vacuous gates](preflight-catches-vacuous-gates.md) — MCP `ok:true` is not enough; executor preflight found 6 gates
 - [Preflight: sweep task ordering + citation arity](preflight-sweep-task-ordering-and-citation-arity.md) — name both sweeps early; a
 - [Revert plans must check test provenance](revert-plans-must-check-test-provenance.md) — verify each test against the pre-change sha; a
