@@ -428,6 +428,17 @@ function Test-BlastRadiusConflict {
     .OUTPUTS
         System.Collections.Hashtable. Keys conflict (a boolean) and reasons (an
         array of hashtables with keys kind and detail).
+
+        Read the verdict from the conflict key of the returned hashtable.
+        Do not test the returned object itself: the hashtable is
+        unconditionally truthy under PowerShell boolean coercion, so
+        'if ($result)' treats every pair as contending.
+        System.Collections.Hashtable implements IDictionary and ICollection but
+        not IList, and the count-based truthiness rule applies only to IList
+        implementations, so a hashtable falls under the rule for any other
+        non-collection type and is always $true. The Python port agrees with its
+        own verdict; this mirror provably cannot, because PowerShell exposes no
+        hook by which a type can decline or change the conversion.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]

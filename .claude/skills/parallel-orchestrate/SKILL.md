@@ -387,15 +387,21 @@ checkout, never from inside a child worktree — issues `git worktree remove <wo
 success it records `merge_status: worktree_removed` and `worktree_removed_at`, then regenerates
 `docs/features/parallel/<slug>/parallel-status.md`.
 
-Mechanical gating of this command for parallel worktrees is F7 scope.
-`.claude/hooks/enforce-epic-worktree-removal-gate.ps1` is a project-wide `PreToolUse` Bash-matcher
-hook that denies any `git worktree remove` unless the epic checkpoint carries a matching
-`features[]` record whose `merge_status` is `merged` or `worktree_removed`; an unreadable checkpoint
-or an absent record also denies. Its block reason is `EPIC_WORKTREE_REMOVAL_BLOCKED`. A parallel run
-has no epic checkpoint record for its worktrees, so removal is denied until F7 both delivers
-`enforce-parallel-worktree-removal-gate.ps1` and coordinates the epic gate's allow conditions:
-`PreToolUse` denials are conjunctive, so a new allow-hook alone cannot override the existing deny.
-This feature ships no hook file and makes no `.claude/settings.json` change.
+Mechanical gating of this command for parallel worktrees is delivered. Both halves have landed.
+`.claude/hooks/enforce-parallel-worktree-removal-gate.ps1` exists and is registered in
+`.claude/settings.json` on the `Bash` matcher; it authorizes a removal from the
+parallel-orchestrator checkpoint and owns the block reason
+`PARALLEL_WORKTREE_REMOVAL_BLOCKED`. `.claude/hooks/enforce-epic-worktree-removal-gate.ps1` is a
+project-wide `PreToolUse` Bash-matcher hook registered alongside it whose block reason is
+`EPIC_WORKTREE_REMOVAL_BLOCKED`; it now carries a second, parallel allow-branch, so it authorizes a
+removal either from a matching epic checkpoint `features[]` record or from a parallel-orchestrator
+checkpoint whose `route_id` is `parallel` and whose matching `items[].worktree_path` record has
+`merge_status` in `{merged, worktree_removed}`. An unreadable checkpoint, an absent record, or a
+non-authorizing `merge_status` still denies on both branches. The coordination matters because
+`PreToolUse` denials are conjunctive: a new allow-hook alone could not have overridden the epic
+gate's independent deny, which is why the epic gate itself had to gain the parallel branch.
+The parallel-orchestrator-surface feature (F7) shipped no hook file and made no
+`.claude/settings.json` change of its own.
 
 ## Documentation Maintenance Boundaries
 
@@ -736,6 +742,9 @@ against `items[].worktree_path`. Removal is allowed only when that item's `merge
 or `worktree_removed`; anything else — including an unreadable checkpoint or no matching record —
 denies with a reason prefixed `PARALLEL_WORKTREE_REMOVAL_BLOCKED`. Commands that are not
 `git worktree remove` always allow. This is the mechanical counterpart to `## Worktree Cleanup`.
+`.claude/hooks/enforce-epic-worktree-removal-gate.ps1` fires on the same command and now carries a
+matching parallel allow-branch keyed on the same checkpoint, so both gates must allow for a removal
+to proceed.
 
 **Invocation-origin extension.** `.claude/hooks/enforce-epic-invocation-origin.ps1` was extended
 additively so `$script:GatedSubagentTypes` lists `epic-planner`, `epic-orchestrator`,
