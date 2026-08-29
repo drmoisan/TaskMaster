@@ -322,42 +322,42 @@ no executable line changes.
 
 ## Acceptance Criteria
 
-- [ ] **AC-1** — The thirteen-identifier search set is derived at commit level from `63eebd47` and
+- [x] **AC-1** — The thirteen-identifier search set is derived at commit level from `63eebd47` and
       recorded in
       `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/baseline/`,
       confirming that the commit removed exactly the twelve methods and the one private field
       `_templateTlp` listed in the Context section.
-- [ ] **AC-2** — The thirteen-identifier sweep over tracked non-`.cs` files outside the docs tree and
+- [x] **AC-2** — The thirteen-identifier sweep over tracked non-`.cs` files outside the docs tree and
       the .claude tree is executed and returns zero hits, with its verbatim command, verbatim output, and
       exit code recorded.
-- [ ] **AC-3** — The scope of the AC-2 sweep is measured and recorded as a file count, together with
+- [x] **AC-3** — The scope of the AC-2 sweep is measured and recorded as a file count, together with
       the repository-wide tracked, tracked-`.cs`, and tracked-non-`.cs` totals and the comparable
       scope of the AC-16 six-extension search, so the AC-2 zero is demonstrably non-vacuous and the
       widening is quantified.
-- [ ] **AC-4** — The same sweep including the docs tree and the .claude tree is executed, its total hit count is
+- [x] **AC-4** — The same sweep including the docs tree and the .claude tree is executed, its total hit count is
       recorded, and every hit is assigned to exactly one category derived from its path; the
       per-category counts sum to the recorded total.
-- [ ] **AC-5** — The category "genuine name-based caller" is empty in the AC-4 classification, and
+- [x] **AC-5** — The category "genuine name-based caller" is empty in the AC-4 classification, and
       the mechanical test by which each hit was assigned its category is stated in the artifact.
-- [ ] **AC-6** — The sweep over tracked `.cs` files is executed and every hit is enumerated
+- [x] **AC-6** — The sweep over tracked `.cs` files is executed and every hit is enumerated
       individually with its file, line, matched identifier, and category; the enumerated row count
       equals the recorded total, and the "genuine name-based caller" category is empty.
-- [ ] **AC-7** — A supplementary pass over untracked, unignored files is executed and recorded,
+- [x] **AC-7** — A supplementary pass over untracked, unignored files is executed and recorded,
       including the enumerated list of files searched, so the result is auditable whether or not the
       list is empty.
-- [ ] **AC-8** — A reflection entry-point inventory is recorded covering the full pattern list —
+- [x] **AC-8** — A reflection entry-point inventory is recorded covering the full pattern list —
       including the `GetField(` and `GetFields(` family that AC-16 omitted — with a per-pattern hit
       count reported separately for the QuickFiler production tree and the QuickFiler test tree, and
       the production-tree count recorded as zero for every name-resolving pattern.
-- [ ] **AC-9** — Each of the six variable-argument reflection call sites that target the removed
+- [x] **AC-9** — Each of the six variable-argument reflection call sites that target the removed
       members' own type is named individually by file and line, and each is closed by an explicit
       stated argument bounding the values its member-name variable can take; the stated limit of
       that argument is recorded rather than omitted.
-- [ ] **AC-10** — Both corrections to the AC-16 record are stated in this item's evidence: that
+- [x] **AC-10** — Both corrections to the AC-16 record are stated in this item's evidence: that
       AC-16's build-input search omitted the thirteenth identifier `_templateTlp`, and that its
       claim of zero occurrences anywhere in the QuickFiler test tree no longer holds, with the
       superseding occurrence identified by file, line, and category.
-- [ ] **AC-11** — Every search in this item whose result is zero records its search scope, its
+- [x] **AC-11** — Every search in this item whose result is zero records its search scope, its
       search patterns, its search result, and a measured scope size, so that no zero result rests on
       an empty or unstated search set.
 - [ ] **AC-12** — No production source file is modified. Proven by a diff anchored to the merge base
@@ -365,11 +365,11 @@ no executable line changes.
       `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/`, together
       with a porcelain working-tree status check; both are recorded in
       `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/qa-gates/`.
-- [ ] **AC-13** — A decision record is written in
+- [x] **AC-13** — A decision record is written in
       `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/`
       that either closes the residual reflective-caller risk on the recorded evidence, or names the
       specific caller found together with the separate issue raised to address it.
-- [ ] **AC-14** — A fail-before exception dossier is recorded in
+- [x] **AC-14** — A fail-before exception dossier is recorded in
       `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/regression-testing/`
       in place of the structurally impossible failing regression test, stating why a failing run is
       impossible and supplying the non-vacuity measurement as the alternative proof.

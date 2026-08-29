@@ -101,14 +101,14 @@ plan task complete without its artifact.
 
 ### Phase 0 — Policy reads and baseline capture
 
-- [ ] [P0-T1] Read the repository policy files in the mandated order and record the read in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/baseline/phase0-instructions-read.2026-08-29T04-55.md`.
+- [x] [P0-T1] Read the repository policy files in the mandated order and record the read in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/baseline/phase0-instructions-read.2026-08-29T04-55.md`.
   - Read, in this order: CLAUDE.md at the repository root; the general-code-change rule file, the general-unit-test rule file, the quality-tiers rule file, the tonality rule file, and the csharp rule file, all under the .claude rules directory; and the atomic-plan-contract, evidence-and-timestamp-conventions, and acceptance-criteria-tracking skill files under the .claude skills directory.
   - Acceptance: the artifact carries `Timestamp:`, a `Policy Order:` line, and an explicit list naming all nine files read, one per line.
 
-- [ ] [P0-T2] Record the requirements inputs for this item in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/baseline/p0-t2-requirements-inputs.2026-08-29T04-55.md`, reading `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` in full, then the issue document and the reflective-caller-closure research document that sit beside it in the same feature folder, also in full.
+- [x] [P0-T2] Record the requirements inputs for this item in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/baseline/p0-t2-requirements-inputs.2026-08-29T04-55.md`, reading `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` in full, then the issue document and the reflective-caller-closure research document that sit beside it in the same feature folder, also in full.
   - Acceptance: the artifact carries `Timestamp:` and the three single-line tokens `AC_COUNT: 15`, `WORK_MODE: full-bug`, and `AC_SOURCE: spec.md`, and lists the thirteen identifiers in the preamble order given in this plan, one per line, numbered 1 through 13.
 
-- [ ] [P0-T3] Capture the worktree baseline in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/baseline/p0-t3-worktree-baseline.2026-08-29T04-55.md`.
+- [x] [P0-T3] Capture the worktree baseline in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/baseline/p0-t3-worktree-baseline.2026-08-29T04-55.md`.
   ```
   git rev-parse HEAD
   git status --porcelain
@@ -116,7 +116,7 @@ plan task complete without its artifact.
   - Acceptance: the artifact records the printed HEAD object name verbatim and the verbatim porcelain output, and states explicitly `(no output)` where the porcelain output is empty. No path with a `.cs`, `.csproj`, `.props`, `.targets`, `.resx`, `.config`, `.settings`, `.xaml`, or `.ps1` extension appears in the porcelain output; if one does, stop and report a dirty-baseline blocker.
   - The recorded HEAD object name is recorded, not asserted against any fixed value. Do not write a fixed commit identifier as a plan expectation for HEAD.
 
-- [ ] [P0-T4] Derive the thirteen-identifier search set at commit level from `63eebd47` and record it in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/baseline/p0-t4-identifier-derivation.2026-08-29T04-55.md`. Discharges AC-1.
+- [x] [P0-T4] Derive the thirteen-identifier search set at commit level from `63eebd47` and record it in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/baseline/p0-t4-identifier-derivation.2026-08-29T04-55.md`. Discharges AC-1.
   ```
   git show --stat 63eebd47
   git show 63eebd47 -- QuickFiler/Controllers/QfcCollectionController.cs
@@ -124,7 +124,7 @@ plan task complete without its artifact.
   - Acceptance: the artifact carries a thirteen-row table, one row per identifier in the preamble order given in this plan, each row naming the identifier and quoting the removed-line text from the second command's diff that declares it; twelve rows are method declarations and the row for `_templateTlp` is a field declaration. The artifact states `IDENTIFIER_ROWS: 13`.
   - If `63eebd47` does not resolve in this worktree, record `BLOCKER: removal commit unresolved` in the artifact, leave the task unchecked, and continue with the remaining phases; do not halt the plan.
 
-- [ ] [P0-T5] Measure the search scope and the tracked-file census and record them in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/baseline/p0-t5-scope-census.2026-08-29T04-55.md`. Discharges AC-3.
+- [x] [P0-T5] Measure the search scope and the tracked-file census and record them in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/baseline/p0-t5-scope-census.2026-08-29T04-55.md`. Discharges AC-3.
   ```
   pwsh -NoProfile -Command '$f = git ls-files -- ":(exclude)*.cs" ":(exclude)docs/*" ":(exclude).claude/*"; Write-Output ("SCOPE_FILES=" + $f.Count); $f | Group-Object { [System.IO.Path]::GetExtension($_) } | Sort-Object Count -Descending | Select-Object -First 12 | ForEach-Object { Write-Output ((($_.Name -replace "^$","(none)")) + " " + $_.Count) }'
   ```
@@ -136,17 +136,17 @@ plan task complete without its artifact.
   - Assert the printed values only. Do not assert the exit code of either `pwsh` wrapper: the wrapper exits `0` regardless of what runs inside it.
   - `SCOPE_FILES` and `AC16_SIX_EXTENSION_SCOPE` are both measured over a pathspec that excludes the docs tree and the .claude tree, so neither value can be moved by this item's own artifact writes.
 
-- [ ] [P0-T6] Check off AC-1 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P0-T4 artifact path as its evidence pointer.
+- [x] [P0-T6] Check off AC-1 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P0-T4 artifact path as its evidence pointer.
   - Acceptance: exactly one checkbox changes in this task; the AC-1 criterion text is unchanged.
 
-- [ ] [P0-T7] Check off AC-3 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P0-T5 artifact path as its evidence pointer.
+- [x] [P0-T7] Check off AC-3 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P0-T5 artifact path as its evidence pointer.
   - Acceptance: exactly one checkbox changes in this task; the AC-3 criterion text is unchanged.
 
 ---
 
 ### Phase 1 — Identifier sweep partitions and the untracked pass
 
-- [ ] [P1-T1] Run the Partition A sweep over tracked non-source files outside the docs tree and the .claude tree and record it in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p1-t1-partition-a-sweep.2026-08-29T04-55.md`. Discharges AC-2.
+- [x] [P1-T1] Run the Partition A sweep over tracked non-source files outside the docs tree and the .claude tree and record it in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p1-t1-partition-a-sweep.2026-08-29T04-55.md`. Discharges AC-2.
   ```
   git grep -n -I -F -e WireUpKeyboardHandler -e AnyOpenDropDownsAsync -e LoadGroups_02cAsync -e LoadGroups_02bAsync -e LoadGroup_03bAsync -e LoadConversationsAndFoldersAsync -e LoadItemGroup -e LoadSequentialAsync -e LoadGroupSequential -e CacheTlpForMove -e SwapTlp -e CaptureTlpTemplate -e _templateTlp -- ":(exclude)*.cs" ":(exclude)docs/*" ":(exclude).claude/*"
   ```
@@ -154,7 +154,7 @@ plan task complete without its artifact.
   - This artifact contains this one gate only. Do not combine it with any gate whose expected exit code is `0`.
   - Acceptance also requires the artifact to carry `SearchScope:`, `SearchPatterns:`, and `SearchResult:` lines, with `SearchScope:` naming the pathspec and citing the `SCOPE_FILES` value recorded by P0-T5, so the zero result is auditable and demonstrably non-vacuous.
 
-- [ ] [P1-T2] Run the Partition A non-vacuity control and record it in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p1-t2-partition-a-control.2026-08-29T04-55.md`.
+- [x] [P1-T2] Run the Partition A non-vacuity control and record it in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p1-t2-partition-a-control.2026-08-29T04-55.md`.
   ```
   git grep -n -I -F -e QfcCollectionController -- ":(exclude)*.cs" ":(exclude)docs/*" ":(exclude).claude/*"
   ```
@@ -162,7 +162,7 @@ plan task complete without its artifact.
   - Acceptance also requires the artifact to state, in one sentence, why the extensionless file is the decisive element of this control: it is a file type that the six build-input extensions of the earlier AC-16 search could never reach, so it proves the widened pathspec reaches real content the narrower scope did not.
   - This control is the non-vacuity proof for P1-T1: the same pathspec that returns nothing for the thirteen identifiers returns thirteen hits for a token that is genuinely present.
 
-- [ ] [P1-T3] Run the Partition B sweep including the docs tree and the .claude tree, classify every hit by path prefix, and record it in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p1-t3-partition-b-classification.2026-08-29T04-55.md`. Discharges AC-4 and AC-5.
+- [x] [P1-T3] Run the Partition B sweep including the docs tree and the .claude tree, classify every hit by path prefix, and record it in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p1-t3-partition-b-classification.2026-08-29T04-55.md`. Discharges AC-4 and AC-5.
   ```
   pwsh -NoProfile -Command '$h = git grep -n -I -F -e WireUpKeyboardHandler -e AnyOpenDropDownsAsync -e LoadGroups_02cAsync -e LoadGroups_02bAsync -e LoadGroup_03bAsync -e LoadConversationsAndFoldersAsync -e LoadItemGroup -e LoadSequentialAsync -e LoadGroupSequential -e CacheTlpForMove -e SwapTlp -e CaptureTlpTemplate -e _templateTlp -- ":(exclude)*.cs"; Write-Output ("TOTAL=" + $h.Count); Write-Output ("CAT_D_DOCS=" + @($h | Where-Object { $_ -like "docs/*" }).Count); Write-Output ("CAT_E_CLAUDE=" + @($h | Where-Object { $_ -like ".claude/*" }).Count); Write-Output ("CAT_G_OTHER=" + @($h | Where-Object { -not ($_ -like "docs/*") -and -not ($_ -like ".claude/*") }).Count)'
   ```
@@ -172,7 +172,7 @@ plan task complete without its artifact.
   - Do not assert a fixed value for `TOTAL`. The base-commit measurement was 2,229 hits, of which 2,216 are under the docs tree and 13 under the .claude tree. `git grep` searches tracked files only, so this plan file and this item's evidence artifacts are outside this sweep's search set at the moment this task runs: they are untracked until P4-T1, which runs in Phase 4. The value can still move, because the agent-memory tree beneath the .claude directory is tracked and is written by the agents executing this plan. Record the printed value and this reason in the artifact.
   - Assert the printed values only. Do not assert the exit code of the `pwsh` wrapper.
 
-- [ ] [P1-T4] Run the Partition C sweep over tracked source files, enumerate every hit, and record it in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p1-t4-partition-c-enumeration.2026-08-29T04-55.md`. Discharges AC-6.
+- [x] [P1-T4] Run the Partition C sweep over tracked source files, enumerate every hit, and record it in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p1-t4-partition-c-enumeration.2026-08-29T04-55.md`. Discharges AC-6.
   ```
   git grep -n -I -F -e WireUpKeyboardHandler -e AnyOpenDropDownsAsync -e LoadGroups_02cAsync -e LoadGroups_02bAsync -e LoadGroup_03bAsync -e LoadConversationsAndFoldersAsync -e LoadItemGroup -e LoadSequentialAsync -e LoadGroupSequential -e CacheTlpForMove -e SwapTlp -e CaptureTlpTemplate -e _templateTlp -- "*.cs"
   ```
@@ -181,7 +181,7 @@ plan task complete without its artifact.
   - Acceptance also requires the artifact to state that no string literal anywhere in the QuickFiler test tree equals one of the thirteen identifiers, and to name the single QuickFiler test-tree hit (the category C row) as the sole occurrence of any of the thirteen in that tree. That statement is the input the Phase 2 closure argument consumes.
   - The 31 figure is stable for this plan's execution because this plan writes no file with a `.cs` extension.
 
-- [ ] [P1-T5] Run the supplementary pass over untracked, unignored files and record it in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p1-t5-untracked-pass.2026-08-29T04-55.md`. Discharges AC-7.
+- [x] [P1-T5] Run the supplementary pass over untracked, unignored files and record it in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p1-t5-untracked-pass.2026-08-29T04-55.md`. Discharges AC-7.
   ```
   pwsh -NoProfile -Command '$f = git ls-files --others --exclude-standard; Write-Output ("UNTRACKED_FILES=" + $f.Count); $f | ForEach-Object { Write-Output ("FILE " + $_) }; $outside = 0; foreach ($p in $f) { if (Test-Path -LiteralPath $p -PathType Leaf) { $m = @(Select-String -LiteralPath $p -SimpleMatch -Pattern "WireUpKeyboardHandler","AnyOpenDropDownsAsync","LoadGroups_02cAsync","LoadGroups_02bAsync","LoadGroup_03bAsync","LoadConversationsAndFoldersAsync","LoadItemGroup","LoadSequentialAsync","LoadGroupSequential","CacheTlpForMove","SwapTlp","CaptureTlpTemplate","_templateTlp" -ErrorAction SilentlyContinue); if ($m.Count -gt 0) { Write-Output ("HIT " + $p + " " + $m.Count); if (-not $p.StartsWith("docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/") -and -not $p.StartsWith(".claude/")) { $outside = $outside + 1 } } } }; Write-Output ("UNTRACKED_HIT_FILES_OUTSIDE_SCOPE=" + $outside)'
   ```
@@ -191,26 +191,26 @@ plan task complete without its artifact.
   - Only the file path from the enumeration variable is printed. Do not print any resolved provider path, because a resolved path carries the host account name.
   - Assert the printed values only. Do not assert the exit code of the `pwsh` wrapper.
 
-- [ ] [P1-T6] Check off AC-2 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P1-T1 artifact path as its evidence pointer.
+- [x] [P1-T6] Check off AC-2 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P1-T1 artifact path as its evidence pointer.
   - Acceptance: exactly one checkbox changes in this task; the AC-2 criterion text is unchanged.
 
-- [ ] [P1-T7] Check off AC-4 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P1-T3 artifact path as its evidence pointer.
+- [x] [P1-T7] Check off AC-4 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P1-T3 artifact path as its evidence pointer.
   - Acceptance: exactly one checkbox changes in this task; the AC-4 criterion text is unchanged.
 
-- [ ] [P1-T8] Check off AC-5 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P1-T3 artifact path as its evidence pointer.
+- [x] [P1-T8] Check off AC-5 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P1-T3 artifact path as its evidence pointer.
   - Acceptance: exactly one checkbox changes in this task; the AC-5 criterion text is unchanged.
 
-- [ ] [P1-T9] Check off AC-6 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P1-T4 artifact path as its evidence pointer.
+- [x] [P1-T9] Check off AC-6 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P1-T4 artifact path as its evidence pointer.
   - Acceptance: exactly one checkbox changes in this task; the AC-6 criterion text is unchanged.
 
-- [ ] [P1-T10] Check off AC-7 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P1-T5 artifact path as its evidence pointer.
+- [x] [P1-T10] Check off AC-7 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P1-T5 artifact path as its evidence pointer.
   - Acceptance: exactly one checkbox changes in this task; the AC-7 criterion text is unchanged.
 
 ---
 
 ### Phase 2 — Reflection entry-point inventory and closure
 
-- [ ] [P2-T1] Run the seventeen-pattern reflection entry-point inventory over the QuickFiler production tree and the QuickFiler test tree and record it in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p2-t1-reflection-inventory.2026-08-29T04-55.md`. Discharges AC-8.
+- [x] [P2-T1] Run the seventeen-pattern reflection entry-point inventory over the QuickFiler production tree and the QuickFiler test tree and record it in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p2-t1-reflection-inventory.2026-08-29T04-55.md`. Discharges AC-8.
   ```
   pwsh -NoProfile -Command 'Write-Output ("QF_PROD_SCOPE_FILES=" + (git ls-files -- "QuickFiler/*").Count); Write-Output ("QF_TEST_SCOPE_FILES=" + (git ls-files -- "QuickFiler.Test/*").Count); @("GetMethod(","GetMethods(","GetMember(","GetMembers(","GetProperty(","GetProperties(","GetField(","GetFields(","GetEvent(","InvokeMember(","Type.GetType(","Activator.CreateInstance","Assembly.CreateInstance","Assembly.Load","Delegate.CreateDelegate","CallByName","System.Reflection") | ForEach-Object { $p = $_; $prod = @(git grep -n -I -F -e $p -- "QuickFiler/*").Count; $test = @(git grep -n -I -F -e $p -- "QuickFiler.Test/*").Count; Write-Output ($p + " prod=" + $prod + " test=" + $test) }'
   ```
@@ -221,7 +221,7 @@ plan task complete without its artifact.
   - The production pathspec reaches every tracked file under the QuickFiler production tree, including tracked non-source files, so the printed `System.Reflection` production value is expected to exceed the 32 first-party source-file occurrences. P2-T2 classifies the whole printed population.
   - Assert the printed values only. Do not assert the exit code of the `pwsh` wrapper.
 
-- [ ] [P2-T2] Enumerate and classify every production-tree `System.Reflection` occurrence and record it in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p2-t2-production-reflection-classification.2026-08-29T04-55.md`.
+- [x] [P2-T2] Enumerate and classify every production-tree `System.Reflection` occurrence and record it in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p2-t2-production-reflection-classification.2026-08-29T04-55.md`.
   ```
   git grep -n -I -F -e "System.Reflection" -- "QuickFiler/*"
   ```
@@ -230,7 +230,7 @@ plan task complete without its artifact.
   - Base-commit reference values, recorded and not asserted except for the `L5: 0` clause and the summation clause: L1 26, L2 3, L3 3, L4 7.
   - Acceptance also requires the artifact to state, in one sentence, why `L5: 0` is the operative finding: `MethodBase.GetCurrentMethod()` takes no member-name argument, a `using` directive resolves no member, a comment is not compiled, and a project or package manifest entry names an assembly rather than a member, so none of the occurrences in L1 through L4 can resolve a member of any type by name.
 
-- [ ] [P2-T3] Enumerate the receiver-scoped reflection call sites in the QuickFiler test tree, state the closure argument for the variable-argument sites, and record both in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p2-t3-variable-argument-closure.2026-08-29T04-55.md`. Discharges AC-9.
+- [x] [P2-T3] Enumerate the receiver-scoped reflection call sites in the QuickFiler test tree, state the closure argument for the variable-argument sites, and record both in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p2-t3-variable-argument-closure.2026-08-29T04-55.md`. Discharges AC-9.
   ```
   git grep -n -I -F -e "typeof(QfcCollectionController)" -- "QuickFiler.Test/*"
   ```
@@ -244,7 +244,7 @@ plan task complete without its artifact.
   - Acceptance also requires the artifact to record the stated limit of that argument rather than omit it: the argument does not cover a member name assembled at runtime by string concatenation or interpolation. No such construction was observed at any site enumerated here, but its absence in general was not proved.
   - Reconciliation note the artifact must carry: AC-9 in the specification names six variable-argument sites; the mechanical derivation above yields eight. The eight are a superset of any six the specification could mean, so enumerating all eight individually discharges AC-9. The specification's baseline section describes AC-9's six as `GetField(` sites, but the measured set contains seven variable-argument `GetField(` sites — QfcCollectionController.TestSupport.cs lines 38, 51, 65, 80 and 95, QfcCollectionControllerNavigationDigitsTests.cs line 34, and QfcCollectionControllerTests.cs line 382 — together with one variable-argument `GetMethod(` site at QfcCollectionController.TestSupport.cs line 118. No six-element subset can be identified with the specification's six, so the artifact records the full eight and does not claim a subset identity. The count difference is recorded here as an evidence note; the approved specification is not edited to change the figure.
 
-- [ ] [P2-T4] Check the data-binding, serialization, and COM-visibility surface of the QuickFiler production tree and record the result in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p2-t4-binding-serialization-surface.2026-08-29T04-55.md`.
+- [x] [P2-T4] Check the data-binding, serialization, and COM-visibility surface of the QuickFiler production tree and record the result in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p2-t4-binding-serialization-surface.2026-08-29T04-55.md`.
   ```
   pwsh -NoProfile -Command '@("DataBindings.Add","DisplayMember","ValueMember","DataPropertyName","[Serializable","DataContract","JsonProperty","XmlElement") | ForEach-Object { $p = $_; $prod = @(git grep -n -I -F -e $p -- "QuickFiler/*").Count; Write-Output ($p + " prod=" + $prod) }'
   ```
@@ -256,51 +256,51 @@ plan task complete without its artifact.
   - Acceptance also requires the artifact to state the affirmative conclusion this evidence supports: the affected type carries no property-name string binding surface and no serialization surface, and the assembly is not COM-visible, so no host-side late-binding path — a VBA `CallByName`, an `Application.Run`, or an Outlook macro — can reach a member of that type by name.
   - Assert the printed values only for the first command. Do not assert the exit code of the `pwsh` wrapper.
 
-- [ ] [P2-T5] Check off AC-8 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P2-T1 artifact path as its evidence pointer.
+- [x] [P2-T5] Check off AC-8 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P2-T1 artifact path as its evidence pointer.
   - Acceptance: exactly one checkbox changes in this task; the AC-8 criterion text is unchanged.
 
-- [ ] [P2-T6] Check off AC-9 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P2-T3 artifact path as its evidence pointer.
+- [x] [P2-T6] Check off AC-9 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P2-T3 artifact path as its evidence pointer.
   - Acceptance: exactly one checkbox changes in this task; the AC-9 criterion text is unchanged.
 
 ---
 
 ### Phase 3 — AC-16 corrections, fail-before dossier, and decision record
 
-- [ ] [P3-T1] Record both corrections to the AC-16 record in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p3-t1-ac16-corrections.2026-08-29T04-55.md`. Discharges AC-10.
+- [x] [P3-T1] Record both corrections to the AC-16 record in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p3-t1-ac16-corrections.2026-08-29T04-55.md`. Discharges AC-10.
   - Acceptance: the artifact carries exactly two numbered corrections and states `AC16_CORRECTIONS: 2`.
   - Correction 1: the AC-16 build-input file-type search covered twelve identifiers and omitted the thirteenth, the private field `_templateTlp`. The artifact states the omission, cites the P0-T4 commit-level derivation as the evidence that the removal was twelve methods plus one field, and states why the omitted identifier is the one for which the search mattered most: field reflection is the only name-based mechanism that demonstrably exists anywhere near the affected type, as P2-T3 enumerates.
   - Correction 2: the AC-16 claim of zero occurrences of any removed identifier anywhere in the QuickFiler test tree no longer holds. The artifact identifies the superseding occurrence by file, line, and category, taking all three from the category C row of the P1-T4 enumeration, and states that the occurrence is a triple-slash documentation comment naming `WireUpKeyboardHandler`, which is not a string literal, is not emitted as a member name into assembly metadata, and cannot be passed to any reflection API.
   - Acceptance also requires the artifact to state that the AC-16 artifact in the issue #468 feature folder is a time-stamped historical record and is not edited by this item; these corrections are recorded here instead.
   - This task writes no command output. It carries `Timestamp:` and `Output Summary:` and omits `Command:` and `EXIT_CODE:`, because it runs no command.
 
-- [ ] [P3-T2] Write the fail-before exception dossier at `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/regression-testing/fail-before-exception.2026-08-29T04-55.md`. Discharges AC-14.
+- [x] [P3-T2] Write the fail-before exception dossier at `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/regression-testing/fail-before-exception.2026-08-29T04-55.md`. Discharges AC-14.
   - Acceptance: the dossier carries `Timestamp:` and a `WhyFailingRunImpossible:` field of one to three sentences stating that this item changes no executable code, that a test asserting a repository search finds no genuine name-based caller is a tautology both before and after the work, and that no reproducible defect exists to redden such a test.
   - Acceptance also requires an alternative-proof section supplying the non-vacuity measurement as the substitute proof, citing by path the P0-T5 scope census, the P1-T1 Partition A zero-hit result, the P1-T2 control that proves the same pathspec reaches real content, the P1-T3 total classification with its empty category G, and the P1-T4 fully enumerated 31-row hit set with its empty category G.
   - Acceptance also requires the dossier to state that no unit test is added and no existing test is modified by this item, and why: a search-based test would encode a point-in-time measurement as a permanent gate over prose files that legitimately accrete these identifiers, and would fail on the next evidence artifact that quotes one of them.
   - This task's artifact records no command output. It carries `Timestamp:` and `Output Summary:` and omits `Command:` and `EXIT_CODE:`, because it runs no command.
 
-- [ ] [P3-T3] Write the decision record at `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p3-t3-decision-record.2026-08-29T04-55.md`. Discharges AC-13.
+- [x] [P3-T3] Write the decision record at `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p3-t3-decision-record.2026-08-29T04-55.md`. Discharges AC-13.
   - Acceptance: the artifact carries exactly one of the two single-line tokens `DECISION: RESIDUAL RISK CLOSED` or `DECISION: CALLER FOUND`, and carries neither token more than once.
   - If the token is `DECISION: RESIDUAL RISK CLOSED`, the artifact cites, by path, every Phase 1 and Phase 2 artifact the closure rests on, and states which classes of caller were proved absent and which were not, naming the runtime-assembled member name as the one class not proved absent.
   - If the token is `DECISION: CALLER FOUND`, the artifact names the caller by file, line, and the mechanism by which it resolves the member, and records the number of the separate issue raised to address it. Do not repair the caller inside this item: the repository bugfix workflow directs a deeper problem uncovered during a fix to a new issue rather than to a widened scope, and a repair would additionally require its own reproducible failing test.
   - A hit under the docs tree or the .claude tree is a category D or E hit, never a caller, and does not trigger the `DECISION: CALLER FOUND` branch.
   - This task's artifact records no command output. It carries `Timestamp:` and `Output Summary:` and omits `Command:` and `EXIT_CODE:`, because it runs no command.
 
-- [ ] [P3-T4] Audit every zero-result search in this item for auditable-absence fields and record the audit in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p3-t4-zero-result-audit.2026-08-29T04-55.md`. Discharges AC-11.
+- [x] [P3-T4] Audit every zero-result search in this item for auditable-absence fields and record the audit in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/other/p3-t4-zero-result-audit.2026-08-29T04-55.md`. Discharges AC-11.
   - Acceptance: the artifact enumerates every search in this item whose recorded result is zero — the P1-T1 Partition A sweep, the P1-T3 category G count, the P1-T4 category G count, the P1-T5 outside-scope count, the sixteen name-resolving production rows of the P2-T1 inventory, the eight test-tree rows of the P2-T1 inventory that print zero — GetMembers(, GetProperties(, InvokeMember(, Type.GetType(, Assembly.CreateInstance, Assembly.Load, Delegate.CreateDelegate and CallByName — the P2-T2 class L5 count, and the eight production rows of the P2-T4 surface check — and for each one records `SearchScope:`, `SearchPatterns:`, `SearchResult:`, and a measured scope size.
   - Acceptance also requires the artifact to state `ZERO_RESULT_SEARCHES: 37` and to show that every enumerated row carries all four fields, so that no zero result in this item rests on an unstated or empty search set.
   - The count of 37 is the sum of the enumerated rows: 1 Partition A sweep, 1 Partition B category G count, 1 Partition C category G count, 1 untracked outside-scope count, 16 production inventory rows, 8 zero test-tree inventory rows, 1 class L5 count, and 8 surface-check rows. The measured scope size for every row scoped to a QuickFiler tree is the corresponding value recorded by P2-T1. If any enumerated row is absent because its producing task recorded a blocker, record the reduced count together with the reason and leave this task unchecked.
 
-- [ ] [P3-T5] Check off AC-10 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P3-T1 artifact path as its evidence pointer.
+- [x] [P3-T5] Check off AC-10 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P3-T1 artifact path as its evidence pointer.
   - Acceptance: exactly one checkbox changes in this task; the AC-10 criterion text is unchanged.
 
-- [ ] [P3-T6] Check off AC-11 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P3-T4 artifact path as its evidence pointer.
+- [x] [P3-T6] Check off AC-11 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P3-T4 artifact path as its evidence pointer.
   - Acceptance: exactly one checkbox changes in this task; the AC-11 criterion text is unchanged.
 
-- [ ] [P3-T7] Check off AC-13 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P3-T3 artifact path as its evidence pointer.
+- [x] [P3-T7] Check off AC-13 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P3-T3 artifact path as its evidence pointer.
   - Acceptance: exactly one checkbox changes in this task; the AC-13 criterion text is unchanged.
 
-- [ ] [P3-T8] Check off AC-14 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P3-T2 dossier path as its evidence pointer.
+- [x] [P3-T8] Check off AC-14 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P3-T2 dossier path as its evidence pointer.
   - Acceptance: exactly one checkbox changes in this task; the AC-14 criterion text is unchanged.
 
 ---
