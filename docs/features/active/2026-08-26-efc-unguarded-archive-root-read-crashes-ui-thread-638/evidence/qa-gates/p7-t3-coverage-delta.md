@@ -69,3 +69,16 @@ Remediation route. Re-running
 `ecdb1c84ba8541ab67042985919cfed4df768c01` until the flaky liveness test passes would yield
 a `koverage-processed` baseline commensurable with [P7-T1], after which the delta could be
 recomputed and AC17 evaluated. That is outside this plan's task set.
+
+## RESOLVED 2026-08-29T13-02 (appended after plan execution; nothing above is edited)
+
+The mode mismatch this artifact reported has been remediated. The merge-base coverage harness
+was re-run in a separate detached worktree at ecdb1c84ba8541ab67042985919cfed4df768c01 with the
+same analyzer package set and SDK; it exited 0, all 6859 tests passed, post-processing ran, and
+it produced BASELINE_REPO_LINE_COVERAGE_PERCENT: 85.26 in koverage-processed mode.
+
+Both figures are now koverage-processed, so the modes are equal and the recomputed delta is
++0.07 points (85.26 to 85.33), at or above the -0.50 tolerance. See
+evidence/remediation-baseline/ac17-commensurable-baseline.md for the measurement and
+evidence/qa-gates/ac17-coverage-delta-recomputed.md for the recomputed delta. AC17 is checked
+off in spec.md on that evidence.

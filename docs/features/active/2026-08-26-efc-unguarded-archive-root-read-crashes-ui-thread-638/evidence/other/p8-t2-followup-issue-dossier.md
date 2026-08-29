@@ -100,3 +100,17 @@ citations and proposed labels. The filing route is the promotion lifecycle defin
 `.claude/skills/feature-promotion-lifecycle/SKILL.md`, which the orchestrator runs after
 this plan returns. AC20 is left unchecked in `spec.md` until the three issue numbers are
 recorded in the spec's Rollout & Follow-up section.
+
+## RESOLVED 2026-08-29T13-02 (appended after plan execution; nothing above is edited)
+
+The three follow-up issues were filed through the repository promotion lifecycle:
+
+- Non-goal (a): issue 696 - https://github.com/drmoisan/TaskMaster/issues/696
+- Non-goal (b): issue 697 - https://github.com/drmoisan/TaskMaster/issues/697
+- Non-goal (c): issue 698 - https://github.com/drmoisan/TaskMaster/issues/698
+
+Each entry was scaffolded with the bug-entry MCP tool, filled from the corresponding section
+above with the scaffold headings preserved, then promoted with the issue-promotion MCP tool at
+promotion type bug and work mode full-bug. The promoted records are retained under
+docs/features/potential/promoted/. The numbers are recorded in the spec Rollout and Follow-up
+section and AC20 is checked off.

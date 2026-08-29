@@ -734,7 +734,7 @@ command. None depends on a live-Outlook manual step. All tests named as new live
   `/InIsolation` and `/TestCaseFilter:"TestCategory!=LiveOutlook"`, excluding assemblies under
   `.claude/worktrees`) reports zero failed tests across `QuickFiler.Test` and `TaskMaster.Test`. No
   test in the change carries `[TestCategory("LiveOutlook")]`.
-- [ ] AC17 — Coverage: the new helper, the new diagnostic seam, and every changed line in
+- [x] AC17 — Coverage: the new helper, the new diagnostic seam, and every changed line in
   `QuickFiler/Controllers/EfcDataModel.cs` reach **>= 90%** line coverage, and coverage on changed
   lines does not regress against the merge-base baseline. The repository-wide figure against the
   testable denominator is captured and reported for the baseline run under
@@ -753,7 +753,7 @@ command. None depends on a live-Outlook manual step. All tests named as new live
   against the merge base.
 - [x] AC19 — `QuickFiler/Controllers/EfcDataModel.cs` remains at or under 500 lines after the change
   (423 lines before). Verified by a line count of the file.
-- [ ] AC20 — The three non-goals in Scope & Non-Goals — (a) `COMException` from the archive-root
+- [x] AC20 — The three non-goals in Scope & Non-Goals — (a) `COMException` from the archive-root
   getter's COM calls, (b) the log-only `async void` boundary sinks in
   `QuickFiler/Controllers/EfcFormController.cs`, and (c) the five archive-root reads inside
   `QuickFiler/Controllers/EfcFormController.cs` — are each filed as a separate follow-up issue
@@ -812,7 +812,7 @@ command. None depends on a live-Outlook manual step. All tests named as new live
   - Watch the log4net output for the new `Warn` entry from `QuickFiler/Controllers/EfcDataModel.cs`.
     A sustained rate of that entry indicates profiles in the field whose archive root does not
     resolve, which is useful input for non-goal (a).
-  - File the three follow-up issues required by AC20 and record their numbers here.
+  - Filed the three follow-up issues required by AC20 on 2026-08-29: #696, #697 and #698. Their numbers are recorded under Links below.
   - No temporary scaffolding, feature flag, or migration needs removing afterwards.
 
 - Links: issue, PRs, related docs
@@ -830,7 +830,14 @@ command. None depends on a live-Outlook manual step. All tests named as new live
   - Related issues: #614 (store-root leak; introduced the throwing contract this fix honours), #637
     (producer-side rooted-path normalization), #602 (redaction of mailbox addresses in diagnostics).
   - PRs: to be recorded when opened.
-  - Follow-up issues for the three non-goals: to be recorded when filed (AC20).
+  - Follow-up issues for the three non-goals (AC20), filed 2026-08-29 through the
+    promotion lifecycle in `.claude/skills/feature-promotion-lifecycle/SKILL.md`:
+    - Non-goal (a), `COMException` from the archive-root getter's COM calls: #696 —
+      https://github.com/drmoisan/TaskMaster/issues/696
+    - Non-goal (b), the log-only `async void` boundary sinks in `EfcFormController`: #697 —
+      https://github.com/drmoisan/TaskMaster/issues/697
+    - Non-goal (c), the five archive-root reads inside `EfcFormController`: #698 —
+      https://github.com/drmoisan/TaskMaster/issues/698
 
 ## Correction Log
 
