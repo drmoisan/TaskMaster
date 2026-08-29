@@ -101,5 +101,50 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             viewer.VerifyRemove(v => v.PicturesChanged -= It.IsAny<EventHandler>(), Times.Once());
         }
+
+        /// <summary>
+        /// #680: the additive <c>SearchLeave</c> intent carries the dismissal ownership that WinForms
+        /// menu mode used to provide for a non-capturing search popup, so it must be subscribed
+        /// alongside its <c>SearchKeyDown</c> sibling.
+        /// </summary>
+        [TestMethod]
+        public void WireIntentEvents_SubscribesSearchLeave()
+        {
+            // Arrange
+            var viewer = new Mock<IItemViewer>();
+            var kbd = new Mock<IQfcKeyboardHandler>();
+            var controller = new HarnessController();
+            QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer.Object);
+            QfcItemControllerTestSupport.SetField(controller, "_kbdHandler", kbd.Object);
+
+            // Act
+            controller.WireIntentEvents();
+
+            // Assert
+            viewer.VerifyAdd(v => v.SearchLeave += It.IsAny<EventHandler>(), Times.Once());
+        }
+
+        /// <summary>
+        /// #680: the subscribe/detach symmetry for <c>SearchLeave</c>. Without the matching
+        /// detachment the seam leaks one live subscription per torn-down controller, the same defect
+        /// class as the <c>PicturesChanged</c> leak above.
+        /// </summary>
+        [TestMethod]
+        public void UnwireIntentEvents_DetachesSearchLeave()
+        {
+            // Arrange
+            var viewer = new Mock<IItemViewer>();
+            var kbd = new Mock<IQfcKeyboardHandler>();
+            var controller = new HarnessController();
+            QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer.Object);
+            QfcItemControllerTestSupport.SetField(controller, "_kbdHandler", kbd.Object);
+            controller.WireIntentEvents();
+
+            // Act
+            controller.UnwireIntentEvents();
+
+            // Assert
+            viewer.VerifyRemove(v => v.SearchLeave -= It.IsAny<EventHandler>(), Times.Once());
+        }
     }
 }

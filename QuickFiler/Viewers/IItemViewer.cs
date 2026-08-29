@@ -124,6 +124,26 @@ namespace QuickFiler
         event KeyEventHandler SearchKeyDown;
 
         /// <summary>
+        /// Additive intent member (#680): the folder-search text box lost keyboard focus.
+        /// <para>
+        /// A search-driven open is presented non-capturing (<c>AutoClose == false</c>), which is the
+        /// framework opt-out from WinForms menu mode. Menu mode is what previously dismissed the
+        /// popup when focus moved away, so the controller now owns that dismissal: it closes the
+        /// search popup when the textbox loses focus to anything other than the popup surface.
+        /// </para>
+        /// </summary>
+        event System.EventHandler SearchLeave;
+
+        /// <summary>
+        /// Additive intent member (#680): whether the folder drop-down is currently open.
+        /// <para>
+        /// Read-only guard consulted by the Escape and Leave dismissal branches so neither routes a
+        /// close intent when there is nothing to dismiss.
+        /// </para>
+        /// </summary>
+        bool IsFolderDropDownOpen { get; }
+
+        /// <summary>
         /// Moves keyboard focus to the folder-search text box.
         /// Threading contract: the viewer forwards, the controller marshals. The implementation
         /// calls straight through to the underlying control with no <c>InvokeRequired</c> check

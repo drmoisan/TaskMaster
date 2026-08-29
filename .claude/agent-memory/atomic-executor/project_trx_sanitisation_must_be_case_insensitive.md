@@ -56,6 +56,25 @@ Verify with a strict parser (`xml.etree.ElementTree.parse`), not with `[xml]` in
 confirm the decoded attribute value: `storage` should read `<repo-root>\...`, and the
 `<UnitTestResult>` count should equal the run's test total.
 
+### Catch the raw `<repo-root>` spelling at PREFLIGHT, not at execution
+
+The escaping fix above is unusable once execution reaches the sanitisation task, because that task is
+normally the second-to-last in the plan and the close-out task immediately after it forbids writing
+anything to disk after the commit. An executor that reads this memory only when it reaches the
+sanitisation task has already lost the chance to apply it without violating the clean-tree gate.
+
+**Why:** on 2026-08-28 (feature 680, `[P7-T3]`) the plan text said "substitute ... the worktree-root
+prefix -> `<repo-root>`" with the placeholder written raw. Following it literally produced five TRX
+files that are no longer well-formed XML wherever a substituted path sat in an attribute value. The
+task's own acceptance is three zero-hit greps plus a zero name-hit count, and all four passed, so
+nothing in the task could detect it. The defect was noticed only after `[P7-T4]` had committed, at
+which point amending would have dirtied the tree the close-out gate requires clean.
+
+**How to apply:** during preflight, treat a sanitisation task that quotes a placeholder containing a
+raw `<` or `>` and targets an XML-shaped artifact (TRX, coverage XML, `.csproj`) as a required plan
+delta: the plan must say `&lt;repo-root&gt;`, or must state that the artifact is not required to
+remain parseable. Raise it as a preflight revision, not as an execution-time judgment call.
+
 ## `/EnableCodeCoverage` drops a host-named binary INTO the evidence tree
 
 A vstest run that combines `/EnableCodeCoverage` with an explicit `/ResultsDirectory:` pointing at

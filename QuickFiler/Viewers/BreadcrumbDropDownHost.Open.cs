@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Drawing;
 using System.Threading.Tasks;
 
@@ -67,12 +68,40 @@ namespace QuickFiler.Viewers
                 // read when the refocus executes rather than when it is queued.
                 if (takeFocus)
                 {
-                    _openLifetime.Schedule(FocusPending);
+                    // Issue #680: a takeFocus: true reopen on a popup that was shown non-capturing
+                    // is the Down-arrow handoff. Standard popup semantics resume there, so the
+                    // AutoClose default is restored before focus moves onto the popup surface
+                    // (spec Proposed Fix item 2a).
+                    // Issue #677: scheduling FocusPending() rather than the raw _focusPending
+                    // delegate moves the focus-permission check inside the scheduled action, so
+                    // the predicate is read when the refocus executes rather than when it is
+                    // queued.
+                    _openLifetime.Schedule(() =>
+                    {
+                        DropDown.AutoClose = true;
+                        FocusPending();
+                    });
                 }
                 return Task.FromResult(true);
             }
             LastInitializationException = null;
             return _openLifetime.OpenAsync(anchorScreenBounds, workingArea, desiredSize, takeFocus);
         }
+
+        // Issue #680: AutoClose == false is the WinForms framework's own opt-out from
+        // ModalMenuFilter menu-mode entry. Menu mode retargets every keystroke to the popup's window
+        // handle whenever the popup does not contain focus, which is exactly the state a
+        // search-driven (takeFocus: false) open produces — so typing a second character never
+        // reaches the search textbox. The write must precede the show call because menu mode is
+        // entered inside ToolStripDropDown.SetVisibleCore(true); placing it here guarantees that
+        // ordering by statement order.
+        internal void ShowPopup(Point location, bool takeFocus)
+        {
+            DropDown.AutoClose = takeFocus;
+            _showPopup(DropDown, Anchor, location);
+        }
+
+        internal void PublishPopupMessengerReady() =>
+            PopupMessengerReady?.Invoke(this, EventArgs.Empty);
     }
 }

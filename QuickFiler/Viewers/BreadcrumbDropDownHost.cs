@@ -300,11 +300,6 @@ namespace QuickFiler.Viewers
                 _focusAnchor();
         }
 
-        internal void ShowPopup(Point location) => _showPopup(DropDown, Anchor, location);
-
-        internal void PublishPopupMessengerReady() =>
-            PopupMessengerReady?.Invoke(this, EventArgs.Empty);
-
         private async Task ResetCoreAsync()
         {
             try
@@ -444,6 +439,11 @@ namespace QuickFiler.Viewers
         private void FinishClose(BreadcrumbDropDownCloseReason reason)
         {
             CompleteAll(
+                // Issue #680: restore the AutoClose default first, so every next lifecycle starts
+                // from standard popup semantics. FinishClose is the single completion point for the
+                // programmatic close path (CompleteClose), the native-close path (OnDropDownClosed),
+                // and RestoreAfterOpenFailure, so one restore here covers all three.
+                () => DropDown.AutoClose = true,
                 () =>
                 {
                     if (reason == BreadcrumbDropDownCloseReason.Uncommitted)

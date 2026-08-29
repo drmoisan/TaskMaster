@@ -240,7 +240,7 @@ namespace QuickFiler.Viewers
                     return false;
 
                 bool shown = await _uiOperations
-                    .RunAsync(() => ShowCurrentSurface(placement.Value, lease))
+                    .RunAsync(() => ShowCurrentSurface(placement.Value, lease, takeFocus))
                     .ConfigureAwait(false);
                 if (!shown)
                     return false;
@@ -257,7 +257,8 @@ namespace QuickFiler.Viewers
 
         private bool ShowCurrentSurface(
             BreadcrumbPopupPlacementResult placement,
-            BreadcrumbDropDownOpenLease lease
+            BreadcrumbDropDownOpenLease lease,
+            bool takeFocus
         ) =>
             RunIfCurrent(lease, () => ValidatePlacement(placement))
             && RunIfCurrent(
@@ -272,7 +273,7 @@ namespace QuickFiler.Viewers
                 lease,
                 () =>
                 {
-                    _host.ShowPopup(placement.Bounds.Location);
+                    _host.ShowPopup(placement.Bounds.Location, takeFocus);
                     return IsCurrent(lease) && _host.OpenState;
                 }
             );

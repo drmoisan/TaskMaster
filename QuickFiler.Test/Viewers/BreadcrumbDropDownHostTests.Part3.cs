@@ -280,6 +280,54 @@ namespace QuickFiler.Test.Viewers
         }
 
         /// <summary>
+        /// Issue #680/#677 composition: a <c>takeFocus: true</c> reopen after a non-capturing open
+        /// restores <c>AutoClose</c> unconditionally (issue #680), but the handoff focus call is
+        /// still suppressed while issue #677's <c>MayTakeFocus</c> predicate is false.
+        /// </summary>
+        [TestMethod]
+        public void OpenAsync_TakeFocusReopenAfterNonCapturingOpenWithPredicateFalse_RestoresAutoCloseButSuppressesFocus()
+        {
+            using (var harness = new PredicateHarness())
+            {
+                // Arrange — a non-capturing open never focuses the popup.
+                Task<bool> opening = ((IBreadcrumbDropDownHost)harness.Host).OpenAsync(
+                    Anchor,
+                    Work,
+                    Desired,
+                    false
+                );
+                harness.Context.DrainUntil(opening);
+                opening.GetAwaiter().GetResult().Should().BeTrue("the popup must actually open");
+                harness
+                    .FocusPendingCount.Should()
+                    .Be(0, "a non-capturing open never focuses the popup");
+                harness.AllowFocus = false;
+
+                // Act — the takeFocus reopen (Down-arrow handoff) runs while the predicate is false.
+                Task<bool> reopening = ((IBreadcrumbDropDownHost)harness.Host).OpenAsync(
+                    Anchor,
+                    Work,
+                    Desired,
+                    true
+                );
+                harness.Context.DrainUntil(reopening);
+
+                // Assert
+                harness
+                    .Host.DropDown.AutoClose.Should()
+                    .BeTrue(
+                        "issue #680's restore is unconditional, independent of the focus predicate"
+                    );
+                harness
+                    .FocusPendingCount.Should()
+                    .Be(
+                        0,
+                        "issue #677's MayTakeFocus guard suppresses the handoff focus call while the predicate is false"
+                    );
+            }
+        }
+
+        /// <summary>
         /// Constructs the concrete <see cref="BreadcrumbDropDownHost"/> in typed code through its
         /// internal nine-argument constructor (reachable via
         /// <c>InternalsVisibleTo("QuickFiler.Test")</c>) and assigns the internal

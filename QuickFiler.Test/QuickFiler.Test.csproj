@@ -86,6 +86,7 @@
     <Compile Include="Viewers\BreadcrumbPendingOpenCloseTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownLifecycleTests.cs" />
     <Compile Include="Viewers\ItemViewerBreadcrumbDropDownContractTests.cs" />
+    <Compile Include="Viewers\ItemViewerSearchDismissalContractTests.cs" />
     <Compile Include="Viewers\ItemViewerBreadcrumbLifecycleRegressionTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinatorTests.cs" />
     <Compile Include="Viewers\BreadcrumbDropDownOpenCoordinatorTests.Part2.cs" />
@@ -173,6 +174,7 @@
     <Compile Include="Controllers\QfcItemController.ViewerSetupTests.cs" />
     <Compile Include="Controllers\QfcItemController.EventHandlersTests.cs" />
     <Compile Include="Controllers\QfcItemController.SearchFocusRegressionTests.cs" />
+    <Compile Include="Controllers\QfcItemController.SearchDismissalTests.cs" />
     <Compile Include="Controllers\QfcItemController.FocusAndThemeTests.cs" />
     <Compile Include="Controllers\QfcItemController.SeamDispatcherTests.cs" />
     <Compile Include="Controllers\QfcItemController.SeamCoreTests.cs" />
