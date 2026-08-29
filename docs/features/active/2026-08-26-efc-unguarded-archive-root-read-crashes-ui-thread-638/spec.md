@@ -3,8 +3,8 @@
 - **Issue:** #638
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-29T08-40
-- **Status:** Ready for Planning
+- **Last Updated:** 2026-08-29T12-47
+- **Status:** Implemented
 - **Version:** 1.0
 
 > Work Mode for issue #638 is `full-bug`. Per `.claude/skills/acceptance-criteria-tracking/SKILL.md`,
@@ -670,38 +670,38 @@ Every criterion below is independently checkable by the named MSTest test or the
 command. None depends on a live-Outlook manual step. All tests named as new live in
 `QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs` unless stated otherwise.
 
-- [ ] AC1 — `MoveToFolderAsync(string, bool, bool, bool, bool)` returns `false` instead of
+- [x] AC1 — `MoveToFolderAsync(string, bool, bool, bool, bool)` returns `false` instead of
   propagating when the injected `IOlObjects.ArchiveRootPath` getter throws
   `InvalidOperationException`. Verified by `MoveToFolderAsync_WhenArchiveRootIsUnresolvable_ReturnsFalseInsteadOfThrowing`.
-- [ ] AC2 — `OpenOlFolderAsync(string)` completes without throwing and invokes the injected
+- [x] AC2 — `OpenOlFolderAsync(string)` completes without throwing and invokes the injected
   user-diagnostic seam exactly once when the archive root is unresolvable. Verified by
   `OpenOlFolderAsync_WhenArchiveRootIsUnresolvable_ReportsAndReturns`.
-- [ ] AC3 — `OpenFsFolderAsync(string)` completes without throwing and invokes the injected
+- [x] AC3 — `OpenFsFolderAsync(string)` completes without throwing and invokes the injected
   user-diagnostic seam exactly once when the archive root is unresolvable. Verified by
   `OpenFsFolderAsync_WhenArchiveRootIsUnresolvable_ReportsAndReturns`.
-- [ ] AC4 — The user-visible diagnostic contains neither a mailbox address nor the archive root
+- [x] AC4 — The user-visible diagnostic contains neither a mailbox address nor the archive root
   path. Verified by `ArchiveRootFailureDiagnostic_DoesNotContainTheArchivePathOrMailboxAddress`.
-- [ ] AC5 — The archive-root guard sits **after** the OneDrive `SpecialFolders` read in all three
+- [x] AC5 — The archive-root guard sits **after** the OneDrive `SpecialFolders` read in all three
   methods: `ArchiveRootPath` is never read when the `"OneDrive"` key is absent. Verified by
   `MoveToFolderAsync_WhenOneDriveIsMissing_ReturnsFalseWithoutReadingArchiveRoot`
   (`VerifyGet(..., Times.Never())`) **and** by
   `OpenFolderMethods_DelegateToDataModelWithoutExternalServices` in
   `QuickFiler.Test/Controllers/EfcHomeControllerLifecycleTests.cs` still passing unmodified with its
   `SpecialFoldersAccessCount == 2` assertion at `:217`.
-- [ ] AC6 — The `MailInfo is null` guard remains the first check in `MoveToFolderAsync`:
+- [x] AC6 — The `MailInfo is null` guard remains the first check in `MoveToFolderAsync`:
   `ArchiveRootPath` is not read when `MailInfo` is null. Verified by
   `MoveToFolderAsync_WhenMailInfoIsNull_ReturnsFalseWithoutReadingArchiveRoot`
   (`VerifyGet(..., Times.Never())`).
-- [ ] AC7 — The success path reads `ArchiveRootPath` exactly once per call; the guard introduces no
+- [x] AC7 — The success path reads `ArchiveRootPath` exactly once per call; the guard introduces no
   second COM-backed read. Verified by `MoveToFolderAsync_WhenArchiveRootResolves_StillReadsItOnce`
   (`VerifyGet(..., Times.Once())`).
-- [ ] AC8 — The catch is narrowed to `InvalidOperationException`: a
+- [x] AC8 — The catch is narrowed to `InvalidOperationException`: a
   `System.Runtime.InteropServices.COMException` raised by the same getter still propagates and is not
   absorbed. Verified by `MoveToFolderAsync_WhenArchiveRootThrowsComException_StillPropagates`.
-- [ ] AC9 — Both documented throw conditions are covered, not only one: a test exercises the
+- [x] AC9 — Both documented throw conditions are covered, not only one: a test exercises the
   unresolvable-root message and a test exercises the cross-store/renamed message, matching the
   constants at `TaskMaster/AppGlobals/ArchiveRootPathGuard.cs:13-17`.
-- [ ] AC10 — Public and internal signatures are unchanged:
+- [x] AC10 — Public and internal signatures are unchanged:
   `Task<bool> MoveToFolderAsync(string, bool, bool, bool, bool)`, `Task OpenOlFolderAsync(string)`,
   `Task OpenFsFolderAsync(string)`. Verified by
   `QuickFiler.Test/Controllers/EfcHomeControllerLifecycleTests.cs`,
@@ -711,26 +711,26 @@ command. None depends on a live-Outlook manual step. All tests named as new live
   `QuickFiler.Test/Controllers/EfcFormControllerTests.cs` and
   `TaskMaster.Test/AppGlobals/AppOlObjectsArchiveRootValidationTests.cs` all compiling and passing
   with **zero** edits.
-- [ ] AC11 — `QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs` is registered as an
+- [x] AC11 — `QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs` is registered as an
   explicit `<Compile Include="Controllers\EfcDataModelArchiveRootTests.cs" />` entry in
   `QuickFiler.Test/QuickFiler.Test.csproj`, and the new tests appear in the executed test list of the
   step-4 `vstest.console.exe` run.
-- [ ] AC12 — Fail-before / pass-after evidence exists for the three regression tests (AC1-AC3): a
+- [x] AC12 — Fail-before / pass-after evidence exists for the three regression tests (AC1-AC3): a
   captured run showing them failing against unmodified production code, and a captured run showing
   them passing after the fix, both written under
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/regression-testing/`.
-- [ ] AC13 — Format gate: `dotnet tool run csharpier check .` reports no unformatted files, run
+- [x] AC13 — Format gate: `dotnet tool run csharpier check .` reports no unformatted files, run
   through `dotnet tool run` against the manifest-pinned version.
-- [ ] AC14 — Analyzer gate:
+- [x] AC14 — Analyzer gate:
   `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
   completes with `0 Error(s)` on MSBuild's own summary line, and the log contains zero occurrences of
   `Skipping target "CoreCompile"`.
-- [ ] AC15 — Type-check gate:
+- [x] AC15 — Type-check gate:
   `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
   completes with `0 Error(s)` on MSBuild's own summary line, with zero occurrences of
   `Skipping target "CoreCompile"`, and without `/p:Nullable=enable` and without substituting
   `/t:Build`.
-- [ ] AC16 — Test gate: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage` (with CI's
+- [x] AC16 — Test gate: `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage` (with CI's
   `/InIsolation` and `/TestCaseFilter:"TestCategory!=LiveOutlook"`, excluding assemblies under
   `.claude/worktrees`) reports zero failed tests across `QuickFiler.Test` and `TaskMaster.Test`. No
   test in the change carries `[TestCategory("LiveOutlook")]`.
@@ -743,7 +743,7 @@ command. None depends on a live-Outlook manual step. All tests named as new live
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/qa-gates/`,
   and the change is shown not to lower it; the repo-wide figure itself is recorded, not used as a
   blocking threshold, because no baseline evidence existed when this spec was written.
-- [ ] AC18 — Change footprint is exactly `QuickFiler/Controllers/EfcDataModel.cs`,
+- [x] AC18 — Change footprint is exactly `QuickFiler/Controllers/EfcDataModel.cs`,
   `QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs`,
   `QuickFiler.Test/QuickFiler.Test.csproj`, and this feature folder's documents and evidence. No
   other production file is modified; in particular
@@ -751,7 +751,7 @@ command. None depends on a live-Outlook manual step. All tests named as new live
   `TaskMaster/AppGlobals/ArchiveRootPathGuard.cs` and
   `UtilitiesCS/Interfaces/IGlobals/IOlObjects.cs` are untouched. Verified by `git diff --name-only`
   against the merge base.
-- [ ] AC19 — `QuickFiler/Controllers/EfcDataModel.cs` remains at or under 500 lines after the change
+- [x] AC19 — `QuickFiler/Controllers/EfcDataModel.cs` remains at or under 500 lines after the change
   (423 lines before). Verified by a line count of the file.
 - [ ] AC20 — The three non-goals in Scope & Non-Goals — (a) `COMException` from the archive-root
   getter's COM calls, (b) the log-only `async void` boundary sinks in

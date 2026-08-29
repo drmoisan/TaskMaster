@@ -4,7 +4,7 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-08-29T11-09
-- **Status:** Ready for Preflight
+- **Status:** Executed
 - **Version:** 1.0
 - **Work Mode:** `full-bug`
 
@@ -248,28 +248,28 @@ Each was re-derived against the working tree of this worktree during plan author
 
 ### Phase 0 — Baseline Capture and Policy Reads
 
-- [ ] [P0-T1] Read `CLAUDE.md` in full and record its four embedded policies (General Code Change,
+- [x] [P0-T1] Read `CLAUDE.md` in full and record its four embedded policies (General Code Change,
   General Unit Test, C# Code Change, C# Unit Test) plus the `## C# Toolchain (run in this exact order)`
   section. Acceptance: the reader can quote the four toolchain commands verbatim from that section.
-- [ ] [P0-T2] Read `.claude/rules/general-code-change.md` in full. Acceptance: the 500-line file-size
+- [x] [P0-T2] Read `.claude/rules/general-code-change.md` in full. Acceptance: the 500-line file-size
   limit and the mandatory toolchain loop are recorded in the reader's notes for [P0-T5].
-- [ ] [P0-T3] Read `.claude/rules/general-unit-test.md` in full. Acceptance: the Coverage Exclusion
+- [x] [P0-T3] Read `.claude/rules/general-unit-test.md` in full. Acceptance: the Coverage Exclusion
   Policy and the Test File Location clause are recorded, together with the note that D1 supersedes the
   `tests/` mirroring clause for C# in this repository because `CLAUDE.md` outranks it.
-- [ ] [P0-T4] Read `.claude/rules/csharp.md` in full. Acceptance: its contents are recorded in the
+- [x] [P0-T4] Read `.claude/rules/csharp.md` in full. Acceptance: its contents are recorded in the
   reader's notes for [P0-T5].
-- [ ] [P0-T5] Write
+- [x] [P0-T5] Write
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/baseline/phase0-instructions-read.md`
   containing `Timestamp:`, `Policy Order:` (the four files in the order read), and an explicit list of
   the files read. Acceptance: the file exists and contains all three field labels and four file paths.
-- [ ] [P0-T6] Run `dotnet tool restore` from the worktree root and write
+- [x] [P0-T6] Run `dotnet tool restore` from the worktree root and write
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/baseline/p0-t6-dotnet-tool-restore.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Acceptance: the artifact records
   `EXIT_CODE: 0` and `Output Summary:` names CSharpier version `1.2.6`. If `dotnet` cannot resolve an
   SDK because the repo-local `.dotnet-sdk` directory named in `global.json:7` is absent, first run
   `pwsh -NoProfile -File scripts/vscode/Install-RepoDotNetSdk.ps1`, then retry, and record both
   invocations in `Output Summary:`.
-- [ ] [P0-T7] Run
+- [x] [P0-T7] Run
   `pwsh -NoProfile -File scripts/vscode/Invoke-Restore.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform "Any CPU"`
   and write
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/baseline/p0-t7-solution-restore.md`
@@ -308,14 +308,14 @@ Each was re-derived against the working tree of this worktree during plan author
   `git status --porcelain` output is empty, proving the remediation touched no
   tracked file. If the skew cannot be resolved this way, stop and report; do not proceed to [P0-T10]
   with a CS0006 baseline.
-- [ ] [P0-T8] Probe for the `dotnet-coverage` global tool with
+- [x] [P0-T8] Probe for the `dotnet-coverage` global tool with
   `Get-Command dotnet-coverage -ErrorAction SilentlyContinue`; if it is absent run
   `dotnet tool install --global dotnet-coverage`. Write
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/baseline/p0-t8-dotnet-coverage-probe.md`
   with the four schema fields and a `Resolution:` line reading either `already present` or
   `installed`. Acceptance: the artifact exists and `Output Summary:` records the resolved
   `dotnet-coverage` version string. Do not halt on absence; install and continue.
-- [ ] [P0-T9] Run `dotnet tool run csharpier check .` from the worktree root and write
+- [x] [P0-T9] Run `dotnet tool run csharpier check .` from the worktree root and write
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/baseline/p0-t9-csharpier-check.md`
   with the four schema fields. `Output Summary:` must quote the tool's final summary line verbatim and
   record `BASELINE_UNFORMATTED_COUNT:` as the count of `Error <path> - Was not formatted.` lines in the
@@ -325,7 +325,7 @@ Each was re-derived against the working tree of this worktree during plan author
   Acceptance: the artifact exists and carries a numeric `BASELINE_UNFORMATTED_COUNT:` value and a
   `BASELINE_UNFORMATTED_FILES:` line. A non-zero baseline is recorded, not repaired here; the count
   governs the branch chosen in [P6-T1] and the list is the comparison set for [P6-T2].
-- [ ] [P0-T10] Run
+- [x] [P0-T10] Run
   `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
   using the MSBuild resolved by
   `& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe" | Select-Object -First 1`
@@ -341,7 +341,7 @@ Each was re-derived against the working tree of this worktree during plan author
   non-zero baseline. Do not invoke
   `scripts/vscode/Invoke-VSBuild.ps1`; it runs `scripts/vscode/Sync-PackageReferences.ps1` over every
   `.csproj` and would rewrite project files outside the change footprint.
-- [ ] [P0-T11] Run
+- [x] [P0-T11] Run
   `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
   using the same vswhere-resolved MSBuild as [P0-T10], including its `| Select-Object -First 1`
   suffix, teeing console output to `TestResults\msbuild\p0-t11.log` (creating `TestResults\msbuild`
@@ -352,7 +352,7 @@ Each was re-derived against the working tree of this worktree during plan author
   integer. If the recorded integer is non-zero, stop and report before Phase 2; [P6-T3]/[P6-T4] demand
   `0 Error(s)` and cannot be satisfied from a non-zero baseline. The command must not gain
   `/p:Nullable=enable` and must not substitute `/t:Build`.
-- [ ] [P0-T12] Run the baseline test suite in coverage mode with
+- [x] [P0-T12] Run the baseline test suite in coverage mode with
   `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput coverage/coverage.cobertura.xml`
   and write
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/baseline/p0-t12-vstest-coverage.md`
@@ -413,19 +413,19 @@ Each was re-derived against the working tree of this worktree during plan author
 
 ### Phase 1 — Scope Lock and Citation Re-derivation
 
-- [ ] [P1-T1] Re-derive the three unguarded read sites. Run
+- [x] [P1-T1] Re-derive the three unguarded read sites. Run
   `Select-String -Path 'QuickFiler/Controllers/EfcDataModel.cs' -SimpleMatch 'OlAncestor = Globals.Ol.ArchiveRootPath'`
   and record the matched line numbers. Acceptance: exactly three matches are returned and their line
   numbers are 289, 310 and 328.
-- [ ] [P1-T2] Re-derive the ordering sentinel. Run
+- [x] [P1-T2] Re-derive the ordering sentinel. Run
   `Select-String -Path 'QuickFiler.Test/Controllers/EfcHomeControllerLifecycleTests.cs' -SimpleMatch 'SpecialFoldersAccessCount.Should().Be(2)'`
   and record the matched line number. Acceptance: exactly one match is returned at line 217.
-- [ ] [P1-T3] Confirm the new test file is not yet registered. Run
+- [x] [P1-T3] Confirm the new test file is not yet registered. Run
   `Select-String -Path 'QuickFiler.Test/QuickFiler.Test.csproj' -SimpleMatch 'EfcDataModelArchiveRootTests.cs'`.
   Acceptance: zero matches are returned, and
   `Select-String -Path 'QuickFiler.Test/QuickFiler.Test.csproj' -SimpleMatch 'Controllers\EfcDataModelTests.cs'`
   returns exactly one match at line 115, which is the insertion anchor for [P3-T2].
-- [ ] [P1-T4] Record the pre-change file size with
+- [x] [P1-T4] Record the pre-change file size with
   `(Get-Content -LiteralPath 'QuickFiler/Controllers/EfcDataModel.cs').Count` and write
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/baseline/p1-t4-tree-facts.md`
   with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` and the four re-derived facts from
@@ -435,7 +435,7 @@ Each was re-derived against the working tree of this worktree during plan author
 
 ### Phase 2 — Diagnostic Seam Declaration
 
-- [ ] [P2-T1] Add the injectable user-diagnostic seam to `QuickFiler/Controllers/EfcDataModel.cs`,
+- [x] [P2-T1] Add the injectable user-diagnostic seam to `QuickFiler/Controllers/EfcDataModel.cs`,
   inside the `#region Public Properties` block, which spans
   `QuickFiler/Controllers/EfcDataModel.cs:146-255`. Write the declaration as
   `internal Action<string> UserDiagnosticAction { get; set; } = text => MessageBox.Show(text);`,
@@ -448,14 +448,14 @@ Each was re-derived against the working tree of this worktree during plan author
   Acceptance:
   `Select-String -Path 'QuickFiler/Controllers/EfcDataModel.cs' -SimpleMatch 'UserDiagnosticAction'`
   returns exactly one match.
-- [ ] [P2-T2] Confirm the seam is declaration-only across the production tree. Run
+- [x] [P2-T2] Confirm the seam is declaration-only across the production tree. Run
   `Get-ChildItem -Path 'QuickFiler','TaskMaster','UtilitiesCS','ToDoModel' -Recurse -Filter '*.cs' | Where-Object { $_.FullName -notmatch '\\obj\\' -and $_.FullName -notmatch '\\bin\\' } | Select-String -SimpleMatch 'UserDiagnosticAction'`.
   `Select-String` has no `-Recurse` parameter, so the file set is enumerated by `Get-ChildItem` and
   piped in; `obj` and `bin` are excluded because a build leaves generated copies of source files there.
   Acceptance: exactly one match is returned, and it is in `QuickFiler/Controllers/EfcDataModel.cs`.
   This proves the seam changes no behavior yet, so Phase 3's red is caused by the missing guard rather
   than by the seam.
-- [ ] [P2-T3] Rebuild the solution with
+- [x] [P2-T3] Rebuild the solution with
   `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU"` using the
   vswhere-resolved MSBuild from [P0-T10], including its `| Select-Object -First 1` suffix, teeing
   console output to `TestResults\msbuild\p2-t3.log` (creating `TestResults\msbuild` first;
@@ -481,7 +481,7 @@ scenario requires `MailInfo` to be null; that `CancellationTokenSource` is const
 test method with no disposal, matching `QuickFiler.Test/Controllers/EfcDataModelTests.cs:203`.
 Where a task below says "arrange as in [P3-T3]", that includes the `TestableEfcDataModel` construction.
 
-- [ ] [P3-T1] Create `QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs` with namespace
+- [x] [P3-T1] Create `QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs` with namespace
   `QuickFiler.Test.Controllers`, a `[TestClass] public class EfcDataModelArchiveRootTests`, two
   private `const string` fields holding verbatim copies of the two rule texts from
   `TaskMaster/AppGlobals/ArchiveRootPathGuard.cs:13-14` and `:16-17` (named `UnresolvableRuleText` and
@@ -525,39 +525,39 @@ Where a task below says "arrange as in [P3-T3]", that includes the `TestableEfcD
   constructor. Acceptance: the file exists, contains the literal
   `namespace QuickFiler.Test.Controllers`, contains the literal `class EfcDataModelArchiveRootTests`,
   and contains the literal `class TestableEfcDataModel : EfcDataModel`.
-- [ ] [P3-T2] Register the new file in `QuickFiler.Test/QuickFiler.Test.csproj` by inserting
+- [x] [P3-T2] Register the new file in `QuickFiler.Test/QuickFiler.Test.csproj` by inserting
   `<Compile Include="Controllers\EfcDataModelArchiveRootTests.cs" />` immediately after the existing
   `<Compile Include="Controllers\EfcDataModelTests.cs" />` entry identified in [P1-T3]. Acceptance:
   `Select-String -Path 'QuickFiler.Test/QuickFiler.Test.csproj' -SimpleMatch 'Controllers\EfcDataModelArchiveRootTests.cs'`
   returns exactly one match.
-- [ ] [P3-T3] Add `MoveToFolderAsync_WhenArchiveRootIsUnresolvable_ReturnsFalseInsteadOfThrowing`.
+- [x] [P3-T3] Add `MoveToFolderAsync_WhenArchiveRootIsUnresolvable_ReturnsFalseInsteadOfThrowing`.
   Arrange a strict `Mock<IOlObjects>` whose `ArchiveRootPath` getter throws
   `new InvalidOperationException(UnresolvableRuleText)`, a `SpecialFolders` dictionary containing the
   key `OneDrive`, and a `TestableEfcDataModel` built as defined in [P3-T1], whose `MailInfo` is
   therefore non-null. Act with `moveConversation: false`. Assert the awaited result is `false` and that the
   call does not throw. Acceptance: the test method exists with that exact name and its assert block
   contains a FluentAssertions `Should().BeFalse()` call on the awaited result.
-- [ ] [P3-T4] Add
+- [x] [P3-T4] Add
   `MoveToFolderAsync_WhenArchiveRootIsCrossStoreUnresolvable_ReturnsFalseInsteadOfThrowing`, identical
   in shape to [P3-T3] except that the getter throws
   `new InvalidOperationException(CrossStoreRuleText)`. This is the second documented throw condition
   required by AC9. Acceptance: the test method exists with that exact name and references
   `CrossStoreRuleText`.
-- [ ] [P3-T5] Add `OpenOlFolderAsync_WhenArchiveRootIsUnresolvable_ReportsAndReturns`. Arrange as in
+- [x] [P3-T5] Add `OpenOlFolderAsync_WhenArchiveRootIsUnresolvable_ReportsAndReturns`. Arrange as in
   [P3-T3], additionally assigning `dataModel.UserDiagnosticAction` to a capturing delegate that appends
   to a `List<string>`. Act by awaiting `OpenOlFolderAsync("Clients\\North")`. Assert the call does not
   throw and the captured list has exactly one element. Acceptance: the test method exists with that
   exact name and its assert block contains `Should().ContainSingle()` on the captured list.
-- [ ] [P3-T6] Add `OpenFsFolderAsync_WhenArchiveRootIsUnresolvable_ReportsAndReturns`, the same shape
+- [x] [P3-T6] Add `OpenFsFolderAsync_WhenArchiveRootIsUnresolvable_ReportsAndReturns`, the same shape
   as [P3-T5] but awaiting `OpenFsFolderAsync("Clients\\North")`. Acceptance: the test method exists
   with that exact name and its assert block contains `Should().ContainSingle()` on the captured list.
-- [ ] [P3-T7] Add `ArchiveRootFailureDiagnostic_DoesNotContainTheArchivePathOrMailboxAddress`. Arrange
+- [x] [P3-T7] Add `ArchiveRootFailureDiagnostic_DoesNotContainTheArchivePathOrMailboxAddress`. Arrange
   as in [P3-T5]. Act by awaiting `OpenOlFolderAsync("Clients\\North")`. Assert the single captured
   message contains neither `mailbox@example.com` nor `ArchiveRootLiteral`, using the redaction
   assertion style of `QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs:58`. Acceptance: the
   test method exists with that exact name and its assert block contains two
   `Should().NotContain(...)` calls.
-- [ ] [P3-T8] Add `MoveToFolderAsync_WhenArchiveRootResolves_StillReadsItOnce`. Arrange a strict
+- [x] [P3-T8] Add `MoveToFolderAsync_WhenArchiveRootResolves_StillReadsItOnce`. Arrange a strict
   `Mock<IOlObjects>` whose `ArchiveRootPath` getter returns `ArchiveRootLiteral`, a `SpecialFolders`
   dictionary containing `OneDrive`, and an `EfcDataModel` whose `MailInfo` is a `MailItemHelper`
   created through its public parameterless constructor, whose `InitializeSafeDefaults` sets
@@ -584,7 +584,7 @@ Where a task below says "arrange as in [P3-T3]", that includes the `TestableEfcD
   `UtilitiesCS/OutlookObjects/MailItem/MailItemHelper.cs:106-111` whose materialization reads
   `ArchiveRootPath` a second time and would make `Times.Once()` fail both before and after the fix.
   Acceptance: the test method exists with that exact name and contains the literal `Times.Once()`.
-- [ ] [P3-T9] Add `MoveToFolderAsync_WhenMailInfoIsNull_ReturnsFalseWithoutReadingArchiveRoot`.
+- [x] [P3-T9] Add `MoveToFolderAsync_WhenMailInfoIsNull_ReturnsFalseWithoutReadingArchiveRoot`.
   Arrange a strict `Mock<IOlObjects>` with `ArchiveRootPath` set up to throw and with no `App` setup,
   and construct a plain
   `new EfcDataModel(globals, null, new CancellationTokenSource(), CancellationToken.None)` rather than
@@ -594,12 +594,12 @@ Where a task below says "arrange as in [P3-T3]", that includes the `TestableEfcD
   Act with `moveConversation: false`. Assert the awaited result is `false` and
   `olObjects.VerifyGet(x => x.ArchiveRootPath, Times.Never())`. Acceptance: the test method exists
   with that exact name and contains the literal `Times.Never()`.
-- [ ] [P3-T10] Add `MoveToFolderAsync_WhenOneDriveIsMissing_ReturnsFalseWithoutReadingArchiveRoot`.
+- [x] [P3-T10] Add `MoveToFolderAsync_WhenOneDriveIsMissing_ReturnsFalseWithoutReadingArchiveRoot`.
   Arrange as in [P3-T3] but with an empty `SpecialFolders` dictionary. Assert the awaited result is
   `false` and `olObjects.VerifyGet(x => x.ArchiveRootPath, Times.Never())`. This pins the ordering
   constraint from the production side. Acceptance: the test method exists with that exact name and
   contains the literal `Times.Never()`.
-- [ ] [P3-T11] Add `MoveToFolderAsync_WhenArchiveRootThrowsComException_StillPropagates`. Arrange
+- [x] [P3-T11] Add `MoveToFolderAsync_WhenArchiveRootThrowsComException_StillPropagates`. Arrange
   exactly as in [P3-T3] — a `SpecialFolders` dictionary containing the key `OneDrive` and a
   `TestableEfcDataModel` with a non-null `MailInfo` — except that the `ArchiveRootPath` getter throws
   `new System.Runtime.InteropServices.COMException("com failure")`. Act with `moveConversation: false`
@@ -607,14 +607,14 @@ Where a task below says "arrange as in [P3-T3]", that includes the `TestableEfcD
   awaited call throws `COMException` rather than returning `false`. Acceptance: the test method exists
   with that exact name, and its assert block contains the literal `ThrowAsync` and the literal
   `COMException`.
-- [ ] [P3-T12] Add `OpenOlFolderAsync_WhenOneDriveIsMissing_ReturnsWithoutReadingArchiveRoot`.
+- [x] [P3-T12] Add `OpenOlFolderAsync_WhenOneDriveIsMissing_ReturnsWithoutReadingArchiveRoot`.
   Arrange an empty `SpecialFolders` dictionary and a throwing `ArchiveRootPath` getter. Assert the
   awaited call does not throw and `olObjects.VerifyGet(x => x.ArchiveRootPath, Times.Never())`.
   Acceptance: the test method exists with that exact name and contains the literal `Times.Never()`.
-- [ ] [P3-T13] Add `OpenFsFolderAsync_WhenOneDriveIsMissing_ReturnsWithoutReadingArchiveRoot`, the
+- [x] [P3-T13] Add `OpenFsFolderAsync_WhenOneDriveIsMissing_ReturnsWithoutReadingArchiveRoot`, the
   same shape as [P3-T12] but awaiting `OpenFsFolderAsync`. Acceptance: the test method exists with
   that exact name and contains the literal `Times.Never()`.
-- [ ] [P3-T14] Rebuild the solution with
+- [x] [P3-T14] Rebuild the solution with
   `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU"` using the
   vswhere-resolved MSBuild from [P0-T10], including its `| Select-Object -First 1` suffix, and write
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/other/p3-t14-tests-compile.md`
@@ -622,7 +622,7 @@ Where a task below says "arrange as in [P3-T3]", that includes the `TestableEfcD
   quotes an MSBuild `Error(s)` summary line reading `0 Error(s)`. A non-zero result here means the new
   tests do not compile and must be corrected before [P3-T15]; the fail-before evidence must be a
   runtime failure, never a build failure.
-- [ ] [P3-T15] `[expect-fail]` Run only the new test class against the built `QuickFiler.Test`
+- [x] [P3-T15] `[expect-fail]` Run only the new test class against the built `QuickFiler.Test`
   assembly with the vswhere-resolved `vstest.console.exe`, resolved with
   `& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -find "Common7\IDE\Extensions\TestPlatform\vstest.console.exe" | Select-Object -First 1`,
   run against `QuickFiler.Test\bin\Debug\QuickFiler.Test.dll` — the Debug|AnyCPU `<OutputPath>` at
@@ -649,7 +649,7 @@ Where a task below says "arrange as in [P3-T3]", that includes the `TestableEfcD
 
 ### Phase 4 — Minimal Fix
 
-- [ ] [P4-T1] Add a private helper to `QuickFiler/Controllers/EfcDataModel.cs` with the signature
+- [x] [P4-T1] Add a private helper to `QuickFiler/Controllers/EfcDataModel.cs` with the signature
   `private bool TryGetArchiveRoot(out string archiveRoot)`. It reads `Globals.Ol.ArchiveRootPath`
   exactly once inside a `try`, returns `true` on success, and in
   `catch (InvalidOperationException ex)` sets `archiveRoot` to `null`, writes one
@@ -661,7 +661,7 @@ Where a task below says "arrange as in [P3-T3]", that includes the `TestableEfcD
   returns exactly one match, and
   `Select-String -Path 'QuickFiler/Controllers/EfcDataModel.cs' -SimpleMatch 'catch (InvalidOperationException'`
   returns exactly one match.
-- [ ] [P4-T2] Route the `MoveToFolderAsync(string, bool, bool, bool, bool)` read through the helper.
+- [x] [P4-T2] Route the `MoveToFolderAsync(string, bool, bool, bool, bool)` read through the helper.
   Insert `if (!TryGetArchiveRoot(out var olAncestor)) { return false; }` immediately after the OneDrive
   guard block — the `Globals.FS.SpecialFolders.TryGetValue("OneDrive", out var folderRoot)` block
   ending at `QuickFiler/Controllers/EfcDataModel.cs:281` before [P2-T1]'s insertion shifted it, since
@@ -672,7 +672,7 @@ Where a task below says "arrange as in [P3-T3]", that includes the `TestableEfcD
   body of `MoveToFolderAsync(string, ...)` the line index of the `SpecialFolders.TryGetValue` call is
   strictly less than the line index of the `TryGetArchiveRoot` call, and the line index of the
   `MailInfo is null` check is strictly less than both.
-- [ ] [P4-T3] Route the `OpenOlFolderAsync(string)` read through the helper. Insert, immediately after
+- [x] [P4-T3] Route the `OpenOlFolderAsync(string)` read through the helper. Insert, immediately after
   the OneDrive guard block — the `Globals.FS.SpecialFolders.TryGetValue("OneDrive", out var oneDrive)`
   block ending at `QuickFiler/Controllers/EfcDataModel.cs:304` before [P2-T1]'s insertion shifted it —
   a guard
@@ -681,14 +681,14 @@ Where a task below says "arrange as in [P3-T3]", that includes the `TestableEfcD
   Acceptance: within the body of `OpenOlFolderAsync` the line index of the `SpecialFolders.TryGetValue`
   call is strictly less than the line index of the `TryGetArchiveRoot` call, and exactly one
   `UserDiagnosticAction` invocation appears in that body.
-- [ ] [P4-T4] Route the `OpenFsFolderAsync(string)` read through the helper, in the same shape as
+- [x] [P4-T4] Route the `OpenFsFolderAsync(string)` read through the helper, in the same shape as
   [P4-T3], after the OneDrive guard block — the
   `Globals.FS.SpecialFolders.TryGetValue("OneDrive", out var oneDrive)` block ending at
   `QuickFiler/Controllers/EfcDataModel.cs:323` before [P2-T1]'s insertion shifted it. Acceptance:
   within the body of `OpenFsFolderAsync` the
   line index of the `SpecialFolders.TryGetValue` call is strictly less than the line index of the
   `TryGetArchiveRoot` call, and exactly one `UserDiagnosticAction` invocation appears in that body.
-- [ ] [P4-T5] Prove no unguarded read remains. Run
+- [x] [P4-T5] Prove no unguarded read remains. Run
   `Select-String -Path 'QuickFiler/Controllers/EfcDataModel.cs' -SimpleMatch 'OlAncestor = Globals.Ol.ArchiveRootPath'`
   and
   `Select-String -Path 'QuickFiler/Controllers/EfcDataModel.cs' -SimpleMatch 'Globals.Ol.ArchiveRootPath'`.
@@ -698,13 +698,13 @@ Where a task below says "arrange as in [P3-T3]", that includes the `TestableEfcD
   comment on `TryGetArchiveRoot`, violates this condition; write the doc comment without naming
   `Globals.Ol.ArchiveRootPath`. Commented-out copies of the old expression are
   prohibited, because they would defeat the first assertion.
-- [ ] [P4-T6] Rebuild the solution with
+- [x] [P4-T6] Rebuild the solution with
   `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU"` using the
   vswhere-resolved MSBuild from [P0-T10], including its `| Select-Object -First 1` suffix, and write
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/other/p4-t6-fix-compile.md`
   with the four schema fields. Acceptance: the artifact records `EXIT_CODE: 0` and `Output Summary:`
   quotes an MSBuild `Error(s)` summary line reading `0 Error(s)`.
-- [ ] [P4-T7] Record the post-fix file size with
+- [x] [P4-T7] Record the post-fix file size with
   `(Get-Content -LiteralPath 'QuickFiler/Controllers/EfcDataModel.cs').Count` and write
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/other/p4-t7-file-size.md`
   with the four schema fields plus `POSTFIX_EFCDATAMODEL_LINE_COUNT:`. Record the line count of
@@ -721,12 +721,12 @@ Where a task below says "arrange as in [P3-T3]", that includes the `TestableEfcD
 
 ### Phase 5 — Regression Pass After the Fix
 
-- [ ] [P5-T1] Re-run the new test class with the same command, executable resolution, assembly and
+- [x] [P5-T1] Re-run the new test class with the same command, executable resolution, assembly and
   filter as [P3-T15] but with `/ResultsDirectory:TestResults\p5-t1`, and write
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/regression-testing/p5-t1-regression-pass-after.md`
   with the four schema fields. Acceptance: the artifact records `EXIT_CODE: 0` and `Output Summary:`
   records `Total tests: 11`, `Passed: 11` and `Failed: 0`, with each of the eleven test names listed.
-- [ ] [P5-T2] Run the two ordering-sentinel tests that must keep passing unmodified, using the
+- [x] [P5-T2] Run the two ordering-sentinel tests that must keep passing unmodified, using the
   `vstest.console.exe` resolved exactly as in [P3-T15] against the same
   `QuickFiler.Test\bin\Debug\QuickFiler.Test.dll` assembly, with
   `/InIsolation /Logger:trx /ResultsDirectory:TestResults\p5-t2 /TestCaseFilter:"FullyQualifiedName~OpenFolderMethods_DelegateToDataModelWithoutExternalServices|FullyQualifiedName~HandleMoveResult_WhenMoveFails_RoutesMessageThroughInjectedAction"`,
@@ -734,7 +734,7 @@ Where a task below says "arrange as in [P3-T3]", that includes the `TestableEfcD
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/regression-testing/p5-t2-sentinel-tests.md`
   with the four schema fields. Acceptance: the artifact records `EXIT_CODE: 0`, `Total tests: 2`,
   `Passed: 2` and `Failed: 0`.
-- [ ] [P5-T3] Prove the six existing test files named by the spec are unedited. Run
+- [x] [P5-T3] Prove the six existing test files named by the spec are unedited. Run
   `git diff --name-only ecdb1c84ba8541ab67042985919cfed4df768c01 -- QuickFiler.Test TaskMaster.Test`
   and, as the companion required for a name-listing diff,
   `git status --porcelain -uall -- QuickFiler.Test TaskMaster.Test`;
@@ -758,7 +758,7 @@ format step is scoped to this change's two owned files so pre-existing drift is 
 change footprint, and AC13 is then resolved through [P8-T15]'s remediation branch. If any step fails
 or changes a file, restart the loop from [P6-T1].
 
-- [ ] [P6-T1] Record `Get-FileHash -Algorithm SHA256` for `QuickFiler/Controllers/EfcDataModel.cs` and
+- [x] [P6-T1] Record `Get-FileHash -Algorithm SHA256` for `QuickFiler/Controllers/EfcDataModel.cs` and
   `QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs`, run
   `dotnet tool run csharpier format .`, then record the same two hashes again, and write
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/qa-gates/p6-t1-csharpier-format.md`
@@ -770,7 +770,7 @@ or changes a file, restart the loop from [P6-T1].
   `QuickFiler/Controllers/EfcDataModel.cs` and
   `QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs` so the pre-existing drift is not swept
   into this change footprint, and record that branch and the baseline count in `Output Summary:`.
-- [ ] [P6-T2] Run `dotnet tool run csharpier check .` and write
+- [x] [P6-T2] Run `dotnet tool run csharpier check .` and write
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/qa-gates/p6-t2-csharpier-check.md`
   with the four schema fields, quoting the tool's final summary line verbatim in `Output Summary:`.
   Acceptance: the artifact records `EXIT_CODE: 0` when [P0-T9] recorded
@@ -781,7 +781,7 @@ or changes a file, restart the loop from [P6-T1].
   contains neither `QuickFiler/Controllers/EfcDataModel.cs` nor
   `QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs`; record that set difference in
   `Output Summary:`.
-- [ ] [P6-T3] Run
+- [x] [P6-T3] Run
   `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
   using the vswhere-resolved MSBuild from [P0-T10], including its `| Select-Object -First 1` suffix,
   teeing console output to `TestResults\msbuild\p6-t3.log` (creating `TestResults\msbuild` first;
@@ -791,7 +791,7 @@ or changes a file, restart the loop from [P6-T1].
   quotes an MSBuild `Error(s)` summary line reading `0 Error(s)`; and the tee'd log contains zero
   occurrences of the literal `Skipping target "CoreCompile"`, proving the gate was not vacuous. The
   error count is read from MSBuild's own summary line, not by counting `error CS` occurrences.
-- [ ] [P6-T4] Run
+- [x] [P6-T4] Run
   `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
   using the vswhere-resolved MSBuild from [P0-T10], including its `| Select-Object -First 1` suffix,
   teeing console output to `TestResults\msbuild\p6-t4.log` (creating `TestResults\msbuild` first;
@@ -801,7 +801,7 @@ or changes a file, restart the loop from [P6-T1].
   quotes an MSBuild `Error(s)` summary line reading `0 Error(s)`; the tee'd log contains zero
   occurrences of the literal `Skipping target "CoreCompile"`; and `Command:` contains neither
   `/p:Nullable=enable` nor `/t:Build`.
-- [ ] [P6-T5] Run the full suite with `vstest.console.exe` and `/EnableCodeCoverage`. Resolve the
+- [x] [P6-T5] Run the full suite with `vstest.console.exe` and `/EnableCodeCoverage`. Resolve the
   executable with
   `& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -find "Common7\IDE\Extensions\TestPlatform\vstest.console.exe" | Select-Object -First 1`.
   The `| Select-Object -First 1` suffix is required for the same reason as in [P0-T10]: `-find` can
@@ -830,7 +830,7 @@ or changes a file, restart the loop from [P6-T1].
   baseline occurrence, and no test in `EfcDataModelArchiveRootTests` may appear among them; and no
   executed test carries `[TestCategory("LiveOutlook")]`. Run this through
   `Start-Process -Wait` or an equivalent detached wrapper.
-- [ ] [P6-T6] Close the toolchain loop. Write
+- [x] [P6-T6] Close the toolchain loop. Write
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/qa-gates/p6-t6-loop-closure.md`
   recording, for the final accepted pass, the `Timestamp:` of each of [P6-T1] through [P6-T5] and the
   SHA-256 of `QuickFiler/Controllers/EfcDataModel.cs` and
@@ -841,7 +841,7 @@ or changes a file, restart the loop from [P6-T1].
 
 ### Phase 7 — Coverage Measurement and Delta
 
-- [ ] [P7-T1] Run
+- [x] [P7-T1] Run
   `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput coverage/coverage.cobertura.xml`
   and write
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/qa-gates/p7-t1-coverage-postchange.md`
@@ -860,7 +860,7 @@ or changes a file, restart the loop from [P6-T1].
   literal is absent from the run output, the non-zero exit came from another cause: record it without
   `ExpectedExitCode:` and treat the task as REMEDIATION-REQUIRED.
   Run through `Start-Process -Wait` or an equivalent detached wrapper.
-- [ ] [P7-T2] Compute coverage for the changed code. From `coverage/coverage.cobertura.xml`, aggregate
+- [x] [P7-T2] Compute coverage for the changed code. From `coverage/coverage.cobertura.xml`, aggregate
   every `class` element whose `filename` attribute resolves to `QuickFiler/Controllers/EfcDataModel.cs`
   — aggregate by `filename`, not by `class`, because a C# async state machine emits its lines under a
   separate generated class and a per-class figure would understate the method.
@@ -884,7 +884,7 @@ or changes a file, restart the loop from [P6-T1].
   re-derive the figure. The lambda body of [P2-T1]'s default seam value is expected to be uncovered:
   every test replaces the seam before invoking the paths that use it, so no test executes the default.
   List it explicitly among the uncovered lines rather than treating it as a gap to close.
-- [ ] [P7-T3] Write the coverage delta report to
+- [x] [P7-T3] Write the coverage delta report to
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/qa-gates/p7-t3-coverage-delta.md`
   with the four schema fields plus `BASELINE_REPO_LINE_COVERAGE_PERCENT:` copied from [P0-T12],
   `POSTCHANGE_REPO_LINE_COVERAGE_PERCENT:` copied from [P7-T1], `CHANGED_LINE_COVERAGE_PERCENT:`
@@ -899,7 +899,7 @@ or changes a file, restart the loop from [P6-T1].
   `REMEDIATION-REQUIRED` rather than as a pass. The repo-wide figure is recorded and
   reported per AC17 and is not itself a blocking threshold; the blocking clauses are the change-scoped
   ones in [P7-T2] and the tolerance in this task.
-- [ ] [P7-T4] Decide, and record the decision for, the canonical review coverage artifact. Read
+- [x] [P7-T4] Decide, and record the decision for, the canonical review coverage artifact. Read
   `POSTCHANGE_REPO_LINE_COVERAGE_PERCENT:` and `COVERAGE_XML_MODE:` from [P7-T1]. When
   `COVERAGE_XML_MODE:` reads `raw`, do not create the file and record
   `Decision: NOT WRITTEN — measured figure is a raw denominator that includes test assemblies`,
@@ -939,7 +939,7 @@ per `.claude/skills/acceptance-criteria-tracking/SKILL.md`. Work Mode is `full-b
 the sole AC source. Change only `- [ ]` to `- [x]`; never edit criterion text; never add a criterion.
 Leave any criterion whose evidence is absent unchecked.
 
-- [ ] [P8-T1] Confirm the spec carries no non-canonical evidence path and no absolute host path. Run
+- [x] [P8-T1] Confirm the spec carries no non-canonical evidence path and no absolute host path. Run
   `Select-String -Path 'docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/spec.md' -SimpleMatch 'evidence/coverage/'`
   and
   `Select-String -Path 'docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/spec.md' -SimpleMatch 'C:\Users'`.
@@ -947,7 +947,7 @@ Leave any criterion whose evidence is absent unchecked.
   naming `.claude/skills/evidence-and-timestamp-conventions/SKILL.md` and the dated entry recording the
   removal of the absolute host path from the Context section. This task edits no criterion text; both
   substitutions were applied by the planner during preflight.
-- [ ] [P8-T2] Write the follow-up-issue dossier for the three non-goals to
+- [x] [P8-T2] Write the follow-up-issue dossier for the three non-goals to
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/other/p8-t2-followup-issue-dossier.md`,
   with one section per non-goal — (a) `COMException` from the live COM calls in the `ArchiveRootPath`
   getter at `TaskMaster/AppGlobals/AppOlObjects.cs:260-261`; (b) the log-only `async void` boundary
@@ -955,48 +955,48 @@ Leave any criterion whose evidence is absent unchecked.
   `QuickFiler/Controllers/EfcFormController.cs` — each carrying a title, a one-paragraph body, its
   verified citations, and a `ProposedLabels:` line. Acceptance: the file exists and contains exactly
   three `## ` sections whose titles name non-goals (a), (b) and (c).
-- [ ] [P8-T3] Check off AC1 in `spec.md` once
+- [x] [P8-T3] Check off AC1 in `spec.md` once
   `MoveToFolderAsync_WhenArchiveRootIsUnresolvable_ReturnsFalseInsteadOfThrowing` is recorded as
   passing in [P5-T1]. Acceptance: the AC1 line begins `- [x] AC1` and its text is unchanged.
-- [ ] [P8-T4] Check off AC2 once `OpenOlFolderAsync_WhenArchiveRootIsUnresolvable_ReportsAndReturns` is
+- [x] [P8-T4] Check off AC2 once `OpenOlFolderAsync_WhenArchiveRootIsUnresolvable_ReportsAndReturns` is
   recorded as passing in [P5-T1]. Acceptance: the AC2 line begins `- [x] AC2` and its text is unchanged.
-- [ ] [P8-T5] Check off AC3 once `OpenFsFolderAsync_WhenArchiveRootIsUnresolvable_ReportsAndReturns` is
+- [x] [P8-T5] Check off AC3 once `OpenFsFolderAsync_WhenArchiveRootIsUnresolvable_ReportsAndReturns` is
   recorded as passing in [P5-T1]. Acceptance: the AC3 line begins `- [x] AC3` and its text is unchanged.
-- [ ] [P8-T6] Check off AC4 once
+- [x] [P8-T6] Check off AC4 once
   `ArchiveRootFailureDiagnostic_DoesNotContainTheArchivePathOrMailboxAddress` is recorded as passing in
   [P5-T1]. Acceptance: the AC4 line begins `- [x] AC4` and its text is unchanged.
-- [ ] [P8-T7] Check off AC5 once both
+- [x] [P8-T7] Check off AC5 once both
   `MoveToFolderAsync_WhenOneDriveIsMissing_ReturnsFalseWithoutReadingArchiveRoot` (in [P5-T1]) and
   `OpenFolderMethods_DelegateToDataModelWithoutExternalServices` (in [P5-T2]) are recorded as passing
   and [P5-T3] shows `QuickFiler.Test/Controllers/EfcHomeControllerLifecycleTests.cs` unmodified.
   Acceptance: the AC5 line begins `- [x] AC5` and its text is unchanged.
-- [ ] [P8-T8] Check off AC6 once
+- [x] [P8-T8] Check off AC6 once
   `MoveToFolderAsync_WhenMailInfoIsNull_ReturnsFalseWithoutReadingArchiveRoot` is recorded as passing in
   [P5-T1]. Acceptance: the AC6 line begins `- [x] AC6` and its text is unchanged.
-- [ ] [P8-T9] Check off AC7 once `MoveToFolderAsync_WhenArchiveRootResolves_StillReadsItOnce` is
+- [x] [P8-T9] Check off AC7 once `MoveToFolderAsync_WhenArchiveRootResolves_StillReadsItOnce` is
   recorded as passing in [P5-T1]. Acceptance: the AC7 line begins `- [x] AC7` and its text is unchanged.
-- [ ] [P8-T10] Check off AC8 once `MoveToFolderAsync_WhenArchiveRootThrowsComException_StillPropagates`
+- [x] [P8-T10] Check off AC8 once `MoveToFolderAsync_WhenArchiveRootThrowsComException_StillPropagates`
   is recorded as passing in [P5-T1]. Acceptance: the AC8 line begins `- [x] AC8` and its text is
   unchanged.
-- [ ] [P8-T11] Check off AC9 once both
+- [x] [P8-T11] Check off AC9 once both
   `MoveToFolderAsync_WhenArchiveRootIsUnresolvable_ReturnsFalseInsteadOfThrowing` and
   `MoveToFolderAsync_WhenArchiveRootIsCrossStoreUnresolvable_ReturnsFalseInsteadOfThrowing` are recorded
   as passing in [P5-T1]. Acceptance: the AC9 line begins `- [x] AC9` and its text is unchanged.
-- [ ] [P8-T12] Check off AC10 once [P6-T5] records `Failed: 0` for the `QuickFiler.` and `TaskMaster.`
+- [x] [P8-T12] Check off AC10 once [P6-T5] records `Failed: 0` for the `QuickFiler.` and `TaskMaster.`
   test namespaces — the TRX-derived per-namespace figures, not the console all-assembly `Failed:`
   total — and [P5-T3] shows all six named existing test files unmodified. Acceptance: the AC10
   line begins `- [x] AC10` and its text is unchanged.
-- [ ] [P8-T13] Check off AC11 once [P3-T2] recorded the `<Compile Include=... />` entry and [P6-T5]'s
+- [x] [P8-T13] Check off AC11 once [P3-T2] recorded the `<Compile Include=... />` entry and [P6-T5]'s
   TRX under `TestResults\p6-t5` lists at least one test whose fully qualified name contains
   `EfcDataModelArchiveRootTests`. Acceptance: the AC11 line begins `- [x] AC11` and its text is
   unchanged.
-- [ ] [P8-T14] Check off AC12 once both
+- [x] [P8-T14] Check off AC12 once both
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/regression-testing/p3-t15-regression-fail-before.md`
   and
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/regression-testing/p5-t1-regression-pass-after.md`
   exist and carry all four schema fields. Acceptance: the AC12 line begins `- [x] AC12` and its text is
   unchanged.
-- [ ] [P8-T15] Check off AC13 only when [P6-T2] recorded `EXIT_CODE: 0`. When [P6-T2] was accepted
+- [x] [P8-T15] Check off AC13 only when [P6-T2] recorded `EXIT_CODE: 0`. When [P6-T2] was accepted
   under the subset branch because [P0-T9] recorded a non-zero `BASELINE_UNFORMATTED_COUNT:`, leave AC13
   unchecked and append
   `REMEDIATION-REQUIRED: AC13 unmet — pre-existing format drift outside this change footprint, baseline count <N>, files <list>`
@@ -1006,13 +1006,13 @@ Leave any criterion whose evidence is absent unchecked.
   realized, and the realized branch is verifiable — either the AC13 line begins `- [x] AC13` with its
   text unchanged and [P6-T2] recorded `EXIT_CODE: 0`, or the AC13 line begins `- [ ] AC13` and the
   [P6-T2] artifact contains the `REMEDIATION-REQUIRED:` line.
-- [ ] [P8-T16] Check off AC14 once [P6-T3] records `0 Error(s)` and zero occurrences of
+- [x] [P8-T16] Check off AC14 once [P6-T3] records `0 Error(s)` and zero occurrences of
   `Skipping target "CoreCompile"`. Acceptance: the AC14 line begins `- [x] AC14` and its text is
   unchanged.
-- [ ] [P8-T17] Check off AC15 once [P6-T4] records `0 Error(s)`, zero occurrences of
+- [x] [P8-T17] Check off AC15 once [P6-T4] records `0 Error(s)`, zero occurrences of
   `Skipping target "CoreCompile"`, and a `Command:` free of `/p:Nullable=enable` and `/t:Build`.
   Acceptance: the AC15 line begins `- [x] AC15` and its text is unchanged.
-- [ ] [P8-T18] Check off AC16 only when [P6-T5] recorded `Failed: 0` with an empty baseline-exception
+- [x] [P8-T18] Check off AC16 only when [P6-T5] recorded `Failed: 0` with an empty baseline-exception
   list and no new test carries `[TestCategory("LiveOutlook")]`. When [P6-T5] was accepted with a
   non-empty exception list, leave AC16 unchecked and append
   `REMEDIATION-REQUIRED: AC16 unmet — pre-existing test failures <list> present in the [P0-T12] direct-harness BASELINE_FAILURE_SET`
@@ -1028,7 +1028,7 @@ Leave any criterion whose evidence is absent unchecked.
   and [P7-T3] records all four numeric fields with a delta at or above the stated tolerance and with
   `BASELINE_COVERAGE_XML_MODE:` equal to `POSTCHANGE_COVERAGE_XML_MODE:`.
   Acceptance: the AC17 line begins `- [x] AC17` and its text is unchanged.
-- [ ] [P8-T20] Check off AC18 after verifying the change footprint against the merge base from the
+- [x] [P8-T20] Check off AC18 after verifying the change footprint against the merge base from the
   working tree, before any commit exists. Run
   `git diff --name-only ecdb1c84ba8541ab67042985919cfed4df768c01 -- QuickFiler QuickFiler.Test TaskMaster TaskMaster.Test UtilitiesCS ToDoModel .github docs`
   and, as its companion span,
@@ -1047,14 +1047,14 @@ Leave any criterion whose evidence is absent unchecked.
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/`; and the
   AC18 line then begins `- [x] AC18` with its text unchanged. [P9-T2] repeats this check against the
   commit and is the artifact-bearing record of it.
-- [ ] [P8-T21] Check off AC19 once [P4-T7] records both `POSTFIX_EFCDATAMODEL_LINE_COUNT:` and
+- [x] [P8-T21] Check off AC19 once [P4-T7] records both `POSTFIX_EFCDATAMODEL_LINE_COUNT:` and
   `POSTFIX_ARCHIVEROOTTESTS_LINE_COUNT:` at or below 500 and both counts are re-confirmed after the
   [P6-T1] formatting pass by re-running
   `(Get-Content -LiteralPath 'QuickFiler/Controllers/EfcDataModel.cs').Count` and
   `(Get-Content -LiteralPath 'QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs').Count`.
   Acceptance: both re-run counts are at most 500, the AC19
   line begins `- [x] AC19` and its text is unchanged.
-- [ ] [P8-T22] Resolve AC20. If three follow-up issue numbers for non-goals (a), (b) and (c) are
+- [x] [P8-T22] Resolve AC20. If three follow-up issue numbers for non-goals (a), (b) and (c) are
   already recorded in the spec's Rollout & Follow-up section, check off AC20. Otherwise leave AC20
   unchecked and append to
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/other/p8-t2-followup-issue-dossier.md`
@@ -1064,7 +1064,7 @@ Leave any criterion whose evidence is absent unchecked.
   branches is realized, and the realized branch is verifiable — either the AC20 line begins `- [x] AC20`
   and the spec's Rollout & Follow-up section names three issue numbers, or the AC20 line begins
   `- [ ] AC20` and the dossier contains the `REMEDIATION-REQUIRED:` line.
-- [ ] [P8-T23] Update the `spec.md` header fields `- **Status:**` to `Implemented` and
+- [x] [P8-T23] Update the `spec.md` header fields `- **Status:**` to `Implemented` and
   `- **Last Updated:**` to the current ISO-8601 `yyyy-MM-ddTHH-mm` value, and update this plan file's
   `- **Status:**` to `Executed`. Acceptance:
   `Select-String -Path 'docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/spec.md' -SimpleMatch 'Status:** Ready for Planning'`
