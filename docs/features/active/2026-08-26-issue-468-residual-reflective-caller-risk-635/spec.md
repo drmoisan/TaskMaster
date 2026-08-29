@@ -360,7 +360,7 @@ no executable line changes.
 - [x] **AC-11** — Every search in this item whose result is zero records its search scope, its
       search patterns, its search result, and a measured scope size, so that no zero result rests on
       an empty or unstated search set.
-- [ ] **AC-12** — No production source file is modified. Proven by a diff anchored to the merge base
+- [x] **AC-12** — No production source file is modified. Proven by a diff anchored to the merge base
       with the base branch showing only Markdown files under
       `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/`, together
       with a porcelain working-tree status check; both are recorded in
@@ -373,7 +373,7 @@ no executable line changes.
       `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/regression-testing/`
       in place of the structurally impossible failing regression test, stating why a failing run is
       impossible and supplying the non-vacuity measurement as the alternative proof.
-- [ ] **AC-15** — The toolchain gates applicable to the branch diff are recorded in
+- [x] **AC-15** — The toolchain gates applicable to the branch diff are recorded in
       `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/qa-gates/`,
       with the language composition of the diff stated and each non-applicable gate marked
       not applicable with its reason.

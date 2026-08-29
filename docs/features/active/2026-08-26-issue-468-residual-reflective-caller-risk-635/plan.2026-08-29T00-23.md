@@ -307,7 +307,7 @@ plan task complete without its artifact.
 
 ### Phase 4 — Final QC, no-modification proof, and toolchain gate
 
-- [ ] [P4-T1] Stage and commit every artifact produced so far under `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/`, so the anchored diff that P4-T2 runs can observe them.
+- [x] [P4-T1] Stage and commit every artifact produced so far under `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/`, so the anchored diff that P4-T2 runs can observe them.
   ```
   git add -- docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635
   git commit -m "docs(635): record widened reflective-caller sweep, reflection inventory, and decision"
@@ -317,7 +317,7 @@ plan task complete without its artifact.
   - Stage with the explicit feature-folder pathspec shown above. Do not stage with an all-paths flag: an all-paths stage sweeps unrelated untracked files, including queued promotion entries belonging to other items, onto this branch.
   - This task writes no artifact. Any artifact it wrote would re-dirty the tree it asserts is clean.
 
-- [ ] [P4-T2] Produce the no-modification proof and record it in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/qa-gates/p4-t2-no-modification-proof.2026-08-29T04-55.md`. Discharges AC-12.
+- [x] [P4-T2] Produce the no-modification proof and record it in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/qa-gates/p4-t2-no-modification-proof.2026-08-29T04-55.md`. Discharges AC-12.
   ```
   git diff --name-only origin/main...HEAD
   git status --porcelain
@@ -328,7 +328,7 @@ plan task complete without its artifact.
   - The agent-memory carve-out is stated in the artifact with its reason: that tree is tracked and is written by the agents executing this plan as their own bookkeeping, not by this item's change set. Every path of that kind is enumerated individually in the artifact and marked as such, so the carve-out hides nothing.
   - Acceptance also requires the artifact to record a `LANGUAGE_COMPOSITION:` line derived from the union's file extensions, which P4-T3 consumes as its branch condition.
 
-- [ ] [P4-T3] Record the toolchain gates applicable to the branch diff in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/qa-gates/p4-t3-toolchain-gate.2026-08-29T04-55.md`. Discharges AC-15.
+- [x] [P4-T3] Record the toolchain gates applicable to the branch diff in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/qa-gates/p4-t3-toolchain-gate.2026-08-29T04-55.md`. Discharges AC-15.
   - Branch on the `LANGUAGE_COMPOSITION:` line recorded by P4-T2, and record which branch was taken.
   - Branch one, taken when the P4-T2 union lists any path outside `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/` whose extension is `.cs`, `.csproj`, `.props`, `.targets`, `.resx`, `.config`, `.settings` or `.xaml`: run the four mandated C# toolchain commands in the repository's mandated order — the CSharpier format command, then the analyzer rebuild, then the nullable rebuild, then the test run — and record each command verbatim with its own `EXIT_CODE:`. Restart the loop from the format step if any step fails or changes a file. If the union additionally lists a `.ps1` path outside that folder, run the PowerShell gates and record them the same way.
   - Branch two, taken when the P4-T2 union lists no such path: record the two single-line tokens `CSHARP_GATE: NOT APPLICABLE` and `POWERSHELL_GATE: NOT APPLICABLE`, and for each one cite the P4-T2 artifact path as the evidence that the gate has no in-scope file. Record the reason as no in-scope file rather than as a skip.
@@ -337,7 +337,7 @@ plan task complete without its artifact.
   - This gate can fail. A source-extension path outside the feature folder forces branch one, and a branch-one toolchain failure fails the task. A bare skip could not fail.
   - No coverage command is run and no coverage artifact is emitted by either branch, because no executable line changes in this item.
 
-- [ ] [P4-T4] Scan every artifact under `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/` for host-identity leaks and record the scan in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/qa-gates/p4-t4-host-identity-scan.2026-08-29T04-55.md`.
+- [x] [P4-T4] Scan every artifact under `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/` for host-identity leaks and record the scan in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/qa-gates/p4-t4-host-identity-scan.2026-08-29T04-55.md`.
   ```
   pwsh -NoProfile -Command '$root = "docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635"; $f = Get-ChildItem -Path $root -Recurse -File -Name | Where-Object { $_ -notlike "*p4-t4-host-identity-scan*" -and $_ -notlike "*plan.2026-08-29T00-23.md" }; Write-Output ("SCANNED_FILES=" + $f.Count); $n = 0; foreach ($p in $f) { $m = @(Select-String -LiteralPath (Join-Path $root $p) -SimpleMatch -Pattern "C:\","c:\","C:/","c:/","\Users\","/Users/" -ErrorAction SilentlyContinue); if ($m.Count -gt 0) { Write-Output ("LEAK " + $p + " " + $m.Count); $n = $n + $m.Count } }; Write-Output ("HOST_IDENTITY_HITS=" + $n)'
   ```
@@ -346,13 +346,13 @@ plan task complete without its artifact.
   - The file list is enumerated from disk rather than from the tracked index, so the scan covers the Phase 4 artifacts that are still untracked at this point as well as the artifacts committed by P4-T1. The scan cannot cover an artifact written after it runs; the only such artifact is the P4-T7 reconciliation record, whose sole command is a repository-relative read of the specification file.
   - Run the command before writing the artifact. Assert the printed values only; do not assert the exit code of the `pwsh` wrapper.
 
-- [ ] [P4-T5] Check off AC-12 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P4-T2 artifact path as its evidence pointer.
+- [x] [P4-T5] Check off AC-12 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P4-T2 artifact path as its evidence pointer.
   - Acceptance: exactly one checkbox changes in this task; the AC-12 criterion text is unchanged.
 
-- [ ] [P4-T6] Check off AC-15 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P4-T3 artifact path as its evidence pointer.
+- [x] [P4-T6] Check off AC-15 in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md` by marking that criterion's checkbox `[x]`, citing the P4-T3 artifact path as its evidence pointer.
   - Acceptance: exactly one checkbox changes in this task; the AC-15 criterion text is unchanged.
 
-- [ ] [P4-T7] Reconcile the acceptance-criteria checklist and record the reconciliation in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/qa-gates/p4-t7-ac-reconciliation.2026-08-29T04-55.md`.
+- [x] [P4-T7] Reconcile the acceptance-criteria checklist and record the reconciliation in `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/evidence/qa-gates/p4-t7-ac-reconciliation.2026-08-29T04-55.md`.
   ```
   pwsh -NoProfile -Command '$l = Get-Content -LiteralPath "docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/spec.md"; Write-Output ("AC_CHECKED=" + @($l | Where-Object { $_ -match "^- \[x\] \*\*AC-" }).Count); Write-Output ("AC_UNCHECKED=" + @($l | Where-Object { $_ -match "^- \[ \] \*\*AC-" }).Count)'
   ```
@@ -361,7 +361,7 @@ plan task complete without its artifact.
   - If any acceptance criterion could not be verified, leave its checkbox unchecked, record the gap and its reason here, and leave this task unchecked. Do not check a box that its evidence does not support.
   - Assert the printed values only; do not assert the exit code of the `pwsh` wrapper.
 
-- [ ] [P4-T8] Commit the remaining artifacts and the checked-off specification under `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/` and confirm the feature folder is fully committed.
+- [x] [P4-T8] Commit the remaining artifacts and the checked-off specification under `docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635/` and confirm the feature folder is fully committed.
   ```
   git add -- docs/features/active/2026-08-26-issue-468-residual-reflective-caller-risk-635
   git commit -m "docs(635): record QA gates, no-modification proof, and acceptance reconciliation"
