@@ -39,6 +39,7 @@
 - ["Skip the pointless drain" note makes a negative test vacuous](project_preflight_drain_scope_optimization_note_makes_test_vacuous.md) — a cosmetic "path
 - [Sanitisation task cannot sweep its own record](project_sanitisation_task_cannot_sweep_its_own_record.md) — exactly one resi
 - [Conjunctive criteria break the one-artifact citation rule](project_preflight_conjunctive_criterion_citation_gap.md) — "cites exactly o
+- [Pre-edit gate cites the post-edit replacement table](project_preedit_gate_cites_postedit_replacement_table.md) — baseline asserts s
 ## Build / toolchain environment
 - [pwsh/git/gh CLI gotchas](project_pwsh_git_gh_cli_gotchas.md) — no jq; pwsh won't concatenate `$(git merge-base
 - [Project Build/Test Env](project_build_test_env.md) — git-bash MSBuild switches, MSYS_NO_PATHCONV, csharpier v1
