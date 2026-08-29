@@ -78,6 +78,7 @@
 - [489-review-residuals](project_489-review-residuals.md) — cycle-1 reaudit GO/0 blocking; RC-1 cured (RED TRX committed with test, fix next commit = provable RED-first); commit-per-phase vs single-commit plan text judged on intent; amend the referenced table when an AC delegates to it
 - [493-review-residuals + msbuild-log gate adjudication](project_493-review-residuals-and-msbuild-log-gate-adjudication.md) — PASS/0 blocking; how a structurally unsatisfiable msbuild-log byte-equality gate was adjudicated without downgrading the AC
 - [680-review-residuals](project_680-review-residuals.md) — closed GO c3; leak class recurred 3x (c2 committed TRX, plan draft, pass-2 QA's OWN fresh vstest output) — fresh vstest TRX is born unsanitized, require in-task sanitize; re-run host sweep every cycle
+- [635-review-residuals](project_635-review-residuals.md) — GO/0 blocking; Markdown-only evidence audit; drift-invariant "total classification with one empty category" validated at a 3rd commit (2229->2337->2474, identities held); hook payload key is `output`; session-cwd mirror needed again
 - [677-review-residuals](project_677-review-residuals.md) — PASS/0 blocking; compile-red RED-first equivalence; 70.7% modified-file dispositioned non-blocking (below the #230 bar); owed: analyzer HintPath-skew + SetupDisposal-debt promotions; post-677 baseline 0.852804/0.792300
 
 ## Artifact hygiene
