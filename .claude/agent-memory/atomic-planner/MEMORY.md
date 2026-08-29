@@ -19,7 +19,7 @@
 - [#677 R1–R8](project_677_keyboard_focus_leak_plan_seams.md) — ctor param REJECTED (5 reflection-arity tests); typed harness for compile-red; internal 9-arg ctor, never ambient SetSynchronizationContext; per-file non-vacuity floors
 - [#635](project_635_reflective_caller_audit_plan_seams.md) — evidence-only audit: tracked plan inflates its own sweep; scan hits its own pattern list; spec said six sites, tree has eight; pathspec breadth inflates a count
 - [#440 R1–R4](project_440_breadcrumb_left_arrow_plan_seams.md) — deletion-only change voids a diff-derived changed-line gate; `(Rebuild target(s))`, NOT `(Rebuild target)`; `.csharpierignore` matches the `.cobertura.xml` suffix; `.dotnet-sdk` IS gitignored (`.gitignore:350`); cite an AC by sentence only after counting its sentences; `Include` resolves against the declaring project's dir
-- [#469](project_469_comment_accuracy_plan_seams.md) — a defect-number SWAP voids whole-file token gates; digit-only edits make exact numstat derivable; spec/research counts off by one
+- [#469 R1](project_469_comment_accuracy_plan_seams.md) — defect-number SWAP voids whole-file token gates; terminal clean-tree acceptance unreachable; scoped-format vs repo-wide-check contradiction; `- [x] AC1` is a prefix of `AC10`
 - [#680](project_680_menu_mode_plan_seams.md) — HostTests.cs 499 not 500; set-difference format gate; TRX 5-shape identifiers, `grep -a`; append-a-dated-literal discriminator; post-merge remediation: exact line arithmetic — the review's "optional" fallback was load-bearing (501 vs 500)
 
 ## Plan-structure traps
