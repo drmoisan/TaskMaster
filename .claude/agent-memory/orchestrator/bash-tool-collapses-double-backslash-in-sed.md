@@ -1,6 +1,6 @@
 ---
 name: bash-tool-collapses-double-backslash-in-sed
-description: The Bash tool collapses \\ before sed sees it, so a literal backslash cannot be matched with \\ in a sed pattern; use . as the separator wildcard and always verify with a match count, because a bad pattern is a silent no-op
+description: The Bash tool collapses \\ before sed or grep sees it, so a backslash pattern silently matches nothing; use . as the separator wildcard, and never trust a zero-match sweep that has no passing control case
 metadata:
   type: project
 ---
@@ -16,6 +16,20 @@ the surrounding literal carry the specificity, e.g.
 (note `..claude` for `\.claude` — one `.` for the separator, one for the dot). ALWAYS re-grep for a
 match count afterwards. On feature 488 the first "successful" pass appeared to do the work and only the
 verification grep exposed that nothing had changed.
+
+**It bites `grep` identically, and there the failure is a false ALL-CLEAR.** On 2026-08-29 a
+host-identity sweep `grep -rniE "c:\\\\users|danmoisan|..." <feature-folder>` reported zero matches and
+looked like a clean bill of health. Running the SAME pattern against a file known to contain
+`C:\Users\DanMoisan\...` also reported zero. The pattern was never matching anything; the sweep proved
+nothing. Re-run byte-level in Python (`re.compile(rb"[Cc]:\\\\[Uu]sers")` over `open(p,"rb").read()`),
+the control matched and the feature folder was genuinely clean — but that was luck, not verification.
+
+**The general rule: a negative result is only evidence if the same command produces a positive on a
+known-positive input.** Pair every "no matches, therefore clean" sweep with a control case in the same
+invocation and print both. This costs one extra line and is the only thing standing between a mangled
+pattern and shipping unredacted host paths while reporting success. It applies to any absence claim,
+not just redaction: zero occurrences of a banned API, zero `Skipping target` lines, zero unformatted
+files.
 
 **Related guard behaviour.** In an isolated agent worktree the tool also refuses whole commands it
 cannot verify stay inside the worktree — "this command is too complex to verify". This fires on

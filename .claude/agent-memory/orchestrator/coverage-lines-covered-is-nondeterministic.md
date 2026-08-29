@@ -1,11 +1,40 @@
 ---
 name: coverage-lines-covered-is-nondeterministic
-description: In this repo lines-valid is deterministic across runs but lines-covered drifts by several lines per file, so any per-file covered-line gate fails on correct work
+description: lines-valid is deterministic but lines-covered drifts - measured up to 18 lines at ROOT (0.03 pct points), so a repo-wide >= coverage comparison at two-decimal resolution is undecidable
 metadata:
   type: project
 ---
 
-Measured directly by parsing two filtered Cobertura files in `coverage/`:
+**ROOT-LEVEL DRIFT IS ~0.03 PERCENTAGE POINTS, not one line (measured 2026-08-29, issue #644).**
+An earlier revision of this note recorded root drift of a single line (53972 vs 53973) and that
+figure understated it by more than an order of magnitude. Two full-suite runs of a **byte-identical
+tree**, with no source change of any kind between them, produced:
+
+| Run | lines-covered | lines-valid | Percent |
+|---|---|---|---|
+| E | 54793 | 64221 | 85.3194% |
+| F | 54811 | 64221 | 85.3475% |
+
+An 18-line spread at root. Critically, the two runs **straddled the 85.3303% baseline** — one below,
+one above. A `>=` gate would have returned opposite verdicts on the same tree depending only on which
+run it happened to observe.
+
+**Consequence for plan authoring: never gate a repo-wide `post >= baseline` coverage comparison at
+two-decimal resolution.** The clause is not decidable at the resolution it demands; it reports
+regression on correct work at roughly a 0.03-point granularity. Either state a tolerance band wider
+than the noise floor, or gate on `lines-valid` (deterministic) plus a changed-line coverage figure.
+
+Diagnosing one of these: check whether the changed production file carries
+`[ExcludeFromCodeCoverage]` and enumerate the `<class>` entries to confirm it is absent from the
+document. If it is absent it is in neither numerator nor denominator and cannot move the figure
+mechanically, which converts the question from "did I regress" into "is this noise".
+
+**Measuring the noise floor is legitimate; shopping for a passing run is not.** Re-run once on an
+unchanged tree with the declared purpose of estimating noise, and record BOTH runs. Selecting the
+favorable run out of a set makes the acceptance unfalsifiable, which is exactly the defect the
+plan-acceptance-gate rules exist to prevent.
+
+Original per-file measurement, still valid, from parsing two filtered Cobertura files in `coverage/`:
 
 `coverage.cobertura.filtered.p9-t4.xml` and `coverage.cobertura.filtered.p0-t9r.xml` are measurements
 of the **same tree** — all 550 files carry identical `lines-valid` and both roots read `63594`. Yet

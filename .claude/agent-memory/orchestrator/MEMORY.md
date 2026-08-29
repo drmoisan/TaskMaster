@@ -72,11 +72,11 @@
 - [Epic-child agent-memory merge conflicts](epic-child-agent-memory-merge-conflicts.md) — CONFLICTING solely on shared MEMORY.md index
 - [Epic-child nullable fan-in debt is deferred](project_epic_child_nullable_fanin_debt_deferred.md) — cross-child CS86xx fan-in is the
 - [C# coverage has two denominators](csharp-coverage-denominator-two-figures.md) — filtered first-party ~85.9% clears the gate, unfiltered
-- [lines-covered is nondeterministic; lines-valid is not](coverage-lines-covered-is-nondeterministic.md) — same-tree runs drift up to 4
+- [lines-covered is nondeterministic; lines-valid is not](coverage-lines-covered-is-nondeterministic.md) - same-tree runs drift 18 lines at ROOT (~0.03 pct pts) and can straddle the baseline; a repo-wide >= gate at two decimals is undecidable
 - [Preflight catches vacuous gates](preflight-catches-vacuous-gates.md) — MCP `ok:true` is not enough; executor preflight found 6 gates
 - [Preflight: sweep task ordering + citation arity](preflight-sweep-task-ordering-and-citation-arity.md) — name both sweeps early; a
 - [Revert plans must check test provenance](revert-plans-must-check-test-provenance.md) — verify each test against the pre-change sha; a
-- [Bash tool collapses `\` before sed sees it](bash-tool-collapses-double-backslash-in-sed.md) — a `\` pattern is a silent no-op exiting 0
+- [Bash tool collapses `\` before sed sees it](bash-tool-collapses-double-backslash-in-sed.md) — a `\` pattern is a silent no-op exiting 0; it bites grep too, so pair every absence sweep with a known-positive control
 - [Bash tool mangles MSBuild switches](bash-tool-mangles-msbuild-switches.md) — `/m` becomes `M:/` (MSB1008); run C# tools via `pwsh
 - [pwsh double-quoted -Command is refused in a worktree](pwsh-double-quoted-command-refused-in-worktree.md) — the `$` trips the isolation
 - [Analyzer gate is vacuous without /t:Rebuild](msbuild-analyzer-gate-vacuous-without-rebuild.md) — `/t:Build` after any earlier build
@@ -88,6 +88,7 @@
 - [Model-routing hook reads the canonical path only](model-routing-hook-reads-canonical-path-only.md) — it hardcodes
 - [No helper scripts under evidence/](feedback_no_helper_scripts_under_evidence.md) — feature-review's language match is extension-only and
 - [One executor per worktree](one-executor-per-worktree.md) — a stale checkpoint is NOT a dead delegation; never launch a second executor
+- [No SendMessage: relaunch with a resume brief](no-sendmessage-relaunch-with-resume-brief.md) - a stopped executor cannot be resumed in place; never use a placeholder Agent prompt
 - [Agent() cannot course-correct a running subagent](agent-tool-cannot-course-correct-running-subagent.md) — it starts a SECOND agent
 - [Removing a halt requires branch propagation](removing-a-halt-requires-branch-propagation.md) — converting a HALT into a recorded blocker
 - [Prepared epic child invalidated by a sibling merge](prepared-epic-child-invalidated-by-sibling-merge.md) — a merged fix for an issue the
@@ -107,7 +108,9 @@
 - [CR-pattern grep falsely reports 100% CRLF](grep-cr-empty-pattern-false-crlf.md) — the shell strips the CR, leaving an empty pattern
 
 - [Resumed child orchestrator shares your worktree](resumed-child-orchestrator-shares-worktree.md) — a checkpoint mtime you did not author
-- [Shared checkpoint: never read-modify-write](shared-checkpoint-read-modify-write-corrupts.md) - a sibling swaps the session-root file
+- [Run the hook gates locally](run-orchestration-hook-gates-locally.md) — `Invoke-OrchestratorStatePreflight` / `Test-OrchestratorStateCompletionReadiness` ARE the hooks; PowerShell is authoritative, MCP disagrees on the bug route
+- [Coverage mode raw vs processed is flake-sensitive](coverage-mode-raw-vs-processed-is-flake-sensitive.md) — one flaky test kills post-processing and yields an incomparable denominator; re-measure in a detached worktree with packages copied
+- [Shared checkpoint: never read-modify-write](shared-checkpoint-read-modify-write-corrupts.md) - a sibling swaps the session-root file; assert issue-num in-process, and stop writing the canonical path once your PR is open
 - [External actor can merge your child PR mid-run](external-actor-can-merge-your-child-pr-midrun.md) — re-read PR state before the CI gate
 
 ## Artifact hygiene
@@ -125,3 +128,4 @@
 - [grep-count wrapper does not clear $LASTEXITCODE](grep-count-wrapper-does-not-clear-lastexitcode.md) — git grep exits 1 on zero matches
 - [Session-root shims are deleted by siblings](session-root-shims-are-deleted-by-siblings.md) — PRD_FEATURE_BLOCKED is a session-cwd path
 - [Stale-figure sweep by changed-file set](stale-figure-sweep-by-changed-file-set.md) — sweep the upstream PR's FULL changed-file set and
+- [Merging main invalidates the plan base anchor](merging-main-invalidates-plan-base-anchor.md) - a sibling-touched .csproj makes an exactly-one-line gate fail; anchor diffs to the MERGE commit

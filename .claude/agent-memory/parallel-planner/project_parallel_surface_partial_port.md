@@ -6,6 +6,24 @@ metadata:
   type: project
 ---
 
+**2026-08-29 UPDATE — defects 1 and 2 below are FIXED.** Re-read `config/blast-radius.json` on
+`main @ b56400ab`: the `claude-runtime` umbrella module is GONE (the module map is now exactly the
+18 real C# projects plus `config`), and `mandate_reads` has been extended to the ten entries
+`.claude/rules/**`, `.claude/skills/atomic-plan-contract/SKILL.md`,
+`.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, `.github/instructions/**`,
+`artifacts/**`, `quality-tiers.yml`, `.claude/skills/acceptance-criteria-tracking/SKILL.md`,
+`.claude/skills/policy-compliance-order/SKILL.md`, `.claude/agent-memory/**`, and
+`.agents/skills/**`. The 83.3%-density measurement below predates both fixes and should be
+re-measured before it is cited again. Defect 3 (placeholder tokens) and issue #576 (root build
+files absent from `shared_surfaces`) were NOT re-checked on 2026-08-29 and may still stand.
+
+A two-item run planned on 2026-08-29 (`bugs-635-440`) produced **zero** conflict edges between a
+`UtilitiesCS`-scoped bug and a docs-only audit, so the surface now discriminates rather than
+collapsing. Note the corollary: `.claude/agent-memory/**` being a `mandate_reads` exclusion is
+load-bearing and correct — every agent-driven branch writes those append-only index files, so
+counting them as contention would serialize every run. The cost is a possible trivial append-order
+merge conflict on the second PR, which is a merge-time cost and not a scheduling constraint.
+
 Status as of 2026-08-21, measured empirically on `main @ a01bdbb0`. Supersedes the 2026-08-11
 assessment, which is now wrong on its headline blocker. Re-verify before relying on this.
 

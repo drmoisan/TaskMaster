@@ -17,6 +17,16 @@ on `module_overlap`, so the cohort barrier serializes them:
 - module frequency: `QuickFiler` 51, `scripts/vscode` 11, `QuickFiler.Test` 6, `csproj/packages` 6,
   `UtilitiesCS` 4, `TaskMaster` 4, `UtilitiesCS.Test` 2, `.github/workflows` 2
 
+**Confirmed 2026-08-29 by the `bugs-638-644-647` run, at a scale small enough to audit by hand.**
+Three deliberately unrelated bugs — an `EmailFilerConfig` UI-thread crash, a `QfcCollectionController`
+registration mismatch, and a `FileIO2` retry defect in `UtilitiesCS` — still produced a COMPLETE
+conflict graph (all 3 pairs), hence 3 singleton cohorts and a fully serial run at
+`max_concurrency: 2`. Every pair carried a `module_overlap` on `QuickFiler` *in addition to* its
+path overlaps, so the serialization was genuine contention and not an artifact of the extractor's
+over-reporting. This is the useful diagnostic: when a pair conflicts, check whether it still
+conflicts after setting the spurious paths aside. Here it did. Thematic unrelatedness at the issue
+level does not imply blast-radius disjointness when one module dominates the corpus.
+
 `max_concurrency` is **inert** at this shape: 51 sequential cohort barriers, each requiring a full
 CI cycle plus PR merge before the next starts. Raising the cap changes nothing.
 
