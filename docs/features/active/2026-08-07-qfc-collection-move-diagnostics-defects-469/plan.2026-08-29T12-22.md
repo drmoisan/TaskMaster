@@ -3,9 +3,9 @@
 - **Issue:** #469
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-29T13-50
+- **Last Updated:** 2026-08-29T14-15
 - **Status:** Draft
-- **Version:** 0.4
+- **Version:** 0.5
 - **Work Mode:** full-bug (marker source: `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/issue.md`, line 12, `- Work Mode: full-bug`)
 - **Requirements and acceptance-criteria source:** `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/spec.md`, section `## Acceptance Criteria` (13 criteria, AC1 through AC13)
 - **Verified findings source:** `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/research/2026-08-29T12-31-qfc-collection-move-diagnostics-defects-469.md`
@@ -40,6 +40,13 @@ All evidence artifacts produced by this plan are written under
 `<kind>` is one of `baseline`, `regression-testing`, `qa-gates`, or `other`. No artifact is written
 under `artifacts/`. Every command-step artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:` and
 `Output Summary:`.
+
+Every file path recorded inside an evidence artifact is written repository-relative. Where a command
+prints an absolute path — MSBuild diagnostics in the non-zero branches of P0-T11, P0-T12, P6-T3 and
+P6-T4, and any absolute entry in the unformatted-file enumerations of P0-T10 and P6-T2 — the
+executor removes the repository-root prefix from the recorded text before saving the artifact, so no
+account name, machine name or drive letter is committed by P7-T14. The rewrite applies to recorded
+paths only; counts, exit codes and quoted summary lines are recorded verbatim.
 
 Throughout this plan `FEATURE` is shorthand for
 `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469`.
@@ -425,7 +432,21 @@ $LASTEXITCODE
   - the count for `IQfcCollectionController` is 0 in
     `QuickFiler/Controllers/QfcHomeController.Metrics.cs`;
   - the count for `.Where(` is 1 in `QuickFiler/Controllers/QfcHomeController.Metrics.cs`;
-  - the eight pre-edit tokens named in the R3 table each have count 1 in their named file;
+  - the eight pre-edit tokens listed below each have count 1 in their named file. They are drawn
+    from the `Currently reads` column of the "Defect-numbering inversion — exactly 8 sites" table
+    above, not from the R3 table, whose third column states post-edit text and whose tokens all have
+    count 0 before Phase 3 runs. In `QuickFiler/Controllers/QfcCollectionController.cs`:
+    `Issue #469 defect 1: exactly one diagnostics line` and
+    `Issue #469 defect 2: the null test must dominate`. In
+    `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs`:
+    `Issue #469 defect 1. Regression test proving that the diagnostics array`,
+    `issue #469 defect 1 requires one diagnostics line per cached move`,
+    `Issue #469 defect 1. Regression test proving the off-by-one`,
+    `issue #469 defect 1 requires exactly one diagnostics line per cached`,
+    `Issue #469 defect 2. Regression test proving that the item-controller null guard`, and
+    `issue #469 defect 2 requires the null guard to run before the first`. Each pairs the defect
+    number with its distinguishing text on one physical line and is the exact pre-edit counterpart
+    of a token P3-T3 or P3-T10 asserts after the edit;
   - `(Get-Content).Count` is 2437 for `QuickFiler/Controllers/QfcCollectionController.cs`, 215 for
     `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, 497 for
     `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs`, 453 for
@@ -447,6 +468,15 @@ git merge-base origin/main HEAD
 (Get-Content -LiteralPath 'QuickFiler.Test\Controllers\QfcHomeControllerMetricsTests.cs').Count
 (Get-Content -LiteralPath 'QuickFiler.Test\Controllers\QfcCollectionControllerTests.cs').Count
 @(Select-String -LiteralPath 'docs\features\active\quickfiler-home-controller-metrics-442\spec.md' -SimpleMatch -Pattern 'CFN-2 RESOLVED').Count
+@(Select-String -LiteralPath 'QuickFiler\Controllers\QfcCollectionController.cs' -SimpleMatch -Pattern 'Issue #469 defect 1: exactly one diagnostics line').Count
+@(Select-String -LiteralPath 'QuickFiler\Controllers\QfcCollectionController.cs' -SimpleMatch -Pattern 'Issue #469 defect 2: the null test must dominate').Count
+$m = 'QuickFiler.Test\Controllers\QfcCollectionControllerDefects468MoveTests.cs'
+@(Select-String -LiteralPath $m -SimpleMatch -Pattern 'Issue #469 defect 1. Regression test proving that the diagnostics array').Count
+@(Select-String -LiteralPath $m -SimpleMatch -Pattern 'issue #469 defect 1 requires one diagnostics line per cached move').Count
+@(Select-String -LiteralPath $m -SimpleMatch -Pattern 'Issue #469 defect 1. Regression test proving the off-by-one').Count
+@(Select-String -LiteralPath $m -SimpleMatch -Pattern 'issue #469 defect 1 requires exactly one diagnostics line per cached').Count
+@(Select-String -LiteralPath $m -SimpleMatch -Pattern 'Issue #469 defect 2. Regression test proving that the item-controller null guard').Count
+@(Select-String -LiteralPath $m -SimpleMatch -Pattern 'issue #469 defect 2 requires the null guard to run before the first').Count
 ```
 
 ---
@@ -1121,6 +1151,11 @@ was re-observed after that merge rather than before it. Items 18, 20, 22, 23, 24
 52 were re-derived directly in this pass. Item 18 was reclassified, item 31 was corrected for a line
 shift the merge introduced, and item 52 is new.
 
+The version 0.5 pass applied two localized text insertions and renumbered nothing. Items 53 and 54
+are new and record what that pass measured. Items 10 through 17 were re-measured as counts rather
+than as line reads in the same pass, because the version 0.5 delta makes P0-T15 assert those eight
+counts explicitly; each was confirmed at count 1 in its named file. No other citation changed.
+
 1. `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/issue.md:12` —
    re-derived: the line reads `- Work Mode: full-bug`. Mode resolves to `full-bug`, so `spec.md` is
    required and `user-story.md` is optional and absent.
@@ -1333,3 +1368,46 @@ shift the merge introduced, and item 52 is new.
     and `git rev-parse origin/main` agree, and `git diff origin/main --name-only -- QuickFiler
     QuickFiler.Test docs` returns only this feature folder's four documents. P0-T6 exists so the
     executor re-establishes this state, because `origin/main` can advance again before execution.
+53. P0-T15's eight-token bullet, table source correction — re-derived in this pass. The bullet
+    previously sourced its eight tokens from the R3 table, whose third column is headed `Becomes`
+    and states post-edit text. Every R3 token was measured at count 0 in its named file at branch
+    head — the two `QfcCollectionController.cs` tokens
+    (`Issue #469 defect 2: exactly one diagnostics line`,
+    `Issue #469 defect 1: the null test must dominate`) and the six
+    `QfcCollectionControllerDefects468MoveTests.cs` tokens
+    (`Issue #469 defect 2. Regression test proving that the diagnostics array`,
+    `issue #469 defect 2 requires one diagnostics line per cached move`,
+    `Issue #469 defect 2. Regression test proving the off-by-one`,
+    `issue #469 defect 2 requires exactly one diagnostics line per cached`,
+    `Issue #469 defect 1. Regression test proving that the item-controller null guard`,
+    `issue #469 defect 1 requires the null guard to run before the first`) — so a P0-T15 acceptance
+    demanding count 1 for them was unsatisfiable and would have halted the executor in Phase 0. The
+    bullet now names the eight tokens from the `Currently reads` column of the "Defect-numbering
+    inversion — exactly 8 sites" table. Each of those eight was measured at count 1 in its named
+    file in this pass: `Issue #469 defect 1: exactly one diagnostics line` and
+    `Issue #469 defect 2: the null test must dominate` in
+    `QuickFiler/Controllers/QfcCollectionController.cs`;
+    `Issue #469 defect 1. Regression test proving that the diagnostics array`,
+    `issue #469 defect 1 requires one diagnostics line per cached move`,
+    `Issue #469 defect 1. Regression test proving the off-by-one`,
+    `issue #469 defect 1 requires exactly one diagnostics line per cached`,
+    `Issue #469 defect 2. Regression test proving that the item-controller null guard` and
+    `issue #469 defect 2 requires the null guard to run before the first` in
+    `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs`. No one of the eight
+    is a substring of another, so the eight counts are independent. The P0-T15 command block gained
+    eight `Select-String` lines producing exactly these counts, so every count the acceptance
+    asserts is now produced by a command in the block; the block's other assertions
+    (rev-parse/merge-base, `one element longer`, `IQfcCollectionController`, `.Where(`, the five
+    line counts, `CFN-2 RESOLVED`) already had producing commands and are unchanged. The `$m`
+    variable introduced by those eight lines is local to the P0-T15 block and does not collide with
+    `$f` in P3-T10 or `$s` in P4-T3.
+54. Absolute-path exposure in committed evidence — re-derived from the plan text in this pass.
+    P7-T14 stages everything under `FEATURE/evidence/`, so every artifact this plan writes is
+    published. Six acceptance conditions require verbatim tool output that can carry an absolute
+    path: P0-T10 and P6-T2 enumerate unformatted files, and the non-zero branches of P0-T11,
+    P0-T12, P6-T3 and P6-T4 enumerate MSBuild diagnostics, which carry absolute paths. The evidence
+    location rule constrained only where artifacts are written, and the repository hook checks the
+    directory rather than the recorded text, so nothing kept an account name, machine name or drive
+    letter out of a committed artifact. The rule now requires repository-relative recorded paths and
+    names those six tasks explicitly. Counts, exit codes and quoted summary lines remain verbatim,
+    so no acceptance condition in those six tasks loses its observable value.
