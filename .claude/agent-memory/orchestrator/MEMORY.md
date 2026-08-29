@@ -58,7 +58,7 @@
 - [Unplanned epic-child worktree mechanics](unplanned-epic-child-worktree-mechanics.md) — cross-worktree delegation works via absolute
 - [Epic generic-constraint cascades across children](epic-generic-constraint-cascades-multiple-children.md) — a `where TKey : notnull
 - [Parallel epic children name collisions](parallel-epic-children-name-collisions.md) — siblings coin identical type names; CS0101/CS0104
-- [feature-review is ALWAYS fable](model-routing-feature-review-is-always-fable.md) — no band makes an opus review conformant; the PR hook
+- [feature-review is fable only under `preferred`](model-routing-feature-review-is-always-fable.md) — CORRECTED: under `available` it is C3 opus; resolve, never recall
 - [delegation_receipts namespaces + checkpoint owner race](checkpoint-receipt-namespaces-and-owner-race.md) — only {agents, promotion}
 - [Model-routing: use the portable PS modules](model-routing-scripts-absent-on-epic-integration-base.md) — when scripts/dev_tools is
 - [Swordfish epic F5 ScoDictionary blocker (RESOLVED)](project_swordfish_epic_f5_blocked_on_old_scodictionary.md) — grep the OLD class base

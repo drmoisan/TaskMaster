@@ -51,6 +51,32 @@ from the branch entirely — the validator checks receipt shape and floor/model 
 you shelled out to the Python reference implementations. See
 [[model-routing-scripts-absent-on-epic-integration-base]].
 
+**Two more gates, verified 2026-08-29 on the #635 parallel-item run.** These are enforced by the
+pushed-down PowerShell modules, not only by the MCP validator, so they bite even when the MCP route is
+not used.
+
+- `enforce-orchestration-preimplementation-gate.ps1` additionally requires a top-level
+  **`lifecycle_ready: true`**. `Test-OrchestrationReady` reads `issue-num`, `feature-folder`,
+  `route_id` (falling back to `path_selected`), and `lifecycle_ready`, and denies when any is falsy.
+  A checkpoint carrying every documented key but omitting `lifecycle_ready` still fails with
+  `PREIMPLEMENTATION_GATE_BLOCKED`, whose message does not name the missing key. That gate also blocks
+  the **Write tool creating the checkpoint itself**, so bootstrap it with `python3 -c` instead.
+- `delegation_receipts` may be a LIST or an OBJECT namespace, but the object form's **`agents` value
+  must itself be a LIST**, not a map keyed by agent name. A map produces
+  `Checkpoint delegation_receipts.agents must be a list.` Only `agents` and `promotion` are supported
+  keys of the object form. The eight per-receipt required keys above apply to the entries of that inner
+  list.
+- Run the gate yourself before delegating or creating a PR rather than guessing the shape:
+  `Import-Module ./.claude/lib/orchestrator-state/OrchestratorState.psm1 -Force;`
+  `Invoke-OrchestratorStatePreflight -CheckpointPath artifacts/orchestration/orchestrator-state.json`
+  names every missing key in one pass, which converges in two or three rounds instead of one key at a
+  time.
+
+**`enforce-promotion-mcp-only.ps1` matches Bash command TEXT, not intent.** A `python3 -c` that merely
+writes the MCP promotion tool-name literals into a checkpoint's `required_mcp_tools` array is blocked
+with `PROMOTION_MCP_ONLY_BLOCKED`. Split the literals across string concatenation to write them.
+See [[hooks-pattern-match-bash-command-text]].
+
 **Do not fabricate a lost receipt.** When a prior attempt dies and takes the gitignored checkpoint
 with it, the raw MCP promotion payloads are gone. Record `receipt: null` plus a `receipt_note`
 explaining what corroborates the invocation (folder on disk, issue.md provenance section), and set
