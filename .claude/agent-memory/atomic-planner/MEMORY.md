@@ -19,6 +19,7 @@
 - [#677 R1–R8](project_677_keyboard_focus_leak_plan_seams.md) — ctor param REJECTED (5 reflection-arity tests); typed harness for compile-red; internal 9-arg ctor, never ambient SetSynchronizationContext; per-file non-vacuity floors
 - [#635](project_635_reflective_caller_audit_plan_seams.md) — evidence-only audit: tracked plan inflates its own sweep; scan hits its own pattern list; spec said six sites, tree has eight; pathspec breadth inflates a count
 - [#440 R1–R4](project_440_breadcrumb_left_arrow_plan_seams.md) — deletion-only change voids a diff-derived changed-line gate; `(Rebuild target(s))`, NOT `(Rebuild target)`; `.csharpierignore` matches the `.cobertura.xml` suffix; `.dotnet-sdk` IS gitignored (`.gitignore:350`); cite an AC by sentence only after counting its sentences; `Include` resolves against the declaring project's dir
+- [#637 R2/R3](project_637_selectrow_rooted_path_plan_seams.md) — `docs/features/active` operand hits 121 sibling evidence files; the untracked-440 claim was FALSE for the agent worktree; blanket `-F` breaks every regex; pre-format range consumed post-format; probe with no branch for the outcome that occurs
 - [#680](project_680_menu_mode_plan_seams.md) — HostTests.cs 499 not 500; set-difference format gate; TRX 5-shape identifiers, `grep -a`; append-a-dated-literal discriminator; post-merge remediation: exact line arithmetic — the review's "optional" fallback was load-bearing (501 vs 500)
 
 ## Plan-structure traps
@@ -48,6 +49,7 @@
 - [Enumeration variable must match its consumer](enumeration-variable-must-match-consumer.md) — `$kept` produced vs `@assemblies` splatted = zero-assembly vstest run reporting zero failures
 - [Diff gates need a commit task](diff-gates-need-a-commit-task.md) — `git diff <BASE>..HEAD` passes vacuously with no commit task
 - [Never pin a HEAD SHA as a plan expectation](never-pin-head-sha-as-plan-expectation.md) — gate on tree invariants instead
+- [Harness gitStatus may describe another worktree](harness-git-status-may-describe-another-worktree.md) — measure inside the target worktree (index grep + negative control) or mark the fact unverified
 - [Absolute counts in shared files go stale](absolute-counts-in-shared-files-go-stale.md) — lower-bound/baseline-relative for co-owned files; keep exact the count the task changes
 - [.claude/agent-memory is tracked](agent-memory-is-tracked-scope-git-gates.md) — scope every diff/status/grep gate or it is unsatisfiable
 - [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — verify with `git ls-files`, not `obj/`

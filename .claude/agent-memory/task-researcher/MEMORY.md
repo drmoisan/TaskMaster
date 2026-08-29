@@ -45,6 +45,7 @@
 - [qfc677-webview2-focus-hold-outlook-keyboard](project_qfc677_webview2_focus_hold_outlook_keyboard.md) — #677: Outlook keyboard death = WebView2 focus hold (WV2Feedback #951) + unconditional FinishClose _focusAnchor steal, NOT a repo hook; fix = focus-permission predicate + deactivate parking (2026-08-28)
 - [qfc680-menu-mode-keyboard-capture](project_qfc680_menu_mode_keyboard_capture.md) — #680: ModalMenuFilter retargets keys on non-focusing ToolStripDropDown show; AutoClose=false pre-Show is the only public opt-out; #438 HV-1 residual, not fixable via #677 MayTakeFocus (2026-08-28)
 - [reflective-caller-closure-635](project_reflective_caller_closure_635.md) — #635/#468: removal was THIRTEEN members (`_templateTlp` omitted from AC-16); `GetField(` never searched (172 hits) yet is the only reaching mechanism; QuickFiler is ComVisible(false) (2026-08-29)
+- [selectrow-two-families-637](project_selectrow_two_families_637.md) — #637: TWO unrelated SelectRow families (bare grep over-counts ~10x); blanket TryMakeArchiveRelative rejects relative/Trash rows; ButtonOK_Click does NOT rethrow (2026-08-29)
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
