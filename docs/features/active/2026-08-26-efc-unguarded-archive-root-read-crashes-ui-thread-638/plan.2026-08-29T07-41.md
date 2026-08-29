@@ -1024,7 +1024,7 @@ Leave any criterion whose evidence is absent unchecked.
   the realized branch is verifiable — either the AC16 line begins `- [x] AC16` with its text unchanged
   and [P6-T5] recorded `Failed: 0` with an empty exception list, or the AC16 line begins `- [ ] AC16`
   and the [P6-T5] artifact contains the `REMEDIATION-REQUIRED:` line.
-- [ ] [P8-T19] Check off AC17 once [P7-T2] records `CHANGED_LINE_COVERAGE_PERCENT:` at or above 90.0
+- [x] [P8-T19] Check off AC17 once [P7-T2] records `CHANGED_LINE_COVERAGE_PERCENT:` at or above 90.0
   and [P7-T3] records all four numeric fields with a delta at or above the stated tolerance and with
   `BASELINE_COVERAGE_XML_MODE:` equal to `POSTCHANGE_COVERAGE_XML_MODE:`.
   Acceptance: the AC17 line begins `- [x] AC17` and its text is unchanged.
@@ -1072,7 +1072,7 @@ Leave any criterion whose evidence is absent unchecked.
 
 ### Phase 9 — Commit, Footprint Verification, and Clean Tree
 
-- [ ] [P9-T1] Stage and commit all work with pathspecs scoped to this change:
+- [x] [P9-T1] Stage and commit all work with pathspecs scoped to this change:
   `git add -A -- QuickFiler QuickFiler.Test docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638`
   followed by a commit whose subject references issue 638. The pathspecs are mandatory: `git add -A`
   without them would sweep unrelated tracked paths, including `.claude/agent-memory`, onto this branch.
@@ -1081,7 +1081,7 @@ Leave any criterion whose evidence is absent unchecked.
   `QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs` and
   `QuickFiler.Test/QuickFiler.Test.csproj`, and lists no path outside the three pathspecs above; and
   `git log -1 --format=%s` contains the literal `638`.
-- [ ] [P9-T2] Verify the change footprint against the merge base. Run
+- [x] [P9-T2] Verify the change footprint against the merge base. Run
   `git diff --name-only ecdb1c84ba8541ab67042985919cfed4df768c01..HEAD` and, as its companion span,
   `git status --porcelain -uall -- QuickFiler QuickFiler.Test docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638`,
   and write
@@ -1096,7 +1096,7 @@ Leave any criterion whose evidence is absent unchecked.
   particular it must not name `QuickFiler/Controllers/EfcFormController.cs`,
   `TaskMaster/AppGlobals/AppOlObjects.cs`, `TaskMaster/AppGlobals/ArchiveRootPathGuard.cs` or
   `UtilitiesCS/Interfaces/IGlobals/IOlObjects.cs`.
-- [ ] [P9-T3] Write
+- [x] [P9-T3] Write
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/qa-gates/p9-t3-clean-tree.md`
   with the four schema fields, summarizing the outcome of every phase and listing every evidence
   artifact this plan produced with its `EXIT_CODE:`, then stage and commit both it and the [P9-T2]
@@ -1105,7 +1105,7 @@ Leave any criterion whose evidence is absent unchecked.
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/qa-gates/p9-t2-change-footprint.md`
   and
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/evidence/qa-gates/p9-t3-clean-tree.md`.
-- [ ] [P9-T4] Close the plan and confirm the working tree is clean within this change's scope. First
+- [x] [P9-T4] Close the plan and confirm the working tree is clean within this change's scope. First
   mark every remaining unchecked box in
   `docs/features/active/2026-08-26-efc-unguarded-archive-root-read-crashes-ui-thread-638/plan.2026-08-29T07-41.md`,
   including [P9-T3] and this task. Then run
