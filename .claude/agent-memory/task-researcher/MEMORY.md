@@ -44,6 +44,7 @@
 - [efc614-store-root-stem-leak](project_efc614_store_root_stem_leak.md) — #614: verbatim ToArchiveRelativePath + unvalidated DestinationOlStem; #609 fix is FolderPredictor-only by design; FolderConverterTests.cs:329 codifies a bug (2026-08-26)
 - [qfc677-webview2-focus-hold-outlook-keyboard](project_qfc677_webview2_focus_hold_outlook_keyboard.md) — #677: Outlook keyboard death = WebView2 focus hold (WV2Feedback #951) + unconditional FinishClose _focusAnchor steal, NOT a repo hook; fix = focus-permission predicate + deactivate parking (2026-08-28)
 - [qfc680-menu-mode-keyboard-capture](project_qfc680_menu_mode_keyboard_capture.md) — #680: ModalMenuFilter retargets keys on non-focusing ToolStripDropDown show; AutoClose=false pre-Show is the only public opt-out; #438 HV-1 residual, not fixable via #677 MayTakeFocus (2026-08-28)
+- [issue-469-already-fixed-residual-is-629](project_issue_469_already_fixed_residual_is_629.md) — #469's 4 defects verified fixed on main; only residual is param removal = existing #629; `Initialized<T>` never memoizes; defect 1/2 numbering inverted (2026-08-29)
 - [reflective-caller-closure-635](project_reflective_caller_closure_635.md) — #635/#468: removal was THIRTEEN members (`_templateTlp` omitted from AC-16); `GetField(` never searched (172 hits) yet is the only reaching mechanism; QuickFiler is ComVisible(false) (2026-08-29)
 
 ## Artifact hygiene
