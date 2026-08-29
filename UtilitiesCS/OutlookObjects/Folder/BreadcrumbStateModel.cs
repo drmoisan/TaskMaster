@@ -224,15 +224,15 @@ namespace UtilitiesCS.OutlookObjects.Folder
             {
                 return false;
             }
-            // #440: attempt the tree transition first (decision D1 handling order). It selects the
-            // parent of the leaf-anchored node; once a non-leaf node is selected, or while a child
-            // of the open expansion is selected, no parent-select is available and the pre-existing
-            // behavior runs unchanged.
+            // #440: attempt the tree transition first (decision D1 handling order). Each press
+            // selects the parent of the currently active node, so repeated Left walks the ancestor
+            // chain to the root. No index test is needed here: ActivateSegment refuses a negative
+            // index, which is what preserves the root boundary and the pre-existing fall-through.
+            // While a child of the open expansion is selected, no parent-select is available.
             int? activeIndex = row.ActiveSegmentIndex;
             if (
                 _selectedSubfolderIndex < 0
                 && activeIndex.HasValue
-                && activeIndex.Value == row.Chain.Count - 1
                 && row.ActivateSegment(activeIndex.Value - 1)
             )
             {

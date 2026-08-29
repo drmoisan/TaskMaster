@@ -491,35 +491,114 @@ class doc comments.
 
 ## Acceptance Criteria
 
-- [ ] AC-1: On the Qfc surface, for a selected suggestion row whose resolved chain has `N` segments
+- [x] AC-1: On the Qfc surface, for a selected suggestion row whose resolved chain has `N` segments
       with the active segment index at the leaf and no subfolder selected, each of the first `N-1`
       consecutive Left presses returns `true` and decrements the active segment index by exactly one,
       ending with index 0 (the root of the resolved chain) active. Verified by an MSTest test that
       asserts the active segment index after every press.
-- [ ] AC-2: The clause `activeIndex.Value == row.Chain.Count - 1` is removed from the `LeftArrow()`
+      - Evidence: `evidence/regression-testing/p1-t4-fail-before.2026-08-29T06-30.md` (fail-before,
+        `EXIT_CODE: 1`, both presses-2 assertions failing) and
+        `evidence/regression-testing/p3-t1-pass-after.2026-08-29T06-32.md` (pass-after,
+        `EXIT_CODE: 0`, `Total tests: 2` / `Passed: 2`). The test that asserts the active segment
+        index after every press is `LeftArrow_RepeatedOnThreeSegmentChain_WalksToRootThenReportsUnhandled`
+        in `UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbStateModelSequenceTests.cs`: on the
+        three-segment fixture it asserts the starting index is 2, then index 1 after press 1, index 0
+        after press 2, and `false` with index still 0 on press 3.
+- [x] AC-2: The clause `activeIndex.Value == row.Chain.Count - 1` is removed from the `LeftArrow()`
       transition guard in `UtilitiesCS/OutlookObjects/Folder/BreadcrumbStateModel.cs`, and no other
       conditional in that method is altered. Verified by inspection of the diff for that file.
-- [ ] AC-3: The clause `_selectedSubfolderIndex < 0` is retained in the same guard, and the existing
+      - Evidence: the P2-T1 acceptance result — `Select-String -SimpleMatch` for the literal
+        `activeIndex.Value == row.Chain.Count - 1` in that file returns **zero** matches, and for the
+        retained literal `row.ActivateSegment(activeIndex.Value - 1)` returns **exactly one**. Both
+        were counted as exactly 1 before the edit by P0-T9
+        (`evidence/baseline/structural-baseline.2026-08-29T06-23.md`), so both halves could fail.
+      - Evidence: the third span of `evidence/qa-gates/p3-t5-diff-scope.2026-08-29T06-34.md`, the
+        hunk-level `git diff` of the production file. It shows exactly one removed line whose content
+        is not a comment, and shows the `if (` opener, the closing `)`, the `int? activeIndex`
+        assignment, the `return true;` body, the `_selectedSubfolderIndex >= 0` reset block and the
+        `return row.TryCollapseLeaf();` tail all as unchanged context, so no other conditional in the
+        method changed.
+- [x] AC-3: The clause `_selectedSubfolderIndex < 0` is retained in the same guard, and the existing
       test `LeftArrow_WithSubfolderSelected_ResetsSubfolderSelectionAndCollapses` in
       `UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbStateModelSequenceTests.cs` passes without
       modification. Verified by the diff plus a green run of that test.
-- [ ] AC-4: With the root of the resolved chain already active, Left still returns `false`, the Qfc
+      - Evidence: the third span of `evidence/qa-gates/p3-t5-diff-scope.2026-08-29T06-34.md`, in
+        which the `_selectedSubfolderIndex < 0` conjunct is rendered with a **leading space** as its
+        first character, the diff context marker, rather than the leading `-` a deleted line carries.
+        The conjunct is therefore unchanged.
+      - Evidence: `evidence/qa-gates/p3-t2-qfc-no-regression.2026-08-29T06-32.md`, which reads an
+        `Outcome` of `Passed` for
+        `LeftArrow_WithSubfolderSelected_ResetsSubfolderSelectionAndCollapses` directly from the TRX.
+        That test is untouched by this change, so it passed without modification.
+- [x] AC-4: With the root of the resolved chain already active, Left still returns `false`, the Qfc
       router still emits an unhandled Left arrow, and the legacy fall-through that closes the folder
       drop-down is retained unchanged. Verified by the corrected router test and by the absence of
       QuickFiler/Controllers/KeyboardHandler.cs from the diff.
-- [ ] AC-5: Right on a node with no children still returns `false` and still reaches the unhandled
+      - Evidence: `evidence/qa-gates/p3-t2-qfc-no-regression.2026-08-29T06-32.md`, TRX `Outcome` of
+        `Passed` for the corrected `Route_LeftArrow_NothingToCollapse_ReportsUnhandledLeft`, which
+        now drives the chain to the root with two Arrange presses and then asserts that the third
+        press yields `UnhandledArrowMessage` with direction Left.
+      - Evidence: `evidence/qa-gates/p3-t3-efc-no-regression.2026-08-29T06-33.md`, TRX `Outcome` of
+        `Passed` for `Boundary_QfcUnhandledArrow_StillReachesBreadcrumbArrowFallThrough`, the
+        fall-through boundary observed at the interface seam.
+      - Evidence: the **fourth span** of `evidence/qa-gates/p3-t5-diff-scope.2026-08-29T06-34.md`,
+        the repository-wide anchored diff file list, in which QuickFiler/Controllers/KeyboardHandler.cs
+        is absent. The fourth span is named explicitly as the source of this absence observation
+        because the first span is pathspec-scoped to `UtilitiesCS` and `UtilitiesCS.Test` and cannot
+        report a QuickFiler path either way.
+- [x] AC-5: Right on a node with no children still returns `false` and still reaches the unhandled
       fall-through, so the Pop Out / Enumerate Conversation dialog remains reachable by keyboard.
       Verified by the existing `Route_RightArrow_NothingToExpand_ReportsUnhandledRight` test passing
       unmodified.
-- [ ] AC-6: `Route_LeftArrow_NothingToCollapse_ReportsUnhandledLeft` in
+      - Evidence: `evidence/qa-gates/p3-t2-qfc-no-regression.2026-08-29T06-32.md`, TRX `Outcome` of
+        `Passed` for `Route_RightArrow_NothingToExpand_ReportsUnhandledRight`. That test is not
+        touched by this change, so it passed unmodified.
+      - Evidence: the third span of `evidence/qa-gates/p3-t5-diff-scope.2026-08-29T06-34.md`, the
+        hunk-level production-file diff, whose only hunk is inside `LeftArrow()`. Neither
+        `RightArrow()` nor `TryRightTreeTransition()` appears in it, so the Right transition is
+        unchanged; in particular the `activeIndex.Value >= row.Chain.Count - 1` condition inside
+        `TryRightTreeTransition` is a different and correct condition and was not touched.
+- [x] AC-6: `Route_LeftArrow_NothingToCollapse_ReportsUnhandledLeft` in
       `UtilitiesCS.Test/OutlookObjects/Folder/FolderBreadcrumbBridgeRouterTests.cs` is updated so it
       walks the chain to the root before asserting the unhandled Left, and its Arrange comment no
       longer states the one-step limit. Verified by reading the updated test and its comment.
-- [ ] AC-7: `Arrows_RightExpandsThenLeftCollapses_UnhandledWhenNothingChanges` in
+      - Evidence: the P2-T4 acceptance result — `Select-String -SimpleMatch` for the superseded
+        literal `the one available #440 parent-select transition` in that file returns **zero**
+        matches (it was present exactly once at the base commit, at line 370), and the file is 491
+        lines, at or under its 495-line baseline.
+      - Evidence: the rewritten Arrange comment, quoted verbatim so a reviewer can read that it no
+        longer states the one-step limit:
+
+        ```
+        // Arrange: #440 Left walks the ancestor chain, so on this three-segment fixture two
+        // presses are needed to reach the root. Only once the root is active does nothing
+        // remain to collapse and no further tree transition apply.
+        ```
+
+        The Arrange block now issues two `ArrowAsync(router, "left")` presses before the Act block's
+        asserted third press.
+- [x] AC-7: `Arrows_RightExpandsThenLeftCollapses_UnhandledWhenNothingChanges` in
       `UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbStateModelSequenceTests.cs` is updated to the
       corrected contract, with the rationale for the chosen repair recorded in the test comment.
       Verified by reading the updated test and its comment.
-- [ ] AC-8: New MSTest coverage for the walk-to-root behavior exists in
+      - Evidence: the P2-T3 acceptance result — `Select-String -SimpleMatch` for the superseded
+        literal `a second Left is unhandled` in that file returns **zero** matches (it was present
+        exactly once at the base commit, in the comment this correction replaced), and the file still
+        contains exactly one declaration of the test.
+      - Evidence: the rewritten comment, whose rationale sentence records decision D1 verbatim:
+
+        ```
+        // #440 corrected contract: Left walks the ancestor chain, so the unhandled press comes
+        // only once the root is active. Decision D1: the sequence is extended to the root rather
+        // than re-pointed at a single-segment row, because the single-segment boundary is already
+        // covered by ArrowKey_QfcSingleSegmentRow_TakesPreExistingCollapsePath, and re-pointing
+        // would delete the only sequence-level assertion over the three-segment fixture.
+        ```
+
+        The corrected sequence asserts Left press 1 returns `true` with `LeafExpanded` false and
+        active index 1, press 2 returns `true` with active index 0, and only then that press 3
+        returns `false`.
+- [x] AC-8: New MSTest coverage for the walk-to-root behavior exists in
       `UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbStateModelSequenceTests.cs`, uses
       FluentAssertions, follows Arrange-Act-Assert, and creates no temporary file and no Outlook,
       WebView2, or timer dependency. Moq is required only where the test under construction
@@ -535,35 +614,170 @@ class doc comments.
       in which this issue was expected to change the router-level child-expansion path. Under the
       narrowed scope the unconditional clause had no referent. The orchestrator amended it on
       2026-08-29 rather than leave a criterion that no correct implementation could satisfy.
-- [ ] AC-9: No behavior change on the Efc surface. QuickFiler/Controllers/BreadcrumbBridgeRouter.Arrows.cs,
+      - The two new tests are `LeftArrow_RepeatedOnThreeSegmentChain_WalksToRootThenReportsUnhandled`
+        and `LeftArrow_WalkFromAnOpenLeafExpansion_ClearsTheExpansionAndStillReachesTheRoot`, both in
+        `UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbStateModelSequenceTests.cs`.
+      - Evidence: `evidence/regression-testing/p3-t1-pass-after.2026-08-29T06-32.md`, the green
+        headless run — `EXIT_CODE: 0`, `Total tests: 2`, `Passed: 2`.
+      - Both tests carry `[TestMethod]`, use FluentAssertions for every assertion, follow
+        Arrange-Act-Assert with labelled sections, and carry an XML doc comment stating the scenario.
+        Neither creates a temporary file, and neither takes an Outlook, WebView2, or timer
+        dependency; each runs entirely in process against an in-memory `BreadcrumbStateModel`.
+      - Conditional-Moq clarification, so a reviewer does not read the absence of a mock in the two
+        new tests as a policy gap: the amended criterion requires Moq only where the test under
+        construction exercises a collaborator seam. The walk-to-root transition runs entirely inside
+        an in-memory `BreadcrumbStateModel` built by the existing `ModelWithSuggestion()` helper and
+        has no collaborator to mock, so introducing a mock there would add a dependency the code
+        under test does not take. FluentAssertions, which the amended criterion requires
+        unconditionally, is used throughout both tests.
+      - The mocked `IFolderHierarchyProvider` seam is exercised at the router level by the corrected
+        `Route_LeftArrow_NothingToCollapse_ReportsUnhandledLeft` in
+        `UtilitiesCS.Test/OutlookObjects/Folder/FolderBreadcrumbBridgeRouterTests.cs`, whose Arrange
+        builds the router through that file's `ProviderMock()` helper, which constructs
+        `new Mock<IFolderHierarchyProvider>(MockBehavior.Strict)`.
+- [x] AC-9: No behavior change on the Efc surface. QuickFiler/Controllers/BreadcrumbBridgeRouter.Arrows.cs,
       QuickFiler/Controllers/BreadcrumbBridgeRouter.cs, and
       UtilitiesCS/OutlookObjects/Folder/BreadcrumbRow.cs are absent from the diff, and the full
       QuickFiler.Test Efc breadcrumb router suite passes unmodified. Verified by the diff file list
       and the test run.
-- [ ] AC-10: No new test file is added and UtilitiesCS.Test/UtilitiesCS.Test.csproj is absent from
+      - Evidence for the QuickFiler half of the absence observation: the **fourth span** of
+        `evidence/qa-gates/p3-t5-diff-scope.2026-08-29T06-34.md`, the repository-wide anchored diff
+        file list, which contains neither QuickFiler/Controllers/BreadcrumbBridgeRouter.Arrows.cs nor
+        QuickFiler/Controllers/BreadcrumbBridgeRouter.cs. The fourth span supplies this half because
+        the first span is pathspec-scoped to the two owned roots and cannot report a QuickFiler path
+        either way.
+      - Evidence for the BreadcrumbRow half: the **first span** of the same artifact, the anchored
+        diff over `UtilitiesCS` and `UtilitiesCS.Test`, whose three-path list contains no
+        UtilitiesCS/OutlookObjects/Folder/BreadcrumbRow.cs entry. That span covers `UtilitiesCS`, so
+        it is the correct source for this half.
+      - Evidence for the suite: `evidence/qa-gates/p3-t3-efc-no-regression.2026-08-29T06-33.md` —
+        `EXIT_CODE: 0`, `Total tests: 119`, `Passed: 119`, with all four Efc router classes
+        represented in the TRX (24, 26, 10 and 8 results respectively) and
+        `HandleArrowKey_RepeatedLeft_WalksToRootThenFallsThroughToExistingBehavior` and
+        `LeftAndRightBreadcrumbMessages_RemainSupported` both `Passed`.
+- [x] AC-10: No new test file is added and UtilitiesCS.Test/UtilitiesCS.Test.csproj is absent from
       the diff. Verified by the diff file list.
-- [ ] AC-11: `UtilitiesCS.Test/OutlookObjects/Folder/FolderBreadcrumbBridgeRouterTests.cs` and
+      - Evidence: the **second span** of `evidence/qa-gates/p3-t5-diff-scope.2026-08-29T06-34.md`,
+        `git status --porcelain -- UtilitiesCS UtilitiesCS.Test`, whose three entries all carry the
+        modification status field `M ` and none of which carries an add (`A`), untracked (`?`), or
+        rename (`R`) status field. No file was created under either owned root, so no new test file
+        was added.
+      - Evidence: the **first span** of the same artifact, the anchored diff file list, which names
+        exactly `UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbStateModelSequenceTests.cs`,
+        `UtilitiesCS.Test/OutlookObjects/Folder/FolderBreadcrumbBridgeRouterTests.cs` and
+        `UtilitiesCS/OutlookObjects/Folder/BreadcrumbStateModel.cs`.
+        UtilitiesCS.Test/UtilitiesCS.Test.csproj is absent from it.
+- [x] AC-11: `UtilitiesCS.Test/OutlookObjects/Folder/FolderBreadcrumbBridgeRouterTests.cs` and
       `UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbStateModelSequenceTests.cs` each remain at or
       under 500 lines after the change. Verified by a line count of each file.
-- [ ] AC-12: The diff touches exactly three repository files:
+      - Evidence: `evidence/qa-gates/p3-t4-file-sizes.2026-08-29T06-33.md`, which records all three
+        owned files at or under 500 lines, and
+        `evidence/qa-gates/p4-t1-csharpier-format.2026-08-29T06-34.md`, which records the formatting
+        step as having rewritten **0** files (identical SHA-256 digests before and after).
+      - Post-format re-measurement, taken after the final P4-T1 formatter pass, so these are
+        post-format counts: `FolderBreadcrumbBridgeRouterTests.cs` is **491** lines and
+        `BreadcrumbStateModelSequenceTests.cs` is **292** lines. Both are at or under 500. The
+        counts are unchanged from the P3-T4 measurement because the formatter rewrote nothing.
+- [x] AC-12: The diff touches exactly three repository files:
       `UtilitiesCS/OutlookObjects/Folder/BreadcrumbStateModel.cs`,
       `UtilitiesCS.Test/OutlookObjects/Folder/FolderBreadcrumbBridgeRouterTests.cs`, and
       `UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbStateModelSequenceTests.cs`, plus this
       feature folder's own documentation and evidence artifacts. Verified by the diff file list.
-- [ ] AC-13: The two boundary decisions are recorded in this spec as already decided under #498
+      - Evidence: the **fourth span** of `evidence/qa-gates/p3-t5-diff-scope.2026-08-29T06-34.md`,
+        `git diff --name-only <BASE> -- . ":(exclude)docs" ":(exclude).claude"`, whose output is
+        exactly those three source paths and no others. The fourth span is named explicitly as the
+        source of the exactly-three-repository-files count because AC-12's claim is about the whole
+        repository, and the first span is pathspec-scoped to the two owned roots and cannot report a
+        path outside them.
+      - Evidence: the **fifth span** of the same artifact,
+        `git status --porcelain -- QuickFiler QuickFiler.Test`, whose output is **empty**. This
+        catches a file created rather than modified under either QuickFiler root, which a
+        name-listing diff is blind to.
+      - This feature folder's own documentation and evidence artifacts are the explicitly permitted
+        addition named by the criterion itself; they are excluded from the fourth span by the `docs`
+        exclusion.
+- [x] AC-13: The two boundary decisions are recorded in this spec as already decided under #498
       decision D2 / AC-23 / AC-24, and the #400 AC-9 supersession record is cited rather than
       re-authored. No new supersession record is created anywhere in this feature folder. Verified by
       inspection of this spec and the feature folder contents.
-- [ ] AC-14: A full C# toolchain pass completes with zero errors in a single final pass, in order:
+      - Confirmed by inspection, without editing this spec's prose: the "Boundary decisions —
+        DECIDED, do not reopen" subsection above records **Left at the root** and **Right on a
+        childless node** as both ratified under feature #498 decision D2 and locked by its landed
+        AC-23 and AC-24, with provenance given as
+        `docs/features/active/breadcrumb-router-navigation-defects-498/spec.md`.
+      - Confirmed by inspection: the "Issue #400 reconciliation" subsection **cites** the existing
+        record at
+        `docs/features/active/breadcrumb-router-navigation-defects-498/evidence/qa-gates/p7-t7-ac21-supersession-record.md`
+        and states "Cite the existing record; do not duplicate it." It re-authors nothing.
+      - `SearchScope:` the whole feature folder
+        `docs/features/active/2026-08-07-breadcrumb-left-right-arrow-parent-child-navigation-440`,
+        searched recursively; 33 files, comprising `issue.md`, `spec.md`, the plan, the single
+        research artifact, and 29 files under `evidence/`.
+      - `SearchPatterns:` case-insensitive regular expression `supersession|supersede|retract`
+        applied to file content across that whole tree.
+      - `SearchResult:` matches were found, and every one is either (a) a citation of, or an
+        instruction to cite rather than re-author, the existing #498 record; (b) the plan's own
+        version-history line and its instruction "No new supersession record is authored anywhere in
+        this feature folder (AC-13)"; or (c) an unrelated use of the word, such as the plan and the
+        P3-T5 artifact describing the superseded `#440` source comment. **No file in this feature
+        folder declares a new supersession record.** The negative claim is therefore auditable
+        rather than an unqualified absence assertion.
+- [x] AC-14: A full C# toolchain pass completes with zero errors in a single final pass, in order:
       `dotnet tool run csharpier check .`; `msbuild TaskMaster.sln /t:Rebuild ... /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`;
       `msbuild TaskMaster.sln /t:Rebuild ... /p:TreatWarningsAsErrors=true`; and
       `vstest.console.exe ... /EnableCodeCoverage`. The msbuild steps must be shown to be non-vacuous,
       with no `Skipping target "CoreCompile"` occurrences. Evidence recorded under this feature
       folder's `evidence/qa-gates/` directory.
-- [ ] AC-15: Line and branch coverage for
+      - Evidence, in the criterion's own order, each with its exit code:
+        1. `evidence/qa-gates/p4-t2-csharpier-check.2026-08-29T06-35.md` — `EXIT_CODE: 0`;
+           `Checked 1560 files`, equal to the P0-T10 baseline count.
+        2. `evidence/qa-gates/p4-t3-analyzer-build.2026-08-29T06-36.md` — `EXIT_CODE: 0`;
+           0 errors, 5 warnings, at the baseline warning count.
+        3. `evidence/qa-gates/p4-t4-nullable-build.2026-08-29T06-36.md` — `EXIT_CODE: 0`;
+           0 errors, 5 warnings.
+        4. `evidence/qa-gates/p4-t5-test-coverage.2026-08-29T06-38.md` — `EXIT_CODE: 0`;
+           `Total tests: 6859`, `Passed: 6859`, no failures.
+      - Evidence for the single final pass: `evidence/qa-gates/p4-t7-consecutive-pass.2026-08-29T06-40.md`,
+        which lists the five Phase 4 artifacts in ascending timestamp order with exit code 0 each,
+        records the formatter's rewritten-file count as 0, and records 0 restarts.
+      - The four non-vacuity counts, as recorded numbers. In
+        `evidence/qa-gates/p4-t3-analyzer-build.2026-08-29T06-36.md`: occurrences of
+        `Skipping target "CoreCompile"` = **0**, occurrences of `(Rebuild target(s))` = **40**. In
+        `evidence/qa-gates/p4-t4-nullable-build.2026-08-29T06-36.md`: occurrences of
+        `Skipping target "CoreCompile"` = **0**, occurrences of `(Rebuild target(s))` = **40**. The
+        zero counts are the negative half of the proof and the 40 counts are the positive half,
+        which is what fails if a log is empty or was never written.
+      - Tool substitution for the criterion's fourth command: it is discharged by the repository
+        wrapper `scripts\vscode\Invoke-MSTestWithCoverage.ps1` rather than by a bare
+        `vstest.console.exe ... /EnableCodeCoverage`. The wrapper is what supplies `/InIsolation` and
+        the `TestCategory!=LiveOutlook` exclusion, which is what keeps a real Outlook process from
+        launching during a full-suite run; a bare invocation omits that exclusion. The wrapper
+        collects through the `dotnet-coverage` global tool rather than through `/EnableCodeCoverage`.
+- [x] AC-15: Line and branch coverage for
       `UtilitiesCS/OutlookObjects/Folder/BreadcrumbStateModel.cs` is not reduced relative to the
       pre-change measurement, and every changed line is covered. Evidence recorded under this feature
       folder's `evidence/coverage/` directory.
+      - Evidence: `evidence/qa-gates/p4-t6-coverage-delta.2026-08-29T06-40.md`, which records all
+        three required figures and applies four gates, all of which passed. Per-file uncovered lines
+        held at 2 (baseline 121/119, post-change 120/118) and per-file uncovered branches held at 3
+        (baseline 44/41, post-change 42/39), so neither was reduced. The changed-region set,
+        enumerated over the post-change `LeftArrow()` span of lines 220 to 246, contains 19 `line`
+        elements and every one has `hits` greater than 0, so every changed line is covered. The
+        `condition-coverage` of the `#440` transition `if` reads `100% (8/8)` before and
+        `100% (6/6)` after, both 100 %, the condition count falling only because the guard lost one
+        `&&` conjunct.
+      - This criterion's second sentence names an evidence location that is not canonical under
+        `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`. The override was rejected and
+        recorded verbatim in the plan as:
+
+        ```
+        EVIDENCE_LOCATION_OVERRIDE_REJECTED: <FEATURE>/evidence/coverage/ replaced with <FEATURE>/evidence/baseline/ (baseline coverage) and <FEATURE>/evidence/qa-gates/ (post-change coverage and the coverage delta)
+        ```
+
+        A reviewer looking for `evidence/coverage/` should read
+        `evidence/baseline/test-coverage.2026-08-29T06-27.md` for the baseline measurement,
+        `evidence/qa-gates/p4-t5-test-coverage.2026-08-29T06-38.md` for the post-change measurement,
+        and `evidence/qa-gates/p4-t6-coverage-delta.2026-08-29T06-40.md` for the delta.
 
 ## Risks & Mitigations
 

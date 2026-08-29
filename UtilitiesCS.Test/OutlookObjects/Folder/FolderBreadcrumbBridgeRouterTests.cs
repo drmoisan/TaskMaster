@@ -367,19 +367,15 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         [TestMethod]
         public async Task Route_LeftArrow_NothingToCollapse_ReportsUnhandledLeft()
         {
-            // Arrange: the first Left consumes the one available #440 parent-select transition,
-            // after which nothing remains to collapse and no further tree transition applies.
+            // Arrange: #440 Left walks the ancestor chain, so on this three-segment fixture two
+            // presses are needed to reach the root. Only once the root is active does nothing
+            // remain to collapse and no further tree transition apply.
             var router = await PopulatedRouterAsync(ProviderMock());
-            await router.RouteAsync(
-                "{\"type\":\"arrowKey\",\"direction\":\"left\"}",
-                CancellationToken.None
-            );
+            await ArrowAsync(router, "left");
+            await ArrowAsync(router, "left");
 
             // Act
-            var outputs = await router.RouteAsync(
-                "{\"type\":\"arrowKey\",\"direction\":\"left\"}",
-                CancellationToken.None
-            );
+            var outputs = await ArrowAsync(router, "left");
 
             // Assert
             outputs.Should().ContainSingle();

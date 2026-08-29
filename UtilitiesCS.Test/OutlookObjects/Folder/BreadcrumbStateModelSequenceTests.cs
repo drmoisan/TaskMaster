@@ -70,9 +70,16 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             // Right again: nothing further to expand -> unhandled (legacy fall-through signal).
             model.RightArrow().Should().BeFalse();
 
-            // Left closes the expansion; a second Left is unhandled.
+            // #440 corrected contract: Left walks the ancestor chain, so the unhandled press comes
+            // only once the root is active. Decision D1: the sequence is extended to the root rather
+            // than re-pointed at a single-segment row, because the single-segment boundary is already
+            // covered by ArrowKey_QfcSingleSegmentRow_TakesPreExistingCollapsePath, and re-pointing
+            // would delete the only sequence-level assertion over the three-segment fixture.
             model.LeftArrow().Should().BeTrue();
             model.SelectedRow.LeafExpanded.Should().BeFalse();
+            model.SelectedRow.ActiveSegmentIndex.Should().Be(1);
+            model.LeftArrow().Should().BeTrue();
+            model.SelectedRow.ActiveSegmentIndex.Should().Be(0);
             model.LeftArrow().Should().BeFalse();
         }
 
@@ -138,6 +145,56 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             // Assert
             handled.Should().BeTrue();
             model.SelectedSubfolderIndex.Should().Be(-1);
+            model.SelectedRow.LeafExpanded.Should().BeFalse();
+        }
+
+        /// <summary>
+        /// #440 walk-to-root: on a three-segment chain with the leaf active and no subfolder
+        /// selected, each of the first two Left presses selects the parent of the currently active
+        /// node, and the third press at the root is unhandled. The active segment index is asserted
+        /// after every press so the test cannot pass on the boolean alone.
+        /// </summary>
+        [TestMethod]
+        public void LeftArrow_RepeatedOnThreeSegmentChain_WalksToRootThenReportsUnhandled()
+        {
+            // Arrange
+            var model = ModelWithSuggestion();
+            model.SelectedRow.ActiveSegmentIndex.Should().Be(2, "the row starts leaf-anchored");
+
+            // Act + Assert: press 1 selects the parent.
+            model.LeftArrow().Should().BeTrue();
+            model.SelectedRow.ActiveSegmentIndex.Should().Be(1);
+
+            // Act + Assert: press 2 selects the root of the resolved chain.
+            model.LeftArrow().Should().BeTrue();
+            model.SelectedRow.ActiveSegmentIndex.Should().Be(0);
+
+            // Act + Assert: press 3 at the root is unhandled and leaves the root active.
+            model.LeftArrow().Should().BeFalse();
+            model.SelectedRow.ActiveSegmentIndex.Should().Be(0);
+        }
+
+        /// <summary>
+        /// #440 walk-to-root from an open leaf expansion: the first Left both clears the expansion,
+        /// because the fetched subfolders belonged to the previous node, and selects the parent. The
+        /// walk then continues to the root with the expansion staying closed.
+        /// </summary>
+        [TestMethod]
+        public void LeftArrow_WalkFromAnOpenLeafExpansion_ClearsTheExpansionAndStillReachesTheRoot()
+        {
+            // Arrange
+            var model = ModelWithSuggestion();
+            model.RightArrow().Should().BeTrue();
+            model.SelectedRow.LeafExpanded.Should().BeTrue();
+
+            // Act + Assert: press 1 clears the expansion and selects the parent.
+            model.LeftArrow().Should().BeTrue();
+            model.SelectedRow.ActiveSegmentIndex.Should().Be(1);
+            model.SelectedRow.LeafExpanded.Should().BeFalse();
+
+            // Act + Assert: press 2 reaches the root with the expansion still closed.
+            model.LeftArrow().Should().BeTrue();
+            model.SelectedRow.ActiveSegmentIndex.Should().Be(0);
             model.SelectedRow.LeafExpanded.Should().BeFalse();
         }
 
