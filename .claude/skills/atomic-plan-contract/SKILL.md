@@ -139,6 +139,20 @@ For command-bearing tasks in approved plans (especially Phase 2 final-QC tasks):
 
 Any regression test task expected to fail must be tagged with `[expect-fail]` and include an auditable evidence artifact per `evidence-and-timestamp-conventions`.
 
+## Planner Adversarial Self-Review (Mandatory)
+
+Before any plan handoff, `atomic-planner` MUST complete one explicit adversarial self-review pass over every fact, assumption, and line or file citation the plan relies on. The pass is required on initial authoring and on every revision-delta round. A revision round is not exempt because it changed only part of the plan: the citations the revision touched describe the tree as it stands after the revision, and no earlier pass observed that state.
+
+Rules:
+
+- **Re-derive every citation in this pass.** Any line, file, test, or assertion that the planner's own edit touched, added, or removed in the current authoring or revision pass MUST be re-derived directly against current repository state in that same pass. The prohibited source is a citation carried forward from an earlier round, including one the planner itself verified in a prior round: that earlier verification observed the tree before the intervening edits, so it is evidence about a superseded state rather than about the state the plan now asserts.
+- **Re-check the sibling region.** The self-review MUST re-check the sibling lines, tests, and assertions that sit in the same file or region as any edited citation. The failure mechanism is sibling invalidation: a fix to one line can invalidate an assumption baked into a sibling line or test that a prior round's citation did not cover, so a pass that verifies only the edited line leaves the invalidated sibling unreported and it surfaces as a defect on a later round.
+
+Declaration requirement. Every plan handoff MUST carry exactly one of these two signal lines, written in the directive-line form already used elsewhere in this contract:
+
+- `SELF-REVIEW: RE-DERIVED THIS PASS` — the adversarial self-review pass completed in this pass. This signal MUST be followed by an enumeration of the citations re-derived in that pass, one entry per citation, each naming the file and the line, test, or identifier that was re-derived. A signal carrying no enumeration is not a completed declaration.
+- `SELF-REVIEW: BLOCKED` — the pass could not be completed. This signal halts the handoff. It does not permit a self-approved plan: the planner reports the blocking reason and waits for the caller rather than proceeding to hand off an unverified plan.
+
 ## Preflight Validation (Planner ↔ Executor)
 
 When validating or handing off plans for execution:
@@ -148,6 +162,20 @@ When validating or handing off plans for execution:
 	- `PREFLIGHT: REVISIONS REQUIRED`
 - If revisions are required, provide a precise plan delta and repeat validation until all clear.
 - If the required planner ↔ executor handoff cannot be started or completed, stop and report blocked state; do not self-approve the plan.
+
+Review depth and reporting rules:
+
+- **Review the entire plan in one pass.** Under `DIRECTIVE: PREFLIGHT VALIDATION ONLY`, `atomic-executor` MUST continue checking every remaining phase, task, and prose region after finding an initial defect. Stopping at the first defect is prohibited: the unchecked remainder holds defects that the same pass could have reported, and each one that is left unreported becomes an additional round.
+- **Enumerate every defect found.** `PREFLIGHT: REVISIONS REQUIRED` output MUST list every defect found in that pass, not only the first. The failure mechanism is round inflation: a single-defect report causes the next round to rediscover a defect the same pass could have reported, so the round count rises without the review having covered more of the plan.
+- **Check the delta against its own rule.** Before returning either signal, `atomic-executor` MUST check its proposed fix or delta text against every rule the plan enforces, including that delta's own prose against the same violation class it is remediating. Worked example: the delta prose of a tonality-compliance fix must not itself contain the hyperbole or humor that `.claude/rules/tonality.md` prohibits, because a delta that violates the rule it is written to enforce reintroduces the finding it closes.
+- **Two-round target.** The quality bar is a target of at most two preflight rounds per plan. Exhaustive first-pass review is the mechanism that holds the round count to that target: a pass that reports every defect it can find leaves at most a revision round and a confirming round, whereas a pass that reports one defect at a time cannot reach the target however correct each individual report is.
+
+Convergence signal. Every preflight return, whether it carries `PREFLIGHT: ALL CLEAR` or `PREFLIGHT: REVISIONS REQUIRED`, MUST additionally carry exactly one of these two forward-looking lines:
+
+- `CONVERGENCE: NO FURTHER ROUNDS EXPECTED` — the reviewer expects the plan to clear without a further round.
+- `CONVERGENCE: FURTHER ROUNDS LIKELY` — the reviewer expects at least one further round, and states why.
+
+The convergence line is a required signal rather than free prose. It is a second required line accompanying the preflight signal, not a third value of the signal set that the `Require one of the exact signals:` bullet above enumerates: that bullet's two-value set is unchanged, and every return carries one value from it together with one convergence line.
 
 ## Validator Gate (Mandatory)
 

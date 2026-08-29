@@ -81,6 +81,10 @@ Timestamp rule:
 
 A cycle with fewer than five artifacts is malformed. A cycle that uses the same timestamp value for both its `remediation/<ts>/` and `audit/<ts>/` folders is malformed unless entry and exit genuinely ran within the same minute — the two folders remain distinct either way, since one is named `remediation/` and the other `audit/`.
 
+### Cycle-Document Sweep Scope
+
+A comprehensive or final sweep in a remediation cycle covers that cycle's own plan and audit documents — `remediation-plan.md`, `code-review.md`, `feature-audit.md`, and `policy-audit.md` — in addition to production and test code. The failure mechanism a code-only sweep leaves open is self-referential rule violation: a policy-compliance fix whose own descriptive text violates the policy it enforces is written into one of those four documents rather than into code, so a sweep scoped to code only reports no finding and the violation ships with the cycle.
+
 ## Plan Shape
 
 `remediation/<entry-ts>/remediation-plan.md` MUST conform to `.claude/skills/atomic-plan-contract/SKILL.md`. In particular:
@@ -101,6 +105,12 @@ After the plan is authored, `atomic-executor` runs preflight under the directive
 - `PREFLIGHT: REVISIONS REQUIRED` — `atomic-executor` returns a precise plan delta. The orchestrator routes the delta to `atomic-planner` for revision. `atomic-planner` updates the same plan file in place (per the plan-path continuity contract in `atomic-plan-contract`). The orchestrator then re-runs preflight. The sub-loop repeats until `PREFLIGHT: ALL CLEAR` is returned.
 
 The orchestrator records the preflight outcome in `remediation_loop.cycles[current_cycle].preflight` with `iterations` (counter) and `final_status` (`clear|changes_requested|pending`).
+
+The exhaustive-pass, defect-enumeration, and delta-self-check rules that govern how `atomic-executor` conducts preflight are defined in the `## Preflight Validation (Planner ↔ Executor)` section of `.claude/skills/atomic-plan-contract/SKILL.md` and are not restated here.
+
+Alongside `iterations` and `final_status`, the orchestrator also records in `remediation_loop.cycles[current_cycle].preflight` the convergence line `atomic-executor` returned on that round, which is one of `CONVERGENCE: NO FURTHER ROUNDS EXPECTED` or `CONVERGENCE: FURTHER ROUNDS LIKELY`. This convergence field extends the field set already recorded at `remediation_loop.cycles[current_cycle].preflight` rather than replacing it: `iterations` and `final_status` continue to be recorded exactly as stated above, and the convergence field is written in addition to them.
+
+Iteration ceiling. When a cycle's `iterations` would exceed 2, the orchestrator records `final_status: "blocked_preflight_iteration_limit"`, halts the preflight sub-loop, and escalates to the caller, rather than continuing the sub-loop indefinitely. `blocked_preflight_iteration_limit` is a fourth `final_status` value extending the `clear|changes_requested|pending` enumeration stated above. This ceiling bounds the repeat-until-clear behavior stated above it: the sub-loop still repeats until `PREFLIGHT: ALL CLEAR` is returned, and the ceiling supplies the terminating condition for the case where that signal is not reached within two iterations.
 
 ## Execution and Reaudit
 

@@ -214,7 +214,9 @@ as-is and never reimplemented here:
   `compute_blast_radius.py`. The signature takes three arguments; the third is the parsed
   `config/blast-radius.json`. Reasons come from the fixed vocabulary
   `{path_overlap, module_overlap, shared_surface_overlap, contract_dependency}`, and the relation
-  fails closed.
+  fails closed. Read the verdict from the conflict field of the returned ConflictResult.
+  The result's boolean projection now agrees with that field, so `if conflicts(a, b, config):`
+  yields the verdict rather than the unconditional truth a bare object test gave before issue #576.
 
 **The F1a corrections (issue #452, merged PR #453) are load-bearing.** Derivation now reaches
 separator-free repository-root shared surfaces from plan and spec text, admitting such a token only
@@ -303,6 +305,11 @@ The library returns the partition; the planner supplies the record fields.
    item is `prepared` and radius-validated. Derive the conflict edge set by applying
    `Test-BlastRadiusConflict` to every unordered pair of `declared` radii, then pass the pairs as
    `--edges "<a>:<b> ..."` and the item keys as `--keys "<k1> <k2> ..."`.
+   Read the verdict from the conflict key of the returned hashtable.
+   The hashtable itself is always truthy, so a bare boolean test on the result treats every pair as
+   conflicting and serializes the whole run. This is the sibling hazard to the `@(...)` warning
+   above for `Test-BlastRadius`: that function writes an `IList`-shaped pipeline result whose
+   emptiness is falsy, while this one returns a hashtable whose emptiness is not expressible at all.
 2. Immediately after the conflict-edge set is derived and before anything consumes it, run the
    lane-assertion diagnostic:
    `poetry run python -m scripts.dev_tools.parallel_lane_assertion --manifest docs/features/parallel/<slug>/parallel.md --edges "<a>:<b> ..."`

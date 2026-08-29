@@ -64,7 +64,9 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
    required parsed `config/blast-radius.json` mapping, which push-down publishes into the
    destination workspace. `conflicts(a, b, config)` in `scripts/dev_tools/compute_blast_radius.py`
    (defined in `scripts/dev_tools/_blast_radius_conflicts.py`) remains the repository authority and
-   the parity reference. Map each conflicting pair onto an `(int, int)` conflict edge
+   the parity reference. Read the verdict from the conflict key of the returned hashtable.
+   The hashtable itself is always truthy, so a bare boolean test on the result treats every pair as
+   conflicting. Map each conflicting pair onto an `(int, int)` conflict edge
    of `items[].issue_num` values, normalized so `a < b`. Do not reimplement the relation and do not
    compute edges over the unstarted subset only: an in-flight conflict is precisely what the
    admission decision turns on.
