@@ -80,6 +80,7 @@
 - [680-review-residuals](project_680-review-residuals.md) — closed GO c3; leak class recurred 3x (c2 committed TRX, plan draft, pass-2 QA's OWN fresh vstest output) — fresh vstest TRX is born unsanitized, require in-task sanitize; re-run host sweep every cycle
 - [635-review-residuals](project_635-review-residuals.md) — GO/0 blocking; Markdown-only evidence audit; drift-invariant "total classification with one empty category" validated at a 3rd commit (2229->2337->2474, identities held); hook payload key is `output`; session-cwd mirror needed again
 - [677-review-residuals](project_677-review-residuals.md) — PASS/0 blocking; compile-red RED-first equivalence; 70.7% modified-file dispositioned non-blocking (below the #230 bar); owed: analyzer HintPath-skew + SetupDisposal-debt promotions; post-677 baseline 0.852804/0.792300
+- [440-review-residuals](project_440-review-residuals.md) — PASS/0 blocking; a "corrected" defect-encoding test can be defect-NEUTRAL — check the fail-before Total tests for its absence; AC-15 rate-vs-uncovered-count when a fix deletes covered code; partial-class test files defeat filename FQN filters
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
