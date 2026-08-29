@@ -3,9 +3,9 @@
 - **Issue:** #469
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-29T12-22
+- **Last Updated:** 2026-08-29T13-50
 - **Status:** Draft
-- **Version:** 0.3
+- **Version:** 0.4
 - **Work Mode:** full-bug (marker source: `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/issue.md`, line 12, `- Work Mode: full-bug`)
 - **Requirements and acceptance-criteria source:** `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/spec.md`, section `## Acceptance Criteria` (13 criteria, AC1 through AC13)
 - **Verified findings source:** `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/research/2026-08-29T12-31-qfc-collection-move-diagnostics-defects-469.md`
@@ -246,11 +246,47 @@ zero occurrences in that file today, so the Phase 4 gate is false-before / true-
   `Timestamp:`, `Policy Order:` and an explicit list of the five files read. Acceptance: the
   artifact contains all three fields and exactly five listed files.
 
-- [ ] [P0-T6] Probe the .NET SDK and bootstrap it if the probe fails. Run `dotnet --version`. If it
+- [ ] [P0-T6] Reconcile this branch's base against `origin/main` before any baseline is captured.
+  Run `git fetch origin main`, then `git merge --no-edit origin/main`. The merge is unconditional:
+  when the branch already contains `origin/main` the command reports `Already up to date.` and exits
+  0, so there is no skip branch. Use `merge`, never `rebase`: the repository's force-push guard
+  rejects the rewritten history a rebase produces. Record the run in
+  `FEATURE/evidence/baseline/p0-t6-base-reconciliation.2026-08-29T12-22.md`. Acceptance: the
+  artifact records `Command:`, `EXIT_CODE:` and an `Output Summary:` in which all three of the
+  following hold, and the task fails if any one does not: the post-merge `git rev-parse origin/main`
+  and `git merge-base origin/main HEAD` print the same value; `git ls-files --unmerged` prints zero
+  lines; and `(Get-Content).Count` is 2437 for `QuickFiler/Controllers/QfcCollectionController.cs`,
+  215 for `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, 497 for
+  `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs`, 453 for
+  `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, and 500 for
+  `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs`. The exit code alone is not
+  sufficient evidence for this write-mode command, because `git merge` exits 0 both when it advances
+  the branch and when it does nothing; the rev-equality re-check and the five line counts are the
+  required additional observations. If the merge reports a conflict, or if any of the five counts
+  changes, halt and report rather than proceeding: this plan's line and token citations would no
+  longer describe the tree. This task must precede P0-T10 through P0-T14, because a merge that lands
+  after a baseline invalidates that baseline, most directly the `BASELINE_PASSED:` count that spec
+  AC9 compares against.
+
+```powershell
+git fetch origin main
+git merge --no-edit origin/main
+$LASTEXITCODE
+git rev-parse origin/main
+git merge-base origin/main HEAD
+git ls-files --unmerged
+(Get-Content -LiteralPath 'QuickFiler\Controllers\QfcCollectionController.cs').Count
+(Get-Content -LiteralPath 'QuickFiler\Controllers\QfcHomeController.Metrics.cs').Count
+(Get-Content -LiteralPath 'QuickFiler.Test\Controllers\QfcCollectionControllerDefects468MoveTests.cs').Count
+(Get-Content -LiteralPath 'QuickFiler.Test\Controllers\QfcHomeControllerMetricsTests.cs').Count
+(Get-Content -LiteralPath 'QuickFiler.Test\Controllers\QfcCollectionControllerTests.cs').Count
+```
+
+- [ ] [P0-T7] Probe the .NET SDK and bootstrap it if the probe fails. Run `dotnet --version`. If it
   exits non-zero (the repository-local `.dotnet-sdk` path named by `global.json` is gitignored and
   is absent from a fresh worktree), run `scripts/vscode/Install-RepoDotNetSdk.ps1` from the
   repository root and re-run `dotnet --version`. Record both invocations in
-  `FEATURE/evidence/baseline/p0-t6-dotnet-sdk-probe.2026-08-29T12-22.md`. Acceptance: the artifact
+  `FEATURE/evidence/baseline/p0-t7-dotnet-sdk-probe.2026-08-29T12-22.md`. Acceptance: the artifact
   records a final `dotnet --version` invocation with `EXIT_CODE: 0` and an `Output Summary:` naming
   the resolved SDK version, which must be `8.0.205` or a later 8.0.x feature band per
   `global.json`.
@@ -260,8 +296,8 @@ dotnet --version
 $LASTEXITCODE
 ```
 
-- [ ] [P0-T7] Restore the CSharpier tool manifest. Run `dotnet tool restore` from the repository
-  root. Record it in `FEATURE/evidence/baseline/p0-t7-dotnet-tool-restore.2026-08-29T12-22.md`.
+- [ ] [P0-T8] Restore the CSharpier tool manifest. Run `dotnet tool restore` from the repository
+  root. Record it in `FEATURE/evidence/baseline/p0-t8-dotnet-tool-restore.2026-08-29T12-22.md`.
   Acceptance: `EXIT_CODE: 0`, and `dotnet tool run csharpier --version` prints `1.2.6` (the version
   pinned by `dotnet-tools.json` at the repository root). Record the printed version verbatim in
   `Output Summary:`.
@@ -272,11 +308,11 @@ $LASTEXITCODE
 dotnet tool run csharpier --version
 ```
 
-- [ ] [P0-T8] Restore NuGet packages for the solution. Run `scripts/vscode/Invoke-Restore.ps1` from
+- [ ] [P0-T9] Restore NuGet packages for the solution. Run `scripts/vscode/Invoke-Restore.ps1` from
   the repository root. This uses `vswhere`-resolved MSBuild with `/t:Restore` and
   `/p:RestorePackagesConfig=true`, which is required because every project in this solution is a
   legacy `packages.config` project. Record it in
-  `FEATURE/evidence/baseline/p0-t8-nuget-restore.2026-08-29T12-22.md`. Acceptance: `EXIT_CODE: 0`
+  `FEATURE/evidence/baseline/p0-t9-nuget-restore.2026-08-29T12-22.md`. Acceptance: `EXIT_CODE: 0`
   and the directory `packages` exists at the repository root after the run. Do not use
   `Invoke-VSBuild.ps1` for this: it runs a package-reference synchronisation pass over every csproj
   and can rewrite `HintPath` elements, which would breach the no-csproj-edit constraint.
@@ -287,8 +323,8 @@ $LASTEXITCODE
 Test-Path 'packages'
 ```
 
-- [ ] [P0-T9] Capture the baseline CSharpier state. Run `dotnet tool run csharpier check .` and
-  record it in `FEATURE/evidence/baseline/p0-t9-csharpier-check.2026-08-29T12-22.md`.
+- [ ] [P0-T10] Capture the baseline CSharpier state. Run `dotnet tool run csharpier check .` and
+  record it in `FEATURE/evidence/baseline/p0-t10-csharpier-check.2026-08-29T12-22.md`.
   Acceptance: the artifact records `Command:`, `EXIT_CODE:` and an `Output Summary:` that states the
   exit code and enumerates every file path the command reported as unformatted, verbatim, together
   with the count of those paths. The branch decision referenced by P6-T1 is made on the exit code,
@@ -303,8 +339,8 @@ dotnet tool run csharpier check .
 $LASTEXITCODE
 ```
 
-- [ ] [P0-T10] Capture the baseline analyzer build. Record it in
-  `FEATURE/evidence/baseline/p0-t10-msbuild-analyzers.2026-08-29T12-22.md`. Acceptance: the artifact
+- [ ] [P0-T11] Capture the baseline analyzer build. Record it in
+  `FEATURE/evidence/baseline/p0-t11-msbuild-analyzers.2026-08-29T12-22.md`. Acceptance: the artifact
   records `Command:`, `EXIT_CODE:`, and an `Output Summary:` quoting the MSBuild summary lines that
   report the error count and the warning count. If `EXIT_CODE:` is non-zero, the artifact must
   enumerate every reported error code and file so that Phase 6 can distinguish a pre-existing
@@ -317,9 +353,9 @@ $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find 'MSBui
 $LASTEXITCODE
 ```
 
-- [ ] [P0-T11] Capture the baseline nullable/type-check build. Record it in
-  `FEATURE/evidence/baseline/p0-t11-msbuild-nullable.2026-08-29T12-22.md`. Acceptance: same field
-  and enumeration requirements as P0-T10. Do not add `/p:Nullable=enable`; the command below is
+- [ ] [P0-T12] Capture the baseline nullable/type-check build. Record it in
+  `FEATURE/evidence/baseline/p0-t12-msbuild-nullable.2026-08-29T12-22.md`. Acceptance: same field
+  and enumeration requirements as P0-T11. Do not add `/p:Nullable=enable`; the command below is
   character-for-character the CI command.
 
 ```powershell
@@ -329,9 +365,9 @@ $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find 'MSBui
 $LASTEXITCODE
 ```
 
-- [ ] [P0-T12] Capture the baseline `QuickFiler.Test` passing-test count against the explicitly named
-  assembly `QuickFiler.Test\bin\Debug\QuickFiler.Test.dll` produced by P0-T11. Record it in
-  `FEATURE/evidence/baseline/p0-t12-quickfiler-test-count.2026-08-29T12-22.md`. Acceptance: the
+- [ ] [P0-T13] Capture the baseline `QuickFiler.Test` passing-test count against the explicitly named
+  assembly `QuickFiler.Test\bin\Debug\QuickFiler.Test.dll` produced by P0-T12. Record it in
+  `FEATURE/evidence/baseline/p0-t13-quickfiler-test-count.2026-08-29T12-22.md`. Acceptance: the
   artifact records `Command:`, `EXIT_CODE:`, and an `Output Summary:` that quotes verbatim the
   vstest summary line reporting the failed, passed, skipped and total counts, and records the
   passed count as `BASELINE_PASSED:` and the total count as `BASELINE_TOTAL:`. Also record
@@ -348,15 +384,15 @@ $LASTEXITCODE
 ```powershell
 $vswhere = Join-Path ([Environment]::GetEnvironmentVariable('ProgramFiles(x86)')) 'Microsoft Visual Studio\Installer\vswhere.exe'
 $vstest = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
-& $vstest 'QuickFiler.Test\bin\Debug\QuickFiler.Test.dll' '/Settings:scripts\vscode\TaskMaster.cli.runsettings' /InIsolation '/TestCaseFilter:TestCategory!=LiveOutlook' /Logger:trx '/ResultsDirectory:TestResults\p0-t12'
+& $vstest 'QuickFiler.Test\bin\Debug\QuickFiler.Test.dll' '/Settings:scripts\vscode\TaskMaster.cli.runsettings' /InIsolation '/TestCaseFilter:TestCategory!=LiveOutlook' /Logger:trx '/ResultsDirectory:TestResults\p0-t13'
 $LASTEXITCODE
 @(Select-String -LiteralPath 'QuickFiler.Test\Controllers\QfcCollectionControllerDefects468MoveTests.cs' -SimpleMatch -Pattern '[TestMethod]').Count
 @(Select-String -LiteralPath 'QuickFiler.Test\Controllers\QfcHomeControllerMetricsTests.cs' -SimpleMatch -Pattern '[TestMethod]').Count
 ```
 
-- [ ] [P0-T13] Capture the baseline solution-wide coverage figure. Run
+- [ ] [P0-T14] Capture the baseline solution-wide coverage figure. Run
   `scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot .` and record it in
-  `FEATURE/evidence/baseline/p0-t13-coverage.2026-08-29T12-22.md`. Acceptance: the artifact records
+  `FEATURE/evidence/baseline/p0-t14-coverage.2026-08-29T12-22.md`. Acceptance: the artifact records
   `Command:`, `EXIT_CODE:`, and an `Output Summary:` containing `BASELINE_LINE_RATE_PERCENT:` set to
   the numeric line-coverage percentage read from the `line-rate` attribute of the root `coverage`
   element of `coverage/coverage.cobertura.xml`, multiplied by 100 and recorded to four decimal
@@ -373,17 +409,16 @@ pwsh -NoProfile -File 'scripts\vscode\Invoke-MSTestWithCoverage.ps1' -SearchRoot
 $LASTEXITCODE
 ```
 
-- [ ] [P0-T14] Re-derive every citation this plan depends on against the current tree before any edit
+- [ ] [P0-T15] Re-derive every citation this plan depends on against the current tree before any edit
   is made, and record the result in
-  `FEATURE/evidence/baseline/p0-t14-citation-reverification.2026-08-29T12-22.md`. Acceptance: the
+  `FEATURE/evidence/baseline/p0-t15-citation-reverification.2026-08-29T12-22.md`. Acceptance: the
   artifact records `Command:`, `EXIT_CODE:`, and an `Output Summary:` in which every one of the
   following holds, and the task fails if any single one does not:
-  - `git rev-parse origin/main` and `git merge-base origin/main HEAD` print the same value, which
-    establishes that `origin/main` is an ancestor of `HEAD` and therefore that every
+  - `git rev-parse origin/main` and `git merge-base origin/main HEAD` still print the same value,
+    re-confirming after the Phase 0 baseline captures the ancestry that P0-T6 established, so every
     `git diff origin/main` gate in this plan reports exactly this branch's changes. If they differ,
-    run `git fetch origin main` once and re-check; if they still differ, halt and report the
-    divergence rather than proceeding, because the diff gates would then attribute unrelated
-    upstream changes to this branch.
+    `origin/main` advanced during Phase 0; re-run P0-T6 and then re-run P0-T10 through P0-T14 before
+    proceeding, because a merge landing after a baseline invalidates that baseline.
   - the count for the single-line token `one element longer` is 1 in
     `QuickFiler/Controllers/QfcHomeController.Metrics.cs` and 1 in
     `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`;
@@ -457,7 +492,7 @@ git merge-base origin/main HEAD
 
 - [ ] [P2-T3] Verify spec AC2. Acceptance: in
   `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, the count of `IQfcCollectionController` is
-  at least 1 (discriminating: it was 0 at branch head per P0-T14), the count of `.Where(` is exactly
+  at least 1 (discriminating: it was 0 at branch head per P0-T15), the count of `.Where(` is exactly
   1 (invariant guard: the filter expression is retained verbatim), and the count of
   `IsNullOrWhiteSpace` is at least 1 (invariant guard). Record the result in
   `FEATURE/evidence/qa-gates/p2-t3-ac2-interface-reason.2026-08-29T12-22.md`.
@@ -491,7 +526,7 @@ git merge-base origin/main HEAD
   `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, and added count 3 and deleted count 3 for
   `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`. Record the raw numstat output in
   `FEATURE/evidence/qa-gates/p2-t6-numstat.2026-08-29T12-22.md`. The `origin/main` anchor is valid
-  because P0-T14 established that `origin/main` is an ancestor of `HEAD`.
+  because P0-T15 established that `origin/main` is an ancestor of `HEAD`.
 
 ```powershell
 git diff origin/main --numstat -- QuickFiler/Controllers/QfcHomeController.Metrics.cs QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs
@@ -620,7 +655,7 @@ git status --porcelain -- QuickFiler QuickFiler.Test
 
 - [ ] [P4-T3] Verify spec AC11. Acceptance: in
   `docs/features/active/quickfiler-home-controller-metrics-442/spec.md`, the count of the token
-  `CFN-2 RESOLVED` is at least 1 (discriminating: it was 0 at branch head per P0-T14) and the count
+  `CFN-2 RESOLVED` is at least 1 (discriminating: it was 0 at branch head per P0-T15) and the count
   of the token `CFN-2` is at least 9 (invariant guard: nine occurrences exist at branch head at
   lines 130, 147, 300, 591, 835, 869, 927, 940 and 953, and none may be deleted). Markdown files are
   exempt from the 500-line cap, so no line-count gate applies to this file. Record the two counts in
@@ -722,7 +757,7 @@ git diff origin/main --numstat -- QuickFiler QuickFiler.Test
   Acceptance: the count of `[TestMethod]` is 9 in
   `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` and 11 in
   `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, each equal to the corresponding
-  `BASELINE_TESTMETHOD_` value recorded by P0-T12. This is an invariant guard. Record both counts in
+  `BASELINE_TESTMETHOD_` value recorded by P0-T13. This is an invariant guard. Record both counts in
   `FEATURE/evidence/qa-gates/p5-t6-ac9-testmethod-counts.2026-08-29T12-22.md`.
 
 ```powershell
@@ -738,8 +773,8 @@ Every command task in this phase is unconditional. `EXIT_CODE: SKIPPED` is not a
 any of them. If any task in this phase fails or rewrites a tracked file, restart the phase from
 P6-T1.
 
-- [ ] [P6-T1] Run the CSharpier formatting pass. If P0-T9 recorded `EXIT_CODE: 0`, run
-  `dotnet tool run csharpier format .` at the repository root. If P0-T9 recorded a non-zero exit
+- [ ] [P6-T1] Run the CSharpier formatting pass. If P0-T10 recorded `EXIT_CODE: 0`, run
+  `dotnet tool run csharpier format .` at the repository root. If P0-T10 recorded a non-zero exit
   code, the repository carries pre-existing formatting drift that a repo-wide mutating pass would
   sweep into this change's diff and break spec AC7, so instead run
   `dotnet tool run csharpier format` against exactly the four C# paths this plan edits. Either way
@@ -761,7 +796,11 @@ P6-T1.
   is not known to still describe the tree.
 
 ```powershell
+# Run exactly one of the next two lines, selected by the exit code P0-T10 recorded.
+# P0-T10 EXIT_CODE 0: repository-wide pass is safe.
 dotnet tool run csharpier format .
+# P0-T10 exit code non-zero: scope the mutating pass to this plan's four C# paths.
+dotnet tool run csharpier format QuickFiler\Controllers\QfcCollectionController.cs QuickFiler\Controllers\QfcHomeController.Metrics.cs QuickFiler.Test\Controllers\QfcCollectionControllerDefects468MoveTests.cs QuickFiler.Test\Controllers\QfcHomeControllerMetricsTests.cs
 $LASTEXITCODE
 git diff origin/main --name-only -- QuickFiler QuickFiler.Test
 git status --porcelain -- QuickFiler QuickFiler.Test
@@ -769,12 +808,12 @@ git diff origin/main --numstat -- QuickFiler QuickFiler.Test
 ```
 
 - [ ] [P6-T2] Run `dotnet tool run csharpier check .` at the repository root. Acceptance: every file
-  the output reports as unformatted also appears in the enumeration recorded by P0-T9. If P0-T9
+  the output reports as unformatted also appears in the enumeration recorded by P0-T10. If P0-T10
   recorded no unformatted file, this means `EXIT_CODE: 0` and an output carrying zero
-  unformatted-file reports. If P0-T9 enumerated unformatted files, the exit code may be non-zero, and
-  the acceptance is instead that the set of files reported here is a subset of the P0-T9 enumeration
+  unformatted-file reports. If P0-T10 enumerated unformatted files, the exit code may be non-zero, and
+  the acceptance is instead that the set of files reported here is a subset of the P0-T10 enumeration
   and that none of the four C# paths this plan edits appears in it; any file reported here and absent
-  from the P0-T9 enumeration is a regression introduced by this change, and the phase restarts from
+  from the P0-T10 enumeration is a regression introduced by this change, and the phase restarts from
   P6-T1 after it is fixed. This mirrors the baseline-relative rule used by P6-T3 and P6-T4 and is
   required because P6-T1 deliberately does not repair pre-existing drift in unrelated files. Record
   the exit code, the full reported file list, and the subset verdict in
@@ -787,7 +826,7 @@ $LASTEXITCODE
 
 - [ ] [P6-T3] Run the analyzer build. Acceptance: `EXIT_CODE: 0` and the MSBuild summary reports
   `0 Error(s)`. If the exit code is non-zero, compare the reported diagnostics against the
-  enumeration recorded by P0-T10: a diagnostic present in the P0-T10 enumeration is a pre-existing
+  enumeration recorded by P0-T11: a diagnostic present in the P0-T11 enumeration is a pre-existing
   baseline failure and must be recorded as such; any diagnostic not in that enumeration is a
   regression introduced by this change and the phase restarts from P6-T1 after it is fixed. Record
   the outcome in `FEATURE/evidence/qa-gates/p6-t3-msbuild-analyzers.2026-08-29T12-22.md`.
@@ -800,7 +839,7 @@ $LASTEXITCODE
 ```
 
 - [ ] [P6-T4] Run the nullable/type-check build. Acceptance and baseline-comparison rule: identical
-  to P6-T3, compared against the P0-T11 enumeration. `/p:Nullable=enable` must not be added. Record
+  to P6-T3, compared against the P0-T12 enumeration. `/p:Nullable=enable` must not be added. Record
   the outcome in `FEATURE/evidence/qa-gates/p6-t4-msbuild-nullable.2026-08-29T12-22.md`.
 
 ```powershell
@@ -816,7 +855,7 @@ $LASTEXITCODE
   and an `Output Summary:` containing `POST_LINE_RATE_PERCENT:` set to the numeric line-coverage
   percentage read from the `line-rate` attribute of the root `coverage` element of
   `coverage/coverage.cobertura.xml`, multiplied by 100 and recorded to four decimal places, together
-  with `POST_THRESHOLD_STATE:` mirroring the P0-T13 convention. The raw Cobertura file stays under
+  with `POST_THRESHOLD_STATE:` mirroring the P0-T14 convention. The raw Cobertura file stays under
   `coverage/`, which `.gitignore` line 144 excludes, so it does not dirty the tree.
 
 ```powershell
@@ -825,8 +864,8 @@ $LASTEXITCODE
 ```
 
 - [ ] [P6-T6] Re-run the scoped `QuickFiler.Test` pass and verify spec AC9. Acceptance: the vstest
-  summary reports a passed count equal to `BASELINE_PASSED:` from P0-T12, a total count equal to
-  `BASELINE_TOTAL:` from P0-T12, and a failed count of 0. Record the summary line verbatim as
+  summary reports a passed count equal to `BASELINE_PASSED:` from P0-T13, a total count equal to
+  `BASELINE_TOTAL:` from P0-T13, and a failed count of 0. Record the summary line verbatim as
   `POST_PASSED:` and `POST_TOTAL:` in
   `FEATURE/evidence/regression-testing/p6-t6-quickfiler-test-count.2026-08-29T12-22.md`.
 
@@ -858,7 +897,7 @@ $LASTEXITCODE
 
 - [ ] [P6-T8] Record the coverage comparison and the non-attribution statement in
   `FEATURE/evidence/qa-gates/p6-t8-coverage-delta.2026-08-29T12-22.md`. Acceptance: the artifact
-  records `BASELINE_LINE_RATE_PERCENT:` from P0-T13, `POST_LINE_RATE_PERCENT:` from P6-T5, their
+  records `BASELINE_LINE_RATE_PERCENT:` from P0-T14, `POST_LINE_RATE_PERCENT:` from P6-T5, their
   arithmetic difference in percentage points as `DELTA_PERCENTAGE_POINTS:`, and a
   `CHANGED_LINE_COVERAGE:` field. The delta must be greater than or equal to minus 0.50 percentage
   points. If it is not, re-run P6-T5 once and recompute against the second reading before declaring
@@ -880,7 +919,7 @@ $LASTEXITCODE
   naming each command run and its exit code. "No failure" here means that each task's own acceptance
   condition held, not that every recorded exit code was 0: P6-T2, P6-T3 and P6-T4 are all
   baseline-relative and each may record a non-zero exit code while still passing, provided the
-  reported set is a subset of the corresponding P0-T9, P0-T10 or P0-T11 enumeration. If any of those
+  reported set is a subset of the corresponding P0-T10, P0-T11 or P0-T12 enumeration. If any of those
   tasks failed its acceptance condition or rewrote a tracked file, this task fails and the phase
   restarts from P6-T1.
   The artifact must additionally record the AC10 realisation mapping explicitly, one line per
@@ -896,7 +935,7 @@ $LASTEXITCODE
 
 - [ ] [P6-T10] Verify spec AC13. Acceptance:
   `FEATURE/evidence/regression-testing/p6-t10-test-count-comparison.2026-08-29T12-22.md` exists and
-  records `BASELINE_PASSED:` (from P0-T12), `POST_PASSED:` (from P6-T6), the two source artifact
+  records `BASELINE_PASSED:` (from P0-T13), `POST_PASSED:` (from P6-T6), the two source artifact
   paths, and an explicit equality verdict. Both figures live under
   `FEATURE/evidence/regression-testing/`, which is the canonical location required by the repository
   evidence conventions.
@@ -906,60 +945,61 @@ $LASTEXITCODE
 ### Phase 7 — Acceptance Check-off, Commit, and Traceability
 
 - [ ] [P7-T1] Check off AC1 in `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/spec.md`
-  by changing its list marker from `- [ ] AC1` to `- [x] AC1`, appending the evidence path
+  by changing its list marker from `- [ ] AC1` to `- [x] AC1`. Do not alter the criterion text; the
+  criterion line changes only in its checkbox marker. Record the evidence path
   `FEATURE/evidence/qa-gates/p2-t2-ac1-metrics-token.2026-08-29T12-22.md`. Acceptance: exactly one
   line in that file begins with `- [x] AC1 —` (the em dash and its leading space are required:
   without them the string is also a prefix of `- [x] AC10` through `- [x] AC13`) and the cited
   artifact exists on disk.
 
-- [ ] [P7-T2] Check off AC2 in the same file, citing
+- [ ] [P7-T2] Check off AC2 in the same file, recording in this task's progress output
   `FEATURE/evidence/qa-gates/p2-t3-ac2-interface-reason.2026-08-29T12-22.md`. Acceptance: exactly
   one line begins with `- [x] AC2 —` and the cited artifact exists on disk.
 
-- [ ] [P7-T3] Check off AC3, citing
+- [ ] [P7-T3] Check off AC3, recording in this task's progress output
   `FEATURE/evidence/qa-gates/p2-t5-ac3-metricstests-token.2026-08-29T12-22.md`. Acceptance: exactly
   one line begins with `- [x] AC3 —` and the cited artifact exists on disk.
 
-- [ ] [P7-T4] Check off AC4, citing
+- [ ] [P7-T4] Check off AC4, recording in this task's progress output
   `FEATURE/evidence/regression-testing/p6-t7-named-guard-tests.2026-08-29T12-22.md`. Acceptance:
   exactly one line begins with `- [x] AC4 —` and the cited artifact exists on disk.
 
-- [ ] [P7-T5] Check off AC5, citing
+- [ ] [P7-T5] Check off AC5, recording in this task's progress output
   `FEATURE/evidence/qa-gates/p3-t3-ac5-production-renumbering.2026-08-29T12-22.md`. Acceptance:
   exactly one line begins with `- [x] AC5 —` and the cited artifact exists on disk.
 
-- [ ] [P7-T6] Check off AC6, citing both
+- [ ] [P7-T6] Check off AC6, recording in this task's progress output
   `FEATURE/evidence/qa-gates/p3-t10-ac6-test-renumbering.2026-08-29T12-22.md` and
   `FEATURE/evidence/regression-testing/p6-t7-named-guard-tests.2026-08-29T12-22.md`. Acceptance:
   exactly one line begins with `- [x] AC6 —` and both cited artifacts exist on disk.
 
-- [ ] [P7-T7] Check off AC7, citing
+- [ ] [P7-T7] Check off AC7, recording in this task's progress output
   `FEATURE/evidence/qa-gates/p5-t5-ac7-changed-line-classification.2026-08-29T12-22.md`.
   Acceptance: exactly one line begins with `- [x] AC7 —` and the cited artifact exists on disk.
 
-- [ ] [P7-T8] Check off AC8, citing
+- [ ] [P7-T8] Check off AC8, recording in this task's progress output
   `FEATURE/evidence/qa-gates/p5-t4-ac8-file-sizes.2026-08-29T12-22.md`. Acceptance: exactly one line
   begins with `- [x] AC8 —` and the cited artifact exists on disk.
 
-- [ ] [P7-T9] Check off AC9, citing both
+- [ ] [P7-T9] Check off AC9, recording in this task's progress output
   `FEATURE/evidence/regression-testing/p6-t6-quickfiler-test-count.2026-08-29T12-22.md` and
   `FEATURE/evidence/qa-gates/p5-t6-ac9-testmethod-counts.2026-08-29T12-22.md`. Acceptance: exactly
   one line begins with `- [x] AC9 —` and both cited artifacts exist on disk.
 
-- [ ] [P7-T10] Check off AC10, citing
+- [ ] [P7-T10] Check off AC10, recording in this task's progress output
   `FEATURE/evidence/qa-gates/p6-t9-clean-pass.2026-08-29T12-22.md`. Acceptance: exactly one line
   begins with `- [x] AC10 —` and the cited artifact exists on disk.
 
-- [ ] [P7-T11] Check off AC11, citing
+- [ ] [P7-T11] Check off AC11, recording in this task's progress output
   `FEATURE/evidence/qa-gates/p4-t3-ac11-cfn2-resolved.2026-08-29T12-22.md`. Acceptance: exactly one
   line begins with `- [x] AC11 —` and the cited artifact exists on disk.
 
-- [ ] [P7-T12] Check off AC12, citing both
+- [ ] [P7-T12] Check off AC12, recording in this task's progress output
   `FEATURE/evidence/qa-gates/p5-t1-ac12-forbidden-file.2026-08-29T12-22.md` and
   `FEATURE/evidence/qa-gates/p5-t2-ac12-parameter-retained.2026-08-29T12-22.md`. Acceptance: exactly
   one line begins with `- [x] AC12 —` and both cited artifacts exist on disk.
 
-- [ ] [P7-T13] Check off AC13, citing
+- [ ] [P7-T13] Check off AC13, recording in this task's progress output
   `FEATURE/evidence/regression-testing/p6-t10-test-count-comparison.2026-08-29T12-22.md`.
   Acceptance: exactly one line begins with `- [x] AC13 —` and the cited artifact exists on disk.
 
@@ -1052,7 +1092,7 @@ Every one of the spec's 13 acceptance criteria maps to at least one task that ve
 | AC10 | P6-T1 through P6-T7, declared by P6-T9 | unconditional toolchain commands in order |
 | AC11 | P4-T3 | discriminating (`CFN-2 RESOLVED` count moves 0 to at least 1) plus an invariant guard |
 | AC12 | P5-T1, P5-T2 | invariant guards against absorbing issue #629 |
-| AC13 | P0-T12, P6-T6, P6-T10 | baseline plus post-change counts recorded under `evidence/regression-testing/` |
+| AC13 | P0-T13, P6-T6, P6-T10 | baseline plus post-change counts recorded under `evidence/regression-testing/` |
 
 Acceptance criteria this change cannot fail are not restated anywhere in this plan. In particular,
 no acceptance condition claims a coverage increase attributable to
@@ -1069,12 +1109,17 @@ against absorbing it (P5-T1 and P5-T2) rather than attempting it.
 
 ## SELF-REVIEW: RE-DERIVED THIS PASS
 
-Adversarial self-review completed in the preflight revision pass that produced version 0.3. Every
+Adversarial self-review completed in the preflight revision pass that produced version 0.4. Every
 citation below was re-derived directly against the current working tree during this pass; none was
 carried forward from the delegation prompt, from `spec.md`, from the research document, or from an
 earlier round of this plan without independent confirmation. Items 41 through 51 are the citations
 that the version 0.3 revision deltas introduced or altered, and item 24 is the citation that
 revision corrected.
+
+The version 0.4 pass ran against a tree into which `origin/main` had been merged, so every citation
+was re-observed after that merge rather than before it. Items 18, 20, 22, 23, 24, 25, 26, 29, 31 and
+52 were re-derived directly in this pass. Item 18 was reclassified, item 31 was corrected for a line
+shift the merge introduced, and item 52 is new.
 
 1. `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/issue.md:12` —
    re-derived: the line reads `- Work Mode: full-bug`. Mode resolves to `full-bug`, so `spec.md` is
@@ -1127,8 +1172,12 @@ revision corrected.
     case-insensitive searches for `Issue #469 defect` outside `docs/**` return 17 hits. Eight are the
     sites above. The remaining nine are `QfcCollectionController.cs:71`, `:727`, `:2335`;
     `QfcCollectionControllerTests.cs:66`; `QfcCollectionControllerDefects468MoveTests.cs:17`, `:29`,
-    `:57`, `:64` (all defect 3) and `QfcCollectionControllerDefects468MoveTests.cs:463` (defect 4).
-    All nine already agree with `issue.md` numbering and are untouched by this plan. This confirms
+    `:57`, `:64` and `QfcCollectionControllerDefects468MoveTests.cs:463`.
+    `QfcCollectionControllerDefects468MoveTests.cs:17` is a class-level summary enumerating
+    "issue #469 defects 1," and continuing "2, 3 and 4" on `:18`; it lists all four numbers and is
+    therefore invariant under a 1-for-2 swap. The other eight are defect-3 citations except `:463`,
+    which is defect 4. All nine already agree with `issue.md` numbering and are untouched by this
+    plan. This confirms
     the swap is confined to defects 1 and 2 and does not invalidate a defect-3 or defect-4 citation.
 19. Line-length invariance of the eight edits — re-derived by reading each line: every one of the
     eight is a single-character digit substitution, so no line changes length and neither file
@@ -1167,15 +1216,21 @@ revision corrected.
     `docs/features/active/quickfiler-home-controller-metrics-442/spec.md:869` and in this feature's
     own documents, and `Issue #469 defect` occurs throughout `docs/features/**`. A repository-wide
     zero-hit gate on either would be unsatisfiable; none is authored.
-31. `QuickFiler.Test/QuickFiler.Test.csproj:135` and `:155` — re-derived: the two edited test files
-    already carry `Compile Include` entries. No new file is created, so no csproj edit is required
-    and none is planned.
+31. `QuickFiler.Test/QuickFiler.Test.csproj:136` and `:156` — re-derived in this pass: the two edited
+    test files already carry `Compile Include` entries, at `:136` for
+    `Controllers\QfcCollectionControllerDefects468MoveTests.cs` and `:156` for
+    `Controllers\QfcHomeControllerMetricsTests.cs`. Version 0.3 cited `:135` and `:155`, which were
+    correct before the base merge; the merge of `origin/main` added
+    `<Compile Include="Controllers\EfcDataModelArchiveRootTests.cs" />` at `:116`, shifting both
+    entries down by one. This is a sibling invalidation caught by the version 0.4 pass and is the
+    only citation in this plan that the merge moved. No new file is created by this plan, so no
+    csproj edit is required and none is planned.
 32. `dotnet-tools.json` at the repository root — re-derived: pins `csharpier` to `1.2.6` with
     `rollForward: false`. There is no `.config/dotnet-tools.json`; the root-level manifest is the
     one `dotnet tool restore` resolves.
 33. `global.json` — re-derived: requires SDK `8.0.205` with `rollForward: latestFeature` and search
     paths `.dotnet-sdk` then the host. `.dotnet-sdk` is absent from this worktree, which is why
-    P0-T6 probes and conditionally runs `scripts/vscode/Install-RepoDotNetSdk.ps1`.
+    P0-T7 probes and conditionally runs `scripts/vscode/Install-RepoDotNetSdk.ps1`.
 34. `.gitignore:26`, `:27`, `:39`, `:144` — re-derived by reading the file: `[Bb]in/`, `[Oo]bj/`,
     `[Tt]est[Rr]esult*/` and `coverage/*` are all ignored. A first pass of this self-review searched
     for the literal `TestResults` and wrongly concluded that TRX output was untracked-and-visible;
@@ -1190,16 +1245,16 @@ revision corrected.
 36. `scripts/vscode/Invoke-MSTestWithCoverage.ps1:341` and
     `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1:459-491` — re-derived:
     `Assert-CoberturaLineCoverageThreshold` throws when solution-wide line coverage is below 80
-    percent, and it runs before `Set-Content` writes the post-processed XML. P0-T13 and P6-T5 record
+    percent, and it runs before `Set-Content` writes the post-processed XML. P0-T14 and P6-T5 record
     that behavior so a pre-existing sub-threshold repository state is not misattributed to this
     change.
 37. `scripts/vscode/Invoke-Restore.ps1:36` — re-derived: runs `vswhere`-resolved MSBuild with
     `/t:Restore /p:RestorePackagesConfig=true`, which is the correct restore for this
     all-`packages.config` solution, and it does not rewrite any csproj.
 38. `packages` directory at the repository root — re-derived: absent in this worktree, which is why
-    P0-T8 is mandatory before the first build.
-39. `QuickFiler.Test/bin/Debug/` — re-derived: absent in this worktree, so P0-T12 must run after
-    P0-T10 and P0-T11 have produced the assembly. Task ordering in Phase 0 reflects this.
+    P0-T9 is mandatory before the first build.
+39. `QuickFiler.Test/bin/Debug/` — re-derived: absent in this worktree, so P0-T13 must run after
+    P0-T11 and P0-T12 have produced the assembly. Task ordering in Phase 0 reflects this.
 40. `.claude/rules/` contents — re-derived by Glob: `general-code-change.md`, `general-unit-test.md`,
     `csharp.md` and `tonality.md` all exist at the paths the Phase 0 read tasks name.
 41. All five gated file line counts — re-derived in this revision pass by counting every physical
@@ -1208,7 +1263,7 @@ revision corrected.
     `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs`, 453 for
     `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, 500 for
     `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs`. Only the Metrics.cs figure moved,
-    from the 216 asserted by version 0.2 to the measured 215. P0-T14, P2-T1, P5-T4 and self-review
+    from the 216 asserted by version 0.2 to the measured 215. P0-T15, P2-T1, P5-T4 and self-review
     item 24 were all corrected in the same pass, and no other site in the plan states a Metrics.cs
     line count.
 42. Changed-line arithmetic in P5-T5 — re-derived from the per-file numstat figures the plan itself
@@ -1268,3 +1323,13 @@ revision corrected.
     condition held rather than that every exit code was 0, which is the same baseline-relative
     reading P6-T3 and P6-T4 already carried. Without that clarification the two tasks would have
     contradicted each other on the pre-existing-drift branch.
+52. Branch base — re-derived in this pass: `origin/main` advanced during preparation from
+    `ecdb1c84ba8541ab67042985919cfed4df768c01` to `fa2ddefacf2c08abe18f3e3250d77da804534637`,
+    pull request #700 (issue 638), which touches `QuickFiler/Controllers/EfcDataModel.cs` and
+    `QuickFiler.Test/QuickFiler.Test.csproj` and adds
+    `QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs`. None of the five files this plan
+    gates on is among them, and a clean merge of `origin/main` into this branch preserved all five
+    line counts at 2437, 215, 497, 453 and 500. After that merge `git merge-base origin/main HEAD`
+    and `git rev-parse origin/main` agree, and `git diff origin/main --name-only -- QuickFiler
+    QuickFiler.Test docs` returns only this feature folder's four documents. P0-T6 exists so the
+    executor re-establishes this state, because `origin/main` can advance again before execution.
