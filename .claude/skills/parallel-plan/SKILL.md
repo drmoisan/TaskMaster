@@ -32,6 +32,8 @@ Before proceeding, `parallel-planner` must:
 
 ## Item Intake
 
+Initial intake must provide the complete item set in one `/parallel-plan <slug> <item> [<item> ...]` invocation before waves are calculated. `/parallel-add` is not an initial-intake path.
+
 Invocation shape: `/parallel-plan <slug> <item> [<item> ...]`, where each `<item>` is either a
 GitHub issue number (already-promoted work) or a potential-entry path (unpromoted work). This is
 the same intake domain as `/parallel-add`, so initial intake here and F6's add operation accept

@@ -57,6 +57,8 @@ Generate plans using the atomic plan contract defined in the `atomic-plan-contra
 
 ## Preflight Validation
 
+Before handing the plan to executor preflight, return the exact bounded line record defined in `atomic-plan-contract`, starting with `PLANNER-INTERNAL-REVIEW: PASS` and ending with the required `PREFLIGHT:` signal. The bounded record must include exactly one passing `CITATION-TO-TREE`, `AC-TRACEABILITY`, and `SCOPE-BOUNDARY` declaration; one or more current-tree `CITATION: <repository-relative path> | <locator>` records; one complete unique `AC-INVENTORY:`; one complete `AC-MAPPING: <ID> | IMPLEMENTATION: <identifier> | TESTS: <identifier> | EVIDENCE: <identifier>` for every and only inventory ID; and exactly one `UNRESOLVED-GAPS: NONE`. A missing, duplicate, malformed, failed, blocked, or out-of-bounds record declaration requires `SELF-REVIEW: BLOCKED` and stops handoff.
+
 Return the finalized plan for validation-only preflight through `atomic-executor` and preserve the same target file path across revision loops. Do not claim nested worker delegation from within planner execution.
 
 ## Output

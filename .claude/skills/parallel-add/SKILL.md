@@ -21,6 +21,8 @@ this operation may and may not disturb. Read that section before applying anythi
 
 ## Prerequisites
 
+- Reject a pending or not-started run with guidance to consolidate the initial set through `/parallel-plan`. Admit exactly one item only after execution has started in an open run; closed runs are not eligible.
+
 - A parallel run is in progress and `artifacts/orchestration/parallel-orchestrator-state.json`
   tracks its `parallel_slug`. This skill does not start a run; use `/parallel-plan` and
   `/parallel-run` for that.
