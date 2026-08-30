@@ -39,6 +39,8 @@
 - ["Skip the pointless drain" note makes a negative test vacuous](project_preflight_drain_scope_optimization_note_makes_test_vacuous.md) — a cosmetic "path
 - [Sanitisation task cannot sweep its own record](project_sanitisation_task_cannot_sweep_its_own_record.md) — exactly one resi
 - [Conjunctive criteria break the one-artifact citation rule](project_preflight_conjunctive_criterion_citation_gap.md) — "cites exactly o
+- [Caller-stated preflight count drifts before execution](project_caller_stated_preflight_count_drifts_before_execution.md) — 42 quoted vs 48 measured; read the plan's own clause
+- [Orchestrator override does not satisfy an AC](project_orchestrator_override_does_not_satisfy_an_ac.md) — proceed past the gate,
 ## Build / toolchain environment
 - [pwsh/git/gh CLI gotchas](project_pwsh_git_gh_cli_gotchas.md) — no jq; pwsh won't concatenate `$(git merge-base
 - [Project Build/Test Env](project_build_test_env.md) — git-bash MSBuild switches, MSYS_NO_PATHCONV, csharpier v1
@@ -73,6 +75,8 @@
 - [Pester 5 result shape](project_pester5_result_shape_container_tests_and_ci_codecoverage.md) — use TotalCount; `-CI`
 - [Bash heredoc collapses `\\` to `\`](project_bash_heredoc_collapses_doubled_backslashes.md) — even with a quoted
 - [Unquoted backslash in a bash ARG redirects output](project_unquoted_backslash_in_bash_arg_silently_redirects_output.md) — silent wrong pat
+- [Recursive delete: both idioms blocked](project_recursive_delete_idioms_blocked_use_dotnet_api.md) — `rm -rf` AND `Remove-Item -Recurse -Force`; use `[System.IO.Directory]::Delete(p,$true)`
+- [Doubled backslash de-doubles bash->native exe](project_doubled_backslash_dedoubles_bash_to_native_exe.md) — a `[\\/]` regex silently becomes forward-slash-only; verify against `[char]92`
 - [pwsh -Command quoting + backtick stripping](project_pwsh_command_quoting_from_bash.md) — backticks vanish; `-split
 - [pwsh -File binds a list as ONE string](project_pwsh_file_array_param_from_bash.md) — `-Tokens a,b,c` is a
 - [Compile-time red needs body-level refs](project_compile_red_needs_body_level_references.md) — a missing type in a
@@ -143,6 +147,7 @@
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no account or machine name in ANY artifact
+- [Self-test probe literal trips the NEXT sweep pass](project_selftest_probe_literal_trips_the_next_sweep_pass.md) — describe probes, never quote them
 - [TRX sanitisation must be case-insensitive](project_trx_sanitisation_must_be_case_insensitive.md) — vstest writes lo
 - [TRX/msbuild evidence needs a sanitisation micro-action](project_vstest_trx_evidence_needs_sanitisation_task.md) — no plan ever bud
 - [PowerShell budget hook blocks scratch .ps1 helpers](project_powershell_scratch_script_budget_hook_blocks_helpers.md) — cap counts other

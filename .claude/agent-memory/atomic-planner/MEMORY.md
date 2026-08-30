@@ -19,6 +19,9 @@
 - [#677 R1–R8](project_677_keyboard_focus_leak_plan_seams.md) — ctor param REJECTED (5 reflection-arity tests); typed harness for compile-red; internal 9-arg ctor, never ambient SetSynchronizationContext; per-file non-vacuity floors
 - [#635](project_635_reflective_caller_audit_plan_seams.md) — evidence-only audit: tracked plan inflates its own sweep; scan hits its own pattern list; spec said six sites, tree has eight; pathspec breadth inflates a count
 - [#440 R1–R4](project_440_breadcrumb_left_arrow_plan_seams.md) — deletion-only change voids a diff-derived changed-line gate; `(Rebuild target(s))`, NOT `(Rebuild target)`; `.csharpierignore` matches the `.cobertura.xml` suffix; `.dotnet-sdk` IS gitignored (`.gitignore:350`); cite an AC by sentence only after counting its sentences; `Include` resolves against the declaring project's dir
+- [#644](project_644_ac16_referral_revision_seams.md) — AC's named instrument prints no figure; substitute's noise (~0.028pp) exceeds the 0.01pp delta; check-off task → referral task pinning the UNCHECKED state
+- [#644 cycle 2](project_644_cycle2_sweep_gate_evasion_seams.md) — rewording out of a detector's match set is gate evasion; SHA-256 pair for untracked prior artifacts; bound the porcelain `??` scope
+- [#644 PA-7](project_644_pa7_redaction_plan_seams.md) — untracked audit artifact still enters main; name-status diff blind to it; mandated literal contradicted its own stated intent
 - [#680](project_680_menu_mode_plan_seams.md) — HostTests.cs 499 not 500; set-difference format gate; TRX 5-shape identifiers, `grep -a`; append-a-dated-literal discriminator; post-merge remediation: exact line arithmetic — the review's "optional" fallback was load-bearing (501 vs 500)
 
 ## Plan-structure traps
@@ -51,6 +54,8 @@
 - [Absolute counts in shared files go stale](absolute-counts-in-shared-files-go-stale.md) — lower-bound/baseline-relative for co-owned files; keep exact the count the task changes
 - [.claude/agent-memory is tracked](agent-memory-is-tracked-scope-git-gates.md) — scope every diff/status/grep gate or it is unsatisfiable
 - [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — verify with `git ls-files`, not `obj/`
+- [Observation scope must match blast radius](observation-scope-must-match-blast-radius.md) — space (repo-wide formatter), time (sweep before later artifacts), spelling (doubled backslash, bare token)
+- [Run-time-derived account-token pattern](runtime-derived-account-token-pattern.md) — `Split-Path -Leaf $env:USERPROFILE`; self-exempt, and does not flag the org handle or display name
 
 ## C# toolchain and test mechanics
 
