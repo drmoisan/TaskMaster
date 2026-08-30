@@ -142,7 +142,7 @@ namespace QuickFiler.Controllers.Tests
         /// <c>RemoveSpecificControlGroup</c> path, so the live <c>Digits</c> getter now computes width
         /// 1. Before the fix <c>UnregisterNavigation</c> re-evaluated <c>Digits</c> per iteration and
         /// removed the never-registered "1".."9", leaving all ten two-digit keys orphaned. After the
-        /// fix it replays the recorded width and removes "01".."09".
+        /// #472 fix, it replayed the recorded width and removed "01".."09".
         ///
         /// The single residual "10" entry this test used to pin is now closed by issue #644.
         /// It came from the removal loop being bounded by the current <c>_itemGroups.Count</c>,
@@ -176,7 +176,7 @@ namespace QuickFiler.Controllers.Tests
                 .Where(k => k.StartsWith("0", StringComparison.Ordinal))
                 .Should()
                 .BeEmpty(
-                    "the recorded registration width is replayed, so the '0'-prefixed keys go"
+                    "the ledger replays each recorded key verbatim, so no '0'-prefixed key survives"
                 );
             remaining
                 .Should()
