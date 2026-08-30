@@ -1,6 +1,6 @@
 ---
 name: project-637-selectrow-rooted-path-plan-seams
-description: Issue #637 breadcrumb SelectRow plan — preflight R2/R3/R4 seams: docs/features/active as a command operand reaches 121 sibling evidence files; the untracked-440 claim was false for the agent worktree; a blanket -F rule breaks every regex; pre-format line ranges consumed post-format; a set-difference file named by recency instead of by the difference.
+description: Issue #637 breadcrumb SelectRow plan — preflight R2/R3/R4 seams plus the R5 base-anchor reconciliation: docs/features/active as a command operand reaches 121 sibling evidence files; the untracked-440 claim was false for the agent worktree; a blanket -F rule breaks every regex; pre-format line ranges consumed post-format; a set-difference file named by recency; re-anchoring after a mid-plan origin/main merge; rewrapped prose putting #NNN at column 0.
 metadata:
   type: project
 ---
@@ -58,6 +58,31 @@ comment. An executor running both searches would have seen the named file in bot
 a falsehood or halt. **How to apply:** when a plan asserts "the file in A but not B", actually compute
 A minus B; do not infer it from which file changed most recently. The census totals (23/6 and 10/5) were
 correct — only the identification was wrong, so a totals check would not have caught it.
+
+**R5: a mid-plan `origin/main` merge invalidates every anchored footprint gate.** The plan carried
+its anchor at 19 distinct lines. When the orchestrator merged the current `origin/main` into the
+branch, the previous anchor stayed an ancestor of `HEAD` but stopped being clean: six unowned files
+now sat between it and `HEAD`, which makes P0-T8's empty-diff proof, the exact-N-path enumerations
+and any tree-wide `git diff <anchor> --cached -- <tree>` gate unsatisfiable. Fix: re-anchor on the
+**merge commit itself**, so everything the merge brought in is behind the anchor.
+**How to apply:** grep the SHA and count the sites before editing — the delegating prompt's own site
+list was short by one (a continuation line where the SHA starts at column 0 of the next line).
+Re-anchoring on the merge commit means the anchor equals the branch tip; that is not a HEAD pin
+provided no task asserts `git rev-parse HEAD` equals a value, and the empty-diff gate still fails on
+any further commit while the porcelain companion still fails on staged/unstaged/untracked change.
+Name only the gates the stale anchor actually breaks: per-file hunk-range gates scoped to files the
+merge did not touch are unaffected, so listing them as "would be unsatisfiable" is a false claim.
+See [[never-pin-head-sha-as-plan-expectation]] and [[diff-gates-need-a-commit-task]].
+
+**Rewrapped prose can push `#NNN` to column 0 and look like an ATX heading.** Rewriting the base-commit
+block produced a line beginning `#638) and that work was merged...`. CommonMark does not treat it as a
+heading, but the plan validator's heading scan is line-oriented, and the plan contract requires the
+exact `### Phase N — <Title>` form. Rewrap so no line starts with `#`. Same failure family as
+[[plan-fenced-powershell-comments-look-like-headings]].
+
+**Editing a 100%-CRLF plan file: multi-line Edit round-trips CRLF, including inserted lines.** Measured
+before and after with `rg -c '\r$'` versus `rg -c '^'` (equal counts = 100% CRLF). Verify with that
+pair rather than assuming; a whole-file ending flip turns a 20-line amendment into a full-file diff.
 
 **A probe must state what each outcome means.** An `ON_PATH`/`NOT_ON_PATH` `msbuild` probe was added
 to justify a vswhere substitution, but the plan supplied no branch for `ON_PATH` — which is the

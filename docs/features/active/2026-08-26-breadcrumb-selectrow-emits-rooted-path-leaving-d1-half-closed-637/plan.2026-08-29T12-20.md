@@ -3,9 +3,9 @@
 - **Issue:** #637
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-29T15-10
+- **Last Updated:** 2026-08-30T07-30
 - **Status:** Draft
-- **Version:** 0.4
+- **Version:** 0.5
 - **Work Mode:** full-bug (from `issue.md`); `spec.md` is the sole acceptance-criteria source (AC1-AC30).
 
 ## Conventions (read before executing any task)
@@ -29,13 +29,29 @@ path in prose is the one at `research/research.2026-08-29T12-30.md:6`,
 `<repo-root>/.claude/worktrees/<worktree-id>`.
 
 **Base commit** — the diff anchor for this plan is the literal commit
-`b9476588e0e49e113c73cc55cc918f4a65e022fd`. Every `git diff` in this plan supplies it explicitly. No
-task pins a HEAD SHA. This anchor supersedes the earlier anchor `ecdb1c84`, which this plan was first
-authored against. `origin/main` advanced to `fa2ddefa` (pull request #700, issue #638) and that work
-was merged into this branch, so `ecdb1c84` is still an ancestor of `HEAD` but is no longer a clean
-pre-change baseline: three files differ between it and `HEAD` for reasons this plan does not own.
-`b9476588e0e49e113c73cc55cc918f4a65e022fd` is the post-merge, pre-change baseline, and P0-T8 proves
-that property by a check that can fail rather than by an ancestry check that cannot.
+`0eda184ca0009bc79ac9b7146897270c17c095fa`. Every `git diff` in this plan supplies it explicitly. No
+task pins a HEAD SHA: no acceptance condition in this plan asserts that `HEAD` equals a stated
+value, and P0-T8 records `git rev-parse HEAD` as an observation rather than as a gate. This anchor
+is the third this plan has carried, and both supersessions have the same cause. The plan was first
+authored against `ecdb1c84`. `origin/main` then advanced to `fa2ddefa` (pull request #700,
+issue #638) and that work was merged into this branch, which left `ecdb1c84` an ancestor of `HEAD`
+but no longer a clean pre-change baseline, because files under `QuickFiler` and `QuickFiler.Test`
+that this plan does not own then differed between it and `HEAD`; the anchor moved to `b9476588`.
+`origin/main` has since advanced to `69aa28dd` (pull request #702, issue #644), and that work was
+merged into this branch at `0eda184ca0009bc79ac9b7146897270c17c095fa`. That merge put `b9476588`
+in exactly the position `ecdb1c84` had been in: the issue #644 navigation key-ledger work the merge
+brought in lies between `b9476588` and `HEAD`, so a diff anchored there reports files this plan does
+not own, and the gates that enumerate or scope over a whole tree — P0-T8's empty-diff baseline
+proof, P6-T6's exact ten-path enumeration, P8-T30's `QuickFiler QuickFiler.Test` diff, and P5-T5's
+tree-wide `QuickFiler.Test` diff — would be unsatisfiable as written. Anchoring at the merge commit
+puts all of that work behind the anchor.
+`0eda184ca0009bc79ac9b7146897270c17c095fa` is the post-merge, pre-change baseline, and P0-T8 proves
+that property by a check that can fail rather than by an ancestry check that cannot. The proof is
+not vacuous merely because this anchor is the branch tip at the moment this plan was amended.
+P0-T8's diff fails as soon as any file under `QuickFiler` or `QuickFiler.Test` differs between the
+anchor and `HEAD` in the checkout the executor actually runs in, and its porcelain companion fails
+on any staged, unstaged or untracked change in those same trees. The anchor stops being the tip
+at P6-T6, after which every later anchored diff carries this plan's own changes.
 
 **Git pathspec scoping** — `.claude/` is a tracked directory in this repository and carries unrelated
 in-flight modifications, and `docs/features/parallel/` and `artifacts/` are owned by other processes.
@@ -237,9 +253,9 @@ file are outside the formatter's scope.
 
 **Anchored-diff form.** Before P6-T6 commits, nothing this plan changes is in `HEAD`, so a two-dot
 `BASE..HEAD` diff reports nothing for it. Every pre-commit diff gate in this plan therefore uses the
-index form `git diff b9476588e0e49e113c73cc55cc918f4a65e022fd --cached -- <paths>` and is preceded in
+index form `git diff 0eda184ca0009bc79ac9b7146897270c17c095fa --cached -- <paths>` and is preceded in
 the same task by a `git add` over the same paths. Every post-commit diff gate uses
-`git diff b9476588e0e49e113c73cc55cc918f4a65e022fd..HEAD -- <paths>`. Both forms are anchored to an
+`git diff 0eda184ca0009bc79ac9b7146897270c17c095fa..HEAD -- <paths>`. Both forms are anchored to an
 explicit ref; the bare unanchored `git diff` is never used.
 
 **Name-listing diffs carry a companion.** A `git diff --name-only` or `--name-status` enumerates
@@ -415,6 +431,18 @@ no downstream artifact inherits a wrong figure.
    items. The `ItemGroup` carrying the `Controllers\` entries opens at `:287`, and
    `<Compile Include="Controllers\EfcDataModel.cs" />` is at `:289`. A production file absent from
    this project does not compile into the assembly.
+9. Issue #644 (pull request #702) landed on this branch in the same merge that produced the current
+   base anchor, so all of that work is behind the anchor and appears in no diff this plan takes. It
+   added `QuickFiler.Test/Controllers/QfcCollectionControllerNavigationLedgerTests.cs` and registered
+   it at `QuickFiler.Test/QuickFiler.Test.csproj:133`, which is below every line this plan cites in
+   that file — `:57`, `:64`, `:114` and `:116` — so no cited line number in it shifted. The
+   citations most exposed to that merge were re-derived against the merged tree and are unchanged:
+   `QuickFiler/Controllers/EfcDataModel.cs` is still 485 lines with its declaration at `:21` and the
+   `DestinationOlStem` assignment at `:337`; `QuickFiler/QuickFiler.csproj` still carries 130
+   `<Compile Include>` items with the `ItemGroup` at `:287` and `Controllers\EfcDataModel.cs` at
+   `:289`; and `QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs` is still 209 lines with
+   the discarded `out _` at `:99`. The `MoveToFolder` and `SelectedFolderPath` censuses in
+   observation 5 and in P1-T2 and P1-T3 were re-measured on the merged tree and are also unchanged.
 
 ### Phase 0 — Context, policy reads, and baseline capture
 
@@ -447,14 +475,20 @@ no downstream artifact inherits a wrong figure.
       correction.
 - [ ] [P0-T8] Record the branch and prove the base commit is a clean pre-change baseline. Run
       `git rev-parse --abbrev-ref HEAD`, `git rev-parse HEAD`,
-      `git diff --name-only b9476588e0e49e113c73cc55cc918f4a65e022fd..HEAD -- QuickFiler QuickFiler.Test`,
+      `git diff --name-only 0eda184ca0009bc79ac9b7146897270c17c095fa..HEAD -- QuickFiler QuickFiler.Test`,
       and, as the porcelain companion to that name-listing diff,
       `git status --porcelain -- QuickFiler QuickFiler.Test`,
       and write `evidence/baseline/p0-t8-git-base.md` recording all four outputs verbatim. The porcelain
       span is required because a name-listing diff compares two commits and therefore reports neither an
       untracked path nor a modified-but-unstaged tracked file; either state falsifies the clean-baseline
       conclusion this task exists to establish, and both would otherwise surface for the first time at
-      P6-T6's exact ten-path enumeration.
+      P6-T6's exact ten-path enumeration. `git rev-parse HEAD` is recorded as an observation and is
+      never compared against a stated value. The anchor is the commit at which `origin/main` was
+      merged into this branch, and it was the branch tip when this plan was amended, so on an
+      untouched checkout the name-listing diff is empty for that reason; it becomes non-empty the
+      moment the executor's checkout carries any further commit under those two trees, and the
+      porcelain companion beside it reports any staged, unstaged or untracked change in the same
+      trees. Together those are exactly the states this task exists to detect.
       Acceptance: the `git diff --name-only` invocation produces **no output at all**; the
       `git status --porcelain` invocation produces **no output at all**; and the
       recorded branch name is
@@ -831,7 +865,7 @@ redirect the assignment. Reversing any of those orders produces a build that doe
       `rg -n "class EfcDataModelIssue637Tests" QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`
       returns exactly 1 line; each of the eight fixed method names is found exactly once in that file;
       `git add QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs` followed in the same task by
-      `git diff b9476588e0e49e113c73cc55cc918f4a65e022fd --cached -- QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`
+      `git diff 0eda184ca0009bc79ac9b7146897270c17c095fa --cached -- QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`
       shows zero removed content lines, meaning zero lines beginning with a single `-`; and
       `(Get-Content -LiteralPath "QuickFiler.Test\Controllers\EfcDataModelIssue614Tests.cs").Count` is
       at most 500.
@@ -937,7 +971,7 @@ redirect the assignment. Reversing any of those orders produces a build that doe
       pass-through mode is untouched.
 - [ ] [P3-T3] Verify AC8: `SelectHierarchyPath` and `CommitSelection` are unmodified. Run
       `git add QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs` then
-      `git diff b9476588e0e49e113c73cc55cc918f4a65e022fd --cached -U0 -- QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs`
+      `git diff 0eda184ca0009bc79ac9b7146897270c17c095fa --cached -U0 -- QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs`
       and write `evidence/regression-testing/p3-t3-selectionfile-diff.md`. Acceptance: every hunk
       header in the diff addresses a line range that lies entirely within the original lines 83 to 107;
       no hunk touches the original line range 109 to 139; and the artifact lists the hunk headers
@@ -1033,11 +1067,11 @@ redirect the assignment. Reversing any of those orders produces a build that doe
       `EXIT_CODE: 0`; the run reports 8 tests for that class; 8 passed including
       `ToArchiveRelativeStem_ArchiveRootItself_Throws`; and, after
       `git add QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`,
-      `git diff b9476588e0e49e113c73cc55cc918f4a65e022fd --cached -- QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`
+      `git diff 0eda184ca0009bc79ac9b7146897270c17c095fa --cached -- QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`
       shows zero removed content lines.
 - [ ] [P4-T6] Verify AC17: the non-goals are untouched. Run
       `git add QuickFiler/Controllers/EfcDataModel.cs` then
-      `git diff b9476588e0e49e113c73cc55cc918f4a65e022fd --cached -U0 -- QuickFiler/Controllers/EfcDataModel.cs`
+      `git diff 0eda184ca0009bc79ac9b7146897270c17c095fa --cached -U0 -- QuickFiler/Controllers/EfcDataModel.cs`
       and write `evidence/regression-testing/p4-t6-nongoals-untouched.md`, quoting every hunk header
       verbatim. This plan makes exactly two edits to this file, both single-line substitutions, so the
       file's line count and every line number in it are unchanged and the diff is exactly two hunks.
@@ -1107,12 +1141,12 @@ redirect the assignment. Reversing any of those orders produces a build that doe
       `evidence/regression-testing/p5-t4-provider-assertion-preserved.md`. Acceptance: lines 161 to 164
       of `BreadcrumbBridgeRouterIssue439Tests.cs` are byte-identical to their pre-change text, quoted
       in the artifact; and, after `git add QuickFiler/Controllers/BreadcrumbBridgeRouter.cs`,
-      `git diff b9476588e0e49e113c73cc55cc918f4a65e022fd --cached -U0 -- QuickFiler/Controllers/BreadcrumbBridgeRouter.cs`
+      `git diff 0eda184ca0009bc79ac9b7146897270c17c095fa --cached -U0 -- QuickFiler/Controllers/BreadcrumbBridgeRouter.cs`
       produces no output at all, since this plan changes no line of that file.
 - [ ] [P5-T5] Verify the file did not grow and that exactly one assertion changed. Run
       `pwsh -NoProfile -Command '(Get-Content -LiteralPath "QuickFiler.Test\Controllers\BreadcrumbBridgeRouterIssue439Tests.cs").Count'`,
       then `git add QuickFiler.Test` followed by
-      `git diff b9476588e0e49e113c73cc55cc918f4a65e022fd --cached -- QuickFiler.Test`, and write
+      `git diff 0eda184ca0009bc79ac9b7146897270c17c095fa --cached -- QuickFiler.Test`, and write
       `evidence/regression-testing/p5-t5-single-assertion-change.md`. Acceptance: the line count is
       exactly 694; among the diff's removed content lines, exactly one matches `.Should()`, and it is
       `            router.SelectedFolderPath.Should().Be(fullTarget);`; and the artifact records the
@@ -1169,7 +1203,7 @@ redirect the assignment. Reversing any of those orders produces a build that doe
       `EXIT_CODE: 0` with 0 failed; and the artifact records that
       `Issue614_GuardAcceptedSelection_DoesNotThrowAtFilingBoundary` passed and that neither
       `IsValidFilingSelection` nor `IsValidCreationSelection` had any executable line changed, verified
-      by a `git diff b9476588e0e49e113c73cc55cc918f4a65e022fd --cached -- QuickFiler/Controllers/EfcSelectionGuard.cs`
+      by a `git diff 0eda184ca0009bc79ac9b7146897270c17c095fa --cached -- QuickFiler/Controllers/EfcSelectionGuard.cs`
       run in the same task after `git add QuickFiler/Controllers/EfcSelectionGuard.cs`, whose only
       changed line is line 30.
 - [ ] [P6-T5] Redact host identity from every evidence artifact written so far, then prove it. Apply
@@ -1199,10 +1233,10 @@ redirect the assignment. Reversing any of those orders produces a build that doe
       then
       `git commit -m "fix(637): normalize the breadcrumb producer and the string filing overload"` and
       write `evidence/other/p6-t6-commit.md`. A commit is required here because every Phase 7 and
-      Phase 8 gate is anchored to `b9476588e0e49e113c73cc55cc918f4a65e022fd..HEAD`, and an anchored diff
+      Phase 8 gate is anchored to `0eda184ca0009bc79ac9b7146897270c17c095fa..HEAD`, and an anchored diff
       reports nothing for changes that are not yet committed. Acceptance: `EXIT_CODE: 0`;
       `git status --porcelain -- QuickFiler QuickFiler.Test` produces no output; and
-      `git diff --name-only b9476588e0e49e113c73cc55cc918f4a65e022fd..HEAD -- QuickFiler QuickFiler.Test`
+      `git diff --name-only 0eda184ca0009bc79ac9b7146897270c17c095fa..HEAD -- QuickFiler QuickFiler.Test`
       lists exactly these ten paths and no others:
       `QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs`,
       `QuickFiler/Controllers/EfcDataModel.cs`,
@@ -1243,7 +1277,7 @@ again from the start.
       the write-mode discrimination that a read-only command cannot supply is provided by P7-T1's
       before-and-after porcelain pair. Then, in this same task, run `git add QuickFiler QuickFiler.Test`
       and `git commit -m "style(637): apply csharpier formatting before the coverage gates"`, so that
-      every subsequent `b9476588e0e49e113c73cc55cc918f4a65e022fd..HEAD` diff describes the same file
+      every subsequent `0eda184ca0009bc79ac9b7146897270c17c095fa..HEAD` diff describes the same file
       contents the P7-T5 build measured. If nothing changed, record that the commit was a no-op and
       that the tree already matched `HEAD`. Record the commit result in
       `evidence/qa-gates/p7-t2-csharpier-check.md`.
@@ -1286,11 +1320,11 @@ again from the start.
       production files this plan touches — `QuickFiler\Controllers\BreadcrumbBridgeRouter.Selection.cs`,
       `QuickFiler\Controllers\EfcDataModel.cs` and
       `QuickFiler\Controllers\EfcDataModel.FilingStem.cs` — and in the same task run
-      `git diff -U0 b9476588e0e49e113c73cc55cc918f4a65e022fd..HEAD -- QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs QuickFiler/Controllers/EfcDataModel.cs QuickFiler/Controllers/EfcDataModel.FilingStem.cs`
+      `git diff -U0 0eda184ca0009bc79ac9b7146897270c17c095fa..HEAD -- QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs QuickFiler/Controllers/EfcDataModel.cs QuickFiler/Controllers/EfcDataModel.FilingStem.cs`
       to enumerate the added line numbers from the hunk headers. The base anchor
-      `b9476588e0e49e113c73cc55cc918f4a65e022fd` is the post-merge, pre-change baseline P0-T8 proved
-      clean, so the added-line set this diff produces contains only lines this plan added and none of
-      issue #638's. Re-derive the
+      `0eda184ca0009bc79ac9b7146897270c17c095fa` is the post-merge, pre-change baseline P0-T8 proved
+      clean, so the added-line set this diff produces contains only lines this plan added and none
+      of issue #638's or issue #644's. Re-derive the
       `ToFilingStemOrVerbatim` line range against the post-format working tree in this same task,
       recording the declaration line and the closing-brace line, and record both that range and the
       range `evidence/regression-testing/p4-t2-helper-shape.md` recorded, stating whether they differ.
@@ -1664,9 +1698,9 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       this task, in this order. First the porcelain companion,
       `git status --porcelain -- QuickFiler QuickFiler.Test UtilitiesCS UtilitiesCS.Test TaskMaster TaskMaster.Test ToDoModel Tags TaskVisualization`.
       Second
-      `git diff --name-only b9476588e0e49e113c73cc55cc918f4a65e022fd..HEAD -- QuickFiler QuickFiler.Test`.
+      `git diff --name-only 0eda184ca0009bc79ac9b7146897270c17c095fa..HEAD -- QuickFiler QuickFiler.Test`.
       Third
-      `git diff --name-only b9476588e0e49e113c73cc55cc918f4a65e022fd..HEAD -- UtilitiesCS UtilitiesCS.Test TaskMaster TaskMaster.Test ToDoModel Tags TaskVisualization`.
+      `git diff --name-only 0eda184ca0009bc79ac9b7146897270c17c095fa..HEAD -- UtilitiesCS UtilitiesCS.Test TaskMaster TaskMaster.Test ToDoModel Tags TaskVisualization`.
       Write `evidence/qa-gates/p8-t30-scope-boundary.md` recording all three outputs verbatim. The
       porcelain companion is required because a name-listing diff enumerates tracked changes only and
       never reports an untracked path, so the two diffs alone cannot fail on a file this plan created
