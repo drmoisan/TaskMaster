@@ -13,4 +13,6 @@
 - [Self-review before preflight round one](feedback_self_review_before_preflight_round_one.md) — mirror preflight's own checks internally first; a preflight round count above 1 is a process defect to investigate
 - [Children share one orchestrator-state file](project_children_share_one_orchestrator_state_file.md) — a finishing child's late write lands in the next child's live checkpoint; verify identity fields by substring, stay read-only mid-run
 - [Don't repair a concurrent add's partial item](feedback_do_not_repair_a_concurrent_adds_partial_item.md) — a stalled /parallel-add leaves an `admitted` item with no cohort; leave it, report it, keep re-reading before writes
+- [PR-creation gate + receipt mechanics](project_pr_creation_readiness_gate_and_receipt_mechanics.md) — local_execution_overrides must be empty with no documented drain (escalate to the user); use `cp -p` or the pr-author receipt goes stale
+- [Keyed issue_num in delegation prompts](feedback_keyed_issue_num_in_delegation_prompts.md) — "Issue number:" with a space misses the keyed regex; the gate then grabs a bare `#NNN` from prose and denies on the wrong item
 - [Blast-radius PowerShell calling convention](reference_blast_radius_powershell_calling_convention.md) — absolute Import-Module, `-DateKind String`, read the `conflict` key; four traps, incl. a `detail` string that names the wrong pair

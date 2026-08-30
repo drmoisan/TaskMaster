@@ -26,6 +26,14 @@ usually fine. Two related mechanics on the same path:
   where the pid is the still-live parent session). Both removal gates ALLOW the removal; git
   itself refuses. Run `git worktree unlock <path>` first, then remove. Prefer plain `remove`
   over `-f` so a dirty tree still refuses.
+- **Never let the literal phrase `git worktree remove` appear inside a command's DATA, not just
+  its verb.** The removal gate matches that phrase anywhere in the command text, so a
+  `node -e` read-modify-write of the checkpoint that merely *describes* the phrase in a
+  `resume_note` string is denied with `PARALLEL_WORKTREE_REMOVAL_BLOCKED: ... for ''` — the
+  empty target in the reason is the tell that no real removal was ever parsed. Reword the
+  prose ("deleting that worktree", "the prior worktree HEAD was detached") and the same write
+  succeeds. Same root cause as the merge-gate digit scan above: the hook reads the whole
+  command string with no notion of which part is the command and which is a payload.
 - The Bash tool's MSYS path conversion mangles a `git show <ref>:<path>` operand into
   `<ref>;<path>` with backslashes, which fails and silently produces an EMPTY output file if
   redirected. A diff against that empty file reports the whole other file as added, which
