@@ -32,6 +32,20 @@ so this recurs on every bump that is not followed by the repair.
   excludes `UtilitiesCS`/`VBFunctions`, **must not** repair it — record and escalate.
   `scripts/vscode/Sync-PackageReferences.ps1` is the likely remedy but mutates csproj files
   solution-wide.
+- **Third option, better than escalating a blocked gate (confirmed 2026-08-30, issue #644):** provision
+  the HintPath-named versions into the gitignored `packages/` tree instead of editing anything:
+  `nuget install Meziantou.Analyzer -Version 3.0.156 -OutputDirectory packages -DependencyVersion Ignore`
+  and the same for `Roslynator.Analyzers -Version 4.16.0`. `packages/` is gitignored, so this changes
+  ZERO tracked files (`git status --porcelain -- '*.csproj' '*.config' '*.props' '*.targets'` stays
+  empty) and the mandated msbuild command then runs unmodified — 0 errors. This is the same class of
+  action as installing the repo-local SDK or running the packages.config restore, both of which a cold
+  worktree needs anyway. Verify it is pre-existing first: `git show origin/main:UtilitiesCS/UtilitiesCS.csproj`
+  carried the identical skew, and `git diff --name-only origin/main...HEAD -- '*.csproj'` proved the
+  branch never touched the skewed projects.
+- **It only bites a COLD worktree.** A long-lived worktree accumulates package dirs across bumps and
+  `nuget restore` never deletes superseded ones, so the old 3.0.156/4.16.0 folders are still present and
+  the stale HintPaths still resolve. That is why a prior cycle on the same branch built fine and a fresh
+  agent worktree fails: do not read the failure as a regression introduced by the current change.
 - Never record the resulting `0 Warning(s)` as a baseline. It is the absence of a measurement, and a
   later "warning count not greater than baseline" gate would compare against a floor of zero.
   Likewise a `Skipped: 0` from a 1-assembly coverage run poisons any later equality gate, because a
