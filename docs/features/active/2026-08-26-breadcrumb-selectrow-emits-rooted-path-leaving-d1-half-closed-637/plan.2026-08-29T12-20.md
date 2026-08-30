@@ -3,9 +3,9 @@
 - **Issue:** #637
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-29T14-05
+- **Last Updated:** 2026-08-29T15-10
 - **Status:** Draft
-- **Version:** 0.3
+- **Version:** 0.4
 - **Work Mode:** full-bug (from `issue.md`); `spec.md` is the sole acceptance-criteria source (AC1-AC30).
 
 ## Conventions (read before executing any task)
@@ -42,20 +42,15 @@ in-flight modifications, and `docs/features/parallel/` and `artifacts/` are owne
 Every `git status --porcelain` and `git diff` gate in this plan is therefore scoped with an explicit
 pathspec naming only first-party source, test and feature-document trees. The feature-document
 component of every such pathspec is this feature's own folder and never the parent directory
-`docs/features/active`. That narrowing is load-bearing rather than cosmetic, and it is required by the
-tree as it stands now as well as by the tree the executor will meet. A sibling folder is untracked in
-this checkout at the time of this revision:
-`docs/features/active/2026-08-07-breadcrumb-left-right-arrow-parent-child-navigation-440` exists on
-disk, carrying `issue.md`, `plan.2026-08-29T00-22.md` and `spec.md`, and is reported as untracked by
-`git status --porcelain`. An earlier revision of this plan asserted the opposite — that no sibling
-folder was untracked and that the 440 folder's paths were present in this worktree's git index — and
-that assertion was wrong for this worktree; it is corrected here rather than carried forward, because
-a false premise under a correct conclusion is a defect a later reader would have to rediscover. A
-`git add` over the parent directory would therefore stage that other feature's folder onto this branch
-today, not merely under some future condition. The narrowing is also required prospectively, because
-the executor runs later than this planning pass: this repository carries several concurrent worktrees and
-in-flight feature folders, and a concurrent run in this checkout can leave an untracked or modified
-sibling folder under `docs/features/active` at any point between planning and execution. A `git add`
+`docs/features/active`. That narrowing is load-bearing rather than cosmetic, and it is required
+prospectively rather than by any present-tense observation of the tree. Whether a given sibling
+folder under `docs/features/active` is tracked, untracked, or modified is a worktree-local property
+that does not travel with the branch: this repository carries several concurrent worktrees on
+different branches, and the checkout in which this plan was authored is not necessarily the one in
+which it is executed. This plan therefore records no claim about the present tracking state of any
+sibling folder and does not depend on one. The executor also runs later than this planning pass, and a
+concurrent run in this checkout can leave an untracked or modified sibling folder under
+`docs/features/active` at any point between planning and execution. A `git add`
 over the parent directory would then stage and commit another feature's folder onto this branch, and a
 `git status --porcelain` over the parent directory would report that folder and make every emptiness
 gate that consumes it unsatisfiable. This plan does not assume that the tree it observed at planning
@@ -253,8 +248,9 @@ plan creates and leaves uncommitted. Every name-listing diff in this plan theref
 `git add` span or a `git status --porcelain` span in the same task, and the task text states what the
 executor must observe in that companion output. The two mechanisms are complementary and each alone
 is wrong in one state: the anchored diff is blind to untracked files, and porcelain status goes empty
-once the change is committed. This plan contains exactly two name-listing diff sites, and both carry a
-companion. P6-T6 runs
+once the change is committed. This plan contains exactly three name-listing diff sites, and all three
+carry a companion. P0-T8 runs `git status --porcelain -- QuickFiler QuickFiler.Test` alongside its
+baseline diff and asserts that span is empty. P6-T6 runs
 `git add QuickFiler QuickFiler.Test docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`
 before its diff and asserts that `git status --porcelain -- QuickFiler QuickFiler.Test` produces no
 output after the commit. P8-T30 runs a porcelain span over the nine trees it audits, ahead of its two diffs, and
@@ -395,8 +391,11 @@ no downstream artifact inherits a wrong figure.
    across **5** files: 3 declarations and 7 call sites, leaving 13 residual non-member textual
    references. Research section 6 says 16 lines across 6 files and `spec.md` says 16 across 5; both
    describe the pre-merge tree. AC16's counts and citations are corrected in `spec.md`; P1-T2 and
-   P8-T16 carry the measured figures. The sixth file in the stem search is
-   `QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs`, added by issue #638.
+   P8-T16 carry the measured figures. The one file the stem search reaches that the syntax-anchored
+   search does not is `QuickFiler.Test/Controllers/EfcHomeControllerTests.cs`, whose single match at
+   `:55` is a comment naming `MoveToFolderAsync` and not a member reference.
+   `QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs`, added by issue #638, appears in both
+   searches and contributes the call site at `:314`.
 6. This worktree has no `.dotnet-sdk` directory and no `packages` directory, so the repo-local SDK and
    the NuGet package restore must both be bootstrapped before any toolchain command runs.
 7. Issue #638 landed on this branch before execution begins. It changed
@@ -447,10 +446,17 @@ no downstream artifact inherits a wrong figure.
       `MoveToFolder` five-file correction, and the `SelectedFolderPath` three-production-file
       correction.
 - [ ] [P0-T8] Record the branch and prove the base commit is a clean pre-change baseline. Run
-      `git rev-parse --abbrev-ref HEAD`, `git rev-parse HEAD`, and
+      `git rev-parse --abbrev-ref HEAD`, `git rev-parse HEAD`,
       `git diff --name-only b9476588e0e49e113c73cc55cc918f4a65e022fd..HEAD -- QuickFiler QuickFiler.Test`,
-      and write `evidence/baseline/p0-t8-git-base.md` recording all three outputs verbatim.
-      Acceptance: the `git diff --name-only` invocation produces **no output at all**, and the
+      and, as the porcelain companion to that name-listing diff,
+      `git status --porcelain -- QuickFiler QuickFiler.Test`,
+      and write `evidence/baseline/p0-t8-git-base.md` recording all four outputs verbatim. The porcelain
+      span is required because a name-listing diff compares two commits and therefore reports neither an
+      untracked path nor a modified-but-unstaged tracked file; either state falsifies the clean-baseline
+      conclusion this task exists to establish, and both would otherwise surface for the first time at
+      P6-T6's exact ten-path enumeration.
+      Acceptance: the `git diff --name-only` invocation produces **no output at all**; the
+      `git status --porcelain` invocation produces **no output at all**; and the
       recorded branch name is
       `bug/breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`. An ancestry check is
       deliberately not used here. `git merge-base --is-ancestor` exits 0 for any ancestor, including
@@ -458,7 +464,8 @@ no downstream artifact inherits a wrong figure.
       exists to detect; the empty-diff form fails as soon as any file under `QuickFiler` or
       `QuickFiler.Test` differs between the anchor and `HEAD`, which is the property every later
       "exactly N paths", "no hunk in range" and "added line numbers" gate depends on. If the branch
-      name differs, or if the diff produces any output, record `BASE MISMATCH` in the artifact
+      name differs, if the diff produces any output, or if the porcelain span produces any output,
+      record `BASE MISMATCH` in the artifact
       together with the offending output, stop, and report to the orchestrator; do not proceed to
       P0-T9.
 - [ ] [P0-T9] Bootstrap the repo-local .NET SDK with
@@ -593,8 +600,11 @@ second, independently constructed search. No number in this phase is verified by
       `EfcDataModelArchiveRootTests.cs:314`); and the artifact records that Search 1 minus
       Search 2 leaves exactly 13 non-member textual references, closing the 23-line accounting. The
       artifact also records that the stem-search file count is 6 and the syntax-anchored file count is
-      5, that the sixth stem-search file is `EfcDataModelArchiveRootTests.cs`, and that the 16-line
-      figure in research section 6 and in `spec.md` describes the tree before issue #638 merged.
+      5, that the one stem-search file the syntax-anchored search does not reach is
+      `EfcHomeControllerTests.cs`, whose single match at `:55` is a comment, and that
+      `EfcDataModelArchiveRootTests.cs` appears in both searches, contributing the `:314` call site,
+      and that the 16-line figure in research section 6 and in `spec.md` describes the tree before
+      issue #638 merged.
 - [ ] [P1-T3] Re-derive the `SelectedFolderPath` surface (AC24: 9 lines across 3 production files, 2
       writes, 3 reads). Search 1: `rg -c "SelectedFolderPath" --glob "*.cs" .`, recording the per-file
       counts. Search 2, independently constructed by scoping to the production project directories up
@@ -1759,12 +1769,10 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       artifact and this plan file, with every other feature-folder path already in `HEAD`. Record
       both outputs verbatim. The pathspec scoping is required because `.claude/` is tracked and
       carries unrelated in-flight modifications that this plan must not commit, and because sibling
-      feature folders under `docs/features/active` are owned by other work. At least one sibling folder
-      there,
-      `docs/features/active/2026-08-07-breadcrumb-left-right-arrow-parent-child-navigation-440`, is
-      untracked in this checkout as recorded under "Git pathspec scoping", and this task also runs long
-      after planning, so a concurrent run in this
-      checkout can leave a further untracked or modified sibling folder under that parent directory
+      feature folders under `docs/features/active` are owned by other work. This task runs long after
+      planning, and the tracking state of a sibling folder under that parent directory is
+      worktree-local and unobserved by this plan, so a concurrent run in this
+      checkout can leave an untracked or modified sibling folder under that parent directory
       before this task executes; a `git add` over the parent directory would then commit another feature's
       work onto this branch, and a `git status --porcelain` span over the parent directory would report
       that folder and make this gate unsatisfiable. Both spans are therefore scoped so that this gate

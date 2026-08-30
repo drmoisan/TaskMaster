@@ -1,6 +1,6 @@
 ---
 name: project-637-selectrow-rooted-path-plan-seams
-description: Issue #637 breadcrumb SelectRow plan — preflight R2/R3 seams: docs/features/active as a command operand reaches 121 sibling evidence files; the untracked-440 claim was false for the agent worktree; a blanket -F rule breaks every regex; pre-format line ranges consumed post-format.
+description: Issue #637 breadcrumb SelectRow plan — preflight R2/R3/R4 seams: docs/features/active as a command operand reaches 121 sibling evidence files; the untracked-440 claim was false for the agent worktree; a blanket -F rule breaks every regex; pre-format line ranges consumed post-format; a set-difference file named by recency instead of by the difference.
 metadata:
   type: project
 ---
@@ -48,6 +48,16 @@ XML documentation phrasing AC12's contract (`IsFullOutlookPath` again), and a do
 (count 2), `out _` (count 0), and `Globals.Ol.ArchiveRootPath` (count 4). Sweep every asserted token
 against every authoring instruction in the same *and* later tasks over the same file.
 See also [[single-numeral-gates-must-name-the-role]] and [[absolute-counts-in-shared-files-go-stale]].
+
+**R4: name a set-difference file by the difference, not by recency.** The plan called
+`EfcDataModelArchiveRootTests.cs` "the sixth file in the stem search" because issue #638 had just added
+it. It is in **both** search sets — `rg -n "MoveToFolderAsync\s*\(" .../EfcDataModelArchiveRootTests.cs`
+returns `:314`, the call site the plan itself enumerates. The file reached by the stem search only is
+`QuickFiler.Test/Controllers/EfcHomeControllerTests.cs`, whose single `MoveToFolder` hit at `:55` is a
+comment. An executor running both searches would have seen the named file in both sets and had to write
+a falsehood or halt. **How to apply:** when a plan asserts "the file in A but not B", actually compute
+A minus B; do not infer it from which file changed most recently. The census totals (23/6 and 10/5) were
+correct — only the identification was wrong, so a totals check would not have caught it.
 
 **A probe must state what each outcome means.** An `ON_PATH`/`NOT_ON_PATH` `msbuild` probe was added
 to justify a vswhere substitution, but the plan supplied no branch for `ON_PATH` — which is the
