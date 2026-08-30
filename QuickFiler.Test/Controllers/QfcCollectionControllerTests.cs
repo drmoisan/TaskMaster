@@ -410,7 +410,7 @@ namespace QuickFiler.Controllers.Tests
         {
             // Arrange
             var controller = CreateControllerForSwap(outgoingItemCount: 1, out var kbd);
-            SeedCollectionKey(kbd, "1");
+            controller.RegisterNavigation();
             SeedCollectionKey(kbd, "2");
             var cachedTwoItemPage = MakeGroups(2);
 
@@ -431,8 +431,7 @@ namespace QuickFiler.Controllers.Tests
         {
             // Arrange: 2-item outgoing page with keys "1" and "2" registered.
             var controller = CreateControllerForSwap(outgoingItemCount: 2, out var kbd);
-            SeedCollectionKey(kbd, "1");
-            SeedCollectionKey(kbd, "2");
+            controller.RegisterNavigation();
             var oneItemIncomingPage = MakeGroups(1);
 
             // Act
@@ -475,7 +474,7 @@ namespace QuickFiler.Controllers.Tests
         {
             // Arrange: 1-item outgoing page with key "1" registered.
             var controller = CreateControllerForSwap(outgoingItemCount: 1, out var kbd);
-            SeedCollectionKey(kbd, "1");
+            controller.RegisterNavigation();
             var twoItemCachedPage = MakeGroups(2);
 
             // Act: unregister the outgoing page, drop its item, then swap in the cached page.
