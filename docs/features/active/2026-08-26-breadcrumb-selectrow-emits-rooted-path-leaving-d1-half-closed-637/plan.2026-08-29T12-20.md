@@ -391,10 +391,10 @@ These were re-derived against the working tree and one disagrees with `spec.md`.
 no downstream artifact inherits a wrong figure.
 
 1. `QuickFiler/Controllers/EfcDataModel.cs` is **485** lines on the merged tree — 423 at the
-   `ecdb1c84` planning base, and 424 in the spec's implementation table and in AC25's parenthetical.
+   `ecdb1c84` planning base, and 424 in the spec's implementation table at `spec.md:401`.
    Headroom to the 500-line limit is **15**. This is what forces the change-B file split described
    under "Scope". AC25's binding clause ("at or under 500 lines") is unaffected, and AC25's
-   parenthetical figure is corrected to 485 in `spec.md`.
+   parenthetical already reads 485 in `spec.md`.
 2. The composition test `Issue614_GuardAcceptedSelection_DoesNotThrowAtFilingBoundary` spans
    `QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs:167-214`; AC23 and the spec cite `:167-213`.
    The closing brace is at 214. No behavioral consequence.
@@ -406,7 +406,7 @@ no downstream artifact inherits a wrong figure.
    search returns **23** lines across **6** files, and the syntax-anchored search returns **10** lines
    across **5** files: 3 declarations and 7 call sites, leaving 13 residual non-member textual
    references. Research section 6 says 16 lines across 6 files and `spec.md` says 16 across 5; both
-   describe the pre-merge tree. AC16's counts and citations are corrected in `spec.md`; P1-T2 and
+   describe the pre-merge tree. AC16 already carries the measured counts and citations; P1-T2 and
    P8-T16 carry the measured figures. The one file the stem search reaches that the syntax-anchored
    search does not is `QuickFiler.Test/Controllers/EfcHomeControllerTests.cs`, whose single match at
    `:55` is a comment naming `MoveToFolderAsync` and not a member reference.
@@ -544,6 +544,13 @@ no downstream artifact inherits a wrong figure.
       exclude exactly the paths in that list and nothing else. The artifact also records whether the
       invocation produced a CSharpier result at all, which is the proof that P0-T10's tool restore
       succeeded.
+      If the `BASELINE_FORMAT_DRIFT` list names any path outside `QuickFiler` and `QuickFiler.Test`,
+      record `OUT_OF_SCOPE_FORMAT_DRIFT:` with that sub-list, stop, and report to the orchestrator
+      before proceeding to P0-T13. P7-T1's repo-wide write-mode format run would repair those paths,
+      P7-T2 stages only `QuickFiler QuickFiler.Test` so the repair would never be committed, and
+      P8-T30's porcelain span over the nine audited trees would then be non-empty and that task
+      unsatisfiable. Repairing pre-existing drift in trees this plan does not own is outside this
+      plan's scope and requires an explicit orchestrator decision.
 - [ ] [P0-T13] Capture the baseline analyzer build. Run
       `pwsh -NoProfile -Command '$vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"; $msbuildExe = & $vswhere -latest -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe" | Select-Object -First 1; & $msbuildExe TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true; "EXIT_CODE=$LASTEXITCODE"'`
       and write `evidence/baseline/p0-t13-msbuild-analyzers.md`. Acceptance: `EXIT_CODE: 0`; the
@@ -699,8 +706,9 @@ second, independently constructed search. No number in this phase is verified by
       `EfcSelectionGuard.cs` is 79; `BreadcrumbBridgeRouterIssue439Tests.cs` is 694;
       `EfcDataModelIssue614Tests.cs` is 123; `EfcSelectionGuardTests.cs` is 296; the `Test-Path` result
       for `QuickFiler\Controllers\EfcDataModel.FilingStem.cs` is `False` and is recorded as the
-      baseline for that path; and the artifact records that `spec.md`'s implementation table and AC25
-      state 424 for `EfcDataModel.cs`, that the `ecdb1c84` planning base had 423, and that the merged
+      baseline for that path; and the artifact records that `spec.md`'s implementation table at
+      `spec.md:401` states 424 for `EfcDataModel.cs` while AC25 at `spec.md:977` already states 485,
+      that the `ecdb1c84` planning base had 423, and that the merged
       tree value 485 governs, leaving 15 lines of headroom to the 500-line limit.
 - [ ] [P1-T8] Re-derive the single pinning assertion (AC20: exactly 1 existing assertion changes).
       Construction 1, on the assertion form:
@@ -854,7 +862,8 @@ redirect the assignment. Reversing any of those orders produces a build that doe
       identifiers" section, reaching `EfcDataModel.ToFilingStemOrVerbatim` through the existing
       `InternalsVisibleTo("QuickFiler.Test")` at `QuickFiler/Properties/AssemblyInfo.cs:5`. The eight
       existing `ToArchiveRelativeStem` tests in the file are not modified. The file is already
-      registered at `QuickFiler.Test/QuickFiler.Test.csproj:114`, so no new `Compile Include` is
+      registered in `QuickFiler.Test/QuickFiler.Test.csproj` — at `:114` on the pre-change tree, and
+      at `:115` once P2-T6 has inserted its line above it — so no new `Compile Include` is
       required. The declaration line this task creates is
       `    public class EfcDataModelIssue637Tests`, matching the form of the existing declaration at
       `QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs:16`. The acceptance search below
@@ -1269,6 +1278,14 @@ again from the start.
       changed or a path listed in the `BASELINE_FORMAT_DRIFT` section of
       `evidence/baseline/p0-t12-csharpier-check.md`. A path that is in neither set means the repo-wide
       format pass touched unrelated source and must be reported to the orchestrator before proceeding.
+      In the same task, run
+      `git status --porcelain -- UtilitiesCS UtilitiesCS.Test TaskMaster TaskMaster.Test ToDoModel Tags TaskVisualization`
+      after the format run and record its output verbatim. That span must produce no output. It is
+      required because this task's other two porcelain spans are scoped to `QuickFiler`,
+      `QuickFiler.Test` and this feature's folder, so a repo-wide format rewrite in any of these seven
+      trees is invisible to them and would first surface at P8-T30, after the commit that could have
+      carried it. Any line here means the repo-wide format pass touched a tree this plan does not own;
+      stop and report to the orchestrator.
 - [ ] [P7-T2] Verify the format. Run
       `pwsh -NoProfile -Command 'dotnet tool run csharpier check .; "EXIT_CODE=$LASTEXITCODE"'` and
       write `evidence/qa-gates/p7-t2-csharpier-check.md`. Acceptance: `EXIT_CODE: 0`, and the captured
@@ -1302,7 +1319,18 @@ again from the start.
       test assemblies matches the number recorded in `evidence/baseline/p0-t15-mstest-coverage.md`; the
       post-change failing set is a subset of the `BASELINE_FAILURE_SET` recorded there; no test that
       passed in the baseline is failing now; the artifact names every baseline failure that is still
-      failing; and when `BASELINE_FAILURE_SET` is empty, `EXIT_CODE: 0` and 0 failed are required.
+      failing; and when `BASELINE_FAILURE_SET` is empty, 0 failed is required. The exit code is judged
+      separately, because the wrapper throws on two independent conditions: a non-zero inner vstest
+      exit (`Invoke-MSTestWithCoverage.ps1:235-237`) and a repository line rate below 80 percent
+      (`Invoke-MSTestWithCoverage.Helpers.ps1:487-489`, called at `:341`). When the captured output
+      contains the literal `is below the required 80% threshold.`, the artifact records
+      `COVERAGE_FLOOR_THROW: yes` together with the printed percentage, records `ExpectedExitCode: 1`,
+      and P7-T8's `BASELINE BELOW FLOOR` branch governs; the on-disk
+      `coverage\p7-t5-postchange.cobertura.xml` is then the raw dotnet-coverage output, because the
+      threshold assertion at `:341` precedes the post-processed write-back at `:343`, and P7-T6 and
+      P7-T7 re-apply `ConvertTo-KoverageCoberturaXml` in memory and are unaffected. When that literal
+      is absent, the artifact records `COVERAGE_FLOOR_THROW: no` and `EXIT_CODE: 0` is required
+      whenever `BASELINE_FAILURE_SET` is empty.
       `Output Summary:` additionally carries the six numeric `/coverage` attribute values and the
       derived line and branch percentages that P7-T6 reads, copied in once P7-T6 has produced them,
       because the plan contract requires the final-QC test-step artifact itself to carry the numeric
@@ -1340,9 +1368,17 @@ again from the start.
       `evidence/qa-gates/p7-t7-changed-line-coverage.md`. Acceptance: the artifact lists, per file, the
       set of added line numbers and the set of line numbers with zero hits; the intersection of those
       two sets is empty for all three files; and, for
-      `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`, every line
-      number inside the re-derived `ToFilingStemOrVerbatim` range has non-zero hits, which is the
-      new-code coverage requirement for the new helper stated in AC29; and, for the re-derived
+      `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`,
+      every line number inside the re-derived `ToFilingStemOrVerbatim` range that carries a `<line>`
+      node in the post-change Cobertura document has non-zero hits, and the artifact separately
+      enumerates every line number inside that range that carries no `<line>` node, classifying each
+      as XML documentation, the method signature, a blank line, or a brace. That split is required
+      because Cobertura emits a `<line>` node only for a sequence point, so a documentation or
+      signature line has no `hits` attribute to read and an assertion over it could never be
+      satisfied. The artifact also records that at least one line inside the range carries a `<line>`
+      node, which is the observation that keeps this clause from passing vacuously on a range with no
+      coverage rows at all. Together these are the new-code coverage requirement for the new helper
+      stated in AC29; and, for the re-derived
       `ToFilingStemOrVerbatim` range, the artifact records the line nodes carrying `branch="True"`
       together with their `condition-coverage` values, and states that the `IsFullOutlookPath`
       conditional shows both branches taken — that is, a `condition-coverage` value of the form
@@ -1549,8 +1585,8 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       `evidence/other/p6-t6-commit.md` for the two supporting edits the file split requires: the
       `partial` keyword on `EfcDataModel.cs:21` and the `<Compile Include>` registration in
       `QuickFiler/QuickFiler.csproj`. Acceptance: all four artifacts exist; the check-off record states
-      that AC11's text was corrected in `spec.md` to name the new declaring file and the corrected
-      assignment line 337, that the helper remains the member
+      that AC11's text already names the new declaring file and the assignment at line 337,
+      re-verified against the merged tree in P8-T32 list entry A3, that the helper remains the member
       `EfcDataModel.ToFilingStemOrVerbatim` because the new file is a partial of the same type, and
       that the split is the remedy `spec.md:414-416` authorizes for the 15-line headroom; AC11 is
       checked off.
@@ -1576,28 +1612,32 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       diff and the 8 passing results including `ToArchiveRelativeStem_ArchiveRootItself_Throws`, and
       `evidence/regression-testing/p4-t6-nongoals-untouched.md` for the unmodified `MAPIFolder`
       overload at `EfcDataModel.cs:398-419` and its call to `ToArchiveRelativeStem` at line **407**.
-      Acceptance: all three artifacts exist; the check-off record states that AC15's citations were
-      corrected in `spec.md` from `:372-386`, `:336-357` and `:345` to the measured
-      `:421-448`, `:398-419` and `:407`; AC15 is checked off.
+      Acceptance: all three artifacts exist; the check-off record states that AC15 already carries
+      `:421-448`, `:398-419` and `:407`, re-verified against the merged tree in P8-T32 list
+      entries A5, A6 and A8; AC15 is checked off.
 - [ ] [P8-T16] AC16: re-run both P1-T2 searches against the post-change tree and write
       `evidence/qa-gates/p8-t16-movetofolder-family-post.md`. Acceptance: the syntax-anchored search
       still returns exactly **10** lines across **5** files, classified as 3 declarations and 7 call
       sites; the stem search still returns **23** lines across **6** files; no new overload and no
-      signature change appears; the check-off record states that AC16's counts and citations were
-      corrected in `spec.md` to those measured figures, and that the pre-merge figure of 16 lines is
-      superseded; AC16 is checked off.
+      signature change appears; the check-off record states that AC16 already carries those measured
+      figures, re-verified in P8-T32 list entry A9, and that the 16-line figure retained at
+      `spec.md:313` describes the pre-#638 tree and is recorded in P8-T32 list entry B6; AC16 is
+      checked off.
 - [ ] [P8-T17] AC17: cite `evidence/regression-testing/p4-t6-nongoals-untouched.md`. Acceptance: the
       artifact shows no hunk in the ranges 349 to 396 (`OpenOlFolderAsync` and `OpenFsFolderAsync`) or
       398 to 448 (the `MAPIFolder` overload and `ToArchiveRelativeStem`), and no hunk in the protected
       range 271 to 297; it records that `Globals.Ol.ArchiveRootPath` occurs exactly once in the file,
       at line 284; and it records that the guarded read at 284 and the
       `UserDiagnosticAction(ArchiveRootUnavailableMessage)` degrade at 358 and 382, all introduced by
-      issue #638, are preserved unchanged. The check-off record states that AC17 was reworded in
-      `spec.md` for this reason: its original clause required that no `Globals.Ol.ArchiveRootPath` read
+      issue #638, are preserved unchanged. The check-off record states that AC17's current wording,
+      already present in
+      `spec.md`, is the one this plan can satisfy, and records the reason: its original clause
+      required that no `Globals.Ol.ArchiveRootPath` read
       gains a try/catch or a degrade, and issue #638 had already given the file's single read both, so
       that clause was false on the merged tree before this plan ran and no action this plan authorizes
-      could make it true. The reworded clause requires instead that #638's guarded read and degrade are
-      preserved unchanged, which is the property this plan can and does deliver; AC17 is checked off.
+      could make it true. AC17's current clause requires instead that #638's guarded read and degrade
+      are preserved unchanged, which is the property this plan can and does deliver; AC17 is checked
+      off.
 - [ ] [P8-T18] AC18: cite `evidence/regression-testing/p5-t5-single-assertion-change.md`, which
       records all three clauses. Acceptance: the artifact records the corrected assertion at
       line 165, the renamed method, and the narrowed two-line comment; AC18 is checked off.
@@ -1635,10 +1675,11 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       listed file at or under 500 lines, including the new
       `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`; `BreadcrumbBridgeRouterIssue439Tests.cs` at
       or under 694 and therefore not grown; and the check-off record states that `EfcDataModel.cs` was
-      **485** lines before the change, not the 424 the spec's implementation table and AC25's
-      parenthetical stated, that AC25's parenthetical was corrected to 485 in `spec.md`, that the
-      resulting headroom of 15 lines is what forced the change-B file split, and that AC25 was extended
-      in `spec.md` to name the new file; AC25 is checked off. The bound is stated as "at or under" rather
+      **485** lines before the change, not the 424 the spec's implementation table at `spec.md:401`
+      still states, that AC25's parenthetical already reads 485 in `spec.md`, re-verified in
+      P8-T32 list entry A1, that the
+      resulting headroom of 15 lines is what forced the change-B file split, and that AC25 already
+      names the new file; AC25 is checked off. The bound is stated as "at or under" rather
       than "exactly" for the same reason it is in P7-T9: the figure is read after a write-mode
       formatter that can reduce a line count, and AC25 requires only non-growth.
 - [ ] [P8-T26] AC26: cite `evidence/regression-testing/p2-t13-compile-include-observed.md` for the
@@ -1678,7 +1719,10 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       `evidence/qa-gates/p7-t8-coverage-delta.md`. Acceptance: the baseline capture is under
       `evidence/baseline/` and the post-change capture under `evidence/qa-gates/`, with no artifact
       written to `evidence/coverage/` or to any path under `artifacts/`; the changed-line uncovered
-      intersection is empty; every line of the new helper has non-zero hits, judged against the
+      intersection is empty;
+      every line of the new helper that carries a Cobertura `<line>` node has non-zero hits, with at
+      least one such node present, and P7-T7's enumeration of the range's node-free lines is cited,
+      judged against the
       `ToFilingStemOrVerbatim` range P7-T7 re-derived against the post-format working tree rather than
       against the pre-format range `evidence/regression-testing/p4-t2-helper-shape.md` recorded, with
       P7-T7's record of whether the two ranges differ cited here; the artifact
@@ -1735,63 +1779,79 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       `evidence/qa-gates/p8-t31-ac-reconciliation.md`. Acceptance: both constructions report 30 checked
       and 0 unchecked; both agree; and the artifact records that an unscoped count of every `- [x]` and
       `- [ ]` line in `spec.md` would over-report by exactly 5, naming those five line numbers.
-- [ ] [P8-T32] Record the spec-versus-tree discrepancies found during this work in
-      `evidence/other/p8-t32-spec-tree-discrepancies.md`. Most of these arise because `spec.md` was
-      authored against the tree before issue #638 merged, which changed `EfcDataModel.cs` and shifted
-      every line citation into it. Acceptance: the artifact records each item below, stating for each
-      the figure `spec.md` carries, the figure measured on the merged tree, and whether any acceptance
-      criterion's binding clause is affected.
-      1. `EfcDataModel.cs` line count: `spec.md` states 424; the merged tree is **485**. Corrected in
-         AC25 by this plan. Binding clause ("at or under 500 lines") unaffected, but the derived
-         headroom of 15 lines is what forced the change-B file split. The implementation-table row at
-         `spec.md:401` and the headroom sentence at `spec.md:414-416` retain the 424 figure and its
-         derived 76-line headroom; they are recorded here rather than corrected, because no acceptance
-         criterion depends on them and the file split they authorize is taken on the measured figure.
-      2. `Issue614_GuardAcceptedSelection_DoesNotThrowAtFilingBoundary`: AC23 cites `:167-213`; the
-         span is `:167-214`. Not corrected in `spec.md`. Binding clause unaffected.
-      3. The `#499` clear-on-rebind block: `spec.md` cites `BreadcrumbBridgeRouter.cs:143-146`; the
-         block spans `:143-147`. Not corrected in `spec.md`. The write at `:145` and the read at
-         `:143` that AC24 names are exact, so AC24's binding clause is unaffected.
-      4. The `string` overload declaration of `MoveToFolderAsync`: AC16 cited `EfcDataModel.cs:259`;
-         it is at **303**. Corrected in AC16 by this plan.
-      5. The trash-sentinel comparison: AC5 cites `EfcDataModel.cs:272`; it is at **316**. Not
-         corrected in `spec.md`. AC5's binding clause is behavioral and is unaffected.
-      6. The `DestinationOlStem` assignment in the `string` overload: AC11 cited
-         `EfcDataModel.cs:287`; it is at **337**. Corrected in AC11 by this plan.
-      7. `OpenOlFolderAsync`: AC17 cited `:299-316`; it spans **349-372**. Corrected in AC17 by this
-         plan as part of that criterion's rewording.
-      8. `OpenFsFolderAsync`: AC17 cited `:318-334`; it spans **374-396**. Corrected in AC17 by this
-         plan.
-      9. The `MAPIFolder` overload: AC15 and AC16 cited `:336-357` and `:336`; it spans **398-419**
-         with its declaration at **398**. Corrected in both criteria by this plan.
-      10. The `ToArchiveRelativeStem` call inside the `MAPIFolder` overload: AC15 cited `:345`; it is
-          at **407**. Corrected in AC15 by this plan.
-      11. The `MoveToFolderAsync` delegation call inside the `MAPIFolder` overload: AC16 cited
-          `:346`; it is at **408**, and the call spans **408-414**. Corrected in AC16 by this plan.
-      12. `ToArchiveRelativeStem` itself: AC15 cited `:372-386`; the declaration is at **434** and the
-          documented member spans **421-448**. Corrected in AC15 by this plan.
-      13. The `MoveToFolder` family census: AC16 stated 3 declarations and 6 call sites, and `spec.md`
-          elsewhere states 16 stem lines across 5 files. The merged tree carries **23** stem lines
-          across **6** files and **10** syntax-anchored lines across **5** files, classified as 3
-          declarations and **7** call sites. Corrected in AC16 by this plan.
-      14. AC17's original clause required that no `Globals.Ol.ArchiveRootPath` read gains a new
-          try/catch or degrade. Issue #638 had already given the file's single read both, at
-          `EfcDataModel.cs:284` inside the `try` at 282-286, with the degrade at 358 and 382, so the
-          clause was false on the merged tree before this plan ran and no action this plan authorizes
-          could make it true. AC17 was therefore reworded in `spec.md` to require that #638's guarded
-          read and degrade are preserved unchanged.
-      15. `spec.md:164-172` describes the whole `Globals.Ol.ArchiveRootPath` benign-degrade item as an
-          open non-goal owned by issue #695, and cites the two verbatim `DestinationOlStem`
-          assignments as `:308` and `:326`. The `EfcDataModel` half of that item shipped in issue #638
-          and is no longer pending; the two assignments are at **364** and **388** and do remain
-          verbatim, so that half of the statement still holds. Not corrected in `spec.md`; this is
-          prose outside the acceptance criteria and no binding clause depends on it.
-      `spec.md` is edited by this plan only where an acceptance criterion would otherwise be
-      unsatisfiable or would name the wrong file — items 1, 4, 6, 7, 8, 9, 10, 11, 12, 13 and 14, plus
-      the file-split renaming in AC11, AC15 and AC25. Items 2, 3, 5 and 15 are recorded here and not
-      corrected, because each is a citation whose acceptance criterion remains satisfiable as written.
-      The acceptance-criteria count in `spec.md` is unchanged at 30: no criterion is added, removed, or
-      split by any of these corrections.
+- [ ] [P8-T32] Record the spec-versus-tree reconciliation in
+      `evidence/other/p8-t32-spec-tree-discrepancies.md`. `spec.md` was authored against the tree
+      before issue #638 merged, and a prior revision of `spec.md` already applied the acceptance-
+      criteria corrections that shift required. This plan performs no `spec.md` text edit: its only
+      write to that file is the `- [ ]` to `- [x]` flip in P8-T1 through P8-T30. This task therefore
+      records two lists — criteria whose citations were already corrected before execution, verified
+      as still matching the tree, and citations that remain stale and are deliberately left uncorrected.
+      Acceptance: the artifact carries both lists below, and for every entry records the figure
+      `spec.md` carries, the figure measured on the merged tree, whether the two agree, and whether any
+      acceptance criterion's binding clause is affected.
+
+      **List A — already corrected in `spec.md`; re-verified against the merged tree, all agree.**
+      Each entry is recorded as a verification, not as a correction this plan makes.
+      A1. AC25 (`spec.md:976-983`) states `EfcDataModel.cs` at **485** lines with **15** lines of
+          headroom; the tree is 485. This is what forced the change-B file split.
+      A2. AC16 (`spec.md:926`) cites the `string` overload declaration at `EfcDataModel.cs:303`;
+          the tree is 303.
+      A3. AC11 (`spec.md:900-906`) names `QuickFiler/Controllers/EfcDataModel.FilingStem.cs` at
+          `spec.md:900` and cites the `DestinationOlStem` assignment at `EfcDataModel.cs:337` at
+          `spec.md:903-904`; the tree is 337.
+      A4. AC17 (`spec.md:933`) cites `OpenOlFolderAsync` at `:349-372` and `OpenFsFolderAsync` at
+          `:374-396`; the tree is 349-372 and 374-396.
+      A5. AC15 and AC16 (`spec.md:918-920`, `:926`) cite the `MAPIFolder` overload at `:398-419` with
+          its declaration at `:398`; the tree is 398-419 and 398.
+      A6. AC15 (`spec.md:920`) cites the `ToArchiveRelativeStem` call inside that overload at `:407`;
+          the tree is 407.
+      A7. AC16 (`spec.md:928`) cites the `MoveToFolderAsync` delegation call at `:408`; the tree is
+          408 and the call spans 408-414.
+      A8. AC15 (`spec.md:918`) cites `ToArchiveRelativeStem` at `:421-448` with its declaration at
+          `:434`; the tree is 421-448 and 434.
+      A9. AC16 (`spec.md:925-932`) states 3 declarations and 7 call sites, a family-stem search of
+          **23** lines across **6** files, and a syntax-anchored search of **10** lines across **5**
+          files; P1-T2 and P8-T16 measure exactly those figures.
+      A10. AC17 (`spec.md:933-937`) is already worded to require that issue #638's guarded read at
+          `EfcDataModel.cs:284` and its `UserDiagnosticAction(ArchiveRootUnavailableMessage)` degrade
+          at `:358` and `:382` are preserved unchanged. The clause a prior `spec.md` revision replaced
+          — that no `Globals.Ol.ArchiveRootPath` read gains a try/catch or a degrade — was false on
+          the merged tree before this plan ran, because #638 had already given the file's single read
+          both, so no action this plan authorizes could have made it true. The artifact records this
+          as the reason the current wording is the one that can be satisfied.
+
+      **List B — still stale in `spec.md`; deliberately not corrected, because each remains
+      satisfiable as written or lies outside the acceptance criteria.**
+      B1. AC23 (`spec.md:967`) and the prose at `spec.md:783` cite
+          `Issue614_GuardAcceptedSelection_DoesNotThrowAtFilingBoundary` at `:167-213`; the span is
+          `:167-214`. Binding clause unaffected.
+      B2. `spec.md:376` cites the `#499` clear-on-rebind block at `BreadcrumbBridgeRouter.cs:143-146`;
+          the block spans `:143-147`. The write at `:145` and the read at `:143` that AC24 names are
+          exact, so AC24's binding clause is unaffected.
+      B3. AC5 (`spec.md:874`) and the prose at `spec.md:127`, `:360`, `:635` and `:1021` cite the
+          `folderpath != "Trash to Delete"` comparison at `EfcDataModel.cs:272`; it is at **316**.
+          AC5's binding clause is behavioral and is unaffected.
+      B4. The implementation table at `spec.md:401`, the headroom sentence at `spec.md:414-416`, the
+          constraint sentence at `spec.md:582` and the census line at `spec.md:710` all retain the
+          **424**-line figure and its derived **76**-line headroom; the tree is 485 with 15. No
+          acceptance criterion depends on these four sites, and the file split they authorize is taken
+          on the measured figure, so they are recorded rather than corrected.
+      B5. The prose at `spec.md:119-120`, `:122`, `:284`, `:445`, `:469` and `:514` retains the
+          pre-#638 citations `:259-265` for the `string` overload declaration and `:287` for the
+          `DestinationOlStem` assignment; the tree gives `:303-309` for that declaration and `:337`
+          for that assignment. Recorded, not corrected.
+      B6. `spec.md:313` states the `MoveToFolder` family as 16 lines across 5 files; the merged tree
+          gives 23 stem lines across 6 files. This sentence sits in "Corrections to the research file"
+          and describes the pre-#638 tree. Recorded, not corrected.
+      B7. `spec.md:164-172` describes the whole `Globals.Ol.ArchiveRootPath` benign-degrade item as an
+          open non-goal owned by issue #695 and cites the two verbatim `DestinationOlStem` assignments
+          as `:308` and `:326`. The `EfcDataModel` half of that item shipped in issue #638 and is no
+          longer pending; the two assignments are at **364** and **388** and do remain verbatim, so
+          that half of the statement still holds. Prose outside the acceptance criteria; no binding
+          clause depends on it.
+
+      The acceptance-criteria count in `spec.md` is unchanged at 30: this plan adds, removes and
+      splits no criterion, and edits no criterion's text.
 - [ ] [P8-T33] Final commit and clean tree. Run
       `git add docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`
       then
