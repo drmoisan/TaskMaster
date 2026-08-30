@@ -82,7 +82,7 @@
 - [677-review-residuals](project_677-review-residuals.md) — PASS/0 blocking; compile-red RED-first equivalence; 70.7% modified-file non-blocking (below the #230 bar); post-677 baseline 0.852804/0.792300
 - [440-review-residuals](project_440-review-residuals.md) — PASS/0 blocking; a "corrected" defect-encoding test can be defect-NEUTRAL (check fail-before Totals); partial-class test files defeat filename FQN filters
 
-- [644-review-residuals](project_644-review-residuals.md) — both cycles PASS/0 blocking; AC-16 PARTIAL twice (0.028pt noise vs 0.011pt shortfall); class-of-defect fixed instance-by-instance left a 4th instance unswept; "cold build fails" escalation disproved via CI at the merge base
+- [644-review-residuals](project_644-review-residuals.md) — all 3 cycles PASS/0 blocking; AC-16 PARTIAL x3; rejecting the caller's `.claude/agent-memory` diff exclusion found the only new defect; SHA-256 beats mtime as compile proof
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.

@@ -52,7 +52,7 @@ added, the whole argument is circular and that is a material finding.
 - CR-1 stale XML doc at `QfcCollectionControllerNavigationDigitsTests.cs` lines 192-195 still
   describes "replays the recorded width 1 ... loop bound has grown to ten" — a mechanism this fix
   deleted. That test is the #472-supersession proof, so its doc mattering more than usual.
-- PA-7 absolute host path `C:/Users/DanMoisan/repos/...` at `research/research.2026-08-29T07-55.md`
+- PA-7 absolute host path (drive-rooted `<user-profile>/repos/...` form) at `research/research.2026-08-29T07-55.md`
   line 5, committed. Redact before merge; see [[_shared_no_absolute_host_paths]].
 - PA-4 overclaim at `p4-t6` lines 136-138; PA-5 recommend an **append-only** SUPERSEDED footer on
   `p4-t6` rather than an edit (correcting forward was endorsed as the right call).
@@ -114,6 +114,46 @@ Zero hits across all 66 feature-folder files. Bash refuses `ACCT=$(...)` + grep 
 
 Cycle-2 residuals: CR-2 + CR-6 (one defect, 34 lines apart, fix together), CR-3/CR-4/CR-5,
 PA-1/PA-2/PA-3/PA-4/PA-5/PA-6 all standing, PA-8 analyzer skew to promote.
+
+## Cycle-2 exit reaudit (2026-08-30T13-10, head `4572fef5`) — PASS / 0 blocking, GO
+
+CR-2 + CR-6 both verified closed by `d7faef54` (2 added / 2 removed, one file). Class-scoped sweep
+now returns **three** hits, not the two the cycle-2 inputs predicted: curing CR-2 by moving the
+sentence into the past tense *preserves* the phrase rather than deleting it, so the inputs'
+arithmetic was off by one while the substantive condition held. **When an exit condition is written
+as a hit count, check whether the prescribed fix removes the phrase or only re-tenses it.**
+
+**The caller excluded `.claude/agent-memory` from the audited diff — rejecting that exclusion is what
+found the only new defect.** The branch tip `4572fef5` is an agent-memory checkpoint commit adding 15
+paths, and one of them (my own `project_644-review-residuals.md`, line 55) reproduced a drive-rooted
+path with the account name in full — the memory entry recording PA-7 was itself a PA-7. Cured
+in-session by redaction. Recipe: run the runtime-token sweep over **the branch-added agent-memory
+paths**, then `git cat-file -e <base>:<path>` each hit to separate branch-introduced from
+pre-existing (#685 class). Three of four hits here were pre-existing and uncurable by this branch.
+
+**Cheapest strong proof that the tested binary is the reviewed source:** the executor's vstest
+artifact recorded the SHA-256 of the edited file on both sides of its run. Recomputing it with
+`certutil -hashfile <file> SHA256` and matching character-for-character beats the cycle-1 mtime
+argument, and costs one command. Then re-run the suite yourself — vstest via
+`powershell -Command "& '<vstest>' ... "` because bash mangles `/InIsolation` into
+`C:/Program Files/Git/InIsolation`.
+
+**A resuming orchestrator may have already run the expensive gates in your worktree.** Check
+`git status --porcelain` for an untracked `evidence/other/resume-*.md` before deciding to re-run or
+to cite. Here it recorded both msbuild `/t:Rebuild` gates green at the exact head, which is stronger
+than anything a reviewer would produce, and it also confirmed PA-8's skew is real (the analyzer build
+needed `Meziantou.Analyzer.3.0.156` + `Roslynator.Analyzers.4.16.0` junctioned in) without changing
+the non-blocking verdict.
+
+**Spec Blast Radius "any path outside this list is blocking" is never literally true** once evidence
+artifacts and agent memory land on the branch. Both predecessors already read it in a carve-out
+sense. Record the divergence explicitly (PA-9) and pass the AC on the property it guards; do not
+uncheck. Recommend the next spec add `.claude/agent-memory/**` to the existing carve-out sentence.
+
+**This worktree's `pr_context.summary.txt` listed only the ten largest changed files, all `.md`**, so
+`Get-ChangedLanguageSet` returns EMPTY and the hook's coverage enforcement is skipped entirely from
+that cwd. The *session* cwd's copy was an older #644 summary that does list the `.cs` bullets, so
+enforcement was live from there. Simulate from both cwds; write clean C# rows regardless.
 
 **Supersession-vs-revert verification recipe that worked:** read the superseded commit's own diff
 (`git show 9494ca35 -- <file>`), identify what the earlier fix actually changed (here: a live
