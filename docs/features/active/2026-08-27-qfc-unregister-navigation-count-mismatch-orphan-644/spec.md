@@ -617,7 +617,7 @@ same code path.
 Check off only after the named test or command has actually been run and passed. AC-0 must be
 completed before any other criterion is evaluated.
 
-- [ ] **AC-0 (Phase 0 baselines).** Before any edit, re-derive and record as evidence: the line count
+- [x] **AC-0 (Phase 0 baselines).** Before any edit, re-derive and record as evidence: the line count
       and `[TestMethod]` count of `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs`
       (expected 500 and 13), the line count and `[TestMethod]` count of
       `QuickFiler.Test/Controllers/QfcCollectionControllerNavigationDigitsTests.cs` (expected 226 and
@@ -628,38 +628,38 @@ completed before any other criterion is evaluated.
       `(Select-String -Path QuickFiler.Test\Controllers\QfcCollectionControllerTests.cs -Pattern '\[TestMethod\]').Count`.
       Any figure that differs from the expected value above is recorded as a discrepancy and the plan
       is re-checked against the measured value, not the expected one.
-- [ ] **AC-1 (red before green).** T1
+- [x] **AC-1 (red before green).** T1
       (`UnregisterNavigation_AfterGroupRemovedThroughRemoveGroupByEntryIdSeam_RemovesEveryRegisteredKey`)
       is demonstrated failing against the unmodified production code, with the failure output
       captured as evidence, before the production fix is applied.
-- [ ] **AC-2 (`RemoveBelowThresholdAsync` path).** After a group is removed through the
+- [x] **AC-2 (`RemoveBelowThresholdAsync` path).** After a group is removed through the
       `_removeGroupByEntryId` seam between register and unregister, zero `"Collection"`-sourced keys
       remain in `StringActionsAsync`. Verified by T1 passing.
-- [ ] **AC-3 (`RemoveSpecificControlGroup(int)` path — synchronous `'R'` char action and
+- [x] **AC-3 (`RemoveSpecificControlGroup(int)` path — synchronous `'R'` char action and
       `PopOutControlGroup(int)`).** After an unbracketed `_itemGroups` removal between register and
       unregister, unregistration is total and a subsequent `RegisterNavigation()` throws no
       `ArgumentException`. Verified by T2
       (`UnregisterNavigation_AfterUnbracketedItemGroupsRemoval_ThenReRegister_DoesNotThrow`) passing.
-- [ ] **AC-4 (width-crossing path).** Registering ten groups at width 2 and shrinking to nine leaves
+- [x] **AC-4 (width-crossing path).** Registering ten groups at width 2 and shrinking to nine leaves
       no residual key. Verified by T6
       (`UnregisterNavigation_AfterTwoDigitRegistrationAndShrinkToNine_LeavesNoCollectionKeys`)
       passing.
-- [ ] **AC-5 (state transitions).** Repeated register/unregister cycles leave the registry empty and
+- [x] **AC-5 (state transitions).** Repeated register/unregister cycles leave the registry empty and
       throw nothing. Verified by T3 (`RegisterAndUnregisterNavigation_RepeatedCycles_LeaveRegistryEmpty`)
       passing.
-- [ ] **AC-6 (empty-ledger negative case).** `UnregisterNavigation()` with no prior registration
+- [x] **AC-6 (empty-ledger negative case).** `UnregisterNavigation()` with no prior registration
       throws nothing and leaves unrelated registry entries untouched. Verified by T4
       (`UnregisterNavigation_WithNoPriorRegistration_DoesNotThrowAndLeavesRegistryUnchanged`) passing.
-- [ ] **AC-7 (`UnregisterNavigation` no longer reads `_itemGroups`).** With `_itemGroups` set to
+- [x] **AC-7 (`UnregisterNavigation` no longer reads `_itemGroups`).** With `_itemGroups` set to
       null, `UnregisterNavigation()` completes without throwing and drains the ledger. Verified by T5
       (`UnregisterNavigation_AfterItemGroupsSetToNull_DoesNotThrow`) passing.
-- [ ] **AC-8 (new test file exists and is compiled).**
+- [x] **AC-8 (new test file exists and is compiled).**
       `QuickFiler.Test/Controllers/QfcCollectionControllerNavigationLedgerTests.cs` exists, and a
       `Compile Include` item naming it is present in `QuickFiler.Test/QuickFiler.Test.csproj`.
       Verified by the step-2 `msbuild` command succeeding and by all six of T1–T6 appearing as
       executed results in the `/Logger:trx` output of the step-4 `vstest.console.exe` command; a
       missing csproj entry manifests as the six tests being absent from the trx.
-- [ ] **AC-9 (amended characterisation tests pass).** All three amended tests in
+- [x] **AC-9 (amended characterisation tests pass).** All three amended tests in
       `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs` pass:
       `LoadControlsAndHandlers_01_ReportedRepro_SwapToOverlappingCachedPage_ThrowsBeforeFix` (still
       asserting `*Key 2 SourceId Collection*`),
@@ -667,36 +667,36 @@ completed before any other criterion is evaluated.
       `SwapItemGroups_ThenSkipGuardedTrailingRegister_LeavesExactlyOneEntryPerIncomingKey`. The
       unchanged `RegisterNavigation_CalledTwiceWithoutInterveningUnregister_ThrowsArgumentException`
       also passes. Verified in the step-4 trx.
-- [ ] **AC-10 (frozen-file constraints hold).**
+- [x] **AC-10 (frozen-file constraints hold).**
       `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs` still contains exactly 13
       `[TestMethod]` attributes and is at or under 500 lines after the edit. Verified by re-running
       the two AC-0 counting commands against the edited file and comparing to the recorded baseline.
-- [ ] **AC-11 (digits-file assertion flipped and passing).** In
+- [x] **AC-11 (digits-file assertion flipped and passing).** In
       `QuickFiler.Test/Controllers/QfcCollectionControllerNavigationDigitsTests.cs`,
       `UnregisterNavigation_AfterRegisteringAtTwoDigitsAndShrinkingToNine_RemovesTheTwoDigitKeys` now
       asserts an empty `"Collection"` key set with a `because:` string naming #644, its XML
       documentation records the residual as closed rather than as out of scope, the file still
       contains exactly 3 `[TestMethod]` attributes, and all three tests in the file pass. Verified in
       the step-4 trx plus a read of the edited assertion and doc block.
-- [ ] **AC-12 (`_registeredDigits` fully removed, no CS0414).** A content search for
+- [x] **AC-12 (`_registeredDigits` fully removed, no CS0414).** A content search for
       `_registeredDigits` across the repository returns zero occurrences, and the step-3 command
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
       completes with exit code 0 and no CS0414 diagnostic in its output.
-- [ ] **AC-13 (comment synchronisation, no assertion drift).** In
+- [x] **AC-13 (comment synchronisation, no assertion drift).** In
       `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468Tests.cs`, the XML doc and
       `because:` string of `RemoveSpecificControlGroupAsync_ThrowAtFirstStatement_RestoresReentrancyCounter`
       attribute the `NullReferenceException` to `_itemGroups[selection - 1]` in
       `RemoveSpecificControlGroupAsync` rather than to `UnregisterNavigation()`; `git diff` for that
       file shows changes to comment and string literals only, with no assertion edit; and the test
       passes in the step-4 trx.
-- [ ] **AC-14 (footprint containment).** `git diff --name-only` against the base commit
+- [x] **AC-14 (footprint containment).** `git diff --name-only` against the base commit
       `ecdb1c84ba8541ab67042985919cfed4df768c01` lists only the seven paths enumerated in the
       Blast Radius section — no production file is added, QuickFiler/QuickFiler.csproj is
       unchanged, and no interface file is touched. `git diff --stat` for
       `QuickFiler/Controllers/QfcCollectionController.cs` shows a net addition of no more than 10
       lines, confined to the private field block and the `RegisterNavigation` /
       `UnregisterNavigation` / `RegisterNavigationAsyncAction` members.
-- [ ] **AC-15 (full toolchain pass).** In one uninterrupted pass with no file rewritten by any step:
+- [x] **AC-15 (full toolchain pass).** In one uninterrupted pass with no file rewritten by any step:
       `dotnet tool run csharpier check .` reports no unformatted file;
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
       exits 0 with no new analyzer diagnostic;
@@ -709,7 +709,7 @@ completed before any other criterion is evaluated.
       in a `[ExcludeFromCodeCoverage]` class and are therefore outside the denominator; that fact is
       stated explicitly in the coverage evidence artifact so the gate is not read as vacuously
       satisfied.
-- [ ] **AC-17 (evidence location).** Every baseline, QA-gate, coverage, and regression artifact
+- [x] **AC-17 (evidence location).** Every baseline, QA-gate, coverage, and regression artifact
       produced for this issue is written under
       docs/features/active/2026-08-27-qfc-unregister-navigation-count-mismatch-orphan-644/evidence/
       in a subfolder named for the artifact kind, with ISO-8601 timestamps, per
