@@ -36,6 +36,22 @@ $v['reasons']    # @( @{ kind; detail } ), in fixed kind order
 Note traps 1 and 3 fail in OPPOSITE directions — 1 reports nothing contends, 3 reports
 everything does — so neither an all-clear nor an all-conflict result is self-validating.
 
+4. **The `path_overlap` `detail` string is not always the pair that actually matched.**
+   The `conflict` verdict is trustworthy; the `detail` is not, once either radius holds a
+   glob. Observed 2026-08-29 deriving item 637: every one of its three edges reported
+   `**/evidence/**/*.md ~ <first path of the other radius>` — including
+   `~ .claude/settings.local.json`, which that glob cannot match. `**/evidence/**/*.md`
+   sorts first in 637's paths because it begins with `*`, so the reported pair looks like a
+   first-pair artifact rather than the matching pair. Radii whose first sorted path happens
+   to be the matching one (the planner-seeded 638/644/647 edges) report accurately, which is
+   why the quirk stays hidden on a replay check.
+
+   **How to apply:** corroborate any `path_overlap` verdict with a plain set intersection of
+   the two `paths` lists before writing an edge, and record a confirmed exact-overlap pair as
+   the `detail`. Invariant 15 constrains only `a`, `b`, and `reason`, so `detail` is free-form
+   and an accurate value is the useful one. A derived radius carrying a broad `**/…` glob will
+   also contend with essentially every item forever — worth reporting when you see one.
+
 **How to apply:** Before trusting a fresh computation, replay it against the edges already
 in `parallel-orchestrator-state.json` and require an exact match on `conflict`, on the
 reason `kind` set, and on each `detail` string. That replay is what proves the convention
