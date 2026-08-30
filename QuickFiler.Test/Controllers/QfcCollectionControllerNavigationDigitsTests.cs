@@ -190,9 +190,9 @@ namespace QuickFiler.Controllers.Tests
         /// Issue #472, mirror direction. A nine-item page registers keys "1".."9" at width 1. A group
         /// is then added without an intervening unregister, so the live <c>Digits</c> getter now
         /// computes width 2. Before the fix <c>UnregisterNavigation</c> removed the never-registered
-        /// "01".."10" and left all nine single-digit keys orphaned. After the fix it replays the
-        /// recorded width 1 and, because the loop bound has grown to ten, removes every registered
-        /// key.
+        /// "01".."10" and left all nine single-digit keys orphaned. After the fix the ledger replays
+        /// the nine recorded keys "1".."9" verbatim, so the added tenth group is irrelevant to
+        /// unregistration.
         /// </summary>
         [TestMethod]
         public void UnregisterNavigation_AfterRegisteringAtOneDigitAndGrowingToTen_RemovesTheOneDigitKeys()
@@ -219,7 +219,7 @@ namespace QuickFiler.Controllers.Tests
             CollectionKeys(registry)
                 .Should()
                 .BeEmpty(
-                    "the recorded width 1 is replayed and the grown loop bound reaches every registered key"
+                    "the ledger replays each key verbatim, so every key is removed regardless of group count"
                 );
         }
     }

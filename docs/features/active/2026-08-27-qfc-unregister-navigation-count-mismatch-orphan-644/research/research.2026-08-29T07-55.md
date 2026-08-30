@@ -2,7 +2,7 @@
 
 - Issue: #644 (`qfc-unregister-navigation-count-mismatch-orphan`), work mode `full-bug`
 - Branch: `bug/qfc-unregister-navigation-count-mismatch-orphan-644`
-- Worktree: `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a9e13727f905b003a`
+- Worktree: `<repo-root>/.claude/worktrees/<agent-worktree>`
 - Read SHA: `ecdb1c84ba8541ab67042985919cfed4df768c01` (branch tip, read from
   `.git/worktrees/agent-a9e13727f905b003a/HEAD` -> `refs/heads/bug/qfc-unregister-navigation-count-mismatch-orphan-644`;
   identical to the `origin/main` SHA the branch was cut from, so no commit has landed on the branch yet).
