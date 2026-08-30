@@ -3,9 +3,9 @@
 - **Issue:** #637
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-29T12-20
+- **Last Updated:** 2026-08-29T14-05
 - **Status:** Draft
-- **Version:** 0.2
+- **Version:** 0.3
 - **Work Mode:** full-bug (from `issue.md`); `spec.md` is the sole acceptance-criteria source (AC1-AC30).
 
 ## Conventions (read before executing any task)
@@ -17,29 +17,43 @@ Every evidence path in this plan is written relative to FEATURE_DIR
 `FEATURE_DIR/evidence/baseline/p0-t12-csharpier-check.md`). Commands that require a literal pathspec
 or a literal search operand spell the folder path in full rather than using the name FEATURE_DIR,
 because a command carrying a placeholder cannot be executed verbatim. The sites that spell it in full
-are the git pathspecs described under "Git pathspec scoping" and the token scan in P7-T10.
+are the git pathspecs described under "Git pathspec scoping", the token scan in P7-T10, and the two
+host-identity redaction scans in P6-T5 and P7-T11.
 
-**Working directory** — every command below runs with the current directory set to the worktree root
-`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a68051a23e4479267`. All repository-relative
-paths in commands resolve against that root.
+**Working directory** — every command below runs with the current directory set to the worktree root,
+the directory containing `TaskMaster.sln` and `global.json`. All repository-relative paths in commands
+resolve against that root. The worktree is chosen when the plan is executed and is deliberately not
+named here: no command in this plan needs an absolute path, and writing one into a committed artifact
+would embed a host account name. The placeholder convention this feature already uses for a worktree
+path in prose is the one at `research/research.2026-08-29T12-30.md:6`,
+`<repo-root>/.claude/worktrees/<worktree-id>`.
 
 **Base commit** — the diff anchor for this plan is the literal commit
-`ecdb1c84ba8541ab67042985919cfed4df768c01`. Every `git diff` in this plan supplies it explicitly. No
-task pins a HEAD SHA.
+`b9476588e0e49e113c73cc55cc918f4a65e022fd`. Every `git diff` in this plan supplies it explicitly. No
+task pins a HEAD SHA. This anchor supersedes the earlier anchor `ecdb1c84`, which this plan was first
+authored against. `origin/main` advanced to `fa2ddefa` (pull request #700, issue #638) and that work
+was merged into this branch, so `ecdb1c84` is still an ancestor of `HEAD` but is no longer a clean
+pre-change baseline: three files differ between it and `HEAD` for reasons this plan does not own.
+`b9476588e0e49e113c73cc55cc918f4a65e022fd` is the post-merge, pre-change baseline, and P0-T8 proves
+that property by a check that can fail rather than by an ancestry check that cannot.
 
 **Git pathspec scoping** — `.claude/` is a tracked directory in this repository and carries unrelated
 in-flight modifications, and `docs/features/parallel/` and `artifacts/` are owned by other processes.
 Every `git status --porcelain` and `git diff` gate in this plan is therefore scoped with an explicit
 pathspec naming only first-party source, test and feature-document trees. The feature-document
 component of every such pathspec is this feature's own folder and never the parent directory
-`docs/features/active`. That narrowing is load-bearing rather than cosmetic, and its justification is
-forward-looking rather than a claim about the tree as it stands today. At the time this plan was
-authored no sibling folder under `docs/features/active` is untracked in this worktree: a
-`git status --porcelain` span over that parent directory lists only this feature's own folder, and the
-sibling folders are committed — including
-`docs/features/active/2026-08-07-breadcrumb-left-right-arrow-parent-child-navigation-440`, whose paths
-were confirmed present in this worktree's git index. The narrowing is required regardless, because the
-executor runs later than this planning pass: this repository carries several concurrent worktrees and
+`docs/features/active`. That narrowing is load-bearing rather than cosmetic, and it is required by the
+tree as it stands now as well as by the tree the executor will meet. A sibling folder is untracked in
+this checkout at the time of this revision:
+`docs/features/active/2026-08-07-breadcrumb-left-right-arrow-parent-child-navigation-440` exists on
+disk, carrying `issue.md`, `plan.2026-08-29T00-22.md` and `spec.md`, and is reported as untracked by
+`git status --porcelain`. An earlier revision of this plan asserted the opposite — that no sibling
+folder was untracked and that the 440 folder's paths were present in this worktree's git index — and
+that assertion was wrong for this worktree; it is corrected here rather than carried forward, because
+a false premise under a correct conclusion is a defect a later reader would have to rediscover. A
+`git add` over the parent directory would therefore stage that other feature's folder onto this branch
+today, not merely under some future condition. The narrowing is also required prospectively, because
+the executor runs later than this planning pass: this repository carries several concurrent worktrees and
 in-flight feature folders, and a concurrent run in this checkout can leave an untracked or modified
 sibling folder under `docs/features/active` at any point between planning and execution. A `git add`
 over the parent directory would then stage and commit another feature's folder onto this branch, and a
@@ -48,7 +62,7 @@ gate that consumes it unsatisfiable. This plan does not assume that the tree it 
 time is the tree the executor will meet, so every gate is scoped to paths this plan owns. The default
 pathspec is therefore
 `-- QuickFiler QuickFiler.Test docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`;
-P6-T5 narrows it to `-- QuickFiler QuickFiler.Test` for its post-commit cleanliness check, and P8-T30
+P6-T6 narrows it to `-- QuickFiler QuickFiler.Test` for its post-commit cleanliness check, and P8-T30
 widens it to the nine production and test trees that task audits. No pathspec in this plan names
 `.claude/`, `docs/features/parallel/`, `artifacts/`, or the bare `docs/features/active`.
 An unscoped gate is unsatisfiable here and must not be substituted.
@@ -77,19 +91,56 @@ no other evidence artifact of this feature is excluded from it. Evidence artifac
 feature folders lie outside the scan's directory operand entirely, and this plan neither reads nor
 changes them.
 
+**Evidence transcript redaction (host-identity discipline).** Every artifact this plan writes under
+`evidence/` is committed, and several of them record captured stdout verbatim. MSBuild prints absolute
+project paths, and vstest names its TRX file after the account and the machine, so a verbatim
+transcript carries the host account name and the machine name into a committed file. This repository
+has already had to promote host-identity leaks in committed artifacts to a tracked issue, and no hook
+catches this class: `enforce-evidence-locations.ps1` checks where an artifact is written, not what it
+contains. Therefore, before any evidence artifact is written, every occurrence of the absolute
+worktree path inside the captured text is replaced with the literal `<worktree-root>`, and every
+remaining absolute path that begins with the Windows per-user profile root is replaced with
+`<user-profile>`. A third replacement is required and is not covered by the first two: vstest composes
+its results file name from the account name and the machine name, so a transcript line naming that
+file still carries host identity after its directory prefix has been redacted. Every occurrence of a
+vstest results file name is therefore replaced with the placeholder `<trx-file>`, which deliberately
+carries no extension, so that the redaction can be gated by searching for the extension itself. The rule applies to every recording task in this plan — P0-T12, P0-T13, P0-T14,
+P2-T8, P2-T9, P3-T4, P4-T3, P5-T6, P6-T4, P7-T1, P7-T2, P7-T3 and P7-T4 — and to the TRX-derived
+content P2-T13 quotes. Two sweep tasks verify it, P6-T5 before the Phase 6 commit and P7-T11 before
+the Phase 7 commit. No third sweep is scheduled for Phase 8: every Phase 8 artifact records
+repository-relative paths, search results and check-off statements, and none captures a toolchain
+transcript. The per-write rule above nonetheless binds every Phase 8 artifact as well.
+Each sweep task runs two searches over this feature's evidence tree and requires zero matches from
+both: one for the fixed string `C:\Users`, and one for the fixed string `.trx`. That two-component
+path prefix is sufficient for the first search and is deliberately the whole pattern: on Windows the
+account segment always follows it immediately, so a
+zero-match result over the prefix proves the account segment is absent too, and the account name is
+therefore never spelled anywhere in this plan or in any artifact it produces. The second search covers
+the results-file case the first cannot reach, because that file name carries the account and the
+machine with no preceding profile path. Each sweep task excludes
+its own artifact from its own scan by an explicit `--glob` exclusion, for the same reason P7-T10
+excludes its own artifact: the artifact must record its own `Command:` line, and that command's
+pattern is the string being searched for. P7-T11 additionally excludes P6-T5's artifact, because that
+earlier artifact carries the same `Command:` line and is inside P7-T11's scan scope. The restriction
+to the `**/evidence/**` subtree is
+load-bearing for the same reason it is in P7-T10: this plan file and `spec.md` both sit at the root of
+the feature folder, and this plan file necessarily spells the search string in the two task texts that
+run the gate, so a scan of the folder without the evidence-subtree glob could never return 0.
+
 **PowerShell invocation form** — every MSBuild and vstest command is issued through
 `pwsh -NoProfile -Command '...'` with outer single quotes and inner double quotes. A bare `/m` passed
 to a POSIX shell layer is rewritten to a path and MSBuild fails with MSB1008. Every acceptance
-condition expressed as a PowerShell expression — including every `(Get-Content -LiteralPath ...).Count`
-check in P2-T2, P2-T4, P4-T1, P6-T1 and P6-T3, and every `Test-Path` check in P0-T9 and P0-T11 — is
-likewise issued through `pwsh -NoProfile -Command '...'` with outer single quotes and inner double
-quotes. Only `git` and `rg` invocations are issued directly.
+condition expressed as a PowerShell expression is likewise issued through
+`pwsh -NoProfile -Command '...'` with outer single quotes and inner double quotes. The
+`(Get-Content -LiteralPath ...).Count` sites are P1-T7, P2-T1, P2-T2, P2-T4, P2-T5, P2-T7, P4-T1,
+P5-T5, P6-T1, P6-T3 and P7-T9; the `Test-Path` sites are P0-T9, P0-T11 and P1-T7. Only `git` and `rg`
+invocations are issued directly.
 
 **Search invocation form** — every `rg` invocation in this plan is issued with its pattern in single
 quotes. `-F` is used only where the pattern is a fixed string whose regex metacharacters — a literal
 backslash, or a parenthesis — must match those same characters in the target text, and in that case
-a backslash is written once. This plan has exactly two such sites, P2-T3 and P5-T1, and both spell
-`-F` in their own task text. Every other `rg` pattern in this plan is a regular expression whose
+a backslash is written once. This plan has exactly six such sites — P2-T3, P2-T6, P5-T1, P5-T3, P6-T5
+and P7-T11 — and each spells `-F` in its own task text. Every other `rg` pattern in this plan is a regular expression whose
 backslashes are regex escape sequences; those patterns are issued in single quotes without `-F`,
 because `-F` would match the escape sequences as literal text and return zero matches for text that
 is present. A
@@ -162,12 +213,22 @@ Findings that this plan depends on:
   `sources` node already exists), so it yields the same six numbers in both cases.
 - The enforced repository floor in the runner is **80 percent line coverage** (`Helpers.ps1:487-489`:
   the percentage is assigned at `:486`, the enforcing comparison `if ($percentage -lt 80)` is at
-  `:487`, and the `80%` message literal is at `:489`),
-  which matches CLAUDE.md. `.claude/rules/general-unit-test.md` states 85 percent line and 75 percent
-  branch. This plan reports the repository-wide figure and treats the runner's own 80 percent gate as
-  blocking; the change-scoped gates (no changed line loses coverage, new helper fully covered) are
-  blocking regardless of which repository-wide figure is quoted. The conflict is recorded, not
-  resolved, by this plan.
+  `:487`, and the `80%` message literal is at `:489`).
+
+**Coverage-floor authority resolution.** Two repository documents state different repository-wide
+coverage figures. `CLAUDE.md` states a floor of **80 percent line coverage on the testable
+denominator**, together with a maintainer-ratified COM/VSTO/WinForms exemption.
+`.claude/rules/general-unit-test.md` states 85 percent line and 75 percent branch. The conflict is
+resolved here by authority ordering rather than by a new exception. `policy-compliance-order` ranks
+`CLAUDE.md` first and `.claude/rules/general-unit-test.md` third, so `CLAUDE.md`'s 80 percent line
+floor on the testable denominator is the binding repository-wide gate for this plan. It is also the
+figure the runner itself enforces, at `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1:487`, so
+the binding gate and the executed gate are the same number. The 85 percent line and 75 percent branch
+figures in `.claude/rules/general-unit-test.md` are the stricter non-binding target and are superseded
+by `CLAUDE.md` where they conflict; this plan still records the post-change figure against them as a
+non-blocking observation, so the gap remains visible without gating the work. The change-scoped gates
+— no changed line loses coverage, and the new helper is fully covered — are blocking regardless of
+which repository-wide figure is quoted. P7-T8 states this resolution and applies it.
 
 **Formatting observables.** `dotnet tool run csharpier format .` rewrites files and still exits 0, so
 its exit code alone proves nothing. The discriminating observation used by this plan is therefore a
@@ -179,11 +240,11 @@ tree observation. `.csharpierignore` excludes `**/evidence/**`, `*.cobertura.xml
 `*.csproj`, `*.props` and `*.targets`, so evidence artifacts, coverage documents and the test project
 file are outside the formatter's scope.
 
-**Anchored-diff form.** Before P6-T5 commits, nothing this plan changes is in `HEAD`, so a two-dot
+**Anchored-diff form.** Before P6-T6 commits, nothing this plan changes is in `HEAD`, so a two-dot
 `BASE..HEAD` diff reports nothing for it. Every pre-commit diff gate in this plan therefore uses the
-index form `git diff ecdb1c84ba8541ab67042985919cfed4df768c01 --cached -- <paths>` and is preceded in
+index form `git diff b9476588e0e49e113c73cc55cc918f4a65e022fd --cached -- <paths>` and is preceded in
 the same task by a `git add` over the same paths. Every post-commit diff gate uses
-`git diff ecdb1c84ba8541ab67042985919cfed4df768c01..HEAD -- <paths>`. Both forms are anchored to an
+`git diff b9476588e0e49e113c73cc55cc918f4a65e022fd..HEAD -- <paths>`. Both forms are anchored to an
 explicit ref; the bare unanchored `git diff` is never used.
 
 **Name-listing diffs carry a companion.** A `git diff --name-only` or `--name-status` enumerates
@@ -193,7 +254,7 @@ plan creates and leaves uncommitted. Every name-listing diff in this plan theref
 executor must observe in that companion output. The two mechanisms are complementary and each alone
 is wrong in one state: the anchored diff is blind to untracked files, and porcelain status goes empty
 once the change is committed. This plan contains exactly two name-listing diff sites, and both carry a
-companion. P6-T5 runs
+companion. P6-T6 runs
 `git add QuickFiler QuickFiler.Test docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`
 before its diff and asserts that `git status --porcelain -- QuickFiler QuickFiler.Test` produces no
 output after the commit. P8-T30 runs a porcelain span over the nine trees it audits, ahead of its two diffs, and
@@ -219,21 +280,60 @@ In scope, exactly four changes:
   `ArchiveStemContract.TryMakeArchiveRelative` at line 99, commit the stem when non-empty, and treat an
   empty stem as a deterministic non-selection with a value-free diagnostic. The change stays nested
   inside the existing `ArchiveStemContract.IsFullOutlookPath(selection)` arm.
-- **B.** `QuickFiler/Controllers/EfcDataModel.cs` — one new pure `internal static` helper called from
-  the `DestinationOlStem` assignment at line 287 in the `string` overload of `MoveToFolderAsync`.
+- **B.** One new pure `internal static` helper, `EfcDataModel.ToFilingStemOrVerbatim`, declared in a
+  new partial-class file `QuickFiler/Controllers/EfcDataModel.FilingStem.cs` and called from the
+  `DestinationOlStem` assignment at `QuickFiler/Controllers/EfcDataModel.cs:337` in the `string`
+  overload of `MoveToFolderAsync`. Change B therefore also makes two supporting edits: the class
+  declaration at `EfcDataModel.cs:21` gains the `partial` keyword, and
+  `QuickFiler/QuickFiler.csproj` gains one `<Compile Include>` item for the new file.
 - **C.** `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` — one assertion, one test
   method name, and one two-line arrange comment, recorded as a deliberate spec correction.
 - **D.** Three stale "deferred to issue #637" records.
 
-Out of scope and owned by issue #695: the `Globals.Ol.ArchiveRootPath` benign degrade, the unhandled
-keyboard entry points to `ActionOkAsync`, the half-completed button-path teardown, and the verbatim
-`DestinationOlStem` assignments in `EfcDataModel.OpenOlFolderAsync` and `OpenFsFolderAsync`. No task in
-this plan touches any of those.
+**Why change B is split into a second file.** `spec.md:414-416` authorizes this: "if it does not, the
+helper moves to its own file rather than the 500-line limit being exceeded." That condition is met.
+`QuickFiler/Controllers/EfcDataModel.cs` is 485 lines on the merged tree, so its headroom to the
+500-line limit in `.claude/rules/general-code-change.md` is 15 lines. The final helper needs roughly
+24 to 26 lines: five to eight lines of XML documentation that must state the contract, describe the
+second parameter, express the gate without naming `IsFullOutlookPath`, and express totality without
+using the character sequence `throw`; plus a body of about twelve lines, because the call
+`ArchiveStemContract.TryMakeArchiveRelative(candidatePath, archiveAncestor, out string stem)` at
+eight-space indentation exceeds CSharpier's default print width of 100 columns once wrapped in an
+`if (` at twelve-space indentation, so that call occupies more than one line. Even the
+behavior-preserving seam alone, had it been placed in `EfcDataModel.cs`, would have taken that file to
+roughly 498 lines, leaving no room for the Phase 4 body. Placing the helper in
+`EfcDataModel.cs` therefore cannot satisfy the 500-line limit, and the split is taken. The helper is a
+partial-class member of the same type, so the fixed identifier `EfcDataModel.ToFilingStemOrVerbatim`
+that AC11 and the "Fixed identifiers" section name is preserved exactly. In-place single-line
+substitutions are the only edits made to `EfcDataModel.cs` itself, so that file's line count is
+unchanged by this plan and no line number in it shifts.
+
+Out of scope and owned by issue #695: the unhandled keyboard entry points to `ActionOkAsync`, the
+half-completed button-path teardown, and the verbatim `DestinationOlStem` assignments in
+`EfcDataModel.OpenOlFolderAsync` at `EfcDataModel.cs:364` and `OpenFsFolderAsync` at `:388`. No task in
+this plan touches any of those. The `Globals.Ol.ArchiveRootPath` benign-degrade item is no longer
+pending in `EfcDataModel`: issue #638 delivered it there, adding `TryGetArchiveRoot` at
+`EfcDataModel.cs:271-297` with the guarded read at `:284` and the
+`UserDiagnosticAction(ArchiveRootUnavailableMessage)` degrade at `:358` and `:382`. This plan
+preserves that work unchanged and adds nothing to it; `spec.md:164-172` still describes the whole
+benign-degrade item as pending, and that staleness is recorded by P8-T32 rather than corrected in
+`spec.md`.
 
 ## Fixed identifiers (the executor does not choose these)
 
 - New helper: `EfcDataModel.ToFilingStemOrVerbatim(string candidatePath, string archiveAncestor)`,
   `internal static string`.
+- New production file: `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`, namespace
+  `QuickFiler.Controllers`, whose only type declaration is written verbatim as
+  `    internal partial class EfcDataModel` and whose only member is `ToFilingStemOrVerbatim` with its
+  XML documentation. Its `using` set is exactly `using UtilitiesCS.OutlookObjects.Folder;`, which is
+  the namespace of `ArchiveStemContract` (`UtilitiesCS/OutlookObjects/Folder/ArchiveStemContract.cs:4`,
+  type at `:18`) and is the only namespace the helper body needs.
+- Amended declaration line in `QuickFiler/Controllers/EfcDataModel.cs:21`: `    internal class EfcDataModel`
+  becomes `    internal partial class EfcDataModel`. This is a one-token, single-line substitution; the
+  file's line count and every line number in it are unchanged by it.
+- New project item in `QuickFiler/QuickFiler.csproj`, written verbatim as
+  `    <Compile Include="Controllers\EfcDataModel.FilingStem.cs" />`.
 - New test file: `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue637Tests.cs`, class
   `BreadcrumbBridgeRouterIssue637Tests`, with exactly these ten test methods:
   `RowSelected_ArchiveRootExactFilingTarget_IsNotSelected`,
@@ -278,9 +378,11 @@ this plan touches any of those.
 These were re-derived against the working tree and one disagrees with `spec.md`. They are recorded so
 no downstream artifact inherits a wrong figure.
 
-1. `QuickFiler/Controllers/EfcDataModel.cs` is **423** lines, not the 424 stated in the spec's
-   implementation table and in AC25's parenthetical. Headroom to the 500-line limit is 77, not 76.
-   AC25's binding clause ("at or under 500 lines") is unaffected.
+1. `QuickFiler/Controllers/EfcDataModel.cs` is **485** lines on the merged tree — 423 at the
+   `ecdb1c84` planning base, and 424 in the spec's implementation table and in AC25's parenthetical.
+   Headroom to the 500-line limit is **15**. This is what forces the change-B file split described
+   under "Scope". AC25's binding clause ("at or under 500 lines") is unaffected, and AC25's
+   parenthetical figure is corrected to 485 in `spec.md`.
 2. The composition test `Issue614_GuardAcceptedSelection_DoesNotThrowAtFilingBoundary` spans
    `QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs:167-214`; AC23 and the spec cite `:167-213`.
    The closing brace is at 214. No behavioral consequence.
@@ -288,10 +390,32 @@ no downstream artifact inherits a wrong figure.
    the spec cites `:143-146`. The write at `:145` and the read at `:143` that AC24 names are exact.
 4. Research section 11's claim that no `EfcDataModelTests.cs` exists is wrong; the file exists at 409
    lines. `spec.md` already records this correction and the spec wins.
-5. Research section 6's "16 matching lines across 6 files" for the `MoveToFolder` family is 16 lines
-   across **5** files on the tree. `spec.md` already records this correction and the spec wins.
+5. The `MoveToFolder` family census moved when issue #638 merged. On the merged tree the family-stem
+   search returns **23** lines across **6** files, and the syntax-anchored search returns **10** lines
+   across **5** files: 3 declarations and 7 call sites, leaving 13 residual non-member textual
+   references. Research section 6 says 16 lines across 6 files and `spec.md` says 16 across 5; both
+   describe the pre-merge tree. AC16's counts and citations are corrected in `spec.md`; P1-T2 and
+   P8-T16 carry the measured figures. The sixth file in the stem search is
+   `QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs`, added by issue #638.
 6. This worktree has no `.dotnet-sdk` directory and no `packages` directory, so the repo-local SDK and
    the NuGet package restore must both be bootstrapped before any toolchain command runs.
+7. Issue #638 landed on this branch before execution begins. It changed
+   `QuickFiler/Controllers/EfcDataModel.cs` (+68/-3), added one `<Compile Include>` line at
+   `QuickFiler.Test/QuickFiler.Test.csproj:116`, and added the 389-line test file
+   `QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs` with 11 `[TestMethod]` members and a
+   `private sealed class TestableEfcDataModel : EfcDataModel` at `:377`. That subclass derives from
+   `EfcDataModel`, and adding `partial` to a class declaration does not change its accessibility, its
+   base list, or its members, so the Phase 2 `partial` edit leaves it compiling unchanged. This plan
+   interacts with that file in exactly two ways: it must not break
+   `MoveToFolderAsync_WhenArchiveRootResolves_StillReadsItOnce` at `:172`, whose
+   `olObjects.VerifyGet(value => value.ArchiveRootPath, Times.Once());` at `:185` pins a single
+   archive-root read per call; and the file contributes one call site at `:314` to the `MoveToFolder`
+   census. It contains no `DestinationOlStem`, no `ToFilingStem` and no `SelectedFolderPath`, so
+   changes A, C and D do not touch it.
+8. `QuickFiler/QuickFiler.csproj` is a non-SDK-style project with **130** explicit `<Compile Include>`
+   items. The `ItemGroup` carrying the `Controllers\` entries opens at `:287`, and
+   `<Compile Include="Controllers\EfcDataModel.cs" />` is at `:289`. A production file absent from
+   this project does not compile into the assembly.
 
 ### Phase 0 — Context, policy reads, and baseline capture
 
@@ -322,14 +446,21 @@ no downstream artifact inherits a wrong figure.
       Acceptance: the artifact names the `EfcDataModelTests.cs` existence correction, the
       `MoveToFolder` five-file correction, and the `SelectedFolderPath` three-production-file
       correction.
-- [ ] [P0-T8] Record the branch and base commit. Run
+- [ ] [P0-T8] Record the branch and prove the base commit is a clean pre-change baseline. Run
       `git rev-parse --abbrev-ref HEAD`, `git rev-parse HEAD`, and
-      `git merge-base --is-ancestor ecdb1c84ba8541ab67042985919cfed4df768c01 HEAD`, and write
-      `evidence/baseline/p0-t8-git-base.md`. Acceptance: the `merge-base --is-ancestor` invocation
-      exits 0, and the recorded branch name is
-      `bug/breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`. If the branch name
-      differs, record `BRANCH MISMATCH` in the artifact, stop, and report to the orchestrator; do not
-      proceed to P0-T9.
+      `git diff --name-only b9476588e0e49e113c73cc55cc918f4a65e022fd..HEAD -- QuickFiler QuickFiler.Test`,
+      and write `evidence/baseline/p0-t8-git-base.md` recording all three outputs verbatim.
+      Acceptance: the `git diff --name-only` invocation produces **no output at all**, and the
+      recorded branch name is
+      `bug/breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`. An ancestry check is
+      deliberately not used here. `git merge-base --is-ancestor` exits 0 for any ancestor, including
+      an ancestor that predates work this plan does not own, so it cannot fail in the state this task
+      exists to detect; the empty-diff form fails as soon as any file under `QuickFiler` or
+      `QuickFiler.Test` differs between the anchor and `HEAD`, which is the property every later
+      "exactly N paths", "no hunk in range" and "added line numbers" gate depends on. If the branch
+      name differs, or if the diff produces any output, record `BASE MISMATCH` in the artifact
+      together with the offending output, stop, and report to the orchestrator; do not proceed to
+      P0-T9.
 - [ ] [P0-T9] Bootstrap the repo-local .NET SDK with
       `pwsh -NoProfile -File scripts/vscode/Install-RepoDotNetSdk.ps1` and write
       `evidence/baseline/p0-t9-sdk-bootstrap.md`. Acceptance: `EXIT_CODE: 0`, and after the run the
@@ -402,9 +533,12 @@ no downstream artifact inherits a wrong figure.
       failing test's fully qualified name (empty when the run passes). The file
       `coverage/p0-t15-baseline.cobertura.xml` exists after the run. `Output Summary:` additionally
       carries the six numeric `/coverage` attribute values and the derived line and branch
-      percentages that P0-T16 reads, copied in once P0-T16 has produced them; this task is not
-      complete until that copy-back has been made, because the plan contract requires the baseline
-      test-step artifact itself to carry the numeric coverage headline.
+      percentages that P0-T16 reads, copied in once P0-T16 has produced them, because the plan
+      contract requires the baseline test-step artifact itself to carry the numeric coverage
+      headline. The execution order for the pair is explicit and is not a deadlock: run this task's
+      command and write everything except the copied-back headline, leave P0-T15 **unchecked**,
+      execute P0-T16 in full, then return to P0-T15, write the copy-back into `Output Summary:`, and
+      check both tasks off together.
 - [ ] [P0-T16] Read the baseline numeric coverage headline. Run
       `pwsh -NoProfile -Command '. ".\scripts\vscode\Invoke-MSTestWithCoverage.Helpers.ps1"; $raw = Get-Content -LiteralPath ".\coverage\p0-t15-baseline.cobertura.xml" -Raw -Encoding UTF8; [xml]$d = ConvertTo-KoverageCoberturaXml -XmlContent $raw -RepoRoot (Get-Location).Path; $c = $d.SelectSingleNode("/coverage"); foreach ($a in @("line-rate","branch-rate","lines-covered","lines-valid","branches-covered","branches-valid")) { $a + "=" + $c.GetAttribute($a) }'`
       and write `evidence/baseline/p0-t16-coverage-headline.md`. Acceptance: `EXIT_CODE: 0`, and
@@ -417,7 +551,12 @@ no downstream artifact inherits a wrong figure.
       `pwsh -NoProfile -Command '. ".\scripts\vscode\Invoke-MSTestWithCoverage.Helpers.ps1"; $raw = Get-Content -LiteralPath ".\coverage\p0-t15-baseline.cobertura.xml" -Raw -Encoding UTF8; [xml]$d = ConvertTo-KoverageCoberturaXml -XmlContent $raw -RepoRoot (Get-Location).Path; foreach ($f in @("QuickFiler\Controllers\BreadcrumbBridgeRouter.Selection.cs","QuickFiler\Controllers\EfcDataModel.cs")) { $u = @(); foreach ($c in $d.SelectNodes("//class")) { if ($c.GetAttribute("filename") -eq $f) { foreach ($l in $c.SelectNodes("./lines/line")) { if ([int]$l.GetAttribute("hits") -eq 0) { $u += [int]$l.GetAttribute("number") } } } }; $f + " uncovered=" + (($u | Sort-Object -Unique) -join ",") } '`
       and write `evidence/baseline/p0-t17-baseline-uncovered-lines.md`. Acceptance: `EXIT_CODE: 0`, and
       the artifact records one `uncovered=` line for each of the two file paths, even when the set is
-      empty.
+      empty. The third production file this plan touches,
+      `QuickFiler\Controllers\EfcDataModel.FilingStem.cs`, is deliberately absent from this command:
+      it does not exist on the baseline tree, so it has no baseline coverage row and no baseline
+      uncovered set. The artifact records that absence in a line reading
+      `QuickFiler\Controllers\EfcDataModel.FilingStem.cs baseline=absent`, which is the baseline
+      P7-T7 compares its post-change measurement of that file against.
 
 ### Phase 1 — Pre-change census re-derivation, two independent searches per number
 
@@ -439,20 +578,23 @@ second, independently constructed search. No number in this phase is verified by
       (`BreadcrumbBridgeRouter.Selection.cs:83` and `:109`) and call sites total 7
       (`BreadcrumbBridgeRouter.cs:201`, `:286`, `BreadcrumbBridgeRouter.Arrows.cs:138`, `:153`, `:161`,
       `BreadcrumbBridgeRouter.Selection.cs:33`, `:47`).
-- [ ] [P1-T2] Re-derive the `MoveToFolder` family census (AC16: 3 declarations, 6 call sites).
+- [ ] [P1-T2] Re-derive the `MoveToFolder` family census (AC16: 3 declarations, 7 call sites).
       Search 1, family-stem: `rg -n "MoveToFolder" --glob "*.cs" .` — the bare stem catches any
       non-`Async` sibling or partially renamed overload that an `Async`-suffixed pattern would miss.
       Search 2, independently constructed on invocation and declaration syntax:
       `rg -n "MoveToFolderAsync\s*\(" --glob "*.cs" .` — this excludes the `MoveToFolderAsyncAction`
       delegate property, its null test and its invocation, which are textual references rather than
       family members. Write `evidence/baseline/p1-t2-movetofolder-family.md`. Acceptance: Search 1
-      returns 16 lines across 5 files; Search 2 returns 9 lines across 4 files; the artifact classifies
-      Search 2's 9 lines as exactly 3 declarations (`EfcDataModel.cs:259`, `EfcDataModel.cs:336`,
-      `EfcHomeController.ExecuteMoves.cs:89`) and 6 call sites
-      (`EfcHomeController.ExecuteMoves.cs:78`, `:98`, `EfcDataModel.cs:346`, `EfcFormController.cs:537`,
-      `:844`, `EfcHomeControllerExecuteMovesTests.cs:87`); and the artifact records that Search 1 minus
-      Search 2 leaves exactly 7 non-member textual references, closing the 16-line accounting. The
-      artifact also records that the file count is 5, not the 6 stated in research section 6.
+      returns 23 lines across 6 files; Search 2 returns 10 lines across 5 files; the artifact classifies
+      Search 2's 10 lines as exactly 3 declarations (`EfcDataModel.cs:303`, `EfcDataModel.cs:398`,
+      `EfcHomeController.ExecuteMoves.cs:89`) and 7 call sites
+      (`EfcHomeController.ExecuteMoves.cs:78`, `:98`, `EfcDataModel.cs:408`, `EfcFormController.cs:537`,
+      `:844`, `EfcHomeControllerExecuteMovesTests.cs:87`,
+      `EfcDataModelArchiveRootTests.cs:314`); and the artifact records that Search 1 minus
+      Search 2 leaves exactly 13 non-member textual references, closing the 23-line accounting. The
+      artifact also records that the stem-search file count is 6 and the syntax-anchored file count is
+      5, that the sixth stem-search file is `EfcDataModelArchiveRootTests.cs`, and that the 16-line
+      figure in research section 6 and in `spec.md` describes the tree before issue #638 merged.
 - [ ] [P1-T3] Re-derive the `SelectedFolderPath` surface (AC24: 9 lines across 3 production files, 2
       writes, 3 reads). Search 1: `rg -c "SelectedFolderPath" --glob "*.cs" .`, recording the per-file
       counts. Search 2, independently constructed by scoping to the production project directories up
@@ -503,12 +645,19 @@ second, independently constructed search. No number in this phase is verified by
       Construction 2, independently constructed with a line-oriented search rather than a file read:
       `rg -c "^" --glob "*.cs" QuickFiler/Controllers/ QuickFiler.Test/Controllers/` filtered to the
       same six paths. `Measure-Object -Line` must not be substituted for `(Get-Content).Count`; it
-      reports a different figure for a file without a trailing newline. Write
-      `evidence/baseline/p1-t7-file-line-counts.md`. Acceptance: both constructions agree on all six
-      paths; `EfcDataModel.cs` is 423; `BreadcrumbBridgeRouter.Selection.cs` is 209;
+      reports a different figure for a file without a trailing newline. In the same task run
+      `pwsh -NoProfile -Command 'Test-Path "QuickFiler\Controllers\EfcDataModel.FilingStem.cs"'` to
+      establish the seventh path's baseline. That path is checked with `Test-Path` rather than added
+      to the two line-count constructions because this plan creates it in Phase 2 and
+      `Get-Content -LiteralPath` on an absent path throws, which would make this task unsatisfiable.
+      Write `evidence/baseline/p1-t7-file-line-counts.md`. Acceptance: both constructions agree on all
+      six paths; `EfcDataModel.cs` is 485; `BreadcrumbBridgeRouter.Selection.cs` is 209;
       `EfcSelectionGuard.cs` is 79; `BreadcrumbBridgeRouterIssue439Tests.cs` is 694;
-      `EfcDataModelIssue614Tests.cs` is 123; `EfcSelectionGuardTests.cs` is 296; and the artifact
-      records that `spec.md` states 424 for `EfcDataModel.cs` and that the tree value 423 governs.
+      `EfcDataModelIssue614Tests.cs` is 123; `EfcSelectionGuardTests.cs` is 296; the `Test-Path` result
+      for `QuickFiler\Controllers\EfcDataModel.FilingStem.cs` is `False` and is recorded as the
+      baseline for that path; and the artifact records that `spec.md`'s implementation table and AC25
+      state 424 for `EfcDataModel.cs`, that the `ecdb1c84` planning base had 423, and that the merged
+      tree value 485 governs, leaving 15 lines of headroom to the 500-line limit.
 - [ ] [P1-T8] Re-derive the single pinning assertion (AC20: exactly 1 existing assertion changes).
       Construction 1, on the assertion form:
       `rg -n "SelectedFolderPath\.Should\(\)\.Be\(" --glob "*.cs" QuickFiler.Test/` with every hit
@@ -526,37 +675,103 @@ second, independently constructed search. No number in this phase is verified by
 
 The change-B tests name a member that does not exist yet, and a test file referencing a missing member
 makes the whole `QuickFiler.Test` assembly fail to compile, which would prevent every other test in
-this phase from running at all. P2-T1 therefore lands a behavior-preserving seam first: the helper is
-declared and called, but returns its input verbatim, which is byte-for-byte the behavior of the current
-assignment at `EfcDataModel.cs:287`. The red in this phase is a genuine runtime red, not a compile
-failure.
+this phase from running at all. P2-T1 through P2-T4 therefore land a behavior-preserving seam first:
+the helper is declared and called, but returns its input verbatim, which is byte-for-byte the behavior
+of the current assignment at `EfcDataModel.cs:337`. The red in this phase is a genuine runtime red, not
+a compile failure.
 
-- [ ] [P2-T1] Add the behavior-preserving seam. In `QuickFiler/Controllers/EfcDataModel.cs`, declare
-      `internal static string ToFilingStemOrVerbatim(string candidatePath, string archiveAncestor)`
+The seam is delivered as a partial-class member in a new file, for the 500-line reason stated under
+"Scope". Three tasks are therefore prerequisites of the seam and are ordered ahead of it here rather
+than left to Phase 4: the `partial` keyword on the existing declaration (P2-T1), the new file itself
+(P2-T2), and the project registration that makes the new file compile (P2-T3). Only then does P2-T4
+redirect the assignment. Reversing any of those orders produces a build that does not compile.
+
+- [ ] [P2-T1] Make the existing declaration partial. In `QuickFiler/Controllers/EfcDataModel.cs`,
+      replace line 21, `    internal class EfcDataModel`, with
+      `    internal partial class EfcDataModel`. This is a one-token, single-line substitution: the
+      file stays at 485 lines and no line number in it shifts, which is what lets every line citation
+      in Phase 4 and Phase 8 remain valid after the edit. Adding `partial` changes no accessibility, no
+      base list and no member, so
+      `QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs:377`, which declares
+      `private sealed class TestableEfcDataModel : EfcDataModel`, continues to compile unchanged.
+      Acceptance:
+      `rg -n "internal partial class EfcDataModel" QuickFiler/Controllers/EfcDataModel.cs` returns
+      exactly 1 line and it is line 21;
+      `rg -n "^    internal class EfcDataModel$" QuickFiler/Controllers/EfcDataModel.cs` returns 0
+      lines; and
+      `pwsh -NoProfile -Command '(Get-Content -LiteralPath "QuickFiler\Controllers\EfcDataModel.cs").Count'`
+      reports exactly 485.
+- [ ] [P2-T2] Create the new partial-class file
+      `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`. It contains exactly one `using` directive,
+      `using UtilitiesCS.OutlookObjects.Folder;`, the namespace `QuickFiler.Controllers`, the type
+      declaration written verbatim as `    internal partial class EfcDataModel`, and one member: the
+      seam form of `internal static string ToFilingStemOrVerbatim(string candidatePath, string archiveAncestor)`
       whose body is exactly
       `_ = ArchiveStemContract.TryMakeArchiveRelative(candidatePath, archiveAncestor, out _);` followed
-      by `return candidatePath;`, with an XML documentation comment stating that this is the #637 seam
-      and that the normalization lands in P4-T1. Change the assignment at `EfcDataModel.cs:287` from
-      `DestinationOlStem = folderpath,` to
-      `DestinationOlStem = ToFilingStemOrVerbatim(folderpath, Globals.Ol.ArchiveRootPath),`.
-      The explicit discard on the `TryMakeArchiveRelative` call is required so that both parameters are
-      used and no unused-parameter diagnostic can be promoted to an error by
-      `/p:TreatWarningsAsErrors=true`. Declare the helper immediately after the closing brace of the
-      `string` overload of `MoveToFolderAsync` at original line 297 and before
-      `internal async Task OpenOlFolderAsync` at original line 299, so the insertion hunk falls
-      outside both ranges P4-T6 excludes. Do not place it adjacent to `ToArchiveRelativeStem`. The
+      by `return candidatePath;`, carrying an XML documentation comment stating that this is the #637
+      seam and that the normalization lands in P4-T1. The explicit discard on the
+      `TryMakeArchiveRelative` call is required so that both parameters are used and no
+      unused-parameter diagnostic can be promoted to an error by `/p:TreatWarningsAsErrors=true`. The
       seam's XML documentation must not contain the token `MoveToFolder`; refer to its caller as
       "the `string` filing overload" instead, because P8-T16 asserts the family stem search still
-      returns exactly 16 lines. For the same reason the seam's XML documentation must not contain
-      either of the two literals this task asserts an exact count of 1 for —
+      returns exactly 23 lines. For the same reason the seam's XML documentation must not contain
+      either of the two literals whose exact count of 1 is asserted below —
       `internal static string ToFilingStemOrVerbatim` and `DestinationOlStem = ToFilingStemOrVerbatim`
       — so it must not reproduce the declaration signature or the assignment statement; naming the
-      method by its bare identifier is permitted and is classified rather than counted by P4-T2.
-      Acceptance: `rg -n "internal static string ToFilingStemOrVerbatim" QuickFiler/Controllers/EfcDataModel.cs`
-      returns exactly 1 line, and
+      method by its bare identifier is permitted and is classified rather than counted by P4-T2. Three
+      further tokens are barred from this file, in its documentation and in its body alike, because
+      P4-T1's acceptance asserts each of their pre-edit counts in this file: `IsFullOutlookPath`, which
+      P4-T1 requires to be 0 before its edit and 1 after; the character sequence `throw` in any form,
+      including `throws`, which P4-T1 requires to be absent both before and after; and `Globals` in any
+      form, which P4-T1 requires to be absent. The seam body given above uses none of the three. The
+      two literals this task creates are quoted verbatim here because both are absent from the tracked
+      tree until this task writes them:
+      `internal static string ToFilingStemOrVerbatim` and `internal partial class EfcDataModel`.
+      Acceptance: the file exists;
+      `rg -n "internal static string ToFilingStemOrVerbatim" QuickFiler/Controllers/EfcDataModel.FilingStem.cs`
+      returns exactly 1 line;
+      `rg -n "internal partial class EfcDataModel" QuickFiler/Controllers/EfcDataModel.FilingStem.cs`
+      returns exactly 1 line; and
+      `pwsh -NoProfile -Command '(Get-Content -LiteralPath "QuickFiler\Controllers\EfcDataModel.FilingStem.cs").Count'`
+      is at most 500.
+- [ ] [P2-T3] Register the new production file in the non-SDK project. Insert
+      `    <Compile Include="Controllers\EfcDataModel.FilingStem.cs" />` into
+      `QuickFiler/QuickFiler.csproj` immediately after the existing line 289,
+      `    <Compile Include="Controllers\EfcDataModel.cs" />`, which sits inside the `ItemGroup` that
+      opens at line 287. That project carries 130 explicit `<Compile Include>` items and no wildcard
+      glob, so a production file absent from it compiles into nothing and the seam would not exist at
+      run time. The literal this task creates is `Controllers\EfcDataModel.FilingStem.cs`, quoted here
+      verbatim because it is absent from the tracked tree until this task inserts it. The acceptance
+      search below is the fixed-string, single-quoted form required by the "Search invocation form"
+      convention: the backslash is written once and `-F` disables regex interpretation, so no shell
+      layer and no regex engine can consume it. Acceptance:
+      `rg -F -n 'Controllers\EfcDataModel.FilingStem.cs' QuickFiler/QuickFiler.csproj`
+      returns exactly 1 line; that line is line 290; and it is inside the same `ItemGroup` that begins
+      at line 287.
+- [ ] [P2-T4] Redirect the `DestinationOlStem` assignment to the seam. In
+      `QuickFiler/Controllers/EfcDataModel.cs`, change line 337 from
+      `                DestinationOlStem = folderpath,` to
+      `                DestinationOlStem = ToFilingStemOrVerbatim(folderpath, olAncestor),`.
+      The second argument is the local produced by `if (!TryGetArchiveRoot(out var olAncestor))` at
+      line 327, and it is the same local the initializer already assigns to `OlAncestor` at line 339.
+      Naming `Globals.Ol.ArchiveRootPath` at line 337 is **prohibited**. Issue #638 removed exactly
+      that unguarded read from exactly this method and left the property read once, inside the
+      `try` of `TryGetArchiveRoot` at line 284. Writing the property here would reintroduce the
+      unguarded read and would read it twice in one call, failing the merged regression test
+      `MoveToFolderAsync_WhenArchiveRootResolves_StillReadsItOnce` at
+      `QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs:172`, whose
+      `olObjects.VerifyGet(value => value.ArchiveRootPath, Times.Once());` at `:185` pins the single
+      read. P2-T10 gates that constraint at a scoped run rather than leaving it documented, because
+      every other scoped run in Phases 2 through 6 is filtered to a class that would not observe it.
+      This is a single-line substitution, so `EfcDataModel.cs` stays at 485 lines and no line number
+      in it shifts. Acceptance:
       `rg -n "DestinationOlStem = ToFilingStemOrVerbatim" QuickFiler/Controllers/EfcDataModel.cs`
-      returns exactly 1 line.
-- [ ] [P2-T2] Create `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue637Tests.cs` containing
+      returns exactly 1 line and it is line 337;
+      `rg -n "Globals.Ol.ArchiveRootPath" QuickFiler/Controllers/EfcDataModel.cs` returns exactly 1
+      line and it is line 284; and
+      `pwsh -NoProfile -Command '(Get-Content -LiteralPath "QuickFiler\Controllers\EfcDataModel.cs").Count'`
+      reports exactly 485.
+- [ ] [P2-T5] Create `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue637Tests.cs` containing
       the class `BreadcrumbBridgeRouterIssue637Tests` with exactly the ten test methods named in the
       "Fixed identifiers" section. Use fixture Shape 2 and do not invent a new fixture shape: a
       `[TestInitialize]` `Setup` and `[TestCleanup]` `Cleanup` modelled on
@@ -571,13 +786,13 @@ failure.
       `BindRowsAsync` trims to empty at `BreadcrumbBridgeRouter.cs:107-109`. Framework is MSTest with
       Moq and FluentAssertions; no temporary file, no wall-clock wait, no Outlook process. No text in
       this file may contain the token `MoveToFolder`, because P8-T16 asserts that a repository-wide
-      `*.cs` search for that stem still returns exactly 16 lines. Acceptance:
+      `*.cs` search for that stem still returns exactly 23 lines. Acceptance:
       the file exists; `rg -c "\[TestMethod\]" QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue637Tests.cs`
       returns 10; each of the ten fixed method names is found exactly once by
       `rg -n "public void " QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue637Tests.cs`; and
       `(Get-Content -LiteralPath "QuickFiler.Test\Controllers\BreadcrumbBridgeRouterIssue637Tests.cs").Count`
       is at most 500.
-- [ ] [P2-T3] Register the new test file in the non-SDK project. Insert
+- [ ] [P2-T6] Register the new test file in the non-SDK project. Insert
       `    <Compile Include="Controllers\BreadcrumbBridgeRouterIssue637Tests.cs" />` into
       `QuickFiler.Test/QuickFiler.Test.csproj` immediately after the existing line 64,
       `    <Compile Include="Controllers\BreadcrumbBridgeRouterIssue439Tests.cs" />`. A file absent
@@ -589,7 +804,7 @@ failure.
       regex engine can consume it. Acceptance:
       `rg -F -n 'Controllers\BreadcrumbBridgeRouterIssue637Tests.cs' QuickFiler.Test/QuickFiler.Test.csproj`
       returns exactly 1 line, and that line is inside the same `ItemGroup` that begins at line 57.
-- [ ] [P2-T4] Add the change-B helper tests. In the existing file
+- [ ] [P2-T7] Add the change-B helper tests. In the existing file
       `QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`, add a new sibling `[TestClass]`
       `EfcDataModelIssue637Tests` containing exactly the eight test methods named in the "Fixed
       identifiers" section, reaching `EfcDataModel.ToFilingStemOrVerbatim` through the existing
@@ -602,27 +817,48 @@ failure.
       therefore asserts over the literal `class EfcDataModelIssue637Tests`, which is quoted here
       verbatim because it is absent from the tracked tree until this task creates it. No text this
       task adds may contain the token `MoveToFolder`, because P8-T16 asserts that a repository-wide
-      `*.cs` search for that stem still returns exactly 16 lines. Acceptance:
+      `*.cs` search for that stem still returns exactly 23 lines. Acceptance:
       `rg -n "class EfcDataModelIssue637Tests" QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`
       returns exactly 1 line; each of the eight fixed method names is found exactly once in that file;
       `git add QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs` followed in the same task by
-      `git diff ecdb1c84ba8541ab67042985919cfed4df768c01 --cached -- QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`
+      `git diff b9476588e0e49e113c73cc55cc918f4a65e022fd --cached -- QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`
       shows zero removed content lines, meaning zero lines beginning with a single `-`; and
       `(Get-Content -LiteralPath "QuickFiler.Test\Controllers\EfcDataModelIssue614Tests.cs").Count` is
       at most 500.
-- [ ] [P2-T5] Run the analyzer build and write `evidence/regression-testing/p2-t5-msbuild-analyzers.md`
+- [ ] [P2-T8] Run the analyzer build and write `evidence/regression-testing/p2-t8-msbuild-analyzers.md`
       using the P0-T13 command verbatim. Acceptance: `EXIT_CODE: 0`; the output contains
-      `(Rebuild target(s))`; and the `Error(s)` count is 0. A non-zero exit here means the seam or the
-      new test files do not compile and must be repaired before P2-T7 runs.
-- [ ] [P2-T6] Run the nullable build and write `evidence/regression-testing/p2-t6-msbuild-nullable.md`
+      `(Rebuild target(s))`; and the `Error(s)` count is 0. A non-zero exit here means the seam, the
+      partial-class split, the project registrations, or the new test files do not compile and must be
+      repaired before P2-T10 runs.
+- [ ] [P2-T9] Run the nullable build and write `evidence/regression-testing/p2-t9-msbuild-nullable.md`
       using the P0-T14 command verbatim. Acceptance: `EXIT_CODE: 0`; the output contains
       `(Rebuild target(s))`; the recorded `Command:` line does not contain the solution-wide nullable
       opt-in property — record this as `NULLABLE_OPT_IN_PROPERTY: absent`; do not spell the token in
       the artifact. This gate is where an unused-parameter or nullable diagnostic introduced by the
       seam would surface as an error.
-- [ ] [P2-T7] [expect-fail] Run the new router regression tests before the fix. Run
-      `pwsh -NoProfile -Command '$vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"; $vstest = & $vswhere -latest -products * -find "Common7\IDE\Extensions\TestPlatform\vstest.console.exe" | Select-Object -First 1; $asm = Join-Path (Get-Location).Path "QuickFiler.Test\bin\Debug\QuickFiler.Test.dll"; & $vstest $asm /InIsolation "/TestCaseFilter:FullyQualifiedName~BreadcrumbBridgeRouterIssue637Tests&TestCategory!=LiveOutlook" /Logger:trx "/ResultsDirectory:coverage\testresults\p2-t7"; "EXIT_CODE=$LASTEXITCODE"'`
-      and write `evidence/regression-testing/p2-t7-router-tests-red.md` with `ExpectedExitCode: 1`.
+- [ ] [P2-T10] Prove the seam did not regress issue #638's single-read guarantee. Use the scoped
+      vstest command stated in full in P2-T11 below, with the filter
+      `"/TestCaseFilter:FullyQualifiedName~EfcDataModelArchiveRootTests&TestCategory!=LiveOutlook"`
+      and the results directory `coverage\testresults\p2-t10`, and write
+      `evidence/regression-testing/p2-t10-issue638-preserved.md`. This task exists because P2-T4
+      rewrites the one line issue #638 changed in the `string` overload, and every other scoped run in
+      Phases 2 through 6 is filtered to a class that cannot observe the result; without this task the
+      regression would surface for the first time at the full-suite run in P7-T5. Acceptance: the
+      output does not contain `No test matches the given testcase filter`; the run reports 11 tests for
+      that class, which is the number of `[TestMethod]` members the file carries; the artifact names
+      `MoveToFolderAsync_WhenArchiveRootResolves_StillReadsItOnce` individually as **passing**,
+      together with the statement that its `Times.Once()` assertion is what proves P2-T4 passed the
+      existing `olAncestor` local rather than reading `Globals.Ol.ArchiveRootPath` a second time; and
+      the failing set is a subset of the `BASELINE_FAILURE_SET` recorded in
+      `evidence/baseline/p0-t15-mstest-coverage.md`, with every still-failing baseline member named. If
+      that baseline set is empty, `EXIT_CODE: 0` with 11 passed and 0 failed is required. If
+      `MoveToFolderAsync_WhenArchiveRootResolves_StillReadsItOnce` is itself in the baseline failing
+      set, record `BASELINE PROTECTS NOTHING`, stop, and report to the orchestrator: the invariant this
+      task exists to protect would already be red before this plan ran, and no result here would
+      distinguish a regression from that pre-existing state.
+- [ ] [P2-T11] [expect-fail] Run the new router regression tests before the fix. Run
+      `pwsh -NoProfile -Command '$vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"; $vstest = & $vswhere -latest -products * -find "Common7\IDE\Extensions\TestPlatform\vstest.console.exe" | Select-Object -First 1; $asm = Join-Path (Get-Location).Path "QuickFiler.Test\bin\Debug\QuickFiler.Test.dll"; & $vstest $asm /InIsolation "/TestCaseFilter:FullyQualifiedName~BreadcrumbBridgeRouterIssue637Tests&TestCategory!=LiveOutlook" /Logger:trx "/ResultsDirectory:coverage\testresults\p2-t11"; "EXIT_CODE=$LASTEXITCODE"'`
+      and write `evidence/regression-testing/p2-t11-router-tests-red.md` with `ExpectedExitCode: 1`.
       Acceptance: the output does not contain `No test matches the given testcase filter`; the run
       reports 10 tests total; exactly these 5 fail, named individually in the artifact:
       `RowSelected_ArchiveRootExactFilingTarget_IsNotSelected`,
@@ -636,19 +872,24 @@ failure.
       `RowSelected_SeparatorBoundaryNearMissTarget_IsStillRejected`,
       `RowSelected_RootedTargetWithNoBoundArchiveRoot_PassesThroughVerbatim`. A different partition is a
       defect in the tests, not evidence of the bug, and must be repaired before Phase 3.
-- [ ] [P2-T8] [expect-fail] Run the new helper tests before the fix. Run the P2-T7 command with the
+- [ ] [P2-T12] [expect-fail] Run the new helper tests before the fix. Run the P2-T11 command with the
       filter substring changed to `FullyQualifiedName~EfcDataModelIssue637Tests` and the results
-      directory changed to `coverage\testresults\p2-t8`, and write
-      `evidence/regression-testing/p2-t8-helper-tests-red.md` with `ExpectedExitCode: 1`. Acceptance:
+      directory changed to `coverage\testresults\p2-t12`, and write
+      `evidence/regression-testing/p2-t12-helper-tests-red.md` with `ExpectedExitCode: 1`. Acceptance:
       the output does not contain `No test matches the given testcase filter`; the run reports 8 tests
       total; exactly these 2 fail: `ToFilingStemOrVerbatim_RootedUnderAncestor_ReturnsTheStem` and
       `ToFilingStemOrVerbatim_RootedUnderCaseDifferingAncestor_ReturnsTheStem`; and the other 6 pass,
       because the seam already returns the input verbatim for every non-normalizable case.
-- [ ] [P2-T9] Prove the new test file actually executes rather than silently compiling into nothing.
-      From the TRX produced by P2-T7 at `coverage\testresults\p2-t7`, extract every `UnitTestResult`
+- [ ] [P2-T13] Prove the new test file actually executes rather than silently compiling into nothing.
+      From the TRX produced by P2-T11 at `coverage\testresults\p2-t11`, extract every `UnitTestResult`
       whose `testName` begins with one of the ten fixed method names, and write
-      `evidence/regression-testing/p2-t9-compile-include-observed.md`. Acceptance: the artifact records
-      exactly 10 such results; it quotes the `Compile Include` line added by P2-T3 verbatim; and it
+      `evidence/regression-testing/p2-t13-compile-include-observed.md`. Quote only the `testName` and
+      `outcome` attribute values of each result. Do not quote the results file's name, and do not quote
+      any absolute path: vstest composes that file name from the account and the machine, so quoting it
+      would put host identity into a committed artifact, and the "Evidence transcript redaction"
+      convention requires it to be written as `<trx-file>` if it must be referred to at all.
+      Acceptance: the artifact records
+      exactly 10 such results; it quotes the `Compile Include` line added by P2-T6 verbatim; and it
       records that removing that line would make this count 0, which is the observable AC26 requires.
 
 ### Phase 3 — Change A, producer normalization in `SelectRow`
@@ -686,7 +927,7 @@ failure.
       pass-through mode is untouched.
 - [ ] [P3-T3] Verify AC8: `SelectHierarchyPath` and `CommitSelection` are unmodified. Run
       `git add QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs` then
-      `git diff ecdb1c84ba8541ab67042985919cfed4df768c01 --cached -U0 -- QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs`
+      `git diff b9476588e0e49e113c73cc55cc918f4a65e022fd --cached -U0 -- QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs`
       and write `evidence/regression-testing/p3-t3-selectionfile-diff.md`. Acceptance: every hunk
       header in the diff addresses a line range that lies entirely within the original lines 83 to 107;
       no hunk touches the original line range 109 to 139; and the artifact lists the hunk headers
@@ -696,12 +937,12 @@ failure.
       both record `EXIT_CODE: 0`; both outputs contain `(Rebuild target(s))`; and neither recorded
       `Command:` line contains the solution-wide nullable opt-in property — record this as
       `NULLABLE_OPT_IN_PROPERTY: absent`; do not spell the token in the artifact.
-- [ ] [P3-T5] Run the router regression suite green. Use the P2-T7 command with the results directory
+- [ ] [P3-T5] Run the router regression suite green. Use the P2-T11 command with the results directory
       changed to `coverage\testresults\p3-t5`, and write
       `evidence/regression-testing/p3-t5-router-tests-green.md`. Acceptance: `EXIT_CODE: 0`; 10 tests
-      total; 10 passed; 0 failed; 0 skipped; and the five tests that failed in P2-T7 are named
+      total; 10 passed; 0 failed; 0 skipped; and the five tests that failed in P2-T11 are named
       individually in the artifact as now passing.
-- [ ] [P3-T6] Run the unmodified router test classes to prove no collateral regression. Use the P2-T7
+- [ ] [P3-T6] Run the unmodified router test classes to prove no collateral regression. Use the P2-T11
       command with the filter
       `"/TestCaseFilter:(FullyQualifiedName~BreadcrumbBridgeRouterIssue614Tests|FullyQualifiedName~BreadcrumbBridgeRouterTests|FullyQualifiedName~BreadcrumbBridgeRouterQueueTests)&TestCategory!=LiveOutlook"`
       and the results directory `coverage\testresults\p3-t6`, and write
@@ -713,8 +954,8 @@ failure.
 
 ### Phase 4 — Change B, normalization in the `string` overload of `MoveToFolderAsync`
 
-- [ ] [P4-T1] Replace the seam body in `QuickFiler/Controllers/EfcDataModel.cs` with the real
-      normalization. `ToFilingStemOrVerbatim` returns `candidatePath` unchanged when
+- [ ] [P4-T1] Replace the seam body in `QuickFiler/Controllers/EfcDataModel.FilingStem.cs` with the
+      real normalization. `ToFilingStemOrVerbatim` returns `candidatePath` unchanged when
       `ArchiveStemContract.IsFullOutlookPath(candidatePath)` is false; otherwise it calls
       `ArchiveStemContract.TryMakeArchiveRelative(candidatePath, archiveAncestor, out string stem)` and
       returns `stem` when that call succeeds and `stem.Length != 0`, and returns `candidatePath`
@@ -722,36 +963,43 @@ failure.
       and touches no static mutable state. It deliberately does not adopt
       `ToArchiveRelativeStem`'s throw on the archive-root-exact input; the rationale is recorded in
       `spec.md` under "Error handling and logging updates". Update the XML documentation to state the
-      final contract and remove the seam wording added by P2-T1. The helper's XML documentation must
+      final contract and remove the seam wording added by P2-T2. The helper's XML documentation must
       not contain the token `MoveToFolder`; refer to its caller as "the `string` filing overload"
-      instead, because P8-T16 asserts the family stem search still returns exactly 16 lines. Three
-      further tokens are barred from that documentation for the same reason — each is a token some
+      instead, because P8-T16 asserts the family stem search still returns exactly 23 lines. Two
+      further tokens are barred from that documentation for the same reason — each is a token an
       acceptance condition asserts an exact count for over this same file, and the natural wording of
       the contract would otherwise add an occurrence. First, `IsFullOutlookPath`: AC12 phrases the
       contract as "The helper is gated on `ArchiveStemContract.IsFullOutlookPath`", but this task
       asserts an exact count of 1 for that token in this file, so the documentation states the gate as
       "returns its input unchanged unless the input is a full Outlook path" without naming the
       predicate. Second, the character sequence `throw` in any form, including `throws`: this task
-      compares the matched line texts of `rg -n "throw"` taken before the edit against those taken
-      after it and requires the two sets identical, so the totality claim is worded as
-      "returns a value for every input and
-      propagates no exception". Third, `Globals.Ol.ArchiveRootPath`: P4-T6 asserts an exact count of 4
-      for that token in this file, so the documentation describes the second parameter as the archive
-      ancestor supplied by the caller rather than naming the global. Record
-      the run in
+      asserts that the token is absent from this file both before and after the edit, so the totality
+      claim is worded as "returns a value for every input and propagates no exception". The token
+      `Globals.Ol.ArchiveRootPath` is barred as well and for an additional reason: the helper takes its
+      archive ancestor as a parameter and must never name the global, because doing so would reopen the
+      unguarded-read defect issue #638 closed. The documentation therefore describes the second
+      parameter as the archive ancestor supplied by the caller. Record the run in
       `evidence/regression-testing/p4-t1-helper-implemented.md`, capturing the output of
-      `rg -n "throw" QuickFiler/Controllers/EfcDataModel.cs` taken immediately before and immediately
-      after the edit. Acceptance: the two `rg` outputs contain the identical set of matched line
-      **texts**, compared without their line numbers because the helper body changes length and shifts
-      every later line number, so the helper introduces no new throw site;
-      `rg -n "IsFullOutlookPath" QuickFiler/Controllers/EfcDataModel.cs` returns exactly 1 line and it
-      is inside the helper, where before this task it returned 0 lines; and
-      `(Get-Content -LiteralPath "QuickFiler\Controllers\EfcDataModel.cs").Count` is at most 500.
+      `rg -n "throw" QuickFiler/Controllers/EfcDataModel.FilingStem.cs` taken immediately before and
+      immediately after the edit, each recorded with `ExpectedExitCode: 1` because ripgrep exits 1 on
+      zero matches. Acceptance: both `rg` invocations report zero matches and exit non-zero, so the
+      helper introduces no throw site and none was present in the seam;
+      `rg -n "IsFullOutlookPath" QuickFiler/Controllers/EfcDataModel.FilingStem.cs` returns exactly 1
+      line and it is inside the helper, where before this task it returned 0 lines;
+      `rg -n "Globals" QuickFiler/Controllers/EfcDataModel.FilingStem.cs` returns 0 lines, recorded
+      with `ExpectedExitCode: 1`;
+      `pwsh -NoProfile -Command '(Get-Content -LiteralPath "QuickFiler\Controllers\EfcDataModel.FilingStem.cs").Count'`
+      is at most 500; and
+      `pwsh -NoProfile -Command '(Get-Content -LiteralPath "QuickFiler\Controllers\EfcDataModel.cs").Count'`
+      reports exactly 485, because this task changes no line of that file.
 - [ ] [P4-T2] Record the helper's line range and verify its purity, and write
       `evidence/regression-testing/p4-t2-helper-shape.md`. Acceptance: the artifact records the first
-      and last line numbers of the `ToFilingStemOrVerbatim` declaration body; it records that the body
+      and last line numbers of the `ToFilingStemOrVerbatim` declaration body **in
+      `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`**, and records separately that
+      `QuickFiler/Controllers/EfcDataModel.cs` contains no part of the helper, so a reader cannot
+      mistake one file's line numbers for the other's; it records that the body
       contains no `await`, no `Globals`, no `logger`, and no `throw`; it records that the only call
-      sites of the helper are the single assignment in the `string` overload and the eight tests in
+      sites of the helper are the single assignment at `EfcDataModel.cs:337` and the eight tests in
       `EfcDataModelIssue637Tests`, verified by `rg -n "ToFilingStemOrVerbatim" --glob "*.cs" .`; and it
       enumerates every line `rg -n "ToFilingStemOrVerbatim" --glob "*.cs" QuickFiler/` returns and
       classifies each as the single declaration, the single call, or an XML-documentation reference,
@@ -762,35 +1010,49 @@ failure.
       `EXIT_CODE: 0`; both outputs contain `(Rebuild target(s))`; and neither recorded `Command:` line
       contains the solution-wide nullable opt-in property — record this as
       `NULLABLE_OPT_IN_PROPERTY: absent`; do not spell the token in the artifact.
-- [ ] [P4-T4] Run the helper test class green. Use the P2-T8 command with the results directory
+- [ ] [P4-T4] Run the helper test class green. Use the P2-T12 command with the results directory
       changed to `coverage\testresults\p4-t4`, and write
       `evidence/regression-testing/p4-t4-helper-tests-green.md`. Acceptance: `EXIT_CODE: 0`; 8 tests
-      total; 8 passed; 0 failed; and the two tests that failed in P2-T8 are named individually as now
+      total; 8 passed; 0 failed; and the two tests that failed in P2-T12 are named individually as now
       passing.
 - [ ] [P4-T5] Prove the eight existing `ToArchiveRelativeStem` tests are unchanged and still pass. Use
-      the P2-T7 command with the filter
+      the P2-T11 command with the filter
       `"/TestCaseFilter:FullyQualifiedName~EfcDataModelIssue614Tests&TestCategory!=LiveOutlook"` and the
       results directory `coverage\testresults\p4-t5`, and write
       `evidence/regression-testing/p4-t5-toarchiverelativestem-unchanged.md`. Acceptance:
       `EXIT_CODE: 0`; the run reports 8 tests for that class; 8 passed including
       `ToArchiveRelativeStem_ArchiveRootItself_Throws`; and, after
       `git add QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`,
-      `git diff ecdb1c84ba8541ab67042985919cfed4df768c01 --cached -- QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`
+      `git diff b9476588e0e49e113c73cc55cc918f4a65e022fd --cached -- QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`
       shows zero removed content lines.
 - [ ] [P4-T6] Verify AC17: the non-goals are untouched. Run
       `git add QuickFiler/Controllers/EfcDataModel.cs` then
-      `git diff ecdb1c84ba8541ab67042985919cfed4df768c01 --cached -U0 -- QuickFiler/Controllers/EfcDataModel.cs`
-      and write `evidence/regression-testing/p4-t6-nongoals-untouched.md`. Acceptance: no hunk header
-      addresses any line inside the original ranges 299 to 334 (`OpenOlFolderAsync` and
-      `OpenFsFolderAsync`) or 336 to 386 (the `MAPIFolder` overload and `ToArchiveRelativeStem`); a
-      pure-insertion hunk whose old-side range is `-297,0` or `-298,0` is the helper declaration
-      required by P2-T1 and is expected; any other hunk outside the line-287 assignment fails this
-      task; and `rg -n "Globals.Ol.ArchiveRootPath" QuickFiler/Controllers/EfcDataModel.cs` returns
-      exactly 4 lines, quoted in the artifact and classified as the 3 pre-existing `OlAncestor`
-      initializers (originally lines 289, 310 and 328, shifted by the length of the helper this plan
-      adds) plus the single new argument on the `DestinationOlStem` assignment introduced by P2-T1;
-      and none of the 4 is inside a `try` or `catch` block, verified by quoting the enclosing
-      statement of each.
+      `git diff b9476588e0e49e113c73cc55cc918f4a65e022fd --cached -U0 -- QuickFiler/Controllers/EfcDataModel.cs`
+      and write `evidence/regression-testing/p4-t6-nongoals-untouched.md`, quoting every hunk header
+      verbatim. This plan makes exactly two edits to this file, both single-line substitutions, so the
+      file's line count and every line number in it are unchanged and the diff is exactly two hunks.
+      Acceptance, in five parts.
+      First, the diff contains exactly two hunk headers: one addressing old line 21 only — the
+      `partial` keyword added by P2-T1, accepted in either the `-21 +21` or the `-21,1 +21,1` spelling
+      git may emit under `-U0` — and one addressing old line 337 only, the `DestinationOlStem`
+      assignment redirected by P2-T4. Any third hunk, and any hunk whose old-side range spans more
+      than one line, fails this task.
+      Second, no hunk header addresses any line inside the protected range 271 to 297. That range is
+      `TryGetArchiveRoot`, introduced by issue #638 with its declaration at 280; it is that issue's
+      code and this plan must not touch it.
+      Third, no hunk header addresses any line inside 349 to 396 (`OpenOlFolderAsync` at 349-372 and
+      `OpenFsFolderAsync` at 374-396) or inside 398 to 448 (the `MAPIFolder` overload at 398-419 and
+      `ToArchiveRelativeStem` at 421-448).
+      Fourth, `rg -n "Globals.Ol.ArchiveRootPath" QuickFiler/Controllers/EfcDataModel.cs` returns
+      **exactly 1** line, and it is line 284. The artifact quotes it and classifies it as the single
+      guarded read inside `TryGetArchiveRoot`. There is no second read to classify: issue #638
+      replaced the three former `OlAncestor` initializer reads with the `out var olAncestor` local
+      produced by `TryGetArchiveRoot`, and P2-T4 is required to pass that same local rather than the
+      global.
+      Fifth, the artifact records the inverse assertion that actually protects the non-goal: the single
+      read at line 284 remains inside the `try` block at 282-286, whose `catch (InvalidOperationException ex)`
+      is at 287, exactly as issue #638 wrote it, and no read is added, removed, or moved into or out of
+      that block. The artifact quotes lines 280 through 297 verbatim to evidence this.
 
 ### Phase 5 — Change C, the recorded spec correction to the issue #439 assertion
 
@@ -820,21 +1082,27 @@ failure.
       `            // Arrange: the presented target is rooted with casing different from the configured`
       and
       `            // root, so the provider must receive the original full path unchanged (#439).`
-      Acceptance:
-      `rg -n "so the provider must receive the original full path unchanged" QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs`
-      returns exactly 1 line, and
+      The asserted token below is the replacement's own distinguishing suffix rather than the phrase
+      the two versions share. Line 122 already reads
+      `            // root, so the provider must receive the original full path unchanged.` before this
+      task runs, so a search for that shared phrase returns 1 line before any edit and cannot fail. The
+      literal `unchanged (#439).` is absent from the tracked tree until this task writes it and is
+      quoted here verbatim for that reason; it is asserted with `-F` because the parentheses and the
+      period are regex metacharacters that must match those same characters. Acceptance:
+      `rg -F -n 'unchanged (#439).' QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs`
+      returns exactly 1 line and it is line 122, and
       `rg -n "already rooted with casing different" QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs`
-      returns 0 lines.
+      returns 0 lines, recorded with `ExpectedExitCode: 1`.
 - [ ] [P5-T4] Verify AC19: the companion provider assertion and `ToHierarchyPath` are preserved. Write
       `evidence/regression-testing/p5-t4-provider-assertion-preserved.md`. Acceptance: lines 161 to 164
       of `BreadcrumbBridgeRouterIssue439Tests.cs` are byte-identical to their pre-change text, quoted
       in the artifact; and, after `git add QuickFiler/Controllers/BreadcrumbBridgeRouter.cs`,
-      `git diff ecdb1c84ba8541ab67042985919cfed4df768c01 --cached -U0 -- QuickFiler/Controllers/BreadcrumbBridgeRouter.cs`
+      `git diff b9476588e0e49e113c73cc55cc918f4a65e022fd --cached -U0 -- QuickFiler/Controllers/BreadcrumbBridgeRouter.cs`
       produces no output at all, since this plan changes no line of that file.
 - [ ] [P5-T5] Verify the file did not grow and that exactly one assertion changed. Run
       `pwsh -NoProfile -Command '(Get-Content -LiteralPath "QuickFiler.Test\Controllers\BreadcrumbBridgeRouterIssue439Tests.cs").Count'`,
       then `git add QuickFiler.Test` followed by
-      `git diff ecdb1c84ba8541ab67042985919cfed4df768c01 --cached -- QuickFiler.Test`, and write
+      `git diff b9476588e0e49e113c73cc55cc918f4a65e022fd --cached -- QuickFiler.Test`, and write
       `evidence/regression-testing/p5-t5-single-assertion-change.md`. Acceptance: the line count is
       exactly 694; among the diff's removed content lines, exactly one matches `.Should()`, and it is
       `            router.SelectedFolderPath.Should().Be(fullTarget);`; and the artifact records the
@@ -849,7 +1117,7 @@ failure.
       `QuickFiler.Test\bin\Debug\QuickFiler.Test.dll`; record its `EXIT_CODE:` and its
       `(Rebuild target(s))` line in the same artifact. Without this rebuild the scoped run would
       execute the assembly P4-T3 produced, which still carries the old method name and the old
-      assertion, and its acceptance would be unsatisfiable. Then use the P2-T7 command with the filter
+      assertion, and its acceptance would be unsatisfiable. Then use the P2-T11 command with the filter
       `"/TestCaseFilter:FullyQualifiedName~BreadcrumbBridgeRouterIssue439Tests&TestCategory!=LiveOutlook"`
       and the results directory `coverage\testresults\p5-t6`, and write
       `evidence/regression-testing/p5-t6-issue439-green.md`. Acceptance: `EXIT_CODE: 0`; 0 failed; and
@@ -881,7 +1149,7 @@ failure.
       `(Rebuild target(s))` line in the same artifact. Without this rebuild the scoped run would
       execute the assembly P4-T3 produced, which predates those edits, so the run would not be
       evidence about the edited file that AC23 requires. Then run
-      `rg -c "deferred to issue #637" --glob "*.cs" .`, then run the P2-T7 command with the filter
+      `rg -c "deferred to issue #637" --glob "*.cs" .`, then run the P2-T11 command with the filter
       `"/TestCaseFilter:FullyQualifiedName~EfcSelectionGuardTests&TestCategory!=LiveOutlook"` and the
       results directory `coverage\testresults\p6-t4`, and write
       `evidence/regression-testing/p6-t4-deferral-cleared.md`. The `*.cs` glob is load-bearing: the
@@ -891,26 +1159,54 @@ failure.
       `EXIT_CODE: 0` with 0 failed; and the artifact records that
       `Issue614_GuardAcceptedSelection_DoesNotThrowAtFilingBoundary` passed and that neither
       `IsValidFilingSelection` nor `IsValidCreationSelection` had any executable line changed, verified
-      by a `git diff ecdb1c84ba8541ab67042985919cfed4df768c01 --cached -- QuickFiler/Controllers/EfcSelectionGuard.cs`
+      by a `git diff b9476588e0e49e113c73cc55cc918f4a65e022fd --cached -- QuickFiler/Controllers/EfcSelectionGuard.cs`
       run in the same task after `git add QuickFiler/Controllers/EfcSelectionGuard.cs`, whose only
       changed line is line 30.
-- [ ] [P6-T5] Commit changes A through D. Run
+- [ ] [P6-T5] Redact host identity from every evidence artifact written so far, then prove it. Apply
+      the "Evidence transcript redaction" convention to every file already written under
+      `docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637/evidence/`:
+      replace every occurrence of the absolute worktree path with the literal `<worktree-root>`, and
+      every remaining absolute path beginning with the Windows per-user profile root with
+      `<user-profile>`, and every vstest results file name with `<trx-file>`. Then run two searches.
+      Search 1:
+      `rg -F -n 'C:\Users' docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637 --glob '**/evidence/**' --glob '!**/p6-t5-evidence-redaction.md'`.
+      Search 2:
+      `rg -F -n '.trx' docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637 --glob '**/evidence/**' --glob '!**/p6-t5-evidence-redaction.md'`.
+      Write `evidence/other/p6-t5-evidence-redaction.md` with `ExpectedExitCode: 1`. Acceptance:
+      both searches report 0 matches and exit non-zero; the artifact lists every evidence file it
+      rewrote and, for each, the number of replacements made; the artifact records that a zero-match
+      result over the two-component prefix `C:\Users` proves the account segment is absent as well,
+      because on Windows that segment always follows the prefix immediately; and it records that
+      Search 2 covers the vstest results file name, which carries the account and the machine with no
+      preceding profile path and so is invisible to Search 1. The `-F` flag is required in both
+      because the backslash and the period are regex metacharacters that must match themselves. The
+      `--glob` exclusion of
+      this task's own artifact is required for the same reason P7-T10 excludes its own: this artifact
+      records its own two `Command:` lines, and those commands' patterns are the strings being searched
+      for. No other evidence file of this feature is excluded.
+- [ ] [P6-T6] Commit changes A through D. Run
       `git add QuickFiler QuickFiler.Test docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`
       then
       `git commit -m "fix(637): normalize the breadcrumb producer and the string filing overload"` and
-      write `evidence/other/p6-t5-commit.md`. A commit is required here because every Phase 7 and
-      Phase 8 gate is anchored to `ecdb1c84ba8541ab67042985919cfed4df768c01..HEAD`, and an anchored diff
+      write `evidence/other/p6-t6-commit.md`. A commit is required here because every Phase 7 and
+      Phase 8 gate is anchored to `b9476588e0e49e113c73cc55cc918f4a65e022fd..HEAD`, and an anchored diff
       reports nothing for changes that are not yet committed. Acceptance: `EXIT_CODE: 0`;
       `git status --porcelain -- QuickFiler QuickFiler.Test` produces no output; and
-      `git diff --name-only ecdb1c84ba8541ab67042985919cfed4df768c01..HEAD -- QuickFiler QuickFiler.Test`
-      lists exactly these eight paths and no others:
+      `git diff --name-only b9476588e0e49e113c73cc55cc918f4a65e022fd..HEAD -- QuickFiler QuickFiler.Test`
+      lists exactly these ten paths and no others:
       `QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs`,
-      `QuickFiler/Controllers/EfcDataModel.cs`, `QuickFiler/Controllers/EfcSelectionGuard.cs`,
+      `QuickFiler/Controllers/EfcDataModel.cs`,
+      `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`,
+      `QuickFiler/Controllers/EfcSelectionGuard.cs`,
+      `QuickFiler/QuickFiler.csproj`,
       `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs`,
       `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue637Tests.cs`,
       `QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`,
       `QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs`,
       `QuickFiler.Test/QuickFiler.Test.csproj`.
+      The enumeration is ten rather than the eight this plan named before the change-B file split: the
+      split adds `QuickFiler/Controllers/EfcDataModel.FilingStem.cs` and the
+      `QuickFiler/QuickFiler.csproj` registration that makes it compile.
 
 ### Phase 7 — Final QC toolchain loop and coverage delta
 
@@ -937,7 +1233,7 @@ again from the start.
       the write-mode discrimination that a read-only command cannot supply is provided by P7-T1's
       before-and-after porcelain pair. Then, in this same task, run `git add QuickFiler QuickFiler.Test`
       and `git commit -m "style(637): apply csharpier formatting before the coverage gates"`, so that
-      every subsequent `ecdb1c84ba8541ab67042985919cfed4df768c01..HEAD` diff describes the same file
+      every subsequent `b9476588e0e49e113c73cc55cc918f4a65e022fd..HEAD` diff describes the same file
       contents the P7-T5 build measured. If nothing changed, record that the commit was a no-op and
       that the tree already matched `HEAD`. Record the commit result in
       `evidence/qa-gates/p7-t2-csharpier-check.md`.
@@ -964,31 +1260,43 @@ again from the start.
       passed in the baseline is failing now; the artifact names every baseline failure that is still
       failing; and when `BASELINE_FAILURE_SET` is empty, `EXIT_CODE: 0` and 0 failed are required.
       `Output Summary:` additionally carries the six numeric `/coverage` attribute values and the
-      derived line and branch percentages that P7-T6 reads, copied in once P7-T6 has produced them;
-      this task is not complete until that copy-back has been made, because the plan contract
-      requires the final-QC test-step artifact itself to carry the numeric coverage headline.
+      derived line and branch percentages that P7-T6 reads, copied in once P7-T6 has produced them,
+      because the plan contract requires the final-QC test-step artifact itself to carry the numeric
+      coverage headline. The execution order for the pair is explicit and is not a deadlock: run this
+      task's command and write everything except the copied-back headline, leave P7-T5 **unchecked**,
+      execute P7-T6 in full, then return to P7-T5, write the copy-back into `Output Summary:`, and
+      check both tasks off together.
 - [ ] [P7-T6] Read the post-change numeric coverage headline. Run the P0-T16 command with the input
       path changed to `.\coverage\p7-t5-postchange.cobertura.xml` and write
       `evidence/qa-gates/p7-t6-coverage-headline.md`. Acceptance: `EXIT_CODE: 0`, and `Output Summary:`
       records all six numeric attribute values plus the derived line-coverage percentage and branch
       percentage.
 - [ ] [P7-T7] Verify changed-line coverage. Run the P0-T17 command with the input path changed to
-      `.\coverage\p7-t5-postchange.cobertura.xml`, and in the same task run
-      `git diff -U0 ecdb1c84ba8541ab67042985919cfed4df768c01..HEAD -- QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs QuickFiler/Controllers/EfcDataModel.cs`
-      to enumerate the added line numbers from the hunk headers. Re-derive the
+      `.\coverage\p7-t5-postchange.cobertura.xml` and with its file list extended to the three
+      production files this plan touches — `QuickFiler\Controllers\BreadcrumbBridgeRouter.Selection.cs`,
+      `QuickFiler\Controllers\EfcDataModel.cs` and
+      `QuickFiler\Controllers\EfcDataModel.FilingStem.cs` — and in the same task run
+      `git diff -U0 b9476588e0e49e113c73cc55cc918f4a65e022fd..HEAD -- QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs QuickFiler/Controllers/EfcDataModel.cs QuickFiler/Controllers/EfcDataModel.FilingStem.cs`
+      to enumerate the added line numbers from the hunk headers. The base anchor
+      `b9476588e0e49e113c73cc55cc918f4a65e022fd` is the post-merge, pre-change baseline P0-T8 proved
+      clean, so the added-line set this diff produces contains only lines this plan added and none of
+      issue #638's. Re-derive the
       `ToFilingStemOrVerbatim` line range against the post-format working tree in this same task,
       recording the declaration line and the closing-brace line, and record both that range and the
       range `evidence/regression-testing/p4-t2-helper-shape.md` recorded, stating whether they differ.
       Every coverage assertion in this task is evaluated against the re-derived range; the P4-T2 range
-      is recorded for audit only. This re-derivation is required because P4-T2 measured the range in
-      Phase 4, P7-T1 then ran the write-mode formatter over `EfcDataModel.cs` — the first format pass
-      over the hand-written helper body, since Phases 2 through 6 contain no format step — and P7-T5
-      measured the tree after it, so a formatter change to the helper's extent would make the P4-T2
-      range identify uncovered lines in `OpenOlFolderAsync` or unrelated covered lines instead of the
-      helper. Write
+      is recorded for audit only. The range is re-derived against
+      `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`, which is the file that declares the helper;
+      `QuickFiler/Controllers/EfcDataModel.cs` declares no part of it. This re-derivation is required
+      because P4-T2 measured the range in
+      Phase 4, P7-T1 then ran the write-mode formatter over `EfcDataModel.FilingStem.cs` — the first
+      format pass over the hand-written helper body, since Phases 2 through 6 contain no format step —
+      and P7-T5 measured the tree after it, so a formatter change to the helper's extent would make the
+      P4-T2 range identify the wrong lines. Write
       `evidence/qa-gates/p7-t7-changed-line-coverage.md`. Acceptance: the artifact lists, per file, the
       set of added line numbers and the set of line numbers with zero hits; the intersection of those
-      two sets is empty for both files; and, for `QuickFiler/Controllers/EfcDataModel.cs`, every line
+      two sets is empty for all three files; and, for
+      `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`, every line
       number inside the re-derived `ToFilingStemOrVerbatim` range has non-zero hits, which is the
       new-code coverage requirement for the new helper stated in AC29; and, for the re-derived
       `ToFilingStemOrVerbatim` range, the artifact records the line nodes carrying `branch="True"`
@@ -1014,27 +1322,40 @@ again from the start.
       three labelled numeric sections: baseline coverage, copied from
       `evidence/baseline/p0-t16-coverage-headline.md`; post-change coverage, copied from
       `evidence/qa-gates/p7-t6-coverage-headline.md`; and changed and new-code coverage, copied from
-      `evidence/qa-gates/p7-t7-changed-line-coverage.md`. Acceptance: all three sections carry numeric
+      `evidence/qa-gates/p7-t7-changed-line-coverage.md`. The artifact also states the coverage-floor
+      authority resolution this plan applies, in these terms: `CLAUDE.md` states a repository-wide floor
+      of at or above 80 percent line coverage on the testable denominator, together with a
+      maintainer-ratified COM/VSTO/WinForms exemption; `.claude/rules/general-unit-test.md` states 85
+      percent line and 75 percent branch; `policy-compliance-order` ranks `CLAUDE.md` first and
+      `.claude/rules/general-unit-test.md` third, so `CLAUDE.md`'s 80 percent floor is the binding
+      repository-wide gate here and the 85/75 figures are the stricter non-binding target, superseded
+      where they conflict. The binding figure is also the one the runner enforces, at
+      `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1:487`, so the gate this task applies and the
+      gate the tooling applies are the same number. Acceptance: all three sections carry numeric
       values and none carries a placeholder; the post-change line-coverage percentage is at or above
-      80, which is the floor the coverage runner itself enforces at
-      `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1:487-489` and which CLAUDE.md states, except
-      that if the baseline figure recorded in `evidence/baseline/p0-t16-coverage-headline.md` is
-      itself already below 80 the artifact records `BASELINE BELOW FLOOR`, reports that pre-existing
-      condition to the orchestrator, and the binding requirement becomes that the post-change figure is
-      at or above the recorded baseline figure; the
-      artifact records the post-change figure against the 85 percent line and 75 percent branch figures
-      in `.claude/rules/general-unit-test.md` and states explicitly which of the two repository-wide
-      figures each threshold comes from, without resolving the conflict; and the changed-line section
-      records an empty uncovered intersection.
+      **80**, and that clause is blocking; the artifact carries the authority statement above with its
+      two document citations; the artifact additionally records the post-change line and branch
+      percentages against the 85 percent and 75 percent figures as an explicitly **non-blocking**
+      observation, labelled `NON-BLOCKING TARGET:`, so the gap stays visible without gating the work;
+      and the changed-line section records an empty uncovered intersection. One exception applies to
+      the blocking clause and to nothing else: if the baseline figure recorded in
+      `evidence/baseline/p0-t16-coverage-headline.md` is itself already below 80, the artifact records
+      `BASELINE BELOW FLOOR`, reports that pre-existing condition to the orchestrator, and the binding
+      requirement becomes that the post-change figure is at or above the recorded baseline figure. The
+      change-scoped gates — no changed line loses coverage, and every line of the new helper is covered
+      — remain blocking in every case, including under that exception.
 - [ ] [P7-T9] File-size audit, run after the formatter rather than before it, because CSharpier can
       change a file's line count. Run
-      `pwsh -NoProfile -Command 'foreach ($p in @("QuickFiler\Controllers\EfcDataModel.cs","QuickFiler\Controllers\BreadcrumbBridgeRouter.Selection.cs","QuickFiler\Controllers\EfcSelectionGuard.cs","QuickFiler.Test\Controllers\BreadcrumbBridgeRouterIssue439Tests.cs","QuickFiler.Test\Controllers\BreadcrumbBridgeRouterIssue637Tests.cs","QuickFiler.Test\Controllers\EfcDataModelIssue614Tests.cs","QuickFiler.Test\Controllers\EfcSelectionGuardTests.cs")) { $p + "=" + (Get-Content -LiteralPath $p).Count }'`
-      and write `evidence/qa-gates/p7-t9-file-sizes.md`. Acceptance: `EfcDataModel.cs` is at most 500;
+      `pwsh -NoProfile -Command 'foreach ($p in @("QuickFiler\Controllers\EfcDataModel.cs","QuickFiler\Controllers\EfcDataModel.FilingStem.cs","QuickFiler\Controllers\BreadcrumbBridgeRouter.Selection.cs","QuickFiler\Controllers\EfcSelectionGuard.cs","QuickFiler.Test\Controllers\BreadcrumbBridgeRouterIssue439Tests.cs","QuickFiler.Test\Controllers\BreadcrumbBridgeRouterIssue637Tests.cs","QuickFiler.Test\Controllers\EfcDataModelIssue614Tests.cs","QuickFiler.Test\Controllers\EfcSelectionGuardTests.cs")) { $p + "=" + (Get-Content -LiteralPath $p).Count }'`
+      and write `evidence/qa-gates/p7-t9-file-sizes.md`. Acceptance: `EfcDataModel.cs` is at most 500,
+      with the exact value recorded, and the artifact states whether it is still 485, which is the
+      value the plan expects because this plan makes only single-line substitutions in it;
+      `EfcDataModel.FilingStem.cs` is at most 500, with the exact value recorded;
       `BreadcrumbBridgeRouterIssue637Tests.cs` is at most 500; `EfcDataModelIssue614Tests.cs` is at most
       500; `BreadcrumbBridgeRouterIssue439Tests.cs` is at most 694 and therefore has not grown, with
       the exact value recorded; `EfcSelectionGuard.cs` is at most 79, with the exact value recorded;
       `EfcSelectionGuardTests.cs` is at most 296, with the exact value recorded; and
-      `BreadcrumbBridgeRouter.Selection.cs` is at most 500. The three upper bounds replace exact
+      `BreadcrumbBridgeRouter.Selection.cs` is at most 500. The upper bounds replace exact
       equalities because this task runs after a write-mode formatter that can reduce a line count,
       and AC25 requires only that these files not grow.
 - [ ] [P7-T10] Toolchain non-vacuity audit. Write `evidence/qa-gates/p7-t10-toolchain-audit.md`
@@ -1047,9 +1368,11 @@ again from the start.
       returning 0 matches and exiting non-zero, recorded with `ExpectedExitCode: 1` for that step;
       and both MSBuild transcripts contain `(Rebuild target(s))`. Three scope restrictions on that
       command are load-bearing. The directory operand must be this feature's folder rather than
-      `docs/features/active`, because 121 evidence Markdown files under other feature folders in that
+      `docs/features/active`, because many evidence Markdown files under other feature folders in that
       tree contain the token and this plan cannot change them, so the parent-directory form can never
-      return 0 and the gate could never pass. The restriction to the evidence subtree is required
+      return 0 and the gate could never pass. No count of those files is stated here deliberately: the
+      count changes as other feature work lands, and this justification does not depend on its value.
+      The restriction to the evidence subtree is required
       because `spec.md` and this plan both discuss the token in prose and both live at the root of
       this feature's folder, so a scan of the folder without the `**/evidence/**/*.md` glob would
       never return 0 either. The exclusion of `p7-t10-toolchain-audit.md` is required because this
@@ -1077,11 +1400,35 @@ again from the start.
       `dotnet-coverage --output-format cobertura` rather than by `/EnableCodeCoverage`, which is the
       repository's standard runner and the local analogue of
       `.github/workflows/_mstest-coverage.yml:83`. The substitutions are recorded, not resolved.
-- [ ] [P7-T11] Commit the QA evidence and any residual formatting result. Run
+- [ ] [P7-T11] Redact host identity from the Phase 7 evidence artifacts, then prove it. Apply the
+      "Evidence transcript redaction" convention to every file written under
+      `docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637/evidence/`
+      since P6-T5 ran: replace every occurrence of the absolute worktree path with the literal
+      `<worktree-root>`, and every remaining absolute path beginning with the Windows per-user profile
+      root with `<user-profile>`, and every vstest results file name with `<trx-file>`. The Phase 7
+      artifacts are the ones most exposed to this, because
+      P7-T3 and P7-T4 record MSBuild transcripts and MSBuild prints an absolute project path for every
+      project it builds. Then run two searches. Search 1:
+      `rg -F -n 'C:\Users' docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637 --glob '**/evidence/**' --glob '!**/p7-t11-evidence-redaction.md' --glob '!**/p6-t5-evidence-redaction.md'`.
+      Search 2:
+      `rg -F -n '.trx' docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637 --glob '**/evidence/**' --glob '!**/p7-t11-evidence-redaction.md' --glob '!**/p6-t5-evidence-redaction.md'`.
+      Write `evidence/qa-gates/p7-t11-evidence-redaction.md` with `ExpectedExitCode: 1`.
+      Acceptance: both searches report 0 matches and exit non-zero; the artifact lists every evidence
+      file it rewrote and, for each, the number of replacements made; and the artifact records that the
+      scan covers the whole feature evidence tree, so it re-verifies the Phase 0 through Phase 6
+      artifacts P6-T5 cleared as well as the Phase 7 artifacts. The `-F` flag is required in both
+      because the backslash and the period are regex metacharacters that must match themselves.
+      Exactly two evidence artifacts are
+      excluded, and both for the same reason P7-T10 excludes its own: each records its own `Command:`
+      lines, and those commands' patterns are the strings being searched for. They are this task's
+      artifact and `evidence/other/p6-t5-evidence-redaction.md`, which P6-T5 wrote earlier in the same
+      feature tree. Omitting the second exclusion would make this gate unsatisfiable. No other evidence
+      file of this feature is excluded.
+- [ ] [P7-T12] Commit the QA evidence and any residual formatting result. Run
       `git add QuickFiler QuickFiler.Test docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`
       then
       `git commit -m "chore(637): final QC toolchain pass and coverage evidence"` and write
-      `evidence/other/p7-t11-commit.md`. Acceptance: `EXIT_CODE: 0`, and
+      `evidence/other/p7-t12-commit.md`. Acceptance: `EXIT_CODE: 0`, and
       `git status --porcelain -- QuickFiler QuickFiler.Test` produces no output; and
       `git status --porcelain -- docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`
       lists at most this task's own evidence
@@ -1100,7 +1447,7 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
 - [ ] [P8-T1] AC1: cite `evidence/regression-testing/p3-t5-router-tests-green.md` showing
       `RowSelected_ArchiveRootExactFilingTarget_IsNotSelected` and
       `RowSelected_ArchiveRootExactFilingTarget_PreservesAPriorValidSelection` passing, and
-      `evidence/regression-testing/p2-t7-router-tests-red.md` showing both failing before the fix.
+      `evidence/regression-testing/p2-t11-router-tests-red.md` showing both failing before the fix.
       Acceptance: both artifacts exist and name both tests; AC1 is checked off.
 - [ ] [P8-T2] AC2: cite `evidence/regression-testing/p3-t5-router-tests-green.md` showing
       `RowSelected_RootedTargetUnderArchiveRoot_CommitsTheArchiveRelativeStem` and
@@ -1120,7 +1467,11 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       `RowSelected_TrashPseudoRow_CommitsTheSentinelVerbatim`, and
       `evidence/regression-testing/p4-t4-helper-tests-green.md` for
       `ToFilingStemOrVerbatim_TrashSentinel_ReturnsTheInputVerbatim`. Acceptance: both artifacts exist
-      and name the tests; AC5 is checked off.
+      and name the tests; the check-off record additionally states that AC5's citation of
+      `EfcDataModel.cs:272` for the `folderpath != "Trash to Delete"` comparison is stale — the
+      comparison is at line **316** on the merged tree — that the discrepancy is recorded in full by
+      P8-T32, and that AC5's binding clause, which is behavioral rather than positional, is
+      unaffected; AC5 is checked off.
 - [ ] [P8-T6] AC6: cite `evidence/regression-testing/p3-t2-nesting.md` for the preserved message
       literal, `evidence/regression-testing/p3-t5-router-tests-green.md` for
       `RowSelected_OutOfRootRootedTarget_IsStillRejected` and
@@ -1146,9 +1497,18 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       than through the `rowSelected` inbound message. Acceptance: the artifact names that test as
       passing; AC10 is checked off.
 - [ ] [P8-T11] AC11: cite `evidence/regression-testing/p4-t2-helper-shape.md` for the single
-      `internal static` declaration, the single assignment call site, and the purity record, and
+      `internal static` declaration in `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`, the single
+      assignment call site at `QuickFiler/Controllers/EfcDataModel.cs:337`, and the purity record, and
       `evidence/regression-testing/p4-t4-helper-tests-green.md` for the eight tests that invoke the
-      helper directly without constructing an `EmailFiler`. Acceptance: both artifacts exist; AC11 is
+      helper directly without constructing an `EmailFiler`. Also cite
+      `evidence/regression-testing/p2-t13-compile-include-observed.md` and
+      `evidence/other/p6-t6-commit.md` for the two supporting edits the file split requires: the
+      `partial` keyword on `EfcDataModel.cs:21` and the `<Compile Include>` registration in
+      `QuickFiler/QuickFiler.csproj`. Acceptance: all four artifacts exist; the check-off record states
+      that AC11's text was corrected in `spec.md` to name the new declaring file and the corrected
+      assignment line 337, that the helper remains the member
+      `EfcDataModel.ToFilingStemOrVerbatim` because the new file is a partial of the same type, and
+      that the split is the remedy `spec.md:414-416` authorizes for the 15-line headroom; AC11 is
       checked off.
 - [ ] [P8-T12] AC12: cite `evidence/regression-testing/p4-t4-helper-tests-green.md` for
       `ToFilingStemOrVerbatim_RelativeStem_ReturnsTheInputVerbatim` and
@@ -1157,7 +1517,7 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
 - [ ] [P8-T13] AC13: cite `evidence/regression-testing/p4-t4-helper-tests-green.md` for
       `ToFilingStemOrVerbatim_RootedUnderAncestor_ReturnsTheStem` and
       `ToFilingStemOrVerbatim_RootedUnderCaseDifferingAncestor_ReturnsTheStem`, together with
-      `evidence/regression-testing/p2-t8-helper-tests-red.md` showing both failing before the fix.
+      `evidence/regression-testing/p2-t12-helper-tests-red.md` showing both failing before the fix.
       Acceptance: both artifacts exist and name both tests; AC13 is checked off.
 - [ ] [P8-T14] AC14: cite `evidence/regression-testing/p4-t4-helper-tests-green.md` for
       `ToFilingStemOrVerbatim_ArchiveRootExact_ReturnsTheInputVerbatimAndDoesNotThrow`,
@@ -1171,16 +1531,29 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       `evidence/regression-testing/p4-t5-toarchiverelativestem-unchanged.md` for the zero-removed-line
       diff and the 8 passing results including `ToArchiveRelativeStem_ArchiveRootItself_Throws`, and
       `evidence/regression-testing/p4-t6-nongoals-untouched.md` for the unmodified `MAPIFolder`
-      overload and its call at the original line 345. Acceptance: all three artifacts exist; AC15 is
-      checked off.
+      overload at `EfcDataModel.cs:398-419` and its call to `ToArchiveRelativeStem` at line **407**.
+      Acceptance: all three artifacts exist; the check-off record states that AC15's citations were
+      corrected in `spec.md` from `:372-386`, `:336-357` and `:345` to the measured
+      `:421-448`, `:398-419` and `:407`; AC15 is checked off.
 - [ ] [P8-T16] AC16: re-run both P1-T2 searches against the post-change tree and write
       `evidence/qa-gates/p8-t16-movetofolder-family-post.md`. Acceptance: the syntax-anchored search
-      still returns exactly 9 lines classified as 3 declarations and 6 call sites, the stem search
-      still returns 16 lines across 5 files, and no new overload and no signature change appears; AC16
-      is checked off.
+      still returns exactly **10** lines across **5** files, classified as 3 declarations and 7 call
+      sites; the stem search still returns **23** lines across **6** files; no new overload and no
+      signature change appears; the check-off record states that AC16's counts and citations were
+      corrected in `spec.md` to those measured figures, and that the pre-merge figure of 16 lines is
+      superseded; AC16 is checked off.
 - [ ] [P8-T17] AC17: cite `evidence/regression-testing/p4-t6-nongoals-untouched.md`. Acceptance: the
-      artifact shows no hunk in the original ranges 299 to 334 and 336 to 386 and records that no
-      `Globals.Ol.ArchiveRootPath` read gained a `try` or `catch`; AC17 is checked off.
+      artifact shows no hunk in the ranges 349 to 396 (`OpenOlFolderAsync` and `OpenFsFolderAsync`) or
+      398 to 448 (the `MAPIFolder` overload and `ToArchiveRelativeStem`), and no hunk in the protected
+      range 271 to 297; it records that `Globals.Ol.ArchiveRootPath` occurs exactly once in the file,
+      at line 284; and it records that the guarded read at 284 and the
+      `UserDiagnosticAction(ArchiveRootUnavailableMessage)` degrade at 358 and 382, all introduced by
+      issue #638, are preserved unchanged. The check-off record states that AC17 was reworded in
+      `spec.md` for this reason: its original clause required that no `Globals.Ol.ArchiveRootPath` read
+      gains a try/catch or a degrade, and issue #638 had already given the file's single read both, so
+      that clause was false on the merged tree before this plan ran and no action this plan authorizes
+      could make it true. The reworded clause requires instead that #638's guarded read and degrade are
+      preserved unchanged, which is the property this plan can and does deliver; AC17 is checked off.
 - [ ] [P8-T18] AC18: cite `evidence/regression-testing/p5-t5-single-assertion-change.md`, which
       records all three clauses. Acceptance: the artifact records the corrected assertion at
       line 165, the renamed method, and the narrowed two-line comment; AC18 is checked off.
@@ -1213,13 +1586,18 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       still 9 lines across 3 files with 2 writes and 3 reads, no new write site appears, no new public
       API member appears, and `rg -n "public string\? SelectedFolderPath \{ get; private set; \}" QuickFiler/Controllers/BreadcrumbBridgeRouter.cs`
       returns exactly 1 line; AC24 is checked off.
-- [ ] [P8-T25] AC25: cite `evidence/qa-gates/p7-t9-file-sizes.md`. Acceptance: the artifact shows every
-      listed file at or under 500 lines, `BreadcrumbBridgeRouterIssue439Tests.cs` at or under 694 and
-      therefore not grown, and it records that the spec's stated 424 for `EfcDataModel.cs` was 423 on
-      the tree before the change; AC25 is checked off. The bound is stated as "at or under" rather
+- [ ] [P8-T25] AC25: cite `evidence/qa-gates/p7-t9-file-sizes.md` and
+      `evidence/baseline/p1-t7-file-line-counts.md`. Acceptance: the artifact shows every
+      listed file at or under 500 lines, including the new
+      `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`; `BreadcrumbBridgeRouterIssue439Tests.cs` at
+      or under 694 and therefore not grown; and the check-off record states that `EfcDataModel.cs` was
+      **485** lines before the change, not the 424 the spec's implementation table and AC25's
+      parenthetical stated, that AC25's parenthetical was corrected to 485 in `spec.md`, that the
+      resulting headroom of 15 lines is what forced the change-B file split, and that AC25 was extended
+      in `spec.md` to name the new file; AC25 is checked off. The bound is stated as "at or under" rather
       than "exactly" for the same reason it is in P7-T9: the figure is read after a write-mode
       formatter that can reduce a line count, and AC25 requires only non-growth.
-- [ ] [P8-T26] AC26: cite `evidence/regression-testing/p2-t9-compile-include-observed.md` for the
+- [ ] [P8-T26] AC26: cite `evidence/regression-testing/p2-t13-compile-include-observed.md` for the
       `Compile Include` line and the 10 observed test results, and
       `evidence/regression-testing/p3-t5-router-tests-green.md` for the same 10 tests executing after
       the fix. Acceptance: both artifacts exist and both record 10 executed tests; AC26 is checked off.
@@ -1261,8 +1639,14 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       against the pre-format range `evidence/regression-testing/p4-t2-helper-shape.md` recorded, with
       P7-T7's record of whether the two ranges differ cited here; the artifact
       `evidence/qa-gates/p7-t8-coverage-delta.md` records either a post-change line-coverage
-      percentage at or above 80 or an explicit `BASELINE BELOW FLOOR` finding with the post-change
-      figure at or above the recorded baseline; the `IsFullOutlookPath` conditional in the new helper
+      percentage at or above 80 — the binding repository-wide floor under the authority resolution
+      P7-T8 states, in which `policy-compliance-order` ranks `CLAUDE.md` above
+      `.claude/rules/general-unit-test.md`, so the latter's 85 and 75 figures are the non-binding
+      target and are recorded as such — or an explicit `BASELINE BELOW FLOOR` finding with the
+      post-change figure at or above the recorded baseline; the changed-line intersection is empty for
+      all three production files, including the new
+      `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`; the `IsFullOutlookPath` conditional in the
+      new helper
       shows both branches taken, per the `condition-coverage` values P7-T7 recorded, or — when P7-T7
       records that the helper's range carries no `branch="True"` node — per the two witness tests
       P7-T7 names; and AC29 is checked off.
@@ -1270,15 +1654,15 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       this task, in this order. First the porcelain companion,
       `git status --porcelain -- QuickFiler QuickFiler.Test UtilitiesCS UtilitiesCS.Test TaskMaster TaskMaster.Test ToDoModel Tags TaskVisualization`.
       Second
-      `git diff --name-only ecdb1c84ba8541ab67042985919cfed4df768c01..HEAD -- QuickFiler QuickFiler.Test`.
+      `git diff --name-only b9476588e0e49e113c73cc55cc918f4a65e022fd..HEAD -- QuickFiler QuickFiler.Test`.
       Third
-      `git diff --name-only ecdb1c84ba8541ab67042985919cfed4df768c01..HEAD -- UtilitiesCS UtilitiesCS.Test TaskMaster TaskMaster.Test ToDoModel Tags TaskVisualization`.
+      `git diff --name-only b9476588e0e49e113c73cc55cc918f4a65e022fd..HEAD -- UtilitiesCS UtilitiesCS.Test TaskMaster TaskMaster.Test ToDoModel Tags TaskVisualization`.
       Write `evidence/qa-gates/p8-t30-scope-boundary.md` recording all three outputs verbatim. The
       porcelain companion is required because a name-listing diff enumerates tracked changes only and
       never reports an untracked path, so the two diffs alone cannot fail on a file this plan created
       and left uncommitted. At the point this task runs the division of labour between the two
-      mechanisms is fixed and is stated here: P6-T5 committed changes A through D, P7-T2 committed the
-      formatting result, and P7-T11 committed the Phase 7 evidence, so both anchored diffs carry the
+      mechanisms is fixed and is stated here: P6-T6 committed changes A through D, P7-T2 committed the
+      formatting result, and P7-T12 committed the Phase 7 evidence, so both anchored diffs carry the
       enumeration assertion, and the porcelain
       span is expected to be empty because every path it covers is already in `HEAD`. That emptiness
       is itself the assertion and not a null result — an untracked or unstaged file anywhere in those
@@ -1288,11 +1672,11 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       omits `docs/features/active` deliberately: Phase 8 writes evidence artifacts and edits `spec.md`
       under that path and P8-T33 commits them afterwards, so a porcelain span covering it would be
       non-empty for reasons this gate is not measuring. Acceptance: the porcelain invocation produces
-      no output; the second command lists the eight paths enumerated in P6-T5, plus — only when the
+      no output; the second command lists the ten paths enumerated in P6-T6, plus — only when the
       `BASELINE_FORMAT_DRIFT` section of `evidence/baseline/p0-t12-csharpier-check.md` is non-empty —
       the paths in that section that lie under `QuickFiler` or `QuickFiler.Test`, each of which the
       artifact must show as a formatting-only change committed by P7-T2, and no others; when
-      `BASELINE_FORMAT_DRIFT` is empty the list is exactly the eight paths; the third command
+      `BASELINE_FORMAT_DRIFT` is empty the list is exactly the ten paths; the third command
       produces no output, which is the evidence that `UtilitiesCS`, `TaskMaster`,
       `ToDoModel`, `Tags`, `TaskVisualization`, `UtilitiesCS.Test` and `TaskMaster.Test` contain no
       changed file; and AC30 is checked off.
@@ -1308,13 +1692,62 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       and 0 unchecked; both agree; and the artifact records that an unscoped count of every `- [x]` and
       `- [ ]` line in `spec.md` would over-report by exactly 5, naming those five line numbers.
 - [ ] [P8-T32] Record the spec-versus-tree discrepancies found during this work in
-      `evidence/other/p8-t32-spec-tree-discrepancies.md`. Acceptance: the artifact records the three
-      items listed under "Tree observations recorded while authoring this plan" that concern `spec.md`
-      citations — the 423-versus-424 line count for `EfcDataModel.cs`, the `:167-214`-versus-`:167-213`
-      span of `Issue614_GuardAcceptedSelection_DoesNotThrowAtFilingBoundary`, and the
-      `:143-147`-versus-`:143-146` span of the clear-on-rebind block — and states for each that no
-      acceptance criterion's binding clause is affected. `spec.md` itself is not edited for these; only
-      the acceptance-criteria checkboxes are edited by this phase.
+      `evidence/other/p8-t32-spec-tree-discrepancies.md`. Most of these arise because `spec.md` was
+      authored against the tree before issue #638 merged, which changed `EfcDataModel.cs` and shifted
+      every line citation into it. Acceptance: the artifact records each item below, stating for each
+      the figure `spec.md` carries, the figure measured on the merged tree, and whether any acceptance
+      criterion's binding clause is affected.
+      1. `EfcDataModel.cs` line count: `spec.md` states 424; the merged tree is **485**. Corrected in
+         AC25 by this plan. Binding clause ("at or under 500 lines") unaffected, but the derived
+         headroom of 15 lines is what forced the change-B file split. The implementation-table row at
+         `spec.md:401` and the headroom sentence at `spec.md:414-416` retain the 424 figure and its
+         derived 76-line headroom; they are recorded here rather than corrected, because no acceptance
+         criterion depends on them and the file split they authorize is taken on the measured figure.
+      2. `Issue614_GuardAcceptedSelection_DoesNotThrowAtFilingBoundary`: AC23 cites `:167-213`; the
+         span is `:167-214`. Not corrected in `spec.md`. Binding clause unaffected.
+      3. The `#499` clear-on-rebind block: `spec.md` cites `BreadcrumbBridgeRouter.cs:143-146`; the
+         block spans `:143-147`. Not corrected in `spec.md`. The write at `:145` and the read at
+         `:143` that AC24 names are exact, so AC24's binding clause is unaffected.
+      4. The `string` overload declaration of `MoveToFolderAsync`: AC16 cited `EfcDataModel.cs:259`;
+         it is at **303**. Corrected in AC16 by this plan.
+      5. The trash-sentinel comparison: AC5 cites `EfcDataModel.cs:272`; it is at **316**. Not
+         corrected in `spec.md`. AC5's binding clause is behavioral and is unaffected.
+      6. The `DestinationOlStem` assignment in the `string` overload: AC11 cited
+         `EfcDataModel.cs:287`; it is at **337**. Corrected in AC11 by this plan.
+      7. `OpenOlFolderAsync`: AC17 cited `:299-316`; it spans **349-372**. Corrected in AC17 by this
+         plan as part of that criterion's rewording.
+      8. `OpenFsFolderAsync`: AC17 cited `:318-334`; it spans **374-396**. Corrected in AC17 by this
+         plan.
+      9. The `MAPIFolder` overload: AC15 and AC16 cited `:336-357` and `:336`; it spans **398-419**
+         with its declaration at **398**. Corrected in both criteria by this plan.
+      10. The `ToArchiveRelativeStem` call inside the `MAPIFolder` overload: AC15 cited `:345`; it is
+          at **407**. Corrected in AC15 by this plan.
+      11. The `MoveToFolderAsync` delegation call inside the `MAPIFolder` overload: AC16 cited
+          `:346`; it is at **408**, and the call spans **408-414**. Corrected in AC16 by this plan.
+      12. `ToArchiveRelativeStem` itself: AC15 cited `:372-386`; the declaration is at **434** and the
+          documented member spans **421-448**. Corrected in AC15 by this plan.
+      13. The `MoveToFolder` family census: AC16 stated 3 declarations and 6 call sites, and `spec.md`
+          elsewhere states 16 stem lines across 5 files. The merged tree carries **23** stem lines
+          across **6** files and **10** syntax-anchored lines across **5** files, classified as 3
+          declarations and **7** call sites. Corrected in AC16 by this plan.
+      14. AC17's original clause required that no `Globals.Ol.ArchiveRootPath` read gains a new
+          try/catch or degrade. Issue #638 had already given the file's single read both, at
+          `EfcDataModel.cs:284` inside the `try` at 282-286, with the degrade at 358 and 382, so the
+          clause was false on the merged tree before this plan ran and no action this plan authorizes
+          could make it true. AC17 was therefore reworded in `spec.md` to require that #638's guarded
+          read and degrade are preserved unchanged.
+      15. `spec.md:164-172` describes the whole `Globals.Ol.ArchiveRootPath` benign-degrade item as an
+          open non-goal owned by issue #695, and cites the two verbatim `DestinationOlStem`
+          assignments as `:308` and `:326`. The `EfcDataModel` half of that item shipped in issue #638
+          and is no longer pending; the two assignments are at **364** and **388** and do remain
+          verbatim, so that half of the statement still holds. Not corrected in `spec.md`; this is
+          prose outside the acceptance criteria and no binding clause depends on it.
+      `spec.md` is edited by this plan only where an acceptance criterion would otherwise be
+      unsatisfiable or would name the wrong file — items 1, 4, 6, 7, 8, 9, 10, 11, 12, 13 and 14, plus
+      the file-split renaming in AC11, AC15 and AC25. Items 2, 3, 5 and 15 are recorded here and not
+      corrected, because each is a citation whose acceptance criterion remains satisfiable as written.
+      The acceptance-criteria count in `spec.md` is unchanged at 30: no criterion is added, removed, or
+      split by any of these corrections.
 - [ ] [P8-T33] Final commit and clean tree. Run
       `git add docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`
       then
@@ -1326,10 +1759,13 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       artifact and this plan file, with every other feature-folder path already in `HEAD`. Record
       both outputs verbatim. The pathspec scoping is required because `.claude/` is tracked and
       carries unrelated in-flight modifications that this plan must not commit, and because sibling
-      feature folders under `docs/features/active` are owned by other work. No sibling folder there is
-      untracked at planning time, but this task runs long after planning, and a concurrent run in this
-      checkout can leave an untracked or modified sibling folder under that parent directory before
-      this task executes; a `git add` over the parent directory would then commit another feature's
+      feature folders under `docs/features/active` are owned by other work. At least one sibling folder
+      there,
+      `docs/features/active/2026-08-07-breadcrumb-left-right-arrow-parent-child-navigation-440`, is
+      untracked in this checkout as recorded under "Git pathspec scoping", and this task also runs long
+      after planning, so a concurrent run in this
+      checkout can leave a further untracked or modified sibling folder under that parent directory
+      before this task executes; a `git add` over the parent directory would then commit another feature's
       work onto this branch, and a `git status --porcelain` span over the parent directory would report
       that folder and make this gate unsatisfiable. Both spans are therefore scoped so that this gate
       cannot depend on state this plan does not own. The feature-folder

@@ -897,10 +897,12 @@ under "Corrections to the research file".
 
 ### Change B — normalization in the `string` overload of `MoveToFolderAsync`
 
-- [ ] AC11. `QuickFiler/Controllers/EfcDataModel.cs` declares exactly one new `internal static`
+- [ ] AC11. `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`, a new partial-class file of
+      `EfcDataModel`, declares exactly one new `internal static`
       helper that takes the candidate path and the archive ancestor and returns the value to assign,
       and the `DestinationOlStem` assignment in the `string` overload (currently
-      `EfcDataModel.cs:287`) calls it. The helper is pure: no I/O, no logging, no static mutable
+      `EfcDataModel.cs:337`) calls it. The member is therefore `EfcDataModel.ToFilingStemOrVerbatim`,
+      unchanged by the file split. The helper is pure: no I/O, no logging, no static mutable
       state, and it is invoked directly by unit tests without constructing an `EmailFiler`.
 - [ ] AC12. The helper is gated on `ArchiveStemContract.IsFullOutlookPath`. Any value that is not a
       full Outlook path — every ordinary relative stem and the `"Trash to Delete"` sentinel — is
@@ -913,21 +915,26 @@ under "Corrections to the research file".
       decides exactly as it does today. This is a deliberate divergence from
       `EfcDataModel.ToArchiveRelativeStem`, which throws on the archive-root-exact input; the
       rationale is recorded under "Error handling and logging updates".
-- [ ] AC15. `EfcDataModel.ToArchiveRelativeStem` (`EfcDataModel.cs:372-386`), the `MAPIFolder`
-      overload (`:336-357`), and its call to `ToArchiveRelativeStem` at `:345` are unmodified, and
+- [ ] AC15. `EfcDataModel.ToArchiveRelativeStem` (`EfcDataModel.cs:421-448`, declaration at `:434`),
+      the `MAPIFolder`
+      overload (`:398-419`), and its call to `ToArchiveRelativeStem` at `:407` are unmodified, and
       the **8** existing `ToArchiveRelativeStem` tests in
       `QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs` (methods at :21, :34, :48, :62,
       :72, :87, :100, :111) pass unchanged — including
       `ToArchiveRelativeStem_ArchiveRootItself_Throws`.
 - [ ] AC16. The `MoveToFolder` family is unchanged in shape apart from the helper call: still
-      **3** declarations (`EfcDataModel.cs:259`, `EfcDataModel.cs:336`, and the same-named forwarder
-      at EfcHomeController.ExecuteMoves.cs:89) and **6** call sites (EfcHomeController.ExecuteMoves.cs:78
-      and :98, `EfcDataModel.cs:346`, EfcFormController.cs:537 and :844, and
-      QuickFiler.Test/Controllers/EfcHomeControllerExecuteMovesTests.cs:87). No new overload and no
-      signature change.
-- [ ] AC17. `EfcDataModel.OpenOlFolderAsync` (`:299-316`) and `OpenFsFolderAsync` (`:318-334`) are
-      **not** modified, and no `Globals.Ol.ArchiveRootPath` read anywhere gains a new try/catch or
-      degrade — those are non-goals owned by issue #695.
+      **3** declarations (`EfcDataModel.cs:303`, `EfcDataModel.cs:398`, and the same-named forwarder
+      at EfcHomeController.ExecuteMoves.cs:89) and **7** call sites (EfcHomeController.ExecuteMoves.cs:78
+      and :98, `EfcDataModel.cs:408`, EfcFormController.cs:537 and :844,
+      QuickFiler.Test/Controllers/EfcHomeControllerExecuteMovesTests.cs:87, and
+      QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs:314). The family-stem search over
+      `*.cs` returns **23** lines across **6** files, and the syntax-anchored search returns **10**
+      lines across **5** files. No new overload and no signature change.
+- [ ] AC17. `EfcDataModel.OpenOlFolderAsync` (`:349-372`) and `OpenFsFolderAsync` (`:374-396`) are
+      **not** modified, and the guarded `Globals.Ol.ArchiveRootPath` read at `EfcDataModel.cs:284`
+      together with the `UserDiagnosticAction(ArchiveRootUnavailableMessage)` degrade at `:358` and
+      `:382`, both introduced by issue #638, are preserved unchanged. The remaining benign-degrade
+      work is a non-goal owned by issue #695.
 
 ### Change C — test spec correction
 
@@ -967,9 +974,11 @@ under "Corrections to the research file".
       `BreadcrumbBridgeRouter.Selection.cs:138`, EfcFormController.cs:321). No new write site, no
       new public API member, and the property's `private set` is preserved.
 - [ ] AC25. File-size limits hold. `QuickFiler/Controllers/EfcDataModel.cs` remains at or under 500
-      lines (424 before the change);
+      lines (485 before the change, leaving 15 lines of headroom, which is why the change-B helper is
+      declared in its own partial-class file as this document's implementation section authorizes);
       `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` does not grow beyond its
       current 694 lines; and every new or modified file, including
+      `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`,
       `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue637Tests.cs` and
       `QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`, is at or under 500 lines.
 - [ ] AC26. `QuickFiler.Test/QuickFiler.Test.csproj` contains a `<Compile Include>` item for
