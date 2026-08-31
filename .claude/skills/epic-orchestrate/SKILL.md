@@ -292,10 +292,10 @@ Every field needed to re-derive state durably on resume (`worktree_path`, `branc
 and `gh pr view --json state,mergedAt,headRefOid` — the checkpoint is a cache of that durable
 state, not the source of truth.
 
-Validate the checkpoint via
-`python -m scripts.dev_tools.validate_orchestration_artifacts epic-orchestrator-state <path> --require-complete`
-(or the equivalent `mcp__drm-copilot__validate_orchestration_artifacts` call with
-`artifact_type: "epic-orchestrator-state"`), implemented in
+Validate the checkpoint through the
+`mcp__drm-copilot__validate_orchestration_artifacts` call with
+`artifact_type: "epic-orchestrator-state"`, supplying the `require_complete` argument on
+that same call at the completion gate. The validation is implemented in
 `scripts/dev_tools/validate_epic_orchestrator_state.py`.
 
 ## Completion Requirements

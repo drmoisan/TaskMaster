@@ -31,9 +31,11 @@
         newline in .NET.
       - Comparisons and ordering use [StringComparer]::Ordinal and
         [string]::CompareOrdinal so results do not vary with the current culture.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 # Wildcards that make a path entry a pattern rather than a file. The question
 # mark is included because the subsumption helper treats it as a pattern;

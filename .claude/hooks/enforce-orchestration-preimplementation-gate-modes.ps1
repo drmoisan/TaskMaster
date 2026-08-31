@@ -267,7 +267,7 @@ function Find-OrchestrationDelegationIssueNumber {
 
     if (-not $Prompt) { return $null }
 
-    $keyed = [regex]::Match($Prompt, 'issue[_-]?num(?:ber)?\s*[:=]\s*#?(\d+)', 'IgnoreCase')
+    $keyed = [regex]::Match($Prompt, 'issue(?:[_-]?num(?:ber)?|\s+number)\s*[:=]\s*#?(\d+)', 'IgnoreCase')
     if ($keyed.Success) { return $keyed.Groups[1].Value }
     $hashForm = [regex]::Match($Prompt, '(?:^|\s)#(\d+)\b')
     if ($hashForm.Success) { return $hashForm.Groups[1].Value }
@@ -344,14 +344,17 @@ function Find-OrchestrationModeRecord {
     )
 
     if ($null -eq $Records) { return $null }
-    foreach ($record in @($Records)) {
-        if ($null -eq $record) { continue }
-        if ($TargetFolder) {
+    if ($TargetFolder) {
+        foreach ($record in @($Records)) {
+            if ($null -eq $record) { continue }
             $folder = Get-OrchestrationModeString -Value $record -Name 'feature_folder'
             $basename = Get-OrchestrationModeFolderBasename -Path $folder
             if ($basename -and $basename -eq $TargetFolder) { return $record }
         }
-        if ($IssueNumber) {
+    }
+    if ($IssueNumber) {
+        foreach ($record in @($Records)) {
+            if ($null -eq $record) { continue }
             $issue = Get-OrchestrationModeString -Value $record -Name 'issue_num'
             if ($issue -and $issue -eq $IssueNumber) { return $record }
         }

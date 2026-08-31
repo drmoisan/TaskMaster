@@ -89,11 +89,12 @@ reference; it is not invoked on the destination-runtime path. Cohort recoloring 
 batching use `compute-cohorts.sh` and `compute-concurrency-batches.sh` under the same allowlist
 entry.
 
-The two `poetry run` grants remain for the repository-local paths that still need an interpreter:
-the checkpoint-validator CLI fallback the skill names in its `## Parallel-Level Checkpoint` section
-is invoked as `poetry run python -m`, and the drift-detection CLI likewise. Both grants stay scoped
-to those two invocation forms only — not to `poetry run` as a whole — so `pytest`, `black`, `ruff`,
-and every other `poetry run` subcommand remain outside the allowlist. The sibling persona
+The `poetry run` grants remain for the repository-local paths that still need an interpreter. The
+skill's `## Parallel-Level Checkpoint` section now validates through
+`mcp__drm-copilot__validate_orchestration_artifacts`, so exactly one named consumer is left: the
+drift-detection CLI, invoked as `poetry run python -m`. Each grant stays scoped to its own
+`poetry run python` invocation form — not to `poetry run` as a whole — so `pytest`, `black`,
+`ruff`, and every other `poetry run` subcommand remain outside the allowlist. The sibling persona
 `.claude/agents/parallel-planner.md` records the same destination-runtime posture.
 
 ## Startup Protocol

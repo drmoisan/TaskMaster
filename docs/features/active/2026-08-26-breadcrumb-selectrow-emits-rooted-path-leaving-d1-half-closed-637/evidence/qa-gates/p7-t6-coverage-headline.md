@@ -1,0 +1,4 @@
+Timestamp: 2026-08-31T11:00:26-04:00
+Command: pwsh -NoProfile -Command '. ".\scripts\vscode\Invoke-MSTestWithCoverage.Helpers.ps1"; $raw = Get-Content -LiteralPath ".\coverage\p7-t5-postchange.cobertura.xml" -Raw -Encoding UTF8; [xml]$d = ConvertTo-KoverageCoberturaXml -XmlContent $raw -RepoRoot (Get-Location).Path; $c = $d.SelectSingleNode("/coverage"); foreach ($a in @("line-rate","branch-rate","lines-covered","lines-valid","branches-covered","branches-valid")) { $a + "=" + $c.GetAttribute($a) }'
+EXIT_CODE: 0
+Output Summary: line-rate=0.853327; branch-rate=0.793089; lines-covered=54822; lines-valid=64245; branches-covered=13059; branches-valid=16466. Derived line coverage: 85.3327%. Derived branch coverage: 79.3089%. All six attributes and both derived percentages equal the P7-T5 artifact.

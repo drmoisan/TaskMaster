@@ -182,8 +182,12 @@ PowerShell port** under `.claude/lib/blast-radius/`, which is published by push-
 Python interpreter:
 
 ```powershell
-Import-Module .claude/lib/blast-radius/BlastRadius.psm1 -Force
+$repoRoot = git rev-parse --show-toplevel
+Import-Module (Join-Path $repoRoot '.claude/lib/blast-radius/BlastRadius.psm1') -Force -ErrorAction Stop
 ```
+
+The default PowerShell 5.1 execution policy blocks `Import-Module` of a `.psm1` file, so `pwsh` is
+mandatory here.
 
 The facade re-exports the five functions this skill needs: `Get-PlanPaths` (port of
 `extract_plan_paths`), `Get-BlastRadius` (port of `derive_blast_radius`),
@@ -314,8 +318,9 @@ The library returns the partition; the planner supplies the record fields.
    emptiness is falsy, while this one returns a hashtable whose emptiness is not expressible at all.
 2. Immediately after the conflict-edge set is derived and before anything consumes it, run the
    lane-assertion diagnostic:
-   `poetry run python -m scripts.dev_tools.parallel_lane_assertion --manifest docs/features/parallel/<slug>/parallel.md --edges "<a>:<b> ..."`
-   (covered by the planner's existing `Bash(poetry run *)` grant). It compares the manifest's
+   `bash .claude/lib/bash/report-lane-assertion.sh --manifest docs/features/parallel/<slug>/parallel.md --edges "<a>:<b> ..."`
+   (a bash invocation against the published payload; it requires no Python interpreter at the
+   destination runtime). It compares the manifest's
    optional `expected_conflict_components` assertion (invariant M8) against the connected
    components of the DERIVED conflict graph and prints one `ADVISORY` line per finding in four
    classes: expected-together-but-derived-apart, expected-apart-but-derived-together, a member

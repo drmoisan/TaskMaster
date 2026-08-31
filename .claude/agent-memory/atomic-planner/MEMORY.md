@@ -19,6 +19,12 @@
 - [#677 R1–R8](project_677_keyboard_focus_leak_plan_seams.md) — ctor param REJECTED (5 reflection-arity tests); typed harness for compile-red; internal 9-arg ctor, never ambient SetSynchronizationContext; per-file non-vacuity floors
 - [#635](project_635_reflective_caller_audit_plan_seams.md) — evidence-only audit: tracked plan inflates its own sweep; scan hits its own pattern list; spec said six sites, tree has eight; pathspec breadth inflates a count
 - [#440 R1–R4](project_440_breadcrumb_left_arrow_plan_seams.md) — deletion-only change voids a diff-derived changed-line gate; `(Rebuild target(s))`, NOT `(Rebuild target)`; `.csharpierignore` matches the `.cobertura.xml` suffix; `.dotnet-sdk` IS gitignored (`.gitignore:350`); cite an AC by sentence only after counting its sentences; `Include` resolves against the declaring project's dir
+- [#637 R6](project_637_r6_superseded_spec_claim_seams.md) — plan narrates spec edits it never performs; delta's stale-site list short by 3 (P1-T7 demanded a falsehood); wrapper throws on 2 conditions; Cobertura node-free lines; repo-wide format drift outside the staged pathspec
+- [#637 R2–R5](project_637_selectrow_rooted_path_plan_seams.md) — `docs/features/active` operand hits 121 sibling evidence files; the untracked-440 claim was FALSE for the agent worktree; blanket `-F` breaks every regex; pre-format range consumed post-format; probe with no branch for the outcome that occurs; set-difference file named by recency; R5 re-anchor on the merge commit, `#NNN` at column 0, CRLF round-trip check
+- [#469 R1–R3](project_469_comment_accuracy_plan_seams.md) — defect-number SWAP voids whole-file token gates; `- [x] AC1` is a prefix of `AC10`; unconditional base-merge task; Phase 0 insert renumbers artifact FILENAMES; pre-edit vs post-edit table cited wrong; evidence dir rule ≠ recorded path form
+- [#644](project_644_ac16_referral_revision_seams.md) — AC's named instrument prints no figure; substitute's noise (~0.028pp) exceeds the 0.01pp delta; check-off task → referral task pinning the UNCHECKED state
+- [#644 cycle 2](project_644_cycle2_sweep_gate_evasion_seams.md) — rewording out of a detector's match set is gate evasion; SHA-256 pair for untracked prior artifacts; bound the porcelain `??` scope
+- [#644 PA-7](project_644_pa7_redaction_plan_seams.md) — untracked audit artifact still enters main; name-status diff blind to it; mandated literal contradicted its own stated intent
 - [#680](project_680_menu_mode_plan_seams.md) — HostTests.cs 499 not 500; set-difference format gate; TRX 5-shape identifiers, `grep -a`; append-a-dated-literal discriminator; post-merge remediation: exact line arithmetic — the review's "optional" fallback was load-bearing (501 vs 500)
 
 ## Plan-structure traps
@@ -48,9 +54,12 @@
 - [Enumeration variable must match its consumer](enumeration-variable-must-match-consumer.md) — `$kept` produced vs `@assemblies` splatted = zero-assembly vstest run reporting zero failures
 - [Diff gates need a commit task](diff-gates-need-a-commit-task.md) — `git diff <BASE>..HEAD` passes vacuously with no commit task
 - [Never pin a HEAD SHA as a plan expectation](never-pin-head-sha-as-plan-expectation.md) — gate on tree invariants instead
+- [Harness gitStatus may describe another worktree](harness-git-status-may-describe-another-worktree.md) — measure inside the target worktree (index grep + negative control) or mark the fact unverified
 - [Absolute counts in shared files go stale](absolute-counts-in-shared-files-go-stale.md) — lower-bound/baseline-relative for co-owned files; keep exact the count the task changes
 - [.claude/agent-memory is tracked](agent-memory-is-tracked-scope-git-gates.md) — scope every diff/status/grep gate or it is unsatisfiable
 - [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — verify with `git ls-files`, not `obj/`
+- [Observation scope must match blast radius](observation-scope-must-match-blast-radius.md) — space (repo-wide formatter), time (sweep before later artifacts), spelling (doubled backslash, bare token)
+- [Run-time-derived account-token pattern](runtime-derived-account-token-pattern.md) — `Split-Path -Leaf $env:USERPROFILE`; self-exempt, and does not flag the org handle or display name
 
 ## C# toolchain and test mechanics
 
@@ -61,6 +70,7 @@
 - [CSharpier "Formatted N files" is processed count](csharpier-formatted-n-is-processed-count.md) — a restart-on-rewrite loop keyed on it never terminates; define rewritten-count via before/after SHA-256
 - [Repo-wide csharpier format breaks zero-diff ACs](csharpier-repowide-format-breaks-zero-diff-acs.md) — scope the mutating pass to the plan's own path list
 - [.csharpierignore scope](csharpierignore-scope-packages-config.md) — only `*.csproj`/`*.props`/`*.targets` are excluded; `packages.config` is NOT
+- [.gitignore bracket classes defeat a literal grep](gitignore-bracket-classes-defeat-literal-grep.md) — `[Tt]est[Rr]esult*/` does ignore `TestResults/`; never claim a path is tracked from a literal search
 - [`/Logger:trx` needs `/ResultsDirectory`](trx-needs-resultsdirectory.md) — TRX lands in `TestResults\` relative to cwd; give each run task its own `p#-t#` subdirectory
 - [`[expect-fail]` needs a synchronous seam](expect-fail-needs-a-synchronous-seam.md) — async-void boundaries false-GREEN; re-run RED analysis after scoping `Times.Never()`
 - [Invoke-MSTestWithCoverage.ps1](reference_invoke_mstest_with_coverage_script.md) — canonical full-suite Cobertura runner

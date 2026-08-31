@@ -27,7 +27,7 @@ namespace QuickFiler.Controllers
         /// Rejects null, empty, and whitespace-only values; banner sentinels; and every full
         /// (rooted) path. Rooted values are rejected as such at this surface so the predicate
         /// agrees with <see cref="ArchiveStemContract.RequireArchiveRelativeStem"/>. Producer-side
-        /// normalization in BreadcrumbBridgeRouter.SelectRow is deferred to issue #637.
+        /// normalization in BreadcrumbBridgeRouter.SelectRow is implemented by issue #637.
         /// </para>
         /// <para>
         /// The filing predicate carries NO minimum-length rule (CR-1). Filing into an existing

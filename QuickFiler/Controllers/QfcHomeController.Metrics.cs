@@ -168,9 +168,9 @@ namespace QuickFiler.Controllers
                 ref OlAppointment
             );
 
-            // GetMoveDiagnostics returns an array one element longer than it fills, so its trailing
-            // element is null; dropping null and whitespace-only entries keeps blank rows out of
-            // the CSV.
+            // The call is made through IQfcCollectionController.GetMoveDiagnostics, which carries
+            // no XML documentation and therefore no non-null element guarantee, so this filter
+            // defends the interface contract rather than a known producer defect.
             var lines = strOutput.Where(line => !string.IsNullOrWhiteSpace(line)).ToArray();
 
             // CancellationToken.None, never the session Token: the dispatcher continuation that

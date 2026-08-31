@@ -1,4 +1,16 @@
+<#
+.SYNOPSIS
+    Markdown checkbox counting for generated requirement documents.
+
+.DESCRIPTION
+    Provides Get-NamedSectionCheckboxCount, a pure function that counts the
+    markdown checkbox items contained by a named heading section. It reads no
+    file, starts no process, and never mutates its input.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
+#>
+
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 <#
 .SYNOPSIS

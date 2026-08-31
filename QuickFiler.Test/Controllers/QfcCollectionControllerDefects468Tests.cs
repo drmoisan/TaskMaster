@@ -151,13 +151,15 @@ namespace QuickFiler.Controllers.Tests
 
         /// <summary>
         /// Issue #286. The reentrancy counter must be restored when
-        /// <c>RemoveSpecificControlGroupAsync</c> throws at the very first statement after the
+        /// <c>RemoveSpecificControlGroupAsync</c> throws early in its body, just after the
         /// <c>Interlocked.Increment</c>. An uninitialized controller leaves <c>_itemGroups</c>
-        /// <c>null</c>, so <c>UnregisterNavigation()</c> raises
-        /// <see cref="NullReferenceException"/> there. Expected outcome: the exception propagates
-        /// and the private static counter is back at its pre-call value. Before the fix the
-        /// decrement was the method's last statement and unreachable after a throw, leaking the
-        /// counter for the life of the process.
+        /// <c>null</c>; since issue #644 replaced the count-bounded unregister loop with a key
+        /// ledger, <c>UnregisterNavigation()</c> no longer reads that field and completes, so the
+        /// <see cref="NullReferenceException"/> now originates one statement later, at the
+        /// <c>_itemGroups[selection - 1]</c> dereference inside
+        /// <c>RemoveSpecificControlGroupAsync</c>. Expected outcome is unchanged: the exception
+        /// propagates and the counter is back at its pre-call value. Before the fix the decrement
+        /// was the method's last statement and unreachable after a throw, leaking the counter.
         /// </summary>
         [TestMethod]
         public async Task RemoveSpecificControlGroupAsync_ThrowAtFirstStatement_RestoresReentrancyCounter()
@@ -173,8 +175,8 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             await act.Should()
                 .ThrowAsync<NullReferenceException>(
-                    because: "UnregisterNavigation() is the first statement after the increment and "
-                        + "it dereferences the null _itemGroups field"
+                    because: "the null _itemGroups field is dereferenced at _itemGroups[selection - 1] "
+                        + "inside RemoveSpecificControlGroupAsync, so the decrement must run on that path"
                 );
             ReadReentrancyCounter()
                 .Should()
@@ -200,8 +202,10 @@ namespace QuickFiler.Controllers.Tests
             QfcCollectionController controller =
                 QfcCollectionControllerTestSupport.CreateUninitializedController();
 
-            // A real (empty) KbdActions instance rather than a mock: UnregisterNavigation calls
-            // Remove(...) on it directly, and it must succeed so the throw lands later in the body.
+            // A real (empty) KbdActions instance rather than a mock. Since issue #644 replaced the
+            // count-bounded loop with a ledger, UnregisterNavigation iterates an empty ledger here
+            // and calls Remove zero times; the real instance is retained so the arrangement stays
+            // valid, not because UnregisterNavigation still calls Remove on it.
             Mock<IQfcKeyboardHandler> keyboardHandler = new Mock<IQfcKeyboardHandler>(
                 MockBehavior.Loose
             );

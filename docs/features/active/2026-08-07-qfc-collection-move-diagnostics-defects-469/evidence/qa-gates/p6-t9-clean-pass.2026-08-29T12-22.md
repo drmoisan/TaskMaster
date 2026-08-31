@@ -1,0 +1,2 @@
+P6-T1 formatter=0; P6-T2 check baseline-relative pre-existing config drift only; P6-T3 analyzer rebuild=0; P6-T4 nullable rebuild=0; P6-T5 coverage=0; P6-T6 scoped tests=0; P6-T7 named guards=0.
+AC10 mapping: format/check P6-T1/P6-T2; analyzers P6-T3; type checking P6-T4; coverage P6-T5 and vstest P6-T6/P6-T7. Coverage uses dotnet-coverage Cobertura; no command passes EnableCodeCoverage because the runsettings does not declare that collector.

@@ -28,6 +28,16 @@ Observed 2026-08-30 on run bugs-638-644-647: the prompt said `Issue number: 644.
 `merge_status` was the terminal `worktree_removed`, and denied. The checkpoint was correct
 throughout.
 
+**Still unfixed as of the v1.1.7 push-down (commit `622a32bf`, verified 2026-08-30).** That push-down
+touched every `.claude` file's mtime but changed only 15 files, and neither half of this defect was
+among them: the keyed regex is still `issue[_-]?num(?:ber)?\s*[:=]\s*#?(\d+)` with no whitespace
+separator, and `Find-OrchestrationModeRecord` still tests folder-then-issue per record in array
+order. Do not assume a push-down fixed a defect you filed — re-grep the two specific lines. The same
+check applies to the merge gate: it gained a precise `\bgh\s+pr\s+merge\s+(\d+)\b` form first, but
+the whole-string `(?<![-\w])(\d+)\b` fallback remains, and `gh pr merge --merge <N>` does not match
+the precise form, so the bare-command discipline in
+[[issue-merge-and-removal-commands-bare]] is still required.
+
 **How to apply:**
 
 - Use `issue_num: <N>.` verbatim, and spell sibling items in prose without a hash ("the archive-root
