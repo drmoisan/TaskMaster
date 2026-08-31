@@ -3,9 +3,9 @@
 - **Issue:** #469
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-29T14-15
-- **Status:** Draft
-- **Version:** 0.5
+- **Last Updated:** 2026-08-31T08-21
+- **Status:** Ready for Codex preflight
+- **Version:** 0.6
 - **Work Mode:** full-bug (marker source: `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/issue.md`, line 12, `- Work Mode: full-bug`)
 - **Requirements and acceptance-criteria source:** `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/spec.md`, section `## Acceptance Criteria` (13 criteria, AC1 through AC13)
 - **Verified findings source:** `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/research/2026-08-29T12-31-qfc-collection-move-diagnostics-defects-469.md`
@@ -45,7 +45,7 @@ Every file path recorded inside an evidence artifact is written repository-relat
 prints an absolute path — MSBuild diagnostics in the non-zero branches of P0-T11, P0-T12, P6-T3 and
 P6-T4, and any absolute entry in the unformatted-file enumerations of P0-T10 and P6-T2 — the
 executor removes the repository-root prefix from the recorded text before saving the artifact, so no
-account name, machine name or drive letter is committed by P7-T14. The rewrite applies to recorded
+account name, machine name or drive letter is included in the final progress commit. The rewrite applies to recorded
 paths only; counts, exit codes and quoted summary lines are recorded verbatim.
 
 Throughout this plan `FEATURE` is shorthand for
@@ -88,8 +88,8 @@ distinguishing text on one physical line, so every gate below is a combined sing
 
 | Site | Line | Currently reads |
 |---|---|---|
-| `QuickFiler/Controllers/QfcCollectionController.cs` | 2362 | `Issue #469 defect 1: exactly one diagnostics line per cached move group. The array` |
-| `QuickFiler/Controllers/QfcCollectionController.cs` | 2372 | `Issue #469 defect 2: the null test must dominate every dereference of qf. It` |
+| `QuickFiler/Controllers/QfcCollectionController.cs` | 2371 | `Issue #469 defect 1: exactly one diagnostics line per cached move group. The array` |
+| `QuickFiler/Controllers/QfcCollectionController.cs` | 2381 | `Issue #469 defect 2: the null test must dominate every dereference of qf. It` |
 | `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` | 275 | `/// Issue #469 defect 1. Regression test proving that the diagnostics array carries exactly` |
 | `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` | 306 | `because: "issue #469 defect 1 requires one diagnostics line per cached move "` |
 | `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` | 313 | `/// Issue #469 defect 1. Regression test proving the off-by-one is a length defect at every` |
@@ -101,7 +101,7 @@ Sites at `:306`, `:340` and `:387` are FluentAssertions `because:` string litera
 statements, not comments. Spec AC7 permits `because:` string edits; this plan does not assert
 "comment lines only" anywhere.
 
-The `Issue #469 defect 3` sites (`QfcCollectionController.cs:71`, `:727`, `:2335`;
+The `Issue #469 defect 3` sites (`QfcCollectionController.cs:71`, `:732`, `:2344`;
 `QfcCollectionControllerTests.cs:66`; `QfcCollectionControllerDefects468MoveTests.cs:17`, `:29`,
 `:57`, `:64`) and the `Issue #469 defect 4` site
 (`QfcCollectionControllerDefects468MoveTests.cs:463`) already agree with `issue.md` and are NOT
@@ -127,7 +127,7 @@ to one named file.
 - The token `IQfcCollectionController` currently has zero occurrences in
   `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, so asserting at least one occurrence after
   the rewrite is a false-before / true-after gate.
-- `QuickFiler/Controllers/QfcCollectionController.cs` is 2437 lines, already over the 500-line cap,
+- `QuickFiler/Controllers/QfcCollectionController.cs` is 2446 lines, already over the 500-line cap,
   under an explicit no-split constraint delegated to open issue #623. This change must be
   net-neutral or net-negative on that file. No split is planned.
 - `QuickFiler/Controllers/QfcCollectionController.cs:21` carries `[ExcludeFromCodeCoverage]`. No
@@ -137,7 +137,7 @@ to one named file.
 - `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` is 497 lines against
   the 500 cap (the spec's figure of 498 is off by one; 497 is the re-derived value). No test method
   is added to it.
-- `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs` is exactly 500 lines and receives
+- `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs` is exactly 499 lines and receives
   nothing.
 - `QuickFiler.Test` is a legacy non-SDK project that enumerates sources with explicit
   `Compile Include` items. No new file is created, so no csproj entry is needed and no csproj is
@@ -182,8 +182,8 @@ that changes only the defect digit. Line length is unchanged, so neither file's 
 
 | File | Line | Becomes |
 |---|---|---|
-| `QuickFiler/Controllers/QfcCollectionController.cs` | 2362 | `Issue #469 defect 2: exactly one diagnostics line per cached move group. The array` |
-| `QuickFiler/Controllers/QfcCollectionController.cs` | 2372 | `Issue #469 defect 1: the null test must dominate every dereference of qf. It` |
+| `QuickFiler/Controllers/QfcCollectionController.cs` | 2371 | `Issue #469 defect 2: exactly one diagnostics line per cached move group. The array` |
+| `QuickFiler/Controllers/QfcCollectionController.cs` | 2381 | `Issue #469 defect 1: the null test must dominate every dereference of qf. It` |
 | `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` | 275 | `/// Issue #469 defect 2. Regression test proving that the diagnostics array carries exactly` |
 | `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` | 306 | `because: "issue #469 defect 2 requires one diagnostics line per cached move "` |
 | `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` | 313 | `/// Issue #469 defect 2. Regression test proving the off-by-one is a length defect at every` |
@@ -227,69 +227,56 @@ zero occurrences in that file today, so the Phase 4 gate is false-before / true-
   creep and accidental deletion. They are labelled as guards so no reviewer mistakes them for
   discriminating gates.
 
+## Execution checkpoint boundaries
+
+This plan contains 69 atomic tasks. After completing and checking off task 35, `[P4-T2]`, the atomic
+executor must stop and return `PROGRESS_COMMIT_REQUIRED: P0-T1..P4-T2`. The orchestrator must stage
+only the completed interval's in-scope files, collect canonical commit context through the repository
+automation adapter, delegate the commit message to the routed `commit-steward` profile, create the
+commit, and record the interval and resulting SHA in `artifacts/orchestration/orchestrator-state.json`
+before resuming at `[P4-T3]`. No executor may mutate the worktree while that commit is being prepared.
+
+After `[P7-T17]`, the executor must return `PROGRESS_COMMIT_REQUIRED: P4-T3..P7-T17`. The
+orchestrator applies the same commit-context and commit-steward sequence to the final partial interval,
+records its SHA, and only then proceeds to review and pull-request steps. These boundaries do not add
+or renumber atomic tasks.
+
 ---
+
+## Pre-execution base-reconciliation gate
+
+Before `[P0-T1]`, the orchestrator must run `git fetch origin main` and then `git merge --no-edit origin/main` while the worktree has no executor-created tracked changes. Use merge, never rebase. It must record the result in `FEATURE/evidence/baseline/p0-t6-base-reconciliation.2026-08-29T12-22.md` with `Command:`, `EXIT_CODE:`, and `Output Summary:`. The evidence must show that `git rev-parse origin/main` equals `git merge-base origin/main HEAD`, `git ls-files --unmerged` returns zero paths, and `(Get-Content).Count` is 2446 for `QuickFiler/Controllers/QfcCollectionController.cs`, 215 for `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, 497 for `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs`, 453 for `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, and 499 for `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs`. If the merge conflicts or any required line count differs, return the plan to preflight revision before atomic execution begins. Do not begin `[P0-T1]` until this gate passes.
 
 ### Phase 0 — Baseline Capture, Toolchain Bootstrap, and Citation Re-verification
 
-- [ ] [P0-T1] Read `CLAUDE.md` in full and record the fact of the read in
+- [x] [P0-T1] Read `AGENTS.md` in full and record the standing-instructions entry in
   `FEATURE/evidence/baseline/phase0-instructions-read.2026-08-29T12-22.md`. Acceptance: the artifact
-  exists and its `Policy Order:` field lists `CLAUDE.md` first.
+  exists and its `Policy Order:` field lists `AGENTS.md — standing instructions` first.
 
-- [ ] [P0-T2] Read `.claude/rules/general-code-change.md` in full and append it as the second entry
-  of the `Policy Order:` field in
-  `FEATURE/evidence/baseline/phase0-instructions-read.2026-08-29T12-22.md`. Acceptance: the artifact
-  lists `.claude/rules/general-code-change.md` in position 2.
+- [x] [P0-T2] Re-read the `Agent Code Change Policy` section of `AGENTS.md` and append
+  `AGENTS.md — Agent Code Change Policy` as the second entry of the `Policy Order:` field in
+  `FEATURE/evidence/baseline/phase0-instructions-read.2026-08-29T12-22.md`. Acceptance: that entry is
+  in position 2.
 
-- [ ] [P0-T3] Read `.claude/rules/general-unit-test.md` in full and append it as the third entry of
-  the `Policy Order:` field in the same artifact. Acceptance: the artifact lists
-  `.claude/rules/general-unit-test.md` in position 3.
+- [x] [P0-T3] Re-read the `General Unit Test Policy` section of `AGENTS.md` and append
+  `AGENTS.md — General Unit Test Policy` as the third entry of the `Policy Order:` field in the same
+  artifact. Acceptance: that entry is in position 3.
 
-- [ ] [P0-T4] Read `.claude/rules/csharp.md` in full and append it as the fourth entry of the
-  `Policy Order:` field in the same artifact. Acceptance: the artifact lists `.claude/rules/csharp.md`
-  in position 4.
+- [x] [P0-T4] Read `.agents/skills/csharp/SKILL.md` in full and append it as the fourth entry of the
+  `Policy Order:` field in the same artifact. Acceptance: the artifact lists
+  `.agents/skills/csharp/SKILL.md` in position 4.
 
-- [ ] [P0-T5] Read `.claude/rules/tonality.md` in full, append it as the fifth entry, and finalise
+- [x] [P0-T5] Re-read the `Tone Policy` section of `AGENTS.md`, append
+  `AGENTS.md — Tone Policy` as the fifth entry, and finalise
   `FEATURE/evidence/baseline/phase0-instructions-read.2026-08-29T12-22.md` with the fields
-  `Timestamp:`, `Policy Order:` and an explicit list of the five files read. Acceptance: the
-  artifact contains all three fields and exactly five listed files.
+  `Timestamp:`, `Policy Order:`, `Distinct Files Read:`, and `Tone Policy Acknowledgement:`.
+  Acceptance: the artifact contains all four fields; `Policy Order:` contains exactly five ordered
+  entries; `Distinct Files Read:` contains exactly `AGENTS.md` and `.agents/skills/csharp/SKILL.md`;
+  and the acknowledgement confirms that professional, factual, neutral wording is required.
 
-- [ ] [P0-T6] Reconcile this branch's base against `origin/main` before any baseline is captured.
-  Run `git fetch origin main`, then `git merge --no-edit origin/main`. The merge is unconditional:
-  when the branch already contains `origin/main` the command reports `Already up to date.` and exits
-  0, so there is no skip branch. Use `merge`, never `rebase`: the repository's force-push guard
-  rejects the rewritten history a rebase produces. Record the run in
-  `FEATURE/evidence/baseline/p0-t6-base-reconciliation.2026-08-29T12-22.md`. Acceptance: the
-  artifact records `Command:`, `EXIT_CODE:` and an `Output Summary:` in which all three of the
-  following hold, and the task fails if any one does not: the post-merge `git rev-parse origin/main`
-  and `git merge-base origin/main HEAD` print the same value; `git ls-files --unmerged` prints zero
-  lines; and `(Get-Content).Count` is 2437 for `QuickFiler/Controllers/QfcCollectionController.cs`,
-  215 for `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, 497 for
-  `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs`, 453 for
-  `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, and 500 for
-  `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs`. The exit code alone is not
-  sufficient evidence for this write-mode command, because `git merge` exits 0 both when it advances
-  the branch and when it does nothing; the rev-equality re-check and the five line counts are the
-  required additional observations. If the merge reports a conflict, or if any of the five counts
-  changes, halt and report rather than proceeding: this plan's line and token citations would no
-  longer describe the tree. This task must precede P0-T10 through P0-T14, because a merge that lands
-  after a baseline invalidates that baseline, most directly the `BASELINE_PASSED:` count that spec
-  AC9 compares against.
+- [x] [P0-T6] Verify the pre-execution base-reconciliation evidence. Do not run `git fetch` or `git merge` in this task. Confirm `FEATURE/evidence/baseline/p0-t6-base-reconciliation.2026-08-29T12-22.md` records the required commands, `EXIT_CODE:`, matching `origin/main` and merge-base revisions, zero unmerged paths, and the five required line counts. Acceptance: every recorded condition passes. If the evidence is absent or any condition fails, return the plan to preflight revision before proceeding.
 
-```powershell
-git fetch origin main
-git merge --no-edit origin/main
-$LASTEXITCODE
-git rev-parse origin/main
-git merge-base origin/main HEAD
-git ls-files --unmerged
-(Get-Content -LiteralPath 'QuickFiler\Controllers\QfcCollectionController.cs').Count
-(Get-Content -LiteralPath 'QuickFiler\Controllers\QfcHomeController.Metrics.cs').Count
-(Get-Content -LiteralPath 'QuickFiler.Test\Controllers\QfcCollectionControllerDefects468MoveTests.cs').Count
-(Get-Content -LiteralPath 'QuickFiler.Test\Controllers\QfcHomeControllerMetricsTests.cs').Count
-(Get-Content -LiteralPath 'QuickFiler.Test\Controllers\QfcCollectionControllerTests.cs').Count
-```
-
-- [ ] [P0-T7] Probe the .NET SDK and bootstrap it if the probe fails. Run `dotnet --version`. If it
+- [x] [P0-T7] Probe the .NET SDK and bootstrap it if the probe fails. Run `dotnet --version`. If it
   exits non-zero (the repository-local `.dotnet-sdk` path named by `global.json` is gitignored and
   is absent from a fresh worktree), run `scripts/vscode/Install-RepoDotNetSdk.ps1` from the
   repository root and re-run `dotnet --version`. Record both invocations in
@@ -303,7 +290,7 @@ dotnet --version
 $LASTEXITCODE
 ```
 
-- [ ] [P0-T8] Restore the CSharpier tool manifest. Run `dotnet tool restore` from the repository
+- [x] [P0-T8] Restore the CSharpier tool manifest. Run `dotnet tool restore` from the repository
   root. Record it in `FEATURE/evidence/baseline/p0-t8-dotnet-tool-restore.2026-08-29T12-22.md`.
   Acceptance: `EXIT_CODE: 0`, and `dotnet tool run csharpier --version` prints `1.2.6` (the version
   pinned by `dotnet-tools.json` at the repository root). Record the printed version verbatim in
@@ -315,7 +302,7 @@ $LASTEXITCODE
 dotnet tool run csharpier --version
 ```
 
-- [ ] [P0-T9] Restore NuGet packages for the solution. Run `scripts/vscode/Invoke-Restore.ps1` from
+- [x] [P0-T9] Restore NuGet packages for the solution. Run `scripts/vscode/Invoke-Restore.ps1` from
   the repository root. This uses `vswhere`-resolved MSBuild with `/t:Restore` and
   `/p:RestorePackagesConfig=true`, which is required because every project in this solution is a
   legacy `packages.config` project. Record it in
@@ -330,7 +317,7 @@ $LASTEXITCODE
 Test-Path 'packages'
 ```
 
-- [ ] [P0-T10] Capture the baseline CSharpier state. Run `dotnet tool run csharpier check .` and
+- [x] [P0-T10] Capture the baseline CSharpier state. Run `dotnet tool run csharpier check .` and
   record it in `FEATURE/evidence/baseline/p0-t10-csharpier-check.2026-08-29T12-22.md`.
   Acceptance: the artifact records `Command:`, `EXIT_CODE:` and an `Output Summary:` that states the
   exit code and enumerates every file path the command reported as unformatted, verbatim, together
@@ -346,7 +333,7 @@ dotnet tool run csharpier check .
 $LASTEXITCODE
 ```
 
-- [ ] [P0-T11] Capture the baseline analyzer build. Record it in
+- [x] [P0-T11] Capture the baseline analyzer build. Record it in
   `FEATURE/evidence/baseline/p0-t11-msbuild-analyzers.2026-08-29T12-22.md`. Acceptance: the artifact
   records `Command:`, `EXIT_CODE:`, and an `Output Summary:` quoting the MSBuild summary lines that
   report the error count and the warning count. If `EXIT_CODE:` is non-zero, the artifact must
@@ -360,7 +347,7 @@ $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find 'MSBui
 $LASTEXITCODE
 ```
 
-- [ ] [P0-T12] Capture the baseline nullable/type-check build. Record it in
+- [x] [P0-T12] Capture the baseline nullable/type-check build. Record it in
   `FEATURE/evidence/baseline/p0-t12-msbuild-nullable.2026-08-29T12-22.md`. Acceptance: same field
   and enumeration requirements as P0-T11. Do not add `/p:Nullable=enable`; the command below is
   character-for-character the CI command.
@@ -372,7 +359,7 @@ $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find 'MSBui
 $LASTEXITCODE
 ```
 
-- [ ] [P0-T13] Capture the baseline `QuickFiler.Test` passing-test count against the explicitly named
+- [x] [P0-T13] Capture the baseline `QuickFiler.Test` passing-test count against the explicitly named
   assembly `QuickFiler.Test\bin\Debug\QuickFiler.Test.dll` produced by P0-T12. Record it in
   `FEATURE/evidence/baseline/p0-t13-quickfiler-test-count.2026-08-29T12-22.md`. Acceptance: the
   artifact records `Command:`, `EXIT_CODE:`, and an `Output Summary:` that quotes verbatim the
@@ -397,7 +384,7 @@ $LASTEXITCODE
 @(Select-String -LiteralPath 'QuickFiler.Test\Controllers\QfcHomeControllerMetricsTests.cs' -SimpleMatch -Pattern '[TestMethod]').Count
 ```
 
-- [ ] [P0-T14] Capture the baseline solution-wide coverage figure. Run
+- [x] [P0-T14] Capture the baseline solution-wide coverage figure. Run
   `scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot .` and record it in
   `FEATURE/evidence/baseline/p0-t14-coverage.2026-08-29T12-22.md`. Acceptance: the artifact records
   `Command:`, `EXIT_CODE:`, and an `Output Summary:` containing `BASELINE_LINE_RATE_PERCENT:` set to
@@ -416,7 +403,7 @@ pwsh -NoProfile -File 'scripts\vscode\Invoke-MSTestWithCoverage.ps1' -SearchRoot
 $LASTEXITCODE
 ```
 
-- [ ] [P0-T15] Re-derive every citation this plan depends on against the current tree before any edit
+- [x] [P0-T15] Re-derive every citation this plan depends on against the current tree before any edit
   is made, and record the result in
   `FEATURE/evidence/baseline/p0-t15-citation-reverification.2026-08-29T12-22.md`. Acceptance: the
   artifact records `Command:`, `EXIT_CODE:`, and an `Output Summary:` in which every one of the
@@ -447,10 +434,10 @@ $LASTEXITCODE
     `issue #469 defect 2 requires the null guard to run before the first`. Each pairs the defect
     number with its distinguishing text on one physical line and is the exact pre-edit counterpart
     of a token P3-T3 or P3-T10 asserts after the edit;
-  - `(Get-Content).Count` is 2437 for `QuickFiler/Controllers/QfcCollectionController.cs`, 215 for
+  - `(Get-Content).Count` is 2446 for `QuickFiler/Controllers/QfcCollectionController.cs`, 215 for
     `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, 497 for
     `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs`, 453 for
-    `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, and 500 for
+    `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, and 499 for
     `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs`;
   - the count for `CFN-2 RESOLVED` is 0 in
     `docs/features/active/quickfiler-home-controller-metrics-442/spec.md`.
@@ -483,7 +470,7 @@ $m = 'QuickFiler.Test\Controllers\QfcCollectionControllerDefects468MoveTests.cs'
 
 ### Phase 1 — Fail-Before Exception Dossier
 
-- [ ] [P1-T1] Write the fail-before exception dossier to
+- [x] [P1-T1] Write the fail-before exception dossier to
   `FEATURE/evidence/regression-testing/fail-before-exception.2026-08-29T12-22.md`. Acceptance: the
   file exists and contains all of the following fields: `Timestamp:`;
   `WhyFailingRunImpossible:` stating in one to three sentences that comment text and XML
@@ -503,13 +490,13 @@ $m = 'QuickFiler.Test\Controllers\QfcCollectionControllerDefects468MoveTests.cs'
 
 ### Phase 2 — Stale-Comment Correction (spec items A and B)
 
-- [ ] [P2-T1] Replace lines 171 through 173 of `QuickFiler/Controllers/QfcHomeController.Metrics.cs`
+- [x] [P2-T1] Replace lines 171 through 173 of `QuickFiler/Controllers/QfcHomeController.Metrics.cs`
   with literal R1 exactly as quoted in the "Exact replacement text" section above, preserving the
   12-space indentation. Do not touch line 174. Acceptance: the file contains the single-line token
   `The call is made through IQfcCollectionController.GetMoveDiagnostics, which carries` exactly
   once, and `(Get-Content).Count` for the file is still 215.
 
-- [ ] [P2-T2] Verify spec AC1 as a discriminating gate. Acceptance: the count of the single-line
+- [x] [P2-T2] Verify spec AC1 as a discriminating gate. Acceptance: the count of the single-line
   token `one element longer` in `QuickFiler/Controllers/QfcHomeController.Metrics.cs` is 0. This
   gate is scoped to that one named file; no repository-wide variant is run, because the same token
   legitimately remains in this feature's `issue.md`, `spec.md` and research document and in
@@ -520,7 +507,7 @@ $m = 'QuickFiler.Test\Controllers\QfcCollectionControllerDefects468MoveTests.cs'
 @(Select-String -LiteralPath 'QuickFiler\Controllers\QfcHomeController.Metrics.cs' -SimpleMatch -Pattern 'one element longer').Count
 ```
 
-- [ ] [P2-T3] Verify spec AC2. Acceptance: in
+- [x] [P2-T3] Verify spec AC2. Acceptance: in
   `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, the count of `IQfcCollectionController` is
   at least 1 (discriminating: it was 0 at branch head per P0-T15), the count of `.Where(` is exactly
   1 (invariant guard: the filter expression is retained verbatim), and the count of
@@ -533,7 +520,7 @@ $m = 'QuickFiler.Test\Controllers\QfcCollectionControllerDefects468MoveTests.cs'
 @(Select-String -LiteralPath 'QuickFiler\Controllers\QfcHomeController.Metrics.cs' -SimpleMatch -Pattern 'IsNullOrWhiteSpace').Count
 ```
 
-- [ ] [P2-T4] Replace lines 398 through 400 of
+- [x] [P2-T4] Replace lines 398 through 400 of
   `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs` with literal R2 exactly as quoted
   above, preserving the 8-space indentation. Leave line 397 and line 401, which are the XML summary
   opening and closing tag lines, line 402, which is the `[TestMethod]` attribute, and the entire
@@ -542,7 +529,7 @@ $m = 'QuickFiler.Test\Controllers\QfcCollectionControllerDefects468MoveTests.cs'
   `/// The call is made through the IQfcCollectionController.GetMoveDiagnostics contract,` exactly
   once, and `(Get-Content).Count` for the file is still 453.
 
-- [ ] [P2-T5] Verify spec AC3 as a discriminating gate. Acceptance: the count of the single-line
+- [x] [P2-T5] Verify spec AC3 as a discriminating gate. Acceptance: the count of the single-line
   token `one element longer` in `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs` is 0.
   Scoped to that one named file for the reason stated in P2-T2. Record the result in
   `FEATURE/evidence/qa-gates/p2-t5-ac3-metricstests-token.2026-08-29T12-22.md`.
@@ -551,7 +538,7 @@ $m = 'QuickFiler.Test\Controllers\QfcCollectionControllerDefects468MoveTests.cs'
 @(Select-String -LiteralPath 'QuickFiler.Test\Controllers\QfcHomeControllerMetricsTests.cs' -SimpleMatch -Pattern 'one element longer').Count
 ```
 
-- [ ] [P2-T6] Verify that both Phase 2 edits are exactly three-lines-for-three-lines. Acceptance:
+- [x] [P2-T6] Verify that both Phase 2 edits are exactly three-lines-for-three-lines. Acceptance:
   `git diff origin/main --numstat` reports added count 3 and deleted count 3 for
   `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, and added count 3 and deleted count 3 for
   `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`. Record the raw numstat output in
@@ -567,19 +554,19 @@ git status --porcelain -- QuickFiler QuickFiler.Test
 
 ### Phase 3 — Defect-Numbering Correction (spec items C1 and C2)
 
-- [ ] [P3-T1] At `QuickFiler/Controllers/QfcCollectionController.cs` line 2362, change the defect
+- [x] [P3-T1] At `QuickFiler/Controllers/QfcCollectionController.cs` line 2371, change the defect
   digit from 1 to 2 so the line reads
   `            // Issue #469 defect 2: exactly one diagnostics line per cached move group. The array`.
   Change nothing else on that line and nothing on lines 2363 through 2365. Acceptance: the file
   contains the single-line token `Issue #469 defect 2: exactly one diagnostics line` exactly once.
 
-- [ ] [P3-T2] At `QuickFiler/Controllers/QfcCollectionController.cs` line 2372, change the defect
+- [x] [P3-T2] At `QuickFiler/Controllers/QfcCollectionController.cs` line 2381, change the defect
   digit from 2 to 1 so the line reads
   `                // Issue #469 defect 1: the null test must dominate every dereference of qf. It`.
   Change nothing else on that line and nothing on lines 2373 through 2376. Acceptance: the file
   contains the single-line token `Issue #469 defect 1: the null test must dominate` exactly once.
 
-- [ ] [P3-T3] Verify spec AC5 as a set of discriminating gates over
+- [x] [P3-T3] Verify spec AC5 as a set of discriminating gates over
   `QuickFiler/Controllers/QfcCollectionController.cs`. Acceptance, all four of which must hold and
   any one of which fails the task: the count of `Issue #469 defect 2: exactly one diagnostics line`
   is 1; the count of `Issue #469 defect 1: exactly one diagnostics line` is 0; the count of
@@ -597,36 +584,36 @@ git status --porcelain -- QuickFiler QuickFiler.Test
 @(Select-String -LiteralPath 'QuickFiler\Controllers\QfcCollectionController.cs' -SimpleMatch -Pattern 'Issue #469 defect 2: the null test must dominate').Count
 ```
 
-- [ ] [P3-T4] At `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` line
+- [x] [P3-T4] At `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` line
   275, change the defect digit from 1 to 2. Acceptance: the file contains the single-line token
   `Issue #469 defect 2. Regression test proving that the diagnostics array` exactly once.
 
-- [ ] [P3-T5] At `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` line
+- [x] [P3-T5] At `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` line
   306, change the defect digit from 1 to 2 inside the `because:` string literal. This is a string
   literal in an executable statement, not a comment; spec AC7 explicitly permits `because:` string
   edits. Do not alter the continuation lines 307 and 308. Acceptance: the file contains the
   single-line token `issue #469 defect 2 requires one diagnostics line per cached move` exactly
   once.
 
-- [ ] [P3-T6] At `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` line
+- [x] [P3-T6] At `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` line
   313, change the defect digit from 1 to 2. Acceptance: the file contains the single-line token
   `Issue #469 defect 2. Regression test proving the off-by-one` exactly once.
 
-- [ ] [P3-T7] At `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` line
+- [x] [P3-T7] At `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` line
   340, change the defect digit from 1 to 2 inside the `because:` string literal. Do not alter the
   continuation line 341. Acceptance: the file contains the single-line token
   `issue #469 defect 2 requires exactly one diagnostics line per cached` exactly once.
 
-- [ ] [P3-T8] At `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` line
+- [x] [P3-T8] At `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` line
   352, change the defect digit from 2 to 1. Acceptance: the file contains the single-line token
   `Issue #469 defect 1. Regression test proving that the item-controller null guard` exactly once.
 
-- [ ] [P3-T9] At `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` line
+- [x] [P3-T9] At `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` line
   387, change the defect digit from 2 to 1 inside the `because:` string literal. Do not alter the
   continuation lines 388 and 389. Acceptance: the file contains the single-line token
   `issue #469 defect 1 requires the null guard to run before the first` exactly once.
 
-- [ ] [P3-T10] Verify the static half of spec AC6 as a set of discriminating gates over
+- [x] [P3-T10] Verify the static half of spec AC6 as a set of discriminating gates over
   `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs`. Acceptance, all six
   of which must hold and any one of which fails the task: each of the six tokens below has count 1.
   Every token is a combined single-line token for the reason stated in P3-T3. Record the six counts
@@ -653,7 +640,7 @@ $f = 'QuickFiler.Test\Controllers\QfcCollectionControllerDefects468MoveTests.cs'
 @(Select-String -LiteralPath $f -SimpleMatch -Pattern 'issue #469 defect 1 requires the null guard to run before the first').Count
 ```
 
-- [ ] [P3-T11] Verify that the eight renumbering edits changed exactly eight lines and added no
+- [x] [P3-T11] Verify that the eight renumbering edits changed exactly eight lines and added no
   lines. Acceptance: `git diff origin/main --numstat` reports added count 2 and deleted count 2 for
   `QuickFiler/Controllers/QfcCollectionController.cs`, and added count 6 and deleted count 6 for
   `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs`. These figures are
@@ -670,18 +657,22 @@ git status --porcelain -- QuickFiler QuickFiler.Test
 
 ### Phase 4 — Cross-Feature Note Resolution (spec item D)
 
-- [ ] [P4-T1] Replace line 869 of
+- [x] [P4-T1] Replace line 869 of
   `docs/features/active/quickfiler-home-controller-metrics-442/spec.md` with literal R4 exactly as
   quoted above. Acceptance: that file contains the single-line token
   `### CFN-2 — RESOLVED —` exactly once.
 
-- [ ] [P4-T2] Insert literal R5 exactly as quoted above into
+- [x] [P4-T2] Insert literal R5 exactly as quoted above into
   `docs/features/active/quickfiler-home-controller-metrics-442/spec.md` immediately after the blank
   line 870 and ahead of the existing `- **Location:**` bullet. Do not delete or reword any existing
   bullet in the CFN-2 section; they are retained as the historical record. Acceptance: that file
   contains the single-line token `CFN-2 RESOLVED (2026-08-29).` exactly once. That token is short
   and sits entirely on the first physical line of R5, so it survives any reflow of the bullet's
   continuation lines.
+
+**Progress-commit boundary after task 35.** Stop here after checking off `[P4-T2]` and return
+`PROGRESS_COMMIT_REQUIRED: P0-T1..P4-T2`. Do not begin `[P4-T3]` until the orchestrator has recorded
+the completed interval's commit SHA in the canonical checkpoint.
 
 - [ ] [P4-T3] Verify spec AC11. Acceptance: in
   `docs/features/active/quickfiler-home-controller-metrics-442/spec.md`, the count of the token
@@ -746,12 +737,12 @@ git status --porcelain -- QuickFiler QuickFiler.Test docs
 ```
 
 - [ ] [P5-T4] Verify spec AC8 and the companion file-size invariants. Acceptance, all five of which
-  must hold: `(Get-Content).Count` is at most 2437 for
+  must hold: `(Get-Content).Count` is at most 2446 for
   `QuickFiler/Controllers/QfcCollectionController.cs` (spec AC8; no split is performed and
   decomposition remains delegated to open issue #623), at most 497 for
   `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs`, at most 215 for
   `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, at most 453 for
-  `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, and exactly 500 for
+  `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, and exactly 499 for
   `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs`, which this change does not touch.
   Use `(Get-Content).Count`, not `Measure-Object -Line`. Record all five figures in
   `FEATURE/evidence/qa-gates/p5-t4-ac8-file-sizes.2026-08-29T12-22.md`.
@@ -854,12 +845,13 @@ dotnet tool run csharpier check .
 $LASTEXITCODE
 ```
 
-- [ ] [P6-T3] Run the analyzer build. Acceptance: `EXIT_CODE: 0` and the MSBuild summary reports
-  `0 Error(s)`. If the exit code is non-zero, compare the reported diagnostics against the
-  enumeration recorded by P0-T11: a diagnostic present in the P0-T11 enumeration is a pre-existing
-  baseline failure and must be recorded as such; any diagnostic not in that enumeration is a
-  regression introduced by this change and the phase restarts from P6-T1 after it is fixed. Record
-  the outcome in `FEATURE/evidence/qa-gates/p6-t3-msbuild-analyzers.2026-08-29T12-22.md`.
+- [ ] [P6-T3] Run the analyzer build. Acceptance: if `EXIT_CODE: 0`, the MSBuild summary reports
+  `0 Error(s)`. If `EXIT_CODE:` is non-zero, compare every reported diagnostic against the
+  enumeration recorded by P0-T11: a diagnostic present in that enumeration is a pre-existing
+  baseline failure and is an accepted baseline-relative outcome; any diagnostic absent from that
+  enumeration is a regression introduced by this change and the phase restarts from P6-T1 after it
+  is fixed. Record the outcome in
+  `FEATURE/evidence/qa-gates/p6-t3-msbuild-analyzers.2026-08-29T12-22.md`.
 
 ```powershell
 $vswhere = Join-Path ([Environment]::GetEnvironmentVariable('ProgramFiles(x86)')) 'Microsoft Visual Studio\Installer\vswhere.exe'
@@ -947,10 +939,9 @@ $LASTEXITCODE
   `FEATURE/evidence/qa-gates/p6-t9-clean-pass.2026-08-29T12-22.md` that P6-T1 through P6-T7 all
   completed in a single uninterrupted sequence with no failure and no file rewrite between them,
   naming each command run and its exit code. "No failure" here means that each task's own acceptance
-  condition held, not that every recorded exit code was 0: P6-T2, P6-T3 and P6-T4 are all
-  baseline-relative and each may record a non-zero exit code while still passing, provided the
-  reported set is a subset of the corresponding P0-T10, P0-T11 or P0-T12 enumeration. If any of those
-  tasks failed its acceptance condition or rewrote a tracked file, this task fails and the phase
+  condition held, not that every recorded exit code was 0: P6-T2 through P6-T5 are baseline-relative
+  and may record a non-zero exit code only when their respective task acceptance condition explicitly
+  accepts the baseline state. If any of those tasks failed its acceptance condition or rewrote a tracked file, this task fails and the phase
   restarts from P6-T1.
   The artifact must additionally record the AC10 realisation mapping explicitly, one line per
   toolchain step: step 1 `dotnet tool run csharpier format .` and `check .` by P6-T1 and P6-T2; step
@@ -1033,15 +1024,14 @@ $LASTEXITCODE
   `FEATURE/evidence/regression-testing/p6-t10-test-count-comparison.2026-08-29T12-22.md`.
   Acceptance: exactly one line begins with `- [x] AC13 —` and the cited artifact exists on disk.
 
-- [ ] [P7-T14] Commit the change. Stage exactly the four C# files, the two documentation files
+- [ ] [P7-T14] Prepare the final partial-interval commit candidate without staging or committing it.
+  Enumerate the four C# files, the two documentation files
   (`docs/features/active/quickfiler-home-controller-metrics-442/spec.md` and this feature's
-  `spec.md`), this plan file, and everything under `FEATURE/evidence/`. Use the commit subject
-  `docs(469): correct stale metrics comments and defect numbering` verbatim. That subject carries no
-  GitHub closing keyword, and the commit body must not contain one either: disposition of issue #469
-  is the maintainer's decision, not this plan's.
-  Acceptance: `git status --porcelain -- QuickFiler QuickFiler.Test docs` names no path other than
-  this plan file, whose check-off marks for P7-T14 through P7-T17 are written after this commit, and
-  the artifacts produced by P7-T15, P7-T16 and P7-T17, which have not yet run.
+  `spec.md`), this plan file, and everything under `FEATURE/evidence/` that remains uncommitted after
+  the task-35 boundary. Disposition of issue #469 remains the maintainer's decision, so the eventual
+  commit message must contain no GitHub closing keyword. Acceptance: the candidate enumeration is
+  recorded in `FEATURE/evidence/other/p7-t14-final-commit-candidate.2026-08-29T12-22.md`; no index
+  entry or commit is created by this task; and the recorded candidate contains no out-of-scope path.
 
 - [ ] [P7-T15] Verify that no commit on this branch carries a GitHub closing keyword for issue #469.
   Acceptance: over the concatenated commit messages of the range `origin/main..HEAD`, the
@@ -1071,9 +1061,9 @@ $log = git log origin/main..HEAD --format=%B | Out-String
   are excluded from the exact enumeration, because earlier commits on this branch added them and they
   therefore appear in every `origin/main`-anchored diff regardless of this plan's edits. No `.csproj`,
   `.props`, `.targets`, `packages.config`, or coverage-configuration file may appear. The pathspec
-  `-- QuickFiler QuickFiler.Test docs` is mandatory: `.claude/agent-memory/` carries tracked
-  modifications written by other agents in this worktree, and an unscoped diff or status would report
-  them and make this gate unsatisfiable through no action of this plan. The companion
+  `-- QuickFiler QuickFiler.Test docs` is mandatory because this is the issue-deliverable footprint
+  gate. The branch also carries committed preparation history outside these roots; that history is
+  reviewed by the later full feature-branch review rather than attributed to this plan. The companion
   `git status --porcelain -- QuickFiler QuickFiler.Test docs` output is recorded in the same artifact,
   because a `--name-only` diff cannot report an untracked addition. Record both in
   `FEATURE/evidence/qa-gates/p7-t16-final-footprint.2026-08-29T12-22.md`.
@@ -1083,23 +1073,19 @@ git diff origin/main --name-only -- QuickFiler QuickFiler.Test docs
 git status --porcelain -- QuickFiler QuickFiler.Test docs
 ```
 
-- [ ] [P7-T17] Finalise the working tree. Run `git status --porcelain -- QuickFiler QuickFiler.Test
-  docs`; if the output names any path other than this plan file and this task's own artifact, stage
-  exactly those other paths and commit them with the subject
-  `docs(469): record final scope-boundary verification` verbatim, which carries no closing keyword,
-  then re-run both this status command and the P7-T15 closing-keyword scan. Repeat at most twice.
-  Acceptance: `git status --porcelain -- QuickFiler QuickFiler.Test docs` names no path other than
-  this plan file and `FEATURE/evidence/other/p7-t17-finalisation.2026-08-29T12-22.md`, and the
-  P7-T15 scan reports 0 for all nine tokens over the final `origin/main..HEAD` range. A fully empty
-  status is not asserted and is not a reachable state inside this plan: this task must tick its own
-  checkbox in the plan file and must write its own artifact, and both paths sit inside the asserted
-  pathspec, so no commit this plan can make leaves them clean. Committing those two residual paths is
-  the orchestrator's step after plan completion. Record the final state in
-  `FEATURE/evidence/other/p7-t17-finalisation.2026-08-29T12-22.md`.
+- [ ] [P7-T17] Finalise the final partial interval without staging or committing it. Run
+  `git status --porcelain -- QuickFiler QuickFiler.Test docs` and the P7-T15 closing-keyword scan.
+  Acceptance: every status path belongs to the P7-T16 allowed footprint; the status includes this
+  plan file and `FEATURE/evidence/other/p7-t17-finalisation.2026-08-29T12-22.md`; and the P7-T15 scan
+  reports 0 for all nine tokens over `origin/main..HEAD`. Record the final state in that artifact,
+  check off this task, and return `PROGRESS_COMMIT_REQUIRED: P4-T3..P7-T17`. The orchestrator then
+  stages the complete final interval, collects canonical commit context, obtains the routed
+  commit-steward message, commits it, records the interval and SHA in the canonical checkpoint, and
+  reruns the closing-keyword scan before review.
 
 ```powershell
 git status --porcelain -- QuickFiler QuickFiler.Test docs
-git log origin/main..HEAD --format=%s
+git log origin/main..HEAD --format=%B
 ```
 
 ---
@@ -1162,7 +1148,7 @@ counts explicitly; each was confirmed at count 1 in its named file. No other cit
 2. `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/spec.md:302-316` —
    re-derived: the `## Acceptance Criteria` section holds exactly 13 unchecked criteria, AC1 through
    AC13. All 13 are mapped in the traceability table above.
-3. Research document path — re-derived by Glob: the single markdown file under the feature's
+3. Research document path — re-derived with `rg --files`: the single markdown file under the feature's
    `research/` subdirectory is
    `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/research/2026-08-29T12-31-qfc-collection-move-diagnostics-defects-469.md`.
 4. `QuickFiler/Controllers/QfcHomeController.Metrics.cs:171` — re-derived: carries the single-line
@@ -1182,9 +1168,9 @@ counts explicitly; each was confirmed at count 1 in its named file. No other cit
    `line-two` reach the writer. Deleting the filter fails this test.
 9. `IQfcCollectionController` in `QuickFiler/Controllers/QfcHomeController.Metrics.cs` — re-derived:
    zero occurrences. The AC2 gate is therefore false-before / true-after.
-10. `QuickFiler/Controllers/QfcCollectionController.cs:2362` — re-derived: reads
+10. `QuickFiler/Controllers/QfcCollectionController.cs:2371` — re-derived: reads
     `// Issue #469 defect 1: exactly one diagnostics line per cached move group. The array`.
-11. `QuickFiler/Controllers/QfcCollectionController.cs:2372` — re-derived: reads
+11. `QuickFiler/Controllers/QfcCollectionController.cs:2381` — re-derived: reads
     `// Issue #469 defect 2: the null test must dominate every dereference of qf. It`.
 12. `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs:275` — re-derived:
     `/// Issue #469 defect 1. Regression test proving that the diagnostics array carries exactly`.
@@ -1205,7 +1191,7 @@ counts explicitly; each was confirmed at count 1 in its named file. No other cit
     literal, with continuations at `:388-389`.
 18. Sibling-region re-check for the renumbering — re-derived: the case-sensitive and
     case-insensitive searches for `Issue #469 defect` outside `docs/**` return 17 hits. Eight are the
-    sites above. The remaining nine are `QfcCollectionController.cs:71`, `:727`, `:2335`;
+    sites above. The remaining nine are `QfcCollectionController.cs:71`, `:732`, `:2344`;
     `QfcCollectionControllerTests.cs:66`; `QfcCollectionControllerDefects468MoveTests.cs:17`, `:29`,
     `:57`, `:64` and `QfcCollectionControllerDefects468MoveTests.cs:463`.
     `QfcCollectionControllerDefects468MoveTests.cs:17` is a class-level summary enumerating
@@ -1219,7 +1205,8 @@ counts explicitly; each was confirmed at count 1 in its named file. No other cit
     changes line count. This is what makes the exact numstat figures in P3-T11 (2/2 and 6/6)
     derivable rather than guessed.
 20. `QuickFiler/Controllers/QfcCollectionController.cs` line count — re-derived by end-of-file read:
-    last content line is 2437. Matches the delegation prompt and research section 7.
+    last content line is 2446. The executor uses this current-tree value rather than the older
+    preparation citation.
 21. `QuickFiler/Controllers/QfcCollectionController.cs:21` — re-derived: carries
     `[ExcludeFromCodeCoverage]` immediately above the class declaration at `:22`. No coverage
     increase is claimed for this class anywhere in the plan.
@@ -1228,7 +1215,7 @@ counts explicitly; each was confirmed at count 1 in its named file. No other cit
     188 and research section 7. The plan gates at "at most 497" and records the discrepancy; the
     invariant the spec intends (the file must not grow past 500) holds under either figure.
 23. `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs` line count — re-derived by
-    end-of-file read: last content line is 500. Nothing is added to it.
+    end-of-file read: last content line is 499. Nothing is added to it.
 24. `QuickFiler/Controllers/QfcHomeController.Metrics.cs` line count — re-derived: 215 lines.
     Research section 7 recorded this as "232, approximate, unverified"; 215 is the measured value.
 25. `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs` line count — re-derived by
@@ -1251,15 +1238,15 @@ counts explicitly; each was confirmed at count 1 in its named file. No other cit
     `docs/features/active/quickfiler-home-controller-metrics-442/spec.md:869` and in this feature's
     own documents, and `Issue #469 defect` occurs throughout `docs/features/**`. A repository-wide
     zero-hit gate on either would be unsatisfiable; none is authored.
-31. `QuickFiler.Test/QuickFiler.Test.csproj:136` and `:156` — re-derived in this pass: the two edited
-    test files already carry `Compile Include` entries, at `:136` for
-    `Controllers\QfcCollectionControllerDefects468MoveTests.cs` and `:156` for
+31. `QuickFiler.Test/QuickFiler.Test.csproj:137` and `:157` — re-derived in this pass: the two edited
+    test files already carry `Compile Include` entries, at `:137` for
+    `Controllers\QfcCollectionControllerDefects468MoveTests.cs` and `:157` for
     `Controllers\QfcHomeControllerMetricsTests.cs`. Version 0.3 cited `:135` and `:155`, which were
     correct before the base merge; the merge of `origin/main` added
     `<Compile Include="Controllers\EfcDataModelArchiveRootTests.cs" />` at `:116`, shifting both
-    entries down by one. This is a sibling invalidation caught by the version 0.4 pass and is the
-    only citation in this plan that the merge moved. No new file is created by this plan, so no
-    csproj edit is required and none is planned.
+    entries down by one. A later source insertion moved both current entries down once more to lines
+    137 and 157. No new file is created by this plan, so no csproj edit is required and none is
+    planned.
 32. `dotnet-tools.json` at the repository root — re-derived: pins `csharpier` to `1.2.6` with
     `rollForward: false`. There is no `.config/dotnet-tools.json`; the root-level manifest is the
     one `dotnet tool restore` resolves.
@@ -1286,21 +1273,21 @@ counts explicitly; each was confirmed at count 1 in its named file. No other cit
 37. `scripts/vscode/Invoke-Restore.ps1:36` — re-derived: runs `vswhere`-resolved MSBuild with
     `/t:Restore /p:RestorePackagesConfig=true`, which is the correct restore for this
     all-`packages.config` solution, and it does not rewrite any csproj.
-38. `packages` directory at the repository root — re-derived: absent in this worktree, which is why
-    P0-T9 is mandatory before the first build.
-39. `QuickFiler.Test/bin/Debug/` — re-derived: absent in this worktree, so P0-T13 must run after
-    P0-T11 and P0-T12 have produced the assembly. Task ordering in Phase 0 reflects this.
-40. `.claude/rules/` contents — re-derived by Glob: `general-code-change.md`, `general-unit-test.md`,
-    `csharp.md` and `tonality.md` all exist at the paths the Phase 0 read tasks name.
+38. `packages` directory at the repository root — absent at the Codex conversion baseline. P0-T9
+    probes the execution-time state and restores packages when required before the first build.
+39. `QuickFiler.Test/bin/Debug/` — absent at the Codex conversion baseline. P0-T13 runs after P0-T11
+    and P0-T12 have produced the execution-time assembly; task ordering does not assume the baseline
+    remains unchanged.
+40. Codex policy surfaces — re-derived from `AGENTS.md`,
+    `.agents/skills/policy-compliance-order/SKILL.md`, and `.agents/skills/csharp/SKILL.md`. Phase 0
+    records five ordered policy entries backed by the two distinct required files.
 41. All five gated file line counts — re-derived in this revision pass by counting every physical
-    line of each file: 2437 for `QuickFiler/Controllers/QfcCollectionController.cs`, 215 for
+    line of each file: 2446 for `QuickFiler/Controllers/QfcCollectionController.cs`, 215 for
     `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, 497 for
     `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs`, 453 for
-    `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, 500 for
-    `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs`. Only the Metrics.cs figure moved,
-    from the 216 asserted by version 0.2 to the measured 215. P0-T15, P2-T1, P5-T4 and self-review
-    item 24 were all corrected in the same pass, and no other site in the plan states a Metrics.cs
-    line count.
+    `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, 499 for
+    `QuickFiler.Test/Controllers/QfcCollectionControllerTests.cs`. P0-T6, P0-T15, P2-T1, P5-T4 and
+    the source-limit notes use the same current-tree values.
 42. Changed-line arithmetic in P5-T5 — re-derived from the per-file numstat figures the plan itself
     fixes: 3 + 3 + 2 + 6 = 14 added and 14 deleted, so the diff-line total is 28. Version 0.2 stated
     both 20 and 28 in one sentence; 28 is the derivable value and is now the only figure stated.
@@ -1327,23 +1314,20 @@ counts explicitly; each was confirmed at count 1 in its named file. No other cit
     returns only those two PascalCase hits, confirming the camelCase form is absent and that a
     case-sensitive gate on it would be unsatisfiable. The P5-T2 casing note now describes the
     `-CaseSensitive` command it actually runs.
-47. Feature-folder contents — re-derived by Glob: the folder holds exactly four files, `issue.md`,
+47. Feature-folder contents — re-derived with `rg --files`: the folder holds exactly four files, `issue.md`,
     `spec.md`, this plan, and `research/2026-08-29T12-31-qfc-collection-move-diagnostics-defects-469.md`.
     There is no `evidence/` subtree yet and no `user-story.md`. `issue.md` and the research document
     were added by earlier commits on this branch, so both appear in every `origin/main`-anchored
     diff; P7-T16 excludes them from its exact enumeration for that reason and enumerates five source
     and document paths rather than seven.
-48. Pathspec scoping of the Phase 7 git gates — re-derived from the worktree state: tracked files
-    under `.claude/agent-memory/` carry modifications written by other agents in this worktree, so an
-    unscoped `git diff` or `git status` reports paths this plan never touches. P7-T16 and P7-T17 now
-    carry the same `-- QuickFiler QuickFiler.Test docs` pathspec that P5-T1 already used, which makes
-    all four gates consistent in scope.
-49. Reachability of the P7-T17 end state — re-derived from the plan's own task list: P7-T17 must
-    write `- [x] [P7-T17]` into this plan file and must write its own artifact under
-    `FEATURE/evidence/other/`, and both paths fall inside the `docs` pathspec it asserts over.
-    An empty-status acceptance was therefore unreachable and is replaced by an
-    all-but-two-named-paths acceptance. P7-T14's acceptance was widened in the same pass to name the
-    plan file and the three not-yet-run artifacts, so the two tasks now agree.
+48. Pathspec scoping of the Phase 7 git gates — re-derived from the branch history and issue scope.
+    P7-T16 and P7-T17 carry the same `-- QuickFiler QuickFiler.Test docs` pathspec that P5-T1 uses,
+    so the issue-deliverable gates do not attribute preparation-history paths to this plan. The later
+    feature review remains responsible for the complete branch diff.
+49. Reachability of the P7-T17 end state — re-derived from the progress-commit contract. P7-T14
+    prepares but does not commit the final candidate, and P7-T17 writes its own artifact and task
+    check-off before returning the final progress-commit signal. The orchestrator can therefore
+    commit the complete task-36-through-task-69 interval and record one interval SHA.
 50. `QuickFiler/Controllers/QfcHomeController.Metrics.cs:171-174` and
     `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs:397-403` — sibling-region re-check
     in this pass: the R1 target is exactly the three comment lines `:171-173`, with the filter
@@ -1358,16 +1342,14 @@ counts explicitly; each was confirmed at count 1 in its named file. No other cit
     condition held rather than that every exit code was 0, which is the same baseline-relative
     reading P6-T3 and P6-T4 already carried. Without that clarification the two tasks would have
     contradicted each other on the pre-existing-drift branch.
-52. Branch base — re-derived in this pass: `origin/main` advanced during preparation from
-    `ecdb1c84ba8541ab67042985919cfed4df768c01` to `fa2ddefacf2c08abe18f3e3250d77da804534637`,
-    pull request #700 (issue 638), which touches `QuickFiler/Controllers/EfcDataModel.cs` and
-    `QuickFiler.Test/QuickFiler.Test.csproj` and adds
-    `QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs`. None of the five files this plan
-    gates on is among them, and a clean merge of `origin/main` into this branch preserved all five
-    line counts at 2437, 215, 497, 453 and 500. After that merge `git merge-base origin/main HEAD`
-    and `git rev-parse origin/main` agree, and `git diff origin/main --name-only -- QuickFiler
-    QuickFiler.Test docs` returns only this feature folder's four documents. P0-T6 exists so the
-    executor re-establishes this state, because `origin/main` can advance again before execution.
+52. Branch base — re-derived at Codex conversion. `HEAD` is
+    `30d2aeb298c9b2689dc69b38a5c733512c6e22f5`; the cached `origin/main` is
+    `6191c74f3be6e37ecd82816902df9c3832bfc9af`; and their merge base is
+    `69aa28dd1154684b622904b9958ecaa2c6aa17d0`. The branch is three commits behind and thirteen
+    commits ahead of that cached base. The three upstream commits do not modify the five gated source
+    files and retain the two test-project compile entries at lines 137 and 157. P0-T6 fetches and
+    merges the execution-time `origin/main`, then re-establishes ancestry and line-count invariants;
+    the conversion snapshot is provenance rather than an execution-time assumption.
 53. P0-T15's eight-token bullet, table source correction — re-derived in this pass. The bullet
     previously sourced its eight tokens from the R3 table, whose third column is headed `Becomes`
     and states post-edit text. Every R3 token was measured at count 0 in its named file at branch
@@ -1402,8 +1384,8 @@ counts explicitly; each was confirmed at count 1 in its named file. No other cit
     variable introduced by those eight lines is local to the P0-T15 block and does not collide with
     `$f` in P3-T10 or `$s` in P4-T3.
 54. Absolute-path exposure in committed evidence — re-derived from the plan text in this pass.
-    P7-T14 stages everything under `FEATURE/evidence/`, so every artifact this plan writes is
-    published. Six acceptance conditions require verbatim tool output that can carry an absolute
+    The final progress commit stages everything under `FEATURE/evidence/`, so every artifact this plan
+    writes is published. Six acceptance conditions require verbatim tool output that can carry an absolute
     path: P0-T10 and P6-T2 enumerate unformatted files, and the non-zero branches of P0-T11,
     P0-T12, P6-T3 and P6-T4 enumerate MSBuild diagnostics, which carry absolute paths. The evidence
     location rule constrained only where artifacts are written, and the repository hook checks the

@@ -272,7 +272,7 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Issue #469 defect 1. Regression test proving that the diagnostics array carries exactly
+        /// Issue #469 defect 2. Regression test proving that the diagnostics array carries exactly
         /// one line per cached move group.
         /// <para>
         /// Scenario: one cached move group with a fully mocked item controller and a null
@@ -303,14 +303,14 @@ namespace QuickFiler.Controllers.Tests
                 .Should()
                 .HaveCount(
                     cached.Count,
-                    because: "issue #469 defect 1 requires one diagnostics line per cached move "
+                because: "issue #469 defect 2 requires one diagnostics line per cached move "
                         + "group; a length greater than the group count is the surplus unassigned "
                         + "element produced by the off-by-one allocation"
                 );
         }
 
         /// <summary>
-        /// Issue #469 defect 1. Regression test proving the off-by-one is a length defect at every
+        /// Issue #469 defect 2. Regression test proving the off-by-one is a length defect at every
         /// group count, and that the surplus element is an unassigned null rather than a harmless
         /// duplicate.
         /// <para>
@@ -337,7 +337,7 @@ namespace QuickFiler.Controllers.Tests
                 .Should()
                 .HaveCount(
                     3,
-                    because: "issue #469 defect 1 requires exactly one diagnostics line per cached "
+                because: "issue #469 defect 2 requires exactly one diagnostics line per cached "
                         + "move group, and three groups were cached"
                 );
             lines
@@ -349,7 +349,7 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Issue #469 defect 2. Regression test proving that the item-controller null guard runs
+        /// Issue #469 defect 1. Regression test proving that the item-controller null guard runs
         /// before the first dereference, so its "Unknown" branch is reachable.
         /// <para>
         /// Scenario: one cached move group whose <c>ItemController</c> is <see langword="null"/>,
@@ -384,7 +384,7 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             act.Should()
                 .NotThrow(
-                    because: "issue #469 defect 2 requires the null guard to run before the first "
+                because: "issue #469 defect 1 requires the null guard to run before the first "
                         + "dereference, so a group with no item controller degrades to an Unknown "
                         + "diagnostics line instead of raising NullReferenceException"
                 );
