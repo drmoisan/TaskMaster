@@ -850,79 +850,79 @@ under "Corrections to the research file".
 
 ### Change A — producer normalization in `SelectRow`
 
-- [ ] AC1. Selecting a row whose `FilingTarget` is a full Outlook path **exactly equal** to the
+- [x] AC1. Selecting a row whose `FilingTarget` is a full Outlook path **exactly equal** to the
       bound archive root is a deterministic non-selection: `SelectRow` returns early,
       `SelectedFolderPath` is not written, `SelectedFolderPathChanged` is not raised, and any prior
       valid selection survives unchanged. Verified by a named test in
       `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue637Tests.cs`.
-- [ ] AC2. Selecting a row whose `FilingTarget` is a full Outlook path **strictly under** the bound
+- [x] AC2. Selecting a row whose `FilingTarget` is a full Outlook path **strictly under** the bound
       archive root commits the archive-relative stem, not the rooted input — including when the
       root differs in case and when the root carries a trailing separator. Verified by named tests
       in `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue637Tests.cs`.
-- [ ] AC3. The new behavior is nested inside the existing
+- [x] AC3. The new behavior is nested inside the existing
       `ArchiveStemContract.IsFullOutlookPath(selection)` arm of the guard in
       `QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs`. An ordinary **relative**
       suggestion target is still committed byte-identically, proven by a test that would fail under
       a method-wide "commit only when `TryMakeArchiveRelative` succeeds" rewrite.
-- [ ] AC4. The no-bound-root pass-through mode is preserved: with `_boundRoot.Length == 0` every
+- [x] AC4. The no-bound-root pass-through mode is preserved: with `_boundRoot.Length == 0` every
       value, including a rooted one, is committed verbatim. The **2** existing tests that pin this
       pass through unmodified — `BreadcrumbBridgeRouterIssue439Tests.cs:665` (bound with `@"\"` at
       :645) and BreadcrumbBridgeRouterIssue614Tests.cs:221 (3-argument bind at :213) — and a new
       test covers the `SelectRow` path in the same mode.
-- [ ] AC5. The `Trash to Delete` pseudo-row still commits `BreadcrumbRowBuilder.TrashRowText`
+- [x] AC5. The `Trash to Delete` pseudo-row still commits `BreadcrumbRowBuilder.TrashRowText`
       byte-identically, and `EfcDataModel.MoveToFolderAsync`'s `folderpath != "Trash to Delete"`
       comparison at `EfcDataModel.cs:272` continues to take the same branch as before.
-- [ ] AC6. Out-of-root rejection is unchanged: a rooted target outside the bound root, and a
+- [x] AC6. Out-of-root rejection is unchanged: a rooted target outside the bound root, and a
       separator-boundary near miss such as `\Archive2\Clients`, are still rejected with the existing
       message `"Breadcrumb row rejected: target is outside the archive root."`, leave the prior
       selection untouched, and raise no event.
       `RowSelected_OutOfRootFilingTarget_DoesNotStoreAFullOutlookPath`
       (BreadcrumbBridgeRouterIssue614Tests.cs:169) passes unmodified.
-- [ ] AC7. The archive-root-exact non-selection emits a **value-free** diagnostic that embeds
+- [x] AC7. The archive-root-exact non-selection emits a **value-free** diagnostic that embeds
       neither the selection nor the archive root, asserted with the existing
       `AssertRejectionDiagnosticWithoutIdentifiers` helper shape (no message containing the queried
       fragment contains `@`).
-- [ ] AC8. `SelectHierarchyPath` (`BreadcrumbBridgeRouter.Selection.cs:109-129`) and
+- [x] AC8. `SelectHierarchyPath` (`BreadcrumbBridgeRouter.Selection.cs:109-129`) and
       `CommitSelection` (:131-139) are not modified.
-- [ ] AC9. The selection family is unchanged in shape: still exactly **2** declarations
+- [x] AC9. The selection family is unchanged in shape: still exactly **2** declarations
       (`BreadcrumbBridgeRouter.Selection.cs:83` and `:109`) and **7** call sites (4 to `SelectRow`
       at BreadcrumbBridgeRouter.cs:201, :286 and BreadcrumbBridgeRouter.Arrows.cs:153, :161; 3 to
       `SelectHierarchyPath` at `BreadcrumbBridgeRouter.Selection.cs:33`, `:47` and
       BreadcrumbBridgeRouter.Arrows.cs:138). No new declaration, no overload, no interface member,
       and no new call site is introduced, and no member of the unrelated Family-B `SelectRow(int)`
       surface is touched.
-- [ ] AC10. The normalization is on the shared implementation, so all four `SelectRow` call sites
+- [x] AC10. The normalization is on the shared implementation, so all four `SelectRow` call sites
       observe it. Proven by at least one regression test that reaches `SelectRow` through
       `SelectFirstRow()` rather than through the `rowSelected` inbound message.
 
 ### Change B — normalization in the `string` overload of `MoveToFolderAsync`
 
-- [ ] AC11. `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`, a new partial-class file of
+- [x] AC11. `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`, a new partial-class file of
       `EfcDataModel`, declares exactly one new `internal static`
       helper that takes the candidate path and the archive ancestor and returns the value to assign,
       and the `DestinationOlStem` assignment in the `string` overload (currently
       `EfcDataModel.cs:337`) calls it. The member is therefore `EfcDataModel.ToFilingStemOrVerbatim`,
       unchanged by the file split. The helper is pure: no I/O, no logging, no static mutable
       state, and it is invoked directly by unit tests without constructing an `EmailFiler`.
-- [ ] AC12. The helper is gated on `ArchiveStemContract.IsFullOutlookPath`. Any value that is not a
+- [x] AC12. The helper is gated on `ArchiveStemContract.IsFullOutlookPath`. Any value that is not a
       full Outlook path — every ordinary relative stem and the `"Trash to Delete"` sentinel — is
       returned **verbatim and byte-identical**, asserted by named tests.
-- [ ] AC13. For a rooted value at or strictly under the ancestor, the helper returns the
+- [x] AC13. For a rooted value at or strictly under the ancestor, the helper returns the
       archive-relative stem.
-- [ ] AC14. The helper is **total and never throws**, for any input including archive-root-exact,
+- [x] AC14. The helper is **total and never throws**, for any input including archive-root-exact,
       out-of-root, cross-store, null/empty candidate, and null/empty/whitespace/separator-only
       ancestor; in each of those cases it returns the input verbatim so the existing boundary guard
       decides exactly as it does today. This is a deliberate divergence from
       `EfcDataModel.ToArchiveRelativeStem`, which throws on the archive-root-exact input; the
       rationale is recorded under "Error handling and logging updates".
-- [ ] AC15. `EfcDataModel.ToArchiveRelativeStem` (`EfcDataModel.cs:421-448`, declaration at `:434`),
+- [x] AC15. `EfcDataModel.ToArchiveRelativeStem` (`EfcDataModel.cs:421-448`, declaration at `:434`),
       the `MAPIFolder`
       overload (`:398-419`), and its call to `ToArchiveRelativeStem` at `:407` are unmodified, and
       the **8** existing `ToArchiveRelativeStem` tests in
       `QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs` (methods at :21, :34, :48, :62,
       :72, :87, :100, :111) pass unchanged — including
       `ToArchiveRelativeStem_ArchiveRootItself_Throws`.
-- [ ] AC16. The `MoveToFolder` family is unchanged in shape apart from the helper call: still
+- [x] AC16. The `MoveToFolder` family is unchanged in shape apart from the helper call: still
       **3** declarations (`EfcDataModel.cs:303`, `EfcDataModel.cs:398`, and the same-named forwarder
       at EfcHomeController.ExecuteMoves.cs:89) and **7** call sites (EfcHomeController.ExecuteMoves.cs:78
       and :98, `EfcDataModel.cs:408`, EfcFormController.cs:537 and :844,
@@ -930,7 +930,7 @@ under "Corrections to the research file".
       QuickFiler.Test/Controllers/EfcDataModelArchiveRootTests.cs:314). The family-stem search over
       `*.cs` returns **23** lines across **6** files, and the syntax-anchored search returns **10**
       lines across **5** files. No new overload and no signature change.
-- [ ] AC17. `EfcDataModel.OpenOlFolderAsync` (`:349-372`) and `OpenFsFolderAsync` (`:374-396`) are
+- [x] AC17. `EfcDataModel.OpenOlFolderAsync` (`:349-372`) and `OpenFsFolderAsync` (`:374-396`) are
       **not** modified, and the guarded `Globals.Ol.ArchiveRootPath` read at `EfcDataModel.cs:284`
       together with the `UserDiagnosticAction(ArchiveRootUnavailableMessage)` degrade at `:358` and
       `:382`, both introduced by issue #638, are preserved unchanged. The remaining benign-degrade
@@ -938,42 +938,42 @@ under "Corrections to the research file".
 
 ### Change C — test spec correction
 
-- [ ] AC18. `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs:165` asserts
+- [x] AC18. `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs:165` asserts
       `router.SelectedFolderPath.Should().Be(@"Clients\North");`, the enclosing test method is
       renamed so it no longer asserts that a rooted target "RemainsUnchanged", and the arrange
       comment at :121-122 is narrowed to the provider claim it still supports.
-- [ ] AC19. The companion assertion at `BreadcrumbBridgeRouterIssue439Tests.cs:161-164`
+- [x] AC19. The companion assertion at `BreadcrumbBridgeRouterIssue439Tests.cs:161-164`
       (`provider.Verify(p => p.ResolveLeafKeyAsync(fullTarget, ...), Times.Once)`) is preserved
       verbatim, and `ToHierarchyPath` (BreadcrumbBridgeRouter.cs:152-167) is unmodified, so the
       provider lookup still uses the original rooted path.
-- [ ] AC20. Exactly **1** existing test assertion changes its expected value across the entire
+- [x] AC20. Exactly **1** existing test assertion changes its expected value across the entire
       repository — the one at `BreadcrumbBridgeRouterIssue439Tests.cs:165`. No other existing
       assertion in any test project is modified, weakened, disabled, or deleted.
-- [ ] AC21. The change is recorded in the change description as a **deliberate spec correction**:
+- [x] AC21. The change is recorded in the change description as a **deliberate spec correction**:
       the issue #439 criterion that a rooted target survives selection is superseded by issue #614's
       archive-relative-stem invariant, which #614 enforced on the `SelectHierarchyPath` half and at
       the filing boundary but not on the `SelectRow` half. It is explicitly not a weakened test.
 
 ### Change D — stale-comment cleanup
 
-- [ ] AC22. All **3** stale deferral records are corrected to state that producer-side normalization
+- [x] AC22. All **3** stale deferral records are corrected to state that producer-side normalization
       is implemented: `QuickFiler/Controllers/EfcSelectionGuard.cs:30`,
       `QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs:146`, and the `because` string at
       `QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs:152`. After the change, a repository
       grep for `deferred to issue #637` across `*.cs` returns **0** matches.
-- [ ] AC23. `EfcSelectionGuard` behavior is unchanged — `IsValidFilingSelection` and
+- [x] AC23. `EfcSelectionGuard` behavior is unchanged — `IsValidFilingSelection` and
       `IsValidCreationSelection` still reject rooted values — and every test in
       `QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs` passes, including the composition test
       `Issue614_GuardAcceptedSelection_DoesNotThrowAtFilingBoundary` (:167-213).
 
 ### Cross-cutting
 
-- [ ] AC24. The `SelectedFolderPath` production surface is unchanged in shape: still **9** lines
+- [x] AC24. The `SelectedFolderPath` production surface is unchanged in shape: still **9** lines
       across **3** files, with **2** write sites (`BreadcrumbBridgeRouter.Selection.cs:134`,
       BreadcrumbBridgeRouter.cs:145) and **3** read sites (BreadcrumbBridgeRouter.cs:143,
       `BreadcrumbBridgeRouter.Selection.cs:138`, EfcFormController.cs:321). No new write site, no
       new public API member, and the property's `private set` is preserved.
-- [ ] AC25. File-size limits hold. `QuickFiler/Controllers/EfcDataModel.cs` remains at or under 500
+- [x] AC25. File-size limits hold. `QuickFiler/Controllers/EfcDataModel.cs` remains at or under 500
       lines (485 before the change, leaving 15 lines of headroom, which is why the change-B helper is
       declared in its own partial-class file as this document's implementation section authorizes);
       `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs` does not grow beyond its
@@ -981,28 +981,28 @@ under "Corrections to the research file".
       `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`,
       `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue637Tests.cs` and
       `QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`, is at or under 500 lines.
-- [ ] AC26. `QuickFiler.Test/QuickFiler.Test.csproj` contains a `<Compile Include>` item for
+- [x] AC26. `QuickFiler.Test/QuickFiler.Test.csproj` contains a `<Compile Include>` item for
       `Controllers\BreadcrumbBridgeRouterIssue637Tests.cs`, and the new tests are observed executing
       in the vstest run output (a test file absent from this non-SDK project compiles into nothing
       and silently never runs).
-- [ ] AC27. Nullable posture is respected: `QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs`
+- [x] AC27. Nullable posture is respected: `QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs`
       keeps its `#nullable enable` directive, the edited lines introduce no `CS86xx` diagnostic under
       `/p:TreatWarningsAsErrors=true`, and no nullable temporary is passed to `CommitSelection`,
       whose parameter is a non-nullable `string`.
-- [ ] AC28. Full C# toolchain pass completed in order with no failures in the final pass, using
+- [x] AC28. Full C# toolchain pass completed in order with no failures in the final pass, using
       exactly these commands: `dotnet tool run csharpier format .` (verified with
       `dotnet tool run csharpier check .`);
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`;
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`;
       `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`. `/p:Nullable=enable` was not
       added and `/t:Build` was not substituted.
-- [ ] AC29. Coverage evidence is captured under the canonical evidence kinds — the pre-change
+- [x] AC29. Coverage evidence is captured under the canonical evidence kinds — the pre-change
       capture under `<FEATURE>/evidence/baseline/` and the post-change capture under
       `<FEATURE>/evidence/qa-gates/`, per `evidence-and-timestamp-conventions`: repository line
       coverage is at or above the policy floor, no changed line loses coverage relative to the base
       commit, and the new change-B helper meets the new-code coverage target with both sides of its
       gate exercised.
-- [ ] AC30. No behavior outside changes A-D is altered. Specifically unchanged:
+- [x] AC30. No behavior outside changes A-D is altered. Specifically unchanged:
       `ArchiveStemContract`, `EmailFilerConfig.ResolvePaths` / `RequireArchiveRelativeStem`,
       `EfcHomeController.ExecuteMovesAsync`, EfcFormController.cs, the Family-B breadcrumb surface,
       and all `UtilitiesCS.Test` suites.

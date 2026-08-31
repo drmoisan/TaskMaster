@@ -3,9 +3,9 @@
 - **Issue:** #637
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-31T10-22
+- **Last Updated:** 2026-08-31T11-14
 - **Status:** Ready for Codex preflight
-- **Version:** 0.8
+- **Version:** 0.9
 - **Work Mode:** full-bug (from `issue.md`); `spec.md` is the sole acceptance-criteria source (AC1-AC30).
 
 ## Conventions (read before executing any task)
@@ -28,11 +28,13 @@ would embed a host account name. The placeholder convention this feature already
 path in prose is the one at `research/research.2026-08-29T12-30.md:6`,
 `<repo-root>/.claude/worktrees/<worktree-id>`.
 
-**Base commit** — the diff anchor for this plan is the literal commit
-`0eda184ca0009bc79ac9b7146897270c17c095fa`. Every `git diff` in this plan supplies it explicitly. No
-task pins a HEAD SHA: no acceptance condition in this plan asserts that `HEAD` equals a stated
-value, and P0-T8 records `git rev-parse HEAD` as an observation rather than as a gate. This anchor
-is the third this plan has carried, and both supersessions have the same cause. The plan was first
+**Base commit** — completed P0 through P7 tasks retain their historical literal diff anchor
+`0eda184ca0009bc79ac9b7146897270c17c095fa`; their recorded evidence must not be reinterpreted or
+replayed. The remaining P8-T30 scope gate uses the literal post-merge `main` parent
+`3be3f237a8551df3f27f83d9d1af2f26074fc93a`. No task pins a HEAD SHA: no acceptance condition in
+this plan asserts that `HEAD` equals a stated value, and P0-T8 records `git rev-parse HEAD` as an
+observation rather than as a gate. The historical anchor is the third this plan has carried, and
+both supersessions had the same cause. The plan was first
 authored against `ecdb1c84`. `origin/main` then advanced to `fa2ddefa` (pull request #700,
 issue #638) and that work was merged into this branch, which left `ecdb1c84` an ancestor of `HEAD`
 but no longer a clean pre-change baseline, because files under `QuickFiler` and `QuickFiler.Test`
@@ -45,13 +47,16 @@ not own, and the gates that enumerate or scope over a whole tree — P0-T8's emp
 proof, P6-T6's exact ten-path enumeration, P8-T30's `QuickFiler QuickFiler.Test` diff, and P5-T5's
 tree-wide `QuickFiler.Test` diff — would be unsatisfiable as written. Anchoring at the merge commit
 puts all of that work behind the anchor.
-`0eda184ca0009bc79ac9b7146897270c17c095fa` is the post-merge, pre-change baseline, and P0-T8 proves
-that property by a check that can fail rather than by an ancestry check that cannot. The proof is
-not vacuous merely because this anchor is the branch tip at the moment this plan was amended.
-P0-T8's diff fails as soon as any file under `QuickFiler` or `QuickFiler.Test` differs between the
-anchor and `HEAD` in the checkout the executor actually runs in, and its porcelain companion fails
-on any staged, unstaged or untracked change in those same trees. The anchor stops being the tip
-at P6-T6, after which every later anchored diff carries this plan's own changes.
+`0eda184ca0009bc79ac9b7146897270c17c095fa` was the post-merge, pre-change baseline for the completed
+tasks, and P0-T8 proved that property by a check that could fail rather than by an ancestry check
+that could not. After those tasks completed, `main` advanced through commit
+`3be3f237a8551df3f27f83d9d1af2f26074fc93a` and was merged at
+`dfa6abe00d6aec18458f3fd4cc6d60d99a796173`. That merge adds main-owned `QuickFiler` and
+`QuickFiler.Test` changes between the historical anchor and `HEAD`, so P8-T30 uses the merged
+`main` parent as its current scope boundary. The P8-T30 diff fails as soon as a file under
+`QuickFiler` or `QuickFiler.Test` differs from that parent other than the issue #637 paths it
+enumerates, and its porcelain companion fails on any staged, unstaged or untracked change in the
+audited trees.
 
 **Git pathspec scoping** — `.claude/` is a tracked directory in this repository and carries unrelated
 in-flight modifications, and `docs/features/parallel/` and `artifacts/` are owned by other processes.
@@ -247,11 +252,13 @@ tree observation. `.csharpierignore` excludes `**/evidence/**`, `*.cobertura.xml
 `*.csproj`, `*.props` and `*.targets`, so evidence artifacts, coverage documents and the test project
 file are outside the formatter's scope.
 
-**Anchored-diff form.** Before P6-T6 commits, nothing this plan changes is in `HEAD`, so a two-dot
-`BASE..HEAD` diff reports nothing for it. Every pre-commit diff gate in this plan therefore uses the
-index form `git diff 0eda184ca0009bc79ac9b7146897270c17c095fa --cached -- <paths>` and is preceded in
-the same task by a `git add` over the same paths. Every post-commit diff gate uses
-`git diff 0eda184ca0009bc79ac9b7146897270c17c095fa..HEAD -- <paths>`. Both forms are anchored to an
+**Anchored-diff form.** Before P6-T6 committed, nothing this plan changed was in `HEAD`, so a two-dot
+`BASE..HEAD` diff reported nothing for it. The completed pre-commit gates therefore used the index
+form `git diff 0eda184ca0009bc79ac9b7146897270c17c095fa --cached -- <paths>` after a matching
+`git add`, and the completed post-commit gates used
+`git diff 0eda184ca0009bc79ac9b7146897270c17c095fa..HEAD -- <paths>`. The remaining post-merge
+scope gate P8-T30 uses `git diff 3be3f237a8551df3f27f83d9d1af2f26074fc93a..HEAD -- <paths>` so it
+excludes main-owned changes already present in that parent. Every diff form remains anchored to an
 explicit ref; the bare unanchored `git diff` is never used.
 
 **Name-listing diffs carry a companion.** A `git diff --name-only` or `--name-status` enumerates
@@ -1115,7 +1122,12 @@ commit SHA in the canonical checkpoint.
       changed to `coverage\testresults\p4-t4`, and write
       `evidence/regression-testing/p4-t4-helper-tests-green.md`. Acceptance: `EXIT_CODE: 0`; 8 tests
       total; 8 passed; 0 failed; and the two tests that failed in P2-T12 are named individually as now
-      passing.
+      passing. When the preserved stdout summary does not name that required pair, preserve it unchanged
+      and write the factual supplemental artifact
+      `evidence/regression-testing/p4-t4-helper-tests-derived-summary.md`, derived only from the retained
+      P4-T4 TRX result XML. The supplemental artifact must name both required tests, record each `Passed`
+      outcome and the retained source SHA256, and use `<trx-file>` rather than a host-derived result-file
+      name. The original artifact and retained result XML must not be modified.
 - [x] [P4-T5] Prove the eight existing `ToArchiveRelativeStem` tests are unchanged and still pass. Use
       the P2-T11 command with the filter
       `"/TestCaseFilter:FullyQualifiedName~EfcDataModelIssue614Tests&TestCategory!=LiveOutlook"` and the
@@ -1578,26 +1590,26 @@ Each task below verifies one acceptance criterion against evidence already on di
 that criterion's `- [ ]` to `- [x]` in the `## Acceptance Criteria` section of `spec.md`. No criterion
 is checked off before its cited evidence exists. Exactly one criterion is checked off per task.
 
-- [ ] [P8-T1] AC1: cite `evidence/regression-testing/p3-t5-router-tests-green.md` showing
+- [x] [P8-T1] AC1: cite `evidence/regression-testing/p3-t5-router-tests-green.md` showing
       `RowSelected_ArchiveRootExactFilingTarget_IsNotSelected` and
       `RowSelected_ArchiveRootExactFilingTarget_PreservesAPriorValidSelection` passing, and
       `evidence/regression-testing/p2-t11-router-tests-red.md` showing both failing before the fix.
       Acceptance: both artifacts exist and name both tests; AC1 is checked off.
-- [ ] [P8-T2] AC2: cite `evidence/regression-testing/p3-t5-router-tests-green.md` showing
+- [x] [P8-T2] AC2: cite `evidence/regression-testing/p3-t5-router-tests-green.md` showing
       `RowSelected_RootedTargetUnderArchiveRoot_CommitsTheArchiveRelativeStem` and
       `RowSelected_RootedTargetUnderArchiveRoot_CaseInsensitiveAndTrailingSeparatorRoot_CommitsTheStem`
       passing. Acceptance: the artifact names both tests as passing; AC2 is checked off.
-- [ ] [P8-T3] AC3: cite `evidence/regression-testing/p3-t2-nesting.md` for the nesting inside the
+- [x] [P8-T3] AC3: cite `evidence/regression-testing/p3-t2-nesting.md` for the nesting inside the
       `IsFullOutlookPath` arm, and `evidence/regression-testing/p3-t5-router-tests-green.md` for
       `RowSelected_RelativeFilingTarget_CommitsTheValueVerbatim` passing. Acceptance: both artifacts
       exist and the nesting artifact quotes the edited body; AC3 is checked off.
-- [ ] [P8-T4] AC4: cite `evidence/baseline/p1-t6-passthrough-tests.md` for the two existing tests,
+- [x] [P8-T4] AC4: cite `evidence/baseline/p1-t6-passthrough-tests.md` for the two existing tests,
       `evidence/regression-testing/p3-t6-router-siblings.md` and
       `evidence/regression-testing/p5-t6-issue439-green.md` for both passing unmodified, and
       `evidence/regression-testing/p3-t5-router-tests-green.md` for the new
       `RowSelected_RootedTargetWithNoBoundArchiveRoot_PassesThroughVerbatim`. Acceptance: all three
       artifacts exist and name the tests; AC4 is checked off.
-- [ ] [P8-T5] AC5: cite `evidence/regression-testing/p3-t5-router-tests-green.md` for
+- [x] [P8-T5] AC5: cite `evidence/regression-testing/p3-t5-router-tests-green.md` for
       `RowSelected_TrashPseudoRow_CommitsTheSentinelVerbatim`, and
       `evidence/regression-testing/p4-t4-helper-tests-green.md` for
       `ToFilingStemOrVerbatim_TrashSentinel_ReturnsTheInputVerbatim`. Acceptance: both artifacts exist
@@ -1606,31 +1618,31 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       comparison is at line **316** on the merged tree — that the discrepancy is recorded in full by
       P8-T32, and that AC5's binding clause, which is behavioral rather than positional, is
       unaffected; AC5 is checked off.
-- [ ] [P8-T6] AC6: cite `evidence/regression-testing/p3-t2-nesting.md` for the preserved message
+- [x] [P8-T6] AC6: cite `evidence/regression-testing/p3-t2-nesting.md` for the preserved message
       literal, `evidence/regression-testing/p3-t5-router-tests-green.md` for
       `RowSelected_OutOfRootRootedTarget_IsStillRejected` and
       `RowSelected_SeparatorBoundaryNearMissTarget_IsStillRejected`, and
       `evidence/regression-testing/p3-t6-router-siblings.md` for
       `RowSelected_OutOfRootFilingTarget_DoesNotStoreAFullOutlookPath`. Acceptance: all three artifacts
       exist and name the tests; AC6 is checked off.
-- [ ] [P8-T7] AC7: cite `evidence/regression-testing/p3-t2-nesting.md` recording that the new message
+- [x] [P8-T7] AC7: cite `evidence/regression-testing/p3-t2-nesting.md` recording that the new message
       contains no `@`, and `evidence/regression-testing/p3-t5-router-tests-green.md` for
       `RowSelected_ArchiveRootExactFilingTarget_IsNotSelected`, which asserts through
       `AssertRejectionDiagnosticWithoutIdentifiers`. Acceptance: both artifacts exist; AC7 is checked
       off.
-- [ ] [P8-T8] AC8: cite `evidence/regression-testing/p3-t3-selectionfile-diff.md` showing no hunk in
+- [x] [P8-T8] AC8: cite `evidence/regression-testing/p3-t3-selectionfile-diff.md` showing no hunk in
       the original line range 109 to 139. Acceptance: the artifact exists and lists the hunk headers;
       AC8 is checked off.
-- [ ] [P8-T9] AC9: re-run both P1-T1 searches against the post-change tree and write
+- [x] [P8-T9] AC9: re-run both P1-T1 searches against the post-change tree and write
       `evidence/qa-gates/p8-t9-selection-family-post.md`. Acceptance: both searches still return
       exactly 9 lines with the same classification of 2 declarations and 7 call sites, and no Family-B
       member appears in either result; AC9 is checked off.
-- [ ] [P8-T10] AC10: cite `evidence/regression-testing/p3-t5-router-tests-green.md` for
+- [x] [P8-T10] AC10: cite `evidence/regression-testing/p3-t5-router-tests-green.md` for
       `SelectFirstRow_RootedTargetUnderArchiveRoot_CommitsTheArchiveRelativeStem`, which reaches
       `SelectRow` through the public `SelectFirstRow` at `BreadcrumbBridgeRouter.cs:196-203` rather
       than through the `rowSelected` inbound message. Acceptance: the artifact names that test as
       passing; AC10 is checked off.
-- [ ] [P8-T11] AC11: cite `evidence/regression-testing/p4-t2-helper-shape.md` for the single
+- [x] [P8-T11] AC11: cite `evidence/regression-testing/p4-t2-helper-shape.md` for the single
       `internal static` declaration in `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`, the single
       assignment call site at `QuickFiler/Controllers/EfcDataModel.cs:337`, and the purity record, and
       `evidence/regression-testing/p4-t4-helper-tests-green.md` for the eight tests that invoke the
@@ -1644,23 +1656,33 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       `EfcDataModel.ToFilingStemOrVerbatim` because the new file is a partial of the same type, and
       that the split is the remedy `spec.md:414-416` authorizes for the 15-line headroom; AC11 is
       checked off.
-- [ ] [P8-T12] AC12: cite `evidence/regression-testing/p4-t4-helper-tests-green.md` for
+- [x] [P8-T12] AC12: cite `evidence/regression-testing/p4-t4-helper-tests-green.md` for the P4-T4
+      green-run headline and `evidence/regression-testing/p4-t4-helper-tests-derived-summary.md` for
       `ToFilingStemOrVerbatim_RelativeStem_ReturnsTheInputVerbatim` and
-      `ToFilingStemOrVerbatim_TrashSentinel_ReturnsTheInputVerbatim`. Acceptance: the artifact names
-      both tests as passing; AC12 is checked off.
-- [ ] [P8-T13] AC13: cite `evidence/regression-testing/p4-t4-helper-tests-green.md` for
+      `ToFilingStemOrVerbatim_TrashSentinel_ReturnsTheInputVerbatim`. Acceptance: the supplemental
+      artifact names both tests as `Passed`, identifies the retained P4-T4 TRX result XML by its recorded
+      SHA256 without exposing the host-derived file name, and AC12 is checked off.
+- [x] [P8-T13] AC13: cite `evidence/regression-testing/p4-t4-helper-tests-green.md` for
       `ToFilingStemOrVerbatim_RootedUnderAncestor_ReturnsTheStem` and
       `ToFilingStemOrVerbatim_RootedUnderCaseDifferingAncestor_ReturnsTheStem`, together with
       `evidence/regression-testing/p2-t12-helper-tests-red.md` showing both failing before the fix.
       Acceptance: both artifacts exist and name both tests; AC13 is checked off.
-- [ ] [P8-T14] AC14: cite `evidence/regression-testing/p4-t4-helper-tests-green.md` for
-      `ToFilingStemOrVerbatim_ArchiveRootExact_ReturnsTheInputVerbatimAndDoesNotThrow`,
-      `ToFilingStemOrVerbatim_OutOfRootRootedInput_ReturnsTheInputVerbatimAndDoesNotThrow`,
-      `ToFilingStemOrVerbatim_NullEmptyWhitespaceOrSeparatorOnlyAncestor_ReturnsTheInputVerbatim` and
-      `ToFilingStemOrVerbatim_NullOrEmptyCandidate_ReturnsTheInputVerbatim`, and
-      `evidence/regression-testing/p4-t2-helper-shape.md` for the record that the body contains no
-      `throw`. Acceptance: both artifacts exist and name all four tests; AC14 is checked off.
-- [ ] [P8-T15] AC15: cite `evidence/baseline/p1-t5-toarchiverelativestem-tests.md` for the count of 8
+- [x] [P8-T14] AC14: cite `evidence/regression-testing/p4-t4-helper-tests-green.md` for the P4-T4
+      green-run headline, `evidence/regression-testing/p4-t4-helper-tests-ac14-derived-summary.md` for
+      the four retained-result entries, and `evidence/regression-testing/p4-t2-helper-shape.md` for the
+      record that the body contains no `throw`. The supplemental artifact must identify the retained
+      P4-T4 TRX result XML only by SHA256
+      `D55969654086D9C56BD799F313CEE2A0FB9A6C17FDE0C2631050DEFE8077374C`, state that the source
+      hash was verified before parsing, and list these exact fully qualified result names with outcome
+      `Passed`: `QuickFiler.Test.Controllers.EfcDataModelIssue637Tests.ToFilingStemOrVerbatim_ArchiveRootExact_ReturnsTheInputVerbatimAndDoesNotThrow`,
+      `QuickFiler.Test.Controllers.EfcDataModelIssue637Tests.ToFilingStemOrVerbatim_OutOfRootRootedInput_ReturnsTheInputVerbatimAndDoesNotThrow`,
+      `QuickFiler.Test.Controllers.EfcDataModelIssue637Tests.ToFilingStemOrVerbatim_NullEmptyWhitespaceOrSeparatorOnlyAncestor_ReturnsTheInputVerbatim`,
+      and `QuickFiler.Test.Controllers.EfcDataModelIssue637Tests.ToFilingStemOrVerbatim_NullOrEmptyCandidate_ReturnsTheInputVerbatim`.
+      The artifact must derive each name by pairing the retained TRX `UnitTestResult` `testName` and
+      `outcome` attributes with its `UnitTest/TestMethod` class name; it must not modify the retained
+      TRX or either existing P4-T4 Markdown summary. Acceptance: all three artifacts exist; the
+      supplemental artifact names all four results as `Passed`; AC14 is checked off.
+- [x] [P8-T15] AC15: cite `evidence/baseline/p1-t5-toarchiverelativestem-tests.md` for the count of 8
       and the declaration line numbers, and
       `evidence/regression-testing/p4-t5-toarchiverelativestem-unchanged.md` for the zero-removed-line
       diff and the 8 passing results including `ToArchiveRelativeStem_ArchiveRootItself_Throws`, and
@@ -1669,7 +1691,7 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       Acceptance: all three artifacts exist; the check-off record states that AC15 already carries
       `:421-448`, `:398-419` and `:407`, re-verified against the merged tree in P8-T32 list
       entries A5, A6 and A8; AC15 is checked off.
-- [ ] [P8-T16] AC16: re-run both P1-T2 searches against the post-change tree and write
+- [x] [P8-T16] AC16: re-run both P1-T2 searches against the post-change tree and write
       `evidence/qa-gates/p8-t16-movetofolder-family-post.md`. Acceptance: the syntax-anchored search
       still returns exactly **10** lines across **5** files, classified as 3 declarations and 7 call
       sites; the stem search still returns **23** lines across **6** files; no new overload and no
@@ -1677,7 +1699,7 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       figures, re-verified in P8-T32 list entry A9, and that the 16-line figure retained at
       `spec.md:313` describes the pre-#638 tree and is recorded in P8-T32 list entry B6; AC16 is
       checked off.
-- [ ] [P8-T17] AC17: cite `evidence/regression-testing/p4-t6-nongoals-untouched.md`. Acceptance: the
+- [x] [P8-T17] AC17: cite `evidence/regression-testing/p4-t6-nongoals-untouched.md`. Acceptance: the
       artifact shows no hunk in the ranges 349 to 396 (`OpenOlFolderAsync` and `OpenFsFolderAsync`) or
       398 to 448 (the `MAPIFolder` overload and `ToArchiveRelativeStem`), and no hunk in the protected
       range 271 to 297; it records that `Globals.Ol.ArchiveRootPath` occurs exactly once in the file,
@@ -1692,18 +1714,18 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       could make it true. AC17's current clause requires instead that #638's guarded read and degrade
       are preserved unchanged, which is the property this plan can and does deliver; AC17 is checked
       off.
-- [ ] [P8-T18] AC18: cite `evidence/regression-testing/p5-t5-single-assertion-change.md`, which
+- [x] [P8-T18] AC18: cite `evidence/regression-testing/p5-t5-single-assertion-change.md`, which
       records all three clauses. Acceptance: the artifact records the corrected assertion at
       line 165, the renamed method, and the narrowed two-line comment; AC18 is checked off.
-- [ ] [P8-T19] AC19: cite `evidence/regression-testing/p5-t4-provider-assertion-preserved.md`.
+- [x] [P8-T19] AC19: cite `evidence/regression-testing/p5-t4-provider-assertion-preserved.md`.
       Acceptance: the artifact quotes lines 161 to 164 byte-identically and shows no diff hunk over
       `ToHierarchyPath` at the original `BreadcrumbBridgeRouter.cs:152-167`; AC19 is checked off.
-- [ ] [P8-T20] AC20: cite `evidence/baseline/p1-t8-pinning-assertion.md` for the pre-change derivation
+- [x] [P8-T20] AC20: cite `evidence/baseline/p1-t8-pinning-assertion.md` for the pre-change derivation
       by two independent constructions, and
       `evidence/regression-testing/p5-t5-single-assertion-change.md` for the post-change diff showing
       exactly one removed `.Should()` line across the whole `QuickFiler.Test` tree. Acceptance: both
       artifacts exist and agree that the count is 1; AC20 is checked off.
-- [ ] [P8-T21] AC21: write `evidence/other/p8-t21-spec-correction-record.md` carrying the change
+- [x] [P8-T21] AC21: write `evidence/other/p8-t21-spec-correction-record.md` carrying the change
       description text for this correction, copied from the record P5-T5 wrote into
       `evidence/regression-testing/p5-t5-single-assertion-change.md`. This artifact is the designated
       source text for the pull-request change description, so the statement is owned by this plan
@@ -1712,19 +1734,19 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       archive-relative-stem invariant, which #614 enforced on the `SelectHierarchyPath` half and at the
       filing boundary but not on the `SelectRow` half, and that the change is a deliberate spec
       correction and explicitly not a weakened test; AC21 is checked off.
-- [ ] [P8-T22] AC22: cite `evidence/baseline/p1-t4-deferral-records.md` for the pre-change count of 3
+- [x] [P8-T22] AC22: cite `evidence/baseline/p1-t4-deferral-records.md` for the pre-change count of 3
       and `evidence/regression-testing/p6-t4-deferral-cleared.md` for the post-change count of 0 over
       `*.cs`. Acceptance: both artifacts exist and the post-change count is 0; AC22 is checked off.
-- [ ] [P8-T23] AC23: cite `evidence/regression-testing/p6-t4-deferral-cleared.md` for the scoped
+- [x] [P8-T23] AC23: cite `evidence/regression-testing/p6-t4-deferral-cleared.md` for the scoped
       `EfcSelectionGuardTests` run with 0 failures including
       `Issue614_GuardAcceptedSelection_DoesNotThrowAtFilingBoundary`, and for the single-line diff over
       `EfcSelectionGuard.cs`. Acceptance: the artifact exists and records both; AC23 is checked off.
-- [ ] [P8-T24] AC24: re-run both P1-T3 searches against the post-change tree and write
+- [x] [P8-T24] AC24: re-run both P1-T3 searches against the post-change tree and write
       `evidence/qa-gates/p8-t24-selectedfolderpath-post.md`. Acceptance: the production surface is
       still 9 lines across 3 files with 2 writes and 3 reads, no new write site appears, no new public
       API member appears, and `rg -n "public string\? SelectedFolderPath \{ get; private set; \}" QuickFiler/Controllers/BreadcrumbBridgeRouter.cs`
       returns exactly 1 line; AC24 is checked off.
-- [ ] [P8-T25] AC25: cite `evidence/qa-gates/p7-t9-file-sizes.md` and
+- [x] [P8-T25] AC25: cite `evidence/qa-gates/p7-t9-file-sizes.md` and
       `evidence/baseline/p1-t7-file-line-counts.md`. Acceptance: the artifact shows every
       listed file at or under 500 lines, including the new
       `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`; `BreadcrumbBridgeRouterIssue439Tests.cs` at
@@ -1736,17 +1758,17 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       names the new file; AC25 is checked off. The bound is stated as "at or under" rather
       than "exactly" for the same reason it is in P7-T9: the figure is read after a write-mode
       formatter that can reduce a line count, and AC25 requires only non-growth.
-- [ ] [P8-T26] AC26: cite `evidence/regression-testing/p2-t13-compile-include-observed.md` for the
+- [x] [P8-T26] AC26: cite `evidence/regression-testing/p2-t13-compile-include-observed.md` for the
       `Compile Include` line and the 10 observed test results, and
       `evidence/regression-testing/p3-t5-router-tests-green.md` for the same 10 tests executing after
       the fix. Acceptance: both artifacts exist and both record 10 executed tests; AC26 is checked off.
-- [ ] [P8-T27] AC27: cite `evidence/qa-gates/p7-t4-msbuild-nullable.md` for the clean nullable build,
+- [x] [P8-T27] AC27: cite `evidence/qa-gates/p7-t4-msbuild-nullable.md` for the clean nullable build,
       and verify in the same task that
       `rg -n "^#nullable enable" QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs` returns
       line 1 and that `evidence/regression-testing/p3-t2-nesting.md` records that `stem` is a
       non-nullable `string` passed to `CommitSelection` without a nullable temporary. Acceptance: all
       three checks hold; AC27 is checked off.
-- [ ] [P8-T28] AC28: cite `evidence/qa-gates/p7-t10-toolchain-audit.md`. Acceptance: the artifact
+- [x] [P8-T28] AC28: cite `evidence/qa-gates/p7-t10-toolchain-audit.md`. Acceptance: the artifact
       quotes all four final-QC commands verbatim in order, shows `/t:Rebuild` on both MSBuild lines,
       records `NULLABLE_OPT_IN_PROPERTY: absent` for every one of the four quoted final-QC `Command:`
       lines — do not spell the token in this task's own record — and shows every step recording
@@ -1767,7 +1789,7 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       repository's standard runner and the local analogue of
       `.github/workflows/_mstest-coverage.yml:83`. The substitutions are recorded, not resolved.
       AC28 is checked off.
-- [ ] [P8-T29] AC29: cite `evidence/baseline/p0-t16-coverage-headline.md`,
+- [x] [P8-T29] AC29: cite `evidence/baseline/p0-t16-coverage-headline.md`,
       `evidence/qa-gates/p7-t6-coverage-headline.md`,
       `evidence/qa-gates/p7-t7-changed-line-coverage.md` and
       `evidence/qa-gates/p7-t8-coverage-delta.md`. Acceptance: the baseline capture is under
@@ -1791,19 +1813,21 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       shows both branches taken, per the `condition-coverage` values P7-T7 recorded, or — when P7-T7
       records that the helper's range carries no `branch="True"` node — per the two witness tests
       P7-T7 names; and AC29 is checked off.
-- [ ] [P8-T30] AC30: verify no behavior outside changes A through D was altered. Run three commands in
+- [x] [P8-T30] AC30: verify no behavior outside changes A through D was altered after the merge from
+      `main`. Run three commands in
       this task, in this order. First the porcelain companion,
       `git status --porcelain -- QuickFiler QuickFiler.Test UtilitiesCS UtilitiesCS.Test TaskMaster TaskMaster.Test ToDoModel Tags TaskVisualization`.
       Second
-      `git diff --name-only 0eda184ca0009bc79ac9b7146897270c17c095fa..HEAD -- QuickFiler QuickFiler.Test`.
+      `git diff --name-only 3be3f237a8551df3f27f83d9d1af2f26074fc93a..HEAD -- QuickFiler QuickFiler.Test`.
       Third
-      `git diff --name-only 0eda184ca0009bc79ac9b7146897270c17c095fa..HEAD -- UtilitiesCS UtilitiesCS.Test TaskMaster TaskMaster.Test ToDoModel Tags TaskVisualization`.
+      `git diff --name-only 3be3f237a8551df3f27f83d9d1af2f26074fc93a..HEAD -- UtilitiesCS UtilitiesCS.Test TaskMaster TaskMaster.Test ToDoModel Tags TaskVisualization`.
       Write `evidence/qa-gates/p8-t30-scope-boundary.md` recording all three outputs verbatim. The
       porcelain companion is required because a name-listing diff enumerates tracked changes only and
       never reports an untracked path, so the two diffs alone cannot fail on a file this plan created
       and left uncommitted. At the point this task runs the division of labour between the two
       mechanisms is fixed and is stated here: P6-T6 committed changes A through D, P7-T2 committed the
-      formatting result, and P7-T12 committed the Phase 7 evidence, so both anchored diffs carry the
+      formatting result, P7-T12 committed the Phase 7 evidence, and the `main` parent named above
+      excludes the subsequent main-owned changes, so both anchored diffs carry the issue #637-only
       enumeration assertion, and the porcelain
       span is expected to be empty because every path it covers is already in `HEAD`. That emptiness
       is itself the assertion and not a null result — an untracked or unstaged file anywhere in those
@@ -1817,11 +1841,13 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       `BASELINE_FORMAT_DRIFT` section of `evidence/baseline/p0-t12-csharpier-check.md` is non-empty —
       the paths in that section that lie under `QuickFiler` or `QuickFiler.Test`, each of which the
       artifact must show as a formatting-only change committed by P7-T2, and no others; when
-      `BASELINE_FORMAT_DRIFT` is empty the list is exactly the ten paths; the third command
+      `BASELINE_FORMAT_DRIFT` is empty the list is exactly the ten paths. Files introduced by the
+      merged `main` commit do not appear because they are present in the post-merge parent; their
+      appearance is neither an issue #637 change nor a P8-T30 failure. The third command
       produces no output, which is the evidence that `UtilitiesCS`, `TaskMaster`,
       `ToDoModel`, `Tags`, `TaskVisualization`, `UtilitiesCS.Test` and `TaskMaster.Test` contain no
       changed file; and AC30 is checked off.
-- [ ] [P8-T31] Verify all thirty criteria are checked off, using two independently constructed
+- [x] [P8-T31] Verify all thirty criteria are checked off, using two independently constructed
       section-scoped counts. Construction 1, range-scoped: extract the lines of `spec.md` between the
       line matching `^## Acceptance Criteria$` and the line matching `^## Risks & Mitigations$`, and
       count within that slice the lines matching `^- \[x\] AC` and the lines matching `^- \[ \] AC`.
