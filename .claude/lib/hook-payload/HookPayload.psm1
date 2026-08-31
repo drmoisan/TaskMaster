@@ -37,9 +37,11 @@
     Compatible with PowerShell 7+. No external module dependencies, no filesystem
     access, no subprocess, no network, and no wall-clock read. Mirrored
     byte-identically under extensions/drm-copilot/resources/claude-customizations/.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 # Anomaly codes. These are the only values Get-ClaudeHookPayloadAnomalyReason maps.
 $script:AnomalyEmptyPayload = 'EmptyPayload'

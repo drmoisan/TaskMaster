@@ -29,29 +29,29 @@
     OR on non-empty output, so the previous Python CLI's success line
     ("<type> validation passed: <path>") turned a PASSING validation into a DENY.
 
-    PARITY with `validate_discovery_profile.py` / `validate_discovery_schema_artifacts.py`.
-    Error families are preserved: `invalid JSON (...)`,
-    `JSON root must be an object for validation`, `schema resolution failed (...)`,
-    `Profile document is empty.`, `Profile document root must be a mapping.`,
-    `Missing required field: <field>.` Schema location resolves solely from each
-    artifact's own `$schema`, as in the reference; the type-to-file table below is
-    documentation and artifact-type validation only. Deliberate divergences: an
-    `http(s)://` `$schema` is NOT fetched (no guaranteed destination network, so a
-    non-`file` scheme is reported fail-closed in the `schema resolution failed (...)`
-    family), and `file://` resolves through `[uri]::LocalPath` rather than the
-    reference's `Path(parsed.path)`, which mishandles a Windows `file:///C:/...` path.
-    Unavoidable divergence: per-violation wording comes from `Test-Json`, not
-    `jsonschema`, so violation strings differ while family and verdict match. The
-    profile check reproduces the placeholder contract without a YAML parser (PowerShell
-    ships none); see `Get-DiscoveryProfileValidationError` for what is and is not
-    detected.
+    PARITY with `validate_discovery_profile.py` / `validate_discovery_schema_artifacts.py`. Error
+    families are preserved: `invalid JSON (...)`, `JSON root must be an object for validation`,
+    `schema resolution failed (...)`, `Profile document is empty.`,
+    `Profile document root must be a mapping.`, `Missing required field: <field>.` Schema
+    location resolves solely from each artifact's own `$schema`, as in the reference; the
+    type-to-file table below is documentation and artifact-type validation only. Deliberate
+    divergences: an `http(s)://` `$schema` is NOT fetched (no guaranteed destination network,
+    so a non-`file` scheme is reported fail-closed in the `schema resolution failed (...)`
+    family), and `file://` resolves through `[uri]::LocalPath` rather than the reference's
+    `Path(parsed.path)`, which mishandles a Windows `file:///C:/...` path. Unavoidable
+    divergence: per-violation wording comes from `Test-Json`, not `jsonschema`, so violation
+    strings differ while family and verdict match. The profile check reproduces the
+    placeholder contract without a YAML parser (PowerShell ships none); see
+    `Get-DiscoveryProfileValidationError` for what is and is not detected.
 .EXAMPLE
     Invoke-DiscoveryArtifactValidation -ValidatorArgs @('evidence-reference', $path)
 
     Returns @{ ExitCode = 0; Output = '' } when the artifact conforms.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 # Schema-governed artifact types mapped to their filenames under `schemas/discovery/v1/`.
 # Verified against `validate_discovery_artifacts.py`: `runtime-scenario`,

@@ -37,20 +37,22 @@
 
     The function is pure: it reads no file, starts no process, and never mutates
     its input.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 # Import the four leaf check modules eagerly. None of them imports this module,
 # so this import graph has no cycle. OrchestratorState.psm1 is deliberately NOT
 # imported here; it is loaded lazily inside the function, because the preflight
 # path in that module imports this one and an eager import in both directions
 # would couple their load order.
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateReceipts.psm1') -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateModelReceipts.psm1') -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCodexModelReceipts.psm1') -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCodexTopologyReceipts.psm1') -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCheckpointValue.psm1') -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateReceipts.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateModelReceipts.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCodexModelReceipts.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCodexTopologyReceipts.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCheckpointValue.psm1') -Force -ErrorAction Stop
 
 # The checkpoint key whose value carries the delegation receipts. It is read with
 # the Python `is not None` guard rather than a presence guard, matching the

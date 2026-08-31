@@ -28,9 +28,11 @@
     policy for free-text and plugin-backed grammars. Brackets are structural only
     where they delimit node shapes or attribute blocks: a gantt task named
     `Deploy (phase 1` must never be blocked as unbalanced.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 $script:MermaidGrammarVersion = '11.17.0'
 $script:MermaidGrammarSourceUrl = 'https://mermaid.js.org/intro/syntax-reference.html'

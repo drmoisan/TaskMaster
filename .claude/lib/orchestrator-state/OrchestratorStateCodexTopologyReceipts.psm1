@@ -25,16 +25,18 @@
 
     Every function is pure: it reads no file, starts no process, and never mutates
     its input.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 # Import the shared checkpoint-value primitives and the single Codex topology
 # resolver, resolved relative to this module's directory so both imports travel
 # with the pushed-down pack regardless of the working directory.
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCheckpointValue.psm1') -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCheckpointValue.psm1') -Force -ErrorAction Stop
 $script:CodexTopologyModulePath = Join-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath '..') -ChildPath (Join-Path -Path 'codex-routing' -ChildPath 'CodexTopology.psm1')
-Import-Module $script:CodexTopologyModulePath -Force
+Import-Module $script:CodexTopologyModulePath -Force -ErrorAction Stop
 
 # The checkpoint key this family validates.
 $script:CODEX_TOPOLOGY_RECEIPTS_KEY = 'codex_topology_receipts'

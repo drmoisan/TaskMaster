@@ -35,6 +35,8 @@ When multiple AC source files exist, track checkboxes in **each** applicable fil
 
 ## AC Identification
 
+For generated-document summaries, call `.claude/lib/requirements/GeneratedDocumentCounters.psm1` and supply `Acceptance Criteria` as the named section. The counter begins after that heading and ends at the next equal-or-shallower heading. Do not use `scripts/dev_tools/plan_progress_report.py`, which counts plan tasks rather than generated requirements criteria.
+
 Acceptance criteria are markdown checkbox items within AC source files.
 
 Deterministic heading rule:
