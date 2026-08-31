@@ -1316,7 +1316,7 @@ commit SHA in the canonical checkpoint.
 Run the four steps in order. If any step fails or changes a file, return to P7-T1 and run the phase
 again from the start.
 
-- [ ] [P7-T1] Format. Record
+- [x] [P7-T1] Format. Record
       `git status --porcelain -- QuickFiler QuickFiler.Test docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`
       before the run, then run
       `pwsh -NoProfile -Command 'dotnet tool run csharpier format .; "EXIT_CODE=$LASTEXITCODE"'`, then
@@ -1336,7 +1336,7 @@ again from the start.
       trees is invisible to them and would first surface at P8-T30, after the commit that could have
       carried it. Any line here means the repo-wide format pass touched a tree this plan does not own;
       stop and report to the orchestrator.
-- [ ] [P7-T2] Verify the format. Run
+- [x] [P7-T2] Verify the format. Run
       `pwsh -NoProfile -Command 'dotnet tool run csharpier check .; "EXIT_CODE=$LASTEXITCODE"'` and
       write `evidence/qa-gates/p7-t2-csharpier-check.md`. Acceptance: `EXIT_CODE: 0`, and the captured
       stdout is recorded verbatim. The exit code is the gate here rather than any summary wording,

@@ -92,12 +92,15 @@ namespace QuickFiler.Controllers
                     ? BreadcrumbRowBuilder.TrashRowText
                     : row.FilingTarget;
             // #614 D2: normalize eligible rooted targets, preserving no-bound-root pass-through.
-            if (
-                _boundRoot.Length != 0
-                && ArchiveStemContract.IsFullOutlookPath(selection)
-            )
+            if (_boundRoot.Length != 0 && ArchiveStemContract.IsFullOutlookPath(selection))
             {
-                if (!ArchiveStemContract.TryMakeArchiveRelative(selection, _boundRoot, out string stem))
+                if (
+                    !ArchiveStemContract.TryMakeArchiveRelative(
+                        selection,
+                        _boundRoot,
+                        out string stem
+                    )
+                )
                 {
                     log.Error("Breadcrumb row rejected: target is outside the archive root.");
                     return;

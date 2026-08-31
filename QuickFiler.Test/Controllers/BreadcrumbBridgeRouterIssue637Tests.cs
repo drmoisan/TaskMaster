@@ -195,7 +195,10 @@ namespace QuickFiler.Test.Controllers
             return boundRoot + "\\" + presentedTarget;
         }
 
-        private static IReadOnlyList<FolderBreadcrumbSegment> Chain(string hierarchyPath, string archiveRoot)
+        private static IReadOnlyList<FolderBreadcrumbSegment> Chain(
+            string hierarchyPath,
+            string archiveRoot
+        )
         {
             string boundRoot = archiveRoot.TrimEnd('\\', '/');
             var chain = new List<FolderBreadcrumbSegment>();

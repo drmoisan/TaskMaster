@@ -147,7 +147,10 @@ namespace QuickFiler.Test.Controllers
         [TestMethod]
         public void ToFilingStemOrVerbatim_RelativeStem_ReturnsTheInputVerbatim()
         {
-            EfcDataModel.ToFilingStemOrVerbatim(@"Clients\North", ArchiveRoot).Should().Be(@"Clients\North");
+            EfcDataModel
+                .ToFilingStemOrVerbatim(@"Clients\North", ArchiveRoot)
+                .Should()
+                .Be(@"Clients\North");
         }
 
         [TestMethod]
