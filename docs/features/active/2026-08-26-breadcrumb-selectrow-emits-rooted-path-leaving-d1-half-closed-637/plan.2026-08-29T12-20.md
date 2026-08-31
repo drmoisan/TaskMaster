@@ -957,7 +957,7 @@ redirect the assignment. Reversing any of those orders produces a build that doe
 canonical commit context and the routed commit-steward profile, then recorded the completed interval's
 commit SHA in the canonical checkpoint.
 
-- [ ] [P2-T11] [expect-fail] Run the new router regression tests before the fix. Run
+- [x] [P2-T11] [expect-fail] Run the new router regression tests before the fix. Run
       `pwsh -NoProfile -Command '$vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"; $vstest = & $vswhere -latest -products * -find "Common7\IDE\Extensions\TestPlatform\vstest.console.exe" | Select-Object -First 1; $asm = Join-Path (Get-Location).Path "QuickFiler.Test\bin\Debug\QuickFiler.Test.dll"; & $vstest $asm /InIsolation "/TestCaseFilter:FullyQualifiedName~BreadcrumbBridgeRouterIssue637Tests&TestCategory!=LiveOutlook" /Logger:trx "/ResultsDirectory:coverage\testresults\p2-t11"; "EXIT_CODE=$LASTEXITCODE"'`
       and write `evidence/regression-testing/p2-t11-router-tests-red.md` with `ExpectedExitCode: 1`.
       Acceptance: the output does not contain `No test matches the given testcase filter`; the run
@@ -973,7 +973,7 @@ commit SHA in the canonical checkpoint.
       `RowSelected_SeparatorBoundaryNearMissTarget_IsStillRejected`,
       `RowSelected_RootedTargetWithNoBoundArchiveRoot_PassesThroughVerbatim`. A different partition is a
       defect in the tests, not evidence of the bug, and must be repaired before Phase 3.
-- [ ] [P2-T12] [expect-fail] Run the new helper tests before the fix. Run the P2-T11 command with the
+- [x] [P2-T12] [expect-fail] Run the new helper tests before the fix. Run the P2-T11 command with the
       filter substring changed to `FullyQualifiedName~EfcDataModelIssue637Tests` and the results
       directory changed to `coverage\testresults\p2-t12`, and write
       `evidence/regression-testing/p2-t12-helper-tests-red.md` with `ExpectedExitCode: 1`. Acceptance:
@@ -981,7 +981,7 @@ commit SHA in the canonical checkpoint.
       total; exactly these 2 fail: `ToFilingStemOrVerbatim_RootedUnderAncestor_ReturnsTheStem` and
       `ToFilingStemOrVerbatim_RootedUnderCaseDifferingAncestor_ReturnsTheStem`; and the other 6 pass,
       because the seam already returns the input verbatim for every non-normalizable case.
-- [ ] [P2-T13] Prove the new test file actually executes rather than silently compiling into nothing.
+- [x] [P2-T13] Prove the new test file actually executes rather than silently compiling into nothing.
       From the TRX produced by P2-T11 at `coverage\testresults\p2-t11`, extract every `UnitTestResult`
       whose `testName` begins with one of the ten fixed method names, and write
       `evidence/regression-testing/p2-t13-compile-include-observed.md`. Quote only the `testName` and
@@ -995,7 +995,7 @@ commit SHA in the canonical checkpoint.
 
 ### Phase 3 — Change A, producer normalization in `SelectRow`
 
-- [ ] [P3-T1] Apply change A in `QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs`. Replace
+- [x] [P3-T1] Apply change A in `QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs`. Replace
       the guard currently at lines 94-106 so that the `_boundRoot.Length != 0` and
       `ArchiveStemContract.IsFullOutlookPath(selection)` conjunction opens a block; inside that block,
       a failed `ArchiveStemContract.TryMakeArchiveRelative(selection, _boundRoot, out string stem)`
@@ -1018,7 +1018,7 @@ commit SHA in the canonical checkpoint.
       lines (the new one in `SelectRow` and the existing one at `:120` in `SelectHierarchyPath`);
       `rg -n "out _" QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs` returns 0 lines; and
       `rg -c "IsFullOutlookPath" QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs` returns 1.
-- [ ] [P3-T2] Verify the nesting and the preserved diagnostics required by AC3 and AC6. Acceptance:
+- [x] [P3-T2] Verify the nesting and the preserved diagnostics required by AC3 and AC6. Acceptance:
       `rg -n "Breadcrumb row rejected: target is outside the archive root." QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs`
       returns exactly 1 line;
       `rg -n "Breadcrumb row rejected: target is the archive root itself." QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs`
@@ -1026,24 +1026,24 @@ commit SHA in the canonical checkpoint.
       `evidence/regression-testing/p3-t2-nesting.md` quotes the whole edited `SelectRow` body and
       records that `_boundRoot.Length != 0` is still the first conjunct, so the no-bound-root
       pass-through mode is untouched.
-- [ ] [P3-T3] Verify AC8: `SelectHierarchyPath` and `CommitSelection` are unmodified. Run
+- [x] [P3-T3] Verify AC8: `SelectHierarchyPath` and `CommitSelection` are unmodified. Run
       `git add QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs` then
       `git diff 0eda184ca0009bc79ac9b7146897270c17c095fa --cached -U0 -- QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs`
       and write `evidence/regression-testing/p3-t3-selectionfile-diff.md`. Acceptance: every hunk
       header in the diff addresses a line range that lies entirely within the original lines 83 to 107;
       no hunk touches the original line range 109 to 139; and the artifact lists the hunk headers
       verbatim.
-- [ ] [P3-T4] Run the analyzer build and the nullable build using the P0-T13 and P0-T14 commands
+- [x] [P3-T4] Run the analyzer build and the nullable build using the P0-T13 and P0-T14 commands
       verbatim, and write `evidence/regression-testing/p3-t4-builds.md` recording both. Acceptance:
       both record `EXIT_CODE: 0`; both outputs contain `(Rebuild target(s))`; and neither recorded
       `Command:` line contains the solution-wide nullable opt-in property — record this as
       `NULLABLE_OPT_IN_PROPERTY: absent`; do not spell the token in the artifact.
-- [ ] [P3-T5] Run the router regression suite green. Use the P2-T11 command with the results directory
+- [x] [P3-T5] Run the router regression suite green. Use the P2-T11 command with the results directory
       changed to `coverage\testresults\p3-t5`, and write
       `evidence/regression-testing/p3-t5-router-tests-green.md`. Acceptance: `EXIT_CODE: 0`; 10 tests
       total; 10 passed; 0 failed; 0 skipped; and the five tests that failed in P2-T11 are named
       individually in the artifact as now passing.
-- [ ] [P3-T6] Run the unmodified router test classes to prove no collateral regression. Use the P2-T11
+- [x] [P3-T6] Run the unmodified router test classes to prove no collateral regression. Use the P2-T11
       command with the filter
       `"/TestCaseFilter:(FullyQualifiedName~BreadcrumbBridgeRouterIssue614Tests|FullyQualifiedName~BreadcrumbBridgeRouterTests|FullyQualifiedName~BreadcrumbBridgeRouterQueueTests)&TestCategory!=LiveOutlook"`
       and the results directory `coverage\testresults\p3-t6`, and write
@@ -1055,7 +1055,7 @@ commit SHA in the canonical checkpoint.
 
 ### Phase 4 — Change B, normalization in the `string` overload of `MoveToFolderAsync`
 
-- [ ] [P4-T1] Replace the seam body in `QuickFiler/Controllers/EfcDataModel.FilingStem.cs` with the
+- [x] [P4-T1] Replace the seam body in `QuickFiler/Controllers/EfcDataModel.FilingStem.cs` with the
       real normalization. `ToFilingStemOrVerbatim` returns `candidatePath` unchanged when
       `ArchiveStemContract.IsFullOutlookPath(candidatePath)` is false; otherwise it calls
       `ArchiveStemContract.TryMakeArchiveRelative(candidatePath, archiveAncestor, out string stem)` and
@@ -1093,7 +1093,7 @@ commit SHA in the canonical checkpoint.
       is at most 500; and
       `pwsh -NoProfile -Command '(Get-Content -LiteralPath "QuickFiler\Controllers\EfcDataModel.cs").Count'`
       reports exactly 485, because this task changes no line of that file.
-- [ ] [P4-T2] Record the helper's line range and verify its purity, and write
+- [x] [P4-T2] Record the helper's line range and verify its purity, and write
       `evidence/regression-testing/p4-t2-helper-shape.md`. Acceptance: the artifact records the first
       and last line numbers of the `ToFilingStemOrVerbatim` declaration body **in
       `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`**, and records separately that
@@ -1106,17 +1106,17 @@ commit SHA in the canonical checkpoint.
       classifies each as the single declaration, the single call, or an XML-documentation reference,
       with exactly one declaration and exactly one call. A second call site anywhere in `QuickFiler/`
       fails this task.
-- [ ] [P4-T3] Run the analyzer build and the nullable build using the P0-T13 and P0-T14 commands
+- [x] [P4-T3] Run the analyzer build and the nullable build using the P0-T13 and P0-T14 commands
       verbatim, and write `evidence/regression-testing/p4-t3-builds.md`. Acceptance: both record
       `EXIT_CODE: 0`; both outputs contain `(Rebuild target(s))`; and neither recorded `Command:` line
       contains the solution-wide nullable opt-in property — record this as
       `NULLABLE_OPT_IN_PROPERTY: absent`; do not spell the token in the artifact.
-- [ ] [P4-T4] Run the helper test class green. Use the P2-T12 command with the results directory
+- [x] [P4-T4] Run the helper test class green. Use the P2-T12 command with the results directory
       changed to `coverage\testresults\p4-t4`, and write
       `evidence/regression-testing/p4-t4-helper-tests-green.md`. Acceptance: `EXIT_CODE: 0`; 8 tests
       total; 8 passed; 0 failed; and the two tests that failed in P2-T12 are named individually as now
       passing.
-- [ ] [P4-T5] Prove the eight existing `ToArchiveRelativeStem` tests are unchanged and still pass. Use
+- [x] [P4-T5] Prove the eight existing `ToArchiveRelativeStem` tests are unchanged and still pass. Use
       the P2-T11 command with the filter
       `"/TestCaseFilter:FullyQualifiedName~EfcDataModelIssue614Tests&TestCategory!=LiveOutlook"` and the
       results directory `coverage\testresults\p4-t5`, and write
@@ -1126,7 +1126,7 @@ commit SHA in the canonical checkpoint.
       `git add QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`,
       `git diff 0eda184ca0009bc79ac9b7146897270c17c095fa --cached -- QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`
       shows zero removed content lines.
-- [ ] [P4-T6] Verify AC17: the non-goals are untouched. Run
+- [x] [P4-T6] Verify AC17: the non-goals are untouched. Run
       `git add QuickFiler/Controllers/EfcDataModel.cs` then
       `git diff 0eda184ca0009bc79ac9b7146897270c17c095fa --cached -U0 -- QuickFiler/Controllers/EfcDataModel.cs`
       and write `evidence/regression-testing/p4-t6-nongoals-untouched.md`, quoting every hunk header
@@ -1157,7 +1157,7 @@ commit SHA in the canonical checkpoint.
 
 ### Phase 5 — Change C, the recorded spec correction to the issue #439 assertion
 
-- [ ] [P5-T1] In `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs`, replace line 165
+- [x] [P5-T1] In `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs`, replace line 165
       `            router.SelectedFolderPath.Should().Be(fullTarget);` with
       `            router.SelectedFolderPath.Should().Be(@"Clients\North");`. The expected value is
       derived from the fixture in the same method: `archiveRoot` is `@"\Archive"` at `:123` and
@@ -1170,7 +1170,7 @@ commit SHA in the canonical checkpoint.
       returns exactly 1 line and it is line 165, and the fixed-string search
       `rg -F -n 'router.SelectedFolderPath.Should().Be(fullTarget);' QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs`
       returns 0 lines.
-- [ ] [P5-T2] Rename the enclosing method at line 119 from
+- [x] [P5-T2] Rename the enclosing method at line 119 from
       `Issue439AlreadyRootedTargetRemainsUnchangedWithCaseInsensitiveArchiveMatch` to
       `Issue439RootedTargetUsesOriginalPathForProviderLookupCaseInsensitively`, on one line so the file
       line count is unchanged. Acceptance:
@@ -1178,7 +1178,7 @@ commit SHA in the canonical checkpoint.
       returns 0 lines, and
       `rg -n "Issue439RootedTargetUsesOriginalPathForProviderLookupCaseInsensitively" --glob "*.cs" .`
       returns exactly 1 line.
-- [ ] [P5-T3] Narrow the arrange comment at lines 121-122 to the provider claim it still supports,
+- [x] [P5-T3] Narrow the arrange comment at lines 121-122 to the provider claim it still supports,
       keeping it exactly two lines so the file line count is unchanged. The replacement text is:
       `            // Arrange: the presented target is rooted with casing different from the configured`
       and
@@ -1194,13 +1194,13 @@ commit SHA in the canonical checkpoint.
       returns exactly 1 line and it is line 122, and
       `rg -n "already rooted with casing different" QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue439Tests.cs`
       returns 0 lines, recorded with `ExpectedExitCode: 1`.
-- [ ] [P5-T4] Verify AC19: the companion provider assertion and `ToHierarchyPath` are preserved. Write
+- [x] [P5-T4] Verify AC19: the companion provider assertion and `ToHierarchyPath` are preserved. Write
       `evidence/regression-testing/p5-t4-provider-assertion-preserved.md`. Acceptance: lines 161 to 164
       of `BreadcrumbBridgeRouterIssue439Tests.cs` are byte-identical to their pre-change text, quoted
       in the artifact; and, after `git add QuickFiler/Controllers/BreadcrumbBridgeRouter.cs`,
       `git diff 0eda184ca0009bc79ac9b7146897270c17c095fa --cached -U0 -- QuickFiler/Controllers/BreadcrumbBridgeRouter.cs`
       produces no output at all, since this plan changes no line of that file.
-- [ ] [P5-T5] Verify the file did not grow and that exactly one assertion changed. Run
+- [x] [P5-T5] Verify the file did not grow and that exactly one assertion changed. Run
       `pwsh -NoProfile -Command '(Get-Content -LiteralPath "QuickFiler.Test\Controllers\BreadcrumbBridgeRouterIssue439Tests.cs").Count'`,
       then `git add QuickFiler.Test` followed by
       `git diff 0eda184ca0009bc79ac9b7146897270c17c095fa --cached -- QuickFiler.Test`, and write
@@ -1213,7 +1213,7 @@ commit SHA in the canonical checkpoint.
       half, and that this is explicitly not a weakened test; and the artifact additionally records the
       P5-T2 rename (both the removed and the added method name) and the two replacement comment lines
       from P5-T3, quoted verbatim, so that all three clauses of AC18 are evidenced in one artifact.
-- [ ] [P5-T6] Run the issue #439 test class green. First re-run the P0-T13 analyzer build command
+- [x] [P5-T6] Run the issue #439 test class green. First re-run the P0-T13 analyzer build command
       verbatim so that the Phase 5 test edits are compiled into
       `QuickFiler.Test\bin\Debug\QuickFiler.Test.dll`; record its `EXIT_CODE:` and its
       `(Rebuild target(s))` line in the same artifact. Without this rebuild the scoped run would
@@ -1227,24 +1227,24 @@ commit SHA in the canonical checkpoint.
 
 ### Phase 6 — Change D, stale-comment cleanup
 
-- [ ] [P6-T1] Replace `QuickFiler/Controllers/EfcSelectionGuard.cs:30` with the fixed replacement text
+- [x] [P6-T1] Replace `QuickFiler/Controllers/EfcSelectionGuard.cs:30` with the fixed replacement text
       given in "Fixed identifiers", item 1. The surrounding claim that the guard still rejects rooted
       values stays as written; only the deferral wording changes. Acceptance:
       `rg -n "is implemented by issue #637" QuickFiler/Controllers/EfcSelectionGuard.cs` returns
       exactly 1 line, and `(Get-Content -LiteralPath "QuickFiler\Controllers\EfcSelectionGuard.cs").Count`
       is exactly 79.
-- [ ] [P6-T2] Replace `QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs:146` with the fixed
+- [x] [P6-T2] Replace `QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs:146` with the fixed
       replacement text given in "Fixed identifiers", item 2. Acceptance:
       `rg -n "the producer normalizes" QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs` returns
       exactly 1 line, and it is line 146.
-- [ ] [P6-T3] Replace the `because` string at `QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs:152`
+- [x] [P6-T3] Replace the `because` string at `QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs:152`
       with the fixed replacement text given in "Fixed identifiers", item 3, on one line so the file
       line count is unchanged. Acceptance:
       `rg -n "the producer now normalizes before this predicate is reached" QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs`
       returns exactly 1 line, and
       `(Get-Content -LiteralPath "QuickFiler.Test\Controllers\EfcSelectionGuardTests.cs").Count` is
       exactly 296.
-- [ ] [P6-T4] Verify the deferral is gone and the guard's behavior is unchanged. First re-run the
+- [x] [P6-T4] Verify the deferral is gone and the guard's behavior is unchanged. First re-run the
       P0-T13 analyzer build command verbatim so that the P6-T2 and P6-T3 test edits are compiled into
       `QuickFiler.Test\bin\Debug\QuickFiler.Test.dll`; record its `EXIT_CODE:` and its
       `(Rebuild target(s))` line in the same artifact. Without this rebuild the scoped run would
@@ -1263,7 +1263,7 @@ commit SHA in the canonical checkpoint.
       by a `git diff 0eda184ca0009bc79ac9b7146897270c17c095fa --cached -- QuickFiler/Controllers/EfcSelectionGuard.cs`
       run in the same task after `git add QuickFiler/Controllers/EfcSelectionGuard.cs`, whose only
       changed line is line 30.
-- [ ] [P6-T5] Redact host identity from every evidence artifact written so far, then prove it. Apply
+- [x] [P6-T5] Redact host identity from every evidence artifact written so far, then prove it. Apply
       the "Evidence transcript redaction" convention to every file already written under
       `docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637/evidence/`:
       replace every occurrence of the absolute worktree path with the literal `<worktree-root>`, and
@@ -1285,7 +1285,7 @@ commit SHA in the canonical checkpoint.
       this task's own artifact is required for the same reason P7-T10 excludes its own: this artifact
       records its own two `Command:` lines, and those commands' patterns are the strings being searched
       for. No other evidence file of this feature is excluded.
-- [ ] [P6-T6] Prepare the changes-A-through-D HEAD-materialization boundary. Write
+- [x] [P6-T6] Prepare the changes-A-through-D HEAD-materialization boundary. Write
       `evidence/other/p6-t6-commit.md`, check off this task, and return
       `PROGRESS_COMMIT_REQUIRED: P2-T11..P6-T6` without invoking `git commit`. The orchestrator must
       stage `QuickFiler`, `QuickFiler.Test`, and this feature folder; collect canonical commit context;

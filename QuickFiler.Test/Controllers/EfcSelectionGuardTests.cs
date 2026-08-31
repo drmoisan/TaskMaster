@@ -143,13 +143,13 @@ namespace QuickFiler.Test.Controllers
         [TestMethod]
         public void IsValidFilingSelection_RootedTargetUnderArchiveRoot_IsRejected()
         {
-            // RC-1 inversion: rooted values are never filing stems here; normalization is deferred to issue #637.
+            // RC-1 inversion: rooted values are never filing stems here; the producer normalizes first.
             // Arrange / Act / Assert
             EfcSelectionGuard
                 .IsValidFilingSelection(@"\aRcHiVe\Clients\North")
                 .Should()
                 .BeFalse(
-                    "a rooted value is never a filing stem at this surface and producer-side normalization is deferred to issue #637"
+                    "a rooted value is never a filing stem at this surface because the producer now normalizes before this predicate is reached"
                 );
         }
 

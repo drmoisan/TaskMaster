@@ -116,10 +116,10 @@ namespace QuickFiler.Test.Controllers
         }
 
         [TestMethod]
-        public void Issue439AlreadyRootedTargetRemainsUnchangedWithCaseInsensitiveArchiveMatch()
+        public void Issue439RootedTargetUsesOriginalPathForProviderLookupCaseInsensitively()
         {
-            // Arrange: the presented target is already rooted with casing different from the
-            // configured root, so the provider must receive the original full path unchanged.
+            // Arrange: the presented target is rooted with casing different from the configured
+            // root, so the provider must receive the original full path unchanged (#439).
             const string archiveRoot = @"\Archive";
             const string fullTarget = @"\aRcHiVe\Clients\North";
             var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
@@ -162,7 +162,7 @@ namespace QuickFiler.Test.Controllers
                 p => p.ResolveLeafKeyAsync(fullTarget, It.IsAny<CancellationToken>()),
                 Times.Once
             );
-            router.SelectedFolderPath.Should().Be(fullTarget);
+            router.SelectedFolderPath.Should().Be(@"Clients\North");
         }
 
         [TestMethod]
