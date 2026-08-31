@@ -1864,7 +1864,7 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
 canonical commit context and the routed commit-steward profile, then recorded the boundary SHA and the
 P7-T12 intermediate SHA within this task interval in the canonical checkpoint.
 
-- [ ] [P8-T32] Record the spec-versus-tree reconciliation in
+- [x] [P8-T32] Record the spec-versus-tree reconciliation in
       `evidence/other/p8-t32-spec-tree-discrepancies.md`. `spec.md` was authored against the tree
       before issue #638 merged, and a prior revision of `spec.md` already applied the acceptance-
       criteria corrections that shift required. This plan performs no `spec.md` text edit: its only
@@ -1937,7 +1937,7 @@ P7-T12 intermediate SHA within this task interval in the canonical checkpoint.
 
       The acceptance-criteria count in `spec.md` is unchanged at 30: this plan adds, removes and
       splits no criterion, and edits no criterion's text.
-- [ ] [P8-T33] Finalise the last partial interval without invoking `git commit`. Write
+- [x] [P8-T33] Finalise the last partial interval without invoking `git commit`. Write
       `evidence/other/p8-t33-final-commit.md`, check off this task, verify that
       `git status --porcelain -- QuickFiler QuickFiler.Test` produces no output, record
       `git status --porcelain -- docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`
