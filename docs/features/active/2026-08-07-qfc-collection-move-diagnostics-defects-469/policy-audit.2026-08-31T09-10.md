@@ -1,12 +1,12 @@
 # Policy Compliance Audit: Issue #469 documentation-accuracy change
 
-**Audit Date:** 2026-08-31  
-**Base / head:** `origin/main` `6191c74f3be6e37ecd82816902df9c3832bfc9af` / `c70927b04d5ad4611b6723be1cccaffd76f9220a`  
+**Audit Date:** 2026-08-31
+**Base / head:** `origin/main` `6191c74f3be6e37ecd82816902df9c3832bfc9af` / `87757e3ecbb881a0a74a37728dcc7499af9c057a`
 **Code Under Test:** Four modified C# files: `QfcCollectionController.cs`, `QfcHomeController.Metrics.cs`, `QfcCollectionControllerDefects468MoveTests.cs`, and `QfcHomeControllerMetricsTests.cs`.
 
 ## Executive Summary
 
-**PASS.** The full feature diff contains four C# documentation-only changes, Markdown specifications, evidence, and pre-existing Claude agent-memory history. The C# diff has no executable, signature, configuration, or project-file change. The current-head evidence records analyzer and nullable rebuild success, 1,254/1,254 QuickFiler.Test tests passing, 6,876/6,876 coverage-run tests passing, and a coverage increase from 85.3303% to 85.3335%. The reviewer also ran `dotnet tool run csharpier check` against all four changed C# files successfully and `git diff --check main...HEAD` successfully.
+**PASS.** The full feature diff contains four C# documentation-only changes, Markdown specifications, evidence, and pre-existing Claude agent-memory history. The C# diff has no executable, signature, configuration, or project-file change. The current-head evidence records analyzer and nullable rebuild success, 1,254/1,254 QuickFiler.Test tests passing, 6,876/6,876 coverage-run tests passing, and a coverage increase from 85.3303% to 85.3335%. The reviewer also verified that all 40 plan-referenced evidence files exist and that `git diff --name-status origin/main...HEAD` reports no `app.config`, `packages.config`, project, or configuration change. The retained commit-pinned baseline enumeration and P2-T2 deterministic set comparison establish that the 35 current CSharpier paths equal the 35 baseline paths and contain no plan-owned C# path.
 
 Policy documents evaluated: `AGENTS.md` (standing, code-change, unit-test, C# code, and C# unit-test sections) and `.agents/skills/csharp/SKILL.md`.
 
@@ -62,7 +62,7 @@ Policy documents evaluated: `AGENTS.md` (standing, code-change, unit-test, C# co
 
 | Requirement | Status | Evidence |
 |---|---|---|
-| CSharpier | PASS | Reviewer command `dotnet tool run csharpier check` on the four changed C# files exited 0. |
+| CSharpier | PASS | Reviewer command `dotnet tool run csharpier check` on the four changed C# files exited 0. The full-tree P6-T2 check recorded configuration-only drift; the commit-pinned 35-path enumeration and P2-T2 deterministic comparison confirm an exact baseline match with no plan-owned C# path. |
 | Analyzer build | PASS | `evidence/baseline/p0-t11-msbuild-analyzers.2026-08-29T12-22.md`: exit 0, 0 errors. |
 | Nullable/type build | PASS | `evidence/baseline/p0-t12-msbuild-nullable.2026-08-29T12-22.md`: exit 0, 0 errors. |
 | Null safety and public APIs | PASS | Review found no executable or API change. |
@@ -100,11 +100,11 @@ Baseline line rate was **85.3303%** and post-change line rate was **85.3335%**, 
 | Nullable build | `msbuild ... TreatWarningsAsErrors=true` | PASS (recorded exit 0) |
 | Tests and coverage | Recorded full test and coverage evidence | PASS |
 
-Repository-wide CSharpier check had historical `app.config` / `packages.config` drift at baseline. It does not include a changed C# path; the reviewer’s changed-file CSharpier check passed.
+Repository-wide CSharpier check had historical `app.config` / `packages.config` drift at baseline. It does not include a changed C# path, and the reviewer’s changed-file CSharpier check passed. P0-T10 remains unchanged historical evidence; the retained detached worktree produced the commit-pinned 35-path enumeration, and P2-T2 confirms the current set is identical. The current `origin/main...HEAD` diff also proves no configuration file was introduced or modified by this feature.
 
 ## 8. Gaps and Exceptions
 
-**None requiring remediation.** The documentation-only scope makes a red-before/green-after runtime test structurally inapplicable. `evidence/regression-testing/fail-before-exception.2026-08-29T12-22.md` documents the exception and existing behavior guards.
+The documentation-only scope makes a red-before/green-after runtime test structurally inapplicable; `evidence/regression-testing/fail-before-exception.2026-08-29T12-22.md` documents that exception and the existing behavior guards. The P6-T2 baseline relation is reconciled by `evidence/remediation-baseline/p1-t2-csharpier-baseline-enumeration.2026-08-31T10-00.md` and `evidence/qa-gates/p2-t2-csharpier-set-comparison.2026-08-31T10-15.md`; P0-T10 is retained unchanged as historical evidence.
 
 ## 9. Summary of Changes
 
@@ -112,9 +112,9 @@ The branch corrects stale filter rationale in production and test comments, alig
 
 ## 10. Compliance Verdict
 
-### Overall Status: FULLY COMPLIANT
+### Overall Status: COMPLIANT
 
-The policy evidence, current diff inspection, changed-file formatting check, coverage comparison, and test results support normal PR flow. No policy audit failure or meaningful partial finding was identified.
+The implementation evidence, current diff inspection, changed-file formatting check, coverage comparison, test results, and commit-pinned CSharpier set comparison support the documentation-only source change. The P6-T2 baseline-relative acceptance condition is reconciled without modifying the original P0-T10 historical evidence.
 
 ## Appendix A: Test Inventory
 
@@ -133,5 +133,5 @@ pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot .
 git diff --check main...HEAD
 ```
 
-**Audit Completed By:** Codex feature-review agent  
+**Audit Completed By:** Codex feature-review agent
 **Audit Date:** 2026-08-31
