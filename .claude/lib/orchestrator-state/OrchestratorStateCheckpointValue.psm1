@@ -23,9 +23,11 @@
     Every function is pure: it reads no file, starts no process, and never mutates
     its input. The module imports nothing, so it is the leaf of the parity family's
     import graph and cannot participate in a load-order cycle.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 # The numeric CLR types a JSON number can deserialize to, used by the Python
 # zero-equivalence predicate so a value is compared numerically, not by type.
