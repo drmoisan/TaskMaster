@@ -3,9 +3,9 @@
 - **Issue:** #637
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-30T07-30
-- **Status:** Draft
-- **Version:** 0.5
+- **Last Updated:** 2026-08-31T08-59
+- **Status:** Ready for Codex preflight
+- **Version:** 0.6
 - **Work Mode:** full-bug (from `issue.md`); `spec.md` is the sole acceptance-criteria source (AC1-AC30).
 
 ## Conventions (read before executing any task)
@@ -226,20 +226,16 @@ Findings that this plan depends on:
   the percentage is assigned at `:486`, the enforcing comparison `if ($percentage -lt 80)` is at
   `:487`, and the `80%` message literal is at `:489`).
 
-**Coverage-floor authority resolution.** Two repository documents state different repository-wide
-coverage figures. `CLAUDE.md` states a floor of **80 percent line coverage on the testable
-denominator**, together with a maintainer-ratified COM/VSTO/WinForms exemption.
-`.claude/rules/general-unit-test.md` states 85 percent line and 75 percent branch. The conflict is
-resolved here by authority ordering rather than by a new exception. `policy-compliance-order` ranks
-`CLAUDE.md` first and `.claude/rules/general-unit-test.md` third, so `CLAUDE.md`'s 80 percent line
-floor on the testable denominator is the binding repository-wide gate for this plan. It is also the
-figure the runner itself enforces, at `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1:487`, so
-the binding gate and the executed gate are the same number. The 85 percent line and 75 percent branch
-figures in `.claude/rules/general-unit-test.md` are the stricter non-binding target and are superseded
-by `CLAUDE.md` where they conflict; this plan still records the post-change figure against them as a
-non-blocking observation, so the gap remains visible without gating the work. The change-scoped gates
-— no changed line loses coverage, and the new helper is fully covered — are blocking regardless of
-which repository-wide figure is quoted. P7-T8 states this resolution and applies it.
+**Coverage-floor authority resolution.** `AGENTS.md` is the Codex repository-policy authority. Its
+General Unit Test Policy requires repository-wide line coverage to remain at or above **80 percent**,
+new modules, classes and methods to target at least **90 percent** coverage, and changed lines not to
+lose coverage. `.agents/skills/csharp/SKILL.md` repeats those same three requirements. The repository
+runner enforces the 80-percent repository floor at
+`scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1:487`, so the binding repository-wide policy and
+the executed gate use the same figure. The change-scoped gates remain independently blocking: no
+changed line may lose coverage, and every Cobertura sequence point in the new helper must be covered,
+with both decision outcomes demonstrated as P7-T7 specifies. P7-T8 states and applies this Codex
+authority resolution.
 
 **Formatting observables.** `dotnet tool run csharpier format .` rewrites files and still exits 0, so
 its exit code alone proves nothing. The discriminating observation used by this plan is therefore a
@@ -284,6 +280,21 @@ count over-reports by exactly five. Because no reusable tool is introduced, the 
 obligation attached to such a tool does not arise; if a future revision introduces one, that
 obligation attaches and must be satisfied before the tool is used.
 
+**Execution checkpoint boundaries.** This plan contains 107 atomic tasks. After completing and
+checking off task 35 (`[P2-T10]`), task 70 (`[P7-T8]`), task 105 (`[P8-T31]`), and the final partial
+interval at task 107 (`[P8-T33]`), the atomic executor must stop mutation and return the exact
+`PROGRESS_COMMIT_REQUIRED` signal stated at that boundary. The orchestrator must then stage only the
+completed interval's in-scope paths, collect canonical commit context through the repository
+automation adapter, resolve and persist the routed `commit-steward` receipt, delegate the commit
+message to that exact profile, create the commit, and record the task interval and resulting SHA in
+`artifacts/orchestration/orchestrator-state.json` before execution resumes. No executor may mutate the
+worktree while a boundary commit is being prepared.
+
+The existing HEAD-materialization points after `[P6-T6]`, `[P7-T2]`, and `[P7-T12]` remain necessary
+because later gates use anchored `BASE..HEAD` diffs. They use the same orchestrator-controlled commit
+protocol and do not replace the mandatory task-count boundaries. No atomic task invokes `git commit`
+or selects its own commit message, and these boundaries add or renumber no tasks.
+
 ## Scope
 
 In scope, exactly four changes:
@@ -305,7 +316,7 @@ In scope, exactly four changes:
 **Why change B is split into a second file.** `spec.md:414-416` authorizes this: "if it does not, the
 helper moves to its own file rather than the 500-line limit being exceeded." That condition is met.
 `QuickFiler/Controllers/EfcDataModel.cs` is 485 lines on the merged tree, so its headroom to the
-500-line limit in `.claude/rules/general-code-change.md` is 15 lines. The final helper needs roughly
+500-line limit in the Agent Code Change Policy section of `AGENTS.md` is 15 lines. The final helper needs roughly
 24 to 26 lines: five to eight lines of XML documentation that must state the contract, describe the
 second parameter, express the gate without naming `IsFullOutlookPath`, and express totality without
 using the character sequence `throw`; plus a body of about twelve lines, because the call
@@ -446,34 +457,36 @@ no downstream artifact inherits a wrong figure.
 
 ### Phase 0 — Context, policy reads, and baseline capture
 
-- [ ] [P0-T1] Read `CLAUDE.md` in full at the worktree root. Acceptance: the file is read in this
-      session before any other task in this phase, and its four-step C# toolchain command list is
-      quoted verbatim into the artifact written by P0-T5.
-- [ ] [P0-T2] Read `.claude/rules/general-code-change.md` in full. Acceptance: the file is read, and
-      its 500-line file-size limit clause is quoted verbatim into the artifact written by P0-T5.
-- [ ] [P0-T3] Read `.claude/rules/general-unit-test.md` in full. Acceptance: the file is read, and its
-      line-coverage and branch-coverage threshold sentence is quoted verbatim into the artifact written
-      by P0-T5.
-- [ ] [P0-T4] Read `.claude/rules/csharp.md` in full. Acceptance: the file is read, and its statement
-      about the required test framework, mocking library and assertion library is quoted verbatim into
-      the artifact written by P0-T5.
-- [ ] [P0-T5] Write `evidence/baseline/phase0-instructions-read.md` containing `Timestamp:`,
-      `Policy Order:` naming the four files in the order P0-T1 through P0-T4 read them, an explicit
-      bulleted list of those four file paths, and the four verbatim quotations required above.
-      Acceptance: the file exists and contains all of `Timestamp:`, `Policy Order:`, `CLAUDE.md`,
-      `general-code-change.md`, `general-unit-test.md`, `csharp.md`.
-- [ ] [P0-T6] Read `spec.md` in full and write `evidence/baseline/p0-t6-spec-read.md` recording the
+- [x] [P0-T1] Read `AGENTS.md` in full at the worktree root before any other task in this phase.
+      Acceptance: the standing-instructions entry `AGENTS.md — standing instructions` is recorded
+      first in the `Policy Order:` field of the artifact written by P0-T5.
+- [x] [P0-T2] Re-read the `Agent Code Change Policy` section of `AGENTS.md`. Acceptance: the entry
+      `AGENTS.md — Agent Code Change Policy` is recorded second in P0-T5's `Policy Order:`, and the
+      artifact records the 500-line file-size limit and four-step toolchain-loop requirement.
+- [x] [P0-T3] Re-read the `General Unit Test Policy` section of `AGENTS.md`. Acceptance: the entry
+      `AGENTS.md — General Unit Test Policy` is recorded third in P0-T5's `Policy Order:`, and the
+      artifact records the repository-wide 80-percent line floor, the at-least-90-percent target for
+      new modules, classes and methods, and the no-regression requirement for changed lines.
+- [x] [P0-T4] Read `.agents/skills/csharp/SKILL.md` in full. Acceptance: that path is recorded fourth
+      in P0-T5's `Policy Order:`, and the artifact records the exact Codex C# format, analyzer,
+      nullable and coverage-enabled test sequence together with MSTest, Moq and FluentAssertions.
+- [x] [P0-T5] Write `evidence/baseline/phase0-instructions-read.md` containing `Timestamp:`,
+      `Policy Order:`, an explicit ordered list of the four policy entries from P0-T1 through P0-T4,
+      and `Distinct Files Read:`. Acceptance: the file exists; `Policy Order:` contains exactly those
+      four ordered entries; and `Distinct Files Read:` contains exactly `AGENTS.md` and
+      `.agents/skills/csharp/SKILL.md`.
+- [x] [P0-T6] Read `spec.md` in full and write `evidence/baseline/p0-t6-spec-read.md` recording the
       count of acceptance criteria found inside the `## Acceptance Criteria` section only. Acceptance:
       the recorded count is exactly 30, and the artifact also records that the five checkboxes at
       `spec.md:54`, `:55`, `:56`, `:57` and `:86` lie outside that section and are excluded.
-- [ ] [P0-T7] Read `research/research.2026-08-29T12-30.md` in full and write
+- [x] [P0-T7] Read `research/research.2026-08-29T12-30.md` in full and write
       `evidence/baseline/p0-t7-research-read.md` listing the two numbered corrections `spec.md`
       records under "Corrections to the research file", the second of which bundles two distinct
       file-count facts, and stating that `spec.md` governs where they conflict.
       Acceptance: the artifact names the `EfcDataModelTests.cs` existence correction, the
       `MoveToFolder` five-file correction, and the `SelectedFolderPath` three-production-file
       correction.
-- [ ] [P0-T8] Record the branch and prove the base commit is a clean pre-change baseline. Run
+- [x] [P0-T8] Record the current worktree branch and prove the base commit is a clean pre-change baseline. Run
       `git rev-parse --abbrev-ref HEAD`, `git rev-parse HEAD`,
       `git diff --name-only 0eda184ca0009bc79ac9b7146897270c17c095fa..HEAD -- QuickFiler QuickFiler.Test`,
       and, as the porcelain companion to that name-listing diff,
@@ -492,7 +505,7 @@ no downstream artifact inherits a wrong figure.
       Acceptance: the `git diff --name-only` invocation produces **no output at all**; the
       `git status --porcelain` invocation produces **no output at all**; and the
       recorded branch name is
-      `bug/breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`. An ancestry check is
+      `agent-af95f0a8159ff28fa-wt-2026-08-31T08-39`. An ancestry check is
       deliberately not used here. `git merge-base --is-ancestor` exits 0 for any ancestor, including
       an ancestor that predates work this plan does not own, so it cannot fail in the state this task
       exists to detect; the empty-diff form fails as soon as any file under `QuickFiler` or
@@ -502,7 +515,7 @@ no downstream artifact inherits a wrong figure.
       record `BASE MISMATCH` in the artifact
       together with the offending output, stop, and report to the orchestrator; do not proceed to
       P0-T9.
-- [ ] [P0-T9] Bootstrap the repo-local .NET SDK with
+- [x] [P0-T9] Bootstrap the repo-local .NET SDK with
       `pwsh -NoProfile -File scripts/vscode/Install-RepoDotNetSdk.ps1` and write
       `evidence/baseline/p0-t9-sdk-bootstrap.md`. Acceptance: `EXIT_CODE: 0`, and after the run the
       path `.dotnet-sdk/dotnet.exe` exists (record the result of `Test-Path .dotnet-sdk/dotnet.exe` as
@@ -512,7 +525,7 @@ no downstream artifact inherits a wrong figure.
       `BOOTSTRAP_FAILED:`, stop, and report to the orchestrator; do not proceed to the next task and
       do not attempt a repair, because no toolchain command in this plan can run without the
       repo-local SDK.
-- [ ] [P0-T10] Restore the pinned CSharpier tool with
+- [x] [P0-T10] Restore the pinned CSharpier tool with
       `pwsh -NoProfile -Command 'dotnet tool restore; "EXIT_CODE=$LASTEXITCODE"'` and write
       `evidence/baseline/p0-t10-dotnet-tool-restore.md`. The manifest is `dotnet-tools.json` at the
       worktree root and pins `csharpier` `1.2.6`. Acceptance: `EXIT_CODE: 0`, and the captured stdout
@@ -523,7 +536,7 @@ no downstream artifact inherits a wrong figure.
       error, which P0-T12 records. If the exit code is non-zero, record the captured output under a
       section headed `BOOTSTRAP_FAILED:`, stop, and report to the orchestrator; do not proceed to the
       next task and do not attempt a repair.
-- [ ] [P0-T11] Restore NuGet packages with
+- [x] [P0-T11] Restore NuGet packages with
       `pwsh -NoProfile -File scripts/vscode/Invoke-Restore.ps1` and write
       `evidence/baseline/p0-t11-nuget-restore.md`. This script resolves MSBuild through vswhere and
       runs `/t:Restore /p:RestorePackagesConfig=true`; it does not rewrite any `.csproj` HintPath.
@@ -533,7 +546,7 @@ no downstream artifact inherits a wrong figure.
       orchestrator; do not proceed to the next task and do not attempt a repair, because an
       unrestored package graph produces CS0006 reference errors that are indistinguishable from real
       analyzer findings.
-- [ ] [P0-T12] Capture the baseline format state **read-only** with
+- [x] [P0-T12] Capture the baseline format state **read-only** with
       `pwsh -NoProfile -Command 'dotnet tool run csharpier check .; "EXIT_CODE=$LASTEXITCODE"'` and
       write `evidence/baseline/p0-t12-csharpier-check.md`. The write-mode `format` command must not be
       run in Phase 0: repairing pre-existing drift before the baseline would either waive it silently
@@ -551,19 +564,38 @@ no downstream artifact inherits a wrong figure.
       P8-T30's porcelain span over the nine audited trees would then be non-empty and that task
       unsatisfiable. Repairing pre-existing drift in trees this plan does not own is outside this
       plan's scope and requires an explicit orchestrator decision.
-- [ ] [P0-T13] Capture the baseline analyzer build. Run
+- [x] [P0-T13] Complete the baseline analyzer build after the recorded fresh-worktree analyzer
+      bootstrap recovery. Preserve the existing first-attempt evidence file
+      `evidence/baseline/p0-t13-msbuild-analyzers.md` unchanged: its `EXIT_CODE: 1` and
+      `BASELINE_BUILD_RED:` section record only `CS0006` diagnostics for the absent
+      `Meziantou.Analyzer.3.0.156` and `Roslynator.Analyzers.4.16.0` analyzer DLLs. Only when that
+      exact evidence condition holds, run `nuget install Meziantou.Analyzer -Version 3.0.156
+      -OutputDirectory packages` and `nuget install Roslynator.Analyzers -Version 4.16.0
+      -OutputDirectory packages`; both commands must exit `0`. This is a fresh-worktree bootstrap of
+      ignored `packages` contents only: do not edit any `.csproj`, `packages.config`, workflow, or
+      NuGet-policy file, and do not integrate `origin/main`. Record the two commands and their exit
+      codes in `evidence/baseline/p0-t13-analyzer-backfill.md`. Before the rebuild retry, enumerate
+      every `<Analyzer Include>` reference in every `*.csproj` whose path contains either of those
+      two exact package versions, resolve each path from its project directory, and record every
+      resolved analyzer DLL path and `Test-Path` result in that same artifact; every result must be
+      `True`. Then run `git status --porcelain -- '*.csproj' '*/packages.config' 'packages'`; it must
+      exit `0` with empty output, which is the proof that the bootstrap changed no tracked project or
+      package-policy surface. Immediately after those checks, retry the following existing baseline
+      analyzer command verbatim and write the retry result to
+      `evidence/baseline/p0-t13-msbuild-analyzers.retry.md`:
       `pwsh -NoProfile -Command '$vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"; $msbuildExe = & $vswhere -latest -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe" | Select-Object -First 1; & $msbuildExe TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true; "EXIT_CODE=$LASTEXITCODE"'`
-      and write `evidence/baseline/p0-t13-msbuild-analyzers.md`. Acceptance: `EXIT_CODE: 0`; the
-      artifact records the MSBuild final status line and the `Warning(s)` and `Error(s)` counts as
-      printed; the captured output contains the literal `(Rebuild target(s))` at least once, which is
-      the per-project completion line MSBuild emits for the Rebuild target and is therefore the
-      discriminator against a skipped incremental Build; and the recorded `Command:` line does not
-      contain the solution-wide nullable opt-in property — record this as
-      `NULLABLE_OPT_IN_PROPERTY: absent`; do not spell the token in the artifact. If the exit code is
-      non-zero, record the full diagnostic list under a section headed `BASELINE_BUILD_RED:`, stop,
-      and report to the orchestrator; do not proceed to the next task and do not attempt a repair,
-      because a pre-existing red baseline is outside this plan's scope.
-- [ ] [P0-T14] Capture the baseline nullable build. Run
+      Acceptance: the first-attempt evidence remains unchanged; both NuGet commands and the status
+      command exit `0`; every referenced analyzer DLL is present; the status output is empty; and
+      the retry artifact records `EXIT_CODE: 0`, the MSBuild final status line, the `Warning(s)` and
+      `Error(s)` counts as printed, and `(Rebuild target(s))` at least once. The retry artifact's
+      `Command:` line must contain `/t:Rebuild` and `EnableNETAnalyzers=true` and
+      `EnforceCodeStyleInBuild=true`, and must not contain the solution-wide nullable opt-in property
+      — record this as `NULLABLE_OPT_IN_PROPERTY: absent`; do not spell the token in the artifact. If
+      the evidence condition does not hold, either NuGet command fails, a referenced analyzer DLL is
+      absent, the status output is non-empty, or the retry exits non-zero, record the applicable
+      output under `BOOTSTRAP_FAILED:` or `BASELINE_BUILD_RED:` in the new recovery artifact, stop,
+      and report to the orchestrator; do not proceed to P0-T14 or attempt another repair.
+- [x] [P0-T14] Capture the baseline nullable build. Run
       `pwsh -NoProfile -Command '$vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"; $msbuildExe = & $vswhere -latest -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe" | Select-Object -First 1; & $msbuildExe TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true; "EXIT_CODE=$LASTEXITCODE"'`
       and write `evidence/baseline/p0-t14-msbuild-nullable.md`. Acceptance: `EXIT_CODE: 0`; the
       captured output contains `(Rebuild target(s))`; and the recorded `Command:` line contains
@@ -581,19 +613,18 @@ no downstream artifact inherits a wrong figure.
       failing test's fully qualified name (empty when the run passes). The file
       `coverage/p0-t15-baseline.cobertura.xml` exists after the run. `Output Summary:` additionally
       carries the six numeric `/coverage` attribute values and the derived line and branch
-      percentages that P0-T16 reads, copied in once P0-T16 has produced them, because the plan
-      contract requires the baseline test-step artifact itself to carry the numeric coverage
-      headline. The execution order for the pair is explicit and is not a deadlock: run this task's
-      command and write everything except the copied-back headline, leave P0-T15 **unchecked**,
-      execute P0-T16 in full, then return to P0-T15, write the copy-back into `Output Summary:`, and
-      check both tasks off together.
+      percentages. As a read-only P0-T15 substep, run the P0-T16 coverage-headline command against
+      `coverage\p0-t15-baseline.cobertura.xml`, record those values in this P0-T15 `Output Summary:`,
+      verify P0-T15, and check P0-T15 off before starting P0-T16. P0-T16 does not modify P0-T15.
 - [ ] [P0-T16] Read the baseline numeric coverage headline. Run
       `pwsh -NoProfile -Command '. ".\scripts\vscode\Invoke-MSTestWithCoverage.Helpers.ps1"; $raw = Get-Content -LiteralPath ".\coverage\p0-t15-baseline.cobertura.xml" -Raw -Encoding UTF8; [xml]$d = ConvertTo-KoverageCoberturaXml -XmlContent $raw -RepoRoot (Get-Location).Path; $c = $d.SelectSingleNode("/coverage"); foreach ($a in @("line-rate","branch-rate","lines-covered","lines-valid","branches-covered","branches-valid")) { $a + "=" + $c.GetAttribute($a) }'`
       and write `evidence/baseline/p0-t16-coverage-headline.md`. Acceptance: `EXIT_CODE: 0`, and
       `Output Summary:` records all six numeric values, plus the derived baseline line-coverage
       percentage computed as `line-rate` multiplied by 100 and the derived branch percentage computed
-      as `branch-rate` multiplied by 100. These are the baseline figures the Phase 7 delta task
-      compares against.
+      as `branch-rate` multiplied by 100. Confirm that all six attributes and both derived
+      percentages equal the values already recorded in
+      `evidence/baseline/p0-t15-mstest-coverage.md`; P0-T16 does not modify that artifact or any
+      prior checklist state. These are the baseline figures the Phase 7 delta task compares against.
 - [ ] [P0-T17] Record the baseline uncovered-line sets for the two production files this plan changes.
       Run
       `pwsh -NoProfile -Command '. ".\scripts\vscode\Invoke-MSTestWithCoverage.Helpers.ps1"; $raw = Get-Content -LiteralPath ".\coverage\p0-t15-baseline.cobertura.xml" -Raw -Encoding UTF8; [xml]$d = ConvertTo-KoverageCoberturaXml -XmlContent $raw -RepoRoot (Get-Location).Path; foreach ($f in @("QuickFiler\Controllers\BreadcrumbBridgeRouter.Selection.cs","QuickFiler\Controllers\EfcDataModel.cs")) { $u = @(); foreach ($c in $d.SelectNodes("//class")) { if ($c.GetAttribute("filename") -eq $f) { foreach ($l in $c.SelectNodes("./lines/line")) { if ([int]$l.GetAttribute("hits") -eq 0) { $u += [int]$l.GetAttribute("number") } } } }; $f + " uncovered=" + (($u | Sort-Object -Unique) -join ",") } '`
@@ -909,6 +940,12 @@ redirect the assignment. Reversing any of those orders produces a build that doe
       set, record `BASELINE PROTECTS NOTHING`, stop, and report to the orchestrator: the invariant this
       task exists to protect would already be red before this plan ran, and no result here would
       distinguish a regression from that pre-existing state.
+
+**Progress-commit boundary after task 35.** Stop after checking off `[P2-T10]` and return
+`PROGRESS_COMMIT_REQUIRED: P0-T1..P2-T10`. Do not begin `[P2-T11]` until the orchestrator has used
+canonical commit context and the routed commit-steward profile, then recorded the completed interval's
+commit SHA in the canonical checkpoint.
+
 - [ ] [P2-T11] [expect-fail] Run the new router regression tests before the fix. Run
       `pwsh -NoProfile -Command '$vswhere = Join-Path ${env:ProgramFiles(x86)} "Microsoft Visual Studio\Installer\vswhere.exe"; $vstest = & $vswhere -latest -products * -find "Common7\IDE\Extensions\TestPlatform\vstest.console.exe" | Select-Object -First 1; $asm = Join-Path (Get-Location).Path "QuickFiler.Test\bin\Debug\QuickFiler.Test.dll"; & $vstest $asm /InIsolation "/TestCaseFilter:FullyQualifiedName~BreadcrumbBridgeRouterIssue637Tests&TestCategory!=LiveOutlook" /Logger:trx "/ResultsDirectory:coverage\testresults\p2-t11"; "EXIT_CODE=$LASTEXITCODE"'`
       and write `evidence/regression-testing/p2-t11-router-tests-red.md` with `ExpectedExitCode: 1`.
@@ -1237,13 +1274,15 @@ redirect the assignment. Reversing any of those orders produces a build that doe
       this task's own artifact is required for the same reason P7-T10 excludes its own: this artifact
       records its own two `Command:` lines, and those commands' patterns are the strings being searched
       for. No other evidence file of this feature is excluded.
-- [ ] [P6-T6] Commit changes A through D. Run
-      `git add QuickFiler QuickFiler.Test docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`
-      then
-      `git commit -m "fix(637): normalize the breadcrumb producer and the string filing overload"` and
-      write `evidence/other/p6-t6-commit.md`. A commit is required here because every Phase 7 and
-      Phase 8 gate is anchored to `0eda184ca0009bc79ac9b7146897270c17c095fa..HEAD`, and an anchored diff
-      reports nothing for changes that are not yet committed. Acceptance: `EXIT_CODE: 0`;
+- [ ] [P6-T6] Prepare the changes-A-through-D HEAD-materialization boundary. Write
+      `evidence/other/p6-t6-commit.md`, check off this task, and return
+      `PROGRESS_COMMIT_REQUIRED: P2-T11..P6-T6` without invoking `git commit`. The orchestrator must
+      stage `QuickFiler`, `QuickFiler.Test`, and this feature folder; collect canonical commit context;
+      obtain the message from the routed commit-steward profile; create the commit; and record its SHA
+      before resuming Phase 7. This intermediate commit is required because every Phase 7 and Phase 8
+      gate is anchored to `0eda184ca0009bc79ac9b7146897270c17c095fa..HEAD`, and an anchored diff
+      reports nothing for changes that are not yet committed. Acceptance after the orchestrator resumes
+      execution: the checkpoint records the interval and a non-empty commit SHA;
       `git status --porcelain -- QuickFiler QuickFiler.Test` produces no output; and
       `git diff --name-only 0eda184ca0009bc79ac9b7146897270c17c095fa..HEAD -- QuickFiler QuickFiler.Test`
       lists exactly these ten paths and no others:
@@ -1292,12 +1331,14 @@ again from the start.
       stdout is recorded verbatim. The exit code is the gate here rather than any summary wording,
       because `check` is read-only and returns non-zero exactly when some file would be reformatted;
       the write-mode discrimination that a read-only command cannot supply is provided by P7-T1's
-      before-and-after porcelain pair. Then, in this same task, run `git add QuickFiler QuickFiler.Test`
-      and `git commit -m "style(637): apply csharpier formatting before the coverage gates"`, so that
+      before-and-after porcelain pair. Record the boundary-ready state in
+      `evidence/qa-gates/p7-t2-csharpier-check.md`, check off this task, and return
+      `PROGRESS_COMMIT_REQUIRED: P7-T1..P7-T2` without invoking `git commit`. The orchestrator must
+      stage the in-scope paths, collect canonical commit context, obtain the message from the routed
+      commit-steward profile, create the commit, and record its SHA before P7-T3 begins. This ensures
       every subsequent `0eda184ca0009bc79ac9b7146897270c17c095fa..HEAD` diff describes the same file
-      contents the P7-T5 build measured. If nothing changed, record that the commit was a no-op and
-      that the tree already matched `HEAD`. Record the commit result in
-      `evidence/qa-gates/p7-t2-csharpier-check.md`.
+      contents the P7-T5 build measures. If CSharpier changed no source, the evidence and plan check-off
+      still make the boundary non-empty; the artifact records that the source already matched `HEAD`.
 - [ ] [P7-T3] Analyzers. Run the P0-T13 command verbatim and write
       `evidence/qa-gates/p7-t3-msbuild-analyzers.md`. Acceptance: `EXIT_CODE: 0`; the output contains
       `(Rebuild target(s))`; the `Error(s)` count is 0; and the recorded `Command:` line contains
@@ -1330,19 +1371,18 @@ again from the start.
       threshold assertion at `:341` precedes the post-processed write-back at `:343`, and P7-T6 and
       P7-T7 re-apply `ConvertTo-KoverageCoberturaXml` in memory and are unaffected. When that literal
       is absent, the artifact records `COVERAGE_FLOOR_THROW: no` and `EXIT_CODE: 0` is required
-      whenever `BASELINE_FAILURE_SET` is empty.
-      `Output Summary:` additionally carries the six numeric `/coverage` attribute values and the
-      derived line and branch percentages that P7-T6 reads, copied in once P7-T6 has produced them,
-      because the plan contract requires the final-QC test-step artifact itself to carry the numeric
-      coverage headline. The execution order for the pair is explicit and is not a deadlock: run this
-      task's command and write everything except the copied-back headline, leave P7-T5 **unchecked**,
-      execute P7-T6 in full, then return to P7-T5, write the copy-back into `Output Summary:`, and
-      check both tasks off together.
+      whenever `BASELINE_FAILURE_SET` is empty. `Output Summary:` additionally carries the six
+      numeric `/coverage` attribute values and the derived line and branch percentages. As a
+      read-only P7-T5 substep, run the P7-T6 coverage-headline command against
+      `coverage\p7-t5-postchange.cobertura.xml`, record those values in this P7-T5 `Output Summary:`,
+      verify P7-T5, and check P7-T5 off before starting P7-T6. P7-T6 does not modify P7-T5.
 - [ ] [P7-T6] Read the post-change numeric coverage headline. Run the P0-T16 command with the input
       path changed to `.\coverage\p7-t5-postchange.cobertura.xml` and write
       `evidence/qa-gates/p7-t6-coverage-headline.md`. Acceptance: `EXIT_CODE: 0`, and `Output Summary:`
       records all six numeric attribute values plus the derived line-coverage percentage and branch
-      percentage.
+      percentage. Confirm that all six attributes and both derived percentages equal the values
+      already recorded in `evidence/qa-gates/p7-t5-mstest-coverage.md`; P7-T6 does not modify that
+      artifact or any prior checklist state.
 - [ ] [P7-T7] Verify changed-line coverage. Run the P0-T17 command with the input path changed to
       `.\coverage\p7-t5-postchange.cobertura.xml` and with its file list extended to the three
       production files this plan touches — `QuickFiler\Controllers\BreadcrumbBridgeRouter.Selection.cs`,
@@ -1403,27 +1443,30 @@ again from the start.
       `evidence/baseline/p0-t16-coverage-headline.md`; post-change coverage, copied from
       `evidence/qa-gates/p7-t6-coverage-headline.md`; and changed and new-code coverage, copied from
       `evidence/qa-gates/p7-t7-changed-line-coverage.md`. The artifact also states the coverage-floor
-      authority resolution this plan applies, in these terms: `CLAUDE.md` states a repository-wide floor
-      of at or above 80 percent line coverage on the testable denominator, together with a
-      maintainer-ratified COM/VSTO/WinForms exemption; `.claude/rules/general-unit-test.md` states 85
-      percent line and 75 percent branch; `policy-compliance-order` ranks `CLAUDE.md` first and
-      `.claude/rules/general-unit-test.md` third, so `CLAUDE.md`'s 80 percent floor is the binding
-      repository-wide gate here and the 85/75 figures are the stricter non-binding target, superseded
-      where they conflict. The binding figure is also the one the runner enforces, at
+      authority resolution this plan applies, in these terms: the General Unit Test Policy in
+      `AGENTS.md` and `.agents/skills/csharp/SKILL.md` both require repository-wide line coverage at or
+      above 80 percent, new modules, classes and methods to target at least 90 percent coverage, and no
+      coverage regression on changed lines. The binding repository-wide figure is also the one the
+      runner enforces, at
       `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1:487`, so the gate this task applies and the
       gate the tooling applies are the same number. Acceptance: all three sections carry numeric
       values and none carries a placeholder; the post-change line-coverage percentage is at or above
-      **80**, and that clause is blocking; the artifact carries the authority statement above with its
-      two document citations; the artifact additionally records the post-change line and branch
-      percentages against the 85 percent and 75 percent figures as an explicitly **non-blocking**
-      observation, labelled `NON-BLOCKING TARGET:`, so the gap stays visible without gating the work;
-      and the changed-line section records an empty uncovered intersection. One exception applies to
+      **80**, and that clause is blocking; the artifact carries the authority statement above with both
+      Codex policy citations; the new helper meets the at-least-90-percent target through P7-T7's
+      stronger requirement that every emitted Cobertura sequence point has non-zero hits; and the
+      changed-line section records an empty uncovered intersection. One exception applies to
       the blocking clause and to nothing else: if the baseline figure recorded in
       `evidence/baseline/p0-t16-coverage-headline.md` is itself already below 80, the artifact records
       `BASELINE BELOW FLOOR`, reports that pre-existing condition to the orchestrator, and the binding
       requirement becomes that the post-change figure is at or above the recorded baseline figure. The
       change-scoped gates — no changed line loses coverage, and every line of the new helper is covered
       — remain blocking in every case, including under that exception.
+
+**Progress-commit boundary after task 70.** Stop after checking off `[P7-T8]` and return
+`PROGRESS_COMMIT_REQUIRED: P2-T11..P7-T8`. Do not begin `[P7-T9]` until the orchestrator has used
+canonical commit context and the routed commit-steward profile, then recorded the boundary SHA and all
+intermediate HEAD-materialization SHAs within this task interval in the canonical checkpoint.
+
 - [ ] [P7-T9] File-size audit, run after the formatter rather than before it, because CSharpier can
       change a file's line count. Run
       `pwsh -NoProfile -Command 'foreach ($p in @("QuickFiler\Controllers\EfcDataModel.cs","QuickFiler\Controllers\EfcDataModel.FilingStem.cs","QuickFiler\Controllers\BreadcrumbBridgeRouter.Selection.cs","QuickFiler\Controllers\EfcSelectionGuard.cs","QuickFiler.Test\Controllers\BreadcrumbBridgeRouterIssue439Tests.cs","QuickFiler.Test\Controllers\BreadcrumbBridgeRouterIssue637Tests.cs","QuickFiler.Test\Controllers\EfcDataModelIssue614Tests.cs","QuickFiler.Test\Controllers\EfcSelectionGuardTests.cs")) { $p + "=" + (Get-Content -LiteralPath $p).Count }'`
@@ -1504,19 +1547,19 @@ again from the start.
       artifact and `evidence/other/p6-t5-evidence-redaction.md`, which P6-T5 wrote earlier in the same
       feature tree. Omitting the second exclusion would make this gate unsatisfiable. No other evidence
       file of this feature is excluded.
-- [ ] [P7-T12] Commit the QA evidence and any residual formatting result. Run
-      `git add QuickFiler QuickFiler.Test docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`
-      then
-      `git commit -m "chore(637): final QC toolchain pass and coverage evidence"` and write
-      `evidence/other/p7-t12-commit.md`. Acceptance: `EXIT_CODE: 0`, and
-      `git status --porcelain -- QuickFiler QuickFiler.Test` produces no output; and
+- [ ] [P7-T12] Prepare the QA-evidence HEAD-materialization boundary. Write
+      `evidence/other/p7-t12-commit.md`, check off this task, and return
+      `PROGRESS_COMMIT_REQUIRED: P7-T9..P7-T12` without invoking `git commit`. The orchestrator must
+      stage `QuickFiler`, `QuickFiler.Test`, and this feature folder; collect canonical commit context;
+      obtain the message from the routed commit-steward profile; create the commit; and record its SHA
+      before Phase 8 begins. Acceptance after execution resumes: the checkpoint records the interval
+      and a non-empty commit SHA; `git status --porcelain -- QuickFiler QuickFiler.Test` produces no
+      output; and
       `git status --porcelain -- docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`
       lists at most this task's own evidence
       artifact and this plan file, with every other feature-folder path already in `HEAD`. Record
-      both outputs verbatim. This task's commit carries the Phase 7 evidence artifacts; the
-      formatting result itself is normally already in `HEAD` because P7-T2 committed it, so a
-      source-only no-op here is expected rather than exceptional. If the commit fails because nothing
-      changed at all, record that outcome and both `git status` results.
+      both outputs verbatim. The boundary commit carries the remaining Phase 7 evidence artifacts; the
+      formatting result itself is already in `HEAD` through the P7-T2 boundary.
 
 ### Phase 8 — Acceptance-criteria reconciliation
 
@@ -1727,10 +1770,9 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       against the pre-format range `evidence/regression-testing/p4-t2-helper-shape.md` recorded, with
       P7-T7's record of whether the two ranges differ cited here; the artifact
       `evidence/qa-gates/p7-t8-coverage-delta.md` records either a post-change line-coverage
-      percentage at or above 80 — the binding repository-wide floor under the authority resolution
-      P7-T8 states, in which `policy-compliance-order` ranks `CLAUDE.md` above
-      `.claude/rules/general-unit-test.md`, so the latter's 85 and 75 figures are the non-binding
-      target and are recorded as such — or an explicit `BASELINE BELOW FLOOR` finding with the
+      percentage at or above 80 — the binding repository-wide floor in `AGENTS.md` and
+      `.agents/skills/csharp/SKILL.md` under the authority resolution P7-T8 states — or an explicit
+      `BASELINE BELOW FLOOR` finding with the
       post-change figure at or above the recorded baseline; the changed-line intersection is empty for
       all three production files, including the new
       `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`; the `IsFullOutlookPath` conditional in the
@@ -1779,6 +1821,12 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
       `evidence/qa-gates/p8-t31-ac-reconciliation.md`. Acceptance: both constructions report 30 checked
       and 0 unchecked; both agree; and the artifact records that an unscoped count of every `- [x]` and
       `- [ ]` line in `spec.md` would over-report by exactly 5, naming those five line numbers.
+
+**Progress-commit boundary after task 105.** Stop after checking off `[P8-T31]` and return
+`PROGRESS_COMMIT_REQUIRED: P7-T9..P8-T31`. Do not begin `[P8-T32]` until the orchestrator has used
+canonical commit context and the routed commit-steward profile, then recorded the boundary SHA and the
+P7-T12 intermediate SHA within this task interval in the canonical checkpoint.
+
 - [ ] [P8-T32] Record the spec-versus-tree reconciliation in
       `evidence/other/p8-t32-spec-tree-discrepancies.md`. `spec.md` was authored against the tree
       before issue #638 merged, and a prior revision of `spec.md` already applied the acceptance-
@@ -1852,16 +1900,16 @@ is checked off before its cited evidence exists. Exactly one criterion is checke
 
       The acceptance-criteria count in `spec.md` is unchanged at 30: this plan adds, removes and
       splits no criterion, and edits no criterion's text.
-- [ ] [P8-T33] Final commit and clean tree. Run
-      `git add docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`
-      then
-      `git commit -m "docs(637): reconcile acceptance criteria and record final evidence"` and write
-      `evidence/other/p8-t33-final-commit.md`. Acceptance: `EXIT_CODE: 0`, and
-      `git status --porcelain -- QuickFiler QuickFiler.Test` produces no output; and
+- [ ] [P8-T33] Finalise the last partial interval without invoking `git commit`. Write
+      `evidence/other/p8-t33-final-commit.md`, check off this task, verify that
+      `git status --porcelain -- QuickFiler QuickFiler.Test` produces no output, record
       `git status --porcelain -- docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637`
-      lists at most this task's own evidence
-      artifact and this plan file, with every other feature-folder path already in `HEAD`. Record
-      both outputs verbatim. The pathspec scoping is required because `.claude/` is tracked and
+      verbatim, and return `PROGRESS_COMMIT_REQUIRED: P8-T32..P8-T33`. Before review, the orchestrator
+      must stage this feature folder, collect canonical commit context, obtain the message from the
+      routed commit-steward profile, create the commit, record its SHA for the final partial interval,
+      and verify both status spans are empty. Before that boundary commit, the feature-folder status
+      may list only this task's evidence artifact and this plan file, with every other feature-folder
+      path already in `HEAD`. The pathspec scoping is required because `.claude/` is tracked and
       carries unrelated in-flight modifications that this plan must not commit, and because sibling
       feature folders under `docs/features/active` are owned by other work. This task runs long after
       planning, and the tracking state of a sibling folder under that parent directory is
