@@ -1478,7 +1478,7 @@ again from the start.
 canonical commit context and the routed commit-steward profile, then recorded the boundary SHA and all
 intermediate HEAD-materialization SHAs within this task interval in the canonical checkpoint.
 
-- [ ] [P7-T9] File-size audit, run after the formatter rather than before it, because CSharpier can
+- [x] [P7-T9] File-size audit, run after the formatter rather than before it, because CSharpier can
       change a file's line count. Run
       `pwsh -NoProfile -Command 'foreach ($p in @("QuickFiler\Controllers\EfcDataModel.cs","QuickFiler\Controllers\EfcDataModel.FilingStem.cs","QuickFiler\Controllers\BreadcrumbBridgeRouter.Selection.cs","QuickFiler\Controllers\EfcSelectionGuard.cs","QuickFiler.Test\Controllers\BreadcrumbBridgeRouterIssue439Tests.cs","QuickFiler.Test\Controllers\BreadcrumbBridgeRouterIssue637Tests.cs","QuickFiler.Test\Controllers\EfcDataModelIssue614Tests.cs","QuickFiler.Test\Controllers\EfcSelectionGuardTests.cs")) { $p + "=" + (Get-Content -LiteralPath $p).Count }'`
       and write `evidence/qa-gates/p7-t9-file-sizes.md`. Acceptance: `EfcDataModel.cs` is at most 500,
@@ -1492,7 +1492,7 @@ intermediate HEAD-materialization SHAs within this task interval in the canonica
       `BreadcrumbBridgeRouter.Selection.cs` is at most 500. The upper bounds replace exact
       equalities because this task runs after a write-mode formatter that can reduce a line count,
       and AC25 requires only that these files not grow.
-- [ ] [P7-T10] Toolchain non-vacuity audit. Write `evidence/qa-gates/p7-t10-toolchain-audit.md`
+- [x] [P7-T10] Toolchain non-vacuity audit. Write `evidence/qa-gates/p7-t10-toolchain-audit.md`
       enumerating the four final-QC command steps in order with their recorded `Command:` lines quoted
       verbatim. Acceptance: the format step is `dotnet tool run csharpier format .` invoked through
       `dotnet tool run` and not through a globally installed binary; both MSBuild `Command:` lines
@@ -1534,7 +1534,7 @@ intermediate HEAD-materialization SHAs within this task interval in the canonica
       `dotnet-coverage --output-format cobertura` rather than by `/EnableCodeCoverage`, which is the
       repository's standard runner and the local analogue of
       `.github/workflows/_mstest-coverage.yml:83`. The substitutions are recorded, not resolved.
-- [ ] [P7-T11] Redact host identity from the Phase 7 evidence artifacts, then prove it. Apply the
+- [x] [P7-T11] Redact host identity from the Phase 7 evidence artifacts, then prove it. Apply the
       "Evidence transcript redaction" convention to every file written under
       `docs/features/active/2026-08-26-breadcrumb-selectrow-emits-rooted-path-leaving-d1-half-closed-637/evidence/`
       since P6-T5 ran: replace every occurrence of the absolute worktree path with the literal
@@ -1558,7 +1558,7 @@ intermediate HEAD-materialization SHAs within this task interval in the canonica
       artifact and `evidence/other/p6-t5-evidence-redaction.md`, which P6-T5 wrote earlier in the same
       feature tree. Omitting the second exclusion would make this gate unsatisfiable. No other evidence
       file of this feature is excluded.
-- [ ] [P7-T12] Prepare the QA-evidence HEAD-materialization boundary. Write
+- [x] [P7-T12] Prepare the QA-evidence HEAD-materialization boundary. Write
       `evidence/other/p7-t12-commit.md`, check off this task, and return
       `PROGRESS_COMMIT_REQUIRED: P7-T9..P7-T12` without invoking `git commit`. The orchestrator must
       stage `QuickFiler`, `QuickFiler.Test`, and this feature folder; collect canonical commit context;
