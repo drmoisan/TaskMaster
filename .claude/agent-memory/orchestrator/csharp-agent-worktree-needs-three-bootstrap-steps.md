@@ -18,7 +18,16 @@ blocking, because every `EXIT_CODE: 0` acceptance downstream is unreachable with
    fires at `BeforeTargets="PrepareForBuild"`, so msbuild hard-fails. Fix: `nuget restore TaskMaster.sln`
    (what CI does at `.github/workflows/_build-analyzers.yml:45`). Restored content is ignored by
    `.gitignore:191` (`**/[Pp]ackages/*`) — NOT by line 349, which is blank.
-3. **A clean restore still breaks the build.** All 16 first-party `.csproj` files carry UNCONDITIONAL
+3. **RESOLVED UPSTREAM 2026-08-31 (issue #647) — verify before acting on it.** The skew below is gone
+   on current main: every `.csproj` `<Analyzer Include>` and every `packages.config` now agree on
+   Meziantou.Analyzer **3.0.194** and Roslynator.Analyzers **5.0.0**. A plain
+   `pwsh -NoProfile -File scripts/vscode/Invoke-Restore.ps1` was sufficient and no hand-installed
+   analyzer package was needed. Re-measure with two greps (csproj analyzer paths vs `packages.config`
+   versions) before you plan around this item; steps 1 and 2 above still hold on a fresh worktree.
+   The historical description follows, because the failure mode can return with any Dependabot bump
+   that touches `packages.config` without touching the hand-authored Issue-#181 analyzer items.
+
+   All 16 first-party `.csproj` files carried UNCONDITIONAL
    `<Analyzer Include>` items naming `Meziantou.Analyzer.3.0.156` and `Roslynator.Analyzers.4.16.0`,
    while all 16 `packages.config` pin `3.0.174` and `4.16.1`. Dependabot `f8e22af7` updated only the
    `Condition`-guarded `<Import>`/`<Error>` lines and `packages.config`, missing the hand-authored
