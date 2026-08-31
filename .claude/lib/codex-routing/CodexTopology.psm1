@@ -47,9 +47,11 @@
 
     The function is pure: it reads no file, starts no process, and never mutates
     its input.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 # The three permitted execution contexts, the sorted tuple rendering the Python
 # message interpolates, and the two contexts that mark epic child work.

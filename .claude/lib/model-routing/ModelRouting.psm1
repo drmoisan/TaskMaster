@@ -18,9 +18,11 @@
     model_budget) by a static config-parity Pester test, and the Python modules
     remain the validator's authoritative reference. This module is one half of a
     two-language mirror; it never imports validator logic.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 # The fixed complexity-band vocabulary, ordered from lowest to highest rigor.
 # The array order defines "higher" and "lower" band comparisons used by the

@@ -17,6 +17,7 @@ tools:
   - "Bash(bash .claude/lib/bash/compute-cohorts.sh*)"
   - "Bash(bash .claude/lib/bash/compute-concurrency-batches.sh*)"
   - "Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)"
+  - "Bash(bash .claude/lib/bash/report-lane-assertion.sh*)"
   - "mcp__drm-copilot__validate_orchestration_artifacts"
 skills:
   - policy-compliance-order
@@ -148,19 +149,24 @@ plan a parallel run.
 relation come from `.claude/lib/blast-radius/BlastRadius.psm1`:
 
 ```powershell
-Import-Module .claude/lib/blast-radius/BlastRadius.psm1 -Force
+$repoRoot = git rev-parse --show-toplevel
+Import-Module (Join-Path $repoRoot '.claude/lib/blast-radius/BlastRadius.psm1') -Force -ErrorAction Stop
 ```
+
+The default PowerShell 5.1 execution policy blocks `Import-Module` of a `.psm1` file, so `pwsh` is
+mandatory here.
 
 The facade exports `Get-PlanPaths`, `Get-BlastRadius`, `Get-BlastRadiusFromObservedPaths`,
 `Test-BlastRadius`, and `Test-BlastRadiusConflict`. Its truth table is
 `config/blast-radius.json`, which push-down publishes alongside `.claude`.
 
 **Cohort seeding and concurrency batching — bash entry points.** The bash library is granted as
-three entry-point-specific allowlist entries — `"Bash(bash .claude/lib/bash/compute-cohorts.sh*)"`,
-`"Bash(bash .claude/lib/bash/compute-concurrency-batches.sh*)"`, and
-`"Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)"` — one per command-line entry point.
-The six sourceable libraries carry no grant because they are never invoked directly. The two
-commands below require the first two of those entries:
+four entry-point-specific allowlist entries — `"Bash(bash .claude/lib/bash/compute-cohorts.sh*)"`,
+`"Bash(bash .claude/lib/bash/compute-concurrency-batches.sh*)"`,
+`"Bash(bash .claude/lib/bash/validate-parallel-manifest.sh*)"`, and the entry for
+`.claude/lib/bash/report-lane-assertion.sh` declared in this persona's `tools:` list — one per
+command-line entry point. The seven sourceable libraries carry no grant because they are never
+invoked directly. The two commands below require the first two of those entries:
 
 ```bash
 bash .claude/lib/bash/compute-cohorts.sh --keys "<k1> <k2> ..." --edges "<a>:<b> ..."
@@ -176,6 +182,16 @@ bash .claude/lib/bash/validate-parallel-manifest.sh --print-mode <manifest-path>
 bash .claude/lib/bash/validate-parallel-manifest.sh --print-max-concurrency <manifest-path>
 ```
 
+**Lane assertion — bash entry point.** The entry-point grant for
+`.claude/lib/bash/report-lane-assertion.sh` covers:
+
+```bash
+bash .claude/lib/bash/report-lane-assertion.sh --manifest <manifest-path> --edges "<a>:<b> ..."
+```
+
+The diagnostic is advisory only. It never blocks the run, never modifies or suppresses a derived
+edge, never feeds cohort computation, and always exits 0, including when it reports disagreements.
+
 **Python modules are the repository authority, not the runtime path.**
 `scripts/dev_tools/compute_blast_radius.py`, `scripts/dev_tools/parallel_cohort_computation.py`,
 and `scripts/dev_tools/parallel_manifest_contract.py` remain the reference implementations that the
@@ -183,4 +199,5 @@ ported libraries are asserted against by shared fixture corpora. Do not invoke t
 destination-runtime path; cite them for their contract.
 
 The `"Bash(poetry run *)"` allowlist entry is retained for the repository-local paths that still
-need it — it is not required by any step above.
+need a Python interpreter. The four bash entry points above and the PowerShell blast-radius facade
+run without it, so no destination-runtime step depends on that grant.

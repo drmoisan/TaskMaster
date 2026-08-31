@@ -49,9 +49,11 @@
         throws for any input, because the classifier that calls them runs over
         every inline-code span in a document and a throw would abort an entire
         derivation over one stray span.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 # Placeholder and interpolation markers. A token carrying any of these was
 # written to document a shape, not to name a file, so it can never be a write
