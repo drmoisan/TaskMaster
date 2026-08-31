@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,23 +27,241 @@ namespace UtilitiesCS.Test.HelperClasses
             act.Should().Throw<NotSupportedException>();
         }
 
+        /// <summary>
+        /// A failure raised after the writer opened is terminal: the file is opened in append mode,
+        /// so retrying after a partial flush would duplicate lines. The observable proof that no
+        /// retry occurred is a delay-delegate invocation count of zero.
+        /// </summary>
         [TestMethod]
-        public async Task WriteTextFileAsync_WhenTargetIsLocked_ShouldRetryAndExitWithoutThrowing()
+        public async Task WriteTextFileAsync_WhenWriteFailsAfterOpen_ShouldReturnFalseWithoutRetrying()
         {
-            var (fileName, folderPath) = GetFixtureLocation();
-            var filePath = Path.Combine(folderPath, fileName);
+            // Arrange
+            int midWriteFactoryCalls = 0;
+            int midWriteDelayCalls = 0;
+            using var cts = new CancellationTokenSource();
 
-            using (new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None))
+            // Act
+            bool midWriteResult = await FileIO2.WriteTextFileAsync(
+                "irrelevant.csv",
+                new[] { "alpha" },
+                "irrelevant-folder",
+                cts.Token,
+                writerFactory: _ =>
+                {
+                    midWriteFactoryCalls++;
+                    return new ThrowingOnWriteTextWriter();
+                },
+                delay: (ms, t) =>
+                {
+                    midWriteDelayCalls++;
+                    return Task.CompletedTask;
+                }
+            );
+
+            // Assert
+            midWriteFactoryCalls.Should().Be(1);
+            midWriteDelayCalls.Should().Be(0);
+            midWriteResult.Should().BeFalse();
+        }
+
+        /// <summary>
+        /// Retry exhaustion: every open attempt fails, so the loop consumes its whole 100-attempt
+        /// budget and awaits 99 delays between them. No filesystem access and no wall-clock wait.
+        /// </summary>
+        [TestMethod]
+        public async Task WriteTextFileAsync_WhenEveryOpenAttemptFails_ShouldReturnFalseAfterBudget()
+        {
+            // Arrange
+            int exhaustionFactoryCalls = 0;
+            int exhaustionDelayCalls = 0;
+            using var cts = new CancellationTokenSource();
+
+            // Act
+            bool exhaustionResult = await FileIO2.WriteTextFileAsync(
+                "irrelevant.csv",
+                new[] { "alpha" },
+                "irrelevant-folder",
+                cts.Token,
+                writerFactory: _ =>
+                {
+                    exhaustionFactoryCalls++;
+                    throw new IOException("Simulated open failure.");
+                },
+                delay: (ms, t) =>
+                {
+                    exhaustionDelayCalls++;
+                    return Task.CompletedTask;
+                }
+            );
+
+            // Assert
+            exhaustionResult.Should().BeFalse();
+            exhaustionFactoryCalls.Should().Be(100);
+            exhaustionDelayCalls.Should().Be(99);
+        }
+
+        /// <summary>
+        /// The success path: a transient inability to open resolves within the retry budget, so the
+        /// method reports success and the writer receives every supplied line.
+        /// </summary>
+        [TestMethod]
+        public async Task WriteTextFileAsync_WhenTransientOpenFailureThenSucceeds_ShouldReturnTrueAndWriteAllLines()
+        {
+            // Arrange
+            int transientOpenAttempts = 0;
+            int transientDelayCalls = 0;
+            var sink = new StringWriter();
+            var lines = new[] { "alpha", "beta" };
+            string expectedContent = "alpha" + Environment.NewLine + "beta" + Environment.NewLine;
+            using var cts = new CancellationTokenSource();
+
+            // Act
+            bool transientResult = await FileIO2.WriteTextFileAsync(
+                "irrelevant.csv",
+                lines,
+                "irrelevant-folder",
+                cts.Token,
+                writerFactory: _ =>
+                {
+                    transientOpenAttempts++;
+                    if (transientOpenAttempts <= 3)
+                    {
+                        throw new IOException("Simulated transient open failure.");
+                    }
+                    return sink;
+                },
+                delay: (ms, t) =>
+                {
+                    transientDelayCalls++;
+                    return Task.CompletedTask;
+                }
+            );
+            string transientContent = sink.ToString();
+
+            // Assert
+            transientResult.Should().BeTrue();
+            transientDelayCalls.Should().Be(3);
+            transientContent.Should().Be(expectedContent);
+        }
+
+        /// <summary>
+        /// A token that is already cancelled must be observed before the writer is ever obtained,
+        /// so no file handle is opened on a doomed call.
+        /// </summary>
+        [TestMethod]
+        public async Task WriteTextFileAsync_WhenTokenAlreadyCancelled_ShouldThrowBeforeOpening()
+        {
+            // Arrange
+            int cancelledFactoryCalls = 0;
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            Func<Task> act = () =>
+                FileIO2.WriteTextFileAsync(
+                    "irrelevant.csv",
+                    new[] { "alpha" },
+                    "irrelevant-folder",
+                    cts.Token,
+                    writerFactory: _ =>
+                    {
+                        cancelledFactoryCalls++;
+                        return new StringWriter();
+                    },
+                    delay: (ms, t) => Task.CompletedTask
+                );
+
+            // Act & Assert
+            await act.Should().ThrowAsync<OperationCanceledException>();
+            cancelledFactoryCalls.Should().Be(0);
+        }
+
+        /// <summary>
+        /// Cancellation signalled from inside the retry window is observed by the next iteration's
+        /// cancellation check, so the call abandons promptly instead of consuming the whole budget.
+        /// The delay seam does the cancelling, so no wall-clock wait is involved.
+        /// </summary>
+        [TestMethod]
+        public async Task WriteTextFileAsync_WhenCancelledDuringRetryWindow_ShouldThrowPromptly()
+        {
+            // Arrange
+            int retryCancelFactoryCalls = 0;
+            using var cts = new CancellationTokenSource();
+
+            Func<Task> act = () =>
+                FileIO2.WriteTextFileAsync(
+                    "irrelevant.csv",
+                    new[] { "alpha" },
+                    "irrelevant-folder",
+                    cts.Token,
+                    writerFactory: _ =>
+                    {
+                        retryCancelFactoryCalls++;
+                        throw new IOException("Simulated open failure.");
+                    },
+                    delay: (ms, t) =>
+                    {
+                        cts.Cancel();
+                        return Task.CompletedTask;
+                    }
+                );
+
+            // Act & Assert
+            await act.Should().ThrowAsync<OperationCanceledException>();
+            retryCancelFactoryCalls.Should().Be(1);
+        }
+
+        /// <summary>
+        /// The caller's token must reach the retry delay. Without this the delay is uncancellable
+        /// and a caller supplying a real token is still stalled for the whole retry window.
+        /// </summary>
+        [TestMethod]
+        public async Task WriteTextFileAsync_WhenRetrying_ShouldPassCallerTokenToDelay()
+        {
+            // Arrange
+            int tokenOpenAttempts = 0;
+            var capturedTokens = new List<CancellationToken>();
+            using var cts = new CancellationTokenSource();
+            CancellationToken token = cts.Token;
+
+            // Act
+            await FileIO2.WriteTextFileAsync(
+                "irrelevant.csv",
+                new[] { "alpha" },
+                "irrelevant-folder",
+                token,
+                writerFactory: _ =>
+                {
+                    tokenOpenAttempts++;
+                    if (tokenOpenAttempts <= 2)
+                    {
+                        throw new IOException("Simulated transient open failure.");
+                    }
+                    return new StringWriter();
+                },
+                delay: (ms, t) =>
+                {
+                    capturedTokens.Add(t);
+                    return Task.CompletedTask;
+                }
+            );
+
+            // Assert
+            capturedTokens.Should().HaveCount(2);
+            capturedTokens.Should().OnlyContain(t => t.Equals(token));
+        }
+
+        /// <summary>
+        /// A <see cref="TextWriter"/> that opens successfully and then fails on the first write.
+        /// This is the only way to observe a mid-write failure without external interference,
+        /// because a real StreamWriter cannot be made to fail after opening from inside a test.
+        /// </summary>
+        private sealed class ThrowingOnWriteTextWriter : TextWriter
+        {
+            public override System.Text.Encoding Encoding => System.Text.Encoding.UTF8;
+
+            public override Task WriteLineAsync(string value)
             {
-                Func<Task> act = () =>
-                    FileIO2.WriteTextFileAsync(
-                        fileName,
-                        new[] { "delta" },
-                        folderPath,
-                        CancellationToken.None
-                    );
-
-                await act.Should().NotThrowAsync();
+                throw new IOException("Simulated mid-write failure.");
             }
         }
 

@@ -4,7 +4,7 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-08-29
-- **Status:** Ready for implementation planning
+- **Status:** Implemented; all 21 acceptance criteria verified
 - **Version:** 0.2
 - **Work Mode:** full-bug
 
@@ -561,27 +561,27 @@ Seeded from the issue (retained for traceability):
 
 
 ## Acceptance Criteria
-- [ ] AC1 — In `UtilitiesCS/To Depricate/FileIO2.cs`, the public `WriteTextFileAsync` declares the return type `Task<bool>`, and its parameter names, order, and types (`string filename, string[] strOutput, string folderpath, CancellationToken token`) are unchanged.
-- [ ] AC2 — The public `WriteTextFileAsync` carries an XML documentation comment whose `<returns>` clause states that `true` means the write completed and `false` means it did not, and that the method does not throw on a failed write.
-- [ ] AC3 — A deterministic test in `UtilitiesCS.Test/HelperClasses/FileIO2_Tests.cs` drives the seam with a writer factory that always throws `IOException` and asserts the method returns `false`, the factory was invoked exactly 100 times, and the delay delegate was invoked exactly 99 times.
-- [ ] AC4 — A deterministic test in `UtilitiesCS.Test/HelperClasses/FileIO2_Tests.cs` drives the seam with a `TextWriter` whose `WriteLineAsync` throws `IOException` and asserts the method returns `false`, the delay delegate was invoked zero times, and the writer factory was invoked exactly once.
-- [ ] AC5 — A deterministic test in `UtilitiesCS.Test/HelperClasses/FileIO2_Tests.cs` asserts the success path: a factory that fails N times then returns a `StringWriter` yields `true`, N delay invocations, and `StringWriter` content equal to the supplied lines each followed by `Environment.NewLine`.
-- [ ] AC6 — In `UtilitiesCS/To Depricate/FileIO2.cs`, the value returned as `true` is assigned only after the write loop has completed and the writer has been disposed without error; no assignment establishing success occurs between the writer's creation and the completion of the writes.
-- [ ] AC7 — In `UtilitiesCS/To Depricate/FileIO2.cs`, the catch clause binds the exception (`catch (IOException ex)`), and both the retry-exhaustion log call and the mid-write-failure log call pass `ex` to the two-argument `logger.Error(object, Exception)` overload. The two log messages are textually distinct from each other.
-- [ ] AC8 — In `UtilitiesCS/To Depricate/FileIO2.cs`, the retry delay receives the caller's token; no call to a single-argument `Task.Delay` remains in `WriteTextFileAsync`.
-- [ ] AC9 — A deterministic test in `UtilitiesCS.Test/HelperClasses/FileIO2_Tests.cs` captures the `CancellationToken` argument passed to the injected delay delegate and asserts it equals the token supplied to `WriteTextFileAsync`.
-- [ ] AC10 — Deterministic tests in `UtilitiesCS.Test/HelperClasses/FileIO2_Tests.cs` cover both cancellation entry points: an already-cancelled token throws `OperationCanceledException` with zero writer-factory invocations, and cancellation signalled from inside the delay seam throws `OperationCanceledException` after a bounded factory invocation count.
-- [ ] AC11 — `UtilitiesCS/To Depricate/FileIO2.cs` contains an `internal static` overload of `WriteTextFileAsync` taking the four original parameters plus `Func<string, TextWriter>?` and `Func<int, CancellationToken, Task>?`; the public overload forwards to it with both delegates null; no new `static` mutable field or property is added to `FileIO2`; and no new `InternalsVisibleTo` attribute is added anywhere in the repository.
-- [ ] AC12 — Call site 1: in `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, the `MetricsFileWriter` property is declared `Func<string, string[], string, CancellationToken, Task<bool>>`.
-- [ ] AC13 — Call site 2: in `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, the `WriteMetricsAsync` flush assigns the awaited result to a named local and emits a log entry when that result is `false`. The statement is not left as a bare `await` that discards the value.
-- [ ] AC14 — At that same flush in `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, the fourth argument is still `CancellationToken.None`, and the explanatory comment stating why the session token must not be used is retained.
-- [ ] AC15 — Call site 3: in `TaskMaster/AppGlobals/AppOlObjects.cs`, the `TimedDiskWriter` `DiskWriter` assignment is a block-bodied lambda that assigns the awaited result to a named local and logs when it is `false`. No exception is allowed to escape that async void lambda.
-- [ ] AC16 — Call site 4: `WriteTextFileAsync_WhenTargetIsLocked_ShouldRetryAndExitWithoutThrowing` is deleted from `UtilitiesCS.Test/HelperClasses/FileIO2_Tests.cs`, and no test in that file opens the UtilitiesCS.Test/TestData/FileIO2/sample.csv fixture with `FileShare.None` or calls the public `WriteTextFileAsync` overload against a real filesystem path.
-- [ ] AC17 — In `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, all six `MetricsFileWriter` test doubles return a `bool`-bearing task (no remaining `Task.CompletedTask` assignment to `MetricsFileWriter`, and the `async` double contains an explicit `return`), and the seam comment preceding the default double describes the post-fix contract rather than the pre-fix one.
-- [ ] AC18 — No new or modified test creates a file or directory, uses a temporary path, calls `Thread.Sleep`, or calls a real `Task.Delay`; all timing-dependent branches are driven through the injected delay delegate. Verifiable by inspection of the two changed test files.
-- [ ] AC19 — The change footprint is exactly the five source files named in this spec plus this feature folder's documents and evidence. In particular, `FileIO2.WriteTextFile` (the synchronous overload) and every file that calls only it are unmodified, and no .csproj, .editorconfig, coverage.config, or AssemblyInfo.cs file is modified.
-- [ ] AC20 — Every changed line in `UtilitiesCS/To Depricate/FileIO2.cs` is exercised by the new tests, `WriteTextFileAsync` reaches at least 90% line coverage as a changed method, and no changed line regresses in coverage. The repository-wide line-coverage figure is captured before and after under this feature's `evidence/baseline/` and `evidence/qa-gates/` directories and is not lowered by this change; it is assessed against the testable denominator defined in CLAUDE.md § UT2, since no merge-base baseline was available when this spec was authored.
-- [ ] AC21 — A full toolchain pass completes in a single run with no failures and no auto-fixes, in order: `dotnet tool run csharpier format .` followed by a clean `dotnet tool run csharpier check .`; the analyzer msbuild command; the `TreatWarningsAsErrors` msbuild command; and `vstest.console.exe` over all discovered `*.Test.dll` assemblies with `/EnableCodeCoverage /InIsolation`, excluding paths under `\.claude\`. The commands run and their results are recorded under this feature's `evidence/qa-gates/` directory.
+- [x] AC1 — In `UtilitiesCS/To Depricate/FileIO2.cs`, the public `WriteTextFileAsync` declares the return type `Task<bool>`, and its parameter names, order, and types (`string filename, string[] strOutput, string folderpath, CancellationToken token`) are unchanged.
+- [x] AC2 — The public `WriteTextFileAsync` carries an XML documentation comment whose `<returns>` clause states that `true` means the write completed and `false` means it did not, and that the method does not throw on a failed write.
+- [x] AC3 — A deterministic test in `UtilitiesCS.Test/HelperClasses/FileIO2_Tests.cs` drives the seam with a writer factory that always throws `IOException` and asserts the method returns `false`, the factory was invoked exactly 100 times, and the delay delegate was invoked exactly 99 times.
+- [x] AC4 — A deterministic test in `UtilitiesCS.Test/HelperClasses/FileIO2_Tests.cs` drives the seam with a `TextWriter` whose `WriteLineAsync` throws `IOException` and asserts the method returns `false`, the delay delegate was invoked zero times, and the writer factory was invoked exactly once.
+- [x] AC5 — A deterministic test in `UtilitiesCS.Test/HelperClasses/FileIO2_Tests.cs` asserts the success path: a factory that fails N times then returns a `StringWriter` yields `true`, N delay invocations, and `StringWriter` content equal to the supplied lines each followed by `Environment.NewLine`.
+- [x] AC6 — In `UtilitiesCS/To Depricate/FileIO2.cs`, the value returned as `true` is assigned only after the write loop has completed and the writer has been disposed without error; no assignment establishing success occurs between the writer's creation and the completion of the writes.
+- [x] AC7 — In `UtilitiesCS/To Depricate/FileIO2.cs`, the catch clause binds the exception (`catch (IOException ex)`), and both the retry-exhaustion log call and the mid-write-failure log call pass `ex` to the two-argument `logger.Error(object, Exception)` overload. The two log messages are textually distinct from each other.
+- [x] AC8 — In `UtilitiesCS/To Depricate/FileIO2.cs`, the retry delay receives the caller's token; no call to a single-argument `Task.Delay` remains in `WriteTextFileAsync`.
+- [x] AC9 — A deterministic test in `UtilitiesCS.Test/HelperClasses/FileIO2_Tests.cs` captures the `CancellationToken` argument passed to the injected delay delegate and asserts it equals the token supplied to `WriteTextFileAsync`.
+- [x] AC10 — Deterministic tests in `UtilitiesCS.Test/HelperClasses/FileIO2_Tests.cs` cover both cancellation entry points: an already-cancelled token throws `OperationCanceledException` with zero writer-factory invocations, and cancellation signalled from inside the delay seam throws `OperationCanceledException` after a bounded factory invocation count.
+- [x] AC11 — `UtilitiesCS/To Depricate/FileIO2.cs` contains an `internal static` overload of `WriteTextFileAsync` taking the four original parameters plus `Func<string, TextWriter>?` and `Func<int, CancellationToken, Task>?`; the public overload forwards to it with both delegates null; no new `static` mutable field or property is added to `FileIO2`; and no new `InternalsVisibleTo` attribute is added anywhere in the repository.
+- [x] AC12 — Call site 1: in `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, the `MetricsFileWriter` property is declared `Func<string, string[], string, CancellationToken, Task<bool>>`.
+- [x] AC13 — Call site 2: in `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, the `WriteMetricsAsync` flush assigns the awaited result to a named local and emits a log entry when that result is `false`. The statement is not left as a bare `await` that discards the value.
+- [x] AC14 — At that same flush in `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, the fourth argument is still `CancellationToken.None`, and the explanatory comment stating why the session token must not be used is retained.
+- [x] AC15 — Call site 3: in `TaskMaster/AppGlobals/AppOlObjects.cs`, the `TimedDiskWriter` `DiskWriter` assignment is a block-bodied lambda that assigns the awaited result to a named local and logs when it is `false`. No exception is allowed to escape that async void lambda.
+- [x] AC16 — Call site 4: `WriteTextFileAsync_WhenTargetIsLocked_ShouldRetryAndExitWithoutThrowing` is deleted from `UtilitiesCS.Test/HelperClasses/FileIO2_Tests.cs`, and no test in that file opens the UtilitiesCS.Test/TestData/FileIO2/sample.csv fixture with `FileShare.None` or calls the public `WriteTextFileAsync` overload against a real filesystem path.
+- [x] AC17 — In `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, all six `MetricsFileWriter` test doubles return a `bool`-bearing task (no remaining `Task.CompletedTask` assignment to `MetricsFileWriter`, and the `async` double contains an explicit `return`), and the seam comment preceding the default double describes the post-fix contract rather than the pre-fix one.
+- [x] AC18 — No new or modified test creates a file or directory, uses a temporary path, calls `Thread.Sleep`, or calls a real `Task.Delay`; all timing-dependent branches are driven through the injected delay delegate. Verifiable by inspection of the two changed test files.
+- [x] AC19 — The change footprint is exactly the five source files named in this spec plus this feature folder's documents and evidence. In particular, `FileIO2.WriteTextFile` (the synchronous overload) and every file that calls only it are unmodified, and no .csproj, .editorconfig, coverage.config, or AssemblyInfo.cs file is modified.
+- [x] AC20 — Every changed line in `UtilitiesCS/To Depricate/FileIO2.cs` is exercised by the new tests, `WriteTextFileAsync` reaches at least 90% line coverage as a changed method, and no changed line regresses in coverage. The repository-wide line-coverage figure is captured before and after under this feature's `evidence/baseline/` and `evidence/qa-gates/` directories and is not lowered by this change; it is assessed against the testable denominator defined in CLAUDE.md § UT2, since no merge-base baseline was available when this spec was authored.
+- [x] AC21 — A full toolchain pass completes in a single run with no failures and no auto-fixes, in order: `dotnet tool run csharpier format .` followed by a clean `dotnet tool run csharpier check .`; the analyzer msbuild command; the `TreatWarningsAsErrors` msbuild command; and `vstest.console.exe` over all discovered `*.Test.dll` assemblies with `/EnableCodeCoverage /InIsolation`, excluding paths under `\.claude\`. The commands run and their results are recorded under this feature's `evidence/qa-gates/` directory.
 
 ## Risks & Mitigations
 - Technical or operational risks:
@@ -622,6 +622,20 @@ Seeded from the issue (retained for traceability):
   configuration, and no migration. Reverting restores the prior signature and prior behavior exactly.
 
 ## Rollout & Follow-up
+
+- Outcome note: all 21 acceptance criteria are verified and checked off above. The two defects carry
+  different fail-before evidence, as anticipated by Risk 5.
+  - The **mid-write** regression (AC4) carries a real failing pre-fix run at
+    `docs/features/active/2026-08-27-fileio2-write-retry-reports-success-on-final-failure-647/evidence/regression-testing/p3-t2-midwrite-fail-before.md`.
+    It was made possible by landing the test seam ahead of the loop restructure, so the same test
+    could be driven against unfixed control flow. It observed a delay-invocation count of 1 where 0
+    was required; the matching post-fix run observed 0.
+  - The **retry-exhaustion** regression (AC3) carries the exception dossier at
+    `docs/features/active/2026-08-27-fileio2-write-retry-reports-success-on-final-failure-647/evidence/regression-testing/fail-before-exception.2026-08-31T19-40.md`,
+    because a test asserting a `false` return can only be written against the post-fix signature and
+    that signature change is itself the fix. The dossier's alternative proof is a pre-fix
+    characterization run showing the always-failing open path consuming its full 100-attempt budget
+    and 99 delays before returning with no failure signal.
 - Release/rollout steps: merge with the rest of the solution; the change ships with the next add-in
   build. No deployment step, no configuration change, and no user communication is required.
 - Post-fix monitoring or clean-up tasks:
