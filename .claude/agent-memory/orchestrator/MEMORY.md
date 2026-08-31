@@ -94,6 +94,7 @@
 - [Removing a halt requires branch propagation](removing-a-halt-requires-branch-propagation.md) — converting a HALT into a recorded blocker
 - [Prepared epic child invalidated by a sibling merge](prepared-epic-child-invalidated-by-sibling-merge.md) — a merged fix for an issue the
 - [Bash tool rejects complex commands in isolated worktrees](bash-tool-rejects-complex-commands-in-isolated-worktree.md)
+- [Subagent cites harness gitStatus of the wrong checkout](subagent-cites-harness-gitstatus-of-wrong-checkout.md) — an untracked-file claim may describe the session worktree, not yours; re-measure before it lands in a plan
 - [#457 coverage moved UP, and the kickoff figure was wrong](project_457_coverage_moved_up_not_down.md) — the denominator fix raised the
 - [atomic-planner has no MCP validator tool](atomic-planner-lacks-mcp-validator-tool.md) — it cannot run the mandatory plan gate; run it
 - [Preflight defect-trend scope confound](preflight-defect-trend-scope-confound.md) — a rising count isn't divergence if you widened scope
@@ -112,6 +113,7 @@
 - [Resumed child orchestrator shares your worktree](resumed-child-orchestrator-shares-worktree.md) — a checkpoint mtime you did not author
 - [Shared checkpoint: never read-modify-write](shared-checkpoint-read-modify-write-corrupts.md) - a sibling swaps the session-root file
 - [External actor can merge your child PR mid-run](external-actor-can-merge-your-child-pr-midrun.md) — re-read PR state before the CI gate
+- [Stale base anchor passes ancestry vacuously](stale-base-anchor-passes-ancestry-vacuously.md) — on a prep resume the pinned base stays an ancestor, so the check passes while diffs bill another issue's work to your plan
 
 ## Artifact hygiene
 - [Angle-bracket redaction breaks TRX XML](angle-bracket-redaction-breaks-trx-xml.md) — a `<placeholder>` in an XML attribute makes the

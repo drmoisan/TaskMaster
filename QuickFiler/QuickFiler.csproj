@@ -287,6 +287,7 @@
   <ItemGroup>
     <Compile Include="Controllers\BayesianPerformanceController.cs" />
     <Compile Include="Controllers\EfcDataModel.cs" />
+    <Compile Include="Controllers\EfcDataModel.FilingStem.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouter.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouter.Arrows.cs" />
     <Compile Include="Controllers\BreadcrumbBridgeRouter.Selection.cs" />

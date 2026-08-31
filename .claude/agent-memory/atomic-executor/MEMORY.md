@@ -4,6 +4,7 @@
 - [Blocked Bash command drops chained check-off](project_blocked_bash_command_silently_drops_chained_checkoff.md) — aborts the WHOLE
 - [CSharpier chain-wrap defeats single-line search gates](project_csharpier_chain_wrap_defeats_singleline_search_gates.md) — zero-hit gate go
 - [Verify line citations with numbered output](feedback_verify_line_citations_with_numbered_output.md) — never hand-count
+- [Planner and executor observe different worktrees](project_planner_and_executor_observe_different_worktrees.md) — `git status` claims don't travel
 - [Extract gate literals from the plan, never re-type](project_preflight_gate_literal_extract_from_plan_not_retype.md) — quoting drift
 - [Tool layer collapses `\` in file content](project_tool_layer_collapses_double_backslash_in_file_content.md) — heredocs and Wri
 - [Self-derived gate thresholds are blind](project_preflight_selfderived_gate_thresholds_are_blind.md) — floor from the r
