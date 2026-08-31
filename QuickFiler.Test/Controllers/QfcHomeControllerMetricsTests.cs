@@ -395,9 +395,9 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// GetMoveDiagnostics returns an array one element longer than it fills, so its trailing
-        /// element is null. Null and whitespace-only entries must be dropped before the write rather
-        /// than producing a blank CSV line.
+        /// The call is made through the IQfcCollectionController.GetMoveDiagnostics contract,
+        /// which carries no XML documentation and no non-null element guarantee. Null and
+        /// whitespace-only entries must therefore be dropped before the write.
         /// </summary>
         [TestMethod]
         public async Task WriteMetricsAsync_FiltersNullDiagnosticLinesBeforeWriting()

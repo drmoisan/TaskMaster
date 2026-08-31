@@ -866,7 +866,18 @@ fixing them requires writing a file owned by a sibling epic child. None is fixed
   reflection-based tests; having `WriteMetricsAsync` call `SwapStopWatch()` itself converts one race
   into two; and capturing at `CacheMoveObjects()` time requires two forbidden files.
 
-### CFN-2 — `GetMoveDiagnostics` returns an array one element longer than it fills (feature 468)
+### CFN-2 — RESOLVED — `GetMoveDiagnostics` returned an array one element longer than it filled (feature 468)
+
+- **CFN-2 RESOLVED (2026-08-29).** Feature 468 landed the recommended fix:
+  `QuickFiler/Controllers/QfcCollectionController.cs` now allocates
+  `new string[_itemGroupsToMove.Count]` and assigns every index on both branches of the loop, so
+  the trailing-null hazard described in the bullets below no longer exists. It is pinned by
+  `GetMoveDiagnostics_WithOneGroup_ReturnsExactlyOneLine` and
+  `GetMoveDiagnostics_WithThreeGroups_ReturnsThreeLinesAndNoNulls` in
+  `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs`. The bullets below are
+  retained as the historical record. The `WriteMetricsAsync` null-and-whitespace filter is retained
+  for a different and still-valid reason: `IQfcCollectionController.GetMoveDiagnostics` carries no
+  non-null element guarantee.
 
 - **Location:** `QuickFiler/Controllers/QfcCollectionController.cs:2284` allocates
   `new string[_itemGroupsToMove.Count + 1]`; the loop at `:2286-2325` fills only indices

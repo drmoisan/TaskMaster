@@ -2368,7 +2368,7 @@ namespace QuickFiler.Controllers
             //TraceUtility.LogMethodCall(durationText, durationMinutesText, Duration, dataLineBeg, OlEndTime, OlAppointment);
 
             int k;
-            // Issue #469 defect 1: exactly one diagnostics line per cached move group. The array
+            // Issue #469 defect 2: exactly one diagnostics line per cached move group. The array
             // was allocated as Count + 1 while the loop bound stayed Count, so the trailing
             // element was never assigned and QfcHomeController.Metrics wrote it out as a blank
             // diagnostics row for a message that does not exist.
@@ -2378,7 +2378,7 @@ namespace QuickFiler.Controllers
             {
                 var qf = TryGetItemGroupByIndex(k)?.ItemController;
 
-                // Issue #469 defect 2: the null test must dominate every dereference of qf. It
+                // Issue #469 defect 1: the null test must dominate every dereference of qf. It
                 // previously sat below this ItemHelper read and below the interpolation of
                 // qf.ItemHelper.Subject into the data line, so a group with no controller raised
                 // NullReferenceException and the Unknown branch below was unreachable. The empty
