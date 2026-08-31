@@ -1350,19 +1350,19 @@ again from the start.
       every subsequent `0eda184ca0009bc79ac9b7146897270c17c095fa..HEAD` diff describes the same file
       contents the P7-T5 build measures. If CSharpier changed no source, the evidence and plan check-off
       still make the boundary non-empty; the artifact records that the source already matched `HEAD`.
-- [ ] [P7-T3] Analyzers. Run the P0-T13 command verbatim and write
+- [x] [P7-T3] Analyzers. Run the P0-T13 command verbatim and write
       `evidence/qa-gates/p7-t3-msbuild-analyzers.md`. Acceptance: `EXIT_CODE: 0`; the output contains
       `(Rebuild target(s))`; the `Error(s)` count is 0; and the recorded `Command:` line contains
       `/t:Rebuild` and `EnableNETAnalyzers=true` and `EnforceCodeStyleInBuild=true` and contains
       neither `/t:Build` nor the solution-wide nullable opt-in property — record this as
       `NULLABLE_OPT_IN_PROPERTY: absent`; do not spell the token in the artifact.
-- [ ] [P7-T4] Nullable. Run the P0-T14 command verbatim and write
+- [x] [P7-T4] Nullable. Run the P0-T14 command verbatim and write
       `evidence/qa-gates/p7-t4-msbuild-nullable.md`. Acceptance: `EXIT_CODE: 0`; the output contains
       `(Rebuild target(s))`; and the recorded `Command:` line contains `/t:Rebuild` and
       `TreatWarningsAsErrors=true` and contains neither `/t:Build` nor the solution-wide nullable
       opt-in property — record this as `NULLABLE_OPT_IN_PROPERTY: absent`; do not spell the token in
       the artifact.
-- [ ] [P7-T5] Full test run with coverage. Run
+- [x] [P7-T5] Full test run with coverage. Run
       `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput coverage\p7-t5-postchange.cobertura.xml`
       and write `evidence/qa-gates/p7-t5-mstest-coverage.md`. The exit-code condition is stated
       against the recorded baseline rather than as an unconditional zero, because the wrapper throws
@@ -1387,14 +1387,14 @@ again from the start.
       read-only P7-T5 substep, run the P7-T6 coverage-headline command against
       `coverage\p7-t5-postchange.cobertura.xml`, record those values in this P7-T5 `Output Summary:`,
       verify P7-T5, and check P7-T5 off before starting P7-T6. P7-T6 does not modify P7-T5.
-- [ ] [P7-T6] Read the post-change numeric coverage headline. Run the P0-T16 command with the input
+- [x] [P7-T6] Read the post-change numeric coverage headline. Run the P0-T16 command with the input
       path changed to `.\coverage\p7-t5-postchange.cobertura.xml` and write
       `evidence/qa-gates/p7-t6-coverage-headline.md`. Acceptance: `EXIT_CODE: 0`, and `Output Summary:`
       records all six numeric attribute values plus the derived line-coverage percentage and branch
       percentage. Confirm that all six attributes and both derived percentages equal the values
       already recorded in `evidence/qa-gates/p7-t5-mstest-coverage.md`; P7-T6 does not modify that
       artifact or any prior checklist state.
-- [ ] [P7-T7] Verify changed-line coverage. Run the P0-T17 command with the input path changed to
+- [x] [P7-T7] Verify changed-line coverage. Run the P0-T17 command with the input path changed to
       `.\coverage\p7-t5-postchange.cobertura.xml` and with its file list extended to the three
       production files this plan touches — `QuickFiler\Controllers\BreadcrumbBridgeRouter.Selection.cs`,
       `QuickFiler\Controllers\EfcDataModel.cs` and
@@ -1449,7 +1449,7 @@ again from the start.
       `branch="True"` node exists in the re-derived range, and the witness-test form applies only when
       none does. The `HEAD` this diff is anchored against already carries the formatting result,
       because P7-T2 committed it before P7-T5 measured the tree.
-- [ ] [P7-T8] Report the coverage delta. Write `evidence/qa-gates/p7-t8-coverage-delta.md` containing
+- [x] [P7-T8] Report the coverage delta. Write `evidence/qa-gates/p7-t8-coverage-delta.md` containing
       three labelled numeric sections: baseline coverage, copied from
       `evidence/baseline/p0-t16-coverage-headline.md`; post-change coverage, copied from
       `evidence/qa-gates/p7-t6-coverage-headline.md`; and changed and new-code coverage, copied from
