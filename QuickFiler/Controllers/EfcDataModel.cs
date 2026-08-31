@@ -18,7 +18,7 @@ using UtilitiesCS.OutlookObjects.Folder;
 
 namespace QuickFiler.Controllers
 {
-    internal class EfcDataModel
+    internal partial class EfcDataModel
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
@@ -334,7 +334,7 @@ namespace QuickFiler.Controllers
                 SaveMsg = saveEmail,
                 SaveAttachments = attachments,
                 SavePictures = savePictures,
-                DestinationOlStem = folderpath,
+                DestinationOlStem = ToFilingStemOrVerbatim(folderpath, olAncestor),
                 Globals = Globals,
                 OlAncestor = olAncestor,
                 FsAncestorEquivalent = folderRoot,

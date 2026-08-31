@@ -120,4 +120,74 @@ namespace QuickFiler.Test.Controllers
             stem.Should().Be(@"Clients\Archive\North");
         }
     }
+
+    [TestClass]
+    public class EfcDataModelIssue637Tests
+    {
+        private const string ArchiveRoot = @"\\mailbox@example.com\Archive";
+
+        [TestMethod]
+        public void ToFilingStemOrVerbatim_RootedUnderAncestor_ReturnsTheStem()
+        {
+            EfcDataModel
+                .ToFilingStemOrVerbatim(ArchiveRoot + @"\Clients\North", ArchiveRoot)
+                .Should()
+                .Be(@"Clients\North");
+        }
+
+        [TestMethod]
+        public void ToFilingStemOrVerbatim_RootedUnderCaseDifferingAncestor_ReturnsTheStem()
+        {
+            EfcDataModel
+                .ToFilingStemOrVerbatim(@"\\MAILBOX@EXAMPLE.COM\aRcHiVe\Clients", ArchiveRoot)
+                .Should()
+                .Be("Clients");
+        }
+
+        [TestMethod]
+        public void ToFilingStemOrVerbatim_RelativeStem_ReturnsTheInputVerbatim()
+        {
+            EfcDataModel.ToFilingStemOrVerbatim(@"Clients\North", ArchiveRoot).Should().Be(@"Clients\North");
+        }
+
+        [TestMethod]
+        public void ToFilingStemOrVerbatim_TrashSentinel_ReturnsTheInputVerbatim()
+        {
+            EfcDataModel
+                .ToFilingStemOrVerbatim("Trash to Delete", ArchiveRoot)
+                .Should()
+                .Be("Trash to Delete");
+        }
+
+        [TestMethod]
+        public void ToFilingStemOrVerbatim_ArchiveRootExact_ReturnsTheInputVerbatimAndDoesNotThrow()
+        {
+            EfcDataModel.ToFilingStemOrVerbatim(ArchiveRoot, ArchiveRoot).Should().Be(ArchiveRoot);
+        }
+
+        [TestMethod]
+        public void ToFilingStemOrVerbatim_OutOfRootRootedInput_ReturnsTheInputVerbatimAndDoesNotThrow()
+        {
+            const string candidate = @"\\other@example.org\Archive\Clients";
+            EfcDataModel.ToFilingStemOrVerbatim(candidate, ArchiveRoot).Should().Be(candidate);
+        }
+
+        [TestMethod]
+        public void ToFilingStemOrVerbatim_NullEmptyWhitespaceOrSeparatorOnlyAncestor_ReturnsTheInputVerbatim()
+        {
+            const string candidate = @"\\mailbox@example.com\Archive\Clients";
+
+            EfcDataModel.ToFilingStemOrVerbatim(candidate, null).Should().Be(candidate);
+            EfcDataModel.ToFilingStemOrVerbatim(candidate, string.Empty).Should().Be(candidate);
+            EfcDataModel.ToFilingStemOrVerbatim(candidate, " ").Should().Be(candidate);
+            EfcDataModel.ToFilingStemOrVerbatim(candidate, @"\").Should().Be(candidate);
+        }
+
+        [TestMethod]
+        public void ToFilingStemOrVerbatim_NullOrEmptyCandidate_ReturnsTheInputVerbatim()
+        {
+            EfcDataModel.ToFilingStemOrVerbatim(null, ArchiveRoot).Should().BeNull();
+            EfcDataModel.ToFilingStemOrVerbatim(string.Empty, ArchiveRoot).Should().BeEmpty();
+        }
+    }
 }

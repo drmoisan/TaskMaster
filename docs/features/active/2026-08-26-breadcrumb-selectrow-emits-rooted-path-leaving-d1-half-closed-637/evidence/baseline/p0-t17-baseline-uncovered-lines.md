@@ -1,0 +1,7 @@
+Timestamp: 2026-08-31T10:27:25-04:00
+Command: pwsh -NoProfile -Command '. ".\scripts\vscode\Invoke-MSTestWithCoverage.Helpers.ps1"; $raw = Get-Content -LiteralPath ".\coverage\p0-t15-baseline.cobertura.xml" -Raw -Encoding UTF8; [xml]$d = ConvertTo-KoverageCoberturaXml -XmlContent $raw -RepoRoot (Get-Location).Path; foreach ($f in @("QuickFiler\Controllers\BreadcrumbBridgeRouter.Selection.cs","QuickFiler\Controllers\EfcDataModel.cs")) { $u = @(); foreach ($c in $d.SelectNodes("//class")) { if ($c.GetAttribute("filename") -eq $f) { foreach ($l in $c.SelectNodes("./lines/line")) { if ([int]$l.GetAttribute("hits") -eq 0) { $u += [int]$l.GetAttribute("number") } } } }; $f + " uncovered=" + (($u | Sort-Object -Unique) -join ",") } '
+EXIT_CODE: 0
+Output Summary: Recorded one uncovered-line set for each baseline production file.
+QuickFiler\Controllers\BreadcrumbBridgeRouter.Selection.cs uncovered=29,30,193
+QuickFiler\Controllers\EfcDataModel.cs uncovered=181,183,184,185,189,190,191,192,193,194,195,197,198,199,200,201,202,203,204,205,206,207,208,210,211,212,213,214,215,216,217,218,219,220,221,248,249,250,253,254,345,346,362,363,364,365,366,367,368,370,371,386,387,388,389,390,391,392,394,395,406,407,408,409,410,411,412,413,414,415,416,417,418,419,451,452,453,454,457,458,460,463,464,465,466,467,469,470,471,472,473,474,475,478,480,481
+QuickFiler\Controllers\EfcDataModel.FilingStem.cs baseline=absent

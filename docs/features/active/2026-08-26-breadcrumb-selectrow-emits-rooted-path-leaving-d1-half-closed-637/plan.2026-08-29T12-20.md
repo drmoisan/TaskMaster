@@ -3,9 +3,9 @@
 - **Issue:** #637
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-31T08-59
+- **Last Updated:** 2026-08-31T10-22
 - **Status:** Ready for Codex preflight
-- **Version:** 0.6
+- **Version:** 0.8
 - **Work Mode:** full-bug (from `issue.md`); `spec.md` is the sole acceptance-criteria source (AC1-AC30).
 
 ## Conventions (read before executing any task)
@@ -604,28 +604,39 @@ no downstream artifact inherits a wrong figure.
       non-zero, record the full diagnostic list under a section headed `BASELINE_BUILD_RED:`, stop,
       and report to the orchestrator; do not proceed to the next task and do not attempt a repair,
       because a pre-existing red baseline is outside this plan's scope.
-- [ ] [P0-T15] Capture the baseline full test run with coverage. Run
-      `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput coverage\p0-t15-baseline.cobertura.xml`
-      and write `evidence/baseline/p0-t15-mstest-coverage.md`. `coverage/*` is gitignored
-      (`.gitignore:144`), so the Cobertura document does not dirty the tree. Acceptance: the artifact
-      records `EXIT_CODE:`, the number of discovered test assemblies printed by the wrapper, the total
-      and passed and failed test counts, and a section headed `BASELINE_FAILURE_SET:` naming every
-      failing test's fully qualified name (empty when the run passes). The file
-      `coverage/p0-t15-baseline.cobertura.xml` exists after the run. `Output Summary:` additionally
-      carries the six numeric `/coverage` attribute values and the derived line and branch
-      percentages. As a read-only P0-T15 substep, run the P0-T16 coverage-headline command against
-      `coverage\p0-t15-baseline.cobertura.xml`, record those values in this P0-T15 `Output Summary:`,
-      verify P0-T15, and check P0-T15 off before starting P0-T16. P0-T16 does not modify P0-T15.
-- [ ] [P0-T16] Read the baseline numeric coverage headline. Run
+- [x] [P0-T15] Capture the baseline full test run with coverage. Preserve the existing failed
+      first-attempt evidence file `evidence/baseline/p0-t15-mstest-coverage.md` unchanged. Permit at
+      most two recovery retries, and only for the documented #592 60,000ms QuickFiler
+      pump/dispatcher-timeout cascade. Before each retry, verify that no `dotnet-coverage`, `vstest`,
+      or `testhost` process targeting this worktree remains; wait until the 17 P0-T13/P0-T14 MSBuild
+      nodes have exited; and write a separate immutable retry artifact
+      `evidence/baseline/p0-t15-retry-<attempt>.md` that records `Timestamp:`, the unchanged command,
+      `EXIT_CODE:`, #592 qualification evidence, pre-retry process counts, machine-load observation,
+      and `Output Summary:`. Execute this unchanged command in one persistent terminal session and
+      poll that same process ID to terminal completion; do not use `Start-Process` or another launcher:
+      `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput coverage\p0-t15-baseline.cobertura.xml`.
+      Do not alter runsettings, worker count, timeout, filter, wrapper, or the canonical nine-assembly
+      list. `coverage/*` is gitignored (`.gitignore:144`), so the Cobertura document does not dirty the
+      tree. Acceptance: a retry exits `0`; reports the nine canonical assemblies and total, passed, and
+      failed test counts; creates `coverage/p0-t15-baseline.cobertura.xml`; and records all six numeric
+      `/coverage` attributes in its `Output Summary:` with derived line and branch percentages. The
+      successful retry artifact includes a `BASELINE_FAILURE_SET:` section naming every failing test's
+      fully qualified name (empty when the run passes). As a read-only P0-T15 substep, run the P0-T16
+      coverage-headline command against `coverage\p0-t15-baseline.cobertura.xml`, record those values
+      in the successful retry artifact, verify P0-T15, and check P0-T15 off before starting P0-T16.
+      P0-T16 does not modify P0-T15 evidence. On a non-#592 failure, or after two cleared-load #592
+      retry attempts without the required output, stop and report the baseline blocker; do not perform
+      further retries or any repair.
+- [x] [P0-T16] Read the baseline numeric coverage headline. Run
       `pwsh -NoProfile -Command '. ".\scripts\vscode\Invoke-MSTestWithCoverage.Helpers.ps1"; $raw = Get-Content -LiteralPath ".\coverage\p0-t15-baseline.cobertura.xml" -Raw -Encoding UTF8; [xml]$d = ConvertTo-KoverageCoberturaXml -XmlContent $raw -RepoRoot (Get-Location).Path; $c = $d.SelectSingleNode("/coverage"); foreach ($a in @("line-rate","branch-rate","lines-covered","lines-valid","branches-covered","branches-valid")) { $a + "=" + $c.GetAttribute($a) }'`
       and write `evidence/baseline/p0-t16-coverage-headline.md`. Acceptance: `EXIT_CODE: 0`, and
       `Output Summary:` records all six numeric values, plus the derived baseline line-coverage
       percentage computed as `line-rate` multiplied by 100 and the derived branch percentage computed
       as `branch-rate` multiplied by 100. Confirm that all six attributes and both derived
-      percentages equal the values already recorded in
-      `evidence/baseline/p0-t15-mstest-coverage.md`; P0-T16 does not modify that artifact or any
-      prior checklist state. These are the baseline figures the Phase 7 delta task compares against.
-- [ ] [P0-T17] Record the baseline uncovered-line sets for the two production files this plan changes.
+      percentages equal the values already recorded in the successful
+      `evidence/baseline/p0-t15-retry-<attempt>.md` artifact; P0-T16 does not modify that artifact or
+      any prior checklist state. These are the baseline figures the Phase 7 delta task compares against.
+- [x] [P0-T17] Record the baseline uncovered-line sets for the two production files this plan changes.
       Run
       `pwsh -NoProfile -Command '. ".\scripts\vscode\Invoke-MSTestWithCoverage.Helpers.ps1"; $raw = Get-Content -LiteralPath ".\coverage\p0-t15-baseline.cobertura.xml" -Raw -Encoding UTF8; [xml]$d = ConvertTo-KoverageCoberturaXml -XmlContent $raw -RepoRoot (Get-Location).Path; foreach ($f in @("QuickFiler\Controllers\BreadcrumbBridgeRouter.Selection.cs","QuickFiler\Controllers\EfcDataModel.cs")) { $u = @(); foreach ($c in $d.SelectNodes("//class")) { if ($c.GetAttribute("filename") -eq $f) { foreach ($l in $c.SelectNodes("./lines/line")) { if ([int]$l.GetAttribute("hits") -eq 0) { $u += [int]$l.GetAttribute("number") } } } }; $f + " uncovered=" + (($u | Sort-Object -Unique) -join ",") } '`
       and write `evidence/baseline/p0-t17-baseline-uncovered-lines.md`. Acceptance: `EXIT_CODE: 0`, and
@@ -643,7 +654,7 @@ Every number in this phase is a number that `spec.md` already carries inside an 
 criterion. Each task verifies it by a search over the full symbol family and cross-checks it with a
 second, independently constructed search. No number in this phase is verified by a single-pass grep.
 
-- [ ] [P1-T1] Re-derive the selection family census (AC9: 2 declarations, 7 call sites).
+- [x] [P1-T1] Re-derive the selection family census (AC9: 2 declarations, 7 call sites).
       Search 1, path-anchored: `rg -n "Select(Row|HierarchyPath)\s*\(" --glob "*.cs" QuickFiler/Controllers/BreadcrumbBridgeRouter.cs QuickFiler/Controllers/BreadcrumbBridgeRouter.Selection.cs QuickFiler/Controllers/BreadcrumbBridgeRouter.Arrows.cs`.
       Search 2, syntax-anchored and independently constructed on unqualified-invocation form rather
       than on file paths: `rg -n "^\s+(private void )?Select(Row|HierarchyPath)\(" --glob "*.cs" .`
@@ -657,7 +668,7 @@ second, independently constructed search. No number in this phase is verified by
       (`BreadcrumbBridgeRouter.Selection.cs:83` and `:109`) and call sites total 7
       (`BreadcrumbBridgeRouter.cs:201`, `:286`, `BreadcrumbBridgeRouter.Arrows.cs:138`, `:153`, `:161`,
       `BreadcrumbBridgeRouter.Selection.cs:33`, `:47`).
-- [ ] [P1-T2] Re-derive the `MoveToFolder` family census (AC16: 3 declarations, 7 call sites).
+- [x] [P1-T2] Re-derive the `MoveToFolder` family census (AC16: 3 declarations, 7 call sites).
       Search 1, family-stem: `rg -n "MoveToFolder" --glob "*.cs" .` — the bare stem catches any
       non-`Async` sibling or partially renamed overload that an `Async`-suffixed pattern would miss.
       Search 2, independently constructed on invocation and declaration syntax:
@@ -677,7 +688,7 @@ second, independently constructed search. No number in this phase is verified by
       `EfcDataModelArchiveRootTests.cs` appears in both searches, contributing the `:314` call site,
       and that the 16-line figure in research section 6 and in `spec.md` describes the tree before
       issue #638 merged.
-- [ ] [P1-T3] Re-derive the `SelectedFolderPath` surface (AC24: 9 lines across 3 production files, 2
+- [x] [P1-T3] Re-derive the `SelectedFolderPath` surface (AC24: 9 lines across 3 production files, 2
       writes, 3 reads). Search 1: `rg -c "SelectedFolderPath" --glob "*.cs" .`, recording the per-file
       counts. Search 2, independently constructed by scoping to the production project directories up
       front rather than by subtracting the test projects from Search 1's table:
@@ -691,7 +702,7 @@ second, independently constructed search. No number in this phase is verified by
       (`:143`, `BreadcrumbBridgeRouter.Selection.cs:138`, `EfcFormController.cs:321`) and 2 event-only
       lines (`:62`, `:146`); and it records that the production split is 3 production files and 6 test
       files, not the 2-and-7 stated in research section 7.
-- [ ] [P1-T4] Re-derive the stale deferral record census (AC22: 3 records).
+- [x] [P1-T4] Re-derive the stale deferral record census (AC22: 3 records).
       Search 1, on the deferral phrase: `rg -n "deferred to issue #637" --glob "*.cs" .`.
       Search 2, independently constructed on the issue reference alone so it cannot miss a differently
       worded deferral: `rg -n "#637" --glob "*.cs" .`. Write
@@ -701,7 +712,7 @@ second, independently constructed search. No number in this phase is verified by
       superset whose every additional line is enumerated in the artifact and individually classified as
       not a deferral claim; and the artifact quotes the current text of all three Search 1 lines
       verbatim.
-- [ ] [P1-T5] Re-derive the existing `ToArchiveRelativeStem` test count (AC15: 8 tests).
+- [x] [P1-T5] Re-derive the existing `ToArchiveRelativeStem` test count (AC15: 8 tests).
       Search 1, on the method-name convention:
       `rg -n "public void ToArchiveRelativeStem_" QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`.
       Search 2, independently constructed on the call to the member under test rather than on test
@@ -709,7 +720,7 @@ second, independently constructed search. No number in this phase is verified by
       Write `evidence/baseline/p1-t5-toarchiverelativestem-tests.md`. Acceptance: both searches return
       exactly 8 lines; the artifact records the declaration line numbers 21, 34, 48, 62, 72, 87, 100,
       111 and records that `ToArchiveRelativeStem_ArchiveRootItself_Throws` is the method at line 62.
-- [ ] [P1-T6] Re-derive the no-bound-root pass-through test pair (AC4: 2 tests).
+- [x] [P1-T6] Re-derive the no-bound-root pass-through test pair (AC4: 2 tests).
       Search 1, by name:
       `rg -n "Issue439SlashOnlyArchiveRootPreservesFullHierarchySelection|SegmentActivate_WithNoBoundArchiveRoot_PreservesThePassThroughMode" --glob "*.cs" .`.
       Search 2, independently constructed on the binding mechanism that produces an empty bound root —
@@ -722,7 +733,7 @@ second, independently constructed search. No number in this phase is verified by
       `:665`, and the second uses the three-argument overload at `:213` and asserts `Be(@"\Archive")` at
       `:221`; and Search 2's classification identifies the same two tests as the only pass-through
       cases and no others.
-- [ ] [P1-T7] Re-derive the file line counts AC25 depends on. Construction 1:
+- [x] [P1-T7] Re-derive the file line counts AC25 depends on. Construction 1:
       `pwsh -NoProfile -Command 'foreach ($p in @("QuickFiler\Controllers\EfcDataModel.cs","QuickFiler\Controllers\BreadcrumbBridgeRouter.Selection.cs","QuickFiler\Controllers\EfcSelectionGuard.cs","QuickFiler.Test\Controllers\BreadcrumbBridgeRouterIssue439Tests.cs","QuickFiler.Test\Controllers\EfcDataModelIssue614Tests.cs","QuickFiler.Test\Controllers\EfcSelectionGuardTests.cs")) { $p + "=" + (Get-Content -LiteralPath $p).Count }'`.
       Construction 2, independently constructed with a line-oriented search rather than a file read:
       `rg -c "^" --glob "*.cs" QuickFiler/Controllers/ QuickFiler.Test/Controllers/` filtered to the
@@ -741,7 +752,7 @@ second, independently constructed search. No number in this phase is verified by
       `spec.md:401` states 424 for `EfcDataModel.cs` while AC25 at `spec.md:977` already states 485,
       that the `ecdb1c84` planning base had 423, and that the merged
       tree value 485 governs, leaving 15 lines of headroom to the 500-line limit.
-- [ ] [P1-T8] Re-derive the single pinning assertion (AC20: exactly 1 existing assertion changes).
+- [x] [P1-T8] Re-derive the single pinning assertion (AC20: exactly 1 existing assertion changes).
       Construction 1, on the assertion form:
       `rg -n "SelectedFolderPath\.Should\(\)\.Be\(" --glob "*.cs" QuickFiler.Test/` with every hit
       classified by whether the selected row's filing target is a full Outlook path at or under a
@@ -769,7 +780,7 @@ than left to Phase 4: the `partial` keyword on the existing declaration (P2-T1),
 (P2-T2), and the project registration that makes the new file compile (P2-T3). Only then does P2-T4
 redirect the assignment. Reversing any of those orders produces a build that does not compile.
 
-- [ ] [P2-T1] Make the existing declaration partial. In `QuickFiler/Controllers/EfcDataModel.cs`,
+- [x] [P2-T1] Make the existing declaration partial. In `QuickFiler/Controllers/EfcDataModel.cs`,
       replace line 21, `    internal class EfcDataModel`, with
       `    internal partial class EfcDataModel`. This is a one-token, single-line substitution: the
       file stays at 485 lines and no line number in it shifts, which is what lets every line citation
@@ -784,7 +795,7 @@ redirect the assignment. Reversing any of those orders produces a build that doe
       lines; and
       `pwsh -NoProfile -Command '(Get-Content -LiteralPath "QuickFiler\Controllers\EfcDataModel.cs").Count'`
       reports exactly 485.
-- [ ] [P2-T2] Create the new partial-class file
+- [x] [P2-T2] Create the new partial-class file
       `QuickFiler/Controllers/EfcDataModel.FilingStem.cs`. It contains exactly one `using` directive,
       `using UtilitiesCS.OutlookObjects.Folder;`, the namespace `QuickFiler.Controllers`, the type
       declaration written verbatim as `    internal partial class EfcDataModel`, and one member: the
@@ -817,7 +828,7 @@ redirect the assignment. Reversing any of those orders produces a build that doe
       returns exactly 1 line; and
       `pwsh -NoProfile -Command '(Get-Content -LiteralPath "QuickFiler\Controllers\EfcDataModel.FilingStem.cs").Count'`
       is at most 500.
-- [ ] [P2-T3] Register the new production file in the non-SDK project. Insert
+- [x] [P2-T3] Register the new production file in the non-SDK project. Insert
       `    <Compile Include="Controllers\EfcDataModel.FilingStem.cs" />` into
       `QuickFiler/QuickFiler.csproj` immediately after the existing line 289,
       `    <Compile Include="Controllers\EfcDataModel.cs" />`, which sits inside the `ItemGroup` that
@@ -831,7 +842,7 @@ redirect the assignment. Reversing any of those orders produces a build that doe
       `rg -F -n 'Controllers\EfcDataModel.FilingStem.cs' QuickFiler/QuickFiler.csproj`
       returns exactly 1 line; that line is line 290; and it is inside the same `ItemGroup` that begins
       at line 287.
-- [ ] [P2-T4] Redirect the `DestinationOlStem` assignment to the seam. In
+- [x] [P2-T4] Redirect the `DestinationOlStem` assignment to the seam. In
       `QuickFiler/Controllers/EfcDataModel.cs`, change line 337 from
       `                DestinationOlStem = folderpath,` to
       `                DestinationOlStem = ToFilingStemOrVerbatim(folderpath, olAncestor),`.
@@ -854,7 +865,7 @@ redirect the assignment. Reversing any of those orders produces a build that doe
       line and it is line 284; and
       `pwsh -NoProfile -Command '(Get-Content -LiteralPath "QuickFiler\Controllers\EfcDataModel.cs").Count'`
       reports exactly 485.
-- [ ] [P2-T5] Create `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue637Tests.cs` containing
+- [x] [P2-T5] Create `QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue637Tests.cs` containing
       the class `BreadcrumbBridgeRouterIssue637Tests` with exactly the ten test methods named in the
       "Fixed identifiers" section. Use fixture Shape 2 and do not invent a new fixture shape: a
       `[TestInitialize]` `Setup` and `[TestCleanup]` `Cleanup` modelled on
@@ -875,7 +886,7 @@ redirect the assignment. Reversing any of those orders produces a build that doe
       `rg -n "public void " QuickFiler.Test/Controllers/BreadcrumbBridgeRouterIssue637Tests.cs`; and
       `(Get-Content -LiteralPath "QuickFiler.Test\Controllers\BreadcrumbBridgeRouterIssue637Tests.cs").Count`
       is at most 500.
-- [ ] [P2-T6] Register the new test file in the non-SDK project. Insert
+- [x] [P2-T6] Register the new test file in the non-SDK project. Insert
       `    <Compile Include="Controllers\BreadcrumbBridgeRouterIssue637Tests.cs" />` into
       `QuickFiler.Test/QuickFiler.Test.csproj` immediately after the existing line 64,
       `    <Compile Include="Controllers\BreadcrumbBridgeRouterIssue439Tests.cs" />`. A file absent
@@ -887,7 +898,7 @@ redirect the assignment. Reversing any of those orders produces a build that doe
       regex engine can consume it. Acceptance:
       `rg -F -n 'Controllers\BreadcrumbBridgeRouterIssue637Tests.cs' QuickFiler.Test/QuickFiler.Test.csproj`
       returns exactly 1 line, and that line is inside the same `ItemGroup` that begins at line 57.
-- [ ] [P2-T7] Add the change-B helper tests. In the existing file
+- [x] [P2-T7] Add the change-B helper tests. In the existing file
       `QuickFiler.Test/Controllers/EfcDataModelIssue614Tests.cs`, add a new sibling `[TestClass]`
       `EfcDataModelIssue637Tests` containing exactly the eight test methods named in the "Fixed
       identifiers" section, reaching `EfcDataModel.ToFilingStemOrVerbatim` through the existing
@@ -909,18 +920,18 @@ redirect the assignment. Reversing any of those orders produces a build that doe
       shows zero removed content lines, meaning zero lines beginning with a single `-`; and
       `(Get-Content -LiteralPath "QuickFiler.Test\Controllers\EfcDataModelIssue614Tests.cs").Count` is
       at most 500.
-- [ ] [P2-T8] Run the analyzer build and write `evidence/regression-testing/p2-t8-msbuild-analyzers.md`
+- [x] [P2-T8] Run the analyzer build and write `evidence/regression-testing/p2-t8-msbuild-analyzers.md`
       using the P0-T13 command verbatim. Acceptance: `EXIT_CODE: 0`; the output contains
       `(Rebuild target(s))`; and the `Error(s)` count is 0. A non-zero exit here means the seam, the
       partial-class split, the project registrations, or the new test files do not compile and must be
       repaired before P2-T10 runs.
-- [ ] [P2-T9] Run the nullable build and write `evidence/regression-testing/p2-t9-msbuild-nullable.md`
+- [x] [P2-T9] Run the nullable build and write `evidence/regression-testing/p2-t9-msbuild-nullable.md`
       using the P0-T14 command verbatim. Acceptance: `EXIT_CODE: 0`; the output contains
       `(Rebuild target(s))`; the recorded `Command:` line does not contain the solution-wide nullable
       opt-in property — record this as `NULLABLE_OPT_IN_PROPERTY: absent`; do not spell the token in
       the artifact. This gate is where an unused-parameter or nullable diagnostic introduced by the
       seam would surface as an error.
-- [ ] [P2-T10] Prove the seam did not regress issue #638's single-read guarantee. Use the scoped
+- [x] [P2-T10] Prove the seam did not regress issue #638's single-read guarantee. Use the scoped
       vstest command stated in full in P2-T11 below, with the filter
       `"/TestCaseFilter:FullyQualifiedName~EfcDataModelArchiveRootTests&TestCategory!=LiveOutlook"`
       and the results directory `coverage\testresults\p2-t10`, and write
