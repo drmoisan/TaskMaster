@@ -21,6 +21,8 @@ this operation may and may not disturb. Read that section before applying anythi
 
 ## Prerequisites
 
+- Reject a pending or not-started run with guidance to consolidate the initial set through `/parallel-plan`. Admit exactly one item only after execution has started in an open run; closed runs are not eligible.
+
 - A parallel run is in progress and `artifacts/orchestration/parallel-orchestrator-state.json`
   tracks its `parallel_slug`. This skill does not start a run; use `/parallel-plan` and
   `/parallel-run` for that.
@@ -59,15 +61,18 @@ re-derivation is mandatory and is not an optimization to skip when the checkpoin
 3. **Compute conflict edges over ALL items, including in-flight ones.** Invoke the contention
    relation `Test-BlastRadiusConflict` from the destination-runtime PowerShell port
    `.claude/lib/blast-radius/BlastRadius.psm1`, which is published by push-down and needs no Python
-   interpreter (`Import-Module .claude/lib/blast-radius/BlastRadius.psm1 -Force`). Its two radius
-   arguments are the two items' radius hashtables, not strings, and the third argument is the
-   required parsed `config/blast-radius.json` mapping, which push-down publishes into the
-   destination workspace. `conflicts(a, b, config)` in `scripts/dev_tools/compute_blast_radius.py`
-   (defined in `scripts/dev_tools/_blast_radius_conflicts.py`) remains the repository authority and
-   the parity reference. Read the verdict from the conflict key of the returned hashtable.
-   The hashtable itself is always truthy, so a bare boolean test on the result treats every pair as
-   conflicting. Map each conflicting pair onto an `(int, int)` conflict edge
-   of `items[].issue_num` values, normalized so `a < b`. Do not reimplement the relation and do not
+   interpreter (the default PowerShell 5.1 execution policy blocks `Import-Module` of a `.psm1`
+   file, so `pwsh` is mandatory: run as `$repoRoot = git rev-parse --show-toplevel; Import-Module
+   (Join-Path $repoRoot '.claude/lib/blast-radius/BlastRadius.psm1') -Force -ErrorAction Stop`).
+   Its two radius arguments are the two items' radius hashtables, not strings, and the third
+   argument is the required parsed `config/blast-radius.json` mapping, which push-down publishes
+   into the destination workspace. `conflicts(a, b, config)` in
+   `scripts/dev_tools/compute_blast_radius.py` (defined in
+   `scripts/dev_tools/_blast_radius_conflicts.py`) remains the repository authority and the parity
+   reference. Read the verdict from `$result['conflict']`; do not test the returned hashtable
+   itself, since it is always truthy under PowerShell boolean coercion, so a bare `if ($result)`
+   check treats every pair as conflicting. Map each conflicting pair onto an `(int, int)` conflict
+   edge of `items[].issue_num` values, normalized so `a < b`. Do not reimplement the relation and do not
    compute edges over the unstarted subset only: an in-flight conflict is precisely what the
    admission decision turns on.
 

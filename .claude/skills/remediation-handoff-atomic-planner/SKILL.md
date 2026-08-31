@@ -106,6 +106,8 @@ After the plan is authored, `atomic-executor` runs preflight under the directive
 
 The orchestrator records the preflight outcome in `remediation_loop.cycles[current_cycle].preflight` with `iterations` (counter) and `final_status` (`clear|changes_requested|pending`).
 
+For a well-scoped item where `preflight.iterations > 1`, record a process-defect investigation that identifies the incomplete planner internal-review dimension. Treat excess rounds as a process signal, not routine iteration.
+
 The exhaustive-pass, defect-enumeration, and delta-self-check rules that govern how `atomic-executor` conducts preflight are defined in the `## Preflight Validation (Planner ↔ Executor)` section of `.claude/skills/atomic-plan-contract/SKILL.md` and are not restated here.
 
 Alongside `iterations` and `final_status`, the orchestrator also records in `remediation_loop.cycles[current_cycle].preflight` the convergence line `atomic-executor` returned on that round, which is one of `CONVERGENCE: NO FURTHER ROUNDS EXPECTED` or `CONVERGENCE: FURTHER ROUNDS LIKELY`. This convergence field extends the field set already recorded at `remediation_loop.cycles[current_cycle].preflight` rather than replacing it: `iterations` and `final_status` continue to be recorded exactly as stated above, and the convergence field is written in addition to them.

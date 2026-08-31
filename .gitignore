@@ -355,3 +355,8 @@ logs/
 # .claude/state/powershell-batch-budget.<session_id>.json. It is session-scoped and records
 # absolute local paths, so it must never be committed.
 .claude/state/
+
+# BEGIN drm-copilot managed ignores
+.claude/state/
+.codex/state/
+# END drm-copilot managed ignores

@@ -110,6 +110,123 @@ function Test-HasPreflightSignal {
     )
 }
 
+function Get-PlannerInternalReviewValidation {
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param([Parameter(Mandatory = $true)][string] $AgentOutput)
+
+    $lines = @($AgentOutput -split "`r?`n")
+    $labelPattern = '^\s*(?:PLANNER-INTERNAL-REVIEW|CITATION-TO-TREE|AC-TRACEABILITY|SCOPE-BOUNDARY|CITATION|AC-INVENTORY|AC-MAPPING|UNRESOLVED-GAPS|PREFLIGHT)\s*:'
+    $headerPattern = '^\s*PLANNER-INTERNAL-REVIEW\s*:\s*(?<Value>.*?)\s*$'
+    $preflightPattern = '^\s*PREFLIGHT\s*:\s*(?:ALL CLEAR|REVISIONS REQUIRED)\s*$'
+    $labelIndexes = [System.Collections.Generic.List[int]]::new()
+    $headerIndexes = [System.Collections.Generic.List[int]]::new()
+    $preflightIndexes = [System.Collections.Generic.List[int]]::new()
+
+    for ($index = 0; $index -lt $lines.Count; $index++) {
+        if ($lines[$index] -match $labelPattern) {
+            $labelIndexes.Add($index)
+        }
+        if ($lines[$index] -match $headerPattern) {
+            $headerIndexes.Add($index)
+        }
+        if ($lines[$index] -match $preflightPattern) {
+            $preflightIndexes.Add($index)
+        }
+    }
+
+    if ($headerIndexes.Count -ne 1) {
+        return @{ Ok = $false; Message = 'planner internal review must contain exactly one `PLANNER-INTERNAL-REVIEW:` declaration.' }
+    }
+
+    $headerIndex = $headerIndexes[0]
+    $headerMatch = [regex]::Match($lines[$headerIndex], $headerPattern)
+    if ($headerMatch.Groups['Value'].Value.Trim() -ne 'PASS') {
+        return @{ Ok = $false; Message = 'planner internal review header must be exactly `PLANNER-INTERNAL-REVIEW: PASS`.' }
+    }
+
+    $preflightAfterHeader = @($preflightIndexes | Where-Object { $_ -gt $headerIndex })
+    if ($preflightAfterHeader.Count -ne 1) {
+        return @{ Ok = $false; Message = 'planner internal review must terminate at exactly one required `PREFLIGHT:` signal after its header.' }
+    }
+
+    $preflightIndex = $preflightAfterHeader[0]
+    foreach ($labelIndex in $labelIndexes) {
+        if ($labelIndex -lt $headerIndex -or $labelIndex -gt $preflightIndex) {
+            return @{ Ok = $false; Message = 'planner internal review declarations must not occur outside the bounded record.' }
+        }
+    }
+
+    $recordLines = @($lines[$headerIndex..$preflightIndex])
+    $requiredDeclarations = @('CITATION-TO-TREE', 'AC-TRACEABILITY', 'SCOPE-BOUNDARY')
+    foreach ($declaration in $requiredDeclarations) {
+        $declarationMatches = @($recordLines | Where-Object { $_ -match "^\s*$declaration\s*:" })
+        if ($declarationMatches.Count -ne 1) {
+            return @{ Ok = $false; Message = "planner internal review must contain exactly one `$declaration: PASS` declaration." }
+        }
+        if ($declarationMatches[0] -notmatch "^\s*$declaration\s*:\s*PASS\s*$") {
+            return @{ Ok = $false; Message = "planner internal review declaration `$declaration must be exactly PASS." }
+        }
+    }
+
+    $citationLines = @($recordLines | Where-Object { $_ -match '^\s*CITATION\s*:' })
+    if ($citationLines.Count -eq 0) {
+        return @{ Ok = $false; Message = 'planner internal review must contain at least one `CITATION:` record.' }
+    }
+    foreach ($citationLine in $citationLines) {
+        $citation = [regex]::Match($citationLine, '^\s*CITATION\s*:\s*(?<Path>[^|\s]+)\s*\|\s*(?<Locator>.+?\S)\s*$')
+        if (-not $citation.Success -or $citation.Groups['Path'].Value -notmatch '^(?![A-Za-z]:)(?!/)(?!\\)(?:\.?[^/\\|\s]+)(?:/[^/\\|\s]+)+$') {
+            return @{ Ok = $false; Message = 'planner internal review citations require a repository-relative path and nonblank locator.' }
+        }
+    }
+
+    $inventoryLines = @($recordLines | Where-Object { $_ -match '^\s*AC-INVENTORY\s*:' })
+    if ($inventoryLines.Count -ne 1) {
+        return @{ Ok = $false; Message = 'planner internal review must contain exactly one nonblank `AC-INVENTORY:` declaration.' }
+    }
+    $inventoryValue = ($inventoryLines[0] -replace '^\s*AC-INVENTORY\s*:\s*', '').Trim()
+    if ([string]::IsNullOrWhiteSpace($inventoryValue)) {
+        return @{ Ok = $false; Message = 'planner internal review `AC-INVENTORY:` must contain nonblank unique IDs.' }
+    }
+    $inventoryIds = @($inventoryValue -split ',' | ForEach-Object { $_.Trim() })
+    if ((@($inventoryIds | Where-Object { [string]::IsNullOrWhiteSpace($_) }).Count -gt 0) -or
+        (@($inventoryIds | Select-Object -Unique).Count -ne $inventoryIds.Count)) {
+        return @{ Ok = $false; Message = 'planner internal review `AC-INVENTORY:` must contain nonblank unique IDs.' }
+    }
+
+    $mappingLines = @($recordLines | Where-Object { $_ -match '^\s*AC-MAPPING\s*:' })
+    if ($mappingLines.Count -eq 0) {
+        return @{ Ok = $false; Message = 'planner internal review must contain one `AC-MAPPING:` record for every inventory ID.' }
+    }
+    $mappingIds = [System.Collections.Generic.List[string]]::new()
+    foreach ($mappingLine in $mappingLines) {
+        $mapping = [regex]::Match($mappingLine, '^\s*AC-MAPPING\s*:\s*(?<Id>[^|]*?)\s*\|\s*IMPLEMENTATION\s*:\s*(?<Implementation>[^|]*?)\s*\|\s*TESTS\s*:\s*(?<Tests>[^|]*?)\s*\|\s*EVIDENCE\s*:\s*(?<Evidence>.*?)\s*$')
+        if (-not $mapping.Success -or
+            [string]::IsNullOrWhiteSpace($mapping.Groups['Id'].Value) -or
+            [string]::IsNullOrWhiteSpace($mapping.Groups['Implementation'].Value) -or
+            [string]::IsNullOrWhiteSpace($mapping.Groups['Tests'].Value) -or
+            [string]::IsNullOrWhiteSpace($mapping.Groups['Evidence'].Value)) {
+            return @{ Ok = $false; Message = 'planner internal review `AC-MAPPING:` requires nonblank ID, IMPLEMENTATION, TESTS, and EVIDENCE fields.' }
+        }
+        $mappingIds.Add($mapping.Groups['Id'].Value.Trim())
+    }
+    if (@($mappingIds | Select-Object -Unique).Count -ne $mappingIds.Count) {
+        return @{ Ok = $false; Message = 'planner internal review `AC-MAPPING:` identifiers must be unique.' }
+    }
+    if ($inventoryIds.Count -ne $mappingIds.Count -or
+        (@($inventoryIds | Where-Object { $_ -notin $mappingIds }).Count -gt 0) -or
+        (@($mappingIds | Where-Object { $_ -notin $inventoryIds }).Count -gt 0)) {
+        return @{ Ok = $false; Message = 'planner internal review AC inventory and mapping identifiers must match exactly.' }
+    }
+
+    $gapLines = @($recordLines | Where-Object { $_ -match '^\s*UNRESOLVED-GAPS\s*:' })
+    if ($gapLines.Count -ne 1 -or $gapLines[0] -notmatch '^\s*UNRESOLVED-GAPS\s*:\s*NONE\s*$') {
+        return @{ Ok = $false; Message = 'planner internal review must contain exactly one `UNRESOLVED-GAPS: NONE` declaration.' }
+    }
+
+    return @{ Ok = $true; Message = $null }
+}
+
 function Get-PlanStructureValidationReport {
     [CmdletBinding()]
     [OutputType([string[]])]
@@ -270,6 +387,11 @@ function Invoke-PlannerOutputValidation {
     if ($errors.Count -gt 0) {
         $message = "atomic-planner hook: plan '$planPath' violates the atomic plan contract:`n  - " + ($errors -join "`n  - ")
         return @{ Ok = $false; Message = $message }
+    }
+
+    $review = Get-PlannerInternalReviewValidation -AgentOutput $agentOutput
+    if (-not $review.Ok) {
+        return @{ Ok = $false; Message = "atomic-planner hook: $($review.Message)" }
     }
 
     return @{ Ok = $true; Message = $null }

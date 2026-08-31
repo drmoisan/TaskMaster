@@ -28,12 +28,14 @@
         rely on the PSCustomObject conversion this module performs; no other
         shape is accepted.
       - Every returned collection is deduplicated and ordinally sorted.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusExtraction.psm1') -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusGlob.psm1') -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusExtraction.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusGlob.psm1') -Force -ErrorAction Stop
 
 # Keys read from the parsed config/blast-radius.json truth table.
 $script:ConfigSharedSurfaceKey = 'shared_surfaces'

@@ -18,7 +18,7 @@ using UtilitiesCS.OutlookObjects.Folder;
 
 namespace QuickFiler.Controllers
 {
-    internal class EfcDataModel
+    internal partial class EfcDataModel
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
@@ -145,6 +145,14 @@ namespace QuickFiler.Controllers
 
         #region Public Properties
 
+        /// <summary>
+        /// Injectable sink for a user-facing diagnostic raised on a folder-open path.
+        /// Production never assigns this seam, so the default delegate shows the message
+        /// box; tests replace it with a capturing delegate so no modal dialog is shown and
+        /// the message text can be asserted.
+        /// </summary>
+        internal Action<string> UserDiagnosticAction { get; set; } = text => MessageBox.Show(text);
+
         private IApplicationGlobals _globals;
         public IApplicationGlobals Globals
         {
@@ -252,6 +260,42 @@ namespace QuickFiler.Controllers
             }
         }
 
+        /// <summary>
+        /// The user-facing text raised when the archive root cannot be resolved. It names no
+        /// path and no mailbox address, because both identify the user's mailbox.
+        /// </summary>
+        private const string ArchiveRootUnavailableMessage =
+            "Cannot open the folder because the Outlook archive root could not be resolved. "
+            + "The details are withheld from this message because they contain a mailbox address.";
+
+        /// <summary>
+        /// Reads the Outlook archive root exactly once and reports whether it resolved.
+        /// The archive-root validator raises <see cref="InvalidOperationException"/> when the
+        /// root is unresolvable or lies in another store; that is a recoverable user-facing
+        /// condition, so it is absorbed here rather than escaping onto the UI thread. Any other
+        /// failure, including a COM failure, still propagates.
+        /// </summary>
+        /// <param name="archiveRoot">The resolved archive root, or null on failure.</param>
+        /// <returns>True when the archive root resolved; otherwise false.</returns>
+        private bool TryGetArchiveRoot(out string archiveRoot)
+        {
+            try
+            {
+                archiveRoot = Globals.Ol.ArchiveRootPath;
+                return true;
+            }
+            catch (InvalidOperationException ex)
+            {
+                archiveRoot = null;
+                logger.Warn(
+                    "Cannot resolve the Outlook archive root. Details are withheld from this "
+                        + "message because they contain a mailbox address.",
+                    ex
+                );
+                return false;
+            }
+        }
+
         #endregion Public Properties
 
         #region Public Methods
@@ -279,14 +323,20 @@ namespace QuickFiler.Controllers
                 logger.Warn($"Cannot sort without OneDrive location");
                 return false;
             }
+
+            if (!TryGetArchiveRoot(out var olAncestor))
+            {
+                return false;
+            }
+
             var config = new EmailFilerConfig()
             {
                 SaveMsg = saveEmail,
                 SaveAttachments = attachments,
                 SavePictures = savePictures,
-                DestinationOlStem = folderpath,
+                DestinationOlStem = ToFilingStemOrVerbatim(folderpath, olAncestor),
                 Globals = Globals,
-                OlAncestor = Globals.Ol.ArchiveRootPath,
+                OlAncestor = olAncestor,
                 FsAncestorEquivalent = folderRoot,
             };
 
@@ -303,11 +353,17 @@ namespace QuickFiler.Controllers
                 return;
             }
 
+            if (!TryGetArchiveRoot(out var olAncestor))
+            {
+                UserDiagnosticAction(ArchiveRootUnavailableMessage);
+                return;
+            }
+
             var config = new EmailFilerConfig()
             {
                 DestinationOlStem = folderpath,
                 Globals = Globals,
-                OlAncestor = Globals.Ol.ArchiveRootPath,
+                OlAncestor = olAncestor,
                 FsAncestorEquivalent = oneDrive,
             };
 
@@ -321,11 +377,17 @@ namespace QuickFiler.Controllers
             {
                 return;
             }
+            if (!TryGetArchiveRoot(out var olAncestor))
+            {
+                UserDiagnosticAction(ArchiveRootUnavailableMessage);
+                return;
+            }
+
             var config = new EmailFilerConfig()
             {
                 DestinationOlStem = folderpath,
                 Globals = Globals,
-                OlAncestor = Globals.Ol.ArchiveRootPath,
+                OlAncestor = olAncestor,
                 FsAncestorEquivalent = oneDrive,
             };
 

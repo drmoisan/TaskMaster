@@ -33,16 +33,18 @@
       - Every returned collection is deduplicated and ordinally sorted via
         [StringComparer]::Ordinal, so identical inputs produce identical output
         in both languages regardless of the current culture.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 # Get-OrdinalSortedEntry moved to BlastRadiusGlob.psm1, where its sibling ordinal
 # primitive Get-OrdinalSmallestEntry already lives, so this module stays within
 # the 500-line limit (issue #452). The import keeps every pre-existing call site
 # and test source-compatible, and introduces no cycle because the Glob module
 # imports no sibling.
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusGlob.psm1') -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusGlob.psm1') -Force -ErrorAction Stop
 
 # Test-MultipleFeatureFolderSpan moved to BlastRadiusTokenShape.psm1, joining the
 # new Test-PlaceholderMarker predicate that could not be added here: this module
@@ -52,7 +54,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusGlob.psm1') 
 # introduces no cycle, because the TokenShape module imports no sibling. This
 # follows the same re-import-and-re-export pattern used above for the relocated
 # ordinal-sort helper.
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusTokenShape.psm1') -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'BlastRadiusTokenShape.psm1') -Force -ErrorAction Stop
 
 # Plan-structure patterns. The regex text mirrors the Python constants so radius
 # derivation and the plan validator can never disagree about which lines are

@@ -37,13 +37,15 @@
     no filesystem, subprocess, network, or wall-clock access, and no input is
     mutated. CRLF, CR, and LF inputs produce identical verdicts because line
     splitting is normalized once in MermaidMarkdownFences.psm1.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'MermaidGrammar.psm1') -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'MermaidLineScanner.psm1') -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'MermaidMarkdownFences.psm1') -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'MermaidGrammar.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'MermaidLineScanner.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'MermaidMarkdownFences.psm1') -Force -ErrorAction Stop
 
 function Get-MermaidFinding {
     <#

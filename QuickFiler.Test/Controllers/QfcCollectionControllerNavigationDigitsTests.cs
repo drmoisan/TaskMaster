@@ -142,13 +142,13 @@ namespace QuickFiler.Controllers.Tests
         /// <c>RemoveSpecificControlGroup</c> path, so the live <c>Digits</c> getter now computes width
         /// 1. Before the fix <c>UnregisterNavigation</c> re-evaluated <c>Digits</c> per iteration and
         /// removed the never-registered "1".."9", leaving all ten two-digit keys orphaned. After the
-        /// fix it replays the recorded width and removes "01".."09".
+        /// #472 fix, it replayed the recorded width and removed "01".."09".
         ///
-        /// The single residual "10" entry is expected and is NOT this fix's scope. The loop is bounded
-        /// by the current <c>_itemGroups.Count</c>, which is now nine, so the tenth key is never
-        /// visited whatever the digit width. That count mismatch is the separately-promoted defect
-        /// recorded in <c>### Downstream notes</c> item 3 of this feature's spec, and the assertion
-        /// below is written as an explicit at-most bound so it cannot silently absorb it.
+        /// The single residual "10" entry this test used to pin is now closed by issue #644.
+        /// It came from the removal loop being bounded by the current <c>_itemGroups.Count</c>,
+        /// nine here, so the tenth key was never visited whatever the digit width. #644 replaced
+        /// that bound with a ledger that replays the recorded set verbatim, so unregistration is
+        /// total and the assertion below is now empty-collection. #472 is strengthened, not undone.
         /// </summary>
         [TestMethod]
         public void UnregisterNavigation_AfterRegisteringAtTwoDigitsAndShrinkingToNine_RemovesTheTwoDigitKeys()
@@ -176,13 +176,13 @@ namespace QuickFiler.Controllers.Tests
                 .Where(k => k.StartsWith("0", StringComparison.Ordinal))
                 .Should()
                 .BeEmpty(
-                    "the recorded registration width is replayed, so the '0'-prefixed keys go"
+                    "the ledger replays each recorded key verbatim, so no '0'-prefixed key survives"
                 );
             remaining
                 .Should()
-                .Equal(
-                    new[] { "10" },
-                    "only the key the shortened loop bound cannot reach survives, which is the separately-promoted count mismatch"
+                .BeEmpty(
+                    "issue #644 replaced the count-bounded removal loop with a ledger that replays "
+                        + "the recorded registration set verbatim, so no key survives unregistration"
                 );
         }
 
@@ -190,9 +190,9 @@ namespace QuickFiler.Controllers.Tests
         /// Issue #472, mirror direction. A nine-item page registers keys "1".."9" at width 1. A group
         /// is then added without an intervening unregister, so the live <c>Digits</c> getter now
         /// computes width 2. Before the fix <c>UnregisterNavigation</c> removed the never-registered
-        /// "01".."10" and left all nine single-digit keys orphaned. After the fix it replays the
-        /// recorded width 1 and, because the loop bound has grown to ten, removes every registered
-        /// key.
+        /// "01".."10" and left all nine single-digit keys orphaned. After the fix the ledger replays
+        /// the nine recorded keys "1".."9" verbatim, so the added tenth group is irrelevant to
+        /// unregistration.
         /// </summary>
         [TestMethod]
         public void UnregisterNavigation_AfterRegisteringAtOneDigitAndGrowingToTen_RemovesTheOneDigitKeys()
@@ -219,7 +219,7 @@ namespace QuickFiler.Controllers.Tests
             CollectionKeys(registry)
                 .Should()
                 .BeEmpty(
-                    "the recorded width 1 is replayed and the grown loop bound reaches every registered key"
+                    "the ledger replays each key verbatim, so every key is removed regardless of group count"
                 );
         }
     }

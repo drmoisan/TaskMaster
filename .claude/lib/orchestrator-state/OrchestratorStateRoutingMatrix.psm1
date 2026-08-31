@@ -33,13 +33,15 @@
 
     Every function is pure: it reads no file, starts no process, and never mutates
     its input.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 # Import the shared checkpoint-value primitives, resolved relative to this
 # module's directory so the import travels with the pushed-down pack.
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCheckpointValue.psm1') -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCheckpointValue.psm1') -Force -ErrorAction Stop
 
 # The pinned routing-matrix subset. Each route records the two gate flags and the
 # three required-name lists the completion checks consume. A gate flag of $null

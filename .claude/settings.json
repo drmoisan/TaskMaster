@@ -240,6 +240,15 @@
         ]
       },
       {
+        "matcher": "prd-feature",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .claude/hooks/validate-prd-feature-output.ps1"
+          }
+        ]
+      },
+      {
         "matcher": "pr-author",
         "hooks": [
           {

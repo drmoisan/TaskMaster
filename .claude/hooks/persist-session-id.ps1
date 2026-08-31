@@ -8,13 +8,15 @@
     falling back to the CLAUDE_HOOK_INPUT environment variable (the existing
     SubagentStop-hook precedent), and extracts the 'session_id' field.
 
-    Persistence channel:
-      - When CLAUDE_ENV_FILE is set, appends the line
-        'CLAUDE_SESSION_ID=<id>' to that file. Variables persisted there are
+    Persistence channels:
+      - The id is always written to .claude/state/current-session-id, creating
+        that directory when absent. Publishing it unconditionally is what lets a
+        consumer that cannot read the env file, such as a hook running in a
+        fresh process, still resolve the session id from disk.
+      - When CLAUDE_ENV_FILE is set, the line 'CLAUDE_SESSION_ID=<id>' is
+        additionally appended to that file. Variables persisted there are
         exported to subsequent Bash tool commands in the session, which is how
         this hook provisions the otherwise-unset CLAUDE_SESSION_ID variable.
-      - When CLAUDE_ENV_FILE is unset, writes the id to
-        .claude/state/current-session-id instead.
 
     On malformed or empty input (missing/blank payload, unparseable JSON, or an
     absent/blank session_id) the hook performs no write. It always exits 0 so a
@@ -101,6 +103,15 @@ function Invoke-PersistSessionIdHook {
     switch ($decision.action) {
         'env-file' {
             & $AppendLine $decision.path ("CLAUDE_SESSION_ID={0}" -f $decision.sessionId)
+
+            # The state file is published unconditionally, so a consumer that
+            # cannot read the env file (a hook invoked in a fresh process, for
+            # example) still resolves the session id from disk.
+            $envStateDir = Split-Path -Path $StateFilePath -Parent
+            if ($envStateDir) {
+                & $EnsureDirectory $envStateDir
+            }
+            & $WriteStateFile $StateFilePath $decision.sessionId
         }
         'state-file' {
             $stateDir = Split-Path -Path $decision.path -Parent
