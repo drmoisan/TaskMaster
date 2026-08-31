@@ -39,6 +39,7 @@
 - ["Skip the pointless drain" note makes a negative test vacuous](project_preflight_drain_scope_optimization_note_makes_test_vacuous.md) — a cosmetic "path
 - [Sanitisation task cannot sweep its own record](project_sanitisation_task_cannot_sweep_its_own_record.md) — exactly one resi
 - [Conjunctive criteria break the one-artifact citation rule](project_preflight_conjunctive_criterion_citation_gap.md) — "cites exactly o
+- [Pre-edit gate cites the post-edit replacement table](project_preedit_gate_cites_postedit_replacement_table.md) — baseline asserts s
 - [Caller-stated preflight count drifts before execution](project_caller_stated_preflight_count_drifts_before_execution.md) — 42 quoted vs 48 measured; read the plan's own clause
 - [Orchestrator override does not satisfy an AC](project_orchestrator_override_does_not_satisfy_an_ac.md) — proceed past the gate,
 ## Build / toolchain environment
