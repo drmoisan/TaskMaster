@@ -1,0 +1,386 @@
+{
+  "schema_version": 2,
+  "objective": "Recover PR #704 GitHub Actions run 33396149197 job 99501030607 by applying the repository-pinned CSharpier formatter only to the verified 35 app.config/packages.config paths, then complete the required local C# toolchain and commit without push, PR update, merge, or worktree removal.",
+  "workspace_root": "C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\ci-format-recovery-704",
+  "branch": "codex/ci-format-recovery-704",
+  "initial_head": "d69a572b2f1ce3d65866fd9e09c8028b55545ee7",
+  "last_updated": "2026-08-31T11-15",
+  "change_budget_estimate": {
+    "language": "csharp",
+    "production_file_count": 35,
+    "test_file_count": 0,
+    "cross_cutting": true,
+    "rationale": "The exact failed-job path set contains 35 app.config/packages.config files. The authoritative topology resolver classifies the scope as cross-cutting and selects the large route."
+  },
+  "path_selected": "large",
+  "promotion-type": "bug",
+  "short-name": "qfc-collection-move-diagnostics-defects",
+  "relativeFile": "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/issue.md",
+  "long-name": "2026-08-07-qfc-collection-move-diagnostics-defects-469",
+  "issue-num": "469",
+  "feature-folder": "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469",
+  "work-mode": "full-bug",
+  "plan-path": "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/formatter-recovery-plan.2026-08-31T00-00.md",
+  "route_id": "large",
+  "work_mode": "full-bug",
+  "issue_num": 469,
+  "feature_folder": "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469",
+  "plan_path": "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/formatter-recovery-plan.2026-08-31T00-00.md",
+  "required_agents": [
+    "task-researcher",
+    "prd-feature",
+    "atomic-planner",
+    "atomic-executor",
+    "feature-review",
+    "pr-author"
+  ],
+  "required_skills": [
+    "orchestrate",
+    "feature-promotion-lifecycle",
+    "atomic-plan-contract",
+    "acceptance-criteria-tracking",
+    "pr-context-artifacts",
+    "pr-base-branch-merge-base"
+  ],
+  "required_mcp_tools": [
+    "new_potential_entry",
+    "potential_to_issue",
+    "new_active_feature_folder",
+    "collect_pr_context",
+    "validate_orchestration_artifacts"
+  ],
+  "scope": {
+    "languages": [
+      "csharp"
+    ],
+    "estimated_production_file_count": 35,
+    "estimated_test_file_count": 0,
+    "cross_cutting": true,
+    "authorized_path_set_count": 35,
+    "authorized_path_kinds": [
+      "app.config",
+      "packages.config"
+    ],
+    "excluded": [
+      "TaskMaster/TaskMaster.csproj in the user's main checkout",
+      "the user's older dirty source worktree",
+      "all worktree removal or pruning",
+      "all historical issue #469 evidence reconciliation artifacts"
+    ]
+  },
+  "baseline_evidence": [
+    "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/evidence/remediation-baseline/p1-t2-csharpier-baseline-enumeration.2026-08-31T10-00.md",
+    "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/evidence/qa-gates/p2-t2-csharpier-set-comparison.2026-08-31T10-15.md"
+  ],
+  "completed_steps": [
+    "S0_read_only_intake",
+    "S1_resolve_codex_topology",
+    "S2_resolve_codex_deployment",
+    "S3_plan",
+    "S4_preflight"
+  ],
+  "next_step": "S8_local_stop",
+  "step5_status": "completed",
+  "step6_status": "completed",
+  "step7_status": "completed",
+  "step8_status": "not_started",
+  "step9_status": "not_started",
+  "step10_status": "not_started",
+  "step_statuses": {
+    "S0_read_only_intake": "completed",
+    "S1_resolve_codex_topology": "completed",
+    "S2_resolve_codex_deployment": "completed",
+    "S3_plan": "completed",
+    "S4_preflight": "completed",
+    "S5_execute": "completed",
+    "S6_verify": "completed",
+    "S7_commit": "completed"
+  },
+  "codex_topology_receipts": [
+    {
+      "phase": "S1_resolve_codex_topology",
+      "delegation_id": "ci-format-recovery-704-orchestrator",
+      "cross_cutting": true,
+      "execution_context": "standalone",
+      "languages": ["csharp"],
+      "logical_agent": "orchestrator",
+      "max_production_files": 3,
+      "max_test_files": 3,
+      "production_file_count": 35,
+      "root_persona": null,
+      "route": "large",
+      "routing_reason": "cross_cutting",
+      "test_file_count": 0,
+      "topology": "orchestrator",
+      "resolver_command": "poetry -C 'C:\\Users\\DanMoisan\\repos\\drm-copilot' run python -m scripts.dev_tools.resolve_codex_topology --language csharp --production-file-count 35 --test-file-count 0 --execution-context standalone --cross-cutting",
+      "raw_output": {
+        "cross_cutting": true,
+        "execution_context": "standalone",
+        "languages": ["csharp"],
+        "logical_agent": "orchestrator",
+        "max_production_files": 3,
+        "max_test_files": 3,
+        "production_file_count": 35,
+        "root_persona": null,
+        "route": "large",
+        "routing_reason": "cross_cutting",
+        "test_file_count": 0,
+        "topology": "orchestrator"
+      }
+    }
+  ],
+  "codex_model_routing_receipts": [
+    {
+      "phase": "S2_resolve_codex_deployment",
+      "delegation_id": "ci-format-recovery-704-orchestrator",
+      "c3_overlay_applied": false,
+      "c3_overlay_reason": null,
+      "complexity_band": "C2",
+      "deployment_agent": "orchestrator-c2",
+      "execution_context": "standalone",
+      "logical_agent": "orchestrator",
+      "model": "gpt-5.6-terra",
+      "model_reasoning_effort": "medium",
+      "orchestration_complexity_ceiling": "C2",
+      "resolver_command": "poetry -C 'C:\\Users\\DanMoisan\\repos\\drm-copilot' run python -m scripts.dev_tools.resolve_codex_deployment --logical-agent orchestrator --complexity-band C2 --execution-context standalone --orchestration-complexity-ceiling C2",
+      "raw_output": {
+        "c3_overlay_applied": false,
+        "c3_overlay_reason": null,
+        "complexity_band": "C2",
+        "deployment_agent": "orchestrator-c2",
+        "execution_context": "standalone",
+        "logical_agent": "orchestrator",
+        "model": "gpt-5.6-terra",
+        "model_reasoning_effort": "medium",
+        "orchestration_complexity_ceiling": "C2"
+      },
+      "agent_profile_path": ".codex/agents/orchestrator-c2.toml",
+      "agent_profile_sha256": "BB068C0CA946234FE8D6871FF95174D79D79131E48DB38E2F4FD268D54F418EE"
+    },
+    {
+      "phase": "S3_plan",
+      "delegation_id": "ci-format-recovery-704-atomic-planner",
+      "c3_overlay_applied": false,
+      "c3_overlay_reason": null,
+      "complexity_band": "C2",
+      "deployment_agent": "atomic-planner-c2",
+      "execution_context": "standalone",
+      "logical_agent": "atomic-planner",
+      "model": "gpt-5.6-terra",
+      "model_reasoning_effort": "medium",
+      "orchestration_complexity_ceiling": "C2",
+      "resolver_command": "poetry -C 'C:\\Users\\DanMoisan\\repos\\drm-copilot' run python -m scripts.dev_tools.resolve_codex_deployment --logical-agent atomic-planner --complexity-band C2 --execution-context standalone --orchestration-complexity-ceiling C2",
+      "raw_output": {
+        "c3_overlay_applied": false,
+        "c3_overlay_reason": null,
+        "complexity_band": "C2",
+        "deployment_agent": "atomic-planner-c2",
+        "execution_context": "standalone",
+        "logical_agent": "atomic-planner",
+        "model": "gpt-5.6-terra",
+        "model_reasoning_effort": "medium",
+        "orchestration_complexity_ceiling": "C2"
+      },
+      "agent_profile_path": ".codex/agents/atomic-planner-c2.toml",
+      "agent_profile_sha256": "408CDAEA8192D5C4635573216EFB96F949230753E0334BFDD0E71040FA0C1C0E"
+    },
+    {
+      "phase": "S4_preflight",
+      "delegation_id": "ci-format-recovery-704-atomic-executor-preflight",
+      "c3_overlay_applied": false,
+      "c3_overlay_reason": null,
+      "complexity_band": "C2",
+      "deployment_agent": "atomic-executor-c2",
+      "execution_context": "standalone",
+      "logical_agent": "atomic-executor",
+      "model": "gpt-5.6-terra",
+      "model_reasoning_effort": "medium",
+      "orchestration_complexity_ceiling": "C2",
+      "resolver_command": "poetry -C 'C:\\Users\\DanMoisan\\repos\\drm-copilot' run python -m scripts.dev_tools.resolve_codex_deployment --logical-agent atomic-executor --complexity-band C2 --execution-context standalone --orchestration-complexity-ceiling C2",
+      "raw_output": {
+        "c3_overlay_applied": false,
+        "c3_overlay_reason": null,
+        "complexity_band": "C2",
+        "deployment_agent": "atomic-executor-c2",
+        "execution_context": "standalone",
+        "logical_agent": "atomic-executor",
+        "model": "gpt-5.6-terra",
+        "model_reasoning_effort": "medium",
+        "orchestration_complexity_ceiling": "C2"
+      },
+      "agent_profile_path": ".codex/agents/atomic-executor-c2.toml",
+      "agent_profile_sha256": "2305CA12DF4D08E9EA913A26B454133508E2F13A037F2FB095C3D21927C1C5EF"
+    },
+    {
+      "phase": "S5_execute",
+      "delegation_id": "ci-format-recovery-704-atomic-executor-execution",
+      "c3_overlay_applied": false,
+      "c3_overlay_reason": null,
+      "complexity_band": "C2",
+      "deployment_agent": "atomic-executor-c2",
+      "execution_context": "standalone",
+      "logical_agent": "atomic-executor",
+      "model": "gpt-5.6-terra",
+      "model_reasoning_effort": "medium",
+      "orchestration_complexity_ceiling": "C2",
+      "resolver_command": "poetry -C 'C:\\Users\\DanMoisan\\repos\\drm-copilot' run python -m scripts.dev_tools.resolve_codex_deployment --logical-agent atomic-executor --complexity-band C2 --execution-context standalone --orchestration-complexity-ceiling C2",
+      "raw_output": {
+        "c3_overlay_applied": false,
+        "c3_overlay_reason": null,
+        "complexity_band": "C2",
+        "deployment_agent": "atomic-executor-c2",
+        "execution_context": "standalone",
+        "logical_agent": "atomic-executor",
+        "model": "gpt-5.6-terra",
+        "model_reasoning_effort": "medium",
+        "orchestration_complexity_ceiling": "C2"
+      },
+      "agent_profile_path": ".codex/agents/atomic-executor-c2.toml",
+      "agent_profile_sha256": "2305CA12DF4D08E9EA913A26B454133508E2F13A037F2FB095C3D21927C1C5EF"
+    },
+    {
+      "phase": "S5_execute_resume_P1_T3",
+      "delegation_id": "ci-format-recovery-704-atomic-executor-resume-p1-t3",
+      "c3_overlay_applied": false,
+      "c3_overlay_reason": null,
+      "complexity_band": "C2",
+      "deployment_agent": "atomic-executor-c2",
+      "execution_context": "standalone",
+      "logical_agent": "atomic-executor",
+      "model": "gpt-5.6-terra",
+      "model_reasoning_effort": "medium",
+      "orchestration_complexity_ceiling": "C2",
+      "resolver_command": "poetry -C 'C:\\Users\\DanMoisan\\repos\\drm-copilot' run python -m scripts.dev_tools.resolve_codex_deployment --logical-agent atomic-executor --complexity-band C2 --execution-context standalone --orchestration-complexity-ceiling C2",
+      "raw_output": {
+        "c3_overlay_applied": false,
+        "c3_overlay_reason": null,
+        "complexity_band": "C2",
+        "deployment_agent": "atomic-executor-c2",
+        "execution_context": "standalone",
+        "logical_agent": "atomic-executor",
+        "model": "gpt-5.6-terra",
+        "model_reasoning_effort": "medium",
+        "orchestration_complexity_ceiling": "C2"
+      },
+      "agent_profile_path": ".codex/agents/atomic-executor-c2.toml",
+      "agent_profile_sha256": "2305CA12DF4D08E9EA913A26B454133508E2F13A037F2FB095C3D21927C1C5EF"
+    },
+    {
+      "phase": "S5_execute_resume_P3_T1",
+      "delegation_id": "ci-format-recovery-704-atomic-executor-resume-p3-t1",
+      "c3_overlay_applied": false,
+      "c3_overlay_reason": null,
+      "complexity_band": "C2",
+      "deployment_agent": "atomic-executor-c2",
+      "execution_context": "standalone",
+      "logical_agent": "atomic-executor",
+      "model": "gpt-5.6-terra",
+      "model_reasoning_effort": "medium",
+      "orchestration_complexity_ceiling": "C2",
+      "resolver_command": "poetry -C 'C:\\Users\\DanMoisan\\repos\\drm-copilot' run python -m scripts.dev_tools.resolve_codex_deployment --logical-agent atomic-executor --complexity-band C2 --execution-context standalone --orchestration-complexity-ceiling C2",
+      "raw_output": {
+        "c3_overlay_applied": false,
+        "c3_overlay_reason": null,
+        "complexity_band": "C2",
+        "deployment_agent": "atomic-executor-c2",
+        "execution_context": "standalone",
+        "logical_agent": "atomic-executor",
+        "model": "gpt-5.6-terra",
+        "model_reasoning_effort": "medium",
+        "orchestration_complexity_ceiling": "C2"
+      },
+      "agent_profile_path": ".codex/agents/atomic-executor-c2.toml",
+      "agent_profile_sha256": "2305CA12DF4D08E9EA913A26B454133508E2F13A037F2FB095C3D21927C1C5EF"
+    }
+  ],
+  "delegation_receipts": {
+    "agents": [],
+    "promotion": {}
+  },
+  "skill_receipts": [
+    {
+      "skill": "orchestrate",
+      "required": true,
+      "acknowledged_at_phase": "S0_read_only_intake",
+      "evidence": "artifacts/orchestration/orchestrator-state.json"
+    },
+    {
+      "skill": "atomic-plan-contract",
+      "required": true,
+      "acknowledged_at_phase": "S0_read_only_intake",
+      "evidence": "artifacts/orchestration/orchestrator-state.json"
+    },
+    {
+      "skill": "acceptance-criteria-tracking",
+      "required": true,
+      "acknowledged_at_phase": "S0_read_only_intake",
+      "evidence": "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/spec.md"
+    },
+    {
+      "skill": "pr-context-artifacts",
+      "required": true,
+      "acknowledged_at_phase": "S0_read_only_intake",
+      "evidence": "artifacts/orchestration/orchestrator-state.json"
+    }
+  ],
+  "mcp_call_receipts": [
+    {
+      "phase": "P3-T1",
+      "tool": "validate_orchestration_artifacts",
+      "inputs": {
+        "artifact_path": "artifacts/orchestration/orchestrator-state.json",
+        "artifact_type": "orchestrator-state",
+        "workspace_root": "C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\ci-format-recovery-704",
+        "require_codex_topology": true,
+        "require_codex_model_routing": true,
+        "require_model_routing": true
+      },
+      "response": {
+        "ok": true,
+        "tool": "validate_orchestration_artifacts",
+        "workspace_root": "C:\\Users\\DanMoisan\\repos\\TaskMaster-wt\\ci-format-recovery-704",
+        "summary": "Validated orchestrator-state artifact at 'artifacts/orchestration/orchestrator-state.json'."
+      },
+      "evidence": "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/evidence/qa-gates/p3-t1-checkpoint-validator.2026-08-31T00-00.md"
+    }
+  ],
+  "lifecycle_operations": [],
+  "local_execution_overrides": [],
+  "delegation_bypasses": [],
+  "human_interaction": {
+    "requirements": []
+  },
+  "blocked_reason": null,
+  "recovery_completion": {
+    "approved_plan_path": "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/formatter-recovery-plan.2026-08-31T00-00.md",
+    "preflight_status": "PREFLIGHT: ALL CLEAR",
+    "final_command_evidence": [
+      "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/evidence/qa-gates/p2-t1-csharpier-format.2026-08-31T00-00.md",
+      "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/evidence/qa-gates/p2-t1-csharpier-check.2026-08-31T00-00.md",
+      "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/evidence/qa-gates/p2-t2-analyzer-rebuild.2026-08-31T00-00.md",
+      "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/evidence/qa-gates/p2-t3-nullable-rebuild.2026-08-31T00-00.md",
+      "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/evidence/qa-gates/p2-t4-mstest-coverage.2026-08-31T00-00.md",
+      "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/evidence/qa-gates/p2-t5-zero-regression-delta.2026-08-31T00-00.md"
+    ],
+    "final_scope_result": "PASS: exactly 35 allowlisted app.config/packages.config paths changed; no issue #469 implementation or test path changed.",
+    "provisional_local_commit_transition": "completed",
+    "provisional_local_commit_sha": "1ff88d03d24d0b386655b86db01001cf44263d97",
+    "provisional_local_commit_message": "ci(format): recover CI formatter configuration",
+    "final_amendment_transition": "pending",
+    "provisional_checkpoint_validator_evidence": "docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/evidence/qa-gates/p3-t1-checkpoint-validator.2026-08-31T00-00.md",
+    "forbidden_actions": {
+      "push": "not_run",
+      "pr_update": "not_run",
+      "merge": "not_run",
+      "worktree_removal": "not_run",
+      "worktree_prune": "not_run"
+    }
+  },
+  "previous_blocker": {
+    "code": "CODEX_TOPOLOGY_RESOLVER_UNAVAILABLE",
+    "resolved_by": "parent-authorized canonical central resolver runtime",
+    "topology_command": "poetry run python -m scripts.dev_tools.resolve_codex_topology --language csharp --production-file-count 0 --test-file-count 0 --execution-context standalone",
+    "deployment_command": "poetry run python -m scripts.dev_tools.resolve_codex_deployment --logical-agent csharp-typed-engineer --complexity-band C1 --execution-context standalone --orchestration-complexity-ceiling C1",
+    "observed_error": "ModuleNotFoundError: No module named 'scripts.dev_tools'"
+  }
+}
