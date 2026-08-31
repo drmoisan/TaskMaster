@@ -674,7 +674,7 @@ git status --porcelain -- QuickFiler QuickFiler.Test
 `PROGRESS_COMMIT_REQUIRED: P0-T1..P4-T2`. Do not begin `[P4-T3]` until the orchestrator has recorded
 the completed interval's commit SHA in the canonical checkpoint.
 
-- [ ] [P4-T3] Verify spec AC11. Acceptance: in
+- [x] [P4-T3] Verify spec AC11. Acceptance: in
   `docs/features/active/quickfiler-home-controller-metrics-442/spec.md`, the count of the token
   `CFN-2 RESOLVED` is at least 1 (discriminating: it was 0 at branch head per P0-T15) and the count
   of the token `CFN-2` is at least 9 (invariant guard: nine occurrences exist at branch head at
@@ -692,7 +692,7 @@ $s = 'docs\features\active\quickfiler-home-controller-metrics-442\spec.md'
 
 ### Phase 5 — Scope-Boundary and Invariant Verification
 
-- [ ] [P5-T1] Verify the first half of spec AC12: the forbidden file is absent from the change.
+- [x] [P5-T1] Verify the first half of spec AC12: the forbidden file is absent from the change.
   Acceptance: the output of `git diff origin/main --name-only -- QuickFiler QuickFiler.Test docs`
   contains zero lines equal to `QuickFiler/Controllers/QfcFormController.EventHandlers.cs`, and the
   output of the companion `git status --porcelain -- QuickFiler QuickFiler.Test docs` likewise
@@ -707,7 +707,7 @@ git diff origin/main --name-only -- QuickFiler QuickFiler.Test docs
 git status --porcelain -- QuickFiler QuickFiler.Test docs
 ```
 
-- [ ] [P5-T2] Verify the second half of spec AC12: issue #629 was not absorbed. Acceptance: the count
+- [x] [P5-T2] Verify the second half of spec AC12: issue #629 was not absorbed. Acceptance: the count
   of the token `StackMovedItems` in `QuickFiler/Interfaces/IQfcCollectionController.cs` is at least
   2 (it occurs at lines 54 and 63 at branch head).
   Casing note: the issue text and the implementation use the camelCase form `stackMovedItems`, but
@@ -722,7 +722,7 @@ git status --porcelain -- QuickFiler QuickFiler.Test docs
 @(Select-String -LiteralPath 'QuickFiler\Interfaces\IQfcCollectionController.cs' -CaseSensitive -SimpleMatch -Pattern 'StackMovedItems').Count
 ```
 
-- [ ] [P5-T3] Verify the whitespace filter was not deleted, statically. Acceptance, both of which
+- [x] [P5-T3] Verify the whitespace filter was not deleted, statically. Acceptance, both of which
   must hold: in `QuickFiler/Controllers/QfcHomeController.Metrics.cs` the count of the single-line
   token `strOutput.Where(line` is exactly 1 and the count of the single-line token
   `IsNullOrWhiteSpace(line)).ToArray();` is exactly 1. Both tokens are drawn from the single
@@ -736,7 +736,7 @@ git status --porcelain -- QuickFiler QuickFiler.Test docs
 @(Select-String -LiteralPath 'QuickFiler\Controllers\QfcHomeController.Metrics.cs' -SimpleMatch -Pattern 'IsNullOrWhiteSpace(line)).ToArray();').Count
 ```
 
-- [ ] [P5-T4] Verify spec AC8 and the companion file-size invariants. Acceptance, all five of which
+- [x] [P5-T4] Verify spec AC8 and the companion file-size invariants. Acceptance, all five of which
   must hold: `(Get-Content).Count` is at most 2446 for
   `QuickFiler/Controllers/QfcCollectionController.cs` (spec AC8; no split is performed and
   decomposition remains delegated to open issue #623), at most 497 for
@@ -755,7 +755,7 @@ git status --porcelain -- QuickFiler QuickFiler.Test docs
 (Get-Content -LiteralPath 'QuickFiler.Test\Controllers\QfcCollectionControllerTests.cs').Count
 ```
 
-- [ ] [P5-T5] Verify spec AC7 by classifying every changed line in the C# diff. Acceptance: for
+- [x] [P5-T5] Verify spec AC7 by classifying every changed line in the C# diff. Acceptance: for
   `git diff origin/main -- QuickFiler QuickFiler.Test`, every output line that begins with a single
   `+` or a single `-` and is not a `+++` or `---` file header, after removal of that leading
   character and of leading whitespace, begins with one of exactly three prefixes: `// `, `/// `, or
@@ -774,7 +774,7 @@ git diff origin/main -- QuickFiler QuickFiler.Test
 git diff origin/main --numstat -- QuickFiler QuickFiler.Test
 ```
 
-- [ ] [P5-T6] Verify the "no test method is added or removed" half of spec AC9, statically.
+- [x] [P5-T6] Verify the "no test method is added or removed" half of spec AC9, statically.
   Acceptance: the count of `[TestMethod]` is 9 in
   `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs` and 11 in
   `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, each equal to the corresponding
@@ -794,7 +794,7 @@ Every command task in this phase is unconditional. `EXIT_CODE: SKIPPED` is not a
 any of them. If any task in this phase fails or rewrites a tracked file, restart the phase from
 P6-T1.
 
-- [ ] [P6-T1] Run the CSharpier formatting pass. If P0-T10 recorded `EXIT_CODE: 0`, run
+- [x] [P6-T1] Run the CSharpier formatting pass. If P0-T10 recorded `EXIT_CODE: 0`, run
   `dotnet tool run csharpier format .` at the repository root. If P0-T10 recorded a non-zero exit
   code, the repository carries pre-existing formatting drift that a repo-wide mutating pass would
   sweep into this change's diff and break spec AC7, so instead run
@@ -828,7 +828,7 @@ git status --porcelain -- QuickFiler QuickFiler.Test
 git diff origin/main --numstat -- QuickFiler QuickFiler.Test
 ```
 
-- [ ] [P6-T2] Run `dotnet tool run csharpier check .` at the repository root. Acceptance: every file
+- [x] [P6-T2] Run `dotnet tool run csharpier check .` at the repository root. Acceptance: every file
   the output reports as unformatted also appears in the enumeration recorded by P0-T10. If P0-T10
   recorded no unformatted file, this means `EXIT_CODE: 0` and an output carrying zero
   unformatted-file reports. If P0-T10 enumerated unformatted files, the exit code may be non-zero, and
@@ -845,7 +845,7 @@ dotnet tool run csharpier check .
 $LASTEXITCODE
 ```
 
-- [ ] [P6-T3] Run the analyzer build. Acceptance: if `EXIT_CODE: 0`, the MSBuild summary reports
+- [x] [P6-T3] Run the analyzer build. Acceptance: if `EXIT_CODE: 0`, the MSBuild summary reports
   `0 Error(s)`. If `EXIT_CODE:` is non-zero, compare every reported diagnostic against the
   enumeration recorded by P0-T11: a diagnostic present in that enumeration is a pre-existing
   baseline failure and is an accepted baseline-relative outcome; any diagnostic absent from that
@@ -860,7 +860,7 @@ $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find 'MSBui
 $LASTEXITCODE
 ```
 
-- [ ] [P6-T4] Run the nullable/type-check build. Acceptance and baseline-comparison rule: identical
+- [x] [P6-T4] Run the nullable/type-check build. Acceptance and baseline-comparison rule: identical
   to P6-T3, compared against the P0-T12 enumeration. `/p:Nullable=enable` must not be added. Record
   the outcome in `FEATURE/evidence/qa-gates/p6-t4-msbuild-nullable.2026-08-29T12-22.md`.
 
@@ -871,7 +871,7 @@ $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find 'MSBui
 $LASTEXITCODE
 ```
 
-- [ ] [P6-T5] Run the solution-wide coverage-enabled test pass, which is the realisation of
+- [x] [P6-T5] Run the solution-wide coverage-enabled test pass, which is the realisation of
   toolchain step 4. Acceptance: the run completes and
   `FEATURE/evidence/qa-gates/p6-t5-coverage.2026-08-29T12-22.md` records `Command:`, `EXIT_CODE:`,
   and an `Output Summary:` containing `POST_LINE_RATE_PERCENT:` set to the numeric line-coverage
@@ -885,7 +885,7 @@ pwsh -NoProfile -File 'scripts\vscode\Invoke-MSTestWithCoverage.ps1' -SearchRoot
 $LASTEXITCODE
 ```
 
-- [ ] [P6-T6] Re-run the scoped `QuickFiler.Test` pass and verify spec AC9. Acceptance: the vstest
+- [x] [P6-T6] Re-run the scoped `QuickFiler.Test` pass and verify spec AC9. Acceptance: the vstest
   summary reports a passed count equal to `BASELINE_PASSED:` from P0-T13, a total count equal to
   `BASELINE_TOTAL:` from P0-T13, and a failed count of 0. Record the summary line verbatim as
   `POST_PASSED:` and `POST_TOTAL:` in
@@ -898,7 +898,7 @@ $vstest = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatf
 $LASTEXITCODE
 ```
 
-- [ ] [P6-T7] Verify spec AC4 and the behavioral half of spec AC6 by naming the four guard tests
+- [x] [P6-T7] Verify spec AC4 and the behavioral half of spec AC6 by naming the four guard tests
   explicitly. Acceptance: the run reports total 4, passed 4, failed 0, skipped 0 for the four named
   tests `WriteMetricsAsync_FiltersNullDiagnosticLinesBeforeWriting`,
   `GetMoveDiagnostics_WithOneGroup_ReturnsExactlyOneLine`,
@@ -917,7 +917,7 @@ $filter = 'FullyQualifiedName~WriteMetricsAsync_FiltersNullDiagnosticLinesBefore
 $LASTEXITCODE
 ```
 
-- [ ] [P6-T8] Record the coverage comparison and the non-attribution statement in
+- [x] [P6-T8] Record the coverage comparison and the non-attribution statement in
   `FEATURE/evidence/qa-gates/p6-t8-coverage-delta.2026-08-29T12-22.md`. Acceptance: the artifact
   records `BASELINE_LINE_RATE_PERCENT:` from P0-T14, `POST_LINE_RATE_PERCENT:` from P6-T5, their
   arithmetic difference in percentage points as `DELTA_PERCENTAGE_POINTS:`, and a
@@ -935,7 +935,7 @@ $LASTEXITCODE
   carries `[ExcludeFromCodeCoverage]` at line 21, so no coverage figure in this artifact is
   attributable to that class and no coverage-increase claim is made for it anywhere in this plan.
 
-- [ ] [P6-T9] Declare the clean toolchain pass. Acceptance: record in
+- [x] [P6-T9] Declare the clean toolchain pass. Acceptance: record in
   `FEATURE/evidence/qa-gates/p6-t9-clean-pass.2026-08-29T12-22.md` that P6-T1 through P6-T7 all
   completed in a single uninterrupted sequence with no failure and no file rewrite between them,
   naming each command run and its exit code. "No failure" here means that each task's own acceptance
@@ -954,7 +954,7 @@ $LASTEXITCODE
   is a wording divergence between AC10 and the repository's actual step-4 command rather than an
   omitted step.
 
-- [ ] [P6-T10] Verify spec AC13. Acceptance:
+- [x] [P6-T10] Verify spec AC13. Acceptance:
   `FEATURE/evidence/regression-testing/p6-t10-test-count-comparison.2026-08-29T12-22.md` exists and
   records `BASELINE_PASSED:` (from P0-T13), `POST_PASSED:` (from P6-T6), the two source artifact
   paths, and an explicit equality verdict. Both figures live under
@@ -965,7 +965,7 @@ $LASTEXITCODE
 
 ### Phase 7 — Acceptance Check-off, Commit, and Traceability
 
-- [ ] [P7-T1] Check off AC1 in `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/spec.md`
+- [x] [P7-T1] Check off AC1 in `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/spec.md`
   by changing its list marker from `- [ ] AC1` to `- [x] AC1`. Do not alter the criterion text; the
   criterion line changes only in its checkbox marker. Record the evidence path
   `FEATURE/evidence/qa-gates/p2-t2-ac1-metrics-token.2026-08-29T12-22.md`. Acceptance: exactly one
@@ -973,58 +973,58 @@ $LASTEXITCODE
   without them the string is also a prefix of `- [x] AC10` through `- [x] AC13`) and the cited
   artifact exists on disk.
 
-- [ ] [P7-T2] Check off AC2 in the same file, recording in this task's progress output
+- [x] [P7-T2] Check off AC2 in the same file, recording in this task's progress output
   `FEATURE/evidence/qa-gates/p2-t3-ac2-interface-reason.2026-08-29T12-22.md`. Acceptance: exactly
   one line begins with `- [x] AC2 —` and the cited artifact exists on disk.
 
-- [ ] [P7-T3] Check off AC3, recording in this task's progress output
+- [x] [P7-T3] Check off AC3, recording in this task's progress output
   `FEATURE/evidence/qa-gates/p2-t5-ac3-metricstests-token.2026-08-29T12-22.md`. Acceptance: exactly
   one line begins with `- [x] AC3 —` and the cited artifact exists on disk.
 
-- [ ] [P7-T4] Check off AC4, recording in this task's progress output
+- [x] [P7-T4] Check off AC4, recording in this task's progress output
   `FEATURE/evidence/regression-testing/p6-t7-named-guard-tests.2026-08-29T12-22.md`. Acceptance:
   exactly one line begins with `- [x] AC4 —` and the cited artifact exists on disk.
 
-- [ ] [P7-T5] Check off AC5, recording in this task's progress output
+- [x] [P7-T5] Check off AC5, recording in this task's progress output
   `FEATURE/evidence/qa-gates/p3-t3-ac5-production-renumbering.2026-08-29T12-22.md`. Acceptance:
   exactly one line begins with `- [x] AC5 —` and the cited artifact exists on disk.
 
-- [ ] [P7-T6] Check off AC6, recording in this task's progress output
+- [x] [P7-T6] Check off AC6, recording in this task's progress output
   `FEATURE/evidence/qa-gates/p3-t10-ac6-test-renumbering.2026-08-29T12-22.md` and
   `FEATURE/evidence/regression-testing/p6-t7-named-guard-tests.2026-08-29T12-22.md`. Acceptance:
   exactly one line begins with `- [x] AC6 —` and both cited artifacts exist on disk.
 
-- [ ] [P7-T7] Check off AC7, recording in this task's progress output
+- [x] [P7-T7] Check off AC7, recording in this task's progress output
   `FEATURE/evidence/qa-gates/p5-t5-ac7-changed-line-classification.2026-08-29T12-22.md`.
   Acceptance: exactly one line begins with `- [x] AC7 —` and the cited artifact exists on disk.
 
-- [ ] [P7-T8] Check off AC8, recording in this task's progress output
+- [x] [P7-T8] Check off AC8, recording in this task's progress output
   `FEATURE/evidence/qa-gates/p5-t4-ac8-file-sizes.2026-08-29T12-22.md`. Acceptance: exactly one line
   begins with `- [x] AC8 —` and the cited artifact exists on disk.
 
-- [ ] [P7-T9] Check off AC9, recording in this task's progress output
+- [x] [P7-T9] Check off AC9, recording in this task's progress output
   `FEATURE/evidence/regression-testing/p6-t6-quickfiler-test-count.2026-08-29T12-22.md` and
   `FEATURE/evidence/qa-gates/p5-t6-ac9-testmethod-counts.2026-08-29T12-22.md`. Acceptance: exactly
   one line begins with `- [x] AC9 —` and both cited artifacts exist on disk.
 
-- [ ] [P7-T10] Check off AC10, recording in this task's progress output
+- [x] [P7-T10] Check off AC10, recording in this task's progress output
   `FEATURE/evidence/qa-gates/p6-t9-clean-pass.2026-08-29T12-22.md`. Acceptance: exactly one line
   begins with `- [x] AC10 —` and the cited artifact exists on disk.
 
-- [ ] [P7-T11] Check off AC11, recording in this task's progress output
+- [x] [P7-T11] Check off AC11, recording in this task's progress output
   `FEATURE/evidence/qa-gates/p4-t3-ac11-cfn2-resolved.2026-08-29T12-22.md`. Acceptance: exactly one
   line begins with `- [x] AC11 —` and the cited artifact exists on disk.
 
-- [ ] [P7-T12] Check off AC12, recording in this task's progress output
+- [x] [P7-T12] Check off AC12, recording in this task's progress output
   `FEATURE/evidence/qa-gates/p5-t1-ac12-forbidden-file.2026-08-29T12-22.md` and
   `FEATURE/evidence/qa-gates/p5-t2-ac12-parameter-retained.2026-08-29T12-22.md`. Acceptance: exactly
   one line begins with `- [x] AC12 —` and both cited artifacts exist on disk.
 
-- [ ] [P7-T13] Check off AC13, recording in this task's progress output
+- [x] [P7-T13] Check off AC13, recording in this task's progress output
   `FEATURE/evidence/regression-testing/p6-t10-test-count-comparison.2026-08-29T12-22.md`.
   Acceptance: exactly one line begins with `- [x] AC13 —` and the cited artifact exists on disk.
 
-- [ ] [P7-T14] Prepare the final partial-interval commit candidate without staging or committing it.
+- [x] [P7-T14] Prepare the final partial-interval commit candidate without staging or committing it.
   Enumerate the four C# files, the two documentation files
   (`docs/features/active/quickfiler-home-controller-metrics-442/spec.md` and this feature's
   `spec.md`), this plan file, and everything under `FEATURE/evidence/` that remains uncommitted after
@@ -1033,7 +1033,7 @@ $LASTEXITCODE
   recorded in `FEATURE/evidence/other/p7-t14-final-commit-candidate.2026-08-29T12-22.md`; no index
   entry or commit is created by this task; and the recorded candidate contains no out-of-scope path.
 
-- [ ] [P7-T15] Verify that no commit on this branch carries a GitHub closing keyword for issue #469.
+- [x] [P7-T15] Verify that no commit on this branch carries a GitHub closing keyword for issue #469.
   Acceptance: over the concatenated commit messages of the range `origin/main..HEAD`, the
   case-insensitive count of each of these nine tokens is 0: `close #469`, `closes #469`,
   `closed #469`, `fix #469`, `fixes #469`, `fixed #469`, `resolve #469`, `resolves #469`,
@@ -1048,7 +1048,7 @@ $log = git log origin/main..HEAD --format=%B | Out-String
 @('close #469','closes #469','closed #469','fix #469','fixes #469','fixed #469','resolve #469','resolves #469','resolved #469') | ForEach-Object { $_ + ' => ' + ([regex]::Matches($log, [regex]::Escape($_), 'IgnoreCase').Count) }
 ```
 
-- [ ] [P7-T16] Verify the final change footprint against `origin/main`. Acceptance: `git diff
+- [x] [P7-T16] Verify the final change footprint against `origin/main`. Acceptance: `git diff
   origin/main --name-only -- QuickFiler QuickFiler.Test docs` lists exactly these five source and
   document paths and no others, plus this plan file, this feature's `spec.md`, and any number of
   paths under `FEATURE/evidence/`:
@@ -1073,7 +1073,7 @@ git diff origin/main --name-only -- QuickFiler QuickFiler.Test docs
 git status --porcelain -- QuickFiler QuickFiler.Test docs
 ```
 
-- [ ] [P7-T17] Finalise the final partial interval without staging or committing it. Run
+- [x] [P7-T17] Finalise the final partial interval without staging or committing it. Run
   `git status --porcelain -- QuickFiler QuickFiler.Test docs` and the P7-T15 closing-keyword scan.
   Acceptance: every status path belongs to the P7-T16 allowed footprint; the status includes this
   plan file and `FEATURE/evidence/other/p7-t17-finalisation.2026-08-29T12-22.md`; and the P7-T15 scan

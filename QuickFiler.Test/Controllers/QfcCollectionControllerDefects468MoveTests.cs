@@ -303,7 +303,7 @@ namespace QuickFiler.Controllers.Tests
                 .Should()
                 .HaveCount(
                     cached.Count,
-                because: "issue #469 defect 2 requires one diagnostics line per cached move "
+                    because: "issue #469 defect 2 requires one diagnostics line per cached move "
                         + "group; a length greater than the group count is the surplus unassigned "
                         + "element produced by the off-by-one allocation"
                 );
@@ -337,7 +337,7 @@ namespace QuickFiler.Controllers.Tests
                 .Should()
                 .HaveCount(
                     3,
-                because: "issue #469 defect 2 requires exactly one diagnostics line per cached "
+                    because: "issue #469 defect 2 requires exactly one diagnostics line per cached "
                         + "move group, and three groups were cached"
                 );
             lines
@@ -384,7 +384,7 @@ namespace QuickFiler.Controllers.Tests
             // Assert
             act.Should()
                 .NotThrow(
-                because: "issue #469 defect 1 requires the null guard to run before the first "
+                    because: "issue #469 defect 1 requires the null guard to run before the first "
                         + "dereference, so a group with no item controller degrades to an Unknown "
                         + "diagnostics line instead of raising NullReferenceException"
                 );

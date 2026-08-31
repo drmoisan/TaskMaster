@@ -301,19 +301,19 @@ explicitly as a policy exception rather than silently skipped.
 
 ## Acceptance Criteria
 
-- [ ] AC1 — `QuickFiler/Controllers/QfcHomeController.Metrics.cs` contains zero occurrences of the token `one element longer`. Scoped to that named file only; the token legitimately remains in this feature folder's issue.md, spec.md, and research document, so a repository-wide gate is not used.
-- [ ] AC2 — The replacement comment in `QuickFiler/Controllers/QfcHomeController.Metrics.cs` states the interface-contract reason: the file contains the token `IQfcCollectionController` within the comment block immediately preceding the filter, and the file still contains the token `.Where(`.
-- [ ] AC3 — `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs` contains zero occurrences of the token `one element longer`. Scoped to that named file only.
-- [ ] AC4 — The existing test `WriteMetricsAsync_FiltersNullDiagnosticLinesBeforeWriting` passes.
-- [ ] AC5 — In `QuickFiler/Controllers/QfcCollectionController.cs`, the comment immediately preceding the diagnostics-array allocation contains the token `Issue #469 defect 2`, and the comment immediately preceding the `if (qf is null)` guard contains the token `Issue #469 defect 1`. This matches the numbering published in issue.md.
-- [ ] AC6 — In `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs`, the doc comments and `because:` strings of the three array-length tests cite defect 2 and those of the null-guard test cite defect 1, matching issue.md. The three test method bodies are unchanged.
-- [ ] AC7 — Zero executable lines change. The diff against `origin/main` restricted to `QuickFiler/` and `QuickFiler.Test/` touches only comment lines, XML doc lines, and `because:` string literals.
-- [ ] AC8 — `QuickFiler/Controllers/QfcCollectionController.cs` line count does not increase above 2437.
-- [ ] AC9 — The full `QuickFiler.Test` assembly passes with the same passing-test count as the pre-change baseline, and no test method is added or removed.
-- [ ] AC10 — The full C# toolchain passes in order: `dotnet tool run csharpier check .`, then msbuild with `EnableNETAnalyzers` and `EnforceCodeStyleInBuild`, then msbuild with `TreatWarningsAsErrors`, then `vstest.console.exe` with `/EnableCodeCoverage`.
-- [ ] AC11 — Cross-feature note CFN-2 in `docs/features/active/quickfiler-home-controller-metrics-442/spec.md` is marked resolved.
-- [ ] AC12 — Scope boundary holds: `git diff origin/main --name-only` does not list QuickFiler/Controllers/QfcFormController.EventHandlers.cs, and the token `StackMovedItems` is still present in QuickFiler/Interfaces/IQfcCollectionController.cs, proving issue #629 was not absorbed. Casing note: the issue text and the implementation use the camelCase form `stackMovedItems`, but the interface declares the parameter as `StackMovedItems`; the asserted token uses the interface's casing so the assertion is satisfiable as written.
-- [ ] AC13 — The pre-change and post-change `QuickFiler.Test` passing-test counts are recorded as evidence under `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/evidence/regression-testing/`, per the repository evidence-location conventions.
+- [x] AC1 — `QuickFiler/Controllers/QfcHomeController.Metrics.cs` contains zero occurrences of the token `one element longer`. Scoped to that named file only; the token legitimately remains in this feature folder's issue.md, spec.md, and research document, so a repository-wide gate is not used.
+- [x] AC2 — The replacement comment in `QuickFiler/Controllers/QfcHomeController.Metrics.cs` states the interface-contract reason: the file contains the token `IQfcCollectionController` within the comment block immediately preceding the filter, and the file still contains the token `.Where(`.
+- [x] AC3 — `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs` contains zero occurrences of the token `one element longer`. Scoped to that named file only.
+- [x] AC4 — The existing test `WriteMetricsAsync_FiltersNullDiagnosticLinesBeforeWriting` passes.
+- [x] AC5 — In `QuickFiler/Controllers/QfcCollectionController.cs`, the comment immediately preceding the diagnostics-array allocation contains the token `Issue #469 defect 2`, and the comment immediately preceding the `if (qf is null)` guard contains the token `Issue #469 defect 1`. This matches the numbering published in issue.md.
+- [x] AC6 — In `QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs`, the doc comments and `because:` strings of the three array-length tests cite defect 2 and those of the null-guard test cite defect 1, matching issue.md. The three test method bodies are unchanged.
+- [x] AC7 — Zero executable lines change. The diff against `origin/main` restricted to `QuickFiler/` and `QuickFiler.Test/` touches only comment lines, XML doc lines, and `because:` string literals.
+- [x] AC8 — `QuickFiler/Controllers/QfcCollectionController.cs` line count does not increase above 2437.
+- [x] AC9 — The full `QuickFiler.Test` assembly passes with the same passing-test count as the pre-change baseline, and no test method is added or removed.
+- [x] AC10 — The full C# toolchain passes in order: `dotnet tool run csharpier check .`, then msbuild with `EnableNETAnalyzers` and `EnforceCodeStyleInBuild`, then msbuild with `TreatWarningsAsErrors`, then `vstest.console.exe` with `/EnableCodeCoverage`.
+- [x] AC11 — Cross-feature note CFN-2 in `docs/features/active/quickfiler-home-controller-metrics-442/spec.md` is marked resolved.
+- [x] AC12 — Scope boundary holds: `git diff origin/main --name-only` does not list QuickFiler/Controllers/QfcFormController.EventHandlers.cs, and the token `StackMovedItems` is still present in QuickFiler/Interfaces/IQfcCollectionController.cs, proving issue #629 was not absorbed. Casing note: the issue text and the implementation use the camelCase form `stackMovedItems`, but the interface declares the parameter as `StackMovedItems`; the asserted token uses the interface's casing so the assertion is satisfiable as written.
+- [x] AC13 — The pre-change and post-change `QuickFiler.Test` passing-test counts are recorded as evidence under `docs/features/active/2026-08-07-qfc-collection-move-diagnostics-defects-469/evidence/regression-testing/`, per the repository evidence-location conventions.
 
 ## Risks & Mitigations
 
