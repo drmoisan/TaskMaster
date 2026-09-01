@@ -3,8 +3,8 @@
 - **Issue:** #633
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-31T22-10
-- **Status:** Ready for preflight
+- **Last Updated:** 2026-09-01T11-22
+- **Status:** Complete
 - **Version:** 1.0
 - **Work Mode:** full-bug — `spec.md` is the sole acceptance-criteria source. `user-story.md` does not
   exist for this issue and must not be created or required.
@@ -1105,7 +1105,7 @@ whose unformatted set includes one of the six in-scope files.
 
 ### Phase 8 — Traceability, acceptance check-off, and handoff
 
-- [ ] [P8-T1] Sanitise the evidence tree before it is committed. Across every file under
+- [x] [P8-T1] Sanitise the evidence tree before it is committed. Across every file under
       `FEATURE/evidence/`, replace all case-insensitive occurrences of the absolute worktree path with
       the literal token `WORKTREE`, covering all three spellings that appear in this evidence set: the
       backslash form, the forward-slash form, and the doubled-backslash form. This is required because
@@ -1121,13 +1121,13 @@ whose unformatted set includes one of the six in-scope files.
       `FEATURE/evidence/` and record that count too, for the reason given in P2-T7. Acceptance: the
       recorded remaining-match count for the absolute worktree path is 0, the recorded account-token
       file-name count is 0, and the recorded account-token directory-name count is 0.
-- [ ] [P8-T2] Commit every source, test, project, and evidence change produced by Phases 3 through 7,
+- [x] [P8-T2] Commit every source, test, project, and evidence change produced by Phases 3 through 7,
       including the sanitised evidence and the P8-T1 artifact, with a message naming issue 633.
       Acceptance: `git status --porcelain` in `WORKTREE`, restricted to
       the paths `QuickFiler/` and `QuickFiler.Test/`, produces no output, and restricted to
       `docs/features/active/2026-08-26-qfc-unsynchronized-undo-handoff-after-batch-move-633/` lists no
       path other than this plan file, whose checkbox for this task is written after the commit.
-- [ ] [P8-T3] Run `git diff --name-only origin/main...HEAD` and `git status --porcelain` in `WORKTREE`
+- [x] [P8-T3] Run `git diff --name-only origin/main...HEAD` and `git status --porcelain` in `WORKTREE`
       as two commands, and write both outputs verbatim into
       `FEATURE/evidence/qa-gates/p8-t3-diff-scope.TIMESTAMP.md` with the four required fields for each
       command. The porcelain companion is required because a name-listing diff is blind to untracked
@@ -1150,7 +1150,7 @@ whose unformatted set includes one of the six in-scope files.
       infrastructure, are neither production nor test code, and do not widen the production diff that
       AC16 constrains. Record the exact list of `.claude/agent-memory/` paths in the artifact so a
       reviewer can confirm none of them is source.
-- [ ] [P8-T4] Update `FEATURE/spec.md` `- **Last Updated:**` to the current ISO-8601 instant and add one
+- [x] [P8-T4] Update `FEATURE/spec.md` `- **Last Updated:**` to the current ISO-8601 instant and add one
       sentence under `## Deviation from the research record` recording the fail-before split decided by
       this plan: that the barrier defect carries the real failing run and that the orphan-window
       regression and the drain suite carry the exception dossier, with the reason. Do not renumber,
@@ -1166,87 +1166,87 @@ whose unformatted set includes one of the six in-scope files.
       the whole of `spec.md` as added, which makes the zero-changed-lines condition false for reasons
       that have nothing to do with this edit. The `HEAD` form compares the working file against the
       just-committed version and therefore shows exactly this task's hunks.
-- [ ] [P8-T5] Mark AC1 complete in `FEATURE/spec.md`: change the checkbox of the acceptance bullet whose
+- [x] [P8-T5] Mark AC1 complete in `FEATURE/spec.md`: change the checkbox of the acceptance bullet whose
       line contains the anchor `exposes` from `- [ ]` to `- [x]`. Acceptance: that line begins with
       `- [x]`, and `QuickFiler/Controllers/FilerQueue.cs` contains the literal token
       `public Task WhenDrainedAsync()`, and the P5-T10 artifact records
       `WhenDrainedAsync_OnFreshQueue_ReturnsCompletedTask` as passed.
-- [ ] [P8-T6] Mark AC2 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T6] Mark AC2 complete: change the checkbox of the bullet whose line contains the anchor
       `The drain task does not complete while any enqueued item` to `- [x]`. Acceptance: that line
       begins with `- [x]` and the P5-T10 artifact records both
       `WhenDrainedAsync_WithGatedItem_DoesNotCompleteBeforeItemCompletes` and
       `WhenDrainedAsync_WithTwoGatedItems_CompletesOnlyAfterBothComplete` as passed.
-- [ ] [P8-T7] Mark AC3 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T7] Mark AC3 complete: change the checkbox of the bullet whose line contains the anchor
       `The drain task completes once every enqueued item has completed` to `- [x]`. Acceptance: that
       line begins with `- [x]` and the P5-T10 artifact records
       `WhenDrainedAsync_AfterGateReleased_CompletesAndItemRanOnce` as passed.
-- [ ] [P8-T8] Mark AC4 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T8] Mark AC4 complete: change the checkbox of the bullet whose line contains the anchor
       `is idempotent: repeated and concurrent waiters all complete` to `- [x]`. Acceptance: that line
       begins with `- [x]` and the P5-T10 artifact records
       `WhenDrainedAsync_AwaitedTwice_BothWaitersComplete` as passed.
-- [ ] [P8-T9] Mark AC5 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T9] Mark AC5 complete: change the checkbox of the bullet whose line contains the anchor
       `The orphaned-item window is closed` to `- [x]`. Acceptance: that line begins with `- [x]`, the
       P5-T10 artifact records `Enqueue_AfterPreviousBatchDrained_ProcessesSecondBatch` as passed, and
       the P2-T6 dossier records why this test is not a fail-before witness: that it names
       `WhenDrainedAsync()` and so cannot compile before Phase 3, and that the orphaned-item window has
       no deterministic pre-fix witness at all.
-- [ ] [P8-T10] Mark AC6 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T10] Mark AC6 complete: change the checkbox of the bullet whose line contains the anchor
       `An item whose processing throws still decrements` to `- [x]`. Acceptance: that line begins with
       `- [x]` and the P5-T10 artifact records
       `ItemProcessor_ThatThrows_StillDecrementsAndDrainCompletes` as passed.
-- [ ] [P8-T11] Mark AC7 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T11] Mark AC7 complete: change the checkbox of the bullet whose line contains the anchor
       `awaits` to `- [x]`. Acceptance: that line begins with `- [x]`, the P4-T2 statement-order
       assertion holds, and the P7-T8 artifact records both
       `BackGroundMoveAsync_WithPendingQueueItem_DoesNotDispatchCleanupBeforeDrain` and
       `BackGroundMoveAsync_WithPendingQueueItem_DoesNotWriteMetricsBeforeDrain` as passed.
-- [ ] [P8-T12] Mark AC8 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T12] Mark AC8 complete: change the checkbox of the bullet whose line contains the anchor
       `The existing metrics-before-cleanup ordering is preserved` to `- [x]`. Acceptance: that line
       begins with `- [x]` and the P7-T8 artifact records
       `BackGroundMoveAsync_AfterQueueDrains_WritesMetricsThenCleansUp` as passed.
-- [ ] [P8-T13] Mark AC9 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T13] Mark AC9 complete: change the checkbox of the bullet whose line contains the anchor
       `The early-return guard in` to `- [x]`. Acceptance: that line begins with `- [x]`,
       `QuickFiler/Controllers/QfcFormController.EventHandlers.cs` contains the literal token
       `_parent is null` on the `BackGroundMoveAsync` guard line, and the P7-T8 artifact records
       `BackGroundMoveAsync_WhenParentIsNull_ReturnsWithoutThrowing` as passed.
-- [ ] [P8-T14] Mark AC10 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T14] Mark AC10 complete: change the checkbox of the bullet whose line contains the anchor
       `The two production reads of` to `- [x]`. Acceptance: that line begins with `- [x]` and the P6-T4
       artifact records a `\.Consumer\b` match count of 0 over `QuickFiler/**/*.cs`.
-- [ ] [P8-T15] Mark AC11 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T15] Mark AC11 complete: change the checkbox of the bullet whose line contains the anchor
       `remains declared with the same type` to `- [x]`. Acceptance: that line begins with `- [x]`, the
       P3-T7 declaration check holds, and the P6-T10 artifact records
       `FilerQueue_NewInstance_HasCompletedConsumerByDefault` as passed with its body byte-identical to
       the pre-change text.
-- [ ] [P8-T16] Mark AC12 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T16] Mark AC12 complete: change the checkbox of the bullet whose line contains the anchor
       `still raises` to `- [x]`. Acceptance: that line begins with `- [x]` and the P6-T8 artifact
       records `MoveMailAsync_WhenEnqueueThrows_WrapsArgumentNullException` as passed with an empty diff
       for its file.
-- [ ] [P8-T17] Mark AC13 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T17] Mark AC13 complete: change the checkbox of the bullet whose line contains the anchor
       `is reconciled with the new` to `- [x]`. Acceptance: that line begins with `- [x]`, the P3-T8
       zero-match check for `GetField("guard"` holds, and the P6-T9 artifact records
       `MoveMailAsync_WhenOneDrivePresent_InvokesFactoryWithConfigAndEnqueues` as passed.
-- [ ] [P8-T18] Mark AC14 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T18] Mark AC14 complete: change the checkbox of the bullet whose line contains the anchor
       `contains no banned wait API` to `- [x]`. Acceptance: that line begins with `- [x]` and the P6-T1
       artifact records a total match count of 0 across the three named test files.
-- [ ] [P8-T19] Mark AC15 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T19] Mark AC15 complete: change the checkbox of the bullet whose line contains the anchor
       `is introduced` to `- [x]`. Acceptance: that line begins with `- [x]`, the P6-T2 artifact records
       a total match count of 0, and the P7-T5 artifact records `EXIT_CODE: 0` with no CS0518 diagnostic
       in its log.
-- [ ] [P8-T20] Mark AC16 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T20] Mark AC16 complete: change the checkbox of the bullet whose line contains the anchor
       `The production diff touches no file other than` to `- [x]`. Acceptance: that line begins with
       `- [x]` and the P8-T3 artifact satisfies its own acceptance condition.
-- [ ] [P8-T21] Mark AC17 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T21] Mark AC17 complete: change the checkbox of the bullet whose line contains the anchor
       `contains a` to `- [x]`. Acceptance: that line begins with `- [x]`, the P6-T7 artifact records a
       match count of 1, and the P7-T8 artifact lists all five new test names.
-- [ ] [P8-T22] Mark AC18 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T22] Mark AC18 complete: change the checkbox of the bullet whose line contains the anchor
       `Both changed production files remain under 500 lines` to `- [x]`. Acceptance: that line begins
       with `- [x]` and the P6-T5 artifact records both counts as at most 500.
-- [ ] [P8-T23] Mark AC19 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T23] Mark AC19 complete: change the checkbox of the bullet whose line contains the anchor
       `The full C# toolchain passes in a single uninterrupted pass` to `- [x]`. Acceptance: that line
       begins with `- [x]` and the four artifacts P7-T3, P7-T4, P7-T5, and P7-T6 all record
       `EXIT_CODE: 0`, with P7-T4 and P7-T5 each recording a `Skipping target "CoreCompile"` occurrence
       count of 0 and P7-T6 recording a failed count of 0, all four produced within one uninterrupted
       pass of Phase 7 with no intervening file edit.
-- [ ] [P8-T24] Mark AC20 complete: change the checkbox of the bullet whose line contains the anchor
+- [x] [P8-T24] Mark AC20 complete: change the checkbox of the bullet whose line contains the anchor
       `Coverage does not regress on any line changed by this fix` to `- [x]`. Acceptance: that line
       begins with `- [x]`, the P7-T9 artifact records both denominators as `FILTERED` with a
       `QuickFiler/Controllers/FilerQueue.cs` per-file rate of at least 0.90, and the P7-T10 artifact
@@ -1258,13 +1258,13 @@ whose unformatted set includes one of the six in-scope files.
       conditional on the initializer line actually appearing in the uncovered list, because
       `QuickFiler.Test/Controllers/QfcItemController.TestSupport.cs:350` supplies a real `FilerQueue`
       carrying the production default processor and the line may therefore be covered.
-- [ ] [P8-T25] Write `FEATURE/evidence/issue-updates/issue-633.TIMESTAMP.md` containing `Timestamp:`,
+- [x] [P8-T25] Write `FEATURE/evidence/issue-updates/issue-633.TIMESTAMP.md` containing `Timestamp:`,
       the exact text of the status update intended for GitHub issue 633 summarizing the barrier, the
       handshake repair, the `_parent` guard clause, and the two removed `Consumer` awaits, and
       `PostedAs: body`, `PostedAs: comment`, or a `POSTING BLOCKED` header with the reason. Mirror the
       same update into `FEATURE/issue.md` if `PostedAs: body` is used. Acceptance: the artifact exists
       and contains exactly one `PostedAs:` line or one `POSTING BLOCKED` header.
-- [ ] [P8-T26] Close out the plan file, then commit. In this order: set this plan file's
+- [x] [P8-T26] Close out the plan file, then commit. In this order: set this plan file's
       `- **Last Updated:**` to the completion instant and `- **Status:**` to `Complete`; mark every
       remaining checkbox in this plan, including this one; then commit every remaining change other than
       `artifacts/orchestration/orchestrator-state.json`, including any file under

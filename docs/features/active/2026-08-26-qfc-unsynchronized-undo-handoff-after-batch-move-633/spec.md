@@ -3,7 +3,7 @@
 - **Issue:** #633
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-31T20-15
+- **Last Updated:** 2026-09-01T11-17
 - **Status:** Approved
 - **Version:** 1.0
 - **Work Mode:** full-bug — this document is the **sole authoritative acceptance-criteria source**.
@@ -577,78 +577,78 @@ Each criterion below is checkable by a named test or a named command. Test names
 in the Test Strategy; if an implementer chooses different names, the criterion is satisfied by the test
 that covers the named scenario, and the substitution must be recorded.
 
-- [ ] `QuickFiler/Controllers/FilerQueue.cs` exposes `public Task WhenDrainedAsync()`, which returns an
+- [x] `QuickFiler/Controllers/FilerQueue.cs` exposes `public Task WhenDrainedAsync()`, which returns an
       already-completed task on a queue with no outstanding work. Verified by
       `WhenDrainedAsync_OnFreshQueue_ReturnsCompletedTask`.
-- [ ] The drain task does not complete while any enqueued item is still being processed. Verified by
+- [x] The drain task does not complete while any enqueued item is still being processed. Verified by
       `WhenDrainedAsync_WithGatedItem_DoesNotCompleteBeforeItemCompletes` and
       `WhenDrainedAsync_WithTwoGatedItems_CompletesOnlyAfterBothComplete`, both driven by
       `TaskCompletionSource` gates through `ItemProcessor`.
-- [ ] The drain task completes once every enqueued item has completed, and each item's processor ran
+- [x] The drain task completes once every enqueued item has completed, and each item's processor ran
       exactly once. Verified by `WhenDrainedAsync_AfterGateReleased_CompletesAndItemRanOnce` and
       `WhenDrainedAsync_WithTwoGatedItems_CompletesOnlyAfterBothComplete`.
-- [ ] `WhenDrainedAsync()` is idempotent: repeated and concurrent waiters all complete, and a call made
+- [x] `WhenDrainedAsync()` is idempotent: repeated and concurrent waiters all complete, and a call made
       after the queue is idle returns a completed task. Verified by
       `WhenDrainedAsync_AwaitedTwice_BothWaitersComplete`.
-- [ ] The orphaned-item window is closed: an item enqueued after a previous batch has drained is
+- [x] The orphaned-item window is closed: an item enqueued after a previous batch has drained is
       processed without requiring any further unrelated enqueue. Verified by
       `Enqueue_AfterPreviousBatchDrained_ProcessesSecondBatch`.
-- [ ] An item whose processing throws still decrements the outstanding-work count, the worker loop
+- [x] An item whose processing throws still decrements the outstanding-work count, the worker loop
       continues, and the drain task completes rather than faulting or hanging. Verified by
       `ItemProcessor_ThatThrows_StillDecrementsAndDrainCompletes`.
-- [ ] `BackGroundMoveAsync` in `QuickFiler/Controllers/QfcFormController.EventHandlers.cs` awaits
+- [x] `BackGroundMoveAsync` in `QuickFiler/Controllers/QfcFormController.EventHandlers.cs` awaits
       `WhenDrainedAsync()` after `await _groups.MoveEmailsAsync(_movedItems)` and before both the
       `WriteMetrics` dispatch and the `CleanupBackground()` dispatch. Verified by
       `BackGroundMoveAsync_WithPendingQueueItem_DoesNotDispatchCleanupBeforeDrain` and
       `BackGroundMoveAsync_WithPendingQueueItem_DoesNotWriteMetricsBeforeDrain`.
-- [ ] The existing metrics-before-cleanup ordering is preserved: after the drain, `WriteMetrics` is
+- [x] The existing metrics-before-cleanup ordering is preserved: after the drain, `WriteMetrics` is
       invoked once and `CleanupBackground()` is invoked once, in that order. Verified by
       `BackGroundMoveAsync_AfterQueueDrains_WritesMetricsThenCleansUp`.
-- [ ] The early-return guard in `BackGroundMoveAsync` includes a `_parent` null check, so the method
+- [x] The early-return guard in `BackGroundMoveAsync` includes a `_parent` null check, so the method
       returns without throwing on the post-`Cleanup()` path where `_parent` has been set to null.
       Verified by `BackGroundMoveAsync_WhenParentIsNull_ReturnsWithoutThrowing`.
-- [ ] The two production reads of `FilerQueue.Consumer` — at
+- [x] The two production reads of `FilerQueue.Consumer` — at
       `QuickFiler/Controllers/QfcFormController.EventHandlers.cs:167` and `:193` — are removed, and
       `Grep pattern="\.Consumer\b" glob="QuickFiler/**/*.cs"` returns zero matches. The count of two is
       the complete production population, derived and independently re-verified against the working
       tree on 2026-08-31; the derivation is recorded as Claim 1 under `## Numeric Derivation Evidence`
       in the research record for this issue.
-- [ ] `FilerQueue.Consumer` remains declared with the same type, accessibility and completed-task
+- [x] `FilerQueue.Consumer` remains declared with the same type, accessibility and completed-task
       default. Verified by `FilerQueue_NewInstance_HasCompletedConsumerByDefault` in
       `QuickFiler.Test/Controllers/FilerQueueTests.cs`, which passes unmodified.
-- [ ] `Enqueue(EmailFiler, IList<MailItemHelper>)` still raises `ArgumentNullException` synchronously in
+- [x] `Enqueue(EmailFiler, IList<MailItemHelper>)` still raises `ArgumentNullException` synchronously in
       the caller's frame for a helper list containing null. Verified by
       `MoveMailAsync_WhenEnqueueThrows_WrapsArgumentNullException`, which passes unmodified.
-- [ ] `QuickFiler.Test/Controllers/QfcItemController.SeamFactoryTests.cs` is reconciled with the new
+- [x] `QuickFiler.Test/Controllers/QfcItemController.SeamFactoryTests.cs` is reconciled with the new
       queue internals: `MoveMailAsync_WhenOneDrivePresent_InvokesFactoryWithConfigAndEnqueues` passes
       and no longer reflects into a private `FilerQueue` field that the fix removes or renames.
-- [ ] The added and modified test code contains no banned wait API. `Grep` over
+- [x] The added and modified test code contains no banned wait API. `Grep` over
       `QuickFiler.Test/Controllers/FilerQueueTests.cs`,
       `QuickFiler.Test/Controllers/QfcFormControllerUndoHandoffTests.cs` and
       `QuickFiler.Test/Controllers/QfcItemController.SeamFactoryTests.cs` for
       `Thread\.Sleep|Task\.Delay|\.Wait\(|\.Result\b|DateTime\.(Now|UtcNow)` returns zero matches.
-- [ ] No `init` accessor, `record`, or `record struct` is introduced. `Grep` over
+- [x] No `init` accessor, `record`, or `record struct` is introduced. `Grep` over
       `QuickFiler/Controllers/FilerQueue.cs` and
       `QuickFiler/Controllers/QfcFormController.EventHandlers.cs` for `\binit\s*[;{]|\brecord\b` returns
       zero matches, and the solution compiles on net481 without CS0518.
-- [ ] The production diff touches no file other than `QuickFiler/Controllers/FilerQueue.cs` and
+- [x] The production diff touches no file other than `QuickFiler/Controllers/FilerQueue.cs` and
       `QuickFiler/Controllers/QfcFormController.EventHandlers.cs`. Verified by
       `git diff --name-only <merge-base>..HEAD` showing no other path outside `QuickFiler.Test/` and
       `docs/`.
-- [ ] `QuickFiler.Test/QuickFiler.Test.csproj` contains a `<Compile Include>` entry for
+- [x] `QuickFiler.Test/QuickFiler.Test.csproj` contains a `<Compile Include>` entry for
       `QuickFiler.Test/Controllers/QfcFormControllerUndoHandoffTests.cs`, and the new tests appear in
       the `vstest.console.exe` run output.
-- [ ] Both changed production files remain under 500 lines. Verified by a line count on
+- [x] Both changed production files remain under 500 lines. Verified by a line count on
       `QuickFiler/Controllers/FilerQueue.cs` and
       `QuickFiler/Controllers/QfcFormController.EventHandlers.cs`.
-- [ ] The full C# toolchain passes in a single uninterrupted pass, in the order format, analyze,
+- [x] The full C# toolchain passes in a single uninterrupted pass, in the order format, analyze,
       type-check, test: `dotnet tool run csharpier check .` reports no unformatted file; both
       `msbuild TaskMaster.sln /t:Rebuild ...` invocations exit 0 with zero
       `Skipping target "CoreCompile"` occurrences in their `/fl` logs; and
       `vstest.console.exe <QuickFiler.Test assembly path> /EnableCodeCoverage` reports zero failures.
       Logs are recorded under
       `docs/features/active/2026-08-26-qfc-unsynchronized-undo-handoff-after-batch-move-633/evidence/qa-gates/`.
-- [ ] Coverage does not regress on any line changed by this fix, and the members added or modified in
+- [x] Coverage does not regress on any line changed by this fix, and the members added or modified in
       `QuickFiler/Controllers/FilerQueue.cs` reach at least 90% line coverage. Before-and-after coverage
       artifacts are recorded under
       `docs/features/active/2026-08-26-qfc-unsynchronized-undo-handoff-after-batch-move-633/evidence/baseline/`
@@ -731,3 +731,14 @@ remains the two files the research identifies.
 The research record's recommended remedy is otherwise adopted in full: the counted per-batch awaitable
 quiesce, the handshake repair as a precondition rather than a refactor, the `_parent` guard clause, the
 `ItemProcessor` seam, and the removal of the two subsumed `Consumer` awaits.
+
+**Fail-before split as delivered.** The implementation plan divided the Bugfix Workflow's failing-test
+requirement between a real failing run and a documented exception, because the two halves of the defect
+differ in what can be observed before the fix exists: the barrier defect carries the real failing run,
+in which both `BackGroundMoveAsync_WithPendingQueueItem_*` tests fail deterministically against the
+pre-fix tree once the `ItemProcessor` seam makes the queue drivable, while the orphan-window regression
+`Enqueue_AfterPreviousBatchDrained_ProcessesSecondBatch` and the `WhenDrainedAsync_*` drain suite carry
+the exception dossier, because they name an API that does not exist before the fix and the orphaned-item
+window has no deterministic pre-fix witness at all — it requires a producer `Queue.Add` to land strictly
+between the worker's loop exit and its guard reinstall, and no seam, await, or observable state change
+exists between those two statements.
