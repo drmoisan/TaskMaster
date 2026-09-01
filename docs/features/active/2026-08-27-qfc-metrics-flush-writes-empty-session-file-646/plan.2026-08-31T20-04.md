@@ -77,43 +77,43 @@ Policy reads follow the `policy-compliance-order` sequence: `CLAUDE.md` (positio
 (position 3), `.claude/rules/csharp.md` (position 4, applicable because both in-scope files
 are `*.cs`).
 
-- [ ] [P0-T1] Read `CLAUDE.md` in full at the repository root. Acceptance: the read is
+- [x] [P0-T1] Read `CLAUDE.md` in full at the repository root. Acceptance: the read is
   recorded in the Phase 0 policy-read evidence artifact produced by P0-T5.
-- [ ] [P0-T2] Read `.claude/rules/general-code-change.md` in full. Acceptance: recorded in
+- [x] [P0-T2] Read `.claude/rules/general-code-change.md` in full. Acceptance: recorded in
   the P0-T5 artifact.
-- [ ] [P0-T3] Read `.claude/rules/general-unit-test.md` in full. Acceptance: recorded in the
+- [x] [P0-T3] Read `.claude/rules/general-unit-test.md` in full. Acceptance: recorded in the
   P0-T5 artifact.
-- [ ] [P0-T4] Read `.claude/rules/csharp.md` in full. Acceptance: recorded in the P0-T5
+- [x] [P0-T4] Read `.claude/rules/csharp.md` in full. Acceptance: recorded in the P0-T5
   artifact.
-- [ ] [P0-T5] Write the Phase 0 policy-read evidence artifact to
+- [x] [P0-T5] Write the Phase 0 policy-read evidence artifact to
   `docs/features/active/2026-08-27-qfc-metrics-flush-writes-empty-session-file-646/
   evidence/baseline/phase0-instructions-read.md` with `Timestamp:`, `Policy Order:` (the
   four files in the order listed above), and an explicit list of files read. Acceptance:
   the file exists and contains all three required fields.
-- [ ] [P0-T6] Run `git fetch origin`, then reconcile the current branch onto the
+- [x] [P0-T6] Run `git fetch origin`, then reconcile the current branch onto the
   `origin/main` tip (fast-forward merge if a clean fast-forward is possible, otherwise a
   merge of `origin/main` into the current branch). Record the pre- and post-reconciliation
   `git rev-parse HEAD` values. Acceptance: `git merge-base --is-ancestor origin/main HEAD`
   exits `0`. Evidence:
   `evidence/baseline/branch-reconciliation.2026-08-31T20-04.md` with `Timestamp:`,
   `Command:`, `EXIT_CODE:`, `Output Summary:`.
-- [ ] [P0-T7] Run `dotnet tool run csharpier check .` from the repository root. Record the
+- [x] [P0-T7] Run `dotnet tool run csharpier check .` from the repository root. Record the
   printed summary line verbatim (CSharpier's check-mode success output, or the list of
   files needing formatting on failure). Acceptance: `EXIT_CODE` and `Output Summary` are
   both recorded, whatever the exit code is (this step establishes the pre-existing
   formatting state; it is not gated pass/fail). Evidence:
   `evidence/baseline/csharpier-check.2026-08-31T20-04.md`.
-- [ ] [P0-T8] Run `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug
+- [x] [P0-T8] Run `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug
   "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` from the
   repository root. Record `EXIT_CODE` and the printed `Build succeeded`/`Build FAILED`
   summary line with warning/error counts. Acceptance: `EXIT_CODE` recorded (this is a
   baseline capture, not a gate). Evidence:
   `evidence/baseline/msbuild-analyzer-rebuild.2026-08-31T20-04.md`.
-- [ ] [P0-T9] Run `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug
+- [x] [P0-T9] Run `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug
   "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true` from the repository root. Record
   `EXIT_CODE` and the printed build summary line. Acceptance: `EXIT_CODE` recorded.
   Evidence: `evidence/baseline/msbuild-nullable-rebuild.2026-08-31T20-04.md`.
-- [ ] [P0-T10] Resolve `vstest.console.exe` via `vswhere.exe` (not on PATH in this
+- [x] [P0-T10] Resolve `vstest.console.exe` via `vswhere.exe` (not on PATH in this
   environment): `$vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual
   Studio\Installer\vswhere.exe'; $vstest = & $vswhere -latest -products * -find
   'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1`. Then
@@ -122,7 +122,7 @@ are `*.cs`).
   and the printed `Passed!`/`Failed!` summary line with Passed/Failed/Total counts.
   Acceptance: `EXIT_CODE` and the printed summary line are both recorded. Evidence:
   `evidence/baseline/vstest-coverage-run.2026-08-31T20-04.md`.
-- [ ] [P0-T11] Locate the `.coverage` file created by P0-T10 (`Get-ChildItem -Path
+- [x] [P0-T11] Locate the `.coverage` file created by P0-T10 (`Get-ChildItem -Path
   TestResults -Filter *.coverage -Recurse | Sort-Object LastWriteTime -Descending |
   Select-Object -First 1`), then run `dotnet-coverage merge -f cobertura -o
   docs\features\active\2026-08-27-qfc-metrics-flush-writes-empty-session-file-646\evidence\
@@ -135,7 +135,7 @@ are `*.cs`).
 
 ### Phase 1 — Constrained Implementation
 
-- [ ] [P1-T1] Re-derive the two edit anchors against the current tree (post-P0-T6
+- [x] [P1-T1] Re-derive the two edit anchors against the current tree (post-P0-T6
   reconciliation): search `QuickFiler/Controllers/QfcHomeController.Metrics.cs` for the
   literal `var lines = strOutput.Where(line => !string.IsNullOrWhiteSpace(line)).ToArray();`
   (Anchor A) and the literal `bool metricsWritten = await MetricsFileWriter(` (Anchor B),
@@ -143,7 +143,7 @@ are `*.cs`).
   recorded in this plan or in either research artifact. Acceptance: both literals are found
   exactly once each in the file, and their line numbers are recorded. Evidence:
   `evidence/other/anchor-rederivation.2026-08-31T20-04.md`.
-- [ ] [P1-T2] [expect-fail] Add a new MSTest regression test method,
+- [x] [P1-T2] [expect-fail] Add a new MSTest regression test method,
   `WriteMetricsAsync_WithAllNullOrWhitespaceDiagnostics_DoesNotInvokeWriter`, to
   `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, inserted immediately after
   `WriteMetricsAsync_WithoutMyDocumentsFolder_DoesNotInvokeWriter` inside the `#region Issue
@@ -154,12 +154,12 @@ are `*.cs`).
   `Task.FromResult(true)`, call `await controller.WriteMetricsAsync("metrics.csv")`, then
   assert `invoked.Should().BeFalse(...)`. Acceptance: the method exists verbatim as
   described in the file.
-- [ ] [P1-T3] Check off AC3 in `issue.md` (`A new MSTest regression test in
+- [x] [P1-T3] Check off AC3 in `issue.md` (`A new MSTest regression test in
   QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs stubs GetMoveDiagnostics to
   return an array whose every element is null or whitespace and asserts that the injected
   MetricsFileWriter delegate is invoked zero times.`), backed by P1-T2. Change only `- [ ]`
   to `- [x]` for that line.
-- [ ] [P1-T4] [expect-fail] Rebuild the test project: `msbuild
+- [x] [P1-T4] [expect-fail] Rebuild the test project: `msbuild
   QuickFiler.Test\QuickFiler.Test.csproj /t:Rebuild /m /p:Configuration=Debug
   /p:Platform=AnyCPU`. Use `/p:Platform=AnyCPU` (no space) for this project-level build,
   not the solution-level `"/p:Platform=Any CPU"` alias: `QuickFiler.Test.csproj`'s
@@ -175,7 +175,7 @@ are `*.cs`).
   `Failed:     1` — the new test fails against the unguarded implementation, because the
   guard does not exist yet. Evidence:
   `evidence/regression-testing/fail-before-new-test.2026-08-31T20-04.md`.
-- [ ] [P1-T5] Apply the fix: insert
+- [x] [P1-T5] Apply the fix: insert
   ```
   if (lines.Length == 0)
   {
@@ -188,51 +188,51 @@ are `*.cs`).
   stays adjacent to the writer statement it explains, in `QuickFiler/Controllers/
   QfcHomeController.Metrics.cs`. Acceptance: the exact four-line block appears in the file
   immediately after Anchor A and immediately before that comment block.
-- [ ] [P1-T6] Verify the production diff is scoped to exactly the new guard: run `git diff
+- [x] [P1-T6] Verify the production diff is scoped to exactly the new guard: run `git diff
   origin/main -- QuickFiler/Controllers/QfcHomeController.Metrics.cs`. Confirm zero removed
   (`-`) lines appear in the diff, confirm the only added (`+`) lines are the four guard
   lines from P1-T5, and confirm the diff contains no hunk touching the `MetricsFileWriter`
   property declaration (the `Task<bool>` lines at 28-34) or the `if (!metricsWritten)` block
   (lines 185-191). Acceptance: all three conditions hold. Evidence:
   `evidence/other/production-diff-scope.2026-08-31T20-04.md`.
-- [ ] [P1-T7] Check off AC6 in `issue.md` (`The MetricsFileWriter delegate signature and the
+- [x] [P1-T7] Check off AC6 in `issue.md` (`The MetricsFileWriter delegate signature and the
   writer's failure-handling branch are unchanged by this item. Both are owned by issue #647
   and are out of scope here.`), backed by P1-T6.
-- [ ] [P1-T8] Check off AC2 in `issue.md` (`The guard is an early return placed between the
+- [x] [P1-T8] Check off AC2 in `issue.md` (`The guard is an early return placed between the
   statement that computes the filtered diagnostic-line array and the statement that awaits
   MetricsFileWriter, and is textually equivalent to the guard already present in
   QuickFiler/Controllers/EfcHomeController.Metrics.cs`), backed by P1-T5 and by the
   `if (dataLines.Length == 0) { return; }` guard already present at
   `QuickFiler/Controllers/EfcHomeController.Metrics.cs:72-75`.
-- [ ] [P1-T9] Rebuild the test project again (`msbuild
+- [x] [P1-T9] Rebuild the test project again (`msbuild
   QuickFiler.Test\QuickFiler.Test.csproj /t:Rebuild /m /p:Configuration=Debug
   /p:Platform=AnyCPU`, per the same `/p:Platform=AnyCPU` (no space) requirement documented
   in P1-T4), then re-run the same scoped command as P1-T4 (same `/TestCaseFilter`) against
   the fixed implementation. Acceptance: `EXIT_CODE 0` and the printed summary line shows
   `Passed:     1`. Evidence:
   `evidence/regression-testing/pass-after-new-test.2026-08-31T20-04.md`.
-- [ ] [P1-T10] Check off AC1 in `issue.md` (`WriteMetricsAsync ... returns without invoking
+- [x] [P1-T10] Check off AC1 in `issue.md` (`WriteMetricsAsync ... returns without invoking
   MetricsFileWriter when the null-and-whitespace filter leaves the filtered
   diagnostic-line array empty.`), backed by P1-T9.
-- [ ] [P1-T11] Check off AC4 in `issue.md` (`The new regression test fails against the
+- [x] [P1-T11] Check off AC4 in `issue.md` (`The new regression test fails against the
   unguarded implementation and passes after the guard is added, with fail-before evidence
   recorded ...`), backed by P1-T4 and P1-T9.
-- [ ] [P1-T12] Run the two existing tests `WriteMetricsAsync_InvokesInjectedMetricsFileWriterOnce`
+- [x] [P1-T12] Run the two existing tests `WriteMetricsAsync_InvokesInjectedMetricsFileWriterOnce`
   and `WriteMetricsAsync_FiltersNullDiagnosticLinesBeforeWriting` via the vswhere-resolved
   `$vstest` with `/Settings:scripts\vscode\TaskMaster.cli.runsettings /InIsolation
   /TestCaseFilter:"FullyQualifiedName~WriteMetricsAsync_InvokesInjectedMetricsFileWriterOnce|FullyQualifiedName~WriteMetricsAsync_FiltersNullDiagnosticLinesBeforeWriting"`.
   Acceptance: `EXIT_CODE 0` and the printed summary line shows `Passed:     2`. Evidence:
   `evidence/regression-testing/existing-tests-pass.2026-08-31T20-04.md`.
-- [ ] [P1-T13] Verify the test-file diff contains zero removed lines: run `git diff
+- [x] [P1-T13] Verify the test-file diff contains zero removed lines: run `git diff
   origin/main -- QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`. Confirm no
   `-` line appears in the diff (only additions), which together with P1-T12 confirms the
   two pre-existing tests were not modified. Evidence:
   `evidence/other/test-file-diff-scope.2026-08-31T20-04.md`.
-- [ ] [P1-T14] Check off AC5 in `issue.md` (`The existing tests
+- [x] [P1-T14] Check off AC5 in `issue.md` (`The existing tests
   WriteMetricsAsync_InvokesInjectedMetricsFileWriterOnce and
   WriteMetricsAsync_FiltersNullDiagnosticLinesBeforeWriting still pass and are not
   modified.`), backed by P1-T12 and P1-T13.
-- [ ] [P1-T15] Verify the post-change line count of the test file: run `(Get-Content
+- [x] [P1-T15] Verify the post-change line count of the test file: run `(Get-Content
   'QuickFiler.Test\Controllers\QfcHomeControllerMetricsTests.cs').Count`. Acceptance: the
   result is less than or equal to `500`. Evidence:
   `evidence/other/test-file-line-count.2026-08-31T20-04.md`.
@@ -243,7 +243,7 @@ Run P2-T1 through P2-T5 in order, unconditionally. If any of P2-T1 through P2-T5
 non-zero `EXIT_CODE`, or if P2-T1 rewrites any tracked file, restart the loop from P2-T1.
 `EXIT_CODE: SKIPPED` is not a valid recorded outcome for any task in this phase.
 
-- [ ] [P2-T1] Run `git status --porcelain` and record the set of modified paths and their
+- [x] [P2-T1] Run `git status --porcelain` and record the set of modified paths and their
   diff line-counts (the tree already carries the Phase 1 edits to the two owned files).
   Then run `dotnet tool run csharpier format .` from the repository root. Then run `git
   status --porcelain` again. Acceptance: `EXIT_CODE 0` is recorded, and the task records
@@ -251,23 +251,23 @@ non-zero `EXIT_CODE`, or if P2-T1 rewrites any tracked file, restart the loop fr
   the two owned files, or any newly-modified path, beyond the pre-format snapshot (a
   difference means the formatter rewrote content; no difference means the tree was already
   compliant). Evidence: `evidence/qa-gates/csharpier-format.2026-08-31T20-04.md`.
-- [ ] [P2-T2] Run `dotnet tool run csharpier check .`. Acceptance: `EXIT_CODE 0`. Evidence:
+- [x] [P2-T2] Run `dotnet tool run csharpier check .`. Acceptance: `EXIT_CODE 0`. Evidence:
   `evidence/qa-gates/csharpier-check-final.2026-08-31T20-04.md`.
-- [ ] [P2-T3] Run `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug
+- [x] [P2-T3] Run `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug
   "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`.
   Acceptance: `EXIT_CODE 0` and the printed summary line reads `Build succeeded.`. Evidence:
   `evidence/qa-gates/msbuild-analyzer-rebuild.2026-08-31T20-04.md`.
-- [ ] [P2-T4] Run `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug
+- [x] [P2-T4] Run `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug
   "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`. Acceptance: `EXIT_CODE 0` and the
   printed summary line reads `Build succeeded.`. Evidence:
   `evidence/qa-gates/msbuild-nullable-rebuild.2026-08-31T20-04.md`.
-- [ ] [P2-T5] Resolve `vstest.console.exe` via `vswhere.exe` (same resolution as P0-T10),
+- [x] [P2-T5] Resolve `vstest.console.exe` via `vswhere.exe` (same resolution as P0-T10),
   then run `& $vstest QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCoverage` —
   the exact assembly path and flag CUT3 names, with no other flags added. Acceptance:
   `EXIT_CODE 0` and the printed summary line shows `Failed:     0` with a `Total:` count
   greater than or equal to the P0-T10 baseline total. Evidence:
   `evidence/qa-gates/vstest-coverage-run.2026-08-31T20-04.md`.
-- [ ] [P2-T6] Locate the `.coverage` file created by P2-T5 (same discovery method as
+- [x] [P2-T6] Locate the `.coverage` file created by P2-T5 (same discovery method as
   P0-T11), then run `dotnet-coverage merge -f cobertura -o
   docs\features\active\2026-08-27-qfc-metrics-flush-writes-empty-session-file-646\evidence\
   qa-gates\final-coverage.cobertura.xml <located-.coverage-path>`. Record the resulting
@@ -275,7 +275,7 @@ non-zero `EXIT_CODE`, or if P2-T1 rewrites any tracked file, restart the loop fr
   the final coverage headline. Acceptance: the `.cobertura.xml` artifact exists and its root
   `line-rate` value is a numeric string, not a placeholder. Evidence:
   `evidence/qa-gates/coverage-cobertura-final.2026-08-31T20-04.md`.
-- [ ] [P2-T7] Coverage delta verification: compare the baseline `line-rate` (P0-T11) to the
+- [x] [P2-T7] Coverage delta verification: compare the baseline `line-rate` (P0-T11) to the
   final `line-rate` (P2-T6) and record both values plus the difference; confirm the final
   value is not lower than the baseline value. Separately, in the final Cobertura XML,
   locate the `<class filename="...QfcHomeController.Metrics.cs">` element and the `<line
@@ -284,21 +284,21 @@ non-zero `EXIT_CODE`, or if P2-T1 rewrites any tracked file, restart the loop fr
   greater than `0`. Acceptance: both conditions hold (no repository-wide regression, and
   100% coverage on the new guard, satisfying the CLAUDE.md >= 90% new-code floor). Evidence:
   `evidence/qa-gates/coverage-delta-verification.2026-08-31T20-04.md`.
-- [ ] [P2-T8] Verify the total change footprint: run `git status --porcelain` and `git diff
+- [x] [P2-T8] Verify the total change footprint: run `git status --porcelain` and `git diff
   origin/main --name-status`. Confirm every path listed by either command begins with one
   of `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, `QuickFiler.Test/Controllers/
   QfcHomeControllerMetricsTests.cs`, or `docs/features/active/
   2026-08-27-qfc-metrics-flush-writes-empty-session-file-646/`. Acceptance: no listed path
   falls outside that set. Evidence: `evidence/qa-gates/footprint-scope.2026-08-31T20-04.md`.
-- [ ] [P2-T9] Check off AC7 in `issue.md` (`No repository file outside
+- [x] [P2-T9] Check off AC7 in `issue.md` (`No repository file outside
   QuickFiler/Controllers/QfcHomeController.Metrics.cs,
   QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs, and this feature folder is
   modified.`), backed by P2-T8.
-- [ ] [P2-T10] Check off AC8 in `issue.md` (`The C# toolchain passes in order in a single
+- [x] [P2-T10] Check off AC8 in `issue.md` (`The C# toolchain passes in order in a single
   final pass: csharpier format then csharpier check, the analyzer msbuild rebuild, the
   nullable msbuild rebuild, and vstest.console.exe with coverage enabled.`), backed by
   P2-T1 through P2-T5 having completed with no restart of the loop.
-- [ ] [P2-T11] Final reconciliation: read `issue.md` and confirm all eight items under
+- [x] [P2-T11] Final reconciliation: read `issue.md` and confirm all eight items under
   `## Acceptance Criteria` (AC1 through AC8) are `- [x]`. Acceptance: all eight are checked;
   if any is not, this task fails and the gap must be documented rather than the checkbox
   force-checked.

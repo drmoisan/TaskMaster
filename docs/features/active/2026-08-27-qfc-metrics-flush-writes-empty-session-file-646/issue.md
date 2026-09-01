@@ -113,30 +113,30 @@ Raised as finding CR-1 in
 
 ## Acceptance Criteria
 
-- [ ] AC1: `WriteMetricsAsync` in `QuickFiler/Controllers/QfcHomeController.Metrics.cs` returns without
+- [x] AC1: `WriteMetricsAsync` in `QuickFiler/Controllers/QfcHomeController.Metrics.cs` returns without
   invoking `MetricsFileWriter` when the null-and-whitespace filter leaves the filtered diagnostic-line
   array empty.
-- [ ] AC2: The guard is an early return placed between the statement that computes the filtered
+- [x] AC2: The guard is an early return placed between the statement that computes the filtered
   diagnostic-line array and the statement that awaits `MetricsFileWriter`, and is textually equivalent
   to the guard already present in `QuickFiler/Controllers/EfcHomeController.Metrics.cs`
   (`if (<array>.Length == 0) { return; }`).
-- [ ] AC3: A new MSTest regression test in `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`
+- [x] AC3: A new MSTest regression test in `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`
   stubs `GetMoveDiagnostics` to return an array whose every element is `null` or whitespace and asserts
   that the injected `MetricsFileWriter` delegate is invoked zero times.
-- [ ] AC4: The new regression test fails against the unguarded implementation and passes after the
+- [x] AC4: The new regression test fails against the unguarded implementation and passes after the
   guard is added, with fail-before evidence recorded under the feature folder's
   `evidence/regression-testing/` directory.
-- [ ] AC5: The existing tests `WriteMetricsAsync_InvokesInjectedMetricsFileWriterOnce` and
+- [x] AC5: The existing tests `WriteMetricsAsync_InvokesInjectedMetricsFileWriterOnce` and
   `WriteMetricsAsync_FiltersNullDiagnosticLinesBeforeWriting` still pass and are not modified.
-- [ ] AC6: The `MetricsFileWriter` delegate signature and the writer's failure-handling branch are
+- [x] AC6: The `MetricsFileWriter` delegate signature and the writer's failure-handling branch are
   unchanged by this item. Both are owned by issue #647 and are out of scope here.
-- [ ] AC7: No repository file outside `QuickFiler/Controllers/QfcHomeController.Metrics.cs`,
+- [x] AC7: No repository file outside `QuickFiler/Controllers/QfcHomeController.Metrics.cs`,
   `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, and this feature folder is modified.
-- [ ] AC8: The C# toolchain passes in order in a single final pass: `csharpier format` then
+- [x] AC8: The C# toolchain passes in order in a single final pass: `csharpier format` then
   `csharpier check`, the analyzer `msbuild` rebuild, the nullable `msbuild` rebuild, and
   `vstest.console.exe` with coverage enabled.
 
 ## Next Step
 
 - [x] Promote to GitHub issue (bug-report template)
-- [ ] Move to active fix folder / branch
+- [x] Move to active fix folder / branch
