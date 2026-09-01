@@ -23,6 +23,7 @@ enumerates, read after the baseline order above.
 - `.claude/skills/acceptance-criteria-tracking/SKILL.md`
 - `.claude/rules/plan-acceptance-gates.md`
 
-Ten repository-relative paths are listed. Each was read in full from this checkout
-(`C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-acf06b6910e95bba7`) rather than from a
-sibling worktree, so the content read is the content this branch carries.
+Ten repository-relative paths are listed. Each was read in full from this checkout — the isolated
+agent worktree `agent-acf06b6910e95bba7`, whose absolute path is account-derived and is therefore
+not reproduced here — rather than from a sibling worktree, so the content read is the content this
+branch carries.
