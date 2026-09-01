@@ -108,6 +108,8 @@
 - [Multi-location fact residuals drive preflight rounds](multi-location-fact-residuals-drive-preflight-rounds.md) — nearly every blocking
 - [expect-fail tests break substring scoped-run gates](expect-fail-tests-break-substring-scoped-run-gates.md) — a "0 failed" gate under
 - [CR-pattern grep falsely reports 100% CRLF](grep-cr-empty-pattern-false-crlf.md) — the shell strips the CR, leaving an empty pattern
+- [.gitignore does NOT cover *.trx](gitignore-does-not-cover-trx.md) — a committed TRX leaks account, machine and worktree root; sweep before any git add of vstest evidence
+- [Preflight converges on verbatim delta text](preflight-converges-on-verbatim-delta-text.md) — round overrun comes from the planner paraphrasing delta items, not from the review
 
 - [PR readiness gate bars ANY recorded override](pr-readiness-gate-bars-any-recorded-override.md) — one authorized override blocks gh pr create; no drain procedure exists
 - [Resumed child orchestrator shares your worktree](resumed-child-orchestrator-shares-worktree.md) — a checkpoint mtime you did not author
