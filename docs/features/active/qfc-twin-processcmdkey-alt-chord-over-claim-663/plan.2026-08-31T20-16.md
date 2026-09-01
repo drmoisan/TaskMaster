@@ -217,9 +217,13 @@ of the seven new method names are not unique within the assembly.
 the inner run reports a non-zero exit, and `Invoke-MSTest.ps1` throws at line 130 for the same reason.
 This repository carries pre-existing load-driven failures concentrated in the `QfcItemController` test
 files that appear under the concurrent instrumented run. Neither repository-wide run is therefore gated
-on exit code 0. Both are gated on failure-set membership: `[P0-T12]` captures BASELINE_FAILURE_SET as a
-verbatim list of failing test names, and every later run must report no failing test outside that set
-apart from the three named expected failures in Phase 2.
+on exit code 0. Both are gated on failure-set membership, against two separate baselines. `[P0-T12]`
+captures BASELINE_FAILURE_SET as a verbatim list of failing test names from the uninstrumented run, and
+every later uninstrumented run — `[P2-T3]`, `[P3-T3]` and `[P4-T5]` — must report no failing test
+outside that set apart from the three named expected failures in Phase 2. `[P0-T13]` captures
+BASELINE_COVERAGE_FAILURE_SET from the instrumented run, and `[P4-T6]`, which is the only later
+instrumented run, is compared against that set instead. The two sets are not interchangeable, because
+instrumentation adds load-driven failures that the uninstrumented baseline does not contain.
 
 **Coverage post-processing.** Because `Invoke-MSTestWithCoverage.ps1` throws before its
 Koverage post-processing block on lines 333 through 344, a run with any failing test leaves the raw
@@ -282,10 +286,17 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
 - [ ] [P0-T5] Re-derive analyzer version concordance with two independently formulated searches and
       record both member sets. Search one enumerates the project-file side, keyed on the analyzer
       reference path:
-      `pwsh -NoProfile -Command 'Get-ChildItem -Path . -Recurse -Filter *.csproj | Select-String -Pattern "packages\\(Meziantou\.Analyzer|Roslynator\.Analyzers)\.[0-9][0-9.]*\\" -AllMatches'`.
+      `pwsh -NoProfile -Command 'Get-ChildItem -Path . -Recurse -Filter *.csproj | Select-String -Pattern "packages\x5C(Meziantou\.Analyzer|Roslynator\.Analyzers)\.[0-9][0-9.]*\x5C" -AllMatches'`.
       Search two enumerates the pins independently, keyed on the package identifier rather than on a
       path and reading a different file type:
-      `pwsh -NoProfile -Command 'Get-ChildItem -Path . -Recurse -Filter packages.config | Select-String -Pattern "id=\"(Meziantou\.Analyzer|Roslynator\.Analyzers)\"" -Context 0,2'`.
+      `pwsh -NoProfile -Command 'Get-ChildItem -Path . -Recurse -Filter packages.config | Select-String -Pattern "id=\x22(Meziantou\.Analyzer|Roslynator\.Analyzers)\x22" -Context 0,2'`.
+      Both patterns spell the backslash as `\x5C` and the double quote as `\x22` rather than as `\\`
+      and `\"`. Those hex escapes are interpreted by the .NET regular-expression engine and are inert
+      to every intervening quoting layer. The literal spellings are not usable here: `\"` is not an
+      escape sequence in a PowerShell double-quoted string, so the string terminates at that quote and
+      the alternation group is then parsed as a command; and a doubled backslash de-doubles when the
+      command text is handed to the native `pwsh` executable, leaving an unbalanced group. Both
+      spellings were executed against this worktree and both raised terminating errors.
       Acceptance: both sets are recorded verbatim in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/baseline/analyzer-version-concordance.md`
       and the artifact states, per package identifier, whether the two version sets are equal. A
@@ -447,7 +458,13 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       modify the four existing `IsAltKeyCommand_*` methods. No test may construct, show, or derive
       from a `System.Windows.Forms.Form`, and no test may use a temporary file, `Thread.Sleep` or
       `Task.Delay`. Acceptance: the file declares exactly eleven `[TestMethod]` attributes, each of the
-      seven method names appears exactly once, and VC-1 against the file returns zero matches. Record
+      seven method names appears exactly once, VC-1 against the file returns zero matches, and
+      `Select-String -Path QuickFiler.Test/Controllers/QfcFormKeyHandlerTests.cs -Pattern 'Keys\.Control'`
+      returns at least two matches with at least one matched line inside the body of
+      `ClaimsAltChord_WithoutAltFlag_ReturnsFalse`. That last clause is a change detector: at branch
+      head the pattern returns exactly one match, on line 45 inside
+      `IsAltKeyCommand_WithControlKey_ReturnsFalse`, so without it no acceptance condition in this plan
+      would change value if the second assertion AC-5 requires were omitted. Record
       in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/regression-testing/tests-added.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-2, AC-3, AC-4,
@@ -772,9 +789,12 @@ searching for `- [x] AC-1` alone would also match the AC-10 through AC-15 lines,
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/end-state.md`,
       with no `.cs` path among them. Those two residues are structural: this task writes
       `end-state.md`, and the plan file carries the `[P6-T18]` check-off that could only be made after
-      `[P6-T18]` committed. After recording the artifact, fold both into the `[P6-T18]` commit with
+      `[P6-T18]` committed. After recording the artifact, flip this task's own checkbox to `[x]` in the
+      plan file, which its acceptance permits at that point because the artifact is already written,
+      then fold the plan file and `end-state.md` into the `[P6-T18]` commit with
       `git commit --amend --no-edit`, then run `git status --porcelain` once more and record that it
-      prints nothing. Record in
+      prints nothing. The check-off precedes the amend because performing it afterwards would leave the
+      plan file modified and uncommitted, which is the state this task exists to close. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/end-state.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-14.
 
