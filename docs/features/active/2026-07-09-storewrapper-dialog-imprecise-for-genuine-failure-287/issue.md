@@ -70,34 +70,39 @@ Cosmetic/messaging-accuracy issue only; no functional or data-integrity impact. 
 ## Acceptance Criteria
 
 Work Mode for this item is `full-bug`, so `spec.md` is the authoritative acceptance-criteria source
-per the `acceptance-criteria-tracking` skill. The list below mirrors `spec.md` for convenience and
-must be kept in step with it; where the two disagree, `spec.md` governs.
+per the `acceptance-criteria-tracking` skill. The list below mirrors `spec.md` v2.0 for convenience
+and must be kept in step with it; where the two disagree, `spec.md` governs.
 
-- [ ] **AC1** A new file `UtilitiesCS/OutlookObjects/Store/StoreLaunchUnavailableMessage.cs` exists,
-      declares an `internal static` type mapping `StoreLaunchReadinessState` to a message and a
-      title, references neither `System.Windows.Forms` nor `MyBox`, and carries no
-      `[ExcludeFromCodeCoverage]` attribute.
-- [ ] **AC2** `UtilitiesCS/UtilitiesCS.csproj` registers the new file with a `<Compile Include>` item
-      and it compiles into `UtilitiesCS.dll`.
-- [ ] **AC3** The helper returns a different message for `ModelUnavailable` than for
+Note on the premise: research recorded in
+`research/readiness-state-semantics.2026-08-31T21-10.md` establishes that the Summary and Steps to
+Reproduce above have the two readiness states inverted. `ModelUnavailable` carries the permanent
+case; `StoresUnavailable` is transient. See the "Correction to the issue's stated premise" section
+of `spec.md`.
+
+- [ ] **AC1** `StoreLaunchReadinessEvaluator.cs` declares two pure `internal static` methods mapping
+      a `StoreLaunchReadinessState` to a message string and a title string; neither references
+      `System.Windows.Forms` or `MyBox`, performs I/O, or carries `[ExcludeFromCodeCoverage]`.
+- [ ] **AC2** No new source or test file is added and no project file is modified.
+- [ ] **AC3** The message method returns a different string for `ModelUnavailable` than for
       `StoresUnavailable`.
-- [ ] **AC4** The helper throws `ArgumentOutOfRangeException` for `StoreLaunchReadinessState.Ready`.
-- [ ] **AC5** The helper returns the `ModelUnavailable` copy for an undefined enum value.
+- [ ] **AC4** Both methods throw `ArgumentOutOfRangeException` for `StoreLaunchReadinessState.Ready`.
+- [ ] **AC5** Both methods return the `ModelUnavailable` copy for an undefined enum value.
 - [ ] **AC6** Neither `Launch()` contains a dialog message or title literal; a case-sensitive search
       for `Store settings are not available yet` over `*.cs` returns 0 matches, down from 2.
-- [ ] **AC7** Both `Launch()` methods keep `[ExcludeFromCodeCoverage]`, keep the same gate condition,
-      and still return without constructing a viewer when not ready.
-- [ ] **AC8** A new MSTest file for the helper exists under `UtilitiesCS.Test/OutlookObjects/Store/`
-      and is registered in `UtilitiesCS.Test/UtilitiesCS.Test.csproj`.
-- [ ] **AC9** Tests assert the exact message and title shown by `StoreWrapperController.Launch()` for
-      both non-ready states through the `MyBox.DialogInvoker` seam.
-- [ ] **AC10** Equivalent tests exist for `DisabledStoresController.Launch()` and assert `Viewer`
-      remains null.
-- [ ] **AC11** The stale `DisabledStoresController.Launch` XML summary remark is corrected.
-- [ ] **AC12** The `StoreWrapperController` readiness XML doc records that `ModelUnavailable` is also
-      the terminal state after a caught failure in `AppOlObjects.LoadStoresAsync`.
-- [ ] **AC13** All five existing readiness tests in `StoreWrapperController_Tests.Launch.cs` still
+- [ ] **AC7** Both `Launch()` methods keep `[ExcludeFromCodeCoverage]`, the same gate condition, the
+      same buttons and icon, and still return without constructing a viewer when not ready.
+- [ ] **AC8** Tests assert the exact message and title shown by `StoreWrapperController.Launch()` for
+      both non-ready states through the `MyBox.DialogInvoker` seam, and that the two messages differ.
+- [ ] **AC9** Equivalent tests exist for `DisabledStoresController.Launch()` and assert `Viewer`
+      remains null; no test constructs a viewer form.
+- [ ] **AC10** The stale `DisabledStoresController.Launch` XML summary remark is corrected.
+- [ ] **AC11** The `StoreLaunchReadinessEvaluator` XML doc records that `ModelUnavailable` is also
+      the terminal state after the caught failure in `AppOlObjects.LoadStoresAsync`.
+- [ ] **AC12** All five existing readiness tests in `StoreWrapperController_Tests.Launch.cs` still
       pass and the evaluator's return values are unchanged.
-- [ ] **AC14** The full C# toolchain passes in order with zero errors in a single final pass.
-- [ ] **AC15** No production source file is added to a coverage exclusion.
-- [ ] **AC16** No file exceeds 500 lines and no file outside the spec's design table is modified.
+- [ ] **AC13** The full C# toolchain passes in order with zero errors in a single final pass.
+- [ ] **AC14** No production source file is added to a coverage exclusion; the two new methods are
+      measured at or above 90%.
+- [ ] **AC15** `StoreWrapperController.cs` remains under 500 lines and no touched file exceeds 500
+      lines; post-change line counts are recorded as evidence.
+- [ ] **AC16** No file outside the five in the spec's design-summary table is modified.
