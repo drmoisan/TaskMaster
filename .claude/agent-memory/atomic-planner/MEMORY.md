@@ -25,7 +25,7 @@
 - [#644](project_644_ac16_referral_revision_seams.md) — AC's named instrument prints no figure; substitute's noise (~0.028pp) exceeds the 0.01pp delta; check-off task → referral task pinning the UNCHECKED state
 - [#644 cycle 2](project_644_cycle2_sweep_gate_evasion_seams.md) — rewording out of a detector's match set is gate evasion; SHA-256 pair for untracked prior artifacts; bound the porcelain `??` scope
 - [#644 PA-7](project_644_pa7_redaction_plan_seams.md) — untracked audit artifact still enters main; name-status diff blind to it; mandated literal contradicted its own stated intent
-- [#648](project_648_ungated_static_swap_plan_seams.md) — coverage pipeline STRIPS `.Test` packages before recomputing the root summary (so lines-valid is EQUAL, not grown); `.csproj` needs `AnyCPU` no-space; git pathspecs union; CSharpier's tree differs pre/post restore
+- [#648](project_648_ungated_static_swap_plan_seams.md) — lines-valid equality is UNSATISFIABLE (merge nondeterminism), use a 5% tolerance; MSBuild path gate takes the project-relative item spec, not the qualified path; CSharpier walking premise refuted; `git tag` not idempotent
 - [#680](project_680_menu_mode_plan_seams.md) — HostTests.cs 499 not 500; set-difference format gate; TRX 5-shape identifiers, `grep -a`; append-a-dated-literal discriminator; post-merge remediation: exact line arithmetic — the review's "optional" fallback was load-bearing (501 vs 500)
 
 ## Plan-structure traps
