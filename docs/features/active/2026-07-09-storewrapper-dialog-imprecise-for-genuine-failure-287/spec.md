@@ -216,7 +216,7 @@ Placement rationale. `UtilitiesCS.csproj` and `UtilitiesCS.Test.csproj` are non-
 `packages.config`-era projects that list every source file explicitly (see `UtilitiesCS.csproj:744`
 for `StoreLaunchReadinessEvaluator.cs`), so a new `.cs` file that is not registered compiles into
 nothing and the change silently does nothing. `StoreWrapperController.cs` is also 478 lines against
-the 500-line cap, leaving about 21 lines of headroom. Using the existing 41-line evaluator file
+the 500-line cap, leaving 22 lines of headroom. Using the existing 41-line evaluator file
 avoids both hazards, keeps the readiness decision and the copy that describes it in one place, and
 keeps the diff to five already-registered files.
 
@@ -434,7 +434,7 @@ error log already records the terminal cause the new copy points at.
 
 ## Risks & Mitigations
 
-- Risk: `StoreWrapperController.cs` is within about 21 lines of the 500-line cap, so an incautious
+- Risk: `StoreWrapperController.cs` is within 22 lines of the 500-line cap, so an incautious
   doc addition breaks the file-size rule. Mitigation: the permanence documentation goes in the
   evaluator file (41 lines), not the controller; AC15 asserts the post-change count.
 - Risk: the end-to-end `Launch()` assertions construct a real `MyBoxViewer`. Mitigation: this is the
