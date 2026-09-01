@@ -18,7 +18,7 @@ Supporting (non-requirements) input: `docs/features/active/efcselectionguard-ban
 
 ## Working Directory and Base Commit
 
-Every command in this plan runs from the worktree root `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-affe8d0920bd5c3f9` on branch `bug/efcselectionguard-banner-prefix-arity-and-stale-comment-662`. The diff anchor for AC5b and AC7 is the base commit `2b85134b42872e405602e6064e02dc9cda6c319b`.
+Every command in this plan runs from the worktree root supplied by the delegating orchestrator, referred to below as the repo root and deliberately not written out here because the artifact-hygiene rule in Fail-Closed Evidence Rules forbids an absolute host path in any file this plan commits and that rule must hold for this plan file itself, on branch `bug/efcselectionguard-banner-prefix-arity-and-stale-comment-662`. The diff anchor for AC5b and AC7 is the base commit `2b85134b42872e405602e6064e02dc9cda6c319b`.
 
 ## Fail-Closed Evidence Rules
 
