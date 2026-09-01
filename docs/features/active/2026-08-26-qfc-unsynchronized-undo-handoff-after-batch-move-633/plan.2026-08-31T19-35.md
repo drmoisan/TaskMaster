@@ -622,7 +622,7 @@ and run against a tree that still carries the defect.
       `SearchResult:` showing that no test naming `WhenDrainedAsync` exists in `QuickFiler.Test/` before
       Phase 3. Acceptance: the artifact contains one `WhyFailingRunImpossible:` field, one
       `SearchScope:`, one `SearchPatterns:`, and one `SearchResult:` field.
-- [ ] [P2-T7] Sanitise, then commit. First, across every file under `FEATURE/evidence/`, replace all
+- [x] [P2-T7] Sanitise, then commit. First, across every file under `FEATURE/evidence/`, replace all
       case-insensitive occurrences of the absolute worktree path with the literal token `WORKTREE`,
       covering all three spellings that appear in this evidence set: the backslash form, the
       forward-slash form, and the doubled-backslash form. This is required because the TRX trees and the
@@ -653,13 +653,13 @@ and run against a tree that still carries the defect.
 
 ### Phase 3 — FilerQueue drain barrier and handshake repair
 
-- [ ] [P3-T1] In `QuickFiler/Controllers/FilerQueue.cs`, add three private members: a
+- [x] [P3-T1] In `QuickFiler/Controllers/FilerQueue.cs`, add three private members: a
       `private readonly object` monitor, a `private int` outstanding-work counter, and a
       `private TaskCompletionSource<bool>` drain signal that is null when the queue is idle. Do not use
       the parameterless non-generic `TaskCompletionSource`; it does not exist on net481. Acceptance: the
       file declares exactly one `readonly object` field and exactly one
       `TaskCompletionSource<bool>` field.
-- [ ] [P3-T2] In `QuickFiler/Controllers/FilerQueue.cs`, add a `private bool` consumer-running flag and
+- [x] [P3-T2] In `QuickFiler/Controllers/FilerQueue.cs`, add a `private bool` consumer-running flag and
       remove the `ThreadSafeSingleShotGuard guard` field at line 40 together with both
       `guard.CheckAndSetFirstCall` reads and the `guard = new ThreadSafeSingleShotGuard();` statement at
       line 63. Do not modify `UtilitiesCS/Threading/ThreadSafeSingleShotGuard.cs`; the counter-based
@@ -667,21 +667,21 @@ and run against a tree that still carries the defect.
       `QuickFiler/Controllers/FilerQueue.cs` for the literal token `ThreadSafeSingleShotGuard` returns
       zero matches, and a search of `UtilitiesCS/Threading/ThreadSafeSingleShotGuard.cs` for the literal
       token `class ThreadSafeSingleShotGuard` still returns one match.
-- [ ] [P3-T3] Rewrite `Enqueue(FilerQueueItem item)` in `QuickFiler/Controllers/FilerQueue.cs` so that,
+- [x] [P3-T3] Rewrite `Enqueue(FilerQueueItem item)` in `QuickFiler/Controllers/FilerQueue.cs` so that,
       under the monitor, it increments the outstanding-work counter, performs `Queue.Add(item)`, and
       decides from the consumer-running flag whether a worker must be started; the worker is started
       outside the monitor and `Consumer` is still assigned. `Queue.Add` on an unbounded
       `BlockingCollection` never blocks, so holding the monitor across it is safe, and the monitor is
       never held across an `await`. Acceptance: the method body contains exactly one `lock` statement
       and one `Queue.Add(item);` statement, and `Consumer` is still assigned within the method.
-- [ ] [P3-T4] Rewrite `Enqueue(EmailFiler filer, IList<MailItemHelper> helpers)` in
+- [x] [P3-T4] Rewrite `Enqueue(EmailFiler filer, IList<MailItemHelper> helpers)` in
       `QuickFiler/Controllers/FilerQueue.cs` to construct the `FilerQueueItem` in its own frame and
       delegate to the item overload. Constructing in this frame is load-bearing: it is what keeps a null
       helper surfacing as a synchronous `ArgumentNullException` to the caller, which
       `MoveMailAsync_WhenEnqueueThrows_WrapsArgumentNullException` depends on. Acceptance: the method
       body contains the literal token `new FilerQueueItem(filer, helpers)` and contains no `Queue.Add`
       call of its own.
-- [ ] [P3-T5] Rewrite `ConsumeAsync` in `QuickFiler/Controllers/FilerQueue.cs` so that the worker takes
+- [x] [P3-T5] Rewrite `ConsumeAsync` in `QuickFiler/Controllers/FilerQueue.cs` so that the worker takes
       each item and clears the consumer-running flag in the **same** critical section in which `TryTake`
       fails, and so that the outstanding-work counter is decremented in a `finally` around the
       `ItemProcessor` call. When the counter reaches zero, complete and clear the drain signal inside
@@ -690,7 +690,7 @@ and run against a tree that still carries the defect.
       logged and the loop still continues. Acceptance: the method contains exactly one `finally` block
       and the literal tokens `logger.Error` and `item.Helpers.First()` each still appear exactly once in
       the file.
-- [ ] [P3-T6] Add `public Task WhenDrainedAsync()` to `QuickFiler/Controllers/FilerQueue.cs`. Under the
+- [x] [P3-T6] Add `public Task WhenDrainedAsync()` to `QuickFiler/Controllers/FilerQueue.cs`. Under the
       monitor it returns `Task.CompletedTask` when the outstanding count is zero, and otherwise the
       lazily created drain signal's `Task`. The signal is created with
       `TaskCreationOptions.RunContinuationsAsynchronously`. The returned task completes; it never
@@ -702,10 +702,10 @@ and run against a tree that still carries the defect.
       is a word character and the trailing `\b` therefore does not hold. Acceptance:
       `QuickFiler/Controllers/FilerQueue.cs` contains the literal token
       `public Task WhenDrainedAsync()` exactly once.
-- [ ] [P3-T7] Verify that `Consumer` in `QuickFiler/Controllers/FilerQueue.cs` still has its original
+- [x] [P3-T7] Verify that `Consumer` in `QuickFiler/Controllers/FilerQueue.cs` still has its original
       declaration. Acceptance: a search of that file for the literal token
       `public Task Consumer { get; private set; } = Task.CompletedTask;` returns exactly one match.
-- [ ] [P3-T8] Repair `QuickFiler.Test/Controllers/QfcItemController.SeamFactoryTests.cs`. In
+- [x] [P3-T8] Repair `QuickFiler.Test/Controllers/QfcItemController.SeamFactoryTests.cs`. In
       `MoveMailAsync_WhenOneDrivePresent_InvokesFactoryWithConfigAndEnqueues`, delete the reflection
       block at lines 213-218 that reads the private `guard` field and sets
       `ThreadSafeSingleShotGuard._state`, and delete the `filerQueue.Queue.Count.Should().Be(1)`
@@ -751,14 +751,14 @@ and run against a tree that still carries the defect.
 
 ### Phase 4 — QfcFormController barrier, guard clause, and Consumer-await removal
 
-- [ ] [P4-T1] In `QuickFiler/Controllers/QfcFormController.EventHandlers.cs`, add a `_parent` null check
+- [x] [P4-T1] In `QuickFiler/Controllers/QfcFormController.EventHandlers.cs`, add a `_parent` null check
       to the early-return guard of `BackGroundMoveAsync` at line 219, keeping the existing three clauses
       and the existing early-return shape. The clause is required because P4-T2 makes the method
       dereference `_parent`, and `QuickFiler/Controllers/QfcFormController.SetupDisposal.cs:224` sets
       `_parent = null` during cleanup. Acceptance: the guard line contains the literal token
       `_parent is null` and the file still contains the literal token
       `_globals?.FS?.Filenames is null`.
-- [ ] [P4-T2] In `QuickFiler/Controllers/QfcFormController.EventHandlers.cs`, insert
+- [x] [P4-T2] In `QuickFiler/Controllers/QfcFormController.EventHandlers.cs`, insert
       `await _parent.FilerQueue.WhenDrainedAsync();` between the `await _groups.MoveEmailsAsync(_movedItems);`
       statement and the `WriteMetrics` dispatch, with a short comment explaining that the barrier makes
       the undo-push ordering a control-flow property rather than an assumption. That comment prose must
@@ -771,24 +771,24 @@ and run against a tree that still carries the defect.
       `await _parent.FilerQueue.WhenDrainedAsync();` exactly once, and the line number of that statement
       is greater than the line number of `await _groups.MoveEmailsAsync(_movedItems);` and less than the
       line number of the first `UiThread.Dispatcher.InvokeAsync` call inside `BackGroundMoveAsync`.
-- [ ] [P4-T3] Delete the two `await _parent.FilerQueue.Consumer;` statements in
+- [x] [P4-T3] Delete the two `await _parent.FilerQueue.Consumer;` statements in
       `QuickFiler/Controllers/QfcFormController.EventHandlers.cs`, currently at lines 167 and 193. Both
       are strictly subsumed: each is immediately preceded by an await of the same `BackGroundMoveAsync`
       task, which now contains the barrier, and the barrier waits on the whole outstanding count rather
       than on a single worker task. Acceptance: a search of `QuickFiler/**/*.cs` for the pattern
       `\.Consumer\b` returns zero matches.
-- [ ] [P4-T4] Confirm that `QuickFiler/Controllers/QfcFormController.EventHandlers.cs` still contains no
+- [x] [P4-T4] Confirm that `QuickFiler/Controllers/QfcFormController.EventHandlers.cs` still contains no
       `#nullable` directive, no `record`, and no `init` accessor, by running a single search over that
       file for the pattern `#nullable|\brecord\b|\binit\s*[;{]`. Acceptance: the search returns zero
       matches.
-- [ ] [P4-T5] Run
+- [x] [P4-T5] Run
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true /fl "/flp:logfile=FEATURE/evidence/other/p4-t5-build.msbuild.txt;verbosity=normal"`.
       Write `FEATURE/evidence/other/p4-t5-build.TIMESTAMP.md` with the four required fields and the
       `Skipping target "CoreCompile"` occurrence count in
       `FEATURE/evidence/other/p4-t5-build.msbuild.txt`. Acceptance: the artifact records `EXIT_CODE: 0`
       and a `Skipping target "CoreCompile"` occurrence count of 0 in
       `FEATURE/evidence/other/p4-t5-build.msbuild.txt`.
-- [ ] [P4-T6] Run, using the absolute path recorded by P0-T14 in place of the leading executable name:
+- [x] [P4-T6] Run, using the absolute path recorded by P0-T14 in place of the leading executable name:
       `vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation /TestCaseFilter:"FullyQualifiedName~QfcFormControllerUndoHandoffTests" "/Logger:trx;LogFileName=p4-t6.trx" /ResultsDirectory:FEATURE\evidence\regression-testing\p4-t6`
       from `WORKTREE`. Write
       `FEATURE/evidence/regression-testing/pass-after-run.TIMESTAMP.md` with the four required fields
@@ -799,50 +799,50 @@ and run against a tree that still carries the defect.
 
 ### Phase 5 — Queue-level and ordering regression suites
 
-- [ ] [P5-T1] Correct the class comment at `QuickFiler.Test/Controllers/FilerQueueTests.cs:12-19` so it
+- [x] [P5-T1] Correct the class comment at `QuickFiler.Test/Controllers/FilerQueueTests.cs:12-19` so it
       no longer records that the `Enqueue`/`ConsumeAsync` path is deliberately not exercised; state
       instead that the path is exercised deterministically through the `ItemProcessor` seam added for
       issue 633. Acceptance: a search of that file for the literal token
       `intentionally NOT exercised` returns zero matches and a search for the literal token
       `ItemProcessor` returns at least one match.
-- [ ] [P5-T2] Add `WhenDrainedAsync_OnFreshQueue_ReturnsCompletedTask` to
+- [x] [P5-T2] Add `WhenDrainedAsync_OnFreshQueue_ReturnsCompletedTask` to
       `QuickFiler.Test/Controllers/FilerQueueTests.cs`: construct a `FilerQueue`, enqueue nothing, and
       assert the returned task's `IsCompleted` is true. Acceptance: the test method name appears
       verbatim in the file exactly once.
-- [ ] [P5-T3] Add `WhenDrainedAsync_WithGatedItem_DoesNotCompleteBeforeItemCompletes` to
+- [x] [P5-T3] Add `WhenDrainedAsync_WithGatedItem_DoesNotCompleteBeforeItemCompletes` to
       `QuickFiler.Test/Controllers/FilerQueueTests.cs`: assign an `ItemProcessor` that signals an entry
       `TaskCompletionSource<bool>` and then awaits a gate `TaskCompletionSource<bool>`; enqueue one
       item; await the entry signal; assert the drain task's `IsCompleted` is false; release the gate in
       a `finally`. Acceptance: the test method name appears verbatim exactly once and
       `QuickFiler.Test/Controllers/FilerQueueTests.cs` contains zero matches for
       `Thread\.Sleep|Task\.Delay|\.Wait\(|\.Result\b|DateTime\.(Now|UtcNow)`.
-- [ ] [P5-T4] Add `WhenDrainedAsync_AfterGateReleased_CompletesAndItemRanOnce` to
+- [x] [P5-T4] Add `WhenDrainedAsync_AfterGateReleased_CompletesAndItemRanOnce` to
       `QuickFiler.Test/Controllers/FilerQueueTests.cs`: enqueue one gated item, release the gate, await
       the drain task, and assert the processor invocation counter equals 1. Acceptance: the test method
       name appears verbatim exactly once, the test asserts an invocation count of 1, and
       `QuickFiler.Test/Controllers/FilerQueueTests.cs` contains zero matches for
       `Thread\.Sleep|Task\.Delay|\.Wait\(|\.Result\b|DateTime\.(Now|UtcNow)`.
-- [ ] [P5-T5] Add `WhenDrainedAsync_WithTwoGatedItems_CompletesOnlyAfterBothComplete` to
+- [x] [P5-T5] Add `WhenDrainedAsync_WithTwoGatedItems_CompletesOnlyAfterBothComplete` to
       `QuickFiler.Test/Controllers/FilerQueueTests.cs`: enqueue two items with one gate each, release
       the first gate only, assert the drain task's `IsCompleted` is false, then release the second gate,
       await the drain task, and assert both processors ran. Acceptance: the test method name appears
       verbatim exactly once, the test asserts an invocation count of 2, and
       `QuickFiler.Test/Controllers/FilerQueueTests.cs` contains zero matches for
       `Thread\.Sleep|Task\.Delay|\.Wait\(|\.Result\b|DateTime\.(Now|UtcNow)`.
-- [ ] [P5-T6] Add `WhenDrainedAsync_AwaitedTwice_BothWaitersComplete` to
+- [x] [P5-T6] Add `WhenDrainedAsync_AwaitedTwice_BothWaitersComplete` to
       `QuickFiler.Test/Controllers/FilerQueueTests.cs`: obtain two drain tasks before the gate releases,
       release the gate, await both, then call `WhenDrainedAsync()` once more and assert the third
       returned task's `IsCompleted` is true. Acceptance: the test method name appears verbatim exactly
       once, the test obtains at least three drain tasks, and
       `QuickFiler.Test/Controllers/FilerQueueTests.cs` contains zero matches for
       `Thread\.Sleep|Task\.Delay|\.Wait\(|\.Result\b|DateTime\.(Now|UtcNow)`.
-- [ ] [P5-T7] Add `Enqueue_AfterPreviousBatchDrained_ProcessesSecondBatch` to
+- [x] [P5-T7] Add `Enqueue_AfterPreviousBatchDrained_ProcessesSecondBatch` to
       `QuickFiler.Test/Controllers/FilerQueueTests.cs`: release the first gate, await the drain, enqueue
       a second item with a second gate, release it, await the new drain, and assert the second item was
       processed. This is the regression guard for the orphaned-item window; per the P2-T6 dossier it is
       green before the fix as well as after, and it guards against reintroducing the window under the
       repaired handshake. Acceptance: the test method name appears verbatim exactly once.
-- [ ] [P5-T8] Add `ItemProcessor_ThatThrows_StillDecrementsAndDrainCompletes` to
+- [x] [P5-T8] Add `ItemProcessor_ThatThrows_StillDecrementsAndDrainCompletes` to
       `QuickFiler.Test/Controllers/FilerQueueTests.cs`: assign an `ItemProcessor` that throws for the
       first item and completes for the second, enqueue both, await the drain, and assert the drain task
       completed without faulting and that the second item was still processed. Acceptance: the test
@@ -859,7 +859,7 @@ and run against a tree that still carries the defect.
       default-constructed `MailItemHelper` is safe: `MailItemHelper()` at
       `UtilitiesCS/OutlookObjects/MailItem/MailItemHelper.cs:80` calls `InitializeSafeDefaults()`, which
       seeds `Subject`, `SenderName`, and `SentOn` with non-COM values.
-- [ ] [P5-T9] Add the three remaining ordering tests to
+- [x] [P5-T9] Add the three remaining ordering tests to
       `QuickFiler.Test/Controllers/QfcFormControllerUndoHandoffTests.cs`:
       `BackGroundMoveAsync_AfterQueueDrains_WritesMetricsThenCleansUp`, which installs a pumping STA
       dispatcher via `using (var transaction = await UiThreadDispatcherFixture.BeginTransactionAsync())`
@@ -887,7 +887,7 @@ and run against a tree that still carries the defect.
       `Thread\.Sleep|Task\.Delay|\.Wait\(|\.Result\b|DateTime\.(Now|UtcNow)`, and every line of the file
       that contains the literal token `BeginTransactionAsync` also contains the literal token
       `using (`, checked as in P2-T3.
-- [ ] [P5-T10] Run
+- [x] [P5-T10] Run
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true /fl "/flp:logfile=FEATURE/evidence/other/p5-t10-build.msbuild.txt;verbosity=normal"`
       and then, using the absolute path recorded by P0-T14 in place of the leading executable name,
       `vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation /TestCaseFilter:"FullyQualifiedName~FilerQueueTests" "/Logger:trx;LogFileName=p5-t10.trx" /ResultsDirectory:FEATURE\evidence\regression-testing\p5-t10`
@@ -900,46 +900,46 @@ and run against a tree that still carries the defect.
 
 ### Phase 6 — Constraint verification sweep
 
-- [ ] [P6-T1] Search `QuickFiler.Test/Controllers/FilerQueueTests.cs`,
+- [x] [P6-T1] Search `QuickFiler.Test/Controllers/FilerQueueTests.cs`,
       `QuickFiler.Test/Controllers/QfcFormControllerUndoHandoffTests.cs`, and
       `QuickFiler.Test/Controllers/QfcItemController.SeamFactoryTests.cs` for the pattern
       `Thread\.Sleep|Task\.Delay|\.Wait\(|\.Result\b|DateTime\.(Now|UtcNow)`. Write
       `FEATURE/evidence/qa-gates/p6-t1-determinism-sweep.TIMESTAMP.md` with `Timestamp:`, `Command:`,
       `EXIT_CODE:`, `Output Summary:`, and the per-file match counts. Acceptance: the artifact records a
       total match count of 0 across the three files.
-- [ ] [P6-T2] Search `QuickFiler/Controllers/FilerQueue.cs` and
+- [x] [P6-T2] Search `QuickFiler/Controllers/FilerQueue.cs` and
       `QuickFiler/Controllers/QfcFormController.EventHandlers.cs` for the pattern
       `\binit\s*[;{]|\brecord\b`. Write
       `FEATURE/evidence/qa-gates/p6-t2-net481-language-sweep.TIMESTAMP.md` with the four required fields
       and the per-file match counts. Acceptance: the artifact records a total match count of 0.
-- [ ] [P6-T3] Search `QuickFiler/Controllers/FilerQueue.cs` and
+- [x] [P6-T3] Search `QuickFiler/Controllers/FilerQueue.cs` and
       `QuickFiler/Controllers/QfcFormController.EventHandlers.cs` for the literal token `#nullable`.
       Write `FEATURE/evidence/qa-gates/p6-t3-nullable-pragma-sweep.TIMESTAMP.md` with the four required
       fields. Acceptance: the artifact records a total match count of 0. This is a preservation gate,
       not a change gate: the pre-change count is also 0, and the gate exists because adding
       `#nullable enable` to either file would conscript it into nullable analysis and promote its
       `CS86xx` diagnostics to build errors under `/p:TreatWarningsAsErrors=true`.
-- [ ] [P6-T4] Search `QuickFiler/**/*.cs` for the pattern `\.Consumer\b`. Write
+- [x] [P6-T4] Search `QuickFiler/**/*.cs` for the pattern `\.Consumer\b`. Write
       `FEATURE/evidence/qa-gates/p6-t4-consumer-read-sweep.TIMESTAMP.md` with the four required fields
       and the full match list. Acceptance: the artifact records a match count of 0. The pre-change
       population was exactly two, at `QuickFiler/Controllers/QfcFormController.EventHandlers.cs:167` and
       `:193`, and both were removed by P4-T3.
-- [ ] [P6-T5] Record `(Get-Content -LiteralPath <path>).Count` for
+- [x] [P6-T5] Record `(Get-Content -LiteralPath <path>).Count` for
       `QuickFiler/Controllers/FilerQueue.cs` and
       `QuickFiler/Controllers/QfcFormController.EventHandlers.cs` into
       `FEATURE/evidence/qa-gates/p6-t5-production-file-sizes.TIMESTAMP.md` with the four required
       fields. Do not use `Measure-Object -Line`. Acceptance: both recorded counts are at most 500.
-- [ ] [P6-T6] Record `(Get-Content -LiteralPath <path>).Count` for
+- [x] [P6-T6] Record `(Get-Content -LiteralPath <path>).Count` for
       `QuickFiler.Test/Controllers/FilerQueueTests.cs`,
       `QuickFiler.Test/Controllers/QfcFormControllerUndoHandoffTests.cs`, and
       `QuickFiler.Test/Controllers/QfcItemController.SeamFactoryTests.cs` into
       `FEATURE/evidence/qa-gates/p6-t6-test-file-sizes.TIMESTAMP.md` with the four required fields.
       Acceptance: all three recorded counts are at most 500.
-- [ ] [P6-T7] Search `QuickFiler.Test/QuickFiler.Test.csproj` for the literal token
+- [x] [P6-T7] Search `QuickFiler.Test/QuickFiler.Test.csproj` for the literal token
       `Controllers\QfcFormControllerUndoHandoffTests.cs`. Write
       `FEATURE/evidence/qa-gates/p6-t7-csproj-compile-item.TIMESTAMP.md` with the four required fields.
       Acceptance: the artifact records a match count of exactly 1.
-- [ ] [P6-T8] Run, using the absolute path recorded by P0-T14 in place of the leading executable name:
+- [x] [P6-T8] Run, using the absolute path recorded by P0-T14 in place of the leading executable name:
       `vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation /TestCaseFilter:"FullyQualifiedName~MoveMailAsync_WhenEnqueueThrows_WrapsArgumentNullException" "/Logger:trx;LogFileName=p6-t8.trx" /ResultsDirectory:FEATURE\evidence\qa-gates\p6-t8`
       from `WORKTREE`. Write `FEATURE/evidence/qa-gates/p6-t8-enqueue-argnull.TIMESTAMP.md` with the
       four required fields and the count of `outcome="Passed"` occurrences in the produced TRX file.
@@ -953,12 +953,12 @@ and run against a tree that still carries the defect.
       committed. If `git rev-parse origin/main` at this point differs from the value P0-T3 recorded,
       re-run the command with the merge-base SHA that P0-T3 recorded substituted for `origin/main` and
       record both outputs, so an upstream advance cannot be mistaken for a local edit.
-- [ ] [P6-T9] Run, using the absolute path recorded by P0-T14 in place of the leading executable name:
+- [x] [P6-T9] Run, using the absolute path recorded by P0-T14 in place of the leading executable name:
       `vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation /TestCaseFilter:"FullyQualifiedName~MoveMailAsync_WhenOneDrivePresent_InvokesFactoryWithConfigAndEnqueues" "/Logger:trx;LogFileName=p6-t9.trx" /ResultsDirectory:FEATURE\evidence\qa-gates\p6-t9`
       from `WORKTREE`. Write `FEATURE/evidence/qa-gates/p6-t9-seamfactory-reconciled.TIMESTAMP.md` with
       the four required fields and the `outcome="Passed"` count. Acceptance: the artifact records
       `EXIT_CODE: 0` and an `outcome="Passed"` count of 1.
-- [ ] [P6-T10] Run, using the absolute path recorded by P0-T14 in place of the leading executable name:
+- [x] [P6-T10] Run, using the absolute path recorded by P0-T14 in place of the leading executable name:
       `vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation /TestCaseFilter:"FullyQualifiedName~FilerQueue_NewInstance_HasCompletedConsumerByDefault" "/Logger:trx;LogFileName=p6-t10.trx" /ResultsDirectory:FEATURE\evidence\qa-gates\p6-t10`
       from `WORKTREE`. Write `FEATURE/evidence/qa-gates/p6-t10-consumer-default.TIMESTAMP.md` with the
       four required fields and the `outcome="Passed"` count. Obtain the pre-change text as a second
@@ -985,11 +985,11 @@ files as unformatted on every subsequent iteration, and restarting on that repor
 The restart rule continues to apply to every other failure in this phase, including any P7-T3 failure
 whose unformatted set includes one of the six in-scope files.
 
-- [ ] [P7-T1] Record `git status --porcelain` in `WORKTREE` before running the formatter, into
+- [x] [P7-T1] Record `git status --porcelain` in `WORKTREE` before running the formatter, into
       `FEATURE/evidence/qa-gates/p7-t1-preformat-status.TIMESTAMP.md` with the four required fields and
       the verbatim output. Acceptance: the artifact records the verbatim porcelain output, which may be
       empty.
-- [ ] [P7-T2] Run `dotnet tool run csharpier format .` from `WORKTREE`, then immediately record
+- [x] [P7-T2] Run `dotnet tool run csharpier format .` from `WORKTREE`, then immediately record
       `git status --porcelain` again. Write `FEATURE/evidence/qa-gates/p7-t2-csharpier-format.TIMESTAMP.md`
       with the four required fields, the verbatim summary line the command printed, and both the
       pre-run porcelain output from P7-T1 and the post-run porcelain output. Do not assert on the
@@ -1004,20 +1004,20 @@ whose unformatted set includes one of the six in-scope files.
       an out-of-scope rewrite falsifies AC16.
       Acceptance: the artifact records `EXIT_CODE: 0`, both porcelain outputs, and an explicit statement
       that the set difference contains no path outside the six in-scope files.
-- [ ] [P7-T3] Run `dotnet tool run csharpier check .` from `WORKTREE`. Write
+- [x] [P7-T3] Run `dotnet tool run csharpier check .` from `WORKTREE`. Write
       `FEATURE/evidence/qa-gates/p7-t3-csharpier-check.TIMESTAMP.md` with the four required fields and
       the verbatim summary line. Acceptance: the artifact records `EXIT_CODE: 0`. If P0-T7 recorded
       pre-existing drift and this check still reports unformatted files outside the six in-scope files,
       record `REMEDIATION-REQUIRED: pre-existing formatting drift outside scope` with the file list and
       report it rather than reformatting out-of-scope files.
-- [ ] [P7-T4] Run
+- [x] [P7-T4] Run
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true /fl "/flp:logfile=FEATURE/evidence/qa-gates/p7-t4-analyze.msbuild.txt;verbosity=normal"`.
       Write `FEATURE/evidence/qa-gates/p7-t4-analyze.TIMESTAMP.md` with the four required fields, the
       verbatim `Error(s)` and `Warning(s)` summary lines, and the count of occurrences of the literal
       `Skipping target "CoreCompile"` in `FEATURE/evidence/qa-gates/p7-t4-analyze.msbuild.txt`.
       Acceptance: the artifact records `EXIT_CODE: 0` and a `Skipping target "CoreCompile"` occurrence
       count of 0 in `FEATURE/evidence/qa-gates/p7-t4-analyze.msbuild.txt`.
-- [ ] [P7-T5] Run
+- [x] [P7-T5] Run
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true /fl "/flp:logfile=FEATURE/evidence/qa-gates/p7-t5-nullable.msbuild.txt;verbosity=normal"`.
       Write `FEATURE/evidence/qa-gates/p7-t5-nullable.TIMESTAMP.md` with the four required fields, the
       verbatim `Error(s)` summary line, and the `Skipping target "CoreCompile"` occurrence count in
@@ -1025,7 +1025,7 @@ whose unformatted set includes one of the six in-scope files.
       substitute `/t:Build`. Acceptance: the artifact records `EXIT_CODE: 0` and a
       `Skipping target "CoreCompile"` occurrence count of 0 in
       `FEATURE/evidence/qa-gates/p7-t5-nullable.msbuild.txt`.
-- [ ] [P7-T6] Run
+- [x] [P7-T6] Run
       `pwsh -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput coverage\post-change.cobertura.xml`
       from `WORKTREE`. Write `FEATURE/evidence/qa-gates/p7-t6-test-coverage.TIMESTAMP.md` with the four
       required fields, the verbatim vstest result summary line, and the total, passed, failed, and
@@ -1034,7 +1034,7 @@ whose unformatted set includes one of the six in-scope files.
       failure not in that set is a regression introduced by this change and must be fixed before this
       phase restarts; any failure inside that set is recorded as pre-existing, `EXIT_CODE: 0` becomes
       unreachable, and the task is recorded as `REMEDIATION-REQUIRED` rather than checked.
-- [ ] [P7-T7] Read `coverage\post-change.cobertura.xml` and record, in
+- [x] [P7-T7] Read `coverage\post-change.cobertura.xml` and record, in
       `FEATURE/evidence/qa-gates/p7-t7-coverage-denominator.TIMESTAMP.md`, the same field set that
       P0-T11 recorded for the baseline file: the sorted `package` `name` list, the root `coverage`
       element's `line-rate`, `lines-covered`, `lines-valid`, `branch-rate`, `branches-covered`, and
@@ -1042,7 +1042,7 @@ whose unformatted set includes one of the six in-scope files.
       and exactly one of `DENOMINATOR: FILTERED` or `DENOMINATOR: UNFILTERED`. Acceptance: the artifact
       records `DENOMINATOR: FILTERED` and a numeric percentage. If it records
       `DENOMINATOR: UNFILTERED`, the run was not green and P7-T6 must be resolved first.
-- [ ] [P7-T8] Run, using the absolute path recorded by P0-T14 in place of the leading executable name:
+- [x] [P7-T8] Run, using the absolute path recorded by P0-T14 in place of the leading executable name:
       `vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation /TestCaseFilter:"FullyQualifiedName~QfcFormControllerUndoHandoffTests" "/Logger:trx;LogFileName=p7-t8.trx" /ResultsDirectory:FEATURE\evidence\qa-gates\p7-t8`
       from `WORKTREE`. Write `FEATURE/evidence/qa-gates/p7-t8-new-tests-visible.TIMESTAMP.md` with the
       four required fields and the verbatim list of test names found in the produced TRX file.
@@ -1053,7 +1053,7 @@ whose unformatted set includes one of the six in-scope files.
       `BackGroundMoveAsync_AfterQueueDrains_WritesMetricsThenCleansUp`,
       `BackGroundMoveAsync_WhenParentIsNull_ReturnsWithoutThrowing`, and
       `BackGroundMoveAsync_WhenGroupsIsNull_ReturnsWithoutTouchingQueue`.
-- [ ] [P7-T9] Compare the baseline and post-change coverage figures. Write
+- [x] [P7-T9] Compare the baseline and post-change coverage figures. Write
       `FEATURE/evidence/qa-gates/p7-t9-coverage-comparison.TIMESTAMP.md` recording: the baseline
       percentage and denominator classification from P0-T11; the post-change percentage and denominator
       classification from P7-T7; the delta to two decimal places; the `lines-covered` and `lines-valid`
@@ -1069,7 +1069,7 @@ whose unformatted set includes one of the six in-scope files.
       stated. If either denominator classification is
       `UNFILTERED`, record `COMPARISON: NOT PERFORMED — mixed denominators` and do not report a delta;
       a red-run figure compared to a green-run figure manufactures a phantom regression.
-- [ ] [P7-T10] Record the changed-line coverage check. From
+- [x] [P7-T10] Record the changed-line coverage check. From
       `git diff origin/main -- QuickFiler/Controllers/FilerQueue.cs QuickFiler/Controllers/QfcFormController.EventHandlers.cs`,
       enumerate every added or modified production line number, then read the `line` elements of the
       post-change Cobertura file for those two files and record which of those line numbers have a

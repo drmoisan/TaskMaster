@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="60002154-ef4a-4680-a468-dd0911ba8062" name="DanMoisan@MEGALODON4 2026-09-01 10:58:23" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-09-01T10:58:23.1535792-04:00" queuing="2026-09-01T10:58:23.1535792-04:00" start="2026-09-01T10:58:21.9773103-04:00" finish="2026-09-01T10:58:23.2782236-04:00" />
+  <TestSettings name="default" id="1219c62d-7654-4d1d-9d0f-e50b159f3247">
+    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-09-01_10_58_23" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="ef58f1bc-1b65-48c8-88c0-feeb9bce17fc" testId="1a12f49b-4487-8e9a-85eb-07df529f73c9" testName="WhenDrainedAsync_OnFreshQueue_ReturnsCompletedTask" computerName="MEGALODON4" duration="00:00:00.0002136" startTime="2026-09-01T10:58:23.1200364-04:00" endTime="2026-09-01T10:58:23.1200364-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ef58f1bc-1b65-48c8-88c0-feeb9bce17fc" />
+    <UnitTestResult executionId="759a2482-88b2-4e69-97b2-195535f974fd" testId="1edbf339-24fc-8241-acce-6157bb69d72c" testName="FilerQueueItem_Constructor_NullHelpers_ThrowsArgumentNullException" computerName="MEGALODON4" duration="00:00:00.0003229" startTime="2026-09-01T10:58:23.1175278-04:00" endTime="2026-09-01T10:58:23.1175278-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="759a2482-88b2-4e69-97b2-195535f974fd" />
+    <UnitTestResult executionId="1d40c88d-e956-44a9-bc3a-25991101e1ab" testId="145cb961-0069-8f6f-a35f-964d59e02740" testName="FilerQueueItem_Constructor_HelpersContainingNull_ThrowsArgumentNullException" computerName="MEGALODON4" duration="00:00:00.0002540" startTime="2026-09-01T10:58:23.1175278-04:00" endTime="2026-09-01T10:58:23.1175278-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1d40c88d-e956-44a9-bc3a-25991101e1ab" />
+    <UnitTestResult executionId="a4fce247-5ad6-493e-9053-cff44c1eb29c" testId="1550a703-d286-87a6-9462-2867746bae49" testName="WhenDrainedAsync_AwaitedTwice_BothWaitersComplete" computerName="MEGALODON4" duration="00:00:00.0010518" startTime="2026-09-01T10:58:23.1351743-04:00" endTime="2026-09-01T10:58:23.1367325-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a4fce247-5ad6-493e-9053-cff44c1eb29c" />
+    <UnitTestResult executionId="e2435fd5-f443-49a1-ac82-d64c2905a8b7" testId="1463d3f2-e106-88f1-85b9-45c3e680941a" testName="WhenDrainedAsync_WithGatedItem_DoesNotCompleteBeforeItemCompletes" computerName="MEGALODON4" duration="00:00:00.0046985" startTime="2026-09-01T10:58:23.1200364-04:00" endTime="2026-09-01T10:58:23.1261821-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e2435fd5-f443-49a1-ac82-d64c2905a8b7" />
+    <UnitTestResult executionId="15c38c88-96f4-43da-b07a-5907153a61ba" testId="14523ba7-7990-8557-9d02-87e725c2b75a" testName="FilerQueueItem_Constructor_NullFiler_ThrowsArgumentNullException" computerName="MEGALODON4" duration="00:00:00.0096016" startTime="2026-09-01T10:58:23.1074538-04:00" endTime="2026-09-01T10:58:23.1175278-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="15c38c88-96f4-43da-b07a-5907153a61ba" />
+    <UnitTestResult executionId="7bf0d581-917f-42e6-b27a-5f54687a3929" testId="1f1a7535-210e-86e2-ab50-d7cc4ea5d327" testName="Enqueue_AfterPreviousBatchDrained_ProcessesSecondBatch" computerName="MEGALODON4" duration="00:00:00.0011310" startTime="2026-09-01T10:58:23.1367325-04:00" endTime="2026-09-01T10:58:23.1377786-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7bf0d581-917f-42e6-b27a-5f54687a3929" />
+    <UnitTestResult executionId="cdfe7a0e-00c3-41ec-a792-34550d8d6519" testId="15c4b13f-2b55-8ee0-b125-f6e5974a2235" testName="ItemProcessor_ThatThrows_StillDecrementsAndDrainCompletes" computerName="MEGALODON4" duration="00:00:00.0019360" startTime="2026-09-01T10:58:23.1377786-04:00" endTime="2026-09-01T10:58:23.1435813-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cdfe7a0e-00c3-41ec-a792-34550d8d6519" />
+    <UnitTestResult executionId="0646329c-a83b-4cee-b963-f3d7237556a6" testId="15b3c3be-d3ee-8b6d-9e9d-54c4d1cdbcc3" testName="WhenDrainedAsync_WithTwoGatedItems_CompletesOnlyAfterBothComplete" computerName="MEGALODON4" duration="00:00:00.0010599" startTime="2026-09-01T10:58:23.1282928-04:00" endTime="2026-09-01T10:58:23.1293486-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0646329c-a83b-4cee-b963-f3d7237556a6" />
+    <UnitTestResult executionId="922767fa-a43c-48c5-98d9-094a8bcf0cb9" testId="1a7c744f-7730-8f1c-9393-f616fd6b714a" testName="FilerQueueItem_Constructor_StoresFilerAndHelpers" computerName="MEGALODON4" duration="00:00:00.0532883" startTime="2026-09-01T10:58:22.9413243-04:00" endTime="2026-09-01T10:58:23.1009883-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="922767fa-a43c-48c5-98d9-094a8bcf0cb9">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="35ac738c-a082-4cb7-ab26-b199854ef98c" testId="14dc8565-ed22-83d5-a413-6a4a0bbc2e30" testName="WhenDrainedAsync_AfterGateReleased_CompletesAndItemRanOnce" computerName="MEGALODON4" duration="00:00:00.0019080" startTime="2026-09-01T10:58:23.1261821-04:00" endTime="2026-09-01T10:58:23.1282928-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="35ac738c-a082-4cb7-ab26-b199854ef98c" />
+    <UnitTestResult executionId="f5aeb861-ea06-43fb-8b87-359faa11fa19" testId="1b150694-bda3-8db5-8d14-059d2972da79" testName="FilerQueue_NewInstance_HasCompletedConsumerByDefault" computerName="MEGALODON4" duration="00:00:00.0015948" startTime="2026-09-01T10:58:23.1175278-04:00" endTime="2026-09-01T10:58:23.1200364-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f5aeb861-ea06-43fb-8b87-359faa11fa19" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="ItemProcessor_ThatThrows_StillDecrementsAndDrainCompletes" storage="WORKTREE\quickfiler.test\bin\debug\quickfiler.test.dll" id="15c4b13f-2b55-8ee0-b125-f6e5974a2235">
+      <Execution id="cdfe7a0e-00c3-41ec-a792-34550d8d6519" />
+      <TestMethod codeBase="WORKTREE\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.FilerQueueTests" name="ItemProcessor_ThatThrows_StillDecrementsAndDrainCompletes" />
+    </UnitTest>
+    <UnitTest name="FilerQueueItem_Constructor_NullHelpers_ThrowsArgumentNullException" storage="WORKTREE\quickfiler.test\bin\debug\quickfiler.test.dll" id="1edbf339-24fc-8241-acce-6157bb69d72c">
+      <Execution id="759a2482-88b2-4e69-97b2-195535f974fd" />
+      <TestMethod codeBase="WORKTREE\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.FilerQueueTests" name="FilerQueueItem_Constructor_NullHelpers_ThrowsArgumentNullException" />
+    </UnitTest>
+    <UnitTest name="WhenDrainedAsync_WithTwoGatedItems_CompletesOnlyAfterBothComplete" storage="WORKTREE\quickfiler.test\bin\debug\quickfiler.test.dll" id="15b3c3be-d3ee-8b6d-9e9d-54c4d1cdbcc3">
+      <Execution id="0646329c-a83b-4cee-b963-f3d7237556a6" />
+      <TestMethod codeBase="WORKTREE\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.FilerQueueTests" name="WhenDrainedAsync_WithTwoGatedItems_CompletesOnlyAfterBothComplete" />
+    </UnitTest>
+    <UnitTest name="FilerQueueItem_Constructor_StoresFilerAndHelpers" storage="WORKTREE\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a7c744f-7730-8f1c-9393-f616fd6b714a">
+      <Execution id="922767fa-a43c-48c5-98d9-094a8bcf0cb9" />
+      <TestMethod codeBase="WORKTREE\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.FilerQueueTests" name="FilerQueueItem_Constructor_StoresFilerAndHelpers" />
+    </UnitTest>
+    <UnitTest name="WhenDrainedAsync_OnFreshQueue_ReturnsCompletedTask" storage="WORKTREE\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a12f49b-4487-8e9a-85eb-07df529f73c9">
+      <Execution id="ef58f1bc-1b65-48c8-88c0-feeb9bce17fc" />
+      <TestMethod codeBase="WORKTREE\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.FilerQueueTests" name="WhenDrainedAsync_OnFreshQueue_ReturnsCompletedTask" />
+    </UnitTest>
+    <UnitTest name="FilerQueue_NewInstance_HasCompletedConsumerByDefault" storage="WORKTREE\quickfiler.test\bin\debug\quickfiler.test.dll" id="1b150694-bda3-8db5-8d14-059d2972da79">
+      <Execution id="f5aeb861-ea06-43fb-8b87-359faa11fa19" />
+      <TestMethod codeBase="WORKTREE\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.FilerQueueTests" name="FilerQueue_NewInstance_HasCompletedConsumerByDefault" />
+    </UnitTest>
+    <UnitTest name="WhenDrainedAsync_WithGatedItem_DoesNotCompleteBeforeItemCompletes" storage="WORKTREE\quickfiler.test\bin\debug\quickfiler.test.dll" id="1463d3f2-e106-88f1-85b9-45c3e680941a">
+      <Execution id="e2435fd5-f443-49a1-ac82-d64c2905a8b7" />
+      <TestMethod codeBase="WORKTREE\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.FilerQueueTests" name="WhenDrainedAsync_WithGatedItem_DoesNotCompleteBeforeItemCompletes" />
+    </UnitTest>
+    <UnitTest name="FilerQueueItem_Constructor_NullFiler_ThrowsArgumentNullException" storage="WORKTREE\quickfiler.test\bin\debug\quickfiler.test.dll" id="14523ba7-7990-8557-9d02-87e725c2b75a">
+      <Execution id="15c38c88-96f4-43da-b07a-5907153a61ba" />
+      <TestMethod codeBase="WORKTREE\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.FilerQueueTests" name="FilerQueueItem_Constructor_NullFiler_ThrowsArgumentNullException" />
+    </UnitTest>
+    <UnitTest name="WhenDrainedAsync_AfterGateReleased_CompletesAndItemRanOnce" storage="WORKTREE\quickfiler.test\bin\debug\quickfiler.test.dll" id="14dc8565-ed22-83d5-a413-6a4a0bbc2e30">
+      <Execution id="35ac738c-a082-4cb7-ab26-b199854ef98c" />
+      <TestMethod codeBase="WORKTREE\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.FilerQueueTests" name="WhenDrainedAsync_AfterGateReleased_CompletesAndItemRanOnce" />
+    </UnitTest>
+    <UnitTest name="FilerQueueItem_Constructor_HelpersContainingNull_ThrowsArgumentNullException" storage="WORKTREE\quickfiler.test\bin\debug\quickfiler.test.dll" id="145cb961-0069-8f6f-a35f-964d59e02740">
+      <Execution id="1d40c88d-e956-44a9-bc3a-25991101e1ab" />
+      <TestMethod codeBase="WORKTREE\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.FilerQueueTests" name="FilerQueueItem_Constructor_HelpersContainingNull_ThrowsArgumentNullException" />
+    </UnitTest>
+    <UnitTest name="Enqueue_AfterPreviousBatchDrained_ProcessesSecondBatch" storage="WORKTREE\quickfiler.test\bin\debug\quickfiler.test.dll" id="1f1a7535-210e-86e2-ab50-d7cc4ea5d327">
+      <Execution id="7bf0d581-917f-42e6-b27a-5f54687a3929" />
+      <TestMethod codeBase="WORKTREE\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.FilerQueueTests" name="Enqueue_AfterPreviousBatchDrained_ProcessesSecondBatch" />
+    </UnitTest>
+    <UnitTest name="WhenDrainedAsync_AwaitedTwice_BothWaitersComplete" storage="WORKTREE\quickfiler.test\bin\debug\quickfiler.test.dll" id="1550a703-d286-87a6-9462-2867746bae49">
+      <Execution id="a4fce247-5ad6-493e-9053-cff44c1eb29c" />
+      <TestMethod codeBase="WORKTREE\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.FilerQueueTests" name="WhenDrainedAsync_AwaitedTwice_BothWaitersComplete" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1a12f49b-4487-8e9a-85eb-07df529f73c9" executionId="ef58f1bc-1b65-48c8-88c0-feeb9bce17fc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1edbf339-24fc-8241-acce-6157bb69d72c" executionId="759a2482-88b2-4e69-97b2-195535f974fd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="145cb961-0069-8f6f-a35f-964d59e02740" executionId="1d40c88d-e956-44a9-bc3a-25991101e1ab" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1550a703-d286-87a6-9462-2867746bae49" executionId="a4fce247-5ad6-493e-9053-cff44c1eb29c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1463d3f2-e106-88f1-85b9-45c3e680941a" executionId="e2435fd5-f443-49a1-ac82-d64c2905a8b7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14523ba7-7990-8557-9d02-87e725c2b75a" executionId="15c38c88-96f4-43da-b07a-5907153a61ba" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f1a7535-210e-86e2-ab50-d7cc4ea5d327" executionId="7bf0d581-917f-42e6-b27a-5f54687a3929" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15c4b13f-2b55-8ee0-b125-f6e5974a2235" executionId="cdfe7a0e-00c3-41ec-a792-34550d8d6519" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15b3c3be-d3ee-8b6d-9e9d-54c4d1cdbcc3" executionId="0646329c-a83b-4cee-b963-f3d7237556a6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a7c744f-7730-8f1c-9393-f616fd6b714a" executionId="922767fa-a43c-48c5-98d9-094a8bcf0cb9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14dc8565-ed22-83d5-a413-6a4a0bbc2e30" executionId="35ac738c-a082-4cb7-ab26-b199854ef98c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b150694-bda3-8db5-8d14-059d2972da79" executionId="f5aeb861-ea06-43fb-8b87-359faa11fa19" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="12" executed="12" passed="12" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+</TestRun>

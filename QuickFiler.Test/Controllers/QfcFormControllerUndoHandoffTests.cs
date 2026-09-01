@@ -76,7 +76,9 @@ namespace QuickFiler.Controllers.Tests
                 .Returns(Task.CompletedTask);
             _mockGroups.Setup(g => g.CleanupBackground()).Callback(() => Record(CleanupToken));
 
-            _gate = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            _gate = new TaskCompletionSource<bool>(
+                TaskCreationOptions.RunContinuationsAsynchronously
+            );
             _processorEntered = new TaskCompletionSource<bool>(
                 TaskCreationOptions.RunContinuationsAsynchronously
             );
@@ -168,7 +170,9 @@ namespace QuickFiler.Controllers.Tests
         private void InstallRecordingMetrics(QfcFormController controller)
         {
             FieldInfo field = typeof(QfcFormController).GetField("WriteMetrics", PrivateInstance);
-            field.Should().NotBeNull(because: "QfcFormController declares a private WriteMetrics field");
+            field
+                .Should()
+                .NotBeNull(because: "QfcFormController declares a private WriteMetrics field");
 
             MethodInfo method = typeof(QfcFormControllerUndoHandoffTests).GetMethod(
                 nameof(RecordWriteMetrics),
@@ -204,7 +208,10 @@ namespace QuickFiler.Controllers.Tests
                 await _gate.Task;
             };
 
-            _filerQueue.Enqueue(new EmailFiler(), new List<MailItemHelper> { new MailItemHelper() });
+            _filerQueue.Enqueue(
+                new EmailFiler(),
+                new List<MailItemHelper> { new MailItemHelper() }
+            );
             await _processorEntered.Task;
         }
 
@@ -320,6 +327,102 @@ namespace QuickFiler.Controllers.Tests
                     QfcItemControllerTestSupport.ShutdownDispatcher(dispatcher);
                 }
             }
+        }
+
+        /// <summary>
+        /// After the drain, metrics is written once and cleanup runs once, in that order. The order is
+        /// load-bearing: the metrics writer reads state that cleanup resets.
+        /// </summary>
+        [TestMethod]
+        public async Task BackGroundMoveAsync_AfterQueueDrains_WritesMetricsThenCleansUp()
+        {
+            using (var transaction = await UiThreadDispatcherFixture.BeginTransactionAsync())
+            {
+                Dispatcher dispatcher = QfcItemControllerTestSupport.StartRunningDispatcher();
+                try
+                {
+                    // Arrange
+                    transaction.Install(dispatcher);
+                    QfcFormController controller = CreateWiredController();
+                    await EnqueueOneGatedItemAsync();
+
+                    // Act
+                    Task moveTask = controller.BackGroundMoveAsync();
+                    _gate.TrySetResult(true);
+                    await moveTask;
+
+                    // Assert
+                    CountOf(MetricsToken).Should().Be(1, "metrics is written exactly once");
+                    CountOf(CleanupToken).Should().Be(1, "cleanup runs exactly once");
+                    RecordedOrder()
+                        .Should()
+                        .Equal(
+                            new List<string> { MetricsToken, CleanupToken },
+                            "the existing metrics-before-cleanup ordering is preserved"
+                        );
+                }
+                finally
+                {
+                    _gate.TrySetResult(true);
+                    QfcItemControllerTestSupport.ShutdownDispatcher(dispatcher);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The post-cleanup state, in which <c>_parent</c> has been set to null, must not throw. The
+        /// added guard clause is required because the barrier dereferences <c>_parent</c>.
+        /// </summary>
+        [TestMethod]
+        public async Task BackGroundMoveAsync_WhenParentIsNull_ReturnsWithoutThrowing()
+        {
+            // Arrange: every other guarded collaborator stays non-null, so only the _parent clause
+            // can produce the early return.
+            QfcFormController controller = CreateWiredController();
+            SetPrivateField<IQfcHomeController>(controller, "_parent", null);
+            GetPrivateField<IQfcHomeController>(controller, "_parent")
+                .Should()
+                .BeNull("the arrangement must actually reproduce the post-Cleanup state");
+
+            // Act
+            Task moveTask = controller.BackGroundMoveAsync();
+            await moveTask;
+
+            // Assert
+            moveTask
+                .IsFaulted.Should()
+                .BeFalse("a null parent is an early return, not an exception");
+            moveTask.IsCompleted.Should().BeTrue("the method returns rather than hanging");
+            _mockGroups.Verify(
+                g => g.MoveEmailsAsync(It.IsAny<SloStack<IMovedMailInfo>>()),
+                Times.Never
+            );
+        }
+
+        /// <summary>
+        /// The pre-existing null-<c>_groups</c> early return is preserved, and nothing on that path
+        /// touches the queue.
+        /// </summary>
+        [TestMethod]
+        public async Task BackGroundMoveAsync_WhenGroupsIsNull_ReturnsWithoutTouchingQueue()
+        {
+            // Arrange
+            QfcFormController controller = CreateWiredController();
+            SetPrivateField<IQfcCollectionController>(controller, "_groups", null);
+
+            // Act
+            Task moveTask = controller.BackGroundMoveAsync();
+            await moveTask;
+
+            // Assert: the outstanding-work counter is private and is not an observable, so the two
+            // public observables are named instead. Both hold on a queue that was never enqueued to,
+            // and both would be falsified by an implementation that enqueued from this path.
+            moveTask.IsFaulted.Should().BeFalse("a null groups collaborator is an early return");
+            _filerQueue
+                .WhenDrainedAsync()
+                .IsCompleted.Should()
+                .BeTrue("nothing was enqueued, so the queue is drained");
+            _filerQueue.Queue.Count.Should().Be(0, "no item was ever added to the queue");
         }
     }
 }
