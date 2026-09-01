@@ -16,6 +16,17 @@ increments and are not observed clock readings. Three cheap falsifiers, in incre
    contradicting itself is unanswerable evidence.
 3. mtimes of the run's own outputs (`coverage/coverage.cobertura.xml`, `bin/Debug/*.dll`) versus the
    claimed stamps.
+4. **Bracketing-commits interval test (#663, timezone-free — prefer this one).** Pick two artifacts
+   that each record creating a commit. The *declared* interval between their `Timestamp:` fields must
+   fit inside the *actual* interval between those two commits, read from one clock. At #663,
+   `code-commit.md` (`23-24`, created `ae2885e7`) and `end-state.md` (`23-45`, ran the
+   `git commit --amend --no-edit` producing `20f1b201`) declared 21 minutes; git reported
+   `18:55:14-04:00` and `19:02:44-04:00`, i.e. 7m30s. No timezone reading rescues that. Note `--amend`
+   moves the committer date but not the author date, so compare `%cd`, not `%ad`.
+5. **`artifacts/pr_context.summary.txt` as an independent clock (#663).** It stamps its own generation
+   in UTC (`2026-09-01 23:04:35 UTC`) and pins a `Head SHA:`. When that SHA equals the commit under
+   test, its stamp is a third-party wall-clock reading minutes after the final commit — at #663 the
+   artifacts inside that very commit declared times up to 40 minutes *ahead* of it.
 
 **Why:** the stamps look plausible in isolation and are monotonic, so they pass a casual read. They
 matter because plan gates are often written as "this run's X equals the baseline's X," and ordering

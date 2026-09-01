@@ -30,6 +30,7 @@
 - [#662](project_662_banner_prefix_arity_plan_seams.md) — `AC5` is a prefix of `AC5b`; `("===")` not a substring of `("====")`
 - [#662 R3](project_662_round3_trx_hygiene_and_verbatim_seams.md) — `*.trx` is NOT gitignored; sweep case-insensitively; exclude the plan file from the sweep's own zero-hit gate
 - [#662 R2](project_662_banner_prefix_revision_round_seams.md) — `'*.xml'` scope gate hits the plan's own cobertura evidence; loop-restart needs a baseline-relative failure test
+- [#663](project_663_qfc_alt_chord_plan_seams.md) — defect-preserving seam turns compile-red into runtime red; derive named-test outcomes from totals
 - [#680](project_680_menu_mode_plan_seams.md) — HostTests.cs 499 not 500; TRX 5-shape identifiers, `grep -a`; exact line arithmetic
 
 ## Plan-structure traps
@@ -81,6 +82,7 @@
 - [`[expect-fail]` needs a synchronous seam](expect-fail-needs-a-synchronous-seam.md) — async-void boundaries false-GREEN
 - [Invoke-MSTestWithCoverage.ps1](reference_invoke_mstest_with_coverage_script.md) — canonical full-suite Cobertura runner
 - [Invoke-MSTest.ps1 single-SearchRoot defect](reference_invoke_mstest_single_searchroot_defect.md) — always pass `-SearchRoot .`
+- [`Task "Csc"` needs detailed verbosity](msbuild-task-csc-literal-needs-detailed-verbosity.md) — use a detailed `/flp:` log or an output-assembly timestamp
 - [PoshQC MCP + msbuild facts](poshqc-mcp-and-msbuild-invocation-facts.md) — MCP returns no counts; pair with direct runs
 - [pwsh -Command payload quoting](pwsh-command-payload-quoting.md) — outer single quotes, inner doubles
 - [Pester exits 0 on failing It blocks](pester-invoke-does-not-exit-nonzero.md) — scope every exit-code clause to a named channel

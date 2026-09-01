@@ -40,3 +40,11 @@ not the full record.
   row that `RequireArchiveRelativeStem` throws on; a post-Hide async-void crash was found; CR-1 closed.
 - **#635**: Markdown-only evidence audit; drift-invariant classification identities held across a 3rd
   commit; hook payload key is `output`; the session-cwd artifact mirror was needed again.
+- **#663**: 15/15 AC confirmed on evidence; strongest RED-first record seen (verbatim `but found True`
+  FluentAssertions text for exactly 3 tests) and the 6927+7=6934 arithmetic independently corroborates
+  "no existing test removed". Residuals: raw Cobertura deleted per plan so coverage is executor-attested
+  (honest FAIL row on canonical-artifact presence, thresholds PASS at 85.3726/79.4078); AltGr and
+  Alt+Shift still claimed via the `Keys.None`/`Keys.Menu` arms but that is pre-existing, not a
+  regression; `IsAltKeyCommand` left with zero compiled consumers deliberately; AC-15 manual validation
+  deferred so the user-facing Alt+M outcome is unconfirmed. `quality-tiers.yml` does NOT exist at repo
+  root, so no tier-dependent gate (property tests, mutation score) can be evaluated for any project.

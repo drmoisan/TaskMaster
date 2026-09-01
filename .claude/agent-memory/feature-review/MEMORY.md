@@ -70,7 +70,7 @@
 - [msbuild-log byte-equality gate adjudication](project_493-review-residuals-and-msbuild-log-gate-adjudication.md) — #493: how a structurally unsatisfiable msbuild-log byte-equality gate was adjudicated without downgrading the AC
 - [StoreWrapperController absent from Cobertura](project_storewrapper-controller-absent-from-cobertura.md) — whole class missing from both baseline+post Cobertura XML despite only 2/N members `[ExcludeFromCodeCoverage]`; pre-existing (#287), don't treat absence as evidence either way
 - [287-review-outcome](project_287-review-outcome.md) — PASS/0 blocking; 85.297%/79.293% repo-wide clears both coverage floors; positive base-anchor-divergence handling (contrast [[Stale caller-supplied merge-base]])
-- [review-residuals index (misc closed issues)](project_review-residuals-index.md) — one-line PASS/0-blocking pointers for #442/#444/#446/#449/#457/#468/#476/#484/#488/#501/#511/#553/#614/#635 with their specific residual/owed items, for lookup if any resurfaces
+- [review-residuals index (misc closed issues)](project_review-residuals-index.md) — one-line PASS/0-blocking pointers for #442/#444/#446/#449/#457/#468/#476/#484/#488/#501/#511/#553/#614/#635/#663 with their specific residual/owed items, for lookup if any resurfaces
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
