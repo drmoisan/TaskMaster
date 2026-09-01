@@ -26,6 +26,7 @@
 - [#644 cycle 2](project_644_cycle2_sweep_gate_evasion_seams.md) — rewording out of a detector's match set is gate evasion; SHA-256 pair
 - [#644 PA-7](project_644_pa7_redaction_plan_seams.md) — untracked audit artifact still enters main; name-status diff blind to it
 - [#648](project_648_ungated_static_swap_plan_seams.md) — lines-valid equality UNSATISFIABLE, use 5% tolerance; `git tag` not idempotent
+- [#656](project_656_closecompleted_guard_plan_seams.md) — no TestCaseFilter override in either wrapper; wrapper writes no TRX; class nodes lack lines-covered/lines-valid; TestResults\ must be created first
 - [#680](project_680_menu_mode_plan_seams.md) — HostTests.cs 499 not 500; TRX 5-shape identifiers, `grep -a`; exact line arithmetic
 
 ## Plan-structure traps
