@@ -1,3 +1,4 @@
+- [breadcrumb Close returns before OpenState=false](project_breadcrumb-close-returns-before-openstate-false.md) — #656: reopen-path enumeration doesn't prove `_closeCompleted && IsOpen` unreachable; CompleteClose is queued, not synchronous
 - [verify-zero-own-effect-coverage-noise-491](project_verify-zero-own-effect-coverage-noise-491.md) — verify "coverage shortfall is noise": grep both Cobertura XMLs for the assembly; distrust deleted-raw-XML narratives (#491)
 - [poshqc-bundled-coverage-artifact-reads-zero](project_poshqc-bundled-coverage-artifact-reads-zero.md) — run_poshqc_test's canonical Pester XML reads 0 covered (invalid capture) -> honest non-blocking FAIL row; adjudicate from committed direct-Pester JaCoCo (#441)
 - [441-review-residuals-and-494-handoff](project_441-review-residuals-and-494-handoff.md) — #441 PASS/0 blocking; 85.0317% vs 85% margin is #494's call; NF-1 uncovered Helpers.ps1:220; #529-#532 OPEN deliberately
