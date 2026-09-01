@@ -3,42 +3,285 @@
 - **Issue:** #656
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-08-31T20-10
-- **Status:** Draft
-- **Version:** 0.1
+- **Last Updated:** 2026-08-31T20-40
+- **Status:** Ready for execution
+- **Version:** 1.0
+- **Work Mode:** full-bug (requirements source is `spec.md`; `user-story.md` does not exist and is not required)
 
-**Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+## Execution Preconditions and Conventions
 
-**Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+**Shell.** Every command in this plan runs in **PowerShell** from the worktree root. The Bash tool mangles MSBuild switches (`/m` is rewritten to `M:/`, producing MSB1008), so no msbuild, vstest, or csharpier command in this plan may be issued through Bash.
+
+**MSBuild resolution.** `msbuild` is not assumed to be on `PATH`. Every msbuild task resolves it through vswhere first, matching `scripts/vscode/Invoke-Restore.ps1:22-30`:
+
+```
+$vswhere = 'C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe'
+$msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\MSBuild.exe' | Select-Object -First 1
+```
+
+`scripts/vscode/Invoke-VSBuild.ps1` must **not** be used: it calls `Sync-PackageReferences.ps1` over every `.csproj` and rewrites `HintPath` values, which would breach the build-configuration footprint boundary that AC-11 pins.
+
+**Base ref.** All diff assertions are anchored to the explicit base commit `2b85134b42872e405602e6064e02dc9cda6c319b`. No unanchored `git diff` appears in this plan.
+
+**Artifact stamp.** Every evidence filename in this plan uses the fixed stamp `2026-08-31T20-40` so that each asserted path is a concrete literal. The `Timestamp:` field **inside** each artifact carries the actual ISO-8601 execution time.
+
+**Evidence locations.** All evidence is written under `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/` in the sub-kinds `baseline/`, `regression-testing/`, `qa-gates/`, and `other/`. No `artifacts/` path is used for evidence. Every command-step artifact carries `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. Baseline and final-QC test artifacts additionally carry numeric coverage headline values. No helper script is placed under `evidence/`.
+
+**Raw tool output.** Raw msbuild logs and raw TRX files are large intermediates, not evidence records. They are written under `TestResults\` (git-ignored by `.gitignore:39`, pattern `[Tt]est[Rr]esult*/`) and the evidence markdown records the command, exit code, and the extracted values. The raw Cobertura XML is written by the runner to `coverage\coverage.cobertura.xml` (git-ignored by `.gitignore:144`); the numeric values are transcribed into the evidence markdown.
+
+**Fail-closed evidence rule.** If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing or incomplete, the outcome is BLOCKED or INCOMPLETE, never PASS. A checklist box stays unchecked when its artifact is absent or its fields are incomplete.
+
+**Bootstrap versus gate.** This worktree contains no `.dotnet-sdk` directory (verified: no files match `.dotnet-sdk/**`) and no `packages/` directory (verified: no files match `packages/*/`). A failure in P0-T3, P0-T4, P0-T5, or P0-T6 is a **bootstrap failure** and must be recorded as such, never as a toolchain gate failure.
+
+**Toolchain order.** Format, then analyze, then type-check, then test. Phase 4 runs the full loop. If any step in P4-T1 through P4-T7 fails or rewrites a tracked file, restart the loop at P4-T1.
+
+**Literals this plan instructs the executor to create.** These are quoted here, outside every command span, so a search for them is understood as an instruction rather than an existing-tree claim: `bool hostOpen = _host.IsOpen;`, `if (_closeCompleted && !hostOpen)`, `CloseCore_AfterSuccessfulCloseAndHostReopen_ReachesHostCloseAgain`, `Issue #656`, and `hoisted`. The literal `Skipping target "CoreCompile"` is quoted here for the same reason: P4-T4 asserts its **absence** from a log this plan creates.
+
+**Authorized footprint (hard boundary, from `spec.md` Scope & Non-Goals).** Exactly two code files may change:
+
+| Kind | File |
+|---|---|
+| Production | `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs` |
+| Test | `QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.Part3.cs` |
+
+Plus this feature folder. No other file may appear in the change set.
+
+**Files that must not appear in the diff at all.** `QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.cs`, `QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.Part2.cs`, `QuickFiler/Viewers/IBreadcrumbDropDownHost.cs`, and every `.csproj`, `.props`, `.targets`, and `packages.config`.
+
+**Why no seam task precedes the failing test.** The new test uses only members that already exist: `CoordinatorHarness` (`QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.cs:323`), `ControlledHost.Enqueue` (`:402`), `ControlledHost.SetOpen` (`:407`), `ControlledHost.CloseReasons` (`:395`), `ControlledHost.IsOpen` (`:378`), `CoordinatorHarness.SelectorOpen` (`:352`), and `BreadcrumbDropDownOpenCoordinator.SetDroppedDown` (`QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs:152`). `Part3.cs:1-4` already imports `System.Threading.Tasks`, `FluentAssertions`, `Microsoft.VisualStudio.TestTools.UnitTesting`, and `QuickFiler.Viewers`. The test therefore compiles against unmodified production code, and its failure in P1-T3 is a **runtime** red, not a compile red. No production seam, no new file, and no `InternalsVisibleTo` change is required.
 
 
-**Phase 0 — Context & Inputs**
-- [ ] [P0-T1] Link approved spec: <spec link>
-- [ ] [P0-T2] Record branch/commit baseline: <branch/commit>
-- [ ] [P0-T3] List required environment/fixtures/data: <notes>
+### Phase 0 — Policy Reads, Environment Bootstrap, and Baseline Capture
 
-**Phase 1 — Preparation**
-- [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
-- [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
+- [ ] [P0-T1] Read the four policy files in the order required by `policy-compliance-order` — `CLAUDE.md`, then `.claude/rules/general-code-change.md`, then `.claude/rules/general-unit-test.md`, then `.claude/rules/csharp.md` — and write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/baseline/phase0-instructions-read.md`. Acceptance: that file exists and contains a `Timestamp:` field, a `Policy Order:` field, and four bullet lines naming the four paths above in that order.
 
-**Phase 2 — Regression Test (must fail first)**
-- [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/#656-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the regression to confirm it fails and captures the repro
+- [ ] [P0-T2] Confirm the base ref resolves and record the current head. Run `git rev-parse 2b85134b42872e405602e6064e02dc9cda6c319b` and `git rev-parse HEAD` and `git rev-parse --abbrev-ref HEAD`, and write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/baseline/base-ref.2026-08-31T20-40.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: `EXIT_CODE: 0` for the base-ref command and the artifact records a 40-character object id for `2b85134b42872e405602e6064e02dc9cda6c319b`.
 
-**Phase 3 — Minimal Fix**
-- [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+- [ ] [P0-T3] Bootstrap the repo-local .NET SDK by running `pwsh -NoProfile -File scripts/vscode/Install-RepoDotNetSdk.ps1`, then run `dotnet --version` from the worktree root. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/baseline/bootstrap-sdk.2026-08-31T20-40.md` with the four required fields. Acceptance: the path `.dotnet-sdk\dotnet.exe` exists and `dotnet --version` records `EXIT_CODE: 0`. A failure here is a bootstrap failure, recorded with the header `BOOTSTRAP FAILURE`, never as a gate failure. Note: `global.json:3-10` pins SDK `8.0.205` with `paths` `[".dotnet-sdk", "$host$"]`, so before this step `dotnet --version` prints the `global.json` `errorMessage` instead of a version. `.dotnet-sdk/` is git-ignored by `.gitignore:350` (`.dotnet*/`) and therefore never enters the change set.
 
-**Phase 4 — Verification Loop**
-- [ ] [P4-T1] Re-run repro and regression test to confirm expected behavior
-- [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
-- [ ] [P4-T3] Record baseline, post-change, and comparison artifact paths for each in-scope language where coverage is required
+- [ ] [P0-T4] Populate `packages/` by running `pwsh -NoProfile -File scripts/vscode/Invoke-Restore.ps1`, then run `(Get-ChildItem -Directory packages).Count`. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/baseline/bootstrap-restore.2026-08-31T20-40.md` with the four required fields. Acceptance: `EXIT_CODE: 0` and the recorded directory count is greater than 0. Rationale recorded in the artifact: every first-party project declares `EnsureNuGetPackageBuildImports` whose `<Error>` fires at `BeforeTargets="PrepareForBuild"`, and `.claude/rules/csharp.md:77` wires each analyzer through an explicit `..\packages\...` path, so msbuild hard-fails without `packages/`. `packages/` is git-ignored by `.gitignore:191`.
 
-**Phase 5 — Documentation & Status**
-- [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope
+- [ ] [P0-T5] Restore the manifest-pinned CSharpier by running `dotnet tool restore` from the worktree root. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/baseline/bootstrap-tool-restore.2026-08-31T20-40.md` with the four required fields. Acceptance: `EXIT_CODE: 0`. The manifest is `dotnet-tools.json` at the worktree root and pins `csharpier` to `1.2.6` (`dotnet-tools.json:5-11`).
 
-**Phase 6 — PR & Handoff**
-- [ ] [P6-T1] Prepare PR notes (summary, risks, validation performed, links to tests) and request review
+- [ ] [P0-T6] Confirm the coverage collector is available by running `dotnet-coverage --version`. If the command does not resolve, install it with `dotnet tool install --global dotnet-coverage` and re-run `dotnet-coverage --version` until it succeeds. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/baseline/bootstrap-dotnet-coverage.2026-08-31T20-40.md` with the four required fields. Acceptance: the final recorded `dotnet-coverage --version` invocation has `EXIT_CODE: 0`. This is required because `scripts/vscode/Invoke-MSTestWithCoverage.ps1:292-294` throws when `dotnet-coverage` is absent.
 
-**Phase 7 — Rollout / Follow-up**
-- [ ] [P7-T1] Capture deployment/rollout notes and post-fix monitoring items
-- [ ] [P7-T2] Record links (issue, PRs, related docs) for traceability
+- [ ] [P0-T7] Capture the baseline format state, read-only, by running `dotnet tool run csharpier check .` and write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/baseline/format-check.2026-08-31T20-40.md` with the four required fields, transcribing the final summary line of the command output verbatim into `Output Summary:`. Acceptance: `EXIT_CODE: 0`. `check` is read-only, so its exit code alone is a real observation; the write-mode `format` command is deliberately kept out of the baseline so the baseline cannot become a blanket waiver for pre-existing drift. A non-zero exit here means pre-existing repository-wide format drift, which makes AC-14 unreachable inside this item's footprint; record it as `BLOCKED` and report to the orchestrator before proceeding.
+
+- [ ] [P0-T8] Capture the baseline analyzer gate. Record the wall-clock start, then run the vswhere-resolved msbuild with `TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true "/flp:LogFile=TestResults\msbuild\p0-t8-analyzer.log;Verbosity=normal"`. Then run `Select-String -Path TestResults\msbuild\p0-t8-analyzer.log -SimpleMatch 'BreadcrumbDropDownOpenCoordinator.cs' | Select-String -SimpleMatch 'warning'` and record every distinct warning code it reports. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/baseline/analyzer-gate.2026-08-31T20-40.md` with the four required fields plus a `Baseline Warning Codes For BreadcrumbDropDownOpenCoordinator.cs:` list (write `none` when the list is empty). Acceptance: `EXIT_CODE: 0` and the artifact carries that warning-code list. `/t:Rebuild` is mandatory: MSBuild's up-to-date check does not invalidate on a command-line `/p:` change, so a warm `/t:Build` exits 0 with `CoreCompile` skipped and runs no analyzers. `/p:Nullable=enable` must not be added; no project carries a `<Nullable>` element and there is no `Directory.Build.props`, so it can never pass.
+
+- [ ] [P0-T9] Capture the baseline type-check gate by running the vswhere-resolved msbuild with `TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true "/flp:LogFile=TestResults\msbuild\p0-t9-typecheck.log;Verbosity=normal"`. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/baseline/typecheck-gate.2026-08-31T20-40.md` with the four required fields. Acceptance: `EXIT_CODE: 0` and the recorded `Command:` string contains neither `/p:Nullable=enable` nor `/t:Build`. `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs:1` carries `#nullable enable`, so this gate already covers that file per-file.
+
+- [ ] [P0-T10] Capture the baseline test-and-coverage state by running `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot .` with its console output tee'd to `TestResults\p0-t10\coverage-run.log`, then read `coverage\coverage.cobertura.xml` and record: the `/coverage` `line-rate` attribute, and the `line-rate`, `lines-covered`, and `lines-valid` attributes of the single `class` node whose `filename` attribute equals `QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs`. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/baseline/test-coverage.2026-08-31T20-40.md` with the four required fields plus `Baseline Repo Line Rate:`, `Baseline Coordinator Line Rate:`, `Baseline Coordinator Lines Covered:`, and `Baseline Coordinator Lines Valid:`, each a numeric value and not a placeholder. Acceptance: `EXIT_CODE: 0` and all four numeric fields present. `EXIT_CODE: 0` strictly implies zero failed tests, because `scripts/vscode/Invoke-MSTestWithCoverage.ps1:235-237` throws when the inner vstest exit code is non-zero. The `filename` form is repo-relative with backslash separators because `ConvertTo-KoverageRelativePath` (`scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1:50-97`) strips the repo-root prefix and normalizes to the native separator, and `Merge-CoberturaClassesByFilename` collapses the file to a single `class` node.
+
+- [ ] [P0-T11] Capture the pre-change source baseline. Record all of the following and write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/baseline/source-baseline.2026-08-31T20-40.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` plus one labelled line per value. Acceptance: every one of the following recorded values matches the stated expected value.
+  - `(Get-Content -LiteralPath QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs).Count` equals `378`.
+  - `(Get-Content -LiteralPath QuickFiler.Test\Viewers\BreadcrumbDropDownOpenCoordinatorTests.Part3.cs).Count` equals `173`.
+  - `(Get-Content -LiteralPath QuickFiler.Test\Viewers\BreadcrumbDropDownOpenCoordinatorTests.Part2.cs).Count` equals `455`.
+  - `(Get-Content -LiteralPath QuickFiler.Test\Viewers\BreadcrumbDropDownOpenCoordinatorTests.cs).Count` equals `463`.
+  - `(Select-String -Path QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs -Pattern '^\s*[^/\s].*_host\.').Count` equals `5`.
+  - `(Select-String -Path QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs -Pattern '^\s+(internal|public)\s').Count` equals `12`.
+  - `(Select-String -Path QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs -SimpleMatch 'lock (_sync)').Count` equals `12`.
+  - `(Select-String -Path QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs -SimpleMatch 'if (_closeCompleted)').Count` equals `1`.
+  - `(Select-String -Path QuickFiler.Test -Recurse -SimpleMatch 'CloseCore_AfterSuccessfulCloseAndHostReopen_ReachesHostCloseAgain').Count` equals `0`.
+
+
+### Phase 1 — Failing Regression Test
+
+The test is added before the production change so the recorded red-then-green pair required by AC-4 is obtainable. The red run in P1-T3 is deliberately scoped to the single new test by name; the full suite is not run while a test is deliberately failing, because a full-suite gate could not exit 0 in that state.
+
+- [ ] [P1-T1] Append the regression test method to the existing `public sealed partial class BreadcrumbDropDownOpenCoordinatorTests` in `QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.Part3.cs`, immediately after `LatchAfterRelease_IsIgnoredAndIssuesNoOpen` (which ends at `Part3.cs:171`) and before the closing brace of the class at `Part3.cs:172`. Do not repeat the `[TestClass]` attribute; it is declared once on the primary partial at `QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.cs:17`. Do not add any `using` directive. The method text:
+
+  ```
+      /// <summary>
+      /// Issue #656: after a close that returned true, with the host open again by a path that
+      /// reaches neither RequestOpen nor Invalidate, a further close must reach the host rather
+      /// than being suppressed by the completed-close flag. Deterministic: one thread, explicit
+      /// drain, no timers, no sleeps, no second thread, no temp files.
+      /// </summary>
+      [TestMethod]
+      public void CloseCore_AfterSuccessfulCloseAndHostReopen_ReachesHostCloseAgain()
+      {
+          // Arrange: open the drop-down, then drive a close that the host accepts.
+          var harness = new CoordinatorHarness();
+          harness.Host.Enqueue(Task.FromResult(true));
+          Task<bool> opening = harness.Coordinator.RequestOpen();
+          harness.Context.DrainUntil(opening);
+          opening.Result.Should().BeTrue();
+
+          harness.Coordinator.SetDroppedDown(false);
+          harness.Context.DrainAll();
+          harness.Host.CloseReasons.Should().Equal(BreadcrumbDropDownCloseReason.Uncommitted);
+          harness.Host.IsOpen.Should().BeFalse("the host accepted the close");
+
+          // Act: the host becomes open again by a path that bypasses RequestOpen and Invalidate.
+          harness.Host.SetOpen(true);
+          harness.SelectorOpen = true;
+          harness.Coordinator.SetDroppedDown(false);
+          harness.Context.DrainAll();
+
+          // Assert
+          harness
+              .Host.CloseReasons.Should()
+              .Equal(
+                  new[]
+                  {
+                      BreadcrumbDropDownCloseReason.Uncommitted,
+                      BreadcrumbDropDownCloseReason.Uncommitted,
+                  },
+                  "the close after a bypassing reopen must reach _host.Close a second time"
+              );
+      }
+  ```
+
+  Acceptance: `(Select-String -Path QuickFiler.Test\Viewers\BreadcrumbDropDownOpenCoordinatorTests.Part3.cs -SimpleMatch 'public void CloseCore_AfterSuccessfulCloseAndHostReopen_ReachesHostCloseAgain()').Count` equals `1`, and `(Select-String -Path QuickFiler.Test\Viewers\BreadcrumbDropDownOpenCoordinatorTests.Part3.cs -SimpleMatch 'harness.Host.SetOpen(true);').Count` equals `1`.
+
+- [ ] [P1-T2] Build the solution so the scoped red run has a current `QuickFiler.Test.dll`. Run the vswhere-resolved msbuild with `TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" "/flp:LogFile=TestResults\msbuild\p1-t2-build.log;Verbosity=normal"`. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/regression-testing/red-build.2026-08-31T20-40.md` with the four required fields. Acceptance: `EXIT_CODE: 0` and the file `QuickFiler.Test\bin\Debug\QuickFiler.Test.dll` exists. The test compiles against unmodified production code, so a non-zero exit here is a defect in the test text, not an expected red.
+
+- [ ] [P1-T3] [expect-fail] Run the new test alone and record the failing result. Commands:
+
+  ```
+  $vswhere = 'C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe'
+  $vstest = & $vswhere -latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe' | Select-Object -First 1
+  New-Item -ItemType Directory -Force -Path 'TestResults\p1-t3' | Out-Null
+  & $vstest 'QuickFiler.Test\bin\Debug\QuickFiler.Test.dll' '/Settings:scripts\vscode\TaskMaster.cli.runsettings' '/InIsolation' '/TestCaseFilter:TestCategory!=LiveOutlook&FullyQualifiedName~CloseCore_AfterSuccessfulCloseAndHostReopen_ReachesHostCloseAgain' '/Logger:trx' '/ResultsDirectory:TestResults\p1-t3'
+  ```
+
+  Then parse the produced TRX: `[xml]$t = Get-Content -LiteralPath (Get-ChildItem TestResults\p1-t3 -Filter *.trx | Select-Object -First 1).FullName -Raw` and read `$t.TestRun.ResultSummary.Counters` attributes `total`, `passed`, `failed`. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/regression-testing/red-run.2026-08-31T20-40.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1`, `Output Summary:`, and the three TRX counter values, plus the failure message text copied from the TRX `UnitTestResult` node. Acceptance: `EXIT_CODE: 1`, TRX `total` equals `1`, TRX `failed` equals `1`, TRX `passed` equals `0`. This is a direct vstest invocation rather than a wrapper call because neither `scripts/vscode/Invoke-MSTest.ps1:54` nor `scripts/vscode/Invoke-MSTestWithCoverage.ps1:76` accepts a `TestCaseFilter` override, and editing either script is outside the authorized footprint; the invocation reproduces both wrapper protections explicitly — `/InIsolation` and the `TestCategory!=LiveOutlook` conjunct — so no real Outlook process can be launched.
+
+- [ ] [P1-T4] Record why the red is the expected red. Confirm from the P1-T3 failure message that the observed `CloseReasons` collection held exactly one element while two were expected, and append a `Red Cause:` section to `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/regression-testing/red-run.2026-08-31T20-40.md` naming `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs:316` as the suppressing guard. Acceptance: that artifact contains a `Red Cause:` section and `(Select-String -Path QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs -SimpleMatch 'if (_closeCompleted)').Count` still equals `1`, proving the production file is still unmodified at this point.
+
+
+### Phase 2 — Production Fix in CloseCore
+
+Only `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs` changes in this phase. The guard order (released, then in-flight, then completed) is preserved, the `finally` that clears `_closeInFlight` is untouched, and the success block that increments `_generation` and sets `_closeCompleted` is untouched.
+
+- [ ] [P2-T1] Hoist the host read out of the critical section. In `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs`, insert the single statement `bool hostOpen = _host.IsOpen;` as the first statement of `CloseCore`, on its own line immediately after the opening brace of the method (currently `:309`) and immediately before the `lock (_sync)` that currently sits at `:310`. Acceptance: `(Select-String -Path QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs -SimpleMatch 'bool hostOpen = _host.IsOpen;').Count` equals `1`, and that match's `LineNumber` is strictly less than the `LineNumber` of the first `lock (_sync)` match whose `LineNumber` is greater than the `LineNumber` of the `private bool CloseCore(` match.
+
+- [ ] [P2-T2] Narrow the completed-close suppression. Replace the guard line currently reading `if (_closeCompleted)` inside `CloseCore` with `if (_closeCompleted && !hostOpen)`. Change nothing else on that line or the `return true;` beneath it. Acceptance: `(Select-String -Path QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs -SimpleMatch 'if (_closeCompleted && !hostOpen)').Count` equals `1` and `(Select-String -Path QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs -SimpleMatch 'if (_closeCompleted)').Count` equals `0`. The zero-hit half is meaningful because the replacement text is not a superstring of the searched literal: the searched literal ends with a closing parenthesis directly after `_closeCompleted`, which the replacement does not contain. The comment text added by P2-T3 and P2-T4 must not contain the literal `if (_closeCompleted)`.
+
+- [ ] [P2-T3] Replace the `_closeCompleted` field XML documentation (currently `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs:38-46`) so it records the new suppression condition, by appending this `remarks` block between the existing `</summary>` line and the `private bool _closeCompleted;` declaration:
+
+  ```
+      /// <remarks>
+      /// Issue #656: the flag alone is not sufficient, because it is cleared only on the
+      /// <see cref="RequestOpen"/> and <c>Invalidate</c> paths. A host reopened by any other
+      /// path leaves it set, which suppressed a close the host was genuinely open for.
+      /// Suppression in <see cref="CloseCore"/> therefore additionally requires the host to
+      /// report not open.
+      /// </remarks>
+  ```
+
+  Acceptance: the contiguous run of `///` lines immediately preceding the `private bool _closeCompleted;` line contains exactly one line matching `Select-String -SimpleMatch 'Issue #656'`, and that block contains no line matching `Select-String -Pattern '_host\.'`.
+
+- [ ] [P2-T4] Replace the `CloseCore` summary documentation (currently `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs:302-307`) so it records the new guard and the reason the host read is taken outside `_sync`, by appending this `remarks` block between the existing `</summary>` line and the `private bool CloseCore(BreadcrumbDropDownCloseReason reason)` declaration:
+
+  ```
+      /// <remarks>
+      /// Issue #656: the completed-close guard additionally requires the host to report not
+      /// open, so a close is not suppressed while the host is genuinely open again. The host
+      /// read is hoisted above the critical section deliberately: SR-4 of #501 declined the
+      /// same refinement written as a read taken inside the lock, because that adds a foreign
+      /// call made while the coordinator lock is held. Hoisting leaves the count of such calls
+      /// unchanged. The host state can change between the read and the lock; both directions
+      /// are analysed in the spec for this change and neither corrupts state.
+      /// </remarks>
+  ```
+
+  Acceptance: the contiguous run of `///` lines immediately preceding the `private bool CloseCore(` line contains exactly one line matching `Select-String -SimpleMatch 'Issue #656'` and exactly one line matching `Select-String -SimpleMatch 'hoisted'`, and that block contains no line matching `Select-String -Pattern '_host\.'`. Across the whole file, `(Select-String -Path QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs -SimpleMatch 'Issue #656').Count` equals `2`.
+
+- [ ] [P2-T5] Verify the SR-4 lock-discipline invariant holds after the edits. Run `Select-String -Path QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs -Pattern '^\s*[^/\s].*_host\.'` and `Select-String -Path QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs -SimpleMatch 'lock (_sync)'`, and write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/other/lock-discipline.2026-08-31T20-40.md` with the four required fields plus the enumerated line numbers of both result sets. Acceptance: the non-comment `_host.` line count equals `6` (baseline `5` plus the one hoisted read), the `lock (_sync)` count equals `12` (unchanged from the P0-T11 baseline), and the artifact records that exactly one non-comment `_host.` line sits inside a `lock (_sync)` body — the pre-existing `if (_closeInFlight && _host.IsOpen)` in `RequestOpen` — with every other such line outside every lock body.
+
+- [ ] [P2-T6] Verify no production seam was added. Run `Select-String -Path QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs -Pattern '^\s+(internal|public)\s'` and append the count and the enumerated line numbers to `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/other/lock-discipline.2026-08-31T20-40.md` under a `Declared Member Lines:` section. Acceptance: the count equals `12`, unchanged from the P0-T11 baseline. The pattern excludes XML documentation lines because a `///` line's first non-whitespace character is a forward slash.
+
+
+### Phase 3 — Pass-After Verification and Standing-Guard Regression
+
+- [ ] [P3-T1] Rebuild the solution after the production edit. Run the vswhere-resolved msbuild with `TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" "/flp:LogFile=TestResults\msbuild\p3-t1-build.log;Verbosity=normal"`. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/qa-gates/green-build.2026-08-31T20-40.md` with the four required fields. Acceptance: `EXIT_CODE: 0`.
+
+- [ ] [P3-T2] Re-run the new test alone and record the passing result, using the same vstest invocation as P1-T3 with `/ResultsDirectory:TestResults\p3-t2` and the results directory created first. Parse the produced TRX for `ResultSummary/Counters` `total`, `passed`, `failed`. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/qa-gates/green-run.2026-08-31T20-40.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`, and the three counter values. Acceptance: `EXIT_CODE: 0`, TRX `total` equals `1`, TRX `passed` equals `1`, TRX `failed` equals `0`.
+
+- [ ] [P3-T3] Write the fail-before / pass-after comparison record required by AC-4 at `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/qa-gates/red-green-comparison.2026-08-31T20-40.md`. It must embed, verbatim, the `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` blocks of both the red artifact (`evidence/regression-testing/red-run.2026-08-31T20-40.md`) and the green artifact (`evidence/qa-gates/green-run.2026-08-31T20-40.md`), and must name both source paths. Acceptance: the file exists, names both source paths, and records the pair `failed=1, passed=0` for the red run and `failed=0, passed=1` for the green run, both for the test `CloseCore_AfterSuccessfulCloseAndHostReopen_ReachesHostCloseAgain`.
+
+- [ ] [P3-T4] Run the five standing-guard tests that must not regress, in one scoped invocation. Use the same vstest resolution as P1-T3 with `/ResultsDirectory:TestResults\p3-t4` and the filter `'/TestCaseFilter:FullyQualifiedName~PendingToggleClose_HostOwnershipSuppressesFallbackAndRepeatedClose|FullyQualifiedName~SelectorStateTransitions_RequestOpenThenCloseOnlyWhenRequired|FullyQualifiedName~RequestOpen_AfterSuccessfulCloseAndHostReopen_ReachesHostOpenAsync|FullyQualifiedName~CloseCore_RepeatedCloseWithoutReopen_ClosesHostExactlyOnce|FullyQualifiedName~PendingAutomaticClose_RequestsExplicitCommitWhenHostIsNotOpen'`. Parse the TRX counters. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/qa-gates/standing-guards.2026-08-31T20-40.md` with the four required fields plus the per-test outcome list read from the TRX `UnitTestResult` nodes. Acceptance: `EXIT_CODE: 0`, TRX `total` equals `5`, TRX `passed` equals `5`, TRX `failed` equals `0`, and the recorded per-test list names all five test names above.
+
+
+### Phase 4 — Full QC Toolchain, Footprint, and Coverage
+
+This phase runs the full four-step toolchain unconditionally in order. There is no `IN_SCOPE` or `OUT_OF_SCOPE` branch and no `SKIPPED` completion path. If any of P4-T1 through P4-T7 fails or rewrites a tracked file, restart the loop at P4-T1.
+
+- [ ] [P4-T1] Format. Run `dotnet tool run csharpier format .`, then immediately run `git status --porcelain -- QuickFiler QuickFiler.Test` and record its full output. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/qa-gates/format-apply.2026-08-31T20-40.md` with the four required fields plus a `Porcelain After Format:` section holding that output verbatim. Acceptance: `EXIT_CODE: 0` and the recorded `Porcelain After Format:` output contains exactly the two lines naming `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs` and `QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.Part3.cs` and no other path. The tree observation is required in addition to the exit code because `csharpier format` is a write-mode command that exits 0 whether or not it rewrote a file. The porcelain span is scoped by pathspec to the two production trees so that tracked files under `.claude/agent-memory` and `artifacts/orchestration` cannot make the assertion unsatisfiable.
+
+- [ ] [P4-T2] Verify formatting read-only. Run `dotnet tool run csharpier check .` and write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/qa-gates/format-check.2026-08-31T20-40.md` with the four required fields, transcribing the final summary line of the output verbatim into `Output Summary:`. Acceptance: `EXIT_CODE: 0`. This satisfies AC-14.
+
+- [ ] [P4-T3] Analyzer gate. Record the wall-clock start into the artifact as `Gate Start:`, then run the vswhere-resolved msbuild with `TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true "/flp:LogFile=TestResults\msbuild\p4-t3-analyzer.log;Verbosity=normal"`. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/qa-gates/analyzer-gate.2026-08-31T20-40.md` with the four required fields plus `Gate Start:`. Acceptance: `EXIT_CODE: 0` and `(Select-String -Path TestResults\msbuild\p4-t3-analyzer.log -SimpleMatch '0 Error(s)').Count` is greater than `0`.
+
+- [ ] [P4-T4] Prove the analyzer gate was not vacuous. Run `(Select-String -Path TestResults\msbuild\p4-t3-analyzer.log -SimpleMatch 'Skipping target "CoreCompile"').Count`, and read `(Get-Item QuickFiler\bin\Debug\QuickFiler.dll).LastWriteTime` and `(Get-Item QuickFiler.Test\bin\Debug\QuickFiler.Test.dll).LastWriteTime`. Append a `Non-Vacuity:` section to `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/qa-gates/analyzer-gate.2026-08-31T20-40.md` recording the count and both timestamps. Acceptance: the recorded count equals `0`, and both recorded `LastWriteTime` values are later than the `Gate Start:` value recorded in P4-T3. The timestamp comparison is the positive control: it proves both assemblies were recompiled during this gate, so the zero count reports a genuinely absent skip rather than an empty or mis-scoped log. This satisfies AC-16.
+
+- [ ] [P4-T5] Prove the analyzer gate introduced no new warning for the changed production file. Run `Select-String -Path TestResults\msbuild\p4-t3-analyzer.log -SimpleMatch 'BreadcrumbDropDownOpenCoordinator.cs' | Select-String -SimpleMatch 'warning'` and record every distinct warning code. Append a `Post-Change Warning Codes For BreadcrumbDropDownOpenCoordinator.cs:` section to the P4-T3 artifact (write `none` when empty). Acceptance: the recorded post-change warning-code set is a subset of the `Baseline Warning Codes For BreadcrumbDropDownOpenCoordinator.cs:` set recorded in `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/baseline/analyzer-gate.2026-08-31T20-40.md`. Together with P4-T3 this satisfies AC-15.
+
+- [ ] [P4-T6] Type-check gate. Run the vswhere-resolved msbuild with `TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true "/flp:LogFile=TestResults\msbuild\p4-t6-typecheck.log;Verbosity=normal"`. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/qa-gates/typecheck-gate.2026-08-31T20-40.md` with the four required fields. Acceptance: `EXIT_CODE: 0`, `(Select-String -Path TestResults\msbuild\p4-t6-typecheck.log -SimpleMatch '0 Error(s)').Count` is greater than `0`, and the recorded `Command:` string contains `/t:Rebuild` and contains neither `/p:Nullable=enable` nor `/t:Build`. This satisfies AC-17.
+
+- [ ] [P4-T7] Test gate with coverage. Run `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot .` with console output tee'd to `TestResults\p4-t7\coverage-run.log`. Then read `coverage\coverage.cobertura.xml` and record the `/coverage` `line-rate`, and the `line-rate`, `lines-covered`, and `lines-valid` of the `class` node whose `filename` equals `QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs`. Also run `Select-String -Path scripts\vscode\Invoke-MSTestWithCoverage.ps1 -SimpleMatch '/TestCaseFilter:TestCategory!=LiveOutlook'` and `Select-String -Path scripts\vscode\Invoke-MSTestWithCoverage.ps1 -SimpleMatch '/InIsolation'` and record the matched line numbers. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/qa-gates/test-coverage.2026-08-31T20-40.md` with the four required fields plus `Post-Change Repo Line Rate:`, `Post-Change Coordinator Line Rate:`, `Post-Change Coordinator Lines Covered:`, `Post-Change Coordinator Lines Valid:`, and `Wrapper Filter Lines:`. Acceptance: `EXIT_CODE: 0`, all four numeric fields present and numeric, and both `Select-String` results report line `76`. `EXIT_CODE: 0` strictly implies zero failed tests, because `scripts/vscode/Invoke-MSTestWithCoverage.ps1:235-237` throws when the inner vstest exit code is non-zero. This satisfies AC-18.
+
+- [ ] [P4-T8] Verify coverage on the changed lines and the coverage delta. Derive the two changed line numbers mechanically: `A` is the `LineNumber` of `Select-String -Path QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs -SimpleMatch 'bool hostOpen = _host.IsOpen;'` and `B` is the `LineNumber` of `Select-String -Path QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs -SimpleMatch 'if (_closeCompleted && !hostOpen)'`. In `coverage\coverage.cobertura.xml`, read the `hits` attribute of the `line` nodes with `number` equal to `A` and to `B` under the `class` node whose `filename` equals `QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs`. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/qa-gates/coverage-delta.2026-08-31T20-40.md` with the four required fields plus `Changed Line A:`, `Changed Line A Hits:`, `Changed Line B:`, `Changed Line B Hits:`, `Baseline Repo Line Rate:`, `Post-Change Repo Line Rate:`, `Baseline Coordinator Line Rate:`, and `Post-Change Coordinator Line Rate:`. Acceptance: both recorded hit counts are greater than or equal to `1`; the post-change repo line rate is greater than or equal to `0.80`; and the post-change coordinator line rate is greater than or equal to the baseline coordinator line rate recorded in `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/baseline/test-coverage.2026-08-31T20-40.md`. The last comparison is satisfiable by construction: the change adds one executable line that the new regression test executes and modifies one already-covered line, so the ratio cannot fall.
+
+- [ ] [P4-T9] Verify the file-size limit. Run `(Get-Content -LiteralPath QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs).Count` and `(Get-Content -LiteralPath QuickFiler.Test\Viewers\BreadcrumbDropDownOpenCoordinatorTests.Part3.cs).Count` and write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/qa-gates/file-size.2026-08-31T20-40.md` with the four required fields plus both counts. Acceptance: both recorded counts are strictly less than `500`. This task runs after the final format pass in P4-T1, so the counts measure the formatted files. This satisfies AC-13.
+
+- [ ] [P4-T10] Commit the change so the anchored diff assertions in P4-T11 through P4-T14 are non-vacuous. Run `git add QuickFiler QuickFiler.Test docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656` then `git commit -m "fix(breadcrumb): stop suppressing a close while the host reports open (#656)"` then `git rev-parse HEAD`. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/other/commit.2026-08-31T20-40.md` with the four required fields plus the resulting commit id. Acceptance: `EXIT_CODE: 0` for the commit and `git status --porcelain -- QuickFiler QuickFiler.Test` returns no output. The `git add` pathspec is scoped so that tracked files under `.claude/agent-memory` and `artifacts/orchestration` are not swept into this commit.
+
+- [ ] [P4-T11] Verify the production footprint. Run `git diff --name-only 2b85134b42872e405602e6064e02dc9cda6c319b...HEAD -- QuickFiler` and `git status --porcelain -- QuickFiler`, and write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/qa-gates/footprint-production.2026-08-31T20-40.md` with the four required fields plus both outputs verbatim. Acceptance: the diff output is exactly the single line `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs` and the porcelain output is empty. The porcelain span is the companion required because a name-listing diff cannot report an untracked path. This satisfies AC-10.
+
+- [ ] [P4-T12] Verify the build-configuration footprint. Run `git diff --name-only 2b85134b42872e405602e6064e02dc9cda6c319b...HEAD -- '*.csproj' '*.props' '*.targets' '*packages.config'` and `git status --porcelain -- '*.csproj' '*.props' '*.targets' '*packages.config'`, and write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/qa-gates/footprint-buildconfig.2026-08-31T20-40.md` with the four required fields plus both outputs verbatim. Acceptance: both outputs are empty. This satisfies AC-11.
+
+- [ ] [P4-T13] Verify the test footprint. Run `git diff --name-only 2b85134b42872e405602e6064e02dc9cda6c319b...HEAD -- QuickFiler.Test` and `git status --porcelain -- QuickFiler.Test`, and write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/qa-gates/footprint-test.2026-08-31T20-40.md` with the four required fields plus both outputs verbatim. Acceptance: the diff output is exactly the single line `QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.Part3.cs` and the porcelain output is empty. Neither `QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.cs` nor `QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.Part2.cs` appears, which is the mechanical proof that the five standing-guard tests were not edited. This satisfies AC-12, and together with P3-T4 it satisfies AC-5, AC-6, AC-7, and AC-8.
+
+- [ ] [P4-T14] Verify no new production seam. Run `git diff --name-only 2b85134b42872e405602e6064e02dc9cda6c319b...HEAD -- QuickFiler/Viewers/IBreadcrumbDropDownHost.cs`, `git status --porcelain -- QuickFiler/Viewers/IBreadcrumbDropDownHost.cs`, and `(Select-String -Path QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs -Pattern '^\s+(internal|public)\s').Count`. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/qa-gates/no-new-seam.2026-08-31T20-40.md` with the four required fields plus all three results. Acceptance: both git outputs are empty and the declared-member count equals `12`, unchanged from the P0-T11 baseline. This satisfies AC-20.
+
+
+### Phase 5 — Acceptance Criteria Check-Off and Close-Out
+
+Each check-off task marks exactly one acceptance criterion in `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/spec.md` by changing that criterion's leading `- [ ] AC-N —` to `- [x] AC-N —`. The trailing space and em dash are part of every match so that `AC-1` is never confused with `AC-10` through `AC-19`, and `AC-2` is never confused with `AC-20`. A criterion is checked only when its named evidence artifact exists and its acceptance was met.
+
+- [ ] [P5-T1] Check off AC-1 against `evidence/other/lock-discipline.2026-08-31T20-40.md` and the P2-T1 and P2-T2 results. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-1 —').Count` equals `1`.
+
+- [ ] [P5-T2] Check off AC-2 against `evidence/other/lock-discipline.2026-08-31T20-40.md`. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-2 —').Count` equals `1`.
+
+- [ ] [P5-T3] Check off AC-3 against the P1-T1 result and `evidence/qa-gates/green-run.2026-08-31T20-40.md`. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-3 —').Count` equals `1`.
+
+- [ ] [P5-T4] Check off AC-4 against `evidence/qa-gates/red-green-comparison.2026-08-31T20-40.md`. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-4 —').Count` equals `1`.
+
+- [ ] [P5-T5] Check off AC-5 against `evidence/qa-gates/standing-guards.2026-08-31T20-40.md` and `evidence/qa-gates/footprint-test.2026-08-31T20-40.md`. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-5 —').Count` equals `1`.
+
+- [ ] [P5-T6] Check off AC-6 against `evidence/qa-gates/standing-guards.2026-08-31T20-40.md` and `evidence/qa-gates/footprint-test.2026-08-31T20-40.md`. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-6 —').Count` equals `1`.
+
+- [ ] [P5-T7] Check off AC-7 against `evidence/qa-gates/standing-guards.2026-08-31T20-40.md` and `evidence/qa-gates/footprint-test.2026-08-31T20-40.md`. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-7 —').Count` equals `1`.
+
+- [ ] [P5-T8] Check off AC-8 against `evidence/qa-gates/standing-guards.2026-08-31T20-40.md` and `evidence/qa-gates/footprint-test.2026-08-31T20-40.md`. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-8 —').Count` equals `1`.
+
+- [ ] [P5-T9] Check off AC-9 against `evidence/qa-gates/standing-guards.2026-08-31T20-40.md`. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-9 —').Count` equals `1`.
+
+- [ ] [P5-T10] Check off AC-10 against `evidence/qa-gates/footprint-production.2026-08-31T20-40.md`. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-10 —').Count` equals `1`.
+
+- [ ] [P5-T11] Check off AC-11 against `evidence/qa-gates/footprint-buildconfig.2026-08-31T20-40.md`. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-11 —').Count` equals `1`.
+
+- [ ] [P5-T12] Check off AC-12 against `evidence/qa-gates/footprint-test.2026-08-31T20-40.md`. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-12 —').Count` equals `1`.
+
+- [ ] [P5-T13] Check off AC-13 against `evidence/qa-gates/file-size.2026-08-31T20-40.md`. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-13 —').Count` equals `1`.
+
+- [ ] [P5-T14] Check off AC-14 against `evidence/qa-gates/format-check.2026-08-31T20-40.md`. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-14 —').Count` equals `1`.
+
+- [ ] [P5-T15] Check off AC-15 against `evidence/qa-gates/analyzer-gate.2026-08-31T20-40.md`. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-15 —').Count` equals `1`.
+
+- [ ] [P5-T16] Check off AC-16 against the `Non-Vacuity:` section of `evidence/qa-gates/analyzer-gate.2026-08-31T20-40.md`. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-16 —').Count` equals `1`.
+
+- [ ] [P5-T17] Check off AC-17 against `evidence/qa-gates/typecheck-gate.2026-08-31T20-40.md`. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-17 —').Count` equals `1`.
+
+- [ ] [P5-T18] Check off AC-18 against `evidence/qa-gates/test-coverage.2026-08-31T20-40.md`. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-18 —').Count` equals `1`.
+
+- [ ] [P5-T19] Check off AC-19 against the P2-T3 and P2-T4 results. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-19 —').Count` equals `1`.
+
+- [ ] [P5-T20] Check off AC-20 against `evidence/qa-gates/no-new-seam.2026-08-31T20-40.md`. Acceptance: `(Select-String -Path docs\features\active\2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656\spec.md -SimpleMatch '- [x] AC-20 —').Count` equals `1`.
+
+- [ ] [P5-T21] Write the acceptance-criteria status summary at `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/issue-updates/ac-status.2026-08-31T20-40.md`, listing all twenty identifiers AC-1 through AC-20 with their status and the evidence path that establishes each. Acceptance: the file exists, contains a `Timestamp:` field, and contains exactly twenty lines each beginning with one of `AC-1` through `AC-20`, with no identifier repeated.
+
+- [ ] [P5-T22] Commit the remaining feature-folder evidence and confirm the scoped tree is clean. Run `git add docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656` then `git commit -m "docs(issue-656): record QA gate and acceptance evidence"` then `git status --porcelain -- QuickFiler QuickFiler.Test docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656`. Write `docs/features/active/2026-08-27-breadcrumb-closecompleted-residual-outside-requestopen-invalidate-656/evidence/other/final-commit.2026-08-31T20-40.md` with the four required fields plus the resulting commit id. Acceptance: the commit records `EXIT_CODE: 0` and the scoped `git status --porcelain` output is empty. The status span is scoped by pathspec because `.claude/agent-memory` is tracked in this repository and `artifacts/orchestration/orchestrator-state.json` is tracked despite the `artifacts/` entry in `.gitignore`; an unscoped clean-tree assertion would be unsatisfiable. No `git update-index` command is run by any task in this plan.
