@@ -606,21 +606,21 @@ dot, which is the intended meaning. Only the alternation pipes are left unescape
 
 ### Acceptance-criteria checklist
 
-- [ ] AC-1 `QfcFormKeyHandler.ClaimsAltChord(IQfcKeyboardHandler handler, Keys keyData)` exists as an `internal static bool` member of `QuickFiler/Controllers/QfcFormKeyHandler.cs` and returns `true` if and only if `handler` is non-null, `keyData` has the `Keys.Alt` flag, and `keyData & Keys.KeyCode` equals `Keys.Menu` or `Keys.None`.
-- [ ] AC-2 A bare Alt press is still claimed, pinned in both key-data shapes: `Keys.Alt` (key-code portion `Keys.None`) and `Keys.Menu | Keys.Alt` (key-code portion `Keys.Menu`, the shape a physical keyboard produces).
-- [ ] AC-3 `Keys.Alt | Keys.M` is not claimed, so the `&Move Options` mnemonic reaches `base.ProcessCmdKey`.
-- [ ] AC-4 A representative non-mnemonic Alt chord is not claimed: `Keys.Alt | Keys.F4`, the window-close chord, and `Keys.Alt | Keys.Left`, the previously-claimed arrow chord.
-- [ ] AC-5 A chord that does not carry the `Keys.Alt` flag is not claimed.
-- [ ] AC-6 A null handler is not claimed.
-- [ ] AC-7 `QfcFormViewer.ProcessCmdKey` delegates its claim decision to `ClaimsAltChord` and contains no independent Alt test.
-- [ ] AC-8 `QfcFormKeyHandler.IsAltKeyCommand` is unchanged, and the four existing tests `IsAltKeyCommand_WithAltKey_ReturnsTrue`, `IsAltKeyCommand_WithAltPlusOtherKey_ReturnsTrue`, `IsAltKeyCommand_WithControlKey_ReturnsFalse` and `IsAltKeyCommand_WithNone_ReturnsFalse` still pass unmodified.
-- [ ] AC-9 No file is added to or removed from either QuickFiler/QuickFiler.csproj or QuickFiler.Test/QuickFiler.Test.csproj.
-- [ ] AC-10 The full C# toolchain passes in order: format, analyzers, nullable/type-check, tests.
-- [ ] AC-11 Coverage shows no regression on changed lines, and `ClaimsAltChord` meets the `>= 90%` new-method floor.
-- [ ] AC-12 No test constructs, shows, or derives from a `System.Windows.Forms.Form`, and the new tests use no temporary files, `Thread.Sleep`, or `Task.Delay`.
-- [ ] AC-13 No new `[ExcludeFromCodeCoverage]` attribute is introduced anywhere in the change.
-- [ ] AC-14 The production and test change set is exactly `QuickFiler/Controllers/QfcFormKeyHandler.cs`, `QuickFiler/Viewers/QfcFormViewer.cs` and `QuickFiler.Test/Controllers/QfcFormKeyHandlerTests.cs`; call sites 2 through 5 in the Call-Site Disposition table are untouched, and the pre-existing unused locals at `QuickFiler/Viewers/QfcFormViewer.cs:64-67` are retained.
-- [ ] AC-15 The live-host manual validation of bare Alt, Alt+M and Alt+F4 is recorded at the strength of the evidence actually obtained, and is never recorded as a pass on an executor's assertion.
+- [x] AC-1 `QfcFormKeyHandler.ClaimsAltChord(IQfcKeyboardHandler handler, Keys keyData)` exists as an `internal static bool` member of `QuickFiler/Controllers/QfcFormKeyHandler.cs` and returns `true` if and only if `handler` is non-null, `keyData` has the `Keys.Alt` flag, and `keyData & Keys.KeyCode` equals `Keys.Menu` or `Keys.None`.
+- [x] AC-2 A bare Alt press is still claimed, pinned in both key-data shapes: `Keys.Alt` (key-code portion `Keys.None`) and `Keys.Menu | Keys.Alt` (key-code portion `Keys.Menu`, the shape a physical keyboard produces).
+- [x] AC-3 `Keys.Alt | Keys.M` is not claimed, so the `&Move Options` mnemonic reaches `base.ProcessCmdKey`.
+- [x] AC-4 A representative non-mnemonic Alt chord is not claimed: `Keys.Alt | Keys.F4`, the window-close chord, and `Keys.Alt | Keys.Left`, the previously-claimed arrow chord.
+- [x] AC-5 A chord that does not carry the `Keys.Alt` flag is not claimed.
+- [x] AC-6 A null handler is not claimed.
+- [x] AC-7 `QfcFormViewer.ProcessCmdKey` delegates its claim decision to `ClaimsAltChord` and contains no independent Alt test.
+- [x] AC-8 `QfcFormKeyHandler.IsAltKeyCommand` is unchanged, and the four existing tests `IsAltKeyCommand_WithAltKey_ReturnsTrue`, `IsAltKeyCommand_WithAltPlusOtherKey_ReturnsTrue`, `IsAltKeyCommand_WithControlKey_ReturnsFalse` and `IsAltKeyCommand_WithNone_ReturnsFalse` still pass unmodified.
+- [x] AC-9 No file is added to or removed from either QuickFiler/QuickFiler.csproj or QuickFiler.Test/QuickFiler.Test.csproj.
+- [x] AC-10 The full C# toolchain passes in order: format, analyzers, nullable/type-check, tests.
+- [x] AC-11 Coverage shows no regression on changed lines, and `ClaimsAltChord` meets the `>= 90%` new-method floor.
+- [x] AC-12 No test constructs, shows, or derives from a `System.Windows.Forms.Form`, and the new tests use no temporary files, `Thread.Sleep`, or `Task.Delay`.
+- [x] AC-13 No new `[ExcludeFromCodeCoverage]` attribute is introduced anywhere in the change.
+- [x] AC-14 The production and test change set is exactly `QuickFiler/Controllers/QfcFormKeyHandler.cs`, `QuickFiler/Viewers/QfcFormViewer.cs` and `QuickFiler.Test/Controllers/QfcFormKeyHandlerTests.cs`; call sites 2 through 5 in the Call-Site Disposition table are untouched, and the pre-existing unused locals at `QuickFiler/Viewers/QfcFormViewer.cs:64-67` are retained.
+- [x] AC-15 The live-host manual validation of bare Alt, Alt+M and Alt+F4 is recorded at the strength of the evidence actually obtained, and is never recorded as a pass on an executor's assertion.
 
 ## Risks & Mitigations
 

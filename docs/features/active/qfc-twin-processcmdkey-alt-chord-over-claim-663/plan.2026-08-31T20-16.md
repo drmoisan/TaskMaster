@@ -256,7 +256,7 @@ Both are gitignored (`.gitignore` line 350 is `.dotnet*/`, line 191 is `**/[Pp]a
 provisioning them does not dirty the tree. Until both exist, every `dotnet` and `msbuild` command is
 unreachable and every downstream exit-code acceptance in this plan is unsatisfiable.
 
-- [ ] [P0-T1] Read, in this order, `CLAUDE.md`, `.claude/rules/general-code-change.md`,
+- [x] [P0-T1] Read, in this order, `CLAUDE.md`, `.claude/rules/general-code-change.md`,
       `.claude/rules/general-unit-test.md`, `.claude/rules/csharp.md`, and then the supplementary
       `.claude/rules/quality-tiers.md`, `.claude/rules/tonality.md` and
       `.claude/rules/plan-acceptance-gates.md`. Write
@@ -264,7 +264,7 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       carrying `Timestamp:`, `Policy Order:` naming the four core policies in the order above, and an
       explicit list of all seven file paths read. Acceptance: the artifact exists and contains all
       three required fields and all seven paths. Serves AC-10.
-- [ ] [P0-T2] Read the requirement sources
+- [x] [P0-T2] Read the requirement sources
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/spec.md`,
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/issue.md`,
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/research/2026-09-01T01-05-qfc-alt-chord-over-claim-research.md`,
@@ -277,7 +277,7 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       identifier repeated and none omitted, and the three in-scope file paths from the spec's In scope
       subsection. Acceptance: the artifact lists exactly fifteen acceptance identifiers and exactly
       three in-scope file paths. Serves AC-14.
-- [ ] [P0-T3] Provision the repository-local .NET SDK by running
+- [x] [P0-T3] Provision the repository-local .NET SDK by running
       `pwsh -NoProfile -File scripts/vscode/Install-RepoDotNetSdk.ps1` from the worktree root.
       `global.json` pins `sdk.version` 8.0.205 with `paths` of `.dotnet-sdk` and `$host$`, so a host
       SDK alone cannot satisfy it. Acceptance: `dotnet --version` prints `8.0.205`, and
@@ -293,7 +293,7 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       output and the `Test-Path` result in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/baseline/sdk-bootstrap.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
-- [ ] [P0-T4] Restore NuGet packages by running
+- [x] [P0-T4] Restore NuGet packages by running
       `pwsh -NoProfile -File scripts/vscode/Invoke-Restore.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform "Any CPU"`.
       Every project declares an `EnsureNuGetPackageBuildImports` target whose `Error` fires at
       `BeforeTargets="PrepareForBuild"`, so no build can run before this completes. Acceptance: exit
@@ -305,7 +305,7 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       run. Record both invocations and both exit codes. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/baseline/nuget-restore.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
-- [ ] [P0-T5] Re-derive analyzer version concordance with two independently formulated searches and
+- [x] [P0-T5] Re-derive analyzer version concordance with two independently formulated searches and
       record both member sets. Search one enumerates the project-file side, keyed on the analyzer
       reference path:
       `pwsh -NoProfile -Command 'Get-ChildItem -Path . -Recurse -Filter *.csproj | Select-String -Pattern "packages\x5C(Meziantou\.Analyzer|Roslynator\.Analyzers)\.[0-9][0-9.]*\x5C" -AllMatches'`.
@@ -325,21 +325,21 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       version present on one side and absent from the other is `error CS0006` at compile time rather
       than a warning, so a recorded disagreement is a blocking finding that must be resolved before
       `[P0-T9]`. Include `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
-- [ ] [P0-T6] Restore the manifest-pinned dotnet tools by running `dotnet tool restore` once from the
+- [x] [P0-T6] Restore the manifest-pinned dotnet tools by running `dotnet tool restore` once from the
       worktree root. Acceptance: exit code 0 and the output of `dotnet tool run csharpier --version`
       begins with `1.2.6`, the version `dotnet-tools.json` pins. Equality over the whole version
       string is not asserted, because CSharpier 1.x can print an informational version carrying build
       metadata after the three-part number. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/baseline/dotnet-tool-restore.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
-- [ ] [P0-T7] Ensure the `dotnet-coverage` global tool is present, because
+- [x] [P0-T7] Ensure the `dotnet-coverage` global tool is present, because
       `Invoke-MSTestWithCoverage.ps1` lines 292 and 293 throw before running anything when it is
       absent, and it is a global tool that `dotnet tool restore` does not supply. Run
       `pwsh -NoProfile -Command 'if (-not (Get-Command dotnet-coverage -ErrorAction SilentlyContinue)) { dotnet tool install --global dotnet-coverage }'`.
       Acceptance: `dotnet-coverage --version` prints a version string and exits 0. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/baseline/dotnet-coverage-tool.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
-- [ ] [P0-T8] Capture the baseline formatting state with the read-only command
+- [x] [P0-T8] Capture the baseline formatting state with the read-only command
       `dotnet tool run csharpier check .` from the worktree root. This is a read-only invocation, so
       its exit code is a sufficient observation and no tree comparison is needed. Acceptance: the exit
       code and the tool's final summary line are recorded verbatim as BASELINE_CSHARPIER_EXIT in
@@ -351,7 +351,7 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       none is, `[P4-T2]` compares against exit code 0 for those three files only and records the
       pre-existing set as carried forward; if one is, resolve the drift before Phase 1.
       Serves AC-10.
-- [ ] [P0-T9] Capture the baseline analyzer build by running the analyzer gate command quoted in the
+- [x] [P0-T9] Capture the baseline analyzer build by running the analyzer gate command quoted in the
       Toolchain command forms section above, writing its detailed log to
       `coverage\663-analyzers-baseline.msbuild.log`. Acceptance: the exit code is recorded; the log
       contains at least one occurrence of the literal `Task "Csc"`, whose occurrence count is
@@ -384,7 +384,7 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/baseline/msbuild-analyzers.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
-- [ ] [P0-T10] Capture the baseline type-check build by running the type-check gate command quoted in
+- [x] [P0-T10] Capture the baseline type-check build by running the type-check gate command quoted in
       the Toolchain command forms section above, writing its detailed log to
       `coverage\663-nullable-baseline.msbuild.log`. Confirm in the artifact that the command line
       recorded under `Command:` contains no occurrence of `Nullable=enable`. Acceptance: the exit code
@@ -400,7 +400,7 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       no-scoped-re-reading constraint recorded in `[P0-T9]` applies here. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/baseline/msbuild-nullable.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
-- [ ] [P0-T11] Probe the scoped test-runner form by running
+- [x] [P0-T11] Probe the scoped test-runner form by running
       `pwsh -NoProfile -File scripts/vscode/Invoke-MSTest.ps1 -SearchRoot QuickFiler.Test -Configuration Debug -NoExecute`.
       The `-NoExecute` switch returns at line 125 after the discovery and count logic on lines 107
       through 120 has run, so the probe exercises exactly the scalar-versus-array question without
@@ -412,7 +412,7 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       preparation. Do not fix that defect here; it is out of scope for issue #663. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/baseline/scoped-runner-probe.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
-- [ ] [P0-T12] Capture the baseline repository-wide test state by running
+- [x] [P0-T12] Capture the baseline repository-wide test state by running
       `pwsh -NoProfile -File scripts/vscode/Invoke-MSTest.ps1 -SearchRoot . -Configuration Debug`.
       Acceptance: the artifact records the printed `Discovered N test assemblies.` line, the
       `Total tests:`, `Passed:` and `Failed:` figures, the run's not-run figure recorded as
@@ -430,7 +430,7 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       discovery defect and fails this task rather than being read as an empty suite. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/baseline/tests.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-8 and AC-10.
-- [ ] [P0-T13] Capture baseline coverage by running
+- [x] [P0-T13] Capture baseline coverage by running
       `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput coverage/663-baseline.cobertura.xml`,
       then applying the post-processing out of band with
       `pwsh -NoProfile -Command '. ./scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1; $raw = Get-Content -LiteralPath "coverage/663-baseline.cobertura.xml" -Raw -Encoding UTF8; $p = ConvertTo-KoverageCoberturaXml -XmlContent $raw -RepoRoot (Get-Location).Path; Set-Content -LiteralPath "coverage/663-baseline.processed.cobertura.xml" -Value $p -Encoding UTF8 -NoNewline'`.
@@ -484,7 +484,7 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/baseline/coverage.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`, and render any absolute
       worktree path as `<repo-root>`. Serves AC-11.
-- [ ] [P0-T14] Record the pre-change structural state so that every later structural gate has a
+- [x] [P0-T14] Record the pre-change structural state so that every later structural gate has a
       false-before reading to be compared against. Run and record, each with its match count and
       matched lines: `Select-String -Path QuickFiler/Viewers/QfcFormViewer.cs -Pattern 'IsAltKeyCommand'`
       (expected one match, on line 60); `Select-String -Path QuickFiler/Viewers/QfcFormViewer.cs -Pattern 'ClaimsAltChord'`
@@ -500,7 +500,7 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
 
 ### Phase 1 — Behaviour-preserving predicate seam
 
-- [ ] [P1-T1] Add the member `ClaimsAltChord` to the existing type `QfcFormKeyHandler` in
+- [x] [P1-T1] Add the member `ClaimsAltChord` to the existing type `QfcFormKeyHandler` in
       `QuickFiler/Controllers/QfcFormKeyHandler.cs`, in its behaviour-preserving intermediate form,
       together with the `using QuickFiler.Interfaces;` directive the parameter type requires. The
       intermediate body is exactly
@@ -517,7 +517,7 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       returns exactly one match. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/seam-predicate.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-1 and AC-8.
-- [ ] [P1-T2] Replace the guard on lines 58 through 61 of `QuickFiler/Viewers/QfcFormViewer.cs` with
+- [x] [P1-T2] Replace the guard on lines 58 through 61 of `QuickFiler/Viewers/QfcFormViewer.cs` with
       the single-line condition quoted verbatim in the reading guide. Retain the body of the branch
       unchanged, including the pre-existing locals `object sender = FromHandle(msg.HWnd)` and
       `var e = new KeyEventArgs(keyData)` and the assignment `e.Handled = true`, and retain the
@@ -528,7 +528,7 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       zero matches; and VC-2 against the same file still returns two matches. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/seam-viewer-guard.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-7 and AC-14.
-- [ ] [P1-T3] Prove the seam compiles and introduces no new analyzer diagnostic by running the
+- [x] [P1-T3] Prove the seam compiles and introduces no new analyzer diagnostic by running the
       analyzer gate command quoted in the Toolchain command forms section, writing its detailed log to
       `coverage\663-analyzers-seam.msbuild.log`. This gate exists because routing the viewer through
       the new predicate removes the last compiled consumer of `IsAltKeyCommand`, which could trip an
@@ -548,7 +548,7 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
 
 ### Phase 2 — Regression tests captured red
 
-- [ ] [P2-T1] Add the seven test methods named in the reading guide to the existing file
+- [x] [P2-T1] Add the seven test methods named in the reading guide to the existing file
       `QuickFiler.Test/Controllers/QfcFormKeyHandlerTests.cs`, inside the existing
       `QfcFormKeyHandlerTests` class in namespace `QuickFiler.Controllers.Tests`. Add
       `using Moq;` and `using QuickFiler.Interfaces;` to that file. Use MSTest `[TestMethod]`,
@@ -573,7 +573,7 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/regression-testing/tests-added.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-2, AC-3, AC-4,
       AC-5, AC-6 and AC-12.
-- [ ] [P2-T2] Compile the solution so the red run is a runtime observation rather than a build break,
+- [x] [P2-T2] Compile the solution so the red run is a runtime observation rather than a build break,
       by running
       `pwsh -NoProfile -Command '$mb = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\MSBuild.exe" | Select-Object -First 1; & $mb TaskMaster.sln /t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"'`.
       Acceptance: exit code 0 and the `LastWriteTimeUtc` of `QuickFiler.Test\bin\Debug\QuickFiler.Test.dll`
@@ -581,7 +581,7 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       test assembly was recompiled rather than skipped. Record both timestamps in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/regression-testing/red-build.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
-- [ ] [P2-T3] [expect-fail] Capture the red run by running
+- [x] [P2-T3] [expect-fail] Capture the red run by running
       `pwsh -NoProfile -File scripts/vscode/Invoke-MSTest.ps1 -SearchRoot . -Configuration Debug`.
       Acceptance: the run's failing-test name list contains exactly the three names
       `ClaimsAltChord_WithAltM_ReturnsFalse`, `ClaimsAltChord_WithAltF4_ReturnsFalse` and
@@ -600,7 +600,7 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
 
 ### Phase 3 — Minimal fix and green run
 
-- [ ] [P3-T1] Replace the intermediate body of `ClaimsAltChord` in
+- [x] [P3-T1] Replace the intermediate body of `ClaimsAltChord` in
       `QuickFiler/Controllers/QfcFormKeyHandler.cs` with the final source form quoted verbatim in the
       reading guide, which adds the null and Alt-flag guard, the `keyData & Keys.KeyCode` mask, and
       the acceptance of `Keys.Menu` or `Keys.None` only. Change nothing else in the file; in
@@ -614,12 +614,12 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       still returns exactly one match. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/fix-predicate.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-1 and AC-8.
-- [ ] [P3-T2] Recompile with the same `/t:Build` command as `[P2-T2]`. Acceptance: exit code 0 and the
+- [x] [P3-T2] Recompile with the same `/t:Build` command as `[P2-T2]`. Acceptance: exit code 0 and the
       `LastWriteTimeUtc` of `QuickFiler\bin\Debug\QuickFiler.dll` is strictly later than the value
       captured immediately before the command ran. Record both timestamps in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/fix-build.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
-- [ ] [P3-T3] Capture the green run by running
+- [x] [P3-T3] Capture the green run by running
       `pwsh -NoProfile -File scripts/vscode/Invoke-MSTest.ps1 -SearchRoot . -Configuration Debug`.
       Acceptance: none of the three names listed in `[P2-T3]` appears in the failing-test list; every
       remaining failing name, if any, is a member of BASELINE_FAILURE_SET; no failing name belongs to
@@ -640,7 +640,7 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
 Run stages in order: format, then analyzers, then type-check, then tests, then coverage. If any stage
 fails or rewrites a tracked file, restart this phase from `[P4-T1]`.
 
-- [ ] [P4-T1] Apply formatting with three scoped invocations, one per changed path:
+- [x] [P4-T1] Apply formatting with three scoped invocations, one per changed path:
       `dotnet tool run csharpier format QuickFiler/Controllers/QfcFormKeyHandler.cs`, then
       `dotnet tool run csharpier format QuickFiler/Viewers/QfcFormViewer.cs`, then
       `dotnet tool run csharpier format QuickFiler.Test/Controllers/QfcFormKeyHandlerTests.cs`. The
@@ -656,7 +656,7 @@ fails or rewrites a tracked file, restart this phase from `[P4-T1]`.
       Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/csharpier-format.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
-- [ ] [P4-T2] Verify formatting repository-wide and read-only with `dotnet tool run csharpier check .`.
+- [x] [P4-T2] Verify formatting repository-wide and read-only with `dotnet tool run csharpier check .`.
       Acceptance: exit code 0 and no reported unformatted path, which is the same reading `[P0-T8]`
       recorded as BASELINE_CSHARPIER_EXIT if that baseline was 0; if it was not, apply the
       carry-forward disposition `[P0-T8]` recorded. Under that disposition the scoped reading is
@@ -668,7 +668,7 @@ fails or rewrites a tracked file, restart this phase from `[P4-T1]`.
       both recorded alongside them. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/csharpier-check.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
-- [ ] [P4-T3] Run the analyzer gate command quoted in the Toolchain command forms section, writing its
+- [x] [P4-T3] Run the analyzer gate command quoted in the Toolchain command forms section, writing its
       detailed log to `coverage\663-analyzers.msbuild.log`. Acceptance: exit code 0 and the console
       output carries a summary line matching `^\s*0 Error\(s\)$` and no line matching the MSBuild
       diagnostic form `: error [A-Z]+[0-9]+:`, or, if BASELINE_ANALYZER_EXIT is non-zero, the
@@ -690,7 +690,7 @@ fails or rewrites a tracked file, restart this phase from `[P4-T1]`.
       log after recording its byte size. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/msbuild-analyzers.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
-- [ ] [P4-T4] Run the type-check gate command quoted in the Toolchain command forms section, writing
+- [x] [P4-T4] Run the type-check gate command quoted in the Toolchain command forms section, writing
       its detailed log to `coverage\663-nullable.msbuild.log`. Acceptance: exit code 0 and the console
       output carries a summary line matching `^\s*0 Error\(s\)$` and no line matching the MSBuild
       diagnostic form `: error [A-Z]+[0-9]+:`, for the reason given in `[P4-T3]`, or, if
@@ -707,7 +707,7 @@ fails or rewrites a tracked file, restart this phase from `[P4-T1]`.
       detailed log after recording its byte size. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/msbuild-nullable.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
-- [ ] [P4-T5] Run the final repository-wide test gate with
+- [x] [P4-T5] Run the final repository-wide test gate with
       `pwsh -NoProfile -File scripts/vscode/Invoke-MSTest.ps1 -SearchRoot . -Configuration Debug`.
       Acceptance: the `Total tests:` figure equals the `[P0-T12]` baseline total plus seven; every
       failing name, if any, is a member of BASELINE_FAILURE_SET; no failing name belongs to
@@ -716,7 +716,7 @@ fails or rewrites a tracked file, restart this phase from `[P4-T1]`.
       transcribed summary block, equals BASELINE_NOT_RUN. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/tests-final.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-8, AC-10 and AC-12.
-- [ ] [P4-T6] Run the post-change coverage collection with
+- [x] [P4-T6] Run the post-change coverage collection with
       `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/coverage.cobertura.xml`,
       which is the output path AC-11 names. Acceptance: the Cobertura document exists at that path and
       its byte size is recorded; the run's failing-test list is recorded verbatim and contains no name
@@ -726,7 +726,7 @@ fails or rewrites a tracked file, restart this phase from `[P4-T1]`.
       failures, so the two sets are not interchangeable. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/coverage-run.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-11.
-- [ ] [P4-T7] Post-process the coverage document in place and extract the required figures, by running
+- [x] [P4-T7] Post-process the coverage document in place and extract the required figures, by running
       `pwsh -NoProfile -Command '. ./scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1; $f = "docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/coverage.cobertura.xml"; $raw = Get-Content -LiteralPath $f -Raw -Encoding UTF8; $p = ConvertTo-KoverageCoberturaXml -XmlContent $raw -RepoRoot (Get-Location).Path; Set-Content -LiteralPath $f -Value $p -Encoding UTF8 -NoNewline'`.
       Acceptance, all read from the post-processed document and recorded verbatim in the artifact: the
       document contains a `method` element whose `name` attribute is `ClaimsAltChord`, under the class
@@ -764,12 +764,12 @@ name-listing diff below is paired with a `git status --porcelain` span in the sa
 mechanisms are complementary and each alone is wrong in one state, since the anchored diff is blind to
 an untracked file while porcelain status goes empty once the change is committed.
 
-- [ ] [P5-T1] Stage and commit the three changed source files with a conventional-commit message
+- [x] [P5-T1] Stage and commit the three changed source files with a conventional-commit message
       naming issue #663. Acceptance: `git status --porcelain -- '*.cs'` prints nothing, and
       `git diff --name-only origin/main...HEAD -- '*.cs'` prints exactly three lines. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/code-commit.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-14.
-- [ ] [P5-T2] Verify the predicate structure of the viewer. Run
+- [x] [P5-T2] Verify the predicate structure of the viewer. Run
       `Select-String -Path QuickFiler/Viewers/QfcFormViewer.cs -Pattern 'ClaimsAltChord'`,
       `Select-String -Path QuickFiler/Viewers/QfcFormViewer.cs -Pattern 'Keys\.Alt'` and
       `Select-String -Path QuickFiler/Viewers/QfcFormViewer.cs -Pattern 'IsAltKeyCommand'`.
@@ -783,7 +783,7 @@ an untracked file while porcelain status goes empty once the change is committed
       into the viewer. Record all three commands and their output in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/663-predicate-structure.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-7.
-- [ ] [P5-T3] Verify that `IsAltKeyCommand` survives unchanged. Run
+- [x] [P5-T3] Verify that `IsAltKeyCommand` survives unchanged. Run
       `git diff -U0 origin/main...HEAD -- QuickFiler/Controllers/QfcFormKeyHandler.cs QuickFiler.Test/Controllers/QfcFormKeyHandlerTests.cs`
       and, in the same task, `git status --porcelain -- QuickFiler/Controllers/QfcFormKeyHandler.cs QuickFiler.Test/Controllers/QfcFormKeyHandlerTests.cs`.
       Acceptance: no line of the diff that begins with a single `-` character contains
@@ -791,20 +791,20 @@ an untracked file while porcelain status goes empty once the change is committed
       output in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/isaltkeycommand-unchanged.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-8.
-- [ ] [P5-T4] Verify that neither project file changed. Run
+- [x] [P5-T4] Verify that neither project file changed. Run
       `git diff --name-only origin/main...HEAD` and, in the same task,
       `git status --porcelain`. Acceptance: the diff output contains no line equal to
       `QuickFiler/QuickFiler.csproj` and no line equal to `QuickFiler.Test/QuickFiler.Test.csproj`,
       and the porcelain output contains neither path. Record both outputs in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/csproj-untouched.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-9.
-- [ ] [P5-T5] Verify the test-shape prohibitions. Run VC-1 against
+- [x] [P5-T5] Verify the test-shape prohibitions. Run VC-1 against
       `QuickFiler.Test/Controllers/QfcFormKeyHandlerTests.cs`. Acceptance: zero matches, matching the
       `[P0-T14]` pre-change reading, and the `[P4-T5]` artifact records that
       `ExecutingAssembly_ContainsNoFormDerivedType` is not in the failing list. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/no-live-form.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-12.
-- [ ] [P5-T6] Verify that no coverage exemption was introduced. Run
+- [x] [P5-T6] Verify that no coverage exemption was introduced. Run
       `git diff -U0 origin/main...HEAD -- '*.cs'` and, in the same task, `git status --porcelain`.
       The diff is scoped to `.cs` paths because the documentation commits already on this branch add
       twenty lines that quote the attribute name in prose, so an unscoped diff reports twenty `+`
@@ -817,7 +817,7 @@ an untracked file while porcelain status goes empty once the change is committed
       unrelated agent activity can leave modified. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/no-new-exemption.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-13.
-- [ ] [P5-T7] Verify the change set and the retained locals. Run
+- [x] [P5-T7] Verify the change set and the retained locals. Run
       `git diff --name-only origin/main...HEAD -- '*.cs'`, then in the same task
       `git status --porcelain`, then VC-2 against `QuickFiler/Viewers/QfcFormViewer.cs`. Acceptance:
       the diff lists exactly the three paths `QuickFiler/Controllers/QfcFormKeyHandler.cs`,
@@ -828,7 +828,7 @@ an untracked file while porcelain status goes empty once the change is committed
       retained. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/change-set.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-14.
-- [ ] [P5-T8] Verify the justification wording of the mnemonic test. Run
+- [x] [P5-T8] Verify the justification wording of the mnemonic test. Run
       `Select-String -Path QuickFiler.Test/Controllers/QfcFormKeyHandlerTests.cs -Pattern 'Move Options'`
       and `Select-String -Path QuickFiler.Test/Controllers/QfcFormKeyHandlerTests.cs -Pattern 'Filters menu'`.
       Acceptance: the first returns at least one match and at least one matched line lies inside the
@@ -844,7 +844,7 @@ list share a prefix, so every verification search must include the space that fo
 searching for `- [x] AC-1` alone would also match the AC-10 through AC-15 lines, whereas
 `- [x] AC-1 ` with the trailing space matches only the AC-1 line.
 
-- [ ] [P6-T1] Record the live-host manual validation at
+- [x] [P6-T1] Record the live-host manual validation at
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/other/manual-validation.md`.
       For each of the three gestures bare Alt, Alt+M and Alt+F4, the record must carry either an
       observed outcome naming the Outlook build, or the status `MANUAL_CHECK_DEFERRED` accompanied by
@@ -854,62 +854,62 @@ searching for `- [x] AC-1` alone would also match the AC-10 through AC-15 lines,
       assertion, or omitting a gesture, is not. Acceptance: the artifact carries `Timestamp:`,
       `Command:`, `EXIT_CODE:` and `Output Summary:`, names all three gestures, and for each names
       either an observed outcome or the deferral status with both probe values. Serves AC-15.
-- [ ] [P6-T2] Check off AC-1 in the spec checklist. Acceptance:
+- [x] [P6-T2] Check off AC-1 in the spec checklist. Acceptance:
       `Select-String -Path docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/spec.md -Pattern '- \[x\] AC-1 '`
       returns exactly one match, and the `[P3-T3]` and `[P5-T2]` artifacts both exist. Serves AC-1.
-- [ ] [P6-T3] Check off AC-2 in the spec checklist. Acceptance:
+- [x] [P6-T3] Check off AC-2 in the spec checklist. Acceptance:
       `Select-String -Path docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/spec.md -Pattern '- \[x\] AC-2 '`
       returns exactly one match, and the `[P3-T3]` artifact records that neither
       `ClaimsAltChord_WithBareAltFlagAndHandler_ReturnsTrue` nor
       `ClaimsAltChord_WithMenuKeyCodeAndAltFlag_ReturnsTrue` appears in its failing list. Serves AC-2.
-- [ ] [P6-T4] Check off AC-3 in the spec checklist. Acceptance:
+- [x] [P6-T4] Check off AC-3 in the spec checklist. Acceptance:
       `Select-String -Path docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/spec.md -Pattern '- \[x\] AC-3 '`
       returns exactly one match, and the `[P5-T8]` artifact exists. Serves AC-3.
-- [ ] [P6-T5] Check off AC-4 in the spec checklist. Acceptance:
+- [x] [P6-T5] Check off AC-4 in the spec checklist. Acceptance:
       `Select-String -Path docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/spec.md -Pattern '- \[x\] AC-4 '`
       returns exactly one match, and the `[P2-T3]` artifact records
       `ClaimsAltChord_WithAltF4_ReturnsFalse` and `ClaimsAltChord_WithAltLeft_ReturnsFalse` as failing
       before the fix while the `[P3-T3]` artifact records neither as failing after it. Serves AC-4.
-- [ ] [P6-T6] Check off AC-5 in the spec checklist. Acceptance:
+- [x] [P6-T6] Check off AC-5 in the spec checklist. Acceptance:
       `Select-String -Path docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/spec.md -Pattern '- \[x\] AC-5 '`
       returns exactly one match, and the `[P3-T3]` artifact records that
       `ClaimsAltChord_WithoutAltFlag_ReturnsFalse` is absent from its failing list. Serves AC-5.
-- [ ] [P6-T7] Check off AC-6 in the spec checklist. Acceptance:
+- [x] [P6-T7] Check off AC-6 in the spec checklist. Acceptance:
       `Select-String -Path docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/spec.md -Pattern '- \[x\] AC-6 '`
       returns exactly one match, and the `[P3-T3]` artifact records that
       `ClaimsAltChord_WithNullHandler_ReturnsFalse` is absent from its failing list. Serves AC-6.
-- [ ] [P6-T8] Check off AC-7 in the spec checklist. Acceptance:
+- [x] [P6-T8] Check off AC-7 in the spec checklist. Acceptance:
       `Select-String -Path docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/spec.md -Pattern '- \[x\] AC-7 '`
       returns exactly one match, and the `[P5-T2]` artifact exists. Serves AC-7.
-- [ ] [P6-T9] Check off AC-8 in the spec checklist. Acceptance:
+- [x] [P6-T9] Check off AC-8 in the spec checklist. Acceptance:
       `Select-String -Path docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/spec.md -Pattern '- \[x\] AC-8 '`
       returns exactly one match, and the `[P5-T3]` artifact exists. Serves AC-8.
-- [ ] [P6-T10] Check off AC-9 in the spec checklist. Acceptance:
+- [x] [P6-T10] Check off AC-9 in the spec checklist. Acceptance:
       `Select-String -Path docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/spec.md -Pattern '- \[x\] AC-9 '`
       returns exactly one match, and the `[P5-T4]` artifact exists. Serves AC-9.
-- [ ] [P6-T11] Check off AC-10 in the spec checklist. Acceptance:
+- [x] [P6-T11] Check off AC-10 in the spec checklist. Acceptance:
       `Select-String -Path docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/spec.md -Pattern '- \[x\] AC-10 '`
       returns exactly one match, and all five artifacts from `[P4-T1]` through `[P4-T5]` exist and each
       carries the four required fields. Serves AC-10.
-- [ ] [P6-T12] Check off AC-11 in the spec checklist. Acceptance:
+- [x] [P6-T12] Check off AC-11 in the spec checklist. Acceptance:
       `Select-String -Path docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/spec.md -Pattern '- \[x\] AC-11 '`
       returns exactly one match, and the `[P4-T7]` artifact records the line-rate of the
       `ClaimsAltChord` `method` element under the `class` element whose `filename` ends with
       `QfcFormKeyHandler.cs`, and the class line-rate comparison against BASELINE_CLASS_LINE_RATE.
       Serves AC-11.
-- [ ] [P6-T13] Check off AC-12 in the spec checklist. Acceptance:
+- [x] [P6-T13] Check off AC-12 in the spec checklist. Acceptance:
       `Select-String -Path docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/spec.md -Pattern '- \[x\] AC-12 '`
       returns exactly one match, and the `[P5-T5]` artifact exists. Serves AC-12.
-- [ ] [P6-T14] Check off AC-13 in the spec checklist. Acceptance:
+- [x] [P6-T14] Check off AC-13 in the spec checklist. Acceptance:
       `Select-String -Path docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/spec.md -Pattern '- \[x\] AC-13 '`
       returns exactly one match, and the `[P5-T6]` artifact exists. Serves AC-13.
-- [ ] [P6-T15] Check off AC-14 in the spec checklist. Acceptance:
+- [x] [P6-T15] Check off AC-14 in the spec checklist. Acceptance:
       `Select-String -Path docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/spec.md -Pattern '- \[x\] AC-14 '`
       returns exactly one match, and the `[P5-T7]` artifact exists. Serves AC-14.
-- [ ] [P6-T16] Check off AC-15 in the spec checklist. Acceptance:
+- [x] [P6-T16] Check off AC-15 in the spec checklist. Acceptance:
       `Select-String -Path docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/spec.md -Pattern '- \[x\] AC-15 '`
       returns exactly one match, and the `[P6-T1]` artifact exists. Serves AC-15.
-- [ ] [P6-T17] Mirror the issue update locally at
+- [x] [P6-T17] Mirror the issue update locally at
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/issue-updates/issue-663.2026-08-31T20-16.md`,
       carrying `Timestamp:`, the exact text of the update, and one of `PostedAs: body`,
       `PostedAs: comment` or `PostedAs: unknown`; if posting is not performed, the artifact carries a
@@ -917,7 +917,7 @@ searching for `- [x] AC-1` alone would also match the AC-10 through AC-15 lines,
       swallowed mnemonic on this surface and Alt+F is not, because `ButtonFilters.Text` is the plain
       string `"Filters"` with no ampersand. Acceptance: the artifact exists and carries `Timestamp:`
       and a `PostedAs:` or `POSTING BLOCKED` line. Serves AC-3.
-- [ ] [P6-T18] Commit every remaining change, including this plan file, the spec checklist edits and
+- [x] [P6-T18] Commit every remaining change, including this plan file, the spec checklist edits and
       all evidence artifacts. Stage paths explicitly rather than with an all-paths stage: a blanket
       stage sweeps an unrelated queued promotion file from `docs/features/potential/` onto this branch.
       Before committing, run `git status --porcelain` and confirm that every listed path lies under
@@ -934,7 +934,7 @@ searching for `- [x] AC-1` alone would also match the AC-10 through AC-15 lines,
       Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/final-commit.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-14.
-- [ ] [P6-T19] Confirm the end state after the documentation commits. Run
+- [x] [P6-T19] Confirm the end state after the documentation commits. Run
       `git diff --name-only origin/main...HEAD -- '*.cs'` and, in the same task,
       `git status --porcelain`. Acceptance: the diff still lists exactly the same three `.cs` paths
       recorded by `[P5-T7]` and no other, and the porcelain output lists at most
