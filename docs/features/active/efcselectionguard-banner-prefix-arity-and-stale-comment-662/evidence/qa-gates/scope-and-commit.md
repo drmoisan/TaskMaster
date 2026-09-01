@@ -103,5 +103,33 @@ branch.
 
 ## Agent-memory status
 
-This section is written after the main commit, because that is when the status is
-observable. See the section appended below.
+Observed after the main commit, which is the point at which this task's ordering
+makes it observable.
+
+Command: `git status --porcelain -uall -- .claude/agent-memory`
+
+Output:
+
+```
+ M .claude/agent-memory/atomic-executor/MEMORY.md
+?? .claude/agent-memory/atomic-executor/feedback_never_predict_an_observation_into_an_artifact.md
+?? .claude/agent-memory/atomic-executor/project_full_suite_run_hangs_while_earlier_runs_idle.md
+```
+
+The status is non-empty, so `.claude/agent-memory` is staged and committed in a
+separate follow-up commit whose message names agent memory and issue 662. This
+artifact is staged in that same `git add`, per this task's stated ordering: the
+artifact update is itself committed before the scoped status span whose
+acceptance is "no output" is evaluated last, so that the update cannot leave the
+feature folder dirty and make the acceptance unreachable.
+
+The two new memory files record lessons from this run: a full-assembly test run
+that hung although the byte-identical baseline command had passed, and the rule
+that an observed value must never be written into an evidence artifact before it
+is observed. `MEMORY.md` is modified because both entries were indexed and
+because a repository hook required the index to be compacted below its read
+limit; it is now 102 lines.
+
+## Final scoped status
+
+Evaluated last, after the follow-up commit above. Recorded in the run report.
