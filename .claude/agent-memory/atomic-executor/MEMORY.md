@@ -4,6 +4,7 @@
 - [Blocked Bash command drops chained check-off](project_blocked_bash_command_silently_drops_chained_checkoff.md) — aborts the WHOLE
 - [CSharpier chain-wrap defeats single-line search gates](project_csharpier_chain_wrap_defeats_singleline_search_gates.md) — zero-hit gate go
 - [Verify line citations with numbered output](feedback_verify_line_citations_with_numbered_output.md) — never hand-count
+- [Plan "observed while authoring" counts are undercounts](project_plan_authoring_time_token_counts_are_undercounts.md) — measure; 5 vs 7, 36 vs 37
 - [Planner and executor observe different worktrees](project_planner_and_executor_observe_different_worktrees.md) — `git status` claims don't travel
 - [Extract gate literals from the plan, never re-type](project_preflight_gate_literal_extract_from_plan_not_retype.md) — quoting drift
 - [Tool layer collapses `\` in file content](project_tool_layer_collapses_double_backslash_in_file_content.md) — heredocs and Wri
@@ -107,6 +108,7 @@
 ## Coverage measurement
 - [Exempt-forward extraction leaves call site uncovered](project_exempt_forward_extraction_leaves_call_site_uncovered.md) — >=90% gate unsat
 - [Reproduce the baseline's counting method](project_coverage_delta_reproduce_baseline_counting_method.md) — deduped vs all-d
+- [Async state machine emits no `<method>` element](project_async_state_machine_emits_no_method_element.md) — per-method union is empty; `.//line` double-counts
 - [First-party coverage denominator (#197)](project_coverage_firstparty_denominator_method.md) — count per-`<line>`
 - [dotnet-coverage denominator nondeterminism](project_dotnet_coverage_denominator_nondeterminism.md) — 47% vs 81% from 
 - [Koverage Cobertura post-processing shape](project_koverage_cobertura_postprocessing_shape.md) — passing run = proce
