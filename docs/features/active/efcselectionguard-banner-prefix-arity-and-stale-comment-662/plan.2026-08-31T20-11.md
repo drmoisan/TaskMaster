@@ -20,6 +20,41 @@ Supporting (non-requirements) input: `docs/features/active/efcselectionguard-ban
 
 Every command in this plan runs from the worktree root supplied by the delegating orchestrator, referred to below as the repo root and deliberately not written out here because the artifact-hygiene rule in Fail-Closed Evidence Rules forbids an absolute host path in any file this plan commits and that rule must hold for this plan file itself, on branch `bug/efcselectionguard-banner-prefix-arity-and-stale-comment-662`. The diff anchor for AC5b and AC7 is the base commit `2b85134b42872e405602e6064e02dc9cda6c319b`.
 
+## Execution Amendment — corrected diff anchor (orchestrator, 2026-09-01)
+
+The pinned anchor `2b85134b42872e405602e6064e02dc9cda6c319b` is an ancestor of both this branch's
+HEAD and of `origin/main`, and `origin/main` has advanced well past it. Because the anchor is an
+ancestor, the two-dot `git diff <anchor> -- <paths>` form used by P2-T16, P2-T18 and P2-T23 reports
+every change `origin/main` accumulated since the anchor in addition to this branch's own work, so
+those three gates are unsatisfiable as written. This was measured, not predicted: run before any
+plan task and before any edit, P2-T23's listing returned 22 paths against an asserted union of 4.
+
+The anchor is therefore replaced, for those three tasks only, by the merge base of `origin/main`
+and HEAD, which after the execution-start reconciliation merge is
+`43dcc800e5c75ab1d1033f0eac0e4b61ac919b59`. The merge-base two-dot form is used rather than the
+three-dot `origin/main...HEAD` form because P2-T16 and P2-T18 depend on the diff reporting the
+worktree state whether or not the work has been committed, and a three-dot diff compares two
+commits and cannot see uncommitted changes. Resolve the anchor at run time with
+`git merge-base origin/main HEAD` rather than pasting the literal, so a later reconciliation merge
+does not re-stale it.
+
+With the corrected anchor, the same P2-T23 listing returned empty pre-edit, which is the expected
+pre-edit result and confirms the corrected gate discriminates.
+
+Amended tasks:
+
+- **P2-T16** — replace `git diff 2b85134b42872e405602e6064e02dc9cda6c319b --stat -- UtilitiesCS/OutlookObjects/Folder/BreadcrumbRowBuilder.cs` with the same command anchored at `git merge-base origin/main HEAD`.
+- **P2-T18** — replace `git diff 2b85134b42872e405602e6064e02dc9cda6c319b --stat -- QuickFiler.Test/Controllers/EfcFormControllerTests.cs` with the same command anchored at `git merge-base origin/main HEAD`.
+- **P2-T23** — replace the `git diff 2b85134b42872e405602e6064e02dc9cda6c319b --name-only ...` span with the same span anchored at `git merge-base origin/main HEAD`. The companion `git status --porcelain -uall` span is unchanged.
+
+P0-T2 still runs as written: the anchor does resolve, and recording that it resolves while the
+gates no longer use it is the evidence that the substitution was deliberate. P0-T2's artifact must
+additionally record this amendment and state that the resolved anchor is not the gate anchor.
+
+`origin/main` was merged into this branch at execution start, so `origin/main` is an ancestor of
+HEAD. Re-fetch and re-run `git merge-base origin/main HEAD` at every phase boundary rather than
+caching the value: a sibling item merging mid-run moves `origin/main` and nothing local signals it.
+
 ## Fail-Closed Evidence Rules
 
 **Fail-closed evidence rule:** Every Phase 0 baseline command step and every Phase 2 final-QC command step writes its own evidence artifact. If any required baseline artifact, final-QC artifact, or coverage-comparison artifact is missing or has an incomplete field set, the outcome is BLOCKED or INCOMPLETE, never PASS.
