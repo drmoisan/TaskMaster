@@ -101,6 +101,7 @@
 - [Subagent cites harness gitStatus of the wrong checkout](subagent-cites-harness-gitstatus-of-wrong-checkout.md) — an untracked-file claim may describe the session worktree, not yours; re-measure before it lands in a plan
 - [#457 coverage moved UP, and the kickoff figure was wrong](project_457_coverage_moved_up_not_down.md) — the denominator fix raised the
 - [atomic-planner has no MCP validator tool](atomic-planner-lacks-mcp-validator-tool.md) — it cannot run the mandatory plan gate; run it
+- [feature-folder-order hook is work-mode-blind](feature-folder-order-hook-is-workmode-blind.md) — it demands user-story.md before any `plan.md` write, blocking every full-bug item; name the plan `plan.<timestamp>.md`
 - [Preflight defect-trend scope confound](preflight-defect-trend-scope-confound.md) — a rising count isn't divergence if you widened scope
 - [C# agent worktree needs three bootstrap steps](csharp-agent-worktree-needs-three-bootstrap-steps.md) — no `.dotnet-sdk`, no `packages/
 - [potential_to_issue maps sections by heading name](potential-to-issue-keeps-only-summary-section.md) — template headings survive INTACT
@@ -112,6 +113,7 @@
 - [Multi-location fact residuals drive preflight rounds](multi-location-fact-residuals-drive-preflight-rounds.md) — nearly every blocking
 - [expect-fail tests break substring scoped-run gates](expect-fail-tests-break-substring-scoped-run-gates.md) — a "0 failed" gate under
 - [CR-pattern grep falsely reports 100% CRLF](grep-cr-empty-pattern-false-crlf.md) — the shell strips the CR, leaving an empty pattern
+- [check-ignore false negative on a directory glob](check-ignore-false-negative-on-directory-glob.md) — a not-yet-created dir + a glob with no literal name manufactured a blocking footprint finding
 
 - [PR readiness gate bars ANY recorded override](pr-readiness-gate-bars-any-recorded-override.md) — one authorized override blocks gh pr create; no drain procedure exists
 - [Resumed child orchestrator shares your worktree](resumed-child-orchestrator-shares-worktree.md) — a checkpoint mtime you did not author
