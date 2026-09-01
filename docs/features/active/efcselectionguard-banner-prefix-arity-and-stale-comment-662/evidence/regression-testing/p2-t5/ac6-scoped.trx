@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TestRun id="00ee5015-a835-4870-9099-03ebe57c8de2" name="<user>@<host> 2026-09-01 16:01:18" runUser="<host>\<user>" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="00ee5015-a835-4870-9099-03ebe57c8de2" name="&lt;user&gt;@&lt;host&gt; 2026-09-01 16:01:18" runUser="&lt;host&gt;\&lt;user&gt;" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-09-01T16:01:18.7630698-04:00" queuing="2026-09-01T16:01:18.7630698-04:00" start="2026-09-01T16:01:18.0403046-04:00" finish="2026-09-01T16:01:18.7780730-04:00" />
   <TestSettings name="default" id="9926d845-b867-40c0-a6b1-4b87f55be330">
-    <Deployment runDeploymentRoot="<user>_<host>_2026-09-01_16_01_18" />
+    <Deployment runDeploymentRoot="&lt;user&gt;_&lt;host&gt;_2026-09-01_16_01_18" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="8a632b6c-603f-4b43-9d85-a9269505d1e6" testId="1bcd4a0f-28b8-8211-b332-07e8fd6bfad3" testName="BannerRejectionPrefix_RejectsThreeAndFourEqualsRowsOnBothPredicates" computerName="<host>" duration="00:00:00.0302844" startTime="2026-09-01T16:01:18.5697228-04:00" endTime="2026-09-01T16:01:18.7098008-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8a632b6c-603f-4b43-9d85-a9269505d1e6">
+    <UnitTestResult executionId="8a632b6c-603f-4b43-9d85-a9269505d1e6" testId="1bcd4a0f-28b8-8211-b332-07e8fd6bfad3" testName="BannerRejectionPrefix_RejectsThreeAndFourEqualsRowsOnBothPredicates" computerName="&lt;host&gt;" duration="00:00:00.0302844" startTime="2026-09-01T16:01:18.5697228-04:00" endTime="2026-09-01T16:01:18.7098008-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8a632b6c-603f-4b43-9d85-a9269505d1e6">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -39,9 +39,9 @@ Debug Trace:&#xD;
     </UnitTestResult>
   </Results>
   <TestDefinitions>
-    <UnitTest name="BannerRejectionPrefix_RejectsThreeAndFourEqualsRowsOnBothPredicates" storage="<repo-root>\quickfiler.test\bin\debug\quickfiler.test.dll" id="1bcd4a0f-28b8-8211-b332-07e8fd6bfad3">
+    <UnitTest name="BannerRejectionPrefix_RejectsThreeAndFourEqualsRowsOnBothPredicates" storage="&lt;repo-root&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1bcd4a0f-28b8-8211-b332-07e8fd6bfad3">
       <Execution id="8a632b6c-603f-4b43-9d85-a9269505d1e6" />
-      <TestMethod codeBase="<repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.EfcSelectionGuardTests" name="BannerRejectionPrefix_RejectsThreeAndFourEqualsRowsOnBothPredicates" />
+      <TestMethod codeBase="&lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.EfcSelectionGuardTests" name="BannerRejectionPrefix_RejectsThreeAndFourEqualsRowsOnBothPredicates" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
@@ -54,7 +54,7 @@ Debug Trace:&#xD;
   <ResultSummary outcome="Completed">
     <Counters total="1" executed="1" passed="1" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
-      <StdOut>Test Parallelization enabled for <repo-root>\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+      <StdOut>Test Parallelization enabled for &lt;repo-root&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
 </StdOut>
     </Output>
   </ResultSummary>
