@@ -7,6 +7,7 @@
 - [Verify an issue is open in SUBSTANCE](verify-issue-still-open-in-substance.md) — grep the source for the issue number; the residual may already be its own issue
 - [orchestrator-state.json is TRACKED in git](orchestrator-state-json-is-tracked-in-git.md) — set skip-worktree BEFORE the first write or it pollutes the footprint
 - [Bootstrapping the first checkpoint write](bootstrapping-orchestrator-state-json-first-write.md) — Write tool can't create it; use `python3 -c`
+- [Checkpoint gate exact key names](checkpoint-gate-exact-key-requirements.md) — pre-impl gate wants top-level `lifecycle_ready`; PR preflight wants a 6-key receipt
 - [Flat keys + step-status enum](orchestrator-state-flat-keys-and-enum.md) · [validator divergence](orchestrator-state-validator-divergence.md) · [step_status "completed" write-locks](step-status-completed-write-locks-checkpoint.md)
 - [Completion-gate receipt shapes](completion-gate-receipt-shapes.md) · [delegation_receipts namespaces + owner race](checkpoint-receipt-namespaces-and-owner-race.md) — only {agents, promotion}
 - [blocked_reason enum can't express a substantive halt](blocked-reason-enum-cannot-express-substantive-halt.md) · [Removing a halt requires branch propagation](removing-a-halt-requires-branch-propagation.md)
