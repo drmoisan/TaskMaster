@@ -27,6 +27,9 @@
 - [#644 PA-7](project_644_pa7_redaction_plan_seams.md) — untracked audit artifact still enters main; name-status diff blind to it
 - [#648](project_648_ungated_static_swap_plan_seams.md) — lines-valid equality UNSATISFIABLE, use 5% tolerance; `git tag` not idempotent
 - [#656](project_656_closecompleted_guard_plan_seams.md) — no TestCaseFilter override in either wrapper; wrapper writes no TRX; class nodes lack lines-covered/lines-valid; TestResults\ must be created first
+- [#662](project_662_banner_prefix_arity_plan_seams.md) — `AC5` is a prefix of `AC5b`; `("===")` not a substring of `("====")`
+- [#662 R3](project_662_round3_trx_hygiene_and_verbatim_seams.md) — `*.trx` is NOT gitignored; sweep case-insensitively; exclude the plan file from the sweep's own zero-hit gate
+- [#662 R2](project_662_banner_prefix_revision_round_seams.md) — `'*.xml'` scope gate hits the plan's own cobertura evidence; loop-restart needs a baseline-relative failure test
 - [#680](project_680_menu_mode_plan_seams.md) — HostTests.cs 499 not 500; TRX 5-shape identifiers, `grep -a`; exact line arithmetic
 
 ## Plan-structure traps
