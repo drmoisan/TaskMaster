@@ -461,7 +461,7 @@ invocation.
    Use the repository wrappers, not a bare `vstest.console.exe`:
 
    ```
-   pwsh -NoProfile -File scripts/vscode/Invoke-MSTest.ps1 -SearchRoot QuickFiler.Test -Configuration Debug
+   pwsh -NoProfile -File scripts/vscode/Invoke-MSTest.ps1 -SearchRoot . -Configuration Debug
    ```
 
    ```
@@ -473,6 +473,36 @@ invocation.
    (scripts/vscode/Invoke-MSTest.ps1:54, scripts/vscode/Invoke-MSTestWithCoverage.ps1:76). A bare
    `vstest.console.exe` call silently drops the LiveOutlook exclusion and will attempt to run tests
    that require a live Outlook process.
+
+### Known tooling defect: the single-assembly search root is unusable
+
+Tracked as issue #713. The script paths in this subsection are written without backticks on purpose,
+per the path-notation convention above: this fix does not touch them, and backticking them would put
+the whole `scripts/vscode` surface into the computed blast radius.
+
+scripts/vscode/Invoke-MSTest.ps1 sets `Set-StrictMode -Version Latest` at line 77. Its discovery
+pipeline at lines 107-113 ends in `Select-Object -ExpandProperty FullName`, which yields a bare
+`System.String` rather than an array when exactly one assembly matches. Line 115 then evaluates
+`if (-not $testAssemblies -or $testAssemblies.Count -eq 0)`. The left operand is false for a
+non-empty string, so `-or` goes on to evaluate the right operand and reads `.Count` on a scalar.
+
+Verified directly under `pwsh -NoProfile`:
+
+```
+Set-StrictMode -Version Latest
+$x = "one-string"
+$x.GetType().Name   # String
+$x.Count            # PropertyNotFoundException: The property 'Count' cannot be found on this object.
+```
+
+Any `-SearchRoot` that matches exactly one `*.Test.dll` therefore throws before a single test runs,
+and `-SearchRoot QuickFiler.Test` is precisely such a root. `-SearchRoot .` matches nine assemblies,
+produces an array, and is unaffected. Line 120's `$($testAssemblies.Count)` would fail identically.
+scripts/vscode/Invoke-MSTestWithCoverage.ps1 carries the same shape.
+
+This defect is not in scope for issue #663 and must not be fixed here. It is recorded so that no plan
+task and no acceptance criterion depends on the single-assembly form, and it was promoted to issue
+#713 so the finding survives this feature's merge.
 
 ### Reference points to re-measure (prior observations, not current facts)
 
@@ -546,7 +576,7 @@ dot, which is the intended meaning. Only the alternation pipes are left unescape
 | AC-7 | `QfcFormViewer.ProcessCmdKey` delegates its claim decision to `ClaimsAltChord` and contains no independent Alt test. | `Select-String -Path QuickFiler/Viewers/QfcFormViewer.cs -Pattern 'ClaimsAltChord'` returns exactly one match, inside `ProcessCmdKey`; `Select-String -Path QuickFiler/Viewers/QfcFormViewer.cs -Pattern 'Keys\.Alt'` returns zero matches; `Select-String -Path QuickFiler/Viewers/QfcFormViewer.cs -Pattern 'IsAltKeyCommand'` returns zero matches. Command output recorded at `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/663-predicate-structure.md`. |
 | AC-8 | `QfcFormKeyHandler.IsAltKeyCommand` is unchanged, and the four existing tests `IsAltKeyCommand_WithAltKey_ReturnsTrue`, `IsAltKeyCommand_WithAltPlusOtherKey_ReturnsTrue`, `IsAltKeyCommand_WithControlKey_ReturnsFalse` and `IsAltKeyCommand_WithNone_ReturnsFalse` still pass unmodified. | All four named test methods pass in the Invoke-MSTest.ps1 run, and `git diff -U0 origin/main...HEAD -- QuickFiler/Controllers/QfcFormKeyHandler.cs QuickFiler.Test/Controllers/QfcFormKeyHandlerTests.cs` contains no removed line (`-` prefix) matching `IsAltKeyCommand`. |
 | AC-9 | No file is added to or removed from either QuickFiler/QuickFiler.csproj or QuickFiler.Test/QuickFiler.Test.csproj. | `git diff --name-only origin/main...HEAD` does not list QuickFiler/QuickFiler.csproj or QuickFiler.Test/QuickFiler.Test.csproj. |
-| AC-10 | The full C# toolchain passes in order: format, analyzers, nullable/type-check, tests. | `dotnet tool run csharpier check .` is read-only, so its exit code 0 is the gate. Both msbuild invocations exit 0, and each build log contains at least one occurrence of the literal `Task "Csc"`, which proves `CoreCompile` actually ran rather than being skipped by incrementality. Neither log reports any `error` line, and no `warning` line names any of the three changed files. `/p:Nullable=enable` is absent from the type-check command. The scoped `Invoke-MSTest.ps1 -SearchRoot QuickFiler.Test` run exits 0 with zero failures. The repository-wide `Invoke-MSTestWithCoverage.ps1` run's exit code is recorded but is NOT the gate: that script throws when the inner run reports any failure, and the repository carries pre-existing load-driven failures that appear only under the concurrent instrumented run. Its gate is instead that every failing test it reports is a member of the baseline failure set captured in Phase 0 under `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/baseline/`, with no failure outside that set. Console logs recorded under `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/`. |
+| AC-10 | The full C# toolchain passes in order: format, analyzers, nullable/type-check, tests. | `dotnet tool run csharpier check .` is read-only, so its exit code 0 is the gate. Both msbuild invocations exit 0, and each build log contains at least one occurrence of the literal `Task "Csc"`, which proves `CoreCompile` actually ran rather than being skipped by incrementality. Neither log reports any `error` line, and no `warning` line names any of the three changed files. `/p:Nullable=enable` is absent from the type-check command. Every wrapper invocation uses `-SearchRoot .`; the single-assembly form is unusable for the reason recorded under Known tooling defect below, so no acceptance depends on it. The repository-wide `Invoke-MSTestWithCoverage.ps1` run's exit code is recorded but is NOT the gate: that script throws when the inner run reports any failure, and the repository carries pre-existing load-driven failures that appear only under the concurrent instrumented run. Its gate is instead that every failing test it reports is a member of the baseline failure set captured in Phase 0 under `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/baseline/`, with no failure outside that set. Console logs recorded under `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/`. |
 | AC-11 | Coverage shows no regression on changed lines, and `ClaimsAltChord` meets the `>= 90%` new-method floor. | The Cobertura report produced by Invoke-MSTestWithCoverage.ps1 at `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/coverage.cobertura.xml` contains a `<method>` element named `ClaimsAltChord` under class `QuickFiler.Controllers.QfcFormKeyHandler` with `line-rate` of at least `0.90`, and the `QuickFiler.Controllers.QfcFormKeyHandler` class line-rate is not lower than the pre-change baseline recorded under the same evidence directory. |
 | AC-12 | No test constructs, shows, or derives from a `System.Windows.Forms.Form`, and the new tests use no temporary files, `Thread.Sleep`, or `Task.Delay`. | `QuickFiler.Test/NoLiveFormInTestAssemblyTests.ExecutingAssembly_ContainsNoFormDerivedType` passes, and `Select-String` over `QuickFiler.Test/Controllers/QfcFormKeyHandlerTests.cs` with pattern VC-1 from the Verification command reference returns zero matches. |
 | AC-13 | No new `[ExcludeFromCodeCoverage]` attribute is introduced anywhere in the change. | `git diff -U0 origin/main...HEAD` contains no added line (`+` prefix) matching `ExcludeFromCodeCoverage`. |
@@ -596,5 +626,7 @@ dot, which is the intended meaning. Only the alternation pipes are left unescape
   3. Adding the missing `Keys.Menu | Keys.Alt` positive case to the Email Filer suite at
      QuickFiler.Test/Controllers/EfcViewerTests.cs, which currently pins only the synthetic
      `Keys.Alt` shape.
+  4. Already opened as issue #713: the single-assembly search root throws under StrictMode in the
+     MSTest wrapper scripts. See Known tooling defect above.
 - **Links.** Issue #663. Precedent: issue #467 under feature #464. Research and evidence artifacts are
   listed under Repro & Evidence.

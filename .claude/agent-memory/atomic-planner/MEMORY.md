@@ -5,27 +5,28 @@
 - [#468](project_468_preflight_revision_seams.md) — seam before red test; `[expect-fail]` on run tasks only; epic-child merge-base
 - [#501 R1](untracked-file-and-linecount-gate-seams.md) — `git add -N` before grepping plan-created files; `(Get-Content).Count`, not `Measure-Object -Line`
 - [#501 R3](project_501_r3_preflight_seams.md) — repo-wide 0-skipped gates unsatisfiable; BASELINE_FAILURE_SET subset; `Task.CompletedTask` singleton
-- [#511 R1](project_511_r1_preflight_delta_seams.md) — mid-cycle evidence deletion; git-log scans post-commit; Start-Process for 20-min runs; absolute MSBuild path; per-class coverage noise -0.50pp
+- [#511 R1](project_511_r1_preflight_delta_seams.md) — mid-cycle evidence deletion; post-commit git-log scans; Start-Process for long runs; per-class coverage noise
 - [#484](project_484_qfc_revision_seams.md) — ownership change sweeps plan→issue.md→spec.md (spec is the AC source); old-cardinal grep sweep
-- [QfcItemController test-capacity squeeze](project_qfcitemcontroller_test_capacity_squeeze.md) — four owned test files hold only ~471 aggregate spare lines and `.csproj` edits are barred; budget in Phase 0, permit relocation, mandate DataRow/shared-arrange compaction
+- [QfcItemController test-capacity squeeze](project_qfcitemcontroller_test_capacity_squeeze.md) — ~471 aggregate spare lines across four owned test files, `.csproj` edits barred; budget in Phase 0
 - [#494](project_494_threshold_reconciliation_plan_seams.md) — coverage runner throws before post-processing; reported-floor must not become hook-Blocking
-- [#498](conditional-ladder-and-unowned-class-gates.md) — gate EVERY rung of a recorded-selector ladder incl. rung 1; scope failing-identifier clauses to owned test classes; 0/0 changed-line figure → NOT APPLICABLE
+- [#498](conditional-ladder-and-unowned-class-gates.md) — gate EVERY ladder rung incl. rung 1; scope failing-identifier clauses to owned test classes
 - [#503](project_503_ribbon_readiness_plan_seams.md) — RibbonViewer 487/500 forces a region move; 6+4 Compile entries; compile-time red + dossier
 - [#505](project_505_toggle_state_guards_plan_seams.md) — runtime red (no dossier); raw cobertura to gitignored `coverage/`; manual-verification kind accepted
 - [#512](project_512_toolchain_gate_fidelity_plan_seams.md) — same-line `/t:Build`+`Nullable=enable` grep; `-EnableNullable` no-op proved by EXIT 0
 - [#553](project_553_ci_parallel_split_plan_seams.md) — workflow-only scope, no C# toolchain; no jq; pathspec anchoring; ruleset PUT + gh pr create orchestrator-gated
-- [#614](project_614_store_root_leak_plan_seams.md) — AC25 net non-growth; behavior-preserving seam phase reconciles fail-before with a signature change; net48 `IsNullOrWhiteSpace` doesn't narrow (`archiveRoot!`)
-- [#464 R3/R4](project_464_efc_controller_plan_seams.md) — additive-only file grows, budget a ceiling not a shrink; non-comment literal counts; a phase-N count must survive phases 1..N-1 deletions
-- [#677 R1–R8](project_677_keyboard_focus_leak_plan_seams.md) — ctor param REJECTED (5 reflection-arity tests); typed harness for compile-red; internal 9-arg ctor, never ambient SetSynchronizationContext; per-file non-vacuity floors
-- [#635](project_635_reflective_caller_audit_plan_seams.md) — evidence-only audit: tracked plan inflates its own sweep; scan hits its own pattern list; spec said six sites, tree has eight; pathspec breadth inflates a count
-- [#440 R1–R4](project_440_breadcrumb_left_arrow_plan_seams.md) — deletion-only change voids a diff-derived changed-line gate; `(Rebuild target(s))`, NOT `(Rebuild target)`; `.csharpierignore` matches the `.cobertura.xml` suffix; `.dotnet-sdk` IS gitignored (`.gitignore:350`); cite an AC by sentence only after counting its sentences; `Include` resolves against the declaring project's dir
-- [#637 R6](project_637_r6_superseded_spec_claim_seams.md) — plan narrates spec edits it never performs; delta's stale-site list short by 3 (P1-T7 demanded a falsehood); wrapper throws on 2 conditions; Cobertura node-free lines; repo-wide format drift outside the staged pathspec
-- [#637 R2–R5](project_637_selectrow_rooted_path_plan_seams.md) — `docs/features/active` operand hits 121 sibling evidence files; the untracked-440 claim was FALSE for the agent worktree; blanket `-F` breaks every regex; pre-format range consumed post-format; probe with no branch for the outcome that occurs; set-difference file named by recency; R5 re-anchor on the merge commit, `#NNN` at column 0, CRLF round-trip check
-- [#469 R1–R3](project_469_comment_accuracy_plan_seams.md) — defect-number SWAP voids whole-file token gates; `- [x] AC1` is a prefix of `AC10`; unconditional base-merge task; Phase 0 insert renumbers artifact FILENAMES; pre-edit vs post-edit table cited wrong; evidence dir rule ≠ recorded path form
-- [#644](project_644_ac16_referral_revision_seams.md) — AC's named instrument prints no figure; substitute's noise (~0.028pp) exceeds the 0.01pp delta; check-off task → referral task pinning the UNCHECKED state
-- [#644 cycle 2](project_644_cycle2_sweep_gate_evasion_seams.md) — rewording out of a detector's match set is gate evasion; SHA-256 pair for untracked prior artifacts; bound the porcelain `??` scope
-- [#644 PA-7](project_644_pa7_redaction_plan_seams.md) — untracked audit artifact still enters main; name-status diff blind to it; mandated literal contradicted its own stated intent
-- [#680](project_680_menu_mode_plan_seams.md) — HostTests.cs 499 not 500; set-difference format gate; TRX 5-shape identifiers, `grep -a`; append-a-dated-literal discriminator; post-merge remediation: exact line arithmetic — the review's "optional" fallback was load-bearing (501 vs 500)
+- [#614](project_614_store_root_leak_plan_seams.md) — AC25 net non-growth; behavior-preserving seam reconciles fail-before with a signature change
+- [#464 R3/R4](project_464_efc_controller_plan_seams.md) — additive-only file grows, budget a ceiling not a shrink; a phase-N count must survive earlier deletions
+- [#677 R1–R8](project_677_keyboard_focus_leak_plan_seams.md) — ctor param REJECTED (5 reflection-arity tests); typed harness for compile-red; per-file non-vacuity floors
+- [#635](project_635_reflective_caller_audit_plan_seams.md) — evidence-only audit: tracked plan inflates its own sweep; scan hits its own pattern list; pathspec breadth inflates a count
+- [#440 R1–R4](project_440_breadcrumb_left_arrow_plan_seams.md) — deletion-only change voids a changed-line gate; `(Rebuild target(s))`; `.csharpierignore` matches the `.cobertura.xml` suffix
+- [#637 R6](project_637_r6_superseded_spec_claim_seams.md) — plan narrates spec edits it never performs; stale-site list short by 3; repo-wide format drift outside the staged pathspec
+- [#637 R2–R5](project_637_selectrow_rooted_path_plan_seams.md) — broad path operand hits 121 sibling files; blanket `-F` breaks every regex; probe with no branch for the outcome that occurs
+- [#469 R1–R3](project_469_comment_accuracy_plan_seams.md) — defect-number SWAP voids whole-file token gates; `- [x] AC1` is a prefix of `AC10`; Phase 0 insert renumbers artifact FILENAMES
+- [#644](project_644_ac16_referral_revision_seams.md) — AC's named instrument prints no figure; substitute's noise exceeds the delta; check-off → referral task pinning UNCHECKED
+- [#644 cycle 2](project_644_cycle2_sweep_gate_evasion_seams.md) — rewording out of a detector's match set is gate evasion; SHA-256 pair for untracked prior artifacts
+- [#644 PA-7](project_644_pa7_redaction_plan_seams.md) — untracked audit artifact still enters main; name-status diff blind to it
+- [#663](project_663_qfc_alt_chord_plan_seams.md) — defect-preserving seam turns a compile-red into a runtime red; no TRX, so derive named-test outcomes from total-count + failed-name list
+- [#680](project_680_menu_mode_plan_seams.md) — HostTests.cs 499 not 500; set-difference format gate; TRX 5-shape identifiers; exact line arithmetic on post-merge remediation
 
 ## Plan-structure traps
 
@@ -51,11 +52,11 @@
 - [Wiring gates must be wiring-sensitive](feedback_wiring_gates_must_be_wiring_sensitive.md) — count floors deflate with the defect they guard
 - [Research claims as acceptance clauses](research-claims-as-acceptance-clauses.md) — never encode an unmeasured third-party claim as a literal AC clause
 - [Literal-call clauses block file-size tightening](literal-call-clauses-block-file-size-tightening.md) — pinning a call in 2+ places near a 500-line file is unsatisfiable
-- [Enumeration variable must match its consumer](enumeration-variable-must-match-consumer.md) — `$kept` produced vs `@assemblies` splatted = zero-assembly vstest run reporting zero failures
-- [Diff gates need a commit task](diff-gates-need-a-commit-task.md) — `git diff <BASE>..HEAD` passes vacuously with no commit task
+- [Enumeration variable must match its consumer](enumeration-variable-must-match-consumer.md) — a produced-but-unsplatted list yields a zero-assembly run reporting zero failures
+- [Diff gates need a commit task](diff-gates-need-a-commit-task.md) — an anchored diff passes vacuously with no commit task
 - [Never pin a HEAD SHA as a plan expectation](never-pin-head-sha-as-plan-expectation.md) — gate on tree invariants instead
-- [Harness gitStatus may describe another worktree](harness-git-status-may-describe-another-worktree.md) — measure inside the target worktree (index grep + negative control) or mark the fact unverified
-- [Absolute counts in shared files go stale](absolute-counts-in-shared-files-go-stale.md) — lower-bound/baseline-relative for co-owned files; keep exact the count the task changes
+- [Harness gitStatus may describe another worktree](harness-git-status-may-describe-another-worktree.md) — measure inside the target worktree, or mark the fact unverified
+- [Absolute counts in shared files go stale](absolute-counts-in-shared-files-go-stale.md) — lower-bound for co-owned files; keep exact only the count the task changes
 - [.claude/agent-memory is tracked](agent-memory-is-tracked-scope-git-gates.md) — scope every diff/status/grep gate or it is unsatisfiable
 - [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — verify with `git ls-files`, not `obj/`
 - [Observation scope must match blast radius](observation-scope-must-match-blast-radius.md) — space (repo-wide formatter), time (sweep before later artifacts), spelling (doubled backslash, bare token)
@@ -63,8 +64,8 @@
 
 ## C# toolchain and test mechanics
 
-- [Phase 0 toolchain bootstrap](project_csharp_phase0_toolchain_bootstrap.md) — `dotnet tool run csharpier` works once the SDK is bootstrapped (global.json's missing .dotnet-sdk was the real blocker); mandatory NuGet restore
-- [Agent worktrees need SDK + NuGet + analyzer backfill](agent-worktrees-need-sdk-and-nuget-bootstrap.md) — four Phase 0 steps; CS0006 is an error, not a warning; skewed analyzer versions survive a clean restore
+- [Phase 0 toolchain bootstrap](project_csharp_phase0_toolchain_bootstrap.md) — csharpier works once the SDK is bootstrapped; NuGet restore is mandatory
+- [Agent worktrees need SDK + NuGet + analyzer backfill](agent-worktrees-need-sdk-and-nuget-bootstrap.md) — four Phase 0 steps; CS0006 is an error, not a warning
 - [vstest scoped-run + csharpier 1.2.6 commands](reference_vstest_scoped_run_command.md) — vswhere + `/InIsolation` + `/TestCaseFilter`; csharpier needs a subcommand
 - [CSharpier gate: format not pipe-files](csharpier-format-not-pipe-files-gate.md) — `pipe-files` is stdout-only and non-enforcing
 - [CSharpier "Formatted N files" is processed count](csharpier-formatted-n-is-processed-count.md) — a restart-on-rewrite loop keyed on it never terminates; define rewritten-count via before/after SHA-256
@@ -75,6 +76,7 @@
 - [`[expect-fail]` needs a synchronous seam](expect-fail-needs-a-synchronous-seam.md) — async-void boundaries false-GREEN; re-run RED analysis after scoping `Times.Never()`
 - [Invoke-MSTestWithCoverage.ps1](reference_invoke_mstest_with_coverage_script.md) — canonical full-suite Cobertura runner
 - [Invoke-MSTest.ps1 single-SearchRoot defect](reference_invoke_mstest_single_searchroot_defect.md) — always pass `-SearchRoot .`
+- [`Task "Csc"` needs detailed verbosity](msbuild-task-csc-literal-needs-detailed-verbosity.md) — never printed at default verbosity; use a detailed `/flp:` log or an output-assembly timestamp
 - [PoshQC MCP + msbuild facts](poshqc-mcp-and-msbuild-invocation-facts.md) — MCP returns no counts; pair unconditionally with direct runs
 - [pwsh -Command payload quoting](pwsh-command-payload-quoting.md) — outer single quotes, inner doubles
 - [Pester exits 0 on failing It blocks](pester-invoke-does-not-exit-nonzero.md) — scope every exit-code clause to a named channel
@@ -88,9 +90,9 @@
 ## Coverage
 
 - [Deletion-adjusted coverage no-regression gate](deletion-adjusted-coverage-no-regression-gate.md) — deleting covered lines makes `rate_post >= rate_base` unsatisfiable; gate on covered/valid counters
-- [#489 PartN reroute amendment seams](project_489_partn_reroute_amendment_seams.md) — verify parent `partial` before continuation-file tasks; spec amendment notes shift all AC line citations; re-grep rename-site lines after sibling growth
-- [Spec corrections sweep sibling sections](feedback_spec_corrections_sweep_sibling_sections.md) — falsified-premise fixes must cover Scope/Out-of-scope/Rollout, not AC only; denial text must dodge closing-keyword scans
-- [#493 UiThread dispatcher plan seams](project_493_uithread_dispatcher_plan_seams.md) — signature-change fail-before gets a REAL red build by staging the two `<Compile Include>` lines; coverage script IS the parallelized run
+- [#489 PartN reroute amendment seams](project_489_partn_reroute_amendment_seams.md) — verify parent `partial` first; amendment notes shift every AC line citation
+- [Spec corrections sweep sibling sections](feedback_spec_corrections_sweep_sibling_sections.md) — falsified-premise fixes must cover Scope/Out-of-scope/Rollout, not AC only
+- [#493 UiThread dispatcher plan seams](project_493_uithread_dispatcher_plan_seams.md) — a signature-change fail-before gets a real red build by staging the two `<Compile Include>` lines
 - [#442 QuickFiler metrics plan seams](project_442_quickfiler_metrics_plan_seams.md) — commented-out code defeats zero-hit grep gates; declare the seam BEFORE the red tests or they don't compile
 - [#468 QfcCollectionController plan seams](project_468_qfc_collection_controller_plan_seams.md) — ToggleUnGroupConv is not COM-free drivable; a sign-defect seam must land carrying the defect
 - [Threshold conflict: CLAUDE.md vs general-unit-test.md](project_coverage_threshold_conflict_claude_md_vs_general_unit_test.md) — 80/90 vs 85/75; repo-wide figure non-blocking, change-scoped gates blocking
