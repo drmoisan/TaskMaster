@@ -30,3 +30,16 @@ baseline check had exited 0 over 1554 files.
   [[count-idiom-pitfalls-csharpier-and-measureobject]].
 - Running `csharpier format` immediately after Writing each new file — before the final QA loop —
   avoids the restart entirely, but only if the plan does not gate on a pristine first pass.
+
+**It is not limited to NEW files (2026-09-01, #648).** Overwriting an EXISTING tracked CRLF `.cs` file
+with the Write tool also lands LF, so a single-file plan that edits one long-standing file still burns
+a mandatory loop iteration. #648's `[P2-T1]` executed twice for exactly this reason and recorded
+`LoopIterations: 2`. Any plan with a Phase 2 loop ceiling must budget the restart even when it creates
+no new file.
+
+**A SHA-256 pair DOES discriminate where porcelain does not.** The bullet above is right that
+`git status --porcelain` is byte-identical across a repairing format run. #648's `[P2-T1]` recorded
+`SHA256Before`/`SHA256After` instead and the pair separated the two executions cleanly: unequal on the
+repairing run (`3fa83d3e…` → `c7f4ae79…`), equal on the clean one (`c7f4ae79…` both sides). Prefer a
+content hash over a porcelain pair whenever a plan needs a write-mode formatter observation and cannot
+use a pre-format `check` exit code.

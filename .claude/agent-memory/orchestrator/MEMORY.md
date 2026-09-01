@@ -76,6 +76,10 @@
 - [Verify an issue is open in SUBSTANCE](verify-issue-still-open-in-substance.md) — grep the source for the issue number before preparing; the residual may already be its own issue
 - [Reconcile plan numbers against your own measurements](reconcile-plan-numbers-against-your-own-measurements.md) — a stale line count passes a citation-only review and halts Phase 0
 - [Preflight catches vacuous gates](preflight-catches-vacuous-gates.md) — MCP `ok:true` is not enough; executor preflight found 6 gates
+- [Spec backticks widen the blast radius](spec-backticks-widen-blast-radius.md) — Get-BlastRadius harvests spec.md inline-code paths too; a backticked comparison path can force a false cohort conflict
+- [Select-String pattern quoting in plans](select-string-pattern-quoting-in-plans.md) — `\|` is a LITERAL pipe (vacuous gate); `\\` and `\"` die reaching pwsh — use `\x5C` and `\x22`
+- [A successful msbuild prints "error" 35 times](msbuild-success-output-contains-error.md) — `/errorreport:prompt` plus the `0 Error(s)` summary; match `: error [A-Z]+[0-9]+:` instead
+- [Apply EVERY part of a multi-part delta](apply-every-part-of-a-multipart-delta.md) — task edit plus sibling plus reading-guide prose plus the spec's copy; partial application cost a whole round
 - [Preflight: sweep task ordering + citation arity](preflight-sweep-task-ordering-and-citation-arity.md) — name both sweeps early; a
 - [Revert plans must check test provenance](revert-plans-must-check-test-provenance.md) — verify each test against the pre-change sha; a
 - [Bash tool collapses `\` before sed sees it](bash-tool-collapses-double-backslash-in-sed.md) — a `\` pattern is a silent no-op exiting 0
@@ -109,6 +113,8 @@
 - [Multi-location fact residuals drive preflight rounds](multi-location-fact-residuals-drive-preflight-rounds.md) — nearly every blocking
 - [expect-fail tests break substring scoped-run gates](expect-fail-tests-break-substring-scoped-run-gates.md) — a "0 failed" gate under
 - [CR-pattern grep falsely reports 100% CRLF](grep-cr-empty-pattern-false-crlf.md) — the shell strips the CR, leaving an empty pattern
+- [.gitignore does NOT cover *.trx](gitignore-does-not-cover-trx.md) — a committed TRX leaks account, machine and worktree root; sweep before any git add of vstest evidence
+- [Preflight converges on verbatim delta text](preflight-converges-on-verbatim-delta-text.md) — round overrun comes from the planner paraphrasing delta items, not from the review
 - [check-ignore false negative on a directory glob](check-ignore-false-negative-on-directory-glob.md) — a not-yet-created dir + a glob with no literal name manufactured a blocking footprint finding
 
 - [PR readiness gate bars ANY recorded override](pr-readiness-gate-bars-any-recorded-override.md) — one authorized override blocks gh pr create; no drain procedure exists
@@ -116,6 +122,8 @@
 - [Shared checkpoint: never read-modify-write](shared-checkpoint-read-modify-write-corrupts.md) - a sibling swaps the session-root file
 - [External actor can merge your child PR mid-run](external-actor-can-merge-your-child-pr-midrun.md) — re-read PR state before the CI gate
 - [Stale base anchor passes ancestry vacuously](stale-base-anchor-passes-ancestry-vacuously.md) — on a prep resume the pinned base stays an ancestor, so the check passes while diffs bill another issue's work to your plan
+- [A subagent's self-reported correction can be FALSE](subagent-self-reported-correction-can-be-false.md) — it replaced a true sentence with a false one and framed it as diligence; re-derive any correction that flips a fact you measured
+- [Preflight can legitimately exceed the 2-round target](preflight-rounds-exceed-target-legitimately.md) — monotonic convergence over an oversized bootstrap surface, not single-defect reporting
 - [orchestrator-state.json is TRACKED in git](orchestrator-state-json-is-tracked-in-git.md) — .gitignore does not apply; writing your checkpoint pollutes the footprint. Fix with skip-worktree
 - [Preflight sibling-invalidation cascade](preflight-sibling-invalidation-cascade.md) — a delta that changes a count or taxonomy falsifies sibling tasks; bundle the sibling fix, and a planner's flagged-but-declined residual is a probable defect
 

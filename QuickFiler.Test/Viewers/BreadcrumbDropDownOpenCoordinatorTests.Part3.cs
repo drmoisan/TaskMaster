@@ -169,5 +169,45 @@ namespace QuickFiler.Test.Viewers
             opening.Result.Should().BeFalse();
             harness.Host.Requests.Should().BeEmpty();
         }
+
+        /// <summary>
+        /// Issue #656: after a close that returned true, with the host open again by a path that
+        /// reaches neither RequestOpen nor Invalidate, a further close must reach the host rather
+        /// than being suppressed by the completed-close flag. Deterministic: one thread, explicit
+        /// drain, no timers, no sleeps, no second thread, no temp files.
+        /// </summary>
+        [TestMethod]
+        public void CloseCore_AfterSuccessfulCloseAndHostReopen_ReachesHostCloseAgain()
+        {
+            // Arrange: open the drop-down, then drive a close that the host accepts.
+            var harness = new CoordinatorHarness();
+            harness.Host.Enqueue(Task.FromResult(true));
+            Task<bool> opening = harness.Coordinator.RequestOpen();
+            harness.Context.DrainUntil(opening);
+            opening.Result.Should().BeTrue();
+
+            harness.Coordinator.SetDroppedDown(false);
+            harness.Context.DrainAll();
+            harness.Host.CloseReasons.Should().Equal(BreadcrumbDropDownCloseReason.Uncommitted);
+            harness.Host.IsOpen.Should().BeFalse("the host accepted the close");
+
+            // Act: the host becomes open again by a path that bypasses RequestOpen and Invalidate.
+            harness.Host.SetOpen(true);
+            harness.SelectorOpen = true;
+            harness.Coordinator.SetDroppedDown(false);
+            harness.Context.DrainAll();
+
+            // Assert
+            harness
+                .Host.CloseReasons.Should()
+                .Equal(
+                    new[]
+                    {
+                        BreadcrumbDropDownCloseReason.Uncommitted,
+                        BreadcrumbDropDownCloseReason.Uncommitted,
+                    },
+                    "the close after a bypassing reopen must reach _host.Close a second time"
+                );
+        }
     }
 }

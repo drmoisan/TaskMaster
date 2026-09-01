@@ -55,10 +55,7 @@ namespace QuickFiler
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            if (
-                (_keyboardHandler is not null)
-                && Controllers.QfcFormKeyHandler.IsAltKeyCommand(keyData)
-            )
+            if (Controllers.QfcFormKeyHandler.ClaimsAltChord(_keyboardHandler, keyData))
             {
                 SynchronizationContext.SetSynchronizationContext(UiSyncContext);
                 object sender = FromHandle(msg.HWnd);
