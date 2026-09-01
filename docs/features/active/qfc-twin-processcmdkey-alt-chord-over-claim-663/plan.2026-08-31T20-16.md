@@ -10,7 +10,10 @@
   AC-15. No `user-story.md` exists for this feature and none is required.
 
 **Fail-closed evidence rule:** every command-bearing task below emits an evidence artifact carrying
-`Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. If any required baseline artifact, QA
+`Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`, with the single exception of the
+acceptance check-off tasks `[P6-T2]` through `[P6-T16]`, whose product is the flipped checkbox in
+`spec.md` and whose verification search is recorded in the task's progress output rather than in a
+separate artifact. If any required baseline artifact, QA
 artifact, or coverage artifact is missing or incomplete, the outcome is BLOCKED or INCOMPLETE, never
 PASS, and the corresponding plan checkbox stays unchecked.
 
@@ -86,6 +89,13 @@ instruction rather than an unfalsifiable assertion:
 | `ClaimsAltChord_WithAltLeft_ReturnsFalse` | `Keys.Alt` OR-ed with `Keys.Left` | `false` |
 | `ClaimsAltChord_WithoutAltFlag_ReturnsFalse` | `Keys.M` | `false` |
 | `ClaimsAltChord_WithNullHandler_ReturnsFalse` | `null`, `Keys.Alt` | `false` |
+
+`ClaimsAltChord_WithoutAltFlag_ReturnsFalse` must assert two inputs in a single Arrange-Act-Assert
+body, `Keys.M` first and `Keys.Control` second, each with its own because-string. The spec's behavior
+table carries eight rows and the seven method names cover seven of them; the `Keys.Control` row, which
+the spec's Edge cases subsection names explicitly, exercises the same predicate arm as the `Keys.M`
+row, so the second assertion closes AC-1's "every row" claim without changing the eleven-`[TestMethod]`
+count that `[P2-T1]` pins or the seven-name enumeration the plan uses elsewhere.
 
 The because-string of `ClaimsAltChord_WithAltM_ReturnsFalse` must name `Move Options`. It must not
 name a Filters menu: `ButtonFilters.Text` on the QuickFiler surface is the plain string `"Filters"`
@@ -163,6 +173,12 @@ verbosity, so each gate above attaches a detailed file logger writing to the rep
 artifact is committed. A run whose log contains zero occurrences of that literal has skipped
 compilation and fails the gate regardless of its exit code.
 
+The `LogFile=` segment is the only part of the quoted commands a task may vary. `[P0-T9]` substitutes
+`coverage\663-analyzers-baseline.msbuild.log`, `[P1-T3]` substitutes
+`coverage\663-analyzers-seam.msbuild.log`, `[P0-T10]` substitutes
+`coverage\663-nullable-baseline.msbuild.log`, and `[P4-T3]` and `[P4-T4]` use the quoted names
+unchanged. Every other character of the quoted commands is fixed.
+
 **Formatting.** The mutating CSharpier pass is scoped to the three changed paths, one invocation per
 path, so a repository-wide rewrite cannot widen the change set and break AC-14. The read-only
 repository-wide `dotnet tool run csharpier check .` is then the gate, matching
@@ -189,9 +205,13 @@ be promoted to its own issue.
 **Reading a named test's outcome.** `vstest.console.exe` prints the names of failing tests but not the
 names of passing ones, so "test X passed" is derived, once, as follows and this derivation is reused
 by every acceptance below that names a test: X is declared as a `[TestMethod]` in a compiled test file,
-X does not appear in the run's failed-test name list, and the run's `Total tests:` figure equals the
+no entry in the run's failed-test list carries both the name X and the declaring type
+`QuickFiler.Controllers.Tests.QfcFormKeyHandlerTests`, and the run's `Total tests:` figure equals the
 Phase 0 baseline total plus seven. Under those three observations every named method both ran and
-passed.
+passed. The declaring type is part of the derivation rather than the bare name because
+`QuickFiler.Test` already declares `ClaimsAltChord_WithAltM_ReturnsFalse` and
+`ClaimsAltChord_WithNullHandler_ReturnsFalse` in QuickFiler.Test/Controllers/EfcViewerTests.cs, so two
+of the seven new method names are not unique within the assembly.
 
 **Gating rule for the repository-wide runs.** `Invoke-MSTestWithCoverage.ps1` throws at line 236 when
 the inner run reports a non-zero exit, and `Invoke-MSTest.ps1` throws at line 130 for the same reason.
@@ -253,7 +273,10 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       `BeforeTargets="PrepareForBuild"`, so no build can run before this completes. Acceptance: exit
       code 0 and the file
       `packages\Meziantou.Analyzer.3.0.194\analyzers\dotnet\roslyn5.0\cs\Meziantou.Analyzer.dll`
-      exists on disk. Record in
+      exists on disk. If that file is absent after an exit-0 restore, run `nuget restore TaskMaster.sln`
+      and re-check; feature #469 recorded that shape on 2026-08-31, where the MSBuild restore reported
+      success and the analyzer rebuild then failed on missing packages until a `nuget restore` was
+      run. Record both invocations and both exit codes. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/baseline/nuget-restore.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
 - [ ] [P0-T5] Re-derive analyzer version concordance with two independently formulated searches and
@@ -292,8 +315,15 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       Toolchain command forms section above, writing its detailed log to
       `coverage\663-analyzers-baseline.msbuild.log`. Acceptance: the exit code is recorded; the log
       contains at least one occurrence of the literal `Task "Csc"`, whose occurrence count is
-      recorded; and the artifact records, verbatim, every console line containing `warning` that names
-      `QfcFormKeyHandler.cs`, `QfcFormViewer.cs` or `QfcFormKeyHandlerTests.cs`, as BASELINE_WARNINGS
+      recorded. This is the first task in the plan to assert that literal, and no detailed-verbosity
+      MSBuild log exists in this repository's recorded evidence, so the literal is reasoned rather
+      than measured. If the count is zero, this task fails: record the log's
+      `Logging verbosity is set to:` header line and the verbatim task-started line the log emits for
+      the compiler task, then substitute that literal into `[P0-T10]`, `[P1-T3]`, `[P4-T3]` and
+      `[P4-T4]` as a micro-action before continuing. The artifact also records, verbatim, every
+      console line matching `: warning [A-Z]+[0-9]+:` that names
+      `QfcFormKeyHandler.cs`, `QfcFormViewer.cs` or `QfcFormKeyHandlerTests.cs`, as BASELINE_WARNINGS,
+      together with the `(source file name, diagnostic identifier)` pair derived from each such line
       (the expected value is an empty list). Delete the detailed log after recording its byte size.
       Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/baseline/msbuild-analyzers.md`
@@ -336,8 +366,11 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       attributes as numeric values; the `line-rate` attribute of the `class` element whose `filename`
       attribute ends with `QfcFormKeyHandler.cs`, recorded as BASELINE_CLASS_LINE_RATE together with
       that element's `name` attribute verbatim; and the observation that the document contains no
-      `method` element named `ClaimsAltChord`. The exit code is recorded but is not the gate, for the
-      reason stated in the reading guide. Both coverage documents stay under the gitignored `coverage`
+      `method` element named `ClaimsAltChord`; and the verbatim list of every failing test name this
+      instrumented run reports, recorded as BASELINE_COVERAGE_FAILURE_SET. That set is captured
+      separately from the `[P0-T12]` BASELINE_FAILURE_SET because instrumentation adds load-driven
+      failures, so the two sets are not interchangeable. The exit code is recorded but is not the
+      gate, for the reason stated in the reading guide. Both coverage documents stay under the gitignored `coverage`
       directory and are not committed. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/baseline/coverage.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`, and render any absolute
@@ -391,8 +424,11 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       `coverage\663-analyzers-seam.msbuild.log`. This gate exists because routing the viewer through
       the new predicate removes the last compiled consumer of `IsAltKeyCommand`, which could trip an
       unused-member diagnostic. Acceptance: exit code 0; the log contains at least one occurrence of
-      the literal `Task "Csc"`; and the set of console `warning` lines naming `QfcFormKeyHandler.cs`,
-      `QfcFormViewer.cs` or `QfcFormKeyHandlerTests.cs` is equal to BASELINE_WARNINGS from `[P0-T9]`.
+      the literal `Task "Csc"`; and the set of `(source file name, diagnostic identifier)` pairs taken
+      from console lines matching `: warning [A-Z]+[0-9]+:` that name `QfcFormKeyHandler.cs`,
+      `QfcFormViewer.cs` or `QfcFormKeyHandlerTests.cs` is equal to the same set derived from
+      BASELINE_WARNINGS in `[P0-T9]`. The comparison is on pairs rather than on whole lines because
+      `[P1-T2]` shifts the line and column numbers a verbatim warning line carries.
       If a new diagnostic appears, fix the root diagnostic; deleting `IsAltKeyCommand` is prohibited
       because AC-8 requires it to survive unchanged. Delete the detailed log after recording its byte
       size. Record in
@@ -433,7 +469,13 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       baseline total plus seven. Record the artifact at
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/regression-testing/red-run.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:`, `ExpectedExitCode: 1` and `Output Summary:`,
-      including the verbatim failing-test list. Serves AC-3 and AC-4.
+      including the verbatim failing-test list, with each failing name recorded alongside the
+      declaring type read from its stack trace. The declaring type is required because
+      `QuickFiler.Test` already declares `ClaimsAltChord_WithAltM_ReturnsFalse` at
+      QuickFiler.Test/Controllers/EfcViewerTests.cs:134 and
+      `ClaimsAltChord_WithNullHandler_ReturnsFalse` at
+      QuickFiler.Test/Controllers/EfcViewerTests.cs:156, so two of the seven new method names are not
+      unique within the assembly. Serves AC-3 and AC-4.
 
 ### Phase 3 — Minimal fix and green run
 
@@ -480,11 +522,14 @@ fails or rewrites a tracked file, restart this phase from `[P4-T1]`.
       `dotnet tool run csharpier format QuickFiler.Test/Controllers/QfcFormKeyHandlerTests.cs`. The
       pass is scoped rather than repository-wide so a rewrite of an unrelated file cannot widen the
       change set that AC-14 pins. Because a formatter rewrites tracked source and still exits 0 after
-      rewriting, the exit code alone cannot distinguish a clean run from a repairing one; the required
-      observation is therefore a `git status --porcelain -- '*.cs'` span captured immediately before
-      the three invocations and a second one captured immediately after, both recorded verbatim, plus
-      each invocation's own summary line. Acceptance: all three invocations exit 0 and both porcelain
-      spans are recorded. Record in
+      rewriting, the exit code alone cannot distinguish a clean run from a repairing one. A
+      `git status --porcelain` span cannot distinguish them either at this point in the plan: the
+      three files are already modified relative to `HEAD` and remain so whether or not CSharpier
+      rewrites them, because `[P5-T1]` is the first task that commits them. The required observation
+      is therefore the SHA-256 of each of the three files captured immediately before the three
+      invocations and again immediately after. Acceptance: all three invocations exit 0, all six
+      hashes are recorded verbatim, and the artifact states for each file whether its hash changed.
+      Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/csharpier-format.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
 - [ ] [P4-T2] Verify formatting repository-wide and read-only with `dotnet tool run csharpier check .`.
@@ -493,18 +538,26 @@ fails or rewrites a tracked file, restart this phase from `[P4-T1]`.
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/csharpier-check.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
 - [ ] [P4-T3] Run the analyzer gate command quoted in the Toolchain command forms section, writing its
-      detailed log to `coverage\663-analyzers.msbuild.log`. Acceptance: exit code 0; no console line
-      containing `error`; the log contains at least one occurrence of the literal `Task "Csc"` and the
-      count is recorded; and no console line containing `warning` names
-      `QfcFormKeyHandler.cs`, `QfcFormViewer.cs` or `QfcFormKeyHandlerTests.cs`. Delete the detailed
+      detailed log to `coverage\663-analyzers.msbuild.log`. Acceptance: exit code 0; the console
+      output carries a summary line matching `^\s*0 Error\(s\)$` and no line matching the MSBuild
+      diagnostic form `: error [A-Z]+[0-9]+:`; the log contains at least one occurrence of the literal
+      `Task "Csc"` and the count is recorded; and no console line matching
+      `: warning [A-Z]+[0-9]+:` names
+      `QfcFormKeyHandler.cs`, `QfcFormViewer.cs` or `QfcFormKeyHandlerTests.cs`. A bare search for the
+      word `error` is not used because a successful MSBuild run prints the `/errorreport:prompt` token
+      on every Csc command line and prints the `0 Error(s)` summary, so that search matches on a clean
+      run and the gate could never pass. Delete the detailed
       log after recording its byte size. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/msbuild-analyzers.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
 - [ ] [P4-T4] Run the type-check gate command quoted in the Toolchain command forms section, writing
-      its detailed log to `coverage\663-nullable.msbuild.log`. Acceptance: exit code 0; no console line
-      containing `error`; the recorded `Command:` value contains no occurrence of `Nullable=enable`;
+      its detailed log to `coverage\663-nullable.msbuild.log`. Acceptance: exit code 0; the console
+      output carries a summary line matching `^\s*0 Error\(s\)$` and no line matching the MSBuild
+      diagnostic form `: error [A-Z]+[0-9]+:`, for the reason given in `[P4-T3]`; the recorded
+      `Command:` value contains no occurrence of `Nullable=enable`;
       the log contains at least one occurrence of the literal `Task "Csc"` and the count is recorded;
-      and no console line containing `warning` names any of the three changed files. Delete the
+      and no console line matching `: warning [A-Z]+[0-9]+:` names any of the three changed files.
+      Delete the
       detailed log after recording its byte size. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/msbuild-nullable.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
@@ -519,8 +572,10 @@ fails or rewrites a tracked file, restart this phase from `[P4-T1]`.
       `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/coverage.cobertura.xml`,
       which is the output path AC-11 names. Acceptance: the Cobertura document exists at that path and
       its byte size is recorded; the run's failing-test list is recorded verbatim and contains no name
-      outside BASELINE_FAILURE_SET; and the exit code is recorded but is not the gate, for the reason
-      stated in the reading guide. Record in
+      outside BASELINE_COVERAGE_FAILURE_SET from `[P0-T13]`; and the exit code is recorded but is not
+      the gate, for the reason stated in the reading guide. The comparison uses the instrumented
+      baseline rather than the `[P0-T12]` uninstrumented one because instrumentation adds load-driven
+      failures, so the two sets are not interchangeable. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/coverage-run.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-11.
 - [ ] [P4-T7] Post-process the coverage document in place and extract the required figures, by running
@@ -588,7 +643,11 @@ an untracked file while porcelain status goes empty once the change is committed
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/no-live-form.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-12.
 - [ ] [P5-T6] Verify that no coverage exemption was introduced. Run
-      `git diff -U0 origin/main...HEAD` and, in the same task, `git status --porcelain`. Acceptance:
+      `git diff -U0 origin/main...HEAD -- '*.cs'` and, in the same task, `git status --porcelain`.
+      The diff is scoped to `.cs` paths because the documentation commits already on this branch add
+      twenty lines that quote the attribute name in prose, so an unscoped diff reports twenty `+`
+      matches before any source edit is made; scoping preserves the gate's discrimination because
+      AC-13 is about the change set's C# content. Acceptance:
       no line of the diff that begins with a single `+` character contains `ExcludeFromCodeCoverage`,
       and the porcelain output reports no path ending in `.cs`. The porcelain span is scoped to `.cs`
       paths rather than required to be empty, because evidence artifacts written by Phases 0 through 4
@@ -707,7 +766,15 @@ searching for `- [x] AC-1` alone would also match the AC-10 through AC-15 lines,
 - [ ] [P6-T19] Confirm the end state after the documentation commits. Run
       `git diff --name-only origin/main...HEAD -- '*.cs'` and, in the same task,
       `git status --porcelain`. Acceptance: the diff still lists exactly the same three `.cs` paths
-      recorded by `[P5-T7]` and no other, and the porcelain output prints nothing. Record in
+      recorded by `[P5-T7]` and no other, and the porcelain output lists at most
+      `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/plan.2026-08-31T20-16.md`
+      and
+      `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/end-state.md`,
+      with no `.cs` path among them. Those two residues are structural: this task writes
+      `end-state.md`, and the plan file carries the `[P6-T18]` check-off that could only be made after
+      `[P6-T18]` committed. After recording the artifact, fold both into the `[P6-T18]` commit with
+      `git commit --amend --no-edit`, then run `git status --porcelain` once more and record that it
+      prints nothing. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/qa-gates/end-state.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-14.
 
