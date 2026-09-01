@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FluentAssertions;
@@ -15,7 +14,6 @@ using QuickFiler.Test.TestSupport;
 using TaskVisualization;
 using UtilitiesCS;
 using UtilitiesCS.EmailIntelligence.EmailParsingSorting;
-using UtilitiesCS.Threading;
 
 namespace QuickFiler.Controllers.Tests
 {
@@ -191,10 +189,12 @@ namespace QuickFiler.Controllers.Tests
         public async Task MoveMailAsync_WhenOneDrivePresent_InvokesFactoryWithConfigAndEnqueues()
         {
             EmailFilerConfig captured = null;
+            EmailFiler producedFiler = null;
             Func<EmailFilerConfig, EmailFiler> factory = c =>
             {
                 captured = c;
-                return new EmailFiler(c);
+                producedFiler = new EmailFiler(c);
+                return producedFiler;
             };
             var oneDrive = @"C:\OneDrive";
             var globals = new Mock<IApplicationGlobals>();
@@ -207,15 +207,26 @@ namespace QuickFiler.Controllers.Tests
             ol.SetupGet(o => o.ArchiveRootPath).Returns("archive-root");
             globals.SetupGet(g => g.Ol).Returns(ol.Object);
 
-            // A real FilerQueue whose single-shot guard is pre-tripped so Enqueue records the item
-            // without spinning up the background consumer (deterministic, no external I/O).
+            // A real FilerQueue whose ItemProcessor seam is assigned to a gated delegate, so the worker
+            // hands the item to the test and parks there (deterministic, no external I/O).
             var filerQueue = new FilerQueue();
-            var guard = typeof(FilerQueue)
-                .GetField("guard", BindingFlags.NonPublic | BindingFlags.Instance)
-                .GetValue(filerQueue);
-            typeof(ThreadSafeSingleShotGuard)
-                .GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance)
-                .SetValue(guard, 1);
+            var receivedItems = new List<FilerQueueItem>();
+            var receivedItemsLock = new object();
+            var receivedFirst = new TaskCompletionSource<FilerQueueItem>(
+                TaskCreationOptions.RunContinuationsAsynchronously
+            );
+            var gate = new TaskCompletionSource<bool>(
+                TaskCreationOptions.RunContinuationsAsynchronously
+            );
+            filerQueue.ItemProcessor = item =>
+            {
+                lock (receivedItemsLock)
+                {
+                    receivedItems.Add(item);
+                }
+                receivedFirst.TrySetResult(item);
+                return gate.Task;
+            };
             var home = new Mock<IFilerHomeController>();
             home.SetupGet(h => h.FilerQueue).Returns(filerQueue);
 
@@ -225,13 +236,36 @@ namespace QuickFiler.Controllers.Tests
             QfcItemControllerTestSupport.SetField(controller, "_homeController", home.Object);
             QfcItemControllerTestSupport.SetField(controller, "_emailFilerFactory", factory);
 
-            await controller.MoveMailAsync();
+            try
+            {
+                await controller.MoveMailAsync();
 
-            captured.Should().NotBeNull();
-            captured.Globals.Should().BeSameAs(globals.Object);
-            captured.OlAncestor.Should().Be("archive-root");
-            captured.FsAncestorEquivalent.Should().Be(oneDrive);
-            filerQueue.Queue.Count.Should().Be(1);
+                // Completed by the queue worker itself, so awaiting it needs no timing assumption.
+                FilerQueueItem received = await receivedFirst.Task;
+
+                captured.Should().NotBeNull();
+                captured.Globals.Should().BeSameAs(globals.Object);
+                captured.OlAncestor.Should().Be("archive-root");
+                captured.FsAncestorEquivalent.Should().Be(oneDrive);
+
+                lock (receivedItemsLock)
+                {
+                    receivedItems
+                        .Should()
+                        .ContainSingle("MoveMailAsync enqueues exactly one item for this mail");
+                }
+
+                received
+                    .Filer.Should()
+                    .BeSameAs(
+                        producedFiler,
+                        "the queued item must carry the EmailFiler the factory produced"
+                    );
+            }
+            finally
+            {
+                gate.TrySetResult(true);
+            }
         }
 
         // ------------------------- WireIntentEvents split (P6-T10) -------------------------

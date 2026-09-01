@@ -111,6 +111,7 @@
 - [Async state machine emits no `<method>` element](project_async_state_machine_emits_no_method_element.md) — per-method union is empty; `.//line` double-counts
 - [First-party coverage denominator (#197)](project_coverage_firstparty_denominator_method.md) — count per-`<line>`
 - [dotnet-coverage denominator nondeterminism](project_dotnet_coverage_denominator_nondeterminism.md) — 47% vs 81% from 
+- [Failed coverage run leaves RAW Cobertura](project_failed_coverage_run_leaves_raw_unprocessed_cobertura.md) — throw precedes post-processing; 0.70 raw vs 0.85 processed
 - [Koverage Cobertura post-processing shape](project_koverage_cobertura_postprocessing_shape.md) — passing run = proce
 - [C# canonical coverage artifact conversion](project_csharp_canonical_coverage_artifact_conversion.md) — hook reads JaCoC
 - [Cobertura runsettings `<Attributes>` override](project_cobertura_runsettings_attributes_override.md) — silently disable

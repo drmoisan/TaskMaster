@@ -118,6 +118,8 @@
 - [Shared checkpoint: never read-modify-write](shared-checkpoint-read-modify-write-corrupts.md) - a sibling swaps the session-root file
 - [External actor can merge your child PR mid-run](external-actor-can-merge-your-child-pr-midrun.md) — re-read PR state before the CI gate
 - [Stale base anchor passes ancestry vacuously](stale-base-anchor-passes-ancestry-vacuously.md) — on a prep resume the pinned base stays an ancestor, so the check passes while diffs bill another issue's work to your plan
+- [A subagent's self-reported correction can be FALSE](subagent-self-reported-correction-can-be-false.md) — it replaced a true sentence with a false one and framed it as diligence; re-derive any correction that flips a fact you measured
+- [Preflight can legitimately exceed the 2-round target](preflight-rounds-exceed-target-legitimately.md) — monotonic convergence over an oversized bootstrap surface, not single-defect reporting
 - [orchestrator-state.json is TRACKED in git](orchestrator-state-json-is-tracked-in-git.md) — .gitignore does not apply; writing your checkpoint pollutes the footprint. Fix with skip-worktree
 
 ## Artifact hygiene

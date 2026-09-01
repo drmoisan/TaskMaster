@@ -43,6 +43,13 @@ namespace QuickFiler.Viewers
         /// legitimate reopen through while still suppressing the repeated close: the single close flag
         /// these two replace was doing both jobs at once and could not distinguish them.
         /// </summary>
+        /// <remarks>
+        /// Issue #656: the flag alone is not sufficient, because it is cleared only on the
+        /// <see cref="RequestOpen"/> and <c>Invalidate</c> paths. A host reopened by any other
+        /// path leaves it set, which suppressed a close the host was genuinely open for.
+        /// Suppression in <see cref="CloseCore"/> therefore additionally requires the host to
+        /// report not open.
+        /// </remarks>
         private bool _closeCompleted;
 
         private bool _released;
@@ -305,15 +312,25 @@ namespace QuickFiler.Viewers
         /// <see cref="_closeInFlight"/> is cleared in a <c>finally</c> so it reads <c>false</c> on the
         /// success, not-closed, throw and released exits alike (I-462.1).
         /// </summary>
+        /// <remarks>
+        /// Issue #656: the completed-close guard additionally requires the host to report not
+        /// open, so a close is not suppressed while the host is genuinely open again. The host
+        /// read is hoisted above the critical section deliberately: SR-4 of #501 declined the
+        /// same refinement written as a read taken inside the lock, because that adds a foreign
+        /// call made while the coordinator lock is held. Hoisting leaves the count of such calls
+        /// unchanged. The host state can change between the read and the lock; both directions
+        /// are analysed in the spec for this change and neither corrupts state.
+        /// </remarks>
         private bool CloseCore(BreadcrumbDropDownCloseReason reason)
         {
+            bool hostOpen = _host.IsOpen;
             lock (_sync)
             {
                 if (_released)
                     return false;
                 if (_closeInFlight)
                     return true;
-                if (_closeCompleted)
+                if (_closeCompleted && !hostOpen)
                     return true;
                 _closeInFlight = true;
             }
