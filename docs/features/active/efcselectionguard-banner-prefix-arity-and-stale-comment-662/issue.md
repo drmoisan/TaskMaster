@@ -118,10 +118,10 @@ Every occurrence assertion below is scoped with the pathspec `-- '*.cs'` for the
 under Dependencies / Risks. An unscoped search returns historical audit records and cannot reach
 the asserted count.
 
-- [ ] AC1 — The guard's rejection breadth is unchanged: its constant still holds the
+- [x] AC1 — The guard's rejection breadth is unchanged: its constant still holds the
   three-character value. Verified by `git grep -n -F -- '= "===";' -- '*.cs'` returning exactly
   one line, located in `QuickFiler/Controllers/EfcSelectionGuard.cs`.
-- [ ] AC2 — The guard's constant is renamed from `BannerPrefix` to `BannerRejectionPrefix`, and
+- [x] AC2 — The guard's constant is renamed from `BannerPrefix` to `BannerRejectionPrefix`, and
   the new name is used at both `StartsWith` call sites in that file (currently `:49` in
   `IsValidFilingSelection` and `:75` in `IsValidCreationSelection`). Verified by two commands:
   `git grep -nE 'const +string +[A-Za-z_]*BannerPrefix' -- '*.cs'` returning exactly one line,
@@ -130,17 +130,17 @@ the asserted count.
   returning exactly two lines. The second command counts call sites only and is deliberately
   insensitive to how many times the new name appears in doc-comment prose, so AC3's wording cannot
   perturb AC2's count.
-- [ ] AC3 — `BannerRejectionPrefix` carries an XML doc comment that states three things: that it
+- [x] AC3 — `BannerRejectionPrefix` carries an XML doc comment that states three things: that it
   is deliberately a proper prefix of `BreadcrumbRowBuilder.BannerPrefix`; that it therefore
   rejects a strict superset of the producers' banner rows; and that it must not be widened to the
   producers' four-character value, naming the test from AC6 as the guard against that edit.
-- [ ] AC4 — The `SelectedFolder` comment in `QuickFiler/Controllers/EfcFormController.cs`
+- [x] AC4 — The `SelectedFolder` comment in `QuickFiler/Controllers/EfcFormController.cs`
   (currently `:318-320`) no longer asserts that `IsValidSelection` keeps a four-character
   rejection. The replacement text describes the composition the code implements: `IsBannerRow`
   matching the producers' four-character prefix, combined with the guard's deliberately broader
   three-character rejection. Verified by reading the replacement text and by AC9's clean
   toolchain pass; no occurrence-count assertion is made against comment prose.
-- [ ] AC5 — `UtilitiesCS/OutlookObjects/Folder/FolderSuggestionTree.cs` declares no banner-prefix
+- [x] AC5 — `UtilitiesCS/OutlookObjects/Folder/FolderSuggestionTree.cs` declares no banner-prefix
   constant at all. Its `BannerPrefix` declaration at `:16` is DELETED, not re-aliased, and its
   single reader `IsBanner` (`:195-198`) references `BreadcrumbRowBuilder.BannerPrefix` directly.
   Deletion rather than aliasing is required because an aliasing declaration
@@ -150,12 +150,12 @@ the asserted count.
   `UtilitiesCS/OutlookObjects/Folder/BreadcrumbRowBuilder.cs`, and by
   `git grep -n 'BannerPrefix' -- UtilitiesCS/OutlookObjects/Folder/FolderSuggestionTree.cs`
   returning exactly one line, which is the qualified reference inside `IsBanner`.
-- [ ] AC5b — `UtilitiesCS/OutlookObjects/Folder/BreadcrumbRowBuilder.cs` is NOT modified. Feature
+- [x] AC5b — `UtilitiesCS/OutlookObjects/Folder/BreadcrumbRowBuilder.cs` is NOT modified. Feature
   #498's acceptance criteria assert that file is unmodified, so this work may only add a reader to
   its existing public constant. Verified by
   `git diff 2b85134b42872e405602e6064e02dc9cda6c319b --stat -- UtilitiesCS/OutlookObjects/Folder/BreadcrumbRowBuilder.cs`
   reporting no change to that file.
-- [ ] AC6 — A new MSTest test method named
+- [x] AC6 — A new MSTest test method named
   `BannerRejectionPrefix_RejectsThreeAndFourEqualsRowsOnBothPredicates` is added to
   `QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs`. It asserts that
   `IsValidFilingSelection` and `IsValidCreationSelection` each return false for `"==="` and for
@@ -164,19 +164,19 @@ the asserted count.
   `vstest.console.exe` run with
   `/Tests:BannerRejectionPrefix_RejectsThreeAndFourEqualsRowsOnBothPredicates` reporting
   `Passed: 1` and `Failed: 0`.
-- [ ] AC7 — The pre-existing test
+- [x] AC7 — The pre-existing test
   `IsSelectableFolder_AndIsBannerRow_ClassifyThreeAndFourEqualsRowsIdentically` in
   `QuickFiler.Test/Controllers/EfcFormControllerTests.cs` is unmodified and still passes.
   Verified by `git diff 2b85134b42872e405602e6064e02dc9cda6c319b --stat -- QuickFiler.Test/Controllers/EfcFormControllerTests.cs`
   reporting no change to that file, and by a scoped `vstest.console.exe` run with
   `/Tests:IsSelectableFolder_AndIsBannerRow_ClassifyThreeAndFourEqualsRowsIdentically` reporting
   `Passed: 1` and `Failed: 0`.
-- [ ] AC8 — No behavioural change reaches `FolderSuggestionTree.IsBanner`, `BreadcrumbRowBuilder`,
+- [x] AC8 — No behavioural change reaches `FolderSuggestionTree.IsBanner`, `BreadcrumbRowBuilder`,
   or `EfcFormController.IsBannerRow`. Verified by full-assembly `vstest.console.exe` runs of
   `QuickFiler.Test` and `UtilitiesCS.Test` reporting `Failed: 0` for each, with each assembly's
   `Passed:` count no lower than the count recorded for that same assembly in the Phase 0 baseline
   artifact.
-- [ ] AC9 — The full C# toolchain passes in one clean pass in the order format, analyze,
+- [x] AC9 — The full C# toolchain passes in one clean pass in the order format, analyze,
   type-check, test, using the exact commands in CLAUDE.md. Each step records an evidence artifact
   carrying `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:`. The format step's
   artifact records the CSharpier summary line printed on a no-change run, not the exit code alone.
@@ -196,6 +196,6 @@ the asserted count.
 
 ## Evidence Checklist
 
-- [ ] baseline
-- [ ] targeted verification
-- [ ] end-state
+- [x] baseline
+- [x] targeted verification
+- [x] end-state
