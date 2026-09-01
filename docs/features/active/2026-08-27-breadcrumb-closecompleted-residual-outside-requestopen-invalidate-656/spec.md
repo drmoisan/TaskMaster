@@ -535,78 +535,78 @@ manual gesture that exercises it. Verification is entirely by automated test and
 
 ## Acceptance Criteria
 
-- [ ] AC-1 — `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs` reads `_host.IsOpen` into a local
+- [x] AC-1 — `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs` reads `_host.IsOpen` into a local
       declared **before** the `lock (_sync)` that opens `CloseCore`, and the completed-close guard inside
       that lock is `if (_closeCompleted && !<that local>) return true;`. Checkable by reading the changed
       lines of `CloseCore` in the diff.
-- [ ] AC-2 — SR-4 reconciliation: no statement added or modified inside any `lock (_sync)` block of
+- [x] AC-2 — SR-4 reconciliation: no statement added or modified inside any `lock (_sync)` block of
       `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs` invokes a member of
       `_host`/`IBreadcrumbDropDownHost`. Checkable by reading every `lock (_sync)` body in the changed
       file and confirming the only pre-existing such call remains the one at `RequestOpen`
       (`if (_closeInFlight && _host.IsOpen) return ClosedTask;`), with no new one added.
-- [ ] AC-3 — A new test named `CloseCore_AfterSuccessfulCloseAndHostReopen_ReachesHostCloseAgain` exists
+- [x] AC-3 — A new test named `CloseCore_AfterSuccessfulCloseAndHostReopen_ReachesHostCloseAgain` exists
       in `QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.Part3.cs`, drives a successful
       open, a successful close, `harness.Host.SetOpen(true)`, and a second close, and asserts that
       `harness.Host.CloseReasons` equals two `BreadcrumbDropDownCloseReason.Uncommitted` entries.
       Checkable by reading the test body.
-- [ ] AC-4 — `CloseCore_AfterSuccessfulCloseAndHostReopen_ReachesHostCloseAgain` is demonstrated **failing
+- [x] AC-4 — `CloseCore_AfterSuccessfulCloseAndHostReopen_ReachesHostCloseAgain` is demonstrated **failing
       before** the production edit and **passing after** it, with both run outputs recorded in the
       feature evidence folder under `evidence/qa-gates/`. Checkable by comparing the two recorded
       `Invoke-MSTestWithCoverage.ps1` outputs for that test name.
-- [ ] AC-5 — `PendingToggleClose_HostOwnershipSuppressesFallbackAndRepeatedClose`
+- [x] AC-5 — `PendingToggleClose_HostOwnershipSuppressesFallbackAndRepeatedClose`
       (`QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.cs:263`) passes and its file is
       unchanged in the diff. Checkable by the test run output and by `git diff --stat` for that file.
-- [ ] AC-6 — `SelectorStateTransitions_RequestOpenThenCloseOnlyWhenRequired`
+- [x] AC-6 — `SelectorStateTransitions_RequestOpenThenCloseOnlyWhenRequired`
       (`QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.Part2.cs:121`) passes and its
       assertion text is unchanged. Checkable by the test run output and by `git diff` for that file
       showing no change to the test.
-- [ ] AC-7 — `RequestOpen_AfterSuccessfulCloseAndHostReopen_ReachesHostOpenAsync`
+- [x] AC-7 — `RequestOpen_AfterSuccessfulCloseAndHostReopen_ReachesHostOpenAsync`
       (`QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.Part2.cs:333`) passes and its
       assertion text is unchanged. Checkable by the test run output and by `git diff` for that file.
-- [ ] AC-8 — `CloseCore_RepeatedCloseWithoutReopen_ClosesHostExactlyOnce`
+- [x] AC-8 — `CloseCore_RepeatedCloseWithoutReopen_ClosesHostExactlyOnce`
       (`QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.Part2.cs:375`) passes and its
       assertion text is unchanged. Checkable by the test run output and by `git diff` for that file.
-- [ ] AC-9 — `PendingAutomaticClose_RequestsExplicitCommitWhenHostIsNotOpen`
+- [x] AC-9 — `PendingAutomaticClose_RequestsExplicitCommitWhenHostIsNotOpen`
       (`QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.cs:302`) passes, confirming that a
       close while the host reports not open still reaches `_host.Close`. Checkable by the test run
       output.
-- [ ] AC-10 — Production footprint: `git diff --name-only <merge-base>...HEAD` lists no file under
+- [x] AC-10 — Production footprint: `git diff --name-only <merge-base>...HEAD` lists no file under
       `QuickFiler/` other than `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs`. Checkable by
       running that command and reading its output.
-- [ ] AC-11 — Build-configuration footprint: the same `git diff --name-only` output contains no path
+- [x] AC-11 — Build-configuration footprint: the same `git diff --name-only` output contains no path
       matching `*.csproj`, `*.props`, `*.targets`, or `packages.config`. Checkable by running that
       command and reading its output.
-- [ ] AC-12 — Test footprint: the same `git diff --name-only` output lists no file under
+- [x] AC-12 — Test footprint: the same `git diff --name-only` output lists no file under
       `QuickFiler.Test/` other than
       `QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.Part3.cs`. Checkable by running
       that command and reading its output.
-- [ ] AC-13 — File-size limit: `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs` and
+- [x] AC-13 — File-size limit: `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs` and
       `QuickFiler.Test/Viewers/BreadcrumbDropDownOpenCoordinatorTests.Part3.cs` each contain fewer than
       500 lines after the change. Checkable by a line count of each file.
-- [ ] AC-14 — Format gate: `dotnet tool run csharpier check .` exits 0 and reports no file requiring
+- [x] AC-14 — Format gate: `dotnet tool run csharpier check .` exits 0 and reports no file requiring
       formatting. Checkable by the command's exit code and output.
-- [ ] AC-15 — Analyzer gate:
+- [x] AC-15 — Analyzer gate:
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
       completes with `0 Error(s)` and introduces no new warning attributed to
       `BreadcrumbDropDownOpenCoordinator.cs`. Checkable by the msbuild summary and a warning grep of the
       log for that file name.
-- [ ] AC-16 — Analyzer-gate non-vacuity: the analyzer-gate log contains no
+- [x] AC-16 — Analyzer-gate non-vacuity: the analyzer-gate log contains no
       `Skipping target "CoreCompile"` line for `QuickFiler` or `QuickFiler.Test`, proving the changed
       files were actually compiled. Checkable by grepping the captured msbuild log.
-- [ ] AC-17 — Type-check gate:
+- [x] AC-17 — Type-check gate:
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
       completes with `0 Error(s)`. The command must not include `/p:Nullable=enable` and must use
       `/t:Rebuild`. Checkable by the msbuild summary and by the recorded command text.
-- [ ] AC-18 — Test gate: `scripts/vscode/Invoke-MSTestWithCoverage.ps1` completes with zero failed tests
+- [x] AC-18 — Test gate: `scripts/vscode/Invoke-MSTestWithCoverage.ps1` completes with zero failed tests
       for `QuickFiler.Test`, and its recorded invocation shows `/InIsolation` and
       `/TestCaseFilter:TestCategory!=LiveOutlook` in effect. Checkable by the run summary and the
       recorded command line.
-- [ ] AC-19 — The `_closeCompleted` field documentation
+- [x] AC-19 — The `_closeCompleted` field documentation
       (`QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs:38-46`) and the `CloseCore` summary
       (`:302-307`) state that completed-close suppression now additionally requires the host to report
       not open, and record why the host read is taken outside `_sync`. Checkable by reading those comment
       blocks in the diff.
-- [ ] AC-20 — No new production seam: the diff adds no new `internal` or `public` member to
+- [x] AC-20 — No new production seam: the diff adds no new `internal` or `public` member to
       `BreadcrumbDropDownOpenCoordinator` and no member to `IBreadcrumbDropDownHost`. Checkable by
       reading the diff of `QuickFiler/Viewers/BreadcrumbDropDownOpenCoordinator.cs` and confirming
       `QuickFiler/Viewers/IBreadcrumbDropDownHost.cs` is absent from the changed-file list.
