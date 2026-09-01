@@ -47,43 +47,104 @@ namespace UtilitiesCS
                 );
         }
 
-        public static async Task WriteTextFileAsync(
+        /// <summary>
+        /// Appends each entry of <paramref name="strOutput"/> as a line to the file named
+        /// <paramref name="filename"/> under <paramref name="folderpath"/>, retrying a bounded
+        /// number of times while the file cannot be opened.
+        /// </summary>
+        /// <param name="filename">Name of the target file.</param>
+        /// <param name="strOutput">Lines to append, in order.</param>
+        /// <param name="folderpath">Folder containing the target file.</param>
+        /// <param name="token">Observed before each attempt and by the retry delay.</param>
+        /// <returns>
+        /// <see langword="true"/> when the write completed, meaning every line was written and the
+        /// writer was disposed without error; <see langword="false"/> when it did not, either
+        /// because the retry budget was exhausted without the file ever opening or because a
+        /// failure was raised after the writer opened. The method does not throw on a failed write:
+        /// a caller that ignores the result cannot distinguish the two outcomes. An
+        /// <see cref="OperationCanceledException"/> is still raised when
+        /// <paramref name="token"/> is cancelled, and a non-<see cref="IOException"/> failure still
+        /// propagates.
+        /// </returns>
+        public static Task<bool> WriteTextFileAsync(
             string filename,
             string[] strOutput,
             string folderpath,
             CancellationToken token
+        ) => WriteTextFileAsync(filename, strOutput, folderpath, token, null, null);
+
+        /// <summary>
+        /// Test seam for <see cref="WriteTextFileAsync(string, string[], string, CancellationToken)"/>.
+        /// The writer factory and the retry delay are supplied as parameters rather than as static
+        /// state because UtilitiesCS.Test runs class-level parallel, so a shared mutable seam would
+        /// be a genuine cross-class race. Passing null for either delegate selects the production
+        /// default, which is what the public overload does.
+        /// </summary>
+        internal static async Task<bool> WriteTextFileAsync(
+            string filename,
+            string[] strOutput,
+            string folderpath,
+            CancellationToken token,
+            Func<string, TextWriter>? writerFactory,
+            Func<int, CancellationToken, Task>? delay
         )
         {
             //TraceUtility.LogMethodCall(filename, strOutput, folderpath, token);
 
             string filepath = Path.Combine(folderpath, filename);
-            bool success = false;
+
+            // Both delegates are coalesced once, before the loop, into explicitly typed non-nullable
+            // locals. An explicit type is required because a coalescing expression whose right
+            // operand is a lambda has no natural type, and coalescing here rather than inside the
+            // loop avoids a conditional dereference that the type-check gate promotes to an error.
+            Func<string, TextWriter> createWriter =
+                writerFactory ?? (p => new StreamWriter(p, true, System.Text.Encoding.UTF8));
+            Func<int, CancellationToken, Task> delayAsync = delay ?? ((ms, t) => Task.Delay(ms, t));
+
             int attempts = 0;
 
-            while (!success)
+            while (true)
             {
+                // Tracks whether this attempt got past the writer's construction. A failure raised
+                // after that point is terminal: the file is opened in append mode, so retrying
+                // after a partial flush would duplicate the lines already written.
+                bool opened = false;
                 try
                 {
                     token.ThrowIfCancellationRequested();
-                    using (var sw = new StreamWriter(filepath, true, System.Text.Encoding.UTF8))
+                    using (var sw = createWriter(filepath))
                     {
-                        success = true;
+                        opened = true;
                         foreach (var output in strOutput)
                             await sw.WriteLineAsync(output);
                     }
+
+                    // Reached only when every line was written and the writer was disposed without
+                    // error, so this is the single point at which success is established.
+                    return true;
                 }
-                catch (IOException)
+                catch (IOException ex)
                 {
+                    if (opened)
+                    {
+                        logger.Error(
+                            $"Write to {filepath} failed after the writer opened. The file may hold a partial record.",
+                            ex
+                        );
+                        return false;
+                    }
+
                     Interlocked.Increment(ref attempts);
-                    if (attempts < 100)
+                    if (attempts >= 100)
                     {
-                        await Task.Delay(100);
+                        logger.Error(
+                            $"Failed to write to {filepath} after {attempts} attempts.",
+                            ex
+                        );
+                        return false;
                     }
-                    else
-                    {
-                        logger.Error($"Failed to write to {filepath} after {attempts} attempts.");
-                        success = true;
-                    }
+
+                    await delayAsync(100, token);
                 }
             }
         }

@@ -123,12 +123,12 @@ namespace QuickFiler.Controllers.Tests
             var controller = new QfcHomeController(mockGlobals.Object, () => { });
             controller.CreateCancellationToken();
             // Replace the production file writer with a no-op. The default seam value is
-            // FileIO2.WriteTextFileAsync, which probes a real path and retries 100 times over ten
-            // seconds when the folder is absent; a unit test must not touch the filesystem or wait
-            // on wall-clock time. Tests that assert on the flush override this with a capturing
-            // delegate of their own.
+            // FileIO2.WriteTextFileAsync, which probes a real path, retries a bounded 100 times over
+            // ten seconds when the folder is absent and then returns false rather than reporting
+            // success; a unit test must not touch the filesystem or wait on wall-clock time. Tests
+            // that assert on the flush override this with a capturing delegate of their own.
             controller.MetricsFileWriter = (filename, lines, folderRoot, token) =>
-                Task.CompletedTask;
+                Task.FromResult(true);
             SetPrivateField(controller, "_formController", mockFormController.Object);
             SetPrivateField(controller, "_stopWatchMoved", new Stopwatch());
             return (controller, mockGroups);
@@ -335,7 +335,7 @@ namespace QuickFiler.Controllers.Tests
             controller.MetricsFileWriter = (filename, written, folderRoot, token) =>
             {
                 captures.Add(new MetricsWrite(filename, written, folderRoot, token));
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             };
 
             await controller.WriteMetricsAsync("metrics.csv");
@@ -360,6 +360,7 @@ namespace QuickFiler.Controllers.Tests
             {
                 await Task.Yield();
                 writerCompleted = true;
+                return true;
             };
 
             await controller.WriteMetricsAsync("metrics.csv");
@@ -382,7 +383,7 @@ namespace QuickFiler.Controllers.Tests
             controller.MetricsFileWriter = (filename, written, folderRoot, token) =>
             {
                 captured.Add(token);
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             };
             controller.TokenSource.Cancel();
 
@@ -409,7 +410,7 @@ namespace QuickFiler.Controllers.Tests
             controller.MetricsFileWriter = (filename, written, folderRoot, token) =>
             {
                 captures.Add(new MetricsWrite(filename, written, folderRoot, token));
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             };
 
             await controller.WriteMetricsAsync("metrics.csv");
@@ -438,7 +439,7 @@ namespace QuickFiler.Controllers.Tests
             controller.MetricsFileWriter = (filename, written, folderRoot, token) =>
             {
                 invoked = true;
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             };
 
             await controller.WriteMetricsAsync("metrics.csv");

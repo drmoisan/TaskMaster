@@ -30,7 +30,7 @@ namespace QuickFiler.Controllers
             string[],
             string,
             CancellationToken,
-            Task
+            Task<bool>
         > MetricsFileWriter { get; set; } = FileIO2.WriteTextFileAsync;
 
         public void QuickFileMetrics_WRITE(string filename)
@@ -176,7 +176,19 @@ namespace QuickFiler.Controllers
             // CancellationToken.None, never the session Token: the dispatcher continuation that
             // carries this write is not awaited to completion, so a session cancellation can be
             // raised while the write is in flight and must not destroy the metrics.
-            await MetricsFileWriter(filename, lines, myDocuments, CancellationToken.None);
+            bool metricsWritten = await MetricsFileWriter(
+                filename,
+                lines,
+                myDocuments,
+                CancellationToken.None
+            );
+            if (!metricsWritten)
+            {
+                logger.Error(
+                    $"Session metrics were not written to {LOC_TXT_FILE}. The writer exhausted its "
+                        + "retry budget or failed after opening the file."
+                );
+            }
         }
 
         private void WriteMoveToCalendar(
