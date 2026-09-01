@@ -111,6 +111,7 @@
     <Compile Include="Controllers\KaKeyTests.cs" />
     <Compile Include="Controllers\KaStringAsyncTests.cs" />
     <Compile Include="Controllers\FilerQueueTests.cs" />
+    <Compile Include="Controllers\QfcFormControllerUndoHandoffTests.cs" />
     <Compile Include="Controllers\QfcQueueCoverageExpansionTests.cs" />
     <Compile Include="Controllers\QfcQueuePurePathsTests.cs" />
     <Compile Include="Controllers\EfcDataModelIssue614Tests.cs" />
