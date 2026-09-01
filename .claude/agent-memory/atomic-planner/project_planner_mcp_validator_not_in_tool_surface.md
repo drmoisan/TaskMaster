@@ -1,6 +1,6 @@
 ---
 name: planner-mcp-validator-not-in-tool-surface
-description: The atomic-planner subagent is sometimes launched with a file-only tool surface (Read/Grep/Glob/Edit/Write), so mcp__drm-copilot__validate_orchestration_artifacts cannot be run despite being a required output
+description: The atomic-planner subagent is sometimes launched with a file-only tool surface (Read/Grep/Glob/Edit/Write), so neither mcp__drm-copilot__validate_orchestration_artifacts nor git commit can be run despite either being demanded by the caller
 metadata:
   type: project
 ---
