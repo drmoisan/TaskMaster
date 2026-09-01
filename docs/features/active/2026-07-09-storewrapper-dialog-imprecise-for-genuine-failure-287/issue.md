@@ -79,30 +79,30 @@ Reproduce above have the two readiness states inverted. `ModelUnavailable` carri
 case; `StoresUnavailable` is transient. See the "Correction to the issue's stated premise" section
 of `spec.md`.
 
-- [ ] **AC1** `StoreLaunchReadinessEvaluator.cs` declares two pure `internal static` methods mapping
+- [x] **AC1** `StoreLaunchReadinessEvaluator.cs` declares two pure `internal static` methods mapping
       a `StoreLaunchReadinessState` to a message string and a title string; neither references
       `System.Windows.Forms` or `MyBox`, performs I/O, or carries `[ExcludeFromCodeCoverage]`.
-- [ ] **AC2** No new source or test file is added and no project file is modified.
-- [ ] **AC3** The message method returns a different string for `ModelUnavailable` than for
+- [x] **AC2** No new source or test file is added and no project file is modified.
+- [x] **AC3** The message method returns a different string for `ModelUnavailable` than for
       `StoresUnavailable`.
-- [ ] **AC4** Both methods throw `ArgumentOutOfRangeException` for `StoreLaunchReadinessState.Ready`.
-- [ ] **AC5** Both methods return the `ModelUnavailable` copy for an undefined enum value.
-- [ ] **AC6** Neither `Launch()` contains a dialog message or title literal; a case-sensitive search
+- [x] **AC4** Both methods throw `ArgumentOutOfRangeException` for `StoreLaunchReadinessState.Ready`.
+- [x] **AC5** Both methods return the `ModelUnavailable` copy for an undefined enum value.
+- [x] **AC6** Neither `Launch()` contains a dialog message or title literal; a case-sensitive search
       for `Store settings are not available yet` over `*.cs` returns 0 matches, down from 2.
-- [ ] **AC7** Both `Launch()` methods keep `[ExcludeFromCodeCoverage]`, the same gate condition, the
+- [x] **AC7** Both `Launch()` methods keep `[ExcludeFromCodeCoverage]`, the same gate condition, the
       same buttons and icon, and still return without constructing a viewer when not ready.
-- [ ] **AC8** Tests assert the exact message and title shown by `StoreWrapperController.Launch()` for
+- [x] **AC8** Tests assert the exact message and title shown by `StoreWrapperController.Launch()` for
       both non-ready states through the `MyBox.DialogInvoker` seam, and that the two messages differ.
-- [ ] **AC9** Equivalent tests exist for `DisabledStoresController.Launch()` and assert `Viewer`
+- [x] **AC9** Equivalent tests exist for `DisabledStoresController.Launch()` and assert `Viewer`
       remains null; no test constructs a viewer form.
-- [ ] **AC10** The stale `DisabledStoresController.Launch` XML summary remark is corrected.
-- [ ] **AC11** The `StoreLaunchReadinessEvaluator` XML doc records that `ModelUnavailable` is also
+- [x] **AC10** The stale `DisabledStoresController.Launch` XML summary remark is corrected.
+- [x] **AC11** The `StoreLaunchReadinessEvaluator` XML doc records that `ModelUnavailable` is also
       the terminal state after the caught failure in `AppOlObjects.LoadStoresAsync`.
-- [ ] **AC12** All five existing readiness tests in `StoreWrapperController_Tests.Launch.cs` still
+- [x] **AC12** All five existing readiness tests in `StoreWrapperController_Tests.Launch.cs` still
       pass and the evaluator's return values are unchanged.
-- [ ] **AC13** The full C# toolchain passes in order with zero errors in a single final pass.
-- [ ] **AC14** No production source file is added to a coverage exclusion; the two new methods are
+- [x] **AC13** The full C# toolchain passes in order with zero errors in a single final pass.
+- [x] **AC14** No production source file is added to a coverage exclusion; the two new methods are
       measured at or above 90%.
-- [ ] **AC15** `StoreWrapperController.cs` remains under 500 lines and no touched file exceeds 500
+- [x] **AC15** `StoreWrapperController.cs` remains under 500 lines and no touched file exceeds 500
       lines; post-change line counts are recorded as evidence.
-- [ ] **AC16** No file outside the five in the spec's design-summary table is modified.
+- [x] **AC16** No file outside the five in the spec's design-summary table is modified.

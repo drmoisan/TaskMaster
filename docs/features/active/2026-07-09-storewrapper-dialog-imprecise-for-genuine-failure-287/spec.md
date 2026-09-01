@@ -390,47 +390,47 @@ error log already records the terminal cause the new copy points at.
 
 ## Acceptance Criteria
 
-- [ ] **AC1** `UtilitiesCS/OutlookObjects/Store/StoreLaunchReadinessEvaluator.cs` declares two pure
+- [x] **AC1** `UtilitiesCS/OutlookObjects/Store/StoreLaunchReadinessEvaluator.cs` declares two pure
       `internal static` methods that map a `StoreLaunchReadinessState` to a message string and a
       title string. Neither references `System.Windows.Forms` or `MyBox`, neither performs I/O, and
       neither carries `[ExcludeFromCodeCoverage]`.
-- [ ] **AC2** No new source or test file is added, and no `.csproj`, `.props`, `.targets`, or
+- [x] **AC2** No new source or test file is added, and no `.csproj`, `.props`, `.targets`, or
       `packages.config` file is modified by this change.
-- [ ] **AC3** The message method returns a different string for `ModelUnavailable` than for
+- [x] **AC3** The message method returns a different string for `ModelUnavailable` than for
       `StoresUnavailable`, asserted by a named MSTest test.
-- [ ] **AC4** Both methods throw `ArgumentOutOfRangeException` when passed
+- [x] **AC4** Both methods throw `ArgumentOutOfRangeException` when passed
       `StoreLaunchReadinessState.Ready`, asserted by named MSTest tests.
-- [ ] **AC5** Both methods return the `ModelUnavailable` copy when passed an undefined enum value
+- [x] **AC5** Both methods return the `ModelUnavailable` copy when passed an undefined enum value
       produced by a cast, asserted by named MSTest tests.
-- [ ] **AC6** Neither `StoreWrapperController.Launch()` nor `DisabledStoresController.Launch()`
+- [x] **AC6** Neither `StoreWrapperController.Launch()` nor `DisabledStoresController.Launch()`
       contains a dialog message or title literal; both obtain both strings from the evaluator. After
       the change, a case-sensitive search for `Store settings are not available yet` over `*.cs`
       returns 0 matches, down from the 2 recorded in the inventory table above.
-- [ ] **AC7** Both `Launch()` methods still carry `[ExcludeFromCodeCoverage]`, still gate on
+- [x] **AC7** Both `Launch()` methods still carry `[ExcludeFromCodeCoverage]`, still gate on
       `readiness.State != StoreLaunchReadinessState.Ready`, still pass `MessageBoxButtons.OK` and
       `MessageBoxIcon.Warning`, and still return without constructing a viewer when not ready.
-- [ ] **AC8** Tests assert the exact message and title observed through the `MyBox.DialogInvoker`
+- [x] **AC8** Tests assert the exact message and title observed through the `MyBox.DialogInvoker`
       seam when `StoreWrapperController.Launch()` runs with `ModelUnavailable` and with
       `StoresUnavailable`, and assert the two observed messages differ.
-- [ ] **AC9** Equivalent tests exist for `DisabledStoresController.Launch()` covering both non-ready
+- [x] **AC9** Equivalent tests exist for `DisabledStoresController.Launch()` covering both non-ready
       states, asserting the same copy for the same state and that `Viewer` remains null. No test
       constructs a `DisabledStoresViewer` or a `StoreWrapperViewer`.
-- [ ] **AC10** The XML summary on `DisabledStoresController.Launch` no longer states that it shows
+- [x] **AC10** The XML summary on `DisabledStoresController.Launch` no longer states that it shows
       the same warning as the single-store editor.
-- [ ] **AC11** The XML doc on `StoreLaunchReadinessEvaluator` records that `ModelUnavailable` is also
+- [x] **AC11** The XML doc on `StoreLaunchReadinessEvaluator` records that `ModelUnavailable` is also
       the terminal state after the caught failure at
       `TaskMaster/AppGlobals/AppOlObjects.StoreLoading.cs:66-72`, and cites that location.
-- [ ] **AC12** All five existing readiness tests in `StoreWrapperController_Tests.Launch.cs` still
+- [x] **AC12** All five existing readiness tests in `StoreWrapperController_Tests.Launch.cs` still
       pass, and `StoreLaunchReadinessEvaluator.Evaluate`'s return values are unchanged.
-- [ ] **AC13** The full C# toolchain passes in order with zero errors in a single final pass:
+- [x] **AC13** The full C# toolchain passes in order with zero errors in a single final pass:
       CSharpier check clean, analyzer build clean, nullable build clean, and the MSTest run green
       across all 9 test assemblies with no new failure relative to the Phase 0 baseline.
-- [ ] **AC14** No production source file is added to a coverage exclusion, and the two new methods
+- [x] **AC14** No production source file is added to a coverage exclusion, and the two new methods
       are present in the coverage denominator with measured coverage at or above 90%.
-- [ ] **AC15** `UtilitiesCS/OutlookObjects/Store/StoreWrapperController.cs` remains under 500 lines,
+- [x] **AC15** `UtilitiesCS/OutlookObjects/Store/StoreWrapperController.cs` remains under 500 lines,
       and no other file touched by this change exceeds 500 lines. The post-change line count of every
       file in the design-summary table is recorded as evidence.
-- [ ] **AC16** No file outside the five listed in the design-summary table is modified.
+- [x] **AC16** No file outside the five listed in the design-summary table is modified.
 
 ## Risks & Mitigations
 
