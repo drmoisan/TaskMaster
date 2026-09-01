@@ -262,6 +262,88 @@ namespace UtilitiesCS.Test.OutlookObjects.Store
             }
         }
 
+        // ---- P1-T4 (#287): Launch readiness copy (AC9) ----
+
+        [TestMethod]
+        public void Launch_WhenStoresWrapperIsNull_ShowsModelUnavailableCopyAndLeavesViewerNull()
+        {
+            // Arrange: constructed inline (not via CreateController()) so Viewer starts null.
+            var mockGlobals = new Mock<IApplicationGlobals>();
+            var mockOl = new Mock<IOlObjects>();
+            mockOl.SetupGet(o => o.StoresWrapper).Returns((StoresWrapper)null);
+            mockGlobals.SetupGet(g => g.Ol).Returns(mockOl.Object);
+            var controller = new DisabledStoresController(mockGlobals.Object);
+
+            var originalInvoker = MyBox.DialogInvoker;
+            string capturedTitle = null;
+            string capturedMessage = null;
+
+            try
+            {
+                MyBox.DialogInvoker = viewer =>
+                {
+                    capturedTitle = viewer.Text;
+                    capturedMessage = viewer.TextMessage.Text;
+                    return DialogResult.OK;
+                };
+
+                // Act
+                controller.Launch();
+
+                // Assert
+                capturedTitle.Should().Be("Store Settings Unavailable");
+                capturedMessage
+                    .Should()
+                    .Be(
+                        "Store settings are not available. Retry once startup has completed; if the message persists, the store settings failed to load and the application log records the cause."
+                    );
+                GetInternalProperty<IDisabledStoresViewer>(controller, "Viewer").Should().BeNull();
+            }
+            finally
+            {
+                MyBox.DialogInvoker = originalInvoker;
+            }
+        }
+
+        [TestMethod]
+        public void Launch_WhenStoresListIsNull_ShowsStoresUnavailableCopyAndLeavesViewerNull()
+        {
+            // Arrange: constructed inline (not via CreateController()) so Viewer starts null.
+            var mockGlobals = new Mock<IApplicationGlobals>();
+            var mockOl = new Mock<IOlObjects>();
+            mockOl.SetupGet(o => o.StoresWrapper).Returns(new StoresWrapper { Stores = null });
+            mockGlobals.SetupGet(g => g.Ol).Returns(mockOl.Object);
+            var controller = new DisabledStoresController(mockGlobals.Object);
+
+            var originalInvoker = MyBox.DialogInvoker;
+            string capturedTitle = null;
+            string capturedMessage = null;
+
+            try
+            {
+                MyBox.DialogInvoker = viewer =>
+                {
+                    capturedTitle = viewer.Text;
+                    capturedMessage = viewer.TextMessage.Text;
+                    return DialogResult.OK;
+                };
+
+                // Act
+                controller.Launch();
+
+                // Assert
+                capturedTitle.Should().Be("Store Settings Loading");
+                capturedMessage
+                    .Should()
+                    .Be("The store list has not finished loading. Please try again shortly.");
+                GetInternalProperty<IDisabledStoresViewer>(controller, "Viewer").Should().BeNull();
+            }
+            finally
+            {
+                MyBox.DialogInvoker = originalInvoker;
+            }
+        }
+
         // ---- reflection helpers (mirrors StoreWrapperViewerTests.cs) ----
 
         private static T GetInternalProperty<T>(object instance, string propertyName)
