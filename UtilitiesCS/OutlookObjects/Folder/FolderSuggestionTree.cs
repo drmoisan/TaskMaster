@@ -193,7 +193,11 @@ namespace UtilitiesCS
         /// <summary>True when the row is a section/banner header (begins with <c>"===="</c>).</summary>
         private static bool IsBanner(string row)
         {
-            return row != null && row.StartsWith(OutlookObjects.Folder.BreadcrumbRowBuilder.BannerPrefix, StringComparison.Ordinal);
+            return row != null
+                && row.StartsWith(
+                    OutlookObjects.Folder.BreadcrumbRowBuilder.BannerPrefix,
+                    StringComparison.Ordinal
+                );
         }
 
         /// <summary>Returns the leaf path segment (text after the final backslash), or the whole string when unseparated.</summary>
