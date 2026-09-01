@@ -1,44 +1,246 @@
-# wpfuidispatchertests-ungated-static-swap (Plan)
+# Atomic Plan — WpfUiDispatcherTests ungated static swap (Issue #648)
 
-- **Issue:** #648
-- **Parent (optional):** none
-- **Owner:** drmoisan
-- **Last Updated:** 2026-08-31T20-07
-- **Status:** Draft
-- **Version:** 0.1
+- Plan path: `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/plan.2026-08-31T20-07.md`
+- Work Mode: `minor-audit` (persisted marker at `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/issue.md:12`)
+- Acceptance-criteria source: `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/issue.md`, section `## Acceptance Criteria` (AC-1 through AC-7). `spec.md` and `user-story.md` do not exist in this feature folder and are not required by this mode.
+- Branch: `bug/wpfuidispatchertests-ungated-static-swap-648`, cut from `origin/main`.
+- Feature folder: `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648`
+- Research artifact: `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/research/wpfuidispatchertests-ungated-static-swap.2026-08-31T20-15.md`
 
-**Fail-closed evidence rule:** Include explicit baseline artifact tasks, final-QA artifact tasks, and coverage-comparison tasks for each in-scope language when policy requires coverage. If any required baseline artifact, QA artifact, or coverage-comparison artifact is missing, the audit verdict must be BLOCKED or INCOMPLETE, never PASS.
+## Scope Boundary
 
-**Evidence accounting rule:** Record the expected artifact path or location in each evidence-producing task. Do not mark evidence-backed work complete without the artifact.
+In scope: exactly one source file, `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs`, rerouted
+through the already-merged fixture pair declared in
+`QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixture.cs`
+(`UiThreadDispatcherFixture` and `UiThreadDispatcherTransaction`, consumed unchanged).
 
+Out of scope, and no task in this plan may change them:
 
-**Phase 0 — Context & Inputs**
-- [ ] [P0-T1] Link approved spec: <spec link>
-- [ ] [P0-T2] Record branch/commit baseline: <branch/commit>
-- [ ] [P0-T3] List required environment/fixtures/data: <notes>
+- `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs`
+- `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs`
+- `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs`
+- Any file under `UtilitiesCS/`.
+- Any second changed `.cs` path, including a source-scanning guard test. AC-6 permits exactly one
+  changed `.cs` path.
+- The `.globalconfig` documentation discrepancy described in research section 8. It is recorded as an
+  observation only by P0-T18.
 
-**Phase 1 — Preparation**
-- [ ] [P1-T1] Confirm scope is locked for this fix (no open spec gaps)
-- [ ] [P1-T2] Sync workspace to target branch and ensure tooling is available
+## Evidence Location Rule (non-overridable)
 
-**Phase 2 — Regression Test (must fail first)**
-- [ ] [P2-T1] [expect-fail] Add a small, deterministic regression test in the standard module file (use `tests/bugs/<YYYY>/#648-<desc>.py` only if no clear home exists)
-- [ ] [P2-T2] [expect-fail] Run the regression to confirm it fails and captures the repro
+Every artifact this plan produces is written beneath one of these five directories, and no others:
 
-**Phase 3 — Minimal Fix**
-- [ ] [P3-T1] Apply the smallest change needed to make the regression test pass; avoid opportunistic refactors
+- `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/`
+- `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/regression-testing/`
+- `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/`
+- `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/issue-updates/`
+- `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/other/`
 
-**Phase 4 — Verification Loop**
-- [ ] [P4-T1] Re-run repro and regression test to confirm expected behavior
-- [ ] [P4-T2] Run formatter → linter → type checker → tests; restart loop if any step changes files or fails
-- [ ] [P4-T3] Record baseline, post-change, and comparison artifact paths for each in-scope language where coverage is required
+No task may write evidence beneath `artifacts/`. Command-step artifacts use fixed, task-derived
+filenames so that every acceptance condition names one exact file; the ISO-8601 stamp is carried in
+each artifact's `Timestamp:` field rather than in its filename. The single exception is the
+fail-before dossier, whose filename begins with the literal `fail-before-exception.` and carries an
+ISO-8601 stamp in `yyyy-MM-ddTHH-mm` form, per the evidence-and-timestamp-conventions skill.
 
-**Phase 5 — Documentation & Status**
-- [ ] [P5-T1] Update spec/issue with outcomes, decisions, and any deviations from scope
+Every command-step artifact must carry all four fields: `Timestamp:`, `Command:`, `EXIT_CODE:`,
+`Output Summary:`.
 
-**Phase 6 — PR & Handoff**
-- [ ] [P6-T1] Prepare PR notes (summary, risks, validation performed, links to tests) and request review
+## Corrections Applied to the Delegation Input
 
-**Phase 7 — Rollout / Follow-up**
-- [ ] [P7-T1] Capture deployment/rollout notes and post-fix monitoring items
-- [ ] [P7-T2] Record links (issue, PRs, related docs) for traceability
+1. `scripts/vscode/Invoke-MSTest.ps1` cannot be invoked with a `-SearchRoot` that resolves to a single
+   `*.Test.dll`. Lines 107-113 pipe discovery through `Select-Object -ExpandProperty FullName`, which
+   yields a scalar string for one match; line 115 and line 120 then read `.Count` on that scalar under
+   the `Set-StrictMode -Version Latest` set at line 77. `-SearchRoot QuickFiler.Test` therefore throws
+   before `vstest.console.exe` is reached. All `QuickFiler.Test.dll` runs in this plan invoke
+   `vstest.console.exe` directly with the same argument list the wrapper would have built
+   (`/Settings:scripts/vscode/TaskMaster.cli.runsettings`, `/InIsolation`, and one `/TestCaseFilter:`).
+   This defect is pre-existing and out of scope for #648.
+2. `scripts/vscode/Invoke-MSTestWithCoverage.ps1` does not have that defect (line 296 wraps discovery
+   in `@(...)`), but it is invoked with `-SearchRoot .` rather than `-SearchRoot QuickFiler.Test`,
+   because `Assert-CoberturaLineCoverageThreshold`
+   (`scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1:459-491`) evaluates an 80 percent floor over
+   the whole instrumented image, and a single-assembly run cannot meet a solution-wide floor. A glob of
+   `.claude/worktrees/**` inside this checkout returned no files, so `-SearchRoot .` cannot sweep in a
+   sibling worktree's assemblies.
+3. `nuget restore` is replaced by the repo-standard restore wrapper
+   `scripts/vscode/Invoke-Restore.ps1`, which runs MSBuild `/t:Restore` with
+   `/p:RestorePackagesConfig=true` (line 36) and therefore restores both `packages.config` and
+   `PackageReference` projects.
+
+## Command Facts Observed Before Authoring
+
+These are the success-case output facts the acceptance conditions below rely on. They were observed
+against the current tree and the scripts' source, not inferred from documentation.
+
+- `dotnet tool run csharpier format .` exits 0 whether or not it rewrote a file, and its summary line
+  reports the number of files it *processed*, not the number it rewrote. It is therefore paired below
+  with a before-and-after `git status --porcelain` tree observation rather than an assertion over its
+  stdout. `dotnet tool run csharpier check .` is read-only and exits non-zero on drift, so its exit
+  code is falsifiable on its own.
+- `msbuild` prints a summary containing an error count on both a successful and a failed build, so
+  asserting the literal `0 Error(s)` is satisfiable on success and falsifiable on failure.
+- `vstest.console.exe` prints `Test Run Successful.` on a green run and `Test Run Failed.` on a red
+  one. It prints a `Failed:` line only when at least one test failed, so an acceptance condition
+  demanding `Failed: 0` would be unsatisfiable on a green run and is not used here.
+- `scripts/vscode/Invoke-MSTestWithCoverage.ps1` prints no coverage percentage on success. Its only
+  numeric coverage output is the Cobertura document it writes to `coverage/coverage.cobertura.xml`.
+  Every coverage figure in this plan is therefore read from the `line-rate`, `lines-covered`, and
+  `lines-valid` attributes of that document's root `coverage` element.
+- `Assert-CoberturaLineCoverageThreshold` runs before the post-processed XML is written to disk, so a
+  threshold failure leaves the pre-post-processing document on disk. Both coverage tasks below record
+  the same three attributes from the same path so the two readings are comparable, and the Phase 2
+  gate compares against the Phase 0 exit code rather than assuming a particular outcome.
+
+## Literals Asserted by This Plan
+
+These tokens are quoted here verbatim so that a plan-gate literal check can resolve them against this
+document, including the ones a task will create rather than find:
+
+`"_dispatcher"`, `GetField`, `SetValue`, `using System.Reflection;`, `using UtilitiesCS;`,
+`UiThreadDispatcherFixture.BeginTransactionAsync`, `UiThreadDispatcherTransaction`,
+`transaction.Install`, `transaction.Dispose();`, `ShutdownDispatcher`,
+`async Task Invoke_InvokeAsync_BeginInvoke_ExecuteDelegateOnDispatcherThread`,
+`private const int GateTimeoutMs = 60000;`, `[Timeout(GateTimeoutMs)]`,
+`Construction_YieldsAnIUiDispatcher`, `Test Run Successful.`, `Test Run Failed.`, `Total tests: 2`,
+`0 Error(s)`, `ConfigureAwait(false)`, `BASELINE_GATE_RED:`, `LOOP_CEILING_EXCEEDED:`,
+`LoopIterations: 3`.
+
+## Toolchain Invocation Notes for the Executor
+
+- Invoke every `msbuild` command through `pwsh -File` or `pwsh -Command`, never through a bash-tool
+  command line: the bash tool rewrites `/m` into `M:/` and MSBuild fails with MSB1008.
+- MSBuild and `vstest.console.exe` are resolved at execution time through `vswhere.exe`. Do not write a
+  machine-specific absolute path into any plan task or artifact; record the resolved path in the
+  artifact's `Command:` field only.
+- Do not add `/p:Nullable=enable` to any msbuild command. No project in this repository carries a
+  `<Nullable>` element and there is no `Directory.Build.props`, so the property conscripts files that
+  never adopted the pragma. `.github/workflows/ci.yml` omits it deliberately.
+- Do not substitute `/t:Build` for `/t:Rebuild` in the two policy gates. MSBuild's up-to-date check
+  does not invalidate on a command-line `/p:` change, so a warm `/t:Build` exits 0 with `CoreCompile`
+  skipped and runs no analyzers.
+
+---
+
+### Phase 0 — Baseline Capture
+
+- [ ] [P0-T1] Read, in this exact order, `CLAUDE.md`, `.claude/rules/general-code-change.md`, `.claude/rules/general-unit-test.md`, `.claude/rules/quality-tiers.md`, `.claude/rules/tonality.md`, `.claude/rules/csharp.md`, `.claude/skills/atomic-plan-contract/SKILL.md`, `.claude/skills/evidence-and-timestamp-conventions/SKILL.md`, `.claude/skills/acceptance-criteria-tracking/SKILL.md`, and `.claude/rules/plan-acceptance-gates.md`. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/phase0-instructions-read.md` carrying a `Timestamp:` field, a `Policy Order:` field naming the ordering rule from `policy-compliance-order`, and an explicit bulleted list naming every one of those ten files. Acceptance: that file exists, carries all three elements, and its file list contains exactly those ten repository-relative paths.
+
+- [ ] [P0-T2] Confirm the `minor-audit` preconditions on disk. Verify that `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/issue.md` contains the exact heading line `## Acceptance Criteria`, that the seven checkbox items `AC-1` through `AC-7` appear beneath it, and that neither `spec.md` nor `user-story.md` exists in the feature folder. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t2-mode-preconditions.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: the artifact records that the heading was found, that seven `AC-` checkbox items were counted, and that both optional documents were absent. If any of those three observations fails, stop and report a blocked state rather than continuing.
+
+- [ ] [P0-T3] Fetch the base ref so the diff anchor resolves: run `git fetch origin main` from the checkout root. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t3-fetch-base.md` with the four required fields, and record the commit `origin/main` resolves to via `git rev-parse origin/main`. Acceptance: `EXIT_CODE: 0` and the artifact carries a 40-character commit hash for `origin/main`.
+
+- [ ] [P0-T4] Install the repo-pinned .NET SDK. `global.json` pins `sdk.version` to `8.0.205` with `paths` of `.dotnet-sdk` and `$host$`, and `.dotnet-sdk` is absent from this checkout, so no `dotnet` command can satisfy the pin until this task completes. Run `pwsh -File scripts/vscode/Install-RepoDotNetSdk.ps1`. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t4-sdk-install.md` with the four required fields. Acceptance: `EXIT_CODE: 0`, and the directory `.dotnet-sdk` exists in the checkout root after the run where it did not exist before.
+
+- [ ] [P0-T5] Restore the manifest-pinned formatter. Run `dotnet tool restore` from the checkout root. The manifest is `dotnet-tools.json` at the repository root and pins `csharpier` to `1.2.6` with `rollForward` false. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t5-tool-restore.md` with the four required fields. Acceptance: `EXIT_CODE: 0`, and a following `dotnet tool run csharpier --version` prints `1.2.6`, recorded in `Output Summary:`.
+
+- [ ] [P0-T6] Restore NuGet packages. `packages/` is absent from this checkout and every project declares an `EnsureNuGetPackageBuildImports` target that raises an `<Error>` at `BeforeTargets="PrepareForBuild"` (see `QuickFiler.Test/QuickFiler.Test.csproj:480`), so no build can succeed until this task completes. Run `pwsh -File scripts/vscode/Invoke-Restore.ps1`. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t6-nuget-restore.md` with the four required fields. Acceptance: `EXIT_CODE: 0`, and the directory `packages/MSTest.Analyzers.4.3.3` exists after the run.
+
+- [ ] [P0-T7] Verify the analyzer package versions agree between the project file and its package manifest, rather than assuming issue #647 resolved the skew on this branch. Run two searches and record both outputs: search `QuickFiler.Test/QuickFiler.Test.csproj` for lines containing `Analyzer Include`, and search `QuickFiler.Test/packages.config` for lines containing `id=`. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t7-analyzer-version-agreement.md` with the four required fields. Acceptance: the artifact lists every analyzer version string found in each of the two files and states, for each analyzer package named in an `Analyzer Include` path, whether the same version appears in `packages.config`. If any version disagrees, record a line beginning `ANALYZER_VERSION_SKEW:` naming the disagreeing package in the artifact and stop, reporting a blocked state.
+
+- [ ] [P0-T8] Ensure the coverage collector is available. Run `dotnet tool update --global dotnet-coverage`, which installs it when absent and updates it when present. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t8-dotnet-coverage.md` with the four required fields. Acceptance: after the run, `Get-Command dotnet-coverage` resolves to an executable, and the artifact records the resolved path in `Output Summary:`. This matters because `scripts/vscode/Invoke-MSTestWithCoverage.ps1:292-294` throws when the tool is missing.
+
+- [ ] [P0-T9] Resolve the MSBuild executable through `vswhere.exe` using the same discovery `scripts/vscode/Invoke-Restore.ps1:22-30` performs: locate `vswhere.exe` under the Visual Studio Installer directory, then run it with `-latest -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\MSBuild.exe'` and take the first result. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t9-msbuild-resolution.md` with the four required fields. Acceptance: the artifact records a non-empty resolved MSBuild path and the version string that `MSBuild.exe -version` prints. Do not copy that absolute path into any other plan task; re-resolve it in each task that needs it.
+
+- [ ] [P0-T10] Capture the CSharpier baseline, read-only, before any write-mode formatting runs anywhere in this plan. Run `dotnet tool run csharpier check .` from the checkout root. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t10-csharpier-check.md` with the four required fields, recording the observed exit code whatever it is and, when it is non-zero, the complete list of file paths the command named. Acceptance: the artifact exists with all four fields and its `EXIT_CODE:` value is an integer. This task must not run `format`; a baseline captured after a repairing format pass would silently waive pre-existing drift.
+
+- [ ] [P0-T11] Capture the analyzer-gate baseline. Re-resolve MSBuild as in P0-T9 and run, through `pwsh`, `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t11-analyzer-rebuild.md` with the four required fields, and record in `Output Summary:` the summary error count and warning count MSBuild printed. Acceptance: the artifact exists with all four fields, it records `EXIT_CODE: 0`, and `Output Summary:` carries the two counts verbatim from the MSBuild summary with the error count equal to zero. If the observed exit code is non-zero or the summary error count is not zero, record in this same artifact a line beginning `BASELINE_GATE_RED:` naming the gate as `analyzer` and giving the summary error count, then stop and report a blocked state rather than continuing to P0-T12. A red analyzer gate on `origin/main` is pre-existing repository state outside the scope of issue #648 and must not be remediated inside this issue: repairing it would require changing files other than `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs`, which would breach the single-changed-`.cs`-path boundary AC-6 states at `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/issue.md:141-144`.
+
+- [ ] [P0-T12] Capture the nullable-gate baseline. Re-resolve MSBuild and run, through `pwsh`, `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t12-nullable-rebuild.md` with the four required fields, and record the summary error count and warning count in `Output Summary:`. Acceptance: the artifact exists with all four fields, it records `EXIT_CODE: 0`, and the two counts appear in `Output Summary:` with the error count equal to zero. If the observed exit code is non-zero or the summary error count is not zero, record in this same artifact a line beginning `BASELINE_GATE_RED:` naming the gate as `nullable` and giving the summary error count, then stop and report a blocked state rather than continuing to P0-T13. A red nullable gate on `origin/main` is pre-existing repository state outside the scope of issue #648 and must not be remediated inside this issue, for the same AC-6 boundary reason recorded in P0-T11. Do not add `/p:Nullable=enable`.
+
+- [ ] [P0-T13] Capture the baseline full `QuickFiler.Test.dll` run. Re-resolve `vstest.console.exe` through `vswhere.exe` with `-latest -products * -find 'Common7\IDE\Extensions\TestPlatform\vstest.console.exe'`, then run it against the single assembly `QuickFiler.Test/bin/Debug/QuickFiler.Test.dll` with `/Settings:scripts/vscode/TaskMaster.cli.runsettings`, `/InIsolation`, and `/TestCaseFilter:"TestCategory!=LiveOutlook"`. That runsettings file carries the `Workers=0` and `Scope=ClassLevel` parallelization block, so this run is also the parallel-scope run the issue's validation notes request. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t13-quickfiler-test-full.md` with the four required fields. Acceptance: `EXIT_CODE: 0` is recorded, the output contains `Test Run Successful.`, and `Output Summary:` records the `Total tests:` count and the `Passed:` count printed by the run together with the exact assembly path and the resolved runsettings path used. If the run instead printed `Test Run Failed.` or the exit code is non-zero, record in this same artifact a line beginning `BASELINE_GATE_RED:` naming the gate as `quickfiler-test-full` and giving the `Failed:` count the run printed, then stop and report a blocked state rather than continuing to P0-T14. A red baseline suite on `origin/main` is pre-existing repository state outside the scope of issue #648 and must not be remediated inside this issue, for the same AC-6 boundary reason recorded in P0-T11.
+
+- [ ] [P0-T14] Capture the baseline scoped run of the target class. Using the same resolved `vstest.console.exe` and the same assembly, run it with `/Settings:scripts/vscode/TaskMaster.cli.runsettings`, `/InIsolation`, and the single combined filter `/TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName~WpfUiDispatcherTests"`. Only one `/TestCaseFilter:` switch is accepted, so the class restriction must be combined with the category exclusion in one operand. Passing only `QuickFiler.Test.dll` is load-bearing: a second class named `WpfUiDispatcherTests` exists in a different assembly at `UtilitiesCS.Test/Threading/WpfUiDispatcherTests.cs:12`, and the substring filter would match it if that assembly were included. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t14-wpfuidispatchertests-scoped.md` with the four required fields. Acceptance: `Output Summary:` records `Total tests: 2` and the run printed `Test Run Successful.`.
+
+- [ ] [P0-T15] Capture the baseline coverage figures. Run `pwsh -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot .` from the checkout root. This is a long run; allow it to complete rather than terminating it. Copy `coverage/coverage.cobertura.xml` to `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t15-coverage.cobertura.xml`, then write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t15-coverage.md` with the four required fields plus three numeric fields read from the root `coverage` element of that copied document: `BaselineLineRate:`, `BaselineLinesCovered:`, `BaselineLinesValid:`. Also record `BaselineLineCoveragePercent:` as `line-rate` multiplied by 100. Acceptance: the copied XML exists, and all four numeric fields carry numeric values rather than placeholders.
+
+- [ ] [P0-T16] Capture the structural baseline for AC-1 and AC-2 using two independent search methods, as the issue's acceptance preamble requires. Method one is `git grep -n -F "_dispatcher"` restricted to `QuickFiler.Test` and then run again unrestricted; method two is an equivalent recursive content search over the same two scopes using a different tool. Also count, in `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` alone, the occurrences of `GetField`, of `SetValue`, and of `using System.Reflection;`. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t16-structural-counts.md` with the four required fields and one line per measurement. Acceptance: the artifact records that the quoted literal `"_dispatcher"` appears on exactly 2 lines beneath `QuickFiler.Test/` and on exactly 5 lines repository-wide; that the 3 repository-wide lines outside `QuickFiler.Test/` are `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs:422`, `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs:138`, and `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs:144`; and that `GetField`, `SetValue`, and `using System.Reflection;` each occur at least once in the target file. Record explicitly that the unquoted lambda parameter also named `_dispatcher` at `QuickFiler.Test/Viewers/BreadcrumbPopupUiOperationsDirectAdapterTests.cs:207` is unrelated and is deliberately not matched, because the search token includes the surrounding double quotes.
+
+- [ ] [P0-T17] Capture the scope-boundary baseline. Run `git status --porcelain -- QuickFiler.Test UtilitiesCS.Test UtilitiesCS` and `git diff --name-only origin/main -- QuickFiler.Test UtilitiesCS.Test UtilitiesCS`, recording both outputs. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t17-scope-boundary.md` with the four required fields. Acceptance: both outputs are recorded verbatim in `Output Summary:` and the artifact states whether each was empty. This establishes the pre-change state that the AC-6 check in P2-T13 is measured against.
+
+- [ ] [P0-T18] Record the `.globalconfig` documentation observation without acting on it. `CLAUDE.md:197` and `CLAUDE.md:273` name `.globalconfig` as an analyzer-configuration input, and a repository-wide glob for `**/.globalconfig` returns no files; `.editorconfig` is the only analyzer severity configuration, and it sets `dotnet_analyzer_diagnostic.severity = suggestion` at `.editorconfig:27`. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/other/p0-t18-globalconfig-observation.md` with `Timestamp:` and the two `CLAUDE.md` line citations, the glob result, and the `.editorconfig` line citation, and state that no change is made under #648. Acceptance: that file exists and carries all four citations. No file outside `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/` may be modified by this task.
+
+---
+
+### Phase 1 — Constrained Implementation
+
+- [ ] [P1-T1] Hand off implementation to the small-path C# implementation engineer with the constraints below, and record the handoff in `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/other/p1-t1-implementation-handoff.md` with a `Timestamp:` and the verbatim constraint list. The single file the engineer may modify is `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs`. The engineer must not modify `QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixture.cs`, any file under `UtilitiesCS.Test/` or `UtilitiesCS/`, or any `.csproj`. Acceptance: the handoff artifact exists and names exactly one modifiable path.
+
+- [ ] [P1-T2] Rewrite `Invoke_InvokeAsync_BeginInvoke_ExecuteDelegateOnDispatcherThread` in `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` to route the static swap through the shared fixture. Delete the reflection block currently at lines 42 through 47 and the unconditional restore currently at line 83. Declare the method `public async Task`, decorate it with `[TestMethod]` and `[Timeout(GateTimeoutMs)]`, and add `private const int GateTimeoutMs = 60000;` as a class field. Acquire the gate with `await UiThreadDispatcherFixture.BeginTransactionAsync().ConfigureAwait(false)` into a local of type `UiThreadDispatcherTransaction`, install with `transaction.Install(dispatcher)`, and use nested `try`/`finally` blocks so that `transaction.Dispose();` runs in the inner `finally` and `QfcItemControllerTestSupport.ShutdownDispatcher(dispatcher)` runs in the outer `finally`, in that order. Do not use a `using` statement or `using` declaration; `QuickFiler.Test/QuickFiler.Test.csproj` declares no `<LangVersion>` and every existing consumer of the transaction uses explicit `try`/`finally`. Remove `using System.Reflection;` from line 1 and remove `using UtilitiesCS;` from line 7, which exists only to supply `typeof(UiThread)`. Acceptance: the file compiles in P1-T3 and the four structural checks in P1-T4 through P1-T7 pass.
+
+- [ ] [P1-T3] Compile the changed assembly. Re-resolve MSBuild as in P0-T9 and run, through `pwsh`, `msbuild QuickFiler.Test/QuickFiler.Test.csproj /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU"`. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/regression-testing/p1-t3-compile.md` with the four required fields. Acceptance: `EXIT_CODE: 0` and the MSBuild summary line `0 Error(s)` appears in `Output Summary:`. This is a compile check only; the two policy gates with their analyzer and nullable properties are run in Phase 2 with `/t:Rebuild` on the full solution.
+
+- [ ] [P1-T4] Verify AC-2 by measurement. Search `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` for `GetField`, for `SetValue`, and for `using System.Reflection;`, using two independent search methods for each. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/regression-testing/p1-t4-ac2-no-reflection.md` with the four required fields. Acceptance: all three tokens return zero matches in that file under both methods, and the artifact records the zero counts for all six measurements.
+
+- [ ] [P1-T5] Verify AC-1 by measurement. Search for the quoted literal `"_dispatcher"` beneath `QuickFiler.Test/` and then repository-wide, using two independent search methods. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/regression-testing/p1-t5-ac1-single-owner.md` with the four required fields. Acceptance: the literal appears on exactly 1 line beneath `QuickFiler.Test/` under both methods, that line is in `QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixture.cs`, and the repository-wide count is exactly 4 with the other 3 lines being the three `UtilitiesCS.Test/Threading/` paths named in P0-T16.
+
+- [ ] [P1-T6] Verify AC-3 by measurement. Search `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` for each of `UiThreadDispatcherFixture.BeginTransactionAsync`, `UiThreadDispatcherTransaction`, `transaction.Install`, `transaction.Dispose();`, `async Task Invoke_InvokeAsync_BeginInvoke_ExecuteDelegateOnDispatcherThread`, `private const int GateTimeoutMs = 60000;`, and `[Timeout(GateTimeoutMs)]`. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/regression-testing/p1-t6-ac3-fixture-routing.md` with the four required fields, recording the matching line number for each token. Acceptance: every one of those seven tokens matches at least one line of that file, and `transaction.Dispose();` matches a line that lies inside the inner `finally` block, textually above the line matching `ShutdownDispatcher`.
+
+- [ ] [P1-T7] Verify AC-4 by measurement and by test. Confirm the three assertion regions are preserved: search `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` for `sut.Invoke(`, `sut.InvokeAsync(`, `sut.BeginInvoke(`, and `beginInvokeThreadId.Should().Be(dispatcherThreadId);`. Separately confirm that the body of `Construction_YieldsAnIUiDispatcher` is byte-identical to its form at `origin/main` by running `git diff origin/main -- QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` and reading the hunks. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/regression-testing/p1-t7-ac4-behavior-preserved.md` with the four required fields. Acceptance: all four tokens match, and no hunk in the diff touches any line between the `[TestMethod]` attribute of `Construction_YieldsAnIUiDispatcher` and that method's closing brace.
+
+- [ ] [P1-T8] Run the scoped class test to confirm the rewrite is green before the full QC loop. Re-resolve `vstest.console.exe` as in P0-T14 and run it against `QuickFiler.Test/bin/Debug/QuickFiler.Test.dll` with `/Settings:scripts/vscode/TaskMaster.cli.runsettings`, `/InIsolation`, and `/TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName~WpfUiDispatcherTests"`. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/regression-testing/p1-t8-scoped-run.md` with the four required fields. Acceptance: `EXIT_CODE: 0`, the output contains `Test Run Successful.`, and `Output Summary:` records `Total tests: 2`.
+
+- [ ] [P1-T9] Author the fail-before exception dossier in `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/regression-testing/`, naming it with the literal prefix `fail-before-exception.` followed by an ISO-8601 stamp in `yyyy-MM-ddTHH-mm` form and the extension `.md`. It must carry `Timestamp:`, `Command:`, `EXIT_CODE:`, and `WhyFailingRunImpossible:` in one to three sentences, plus an alternative-proof section and the negative-claim fields `SearchScope:`, `SearchPatterns:`, and `SearchResult:`. The `WhyFailingRunImpossible:` reasoning must state that the defect lives entirely inside a test method body so there is no unit under test and no production line changes; that reproducing the hazard requires an interleaving that cannot be forced, citing the same limitation already recorded at `QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs:17-21`; that CI runs the assembly with no `/Settings:` argument so the race is dormant in the only run that gates merge, citing `.github/workflows/_mstest-coverage.yml:83`; and that the one deterministic alternative, a source-scanning guard test of the kind already present at `QuickFiler.Test/Controllers/QfcFormControllerSeamTests.cs:49-50`, is excluded by AC-6 because it would create a second changed `.cs` path. Set `SearchScope:` to `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/regression-testing/`, `SearchPatterns:` to `fail-before-exception.*.md`, and `SearchResult:` to what that search returned. The alternative-proof section must name the substitute evidence: the structural counts from P1-T4 and P1-T5, the behavior-preservation runs from P1-T8 and P2-T7 and P2-T8, and the six inherited regression tests of issue #493 at `QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixtureTests.cs:40-344`, which are the authoritative fail-before and pass-after evidence for the underlying clobber mechanism. Acceptance: the dossier exists at a path matching that pattern and carries all seven named fields plus the alternative-proof section. Do not fabricate a red run.
+
+- [ ] [P1-T10] Check off AC-1 in `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/issue.md` by changing the single line beginning `- [ ] AC-1` to begin `- [x] AC-1`, changing nothing else on that line and no other line. Acceptance: exactly one line in that file begins with `- [x] AC-1`, the evidence for it is `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/regression-testing/p1-t5-ac1-single-owner.md`, and the total count of lines beginning `- [ ] AC-` in that file has decreased by exactly one relative to P0-T2.
+
+- [ ] [P1-T11] Check off AC-2 in the same file by changing the line beginning `- [ ] AC-2` to begin `- [x] AC-2`, changing nothing else. Acceptance: exactly one line begins with `- [x] AC-2`, and the evidence for it is `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/regression-testing/p1-t4-ac2-no-reflection.md`.
+
+- [ ] [P1-T12] Check off AC-3 in the same file by changing the line beginning `- [ ] AC-3` to begin `- [x] AC-3`, changing nothing else. Acceptance: exactly one line begins with `- [x] AC-3`, and the evidence for it is `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/regression-testing/p1-t6-ac3-fixture-routing.md`.
+
+- [ ] [P1-T13] Check off AC-4 in the same file by changing the line beginning `- [ ] AC-4` to begin `- [x] AC-4`, changing nothing else. Acceptance: exactly one line begins with `- [x] AC-4`, and the evidence for it is `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/regression-testing/p1-t7-ac4-behavior-preserved.md`.
+
+---
+
+### Phase 2 — Final QC Loop
+
+The four stages run in the order formatting, linting, type checking, testing. If any stage fails or
+rewrites a tracked file, restart from P2-T1. The remediation restart that P2-T10 directs on a FAIL
+finding is a restart under this same rule, so every return to P2-T1, whatever its cause, counts as
+one restart here.
+
+The restart rule is bounded. The maximum number of executions of P2-T1 is 3. That number is the
+counter P2-T11 records in its `LoopIterations:` field, so the ceiling and the recorded iteration
+count are the same quantity rather than two independent notions of an iteration. If a stage fails or
+rewrites a tracked file on the third execution, the executor does not restart a fourth time. It
+instead writes
+`docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t11-toolchain-loop.md`
+at that point, ahead of that task's ordinary position in the sequence, carrying `LoopIterations: 3`
+and a line beginning `LOOP_CEILING_EXCEEDED:` that names the task that failed and the observation
+that failed, and then stops and reports a blocked state. That artifact is the record of the halt.
+
+Every task below is unconditional: no task may be recorded as skipped.
+
+- [ ] [P2-T1] Apply formatting to the changed file only. Record `git status --porcelain -- QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` and the SHA-256 of that file, then run `dotnet tool run csharpier format QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs`, then record the same two observations again. The scope is deliberately the single owned path rather than the whole tree, because a repository-wide write-mode pass would rewrite files this issue does not own and break the AC-6 single-changed-path condition. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t1-csharpier-format.md` with the four required fields plus `SHA256Before:` and `SHA256After:`. Acceptance: `EXIT_CODE: 0` and the artifact carries both hashes; the two hashes may be equal or unequal, and the artifact must state which, because CSharpier exits 0 whether or not it rewrote the file.
+
+- [ ] [P2-T2] Verify formatting read-only across the whole tree. Run `dotnet tool run csharpier check .` from the checkout root. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t2-csharpier-check.md` with the four required fields. Acceptance: this run's `EXIT_CODE:` equals the integer recorded as `EXIT_CODE:` in `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t10-csharpier-check.md`, and the path `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` does not appear anywhere in this run's output. Comparing against the recorded baseline rather than demanding zero is what makes this gate detect a change this issue introduced without inheriting or waiving any pre-existing drift.
+
+- [ ] [P2-T3] Run the analyzer gate. Re-resolve MSBuild as in P0-T9 and run, through `pwsh`, `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t3-analyzer-rebuild.md` with the four required fields. Acceptance: the MSBuild summary line `0 Error(s)` appears in the output and is recorded in `Output Summary:`, this run's `EXIT_CODE:` equals the integer recorded in `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t11-analyzer-rebuild.md`, the summary warning count does not exceed the baseline warning count recorded there, and no diagnostic in this run names `WpfUiDispatcherTests.cs`. Because P0-T11 halts on a red analyzer baseline, reaching this task at all establishes that the Phase 0 analyzer baseline recorded `EXIT_CODE: 0` and a zero summary error count, which is what makes the absolute `0 Error(s)` demand here satisfiable rather than vacuous or unreachable.
+
+- [ ] [P2-T4] Run the nullable and type-check gate. Re-resolve MSBuild and run, through `pwsh`, `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t4-nullable-rebuild.md` with the four required fields. Acceptance: `0 Error(s)` appears in the output and is recorded in `Output Summary:`, this run's `EXIT_CODE:` equals the integer recorded in `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t12-nullable-rebuild.md`, the summary warning count does not exceed the baseline warning count recorded there, and no diagnostic names `WpfUiDispatcherTests.cs`. Because P0-T12 halts on a red nullable baseline, reaching this task at all establishes that the Phase 0 nullable baseline recorded `EXIT_CODE: 0` and a zero summary error count, which is what makes the absolute `0 Error(s)` demand here satisfiable rather than vacuous or unreachable. Do not add `/p:Nullable=enable`.
+
+- [ ] [P2-T5] Run the scoped class test. Re-resolve `vstest.console.exe` as in P0-T14 and run it against `QuickFiler.Test/bin/Debug/QuickFiler.Test.dll` with `/Settings:scripts/vscode/TaskMaster.cli.runsettings`, `/InIsolation`, and `/TestCaseFilter:"TestCategory!=LiveOutlook&FullyQualifiedName~WpfUiDispatcherTests"`. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t5-scoped-run.md` with the four required fields. Acceptance: `EXIT_CODE: 0`, the output contains `Test Run Successful.`, and `Output Summary:` records `Total tests: 2`, naming both `Construction_YieldsAnIUiDispatcher` and `Invoke_InvokeAsync_BeginInvoke_ExecuteDelegateOnDispatcherThread` as the two members selected.
+
+- [ ] [P2-T6] Run the full `QuickFiler.Test.dll` suite. Using the same resolved `vstest.console.exe` and the same assembly, run with `/Settings:scripts/vscode/TaskMaster.cli.runsettings`, `/InIsolation`, and `/TestCaseFilter:"TestCategory!=LiveOutlook"`. That runsettings file supplies `Workers=0` and `Scope=ClassLevel`, so this is simultaneously the parallel-scope run the issue's validation notes request. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t6-quickfiler-test-full.md` with the four required fields. Acceptance: `EXIT_CODE: 0`, the output contains `Test Run Successful.`, and the recorded `Passed:` count is greater than or equal to the `Passed:` count recorded in `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t13-quickfiler-test-full.md`. Because P0-T13 halts on a red baseline suite, reaching this task at all establishes that the Phase 0 full-suite baseline printed `Test Run Successful.`, which is what makes the absolute `EXIT_CODE: 0` demand here satisfiable rather than vacuous or unreachable. The artifact must also state, in one sentence, that a green run under class-level parallelization does not prove the race is eliminated; it shows only that the gated path is stable under that scope.
+
+- [ ] [P2-T7] Run the coverage-enabled suite. Run `pwsh -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot .` from the checkout root and allow it to complete. Copy `coverage/coverage.cobertura.xml` to `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t7-coverage.cobertura.xml`, then write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t7-coverage.md` with the four required fields plus `PostLineRate:`, `PostLinesCovered:`, `PostLinesValid:`, and `PostLineCoveragePercent:`, each read from the root `coverage` element of that copied document. Acceptance: the copied XML exists, all four numeric fields carry numeric values rather than placeholders, and this run's `EXIT_CODE:` equals the integer recorded in `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/baseline/p0-t15-coverage.md`.
+
+- [ ] [P2-T8] Verify the coverage delta. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t8-coverage-delta.md` carrying `Timestamp:` and six numeric fields copied from the two coverage artifacts: `BaselineLineCoveragePercent:`, `PostLineCoveragePercent:`, `BaselineLinesCovered:`, `PostLinesCovered:`, `BaselineLinesValid:`, `PostLinesValid:`, plus a `ChangedCodeCoverage:` field. Because the only changed lines are in a test file and test assemblies are not excluded by `coverage.config`, `lines-valid` is expected to grow; the no-regression condition is therefore expressed on the covered counter and on the changed lines. Acceptance: `PostLinesCovered:` is greater than or equal to `BaselineLinesCovered:`, and `ChangedCodeCoverage:` reports, for the class element covering `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` in the post-change Cobertura document, the covered-line count and the total-line count for that file with the covered count no lower than the total minus the count of lines in that file that contain only a brace, an attribute, or a comment.
+
+- [ ] [P2-T9] Audit the changed file against the repository file-size limit after formatting. Count the lines of `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` using a line count of the file's content, not a word-count-style measure. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t9-file-size.md` with the four required fields. Acceptance: the recorded line count is at most 500. This audit runs after P2-T1 because formatting can change the line count.
+
+- [ ] [P2-T10] Audit the new and modified test against the General Unit Test Policy and the C# Unit Test Policy. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t10-unit-test-policy-audit.md` with a `Timestamp:` and one explicit finding line for each of: framework is MSTest, assertions use FluentAssertions, no temporary file is created, no external service is contacted, no banned wall-clock wait is used, Arrange-Act-Assert structure is present, and the test intent is documented in a doc comment. Acceptance: the artifact carries all seven finding lines, each marked PASS or FAIL with a line citation into `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs`. If any line is FAIL, return to P2-T1 after correcting it.
+
+- [ ] [P2-T11] Record the toolchain-loop outcome. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t11-toolchain-loop.md` with a `Timestamp:`, the ordered list of the four stages with the artifact path recorded for each, and a `LoopIterations:` field giving the number of times P2-T1 was executed. That field is the counter the Phase 2 preamble's ceiling of 3 is measured against; it is the same quantity and not a separate count. Acceptance: `LoopIterations:` carries an integer no greater than 3, the artifact names the four stage artifacts `p2-t1-csharpier-format.md`, `p2-t3-analyzer-rebuild.md`, `p2-t4-nullable-rebuild.md`, and `p2-t6-quickfiler-test-full.md`, and states that the final iteration completed all four stages without a failure and without a file rewrite. In the ceiling-exceeded outcome defined in the Phase 2 preamble this same artifact is instead written with `LoopIterations: 3` and a line beginning `LOOP_CEILING_EXCEEDED:`, and the executor stops and reports a blocked state rather than proceeding to P2-T12.
+
+- [ ] [P2-T12] Stage the change so the scope-boundary diff can observe untracked files. Run `git add -A -- QuickFiler.Test docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648`, then run `git status --porcelain -- QuickFiler.Test`. The pathspec is deliberately narrow: a bare `git add -A` would also stage unrelated queued work elsewhere in the tree. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t12-staging.md` with the four required fields. Acceptance: `EXIT_CODE: 0` and the porcelain output is recorded verbatim, listing `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` as the only entry beneath `QuickFiler.Test`.
+
+- [ ] [P2-T13] Verify AC-6, the scope boundary. Run `git diff --name-only origin/main` and record the complete list, then run `git diff --name-only origin/main -- UtilitiesCS.Test UtilitiesCS` and record its output. This task is paired with the `git add` span in P2-T12, which is what lets a name-listing diff observe the evidence files this plan created. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t13-ac6-scope-boundary.md` with the four required fields. Acceptance: exactly one path in the first list ends with `.cs`, and it is `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs`; the second command's output is empty; and the artifact confirms that none of `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs`, `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs`, or `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs` appears in either list.
+
+- [ ] [P2-T14] Check off AC-5 in `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/issue.md` by changing the line beginning `- [ ] AC-5` to begin `- [x] AC-5`, changing nothing else. Acceptance: exactly one line begins with `- [x] AC-5`, and the evidence for it is the pair `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t5-scoped-run.md` and `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t6-quickfiler-test-full.md`.
+
+- [ ] [P2-T15] Check off AC-6 in the same file by changing the line beginning `- [ ] AC-6` to begin `- [x] AC-6`, changing nothing else. Acceptance: exactly one line begins with `- [x] AC-6`, and the evidence for it is `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t13-ac6-scope-boundary.md`.
+
+- [ ] [P2-T16] Check off AC-7 in the same file by changing the line beginning `- [ ] AC-7` to begin `- [x] AC-7`, changing nothing else. Acceptance: exactly one line begins with `- [x] AC-7`, and the evidence for it is the set `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t2-csharpier-check.md`, `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t3-analyzer-rebuild.md`, `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t4-nullable-rebuild.md`, and the fail-before dossier written by P1-T9, all of which must exist on disk at the moment of check-off. AC-7 also requires the CSharpier check to report zero errors, so this check-off is permitted only when `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t2-csharpier-check.md` records `EXIT_CODE: 0`. The analyzer and nullable halves of AC-7 are already established by the time this task runs, because P0-T11 and P0-T12 halt on a red baseline; the CSharpier half is not, because P0-T10 records its baseline without halting and P2-T2 deliberately gates on equality with that baseline rather than on zero. If that artifact records a non-zero exit code, leave AC-7 unchecked, record in it a line beginning `BASELINE_GATE_RED:` naming the gate as `csharpier`, and stop with a blocked report: repository-wide formatting drift that predates this branch cannot be repaired here without changing files beyond the single path AC-6 permits.
+
+- [ ] [P2-T17] Write the acceptance-criteria status summary to `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/issue-updates/ac-status-summary.md` with `Timestamp:`, `PostedAs: unknown`, `Source:` naming `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/issue.md`, `Total AC items:`, `Checked off (delivered):`, `Remaining (unchecked):`, and `Items remaining:`. Acceptance: `Total AC items:` is 7, `Checked off (delivered):` is 7, `Remaining (unchecked):` is 0, and a count of lines beginning `- [ ] AC-` in the issue file returns 0.
+
+- [ ] [P2-T18] Commit the change and every artifact, and leave the worktree clean within the plan's scope. Run `git add -A -- QuickFiler.Test docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648` again to pick up artifacts written after P2-T12, then commit with a message naming issue #648. Write `docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648/evidence/qa-gates/p2-t18-commit.md` with the four required fields. Acceptance: `EXIT_CODE: 0`, and a following `git status --porcelain -- QuickFiler.Test docs/features/active/2026-08-27-wpfuidispatchertests-ungated-static-swap-648` produces empty output, recorded verbatim in `Output Summary:`. The status operand is scoped rather than repository-wide because `.claude/agent-memory/` is a tracked path this plan does not own.
