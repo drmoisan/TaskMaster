@@ -47,6 +47,7 @@
 - [issue-469-already-fixed-residual-is-629](project_issue_469_already_fixed_residual_is_629.md) — #469's 4 defects verified fixed on main; only residual is param removal = existing #629; `Initialized<T>` never memoizes; defect 1/2 numbering inverted (2026-08-29)
 - [reflective-caller-closure-635](project_reflective_caller_closure_635.md) — #635/#468: removal was THIRTEEN members (`_templateTlp` omitted from AC-16); `GetField(` never searched (172 hits) yet is the only reaching mechanism; QuickFiler is ComVisible(false) (2026-08-29)
 - [selectrow-two-families-637](project_selectrow_two_families_637.md) — #637: TWO unrelated SelectRow families (bare grep over-counts ~10x); blanket TryMakeArchiveRelative rejects relative/Trash rows; ButtonOK_Click does NOT rethrow (2026-08-29)
+- [analyzer-severity-ceiling-and-runsettings-split](project_analyzer_severity_ceiling_and_runsettings_split.md) — MSTEST0032 is the ONLY rule above suggestion; no .globalconfig; Invoke-MSTest.ps1 docstring names the wrong runsettings (2026-08-31)
 - [issue-656-bypass-path-does-not-exist](project_issue_656_bypass_path_does_not_exist.md) — #656 premise FALSE: no bypassing reopen path exists; SR-4's "no IsOpen under _sync" already violated at :112; both nominated owner files at the 500-line cap (2026-08-31)
 
 ## Artifact hygiene
