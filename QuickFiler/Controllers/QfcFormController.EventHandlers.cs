@@ -164,7 +164,6 @@ namespace QuickFiler.Controllers
                 catch (System.Exception e)
                 {
                     await moveTask;
-                    await _parent.FilerQueue.Consumer;
                     log.Error(e.Message, e);
                     log.Debug("Shutting down QuickFiler");
                     await ActionCancelAsync();
@@ -190,7 +189,6 @@ namespace QuickFiler.Controllers
                 _groups.CacheMoveObjects();
                 _parent.SwapStopWatch();
                 await BackGroundMoveAsync();
-                await _parent.FilerQueue.Consumer;
 
                 // If DataModel is not Complete then an error happened loading the queue
                 if (!_parent.DataModel.Complete)
@@ -216,13 +214,24 @@ namespace QuickFiler.Controllers
         {
             //TraceUtility.LogMethodCall();
 
-            if (_groups is null || _globals?.FS?.Filenames is null || WriteMetrics is null)
+            if (
+                _groups is null
+                || _parent is null
+                || _globals?.FS?.Filenames is null
+                || WriteMetrics is null
+            )
             {
                 return;
             }
 
             // Move emails
             await _groups.MoveEmailsAsync(_movedItems);
+
+            // Wait for the batch's filing work, including its undo pushes, to finish before either
+            // downstream step runs. The await at the line above completes as soon as the last item has
+            // been enqueued, not filed, so without this barrier the undo-push ordering would be an
+            // assumption rather than a control-flow property. Issue 633.
+            await _parent.FilerQueue.WhenDrainedAsync();
 
             // Write Move Metrics
             await UiThread.Dispatcher.InvokeAsync(
