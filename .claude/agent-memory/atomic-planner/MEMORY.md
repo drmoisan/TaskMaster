@@ -26,6 +26,7 @@
 - [#644 cycle 2](project_644_cycle2_sweep_gate_evasion_seams.md) — rewording out of a detector's match set is gate evasion; SHA-256 pair
 - [#644 PA-7](project_644_pa7_redaction_plan_seams.md) — untracked audit artifact still enters main; name-status diff blind to it
 - [#662](project_662_banner_prefix_arity_plan_seams.md) — `AC5` is a prefix of `AC5b`; `("===")` not a substring of `("====")`
+- [#662 R3](project_662_round3_trx_hygiene_and_verbatim_seams.md) — `*.trx` is NOT gitignored; sweep case-insensitively; exclude the plan file from the sweep's own zero-hit gate
 - [#662 R2](project_662_banner_prefix_revision_round_seams.md) — `'*.xml'` scope gate hits the plan's own cobertura evidence; loop-restart needs a baseline-relative failure test
 - [#680](project_680_menu_mode_plan_seams.md) — HostTests.cs 499 not 500; TRX 5-shape identifiers; exact line arithmetic (501 vs 500)
 
