@@ -33,7 +33,7 @@
 - [Verify test provenance before planning a deletion](verify-test-provenance-before-planning-deletion.md) — in a revert plan, read the test at the pre-cycle commit; a two-arg call shape doesn't prove the cycle added it
 - [Validator phase-heading constraint](plan-validator-phase-heading-constraint.md) — exact `### Phase N — <Title>`; nothing between N and the em dash
 - [Validator task-ID sequential constraint](plan-validator-task-id-sequential-constraint.md) — digit-only, sequential by appearance; insertion forces full renumber
-- [Planner may lack the MCP validator](project_planner_mcp_validator_not_in_tool_surface.md) — report VALIDATOR NOT RUN + structural self-check; never claim a pass
+- [Planner may lack the MCP validator](project_planner_mcp_validator_not_in_tool_surface.md) — file-only surface: report VALIDATOR NOT RUN and COMMIT NOT RUN; never claim either passed
 - [Fenced `#` comments look like headings](plan-fenced-powershell-comments-look-like-headings.md) — indent column-0 `#` inside code fences
 - [One AC per check-off task](feedback_ac_checkoff_one_per_task.md) — preflight rejects batched AC check-offs
 - [Terminal-phase planner traps](terminal-phase-planner-traps.md) — unowned "a follow-up issue should carry it"; artifacts written after the clean-tree commit task; false "clarification against spec wording"
