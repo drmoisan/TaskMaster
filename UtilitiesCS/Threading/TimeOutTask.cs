@@ -168,10 +168,19 @@ namespace UtilitiesCS
             CancellationToken token,
             int milliseconds,
             int maxAttempts,
-            bool strict
+            bool strict,
+            Func<int, CancellationTokenSource>? timeoutSourceFactory = null
         )
         {
-            return await function.RunWithTimeout(arg1, token, milliseconds, maxAttempts, strict, 0);
+            return await function.RunWithTimeout(
+                arg1,
+                token,
+                milliseconds,
+                maxAttempts,
+                strict,
+                0,
+                timeoutSourceFactory
+            );
         }
 
         private static async Task<TResult> RunWithTimeout<T1, TResult>(
@@ -181,12 +190,15 @@ namespace UtilitiesCS
             int milliseconds,
             int maxAttempts,
             bool strict,
-            int attempt
+            int attempt,
+            Func<int, CancellationTokenSource>? timeoutSourceFactory = null
         )
         {
             token.ThrowIfCancellationRequested();
 
-            using var timeoutSource = new CancellationTokenSource(milliseconds);
+            using var timeoutSource = (
+                timeoutSourceFactory ?? (ms => new CancellationTokenSource(ms))
+            )(milliseconds);
             using var combinedToken = CancellationTokenSource.CreateLinkedTokenSource(
                 token,
                 timeoutSource.Token
@@ -197,7 +209,12 @@ namespace UtilitiesCS
             {
                 result = await Task.Run(() => function(arg1), combinedToken.Token);
             }
-            catch (TimeoutException)
+            // A timer-driven cancellation of Task.Run surfaces as TaskCanceledException, not
+            // TimeoutException (issue #285). TimeoutException is retained because a wrapped
+            // delegate may raise it directly, and existing callers and tests depend on that retry.
+            // System.Exception is written out because Microsoft.Office.Interop.Outlook, imported at
+            // line 9, also declares a type named Exception and a bare Exception is CS0104-ambiguous.
+            catch (System.Exception e) when (e is TaskCanceledException || e is TimeoutException)
             {
                 token.ThrowIfCancellationRequested();
 
@@ -209,7 +226,8 @@ namespace UtilitiesCS
                         milliseconds,
                         maxAttempts,
                         strict,
-                        attempt + 1
+                        attempt + 1,
+                        timeoutSourceFactory
                     );
                 }
                 else
