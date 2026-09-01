@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TestRun id="bbe5b9f8-1db2-4af0-a1a0-321b08d0b612" name="DanMoisan@MEGALODON4 2026-09-01 11:01:34" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="bbe5b9f8-1db2-4af0-a1a0-321b08d0b612" name="REDACTED_USER@REDACTED_HOST 2026-09-01 11:01:34" runUser="REDACTED_HOST\REDACTED_USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-09-01T11:01:34.5515467-04:00" queuing="2026-09-01T11:01:34.5515467-04:00" start="2026-09-01T11:01:33.3229560-04:00" finish="2026-09-01T11:01:34.5656977-04:00" />
   <TestSettings name="default" id="e13ae965-e719-4b28-981e-9143d6703e2e">
-    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-09-01_11_01_34" />
+    <Deployment runDeploymentRoot="REDACTED_USER_REDACTED_HOST_2026-09-01_11_01_34" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="7746bd89-b8ac-426a-b62f-ac3725b957e4" testId="1b150694-bda3-8db5-8d14-059d2972da79" testName="FilerQueue_NewInstance_HasCompletedConsumerByDefault" computerName="MEGALODON4" duration="00:00:00.0460538" startTime="2026-09-01T11:01:34.2324853-04:00" endTime="2026-09-01T11:01:34.3874270-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7746bd89-b8ac-426a-b62f-ac3725b957e4">
+    <UnitTestResult executionId="7746bd89-b8ac-426a-b62f-ac3725b957e4" testId="1b150694-bda3-8db5-8d14-059d2972da79" testName="FilerQueue_NewInstance_HasCompletedConsumerByDefault" computerName="REDACTED_HOST" duration="00:00:00.0460538" startTime="2026-09-01T11:01:34.2324853-04:00" endTime="2026-09-01T11:01:34.3874270-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7746bd89-b8ac-426a-b62f-ac3725b957e4">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;

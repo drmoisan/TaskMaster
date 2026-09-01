@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TestRun id="c57b779f-5533-472a-ad35-0cef7c8a87b0" name="DanMoisan@MEGALODON4 2026-09-01 10:55:24" runUser="Megalodon4\DanMoisan" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+<TestRun id="c57b779f-5533-472a-ad35-0cef7c8a87b0" name="REDACTED_USER@REDACTED_HOST 2026-09-01 10:55:24" runUser="REDACTED_HOST\REDACTED_USER" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Times creation="2026-09-01T10:55:24.1185840-04:00" queuing="2026-09-01T10:55:24.1185840-04:00" start="2026-09-01T10:55:22.6938513-04:00" finish="2026-09-01T10:55:24.1336413-04:00" />
   <TestSettings name="default" id="4f5edfbf-defb-46c0-8ef9-a8c8c0ea1e92">
-    <Deployment runDeploymentRoot="DanMoisan_MEGALODON4_2026-09-01_10_55_24" />
+    <Deployment runDeploymentRoot="REDACTED_USER_REDACTED_HOST_2026-09-01_10_55_24" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="5d9e2cbc-753f-4413-b13e-65cb0e97a3a1" testId="13bc3140-ef4a-8a40-9542-61a21d59427f" testName="BackGroundMoveAsync_WithPendingQueueItem_DoesNotWriteMetricsBeforeDrain" computerName="MEGALODON4" duration="00:00:00.2932982" startTime="2026-09-01T10:55:23.6306694-04:00" endTime="2026-09-01T10:55:24.0292074-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5d9e2cbc-753f-4413-b13e-65cb0e97a3a1">
+    <UnitTestResult executionId="5d9e2cbc-753f-4413-b13e-65cb0e97a3a1" testId="13bc3140-ef4a-8a40-9542-61a21d59427f" testName="BackGroundMoveAsync_WithPendingQueueItem_DoesNotWriteMetricsBeforeDrain" computerName="REDACTED_HOST" duration="00:00:00.2932982" startTime="2026-09-01T10:55:23.6306694-04:00" endTime="2026-09-01T10:55:24.0292074-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5d9e2cbc-753f-4413-b13e-65cb0e97a3a1">
       <Output>
         <StdOut>Warning:&#xD;
      The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
@@ -37,7 +37,7 @@ Debug Trace:&#xD;
      For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="99caafe4-13e6-4e80-a23e-032d397d521d" testId="150fd8f8-a4aa-836c-9b8f-71f1e2037b93" testName="BackGroundMoveAsync_WithPendingQueueItem_DoesNotDispatchCleanupBeforeDrain" computerName="MEGALODON4" duration="00:00:00.0126723" startTime="2026-09-01T10:55:24.0342067-04:00" endTime="2026-09-01T10:55:24.0507194-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="99caafe4-13e6-4e80-a23e-032d397d521d" />
+    <UnitTestResult executionId="99caafe4-13e6-4e80-a23e-032d397d521d" testId="150fd8f8-a4aa-836c-9b8f-71f1e2037b93" testName="BackGroundMoveAsync_WithPendingQueueItem_DoesNotDispatchCleanupBeforeDrain" computerName="REDACTED_HOST" duration="00:00:00.0126723" startTime="2026-09-01T10:55:24.0342067-04:00" endTime="2026-09-01T10:55:24.0507194-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="99caafe4-13e6-4e80-a23e-032d397d521d" />
   </Results>
   <TestDefinitions>
     <UnitTest name="BackGroundMoveAsync_WithPendingQueueItem_DoesNotWriteMetricsBeforeDrain" storage="WORKTREE\quickfiler.test\bin\debug\quickfiler.test.dll" id="13bc3140-ef4a-8a40-9542-61a21d59427f">

@@ -30,7 +30,7 @@ box without the artifact on disk.
 - Every command-step artifact carries, at minimum, four fields: `Timestamp:`, `Command:`, `EXIT_CODE:`,
   `Output Summary:`. Baseline test artifacts additionally carry numeric coverage headline values.
   `UNVERIFIED` is not an acceptable value for any of these fields.
-- `WORKTREE` denotes `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a2cb3799bdac5110d`.
+- `WORKTREE` denotes `<repo-root>/.claude/worktrees/agent-a2cb3799bdac5110d`.
   Every command in this plan runs with that directory as the working directory.
   (Execution correction, applied 2026-09-01: the authored value named a different worktree,
   `agent-ad3ffa06b9103d4cc`, which is not the checkout this plan is executed in. The value above is the

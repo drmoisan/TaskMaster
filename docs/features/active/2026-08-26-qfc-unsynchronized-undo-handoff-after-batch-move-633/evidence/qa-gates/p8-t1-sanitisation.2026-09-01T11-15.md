@@ -4,6 +4,10 @@ Timestamp: 2026-09-01T11-15
 Task: [P8-T1]
 Working directory: WORKTREE
 
+> **Superseded in part.** The Output Summary of this record was wrong as written. See the
+> "Correction (2026-09-01T11-47)" section at the end of this file before relying on any statement here.
+> The record of what this pass actually did is retained unchanged.
+
 Command: `pwsh -NoProfile -File <scratchpad>/sanitise.ps1`
 EXIT_CODE: 0
 
@@ -50,3 +54,38 @@ into a committed path just as a file name does.
 
 Output Summary: The committed evidence tree carries no absolute host path in any file's content, no
 account token in any file name, and no account token in any directory name.
+
+## Correction (2026-09-01T11-47)
+
+The Output Summary above is wrong as written, and the section that precedes it is narrower than its own
+phrasing suggests. This correction states the defect plainly and leaves the original record intact.
+
+**What the pass actually covered.** The sweep recorded above substituted the three spellings of one
+value only: this worktree's own absolute path. Its remaining-match count of 0 was measured against that
+one value. Within that scope the count was correct, and the file-name and directory-name counts were
+correct as well.
+
+**What the pass did not cover.** Every other absolute host path and every bare host identifier in the
+evidence set was left in place, because none of them is a spelling of the worktree path and none was in
+the pattern set. Three classes survived the pass and were still present when the correction was made:
+
+| Class of surviving token | Files affected |
+|---|---|
+| Analyzer-configuration path into the main checkout, in the `.msbuild.txt` logs | 8 |
+| Run-identity attributes naming the account and the machine, in the `.trx` files | 8 |
+| A note in the plan file defining the `WORKTREE` constant by its literal absolute value | 1 |
+
+The third class was introduced during this plan's own execution: the note that documents the `WORKTREE`
+substitution wrote the substituted value out in full, so the act of recording the sanitisation reinstated
+the identifier in a different file.
+
+**Why the summary was wrong.** The claim "carries no absolute host path in any file's content" is a
+statement about all absolute host paths. The measurement that supported it ranged over one path. A count
+of 0 remaining matches for the swept value does not license a claim of 0 for the unswept ones, and
+restating a scoped measurement in unscoped language is the specific error made here.
+
+**Corrected status.** The surviving tokens were removed by a corrective sweep over the branch's changed
+file set. That sweep, its command, its exit code, and its post-sweep counts are recorded in
+`p8-t1-sanitisation-correction.2026-09-01T11-47.md` in this directory. No raw pre-substitution value is
+quoted in either artifact; each substituted token is described by class only, because quoting a removed
+identifier would write it back into a committed file.
