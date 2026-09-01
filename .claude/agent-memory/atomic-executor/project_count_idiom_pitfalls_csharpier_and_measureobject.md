@@ -17,6 +17,8 @@ foreach ($f in $files) { if ((Get-FileHash -LiteralPath $f -Algorithm SHA256).Ha
 ```
 `csharpier check .` remains the right read-only verdict (`Checked 1517 files in ...` plus exit 0 means zero need formatting; non-conforming files are printed one per line before the summary).
 
+Corollary hit on #285: a plan task can instruct you to record "the `Formatted` summary line CSharpier prints" for a task whose command is `csharpier check .`. Check mode never prints a `Formatted` line — it prints `Checked N files`. Record the line the invoked subcommand actually printed and state in the artifact that check mode uses different wording; do not fabricate a `Formatted` line to satisfy the task text, and do not switch the command to `format` to make the quoted line appear (that would turn a read-only baseline into a writing one).
+
 **2. `Measure-Object -Line` does NOT count blank lines.**
 `(Get-Content -LiteralPath $f | Measure-Object -Line).Lines` returned 86 / 84 / 84 / 17 / 143 for files whose true physical line counts are 95 / 99 / 99 / 18 / 168. Every figure is understated, by exactly the blank-line count. A file-size audit against a 500-line cap using this idiom under-reports and can pass a file that actually violates the cap.
 Use `(Get-Content -LiteralPath $f).Count`, and cross-check with `wc -l`. The two agreed exactly on all five files.
