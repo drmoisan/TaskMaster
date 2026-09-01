@@ -115,6 +115,7 @@
 - [External actor can merge your child PR mid-run](external-actor-can-merge-your-child-pr-midrun.md) — re-read PR state before the CI gate
 - [Stale base anchor passes ancestry vacuously](stale-base-anchor-passes-ancestry-vacuously.md) — on a prep resume the pinned base stays an ancestor, so the check passes while diffs bill another issue's work to your plan
 - [orchestrator-state.json is TRACKED in git](orchestrator-state-json-is-tracked-in-git.md) — .gitignore does not apply; writing your checkpoint pollutes the footprint. Fix with skip-worktree
+- [Preflight sibling-invalidation cascade](preflight-sibling-invalidation-cascade.md) — a delta that changes a count or taxonomy falsifies sibling tasks; bundle the sibling fix, and a planner's flagged-but-declined residual is a probable defect
 
 ## Artifact hygiene
 - [Angle-bracket redaction breaks TRX XML](angle-bracket-redaction-breaks-trx-xml.md) — a `<placeholder>` in an XML attribute makes the
