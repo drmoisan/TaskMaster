@@ -314,7 +314,8 @@ unreachable and every downstream exit-code acceptance in this plan is unsatisfia
       stderr verbatim, and states which of the two outcomes occurred: the line
       `Discovered 1 test assemblies.` was printed, or a terminating error was raised. No later task in
       this plan depends on the outcome; the record exists to justify this plan's use of
-      `-SearchRoot .` and to supply evidence for a follow-up issue. Record in
+      `-SearchRoot .` and to supply evidence for issue #713, which was opened for this defect during
+      preparation. Do not fix that defect here; it is out of scope for issue #663. Record in
       `docs/features/active/qfc-twin-processcmdkey-alt-chord-over-claim-663/evidence/baseline/scoped-runner-probe.md`
       with `Timestamp:`, `Command:`, `EXIT_CODE:` and `Output Summary:`. Serves AC-10.
 - [ ] [P0-T12] Capture the baseline repository-wide test state by running
