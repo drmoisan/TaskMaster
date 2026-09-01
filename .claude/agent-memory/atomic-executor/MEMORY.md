@@ -1,6 +1,7 @@
 # Atomic Executor Memory Index
 
 ## Plan validation & gates
+- [Mid-plan commit needs a capture-time sanitisation gate](project_midplan_commit_needs_capture_time_sanitisation_gate.md) — a final whole-tree sweep cannot reach an earlier commit
 - [Blocked Bash command drops chained check-off](project_blocked_bash_command_silently_drops_chained_checkoff.md) — aborts the WHOLE
 - [CSharpier chain-wrap defeats single-line search gates](project_csharpier_chain_wrap_defeats_singleline_search_gates.md) — zero-hit gate go
 - [Verify line citations with numbered output](feedback_verify_line_citations_with_numbered_output.md) — never hand-count
@@ -110,6 +111,7 @@
 - [Reproduce the baseline's counting method](project_coverage_delta_reproduce_baseline_counting_method.md) — deduped vs all-d
 - [Async state machine emits no `<method>` element](project_async_state_machine_emits_no_method_element.md) — per-method union is empty; `.//line` double-counts
 - [First-party coverage denominator (#197)](project_coverage_firstparty_denominator_method.md) — count per-`<line>`
+- [Coverage runner throws before post-processing](project_coverage_runner_throws_before_postprocessing.md) — a red suite leaves a RAW cobertura; not comparable with a processed one
 - [dotnet-coverage denominator nondeterminism](project_dotnet_coverage_denominator_nondeterminism.md) — 47% vs 81% from 
 - [Koverage Cobertura post-processing shape](project_koverage_cobertura_postprocessing_shape.md) — passing run = proce
 - [C# canonical coverage artifact conversion](project_csharp_canonical_coverage_artifact_conversion.md) — hook reads JaCoC
