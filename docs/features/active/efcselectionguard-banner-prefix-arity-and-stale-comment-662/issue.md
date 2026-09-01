@@ -82,13 +82,15 @@ and test-pinned as broader.
   1. `"==="` is a substring of `"===="`, so a bare grep for the three-character literal also
      matches every four-character declaration. Every occurrence assertion must anchor on the
      closing quote and semicolon (`= "===";` versus `= "====";`), which cannot cross-match.
-  2. The anchored form still over-counts if it is run across the whole tree. Four files contain
-     the literal text `= "====";`: the two production declarations, plus two historical audit
+  2. The anchored form still over-counts if it is run across the whole tree. Beyond the two
+     production declarations, the literal text `= "====";` also appears in historical audit
      records under `docs/features/active/efc-controller-surface-defects-464/`
      (`evidence/qa-gates/sibling-ownership.md:103` and
-     `research/2026-08-25T12-20-efc-controller-surface-defects.md:1134`). Those are closed-feature
-     audit records and must not be edited. Every occurrence assertion must therefore be scoped
-     with the pathspec `-- '*.cs'`.
+     `research/2026-08-25T12-20-efc-controller-surface-defects.md:1134`), which are closed-feature
+     records and must not be edited, and in this document itself. The unscoped file count is
+     therefore scope-dependent and grows as this feature's own documents are authored; no absolute
+     unscoped figure is asserted anywhere in this issue. Every occurrence assertion is scoped with
+     the pathspec `-- '*.cs'`, and only the scoped counts are operative.
 
   Pre-change baseline, derived by two independent methods (anchored fixed-string search and a
   `const string` declaration regex), both scoped to `-- '*.cs'`:
@@ -121,11 +123,13 @@ the asserted count.
   one line, located in `QuickFiler/Controllers/EfcSelectionGuard.cs`.
 - [ ] AC2 — The guard's constant is renamed from `BannerPrefix` to `BannerRejectionPrefix`, and
   the new name is used at both `StartsWith` call sites in that file (currently `:49` in
-  `IsValidFilingSelection` and `:75` in `IsValidCreationSelection`). Verified by
+  `IsValidFilingSelection` and `:75` in `IsValidCreationSelection`). Verified by two commands:
   `git grep -nE 'const +string +[A-Za-z_]*BannerPrefix' -- '*.cs'` returning exactly one line,
-  located in `UtilitiesCS/OutlookObjects/Folder/BreadcrumbRowBuilder.cs`, and by
-  `git grep -n 'BannerRejectionPrefix' -- QuickFiler/Controllers/EfcSelectionGuard.cs` returning
-  exactly three lines (one declaration, two call sites).
+  located in `UtilitiesCS/OutlookObjects/Folder/BreadcrumbRowBuilder.cs`; and
+  `git grep -n -F -- 'StartsWith(BannerRejectionPrefix' -- QuickFiler/Controllers/EfcSelectionGuard.cs`
+  returning exactly two lines. The second command counts call sites only and is deliberately
+  insensitive to how many times the new name appears in doc-comment prose, so AC3's wording cannot
+  perturb AC2's count.
 - [ ] AC3 — `BannerRejectionPrefix` carries an XML doc comment that states three things: that it
   is deliberately a proper prefix of `BreadcrumbRowBuilder.BannerPrefix`; that it therefore
   rejects a strict superset of the producers' banner rows; and that it must not be widened to the
@@ -136,10 +140,21 @@ the asserted count.
   matching the producers' four-character prefix, combined with the guard's deliberately broader
   three-character rejection. Verified by reading the replacement text and by AC9's clean
   toolchain pass; no occurrence-count assertion is made against comment prose.
-- [ ] AC5 — `UtilitiesCS/OutlookObjects/Folder/FolderSuggestionTree.cs` no longer declares its own
-  four-character banner literal and instead references `BreadcrumbRowBuilder.BannerPrefix`.
-  Verified by `git grep -n -F -- '= "====";' -- '*.cs'` returning exactly one line, located in
-  `UtilitiesCS/OutlookObjects/Folder/BreadcrumbRowBuilder.cs`.
+- [ ] AC5 — `UtilitiesCS/OutlookObjects/Folder/FolderSuggestionTree.cs` declares no banner-prefix
+  constant at all. Its `BannerPrefix` declaration at `:16` is DELETED, not re-aliased, and its
+  single reader `IsBanner` (`:195-198`) references `BreadcrumbRowBuilder.BannerPrefix` directly.
+  Deletion rather than aliasing is required because an aliasing declaration
+  (`private const string BannerPrefix = BreadcrumbRowBuilder.BannerPrefix;`) still matches AC2's
+  declaration regex and would make AC2's count two instead of one. Verified by
+  `git grep -n -F -- '= "====";' -- '*.cs'` returning exactly one line, located in
+  `UtilitiesCS/OutlookObjects/Folder/BreadcrumbRowBuilder.cs`, and by
+  `git grep -n 'BannerPrefix' -- UtilitiesCS/OutlookObjects/Folder/FolderSuggestionTree.cs`
+  returning exactly one line, which is the qualified reference inside `IsBanner`.
+- [ ] AC5b — `UtilitiesCS/OutlookObjects/Folder/BreadcrumbRowBuilder.cs` is NOT modified. Feature
+  #498's acceptance criteria assert that file is unmodified, so this work may only add a reader to
+  its existing public constant. Verified by
+  `git diff 2b85134b42872e405602e6064e02dc9cda6c319b --stat -- UtilitiesCS/OutlookObjects/Folder/BreadcrumbRowBuilder.cs`
+  reporting no change to that file.
 - [ ] AC6 — A new MSTest test method named
   `BannerRejectionPrefix_RejectsThreeAndFourEqualsRowsOnBothPredicates` is added to
   `QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs`. It asserts that
@@ -152,7 +167,7 @@ the asserted count.
 - [ ] AC7 — The pre-existing test
   `IsSelectableFolder_AndIsBannerRow_ClassifyThreeAndFourEqualsRowsIdentically` in
   `QuickFiler.Test/Controllers/EfcFormControllerTests.cs` is unmodified and still passes.
-  Verified by `git diff origin/main --stat -- QuickFiler.Test/Controllers/EfcFormControllerTests.cs`
+  Verified by `git diff 2b85134b42872e405602e6064e02dc9cda6c319b --stat -- QuickFiler.Test/Controllers/EfcFormControllerTests.cs`
   reporting no change to that file, and by a scoped `vstest.console.exe` run with
   `/Tests:IsSelectableFolder_AndIsBannerRow_ClassifyThreeAndFourEqualsRowsIdentically` reporting
   `Passed: 1` and `Failed: 0`.
