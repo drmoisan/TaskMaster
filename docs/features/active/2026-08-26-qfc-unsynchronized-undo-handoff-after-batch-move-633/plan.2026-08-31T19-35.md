@@ -30,8 +30,11 @@ box without the artifact on disk.
 - Every command-step artifact carries, at minimum, four fields: `Timestamp:`, `Command:`, `EXIT_CODE:`,
   `Output Summary:`. Baseline test artifacts additionally carry numeric coverage headline values.
   `UNVERIFIED` is not an acceptable value for any of these fields.
-- `WORKTREE` denotes `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-ad3ffa06b9103d4cc`.
+- `WORKTREE` denotes `C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a2cb3799bdac5110d`.
   Every command in this plan runs with that directory as the working directory.
+  (Execution correction, applied 2026-09-01: the authored value named a different worktree,
+  `agent-ad3ffa06b9103d4cc`, which is not the checkout this plan is executed in. The value above is the
+  worktree that actually holds branch `bug/qfc-unsynchronized-undo-handoff-after-batch-move-633`.)
 
 ## Executor environment notes (read before Phase 0)
 
@@ -314,28 +317,28 @@ without them every `dotnet` and `msbuild` command fails and every downstream `EX
 in this plan is unreachable. Do not add analyzer back-fill tasks: all sixteen projects and every
 `packages.config` already agree on `Meziantou.Analyzer 3.0.194` and `Roslynator.Analyzers 5.0.0`.
 
-- [ ] [P0-T1] Read, in this order, `CLAUDE.md`, `.claude/rules/general-code-change.md`,
+- [x] [P0-T1] Read, in this order, `CLAUDE.md`, `.claude/rules/general-code-change.md`,
       `.claude/rules/general-unit-test.md`, `.claude/rules/quality-tiers.md`,
       `.claude/rules/tonality.md`, and `.claude/rules/csharp.md` if it exists. Write
       `FEATURE/evidence/baseline/phase0-instructions-read.TIMESTAMP.md` containing `Timestamp:`,
       `Policy Order:`, and the explicit list of files read with the line count of each.
       Acceptance: the artifact exists and lists at least five read files, each with a numeric line count.
-- [ ] [P0-T2] Read `FEATURE/spec.md` in full and transcribe its twenty acceptance-criteria bullets into
+- [x] [P0-T2] Read `FEATURE/spec.md` in full and transcribe its twenty acceptance-criteria bullets into
       `FEATURE/evidence/baseline/ac-inventory.TIMESTAMP.md`, one row per criterion, each row carrying
       the identifier AC1 through AC20, the spec line number, and the anchor fragment from the table
       above. Acceptance: the artifact contains exactly twenty rows with identifiers AC1 through AC20 and
       no duplicate identifier.
-- [ ] [P0-T3] Run `git fetch origin main` then `git merge-base origin/main HEAD` in `WORKTREE`. Record
+- [x] [P0-T3] Run `git fetch origin main` then `git merge-base origin/main HEAD` in `WORKTREE`. Record
       both commands and the resulting SHA, plus the output of `git rev-parse origin/main`, in
       `FEATURE/evidence/baseline/p0-t3-merge-base.TIMESTAMP.md` with `Timestamp:`, `Command:`,
       `EXIT_CODE:`, `Output Summary:`. Acceptance: the artifact records a 40-character hexadecimal
       merge-base SHA and `EXIT_CODE: 0` for `git merge-base`.
-- [ ] [P0-T4] Run `pwsh -File scripts/vscode/Install-RepoDotNetSdk.ps1` from `WORKTREE`, then run
+- [x] [P0-T4] Run `pwsh -File scripts/vscode/Install-RepoDotNetSdk.ps1` from `WORKTREE`, then run
       `dotnet --version`. Record both in
       `FEATURE/evidence/baseline/p0-t4-dotnet-sdk-bootstrap.TIMESTAMP.md` with the four required fields.
       Acceptance: the directory `.dotnet-sdk` exists in `WORKTREE` and the recorded `dotnet --version`
       output begins with `8.0.`.
-- [ ] [P0-T5] Run `pwsh -File scripts/vscode/Invoke-Restore.ps1` from `WORKTREE`. This is the
+- [x] [P0-T5] Run `pwsh -File scripts/vscode/Invoke-Restore.ps1` from `WORKTREE`. This is the
       repo-sanctioned restore: `scripts/vscode/Invoke-Restore.ps1:36` runs
       `msbuild /t:Restore /p:RestorePackagesConfig=true /m`, which covers both the `packages.config`
       projects and the `PackageReference` projects, where a bare `nuget restore` covers only the former.
@@ -344,7 +347,7 @@ in this plan is unreachable. Do not add analyzer back-fill tasks: all sixteen pr
       If the exit code is non-zero, record the verbatim terminating message and stop with
       `REMEDIATION-REQUIRED`; every `EnsureNuGetPackageBuildImports` `Error` target fires at
       `BeforeTargets="PrepareForBuild"`, so msbuild hard-fails until this succeeds.
-- [ ] [P0-T6] Run `dotnet tool restore` from `WORKTREE`, then `dotnet tool run csharpier --version`.
+- [x] [P0-T6] Run `dotnet tool restore` from `WORKTREE`, then `dotnet tool run csharpier --version`.
       Record both in `FEATURE/evidence/baseline/p0-t6-dotnet-tool-restore.TIMESTAMP.md` with the four
       required fields. The success-case output of the second command has not been observed on this
       worktree, and `CLAUDE.md` records that CSharpier v1 requires a subcommand, so the version switch
@@ -354,13 +357,13 @@ in this plan is unreachable. Do not add analyzer back-fill tasks: all sixteen pr
       `dotnet-tools.json`, which is `1.2.6`. Acceptance: `dotnet tool restore` records `EXIT_CODE: 0`,
       and the artifact records either an observed version output of `1.2.6` or both the verbatim error
       text and the `1.2.6` value read from `dotnet-tools.json`.
-- [ ] [P0-T7] Run `dotnet tool run csharpier check .` from `WORKTREE`. Record it in
+- [x] [P0-T7] Run `dotnet tool run csharpier check .` from `WORKTREE`. Record it in
       `FEATURE/evidence/baseline/p0-t7-csharpier-check.TIMESTAMP.md` with the four required fields, and
       record in `Output Summary:` the verbatim final summary line the command printed and the count of
       files it reported as unformatted. Acceptance: the artifact records the observed exit code and a
       numeric count of unformatted files. A non-zero exit code here is recorded as pre-existing
       formatting drift, is not a failure of this plan, and is carried forward to P7-T2.
-- [ ] [P0-T8] Run
+- [x] [P0-T8] Run
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true /fl "/flp:logfile=FEATURE/evidence/baseline/p0-t8-analyze.msbuild.txt;verbosity=normal"`.
       Record it in `FEATURE/evidence/baseline/p0-t8-analyze.TIMESTAMP.md` with the four required fields,
       plus the verbatim `Error(s)` and `Warning(s)` summary lines and the count of occurrences of the
@@ -369,14 +372,14 @@ in this plan is unreachable. Do not add analyzer back-fill tasks: all sixteen pr
       `.gitignore:84` is `*.log`, so a `.log` file would never be committed. Acceptance: the artifact
       records `EXIT_CODE: 0` and a `Skipping target "CoreCompile"` occurrence count of 0 in
       `FEATURE/evidence/baseline/p0-t8-analyze.msbuild.txt`.
-- [ ] [P0-T9] Run
+- [x] [P0-T9] Run
       `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true /fl "/flp:logfile=FEATURE/evidence/baseline/p0-t9-nullable.msbuild.txt;verbosity=normal"`.
       Record it in `FEATURE/evidence/baseline/p0-t9-nullable.TIMESTAMP.md` with the four required
       fields, plus the verbatim `Error(s)` summary line and the `Skipping target "CoreCompile"`
       occurrence count in `FEATURE/evidence/baseline/p0-t9-nullable.msbuild.txt`. Acceptance: the
       artifact records `EXIT_CODE: 0` and a `Skipping target "CoreCompile"` occurrence count of 0 in
       `FEATURE/evidence/baseline/p0-t9-nullable.msbuild.txt`. Do not add `/p:Nullable=enable`.
-- [ ] [P0-T10] Run
+- [x] [P0-T10] Run
       `pwsh -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug -CoverageOutput coverage\baseline.cobertura.xml`
       from `WORKTREE`. Record it in
       `FEATURE/evidence/baseline/p0-t10-test-coverage.TIMESTAMP.md` with the four required fields, plus
@@ -388,7 +391,7 @@ in this plan is unreachable. Do not add analyzer back-fill tasks: all sixteen pr
       and its `Output Summary:` records the observed exit code together with either the total, passed,
       and failed test counts as printed by the run, or the terminating message and the
       `REMEDIATION-REQUIRED` line.
-- [ ] [P0-T11] Read `coverage\baseline.cobertura.xml` and record, in
+- [x] [P0-T11] Read `coverage\baseline.cobertura.xml` and record, in
       `FEATURE/evidence/baseline/p0-t11-coverage-denominator.TIMESTAMP.md`, the sorted list of every
       `package` element `name` attribute value in the file, the `line-rate`, `lines-covered`,
       `lines-valid`, `branch-rate`, `branches-covered`, and `branches-valid` attribute values of the
@@ -404,13 +407,13 @@ in this plan is unreachable. Do not add analyzer back-fill tasks: all sixteen pr
       `Assert-CoberturaLineCoverageThreshold` throws before `Set-Content`, so a red or sub-80 run leaves
       an unfiltered file on disk and makes the P7-T9 comparison and AC20 unreachable; discovering that
       after all implementation work is done costs the whole run.
-- [ ] [P0-T12] Extract from the P0-T10 run output the set of test identifiers that failed, and write it
+- [x] [P0-T12] Extract from the P0-T10 run output the set of test identifiers that failed, and write it
       to `FEATURE/evidence/baseline/p0-t12-baseline-failure-set.TIMESTAMP.md` as
       `BASELINE_FAILURE_SET:` followed by one fully qualified test name per line, or the single line
       `BASELINE_FAILURE_SET: NONE` when the baseline run was green. Acceptance: the artifact contains
       exactly one `BASELINE_FAILURE_SET:` declaration and its member list is consistent with the counts
       recorded in P0-T10.
-- [ ] [P0-T13] Record the current line count of each of the six in-scope files —
+- [x] [P0-T13] Record the current line count of each of the six in-scope files —
       `QuickFiler/Controllers/FilerQueue.cs`,
       `QuickFiler/Controllers/QfcFormController.EventHandlers.cs`,
       `QuickFiler.Test/Controllers/FilerQueueTests.cs`,
@@ -421,7 +424,7 @@ in this plan is unreachable. Do not add analyzer back-fill tasks: all sixteen pr
       `FEATURE/evidence/baseline/p0-t13-file-line-budget.TIMESTAMP.md`. Acceptance: the artifact records
       six numeric counts and states the remaining headroom to 500 for each, with
       `QuickFiler.Test/Controllers/QfcItemController.SeamFactoryTests.cs` showing 64 lines of headroom.
-- [ ] [P0-T14] Resolve the absolute path of `vstest.console.exe`, which is not on `PATH` in this
+- [x] [P0-T14] Resolve the absolute path of `vstest.console.exe`, which is not on `PATH` in this
       worktree. Run
       `& "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -find "Common7\IDE\Extensions\TestPlatform\vstest.console.exe"`
       from `WORKTREE` under `pwsh` and write the resolved path into
@@ -437,7 +440,7 @@ This phase adds only the seam. It changes no observable production behaviour, ke
 and `Consumer` semantics exactly as they are, and exists so that the Phase 2 fail-before tests compile
 and run against a tree that still carries the defect.
 
-- [ ] [P1-T1] In `QuickFiler/Controllers/FilerQueue.cs`, add an `internal Func<FilerQueueItem, Task> ItemProcessor { get; set; }`
+- [x] [P1-T1] In `QuickFiler/Controllers/FilerQueue.cs`, add an `internal Func<FilerQueueItem, Task> ItemProcessor { get; set; }`
       auto-property initialized to `item => item.Filer.SortAsync(item.Helpers)`, with an XML doc comment
       that names issue 633 and states that the production default preserves current behaviour and that
       tests assign a fake so no live Outlook COM call is made. Place it adjacent to the `Consumer`
@@ -451,7 +454,7 @@ and run against a tree that still carries the defect.
       least once and the file still contains the literal token `ThreadSafeSingleShotGuard`. One
       occurrence is the satisfiable bound for this task alone: the property declaration supplies the
       first occurrence and the call site that supplies a second arrives only with P1-T2.
-- [ ] [P1-T2] In `QuickFiler/Controllers/FilerQueue.cs`, replace the body of the worker's per-item call
+- [x] [P1-T2] In `QuickFiler/Controllers/FilerQueue.cs`, replace the body of the worker's per-item call
       at line 52 so that it invokes the seam instead of the hard-coded call, leaving the surrounding
       `try` block, the `catch (Exception e)` block, the `item.Helpers.First()` diagnostic, and the
       `logger.Error` call byte-identical. `EmailFiler.SortAsync(IList<MailItemHelper>)` returns
@@ -459,10 +462,10 @@ and run against a tree that still carries the defect.
       Acceptance: `QuickFiler/Controllers/FilerQueue.cs` contains zero occurrences of the literal token
       `item.Filer.SortAsync(item.Helpers);` inside `ConsumeAsync` and still contains the literal token
       `logger.Error`.
-- [ ] [P1-T3] Confirm that `QuickFiler/Controllers/FilerQueue.cs` still contains no `#nullable`
+- [x] [P1-T3] Confirm that `QuickFiler/Controllers/FilerQueue.cs` still contains no `#nullable`
       directive, no `record`, and no `init` accessor, by running a single search over that file for the
       pattern `#nullable|\brecord\b|\binit\s*[;{]`. Acceptance: the search returns zero matches.
-- [ ] [P1-T4] First run `New-Item -ItemType Directory -Force -Path FEATURE/evidence/other`. This step is
+- [x] [P1-T4] First run `New-Item -ItemType Directory -Force -Path FEATURE/evidence/other`. This step is
       required and is not decoration: MSBuild's file logger does not create intermediate directories and
       terminates the build with MSB1029 when the directory part of `/flp:logfile=` does not exist, and
       `FEATURE/evidence/other` does not exist before this task. Then, as a separate command, run
@@ -472,7 +475,7 @@ and run against a tree that still carries the defect.
       `FEATURE/evidence/other/p1-t4-seam-build.msbuild.txt`. Acceptance: the artifact records
       `EXIT_CODE: 0` and a `Skipping target "CoreCompile"` occurrence count of 0 in
       `FEATURE/evidence/other/p1-t4-seam-build.msbuild.txt`.
-- [ ] [P1-T5] Run the scoped, single-assembly verification of the pre-existing queue tests, using the
+- [x] [P1-T5] Run the scoped, single-assembly verification of the pre-existing queue tests, using the
       absolute path recorded by P0-T14 in place of the leading executable name:
       `vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation /TestCaseFilter:"FullyQualifiedName~FilerQueueTests" "/Logger:trx;LogFileName=p1-t5.trx" /ResultsDirectory:FEATURE\evidence\other\p1-t5`
       from `WORKTREE`. Write `FEATURE/evidence/other/p1-t5-existing-queue-tests.TIMESTAMP.md` with the
@@ -482,12 +485,12 @@ and run against a tree that still carries the defect.
 
 ### Phase 2 — Fail-before regression evidence
 
-- [ ] [P2-T1] Add exactly one line to `QuickFiler.Test/QuickFiler.Test.csproj`, immediately after the
+- [x] [P2-T1] Add exactly one line to `QuickFiler.Test/QuickFiler.Test.csproj`, immediately after the
       existing `Controllers\FilerQueueTests.cs` compile item, reading
       `Compile Include="Controllers\QfcFormControllerUndoHandoffTests.cs"` in the same XML element form
       as its neighbours. Acceptance: a search of `QuickFiler.Test/QuickFiler.Test.csproj` for the
       literal token `Controllers\QfcFormControllerUndoHandoffTests.cs` returns exactly one match.
-- [ ] [P2-T2] Create `QuickFiler.Test/Controllers/QfcFormControllerUndoHandoffTests.cs` containing a
+- [x] [P2-T2] Create `QuickFiler.Test/Controllers/QfcFormControllerUndoHandoffTests.cs` containing a
       single `[TestClass]` named `QfcFormControllerUndoHandoffTests`, MSTest plus Moq plus
       FluentAssertions only. Mirror the construction fixture at
       `QuickFiler.Test/Controllers/QfcFormControllerSeamTests.cs:64-76` and the private reflection
@@ -515,7 +518,7 @@ and run against a tree that still carries the defect.
       count still at 0, which destroys the pre-fix discriminator.
       Acceptance: the file exists, is under 500 lines, and contains the literal token
       `[TestClass]` exactly once.
-- [ ] [P2-T3] Into `QuickFiler.Test/Controllers/QfcFormControllerUndoHandoffTests.cs`, add the two
+- [x] [P2-T3] Into `QuickFiler.Test/Controllers/QfcFormControllerUndoHandoffTests.cs`, add the two
       barrier tests named `BackGroundMoveAsync_WithPendingQueueItem_DoesNotDispatchCleanupBeforeDrain`
       and `BackGroundMoveAsync_WithPendingQueueItem_DoesNotWriteMetricsBeforeDrain`. Each test is built
       from these five parts, in this order.
@@ -571,7 +574,7 @@ and run against a tree that still carries the defect.
       `BeginTransactionAsync`, and require that the count of those that also match `using (` equals the
       total. Satisfying it requires the acquisition to be written as one physical line with no
       `.ConfigureAwait(false)` continuation, per executor environment note 10.
-- [ ] [P2-T4] First run
+- [x] [P2-T4] First run
       `New-Item -ItemType Directory -Force -Path FEATURE/evidence/regression-testing`. This step is
       required: MSBuild's file logger does not create intermediate directories and terminates the build
       with MSB1029 when the directory part of `/flp:logfile=` does not exist, and
@@ -582,7 +585,7 @@ and run against a tree that still carries the defect.
       fields for the msbuild command. Acceptance: the artifact records `EXIT_CODE: 0`. The fail-before
       tests must compile; a compile failure here is a defect in P2-T2 or P2-T3, not a fail-before
       witness.
-- [ ] [P2-T5] [expect-fail] Run, using the absolute path recorded by P0-T14 in place of the leading
+- [x] [P2-T5] [expect-fail] Run, using the absolute path recorded by P0-T14 in place of the leading
       executable name:
       `vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /InIsolation /TestCaseFilter:"FullyQualifiedName~QfcFormControllerUndoHandoffTests" "/Logger:trx;LogFileName=p2-t5.trx" /ResultsDirectory:FEATURE\evidence\regression-testing\p2-t5`
       from `WORKTREE`. Write
@@ -593,7 +596,14 @@ and run against a tree that still carries the defect.
       non-zero `EXIT_CODE`, an `outcome="Failed"` count of 2, both test names among the failures, and a
       named failing assertion for each. If either test passes against this tree, stop and record
       `REMEDIATION-REQUIRED: fail-before witness did not fail` rather than proceeding to Phase 3.
-- [ ] [P2-T6] Write `FEATURE/evidence/regression-testing/fail-before-exception.TIMESTAMP.md` covering
+      (Execution correction, applied 2026-09-01: the `outcome="Failed"` count of 2 is the count of
+      `UnitTestResult` elements carrying that attribute, not the raw count of the literal anywhere in
+      the TRX. A TRX produced by a failing run also carries a run-level `<ResultSummary outcome="Failed">`
+      element, so the raw literal count is 3 for two failing tests. The observed values were: 2
+      `UnitTestResult` failures, `Counters failed="2"`, raw literal count 3. The equivalent
+      `outcome="Passed"` counts elsewhere in this plan are unaffected, because `ResultSummary` carries
+      `outcome="Completed"` on a successful run — as P1-T5's exact count of 5 confirms.)
+- [x] [P2-T6] Write `FEATURE/evidence/regression-testing/fail-before-exception.TIMESTAMP.md` covering
       the two cases for which a failing run is structurally impossible. It must contain
       `WhyFailingRunImpossible:` with two labelled paragraphs: one for the seven `WhenDrainedAsync_*`
       and `ItemProcessor_ThatThrows_*` tests, which name an API that does not exist before Phase 3 and

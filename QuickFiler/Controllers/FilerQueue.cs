@@ -41,6 +41,20 @@ namespace QuickFiler.Controllers
 
         public Task Consumer { get; private set; } = Task.CompletedTask;
 
+        /// <summary>
+        /// Per-item processing seam introduced for issue 633. The production default forwards to
+        /// <see cref="EmailFiler.SortAsync(IList{MailItemHelper})"/>, so production behaviour is
+        /// unchanged by the presence of this seam.
+        /// </summary>
+        /// <remarks>
+        /// Tests assign a fake so that no live Outlook COM call is made. That substitution is what
+        /// makes the queue's concurrency assertions deterministic: the real
+        /// <see cref="EmailFiler.SortAsync(IList{MailItemHelper})"/> is non-virtual and casts to a COM
+        /// folder, so it cannot be driven from a unit test.
+        /// </remarks>
+        internal Func<FilerQueueItem, Task> ItemProcessor { get; set; } =
+            item => item.Filer.SortAsync(item.Helpers);
+
         public async Task ConsumeAsync()
         {
             await Task.Run(async () =>
@@ -49,7 +63,7 @@ namespace QuickFiler.Controllers
                 {
                     try
                     {
-                        _ = await item.Filer.SortAsync(item.Helpers);
+                        await ItemProcessor(item);
                     }
                     catch (Exception e)
                     {
