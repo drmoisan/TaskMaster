@@ -113,6 +113,8 @@
 - [Multi-location fact residuals drive preflight rounds](multi-location-fact-residuals-drive-preflight-rounds.md) — nearly every blocking
 - [expect-fail tests break substring scoped-run gates](expect-fail-tests-break-substring-scoped-run-gates.md) — a "0 failed" gate under
 - [CR-pattern grep falsely reports 100% CRLF](grep-cr-empty-pattern-false-crlf.md) — the shell strips the CR, leaving an empty pattern
+- [.gitignore does NOT cover *.trx](gitignore-does-not-cover-trx.md) — a committed TRX leaks account, machine and worktree root; sweep before any git add of vstest evidence
+- [Preflight converges on verbatim delta text](preflight-converges-on-verbatim-delta-text.md) — round overrun comes from the planner paraphrasing delta items, not from the review
 - [check-ignore false negative on a directory glob](check-ignore-false-negative-on-directory-glob.md) — a not-yet-created dir + a glob with no literal name manufactured a blocking footprint finding
 
 - [PR readiness gate bars ANY recorded override](pr-readiness-gate-bars-any-recorded-override.md) — one authorized override blocks gh pr create; no drain procedure exists
@@ -120,6 +122,8 @@
 - [Shared checkpoint: never read-modify-write](shared-checkpoint-read-modify-write-corrupts.md) - a sibling swaps the session-root file
 - [External actor can merge your child PR mid-run](external-actor-can-merge-your-child-pr-midrun.md) — re-read PR state before the CI gate
 - [Stale base anchor passes ancestry vacuously](stale-base-anchor-passes-ancestry-vacuously.md) — on a prep resume the pinned base stays an ancestor, so the check passes while diffs bill another issue's work to your plan
+- [A subagent's self-reported correction can be FALSE](subagent-self-reported-correction-can-be-false.md) — it replaced a true sentence with a false one and framed it as diligence; re-derive any correction that flips a fact you measured
+- [Preflight can legitimately exceed the 2-round target](preflight-rounds-exceed-target-legitimately.md) — monotonic convergence over an oversized bootstrap surface, not single-defect reporting
 - [orchestrator-state.json is TRACKED in git](orchestrator-state-json-is-tracked-in-git.md) — .gitignore does not apply; writing your checkpoint pollutes the footprint. Fix with skip-worktree
 
 ## Artifact hygiene

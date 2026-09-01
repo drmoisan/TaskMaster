@@ -449,6 +449,29 @@ namespace QuickFiler.Controllers.Tests
                 .BeFalse("the guard must abort before any write when MyDocuments is absent");
         }
 
+        /// <summary>
+        /// The zero-line boundary case. When every diagnostic entry is null or whitespace the
+        /// null-and-whitespace filter leaves an empty array, so there is no content to record and
+        /// the writer must not be reached at all. The default writer appends, which would create
+        /// or touch an empty session-metrics file. MyDocuments is present, so the pre-existing
+        /// MyDocuments guard is not what causes the early return.
+        /// </summary>
+        [TestMethod]
+        public async Task WriteMetricsAsync_WithAllNullOrWhitespaceDiagnostics_DoesNotInvokeWriter()
+        {
+            var (controller, _) = BuildLooseMetricsController(new[] { "   ", null, "\t" });
+            var invoked = false;
+            controller.MetricsFileWriter = (filename, written, folderRoot, token) =>
+            {
+                invoked = true;
+                return Task.FromResult(true);
+            };
+
+            await controller.WriteMetricsAsync("metrics.csv");
+
+            invoked.Should().BeFalse("an empty filtered array must not reach the writer at all");
+        }
+
         #endregion Issue #442 — metrics flush tests
     }
 }

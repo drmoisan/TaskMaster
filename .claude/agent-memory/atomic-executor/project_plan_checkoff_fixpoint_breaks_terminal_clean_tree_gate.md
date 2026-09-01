@@ -29,6 +29,14 @@ reason: eleven earlier Phase 5 artifacts were also still uncommitted.
 - Flag it in the completion report as a plan-text/mechanics tension so the planner can fix the
   wording next time. Suggested planner fix: word the gate as "names at most one path, and if it names
   one, that path is the plan file", or add an intermediate commit before the terminal capture.
+- Second validated planner fix (issue #648 plan, cleared at preflight round 4): order the commit task
+  as commit -> **capture and retain** `git status --porcelain <pathspec>` -> write the artifact from
+  the retained output -> flip the checkbox -> a second `git add`/commit that the task text explicitly
+  declares housekeeping and outside its acceptance. The capture must precede the artifact write
+  because the artifact itself lives under the status pathspec; a capture taken afterwards always sees
+  it as untracked. This makes the residual genuinely empty at capture time and keeps the unverifiable
+  final step out of the acceptance clause. The remaining gap — nothing executes a check after the
+  second commit — is the irreducible fixpoint and is acceptable.
 - Scope every terminal `git status` by pathspec. `.claude/agent-memory/**` is tracked and other agents
   write to it, so an unscoped clean-tree gate is unsatisfiable for reasons unrelated to the feature.
   See [[project_agent_memory_tracked_breaks_unscoped_git_gates]].

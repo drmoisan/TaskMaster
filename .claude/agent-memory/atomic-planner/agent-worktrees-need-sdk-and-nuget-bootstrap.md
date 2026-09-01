@@ -24,7 +24,15 @@ before the first `dotnet tool restore` and before the first `msbuild`, in this o
    fires before compilation when the tree is missing (e.g. `QuickFiler.Test.csproj:452-466`), and every
    `Reference` `HintPath` under `..\packages\` is unresolvable. CI does not hit this because
    `.github/workflows/_build-analyzers.yml:45` runs `nuget restore` explicitly.
-3. **Back-fill `Meziantou.Analyzer 3.0.156` and `Roslynator.Analyzers 4.16.0`.** Step 2 alone is NOT
+3. **Back-fill skewed analyzer packages — RE-MEASURE BEFORE ASSERTING THIS.** As of 2026-08-31 the skew
+   is **RESOLVED** in the tree: every `<Analyzer Include>` across all 16 first-party `.csproj` names
+   `Meziantou.Analyzer.3.0.194` / `Roslynator.Analyzers.5.0.0`, and every `packages.config` pins the same
+   two versions, so step 2 alone now suffices and a back-fill task would be a no-op. Do not carry the
+   historical figures below into a plan without re-deriving them: grep `packages\\(Meziantou\.Analyzer|Roslynator\.Analyzers)\.[0-9.]+`
+   over `*.csproj` and compare with the `version=` values in `packages.config`. The historical failure,
+   preserved because Dependabot can reintroduce it:
+
+   **Historical (2026-08, no longer true).** Step 2 alone was NOT
    enough. All 16 first-party `.csproj` files carry UNCONDITIONAL `<Analyzer Include>` items naming
    `..\packages\Meziantou.Analyzer.3.0.156\...` and four `..\packages\Roslynator.Analyzers.4.16.0\...`
    DLLs (`QuickFiler.Test.csproj:474-478`), while all 16 `packages.config` pin `3.0.174` and `4.16.1`.
