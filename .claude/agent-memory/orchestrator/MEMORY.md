@@ -76,6 +76,10 @@
 - [Verify an issue is open in SUBSTANCE](verify-issue-still-open-in-substance.md) — grep the source for the issue number before preparing; the residual may already be its own issue
 - [Reconcile plan numbers against your own measurements](reconcile-plan-numbers-against-your-own-measurements.md) — a stale line count passes a citation-only review and halts Phase 0
 - [Preflight catches vacuous gates](preflight-catches-vacuous-gates.md) — MCP `ok:true` is not enough; executor preflight found 6 gates
+- [Spec backticks widen the blast radius](spec-backticks-widen-blast-radius.md) — Get-BlastRadius harvests spec.md inline-code paths too; a backticked comparison path can force a false cohort conflict
+- [Select-String pattern quoting in plans](select-string-pattern-quoting-in-plans.md) — `\|` is a LITERAL pipe (vacuous gate); `\\` and `\"` die reaching pwsh — use `\x5C` and `\x22`
+- [A successful msbuild prints "error" 35 times](msbuild-success-output-contains-error.md) — `/errorreport:prompt` plus the `0 Error(s)` summary; match `: error [A-Z]+[0-9]+:` instead
+- [Apply EVERY part of a multi-part delta](apply-every-part-of-a-multipart-delta.md) — task edit plus sibling plus reading-guide prose plus the spec's copy; partial application cost a whole round
 - [Preflight: sweep task ordering + citation arity](preflight-sweep-task-ordering-and-citation-arity.md) — name both sweeps early; a
 - [Revert plans must check test provenance](revert-plans-must-check-test-provenance.md) — verify each test against the pre-change sha; a
 - [Bash tool collapses `\` before sed sees it](bash-tool-collapses-double-backslash-in-sed.md) — a `\` pattern is a silent no-op exiting 0
