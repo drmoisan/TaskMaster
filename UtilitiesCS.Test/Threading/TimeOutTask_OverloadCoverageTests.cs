@@ -383,5 +383,45 @@ namespace UtilitiesCS.Test
             // Assert
             await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("boom");
         }
+
+        [TestMethod]
+        public async Task RunWithTimeout_FuncT1TResult_ShouldRetryAfterTaskCanceledException()
+        {
+            // Arrange
+            // Attempt 0 receives an already-cancelled timeout source, so the linked combined
+            // token is cancelled before Task.Run is queued and the delegate is never dequeued.
+            // The awaited task is Canceled by construction, so the await throws
+            // TaskCanceledException with no wall-clock wait and no scheduling race. Attempt 1
+            // receives a never-cancelled source so the retry can complete and be observed.
+            using var canceledSource = new CancellationTokenSource();
+            canceledSource.Cancel();
+            using var liveSource = new CancellationTokenSource();
+
+            int factoryCalls = 0;
+            Func<int, CancellationTokenSource> timeoutSourceFactory = _ =>
+                Interlocked.Increment(ref factoryCalls) == 1 ? canceledSource : liveSource;
+
+            int delegateCalls = 0;
+            Func<int, string> function = arg =>
+            {
+                Interlocked.Increment(ref delegateCalls);
+                return $"result-{arg}";
+            };
+
+            // Act
+            var result = await function.RunWithTimeout(
+                42,
+                CancellationToken.None,
+                milliseconds: 30_000,
+                maxAttempts: 1,
+                strict: true,
+                timeoutSourceFactory: timeoutSourceFactory
+            );
+
+            // Assert
+            result.Should().Be("result-42");
+            delegateCalls.Should().Be(1);
+            factoryCalls.Should().Be(2);
+        }
     }
 }
