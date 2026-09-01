@@ -1,0 +1,62 @@
+<report name="TaskMaster">
+  <package name="Mono.Reflection">
+    <counter type="LINE" missed="402" covered="0" />
+    <counter type="BRANCH" missed="0" covered="0" />
+  </package>
+  <package name="System.Interactive">
+    <counter type="LINE" missed="765" covered="5" />
+    <counter type="BRANCH" missed="0" covered="0" />
+  </package>
+  <package name="TaskVisualization">
+    <counter type="LINE" missed="1595" covered="0" />
+    <counter type="BRANCH" missed="0" covered="0" />
+  </package>
+  <package name="Microsoft.IO.RecyclableMemoryStream">
+    <counter type="LINE" missed="761" covered="0" />
+    <counter type="BRANCH" missed="0" covered="0" />
+  </package>
+  <package name="Tags">
+    <counter type="LINE" missed="766" covered="0" />
+    <counter type="BRANCH" missed="0" covered="0" />
+  </package>
+  <package name="ToDoModel">
+    <counter type="LINE" missed="1874" covered="0" />
+    <counter type="BRANCH" missed="0" covered="0" />
+  </package>
+  <package name="SVGControl">
+    <counter type="LINE" missed="1580" covered="274" />
+    <counter type="BRANCH" missed="0" covered="0" />
+  </package>
+  <package name="log4net">
+    <counter type="LINE" missed="6367" covered="902" />
+    <counter type="BRANCH" missed="0" covered="0" />
+  </package>
+  <package name="QuickFiler">
+    <counter type="LINE" missed="2468" covered="9801" />
+    <counter type="BRANCH" missed="0" covered="0" />
+  </package>
+  <package name="System.Linq.Async">
+    <counter type="LINE" missed="7845" covered="125" />
+    <counter type="BRANCH" missed="0" covered="0" />
+  </package>
+  <package name="FluentAssertions">
+    <counter type="LINE" missed="5429" covered="1657" />
+    <counter type="BRANCH" missed="0" covered="0" />
+  </package>
+  <package name="Deedle">
+    <counter type="LINE" missed="8406" covered="430" />
+    <counter type="BRANCH" missed="0" covered="0" />
+  </package>
+  <package name="FSharp.Core">
+    <counter type="LINE" missed="15555" covered="1248" />
+    <counter type="BRANCH" missed="0" covered="0" />
+  </package>
+  <package name="QuickFiler.Test">
+    <counter type="LINE" missed="693" covered="29529" />
+    <counter type="BRANCH" missed="0" covered="0" />
+  </package>
+  <package name="UtilitiesCS">
+    <counter type="LINE" missed="39298" covered="4465" />
+    <counter type="BRANCH" missed="0" covered="0" />
+  </package>
+</report>

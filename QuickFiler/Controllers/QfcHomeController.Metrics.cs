@@ -172,6 +172,10 @@ namespace QuickFiler.Controllers
             // no XML documentation and therefore no non-null element guarantee, so this filter
             // defends the interface contract rather than a known producer defect.
             var lines = strOutput.Where(line => !string.IsNullOrWhiteSpace(line)).ToArray();
+            if (lines.Length == 0)
+            {
+                return;
+            }
 
             // CancellationToken.None, never the session Token: the dispatcher continuation that
             // carries this write is not awaited to completion, so a session cancellation can be
