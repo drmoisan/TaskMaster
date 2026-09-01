@@ -1,6 +1,6 @@
 # Numeric Coverage Baseline (P0-T13)
 
-Timestamp: 2026-09-01T15-58
+Timestamp: 2026-09-01T15-46
 
 Command: `pwsh -NoProfile -File .\scripts\vscode\Invoke-MSTestWithCoverage.ps1 -SearchRoot . -Configuration Debug`
 

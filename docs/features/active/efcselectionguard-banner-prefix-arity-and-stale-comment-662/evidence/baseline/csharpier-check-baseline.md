@@ -1,6 +1,6 @@
 # CSharpier Read-Only Baseline (P0-T6)
 
-Timestamp: 2026-09-01T15-45
+Timestamp: 2026-09-01T15-42
 
 Command: `dotnet tool run csharpier check .`
 

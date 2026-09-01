@@ -1,6 +1,6 @@
-# Artifact Hygiene Sweep — Phase 0 Commit (P0-T18)
+# Artifact Hygiene Sweep — Phase 1 Commit (P1-T11)
 
-Timestamp: 2026-09-01T15-50
+Timestamp: 2026-09-01T15-58
 
 Command:
 
@@ -30,26 +30,24 @@ $hits = Get-ChildItem -LiteralPath $feature -Recurse -File | Where-Object { $_.F
 "ResidualMatchCount=$(@($hits).Count)"
 ```
 
-The span is recorded as written, with its variable names unsubstituted. No
-pre-substitution value and no verification command with real values substituted
-in is recorded here.
+The span is recorded as written, with its variable names unsubstituted.
 
 EXIT_CODE: 0
 
 Output Summary:
 
 ```
-FilesRewritten=2
+FilesRewritten=0
 ResidualMatchCount=0
 ```
 
-- `FilesRewritten=` 2
+- `FilesRewritten=` 0
 - `ResidualMatchCount=` 0
 
 Token classes substituted: worktree-root prefix, user-profile path,
 `computerName`, `runUser`, `storage`, Cobertura `filename`.
 
-`ResidualMatchCount=` is 0, so the BLOCKED branch does not arise and the sweep
-clears the `git add` that follows. The sweep ran before this task's check-off
-and before the `git add`, because the `git add` span stages the artifacts as
-they stand on disk.
+`FilesRewritten=` is 0 because the P0-T18 sweep already cleaned every file that
+carried a host token, and the Phase 1 artifacts written since then were authored
+without one. `ResidualMatchCount=` is 0, so the BLOCKED branch does not arise
+and the sweep clears the `git add` that follows.

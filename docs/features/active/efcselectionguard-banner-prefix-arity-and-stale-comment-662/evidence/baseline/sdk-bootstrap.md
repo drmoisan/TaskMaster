@@ -1,6 +1,6 @@
 # Repo-local .NET SDK Bootstrap (P0-T3)
 
-Timestamp: 2026-09-01T15-42
+Timestamp: 2026-09-01T15-40
 
 Command: `pwsh -NoProfile -File ./scripts/vscode/Install-RepoDotNetSdk.ps1`
 

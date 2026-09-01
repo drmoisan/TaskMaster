@@ -1,6 +1,6 @@
 # CSharpier State of the Two Protected Files (P0-T7)
 
-Timestamp: 2026-09-01T15-46
+Timestamp: 2026-09-01T15-42
 
 Command: `dotnet tool run csharpier check UtilitiesCS/OutlookObjects/Folder/BreadcrumbRowBuilder.cs`
 

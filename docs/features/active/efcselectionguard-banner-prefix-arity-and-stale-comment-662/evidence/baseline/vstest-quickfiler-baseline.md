@@ -1,6 +1,6 @@
 # QuickFiler.Test Full-Assembly Baseline (P0-T11)
 
-Timestamp: 2026-09-01T15-53
+Timestamp: 2026-09-01T15-44
 
 Command: `C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\Extensions\TestPlatform\vstest.console.exe QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /Settings:TaskMaster.runsettings /EnableCodeCoverage /InIsolation "/TestCaseFilter:TestCategory!=LiveOutlook" "/Logger:trx;LogFileName=quickfiler-baseline.trx" /ResultsDirectory:docs/features/active/efcselectionguard-banner-prefix-arity-and-stale-comment-662/evidence/baseline/p0-t11`
 

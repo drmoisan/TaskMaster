@@ -1,6 +1,6 @@
 # Pre-Change Absence of a Three-Equals-Only Literal in the Test File (P0-T17)
 
-Timestamp: 2026-09-01T16-02
+Timestamp: 2026-09-01T15-49
 
 Command: `git grep -c -F -- '("===")' -- QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs`
 
