@@ -120,29 +120,29 @@ acceptance-criteria source, so this section was added before planning began. Eve
 derived exhaustively against `origin/main` at commit `2b85134b42872e405602e6064e02dc9cda6c319b` and
 cross-checked by two independent search methods.
 
-- [ ] AC-1 — Single reflection owner. After the change, the quoted literal `"_dispatcher"` appears on
+- [x] AC-1 — Single reflection owner. After the change, the quoted literal `"_dispatcher"` appears on
       exactly one line beneath `QuickFiler.Test/`, and that line is in
       `QuickFiler.Test/Controllers/QfcItemController.UiThreadDispatcherFixture.cs`. The baseline is
       two lines: that fixture, and `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs`.
-- [ ] AC-2 — No reflection remains in the test file.
+- [x] AC-2 — No reflection remains in the test file.
       `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` contains no occurrence of `GetField`, no
       occurrence of `SetValue`, and no `using System.Reflection;` directive.
-- [ ] AC-3 — Swap routed through the shared fixture. The test obtains its gate from
+- [x] AC-3 — Swap routed through the shared fixture. The test obtains its gate from
       `UiThreadDispatcherFixture.BeginTransactionAsync()`, installs the running dispatcher through the
       returned `UiThreadDispatcherTransaction`, and restores by disposing that transaction rather than
       by writing the field. The test method is declared `async Task` because the gate is awaited.
-- [ ] AC-4 — Behavior preserved. `Invoke_InvokeAsync_BeginInvoke_ExecuteDelegateOnDispatcherThread`
+- [x] AC-4 — Behavior preserved. `Invoke_InvokeAsync_BeginInvoke_ExecuteDelegateOnDispatcherThread`
       still asserts that `Invoke`, `InvokeAsync`, and `BeginInvoke` each execute their delegate on the
       dispatcher's own thread, and the body of `Construction_YieldsAnIUiDispatcher` is unchanged.
-- [ ] AC-5 — Tests green with no regression. A scoped run of `QuickFiler.Test.dll` restricted to
+- [x] AC-5 — Tests green with no regression. A scoped run of `QuickFiler.Test.dll` restricted to
       `WpfUiDispatcherTests` reports zero failed tests with both of that class's tests passing, and a
       full `QuickFiler.Test.dll` run reports zero failed tests with a passed count no lower than the
       Phase 0 baseline recorded under `evidence/baseline/`.
-- [ ] AC-6 — Scope boundary held. The branch diff against `origin/main` changes exactly one path with
+- [x] AC-6 — Scope boundary held. The branch diff against `origin/main` changes exactly one path with
       a `.cs` extension, `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs`, and changes no path
       beneath `UtilitiesCS.Test/` or `UtilitiesCS/`. The three out-of-scope cross-assembly mutators
       named under Summary remain untouched.
-- [ ] AC-7 — Toolchain green and evidence complete. The CSharpier check, the analyzer rebuild, and
+- [x] AC-7 — Toolchain green and evidence complete. The CSharpier check, the analyzer rebuild, and
       the nullable rebuild each report zero errors and introduce no new finding relative to the
       Phase 0 baseline capture; and the canonical evidence tree carries the Phase 0 baseline
       artifacts, the Phase 2 final-QC artifacts, and a fail-before record under
