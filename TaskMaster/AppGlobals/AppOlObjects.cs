@@ -16,6 +16,10 @@ using UtilitiesCS.OutlookObjects.Store;
 using UtilitiesCS.ReusableTypeClasses;
 using UtilitiesCS.Threading;
 using UtilitiesCS.Windows_Forms;
+// Microsoft.Office.Interop.Outlook also declares a type named Exception, so an unqualified
+// Exception in this file is CS0104-ambiguous. The alias resolves it to the BCL type, matching the
+// precedent at UtilitiesCS.Test/OutlookObjects/Table/OlToDoTable_Tests.cs.
+using Exception = System.Exception;
 
 namespace TaskMaster
 {
@@ -300,12 +304,35 @@ namespace TaskMaster
                     myDocuments
                 );
                 writer.DiskWriter = async (items) =>
-                    await FileIO2.WriteTextFileAsync(
-                        _globals.FS.Filenames.MovedMails,
-                        items.ToArray(),
-                        myDocuments,
-                        default
-                    );
+                {
+                    // This lambda is assigned to Action<IEnumerable<T>>, so it is async void and is
+                    // invoked from a System.Timers.Timer elapsed callback with no
+                    // SynchronizationContext. An exception escaping here is re-raised on the thread
+                    // pool and terminates the Outlook host process, so the broad catch is the
+                    // deliberate boundary treatment rather than a swallowed error.
+                    try
+                    {
+                        bool movedMailsWritten = await FileIO2.WriteTextFileAsync(
+                            _globals.FS.Filenames.MovedMails,
+                            items.ToArray(),
+                            myDocuments,
+                            default
+                        );
+                        if (!movedMailsWritten)
+                        {
+                            logger.Error(
+                                $"Timed disk write of {_globals.FS.Filenames.MovedMails} did not complete."
+                            );
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error(
+                            $"Timed disk write of {_globals.FS.Filenames.MovedMails} threw.",
+                            ex
+                        );
+                    }
+                };
                 return writer;
             }
             else

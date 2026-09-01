@@ -83,6 +83,8 @@
 - [440-review-residuals](project_440-review-residuals.md) — PASS/0 blocking; a "corrected" defect-encoding test can be defect-NEUTRAL (check fail-before Totals); partial-class test files defeat filename FQN filters
 
 - [644-review-residuals](project_644-review-residuals.md) — all 3 cycles PASS/0 blocking; AC-16 PARTIAL x3; rejecting the caller's `.claude/agent-memory` diff exclusion found the only new defect; SHA-256 beats mtime as compile proof
+- [647-review-residuals](project_647-review-residuals.md) — PASS/0 blocking, 21/21 AC; AC20 PASS-with-deviation on in-spec provisions; footprint SHA-256 vs p6-t1 hash table binds all gates to head; evidence timestamps drifted +1h40m
+- [measure every changed file, not just the AC-named one](feedback_measure-every-changed-file-not-just-the-ac-named-one.md) — per-file Cobertura aggregation exposed a call-site regression (77.05%, new lines uncovered) that no executor artifact reported
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
