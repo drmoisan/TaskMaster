@@ -33,6 +33,8 @@ $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find 'MSBui
 
 **Bootstrap versus gate.** This worktree contains no `.dotnet-sdk` directory (verified: no files match `.dotnet-sdk/**`) and no `packages/` directory (verified: no files match `packages/*/`). A failure in P0-T3, P0-T4, P0-T5, or P0-T6 is a **bootstrap failure** and must be recorded as such, never as a toolchain gate failure.
 
+**Count expressions.** Every `Select-String` count stated as an acceptance value in this plan is evaluated with the array subexpression form so that a zero-match result is the number `0` rather than an absent value: write `@(Select-String ...).Count`, not `(Select-String ...).Count`. Where a task text below shows the parenthesised form, the array subexpression form is the one to run.
+
 **Toolchain order.** Format, then analyze, then type-check, then test. Phase 4 runs the full loop. If any step in P4-T1 through P4-T7 fails or rewrites a tracked file, restart the loop at P4-T1.
 
 **Literals this plan instructs the executor to create.** These are quoted here, outside every command span, so a search for them is understood as an instruction rather than an existing-tree claim: `bool hostOpen = _host.IsOpen;`, `if (_closeCompleted && !hostOpen)`, `CloseCore_AfterSuccessfulCloseAndHostReopen_ReachesHostCloseAgain`, `Issue #656`, and `hoisted`. The literal `Skipping target "CoreCompile"` is quoted here for the same reason: P4-T4 asserts its **absence** from a log this plan creates.
@@ -82,7 +84,7 @@ Plus this feature folder. No other file may appear in the change set.
   - `(Select-String -Path QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs -Pattern '^\s+(internal|public)\s').Count` equals `12`.
   - `(Select-String -Path QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs -SimpleMatch 'lock (_sync)').Count` equals `12`.
   - `(Select-String -Path QuickFiler\Viewers\BreadcrumbDropDownOpenCoordinator.cs -SimpleMatch 'if (_closeCompleted)').Count` equals `1`.
-  - `(Select-String -Path QuickFiler.Test -Recurse -SimpleMatch 'CloseCore_AfterSuccessfulCloseAndHostReopen_ReachesHostCloseAgain').Count` equals `0`.
+  - `@(Get-ChildItem QuickFiler.Test -Recurse -Filter *.cs | Select-String -SimpleMatch 'CloseCore_AfterSuccessfulCloseAndHostReopen_ReachesHostCloseAgain').Count` equals `0`. `Select-String` has no `-Recurse` parameter, so the file set is produced by `Get-ChildItem` and piped in.
 
 
 ### Phase 1 — Failing Regression Test
