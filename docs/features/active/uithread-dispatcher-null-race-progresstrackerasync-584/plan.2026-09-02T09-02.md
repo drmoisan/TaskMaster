@@ -4,8 +4,8 @@
 - **Work Mode:** full-bug (AC source is `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/spec.md`; no `user-story.md` exists or is expected)
 - **Owner:** drmoisan
 - **Last Updated:** 2026-09-02T09-02
-- **Status:** Ready for preflight (revision round 8; findings D1-D11 from preflight round 1, B1-B3 and NB1-NB6 from preflight round 2, C1-C3 and N1-N2 from preflight round 3, E1-E3 and N-1/N-2/N-3 from preflight round 4, F1 from preflight round 5, and G1 plus O1-O4 from preflight round 6 applied)
-- **Version:** 1.6
+- **Status:** Ready for preflight (revision round 8; findings D1-D11 from preflight round 1, B1-B3 and NB1-NB6 from preflight round 2, C1-C3 and N1-N2 from preflight round 3, E1-E3 and N-1/N-2/N-3 from preflight round 4, F1 from preflight round 5, and G1 plus O1-O4 from preflight round 6 applied, revision round 9 (backtick-removal presentation fix for the parallel-scheduling blast-radius harvester) applied)
+- **Version:** 1.7
 - **Branch:** `bug/uithread-dispatcher-null-race-progresstrackerasync-584`
 - **BASE (merge base with `origin/main`):** `5ebaaf105d8241f309f704d1ff90af2e32e5a6c1`
 
@@ -61,12 +61,13 @@ and 162).
 ### Pre-existing file-size overage recorded, not deepened
 
 `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs` is 514 lines at BASE, already above the
-500-line limit in `.claude/rules/general-code-change.md`. That overage is pre-existing and is not
-caused by this change. To avoid deepening it, P1-T5 adds the attribute to that one file by extending
-its existing attribute list on line 14 to `[TestClass, DoNotParallelize]` rather than adding a line.
-The other two files have ample headroom (347 and 205 lines) and use the repository's prevailing
-two-line idiom, which is `[TestClass]` on one line and `[DoNotParallelize]` on the next
-(`UtilitiesCS.Test/Threading/CurrentStoreContextTests.cs` lines 15-16, re-derived this pass).
+500-line limit in the rule file .claude/rules/general-code-change.md. That overage is pre-existing
+and is not caused by this change. To avoid deepening it, P1-T5 adds the attribute to that one file by
+extending its existing attribute list on line 14 to `[TestClass, DoNotParallelize]` rather than
+adding a line. The other two files have ample headroom (347 and 205 lines) and use the repository's
+prevailing two-line idiom, which is `[TestClass]` on one line and `[DoNotParallelize]` on the next
+(the existing pattern in UtilitiesCS.Test/Threading/CurrentStoreContextTests.cs, lines 15-16,
+re-derived this pass).
 
 Documentation and evidence written by this plan:
 
@@ -79,9 +80,10 @@ Documentation and evidence written by this plan:
 - `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/other/`
 
 Explicitly NOT written by this plan (verified this pass, see P0-T3 and P3-T4):
-`UtilitiesCS/Threading/ProgressTrackerAsync.cs`, `UtilitiesCS.Test/UtilitiesCS.Test.csproj`,
-`UtilitiesCS/UtilitiesCS.csproj`, and anything under `.claude/`, `.codex/`, `.agents/`,
-`config/blast-radius.json`, `config/orchestration-routing.json`.
+UtilitiesCS/Threading/ProgressTrackerAsync.cs, UtilitiesCS.Test/UtilitiesCS.Test.csproj,
+UtilitiesCS/UtilitiesCS.csproj, and anything under the Claude runtime tree at .claude/, the Codex
+mirror tree at .codex/, the dot-agents tree at .agents/, config/blast-radius.json, or
+config/orchestration-routing.json.
 
 ### Test-file placement decision (made this pass, not deferred to the executor)
 
@@ -90,24 +92,24 @@ as a second `[TestClass]` alongside the existing `SynchronizationContextAwaiter_
 re-derived facts fix this decision:
 
 1. The file is currently 104 lines. The addition specified in P1-T2 is approximately 75 lines, so the
-   post-change file is approximately 180 lines — under the 500-line limit in
-   `.claude/rules/general-code-change.md`. The alternative file
-   `UtilitiesCS.Test/Threading/UiThread_Dispatcher_Tests.cs` is therefore NOT created.
-2. `UtilitiesCS.Test/UtilitiesCS.Test.csproj` line 493 already carries
+   post-change file is approximately 180 lines — under the 500-line limit in the rule file
+   .claude/rules/general-code-change.md. The alternative file
+   UtilitiesCS.Test/Threading/UiThread_Dispatcher_Tests.cs is therefore NOT created.
+2. UtilitiesCS.Test/UtilitiesCS.Test.csproj line 493 already carries
    `<Compile Include="Threading\UiThread_Tests.cs" />`. This project uses explicit `Compile Include`
    wiring, so reusing the existing file requires no `.csproj` edit, whereas a new file would. The
    three files P1-T5 touches are wired at the same project's lines 476
    (`Threading\ProgressTracker_Tests.cs`), 478 (`Threading\ProgressTrackerAsync_Tests.cs`), and 489
    (`Threading\IdleAsyncQueue_Tests.cs`), all re-derived this pass, so no `.csproj` edit is required
-   for them either and `UtilitiesCS.Test/UtilitiesCS.Test.csproj` stays out of this plan's diff.
+   for them either and UtilitiesCS.Test/UtilitiesCS.Test.csproj stays out of this plan's diff.
 
 ---
 
 ## Threshold reconciliation (recorded, applied)
 
 `CLAUDE.md` (rank 1 in `policy-compliance-order`) sets repository line coverage `>= 80%` and new
-module/class/method coverage `>= 90%`. `.claude/rules/general-unit-test.md` and
-`.claude/rules/quality-tiers.md` (rank 3/4) set `>= 85%` line and `>= 75%` branch. This plan applies
+module/class/method coverage `>= 90%`. The rule files .claude/rules/general-unit-test.md and
+.claude/rules/quality-tiers.md (rank 3/4) set `>= 85%` line and `>= 75%` branch. This plan applies
 the rank-1 `CLAUDE.md` figures (`>= 80%` repository line, `>= 90%` new code) and records the
 divergence in P0-T12 rather than silently choosing one. The conflict is pre-existing and is NOT
 resolved by this bug fix.
@@ -218,8 +220,9 @@ from being present in some of those tasks and absent from others.
    keyed on `pwsh` occupying the command position, not on `-Command` versus `-File`. The verbatim
    refusal text is: "this command runs pwsh in a plain command; what it reads or is handed as shell
    text cannot be shown not to run git. Refusing to run it." Consequence: no task in this plan may
-   invoke `pwsh`, and `scripts/vscode/Install-RepoDotNetSdk.ps1` cannot be run from this shell in any
-   form. P0-T5 step 1 performs the same download-and-extract with POSIX utilities instead. No `pwsh`
+   invoke `pwsh`, and the script scripts/vscode/Install-RepoDotNetSdk.ps1 cannot be run from this
+   shell in any form. P0-T5 step 1 performs the same download-and-extract with POSIX utilities
+   instead. No `pwsh`
    invocation appears anywhere in this plan.
 
 2. **A command whose NAME is a quoted absolute path is refused** ("runs a command whose name is
@@ -393,13 +396,14 @@ fails). No task in this plan may be skipped on the assumption that a prior run a
 ### Phase 0 — Baseline capture, policy reads, and tree re-derivation
 
 Phase 0 does not assume an empty `git status --porcelain`. This worktree already carries modified or
-untracked files under `.claude/agent-memory/**`, written by the planning and preflight delegations
-that ran in this same preparation cycle. That state is expected and affects no gate in this plan:
-every terminal porcelain and diff gate here is pathspec-scoped to `UtilitiesCS`, `UtilitiesCS.Test`,
-and the feature folder, and the two deliberately unscoped porcelain spans in P4-T1 are compared
-before-against-after rather than asserted empty, precisely so that ambient state cannot satisfy or
-falsify them. This plan's own commits never touch `.claude/**`, `.codex/**`, `.agents/**`,
-`config/blast-radius.json`, or `config/orchestration-routing.json`, and P5-T10 asserts that.
+untracked files under the agent-memory tree at .claude/agent-memory/, written by the planning and
+preflight delegations that ran in this same preparation cycle. That state is expected and affects no
+gate in this plan: every terminal porcelain and diff gate here is pathspec-scoped to `UtilitiesCS`,
+`UtilitiesCS.Test`, and the feature folder, and the two deliberately unscoped porcelain spans in
+P4-T1 are compared before-against-after rather than asserted empty, precisely so that ambient state
+cannot satisfy or falsify them. This plan's own commits never touch the Claude runtime tree at
+.claude/, the Codex mirror tree at .codex/, the dot-agents tree at .agents/,
+config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asserts that.
 
 - [ ] [P0-T1] Read the policy files in the order required by `policy-compliance-order`: `CLAUDE.md`, then `.claude/rules/general-code-change.md`, then `.claude/rules/general-unit-test.md`, then `.claude/rules/quality-tiers.md`, then `.claude/rules/csharp.md`, then `.claude/rules/tonality.md`. Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/phase0-instructions-read.md` containing `Timestamp:`, `Policy Order:` (the six paths in the order read), and an explicit list of the files read. Acceptance: the artifact exists, lists all six paths, and its `Policy Order:` line matches the order above.
 
@@ -897,7 +901,7 @@ falsify them. This plan's own commits never touch `.claude/**`, `.codex/**`, `.a
 
 - [ ] [P5-T2] Mark AC2 in the same file (the bullet beginning "AC2: The `null!` null-forgiving suppression"). Acceptance: that bullet reads `- [x]` and cites `evidence/qa-gates/p2-t2-nullforgiving-removed.md` recording zero `null!` matches in `UtilitiesCS/Threading/UiThread.cs`, and `evidence/qa-gates/p4-t4-nullable-build.md` recording `0 Error(s)`.
 
-- [ ] [P5-T3] Mark AC3 in the same file (the bullet beginning "AC3: `UtilitiesCS/Threading/ProgressTrackerAsync.cs` is left unmodified"). Acceptance: that bullet reads `- [x]` and cites `evidence/other/p3-t4-progresstrackerasync-unmodified.md`, which must contain the empty `--cached` name-status diff for that path, the empty porcelain status for that path, and the recorded verification paragraph.
+- [ ] [P5-T3] Mark AC3 in the same file (the bullet beginning "AC3: UtilitiesCS/Threading/ProgressTrackerAsync.cs is left unmodified"). Acceptance: that bullet reads `- [x]` and cites `evidence/other/p3-t4-progresstrackerasync-unmodified.md`, which must contain the empty `--cached` name-status diff for that path, the empty porcelain status for that path, and the recorded verification paragraph.
 
 - [ ] [P5-T4] Mark AC4 in the same file (the bullet beginning "AC4: No regression in"). Acceptance: that bullet reads `- [x]` and cites `evidence/qa-gates/p1-t5-donotparallelize.md` (recording that the change to `IdleAsyncQueue_Tests.cs` and `ProgressTrackerAsync_Tests.cs` is attribute-only and alters no assertion), `evidence/regression-testing/p3-t3-at-risk-tests.md` (five named tests executed, no failure outside the recorded `BASELINE_FAILURE_SET`), and `evidence/regression-testing/p3-t6-quickfiler-wpfuidispatcher.md` (`Failed: 0`).
 
@@ -978,7 +982,7 @@ Citations re-derived directly against the working tree in this pass:
 3. `UtilitiesCS/Threading/UiThread.cs` line 61 — `Dispatcher = _syncContextForm.UiDispatcher;` is the sole writer through the private setter; re-derived to confirm the setter's non-nullable parameter type is unaffected by the field retyping.
 4. `UtilitiesCS/Threading/SyncContextForm.cs` line 30 — `public Dispatcher UiDispatcher { get; private set; } = null!;` re-derived, confirming the value assigned at `UiThread.cs:61` is statically non-null and introduces no `CS8604` at that assignment.
 5. `UtilitiesCS/Threading/ProgressTrackerAsync.cs` — read in full (109 lines). Line 33 is `UiDispatcher = UiThread.Dispatcher;` and line 35 is `await UiDispatcher.InvokeAsync(`. AC3's "no edit required" conclusion is re-derived from the tree, not carried from the research document, and is confirmed.
-6. `UtilitiesCS/OutlookObjects/Folder/WpfDispatcherYield.cs` lines 57-67 — the existing `InvalidOperationException` precedent re-derived verbatim; lines 45-46 confirm the default fallback provider is `() => UtilitiesCS.UiThread.Dispatcher`.
+6. UtilitiesCS/OutlookObjects/Folder/WpfDispatcherYield.cs lines 57-67 — the existing `InvalidOperationException` precedent re-derived verbatim; lines 45-46 confirm the default fallback provider is `() => UtilitiesCS.UiThread.Dispatcher`.
 7. `UtilitiesCS.Test/Threading/UiThread_Tests.cs` — read in full (104 lines). Namespace `UtilitiesCS.Test.Threading`; four using directives; one `[TestClass]` (`SynchronizationContextAwaiter_Tests`); no `System.Reflection` using. Establishes the 500-line headroom decision and the exact using-block edit.
 8. `UtilitiesCS.Test/UtilitiesCS.Test.csproj` line 493 — `<Compile Include="Threading\UiThread_Tests.cs" />` re-derived, establishing that reusing the existing test file requires no project-file edit.
 9. `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs` lines 141-186 — `DispatcherField`, `ForceDispatcherNull`, and `RestoreDispatcher` re-derived, giving the exact reflection idiom (`typeof(UiThread).GetField("_dispatcher", BindingFlags.NonPublic | BindingFlags.Static)`) the new test mirrors. Lines 248-289 re-derived: the at-risk test asserts `NotThrow` and `callCount == 0` with no exception-type assertion, so the type change is invisible to it.
@@ -990,9 +994,40 @@ Citations re-derived directly against the working tree in this pass:
 15. `.csharpierignore` — re-derived: it excludes `**/evidence/**`, `*.cobertura.xml`, `*.trx`, `*.csproj`, `*.props`, `*.targets`. Evidence artifacts written by this plan therefore cannot fail the format gate.
 16. `.gitignore` lines 39 and 144-145 — re-derived: `[Tt]est[Rr]esult*/` ignores the `TestResults/` subdirectories this plan writes, and `coverage/*` (except `coverage/.gitkeep`) ignores the Cobertura outputs. Neither enters the committed footprint asserted in P5-T10. See citation 30 for why both patterns require the forward-slash spelling to take effect.
 17. `coverage.config` — re-derived: it excludes only third-party module paths (Deedle, FSharp, Castle.Core, FluentAssertions, Moq, Microsoft.Testing, MSTest). No first-party production path is excluded, so `UtilitiesCS/Threading/UiThread.cs` is in the coverage denominator and P4-T7's class-node lookup can resolve.
-18. `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/spec.md` lines 234-257 — the AC1..AC7 bullets re-derived verbatim, giving the exact bullet-opening text each P5 check-off task must match.
+18. `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/spec.md` lines 249-272 — the AC1..AC7 bullets re-derived verbatim, giving the exact bullet-opening text each P5 check-off task must match. Line range corrected in the revision round 9 pass; see "Citations re-derived in the revision pass of 2026-09-02 (revision round 9, backtick-removal presentation fix)" below for the re-derivation, which supersedes this entry's round-1 "lines 234-257" reading — that reading predated the `## Write Set` section inserted at spec.md lines 77-86.
 19. `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/issue.md` line 8 — the merge base `5ebaaf105d8241f309f704d1ff90af2e32e5a6c1` re-derived as the anchor for every `git diff` in this plan.
 20. `CLAUDE.md` "C# Toolchain" section and `.claude/rules/general-unit-test.md` / `.claude/rules/quality-tiers.md` coverage sections — re-derived, producing the recorded 80/90 versus 85/75 conflict and the rank-1 resolution stated in "Threshold reconciliation" above.
+
+### Citations re-derived in the revision pass of 2026-09-02 (revision round 9, backtick-removal presentation fix)
+
+Every citation below was re-derived against the working tree in this revision pass by reading the
+named file. The tree is still at BASE `5ebaaf105d8241f309f704d1ff90af2e32e5a6c1` with no commit made.
+This round changed no command line, no task ID, no write-target file, and no evidence path. It
+changed only: the removal of backtick-wrapping around scope-exclusion, precedent, and
+context-reference file-path mentions in `spec.md` and this plan (round 9 itself, applied before this
+pass); one incomplete backtick-removal left behind by that round at spec.md line 168 (Defect 1,
+corrected in this pass); the plan's own status and version metadata; and citation 18 above, which the
+`## Write Set` section insertion had already made stale before round 9 and which round 9's edits did
+not touch. The prose corrections are enumerated in "Sibling regions re-checked in the revision round
+9 pass" below.
+
+58. `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/spec.md` lines 77-86
+    — the `## Write Set` section re-derived this pass. It lists exactly five paths, in this order:
+    `UtilitiesCS/Threading/UiThread.cs`, `UtilitiesCS.Test/Threading/UiThread_Tests.cs`,
+    `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs`,
+    `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs`, and
+    `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs`. This plan's own "Scope: files this plan's
+    diff writes" list (above, lines 23-32) was re-read alongside it and names the same five paths in
+    the same order.
+59. `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/spec.md` lines
+    249-272 — the current position of the `## Acceptance Criteria` block re-derived directly from the
+    file: the heading sits at line 249, the AC1-AC7 bullets run through line 272, and line 274 is `##
+    Risks & Mitigations`. This is the corrected range that supersedes citation 18's round-1 "lines
+    234-257" reading, which predated the `## Write Set` section this pass re-derived as citation 58.
+60. `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/spec.md` line 259 —
+    the AC3 bullet's opening text, "AC3: UtilitiesCS/Threading/ProgressTrackerAsync.cs is left
+    unmodified", re-read this pass and compared character-for-character against P5-T3's quotation of
+    the same opening text (above). The two match exactly; no correction to P5-T3 was required.
 
 ### Citations re-derived in the revision pass of 2026-09-02 (preflight round 2)
 
@@ -1263,6 +1298,39 @@ The statement that a default TRX filename embeds a timestamp and does not overwr
 is reported by the same reviewer. The planner has no shell in its tool surface and did not re-run any
 of them in this pass; they are carried as reported measurements and are labelled as such rather than
 as citations to the repository tree.
+
+### Sibling regions re-checked in the revision round 9 pass
+
+- **The spec.md line-168 `WpfDispatcherYield.cs` backtick leftover was found and fixed in this
+  round.** Round 9's backtick-removal pass converted every other backtick-wrapped
+  scope-exclusion/precedent/context-reference path mention in `spec.md` and this plan to plain text,
+  but left the `WpfDispatcherYield.cs:64-66` mention inside spec.md's "Error handling and logging
+  updates" subsection (the same file already referenced in plain-text form at spec.md lines 100 and
+  133) still backtick-wrapped. It is now corrected to the unbackticked, full-repository-relative-path
+  form `UtilitiesCS/OutlookObjects/Folder/WpfDispatcherYield.cs:64-66`, matching the spelling already
+  established at those two lines. The surrounding code-identifier backticks on
+  `InvalidOperationException`, `Initialize()`, and `IdleAsyncQueue.OnApplicationIdle` in the same
+  passage were left untouched, because those are code-identifier citations rather than path mentions.
+- **No other task in this plan quotes the AC3 or AC4 bullet text in full, so no further
+  quotation-consistency fix was needed.** P5-T1, P5-T2, and P5-T5 through P5-T8 were each re-read this
+  pass: every one quotes only a short opening fragment of its own AC bullet (for example P5-T4's "AC4:
+  No regression in"), never the AC3 or AC4 bullet in full. P5-T3's opening-fragment quotation of AC3
+  was re-derived directly (citation 60 above) and P5-T4's opening-fragment quotation of AC4 ("AC4: No
+  regression in") was re-checked against spec.md's current AC4 bullet and still matches.
+- **P5-T9's and P5-T10's backtick-wrapped acceptance-criterion path spans were read and confirmed
+  unaffected by this round's edits.** Both tasks still assert, in backtick-wrapped form, that the
+  committed diff and the anchored name-status diff contain no path under `.claude/`, `.codex/`,
+  `.agents/`, or `config/`. Those are enforcement assertions the executor checks against, not
+  scope-exclusion/precedent/context-reference prose, so round 9's backtick-removal pass correctly left
+  them backtick-wrapped and this pass found no change needed.
+- **Constraint 5, the TRX selection rule, and the seven TRX-reading tasks (P0-T10, P0-T11, P3-T2,
+  P3-T3, P3-T6, P4-T5, P4-T6) were read and confirmed unaffected by round 9's backtick-removal
+  edits.** None of the seven task bodies, and neither the constraint-5 sourcing paragraph nor the TRX
+  selection rule that follows it, mentions `WpfDispatcherYield.cs` or any other
+  scope-exclusion/precedent/context-reference file path; each cites only its own vstest command,
+  `/ResultsDirectory` value, and the `notExecuted`/`Skipped` sourcing rule already re-derived in the
+  revision round 8 pass. No command line, task ID, write-target file, or evidence path in any of the
+  seven changed as a result of round 9.
 
 ### Sibling regions re-checked in the revision round 8 pass
 
@@ -1593,7 +1661,7 @@ CITATION: QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs | lines 23-24 and 
 CITATION: .csharpierignore | lines 4-14, evidence and project-file exclusions, including line 8 `*.trx`, which keeps the TRX files P0-T10, P0-T11, P3-T2, P3-T3, P3-T6, P4-T5, and P4-T6 read out of P4-T2's repo-wide format check
 CITATION: .gitignore | line 39 `[Tt]est[Rr]esult*/` and lines 144-145 `coverage/*`, both directory-scoped, which is why backslash-stripped root-level paths would escape them and why every `TestResults/<task>/` TRX this plan reads is untracked
 CITATION: coverage.config | lines 12-22, third-party-only module excludes; no first-party assembly excluded, so added production and test lines legitimately move lines-valid
-CITATION: docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/spec.md | lines 234-257, AC1-AC7
+CITATION: docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/spec.md | lines 249-272, AC1-AC7 (corrected in revision round 9; supersedes citation 18's round-1 "lines 234-257" reading, which predated the ## Write Set section insertion)
 CITATION: docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/issue.md | line 8, merge base SHA
 CITATION: global.json | lines 6-10, sdk paths [".dotnet-sdk", "$host$"] and the missing-repo-local-SDK error message; `.dotnet-sdk/` absent from this worktree
 CITATION: scripts/vscode/Install-RepoDotNetSdk.ps1 | line 3 default version 8.0.205; line 26 download URL https://builds.dotnet.microsoft.com/dotnet/Sdk/$Version/dotnet-sdk-$Version-win-$Architecture.zip; line 36 install dir Join-Path $PSScriptRoot '..\..\.dotnet-sdk' — the three values P0-T5's POSIX bootstrap reproduces without running the script
