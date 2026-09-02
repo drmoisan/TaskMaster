@@ -31,8 +31,13 @@ first turned an apparent package regression into the true result: 1412/3266 = 43
 **How to apply:** Before writing any coverage-delta artifact, sanity-check the baseline by recomputing
 one of its own recorded rows from the current XML structure and confirming your script reproduces the
 shape (e.g. that the baseline's per-class denominators sum to its package denominator). State the
-counting method explicitly in the delta artifact so the next reader can reproduce it. The repo-wide
-root `<coverage>` attributes are already deduped and match a per-package all-descendant sum in this
-repo, so repo-level figures need no adjustment. See also
-[[csharp-canonical-coverage-artifact-conversion]] and
+counting method explicitly in the delta artifact so the next reader can reproduce it.
+
+**Correction (2026-09-02, issue #532):** the claim that repo-wide root `<coverage>` attributes are
+already deduped and need no adjustment holds only for **raw `dotnet-coverage` generator output**. It
+does NOT hold for a post-processed `ConvertTo-KoverageCoberturaXml` artifact — before issue #441 was
+fixed, that post-processing step's root attributes *were* the (undeduped) all-descendant sum, which
+is the exact defect #441 corrects. Check which kind of artifact you're reading before applying the
+"no adjustment needed" shortcut; do not assume it transfers from raw output to a post-processed file.
+See also [[csharp-canonical-coverage-artifact-conversion]] and
 [[dotnet-coverage-denominator-nondeterminism]].
