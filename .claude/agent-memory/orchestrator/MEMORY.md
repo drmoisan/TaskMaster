@@ -4,6 +4,8 @@
 - [Completion-gate receipt shapes](completion-gate-receipt-shapes.md) — SOLVED: the missing key is `evidence`; plus the bug-route
 - [Evidence timestamps can be synthesized](evidence-timestamps-can-be-synthesized.md) — an executor can increment a counter instead of
 - [JaCoCo not Cobertura for coverage evidence](jacoco-not-cobertura-for-evidence.md) — maintainer deletes committed Cobertura; convert to
+- [Cobertura substitution must precede the commit](cobertura-substitution-must-happen-precommit.md) — converting AFTER the executor commits leaves the blobs reachable; this run merges with merge commits, not squashes
+- [PR-creation readiness: exact checkpoint shape](pr-creation-readiness-exact-requirements.md) — needs relativeFile, an 8-key receipt LIST, and `verified` (not `completed`) on step7/step8
 - [Store-lockup watchdog null-model hazard](project_store_lockup_watchdog_null_model_hazard.md) — new startup COM scopes need a
 - [VS Code extension location](project_extension_location.md) — the extension lives at `extensions/drm-copilot/`, not the repo root
 - [Verify package.json before vsce work](feedback_vsce_verify_package_location.md) — never assume the repo root is the publishable
@@ -76,6 +78,8 @@
 - [Verify an issue is open in SUBSTANCE](verify-issue-still-open-in-substance.md) — grep the source for the issue number before preparing; the residual may already be its own issue
 - [Reconcile plan numbers against your own measurements](reconcile-plan-numbers-against-your-own-measurements.md) — a stale line count passes a citation-only review and halts Phase 0
 - [Preflight catches vacuous gates](preflight-catches-vacuous-gates.md) — MCP `ok:true` is not enough; executor preflight found 6 gates
+- [Absence from a failure list is not a pass gate](absence-from-failure-list-is-not-a-pass-gate.md) — "X not among failures" is satisfied by "X never ran"; add a test-discovery count control
+- [Convergence signal is systematically optimistic](convergence-signal-is-systematically-optimistic.md) — predicted "no further rounds" and was wrong twice; budget 3 rounds when round 1 finds blocking defects
 - [Preflight: sweep task ordering + citation arity](preflight-sweep-task-ordering-and-citation-arity.md) — name both sweeps early; a
 - [Revert plans must check test provenance](revert-plans-must-check-test-provenance.md) — verify each test against the pre-change sha; a
 - [Bash tool collapses `\` before sed sees it](bash-tool-collapses-double-backslash-in-sed.md) — a `\` pattern is a silent no-op exiting 0; it bites grep too, so pair every absence sweep with a known-positive control
@@ -91,6 +95,7 @@
 - [No helper scripts under evidence/](feedback_no_helper_scripts_under_evidence.md) — feature-review's language match is extension-only and
 - [One executor per worktree](one-executor-per-worktree.md) — a stale checkpoint is NOT a dead delegation; never launch a second executor
 - [No SendMessage: relaunch with a resume brief](no-sendmessage-relaunch-with-resume-brief.md) - a stopped executor cannot be resumed in place; never use a placeholder Agent prompt
+- [Dead subagent's work may be complete on disk](dead-subagent-work-may-be-complete-on-disk.md) — diff the worktree before relaunching; its self-reported counts can still be wrong
 - [Agent() cannot course-correct a running subagent](agent-tool-cannot-course-correct-running-subagent.md) — it starts a SECOND agent
 - [Removing a halt requires branch propagation](removing-a-halt-requires-branch-propagation.md) — converting a HALT into a recorded blocker
 - [Prepared epic child invalidated by a sibling merge](prepared-epic-child-invalidated-by-sibling-merge.md) — a merged fix for an issue the
@@ -118,6 +123,9 @@
 - [External actor can merge your child PR mid-run](external-actor-can-merge-your-child-pr-midrun.md) — re-read PR state before the CI gate
 - [Stale base anchor passes ancestry vacuously](stale-base-anchor-passes-ancestry-vacuously.md) — on a prep resume the pinned base stays an ancestor, so the check passes while diffs bill another issue's work to your plan
 - [orchestrator-state.json is TRACKED in git](orchestrator-state-json-is-tracked-in-git.md) — .gitignore does not apply; writing your checkpoint pollutes the footprint. Fix with skip-worktree
+- [Three-dot diff degenerates on an ancestor base](three-dot-diff-degenerates-on-ancestor-base.md) — `PINNED...HEAD` silently becomes two-dot once PINNED is an ancestor; 299 paths vs 10
+- [Full delegation-receipt shape + relativeFile](orchestrator-state-full-delegation-receipt-shape.md) — validator needs 8 keys per receipt; completing a REAL delegation is not padding
+- [Footprint AC forbids on-branch follow-up promotion](footprint-ac-forbids-onbranch-followup-promotion.md) — a checked footprint criterion makes promoting review findings impossible on that branch; defer and file elsewhere
 
 ## Artifact hygiene
 - [Angle-bracket redaction breaks TRX XML](angle-bracket-redaction-breaks-trx-xml.md) — a `<placeholder>` in an XML attribute makes the
@@ -134,4 +142,5 @@
 - [grep-count wrapper does not clear $LASTEXITCODE](grep-count-wrapper-does-not-clear-lastexitcode.md) — git grep exits 1 on zero matches
 - [Session-root shims are deleted by siblings](session-root-shims-are-deleted-by-siblings.md) — PRD_FEATURE_BLOCKED is a session-cwd path
 - [Stale-figure sweep by changed-file set](stale-figure-sweep-by-changed-file-set.md) — sweep the upstream PR's FULL changed-file set and
+- [validate-bash blocks --force-with-lease too](validate-bash-blocks-force-with-lease-too.md) — literal substring match; delete+re-push a single-owner branch instead
 - [Merging main invalidates the plan base anchor](merging-main-invalidates-plan-base-anchor.md) - a sibling-touched .csproj makes an exactly-one-line gate fail; anchor diffs to the MERGE commit

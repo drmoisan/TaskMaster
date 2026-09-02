@@ -1,6 +1,6 @@
 ---
 name: trx-needs-resultsdirectory
-description: /Logger:trx writes to TestResults\ relative to cwd, so a TRX-existence acceptance clause needs an explicit /ResultsDirectory: — and that directory must be private to the task, not shared across tasks
+description: /Logger:trx writes to TestResults\ relative to cwd, so a TRX-existence acceptance clause needs an explicit /ResultsDirectory: — that directory must be private to the task, and a BARE /Logger:trx names the file after the account and host
 metadata:
   type: feedback
 ---
@@ -31,6 +31,19 @@ task-ID segment goes underneath it, so the canonical `<FEATURE>/evidence/<kind>/
 holds. Renumbering a task means renaming its segment — re-check after any Delta that shifts IDs. A
 stray `TestResults\` from an omission does not break a clean-tree acceptance — `.gitignore:39` is
 `[Tt]est[Rr]esult*/` — so the clean-tree gate will NOT catch the missing-flag defect for you.
+
+**A bare `/Logger:trx` is a third, independent defect: it puts the account and machine name in the
+committed artifact's FILE NAME.** vstest's default TRX name is `<account>_<machine> <timestamp>.trx`.
+`.claude/agent-memory/_shared_no_absolute_host_paths.md` prohibits an account or machine name in any
+committed artifact, and a sanitisation sweep that rewrites file CONTENT never reaches a file name, so
+the violation survives every sanitise-then-commit task a plan carries. Always pass an explicit name,
+and always double-quote the whole switch: `"/Logger:trx;LogFileName=p5-t10.trx"`. The quotes are
+load-bearing — an unquoted semicolon terminates the argument in `pwsh`, so the unquoted form silently
+degrades to a bare `/Logger:trx` and restores the account-named file. Gate it: have the sanitisation
+task count files AND DIRECTORIES under `<FEATURE>/evidence/` whose name contains the token produced by
+`Split-Path -Leaf $env:USERPROFILE`, require 0, and never write that token into the artifact. A plan
+that measures this count but explicitly declines to gate on it (#633 round 1 did, in two tasks) has
+documented the violation rather than prevented it. Confirmed on #633 round 2 across eight scoped runs.
 
 **Confirmed instance.** #464 round 3 inserted a task into Phase 5 and renumbered its tail; the
 renamed `[P5-T12]` kept the segment `p5-t11` and round 4 caught it. The cheap audit is two `-o`

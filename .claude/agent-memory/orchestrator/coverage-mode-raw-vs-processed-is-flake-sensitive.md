@@ -39,6 +39,45 @@ Note this cuts against a plan clause that requires baseline and post-change mode
 such a clause is hostage to suite flakiness rather than to the change under test, so expect to
 have to remediate it rather than treating it as a code defect.
 
+**Recurrence, 2026-09-01 on issue #287 (found at plan-authoring time, before any run).** Executor
+preflight caught the same hazard statically. Current line numbers: `Invoke-DotnetCoverageCollection`
+is called at `:326` and the post-processing, `Assert-CoberturaLineCoverageThreshold`, and the
+`Set-Content` that persists the processed XML are all downstream at `:333-344`. Re-derive these;
+they have moved at least once.
+
+Two ways a plan can guard it, and they are not equivalent:
+
+- **Require a green baseline suite** so both runs are necessarily processed mode. This is what the
+  #287 plan adopted. It is correct but it makes the whole plan hostage to any pre-existing flake,
+  so it must carry an explicit halt clause ("record as a pre-existing blocker and stop for
+  orchestrator direction") rather than an instruction to proceed.
+- **Record `COVERAGE_XML_MODE` on every coverage artifact and refuse to difference unequal modes.**
+  Cheaper and not flake-hostage, because it degrades to "cannot compare" instead of "cannot
+  proceed". Prefer this when the suite has known flakes. Cross-check the `<package>` count as the
+  proof the denominators match.
+
+When scheduling a C# item whose plan takes the green-baseline route, warn the parent that the
+run can halt on an unrelated flaky test.
+
+**Two more facts from #287, both measured rather than inferred.**
+
+*Cobertura emits every line element TWICE per class.* Each `line` appears once under
+`methods/method/lines` and again under the class-level `lines`. Parsing the committed artifact
+`docs/features/.../439/evidence/qa-gates/issue-439-final.normalized.cobertura.xml` for the
+`StoreLaunchReadinessEvaluator` class element: `.//line` returns **25**, `lines/line` returns
+**13**, `methods/method/lines/line` returns **12**, and 13 + 12 = 25. So a PowerShell
+`GetElementsByTagName("line")` on a class element — a *descendant* traversal — double-counts, and
+any acceptance condition asserting an uncovered-line count from it is inflated. Use
+`SelectNodes("lines/line")` to scope to the class-level child. Note the ratio is **not exactly
+two**: the class-level block carries one line the method blocks do not, so do not write "twice the
+count" in a plan.
+
+*Distinguish a post-processed artifact from a raw one by stdout, not by parsing.* The four root
+attributes parse in both states, so reading them proves nothing. `Invoke-MSTestWithCoverage.ps1`
+prints `Post-processing coverage XML for Koverage compatibility...` and `Done. Coverage artifact:`
+only after the collection exited zero, both downstream of the throw. Requiring both literals in the
+log is the cheap, falsifiable discriminator. Re-derive the line numbers; they have moved before.
+
 Related: [[csharp-coverage-denominator-two-figures]],
 [[coverage-lines-covered-is-nondeterministic]],
 [[feature-review-coverage-85-floor-trap]],

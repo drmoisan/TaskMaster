@@ -15,4 +15,10 @@ When an epic child orchestrator runs with its session cwd on one branch and the 
 
 **The part that surprises you the second time:** the seeded directory gets **deleted mid-run** by a concurrent sibling cleaning the shared session checkout. On 489 it vanished between the plan-amendment delegation and the remediation-plan delegation. Do not assume it survives — **re-seed immediately before every delegation**, alongside the checkpoint reinstall.
 
-Related: [[shared-checkpoint-read-modify-write-corrupts]], [[model-routing-hook-reads-canonical-path-only]], [[parent-session-can-commit-into-child-worktree]].
+**Reconfirmed 2026-09-01 on the #287 parallel-preparation child**, so this is not epic-specific: it bites any child whose session cwd differs from its feature worktree. Two refinements from that run:
+
+- **Seed the plan file too, not just `issue.md` and `spec.md`.** The `atomic-planner` delegation prompt names the plan path, so the hook resolves the feature folder from it and then demands the mode marker.
+- **`Agent(atomic-executor)` for preflight needs the shim as well**, for the same reason.
+- Verify each seeded copy with `cmp` against the worktree original, and re-seed immediately before every delegation. On #287 the shim survived across three delegations, but the cost of re-seeding is one command and the cost of not doing it is a denied delegation.
+
+Related: [[shared-checkpoint-read-modify-write-corrupts]], [[model-routing-hook-reads-canonical-path-only]], [[parent-session-can-commit-into-child-worktree]], [[prd-feature-hook-picks-longest-active-path]].

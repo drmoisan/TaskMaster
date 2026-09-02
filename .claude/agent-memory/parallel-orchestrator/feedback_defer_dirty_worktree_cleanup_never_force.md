@@ -29,6 +29,16 @@ they do for a planner worktree. There is no in-band way to clean it up; report i
 hunting for one. Note the paths are SIBLINGS, not nested — the `-wt` suffix makes a different
 directory — so the parent's removability is independent of it.
 
+**A CLEAN reading taken at merge time is not sufficient evidence to remove a worktree — re-read it
+later.** Items 285 and 287 of run bugs-638-644-647 both returned an empty `git status --porcelain`
+when checked immediately after their merge, and both were dirty minutes later with a modified
+`.claude/agent-memory/<agent>/MEMORY.md` plus a new untracked sibling note. The cause is ordering, not
+flakiness: a child writes its agent-memory AFTER opening the pull request and after emitting its
+report, so the parent's merge-time check races the child's last writes. On 285 the first reading
+showed one file and the second showed two. Two items in a row is a pattern, so treat the merge-time
+reading as provisional and re-check before any removal. Because those memory paths are never on
+`origin/main`, a removal destroys the only copy.
+
 **How to apply:**
 
 - Assess, then record the deferral in a durable field (an item-level `cleanup_note`) and in

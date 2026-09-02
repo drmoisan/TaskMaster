@@ -19,6 +19,17 @@ metadata:
 
 **Wrong-branch head resolution (verified 2026-08-27, epic child 442).** Run with `workspace_root` set to the **session root** while the feature lived in a separate worktree, the collector resolved `Head ref` to the *session* worktree's own scratch branch (`TaskMaster-wt-2026-08-23T22-51 @ 096f8493`) instead of the target branch (`bug/quickfiler-home-controller-metrics-442 @ 1fd417dd`), reported the merge base against `main`, and then described a **different feature entirely** — it named sibling `quickfiler-bug-family-446` and listed that sibling's three audit files as the whole changed-file set. It also repeated the false "GitHub CLI unavailable" line. Every substantive field was wrong; only the requested/resolved *base* ref was right. The collector resolves the head from the workspace_root's `HEAD`, so it cannot describe a branch that lives in a different worktree. Verify the summary names YOUR branch and YOUR head SHA before using any of it, and author from the real `git diff <base>...HEAD` when it does not.
 
+**Acceptance-criteria IDs scraped as issue numbers (verified 2026-09-01, #656).** The
+author-asserted autoclose list contained **twenty non-issue tokens** `#AC-1` through `#AC-20`, which
+are the acceptance-criterion identifiers in `spec.md`, alongside four unrelated real issues (462,
+488, 500, 501) harvested from the spec's cross-references. The scraper matches `#<token>` in the
+feature documents with no check that the token is numeric or that the issue belongs to this item. On
+#656 all four real issues happened to be already closed, so the error was benign; on an earlier item
+the same list named an issue that was OPEN and explicitly out of scope. Verify every number with
+`gh issue view <n>` and emit `Closes` only for this item's own issue. Note the same run again
+repeated the false "GitHub CLI unavailable" line while `gh` worked — that is now five consecutive
+items.
+
 The bundle is still worth generating: the `enforce-pr-author-skill.ps1` hook checks that `artifacts/pr_context.summary.txt` **exists** and that `receipt.created_at` is strictly newer than its mtime, not that its content is correct. Generate it first, then write the body and receipt.
 
 **Worktree write quirk (verified 2026-07-08, #264 in an agent worktree):** when run with `workspace_root` set to an agent worktree, `collect_pr_context` returned `ok` and listed worktree artifact paths, but wrote NOTHING to the worktree `artifacts/` and did NOT refresh the main-checkout copy either (its `pr_context.summary.txt` kept a stale mtime from a prior feature's run). The `enforce-pr-author-skill.ps1` hook checks `artifacts/pr_context.summary.txt` relative to the gh-invocation cwd (the worktree) and requires `receipt.created_at` strictly newer than that file's mtime. Fix: generate `artifacts/pr_context.summary.txt` yourself in the worktree from the real `git log`/`git diff --stat base...HEAD`, then author `pr_body_<N>.md`, compute the SHA-256, and write the receipt with `created_at` newer than the summary you just wrote. The hook validates the receipt/body/SHA and the summary's existence+mtime — not the summary's content — so a self-authored summary satisfies it.

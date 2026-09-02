@@ -14,6 +14,7 @@
 - [Follow-up promotion task is unexecutable](project_followup_promotion_task_is_unexecutable_by_executor.md) — no MCP tool; "pr
 - [Plan check-off fixpoint breaks clean-tree gates](project_plan_checkoff_fixpoint_breaks_terminal_clean_tree_gate.md) — flip last boxes 
 - [Merge-base diff gates need a commit cadence](project_preflight_mergebase_diff_gates_need_commit_cadence.md) — vacuous while HE
+- [Moving-base two-dot diff: test inertness](project_preflight_moving_base_two_dot_diff_inertness_test.md) — `git diff origin/main -- <paths>` is blocking only if the upstream delta hits those paths
 - [BASELINE_SHA diff conflates the merged base](project_baseline_sha_diff_conflates_merged_base.md) — use `<base>..HEA
 - [Inserted plan tasks force renumbering](project_plan_task_ids_digit_only_forces_renumbering.md) — suffixed IDs (`P3-
 - [Plan rationale clauses are evidence](project_418_plan_rationale_clauses_are_evidence.md) — blockers hide as prose

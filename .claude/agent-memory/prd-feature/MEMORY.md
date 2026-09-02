@@ -1,6 +1,6 @@
 - [push-down command pattern](project_push_down_pattern.md) — 10-file change map for adding a new push-down command; reference impl is pushDownCodexAndAgentsCustomizations
 - [Promotion scaffold metadata defects](project_promotion_scaffold_metadata_defects.md) — fix Status folder path and Last Updated date in scaffolded issue.md before filling docs
-- [Test disposition: grep for old-overload pins](feedback_test_disposition_overload_pins.md) — grep test project for Setup/Verify of retired overloads before marking any test file "unchanged"; loose mocks fail at run time
+- [Test disposition: grep for run-time-only bindings](feedback_test_disposition_overload_pins.md) — before marking a test file "unchanged", grep for Setup/Verify of retired overloads AND GetField reflection on renamed private fields
 - [AC gates: verify satisfiability + fresh reads](feedback_ac_gates_verify_satisfiability.md) — check baselines before repo-wide floors; grep asserted tokens on disk for exact casing; scope zero-hit gates to named files; re-read spec before tallies
 - [full-bug means spec.md is the only AC source](feedback_full_bug_spec_only.md) — no user-story.md by default (Expected Outputs header vs AC-tracking skill); two exceptions (epic-prep route, cross-reference instruction) handled by making it checkbox-free narrative with a banner
 - [Backticked paths ARE the change footprint](feedback_backticked_paths_are_the_change_footprint.md) — a harvester reads backticked paths from spec.md/plan; backtick every in-scope file, leave out-of-scope citations unbackticked

@@ -35,7 +35,29 @@ minutes and 137k tokens, then halted because all three defects were already on `
 grep would have caught it. See [[qfc-collection-468-family-shipped-issues-left-open]] for the
 family this bit.
 
-**Four families confirmed, so treat this as a repository-wide property, not a one-off.** The fourth
+**Six families confirmed, so treat this as a repository-wide property, not a one-off.** The sixth,
+[[quickfiler-bug-family-446-shipped-issues-left-open]], caught on `/parallel-add 448` in seven tool
+calls with no preparation delegated, REFINES the cause stated below rather than repeating it. That
+family DID use closing keywords — an entire scope-containment criterion (AC17) asserts the PR body
+carries them for `#446, #448 and #426 only`, and it is checked with evidence — and the issues stayed
+OPEN regardless. The mechanism is the PR BASE: PR #625 targeted
+`epic/quickfiler-bug-family-integration`, and GitHub auto-closes only on merge into the DEFAULT
+branch, so correct keywords on an epic-surface PR never fire. So the generalization is stronger than
+"this repo does not use closing keywords": issue state is decoupled from delivery whether or not
+keywords were written. When the bare-number grep finds a delivering commit, settle the OPEN state
+with one call — `gh api repos/<owner>/<repo>/commits/<sha>/pulls --jq '.[] | "PR #\(.number)
+base=\(.base.ref)"'` — a non-`main` base explains it outright. Expect this variant on any
+epic-surface family, which merges into an integration branch by construction. The fifth
+is [[breadcrumb-router-498-family-shipped-issues-left-open]], caught on `/parallel-add 499` in six
+tool calls with no preparation delegated. It is the EASIEST case and it still had to be caught here:
+the delivering commit's subject names the issue number outright — `fix(quickfiler): clear stale
+SelectedFolderPath on re-bind (#499)` — so the bare-number grep hit the subject line directly. That
+the issue nonetheless stayed OPEN rules out "the reference was too obscure" and settles the cause:
+this repository does not use closing keywords, so issue state is decoupled from delivery
+UNIVERSALLY, not just when the delivering commit is hard to find. Never treat an OPEN issue as
+evidence of outstanding work, however direct the delivery reference turns out to be. One trap
+specific to such a spec: a scope-reconciliation table row reading `**STILL IN SCOPE.** Unfixed.` is a
+snapshot from spec-authoring time. Read the AC table at the end of the file for current status. The fourth
 is [[breadcrumb-coordinator-501-family-shipped-issues-left-open]], caught on `/parallel-add 462` in
 six tool calls with no preparation delegated. It is the worst case for the slug heuristic: the
 delivering commit's subject names **neither the issue nor any feature slug** — it reads
@@ -131,10 +153,38 @@ left open. **A follow-up the delivering commit PROMOTED to its own issue is not 
 candidate.** Observed 2026-08-31 on `/parallel-add 462`: the fix commit recorded #655 and #656 as
 real issues rather than prose, and #656 is a direct residual of the very field #462 asked to be
 split. It still does not make #462 partially delivered — the promotion is what discharged it, per
-[[promote-latent-defects-to-issues]] — so admit #656 on its own merits and reject #462. Discount a
+[[promote-latent-defects-to-issues]] — so admit #656 on its own merits and reject #462.
+That call was confirmed 2026-09-01: `/parallel-add 656` ran the full pre-check and ADMITTED.
+A promoted follow-up is the one bare-number hit shape that means "genuine outstanding work"
+rather than "already shipped" — the commit body reads `Records two follow-ups as real issues`,
+which is the opposite of a delivery claim, so read the body before assuming the hit is a fix. Discount a
 `[ ]` AC that is pure bookkeeping — the 468 feature's AC-28 is "close all seven
 issues" and is permanently unchecked while any sibling stays OPEN, so it flags no deliverable and
 needs no branch. The whole #474 pre-check ran in five tool calls with no preparation delegated.
+
+**Fifth mechanism: the residual is UNAUTOMATABLE MANUAL VERIFICATION, so unchecked ACs are not a
+deliverable.** Normally an unchecked, non-bookkeeping AC signals genuine residual scope — that is
+what made #469 admissible. This case inverts it. Observed 2026-08-31 on `/parallel-add 677`: the
+fix commit `f8079416 fix(quickfiler): stop breadcrumb focus restoration leaking keyboard to Outlook
+(#677)` is an ancestor of `origin/main` via PR #684, merged from the item's own branch
+`bug/quickfiler-keyboard-hook-leaks-to-outlook-677`, whose three-dot diff against `origin/main` is
+EMPTY. Yet spec.md carries three unchecked ACs (AC-1, AC-2, manual half of AC-3), each annotated
+`pending manual live-Outlook verification`.
+
+They are not admissible residual. The feature-audit states it directly — "No remediation plan is
+triggered: the outstanding halves are not remediable by code work" — and the feature ships a
+committed `runbooks/manual-live-outlook-verification.runbook.md` whose own text says the criteria
+cannot be closed from unit-test evidence. The requirement needs a live Outlook desktop session, a
+real WebView2 runtime, and a human click, so it produces no diff and a parallel item has nothing to
+ship.
+
+The tell, and it is cheap: read the AC annotation and the feature-audit's residual list before
+concluding an unchecked box is work. An unchecked AC that names a runbook, an owner, and a
+`post-merge-schedulable` disposition is a tracked HUMAN obligation, not an engineering task. It sits
+alongside the bookkeeping-AC discount already noted above as the second class of unchecked AC that
+flags no deliverable. Where the audit's OTHER residuals were promoted to real issues (here #683 for
+the SetupDisposal coverage debt), those promoted issues are the admissible items — judge each on its
+own merits, per [[promote-latent-defects-to-issues]].
 
 **How to apply:** Make the pre-check the first step of the add, before the `proposed` entry and
 before the preparation delegation. When it shows the work is delivered — or that the defect does not
@@ -149,5 +199,31 @@ comes back byte-identical to the pre-add baseline. Confirmed on this run. Second
 BASELINE validation before starting, so a pre-existing failure from a concurrent add is not
 misattributed to your own operation.
 
+**A lone bare-number hit that is a PROMOTION commit is the positive signal, and it is now confirmed
+twice.** The #462 note above reached this by inference; `/parallel-add 648` (2026-09-01) is the clean
+case. The sole hit was `98113b09 docs(quickfiler): capture the #493 R-1 residual as issue #648`,
+whose body reads "Issue #648 tracks the ungated reflection swap" — a commit that CREATES the issue
+cannot deliver it, so the hit inverts to evidence of outstanding work. The tell is in the subject
+verb: `capture`, `record`, `promote` and `Records ... as real issues` are promotion vocabulary,
+whereas `fix`, `close` and `enforce` are delivery vocabulary. Read the verb before opening the body.
+
+**When the issue's remedy depends on a PRIOR issue's deliverable, check that prerequisite exists on
+`main` as part of the same pre-check.** #648 asks that a call site be routed through
+`UiThreadDispatcherFixture`, which #493 was to create. A single `git ls-tree -r origin/main
+--name-only | grep -i <Type>` confirmed it, and the guard-site read confirmed the call site is still
+unrouted. Both halves matter and they fail in opposite directions: a missing prerequisite makes the
+item unpreparable as written, and an already-routed call site makes it already delivered. Checking
+only the guard site answers half the question.
+
 Also verify the halt claim rather than relaying it: a child's "already delivered" summary is a
 claim, not evidence. Confirm ancestry and read the guard sites yourself before rejecting.
+
+**An ALL-false-positive bare-number grep is a real outcome — open every hit before concluding
+anything from the count.** The three-digit issue numbers on this repository collide constantly with
+abbreviated SHAs and with test counts. On `/parallel-add 663` the grep returned three commits and
+NONE referenced the issue: `663` occurred inside the SHAs `8663db03` and `29c9f789...666373851...`
+and inside the pass count `4663/4663`. So a non-empty result is not even weak evidence of delivery,
+and the cheap disambiguation is `git log -1 --format=%B <sha> | grep -o '.\{0,30\}<N>.\{0,30\}'`,
+which shows the surrounding characters and makes a digit-run collision obvious at a glance. This is
+the opposite error from the one the rest of this memory guards against: there the risk is dismissing
+a real delivery, here it is spending calls chasing a coincidence.

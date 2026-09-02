@@ -50,4 +50,17 @@ skill or rule, so each costs a diagnosis cycle.
   matches the receipt because the bytes are untouched. Do not edit the body to "fix" anything —
   the receipt binds its exact SHA, so any edit invalidates it and forces a re-author.
 
+- **The PR-creation preflight wants a SIX-key delegation receipt, and it is a different set from the
+  completion gate's.** The members are `step`, `agent_name`, `agent_id`, `skill_source`,
+  `result_signal`, `artifact_paths`. The intuitive `{agent, phase, model, status}` shape fails with
+  **one error per missing key per receipt**, so a run with several receipts produces a wall of
+  errors that reads like a broken checkpoint rather than one wrong shape. The completion gate asks
+  instead for `evidence`; satisfying one gate's shape does not satisfy the other's.
+- **The pre-implementation gate keys on a TOP-LEVEL boolean `lifecycle_ready`.** A nested
+  `lifecycle_readiness: {ready_for_execution: true}` does not satisfy `Test-OrchestrationReady`,
+  which also wants a non-empty `issue-num`, a `feature-folder` beginning with the literal
+  `docs/features/active/`, and `route_id` (falling back to `path_selected`). The deny message names
+  the CONCEPT rather than the key, which is why the wrong shape is easy to author and hard to
+  diagnose from the error alone.
+
 See [[parallel-run-execution-playbook]] and [[issue-merge-and-removal-commands-bare]].

@@ -25,6 +25,9 @@
 - [#644](project_644_ac16_referral_revision_seams.md) — AC's named instrument prints no figure; substitute's noise (~0.028pp) exceeds the 0.01pp delta; check-off task → referral task pinning the UNCHECKED state
 - [#644 cycle 2](project_644_cycle2_sweep_gate_evasion_seams.md) — rewording out of a detector's match set is gate evasion; SHA-256 pair for untracked prior artifacts; bound the porcelain `??` scope
 - [#644 PA-7](project_644_pa7_redaction_plan_seams.md) — untracked audit artifact still enters main; name-status diff blind to it; mandated literal contradicted its own stated intent
+- [#633](project_633_undo_handoff_plan_seams.md) — orphan window has NO deterministic fail-before; real red is an equal-priority ContextIdle probe; empty `Helpers` HANGS the preserved catch; recorder must record synchronously
+- [#678](project_678_carry_folder_predictor_plan_seams.md) — runner throws TWICE before writing; `.//line` double-counts; fail-closed `CreateGate` exact-type lookup; `:405` lambda body is not relocatable; `esult` grep for the gitignore bracket class
+- [#670](project_670_webview_fault_boundary_plan_seams.md) — awaiter `IsCompleted` identity check breaks the "no pump" test; spec-fixed 3-test set can't reach 90%; Cobertura merge is BY FILENAME but the 80% throw precedes the write; 102-column property forces split accessors
 - [#680](project_680_menu_mode_plan_seams.md) — HostTests.cs 499 not 500; set-difference format gate; TRX 5-shape identifiers, `grep -a`; append-a-dated-literal discriminator; post-merge remediation: exact line arithmetic — the review's "optional" fallback was load-bearing (501 vs 500)
 
 ## Plan-structure traps
@@ -71,7 +74,7 @@
 - [Repo-wide csharpier format breaks zero-diff ACs](csharpier-repowide-format-breaks-zero-diff-acs.md) — scope the mutating pass to the plan's own path list
 - [.csharpierignore scope](csharpierignore-scope-packages-config.md) — only `*.csproj`/`*.props`/`*.targets` are excluded; `packages.config` is NOT
 - [.gitignore bracket classes defeat a literal grep](gitignore-bracket-classes-defeat-literal-grep.md) — `[Tt]est[Rr]esult*/` does ignore `TestResults/`; never claim a path is tracked from a literal search
-- [`/Logger:trx` needs `/ResultsDirectory`](trx-needs-resultsdirectory.md) — TRX lands in `TestResults\` relative to cwd; give each run task its own `p#-t#` subdirectory
+- [`/Logger:trx` needs `/ResultsDirectory` AND `LogFileName`](trx-needs-resultsdirectory.md) — TRX lands in `TestResults\` relative to cwd; own `p#-t#` subdir per task; bare `/Logger:trx` names the file after the account+host — use quoted `"/Logger:trx;LogFileName=..."`
 - [`[expect-fail]` needs a synchronous seam](expect-fail-needs-a-synchronous-seam.md) — async-void boundaries false-GREEN; re-run RED analysis after scoping `Times.Never()`
 - [Invoke-MSTestWithCoverage.ps1](reference_invoke_mstest_with_coverage_script.md) — canonical full-suite Cobertura runner
 - [Invoke-MSTest.ps1 single-SearchRoot defect](reference_invoke_mstest_single_searchroot_defect.md) — always pass `-SearchRoot .`

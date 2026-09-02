@@ -32,3 +32,12 @@ committed nothing to that path.
 - The stale-record hazard is separate and still live: the session-root copy of this file may name a
   different item than the one running. Verify the issue number before relying on it, per
   [[children-share-one-orchestrator-state-file]].
+- **What the tracked copy holds matters, and it is not scratch.** Read on 2026-09-01 from
+  `origin/main`, it is issue **#469's** checkpoint: `feature_folder` names the 469 folder,
+  `route_id` is `large`, `next_step` is `S8_local_stop`, `last_updated` is `2026-08-31T11-15`. So it
+  is a COMMITTED record of a different, stopped run — not live, but not disposable either. An
+  overwrite destroys another item's audit trail, which is a second and independent reason to contain
+  the write beyond the footprint-clause breach above.
+- Two children on two different items (647, then 648) independently reached `--skip-worktree` without
+  being told to. Treat the containment as the expected outcome rather than a clever one, and do not
+  read a child reporting it as a sign that something went wrong.
