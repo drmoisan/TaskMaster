@@ -70,6 +70,8 @@
 - [msbuild-log byte-equality gate adjudication](project_493-review-residuals-and-msbuild-log-gate-adjudication.md) — #493: how a structurally unsatisfiable msbuild-log byte-equality gate was adjudicated without downgrading the AC
 - [StoreWrapperController absent from Cobertura](project_storewrapper-controller-absent-from-cobertura.md) — whole class missing from both baseline+post Cobertura XML despite only 2/N members `[ExcludeFromCodeCoverage]`; pre-existing (#287), don't treat absence as evidence either way
 - [287-review-outcome](project_287-review-outcome.md) — PASS/0 blocking; 85.297%/79.293% repo-wide clears both coverage floors; positive base-anchor-divergence handling (contrast [[Stale caller-supplied merge-base]])
+- [Cobertura `.//line` double-counts under a class](project_cobertura-class-line-double-count-trap.md) — #670: method rows re-count field initializers; use `lines/line` and cross-check `line-rate`
+- [Verify the caller's factual "correction"](feedback_verify-the-callers-factual-correction.md) — #670: caller's ODE-absent claim was wrong; they'd found D3/D4, not D5's throw at Breadcrumb.cs:391-393
 - [review-residuals index (misc closed issues)](project_review-residuals-index.md) — one-line PASS/0-blocking pointers for #442/#444/#446/#449/#457/#468/#476/#484/#488/#501/#511/#553/#614/#635/#663 with their specific residual/owed items, for lookup if any resurfaces
 
 ## Artifact hygiene
