@@ -311,6 +311,7 @@
     <Compile Include="Controllers\KaStringAsync.cs" />
     <Compile Include="Controllers\KbdActions.cs" />
     <Compile Include="Controllers\QfcCollectionController.cs" />
+    <Compile Include="Controllers\QfcCollectionController.CarrierLoad.cs" />
     <Compile Include="Controllers\EmailSorter.cs" />
     <Compile Include="Controllers\QfcDatamodel.cs" />
     <Compile Include="Controllers\QfcDatamodel.FrameBuilding.cs" />
@@ -331,6 +332,7 @@
     <Compile Include="Controllers\QfcItemController.cs" />
     <Compile Include="Controllers\QfcItemController.Initialization.cs" />
     <Compile Include="Controllers\QfcItemController.ViewerSetup.cs" />
+    <Compile Include="Controllers\QfcItemController.WebViewFaultBoundary.cs" />
     <Compile Include="Controllers\QfcItemController.Conversation.cs" />
     <Compile Include="Controllers\QfcItemController.FolderHandling.cs" />
     <Compile Include="Controllers\QfcItemController.EventWiring.cs" />
@@ -342,6 +344,7 @@
     <Compile Include="Controllers\KeyboardHandler.cs" />
     <Compile Include="Controllers\QfcRemainingQueueAdmission.cs" />
     <Compile Include="Controllers\QfcQueue.cs" />
+    <Compile Include="Controllers\QfcQueue.Enqueue.cs" />
     <Compile Include="Helper Classes\cInfoMail.cs" />
     <Compile Include="Helper Classes\ConversationResolver.cs" />
     <Compile Include="Helper Classes\ConversationResolver.Loading.cs" />

@@ -1,0 +1,5 @@
+QuickFiler.Test/Controllers/QfcCollectionControllerDefects468MoveTests.cs
+QuickFiler.Test/Controllers/QfcFormControllerUndoHandoffTests.cs
+QuickFiler/Controllers/QfcCollectionController.cs
+QuickFiler/Controllers/QfcFormController.EventHandlers.cs
+QuickFiler/Interfaces/IQfcCollectionController.cs

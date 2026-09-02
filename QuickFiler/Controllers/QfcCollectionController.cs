@@ -19,7 +19,7 @@ using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 namespace QuickFiler.Controllers
 {
     [ExcludeFromCodeCoverage]
-    public class QfcCollectionController : IQfcCollectionController
+    public partial class QfcCollectionController : IQfcCollectionController
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
@@ -477,93 +477,8 @@ namespace QuickFiler.Controllers
             //var conversationTasks = _itemGroups.Select(grp => grp.ItemController.LoadConversationResolverAsync(TokenSource, Token, false)).ToList();
         }
 
-        /// <summary>
-        /// High-confidence (Issue #171) carrier-list overload. Builds UI item controllers for the
-        /// pre-filtered survivors in <paramref name="preScored"/>, mirroring the standard
-        /// <see cref="LoadControlsAndHandlers_01Async(IList{MailItem}, RowStyle, RowStyle)"/> path but
-        /// threading each survivor's predetermined folder into its <see cref="QfcItemGroup"/> and item
-        /// controller so the folder is preselected instead of selected by index.
-        /// </summary>
-        public async Task LoadControlsAndHandlers_01Async(
-            IList<QfcPreScoredItem> preScored,
-            RowStyle template,
-            RowStyle templateExpanded
-        )
-        {
-            var items = preScored.Select(x => x.MailItem).ToList();
-            ValidateParams(items, template, templateExpanded);
-
-            // Start loading mail item helpers
-            var helpers = items.Select(GetPartiallyInitializedHelperAsync).ToList();
-
-            // Freeze the form while loading controls
-            _formViewer.SuspendLayout();
-            var tlpLayoutState = SafeSetTlpLayout(false);
-
-            // Save the QfcItem template styles
-            _template = template;
-            _templateExpanded = templateExpanded;
-
-            // Hook the move monitor to the mail items
-            BackgroundLoadingTasks.Add(
-                Task.Run(() =>
-                    items.ForEach(mailItem =>
-                        _moveMonitor.HookItem(mailItem, (x) => RemovedItemMonitor(x.EntryID))
-                    )
-                )
-            );
-
-            // Create empty keyboard handler actions
-            BackgroundLoadingTasks.Add(Task.Run(CreateEmptyKbdHandlerCharActions, Token));
-
-            // Create the item groups, carrying each survivor's predetermined folder
-            var digits = preScored.Count >= 10 ? 2 : 1;
-            _itemGroups =
-            [
-                .. preScored.Select(
-                    (scored, i) =>
-                        EncapsulateItemGroup(
-                            template,
-                            scored.MailItem,
-                            i,
-                            digits,
-                            _tlpStates,
-                            scored.PredeterminedFolder
-                        )
-                ),
-            ];
-
-            // Initialize graphics
-            foreach (var group in _itemGroups)
-            {
-                await group.ItemController.InitializeGraphicsAsync();
-            }
-
-            while (helpers.Count > 0)
-            {
-                var helperTask = await Task.WhenAny(helpers);
-                var helper = await helperTask;
-                helpers.Remove(helperTask);
-                var grp = _itemGroups.FirstOrDefault(x => x.MailItem.EntryID == helper.EntryId);
-                grp.ItemController.PopulateControls(helper, grp.ItemController.ItemNumber);
-            }
-
-            // Wait until Background Loading Tasks finish and then clear the collection
-            await DrainBackgroundLoadingTasksAsync();
-
-            WireUpAsyncKeyboardHandler();
-
-            // Restore state of window
-            TlpLayout = tlpLayoutState;
-            if (_formViewer.InvokeRequired)
-            {
-                _formViewer.Invoke(() => _formViewer.ResumeLayout());
-            }
-            else
-            {
-                _formViewer.ResumeLayout();
-            }
-        }
+        // The QfcPreScoredItem carrier overload of LoadControlsAndHandlers_01Async lives in the
+        // partial part QfcCollectionController.CarrierLoad.cs; see that file for the reason.
 
         //public async Task LoadSecondaryAsync()
         //{
@@ -643,33 +558,8 @@ namespace QuickFiler.Controllers
             _kbdHandler.CharActionsAsync = new KbdActions<char, KaCharAsync, Func<char, Task>>();
         }
 
-        internal QfcItemGroup EncapsulateItemGroup(
-            RowStyle template,
-            MailItem mailItem,
-            int i,
-            int digits,
-            TlpCellStates tlpStates,
-            string predeterminedFolder = null
-        )
-        {
-            var grp = new QfcItemGroup(mailItem) { PredeterminedFolder = predeterminedFolder };
-            var itemViewer = ItemViewerQueue.Dequeue(_homeController.Token);
-            LoadItemToTlp(itemViewer, i, template, true, 0);
-            grp.ItemViewer = itemViewer;
-            grp.ItemController = new QfcItemController(
-                _globals,
-                _homeController,
-                this,
-                grp.ItemViewer,
-                i + 1,
-                digits,
-                grp.MailItem,
-                tlpStates,
-                predeterminedFolder
-            );
-            grp.ItemController.Token = Token;
-            return grp;
-        }
+        // EncapsulateItemGroup lives in the partial part QfcCollectionController.CarrierLoad.cs;
+        // see that file for the reason.
 
         public void LoadItemGroupsAndViewers_02(IList<MailItem> items, RowStyle template)
         {
@@ -2250,23 +2140,14 @@ namespace QuickFiler.Controllers
         /// <summary>
         /// Moves every cached item group's message to its assigned destination folder.
         /// </summary>
-        /// <param name="stackMovedItems">
-        /// The undo stack. This parameter does not carry the undo records: the stack is populated
-        /// by the email filer's push-to-undo-stack path, which pushes onto
-        /// <c>Globals.AF.MovedMails</c>. That is the same instance the caller passes here, because
-        /// the caller reads it from the same globals object. Passing a different instance would not
-        /// redirect the undo records, and passing <c>null</c> does not suppress them. The parameter
-        /// is retained only for source compatibility with existing callers; removing it is a
-        /// follow-up candidate, not part of this change.
-        /// </param>
-        public async Task MoveEmailsAsync(SloStack<IMovedMailInfo> stackMovedItems)
+        /// <remarks>
+        /// The undo stack is populated by the email filer's push-to-undo-stack path, which pushes
+        /// onto <c>Globals.AF.MovedMails</c> directly; this method takes no undo-stack argument
+        /// because none is needed to reach it (issue #629).
+        /// </remarks>
+        public async Task MoveEmailsAsync()
         {
-            //TraceUtility.LogMethodCall(stackMovedItems);
-
-            // The parameter is deliberately discarded rather than left untouched. The undo records
-            // reach the stack through the email filer, not through this argument, and the discard
-            // states that at the point of use so the parameter cannot be read as an oversight.
-            _ = stackMovedItems;
+            //TraceUtility.LogMethodCall();
 
             var count = _itemGroupsToMove?.Count() ?? 0;
             if (count <= 0)

@@ -248,6 +248,17 @@ namespace QuickFiler.Controllers
         private readonly string _predeterminedFolder;
 
         /// <summary>
+        /// Issue #678. The already-initialised folder search handler carried forward from the
+        /// dequeue-time confidence gate, set via the constructor on both high-confidence display
+        /// legs. Null on the standard path and whenever no carrier is available, in which case
+        /// <see cref="LoadFolderHandlerAsync"/> builds and initialises a predictor as before.
+        /// Declared as the narrow <see cref="IFolderSearchHandler"/> seam rather than the concrete
+        /// <see cref="FolderPredictor"/>, because the consuming surface is only
+        /// <c>FolderArray</c>, <c>Suggestions</c> and <c>FolderRowArray</c>.
+        /// </summary>
+        private IFolderSearchHandler _carriedFolderHandler;
+
+        /// <summary>
         /// Gets the top folder suggestion score for this item, in 0-1000 score units, or 0 when
         /// the folder handler has not produced suggestions. Read-only seam over the folder handler.
         /// </summary>

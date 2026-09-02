@@ -17,7 +17,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace QuickFiler.Controllers
 {
-    public class QfcQueue(
+    public partial class QfcQueue(
         CancellationToken token,
         QfcHomeController homeController,
         IApplicationGlobals appGlobals
@@ -208,72 +208,7 @@ namespace QuickFiler.Controllers
             Interlocked.Decrement(ref _jobsRunning);
         }
 
-        public async Task EnqueueAsync(
-            IList<MailItem> items,
-            IQfcCollectionController qfcCollectionController
-        )
-        {
-            //TraceUtility.LogMethodCall(items, qfcCollectionController);
-
-            if (items is null)
-            {
-                throw new ArgumentNullException(nameof(items));
-            }
-            if (items.Count == 0)
-            {
-                throw new ArgumentException("items is empty");
-            }
-
-            _qfcCollectionController = qfcCollectionController;
-
-            await Task.Run(() =>
-                items.ForEach(item => _moveMonitor.HookItem(item, async (x) => await RemoveItem(x)))
-            );
-
-            Interlocked.Increment(ref _jobsRunning);
-            //logger.Debug($"{nameof(EnqueueAsync)} called and jobsRunning increased to {_jobsRunning}");
-
-            var tlp = await UiIdleCallAsync(() =>
-                _tlpTemplate.Clone(name: "BackgroundTableLayout")
-            );
-
-            //ActivateTlpTemplate(tlp);
-
-            try
-            {
-                var itemGroups = await UiIdleAsyncCallAsync(async () =>
-                    await LoadControllersViewersAsync(
-                        items,
-                        _globals,
-                        _homeController,
-                        qfcCollectionController,
-                        tlp,
-                        0
-                    )
-                );
-                _queue.Add((tlp, itemGroups));
-            }
-            catch (OperationCanceledException)
-            {
-                //logger.Debug($"{nameof(EnqueueAsync)} was canceled by the user");
-            }
-            catch (System.Exception e)
-            {
-                logger.Error(
-                    $"{nameof(EnqueueAsync)} failed to load controllers and viewers. \n {e.Message}\n{e.StackTrace}"
-                );
-            }
-            finally
-            {
-                Interlocked.Decrement(ref _jobsRunning);
-                //logger.Debug($"{nameof(EnqueueAsync)} completed and jobsRunning decreased to {_jobsRunning}");
-
-                CollectionChanged?.Invoke(
-                    this,
-                    new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, _queue)
-                );
-            }
-        }
+        // EnqueueAsync lives in the partial part QfcQueue.Enqueue.cs; see that file for the reason.
 
         public async Task JobsToFinish(int pollInterval, CancellationToken token)
         {
@@ -377,48 +312,8 @@ namespace QuickFiler.Controllers
             }
         }
 
-        private ValueTask<List<QfcItemGroup>> LoadControllersViewersAsync(
-            IList<MailItem> items,
-            IApplicationGlobals appGlobals,
-            IFilerHomeController homeController,
-            IQfcCollectionController qfcCollectionController,
-            TableLayoutPanel tlp,
-            int start
-        )
-        {
-            //TraceUtility.LogMethodCall(items, appGlobals, homeController, qfcCollectionController, tlp, start);
-
-            var digits = start + items.Count >= 10 ? 2 : 1;
-
-            // SelectAwait (System.Linq.Async) is obsolete (CS0618) per the framework's migration
-            // guidance ("Use Select... the SelectAwait functionality now exists as overloads of
-            // Select"), but migrating to the new overload signature is a call-shape change to
-            // production code, not an annotation-only edit. Suppressing narrowly preserves the
-            // exact pre-existing behavior (no behavior change per AC7).
-#pragma warning disable CS0618
-            var itemTasks = Enumerable
-                .Range(start, items.Count)
-                .ToAsyncEnumerable()
-                .SelectAwait(async i => (i: i, grp: await AddAsync(tlp, items[i - start], i)))
-                .SelectAwait(async x =>
-                {
-                    x.grp.ItemController = new QfcItemController(
-                        appGlobals: appGlobals,
-                        homeController: homeController,
-                        parent: qfcCollectionController,
-                        itemViewer: x.grp.ItemViewer,
-                        viewerPosition: x.i + 1,
-                        itemNumberDigits: digits,
-                        x.grp.MailItem,
-                        TlpStates
-                    );
-                    await x.grp.ItemController.InitializeAsync();
-                    return x.grp;
-                })
-                .ToListAsync();
-#pragma warning restore CS0618
-            return itemTasks;
-        }
+        // LoadControllersViewersAsync lives in the partial part QfcQueue.Enqueue.cs; see that file
+        // for the reason.
 
         public async Task ChangeIterationSize(
             (TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups) entry,

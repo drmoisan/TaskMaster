@@ -1,10 +1,8 @@
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using UtilitiesCS;
 using UtilitiesCS.Threading;
 
 namespace QuickFiler.Controllers.Tests
@@ -20,6 +18,8 @@ namespace QuickFiler.Controllers.Tests
     [TestClass]
     public class WpfUiDispatcherTests
     {
+        private const int GateTimeoutMs = 60000;
+
         [TestMethod]
         public void Construction_YieldsAnIUiDispatcher()
         {
@@ -34,53 +34,69 @@ namespace QuickFiler.Controllers.Tests
         /// <c>BeginInvoke</c> each execute the supplied delegate on the dispatcher's own thread (not the
         /// test thread). <c>BeginInvoke</c> is fire-and-forget, so its completion is observed
         /// deterministically via a <see cref="ManualResetEventSlim"/> signal rather than polling.
+        /// <para>
+        /// Issue #648: the swap of the process-wide static <c>UtilitiesCS.UiThread._dispatcher</c> is
+        /// routed through <see cref="UiThreadDispatcherFixture"/>, which is the single owner of that
+        /// mutation for this assembly's owned files, rather than performed by raw reflection here.
+        /// The gate is awaited, so the method is declared <c>async Task</c>, and it carries the same
+        /// 60-second timeout the sibling issue #493 regression tests use so a genuine deadlock
+        /// becomes a test failure rather than a hung run. The restore is
+        /// <see cref="UiThreadDispatcherTransaction.Dispose"/>, which restores conditionally by
+        /// reference comparison and then releases the gate, in that order.
+        /// </para>
         /// </summary>
         [TestMethod]
-        public void Invoke_InvokeAsync_BeginInvoke_ExecuteDelegateOnDispatcherThread()
+        [Timeout(GateTimeoutMs)]
+        public async Task Invoke_InvokeAsync_BeginInvoke_ExecuteDelegateOnDispatcherThread()
         {
             // Arrange
-            FieldInfo field = typeof(UiThread).GetField(
-                "_dispatcher",
-                BindingFlags.NonPublic | BindingFlags.Static
-            );
-            field.Should().NotBeNull(because: "UiThread._dispatcher backing field must exist");
-            object original = field.GetValue(null);
             Dispatcher dispatcher = QfcItemControllerTestSupport.StartRunningDispatcher();
             try
             {
-                field.SetValue(null, dispatcher);
-                WpfUiDispatcher sut = new WpfUiDispatcher();
-                int dispatcherThreadId = dispatcher.Thread.ManagedThreadId;
-
-                // Act / Assert — Invoke (blocking, synchronous marshal)
-                int invokeThreadId = -1;
-                sut.Invoke(() => invokeThreadId = Thread.CurrentThread.ManagedThreadId);
-                invokeThreadId.Should().Be(dispatcherThreadId);
-
-                // Act / Assert — InvokeAsync
-                int invokeAsyncThreadId = -1;
-                Task invokeAsyncTask = sut.InvokeAsync(() =>
-                    invokeAsyncThreadId = Thread.CurrentThread.ManagedThreadId
-                );
-                invokeAsyncTask.GetAwaiter().GetResult();
-                invokeAsyncThreadId.Should().Be(dispatcherThreadId);
-
-                // Act / Assert — BeginInvoke (fire-and-forget; observed deterministically via a signal)
-                int beginInvokeThreadId = -1;
-                using (ManualResetEventSlim signal = new ManualResetEventSlim(false))
+                // Split across two statements so the qualified call stays on one line: CSharpier
+                // wraps the single-expression form into a three-line member chain at this indent.
+                Task<UiThreadDispatcherTransaction> gate =
+                    UiThreadDispatcherFixture.BeginTransactionAsync();
+                UiThreadDispatcherTransaction transaction = await gate.ConfigureAwait(false);
+                try
                 {
-                    sut.BeginInvoke(() =>
+                    transaction.Install(dispatcher);
+                    WpfUiDispatcher sut = new WpfUiDispatcher();
+                    int dispatcherThreadId = dispatcher.Thread.ManagedThreadId;
+
+                    // Act / Assert — Invoke (blocking, synchronous marshal)
+                    int invokeThreadId = -1;
+                    sut.Invoke(() => invokeThreadId = Thread.CurrentThread.ManagedThreadId);
+                    invokeThreadId.Should().Be(dispatcherThreadId);
+
+                    // Act / Assert — InvokeAsync
+                    int invokeAsyncThreadId = -1;
+                    Task invokeAsyncTask = sut.InvokeAsync(() =>
+                        invokeAsyncThreadId = Thread.CurrentThread.ManagedThreadId
+                    );
+                    invokeAsyncTask.GetAwaiter().GetResult();
+                    invokeAsyncThreadId.Should().Be(dispatcherThreadId);
+
+                    // Act / Assert — BeginInvoke (fire-and-forget; observed deterministically via a signal)
+                    int beginInvokeThreadId = -1;
+                    using (ManualResetEventSlim signal = new ManualResetEventSlim(false))
                     {
-                        beginInvokeThreadId = Thread.CurrentThread.ManagedThreadId;
-                        signal.Set();
-                    });
-                    signal.Wait();
+                        sut.BeginInvoke(() =>
+                        {
+                            beginInvokeThreadId = Thread.CurrentThread.ManagedThreadId;
+                            signal.Set();
+                        });
+                        signal.Wait();
+                    }
+                    beginInvokeThreadId.Should().Be(dispatcherThreadId);
                 }
-                beginInvokeThreadId.Should().Be(dispatcherThreadId);
+                finally
+                {
+                    transaction.Dispose();
+                }
             }
             finally
             {
-                field.SetValue(null, original);
                 QfcItemControllerTestSupport.ShutdownDispatcher(dispatcher);
             }
         }

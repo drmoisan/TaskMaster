@@ -23,7 +23,19 @@ namespace QuickFiler.Controllers
         );
         Task CompleteAddingAsync(CancellationToken token, int timeout);
         (TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups) Dequeue();
-        Task EnqueueAsync(IList<MailItem> items, IQfcCollectionController qfcCollectionController);
+
+        /// <summary>
+        /// Enqueues a background page. Issue #678 adds <paramref name="preScored"/>, the carriers
+        /// holding the folder search handler the dequeue-time gate already initialised for each
+        /// accepted item. It is a required parameter rather than optional because an optional
+        /// parameter cannot be omitted inside a Moq setup or verification expression tree (CS0854);
+        /// callers outside high-confidence mode pass <see langword="null"/>.
+        /// </summary>
+        Task EnqueueAsync(
+            IList<MailItem> items,
+            IQfcCollectionController qfcCollectionController,
+            IList<QfcPreScoredItem> preScored
+        );
         void GrowEntry(
             ref (TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups) target,
             ref (TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups) source,

@@ -54,6 +54,58 @@ namespace QuickFiler.Controllers.Tests
             return home;
         }
 
+        /// <summary>
+        /// #670 shared arrange helper: wires a harness controller to the faulting
+        /// <c>IWebViewCoreInitializer</c> mock and to an <c>IItemViewer</c> whose
+        /// <c>UiSyncContext</c> returns <paramref name="context"/>. The caller must install that
+        /// same context as <c>SynchronizationContext.Current</c> before awaiting the guard, so the
+        /// await at <c>ViewerSetup.cs:64</c> continues inline and execution reaches the mocked seam.
+        /// </summary>
+        private static HarnessController BuildGuardedWebViewTarget(SynchronizationContext context)
+        {
+            HarnessController controller = new HarnessController();
+            QfcItemControllerTestSupport.SetField(
+                controller,
+                "_webViewInitializer",
+                BuildWebViewInitializerMock().Object
+            );
+            Mock<IItemViewer> viewer = new Mock<IItemViewer>();
+            viewer.SetupGet(v => v.UiSyncContext).Returns(context);
+            QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer.Object);
+            return controller;
+        }
+
+        /// <summary>
+        /// #670: cooperative cancellation during teardown is not a fault. <c>InitializeWebViewAsync</c>
+        /// opens with <c>Token.ThrowIfCancellationRequested()</c> before any seam call, so a
+        /// pre-cancelled token reaches the guard's <c>OperationCanceledException</c> arm
+        /// deterministically, and the sink must not be invoked.
+        /// </summary>
+        [TestMethod]
+        public async Task InitializeWebViewGuardedAsync_WhenTheTokenIsAlreadyCanceled_DoesNotInvokeTheSink()
+        {
+            // Arrange
+            HarnessController controller = BuildGuardedWebViewTarget(new SynchronizationContext());
+            bool sinkInvoked = false;
+            controller.WebViewInitializationErrorSink = (message, exception) => sinkInvoked = true;
+            using (CancellationTokenSource source = new CancellationTokenSource())
+            {
+                source.Cancel();
+                controller.Token = source.Token;
+
+                // Act
+                Func<Task> act = () => controller.InitializeWebViewGuardedAsync();
+
+                // Assert
+                await act.Should()
+                    .NotThrowAsync(because: "cancellation is swallowed, not surfaced")
+                    .ConfigureAwait(false);
+                sinkInvoked
+                    .Should()
+                    .BeFalse(because: "cooperative cancellation is not a fault to report");
+            }
+        }
+
         [TestMethod]
         public void PrimaryConstructor_AssignsFieldsAndSetsControllerBackReference()
         {
@@ -98,6 +150,7 @@ namespace QuickFiler.Controllers.Tests
             Mock<IApplicationGlobals> globals = new Mock<IApplicationGlobals>();
             Mock<IQfcCollectionController> parent = new Mock<IQfcCollectionController>();
             Mock<IItemViewer> viewer = new Mock<IItemViewer>();
+            IFolderSearchHandler carried = new Mock<IFolderSearchHandler>().Object;
 
             // Act
             QfcItemController controller = new QfcItemController(
@@ -109,7 +162,8 @@ namespace QuickFiler.Controllers.Tests
                 itemNumberDigits: 1,
                 mailItem: null,
                 tlpStates: null,
-                predeterminedFolder: @"\\Archive\Predetermined"
+                predeterminedFolder: @"\\Archive\Predetermined",
+                carriedFolderHandler: carried
             );
 
             // Assert — the high-confidence folder path is stored in the readonly private field.
@@ -117,6 +171,14 @@ namespace QuickFiler.Controllers.Tests
                 .GetField("_predeterminedFolder", BindingFlags.NonPublic | BindingFlags.Instance)
                 .GetValue(controller);
             stored.Should().Be(@"\\Archive\Predetermined");
+
+            // Assert — issue #678: the same constructor stores the carried folder search handler,
+            // which is what lets LoadFolderHandlerAsync adopt it instead of scoring a second time.
+            object storedHandler = typeof(QfcItemController)
+                .GetField("_carriedFolderHandler", BindingFlags.NonPublic | BindingFlags.Instance)
+                .GetValue(controller);
+            storedHandler.Should().BeSameAs(carried);
+
             viewer.VerifySet(v => v.Controller = controller, Times.Once());
 
             cts.Dispose();

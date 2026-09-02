@@ -286,25 +286,45 @@ namespace QuickFiler.Controllers
                 )
             );
 
+            IList<QfcPreScoredItem> preScored = null;
             if (highConfidenceModeEnabled)
             {
                 // Issue #424: bound the pre-UI scan and surface its progress. The mapper owns the
                 // 0->30 band mapping; reports route through the existing ProgressTracker, which
                 // marshals to the UI thread. O1: the empty-queue poll drops 1000 -> 200 ms at this
                 // pre-UI call site only.
+                // Issue #678: the outcome-returning member is used in place of the plain one because
+                // it is the only overload that surfaces QfcDequeueBatch.PreScored, the carriers that
+                // hold the folder search handler the gate already initialised for each accepted item.
                 var scanProgress = new QfcScanProgressBandMapper(progress.Report);
-                listEmail = await _datamodel.DequeueNextItemGroupAsync(
+                QfcDequeueBatch batch = await _datamodel.DequeueNextItemGroupWithOutcomeAsync(
                     itemsPerIteration,
                     200,
                     QfcStreamingDequeueConfidenceGate.DefaultFirstBatchDeadline,
                     scanProgress.Report
                 );
+                listEmail = batch.Items;
+                // #678 R1: reconcile against Items, which is the post-unhook set. PreScored is
+                // captured before UnhookDequeuedNodes and diverges from it on the UnhookItem throw
+                // path, so consuming it directly would display a still-hooked item and lose the
+                // substitute that replaced it.
+                preScored = QfcPreScoredItem.ReconcileCarriersToItems(batch.Items, batch.PreScored);
             }
 
             progress.Report(30, "Initializing Qfc Items");
 
             //logger.Debug($"{DateTime.Now.ToString("mm:ss.fff")} Calling {nameof(QfcFormController.LoadItemsAsync)} ...");
-            await _formController.LoadItemsAsync(listEmail);
+            if (highConfidenceModeEnabled)
+            {
+                // Issue #678: high-confidence mode selects the carrier overload so the handler
+                // reaches QfcCollectionController, QfcItemGroup and QfcItemController. Disabled mode
+                // keeps the IList<MailItem> overload unchanged.
+                await _formController.LoadItemsAsync(preScored);
+            }
+            else
+            {
+                await _formController.LoadItemsAsync(listEmail);
+            }
 
             progress?.Report(100);
 

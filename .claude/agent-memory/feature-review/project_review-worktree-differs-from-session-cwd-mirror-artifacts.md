@@ -42,3 +42,15 @@ alongside, so the orchestrator commits the right thing.
   cwd (see [[stale-untracked-coverage-xml-leftover-false-block]]).
 - Simulate the hook from BOTH cwds before finalizing (pwsh script that sets CLAUDE_HOOK_INPUT and
   invokes the hook with Set-Location; both returned exit 0 on #484).
+
+**Recurred at #635 and again at #670** (2026-09-01), so treat it as the default condition, not an
+edge case. Cheapest reliable simulation: dot-source the hook (`. $hookPath`) after `Set-Location`
+and call `Invoke-FeatureReviewCoverageValidation -RawPayload (@{output=$text}|ConvertTo-Json)`
+directly — no env var needed, and it returns the failure message verbatim.
+
+At #670 the session cwd DID hold an `artifacts/pr_context.summary.txt`, but a **stale one for an
+unrelated branch** (#647) whose hook-matching lines were all `.md`, so `Get-ChangedLanguageSet`
+returned `[]` and coverage enforcement short-circuited at the `$changedLanguages.Count -eq 0` early
+return. Only the three artifact-existence checks actually fired. So: enumerate the stale summary's
+extensions before assuming which checks are live — a sibling's summary can either disarm the
+language checks (as here) or demand rows for languages your branch never touched.

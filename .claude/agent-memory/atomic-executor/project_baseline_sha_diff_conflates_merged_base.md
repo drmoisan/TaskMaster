@@ -19,6 +19,16 @@ would have failed the feature for files it never touched — including
 **Why:** two-dot `<base>..HEAD` is "in HEAD, not in base", which after a merge is precisely the
 branch's own additions. A diff against a pre-merge SHA has no such property.
 
+**Three-dot does NOT protect you.** Confirmed again on #656, 2026-09-01, where the plan wrote every
+footprint gate as `<PINNED_SHA>...HEAD`. When the pinned SHA is an *ancestor* of HEAD,
+`merge-base(PINNED, HEAD)` is the pinned SHA itself, so the three-dot form silently degenerates to
+the two-dot diff against it and inherits the whole defect. Measured: `<PINNED>...HEAD` = **299**
+paths including 9 under `QuickFiler/`+`QuickFiler.Test/` and a `.csproj`, versus
+`origin/main...HEAD` = **10**. Four gates asserting "exactly the single line" and "both outputs
+empty" were unsatisfiable as written. The tell is that the plan's base predates the branch's
+reconciliation merge — check `git merge-base <PINNED> HEAD` against `<PINNED>` before trusting any
+`...` gate.
+
 **How to apply:** run the command the task names AND the `<base>..HEAD` form, record both, and make
 the `<base>..HEAD` classification the authoritative one with an explicit attribution column for the
 merge-induced rows. Do not silently substitute — the task text is still the plan of record. Same

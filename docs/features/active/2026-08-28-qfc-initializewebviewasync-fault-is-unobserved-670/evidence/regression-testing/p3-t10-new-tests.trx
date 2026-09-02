@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="87346c06-d4f6-45d6-8767-1fe8313f01d7" name="&lt;user&gt;@&lt;host&gt; 2026-09-01 20:06:59" runUser="&lt;host&gt;\&lt;user&gt;" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-09-01T20:06:59.6680399-04:00" queuing="2026-09-01T20:06:59.6680399-04:00" start="2026-09-01T20:06:57.7676229-04:00" finish="2026-09-01T20:07:00.1763021-04:00" />
+  <TestSettings name="default" id="35ddbcf0-a36e-47aa-a93c-6687697a7f58">
+    <Deployment runDeploymentRoot="&lt;user&gt;_&lt;host&gt;_2026-09-01_20_06_59" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="1ddb588a-c14e-4716-8ccc-23beb8ff4446" testId="16b780b4-6365-83ba-be5c-a3935841308d" testName="InitializeBool_WhenTheWebViewSeamFaults_ObservesTheFaultThroughTheSink" computerName="&lt;host&gt;" duration="00:00:01.0381009" startTime="2026-09-01T20:06:59.0719038-04:00" endTime="2026-09-01T20:07:00.1137535-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1ddb588a-c14e-4716-8ccc-23beb8ff4446">
+      <Output>
+        <StdOut>Debug Trace:&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.&#xD;
+testhost.exe Warning: 0 : SvgRenderer load 'QuickFiler.resources': System.IO.FileNotFoundException: Could not load file or assembly 'QuickFiler.resources' or one of its dependencies. The system cannot find the file specified.</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="7d9e26d9-9b18-4647-be21-f96e4f4d4afa" testId="13c23eae-69e4-8e8c-8916-4d7ab637bd78" testName="InitializeWebViewGuardedAsync_WhenTheTokenIsAlreadyCanceled_DoesNotInvokeTheSink" computerName="&lt;host&gt;" duration="00:00:00.2124429" startTime="2026-09-01T20:06:58.7347430-04:00" endTime="2026-09-01T20:06:59.0524278-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7d9e26d9-9b18-4647-be21-f96e4f4d4afa">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="f7143263-3e80-46cd-af8e-c1b04dd29cea" testId="130160f9-b3ef-89ff-be0d-9bb3b9a8837a" testName="WebViewInitializationErrorSink_DefaultDelegate_InvokesWithoutThrowing" computerName="&lt;host&gt;" duration="00:00:00.0027734" startTime="2026-09-01T20:06:59.0688940-04:00" endTime="2026-09-01T20:06:59.0719038-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f7143263-3e80-46cd-af8e-c1b04dd29cea" />
+    <UnitTestResult executionId="04c9f15f-c647-471c-9336-39a81f7ea0e2" testId="1e3d326f-cc57-8e9a-832f-434856ce528b" testName="InitializeWebViewGuardedAsync_WhenTheWebViewSeamFaults_ReportsToTheSinkAndDoesNotFault" computerName="&lt;host&gt;" duration="00:00:00.0103041" startTime="2026-09-01T20:06:59.0578837-04:00" endTime="2026-09-01T20:06:59.0688940-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="04c9f15f-c647-471c-9336-39a81f7ea0e2" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="InitializeWebViewGuardedAsync_WhenTheTokenIsAlreadyCanceled_DoesNotInvokeTheSink" storage="&lt;repo-root-worktree&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="13c23eae-69e4-8e8c-8916-4d7ab637bd78">
+      <Execution id="7d9e26d9-9b18-4647-be21-f96e4f4d4afa" />
+      <TestMethod codeBase="&lt;repo-root-worktree&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_InitializationTests" name="InitializeWebViewGuardedAsync_WhenTheTokenIsAlreadyCanceled_DoesNotInvokeTheSink" />
+    </UnitTest>
+    <UnitTest name="InitializeWebViewGuardedAsync_WhenTheWebViewSeamFaults_ReportsToTheSinkAndDoesNotFault" storage="&lt;repo-root-worktree&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e3d326f-cc57-8e9a-832f-434856ce528b">
+      <Execution id="04c9f15f-c647-471c-9336-39a81f7ea0e2" />
+      <TestMethod codeBase="&lt;repo-root-worktree&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_InitializationTests" name="InitializeWebViewGuardedAsync_WhenTheWebViewSeamFaults_ReportsToTheSinkAndDoesNotFault" />
+    </UnitTest>
+    <UnitTest name="InitializeBool_WhenTheWebViewSeamFaults_ObservesTheFaultThroughTheSink" storage="&lt;repo-root-worktree&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="16b780b4-6365-83ba-be5c-a3935841308d">
+      <Execution id="1ddb588a-c14e-4716-8ccc-23beb8ff4446" />
+      <TestMethod codeBase="&lt;repo-root-worktree&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_InitializationTests" name="InitializeBool_WhenTheWebViewSeamFaults_ObservesTheFaultThroughTheSink" />
+    </UnitTest>
+    <UnitTest name="WebViewInitializationErrorSink_DefaultDelegate_InvokesWithoutThrowing" storage="&lt;repo-root-worktree&gt;\quickfiler.test\bin\debug\quickfiler.test.dll" id="130160f9-b3ef-89ff-be0d-9bb3b9a8837a">
+      <Execution id="f7143263-3e80-46cd-af8e-c1b04dd29cea" />
+      <TestMethod codeBase="&lt;repo-root-worktree&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.QfcItemController_InitializationTests" name="WebViewInitializationErrorSink_DefaultDelegate_InvokesWithoutThrowing" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="16b780b4-6365-83ba-be5c-a3935841308d" executionId="1ddb588a-c14e-4716-8ccc-23beb8ff4446" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13c23eae-69e4-8e8c-8916-4d7ab637bd78" executionId="7d9e26d9-9b18-4647-be21-f96e4f4d4afa" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="130160f9-b3ef-89ff-be0d-9bb3b9a8837a" executionId="f7143263-3e80-46cd-af8e-c1b04dd29cea" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e3d326f-cc57-8e9a-832f-434856ce528b" executionId="04c9f15f-c647-471c-9336-39a81f7ea0e2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="4" executed="4" passed="4" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for &lt;repo-root-worktree&gt;\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
