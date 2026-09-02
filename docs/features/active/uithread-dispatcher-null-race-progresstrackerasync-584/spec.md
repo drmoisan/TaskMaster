@@ -239,7 +239,7 @@ None; the change adds a single null check to an existing property getter.
 - Coverage impact and targets for changed lines/modules: the new getter branch is new code and must
   meet the repository's `>= 90%` new-code coverage target; the change is small enough that the
   single new test should reach 100% of the new lines.
-- Toolchain commands to run (format → lint → type-check → test): per `CLAUDE.md` C# Toolchain --
+- Toolchain commands to run (format → lint → type-check → test): per CLAUDE.md C# Toolchain --
   `dotnet tool run csharpier format .` (verify with `check .`), then
   `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`,
   then `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`,

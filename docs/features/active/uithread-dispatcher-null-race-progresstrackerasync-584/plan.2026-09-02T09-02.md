@@ -37,7 +37,7 @@ them compatible with AC4's "unmodified assertions" wording; P1-T5 states the enf
 
 ### Why three additional test files are in scope (re-derived this pass)
 
-`UtilitiesCS.Test/Properties/AssemblyInfo.cs` line 18 declares `[assembly: Parallelize(`, so classes
+UtilitiesCS.Test/Properties/AssemblyInfo.cs line 18 declares `[assembly: Parallelize(`, so classes
 in this assembly run concurrently by default. Exactly three files in `UtilitiesCS.Test` reflect over
 the process-global `UiThread._dispatcher` backing field and write it:
 `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs` line 144,
@@ -107,10 +107,10 @@ re-derived facts fix this decision:
 
 ## Threshold reconciliation (recorded, applied)
 
-`CLAUDE.md` (rank 1 in `policy-compliance-order`) sets repository line coverage `>= 80%` and new
+CLAUDE.md (rank 1 in `policy-compliance-order`) sets repository line coverage `>= 80%` and new
 module/class/method coverage `>= 90%`. The rule files .claude/rules/general-unit-test.md and
 .claude/rules/quality-tiers.md (rank 3/4) set `>= 85%` line and `>= 75%` branch. This plan applies
-the rank-1 `CLAUDE.md` figures (`>= 80%` repository line, `>= 90%` new code) and records the
+the rank-1 CLAUDE.md figures (`>= 80%` repository line, `>= 90%` new code) and records the
 divergence in P0-T12 rather than silently choosing one. The conflict is pre-existing and is NOT
 resolved by this bug fix.
 
@@ -238,7 +238,7 @@ from being present in some of those tasks and absent from others.
    `msbuild -version` returns `command not found` with exit 127, and `msbuild.exe -version` exits 0
    printing `MSBuild version 18.9.1+a81b43525 for .NET Framework`. This is a git-bash PATH-resolution
    property — MSYS bash does not append `.exe` when searching `PATH` for a bare name — and not a
-   deviation from `CLAUDE.md`. Every switch set below is character-for-character the one `CLAUDE.md`
+   deviation from CLAUDE.md. Every switch set below is character-for-character the one CLAUDE.md
    mandates: no `/p:Nullable=enable` is ever added, and `/t:Rebuild` is always used in place of
    `/t:Build`.
 
@@ -330,8 +330,8 @@ from being present in some of those tasks and absent from others.
    and each task writes to its own results directory, so no TRX can be attributed to the wrong task.
    Repeated runs of the SAME task do leave more than one `.trx` file in that task's own directory,
    which is what the TRX selection rule stated below governs. The TRX files are
-   gitignored by `.gitignore` line 39 `[Tt]est[Rr]esult*/` and excluded from the format gate by
-   `.csharpierignore` line 8 `*.trx` (both re-derived this pass), so reading them adds nothing to any
+   gitignored by .gitignore line 39 `[Tt]est[Rr]esult*/` and excluded from the format gate by
+   .csharpierignore line 8 `*.trx` (both re-derived this pass), so reading them adds nothing to any
    porcelain, diff, or format gate in this plan.
 
    **Redaction rule binding on all seven of those tasks.** Record the `total`, `executed`, and
@@ -405,13 +405,13 @@ cannot satisfy or falsify them. This plan's own commits never touch the Claude r
 .claude/, the Codex mirror tree at .codex/, the dot-agents tree at .agents/,
 config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asserts that.
 
-- [ ] [P0-T1] Read the policy files in the order required by `policy-compliance-order`: `CLAUDE.md`, then `.claude/rules/general-code-change.md`, then `.claude/rules/general-unit-test.md`, then `.claude/rules/quality-tiers.md`, then `.claude/rules/csharp.md`, then `.claude/rules/tonality.md`. Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/phase0-instructions-read.md` containing `Timestamp:`, `Policy Order:` (the six paths in the order read), and an explicit list of the files read. Acceptance: the artifact exists, lists all six paths, and its `Policy Order:` line matches the order above.
+- [ ] [P0-T1] Read the policy files in the order required by `policy-compliance-order`: CLAUDE.md, then .claude/rules/general-code-change.md, then .claude/rules/general-unit-test.md, then .claude/rules/quality-tiers.md, then .claude/rules/csharp.md, then .claude/rules/tonality.md. Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/phase0-instructions-read.md` containing `Timestamp:`, `Policy Order:` (the six paths in the order read), and an explicit list of the files read. Acceptance: the artifact exists, lists all six paths, and its `Policy Order:` line matches the order above.
 
 - [ ] [P0-T2] Re-derive the defect site by reading `UtilitiesCS/Threading/UiThread.cs` in full. Record: the file's total line count; the line numbers of the `Dispatcher` property and its backing field; the verbatim backing-field declaration line; whether the file carries a nullable-enable directive on line 1; and the line numbers of the two lazy-initialising sibling properties `UiSyncContext` and `AutoScaleFactor`. Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t2-uithread-rederivation.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: the artifact records a total line count of 163, records that the backing-field line contains `null!`, records the property at lines 135-139 and the field at line 140, and records the nullable-enable directive on line 1. If any of these five recorded values differs from the value stated here, stop and report BLOCKED rather than editing, because the fix text quoted above was derived from them.
 
-- [ ] [P0-T3] Re-derive the AC3 hypothesis by reading `UtilitiesCS/Threading/ProgressTrackerAsync.cs` in full. Record the verbatim text and line number of the statement that assigns `UiThread.Dispatcher` to the instance field, and the verbatim text and line number of the first statement that dereferences that instance field. Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t3-progresstrackerasync-rederivation.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: the artifact records that line 33 is `UiDispatcher = UiThread.Dispatcher;` and that line 35 is the first dereference (`await UiDispatcher.InvokeAsync(`), and states the conclusion that a throwing getter raises at line 33 before line 35 executes, so no edit to this file is required. If line 33 is not the property read, record the actual ordering, add `UtilitiesCS/Threading/ProgressTrackerAsync.cs` to the write-target list in the "Scope" section of this plan, and report the overturned conclusion to the caller before proceeding.
+- [ ] [P0-T3] Re-derive the AC3 hypothesis by reading UtilitiesCS/Threading/ProgressTrackerAsync.cs in full. Record the verbatim text and line number of the statement that assigns `UiThread.Dispatcher` to the instance field, and the verbatim text and line number of the first statement that dereferences that instance field. Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t3-progresstrackerasync-rederivation.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: the artifact records that line 33 is `UiDispatcher = UiThread.Dispatcher;` and that line 35 is the first dereference (`await UiDispatcher.InvokeAsync(`), and states the conclusion that a throwing getter raises at line 33 before line 35 executes, so no edit to this file is required. If line 33 is not the property read, record the actual ordering, add UtilitiesCS/Threading/ProgressTrackerAsync.cs to the write-target list in the "Scope" section of this plan, and report the overturned conclusion to the caller before proceeding.
 
-- [ ] [P0-T4] Re-derive the test-side facts by reading `UtilitiesCS.Test/Threading/UiThread_Tests.cs` in full, reading the `DispatcherField`/`ForceDispatcherNull`/`RestoreDispatcher` helper region of `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs`, and reading `UtilitiesCS.Test/Properties/AssemblyInfo.cs`. Record: the total line count of `UtilitiesCS.Test/Threading/UiThread_Tests.cs`; its namespace; its existing `using` directives; the reflection idiom used to reach the private static backing field; and whether the assembly declares class-level parallelisation. Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t4-test-rederivation.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: the artifact records 104 total lines, namespace `UtilitiesCS.Test.Threading`, absence of a `System.Reflection` using directive, the reflection idiom taking the field by the name `_dispatcher` with non-public static binding flags, and the presence of an assembly-level parallelisation attribute on line 18 of `UtilitiesCS.Test/Properties/AssemblyInfo.cs` (which is the justification for the do-not-parallelize attribute in P1-T2 and P1-T5).
+- [ ] [P0-T4] Re-derive the test-side facts by reading `UtilitiesCS.Test/Threading/UiThread_Tests.cs` in full, reading the `DispatcherField`/`ForceDispatcherNull`/`RestoreDispatcher` helper region of `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs`, and reading UtilitiesCS.Test/Properties/AssemblyInfo.cs. Record: the total line count of `UtilitiesCS.Test/Threading/UiThread_Tests.cs`; its namespace; its existing `using` directives; the reflection idiom used to reach the private static backing field; and whether the assembly declares class-level parallelisation. Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t4-test-rederivation.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: the artifact records 104 total lines, namespace `UtilitiesCS.Test.Threading`, absence of a `System.Reflection` using directive, the reflection idiom taking the field by the name `_dispatcher` with non-public static binding flags, and the presence of an assembly-level parallelisation attribute on line 18 of UtilitiesCS.Test/Properties/AssemblyInfo.cs (which is the justification for the do-not-parallelize attribute in P1-T2 and P1-T5).
 
 - [ ] [P0-T5] Resolve and record the toolchain entry points. Run these commands from the worktree root, in the order given.
 
@@ -421,7 +421,7 @@ config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asser
   dotnet --version
   ```
 
-  If this fails with an error containing `The repo-local .NET SDK is missing`, the worktree has no `.dotnet-sdk/` directory, and `global.json` (`"paths": [".dotnet-sdk", "$host$"]`, re-derived this pass) then resolves to no SDK at all, so every `dotnet` command in this plan — `dotnet tool restore` in this task, `dotnet tool run csharpier --version` in this task, and the formatter and format-check commands in P4-T1 and P4-T2 — fails. Bootstrap the SDK by running, from the worktree root:
+  If this fails with an error containing `The repo-local .NET SDK is missing`, the worktree has no `.dotnet-sdk/` directory, and global.json (`"paths": [".dotnet-sdk", "$host$"]`, re-derived this pass) then resolves to no SDK at all, so every `dotnet` command in this plan — `dotnet tool restore` in this task, `dotnet tool run csharpier --version` in this task, and the formatter and format-check commands in P4-T1 and P4-T2 — fails. Bootstrap the SDK by running, from the worktree root:
 
   ```text
   mkdir -p .dotnet-sdk
@@ -432,9 +432,9 @@ config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asser
 
   then re-run `dotnet --version`. Record every command actually run and every `dotnet --version` reading taken, in the order taken.
 
-  This is deliberately NOT an invocation of `scripts/vscode/Install-RepoDotNetSdk.ps1`, and that script MUST NOT be run here. The script can only be started through `pwsh`, and a command whose name is `pwsh` is refused outright by this worktree's shell in every argument shape — `-File` and `-Command` alike, because the guard keys on `pwsh` occupying the command position. The verbatim refusal text measured in this worktree is: "this command runs pwsh in a plain command; what it reads or is handed as shell text cannot be shown not to run git. Refusing to run it." The four POSIX commands above perform the same download-and-extract the script performs: the URL is character-for-character the one the script builds at `scripts/vscode/Install-RepoDotNetSdk.ps1` line 26 for its default `$Version` of `8.0.205` and default `$Architecture` of `x64` (re-derived this pass), and `.dotnet-sdk` at the worktree root is the same destination the script resolves at line 36 (`Join-Path $PSScriptRoot '..\..\.dotnet-sdk'`, re-derived this pass). Version `8.0.205` is also what `global.json` pins, so the acceptance below is unchanged by the substitution.
+  This is deliberately NOT an invocation of `scripts/vscode/Install-RepoDotNetSdk.ps1`, and that script MUST NOT be run here. The script can only be started through `pwsh`, and a command whose name is `pwsh` is refused outright by this worktree's shell in every argument shape — `-File` and `-Command` alike, because the guard keys on `pwsh` occupying the command position. The verbatim refusal text measured in this worktree is: "this command runs pwsh in a plain command; what it reads or is handed as shell text cannot be shown not to run git. Refusing to run it." The four POSIX commands above perform the same download-and-extract the script performs: the URL is character-for-character the one the script builds at `scripts/vscode/Install-RepoDotNetSdk.ps1` line 26 for its default `$Version` of `8.0.205` and default `$Architecture` of `x64` (re-derived this pass), and `.dotnet-sdk` at the worktree root is the same destination the script resolves at line 36 (`Join-Path $PSScriptRoot '..\..\.dotnet-sdk'`, re-derived this pass). Version `8.0.205` is also what global.json pins, so the acceptance below is unchanged by the substitution.
 
-  The bootstrap leaves nothing in any porcelain or diff gate later in this plan: `.gitignore` line 350 is `.dotnet*/` (re-derived this pass), which already ignores `.dotnet-sdk/`.
+  The bootstrap leaves nothing in any porcelain or diff gate later in this plan: .gitignore line 350 is `.dotnet*/` (re-derived this pass), which already ignores `.dotnet-sdk/`.
 
   Fail-closed rule for this step: if any of the four commands exits non-zero — including `curl` failing to download and including `unzip` being unavailable in this shell, which this plan has not measured — record `SDK_BOOTSTRAP: BLOCKED` in the artifact together with the failing command and its verbatim output, and halt. Do not proceed to any later task, because no formatting gate in this plan can run without an SDK and the evidence produced would be unverifiable. Exactly one fallback is authorised, and only for a failure of the `unzip` command specifically: run `PATH="/c/Windows/System32:$PATH" tar.exe -xf .dotnet-sdk/sdk.zip -C .dotnet-sdk`, record it with its own exit code, and declare `SDK_BOOTSTRAP: BLOCKED` if it too exits non-zero. That fallback uses the libarchive `tar.exe` Windows ships in `System32`, which reads zip archives; the GNU `tar` on the shell's default `PATH` does not, which is why the `PATH=` prefix is required to select the right one. No other substitution is authorised for any of the four commands.
 
@@ -461,7 +461,7 @@ config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asser
   msbuild.exe -version
   ```
 
-  The `.exe` suffix is required and is not optional shorthand. Measured in this worktree during preflight round 3: `msbuild -version` returns `command not found` with exit 127, while `msbuild.exe -version` exits 0 and prints `MSBuild version 18.9.1+a81b43525 for .NET Framework`. MSYS bash does not append `.exe` when searching `PATH` for a bare name, so the bare spelling names nothing. No `vswhere`-based resolution step is added for MSBuild and none is needed: `msbuild.exe` is on `PATH`, and this plan invokes it by that name in P0-T8, P0-T9, P1-T3, P3-T1, P4-T3, and P4-T4 with the switch sets `CLAUDE.md` mandates, unchanged. This probe carries NO `MSYS_NO_PATHCONV=1` prefix and must not be given one: its single argument `-version` begins with `-`, not `/`, so MSYS path conversion has nothing to rewrite here. The six full `msbuild.exe` build commands do carry the prefix, for the reason given in constraint 4 of "Shell constraints measured in this worktree". No switch is added, removed, or altered in any of them.
+  The `.exe` suffix is required and is not optional shorthand. Measured in this worktree during preflight round 3: `msbuild -version` returns `command not found` with exit 127, while `msbuild.exe -version` exits 0 and prints `MSBuild version 18.9.1+a81b43525 for .NET Framework`. MSYS bash does not append `.exe` when searching `PATH` for a bare name, so the bare spelling names nothing. No `vswhere`-based resolution step is added for MSBuild and none is needed: `msbuild.exe` is on `PATH`, and this plan invokes it by that name in P0-T8, P0-T9, P1-T3, P3-T1, P4-T3, and P4-T4 with the switch sets CLAUDE.md mandates, unchanged. This probe carries NO `MSYS_NO_PATHCONV=1` prefix and must not be given one: its single argument `-version` begins with `-`, not `/`, so MSYS path conversion has nothing to rewrite here. The six full `msbuild.exe` build commands do carry the prefix, for the reason given in constraint 4 of "Shell constraints measured in this worktree". No switch is added, removed, or altered in any of them.
 
   **4. Restore NuGet packages for the solution.**
 
@@ -469,13 +469,13 @@ config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asser
   nuget.exe restore TaskMaster.sln
   ```
 
-  This step is required and is not redundant with `dotnet tool restore` in step 5. `dotnet tool restore` restores only the local tool manifest, which in this repository is `dotnet-tools.json` at the worktree root (there is no `.config/` directory, re-derived this pass); it performs no NuGet package restore. A fresh worktree has no `packages/` directory at all, and every project in this solution is `packages.config`-based — 18 `packages.config` files exist across the solution's projects, including `UtilitiesCS/packages.config` and `UtilitiesCS.Test/packages.config`, re-derived this pass. Without this restore the FIRST build task in this plan (P0-T8) fails with 37 errors, comprising `CS0246` type-not-found errors and MSBuild `.targets`-file-not-found errors from the `packages.config` import elements; that failure was reproduced directly in this worktree during preflight round 4.
+  This step is required and is not redundant with `dotnet tool restore` in step 5. `dotnet tool restore` restores only the local tool manifest, which in this repository is dotnet-tools.json at the worktree root (there is no `.config/` directory, re-derived this pass); it performs no NuGet package restore. A fresh worktree has no `packages/` directory at all, and every project in this solution is `packages.config`-based — 18 `packages.config` files exist across the solution's projects, including `UtilitiesCS/packages.config` and `UtilitiesCS.Test/packages.config`, re-derived this pass. Without this restore the FIRST build task in this plan (P0-T8) fails with 37 errors, comprising `CS0246` type-not-found errors and MSBuild `.targets`-file-not-found errors from the `packages.config` import elements; that failure was reproduced directly in this worktree during preflight round 4.
 
   The command name is the bare `nuget.exe`, which resolves on `PATH` in this shell and therefore needs no `PATH=` prefix. It MUST NOT be spelled as a quoted absolute path: constraint 2 in "Shell constraints measured in this worktree" records that this shell refuses any command whose NAME is a quoted absolute path. It also needs no `MSYS_NO_PATHCONV=1` prefix, because neither of its two arguments begins with `/`.
 
-  This step is CI parity, not a local deviation: `.github/workflows/_build-analyzers.yml` line 45 runs `nuget restore $env:SOLUTION_PATH` with `SOLUTION_PATH: TaskMaster.sln` (line 17) immediately before its analyzer build, and `.github/workflows/_build-nullable.yml` line 45 and `.github/workflows/_mstest-coverage.yml` line 45 do the same before their respective gates. All three re-derived this pass.
+  This step is CI parity, not a local deviation: .github/workflows/_build-analyzers.yml line 45 runs `nuget restore $env:SOLUTION_PATH` with `SOLUTION_PATH: TaskMaster.sln` (line 17) immediately before its analyzer build, and .github/workflows/_build-nullable.yml line 45 and .github/workflows/_mstest-coverage.yml line 45 do the same before their respective gates. All three re-derived this pass.
 
-  The restore writes only into `packages/` at the worktree root, which `.gitignore` line 191 ignores as `**/[Pp]ackages/*` (re-derived this pass), so it enters no porcelain or diff gate later in this plan. The one un-ignored path under that pattern is `!**/[Pp]ackages/build/` on line 193; no `packages/build/` directory exists in this worktree after a completed restore, re-derived this pass. If a restore in a fresh worktree does produce one, record it in this artifact and report it, because it would otherwise appear as an untracked path in P4-T1's two unscoped porcelain spans — where, being present in both, it would cancel — and it lies outside every scoped gate in Phase 5.
+  The restore writes only into `packages/` at the worktree root, which .gitignore line 191 ignores as `**/[Pp]ackages/*` (re-derived this pass), so it enters no porcelain or diff gate later in this plan. The one un-ignored path under that pattern is `!**/[Pp]ackages/build/` on line 193; no `packages/build/` directory exists in this worktree after a completed restore, re-derived this pass. If a restore in a fresh worktree does produce one, record it in this artifact and report it, because it would otherwise appear as an untracked path in P4-T1's two unscoped porcelain spans — where, being present in both, it would cancel — and it lies outside every scoped gate in Phase 5.
 
   **5.** `dotnet tool restore`
   **6.** `dotnet tool run csharpier --version`
@@ -489,7 +489,7 @@ config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asser
   - the derived `RESOLVED_VSTEST_DIR_NATIVE:` and `RESOLVED_VSTEST_DIR:` values described in step 2;
   - the reported MSBuild version, the CSharpier version, and the `dotnet-coverage` version.
 
-  Acceptance: the last `dotnet --version` reading recorded from step 1 reports a version beginning `8.0.2` and exits 0; `nuget.exe restore TaskMaster.sln` exits 0; `RESOLVED_VSTEST_DIR_NATIVE:` and `RESOLVED_VSTEST_DIR:` are both recorded as non-empty concrete directory paths, and the file `vstest.console.exe` exists inside that directory; `msbuild.exe -version` exits 0; `dotnet tool restore` exits 0; and the reported CSharpier version is `1.2.6` (the version pinned by `dotnet-tools.json`). The two recorded directory values are the substitutions for the `<resolved-vstest-dir-native>` and `<resolved-vstest-dir>` placeholders used in P0-T10, P0-T11, P1-T4, P3-T2, P3-T3, P3-T6, P4-T5, and P4-T6; no task in this plan records or substitutes a full `vstest.console.exe` file path as a command name. If `dotnet-coverage` is absent, record `dotnet-coverage: UNAVAILABLE`, install it with `dotnet tool install --global dotnet-coverage`, re-run the version probe, and record both attempts; do not proceed to P0-T10 with an unresolved collector.
+  Acceptance: the last `dotnet --version` reading recorded from step 1 reports a version beginning `8.0.2` and exits 0; `nuget.exe restore TaskMaster.sln` exits 0; `RESOLVED_VSTEST_DIR_NATIVE:` and `RESOLVED_VSTEST_DIR:` are both recorded as non-empty concrete directory paths, and the file `vstest.console.exe` exists inside that directory; `msbuild.exe -version` exits 0; `dotnet tool restore` exits 0; and the reported CSharpier version is `1.2.6` (the version pinned by dotnet-tools.json). The two recorded directory values are the substitutions for the `<resolved-vstest-dir-native>` and `<resolved-vstest-dir>` placeholders used in P0-T10, P0-T11, P1-T4, P3-T2, P3-T3, P3-T6, P4-T5, and P4-T6; no task in this plan records or substitutes a full `vstest.console.exe` file path as a command name. If `dotnet-coverage` is absent, record `dotnet-coverage: UNAVAILABLE`, install it with `dotnet tool install --global dotnet-coverage`, re-run the version probe, and record both attempts; do not proceed to P0-T10 with an unresolved collector.
 
 - [ ] [P0-T6] Probe MCP availability by attempting one call to `mcp__drm-copilot__validate_orchestration_artifacts` with `artifact_type: "plan"` and `artifact_path: "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/plan.2026-09-02T09-02.md"`. Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t6-mcp-probe.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:`. Acceptance: the artifact records either the validator result or the exact string `MCP VALIDATOR UNAVAILABLE` plus the error text. This task never halts the plan: an unavailable validator is recorded and execution continues.
 
@@ -509,7 +509,7 @@ config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asser
   MSYS_NO_PATHCONV=1 msbuild.exe TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true
   ```
 
-  Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t9-nullable-build.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` recording the trailing `N Error(s)` count and the quoted command line. Acceptance: `EXIT_CODE: 0`, the artifact records `0 Error(s)`, and the quoted command line contains `msbuild.exe TaskMaster.sln`, contains no `Nullable=enable` substring, and uses `/t:Rebuild` rather than `/t:Build`. The first of those three clauses is worded as `contains` rather than `begins with` because the recorded line begins with the `MSYS_NO_PATHCONV=1 ` assignment required by constraint 4 in "Shell constraints measured in this worktree"; it checks only the executable spelling this shell requires. The two substantive clauses are unchanged from `CLAUDE.md` and are what this gate actually enforces.
+  Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t9-nullable-build.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` recording the trailing `N Error(s)` count and the quoted command line. Acceptance: `EXIT_CODE: 0`, the artifact records `0 Error(s)`, and the quoted command line contains `msbuild.exe TaskMaster.sln`, contains no `Nullable=enable` substring, and uses `/t:Rebuild` rather than `/t:Build`. The first of those three clauses is worded as `contains` rather than `begins with` because the recorded line begins with the `MSYS_NO_PATHCONV=1 ` assignment required by constraint 4 in "Shell constraints measured in this worktree"; it checks only the executable spelling this shell requires. The two substantive clauses are unchanged from CLAUDE.md and are what this gate actually enforces.
 
 - [ ] [P0-T10] Capture the `UtilitiesCS.Test` baseline run with Cobertura coverage, using the native vstest directory resolved in P0-T5:
 
@@ -519,7 +519,7 @@ config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asser
 
   This task does NOT use the `PATH=`-prefix form that P0-T11, P1-T4, P3-T2, P3-T3, P3-T6, and P4-T6 use. Here `vstest.console.exe` is not the command name — `dotnet-coverage` is — and the executable is an ARGUMENT after `--`, which this worktree's shell does not refuse. It DOES carry the `MSYS_NO_PATHCONV=1` prefix, which every vstest invocation in this plan carries regardless of which of the two forms it uses: the prefix suppresses the conversion of the colon-free `/InIsolation` switch, and that switch is passed through to `vstest.console.exe` identically in both forms. Without it, `/InIsolation` arrives as `C:/Program Files/Git/InIsolation`, vstest treats it as a test source, reports `The test source file ... was not found`, and runs zero tests — a run that would produce a coverage file describing nothing and a test count of zero. See constraint 4 in "Shell constraints measured in this worktree". The operand is double-quoted so the backslashes in `<resolved-vstest-dir-native>` survive word expansion and `dotnet-coverage` receives a valid native Windows path; the native spelling rather than the POSIX one is used for that same reason. P4-T5 uses this identical form, which is what keeps the two runs command-identical apart from their `--output` and `/ResultsDirectory` values, as P4-T7's comparison requires.
 
-  Every other path in this command is written with forward slashes deliberately. Every command block in this plan is executed through a POSIX shell, which removes an unquoted backslash inside a word; a backslash-spelled `coverage\p0-t10.cobertura.xml` would therefore be created as `coveragep0-t10.cobertura.xml` at the worktree root, where `.gitignore`'s `coverage/*` rule (line 144, re-derived this pass) does not match it and where P4-T7 could not read it. `msbuild.exe`, `vstest.console.exe`, and `dotnet-coverage` all accept forward-slash paths on Windows. Backslashes survive in exactly three places in this plan, and all three are inside double quotes, which is what preserves them: the `-find` pattern in P0-T5 step 2, and the `"<resolved-vstest-dir-native>\vstest.console.exe"` operands in this task and in P4-T5.
+  Every other path in this command is written with forward slashes deliberately. Every command block in this plan is executed through a POSIX shell, which removes an unquoted backslash inside a word; a backslash-spelled `coverage\p0-t10.cobertura.xml` would therefore be created as `coveragep0-t10.cobertura.xml` at the worktree root, where .gitignore's `coverage/*` rule (line 144, re-derived this pass) does not match it and where P4-T7 could not read it. `msbuild.exe`, `vstest.console.exe`, and `dotnet-coverage` all accept forward-slash paths on Windows. Backslashes survive in exactly three places in this plan, and all three are inside double quotes, which is what preserves them: the `-find` pattern in P0-T5 step 2, and the `"<resolved-vstest-dir-native>\vstest.console.exe"` operands in this task and in P4-T5.
 
   This command's flag set is deliberately identical to P4-T5's. The two differ only in the `--output` filename and the `/ResultsDirectory` value. In particular neither passes `/EnableCodeCoverage`, because activating the vstest in-process collector underneath `dotnet-coverage collect` changes the loaded-module set and therefore the `lines-valid` denominator, which would make the P4-T7 comparison between these two runs not apples-to-apples.
 
@@ -560,9 +560,9 @@ config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asser
 
   The same sourcing rule P0-T10 states applies here unchanged. `Total tests` and `Passed` are read from the console summary block; `Failed` is read from the `failed` attribute of the single `<Counters .../>` element in the TRX file this task's own `/Logger:trx` switch writes under `TestResults/p0-t11/`; and `Skipped` is DERIVED from that same element as `total` minus `executed`, with `total`, `executed`, and the derived `Skipped` value all recorded. The `notExecuted` attribute MUST NOT be used: `vstest.console.exe`'s TRX logger populates only `total`, `executed`, `passed`, and `failed` on the `<Counters .../>` element and hard-codes every other attribute (`notExecuted`, `error`, `timeout`, `aborted`, `inconclusive`, ...) to `0` regardless of the run's actual outcome. Measured in preflight round 6: a run whose console printed `Skipped: 1` produced a TRX with `notExecuted="0"`; the derivation `total` minus `executed` correctly returned `1` on that run and `0` on an all-passing run. The counts come from the TRX rather than the console because a green `vstest.console.exe` run prints no `Failed:` line and no `Skipped:` line at all (constraint 5 in "Shell constraints measured in this worktree", measured across four green runs in preflight round 5). Only the SOURCE of the `Failed` and `Skipped` values changes; the `BASELINE_FAILURE_SET:` mechanism keyed off a non-zero `Failed` count is unchanged, and the failing test names it lists are still taken from the run's per-test output. `TestResults/p0-t11/` is written by this task and by no other task in this plan; if this task has been run more than once, the "TRX selection rule" stated immediately after constraint 5 governs which `.trx` in that directory is read and what is recorded about the selection. The TRX reference is subject to the same redaction rule P0-T10 states: identify the file by its repository-relative results directory only, never by its own name and never by quoting the run's `Results File:` console line, because `vstest.console.exe` composes the default TRX filename from the host account name and the machine name and prints it inside a full absolute host path.
 
-  Acceptance: all four counts are recorded as concrete numbers, the `total` and `executed` values from which `Skipped` was derived are recorded, and the artifact identifies `TestResults/p0-t11/` as the results directory `Failed` and `Skipped` were read from without recording a TRX filename and without quoting a `Results File:` line. This assembly is baselined because the sibling audit in P3-T6 found that `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` constructs the parameterless `WpfUiDispatcher`, whose provider closes over `UiThread.Dispatcher`.
+  Acceptance: all four counts are recorded as concrete numbers, the `total` and `executed` values from which `Skipped` was derived are recorded, and the artifact identifies `TestResults/p0-t11/` as the results directory `Failed` and `Skipped` were read from without recording a TRX filename and without quoting a `Results File:` line. This assembly is baselined because the sibling audit in P3-T6 found that QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs constructs the parameterless `WpfUiDispatcher`, whose provider closes over `UiThread.Dispatcher`.
 
-- [ ] [P0-T12] Record the coverage-threshold reconciliation. Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t12-threshold-reconciliation.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` naming `CLAUDE.md` as the rank-1 authority supplying `>= 80%` repository line coverage and `>= 90%` new-code coverage, naming `.claude/rules/general-unit-test.md` and `.claude/rules/quality-tiers.md` as the rank-3/rank-4 sources supplying `>= 85%` line and `>= 75%` branch, stating that the rank-1 figures are the ones this plan enforces, and quoting the baseline `line-rate` recorded in P0-T10. Acceptance: the artifact names `CLAUDE.md` explicitly as the superseding authority and quotes the concrete baseline `line-rate` value.
+- [ ] [P0-T12] Record the coverage-threshold reconciliation. Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/baseline/p0-t12-threshold-reconciliation.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` naming CLAUDE.md as the rank-1 authority supplying `>= 80%` repository line coverage and `>= 90%` new-code coverage, naming .claude/rules/general-unit-test.md and .claude/rules/quality-tiers.md as the rank-3/rank-4 sources supplying `>= 85%` line and `>= 75%` branch, stating that the rank-1 figures are the ones this plan enforces, and quoting the baseline `line-rate` recorded in P0-T10. Acceptance: the artifact names CLAUDE.md explicitly as the superseding authority and quotes the concrete baseline `line-rate` value.
 
 - [ ] [P0-T13] Baseline the parallel-bucket census and the file sizes of the five files this plan writes. Run:
 
@@ -674,7 +674,7 @@ config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asser
 
   1. `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs`: insert `    [DoNotParallelize]` immediately after the `[TestClass]` on line 28, giving the two-line form quoted verbatim in the "Exact source text this plan will create" section.
   2. `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs`: insert `    [DoNotParallelize]` immediately after the `[TestClass]` on line 13, same two-line form.
-  3. `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs`: replace line 14's `    [TestClass]` with the single line `    [TestClass, DoNotParallelize]`. The combined attribute list is used for this one file only, because the file is 514 lines at BASE and already exceeds the 500-line limit in `.claude/rules/general-code-change.md`; the combined form adds the attribute without adding a line, so this change does not deepen a pre-existing overage.
+  3. `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs`: replace line 14's `    [TestClass]` with the single line `    [TestClass, DoNotParallelize]`. The combined attribute list is used for this one file only, because the file is 514 lines at BASE and already exceeds the 500-line limit in .claude/rules/general-code-change.md; the combined form adds the attribute without adding a line, so this change does not deepen a pre-existing overage.
 
   Then run:
 
@@ -705,7 +705,7 @@ config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asser
 
   Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/qa-gates/p2-t2-nullforgiving-removed.md` with `Timestamp:`, `Command:` (both), `EXIT_CODE:` (per command), `Output Summary:` quoting each command's output. Acceptance: the first command prints no matching line and exits 1 (`git grep` exits 1 on zero matches), and the second command prints exactly one line whose path is `UtilitiesCS/Threading/UiThread.cs`. Both commands are scoped by pathspec to this one file, so neither is affected by `null!` occurrences elsewhere in the repository. The pre-change state of the first command was exactly one match on line 140, recorded in P0-T2, so this gate is false before the edit and true after it.
 
-- [ ] [P2-T3] Account for the file-size limit in `.claude/rules/general-code-change.md` across all five files this plan writes. Run:
+- [ ] [P2-T3] Account for the file-size limit in .claude/rules/general-code-change.md across all five files this plan writes. Run:
 
   ```text
   wc -l UtilitiesCS/Threading/UiThread.cs UtilitiesCS.Test/Threading/UiThread_Tests.cs UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs
@@ -777,9 +777,9 @@ config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asser
 
   Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/qa-gates/p3-t5-no-timing-tokens.md` with `Timestamp:`, `Command:` (all three), `EXIT_CODE:` (per command), and `Output Summary:` recording the byte size of `TestResults/p3-t5-source.diff` and quoting the last command's output verbatim. Acceptance: `TestResults/p3-t5-source.diff` is non-empty (an empty diff means the gate had nothing to inspect and the result is BLOCKED, not PASS), and the third command prints nothing and its second `grep` exits 1, which is what `grep` returns when it finds no match. If it prints any line, the change violates AC5 and the offending construct must be removed before proceeding.
 
-  Two properties of the diff span are load-bearing and must not be "simplified". First, it is anchored to the BASE SHA rather than left bare, so it cannot silently degrade into a worktree-versus-index comparison. Second, it uses the **single-ref** form `git diff <SHA> -- <paths>`, which compares the working tree against that commit, and NOT the two-dot form `git diff <SHA>..HEAD`. This plan's first commit is P5-T9, so at Phase 3 the branch HEAD is still identical to BASE and a two-dot span would emit an empty diff no matter what the executor wrote — the `grep` filter would then print nothing and the gate would pass vacuously. The single-ref form is blind to untracked files, which is harmless here because all five files this plan writes are already tracked at BASE (re-derived this pass from `UtilitiesCS.Test/UtilitiesCS.Test.csproj` lines 476, 478, 489, and 493, and from the presence of `UtilitiesCS/Threading/UiThread.cs` at BASE).
+  Two properties of the diff span are load-bearing and must not be "simplified". First, it is anchored to the BASE SHA rather than left bare, so it cannot silently degrade into a worktree-versus-index comparison. Second, it uses the **single-ref** form `git diff <SHA> -- <paths>`, which compares the working tree against that commit, and NOT the two-dot form `git diff <SHA>..HEAD`. This plan's first commit is P5-T9, so at Phase 3 the branch HEAD is still identical to BASE and a two-dot span would emit an empty diff no matter what the executor wrote — the `grep` filter would then print nothing and the gate would pass vacuously. The single-ref form is blind to untracked files, which is harmless here because all five files this plan writes are already tracked at BASE (re-derived this pass from UtilitiesCS.Test/UtilitiesCS.Test.csproj lines 476, 478, 489, and 493, and from the presence of `UtilitiesCS/Threading/UiThread.cs` at BASE).
 
-  The redirection target is written with forward slashes for the reason stated in P0-T10: a backslash-spelled `TestResults\p3-t5-source.diff` would be created as `TestResultsp3-t5-source.diff` at the worktree root, which `.gitignore`'s `[Tt]est[Rr]esult*/` rule on line 39 does not match, which P5-T10's scoped porcelain check does not see, and which the following `grep -E '^\+' TestResults/p3-t5-source.diff` would then fail to open — producing a second, independent vacuous pass of this gate.
+  The redirection target is written with forward slashes for the reason stated in P0-T10: a backslash-spelled `TestResults\p3-t5-source.diff` would be created as `TestResultsp3-t5-source.diff` at the worktree root, which .gitignore's `[Tt]est[Rr]esult*/` rule on line 39 does not match, which P5-T10's scoped porcelain check does not see, and which the following `grep -E '^\+' TestResults/p3-t5-source.diff` would then fail to open — producing a second, independent vacuous pass of this gate.
 
 - [ ] [P3-T6] Run the `QuickFiler.Test` class that constructs the parameterless `WpfUiDispatcher`, whose provider closes over `UiThread.Dispatcher`. This class is NOT named in `spec.md` or in the research trail; it was found during this plan's adversarial self-review by enumerating `new WpfUiDispatcher(` across the repository. Command:
 
@@ -789,7 +789,7 @@ config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asser
 
   Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/regression-testing/p3-t6-quickfiler-wpfuidispatcher.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` recording `Total tests`, `Passed`, `Failed`, and each test name with its outcome. Acceptance: `Total tests` is 2 as observed in the console summary block; `Failed: 0` read from the `failed` attribute of the single `<Counters .../>` element in the TRX file this task's own `/Logger:trx` switch writes under `TestResults/p3-t6/`; and both `Construction_YieldsAnIUiDispatcher` and `Invoke_InvokeAsync_BeginInvoke_ExecuteDelegateOnDispatcherThread` are listed by name as passing in the console output.
 
-  The `Failed` value is sourced from the TRX because a green `vstest.console.exe` run prints no `Failed:` line at all, measured across four green runs in this worktree during preflight round 5 (constraint 5 in "Shell constraints measured in this worktree"). The by-name clause is unaffected by that measurement and is unchanged: the console DOES print per-test pass and fail lines on a green run, and the two names above are the two `[TestMethod]`s declared in `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` at lines 24 and 50, re-derived this pass. This task records no `Skipped` figure, so the `total` minus `executed` derivation stated in constraint 5 does not apply here; the `notExecuted` attribute is not read by this task and MUST NOT be introduced into it. `TestResults/p3-t6/` is written by this task and by no other task in this plan; if this task has been run more than once, the "TRX selection rule" stated immediately after constraint 5 governs which `.trx` in that directory is read and what is recorded about the selection. The TRX reference is subject to the same redaction rule P0-T10 states: identify the file by its repository-relative results directory only, never by its own name and never by quoting the run's `Results File:` console line, because `vstest.console.exe` composes the default TRX filename from the host account name and the machine name and prints it inside a full absolute host path.
+  The `Failed` value is sourced from the TRX because a green `vstest.console.exe` run prints no `Failed:` line at all, measured across four green runs in this worktree during preflight round 5 (constraint 5 in "Shell constraints measured in this worktree"). The by-name clause is unaffected by that measurement and is unchanged: the console DOES print per-test pass and fail lines on a green run, and the two names above are the two `[TestMethod]`s declared in QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs at lines 24 and 50, re-derived this pass. This task records no `Skipped` figure, so the `total` minus `executed` derivation stated in constraint 5 does not apply here; the `notExecuted` attribute is not read by this task and MUST NOT be introduced into it. `TestResults/p3-t6/` is written by this task and by no other task in this plan; if this task has been run more than once, the "TRX selection rule" stated immediately after constraint 5 governs which `.trx` in that directory is read and what is recorded about the selection. The TRX reference is subject to the same redaction rule P0-T10 states: identify the file by its repository-relative results directory only, never by its own name and never by quoting the run's `Results File:` console line, because `vstest.console.exe` composes the default TRX filename from the host account name and the machine name and prints it inside a full absolute host path.
 
   The plan-time expectation is that neither is affected — the constructor only captures the provider lambda without invoking it, and the second test installs a real dispatcher through `UiThreadDispatcherFixture` before any forwarding call — but that expectation is verified by running the tests, not asserted from reading.
 
@@ -811,9 +811,9 @@ config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asser
   - `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs`
   - `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs`
 
-  **Option chosen for the repo-wide-drift problem, and why.** The preflight round-2 review identified that `dotnet tool run csharpier format .` formats the ENTIRE repository, so drift it repairs outside `UtilitiesCS`/`UtilitiesCS.Test` — in `QuickFiler/`, `TaskMaster/`, `ToDoModel/`, and elsewhere — would be rewritten, would not be restored by a check scoped to those two directories, would not be committed, and would be invisible to every terminal porcelain gate in this plan, which are all scoped the same way. Two remedies were available: widen the porcelain check and the `git checkout --` restoration to the whole worktree, or restrict the formatter's write scope so the unowned drift is never created. This plan takes the second. The reason is that the first remedy makes the gate depend on the whole worktree's ambient state, including tracked directories this plan has no relationship with (`.claude/agent-memory/` is tracked in this repository), so a concurrent or pre-existing modification anywhere would either fail the gate or force an exclusion list that grows without bound. Restricting the formatter's write scope removes the failure mode at its source: a file the formatter is never given cannot be rewritten.
+  **Option chosen for the repo-wide-drift problem, and why.** The preflight round-2 review identified that `dotnet tool run csharpier format .` formats the ENTIRE repository, so drift it repairs outside `UtilitiesCS`/`UtilitiesCS.Test` — in `QuickFiler/`, `TaskMaster/`, `ToDoModel/`, and elsewhere — would be rewritten, would not be restored by a check scoped to those two directories, would not be committed, and would be invisible to every terminal porcelain gate in this plan, which are all scoped the same way. Two remedies were available: widen the porcelain check and the `git checkout --` restoration to the whole worktree, or restrict the formatter's write scope so the unowned drift is never created. This plan takes the second. The reason is that the first remedy makes the gate depend on the whole worktree's ambient state, including tracked directories this plan has no relationship with (.claude/agent-memory/ is tracked in this repository), so a concurrent or pre-existing modification anywhere would either fail the gate or force an exclusion list that grows without bound. Restricting the formatter's write scope removes the failure mode at its source: a file the formatter is never given cannot be rewritten.
 
-  Repository policy is preserved by this choice. CSharpier is file-based and formats exactly the paths it is given, so the five owned files receive character-for-character the formatting `csharpier format .` would have applied to them. The repo-wide obligation is discharged on the verification side, unchanged: P4-T2 still runs `dotnet tool run csharpier check .` over the whole tree, which is the same read-only, CI-parity command `.github/workflows/_format-check.yml` line 41 runs (`dotnet csharpier check .`, re-derived this pass). A formatting regression anywhere in the repository therefore still surfaces; what this task no longer does is silently repair a pre-existing one.
+  Repository policy is preserved by this choice. CSharpier is file-based and formats exactly the paths it is given, so the five owned files receive character-for-character the formatting `csharpier format .` would have applied to them. The repo-wide obligation is discharged on the verification side, unchanged: P4-T2 still runs `dotnet tool run csharpier check .` over the whole tree, which is the same read-only, CI-parity command .github/workflows/_format-check.yml line 41 runs (`dotnet csharpier check .`, re-derived this pass). A formatting regression anywhere in the repository therefore still surfaces; what this task no longer does is silently repair a pre-existing one.
 
   If the multi-path invocation is rejected by the pinned CSharpier 1.2.6 CLI, run `dotnet tool run csharpier format <path>` once per owned path instead and record all five invocations. Both forms have identical write scope, so the acceptance below is unaffected.
 
@@ -823,7 +823,7 @@ config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asser
 
 - [ ] [P4-T2] Verify formatting. Run `dotnet tool run csharpier check .`. Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/qa-gates/p4-t2-format-check.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` enumerating every path the command reports as unformatted. Acceptance: none of this plan's five owned paths — `UtilitiesCS/Threading/UiThread.cs`, `UtilitiesCS.Test/Threading/UiThread_Tests.cs`, `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs`, `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs`, `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs` — appears in the reported set, and the reported set is a subset of the `BASELINE_FORMAT_DRIFT_SET` recorded in P0-T7. When that baseline set was `NONE`, this reduces to `EXIT_CODE: 0` with an empty reported set.
 
-  The subset clause is the whole-tree half of this gate and is not slack. P4-T1 restricts the formatter's write scope to the five owned paths, so it repairs no pre-existing drift and creates none: every path this command reports must therefore already have been reported at P0-T7. A path in the reported set that is absent from `BASELINE_FORMAT_DRIFT_SET` is new drift introduced during this plan's execution and fails this task. This command is run over the whole repository (`.`), matching `.github/workflows/_format-check.yml` line 41 exactly, so the check retains full repository scope even though P4-T1's write scope is narrow.
+  The subset clause is the whole-tree half of this gate and is not slack. P4-T1 restricts the formatter's write scope to the five owned paths, so it repairs no pre-existing drift and creates none: every path this command reports must therefore already have been reported at P0-T7. A path in the reported set that is absent from `BASELINE_FORMAT_DRIFT_SET` is new drift introduced during this plan's execution and fails this task. This command is run over the whole repository (`.`), matching .github/workflows/_format-check.yml line 41 exactly, so the check retains full repository scope even though P4-T1's write scope is narrow.
 
 - [ ] [P4-T3] Analyze. Run:
 
@@ -873,17 +873,17 @@ config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asser
 
   **Redaction rule for this task's artifact.** `dotnet-coverage` writes the `filename` attribute as a full absolute host path — it begins with the drive letter and includes the user profile directory, so it contains a host account name. When recording the located class node in the evidence artifact, record ONLY the line-hit data: the `<line number=...>` values and their `hits` values. Do NOT record the `filename` attribute's absolute-path value verbatim. Identify the node in the artifact by the repository-relative path `UtilitiesCS/Threading/UiThread.cs` instead. The same rule applies to any other absolute path this task encounters while reading the Cobertura file.
 
-  Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/qa-gates/p4-t7-coverage-delta.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` recording, as concrete numbers: the baseline `lines-covered`, `lines-valid`, and `line-rate` from P0-T10; the post-change `lines-covered`, `lines-valid`, and `line-rate` from P4-T5; the signed difference `post-change lines-valid` minus `baseline lines-valid`; the added-line set; the intersected line numbers with their `hits` values; and the resulting changed-line coverage percentage. Both recorded `line-rate` figures MUST be labelled, verbatim, `raw unstripped dotnet-coverage line-rate for the UtilitiesCS.Test process; not the repository first-party figure CLAUDE.md's 80% refers to`. The word "single-assembly" is deliberately absent from that label: `dotnet-coverage collect` instruments the whole test host process and reports every first-party module loaded into it, not one assembly, so `UtilitiesCS` and `UtilitiesCS.Test` both contribute to `lines-valid` (which is also why P4-T7 clause (c) is a band rather than an equality). The label's purpose — marking the figure as not comparable to the repository-wide first-party percentage `CLAUDE.md` states — is unchanged. Acceptance:
+  Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/qa-gates/p4-t7-coverage-delta.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` recording, as concrete numbers: the baseline `lines-covered`, `lines-valid`, and `line-rate` from P0-T10; the post-change `lines-covered`, `lines-valid`, and `line-rate` from P4-T5; the signed difference `post-change lines-valid` minus `baseline lines-valid`; the added-line set; the intersected line numbers with their `hits` values; and the resulting changed-line coverage percentage. Both recorded `line-rate` figures MUST be labelled, verbatim, `raw unstripped dotnet-coverage line-rate for the UtilitiesCS.Test process; not the repository first-party figure CLAUDE.md's 80% refers to`. The word "single-assembly" is deliberately absent from that label: `dotnet-coverage collect` instruments the whole test host process and reports every first-party module loaded into it, not one assembly, so `UtilitiesCS` and `UtilitiesCS.Test` both contribute to `lines-valid` (which is also why P4-T7 clause (c) is a band rather than an equality). The label's purpose — marking the figure as not comparable to the repository-wide first-party percentage CLAUDE.md states — is unchanged. Acceptance:
 
   (a) The intersected set contains at least two line numbers. If it contains fewer, the coverage report did not resolve this file and the result is BLOCKED, not PASS.
 
-  (b) Every intersected line has `hits` of 1 or more, giving 100% changed-line coverage, which satisfies the `>= 90%` new-code target from `CLAUDE.md`.
+  (b) Every intersected line has `hits` of 1 or more, giving 100% changed-line coverage, which satisfies the `>= 90%` new-code target from CLAUDE.md.
 
   (c) The denominator is comparable: the signed `lines-valid` difference is between 0 and 200 inclusive. Because P0-T10 and P4-T5 now run a flag-identical command, the only legitimate source of a `lines-valid` change between them is the source this plan adds — approximately six coverable lines in `UtilitiesCS/Threading/UiThread.cs` and approximately seventy-five in `UtilitiesCS.Test/Threading/UiThread_Tests.cs`, both of which are inside the denominator because `coverage.config` excludes third-party module paths only (re-derived this pass). An exact-equality clause would be unsatisfiable for that reason and is deliberately not used. A difference outside the stated band indicates the collector's loaded-module set differed between the two runs — a mismatch of that kind has moved this denominator by tens of thousands of lines on an unchanged tree in this repository. If the difference falls outside the band, record `COVERAGE DENOMINATOR MISMATCH`, state explicitly that the repository-wide percentage comparison in clause (d) is VOID, and rest this gate on clauses (a) and (b) alone.
 
   (d) The post-change `line-rate` is greater than or equal to the baseline `line-rate` minus 0.005, the stated tolerance absorbing run-to-run nondeterminism in this suite. This clause is skipped and marked VOID when clause (c) recorded a denominator mismatch.
 
-  Also record the post-change `line-rate` against the `>= 80%` repository figure from `CLAUDE.md` as an observation, not a gate. That observation is explicitly non-comparable to the policy figure: it is the raw, unstripped `dotnet-coverage` line rate for the `UtilitiesCS.Test` process, whereas `CLAUDE.md`'s 80% refers to the repository's first-party testable denominator after third-party stripping. If the post-change figure is below that floor while the baseline figure was also below it, record `PRE-EXISTING FLOOR SHORTFALL` and do not treat it as caused by this change.
+  Also record the post-change `line-rate` against the `>= 80%` repository figure from CLAUDE.md as an observation, not a gate. That observation is explicitly non-comparable to the policy figure: it is the raw, unstripped `dotnet-coverage` line rate for the `UtilitiesCS.Test` process, whereas CLAUDE.md's 80% refers to the repository's first-party testable denominator after third-party stripping. If the post-change figure is below that floor while the baseline figure was also below it, record `PRE-EXISTING FLOOR SHORTFALL` and do not treat it as caused by this change.
 
 - [ ] [P4-T8] Confirm the loop closed in a single clean pass and re-audit file sizes after the formatter ran. Re-run the P2-T3 command:
 
@@ -920,7 +920,7 @@ config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asser
   git commit -m "<message>" -- UtilitiesCS/Threading/UiThread.cs UtilitiesCS.Test/Threading/UiThread_Tests.cs UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584
   ```
 
-  where `<message>` summarises the accessor contract change and names issue #584. Acceptance: `git log -1 --name-only` lists all five source paths — `UtilitiesCS/Threading/UiThread.cs`, `UtilitiesCS.Test/Threading/UiThread_Tests.cs`, `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs`, `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs`, and `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs` — and lists no path under `.claude/`, `.codex/`, `.agents/`, or `config/`.
+  where `<message>` summarises the accessor contract change and names issue #584. Acceptance: `git log -1 --name-only` lists all five source paths — `UtilitiesCS/Threading/UiThread.cs`, `UtilitiesCS.Test/Threading/UiThread_Tests.cs`, `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs`, `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs`, and `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs` — and lists no path under .claude/, .codex/, .agents/, or config/.
 
   The commit carries the same explicit pathspec as the `git add`, rather than being a bare `git commit` over the whole index. A bare commit would commit everything staged, and P3-T4 already ran `git add -A -- UtilitiesCS UtilitiesCS.Test`, which stages every modified or untracked path under those two directories rather than only this plan's five. The explicit-pathspec commit form is what actually bounds the committed footprint to the enumerated paths; the `git add` is retained ahead of it because a pathspec commit only accepts paths already known to git, so the evidence artifacts this plan creates under the feature folder must be staged first. P5-T10's porcelain span remains the backstop that reports anything left behind.
 
@@ -931,7 +931,7 @@ config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asser
   git status --porcelain -- UtilitiesCS UtilitiesCS.Test docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584
   ```
 
-  Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/other/p5-t10-footprint.md` with `Timestamp:`, `Command:` (both), `EXIT_CODE:` (per command), `Output Summary:` quoting both outputs verbatim. Acceptance: the anchored name-status diff lists exactly these five source paths and no other source path — `UtilitiesCS/Threading/UiThread.cs`, `UtilitiesCS.Test/Threading/UiThread_Tests.cs`, `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs`, `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs`, `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs` — apart from paths under `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/`; it lists no path in the `BASELINE_FORMAT_DRIFT_SET` recorded in P0-T7, because P4-T1's formatter write scope was restricted to the five owned paths and therefore rewrote no unowned path at all; it lists no path under `.claude/`, `.codex/`, `.agents/`, `config/blast-radius.json`, or `config/orchestration-routing.json`; and the porcelain output lists `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/plan.2026-09-02T09-02.md` (modified by this plan's own check-off of P5-T9) and no path outside `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/`. P5-T11 commits both the plan file and this artifact together.
+  Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/other/p5-t10-footprint.md` with `Timestamp:`, `Command:` (both), `EXIT_CODE:` (per command), `Output Summary:` quoting both outputs verbatim. Acceptance: the anchored name-status diff lists exactly these five source paths and no other source path — `UtilitiesCS/Threading/UiThread.cs`, `UtilitiesCS.Test/Threading/UiThread_Tests.cs`, `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs`, `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs`, `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs` — apart from paths under `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/`; it lists no path in the `BASELINE_FORMAT_DRIFT_SET` recorded in P0-T7, because P4-T1's formatter write scope was restricted to the five owned paths and therefore rewrote no unowned path at all; it lists no path under .claude/, .codex/, .agents/, config/blast-radius.json, or config/orchestration-routing.json; and the porcelain output lists `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/plan.2026-09-02T09-02.md` (modified by this plan's own check-off of P5-T9) and no path outside `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/`. P5-T11 commits both the plan file and this artifact together.
 
   The porcelain clause is worded that way because of the state this task actually runs in. `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584` is inside this command's pathspec and contains this plan file; P5-T9 commits that whole folder, and the check-off protocol in `acceptance-criteria-tracking` marks P5-T9 `[x]` in this plan file once P5-T9 completes, so by the time this task runs the plan file is modified relative to that commit. `evidence/other/p5-t10-footprint.md` does not yet exist when these two commands run, because this task writes it from their output. An acceptance demanding that the porcelain output list "only this artifact" is therefore unsatisfiable in both directions at once, and is replaced by the clause above.
 
@@ -945,7 +945,7 @@ config/blast-radius.json, or config/orchestration-routing.json, and P5-T10 asser
   git status --porcelain -- UtilitiesCS UtilitiesCS.Test docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584
   ```
 
-  Acceptance: the final porcelain command prints nothing. The status pathspec is scoped so that unrelated tracked state elsewhere in the worktree, including `.claude/agent-memory/`, cannot make this gate unsatisfiable or falsely satisfied. The `git commit` carries the same explicit pathspec as the `git add`, for the reason stated in P5-T9: P3-T4 ran `git add -A -- UtilitiesCS UtilitiesCS.Test`, so a bare `git commit` here would commit whatever that left staged under those two directories, and P5-T10's name-status diff — the one span that would report it — has already run by this point.
+  Acceptance: the final porcelain command prints nothing. The status pathspec is scoped so that unrelated tracked state elsewhere in the worktree, including .claude/agent-memory/, cannot make this gate unsatisfiable or falsely satisfied. The `git commit` carries the same explicit pathspec as the `git add`, for the reason stated in P5-T9: P3-T4 ran `git add -A -- UtilitiesCS UtilitiesCS.Test`, so a bare `git commit` here would commit whatever that left staged under those two directories, and P5-T10's name-status diff — the one span that would report it — has already run by this point.
 
 - [ ] [P5-T12] Write the acceptance-criteria status summary. Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/other/p5-t12-ac-status-summary.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` listing AC1 through AC7 with, for each, its check state in `spec.md` and its evidence artifact path. Then run:
 
@@ -980,23 +980,23 @@ Citations re-derived directly against the working tree in this pass:
 1. `UtilitiesCS/Threading/UiThread.cs` — read in full (163 lines). Line 1 is the nullable-enable directive; lines 135-139 are the `Dispatcher` property; line 140 is `private static Dispatcher _dispatcher = null!;` with the trailing comment. Confirms the defect and the exact replacement region.
 2. `UtilitiesCS/Threading/UiThread.cs` — lines 113-125 (`UiSyncContext`) and 147-158 (`AutoScaleFactor`) re-derived as the lazy-initialising siblings, confirming the omission on `Dispatcher` is an inconsistency.
 3. `UtilitiesCS/Threading/UiThread.cs` line 61 — `Dispatcher = _syncContextForm.UiDispatcher;` is the sole writer through the private setter; re-derived to confirm the setter's non-nullable parameter type is unaffected by the field retyping.
-4. `UtilitiesCS/Threading/SyncContextForm.cs` line 30 — `public Dispatcher UiDispatcher { get; private set; } = null!;` re-derived, confirming the value assigned at `UiThread.cs:61` is statically non-null and introduces no `CS8604` at that assignment.
-5. `UtilitiesCS/Threading/ProgressTrackerAsync.cs` — read in full (109 lines). Line 33 is `UiDispatcher = UiThread.Dispatcher;` and line 35 is `await UiDispatcher.InvokeAsync(`. AC3's "no edit required" conclusion is re-derived from the tree, not carried from the research document, and is confirmed.
+4. UtilitiesCS/Threading/SyncContextForm.cs line 30 — `public Dispatcher UiDispatcher { get; private set; } = null!;` re-derived, confirming the value assigned at `UiThread.cs:61` is statically non-null and introduces no `CS8604` at that assignment.
+5. UtilitiesCS/Threading/ProgressTrackerAsync.cs — read in full (109 lines). Line 33 is `UiDispatcher = UiThread.Dispatcher;` and line 35 is `await UiDispatcher.InvokeAsync(`. AC3's "no edit required" conclusion is re-derived from the tree, not carried from the research document, and is confirmed.
 6. UtilitiesCS/OutlookObjects/Folder/WpfDispatcherYield.cs lines 57-67 — the existing `InvalidOperationException` precedent re-derived verbatim; lines 45-46 confirm the default fallback provider is `() => UtilitiesCS.UiThread.Dispatcher`.
 7. `UtilitiesCS.Test/Threading/UiThread_Tests.cs` — read in full (104 lines). Namespace `UtilitiesCS.Test.Threading`; four using directives; one `[TestClass]` (`SynchronizationContextAwaiter_Tests`); no `System.Reflection` using. Establishes the 500-line headroom decision and the exact using-block edit.
-8. `UtilitiesCS.Test/UtilitiesCS.Test.csproj` line 493 — `<Compile Include="Threading\UiThread_Tests.cs" />` re-derived, establishing that reusing the existing test file requires no project-file edit.
+8. UtilitiesCS.Test/UtilitiesCS.Test.csproj line 493 — `<Compile Include="Threading\UiThread_Tests.cs" />` re-derived, establishing that reusing the existing test file requires no project-file edit.
 9. `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs` lines 141-186 — `DispatcherField`, `ForceDispatcherNull`, and `RestoreDispatcher` re-derived, giving the exact reflection idiom (`typeof(UiThread).GetField("_dispatcher", BindingFlags.NonPublic | BindingFlags.Static)`) the new test mirrors. Lines 248-289 re-derived: the at-risk test asserts `NotThrow` and `callCount == 0` with no exception-type assertion, so the type change is invisible to it.
 10. `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs` lines 126-190 — re-derived: this test installs a real `Dispatcher.CurrentDispatcher` into `_dispatcher` before calling `InitializeAsync()` and restores in `finally`, so it exercises only the non-null path and is unaffected.
-11. `UtilitiesCS.Test/OutlookObjects/Folder/WpfDispatcherYieldTests.cs` lines 117-142 — re-derived: `YieldAsync_WithoutDispatcher_RemainsStrict` injects two null-returning provider delegates and asserts the exception TYPE only (`ThrowAsync<InvalidOperationException>()`, no `WithMessage`). The real `UiThread.Dispatcher` property is never read by any of this class's tests.
-12. `UtilitiesCS.Test/OutlookObjects/Folder/OutlookFolderTreeServiceConcurrencyTests.cs` line 55 — re-derived: `new WpfDispatcherYield()` uses the parameterless constructor, so its fallback provider is the real property. Sibling re-check outcome: the message text differs after the fix but the exception type does not, and this test asserts neither; P3-T3 verifies empirically rather than resting on this reading.
-13. `UtilitiesCS.Test/Properties/AssemblyInfo.cs` line 18 — the assembly-level `Parallelize(` attribute re-derived, which is the justification for the do-not-parallelize attribute on the new class and on the three existing classes P1-T5 touches.
-14. **Sibling finding not present in `spec.md` or the research trail:** `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` lines 26 and 64 construct `new WpfUiDispatcher()`, whose provider closes over `UiThread.Dispatcher` (`UtilitiesCS/Threading/WpfUiDispatcher.cs` lines 24-25 and 37, re-derived). Line 26's constructor only captures the lambda and never invokes it; line 64 runs inside a `UiThreadDispatcherFixture` transaction that installs a real dispatcher first. Neither is expected to change outcome, but the class is now baselined in P0-T11 and verified in P3-T6 rather than left unexamined.
-15. `.csharpierignore` — re-derived: it excludes `**/evidence/**`, `*.cobertura.xml`, `*.trx`, `*.csproj`, `*.props`, `*.targets`. Evidence artifacts written by this plan therefore cannot fail the format gate.
-16. `.gitignore` lines 39 and 144-145 — re-derived: `[Tt]est[Rr]esult*/` ignores the `TestResults/` subdirectories this plan writes, and `coverage/*` (except `coverage/.gitkeep`) ignores the Cobertura outputs. Neither enters the committed footprint asserted in P5-T10. See citation 30 for why both patterns require the forward-slash spelling to take effect.
+11. UtilitiesCS.Test/OutlookObjects/Folder/WpfDispatcherYieldTests.cs lines 117-142 — re-derived: `YieldAsync_WithoutDispatcher_RemainsStrict` injects two null-returning provider delegates and asserts the exception TYPE only (`ThrowAsync<InvalidOperationException>()`, no `WithMessage`). The real `UiThread.Dispatcher` property is never read by any of this class's tests.
+12. UtilitiesCS.Test/OutlookObjects/Folder/OutlookFolderTreeServiceConcurrencyTests.cs line 55 — re-derived: `new WpfDispatcherYield()` uses the parameterless constructor, so its fallback provider is the real property. Sibling re-check outcome: the message text differs after the fix but the exception type does not, and this test asserts neither; P3-T3 verifies empirically rather than resting on this reading.
+13. UtilitiesCS.Test/Properties/AssemblyInfo.cs line 18 — the assembly-level `Parallelize(` attribute re-derived, which is the justification for the do-not-parallelize attribute on the new class and on the three existing classes P1-T5 touches.
+14. **Sibling finding not present in `spec.md` or the research trail:** QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs lines 26 and 64 construct `new WpfUiDispatcher()`, whose provider closes over `UiThread.Dispatcher` (UtilitiesCS/Threading/WpfUiDispatcher.cs lines 24-25 and 37, re-derived). Line 26's constructor only captures the lambda and never invokes it; line 64 runs inside a `UiThreadDispatcherFixture` transaction that installs a real dispatcher first. Neither is expected to change outcome, but the class is now baselined in P0-T11 and verified in P3-T6 rather than left unexamined.
+15. .csharpierignore — re-derived: it excludes `**/evidence/**`, `*.cobertura.xml`, `*.trx`, `*.csproj`, `*.props`, `*.targets`. Evidence artifacts written by this plan therefore cannot fail the format gate.
+16. .gitignore lines 39 and 144-145 — re-derived: `[Tt]est[Rr]esult*/` ignores the `TestResults/` subdirectories this plan writes, and `coverage/*` (except `coverage/.gitkeep`) ignores the Cobertura outputs. Neither enters the committed footprint asserted in P5-T10. See citation 30 for why both patterns require the forward-slash spelling to take effect.
 17. `coverage.config` — re-derived: it excludes only third-party module paths (Deedle, FSharp, Castle.Core, FluentAssertions, Moq, Microsoft.Testing, MSTest). No first-party production path is excluded, so `UtilitiesCS/Threading/UiThread.cs` is in the coverage denominator and P4-T7's class-node lookup can resolve.
 18. `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/spec.md` lines 249-272 — the AC1..AC7 bullets re-derived verbatim, giving the exact bullet-opening text each P5 check-off task must match. Line range corrected in the revision round 9 pass; see "Citations re-derived in the revision pass of 2026-09-02 (revision round 9, backtick-removal presentation fix)" below for the re-derivation, which supersedes this entry's round-1 "lines 234-257" reading — that reading predated the `## Write Set` section inserted at spec.md lines 77-86.
 19. `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/issue.md` line 8 — the merge base `5ebaaf105d8241f309f704d1ff90af2e32e5a6c1` re-derived as the anchor for every `git diff` in this plan.
-20. `CLAUDE.md` "C# Toolchain" section and `.claude/rules/general-unit-test.md` / `.claude/rules/quality-tiers.md` coverage sections — re-derived, producing the recorded 80/90 versus 85/75 conflict and the rank-1 resolution stated in "Threshold reconciliation" above.
+20. CLAUDE.md "C# Toolchain" section and .claude/rules/general-unit-test.md / .claude/rules/quality-tiers.md coverage sections — re-derived, producing the recorded 80/90 versus 85/75 conflict and the rank-1 resolution stated in "Threshold reconciliation" above.
 
 ### Citations re-derived in the revision pass of 2026-09-02 (revision round 9, backtick-removal presentation fix)
 
@@ -1043,7 +1043,7 @@ this pass and a prior pass observed a superseded scope.
     writes it via `SetValue`. This is the derivation behind P0-T13, P1-T5, and the expanded scope.
 22. `[DoNotParallelize]` occurs in 18 files under `UtilitiesCS.Test`, re-derived this pass. None of
     the three files in citation 21 is among them, so all three are in the parallel bucket at BASE.
-23. `UtilitiesCS.Test/Threading/CurrentStoreContextTests.cs` lines 15-16 — `[TestClass]` then
+23. UtilitiesCS.Test/Threading/CurrentStoreContextTests.cs lines 15-16 — `[TestClass]` then
     `[DoNotParallelize]` on the following line, re-derived as the repository's prevailing two-line
     idiom that P1-T5 follows for two of the three files.
 24. `[TestClass` occurs exactly once in each of the four files P1-T5 and P1-T2 touch, at
@@ -1058,7 +1058,7 @@ this pass and a prior pass observed a superseded scope.
     `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs` 205, and
     `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs` 514. **Sibling finding surfaced by this
     pass and not present in the prior round:** the last of these already exceeds the 500-line limit
-    in `.claude/rules/general-code-change.md` at BASE. A naive "all five files under 500" acceptance
+    in .claude/rules/general-code-change.md at BASE. A naive "all five files under 500" acceptance
     would have been unsatisfiable. P1-T5 therefore uses the combined attribute list for that one
     file, and P2-T3 and P4-T8 record the overage as pre-existing and gate on non-growth instead.
 26. `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs` line 12 declares `namespace
@@ -1074,13 +1074,13 @@ this pass and a prior pass observed a superseded scope.
     the `Dispatcher.PushFrame(frame)` pump. Re-derived this pass; this is the concrete mechanism by
     which a concurrent writer could either observe the post-fix `InvalidOperationException` or leave
     the pumped frame without an exit, and it is what P1-T5 removes from the parallel bucket.
-29. `UtilitiesCS.Test/UtilitiesCS.Test.csproj` lines 476, 478, 489, and 493 — `Compile Include`
+29. UtilitiesCS.Test/UtilitiesCS.Test.csproj lines 476, 478, 489, and 493 — `Compile Include`
     entries for `Threading\ProgressTracker_Tests.cs`, `Threading\ProgressTrackerAsync_Tests.cs`,
     `Threading\IdleAsyncQueue_Tests.cs`, and `Threading\UiThread_Tests.cs`. Re-derived this pass;
     all four files are already wired and already tracked, so the expanded scope requires no
     `.csproj` edit and the single-ref `git diff` form used in P3-T5 and P4-T7 is not blind to any
     file this plan writes.
-30. `.gitignore` line 39 `[Tt]est[Rr]esult*/` and line 144 `coverage/*` — re-derived this pass.
+30. .gitignore line 39 `[Tt]est[Rr]esult*/` and line 144 `coverage/*` — re-derived this pass.
     Both are directory-scoped patterns. A file written to the worktree root as
     `TestResultsp3-t5-source.diff` or `coveragep0-t10.cobertura.xml`, which is what a POSIX shell
     produces from an unquoted backslash-spelled path, matches neither. This is the derivation behind
@@ -1113,7 +1113,7 @@ observations describe the state the plan's first task will actually run in.
     87 and 422 for those two files against a plan asserting 104 and 514. That is the derivation
     behind the `wc -l` idiom now fixed in P0-T13, P2-T3, and P4-T8, and behind P0-T13's explicit
     prohibition on substituting `Measure-Object -Line`.
-35. `global.json` lines 6-10 — `"paths": [".dotnet-sdk", "$host$"]` with the error message `The
+35. global.json lines 6-10 — `"paths": [".dotnet-sdk", "$host$"]` with the error message `The
     repo-local .NET SDK is missing. Run ./scripts/vscode/Install-RepoDotNetSdk.ps1 from the
     repository root...`. Re-derived this pass. `.dotnet-sdk/` does NOT exist in this worktree, also
     re-derived this pass, so every `dotnet` command fails until the bootstrap in P0-T5 runs.
@@ -1123,8 +1123,8 @@ observations describe the state the plan's first task will actually run in.
 37. `C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe` — confirmed present at
     that path this pass. This is what makes P0-T5 step 2 a real command rather than a documented
     shape.
-38. `.github/workflows/ci.yml` line 21-23 delegates format checking to
-    `.github/workflows/_format-check.yml`, whose line 41 runs `dotnet csharpier check .` after
+38. .github/workflows/ci.yml line 21-23 delegates format checking to
+    .github/workflows/_format-check.yml, whose line 41 runs `dotnet csharpier check .` after
     `dotnet tool restore` on line 37. Re-derived this pass. This is the CI-parity command P4-T2
     runs repo-wide, and it is why restricting P4-T1's formatter WRITE scope to the five owned paths
     does not narrow the repository-wide format gate.
@@ -1144,7 +1144,7 @@ Every citation below was re-derived against the working tree in this revision pa
 named file. The tree is still at BASE `5ebaaf105d8241f309f704d1ff90af2e32e5a6c1` with no commit made,
 so these observations describe the state the plan's first task will actually run in.
 
-41. `.gitignore` line 350 is `.dotnet*/`. Re-derived this pass by searching the file for `dotnet`,
+41. .gitignore line 350 is `.dotnet*/`. Re-derived this pass by searching the file for `dotnet`,
     which returns exactly two lines: line 143, a comment about `dotnet-coverage` Cobertura output,
     and line 350, the pattern itself. `.dotnet-sdk/` is therefore already ignored, so P0-T5 step 1's
     bootstrap cannot appear in any porcelain or diff gate later in this plan.
@@ -1160,7 +1160,7 @@ so these observations describe the state the plan's first task will actually run
     the worktree root — the same destination P0-T5 step 1's `unzip -d .dotnet-sdk` writes to.
     Line 56 shows the script's own success marker is `.dotnet-sdk/sdk/8.0.205`, which the extracted
     archive creates. Re-derived this pass.
-44. `global.json` lines 2-11 re-derived this pass: `"version": "8.0.205"`, `"rollForward":
+44. global.json lines 2-11 re-derived this pass: `"version": "8.0.205"`, `"rollForward":
     "latestFeature"`, `"paths": [".dotnet-sdk", "$host$"]`, and the `errorMessage` beginning `The
     repo-local .NET SDK is missing`. This is why P0-T5's acceptance clause — post-bootstrap
     `dotnet --version` beginning `8.0.2` and exiting 0 — is unchanged by replacing the PowerShell
@@ -1194,10 +1194,10 @@ commit made. The worktree now additionally contains gitignored `.dotnet-sdk/`, `
 `Debug` build output left in place by the round-4 reviewer; none of them is a tracked file and none of
 them changes any citation below.
 
-45. `.github/workflows/_build-analyzers.yml` — line 17 sets `SOLUTION_PATH: TaskMaster.sln`, line 45
+45. .github/workflows/_build-analyzers.yml — line 17 sets `SOLUTION_PATH: TaskMaster.sln`, line 45
     runs `nuget restore $env:SOLUTION_PATH` as the step named "Restore solution", and line 50 runs the
-    analyzer `msbuild` immediately after it. Read in full this pass. `.github/workflows/_build-nullable.yml`
-    line 45 and `.github/workflows/_mstest-coverage.yml` line 45 carry the identical restore step.
+    analyzer `msbuild` immediately after it. Read in full this pass. .github/workflows/_build-nullable.yml
+    line 45 and .github/workflows/_mstest-coverage.yml line 45 carry the identical restore step.
     This is the CI-parity citation for the new P0-T5 step 4: every CI gate that builds this solution
     restores NuGet packages first.
 46. `packages.config` exists in 18 project directories across this solution, enumerated this pass:
@@ -1207,12 +1207,12 @@ them changes any citation below.
     `VBFunctions`, and `VBFunctions.Test`. Every one of them is a restore target of P0-T5 step 4, and
     the two that matter directly to this plan — `UtilitiesCS/packages.config` and
     `UtilitiesCS.Test/packages.config` — are among them.
-47. `.gitignore` line 191 is `**/[Pp]ackages/*` and line 193 is `!**/[Pp]ackages/build/`. Re-derived
+47. .gitignore line 191 is `**/[Pp]ackages/*` and line 193 is `!**/[Pp]ackages/build/`. Re-derived
     this pass by reading lines 185-216. The restore output under `packages/` is therefore ignored, with
     the single exception of a `packages/build/` directory, which does not exist in this worktree after
     a completed restore (also re-derived this pass). P0-T5 step 4 states what to do if a fresh-worktree
     restore produces one.
-48. `dotnet-tools.json` exists at the worktree root and no `.config/` directory exists. Re-derived this
+48. dotnet-tools.json exists at the worktree root and no `.config/` directory exists. Re-derived this
     pass. This is why P0-T5 step 4's rationale names the root manifest rather than the conventional
     `.config/` location.
 49. `UtilitiesCS/Threading/UiThread.cs` lines 135-140 re-read again in this pass and still unchanged:
@@ -1221,7 +1221,7 @@ them changes any citation below.
     `private static Dispatcher _dispatcher = null!; // set in Initialize() before any access`.
     The replacement text quoted in "Exact source text this plan will create" still matches the region it
     replaces, and P0-T2's five BLOCKED-clause values are still the values the tree reports.
-50. `.dotnet-sdk/dotnet.exe` is present in this worktree. Re-derived this pass. `.gitignore` line 350
+50. `.dotnet-sdk/dotnet.exe` is present in this worktree. Re-derived this pass. .gitignore line 350
     `.dotnet*/` ignores it (citation 41). Its presence is why P0-T5's `SDK_BOOTSTRAP:` field now accepts
     a `NOT REQUIRED` value: in this worktree the first `dotnet --version` probe succeeds and the
     four-command bootstrap never runs, so there is no post-bootstrap reading to record. In a fresh
@@ -1236,7 +1236,7 @@ changed only how seven tasks source two numeric fields, plus one new constraint 
 redaction rule. (The `Skipped` half of that sourcing rule was itself wrong and was corrected in
 revision round 8; see the round-8 section below.)
 
-51. `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` — searched this pass for `[TestMethod]` and
+51. QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs — searched this pass for `[TestMethod]` and
     for public method declarations. The file declares exactly two `[TestMethod]` attributes, at lines
     23 and 48, whose methods are `public void Construction_YieldsAnIUiDispatcher()` on line 24 and
     `public async Task Invoke_InvokeAsync_BeginInvoke_ExecuteDelegateOnDispatcherThread()` on line 50.
@@ -1244,13 +1244,13 @@ revision round 8; see the round-8 section below.)
     requires to appear as passing in the console output; both names are re-derived here rather than
     carried forward from the round-1 citation, which recorded the two `new WpfUiDispatcher()`
     construction sites (lines 26 and 64) and not the method declarations.
-52. `.gitignore` lines 33-50 read this pass. Line 39 is `[Tt]est[Rr]esult*/` and is directory-scoped,
+52. .gitignore lines 33-50 read this pass. Line 39 is `[Tt]est[Rr]esult*/` and is directory-scoped,
     so `TestResults/p0-t10/`, `TestResults/p0-t11/`, `TestResults/p3-t2/`, `TestResults/p3-t3/`,
     `TestResults/p3-t6/`, `TestResults/p4-t5/`, and `TestResults/p4-t6/` — and every `.trx` file
     inside them — are ignored. Line 44 is the unrelated NUnit pattern `TestResult.xml`. Reading the
     TRX files therefore adds nothing to P5-T10's name-status diff or to any porcelain gate in this
     plan.
-53. `.csharpierignore` read in full this pass (15 lines). Line 8 is `*.trx`, alongside
+53. .csharpierignore read in full this pass (15 lines). Line 8 is `*.trx`, alongside
     `**/evidence/**` on line 4, `*.cobertura.xml` on line 5, `*.coverage` on line 6, `*.coveragexml`
     on line 7, and the project-file exclusions on lines 12-14. The TRX files this round's rule reads
     are outside the format gate, so P4-T2's repo-wide `csharpier check .` cannot report them.
@@ -1270,16 +1270,16 @@ enumerated in "Sibling regions re-checked in the revision round 8 pass" below.
     `private static Dispatcher _dispatcher = null!; // set in Initialize() before any access`. The
     replacement text in "Exact source text this plan will create" still matches the region it
     replaces, and P0-T2's five BLOCKED-clause values are still the values the tree reports.
-55. `.csharpierignore` read in full again this pass (15 lines). Line 8 is `*.trx`, line 4 is
+55. .csharpierignore read in full again this pass (15 lines). Line 8 is `*.trx`, line 4 is
     `**/evidence/**`, line 5 is `*.cobertura.xml`. Every TRX this round's rewritten sourcing rule
     reads remains outside P4-T2's repo-wide `csharpier check .`, including a second `.trx` left in a
     results directory by a re-run, because the pattern is extension-scoped and not name-scoped.
-56. `.gitignore` lines 33-48 re-read this pass. Line 39 is `[Tt]est[Rr]esult*/` and is
+56. .gitignore lines 33-48 re-read this pass. Line 39 is `[Tt]est[Rr]esult*/` and is
     directory-scoped, so every file inside `TestResults/<task>/` is ignored however many `.trx` files
     a re-run leaves there. Line 44 is the unrelated NUnit pattern `TestResult.xml`. The TRX selection
     rule added this round therefore adds nothing to P5-T10's name-status diff or to any porcelain
     gate in this plan.
-57. `QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs` re-searched this pass for `[TestMethod]`
+57. QuickFiler.Test/Controllers/WpfUiDispatcherTests.cs re-searched this pass for `[TestMethod]`
     and for public method declarations: exactly two `[TestMethod]` attributes, at lines 23 and 48,
     on `public void Construction_YieldsAnIUiDispatcher()` at line 24 and
     `public async Task Invoke_InvokeAsync_BeginInvoke_ExecuteDelegateOnDispatcherThread()` at line
@@ -1301,7 +1301,7 @@ as citations to the repository tree.
 
 ### Sibling regions re-checked in the revision round 9 pass
 
-- **The spec.md line-168 `WpfDispatcherYield.cs` backtick leftover was found and fixed in this
+- **The spec.md line-168 WpfDispatcherYield.cs backtick leftover was found and fixed in this
   round.** Round 9's backtick-removal pass converted every other backtick-wrapped
   scope-exclusion/precedent/context-reference path mention in `spec.md` and this plan to plain text,
   but left the `WpfDispatcherYield.cs:64-66` mention inside spec.md's "Error handling and logging
@@ -1317,16 +1317,17 @@ as citations to the repository tree.
   No regression in"), never the AC3 or AC4 bullet in full. P5-T3's opening-fragment quotation of AC3
   was re-derived directly (citation 60 above) and P5-T4's opening-fragment quotation of AC4 ("AC4: No
   regression in") was re-checked against spec.md's current AC4 bullet and still matches.
-- **P5-T9's and P5-T10's backtick-wrapped acceptance-criterion path spans were read and confirmed
-  unaffected by this round's edits.** Both tasks still assert, in backtick-wrapped form, that the
-  committed diff and the anchored name-status diff contain no path under `.claude/`, `.codex/`,
-  `.agents/`, or `config/`. Those are enforcement assertions the executor checks against, not
-  scope-exclusion/precedent/context-reference prose, so round 9's backtick-removal pass correctly left
-  them backtick-wrapped and this pass found no change needed.
+- **P5-T9's and P5-T10's exclusion-assertion path mentions were read and corrected in this round.**
+  Both tasks previously asserted, in backtick-wrapped form, that the committed diff and the anchored
+  name-status diff contain no path under .claude/, .codex/, .agents/, or config/. On
+  re-derivation this pass, that "no path under X" phrasing is itself the exclusion case the
+  delegation's backtick-removal instruction names explicitly, so those spans are now plain text
+  (.claude/, .codex/, .agents/, config/blast-radius.json, config/orchestration-routing.json) rather
+  than backtick-wrapped, matching every other exclusion mention in this plan and in spec.md.
 - **Constraint 5, the TRX selection rule, and the seven TRX-reading tasks (P0-T10, P0-T11, P3-T2,
   P3-T3, P3-T6, P4-T5, P4-T6) were read and confirmed unaffected by round 9's backtick-removal
   edits.** None of the seven task bodies, and neither the constraint-5 sourcing paragraph nor the TRX
-  selection rule that follows it, mentions `WpfDispatcherYield.cs` or any other
+  selection rule that follows it, mentions WpfDispatcherYield.cs or any other
   scope-exclusion/precedent/context-reference file path; each cites only its own vstest command,
   `/ResultsDirectory` value, and the `notExecuted`/`Skipped` sourcing rule already re-derived in the
   revision round 8 pass. No command line, task ID, write-target file, or evidence path in any of the
@@ -1402,7 +1403,7 @@ as citations to the repository tree.
   `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs`,
   `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs`, and
   `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs`.
-  `UtilitiesCS/Threading/ProgressTrackerAsync.cs` remains outside the write-target list. No evidence
+  UtilitiesCS/Threading/ProgressTrackerAsync.cs remains outside the write-target list. No evidence
   path and no command line changed, so the acceptance-criteria mapping table and the `AC-MAPPING:`
   block below are unaffected and were re-read row by row against each other to confirm they still
   agree.
@@ -1464,7 +1465,7 @@ as citations to the repository tree.
   `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs`,
   `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs`, and
   `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs`.
-  `UtilitiesCS/Threading/ProgressTrackerAsync.cs` remains outside the write-target list. No evidence
+  UtilitiesCS/Threading/ProgressTrackerAsync.cs remains outside the write-target list. No evidence
   path changed, so the acceptance-criteria mapping table and the `AC-MAPPING:` block below are
   unaffected and were re-read row by row against each other to confirm they still agree.
 
@@ -1512,7 +1513,7 @@ as citations to the repository tree.
 - **The write-target set was re-read after every edit in this round and is unchanged.** This round
   touched command prefixes, one new toolchain step, two acceptance wordings, one evidence-redaction
   rule, and prose. It added no file to the diff and removed none.
-  `UtilitiesCS/Threading/ProgressTrackerAsync.cs` remains outside the write-target list, and the
+  UtilitiesCS/Threading/ProgressTrackerAsync.cs remains outside the write-target list, and the
   restore step writes only into gitignored `packages/`.
 - **P4-T7's new redaction rule was checked against P4-T7's own acceptance clauses.** Clauses (a) and
   (b) read the intersected line numbers and their `hits` values, which the rule explicitly preserves;
@@ -1564,10 +1565,10 @@ as citations to the repository tree.
   invocation shape would have been available.
 - Phase 0's new introductory paragraph (finding N1) was checked against every porcelain gate in the
   plan. P4-T1's two porcelain spans are deliberately unscoped but are compared before-against-after,
-  so pre-existing `.claude/agent-memory/**` entries appear in both and cancel. P5-T10, P5-T11,
+  so pre-existing .claude/agent-memory/** entries appear in both and cancel. P5-T10, P5-T11,
   P5-T12, and P5-T13 are pathspec-scoped to `UtilitiesCS`, `UtilitiesCS.Test`, and the feature
   folder. P3-T4's porcelain span is scoped to a single file. No gate is affected by the dirty
-  `.claude/` state, which is what the paragraph asserts.
+  .claude/ state, which is what the paragraph asserts.
 - P5-T11, P5-T12, and P5-T13 (finding N2) were rewritten to carry the feature-folder pathspec on
   `git commit` as well as on `git add`, matching P5-T9. P5-T12 previously described its commit only
   in prose; it now has an explicit command block, so all four commit tasks in Phase 5 are stated in
@@ -1575,7 +1576,7 @@ as citations to the repository tree.
   UtilitiesCS.Test`.
 - The five write targets were re-read against the "Scope" section after all of this round's edits.
   The set is unchanged: this round touched only command spellings, commit pathspecs, and prose.
-  `UtilitiesCS/Threading/ProgressTrackerAsync.cs` remains outside the write-target list.
+  UtilitiesCS/Threading/ProgressTrackerAsync.cs remains outside the write-target list.
 
 ### Sibling regions re-checked in the preflight round 3 pass and found consistent
 
