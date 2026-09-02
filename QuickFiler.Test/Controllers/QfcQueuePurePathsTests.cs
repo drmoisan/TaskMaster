@@ -343,17 +343,69 @@ namespace QuickFiler.Controllers.Tests
         /// AC6. The injectable item-controller seam has a production default, so a queue that no
         /// test has configured constructs rows exactly as it did before the seam was introduced.
         /// A null default would make the seam a behaviour change rather than a test affordance.
+        ///
+        /// The default is invoked here rather than merely probed for non-nullity: invoking it is
+        /// what proves the construction expression it wraps still builds a controller and still
+        /// carries the folder handler through. The seam's viewer parameter is the narrow
+        /// <see cref="IItemViewer"/> rather than the concrete WinForms <c>ItemViewer</c> precisely
+        /// so this can be done with a Moq double and no live window, following the same shape as
+        /// <c>QfcItemController_InitializationTests.PredeterminedFolderConstructor_StoresPredeterminedFolder</c>.
         /// </summary>
         [TestMethod]
-        public void ItemControllerFactory_OnAFreshQueue_HasANonNullProductionDefault()
+        public void ItemControllerFactory_DefaultInvocation_BuildsControllerCarryingTheHandler()
         {
+            // Arrange
             QfcQueue queue = NewQueue(CancellationToken.None);
-
             queue
                 .ItemControllerFactory.Should()
                 .NotBeNull(
                     "the seam's production default must preserve the current construction expression"
                 );
+
+            var kbd = new Mock<IQfcKeyboardHandler>();
+            var explorer = new Mock<IQfcExplorerController>();
+            var cts = new CancellationTokenSource();
+            var home = new Mock<IFilerHomeController>();
+            home.SetupGet(h => h.KeyboardHandler).Returns(kbd.Object);
+            home.SetupGet(h => h.ExplorerController).Returns(explorer.Object);
+            home.SetupGet(h => h.TokenSource).Returns(cts);
+            home.SetupGet(h => h.Token).Returns(cts.Token);
+            var viewer = new Mock<IItemViewer>();
+            IFolderSearchHandler carried = new Mock<IFolderSearchHandler>().Object;
+
+            // Act — invoke the production default exactly as LoadControllersViewersAsync does.
+            IQfcItemController controller = queue.ItemControllerFactory(
+                new Mock<IApplicationGlobals>().Object,
+                home.Object,
+                new Mock<IQfcCollectionController>().Object,
+                viewer.Object,
+                3,
+                2,
+                null,
+                null,
+                carried
+            );
+
+            // Assert — a controller was built, wired to the viewer, and given the carried handler.
+            controller.Should().NotBeNull();
+            controller.ItemNumber.Should().Be(3, "the viewer position is passed through unchanged");
+            controller
+                .ItemNumberDigits.Should()
+                .Be(2, "the digit count is passed through unchanged");
+            // IItemViewer.Controller is declared as the narrower QuickFiler.IItemControler, so the
+            // returned IQfcItemController is cast rather than passed directly.
+            viewer.VerifySet(v => v.Controller = (IItemControler)controller, Times.Once());
+            typeof(QfcItemController)
+                .GetField("_carriedFolderHandler", NonPublicInstance)
+                .GetValue(controller)
+                .Should()
+                .BeSameAs(
+                    carried,
+                    "the seam's default must pass the carried handler into the controller, which is "
+                        + "the whole point of widening the construction"
+                );
+
+            cts.Dispose();
         }
 
         #endregion Issue #678 — leg-B carrier resolution

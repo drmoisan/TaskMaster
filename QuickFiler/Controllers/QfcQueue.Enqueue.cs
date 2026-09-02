@@ -34,22 +34,23 @@ namespace QuickFiler.Controllers
             IApplicationGlobals,
             IFilerHomeController,
             IQfcCollectionController,
-            QfcItemGroup,
+            IItemViewer,
             int,
             int,
+            MailItem,
             TlpCellStates,
             IFolderSearchHandler,
             IQfcItemController
         > ItemControllerFactory { get; set; } =
-            (globals, home, parent, grp, viewerPosition, digits, tlpStates, carriedHandler) =>
+            (globals, home, parent, viewer, position, digits, mail, tlpStates, carriedHandler) =>
                 new QfcItemController(
                     appGlobals: globals,
                     homeController: home,
                     parent: parent,
-                    itemViewer: grp.ItemViewer,
-                    viewerPosition: viewerPosition,
+                    itemViewer: viewer,
+                    viewerPosition: position,
                     itemNumberDigits: digits,
-                    grp.MailItem,
+                    mail,
                     tlpStates,
                     carriedFolderHandler: carriedHandler
                 );
@@ -197,9 +198,10 @@ namespace QuickFiler.Controllers
                         appGlobals,
                         homeController,
                         qfcCollectionController,
-                        x.grp,
+                        x.grp.ItemViewer,
                         x.i + 1,
                         digits,
+                        x.grp.MailItem,
                         TlpStates,
                         x.grp.CarriedFolderHandler
                     );
