@@ -71,9 +71,7 @@ namespace QuickFiler.Controllers.Tests
             _mockQfcQueue = new Mock<IQfcQueue>();
 
             _mockGroups = new Mock<IQfcCollectionController>();
-            _mockGroups
-                .Setup(g => g.MoveEmailsAsync(It.IsAny<SloStack<IMovedMailInfo>>()))
-                .Returns(Task.CompletedTask);
+            _mockGroups.Setup(g => g.MoveEmailsAsync()).Returns(Task.CompletedTask);
             _mockGroups.Setup(g => g.CleanupBackground()).Callback(() => Record(CleanupToken));
 
             _gate = new TaskCompletionSource<bool>(
@@ -393,10 +391,7 @@ namespace QuickFiler.Controllers.Tests
                 .IsFaulted.Should()
                 .BeFalse("a null parent is an early return, not an exception");
             moveTask.IsCompleted.Should().BeTrue("the method returns rather than hanging");
-            _mockGroups.Verify(
-                g => g.MoveEmailsAsync(It.IsAny<SloStack<IMovedMailInfo>>()),
-                Times.Never
-            );
+            _mockGroups.Verify(g => g.MoveEmailsAsync(), Times.Never);
         }
 
         /// <summary>
