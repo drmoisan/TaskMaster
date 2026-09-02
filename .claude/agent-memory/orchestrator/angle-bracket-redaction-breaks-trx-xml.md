@@ -29,3 +29,28 @@ fabricated test result.
 **How to apply:** after any evidence scrub, run three checks — case-insensitive account sweep,
 machine/domain token sweep, and an XML parse of every touched file with a counter comparison. Tracked
 repo-wide as issue #671. See [[_shared_no_absolute_host_paths]].
+
+**Recurrence on issue #662, with a new mechanism: the defect was CODIFIED IN THE PLAN.** The
+artifact-hygiene rule in the approved plan *mandated* the four angle-bracket placeholders
+`<repo-root>`, `<user-profile>`, `<user>`, `<host>`, so the executor produced six unparseable TRX
+files by following the plan correctly. This is worse than an executor slip: the plan's own gate
+asserts only `ResidualMatchCount=0`, which measures whether identifiers were *removed* and is fully
+satisfied by a rewrite that destroys the document. A sweep rule that names bracketed placeholders
+will corrupt every XML artifact it touches, on every run, and its gate will report success each time.
+Treat `ResidualMatchCount=0` as necessary and NOT sufficient; the gate needs a companion parse check.
+
+**Repairing an already-committed scrub: escape, do not re-scrub.** Switching to bracket-free tokens
+is right when authoring the rule, but once the redaction is committed the cheap fix is to XML-escape
+the placeholders in the `.trx` files only — `<user>` becomes `&lt;user&gt;`. The parsed attribute
+value is then exactly the placeholder, so redaction is byte-for-byte unchanged and the residual sweep
+still returns zero, while the document parses. A blind textual replace is safe because no TRX element
+is named `repo-root`, `user-profile`, `user` or `host`, so every bracketed occurrence is a
+placeholder rather than markup. Expect a large diff and do not mistake it for a line-ending flip:
+`vstest` writes `storage="<repo-root>\..."` on EVERY test element, so a 33k-line TRX legitimately
+changes ~14k lines. Confirm by comparing line COUNTS on both sides before assuming CRLF damage.
+Cobertura `.xml` is unaffected — its rewritten `filename` attributes are repo-relative paths with no
+angle brackets.
+
+**The parse check is also free corroboration.** Parsing the repaired TRX let me read the
+`<Counters/>` elements directly and confirm the added test raised the passed count by exactly one,
+which verified three acceptance criteria from primary data instead of from a subagent's prose.
