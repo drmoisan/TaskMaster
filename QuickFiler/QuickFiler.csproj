@@ -331,6 +331,7 @@
     <Compile Include="Controllers\QfcItemController.cs" />
     <Compile Include="Controllers\QfcItemController.Initialization.cs" />
     <Compile Include="Controllers\QfcItemController.ViewerSetup.cs" />
+    <Compile Include="Controllers\QfcItemController.WebViewFaultBoundary.cs" />
     <Compile Include="Controllers\QfcItemController.Conversation.cs" />
     <Compile Include="Controllers\QfcItemController.FolderHandling.cs" />
     <Compile Include="Controllers\QfcItemController.EventWiring.cs" />

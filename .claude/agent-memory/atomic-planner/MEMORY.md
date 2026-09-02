@@ -31,6 +31,7 @@
 - [#662 R3](project_662_round3_trx_hygiene_and_verbatim_seams.md) — `*.trx` is NOT gitignored; sweep case-insensitively; exclude the plan file from the sweep's own zero-hit gate
 - [#662 R2](project_662_banner_prefix_revision_round_seams.md) — `'*.xml'` scope gate hits the plan's own cobertura evidence; loop-restart needs a baseline-relative failure test
 - [#663](project_663_qfc_alt_chord_plan_seams.md) — defect-preserving seam turns compile-red into runtime red; derive named-test outcomes from totals
+- [#670](project_670_capture_time_sanitisation_seams.md) — a script that echoes a vswhere-resolved path leaks via an *indirect* invoker; gate sanitisation at capture time
 - [#680](project_680_menu_mode_plan_seams.md) — HostTests.cs 499 not 500; TRX 5-shape identifiers, `grep -a`; exact line arithmetic
 
 ## Plan-structure traps
@@ -42,6 +43,7 @@
 - [Fenced `#` comments look like headings](plan-fenced-powershell-comments-look-like-headings.md) — indent column-0 `#` inside code fences
 - [One AC per check-off task](feedback_ac_checkoff_one_per_task.md) — preflight rejects batched AC check-offs
 - [Terminal-phase planner traps](terminal-phase-planner-traps.md) — unowned follow-ups; artifacts written after the clean-tree commit task
+- [A reviewer's enumeration may be deliberately narrow](reviewer-enumeration-may-be-deliberately-narrow.md) — omitted IDs are often bound by a sibling clause; "completing" the list can falsify its trailing predicate
 - [Never plan a mid-plan halt on MCP availability](never-plan-a-mid-plan-halt-on-mcp-availability.md) — Phase 0 probe + record-and-continue
 - [Thread granted discharges through consumers](thread-granted-discharges-through-consumers.md) — softening one task strands its discharge
 - [Durable script copy into feature folder](durable-script-copy-into-feature-folder.md) — copy scratchpad scripts into `<FEATURE>/scripts/`

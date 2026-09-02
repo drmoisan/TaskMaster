@@ -189,7 +189,7 @@ namespace QuickFiler.Controllers
             WireEvents();
 
             // Fire and forget WebView initialization
-            _ = _itemViewer.UiDispatcher.InvokeAsync(InitializeWebViewAsync);
+            _ = _itemViewer.UiDispatcher.InvokeAsync(InitializeWebViewGuardedAsync);
             //Task.Run(() => InitializeWebViewAsync());
         }
 
@@ -285,7 +285,7 @@ namespace QuickFiler.Controllers
             await ToggleTipsAsync(desiredState: Enums.ToggleState.Off | Enums.ToggleState.Force);
             await ToggleNavigationAsync(desiredState: Enums.ToggleState.Off);
             WireEvents();
-            _ = InitializeWebViewAsync();
+            _ = InitializeWebViewGuardedAsync();
         }
 
         // #230: de-exempted. The former barrier was the missing WinForms message pump, not headless
@@ -321,7 +321,7 @@ namespace QuickFiler.Controllers
             await ToggleNavigationAsync(desiredState: Enums.ToggleState.Off);
             WireEvents();
 
-            _ = InitializeWebViewAsync();
+            _ = InitializeWebViewGuardedAsync();
         }
 
         //public async Task InitializeSequentialAsync()

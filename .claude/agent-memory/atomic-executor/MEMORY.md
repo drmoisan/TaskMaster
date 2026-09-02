@@ -1,6 +1,7 @@
 # Atomic Executor Memory Index
 
 ## Plan validation & gates
+- [Mid-plan commit needs a capture-time sanitisation gate](project_midplan_commit_needs_capture_time_sanitisation_gate.md) — a final whole-tree sweep cannot reach an earlier commit
 - [Blocked Bash command drops chained check-off](project_blocked_bash_command_silently_drops_chained_checkoff.md) — aborts the WHOLE command
 - [CSharpier chain-wrap defeats single-line search gates](project_csharpier_chain_wrap_defeats_singleline_search_gates.md) — zero-hit gate
 - [Verify line citations with numbered output](feedback_verify_line_citations_with_numbered_output.md) — never hand-count
@@ -70,6 +71,7 @@
 - [Async state machine emits no `<method>` element](project_async_state_machine_emits_no_method_element.md) — `.//line` double-counts
 - [First-party coverage denominator (#197)](project_coverage_firstparty_denominator_method.md) · [dotnet-coverage denominator nondeterminism](project_dotnet_coverage_denominator_nondeterminism.md) — 47% vs 81%
 - [Failed coverage run leaves RAW Cobertura](project_failed_coverage_run_leaves_raw_unprocessed_cobertura.md) · [Koverage Cobertura post-processing shape](project_koverage_cobertura_postprocessing_shape.md)
+- [Coverage runner throws before post-processing](project_coverage_runner_throws_before_postprocessing.md) — a red suite leaves a RAW cobertura; not comparable with a processed one
 - [C# canonical coverage artifact conversion](project_csharp_canonical_coverage_artifact_conversion.md) · [Cobertura runsettings `<Attributes>` override](project_cobertura_runsettings_attributes_override.md)
 - [Cobertura hits vs MS-coverage partial](project_changed_line_coverage_cobertura_vs_mscoverage_partial.md) · [QFC #227 coverage tooling](project_qfc227_coverage_tooling.md)
 - [#398 test-split gate gotchas](project_398_test_split_gate_gotchas.md) · [ExcludeFromCodeCoverage on partial = CS0579](project_excludefromcodecoverage_partial_class_cs0579.md)

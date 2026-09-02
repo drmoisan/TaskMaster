@@ -49,3 +49,19 @@ finds compensates. See [[bootstrapping-orchestrator-state-json-first-write]] for
 The real defect is upstream: the file should never have been committed. Worth its own issue if it
 recurs. Related: [[bootstrapping-orchestrator-state-json-first-write]],
 [[model-routing-hook-reads-canonical-path-only]], [[stale-base-anchor-passes-ancestry-vacuously]].
+
+**You cannot simply leave the inherited file alone (verified 2026-09-01, #670 preparation resume).**
+The committed content on `main` belongs to whatever run last force-added it — on that resume it was
+issue #469's CI-format-recovery state, a completely unrelated objective. That is not merely untidy:
+`enforce-model-routing-receipt.ps1` reads this exact path and requires a `model_routing_receipts[]`
+entry whose `agent` equals the `subagent_type` being delegated, so **every** `Agent(atomic-planner)`
+and `Agent(atomic-executor)` call is denied `MODEL_ROUTING_RECEIPT_BLOCKED` until you write your own
+checkpoint. The inherited #469 file carries `codex_model_routing_receipts` (the Codex-topology
+spelling), which does **not** satisfy the hook — it scans `model_routing_receipts` only.
+
+The working sequence is: `git update-index --skip-worktree` the path FIRST, then overwrite it with
+your own checkpoint. The flag makes the overwrite invisible to `git status` and to
+`git diff --name-only`, so the branch footprint stays exactly the plan and evidence you intended, and
+the shared `main` content is never modified. Confirmed across five delegations and four checkpoint
+edits: `git status --porcelain` never once listed the path. Record the flag in the checkpoint `notes`
+so a later reader does not mistake the clean status for evidence the file is untracked.

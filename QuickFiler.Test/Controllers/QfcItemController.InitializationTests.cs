@@ -54,6 +54,58 @@ namespace QuickFiler.Controllers.Tests
             return home;
         }
 
+        /// <summary>
+        /// #670 shared arrange helper: wires a harness controller to the faulting
+        /// <c>IWebViewCoreInitializer</c> mock and to an <c>IItemViewer</c> whose
+        /// <c>UiSyncContext</c> returns <paramref name="context"/>. The caller must install that
+        /// same context as <c>SynchronizationContext.Current</c> before awaiting the guard, so the
+        /// await at <c>ViewerSetup.cs:64</c> continues inline and execution reaches the mocked seam.
+        /// </summary>
+        private static HarnessController BuildGuardedWebViewTarget(SynchronizationContext context)
+        {
+            HarnessController controller = new HarnessController();
+            QfcItemControllerTestSupport.SetField(
+                controller,
+                "_webViewInitializer",
+                BuildWebViewInitializerMock().Object
+            );
+            Mock<IItemViewer> viewer = new Mock<IItemViewer>();
+            viewer.SetupGet(v => v.UiSyncContext).Returns(context);
+            QfcItemControllerTestSupport.SetField(controller, "_itemViewer", viewer.Object);
+            return controller;
+        }
+
+        /// <summary>
+        /// #670: cooperative cancellation during teardown is not a fault. <c>InitializeWebViewAsync</c>
+        /// opens with <c>Token.ThrowIfCancellationRequested()</c> before any seam call, so a
+        /// pre-cancelled token reaches the guard's <c>OperationCanceledException</c> arm
+        /// deterministically, and the sink must not be invoked.
+        /// </summary>
+        [TestMethod]
+        public async Task InitializeWebViewGuardedAsync_WhenTheTokenIsAlreadyCanceled_DoesNotInvokeTheSink()
+        {
+            // Arrange
+            HarnessController controller = BuildGuardedWebViewTarget(new SynchronizationContext());
+            bool sinkInvoked = false;
+            controller.WebViewInitializationErrorSink = (message, exception) => sinkInvoked = true;
+            using (CancellationTokenSource source = new CancellationTokenSource())
+            {
+                source.Cancel();
+                controller.Token = source.Token;
+
+                // Act
+                Func<Task> act = () => controller.InitializeWebViewGuardedAsync();
+
+                // Assert
+                await act.Should()
+                    .NotThrowAsync(because: "cancellation is swallowed, not surfaced")
+                    .ConfigureAwait(false);
+                sinkInvoked
+                    .Should()
+                    .BeFalse(because: "cooperative cancellation is not a fault to report");
+            }
+        }
+
         [TestMethod]
         public void PrimaryConstructor_AssignsFieldsAndSetsControllerBackReference()
         {
