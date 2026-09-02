@@ -1,12 +1,12 @@
 # P2-T12 — Final toolchain clean-pass declaration (AC19)
 
-Timestamp: 2026-09-02T00-28
+Timestamp: 2026-09-01T23-20
 
 ## The five commands of the final pass, in order
 
 ### 1. Format apply (P2-T1)
 
-- Timestamp: 2026-09-02T00-05
+- Timestamp: 2026-09-01T22-42
 - Command: `dotnet tool run csharpier format .`
 - EXIT_CODE: 0
 - Output Summary: `Formatted 1574 files in 2132ms.` `git status --porcelain` taken immediately before
@@ -17,7 +17,7 @@ Timestamp: 2026-09-02T00-28
 
 ### 2. Format verify (P2-T2) — AC19 gate 1
 
-- Timestamp: 2026-09-02T00-06
+- Timestamp: 2026-09-01T22-42
 - Command: `dotnet tool run csharpier check .`
 - EXIT_CODE: 0
 - Output Summary: `Checked 1574 files in 4846ms.` No file was reported as needing formatting; the
@@ -26,7 +26,7 @@ Timestamp: 2026-09-02T00-28
 
 ### 3. Analyzer build (P2-T3) — AC19 gate 2
 
-- Timestamp: 2026-09-02T00-07
+- Timestamp: 2026-09-01T22-43
 - Command: `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
 - EXIT_CODE: 0
 - Output Summary: `5 Warning(s)`, `0 Error(s)`. The warning count equals the
@@ -36,7 +36,7 @@ Timestamp: 2026-09-02T00-28
 
 ### 4. Nullable build (P2-T4) — AC19 gate 3
 
-- Timestamp: 2026-09-02T00-08
+- Timestamp: 2026-09-01T22-43
 - Command: `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
 - EXIT_CODE: 0
 - Output Summary: `5 Warning(s)`, `0 Error(s)`. No `CS86` diagnostic was reported, matching the empty
@@ -45,7 +45,7 @@ Timestamp: 2026-09-02T00-28
 
 ### 5. MSTest run with coverage (P2-T5) — AC19 gate 4
 
-- Timestamp: 2026-09-02T00-10
+- Timestamp: 2026-09-01T23-03
 - Command: `pwsh -NoProfile -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot .`
 - EXIT_CODE: 0
 - Output Summary: `Test Run Successful.` `Total tests: 6946`, `Passed: 6946`, `Failed: 0`,

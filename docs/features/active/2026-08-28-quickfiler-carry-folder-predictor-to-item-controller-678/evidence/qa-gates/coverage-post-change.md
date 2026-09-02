@@ -1,6 +1,6 @@
 # P2-T6 — Post-change coverage figures
 
-Timestamp: 2026-09-01T23-58
+Timestamp: 2026-09-01T23-17
 
 Report read: `coverage/coverage.cobertura.xml`, written by the P2-T5 run of the final toolchain pass.
 

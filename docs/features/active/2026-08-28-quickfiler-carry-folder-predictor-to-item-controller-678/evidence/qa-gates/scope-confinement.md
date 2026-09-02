@@ -1,6 +1,6 @@
 # P2-T11 — Scope confinement (AC23)
 
-Timestamp: 2026-09-02T00-24
+Timestamp: 2026-09-01T23-20
 
 ## Commands, in order
 

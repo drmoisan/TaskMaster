@@ -147,6 +147,79 @@ namespace QuickFiler.Controllers
         /// no handler to publish.
         /// </summary>
         public IFolderSearchHandler FolderHandler { get; }
+
+        /// <summary>
+        /// Resolves the carrier that belongs to <paramref name="mailItem"/>, or null when no
+        /// carrier list was supplied or none of its entries matches. A carrier is matched first by
+        /// reference identity and then by <c>EntryID</c>. Reference identity is tried first because
+        /// the happy path builds the item list directly from the carriers' own mail items, so the
+        /// two are literally the same instances, and because a mail item whose <c>EntryID</c> is
+        /// null or empty would otherwise be unmatchable.
+        /// </summary>
+        /// <param name="preScored">The carrier list. Null or empty yields null.</param>
+        /// <param name="mailItem">The item to resolve. Null yields null.</param>
+        /// <returns>The matching carrier, or null when none matches.</returns>
+        internal static QfcPreScoredItem? ResolveCarrier(
+            IList<QfcPreScoredItem> preScored,
+            MailItem mailItem
+        )
+        {
+            if (preScored is null || preScored.Count == 0 || mailItem is null)
+            {
+                return null;
+            }
+
+            string entryId = mailItem.EntryID;
+            foreach (QfcPreScoredItem carrier in preScored)
+            {
+                if (ReferenceEquals(carrier.MailItem, mailItem))
+                {
+                    return carrier;
+                }
+                if (
+                    !string.IsNullOrEmpty(entryId)
+                    && carrier.MailItem is not null
+                    && carrier.MailItem.EntryID == entryId
+                )
+                {
+                    return carrier;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Issue #678 R1. Reconciles a carrier list against the item list that actually survived
+        /// <c>UnhookDequeuedNodes</c>, returning one carrier per surviving item in item order.
+        /// <c>QfcDequeueBatch.PreScored</c> is captured BEFORE the unhook pass and
+        /// <c>QfcDequeueBatch.Items</c> after it, and <c>QfcDatamodel.TryUnhookOrReplace</c> mutates
+        /// on the <c>UnhookItem</c> throw path: it removes the failed item and inserts a substitute
+        /// pulled from the master queue. Consuming <c>PreScored</c> directly would therefore display
+        /// an item that is still hooked to the <c>EmailMoveMonitor</c> and silently lose a
+        /// substitute that has already left the master queue.
+        ///
+        /// An item with no matching carrier gets a bare carrier rather than a fabricated one: the
+        /// constructor coerces <c>PredeterminedFolder</c> to <see cref="string.Empty"/> and leaves
+        /// <c>FolderHandler</c> null, so the item controller falls back to its own scoring pass and
+        /// to index-1 selection, which is the pre-#678 behaviour for a row with no carrier.
+        /// </summary>
+        /// <param name="items">The post-unhook item list, which defines the result order.</param>
+        /// <param name="preScored">The pre-unhook carrier list used as a lookup table.</param>
+        /// <returns>One carrier per element of <paramref name="items"/>, in item order.</returns>
+        internal static IList<QfcPreScoredItem> ReconcileCarriersToItems(
+            IList<MailItem> items,
+            IList<QfcPreScoredItem> preScored
+        )
+        {
+            IList<MailItem> spine = items ?? new List<MailItem>();
+            var reconciled = new List<QfcPreScoredItem>(spine.Count);
+            foreach (MailItem item in spine)
+            {
+                reconciled.Add(ResolveCarrier(preScored, item) ?? new QfcPreScoredItem(item, null));
+            }
+            return reconciled;
+        }
     }
 
     /// <summary>

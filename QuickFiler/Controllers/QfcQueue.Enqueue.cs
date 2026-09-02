@@ -60,8 +60,11 @@ namespace QuickFiler.Controllers
         /// handler the dequeue-time confidence gate already initialised for each accepted item
         /// (issue #678); it is null or empty outside high-confidence mode, in which case every row
         /// is constructed exactly as before and the item controller performs its own scoring pass.
-        /// Carriers are matched to items by <c>EntryID</c> rather than by position, because
-        /// <c>UnhookDequeuedNodes</c> can replace an element of the item list in place.
+        /// Carriers are matched to items first by reference identity and then by <c>EntryID</c>,
+        /// rather than by position, because <c>UnhookDequeuedNodes</c> can replace an element of the
+        /// item list in place. #678 R1b: identity is tried first because the happy path builds the
+        /// item list from the carriers' own mail items, so an item whose <c>EntryID</c> is null or
+        /// empty is still matchable.
         /// The parameter is required rather than optional so that a Moq setup or verification can
         /// name it in an expression tree, which C# forbids for an omitted optional argument.
         /// </summary>
@@ -136,36 +139,17 @@ namespace QuickFiler.Controllers
 
         /// <summary>
         /// Resolves the folder search handler carried for <paramref name="mailItem"/>, or null when
-        /// no carrier list was supplied or none of its entries matches. Matching is by
-        /// <c>EntryID</c>: a null or empty carrier list, a null mail item, and a mail item absent
-        /// from the list all yield null, which is the pre-#678 behaviour for every row.
+        /// no carrier list was supplied or none of its entries matches. A carrier is matched first
+        /// by reference identity and then by <c>EntryID</c>: a null or empty carrier list, a null
+        /// mail item, and a mail item absent from the list all yield null, which is the pre-#678
+        /// behaviour for every row. #678 R1a: the matching body itself now lives on
+        /// <see cref="QfcPreScoredItem.ResolveCarrier"/>, so exactly one implementation of it
+        /// exists in the tree and leg A and leg B cannot drift apart.
         /// </summary>
         internal static IFolderSearchHandler ResolveCarriedHandler(
             IList<QfcPreScoredItem> preScored,
             MailItem mailItem
-        )
-        {
-            if (preScored is null || preScored.Count == 0 || mailItem is null)
-            {
-                return null;
-            }
-
-            string entryId = mailItem.EntryID;
-            if (string.IsNullOrEmpty(entryId))
-            {
-                return null;
-            }
-
-            foreach (var carrier in preScored)
-            {
-                if (carrier.MailItem is not null && carrier.MailItem.EntryID == entryId)
-                {
-                    return carrier.FolderHandler;
-                }
-            }
-
-            return null;
-        }
+        ) => QfcPreScoredItem.ResolveCarrier(preScored, mailItem)?.FolderHandler;
 
         private ValueTask<List<QfcItemGroup>> LoadControllersViewersAsync(
             IList<MailItem> items,

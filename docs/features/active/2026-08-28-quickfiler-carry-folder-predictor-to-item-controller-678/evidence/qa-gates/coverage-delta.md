@@ -1,6 +1,6 @@
 # P2-T7 — Changed-line and new-member coverage (AC20)
 
-Timestamp: 2026-09-02T00-02
+Timestamp: 2026-09-01T23-17
 
 Derived by joining Derivation D5 (added production lines relative to the base ref
 `807fb0bb6e5e49f43efa6b256b05960bf078ca19`, scoped to `QuickFiler`) to Derivation D6 (the per-line

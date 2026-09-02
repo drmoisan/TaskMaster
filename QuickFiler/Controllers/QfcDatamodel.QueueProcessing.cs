@@ -166,7 +166,13 @@ namespace QuickFiler.Controllers
         /// Issue #446 and Scope 427-A. The high-confidence dequeue with the gate's outcome intact.
         /// <see cref="QfcDequeueBatch.Items"/> is taken from the same accepted set as
         /// <see cref="QfcDequeueBatch.PreScored"/>, after <see cref="UnhookDequeuedNodes"/> has run
-        /// over it, so the two collections describe one dequeue rather than two.
+        /// over it. #678 R1: that correspondence holds on the happy path only. On the
+        /// <c>UnhookItem</c> throw path <see cref="TryUnhookOrReplace"/> (:31-66) removes the failed
+        /// item and inserts a substitute pulled from the master queue, so <c>PreScored</c> can name
+        /// an item absent from <c>Items</c> and <c>Items</c> can name an item absent from
+        /// <c>PreScored</c>. Leg A reconciles the two at the load boundary through
+        /// <see cref="QfcPreScoredItem.ReconcileCarriersToItems"/>; leg B already resolves per row
+        /// from the item spine.
         /// </summary>
         private async Task<QfcDequeueBatch> DequeueWithHighConfidenceGateWithOutcomeAsync(
             int quantity,

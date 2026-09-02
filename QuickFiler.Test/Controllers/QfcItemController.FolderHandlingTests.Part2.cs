@@ -219,7 +219,11 @@ namespace QuickFiler.Controllers.Tests
             QfcItemController
                 .ProjectPredeterminedFolder(@"\\Archive\Projects\Active", string.Empty)
                 .Should()
-                .Be(@"\\Archive\Projects\Active", "an empty archive root is the identity");
+                .Be(
+                    @"\Archive\Projects\Active",
+                    "a non-null globals with an EMPTY archive root gives FolderPredictor an "
+                        + "archivePrefix of one separator, which it strips"
+                );
             QfcItemController
                 .ProjectPredeterminedFolder(null, @"\\Archive")
                 .Should()
@@ -236,6 +240,115 @@ namespace QuickFiler.Controllers.Tests
                 .ProjectPredeterminedFolder(@"\\ARCHIVE\Projects", @"\\archive")
                 .Should()
                 .Be(@"Projects", "the prefix comparison is case-insensitive");
+        }
+
+        /// <summary>
+        /// Issue #678, remediation R2. The boundary case the projection previously got wrong: a
+        /// non-null globals whose <c>ArchiveRootPath</c> is EMPTY, with a leading-separator
+        /// suggestion path. <c>FolderPredictor.ProjectSuggestionPath</c> guards only on
+        /// <c>_globals is null</c> and then forms <c>ArchiveRootPath + "\\"</c> unconditionally, so
+        /// in this state its prefix is a single separator and its <c>FolderArray</c> entries ARE
+        /// stripped. The carried <c>PredeterminedFolder</c> must be projected the same way, or
+        /// <c>FolderContains</c> misses and the selection falls back to the index-1 entry — the
+        /// exact AC12 defect the change set out to close.
+        ///
+        /// The assertion is made at the <c>FolderContains</c> boundary rather than on the equality
+        /// of two helper bodies, because that boundary is what decides whether the row shows the
+        /// predetermined folder or an arbitrary index-1 suggestion.
+        /// </summary>
+        [TestMethod]
+        public void AssignFolderComboBox_WhenEmptyArchiveRootAndLeadingSeparator_PreselectsProjectedFolder()
+        {
+            // Arrange
+            const string RawSuggestion = @"\Projects\Active";
+            const string ProjectedSuggestion = @"Projects\Active";
+
+            var mock = new Mock<IItemViewer>();
+            mock.SetupGet(v => v.InvokeRequired).Returns(false);
+            mock.Setup(v => v.FolderContains(ProjectedSuggestion)).Returns(true);
+            mock.Setup(v => v.GetSelectedFolder()).Returns(ProjectedSuggestion);
+
+            var globals = new Mock<IApplicationGlobals>();
+            globals.SetupGet(g => g.Ol.ArchiveRootPath).Returns(string.Empty);
+
+            var controller = new FolderController();
+            SetPrivate(controller, "_itemViewer", mock.Object);
+            SetPrivate(controller, "_globals", globals.Object);
+            SetPrivate(controller, "_predeterminedFolder", RawSuggestion);
+            SetPrivate(
+                controller,
+                "_folderHandler",
+                BuildFolderHandlerWithArray(@"\\A\header", @"\\A\top", ProjectedSuggestion)
+            );
+
+            // Act
+            controller.AssignFolderComboBox();
+
+            // Assert
+            mock.Verify(
+                v => v.SetFolderSelectedItem(ProjectedSuggestion),
+                Times.Once(),
+                "an empty archive root still strips the leading separator in FolderPredictor, so "
+                    + "the carried value must be stripped the same way to match"
+            );
+            mock.Verify(
+                v => v.SetFolderSelectedIndex(It.IsAny<int>()),
+                Times.Never(),
+                "falling back to index selection is the defect this remediation removes"
+            );
+        }
+
+        /// <summary>
+        /// Issue #678, remediation R3. Every pre-change route into the predictor ran inside
+        /// <c>await Task.Run(..., cancel)</c>, which returns a cancelled task for an
+        /// already-cancelled token, so the await threw an <c>OperationCanceledException</c> and
+        /// <c>_folderHandler</c> was never assigned. The carried-handler adoption branch added by
+        /// this change bypassed that route entirely and returned normally, silently adopting the
+        /// handler for work the caller had already cancelled.
+        ///
+        /// The invariant is that an already-cancelled token produces the same observable outcome on
+        /// the adoption path as it did on the pre-change path: the exception propagates and
+        /// <c>_folderHandler</c> is not assigned.
+        /// </summary>
+        [TestMethod]
+        public async Task LoadFolderHandlerAsync_WhenCarriedHandlerAndCancelledToken_ObservesCancellation()
+        {
+            // Arrange
+            var controller = new FolderController();
+            SetPrivate(controller, "_globals", new Mock<IApplicationGlobals>().Object);
+            var factory = BuildThrowingPredictorFactoryMock();
+            SetPrivate(controller, "_folderPredictorFactory", factory.Object);
+            SetPrivate(
+                controller,
+                "_carriedFolderHandler",
+                new Mock<IFolderSearchHandler>().Object
+            );
+
+            // A using STATEMENT rather than a using declaration: QuickFiler.Test compiles at
+            // C# 7.3, where a using declaration is CS8370.
+            using (var cancelled = new CancellationTokenSource())
+            {
+                cancelled.Cancel();
+
+                // Act
+                Func<Task> act = () => controller.LoadFolderHandlerAsync(cancelled.Token);
+
+                // Assert
+                await act.Should()
+                    .ThrowAsync<OperationCanceledException>(
+                        "the pre-change Task.Run(..., cancel) route threw for an already-cancelled "
+                            + "token, and the adoption path must reproduce that outcome"
+                    );
+                QfcItemControllerTestSupport
+                    .GetField(controller, "_folderHandler")
+                    .Should()
+                    .BeNull("a cancelled request must not adopt the carried handler");
+                VerifyFactoryTimes(
+                    factory,
+                    Times.Never(),
+                    "cancellation is observed before any predictor construction is attempted"
+                );
+            }
         }
     }
 }

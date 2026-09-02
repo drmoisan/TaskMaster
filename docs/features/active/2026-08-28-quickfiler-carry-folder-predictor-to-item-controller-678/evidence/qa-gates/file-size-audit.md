@@ -1,6 +1,6 @@
 # P2-T10 — File-size audit (AC21)
 
-Timestamp: 2026-09-02T00-18
+Timestamp: 2026-09-01T23-19
 
 Run **after** P2-T1, because CSharpier reflow changes line counts; every count below is a post-format
 count taken from the tree that passed the final toolchain loop.

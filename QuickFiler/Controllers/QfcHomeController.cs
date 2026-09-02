@@ -304,7 +304,14 @@ namespace QuickFiler.Controllers
                     scanProgress.Report
                 );
                 listEmail = batch.Items;
-                preScored = batch.PreScored;
+                // #678 R1: reconcile against Items, which is the post-unhook set. PreScored is
+                // captured before UnhookDequeuedNodes and diverges from it on the UnhookItem throw
+                // path, so consuming it directly would display a still-hooked item and lose the
+                // substitute that replaced it.
+                preScored = QfcPreScoredItem.ReconcileCarriersToItems(
+                    batch.Items,
+                    batch.PreScored
+                );
             }
 
             progress.Report(30, "Initializing Qfc Items");

@@ -1,6 +1,6 @@
 # P2-T15 — Final commit and clean worktree
 
-Timestamp: 2026-09-02T00-46
+Timestamp: 2026-09-01T23-25
 
 This is the last task of the plan. No evidence artifact is written after it.
 

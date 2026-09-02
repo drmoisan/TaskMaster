@@ -67,6 +67,15 @@ namespace QuickFiler.Controllers
                 // per-item scoring pass, so a carried handler is never valid there.
                 if (_carriedFolderHandler is not null)
                 {
+                    // #678 R3: the cancellation observation sits INSIDE this branch rather than at
+                    // the top of the member. Every pre-change route reached the predictor through
+                    // await Task.Run(..., cancel) below, inside the try that follows this branch,
+                    // so an already-cancelled token surfaced as an OperationCanceledException that
+                    // the catch (System.Exception e) logged through logger.Error before rethrowing.
+                    // Hoisting the throw to the top of the member would place it before that try
+                    // and silently remove that logger.Error for the FromField route, which is a
+                    // second behaviour change this remediation is not authorised to make.
+                    cancel.ThrowIfCancellationRequested();
                     _folderHandler = _carriedFolderHandler;
                     logger.Debug(
                         $"Probability debug [QfcItemController.LoadFolderHandlerAsync (carried)] "
@@ -221,7 +230,7 @@ namespace QuickFiler.Controllers
                 // which this change may not modify.
                 string predetermined = ProjectPredeterminedFolder(
                     _predeterminedFolder,
-                    _globals?.Ol?.ArchiveRootPath
+                    _globals is null ? null : (_globals.Ol?.ArchiveRootPath ?? string.Empty)
                 );
                 if (
                     !string.IsNullOrEmpty(predetermined)
@@ -242,17 +251,27 @@ namespace QuickFiler.Controllers
 
         /// <summary>
         /// #678 AC12. Projects a raw suggestion path onto the form <c>FolderPredictor.FolderArray</c>
-        /// stores, so a containment probe against the combo box can match. The projection mirrors
-        /// <c>FolderPredictor.ProjectSuggestionPath</c> exactly: strip
+        /// stores, so a containment probe against the combo box can match: strip
         /// <paramref name="archiveRootPath"/> plus a trailing separator from the front of
         /// <paramref name="folderPath"/>, case-insensitively, but only when the remainder is
-        /// non-empty. A null or empty archive root, which is the state in every non-high-confidence
-        /// path and in tests that supply no globals, returns the input unchanged, so the pre-change
-        /// selection behaviour is preserved exactly for those cases.
+        /// non-empty. #678 R2: the projection mirrors <c>FolderPredictor.ProjectSuggestionPath</c>
+        /// for every non-null <paramref name="folderPath"/> and non-null
+        /// <paramref name="archiveRootPath"/>. A NULL <paramref name="archiveRootPath"/> stands for
+        /// that member's <c>_globals is null</c> guard and yields the identity; an EMPTY one does
+        /// not, because that member forms its prefix unconditionally and so strips a single leading
+        /// separator in that state.
+        ///
+        /// Two divergences from that member remain and are deliberate, and both are null-safety
+        /// differences rather than projection differences. First, a null or empty
+        /// <paramref name="folderPath"/> is returned unchanged rather than dereferenced;
+        /// <c>ProjectSuggestionPath</c> does not guard it because its input comes from
+        /// <c>Suggestions</c>. Second, a non-null globals with a null <c>Ol</c> is treated by the
+        /// call site as an empty archive root rather than reproducing that member's null
+        /// dereference.
         /// </summary>
         internal static string ProjectPredeterminedFolder(string folderPath, string archiveRootPath)
         {
-            if (string.IsNullOrEmpty(folderPath) || string.IsNullOrEmpty(archiveRootPath))
+            if (string.IsNullOrEmpty(folderPath) || archiveRootPath is null)
             {
                 return folderPath;
             }

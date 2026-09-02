@@ -155,6 +155,7 @@
     <Compile Include="Controllers\QfcCollectionControllerTests.Part2.cs" />
     <Compile Include="Controllers\QfcHomeControllerIterationTests.Part2.cs" />
     <Compile Include="Controllers\QfcHomeControllerRunAsyncHighConfidenceTests.Part2.cs" />
+    <Compile Include="Controllers\QfcHomeControllerRunAsyncHighConfidenceTests.Part3.cs" />
     <Compile Include="Controllers\QfcFormControllerTests.Part2.cs" />
     <Compile Include="Controllers\QfcStreamingDequeueConfidenceGateTests.cs" />
     <Compile Include="Controllers\QfcStreamingDequeueConfidenceGateTests.Part2.cs" />
