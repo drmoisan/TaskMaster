@@ -3,7 +3,7 @@
 - **Issue:** #729
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-02T10-05
+- **Last Updated:** 2026-09-02T21-00
 - **Status:** Ready for Planning
 - **Version:** 1.0
 - **Work Mode:** full-bug — this spec is the sole acceptance-criteria source. No user-story.md is produced for this item.
@@ -36,7 +36,7 @@ Per this repo's own determinism-infrastructure policy: tests use an injected `Ti
 Actual:
 **1. `NonBlockingDelayTests.cs` awaits real wall-clock time.** Confirmed at `TaskMaster.Test/AppGlobals/NonBlockingDelayTests.cs:38-39`: `var interval = TimeSpan.FromMilliseconds(30); var stopwatch = Stopwatch.StartNew();` then awaits `NonBlockingDelay.WaitAsync(interval)` against that real stopwatch — no fake-timer/`TimeProvider` seam is used. *(Source: #694.)*
 
-**2. `UtilitiesCS.Test/ResourceTests.cs` constructs a live WinForms form in a unit test.** Confirmed at line 20: `Form1 frm = new Form1();` inside `TestMethod1`. No structural guard against this exists for `UtilitiesCS.Test` — only `QuickFiler.Test` has an equivalent "no live Form in test assembly" structural test. *(Source: #586.)*
+**2. `UtilitiesCS.Test/ResourceTests.cs` constructs a live WinForms form in a unit test.** Confirmed at line 20: `Form1 frm = new Form1();` inside `TestMethod1`. No structural guard against this exists for `UtilitiesCS.Test` — only QuickFiler.Test has an equivalent "no live Form in test assembly" structural test. *(Source: #586.)*
 
 **3. Two duplicate `DASLFilterParser*Tests.cs` classes lack `[DoNotParallelize]`**, while the test assembly runs `[assembly: Parallelize(Workers=0, Scope=ClassLevel)]` and no console-lock/serialization mechanism exists to make concurrent execution of these two classes safe. *(Source: #520.)*
 
@@ -85,11 +85,11 @@ Additional verified facts established while preparing this spec (2026-09-02):
 ### Out of scope / non-goals
 
 - **Finding 4 — pump-hosted `QfcItemController` timeout — is explicitly and entirely OUT of scope for issue #729.** Research §4 verified that no test-only change removes its load sensitivity (four independent reasons, §4.2). It has been promoted as its own follow-up issue **#743** (docs/features/potential/promoted/2026-09-02-quickfiler-itemviewer-ui-marshalling-seam.md). This promotion is load-bearing: the prior standalone tracker for this same finding, **#711**, was already closed as "superseded by #729", so #743 exists specifically so that closing #729 does not silently drop the finding a second time.
-- **All `QuickFiler/` production sources.** These are owned by a different parallel work item in this run. No file under `QuickFiler/` is modified by #729.
+- **All QuickFiler/ production sources.** These are owned by a different parallel work item in this run. No file under QuickFiler/ is modified by #729.
 - **No production API seam for `DASLFilterParser.PrintTree`.** Giving `PrintTree` a `TextWriter` parameter would be an unrelated `UtilitiesCS` production API change with no defect behind it, outside the bugfix minimal-change rule (research §3.5).
 - **No `[DoNotParallelize]` on UtilitiesCS.Test/HelperClasses/NLogTraceWriter_Test.cs.** It captures and restores `Console.Out` but asserts through Moq rather than on captured text, so it has no failing mode of its own; marking it would serialize a class for no benefit (research §3.4).
 - **No `PumpTimeoutMs` constant-hoisting hygiene in QuickFiler.Test.** Research §4.3 lists this as permitted but non-remedial; it is excluded to keep the change minimal and to avoid touching a parallel work item's assembly.
-- **No `app.config` change in TaskMaster.Test.** The `Microsoft.Bcl.TimeProvider` binding redirect is already present (TaskMaster.Test/app.config lines 265-271) and no redirect exists or is needed for `Microsoft.Extensions.TimeProvider.Testing` (research §1.5).
+- **No app.config change in TaskMaster.Test.** The `Microsoft.Bcl.TimeProvider` binding redirect is already present (TaskMaster.Test/app.config lines 265-271) and no redirect exists or is needed for `Microsoft.Extensions.TimeProvider.Testing` (research §1.5).
 
 ### Explicitly excluded systems, integrations, or datasets
 
@@ -129,13 +129,13 @@ Three independent, small changes, all test-side except one production seam:
 - **The structural guard is metadata-only.** It reflects over `Assembly.GetExecutingAssembly()` and never instantiates a type; the `ReflectionTypeLoadException` fallback must be carried over so the guard degrades to the loadable subset rather than turning permanently red for an unrelated load failure.
 - **`[DoNotParallelize]` is additive and order-independent.** No test body, assertion, or test name changes for finding 3.
 - **No production API seam for `DASLFilterParser.PrintTree`**; the console redirect stays at the test level.
-- **No file under .claude/**, .codex/**, .agents/**, config/blast-radius.json, or config/orchestration-routing.json is touched. No file under `QuickFiler/` production sources is touched.**
+- **No file under .claude/**, .codex/**, .agents/**, config/blast-radius.json, or config/orchestration-routing.json is touched. No file under QuickFiler/ production sources is touched.**
 
 ### Dependencies or blocked work:
 
-- The `packages/` directory is absent from this worktree, so `nuget restore` (or a restore-on-build) is a prerequisite before any build following the `packages.config` / `.csproj` edits (research §0).
+- The `packages/` directory is absent from this worktree, so `nuget restore` (or a restore-on-build) is a prerequisite before any build following the packages.config / `.csproj` edits (research §0).
 - Issue #743 tracks Finding 4. It is a follow-up, not a blocker: #729 can be completed and merged independently.
-- `QuickFiler/` production sources are held by a different parallel work item in this run; this item must not write into that footprint.
+- QuickFiler/ production sources are held by a different parallel work item in this run; this item must not write into that footprint.
 
 ### Implementation strategy (what changes, not sequencing):
 
@@ -212,7 +212,7 @@ None. `TimeProvider.System` is the default supplied by the 1-arg overload; no co
   - Bugfix minimal-change rule: no opportunistic refactors, no production API widening beyond the single seam.
   - Test-only wherever possible; the one production file is justified above.
   - net481 / legacy (non-SDK) project format: every new source file needs an explicit `<Compile Include>` entry.
-  - File ownership: `QuickFiler/` production sources and the push-down-owned .claude/.codex/.agents/config paths are off-limits.
+  - File ownership: QuickFiler/ production sources and the push-down-owned .claude/.codex/.agents/config paths are off-limits.
 - External dependencies (services, libraries, releases):
   - `Microsoft.Bcl.TimeProvider` 10.0.11 and `Microsoft.Extensions.TimeProvider.Testing` 10.9.0, both already in use by UtilitiesCS.Test. The testing package declares exactly one net462 dependency (`Microsoft.Bcl.TimeProvider >= 8.0.1`), satisfied by the 10.0.11 pin, so two package entries suffice (research §1.5).
 
@@ -234,7 +234,7 @@ Derived from research §8.
 - `UtilitiesCS.Test/NoLiveFormInTestAssemblyTests.cs` is **green from birth**. Because the `Form` sources were never compiled into that assembly (research §2.1, §5 N2), it is regression *prevention*, not a fail-before/pass-after regression test. No red run exists or can be produced there, and no reviewer should expect one. Deleting the orphan sources rather than gutting the `[Ignore]`d method bodies is deliberate: gutting would leave `Form` sources on disk one csproj line away from re-entering the assembly.
 - `SVGControl.Test/NoLiveFormInTestAssemblyTests.cs` is a **genuine red-before / green-after regression test** (research §2.2, §5 N3). The guard must be observed failing against the current csproj — naming the two `Form`-derived types — before the deletions, and passing after. That failing run is the fail-before evidence and is recorded under `docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/regression-testing/`.
 
-**Finding 3 — attribute-only change, no new test, with a fail-before exception dossier.** The hazard is a race requiring a specific interleaving of `Console.SetOut` across two threads, so a deterministic red run is not producible. Record a fail-before exception dossier at `docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/regression-testing/fail-before-exception.<timestamp>.md` with a `WhyFailingRunImpossible` section stating that constraint, and cite the two in-repo precedent classes as the alternative proof that the hazard is real and was previously observed: UtilitiesCS.Test/HelperClasses/PrettyPrint_Tests.cs lines 14-20 and UtilitiesCS.Test/OutlookObjects/Table/OlTableExtensions_Tests.cs lines 17-21. The new hazard comments should reuse that precedent wording but cite UtilitiesCS.Test/Properties/AssemblyInfo.cs lines 18-21 as the live source of the parallel scope, because the precedent comments' reference to `TaskMaster.runsettings` is stale — CI passes no `/Settings:` argument, so the assembly-level attribute is what actually takes effect (research §0).
+**Finding 3 — attribute-only change, no new test, with a fail-before exception dossier.** The hazard is a race requiring a specific interleaving of `Console.SetOut` across two threads, so a deterministic red run is not producible. Record a fail-before exception dossier at `docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/regression-testing/fail-before-exception.<timestamp>.md` with a `WhyFailingRunImpossible` section stating that constraint, and cite the two in-repo precedent classes as the alternative proof that the hazard is real and was previously observed: UtilitiesCS.Test/HelperClasses/PrettyPrint_Tests.cs lines 14-20 and UtilitiesCS.Test/OutlookObjects/Table/OlTableExtensions_Tests.cs lines 17-21. The new hazard comments should reuse that precedent wording but cite UtilitiesCS.Test/Properties/AssemblyInfo.cs lines 18-21 as the live source of the parallel scope, because the precedent comments' reference to TaskMaster.runsettings is stale — CI passes no `/Settings:` argument, so the assembly-level attribute is what actually takes effect (research §0).
 
 **Finding 4 — no test change.** Out of scope; tracked by #743.
 
@@ -245,11 +245,11 @@ Derived from research §8.
 - Coverage impact and targets for changed lines/modules: `TaskMaster/AppGlobals/NonBlockingDelay.cs` is the only production file with changed covered lines; both overloads must be directly exercised so coverage on changed lines does not regress. Test-only files do not enter the production coverage denominator.
 - Toolchain commands to run (format → lint → type-check → test):
   1. `nuget restore` (the `packages/` directory is absent from this worktree)
-  2. `dotnet tool run csharpier format .` (verify with `dotnet tool run csharpier check .`) — note that CSharpier 1.2.6 formats `packages.config`, so this step will reformat the edited file and the loop must restart from step 1 when it does
+  2. `dotnet tool run csharpier format .` (verify with `dotnet tool run csharpier check .`) — note that CSharpier 1.2.6 formats packages.config, so this step will reformat the edited file and the loop must restart from step 1 when it does
   3. `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
   4. `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
   5. `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage /InIsolation`
-- Manual validation steps (if required): for the local test run, exclude `\.claude\` worktree copies from the discovered assembly list and pass `/InIsolation` to match CI; an empty failure message with sub-millisecond duration indicates an assembly-load problem, not a regression.
+- Manual validation steps (if required): for the local test run, exclude \.claude\ worktree copies from the discovered assembly list and pass `/InIsolation` to match CI; an empty failure message with sub-millisecond duration indicates an assembly-load problem, not a regression.
 
 ## Acceptance Criteria
 
@@ -269,9 +269,9 @@ Derived from research §8.
 - [ ] AC14 — `UtilitiesCS.Test/OutlookObjects/DASLFilterParser_Tests.cs` no longer exists on disk, and `UtilitiesCS.Test/UtilitiesCS.Test.csproj` contains no reference to it.
 - [ ] AC15 — A fail-before exception dossier exists at `docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/regression-testing/fail-before-exception.<timestamp>.md` for Finding 3, containing a `WhyFailingRunImpossible` section explaining that the failure requires a specific `Console.SetOut` interleaving across two threads, and citing the two in-repo precedent classes as the alternative proof of the hazard.
 - [ ] AC16 — Finding 4 (pump-hosted `QfcItemController` / `PumpTimeoutMs` load sensitivity) is recorded in this spec as explicitly out of scope, with the four verified reasons no test-only fix exists, and is linked to follow-up issue **#743** (docs/features/potential/promoted/2026-09-02-quickfiler-itemviewer-ui-marshalling-seam.md), including the note that the prior standalone tracker #711 was closed as superseded by #729.
-- [ ] AC17 — `UtilitiesCS/OutlookObjects/Filter DASL/DASLFilterParser.cs` is unmodified: `PrintTree` gains no `TextWriter` parameter and no other production seam is added for Finding 3.
-- [ ] AC18 — `TaskMaster/AppGlobals/NonBlockingDelay.cs` is the only non-test production source file modified by this change; every other modified file belongs to a test project (source, project file, or `packages.config`) or to this feature's documentation and evidence folder.
-- [ ] AC19 — No file under `QuickFiler/` production sources is added, modified, or deleted.
+- [ ] AC17 — UtilitiesCS/OutlookObjects/Filter DASL/DASLFilterParser.cs is unmodified: `PrintTree` gains no `TextWriter` parameter and no other production seam is added for Finding 3.
+- [ ] AC18 — `TaskMaster/AppGlobals/NonBlockingDelay.cs` is the only non-test production source file modified by this change; every other modified file belongs to a test project (source, project file, or packages.config) or to this feature's documentation and evidence folder.
+- [ ] AC19 — No file under QuickFiler/ production sources is added, modified, or deleted.
 - [ ] AC20 — No file under .claude/**, .codex/**, .agents/**, config/blast-radius.json, or config/orchestration-routing.json is added, modified, or deleted.
 - [ ] AC21 — The full C# toolchain passes clean in a single final pass, in order: `dotnet tool run csharpier check .` reports no unformatted files; the analyzer rebuild (`/p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`) succeeds with no new diagnostics; the nullable rebuild (`/p:TreatWarningsAsErrors=true`) succeeds; and `vstest.console.exe ... /EnableCodeCoverage /InIsolation` reports zero failed tests. The commands run and their results are stated in the completion report.
 
@@ -281,7 +281,7 @@ Derived from research §8.
   - **`FakeTimeProvider` zero-delay semantics.** `Advance(TimeSpan.Zero)` is expected to wake a zero-due-time waiter based on reading the upstream `WakeWaiters` implementation, but this is the one behavior confirmed by source reading rather than by an executed run. Mitigated by the documented `Advance(TimeSpan.FromTicks(1))` fallback and by the fact that the test's `[Timeout(5000)]` converts a wrong assumption into a fast, unambiguous failure rather than a hang.
   - **CS8632 from the nullable gate.** The 2-arg overload introduces a second nullable local. Mitigated by AC3's requirement to scope the `annotations`-only pragma pair the same way the existing code does.
   - **`packages/` absent from the worktree.** A build attempted before `nuget restore` fails on the `<Error Condition="!Exists(...)">` package-restore guards rather than on the change itself. Mitigated by making `nuget restore` the first toolchain step.
-  - **CSharpier reformats `packages.config`.** The formatter will rewrite the edited file, which under the repository's restart rule requires restarting the toolchain loop. Mitigated by expecting the restart rather than treating it as a failure.
+  - **CSharpier reformats packages.config.** The formatter will rewrite the edited file, which under the repository's restart rule requires restarting the toolchain loop. Mitigated by expecting the restart rather than treating it as a failure.
   - **Deleting `SVGControl.Test` forms breaks its build.** If the six file deletions and the csproj entry removals are not applied together, the project fails to compile on a missing source file. Mitigated by treating the deletion and the csproj edit as one indivisible change.
   - **Coverage regression on changed production lines.** Mitigated by AC6's requirement that both overloads be directly covered.
 - Mitigations and rollbacks: the change is a plain revert away from the pre-change state; no data, schema, or configuration migration is involved and the one production signature that existing callers bind to is unchanged.
@@ -298,3 +298,35 @@ Derived from research §8.
   - Source issues consolidated here: #694 (Finding 1), #586 (Finding 2), #520 (Finding 3), #711 (Finding 4, now re-promoted as #743)
   - Research artifact: docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/research/research-729.2026-09-02T09-30.md
   - Governing policy: .claude/rules/general-unit-test.md § Determinism Infrastructure
+
+## Write Set
+
+Every file this plan's diff creates, modifies, or deletes, reproduced from the plan's "Complete file-write inventory" section. Nothing else belongs in this list: no scope exclusion, no model reference, and no context reference is a write-set entry.
+
+- `TaskMaster/AppGlobals/NonBlockingDelay.cs`
+- `TaskMaster.Test/AppGlobals/NonBlockingDelayTests.cs`
+- `UtilitiesCS.Test/OutlookObjects/Filter DASL/DASLFilterParserTests.cs` (contains a space)
+- `UtilitiesCS.Test/ReusableTypeClasses/StackGeek_Tests.cs`
+- `UtilitiesCS.Test/NoLiveFormInTestAssemblyTests.cs`
+- `SVGControl.Test/NoLiveFormInTestAssemblyTests.cs`
+- `TaskMaster.Test/TaskMaster.Test.csproj`
+- `TaskMaster.Test/packages.config`
+- `UtilitiesCS.Test/UtilitiesCS.Test.csproj`
+- `SVGControl.Test/SVGControl.Test.csproj`
+- `UtilitiesCS.Test/ResourceTests.cs`
+- `UtilitiesCS.Test/Form1.cs`
+- `UtilitiesCS.Test/Form1.Designer.cs`
+- `UtilitiesCS.Test/Form1.resx`
+- `UtilitiesCS.Test/Form2.cs`
+- `UtilitiesCS.Test/Form2.Designer.cs`
+- `UtilitiesCS.Test/Form2.resx`
+- `UtilitiesCS.Test/Form3.cs`
+- `UtilitiesCS.Test/Form3.Designer.cs`
+- `UtilitiesCS.Test/Form3.resx`
+- `UtilitiesCS.Test/OutlookObjects/DASLFilterParser_Tests.cs`
+- `SVGControl.Test/Form1.cs`
+- `SVGControl.Test/Form1.Designer.cs`
+- `SVGControl.Test/Form1.resx`
+- `SVGControl.Test/Form2.cs`
+- `SVGControl.Test/Form2.Designer.cs`
+- `SVGControl.Test/Form2.resx`
