@@ -7,6 +7,10 @@
 - **Status:** Draft
 - **Version:** 0.1
 
+## Write Set
+`scripts/vscode/Invoke-MSTestWithCoverage.ps1`
+`tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1`
+
 ## Context
 `scripts/vscode/Invoke-MSTestWithCoverage.ps1` asserts the coverage threshold before it writes the
 post-processed Cobertura document to disk. When the assertion fails, the script throws and the
@@ -35,7 +39,7 @@ denominator.
 Steps to Reproduce:
 1. Run `scripts/vscode/Invoke-MSTestWithCoverage.ps1` against a test suite whose measured line
    coverage is below the configured 80% threshold.
-2. Observe that `Assert-CoberturaLineCoverageThreshold` (in `Invoke-MSTestWithCoverage.Helpers.ps1`)
+2. Observe that `Assert-CoberturaLineCoverageThreshold` (in Invoke-MSTestWithCoverage.Helpers.ps1)
    throws before the post-processed XML is persisted.
 3. Inspect the coverage output path named by `-CoverageOutput` after the throw.
 
@@ -64,15 +68,15 @@ Logs / Screenshots:
     post-processed Cobertura document is persisted before the threshold assertion can throw.
 - Out of scope / non-goals:
   - Do NOT change the 80% threshold value inside `Assert-CoberturaLineCoverageThreshold`
-    (`scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1`, line 487). That threshold-value
+    (scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1, line 487). That threshold-value
     contradiction is tracked separately by issue #563 and is explicitly excluded from this fix.
   - Do not change `Assert-CoberturaLineCoverageThreshold`'s parsing, throw conditions, or message
     text.
   - Do not add a `try`/`finally` wrapper or any other indirection; the fix is a pure statement
     reorder (see Proposed Fix).
 - Explicitly excluded systems, integrations, or datasets:
-  - `.claude/**`, `.codex/**`, `.agents/**`, `config/blast-radius.json`,
-    `config/orchestration-routing.json` — these are published from an upstream repository and must
+  - .claude/**, .codex/**, .agents/**, config/blast-radius.json,
+    config/orchestration-routing.json — these are published from an upstream repository and must
     not be edited as part of this fix.
 
 ## Root Cause Analysis
@@ -93,8 +97,8 @@ parameter changes anywhere in the change.
 
 ### Boundaries and invariants to preserve:
 - `Assert-CoberturaLineCoverageThreshold`'s own 80% threshold logic and message text
-  (`scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1`, line 487) are unchanged.
-- The dot-source of `Invoke-MSTestWithCoverage.Helpers.ps1` at line 261 continues to precede both
+  (scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1, line 487) are unchanged.
+- The dot-source of Invoke-MSTestWithCoverage.Helpers.ps1 at line 261 continues to precede both
   calls (unaffected by the reorder; it already sits far above lines 341/343).
 - `Assert-CoberturaLineCoverageThreshold` remains a pure read-and-throw function over its own
   local `[xml]$coverageDocument` copy — it has no side effect that `Set-Content` could observe or
@@ -191,7 +195,7 @@ Seeded from issue:
 - Edge cases and negative scenarios (invalid inputs, missing data, boundary values):
   - Sub-threshold run (this fix's regression test, fixture `line-rate="0.5"`).
   - Existing boundary fixtures (`0.799999`, `0.8`, `0.800001` in
-    `Invoke-MSTestWithCoverage.Helpers.Tests.ps1`, lines 495-497) already cover
+    Invoke-MSTestWithCoverage.Helpers.Tests.ps1, lines 495-497) already cover
     `Assert-CoberturaLineCoverageThreshold`'s own boundary behavior in isolation and require no
     change.
   - At/above-threshold run: already covered by the existing `It` at lines 400-406 of
@@ -225,15 +229,15 @@ Seeded from issue:
       `'<coverage line-rate="0.5" />'`.
 - [ ] The coverage threshold value (80%) is unchanged: no diff touches
       `Assert-CoberturaLineCoverageThreshold`'s threshold literal (line 487) or its throw message
-      text in `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1`.
+      text in scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1.
 - [ ] No production file other than `scripts/vscode/Invoke-MSTestWithCoverage.ps1` is changed (in
-      particular, `scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1` and
-      `scripts/vscode/Invoke-MSTestWithCoverage.ClosureFilter.ps1` are untouched).
+      particular, scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1 and
+      scripts/vscode/Invoke-MSTestWithCoverage.ClosureFilter.ps1 are untouched).
 - [ ] PoshQC format, PSScriptAnalyzer, and Pester all pass cleanly on the changed files
       (`scripts/vscode/Invoke-MSTestWithCoverage.ps1` and
       `tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1`), with no format or lint
       auto-fixes needed and no regression in the existing `Describe 'Invoke-MSTestWithCoverageMain'`
-      cases (lines 345-414) or the boundary tests in `Invoke-MSTestWithCoverage.Helpers.Tests.ps1`.
+      cases (lines 345-414) or the boundary tests in Invoke-MSTestWithCoverage.Helpers.Tests.ps1.
 - [ ] Repro steps from `## Repro & Evidence` now produce the expected behavior: after the fix, the
       artifact left on disk at `-CoverageOutput` on a sub-threshold run is the same post-processed
       Cobertura document that the threshold assertion judged, not the raw `dotnet-coverage` output.
