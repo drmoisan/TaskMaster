@@ -11,10 +11,12 @@ Generated projection of `artifacts/orchestration/parallel-orchestrator-state.jso
 | max_concurrency | 3 |
 | current_cohort | 13 |
 | recolor_generation | 10 |
-| last_updated | 2026-09-02T06:20:00Z |
-| next_step | `open_mode_run_remains_a_standing_queue_awaiting_parallel_close` |
+| last_updated | 2026-09-02T10:09:45Z |
+| next_step | `PARALLEL_RUN_CLOSED` |
 
-Mode is `open`, so this run does not auto-complete. It terminates only through `/parallel-close`.
+Mode is `open`, so this run never auto-completed. It was terminated through `/parallel-close` at 2026-09-02T10:09:45Z and accepts no further admission.
+
+The close gate was decided against durable state re-derived first, not against the recorded values: all fourteen pull requests were confirmed `MERGED` through `gh`, and every recorded merge commit and merge time matched, so the checkpoint needed no rewrite. No item was `in_flight`, so the gate permitted the close. The gate keys on item `state` alone and never on `merge_status`, which is why the seven item worktrees still on disk under deferred cleanup did not stand in its way; forcing a removal to unblock a close would have been the wrong remedy, and none was performed. The close itself is non-destructive: it closed no pull request, removed no worktree, and changed no item state. Items that never started would have kept their recorded states, since a close records that the run stopped admitting rather than that its items were withdrawn.
 
 Every unordered pair of items conflicts — the conflict graph is complete on fourteen vertices with all ninety-one edges present and no independent pair — so every cohort is a singleton and the run executes serially.
 
@@ -595,8 +597,11 @@ Before any fresh verdict was trusted, the harness was replayed against the previ
 | `add` | 648 | 2026-09-01T11:20:00Z | — | `scheduled` | — | 8 |
 | `add` | 662 | 2026-09-01T10:16:33Z | — | `scheduled` | — | 9 |
 | `add` | 663 | 2026-09-01T11:25:00Z | — | `scheduled` | — | 10 |
+| `close` | — | 2026-09-02T10:09:45Z | — | — | — | 10 |
 
-Every row carries a null `prior_state`, which is the documented shape for an `add`. The accompanying `prepared` to `scheduled` transition is not recorded in the mutation entry; it is recorded as an item-state update in `items[]` with the lifecycle timestamps.
+The `close` row is the run's final mutation, and nothing may be appended after it. It is the only run-scoped entry in the table: `item_key` is null because a close acts on the run rather than on an item, and `new_state` is null for the same reason. It stamps `recolor_generation` unchanged at 10 and rewrote no cohort, because run termination changes no cohort assignment and is therefore a non-recompute operation. Counting from generation 0, the eleven admissions contributed nine recomputes and the close contributed none, which is exactly the recorded value.
+
+Every `add` row carries a null `prior_state`, which is the documented shape for an `add`. The accompanying `prepared` to `scheduled` transition is not recorded in the mutation entry; it is recorded as an item-state update in `items[]` with the lifecycle timestamps.
 
 The `recolor_generation` column distinguishes the two admission branches. Items 637 and 646 stamp the generation unchanged because neither admission required a recompute. Items 656, 285, 633, 670, 678, 287, 648, 662 and 663 increment it, to 2, 3, 4, 5, 6, 7, 8, 9 and 10 respectively, because all nine admissions were deferred, and a deferred add is a recompute by definition. The column is monotonically non-decreasing in append order, which is the property that makes a lost update between two concurrent mutations detectable after the fact.
 
