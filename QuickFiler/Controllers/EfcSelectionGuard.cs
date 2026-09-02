@@ -11,8 +11,31 @@ namespace QuickFiler.Controllers
     /// </summary>
     internal static class EfcSelectionGuard
     {
-        /// <summary>Prefix of the non-selectable suggestion banner rows.</summary>
-        private const string BannerPrefix = "===";
+        /// <summary>
+        /// Prefix a selection must not begin with for either predicate to accept it.
+        /// <para>
+        /// This value is deliberately a PROPER PREFIX of
+        /// <see cref="BreadcrumbRowBuilder.BannerPrefix"/>, the four-character prefix both row
+        /// producers emit. It is therefore not a copy of the producers' constant and must not be
+        /// kept in step with it.
+        /// </para>
+        /// <para>
+        /// Because every row beginning with the producers' four-character prefix also begins with
+        /// this three-character one, the guard rejects a strict superset of the producers' banner
+        /// rows: every row a producer emits, plus a three-equals row that no producer emits today.
+        /// </para>
+        /// <para>
+        /// It must not be widened to the producers' four-character value. That edit reads like a
+        /// consistency fix and is a behavioural relaxation: this prefix is the only mechanism
+        /// rejecting a three-equals row at either EFC classification site, because
+        /// <see cref="MinimumCreationLength"/> is 3 and so the length rule accepts that input.
+        /// Widening it would make <see cref="IsValidFilingSelection"/> and
+        /// <see cref="IsValidCreationSelection"/> both return true for a three-equals row. The
+        /// test BannerRejectionPrefix_RejectsThreeAndFourEqualsRowsOnBothPredicates in
+        /// QuickFiler.Test/Controllers/EfcSelectionGuardTests.cs guards against that edit.
+        /// </para>
+        /// </summary>
+        private const string BannerRejectionPrefix = "===";
 
         /// <summary>
         /// Shortest name the folder-creation path accepts. This is a creation rule only: it
@@ -46,7 +69,7 @@ namespace QuickFiler.Controllers
             }
 
             string value = selection!;
-            return !value.StartsWith(BannerPrefix, System.StringComparison.Ordinal)
+            return !value.StartsWith(BannerRejectionPrefix, System.StringComparison.Ordinal)
                 && !ArchiveStemContract.IsFullOutlookPath(value);
         }
 
@@ -72,7 +95,7 @@ namespace QuickFiler.Controllers
 
             string value = selection!;
             return value.Length >= MinimumCreationLength
-                && !value.StartsWith(BannerPrefix, System.StringComparison.Ordinal)
+                && !value.StartsWith(BannerRejectionPrefix, System.StringComparison.Ordinal)
                 && !ArchiveStemContract.IsFullOutlookPath(value);
         }
     }

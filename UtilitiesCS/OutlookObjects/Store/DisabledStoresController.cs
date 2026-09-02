@@ -153,9 +153,10 @@ namespace UtilitiesCS.OutlookObjects.Store
 
         /// <summary>
         /// Opens the disabled-stores dialog. Applies the shared readiness gate; when the model is
-        /// not ready it shows the same warning as the single-store editor and leaves
-        /// <see cref="Viewer"/> null, otherwise constructs the viewer, populates the list, and shows
-        /// the dialog modally. WinForms shell; excluded from coverage.
+        /// not ready it shows a state-specific warning built by <c>BuildUnavailableMessage</c> and
+        /// <c>BuildUnavailableTitle</c> and leaves <see cref="Viewer"/> null, otherwise constructs
+        /// the viewer, populates the list, and shows the dialog modally. WinForms shell; excluded
+        /// from coverage.
         /// </summary>
         [ExcludeFromCodeCoverage]
         public void Launch()
@@ -164,8 +165,8 @@ namespace UtilitiesCS.OutlookObjects.Store
             if (readiness.State != StoreLaunchReadinessState.Ready)
             {
                 MyBox.ShowDialog(
-                    "Store settings are not available yet. Please try again after startup completes.",
-                    "Store Settings Unavailable",
+                    StoreLaunchReadinessEvaluator.BuildUnavailableMessage(readiness.State),
+                    StoreLaunchReadinessEvaluator.BuildUnavailableTitle(readiness.State),
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning
                 );

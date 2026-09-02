@@ -1,4 +1,5 @@
 using System.Windows.Forms;
+using QuickFiler.Interfaces;
 
 namespace QuickFiler.Controllers
 {
@@ -16,5 +17,23 @@ namespace QuickFiler.Controllers
         /// <param name="keyData">The key data reported by <c>ProcessCmdKey</c>.</param>
         /// <returns><see langword="true"/> if the Alt flag is present; otherwise <see langword="false"/>.</returns>
         internal static bool IsAltKeyCommand(Keys keyData) => keyData.HasFlag(Keys.Alt);
+
+        /// <summary>
+        /// Decides whether the QuickFiler form's <c>ProcessCmdKey</c> override should claim the
+        /// supplied key chord for the keyboard-navigation dialog.
+        /// </summary>
+        /// <param name="handler">The keyboard handler the form dispatches to, or <see langword="null"/>.</param>
+        /// <param name="keyData">The key data reported by <c>ProcessCmdKey</c>.</param>
+        /// <returns><see langword="true"/> when the chord is claimed; otherwise <see langword="false"/>.</returns>
+        internal static bool ClaimsAltChord(IQfcKeyboardHandler handler, Keys keyData)
+        {
+            if (handler is null || !keyData.HasFlag(Keys.Alt))
+            {
+                return false;
+            }
+
+            Keys keyCode = keyData & Keys.KeyCode;
+            return keyCode == Keys.Menu || keyCode == Keys.None;
+        }
     }
 }
