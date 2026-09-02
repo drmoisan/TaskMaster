@@ -119,6 +119,24 @@ namespace QuickFiler.Controllers.Tests
                 .BeTrue("bare Alt is the chord the keyboard dialog services");
         }
 
+        // Issue #726 finding 8: ClaimsAltChord's guard is `keyCode == Keys.Menu || keyCode ==
+        // Keys.None` -- the bare-Alt test above only exercises the Keys.None disjunct (Keys.Alt
+        // carries no key-code bits). Keys.Menu | Keys.Alt is the VK_MENU keystroke shape (the Alt
+        // key itself pressed as a key) and exercises the other disjunct; without this test the
+        // Keys.Menu arm of the predicate was deletable without failing any existing test.
+        [TestMethod]
+        public void ClaimsAltChord_WithMenuKeyAndAlt_ReturnsTrue()
+        {
+            var handler = new Mock<IQfcKeyboardHandler>();
+
+            EfcViewer
+                .ClaimsAltChord(handler.Object, Keys.Menu | Keys.Alt)
+                .Should()
+                .BeTrue(
+                    "Keys.Menu | Keys.Alt is the VK_MENU keystroke shape of the bare Alt chord"
+                );
+        }
+
         [TestMethod]
         public void ClaimsAltChord_WithAltF_ReturnsFalse()
         {

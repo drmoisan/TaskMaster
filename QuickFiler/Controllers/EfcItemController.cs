@@ -23,7 +23,7 @@ using static Deedle.FrameBuilder;
 namespace QuickFiler.Controllers
 {
     [ExcludeFromCodeCoverage]
-    internal class EfcItemController : IItemControler
+    internal partial class EfcItemController : IItemControler
     {
         #region Constructors and Initializers
 
@@ -94,7 +94,9 @@ namespace QuickFiler.Controllers
             PopulateControls(dataModel);
             PopulateConversation();
             WireEvents();
-            Task.Run(() => InitializeWebViewAsync());
+            // Issue #726 finding 4: routed through the guarded wrapper so a fault is logged
+            // instead of silently finalized away as an unobserved discarded-task exception.
+            _ = InitializeWebViewGuardedAsync();
             return this;
         }
 
@@ -150,7 +152,9 @@ namespace QuickFiler.Controllers
             _itemPositionTips.Toggle(Enums.ToggleState.Off, shareColumn: true);
 
             WireEvents();
-            Task.Run(() => InitializeWebViewAsync());
+            // Issue #726 finding 4: routed through the guarded wrapper so a fault is logged
+            // instead of silently finalized away as an unobserved discarded-task exception.
+            _ = InitializeWebViewGuardedAsync();
         }
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
