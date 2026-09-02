@@ -19,7 +19,8 @@
     ".claude/skills/acceptance-criteria-tracking/SKILL.md",
     ".claude/skills/policy-compliance-order/SKILL.md",
     ".claude/agent-memory/**",
-    ".agents/skills/**"
+    ".agents/skills/**",
+    "scripts/vscode/**"
   ],
   "modules": {
     "QuickFiler": [

@@ -1,146 +1,137 @@
-- [CLAUDE.md nullable command != CI gate — RESOLVED by #540](project_claudemd_nullable_command_diverges_from_ci.md) — docs now match
-- [PoshQC test drops coverage.xml at repo root](poshqc-test-drops-coverage-xml-at-repo-root.md) — untracked, not
-- [Agent-worktree discovery + evidence hygiene](project_agent_worktree_discovery_and_evidence_hygiene.md) — `\.claude\` test-glob filter
-- [Completion-gate receipt shapes](completion-gate-receipt-shapes.md) — SOLVED: the missing key is `evidence`; plus the bug-route
-- [Evidence timestamps can be synthesized](evidence-timestamps-can-be-synthesized.md) — an executor can increment a counter instead of
-- [JaCoCo not Cobertura for coverage evidence](jacoco-not-cobertura-for-evidence.md) — maintainer deletes committed Cobertura; convert to
-- [Cobertura substitution must precede the commit](cobertura-substitution-must-happen-precommit.md) — converting AFTER the executor commits leaves the blobs reachable; this run merges with merge commits, not squashes
-- [PR-creation readiness: exact checkpoint shape](pr-creation-readiness-exact-requirements.md) — needs relativeFile, an 8-key receipt LIST, and `verified` (not `completed`) on step7/step8
-- [Store-lockup watchdog null-model hazard](project_store_lockup_watchdog_null_model_hazard.md) — new startup COM scopes need a
-- [VS Code extension location](project_extension_location.md) — the extension lives at `extensions/drm-copilot/`, not the repo root
-- [Verify package.json before vsce work](feedback_vsce_verify_package_location.md) — never assume the repo root is the publishable
-- [Repo root is source of truth for codex bundle](feedback_repo_root_is_source_of_truth.md) — when repo `.codex/`/`.agents/`/`AGENTS.md
-- [Evidence + lifecycle for every change](evidence-and-lifecycle-for-every-change.md) — evidence only under a feature folder; promote to
-- [Small-path = minor-audit selection](small-path-minor-audit-selection.md) — 1-3 production-file bug = small path + minor-audit, no
-- [MCP tools available to orchestrator](mcp-tools-available-to-orchestrator.md) — if a worker reports MCP tools unavailable, run them
-- [potential_to_issue creates the GitHub issue](potential-to-issue-creates-github-issue.md) — the promotion tool opens the issue itself; do
-- [potential_to_issue needs an absolute path](potential-to-issue-needs-absolute-path.md) — workspace-relative `potential_path` fails in a
-- [Promotion potential .md may not persist](promotion-potential-md-may-not-persist.md) — the potential/promoted .md may be absent on disk
-- [Remediation loop strict handoff](remediation-loop-strict-handoff.md) — cycles run atomic-planner -> atomic-executor -> feature-review
-- [Remediation-plan em-dash required](remediation-plan-em-dash-required.md) — the validator rejects `### Phase N (continued) — X`; only
-- [new_active_feature_folder date prefix](new-active-feature-folder-date-prefix.md) — standalone folders get the YYYY-MM-DD- prefix
-- [orchestrator-state validator divergence](orchestrator-state-validator-divergence.md) — the MCP check is stricter than the real
-- [orchestrator-state flat keys + step-status enum](orchestrator-state-flat-keys-and-enum.md) — FLAT top-level variable keys and enum step
-- [step_status "completed" write-locks the checkpoint](step-status-completed-write-locks-checkpoint.md) — step8/9/10 "completed" without a
-- [C# analyzer packages.config quirks](csharp-analyzer-packages-config-quirks.md) — non-SDK analyzer wiring needs manual roslyn subfolder
-- [Whole-repo CI gate is not out-of-scope](whole-repo-ci-gate-not-out-of-scope.md) — a pre-existing repo-wide csharpier/lint failure blocks
-- [Honor user's per-cycle folder layout](feedback_verify_flat_artifact_layout_after_executor.md) — follow the user's own reorg; only revert
-- [Repo-wide coverage authority exception](feedback_repowide_coverage_authority_exception.md) — pre-existing repo-wide shortfall + passing
-- [Repo-wide coverage: run the FULL suite](feedback_repowide_coverage_run_full_suite.md) — run ALL *.Test.dll together; a single-assembly
-- [No coverage exemption when purpose is testability](feedback_no_coverage_exemption_when_purpose_is_testability.md)
-- [Verify reducibility before accepting exemption count](feedback_verify_reducibility_before_accepting_exemption_count.md)
-- [Migration posture before PR gate](feedback_migration_not_just_patch.md) — before step 10, report integration/migration posture, not just
-- [Verify repro before bugfix cycle](feedback_verify_repro_before_bugfix_cycle.md) — ground-truth a latent defect's reachability on HEAD; a
-- [VSTO startup STA threading directive](feedback_vsto_startup_sta_threading_directive.md) — minimize STA reliance, always pump, gate COM
-- [Banned API in touched file is in scope](feedback_banned_api_in_touched_file_in_scope.md) — remediate
-- [Re-verify ground truth after user mid-cycle commit](feedback_reverify_ground_truth_after_user_midcycle_commit.md)
-- [pr_context.summary.txt is unreliable](pr-context-summary-unreliable-gh-and-classification.md) — verify gh yourself, author from the real
-- [pr-author agent unavailable; run skill in-thread](pr-author-hook-blocks-gh-in-this-repo.md) — no Agent(pr-author) here; author
-- [Tests must not trigger UX or a live worker](feedback_tests_must_not_trigger_ux_or_live_worker.md) — never start a real
-- [Commit everything before the S9 CI gate](feedback_commit_before_ci_gate.md) — a post-gate commit moves the head SHA and forces an S9
-- [Git-blame regressions before novel hypotheses](feedback_gitblame_regressions_before_novel_hypothesis.md) — for "was working, now wrong"
-- [Flaky CI: PhysicalFileInfoAdapter test](project_flaky_ci_physicalfileinfoadapter_test.md) — intermittently fails opening the real .sln
-- [Commit review artifacts + step8 preflight](feedback_commit_review_artifacts_and_step8_preflight.md) — commit feature-review's artifacts
-- [Epic self-merge step9 gate sequencing](epic-mode-pr-merge-gate-sequencing.md) — merge gate needs epic_mode:true + step9 "passed"
-- [feature-review 85% coverage floor trap](feature-review-coverage-85-floor-trap.md) — do NOT emit artifacts/csharp/coverage.xml at 80-85%
-- [MCP plan validator em-dash is version-dependent](mcp-plan-validator-defective-em-dash.md) — it has PASSED em-dash+LF plans; run it and
-- [collect_pr_context lands in main checkout](collect-pr-context-lands-in-main-checkout.md) — copy pr_context.* into the worktree before gh
-- [MCP plan validator Edit/Write pervasive-diff](mcp-plan-validator-editwrite-pervasive-diff.md) — it can reject an LF plan after an Edit
-- [MCP plan validator requires LF](mcp-plan-validator-requires-lf.md) — it rejects CRLF plans; normalize CRLF->LF (a checkout artifact
-- [Swordfish epic: clean collection premise is false](project_swordfish_removal_false_clean_collection.md) — the manifest's "already in
-- [Epic child PRs get no CI](project_epic_child_prs_no_ci.md) — ci.yml triggers only on main/development, so child->integration PRs run
-- [Child-orchestrator PR hook reads SESSION ROOT](child-orchestrator-pr-hook-reads-session-root.md) — when session cwd != feature worktree
-- [Agent-worktree hooks resolve to agent cwd](agent-worktree-hooks-resolve-to-agent-cwd.md) — in an isolated agent worktree, hooks read
-- [Epic #295 winforms testability](project_epic_295_winforms_testability.md) — design-phase-only mandate; children 293/296/297/298, and 298
-- [STA controls ratified as last resort](feedback_sta_controls_last_resort_ratified.md) — unshown WinForms controls on STA are OK only
-- [Epic children need full lifecycle + PRs](feedback_epic_children_require_full_lifecycle_and_prs.md) — maintainer rejected executor-driver
-- [Verify subagent capability claims](feedback_verify_subagent_capability_claims.md) — never relay "agent type not registered" without
-- [Epic-child plan Phase 0 paths are stale](feedback_plan_phase0_paths_are_stale_in_epic_children.md) — redirect the executor at execution
-- [Absolute-zero gate on a sibling-owned assembly](absolute-zero-gate-on-sibling-owned-assembly.md) — a child can't pass "Failed 0" over an
-- [Unplanned epic-child worktree mechanics](unplanned-epic-child-worktree-mechanics.md) — cross-worktree delegation works via absolute
-- [Epic generic-constraint cascades across children](epic-generic-constraint-cascades-multiple-children.md) — a `where TKey : notnull
-- [Parallel epic children name collisions](parallel-epic-children-name-collisions.md) — siblings coin identical type names; CS0101/CS0104
-- [feature-review is fable only under `preferred`](model-routing-feature-review-is-always-fable.md) — CORRECTED: under `available` it is C3 opus; resolve, never recall
-- [delegation_receipts namespaces + checkpoint owner race](checkpoint-receipt-namespaces-and-owner-race.md) — only {agents, promotion}
-- [Model-routing: use the portable PS modules](model-routing-scripts-absent-on-epic-integration-base.md) — when scripts/dev_tools is
-- [Swordfish epic F5 ScoDictionary blocker (RESOLVED)](project_swordfish_epic_f5_blocked_on_old_scodictionary.md) — grep the OLD class base
-- [Epic-child stale local integration ref](project_epic_child_stale_local_integration_ref.md) — `git fetch` and branch from
-- [Portable completion gate is FULL parity (corrected)](portable-completion-gate-allows-blocked-child.md) — not lenient; needs
-- [Epic-child rebase shared-memory conflict](epic-child-rebase-shared-memory-conflict.md) — the only rebase conflict is the shared
-- [Epic-child PR-gate gotchas](epic-child-pr-gate-gotchas.md) — isolated-worktree collect_pr_context writes to the wrong checkout; the hook
-- [Parallel preparation children share one worktree](parallel-preparation-children-shared-worktree.md) — prep-mode children run
-- [Parallel children conflict on agent-memory index](parallel-epic-children-conflict-on-agent-memory-index.md) — late child PRs conflict
-- [Epic-child self-merge: step9 passed vs verified](epic-child-self-merge-step9-passed-vs-verified.md) — the merge hook needs "passed", the
-- [Epic-child agent-memory merge conflicts](epic-child-agent-memory-merge-conflicts.md) — CONFLICTING solely on shared MEMORY.md index
-- [Epic-child nullable fan-in debt is deferred](project_epic_child_nullable_fanin_debt_deferred.md) — cross-child CS86xx fan-in is the
-- [C# coverage has two denominators](csharp-coverage-denominator-two-figures.md) — filtered first-party ~85.9% clears the gate, unfiltered
-- [lines-covered is nondeterministic; lines-valid is not](coverage-lines-covered-is-nondeterministic.md) - same-tree runs drift 18 lines at ROOT (~0.03 pct pts) and can straddle the baseline; a repo-wide >= gate at two decimals is undecidable
-- [Verify an issue is open in SUBSTANCE](verify-issue-still-open-in-substance.md) — grep the source for the issue number before preparing; the residual may already be its own issue
-- [Reconcile plan numbers against your own measurements](reconcile-plan-numbers-against-your-own-measurements.md) — a stale line count passes a citation-only review and halts Phase 0
-- [Preflight catches vacuous gates](preflight-catches-vacuous-gates.md) — MCP `ok:true` is not enough; executor preflight found 6 gates
-- [Absence from a failure list is not a pass gate](absence-from-failure-list-is-not-a-pass-gate.md) — "X not among failures" is satisfied by "X never ran"; add a test-discovery count control
-- [Convergence signal is systematically optimistic](convergence-signal-is-systematically-optimistic.md) — predicted "no further rounds" and was wrong twice; budget 3 rounds when round 1 finds blocking defects
-- [Preflight: sweep task ordering + citation arity](preflight-sweep-task-ordering-and-citation-arity.md) — name both sweeps early; a
-- [Revert plans must check test provenance](revert-plans-must-check-test-provenance.md) — verify each test against the pre-change sha; a
-- [Bash tool collapses `\` before sed sees it](bash-tool-collapses-double-backslash-in-sed.md) — a `\` pattern is a silent no-op exiting 0; it bites grep too, so pair every absence sweep with a known-positive control
-- [Bash tool mangles MSBuild switches](bash-tool-mangles-msbuild-switches.md) — `/m` becomes `M:/` (MSB1008); run C# tools via `pwsh
-- [pwsh double-quoted -Command is refused in a worktree](pwsh-double-quoted-command-refused-in-worktree.md) — the `$` trips the isolation
-- [Analyzer gate is vacuous without /t:Rebuild](msbuild-analyzer-gate-vacuous-without-rebuild.md) — `/t:Build` after any earlier build
-- [Which msbuild non-vacuity pattern to count](msbuild-non-vacuity-which-pattern-to-count.md) — resolves a contradiction: `Task "Csc"
-- [Hard-lock MCP needs absolute target; review mirrors pollute session root](mcp-hardlock-and-review-mirror-quirks.md)
-- [Aggregate vstest crash: isolate per assembly](vstest-aggregate-crash-isolate-per-assembly.md) — "Test host process crashed" is
-- [Bare vstest omits the LiveOutlook filter](bare-vstest-omits-liveoutlook-filter.md) — a direct call runs a real-Outlook test the wrapper
-- [Direct-csproj build facts (AnyCPU; CS2002)](csharp-direct-csproj-build-facts.md) — a single project needs `AnyCPU` (no space) while the
-- [Model-routing hook reads the canonical path only](model-routing-hook-reads-canonical-path-only.md) — it hardcodes
-- [No helper scripts under evidence/](feedback_no_helper_scripts_under_evidence.md) — feature-review's language match is extension-only and
-- [One executor per worktree](one-executor-per-worktree.md) — a stale checkpoint is NOT a dead delegation; never launch a second executor
-- [No SendMessage: relaunch with a resume brief](no-sendmessage-relaunch-with-resume-brief.md) - a stopped executor cannot be resumed in place; never use a placeholder Agent prompt
-- [Dead subagent's work may be complete on disk](dead-subagent-work-may-be-complete-on-disk.md) — diff the worktree before relaunching; its self-reported counts can still be wrong
-- [Agent() cannot course-correct a running subagent](agent-tool-cannot-course-correct-running-subagent.md) — it starts a SECOND agent
-- [Removing a halt requires branch propagation](removing-a-halt-requires-branch-propagation.md) — converting a HALT into a recorded blocker
-- [Prepared epic child invalidated by a sibling merge](prepared-epic-child-invalidated-by-sibling-merge.md) — a merged fix for an issue the
-- [Bash tool rejects complex commands in isolated worktrees](bash-tool-rejects-complex-commands-in-isolated-worktree.md)
-- [Subagent cites harness gitStatus of the wrong checkout](subagent-cites-harness-gitstatus-of-wrong-checkout.md) — an untracked-file claim may describe the session worktree, not yours; re-measure before it lands in a plan
-- [#457 coverage moved UP, and the kickoff figure was wrong](project_457_coverage_moved_up_not_down.md) — the denominator fix raised the
-- [atomic-planner has no MCP validator tool](atomic-planner-lacks-mcp-validator-tool.md) — it cannot run the mandatory plan gate; run it
-- [Preflight defect-trend scope confound](preflight-defect-trend-scope-confound.md) — a rising count isn't divergence if you widened scope
-- [C# agent worktree needs three bootstrap steps](csharp-agent-worktree-needs-three-bootstrap-steps.md) — no `.dotnet-sdk`, no `packages/
-- [potential_to_issue maps sections by heading name](potential-to-issue-keeps-only-summary-section.md) — template headings survive INTACT
-- [Epic kickoff facts need independent measurement](epic-kickoff-facts-need-independent-measurement.md) — a kickoff predicted a 500-line
-- [WebView2 EndInit creates handles at construction](webview2-endinit-creates-handles-at-construction.md) — a bare ItemViewer already has
-- [blocked_reason enum can't express a substantive halt](blocked-reason-enum-cannot-express-substantive-halt.md) — 7 mechanical members
-- [Bootstrapping orchestrator-state.json's first write](bootstrapping-orchestrator-state-json-first-write.md) — Write tool can't create it
-- [PRD_FEATURE_BLOCKED can be a prompt-parsing false positive](prd-feature-hook-parses-prompt-paths.md) — the hook reads
-- [Multi-location fact residuals drive preflight rounds](multi-location-fact-residuals-drive-preflight-rounds.md) — nearly every blocking
-- [expect-fail tests break substring scoped-run gates](expect-fail-tests-break-substring-scoped-run-gates.md) — a "0 failed" gate under
-- [CR-pattern grep falsely reports 100% CRLF](grep-cr-empty-pattern-false-crlf.md) — the shell strips the CR, leaving an empty pattern
+- [PoshQC test drops coverage.xml](poshqc-test-drops-coverage-xml-at-repo-root.md) — untracked, ungitignored; leaks into diffs
+- [Agent-worktree evidence](project_agent_worktree_discovery_and_evidence_hygiene.md) — `\.claude\` test-glob exclude discards every assembly
+- [Completion-gate receipt shapes](completion-gate-receipt-shapes.md) — SOLVED: missing key is `evidence`; also bug-route tool swap
+- [Evidence timestamps synthesized](evidence-timestamps-can-be-synthesized.md) — executor may increment a counter, not the clock
+- [JaCoCo not Cobertura](jacoco-not-cobertura-for-evidence.md) — maintainer deletes raw Cobertura; convert to JaCoCo first
+- [Cobertura before commit](cobertura-substitution-must-happen-precommit.md) — convert BEFORE commit or blobs stay reachable
+- [PR-creation checkpoint shape](pr-creation-readiness-exact-requirements.md) — relativeFile + 8-key receipts; "verified" not "completed"
+- [Store-lockup watchdog null-model](project_store_lockup_watchdog_null_model_hazard.md) — crashes if attribution precedes store model set
+- [VS Code extension location](project_extension_location.md) — lives at extensions/drm-copilot/, not repo root
+- [Verify package.json location](feedback_vsce_verify_package_location.md) — repo root isn't publishable
+- [Repo root = codex truth](feedback_repo_root_is_source_of_truth.md) — .codex/.agents/AGENTS.md push from root
+- [Evidence + lifecycle for changes](evidence-and-lifecycle-for-every-change.md) — promote every change, even 1-file
+- [Small-path = minor-audit](small-path-minor-audit-selection.md) — 1-3 production files = small path + minor-audit
+- [MCP tools available](mcp-tools-available-to-orchestrator.md) — if a worker claims MCP unavailable, run it yourself
+- [potential_to_issue creates issue](potential-to-issue-creates-github-issue.md) — don't duplicate with `gh issue create`
+- [potential_to_issue needs absolute path](potential-to-issue-needs-absolute-path.md) — relative path fails "not found"
+- [Promotion .md may not persist](promotion-potential-md-may-not-persist.md) — may be absent on disk
+- [Remediation loop strict handoff](remediation-loop-strict-handoff.md) — planner -> executor -> review, no shortcuts
+- [Remediation-plan em-dash required](remediation-plan-em-dash-required.md) — validator needs em-dash in "(continued) — X"
+- [new_active_feature_folder date prefix](new-active-feature-folder-date-prefix.md) — standalone folders get YYYY-MM-DD- prefix
+- [orchestrator-state flat keys + enum](orchestrator-state-flat-keys-and-enum.md) — FLAT top-level keys, enum step_status only
+- [step_status "completed" locks checkpoint](step-status-completed-write-locks-checkpoint.md) — before ci_gate exists blocks all later edits
+- [C# analyzer packages.config quirks](csharp-analyzer-packages-config-quirks.md) — non-SDK wiring needs manual roslyn subfolder
+- [Whole-repo CI gate in scope](whole-repo-ci-gate-not-out-of-scope.md) — pre-existing repo-wide failures block
+- [Honor user's folder layout](feedback_verify_flat_artifact_layout_after_executor.md) — revert real defects only
+- [Repo-wide coverage authority](feedback_repowide_coverage_authority_exception.md) — ratifiable: pre-existing shortfall, clean changed-lines
+- [Repo-wide coverage: run FULL suite](feedback_repowide_coverage_run_full_suite.md) — single-assembly runs misreport
+- [No testability exemption](feedback_no_coverage_exemption_when_purpose_is_testability.md) — not a seam substitute; verify residuals irreducible
+- [Migration posture before PR gate](feedback_migration_not_just_patch.md) — integration posture at step 10, not a diff
+- [Verify repro before bugfix cycle](feedback_verify_repro_before_bugfix_cycle.md) — ground-truth repro on HEAD
+- [VSTO startup STA directive](feedback_vsto_startup_sta_threading_directive.md) — minimize STA, always pump, gate COM
+- [Banned API in touched file](feedback_banned_api_in_touched_file_in_scope.md) — remediate even if unrelated
+- [Re-verify after mid-cycle commit](feedback_reverify_ground_truth_after_user_midcycle_commit.md) — it can invalidate prior measurements
+- [pr_context.summary.txt unreliable](pr-context-summary-unreliable-gh-and-classification.md) — verify gh yourself
+- [pr-author: run skill in-thread](pr-author-hook-blocks-gh-in-this-repo.md) — no Agent(pr-author) here
+- [Tests must not trigger live worker](feedback_tests_must_not_trigger_ux_or_live_worker.md) — never start a real background process
+- [Commit before S9 CI gate](feedback_commit_before_ci_gate.md) — a post-gate commit moves the SHA, forces re-run
+- [Git-blame before novel hypotheses](feedback_gitblame_regressions_before_novel_hypothesis.md) — for "was working" bugs, blame first
+- [Flaky CI: PhysicalFileInfoAdapter](project_flaky_ci_physicalfileinfoadapter_test.md) — intermittently fails opening the real .sln
+- [Commit review artifacts + step8](feedback_commit_review_artifacts_and_step8_preflight.md) — commit its artifacts; unset step8 pending
+- [Epic self-merge step9 sequencing](epic-mode-pr-merge-gate-sequencing.md) — merge hook wants "passed", completion wants "verified"
+- [feature-review 85% coverage floor trap](feature-review-coverage-85-floor-trap.md) — don't emit coverage.xml at 80-85%
+- [MCP validator em-dash version-dependent](mcp-plan-validator-defective-em-dash.md) — run it and read the actual result
+- [MCP validator: Edit/Write pervasive-diff](mcp-plan-validator-editwrite-pervasive-diff.md) — can reject an LF plan after Edit rewrites it
+- [MCP validator requires LF](mcp-plan-validator-requires-lf.md) — normalize CRLF->LF, a checkout artifact
+- [Swordfish epic: clean collection false](project_swordfish_removal_false_clean_collection.md) — manifest's claim doesn't exist on base
+- [Epic child PRs get no CI](project_epic_child_prs_no_ci.md) — ci.yml triggers only main/development
+- [Child-orchestrator hook reads SESSION ROOT](child-orchestrator-pr-hook-reads-session-root.md) — breaks if session cwd != feature worktree
+- [Agent-worktree hooks resolve to cwd](agent-worktree-hooks-resolve-to-agent-cwd.md) — isolated worktree hooks read against THAT cwd
+- [Epic #295 winforms testability](project_epic_295_winforms_testability.md) — design-phase-only; children 293/296/297/298
+- [STA controls: last resort only](feedback_sta_controls_last_resort_ratified.md) — unshown WinForms controls on STA, last resort
+- [Epic children need full lifecycle](feedback_epic_children_require_full_lifecycle_and_prs.md) — maintainer rejected executor-only driver
+- [Verify subagent capability claims](feedback_verify_subagent_capability_claims.md) — never relay "not registered" unverified
+- [Epic-child Phase 0 paths are stale](feedback_plan_phase0_paths_are_stale_in_epic_children.md) — redirect executor at exec time
+- [Absolute-zero gate on shared assembly](absolute-zero-gate-on-sibling-owned-assembly.md) — scope "Failed 0" to owned classes only
+- [Unplanned epic-child worktree](unplanned-epic-child-worktree-mechanics.md) — cross-worktree delegation via absolute paths
+- [Epic generic-constraint cascades](epic-generic-constraint-cascades-multiple-children.md) — a `where TKey : notnull` edit ripples to siblings
+- [Parallel epic children name collisions](parallel-epic-children-name-collisions.md) — identical type names; CS0101/CS0104
+- [feature-review is fable under "preferred"](model-routing-feature-review-is-always-fable.md) — CORRECTED: under "available" it's C3 opus
+- [delegation_receipts namespace race](checkpoint-receipt-namespaces-and-owner-race.md) — only {agents, promotion} namespaces exist
+- [Model-routing: use PS modules](model-routing-scripts-absent-on-epic-integration-base.md) — .claude/lib/model-routing/ModelRouting.psm1
+- [Epic-child stale integration ref](project_epic_child_stale_local_integration_ref.md) — git fetch, branch from origin/<branch>
+- [Portable completion gate is FULL](portable-completion-gate-allows-blocked-child.md) — corrected: not lenient
+- [Epic-child PR-gate gotchas](epic-child-pr-gate-gotchas.md) — isolated collect_pr_context writes wrong checkout
+- [Parallel prep children share worktree](parallel-preparation-children-shared-worktree.md) — prep-mode is NOT isolated
+- [Children conflict on agent-memory](parallel-epic-children-conflict-on-agent-memory-index.md) — siblings append to MEMORY.md; union resolves
+- [Epic-child nullable fan-in deferred](project_epic_child_nullable_fanin_debt_deferred.md) — cross-child CS86xx defers to Wave-2
+- [C# coverage has two denominators](csharp-coverage-denominator-two-figures.md) — filtered ~85.9% clears gate, unfiltered doesn't
+- [lines-covered nondeterministic; lines-valid not](coverage-lines-covered-is-nondeterministic.md) — drift ~18 lines; two-decimal gate undecidable
+- [Verify issue is open in SUBSTANCE](verify-issue-still-open-in-substance.md) — grep source for the issue number
+- [Reconcile plan vs measurements](reconcile-plan-numbers-against-your-own-measurements.md) — stale count passes citation, halts Phase 0
+- [Preflight catches vacuous gates](preflight-catches-vacuous-gates.md) — MCP ok:true isn't enough; found 6 vacuous gates
+- [Absence from failures isn't a pass](absence-from-failure-list-is-not-a-pass-gate.md) — "X absent" == "X never ran"; add count control
+- [Convergence signal is optimistic](convergence-signal-is-systematically-optimistic.md) — "no further rounds" wrong twice; budget 3 rounds
+- [Preflight: sweep ordering + citation arity](preflight-sweep-task-ordering-and-citation-arity.md) — no task cites a LATER artifact
+- [Revert plans check test provenance](revert-plans-must-check-test-provenance.md) — verify vs pre-change sha
+- [Bash tool collapses `\` before sed](bash-tool-collapses-double-backslash-in-sed.md) — silent no-op exit 0; bites grep too
+- [Bash tool mangles MSBuild switches](bash-tool-mangles-msbuild-switches.md) — `/m` becomes `M:/` (MSB1008); run via pwsh
+- [pwsh -Command refused in worktree](pwsh-double-quoted-command-refused-in-worktree.md) — `$` trips the isolation guard
+- [Analyzer gate vacuous without /t:Rebuild](msbuild-analyzer-gate-vacuous-without-rebuild.md) — `/t:Build` skips CoreCompile on a warm tree
+- [msbuild non-vacuity pattern to count](msbuild-non-vacuity-which-pattern-to-count.md) — resolves a `Task "Csc"` counting contradiction
+- [Hard-lock MCP + review-mirror quirks](mcp-hardlock-and-review-mirror-quirks.md) — needs absolute target; mirrors pollute session root
+- [vstest crash: isolate per assembly](vstest-aggregate-crash-isolate-per-assembly.md) — environmental; re-run with /InIsolation
+- [Bare vstest omits LiveOutlook filter](bare-vstest-omits-liveoutlook-filter.md) — a direct call runs real-Outlook test
+- [Direct-csproj build facts](csharp-direct-csproj-build-facts.md) — needs "AnyCPU" not "Any CPU"; CS2002 not promoted
+- [Model-routing hook: canonical path](model-routing-hook-reads-canonical-path-only.md) — hardcodes one checkpoint path
+- [No helper scripts under evidence/](feedback_no_helper_scripts_under_evidence.md) — extension-only match forces FAIL
+- [One executor per worktree](one-executor-per-worktree.md) — stale checkpoint isn't dead; never launch a second executor
+- [No SendMessage: relaunch w/ resume brief](no-sendmessage-relaunch-with-resume-brief.md) — a stopped executor can't resume
+- [Dead subagent's work may be complete](dead-subagent-work-may-be-complete-on-disk.md) — diff worktree before relaunching
+- [Agent() can't course-correct subagent](agent-tool-cannot-course-correct-running-subagent.md) — it starts a SECOND agent
+- [Removing a halt needs propagation](removing-a-halt-requires-branch-propagation.md) — needs a real commit
+- [Prepared epic child invalidated by merge](prepared-epic-child-invalidated-by-sibling-merge.md) — open-issue state isn't evidence
+- [Bash tool rejects complex commands in worktrees](bash-tool-rejects-complex-commands-in-isolated-worktree.md)
+- [Subagent cites wrong gitStatus](subagent-cites-harness-gitstatus-of-wrong-checkout.md) — may be session worktree, not yours
+- [#457 coverage moved UP, kickoff figure wrong](project_457_coverage_moved_up_not_down.md) — denominator fix raised rate
+- [atomic-planner has no MCP validator tool](atomic-planner-lacks-mcp-validator-tool.md) — can't run the mandatory plan gate
+- [Preflight defect-trend scope confound](preflight-defect-trend-scope-confound.md) — rising count isn't divergence if scope widened
+- [C# worktree: three bootstrap steps](csharp-agent-worktree-needs-three-bootstrap-steps.md) — no .dotnet-sdk, no packages/, no restore
+- [potential_to_issue maps by heading](potential-to-issue-keeps-only-summary-section.md) — template headings survive INTACT
+- [Epic kickoff facts need verification](epic-kickoff-facts-need-independent-measurement.md) — a kickoff's 500-line prediction was wrong
+- [WebView2 EndInit creates handles early](webview2-endinit-creates-handles-at-construction.md) — bare ItemViewer holds handles
+- [blocked_reason enum can't express halt](blocked-reason-enum-cannot-express-substantive-halt.md) — 7 mechanical members only
+- [Bootstrapping first checkpoint write](bootstrapping-orchestrator-state-json-first-write.md) — Write tool can't create it directly
+- [PRD_FEATURE_BLOCKED can be false positive](prd-feature-hook-parses-prompt-paths.md) — the hook reads prompt text, not real state
+- [Multi-location residuals drive rounds](multi-location-fact-residuals-drive-preflight-rounds.md) — a blocking defect repeats elsewhere
+- [expect-fail tests break scoped-run gates](expect-fail-tests-break-substring-scoped-run-gates.md) — a "0 failed" gate can pass vacuously
+- [CR-pattern grep falsely reports 100% CRLF](grep-cr-empty-pattern-false-crlf.md) — shell strips the CR, leaving empty pattern
 
-- [PR readiness gate bars ANY recorded override](pr-readiness-gate-bars-any-recorded-override.md) — one authorized override blocks gh pr create; no drain procedure exists
-- [Resumed child orchestrator shares your worktree](resumed-child-orchestrator-shares-worktree.md) — a checkpoint mtime you did not author
-- [Run the hook gates locally](run-orchestration-hook-gates-locally.md) — `Invoke-OrchestratorStatePreflight` / `Test-OrchestratorStateCompletionReadiness` ARE the hooks; PowerShell is authoritative, MCP disagrees on the bug route
-- [Coverage mode raw vs processed is flake-sensitive](coverage-mode-raw-vs-processed-is-flake-sensitive.md) — one flaky test kills post-processing and yields an incomparable denominator; re-measure in a detached worktree with packages copied
-- [Shared checkpoint: never read-modify-write](shared-checkpoint-read-modify-write-corrupts.md) - a sibling swaps the session-root file; assert issue-num in-process, and stop writing the canonical path once your PR is open
-- [External actor can merge your child PR mid-run](external-actor-can-merge-your-child-pr-midrun.md) — re-read PR state before the CI gate
-- [Stale base anchor passes ancestry vacuously](stale-base-anchor-passes-ancestry-vacuously.md) — on a prep resume the pinned base stays an ancestor, so the check passes while diffs bill another issue's work to your plan
-- [orchestrator-state.json is TRACKED in git](orchestrator-state-json-is-tracked-in-git.md) — .gitignore does not apply; writing your checkpoint pollutes the footprint. Fix with skip-worktree
-- [Three-dot diff degenerates on an ancestor base](three-dot-diff-degenerates-on-ancestor-base.md) — `PINNED...HEAD` silently becomes two-dot once PINNED is an ancestor; 299 paths vs 10
-- [Full delegation-receipt shape + relativeFile](orchestrator-state-full-delegation-receipt-shape.md) — validator needs 8 keys per receipt; completing a REAL delegation is not padding
-- [Footprint AC forbids on-branch follow-up promotion](footprint-ac-forbids-onbranch-followup-promotion.md) — a checked footprint criterion makes promoting review findings impossible on that branch; defer and file elsewhere
+- [PR readiness gate bars ANY override](pr-readiness-gate-bars-any-recorded-override.md) — one override blocks gh pr create; no drain path
+- [Resumed orchestrator shares worktree](resumed-child-orchestrator-shares-worktree.md) — an mtime you didn't author isn't yours
+- [Run the real hook, not MCP](run-orchestration-hook-gates-locally.md) — PS preflight/readiness funcs ARE the gates; MCP disagrees on route
+- [Coverage: raw vs processed flake-sensitive](coverage-mode-raw-vs-processed-is-flake-sensitive.md) — re-measure in a detached worktree
+- [Shared checkpoint: no read-modify-write](shared-checkpoint-read-modify-write-corrupts.md) — a sibling can swap the file; assert in-process
+- [External actor can merge child PR mid-run](external-actor-can-merge-your-child-pr-midrun.md) — re-read PR state before the CI gate
+- [Stale base anchor passes vacuously](stale-base-anchor-passes-ancestry-vacuously.md) — diffs can bill another issue's work to yours
+- [orchestrator-state.json is TRACKED](orchestrator-state-json-is-tracked-in-git.md) — .gitignore doesn't apply; fix with skip-worktree
+- [Three-dot diff degenerates on ancestor base](three-dot-diff-degenerates-on-ancestor-base.md) — PINNED...HEAD silently becomes two-dot
+- [Footprint AC forbids on-branch promotion](footprint-ac-forbids-onbranch-followup-promotion.md) — blocks promoting findings on-branch
 
 ## Artifact hygiene
-- [Angle-bracket redaction breaks TRX XML](angle-bracket-redaction-breaks-trx-xml.md) — a `<placeholder>` in an XML attribute makes the
-- [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in
-- [prd-feature hook picks the LONGEST active path](prd-feature-hook-picks-longest-active-path.md) — a deep evidence path in an
-- [Promotion hook matches commit-message text](promotion-hook-matches-commit-message-text.md) — describing the GitHub-CLI issue-creation
-- [Closing keyword fires inside a negation](closing-keyword-fires-inside-negation.md) — `does NOT fix #511` still auto-closes #511; scan
-- [feature-review edits SHARED .git/info/exclude](feature-review-edits-shared-git-info-exclude.md) — one line there hides untracked files
-- [Hooks pattern-match Bash command TEXT](hooks-pattern-match-bash-command-text.md) — a guarded literal quoted inside a heredoc body blocks
-- [PR receipt staleness is mtime vs created_at](pr-author-receipt-staleness-is-mtime-vs-created-at.md) — stage pr_context.summary.txt at
-- [Parent session can commit into your worktree](parent-session-can-commit-into-child-worktree.md) — a path leaving `git status` unstaged
-- [MSB3021-only failure = testhost lock](msbuild-msb3021-only-means-test-host-lock.md) — zero CS/CA/IDE diagnostics means contention, not
-- [Edit tool CRLF-ifies LF markdown](edit-tool-crlf-ifies-lf-markdown.md) — under core.autocrlf=true it flips the WHOLE file; measure with
-- [grep-count wrapper does not clear $LASTEXITCODE](grep-count-wrapper-does-not-clear-lastexitcode.md) — git grep exits 1 on zero matches
-- [Session-root shims are deleted by siblings](session-root-shims-are-deleted-by-siblings.md) — PRD_FEATURE_BLOCKED is a session-cwd path
-- [Stale-figure sweep by changed-file set](stale-figure-sweep-by-changed-file-set.md) — sweep the upstream PR's FULL changed-file set and
-- [validate-bash blocks --force-with-lease too](validate-bash-blocks-force-with-lease-too.md) — literal substring match; delete+re-push a single-owner branch instead
-- [Merging main invalidates the plan base anchor](merging-main-invalidates-plan-base-anchor.md) - a sibling-touched .csproj makes an exactly-one-line gate fail; anchor diffs to the MERGE commit
+- [Angle-bracket redaction breaks TRX XML](angle-bracket-redaction-breaks-trx-xml.md) — a placeholder token breaks XML well-formedness
+- [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, account, or machine name
+- [prd-feature hook picks LONGEST active path](prd-feature-hook-picks-longest-active-path.md) — a deep evidence path can block delegation
+- [Promotion hook matches commit text](promotion-hook-matches-commit-message-text.md) — describing gh issue-creation in prose can fire it
+- [Closing keyword fires inside negation](closing-keyword-fires-inside-negation.md) — "does NOT fix #511" still auto-closes it
+- [feature-review edits SHARED .git/info/exclude](feature-review-edits-shared-git-info-exclude.md) — one line hides untracked files repo-wide
+- [Hooks pattern-match Bash command TEXT](hooks-pattern-match-bash-command-text.md) — a guarded literal quoted in a heredoc still blocks
+- [PR receipt staleness: mtime vs created_at](pr-author-receipt-staleness-is-mtime-vs-created-at.md) — stage pr_context.summary.txt fresh
+- [Parent session commits into child worktree](parent-session-can-commit-into-child-worktree.md) — an unstaged git status isn't trustworthy
+- [MSB3021-only failure = testhost lock](msbuild-msb3021-only-means-test-host-lock.md) — zero CS/CA/IDE diagnostics = lock, not a regression
+- [Edit tool CRLF-ifies LF markdown](edit-tool-crlf-ifies-lf-markdown.md) — autocrlf=true can flip the WHOLE file to CRLF
+- [grep-count wrapper doesn't clear $LASTEXITCODE](grep-count-wrapper-does-not-clear-lastexitcode.md) — git grep exits 1 on zero matches
+- [Session-root shims deleted by siblings](session-root-shims-are-deleted-by-siblings.md) — PRD_FEATURE_BLOCKED is a session-cwd path
+- [Stale-figure sweep by changed-file set](stale-figure-sweep-by-changed-file-set.md) — sweep the PR's full set and both count spellings
+- [validate-bash blocks --force-with-lease too](validate-bash-blocks-force-with-lease-too.md) — literal substring match; delete+re-push
+- [Merging main invalidates plan base anchor](merging-main-invalidates-plan-base-anchor.md) — a sibling .csproj fails a one-line gate

@@ -40,4 +40,5 @@ The vocabulary is `VALID_STEP_STATUS` in `.claude/lib/orchestrator-state/Orchest
 
 Related: [[step-status-completed-write-locks-checkpoint]],
 [[bootstrapping-orchestrator-state-json-first-write]], [[orchestrator-state-json-is-tracked-in-git]],
-[[pr-author-hook-blocks-gh-in-this-repo]].
+[[pr-author-hook-blocks-gh-in-this-repo]], [[orchestrator-state-full-delegation-receipt-shape]]
+(same relativeFile + 8-key receipt requirement, confirmed independently via the MCP validator on #656).

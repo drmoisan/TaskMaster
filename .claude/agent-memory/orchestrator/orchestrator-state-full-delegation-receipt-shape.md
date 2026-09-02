@@ -31,4 +31,6 @@ completeness of each entry.
 named in the array — which is exactly why an over-long array breaks a previously-passing validation.
 
 Related: [[orchestrator-state-flat-keys-and-enum]],
-[[checkpoint-receipt-namespaces-and-owner-race]], [[completion-gate-receipt-shapes]].
+[[checkpoint-receipt-namespaces-and-owner-race]], [[completion-gate-receipt-shapes]],
+[[pr-creation-readiness-exact-requirements]] (the indexed entry for this same relativeFile +
+8-key receipt requirement, confirmed independently via the PS preflight on #648).
