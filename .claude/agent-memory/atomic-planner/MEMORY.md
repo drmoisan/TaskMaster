@@ -34,6 +34,7 @@
 - [#670](project_670_webview_fault_boundary_plan_seams.md) — awaiter `IsCompleted` breaks "no pump" test; Cobertura merge by filename
 - [#670 capture-time sanitisation](project_670_capture_time_sanitisation_seams.md) — a vswhere-resolved path leaks via an *indirect* invoker
 - [#680](project_680_menu_mode_plan_seams.md) — HostTests.cs 499 not 500; "optional" fallback was load-bearing
+- [#731](project_731_lifecycle_disposal_plan_seams.md) — Defects468Tests 498/500 forces a partial continuation; QfcQueue.cs already 505; spec said ONE comment line not three; R3 = all 4 defects in gate wiring; R4 = worktree not bootstrapped (no `.dotnet-sdk/`, no `packages/`), `DebugType=full` leaks host paths, 1:1 line mapping unsatisfiable for a 1-to-20 hunk; R5 = case-insensitive token absence collides with a retained method name, `.//line` double-counts on two axes, unconditional AC17 check-off vs two degraded branches; R6 = document state is DERIVED from exit code (`:236`/`:341` throw before the `:343` write), an exclusion keyed on the regression's own definition is vacuous, `line-rate` is a fraction not a percentage, unanchored filename suffix also selects `IQfcDatamodel.cs`
 
 ## Plan-structure traps
 
@@ -62,6 +63,8 @@
 - [Literal-call clauses block file-size tightening](literal-call-clauses-block-file-size-tightening.md) — unsatisfiable near a 500-line file
 - [Enumeration variable must match its consumer](enumeration-variable-must-match-consumer.md) — mismatch = zero-assembly run, zero reported failures
 - [Diff gates need a commit task](diff-gates-need-a-commit-task.md) — `git diff <BASE>..HEAD` passes vacuously with no commit
+- [Porcelain collapses untracked directories](porcelain-collapses-untracked-directories.md) — needs `--untracked-files=all` to enumerate evidence artifact paths
+- [Self-referential evidence enumeration](self-referential-evidence-enumeration.md) — a gate's own capture can't list its own artifact; bound the range at the capturing task
 - [Never pin a HEAD SHA as a plan expectation](never-pin-head-sha-as-plan-expectation.md) — gate on tree invariants instead
 - [Harness gitStatus may describe another worktree](harness-git-status-may-describe-another-worktree.md) — measure inside the target worktree
 - [Absolute counts in shared files go stale](absolute-counts-in-shared-files-go-stale.md) — lower-bound/baseline-relative for co-owned files
@@ -97,6 +100,7 @@
 
 ## Coverage
 
+- [Repo-wide Cobertura line-rate is nondeterministic](repo-wide-cobertura-line-rate-is-nondeterministic.md) — 47%→81% on an identical tree; branch on `lines-valid` comparability, never gate unbranched
 - [Deletion-adjusted coverage no-regression gate](deletion-adjusted-coverage-no-regression-gate.md) — gate on covered/valid counters; shrink the denominator, never exclude (`project_deadcode_removal_vs_coverage_exclusion.md`)
 - [#489 PartN reroute amendment seams](project_489_partn_reroute_amendment_seams.md) — verify parent `partial`; amendments shift AC line citations
 - [Spec corrections sweep sibling sections](feedback_spec_corrections_sweep_sibling_sections.md) — cover Scope/Out-of-scope/Rollout, not AC only
