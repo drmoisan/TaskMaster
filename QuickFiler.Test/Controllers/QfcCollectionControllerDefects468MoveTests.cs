@@ -162,7 +162,7 @@ namespace QuickFiler.Controllers.Tests
             );
 
             // Act
-            Func<Task> act = () => controller.MoveEmailsAsync(null);
+            Func<Task> act = () => controller.MoveEmailsAsync();
 
             // Assert
             await act.Should()
@@ -213,7 +213,7 @@ namespace QuickFiler.Controllers.Tests
             );
 
             // Act
-            Func<Task> act = () => controller.MoveEmailsAsync(null);
+            Func<Task> act = () => controller.MoveEmailsAsync();
 
             // Assert
             await act.Should()
@@ -260,7 +260,7 @@ namespace QuickFiler.Controllers.Tests
             );
 
             // Act
-            Func<Task> act = () => controller.MoveEmailsAsync(null);
+            Func<Task> act = () => controller.MoveEmailsAsync();
 
             // Assert
             await act.Should()
@@ -460,15 +460,13 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Issue #469 defect 4. The retained <c>stackMovedItems</c> parameter must not influence
-        /// the outcome. With an empty cached move collection, passing <see langword="null"/> and
-        /// passing an in-memory stack are observationally identical: neither throws and neither
-        /// leaves a record on the supplied stack, because undo records reach the stack through the
-        /// email filer's push path onto the same globals instance, never through this argument.
-        /// The stack is constructed in memory and is never serialized, so no file is touched.
+        /// Issue #629: <c>MoveEmailsAsync</c> no longer takes a <c>stackMovedItems</c> argument, so
+        /// this test (formerly <c>MoveEmailsAsync_WithNullStack_BehavesIdenticallyToAnEmptyStack</c>)
+        /// no longer has two argument shapes to compare. Rewritten to keep the one behavior it was
+        /// actually pinning: an empty cached move collection is a no-op early return, not a throw.
         /// </summary>
         [TestMethod]
-        public async Task MoveEmailsAsync_WithNullStack_BehavesIdenticallyToAnEmptyStack()
+        public async Task MoveEmailsAsync_WithEmptyItemGroupsToMove_DoesNotThrow()
         {
             // Arrange
             QfcCollectionController controller =
@@ -478,20 +476,15 @@ namespace QuickFiler.Controllers.Tests
                 "_itemGroupsToMove",
                 new List<QfcItemGroup>()
             );
-            var stack = new SloStack<IMovedMailInfo>();
 
             // Act
-            Func<Task> withNullStack = () => controller.MoveEmailsAsync(null);
-            Func<Task> withSuppliedStack = () => controller.MoveEmailsAsync(stack);
+            Func<Task> act = () => controller.MoveEmailsAsync();
 
             // Assert
-            await withNullStack.Should().NotThrowAsync(because: NoStackEffect);
-            await withSuppliedStack.Should().NotThrowAsync(because: NoStackEffect);
-            stack.Count.Should().Be(0, because: NoStackEffect);
+            await act.Should()
+                .NotThrowAsync(
+                    because: "an empty cached move collection is the early-return no-op branch, not a failure"
+                );
         }
-
-        private const string NoStackEffect =
-            "the stackMovedItems parameter is retained for source compatibility only, so a null "
-            + "argument and a supplied argument must produce the same observable outcome";
     }
 }

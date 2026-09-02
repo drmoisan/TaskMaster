@@ -83,30 +83,41 @@ a file outside that feature's owned set. This feature removes the now-documented
 ## Definition of Done
 
 - [x] Acceptance criteria documented and mapped to tests (see `## Acceptance Criteria` below)
-- [ ] Behavior matches acceptance criteria (verified in the atomic plan's QA gates)
-- [ ] Tests updated/added
-- [ ] Edge cases covered (mock/setup sweep)
+- [x] Behavior matches acceptance criteria (verified in the atomic plan's QA gates)
+- [x] Tests updated/added
+- [x] Edge cases covered (mock/setup sweep)
 - [x] Docs updated (this spec; issue.md already documents the prior deferral decision)
-- [ ] Telemetry/logging: not applicable
-- [ ] Toolchain pass completed (CSharpier → analyzers → nullable → MSTest)
+- [x] Telemetry/logging: not applicable
+- [x] Toolchain pass completed (CSharpier → analyzers → nullable → MSTest)
 
 ## Acceptance Criteria
 
-- [ ] AC1. `IQfcCollectionController.MoveEmailsAsync` declares zero parameters.
-- [ ] AC2. `QfcCollectionController.MoveEmailsAsync` declares zero parameters and its body contains no
-  `stackMovedItems` reference (the `_ = stackMovedItems;` discard at `:2260` is removed along with the
-  parameter), while its XML doc comment continues to state how the undo stack is actually populated
-  (via `EmailFiler.PushToUndoStack` onto the shared `SloStack` instance).
-- [ ] AC3. The sole call site (`QfcFormController.EventHandlers.cs:225`) invokes
-  `await _groups.MoveEmailsAsync();` with no argument.
-- [ ] AC4. No `QuickFiler.Test` file contains a `Mock<IQfcCollectionController>` `Setup`/`Verify` that
-  still names the old single-parameter overload.
-- [ ] AC5. `MoveEmailsAsync_WithNullStack_BehavesIdenticallyToAnEmptyStack` is retired or rewritten to
-  no longer assert on the removed parameter's shape, with the disposition (retire vs. rewrite) recorded
-  and justified.
-- [ ] AC6. The full `QuickFiler.Test` suite passes with no regression, including an assertion that
-  undo-after-batch-move is still exercised by at least one surviving test.
-- [ ] AC7. A single clean toolchain pass completes in order: `dotnet tool run csharpier check .`,
-  the analyzer build, the nullable build, and the full MSTest suite with coverage — each exiting 0.
-- [ ] AC8. The diff touches only the files listed under "Implementation Strategy" above, plus this
-  feature folder's own evidence and documentation.
+- [x] AC1. `IQfcCollectionController.MoveEmailsAsync` declares zero parameters. Verified:
+  `QuickFiler/Interfaces/IQfcCollectionController.cs:63` reads `Task MoveEmailsAsync();`.
+- [x] AC2. `QfcCollectionController.MoveEmailsAsync` declares zero parameters and its body contains no
+  `stackMovedItems` reference. Verified: `QuickFiler/Controllers/QfcCollectionController.cs:2152`
+  (`public async Task MoveEmailsAsync()`), the `_ = stackMovedItems;` discard is gone, and the `<remarks>`
+  block states how the undo stack is actually populated (via `EmailFiler.PushToUndoStack` onto the
+  shared `Globals.AF.MovedMails` instance).
+- [x] AC3. The sole call site invokes `await _groups.MoveEmailsAsync();` with no argument. Verified:
+  `QuickFiler/Controllers/QfcFormController.EventHandlers.cs:228`.
+- [x] AC4. No `QuickFiler.Test` file contains a `Mock<IQfcCollectionController>` `Setup`/`Verify` that
+  still names the old single-parameter overload. Verified: both sites in
+  `QfcFormControllerUndoHandoffTests.cs` (`:74` Setup, `:396` Verify) updated to `MoveEmailsAsync()`;
+  full-repo grep for `MoveEmailsAsync(It.IsAny` and `MoveEmailsAsync(null)` returns zero hits
+  (`evidence/baseline/p0-t8-mock-sweep.md`).
+- [x] AC5. `MoveEmailsAsync_WithNullStack_BehavesIdenticallyToAnEmptyStack` is retired or rewritten to
+  no longer assert on the removed parameter's shape. Disposition: **rewritten** to
+  `MoveEmailsAsync_WithEmptyItemGroupsToMove_DoesNotThrow`, preserving the early-return-branch coverage
+  that would otherwise have been lost. Full justification: `evidence/other/p1-t5-test-disposition.md`.
+- [x] AC6. The full `QuickFiler.Test` suite passes with no regression. Verified: 6949/6949 passing both
+  baseline and final (`evidence/baseline/p0-t7-baseline-coverage.md`,
+  `evidence/qa-gates/p2-t5-final-coverage.md`). Undo-after-batch-move remains exercised by
+  `QfcFormControllerUndoHandoffTests.cs` (unchanged behaviorally; only its mock setup shape was
+  updated to match the new signature).
+- [x] AC7. A single clean toolchain pass completed in order: `dotnet tool run csharpier check .` (exit
+  0), the analyzer build (exit 0, 0 errors), the nullable build (exit 0, 0 errors), and the full MSTest
+  suite with coverage (exit 0, 6949/6949). Evidence: `evidence/qa-gates/p2-t1..t5-*.md`.
+- [x] AC8. The diff touches only the files listed under "Implementation Strategy" above, plus this
+  feature folder's own evidence and documentation. Verified: `evidence/other/p1-t6-footprint-check.md`
+  lists exactly the five predicted files; no other path was touched.

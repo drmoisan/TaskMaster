@@ -225,7 +225,7 @@ namespace QuickFiler.Controllers
             }
 
             // Move emails
-            await _groups.MoveEmailsAsync(_movedItems);
+            await _groups.MoveEmailsAsync();
 
             // Wait for the batch's filing work, including its undo pushes, to finish before either
             // downstream step runs. The await at the line above completes as soon as the last item has
