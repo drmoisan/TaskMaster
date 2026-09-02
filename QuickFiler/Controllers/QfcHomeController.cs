@@ -308,10 +308,7 @@ namespace QuickFiler.Controllers
                 // captured before UnhookDequeuedNodes and diverges from it on the UnhookItem throw
                 // path, so consuming it directly would display a still-hooked item and lose the
                 // substitute that replaced it.
-                preScored = QfcPreScoredItem.ReconcileCarriersToItems(
-                    batch.Items,
-                    batch.PreScored
-                );
+                preScored = QfcPreScoredItem.ReconcileCarriersToItems(batch.Items, batch.PreScored);
             }
 
             progress.Report(30, "Initializing Qfc Items");

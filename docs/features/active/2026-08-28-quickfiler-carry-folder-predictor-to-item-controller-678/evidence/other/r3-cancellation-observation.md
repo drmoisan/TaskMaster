@@ -1,6 +1,6 @@
 # R3 — Cancellation observation on the adoption path
 
-- Timestamp: 2026-09-02T01-45
+- Timestamp: 2026-09-02T01-26
 - Issue: #678
 - Task: [P1-T9]
 - File: `QuickFiler/Controllers/QfcItemController.FolderHandling.cs`

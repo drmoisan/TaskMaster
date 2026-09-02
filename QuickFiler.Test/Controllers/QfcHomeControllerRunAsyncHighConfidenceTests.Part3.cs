@@ -89,9 +89,7 @@ namespace QuickFiler.Controllers.Tests
                         It.IsAny<CancellationToken>()
                     )
                 )
-                .Returns(
-                    Task.FromResult((950L, @"\\Archive\Projects\Active", scoredHandler))
-                );
+                .Returns(Task.FromResult((950L, @"\\Archive\Projects\Active", scoredHandler)));
 
             // The monitor throws for the first item it is handed and succeeds afterwards, which is
             // exactly the TryUnhookOrReplace throw branch: remove the failed node, pull a
@@ -221,7 +219,9 @@ namespace QuickFiler.Controllers.Tests
                 .NotBeNull("RunAsync must invoke the carrier overload in high-confidence mode");
             loaded
                 .Should()
-                .ContainSingle("the displayed set must match the one item that survived the unhook");
+                .ContainSingle(
+                    "the displayed set must match the one item that survived the unhook"
+                );
             loaded[0]
                 .MailItem.Should()
                 .BeSameAs(

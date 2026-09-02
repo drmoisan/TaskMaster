@@ -1,6 +1,6 @@
 # R4 — Evidence timestamp correction
 
-- Timestamp: 2026-09-02T01-53
+- Timestamp: 2026-09-02T01-30
 - Issue: #678
 - Tasks: [P1-T12] (the correction) and [P1-T13] (the no-other-field proof)
 
