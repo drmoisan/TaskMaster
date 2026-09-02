@@ -89,7 +89,6 @@ namespace QuickFiler.Controllers
         private Dictionary<string, Theme> _themes;
         private BlockingCollection<IMovedMailInfo> _undoQueue = [];
         private Task _undoConsumerTask;
-        private List<Task<MailItemHelper>> _helperTasks = [];
 
         #endregion
 

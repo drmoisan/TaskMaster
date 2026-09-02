@@ -151,6 +151,13 @@ namespace QuickFiler.Controllers
             // If DebugLVL And vbCommand Then Debug.Print SubNm & " Variable durationText = " & durationText
 
             durationMinutesText = (Duration / 60d).ToString("##0.00", CultureInfo.InvariantCulture);
+
+            // Issue #726 finding 2: GetMoveDiagnostics needs an AppointmentItem reference before it
+            // runs (it may annotate the appointment WriteMoveToCalendar creates), so the calendar
+            // write itself cannot move after the empty-diagnostics check below. What can move is
+            // the DECISION to keep the appointment: an empty-diagnostics session was previously
+            // producing a calendar entry with no corresponding metrics file. Deleting the orphaned
+            // appointment when there is nothing to report keeps the two artifacts symmetric.
             WriteMoveToCalendar(
                 OlEndTime,
                 OlStartTime,
@@ -170,10 +177,17 @@ namespace QuickFiler.Controllers
 
             // The call is made through IQfcCollectionController.GetMoveDiagnostics, which carries
             // no XML documentation and therefore no non-null element guarantee, so this filter
-            // defends the interface contract rather than a known producer defect.
-            var lines = strOutput.Where(line => !string.IsNullOrWhiteSpace(line)).ToArray();
+            // defends the interface contract rather than a known producer defect. Issue #726
+            // finding 2: the array itself is also treated as possibly null for the same reason.
+            var lines = (strOutput ?? []).Where(line => !string.IsNullOrWhiteSpace(line)).ToArray();
             if (lines.Length == 0)
             {
+                // Issue #726 finding 2: nothing to report, so the appointment WriteMoveToCalendar
+                // just created is deleted rather than left orphaned with no matching metrics file.
+                if (OlAppointment is not null)
+                {
+                    OlAppointment.Delete();
+                }
                 return;
             }
 

@@ -301,6 +301,7 @@
     <Compile Include="Controllers\EfcHomeControllerDependencyFactories.cs" />
     <Compile Include="Controllers\EfcHomeControllerDependencies.cs" />
     <Compile Include="Controllers\EfcItemController.cs" />
+    <Compile Include="Controllers\EfcItemController.WebViewFaultBoundary.cs" />
     <Compile Include="Controllers\FilerQueue.cs" />
     <Compile Include="Controllers\IQfcFormController.cs" />
     <Compile Include="Controllers\IQfcHomeController.cs" />

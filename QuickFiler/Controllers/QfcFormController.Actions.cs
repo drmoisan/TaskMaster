@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -43,9 +42,11 @@ namespace QuickFiler.Controllers
                 return;
             }
 
-            _helperTasks = listObjects
-                .Select(x => MailItemHelper.FromMailItemAsync(x, _globals, Token, false))
-                .ToList();
+            // Issue #726 finding 6: this sync pipeline reaches QfcItemController.Initialize(false)
+            // -> PopulateControls(MailItem, int), which builds its own MailItemHelper via the
+            // synchronous constructor -- it never consumes a helper produced here. The prior
+            // per-item FromMailItemAsync call below was started, discarded unawaited, and its
+            // result read by nothing, so it was pure duplicated Outlook COM work. Removed.
             _groups = new QfcCollectionController(
                 AppGlobals: _globals,
                 viewerInstance: _formViewer,

@@ -57,11 +57,11 @@ namespace QuickFiler
         {
             if (Controllers.QfcFormKeyHandler.ClaimsAltChord(_keyboardHandler, keyData))
             {
+                // Issue #726 finding 8: the pre-existing `sender`/`e` locals from before this
+                // predicate was extracted were dead -- ToggleKeyboardDialogAsync() takes no
+                // arguments, and e.Handled had no effect since `e` was never wired to the real
+                // event pipeline. Removed rather than left as unrelated cruft.
                 SynchronizationContext.SetSynchronizationContext(UiSyncContext);
-                object sender = FromHandle(msg.HWnd);
-                var e = new KeyEventArgs(keyData);
-                //_keyboardHandler.ToggleKeyboardDialog(sender, e);
-                e.Handled = true;
                 _ = _keyboardHandler.ToggleKeyboardDialogAsync();
                 return true;
             }

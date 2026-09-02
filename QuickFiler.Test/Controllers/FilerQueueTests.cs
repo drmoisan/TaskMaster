@@ -97,9 +97,9 @@ namespace QuickFiler.Controllers.Tests
             new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         /// <summary>
-        /// Enqueues one item. Every enqueued item carries a real helper because the preserved
-        /// worker <c>catch</c> block calls <c>item.Helpers.First()</c>; an empty list would raise
-        /// inside the catch, escape the worker loop, and leave the drain permanently incomplete.
+        /// Enqueues one item carrying a real helper, for tests that are not themselves about the
+        /// empty-helpers diagnostic path fixed under issue #726 (see
+        /// <see cref="ConsumeAsync_ItemWithEmptyHelpersThrows_ConsumerRecoversForLaterItems"/>).
         /// </summary>
         private static void EnqueueOne(FilerQueue queue) =>
             queue.Enqueue(new EmailFiler(), OneHelper());
@@ -353,6 +353,77 @@ namespace QuickFiler.Controllers.Tests
                 );
             drain.IsCompleted.Should().BeTrue("the throwing item still decrements the counter");
             invocations.Should().Be(2, "the worker loop continues past the failing item");
+        }
+
+        [TestMethod]
+        public void Enqueue_NullItem_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var queue = new FilerQueue();
+
+            // Act
+            Action act = () => queue.Enqueue((FilerQueueItem)null);
+
+            // Assert
+            act.Should()
+                .Throw<ArgumentNullException>(
+                    "issue #726 finding 1: a null item must never reach the queue -- it previously "
+                        + "left the outstanding counter permanently incremented, since nothing was "
+                        + "actually queued to decrement it"
+                );
+        }
+
+        /// <summary>
+        /// Regression test for issue #726 finding 1. Before the fix, an item constructed with an
+        /// empty (not null) helpers list -- which <see cref="FilerQueueItem"/>'s constructor
+        /// permits -- would cause <c>item.Helpers.First()</c> inside the worker's diagnostic catch
+        /// handler to throw <see cref="InvalidOperationException"/>. That exception escaped the
+        /// catch itself, unwound the entire worker loop, and left the consumer-running flag
+        /// permanently set with no <c>try</c>/<c>finally</c> to clear it -- so no later Enqueue
+        /// call would ever start a new worker again, permanently hanging the background mover.
+        /// </summary>
+        [TestMethod]
+        public async Task ConsumeAsync_ItemWithEmptyHelpersThrows_ConsumerRecoversForLaterItems()
+        {
+            // Arrange
+            var queue = new FilerQueue();
+            var emptyHelpersItem = new FilerQueueItem(new EmailFiler(), new List<MailItemHelper>());
+            TaskCompletionSource<bool> secondProcessed = NewGate();
+            int invocations = 0;
+            queue.ItemProcessor = item =>
+            {
+                int index = Interlocked.Increment(ref invocations) - 1;
+                if (index == 0)
+                {
+                    // Provoked by an EMPTY (not null) Helpers list, exactly like the diagnostic
+                    // path's own item.Helpers.First() would throw before the fix.
+                    throw new InvalidOperationException(
+                        "processing fails for the empty-helpers item"
+                    );
+                }
+
+                secondProcessed.TrySetResult(true);
+                return Task.CompletedTask;
+            };
+
+            // Act: enqueue the poisoning item, wait for the queue to fully drain (proving the
+            // worker did not hang), then enqueue a second, normal item and confirm a NEW worker
+            // starts and processes it -- which only happens if the consumer-running flag was
+            // actually cleared rather than left stuck by the first item's escaping exception.
+            queue.Enqueue(emptyHelpersItem);
+            await queue.WhenDrainedAsync();
+            EnqueueOne(queue);
+            await secondProcessed.Task;
+            await queue.WhenDrainedAsync();
+
+            // Assert
+            invocations
+                .Should()
+                .Be(
+                    2,
+                    "the consumer-running flag must clear on the exceptional exit path so a later "
+                        + "Enqueue can start a fresh worker, not just on the normal empty-queue exit"
+                );
         }
     }
 }
