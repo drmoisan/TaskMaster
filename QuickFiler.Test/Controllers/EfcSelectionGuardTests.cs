@@ -143,13 +143,13 @@ namespace QuickFiler.Test.Controllers
         [TestMethod]
         public void IsValidFilingSelection_RootedTargetUnderArchiveRoot_IsRejected()
         {
-            // RC-1 inversion: rooted values are never filing stems here; normalization is deferred to issue #637.
+            // RC-1 inversion: rooted values are never filing stems here; the producer normalizes first.
             // Arrange / Act / Assert
             EfcSelectionGuard
                 .IsValidFilingSelection(@"\aRcHiVe\Clients\North")
                 .Should()
                 .BeFalse(
-                    "a rooted value is never a filing stem at this surface and producer-side normalization is deferred to issue #637"
+                    "a rooted value is never a filing stem at this surface because the producer now normalizes before this predicate is reached"
                 );
         }
 
@@ -289,6 +289,28 @@ namespace QuickFiler.Test.Controllers
         {
             // Arrange / Act / Assert
             EfcSelectionGuard.IsValidCreationSelection(@"Clients\North").Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void BannerRejectionPrefix_RejectsThreeAndFourEqualsRowsOnBothPredicates()
+        {
+            // Pins the intended relationship between the guard's three-character rejection
+            // prefix and the producers' four-character banner prefix (#662). The guard is
+            // deliberately the broader of the two: it rejects both arities on both predicates.
+            // A contributor who "unifies" the guard upward to the producers' four-character
+            // value relaxes it, and the two three-equals assertions below then fail.
+            // Arrange
+            const string because =
+                "this constant must not be widened to the producers' four-character prefix: "
+                + "widening it is the prohibited direction, because the three-character prefix "
+                + "is the only mechanism rejecting a three-equals row at either EFC "
+                + "classification site";
+
+            // Act / Assert
+            EfcSelectionGuard.IsValidFilingSelection("===").Should().BeFalse(because);
+            EfcSelectionGuard.IsValidCreationSelection("===").Should().BeFalse(because);
+            EfcSelectionGuard.IsValidFilingSelection("====").Should().BeFalse(because);
+            EfcSelectionGuard.IsValidCreationSelection("====").Should().BeFalse(because);
         }
 
         #endregion

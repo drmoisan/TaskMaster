@@ -1,6 +1,6 @@
 ---
 name: ac-gates-verify-satisfiability
-description: Do not encode repo-wide coverage floors (or any global threshold) as blocking AC without checking the captured baseline; and re-read spec.md from disk before reporting AC tallies — executors check items off concurrently
+description: Do not encode repo-wide coverage floors (or any global threshold) as blocking AC without checking the captured baseline; grep every asserted token on disk for exact casing; and re-read spec.md from disk before reporting AC tallies
 metadata:
   type: feedback
 ---
@@ -8,7 +8,8 @@ metadata:
 Two rules for authoring/correcting acceptance criteria in spec.md:
 
 1. Scope threshold gates to what the change controls. The repo-wide 80% line-coverage floor applies to the testable denominator per `CLAUDE.md` § UT2 (COM/VSTO/WinForms/Outlook-Interop exemptions), not the raw uninstrumented Cobertura figure. Before writing "repository line coverage >= 80%" as a blocking AC, check the merge-base baseline evidence (`<FEATURE>/evidence/baseline/`). If the raw figure is already below the floor, make the blocking conditions change-scoped (toolchain pass, no regression on changed lines, >= 90% on named new/changed modules and methods) and make the repo-wide figure a record-and-report obligation inside the criterion, stating the pre-existing shortfall and that the change does not lower it.
-2. Before reporting an AC status summary, re-read the AC section from disk. Executors check off criteria while the spec agent is mid-correction; my in-context copy was stale and I reported 0/13 checked when 9 were already `[x]` on disk. The coordinator corrected this.
+2. Grep every "token X is present in file Y" criterion against the real file before writing it, and copy the casing from the grep hit, not from the delegation prompt or the issue text. On #469 (2026-08-29) the prompt specified asserting `stackMovedItems` in `QuickFiler/Interfaces/IQfcCollectionController.cs`; the interface actually declares `StackMovedItems`, so a case-sensitive gate would have been dead on arrival. Also scope every "zero occurrences of X" criterion to a named file: the feature folder's own issue.md/spec.md/research doc quote the defect prose verbatim, so a repo-wide zero-hit gate on that prose is unsatisfiable by construction.
+3. Before reporting an AC status summary, re-read the AC section from disk. Executors check off criteria while the spec agent is mid-correction; my in-context copy was stale and I reported 0/13 checked when 9 were already `[x]` on disk. The coordinator corrected this.
 
 **Why:** On #424 (2026-08-06) the original AC 13 required repo-wide >= 80% while the merge-base baseline was 70.19% line / 58.30% branch — an unsatisfiable dead gate found at execution time. Corrections must be logged in a dated `## Correction Log` entry quoting the original wording, so the relaxation is visibly deliberate.
 

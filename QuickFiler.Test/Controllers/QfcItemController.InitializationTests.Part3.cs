@@ -288,6 +288,106 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
+        /// #670: awaited directly. The guard must not fault and the sink must get the seam fault.
+        /// </summary>
+        [TestMethod]
+        public async Task InitializeWebViewGuardedAsync_WhenTheWebViewSeamFaults_ReportsToTheSinkAndDoesNotFault()
+        {
+            // Arrange — the supplied context must also be current, so the await at
+            // ViewerSetup.cs:64 continues inline and execution reaches the mocked seam.
+            SynchronizationContext previous = SynchronizationContext.Current;
+            try
+            {
+                SynchronizationContext context = new SynchronizationContext();
+                SynchronizationContext.SetSynchronizationContext(context);
+                HarnessController controller = BuildGuardedWebViewTarget(context);
+                System.Exception captured = null;
+                controller.WebViewInitializationErrorSink = (message, exception) =>
+                    captured = exception;
+
+                // Act
+                Func<Task> act = () => controller.InitializeWebViewGuardedAsync();
+
+                // Assert
+                await act.Should()
+                    .NotThrowAsync(because: "the guard contains the fault instead of returning it")
+                    .ConfigureAwait(false);
+                captured
+                    .Should()
+                    .BeOfType<WebViewSentinelException>(
+                        because: "the sink must receive the exact fault raised at the mocked seam"
+                    );
+            }
+            finally
+            {
+                SynchronizationContext.SetSynchronizationContext(previous);
+            }
+        }
+
+        /// <summary>
+        /// #670: exercises the sink's default lambda body rather than a test double.
+        /// </summary>
+        [TestMethod]
+        public void WebViewInitializationErrorSink_DefaultDelegate_InvokesWithoutThrowing()
+        {
+            // Arrange — no sink assignment, so the default log4net-backed delegate is under test.
+            HarnessController controller = new HarnessController();
+
+            // Act
+            System.Action act = () =>
+                controller.WebViewInitializationErrorSink("smoke", new InvalidOperationException());
+
+            // Assert
+            act.Should()
+                .NotThrow(
+                    because: "the default sink must write through the static logger without faulting"
+                );
+        }
+
+        /// <summary>
+        /// #670: the site-192 dispatcher path. The sink is installed during Arrange because the
+        /// dispatched operation may complete before <c>host.InvokeAsync</c> returns.
+        /// </summary>
+        [TestMethod]
+        [Timeout(PumpTimeoutMs)]
+        public async Task InitializeBool_WhenTheWebViewSeamFaults_ObservesTheFaultThroughTheSink()
+        {
+            // Arrange
+            WinFormsPumpHost host = new WinFormsPumpHost();
+            PumpHarness harness = null;
+            try
+            {
+                harness = await BuildPumpHarnessAsync(host, darkMode: false).ConfigureAwait(false);
+                var observed = new TaskCompletionSource<System.Exception>(
+                    TaskCreationOptions.RunContinuationsAsynchronously
+                );
+                harness.Controller.WebViewInitializationErrorSink = (m, e) =>
+                    observed.TrySetResult(e);
+
+                // Act
+                await host.InvokeAsync(() => harness.Controller.Initialize(async: false))
+                    .ConfigureAwait(false);
+                System.Exception fault = await observed.Task.ConfigureAwait(false);
+
+                // Assert
+                fault
+                    .Should()
+                    .BeOfType<WebViewSentinelException>(
+                        because: "the dispatched guard must route the seam fault to the sink"
+                    );
+            }
+            finally
+            {
+                if (harness != null)
+                {
+                    harness.Restore();
+                }
+
+                await host.StopAsync().ConfigureAwait(false);
+            }
+        }
+
+        /// <summary>
         /// #511/#571 regression probe: the shared pump harness must hand back an
         /// <c>ItemViewer</c> whose window handle already exists, created on the pump thread.
         /// Every pump-hosted test in this class marshals work through the viewer, and

@@ -29,3 +29,18 @@ the reference resolves and the promotion audit trail is complete before committi
 Do NOT treat its absence as a promotion failure — trust the issue URL + populated
 issue.md as the real success signals. Observed once; verify before relying on it.
 Related: [[potential-to-issue-creates-github-issue]].
+
+**Converse, observed 2026-09-01 on issue #663 (parallel-add prep):** when NO
+promoted source exists at all, `new_active_feature_folder` returns `ok:true` and
+emits `spec.md` plus the plan template but **no `issue.md` whatsoever**. It had
+nothing to copy. The tool does not warn. That leaves the folder without the
+`- Work Mode:` marker every downstream mode-resolution rule reads, so planning
+would fail closed to `full-feature` and demand a `user-story.md` the bug route
+does not want.
+
+**How to apply:** always `ls` the active folder immediately after
+`new_active_feature_folder` and confirm `issue.md` exists. If it does not, author
+it from the GitHub issue body (`gh issue view <N> --json body`) and persist the
+correct `- Work Mode:` marker yourself before delegating anything. Record in the
+checkpoint that the tool did not produce it, so a later audit does not read the
+hand-authored file as drift.

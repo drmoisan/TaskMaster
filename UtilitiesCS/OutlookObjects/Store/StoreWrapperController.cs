@@ -120,8 +120,8 @@ namespace UtilitiesCS.OutlookObjects.Store
             if (readiness.State != StoreLaunchReadinessState.Ready)
             {
                 MyBox.ShowDialog(
-                    "Store settings are not available yet. Please try again after startup completes.",
-                    "Store Settings Unavailable",
+                    StoreLaunchReadinessEvaluator.BuildUnavailableMessage(readiness.State),
+                    StoreLaunchReadinessEvaluator.BuildUnavailableTitle(readiness.State),
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning
                 );

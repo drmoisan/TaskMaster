@@ -1,0 +1,4 @@
+Timestamp: 2026-09-01T00-15
+Command: pwsh -NoProfile -File scripts/vscode/Invoke-Restore.ps1 ; pwsh -NoProfile -Command 'Test-Path packages/Meziantou.Analyzer.3.0.194; Test-Path packages/Roslynator.Analyzers.5.0.0; Test-Path packages/AsyncFixer.2.1.0; Test-Path packages/Microsoft.CodeAnalysis.BannedApiAnalyzers.5.6.0; Test-Path packages/SonarAnalyzer.CSharp.10.33.0.1635; Test-Path packages/MSTest.Analyzers.4.3.3'
+EXIT_CODE: 0
+Output Summary: Restore installed 172 packages to packages.config projects; msbuild restore target reported "Build succeeded. 0 Warning(s) 0 Error(s)". All six analyzer package Test-Path checks printed True: Meziantou.Analyzer.3.0.194, Roslynator.Analyzers.5.0.0, AsyncFixer.2.1.0, Microsoft.CodeAnalysis.BannedApiAnalyzers.5.6.0, SonarAnalyzer.CSharp.10.33.0.1635, MSTest.Analyzers.4.3.3. No .csproj or packages.config file was edited.

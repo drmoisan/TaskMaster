@@ -48,9 +48,11 @@ namespace QuickFiler.Controllers
                 FolderPredictor.InitOptions,
                 FolderPredictor
             > folderPredictorFactory = null,
-            Func<IApplicationGlobals, FolderPredictor> folderPredictorEmptyFactory = null
+            Func<IApplicationGlobals, FolderPredictor> folderPredictorEmptyFactory = null,
+            IFolderSearchHandler carriedFolderHandler = null
         )
         {
+            _carriedFolderHandler = carriedFolderHandler;
             //TraceUtility.LogMethodCall(appGlobals, homeController, parent, itemViewer, viewerPosition, itemNumberDigits, mailItem, tlpStates);
             // Store any injected seams before SaveParameters applies the production defaults for the
             // ones left null (see SaveParameters). Non-breaking: all seam parameters are optional.
@@ -83,6 +85,10 @@ namespace QuickFiler.Controllers
         /// The predetermined top-suggestion folder path, or null for the standard (non-high-confidence)
         /// path in which the index-based selection is used.
         /// </param>
+        /// <param name="carriedFolderHandler">
+        /// Issue #678. The already-initialised folder search handler the dequeue-time confidence
+        /// gate produced for this item, or null when none is available.
+        /// </param>
         public QfcItemController(
             IApplicationGlobals appGlobals,
             IFilerHomeController homeController,
@@ -92,7 +98,8 @@ namespace QuickFiler.Controllers
             int itemNumberDigits,
             MailItem mailItem,
             TlpCellStates tlpStates,
-            string predeterminedFolder
+            string predeterminedFolder,
+            IFolderSearchHandler carriedFolderHandler = null
         )
         {
             SaveParameters(
@@ -106,6 +113,7 @@ namespace QuickFiler.Controllers
                 tlpStates
             );
             _predeterminedFolder = predeterminedFolder;
+            _carriedFolderHandler = carriedFolderHandler;
         }
 
         public QfcItemController(
@@ -189,7 +197,7 @@ namespace QuickFiler.Controllers
             WireEvents();
 
             // Fire and forget WebView initialization
-            _ = _itemViewer.UiDispatcher.InvokeAsync(InitializeWebViewAsync);
+            _ = _itemViewer.UiDispatcher.InvokeAsync(InitializeWebViewGuardedAsync);
             //Task.Run(() => InitializeWebViewAsync());
         }
 
@@ -285,7 +293,7 @@ namespace QuickFiler.Controllers
             await ToggleTipsAsync(desiredState: Enums.ToggleState.Off | Enums.ToggleState.Force);
             await ToggleNavigationAsync(desiredState: Enums.ToggleState.Off);
             WireEvents();
-            _ = InitializeWebViewAsync();
+            _ = InitializeWebViewGuardedAsync();
         }
 
         // #230: de-exempted. The former barrier was the missing WinForms message pump, not headless
@@ -321,7 +329,7 @@ namespace QuickFiler.Controllers
             await ToggleNavigationAsync(desiredState: Enums.ToggleState.Off);
             WireEvents();
 
-            _ = InitializeWebViewAsync();
+            _ = InitializeWebViewGuardedAsync();
         }
 
         //public async Task InitializeSequentialAsync()

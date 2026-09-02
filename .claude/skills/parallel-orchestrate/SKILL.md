@@ -478,9 +478,9 @@ pull-request state, merge time, and merge commit. Where the checkpoint disagrees
 commands, the commands win and the checkpoint is rewritten from them.
 
 Validate through `mcp__drm-copilot__validate_orchestration_artifacts` with
-`artifact_type: "parallel-orchestrator-state"`, or the equivalent CLI invocation
-`poetry run python -m scripts.dev_tools.validate_orchestration_artifacts parallel-orchestrator-state <path>`,
-adding `--require-complete` at the completion gate.
+`artifact_type: "parallel-orchestrator-state"`. At the completion gate, pass the
+`require_complete` argument on that same MCP call; no repository-local Python
+interpreter is required at a destination runtime.
 
 ## Completion Requirements
 

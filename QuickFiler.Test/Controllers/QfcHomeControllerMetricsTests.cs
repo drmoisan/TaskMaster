@@ -123,12 +123,12 @@ namespace QuickFiler.Controllers.Tests
             var controller = new QfcHomeController(mockGlobals.Object, () => { });
             controller.CreateCancellationToken();
             // Replace the production file writer with a no-op. The default seam value is
-            // FileIO2.WriteTextFileAsync, which probes a real path and retries 100 times over ten
-            // seconds when the folder is absent; a unit test must not touch the filesystem or wait
-            // on wall-clock time. Tests that assert on the flush override this with a capturing
-            // delegate of their own.
+            // FileIO2.WriteTextFileAsync, which probes a real path, retries a bounded 100 times over
+            // ten seconds when the folder is absent and then returns false rather than reporting
+            // success; a unit test must not touch the filesystem or wait on wall-clock time. Tests
+            // that assert on the flush override this with a capturing delegate of their own.
             controller.MetricsFileWriter = (filename, lines, folderRoot, token) =>
-                Task.CompletedTask;
+                Task.FromResult(true);
             SetPrivateField(controller, "_formController", mockFormController.Object);
             SetPrivateField(controller, "_stopWatchMoved", new Stopwatch());
             return (controller, mockGroups);
@@ -335,7 +335,7 @@ namespace QuickFiler.Controllers.Tests
             controller.MetricsFileWriter = (filename, written, folderRoot, token) =>
             {
                 captures.Add(new MetricsWrite(filename, written, folderRoot, token));
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             };
 
             await controller.WriteMetricsAsync("metrics.csv");
@@ -360,6 +360,7 @@ namespace QuickFiler.Controllers.Tests
             {
                 await Task.Yield();
                 writerCompleted = true;
+                return true;
             };
 
             await controller.WriteMetricsAsync("metrics.csv");
@@ -382,7 +383,7 @@ namespace QuickFiler.Controllers.Tests
             controller.MetricsFileWriter = (filename, written, folderRoot, token) =>
             {
                 captured.Add(token);
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             };
             controller.TokenSource.Cancel();
 
@@ -395,9 +396,9 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// GetMoveDiagnostics returns an array one element longer than it fills, so its trailing
-        /// element is null. Null and whitespace-only entries must be dropped before the write rather
-        /// than producing a blank CSV line.
+        /// The call is made through the IQfcCollectionController.GetMoveDiagnostics contract,
+        /// which carries no XML documentation and no non-null element guarantee. Null and
+        /// whitespace-only entries must therefore be dropped before the write.
         /// </summary>
         [TestMethod]
         public async Task WriteMetricsAsync_FiltersNullDiagnosticLinesBeforeWriting()
@@ -409,7 +410,7 @@ namespace QuickFiler.Controllers.Tests
             controller.MetricsFileWriter = (filename, written, folderRoot, token) =>
             {
                 captures.Add(new MetricsWrite(filename, written, folderRoot, token));
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             };
 
             await controller.WriteMetricsAsync("metrics.csv");
@@ -438,7 +439,7 @@ namespace QuickFiler.Controllers.Tests
             controller.MetricsFileWriter = (filename, written, folderRoot, token) =>
             {
                 invoked = true;
-                return Task.CompletedTask;
+                return Task.FromResult(true);
             };
 
             await controller.WriteMetricsAsync("metrics.csv");
@@ -446,6 +447,29 @@ namespace QuickFiler.Controllers.Tests
             invoked
                 .Should()
                 .BeFalse("the guard must abort before any write when MyDocuments is absent");
+        }
+
+        /// <summary>
+        /// The zero-line boundary case. When every diagnostic entry is null or whitespace the
+        /// null-and-whitespace filter leaves an empty array, so there is no content to record and
+        /// the writer must not be reached at all. The default writer appends, which would create
+        /// or touch an empty session-metrics file. MyDocuments is present, so the pre-existing
+        /// MyDocuments guard is not what causes the early return.
+        /// </summary>
+        [TestMethod]
+        public async Task WriteMetricsAsync_WithAllNullOrWhitespaceDiagnostics_DoesNotInvokeWriter()
+        {
+            var (controller, _) = BuildLooseMetricsController(new[] { "   ", null, "\t" });
+            var invoked = false;
+            controller.MetricsFileWriter = (filename, written, folderRoot, token) =>
+            {
+                invoked = true;
+                return Task.FromResult(true);
+            };
+
+            await controller.WriteMetricsAsync("metrics.csv");
+
+            invoked.Should().BeFalse("an empty filtered array must not reach the writer at all");
         }
 
         #endregion Issue #442 — metrics flush tests

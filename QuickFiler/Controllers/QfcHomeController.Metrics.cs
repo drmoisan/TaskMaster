@@ -30,7 +30,7 @@ namespace QuickFiler.Controllers
             string[],
             string,
             CancellationToken,
-            Task
+            Task<bool>
         > MetricsFileWriter { get; set; } = FileIO2.WriteTextFileAsync;
 
         public void QuickFileMetrics_WRITE(string filename)
@@ -168,15 +168,31 @@ namespace QuickFiler.Controllers
                 ref OlAppointment
             );
 
-            // GetMoveDiagnostics returns an array one element longer than it fills, so its trailing
-            // element is null; dropping null and whitespace-only entries keeps blank rows out of
-            // the CSV.
+            // The call is made through IQfcCollectionController.GetMoveDiagnostics, which carries
+            // no XML documentation and therefore no non-null element guarantee, so this filter
+            // defends the interface contract rather than a known producer defect.
             var lines = strOutput.Where(line => !string.IsNullOrWhiteSpace(line)).ToArray();
+            if (lines.Length == 0)
+            {
+                return;
+            }
 
             // CancellationToken.None, never the session Token: the dispatcher continuation that
             // carries this write is not awaited to completion, so a session cancellation can be
             // raised while the write is in flight and must not destroy the metrics.
-            await MetricsFileWriter(filename, lines, myDocuments, CancellationToken.None);
+            bool metricsWritten = await MetricsFileWriter(
+                filename,
+                lines,
+                myDocuments,
+                CancellationToken.None
+            );
+            if (!metricsWritten)
+            {
+                logger.Error(
+                    $"Session metrics were not written to {LOC_TXT_FILE}. The writer exhausted its "
+                        + "retry budget or failed after opening the file."
+                );
+            }
         }
 
         private void WriteMoveToCalendar(

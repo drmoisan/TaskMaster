@@ -19,16 +19,18 @@
 
     Every function is pure: it reads no file, starts no process, and never mutates
     its input. Each check returns a string array, empty when the block is valid.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 # Import the shared checkpoint-value primitives and the two reference formulas,
 # resolved relative to this module's directory so the imports travel with the
 # pushed-down pack regardless of the consumer repository's working directory.
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCheckpointValue.psm1') -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCheckpointValue.psm1') -Force -ErrorAction Stop
 $script:ModelRoutingModulePath = Join-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath '..') -ChildPath (Join-Path -Path 'model-routing' -ChildPath 'ModelRouting.psm1')
-Import-Module $script:ModelRoutingModulePath -Force
+Import-Module $script:ModelRoutingModulePath -Force -ErrorAction Stop
 
 # The complexity-band vocabulary, ordered lowest to highest. Pinned to BAND_ORDER
 # in scripts/dev_tools/compute_complexity_floor.py and to the identical ordering

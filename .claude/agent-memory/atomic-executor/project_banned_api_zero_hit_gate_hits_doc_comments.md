@@ -18,6 +18,17 @@ lines would have turned the search green by destroying documentation the plan it
 
 The strip filter that worked: `grep -v -E '^\s*(///|//|\*|/\*)'` piped into `grep -F -c "$lit"`.
 
+**PowerShell variant — `Select-String` is case-insensitive unless `-CaseSensitive` is passed.** A
+zero-hit gate spelled `Select-String -SimpleMatch 'throw'` also matches `ThrowIfCancellationRequested`,
+`NotThrowAsync`, `InvokesWithoutThrowing`, and `ThrowsAsync`. Issue #670's P1-T4 required zero `throw`
+hits in a new fault-boundary file whose body — dictated by the same task — carried the comment
+`// fault: InitializeWebViewAsync opens with Token.ThrowIfCancellationRequested().`, so the gate was
+unsatisfiable as written. The fix is `-CaseSensitive`, not deleting the comment: a genuine rethrow is
+always lower-case `throw;` or `throw ex;`, so the case-sensitive search still detects the thing the
+gate exists to detect. Sweep every `Select-String` zero-match and exact-count condition in a plan for
+this: the same trap fires on `'Task.Delay'` vs `task.delay`, and on any identifier whose PascalCase
+form contains the banned lower-case token.
+
 **How to apply:** at preflight, rewrite such a clause to name the executable-code measurement
 explicitly. During execution, if the clause survives as written, record both counts side by side,
 quote each raw hit with its file:line and the full comment text, and state plainly which reading is

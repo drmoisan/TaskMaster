@@ -31,6 +31,21 @@ recorded a head SHA one commit behind and omitted all three review artifacts.
 
 Two more defects confirmed in the same bundle: the summary reported "GitHub CLI (gh) is not installed" while `gh auth status` and `gh issue view` both worked in the same session; and the `author asserted` autoclose list contained `#AC-1`..`#AC-16` (acceptance-criterion IDs scraped as issue numbers) plus three issues that were not mine to close. Never emit `Closes` from that list. Note also that a child PR into an epic integration branch cannot auto-close anything — GitHub only honors closing keywords merging into the DEFAULT branch — so `Refs #NNN` is the correct form and the epic's final integration-to-main PR carries the close.
 
+**It behaved correctly in a parallel-run child whose cwd WAS its own agent worktree (#647,
+2026-08-31).** Session root was `TaskMaster-wt/2026-08-29T00-11`, my cwd was
+`.claude/worktrees/agent-<id>`. `collect_pr_context` with `base: main` wrote `pr_context.summary.txt`
+and `.appendix.txt` DIRECTLY into my worktree's `artifacts/`, freshly (mtime matched the call), with
+`Head ref (resolved)` equal to my own `git rev-parse HEAD` and `Base ref (resolved)` equal to the
+current `origin/main`. Both ownership assertions passed on the first call. `gh pr create --body-file`
+from the worktree was then accepted, so the `enforce-pr-author-skill.ps1` hook read the WORKTREE copy,
+not the session root — consistent with [[agent-worktree-hooks-resolve-to-agent-cwd]] and against
+[[child-orchestrator-pr-hook-reads-session-root]], whose session-root behavior applies when the agent's
+cwd is a DIFFERENT worktree from where the feature branch is checked out. Cheap insurance that cost
+nothing: `cp -p` the summary, appendix, body and receipt to the session root as well, so either
+resolution succeeds. Use `-p` so the preserved mtime keeps the receipt's `created_at` newer
+([[pr-author-receipt-staleness-is-mtime-vs-created-at]]). The "GitHub CLI unavailable" line was
+still false, as always.
+
 **Independent confirmation and the simplest safe remedy (#445, 2026-08-22).** Same run, same wave:
 `ok:true`, worktree paths returned, nothing written there, primary checkout freshly written. The
 worktree copy I would have used was a decoy the feature-review subagent had hand-authored (quirk (a)

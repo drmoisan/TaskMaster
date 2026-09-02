@@ -166,7 +166,7 @@ namespace QuickFiler.Controllers.Tests
                         It.IsAny<CancellationToken>()
                     )
                 )
-                .ReturnsAsync((100L, string.Empty));
+                .ReturnsAsync((100L, string.Empty, (IFolderSearchHandler)null));
 
             var moveMonitor = new Mock<IEmailMoveMonitor>(MockBehavior.Strict);
             moveMonitor.Setup(x => x.UnhookItem(rejectedItem));
@@ -230,7 +230,7 @@ namespace QuickFiler.Controllers.Tests
                 .Returns(() =>
                 {
                     fake.Advance(TimeSpan.FromSeconds(1));
-                    return Task.FromResult((100L, string.Empty));
+                    return Task.FromResult((100L, string.Empty, (IFolderSearchHandler)null));
                 });
 
             var moveMonitor = new Mock<IEmailMoveMonitor>(MockBehavior.Strict);
@@ -258,5 +258,156 @@ namespace QuickFiler.Controllers.Tests
                     "a deadline-bounded empty batch must not be reported as quantity satisfaction"
                 );
         }
+
+        #region Issue #678 — leg-B carrier resolution
+
+        /// <summary>
+        /// Builds a mail item whose <c>EntryID</c> is the supplied value. The resolver reads only
+        /// that member, so a loose mock is sufficient and no live Outlook COM is touched.
+        /// </summary>
+        private static MailItem MailWithEntryId(string entryId)
+        {
+            var mail = new Mock<MailItem>(MockBehavior.Loose);
+            mail.SetupGet(x => x.EntryID).Returns(entryId);
+            return mail.Object;
+        }
+
+        /// <summary>
+        /// AC6. The leg-B resolver matches a carrier to its mail item by <c>EntryID</c> and returns
+        /// the folder search handler the dequeue-time gate already initialised. Matching is by
+        /// identifier rather than by position because <c>UnhookDequeuedNodes</c> can replace an
+        /// element of the item list in place, which would silently pair a row with another row's
+        /// handler under positional matching.
+        /// </summary>
+        [TestMethod]
+        public void ResolveCarriedHandler_WhenEntryIdMatchesACarrier_ReturnsThatCarriersHandler()
+        {
+            // Arrange — two carriers in an order that does not match the lookup order.
+            MailItem first = MailWithEntryId("entry-1");
+            MailItem second = MailWithEntryId("entry-2");
+            IFolderSearchHandler firstHandler = new Mock<IFolderSearchHandler>().Object;
+            IFolderSearchHandler secondHandler = new Mock<IFolderSearchHandler>().Object;
+            IList<QfcPreScoredItem> carriers = new List<QfcPreScoredItem>
+            {
+                new QfcPreScoredItem(first, @"\\A\one", firstHandler),
+                new QfcPreScoredItem(second, @"\\A\two", secondHandler),
+            };
+
+            // Act
+            IFolderSearchHandler resolved = QfcQueue.ResolveCarriedHandler(
+                carriers,
+                MailWithEntryId("entry-2")
+            );
+
+            // Assert
+            resolved
+                .Should()
+                .BeSameAs(
+                    secondHandler,
+                    "the handler must be matched to its own item by EntryID, not by position"
+                );
+        }
+
+        /// <summary>
+        /// AC6 negative cases. A null carrier list, an empty carrier list, a null mail item, a mail
+        /// item with no EntryID, and a mail item absent from the list all resolve to null, which is
+        /// the pre-change behaviour for every row: the item controller then builds and initialises
+        /// its own predictor exactly as before.
+        /// </summary>
+        [TestMethod]
+        public void ResolveCarriedHandler_WhenNoCarrierMatches_ReturnsNull()
+        {
+            MailItem known = MailWithEntryId("entry-1");
+            IList<QfcPreScoredItem> carriers = new List<QfcPreScoredItem>
+            {
+                new QfcPreScoredItem(known, @"\\A\one", new Mock<IFolderSearchHandler>().Object),
+            };
+
+            QfcQueue.ResolveCarriedHandler(null, known).Should().BeNull("a null carrier list");
+            QfcQueue
+                .ResolveCarriedHandler(new List<QfcPreScoredItem>(), known)
+                .Should()
+                .BeNull("an empty carrier list");
+            QfcQueue.ResolveCarriedHandler(carriers, null).Should().BeNull("a null mail item");
+            QfcQueue
+                .ResolveCarriedHandler(carriers, MailWithEntryId(null))
+                .Should()
+                .BeNull("a mail item with no EntryID");
+            QfcQueue
+                .ResolveCarriedHandler(carriers, MailWithEntryId("entry-absent"))
+                .Should()
+                .BeNull("a mail item absent from the carrier list");
+        }
+
+        /// <summary>
+        /// AC6. The injectable item-controller seam has a production default, so a queue that no
+        /// test has configured constructs rows exactly as it did before the seam was introduced.
+        /// A null default would make the seam a behaviour change rather than a test affordance.
+        ///
+        /// The default is invoked here rather than merely probed for non-nullity: invoking it is
+        /// what proves the construction expression it wraps still builds a controller and still
+        /// carries the folder handler through. The seam's viewer parameter is the narrow
+        /// <see cref="IItemViewer"/> rather than the concrete WinForms <c>ItemViewer</c> precisely
+        /// so this can be done with a Moq double and no live window, following the same shape as
+        /// <c>QfcItemController_InitializationTests.PredeterminedFolderConstructor_StoresPredeterminedFolder</c>.
+        /// </summary>
+        [TestMethod]
+        public void ItemControllerFactory_DefaultInvocation_BuildsControllerCarryingTheHandler()
+        {
+            // Arrange
+            QfcQueue queue = NewQueue(CancellationToken.None);
+            queue
+                .ItemControllerFactory.Should()
+                .NotBeNull(
+                    "the seam's production default must preserve the current construction expression"
+                );
+
+            var kbd = new Mock<IQfcKeyboardHandler>();
+            var explorer = new Mock<IQfcExplorerController>();
+            var cts = new CancellationTokenSource();
+            var home = new Mock<IFilerHomeController>();
+            home.SetupGet(h => h.KeyboardHandler).Returns(kbd.Object);
+            home.SetupGet(h => h.ExplorerController).Returns(explorer.Object);
+            home.SetupGet(h => h.TokenSource).Returns(cts);
+            home.SetupGet(h => h.Token).Returns(cts.Token);
+            var viewer = new Mock<IItemViewer>();
+            IFolderSearchHandler carried = new Mock<IFolderSearchHandler>().Object;
+
+            // Act — invoke the production default exactly as LoadControllersViewersAsync does.
+            IQfcItemController controller = queue.ItemControllerFactory(
+                new Mock<IApplicationGlobals>().Object,
+                home.Object,
+                new Mock<IQfcCollectionController>().Object,
+                viewer.Object,
+                3,
+                2,
+                null,
+                null,
+                carried
+            );
+
+            // Assert — a controller was built, wired to the viewer, and given the carried handler.
+            controller.Should().NotBeNull();
+            controller.ItemNumber.Should().Be(3, "the viewer position is passed through unchanged");
+            controller
+                .ItemNumberDigits.Should()
+                .Be(2, "the digit count is passed through unchanged");
+            // IItemViewer.Controller is declared as the narrower QuickFiler.IItemControler, so the
+            // returned IQfcItemController is cast rather than passed directly.
+            viewer.VerifySet(v => v.Controller = (IItemControler)controller, Times.Once());
+            typeof(QfcItemController)
+                .GetField("_carriedFolderHandler", NonPublicInstance)
+                .GetValue(controller)
+                .Should()
+                .BeSameAs(
+                    carried,
+                    "the seam's default must pass the carried handler into the controller, which is "
+                        + "the whole point of widening the construction"
+                );
+
+            cts.Dispose();
+        }
+
+        #endregion Issue #678 — leg-B carrier resolution
     }
 }

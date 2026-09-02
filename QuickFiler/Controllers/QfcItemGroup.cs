@@ -48,5 +48,14 @@ namespace QuickFiler.Controllers
         /// through the carrier-list load path. Null on the standard (non-high-confidence) load path.
         /// </summary>
         internal string PredeterminedFolder { get; set; }
+
+        /// <summary>
+        /// Issue #678. The already-initialised folder search handler carried alongside
+        /// <see cref="PredeterminedFolder"/> from the dequeue-time confidence gate, so the item
+        /// controller adopts it instead of running a second
+        /// <c>FolderPredictor.InitAsync(FromField)</c> pass. Null on the standard load path and
+        /// whenever the producer published no handler.
+        /// </summary>
+        internal IFolderSearchHandler CarriedFolderHandler { get; set; }
     }
 }

@@ -155,6 +155,10 @@ Declaration requirement. Every plan handoff MUST carry exactly one of these two 
 
 ## Preflight Validation (Planner ↔ Executor)
 
+### Planner Internal Review Record
+
+Before executor preflight, the planner must emit exactly one bounded record between `PLANNER-INTERNAL-REVIEW: PASS` and the existing `PREFLIGHT:` signal. The record requires exactly one passing declaration each for `CITATION-TO-TREE`, `AC-TRACEABILITY`, and `SCOPE-BOUNDARY`; one or more `CITATION: <repository-relative path> | <nonblank locator>` entries; exactly one `AC-INVENTORY:` declaration containing unique nonblank IDs; one `AC-MAPPING: <ID> | IMPLEMENTATION: <nonblank> | TESTS: <nonblank> | EVIDENCE: <nonblank>` for every and only inventory ID; and exactly one `UNRESOLVED-GAPS: NONE`. Missing, blank, duplicate, non-passing, out-of-bounds, or inventory/mapping-disagreeing declarations block handoff. If review cannot pass, emit `SELF-REVIEW: BLOCKED` and do not hand the plan to preflight. `SELF-REVIEW: RE-DERIVED THIS PASS` remains distinct and does not replace executor clearance.
+
 When validating or handing off plans for execution:
 - Use the directive line: `DIRECTIVE: PREFLIGHT VALIDATION ONLY`.
 - Require one of the exact signals:

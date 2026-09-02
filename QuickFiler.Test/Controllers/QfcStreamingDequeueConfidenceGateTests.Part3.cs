@@ -8,6 +8,7 @@ using Microsoft.Extensions.Time.Testing;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuickFiler.Interfaces;
+using UtilitiesCS;
 
 namespace QuickFiler.Controllers.Tests
 {
@@ -21,6 +22,19 @@ namespace QuickFiler.Controllers.Tests
     /// </summary>
     public partial class QfcStreamingDequeueConfidenceGateTests
     {
+        /// <summary>
+        /// Builds a completed <c>scoreLoader</c> result. Issue #678 widened that delegate's tuple to
+        /// carry the folder search handler the scoring pass initialised; these gate tests exercise
+        /// the score and stop-reason behaviour and publish no handler, so the third element is null.
+        /// Declared once here so the widening did not have to be spelled out at every inline lambda
+        /// across the three parts of this class.
+        /// </summary>
+        private static Task<(long Score, string TopFolder, IFolderSearchHandler Handler)> Scored(
+            long score,
+            string topFolder = "",
+            IFolderSearchHandler handler = null
+        ) => Task.FromResult((score, topFolder, handler));
+
         /// <summary>
         /// AC 5: the callback fires exactly once per scanned candidate — rejected candidates
         /// included — reporting <c>(scanned, accepted, quantity)</c>, with <c>scanned</c> incrementing
@@ -40,14 +54,10 @@ namespace QuickFiler.Controllers.Tests
             object gate = CreateGate(
                 () => source.Count == 0 ? null : source.Dequeue(),
                 (mail, token) =>
-                    Task.FromResult(
-                        (
-                            ReferenceEquals(mail, candidates[1])
-                            || ReferenceEquals(mail, candidates[3])
-                                ? 950L
-                                : 100L,
-                            ""
-                        )
+                    Scored(
+                        ReferenceEquals(mail, candidates[1]) || ReferenceEquals(mail, candidates[3])
+                            ? 950L
+                            : 100L
                     ),
                 threshold: 0.90,
                 timeProvider: new FakeTimeProvider(),
@@ -94,7 +104,7 @@ namespace QuickFiler.Controllers.Tests
                 (mail, token) =>
                 {
                     fakeTime.Advance(TimeSpan.FromSeconds(1));
-                    return Task.FromResult((100L, ""));
+                    return Scored(100L);
                 },
                 threshold: 0.90,
                 timeProvider: fakeTime,
@@ -134,7 +144,7 @@ namespace QuickFiler.Controllers.Tests
 
             object gate = CreateGate(
                 () => source.Count == 0 ? null : source.Dequeue(),
-                (mail, token) => Task.FromResult((950L, "")),
+                (mail, token) => Scored(950L),
                 threshold: 0.90,
                 timeProvider: new FakeTimeProvider(),
                 sourceActive: () => false,
@@ -176,7 +186,7 @@ namespace QuickFiler.Controllers.Tests
                 (mail, token) =>
                 {
                     fakeTime.Advance(TimeSpan.FromSeconds(1));
-                    return Task.FromResult((100L, ""));
+                    return Scored(100L);
                 },
                 threshold: 0.90,
                 timeProvider: fakeTime,
@@ -208,7 +218,7 @@ namespace QuickFiler.Controllers.Tests
             // Arrange
             object gate = CreateGate(
                 () => null,
-                (mail, token) => Task.FromResult((950L, "")),
+                (mail, token) => Scored(950L),
                 threshold: 0.90,
                 timeProvider: new FakeTimeProvider(),
                 sourceActive: () => false
@@ -243,7 +253,7 @@ namespace QuickFiler.Controllers.Tests
 
             object gate = CreateGate(
                 () => source.Count == 0 ? null : source.Dequeue(),
-                (mail, token) => Task.FromResult((950L, ExpectedFolder)),
+                (mail, token) => Scored(950L, ExpectedFolder),
                 threshold: 0.90,
                 timeProvider: new FakeTimeProvider(),
                 sourceActive: () => false

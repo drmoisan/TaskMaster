@@ -44,21 +44,23 @@
     receipt still yields error text containing the literal token
     `model_routing_receipts`, so the completion hook maps the failure to its
     `MODEL_ROUTING_BLOCKED:` block reason.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 # Import the sibling shared module, the portable model-routing formulas, and the
 # ported check families, resolved relative to this module's directory so every
 # import travels with the pushed-down pack regardless of the working directory.
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorState.psm1') -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorState.psm1') -Force -ErrorAction Stop
 $script:ModelRoutingModulePath = Join-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath '..') -ChildPath (Join-Path -Path 'model-routing' -ChildPath 'ModelRouting.psm1')
-Import-Module $script:ModelRoutingModulePath -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCheckpointValue.psm1') -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateModelReceipts.psm1') -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateUnconditional.psm1') -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCompletionChecks.psm1') -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateRoutingContract.psm1') -Force
+Import-Module $script:ModelRoutingModulePath -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCheckpointValue.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateModelReceipts.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateUnconditional.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateCompletionChecks.psm1') -Force -ErrorAction Stop
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'OrchestratorStateRoutingContract.psm1') -Force -ErrorAction Stop
 
 # The two optional keys the M3 leg re-validates, guarded on key presence so an
 # absent key does not emit a spurious "must be a list when present" error.

@@ -27,9 +27,11 @@
     (Invoke-OrchestratorStatePreflight) consumed by
     .claude/hooks/enforce-pr-author-skill.ps1. Its default seam runs the portable
     in-process validation and names no interpreter on any code path.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 # The canonical top-level checkpoint keys required by the primary validator.
 # Pinned to REQUIRED_STATE_KEYS in scripts/dev_tools/validate_orchestrator_state.py.
@@ -139,6 +141,15 @@ function Get-OrchestratorStateCheckpoint {
           - Ok    (bool): $true when the file exists and parsed to a JSON object.
           - State (object): the parsed PSCustomObject on success, otherwise $null.
           - Error (string): a non-empty failure message on failure, otherwise ''.
+    .NOTES
+        VALUE CONTRACT. An ISO-8601-valued key in the returned State is date-coerced by ConvertFrom-Json
+        into System.DateTime, not the string the checkpoint holds. The module-declared ISO-8601 key
+        families are last_updated, started_at, completed_at, and verified_at. Every current validation
+        is presence-only, so the coercion is unobservable today. Two future exposures make it worth
+        stating: value comparison in OrchestratorStateCheckpointValue.psm1, which reports a mismatch
+        when one side is a string and the other is not, and the [string] $ComputedAt binding in
+        BlastRadius.psm1, which would coerce a DateTime to a culture-dependent string with no error.
+        A post-parse repair back to a string is PROHIBITED as lossy in both offset and format.
     #>
     [CmdletBinding()]
     [OutputType([hashtable])]

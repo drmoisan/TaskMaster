@@ -55,6 +55,8 @@ Create or update a single research file at one of the two tracked research roots
 
 - Map acceptance criteria into a concrete design.
 - Propose state model, transitions, internal API boundaries, and required file changes.
+- For every numeric count, enumeration, or population proposed for an approved `spec.md` acceptance criterion, add complete `## Numeric Derivation Evidence`. Each record must identify `Complete Family`, `Exhaustive Search Scope`, `Inclusion Rules`, `Exclusion Rules`, `Primary Search Strategy or Query Expression`, `Primary Member Set`, `Primary Count`, `Cross-check Search Strategy or Query Expression`, `Cross-check Member Set`, `Cross-check Count`, and `Member-set Comparison`.
+- Both derivations must be non-empty and independently constructed. They must use distinct search strategies or query expressions, independently enumerate the member sets, and explicitly compare normalized member sets. The scope must cover the entire declared family, including all relevant overloads and members; reject a single grep, a narrow named-pattern search, or a query that covers only one family member even when totals and member sets appear equal. Withhold the numeric assertion if the records are incomplete, duplicated, non-exhaustive, narrow, or disagree.
 
 ### 5. Testing Implications
 
@@ -67,3 +69,4 @@ Create or update a single research file at one of the two tracked research roots
 - Ground all findings in verified evidence from the codebase and authoritative external sources.
 - Keep discussion of non-selected approaches brief.
 - Do not claim or perform nested worker delegation.
+- Omit numeric acceptance-criterion facts when the numeric derivation record is absent, incomplete, or disagrees.

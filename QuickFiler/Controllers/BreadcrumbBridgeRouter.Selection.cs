@@ -91,16 +91,28 @@ namespace QuickFiler.Controllers
                 row.Kind == BreadcrumbRowKind.TrashPseudoRow
                     ? BreadcrumbRowBuilder.TrashRowText
                     : row.FilingTarget;
-            // #614 D2: reject only an out-of-root FULL Outlook target; a rooted target at or
-            // under the root passes verbatim (#439) and no bound root leaves the row unguarded.
-            if (
-                _boundRoot.Length != 0
-                && ArchiveStemContract.IsFullOutlookPath(selection)
-                && !ArchiveStemContract.TryMakeArchiveRelative(selection, _boundRoot, out _)
-            )
+            // #614 D2: normalize eligible rooted targets, preserving no-bound-root pass-through.
+            if (_boundRoot.Length != 0 && ArchiveStemContract.IsFullOutlookPath(selection))
             {
-                log.Error("Breadcrumb row rejected: target is outside the archive root.");
-                return;
+                if (
+                    !ArchiveStemContract.TryMakeArchiveRelative(
+                        selection,
+                        _boundRoot,
+                        out string stem
+                    )
+                )
+                {
+                    log.Error("Breadcrumb row rejected: target is outside the archive root.");
+                    return;
+                }
+
+                if (stem.Length == 0)
+                {
+                    log.Error("Breadcrumb row rejected: target is the archive root itself.");
+                    return;
+                }
+
+                selection = stem;
             }
 
             CommitSelection(row, selection);

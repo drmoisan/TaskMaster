@@ -315,9 +315,9 @@ namespace QuickFiler.Controllers
 
         public string SelectedFolder
         {
-            // Derived from the bridge router's selection tracking. The router never selects
-            // "===="-banner rows, and IsValidSelection keeps its "====" rejection as a second
-            // guard, so banner rows remain invalid filing targets.
+            // Derived from the bridge router's selection tracking. IsValidSelection routes to
+            // IsSelectableFolder, which composes IsBannerRow, matching the producers' "===="
+            // prefix, with the guard's deliberately broader three-character rejection.
             get => _router?.SelectedFolderPath;
         }
 

@@ -36,9 +36,11 @@
 
     The function is pure: it reads no file, starts no process, and never mutates
     its input.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 # The complexity-band vocabulary, ordered lowest to highest. Pinned to BAND_ORDER
 # in scripts/dev_tools/compute_complexity_floor.py.

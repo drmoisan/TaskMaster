@@ -32,9 +32,11 @@
     Pinned to Mermaid 11.17.0 through MermaidGrammar.psm1. Every function is pure:
     no filesystem, subprocess, network, or wall-clock access, and no input is
     mutated.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
 # The marker text must be exactly `mermaid-validator: ignore` and is
 # case-sensitive. Whitespace is permitted around the line, around the comment

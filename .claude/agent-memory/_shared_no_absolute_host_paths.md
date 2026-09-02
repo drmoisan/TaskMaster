@@ -57,6 +57,30 @@ test. On issue #468 that was 946 leaked paths in a single TRX, and 16 committed 
 **Always substitute case-insensitively, in binary mode**, and verify with a case-insensitive
 fixed-string sweep (`grep -I -i -F`) rather than trusting the header.
 
+## Angle-bracket placeholders corrupt XML: escape them, and re-parse after redacting
+
+The four required placeholders are written with angle brackets, and a raw `<` is not legal inside
+an XML attribute value. `vstest.console.exe` writes the account and host names into attribute
+values in the TRX header (`<TestRun name=`, `runUser=`, `<Deployment runDeploymentRoot=`,
+`computerName=`, `storage=`, `codeBase=`). A blind textual substitution therefore leaves every
+redacted TRX **not well-formed**, failing to parse at line 2. Issue #662 shipped six corrupt TRX
+files this way; the executor applied the plan's hygiene rule exactly as written.
+
+Two rules:
+1. When the target is an XML-family file (`.trx`, `.xml`, `.coveragexml`, `.cobertura.xml`),
+   substitute the **escaped** form — `&lt;user&gt;`, `&lt;host&gt;`, `&lt;repo-root&gt;`,
+   `&lt;user-profile&gt;`. The parsed attribute value is then still exactly the placeholder, so
+   redaction is unchanged and the document parses. Blind replacement of the bracketed token is
+   safe in a TRX because no TRX element is named `user`, `host`, `repo-root` or `user-profile`.
+2. **`ResidualMatchCount=0` is not a sufficient hygiene gate.** It measures only that the
+   identifiers were removed, never that the file it rewrote still parses, so a sweep that corrupts
+   every XML artifact it touches still reports success. Always add an assertion that every
+   rewritten XML-family file re-parses.
+
+Related structural gap seen on the same issue: a hygiene sweep that excludes `plan.md` from its
+residual scan by path cannot detect a host path reintroduced into the plan, and a sweep that
+rewrites only `evidence/` while scanning the whole feature folder detects residuals it cannot fix.
+
 Two further verification rules learned the same way:
 - **Scope the verification sweep to the files your branch changed** (`git diff --name-only
   <base>..HEAD`). A repo-wide sweep returns thousands of pre-existing hits in other feature folders

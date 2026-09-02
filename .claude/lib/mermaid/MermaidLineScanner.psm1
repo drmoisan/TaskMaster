@@ -30,11 +30,13 @@
     Pinned to Mermaid 11.17.0 through MermaidGrammar.psm1. Every function is
     pure: no filesystem, subprocess, network, or wall-clock access, and no input
     is mutated.
+    CONVENTION: this module fails fast at module scope and imports its siblings with -ErrorAction Stop.
 #>
 
 Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'MermaidGrammar.psm1') -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'MermaidGrammar.psm1') -Force -ErrorAction Stop
 
 # Arrow-token affix tables. An arrow candidate is a run of `-`, `=`, `.`, or `~`
 # (the "core") optionally extended by one of these affixes on either side. The

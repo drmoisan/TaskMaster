@@ -1,0 +1,4 @@
+Timestamp: 2026-08-31T10:26:48-04:00
+Command: pwsh -NoProfile -Command '. ".\scripts\vscode\Invoke-MSTestWithCoverage.Helpers.ps1"; $raw = Get-Content -LiteralPath ".\coverage\p0-t15-baseline.cobertura.xml" -Raw -Encoding UTF8; [xml]$d = ConvertTo-KoverageCoberturaXml -XmlContent $raw -RepoRoot (Get-Location).Path; $c = $d.SelectSingleNode("/coverage"); foreach ($a in @("line-rate","branch-rate","lines-covered","lines-valid","branches-covered","branches-valid")) { $a + "=" + $c.GetAttribute($a) }'
+EXIT_CODE: 0
+Output Summary: line-rate=0.853428; branch-rate=0.793049; lines-covered=54808; lines-valid=64221; branches-covered=13052; branches-valid=16458. Derived baseline line coverage: 85.3428%. Derived baseline branch coverage: 79.3049%. All six attributes and both derived percentages match evidence/baseline/p0-t15-retry-1.md.
