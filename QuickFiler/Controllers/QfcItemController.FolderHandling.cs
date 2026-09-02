@@ -59,6 +59,32 @@ namespace QuickFiler.Controllers
             //TraceUtility.LogMethodCall(varList);
             if (varList is null)
             {
+                // #678: an item that arrived from the dequeue-time confidence gate already carries a
+                // fully initialised handler for THIS item, scored with the same
+                // FolderPredictor.InitOptions.FromField sequence this branch would run. Adopting it
+                // is what removes the second scoring pass. The adoption is confined to this branch:
+                // the FromArrayOrString branch below is a search over a caller-supplied list, not a
+                // per-item scoring pass, so a carried handler is never valid there.
+                if (_carriedFolderHandler is not null)
+                {
+                    // #678 R3: the cancellation observation sits INSIDE this branch rather than at
+                    // the top of the member. Every pre-change route reached the predictor through
+                    // await Task.Run(..., cancel) below, inside the try that follows this branch,
+                    // so an already-cancelled token surfaced as an OperationCanceledException that
+                    // the catch (System.Exception e) logged through logger.Error before rethrowing.
+                    // Hoisting the throw to the top of the member would place it before that try
+                    // and silently remove that logger.Error for the FromField route, which is a
+                    // second behaviour change this remediation is not authorised to make.
+                    cancel.ThrowIfCancellationRequested();
+                    _folderHandler = _carriedFolderHandler;
+                    logger.Debug(
+                        $"Probability debug [QfcItemController.LoadFolderHandlerAsync (carried)] "
+                            + $"Subject='{ItemHelper?.Subject}' EntryID='{ItemHelper?.EntryId}' "
+                            + $"TopScore={_folderHandler?.Suggestions?.TopScore() ?? 0}"
+                    );
+                    return;
+                }
+
                 try
                 {
                     _folderHandler = await Task.Run(
@@ -194,12 +220,24 @@ namespace QuickFiler.Controllers
                 {
                     _itemViewer.SetFolderSuggestions(_folderHandler.FolderRowArray);
                 }
+                // #678 AC12: FolderArray entries are archive-prefix-stripped by
+                // FolderPredictor.ProjectSuggestionPath, while the carried PredeterminedFolder is
+                // the RAW suggestion path the scorer read from Suggestions. Without projecting the
+                // carried value the same way, FolderContains misses every archive-rooted
+                // suggestion and the selection silently falls back to the index-1 entry. The
+                // projection is duplicated here rather than reused because
+                // FolderPredictor.ProjectSuggestionPath is private and lives under UtilitiesCS,
+                // which this change may not modify.
+                string predetermined = ProjectPredeterminedFolder(
+                    _predeterminedFolder,
+                    _globals is null ? null : (_globals.Ol?.ArchiveRootPath ?? string.Empty)
+                );
                 if (
-                    !string.IsNullOrEmpty(_predeterminedFolder)
-                    && _itemViewer.FolderContains(_predeterminedFolder)
+                    !string.IsNullOrEmpty(predetermined)
+                    && _itemViewer.FolderContains(predetermined)
                 )
                 {
-                    _itemViewer.SetFolderSelectedItem(_predeterminedFolder);
+                    _itemViewer.SetFolderSelectedItem(predetermined);
                 }
                 else
                 {
@@ -209,6 +247,41 @@ namespace QuickFiler.Controllers
                 }
                 _selectedFolder = _itemViewer.GetSelectedFolder();
             }
+        }
+
+        /// <summary>
+        /// #678 AC12. Projects a raw suggestion path onto the form <c>FolderPredictor.FolderArray</c>
+        /// stores, so a containment probe against the combo box can match: strip
+        /// <paramref name="archiveRootPath"/> plus a trailing separator from the front of
+        /// <paramref name="folderPath"/>, case-insensitively, but only when the remainder is
+        /// non-empty. #678 R2: the projection mirrors <c>FolderPredictor.ProjectSuggestionPath</c>
+        /// for every non-null <paramref name="folderPath"/> and non-null
+        /// <paramref name="archiveRootPath"/>. A NULL <paramref name="archiveRootPath"/> stands for
+        /// that member's <c>_globals is null</c> guard and yields the identity; an EMPTY one does
+        /// not, because that member forms its prefix unconditionally and so strips a single leading
+        /// separator in that state.
+        ///
+        /// Two divergences from that member remain and are deliberate, and both are null-safety
+        /// differences rather than projection differences. First, a null or empty
+        /// <paramref name="folderPath"/> is returned unchanged rather than dereferenced;
+        /// <c>ProjectSuggestionPath</c> does not guard it because its input comes from
+        /// <c>Suggestions</c>. Second, a non-null globals with a null <c>Ol</c> is treated by the
+        /// call site as an empty archive root rather than reproducing that member's null
+        /// dereference.
+        /// </summary>
+        internal static string ProjectPredeterminedFolder(string folderPath, string archiveRootPath)
+        {
+            if (string.IsNullOrEmpty(folderPath) || archiveRootPath is null)
+            {
+                return folderPath;
+            }
+
+            string archivePrefix = archiveRootPath + "\\";
+            return
+                folderPath.StartsWith(archivePrefix, StringComparison.OrdinalIgnoreCase)
+                && folderPath.Length > archivePrefix.Length
+                ? folderPath.Substring(archivePrefix.Length)
+                : folderPath;
         }
 
         /// <summary>

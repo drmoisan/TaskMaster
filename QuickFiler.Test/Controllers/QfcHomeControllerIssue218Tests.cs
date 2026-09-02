@@ -97,6 +97,9 @@ namespace QuickFiler.Controllers.Tests
                     )
                 )
                 .ReturnsAsync(new List<MailItem>());
+            // Issue #678: high-confidence RunAsync moved from the plain dequeue to the
+            // outcome-returning member, which is the only one that surfaces the carriers. Both are
+            // configured so the disabled-mode assertions in this class stay meaningful.
             mockDataModel
                 .Setup(x =>
                     x.DequeueNextItemGroupAsync(
@@ -107,6 +110,22 @@ namespace QuickFiler.Controllers.Tests
                     )
                 )
                 .ReturnsAsync(new List<MailItem>());
+            mockDataModel
+                .Setup(x =>
+                    x.DequeueNextItemGroupWithOutcomeAsync(
+                        It.IsAny<int>(),
+                        It.IsAny<int>(),
+                        It.IsAny<TimeSpan>(),
+                        It.IsAny<System.Action<int, int, int>>()
+                    )
+                )
+                .ReturnsAsync(
+                    new QfcDequeueBatch(
+                        new List<MailItem>(),
+                        new List<QfcPreScoredItem>(),
+                        QfcDequeueStop.QuantitySatisfied
+                    )
+                );
             mockDataModel.Setup(x => x.Complete).Returns(true);
             _controller.DataModel = mockDataModel.Object;
 
@@ -158,26 +177,28 @@ namespace QuickFiler.Controllers.Tests
                 .Should()
                 .BeFalse("remaining-queue admission now owns high-confidence filtering");
             mockFormController.Verify(
-                m => m.LoadItemsAsync(It.IsAny<IList<MailItem>>()),
+                m => m.LoadItemsAsync(It.IsAny<IList<QfcPreScoredItem>>()),
                 Times.Once,
-                "the initial GUI batch must use the plain MailItem load path"
+                "issue #678: the initial GUI batch now uses the carrier load path, so the folder "
+                    + "handler the gate already initialised reaches the item controller"
             );
             Mock.Get(_controller.DataModel)
                 .Verify(
                     m =>
-                        m.DequeueNextItemGroupAsync(
+                        m.DequeueNextItemGroupWithOutcomeAsync(
                             It.IsAny<int>(),
                             It.IsAny<int>(),
                             It.IsAny<TimeSpan>(),
                             It.IsAny<System.Action<int, int, int>>()
                         ),
                     Times.Once,
-                    "the first displayed page must come from the dequeue-layer gate"
+                    "the first displayed page must come from the dequeue-layer gate, now through "
+                        + "the outcome-returning member that surfaces the carriers"
                 );
             mockFormController.Verify(
-                m => m.LoadItemsAsync(It.IsAny<IList<QfcPreScoredItem>>()),
+                m => m.LoadItemsAsync(It.IsAny<IList<MailItem>>()),
                 Times.Never,
-                "RunAsync must not use the carrier-list overload for the initial batch"
+                "issue #678: the plain MailItem overload is no longer used in enabled mode"
             );
         }
 
@@ -201,16 +222,23 @@ namespace QuickFiler.Controllers.Tests
                     )
                 )
                 .ReturnsAsync(new List<MailItem>());
+            // Issue #678: enabled-mode RunAsync now reads the outcome-returning dequeue member.
             mockDataModel
                 .Setup(x =>
-                    x.DequeueNextItemGroupAsync(
+                    x.DequeueNextItemGroupWithOutcomeAsync(
                         It.IsAny<int>(),
                         It.IsAny<int>(),
                         It.IsAny<TimeSpan>(),
                         It.IsAny<System.Action<int, int, int>>()
                     )
                 )
-                .ReturnsAsync(new List<MailItem>());
+                .ReturnsAsync(
+                    new QfcDequeueBatch(
+                        new List<MailItem>(),
+                        new List<QfcPreScoredItem>(),
+                        QfcDequeueStop.QuantitySatisfied
+                    )
+                );
             mockDataModel.Setup(x => x.Complete).Returns(true);
             _controller.DataModel = mockDataModel.Object;
 
@@ -218,7 +246,7 @@ namespace QuickFiler.Controllers.Tests
 
             var mockFormController = new Mock<IQfcFormController>();
             mockFormController
-                .Setup(x => x.LoadItemsAsync(It.IsAny<IList<MailItem>>()))
+                .Setup(x => x.LoadItemsAsync(It.IsAny<IList<QfcPreScoredItem>>()))
                 .Returns(Task.CompletedTask)
                 .Callback(() => sequence.Add("LoadItemsAsync"));
             SetPrivateField(_controller, "_formController", mockFormController.Object);
@@ -244,7 +272,7 @@ namespace QuickFiler.Controllers.Tests
             sequence.Should().Equal("LoadItemsAsync");
             mockDataModel.Verify(
                 m =>
-                    m.DequeueNextItemGroupAsync(
+                    m.DequeueNextItemGroupWithOutcomeAsync(
                         It.IsAny<int>(),
                         It.IsAny<int>(),
                         It.IsAny<TimeSpan>(),
@@ -253,8 +281,9 @@ namespace QuickFiler.Controllers.Tests
                 Times.Once
             );
             mockFormController.Verify(
-                m => m.LoadItemsAsync(It.IsAny<IList<QfcPreScoredItem>>()),
-                Times.Never
+                m => m.LoadItemsAsync(It.IsAny<IList<MailItem>>()),
+                Times.Never,
+                "issue #678: enabled mode loads through the carrier overload only"
             );
         }
     }

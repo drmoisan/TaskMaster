@@ -16,7 +16,7 @@ namespace QuickFiler.Controllers.Tests
 {
     /// <summary>Folder-handling cluster tests (research §5.2): PopulateAndSelectFolder seam edge cases and AssignFolderComboBox guard behavior.</summary>
     [TestClass]
-    public class QfcItemController_FolderHandlingTests
+    public partial class QfcItemController_FolderHandlingTests
     {
         private sealed class FolderController : QfcItemController
         {

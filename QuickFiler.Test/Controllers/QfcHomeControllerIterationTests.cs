@@ -23,7 +23,7 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 namespace QuickFiler.Controllers.Tests
 {
     [TestClass]
-    public class QfcHomeControllerIterationTests
+    public partial class QfcHomeControllerIterationTests
     {
         private MockRepository _mockRepository;
         private Mock<IApplicationGlobals> _mockApplicationGlobals;
@@ -132,7 +132,8 @@ namespace QuickFiler.Controllers.Tests
                 .Setup(m =>
                     m.EnqueueAsync(
                         It.IsAny<IList<MailItem>>(),
-                        It.IsAny<IQfcCollectionController>()
+                        It.IsAny<IQfcCollectionController>(),
+                        It.IsAny<IList<QfcPreScoredItem>>()
                     )
                 )
                 .Returns(Task.CompletedTask);
@@ -174,7 +175,8 @@ namespace QuickFiler.Controllers.Tests
                 m =>
                     m.EnqueueAsync(
                         It.IsAny<IList<MailItem>>(),
-                        It.IsAny<IQfcCollectionController>()
+                        It.IsAny<IQfcCollectionController>(),
+                        It.IsAny<IList<QfcPreScoredItem>>()
                     ),
                 times
             );
@@ -262,31 +264,9 @@ namespace QuickFiler.Controllers.Tests
             VerifyEnqueue(mockQfcQueue, Times.Once);
         }
 
-        [TestMethod]
-        public async Task IterateQueueAsync_WhenDequeueReturnsFullQualifiedPage_EnqueuesAllItems()
-        {
-            var mailItems = Enumerable
-                .Range(0, 8)
-                .Select(_ => new Mock<MailItem>().Object)
-                .ToList();
-            var (_, mockQfcQueue, _, mockQfcCollectionController) = ArrangeIterate(
-                q => q == 8,
-                t => t == 2000,
-                dequeued: mailItems
-            );
-
-            await _controller.IterateQueueAsync();
-
-            mockQfcQueue.Verify(
-                m =>
-                    m.EnqueueAsync(
-                        It.Is<IList<MailItem>>(items => items.SequenceEqual(mailItems)),
-                        mockQfcCollectionController.Object
-                    ),
-                Times.Once
-            );
-            VerifyCompleteAdding(mockQfcQueue, Times.Never);
-        }
+        // IterateQueueAsync_WhenDequeueReturnsFullQualifiedPage_EnqueuesAllItems and the issue #678
+        // carrier-forwarding test live in the partial part QfcHomeControllerIterationTests.Part2.cs;
+        // see that file for the reason.
 
         [TestMethod]
         public void Iterate_ExecutesCorrectly()

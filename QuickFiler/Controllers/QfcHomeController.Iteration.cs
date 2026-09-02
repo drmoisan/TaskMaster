@@ -29,8 +29,11 @@ namespace QuickFiler.Controllers
                 if (listObjects.Count > 0)
                 {
                     //await UiThread.Dispatcher.InvokeAsync(async () => await QfcQueue.EnqueueAsync(listObjects, _formController.Groups));
+                    // Issue #678: forward the carriers so every page after the first arrives with
+                    // the folder search handler the gate already initialised, exactly as the first
+                    // page does through RunAsync. Empty outside high-confidence mode.
                     await QfcQueue
-                        .EnqueueAsync(listObjects, _formController.Groups)
+                        .EnqueueAsync(listObjects, _formController.Groups, batch.PreScored)
                         .ConfigureAwait(false);
                 }
                 else if (batch.Stop == QfcDequeueStop.SourceExhausted)

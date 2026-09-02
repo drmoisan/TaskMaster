@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Interfaces;
+using UtilitiesCS;
 
 namespace QuickFiler.Controllers
 {
@@ -55,10 +56,13 @@ namespace QuickFiler.Controllers
         internal static readonly TimeSpan DefaultFirstBatchDeadline = TimeSpan.FromSeconds(12);
 
         private readonly Func<MailItem> _tryTakeNext;
+
+        // Issue #678: the loader publishes the handler its scoring pass initialised, so an accepted
+        // candidate carries it forward instead of the consumer re-initialising a second predictor.
         private readonly Func<
             MailItem,
             CancellationToken,
-            Task<(long Score, string TopFolder)>
+            Task<(long Score, string TopFolder, IFolderSearchHandler Handler)>
         > _scoreLoader;
         private readonly long _cutoff;
         private readonly TimeProvider _timeProvider;
@@ -70,7 +74,11 @@ namespace QuickFiler.Controllers
 
         internal QfcStreamingDequeueConfidenceGate(
             Func<MailItem> tryTakeNext,
-            Func<MailItem, CancellationToken, Task<(long Score, string TopFolder)>> scoreLoader,
+            Func<
+                MailItem,
+                CancellationToken,
+                Task<(long Score, string TopFolder, IFolderSearchHandler Handler)>
+            > scoreLoader,
             double threshold,
             TimeProvider timeProvider = null,
             Action<string> debugLog = null
@@ -102,7 +110,11 @@ namespace QuickFiler.Controllers
         /// </param>
         internal QfcStreamingDequeueConfidenceGate(
             Func<MailItem> tryTakeNext,
-            Func<MailItem, CancellationToken, Task<(long Score, string TopFolder)>> scoreLoader,
+            Func<
+                MailItem,
+                CancellationToken,
+                Task<(long Score, string TopFolder, IFolderSearchHandler Handler)>
+            > scoreLoader,
             double threshold,
             TimeProvider timeProvider,
             Action<string> debugLog,
@@ -184,7 +196,10 @@ namespace QuickFiler.Controllers
                 }
 
                 alreadyWaitedForEmptySource = false;
-                (long score, string topFolder) = await _scoreLoader(mailItem, token)
+                (long score, string topFolder, IFolderSearchHandler handler) = await _scoreLoader(
+                        mailItem,
+                        token
+                    )
                     .ConfigureAwait(false);
                 token.ThrowIfCancellationRequested();
                 scanned++;
@@ -192,7 +207,9 @@ namespace QuickFiler.Controllers
 
                 if (score >= _cutoff)
                 {
-                    accepted.Add(new QfcPreScoredItem(mailItem, topFolder));
+                    // Issue #678: the accepted candidate carries the handler the scoring pass just
+                    // initialised, so the item controller adopts it rather than scoring again.
+                    accepted.Add(new QfcPreScoredItem(mailItem, topFolder, handler));
                 }
                 else
                 {

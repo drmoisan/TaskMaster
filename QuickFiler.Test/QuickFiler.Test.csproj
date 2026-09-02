@@ -152,6 +152,11 @@
     <Compile Include="Controllers\QfcFormKeyHandlerTests.cs" />
     <Compile Include="Controllers\QfcHighConfidencePreFilterTests.cs" />
     <Compile Include="Controllers\QfcScanProgressBandMapperTests.cs" />
+    <Compile Include="Controllers\QfcCollectionControllerTests.Part2.cs" />
+    <Compile Include="Controllers\QfcHomeControllerIterationTests.Part2.cs" />
+    <Compile Include="Controllers\QfcHomeControllerRunAsyncHighConfidenceTests.Part2.cs" />
+    <Compile Include="Controllers\QfcHomeControllerRunAsyncHighConfidenceTests.Part3.cs" />
+    <Compile Include="Controllers\QfcFormControllerTests.Part2.cs" />
     <Compile Include="Controllers\QfcStreamingDequeueConfidenceGateTests.cs" />
     <Compile Include="Controllers\QfcStreamingDequeueConfidenceGateTests.Part2.cs" />
     <Compile Include="Controllers\QfcStreamingDequeueConfidenceGateTests.Part3.cs" />
@@ -165,6 +170,7 @@
     <Compile Include="Controllers\QfcItemControllerTests.cs" />
     <Compile Include="Controllers\QfcItemController.ConversationTests.cs" />
     <Compile Include="Controllers\QfcItemController.FolderHandlingTests.cs" />
+    <Compile Include="Controllers\QfcItemController.FolderHandlingTests.Part2.cs" />
     <Compile Include="Controllers\QfcItemController.FolderSuggestionsTests.cs" />
     <Compile Include="Controllers\QfcItemController.EventWiringTests.cs" />
     <Compile Include="Controllers\QfcItemController.NavigationTests.cs" />

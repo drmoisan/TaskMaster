@@ -9,6 +9,7 @@ using Microsoft.Extensions.Time.Testing;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using UtilitiesCS;
 
 namespace QuickFiler.Controllers.Tests
 {
@@ -25,7 +26,11 @@ namespace QuickFiler.Controllers.Tests
 
         private static object CreateGate(
             Func<MailItem> tryTakeNext,
-            Func<MailItem, CancellationToken, Task<(long Score, string TopFolder)>> scoreLoader,
+            Func<
+                MailItem,
+                CancellationToken,
+                Task<(long Score, string TopFolder, IFolderSearchHandler Handler)>
+            > scoreLoader,
             double threshold,
             TimeProvider timeProvider = null,
             Action<string> debugLog = null,
@@ -51,7 +56,11 @@ namespace QuickFiler.Controllers.Tests
                 types: new[]
                 {
                     typeof(Func<MailItem>),
-                    typeof(Func<MailItem, CancellationToken, Task<(long Score, string TopFolder)>>),
+                    typeof(Func<
+                        MailItem,
+                        CancellationToken,
+                        Task<(long Score, string TopFolder, IFolderSearchHandler Handler)>
+                    >),
                     typeof(double),
                     typeof(TimeProvider),
                     typeof(Action<string>),
@@ -99,7 +108,7 @@ namespace QuickFiler.Controllers.Tests
                 (mail, token) =>
                 {
                     token.ThrowIfCancellationRequested();
-                    return Task.FromResult((scores[mail], ""));
+                    return Scored(scores[mail]);
                 },
                 threshold,
                 timeProvider,
@@ -225,7 +234,7 @@ namespace QuickFiler.Controllers.Tests
         {
             object gate = CreateGate(
                 () => throw new AssertFailedException("source must not be read after cancellation"),
-                (mail, token) => Task.FromResult((1000L, "")),
+                (mail, token) => Scored(1000L),
                 threshold: 0.90
             );
             using (var cts = new CancellationTokenSource())
@@ -264,7 +273,7 @@ namespace QuickFiler.Controllers.Tests
                     takeCount++;
                     return takeCount == 1 ? null : item;
                 },
-                (mail, token) => Task.FromResult((950L, "")),
+                (mail, token) => Scored(950L),
                 threshold: 0.90,
                 timeProvider: fakeTime
             );
@@ -290,7 +299,7 @@ namespace QuickFiler.Controllers.Tests
                     takeCount++;
                     return takeCount < 3 ? null : item;
                 },
-                (mail, token) => Task.FromResult((950L, "")),
+                (mail, token) => Scored(950L),
                 threshold: 0.90,
                 timeProvider: fakeTime,
                 sourceActive: () => takeCount < 3
@@ -454,7 +463,7 @@ namespace QuickFiler.Controllers.Tests
                 (mail, token) =>
                 {
                     fakeTime.Advance(TimeSpan.FromSeconds(1));
-                    return Task.FromResult((qualifiers.Contains(mail) ? 950L : 100L, ""));
+                    return Scored(qualifiers.Contains(mail) ? 950L : 100L);
                 },
                 threshold: 0.90,
                 timeProvider: fakeTime,

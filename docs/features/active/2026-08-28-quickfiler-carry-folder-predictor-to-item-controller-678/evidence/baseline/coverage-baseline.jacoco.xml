@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Package-level baseline coverage summary for issue #678 (P0-T10).
+  Transcribed from Derivation D3 run over the post-processed Cobertura document
+  coverage/coverage.cobertura.xml, aggregated by package.
+  D3 was run with the node selection //class rather than //class[@filename] so it selects the same
+  node set as Get-CoberturaCoverageSummary at
+  scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1:117-128.
+  Class nodes lacking a filename attribute: NONE, in any package.
+  LINE counter totals equal the lines-covered (55001) and lines-valid (64406) values recorded in
+  evidence/baseline/coverage-baseline.md: covered 55001, missed 9405, sum 64406.
+  Branch counters are transcribed from the Cobertura root attributes only, because D3 reports lines.
+-->
+<report name="TaskMaster baseline coverage (issue 678, base ref 807fb0bb)">
+  <package name="QuickFiler">
+    <counter type="LINE" missed="2375" covered="9755"/>
+  </package>
+  <package name="SVGControl">
+    <counter type="LINE" missed="977" covered="877"/>
+  </package>
+  <package name="Tags">
+    <counter type="LINE" missed="56" covered="702"/>
+  </package>
+  <package name="TaskMaster">
+    <counter type="LINE" missed="796" covered="2279"/>
+  </package>
+  <package name="TaskTree">
+    <counter type="LINE" missed="11" covered="295"/>
+  </package>
+  <package name="TaskVisualization">
+    <counter type="LINE" missed="143" covered="1414"/>
+  </package>
+  <package name="ToDoModel">
+    <counter type="LINE" missed="762" covered="1061"/>
+  </package>
+  <package name="UtilitiesCS">
+    <counter type="LINE" missed="4285" covered="38614"/>
+  </package>
+  <package name="VBFunctions">
+    <counter type="LINE" missed="0" covered="4"/>
+  </package>
+  <counter type="LINE" missed="9405" covered="55001"/>
+  <counter type="BRANCH" missed="3400" covered="13124"/>
+</report>
