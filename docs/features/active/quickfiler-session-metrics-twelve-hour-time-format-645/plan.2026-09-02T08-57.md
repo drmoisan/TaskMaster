@@ -25,8 +25,8 @@ In-scope files (exactly these four; no new files are created):
 - `QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs` (line 53)
 
 Forbidden paths (must never appear in any diff this plan produces): any file under
-`QuickFiler/Legacy/`; `TaskVisualization/TaskViewer.Designer.cs`; any file matching `.claude/**`,
-`.codex/**`, `.agents/**`; `config/blast-radius.json`; `config/orchestration-routing.json`.
+QuickFiler/Legacy/; TaskVisualization/TaskViewer.Designer.cs; any file matching .claude/\*\*,
+.codex/\*\*, .agents/\*\*; config/blast-radius.json; config/orchestration-routing.json.
 
 Forbidden content change: adding `CultureInfo.InvariantCulture` (or any other `CultureInfo`
 argument) to any of the three fixed production call sites. That gap is tracked separately as
@@ -38,7 +38,7 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
    literal C# Toolchain step 1 is `dotnet tool run csharpier format .`, but a repo-wide mutating
    format pass could silently rewrite an unrelated file that happens to be unformatted at the
    merge-base, which would violate the scope-lock boundary above (spec.md AC "No file under
-   `QuickFiler/Legacy/` ... is modified by this change"). Both the format and the read-only check
+   QuickFiler/Legacy/ ... is modified by this change"). Both the format and the read-only check
    commands in Phase 4 name the four in-scope paths explicitly instead of `.`.
 2. **The CUT3 `vstest.console.exe <QuickFiler.Test assembly path> /EnableCodeCoverage` requirement
    is satisfied via `scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot QuickFiler.Test`.**
@@ -338,9 +338,9 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
       `docs/features/potential/promoted/2026-09-02-quickfiler-date-time-format-missing-invariant-culture.md`
       (a queued sibling-issue-#742 promotion record that predates this plan, is unrelated to and
       untouched by every task here, and must not be added or committed by any task in this plan).
-      No path under `QuickFiler/Legacy/`, no `TaskVisualization/TaskViewer.Designer.cs`, no path
-      matching `.claude/**`, `.codex/**`, `.agents/**`, and neither `config/blast-radius.json` nor
-      `config/orchestration-routing.json` appears in either output.
+      No path under QuickFiler/Legacy/, no TaskVisualization/TaskViewer.Designer.cs, no path
+      matching .claude/\*\*, .codex/\*\*, .agents/\*\*, and neither config/blast-radius.json nor
+      config/orchestration-routing.json appears in either output.
 - [ ] [P3-T5] Commit the Phase 1 and Phase 2 source edits:
       ```
       git add `
@@ -507,9 +507,9 @@ same pass. This restart rule does not apply to a coverage-threshold exception fr
       `BuildQuickFileMetricLines_WithMovedMailItems_FormatsMetricLine`; the checkbox now reads
       `[x]`.
 - [ ] [P5-T7] Check off AC6 in `spec.md`: change the line
-      `` - [ ] No file under `QuickFiler/Legacy/`, no `TaskVisualization/TaskViewer.Designer.cs`, and no ``
+      `- [ ] No file under QuickFiler/Legacy/, no TaskVisualization/TaskViewer.Designer.cs, and no`
       to
-      `` - [x] No file under `QuickFiler/Legacy/`, no `TaskVisualization/TaskViewer.Designer.cs`, and no ``.
+      `- [x] No file under QuickFiler/Legacy/, no TaskVisualization/TaskViewer.Designer.cs, and no`.
       Acceptance: P3-T4's scope-boundary diff check passed with none of the forbidden paths
       present; the checkbox now reads `[x]`.
 - [ ] [P5-T8] Check off AC7 in `spec.md`: change the line

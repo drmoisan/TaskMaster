@@ -7,6 +7,12 @@
 - **Status:** Draft
 - **Version:** 0.2
 
+## Write Set
+- `QuickFiler/Controllers/QfcHomeController.Metrics.cs`
+- `QuickFiler/Controllers/EfcHomeController.Metrics.cs`
+- `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`
+- `QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs`
+
 ## Context
 - The QuickFiler session-metrics CSV writes its time-of-day field using the .NET custom format
   string `"hh:mm"`. `hh` is the 12-hour-clock specifier and the format string carries no `tt`
@@ -42,9 +48,9 @@
   `QuickFiler/Controllers/QfcHomeController.Metrics.cs:127` (`curTimeText`), and
   `QuickFiler/Controllers/EfcHomeController.Metrics.cs:96` (`curTimeText`). All three lines and
   literals were directly verified against the current tree by the research pass supporting this
-  spec (see `docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645/research/2026-09-02T08-47-twelve-hour-time-format-research.md`,
+  spec (see docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645/research/2026-09-02T08-47-twelve-hour-time-format-research.md,
   §1); a fourth, superficially similar line
-  (`QfcHomeController.Metrics.cs:46`, `//var curTimeText = DateTime.Now.ToString("hh:mm");`) is
+  (QfcHomeController.Metrics.cs:46, `//var curTimeText = DateTime.Now.ToString("hh:mm");`) is
   commented-out dead code, not a live site, and is excluded from scope.
 - Frequency / determinism: deterministic and always-reproducing for any write at or after 13:00
   local time (and, as a secondary ambiguity, also at exactly 00:00/midnight — see Root Cause
@@ -72,30 +78,30 @@
   - Adding `CultureInfo.InvariantCulture` to any of the three format calls above, or to the
     adjacent `curDateText`/`SentDate` calls in the same methods. The issue's proposed-fix note
     frames this as optional ("consider passing"), and the research pass confirmed the row's own
-    cited target convention — `SentDate`'s `"HH:mm:ss"` in `EfcHomeController.Metrics.cs:118-119`
+    cited target convention — `SentDate`'s `"HH:mm:ss"` in EfcHomeController.Metrics.cs:118-119
     — itself omits `CultureInfo.InvariantCulture`. Adding it only to the touched sites would make
     the row's culture-handling internally inconsistent rather than more consistent. This gap has
     been promoted separately as GitHub issue #742
-    (`quickfiler-date-time-format-missing-invariant-culture`) and must not be folded into this
+    (quickfiler-date-time-format-missing-invariant-culture) and must not be folded into this
     issue's scope.
-  - `QuickFiler/Legacy/QuickFileController.cs:1013` (`curTimeText =
+  - QuickFiler/Legacy/QuickFileController.cs:1013 (`curTimeText =
     DateTime.Now.ToString("hh:mm");`).
-  - `QuickFiler/Legacy/QfcGroupOperationsLegacy.cs:703`
-    (`strDeletedDte = QF.Mail.SentOn.ToString(@"mm\dd\yyyy hh:mm");`) and `:1307`
+  - QuickFiler/Legacy/QfcGroupOperationsLegacy.cs:703
+    (`strDeletedDte = QF.Mail.SentOn.ToString(@"mm\dd\yyyy hh:mm");`) and :1307
     (`dataLine = dataLine + "," + QF.Mail.SentOn.ToString("hh:mm");`).
     These three Legacy-namespace sites are named explicitly by the issue as excluded — fixing
     them was judged likely to break other things and is not part of this defect's remit.
-  - `TaskVisualization/TaskViewer.Designer.cs:387,400` — these already carry the `tt` AM/PM
+  - TaskVisualization/TaskViewer.Designer.cs:387,400 — these already carry the `tt` AM/PM
     designator (`"MM/dd/yyyy hh:mm tt"`), so they are not ambiguous and require no change.
   - The three already-correct, uppercase `HH:mm` sites noted by research as pre-existing and
-    unaffected: `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs:498`,
-    `QuickFiler/Controllers/QfcCollectionController.cs:1294,2300`, and
-    `QuickFiler/Controllers/EfcItemController.cs:612`.
+    unaffected: QuickFiler/Controllers/QfcItemController.ViewerSetup.cs:498,
+    QuickFiler/Controllers/QfcCollectionController.cs:1294,2300, and
+    QuickFiler/Controllers/EfcItemController.cs:612.
 - Explicitly excluded systems, integrations, or datasets:
-  - `.claude/**`, `.codex/**`, `.agents/**`, `config/blast-radius.json`,
-    `config/orchestration-routing.json` — these are push-down files owned by an upstream
+  - .claude/\*\*, .codex/\*\*, .agents/\*\*, config/blast-radius.json,
+    config/orchestration-routing.json — these are push-down files owned by an upstream
     repository and must never be edited from within this feature.
-  - Any file under `QuickFiler/Legacy/` (see above).
+  - Any file under QuickFiler/Legacy/ (see above).
   - The session-metrics CSV's historical/already-written rows are not migrated or rewritten; the
     fix changes only the format applied to rows written after the change (confirmed no in-repo
     reader exists, so there is no backward-compatibility contract to honor for prior rows).
@@ -250,9 +256,9 @@ None; the change is a literal format-string substitution with no performance imp
 - [ ] `QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs` (line 53) asserts the
       time-of-day field as `13:05` (not `01:05`) for the fixture's `MetricsNow` of
       `2026-07-04 13:05:00`, and the test passes.
-- [ ] No file under `QuickFiler/Legacy/`, no `TaskVisualization/TaskViewer.Designer.cs`, and no
-      file matching `.claude/**`, `.codex/**`, `.agents/**`, `config/blast-radius.json`, or
-      `config/orchestration-routing.json` is modified by this change.
+- [ ] No file under QuickFiler/Legacy/, no TaskVisualization/TaskViewer.Designer.cs, and no
+      file matching .claude/\*\*, .codex/\*\*, .agents/\*\*, config/blast-radius.json, or
+      config/orchestration-routing.json is modified by this change.
 - [ ] None of the three fixed call sites gain a `CultureInfo.InvariantCulture` argument (or any
       other `CultureInfo` argument) as part of this change; that gap is tracked separately as
       issue #742.
@@ -286,4 +292,4 @@ None; the change is a literal format-string substitution with no performance imp
     promoted as a future issue but neither is part of this fix.
 - Links: issue #645 (`https://github.com/drmoisan/TaskMaster/issues/645`); related follow-up
   issue #742; source research at
-  `docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645/research/2026-09-02T08-47-twelve-hour-time-format-research.md`.
+  docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645/research/2026-09-02T08-47-twelve-hour-time-format-research.md.
