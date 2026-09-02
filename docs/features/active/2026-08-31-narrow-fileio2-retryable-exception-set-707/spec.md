@@ -7,6 +7,10 @@
 - **Status:** Draft
 - **Version:** 0.2
 
+## Write Set
+`UtilitiesCS/To Depricate/FileIO2.cs` (contains a space)
+`UtilitiesCS.Test/HelperClasses/FileIO2_Tests.cs`
+
 ## Context
 `FileIO2.WriteTextFileAsync` retries on every `IOException`. `DirectoryNotFoundException` derives from `IOException`, so an absent target folder consumes the full 100-attempt, 100-millisecond retry window even though no attempt in that window can succeed.
 
@@ -22,7 +26,7 @@ Impact / Severity:
 - [ ] Medium
 - [x] Low
 
-Severity is Low because the one production caller that could reach the case guards against it: `QuickFiler/Controllers/QfcHomeController.Metrics.cs` calls `Globals.FS.SpecialFolders.TryGetValue("MyDocuments", ...)` before writing. The stall is therefore latent rather than observed.
+Severity is Low because the one production caller that could reach the case guards against it: QuickFiler/Controllers/QfcHomeController.Metrics.cs calls `Globals.FS.SpecialFolders.TryGetValue("MyDocuments", ...)` before writing. The stall is therefore latent rather than observed.
 
 
 ## Repro & Evidence
@@ -48,11 +52,11 @@ Logs / Screenshots:
   - Adding one new regression test to `UtilitiesCS.Test/HelperClasses/FileIO2_Tests.cs` that drives the existing `writerFactory`/`delay` injectable seam with a factory that always throws `DirectoryNotFoundException`, asserting a writer-factory invocation count of exactly 1 and a delay-delegate invocation count of exactly 0.
 - Out of scope / non-goals:
   - `PathTooLongException` handling. It also derives from `IOException` and is structurally non-retryable (research §2, §3 Approach B), but neither the issue text nor this spec's Expected Behavior names it, and it is not reachable from either in-repo production caller (both build `filepath` from a resolved special-folder path plus a short, fixed filename). It is a candidate for a separate future potential-doc item, not part of this fix.
-  - Any change to caller-side code. Both production callers (`TaskMaster/AppGlobals/AppOlObjects.cs:315` and `QuickFiler/Controllers/QfcHomeController.Metrics.cs`) already consume `Task<bool>` and already handle a `false` result; the new catch path returns through the same `false` result they already handle.
+  - Any change to caller-side code. Both production callers (TaskMaster/AppGlobals/AppOlObjects.cs line 315 and QuickFiler/Controllers/QfcHomeController.Metrics.cs) already consume `Task<bool>` and already handle a `false` result; the new catch path returns through the same `false` result they already handle.
   - Any change to the `opened`-terminal-failure branch, the retry-exhaustion branch, or the general `catch (IOException ex)` body — all established by issue #647 and unaffected by this narrowing.
 - Explicitly excluded systems, integrations, or datasets:
-  - `QuickFiler/Controllers/QfcHomeController.Metrics.cs` — cited only as caller context; modifying it is out of scope for this feature and owned by a separate workstream.
-  - `.claude/**`, `.codex/**`, `.agents/**`, `config/blast-radius.json`, `config/orchestration-routing.json` — governance/config surfaces unrelated to this bugfix.
+  - QuickFiler/Controllers/QfcHomeController.Metrics.cs — cited only as caller context; modifying it is out of scope for this feature and owned by a separate workstream.
+  - the Claude runtime tree at .claude (all contents), the Codex mirror tree at .codex (all contents), the dot-agents tree at .agents (all contents), config/blast-radius.json, and config/orchestration-routing.json — governance/config surfaces unrelated to this bugfix.
 
 ## Root Cause Analysis
 Deferred from issue #647 as an explicit non-goal. Narrowing the caught set is a behavior change beyond that issue's stated Expected Behavior, so it was recorded for separate treatment rather than folded in. The relevant code is the catch clause in the `internal static` seam overload of `WriteTextFileAsync` in `UtilitiesCS/To Depricate/FileIO2.cs`.
@@ -109,7 +113,7 @@ The fix improves latency for the missing-directory case: it eliminates up to 99 
 - Assumptions (environment, data, access):
   - Target environment remains Windows 11 / .NET Framework 4.8.1, matching the documented exception hierarchy for `StreamWriter(String, Boolean, Encoding)` verified against Microsoft Learn (`DirectoryNotFoundException : IOException`).
   - The production writer factory default (`p => new StreamWriter(p, true, System.Text.Encoding.UTF8)`) is unchanged; the fix depends on this specific constructor overload's documented exception set.
-  - `UtilitiesCS/Properties/AssemblyInfo.cs` already declares `[assembly: InternalsVisibleTo("UtilitiesCS.Test")]`, so no new visibility attribute is required for the test to reach the internal seam overload.
+  - UtilitiesCS/Properties/AssemblyInfo.cs already declares `[assembly: InternalsVisibleTo("UtilitiesCS.Test")]`, so no new visibility attribute is required for the test to reach the internal seam overload.
 - Constraints (budget, performance, compatibility):
   - Minimal, targeted diff per the repository's Bugfix Workflow: one new catch block and one new test, no broader refactor.
   - Catch-order is a hard compiler constraint (CS0160), not a style preference.
@@ -169,7 +173,7 @@ Seeded from issue:
 - [ ] `UnauthorizedAccessException` behavior is unchanged (already outside the retry set, no new handling needed) and no test regresses this.
 - [ ] The general `catch (IOException ex)` retry-exhaustion path (100-attempt budget, 100 ms delay) is unchanged for non-`DirectoryNotFoundException` `IOException` cases.
 - [ ] `PathTooLongException` is explicitly not handled by this fix (out of scope; see Scope & Non-Goals) and no test asserts behavior for it.
-- [ ] Neither production caller (`TaskMaster/AppGlobals/AppOlObjects.cs:315`, `QuickFiler/Controllers/QfcHomeController.Metrics.cs`) requires a code change; both already consume `Task<bool>` and already handle a `false` result.
+- [ ] Neither production caller (TaskMaster/AppGlobals/AppOlObjects.cs line 315, QuickFiler/Controllers/QfcHomeController.Metrics.cs) requires a code change; both already consume `Task<bool>` and already handle a `false` result.
 - [ ] Full C# toolchain passes clean in a single pass: `dotnet tool run csharpier check .`, `msbuild TaskMaster.sln /t:Rebuild ... /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`, `msbuild TaskMaster.sln /t:Rebuild ... /p:TreatWarningsAsErrors=true`, and `vstest.console.exe` against `UtilitiesCS.Test` with all tests green.
 
 ## Risks & Mitigations
@@ -186,4 +190,4 @@ Seeded from issue:
   - Standard PR merge through the repository's normal review and CI process; no phased rollout, feature flag, or migration step is needed.
 - Post-fix monitoring or clean-up tasks:
   - None required. If `PathTooLongException`'s analogous retry-budget stall is judged worth fixing later, record it as its own potential-doc item (mirroring how this issue itself was recorded from #647's deferred note) rather than reopening this issue.
-- Links: issue #707 (https://github.com/drmoisan/TaskMaster/issues/707); sibling issue #647 (`docs/features/active/2026-08-27-fileio2-write-retry-reports-success-on-final-failure-647/`), which established the `Task<bool>`/`opened`-flag shape this fix extends and originally deferred this narrowing; research artifact `docs/features/active/2026-08-31-narrow-fileio2-retryable-exception-set-707/research/2026-09-02T09-15-narrow-fileio2-retryable-exception-set-research.md`.
+- Links: issue #707 (https://github.com/drmoisan/TaskMaster/issues/707); sibling issue #647 (folder docs/features/active/2026-08-27-fileio2-write-retry-reports-success-on-final-failure-647), which established the `Task<bool>`/`opened`-flag shape this fix extends and originally deferred this narrowing; research artifact at path docs/features/active/2026-08-31-narrow-fileio2-retryable-exception-set-707/research/2026-09-02T09-15-narrow-fileio2-retryable-exception-set-research.md.
