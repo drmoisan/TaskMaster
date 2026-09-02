@@ -446,59 +446,59 @@ initialization still returns without blocking.
 
 ## Acceptance Criteria
 
-- [ ] **AC1** — `QuickFiler/Controllers/QfcItemController.WebViewFaultBoundary.cs` exists, declares
+- [x] **AC1** — `QuickFiler/Controllers/QfcItemController.WebViewFaultBoundary.cs` exists, declares
   `namespace QuickFiler.Controllers` and `internal partial class QfcItemController`, carries no `#nullable enable`
   directive, and is compiled by exactly one added `<Compile Include="Controllers\QfcItemController.WebViewFaultBoundary.cs" />`
   entry in `QuickFiler/QuickFiler.csproj`; `QuickFiler.Test/QuickFiler.Test.csproj` is unchanged, because the new
   tests land in the already-included `QuickFiler.Test/Controllers/QfcItemController.InitializationTests.Part3.cs`.
   Verified by file existence, `git diff --stat` on the two `.csproj` files, and a successful build.
-- [ ] **AC2** — That file declares
+- [x] **AC2** — That file declares
   `internal System.Action<string, System.Exception> WebViewInitializationErrorSink { get; set; }` whose default
   value is `(message, exception) => logger.Error(message, exception)`, using the log4net message-first overload
   `ILog.Error(string, Exception)`. Verified by reading the declaration and by the build succeeding (the
   exception-first form does not exist on `log4net.ILog` and would not compile).
-- [ ] **AC3** — That file declares `internal async Task InitializeWebViewGuardedAsync()` which awaits
+- [x] **AC3** — That file declares `internal async Task InitializeWebViewGuardedAsync()` which awaits
   `InitializeWebViewAsync()` inside a `try`, catches `OperationCanceledException` without invoking the sink,
   catches `Exception` and invokes `WebViewInitializationErrorSink` with the exception, and does not rethrow.
   Verified by reading the member and by AC4.
-- [ ] **AC4** — `InitializeWebViewGuardedAsync_WhenTheWebViewSeamFaults_ReportsToTheSinkAndDoesNotFault` exists in
+- [x] **AC4** — `InitializeWebViewGuardedAsync_WhenTheWebViewSeamFaults_ReportsToTheSinkAndDoesNotFault` exists in
   `QuickFiler.Test/Controllers/QfcItemController.InitializationTests.Part3.cs` and passes: the awaited guard does
   not throw, and the sink receives a `WebViewSentinelException`.
-- [ ] **AC5** — `WebViewInitializationErrorSink_DefaultDelegate_InvokesWithoutThrowing` exists in the same file and
+- [x] **AC5** — `WebViewInitializationErrorSink_DefaultDelegate_InvokesWithoutThrowing` exists in the same file and
   passes, exercising the default sink lambda body rather than a test double.
-- [ ] **AC6** — `InitializeBool_WhenTheWebViewSeamFaults_ObservesTheFaultThroughTheSink` exists in the same file and
+- [x] **AC6** — `InitializeBool_WhenTheWebViewSeamFaults_ObservesTheFaultThroughTheSink` exists in the same file and
   passes: driving `Initialize(async: false)` through the pump host delivers the seam fault to the sink.
-- [ ] **AC7** — `QuickFiler/Controllers/QfcItemController.Initialization.cs` lines 192, 288 and 324 each name
+- [x] **AC7** — `QuickFiler/Controllers/QfcItemController.Initialization.cs` lines 192, 288 and 324 each name
   `InitializeWebViewGuardedAsync`; no `.Unwrap()`, `ContinueWith`, or `await` is introduced at any of the three
   sites. Verified by a grep for `InitializeWebViewGuardedAsync` in that file returning exactly three executable
   call sites at those lines.
-- [ ] **AC8** — `QuickFiler/Controllers/QfcItemController.Initialization.cs:256` still reads
+- [x] **AC8** — `QuickFiler/Controllers/QfcItemController.Initialization.cs:256` still reads
   `await InitializeWebViewAsync();`, calling the **unguarded** member, and
   `QuickFiler/Controllers/QfcItemController.ViewerSetup.cs` is unmodified — including
   `[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]` at `:47` and the body of `InitializeWebViewAsync` at
   `:48`. Verified by `git diff --stat` showing zero changed lines in `ViewerSetup.cs` and by reading line 256.
-- [ ] **AC9** — The pre-existing tests
+- [x] **AC9** — The pre-existing tests
   `InitializeSequentialAsync_ThroughThePumpHost_CompletesAndInitializesState`,
   `InitializeGraphicsAsync_ThroughThePumpHost_CompletesAndAppliesDarkTheme`, and
   `InitializeAsync_ThroughThePumpHost_RunsToTheMockedWebViewSeamAndFaults` all pass, with their method bodies and
   assertions unchanged. Verified by the test run result and by `git diff` on those test method bodies being empty.
-- [ ] **AC10** — The full four-stage C# toolchain completes in one clean pass, in this order, with no failure and no
+- [x] **AC10** — The full four-stage C# toolchain completes in one clean pass, in this order, with no failure and no
   file rewritten by a later stage: (1) `dotnet tool run csharpier format .` verified by
   `dotnet tool run csharpier check .`; (2)
   `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`;
   (3) `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`;
   (4) `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`. No `/p:Nullable=enable` and no `/t:Build`.
-- [ ] **AC11** — After the change, every touched file is at or below the 500-line ceiling: the new partial file,
+- [x] **AC11** — After the change, every touched file is at or below the 500-line ceiling: the new partial file,
   `QuickFiler/Controllers/QfcItemController.Initialization.cs`, and
   `QuickFiler.Test/Controllers/QfcItemController.InitializationTests.Part3.cs`. Verified by line count per file.
-- [ ] **AC12** — The new tests introduce no determinism-banned API: no `Thread.Sleep`, no `Task.Delay`, no polling
+- [x] **AC12** — The new tests introduce no determinism-banned API: no `Thread.Sleep`, no `Task.Delay`, no polling
   loop, and no real wall-clock wait. The only wait in the pump-hosted test is `await` on a
   `TaskCompletionSource` completed from the sink callback. Verified by grep over the added test code and by reading
   the test bodies.
-- [ ] **AC13** — `QuickFiler/Controllers/QfcItemController.WebViewFaultBoundary.cs` reaches `>= 90%` line coverage
+- [x] **AC13** — `QuickFiler/Controllers/QfcItemController.WebViewFaultBoundary.cs` reaches `>= 90%` line coverage
   in the `/EnableCodeCoverage` report, per the CLAUDE.md new-module rule. Verified by the per-file figure in the
   generated coverage artifact.
-- [ ] **AC14** — Repository-wide line coverage does not regress relative to the Phase 0 baseline captured before any
+- [x] **AC14** — Repository-wide line coverage does not regress relative to the Phase 0 baseline captured before any
   edit in this delivery run. Verified by comparing the Phase 0 and post-change coverage artifacts, both stored under
   `docs/features/active/2026-08-28-qfc-initializewebviewasync-fault-is-unobserved-670/evidence/coverage/`.
 
