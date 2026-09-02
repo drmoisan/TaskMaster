@@ -19,7 +19,7 @@ using UtilitiesCS.ReusableTypeClasses.SerializableNew.Concurrent.Observable;
 namespace QuickFiler.Controllers
 {
     [ExcludeFromCodeCoverage]
-    public class QfcCollectionController : IQfcCollectionController
+    public partial class QfcCollectionController : IQfcCollectionController
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(
             System.Reflection.MethodBase.GetCurrentMethod().DeclaringType
@@ -477,93 +477,8 @@ namespace QuickFiler.Controllers
             //var conversationTasks = _itemGroups.Select(grp => grp.ItemController.LoadConversationResolverAsync(TokenSource, Token, false)).ToList();
         }
 
-        /// <summary>
-        /// High-confidence (Issue #171) carrier-list overload. Builds UI item controllers for the
-        /// pre-filtered survivors in <paramref name="preScored"/>, mirroring the standard
-        /// <see cref="LoadControlsAndHandlers_01Async(IList{MailItem}, RowStyle, RowStyle)"/> path but
-        /// threading each survivor's predetermined folder into its <see cref="QfcItemGroup"/> and item
-        /// controller so the folder is preselected instead of selected by index.
-        /// </summary>
-        public async Task LoadControlsAndHandlers_01Async(
-            IList<QfcPreScoredItem> preScored,
-            RowStyle template,
-            RowStyle templateExpanded
-        )
-        {
-            var items = preScored.Select(x => x.MailItem).ToList();
-            ValidateParams(items, template, templateExpanded);
-
-            // Start loading mail item helpers
-            var helpers = items.Select(GetPartiallyInitializedHelperAsync).ToList();
-
-            // Freeze the form while loading controls
-            _formViewer.SuspendLayout();
-            var tlpLayoutState = SafeSetTlpLayout(false);
-
-            // Save the QfcItem template styles
-            _template = template;
-            _templateExpanded = templateExpanded;
-
-            // Hook the move monitor to the mail items
-            BackgroundLoadingTasks.Add(
-                Task.Run(() =>
-                    items.ForEach(mailItem =>
-                        _moveMonitor.HookItem(mailItem, (x) => RemovedItemMonitor(x.EntryID))
-                    )
-                )
-            );
-
-            // Create empty keyboard handler actions
-            BackgroundLoadingTasks.Add(Task.Run(CreateEmptyKbdHandlerCharActions, Token));
-
-            // Create the item groups, carrying each survivor's predetermined folder
-            var digits = preScored.Count >= 10 ? 2 : 1;
-            _itemGroups =
-            [
-                .. preScored.Select(
-                    (scored, i) =>
-                        EncapsulateItemGroup(
-                            template,
-                            scored.MailItem,
-                            i,
-                            digits,
-                            _tlpStates,
-                            scored.PredeterminedFolder
-                        )
-                ),
-            ];
-
-            // Initialize graphics
-            foreach (var group in _itemGroups)
-            {
-                await group.ItemController.InitializeGraphicsAsync();
-            }
-
-            while (helpers.Count > 0)
-            {
-                var helperTask = await Task.WhenAny(helpers);
-                var helper = await helperTask;
-                helpers.Remove(helperTask);
-                var grp = _itemGroups.FirstOrDefault(x => x.MailItem.EntryID == helper.EntryId);
-                grp.ItemController.PopulateControls(helper, grp.ItemController.ItemNumber);
-            }
-
-            // Wait until Background Loading Tasks finish and then clear the collection
-            await DrainBackgroundLoadingTasksAsync();
-
-            WireUpAsyncKeyboardHandler();
-
-            // Restore state of window
-            TlpLayout = tlpLayoutState;
-            if (_formViewer.InvokeRequired)
-            {
-                _formViewer.Invoke(() => _formViewer.ResumeLayout());
-            }
-            else
-            {
-                _formViewer.ResumeLayout();
-            }
-        }
+        // The QfcPreScoredItem carrier overload of LoadControlsAndHandlers_01Async lives in the
+        // partial part QfcCollectionController.CarrierLoad.cs; see that file for the reason.
 
         //public async Task LoadSecondaryAsync()
         //{
@@ -643,33 +558,8 @@ namespace QuickFiler.Controllers
             _kbdHandler.CharActionsAsync = new KbdActions<char, KaCharAsync, Func<char, Task>>();
         }
 
-        internal QfcItemGroup EncapsulateItemGroup(
-            RowStyle template,
-            MailItem mailItem,
-            int i,
-            int digits,
-            TlpCellStates tlpStates,
-            string predeterminedFolder = null
-        )
-        {
-            var grp = new QfcItemGroup(mailItem) { PredeterminedFolder = predeterminedFolder };
-            var itemViewer = ItemViewerQueue.Dequeue(_homeController.Token);
-            LoadItemToTlp(itemViewer, i, template, true, 0);
-            grp.ItemViewer = itemViewer;
-            grp.ItemController = new QfcItemController(
-                _globals,
-                _homeController,
-                this,
-                grp.ItemViewer,
-                i + 1,
-                digits,
-                grp.MailItem,
-                tlpStates,
-                predeterminedFolder
-            );
-            grp.ItemController.Token = Token;
-            return grp;
-        }
+        // EncapsulateItemGroup lives in the partial part QfcCollectionController.CarrierLoad.cs;
+        // see that file for the reason.
 
         public void LoadItemGroupsAndViewers_02(IList<MailItem> items, RowStyle template)
         {

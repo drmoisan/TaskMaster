@@ -59,6 +59,23 @@ namespace QuickFiler.Controllers
             //TraceUtility.LogMethodCall(varList);
             if (varList is null)
             {
+                // #678: an item that arrived from the dequeue-time confidence gate already carries a
+                // fully initialised handler for THIS item, scored with the same
+                // FolderPredictor.InitOptions.FromField sequence this branch would run. Adopting it
+                // is what removes the second scoring pass. The adoption is confined to this branch:
+                // the FromArrayOrString branch below is a search over a caller-supplied list, not a
+                // per-item scoring pass, so a carried handler is never valid there.
+                if (_carriedFolderHandler is not null)
+                {
+                    _folderHandler = _carriedFolderHandler;
+                    logger.Debug(
+                        $"Probability debug [QfcItemController.LoadFolderHandlerAsync (carried)] "
+                            + $"Subject='{ItemHelper?.Subject}' EntryID='{ItemHelper?.EntryId}' "
+                            + $"TopScore={_folderHandler?.Suggestions?.TopScore() ?? 0}"
+                    );
+                    return;
+                }
+
                 try
                 {
                     _folderHandler = await Task.Run(
@@ -194,12 +211,24 @@ namespace QuickFiler.Controllers
                 {
                     _itemViewer.SetFolderSuggestions(_folderHandler.FolderRowArray);
                 }
+                // #678 AC12: FolderArray entries are archive-prefix-stripped by
+                // FolderPredictor.ProjectSuggestionPath, while the carried PredeterminedFolder is
+                // the RAW suggestion path the scorer read from Suggestions. Without projecting the
+                // carried value the same way, FolderContains misses every archive-rooted
+                // suggestion and the selection silently falls back to the index-1 entry. The
+                // projection is duplicated here rather than reused because
+                // FolderPredictor.ProjectSuggestionPath is private and lives under UtilitiesCS,
+                // which this change may not modify.
+                string predetermined = ProjectPredeterminedFolder(
+                    _predeterminedFolder,
+                    _globals?.Ol?.ArchiveRootPath
+                );
                 if (
-                    !string.IsNullOrEmpty(_predeterminedFolder)
-                    && _itemViewer.FolderContains(_predeterminedFolder)
+                    !string.IsNullOrEmpty(predetermined)
+                    && _itemViewer.FolderContains(predetermined)
                 )
                 {
-                    _itemViewer.SetFolderSelectedItem(_predeterminedFolder);
+                    _itemViewer.SetFolderSelectedItem(predetermined);
                 }
                 else
                 {
@@ -209,6 +238,31 @@ namespace QuickFiler.Controllers
                 }
                 _selectedFolder = _itemViewer.GetSelectedFolder();
             }
+        }
+
+        /// <summary>
+        /// #678 AC12. Projects a raw suggestion path onto the form <c>FolderPredictor.FolderArray</c>
+        /// stores, so a containment probe against the combo box can match. The projection mirrors
+        /// <c>FolderPredictor.ProjectSuggestionPath</c> exactly: strip
+        /// <paramref name="archiveRootPath"/> plus a trailing separator from the front of
+        /// <paramref name="folderPath"/>, case-insensitively, but only when the remainder is
+        /// non-empty. A null or empty archive root, which is the state in every non-high-confidence
+        /// path and in tests that supply no globals, returns the input unchanged, so the pre-change
+        /// selection behaviour is preserved exactly for those cases.
+        /// </summary>
+        internal static string ProjectPredeterminedFolder(string folderPath, string archiveRootPath)
+        {
+            if (string.IsNullOrEmpty(folderPath) || string.IsNullOrEmpty(archiveRootPath))
+            {
+                return folderPath;
+            }
+
+            string archivePrefix = archiveRootPath + "\\";
+            return
+                folderPath.StartsWith(archivePrefix, StringComparison.OrdinalIgnoreCase)
+                && folderPath.Length > archivePrefix.Length
+                ? folderPath.Substring(archivePrefix.Length)
+                : folderPath;
         }
 
         /// <summary>

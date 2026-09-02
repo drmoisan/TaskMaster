@@ -81,11 +81,15 @@ namespace QuickFiler.Controllers.Tests
                     (MailItem item, IApplicationGlobals g, CancellationToken t) =>
                     {
                         t.ThrowIfCancellationRequested();
+                        // Issue #678 widened the seam's third element to the initialised handler.
+                        // This scripted double publishes none, which the carrier tolerates.
                         if (script.TryGetValue(item, out var entry))
                         {
-                            return Task.FromResult((entry.score, entry.topFolder));
+                            return Task.FromResult(
+                                (entry.score, entry.topFolder, (IFolderSearchHandler)null)
+                            );
                         }
-                        return Task.FromResult((0L, string.Empty));
+                        return Task.FromResult((0L, string.Empty, (IFolderSearchHandler)null));
                     }
                 );
             return mock;

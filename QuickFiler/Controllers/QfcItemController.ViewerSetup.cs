@@ -463,6 +463,7 @@ namespace QuickFiler.Controllers
             _mailItem = null;
             //_dfConversation = null;
             _folderHandler = null;
+            _carriedFolderHandler = null; // #678: released with _folderHandler so it does not outlive the row.
             _webViewEnvironment = null;
             _themes = null;
             _folderHandler = null;

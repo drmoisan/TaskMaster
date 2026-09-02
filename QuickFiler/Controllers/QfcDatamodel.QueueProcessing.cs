@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Interfaces;
+using UtilitiesCS;
 
 namespace QuickFiler.Controllers
 {
@@ -260,10 +261,11 @@ namespace QuickFiler.Controllers
         internal Func<IFolderScoringService> ScoringServiceFactory { get; set; } =
             () => new FolderScoringService();
 
-        private async Task<(long Score, string TopFolder)> ScoreRemainingQueueMailItemAsync(
-            MailItem mailItem,
-            CancellationToken cancel
-        )
+        private async Task<(
+            long Score,
+            string TopFolder,
+            IFolderSearchHandler Handler
+        )> ScoreRemainingQueueMailItemAsync(MailItem mailItem, CancellationToken cancel)
         {
             var scoringService = ScoringServiceFactory();
             var score = await scoringService
@@ -273,7 +275,9 @@ namespace QuickFiler.Controllers
                 $"Probability debug [QfcDatamodel.ScoreRemainingQueueMailItemAsync (master-queue admission)] "
                     + $"Subject='{mailItem.Subject}' EntryID='{mailItem.EntryID}' Score={score.Score}"
             );
-            return (score.Score, score.TopFolder);
+            // Issue #678: forward the initialised handler as the third element so it reaches
+            // QfcGateBatch.Accepted and, through it, QfcDequeueBatch.PreScored.
+            return (score.Score, score.TopFolder, score.Handler);
         }
 
         internal async Task WaitForQueue(int quantity, CancellationToken token)

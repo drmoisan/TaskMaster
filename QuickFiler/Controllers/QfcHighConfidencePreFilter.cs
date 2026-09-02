@@ -67,13 +67,17 @@ namespace QuickFiler.Controllers
                 .Select(
                     async (item, index) =>
                     {
-                        var (score, topFolder) = await service.ScoreAsync(item, globals, token);
+                        var (score, topFolder, handler) = await service.ScoreAsync(
+                            item,
+                            globals,
+                            token
+                        );
                         logger.Debug(
                             $"Probability debug [QfcHighConfidencePreFilter.FilterAsync] "
                                 + $"Subject='{item.Subject}' EntryID='{item.EntryID}' "
                                 + $"Score={score} TopFolder='{topFolder}'"
                         );
-                        return (index, item, score, topFolder);
+                        return (index, item, score, topFolder, handler);
                     }
                 )
                 .ToList();
@@ -83,7 +87,11 @@ namespace QuickFiler.Controllers
             return scored
                 .Where(result => result.score >= cutoff && result.score > 0)
                 .OrderBy(result => result.index)
-                .Select(result => new QfcPreScoredItem(result.item, result.topFolder))
+                .Select(result => new QfcPreScoredItem(
+                    result.item,
+                    result.topFolder,
+                    result.handler
+                ))
                 .ToList();
         }
     }
@@ -105,10 +113,22 @@ namespace QuickFiler.Controllers
         /// The top-suggestion folder path for the item. Coerced to <see cref="string.Empty"/> when
         /// null so the property contract (non-null) holds.
         /// </param>
-        public QfcPreScoredItem(MailItem mailItem, string predeterminedFolder)
+        /// <param name="folderHandler">
+        /// Issue #678. The folder search handler the scorer already initialised for this item, so
+        /// the item controller can adopt it instead of running a second
+        /// <c>FolderPredictor.InitAsync(FromField)</c> pass. Optional and nullable: a carrier built
+        /// on a path where no handler is available (a test double, or a scorer that produced none)
+        /// leaves it null, and the item controller then falls back to its existing behaviour.
+        /// </param>
+        public QfcPreScoredItem(
+            MailItem mailItem,
+            string predeterminedFolder,
+            IFolderSearchHandler folderHandler = null
+        )
         {
             MailItem = mailItem;
             PredeterminedFolder = predeterminedFolder ?? string.Empty;
+            FolderHandler = folderHandler;
         }
 
         /// <summary>The surviving mail item. Never null for a produced survivor.</summary>
@@ -119,6 +139,14 @@ namespace QuickFiler.Controllers
         /// available (such an item is not produced as a survivor by the filter).
         /// </summary>
         public string PredeterminedFolder { get; }
+
+        /// <summary>
+        /// Issue #678. The already-initialised folder search handler the scorer produced for this
+        /// item, or <see langword="null"/> when none is available. Unlike the two members above this
+        /// one has no non-null contract, because the carrier is also constructed on paths that have
+        /// no handler to publish.
+        /// </summary>
+        public IFolderSearchHandler FolderHandler { get; }
     }
 
     /// <summary>
@@ -130,17 +158,21 @@ namespace QuickFiler.Controllers
     internal interface IFolderScoringService
     {
         /// <summary>
-        /// Scores a single mail item and returns its top folder score (0-1000 scale) and the
-        /// top-ranked suggested folder path.
+        /// Scores a single mail item and returns its top folder score (0-1000 scale), the
+        /// top-ranked suggested folder path, and the folder search handler the scoring pass
+        /// initialised.
         /// </summary>
         /// <param name="mailItem">The mail item to score.</param>
         /// <param name="globals">Application globals providing the trained classifier.</param>
         /// <param name="token">Cancellation token.</param>
         /// <returns>
-        /// A tuple of the top score (max value in the folder scorer, 0 when no suggestion) and the
-        /// top-ranked folder path (empty string when no suggestion).
+        /// A tuple of the top score (max value in the folder scorer, 0 when no suggestion), the
+        /// top-ranked folder path (empty string when no suggestion), and the initialised handler.
+        /// Issue #678: the handler is published rather than discarded so the consumer can adopt it
+        /// instead of running a second <c>FolderPredictor.InitAsync(FromField)</c> pass. It is
+        /// <see langword="null"/> only for an implementation that produces no handler.
         /// </returns>
-        Task<(long Score, string TopFolder)> ScoreAsync(
+        Task<(long Score, string TopFolder, IFolderSearchHandler Handler)> ScoreAsync(
             MailItem mailItem,
             IApplicationGlobals globals,
             CancellationToken token
@@ -167,7 +199,7 @@ namespace QuickFiler.Controllers
     internal sealed class FolderScoringService : IFolderScoringService
     {
         /// <inheritdoc />
-        public async Task<(long Score, string TopFolder)> ScoreAsync(
+        public async Task<(long Score, string TopFolder, IFolderSearchHandler Handler)> ScoreAsync(
             MailItem mailItem,
             IApplicationGlobals globals,
             CancellationToken token
@@ -185,7 +217,12 @@ namespace QuickFiler.Controllers
 
             long score = predictor.Suggestions.TopScore();
             string topFolder = predictor.Suggestions.ToArray(1).FirstOrDefault() ?? string.Empty;
-            return (score, topFolder);
+
+            // Issue #678: publish the predictor this pass already initialised instead of letting it
+            // fall out of scope. Before this change only the two scalars escaped, so every consumer
+            // that needed FolderArray, Suggestions or FolderRowArray had to build and initialise a
+            // second predictor for the same item.
+            return (score, topFolder, predictor);
         }
     }
 }

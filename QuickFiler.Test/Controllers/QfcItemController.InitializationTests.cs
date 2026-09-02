@@ -150,6 +150,7 @@ namespace QuickFiler.Controllers.Tests
             Mock<IApplicationGlobals> globals = new Mock<IApplicationGlobals>();
             Mock<IQfcCollectionController> parent = new Mock<IQfcCollectionController>();
             Mock<IItemViewer> viewer = new Mock<IItemViewer>();
+            IFolderSearchHandler carried = new Mock<IFolderSearchHandler>().Object;
 
             // Act
             QfcItemController controller = new QfcItemController(
@@ -161,7 +162,8 @@ namespace QuickFiler.Controllers.Tests
                 itemNumberDigits: 1,
                 mailItem: null,
                 tlpStates: null,
-                predeterminedFolder: @"\\Archive\Predetermined"
+                predeterminedFolder: @"\\Archive\Predetermined",
+                carriedFolderHandler: carried
             );
 
             // Assert — the high-confidence folder path is stored in the readonly private field.
@@ -169,6 +171,14 @@ namespace QuickFiler.Controllers.Tests
                 .GetField("_predeterminedFolder", BindingFlags.NonPublic | BindingFlags.Instance)
                 .GetValue(controller);
             stored.Should().Be(@"\\Archive\Predetermined");
+
+            // Assert — issue #678: the same constructor stores the carried folder search handler,
+            // which is what lets LoadFolderHandlerAsync adopt it instead of scoring a second time.
+            object storedHandler = typeof(QfcItemController)
+                .GetField("_carriedFolderHandler", BindingFlags.NonPublic | BindingFlags.Instance)
+                .GetValue(controller);
+            storedHandler.Should().BeSameAs(carried);
+
             viewer.VerifySet(v => v.Controller = controller, Times.Once());
 
             cts.Dispose();

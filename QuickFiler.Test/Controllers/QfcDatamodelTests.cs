@@ -322,6 +322,9 @@ namespace QuickFiler.Controllers.Tests
         /// the datamodel discards the folder, so a later consumer has to re-score the same item.
         /// Scoring is driven through the <c>ScoringServiceFactory</c> seam added by [P1-T5] so no
         /// live Outlook COM is touched, as .claude/rules/general-unit-test.md UT4 requires.
+        /// Issue #678 widened the seam to a third element, the initialised folder search handler;
+        /// this test additionally asserts that third element is forwarded rather than dropped, which
+        /// is the same discard defect one element to the right.
         /// </summary>
         [TestMethod]
         public async Task ScoreRemainingQueueMailItemAsync_ReturnsScoreAndTopFolder()
@@ -333,6 +336,7 @@ namespace QuickFiler.Controllers.Tests
 
             const long ExpectedScore = 875L;
             const string ExpectedTopFolder = @"Inbox\Projects\Alpha";
+            IFolderSearchHandler expectedHandler = new Mock<IFolderSearchHandler>().Object;
 
             var scoringService = new Mock<IFolderScoringService>(MockBehavior.Strict);
             scoringService
@@ -343,16 +347,14 @@ namespace QuickFiler.Controllers.Tests
                         It.IsAny<CancellationToken>()
                     )
                 )
-                .ReturnsAsync((ExpectedScore, ExpectedTopFolder));
+                .ReturnsAsync((ExpectedScore, ExpectedTopFolder, expectedHandler));
 
             SetPrivateField(model, "_globals", globals.Object);
             model.ScoringServiceFactory = () => scoringService.Object;
 
             // Act
-            (long Score, string TopFolder) result = await InvokeScoreRemainingQueueMailItemAsync(
-                model,
-                mailItem
-            );
+            (long Score, string TopFolder, IFolderSearchHandler Handler) result =
+                await InvokeScoreRemainingQueueMailItemAsync(model, mailItem);
 
             // Assert
             result
@@ -365,12 +367,20 @@ namespace QuickFiler.Controllers.Tests
                     "the top-ranked folder the scorer already computed must reach the caller "
                         + "instead of being discarded and re-derived downstream"
                 );
+            result
+                .Handler.Should()
+                .BeSameAs(
+                    expectedHandler,
+                    "issue #678: the folder search handler the scoring pass already initialised "
+                        + "must reach the caller instead of being discarded and re-initialised"
+                );
         }
 
-        private static Task<(long Score, string TopFolder)> InvokeScoreRemainingQueueMailItemAsync(
-            QfcDatamodel model,
-            MailItem mailItem
-        )
+        private static Task<(
+            long Score,
+            string TopFolder,
+            IFolderSearchHandler Handler
+        )> InvokeScoreRemainingQueueMailItemAsync(QfcDatamodel model, MailItem mailItem)
         {
             var method = typeof(QfcDatamodel).GetMethod(
                 "ScoreRemainingQueueMailItemAsync",
@@ -382,7 +392,7 @@ namespace QuickFiler.Controllers.Tests
                     "ScoreRemainingQueueMailItemAsync should exist on QfcDatamodel as a private "
                         + "instance method"
                 );
-            return (Task<(long Score, string TopFolder)>)
+            return (Task<(long Score, string TopFolder, IFolderSearchHandler Handler)>)
                 method.Invoke(model, new object[] { mailItem, CancellationToken.None });
         }
 
