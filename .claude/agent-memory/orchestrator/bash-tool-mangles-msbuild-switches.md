@@ -20,4 +20,19 @@ Running msbuild directly through the Bash tool fails with `MSBUILD : error MSB10
 
 **PowerShell heredoc caution:** complex `pwsh -NoProfile -Command "..."` strings with nested quotes get mangled by Bash-tool quoting. For anything with embedded XML, escaped quotes, or string concatenation, write a `.ps1` to the scratchpad and run `pwsh -NoProfile -File`.
 
+**The same MSYS translation also breaks `git show <rev>:<path>` (verified 2026-09-01).**
+`git show origin/main:.claude/agent-memory/atomic-executor/MEMORY.md` fails with
+`fatal: ambiguous argument 'origin\main;.claude\agent-memory\...'`. MSYS sees a slash before a colon,
+reads the argument as a POSIX path LIST, and converts it to Windows form: `/` becomes `\` and the
+`:` separator becomes `;`. Quoting the argument does not help, because the translation happens on the
+way into the process rather than in shell word-splitting.
+
+Workarounds, in order of preference:
+- Use a SHA instead of a branch name: `git show 43dcc800...:path/to/file` works, because there is no
+  slash before the colon and the argument no longer looks like a path list.
+- Or redirect through a file with `git cat-file`, or set `MSYS_NO_PATHCONV=1`.
+
+The one-sided nature is the tell: `git show HEAD:path/to/file` succeeds while
+`git show origin/main:path/to/file` fails, and the only difference is the slash in the ref name.
+
 **How to apply:** put these paths verbatim into the delegation prompt for `atomic-planner`, `atomic-executor`, and preflight, along with measured baseline exit codes. Making the planner encode them into the command tasks stops each downstream agent from rediscovering the MSB1008 failure.

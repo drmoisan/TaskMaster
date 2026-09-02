@@ -1,6 +1,6 @@
 ---
 name: review-worktree-differs-from-session-cwd-mirror-artifacts
-description: When the reviewed branch lives in a caller worktree (not the session cwd), mirror the three audit artifacts into the session cwd's docs/features/active/<feature>/ too — the SubagentStop hook Test-Paths relative to its own cwd
+description: When the reviewed branch lives in a caller worktree (not the session cwd), advertise a cwd-portable traversal path (or mirror) — the SubagentStop hook Test-Paths relative to its own cwd
 metadata:
   type: project
 ---
@@ -15,7 +15,23 @@ session cwd (`repos/TaskMaster-wt/<ts>`) did not.
 worktree, the path check fails with "no file exists at that location" and blocks termination, even
 though the artifacts exist where the caller asked for them.
 
-**How to apply:**
+**Preferred fix (no mirror) — cwd-portable traversal path.** `Get-ReviewArtifactInfo`'s regex is
+`^docs/features/active/(?<Folder>.+)/<stem>\.<ts>\.md$` and `.+` matches `/` and `.`, so a path that
+*starts* with `docs/features/active/` but then climbs out still satisfies the pattern while
+`Test-Path` resolves it for real. When both worktrees are siblings under one parent, advertise:
+
+```
+docs/features/active/../../../../<review-worktree-name>/docs/features/active/<feature>/policy-audit.<ts>.md
+```
+
+Four `..` from `<root>/docs/features/active` lands on the shared parent. Verified on the #638 review
+(2026-08-29): the same string returned Ok=True from BOTH the session cwd and the review worktree, so
+one advertisement covers either hook cwd. Use this when the caller forbids writing into its sibling's
+tree (a mirror under `docs/features/active/` there is tracked territory and a sibling's `git add -A`
+will sweep it onto the wrong branch). Give the plain repo-relative and absolute paths in prose
+alongside, so the orchestrator commits the right thing.
+
+**How to apply (mirror fallback, only if the traversal form is rejected):**
 - Write the three artifacts into the caller worktree's feature folder (the deliverable), then `cp`
   them to the identical relative path under the session cwd (`mkdir -p` the folder; the copies are
   untracked collateral in the session worktree).

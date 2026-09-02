@@ -252,11 +252,14 @@ Reflection surface, measured over the same base commit:
   `Type.GetType(`, `Assembly.Load`, `CreateDelegate` and `CallByName` across the production tree
   produces no output and exits 1.
 - **QuickFiler test tree:** 172 `GetField(` hits, 69 `GetMethod(` hits, 24 `GetProperty(` hits.
-  Six `GetField(` call sites take a `string name` variable against `typeof(QfcCollectionController)`
+  Eight `GetField(` call sites take a `string name` variable against `typeof(QfcCollectionController)`
   — the exact type whose members were removed. AC-16 searched only `GetMethod(` and `InvokeMember(`
-  and therefore never saw them.
+  and therefore never saw them. *(Corrected 2026-09-02, issue #692: the original derivation recorded
+  six; the actual implementation-time count, on which the merged fix (PR #688) was discharged, is
+  eight. No six-element subset of the eight is separately identifiable, so this correction updates the
+  count in place rather than distinguishing an original six from two additional sites.)*
 
-Those six variable-argument sites are closed mechanically by the Partition C result: no string
+Those eight variable-argument sites are closed mechanically by the Partition C result: no string
 literal anywhere in the QuickFiler test tree equals one of the thirteen identifiers, so no value the
 variable can take resolves a removed member. The stated limit of this argument is that it does not
 cover a member name assembled at runtime by concatenation or interpolation; no such construction was
@@ -303,7 +306,7 @@ What stands in place of tests:
   "genuine name-based caller" category shown empty in both.
 - **The reflection entry-point inventory**, with per-pattern counts for the production tree and the
   test tree reported separately.
-- **The closure argument** for the six variable-argument call sites, stated explicitly rather than
+- **The closure argument** for the eight variable-argument call sites, stated explicitly rather than
   asserted, with its limit recorded.
 - **The fail-before exception dossier**, which records why a failing regression run is impossible
   and supplies the non-vacuity measurement as the alternative proof.
@@ -349,7 +352,7 @@ no executable line changes.
       including the `GetField(` and `GetFields(` family that AC-16 omitted — with a per-pattern hit
       count reported separately for the QuickFiler production tree and the QuickFiler test tree, and
       the production-tree count recorded as zero for every name-resolving pattern.
-- [x] **AC-9** — Each of the six variable-argument reflection call sites that target the removed
+- [x] **AC-9** — Each of the eight variable-argument reflection call sites (corrected 2026-09-02, issue #692 — originally recorded as six) that target the removed
       members' own type is named individually by file and line, and each is closed by an explicit
       stated argument bounding the values its member-name variable can take; the stated limit of
       that argument is recorded rather than omitted.

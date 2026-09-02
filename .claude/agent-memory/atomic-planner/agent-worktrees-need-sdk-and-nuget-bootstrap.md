@@ -24,23 +24,33 @@ before the first `dotnet tool restore` and before the first `msbuild`, in this o
    fires before compilation when the tree is missing (e.g. `QuickFiler.Test.csproj:452-466`), and every
    `Reference` `HintPath` under `..\packages\` is unresolvable. CI does not hit this because
    `.github/workflows/_build-analyzers.yml:45` runs `nuget restore` explicitly.
-3. **Back-fill skewed analyzer packages — RE-MEASURE BEFORE ASSERTING THIS.** As of 2026-08-31 the skew
-   is **RESOLVED** in the tree: every `<Analyzer Include>` across all 16 first-party `.csproj` names
-   `Meziantou.Analyzer.3.0.194` / `Roslynator.Analyzers.5.0.0`, and every `packages.config` pins the same
-   two versions, so step 2 alone now suffices and a back-fill task would be a no-op. Do not carry the
-   historical figures below into a plan without re-deriving them: grep `packages\\(Meziantou\.Analyzer|Roslynator\.Analyzers)\.[0-9.]+`
-   over `*.csproj` and compare with the `version=` values in `packages.config`. The historical failure,
-   preserved because Dependabot can reintroduce it:
+3. **Verify every `<Analyzer Include>` path resolves; back-fill any that does not — RE-MEASURE BEFORE
+   ASSERTING THIS.** Step 2 alone is not always enough. All 16 first-party `.csproj` files carry
+   UNCONDITIONAL `<Analyzer Include>` items under `..\packages\<id>.<version>\...`. Those hand-authored
+   items (Issue #181) and the NuGet-generated `Condition`-guarded `Import`/`Error` lines plus
+   `packages.config` are bumped by DIFFERENT mechanisms, so a Dependabot bump can leave them skewed. A
+   missing `Analyzer` path is `error CS0006`, NOT a warning — the compile FAILS.
+   **Do NOT write a version number into the acceptance clause; it goes stale.** As of 2026-08-31 the
+   skew is **RESOLVED** in the tree: every `<Analyzer Include>` across all 16 first-party `.csproj`
+   names `Meziantou.Analyzer.3.0.194` / `Roslynator.Analyzers.5.0.0`, and every `packages.config` pins
+   the same two versions (checked on `QuickFiler.Test.csproj:3, 493, 502-506` vs its
+   `packages.config:11-16, 139-144`), so step 2 alone now suffices and a back-fill task would be a
+   no-op. Do not carry this figure into a plan without re-deriving it.
+   Write a version-agnostic gate instead: enumerate every `Analyzer` `Include` from every non-`packages`
+   `.csproj` and `Test-Path` it joined to **that project's own directory** (`Include` resolves against
+   the declaring project's dir, NOT the repo root — a check that joins to a hard-coded project folder
+   silently reports garbage); equivalently, grep
+   `packages\\(Meziantou\.Analyzer|Roslynator\.Analyzers)\.[0-9.]+` over `*.csproj` and compare with the
+   `version=` values in `packages.config`. Remedy for a mismatch: `nuget install <id> -Version <v>
+   -OutputDirectory packages`, or copy the folder from the main checkout.
 
-   **Historical (2026-08, no longer true).** Step 2 alone was NOT
-   enough. All 16 first-party `.csproj` files carry UNCONDITIONAL `<Analyzer Include>` items naming
+   **Historical (2026-08, no longer true, preserved because Dependabot can reintroduce it).** All 16
+   first-party `.csproj` files carried UNCONDITIONAL `<Analyzer Include>` items naming
    `..\packages\Meziantou.Analyzer.3.0.156\...` and four `..\packages\Roslynator.Analyzers.4.16.0\...`
-   DLLs (`QuickFiler.Test.csproj:474-478`), while all 16 `packages.config` pin `3.0.174` and `4.16.1`.
-   Dependabot commit `f8e22af7` bumped only the NuGet-generated `Condition`-guarded `Import`/`Error`
-   lines and `packages.config`; the hand-authored Issue #181 `Analyzer` items were never realigned.
-   A missing `Analyzer` path is `error CS0006`, NOT a warning — the compile FAILS. Remedy:
-   `nuget install <id> -Version <v> -OutputDirectory packages`, or copy the folders from the main
-   checkout. Both versions exist there and are verifiable with a glob before you write the claim.
+   DLLs (`QuickFiler.Test.csproj:474-478`), while all 16 `packages.config` pinned `3.0.174` and
+   `4.16.1`. Dependabot commit `f8e22af7` bumped only the NuGet-generated `Condition`-guarded
+   `Import`/`Error` lines and `packages.config`; the hand-authored Issue #181 `Analyzer` items were
+   never realigned.
 
 4. **Provision the `dotnet-coverage` GLOBAL tool** when any task uses
    `scripts/vscode/Invoke-MSTestWithCoverage.ps1`. That script throws

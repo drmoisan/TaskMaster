@@ -14,6 +14,7 @@
 - [Follow-up promotion task is unexecutable](project_followup_promotion_task_is_unexecutable_by_executor.md) · [Supersede clause leaves a routing residual](project_supersede_clause_leaves_hard_routing_residual.md)
 - [Plan check-off fixpoint breaks clean-tree gates](project_plan_checkoff_fixpoint_breaks_terminal_clean_tree_gate.md) · [Tracked agent-memory breaks unscoped git gates](project_agent_memory_tracked_breaks_unscoped_git_gates.md)
 - [Merge-base diff gates need a commit cadence](project_preflight_mergebase_diff_gates_need_commit_cadence.md) · [BASELINE_SHA diff conflates the merged base](project_baseline_sha_diff_conflates_merged_base.md) — use `<base>..HEAD`
+- [Moving-base two-dot diff needs an inertness test](project_preflight_moving_base_two_dot_diff_inertness_test.md) — only blocking if the delta actually hits those paths
 - [Inserted plan tasks force renumbering](project_plan_task_ids_digit_only_forces_renumbering.md) · [Plan rationale clauses are evidence](project_418_plan_rationale_clauses_are_evidence.md) — blockers hide as prose
 - [Bugfix phase grows the file anyway](project_bugfix_phase_grows_the_file_despite_dead_code_removal.md) · [#418 500-line gate vs mandated plan content](project_418_500line_gate_vs_plan_content.md)
 - [AC check-off + artifacts/ tool-output paths](project_preflight_ac_checkoff_and_tooloutput_paths.md) · [Orchestrator override does not satisfy an AC](project_orchestrator_override_does_not_satisfy_an_ac.md)
@@ -70,8 +71,7 @@
 - [Reproduce the baseline's counting method](project_coverage_delta_reproduce_baseline_counting_method.md) — deduped vs all-descendant
 - [Async state machine emits no `<method>` element](project_async_state_machine_emits_no_method_element.md) — `.//line` double-counts
 - [First-party coverage denominator (#197)](project_coverage_firstparty_denominator_method.md) · [dotnet-coverage denominator nondeterminism](project_dotnet_coverage_denominator_nondeterminism.md) — 47% vs 81%
-- [Failed coverage run leaves RAW Cobertura](project_failed_coverage_run_leaves_raw_unprocessed_cobertura.md) · [Koverage Cobertura post-processing shape](project_koverage_cobertura_postprocessing_shape.md)
-- [Coverage runner throws before post-processing](project_coverage_runner_throws_before_postprocessing.md) — a red suite leaves a RAW cobertura; not comparable with a processed one
+- [Failed/red coverage run leaves RAW Cobertura](project_failed_coverage_run_leaves_raw_unprocessed_cobertura.md) · [runner throws before post-processing](project_coverage_runner_throws_before_postprocessing.md) · [Koverage post-processing shape](project_koverage_cobertura_postprocessing_shape.md) — not comparable with a processed one
 - [C# canonical coverage artifact conversion](project_csharp_canonical_coverage_artifact_conversion.md) · [Cobertura runsettings `<Attributes>` override](project_cobertura_runsettings_attributes_override.md)
 - [Cobertura hits vs MS-coverage partial](project_changed_line_coverage_cobertura_vs_mscoverage_partial.md) · [QFC #227 coverage tooling](project_qfc227_coverage_tooling.md)
 - [#398 test-split gate gotchas](project_398_test_split_gate_gotchas.md) · [ExcludeFromCodeCoverage on partial = CS0579](project_excludefromcodecoverage_partial_class_cs0579.md)
@@ -83,8 +83,7 @@
 - [Nullable remediation annotation patterns](project_nullable_remediation_annotation_patterns.md) · [Nullable annotation CS8632 scoping](project_nullable_annotation_cs8632_scoping.md)
 - [init/record struct fails CS0518 on net48](project_record_struct_isexternalinit_netfx.md) · [CS8714 does not fire on net481](project_nullable_cs8714_not_on_net481.md)
 - [Outlook `Action`/`Exception` ambiguity](project_outlook_action_ambiguity.md) — CS0104 in Outlook-interop files
-- Nullable-epic (closed): [#366a](project_366_notnull_cascades_beyond_wrapperscodictionary.md), [#366b](project_366_scdictionary_constraint_cascades_to_fourth_file.md), [#366c](project_366_batch7_tnullable_return_cs8766.md)
-- Nullable-epic (closed): [#372](project_372_email_classifier_nullable_patterns.md), [#371](project_371_outlookobjects_nullable_lessons.md), [#375](project_375_residuals_nullable_gotchas.md)
+- Nullable-epic (closed): [#366a](project_366_notnull_cascades_beyond_wrapperscodictionary.md), [#366b](project_366_scdictionary_constraint_cascades_to_fourth_file.md), [#366c](project_366_batch7_tnullable_return_cs8766.md), [#371](project_371_outlookobjects_nullable_lessons.md), [#372](project_372_email_classifier_nullable_patterns.md), [#375](project_375_residuals_nullable_gotchas.md)
 
 ## Component-specific gotchas
 - [WebView2 EndInit already creates child handles](project_webview2_endinit_creates_handles.md) · [#349 breadcrumb WebView2 gotchas](project_349_breadcrumb_webview2_gotchas.md)

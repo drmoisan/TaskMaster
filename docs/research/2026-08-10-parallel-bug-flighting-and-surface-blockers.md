@@ -1,7 +1,11 @@
 # Parallel Bug Flighting and Parallel-Surface Blockers
 
 **Date:** 2026-08-10
-**Status:** Blocked — analysis complete, execution cannot start
+**Status:** SUPERSEDED (see correction below, 2026-09-02) — the parallel surface described as blocked
+here has since been implemented and used successfully for multiple runs in this repository
+(`bugs-635-440`, `bugs-638-644-647`, both completed with items merged). Retained for its lane-structure
+analysis, which may still be useful, but do not treat §2.1's "does not exist" claim, §7's unblock
+checklist, or §9's fallback-path recommendation as current — issue #546 tracked this correction.
 **Purpose:** Resumable plan for fixing the open bug backlog via `/parallel-plan` + `/parallel-run`, plus the infrastructure gaps that currently prevent that surface from producing a valid run.
 **Resume trigger:** All four items in [Unblock Checklist](#unblock-checklist) are closed.
 
@@ -27,7 +31,15 @@ lane structure, the ordering rationale, and the revalidation steps needed to res
 
 Each finding below was verified directly in this worktree on 2026-08-10.
 
-### 2.1 The cohort-computation library does not exist — in either repository
+### 2.1 The cohort-computation library does not exist — in either repository (CORRECTED 2026-09-02)
+
+> **This finding was wrong and is superseded — issue #546.** As of this correction, `compute_cohorts`
+> (Welsh-Powell graph coloring) exists in both repositories: TaskMaster carries a bash entry point at
+> `.claude/lib/bash/compute-cohorts.sh` (executable, requires neither Python nor Poetry), and the
+> upstream authority is `scripts/dev_tools/parallel_cohort_computation.py` in `drm-copilot` (issue
+> #445). The parallel surface this blocker gated has since run to completion multiple times in this
+> repository. The original (now-false) finding is preserved below for provenance only — do not act on
+> it.
 
 `compute_cohorts` (Welsh-Powell graph coloring) is specified in
 `.claude/skills/parallel-plan/SKILL.md` as a landed, import-only library at
@@ -44,7 +56,7 @@ This blocks two mandatory completion requirements: seeding `cohorts[]`, and the 
 check. P5 is defined as re-invoking the landed library. Self-implementing the coloring would make the
 parity check compare an implementation against itself, certifying nothing.
 
-**Severity: hard blocker. This is new work, not a port.**
+**Severity: hard blocker. This is new work, not a port.** *(Superseded — see correction above.)*
 
 ### 2.2 `config/blast-radius.json` is absent and the upstream copy is not portable
 

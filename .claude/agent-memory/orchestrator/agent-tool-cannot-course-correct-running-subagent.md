@@ -35,5 +35,20 @@ recalled or cancelled. There is no kill-agent tool either.
 - Do not try to signal through the plan file. Mutating an approved plan mid-execution risks
   confusing the legitimate executor and can break the plan validator.
 
+**The same gap applies to a FINISHED agent, and that case has a better answer (2026-09-01, #662).**
+After `atomic-executor` completed, orchestrator verification found a mechanical defect in its output:
+the hygiene sweep had left all six committed TRX files unparseable. The natural move is to resume the
+agent that owns that evidence so it also corrects its own hygiene artifacts — but `SendMessage` was
+again absent, and a fresh `Agent(atomic-executor)` would arrive with no context and re-derive a
+52-task plan to fix an XML escape. For a small, mechanical, fully-specified repair of a finished
+agent's output, do it yourself and record the finding in an evidence artifact naming the root cause.
+Reserve re-delegation for work that needs the agent's judgment, not its hands.
+
+**Concrete slip to avoid: reaching for `SendMessage` and hitting `Agent()`.** On that same run the
+attempt to resume produced a real `Agent(subagent_type: "fork")` launch, because `Agent` is what is
+actually in the tool surface. It was harmless only because the prompt was a placeholder that asked
+for an acknowledgement and nothing else. Before composing any continuation, confirm `SendMessage` is
+in the function list; if it is not, do not start composing a "resume" call at all.
+
 See [[one-executor-per-worktree]] for why the interleaving is damaging, and
 [[stale-checkpoint-is-not-a-dead-agent]] for the related trap of relaunching against a live worktree.

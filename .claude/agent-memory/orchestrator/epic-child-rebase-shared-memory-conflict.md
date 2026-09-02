@@ -13,3 +13,5 @@ An epic integration branch advances as sibling children merge. A child branched 
 1. Before rebasing, prove no overlap: `git diff <fork-point>..origin/<integration> -- <your production paths, your feature folder>` must be empty. Also grep your changed files for any symbol a sibling annotated (e.g. NewtonsoftHelpers, SVGControl) — if zero references, your pragma-gate result is invariant under their merge and no rebuild is needed.
 2. Rebase; resolve the MEMORY.md union conflict; continue.
 3. Regenerate PR context from the real diff — `mcp__drm-copilot__collect_pr_context` writes unreliably in an isolated agent worktree (lands in the main checkout / stale). Write `artifacts/pr_context.summary.txt` yourself from `git diff --name-status <base>..HEAD`; the pr-author hook only needs it to EXIST and be OLDER than the receipt `created_at`. See [[collect-pr-context-lands-in-main-checkout]] and [[agent-worktree-hooks-resolve-to-agent-cwd]].
+
+Same MEMORY.md conflict pattern as [[parallel-epic-children-conflict-on-agent-memory-index]] (the indexed entry) and [[epic-child-agent-memory-merge-conflicts]], hit here via rebase instead of merge.

@@ -36,7 +36,7 @@ FAIL row (coverage) can coexist for the same language; the gate needs >=1 FAIL r
   `informational only`, `context only`) on ANY coverage-scoped row for a changed language.
 - `Get-ChangedLanguageSet` only detects a language from summary lines matching EXACTLY
   `^\s*-\s+<path>\s+\(\+\d+/-\d+\)$`. When correcting the C# misclassification in the summary
-  overview (see [[coverage-hook-trusts-misclassified-summary]]), the re-added C# lines MUST use the
+  overview (see [[pr-context-summary-misclassifies-cs]]), the re-added C# lines MUST use the
   `(+N/-N)` numstat format or the hook silently skips C# enforcement.
 - Simulate before finalizing: dot-source the hook and call
   `Invoke-FeatureReviewCoverageValidation -RawPayload (@{output=$tokens}|ConvertTo-Json)`.

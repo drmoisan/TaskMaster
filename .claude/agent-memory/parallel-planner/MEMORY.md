@@ -6,3 +6,7 @@
 - [Blast-radius extractor mechanics](reference_blast_radius_extractor_mechanics.md) — Get-PlanPaths only sees backtick-delimited paths; bare prose paths silently fail OPEN
 - [Parallel surface cannot express ordering](project_parallel_cannot_express_ordering.md) — depends_on/wave are prohibited; lane-sequential or flight-ordered work belongs to /epic-plan
 - [drm-copilot is the governance upstream](reference_drm_copilot_upstream.md) — check it when a rule/config/library a skill references is missing locally
+- [Planner git commits must be single bare segments](feedback_planner_git_commits_must_be_single_bare_segments.md) — no `cd`, no angle brackets, no dedicated worktree; checkout the plan branch in the session worktree
+- [Parallel artifact authoring gotchas](reference_parallel_artifact_authoring_gotchas.md) — quote ISO timestamps, no prose in kickoff table sections, validator path is workspace-relative
+- [Worktree lock pid is the session, not the subagent](reference_worktree_lock_pid_is_the_session_not_the_subagent.md) — a live pid on a locked worktree proves nothing; walk your own ancestry first
+- [Default to open mode; expect mid-flight knob changes](feedback_default_to_open_mode_for_parallel_runs.md) — operator wants /parallel-add to stay available; a max_concurrency raise can be honoured immediately
