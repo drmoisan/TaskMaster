@@ -41,6 +41,7 @@
 - [sln/csproj edits: preserve CRLF](project_sln_csproj_edit_crlf_preserve.md) — `sed -i` strips CRLF; use Edit
 - [Incremental build makes a vacuous baseline](project_incremental_build_vacuous_baseline.md) · [Nullable /t:Build gate is vacuous](project_nullable_build_gate_is_vacuous_incremental.md) — use `/t:Rebuild`
 - [CSharpier skips *.Designer.cs by filename](project_csharpier_skips_designer_cs_by_filename.md) · [CSharpier 1.3.0 formats XML at 100 cols](project_csharpier_formats_xml_print_width.md)
+- [.gitignore `*.log` blocks committed msbuild-log evidence](project_gitignore_star_log_blocks_committed_msbuild_log_evidence.md) — exists-on-disk gate passes, commit lacks it; `git add -N` is the tracked-status discriminator
 - [csharpier pipe-files is a non-enforcing gate](project_csharpier_pipefiles_nonenforcing_gate.md) · [Count-idiom pitfalls: csharpier + Measure-Object](project_count_idiom_pitfalls_csharpier_and_measureobject.md)
 - [New .cs files guarantee a format-loop restart](project_new_cs_files_guarantee_a_format_loop_restart.md) · [PowerShell new files need UTF-8 BOM](powershell-bom-required.md)
 - [poshqc test MCP carries no verdict/numbers](project_poshqc_pester_mcp_exit_minus1.md) · [poshqc analyze exits 1 on a Warning](project_poshqc_analyze_exit1_on_warning.md)

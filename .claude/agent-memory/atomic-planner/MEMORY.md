@@ -34,6 +34,7 @@
 - [#670](project_670_webview_fault_boundary_plan_seams.md) — awaiter `IsCompleted` breaks "no pump" test; Cobertura merge by filename
 - [#670 capture-time sanitisation](project_670_capture_time_sanitisation_seams.md) — a vswhere-resolved path leaks via an *indirect* invoker
 - [#680](project_680_menu_mode_plan_seams.md) — HostTests.cs 499 not 500; "optional" fallback was load-bearing
+- [#736 R1–R5](project_736_efc_archiveroot_boundary_sink_plan_seams.md) — 485-line test file voids the spec Write Set; R2: hardcoded `U=2` floor breaks when one item is a method body; R3: one shared `try` short-circuits the second delegate to zero invocations; R4: a name-shaped gate never measures a content-shaped rule, and the reviewer's own delta carried a false CI citation; R5: `*.log` evidence artifacts gated only on existence could never be committed
 
 ## Plan-structure traps
 
@@ -62,11 +63,13 @@
 - [Literal-call clauses block file-size tightening](literal-call-clauses-block-file-size-tightening.md) — unsatisfiable near a 500-line file
 - [Enumeration variable must match its consumer](enumeration-variable-must-match-consumer.md) — mismatch = zero-assembly run, zero reported failures
 - [Diff gates need a commit task](diff-gates-need-a-commit-task.md) — `git diff <BASE>..HEAD` passes vacuously with no commit
+- [Empty-porcelain clauses are unsatisfiable](empty-porcelain-clause-is-unsatisfiable.md) — prior task's artifact dirties it; use a negative path-class clause + double amend
 - [Never pin a HEAD SHA as a plan expectation](never-pin-head-sha-as-plan-expectation.md) — gate on tree invariants instead
 - [Harness gitStatus may describe another worktree](harness-git-status-may-describe-another-worktree.md) — measure inside the target worktree
 - [Absolute counts in shared files go stale](absolute-counts-in-shared-files-go-stale.md) — lower-bound/baseline-relative for co-owned files
 - [.claude/agent-memory is tracked](agent-memory-is-tracked-scope-git-gates.md) — scope every diff/status/grep gate
 - [.gitignore does not untrack an indexed path](gitignore-does-not-untrack-indexed-paths.md) — a force-added file stays tracked
+- [Existence is not retention](existence-is-not-retention-gate-committed-artifacts.md) — an ignored artifact exists on disk and never reaches git; add a `git ls-files` clause + `git add -N`
 - [Stale build output is not evidence of existence](stale-build-output-is-not-evidence-of-existence.md) — verify with `git ls-files`, not `obj/`
 - [Observation scope must match blast radius](observation-scope-must-match-blast-radius.md) — space, time, spelling must all match
 - [Run-time-derived account-token pattern](runtime-derived-account-token-pattern.md) — `Split-Path -Leaf $env:USERPROFILE`; self-exempt
@@ -81,6 +84,7 @@
 - [Repo-wide csharpier format breaks zero-diff ACs](csharpier-repowide-format-breaks-zero-diff-acs.md) — scope the pass to the plan's own paths
 - [.csharpierignore scope](csharpierignore-scope-packages-config.md) — only `*.csproj`/`*.props`/`*.targets`; `packages.config` is NOT
 - [.gitignore bracket classes defeat a literal grep](gitignore-bracket-classes-defeat-literal-grep.md) — `[Tt]est[Rr]esult*/` ignores `TestResults/`
+- [`.trx` leaks host tokens in two casings](trx-carries-host-tokens-in-two-casings.md) — `runUser` title-cased beside `computerName` upper-cased; sweep content, not names
 - [`/Logger:trx` needs `/ResultsDirectory` AND `LogFileName`](trx-needs-resultsdirectory.md) — own subdir per task or names collide
 - [`[expect-fail]` needs a synchronous seam](expect-fail-needs-a-synchronous-seam.md) — async-void boundaries false-GREEN
 - [Invoke-MSTestWithCoverage.ps1](reference_invoke_mstest_with_coverage_script.md) · [single-SearchRoot defect](reference_invoke_mstest_single_searchroot_defect.md) — always pass `-SearchRoot .`

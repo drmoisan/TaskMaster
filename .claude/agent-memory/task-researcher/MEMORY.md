@@ -56,6 +56,7 @@
 - [issue-656-bypass-path-does-not-exist](project_issue_656_bypass_path_does_not_exist.md) — #656 premise FALSE: no bypassing reopen path exists; SR-4's "no IsOpen under _sync" already violated at :112; both nominated owner files at the 500-line cap (2026-08-31)
 - [qfc663-alt-chord-no-altf](project_qfc663_alt_chord_no_altf.md) — #663: QfcFormViewer has NO menus/mnemonics of its own; only Alt+M (from hosted ItemViewer) is swallowed, Alt+F is EFC-only; #464 deferred the shared predicate for file-ownership reasons only (2026-09-01)
 - [banner-prefix-arity-662](project_banner_prefix_arity_662.md) — #662: AC2's decl regex contradicts AC5's aliasing remedy; the "must agree" assertion does NOT catch the widening (only the BeFalse line does); `/Tests:` and `/TestCaseFilter:` are mutually exclusive (2026-08-31)
+- [efc736-archiveroot-boundary-sink](project_efc736_archiveroot_boundary_sink.md) — #736: finding 6's cause is FALSE (#699 authoritative); keyboard path logs silently, no crash; 6 sink sites not 4; modal default sink would hang a live test (2026-09-02)
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
