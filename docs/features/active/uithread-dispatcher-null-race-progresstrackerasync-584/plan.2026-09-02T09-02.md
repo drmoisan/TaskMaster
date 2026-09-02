@@ -4,8 +4,8 @@
 - **Work Mode:** full-bug (AC source is `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/spec.md`; no `user-story.md` exists or is expected)
 - **Owner:** drmoisan
 - **Last Updated:** 2026-09-02T09-02
-- **Status:** Ready for preflight (revision round 8; findings D1-D11 from preflight round 1, B1-B3 and NB1-NB6 from preflight round 2, C1-C3 and N1-N2 from preflight round 3, E1-E3 and N-1/N-2/N-3 from preflight round 4, F1 from preflight round 5, and G1 plus O1-O4 from preflight round 6 applied, revision round 9 (backtick-removal presentation fix for the parallel-scheduling blast-radius harvester) applied)
-- **Version:** 1.7
+- **Status:** Ready for preflight (revision round 8; findings D1-D11 from preflight round 1, B1-B3 and NB1-NB6 from preflight round 2, C1-C3 and N1-N2 from preflight round 3, E1-E3 and N-1/N-2/N-3 from preflight round 4, F1 from preflight round 5, and G1 plus O1-O4 from preflight round 6 applied, revision round 9 (backtick-removal presentation fix for the parallel-scheduling blast-radius harvester) applied, revision round 10 (mechanical backtick-removal correction: stripped backtick-wrapping from CLAUDE.md, .claude/rules/general-code-change.md, .claude/rules/general-unit-test.md, .claude/rules/quality-tiers.md, .claude/rules/csharp.md, .claude/rules/tonality.md, .claude/agent-memory/**, .claude/, .codex/, .agents/, config/blast-radius.json, config/orchestration-routing.json, and bare config/ mentions across plan.md and spec.md; no task, AC, command, or evidence-path substance changed) applied)
+- **Version:** 1.8
 - **Branch:** `bug/uithread-dispatcher-null-race-progresstrackerasync-584`
 - **BASE (merge base with `origin/main`):** `5ebaaf105d8241f309f704d1ff90af2e32e5a6c1`
 
@@ -1317,13 +1317,6 @@ as citations to the repository tree.
   No regression in"), never the AC3 or AC4 bullet in full. P5-T3's opening-fragment quotation of AC3
   was re-derived directly (citation 60 above) and P5-T4's opening-fragment quotation of AC4 ("AC4: No
   regression in") was re-checked against spec.md's current AC4 bullet and still matches.
-- **P5-T9's and P5-T10's exclusion-assertion path mentions were read and corrected in this round.**
-  Both tasks previously asserted, in backtick-wrapped form, that the committed diff and the anchored
-  name-status diff contain no path under .claude/, .codex/, .agents/, or config/. On
-  re-derivation this pass, that "no path under X" phrasing is itself the exclusion case the
-  delegation's backtick-removal instruction names explicitly, so those spans are now plain text
-  (.claude/, .codex/, .agents/, config/blast-radius.json, config/orchestration-routing.json) rather
-  than backtick-wrapped, matching every other exclusion mention in this plan and in spec.md.
 - **Constraint 5, the TRX selection rule, and the seven TRX-reading tasks (P0-T10, P0-T11, P3-T2,
   P3-T3, P3-T6, P4-T5, P4-T6) were read and confirmed unaffected by round 9's backtick-removal
   edits.** None of the seven task bodies, and neither the constraint-5 sourcing paragraph nor the TRX
@@ -1332,6 +1325,17 @@ as citations to the repository tree.
   `/ResultsDirectory` value, and the `notExecuted`/`Skipped` sourcing rule already re-derived in the
   revision round 8 pass. No command line, task ID, write-target file, or evidence path in any of the
   seven changed as a result of round 9.
+
+### Sibling regions re-checked in the revision round 10 pass (mechanical backtick-removal correction)
+
+- **P5-T9's and P5-T10's exclusion-assertion path mentions were read and corrected in this round.**
+  Both tasks were still backtick-wrapped after round 9 (confirmed against commit 12a11031), asserting
+  that the committed diff and the anchored name-status diff contain no path under .claude/,
+  .codex/, .agents/, or config/. On re-derivation this pass, that "no path under X" phrasing is
+  itself the exclusion case the delegation's backtick-removal instruction names explicitly, so those
+  spans are now plain text (.claude/, .codex/, .agents/, config/blast-radius.json,
+  config/orchestration-routing.json) rather than backtick-wrapped, matching every other exclusion
+  mention in this plan and in spec.md.
 
 ### Sibling regions re-checked in the revision round 8 pass
 
