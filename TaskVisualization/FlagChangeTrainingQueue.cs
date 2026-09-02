@@ -39,21 +39,33 @@ namespace TaskVisualization
             await Task.Run(
                 async () =>
                 {
-                    while (Queue.TryTake(out var item))
+                    // Issue #726 finding 1: the identical handshake window that motivated the
+                    // FilerQueue fix exists here too. The guard reset was the loop's last statement,
+                    // unprotected by try/finally, so any exception escaping the loop -- including one
+                    // from the catch handler's own diagnostic expression -- would leave _guard
+                    // permanently in its already-fired state and stop Immediate-mode consumption from
+                    // ever restarting.
+                    try
                     {
-                        try
+                        while (Queue.TryTake(out var item))
                         {
-                            await item.ProcessGroupAsync();
-                        }
-                        catch (Exception e)
-                        {
-                            logger.Error(
-                                $"Error training flags for email with subject: {(item as FlagChangeGroup)?.Subject}. {e.Message}",
-                                e
-                            );
+                            try
+                            {
+                                await item.ProcessGroupAsync();
+                            }
+                            catch (Exception e)
+                            {
+                                logger.Error(
+                                    $"Error training flags for email with subject: {(item as FlagChangeGroup)?.Subject}. {e.Message}",
+                                    e
+                                );
+                            }
                         }
                     }
-                    _guard = new ThreadSafeSingleShotGuard();
+                    finally
+                    {
+                        _guard = new ThreadSafeSingleShotGuard();
+                    }
                 },
                 Cancel
             );

@@ -128,6 +128,33 @@ namespace QuickFiler.Controllers
         internal System.Action<string, System.Exception> BoundaryErrorSink { get; set; } =
             (message, exception) => logger.Error(message, exception);
 
+        /// <summary>
+        /// Issue #726 finding 5: invokes <see cref="BoundaryErrorSink"/> defensively so a null or
+        /// throwing sink delegate cannot silently reinstate the unobserved-fault behavior this
+        /// boundary exists to prevent -- these call sites all sit in an <c>async void</c> handler's
+        /// catch block, where an escaping exception would crash the process rather than merely fail
+        /// to log.
+        /// </summary>
+        private void TryReportBoundaryFault(string message, System.Exception exception)
+        {
+            var sink = BoundaryErrorSink;
+            if (sink is null)
+            {
+                logger.Error(message, exception);
+                return;
+            }
+
+            try
+            {
+                sink(message, exception);
+            }
+            catch (System.Exception sinkException)
+            {
+                logger.Error($"{message} (and the error sink itself threw)", sinkException);
+                logger.Error(message, exception);
+            }
+        }
+
         private IApplicationGlobals _globals;
         private System.Action _parentCleanup;
         private EfcDataModel _dataModel;
@@ -453,7 +480,7 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                BoundaryErrorSink(ex.Message, ex);
+                TryReportBoundaryFault(ex.Message, ex);
             }
         }
 
@@ -470,7 +497,7 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                BoundaryErrorSink(ex.Message, ex);
+                TryReportBoundaryFault(ex.Message, ex);
             }
         }
 
@@ -488,7 +515,7 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                BoundaryErrorSink(ex.Message, ex);
+                TryReportBoundaryFault(ex.Message, ex);
             }
         }
 
@@ -550,7 +577,7 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                BoundaryErrorSink(ex.Message, ex);
+                TryReportBoundaryFault(ex.Message, ex);
             }
         }
 
@@ -565,7 +592,7 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                BoundaryErrorSink(ex.Message, ex);
+                TryReportBoundaryFault(ex.Message, ex);
             }
         }
 
@@ -1135,7 +1162,7 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                BoundaryErrorSink(ex.Message, ex);
+                TryReportBoundaryFault(ex.Message, ex);
             }
         }
 

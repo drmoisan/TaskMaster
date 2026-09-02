@@ -47,6 +47,8 @@ namespace QuickFiler.Controllers
 
         public void Enqueue(FilerQueueItem item)
         {
+            item.ThrowIfNull();
+
             bool startWorker;
 
             lock (_sync)
@@ -117,44 +119,76 @@ namespace QuickFiler.Controllers
             }
         }
 
-        public async Task ConsumeAsync()
+        internal async Task ConsumeAsync()
         {
             await Task.Run(async () =>
             {
-                while (true)
+                // Issue #726 finding 1: this outer try/finally is a safety net, not the primary
+                // mechanism. The normal exit path (TryTake fails) still clears the flag inside the
+                // same critical section as the failed take, which is what closes the orphaned-item
+                // window described below. This finally exists so that ANY exception escaping the
+                // loop -- including one from the diagnostic branch of the inner catch, which the
+                // inner catch cannot catch itself -- still clears the flag rather than leaving
+                // _consumerRunning permanently true and hanging the background mover.
+                try
                 {
-                    FilerQueueItem item;
-
-                    lock (_sync)
+                    while (true)
                     {
-                        // Clearing the flag in the same critical section in which TryTake fails is what
-                        // closes the orphaned-item window: a producer cannot observe "a worker is
-                        // running" after this worker has decided to stop.
-                        if (!Queue.TryTake(out item))
+                        FilerQueueItem item;
+
+                        lock (_sync)
                         {
-                            _consumerRunning = false;
-                            return;
+                            // Clearing the flag in the same critical section in which TryTake fails is
+                            // what closes the orphaned-item window: a producer cannot observe "a worker
+                            // is running" after this worker has decided to stop.
+                            if (!Queue.TryTake(out item))
+                            {
+                                _consumerRunning = false;
+                                return;
+                            }
+                        }
+
+                        try
+                        {
+                            await ItemProcessor(item);
+                        }
+                        catch (Exception e)
+                        {
+                            LogItemFailure(item, e);
+                        }
+                        finally
+                        {
+                            CompleteItem();
                         }
                     }
-
-                    try
+                }
+                finally
+                {
+                    lock (_sync)
                     {
-                        await ItemProcessor(item);
-                    }
-                    catch (Exception e)
-                    {
-                        var first = item.Helpers.First();
-                        logger.Error(
-                            $"Error sorting mail items Subject: {first.Subject} Sent On: {first.SentOn} from {first.SenderName} {e.Message}",
-                            e
-                        );
-                    }
-                    finally
-                    {
-                        CompleteItem();
+                        _consumerRunning = false;
                     }
                 }
             });
+        }
+
+        /// <summary>
+        /// Issue #726 finding 1: <c>Helpers</c> may legitimately be empty (the constructor guards
+        /// against null and null elements, but not against an empty list), so the original
+        /// <c>item.Helpers.First()</c> could throw <see cref="InvalidOperationException"/> from
+        /// inside this catch handler -- an exception the catch cannot catch itself, which escaped
+        /// the worker loop entirely and left <see cref="_consumerRunning"/> stuck.
+        /// </summary>
+        private void LogItemFailure(FilerQueueItem item, Exception e)
+        {
+            var first = item.Helpers?.FirstOrDefault();
+            var subject = first?.Subject ?? "(no helpers)";
+            var sentOn = first?.SentOn;
+            var sender = first?.SenderName ?? "(unknown)";
+            logger.Error(
+                $"Error sorting mail items Subject: {subject} Sent On: {sentOn} from {sender} {e.Message}",
+                e
+            );
         }
 
         /// <summary>

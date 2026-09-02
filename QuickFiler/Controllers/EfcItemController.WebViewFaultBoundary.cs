@@ -1,25 +1,26 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 namespace QuickFiler.Controllers
 {
-    internal partial class QfcItemController
+    internal partial class EfcItemController
     {
         /// <summary>
-        /// #670 fault-boundary sink: an injectable seam over the static log4net logger declared at
-        /// QfcItemController.cs:30. Named distinctly from EfcFormController.BoundaryErrorSink so no
-        /// shared contract between the two types is implied.
+        /// Issue #726 finding 4: fault-boundary sink for <see cref="InitializeWebViewGuardedAsync"/>,
+        /// mirroring <c>QfcItemController.WebViewInitializationErrorSink</c>. Named distinctly so no
+        /// shared contract with the QFC sink or with <see cref="EfcFormController.BoundaryErrorSink"/>
+        /// is implied.
         /// </summary>
-        internal System.Action<
-            string,
-            System.Exception
-        > WebViewInitializationErrorSink { get; set; } =
+        internal Action<string, Exception> WebViewInitializationErrorSink { get; set; } =
             (message, exception) => logger.Error(message, exception);
 
         /// <summary>
-        /// #670 fault boundary for InitializeWebViewAsync. Three production call sites discard the
-        /// returned task, so a fault there is never observed. This member contains the fault instead
-        /// of returning it: the task it returns never transitions to Faulted.
+        /// Issue #726 finding 4: fault boundary for <see cref="InitializeWebViewAsync"/>. Both
+        /// production call sites previously discarded the task returned by
+        /// <c>Task.Run(() =&gt; InitializeWebViewAsync())</c>, so a fault there was never observed --
+        /// under .NET Framework 4.5+, a discarded faulted task is silently finalized with no
+        /// diagnostic. This member contains the fault instead of returning it: the task it returns
+        /// never transitions to Faulted.
         /// </summary>
         internal async Task InitializeWebViewGuardedAsync()
         {
@@ -29,8 +30,7 @@ namespace QuickFiler.Controllers
             }
             catch (OperationCanceledException)
             {
-                // Cooperative cancellation during QuickFiler teardown is expected and is not a
-                // fault: InitializeWebViewAsync opens with Token.ThrowIfCancellationRequested().
+                // Cooperative cancellation during teardown is expected and is not a fault.
             }
             catch (Exception ex)
             {

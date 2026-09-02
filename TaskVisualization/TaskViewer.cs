@@ -254,11 +254,19 @@ namespace TaskVisualization
         {
             if (keyData.HasFlag(Keys.Alt))
             {
-                // If keyData = Keys.Up OrElse keyData = Keys.Down OrElse keyData = Keys.Left OrElse keyData = Keys.Right OrElse keyData = Keys.Alt Then
+                // Issue #726 finding 7: the return value of KeyboardHandler_KeyDown was previously
+                // discarded and this method unconditionally returned true, claiming the entire Alt
+                // chord class regardless of whether the handler actually consumed the key -- the
+                // same over-claim shape already fixed for the QuickFiler EFC/QFC surfaces (#467,
+                // #663). Falling through to base.ProcessCmdKey when the handler does not consume the
+                // key restores standard WinForms menu-mnemonic routing for Alt chords it doesn't own.
                 object sender = FromHandle(msg.HWnd);
                 var e = new KeyEventArgs(keyData);
-                _controller.KeyboardHandler_KeyDown(sender, e);
-                return true;
+                bool consumed = _controller.KeyboardHandler_KeyDown(sender, e);
+                if (consumed)
+                {
+                    return true;
+                }
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
