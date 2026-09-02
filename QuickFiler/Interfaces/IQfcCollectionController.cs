@@ -51,16 +51,12 @@ namespace QuickFiler.Interfaces
         /// <summary>
         /// Moves every cached item group's message to its assigned destination folder.
         /// </summary>
-        /// <param name="StackMovedItems">
-        /// The undo stack. This parameter does not carry the undo records: the stack is populated
-        /// by the email filer's push-to-undo-stack path, which pushes onto
-        /// <c>Globals.AF.MovedMails</c>. That is the same instance the caller passes here, because
-        /// the caller reads it from the same globals object. Passing a different instance would not
-        /// redirect the undo records, and passing <c>null</c> does not suppress them. The parameter
-        /// is retained only for source compatibility with existing callers; removing it is a
-        /// follow-up candidate, not part of this change.
-        /// </param>
-        Task MoveEmailsAsync(SloStack<IMovedMailInfo> StackMovedItems);
+        /// <remarks>
+        /// The undo stack is populated by the email filer's push-to-undo-stack path, which pushes
+        /// onto <c>Globals.AF.MovedMails</c> directly; this method takes no undo-stack argument
+        /// because none is needed to reach it (issue #629).
+        /// </remarks>
+        Task MoveEmailsAsync();
         void AddItemGroup(MailItem mailItem);
 
         /// <summary>
