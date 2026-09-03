@@ -11,8 +11,8 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | max_concurrency | 16 |
 | current_cohort | 2 |
 | recolor_generation | 1 |
-| last_updated | 2026-09-03T16-30 |
-| next_step | Await five concurrent children: 584 (opus, resuming ambiguous staged-diff state), 731 (opus, first execution pass), 752 (sonnet, first execution pass), and 751 (opus, first execution pass) -- all under the corrected fable_policy available for any new sub-delegation. When 731 merges, re-evaluate 736's barrier (645, 729, 731, 732, 735 all merged would clear it) and launch it with model_budget.fable_policy: available. Do not report run completion (mode is open) until every non-withdrawn item, including 751 and 752, reaches merged or worktree_removed. |
+| last_updated | 2026-09-03T19-20 |
+| next_step | Item 751's PR 758 is open, awaiting CI. Await 584 (opus, resuming ambiguous staged-diff state), 731 (opus, first execution pass), and 752 (sonnet, first execution pass). When 731 merges, re-evaluate 736's barrier (645, 729, 731, 732, 735 all merged would clear it) and launch it with model_budget.fable_policy: available. Do not report run completion (mode is open) until every non-withdrawn item, including 751 and 752, reaches merged or worktree_removed. |
 
 ## Items
 
@@ -31,7 +31,7 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 735 | docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735 | 1 | merged | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/749 | b01c37654b4cf0a470b09d565fcd5b76d2bcd758 |
 | 736 | docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736 | 4 | scheduled | not_started | - | - |
 | 737 | docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/750 | 87233f867ad60c0a5c0d19b09cc121ae536d7ba1 |
-| 751 | docs/features/active/terminal-notification-hook-test-lacks-sync-barrier-751 | 2 | in_flight | worktree_created | - | - |
+| 751 | docs/features/active/terminal-notification-hook-test-lacks-sync-barrier-751 | 2 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/758 | - |
 | 752 | docs/features/active/2026-09-03-coverage-assembly-discovery-excludes-own-worktree-root-752 | 2 | in_flight | worktree_created | - | - |
 
 ### Item lifecycle timestamps
@@ -51,7 +51,7 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 735 | 2026-09-03T01-08 | 2026-09-03T01-27 | 2026-09-03T07-10 | 2026-09-03T07-11 | 2026-09-03T07-12 |
 | 736 | - | - | - | - | - |
 | 737 | 2026-09-03T01-08 | 2026-09-03T01-28 | 2026-09-03T07-17 | 2026-09-03T07-17 | - |
-| 751 | 2026-09-03T16-30 | - | - | - | - |
+| 751 | 2026-09-03T16-30 | 2026-09-03T19-20 | - | - | - |
 | 752 | 2026-09-03T15-00 | - | - | - | - |
 
 Worktree removal for items 645 and 707 was attempted (non-forced `git worktree remove`) and deferred: both worktrees carry modified/untracked files and removal was not forced. `merge_status: merged` still satisfies open-mode completion.
