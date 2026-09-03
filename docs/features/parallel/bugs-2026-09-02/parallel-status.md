@@ -11,20 +11,20 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | max_concurrency | 16 |
 | current_cohort | 0 |
 | recolor_generation | 0 |
-| last_updated | 2026-09-02T18-10 |
-| next_step | await cohort 0 child completions; on each child DONE confirm PR state and CI conclusion durably, then merge that item to main |
+| last_updated | 2026-09-03T02-15 |
+| next_step | Await the three in-flight children. On each DONE, durably confirm the pull request state and per-check conclusion against the final head, run update-branch and re-confirm green if main has advanced, merge with the merge-commit method, record merged, then re-evaluate the per-edge barrier and launch every newly eligible item immediately. |
 
 ## Items
 
 | issue_num | feature_folder | cohort | state | merge_status | pr_url | merge_commit_sha |
 | --- | --- | --- | --- | --- | --- | --- |
-| 564 | docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564 | 0 | in_flight | worktree_created | - | - |
+| 564 | docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/745 | 8be5a6aac3b5a82c86241fbbf989fd9118602c56 |
 | 565 | docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565 | 1 | scheduled | not_started | - | - |
 | 584 | docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584 | 3 | scheduled | not_started | - | - |
 | 645 | docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645 | 2 | scheduled | not_started | - | - |
 | 707 | docs/features/active/2026-08-31-narrow-fileio2-retryable-exception-set-707 | 4 | scheduled | not_started | - | - |
 | 729 | docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729 | 0 | in_flight | worktree_created | - | - |
-| 730 | docs/features/active/2026-09-02-ci-build-infra-debt-730 | 1 | scheduled | not_started | - | - |
+| 730 | docs/features/active/2026-09-02-ci-build-infra-debt-730 | 1 | in_flight | worktree_created | - | - |
 | 731 | docs/features/active/2026-09-02-quickfiler-controller-lifecycle-disposal-defects-731 | 4 | scheduled | not_started | - | - |
 | 732 | docs/features/active/2026-09-02-folderconverter-folderpredictor-dead-code-and-bugs-732 | 2 | scheduled | not_started | - | - |
 | 733 | docs/features/active/2026-09-02-coverage-cobertura-mstest-powershell-tooling-defects-733 | 0 | in_flight | worktree_created | - | - |
@@ -36,13 +36,13 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 
 | issue_num | worktree_created_at | pr_opened_at | ci_green_at | merged_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- |
-| 564 | 2026-09-02T18-10 | - | - | - | - |
+| 564 | 2026-09-02T18-10 | 2026-09-03T01-50 | 2026-09-03T01-55 | 2026-09-03T02-04 | - |
 | 565 | - | - | - | - | - |
 | 584 | - | - | - | - | - |
 | 645 | - | - | - | - | - |
 | 707 | - | - | - | - | - |
 | 729 | 2026-09-02T18-10 | - | - | - | - |
-| 730 | - | - | - | - | - |
+| 730 | 2026-09-03T02-15 | - | - | - | - |
 | 731 | - | - | - | - | - |
 | 732 | - | - | - | - | - |
 | 733 | 2026-09-02T18-10 | - | - | - | - |
@@ -95,5 +95,4 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 
 
 ## Drift Events
-
 
