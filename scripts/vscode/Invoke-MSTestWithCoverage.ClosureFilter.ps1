@@ -156,8 +156,32 @@ function Get-CoberturaInstrumentedMemberName {
         attribute, so admitting it would let an exempt member's local function mask the member's
         absence and keep its lambdas in the denominator.
 
+        That non-admission is an asserted design choice rather than a measured one (issue #733
+        finding 5). Issue #733's research ratified it because no over-exclusion counter-example
+        was found or could be constructed: every candidate reduced to a member that also emits a
+        plain <method> element or a state-machine class, and is therefore already admitted by
+        source 1 or source 2. Revisit this choice if a genuine case is ever observed in which a
+        non-exempt member's only entry in the report is a local-function entry; that member would
+        resolve as absent and its lambdas would be removed, which is the forbidden over-exclusion
+        direction.
+
         The keys are per (declaring type, filename) rather than per declaring type alone, so a
         partial type spanning files errs toward under-exclusion rather than over-exclusion.
+
+        Known limitation, bare-name overload collision (issue #733 finding 6): the members inside
+        each key are stored by bare member name with no parameter signature, so two overloads
+        sharing a name under the same declaring type and source file occupy one entry. If one
+        overload is exempt and the other is not, the non-exempt overload's plain <method> element
+        admits the shared name, and the exempt overload's closures then resolve as present and are
+        retained. The resulting failure direction is the safe one, under-exclusion: the exempt
+        overload's lambdas stay in the coverage denominator permanently uncovered, so the file
+        measures no better than it truly is. It is not the forbidden direction, over-exclusion,
+        in which coverage for a member the filter failed to resolve would be deleted. A
+        signature-based re-key was evaluated and rejected as infeasible in this item's Root Cause
+        Analysis: Get-CoberturaClosureDeclaringMemberName can never recover a parameter signature
+        from Roslyn's closure-naming convention, which encodes only the bare member name, so
+        forcing a signature key would flip the failure direction from safe under-exclusion to
+        forbidden over-exclusion.
 
         The function is pure: it reads the supplied node and mutates nothing.
 
