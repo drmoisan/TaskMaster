@@ -11,15 +11,15 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | max_concurrency | 16 |
 | current_cohort | 0 |
 | recolor_generation | 0 |
-| last_updated | 2026-09-03T07-44 |
-| next_step | Await 565, 645 and 732. Create each pull request from the parent on READY FOR PR, merge on durably confirmed green with an update-branch cycle where main has moved, and re-evaluate the barrier after every merge. |
+| last_updated | 2026-09-03T07-50 |
+| next_step | Await items 645 and 732. Create each pull request from the parent on READY FOR PR and merge on durably confirmed green. Merging 732 releases 584 and contributes to 736 and 707; 645 plus 736 release 731. |
 
 ## Items
 
 | issue_num | feature_folder | cohort | state | merge_status | pr_url | merge_commit_sha |
 | --- | --- | --- | --- | --- | --- | --- |
 | 564 | docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/745 | 8be5a6aac3b5a82c86241fbbf989fd9118602c56 |
-| 565 | docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565 | 1 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/753 | - |
+| 565 | docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/753 | 87cb4df338322844abfa580abea14df77e738e5c |
 | 584 | docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584 | 3 | scheduled | not_started | - | - |
 | 645 | docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645 | 2 | in_flight | worktree_created | - | - |
 | 707 | docs/features/active/2026-08-31-narrow-fileio2-retryable-exception-set-707 | 4 | scheduled | not_started | - | - |
@@ -37,7 +37,7 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | issue_num | worktree_created_at | pr_opened_at | ci_green_at | merged_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- |
 | 564 | 2026-09-02T18-10 | 2026-09-02T21-50 | 2026-09-02T22-00 | 2026-09-02T22-04 | - |
-| 565 | 2026-09-03T01-30 | 2026-09-03T07-44 | - | - | - |
+| 565 | 2026-09-03T01-30 | 2026-09-03T07-44 | 2026-09-03T07-50 | 2026-09-03T07-50 | - |
 | 584 | - | - | - | - | - |
 | 645 | 2026-09-03T07-19 | - | - | - | - |
 | 707 | - | - | - | - | - |
