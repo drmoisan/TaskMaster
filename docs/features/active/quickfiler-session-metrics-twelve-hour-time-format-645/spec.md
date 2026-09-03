@@ -244,29 +244,29 @@ None; the change is a literal format-string substitution with no performance imp
   still describe the content change per the Data / API / Config Impact note above).
 
 ## Acceptance Criteria
-- [ ] `QuickFiler/Controllers/QfcHomeController.Metrics.cs:48` renders the time-of-day field
+- [x] `QuickFiler/Controllers/QfcHomeController.Metrics.cs:48` renders the time-of-day field
       using `"HH:mm"` (24-hour) instead of `"hh:mm"`.
-- [ ] `QuickFiler/Controllers/QfcHomeController.Metrics.cs:127` renders `curTimeText` using
+- [x] `QuickFiler/Controllers/QfcHomeController.Metrics.cs:127` renders `curTimeText` using
       `"HH:mm"` (24-hour) instead of `"hh:mm"`.
-- [ ] `QuickFiler/Controllers/EfcHomeController.Metrics.cs:96` renders `curTimeText` using
+- [x] `QuickFiler/Controllers/EfcHomeController.Metrics.cs:96` renders `curTimeText` using
       `"HH:mm"` (24-hour) instead of `"hh:mm"`.
-- [ ] `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs` (`expectedDataLineBeg` at
+- [x] `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs` (`expectedDataLineBeg` at
       lines 243 and 278) builds its expected literal via `expectedLocal.ToString("HH:mm")`
       rather than `"hh:mm"`, and both tests pass.
-- [ ] `QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs` (line 53) asserts the
+- [x] `QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs` (line 53) asserts the
       time-of-day field as `13:05` (not `01:05`) for the fixture's `MetricsNow` of
       `2026-07-04 13:05:00`, and the test passes.
-- [ ] No file under QuickFiler/Legacy/, no TaskVisualization/TaskViewer.Designer.cs, and no
+- [x] No file under QuickFiler/Legacy/, no TaskVisualization/TaskViewer.Designer.cs, and no
       file matching .claude/\*\*, .codex/\*\*, .agents/\*\*, config/blast-radius.json, or
       config/orchestration-routing.json is modified by this change.
-- [ ] None of the three fixed call sites gain a `CultureInfo.InvariantCulture` argument (or any
+- [x] None of the three fixed call sites gain a `CultureInfo.InvariantCulture` argument (or any
       other `CultureInfo` argument) as part of this change; that gap is tracked separately as
       issue #742.
-- [ ] The full `QuickFiler.Test` assembly is green after the changes above (`vstest.console.exe`
+- [x] The full `QuickFiler.Test` assembly is green after the changes above (`vstest.console.exe`
       run with `/EnableCodeCoverage`, per the Toolchain commands in Test Strategy).
-- [ ] Full toolchain pass completed in order (CSharpier format/check, analyzer rebuild, nullable
+- [x] Full toolchain pass completed in order (CSharpier format/check, analyzer rebuild, nullable
       rebuild, `QuickFiler.Test` vstest run) with no failures in the final pass.
-- [ ] The PR description explicitly states that this change alters the emitted session-metrics
+- [x] The PR description explicitly states that this change alters the emitted session-metrics
       CSV's time-of-day column content, since the artifact is read by a human-maintained
       spreadsheet outside the repository.
 

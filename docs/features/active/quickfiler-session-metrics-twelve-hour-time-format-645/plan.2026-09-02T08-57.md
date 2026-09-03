@@ -341,7 +341,7 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
       No path under QuickFiler/Legacy/, no TaskVisualization/TaskViewer.Designer.cs, no path
       matching .claude/\*\*, .codex/\*\*, .agents/\*\*, and neither config/blast-radius.json nor
       config/orchestration-routing.json appears in either output.
-- [ ] [P3-T5] Commit the Phase 1 and Phase 2 source edits:
+- [x] [P3-T5] Commit the Phase 1 and Phase 2 source edits:
       ```
       git add `
         QuickFiler/Controllers/QfcHomeController.Metrics.cs `
@@ -368,7 +368,7 @@ from P4-T1. Do not proceed to P4-T6 until P4-T1 through P4-T5 have all completed
 same pass. This restart rule does not apply to a coverage-threshold exception from
 `Assert-CoberturaLineCoverageThreshold` in P4-T5, which is handled per P4-T5's own acceptance text.
 
-- [ ] [P4-T1] Scoped CSharpier format pass. Capture SHA-256 hashes of the four in-scope files
+- [x] [P4-T1] Scoped CSharpier format pass. Capture SHA-256 hashes of the four in-scope files
       immediately before and immediately after running:
       ```
       $files = 'QuickFiler/Controllers/QfcHomeController.Metrics.cs', `
@@ -384,7 +384,7 @@ same pass. This restart rule does not apply to a coverage-threshold exception fr
       `.../evidence/qa-gates/p4-t1-csharpier-format.<timestamp>.md`, plus a `RewrittenCount:` field
       computed as the number of files whose before/after hash differ. Acceptance: `EXIT_CODE: 0`
       for the `csharpier format` invocation, regardless of `RewrittenCount` value.
-- [ ] [P4-T2] Scoped CSharpier read-only verification:
+- [x] [P4-T2] Scoped CSharpier read-only verification:
       ```
       dotnet tool run csharpier check `
         QuickFiler/Controllers/QfcHomeController.Metrics.cs `
@@ -394,7 +394,7 @@ same pass. This restart rule does not apply to a coverage-threshold exception fr
       ```
       Record the four evidence fields in
       `.../evidence/qa-gates/p4-t2-csharpier-check.<timestamp>.md`. Acceptance: `EXIT_CODE: 0`.
-- [ ] [P4-T3] Analyzer rebuild:
+- [x] [P4-T3] Analyzer rebuild:
       ```
       $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
       $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\MSBuild.exe' | Select-Object -First 1
@@ -406,7 +406,7 @@ same pass. This restart rule does not apply to a coverage-threshold exception fr
       Record the four evidence fields plus `AssemblyRebuilt: <bool>` (`$afterTime -gt $beforeTime`)
       in `.../evidence/qa-gates/p4-t3-analyzer-rebuild.<timestamp>.md`. Acceptance: `EXIT_CODE: 0`
       and `AssemblyRebuilt: True`.
-- [ ] [P4-T4] Nullable rebuild:
+- [x] [P4-T4] Nullable rebuild:
       ```
       $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
       $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\MSBuild.exe' | Select-Object -First 1
@@ -419,7 +419,7 @@ same pass. This restart rule does not apply to a coverage-threshold exception fr
       `.../evidence/qa-gates/p4-t4-nullable-rebuild.<timestamp>.md`. Acceptance: `EXIT_CODE: 0`
       and `AssemblyRebuilt: True`. Do NOT add `/p:Nullable=enable` (CLAUDE.md C#1 explicitly
       prohibits it as a solution-wide opt-in the CI command omits).
-- [ ] [P4-T5] Full-assembly, coverage-enabled final run:
+- [x] [P4-T5] Full-assembly, coverage-enabled final run:
       ```
       pwsh -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot QuickFiler.Test `
         -Configuration Debug `
@@ -438,21 +438,21 @@ same pass. This restart rule does not apply to a coverage-threshold exception fr
       rule, and carry the recorded percentage into P4-T6's `FinalLineRate:` field. This is the same
       pre-existing, repository-wide condition P0-T15 addresses, which this plan's three-line
       format-string change neither introduces nor can remediate.
-- [ ] [P4-T6] Coverage delta/threshold verification: read the numeric `line-rate` recorded in
+- [x] [P4-T6] Coverage delta/threshold verification: read the numeric `line-rate` recorded in
       P0-T15 (baseline) and P4-T5 (final) and record both figures side by side, plus the signed
       delta, in `.../evidence/qa-gates/p4-t6-coverage-delta.<timestamp>.md` with fields
       `BaselineLineRate:`, `FinalLineRate:`, `Delta:`. Acceptance: `FinalLineRate` is not lower
       than `BaselineLineRate` by more than 0.0 percentage points (i.e., `Delta >= 0`), consistent
       with spec.md §Test Strategy's statement that every changed line is already exercised by an
       existing, passing test and no coverage regression is expected.
-- [ ] [P4-T7] Record the single-pass completion declaration for the toolchain loop: write
+- [x] [P4-T7] Record the single-pass completion declaration for the toolchain loop: write
       `.../evidence/qa-gates/p4-t7-toolchain-single-pass.<timestamp>.md` stating that P4-T1
       through P4-T6 all recorded `EXIT_CODE: 0` (or the passing threshold for P4-T5 and P4-T6 as
       described in their acceptance text) without any task in this phase triggering the restart
       rule stated at the top of Phase 4. Acceptance: the
       artifact names all six preceding tasks by ID and states, for each, its recorded `EXIT_CODE`
       or pass/fail outcome, with zero restarts recorded.
-- [ ] [P4-T8] Commit the Phase 4 QA-gate evidence:
+- [x] [P4-T8] Commit the Phase 4 QA-gate evidence:
       ```
       git add docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645/evidence/
       git status --porcelain
@@ -468,7 +468,7 @@ same pass. This restart rule does not apply to a coverage-threshold exception fr
 
 ### Phase 5 — PR Notes, Acceptance Criteria Check-off & Final Wrap-up
 
-- [ ] [P5-T1] Draft the PR body content and write it to
+- [x] [P5-T1] Draft the PR body content and write it to
       `.../evidence/other/pr-body-draft.<timestamp>.md`. The draft MUST include, verbatim, a
       sentence stating that this change alters the emitted session-metrics CSV's time-of-day
       column content (per spec.md §Data / API / Config Impact and §Risks & Mitigations), for
@@ -477,65 +477,65 @@ same pass. This restart rule does not apply to a coverage-threshold exception fr
       (`hh:mm`, no AM/PM designator)." Acceptance: the artifact exists and contains a sentence
       matching this content requirement; the orchestrator's subsequent `pr-author` invocation must
       reuse this language in the actual PR description.
-- [ ] [P5-T2] Check off AC1 in `spec.md`: change the line
+- [x] [P5-T2] Check off AC1 in `spec.md`: change the line
       `` - [ ] `QuickFiler/Controllers/QfcHomeController.Metrics.cs:48` renders the time-of-day field ``
       to
       `` - [x] `QuickFiler/Controllers/QfcHomeController.Metrics.cs:48` renders the time-of-day field ``
       (checkbox marker only; no other character on the line changes). Acceptance: P1-T1's
       post-edit verification passed and the checkbox now reads `[x]`.
-- [ ] [P5-T3] Check off AC2 in `spec.md`: change the line
+- [x] [P5-T3] Check off AC2 in `spec.md`: change the line
       `` - [ ] `QuickFiler/Controllers/QfcHomeController.Metrics.cs:127` renders `curTimeText` using ``
       to
       `` - [x] `QuickFiler/Controllers/QfcHomeController.Metrics.cs:127` renders `curTimeText` using ``.
       Acceptance: P1-T2's post-edit verification passed and the checkbox now reads `[x]`.
-- [ ] [P5-T4] Check off AC3 in `spec.md`: change the line
+- [x] [P5-T4] Check off AC3 in `spec.md`: change the line
       `` - [ ] `QuickFiler/Controllers/EfcHomeController.Metrics.cs:96` renders `curTimeText` using ``
       to
       `` - [x] `QuickFiler/Controllers/EfcHomeController.Metrics.cs:96` renders `curTimeText` using ``.
       Acceptance: P1-T3's post-edit verification passed and the checkbox now reads `[x]`.
-- [ ] [P5-T5] Check off AC4 in `spec.md`: change the line
+- [x] [P5-T5] Check off AC4 in `spec.md`: change the line
       `` - [ ] `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs` (`expectedDataLineBeg` at ``
       to
       `` - [x] `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs` (`expectedDataLineBeg` at ``.
       Acceptance: P2-T1 and P2-T2's post-edit verifications passed and P3-T3 recorded 0 failed for
       both test methods; the checkbox now reads `[x]`.
-- [ ] [P5-T6] Check off AC5 in `spec.md`: change the line
+- [x] [P5-T6] Check off AC5 in `spec.md`: change the line
       `` - [ ] `QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs` (line 53) asserts the ``
       to
       `` - [x] `QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs` (line 53) asserts the ``.
       Acceptance: P2-T5's post-edit verification passed and P3-T3 recorded 0 failed for
       `BuildQuickFileMetricLines_WithMovedMailItems_FormatsMetricLine`; the checkbox now reads
       `[x]`.
-- [ ] [P5-T7] Check off AC6 in `spec.md`: change the line
+- [x] [P5-T7] Check off AC6 in `spec.md`: change the line
       `- [ ] No file under QuickFiler/Legacy/, no TaskVisualization/TaskViewer.Designer.cs, and no`
       to
       `- [x] No file under QuickFiler/Legacy/, no TaskVisualization/TaskViewer.Designer.cs, and no`.
       Acceptance: P3-T4's scope-boundary diff check passed with none of the forbidden paths
       present; the checkbox now reads `[x]`.
-- [ ] [P5-T8] Check off AC7 in `spec.md`: change the line
+- [x] [P5-T8] Check off AC7 in `spec.md`: change the line
       `` - [ ] None of the three fixed call sites gain a `CultureInfo.InvariantCulture` argument (or any ``
       to
       `` - [x] None of the three fixed call sites gain a `CultureInfo.InvariantCulture` argument (or any ``.
       Acceptance: P3-T2's verification passed (none of the three lines contains `CultureInfo`); the
       checkbox now reads `[x]`.
-- [ ] [P5-T9] Check off AC8 in `spec.md`: change the line
+- [x] [P5-T9] Check off AC8 in `spec.md`: change the line
       `` - [ ] The full `QuickFiler.Test` assembly is green after the changes above (`vstest.console.exe` ``
       to
       `` - [x] The full `QuickFiler.Test` assembly is green after the changes above (`vstest.console.exe` ``.
       Acceptance: P4-T5 recorded `EXIT_CODE: 0` and 0 failed tests; the checkbox now reads `[x]`.
-- [ ] [P5-T10] Check off AC9 in `spec.md`: change the line
+- [x] [P5-T10] Check off AC9 in `spec.md`: change the line
       `- [ ] Full toolchain pass completed in order (CSharpier format/check, analyzer rebuild, nullable`
       to
       `- [x] Full toolchain pass completed in order (CSharpier format/check, analyzer rebuild, nullable`.
       Acceptance: P4-T7's single-pass completion declaration recorded zero restarts across P4-T1
       through P4-T6; the checkbox now reads `[x]`.
-- [ ] [P5-T11] Check off AC10 in `spec.md`: change the line
+- [x] [P5-T11] Check off AC10 in `spec.md`: change the line
       `- [ ] The PR description explicitly states that this change alters the emitted session-metrics`
       to
       `- [x] The PR description explicitly states that this change alters the emitted session-metrics`.
       Acceptance: P5-T1's PR body draft contains the required sentence; the checkbox now reads
       `[x]`.
-- [ ] [P5-T12] AC reconciliation: read the `## Acceptance Criteria` section of `spec.md` in full
+- [x] [P5-T12] AC reconciliation: read the `## Acceptance Criteria` section of `spec.md` in full
       and confirm all 10 items now read `- [x]`, and that no character other than the checkbox
       marker changed on any of the 10 lines relative to the pre-Phase-5 text quoted in this plan's
       Phase 5 tasks above. Record the result in
