@@ -74,13 +74,13 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
 
 ### Phase 0 — Policy Read, Toolchain Bootstrap & Baseline Capture
 
-- [ ] [P0-T1] Read `CLAUDE.md` in full (repository root). Acceptance: the file has been read
+- [x] [P0-T1] Read `CLAUDE.md` in full (repository root). Acceptance: the file has been read
       end-to-end in this session; no summarization substitutes for the read.
-- [ ] [P0-T2] Read `.claude/rules/general-code-change.md` in full. Acceptance: file read end-to-end.
-- [ ] [P0-T3] Read `.claude/rules/general-unit-test.md` in full. Acceptance: file read end-to-end.
-- [ ] [P0-T4] Read `.claude/rules/csharp.md` in full. Acceptance: file read end-to-end.
-- [ ] [P0-T5] Read `.claude/rules/tonality.md` in full. Acceptance: file read end-to-end.
-- [ ] [P0-T6] Confirm `docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645/issue.md`,
+- [x] [P0-T2] Read `.claude/rules/general-code-change.md` in full. Acceptance: file read end-to-end.
+- [x] [P0-T3] Read `.claude/rules/general-unit-test.md` in full. Acceptance: file read end-to-end.
+- [x] [P0-T4] Read `.claude/rules/csharp.md` in full. Acceptance: file read end-to-end.
+- [x] [P0-T5] Read `.claude/rules/tonality.md` in full. Acceptance: file read end-to-end.
+- [x] [P0-T6] Confirm `docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645/issue.md`,
       `.../spec.md`, and
       `.../research/2026-09-02T08-47-twelve-hour-time-format-research.md` have been read in full,
       then write the evidence artifact
@@ -88,7 +88,7 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
       containing `Timestamp:`, `Policy Order:` (CLAUDE.md, general-code-change.md,
       general-unit-test.md, csharp.md, tonality.md), and an explicit list of all eight files read
       in P0-T1 through this task. Acceptance: the artifact exists and contains all required fields.
-- [ ] [P0-T7] Create the evidence directory structure by writing a `.gitkeep`-style placeholder is
+- [x] [P0-T7] Create the evidence directory structure by writing a `.gitkeep`-style placeholder is
       NOT required; instead create the four directories directly via:
       ```
       New-Item -ItemType Directory -Force -Path `
@@ -98,17 +98,17 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
         'docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645/evidence/other' | Out-Null
       ```
       Acceptance: `Test-Path` returns `True` for all four directories.
-- [ ] [P0-T8] Bootstrap the pinned .NET SDK: `pwsh -File scripts/vscode/Install-RepoDotNetSdk.ps1`.
+- [x] [P0-T8] Bootstrap the pinned .NET SDK: `pwsh -File scripts/vscode/Install-RepoDotNetSdk.ps1`.
       Record `Timestamp:`, `Command:`, `EXIT_CODE:`, `Output Summary:` in
       `.../evidence/baseline/p0-t8-sdk-bootstrap.<timestamp>.md`. Acceptance: `EXIT_CODE: 0`.
-- [ ] [P0-T9] Restore the pinned CSharpier tool manifest: `dotnet tool restore` (run from
+- [x] [P0-T9] Restore the pinned CSharpier tool manifest: `dotnet tool restore` (run from
       repository root, where `dotnet-tools.json` lives). Record the same four fields in
       `.../evidence/baseline/p0-t9-tool-restore.<timestamp>.md`. Acceptance: `EXIT_CODE: 0`.
-- [ ] [P0-T10] Restore NuGet/`packages.config` dependencies:
+- [x] [P0-T10] Restore NuGet/`packages.config` dependencies:
       `pwsh -File scripts/vscode/Invoke-Restore.ps1 -SolutionPath TaskMaster.sln -Configuration Debug -Platform 'Any CPU'`.
       Record the same four fields in `.../evidence/baseline/p0-t10-nuget-restore.<timestamp>.md`.
       Acceptance: `EXIT_CODE: 0`.
-- [ ] [P0-T11] Produce a baseline build so `QuickFiler.Test\bin\Debug\QuickFiler.Test.dll` exists
+- [x] [P0-T11] Produce a baseline build so `QuickFiler.Test\bin\Debug\QuickFiler.Test.dll` exists
       before any source edit:
       ```
       $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
@@ -118,7 +118,7 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
       Record the same four fields plus `Output Summary:` (build succeeded / error count) in
       `.../evidence/baseline/p0-t11-baseline-build.<timestamp>.md`. Acceptance: `EXIT_CODE: 0` and
       `Test-Path QuickFiler.Test\bin\Debug\QuickFiler.Test.dll` returns `True`.
-- [ ] [P0-T12] Capture the pre-edit literal-presence baseline with a fixed-string, case-sensitive
+- [x] [P0-T12] Capture the pre-edit literal-presence baseline with a fixed-string, case-sensitive
       search:
       ```
       Select-String -Path 'QuickFiler/Controllers/QfcHomeController.Metrics.cs' -SimpleMatch -CaseSensitive 'hh:mm'
@@ -136,7 +136,7 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
       96) for `EfcHomeController.Metrics.cs`, exactly 4 (lines 227, 243, 265, 278) for
       `QfcHomeControllerMetricsTests.cs`, and exactly 0 for `EfcHomeControllerMetricsTests.cs` —
       matching the verified current-tree state cited in spec.md and research.md.
-- [ ] [P0-T13] Capture the read-only CSharpier baseline scoped to the four in-scope files:
+- [x] [P0-T13] Capture the read-only CSharpier baseline scoped to the four in-scope files:
       ```
       dotnet tool run csharpier check `
         QuickFiler/Controllers/QfcHomeController.Metrics.cs `
@@ -149,7 +149,7 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
       `.../evidence/baseline/p0-t13-csharpier-baseline.<timestamp>.md`. This is an observation
       task; a non-zero exit code here is recorded as the pre-existing drift state and does not
       block the plan (Phase 4's format task normalizes it).
-- [ ] [P0-T14] Run the deterministic pre-edit regression baseline naming the two affected test
+- [x] [P0-T14] Run the deterministic pre-edit regression baseline naming the two affected test
       classes, proving both currently PASS under the pre-fix 12-hour literal:
       ```
       $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
@@ -164,7 +164,7 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
       `EXIT_CODE: 0` and the summary line reports 0 failed. This is the fail-before-alternative
       evidence described in Plan-Level Decision 3: it demonstrates the sites' current PASS state
       under the literal this plan is about to change.
-- [ ] [P0-T15] Run the full-assembly, coverage-enabled baseline:
+- [x] [P0-T15] Run the full-assembly, coverage-enabled baseline:
       ```
       pwsh -File scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot QuickFiler.Test `
         -Configuration Debug `
@@ -183,7 +183,7 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
       repository-wide condition, not a regression introduced by this change, and is not gated by
       this plan (this plan's own three changed lines are already covered by existing passing
       tests, per spec.md §Test Strategy).
-- [ ] [P0-T16] Fetch and record the merge-base anchor used by every later scope-boundary diff gate:
+- [x] [P0-T16] Fetch and record the merge-base anchor used by every later scope-boundary diff gate:
       ```
       git fetch origin main
       git merge-base HEAD origin/main
@@ -194,7 +194,7 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
       `git diff <merge-base>...HEAD`) recomputes `git merge-base HEAD origin/main` independently
       rather than reading this file, so this task is a traceability record, not a shared-state
       dependency.
-- [ ] [P0-T17] Commit the Phase 0 planning and baseline evidence:
+- [x] [P0-T17] Commit the Phase 0 planning and baseline evidence:
       ```
       git add docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645/
       git status --porcelain
@@ -210,20 +210,20 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
 
 ### Phase 1 — Production Format-String Fix
 
-- [ ] [P1-T1] In `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, change line 48 from
+- [x] [P1-T1] In `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, change line 48 from
       `dataLineBeg = $"{now:MM/dd/yyyy},{now:hh:mm},";` to
       `dataLineBeg = $"{now:MM/dd/yyyy},{now:HH:mm},";` (the interpolated `dataLineBeg` assignment
       inside `QuickFileMetrics_WRITE(string filename)`). Acceptance: `(Get-Content
       'QuickFiler/Controllers/QfcHomeController.Metrics.cs')[47]` equals exactly
       `            dataLineBeg = $"{now:MM/dd/yyyy},{now:HH:mm},";` and every other line in the
       file is byte-identical to its pre-edit content.
-- [ ] [P1-T2] In `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, change line 127 from
+- [x] [P1-T2] In `QuickFiler/Controllers/QfcHomeController.Metrics.cs`, change line 127 from
       `curTimeText = now.ToString("hh:mm");` to `curTimeText = now.ToString("HH:mm");` (inside
       `WriteMetricsAsync`). Acceptance: `(Get-Content
       'QuickFiler/Controllers/QfcHomeController.Metrics.cs')[126]` equals exactly
       `            curTimeText = now.ToString("HH:mm");` and no other line in the file changed
       relative to its state after P1-T1.
-- [ ] [P1-T3] In `QuickFiler/Controllers/EfcHomeController.Metrics.cs`, change line 96 from
+- [x] [P1-T3] In `QuickFiler/Controllers/EfcHomeController.Metrics.cs`, change line 96 from
       `var curTimeText = currentDateTime.ToString("hh:mm");` to
       `var curTimeText = currentDateTime.ToString("HH:mm");` (inside
       `BuildQuickFileMetricLines`). Acceptance: `(Get-Content
@@ -235,7 +235,7 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
 
 ### Phase 2 — Test Literal & Doc-Comment Updates
 
-- [ ] [P2-T1] In `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, change line 243
+- [x] [P2-T1] In `QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs`, change line 243
       (inside `WriteMetricsAsync_UsesInjectedClock_ForDateAndTimeStamps`) from
       `expectedLocal.ToString("MM/dd/yyyy") + "," + expectedLocal.ToString("hh:mm") + ",";` to
       `expectedLocal.ToString("MM/dd/yyyy") + "," + expectedLocal.ToString("HH:mm") + ",";`.
@@ -243,13 +243,13 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
       'QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs')[242]` equals exactly
       `                expectedLocal.ToString("MM/dd/yyyy") + "," + expectedLocal.ToString("HH:mm") + ",";`
       and no other line in the file changed.
-- [ ] [P2-T2] In the same file, change line 278 (inside
+- [x] [P2-T2] In the same file, change line 278 (inside
       `QuickFileMetrics_WRITE_UsesInjectedClock_ForDataLine`) with the identical substitution as
       P2-T1. Acceptance: `(Get-Content
       'QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs')[277]` equals exactly
       `                expectedLocal.ToString("MM/dd/yyyy") + "," + expectedLocal.ToString("HH:mm") + ",";`
       and no other line in the file changed relative to its state after P2-T1.
-- [ ] [P2-T3] In the same file, change line 227 (the XML doc comment on
+- [x] [P2-T3] In the same file, change line 227 (the XML doc comment on
       `WriteMetricsAsync_UsesInjectedClock_ForDateAndTimeStamps`) from
       `/// ("MM/dd/yyyy","hh:mm") and the OlEndTime passed to GetMoveDiagnostics must reflect the`
       to `/// ("MM/dd/yyyy","HH:mm") and the OlEndTime passed to GetMoveDiagnostics must reflect the`.
@@ -258,7 +258,7 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
       `        /// ("MM/dd/yyyy","HH:mm") and the OlEndTime passed to GetMoveDiagnostics must reflect the`
       and no other line changed. This edit is comment-accuracy only and does not affect test
       correctness (spec.md §Scope & Non-Goals).
-- [ ] [P2-T4] In the same file, change line 265 (the XML doc comment on
+- [x] [P2-T4] In the same file, change line 265 (the XML doc comment on
       `QuickFileMetrics_WRITE_UsesInjectedClock_ForDataLine`) from
       `/// the injected <see cref="TimeProvider"/>. The dataLineBeg ("MM/dd/yyyy","hh:mm") and the`
       to
@@ -267,7 +267,7 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
       'QuickFiler.Test/Controllers/QfcHomeControllerMetricsTests.cs')[264]` equals exactly
       `        /// the injected <see cref="TimeProvider"/>. The dataLineBeg ("MM/dd/yyyy","HH:mm") and the`
       and no other line changed.
-- [ ] [P2-T5] In `QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs`, change line 53
+- [x] [P2-T5] In `QuickFiler.Test/Controllers/EfcHomeControllerMetricsTests.cs`, change line 53
       (the asserted literal in `BuildQuickFileMetricLines_WithMovedMailItems_FormatsMetricLine`)
       from
       `"07/04/2026,01:05,Quarterly Update,SingleSorted,120,2.00,Recipient,Sender,Email,Archive/Target,06/30/2026,09:45:10"`
@@ -283,7 +283,7 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
 
 ### Phase 3 — Scope-Boundary & Regression Verification
 
-- [ ] [P3-T1] Re-run the fixed-string search from P0-T12 against the same four files, now with
+- [x] [P3-T1] Re-run the fixed-string search from P0-T12 against the same four files, now with
       `-CaseSensitive` (see P0-T12 for why the flag is required):
       ```
       Select-String -Path 'QuickFiler/Controllers/QfcHomeController.Metrics.cs' -SimpleMatch -CaseSensitive 'hh:mm'
@@ -298,7 +298,7 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
       the commented-out dead-code line spec.md excludes from scope and this plan never edits. Down
       from the P0-T12 baseline of 3, 1, 4, 0 (total 8), 7 of the 8 occurrences are eliminated; the
       one remaining occurrence at line 46 is the expected, correct outcome, not a defect.
-- [ ] [P3-T2] Verify none of the three fixed production lines gained a `CultureInfo` argument:
+- [x] [P3-T2] Verify none of the three fixed production lines gained a `CultureInfo` argument:
       ```
       (Get-Content 'QuickFiler/Controllers/QfcHomeController.Metrics.cs')[47]
       (Get-Content 'QuickFiler/Controllers/QfcHomeController.Metrics.cs')[126]
@@ -308,7 +308,7 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
       `.../evidence/regression-testing/p3-t2-no-cultureinfo-added.<timestamp>.md`. Acceptance: all
       three lines match the exact post-edit text asserted in P1-T1, P1-T2, and P1-T3 respectively,
       and none of the three contains the substring `CultureInfo`.
-- [ ] [P3-T3] Run the scoped two-class regression run post-edit:
+- [x] [P3-T3] Run the scoped two-class regression run post-edit:
       ```
       $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
       $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\MSBuild.exe' | Select-Object -First 1
@@ -323,7 +323,7 @@ issue #742 and is explicitly out of scope here (spec.md §Scope & Non-Goals, §A
       `.../evidence/regression-testing/p3-t3-scoped-regression-postedit.<timestamp>.md`.
       Acceptance: `EXIT_CODE: 0` and 0 failed, confirming the two clock-seam test methods and the
       EFC fixed-clock test method pass under the corrected `HH:mm` rendering.
-- [ ] [P3-T4] Scope-boundary diff check, anchored to the merge-base:
+- [x] [P3-T4] Scope-boundary diff check, anchored to the merge-base:
       ```
       $mergeBase = git merge-base HEAD origin/main
       git diff --name-only $mergeBase..HEAD
