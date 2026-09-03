@@ -45,7 +45,9 @@ namespace TaskMaster.Test.AppGlobals
             var waitTask = NonBlockingDelay.WaitAsync(interval, fakeTimeProvider);
             waitTask
                 .IsCompleted.Should()
-                .BeFalse("the one-shot timer must not fire before virtual time reaches the interval");
+                .BeFalse(
+                    "the one-shot timer must not fire before virtual time reaches the interval"
+                );
             fakeTimeProvider.Advance(interval);
             await waitTask;
 
