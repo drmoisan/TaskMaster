@@ -11,8 +11,8 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | max_concurrency | 16 |
 | current_cohort | 2 |
 | recolor_generation | 1 |
-| last_updated | 2026-09-03T20-15 |
-| next_step | Item 731's PR 775 is open, awaiting CI. Await 584 (opus, resuming ambiguous staged-diff state) and 752 (sonnet, first execution pass). When 731 merges, re-evaluate 736's barrier (645, 729, 731, 732, 735 all merged would clear it) and launch it with model_budget.fable_policy: available. Do not report run completion (mode is open) until every non-withdrawn item, including 752, reaches merged or worktree_removed. |
+| last_updated | 2026-09-03T21-20 |
+| next_step | Await background notifications for: 584 (opus, still cycling an extended preflight loop on a plan revised for the #752 coverage-script worktree blocker; last observed at round 17, execution not yet resumed), 752 (sonnet, plan execution reported complete by its own child and feature-review delegated; awaiting that review to finish before PR authoring), and 736 (opus, just launched, resume-at-execution). On each completion: durably confirm actual git push state before trusting a DONE report (per the 731 near-miss), stage checkpoint + PR artifacts at the session root, create the PR, background-watch CI to green with update-branch cycles on BEHIND, merge, then re-evaluate the per-edge barrier for any newly freed items. Do not report run completion (mode is open) until every non-withdrawn item reaches merged or worktree_removed. |
 
 ## Items
 
@@ -25,11 +25,11 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 707 | docs/features/active/2026-08-31-narrow-fileio2-retryable-exception-set-707 | 3 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/756 | 35583f7c7e1f1c9b97e4f6f1e7846a3f2693c17e |
 | 729 | docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/746 | a679cd082819af6788cd0fb35f4366786fab87e3 |
 | 730 | docs/features/active/2026-09-02-ci-build-infra-debt-730 | 1 | merged | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/747 | 196561ca7a7f595bd88619e908e971b5636b6192 |
-| 731 | docs/features/active/2026-09-02-quickfiler-controller-lifecycle-disposal-defects-731 | 3 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/775 | - |
+| 731 | docs/features/active/2026-09-02-quickfiler-controller-lifecycle-disposal-defects-731 | 3 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/775 | 66749143601aedb816c679b911f1042ffa3e86a5 |
 | 732 | docs/features/active/2026-09-02-folderconverter-folderpredictor-dead-code-and-bugs-732 | 2 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/754 | f8414ee979e1884c4a93703523509d4f45e89151 |
 | 733 | docs/features/active/2026-09-02-coverage-cobertura-mstest-powershell-tooling-defects-733 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/748 | b13d5b7b1a6dd0aa79d51d48a7156ee67377f9d0 |
 | 735 | docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735 | 1 | merged | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/749 | b01c37654b4cf0a470b09d565fcd5b76d2bcd758 |
-| 736 | docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736 | 4 | scheduled | not_started | - | - |
+| 736 | docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736 | 4 | in_flight | worktree_created | - | - |
 | 737 | docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/750 | 87233f867ad60c0a5c0d19b09cc121ae536d7ba1 |
 | 751 | docs/features/active/terminal-notification-hook-test-lacks-sync-barrier-751 | 2 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/758 | 8642d42ce4562241152c8c67f6cad372fcfded46 |
 | 752 | docs/features/active/2026-09-03-coverage-assembly-discovery-excludes-own-worktree-root-752 | 2 | in_flight | worktree_created | - | - |
@@ -45,11 +45,11 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 707 | 2026-09-03T07-57 | 2026-09-03T14-42 | 2026-09-03T15-15 | 2026-09-03T15-55 | - |
 | 729 | 2026-09-02T18-10 | 2026-09-03T00-38 | 2026-09-03T01-04 | 2026-09-03T01-05 | - |
 | 730 | 2026-09-02T22-15 | 2026-09-03T00-45 | 2026-09-03T01-13 | 2026-09-03T01-14 | 2026-09-03T01-18 |
-| 731 | 2026-09-03T16-00 | 2026-09-03T20-15 | - | - | - |
+| 731 | 2026-09-03T16-00 | 2026-09-03T20-15 | 2026-09-03T21-05 | 2026-09-03T21-08 | - |
 | 732 | 2026-09-03T07-19 | 2026-09-03T07-59 | 2026-09-03T08-10 | 2026-09-03T08-11 | - |
 | 733 | 2026-09-02T18-10 | 2026-09-03T01-06 | 2026-09-03T01-21 | 2026-09-03T01-21 | - |
 | 735 | 2026-09-03T01-08 | 2026-09-03T01-27 | 2026-09-03T07-10 | 2026-09-03T07-11 | 2026-09-03T07-12 |
-| 736 | - | - | - | - | - |
+| 736 | 2026-09-03T21-20 | - | - | - | - |
 | 737 | 2026-09-03T01-08 | 2026-09-03T01-28 | 2026-09-03T07-17 | 2026-09-03T07-17 | - |
 | 751 | 2026-09-03T16-30 | 2026-09-03T19-20 | 2026-09-03T20-05 | 2026-09-03T19-38 | - |
 | 752 | 2026-09-03T15-00 | - | - | - | - |
