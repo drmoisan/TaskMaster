@@ -11,44 +11,44 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | max_concurrency | 16 |
 | current_cohort | 0 |
 | recolor_generation | 0 |
-| last_updated | 2026-09-03T01-14 |
-| next_step | Bring pull request 748 (item 733) up to date against main 196561ca, confirm its checks green on the new head, and merge it, which releases item 565. Await 735 and 737, create their pull requests from the parent on READY FOR PR, then merge and re-evaluate the barrier after each. |
+| last_updated | 2026-09-03T01-30 |
+| next_step | Merge pull requests 749 and 750 one at a time, each preceded by an update-branch and a fresh per-check confirmation on the resulting head. Merging 737 releases 645 and contributes to 732, 584, 736, 707 and 731. Await item 565 and create its pull request from the parent on READY FOR PR. |
 
 ## Items
 
 | issue_num | feature_folder | cohort | state | merge_status | pr_url | merge_commit_sha |
 | --- | --- | --- | --- | --- | --- | --- |
 | 564 | docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/745 | 8be5a6aac3b5a82c86241fbbf989fd9118602c56 |
-| 565 | docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565 | 1 | scheduled | not_started | - | - |
+| 565 | docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565 | 1 | in_flight | worktree_created | - | - |
 | 584 | docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584 | 3 | scheduled | not_started | - | - |
 | 645 | docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645 | 2 | scheduled | not_started | - | - |
 | 707 | docs/features/active/2026-08-31-narrow-fileio2-retryable-exception-set-707 | 4 | scheduled | not_started | - | - |
 | 729 | docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/746 | a679cd082819af6788cd0fb35f4366786fab87e3 |
-| 730 | docs/features/active/2026-09-02-ci-build-infra-debt-730 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/747 | 196561ca7a7f595bd88619e908e971b5636b6192 |
+| 730 | docs/features/active/2026-09-02-ci-build-infra-debt-730 | 1 | merged | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/747 | 196561ca7a7f595bd88619e908e971b5636b6192 |
 | 731 | docs/features/active/2026-09-02-quickfiler-controller-lifecycle-disposal-defects-731 | 4 | scheduled | not_started | - | - |
 | 732 | docs/features/active/2026-09-02-folderconverter-folderpredictor-dead-code-and-bugs-732 | 2 | scheduled | not_started | - | - |
-| 733 | docs/features/active/2026-09-02-coverage-cobertura-mstest-powershell-tooling-defects-733 | 0 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/748 | - |
-| 735 | docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735 | 1 | in_flight | worktree_created | - | - |
+| 733 | docs/features/active/2026-09-02-coverage-cobertura-mstest-powershell-tooling-defects-733 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/748 | b13d5b7b1a6dd0aa79d51d48a7156ee67377f9d0 |
+| 735 | docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735 | 1 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/749 | - |
 | 736 | docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736 | 3 | scheduled | not_started | - | - |
-| 737 | docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737 | 1 | in_flight | worktree_created | - | - |
+| 737 | docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737 | 1 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/750 | - |
 
 ### Item lifecycle timestamps
 
 | issue_num | worktree_created_at | pr_opened_at | ci_green_at | merged_at | worktree_removed_at |
 | --- | --- | --- | --- | --- | --- |
 | 564 | 2026-09-02T18-10 | 2026-09-02T21-50 | 2026-09-02T22-00 | 2026-09-02T22-04 | - |
-| 565 | - | - | - | - | - |
+| 565 | 2026-09-03T01-30 | - | - | - | - |
 | 584 | - | - | - | - | - |
 | 645 | - | - | - | - | - |
 | 707 | - | - | - | - | - |
 | 729 | 2026-09-02T18-10 | 2026-09-03T00-38 | 2026-09-03T01-04 | 2026-09-03T01-05 | - |
-| 730 | 2026-09-02T22-15 | 2026-09-03T00-45 | 2026-09-03T01-13 | 2026-09-03T01-14 | - |
+| 730 | 2026-09-02T22-15 | 2026-09-03T00-45 | 2026-09-03T01-13 | 2026-09-03T01-14 | 2026-09-03T01-18 |
 | 731 | - | - | - | - | - |
 | 732 | - | - | - | - | - |
-| 733 | 2026-09-02T18-10 | 2026-09-03T01-06 | - | - | - |
-| 735 | 2026-09-03T01-08 | - | - | - | - |
+| 733 | 2026-09-02T18-10 | 2026-09-03T01-06 | 2026-09-03T01-21 | 2026-09-03T01-21 | - |
+| 735 | 2026-09-03T01-08 | 2026-09-03T01-27 | - | - | - |
 | 736 | - | - | - | - | - |
-| 737 | 2026-09-03T01-08 | - | - | - | - |
+| 737 | 2026-09-03T01-08 | 2026-09-03T01-28 | - | - | - |
 
 ## Cohorts
 
