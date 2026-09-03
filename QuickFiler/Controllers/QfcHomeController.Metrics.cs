@@ -45,7 +45,7 @@ namespace QuickFiler.Controllers
             //var curDateText = DateTime.Now.ToString("MM/dd/yyyy");
             //var curTimeText = DateTime.Now.ToString("hh:mm");
             //dataLineBeg = curDateText + "," + curTimeText + ",";
-            dataLineBeg = $"{now:MM/dd/yyyy},{now:hh:mm},";
+            dataLineBeg = $"{now:MM/dd/yyyy},{now:HH:mm},";
 
             if (!Globals.FS.SpecialFolders.TryGetValue("MyDocuments", out var folderRoot))
             {
@@ -124,7 +124,7 @@ namespace QuickFiler.Controllers
             var now = TimeProvider.GetLocalNow().LocalDateTime;
             curDateText = now.ToString("MM/dd/yyyy");
 
-            curTimeText = now.ToString("hh:mm");
+            curTimeText = now.ToString("HH:mm");
 
             dataLineBeg = curDateText + "," + curTimeText + ",";
 
