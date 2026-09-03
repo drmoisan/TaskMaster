@@ -166,15 +166,15 @@ Seeded from issue:
 
 
 ## Acceptance Criteria
-- [ ] `WriteTextFileAsync` (internal seam overload, `UtilitiesCS/To Depricate/FileIO2.cs`) catches `DirectoryNotFoundException` ahead of the existing `catch (IOException ex)` block, and a `DirectoryNotFoundException` thrown by the writer factory now returns `false` after exactly 1 writer-factory invocation and 0 delay-delegate invocations (was: up to 100 factory invocations and up to 99 delay invocations before this fix).
-- [ ] The new catch block logs the failure via `logger.Error` before returning `false`, without incrementing `attempts` and without calling `delayAsync`.
-- [ ] A new regression test in `UtilitiesCS.Test/HelperClasses/FileIO2_Tests.cs` (e.g. `WriteTextFileAsync_WhenDirectoryDoesNotExist_ShouldReturnFalseWithoutRetrying`) asserts result `false`, writer-factory call count `1`, and delay-delegate call count `0` for a `DirectoryNotFoundException`-throwing factory, and fails against the pre-fix source.
-- [ ] All pre-existing tests in `FileIO2_Tests.cs` still pass unmodified.
-- [ ] `UnauthorizedAccessException` behavior is unchanged (already outside the retry set, no new handling needed) and no test regresses this.
-- [ ] The general `catch (IOException ex)` retry-exhaustion path (100-attempt budget, 100 ms delay) is unchanged for non-`DirectoryNotFoundException` `IOException` cases.
-- [ ] `PathTooLongException` is explicitly not handled by this fix (out of scope; see Scope & Non-Goals) and no test asserts behavior for it.
-- [ ] Neither production caller (TaskMaster/AppGlobals/AppOlObjects.cs line 315, QuickFiler/Controllers/QfcHomeController.Metrics.cs) requires a code change; both already consume `Task<bool>` and already handle a `false` result.
-- [ ] Full C# toolchain passes clean in a single pass: `dotnet tool run csharpier check .`, `msbuild TaskMaster.sln /t:Rebuild ... /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`, `msbuild TaskMaster.sln /t:Rebuild ... /p:TreatWarningsAsErrors=true`, and `vstest.console.exe` against `UtilitiesCS.Test` with all tests green.
+- [x] `WriteTextFileAsync` (internal seam overload, `UtilitiesCS/To Depricate/FileIO2.cs`) catches `DirectoryNotFoundException` ahead of the existing `catch (IOException ex)` block, and a `DirectoryNotFoundException` thrown by the writer factory now returns `false` after exactly 1 writer-factory invocation and 0 delay-delegate invocations (was: up to 100 factory invocations and up to 99 delay invocations before this fix).
+- [x] The new catch block logs the failure via `logger.Error` before returning `false`, without incrementing `attempts` and without calling `delayAsync`.
+- [x] A new regression test in `UtilitiesCS.Test/HelperClasses/FileIO2_Tests.cs` (e.g. `WriteTextFileAsync_WhenDirectoryDoesNotExist_ShouldReturnFalseWithoutRetrying`) asserts result `false`, writer-factory call count `1`, and delay-delegate call count `0` for a `DirectoryNotFoundException`-throwing factory, and fails against the pre-fix source.
+- [x] All pre-existing tests in `FileIO2_Tests.cs` still pass unmodified.
+- [x] `UnauthorizedAccessException` behavior is unchanged (already outside the retry set, no new handling needed) and no test regresses this.
+- [x] The general `catch (IOException ex)` retry-exhaustion path (100-attempt budget, 100 ms delay) is unchanged for non-`DirectoryNotFoundException` `IOException` cases.
+- [x] `PathTooLongException` is explicitly not handled by this fix (out of scope; see Scope & Non-Goals) and no test asserts behavior for it.
+- [x] Neither production caller (TaskMaster/AppGlobals/AppOlObjects.cs line 315, QuickFiler/Controllers/QfcHomeController.Metrics.cs) requires a code change; both already consume `Task<bool>` and already handle a `false` result.
+- [x] Full C# toolchain passes clean in a single pass: `dotnet tool run csharpier check .`, `msbuild TaskMaster.sln /t:Rebuild ... /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`, `msbuild TaskMaster.sln /t:Rebuild ... /p:TreatWarningsAsErrors=true`, and `vstest.console.exe` against `UtilitiesCS.Test` with all tests green.
 
 ## Risks & Mitigations
 - Technical or operational risks:
