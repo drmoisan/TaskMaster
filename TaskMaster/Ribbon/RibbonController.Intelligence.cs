@@ -203,6 +203,31 @@ namespace TaskMaster
 
         internal IAppItemEngines Engines => Globals?.Engines;
 
+        private SpamManagerResetGate _spamManagerResetGate;
+
+        /// <summary>
+        /// The lazily-built availability guard for the Clear Spam Manager command (issue #735,
+        /// finding 2).
+        /// </summary>
+        /// <remarks>
+        /// Deliberately separate from the engine-gated command runner. That runner's predicate is
+        /// inbox-engine readiness, which is the wrong question here: Clear Spam Manager is not a
+        /// member of <see cref="EngineCommandCatalog"/> and correctly declares no enabled-state
+        /// callback, because its real dependency is the availability of the classifier manager. The
+        /// blocked-click notice reuses <see cref="NotifyEngineCommandNotReady"/>, so presentation
+        /// stays in this exempt shim.
+        /// </remarks>
+        private SpamManagerResetGate SpamManagerReset =>
+            _spamManagerResetGate ??= new SpamManagerResetGate(
+                // The null-forgiving operators record that these accessors may legitimately return
+                // null before SetGlobals has run and before the basic load has populated the
+                // container. SpamManagerResetGate treats a null result as "not ready" by contract,
+                // so null is a supported value rather than a defect.
+                () => Globals?.AF!,
+                () => Globals?.Engines!,
+                NotifyEngineCommandNotReady
+            );
+
         internal async Task ClearSpamManagerAsync()
         {
             if (SynchronizationContext.Current is null)
@@ -214,22 +239,29 @@ namespace TaskMaster
                 "Clear Spam Manager",
                 MessageBoxButtons.YesNo
             );
-            if (response == DialogResult.Yes)
+            if (response != DialogResult.Yes)
             {
-                if (
-                    (await Globals.AF.Manager.Configuration).TryGetValue(
-                        SpamBayes.GroupName,
-                        out var loader
-                    )
-                )
-                {
-                    var classifier = await SpamBayes.CreateSpamClassifiersAsync();
-                    classifier.Config.CopyFrom(loader.Config, true);
-                    classifier.Serialize();
-                    Globals.AF.Manager[SpamBayes.GroupName] = classifier.ToAsyncLazy();
-                    await Globals.Engines.RestartEngineAsync(SpamBayes.GroupName);
-                }
+                return;
             }
+
+            await SpamManagerReset.RunAsync(
+                async (manager, engines) =>
+                {
+                    if (
+                        (await manager.Configuration).TryGetValue(
+                            SpamBayes.GroupName,
+                            out var loader
+                        )
+                    )
+                    {
+                        var classifier = await SpamBayes.CreateSpamClassifiersAsync();
+                        classifier.Config.CopyFrom(loader.Config, true);
+                        classifier.Serialize();
+                        manager[SpamBayes.GroupName] = classifier.ToAsyncLazy();
+                        await engines.RestartEngineAsync(SpamBayes.GroupName);
+                    }
+                }
+            );
         }
 
         internal void TestSpamVerbose()

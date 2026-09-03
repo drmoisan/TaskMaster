@@ -321,6 +321,49 @@ Describe 'Remove-CoberturaExemptClosureCoverage' {
         # Only the declaring class's line remains in the document totals.
         $summary.LinesValid | Should -Be '1'
     }
+
+    It 'retains a closure whose bare member name collides with a non-exempt overload' {
+        # Issue #733 finding 6: the presence set is keyed by BARE member name, so the exempt and
+        # the non-exempt 'Overloaded' overloads share one entry. Only the non-exempt overload
+        # emits a plain <method> element (the exempt one emits none), and that element admits the
+        # shared name, so the exempt overload's closure resolves as present and survives.
+        # This pins the CURRENT behaviour, which fails in the SAFE under-exclusion direction: the
+        # exempt overload's lambda lines stay in the denominator permanently uncovered, so the
+        # file measures no better than it truly is. The forbidden over-exclusion direction, in
+        # which those lines would be deleted, is what a signature-based re-key would risk; that
+        # re-key was evaluated and rejected as infeasible, per the P3-T2 addendum on
+        # Get-CoberturaInstrumentedMemberName.
+        [xml]$doc = @'
+<coverage line-rate="0" branch-rate="0" lines-covered="0" lines-valid="0" branches-covered="0" branches-valid="0">
+  <packages><package name="Ns" line-rate="0" branch-rate="0" complexity="1"><classes>
+    <class name="Ns.T" filename="Ns\T.cs" line-rate="1" branch-rate="1" complexity="1">
+      <methods><method name="Overloaded" signature="()" line-rate="1" branch-rate="1"><lines><line number="10" hits="1" branch="False" /></lines></method></methods>
+      <lines><line number="10" hits="1" branch="False" /></lines>
+    </class>
+    <class name="Ns.T.&lt;&gt;c__DisplayClass1_0" filename="Ns\T.cs" line-rate="0" branch-rate="0" complexity="1">
+      <methods><method name="&lt;Overloaded&gt;b__0" signature="()" line-rate="0" branch-rate="0"><lines><line number="20" hits="0" branch="False" /></lines></method></methods>
+      <lines><line number="20" hits="0" branch="False" /></lines>
+    </class>
+  </classes></package></packages>
+</coverage>
+'@
+
+        Remove-CoberturaExemptClosureCoverage -XmlDocument $doc
+
+        # XPath predicates compare against PARSED attribute values, hence the unescaped '<>'.
+        $closure = $doc.SelectSingleNode('//class[@name="Ns.T.<>c__DisplayClass1_0"]')
+        $summary = Get-CoberturaCoverageSummary -XmlDocument $doc
+
+        $closure | Should -Not -BeNullOrEmpty
+        # Scoped to the closure class's own rollup: each fixture line appears twice (once under
+        # its <method>, once in the class-level <lines>), so an unscoped count would not identify
+        # WHERE the line survived.
+        @($closure.SelectNodes('./lines/line[@number="20"]')).Count | Should -Be 1
+        @($closure.SelectNodes('./methods/method')).Count | Should -Be 1
+        # Both lines remain in the denominator; only the declaring class's line is covered.
+        $summary.LinesValid | Should -Be '2'
+        $summary.LinesCovered | Should -Be '1'
+    }
 }
 
 Describe 'Cobertura closure name derivation' {
