@@ -11,7 +11,7 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | max_concurrency | 16 |
 | current_cohort | 0 |
 | recolor_generation | 0 |
-| last_updated | 2026-09-03T01-30 |
+| last_updated | 2026-09-03T07-11 |
 | next_step | Merge pull requests 749 and 750 one at a time, each preceded by an update-branch and a fresh per-check confirmation on the resulting head. Merging 737 releases 645 and contributes to 732, 584, 736, 707 and 731. Await item 565 and create its pull request from the parent on READY FOR PR. |
 
 ## Items
@@ -28,7 +28,7 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 731 | docs/features/active/2026-09-02-quickfiler-controller-lifecycle-disposal-defects-731 | 4 | scheduled | not_started | - | - |
 | 732 | docs/features/active/2026-09-02-folderconverter-folderpredictor-dead-code-and-bugs-732 | 2 | scheduled | not_started | - | - |
 | 733 | docs/features/active/2026-09-02-coverage-cobertura-mstest-powershell-tooling-defects-733 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/748 | b13d5b7b1a6dd0aa79d51d48a7156ee67377f9d0 |
-| 735 | docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735 | 1 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/749 | - |
+| 735 | docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/749 | b01c37654b4cf0a470b09d565fcd5b76d2bcd758 |
 | 736 | docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736 | 3 | scheduled | not_started | - | - |
 | 737 | docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737 | 1 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/750 | - |
 
@@ -46,7 +46,7 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 731 | - | - | - | - | - |
 | 732 | - | - | - | - | - |
 | 733 | 2026-09-02T18-10 | 2026-09-03T01-06 | 2026-09-03T01-21 | 2026-09-03T01-21 | - |
-| 735 | 2026-09-03T01-08 | 2026-09-03T01-27 | - | - | - |
+| 735 | 2026-09-03T01-08 | 2026-09-03T01-27 | 2026-09-03T07-10 | 2026-09-03T07-11 | - |
 | 736 | - | - | - | - | - |
 | 737 | 2026-09-03T01-08 | 2026-09-03T01-28 | - | - | - |
 
