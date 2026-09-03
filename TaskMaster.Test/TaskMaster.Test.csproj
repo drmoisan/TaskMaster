@@ -329,6 +329,7 @@
     <Compile Include="Ribbon\TryFunctionalityInConstructionTests.cs" />
     <Compile Include="Ribbon\RibbonExplorerXmlTests.cs" />
     <Compile Include="Ribbon\SpamManagerResetGateTests.cs" />
+    <Compile Include="Ribbon\EngineToggleStateCoordinatorTests.Race.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

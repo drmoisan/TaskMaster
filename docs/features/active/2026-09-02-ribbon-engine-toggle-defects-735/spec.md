@@ -166,12 +166,12 @@ The existing harness needs no modification.
 
 ### Finding 3 — toggle-state last-writer race
 
-- [ ] The pressed-state cache is a concurrent dictionary of a private nested reference type carrying an activation flag and a monotonic sequence ticket, keyed ordinally; the sequence source is read and written only through interlocked operations.
-- [ ] Both writers capture a ticket immediately before invoking the activation read — on the toggle path, after the engine toggle completes — and store through a compare-and-apply helper that applies a write only when no newer observation is already cached for that key, invalidating the control only when the write was applied.
-- [ ] The pressed-state reader keeps its `bool` return type and still never awaits, blocks, or throws; the existing update-before-invalidate ordering test continues to pass unmodified.
-- [ ] Prime completion treats any outcome other than ran-to-completion as a failure: the in-flight marker is cleared and the failure is logged, with a synthesized cancellation exception when there is no exception to unwrap. The existing faulted-path behavior, including base-exception unwrapping asserted by reference in an existing test, is preserved.
-- [ ] All six new tests in the new coordinator race file pass, and the three that reproduce defects — the prime-after-toggle race, the toggle-versus-toggle race, and the canceled-prime logging case — are demonstrated to fail against the pre-fix tree.
-- [ ] The existing coordinator test class declaration changes by exactly one added `partial` keyword, with no other edit to that file, so the new file reuses the existing private harness with no duplication.
+- [x] The pressed-state cache is a concurrent dictionary of a private nested reference type carrying an activation flag and a monotonic sequence ticket, keyed ordinally; the sequence source is read and written only through interlocked operations.
+- [x] Both writers capture a ticket immediately before invoking the activation read — on the toggle path, after the engine toggle completes — and store through a compare-and-apply helper that applies a write only when no newer observation is already cached for that key, invalidating the control only when the write was applied.
+- [x] The pressed-state reader keeps its `bool` return type and still never awaits, blocks, or throws; the existing update-before-invalidate ordering test continues to pass unmodified.
+- [x] Prime completion treats any outcome other than ran-to-completion as a failure: the in-flight marker is cleared and the failure is logged, with a synthesized cancellation exception when there is no exception to unwrap. The existing faulted-path behavior, including base-exception unwrapping asserted by reference in an existing test, is preserved.
+- [x] All six new tests in the new coordinator race file pass, and the three that reproduce defects — the prime-after-toggle race, the toggle-versus-toggle race, and the canceled-prime logging case — are demonstrated to fail against the pre-fix tree.
+- [x] The existing coordinator test class declaration changes by exactly one added `partial` keyword, with no other edit to that file, so the new file reuses the existing private harness with no duplication.
 
 ### Cross-cutting
 
