@@ -386,3 +386,46 @@ The failure mode is narrower than "non-deterministic tests": under CPU contentio
 - **Finding 4:** no test change.
 - **Toolchain:** `nuget restore` first (the `packages/` folder is absent from this worktree), then the four-step loop from `CLAUDE.md` § CUT3, restarting at step 1 after the `packages.config` edit because CSharpier reformats that file.
 - **Local test run:** per the repo's known local-run constraint, exclude `\.claude\` worktree copies from the assembly list and pass `/InIsolation` to match CI.
+
+## Correction (2026-09-03) — §1.4 zero-due-time premise falsified by execution
+
+This section is appended. No line above it has been changed: the body above is a point-in-time
+record retained verbatim for provenance, including the three statements this correction falsifies.
+
+### What §1.4 asserts
+
+- Line 80 asserts that `CreateTimer(callback, state, dueTime, period)` constructs the fake timer
+  and calls `Change(dueTime, period)`, and that it does **not** invoke the callback at creation.
+- Line 83 asserts the test consequence: that a zero-due-time timer therefore fires on the **next**
+  `Advance`/`SetUtcNow`, not at creation.
+- Line 86 asserts that `WaitAsync_ZeroDelay_CompletesWithoutPump` must therefore call
+  `fake.Advance(TimeSpan.Zero)` between starting the task and awaiting it.
+
+All three are stated unhedged, as verified fact.
+
+### What execution observed
+
+The executed run recorded in
+`docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729/evidence/regression-testing/nonblockingdelay-zero-delay-observation.2026-09-02T10-30.md`
+reproduced the **opposite** behaviour, twice. With a due time of `TimeSpan.Zero`, the callback is
+invoked **during `CreateTimer`**, so the task returned by
+`NonBlockingDelay.WaitAsync(TimeSpan.Zero, fakeTimeProvider)` is already completed when control
+returns from that call, before any `Advance` runs.
+
+The first observation was a three-method scoped run in which the pre-`Advance`
+`waitTask.IsCompleted.Should().BeFalse(...)` assertion failed. The second was a single-node scoped
+run filtered to `WaitAsync_ZeroDelay_CompletesWithoutPump`, which reproduced the identical failure
+at the identical source line. Two reproductions at the same line establish the behaviour as
+deterministic rather than a race.
+
+The direction of the error matters. §1.4 anticipated that the upstream comparison in `WakeWaiters`
+might prove *strict* rather than inclusive, for which `Advance(TimeSpan.FromTicks(1))` was offered
+as the fallback. The observed behaviour is the other direction entirely: the timer is *more* eager
+than assumed, so no advance is required at all and no larger advance can repair an assertion that
+runs before it.
+
+### Governing statement
+
+`spec.md`, not §1.4, carries the governing statement of `FakeTimeProvider` zero-due-time behaviour
+for this change. §1.4 remains on the record as the premise that execution falsified, and it should
+not be cited as a behavioural authority.
