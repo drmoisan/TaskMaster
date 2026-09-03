@@ -76,11 +76,26 @@ actually reachable in production code (not just the test double), scope should b
 
 ## Proposed Fix / Validation Ideas
 
-- [ ] Trace `ControlledUiDispatcher` and `AppOlObjectsFolderTreeService`'s terminal-hook dispatch path
+- [x] Trace `ControlledUiDispatcher` and `AppOlObjectsFolderTreeService`'s terminal-hook dispatch path
   to determine whether `ReleaseAsync()` can legitimately return before the terminal hook has run.
-- [ ] Add a deterministic synchronization barrier (e.g., await a completion signal/TaskCompletionSource
+  Answered by research §2.2-§2.3: the worker is released by `TrySetException` at
+  `AppOlObjects.FolderTreeService.cs:261` while the terminal notification is dispatched afterwards at
+  `:269-272`, and `ReleaseAsync()` is a complete no-op on this path (the identity guard at `:177-183`
+  returns immediately because the initialization field was already nulled at `:262`). So yes,
+  `ReleaseAsync()` legitimately returns before the terminal hook has run, and it is not a barrier.
+- [x] Add a deterministic synchronization barrier (e.g., await a completion signal/TaskCompletionSource
   the terminal hook sets) so the assertion cannot race the hook's execution.
-- [ ] Confirm no production code path shares the same unguarded race; broaden scope if it does.
+  Answered by the delivered change and P3-T3: the test now awaits the terminal signal the fixture already
+  captures, via the inserted assertion
+  `(await GetExceptionAsync(await run.Terminal)).Should().BeSameAs(fault);`, and the counter is hardened
+  with `Interlocked.Increment` and `Volatile.Read`. No new primitive was introduced. The five-run
+  repeat-run series recorded by P3-T3 shows the repaired test passing on every run.
+- [x] Confirm no production code path shares the same unguarded race; broaden scope if it does.
+  Answered by research §3: the defect is test-only. `OnFolderTreeServiceInitializationTerminal` is
+  overridden only in test code, `AppOlObjects` has no production subclass at all, and the
+  notify-after-publish ordering is deliberate. Scope was therefore not broadened, and
+  `TaskMaster/AppGlobals/AppOlObjects.FolderTreeService.cs` is byte-identical to branch point `f8414ee9`
+  (P4-T8).
 
 ## Next Step
 

@@ -323,42 +323,45 @@ introduces a timed wait, so total suite duration is unaffected.
 
 ## Acceptance Criteria
 
-- [ ] The barrier assertion `(await GetExceptionAsync(await run.Terminal)).Should().BeSameAs(fault);` is
+- [x] The barrier assertion `(await GetExceptionAsync(await run.Terminal)).Should().BeSameAs(fault);` is
       present in `TaskMaster.Test/AppGlobals/AppOlObjectsFolderTreeServiceTests.cs`, inside
       `TerminalNotificationHookFailure_DoesNotReplaceDispatchFault`, positioned after the existing
       `run.Worker` assertion and before the `LoadCount` assertion, and uses the captured `run.Terminal`
-      rather than a freshly read `sut.NextTerminal`.
-- [ ] The terminal-hook count assertion in that test still expects the value 1 (it is not relaxed, widened
-      to a range, or deleted), and is reached only after the barrier assertion.
-- [ ] Every read and write of `InvokedTerminalHookCount` across
+      rather than a freshly read `sut.NextTerminal`. (Evidence: P2-T1)
+- [x] The terminal-hook count assertion in that test still expects the value 1 (it is not relaxed, widened
+      to a range, or deleted), and is reached only after the barrier assertion. (Evidence: P2-T2)
+- [x] Every read and write of `InvokedTerminalHookCount` across
       `TaskMaster.Test/AppGlobals/AppOlObjectsFolderTreeServiceTests.cs` and
       `TaskMaster.Test/AppGlobals/AppOlObjectsFolderTreeServiceLifecycleTests.cs` is synchronised:
       the increment uses `Interlocked.Increment` and the cross-thread read uses `Volatile.Read`, matching
       the `_loadCount` pattern already present in the fixture. No new `using` directive is required.
-- [ ] TaskMaster/AppGlobals/AppOlObjects.FolderTreeService.cs is byte-identical to its state at branch point
-      `f8414ee9`; the branch diff contains no production-assembly file.
-- [ ] The repaired test passes on every run of a repeat-run series executed under the CI-shaped invocation
+      (Evidence: P2-T3, P2-T4, P4-T10)
+- [x] TaskMaster/AppGlobals/AppOlObjects.FolderTreeService.cs is byte-identical to its state at branch point
+      `f8414ee9`; the branch diff contains no production-assembly file. (Evidence: P4-T8)
+- [x] The repaired test passes on every run of a repeat-run series executed under the CI-shaped invocation
       with `/EnableCodeCoverage /InIsolation`, with no failure and no re-run required; the series output is
       committed as evidence under
       `docs/features/active/terminal-notification-hook-test-lacks-sync-barrier-751/evidence/qa-gates/`.
-- [ ] Exactly one fail-before route from the Test Strategy is executed and its artifact is committed under
+      (Evidence: P3-T2, P3-T3)
+- [x] Exactly one fail-before route from the Test Strategy is executed and its artifact is committed under
       `docs/features/active/terminal-notification-hook-test-lacks-sync-barrier-751/evidence/regression-testing/`:
       either a genuine red-before run captured with temporary instrumentation that is fully reverted before
       the final toolchain pass, or a `no-fail-before-rationale` dossier paired with the repeat-run stress
       record. If route 1 is taken, no instrumentation remains in the branch diff.
-- [ ] After the change, neither `TaskMaster.Test/AppGlobals/AppOlObjectsFolderTreeServiceTests.cs` nor
+      (Evidence: P1-T1, P1-T2, P4-T10)
+- [x] After the change, neither `TaskMaster.Test/AppGlobals/AppOlObjectsFolderTreeServiceTests.cs` nor
       `TaskMaster.Test/AppGlobals/AppOlObjectsFolderTreeServiceLifecycleTests.cs` exceeds the 500-line cap
       defined in .claude/rules/general-code-change.md, and no new fixture type, gate field,
-      `TaskCompletionSource`, or helper method was introduced.
-- [ ] No banned determinism API (`Thread.Sleep`, `Task.Delay`, wall-clock wait, polling loop,
-      `[DoNotParallelize]`) is added anywhere in the branch diff.
-- [ ] A full toolchain pass completes cleanly in a single final pass, in order: `csharpier check` reports no
+      `TaskCompletionSource`, or helper method was introduced. (Evidence: P4-T7, P4-T10)
+- [x] No banned determinism API (`Thread.Sleep`, `Task.Delay`, wall-clock wait, polling loop,
+      `[DoNotParallelize]`) is added anywhere in the branch diff. (Evidence: P4-T9)
+- [x] A full toolchain pass completes cleanly in a single final pass, in order: `csharpier check` reports no
       unformatted file; the analyzer `msbuild` rebuild reports no error; the nullable `msbuild` rebuild
       reports no error; the MSTest run reports no failed test. The commands run and the clean-pass result
-      are stated in the completion report.
-- [ ] The issue.md checklist items under "Proposed Fix / Validation Ideas" are reconciled: the trace item
+      are stated in the completion report. (Evidence: P4-T2, P4-T5, P4-T6)
+- [x] The issue.md checklist items under "Proposed Fix / Validation Ideas" are reconciled: the trace item
       and the production-reachability item are answered by the research record, and the barrier item is
-      answered by the delivered change.
+      answered by the delivered change. (Evidence: P5-T11)
 
 ## Risks & Mitigations
 
