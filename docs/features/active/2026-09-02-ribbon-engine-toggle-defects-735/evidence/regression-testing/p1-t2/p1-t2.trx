@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="5e57dbed-ecb7-4ac6-af42-2de3743d2126" name="REDACTED-ACCOUNT@REDACTED-MACHINE 2026-09-03 01:22:49" runUser="REDACTED-MACHINE\REDACTED-ACCOUNT" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-09-03T01:22:49.7289263-04:00" queuing="2026-09-03T01:22:49.7289263-04:00" start="2026-09-03T01:22:48.5217733-04:00" finish="2026-09-03T01:22:49.7461323-04:00" />
+  <TestSettings name="default" id="0a094a75-128f-4c65-9afc-dd1b65382ba1">
+    <Deployment runDeploymentRoot="REDACTED-ACCOUNT_REDACTED-MACHINE_2026-09-03_01_22_49" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="0deddae8-d88e-4f3e-9898-351fa4fa26c5" testId="175a1542-2c04-8a5e-a717-078ec1eae9bd" testName="RibbonExplorerXml_EveryCallbackNameResolvesToAPublicRibbonViewerMethod" computerName="REDACTED-MACHINE" duration="00:00:00.1574371" startTime="2026-09-03T01:22:49.4138945-04:00" endTime="2026-09-03T01:22:49.6592747-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0deddae8-d88e-4f3e-9898-351fa4fa26c5">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Expected unresolved to be empty because every CustomUI callback name must resolve to a public instance method on RibbonViewer; these 5 of 84 bound names do not: BtnMigrateIDs_Click, MoveEntireConversation_Clicked, SaveAttachments_Clicked, SaveEmailCopy_Clicked, SavePictures_Clicked, but found at least one item {"BtnMigrateIDs_Click"}.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Execution.GivenSelector`1.FailWith(String message, Object[] args) in /_/Src/FluentAssertions/Execution/GivenSelector.cs:line 75&#xD;
+   at FluentAssertions.Execution.AssertionChain.WithExpectation(String message, Action`1 chain, Object[] args) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 192&#xD;
+   at FluentAssertions.Collections.GenericCollectionAssertions`3.BeEmpty(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Collections/GenericCollectionAssertions.cs:line 300&#xD;
+   at TaskMaster.Test.Ribbon.RibbonExplorerXmlTests.RibbonExplorerXml_EveryCallbackNameResolvesToAPublicRibbonViewerMethod() in C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\Ribbon\RibbonExplorerXmlTests.cs:line 395</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="3e825048-053a-4ab4-91dd-be4de02e7818" testId="1b7e799c-6f4b-85cb-8516-3906ee7c9098" testName="RibbonExplorerXml_CheckBoxOnActionCallbacksTakeControlAndPressedParameters" computerName="REDACTED-MACHINE" duration="00:00:00.0018576" startTime="2026-09-03T01:22:49.6642806-04:00" endTime="2026-09-03T01:22:49.6695977-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3e825048-053a-4ab4-91dd-be4de02e7818">
+      <Output>
+        <ErrorInfo>
+          <Message>Expected defects to be empty because every checkBox onAction callback must be void (Microsoft.Office.Core.IRibbonControl, bool); these 4 are not: MoveEntireConversationDefault: 'MoveEntireConversation_Clicked' resolves to no public instance method; SaveAttachmentsDefault: 'SaveAttachments_Clicked' resolves to no public instance method; SaveEmailCopyDefault: 'SaveEmailCopy_Clicked' resolves to no public instance method; SavePicturesDefault: 'SavePictures_Clicked' resolves to no public instance method, but found at least one item {"MoveEntireConversationDefault: 'MoveEntireConversation_Clicked' resolves to no public instance method"}.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Execution.GivenSelector`1.FailWith(String message, Object[] args) in /_/Src/FluentAssertions/Execution/GivenSelector.cs:line 75&#xD;
+   at FluentAssertions.Execution.AssertionChain.WithExpectation(String message, Action`1 chain, Object[] args) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 192&#xD;
+   at FluentAssertions.Collections.GenericCollectionAssertions`3.BeEmpty(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Collections/GenericCollectionAssertions.cs:line 300&#xD;
+   at TaskMaster.Test.Ribbon.RibbonExplorerXmlTests.RibbonExplorerXml_CheckBoxOnActionCallbacksTakeControlAndPressedParameters() in C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\Ribbon\RibbonExplorerXmlTests.cs:line 452</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="RibbonExplorerXml_EveryCallbackNameResolvesToAPublicRibbonViewerMethod" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="175a1542-2c04-8a5e-a717-078ec1eae9bd">
+      <Execution id="0deddae8-d88e-4f3e-9898-351fa4fa26c5" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.RibbonExplorerXmlTests" name="RibbonExplorerXml_EveryCallbackNameResolvesToAPublicRibbonViewerMethod" />
+    </UnitTest>
+    <UnitTest name="RibbonExplorerXml_CheckBoxOnActionCallbacksTakeControlAndPressedParameters" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="1b7e799c-6f4b-85cb-8516-3906ee7c9098">
+      <Execution id="3e825048-053a-4ab4-91dd-be4de02e7818" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.RibbonExplorerXmlTests" name="RibbonExplorerXml_CheckBoxOnActionCallbacksTakeControlAndPressedParameters" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="175a1542-2c04-8a5e-a717-078ec1eae9bd" executionId="0deddae8-d88e-4f3e-9898-351fa4fa26c5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b7e799c-6f4b-85cb-8516-3906ee7c9098" executionId="3e825048-053a-4ab4-91dd-be4de02e7818" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="2" executed="2" passed="0" failed="2" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

@@ -93,6 +93,26 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             document.Should().NotContain("ItemViewer");
         }
 
+        /// <summary>
+        /// Issue #737 Findings 1 and 2: string-containment assertion against the public
+        /// <see cref="BreadcrumbDocumentAssets.BridgeJs"/> constant, following the
+        /// <see cref="Issue439ActiveAncestorChildrenAndEmbeddedBridgeUseTypedStoppedActivation"/>
+        /// precedent. This repository's test suite has no headless-browser or JS-engine
+        /// dependency, so this test verifies the JS text is present and correctly shaped --
+        /// not that it executes correctly in a real WebView2/Chromium document.
+        /// </summary>
+        [TestMethod]
+        public void Issue737BridgeJsPostsRowSelectedOnEnterAndScrollsSelectedRowIntoView()
+        {
+            // Act
+            string bridgeJs = BreadcrumbDocumentAssets.BridgeJs;
+
+            // Assert
+            bridgeJs.Should().Contain("e.key === 'Enter'");
+            bridgeJs.Should().Contain("post({ type: 'rowSelected', rowId: id });");
+            bridgeJs.Should().Contain("scrollIntoView({ block: 'nearest' })");
+        }
+
         [TestMethod]
         public void RenderRowFragment_EveryRowKind_EmitsTrailingPctFlexItem()
         {
