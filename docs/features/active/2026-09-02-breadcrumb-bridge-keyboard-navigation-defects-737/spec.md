@@ -87,18 +87,18 @@ The following files were read or referenced during research as context, as prece
 
 ## Acceptance Criteria
 
-- [ ] In `UtilitiesCS/OutlookObjects/Folder/BreadcrumbDocumentAssets.cs`'s `BridgeJs` constant, the inbound message listener scrolls the current `.rowwrap.selected` element into view (`scrollIntoView({ block: 'nearest' })`) after a `render` or `subfolderResult` DOM update, addressing Finding 1 (#640).
-- [ ] In the same `BridgeJs` constant, the `keydown` listener includes an `Enter` branch that posts `{ type: 'rowSelected', rowId: id }` using the same `.rowwrap.selected` lookup the arrow-key handler already uses, addressing Finding 2 (#641), and requires no new C#-side message type, codec branch, or router case.
-- [ ] A new MSTest test method in `UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbHtmlRendererTests.cs`, following the existing `Issue439...` string-containment precedent, asserts the rendered document (or the `BreadcrumbDocumentAssets.BridgeJs` constant directly) contains the Enter-triggered `rowSelected` post and the `scrollIntoView` call, with the JS-execution-harness limitation documented in the test's own comment or docstring.
-- [ ] In `UtilitiesCS.Test/OutlookObjects/Folder/FolderBreadcrumbBridgeRouterTests.cs`, `Route_LeftArrow_NothingToCollapse_ReportsUnhandledLeft` captures both previously-discarded `ArrowAsync(router, "left")` results and asserts each parses to a `RenderMessage`, addressing Finding 3 (#693), without modifying the `ArrowAsync` helper signature or any shared provider-mock/router factory in the file.
-- [ ] The fix for Finding 3 preserves the #440 ancestor-walk contract already documented in the test's in-code comment (two presses to reach the root on the three-segment fixture; `UnhandledArrowMessage` only on the third press), and is consistent with the sibling test `ArrowAsync_QfcLeftOnMultiSegmentRow_RoutesParentSelectTransition`.
-- [ ] No file outside the Write Set is modified. In particular, no Qfc-pipeline file (QuickFiler/Resources/FolderBreadcrumb.html, UtilitiesCS/OutlookObjects/Folder/FolderBreadcrumbBridgeRouter.cs, UtilitiesCS/OutlookObjects/Folder/BreadcrumbStateModel.cs, UtilitiesCS/OutlookObjects/Folder/BreadcrumbStateModel.Row.cs, QuickFiler/Viewers/BreadcrumbBridgeCoordinator.cs) and no #440 production logic in QuickFiler/Controllers/BreadcrumbBridgeRouter.Arrows.cs is altered.
-- [ ] The full C# toolchain (csharpier format/check, analyzer rebuild, nullable rebuild, vstest with coverage) passes cleanly in a single pass, per CLAUDE.md and `.claude/rules/general-code-change.md`, with no reduction in coverage on changed lines.
+- [x] In `UtilitiesCS/OutlookObjects/Folder/BreadcrumbDocumentAssets.cs`'s `BridgeJs` constant, the inbound message listener scrolls the current `.rowwrap.selected` element into view (`scrollIntoView({ block: 'nearest' })`) after a `render` or `subfolderResult` DOM update, addressing Finding 1 (#640).
+- [x] In the same `BridgeJs` constant, the `keydown` listener includes an `Enter` branch that posts `{ type: 'rowSelected', rowId: id }` using the same `.rowwrap.selected` lookup the arrow-key handler already uses, addressing Finding 2 (#641), and requires no new C#-side message type, codec branch, or router case.
+- [x] A new MSTest test method in `UtilitiesCS.Test/OutlookObjects/Folder/BreadcrumbHtmlRendererTests.cs`, following the existing `Issue439...` string-containment precedent, asserts the rendered document (or the `BreadcrumbDocumentAssets.BridgeJs` constant directly) contains the Enter-triggered `rowSelected` post and the `scrollIntoView` call, with the JS-execution-harness limitation documented in the test's own comment or docstring.
+- [x] In `UtilitiesCS.Test/OutlookObjects/Folder/FolderBreadcrumbBridgeRouterTests.cs`, `Route_LeftArrow_NothingToCollapse_ReportsUnhandledLeft` captures both previously-discarded `ArrowAsync(router, "left")` results and asserts each parses to a `RenderMessage`, addressing Finding 3 (#693), without modifying the `ArrowAsync` helper signature or any shared provider-mock/router factory in the file.
+- [x] The fix for Finding 3 preserves the #440 ancestor-walk contract already documented in the test's in-code comment (two presses to reach the root on the three-segment fixture; `UnhandledArrowMessage` only on the third press), and is consistent with the sibling test `ArrowAsync_QfcLeftOnMultiSegmentRow_RoutesParentSelectTransition`.
+- [x] No file outside the Write Set is modified. In particular, no Qfc-pipeline file (QuickFiler/Resources/FolderBreadcrumb.html, UtilitiesCS/OutlookObjects/Folder/FolderBreadcrumbBridgeRouter.cs, UtilitiesCS/OutlookObjects/Folder/BreadcrumbStateModel.cs, UtilitiesCS/OutlookObjects/Folder/BreadcrumbStateModel.Row.cs, QuickFiler/Viewers/BreadcrumbBridgeCoordinator.cs) and no #440 production logic in QuickFiler/Controllers/BreadcrumbBridgeRouter.Arrows.cs is altered.
+- [x] The full C# toolchain (csharpier format/check, analyzer rebuild, nullable rebuild, vstest with coverage) passes cleanly in a single pass, per CLAUDE.md and `.claude/rules/general-code-change.md`, with no reduction in coverage on changed lines.
 
 ### Acceptance Criteria Status
 
 - Source: docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737/spec.md
 - Total AC items: 7
-- Checked off (delivered): 0
-- Remaining (unchecked): 7
-- Items remaining: all seven items above (no implementation has occurred yet; this spec is a planning artifact only)
+- Checked off (delivered): 7
+- Remaining (unchecked): 0
+- Items remaining: none
