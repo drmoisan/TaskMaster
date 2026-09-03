@@ -5,7 +5,7 @@
   restore-verification; (2) unsuppressed `System.Reactive` unsupported-`packages.config`
   warning.
 - All evidence below was read directly from the working tree at
-  `C:\Users\DanMoisan\repos\TaskMaster\.claude\worktrees\agent-a7c9d039ae8df6121`
+  `<repo-root>`
   on branch `bug/ci-build-infra-debt-730` (based on `origin/main`) on 2026-09-02.
 - Both findings are configuration-only (workflow YAML / MSBuild property). No
   application source code was read or is proposed to change.
