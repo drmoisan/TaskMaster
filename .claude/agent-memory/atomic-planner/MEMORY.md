@@ -34,6 +34,7 @@
 - [#670](project_670_webview_fault_boundary_plan_seams.md) — awaiter `IsCompleted` breaks "no pump" test; Cobertura merge by filename
 - [#670 capture-time sanitisation](project_670_capture_time_sanitisation_seams.md) — a vswhere-resolved path leaks via an *indirect* invoker
 - [#680](project_680_menu_mode_plan_seams.md) — HostTests.cs 499 not 500; "optional" fallback was load-bearing
+- [#735 R1](project_735_evidence_content_sanitization_seams.md) — name-only sanitization gate can't fail; TRX `runUser=`/`computerName=` leak in content; csproj "between" clause self-contradictory
 
 ## Plan-structure traps
 

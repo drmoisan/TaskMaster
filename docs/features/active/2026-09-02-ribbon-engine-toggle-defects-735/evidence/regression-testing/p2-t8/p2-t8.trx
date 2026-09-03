@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="9c315b26-88b4-4852-a3a3-6c85f87ef3f5" name="REDACTED-ACCOUNT@REDACTED-MACHINE 2026-09-03 01:35:34" runUser="REDACTED-MACHINE\REDACTED-ACCOUNT" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-09-03T01:35:34.8104599-04:00" queuing="2026-09-03T01:35:34.8104599-04:00" start="2026-09-03T01:35:33.5425961-04:00" finish="2026-09-03T01:35:34.8255610-04:00" />
+  <TestSettings name="default" id="bf764f3a-091a-4f26-9d9a-bab8838faab9">
+    <Deployment runDeploymentRoot="REDACTED-ACCOUNT_REDACTED-MACHINE_2026-09-03_01_35_34" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="02e76575-9f13-4e5a-b3fc-39744a10ce7d" testId="1a61cdc3-54af-8d72-895f-296e552b3f86" testName="Constructor_WithNullNotifyDelegate_ThrowsArgumentNullException" computerName="REDACTED-MACHINE" duration="00:00:00.0002673" startTime="2026-09-03T01:35:34.6028171-04:00" endTime="2026-09-03T01:35:34.6038197-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="02e76575-9f13-4e5a-b3fc-39744a10ce7d" />
+    <UnitTestResult executionId="d8b39bd7-c3c3-4476-90a0-82f769486290" testId="18e5ec4d-fa0c-869f-bd41-5c96bd7103c4" testName="RunAsync_WhenAllDependenciesAvailable_InvokesResetWithResolvedManagerAndEngines" computerName="REDACTED-MACHINE" duration="00:00:00.0017832" startTime="2026-09-03T01:35:34.7315747-04:00" endTime="2026-09-03T01:35:34.7335746-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d8b39bd7-c3c3-4476-90a0-82f769486290" />
+    <UnitTestResult executionId="2b5da78d-fa87-4f19-8030-94654b6d798e" testId="1d0757c6-54f8-842b-b009-f9e97b76b26c" testName="RunAsync_WhenManagerIsNull_NotifiesOnceAndDoesNotInvokeReset" computerName="REDACTED-MACHINE" duration="00:00:00.0156717" startTime="2026-09-03T01:35:34.6758271-04:00" endTime="2026-09-03T01:35:34.6919454-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2b5da78d-fa87-4f19-8030-94654b6d798e" />
+    <UnitTestResult executionId="b22a76c2-25fd-4557-820c-12542137b241" testId="1e539e82-5a28-80cd-ba14-00de11da5eaf" testName="Constructor_WithNullAutoFileAccessor_ThrowsArgumentNullException" computerName="REDACTED-MACHINE" duration="00:00:00.0382000" startTime="2026-09-03T01:35:34.4710185-04:00" endTime="2026-09-03T01:35:34.5958101-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b22a76c2-25fd-4557-820c-12542137b241">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="16e7ae06-e0f9-4034-85ce-5a1fb0b1ff23" testId="11a00439-40c0-8a35-b63b-595ad692411c" testName="RunAsync_WhenAutoFileAccessorReturnsNull_NotifiesOnceAndDoesNotInvokeReset" computerName="REDACTED-MACHINE" duration="00:00:00.0672047" startTime="2026-09-03T01:35:34.6088193-04:00" endTime="2026-09-03T01:35:34.6758271-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="16e7ae06-e0f9-4034-85ce-5a1fb0b1ff23" />
+    <UnitTestResult executionId="61001c77-6f23-4370-b4fc-73666954e22d" testId="1eab07a6-be6e-8742-af95-f9b8ffb66a32" testName="RunAsync_WhenEnginesAccessorReturnsNull_NotifiesOnceAndDoesNotInvokeReset" computerName="REDACTED-MACHINE" duration="00:00:00.0398218" startTime="2026-09-03T01:35:34.6919454-04:00" endTime="2026-09-03T01:35:34.7315747-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="61001c77-6f23-4370-b4fc-73666954e22d" />
+    <UnitTestResult executionId="ef4353f6-cedc-41fc-bb87-bca4a7c4237c" testId="16bc5128-ce7d-8391-bf70-d60edcdadb4c" testName="RunAsync_WithNullReset_ThrowsArgumentNullExceptionBeforeProbingAccessors" computerName="REDACTED-MACHINE" duration="00:00:00.0049407" startTime="2026-09-03T01:35:34.6038197-04:00" endTime="2026-09-03T01:35:34.6088193-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ef4353f6-cedc-41fc-bb87-bca4a7c4237c" />
+    <UnitTestResult executionId="d15fe6ec-6fb4-4eb0-838d-f86b994f8938" testId="1c831bba-db11-8391-a8e5-699c033ccc68" testName="RunAsync_WhenResetFaults_PropagatesUnchangedAndDoesNotNotify" computerName="REDACTED-MACHINE" duration="00:00:00.0038652" startTime="2026-09-03T01:35:34.7335746-04:00" endTime="2026-09-03T01:35:34.7416287-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d15fe6ec-6fb4-4eb0-838d-f86b994f8938" />
+    <UnitTestResult executionId="58cfd445-f1a5-4f39-8230-451bbb8f0098" testId="17a48ff7-c86c-8887-a81c-8f0f6ae1e117" testName="Constructor_WithNullEnginesAccessor_ThrowsArgumentNullException" computerName="REDACTED-MACHINE" duration="00:00:00.0003864" startTime="2026-09-03T01:35:34.6018177-04:00" endTime="2026-09-03T01:35:34.6028171-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="58cfd445-f1a5-4f39-8230-451bbb8f0098" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Constructor_WithNullAutoFileAccessor_ThrowsArgumentNullException" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="1e539e82-5a28-80cd-ba14-00de11da5eaf">
+      <Execution id="b22a76c2-25fd-4557-820c-12542137b241" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.SpamManagerResetGateTests" name="Constructor_WithNullAutoFileAccessor_ThrowsArgumentNullException" />
+    </UnitTest>
+    <UnitTest name="RunAsync_WhenAllDependenciesAvailable_InvokesResetWithResolvedManagerAndEngines" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="18e5ec4d-fa0c-869f-bd41-5c96bd7103c4">
+      <Execution id="d8b39bd7-c3c3-4476-90a0-82f769486290" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.SpamManagerResetGateTests" name="RunAsync_WhenAllDependenciesAvailable_InvokesResetWithResolvedManagerAndEngines" />
+    </UnitTest>
+    <UnitTest name="Constructor_WithNullEnginesAccessor_ThrowsArgumentNullException" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="17a48ff7-c86c-8887-a81c-8f0f6ae1e117">
+      <Execution id="58cfd445-f1a5-4f39-8230-451bbb8f0098" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.SpamManagerResetGateTests" name="Constructor_WithNullEnginesAccessor_ThrowsArgumentNullException" />
+    </UnitTest>
+    <UnitTest name="RunAsync_WhenAutoFileAccessorReturnsNull_NotifiesOnceAndDoesNotInvokeReset" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="11a00439-40c0-8a35-b63b-595ad692411c">
+      <Execution id="16e7ae06-e0f9-4034-85ce-5a1fb0b1ff23" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.SpamManagerResetGateTests" name="RunAsync_WhenAutoFileAccessorReturnsNull_NotifiesOnceAndDoesNotInvokeReset" />
+    </UnitTest>
+    <UnitTest name="RunAsync_WhenResetFaults_PropagatesUnchangedAndDoesNotNotify" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="1c831bba-db11-8391-a8e5-699c033ccc68">
+      <Execution id="d15fe6ec-6fb4-4eb0-838d-f86b994f8938" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.SpamManagerResetGateTests" name="RunAsync_WhenResetFaults_PropagatesUnchangedAndDoesNotNotify" />
+    </UnitTest>
+    <UnitTest name="RunAsync_WhenEnginesAccessorReturnsNull_NotifiesOnceAndDoesNotInvokeReset" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="1eab07a6-be6e-8742-af95-f9b8ffb66a32">
+      <Execution id="61001c77-6f23-4370-b4fc-73666954e22d" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.SpamManagerResetGateTests" name="RunAsync_WhenEnginesAccessorReturnsNull_NotifiesOnceAndDoesNotInvokeReset" />
+    </UnitTest>
+    <UnitTest name="Constructor_WithNullNotifyDelegate_ThrowsArgumentNullException" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="1a61cdc3-54af-8d72-895f-296e552b3f86">
+      <Execution id="02e76575-9f13-4e5a-b3fc-39744a10ce7d" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.SpamManagerResetGateTests" name="Constructor_WithNullNotifyDelegate_ThrowsArgumentNullException" />
+    </UnitTest>
+    <UnitTest name="RunAsync_WithNullReset_ThrowsArgumentNullExceptionBeforeProbingAccessors" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="16bc5128-ce7d-8391-bf70-d60edcdadb4c">
+      <Execution id="ef4353f6-cedc-41fc-bb87-bca4a7c4237c" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.SpamManagerResetGateTests" name="RunAsync_WithNullReset_ThrowsArgumentNullExceptionBeforeProbingAccessors" />
+    </UnitTest>
+    <UnitTest name="RunAsync_WhenManagerIsNull_NotifiesOnceAndDoesNotInvokeReset" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="1d0757c6-54f8-842b-b009-f9e97b76b26c">
+      <Execution id="2b5da78d-fa87-4f19-8030-94654b6d798e" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.SpamManagerResetGateTests" name="RunAsync_WhenManagerIsNull_NotifiesOnceAndDoesNotInvokeReset" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1a61cdc3-54af-8d72-895f-296e552b3f86" executionId="02e76575-9f13-4e5a-b3fc-39744a10ce7d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18e5ec4d-fa0c-869f-bd41-5c96bd7103c4" executionId="d8b39bd7-c3c3-4476-90a0-82f769486290" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d0757c6-54f8-842b-b009-f9e97b76b26c" executionId="2b5da78d-fa87-4f19-8030-94654b6d798e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e539e82-5a28-80cd-ba14-00de11da5eaf" executionId="b22a76c2-25fd-4557-820c-12542137b241" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11a00439-40c0-8a35-b63b-595ad692411c" executionId="16e7ae06-e0f9-4034-85ce-5a1fb0b1ff23" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1eab07a6-be6e-8742-af95-f9b8ffb66a32" executionId="61001c77-6f23-4370-b4fc-73666954e22d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16bc5128-ce7d-8391-bf70-d60edcdadb4c" executionId="ef4353f6-cedc-41fc-bb87-bca4a7c4237c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c831bba-db11-8391-a8e5-699c033ccc68" executionId="d15fe6ec-6fb4-4eb0-838d-f86b994f8938" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17a48ff7-c86c-8887-a81c-8f0f6ae1e117" executionId="58cfd445-f1a5-4f39-8230-451bbb8f0098" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="9" executed="9" passed="9" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
