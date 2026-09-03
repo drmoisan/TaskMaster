@@ -1,0 +1,191 @@
+
+===== Context generated =====
+
+2026-09-03 01:01:17 UTC
+Head SHA: fafe3d4d1f5a3dfcd2c44d21245d085e4156faea
+
+
+===== PR Intent (edit before generating PR body) =====
+
+Primary outcome:
+Impact (user/developer):
+Risks:
+Author-asserted autoclose issues:
+
+===== Repository remotes =====
+
+origin	https://github.com/drmoisan/TaskMaster.git (fetch)
+origin	https://github.com/drmoisan/TaskMaster.git (push)
+
+
+===== Current branch =====
+
+bug/claude-md-cites-ciyml-for-moved-toolchain-commands-564
+
+
+===== Upstream =====
+
+origin/bug/claude-md-cites-ciyml-for-moved-toolchain-commands-564
+
+
+===== Status (short) =====
+
+## bug/claude-md-cites-ciyml-for-moved-toolchain-commands-564...origin/bug/claude-md-cites-ciyml-for-moved-toolchain-commands-564
+M  docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/spec.md
+?? docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/
+
+
+===== Untracked files =====
+
+docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/baseline/claude-md-citations-baseline.2026-09-02T08-58.md
+docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/baseline/phase0-instructions-read.2026-09-02T08-58.md
+docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/baseline/scope-boundary-declarations.2026-09-02T08-58.md
+docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac1.2026-09-02T08-58.md
+docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac2.2026-09-02T08-58.md
+docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac3.2026-09-02T08-58.md
+docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac4.2026-09-02T08-58.md
+docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/final-qa-summary.2026-09-02T08-58.md
+docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/line-scope-verification-ac7.2026-09-02T08-58.md
+docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/scope-verification-ac5.2026-09-02T08-58.md
+docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/scope-verification-ac6.2026-09-02T08-58.md
+
+
+===== Working tree diff (staged) =====
+
+M	docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/spec.md
+diff --git a/docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/spec.md b/docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/spec.md
+index 92821e98..9bb668af 100644
+--- a/docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/spec.md
++++ b/docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/spec.md
+@@ -101,13 +101,13 @@ Not applicable.
+ - Manual validation steps: read the corrected `CLAUDE.md` lines 194, 202, and 210-211 alongside the corresponding .github/workflows/_format-check.yml, .github/workflows/_build-analyzers.yml, and .github/workflows/_build-nullable.yml files to confirm each citation now names the file that actually contains the cited step.
+ 
+ ## Acceptance Criteria
+-- [ ] `CLAUDE.md` line ~194 cites .github/workflows/_format-check.yml (not ci.yml) for the CSharpier pinned-version claim.
+-- [ ] `CLAUDE.md` line ~202 cites .github/workflows/_build-analyzers.yml (not ci.yml) for the analyzer `/t:Build /m` claim.
+-- [ ] `CLAUDE.md` line ~210-211 cites .github/workflows/_build-nullable.yml (not ci.yml) for the nullable `TreatWarningsAsErrors` claim, retaining the step-name parenthetical "Build with nullable warnings treated as errors".
+-- [ ] No remaining citation to .github/workflows/ci.yml exists in `CLAUDE.md` for any of the three relocated commands.
+-- [ ] .claude/rules/csharp.md is unchanged.
+-- [ ] No file under .claude/**, .codex/**, .agents/**, config/blast-radius.json, or config/orchestration-routing.json is changed.
+-- [ ] The command text in all three cited bullets is unchanged (only the file citation is edited).
++- [x] `CLAUDE.md` line ~194 cites .github/workflows/_format-check.yml (not ci.yml) for the CSharpier pinned-version claim.
++- [x] `CLAUDE.md` line ~202 cites .github/workflows/_build-analyzers.yml (not ci.yml) for the analyzer `/t:Build /m` claim.
++- [x] `CLAUDE.md` line ~210-211 cites .github/workflows/_build-nullable.yml (not ci.yml) for the nullable `TreatWarningsAsErrors` claim, retaining the step-name parenthetical "Build with nullable warnings treated as errors".
++- [x] No remaining citation to .github/workflows/ci.yml exists in `CLAUDE.md` for any of the three relocated commands.
++- [x] .claude/rules/csharp.md is unchanged.
++- [x] No file under .claude/**, .codex/**, .agents/**, config/blast-radius.json, or config/orchestration-routing.json is changed.
++- [x] The command text in all three cited bullets is unchanged (only the file citation is edited).
+ 
+ ## Risks & Mitigations
+ - Technical or operational risks: low — a text-only Markdown edit with no execution path; the only risk is citing the wrong reusable workflow file name, mitigated by the direct verification performed in Root Cause Analysis above.
+
+
+===== Working tree diff (unstaged) =====
+
+
+
+
+===== PR Comparison =====
+
+Base ref (requested): main
+Base ref (resolved): origin/main @ 687f15fbf164d5aeff044a5ec17de18bc8622b27
+Head ref (resolved): bug/claude-md-cites-ciyml-for-moved-toolchain-commands-564 @ fafe3d4d1f5a3dfcd2c44d21245d085e4156faea
+Merge-base: 5ebaaf105d8241f309f704d1ff90af2e32e5a6c1
+Range: 5ebaaf105d8241f309f704d1ff90af2e32e5a6c1..fafe3d4d1f5a3dfcd2c44d21245d085e4156faea
+
+
+===== Commits in range =====
+
+fafe3d4d 2026-09-02 Dan Moisan docs(claude-md): repoint stale ci.yml citations to reusable workflow files (#564)\n\nCo-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_013hACTdEjvRjdP48xdJ2B5V
+87bcd632 2026-09-02 Dan Moisan docs(prep): remove backtick paths from #564 spec/plan to fix blast-radius harvest
+4479a355 2026-09-02 Dan Moisan docs(prep): prepare issue #564 feature folder and atomic plan
+
+
+===== Conventional commit type summary =====
+
+docs      : 3
+
+
+===== Authors =====
+
+Dan Moisan <drmoisan@gmail.com>
+
+
+===== Changed files (name-status) =====
+
+M	CLAUDE.md
+A	docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/issue.md
+A	docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/plan.2026-09-02T08-58.md
+A	docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/research/workflow-citation-mapping.2026-09-02T09-00.md
+A	docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/spec.md
+
+
+===== Diff shortstat =====
+
+ 5 files changed, 507 insertions(+), 3 deletions(-)
+
+
+===== Additions/Deletions totals (from numstat) =====
+
+Additions: 507
+Deletions: 3
+
+
+===== Files by extension =====
+
+       5  .md
+
+
+===== Referenced issues (detected) =====
+
+#553, #556, #564
+
+
+===== PRs in range =====
+
+(none)
+
+
+===== Diff stat =====
+
+ CLAUDE.md                                          |   6 +-
+ .../issue.md                                       |  82 +++++++++++
+ .../plan.2026-09-02T08-58.md                       | 150 ++++++++++++++++++++
+ .../workflow-citation-mapping.2026-09-02T09-00.md  | 153 +++++++++++++++++++++
+ .../spec.md                                        | 119 ++++++++++++++++
+ 5 files changed, 507 insertions(+), 3 deletions(-)
+
+
+===== Issue details =====
+
+(none)
+
+
+===== Contributing pull requests =====
+
+(none)
+
+
+===== Feature doc: claude-md-cites-ciyml-for-moved-toolchain-commands-564 =====
+
+Spec excerpts:
+Context: - `CLAUDE.md` cites .github/workflows/ci.yml as the source of three C# toolchain commands (CSharpier pinned-version parity, the analyzer `/t:Build /m` step, and the nullable `TreatWarningsAsErrors` step). PR #556 (issue #553, the CI parallel job split) moved the underlying steps out of ci.yml into five reusable `workflow_call` files; ci.yml is now a five-job dispatcher with no `msbuild` or `csharpier` invocation of its own.
+- Observed environment(s): repository documentation (`CLAUDE.md`), not runtime.
+- Customer impact and severity (who is affected, how often, how bad): every agent session loads `CLAUDE.md` first in the policy precedence order; any agent that follows a citation to verify a command finds nothing at that file, and the third citation names a step title that exists only...
+
+Proposed Fix: ### Design summary (what changes where):
+Three inline-text edits to `CLAUDE.md`:
+1. Line ~194 (end of the CSharpier bullet): replace the .github/workflows/ci.yml citation with .github/workflows/_format-check.yml.
+2. Line ~202 (end of the analyzer bullet): replace the .github/workflows/ci.yml citation with .github/workflows/_build-analyzers.yml.
+3. Line ~210 (start of the nullable-command explanatory bullet): replace the .github/workflows/ci.yml citation with .github/workflows/_build-nullable.yml; the parenthetical step name "Build with nullable warnings treated as errors" is retained unchanged because it correctly names the step inside _build-nullable.yml.
+
+### Boundaries and invariants to preserve:
+- Do not alter any command text (`dotnet tool run csharpier check .`, the `msbuil...
+
+Acceptance Criteria: - [x] `CLAUDE.md` line ~194 cites .github/workflows/_format-check.yml (not ci.yml) for the CSharpier pinned-version claim.
+- [x] `CLAUDE.md` line ~202 cites .github/workflows/_build-analyzers.yml (not ci.yml) for the analyzer `/t:Build /m` claim.
+- [x] `CLAUDE.md` line ~210-211 cites .github/workflows/_build-nullable.yml (not ci.yml) for the nullable `TreatWarningsAsErrors` claim, retaining the step-name parenthetical "Build with nullable warnings treated as errors".
+- [x] No remaining citation to .github/workflows/ci.yml exists in `CLAUDE.md` for any of the three relocated commands.
+- [x] .claude/rules/csharp.md is unchanged.
+- [x] No file under .claude/**, .codex/**, .agents/**, config/blast-radius.json, or config/orchestration-routing.json is changed.
+- [x] The command text in...

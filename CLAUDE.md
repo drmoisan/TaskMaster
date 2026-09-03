@@ -191,7 +191,7 @@ These are the required tools for C# code in this repo:
    - Approved commands (CSharpier is pinned to 1.2.6 by `dotnet-tools.json`; v1 requires a subcommand, so the bare-path form does not run):
      - Apply formatting: `dotnet tool run csharpier format .`
      - Verify, read-only, CI parity: `dotnet tool run csharpier check .`
-   - Always invoke through `dotnet tool run` so the manifest-pinned version is used. Do not invoke a globally installed `csharpier`: a different global version produces diffs that disagree with `.github/workflows/ci.yml`, which runs the pinned version after `dotnet tool restore`.
+   - Always invoke through `dotnet tool run` so the manifest-pinned version is used. Do not invoke a globally installed `csharpier`: a different global version produces diffs that disagree with `.github/workflows/_format-check.yml`, which runs the pinned version after `dotnet tool restore`.
 
 2. **Linting / Static Analysis — .NET analyzers**
    - C# code must pass Roslyn/.NET analyzer diagnostics configured by `.editorconfig`, `.globalconfig`, and project properties.
@@ -199,7 +199,7 @@ These are the required tools for C# code in this repo:
    - Prefer fixing diagnostics over suppressing them.
    - Approved commands (PowerShell):
      - `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
-   - Use `/t:Rebuild`, not `/t:Build`. Analyzer diagnostics are produced during compilation, and MSBuild's incremental up-to-date check compares timestamps without invalidating on a command-line `/p:` change, so a warm `/t:Build` returns exit 0 with `CoreCompile` skipped on every project and runs no analyzers. `.github/workflows/ci.yml` uses `/t:Build /m` for its analyzer step because a runner checkout is always cold; a local working tree is not.
+   - Use `/t:Rebuild`, not `/t:Build`. Analyzer diagnostics are produced during compilation, and MSBuild's incremental up-to-date check compares timestamps without invalidating on a command-line `/p:` change, so a warm `/t:Build` returns exit 0 with `CoreCompile` skipped on every project and runs no analyzers. `.github/workflows/_build-analyzers.yml` uses `/t:Build /m` for its analyzer step because a runner checkout is always cold; a local working tree is not.
 
 3. **Type Checking — C# compiler + nullable analysis**
    - Treat C# compiler diagnostics and nullable-flow warnings as first-class type-safety checks.
@@ -207,7 +207,7 @@ These are the required tools for C# code in this repo:
    - Avoid introducing nullable warnings; fix the root null-state issue instead.
    - Approved commands (PowerShell):
      - `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
-   - This is character-for-character the command in `.github/workflows/ci.yml` (step "Build with nullable warnings treated as errors"). Two properties of it are load-bearing and must not be "restored":
+   - This is character-for-character the command in `.github/workflows/_build-nullable.yml` (step "Build with nullable warnings treated as errors"). Two properties of it are load-bearing and must not be "restored":
      - **Do not add `/p:Nullable=enable`.** No project in this repository carries a `<Nullable>` element and there is no `Directory.Build.props`, so the property is a solution-wide opt-in that conscripts every file which has never adopted the pragma. Forcing it produced 195 errors in `UtilitiesCS.csproj` on 2026-08-10 against zero errors without it, and CI omits it deliberately. Removing it loses no enforcement over any file that has opted in.
      - **Do not use `/t:Build`.** MSBuild's up-to-date check does not invalidate on a command-line `/p:` change, so a warm `/t:Build` returns exit 0 having skipped `CoreCompile` on every project: the gate cannot fail.
 
