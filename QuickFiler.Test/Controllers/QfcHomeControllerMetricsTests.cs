@@ -224,7 +224,7 @@ namespace QuickFiler.Controllers.Tests
         /// <summary>
         /// Issue #222 sites 5-7: <c>WriteMetricsAsync</c> must source its date/time stamps and the
         /// OlEndTime from the injected <see cref="TimeProvider"/>. The formatted dataLineBeg
-        /// ("MM/dd/yyyy","hh:mm") and the OlEndTime passed to GetMoveDiagnostics must reflect the
+        /// ("MM/dd/yyyy","HH:mm") and the OlEndTime passed to GetMoveDiagnostics must reflect the
         /// injected clock, not wall-clock. Fails if the seam is bypassed.
         /// </summary>
         [TestMethod]
@@ -240,7 +240,7 @@ namespace QuickFiler.Controllers.Tests
             controller.TimeProvider = fake;
             var expectedLocal = fake.GetLocalNow().LocalDateTime;
             var expectedDataLineBeg =
-                expectedLocal.ToString("MM/dd/yyyy") + "," + expectedLocal.ToString("hh:mm") + ",";
+                expectedLocal.ToString("MM/dd/yyyy") + "," + expectedLocal.ToString("HH:mm") + ",";
 
             // Act
             await controller.WriteMetricsAsync("metrics.csv");
@@ -262,7 +262,7 @@ namespace QuickFiler.Controllers.Tests
 
         /// <summary>
         /// Issue #222 site 4: <c>QuickFileMetrics_WRITE</c> must build its data line and endTime from
-        /// the injected <see cref="TimeProvider"/>. The dataLineBeg ("MM/dd/yyyy","hh:mm") and the
+        /// the injected <see cref="TimeProvider"/>. The dataLineBeg ("MM/dd/yyyy","HH:mm") and the
         /// endTime passed to GetMoveDiagnostics must reflect the injected clock. Fails if bypassed.
         /// </summary>
         [TestMethod]
@@ -275,7 +275,7 @@ namespace QuickFiler.Controllers.Tests
             controller.TimeProvider = fake;
             var expectedLocal = fake.GetLocalNow().LocalDateTime;
             var expectedDataLineBeg =
-                expectedLocal.ToString("MM/dd/yyyy") + "," + expectedLocal.ToString("hh:mm") + ",";
+                expectedLocal.ToString("MM/dd/yyyy") + "," + expectedLocal.ToString("HH:mm") + ",";
 
             // Act
             controller.QuickFileMetrics_WRITE("metrics.csv");

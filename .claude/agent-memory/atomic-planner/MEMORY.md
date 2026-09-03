@@ -35,6 +35,7 @@
 - [#670 capture-time sanitisation](project_670_capture_time_sanitisation_seams.md) — a vswhere-resolved path leaks via an *indirect* invoker
 - [#680](project_680_menu_mode_plan_seams.md) — HostTests.cs 499 not 500; "optional" fallback was load-bearing
 - [#731](project_731_lifecycle_disposal_plan_seams.md) — Defects468Tests 498/500 forces a partial continuation; QfcQueue.cs already 505; spec said ONE comment line not three; R3 = all 4 defects in gate wiring; R4 = worktree not bootstrapped (no `.dotnet-sdk/`, no `packages/`), `DebugType=full` leaks host paths, 1:1 line mapping unsatisfiable for a 1-to-20 hunk; R5 = case-insensitive token absence collides with a retained method name, `.//line` double-counts on two axes, unconditional AC17 check-off vs two degraded branches; R6 = document state is DERIVED from exit code (`:236`/`:341` throw before the `:343` write), an exclusion keyed on the regression's own definition is vacuous, `line-rate` is a fraction not a percentage, unanchored filename suffix also selects `IQfcDatamodel.cs`
+- [#735 R1](project_735_evidence_content_sanitization_seams.md) — name-only sanitization gate can't fail; TRX `runUser=`/`computerName=` leak in content; csproj "between" clause self-contradictory
 
 ## Plan-structure traps
 

@@ -123,6 +123,14 @@ namespace UtilitiesCS
                     // error, so this is the single point at which success is established.
                     return true;
                 }
+                catch (DirectoryNotFoundException ex)
+                {
+                    logger.Error(
+                        $"Failed to write to {filepath}: the target directory does not exist.",
+                        ex
+                    );
+                    return false;
+                }
                 catch (IOException ex)
                 {
                     if (opened)

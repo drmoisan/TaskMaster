@@ -55,6 +55,7 @@
 - [analyzer-severity-ceiling-and-runsettings-split](project_analyzer_severity_ceiling_and_runsettings_split.md) — MSTEST0032 is the ONLY rule above suggestion; no .globalconfig; Invoke-MSTest.ps1 docstring names the wrong runsettings (2026-08-31)
 - [issue-656-bypass-path-does-not-exist](project_issue_656_bypass_path_does_not_exist.md) — #656 premise FALSE: no bypassing reopen path exists; SR-4's "no IsOpen under _sync" already violated at :112; both nominated owner files at the 500-line cap (2026-08-31)
 - [qfc663-alt-chord-no-altf](project_qfc663_alt_chord_no_altf.md) — #663: QfcFormViewer has NO menus/mnemonics of its own; only Alt+M (from hosted ItemViewer) is swallowed, Alt+F is EFC-only; #464 deferred the shared predicate for file-ownership reasons only (2026-09-01)
+- [ribbon-engine-toggle-defects-735](project_ribbon_engine_toggle_defects_735.md) — #735: RibbonExplorer.xml IS CSharpier-formatted; 84 distinct callback names (5 dead, 8 in comments); ManagerAsyncLazy test-constructible; 459-line test file forces partial split (2026-09-02)
 - [banner-prefix-arity-662](project_banner_prefix_arity_662.md) — #662: AC2's decl regex contradicts AC5's aliasing remedy; the "must agree" assertion does NOT catch the widening (only the BeFalse line does); `/Tests:` and `/TestCaseFilter:` are mutually exclusive (2026-08-31)
 - [qfc-lifecycle-disposal-731](project_qfc_lifecycle_disposal_731.md) — #731: sharing EmailMoveMonitor DROPS move actions; `volatile` = CS0420 build break; TWO dead ctor params; Cleanup() is UI-thread so no Task.Wait (2026-09-02)
 
