@@ -11,8 +11,8 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | max_concurrency | 16 |
 | current_cohort | 2 |
 | recolor_generation | 1 |
-| last_updated | 2026-09-03T07-57 |
-| next_step | Launch 584 and 707 immediately; both are edge-free under the corrected relation. Await 645 and 732; merging 645 releases 731, and 645 plus 732 release 736. |
+| last_updated | 2026-09-03T08-11 |
+| next_step | Await 645, 584 and 707. Merging 645 releases 731 and, together with the already merged 732, releases 736. Create each pull request from the parent on READY FOR PR and merge on durably confirmed green, updating the branch first whenever main has advanced. |
 
 ## Items
 
@@ -26,7 +26,7 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 729 | docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/746 | a679cd082819af6788cd0fb35f4366786fab87e3 |
 | 730 | docs/features/active/2026-09-02-ci-build-infra-debt-730 | 1 | merged | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/747 | 196561ca7a7f595bd88619e908e971b5636b6192 |
 | 731 | docs/features/active/2026-09-02-quickfiler-controller-lifecycle-disposal-defects-731 | 3 | scheduled | not_started | - | - |
-| 732 | docs/features/active/2026-09-02-folderconverter-folderpredictor-dead-code-and-bugs-732 | 2 | in_flight | worktree_created | - | - |
+| 732 | docs/features/active/2026-09-02-folderconverter-folderpredictor-dead-code-and-bugs-732 | 2 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/754 | f8414ee979e1884c4a93703523509d4f45e89151 |
 | 733 | docs/features/active/2026-09-02-coverage-cobertura-mstest-powershell-tooling-defects-733 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/748 | b13d5b7b1a6dd0aa79d51d48a7156ee67377f9d0 |
 | 735 | docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735 | 1 | merged | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/749 | b01c37654b4cf0a470b09d565fcd5b76d2bcd758 |
 | 736 | docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736 | 4 | scheduled | not_started | - | - |
@@ -44,7 +44,7 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 729 | 2026-09-02T18-10 | 2026-09-03T00-38 | 2026-09-03T01-04 | 2026-09-03T01-05 | - |
 | 730 | 2026-09-02T22-15 | 2026-09-03T00-45 | 2026-09-03T01-13 | 2026-09-03T01-14 | 2026-09-03T01-18 |
 | 731 | - | - | - | - | - |
-| 732 | 2026-09-03T07-19 | - | - | - | - |
+| 732 | 2026-09-03T07-19 | 2026-09-03T07-59 | 2026-09-03T08-10 | 2026-09-03T08-11 | - |
 | 733 | 2026-09-02T18-10 | 2026-09-03T01-06 | 2026-09-03T01-21 | 2026-09-03T01-21 | - |
 | 735 | 2026-09-03T01-08 | 2026-09-03T01-27 | 2026-09-03T07-10 | 2026-09-03T07-11 | 2026-09-03T07-12 |
 | 736 | - | - | - | - | - |
