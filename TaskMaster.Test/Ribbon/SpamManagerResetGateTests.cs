@@ -66,11 +66,7 @@ namespace TaskMaster.Test.Ribbon
         {
             // Arrange, Act
             Action act = () =>
-                new SpamManagerResetGate(
-                    null!,
-                    () => new Mock<IAppItemEngines>().Object,
-                    _ => { }
-                );
+                new SpamManagerResetGate(null!, () => new Mock<IAppItemEngines>().Object, _ => { });
 
             // Assert
             act.Should()
@@ -314,8 +310,7 @@ namespace TaskMaster.Test.Ribbon
             );
 
             // Act
-            Func<Task> act = () =>
-                gate.RunAsync((manager, engines) => Task.FromException(failure));
+            Func<Task> act = () => gate.RunAsync((manager, engines) => Task.FromException(failure));
 
             // Assert
             var thrown = await act.Should()

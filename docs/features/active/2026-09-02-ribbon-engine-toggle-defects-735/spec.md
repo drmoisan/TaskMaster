@@ -160,8 +160,8 @@ The existing harness needs no modification.
 - [x] The gate carries **no** `ExcludeFromCodeCoverage` attribute, no `Microsoft.Office` using, no `System.Windows.Forms` using and no logger field, and its XML documentation records that the absence of the coverage attribute is deliberate.
 - [x] `ClearSpamManagerAsync` retains its synchronization-context preamble and its confirmation dialog unchanged and in their existing order, and routes only its engine-touching statements through the gate's deferred lambda. No inline ad-hoc null guard is introduced.
 - [x] All nine tests in the new gate fixture pass: three constructor null-argument cases, one null-reset case using strict accessors, three not-ready cases (null auto-file objects, unset manager, null engines), one success case asserting the resolved manager and engines are passed through by identity with no notification, and one faulting-reset case asserting the fault propagates with no notification.
-- [ ] Line coverage for the new gate class is at least 90%, meeting the new-module rule.
-- [ ] **No new `ExcludeFromCodeCoverage` attribute is introduced anywhere in the diff**, and no existing exemption is widened. The residual lines inside `ClearSpamManagerAsync` remain inside the ribbon controller's pre-existing type-level exemption, and the change description asserts no coverage credit for them.
+- [x] Line coverage for the new gate class is at least 90%, meeting the new-module rule.
+- [x] **No new `ExcludeFromCodeCoverage` attribute is introduced anywhere in the diff**, and no existing exemption is widened. The residual lines inside `ClearSpamManagerAsync` remain inside the ribbon controller's pre-existing type-level exemption, and the change description asserts no coverage credit for them.
 - [ ] The change description records the manual verification: the not-ready notice is observed instead of a `NullReferenceException` when Clear Spam Manager is confirmed before initialization completes, and the reset still runs end to end when repeated after initialization completes.
 
 ### Finding 3 — toggle-state last-writer race
@@ -175,10 +175,10 @@ The existing harness needs no modification.
 
 ### Cross-cutting
 
-- [ ] All three new source files are registered as compile items in their respective legacy non-SDK project files, and the solution builds.
-- [ ] Every file created or modified by this change is under the 500-line ceiling after formatting; line counts are verified for the coordinator source, the Intelligence partial, the XML-consistency fixture, and the new coordinator race file.
-- [ ] The full toolchain passes in order in a single pass with no failures and no auto-fixes: format, analyzers, nullable type-check, and tests with coverage.
-- [ ] No behavior outside the three findings changes; in particular the eight QuickFiler-settings members, the orphaned folder-classifier handler, and the three not-implemented bound handlers are left untouched and are recorded here as separate follow-ups.
+- [x] All three new source files are registered as compile items in their respective legacy non-SDK project files, and the solution builds.
+- [x] Every file created or modified by this change is under the 500-line ceiling after formatting; line counts are verified for the coordinator source, the Intelligence partial, the XML-consistency fixture, and the new coordinator race file.
+- [x] The full toolchain passes in order in a single pass with no failures and no auto-fixes: format, analyzers, nullable type-check, and tests with coverage.
+- [x] No behavior outside the three findings changes; in particular the eight QuickFiler-settings members, the orphaned folder-classifier handler, and the three not-implemented bound handlers are left untouched and are recorded here as separate follow-ups.
 
 ## Risks & Mitigations
 

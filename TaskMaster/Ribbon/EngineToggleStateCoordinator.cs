@@ -62,18 +62,12 @@ namespace TaskMaster
         private readonly object _primeGate = new object();
 
         /// <summary>
-        /// Monotonic ticket source for activation observations. Read and written only through
-        /// <see cref="Interlocked"/>.
-        /// </summary>
-        private long _stateSequence;
-
-        /// <summary>
         /// Last-known activation state per engine key, each stamped with the ticket of the read
-        /// that produced it. A key absent from this map has never been primed successfully and
-        /// reports as unchecked.
+        /// that produced it. A key absent from this cache has never been primed successfully and
+        /// reports as unchecked. The compare-and-apply semantics live in the cache type.
         /// </summary>
-        private readonly ConcurrentDictionary<string, PressedState> _pressedState =
-            new ConcurrentDictionary<string, PressedState>(StringComparer.Ordinal);
+        private readonly EngineTogglePressedStateCache _pressedState =
+            new EngineTogglePressedStateCache();
 
         /// <summary>
         /// The in-flight — or most recently completed — prime per engine key. Its presence is the
@@ -146,80 +140,13 @@ namespace TaskMaster
                 return false;
             }
 
-            if (_pressedState.TryGetValue(engineName, out var cached))
+            if (_pressedState.TryGetActive(engineName, out var cached))
             {
-                return cached.Active;
+                return cached;
             }
 
             StartPrimeIfNeeded(engineName, controlId);
             return false;
-        }
-
-        /// <summary>
-        /// Issues the next monotonic observation ticket.
-        /// </summary>
-        /// <remarks>
-        /// A writer takes its ticket immediately BEFORE invoking the activation read, because the
-        /// freshness of a cached value is determined by when its underlying observation began, not
-        /// by when its write lands. A single process-wide counter is sufficient even though the
-        /// cache is per-key, because tickets are only ever compared within a key.
-        /// </remarks>
-        private long NextSequence() => Interlocked.Increment(ref _stateSequence);
-
-        /// <summary>
-        /// Stores an observation only when no newer observation is already cached for the key.
-        /// </summary>
-        /// <param name="engineName">The engine key; ordinal, case-sensitive.</param>
-        /// <param name="active">The observed activation state.</param>
-        /// <param name="sequence">The ticket taken before the observation began.</param>
-        /// <returns>
-        /// <see langword="true"/> when the write was applied, so the caller can invalidate the
-        /// control only on a real change.
-        /// </returns>
-        /// <remarks>
-        /// <para>
-        /// An explicit compare-and-swap loop is used rather than an add-or-update factory, because
-        /// such a factory may run more than once under contention, which makes "did my write land?"
-        /// non-obvious to a reader. The loop terminates: each iteration either returns or observes
-        /// a strictly newer stored ticket.
-        /// </para>
-        /// <para>
-        /// <see cref="PressedState"/> is a reference type precisely so the conditional update
-        /// compares by reference identity, which is the compare-and-swap semantic needed here. A
-        /// value tuple would degrade the comparison to structural equality, weakening the guard to
-        /// "the value looked the same".
-        /// </para>
-        /// </remarks>
-        private bool TryApplyState(string engineName, bool active, long sequence)
-        {
-            while (true)
-            {
-                if (!_pressedState.TryGetValue(engineName, out var existing))
-                {
-                    if (_pressedState.TryAdd(engineName, new PressedState(active, sequence)))
-                    {
-                        return true;
-                    }
-
-                    continue;
-                }
-
-                if (existing.Sequence >= sequence)
-                {
-                    return false;
-                }
-
-                if (
-                    _pressedState.TryUpdate(
-                        engineName,
-                        new PressedState(active, sequence),
-                        existing
-                    )
-                )
-                {
-                    return true;
-                }
-            }
         }
 
         /// <summary>
@@ -298,10 +225,10 @@ namespace TaskMaster
 
             // The ticket is taken after the toggle completes and before the activation read,
             // because that is the moment this observation window opens.
-            var sequence = NextSequence();
+            var sequence = _pressedState.NextSequence();
             var active = await engines.EngineActiveAsync(engineName).ConfigureAwait(false);
 
-            if (TryApplyState(engineName, active, sequence))
+            if (_pressedState.TryApplyState(engineName, active, sequence))
             {
                 _invalidateControl(controlId);
             }
@@ -388,10 +315,10 @@ namespace TaskMaster
         {
             // The ticket is taken immediately before the activation read, so a prime whose
             // observation began before a toggle's cannot overwrite the toggle's newer result.
-            var sequence = NextSequence();
+            var sequence = _pressedState.NextSequence();
             var active = await engines.EngineActiveAsync(engineName).ConfigureAwait(false);
 
-            if (TryApplyState(engineName, active, sequence))
+            if (_pressedState.TryApplyState(engineName, active, sequence))
             {
                 _invalidateControl(controlId);
             }
@@ -483,33 +410,6 @@ namespace TaskMaster
                 "The engine key '{0}' has no toggle checkbox in EngineToggleCatalog.",
                 RenderEngineName(engineName)
             );
-        }
-
-        /// <summary>
-        /// One cached activation observation: the value, plus the ticket of the read that produced
-        /// it.
-        /// </summary>
-        /// <remarks>
-        /// Deliberately a reference type. <see cref="ConcurrentDictionary{TKey, TValue}.TryUpdate"/>
-        /// compares the supplied comparand with the stored value, and for a reference type with no
-        /// equality override that comparison is reference identity — exactly the compare-and-swap
-        /// semantic <see cref="TryApplyState"/> needs. A value tuple would be compared structurally,
-        /// so an unrelated writer that happened to store an equal value would satisfy the comparand
-        /// check and the guard would silently weaken to "the value looked the same".
-        /// </remarks>
-        private sealed class PressedState
-        {
-            internal PressedState(bool active, long sequence)
-            {
-                Active = active;
-                Sequence = sequence;
-            }
-
-            /// <summary>The observed activation state.</summary>
-            internal bool Active { get; }
-
-            /// <summary>The monotonic ticket taken before the observation began.</summary>
-            internal long Sequence { get; }
         }
     }
 }

@@ -428,7 +428,9 @@ namespace TaskMaster.Test.Ribbon
 
                 var controlId = checkBox.Attribute("id")?.Value ?? "(no id)";
                 var candidates = viewerMethods
-                    .Where(method => string.Equals(method.Name, onAction.Value, StringComparison.Ordinal))
+                    .Where(method =>
+                        string.Equals(method.Name, onAction.Value, StringComparison.Ordinal)
+                    )
                     .ToList();
 
                 if (candidates.Count == 0)

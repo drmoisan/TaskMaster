@@ -460,6 +460,7 @@
     <Compile Include="Ribbon\EngineGatedCommandRunner.cs" />
     <Compile Include="Ribbon\EngineReadinessGate.cs" />
     <Compile Include="Ribbon\EngineToggleCatalog.cs" />
+    <Compile Include="Ribbon\EngineTogglePressedStateCache.cs" />
     <Compile Include="Ribbon\EngineToggleStateCoordinator.cs" />
     <Compile Include="Ribbon\RibbonController.cs" />
     <Compile Include="Ribbon\RibbonController.EngineCommands.cs" />
