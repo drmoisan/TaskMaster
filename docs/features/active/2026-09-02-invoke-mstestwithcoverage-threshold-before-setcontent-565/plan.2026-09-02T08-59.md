@@ -155,6 +155,6 @@ Run the three steps below in this exact order. If any step fails, or rewrites a 
 - [x] [P6-T3] Mirror an issue update for #565 and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/issue-updates/issue-565.<timestamp>.md`.
   - Acceptance: the artifact carries `Timestamp:`, the exact text intended/posted (summarizing the statement-reorder fix and linking the branch `bug/invoke-mstestwithcoverage-threshold-before-setcontent-565`), and `PostedAs: comment` or `PostedAs: unknown` with a `POSTING BLOCKED` header and reason if not posted.
 
-- [ ] [P6-T4] Confirm a clean working tree and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/other/final-clean-tree.<timestamp>.md`.
+- [x] [P6-T4] Confirm a clean working tree and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/other/final-clean-tree.<timestamp>.md`.
   - Command: `git status --porcelain`.
   - Acceptance: the artifact records the verbatim output; either it is empty (everything committed) or it lists only files intentionally left uncommitted with an explicit reason. The plan outcome is INCOMPLETE if any in-scope edit (the two owned files, or this feature folder's own evidence/doc artifacts) remains uncommitted with no reason recorded.
