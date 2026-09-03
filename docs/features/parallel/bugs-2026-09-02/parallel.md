@@ -1,7 +1,7 @@
 ---
 parallel: "bugs-2026-09-02"
 mode: "open"
-max_concurrency: 7
+max_concurrency: 16
 created_at: "2026-09-02T20:45:00Z"
 items:
   - issue_num: 564
@@ -757,9 +757,10 @@ hand-append, because `config/blast-radius.json` lists `scripts/vscode/**` as a
 - 564 rewrites `CLAUDE.md` prose that cites the reusable workflow files, and 730
   rewrites those files themselves. The resulting edge is genuine coupling.
 
-`max_concurrency` is 7, which exceeds the widest cohort, so it throttles nothing
-in this run. It is recorded at the value the operator declared for preparation
-fan-out. Raising it cannot widen the run; only a less contended item set can.
+`max_concurrency` is 16, which exceeds the item count, so it throttles nothing
+in this run. It was recorded at 7 for preparation fan-out and raised to 16 on
+2026-09-02 by operator instruction so that no batch split can occur at any
+cohort width. Raising it cannot widen the run; only a less contended item set can.
 
 ## Residual Over-Reporting
 

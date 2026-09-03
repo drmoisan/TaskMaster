@@ -8,7 +8,7 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | --- | --- |
 | parallel_slug | bugs-2026-09-02 |
 | mode | open |
-| max_concurrency | 7 |
+| max_concurrency | 16 |
 | current_cohort | 0 |
 | recolor_generation | 0 |
 | last_updated | 2026-09-02T18-10 |
