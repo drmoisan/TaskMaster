@@ -1,8 +1,8 @@
 
 ===== Context generated =====
 
-2026-09-03 01:01:17 UTC
-Head SHA: fafe3d4d1f5a3dfcd2c44d21245d085e4156faea
+2026-09-03 04:40:11 UTC
+Head SHA: ff2106fe9da48a4afec7d7cee023b47d6655b938
 
 
 ===== GitHub CLI status =====
@@ -19,10 +19,10 @@ Author-asserted autoclose issues:
 ===== Base/Head =====
 
 Base ref (requested): main
-Base ref (resolved): origin/main @ 687f15fbf164d5aeff044a5ec17de18bc8622b27
-Head ref (resolved): bug/claude-md-cites-ciyml-for-moved-toolchain-commands-564 @ fafe3d4d1f5a3dfcd2c44d21245d085e4156faea
-Merge base: 5ebaaf105d8241f309f704d1ff90af2e32e5a6c1
-Range: 5ebaaf105d8241f309f704d1ff90af2e32e5a6c1..fafe3d4d1f5a3dfcd2c44d21245d085e4156faea
+Base ref (resolved): origin/main @ 8be5a6aac3b5a82c86241fbbf989fd9118602c56
+Head ref (resolved): bug/ci-build-infra-debt-730 @ ff2106fe9da48a4afec7d7cee023b47d6655b938
+Merge base: 8be5a6aac3b5a82c86241fbbf989fd9118602c56
+Range: 8be5a6aac3b5a82c86241fbbf989fd9118602c56..ff2106fe9da48a4afec7d7cee023b47d6655b938
 
 
 ===== Issues to autoclose (verified or pending) =====
@@ -36,9 +36,13 @@ Auto-close issues (verified from GitHub PR metadata):
 None (GitHub CLI unavailable)
 
 Auto-close issues (author asserted):
-- #553
-- #556
-- #564
+- #395
+- #561
+- #562
+- #563
+- #569
+- #570
+- #730
 
 Referenced issues (detected):
 (none)
@@ -46,66 +50,93 @@ Referenced issues (detected):
 
 ===== Additional context files =====
 
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac1.2026-09-02T08-58.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac2.2026-09-02T08-58.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac3.2026-09-02T08-58.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac4.2026-09-02T08-58.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/final-qa-summary.2026-09-02T08-58.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/line-scope-verification-ac7.2026-09-02T08-58.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/scope-verification-ac5.2026-09-02T08-58.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/scope-verification-ac6.2026-09-02T08-58.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/issue.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/plan.2026-09-02T08-58.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/spec.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/other/research-line8-pre-edit.2026-09-02T23-56.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/csharpier-check.2026-09-02T23-13.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/diff-build-analyzers.2026-09-02T23-09.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/diff-build-nullable.2026-09-02T23-09.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/diff-mstest-coverage.2026-09-02T23-10.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/git-scope-boundary.2026-09-02T23-08.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/git-stage-scope.2026-09-02T23-07.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/log-sanitization.2026-09-02T23-31.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-analyzers-post.2026-09-02T23-11.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-nullable-post.2026-09-02T23-12.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/research-sanitization-verification.2026-09-02T23-56.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/vstest-regression.2026-09-02T23-16.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/issue.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/plan.2026-09-02T08-57.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/spec.md
 
 
 ===== Feature doc excerpts =====
 
-Feature: claude-md-cites-ciyml-for-moved-toolchain-commands-564
+Feature: 2026-09-02-ci-build-infra-debt-730
 Excerpt:
 
-===== Feature doc: claude-md-cites-ciyml-for-moved-toolchain-commands-564 =====
+===== Feature doc: 2026-09-02-ci-build-infra-debt-730 =====
 
 Spec excerpts:
-Context: - `CLAUDE.md` cites .github/workflows/ci.yml as the source of three C# toolchain commands (CSharpier pinned-version parity, the analyzer `/t:Build /m` step, and the nullable `TreatWarningsAsErrors` step). PR #556 (issue #553, the CI parallel job split) moved the underlying steps out of ci.yml into five reusable `workflow_call` files; ci.yml is now a five-job dispatcher with no `msbuild` or `csharpier` invocation of its own.
-- Observed environment(s): repository documentation (`CLAUDE.md`), not runtime.
-- Customer impact and severity (who is affected, how often, how bad): every agent session loads `CLAUDE.md` first in the policy precedence order; any agent that follows a citation to verify a command finds nothing at that file, and the third citation names a step title that exists only...
+Context: Two consolidated CI/build-infrastructure findings: a NuGet cache fallback with no restore-verification step, and an unsuppressed unsupported-package warning. Consolidated into one issue rather than two since both are build-pipeline configuration debt in the same category (silent tolerance of a degraded/unverified state) rather than application code defects.
+
+Environment:
+- OS/version: Windows 11 Pro (repo default) / GitHub Actions `windows-latest` runners
+- Python version: n/a — GitHub Actions workflow YAML and packages.config
+- Command/flags used: n/a — findings are from direct workflow/config inspection
+- Data source or fixture: n/a
+
+Impact / Severity:
+- [ ] Blocker
+- [ ] High
+- [x] Medium
+- [ ] Low
+
+Medium: neither finding causes a build failure today, but both represen...
 
 Proposed Fix: ### Design summary (what changes where):
-Three inline-text edits to `CLAUDE.md`:
-1. Line ~194 (end of the CSharpier bullet): replace the .github/workflows/ci.yml citation with .github/workflows/_format-check.yml.
-2. Line ~202 (end of the analyzer bullet): replace the .github/workflows/ci.yml citation with .github/workflows/_build-analyzers.yml.
-3. Line ~210 (start of the nullable-command explanatory bullet): replace the .github/workflows/ci.yml citation with .github/workflows/_build-nullable.yml; the parenthetical step name "Build with nullable warnings treated as errors" is retained unchanged because it correctly names the step inside _build-nullable.yml.
+Two independent, additive, configuration-only changes with no application source code footprint:
+1. **Finding 1** — add an explanatory (non-functional) YAML comment block immediately above the `restore-keys:` key in each of the three CI workflow files, documenting why the bare-prefix cache fallback is already safe (version-folder-scoped `nuget restore` idempotency). No YAML key, value, step, or job is added, removed, or reordered.
+2. **Finding 2** — add one new file, `Directory.Build.props`, at the repository root, setting `RxUseUnsupportedPackagesConfig` to `true` with an inline rationale comment. This is picked up automatically by all five `System.Reactive`-consuming projects (and harmlessly by the other thirteen non-`System.Reactive` projec...
 
-### Boundaries and invariants to preserve:
-- Do not alter any command text (`dotnet tool run csharpier check .`, the `msbuil...
-
-Acceptance Criteria: - [x] `CLAUDE.md` line ~194 cites .github/workflows/_format-check.yml (not ci.yml) for the CSharpier pinned-version claim.
-- [x] `CLAUDE.md` line ~202 cites .github/workflows/_build-analyzers.yml (not ci.yml) for the analyzer `/t:Build /m` claim.
-- [x] `CLAUDE.md` line ~210-211 cites .github/workflows/_build-nullable.yml (not ci.yml) for the nullable `TreatWarningsAsErrors` claim, retaining the step-name parenthetical "Build with nullable warnings treated as errors".
-- [x] No remaining citation to .github/workflows/ci.yml exists in `CLAUDE.md` for any of the three relocated commands.
-- [x] .claude/rules/csharp.md is unchanged.
-- [x] No file under .claude/**, .codex/**, .agents/**, config/blast-radius.json, or config/orchestration-routing.json is changed.
-- [x] The command text in...
+Acceptance Criteria: - [x] Explanatory rationale comment (identical in content, per research §1.4) is present immediately above `restore-keys:` in each of `.github/workflows/_build-analyzers.yml`, `.github/workflows/_build-nullable.yml`, and `.github/workflows/_mstest-coverage.yml` (3 files, per research's confirmed exhaustive derivation in §1.1's Numeric Derivation Evidence), with no functional change to the cache/restore step behavior in any of the three files.
+- [x] A new `Directory.Build.props` file exists at the repository root, setting `RxUseUnsupportedPackagesConfig` to `true` inside a `<PropertyGroup>`, with an inline XML comment stating the rationale for accepting the vendor's unsupported-scenario trade-off.
+- [x] A full local rebuild (`msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug...
+Plan completed tasks:
+- [P0-T1] Read, in the order defined by `policy-compliance-order`, the five policy files applicable to this change — CLAUDE.md, the general code-change rule at path .claude/rules/general-code-change.md, the general unit-test rule at path .claude/rules/general-unit-test.md, the C# rule at path .claude/rules/csharp.md (in scope because CLAUDE.md's C# Code Change Policy explicitly extends to `*.props` files, and Phase 1 creates `Directory.Build.props`), and the CI-workflows rule at path .claude/rules/ci-workflows.md (the rule scoped to the .github/workflows directory tree, in scope because Phase 1 edits three workflow files) — then write `docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/phase0-instructions-read.md` containing `Timestamp:`, `Policy Order:` (the five files listed in the order read), and an explicit itemized list of the five file paths. Acceptance: the artifact file exists and lists all five paths verbatim.
+- [P0-T2] Confirm the pre-change absence of `Directory.Build.props` at the repository root: run `Test-Path Directory.Build.props` and record the result in `docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/directory-build-props-absence.<timestamp>.md` with `Timestamp:`, `Command: Test-Path Directory.Build.props`, `EXIT_CODE: 0`, and `Output Summary:` recording the literal boolean printed. Acceptance: the artifact records the literal value `False`, establishing that Phase 0's baseline rebuilds (P0-T3, P0-T4) run before the file exists.
+- [P0-T3] Execute, before any Phase 1 task has run, `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true /flp:logfile=docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/msbuild-analyzers-pre.log;verbosity=normal` and write `docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/msbuild-analyzers-pre.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` recording three numeric values read from the log file using the de-duplicating method fixed by the Framing section's "Warning-count measurement method" note (option (a), chosen because a whole-log `-SimpleMatch` count double-counts: MSBuild's file logger at `verbosity=normal` prints every `System.Reactive.PackagesConfigCheck.targets` warning once inline and again in the end-of-build summary): (a) `RxCheck_analyzers_pre` = the count of lines matching the literal token `System.Reactive.PackagesConfigCheck.targets` found strictly before the line matching the literal token `Build succeeded.` (the log contains exactly one such line; e.g. `$content = Get-Content <logfile>; $cut = ($content | Select-String -Pattern 'Build succeeded.' -SimpleMatch).LineNumber[0]; ($content[0..($cut-2)] | Select-String -Pattern 'System.Reactive.PackagesConfigCheck.targets' -SimpleMatch).Count` — the 0-based slice upper bound is `$cut-2`, not `$cut-1`, because `$cut` is the 1-based line number of the `Build succeeded.` line itself and the slice must exclude that line to match the "strictly before" semantics stated above), (b) `W_analyzers_pre` = the integer captured from MSBuild's own once-emitted end-of-build line matching `^\s*(\d+) Warning\(s\)` (via `(Select-String -Path <logfile> -Pattern '^\s*(\d+) Warning\(s\)').Matches.Groups[1].Value`, not a whole-log token count), and (c) `E_analyzers_pre` = the integer captured the same way from the line matching `^\s*(\d+) Error\(s\)`. Acceptance: the artifact records all three values with `RxCheck_analyzers_pre` equal to exactly 5 (one inline occurrence per affected project: QuickFiler, TaskMaster, ToDoModel, UtilitiesCS, and UtilitiesCS.Test, per research §2.1's confirmed exhaustive derivation), `W_analyzers_pre` equal to exactly 5 (this clean baseline build carries no warnings other than the five System.Reactive suppressions), and `E_analyzers_pre` equal to 0.
+- [P0-T4] Execute, before any Phase 1 task has run, `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true /flp:logfile=docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/msbuild-nullable-pre.log;verbosity=normal` and write `docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/msbuild-nullable-pre.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` recording `RxCheck_nullable_pre`, `W_nullable_pre`, and `E_nullable_pre` using the same de-duplicating method defined in P0-T3 (option (a): `RxCheck_nullable_pre` counted strictly before this log's single `Build succeeded.` line; `W_nullable_pre` and `E_nullable_pre` parsed from this log's own once-emitted `^\s*(\d+) Warning\(s\)` / `^\s*(\d+) Error\(s\)` summary line), read from this command's log file. Acceptance: the artifact records all three values with `RxCheck_nullable_pre` equal to exactly 5, `W_nullable_pre` equal to exactly 5, and `E_nullable_pre` equal to 0 (the System.Reactive.PackagesConfigCheck diagnostic is an MSBuild target-emitted `<Warning>`, not a compiler `CSxxxx`/`BCxxxx` diagnostic, so `/p:TreatWarningsAsErrors=true` — which is consumed by the Csc/Vbc compiler tasks, not by arbitrary target `<Warning>` calls — does not promote it to an error; this is consistent with `spec.md`'s Impact/Severity statement that neither finding causes a build failure today).
+- [P0-T5] Record the pre-change git baseline: run `git rev-parse HEAD` and `git status --porcelain` on branch `bug/ci-build-infra-debt-730`, and write `docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/git-state-pre.<timestamp>.md` with `Timestamp:`, the recorded HEAD SHA, and the `git status --porcelain` output. `issue.md`, `spec.md`, and `research/research.2026-09-02T09-15.md` are already tracked at HEAD — committed by a prior preparation-mode commit (`docs(ci-build-infra-debt): prepare issue #730 feature folder and atomic plan`) that predates this or any execution session — so none of the three appears in porcelain output; only this plan file (modified by this task's own preceding P0-T1/P0-T2 checkbox edits) and the evidence subdirectory (created and partially populated by P0-T1 and P0-T2, both of which run before this task) are unclean at the point this task executes. Acceptance: the artifact records a 40-character SHA and confirms `git status --porcelain` output contains exactly two lines — ` M docs/features/active/2026-09-02-ci-build-infra-debt-730/plan.2026-09-02T08-57.md` and `?? docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/` — and no other entries, before Phase 1 begins.
+- [P1-T1] In `.github/workflows/_build-analyzers.yml`, insert the following 16 comment lines immediately above the `restore-keys:` line (currently line 40, re-derived directly against the current tree in this planning pass), at the same 12-space indentation as the `restore-keys:` block-scalar value line (one level deeper than the sibling `key:`/`restore-keys:` lines, which sit at 10 spaces), with no other change to the file:
+- [P1-T2] In `.github/workflows/_build-nullable.yml`, insert the identical 16 comment lines quoted in P1-T1 immediately above the `restore-keys:` line (currently line 40, re-derived directly against the current tree in this planning pass), at the same 12-space indentation as the `restore-keys:` block-scalar value line (one level deeper than the sibling `key:`/`restore-keys:` lines, which sit at 10 spaces), with no other change to the file. Acceptance: same as P1-T1, applied to `.github/workflows/_build-nullable.yml`.
+- [P1-T3] In `.github/workflows/_mstest-coverage.yml`, insert the identical 16 comment lines quoted in P1-T1 immediately above the `restore-keys:` line (currently line 40, re-derived directly against the current tree in this planning pass), at the same 12-space indentation as the `restore-keys:` block-scalar value line (one level deeper than the sibling `key:`/`restore-keys:` lines, which sit at 10 spaces), with no other change to the file. Acceptance: same as P1-T1, applied to `.github/workflows/_mstest-coverage.yml`.
+- [P1-T4] Create a new file `Directory.Build.props` at the repository root (confirmed absent pre-change in P0-T2) with exactly this content:
+- [P2-T1] Stage exactly the four changed files: `git add Directory.Build.props .github/workflows/_build-analyzers.yml .github/workflows/_build-nullable.yml .github/workflows/_mstest-coverage.yml`, then run `git status --porcelain -- Directory.Build.props .github/workflows/_build-analyzers.yml .github/workflows/_build-nullable.yml .github/workflows/_mstest-coverage.yml` (scoped to just these four pathspecs, so the plan file's own checkbox-edit modification and the evidence directory recorded in P0-T5 fall outside this command's view) and write `docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/git-stage-scope.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` recording the full porcelain output. Acceptance: the scoped porcelain output lists exactly these four staged paths — `A  Directory.Build.props`, `M  .github/workflows/_build-analyzers.yml`, `M  .github/workflows/_build-nullable.yml`, `M  .github/workflows/_mstest-coverage.yml` — and no other entries.
 Context files:
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac1.2026-09-02T08-58.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac2.2026-09-02T08-58.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac3.2026-09-02T08-58.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac4.2026-09-02T08-58.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/final-qa-summary.2026-09-02T08-58.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/line-scope-verification-ac7.2026-09-02T08-58.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/scope-verification-ac5.2026-09-02T08-58.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/scope-verification-ac6.2026-09-02T08-58.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/issue.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/plan.2026-09-02T08-58.md
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/spec.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/other/research-line8-pre-edit.2026-09-02T23-56.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/csharpier-check.2026-09-02T23-13.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/diff-build-analyzers.2026-09-02T23-09.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/diff-build-nullable.2026-09-02T23-09.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/diff-mstest-coverage.2026-09-02T23-10.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/git-scope-boundary.2026-09-02T23-08.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/git-stage-scope.2026-09-02T23-07.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/log-sanitization.2026-09-02T23-31.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-analyzers-post.2026-09-02T23-11.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-nullable-post.2026-09-02T23-12.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/research-sanitization-verification.2026-09-02T23-56.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/vstest-regression.2026-09-02T23-16.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/issue.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/plan.2026-09-02T08-57.md
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/spec.md
 
 
 ===== Referenced issues (classified) =====
 
-- #553
-- #556
-- #564
+- #395
+- #561
+- #562
+- #563
+- #569
+- #570
+- #730
 NOTE: Unverified (GitHub unavailable)
 
 
@@ -122,47 +153,47 @@ NOTE: Unverified (GitHub unavailable)
 ===== Scoping docs changed =====
 
 Scoping docs changed (material):
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/spec.md (Reasons: new scoping doc, >=15 lines changed, key section touched)
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/spec.md (Reasons: new scoping doc, >=15 lines changed, key section touched)
 Acceptance Criteria:
-- [x] `CLAUDE.md` line ~194 cites .github/workflows/_format-check.yml (not ci.yml) for the CSharpier pinned-version claim.
-- [x] `CLAUDE.md` line ~202 cites .github/workflows/_build-analyzers.yml (not ci.yml) for the analyzer `/t:Build /m` claim.
-- [x] `CLAUDE.md` line ~210-211 cites .github/workflows/_build-nullable.yml (not ci.yml) for the nullable `TreatWarningsAsErrors` claim, retaining the step-name parenthetical "Build with nullable warnings treated as errors".
-- [x] No remaining citation to .github/workflows/ci.yml exists in `CLAUDE.md` for any of the three relocated commands.
-- [x] .claude/rules/csharp.md is unchanged.
-- [x] No file under .claude/**, .codex/**, .agents/**, config/blast-radius.json, or config/orchestration-routing.json is changed.
-- [x] The command text in all three cited bullets is unchanged (only the file citation is edited).
+- [x] Explanatory rationale comment (identical in content, per research §1.4) is present immediately above `restore-keys:` in each of `.github/workflows/_build-analyzers.yml`, `.github/workflows/_build-nullable.yml`, and `.github/workflows/_mstest-coverage.yml` (3 files, per research's confirmed exhaustive derivation in §1.1's Numeric Derivation Evidence), with no functional change to the cache/restore step behavior in any of the three files.
+- [x] A new `Directory.Build.props` file exists at the repository root, setting `RxUseUnsupportedPackagesConfig` to `true` inside a `<PropertyGroup>`, with an inline XML comment stating the rationale for accepting the vendor's unsupported-scenario trade-off.
+- [x] A full local rebuild (`msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` and `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`, per CLAUDE.md's C# toolchain commands) shows zero System.Reactive.PackagesConfigCheck "unsupported scenario" warnings across all five previously-affected projects (QuickFiler, TaskMaster, ToDoModel, UtilitiesCS, and UtilitiesCS.Test — per research's confirmed exhaustive derivation in §2.1's Numeric Derivation Evidence), with no new warnings or errors introduced relative to a pre-change baseline rebuild.
+- [x] No .csproj, packages.config, Directory.Build.targets, or application source file is modified by either fix.
+- [x] No coverage threshold, Pester job, or coverage gate is added or changed by this work (that scope belongs to #561/#562/#563).
+- [x] Existing MSTest suites in the Rx-dependent test assemblies (UtilitiesCS.Test, and QuickFiler.Test if present) pass on re-run after the `Directory.Build.props` addition, confirming no behavior change.
+- [x] Full toolchain pass completed for the touched languages: `dotnet tool run csharpier check .` (no formatting drift), both `msbuild TaskMaster.sln /t:Rebuild ...` commands above pass clean, and the `vstest.console.exe` regression re-run passes — no C# source changed, so this is regression re-verification, not new-test authorship.
+- [x] Before/after rebuild transcripts (and any workflow-syntax-check output) are captured as evidence under `docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/` per the evidence-and-timestamp-conventions skill.
 
 Proposed Fix:
 ### Design summary (what changes where):
-Three inline-text edits to `CLAUDE.md`:
-1. Line ~194 (end of the CSharpier bullet): replace the .github/workflows/ci.yml citation with .github/workflows/_format-check.yml.
-2. Line ~202 (end of the analyzer bullet): replace the .github/workflows/ci.yml citation with .github/workflows/_build-analyzers.yml.
-3. Line ~210 (start of the nullable-command explanatory bullet): replace the .github/workflows/ci.yml citation with .github/workflows/_build-nullable.yml; the parenthetical step name "Build with nullable warnings treated as errors" is retained unchanged because it correctly names the step inside _build-nullable.yml.
+Two independent, additive, configuration-only changes with no application source code footprint:
+1. **Finding 1** — add an explanatory (non-functional) YAML comment block immediately above the `restore-keys:` key in each of the three CI workflow files, documenting why the bare-prefix cache fallback is already safe (version-folder-scoped `nuget restore` idempotency). No YAML key, value, step, or job is added, removed, or reordered.
+2. **Finding 2** — add one new file, `Directory.Build.props`, at the repository root, setting `RxUseUnsupportedPackagesConfig` to `true` with an inline rationale comment. This is picked up automatically by all five `System.Reactive`-consuming projects (and harmlessly by the other thirteen non-`System.Reactive` projects in the solution) via MSBuild's standard Microsoft.Common.props auto-import of `Directory.Build.props`, which is already proven live in this repository through the existing Directory.Build.targets file.
 
 ### Boundaries and invariants to preserve:
-- Do not alter any command text (`dotnet tool run csharpier check .`, the `msbuild ... /t:Build /m ...` invocation, or the `msbuild ... /t:Rebuild /m ... /p:TreatWarningsAsErrors=true` invocation).
-- Do not alter .claude/rules/csharp.md — verified already correct.
-- Do not alter any file under .claude/**, .codex/**, .agents/**, config/blast-radius.json, or config/orchestration-routing.json.
+- The cache/restore step behavior in the three workflow files (cache key, restore-keys value, step names, unconditional `nuget restore` invocation) must remain byte-identical except for the inserted comment lines.
+- `Directory.Build.props` must not alter any existing property already set explicitly inside any of the eighteen .csproj files; it only supplies a new property (`RxUseUnsupportedPackagesConfig`) that no .csproj currently sets, so there is no override/collision risk.
+- No .csproj, packages.config, or Directory.Build.targets file is edited by either fix (research §1.4, §2.5).
+- No application (non-build-config) source file is touched by either fix.
 
 ### Dependencies or blocked work:
-None. This is a documentation-only correction with no code or workflow behavior change.
+- None. Both fixes are self-contained and do not depend on or block any other open issue. Coverage-threshold/Pester/gate work tracked under #561/#562/#563 is explicitly independent of this issue's scope.
 
 ### Implementation strategy (what changes, not sequencing):
+This is a build/CI-configuration-only change. No application source code (`.cs`, application XAML/WinForms, VSTO ribbon/ThisAddIn code, etc.) is touched by either fix.
+
+- Finding 1: insert the literal comment block given verbatim in research §1.4 immediately above `restore-keys:` in each of the three named workflow files. The comment text is identical across all three files.
+- Finding 2: create the new `Directory.Build.props` file at the repository root with the literal content given verbatim in research §2.5.
 
 #### Files/modules to change:
-- `CLAUDE.md`
+- `.github/workflows/_build-analyzers.yml`
+- `.github/workflows/_build-nullable.yml`
+- `.github/workflows/_mstest-coverage.yml`
+- `Directory.Build.props`
 
 #### Functions/classes/CLI commands impacted:
-None — no command text changes, only file-attribution text.
+None. No C# class, method, or CLI command is impacted. The `Restore solution` step's `nuget restore $env:SOLUTION_PATH` invocation is unchanged in all three workflow files (comment-only edit occurs on the preceding `Cache NuGet packages` step). MSBuild's System.Reactive.PackagesConfigCheck.targets guard target continues to run in all five affected projects' builds; only its warning-emission condition (`RxUseUnsupportedPackagesConfig`) is now satisfied.
 
-#### Data flow and validation changes:
-None.
-
-#### Error handling and logging updates:
-None.
-
-#### Rollback/feature-flag considerations (if applicable):
-None; a single-file text revert is sufficient if needed.
 
 TRUNCATED: first 40 lines shown
 
@@ -173,11 +204,17 @@ Core logic changes: 0 files
 
 Mechanical moves/renames: 0 files
 
-Docs/templates/agents/tooling: 4 files
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/research/workflow-citation-mapping.2026-09-02T09-00.md (+153/-0)
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/plan.2026-09-02T08-58.md (+150/-0)
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/spec.md (+119/-0)
-- docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/issue.md (+82/-0)
+Docs/templates/agents/tooling: 33 files
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/msbuild-nullable-pre.log (+12030/-0)
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-analyzers-post.log (+11906/-0)
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/msbuild-analyzers-pre.log (+11878/-0)
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-nullable-post.log (+11742/-0)
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/research/research.2026-09-02T09-15.md (+518/-0)
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/policy-audit.2026-09-02T23-47.md (+288/-0)
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/feature-audit.2026-09-02T23-47.md (+230/-0)
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/spec.md (+193/-0)
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/code-review.2026-09-02T23-47.md (+169/-0)
+- docs/features/active/2026-09-02-ci-build-infra-debt-730/remediation-plan.2026-09-02T23-56.md (+148/-0)
 
 
 ===== Issue digests =====
@@ -192,40 +229,64 @@ Docs/templates/agents/tooling: 4 files
 
 ===== Verification evidence (feature docs + canonical artifacts) =====
 
-- Feature: claude-md-cites-ciyml-for-moved-toolchain-commands-564
-  - Source: docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac1.2026-09-02T08-58.md
-  - Timestamp: 2026-09-02T20-52
-  - Command: `Select-String -Path CLAUDE.md -Pattern '_format-check\.yml'`
+- Feature: 2026-09-02-ci-build-infra-debt-730
+  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/other/research-line8-pre-edit.2026-09-02T23-56.md
+  - Timestamp: 2026-09-03T04-20
+  - Command: Read tool — `docs/features/active/2026-09-02-ci-build-infra-debt-730/research/research.2026-09-02T09-15.md` lines 1-12
   - EXIT_CODE: 0
   - Normalized result: pass
-- Feature: claude-md-cites-ciyml-for-moved-toolchain-commands-564
-  - Source: docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac2.2026-09-02T08-58.md
-  - Timestamp: 2026-09-02T20-52
-  - Command: `Select-String -Path CLAUDE.md -Pattern '_build-analyzers\.yml'`
+- Feature: 2026-09-02-ci-build-infra-debt-730
+  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/csharpier-check.2026-09-02T23-13.md
+  - Timestamp: 2026-09-02T23-13
+  - Command: `dotnet tool run csharpier check .`
   - EXIT_CODE: 0
   - Normalized result: pass
-- Feature: claude-md-cites-ciyml-for-moved-toolchain-commands-564
-  - Source: docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac3.2026-09-02T08-58.md
-  - Timestamp: 2026-09-02T20-52
-  - Command: `Select-String -Path CLAUDE.md -Pattern '_build-nullable\.yml'`
+- Feature: 2026-09-02-ci-build-infra-debt-730
+  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/diff-build-analyzers.2026-09-02T23-09.md
+  - Timestamp: 2026-09-02T23-09
+  - Command: `git diff --cached origin/main -- .github/workflows/_build-analyzers.yml`
   - EXIT_CODE: 0
   - Normalized result: pass
-- Feature: claude-md-cites-ciyml-for-moved-toolchain-commands-564
-  - Source: docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/citation-verification-ac4.2026-09-02T08-58.md
-  - Timestamp: 2026-09-02T20-52
-  - Command: `Select-String -Path CLAUDE.md -Pattern 'ci\.yml' | Measure-Object | Select-Object -ExpandProperty Count`
+- Feature: 2026-09-02-ci-build-infra-debt-730
+  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/diff-build-nullable.2026-09-02T23-09.md
+  - Timestamp: 2026-09-02T23-09
+  - Command: `git diff --cached origin/main -- .github/workflows/_build-nullable.yml`
   - EXIT_CODE: 0
   - Normalized result: pass
-- Feature: claude-md-cites-ciyml-for-moved-toolchain-commands-564
-  - Source: docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/line-scope-verification-ac7.2026-09-02T08-58.md
-  - Timestamp: 2026-09-02T20-52
-  - Command: `git diff origin/main...HEAD -- CLAUDE.md`
+- Feature: 2026-09-02-ci-build-infra-debt-730
+  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/diff-mstest-coverage.2026-09-02T23-10.md
+  - Timestamp: 2026-09-02T23-10
+  - Command: `git diff --cached origin/main -- .github/workflows/_mstest-coverage.yml`
   - EXIT_CODE: 0
   - Normalized result: pass
-- Feature: claude-md-cites-ciyml-for-moved-toolchain-commands-564
-  - Source: docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564/evidence/qa-gates/scope-verification-ac5.2026-09-02T08-58.md
-  - Timestamp: 2026-09-02T20-52
-  - Command: `git diff origin/main...HEAD -- .claude/rules/csharp.md`
+- Feature: 2026-09-02-ci-build-infra-debt-730
+  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/git-scope-boundary.2026-09-02T23-08.md
+  - Timestamp: 2026-09-02T23-08
+  - Command: `git diff --cached origin/main --name-status -- Directory.Build.props .github/workflows/_build-analyzers.yml .github/workflows/_build-nullable.yml .github/workflows/_mstest-coverage.yml`
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ci-build-infra-debt-730
+  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-analyzers-post.2026-09-02T23-11.md
+  - Timestamp: 2026-09-02T23-11
+  - Command: `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true /flp:logfile=docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-analyzers-post.log;verbosity=normal`
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ci-build-infra-debt-730
+  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-nullable-post.2026-09-02T23-12.md
+  - Timestamp: 2026-09-02T23-12
+  - Command: `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true /flp:logfile=docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-nullable-post.log;verbosity=normal`
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ci-build-infra-debt-730
+  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/research-sanitization-verification.2026-09-02T23-56.md
+  - Timestamp: 2026-09-03T04-25
+  - Command: pwsh -File p0t3-sweep1.ps1 — `$accountToken = Split-Path -Leaf $env:USERPROFILE; @(Get-ChildItem -Recurse -File -LiteralPath <feature-folder> | Select-String -Pattern "(?i)$([regex]::Escape($accountToken))").Count`
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ci-build-infra-debt-730
+  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/vstest-regression.2026-09-02T23-16.md
+  - Timestamp: 2026-09-02T23-16
+  - Command: `& $vstestPath UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCoverage /InIsolation /Logger:trx /TestCaseFilter:"TestCategory!=LiveOutlook"`
   - EXIT_CODE: 0
   - Normalized result: pass
 
@@ -237,4 +298,4 @@ Docs/templates/agents/tooling: 4 files
 
 ===== Appendix pointer =====
 
-See C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a2e056cf0bbd1ce8b/artifacts/pr_context.appendix.txt
+See C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a7c9d039ae8df6121/artifacts/pr_context.appendix.txt

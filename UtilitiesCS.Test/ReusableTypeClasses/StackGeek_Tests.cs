@@ -6,6 +6,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UtilitiesCS.Test.ReusableTypeClasses
 {
+    // Main_RunsSampleScenarioWithoutThrowing captures and restores Console.Out, which is
+    // process-wide state. Under the class-level parallel scope declared by the Parallelize
+    // attribute at UtilitiesCS.Test/Properties/AssemblyInfo.cs lines 18-21, a sibling test
+    // class's Console.SetOut overrides this class's redirect mid-test and makes the captured
+    // output empty. The assembly attribute, not TaskMaster.runsettings, is what takes effect:
+    // the CI vstest invocation passes no /Settings: argument.
+    [DoNotParallelize]
     [TestClass]
     public class StackGeek_Tests
     {
