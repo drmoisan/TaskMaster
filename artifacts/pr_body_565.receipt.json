@@ -1,0 +1,8 @@
+{
+  "skill": "pr-author",
+  "pr_body_path": "artifacts/pr_body_565.md",
+  "number": 565,
+  "sha256": "2903b6e36c66f23579967db50cf13cfd81af59cf305e9e0f0e3063f0a95b3c0d",
+  "context_summary_path": "artifacts/pr_context.summary.txt",
+  "created_at": "2026-09-03T11:41:29Z"
+}
