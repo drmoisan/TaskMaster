@@ -173,7 +173,7 @@ Seeded from issue (corrected against research where noted):
 - [x] Repro steps now produce the expected behavior in all documented environments.
 - [x] Regression test(s) added and passing (list file path and test name).
 - [x] Edge cases and invalid inputs are handled with correct errors or fallbacks.
-- [ ] No unintended behavior changes outside the defined scope.
+- [x] No unintended behavior changes outside the defined scope.
 - [x] Required logs/telemetry updated and validated (if applicable).
 - [x] Performance constraints met or explicitly waived with rationale.
 - [x] Full toolchain pass completed (format → lint → type-check → test).
