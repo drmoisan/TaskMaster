@@ -101,13 +101,13 @@ Not applicable.
 - Manual validation steps: read the corrected `CLAUDE.md` lines 194, 202, and 210-211 alongside the corresponding .github/workflows/_format-check.yml, .github/workflows/_build-analyzers.yml, and .github/workflows/_build-nullable.yml files to confirm each citation now names the file that actually contains the cited step.
 
 ## Acceptance Criteria
-- [ ] `CLAUDE.md` line ~194 cites .github/workflows/_format-check.yml (not ci.yml) for the CSharpier pinned-version claim.
-- [ ] `CLAUDE.md` line ~202 cites .github/workflows/_build-analyzers.yml (not ci.yml) for the analyzer `/t:Build /m` claim.
-- [ ] `CLAUDE.md` line ~210-211 cites .github/workflows/_build-nullable.yml (not ci.yml) for the nullable `TreatWarningsAsErrors` claim, retaining the step-name parenthetical "Build with nullable warnings treated as errors".
-- [ ] No remaining citation to .github/workflows/ci.yml exists in `CLAUDE.md` for any of the three relocated commands.
-- [ ] .claude/rules/csharp.md is unchanged.
-- [ ] No file under .claude/**, .codex/**, .agents/**, config/blast-radius.json, or config/orchestration-routing.json is changed.
-- [ ] The command text in all three cited bullets is unchanged (only the file citation is edited).
+- [x] `CLAUDE.md` line ~194 cites .github/workflows/_format-check.yml (not ci.yml) for the CSharpier pinned-version claim.
+- [x] `CLAUDE.md` line ~202 cites .github/workflows/_build-analyzers.yml (not ci.yml) for the analyzer `/t:Build /m` claim.
+- [x] `CLAUDE.md` line ~210-211 cites .github/workflows/_build-nullable.yml (not ci.yml) for the nullable `TreatWarningsAsErrors` claim, retaining the step-name parenthetical "Build with nullable warnings treated as errors".
+- [x] No remaining citation to .github/workflows/ci.yml exists in `CLAUDE.md` for any of the three relocated commands.
+- [x] .claude/rules/csharp.md is unchanged.
+- [x] No file under .claude/**, .codex/**, .agents/**, config/blast-radius.json, or config/orchestration-routing.json is changed.
+- [x] The command text in all three cited bullets is unchanged (only the file citation is edited).
 
 ## Risks & Mitigations
 - Technical or operational risks: low — a text-only Markdown edit with no execution path; the only risk is citing the wrong reusable workflow file name, mitigated by the direct verification performed in Root Cause Analysis above.
