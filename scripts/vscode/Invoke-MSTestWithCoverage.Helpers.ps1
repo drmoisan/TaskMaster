@@ -1,5 +1,7 @@
 Set-StrictMode -Version Latest
 . (Join-Path $PSScriptRoot 'Invoke-MSTestWithCoverage.ClosureFilter.ps1')
+. (Join-Path $PSScriptRoot 'Invoke-MSTestWithCoverage.PackageRate.ps1')
+. (Join-Path $PSScriptRoot 'Invoke-MSTestWithCoverage.Threshold.ps1')
 
 function Get-KoverageProjectAllowlist {
     [CmdletBinding()]
@@ -114,18 +116,12 @@ function Get-CoberturaCoverageSummary {
         throw 'Cobertura XML does not contain a <packages> node.'
     }
 
-    foreach ($pkg in $packagesNode.ChildNodes) {
-        if ($pkg.NodeType -ne 'Element') {
-            continue
-        }
-
-        foreach ($cls in $pkg.SelectNodes('.//class')) {
-            $classSummary = Get-CoberturaClassLineSummary -ClassNode $cls
-            $totalLines += $classSummary.TotalLines
-            $coveredLines += $classSummary.CoveredLines
-            $totalBranches += $classSummary.TotalBranches
-            $coveredBranches += $classSummary.CoveredBranches
-        }
+    foreach ($pkg in $packagesNode.SelectNodes('./package')) {
+        $packageSummary = Get-CoberturaPackageLineSummary -PackageNode $pkg
+        $totalLines += [int]$packageSummary.LinesValid
+        $coveredLines += [int]$packageSummary.LinesCovered
+        $totalBranches += [int]$packageSummary.BranchesValid
+        $coveredBranches += [int]$packageSummary.BranchesCovered
     }
 
     [pscustomobject]@{
@@ -300,6 +296,16 @@ function Merge-CoberturaClassesByFilename {
                 [void]$mergedClassNode.AppendChild($methodsNode)
             }
 
+            # Finding 2 of issue #733: the primary clone alone loses the closure and nested-type
+            # methods the merged file genuinely contains, so union-append every other group
+            # member's methods. No deduplication key is applied: distinct group members never
+            # legitimately share an identical method name.
+            foreach ($groupMember in @($group | Where-Object { $_ -ne $primaryNode })) {
+                foreach ($memberMethodNode in @($groupMember.SelectNodes('./methods/method'))) {
+                    [void]$methodsNode.AppendChild($memberMethodNode.CloneNode($true))
+                }
+            }
+
             $linesNode = $mergedClassNode.SelectSingleNode('./lines')
             if ($linesNode) {
                 $linesNode.RemoveAll()
@@ -364,10 +370,10 @@ function Merge-CoberturaClassesByFilename {
 
             $mergedSummary = Get-CoberturaClassLineSummary -ClassNode $mergedClassNode
 
-            # The rate expressions below are duplicated from Get-CoberturaCoverageSummary rather
-            # than shared through a second helper: the spec specifies exactly one new helper, and
-            # existing assertions such as line-rate | Should -Be '1' depend on this rounding and on
-            # the '0' zero-denominator fallback matching that function exactly.
+            # The rate expressions below stay inline rather than delegating to
+            # Get-CoberturaPackageLineSummary: that helper is package-scoped, aggregating every
+            # class in the package, so it cannot render a single merged CLASS's own rate. The
+            # rounding and the '0' zero-denominator fallback match that helper exactly.
             $mergedLineRate = if ($mergedSummary.TotalLines -gt 0) { [string]([math]::Round($mergedSummary.CoveredLines / $mergedSummary.TotalLines, 6)) } else { '0' }
             $mergedBranchRate = if ($mergedSummary.TotalBranches -gt 0) { [string]([math]::Round($mergedSummary.CoveredBranches / $mergedSummary.TotalBranches, 6)) } else { '0' }
 
@@ -387,6 +393,12 @@ function Merge-CoberturaClassesByFilename {
                 }
             }
         }
+
+        # Finding 1 of issue #733: the merge changes the package's class set, so a package rate
+        # carried over from the input document is stale and must be recomputed here.
+        $packageSummary = Get-CoberturaPackageLineSummary -PackageNode $packageNode
+        $packageNode.SetAttribute('line-rate', $packageSummary.LineRate)
+        $packageNode.SetAttribute('branch-rate', $packageSummary.BranchRate)
     }
 }
 
@@ -454,38 +466,4 @@ function ConvertTo-KoverageCoberturaXml {
     $xmlWriter.Close()
 
     return $stringWriter.ToString()
-}
-
-function Assert-CoberturaLineCoverageThreshold {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$CoberturaXml
-    )
-
-    [xml]$coverageDocument = $CoberturaXml
-    $coverageNode = $coverageDocument.SelectSingleNode('/coverage')
-    $lineRateText = if ($coverageNode) { $coverageNode.GetAttribute('line-rate') } else { $null }
-    if ([string]::IsNullOrWhiteSpace($lineRateText)) {
-        throw 'Cobertura line-rate is missing.'
-    }
-
-    [decimal]$lineRate = 0
-    if (-not [decimal]::TryParse(
-            $lineRateText,
-            [System.Globalization.NumberStyles]::Float,
-            [System.Globalization.CultureInfo]::InvariantCulture,
-            [ref]$lineRate)) {
-        throw 'Cobertura line-rate must be numeric.'
-    }
-
-    if ($lineRate -lt 0 -or $lineRate -gt 1) {
-        throw 'Cobertura line-rate must be between 0 and 1.'
-    }
-
-    $percentage = $lineRate * 100
-    if ($percentage -lt 80) {
-        $formattedPercentage = $percentage.ToString('0.####', [System.Globalization.CultureInfo]::InvariantCulture)
-        throw "Cobertura line coverage $formattedPercentage% is below the required 80% threshold."
-    }
 }

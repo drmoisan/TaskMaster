@@ -37,7 +37,7 @@
     <PublishUrl>C:\Users\DanMoisan\OneDrive - The Real Good Food Company\TM\</PublishUrl>
     <InstallUrl />
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.27</ApplicationVersion>
+    <ApplicationVersion>1.0.1.2</ApplicationVersion>
     <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>7</UpdateInterval>
@@ -460,6 +460,7 @@
     <Compile Include="Ribbon\EngineGatedCommandRunner.cs" />
     <Compile Include="Ribbon\EngineReadinessGate.cs" />
     <Compile Include="Ribbon\EngineToggleCatalog.cs" />
+    <Compile Include="Ribbon\EngineTogglePressedStateCache.cs" />
     <Compile Include="Ribbon\EngineToggleStateCoordinator.cs" />
     <Compile Include="Ribbon\RibbonController.cs" />
     <Compile Include="Ribbon\RibbonController.EngineCommands.cs" />
@@ -467,6 +468,7 @@
     <Compile Include="Ribbon\RibbonController.Intelligence.cs" />
     <Compile Include="Ribbon\RibbonViewer.cs" />
     <Compile Include="Ribbon\RibbonViewer.EngineCommands.cs" />
+    <Compile Include="Ribbon\SpamManagerResetGate.cs" />
     <Compile Include="Ribbon\TryFunctionalityInConstruction.cs" />
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>

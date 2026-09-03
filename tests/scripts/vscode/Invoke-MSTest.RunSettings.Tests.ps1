@@ -6,8 +6,9 @@ BeforeAll {
     $script:coverageScript = Join-Path $script:repoRoot 'scripts\vscode\Invoke-MSTestWithCoverage.ps1'
     $script:scriptDir = Join-Path $script:repoRoot 'scripts\vscode'
 
-    # Import the existing non-coverage script's definitions.
-    try { . $script:mstestScript -NoExecute } catch { Write-Verbose "Invoke-MSTest body skipped: $_" }
+    # Import the existing non-coverage script's definitions. Its top-level wiring is guarded
+    # by an InvocationName check, so dot-sourcing imports definitions without running the body.
+    . $script:mstestScript
 
     # Parse and dot-source the coverage scriptblock. The production entrypoint checks
     # dot-source invocation, so only definitions are imported for these in-process tests.
@@ -410,6 +411,34 @@ Describe 'Invoke-MSTestWithCoverageMain' {
 
         { Invoke-MSTestWithCoverageMain -NoExecute -ScriptRoot $script:scriptDir } |
             Should -Throw -ExpectedMessage 'Search root not found: C:\repo\.'
+    }
+
+    It 'excludes assemblies discovered under a .claude worktree segment' {
+        # Issue #733 finding 3: agent worktrees under .claude carry their own built
+        # copy of every test assembly, so discovery must drop them before collection.
+        $script:capturedTestAssembly = $null
+        Mock Get-ChildItem {
+            @(
+                [pscustomobject]@{ FullName = 'C:\repo\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll' },
+                [pscustomobject]@{ FullName = 'C:\repo\.claude\worktrees\agent-1\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll' }
+            )
+        }
+        Mock Invoke-DotnetCoverageCollection {
+            param(
+                [string]$OutputPath,
+                [string]$CoverageConfig,
+                [string]$VsTestPath,
+                [string[]]$TestAssembly,
+                [string]$RunSettingsPath
+            )
+            $null = $OutputPath, $CoverageConfig, $VsTestPath, $RunSettingsPath
+            $script:capturedTestAssembly = $TestAssembly
+        }
+
+        Invoke-MSTestWithCoverageMain -ScriptRoot $script:scriptDir
+
+        $script:capturedTestAssembly |
+            Should -Be @('C:\repo\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll')
     }
 }
 

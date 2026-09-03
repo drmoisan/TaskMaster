@@ -1,0 +1,333 @@
+
+===== Context generated =====
+
+2026-09-03 06:32:25 UTC
+Head SHA: 558c9c42d32a9cc5b060212881e86591b39ca380
+
+
+===== PR Intent (edit before generating PR body) =====
+
+Primary outcome:
+Impact (user/developer):
+Risks:
+Author-asserted autoclose issues:
+
+===== Repository remotes =====
+
+origin	https://github.com/drmoisan/TaskMaster.git (fetch)
+origin	https://github.com/drmoisan/TaskMaster.git (push)
+
+
+===== Current branch =====
+
+bug/ribbon-engine-toggle-defects-735
+
+
+===== Upstream =====
+
+origin/bug/ribbon-engine-toggle-defects-735
+
+
+===== Status (short) =====
+
+## bug/ribbon-engine-toggle-defects-735...origin/bug/ribbon-engine-toggle-defects-735
+
+
+===== Untracked files =====
+
+(none)
+
+
+===== Working tree diff (staged) =====
+
+
+
+
+
+===== Working tree diff (unstaged) =====
+
+
+
+
+===== PR Comparison =====
+
+Base ref (requested): main
+Base ref (resolved): origin/main @ b13d5b7b1a6dd0aa79d51d48a7156ee67377f9d0
+Head ref (resolved): bug/ribbon-engine-toggle-defects-735 @ 558c9c42d32a9cc5b060212881e86591b39ca380
+Merge-base: b13d5b7b1a6dd0aa79d51d48a7156ee67377f9d0
+Range: b13d5b7b1a6dd0aa79d51d48a7156ee67377f9d0..558c9c42d32a9cc5b060212881e86591b39ca380
+
+
+===== Commits in range =====
+
+558c9c42 2026-09-03 Dan Moisan docs(735): record the second independent feature-review pass
+a2792280 2026-09-03 Dan Moisan docs(735): record feature-review audits and correct the test-population reconciliation
+30e66833 2026-09-03 Dan Moisan Merge remote-tracking branch 'origin/main' into bug/ribbon-engine-toggle-defects-735
+3e45428e 2026-09-03 Dan Moisan refactor(ribbon): extract the versioned pressed-state cache and close QA for issue 735
+a68c8598 2026-09-03 Dan Moisan fix(ribbon): make toggle-state writes compare-and-apply for issue 735
+88fc3bfc 2026-09-03 Dan Moisan fix(ribbon): guard the Clear Spam Manager reset behind a testable gate for issue 735
+a3bfb865 2026-09-03 Dan Moisan fix(ribbon): repair dead Explorer CustomUI callback bindings for issue 735
+b6e102e6 2026-09-03 Dan Moisan Merge remote-tracking branch 'origin/main' into bug/ribbon-engine-toggle-defects-735
+044551f0 2026-09-02 Dan Moisan prep(bug-735): promote, research, spec, and plan ribbon-engine-toggle-defects
+
+
+===== Conventional commit type summary =====
+
+fix       : 3
+refactor  : 1
+docs      : 2
+other     : 3
+
+
+===== Authors =====
+
+Dan Moisan <drmoisan@gmail.com>
+
+
+===== Changed files (name-status) =====
+
+M	.claude/agent-memory/atomic-planner/MEMORY.md
+A	.claude/agent-memory/atomic-planner/project_735_evidence_content_sanitization_seams.md
+M	.claude/agent-memory/task-researcher/MEMORY.md
+A	.claude/agent-memory/task-researcher/project_ribbon_engine_toggle_defects_735.md
+A	TaskMaster.Test/Ribbon/EngineTogglePressedStateCacheTests.cs
+A	TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs
+M	TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs
+M	TaskMaster.Test/Ribbon/RibbonExplorerXmlTests.cs
+A	TaskMaster.Test/Ribbon/SpamManagerResetGateTests.cs
+M	TaskMaster.Test/TaskMaster.Test.csproj
+A	TaskMaster/Ribbon/EngineTogglePressedStateCache.cs
+M	TaskMaster/Ribbon/EngineToggleStateCoordinator.cs
+M	TaskMaster/Ribbon/RibbonController.Intelligence.cs
+M	TaskMaster/Ribbon/RibbonExplorer.xml
+A	TaskMaster/Ribbon/SpamManagerResetGate.cs
+M	TaskMaster/TaskMaster.csproj
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/code-review.2026-09-03T06-19.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/code-review.2026-09-03T09-05.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/base-ref.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/coverage-baseline.2026-09-02T12-04.cobertura.xml
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/coverage-baseline.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/csharpier-check.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/file-line-counts.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/msbuild-analyzer.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/msbuild-nullable.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/nuget-restore.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/p0-t8/p0-t8.trx
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/phase0-instructions-read.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/ribbon-tests.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/scope-and-write-set.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/toolchain-bootstrap.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/issue-updates/ac-status.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/other/manual-verification-clear-spam-manager.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/other/reduced-audit-handoff.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-callsite.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-finding1.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-gate-class.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-gate-tests.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-race-fix.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-before-race-fix.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/callsite-edit-scope.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/coordinator-size-contingency.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/coverage-delta.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/coverage-final.2026-09-02T12-04.cobertura.xml
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/csharpier-check-final.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/csharpier-format.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/csharpier-xml-format.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/evidence-completeness.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/evidence-sanitization.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/file-line-counts.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/footprint-scope.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/gate-class-constraints.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/msbuild-analyzer.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/msbuild-nullable.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/no-new-exemption.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/p4-t3/p4-t3.trx
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/partial-keyword-edit.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/race-fix-structure.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/toolchain-loop-closure.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/vstest-coverage-run.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/xml-edit-scope.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/coordinator-fixture-after-fix.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/fail-before-exception.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/fail-before-finding1.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/fail-before-finding3.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/gate-tests.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/p1-t2/p1-t2.trx
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/p1-t7/p1-t7.trx
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/p1-t8/p1-t8.trx
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/p2-t8/p2-t8.trx
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/p3-t11/p3-t11.trx
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/p3-t12/p3-t12.trx
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/p3-t5/p3-t5.trx
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/pass-after-finding1.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/pass-after-finding3.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/ribbon-fixtures-after-finding1.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/feature-audit.2026-09-03T06-19.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/feature-audit.2026-09-03T09-05.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/issue.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/plan.2026-09-02T12-04.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/policy-audit.2026-09-03T06-19.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/policy-audit.2026-09-03T09-05.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/research/2026-09-02T09-15-ribbon-engine-toggle-defects-research.md
+A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/spec.md
+
+
+===== Diff shortstat =====
+
+ 84 files changed, 400411 insertions(+), 34 deletions(-)
+
+
+===== Additions/Deletions totals (from numstat) =====
+
+Additions: 400411
+Deletions: 34
+
+
+===== Files by extension =====
+
+       9  .cs
+       2  .csproj
+      61  .md
+       9  .trx
+       3  .xml
+
+
+===== Referenced issues (detected) =====
+
+#503, #504, #505, #506, #518, #524, #525, #735, CR-2, CR-3, SHA-256
+
+
+===== PRs in range =====
+
+(none)
+
+
+===== Diff stat =====
+
+ .claude/agent-memory/atomic-planner/MEMORY.md      |      1 +
+ ...ject_735_evidence_content_sanitization_seams.md |     47 +
+ .claude/agent-memory/task-researcher/MEMORY.md     |      1 +
+ .../project_ribbon_engine_toggle_defects_735.md    |     44 +
+ .../Ribbon/EngineTogglePressedStateCacheTests.cs   |    213 +
+ .../EngineToggleStateCoordinatorTests.Race.cs      |    277 +
+ .../Ribbon/EngineToggleStateCoordinatorTests.cs    |      2 +-
+ TaskMaster.Test/Ribbon/RibbonExplorerXmlTests.cs   |    173 +
+ .../Ribbon/SpamManagerResetGateTests.cs            |    326 +
+ TaskMaster.Test/TaskMaster.Test.csproj             |      3 +
+ TaskMaster/Ribbon/EngineTogglePressedStateCache.cs |    157 +
+ TaskMaster/Ribbon/EngineToggleStateCoordinator.cs  |     56 +-
+ TaskMaster/Ribbon/RibbonController.Intelligence.cs |     58 +-
+ TaskMaster/Ribbon/RibbonExplorer.xml               |      9 +-
+ TaskMaster/Ribbon/SpamManagerResetGate.cs          |    141 +
+ TaskMaster/TaskMaster.csproj                       |      2 +
+ .../code-review.2026-09-03T06-19.md                |    402 +
+ .../code-review.2026-09-03T09-05.md                |    270 +
+ .../evidence/baseline/base-ref.2026-09-02T12-04.md |     72 +
+ ...overage-baseline.2026-09-02T12-04.cobertura.xml | 194456 +++++++++++++++++
+ .../baseline/coverage-baseline.2026-09-02T12-04.md |     84 +
+ .../baseline/csharpier-check.2026-09-02T12-04.md   |     49 +
+ .../baseline/file-line-counts.2026-09-02T12-04.md  |     46 +
+ .../baseline/msbuild-analyzer.2026-09-02T12-04.md  |     56 +
+ .../baseline/msbuild-nullable.2026-09-02T12-04.md  |     41 +
+ .../baseline/nuget-restore.2026-09-02T12-04.md     |     40 +
+ .../evidence/baseline/p0-t8/p0-t8.trx              |    703 +
+ .../phase0-instructions-read.2026-09-02T12-04.md   |     41 +
+ .../baseline/ribbon-tests.2026-09-02T12-04.md      |     58 +
+ .../scope-and-write-set.2026-09-02T12-04.md        |     61 +
+ .../toolchain-bootstrap.2026-09-02T12-04.md        |     55 +
+ .../issue-updates/ac-status.2026-09-02T12-04.md    |     93 +
+ ...fication-clear-spam-manager.2026-09-02T12-04.md |     78 +
+ .../reduced-audit-handoff.2026-09-02T12-04.md      |    100 +
+ .../build-after-callsite.2026-09-02T12-04.md       |     25 +
+ .../build-after-finding1.2026-09-02T12-04.md       |     33 +
+ .../build-after-gate-class.2026-09-02T12-04.md     |     53 +
+ .../build-after-gate-tests.2026-09-02T12-04.md     |     46 +
+ .../build-after-race-fix.2026-09-02T12-04.md       |     31 +
+ .../build-before-race-fix.2026-09-02T12-04.md      |     44 +
+ .../callsite-edit-scope.2026-09-02T12-04.md        |     97 +
+ ...oordinator-size-contingency.2026-09-02T12-04.md |    130 +
+ .../qa-gates/coverage-delta.2026-09-02T12-04.md    |    134 +
+ .../coverage-final.2026-09-02T12-04.cobertura.xml  | 194753 ++++++++++++++++++
+ .../csharpier-check-final.2026-09-02T12-04.md      |     46 +
+ .../qa-gates/csharpier-format.2026-09-02T12-04.md  |    119 +
+ .../csharpier-xml-format.2026-09-02T12-04.md       |     37 +
+ .../evidence-completeness.2026-09-02T12-04.md      |     80 +
+ .../evidence-sanitization.2026-09-02T12-04.md      |    127 +
+ .../qa-gates/file-line-counts.2026-09-02T12-04.md  |     94 +
+ .../qa-gates/footprint-scope.2026-09-02T12-04.md   |    112 +
+ .../gate-class-constraints.2026-09-02T12-04.md     |     63 +
+ .../qa-gates/msbuild-analyzer.2026-09-02T12-04.md  |     41 +
+ .../qa-gates/msbuild-nullable.2026-09-02T12-04.md  |     43 +
+ .../qa-gates/no-new-exemption.2026-09-02T12-04.md  |     57 +
+ .../evidence/qa-gates/p4-t3/p4-t3.trx              |    865 +
+ .../partial-keyword-edit.2026-09-02T12-04.md       |     52 +
+ .../race-fix-structure.2026-09-02T12-04.md         |    146 +
+ .../toolchain-loop-closure.2026-09-02T12-04.md     |     68 +
+ .../vstest-coverage-run.2026-09-02T12-04.md        |     84 +
+ .../qa-gates/xml-edit-scope.2026-09-02T12-04.md    |    102 +
+ ...ordinator-fixture-after-fix.2026-09-02T12-04.md |     78 +
+ .../fail-before-exception.2026-09-02T12-04.md      |     78 +
+ .../fail-before-finding1.2026-09-02T12-04.md       |    125 +
+ .../fail-before-finding3.2026-09-02T12-04.md       |    105 +
+ .../gate-tests.2026-09-02T12-04.md                 |     86 +
+ .../evidence/regression-testing/p1-t2/p1-t2.trx    |     88 +
+ .../evidence/regression-testing/p1-t7/p1-t7.trx    |     67 +
+ .../evidence/regression-testing/p1-t8/p1-t8.trx    |    711 +
+ .../evidence/regression-testing/p2-t8/p2-t8.trx    |    109 +
+ .../evidence/regression-testing/p3-t11/p3-t11.trx  |     91 +
+ .../evidence/regression-testing/p3-t12/p3-t12.trx  |    199 +
+ .../evidence/regression-testing/p3-t5/p3-t5.trx    |    130 +
+ .../pass-after-finding1.2026-09-02T12-04.md        |     59 +
+ .../pass-after-finding3.2026-09-02T12-04.md        |     57 +
+ ...bon-fixtures-after-finding1.2026-09-02T12-04.md |     67 +
+ .../feature-audit.2026-09-03T06-19.md              |    117 +
+ .../feature-audit.2026-09-03T09-05.md              |    152 +
+ .../issue.md                                       |     68 +
+ .../plan.2026-09-02T12-04.md                       |    486 +
+ .../policy-audit.2026-09-03T06-19.md               |    421 +
+ .../policy-audit.2026-09-03T09-05.md               |    369 +
+ ...T09-15-ribbon-engine-toggle-defects-research.md |    886 +
+ .../spec.md                                        |    199 +
+ 84 files changed, 400411 insertions(+), 34 deletions(-)
+
+
+===== Issue details =====
+
+(none)
+
+
+===== Contributing pull requests =====
+
+(none)
+
+
+===== Feature doc: 2026-09-02-ribbon-engine-toggle-defects-735 =====
+
+Spec excerpts:
+Context: Issue #735 consolidates three code-review defects that all live in the Explorer ribbon subsystem under the directory TaskMaster/Ribbon, with their tests under TaskMaster.Test/Ribbon. They were grouped into one work item because they share a small file set and would otherwise consume three separate orchestration cycles for a combined production delta of roughly forty lines.
+
+- **Finding 1 (source #504) — dead XML-to-handler bindings.** The Explorer CustomUI document declares five callback names that resolve to no public instance method on the RibbonViewer type. Four are a `_Clicked` versus `_Click` suffix mismatch on the Item Sort Settings check boxes; the fifth, `BtnMigrateIDs_Click`, has no implementation anywhere in the solution. Office CustomUI resolves callbacks by name at invocatio...
+
+Proposed Fix: ### Finding 1 — repair the bindings, delete the dead one
+
+Edit the Explorer CustomUI document only; no production C# changes.
+
+- Rename four `onAction` values from the `_Clicked` to the `_Click` spelling on the four Item Sort Settings check boxes (move entire conversation, save attachments, save email copy, save pictures). Each already declares a correctly-resolving pressed-state callback, and each already has a `_Click` twin on the viewer type carrying the exact Office check-box signature `void (Office.IRibbonControl, bool)`.
+- Delete the entire button element whose id is `BtnMigrateIDs`. Removal rather than implementation is justified above; nothing in the working tree contradicts removal. If stronger evidence is wanted, the atomic plan may run a history search for the introducing com...
+
+Acceptance Criteria: ### Finding 1 — dead XML-to-handler bindings
+
+- [x] The Explorer CustomUI document declared **five** callback names that resolve to no public instance method on the viewer type before this change; after this change the count of such unresolved names is **zero**. Both the pre-fix and post-fix counts are demonstrated by the new enumeration test, which reports every unresolved name in a single failure message.
+- [x] Exactly **four** action-callback attribute values are renamed from the `_Clicked` spelling to the `_Click` spelling, on the move-entire-conversation, save-attachments, save-email-copy and save-pictures check boxes in the Item Sort Settings menu. No method on the viewer type is added, renamed, or removed to satisfy these bindings.
+- [x] Exactly **one** element is deleted: the bu...
+Plan completed tasks:
+- [P0-T1] Read the four policy documents in the mandatory order — CLAUDE.md, then .claude/rules/general-code-change.md, then .claude/rules/general-unit-test.md, then .claude/rules/csharp.md — and record the read in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/phase0-instructions-read.2026-09-02T12-04.md`.
+- [P0-T2] Read the acceptance-criteria source `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/spec.md` and the design record `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/research/2026-09-02T09-15-ribbon-engine-toggle-defects-research.md` in full, and record the write set and the two prohibited AppGlobals paths in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/scope-and-write-set.2026-09-02T12-04.md`.
+- [P0-T3] Bootstrap the .NET SDK with scripts/vscode/Install-RepoDotNetSdk.ps1 and then run `dotnet tool restore`, recording both invocations in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/toolchain-bootstrap.2026-09-02T12-04.md`.
+- [P0-T4] Restore NuGet packages with scripts/vscode/Invoke-Restore.ps1 and record the result in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/nuget-restore.2026-09-02T12-04.md`.
+- [P0-T5] Capture the read-only formatter baseline with `dotnet tool run csharpier check .` and record the verbatim unformatted-file set in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/csharpier-check.2026-09-02T12-04.md`.
+- [P0-T6] Capture the analyzer baseline by running the CLAUDE.md analyzer rebuild on TaskMaster.sln and record it in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/msbuild-analyzer.2026-09-02T12-04.md`.
+- [P0-T7] Capture the nullable baseline by running the CLAUDE.md nullable rebuild on TaskMaster.sln and record it in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/msbuild-nullable.2026-09-02T12-04.md`.
+- [P0-T8] Capture the scoped ribbon-fixture test baseline by running every test whose fully qualified name contains `TaskMaster.Test.Ribbon` and record it in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/ribbon-tests.2026-09-02T12-04.md`, with the TRX written to `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/p0-t8`.
+- [P0-T9] Capture the coverage baseline for the whole first-party suite with scripts/vscode/Invoke-MSTestWithCoverage.ps1 and record the numeric headline in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/coverage-baseline.2026-09-02T12-04.md`, with the Cobertura document at `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/coverage-baseline.2026-09-02T12-04.cobertura.xml`.
+- [P0-T10] Record the pre-change line counts of the six existing in-scope source files in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/file-line-counts.2026-09-02T12-04.md`.
