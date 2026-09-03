@@ -1,14 +1,14 @@
 # P0-T9 — Tool Manifest Restore (CSharpier)
 
 Timestamp: 2026-09-03T11-24
-Command: "C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a6cd1c774527c71c3/.dotnet-sdk/dotnet.exe" tool restore --tool-manifest "C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a6cd1c774527c71c3/dotnet-tools.json"
+Command: ".dotnet-sdk/dotnet.exe" tool restore --tool-manifest "dotnet-tools.json" (paths relative to the item worktree root)
 EXIT_CODE: 0
 Output Summary: "Tool 'csharpier' (version '1.2.6') was restored. Available commands: csharpier"
 / "Restore was successful."
 
 Environment note (execution-mechanics deviation, not a plan-scope change): the Bash tool's
 working directory defaults to the session worktree
-(C:/Users/DanMoisan/repos/TaskMaster-wt/2026-09-02T08-47), not the item worktree named by the
+(the session worktree, a separate checkout outside this item's worktree), not the item worktree named by the
 delegation prompt, and the delegation prompt's Bash-discipline rule prohibits `cd`. `dotnet`'s
 global.json-based SDK/tool-manifest resolution is directory-tree search from the process's
 working directory, so a bare `dotnet` invocation from the default cwd cannot see the item
