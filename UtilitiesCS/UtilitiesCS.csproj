@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Meziantou.Analyzer.3.0.194\build\Meziantou.Analyzer.props" Condition="Exists('..\packages\Meziantou.Analyzer.3.0.194\build\Meziantou.Analyzer.props')" />
+  <Import Project="..\packages\Meziantou.Analyzer.3.0.203\build\Meziantou.Analyzer.props" Condition="Exists('..\packages\Meziantou.Analyzer.3.0.203\build\Meziantou.Analyzer.props')" />
   <Import Project="..\packages\Microsoft.ML.5.0.0\build\netstandard2.0\Microsoft.ML.props" Condition="Exists('..\packages\Microsoft.ML.5.0.0\build\netstandard2.0\Microsoft.ML.props')" />
   <Import Project="..\packages\Microsoft.ML.CpuMath.5.0.0\build\netstandard2.0\Microsoft.ML.CpuMath.props" Condition="Exists('..\packages\Microsoft.ML.CpuMath.5.0.0\build\netstandard2.0\Microsoft.ML.CpuMath.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -38,8 +38,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AngleSharp, Version=1.7.2.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
-      <HintPath>..\packages\AngleSharp.1.7.2\lib\net472\AngleSharp.dll</HintPath>
+    <Reference Include="AngleSharp, Version=1.7.3.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea">
+      <HintPath>..\packages\AngleSharp.1.7.3\lib\net472\AngleSharp.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Apache.Arrow, Version=23.0.0.0, Culture=neutral, PublicKeyToken=204f54e5a45c07df, processorArchitecture=MSIL">
       <HintPath>..\packages\Apache.Arrow.23.0.0\lib\net462\Apache.Arrow.dll</HintPath>
@@ -168,23 +169,29 @@
     <Reference Include="Microsoft.IO.RecyclableMemoryStream, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.IO.RecyclableMemoryStream.3.0.1\lib\netstandard2.0\Microsoft.IO.RecyclableMemoryStream.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Abstractions.2.0.0\lib\netstandard2.0\Microsoft.Kiota.Abstractions.dll</HintPath>
+    <Reference Include="Microsoft.Kiota.Abstractions, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\Microsoft.Kiota.Abstractions.2.1.0\lib\netstandard2.0\Microsoft.Kiota.Abstractions.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Authentication.Azure, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Authentication.Azure.2.0.0\lib\netstandard2.0\Microsoft.Kiota.Authentication.Azure.dll</HintPath>
+    <Reference Include="Microsoft.Kiota.Authentication.Azure, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\Microsoft.Kiota.Authentication.Azure.2.1.0\lib\netstandard2.0\Microsoft.Kiota.Authentication.Azure.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Http.HttpClientLibrary, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Http.HttpClientLibrary.2.0.0\lib\net462\Microsoft.Kiota.Http.HttpClientLibrary.dll</HintPath>
+    <Reference Include="Microsoft.Kiota.Http.HttpClientLibrary, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\Microsoft.Kiota.Http.HttpClientLibrary.2.1.0\lib\net462\Microsoft.Kiota.Http.HttpClientLibrary.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Serialization.Form, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Serialization.Form.2.0.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Form.dll</HintPath>
+    <Reference Include="Microsoft.Kiota.Serialization.Form, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Form.2.1.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Form.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Serialization.Json, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Serialization.Json.2.0.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Json.dll</HintPath>
+    <Reference Include="Microsoft.Kiota.Serialization.Json, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Json.2.1.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Kiota.Serialization.Multipart, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Kiota.Serialization.Multipart.2.0.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Multipart.dll</HintPath>
+    <Reference Include="Microsoft.Kiota.Serialization.Multipart, Version=2.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\Microsoft.Kiota.Serialization.Multipart.2.1.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Multipart.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Kiota.Serialization.Text, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Kiota.Serialization.Text.2.0.0\lib\netstandard2.0\Microsoft.Kiota.Serialization.Text.dll</HintPath>
@@ -1289,8 +1296,8 @@
     <Error Condition="!Exists('..\packages\Microsoft.ML.5.0.0\build\netstandard2.0\Microsoft.ML.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ML.5.0.0\build\netstandard2.0\Microsoft.ML.targets'))" />
     <Error Condition="!Exists('..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.ValueTuple.4.6.2\build\net471\System.ValueTuple.targets'))" />
     <Error Condition="!Exists('..\packages\System.Reactive.7.0.0\build\System.Reactive.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Reactive.7.0.0\build\System.Reactive.targets'))" />
-    <Error Condition="!Exists('..\packages\Meziantou.Analyzer.3.0.194\build\Meziantou.Analyzer.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Meziantou.Analyzer.3.0.194\build\Meziantou.Analyzer.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Web.WebView2.1.0.4191.47\build\Microsoft.Web.WebView2.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebView2.1.0.4191.47\build\Microsoft.Web.WebView2.targets'))" />
+    <Error Condition="!Exists('..\packages\Meziantou.Analyzer.3.0.203\build\Meziantou.Analyzer.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Meziantou.Analyzer.3.0.203\build\Meziantou.Analyzer.props'))" />
   </Target>
   <Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
   <Import Project="..\packages\Tesseract.5.2.0\build\Tesseract.targets" Condition="Exists('..\packages\Tesseract.5.2.0\build\Tesseract.targets')" />
