@@ -11,8 +11,8 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | max_concurrency | 16 |
 | current_cohort | 2 |
 | recolor_generation | 1 |
-| last_updated | 2026-09-03T08-11 |
-| next_step | Await 645, 584 and 707. Merging 645 releases 731 and, together with the already merged 732, releases 736. Create each pull request from the parent on READY FOR PR and merge on durably confirmed green, updating the branch first whenever main has advanced. |
+| last_updated | 2026-09-03T15-00 |
+| next_step | Await three concurrent children: 584 (opus, resuming ambiguous staged-diff state), 752 (sonnet, first execution pass), and 751 preparation (sonnet, from scratch). Monitor PRs 755 (645) and 756 (707) for durable CI green and merge each on confirmation, updating branch first if main advances. After 645 merges, re-evaluate the per-edge barrier and launch 731 and 736 (732 already merged). When 751's preparation child reports its assessed complexity_band and preflight-clearance evidence, derive its blast radius the same way as 752, compute conflict edges against all 14 items (including 752), decide admission, and launch it. Do not report run completion (mode is open) until every non-withdrawn item, including 751 and 752, reaches merged or worktree_removed. |
 
 ## Items
 
@@ -21,8 +21,8 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 564 | docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/745 | 8be5a6aac3b5a82c86241fbbf989fd9118602c56 |
 | 565 | docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/753 | 87cb4df338322844abfa580abea14df77e738e5c |
 | 584 | docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584 | 3 | in_flight | worktree_created | - | - |
-| 645 | docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645 | 2 | in_flight | worktree_created | - | - |
-| 707 | docs/features/active/2026-08-31-narrow-fileio2-retryable-exception-set-707 | 3 | in_flight | worktree_created | - | - |
+| 645 | docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645 | 2 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/755 | - |
+| 707 | docs/features/active/2026-08-31-narrow-fileio2-retryable-exception-set-707 | 3 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/756 | - |
 | 729 | docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/746 | a679cd082819af6788cd0fb35f4366786fab87e3 |
 | 730 | docs/features/active/2026-09-02-ci-build-infra-debt-730 | 1 | merged | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/747 | 196561ca7a7f595bd88619e908e971b5636b6192 |
 | 731 | docs/features/active/2026-09-02-quickfiler-controller-lifecycle-disposal-defects-731 | 3 | scheduled | not_started | - | - |
@@ -31,6 +31,9 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 735 | docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735 | 1 | merged | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/749 | b01c37654b4cf0a470b09d565fcd5b76d2bcd758 |
 | 736 | docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736 | 4 | scheduled | not_started | - | - |
 | 737 | docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/750 | 87233f867ad60c0a5c0d19b09cc121ae536d7ba1 |
+| 752 | docs/features/active/2026-09-03-coverage-assembly-discovery-excludes-own-worktree-root-752 | 2 | in_flight | worktree_created | - | - |
+
+Item #751 (TerminalNotificationHookFailure flake) is in preparation-mode intake via /parallel-add and does not yet appear in items[]/cohorts[]; it will be added once its preparation child reports a preflight-cleared plan and an admission decision is recorded.
 
 ### Item lifecycle timestamps
 
@@ -39,8 +42,8 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 564 | 2026-09-02T18-10 | 2026-09-02T21-50 | 2026-09-02T22-00 | 2026-09-02T22-04 | - |
 | 565 | 2026-09-03T01-30 | 2026-09-03T07-44 | 2026-09-03T07-50 | 2026-09-03T07-50 | - |
 | 584 | 2026-09-03T07-57 | - | - | - | - |
-| 645 | 2026-09-03T07-19 | - | - | - | - |
-| 707 | 2026-09-03T07-57 | - | - | - | - |
+| 645 | 2026-09-03T07-19 | 2026-09-03T14-40 | - | - | - |
+| 707 | 2026-09-03T07-57 | 2026-09-03T14-42 | - | - | - |
 | 729 | 2026-09-02T18-10 | 2026-09-03T00-38 | 2026-09-03T01-04 | 2026-09-03T01-05 | - |
 | 730 | 2026-09-02T22-15 | 2026-09-03T00-45 | 2026-09-03T01-13 | 2026-09-03T01-14 | 2026-09-03T01-18 |
 | 731 | - | - | - | - | - |
@@ -49,6 +52,7 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 735 | 2026-09-03T01-08 | 2026-09-03T01-27 | 2026-09-03T07-10 | 2026-09-03T07-11 | 2026-09-03T07-12 |
 | 736 | - | - | - | - | - |
 | 737 | 2026-09-03T01-08 | 2026-09-03T01-28 | 2026-09-03T07-17 | 2026-09-03T07-17 | - |
+| 752 | 2026-09-03T15-00 | - | - | - | - |
 
 ## Cohorts
 
@@ -61,7 +65,7 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 4 | 0 | 707, 731 |
 | 0 | 1 | 564, 729, 733 |
 | 1 | 1 | 565, 730, 735, 737 |
-| 2 | 1 | 645, 732 |
+| 2 | 1 | 645, 732, 752 |
 | 3 | 1 | 584, 707, 731 |
 | 4 | 1 | 736 |
 
@@ -81,9 +85,15 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 731 | 736 | path_overlap |
 | 732 | 736 | path_overlap |
 | 735 | 736 | path_overlap |
+| 565 | 752 | path_overlap |
+| 729 | 752 | module_overlap |
+| 733 | 752 | path_overlap |
 
 ## Mutations
 
+| op | item_key | at | prior_state | new_state | disposition | recolor_generation |
+| --- | --- | --- | --- | --- | --- | --- |
+| add | 752 | 2026-09-03T14-55 | - | scheduled | - | 1 |
 
 ## Drift Events
 
