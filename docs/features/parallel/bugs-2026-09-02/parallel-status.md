@@ -11,8 +11,8 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | max_concurrency | 16 |
 | current_cohort | 2 |
 | recolor_generation | 1 |
-| last_updated | 2026-09-03T15-00 |
-| next_step | Await three concurrent children: 584 (opus, resuming ambiguous staged-diff state), 752 (sonnet, first execution pass), and 751 preparation (sonnet, from scratch). Monitor PRs 755 (645) and 756 (707) for durable CI green and merge each on confirmation, updating branch first if main advances. After 645 merges, re-evaluate the per-edge barrier and launch 731 and 736 (732 already merged). When 751's preparation child reports its assessed complexity_band and preflight-clearance evidence, derive its blast radius the same way as 752, compute conflict edges against all 14 items (including 752), decide admission, and launch it. Do not report run completion (mode is open) until every non-withdrawn item, including 751 and 752, reaches merged or worktree_removed. |
+| last_updated | 2026-09-03T16-00 |
+| next_step | Await four concurrent children: 584 (opus, resuming ambiguous staged-diff state), 752 (sonnet, first execution pass), 751 preparation (sonnet, from scratch), and 731 (opus, first execution pass with required origin/main reconciliation). When 731 merges, re-evaluate 736's barrier (645, 729, 731, 732, 735 all merged would clear it). When 751's preparation child reports its assessed complexity_band and preflight-clearance evidence, derive its blast radius the same way as 752, compute conflict edges against all 14 items (including 752), decide admission, and launch it. Do not report run completion (mode is open) until every non-withdrawn item, including 751 and 752, reaches merged or worktree_removed. |
 
 ## Items
 
@@ -21,11 +21,11 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 564 | docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/745 | 8be5a6aac3b5a82c86241fbbf989fd9118602c56 |
 | 565 | docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/753 | 87cb4df338322844abfa580abea14df77e738e5c |
 | 584 | docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584 | 3 | in_flight | worktree_created | - | - |
-| 645 | docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645 | 2 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/755 | - |
-| 707 | docs/features/active/2026-08-31-narrow-fileio2-retryable-exception-set-707 | 3 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/756 | - |
+| 645 | docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645 | 2 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/755 | 495b012929675f59dd4dea082a0694c0f5a27369 |
+| 707 | docs/features/active/2026-08-31-narrow-fileio2-retryable-exception-set-707 | 3 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/756 | 35583f7c7e1f1c9b97e4f6f1e7846a3f2693c17e |
 | 729 | docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/746 | a679cd082819af6788cd0fb35f4366786fab87e3 |
 | 730 | docs/features/active/2026-09-02-ci-build-infra-debt-730 | 1 | merged | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/747 | 196561ca7a7f595bd88619e908e971b5636b6192 |
-| 731 | docs/features/active/2026-09-02-quickfiler-controller-lifecycle-disposal-defects-731 | 3 | scheduled | not_started | - | - |
+| 731 | docs/features/active/2026-09-02-quickfiler-controller-lifecycle-disposal-defects-731 | 3 | in_flight | worktree_created | - | - |
 | 732 | docs/features/active/2026-09-02-folderconverter-folderpredictor-dead-code-and-bugs-732 | 2 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/754 | f8414ee979e1884c4a93703523509d4f45e89151 |
 | 733 | docs/features/active/2026-09-02-coverage-cobertura-mstest-powershell-tooling-defects-733 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/748 | b13d5b7b1a6dd0aa79d51d48a7156ee67377f9d0 |
 | 735 | docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735 | 1 | merged | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/749 | b01c37654b4cf0a470b09d565fcd5b76d2bcd758 |
@@ -42,17 +42,19 @@ Item #751 (TerminalNotificationHookFailure flake) is in preparation-mode intake 
 | 564 | 2026-09-02T18-10 | 2026-09-02T21-50 | 2026-09-02T22-00 | 2026-09-02T22-04 | - |
 | 565 | 2026-09-03T01-30 | 2026-09-03T07-44 | 2026-09-03T07-50 | 2026-09-03T07-50 | - |
 | 584 | 2026-09-03T07-57 | - | - | - | - |
-| 645 | 2026-09-03T07-19 | 2026-09-03T14-40 | - | - | - |
-| 707 | 2026-09-03T07-57 | 2026-09-03T14-42 | - | - | - |
+| 645 | 2026-09-03T07-19 | 2026-09-03T14-40 | 2026-09-03T15-15 | 2026-09-03T15-55 | - |
+| 707 | 2026-09-03T07-57 | 2026-09-03T14-42 | 2026-09-03T15-15 | 2026-09-03T15-55 | - |
 | 729 | 2026-09-02T18-10 | 2026-09-03T00-38 | 2026-09-03T01-04 | 2026-09-03T01-05 | - |
 | 730 | 2026-09-02T22-15 | 2026-09-03T00-45 | 2026-09-03T01-13 | 2026-09-03T01-14 | 2026-09-03T01-18 |
-| 731 | - | - | - | - | - |
+| 731 | 2026-09-03T16-00 | - | - | - | - |
 | 732 | 2026-09-03T07-19 | 2026-09-03T07-59 | 2026-09-03T08-10 | 2026-09-03T08-11 | - |
 | 733 | 2026-09-02T18-10 | 2026-09-03T01-06 | 2026-09-03T01-21 | 2026-09-03T01-21 | - |
 | 735 | 2026-09-03T01-08 | 2026-09-03T01-27 | 2026-09-03T07-10 | 2026-09-03T07-11 | 2026-09-03T07-12 |
 | 736 | - | - | - | - | - |
 | 737 | 2026-09-03T01-08 | 2026-09-03T01-28 | 2026-09-03T07-17 | 2026-09-03T07-17 | - |
 | 752 | 2026-09-03T15-00 | - | - | - | - |
+
+Worktree removal for items 645 and 707 was attempted (non-forced `git worktree remove`) and deferred: both worktrees carry modified/untracked files (pr_context artifacts and, for 645, a stray promoted-record file) and removal was not forced. `merge_status: merged` still satisfies open-mode completion.
 
 ## Cohorts
 
