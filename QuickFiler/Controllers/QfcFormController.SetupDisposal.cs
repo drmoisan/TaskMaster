@@ -204,6 +204,9 @@ namespace QuickFiler.Controllers
             _formViewer.FormDeactivated -= this.FormViewer_Deactivated;
         }
 
+        /// <summary>Handle for the undo-queue disposal that <c>Cleanup()</c> defers onto a <see cref="TaskScheduler.Default"/> continuation on the undo consumer, so the consumer never faults on a collection disposed underneath it and so tests can observe that continuation deterministically without a wall-clock wait or a polling spin (issue #731 finding 2).</summary>
+        private Task _undoQueueDisposal;
+
         /// <summary>
         /// Release all resources and call the parent cleanup
         /// </summary>
@@ -215,7 +218,35 @@ namespace QuickFiler.Controllers
             }
 
             UnregisterFormEventHandlers();
-            _undoQueue?.Dispose();
+            var undoQueue = _undoQueue;
+            var undoConsumer = _undoConsumerTask;
+            try
+            {
+                undoQueue?.CompleteAdding();
+            }
+            catch (ObjectDisposedException)
+            {
+                // A repeated Cleanup() re-enters here on the already-disposed queue.
+            }
+            if (undoConsumer is null)
+            {
+                undoQueue?.Dispose();
+                _undoQueueDisposal = Task.CompletedTask;
+            }
+            else
+            {
+                _undoQueueDisposal = undoConsumer.ContinueWith(
+                    antecedent =>
+                    {
+                        if (antecedent.Exception is not null)
+                        {
+                            logger.Error("Undo consumer faulted.", antecedent.Exception);
+                        }
+                        undoQueue?.Dispose();
+                    },
+                    TaskScheduler.Default
+                );
+            }
             _globals = null;
             _formViewer?.Dispose();
             _formViewer = null;

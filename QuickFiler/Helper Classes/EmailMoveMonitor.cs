@@ -14,7 +14,11 @@ using UtilitiesCS;
 
 namespace QuickFiler.Helper_Classes
 {
-    // TODO: Determine what EmailMoveMonitor was supposed to be used for. It is now malfunctioning. Temprorarily disabling.
+    // Watches Outlook's BeforeItemMove event on behalf of a single owning controller, so that an
+    // owner can register a per-MailItem action to run when that item is moved out of the folder it
+    // was staged from. Hooks are held in an instance-scoped list: BeforeItemMove dispatches at most
+    // one action per MailItem via FirstOrDefault, and UnhookAll clears that whole list, which is why
+    // each owner constructs its own monitor rather than sharing one (issue #731 finding 1).
     internal class EmailMoveMonitor : IEmailMoveMonitor
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(

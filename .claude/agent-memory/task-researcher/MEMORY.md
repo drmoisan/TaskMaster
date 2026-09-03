@@ -57,6 +57,7 @@
 - [qfc663-alt-chord-no-altf](project_qfc663_alt_chord_no_altf.md) — #663: QfcFormViewer has NO menus/mnemonics of its own; only Alt+M (from hosted ItemViewer) is swallowed, Alt+F is EFC-only; #464 deferred the shared predicate for file-ownership reasons only (2026-09-01)
 - [ribbon-engine-toggle-defects-735](project_ribbon_engine_toggle_defects_735.md) — #735: RibbonExplorer.xml IS CSharpier-formatted; 84 distinct callback names (5 dead, 8 in comments); ManagerAsyncLazy test-constructible; 459-line test file forces partial split (2026-09-02)
 - [banner-prefix-arity-662](project_banner_prefix_arity_662.md) — #662: AC2's decl regex contradicts AC5's aliasing remedy; the "must agree" assertion does NOT catch the widening (only the BeFalse line does); `/Tests:` and `/TestCaseFilter:` are mutually exclusive (2026-08-31)
+- [qfc-lifecycle-disposal-731](project_qfc_lifecycle_disposal_731.md) — #731: sharing EmailMoveMonitor DROPS move actions; `volatile` = CS0420 build break; TWO dead ctor params; Cleanup() is UI-thread so no Task.Wait (2026-09-02)
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
