@@ -688,7 +688,10 @@ namespace UtilitiesCS
 
             // Fully root the folderpath
             string parentFolderpath;
-            if (olAncestor.EndsWith('\\'.ToString()) | parentBranchPath[0] == '\\')
+            if (
+                olAncestor.EndsWith("\\", StringComparison.Ordinal)
+                || (parentBranchPath.Length > 0 && parentBranchPath[0] == '\\')
+            )
             {
                 parentFolderpath = $"{olAncestor}{parentBranchPath}";
             }
