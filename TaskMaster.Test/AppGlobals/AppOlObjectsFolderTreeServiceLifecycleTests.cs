@@ -197,7 +197,7 @@ namespace TaskMaster.Test.AppGlobals
                 TreeTask terminalInitialization
             )
             {
-                InvokedTerminalHookCount++;
+                Interlocked.Increment(ref InvokedTerminalHookCount);
                 var signal = Interlocked.Exchange(ref _terminalSignal, Signal<TreeTask>());
                 signal.TrySetResult(terminalInitialization);
                 if (_throwFromTerminalHook)
