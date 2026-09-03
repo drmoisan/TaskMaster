@@ -467,6 +467,7 @@
     <Compile Include="Ribbon\RibbonController.Intelligence.cs" />
     <Compile Include="Ribbon\RibbonViewer.cs" />
     <Compile Include="Ribbon\RibbonViewer.EngineCommands.cs" />
+    <Compile Include="Ribbon\SpamManagerResetGate.cs" />
     <Compile Include="Ribbon\TryFunctionalityInConstruction.cs" />
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>
