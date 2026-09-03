@@ -114,19 +114,19 @@ If any required baseline artifact, regression artifact, QA-gate artifact, or cov
 
 Run the three steps below in this exact order. If any step fails, or rewrites a file (per the format step's before/after observation), fix the cause and restart from `[P4-T1]` with the iteration counter incremented; do not stop the loop until a single pass completes with all three steps clean.
 
-- [ ] [P4-T1] PoshQC format over the two owned files (iteration `iter1` on first execution) and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/qa-gates/poshqc-format.iter1.<timestamp>.md`.
+- [x] [P4-T1] PoshQC format over the two owned files (iteration `iter1` on first execution) and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/qa-gates/poshqc-format.iter1.<timestamp>.md`.
   - Command and before/after tree observation: identical to `[P0-T5]`, re-run after the `[P2-T1]` fix and `[P1-T1]` test insertion are both in place.
   - Acceptance: the artifact carries the four required fields, the before/after `git status --porcelain` pair for the two owned files, and the folder-coercion check; `Output Summary:` states whether either owned file was rewritten. If a subsequent iteration is needed, its artifact is named with the incremented `iter<N>` suffix.
 
-- [ ] [P4-T2] PSScriptAnalyzer over the two owned files (matching iteration suffix) and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/qa-gates/poshqc-analyze.iter1.<timestamp>.md`.
+- [x] [P4-T2] PSScriptAnalyzer over the two owned files (matching iteration suffix) and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/qa-gates/poshqc-analyze.iter1.<timestamp>.md`.
   - Command: identical to `[P0-T6]`.
   - Acceptance: the artifact carries the four required fields, `MCP Result: ok:true`, and the full verbatim diagnostic list from the paired direct run; the diagnostic count for each of the two files is less than or equal to the `[P0-T6]` baseline count for that file, with zero new rule violations (a diagnostic present in `[P0-T6]`'s list for a given file/rule pair is not counted as new — matching on file+rule rather than file+line+rule, because the statement swap in `[P2-T1]` and the test insertion in `[P1-T1]` can shift line numbers for a pre-existing, substantively-unchanged diagnostic below the edit point).
 
-- [ ] [P4-T3] Full Pester suite with coverage (matching iteration suffix) and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/qa-gates/poshqc-test.iter1.<timestamp>.md`.
+- [x] [P4-T3] Full Pester suite with coverage (matching iteration suffix) and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/qa-gates/poshqc-test.iter1.<timestamp>.md`.
   - Command: identical to `[P0-T7]`, with `CodeCoverage.OutputPath = "docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/qa-gates/pester-coverage.iter1.<timestamp>.xml"`.
   - Acceptance: the artifact carries the four required fields, `MCP Result: ok:true`, `EXIT_CODE: 0`, `Failed=0` across all five test files, and the numeric `MainScriptCommands=`/`Executed=`/`Percent=` coverage of `scripts/vscode/Invoke-MSTestWithCoverage.ps1`.
 
-- [ ] [P4-T4] Verify the coverage delta and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/qa-gates/coverage-delta.<timestamp>.md`.
+- [x] [P4-T4] Verify the coverage delta and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/qa-gates/coverage-delta.<timestamp>.md`.
   - Acceptance: the artifact records, side by side: the `[P0-T7]` baseline `Percent=` for `scripts/vscode/Invoke-MSTestWithCoverage.ps1`; the final `[P4-T3]` `Percent=` for the same file; and the explicit statement that the post-change `Percent=` is greater than or equal to the baseline `Percent=` (no regression). It additionally records that the swapped lines (the `Set-Content` and `Assert-CoberturaLineCoverageThreshold` calls, both now covered by the pre-existing `It 'collects and post-processes coverage on the fully mocked main happy path'` and the new `It` from `[P1-T1]`) are among the commands counted as executed in the `[P4-T3]` run, by name-checking both tests in that run's `Output Summary:`. If the post-change percent is lower than baseline, the outcome is BLOCKED, not PASS.
 
 ### Phase 5 — Acceptance-criteria verification and check-off
