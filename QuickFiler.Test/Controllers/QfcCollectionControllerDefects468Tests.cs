@@ -22,7 +22,7 @@ namespace QuickFiler.Controllers.Tests
     /// </para>
     /// </summary>
     [TestClass]
-    public class QfcCollectionControllerDefects468Tests
+    public partial class QfcCollectionControllerDefects468Tests
     {
         /// <summary>
         /// Name of the private static reentrancy counter guarded by issue #286.

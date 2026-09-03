@@ -18,27 +18,17 @@ namespace QuickFiler.Controllers.Tests
     [TestClass]
     public class QfcDatamodelTests
     {
+        /// <summary>
+        /// Builds the admission collaborator under test. Issue #731 finding 3 removed the settings
+        /// and scoring-delegate constructor parameters, so no settings or globals arrangement is
+        /// needed here any more: admission is provably independent of both.
+        /// </summary>
         private static QfcRemainingQueueAdmission CreateQueueAdmission(
-            bool highConfidenceEnabled,
-            double threshold,
             IList<MailItem> added,
-            IList<MailItem> hooked,
-            Func<MailItem, CancellationToken, Task<long>> scoreLoader
+            IList<MailItem> hooked
         )
         {
-            var settings = new Mock<IAppQuickFilerSettings>(MockBehavior.Strict);
-            settings.SetupGet(x => x.HighConfidenceModeEnabled).Returns(highConfidenceEnabled);
-            if (highConfidenceEnabled)
-            {
-                settings.SetupGet(x => x.HighConfidenceThreshold).Returns(threshold);
-            }
-
-            var globals = new Mock<IApplicationGlobals>(MockBehavior.Strict);
-            globals.SetupGet(x => x.QfSettings).Returns(settings.Object);
-
             return new QfcRemainingQueueAdmission(
-                globals.Object,
-                scoreLoader,
                 added.Add,
                 (mail, _) => hooked.Add(mail),
                 _ => { }
@@ -52,16 +42,7 @@ namespace QuickFiler.Controllers.Tests
             var added = new List<MailItem>();
             var hooked = new List<MailItem>();
             var mailItem = new Mock<MailItem>().Object;
-            var admission = CreateQueueAdmission(
-                highConfidenceEnabled: true,
-                threshold: 0.90,
-                added,
-                hooked,
-                (mail, _) =>
-                    throw new AssertFailedException(
-                        "Remaining-mail admission must not score before queue insertion."
-                    )
-            );
+            var admission = CreateQueueAdmission(added, hooked);
 
             // Act
             var queued = await admission.TryQueueAsync(mailItem, CancellationToken.None);
@@ -72,31 +53,43 @@ namespace QuickFiler.Controllers.Tests
             hooked.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
         }
 
+        /// <summary>
+        /// Scenario: reflect over <see cref="QfcRemainingQueueAdmission"/>'s single constructor and
+        /// its declared fields. Expected outcome: neither declares a scoring delegate. This pins the
+        /// issue #233 intent structurally, in place of the behavioural test that previously pinned
+        /// it by passing a throwing scorer through a parameter that no longer exists.
+        /// </summary>
         [TestMethod]
-        public async Task TryQueueRemainingMailItemAsync_HighConfidenceEnabled_IgnoresThresholdAtAdmission()
+        public void QfcRemainingQueueAdmission_DeclaresNoScoringDelegate()
         {
             // Arrange
-            var added = new List<MailItem>();
-            var hooked = new List<MailItem>();
-            var mailItem = new Mock<MailItem>().Object;
-            var admission = CreateQueueAdmission(
-                highConfidenceEnabled: true,
-                threshold: 0.90,
-                added,
-                hooked,
-                (mail, token) =>
-                    throw new AssertFailedException(
-                        "Threshold scoring belongs to dequeue-time enforcement."
-                    )
-            );
+            const string Rationale =
+                "issue #233: Threshold scoring belongs to dequeue-time enforcement.";
 
             // Act
-            var queued = await admission.TryQueueAsync(mailItem, CancellationToken.None);
+            ConstructorInfo[] constructors = typeof(QfcRemainingQueueAdmission).GetConstructors(
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public
+            );
 
             // Assert
-            queued.Should().BeTrue();
-            added.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
-            hooked.Should().ContainSingle().Which.Should().BeSameAs(mailItem);
+            constructors.Should().ContainSingle(because: Rationale);
+            constructors[0]
+                .GetParameters()
+                .Should()
+                .NotContain(
+                    parameter =>
+                        parameter.ParameterType
+                        == typeof(Func<MailItem, CancellationToken, Task<long>>),
+                    because: Rationale
+                );
+            typeof(QfcRemainingQueueAdmission)
+                .GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+                .Should()
+                .NotContain(
+                    field =>
+                        field.FieldType == typeof(Func<MailItem, CancellationToken, Task<long>>),
+                    because: Rationale
+                );
         }
 
         [TestMethod]
@@ -144,16 +137,7 @@ namespace QuickFiler.Controllers.Tests
             var added = new List<MailItem>();
             var hooked = new List<MailItem>();
             var mailItem = new Mock<MailItem>().Object;
-            var admission = CreateQueueAdmission(
-                highConfidenceEnabled: true,
-                threshold: 0.90,
-                added,
-                hooked,
-                (mail, token) =>
-                    throw new AssertFailedException(
-                        "Below-threshold candidates must reach the queue for dequeue-time filtering."
-                    )
-            );
+            var admission = CreateQueueAdmission(added, hooked);
 
             // Act
             var queued = await admission.TryQueueAsync(mailItem, CancellationToken.None);
@@ -171,14 +155,7 @@ namespace QuickFiler.Controllers.Tests
             var added = new List<MailItem>();
             var hooked = new List<MailItem>();
             var mailItem = new Mock<MailItem>().Object;
-            var admission = CreateQueueAdmission(
-                highConfidenceEnabled: false,
-                threshold: 0.90,
-                added,
-                hooked,
-                (mail, token) =>
-                    throw new AssertFailedException("Scoring should not run when disabled.")
-            );
+            var admission = CreateQueueAdmission(added, hooked);
 
             // Act
             var queued = await admission.TryQueueAsync(mailItem, CancellationToken.None);
@@ -200,14 +177,7 @@ namespace QuickFiler.Controllers.Tests
             // Arrange
             var added = new List<MailItem>();
             var hooked = new List<MailItem>();
-            var admission = CreateQueueAdmission(
-                highConfidenceEnabled: true,
-                threshold: 0.90,
-                added,
-                hooked,
-                (mail, token) =>
-                    throw new AssertFailedException("Scoring must not run for a null mail item.")
-            );
+            var admission = CreateQueueAdmission(added, hooked);
 
             // Act
             var queued = await admission.TryQueueAsync(null, CancellationToken.None);
