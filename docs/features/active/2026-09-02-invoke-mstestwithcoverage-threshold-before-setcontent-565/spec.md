@@ -4,7 +4,7 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-09-02T08-59
-- **Status:** Draft
+- **Status:** Implemented
 - **Version:** 0.1
 
 ## Write Set
@@ -170,7 +170,7 @@ Seeded from issue:
 
 - [x] Move the `Set-Content` above the `Assert-CoberturaLineCoverageThreshold` call so the judged
       document is persisted before the threshold is evaluated.
-- [ ] Add a Pester test under `tests/scripts/vscode/` asserting that a sub-threshold run still leaves
+- [x] Add a Pester test under `tests/scripts/vscode/` asserting that a sub-threshold run still leaves
       the post-processed document on disk (not the raw `dotnet-coverage` output).
 
 - Regression tests to add or update:

@@ -145,14 +145,14 @@ Run the three steps below in this exact order. If any step fails, or rewrites a 
 
 ### Phase 6 — Documentation, issue mirror, and wrap-up
 
-- [ ] [P6-T1] Update `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/spec.md` § Status and § Test Strategy checkboxes to reflect completion (the two `- [x]`/`- [ ]` items under "Seeded from issue" both become `- [x]`).
+- [x] [P6-T1] Update `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/spec.md` § Status and § Test Strategy checkboxes to reflect completion (the two `- [x]`/`- [ ]` items under "Seeded from issue" both become `- [x]`).
   - Acceptance: `spec.md` `- **Status:**` reads a completed value (e.g. `Implemented`), and both "Seeded from issue" checkboxes are `- [x]`.
 
-- [ ] [P6-T2] Emit the acceptance-criteria status summary required by `acceptance-criteria-tracking` into `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/other/ac-status-summary.<timestamp>.md`.
+- [x] [P6-T2] Emit the acceptance-criteria status summary required by `acceptance-criteria-tracking` into `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/other/ac-status-summary.<timestamp>.md`.
   - Required block shape: `### Acceptance Criteria Status` with `- Source:`, `- Total AC items:`, `- Checked off (delivered):`, `- Remaining (unchecked):`, `- Items remaining:`.
   - Acceptance: `Source:` names `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/spec.md` only; `Total AC items:` equals `6` (the count of checkbox items under `## Acceptance Criteria` in `spec.md`); any unchecked item is listed verbatim with the reason it could not be verified. If any item remains unchecked, the plan outcome is INCOMPLETE, not PASS.
 
-- [ ] [P6-T3] Mirror an issue update for #565 and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/issue-updates/issue-565.<timestamp>.md`.
+- [x] [P6-T3] Mirror an issue update for #565 and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/issue-updates/issue-565.<timestamp>.md`.
   - Acceptance: the artifact carries `Timestamp:`, the exact text intended/posted (summarizing the statement-reorder fix and linking the branch `bug/invoke-mstestwithcoverage-threshold-before-setcontent-565`), and `PostedAs: comment` or `PostedAs: unknown` with a `POSTING BLOCKED` header and reason if not posted.
 
 - [ ] [P6-T4] Confirm a clean working tree and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/other/final-clean-tree.<timestamp>.md`.
