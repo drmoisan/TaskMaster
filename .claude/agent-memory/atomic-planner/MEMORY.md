@@ -35,6 +35,8 @@
 - [#670 capture-time sanitisation](project_670_capture_time_sanitisation_seams.md) — a vswhere-resolved path leaks via an *indirect* invoker
 - [#680](project_680_menu_mode_plan_seams.md) — HostTests.cs 499 not 500; "optional" fallback was load-bearing
 - [#736 R1–R5](project_736_efc_archiveroot_boundary_sink_plan_seams.md) — 485-line test file voids the spec Write Set; R2: hardcoded `U=2` floor breaks when one item is a method body; R3: one shared `try` short-circuits the second delegate to zero invocations; R4: a name-shaped gate never measures a content-shaped rule, and the reviewer's own delta carried a false CI citation; R5: `*.log` evidence artifacts gated only on existence could never be committed
+- [#731](project_731_lifecycle_disposal_plan_seams.md) — Defects468Tests 498/500 forces a partial continuation; QfcQueue.cs already 505; spec said ONE comment line not three; R3 = all 4 defects in gate wiring; R4 = worktree not bootstrapped (no `.dotnet-sdk/`, no `packages/`), `DebugType=full` leaks host paths, 1:1 line mapping unsatisfiable for a 1-to-20 hunk; R5 = case-insensitive token absence collides with a retained method name, `.//line` double-counts on two axes, unconditional AC17 check-off vs two degraded branches; R6 = document state is DERIVED from exit code (`:236`/`:341` throw before the `:343` write), an exclusion keyed on the regression's own definition is vacuous, `line-rate` is a fraction not a percentage, unanchored filename suffix also selects `IQfcDatamodel.cs`
+- [#735 R1](project_735_evidence_content_sanitization_seams.md) — name-only sanitization gate can't fail; TRX `runUser=`/`computerName=` leak in content; csproj "between" clause self-contradictory
 
 ## Plan-structure traps
 
@@ -64,6 +66,8 @@
 - [Enumeration variable must match its consumer](enumeration-variable-must-match-consumer.md) — mismatch = zero-assembly run, zero reported failures
 - [Diff gates need a commit task](diff-gates-need-a-commit-task.md) — `git diff <BASE>..HEAD` passes vacuously with no commit
 - [Empty-porcelain clauses are unsatisfiable](empty-porcelain-clause-is-unsatisfiable.md) — prior task's artifact dirties it; use a negative path-class clause + double amend
+- [Porcelain collapses untracked directories](porcelain-collapses-untracked-directories.md) — needs `--untracked-files=all` to enumerate evidence artifact paths
+- [Self-referential evidence enumeration](self-referential-evidence-enumeration.md) — a gate's own capture can't list its own artifact; bound the range at the capturing task
 - [Never pin a HEAD SHA as a plan expectation](never-pin-head-sha-as-plan-expectation.md) — gate on tree invariants instead
 - [Harness gitStatus may describe another worktree](harness-git-status-may-describe-another-worktree.md) — measure inside the target worktree
 - [Absolute counts in shared files go stale](absolute-counts-in-shared-files-go-stale.md) — lower-bound/baseline-relative for co-owned files
@@ -101,6 +105,7 @@
 
 ## Coverage
 
+- [Repo-wide Cobertura line-rate is nondeterministic](repo-wide-cobertura-line-rate-is-nondeterministic.md) — 47%→81% on an identical tree; branch on `lines-valid` comparability, never gate unbranched
 - [Deletion-adjusted coverage no-regression gate](deletion-adjusted-coverage-no-regression-gate.md) — gate on covered/valid counters; shrink the denominator, never exclude (`project_deadcode_removal_vs_coverage_exclusion.md`)
 - [#489 PartN reroute amendment seams](project_489_partn_reroute_amendment_seams.md) — verify parent `partial`; amendments shift AC line citations
 - [Spec corrections sweep sibling sections](feedback_spec_corrections_sweep_sibling_sections.md) — cover Scope/Out-of-scope/Rollout, not AC only

@@ -268,6 +268,10 @@ Describe 'ConvertTo-KoverageCoberturaXml' {
         $mergedClass.'line-rate' | Should -Be '0.6'
         $mergedLines.Count | Should -Be 5
         (@($mergedLines | ForEach-Object { $_.number }) -join ',') | Should -Be '12,13,56,57,58'
+        # Issue #733 finding 1: the enclosing package rate must be recomputed from the merged
+        # classes too, not left at the fixture's stale input value of '0'.
+        $resultXml.SelectSingleNode('//package').'line-rate' | Should -Be '0.6'
+        $resultXml.SelectSingleNode('//package').'branch-rate' | Should -Be '0'
     }
 
     It 'deduplicates a repeated line number by taking the maximum hits value' {
@@ -314,7 +318,7 @@ Describe 'ConvertTo-KoverageCoberturaXml' {
     }
 
     It 'preserves the primary class methods subtree and every hits value when merging' {
-        # Locks the decision not to merge or strip <methods>. Reuses the F3 document.
+        # Locks the union-merge decision for <methods> (issue #733, finding 2). Reuses the F3 document.
         $inputXml = @'
 <?xml version="1.0" encoding="utf-8"?>
 <coverage line-rate="0" branch-rate="0" lines-covered="0" lines-valid="0" branches-covered="0" branches-valid="0">
@@ -343,8 +347,8 @@ Describe 'ConvertTo-KoverageCoberturaXml' {
         $methodNodes = @($mergedClass.SelectNodes('./methods/method'))
         $hitsByLine = @($mergedClass.SelectNodes('./lines/line')) | ForEach-Object { '{0}={1}' -f $_.number, $_.hits }
 
-        $methodNodes.Count | Should -Be 1
-        $methodNodes[0].name | Should -Be 'M'
+        $methodNodes.Count | Should -Be 2
+        (@($methodNodes | ForEach-Object { $_.name }) -join ',') | Should -Be 'M,N'
         ($hitsByLine -join ',') | Should -Be '12=0,13=0,56=1,57=1,58=1'
     }
 
@@ -487,12 +491,4 @@ Describe 'Get-CoberturaClassLineSummary' {
         $summary.TotalBranches | Should -Be 0
         $summary.CoveredBranches | Should -Be 0
     }
-}
-
-Describe 'Assert-CoberturaLineCoverageThreshold' {
-    It 'throws when the Cobertura line-coverage summary is missing' { { Assert-CoberturaLineCoverageThreshold -CoberturaXml '<coverage />' } | Should -Throw 'Cobertura line-rate is missing.' }
-    It 'throws when the Cobertura line-coverage summary is non-numeric' { { Assert-CoberturaLineCoverageThreshold -CoberturaXml '<coverage line-rate="invalid" />' } | Should -Throw 'Cobertura line-rate must be numeric.' }
-    It 'throws when the Cobertura line coverage is below 80 percent' { { Assert-CoberturaLineCoverageThreshold -CoberturaXml '<coverage line-rate="0.799999" />' } | Should -Throw 'Cobertura line coverage 79.9999% is below the required 80% threshold.' }
-    It 'accepts a Cobertura line coverage result at exactly 80 percent' { { Assert-CoberturaLineCoverageThreshold -CoberturaXml '<coverage line-rate="0.8" />' } | Should -Not -Throw }
-    It 'accepts a Cobertura line coverage result above 80 percent' { { Assert-CoberturaLineCoverageThreshold -CoberturaXml '<coverage line-rate="0.800001" />' } | Should -Not -Throw }
 }

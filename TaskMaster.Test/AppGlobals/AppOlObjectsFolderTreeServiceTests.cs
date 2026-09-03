@@ -110,8 +110,9 @@ namespace TaskMaster.Test.AppGlobals
                 dispatcher.Complete(run.Operation, DispatchMode.Faulted);
                 (await GetExceptionAsync(run.Worker)).Should().BeSameAs(fault);
                 await run.Operation.ReleaseAsync();
+                (await GetExceptionAsync(await run.Terminal)).Should().BeSameAs(fault);
                 sut.LoadCount.Should().Be(0);
-                sut.InvokedTerminalHookCount.Should().Be(1);
+                Volatile.Read(ref sut.InvokedTerminalHookCount).Should().Be(1);
             }
             finally
             {

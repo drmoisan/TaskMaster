@@ -861,6 +861,29 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         }
 
         [TestMethod]
+        public void CreateFolder_WhenParentBranchPathIsEmpty_DoesNotThrowIndexOutOfRangeException()
+        {
+            // Regression test for issue #732: CreateFolder indexed parentBranchPath[0]
+            // unconditionally via a bitwise `|` short-circuit-free OR, so an empty
+            // parentBranchPath threw IndexOutOfRangeException instead of taking the
+            // olAncestor.EndsWith('\\') branch. Expected: no exception is thrown.
+            var archiveRoot = CreateFolder(
+                "\\\\ArchiveRoot",
+                new Dictionary<string, OutlookFolder>()
+            );
+            var app = CreateApplication(
+                new Dictionary<string, OutlookFolder> { ["ArchiveRoot"] = archiveRoot.Object }
+            );
+            var globals = CreateGlobals(app, archiveRoot.Object);
+            var predictor = new TestableFolderPredictor(globals.Object, "FY26");
+
+            Action act = () =>
+                predictor.CreateFolder(string.Empty, "\\\\ArchiveRoot", "C:\\OneDrive");
+
+            act.Should().NotThrow();
+        }
+
+        [TestMethod]
         public async Task InjectedUi_CreateFolderAsync_WhenPromptReturnsNull_DoesNotCreateDirectory()
         {
             var childFolders = new Mock<OutlookFolders>();

@@ -40,6 +40,17 @@ agent-memory files and the not-yet-committed plan file are still in the tree (me
 entries). When you accept a fix for this defect class, re-grep the whole plan — the natural mental
 model is "clean tree at the end", so authors patch the end and miss the baseline capture.
 
+**A Phase-0 capture of the dirty set is NOT sufficient.** On issue #731 the planner fixed this class
+by having Phase 0 record the pre-existing dirty set and having the Phase 5 gates subtract it. That
+still fails, because the *executor itself* writes `.claude/agent-memory/atomic-executor/MEMORY.md`
+(tracked; 720 tracked files under `.claude/agent-memory/`) mid-execution, i.e. AFTER the Phase 0
+capture, so the path enters the tracked-modified set outside the recorded baseline and the terminal
+exact-count gate fails with no escape clause. Evidence it is not hypothetical: on that branch the
+planner's own `MEMORY.md` was already modified and a further untracked planner memory file appeared
+between the plan's baseline observation and preflight round 2. Require a **standing** allowance
+("every path under `.claude/agent-memory/` is out of scope for every gate, whenever it appeared"),
+not a point-in-time snapshot.
+
 Related: [[project_preflight_selfderived_gate_thresholds_are_blind]],
 [[project_418_plan_rationale_clauses_are_evidence]],
 [[project_preflight_ac_checkoff_and_tooloutput_paths]].

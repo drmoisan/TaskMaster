@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
-using UtilitiesCS;
 
 namespace QuickFiler.Controllers
 {
@@ -13,18 +12,11 @@ namespace QuickFiler.Controllers
         private readonly Action<MailItem> _removeFromQueue;
 
         internal QfcRemainingQueueAdmission(
-            IApplicationGlobals globals,
-            Func<MailItem, CancellationToken, Task<long>> scoreLoader,
             Action<MailItem> addToQueue,
             Action<MailItem, Action<MailItem>> hookItem,
             Action<MailItem> removeFromQueue
         )
         {
-            if (scoreLoader is null)
-            {
-                throw new ArgumentNullException(nameof(scoreLoader));
-            }
-
             _addToQueue = addToQueue ?? throw new ArgumentNullException(nameof(addToQueue));
             _hookItem = hookItem ?? throw new ArgumentNullException(nameof(hookItem));
             _removeFromQueue =

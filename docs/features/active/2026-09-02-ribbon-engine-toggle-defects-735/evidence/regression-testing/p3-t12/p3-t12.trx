@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="da34915a-4530-458e-96b0-ae100f0e9c5f" name="REDACTED-ACCOUNT@REDACTED-MACHINE 2026-09-03 01:43:51" runUser="REDACTED-MACHINE\REDACTED-ACCOUNT" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-09-03T01:43:51.8965229-04:00" queuing="2026-09-03T01:43:51.8965229-04:00" start="2026-09-03T01:43:50.7524511-04:00" finish="2026-09-03T01:43:52.1268065-04:00" />
+  <TestSettings name="default" id="e15c364e-48a5-47d1-be15-157203f3d94f">
+    <Deployment runDeploymentRoot="REDACTED-ACCOUNT_REDACTED-MACHINE_2026-09-03_01_43_51" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="2f4ab2d7-1e1c-4294-945d-dad4adfaa638" testId="106f74fd-365d-8a33-ab8f-cc14fc78d04a" testName="ExecuteToggleAsync_WithNullEngines_ThrowsInvalidOperationExceptionWithoutTogglingEngine" computerName="REDACTED-MACHINE" duration="00:00:00.0008127" startTime="2026-09-03T01:43:51.9739126-04:00" endTime="2026-09-03T01:43:51.9744196-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2f4ab2d7-1e1c-4294-945d-dad4adfaa638" />
+    <UnitTestResult executionId="bc3e5d81-942b-4ab8-a482-8ee1d183b772" testId="1e29f68e-9a23-86fc-b997-f35b9d9e11b2" testName="GetPressed_WhenPrimeFaults_LogsErrorAndStillReturnsFalse" computerName="REDACTED-MACHINE" duration="00:00:00.0034648" startTime="2026-09-03T01:43:51.9489612-04:00" endTime="2026-09-03T01:43:51.9537706-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bc3e5d81-942b-4ab8-a482-8ee1d183b772" />
+    <UnitTestResult executionId="15158af3-9e59-4faf-bb41-51243fac918b" testId="12fbe888-25c8-84ff-865e-e8c8aae616a3" testName="Constructor_WithNullEnginesAccessor_ThrowsArgumentNullException" computerName="REDACTED-MACHINE" duration="00:00:00.0388231" startTime="2026-09-03T01:43:51.6364641-04:00" endTime="2026-09-03T01:43:51.7626993-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="15158af3-9e59-4faf-bb41-51243fac918b">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="75eaba7b-6cf4-457d-8d74-114254e33ef4" testId="12079152-e854-8bbb-8002-0aaff01d51a5" testName="ApplyPrimeAsync_WhenPrimeResolvesAfterToggle_DoesNotOverwriteToggleResult" computerName="REDACTED-MACHINE" duration="00:00:00.0017412" startTime="2026-09-03T01:43:51.9699279-04:00" endTime="2026-09-03T01:43:51.9719406-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="75eaba7b-6cf4-457d-8d74-114254e33ef4" />
+    <UnitTestResult executionId="9b525311-27fd-4efa-9121-31532cb74003" testId="188e1ab3-c9f4-8b99-8973-5a218a17a1ea" testName="GetPressed_WhenPrimeIsCanceled_LogsErrorAndClearsPrimeMarker" computerName="REDACTED-MACHINE" duration="00:00:00.0019089" startTime="2026-09-03T01:43:51.9744196-04:00" endTime="2026-09-03T01:43:51.9764334-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9b525311-27fd-4efa-9121-31532cb74003" />
+    <UnitTestResult executionId="23abb944-0ebe-4f8a-a92a-93842d03141f" testId="14f5173d-02b8-87b5-af5f-651b1183c9be" testName="ExecuteToggleAsync_WithUnmappedKey_ThrowsArgumentException" computerName="REDACTED-MACHINE" duration="00:00:00.0009539" startTime="2026-09-03T01:43:51.9642956-04:00" endTime="2026-09-03T01:43:51.9653136-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="23abb944-0ebe-4f8a-a92a-93842d03141f" />
+    <UnitTestResult executionId="e7753de9-9c9c-40c0-921e-b50cee8d094c" testId="14c68b3b-4529-8e02-b927-5a90d02629cd" testName="ExecuteToggleAsync_PerformsToggleThenRefreshThenCacheThenInvalidate_InOrder" computerName="REDACTED-MACHINE" duration="00:00:00.0068638" startTime="2026-09-03T01:43:51.9537706-04:00" endTime="2026-09-03T01:43:51.9607702-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e7753de9-9c9c-40c0-921e-b50cee8d094c" />
+    <UnitTestResult executionId="157dbf46-173a-46d3-9b64-36c0a00dd775" testId="1f4c58bf-96a6-8b7e-bbfe-a99284fc9659" testName="GetPressed_OnCacheMissWithEnginesAvailable_StartsExactlyOnePrime" computerName="REDACTED-MACHINE" duration="00:00:00.0605385" startTime="2026-09-03T01:43:51.8795229-04:00" endTime="2026-09-03T01:43:51.9409593-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="157dbf46-173a-46d3-9b64-36c0a00dd775" />
+    <UnitTestResult executionId="e5c16b5f-2ad7-46fc-9b0a-3155f0f14655" testId="12438181-e5db-8c6c-98f4-cd13b541cf86" testName="HandleToggleClickAsync_WhenEnginesAvailable_TogglesAndInvalidates" computerName="REDACTED-MACHINE" duration="00:00:00.0018103" startTime="2026-09-03T01:43:51.9683170-04:00" endTime="2026-09-03T01:43:51.9699279-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e5c16b5f-2ad7-46fc-9b0a-3155f0f14655" />
+    <UnitTestResult executionId="ae86be35-b9a2-41ea-92c5-641413f3cdb6" testId="13e1ce18-4ba3-8df6-9ab6-0f4c661dc1e8" testName="GetPressed_WithNullOrWhitespaceKey_ReturnsFalseWithoutPrimeOrInvalidate (&quot;&quot;)" computerName="REDACTED-MACHINE" duration="00:00:00.0002011" startTime="2026-09-03T01:43:51.8302656-04:00" endTime="2026-09-03T01:43:51.8695974-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ae86be35-b9a2-41ea-92c5-641413f3cdb6" />
+    <UnitTestResult executionId="1c50301e-fb06-4a32-8b29-3d5aafe9df5c" testId="10f094f7-5717-8fe8-b044-d6caa3c6018a" testName="Constructor_WithNullLogErrorDelegate_ThrowsArgumentNullException" computerName="REDACTED-MACHINE" duration="00:00:00.0002563" startTime="2026-09-03T01:43:51.7699051-04:00" endTime="2026-09-03T01:43:51.7699051-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1c50301e-fb06-4a32-8b29-3d5aafe9df5c" />
+    <UnitTestResult executionId="4978d1a6-0eff-4e00-87af-673cc7f7daaf" testId="1d775788-daed-88c9-8a9e-5b06085b4ffa" testName="ExecuteToggleAsync_WithNoCompetingWriter_CachesValueAndInvalidatesExactlyOnce" computerName="REDACTED-MACHINE" duration="00:00:00.0005570" startTime="2026-09-03T01:43:51.9729396-04:00" endTime="2026-09-03T01:43:51.9739126-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4978d1a6-0eff-4e00-87af-673cc7f7daaf" />
+    <UnitTestResult executionId="898ee430-c104-4760-b5f8-dd343a013663" testId="15bb67f9-692c-8137-9614-d2bc719e91dc" testName="HandleToggleClickAsync_WhenToggleFaults_LogsErrorDoesNotThrowDoesNotInvalidate" computerName="REDACTED-MACHINE" duration="00:00:00.0017140" startTime="2026-09-03T01:43:51.9653136-04:00" endTime="2026-09-03T01:43:51.9673091-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="898ee430-c104-4760-b5f8-dd343a013663" />
+    <UnitTestResult executionId="e6165468-5586-405c-826d-1bfe0db15796" testId="1cde601c-e765-8a72-a6bf-5131f960567e" testName="ExecuteToggleAsync_WhenOlderObservationCompletesLast_DoesNotOverwriteNewerResult" computerName="REDACTED-MACHINE" duration="00:00:00.0007942" startTime="2026-09-03T01:43:51.9719406-04:00" endTime="2026-09-03T01:43:51.9729396-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e6165468-5586-405c-826d-1bfe0db15796" />
+    <UnitTestResult executionId="9bb0cbd1-01a1-4278-bcf7-192db0f4f324" testId="133ba7b8-fb00-8c26-a5d6-d0d79a1da7f1" testName="GetPressed_WithNullOrWhitespaceKey_ReturnsFalseWithoutPrimeOrInvalidate (&quot;   &quot;)" computerName="REDACTED-MACHINE" duration="00:00:00.0000887" startTime="2026-09-03T01:43:51.8695974-04:00" endTime="2026-09-03T01:43:51.8711117-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9bb0cbd1-01a1-4278-bcf7-192db0f4f324" />
+    <UnitTestResult executionId="cd953a3c-f098-4035-aa74-30b7ffd12037" testId="1cc0012c-8427-81f7-ab5c-183bd4ad2d43" testName="GetPressed_WithNullOrWhitespaceKey_ReturnsFalseWithoutPrimeOrInvalidate (null)" computerName="REDACTED-MACHINE" duration="00:00:00.0546868" startTime="2026-09-03T01:43:51.7699051-04:00" endTime="2026-09-03T01:43:51.8302656-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cd953a3c-f098-4035-aa74-30b7ffd12037" />
+    <UnitTestResult executionId="3e9a22c6-d6cf-437d-800b-0fb1a393337f" testId="11e055f5-144c-8a32-b0e5-34951ce231b7" testName="Constructor_WithNullNotifyDelegate_ThrowsArgumentNullException" computerName="REDACTED-MACHINE" duration="00:00:00.0003036" startTime="2026-09-03T01:43:51.7693932-04:00" endTime="2026-09-03T01:43:51.7699051-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3e9a22c6-d6cf-437d-800b-0fb1a393337f" />
+    <UnitTestResult executionId="45253f0a-5637-4d10-a971-9662850bf178" testId="10218773-8100-83cc-ae14-261e4ff1e7ed" testName="GetPressed_WhenPrimeIsCanceled_LeavesToggleReportingUnchecked" computerName="REDACTED-MACHINE" duration="00:00:00.0006531" startTime="2026-09-03T01:43:51.9764334-04:00" endTime="2026-09-03T01:43:51.9804309-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="45253f0a-5637-4d10-a971-9662850bf178" />
+    <UnitTestResult executionId="5a31668e-d2af-40c6-aba2-4e5cfb9db129" testId="11eb4b55-4634-803a-8d32-a8b4e27e5c84" testName="GetPressed_WhenEnginesAccessorReturnsNull_ReturnsFalseAndStartsNothing" computerName="REDACTED-MACHINE" duration="00:00:00.0004976" startTime="2026-09-03T01:43:51.8735251-04:00" endTime="2026-09-03T01:43:51.8735251-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5a31668e-d2af-40c6-aba2-4e5cfb9db129" />
+    <UnitTestResult executionId="50a49c16-f529-4dfc-858e-237879b0e020" testId="1c17f05a-fd3a-82b4-9d8d-e556023ad5d2" testName="HandleToggleClickAsync_WithNullEngines_NotifiesOnceAndInvokesNothing" computerName="REDACTED-MACHINE" duration="00:00:00.0007275" startTime="2026-09-03T01:43:51.9673091-04:00" endTime="2026-09-03T01:43:51.9683170-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="50a49c16-f529-4dfc-858e-237879b0e020" />
+    <UnitTestResult executionId="3862a934-06fe-4215-a248-a3f7a869b3d4" testId="1fe55d20-e905-8232-9c5a-b9203a94739f" testName="ExecuteToggleAsync_WhenToggleFaults_PropagatesUnchanged" computerName="REDACTED-MACHINE" duration="00:00:00.0035910" startTime="2026-09-03T01:43:51.9607702-04:00" endTime="2026-09-03T01:43:51.9642956-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3862a934-06fe-4215-a248-a3f7a869b3d4" />
+    <UnitTestResult executionId="f111fa84-698e-48cb-b8b7-2474489fc2be" testId="1a6168b1-aa56-8b30-88c2-bc33dcd3baa9" testName="Constructor_WithNullInvalidateDelegate_ThrowsArgumentNullException" computerName="REDACTED-MACHINE" duration="00:00:00.0003131" startTime="2026-09-03T01:43:51.7683952-04:00" endTime="2026-09-03T01:43:51.7693932-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f111fa84-698e-48cb-b8b7-2474489fc2be" />
+    <UnitTestResult executionId="c8840dca-0fc9-4676-b5cc-2b8cf7de48a4" testId="1f657d9b-8cbc-82d2-9276-7834a8d19aa0" testName="GetPressed_WithUnmappedKey_ReturnsFalseWithoutPrime" computerName="REDACTED-MACHINE" duration="00:00:00.0004206" startTime="2026-09-03T01:43:51.8711117-04:00" endTime="2026-09-03T01:43:51.8735251-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c8840dca-0fc9-4676-b5cc-2b8cf7de48a4" />
+    <UnitTestResult executionId="003138d0-a264-4c8b-9878-fd347164f083" testId="13268e9b-8e4e-84ac-92af-6256fcd2f35b" testName="GetPressed_AfterPrimeCompletes_ReturnsPrimedValueAndInvalidatesMappedControl" computerName="REDACTED-MACHINE" duration="00:00:00.0081250" startTime="2026-09-03T01:43:51.9409593-04:00" endTime="2026-09-03T01:43:51.9489612-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="003138d0-a264-4c8b-9878-fd347164f083" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="ExecuteToggleAsync_WhenOlderObservationCompletesLast_DoesNotOverwriteNewerResult" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="1cde601c-e765-8a72-a6bf-5131f960567e">
+      <Execution id="e6165468-5586-405c-826d-1bfe0db15796" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="ExecuteToggleAsync_WhenOlderObservationCompletesLast_DoesNotOverwriteNewerResult" />
+    </UnitTest>
+    <UnitTest name="HandleToggleClickAsync_WithNullEngines_NotifiesOnceAndInvokesNothing" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="1c17f05a-fd3a-82b4-9d8d-e556023ad5d2">
+      <Execution id="50a49c16-f529-4dfc-858e-237879b0e020" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="HandleToggleClickAsync_WithNullEngines_NotifiesOnceAndInvokesNothing" />
+    </UnitTest>
+    <UnitTest name="HandleToggleClickAsync_WhenEnginesAvailable_TogglesAndInvalidates" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="12438181-e5db-8c6c-98f4-cd13b541cf86">
+      <Execution id="e5c16b5f-2ad7-46fc-9b0a-3155f0f14655" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="HandleToggleClickAsync_WhenEnginesAvailable_TogglesAndInvalidates" />
+    </UnitTest>
+    <UnitTest name="ExecuteToggleAsync_WithNullEngines_ThrowsInvalidOperationExceptionWithoutTogglingEngine" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="106f74fd-365d-8a33-ab8f-cc14fc78d04a">
+      <Execution id="2f4ab2d7-1e1c-4294-945d-dad4adfaa638" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="ExecuteToggleAsync_WithNullEngines_ThrowsInvalidOperationExceptionWithoutTogglingEngine" />
+    </UnitTest>
+    <UnitTest name="GetPressed_OnCacheMissWithEnginesAvailable_StartsExactlyOnePrime" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="1f4c58bf-96a6-8b7e-bbfe-a99284fc9659">
+      <Execution id="157dbf46-173a-46d3-9b64-36c0a00dd775" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="GetPressed_OnCacheMissWithEnginesAvailable_StartsExactlyOnePrime" />
+    </UnitTest>
+    <UnitTest name="ExecuteToggleAsync_WhenToggleFaults_PropagatesUnchanged" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="1fe55d20-e905-8232-9c5a-b9203a94739f">
+      <Execution id="3862a934-06fe-4215-a248-a3f7a869b3d4" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="ExecuteToggleAsync_WhenToggleFaults_PropagatesUnchanged" />
+    </UnitTest>
+    <UnitTest name="GetPressed_WithNullOrWhitespaceKey_ReturnsFalseWithoutPrimeOrInvalidate (&quot;&quot;)" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="13e1ce18-4ba3-8df6-9ab6-0f4c661dc1e8">
+      <Execution id="ae86be35-b9a2-41ea-92c5-641413f3cdb6" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="GetPressed_WithNullOrWhitespaceKey_ReturnsFalseWithoutPrimeOrInvalidate" />
+    </UnitTest>
+    <UnitTest name="GetPressed_WhenPrimeFaults_LogsErrorAndStillReturnsFalse" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="1e29f68e-9a23-86fc-b997-f35b9d9e11b2">
+      <Execution id="bc3e5d81-942b-4ab8-a482-8ee1d183b772" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="GetPressed_WhenPrimeFaults_LogsErrorAndStillReturnsFalse" />
+    </UnitTest>
+    <UnitTest name="HandleToggleClickAsync_WhenToggleFaults_LogsErrorDoesNotThrowDoesNotInvalidate" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="15bb67f9-692c-8137-9614-d2bc719e91dc">
+      <Execution id="898ee430-c104-4760-b5f8-dd343a013663" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="HandleToggleClickAsync_WhenToggleFaults_LogsErrorDoesNotThrowDoesNotInvalidate" />
+    </UnitTest>
+    <UnitTest name="ApplyPrimeAsync_WhenPrimeResolvesAfterToggle_DoesNotOverwriteToggleResult" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="12079152-e854-8bbb-8002-0aaff01d51a5">
+      <Execution id="75eaba7b-6cf4-457d-8d74-114254e33ef4" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="ApplyPrimeAsync_WhenPrimeResolvesAfterToggle_DoesNotOverwriteToggleResult" />
+    </UnitTest>
+    <UnitTest name="Constructor_WithNullEnginesAccessor_ThrowsArgumentNullException" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="12fbe888-25c8-84ff-865e-e8c8aae616a3">
+      <Execution id="15158af3-9e59-4faf-bb41-51243fac918b" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="Constructor_WithNullEnginesAccessor_ThrowsArgumentNullException" />
+    </UnitTest>
+    <UnitTest name="GetPressed_WhenPrimeIsCanceled_LogsErrorAndClearsPrimeMarker" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="188e1ab3-c9f4-8b99-8973-5a218a17a1ea">
+      <Execution id="9b525311-27fd-4efa-9121-31532cb74003" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="GetPressed_WhenPrimeIsCanceled_LogsErrorAndClearsPrimeMarker" />
+    </UnitTest>
+    <UnitTest name="Constructor_WithNullLogErrorDelegate_ThrowsArgumentNullException" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="10f094f7-5717-8fe8-b044-d6caa3c6018a">
+      <Execution id="1c50301e-fb06-4a32-8b29-3d5aafe9df5c" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="Constructor_WithNullLogErrorDelegate_ThrowsArgumentNullException" />
+    </UnitTest>
+    <UnitTest name="GetPressed_WithNullOrWhitespaceKey_ReturnsFalseWithoutPrimeOrInvalidate (&quot;   &quot;)" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="133ba7b8-fb00-8c26-a5d6-d0d79a1da7f1">
+      <Execution id="9bb0cbd1-01a1-4278-bcf7-192db0f4f324" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="GetPressed_WithNullOrWhitespaceKey_ReturnsFalseWithoutPrimeOrInvalidate" />
+    </UnitTest>
+    <UnitTest name="ExecuteToggleAsync_WithUnmappedKey_ThrowsArgumentException" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="14f5173d-02b8-87b5-af5f-651b1183c9be">
+      <Execution id="23abb944-0ebe-4f8a-a92a-93842d03141f" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="ExecuteToggleAsync_WithUnmappedKey_ThrowsArgumentException" />
+    </UnitTest>
+    <UnitTest name="GetPressed_WithUnmappedKey_ReturnsFalseWithoutPrime" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="1f657d9b-8cbc-82d2-9276-7834a8d19aa0">
+      <Execution id="c8840dca-0fc9-4676-b5cc-2b8cf7de48a4" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="GetPressed_WithUnmappedKey_ReturnsFalseWithoutPrime" />
+    </UnitTest>
+    <UnitTest name="Constructor_WithNullNotifyDelegate_ThrowsArgumentNullException" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="11e055f5-144c-8a32-b0e5-34951ce231b7">
+      <Execution id="3e9a22c6-d6cf-437d-800b-0fb1a393337f" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="Constructor_WithNullNotifyDelegate_ThrowsArgumentNullException" />
+    </UnitTest>
+    <UnitTest name="Constructor_WithNullInvalidateDelegate_ThrowsArgumentNullException" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="1a6168b1-aa56-8b30-88c2-bc33dcd3baa9">
+      <Execution id="f111fa84-698e-48cb-b8b7-2474489fc2be" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="Constructor_WithNullInvalidateDelegate_ThrowsArgumentNullException" />
+    </UnitTest>
+    <UnitTest name="ExecuteToggleAsync_WithNoCompetingWriter_CachesValueAndInvalidatesExactlyOnce" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="1d775788-daed-88c9-8a9e-5b06085b4ffa">
+      <Execution id="4978d1a6-0eff-4e00-87af-673cc7f7daaf" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="ExecuteToggleAsync_WithNoCompetingWriter_CachesValueAndInvalidatesExactlyOnce" />
+    </UnitTest>
+    <UnitTest name="ExecuteToggleAsync_PerformsToggleThenRefreshThenCacheThenInvalidate_InOrder" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="14c68b3b-4529-8e02-b927-5a90d02629cd">
+      <Execution id="e7753de9-9c9c-40c0-921e-b50cee8d094c" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="ExecuteToggleAsync_PerformsToggleThenRefreshThenCacheThenInvalidate_InOrder" />
+    </UnitTest>
+    <UnitTest name="GetPressed_WithNullOrWhitespaceKey_ReturnsFalseWithoutPrimeOrInvalidate (null)" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="1cc0012c-8427-81f7-ab5c-183bd4ad2d43">
+      <Execution id="cd953a3c-f098-4035-aa74-30b7ffd12037" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="GetPressed_WithNullOrWhitespaceKey_ReturnsFalseWithoutPrimeOrInvalidate" />
+    </UnitTest>
+    <UnitTest name="GetPressed_AfterPrimeCompletes_ReturnsPrimedValueAndInvalidatesMappedControl" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="13268e9b-8e4e-84ac-92af-6256fcd2f35b">
+      <Execution id="003138d0-a264-4c8b-9878-fd347164f083" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="GetPressed_AfterPrimeCompletes_ReturnsPrimedValueAndInvalidatesMappedControl" />
+    </UnitTest>
+    <UnitTest name="GetPressed_WhenPrimeIsCanceled_LeavesToggleReportingUnchecked" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="10218773-8100-83cc-ae14-261e4ff1e7ed">
+      <Execution id="45253f0a-5637-4d10-a971-9662850bf178" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="GetPressed_WhenPrimeIsCanceled_LeavesToggleReportingUnchecked" />
+    </UnitTest>
+    <UnitTest name="GetPressed_WhenEnginesAccessorReturnsNull_ReturnsFalseAndStartsNothing" storage="c:\users\REDACTED-ACCOUNT\repos\taskmaster\.claude\worktrees\agent-a3324f355df219b0e\taskmaster.test\bin\debug\taskmaster.test.dll" id="11eb4b55-4634-803a-8d32-a8b4e27e5c84">
+      <Execution id="5a31668e-d2af-40c6-aba2-4e5cfb9db129" />
+      <TestMethod codeBase="C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.Ribbon.EngineToggleStateCoordinatorTests" name="GetPressed_WhenEnginesAccessorReturnsNull_ReturnsFalseAndStartsNothing" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="106f74fd-365d-8a33-ab8f-cc14fc78d04a" executionId="2f4ab2d7-1e1c-4294-945d-dad4adfaa638" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e29f68e-9a23-86fc-b997-f35b9d9e11b2" executionId="bc3e5d81-942b-4ab8-a482-8ee1d183b772" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12fbe888-25c8-84ff-865e-e8c8aae616a3" executionId="15158af3-9e59-4faf-bb41-51243fac918b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12079152-e854-8bbb-8002-0aaff01d51a5" executionId="75eaba7b-6cf4-457d-8d74-114254e33ef4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="188e1ab3-c9f4-8b99-8973-5a218a17a1ea" executionId="9b525311-27fd-4efa-9121-31532cb74003" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14f5173d-02b8-87b5-af5f-651b1183c9be" executionId="23abb944-0ebe-4f8a-a92a-93842d03141f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14c68b3b-4529-8e02-b927-5a90d02629cd" executionId="e7753de9-9c9c-40c0-921e-b50cee8d094c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f4c58bf-96a6-8b7e-bbfe-a99284fc9659" executionId="157dbf46-173a-46d3-9b64-36c0a00dd775" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12438181-e5db-8c6c-98f4-cd13b541cf86" executionId="e5c16b5f-2ad7-46fc-9b0a-3155f0f14655" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13e1ce18-4ba3-8df6-9ab6-0f4c661dc1e8" executionId="ae86be35-b9a2-41ea-92c5-641413f3cdb6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10f094f7-5717-8fe8-b044-d6caa3c6018a" executionId="1c50301e-fb06-4a32-8b29-3d5aafe9df5c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d775788-daed-88c9-8a9e-5b06085b4ffa" executionId="4978d1a6-0eff-4e00-87af-673cc7f7daaf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15bb67f9-692c-8137-9614-d2bc719e91dc" executionId="898ee430-c104-4760-b5f8-dd343a013663" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1cde601c-e765-8a72-a6bf-5131f960567e" executionId="e6165468-5586-405c-826d-1bfe0db15796" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="133ba7b8-fb00-8c26-a5d6-d0d79a1da7f1" executionId="9bb0cbd1-01a1-4278-bcf7-192db0f4f324" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1cc0012c-8427-81f7-ab5c-183bd4ad2d43" executionId="cd953a3c-f098-4035-aa74-30b7ffd12037" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11e055f5-144c-8a32-b0e5-34951ce231b7" executionId="3e9a22c6-d6cf-437d-800b-0fb1a393337f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10218773-8100-83cc-ae14-261e4ff1e7ed" executionId="45253f0a-5637-4d10-a971-9662850bf178" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="11eb4b55-4634-803a-8d32-a8b4e27e5c84" executionId="5a31668e-d2af-40c6-aba2-4e5cfb9db129" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c17f05a-fd3a-82b4-9d8d-e556023ad5d2" executionId="50a49c16-f529-4dfc-858e-237879b0e020" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1fe55d20-e905-8232-9c5a-b9203a94739f" executionId="3862a934-06fe-4215-a248-a3f7a869b3d4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a6168b1-aa56-8b30-88c2-bc33dcd3baa9" executionId="f111fa84-698e-48cb-b8b7-2474489fc2be" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f657d9b-8cbc-82d2-9276-7834a8d19aa0" executionId="c8840dca-0fc9-4676-b5cc-2b8cf7de48a4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13268e9b-8e4e-84ac-92af-6256fcd2f35b" executionId="003138d0-a264-4c8b-9878-fd347164f083" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="24" executed="24" passed="24" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\REDACTED-ACCOUNT\repos\TaskMaster\.claude\worktrees\agent-a3324f355df219b0e\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

@@ -297,7 +297,8 @@ function Invoke-MSTestWithCoverageMain {
             Where-Object {
                 $_.FullName -match "\\bin\\$Configuration\\" -and
                 $_.FullName -notmatch '\\obj\\' -and
-                $_.FullName -notmatch '\\ref\\'
+                $_.FullName -notmatch '\\ref\\' -and
+                $_.FullName -notmatch '\\\.claude\\'
             } |
                 Select-Object -ExpandProperty FullName)
 
@@ -338,9 +339,9 @@ function Invoke-MSTestWithCoverageMain {
     Write-Output 'Post-processing coverage XML for Koverage compatibility...'
     $xmlContent = Get-Content $resolvedOutputPath -Raw -Encoding UTF8
     $processedXmlContent = ConvertTo-KoverageCoberturaXml -XmlContent $xmlContent -RepoRoot $repoRoot
-    Assert-CoberturaLineCoverageThreshold -CoberturaXml $processedXmlContent
-
     Set-Content -Path $resolvedOutputPath -Value $processedXmlContent -Encoding UTF8 -NoNewline
+
+    Assert-CoberturaLineCoverageThreshold -CoberturaXml $processedXmlContent
     Write-Output "Done. Coverage artifact: $resolvedOutputPath"
 }
 

@@ -19,6 +19,7 @@
 - [Bugfix phase grows the file anyway](project_bugfix_phase_grows_the_file_despite_dead_code_removal.md) · [#418 500-line gate vs mandated plan content](project_418_500line_gate_vs_plan_content.md)
 - [AC check-off + artifacts/ tool-output paths](project_preflight_ac_checkoff_and_tooloutput_paths.md) · [Orchestrator override does not satisfy an AC](project_orchestrator_override_does_not_satisfy_an_ac.md)
 - [Artifact Output Summary breaks its own count gate](project_artifact_output_summary_breaks_its_own_exact_count_gate.md) · [Sanitisation task cannot sweep its own record](project_sanitisation_task_cannot_sweep_its_own_record.md)
+- [Scope gate cannot list artifacts written after it](project_scope_gate_cannot_list_artifacts_written_after_it.md) — self + later-phase artifacts don't exist at capture time
 - [Absolute-zero gate on a sibling-owned assembly](project_preflight_absolute_zero_gate_on_sibling_owned_assembly.md) · [Directory-scoped format breaks ownership gates](project_directory_scoped_format_breaks_ownership_gates.md)
 - [#207 Hook() redesign breaks AppEventsTests](project_207_hook_redesign_breaks_appeventstests.md) · [C2 capacity budget drifts mid-plan](project_c2_capacity_budget_drifts_mid_plan.md)
 - [ApplicationGlobalsTests.cs at 500-line ceiling](project_appglobalstests_at_500_line_ceiling.md) · [#376 capstone scope-expansion layers](project_376_capstone_scope_expansion_layers.md) — 5 layers, 3 authorized

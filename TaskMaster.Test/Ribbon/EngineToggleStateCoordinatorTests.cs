@@ -20,7 +20,7 @@ namespace TaskMaster.Test.Ribbon
     /// reaches <c>NotifyEngineCommandNotReady</c>: the notification sink is an injected delegate.
     /// </remarks>
     [TestClass]
-    public class EngineToggleStateCoordinatorTests
+    public partial class EngineToggleStateCoordinatorTests
     {
         private const string SpamEngine = "Spam";
         private const string SpamToggleControlId = "SpamBayesEnabledToggle";

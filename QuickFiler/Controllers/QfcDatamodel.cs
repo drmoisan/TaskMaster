@@ -100,6 +100,8 @@ namespace QuickFiler.Controllers
         private IApplicationGlobals _globals;
         private Explorer _activeExplorer;
         private LockingLinkedList<MailItem> _masterQueue = [];
+
+        // Deliberately one monitor instance per owner, not a shared singleton: EmailMoveMonitor.BeforeItemMove dispatches at most one action per MailItem via FirstOrDefault, and UnhookAll is instance-scoped and clears the whole hook list, so a shared instance would both drop sibling owners' actions and unhook them all on any one owner's teardown (issue #731 finding 1, issue #620).
         private IEmailMoveMonitor _moveMonitor = new EmailMoveMonitor();
         private Outlook.Application _olApp;
         private Frame<int, string> _frame;
@@ -351,8 +353,6 @@ namespace QuickFiler.Controllers
         )
         {
             var admission = new QfcRemainingQueueAdmission(
-                _globals,
-                async (m, t) => (await ScoreRemainingQueueMailItemAsync(m, t)).Score,
                 _masterQueue.AddLast,
                 _moveMonitor.HookItem,
                 x => _masterQueue.Remove(x)

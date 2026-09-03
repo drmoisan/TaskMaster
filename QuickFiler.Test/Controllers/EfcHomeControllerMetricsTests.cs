@@ -50,7 +50,7 @@ namespace QuickFiler.Controllers.Tests
             result
                 .Should()
                 .Equal(
-                    "07/04/2026,01:05,Quarterly Update,SingleSorted,120,2.00,Recipient,Sender,Email,Archive/Target,06/30/2026,09:45:10"
+                    "07/04/2026,13:05,Quarterly Update,SingleSorted,120,2.00,Recipient,Sender,Email,Archive/Target,06/30/2026,09:45:10"
                 );
         }
 
