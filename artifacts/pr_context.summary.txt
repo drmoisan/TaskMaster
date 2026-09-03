@@ -1,8 +1,8 @@
 
 ===== Context generated =====
 
-2026-09-03 04:40:11 UTC
-Head SHA: ff2106fe9da48a4afec7d7cee023b47d6655b938
+2026-09-03 06:32:25 UTC
+Head SHA: 558c9c42d32a9cc5b060212881e86591b39ca380
 
 
 ===== GitHub CLI status =====
@@ -19,10 +19,10 @@ Author-asserted autoclose issues:
 ===== Base/Head =====
 
 Base ref (requested): main
-Base ref (resolved): origin/main @ 8be5a6aac3b5a82c86241fbbf989fd9118602c56
-Head ref (resolved): bug/ci-build-infra-debt-730 @ ff2106fe9da48a4afec7d7cee023b47d6655b938
-Merge base: 8be5a6aac3b5a82c86241fbbf989fd9118602c56
-Range: 8be5a6aac3b5a82c86241fbbf989fd9118602c56..ff2106fe9da48a4afec7d7cee023b47d6655b938
+Base ref (resolved): origin/main @ b13d5b7b1a6dd0aa79d51d48a7156ee67377f9d0
+Head ref (resolved): bug/ribbon-engine-toggle-defects-735 @ 558c9c42d32a9cc5b060212881e86591b39ca380
+Merge base: b13d5b7b1a6dd0aa79d51d48a7156ee67377f9d0
+Range: b13d5b7b1a6dd0aa79d51d48a7156ee67377f9d0..558c9c42d32a9cc5b060212881e86591b39ca380
 
 
 ===== Issues to autoclose (verified or pending) =====
@@ -36,13 +36,17 @@ Auto-close issues (verified from GitHub PR metadata):
 None (GitHub CLI unavailable)
 
 Auto-close issues (author asserted):
-- #395
-- #561
-- #562
-- #563
-- #569
-- #570
-- #730
+- #503
+- #504
+- #505
+- #506
+- #518
+- #524
+- #525
+- #735
+- #CR-2
+- #CR-3
+- #SHA-256
 
 Referenced issues (detected):
 (none)
@@ -50,93 +54,135 @@ Referenced issues (detected):
 
 ===== Additional context files =====
 
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/other/research-line8-pre-edit.2026-09-02T23-56.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/csharpier-check.2026-09-02T23-13.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/diff-build-analyzers.2026-09-02T23-09.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/diff-build-nullable.2026-09-02T23-09.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/diff-mstest-coverage.2026-09-02T23-10.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/git-scope-boundary.2026-09-02T23-08.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/git-stage-scope.2026-09-02T23-07.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/log-sanitization.2026-09-02T23-31.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-analyzers-post.2026-09-02T23-11.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-nullable-post.2026-09-02T23-12.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/research-sanitization-verification.2026-09-02T23-56.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/vstest-regression.2026-09-02T23-16.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/issue.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/plan.2026-09-02T08-57.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/spec.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/other/manual-verification-clear-spam-manager.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/other/reduced-audit-handoff.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-callsite.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-finding1.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-gate-class.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-gate-tests.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-race-fix.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-before-race-fix.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/callsite-edit-scope.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/coordinator-size-contingency.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/coverage-delta.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/csharpier-check-final.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/csharpier-format.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/csharpier-xml-format.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/evidence-completeness.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/evidence-sanitization.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/file-line-counts.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/footprint-scope.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/gate-class-constraints.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/msbuild-analyzer.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/msbuild-nullable.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/no-new-exemption.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/partial-keyword-edit.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/race-fix-structure.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/toolchain-loop-closure.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/vstest-coverage-run.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/xml-edit-scope.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/coordinator-fixture-after-fix.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/fail-before-exception.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/fail-before-finding1.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/fail-before-finding3.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/gate-tests.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/pass-after-finding1.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/pass-after-finding3.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/ribbon-fixtures-after-finding1.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/issue.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/plan.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/spec.md
 
 
 ===== Feature doc excerpts =====
 
-Feature: 2026-09-02-ci-build-infra-debt-730
+Feature: 2026-09-02-ribbon-engine-toggle-defects-735
 Excerpt:
 
-===== Feature doc: 2026-09-02-ci-build-infra-debt-730 =====
+===== Feature doc: 2026-09-02-ribbon-engine-toggle-defects-735 =====
 
 Spec excerpts:
-Context: Two consolidated CI/build-infrastructure findings: a NuGet cache fallback with no restore-verification step, and an unsuppressed unsupported-package warning. Consolidated into one issue rather than two since both are build-pipeline configuration debt in the same category (silent tolerance of a degraded/unverified state) rather than application code defects.
+Context: Issue #735 consolidates three code-review defects that all live in the Explorer ribbon subsystem under the directory TaskMaster/Ribbon, with their tests under TaskMaster.Test/Ribbon. They were grouped into one work item because they share a small file set and would otherwise consume three separate orchestration cycles for a combined production delta of roughly forty lines.
 
-Environment:
-- OS/version: Windows 11 Pro (repo default) / GitHub Actions `windows-latest` runners
-- Python version: n/a — GitHub Actions workflow YAML and packages.config
-- Command/flags used: n/a — findings are from direct workflow/config inspection
-- Data source or fixture: n/a
+- **Finding 1 (source #504) — dead XML-to-handler bindings.** The Explorer CustomUI document declares five callback names that resolve to no public instance method on the RibbonViewer type. Four are a `_Clicked` versus `_Click` suffix mismatch on the Item Sort Settings check boxes; the fifth, `BtnMigrateIDs_Click`, has no implementation anywhere in the solution. Office CustomUI resolves callbacks by name at invocatio...
 
-Impact / Severity:
-- [ ] Blocker
-- [ ] High
-- [x] Medium
-- [ ] Low
+Proposed Fix: ### Finding 1 — repair the bindings, delete the dead one
 
-Medium: neither finding causes a build failure today, but both represen...
+Edit the Explorer CustomUI document only; no production C# changes.
 
-Proposed Fix: ### Design summary (what changes where):
-Two independent, additive, configuration-only changes with no application source code footprint:
-1. **Finding 1** — add an explanatory (non-functional) YAML comment block immediately above the `restore-keys:` key in each of the three CI workflow files, documenting why the bare-prefix cache fallback is already safe (version-folder-scoped `nuget restore` idempotency). No YAML key, value, step, or job is added, removed, or reordered.
-2. **Finding 2** — add one new file, `Directory.Build.props`, at the repository root, setting `RxUseUnsupportedPackagesConfig` to `true` with an inline rationale comment. This is picked up automatically by all five `System.Reactive`-consuming projects (and harmlessly by the other thirteen non-`System.Reactive` projec...
+- Rename four `onAction` values from the `_Clicked` to the `_Click` spelling on the four Item Sort Settings check boxes (move entire conversation, save attachments, save email copy, save pictures). Each already declares a correctly-resolving pressed-state callback, and each already has a `_Click` twin on the viewer type carrying the exact Office check-box signature `void (Office.IRibbonControl, bool)`.
+- Delete the entire button element whose id is `BtnMigrateIDs`. Removal rather than implementation is justified above; nothing in the working tree contradicts removal. If stronger evidence is wanted, the atomic plan may run a history search for the introducing com...
 
-Acceptance Criteria: - [x] Explanatory rationale comment (identical in content, per research §1.4) is present immediately above `restore-keys:` in each of `.github/workflows/_build-analyzers.yml`, `.github/workflows/_build-nullable.yml`, and `.github/workflows/_mstest-coverage.yml` (3 files, per research's confirmed exhaustive derivation in §1.1's Numeric Derivation Evidence), with no functional change to the cache/restore step behavior in any of the three files.
-- [x] A new `Directory.Build.props` file exists at the repository root, setting `RxUseUnsupportedPackagesConfig` to `true` inside a `<PropertyGroup>`, with an inline XML comment stating the rationale for accepting the vendor's unsupported-scenario trade-off.
-- [x] A full local rebuild (`msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug...
+Acceptance Criteria: ### Finding 1 — dead XML-to-handler bindings
+
+- [x] The Explorer CustomUI document declared **five** callback names that resolve to no public instance method on the viewer type before this change; after this change the count of such unresolved names is **zero**. Both the pre-fix and post-fix counts are demonstrated by the new enumeration test, which reports every unresolved name in a single failure message.
+- [x] Exactly **four** action-callback attribute values are renamed from the `_Clicked` spelling to the `_Click` spelling, on the move-entire-conversation, save-attachments, save-email-copy and save-pictures check boxes in the Item Sort Settings menu. No method on the viewer type is added, renamed, or removed to satisfy these bindings.
+- [x] Exactly **one** element is deleted: the bu...
 Plan completed tasks:
-- [P0-T1] Read, in the order defined by `policy-compliance-order`, the five policy files applicable to this change — CLAUDE.md, the general code-change rule at path .claude/rules/general-code-change.md, the general unit-test rule at path .claude/rules/general-unit-test.md, the C# rule at path .claude/rules/csharp.md (in scope because CLAUDE.md's C# Code Change Policy explicitly extends to `*.props` files, and Phase 1 creates `Directory.Build.props`), and the CI-workflows rule at path .claude/rules/ci-workflows.md (the rule scoped to the .github/workflows directory tree, in scope because Phase 1 edits three workflow files) — then write `docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/phase0-instructions-read.md` containing `Timestamp:`, `Policy Order:` (the five files listed in the order read), and an explicit itemized list of the five file paths. Acceptance: the artifact file exists and lists all five paths verbatim.
-- [P0-T2] Confirm the pre-change absence of `Directory.Build.props` at the repository root: run `Test-Path Directory.Build.props` and record the result in `docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/directory-build-props-absence.<timestamp>.md` with `Timestamp:`, `Command: Test-Path Directory.Build.props`, `EXIT_CODE: 0`, and `Output Summary:` recording the literal boolean printed. Acceptance: the artifact records the literal value `False`, establishing that Phase 0's baseline rebuilds (P0-T3, P0-T4) run before the file exists.
-- [P0-T3] Execute, before any Phase 1 task has run, `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true /flp:logfile=docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/msbuild-analyzers-pre.log;verbosity=normal` and write `docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/msbuild-analyzers-pre.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` recording three numeric values read from the log file using the de-duplicating method fixed by the Framing section's "Warning-count measurement method" note (option (a), chosen because a whole-log `-SimpleMatch` count double-counts: MSBuild's file logger at `verbosity=normal` prints every `System.Reactive.PackagesConfigCheck.targets` warning once inline and again in the end-of-build summary): (a) `RxCheck_analyzers_pre` = the count of lines matching the literal token `System.Reactive.PackagesConfigCheck.targets` found strictly before the line matching the literal token `Build succeeded.` (the log contains exactly one such line; e.g. `$content = Get-Content <logfile>; $cut = ($content | Select-String -Pattern 'Build succeeded.' -SimpleMatch).LineNumber[0]; ($content[0..($cut-2)] | Select-String -Pattern 'System.Reactive.PackagesConfigCheck.targets' -SimpleMatch).Count` — the 0-based slice upper bound is `$cut-2`, not `$cut-1`, because `$cut` is the 1-based line number of the `Build succeeded.` line itself and the slice must exclude that line to match the "strictly before" semantics stated above), (b) `W_analyzers_pre` = the integer captured from MSBuild's own once-emitted end-of-build line matching `^\s*(\d+) Warning\(s\)` (via `(Select-String -Path <logfile> -Pattern '^\s*(\d+) Warning\(s\)').Matches.Groups[1].Value`, not a whole-log token count), and (c) `E_analyzers_pre` = the integer captured the same way from the line matching `^\s*(\d+) Error\(s\)`. Acceptance: the artifact records all three values with `RxCheck_analyzers_pre` equal to exactly 5 (one inline occurrence per affected project: QuickFiler, TaskMaster, ToDoModel, UtilitiesCS, and UtilitiesCS.Test, per research §2.1's confirmed exhaustive derivation), `W_analyzers_pre` equal to exactly 5 (this clean baseline build carries no warnings other than the five System.Reactive suppressions), and `E_analyzers_pre` equal to 0.
-- [P0-T4] Execute, before any Phase 1 task has run, `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true /flp:logfile=docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/msbuild-nullable-pre.log;verbosity=normal` and write `docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/msbuild-nullable-pre.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` recording `RxCheck_nullable_pre`, `W_nullable_pre`, and `E_nullable_pre` using the same de-duplicating method defined in P0-T3 (option (a): `RxCheck_nullable_pre` counted strictly before this log's single `Build succeeded.` line; `W_nullable_pre` and `E_nullable_pre` parsed from this log's own once-emitted `^\s*(\d+) Warning\(s\)` / `^\s*(\d+) Error\(s\)` summary line), read from this command's log file. Acceptance: the artifact records all three values with `RxCheck_nullable_pre` equal to exactly 5, `W_nullable_pre` equal to exactly 5, and `E_nullable_pre` equal to 0 (the System.Reactive.PackagesConfigCheck diagnostic is an MSBuild target-emitted `<Warning>`, not a compiler `CSxxxx`/`BCxxxx` diagnostic, so `/p:TreatWarningsAsErrors=true` — which is consumed by the Csc/Vbc compiler tasks, not by arbitrary target `<Warning>` calls — does not promote it to an error; this is consistent with `spec.md`'s Impact/Severity statement that neither finding causes a build failure today).
-- [P0-T5] Record the pre-change git baseline: run `git rev-parse HEAD` and `git status --porcelain` on branch `bug/ci-build-infra-debt-730`, and write `docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/git-state-pre.<timestamp>.md` with `Timestamp:`, the recorded HEAD SHA, and the `git status --porcelain` output. `issue.md`, `spec.md`, and `research/research.2026-09-02T09-15.md` are already tracked at HEAD — committed by a prior preparation-mode commit (`docs(ci-build-infra-debt): prepare issue #730 feature folder and atomic plan`) that predates this or any execution session — so none of the three appears in porcelain output; only this plan file (modified by this task's own preceding P0-T1/P0-T2 checkbox edits) and the evidence subdirectory (created and partially populated by P0-T1 and P0-T2, both of which run before this task) are unclean at the point this task executes. Acceptance: the artifact records a 40-character SHA and confirms `git status --porcelain` output contains exactly two lines — ` M docs/features/active/2026-09-02-ci-build-infra-debt-730/plan.2026-09-02T08-57.md` and `?? docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/` — and no other entries, before Phase 1 begins.
-- [P1-T1] In `.github/workflows/_build-analyzers.yml`, insert the following 16 comment lines immediately above the `restore-keys:` line (currently line 40, re-derived directly against the current tree in this planning pass), at the same 12-space indentation as the `restore-keys:` block-scalar value line (one level deeper than the sibling `key:`/`restore-keys:` lines, which sit at 10 spaces), with no other change to the file:
-- [P1-T2] In `.github/workflows/_build-nullable.yml`, insert the identical 16 comment lines quoted in P1-T1 immediately above the `restore-keys:` line (currently line 40, re-derived directly against the current tree in this planning pass), at the same 12-space indentation as the `restore-keys:` block-scalar value line (one level deeper than the sibling `key:`/`restore-keys:` lines, which sit at 10 spaces), with no other change to the file. Acceptance: same as P1-T1, applied to `.github/workflows/_build-nullable.yml`.
-- [P1-T3] In `.github/workflows/_mstest-coverage.yml`, insert the identical 16 comment lines quoted in P1-T1 immediately above the `restore-keys:` line (currently line 40, re-derived directly against the current tree in this planning pass), at the same 12-space indentation as the `restore-keys:` block-scalar value line (one level deeper than the sibling `key:`/`restore-keys:` lines, which sit at 10 spaces), with no other change to the file. Acceptance: same as P1-T1, applied to `.github/workflows/_mstest-coverage.yml`.
-- [P1-T4] Create a new file `Directory.Build.props` at the repository root (confirmed absent pre-change in P0-T2) with exactly this content:
-- [P2-T1] Stage exactly the four changed files: `git add Directory.Build.props .github/workflows/_build-analyzers.yml .github/workflows/_build-nullable.yml .github/workflows/_mstest-coverage.yml`, then run `git status --porcelain -- Directory.Build.props .github/workflows/_build-analyzers.yml .github/workflows/_build-nullable.yml .github/workflows/_mstest-coverage.yml` (scoped to just these four pathspecs, so the plan file's own checkbox-edit modification and the evidence directory recorded in P0-T5 fall outside this command's view) and write `docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/git-stage-scope.<timestamp>.md` with `Timestamp:`, `Command:`, `EXIT_CODE:`, and `Output Summary:` recording the full porcelain output. Acceptance: the scoped porcelain output lists exactly these four staged paths — `A  Directory.Build.props`, `M  .github/workflows/_build-analyzers.yml`, `M  .github/workflows/_build-nullable.yml`, `M  .github/workflows/_mstest-coverage.yml` — and no other entries.
+- [P0-T1] Read the four policy documents in the mandatory order — CLAUDE.md, then .claude/rules/general-code-change.md, then .claude/rules/general-unit-test.md, then .claude/rules/csharp.md — and record the read in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/phase0-instructions-read.2026-09-02T12-04.md`.
+- [P0-T2] Read the acceptance-criteria source `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/spec.md` and the design record `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/research/2026-09-02T09-15-ribbon-engine-toggle-defects-research.md` in full, and record the write set and the two prohibited AppGlobals paths in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/scope-and-write-set.2026-09-02T12-04.md`.
+- [P0-T3] Bootstrap the .NET SDK with scripts/vscode/Install-RepoDotNetSdk.ps1 and then run `dotnet tool restore`, recording both invocations in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/toolchain-bootstrap.2026-09-02T12-04.md`.
+- [P0-T4] Restore NuGet packages with scripts/vscode/Invoke-Restore.ps1 and record the result in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/nuget-restore.2026-09-02T12-04.md`.
+- [P0-T5] Capture the read-only formatter baseline with `dotnet tool run csharpier check .` and record the verbatim unformatted-file set in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/csharpier-check.2026-09-02T12-04.md`.
+- [P0-T6] Capture the analyzer baseline by running the CLAUDE.md analyzer rebuild on TaskMaster.sln and record it in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/msbuild-analyzer.2026-09-02T12-04.md`.
+- [P0-T7] Capture the nullable baseline by running the CLAUDE.md nullable rebuild on TaskMaster.sln and record it in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/msbuild-nullable.2026-09-02T12-04.md`.
+- [P0-T8] Capture the scoped ribbon-fixture test baseline by running every test whose fully qualified name contains `TaskMaster.Test.Ribbon` and record it in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/ribbon-tests.2026-09-02T12-04.md`, with the TRX written to `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/p0-t8`.
+- [P0-T9] Capture the coverage baseline for the whole first-party suite with scripts/vscode/Invoke-MSTestWithCoverage.ps1 and record the numeric headline in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/coverage-baseline.2026-09-02T12-04.md`, with the Cobertura document at `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/coverage-baseline.2026-09-02T12-04.cobertura.xml`.
+- [P0-T10] Record the pre-change line counts of the six existing in-scope source files in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/file-line-counts.2026-09-02T12-04.md`.
 Context files:
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/other/research-line8-pre-edit.2026-09-02T23-56.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/csharpier-check.2026-09-02T23-13.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/diff-build-analyzers.2026-09-02T23-09.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/diff-build-nullable.2026-09-02T23-09.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/diff-mstest-coverage.2026-09-02T23-10.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/git-scope-boundary.2026-09-02T23-08.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/git-stage-scope.2026-09-02T23-07.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/log-sanitization.2026-09-02T23-31.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-analyzers-post.2026-09-02T23-11.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-nullable-post.2026-09-02T23-12.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/research-sanitization-verification.2026-09-02T23-56.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/vstest-regression.2026-09-02T23-16.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/issue.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/plan.2026-09-02T08-57.md
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/spec.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/other/manual-verification-clear-spam-manager.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/other/reduced-audit-handoff.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-callsite.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-finding1.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-gate-class.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-gate-tests.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-race-fix.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-before-race-fix.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/callsite-edit-scope.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/coordinator-size-contingency.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/coverage-delta.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/csharpier-check-final.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/csharpier-format.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/csharpier-xml-format.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/evidence-completeness.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/evidence-sanitization.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/file-line-counts.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/footprint-scope.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/gate-class-constraints.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/msbuild-analyzer.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/msbuild-nullable.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/no-new-exemption.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/partial-keyword-edit.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/race-fix-structure.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/toolchain-loop-closure.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/vstest-coverage-run.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/xml-edit-scope.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/coordinator-fixture-after-fix.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/fail-before-exception.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/fail-before-finding1.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/fail-before-finding3.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/gate-tests.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/pass-after-finding1.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/pass-after-finding3.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/ribbon-fixtures-after-finding1.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/issue.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/plan.2026-09-02T12-04.md
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/spec.md
 
 
 ===== Referenced issues (classified) =====
 
-- #395
-- #561
-- #562
-- #563
-- #569
-- #570
-- #730
+- #503
+- #504
+- #505
+- #506
+- #518
+- #524
+- #525
+- #735
+- #CR-2
+- #CR-3
+- #SHA-256
 NOTE: Unverified (GitHub unavailable)
 
 
@@ -153,47 +199,47 @@ NOTE: Unverified (GitHub unavailable)
 ===== Scoping docs changed =====
 
 Scoping docs changed (material):
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/spec.md (Reasons: new scoping doc, >=15 lines changed, key section touched)
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/spec.md (Reasons: new scoping doc, >=15 lines changed, key section touched)
 Acceptance Criteria:
-- [x] Explanatory rationale comment (identical in content, per research §1.4) is present immediately above `restore-keys:` in each of `.github/workflows/_build-analyzers.yml`, `.github/workflows/_build-nullable.yml`, and `.github/workflows/_mstest-coverage.yml` (3 files, per research's confirmed exhaustive derivation in §1.1's Numeric Derivation Evidence), with no functional change to the cache/restore step behavior in any of the three files.
-- [x] A new `Directory.Build.props` file exists at the repository root, setting `RxUseUnsupportedPackagesConfig` to `true` inside a `<PropertyGroup>`, with an inline XML comment stating the rationale for accepting the vendor's unsupported-scenario trade-off.
-- [x] A full local rebuild (`msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` and `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`, per CLAUDE.md's C# toolchain commands) shows zero System.Reactive.PackagesConfigCheck "unsupported scenario" warnings across all five previously-affected projects (QuickFiler, TaskMaster, ToDoModel, UtilitiesCS, and UtilitiesCS.Test — per research's confirmed exhaustive derivation in §2.1's Numeric Derivation Evidence), with no new warnings or errors introduced relative to a pre-change baseline rebuild.
-- [x] No .csproj, packages.config, Directory.Build.targets, or application source file is modified by either fix.
-- [x] No coverage threshold, Pester job, or coverage gate is added or changed by this work (that scope belongs to #561/#562/#563).
-- [x] Existing MSTest suites in the Rx-dependent test assemblies (UtilitiesCS.Test, and QuickFiler.Test if present) pass on re-run after the `Directory.Build.props` addition, confirming no behavior change.
-- [x] Full toolchain pass completed for the touched languages: `dotnet tool run csharpier check .` (no formatting drift), both `msbuild TaskMaster.sln /t:Rebuild ...` commands above pass clean, and the `vstest.console.exe` regression re-run passes — no C# source changed, so this is regression re-verification, not new-test authorship.
-- [x] Before/after rebuild transcripts (and any workflow-syntax-check output) are captured as evidence under `docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/` per the evidence-and-timestamp-conventions skill.
+### Finding 1 — dead XML-to-handler bindings
+
+- [x] The Explorer CustomUI document declared **five** callback names that resolve to no public instance method on the viewer type before this change; after this change the count of such unresolved names is **zero**. Both the pre-fix and post-fix counts are demonstrated by the new enumeration test, which reports every unresolved name in a single failure message.
+- [x] Exactly **four** action-callback attribute values are renamed from the `_Clicked` spelling to the `_Click` spelling, on the move-entire-conversation, save-attachments, save-email-copy and save-pictures check boxes in the Item Sort Settings menu. No method on the viewer type is added, renamed, or removed to satisfy these bindings.
+- [x] Exactly **one** element is deleted: the button whose id is `BtnMigrateIDs`. No other element, attribute, or attribute value in the document is changed beyond the four renames and any CSharpier reflow.
+- [x] The rename-versus-removal partition is exactly four renames plus one removal, totalling the five defective names: a name is renamed when a correctly signatured method with the intended spelling already exists, and removed when no implementation exists anywhere in the solution.
+- [x] A test named `RibbonExplorerXml_EveryCallbackNameResolvesToAPublicRibbonViewerMethod` exists and passes. It enumerates descendant element nodes only (so commented-out occurrences are excluded structurally), includes the root element's load callback, and treats an attribute as a callback if its local name is `onAction`, `onChange` or `onLoad`, or begins with `get`.
+- [x] A test named `RibbonExplorerXml_CheckBoxOnActionCallbacksTakeControlAndPressedParameters` exists and passes. It asserts every check-box action callback resolves to a method returning void and taking the ribbon-control interface followed by a bool, comparing the first parameter by full type name because the test project has no Office interop reference.
+- [x] Both new tests are demonstrated to fail against the pre-fix tree — the first reporting five unresolved names, the second reporting four unresolvable check-box callbacks — before the production edit lands.
+
+### Finding 2 — unguarded globals dereference in Clear Spam Manager
+
+- [x] A new `internal sealed class SpamManagerResetGate` exists in namespace `TaskMaster` alongside its ribbon siblings, taking an auto-file-objects accessor, an engines accessor and a not-ready notification delegate, and throwing `ArgumentNullException` naming the offending parameter for each of the three.
+- [x] The gate's `RunAsync` throws `ArgumentNullException` for a null reset delegate **before** invoking any accessor; emits the not-ready notification exactly once and returns a completed task without invoking the reset delegate when either the resolved manager or the resolved engines facade is null; and otherwise returns the reset invocation directly, with no await and no catch, so a fault propagates unchanged.
+- [x] The gate carries **no** `ExcludeFromCodeCoverage` attribute, no `Microsoft.Office` using, no `System.Windows.Forms` using and no logger field, and its XML documentation records that the absence of the coverage attribute is deliberate.
+- [x] `ClearSpamManagerAsync` retains its synchronization-context preamble and its confirmation dialog unchanged and in their existing order, and routes only its engine-touching statements through the gate's deferred lambda. No inline ad-hoc null guard is introduced.
+- [x] All nine tests in the new gate fixture pass: three constructor null-argument cases, one null-reset case using strict accessors, three not-ready cases (null auto-file objects, unset manager, null engines), one success case asserting the resolved manager and engines are passed through by identity with no notification, and one faulting-reset case asserting the fault propagates with no notification.
+- [x] Line coverage for the new gate class is at least 90%, meeting the new-module rule.
+- [x] **No new `ExcludeFromCodeCoverage` attribute is introduced anywhere in the diff**, and no existing exemption is widened. The residual lines inside `ClearSpamManagerAsync` remain inside the ribbon controller's pre-existing type-level exemption, and the change description asserts no coverage credit for them.
+- [ ] The change description records the manual verification: the not-ready notice is observed instead of a `NullReferenceException` when Clear Spam Manager is confirmed before initialization completes, and the reset still runs end to end when repeated after initialization completes.
+
+### Finding 3 — toggle-state last-writer race
+
+- [x] The pressed-state cache is a concurrent dictionary of a private nested reference type carrying an activation flag and a monotonic sequence ticket, keyed ordinally; the sequence source is read and written only through interlocked operations.
+- [x] Both writers capture a ticket immediately before invoking the activation read — on the toggle path, after the engine toggle completes — and store through a compare-and-apply helper that applies a write only when no newer observation is already cached for that key, invalidating the control only when the write was applied.
+- [x] The pressed-state reader keeps its `bool` return type and still never awaits, blocks, or throws; the existing update-before-invalidate ordering test continues to pass unmodified.
+- [x] Prime completion treats any outcome other than ran-to-completion as a failure: the in-flight marker is cleared and the failure is logged, with a synthesized cancellation exception when there is no exception to unwrap. The existing faulted-path behavior, including base-exception unwrapping asserted by reference in an existing test, is preserved.
+- [x] All six new tests in the new coordinator race file pass, and the three that reproduce defects — the prime-after-toggle race, the toggle-versus-toggle race, and the canceled-prime logging case — are demonstrated to fail against the pre-fix tree.
+- [x] The existing coordinator test class declaration changes by exactly one added `partial` keyword, with no other edit to that file, so the new file reuses the existing private harness with no duplication.
+
+### Cross-cutting
+
+- [x] All three new source files are registered as compile items in their respective legacy non-SDK project files, and the solution builds.
+- [x] Every file created or modified by this change is under the 500-line ceiling after formatting; line counts are verified for the coordinator source, the Intelligence partial, the XML-consistency fixture, and the new coordinator race file.
+- [x] The full toolchain passes in order in a single pass with no failures and no auto-fixes: format, analyzers, nullable type-check, and tests with coverage.
+- [x] No behavior outside the three findings changes; in particular the eight QuickFiler-settings members, the orphaned folder-classifier handler, and the three not-implemented bound handlers are left untouched and are recorded here as separate follow-ups.
 
 Proposed Fix:
-### Design summary (what changes where):
-Two independent, additive, configuration-only changes with no application source code footprint:
-1. **Finding 1** — add an explanatory (non-functional) YAML comment block immediately above the `restore-keys:` key in each of the three CI workflow files, documenting why the bare-prefix cache fallback is already safe (version-folder-scoped `nuget restore` idempotency). No YAML key, value, step, or job is added, removed, or reordered.
-2. **Finding 2** — add one new file, `Directory.Build.props`, at the repository root, setting `RxUseUnsupportedPackagesConfig` to `true` with an inline rationale comment. This is picked up automatically by all five `System.Reactive`-consuming projects (and harmlessly by the other thirteen non-`System.Reactive` projects in the solution) via MSBuild's standard Microsoft.Common.props auto-import of `Directory.Build.props`, which is already proven live in this repository through the existing Directory.Build.targets file.
-
-### Boundaries and invariants to preserve:
-- The cache/restore step behavior in the three workflow files (cache key, restore-keys value, step names, unconditional `nuget restore` invocation) must remain byte-identical except for the inserted comment lines.
-- `Directory.Build.props` must not alter any existing property already set explicitly inside any of the eighteen .csproj files; it only supplies a new property (`RxUseUnsupportedPackagesConfig`) that no .csproj currently sets, so there is no override/collision risk.
-- No .csproj, packages.config, or Directory.Build.targets file is edited by either fix (research §1.4, §2.5).
-- No application (non-build-config) source file is touched by either fix.
-
-### Dependencies or blocked work:
-- None. Both fixes are self-contained and do not depend on or block any other open issue. Coverage-threshold/Pester/gate work tracked under #561/#562/#563 is explicitly independent of this issue's scope.
-
-### Implementation strategy (what changes, not sequencing):
-This is a build/CI-configuration-only change. No application source code (`.cs`, application XAML/WinForms, VSTO ribbon/ThisAddIn code, etc.) is touched by either fix.
-
-- Finding 1: insert the literal comment block given verbatim in research §1.4 immediately above `restore-keys:` in each of the three named workflow files. The comment text is identical across all three files.
-- Finding 2: create the new `Directory.Build.props` file at the repository root with the literal content given verbatim in research §2.5.
-
-#### Files/modules to change:
-- `.github/workflows/_build-analyzers.yml`
-- `.github/workflows/_build-nullable.yml`
-- `.github/workflows/_mstest-coverage.yml`
-- `Directory.Build.props`
-
-#### Functions/classes/CLI commands impacted:
-None. No C# class, method, or CLI command is impacted. The `Restore solution` step's `nuget restore $env:SOLUTION_PATH` invocation is unchanged in all three workflow files (comment-only edit occurs on the preceding `Cache NuGet packages` step). MSBuild's System.Reactive.PackagesConfigCheck.targets guard target continues to run in all five affected projects' builds; only its warning-emission condition (`RxUseUnsupportedPackagesConfig`) is now satisfied.
-
+### Finding 1 — repair the bindings, delete the dead one
 
 TRUNCATED: first 40 lines shown
 
@@ -204,17 +250,17 @@ Core logic changes: 0 files
 
 Mechanical moves/renames: 0 files
 
-Docs/templates/agents/tooling: 33 files
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/msbuild-nullable-pre.log (+12030/-0)
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-analyzers-post.log (+11906/-0)
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/baseline/msbuild-analyzers-pre.log (+11878/-0)
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-nullable-post.log (+11742/-0)
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/research/research.2026-09-02T09-15.md (+518/-0)
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/policy-audit.2026-09-02T23-47.md (+288/-0)
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/feature-audit.2026-09-02T23-47.md (+230/-0)
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/spec.md (+193/-0)
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/code-review.2026-09-02T23-47.md (+169/-0)
-- docs/features/active/2026-09-02-ci-build-infra-debt-730/remediation-plan.2026-09-02T23-56.md (+148/-0)
+Docs/templates/agents/tooling: 68 files
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/coverage-final.2026-09-02T12-04.cobertura.xml (+194753/-0)
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/coverage-baseline.2026-09-02T12-04.cobertura.xml (+194456/-0)
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/research/2026-09-02T09-15-ribbon-engine-toggle-defects-research.md (+886/-0)
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/p4-t3/p4-t3.trx (+865/-0)
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/p1-t8/p1-t8.trx (+711/-0)
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/p0-t8/p0-t8.trx (+703/-0)
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/plan.2026-09-02T12-04.md (+486/-0)
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/policy-audit.2026-09-03T06-19.md (+421/-0)
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/code-review.2026-09-03T06-19.md (+402/-0)
+- docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/policy-audit.2026-09-03T09-05.md (+369/-0)
 
 
 ===== Issue digests =====
@@ -229,64 +275,179 @@ Docs/templates/agents/tooling: 33 files
 
 ===== Verification evidence (feature docs + canonical artifacts) =====
 
-- Feature: 2026-09-02-ci-build-infra-debt-730
-  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/other/research-line8-pre-edit.2026-09-02T23-56.md
-  - Timestamp: 2026-09-03T04-20
-  - Command: Read tool — `docs/features/active/2026-09-02-ci-build-infra-debt-730/research/research.2026-09-02T09-15.md` lines 1-12
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/other/manual-verification-clear-spam-manager.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T02-21
+  - Command: not applicable — this task performs no command. It writes the procedure and its outcome field.
   - EXIT_CODE: 0
   - Normalized result: pass
-- Feature: 2026-09-02-ci-build-infra-debt-730
-  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/csharpier-check.2026-09-02T23-13.md
-  - Timestamp: 2026-09-02T23-13
-  - Command: `dotnet tool run csharpier check .`
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/other/reduced-audit-handoff.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T03-42
+  - Command: not applicable — this task assembles pointers and records the follow-up list; it runs no command.
   - EXIT_CODE: 0
   - Normalized result: pass
-- Feature: 2026-09-02-ci-build-infra-debt-730
-  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/diff-build-analyzers.2026-09-02T23-09.md
-  - Timestamp: 2026-09-02T23-09
-  - Command: `git diff --cached origin/main -- .github/workflows/_build-analyzers.yml`
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-callsite.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T02-16
+  - Command: `& $msbuild TaskMaster.sln /t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`
   - EXIT_CODE: 0
   - Normalized result: pass
-- Feature: 2026-09-02-ci-build-infra-debt-730
-  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/diff-build-nullable.2026-09-02T23-09.md
-  - Timestamp: 2026-09-02T23-09
-  - Command: `git diff --cached origin/main -- .github/workflows/_build-nullable.yml`
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-finding1.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T01-42
+  - Command: `& $msbuild TaskMaster.sln /t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`
   - EXIT_CODE: 0
   - Normalized result: pass
-- Feature: 2026-09-02-ci-build-infra-debt-730
-  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/diff-mstest-coverage.2026-09-02T23-10.md
-  - Timestamp: 2026-09-02T23-10
-  - Command: `git diff --cached origin/main -- .github/workflows/_mstest-coverage.yml`
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-gate-class.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T02-02
+  - Command: `& $msbuild TaskMaster.sln /t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`
   - EXIT_CODE: 0
   - Normalized result: pass
-- Feature: 2026-09-02-ci-build-infra-debt-730
-  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/git-scope-boundary.2026-09-02T23-08.md
-  - Timestamp: 2026-09-02T23-08
-  - Command: `git diff --cached origin/main --name-status -- Directory.Build.props .github/workflows/_build-analyzers.yml .github/workflows/_build-nullable.yml .github/workflows/_mstest-coverage.yml`
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-gate-tests.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T02-10
+  - Command: `& $msbuild TaskMaster.sln /t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`
   - EXIT_CODE: 0
   - Normalized result: pass
-- Feature: 2026-09-02-ci-build-infra-debt-730
-  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-analyzers-post.2026-09-02T23-11.md
-  - Timestamp: 2026-09-02T23-11
-  - Command: `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true /flp:logfile=docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-analyzers-post.log;verbosity=normal`
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-race-fix.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T02-42
+  - Command: `& $msbuild TaskMaster.sln /t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`
   - EXIT_CODE: 0
   - Normalized result: pass
-- Feature: 2026-09-02-ci-build-infra-debt-730
-  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-nullable-post.2026-09-02T23-12.md
-  - Timestamp: 2026-09-02T23-12
-  - Command: `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true /flp:logfile=docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/msbuild-nullable-post.log;verbosity=normal`
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-before-race-fix.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T02-32
+  - Command: `& $msbuild TaskMaster.sln /t:Build /m /p:Configuration=Debug "/p:Platform=Any CPU"`
   - EXIT_CODE: 0
   - Normalized result: pass
-- Feature: 2026-09-02-ci-build-infra-debt-730
-  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/research-sanitization-verification.2026-09-02T23-56.md
-  - Timestamp: 2026-09-03T04-25
-  - Command: pwsh -File p0t3-sweep1.ps1 — `$accountToken = Split-Path -Leaf $env:USERPROFILE; @(Get-ChildItem -Recurse -File -LiteralPath <feature-folder> | Select-String -Pattern "(?i)$([regex]::Escape($accountToken))").Count`
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/callsite-edit-scope.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T02-17
+  - Command: `git diff --unified=0 (git merge-base origin/main HEAD) -- TaskMaster/Ribbon/RibbonController.Intelligence.cs`
   - EXIT_CODE: 0
   - Normalized result: pass
-- Feature: 2026-09-02-ci-build-infra-debt-730
-  - Source: docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/qa-gates/vstest-regression.2026-09-02T23-16.md
-  - Timestamp: 2026-09-02T23-16
-  - Command: `& $vstestPath UtilitiesCS.Test\bin\Debug\UtilitiesCS.Test.dll QuickFiler.Test\bin\Debug\QuickFiler.Test.dll /EnableCodeCoverage /InIsolation /Logger:trx /TestCaseFilter:"TestCategory!=LiveOutlook"`
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/coordinator-size-contingency.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T03-06
+  - Command: `@(Get-Content -LiteralPath TaskMaster/Ribbon/EngineToggleStateCoordinator.cs).Count` before and after the extraction, with a re-run of P4-T1 and P4-T2 in between.
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/coverage-delta.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T03-20
+  - Command: XML aggregation over both Cobertura documents, plus `git diff --unified=0 (git merge-base origin/main HEAD) -- TaskMaster/Ribbon/EngineToggleStateCoordinator.cs` to derive the added line numbers.
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/csharpier-check-final.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T03-10
+  - Command: `dotnet tool run csharpier check .` (read-only, working directory set to the worktree root)
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/csharpier-format.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T02-56
+  - Command: `Get-FileHash -Algorithm SHA256` for each of the eight paths, then `dotnet tool run csharpier format <the eight paths>`, then the same eight hashes again.
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/csharpier-xml-format.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T01-40
+  - Command: `Get-FileHash -Algorithm SHA256 -LiteralPath TaskMaster/Ribbon/RibbonExplorer.xml`, then `dotnet tool run csharpier format TaskMaster/Ribbon/RibbonExplorer.xml`, then the same hash again.
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/evidence-completeness.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T03-40
+  - Command: existence check over the 55 artifact paths named by tasks P0-T1 through P5-T9; required-field scan over every command-bearing markdown artifact; `ExpectedExitCode: 1` check on the two intentionally failing runs; then a name scan and a content scan of the whole evidence tree for the two run-time-derived tokens.
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/evidence-sanitization.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T03-35
+  - Command: for every in-scope file under the feature evidence tree, read the content, count case-insensitive occurrences of the local account token and the machine-name token, replace each with its redaction literal, and write the file back only when at least one substitution was made.
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/file-line-counts.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T02-58
+  - Command: `@(Get-Content -LiteralPath <path>).Count` for each file, measured AFTER the P4-T1 format pass.
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/footprint-scope.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T03-25
+  - Command: `git add -N .; git diff --name-status (git merge-base origin/main HEAD); git status --porcelain`
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/gate-class-constraints.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T02-03
+  - Command: line-oriented pattern counts over `TaskMaster/Ribbon/SpamManagerResetGate.cs`, using `Get-Content -LiteralPath` and four anchored regular expressions.
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/msbuild-analyzer.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T03-11
+  - Command: `& $msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true`
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/msbuild-nullable.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T03-12
+  - Command: `& $msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true`
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/no-new-exemption.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T03-24
+  - Command: `git add -N .; git diff (git merge-base origin/main HEAD) -- TaskMaster TaskMaster.Test`
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/partial-keyword-edit.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T02-45
+  - Command: `git diff --numstat (git merge-base origin/main HEAD) -- TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs`
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/race-fix-structure.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T02-48
+  - Command: identifier counts and brace-matched method-body extraction over `TaskMaster/Ribbon/EngineToggleStateCoordinator.cs`, using `Get-Content -LiteralPath` and escaped literal regular expressions.
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/toolchain-loop-closure.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T03-27
+  - Command: this task performs no command of its own; it reconciles the exit codes of P4-T1 through P4-T10, each recorded in its own artifact.
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/vstest-coverage-run.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T03-18
+  - Command: `pwsh -NoProfile -File <worktree>/scripts/vscode/Invoke-MSTestWithCoverage.ps1 -SearchRoot '.' -Configuration 'Debug' -CoverageOutput 'docs\features\active\2026-09-02-ribbon-engine-toggle-defects-735\evidence\qa-gates\coverage-final.2026-09-02T12-04.cobertura.xml'`
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/fail-before-exception.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T02-19
+  - Command: filesystem enumeration of the feature evidence tree with the patterns listed above; no
+  - EXIT_CODE: 0
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/fail-before-finding1.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T01-23
+  - Command: the two invocations above, run in that order.
+  - EXIT_CODE: 1
+  - Expected EXIT_CODE: 1
+  - Normalized result: pass
+- Feature: 2026-09-02-ribbon-engine-toggle-defects-735
+  - Source: docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/pass-after-finding3.2026-09-02T12-04.md
+  - Timestamp: 2026-09-03T02-43
+  - Command: the pinned scoped form with the same six-clause filter P3-T5 used,
   - EXIT_CODE: 0
   - Normalized result: pass
 
@@ -298,4 +459,4 @@ Docs/templates/agents/tooling: 33 files
 
 ===== Appendix pointer =====
 
-See C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a7c9d039ae8df6121/artifacts/pr_context.appendix.txt
+See C:/Users/DanMoisan/repos/TaskMaster/.claude/worktrees/agent-a3324f355df219b0e/artifacts/pr_context.appendix.txt

@@ -319,5 +319,178 @@ namespace TaskMaster.Test.Ribbon
         }
 
         #endregion Issue #503 — engine-readiness getEnabled wiring
+
+        #region Issue #735 — callback name binding
+
+        /// <summary>
+        /// Full name of the Office ribbon-control interface that every CustomUI callback takes as
+        /// its first parameter. Compared by <see cref="Type.FullName"/> rather than with
+        /// <c>typeof</c> because <c>TaskMaster.Test.csproj</c> carries no reference to the
+        /// Microsoft.Office.Core primary interop assembly and a legacy non-SDK
+        /// <c>ProjectReference</c> does not flow that reference to the compiler.
+        /// </summary>
+        private const string RibbonControlTypeName = "Microsoft.Office.Core.IRibbonControl";
+
+        /// <summary>
+        /// Returns every public instance method declared on <see cref="RibbonViewer"/>, which is
+        /// the set Office resolves a CustomUI callback name against at invocation time.
+        /// </summary>
+        private static MethodInfo[] GetViewerCallbackSurface() =>
+            typeof(RibbonViewer).GetMethods(BindingFlags.Public | BindingFlags.Instance);
+
+        /// <summary>
+        /// Reports whether an attribute is an Office CustomUI callback binding. The rule — local
+        /// name is <c>onAction</c>, <c>onChange</c> or <c>onLoad</c>, or begins with <c>get</c> —
+        /// is exact for the 2009 CustomUI schema, in which every <c>get*</c> attribute is a
+        /// callback, and stays correct if a new getter such as <c>getVisible</c> is introduced.
+        /// </summary>
+        private static bool IsCallbackAttribute(XAttribute attribute)
+        {
+            var localName = attribute.Name.LocalName;
+            return localName == "onAction"
+                || localName == "onChange"
+                || localName == "onLoad"
+                || localName.StartsWith("get", StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Office binds CustomUI callbacks by string name and resolves them reflectively at
+        /// invocation time, so a name that matches no method produces no compiler error, no load
+        /// error, and no runtime error — the control simply does nothing when clicked. This
+        /// enumerates the document rather than asserting a hand-written list, so drift introduced
+        /// by a future edit is caught by the same test.
+        /// </summary>
+        /// <remarks>
+        /// Enumeration is over <see cref="XContainer.Descendants()"/>, which yields element nodes
+        /// only. XML comment nodes are <c>XComment</c> and carry no attributes, so commented-out
+        /// callbacks are excluded structurally with no regular expression. Descendants of an
+        /// <see cref="XDocument"/> include the root <c>customUI</c> element, so its <c>onLoad</c>
+        /// callback is covered without a special case.
+        /// </remarks>
+        [TestMethod]
+        public void RibbonExplorerXml_EveryCallbackNameResolvesToAPublicRibbonViewerMethod()
+        {
+            // Arrange
+            var document = LoadRibbonDocument();
+            var declaredMethodNames = new HashSet<string>(
+                GetViewerCallbackSurface().Select(method => method.Name),
+                StringComparer.Ordinal
+            );
+
+            // Act: collect every distinct callback name bound anywhere in the document.
+            var boundCallbackNames = document
+                .Descendants()
+                .SelectMany(element => element.Attributes())
+                .Where(IsCallbackAttribute)
+                .Select(attribute => attribute.Value)
+                .Distinct(StringComparer.Ordinal)
+                .ToList();
+
+            var unresolved = boundCallbackNames
+                .Where(name => !declaredMethodNames.Contains(name))
+                .OrderBy(name => name, StringComparer.Ordinal)
+                .ToList();
+
+            // Assert: report every unresolved name in one message so a single run lists them all.
+            unresolved
+                .Should()
+                .BeEmpty(
+                    "every CustomUI callback name must resolve to a public instance method on "
+                        + "RibbonViewer; these {0} of {1} bound names do not: {2}",
+                    unresolved.Count,
+                    boundCallbackNames.Count,
+                    string.Join(", ", unresolved)
+                );
+        }
+
+        /// <summary>
+        /// Office invokes a <c>checkBox</c> action callback with the signature
+        /// <c>void (IRibbonControl, bool)</c> and silently ignores a method whose shape does not
+        /// match. This pins the exact shape whose mis-binding produced the #735 defect: the four
+        /// Item Sort Settings check boxes were bound to names that resolved to nothing at all.
+        /// </summary>
+        [TestMethod]
+        public void RibbonExplorerXml_CheckBoxOnActionCallbacksTakeControlAndPressedParameters()
+        {
+            // Arrange
+            var document = LoadRibbonDocument();
+            var viewerMethods = GetViewerCallbackSurface();
+            var defects = new List<string>();
+
+            // Act
+            foreach (var checkBox in document.Descendants(CustomUiNs + "checkBox"))
+            {
+                var onAction = checkBox.Attribute("onAction");
+                if (onAction == null)
+                {
+                    continue;
+                }
+
+                var controlId = checkBox.Attribute("id")?.Value ?? "(no id)";
+                var candidates = viewerMethods
+                    .Where(method =>
+                        string.Equals(method.Name, onAction.Value, StringComparison.Ordinal)
+                    )
+                    .ToList();
+
+                if (candidates.Count == 0)
+                {
+                    defects.Add(
+                        $"{controlId}: '{onAction.Value}' resolves to no public instance method"
+                    );
+                    continue;
+                }
+
+                if (!candidates.Any(HasCheckBoxActionShape))
+                {
+                    defects.Add(
+                        $"{controlId}: '{onAction.Value}' resolves but its signature is "
+                            + $"{DescribeSignature(candidates[0])}"
+                    );
+                }
+            }
+
+            // Assert: report every offending callback in one message.
+            defects
+                .Should()
+                .BeEmpty(
+                    "every checkBox onAction callback must be void ({0}, bool); these {1} are not: {2}",
+                    RibbonControlTypeName,
+                    defects.Count,
+                    string.Join("; ", defects)
+                );
+        }
+
+        /// <summary>
+        /// Reports whether a method has the Office check-box action shape
+        /// <c>void (IRibbonControl, bool)</c>, comparing the first parameter by full type name.
+        /// </summary>
+        private static bool HasCheckBoxActionShape(MethodInfo method)
+        {
+            if (method.ReturnType != typeof(void))
+            {
+                return false;
+            }
+
+            var parameters = method.GetParameters();
+            return parameters.Length == 2
+                && parameters[0].ParameterType.FullName == RibbonControlTypeName
+                && parameters[1].ParameterType == typeof(bool);
+        }
+
+        /// <summary>
+        /// Renders a method signature for a failure message so the report names the shape that was
+        /// found rather than only the shape that was expected.
+        /// </summary>
+        private static string DescribeSignature(MethodInfo method)
+        {
+            var parameters = string.Join(
+                ", ",
+                method.GetParameters().Select(parameter => parameter.ParameterType.FullName)
+            );
+            return $"{method.ReturnType.FullName} ({parameters})";
+        }
+
+        #endregion Issue #735 — callback name binding
     }
 }

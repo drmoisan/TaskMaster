@@ -371,13 +371,17 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             // presses are needed to reach the root. Only once the root is active does nothing
             // remain to collapse and no further tree transition apply.
             var router = await PopulatedRouterAsync(ProviderMock());
-            await ArrowAsync(router, "left");
-            await ArrowAsync(router, "left");
+            var firstPress = await ArrowAsync(router, "left");
+            var secondPress = await ArrowAsync(router, "left");
 
             // Act
             var outputs = await ArrowAsync(router, "left");
 
             // Assert
+            firstPress.Should().ContainSingle();
+            BreadcrumbBridgeSerializer.Parse(firstPress[0]).Should().BeOfType<RenderMessage>();
+            secondPress.Should().ContainSingle();
+            BreadcrumbBridgeSerializer.Parse(secondPress[0]).Should().BeOfType<RenderMessage>();
             outputs.Should().ContainSingle();
             ((UnhandledArrowMessage)BreadcrumbBridgeSerializer.Parse(outputs[0]))
                 .Direction.Should()
