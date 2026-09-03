@@ -74,6 +74,7 @@
     <Compile Include="TestHelpers\ManualFireInnerTimer.cs" />
     <Compile Include="TestHelpers\ManualFireTimerWrapper.cs" />
     <Compile Include="TestAssemblyInitializer.cs" />
+    <Compile Include="NoLiveFormInTestAssemblyTests.cs" />
     <Compile Include="Dialogs\ActionButtonTests.cs" />
     <Compile Include="Dialogs\MyBoxModelessTests.cs" />
     <Compile Include="Dialogs\DelegateButton_Tests.cs" />
