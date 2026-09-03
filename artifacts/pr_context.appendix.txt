@@ -1,8 +1,8 @@
 
 ===== Context generated =====
 
-2026-09-03 06:32:25 UTC
-Head SHA: 558c9c42d32a9cc5b060212881e86591b39ca380
+2026-09-03 11:38:15 UTC
+Head SHA: e5dcbffd6a51e9f92869c390e85d179400657cd5
 
 
 ===== PR Intent (edit before generating PR body) =====
@@ -20,17 +20,17 @@ origin	https://github.com/drmoisan/TaskMaster.git (push)
 
 ===== Current branch =====
 
-bug/ribbon-engine-toggle-defects-735
+bug/invoke-mstestwithcoverage-threshold-before-setcontent-565
 
 
 ===== Upstream =====
 
-origin/bug/ribbon-engine-toggle-defects-735
+origin/bug/invoke-mstestwithcoverage-threshold-before-setcontent-565
 
 
 ===== Status (short) =====
 
-## bug/ribbon-engine-toggle-defects-735...origin/bug/ribbon-engine-toggle-defects-735
+## bug/invoke-mstestwithcoverage-threshold-before-setcontent-565...origin/bug/invoke-mstestwithcoverage-threshold-before-setcontent-565
 
 
 ===== Untracked files =====
@@ -52,31 +52,33 @@ origin/bug/ribbon-engine-toggle-defects-735
 ===== PR Comparison =====
 
 Base ref (requested): main
-Base ref (resolved): origin/main @ b13d5b7b1a6dd0aa79d51d48a7156ee67377f9d0
-Head ref (resolved): bug/ribbon-engine-toggle-defects-735 @ 558c9c42d32a9cc5b060212881e86591b39ca380
-Merge-base: b13d5b7b1a6dd0aa79d51d48a7156ee67377f9d0
-Range: b13d5b7b1a6dd0aa79d51d48a7156ee67377f9d0..558c9c42d32a9cc5b060212881e86591b39ca380
+Base ref (resolved): origin/main @ 87233f867ad60c0a5c0d19b09cc121ae536d7ba1
+Head ref (resolved): bug/invoke-mstestwithcoverage-threshold-before-setcontent-565 @ e5dcbffd6a51e9f92869c390e85d179400657cd5
+Merge-base: 87233f867ad60c0a5c0d19b09cc121ae536d7ba1
+Range: 87233f867ad60c0a5c0d19b09cc121ae536d7ba1..e5dcbffd6a51e9f92869c390e85d179400657cd5
 
 
 ===== Commits in range =====
 
-558c9c42 2026-09-03 Dan Moisan docs(735): record the second independent feature-review pass
-a2792280 2026-09-03 Dan Moisan docs(735): record feature-review audits and correct the test-population reconciliation
-30e66833 2026-09-03 Dan Moisan Merge remote-tracking branch 'origin/main' into bug/ribbon-engine-toggle-defects-735
-3e45428e 2026-09-03 Dan Moisan refactor(ribbon): extract the versioned pressed-state cache and close QA for issue 735
-a68c8598 2026-09-03 Dan Moisan fix(ribbon): make toggle-state writes compare-and-apply for issue 735
-88fc3bfc 2026-09-03 Dan Moisan fix(ribbon): guard the Clear Spam Manager reset behind a testable gate for issue 735
-a3bfb865 2026-09-03 Dan Moisan fix(ribbon): repair dead Explorer CustomUI callback bindings for issue 735
-b6e102e6 2026-09-03 Dan Moisan Merge remote-tracking branch 'origin/main' into bug/ribbon-engine-toggle-defects-735
-044551f0 2026-09-02 Dan Moisan prep(bug-735): promote, research, spec, and plan ribbon-engine-toggle-defects
+e5dcbffd 2026-09-03 Dan Moisan docs(565): add policy-audit, code-review, and feature-audit for issue #565
+101d5ec8 2026-09-03 Dan Moisan Merge remote-tracking branch 'origin/main' into bug/invoke-mstestwithcoverage-threshold-before-setcontent-565
+e165f7ba 2026-09-03 Dan Moisan Phase 6 close-out: final clean-tree confirmation and last plan check-off
+56f26a55 2026-09-03 Dan Moisan Phase 6: documentation wrap-up and issue-565 mirror
+ae0472f3 2026-09-03 Dan Moisan Phase 5: check off all 6 spec.md acceptance criteria for #565
+d6f13e8f 2026-09-03 Dan Moisan Phase 4: final QA loop, iteration 1 (format/analyze/test), clean single pass
+b981d80f 2026-09-03 Dan Moisan Phase 3: verify GREEN after fix; zero regression in threshold boundary tests
+727f24c2 2026-09-03 Dan Moisan Phase 2: swap Set-Content ahead of the threshold assertion (#565)
+6fc57ce2 2026-09-03 Dan Moisan Phase 1 [expect-fail]: add regression test proving pre-fix ordering defect
+cbe865d7 2026-09-03 Dan Moisan Phase 0: baseline evidence for #565 statement-reorder fix
+dc5e8c0f 2026-09-03 Dan Moisan Merge remote-tracking branch 'origin/main' into bug/invoke-mstestwithcoverage-threshold-before-setcontent-565
+e8bb720b 2026-09-02 Dan Moisan docs(565): de-backtick scope-exclusion paths so blast-radius harvester stops misreading them as writes
+00899a72 2026-09-02 Dan Moisan docs(565): prepare feature folder and atomic plan for coverage-gate ordering fix
 
 
 ===== Conventional commit type summary =====
 
-fix       : 3
-refactor  : 1
-docs      : 2
-other     : 3
+docs      : 3
+other     : 10
 
 
 ===== Authors =====
@@ -86,115 +88,59 @@ Dan Moisan <drmoisan@gmail.com>
 
 ===== Changed files (name-status) =====
 
-M	.claude/agent-memory/atomic-planner/MEMORY.md
-A	.claude/agent-memory/atomic-planner/project_735_evidence_content_sanitization_seams.md
-M	.claude/agent-memory/task-researcher/MEMORY.md
-A	.claude/agent-memory/task-researcher/project_ribbon_engine_toggle_defects_735.md
-A	TaskMaster.Test/Ribbon/EngineTogglePressedStateCacheTests.cs
-A	TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.Race.cs
-M	TaskMaster.Test/Ribbon/EngineToggleStateCoordinatorTests.cs
-M	TaskMaster.Test/Ribbon/RibbonExplorerXmlTests.cs
-A	TaskMaster.Test/Ribbon/SpamManagerResetGateTests.cs
-M	TaskMaster.Test/TaskMaster.Test.csproj
-A	TaskMaster/Ribbon/EngineTogglePressedStateCache.cs
-M	TaskMaster/Ribbon/EngineToggleStateCoordinator.cs
-M	TaskMaster/Ribbon/RibbonController.Intelligence.cs
-M	TaskMaster/Ribbon/RibbonExplorer.xml
-A	TaskMaster/Ribbon/SpamManagerResetGate.cs
-M	TaskMaster/TaskMaster.csproj
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/code-review.2026-09-03T06-19.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/code-review.2026-09-03T09-05.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/base-ref.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/coverage-baseline.2026-09-02T12-04.cobertura.xml
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/coverage-baseline.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/csharpier-check.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/file-line-counts.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/msbuild-analyzer.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/msbuild-nullable.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/nuget-restore.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/p0-t8/p0-t8.trx
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/phase0-instructions-read.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/ribbon-tests.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/scope-and-write-set.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/toolchain-bootstrap.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/issue-updates/ac-status.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/other/manual-verification-clear-spam-manager.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/other/reduced-audit-handoff.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-callsite.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-finding1.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-gate-class.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-gate-tests.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-after-race-fix.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/build-before-race-fix.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/callsite-edit-scope.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/coordinator-size-contingency.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/coverage-delta.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/coverage-final.2026-09-02T12-04.cobertura.xml
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/csharpier-check-final.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/csharpier-format.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/csharpier-xml-format.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/evidence-completeness.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/evidence-sanitization.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/file-line-counts.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/footprint-scope.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/gate-class-constraints.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/msbuild-analyzer.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/msbuild-nullable.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/no-new-exemption.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/p4-t3/p4-t3.trx
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/partial-keyword-edit.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/race-fix-structure.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/toolchain-loop-closure.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/vstest-coverage-run.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/qa-gates/xml-edit-scope.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/coordinator-fixture-after-fix.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/fail-before-exception.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/fail-before-finding1.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/fail-before-finding3.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/gate-tests.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/p1-t2/p1-t2.trx
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/p1-t7/p1-t7.trx
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/p1-t8/p1-t8.trx
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/p2-t8/p2-t8.trx
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/p3-t11/p3-t11.trx
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/p3-t12/p3-t12.trx
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/p3-t5/p3-t5.trx
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/pass-after-finding1.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/pass-after-finding3.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/regression-testing/ribbon-fixtures-after-finding1.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/feature-audit.2026-09-03T06-19.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/feature-audit.2026-09-03T09-05.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/issue.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/plan.2026-09-02T12-04.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/policy-audit.2026-09-03T06-19.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/policy-audit.2026-09-03T09-05.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/research/2026-09-02T09-15-ribbon-engine-toggle-defects-research.md
-A	docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/spec.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/code-review.2026-09-03T12-15.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/baseline/branch-commit-baseline.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/baseline/citation-verification.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/baseline/pester-coverage.2026-09-03T11-09.xml
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/baseline/phase0-feature-documents-read.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/baseline/phase0-instructions-read.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/baseline/poshqc-analyze.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/baseline/poshqc-format.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/baseline/poshqc-test.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/issue-updates/issue-565.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/other/ac-status-summary.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/other/final-clean-tree.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/other/fix-diff-verification.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/other/p1-t1-anchor-resolution.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/qa-gates/coverage-delta.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/qa-gates/pester-coverage.iter1.2026-09-03T11-09.xml
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/qa-gates/poshqc-analyze.iter1.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/qa-gates/poshqc-format.iter1.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/qa-gates/poshqc-test.iter1.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/regression-testing/expect-fail-run.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/regression-testing/helpers-boundary-regression.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/regression-testing/pass-after-run.2026-09-03T11-09.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/feature-audit.2026-09-03T12-15.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/issue.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/plan.2026-09-02T08-59.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/policy-audit.2026-09-03T12-15.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/research/invoke-mstestwithcoverage-ordering-fix.2026-09-02T09-00.md
+A	docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/spec.md
+M	scripts/vscode/Invoke-MSTestWithCoverage.ps1
+M	tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1
 
 
 ===== Diff shortstat =====
 
- 84 files changed, 400411 insertions(+), 34 deletions(-)
+ 30 files changed, 2024 insertions(+), 2 deletions(-)
 
 
 ===== Additions/Deletions totals (from numstat) =====
 
-Additions: 400411
-Deletions: 34
+Additions: 2024
+Deletions: 2
 
 
 ===== Files by extension =====
 
-       9  .cs
-       2  .csproj
-      61  .md
-       9  .trx
-       3  .xml
+      26  .md
+       2  .ps1
+       2  .xml
 
 
 ===== Referenced issues (detected) =====
 
-#503, #504, #505, #506, #518, #524, #525, #735, CR-2, CR-3, SHA-256
+#441, #563, #565, #733, ISO-8601
 
 
 ===== PRs in range =====
@@ -204,91 +150,37 @@ Deletions: 34
 
 ===== Diff stat =====
 
- .claude/agent-memory/atomic-planner/MEMORY.md      |      1 +
- ...ject_735_evidence_content_sanitization_seams.md |     47 +
- .claude/agent-memory/task-researcher/MEMORY.md     |      1 +
- .../project_ribbon_engine_toggle_defects_735.md    |     44 +
- .../Ribbon/EngineTogglePressedStateCacheTests.cs   |    213 +
- .../EngineToggleStateCoordinatorTests.Race.cs      |    277 +
- .../Ribbon/EngineToggleStateCoordinatorTests.cs    |      2 +-
- TaskMaster.Test/Ribbon/RibbonExplorerXmlTests.cs   |    173 +
- .../Ribbon/SpamManagerResetGateTests.cs            |    326 +
- TaskMaster.Test/TaskMaster.Test.csproj             |      3 +
- TaskMaster/Ribbon/EngineTogglePressedStateCache.cs |    157 +
- TaskMaster/Ribbon/EngineToggleStateCoordinator.cs  |     56 +-
- TaskMaster/Ribbon/RibbonController.Intelligence.cs |     58 +-
- TaskMaster/Ribbon/RibbonExplorer.xml               |      9 +-
- TaskMaster/Ribbon/SpamManagerResetGate.cs          |    141 +
- TaskMaster/TaskMaster.csproj                       |      2 +
- .../code-review.2026-09-03T06-19.md                |    402 +
- .../code-review.2026-09-03T09-05.md                |    270 +
- .../evidence/baseline/base-ref.2026-09-02T12-04.md |     72 +
- ...overage-baseline.2026-09-02T12-04.cobertura.xml | 194456 +++++++++++++++++
- .../baseline/coverage-baseline.2026-09-02T12-04.md |     84 +
- .../baseline/csharpier-check.2026-09-02T12-04.md   |     49 +
- .../baseline/file-line-counts.2026-09-02T12-04.md  |     46 +
- .../baseline/msbuild-analyzer.2026-09-02T12-04.md  |     56 +
- .../baseline/msbuild-nullable.2026-09-02T12-04.md  |     41 +
- .../baseline/nuget-restore.2026-09-02T12-04.md     |     40 +
- .../evidence/baseline/p0-t8/p0-t8.trx              |    703 +
- .../phase0-instructions-read.2026-09-02T12-04.md   |     41 +
- .../baseline/ribbon-tests.2026-09-02T12-04.md      |     58 +
- .../scope-and-write-set.2026-09-02T12-04.md        |     61 +
- .../toolchain-bootstrap.2026-09-02T12-04.md        |     55 +
- .../issue-updates/ac-status.2026-09-02T12-04.md    |     93 +
- ...fication-clear-spam-manager.2026-09-02T12-04.md |     78 +
- .../reduced-audit-handoff.2026-09-02T12-04.md      |    100 +
- .../build-after-callsite.2026-09-02T12-04.md       |     25 +
- .../build-after-finding1.2026-09-02T12-04.md       |     33 +
- .../build-after-gate-class.2026-09-02T12-04.md     |     53 +
- .../build-after-gate-tests.2026-09-02T12-04.md     |     46 +
- .../build-after-race-fix.2026-09-02T12-04.md       |     31 +
- .../build-before-race-fix.2026-09-02T12-04.md      |     44 +
- .../callsite-edit-scope.2026-09-02T12-04.md        |     97 +
- ...oordinator-size-contingency.2026-09-02T12-04.md |    130 +
- .../qa-gates/coverage-delta.2026-09-02T12-04.md    |    134 +
- .../coverage-final.2026-09-02T12-04.cobertura.xml  | 194753 ++++++++++++++++++
- .../csharpier-check-final.2026-09-02T12-04.md      |     46 +
- .../qa-gates/csharpier-format.2026-09-02T12-04.md  |    119 +
- .../csharpier-xml-format.2026-09-02T12-04.md       |     37 +
- .../evidence-completeness.2026-09-02T12-04.md      |     80 +
- .../evidence-sanitization.2026-09-02T12-04.md      |    127 +
- .../qa-gates/file-line-counts.2026-09-02T12-04.md  |     94 +
- .../qa-gates/footprint-scope.2026-09-02T12-04.md   |    112 +
- .../gate-class-constraints.2026-09-02T12-04.md     |     63 +
- .../qa-gates/msbuild-analyzer.2026-09-02T12-04.md  |     41 +
- .../qa-gates/msbuild-nullable.2026-09-02T12-04.md  |     43 +
- .../qa-gates/no-new-exemption.2026-09-02T12-04.md  |     57 +
- .../evidence/qa-gates/p4-t3/p4-t3.trx              |    865 +
- .../partial-keyword-edit.2026-09-02T12-04.md       |     52 +
- .../race-fix-structure.2026-09-02T12-04.md         |    146 +
- .../toolchain-loop-closure.2026-09-02T12-04.md     |     68 +
- .../vstest-coverage-run.2026-09-02T12-04.md        |     84 +
- .../qa-gates/xml-edit-scope.2026-09-02T12-04.md    |    102 +
- ...ordinator-fixture-after-fix.2026-09-02T12-04.md |     78 +
- .../fail-before-exception.2026-09-02T12-04.md      |     78 +
- .../fail-before-finding1.2026-09-02T12-04.md       |    125 +
- .../fail-before-finding3.2026-09-02T12-04.md       |    105 +
- .../gate-tests.2026-09-02T12-04.md                 |     86 +
- .../evidence/regression-testing/p1-t2/p1-t2.trx    |     88 +
- .../evidence/regression-testing/p1-t7/p1-t7.trx    |     67 +
- .../evidence/regression-testing/p1-t8/p1-t8.trx    |    711 +
- .../evidence/regression-testing/p2-t8/p2-t8.trx    |    109 +
- .../evidence/regression-testing/p3-t11/p3-t11.trx  |     91 +
- .../evidence/regression-testing/p3-t12/p3-t12.trx  |    199 +
- .../evidence/regression-testing/p3-t5/p3-t5.trx    |    130 +
- .../pass-after-finding1.2026-09-02T12-04.md        |     59 +
- .../pass-after-finding3.2026-09-02T12-04.md        |     57 +
- ...bon-fixtures-after-finding1.2026-09-02T12-04.md |     67 +
- .../feature-audit.2026-09-03T06-19.md              |    117 +
- .../feature-audit.2026-09-03T09-05.md              |    152 +
- .../issue.md                                       |     68 +
- .../plan.2026-09-02T12-04.md                       |    486 +
- .../policy-audit.2026-09-03T06-19.md               |    421 +
- .../policy-audit.2026-09-03T09-05.md               |    369 +
- ...T09-15-ribbon-engine-toggle-defects-research.md |    886 +
- .../spec.md                                        |    199 +
- 84 files changed, 400411 insertions(+), 34 deletions(-)
+ .../code-review.2026-09-03T12-15.md                | 120 +++++++++
+ .../branch-commit-baseline.2026-09-03T11-09.md     |  22 ++
+ .../citation-verification.2026-09-03T11-09.md      |  45 ++++
+ .../baseline/pester-coverage.2026-09-03T11-09.xml  | 170 ++++++++++++
+ ...ase0-feature-documents-read.2026-09-03T11-09.md |  48 ++++
+ .../phase0-instructions-read.2026-09-03T11-09.md   |  19 ++
+ .../baseline/poshqc-analyze.2026-09-03T11-09.md    |  15 ++
+ .../baseline/poshqc-format.2026-09-03T11-09.md     |  19 ++
+ .../baseline/poshqc-test.2026-09-03T11-09.md       |  24 ++
+ .../issue-updates/issue-565.2026-09-03T11-09.md    |  26 ++
+ .../other/ac-status-summary.2026-09-03T11-09.md    |   8 +
+ .../other/final-clean-tree.2026-09-03T11-09.md     |   7 +
+ .../fix-diff-verification.2026-09-03T11-09.md      |  64 +++++
+ .../p1-t1-anchor-resolution.2026-09-03T11-09.md    |  23 ++
+ .../qa-gates/coverage-delta.2026-09-03T11-09.md    |  23 ++
+ .../pester-coverage.iter1.2026-09-03T11-09.xml     | 170 ++++++++++++
+ .../poshqc-analyze.iter1.2026-09-03T11-09.md       |  12 +
+ .../poshqc-format.iter1.2026-09-03T11-09.md        |  17 ++
+ .../qa-gates/poshqc-test.iter1.2026-09-03T11-09.md |  16 ++
+ .../expect-fail-run.2026-09-03T11-09.md            |  51 ++++
+ ...helpers-boundary-regression.2026-09-03T11-09.md |  39 +++
+ .../pass-after-run.2026-09-03T11-09.md             |  25 ++
+ .../feature-audit.2026-09-03T12-15.md              |  47 ++++
+ .../issue.md                                       |  83 ++++++
+ .../plan.2026-09-02T08-59.md                       | 160 ++++++++++++
+ .../policy-audit.2026-09-03T12-15.md               | 215 +++++++++++++++
+ ...stwithcoverage-ordering-fix.2026-09-02T09-00.md | 288 +++++++++++++++++++++
+ .../spec.md                                        | 258 ++++++++++++++++++
+ scripts/vscode/Invoke-MSTestWithCoverage.ps1       |   4 +-
+ .../vscode/Invoke-MSTest.RunSettings.Tests.ps1     |   8 +
+ 30 files changed, 2024 insertions(+), 2 deletions(-)
 
 
 ===== Issue details =====
@@ -301,33 +193,59 @@ Deletions: 34
 (none)
 
 
-===== Feature doc: 2026-09-02-ribbon-engine-toggle-defects-735 =====
+===== Feature doc: 2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565 =====
 
 Spec excerpts:
-Context: Issue #735 consolidates three code-review defects that all live in the Explorer ribbon subsystem under the directory TaskMaster/Ribbon, with their tests under TaskMaster.Test/Ribbon. They were grouped into one work item because they share a small file set and would otherwise consume three separate orchestration cycles for a combined production delta of roughly forty lines.
+Context: `scripts/vscode/Invoke-MSTestWithCoverage.ps1` asserts the coverage threshold before it writes the
+post-processed Cobertura document to disk. When the assertion fails, the script throws and the
+post-processed document is discarded, leaving the raw un-post-processed document at the output path.
 
-- **Finding 1 (source #504) — dead XML-to-handler bindings.** The Explorer CustomUI document declares five callback names that resolve to no public instance method on the RibbonViewer type. Four are a `_Clicked` versus `_Click` suffix mismatch on the Item Sort Settings check boxes; the fifth, `BtnMigrateIDs_Click`, has no implementation anywhere in the solution. Office CustomUI resolves callbacks by name at invocatio...
+Environment:
+- OS/version: Windows 11 Pro (repo default)
+- Python version: n/a — PowerShell 7+ coverage/test-runner scripts
+- Command/flags used: `scripts/vscode/Invoke-MSTestWithCoverage.ps1`
+- Data source or fixture: n/a
 
-Proposed Fix: ### Finding 1 — repair the bindings, delete the dead one
+Impact / Severity:
+- [ ] Blocker
+- [ ] High
+- [x] Medium
+- [ ] Low
 
-Edit the Explorer CustomUI document only; no production C# changes.
+Only the failure path is affected; a passing run writes the correct document. But the failure path is
+exactly when someone reads the artifact to diagnose the shortfall, and what they find is a...
 
-- Rename four `onAction` values from the `_Clicked` to the `_Click` spelling on the four Item Sort Settings check boxes (move entire conversation, save attachments, save email copy, save pictures). Each already declares a correctly-resolving pressed-state callback, and each already has a `_Click` twin on the viewer type carrying the exact Office check-box signature `void (Office.IRibbonControl, bool)`.
-- Delete the entire button element whose id is `BtnMigrateIDs`. Removal rather than implementation is justified above; nothing in the working tree contradicts removal. If stronger evidence is wanted, the atomic plan may run a history search for the introducing com...
+Proposed Fix: ### Design summary (what changes where):
+Pure two-statement reorder inside `Invoke-MSTestWithCoverageMain`
+(`scripts/vscode/Invoke-MSTestWithCoverage.ps1`, lines 341 and 343): swap the `Set-Content` call
+(line 343) to execute immediately after `$processedXmlContent` is computed (line 340) and before
+the `Assert-CoberturaLineCoverageThreshold` call (currently line 341). No function signature or
+parameter changes anywhere in the change.
 
-Acceptance Criteria: ### Finding 1 — dead XML-to-handler bindings
+### Boundaries and invariants to preserve:
+- `Assert-CoberturaLineCoverageThreshold`'s own 80% threshold logic and message text
+  (scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1, line 487) are unchanged.
+- The dot-source of Invoke-MSTestWithCoverage.Helpers.ps1 at line 261 continues to precede both
+  calls (unaffected by the reorder; it a...
 
-- [x] The Explorer CustomUI document declared **five** callback names that resolve to no public instance method on the viewer type before this change; after this change the count of such unresolved names is **zero**. Both the pre-fix and post-fix counts are demonstrated by the new enumeration test, which reports every unresolved name in a single failure message.
-- [x] Exactly **four** action-callback attribute values are renamed from the `_Clicked` spelling to the `_Click` spelling, on the move-entire-conversation, save-attachments, save-email-copy and save-pictures check boxes in the Item Sort Settings menu. No method on the viewer type is added, renamed, or removed to satisfy these bindings.
-- [x] Exactly **one** element is deleted: the bu...
+Acceptance Criteria: - [x] The new Pester test in `tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1`, inside the
+      `Describe 'Invoke-MSTestWithCoverageMain'` block, fails against the pre-fix statement order
+      (`Assert-CoberturaLineCoverageThreshold` at line 341 ahead of `Set-Content` at line 343) and
+      passes after the fix (statement order swapped).
+- [x] `Set-Content` is invoked before `Assert-CoberturaLineCoverageThreshold` can throw on a
+      sub-threshold run, verified by `Should -Invoke Set-Content -Times 1 -Exactly` asserted inside
+      a `{ ... } | Should -Throw` block, using the `ConvertTo-KoverageCoberturaXml` mock returning
+      `'<coverage line-rate="0.5" />'`.
+- [x] The coverage threshold value (80%) is unchanged: no diff touches
+      `Assert-CoberturaLineCoverag...
 Plan completed tasks:
-- [P0-T1] Read the four policy documents in the mandatory order — CLAUDE.md, then .claude/rules/general-code-change.md, then .claude/rules/general-unit-test.md, then .claude/rules/csharp.md — and record the read in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/phase0-instructions-read.2026-09-02T12-04.md`.
-- [P0-T2] Read the acceptance-criteria source `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/spec.md` and the design record `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/research/2026-09-02T09-15-ribbon-engine-toggle-defects-research.md` in full, and record the write set and the two prohibited AppGlobals paths in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/scope-and-write-set.2026-09-02T12-04.md`.
-- [P0-T3] Bootstrap the .NET SDK with scripts/vscode/Install-RepoDotNetSdk.ps1 and then run `dotnet tool restore`, recording both invocations in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/toolchain-bootstrap.2026-09-02T12-04.md`.
-- [P0-T4] Restore NuGet packages with scripts/vscode/Invoke-Restore.ps1 and record the result in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/nuget-restore.2026-09-02T12-04.md`.
-- [P0-T5] Capture the read-only formatter baseline with `dotnet tool run csharpier check .` and record the verbatim unformatted-file set in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/csharpier-check.2026-09-02T12-04.md`.
-- [P0-T6] Capture the analyzer baseline by running the CLAUDE.md analyzer rebuild on TaskMaster.sln and record it in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/msbuild-analyzer.2026-09-02T12-04.md`.
-- [P0-T7] Capture the nullable baseline by running the CLAUDE.md nullable rebuild on TaskMaster.sln and record it in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/msbuild-nullable.2026-09-02T12-04.md`.
-- [P0-T8] Capture the scoped ribbon-fixture test baseline by running every test whose fully qualified name contains `TaskMaster.Test.Ribbon` and record it in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/ribbon-tests.2026-09-02T12-04.md`, with the TRX written to `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/p0-t8`.
-- [P0-T9] Capture the coverage baseline for the whole first-party suite with scripts/vscode/Invoke-MSTestWithCoverage.ps1 and record the numeric headline in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/coverage-baseline.2026-09-02T12-04.md`, with the Cobertura document at `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/coverage-baseline.2026-09-02T12-04.cobertura.xml`.
-- [P0-T10] Record the pre-change line counts of the six existing in-scope source files in `docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/file-line-counts.2026-09-02T12-04.md`.
+- [P0-T1] Read the repository policy documents in the order defined by `policy-compliance-order` and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/baseline/phase0-instructions-read.<timestamp>.md`.
+- [P0-T2] Read the feature requirement documents and the current target source files, and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/baseline/phase0-feature-documents-read.<timestamp>.md`.
+- [P0-T3] Record the branch and commit baseline in `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/baseline/branch-commit-baseline.<timestamp>.md`.
+- [P0-T4] Re-derive and record the exact current statement order in `scripts/vscode/Invoke-MSTestWithCoverage.ps1` and the exact current threshold text in scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1, and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/baseline/citation-verification.<timestamp>.md`.
+- [P0-T5] Capture the PoshQC format baseline over the two files this plan edits and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/baseline/poshqc-format.<timestamp>.md`.
+- [P0-T6] Capture the PSScriptAnalyzer baseline over the same two files and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/baseline/poshqc-analyze.<timestamp>.md`.
+- [P0-T7] Capture the Pester baseline over the full PowerShell suite, with coverage on the production file, and write `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/baseline/poshqc-test.<timestamp>.md`.
+- [P1-T1] [expect-fail] Add one new `It` to the existing `Describe 'Invoke-MSTestWithCoverageMain'` block in `tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1`, immediately after the existing `It 'fails when the search root cannot be found'` block and its closing `}` (currently the block ending at line 413) and before the `Describe` block's own closing `}` (currently line 414), inserting exactly:
+- [P1-T2] [expect-fail] Run the new test against the pre-fix statement order and record the RED result in `docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565/evidence/regression-testing/expect-fail-run.<timestamp>.md`.
+- [P2-T1] In `scripts/vscode/Invoke-MSTestWithCoverage.ps1`, swap the two statements at (or the drifted-anchor equivalent of) lines 341 and 343 so `Set-Content` executes immediately after `$processedXmlContent` is computed and before `Assert-CoberturaLineCoverageThreshold` is called: change line 341 from `Assert-CoberturaLineCoverageThreshold -CoberturaXml $processedXmlContent` to `Set-Content -Path $resolvedOutputPath -Value $processedXmlContent -Encoding UTF8 -NoNewline`, and change line 343 from `Set-Content -Path $resolvedOutputPath -Value $processedXmlContent -Encoding UTF8 -NoNewline` to `Assert-CoberturaLineCoverageThreshold -CoberturaXml $processedXmlContent`. Leave the blank line 342 and every other line (including the `Write-Output "Done. Coverage artifact: $resolvedOutputPath"` line) unchanged. Do not modify scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1 or scripts/vscode/Invoke-MSTestWithCoverage.ClosureFilter.ps1.

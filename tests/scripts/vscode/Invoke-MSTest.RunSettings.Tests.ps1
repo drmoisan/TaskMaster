@@ -413,6 +413,14 @@ Describe 'Invoke-MSTestWithCoverageMain' {
             Should -Throw -ExpectedMessage 'Search root not found: C:\repo\.'
     }
 
+    It 'persists the post-processed Cobertura document before the threshold assertion can throw on a sub-threshold run' {
+        Mock ConvertTo-KoverageCoberturaXml { '<coverage line-rate="0.5" />' }
+
+        { Invoke-MSTestWithCoverageMain -ScriptRoot $script:scriptDir } | Should -Throw
+
+        Should -Invoke Set-Content -Times 1 -Exactly
+    }
+
     It 'excludes assemblies discovered under a .claude worktree segment' {
         # Issue #733 finding 3: agent worktrees under .claude carry their own built
         # copy of every test assembly, so discovery must drop them before collection.
