@@ -170,14 +170,14 @@ Seeded from issue (corrected against research where noted):
 
 
 ## Acceptance Criteria
-- [ ] Repro steps now produce the expected behavior in all documented environments.
-- [ ] Regression test(s) added and passing (list file path and test name).
-- [ ] Edge cases and invalid inputs are handled with correct errors or fallbacks.
+- [x] Repro steps now produce the expected behavior in all documented environments.
+- [x] Regression test(s) added and passing (list file path and test name).
+- [x] Edge cases and invalid inputs are handled with correct errors or fallbacks.
 - [ ] No unintended behavior changes outside the defined scope.
-- [ ] Required logs/telemetry updated and validated (if applicable).
-- [ ] Performance constraints met or explicitly waived with rationale.
-- [ ] Full toolchain pass completed (format → lint → type-check → test).
-- [ ] Docs/config references updated to match the new behavior.
+- [x] Required logs/telemetry updated and validated (if applicable).
+- [x] Performance constraints met or explicitly waived with rationale.
+- [x] Full toolchain pass completed (format → lint → type-check → test).
+- [x] Docs/config references updated to match the new behavior.
 
 ## Risks & Mitigations
 - Technical or operational risks:
