@@ -93,7 +93,7 @@ namespace QuickFiler
             }
 
             var curDateText = currentDateTime.ToString("MM/dd/yyyy");
-            var curTimeText = currentDateTime.ToString("hh:mm");
+            var curTimeText = currentDateTime.ToString("HH:mm");
             var dataLineBeg = curDateText + "," + curTimeText + ",";
 
             var duration = elapsedSeconds;
