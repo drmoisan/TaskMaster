@@ -3,8 +3,8 @@
 - **Issue:** #732
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-02T12-01
-- **Status:** Draft
+- **Last Updated:** 2026-09-03T11-41
+- **Status:** Implemented
 - **Version:** 0.1
 
 ## Context
@@ -181,16 +181,16 @@ Four independent dispositions, two of which (Findings 1 and 4) are a paired dele
   - None required. All four findings are covered by automated toolchain and test verification; no manual exploratory testing of the Outlook add-in UI is needed for this change.
 
 ## Acceptance Criteria
-- [ ] UtilitiesCS/EmailIntelligence/FolderConverter.cs no longer exists in the repository, and no `.csproj` file anywhere in the repo contains a `<Compile Include>` (or equivalent) entry referencing it.
-- [ ] UtilitiesCS.Test/OutlookExtensions/FolderConverter_Tests.cs no longer exists in the repository, and UtilitiesCS.Test.csproj contains no compile-include entry referencing it.
-- [ ] The live UtilitiesCS/OutlookObjects/Folder/FolderConverter.cs class and its public members (ToFsFolderpath overloads, SanitizeFilename, ResolveOlRoot, etc.) are unchanged and remain compiled and passing under their existing test suite (FolderConverterTests.cs).
-- [ ] UtilitiesCS/OutlookObjects/Folder/FolderPredictor.cs line 691 uses the logical `||` operator (not bitwise `|`) and guards parentBranchPath.Length before indexing parentBranchPath[0].
-- [ ] A new regression test in UtilitiesCS.Test/OutlookObjects/Folder/FolderPredictorTests.cs invokes CreateFolder with an empty-string parentBranchPath and asserts the method does not throw IndexOutOfRangeException (test written first per the Bugfix Workflow, confirmed failing before the fix, passing after).
-- [ ] The three pre-existing CreateFolder tests in FolderPredictorTests.cs (covering non-empty parentBranchPath values, at approximately lines 596, 791, and 827 per the research artifact) continue to pass unmodified.
-- [ ] TaskMaster/AppGlobals/AppFileSystemFolderPaths.cs's MatchBestSpecialFolder method and its XML doc comment are unchanged; TaskMaster.Test/AppGlobals/AppFileSystemFolderPathsMatchBestSpecialFolderTests.cs is unchanged and continues to pass.
-- [ ] No production caller of MatchBestSpecialFolder was introduced or discovered; the finding is recorded as confirmed-correct-as-documented, with the semantic-change question left to GitHub issue #618.
-- [ ] Full C# toolchain passes clean in a single pass, in order: CSharpier format/check, .NET analyzers (EnableNETAnalyzers/EnforceCodeStyleInBuild rebuild), nullable/TreatWarningsAsErrors rebuild, and MSTest execution via vstest.console.exe with code coverage enabled.
-- [ ] No file under UtilitiesCS/Threading/** or the path UtilitiesCS/To Depricate/FileIO2.cs is modified by this change.
+- [x] UtilitiesCS/EmailIntelligence/FolderConverter.cs no longer exists in the repository, and no `.csproj` file anywhere in the repo contains a `<Compile Include>` (or equivalent) entry referencing it.
+- [x] UtilitiesCS.Test/OutlookExtensions/FolderConverter_Tests.cs no longer exists in the repository, and UtilitiesCS.Test.csproj contains no compile-include entry referencing it.
+- [x] The live UtilitiesCS/OutlookObjects/Folder/FolderConverter.cs class and its public members (ToFsFolderpath overloads, SanitizeFilename, ResolveOlRoot, etc.) are unchanged and remain compiled and passing under their existing test suite (FolderConverterTests.cs).
+- [x] UtilitiesCS/OutlookObjects/Folder/FolderPredictor.cs line 691 uses the logical `||` operator (not bitwise `|`) and guards parentBranchPath.Length before indexing parentBranchPath[0].
+- [x] A new regression test in UtilitiesCS.Test/OutlookObjects/Folder/FolderPredictorTests.cs invokes CreateFolder with an empty-string parentBranchPath and asserts the method does not throw IndexOutOfRangeException (test written first per the Bugfix Workflow, confirmed failing before the fix, passing after).
+- [x] The three pre-existing CreateFolder tests in FolderPredictorTests.cs (covering non-empty parentBranchPath values, at approximately lines 596, 791, and 827 per the research artifact) continue to pass unmodified.
+- [x] TaskMaster/AppGlobals/AppFileSystemFolderPaths.cs's MatchBestSpecialFolder method and its XML doc comment are unchanged; TaskMaster.Test/AppGlobals/AppFileSystemFolderPathsMatchBestSpecialFolderTests.cs is unchanged and continues to pass.
+- [x] No production caller of MatchBestSpecialFolder was introduced or discovered; the finding is recorded as confirmed-correct-as-documented, with the semantic-change question left to GitHub issue #618.
+- [x] Full C# toolchain passes clean in a single pass, in order: CSharpier format/check, .NET analyzers (EnableNETAnalyzers/EnforceCodeStyleInBuild rebuild), nullable/TreatWarningsAsErrors rebuild, and MSTest execution via vstest.console.exe with code coverage enabled.
+- [x] No file under UtilitiesCS/Threading/** or the path UtilitiesCS/To Depricate/FileIO2.cs is modified by this change.
 
 ## Risks & Mitigations
 - Technical or operational risks:

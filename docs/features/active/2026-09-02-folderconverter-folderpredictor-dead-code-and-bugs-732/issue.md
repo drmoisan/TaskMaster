@@ -60,12 +60,12 @@ Findings 1 and 4 share a root cause: `FolderConverter.cs` and its test were both
 
 ## Proposed Fix / Validation Ideas
 
-- [ ] Decide whether `FolderConverter.cs` should be resurrected (add `<Compile Include>`, fix both bugs, wire in its test file) or deleted as genuinely dead code — do not silently compile it without fixing the two bugs first, since that would introduce a live self-comparison and a build-breaking type error
-- [ ] `FolderPredictor.cs:691`: change `|` to `||`; add a length/empty guard before `parentBranchPath[0]`
-- [ ] `MatchBestSpecialFolder`: decide the correct matching semantics (exact segment vs. substring) and update the XML doc comment to match whatever is implemented
-- [ ] If `FolderConverter.cs` is resurrected, add `FolderConverter_Tests.cs` to `UtilitiesCS.Test.csproj` in the same change
+- [x] Decide whether `FolderConverter.cs` should be resurrected (add `<Compile Include>`, fix both bugs, wire in its test file) or deleted as genuinely dead code — do not silently compile it without fixing the two bugs first, since that would introduce a live self-comparison and a build-breaking type error
+- [x] `FolderPredictor.cs:691`: change `|` to `||`; add a length/empty guard before `parentBranchPath[0]`
+- [x] `MatchBestSpecialFolder`: decide the correct matching semantics (exact segment vs. substring) and update the XML doc comment to match whatever is implemented
+- [x] If `FolderConverter.cs` is resurrected, add `FolderConverter_Tests.cs` to `UtilitiesCS.Test.csproj` in the same change
 
 ## Next Step
 
-- [ ] Promote to GitHub issue (bug-report template)
-- [ ] Move to active fix folder / branch
+- [x] Promote to GitHub issue (bug-report template)
+- [x] Move to active fix folder / branch
