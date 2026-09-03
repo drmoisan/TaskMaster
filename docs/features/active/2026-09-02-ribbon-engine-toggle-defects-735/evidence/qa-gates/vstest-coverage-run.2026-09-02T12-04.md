@@ -23,15 +23,25 @@ Total tests: 6982
 
 **Zero failed tests.** The population moved from the P0-T9 baseline of 6955 to 6982, an increase of
 27, which is exactly this change's new tests: 2 XML-consistency tests (Finding 1), 9 gate tests
-(Finding 2), 6 race tests (Finding 3) and 9 cache tests (P4-T3 branch B). 2 + 9 + 6 + 9 = 26.
+(Finding 2), 6 race tests (Finding 3) and 10 cache tests (P4-T3 branch B). 2 + 9 + 6 + 10 = 27.
 
-The remaining test in the delta is accounted for by the same arithmetic applied to the ribbon
-namespace: the P4-T3 ribbon run measured 134 against the P0-T8 baseline of 107, a delta of 27, of
-which 26 are the new tests above. The twenty-seventh is
-`GetPressed_WhenEnginesAccessorReturnsNull_ReturnsFalseAndStartsNothing`, a pre-existing test whose
-fully qualified name did not match the P0-T8 baseline filter's class-name selection but does match
-the namespace filter. It is a pre-existing test, not a new one; no test was removed and none was
+The same arithmetic holds within the ribbon namespace: the P4-T3 ribbon run measured 134 against the
+P0-T8 baseline of 107, a delta of 27. All 27 new tests are declared in `TaskMaster.Test.Ribbon`, so
+the namespace-scoped delta and the suite-wide delta agree exactly. No test was removed and none was
 skipped.
+
+CORRECTION (recorded 2026-09-03T09-20, after feature review). As first written, this section stated
+the cache fixture contributed 9 tests, summed the four groups to 26, and then explained the
+resulting one-test discrepancy by asserting that
+`GetPressed_WhenEnginesAccessorReturnsNull_ReturnsFalseAndStartsNothing` was a pre-existing test
+absent from the P0-T8 baseline filter. Both parts of that were wrong. The cache fixture
+`TaskMaster.Test/Ribbon/EngineTogglePressedStateCacheTests.cs` declares 10 `[TestMethod]` members,
+not 9, so the four groups sum to 27 and no discrepancy ever existed; and that named test is in fact
+present in the P0-T8 baseline TRX at
+`docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735/evidence/baseline/p0-t8/p0-t8.trx`,
+so the explanation offered for the phantom discrepancy was not merely unnecessary but false. The
+underlying measurements — 6982 tests run, 6982 passed, 0 failed — are unchanged and were never in
+question; only the reconciliation prose was defective.
 
 The script always applies `/TestCaseFilter:TestCategory!=LiveOutlook` to its inner vstest
 invocation, so this run started no external Outlook process, exactly as the baseline did.
