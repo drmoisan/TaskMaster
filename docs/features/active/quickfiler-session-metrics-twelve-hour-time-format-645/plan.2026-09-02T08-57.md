@@ -542,7 +542,7 @@ same pass. This restart rule does not apply to a coverage-threshold exception fr
       `.../evidence/other/p5-t12-ac-reconciliation.<timestamp>.md`. Acceptance: all 10 checkboxes
       read `[x]` and a line-by-line diff against the quoted pre-edit text shows only the marker
       changed on each of the 10 lines.
-- [ ] [P5-T13] Commit the `spec.md` AC check-offs and the PR draft evidence:
+- [x] [P5-T13] Commit the `spec.md` AC check-offs and the PR draft evidence:
       ```
       git add `
         docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645/spec.md `
@@ -553,7 +553,7 @@ same pass. This restart rule does not apply to a coverage-threshold exception fr
         -m "Claude-Session: https://claude.ai/code/session_01LTjXvNFHVh7Fo7kYGgWsx2"
       ```
       Acceptance: `git commit` exits 0.
-- [ ] [P5-T14] Final clean-tree verification:
+- [x] [P5-T14] Final clean-tree verification:
       ```
       git status --porcelain
       ```
