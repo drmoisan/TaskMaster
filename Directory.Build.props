@@ -1,0 +1,18 @@
+<Project>
+  <!--
+    System.Reactive 7.0.0+ refuses to build cleanly against packages.config
+    projects (see System.Reactive.PackagesConfigCheck.targets) and instead
+    emits an "unsupported scenario" warning on every build of every project
+    that references it. This repository intentionally keeps its legacy
+    non-SDK VSTO / .NET Framework 4.8.1 projects on packages.config (see
+    .claude/rules/csharp.md) rather than migrating to PackageReference, so
+    the warning is accepted here as a known, deliberate trade-off rather than
+    fixed by migration. RxUseUnsupportedPackagesConfig=true is the package's
+    own documented suppression switch for this exact scenario. See issue #730
+    and docs/features/active/2026-09-02-ci-build-infra-debt-730/ for the
+    accepted-trade-off rationale.
+  -->
+  <PropertyGroup>
+    <RxUseUnsupportedPackagesConfig>true</RxUseUnsupportedPackagesConfig>
+  </PropertyGroup>
+</Project>
