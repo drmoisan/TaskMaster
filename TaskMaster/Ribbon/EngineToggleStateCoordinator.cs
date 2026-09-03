@@ -62,11 +62,12 @@ namespace TaskMaster
         private readonly object _primeGate = new object();
 
         /// <summary>
-        /// Last-known activation state per engine key. A key absent from this map has never been
-        /// primed successfully and reports as unchecked.
+        /// Last-known activation state per engine key, each stamped with the ticket of the read
+        /// that produced it. A key absent from this cache has never been primed successfully and
+        /// reports as unchecked. The compare-and-apply semantics live in the cache type.
         /// </summary>
-        private readonly ConcurrentDictionary<string, bool> _pressedState =
-            new ConcurrentDictionary<string, bool>(StringComparer.Ordinal);
+        private readonly EngineTogglePressedStateCache _pressedState =
+            new EngineTogglePressedStateCache();
 
         /// <summary>
         /// The in-flight — or most recently completed — prime per engine key. Its presence is the
@@ -139,7 +140,7 @@ namespace TaskMaster
                 return false;
             }
 
-            if (_pressedState.TryGetValue(engineName, out var cached))
+            if (_pressedState.TryGetActive(engineName, out var cached))
             {
                 return cached;
             }
@@ -221,10 +222,16 @@ namespace TaskMaster
             }
 
             await engines.ToggleEngineAsync(engineName).ConfigureAwait(false);
+
+            // The ticket is taken after the toggle completes and before the activation read,
+            // because that is the moment this observation window opens.
+            var sequence = _pressedState.NextSequence();
             var active = await engines.EngineActiveAsync(engineName).ConfigureAwait(false);
 
-            _pressedState[engineName] = active;
-            _invalidateControl(controlId);
+            if (_pressedState.TryApplyState(engineName, active, sequence))
+            {
+                _invalidateControl(controlId);
+            }
         }
 
         /// <summary>
@@ -306,26 +313,45 @@ namespace TaskMaster
             string controlId
         )
         {
+            // The ticket is taken immediately before the activation read, so a prime whose
+            // observation began before a toggle's cannot overwrite the toggle's newer result.
+            var sequence = _pressedState.NextSequence();
             var active = await engines.EngineActiveAsync(engineName).ConfigureAwait(false);
-            _pressedState[engineName] = active;
-            _invalidateControl(controlId);
+
+            if (_pressedState.TryApplyState(engineName, active, sequence))
+            {
+                _invalidateControl(controlId);
+            }
         }
 
         /// <summary>
-        /// Observes the outcome of a prime. On failure the cache is left unset — so the key still
-        /// reports unchecked — the in-flight marker is cleared so a later read may re-prime, and
-        /// the fault is reported through <c>logError</c>.
+        /// Observes the outcome of a prime. On any outcome other than ran-to-completion the cache
+        /// is left unset — so the key still reports unchecked — the in-flight marker is cleared so
+        /// a later read may re-prime, and the failure is reported through <c>logError</c>.
         /// </summary>
+        /// <remarks>
+        /// The status is tested rather than the exception. A CANCELED task carries a null
+        /// <see cref="Task.Exception"/>, so a handler keyed on the exception returned early for a
+        /// cancellation: nothing was logged, the cache stayed unset, and the in-flight marker stayed
+        /// registered, which blocked any re-prime for the rest of the session. When there is no
+        /// exception to unwrap a <see cref="TaskCanceledException"/> is synthesized so the sink
+        /// always receives one. The faulted path is unchanged and still reports the unwrapped base
+        /// exception.
+        /// </remarks>
         private void CompletePrime(Task completed, string engineName)
         {
-            var failure = completed.Exception;
-            if (failure is null)
+            if (completed.Status == TaskStatus.RanToCompletion)
             {
                 return;
             }
 
             _primeTasks.TryRemove(engineName, out _);
-            _logError(BuildPrimeFailedMessage(engineName), failure.GetBaseException());
+
+            var failure =
+                (Exception)completed.Exception?.GetBaseException()
+                ?? new TaskCanceledException(completed);
+
+            _logError(BuildPrimeFailedMessage(engineName), failure);
         }
 
         /// <summary>

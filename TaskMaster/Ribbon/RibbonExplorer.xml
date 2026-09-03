@@ -79,7 +79,6 @@
               onAction="BtnHookToggle_Click"
               getLabel="GetHookButtonText"
             />
-            <button id="BtnMigrateIDs" onAction="BtnMigrateIDs_Click" label="MigrateToDoIDs" />
             <button
               id="BtnPopulateUdf"
               onAction="BtnPopulateUdf_Click"
@@ -265,25 +264,25 @@
                   id="MoveEntireConversationDefault"
                   label="Move Entire Conversation"
                   getPressed="MoveEntireConversation_GetPressed"
-                  onAction="MoveEntireConversation_Clicked"
+                  onAction="MoveEntireConversation_Click"
                 />
                 <checkBox
                   id="SaveAttachmentsDefault"
                   label="Save Attachments"
                   getPressed="SaveAttachments_GetPressed"
-                  onAction="SaveAttachments_Clicked"
+                  onAction="SaveAttachments_Click"
                 />
                 <checkBox
                   id="SaveEmailCopyDefault"
                   label="Save Email Copy"
                   getPressed="SaveEmailCopy_GetPressed"
-                  onAction="SaveEmailCopy_Clicked"
+                  onAction="SaveEmailCopy_Click"
                 />
                 <checkBox
                   id="SavePicturesDefault"
                   label="Save Pictures"
                   getPressed="SavePictures_GetPressed"
-                  onAction="SavePictures_Clicked"
+                  onAction="SavePictures_Click"
                 />
               </menu>
             </menu>
