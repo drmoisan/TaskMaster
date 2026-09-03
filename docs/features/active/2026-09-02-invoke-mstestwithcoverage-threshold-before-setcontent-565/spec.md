@@ -219,26 +219,32 @@ Seeded from issue:
 
 
 ## Acceptance Criteria
-- [ ] The new Pester test in `tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1`, inside the
+- [x] The new Pester test in `tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1`, inside the
       `Describe 'Invoke-MSTestWithCoverageMain'` block, fails against the pre-fix statement order
       (`Assert-CoberturaLineCoverageThreshold` at line 341 ahead of `Set-Content` at line 343) and
       passes after the fix (statement order swapped).
-- [ ] `Set-Content` is invoked before `Assert-CoberturaLineCoverageThreshold` can throw on a
+- [x] `Set-Content` is invoked before `Assert-CoberturaLineCoverageThreshold` can throw on a
       sub-threshold run, verified by `Should -Invoke Set-Content -Times 1 -Exactly` asserted inside
       a `{ ... } | Should -Throw` block, using the `ConvertTo-KoverageCoberturaXml` mock returning
       `'<coverage line-rate="0.5" />'`.
-- [ ] The coverage threshold value (80%) is unchanged: no diff touches
+- [x] The coverage threshold value (80%) is unchanged: no diff touches
       `Assert-CoberturaLineCoverageThreshold`'s threshold literal (line 487) or its throw message
-      text in scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1.
-- [ ] No production file other than `scripts/vscode/Invoke-MSTestWithCoverage.ps1` is changed (in
+      text in scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1. Post-#733 drift note: this
+      logic now actually resides in scripts/vscode/Invoke-MSTestWithCoverage.Threshold.ps1
+      (line 52/54); the [P2-T1] fix-diff-verification artifact confirms an empty `git diff` for
+      BOTH that file and Helpers.ps1 against BASELINE_SHA.
+- [x] No production file other than `scripts/vscode/Invoke-MSTestWithCoverage.ps1` is changed (in
       particular, scripts/vscode/Invoke-MSTestWithCoverage.Helpers.ps1 and
       scripts/vscode/Invoke-MSTestWithCoverage.ClosureFilter.ps1 are untouched).
-- [ ] PoshQC format, PSScriptAnalyzer, and Pester all pass cleanly on the changed files
+- [x] PoshQC format, PSScriptAnalyzer, and Pester all pass cleanly on the changed files
       (`scripts/vscode/Invoke-MSTestWithCoverage.ps1` and
       `tests/scripts/vscode/Invoke-MSTest.RunSettings.Tests.ps1`), with no format or lint
       auto-fixes needed and no regression in the existing `Describe 'Invoke-MSTestWithCoverageMain'`
       cases (lines 345-414) or the boundary tests in Invoke-MSTestWithCoverage.Helpers.Tests.ps1.
-- [ ] Repro steps from `## Repro & Evidence` now produce the expected behavior: after the fix, the
+      Post-#733 drift note: the five boundary tests now live in
+      Invoke-MSTestWithCoverage.Threshold.Tests.ps1, confirmed 5/5 Passed by the [P3-T2]
+      helpers-boundary-regression artifact.
+- [x] Repro steps from `## Repro & Evidence` now produce the expected behavior: after the fix, the
       artifact left on disk at `-CoverageOutput` on a sub-threshold run is the same post-processed
       Cobertura document that the threshold assertion judged, not the raw `dotnet-coverage` output.
 
