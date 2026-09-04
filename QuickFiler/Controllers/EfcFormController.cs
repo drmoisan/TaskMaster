@@ -126,7 +126,19 @@ namespace QuickFiler.Controllers
 
         /// <summary>Fault-boundary sink; an injectable seam over the static logger above.</summary>
         internal System.Action<string, System.Exception> BoundaryErrorSink { get; set; } =
-            (message, exception) => logger.Error(message, exception);
+            DefaultBoundaryErrorSink;
+
+        /// <summary>
+        /// Issue #736 finding 4: the default boundary sink. It logs the fault exactly as the
+        /// previous lambda did and then surfaces it through <see cref="UserFaultNotifier"/>, whose
+        /// own default returns without blocking the calling thread. A static method group is used
+        /// because an instance property initializer cannot reference <c>this</c>.
+        /// </summary>
+        private static void DefaultBoundaryErrorSink(string message, System.Exception exception)
+        {
+            logger.Error(message, exception);
+            UserFaultNotifier?.Invoke(message);
+        }
 
         /// <summary>
         /// Issue #726 finding 5: invokes <see cref="BoundaryErrorSink"/> defensively so a null or
@@ -153,6 +165,67 @@ namespace QuickFiler.Controllers
                 logger.Error($"{message} (and the error sink itself threw)", sinkException);
                 logger.Error(message, exception);
             }
+        }
+
+        // Issue #736 finding 4. Per-async-flow storage rather than a plain shared static: a shared
+        // static races under the ClassLevel parallelization configured in the CLI runsettings, which
+        // is the same reason MyBox.DialogInvoker in UtilitiesCS.Dialogs is written this way.
+        private static readonly AsyncLocal<System.Action<string>> _userFaultNotifier =
+            new AsyncLocal<System.Action<string>>();
+
+        /// <summary>
+        /// Issue #736 finding 4: the injectable user-facing surface the default boundary sink
+        /// reports a fault through. The default is the non-blocking modeless notice below; a test
+        /// installs its own capture and restores the previous value afterwards.
+        /// </summary>
+        internal static System.Action<string> UserFaultNotifier
+        {
+            get => _userFaultNotifier.Value ?? ShowModelessFaultNotice;
+            set => _userFaultNotifier.Value = value;
+        }
+
+        /// <summary>
+        /// Default user-facing surface for a boundary fault: a modeless, self-disposing, read-only
+        /// notice. <c>Show()</c> returns immediately, so the calling thread is never blocked, and no
+        /// modal dialog is invoked from this path.
+        /// </summary>
+        /// <remarks>
+        /// Excluded from coverage by inspection: every statement past the early return constructs
+        /// WinForms controls, which the headless test host cannot exercise. The early return is
+        /// load-bearing rather than defensive — the pre-existing default-delegate test invokes the
+        /// sink directly in the test host, and without it that invocation would construct a window
+        /// on an MSTest thread. The accepted consequence is that a fault raised while the add-in has
+        /// no open WinForms window is logged and not displayed.
+        /// </remarks>
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+        private static void ShowModelessFaultNotice(string message)
+        {
+            if (System.Windows.Forms.Application.OpenForms.Count == 0)
+            {
+                return;
+            }
+
+            var notice = new Form();
+            notice.Text = "QuickFiler";
+            notice.TopMost = true;
+            notice.ShowInTaskbar = false;
+            notice.FormBorderStyle = FormBorderStyle.FixedDialog;
+            notice.MinimizeBox = false;
+            notice.MaximizeBox = false;
+            notice.StartPosition = FormStartPosition.CenterScreen;
+            notice.Width = 460;
+            notice.Height = 160;
+
+            var body = new TextBox();
+            body.Text = message;
+            body.ReadOnly = true;
+            body.Multiline = true;
+            body.Dock = DockStyle.Fill;
+            body.BorderStyle = BorderStyle.None;
+            notice.Controls.Add(body);
+
+            notice.FormClosed += (sender, args) => notice.Dispose();
+            notice.Show();
         }
 
         private IApplicationGlobals _globals;
@@ -918,16 +991,47 @@ namespace QuickFiler.Controllers
 
         #region Helper Methods
 
-        async public Task KbdExecuteAsync(Func<Task> action)
+        /// <summary>
+        /// Issue #736 finding 2: the single containment point for the keyboard-dispatch path. Both
+        /// <c>KbdExecuteAsync</c> overloads route their two statements through this member, so the
+        /// handling is written once rather than duplicated, and a fault raised by the
+        /// keyboard-dialog toggle is covered as well as one raised by the dispatched action.
+        /// </summary>
+        internal async Task RunKbdGuardedAsync(System.Func<Task> body)
         {
-            await _homeController.KeyboardHandler.ToggleKeyboardDialogAsync();
-            await action();
+            try
+            {
+                await body();
+            }
+            catch (OperationCanceledException)
+            {
+                // Cancellation is not a fault, so it is recorded at debug level and deliberately
+                // not reported through the sink, matching the existing distinction in
+                // BindBreadcrumbRowsAsync.
+                logger.Debug("Keyboard dispatch canceled.");
+            }
+            catch (System.Exception ex)
+            {
+                TryReportBoundaryFault($"Keyboard dispatch failed: {ex.Message}", ex);
+            }
+        }
+
+        public async Task KbdExecuteAsync(Func<Task> action)
+        {
+            await RunKbdGuardedAsync(async () =>
+            {
+                await _homeController.KeyboardHandler.ToggleKeyboardDialogAsync();
+                await action();
+            });
         }
 
         public async Task KbdExecuteAsync(System.Action action)
         {
-            await _homeController.KeyboardHandler.ToggleKeyboardDialogAsync();
-            action();
+            await RunKbdGuardedAsync(async () =>
+            {
+                await _homeController.KeyboardHandler.ToggleKeyboardDialogAsync();
+                action();
+            });
         }
 
         internal async Task JumpToAsync(Control control)
@@ -1019,7 +1123,7 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
-                logger.Error($"Breadcrumb bind failed: {ex.Message}", ex);
+                TryReportBoundaryFault($"Breadcrumb bind failed: {ex.Message}", ex);
             }
         }
 

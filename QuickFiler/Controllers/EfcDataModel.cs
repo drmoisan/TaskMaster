@@ -340,10 +340,24 @@ namespace QuickFiler.Controllers
                 FsAncestorEquivalent = folderRoot,
             };
 
-            var sorter = new EmailFiler(config);
-            var result = await sorter.SortAsync(mailHelpers);
+            var result = await InvokeFilerAsync(config, mailHelpers);
             SortEmail.Cleanup_Files();
             return result;
+        }
+
+        /// <summary>
+        /// Issue #736 finding 6: the filer-invocation seam. Production behaviour is identical to
+        /// the inline construction it replaces; a test override supplies a deliberate stopping
+        /// point, so the success-path test no longer depends on an incidental downstream crash.
+        /// The <c>EmailFilerConfig</c> construction above is left in place deliberately, so its
+        /// object initializer stays covered.
+        /// </summary>
+        protected internal virtual Task<bool> InvokeFilerAsync(
+            EmailFilerConfig config,
+            IList<MailItemHelper> mailHelpers
+        )
+        {
+            return new EmailFiler(config).SortAsync(mailHelpers);
         }
 
         internal async Task OpenOlFolderAsync(string folderpath)

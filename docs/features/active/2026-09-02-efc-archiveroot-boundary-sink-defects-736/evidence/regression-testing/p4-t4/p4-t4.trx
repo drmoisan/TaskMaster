@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="536b5426-b65f-477c-8c49-a236fd1814e4" name="REDACTED@REDACTED 2026-09-04 00:10:33" runUser="REDACTED\REDACTED" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-09-04T00:10:33.7218622-04:00" queuing="2026-09-04T00:10:33.7218622-04:00" start="2026-09-04T00:10:32.4390590-04:00" finish="2026-09-04T00:10:33.7397469-04:00" />
+  <TestSettings name="default" id="74e11008-05f2-48c2-a24d-ee6e4e077255">
+    <Deployment runDeploymentRoot="REDACTED_REDACTED_2026-09-04_00_10_33" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="e7a7288b-7d4c-4d73-b4ee-d75fba3099da" testId="18a1e849-ab72-8468-8713-ba4079867d52" testName="BoundaryErrorSink_DefaultDelegate_ReturnsWithoutBlockingTheCallingThread" computerName="REDACTED" duration="00:00:00.0008766" startTime="2026-09-04T00:10:33.6462212-04:00" endTime="2026-09-04T00:10:33.6502256-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e7a7288b-7d4c-4d73-b4ee-d75fba3099da" />
+    <UnitTestResult executionId="ca4cf297-c946-4392-aa36-02a8bd882009" testId="17110586-4452-8693-b5cd-abd626ac7d57" testName="BoundaryErrorSink_DefaultDelegate_RoutesThroughTheUserFaultNotifier" computerName="REDACTED" duration="00:00:00.0938472" startTime="2026-09-04T00:10:33.5515014-04:00" endTime="2026-09-04T00:10:33.6452215-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ca4cf297-c946-4392-aa36-02a8bd882009">
+      <Output>
+        <ErrorInfo>
+          <Message>Expected captured to contain a single item because the default sink must report the fault to the user exactly once, not merely write a log line, but the collection is empty.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Collections.GenericCollectionAssertions`3.ContainSingle(String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Collections/GenericCollectionAssertions.cs:line 1186&#xD;
+   at QuickFiler.Controllers.Tests.EfcFormControllerTests.BoundaryErrorSink_DefaultDelegate_RoutesThroughTheUserFaultNotifier() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\Controllers\EfcFormControllerTests.Part2.cs:line 296</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="50833f4b-f700-4e1a-b944-5aa95a844fd5" testId="15efe720-c5cf-88b6-a104-58a9060fed2e" testName="BoundaryErrorSink_DefaultDelegate_InvokesWithoutThrowing" computerName="REDACTED" duration="00:00:00.0509175" startTime="2026-09-04T00:10:33.3819880-04:00" endTime="2026-09-04T00:10:33.5459978-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="50833f4b-f700-4e1a-b944-5aa95a844fd5">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="BoundaryErrorSink_DefaultDelegate_RoutesThroughTheUserFaultNotifier" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="17110586-4452-8693-b5cd-abd626ac7d57">
+      <Execution id="ca4cf297-c946-4392-aa36-02a8bd882009" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="BoundaryErrorSink_DefaultDelegate_RoutesThroughTheUserFaultNotifier" />
+    </UnitTest>
+    <UnitTest name="BoundaryErrorSink_DefaultDelegate_InvokesWithoutThrowing" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="15efe720-c5cf-88b6-a104-58a9060fed2e">
+      <Execution id="50833f4b-f700-4e1a-b944-5aa95a844fd5" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="BoundaryErrorSink_DefaultDelegate_InvokesWithoutThrowing" />
+    </UnitTest>
+    <UnitTest name="BoundaryErrorSink_DefaultDelegate_ReturnsWithoutBlockingTheCallingThread" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="18a1e849-ab72-8468-8713-ba4079867d52">
+      <Execution id="e7a7288b-7d4c-4d73-b4ee-d75fba3099da" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="BoundaryErrorSink_DefaultDelegate_ReturnsWithoutBlockingTheCallingThread" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="18a1e849-ab72-8468-8713-ba4079867d52" executionId="e7a7288b-7d4c-4d73-b4ee-d75fba3099da" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17110586-4452-8693-b5cd-abd626ac7d57" executionId="ca4cf297-c946-4392-aa36-02a8bd882009" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15efe720-c5cf-88b6-a104-58a9060fed2e" executionId="50833f4b-f700-4e1a-b944-5aa95a844fd5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="3" executed="3" passed="2" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

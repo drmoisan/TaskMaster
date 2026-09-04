@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="04e2eee3-ac3b-4b1d-b8d3-e4a6bdd708c2" name="REDACTED@REDACTED 2026-09-04 01:45:15" runUser="REDACTED\REDACTED" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-09-04T01:45:15.5410750-04:00" queuing="2026-09-04T01:45:15.5410750-04:00" start="2026-09-04T01:45:14.3109825-04:00" finish="2026-09-04T01:45:15.5557540-04:00" />
+  <TestSettings name="default" id="c06d9975-3691-4238-9272-57f6fc762994">
+    <Deployment runDeploymentRoot="REDACTED_REDACTED_2026-09-04_01_45_15" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="19f8f4da-c4a4-431b-ad66-0478484fc8e1" testId="1d4e76a5-69ae-8672-b27c-1ef241956f6c" testName="RequireResolvedArchiveRoot_UnresolvableRoot_ThrowsAndDiagnosesWithoutTheValue" computerName="REDACTED" duration="00:00:00.0087073" startTime="2026-09-04T01:45:15.3761875-04:00" endTime="2026-09-04T01:45:15.3842469-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="19f8f4da-c4a4-431b-ad66-0478484fc8e1" />
+    <UnitTestResult executionId="edaf15d3-c83c-464e-b508-a2e2910abe72" testId="17bec772-b9c9-8206-8062-aa0674b0a475" testName="RequireResolvedArchiveRoot_ResolvedRootMatchesComposedPath_ReturnsIt" computerName="REDACTED" duration="00:00:00.0387780" startTime="2026-09-04T01:45:15.2397939-04:00" endTime="2026-09-04T01:45:15.3686710-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="edaf15d3-c83c-464e-b508-a2e2910abe72">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="2da85d91-db8a-4924-9799-fd09ae0c2174" testId="1a52148c-829e-825a-a1d1-44d6e88d86ae" testName="RequireResolvedArchiveRoot_CaseDifferingResolvedRoot_ReturnsComposedPath" computerName="REDACTED" duration="00:00:00.0001695" startTime="2026-09-04T01:45:15.3751831-04:00" endTime="2026-09-04T01:45:15.3761875-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2da85d91-db8a-4924-9799-fd09ae0c2174" />
+    <UnitTestResult executionId="b392aecd-8e1f-4226-ad54-f7a2f6c0e0a9" testId="1d77695d-834c-8ae7-b57a-c7db9166b06e" testName="RequireResolvedArchiveRoot_CrossStoreRoot_ThrowsAndDiagnosesWithoutTheValue" computerName="REDACTED" duration="00:00:00.0003504" startTime="2026-09-04T01:45:15.3842469-04:00" endTime="2026-09-04T01:45:15.3852481-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b392aecd-8e1f-4226-ad54-f7a2f6c0e0a9" />
+    <UnitTestResult executionId="38fa9364-e42d-44c9-a620-6da1d275461a" testId="1af0c36c-8e4a-8565-ad10-817105378e7e" testName="ConsumerSeam_ArchiveRootPath_IsReadThroughTheMockableInterface" computerName="REDACTED" duration="00:00:00.0910854" startTime="2026-09-04T01:45:15.3852481-04:00" endTime="2026-09-04T01:45:15.4802953-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="38fa9364-e42d-44c9-a620-6da1d275461a" />
+    <UnitTestResult executionId="8c88c71d-8b36-466f-9d31-397cab9bf396" testId="1f56da67-6a69-89bc-aed4-5228ea40a368" testName="RequireResolvedArchiveRoot_EmptyComposedPath_Throws" computerName="REDACTED" duration="00:00:00.0002244" startTime="2026-09-04T01:45:15.3852481-04:00" endTime="2026-09-04T01:45:15.3852481-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8c88c71d-8b36-466f-9d31-397cab9bf396" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="RequireResolvedArchiveRoot_UnresolvableRoot_ThrowsAndDiagnosesWithoutTheValue" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\taskmaster.test\bin\debug\taskmaster.test.dll" id="1d4e76a5-69ae-8672-b27c-1ef241956f6c">
+      <Execution id="19f8f4da-c4a4-431b-ad66-0478484fc8e1" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootValidationTests" name="RequireResolvedArchiveRoot_UnresolvableRoot_ThrowsAndDiagnosesWithoutTheValue" />
+    </UnitTest>
+    <UnitTest name="RequireResolvedArchiveRoot_CrossStoreRoot_ThrowsAndDiagnosesWithoutTheValue" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\taskmaster.test\bin\debug\taskmaster.test.dll" id="1d77695d-834c-8ae7-b57a-c7db9166b06e">
+      <Execution id="b392aecd-8e1f-4226-ad54-f7a2f6c0e0a9" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootValidationTests" name="RequireResolvedArchiveRoot_CrossStoreRoot_ThrowsAndDiagnosesWithoutTheValue" />
+    </UnitTest>
+    <UnitTest name="RequireResolvedArchiveRoot_CaseDifferingResolvedRoot_ReturnsComposedPath" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\taskmaster.test\bin\debug\taskmaster.test.dll" id="1a52148c-829e-825a-a1d1-44d6e88d86ae">
+      <Execution id="2da85d91-db8a-4924-9799-fd09ae0c2174" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootValidationTests" name="RequireResolvedArchiveRoot_CaseDifferingResolvedRoot_ReturnsComposedPath" />
+    </UnitTest>
+    <UnitTest name="RequireResolvedArchiveRoot_EmptyComposedPath_Throws" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\taskmaster.test\bin\debug\taskmaster.test.dll" id="1f56da67-6a69-89bc-aed4-5228ea40a368">
+      <Execution id="8c88c71d-8b36-466f-9d31-397cab9bf396" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootValidationTests" name="RequireResolvedArchiveRoot_EmptyComposedPath_Throws" />
+    </UnitTest>
+    <UnitTest name="RequireResolvedArchiveRoot_ResolvedRootMatchesComposedPath_ReturnsIt" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\taskmaster.test\bin\debug\taskmaster.test.dll" id="17bec772-b9c9-8206-8062-aa0674b0a475">
+      <Execution id="edaf15d3-c83c-464e-b508-a2e2910abe72" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootValidationTests" name="RequireResolvedArchiveRoot_ResolvedRootMatchesComposedPath_ReturnsIt" />
+    </UnitTest>
+    <UnitTest name="ConsumerSeam_ArchiveRootPath_IsReadThroughTheMockableInterface" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\taskmaster.test\bin\debug\taskmaster.test.dll" id="1af0c36c-8e4a-8565-ad10-817105378e7e">
+      <Execution id="38fa9364-e42d-44c9-a620-6da1d275461a" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootValidationTests" name="ConsumerSeam_ArchiveRootPath_IsReadThroughTheMockableInterface" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1d4e76a5-69ae-8672-b27c-1ef241956f6c" executionId="19f8f4da-c4a4-431b-ad66-0478484fc8e1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17bec772-b9c9-8206-8062-aa0674b0a475" executionId="edaf15d3-c83c-464e-b508-a2e2910abe72" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a52148c-829e-825a-a1d1-44d6e88d86ae" executionId="2da85d91-db8a-4924-9799-fd09ae0c2174" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d77695d-834c-8ae7-b57a-c7db9166b06e" executionId="b392aecd-8e1f-4226-ad54-f7a2f6c0e0a9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1af0c36c-8e4a-8565-ad10-817105378e7e" executionId="38fa9364-e42d-44c9-a620-6da1d275461a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f56da67-6a69-89bc-aed4-5228ea40a368" executionId="8c88c71d-8b36-466f-9d31-397cab9bf396" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="6" executed="6" passed="6" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

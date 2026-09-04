@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="ef578bd0-0490-4a90-b21d-901b1ccd8b8d" name="REDACTED@REDACTED 2026-09-04 00:16:39" runUser="REDACTED\REDACTED" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-09-04T00:16:39.1834840-04:00" queuing="2026-09-04T00:16:39.1834840-04:00" start="2026-09-04T00:16:37.8465039-04:00" finish="2026-09-04T00:16:39.3254489-04:00" />
+  <TestSettings name="default" id="36649c9a-5958-4aa3-82c1-495375c25c5d">
+    <Deployment runDeploymentRoot="REDACTED_REDACTED_2026-09-04_00_16_39" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="a6cdceba-21af-445c-b7fe-1f07f7c9d8b5" testId="1136d340-cd0a-865e-bf6a-74f57a022fdc" testName="OpenOlFolderAsync_WhenArchiveRootIsUnresolvable_ReportsAndReturns" computerName="REDACTED" duration="00:00:00.0036560" startTime="2026-09-04T00:16:39.1388830-04:00" endTime="2026-09-04T00:16:39.1428912-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a6cdceba-21af-445c-b7fe-1f07f7c9d8b5" />
+    <UnitTestResult executionId="587719c4-43c5-434e-acaa-91044745cec9" testId="1ed6059b-feee-8ba2-b3ad-bda04ea1f355" testName="OpenFsFolderAsync_WhenOneDriveIsMissing_ReturnsWithoutReadingArchiveRoot" computerName="REDACTED" duration="00:00:00.0005688" startTime="2026-09-04T00:16:39.1684841-04:00" endTime="2026-09-04T00:16:39.1734859-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="587719c4-43c5-434e-acaa-91044745cec9" />
+    <UnitTestResult executionId="4d0c6872-dbe7-4ea2-9561-fbc9ede3a2e9" testId="1bda68ff-946e-85f1-bc3f-09153b991fd0" testName="MoveToFolderAsync_WhenArchiveRootIsCrossStoreUnresolvable_ReturnsFalseInsteadOfThrowing" computerName="REDACTED" duration="00:00:00.0009553" startTime="2026-09-04T00:16:39.1368741-04:00" endTime="2026-09-04T00:16:39.1388830-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4d0c6872-dbe7-4ea2-9561-fbc9ede3a2e9" />
+    <UnitTestResult executionId="ada9b8e2-0dfb-4647-b664-6932643aebd6" testId="1ea728b1-c272-89f9-8d18-d65941e417a1" testName="OpenOlFolderAsync_WhenOneDriveIsMissing_ReturnsWithoutReadingArchiveRoot" computerName="REDACTED" duration="00:00:00.0008763" startTime="2026-09-04T00:16:39.1644850-04:00" endTime="2026-09-04T00:16:39.1684841-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ada9b8e2-0dfb-4647-b664-6932643aebd6" />
+    <UnitTestResult executionId="45efd052-fcf7-44dd-92b7-4ee396c2f0d0" testId="1c0c9759-ec2a-8d00-9540-2882da45cd42" testName="MoveToFolderAsync_WhenArchiveRootResolves_StillReadsItOnce" computerName="REDACTED" duration="00:00:00.0041971" startTime="2026-09-04T00:16:39.1448905-04:00" endTime="2026-09-04T00:16:39.1498903-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="45efd052-fcf7-44dd-92b7-4ee396c2f0d0" />
+    <UnitTestResult executionId="5a698a30-8ad0-477d-b1c6-d352e2b81356" testId="1eef43c9-db4f-83d6-9792-82aec0701edf" testName="ArchiveRootFailureDiagnostic_DoesNotContainTheArchivePathOrMailboxAddress" computerName="REDACTED" duration="00:00:00.0013966" startTime="2026-09-04T00:16:39.1438908-04:00" endTime="2026-09-04T00:16:39.1448905-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5a698a30-8ad0-477d-b1c6-d352e2b81356" />
+    <UnitTestResult executionId="a654a014-f5b5-47d1-90bd-2c2179d70611" testId="10c08a85-67e3-8774-a82d-252ee847ea15" testName="MoveToFolderAsync_WhenMailInfoIsNull_ReturnsFalseWithoutReadingArchiveRoot" computerName="REDACTED" duration="00:00:00.0007222" startTime="2026-09-04T00:16:39.1498903-04:00" endTime="2026-09-04T00:16:39.1508906-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a654a014-f5b5-47d1-90bd-2c2179d70611" />
+    <UnitTestResult executionId="bfbb2b14-0224-46c2-bc39-810840070e52" testId="15cd544e-6120-830e-8d2f-8b484467dfa6" testName="OpenFsFolderAsync_WhenArchiveRootIsUnresolvable_ReportsAndReturns" computerName="REDACTED" duration="00:00:00.0010873" startTime="2026-09-04T00:16:39.1428912-04:00" endTime="2026-09-04T00:16:39.1438908-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bfbb2b14-0224-46c2-bc39-810840070e52" />
+    <UnitTestResult executionId="fe2486f2-1e28-4389-a91e-38bd2f40c54d" testId="1a8ade18-5cac-876a-b37d-2994dcf5ac51" testName="MoveToFolderAsync_WhenArchiveRootIsUnresolvable_ReturnsFalseInsteadOfThrowing" computerName="REDACTED" duration="00:00:00.1577402" startTime="2026-09-04T00:16:38.8560003-04:00" endTime="2026-09-04T00:16:39.1316357-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fe2486f2-1e28-4389-a91e-38bd2f40c54d">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="d221d062-77d5-4a05-a207-1f9079bbd8af" testId="1862c1ff-d561-8bef-af34-9b42681dc5b4" testName="MoveToFolderAsync_WhenOneDriveIsMissing_ReturnsFalseWithoutReadingArchiveRoot" computerName="REDACTED" duration="00:00:00.0006957" startTime="2026-09-04T00:16:39.1508906-04:00" endTime="2026-09-04T00:16:39.1508906-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d221d062-77d5-4a05-a207-1f9079bbd8af" />
+    <UnitTestResult executionId="ddc54130-6474-4d26-bf76-740c03979886" testId="1fd33777-7849-8a65-ba83-90bcd2374666" testName="MoveToFolderAsync_WhenArchiveRootThrowsComException_StillPropagates" computerName="REDACTED" duration="00:00:00.0072387" startTime="2026-09-04T00:16:39.1508906-04:00" endTime="2026-09-04T00:16:39.1589833-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ddc54130-6474-4d26-bf76-740c03979886" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="MoveToFolderAsync_WhenArchiveRootIsCrossStoreUnresolvable_ReturnsFalseInsteadOfThrowing" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1bda68ff-946e-85f1-bc3f-09153b991fd0">
+      <Execution id="4d0c6872-dbe7-4ea2-9561-fbc9ede3a2e9" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.EfcDataModelArchiveRootTests" name="MoveToFolderAsync_WhenArchiveRootIsCrossStoreUnresolvable_ReturnsFalseInsteadOfThrowing" />
+    </UnitTest>
+    <UnitTest name="MoveToFolderAsync_WhenMailInfoIsNull_ReturnsFalseWithoutReadingArchiveRoot" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="10c08a85-67e3-8774-a82d-252ee847ea15">
+      <Execution id="a654a014-f5b5-47d1-90bd-2c2179d70611" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.EfcDataModelArchiveRootTests" name="MoveToFolderAsync_WhenMailInfoIsNull_ReturnsFalseWithoutReadingArchiveRoot" />
+    </UnitTest>
+    <UnitTest name="MoveToFolderAsync_WhenArchiveRootResolves_StillReadsItOnce" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c0c9759-ec2a-8d00-9540-2882da45cd42">
+      <Execution id="45efd052-fcf7-44dd-92b7-4ee396c2f0d0" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.EfcDataModelArchiveRootTests" name="MoveToFolderAsync_WhenArchiveRootResolves_StillReadsItOnce" />
+    </UnitTest>
+    <UnitTest name="ArchiveRootFailureDiagnostic_DoesNotContainTheArchivePathOrMailboxAddress" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1eef43c9-db4f-83d6-9792-82aec0701edf">
+      <Execution id="5a698a30-8ad0-477d-b1c6-d352e2b81356" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.EfcDataModelArchiveRootTests" name="ArchiveRootFailureDiagnostic_DoesNotContainTheArchivePathOrMailboxAddress" />
+    </UnitTest>
+    <UnitTest name="OpenOlFolderAsync_WhenArchiveRootIsUnresolvable_ReportsAndReturns" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1136d340-cd0a-865e-bf6a-74f57a022fdc">
+      <Execution id="a6cdceba-21af-445c-b7fe-1f07f7c9d8b5" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.EfcDataModelArchiveRootTests" name="OpenOlFolderAsync_WhenArchiveRootIsUnresolvable_ReportsAndReturns" />
+    </UnitTest>
+    <UnitTest name="OpenFsFolderAsync_WhenOneDriveIsMissing_ReturnsWithoutReadingArchiveRoot" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ed6059b-feee-8ba2-b3ad-bda04ea1f355">
+      <Execution id="587719c4-43c5-434e-acaa-91044745cec9" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.EfcDataModelArchiveRootTests" name="OpenFsFolderAsync_WhenOneDriveIsMissing_ReturnsWithoutReadingArchiveRoot" />
+    </UnitTest>
+    <UnitTest name="OpenFsFolderAsync_WhenArchiveRootIsUnresolvable_ReportsAndReturns" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="15cd544e-6120-830e-8d2f-8b484467dfa6">
+      <Execution id="bfbb2b14-0224-46c2-bc39-810840070e52" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.EfcDataModelArchiveRootTests" name="OpenFsFolderAsync_WhenArchiveRootIsUnresolvable_ReportsAndReturns" />
+    </UnitTest>
+    <UnitTest name="MoveToFolderAsync_WhenArchiveRootIsUnresolvable_ReturnsFalseInsteadOfThrowing" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1a8ade18-5cac-876a-b37d-2994dcf5ac51">
+      <Execution id="fe2486f2-1e28-4389-a91e-38bd2f40c54d" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.EfcDataModelArchiveRootTests" name="MoveToFolderAsync_WhenArchiveRootIsUnresolvable_ReturnsFalseInsteadOfThrowing" />
+    </UnitTest>
+    <UnitTest name="MoveToFolderAsync_WhenArchiveRootThrowsComException_StillPropagates" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1fd33777-7849-8a65-ba83-90bcd2374666">
+      <Execution id="ddc54130-6474-4d26-bf76-740c03979886" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.EfcDataModelArchiveRootTests" name="MoveToFolderAsync_WhenArchiveRootThrowsComException_StillPropagates" />
+    </UnitTest>
+    <UnitTest name="OpenOlFolderAsync_WhenOneDriveIsMissing_ReturnsWithoutReadingArchiveRoot" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ea728b1-c272-89f9-8d18-d65941e417a1">
+      <Execution id="ada9b8e2-0dfb-4647-b664-6932643aebd6" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.EfcDataModelArchiveRootTests" name="OpenOlFolderAsync_WhenOneDriveIsMissing_ReturnsWithoutReadingArchiveRoot" />
+    </UnitTest>
+    <UnitTest name="MoveToFolderAsync_WhenOneDriveIsMissing_ReturnsFalseWithoutReadingArchiveRoot" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1862c1ff-d561-8bef-af34-9b42681dc5b4">
+      <Execution id="d221d062-77d5-4a05-a207-1f9079bbd8af" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Test.Controllers.EfcDataModelArchiveRootTests" name="MoveToFolderAsync_WhenOneDriveIsMissing_ReturnsFalseWithoutReadingArchiveRoot" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="1136d340-cd0a-865e-bf6a-74f57a022fdc" executionId="a6cdceba-21af-445c-b7fe-1f07f7c9d8b5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ed6059b-feee-8ba2-b3ad-bda04ea1f355" executionId="587719c4-43c5-434e-acaa-91044745cec9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1bda68ff-946e-85f1-bc3f-09153b991fd0" executionId="4d0c6872-dbe7-4ea2-9561-fbc9ede3a2e9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ea728b1-c272-89f9-8d18-d65941e417a1" executionId="ada9b8e2-0dfb-4647-b664-6932643aebd6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c0c9759-ec2a-8d00-9540-2882da45cd42" executionId="45efd052-fcf7-44dd-92b7-4ee396c2f0d0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1eef43c9-db4f-83d6-9792-82aec0701edf" executionId="5a698a30-8ad0-477d-b1c6-d352e2b81356" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10c08a85-67e3-8774-a82d-252ee847ea15" executionId="a654a014-f5b5-47d1-90bd-2c2179d70611" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15cd544e-6120-830e-8d2f-8b484467dfa6" executionId="bfbb2b14-0224-46c2-bc39-810840070e52" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a8ade18-5cac-876a-b37d-2994dcf5ac51" executionId="fe2486f2-1e28-4389-a91e-38bd2f40c54d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1862c1ff-d561-8bef-af34-9b42681dc5b4" executionId="d221d062-77d5-4a05-a207-1f9079bbd8af" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1fd33777-7849-8a65-ba83-90bcd2374666" executionId="ddc54130-6474-4d26-bf76-740c03979886" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="11" executed="11" passed="11" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

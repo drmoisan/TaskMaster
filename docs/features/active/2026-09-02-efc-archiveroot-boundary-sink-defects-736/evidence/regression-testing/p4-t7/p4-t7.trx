@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="74611ef6-c1d0-4275-8da8-3745f8144f76" name="REDACTED@REDACTED 2026-09-04 00:12:25" runUser="REDACTED\REDACTED" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-09-04T00:12:25.4384811-04:00" queuing="2026-09-04T00:12:25.4384811-04:00" start="2026-09-04T00:12:23.7444755-04:00" finish="2026-09-04T00:12:25.5159050-04:00" />
+  <TestSettings name="default" id="f652c34b-5e55-4dcc-8e77-1d629fe2e347">
+    <Deployment runDeploymentRoot="REDACTED_REDACTED_2026-09-04_00_12_25" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="5fdbd998-a3c3-42fc-b572-d636435a8ab4" testId="167d9b8f-dbdd-85eb-8ef0-268604fe1959" testName="KbdExecuteAsync_FuncTaskOverload_WhenToggleFaults_ReportsOnceAndDoesNotThrow" computerName="REDACTED" duration="00:00:00.0017833" startTime="2026-09-04T00:12:25.4477870-04:00" endTime="2026-09-04T00:12:25.4497872-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5fdbd998-a3c3-42fc-b572-d636435a8ab4" />
+    <UnitTestResult executionId="730b881e-b6b1-4104-a2dd-b30e5cc85e7c" testId="190f383b-3c90-81ed-95a6-96f33f1441e3" testName="FormCleanup_InvokesParentCleanupExactlyOnce" computerName="REDACTED" duration="00:00:00.0237326" startTime="2026-09-04T00:12:25.3357252-04:00" endTime="2026-09-04T00:12:25.3597624-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="730b881e-b6b1-4104-a2dd-b30e5cc85e7c" />
+    <UnitTestResult executionId="8020e257-79b3-46a4-8c3e-c310db9d5e76" testId="12623ccd-9bf4-83e5-896e-c86572aa9cc6" testName="Issue439BindBreadcrumbRowsAsync_SubmitsArchiveRootToRealRouter" computerName="REDACTED" duration="00:00:00.1875000" startTime="2026-09-04T00:12:25.1403059-04:00" endTime="2026-09-04T00:12:25.3287281-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8020e257-79b3-46a4-8c3e-c310db9d5e76" />
+    <UnitTestResult executionId="5052f9d3-52e5-4409-b5b6-050692eab3d6" testId="13022579-5a4d-8fce-be10-1b3189c41ec6" testName="BindBreadcrumbRowsAsync_WhenArchiveRootThrows_ReportsOnceAndDoesNotThrow" computerName="REDACTED" duration="00:00:00.0010073" startTime="2026-09-04T00:12:25.4527864-04:00" endTime="2026-09-04T00:12:25.4537861-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5052f9d3-52e5-4409-b5b6-050692eab3d6" />
+    <UnitTestResult executionId="4bdd04f7-bb96-456f-976d-f165cadc86e9" testId="1e7eb9b5-4908-8450-9478-7aab26ea588a" testName="FormCleanup_CalledTwice_DoesNotThrow" computerName="REDACTED" duration="00:00:00.0022525" startTime="2026-09-04T00:12:25.3327290-04:00" endTime="2026-09-04T00:12:25.3357252-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4bdd04f7-bb96-456f-976d-f165cadc86e9" />
+    <UnitTestResult executionId="4b52c96b-8cb4-4bc5-915f-a9063b7e12d6" testId="1d537941-1382-8ef4-9782-f593d7951eed" testName="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonRefreshClickAsync&quot;)" computerName="REDACTED" duration="00:00:00.0003419" startTime="2026-09-04T00:12:25.4207007-04:00" endTime="2026-09-04T00:12:25.4212159-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4b52c96b-8cb4-4bc5-915f-a9063b7e12d6" />
+    <UnitTestResult executionId="34092a05-fe93-4aa5-a96e-9a53f6060ead" testId="1c2e2535-1e8d-8e5d-bdc5-e51bd77ab09d" testName="KbdExecuteAsync_WhenBoundaryErrorSinkThrows_DoesNotThrow" computerName="REDACTED" duration="00:00:00.0004600" startTime="2026-09-04T00:12:25.4507875-04:00" endTime="2026-09-04T00:12:25.4517865-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="34092a05-fe93-4aa5-a96e-9a53f6060ead" />
+    <UnitTestResult executionId="cb273b30-bbe2-4368-a3f2-61b1276e39b0" testId="10fa7ee1-1f59-89ec-bb6b-844b1b29f90a" testName="IsBannerRow_NullOrShortRow_ReturnsFalseWithoutThrowing" computerName="REDACTED" duration="00:00:00.0002627" startTime="2026-09-04T00:12:25.4467878-04:00" endTime="2026-09-04T00:12:25.4467878-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cb273b30-bbe2-4368-a3f2-61b1276e39b0" />
+    <UnitTestResult executionId="a33a4c5e-9349-410a-bb9f-6d055f473621" testId="1cdfafb1-bc79-8436-8f6c-80e5b466a779" testName="FormActiveTheme_OnAllFieldsNullController_ReturnsBackingFieldAndDoesNotThrow" computerName="REDACTED" duration="00:00:00.0017732" startTime="2026-09-04T00:12:25.3307282-04:00" endTime="2026-09-04T00:12:25.3327290-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a33a4c5e-9349-410a-bb9f-6d055f473621" />
+    <UnitTestResult executionId="2221e2e8-6e49-4dea-9153-4809443f9c47" testId="18a1e849-ab72-8468-8713-ba4079867d52" testName="BoundaryErrorSink_DefaultDelegate_ReturnsWithoutBlockingTheCallingThread" computerName="REDACTED" duration="00:00:00.0008363" startTime="2026-09-04T00:12:25.4557863-04:00" endTime="2026-09-04T00:12:25.4593839-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2221e2e8-6e49-4dea-9153-4809443f9c47" />
+    <UnitTestResult executionId="ab5f5f38-6368-431b-a8a4-90043483095c" testId="12905a65-5e20-80dd-8c82-5cd4919215e6" testName="FormDarkMode_OnAllFieldsNullController_ReturnsFalseAndDoesNotThrow" computerName="REDACTED" duration="00:00:00.0017267" startTime="2026-09-04T00:12:25.3287281-04:00" endTime="2026-09-04T00:12:25.3307282-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ab5f5f38-6368-431b-a8a4-90043483095c" />
+    <UnitTestResult executionId="8cd81aea-0292-46c5-86c2-89e5a33b1c9c" testId="1cbef776-6ac6-8597-a153-70cbc1f50c56" testName="FormLoadTheme_OnAllFieldsNullController_DoesNotThrow" computerName="REDACTED" duration="00:00:00.0004224" startTime="2026-09-04T00:12:25.3327290-04:00" endTime="2026-09-04T00:12:25.3327290-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8cd81aea-0292-46c5-86c2-89e5a33b1c9c" />
+    <UnitTestResult executionId="e62c7c7b-1d93-4b40-81a9-02a907a728df" testId="15c38dd9-63c9-882b-b88f-e151558f9c52" testName="RunKbdGuardedAsync_WhenBodyThrowsInvalidOperation_ReportsExactlyOnce" computerName="REDACTED" duration="00:00:00.0004841" startTime="2026-09-04T00:12:25.4517865-04:00" endTime="2026-09-04T00:12:25.4527864-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e62c7c7b-1d93-4b40-81a9-02a907a728df" />
+    <UnitTestResult executionId="b49d2eb5-2674-40dd-85c5-892c48a3dc72" testId="1f4a3747-df86-89ad-b49e-3fa103dee4b2" testName="WithTrashRow_AppliedTwice_YieldsExactlyOneTrashRow" computerName="REDACTED" duration="00:00:00.0031286" startTime="2026-09-04T00:12:25.4358450-04:00" endTime="2026-09-04T00:12:25.4395081-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b49d2eb5-2674-40dd-85c5-892c48a3dc72" />
+    <UnitTestResult executionId="77c36b7e-cb9f-492b-94f3-2b312e25376d" testId="17110586-4452-8693-b5cd-abd626ac7d57" testName="BoundaryErrorSink_DefaultDelegate_RoutesThroughTheUserFaultNotifier" computerName="REDACTED" duration="00:00:00.0011254" startTime="2026-09-04T00:12:25.4537861-04:00" endTime="2026-09-04T00:12:25.4557863-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="77c36b7e-cb9f-492b-94f3-2b312e25376d" />
+    <UnitTestResult executionId="5f9f731f-f50e-4608-8b8b-ee55c1cc90b4" testId="1b805695-1246-8c0c-9730-5f571322b32c" testName="IsBannerRow_ClassifiesByTheFourCharacterPrefix" computerName="REDACTED" duration="00:00:00.0017076" startTime="2026-09-04T00:12:25.4440153-04:00" endTime="2026-09-04T00:12:25.4457827-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5f9f731f-f50e-4608-8b8b-ee55c1cc90b4" />
+    <UnitTestResult executionId="fe4a8543-2741-48e8-9032-8655c3df24ee" testId="1fdcc729-bf9c-8c97-bca3-cd38bda6c807" testName="MatchesForSearchText_WithRepresentativeInput_ReturnsExpectedMatches" computerName="REDACTED" duration="00:00:00.0109339" startTime="2026-09-04T00:12:25.4247424-04:00" endTime="2026-09-04T00:12:25.4358450-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fe4a8543-2741-48e8-9032-8655c3df24ee" />
+    <UnitTestResult executionId="29f9ad90-ca1c-495e-80eb-b843adb6caac" testId="1d5664ed-b703-8ebd-b82d-5bb624e1502d" testName="KbdExecuteAsync_WhenBoundaryErrorSinkIsNull_DoesNotThrow" computerName="REDACTED" duration="00:00:00.0004470" startTime="2026-09-04T00:12:25.4507875-04:00" endTime="2026-09-04T00:12:25.4507875-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="29f9ad90-ca1c-495e-80eb-b843adb6caac" />
+    <UnitTestResult executionId="7fab86d9-a51a-4d4d-bab4-d0a347dad7be" testId="15ad3b63-f33d-8476-b6c3-2a8c6b66d06b" testName="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonOkClickAsync&quot;)" computerName="REDACTED" duration="00:00:00.0003914" startTime="2026-09-04T00:12:25.4143449-04:00" endTime="2026-09-04T00:12:25.4148654-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7fab86d9-a51a-4d4d-bab4-d0a347dad7be" />
+    <UnitTestResult executionId="5af03d1d-4006-4503-a49e-cc3279cc674d" testId="1aa7c8b3-26cf-83b2-9de1-f50217f93a9e" testName="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonDeleteClickAsync&quot;)" computerName="REDACTED" duration="00:00:00.0005564" startTime="2026-09-04T00:12:25.4217360-04:00" endTime="2026-09-04T00:12:25.4227426-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5af03d1d-4006-4503-a49e-cc3279cc674d" />
+    <UnitTestResult executionId="d7c50fc3-41c6-4512-b5ee-96459e5832e1" testId="15efe720-c5cf-88b6-a104-58a9060fed2e" testName="BoundaryErrorSink_DefaultDelegate_InvokesWithoutThrowing" computerName="REDACTED" duration="00:00:00.0016982" startTime="2026-09-04T00:12:25.4227426-04:00" endTime="2026-09-04T00:12:25.4247424-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d7c50fc3-41c6-4512-b5ee-96459e5832e1" />
+    <UnitTestResult executionId="cb1fd212-7717-4bbc-9705-e441a28773bf" testId="122fcbed-8cea-8788-9a74-25361ec1edf9" testName="RunKbdGuardedAsync_WhenBodyThrowsOperationCanceled_DoesNotReportAsFault" computerName="REDACTED" duration="00:00:00.0004951" startTime="2026-09-04T00:12:25.4517865-04:00" endTime="2026-09-04T00:12:25.4517865-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cb1fd212-7717-4bbc-9705-e441a28773bf" />
+    <UnitTestResult executionId="2c292525-392b-4849-b043-0dce7c0821cc" testId="174ed38b-0cdb-8f4b-831b-583aa52a253d" testName="KbdExecuteAsync_ActionOverload_WhenToggleFaults_ReportsOnceAndDoesNotThrow" computerName="REDACTED" duration="00:00:00.0009791" startTime="2026-09-04T00:12:25.4497872-04:00" endTime="2026-09-04T00:12:25.4507875-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2c292525-392b-4849-b043-0dce7c0821cc" />
+    <UnitTestResult executionId="b9d1eb65-6e03-48c0-b7ef-0bfe2076a2ac" testId="16e12bb4-50e4-8f49-87a9-1e9a3da8812e" testName="PopulateFolderCombobox_WhenFormViewerIsNull_ReturnsWithoutTouchingDataModel" computerName="REDACTED" duration="00:00:00.0543433" startTime="2026-09-04T00:12:24.9668227-04:00" endTime="2026-09-04T00:12:25.1353061-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b9d1eb65-6e03-48c0-b7ef-0bfe2076a2ac">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="9cb8629f-df3d-4053-b961-51d076219fc1" testId="1755b826-b33e-89bd-8cd7-ce316601291e" testName="IsSelectableFolder_AndIsBannerRow_ClassifyThreeAndFourEqualsRowsIdentically" computerName="REDACTED" duration="00:00:00.0005459" startTime="2026-09-04T00:12:25.4467878-04:00" endTime="2026-09-04T00:12:25.4477870-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9cb8629f-df3d-4053-b961-51d076219fc1" />
+    <UnitTestResult executionId="33463c79-6d68-44b2-a162-5c91a87d565a" testId="1adeb042-c861-85f9-b595-b937c1b63991" testName="PopulateFolderCombobox_WhenDataModelFaults_LogsOnceAndDoesNotFault" computerName="REDACTED" duration="00:00:00.0004802" startTime="2026-09-04T00:12:25.4247424-04:00" endTime="2026-09-04T00:12:25.4247424-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="33463c79-6d68-44b2-a162-5c91a87d565a" />
+    <UnitTestResult executionId="bb0f897f-39e5-4561-bec5-e2c999756994" testId="1ec6a617-0982-8837-a5a2-f16df74440bc" testName="ActionDeleteAsync_AwaitedTwice_LeavesExactlyOneTrashRowInFolderRows" computerName="REDACTED" duration="00:00:00.0032802" startTime="2026-09-04T00:12:25.4395081-04:00" endTime="2026-09-04T00:12:25.4440153-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bb0f897f-39e5-4561-bec5-e2c999756994" />
+    <UnitTestResult executionId="4d5130a5-2d28-4cb8-b519-cb2c7d6a37cb" testId="14c46de4-d0e2-873a-8867-1efecb62ffd2" testName="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonCreateClickAsync&quot;)" computerName="REDACTED" duration="00:00:00.0007819" startTime="2026-09-04T00:12:25.4212159-04:00" endTime="2026-09-04T00:12:25.4217360-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4d5130a5-2d28-4cb8-b519-cb2c7d6a37cb" />
+    <UnitTestResult executionId="07a8fa95-c1e1-4bb5-8f39-08b2e1a10fa8" testId="15f6bdcf-a6a4-8a38-b5bd-802734c1d035" testName="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonCancelClickAsync&quot;)" computerName="REDACTED" duration="00:00:00.0024986" startTime="2026-09-04T00:12:25.3597624-04:00" endTime="2026-09-04T00:12:25.4143449-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="07a8fa95-c1e1-4bb5-8f39-08b2e1a10fa8" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="RunKbdGuardedAsync_WhenBodyThrowsInvalidOperation_ReportsExactlyOnce" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="15c38dd9-63c9-882b-b88f-e151558f9c52">
+      <Execution id="e62c7c7b-1d93-4b40-81a9-02a907a728df" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="RunKbdGuardedAsync_WhenBodyThrowsInvalidOperation_ReportsExactlyOnce" />
+    </UnitTest>
+    <UnitTest name="FormCleanup_InvokesParentCleanupExactlyOnce" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="190f383b-3c90-81ed-95a6-96f33f1441e3">
+      <Execution id="730b881e-b6b1-4104-a2dd-b30e5cc85e7c" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="FormCleanup_InvokesParentCleanupExactlyOnce" />
+    </UnitTest>
+    <UnitTest name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonCancelClickAsync&quot;)" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="15f6bdcf-a6a4-8a38-b5bd-802734c1d035">
+      <Execution id="07a8fa95-c1e1-4bb5-8f39-08b2e1a10fa8" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonOkClickAsync&quot;)" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="15ad3b63-f33d-8476-b6c3-2a8c6b66d06b">
+      <Execution id="7fab86d9-a51a-4d4d-bab4-d0a347dad7be" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="PopulateFolderCombobox_WhenDataModelFaults_LogsOnceAndDoesNotFault" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1adeb042-c861-85f9-b595-b937c1b63991">
+      <Execution id="33463c79-6d68-44b2-a162-5c91a87d565a" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="PopulateFolderCombobox_WhenDataModelFaults_LogsOnceAndDoesNotFault" />
+    </UnitTest>
+    <UnitTest name="KbdExecuteAsync_WhenBoundaryErrorSinkThrows_DoesNotThrow" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c2e2535-1e8d-8e5d-bdc5-e51bd77ab09d">
+      <Execution id="34092a05-fe93-4aa5-a96e-9a53f6060ead" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="KbdExecuteAsync_WhenBoundaryErrorSinkThrows_DoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="FormDarkMode_OnAllFieldsNullController_ReturnsFalseAndDoesNotThrow" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="12905a65-5e20-80dd-8c82-5cd4919215e6">
+      <Execution id="ab5f5f38-6368-431b-a8a4-90043483095c" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="FormDarkMode_OnAllFieldsNullController_ReturnsFalseAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="IsSelectableFolder_AndIsBannerRow_ClassifyThreeAndFourEqualsRowsIdentically" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1755b826-b33e-89bd-8cd7-ce316601291e">
+      <Execution id="9cb8629f-df3d-4053-b961-51d076219fc1" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="IsSelectableFolder_AndIsBannerRow_ClassifyThreeAndFourEqualsRowsIdentically" />
+    </UnitTest>
+    <UnitTest name="FormCleanup_CalledTwice_DoesNotThrow" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1e7eb9b5-4908-8450-9478-7aab26ea588a">
+      <Execution id="4bdd04f7-bb96-456f-976d-f165cadc86e9" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="FormCleanup_CalledTwice_DoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="Issue439BindBreadcrumbRowsAsync_SubmitsArchiveRootToRealRouter" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="12623ccd-9bf4-83e5-896e-c86572aa9cc6">
+      <Execution id="8020e257-79b3-46a4-8c3e-c310db9d5e76" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="Issue439BindBreadcrumbRowsAsync_SubmitsArchiveRootToRealRouter" />
+    </UnitTest>
+    <UnitTest name="BoundaryErrorSink_DefaultDelegate_RoutesThroughTheUserFaultNotifier" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="17110586-4452-8693-b5cd-abd626ac7d57">
+      <Execution id="77c36b7e-cb9f-492b-94f3-2b312e25376d" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="BoundaryErrorSink_DefaultDelegate_RoutesThroughTheUserFaultNotifier" />
+    </UnitTest>
+    <UnitTest name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonRefreshClickAsync&quot;)" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d537941-1382-8ef4-9782-f593d7951eed">
+      <Execution id="4b52c96b-8cb4-4bc5-915f-a9063b7e12d6" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="RunKbdGuardedAsync_WhenBodyThrowsOperationCanceled_DoesNotReportAsFault" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="122fcbed-8cea-8788-9a74-25361ec1edf9">
+      <Execution id="cb1fd212-7717-4bbc-9705-e441a28773bf" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="RunKbdGuardedAsync_WhenBodyThrowsOperationCanceled_DoesNotReportAsFault" />
+    </UnitTest>
+    <UnitTest name="BoundaryErrorSink_DefaultDelegate_ReturnsWithoutBlockingTheCallingThread" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="18a1e849-ab72-8468-8713-ba4079867d52">
+      <Execution id="2221e2e8-6e49-4dea-9153-4809443f9c47" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="BoundaryErrorSink_DefaultDelegate_ReturnsWithoutBlockingTheCallingThread" />
+    </UnitTest>
+    <UnitTest name="FormActiveTheme_OnAllFieldsNullController_ReturnsBackingFieldAndDoesNotThrow" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1cdfafb1-bc79-8436-8f6c-80e5b466a779">
+      <Execution id="a33a4c5e-9349-410a-bb9f-6d055f473621" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="FormActiveTheme_OnAllFieldsNullController_ReturnsBackingFieldAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="BindBreadcrumbRowsAsync_WhenArchiveRootThrows_ReportsOnceAndDoesNotThrow" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="13022579-5a4d-8fce-be10-1b3189c41ec6">
+      <Execution id="5052f9d3-52e5-4409-b5b6-050692eab3d6" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="BindBreadcrumbRowsAsync_WhenArchiveRootThrows_ReportsOnceAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonDeleteClickAsync&quot;)" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1aa7c8b3-26cf-83b2-9de1-f50217f93a9e">
+      <Execution id="5af03d1d-4006-4503-a49e-cc3279cc674d" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="PopulateFolderCombobox_WhenFormViewerIsNull_ReturnsWithoutTouchingDataModel" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="16e12bb4-50e4-8f49-87a9-1e9a3da8812e">
+      <Execution id="b9d1eb65-6e03-48c0-b7ef-0bfe2076a2ac" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="PopulateFolderCombobox_WhenFormViewerIsNull_ReturnsWithoutTouchingDataModel" />
+    </UnitTest>
+    <UnitTest name="FormLoadTheme_OnAllFieldsNullController_DoesNotThrow" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1cbef776-6ac6-8597-a153-70cbc1f50c56">
+      <Execution id="8cd81aea-0292-46c5-86c2-89e5a33b1c9c" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="FormLoadTheme_OnAllFieldsNullController_DoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="MatchesForSearchText_WithRepresentativeInput_ReturnsExpectedMatches" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1fdcc729-bf9c-8c97-bca3-cd38bda6c807">
+      <Execution id="fe4a8543-2741-48e8-9032-8655c3df24ee" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="MatchesForSearchText_WithRepresentativeInput_ReturnsExpectedMatches" />
+    </UnitTest>
+    <UnitTest name="IsBannerRow_NullOrShortRow_ReturnsFalseWithoutThrowing" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="10fa7ee1-1f59-89ec-bb6b-844b1b29f90a">
+      <Execution id="cb273b30-bbe2-4368-a3f2-61b1276e39b0" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="IsBannerRow_NullOrShortRow_ReturnsFalseWithoutThrowing" />
+    </UnitTest>
+    <UnitTest name="WithTrashRow_AppliedTwice_YieldsExactlyOneTrashRow" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1f4a3747-df86-89ad-b49e-3fa103dee4b2">
+      <Execution id="b49d2eb5-2674-40dd-85c5-892c48a3dc72" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="WithTrashRow_AppliedTwice_YieldsExactlyOneTrashRow" />
+    </UnitTest>
+    <UnitTest name="ActionDeleteAsync_AwaitedTwice_LeavesExactlyOneTrashRowInFolderRows" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1ec6a617-0982-8837-a5a2-f16df74440bc">
+      <Execution id="bb0f897f-39e5-4561-bec5-e2c999756994" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="ActionDeleteAsync_AwaitedTwice_LeavesExactlyOneTrashRowInFolderRows" />
+    </UnitTest>
+    <UnitTest name="KbdExecuteAsync_WhenBoundaryErrorSinkIsNull_DoesNotThrow" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d5664ed-b703-8ebd-b82d-5bb624e1502d">
+      <Execution id="29f9ad90-ca1c-495e-80eb-b843adb6caac" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="KbdExecuteAsync_WhenBoundaryErrorSinkIsNull_DoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="BoundaryErrorSink_DefaultDelegate_InvokesWithoutThrowing" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="15efe720-c5cf-88b6-a104-58a9060fed2e">
+      <Execution id="d7c50fc3-41c6-4512-b5ee-96459e5832e1" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="BoundaryErrorSink_DefaultDelegate_InvokesWithoutThrowing" />
+    </UnitTest>
+    <UnitTest name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow (&quot;ButtonCreateClickAsync&quot;)" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="14c46de4-d0e2-873a-8867-1efecb62ffd2">
+      <Execution id="4d5130a5-2d28-4cb8-b519-cb2c7d6a37cb" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="AsyncVoidBoundary_WhenFaulted_LogsOnceAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="KbdExecuteAsync_FuncTaskOverload_WhenToggleFaults_ReportsOnceAndDoesNotThrow" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="167d9b8f-dbdd-85eb-8ef0-268604fe1959">
+      <Execution id="5fdbd998-a3c3-42fc-b572-d636435a8ab4" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="KbdExecuteAsync_FuncTaskOverload_WhenToggleFaults_ReportsOnceAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="IsBannerRow_ClassifiesByTheFourCharacterPrefix" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1b805695-1246-8c0c-9730-5f571322b32c">
+      <Execution id="5f9f731f-f50e-4608-8b8b-ee55c1cc90b4" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="IsBannerRow_ClassifiesByTheFourCharacterPrefix" />
+    </UnitTest>
+    <UnitTest name="KbdExecuteAsync_ActionOverload_WhenToggleFaults_ReportsOnceAndDoesNotThrow" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="174ed38b-0cdb-8f4b-831b-583aa52a253d">
+      <Execution id="2c292525-392b-4849-b043-0dce7c0821cc" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="KbdExecuteAsync_ActionOverload_WhenToggleFaults_ReportsOnceAndDoesNotThrow" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="167d9b8f-dbdd-85eb-8ef0-268604fe1959" executionId="5fdbd998-a3c3-42fc-b572-d636435a8ab4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="190f383b-3c90-81ed-95a6-96f33f1441e3" executionId="730b881e-b6b1-4104-a2dd-b30e5cc85e7c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12623ccd-9bf4-83e5-896e-c86572aa9cc6" executionId="8020e257-79b3-46a4-8c3e-c310db9d5e76" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13022579-5a4d-8fce-be10-1b3189c41ec6" executionId="5052f9d3-52e5-4409-b5b6-050692eab3d6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e7eb9b5-4908-8450-9478-7aab26ea588a" executionId="4bdd04f7-bb96-456f-976d-f165cadc86e9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d537941-1382-8ef4-9782-f593d7951eed" executionId="4b52c96b-8cb4-4bc5-915f-a9063b7e12d6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c2e2535-1e8d-8e5d-bdc5-e51bd77ab09d" executionId="34092a05-fe93-4aa5-a96e-9a53f6060ead" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10fa7ee1-1f59-89ec-bb6b-844b1b29f90a" executionId="cb273b30-bbe2-4368-a3f2-61b1276e39b0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1cdfafb1-bc79-8436-8f6c-80e5b466a779" executionId="a33a4c5e-9349-410a-bb9f-6d055f473621" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18a1e849-ab72-8468-8713-ba4079867d52" executionId="2221e2e8-6e49-4dea-9153-4809443f9c47" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12905a65-5e20-80dd-8c82-5cd4919215e6" executionId="ab5f5f38-6368-431b-a8a4-90043483095c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1cbef776-6ac6-8597-a153-70cbc1f50c56" executionId="8cd81aea-0292-46c5-86c2-89e5a33b1c9c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15c38dd9-63c9-882b-b88f-e151558f9c52" executionId="e62c7c7b-1d93-4b40-81a9-02a907a728df" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f4a3747-df86-89ad-b49e-3fa103dee4b2" executionId="b49d2eb5-2674-40dd-85c5-892c48a3dc72" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17110586-4452-8693-b5cd-abd626ac7d57" executionId="77c36b7e-cb9f-492b-94f3-2b312e25376d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1b805695-1246-8c0c-9730-5f571322b32c" executionId="5f9f731f-f50e-4608-8b8b-ee55c1cc90b4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1fdcc729-bf9c-8c97-bca3-cd38bda6c807" executionId="fe4a8543-2741-48e8-9032-8655c3df24ee" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d5664ed-b703-8ebd-b82d-5bb624e1502d" executionId="29f9ad90-ca1c-495e-80eb-b843adb6caac" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15ad3b63-f33d-8476-b6c3-2a8c6b66d06b" executionId="7fab86d9-a51a-4d4d-bab4-d0a347dad7be" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1aa7c8b3-26cf-83b2-9de1-f50217f93a9e" executionId="5af03d1d-4006-4503-a49e-cc3279cc674d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15efe720-c5cf-88b6-a104-58a9060fed2e" executionId="d7c50fc3-41c6-4512-b5ee-96459e5832e1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="122fcbed-8cea-8788-9a74-25361ec1edf9" executionId="cb1fd212-7717-4bbc-9705-e441a28773bf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="174ed38b-0cdb-8f4b-831b-583aa52a253d" executionId="2c292525-392b-4849-b043-0dce7c0821cc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="16e12bb4-50e4-8f49-87a9-1e9a3da8812e" executionId="b9d1eb65-6e03-48c0-b7ef-0bfe2076a2ac" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1755b826-b33e-89bd-8cd7-ce316601291e" executionId="9cb8629f-df3d-4053-b961-51d076219fc1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1adeb042-c861-85f9-b595-b937c1b63991" executionId="33463c79-6d68-44b2-a162-5c91a87d565a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ec6a617-0982-8837-a5a2-f16df74440bc" executionId="bb0f897f-39e5-4561-bec5-e2c999756994" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14c46de4-d0e2-873a-8867-1efecb62ffd2" executionId="4d5130a5-2d28-4cb8-b519-cb2c7d6a37cb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="15f6bdcf-a6a4-8a38-b5bd-802734c1d035" executionId="07a8fa95-c1e1-4bb5-8f39-08b2e1a10fa8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="29" executed="29" passed="29" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

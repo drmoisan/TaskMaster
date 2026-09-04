@@ -14,7 +14,7 @@ using UtilitiesCS.OutlookObjects.Folder;
 namespace QuickFiler.Controllers.Tests
 {
     [TestClass]
-    public class EfcFormControllerTests
+    public partial class EfcFormControllerTests
     {
         /// <summary>
         /// Creates an EfcFormController via the private no-arg constructor, which allocates

@@ -10,6 +10,7 @@ using Moq;
 using QuickFiler.Controllers;
 using QuickFiler.Helper_Classes;
 using UtilitiesCS;
+using UtilitiesCS.EmailIntelligence.EmailParsingSorting;
 
 namespace QuickFiler.Test.Controllers
 {
@@ -164,9 +165,11 @@ namespace QuickFiler.Test.Controllers
         /// <summary>
         /// Scenario: the archive root resolves normally, so the guard must not change the
         /// success path.
-        /// Expected outcome: the archive root is read exactly once. The move still fails deeper
-        /// in the filer with a null reference, because the test mail helper carries no folder
-        /// information; that is the barrier that stops any second archive-root read.
+        /// Expected outcome: the archive root is read exactly once. The move stops deliberately at
+        /// the filer-invocation seam, which <see cref="TestableEfcDataModel"/> overrides, so the
+        /// only assertion is the invariant this test exists to pin. It no longer depends on an
+        /// incidental collaborator crash several frames downstream, whose future absence would have
+        /// failed this test with a message pointing at the wrong subsystem (issue #699).
         /// </summary>
         [TestMethod]
         public async Task MoveToFolderAsync_WhenArchiveRootResolves_StillReadsItOnce()
@@ -176,10 +179,9 @@ namespace QuickFiler.Test.Controllers
             olObjects.SetupGet(value => value.ArchiveRootPath).Returns(ArchiveRootLiteral);
             var globals = CreateGlobals(olObjects, SpecialFoldersWithOneDrive());
             var dataModel = new TestableEfcDataModel(globals.Object);
-            Func<Task> act = () => MoveAsync(dataModel);
 
             // Act
-            await act.Should().ThrowAsync<NullReferenceException>();
+            await MoveAsync(dataModel);
 
             // Assert
             olObjects.VerifyGet(value => value.ArchiveRootPath, Times.Once());
@@ -384,6 +386,14 @@ namespace QuickFiler.Test.Controllers
                     MailHelper = new MailItemHelper(),
                 };
             }
+
+            // The deliberate stop that replaces the incidental downstream dereference. The base
+            // body constructs the real filer, which this test has no fixture for; overriding it
+            // ends the success path at the seam instead of several frames later.
+            protected internal override Task<bool> InvokeFilerAsync(
+                EmailFilerConfig config,
+                IList<MailItemHelper> mailHelpers
+            ) => Task.FromResult(true);
         }
     }
 }

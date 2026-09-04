@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="c9d2cec2-fbae-4aae-b3f8-f0a5584bfac0" name="REDACTED@REDACTED 2026-09-03 23:46:27" runUser="REDACTED\REDACTED" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-09-03T23:46:27.8418206-04:00" queuing="2026-09-03T23:46:27.8418206-04:00" start="2026-09-03T23:46:26.2423313-04:00" finish="2026-09-03T23:46:27.8633538-04:00" />
+  <TestSettings name="default" id="b5361246-08d5-42ae-8f73-4f0fa5fedacd">
+    <Deployment runDeploymentRoot="REDACTED_REDACTED_2026-09-03_23_46_27" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="14cdfcb4-7d80-42f8-9e01-b86b6095aa08" testId="158f2c38-7c30-8c76-8cf1-bdb862c990d0" testName="ResolveValidatedArchiveRootPath_WhenBothReadsResolve_ReturnsPathAndEmitsNoDiagnostic" computerName="REDACTED" duration="00:00:00.0075627" startTime="2026-09-03T23:46:27.7287236-04:00" endTime="2026-09-03T23:46:27.7357260-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="14cdfcb4-7d80-42f8-9e01-b86b6095aa08" />
+    <UnitTestResult executionId="cfb4ceef-3bac-4f3d-bbe7-afd24cd93313" testId="18996fe7-13ee-8ed3-96cc-90aec3f515c5" testName="ResolveValidatedArchiveRootPath_WhenComReadFailsTwice_ReReadsTheComposedPathOnTheSecondCall" computerName="REDACTED" duration="00:00:00.0018249" startTime="2026-09-03T23:46:27.7407303-04:00" endTime="2026-09-03T23:46:27.7477302-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cfb4ceef-3bac-4f3d-bbe7-afd24cd93313">
+      <Output>
+        <ErrorInfo>
+          <Message>Expected a &lt;System.InvalidOperationException&gt; to be thrown, but found &lt;System.Runtime.InteropServices.COMException&gt;:&#xD;
+System.Runtime.InteropServices.COMException (0x80004005): Outlook is busy.&#xD;
+   at TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootComGuardTests.&lt;&gt;c__DisplayClass7_0.&lt;ResolveValidatedArchiveRootPath_WhenComReadFailsTwice_ReReadsTheComposedPathOnTheSecondCall&gt;b__0() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\AppGlobals\AppOlObjectsArchiveRootComGuardTests.cs:line 179&#xD;
+   at TaskMaster.AppOlObjects.ResolveValidatedArchiveRootPath(Func`1 readComposedArchiveRootPath, Func`1 readResolvedArchiveFolderPath, Action`1 logDiagnostic) in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster\AppGlobals\AppOlObjects.ArchiveRoot.cs:line 43&#xD;
+   at TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootComGuardTests.&lt;&gt;c__DisplayClass7_0.&lt;ResolveValidatedArchiveRootPath_WhenComReadFailsTwice_ReReadsTheComposedPathOnTheSecondCall&gt;b__2() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\AppGlobals\AppOlObjectsArchiveRootComGuardTests.cs:line 187&#xD;
+   at FluentAssertions.Specialized.DelegateAssertions`2.InvokeSubjectWithInterception() in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 173.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Execution.AssertionChain.WithExpectation(String message, Action`1 chain, Object[] args) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 192&#xD;
+   at FluentAssertions.Specialized.DelegateAssertionsBase`2.ThrowInternal[TException](Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 56&#xD;
+   at FluentAssertions.Specialized.DelegateAssertions`2.Throw[TException](String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 74&#xD;
+   at TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootComGuardTests.ResolveValidatedArchiveRootPath_WhenComReadFailsTwice_ReReadsTheComposedPathOnTheSecondCall() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\AppGlobals\AppOlObjectsArchiveRootComGuardTests.cs:line 194</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="b8f0736b-19c6-470f-9283-9effe664559d" testId="1046f1be-0732-80c9-a9a0-e02889019549" testName="ResolveValidatedArchiveRootPath_WhenResolvedReadThrowsComException_NormalizesToInvalidOperation" computerName="REDACTED" duration="00:00:00.0019807" startTime="2026-09-03T23:46:27.7230348-04:00" endTime="2026-09-03T23:46:27.7257184-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b8f0736b-19c6-470f-9283-9effe664559d">
+      <Output>
+        <ErrorInfo>
+          <Message>Expected a &lt;System.InvalidOperationException&gt; to be thrown, but found &lt;System.Runtime.InteropServices.COMException&gt;:&#xD;
+System.Runtime.InteropServices.COMException (0x80004005): The folder collection is unavailable.&#xD;
+   at TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootComGuardTests.&lt;&gt;c__DisplayClass3_0.&lt;ResolveValidatedArchiveRootPath_WhenResolvedReadThrowsComException_NormalizesToInvalidOperation&gt;b__2() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\AppGlobals\AppOlObjectsArchiveRootComGuardTests.cs:line 69&#xD;
+   at TaskMaster.AppOlObjects.ResolveValidatedArchiveRootPath(Func`1 readComposedArchiveRootPath, Func`1 readResolvedArchiveFolderPath, Action`1 logDiagnostic) in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster\AppGlobals\AppOlObjects.ArchiveRoot.cs:line 44&#xD;
+   at TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootComGuardTests.&lt;&gt;c__DisplayClass3_0.&lt;ResolveValidatedArchiveRootPath_WhenResolvedReadThrowsComException_NormalizesToInvalidOperation&gt;b__0() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\AppGlobals\AppOlObjectsArchiveRootComGuardTests.cs:line 67&#xD;
+   at FluentAssertions.Specialized.DelegateAssertions`2.InvokeSubjectWithInterception() in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 173.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Execution.AssertionChain.WithExpectation(String message, Action`1 chain, Object[] args) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 192&#xD;
+   at FluentAssertions.Specialized.DelegateAssertionsBase`2.ThrowInternal[TException](Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 56&#xD;
+   at FluentAssertions.Specialized.DelegateAssertions`2.Throw[TException](String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 74&#xD;
+   at TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootComGuardTests.ResolveValidatedArchiveRootPath_WhenResolvedReadThrowsComException_NormalizesToInvalidOperation() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\AppGlobals\AppOlObjectsArchiveRootComGuardTests.cs:line 74</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="5cca07fe-6652-4c73-aeb1-e16287beea4b" testId="14d08292-7691-8934-8084-4af1d27229bb" testName="ResolveValidatedArchiveRootPath_WhenComReadFails_MessageWithholdsPathAndMailboxAddress" computerName="REDACTED" duration="00:00:00.0023836" startTime="2026-09-03T23:46:27.7257184-04:00" endTime="2026-09-03T23:46:27.7287236-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5cca07fe-6652-4c73-aeb1-e16287beea4b">
+      <Output>
+        <ErrorInfo>
+          <Message>Expected a &lt;System.InvalidOperationException&gt; to be thrown, but found &lt;System.Runtime.InteropServices.COMException&gt;:&#xD;
+System.Runtime.InteropServices.COMException (0x80004005): Outlook is busy.&#xD;
+   at TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootComGuardTests.&lt;&gt;c.&lt;ResolveValidatedArchiveRootPath_WhenComReadFails_MessageWithholdsPathAndMailboxAddress&gt;b__4_1() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\AppGlobals\AppOlObjectsArchiveRootComGuardTests.cs:line 96&#xD;
+   at TaskMaster.AppOlObjects.ResolveValidatedArchiveRootPath(Func`1 readComposedArchiveRootPath, Func`1 readResolvedArchiveFolderPath, Action`1 logDiagnostic) in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster\AppGlobals\AppOlObjects.ArchiveRoot.cs:line 43&#xD;
+   at TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootComGuardTests.&lt;&gt;c__DisplayClass4_0.&lt;ResolveValidatedArchiveRootPath_WhenComReadFails_MessageWithholdsPathAndMailboxAddress&gt;b__0() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\AppGlobals\AppOlObjectsArchiveRootComGuardTests.cs:line 95&#xD;
+   at FluentAssertions.Specialized.DelegateAssertions`2.InvokeSubjectWithInterception() in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 173.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Execution.AssertionChain.WithExpectation(String message, Action`1 chain, Object[] args) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 192&#xD;
+   at FluentAssertions.Specialized.DelegateAssertionsBase`2.ThrowInternal[TException](Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 56&#xD;
+   at FluentAssertions.Specialized.DelegateAssertions`2.Throw[TException](String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 74&#xD;
+   at TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootComGuardTests.ResolveValidatedArchiveRootPath_WhenComReadFails_MessageWithholdsPathAndMailboxAddress() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\AppGlobals\AppOlObjectsArchiveRootComGuardTests.cs:line 102</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="4b8c74b4-06e9-494f-a4c6-c23bf3cc9c57" testId="1adc7a65-3a77-849e-b5d1-ed022e171d3a" testName="ResolveValidatedArchiveRootPath_WhenComposedReadThrowsComException_NormalizesToInvalidOperation" computerName="REDACTED" duration="00:00:00.4037309" startTime="2026-09-03T23:46:27.2179909-04:00" endTime="2026-09-03T23:46:27.7150340-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4b8c74b4-06e9-494f-a4c6-c23bf3cc9c57">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+log4net:ERROR [FileAppender] ErrorCode: GenericFailure. Unable to acquire lock on file C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\bin\Debug\logs\. Could not find a part of the path 'C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\bin\Debug\logs\'.</StdOut>
+        <StdErr>log4net:ERROR [FileAppender] ErrorCode: GenericFailure. Unable to acquire lock on file C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\bin\Debug\logs\. Could not find a part of the path 'C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\bin\Debug\logs\'.</StdErr>
+        <ErrorInfo>
+          <Message>Expected a &lt;System.InvalidOperationException&gt; to be thrown, but found &lt;System.Runtime.InteropServices.COMException&gt;:&#xD;
+System.Runtime.InteropServices.COMException (0x80004005): Outlook is busy.&#xD;
+   at TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootComGuardTests.&lt;&gt;c__DisplayClass2_0.&lt;ResolveValidatedArchiveRootPath_WhenComposedReadThrowsComException_NormalizesToInvalidOperation&gt;b__1() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\AppGlobals\AppOlObjectsArchiveRootComGuardTests.cs:line 37&#xD;
+   at TaskMaster.AppOlObjects.ResolveValidatedArchiveRootPath(Func`1 readComposedArchiveRootPath, Func`1 readResolvedArchiveFolderPath, Action`1 logDiagnostic) in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster\AppGlobals\AppOlObjects.ArchiveRoot.cs:line 43&#xD;
+   at TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootComGuardTests.&lt;&gt;c__DisplayClass2_0.&lt;ResolveValidatedArchiveRootPath_WhenComposedReadThrowsComException_NormalizesToInvalidOperation&gt;b__0() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\AppGlobals\AppOlObjectsArchiveRootComGuardTests.cs:line 36&#xD;
+   at FluentAssertions.Specialized.DelegateAssertions`2.InvokeSubjectWithInterception() in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 173.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Execution.AssertionChain.WithExpectation(String message, Action`1 chain, Object[] args) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 192&#xD;
+   at FluentAssertions.Specialized.DelegateAssertionsBase`2.ThrowInternal[TException](Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 56&#xD;
+   at FluentAssertions.Specialized.DelegateAssertions`2.Throw[TException](String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertions.cs:line 74&#xD;
+   at TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootComGuardTests.ResolveValidatedArchiveRootPath_WhenComposedReadThrowsComException_NormalizesToInvalidOperation() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\AppGlobals\AppOlObjectsArchiveRootComGuardTests.cs:line 43</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="22423242-1f67-4334-801a-3c724c48ba1b" testId="12a2e8fc-7a55-8f10-8006-8d8093885cad" testName="ResolveValidatedArchiveRootPath_WhenResolvedFolderIsNull_ThrowsUnresolvableWithNoInnerException" computerName="REDACTED" duration="00:00:00.0045370" startTime="2026-09-03T23:46:27.7367236-04:00" endTime="2026-09-03T23:46:27.7407303-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="22423242-1f67-4334-801a-3c724c48ba1b" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="ResolveValidatedArchiveRootPath_WhenBothReadsResolve_ReturnsPathAndEmitsNoDiagnostic" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\taskmaster.test\bin\debug\taskmaster.test.dll" id="158f2c38-7c30-8c76-8cf1-bdb862c990d0">
+      <Execution id="14cdfcb4-7d80-42f8-9e01-b86b6095aa08" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootComGuardTests" name="ResolveValidatedArchiveRootPath_WhenBothReadsResolve_ReturnsPathAndEmitsNoDiagnostic" />
+    </UnitTest>
+    <UnitTest name="ResolveValidatedArchiveRootPath_WhenResolvedReadThrowsComException_NormalizesToInvalidOperation" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\taskmaster.test\bin\debug\taskmaster.test.dll" id="1046f1be-0732-80c9-a9a0-e02889019549">
+      <Execution id="b8f0736b-19c6-470f-9283-9effe664559d" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootComGuardTests" name="ResolveValidatedArchiveRootPath_WhenResolvedReadThrowsComException_NormalizesToInvalidOperation" />
+    </UnitTest>
+    <UnitTest name="ResolveValidatedArchiveRootPath_WhenComReadFailsTwice_ReReadsTheComposedPathOnTheSecondCall" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\taskmaster.test\bin\debug\taskmaster.test.dll" id="18996fe7-13ee-8ed3-96cc-90aec3f515c5">
+      <Execution id="cfb4ceef-3bac-4f3d-bbe7-afd24cd93313" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootComGuardTests" name="ResolveValidatedArchiveRootPath_WhenComReadFailsTwice_ReReadsTheComposedPathOnTheSecondCall" />
+    </UnitTest>
+    <UnitTest name="ResolveValidatedArchiveRootPath_WhenComposedReadThrowsComException_NormalizesToInvalidOperation" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\taskmaster.test\bin\debug\taskmaster.test.dll" id="1adc7a65-3a77-849e-b5d1-ed022e171d3a">
+      <Execution id="4b8c74b4-06e9-494f-a4c6-c23bf3cc9c57" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootComGuardTests" name="ResolveValidatedArchiveRootPath_WhenComposedReadThrowsComException_NormalizesToInvalidOperation" />
+    </UnitTest>
+    <UnitTest name="ResolveValidatedArchiveRootPath_WhenComReadFails_MessageWithholdsPathAndMailboxAddress" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\taskmaster.test\bin\debug\taskmaster.test.dll" id="14d08292-7691-8934-8084-4af1d27229bb">
+      <Execution id="5cca07fe-6652-4c73-aeb1-e16287beea4b" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootComGuardTests" name="ResolveValidatedArchiveRootPath_WhenComReadFails_MessageWithholdsPathAndMailboxAddress" />
+    </UnitTest>
+    <UnitTest name="ResolveValidatedArchiveRootPath_WhenResolvedFolderIsNull_ThrowsUnresolvableWithNoInnerException" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\taskmaster.test\bin\debug\taskmaster.test.dll" id="12a2e8fc-7a55-8f10-8006-8d8093885cad">
+      <Execution id="22423242-1f67-4334-801a-3c724c48ba1b" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="TaskMaster.Test.AppGlobals.AppOlObjectsArchiveRootComGuardTests" name="ResolveValidatedArchiveRootPath_WhenResolvedFolderIsNull_ThrowsUnresolvableWithNoInnerException" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="158f2c38-7c30-8c76-8cf1-bdb862c990d0" executionId="14cdfcb4-7d80-42f8-9e01-b86b6095aa08" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="18996fe7-13ee-8ed3-96cc-90aec3f515c5" executionId="cfb4ceef-3bac-4f3d-bbe7-afd24cd93313" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1046f1be-0732-80c9-a9a0-e02889019549" executionId="b8f0736b-19c6-470f-9283-9effe664559d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="14d08292-7691-8934-8084-4af1d27229bb" executionId="5cca07fe-6652-4c73-aeb1-e16287beea4b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1adc7a65-3a77-849e-b5d1-ed022e171d3a" executionId="4b8c74b4-06e9-494f-a4c6-c23bf3cc9c57" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12a2e8fc-7a55-8f10-8006-8d8093885cad" executionId="22423242-1f67-4334-801a-3c724c48ba1b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="6" executed="6" passed="2" failed="4" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\TaskMaster.Test\bin\Debug\TaskMaster.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>
