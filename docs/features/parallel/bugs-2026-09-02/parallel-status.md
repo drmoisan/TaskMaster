@@ -11,8 +11,8 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | max_concurrency | 16 |
 | current_cohort | 2 |
 | recolor_generation | 1 |
-| last_updated | 2026-09-04T06-40 |
-| next_step | Await background notification for: 584 (opus, still cycling an extended preflight loop on a plan revised for the #752 coverage-script worktree blocker) -- the only remaining non-terminal item. On completion: durably confirm actual git push state before trusting a DONE report, stage checkpoint plus PR artifacts at the session root, create/confirm the PR, background-watch CI to green with update-branch cycles on BEHIND, merge. Do not report run completion (mode is open) until item 584 reaches merged or worktree_removed. |
+| last_updated | 2026-09-04T08-10 |
+| next_step | Item 584 delivered genuine execution (plan 50/50, all gates green, 7/7 AC checked, 0 blocking review findings) and pull request 778 is open against main. Background-watch it to CI green with update-branch cycles on BEHIND, then merge; after merge, independently verify and close issue 584 if still open. Once 584 reaches merged or worktree_removed, every non-withdrawn item in this run is terminal, but the run stays open (mode is open) and does not auto-complete -- it terminates only via /parallel-close. |
 
 ## Items
 
@@ -20,7 +20,7 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | --- | --- | --- | --- | --- | --- | --- |
 | 564 | docs/features/active/claude-md-cites-ciyml-for-moved-toolchain-commands-564 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/745 | 8be5a6aac3b5a82c86241fbbf989fd9118602c56 |
 | 565 | docs/features/active/2026-09-02-invoke-mstestwithcoverage-threshold-before-setcontent-565 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/753 | 87cb4df338322844abfa580abea14df77e738e5c |
-| 584 | docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584 | 3 | in_flight | worktree_created | - | - |
+| 584 | docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584 | 3 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/778 | - |
 | 645 | docs/features/active/quickfiler-session-metrics-twelve-hour-time-format-645 | 2 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/755 | 495b012929675f59dd4dea082a0694c0f5a27369 |
 | 707 | docs/features/active/2026-08-31-narrow-fileio2-retryable-exception-set-707 | 3 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/756 | 35583f7c7e1f1c9b97e4f6f1e7846a3f2693c17e |
 | 729 | docs/features/active/2026-09-02-test-determinism-and-hygiene-debt-729 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/746 | a679cd082819af6788cd0fb35f4366786fab87e3 |
@@ -40,7 +40,7 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | --- | --- | --- | --- | --- | --- |
 | 564 | 2026-09-02T18-10 | 2026-09-02T21-50 | 2026-09-02T22-00 | 2026-09-02T22-04 | - |
 | 565 | 2026-09-03T01-30 | 2026-09-03T07-44 | 2026-09-03T07-50 | 2026-09-03T07-50 | - |
-| 584 | 2026-09-03T07-57 | - | - | - | - |
+| 584 | 2026-09-03T07-57 | 2026-09-04T08-10 | - | - | - |
 | 645 | 2026-09-03T07-19 | 2026-09-03T14-40 | 2026-09-03T15-15 | 2026-09-03T15-55 | - |
 | 707 | 2026-09-03T07-57 | 2026-09-03T14-42 | 2026-09-03T15-15 | 2026-09-03T15-55 | - |
 | 729 | 2026-09-02T18-10 | 2026-09-03T00-38 | 2026-09-03T01-04 | 2026-09-03T01-05 | - |
