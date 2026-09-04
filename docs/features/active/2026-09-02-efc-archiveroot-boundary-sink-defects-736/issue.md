@@ -64,12 +64,14 @@ All six findings share one root pattern: the EFC controller boundary has a desig
 
 ## Proposed Fix / Validation Ideas
 
-- [ ] Wrap the two COM reads in `ArchiveRootPath`'s getter in a try/catch that routes through the existing guard/sink pattern instead of throwing uncaught
-- [ ] Add try/catch to both `KbdExecuteAsync` overloads, routing caught exceptions through `BoundaryErrorSink`
+- [x] Wrap the two COM reads in `ArchiveRootPath`'s getter in a try/catch that routes through the existing guard/sink pattern instead of throwing uncaught
+- [x] Add try/catch to both `KbdExecuteAsync` overloads, routing caught exceptions through `BoundaryErrorSink`
 - [ ] Reorder `ActionOkAsync` so disposal happens before (or is guaranteed via `finally` regardless of) the form-hide step
-- [ ] Give `BoundaryErrorSink`'s default implementation a user-facing surface (e.g. a non-blocking notification), not just a log call
-- [ ] Route the five `_globals.Ol.ArchiveRootPath` reads through a guarded accessor once finding 1 is fixed
-- [ ] Update `EfcDataModelArchiveRootTests.cs:182` to assert the new guarded/handled behavior instead of asserting a crash, once findings 1 and 5 land
+- [x] Give `BoundaryErrorSink`'s default implementation a user-facing surface (e.g. a non-blocking notification), not just a log call
+- [x] Route the five `_globals.Ol.ArchiveRootPath` reads through a guarded accessor once finding 1 is fixed
+- [x] Update `EfcDataModelArchiveRootTests.cs:182` to assert the new guarded/handled behavior instead of asserting a crash, once findings 1 and 5 land
+
+The `ActionOkAsync` disposal reordering is out of scope for this item and is owned by a sibling item.
 
 ## Next Step
 

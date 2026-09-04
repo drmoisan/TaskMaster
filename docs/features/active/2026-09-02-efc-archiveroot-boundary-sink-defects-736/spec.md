@@ -593,17 +593,41 @@ Manual validation steps: none required; every path in scope is reachable from th
 
 ## Acceptance Criteria
 
-- [ ] **AC1 (finding 1 — guarded seam).** A new archive-root partial file exists in the TaskMaster
+- [x] **AC1 (finding 1 — guarded seam).** A new archive-root partial file exists in the TaskMaster
       AppGlobals area containing a COM-guarded read plus a delegate-driven testable core following the
       `ResolveCurrentUserEmailAddress` / `TryGetSmtpAddress` shape; `AppOlObjects.ArchiveRootPath`
       delegates to it; AppOlObjects.cs remains under the 500-line ceiling; and the new file is
       registered in the TaskMaster project file.
-- [ ] **AC2 (finding 1 — normalization contract).** A `COMException` raised while evaluating either
+      (Discharged. Conjunct 1 — the file `TaskMaster/AppGlobals/AppOlObjects.ArchiveRoot.cs` exists,
+      declaring the COM-touching wrapper `internal string ResolveValidatedArchiveRootPath()` and the
+      delegate-driven core `internal static string ResolveValidatedArchiveRootPath(Func<string>,
+      Func<string>, Action<string>)`. Conjunct 2 — `TaskMaster/AppGlobals/AppOlObjects.cs` contains
+      exactly one line `_archiveRootPath = ResolveValidatedArchiveRootPath();` in the
+      `ArchiveRootPath` getter, delegating to the new seam. Conjunct 3 — AppOlObjects.cs is 493 lines
+      after the formatting pass, under the 500-line ceiling, evidenced by
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t3-file-sizes.md`,
+      which also records the new file at 95 lines. Conjunct 4 — `TaskMaster/TaskMaster.csproj`
+      contains exactly one element whose `Include` attribute value is
+      `AppGlobals\AppOlObjects.ArchiveRoot.cs`.)
+- [x] **AC2 (finding 1 — normalization contract).** A `COMException` raised while evaluating either
       archive-root read is converted to `InvalidOperationException` with the `COMException` preserved
       as `InnerException`; the message names the rule and contains neither a filesystem/Outlook path
       nor a mailbox address (#602); the getter's XML documentation states the normalized contract; and
       a failed resolution is not cached (a subsequent read retries).
-- [ ] **AC3 (invariant stated and traced).** This spec's Boundaries and invariants section states the
+      (Discharged. Recorded failing run:
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p1-t7-finding1-red.md`
+      — total 6, passed 2, failed 4 against the defect-preserving seam. Recorded passing run:
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p1-t9-finding1-green.md`
+      — total 6, passed 6, failed 0, which also carries P1-T8's own observations because that task is
+      a source edit writing no artifact of its own. The XML-documentation conjunct is delivered by
+      P1-T3, likewise a source edit writing no artifact, so its citation is the delivered text:
+      `TaskMaster/AppGlobals/AppOlObjects.cs` contains exactly one line whose text after the `/// `
+      prefix is, verbatim, `A transient COM failure is normalized to InvalidOperationException
+      carrying the original COMException as InnerException.`, inside the XML documentation of the
+      `ArchiveRootPath` getter. The retry conjunct is discharged by
+      `ResolveValidatedArchiveRootPath_WhenComReadFailsTwice_ReReadsTheComposedPathOnTheSecondCall`,
+      which asserts the composed-path delegate was invoked twice across two calls.)
+- [x] **AC3 (invariant stated and traced).** This spec's Boundaries and invariants section states the
       `ArchiveRootPath` invariant as a single explicit sentence, and traces one accepted value through
       four numbered steps — accept point (`CreateFolderAsync` local guards at EfcFormController.cs:844
       and :856-859, neither validating the archive root), throw point (the reads at :863 and :873
@@ -611,57 +635,218 @@ Manual validation steps: none required; every path in scope is reachable from th
       (`KeyboardHandler.KeyboardHandler_KeyDownAsync`, KeyboardHandler.cs:133-148, a
       `[ExcludeFromCodeCoverage]` class that logs only), and the boundary the fix moves the catch to
       with the reason it can report to the user. The delivered implementation matches that trace.
-- [ ] **AC4 (finding 2 — keyboard boundary).** Both `KbdExecuteAsync` overloads
+      (Discharged. The delivered `RunKbdGuardedAsync` handling in
+      `QuickFiler/Controllers/EfcFormController.cs` is the boundary named in step 4 of the trace: both
+      `KbdExecuteAsync` overloads route their two statements through it, so a fault raised by the
+      keyboard-dialog toggle at the reads on :863 and :873 is caught there and reported through
+      `TryReportBoundaryFault` rather than travelling three frames up into the
+      `[ExcludeFromCodeCoverage]` keyboard handler that logs only. Recorded failing run:
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p2-t8-finding2-red.md`
+      — total 6, passed 0, failed 6 against the unguarded seam. Recorded passing run:
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p2-t10-finding2-green.md`
+      — total 6, passed 6, failed 0, which also carries P2-T9's own observations because that task is
+      a source edit writing no artifact of its own.)
+- [x] **AC4 (finding 2 — keyboard boundary).** Both `KbdExecuteAsync` overloads
       (EfcFormController.cs:921-931) handle exceptions locally and route them through
       `TryReportBoundaryFault`; neither propagates a fault raised by the dispatched action or by the
       keyboard-dialog toggle; `OperationCanceledException` is treated as cancellation and is not
       reported as a fault. Exactly **2** overloads exist and both are covered by tests (count derived
       in research §3 N3).
-- [ ] **AC5 (finding 4 — user-facing sink default).** The default `BoundaryErrorSink`
+      (Discharged. The two-overload declaration set is established by
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/baseline/p0-t9-preexisting-counts.md`,
+      which records the `KbdExecuteAsync` declaration set as exactly {921, 927}; P2-T5 rewrote both to
+      delegate through `RunKbdGuardedAsync` and left the count at 2. Recorded passing run:
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p2-t10-finding2-green.md`
+      — total 6, passed 6, failed 0, covering both overloads under a faulting toggle and both
+      classification arms, `OperationCanceledException` reporting nothing and every other exception
+      reporting exactly once. The two success-path overload tests added by P6-T13 are recorded green
+      in
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p6-t13-kbd-success-path.md`.)
+- [x] **AC5 (finding 4 — user-facing sink default).** The default `BoundaryErrorSink`
       (EfcFormController.cs:128-129) surfaces a fault to the user through a non-blocking mechanism in
       addition to logging; no modal dialog is invoked from the default;
       `BoundaryErrorSink_DefaultDelegate_InvokesWithoutThrowing` passes without hanging; and the null
       sink and throwing sink branches of `TryReportBoundaryFault` are covered by tests.
-- [ ] **AC6 (finding 5 — all five reads accounted for).** All **5** `_globals.Ol.ArchiveRootPath`
+      (Discharged. Recorded failing run:
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p4-t4-finding4-red.md`
+      — total 3, passed 2, failed 1, the single failure being
+      `BoundaryErrorSink_DefaultDelegate_RoutesThroughTheUserFaultNotifier` with a capture of 0
+      messages where 1 was expected, which is the log-only default finding 4 names. Recorded passing
+      run:
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p4-t6-finding4-green.md`
+      — total 3, passed 3, failed 0, recording each method's TRX-reported duration as under one
+      second, which is the evidence that the default surface did not block the test host; it also
+      carries P4-T5's own observations because that task is a source edit writing no artifact of its
+      own, including that the file's `MessageBox` occurrence count is unchanged from the P0-T9
+      baseline, so no modal dialog is reachable from the default. AC5's fourth conjunct — that the
+      null sink and throwing sink branches of `TryReportBoundaryFault` are covered — is discharged by
+      the two tests `KbdExecuteAsync_WhenBoundaryErrorSinkIsNull_DoesNotThrow` and
+      `KbdExecuteAsync_WhenBoundaryErrorSinkThrows_DoesNotThrow`, authored in P2-T2 and recorded green
+      in
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p2-t10-finding2-green.md`,
+      which neither of the two artifacts above records.)
+- [x] **AC6 (finding 5 — all five reads accounted for).** All **5** `_globals.Ol.ArchiveRootPath`
       reads in the EFC controller (lines 556, 566, 863, 873, 1014; member set derived in research §3
       N1) are covered by a reporting boundary: 556 and 566 through the pre-existing
       `ButtonCreateClickAsync` catch at :578-581; 863 and 873 through the new `KbdExecuteAsync`
       handling from AC4; and 1014 through `BindBreadcrumbRowsAsync`'s general catch (:1020-1023)
       rerouted to `TryReportBoundaryFault`, with `catch (OperationCanceledException)` at :1016 left
       unchanged.
-- [ ] **AC7 (finding 6 — deliberate stop, restated per #699).** `EfcDataModel`'s filer invocation
+      (Discharged. The five-read set is established as exactly {556, 566, 863, 873, 1014} by
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/baseline/p0-t9-preexisting-counts.md`.
+      Mapping each to the reporting boundary that now covers it: 556 and 566 are covered by the
+      pre-existing `ButtonCreateClickAsync` catch, which this item does not change; 863 and 873 are
+      covered by the new `RunKbdGuardedAsync` containment both `KbdExecuteAsync` overloads route
+      through, recorded green in
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p2-t10-finding2-green.md`;
+      and 1014 is covered by `BindBreadcrumbRowsAsync`'s general catch, rerouted from a bare
+      `logger.Error` to `TryReportBoundaryFault` by P3-T3 with the
+      `catch (OperationCanceledException)` arm above it left byte-identical, recorded green in
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p3-t4-finding5-green.md`
+      — total 2, passed 2, failed 0.)
+- [x] **AC7 (finding 6 — deliberate stop, restated per #699).** `EfcDataModel`'s filer invocation
       (EfcDataModel.cs:343-344) is extracted behind a `protected internal virtual` seam;
       `TestableEfcDataModel` overrides it to skip the real filer call; the
       `ThrowAsync<NullReferenceException>` assertion at EfcDataModelArchiveRootTests.cs:182 is
       replaced by a deliberate stop retaining only
       `olObjects.VerifyGet(value => value.ArchiveRootPath, Times.Once())`; and the test's summary
       comment no longer describes the incidental crash as the barrier.
-- [ ] **AC8 (finding 6 — coverage preservation).** EfcDataModel.cs:339 (`OlAncestor = olAncestor,`)
+      (Discharged. Recorded failing run:
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p5-t2-finding6-red.md`
+      — total 1, passed 0, failed 1, the failure naming `NullReferenceException`, which is the
+      incidental collaborator crash the rewrite exists to stop depending on. Recorded passing run:
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p5-t5-finding6-green.md`
+      — total 11, passed 11, failed 0 across the whole class. P5-T1, P5-T3 and P5-T4 are source edits
+      writing no evidence artifact of their own: P5-T1's observations are carried by the P5-T2
+      artifact and P5-T3's and P5-T4's by the P5-T5 artifact, so those two paths carry the evidence of
+      all four AC7-delivering tasks. The seam is `protected internal virtual Task<bool>
+      InvokeFilerAsync(EmailFilerConfig, IList<MailItemHelper>)` and `TestableEfcDataModel` overrides
+      it to return a completed true result.)
+- [x] **AC8 (finding 6 — coverage preservation).** EfcDataModel.cs:339 (`OlAncestor = olAncestor,`)
       remains covered by at least one passing test after the rewrite, evidenced by a coverage report
       captured under this feature folder's evidence subdirectory. All **11** test methods in the
       archive-root data-model test class pass (count derived in research §3 N4).
-- [ ] **AC9 (frozen contracts hold).** ArchiveRootPathGuard.cs is unmodified;
+      (Discharged. The coverage evidence is
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t10-olancestor-coverage.md`,
+      which records that exactly three lines of `QuickFiler/Controllers/EfcDataModel.cs` match the
+      literal — at post-change lines 339, 380 and 404, enclosed in file order by the five-parameter
+      `MoveToFolderAsync` overload, `OpenOlFolderAsync` and `OpenFsFolderAsync` — and that the first,
+      line 339, carries `hits="1"` in the post-change Cobertura document under the key
+      `QuickFiler\Controllers\EfcDataModel.cs`. The single test reaching it is
+      `MoveToFolderAsync_WhenArchiveRootResolves_StillReadsItOnce`. The eleven-method conjunct is
+      discharged by
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p5-t5-finding6-green.md`
+      — total 11, passed 11, failed 0.)
+- [x] **AC9 (frozen contracts hold).** ArchiveRootPathGuard.cs is unmodified;
       AppOlObjectsArchiveRootValidationTests.cs is unmodified and passes 6/6; the `ArchiveRootPath`
       member signature in IOlObjects.cs is unchanged;
       `EfcDataModel.TryGetArchiveRoot`'s `catch (InvalidOperationException)` is **not** widened to
       `COMException`; and `MoveToFolderAsync_WhenArchiveRootThrowsComException_StillPropagates`
       (EfcDataModelArchiveRootTests.cs:248-262) passes with its assertion unchanged.
-- [ ] **AC10 (regression-first evidence).** For each of findings 1, 2, 4, 5, and 6 a regression test
+      (Discharged.
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p1-t10-frozen-contracts.md`
+      records an empty name-only diff over ArchiveRootPathGuard.cs,
+      AppOlObjectsArchiveRootValidationTests.cs and IOlObjects.cs against a non-empty staged index, so
+      the three frozen files are provably unmodified rather than merely unreported.
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p5-t6-com-propagation-unchanged.md`
+      records that no diff hunk intersects the source span of
+      `MoveToFolderAsync_WhenArchiveRootThrowsComException_StillPropagates` and quotes that method's
+      assertion line verbatim.
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t11-frozen-contracts.md`
+      records the post-change runs: AppOlObjectsArchiveRootValidationTests at 6/6/0 and the
+      COM-propagation test passing.
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/regression-testing/p5-t5-finding6-green.md`
+      is the artifact discharging AC9's remaining conjunct, that
+      `EfcDataModel.TryGetArchiveRoot`'s `catch (InvalidOperationException)` is not widened to
+      `COMException`: P5-T3 makes that observation — one line matching
+      `catch (InvalidOperationException ex)` and zero lines matching `catch (COMException` in
+      `QuickFiler/Controllers/EfcDataModel.cs` — and P5-T5 is the artifact recording it, none of the
+      other three artifacts speaking to it.)
+- [x] **AC10 (regression-first evidence).** For each of findings 1, 2, 4, 5, and 6 a regression test
       is recorded as failing before its fix and passing after, per the Bugfix Workflow; each test's
       file path and method name is listed in the delivery report.
-- [ ] **AC11 (scope containment).** No change is made to `ActionOkAsync` or to any disposal ordering
+      (Discharged. The delivery report is
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/other/p7-t1-delivery-report.md`,
+      which names all five findings and, for each, the regression test file path, every test method
+      name, and the evidence artifact paths of the recorded failing and passing runs. The union of the
+      method names it lists is nineteen. Three of them — the success-path tests added by P6-T13 — have
+      no failing run, because P6-T13 changes no production code and a run that fails first is
+      structurally impossible; that artifact records the reason in a `WhyFailingRunImpossible:` field
+      per the fail-before exception convention, and no acceptance criterion here is discharged by a
+      fail-before observation on those three. Every other test carries both a recorded red and a
+      recorded green.)
+- [x] **AC11 (scope containment).** No change is made to `ActionOkAsync` or to any disposal ordering
       (finding 3, owned by a sibling item); no change is made to any file listed in the binding scope
       constraints of Scope & Non-Goals; the EFC controller file is not split; and the delivered diff
       touches only the files enumerated in the Write Set section.
-- [ ] **AC12 (coverage targets).** New and changed code reaches at least 90% line coverage per
+      (Discharged. **The delivered footprint is the eleven-path Write Set ratified in this spec at
+      2026-09-02T14-10.**
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p7-t3-scope-containment.md`
+      records that the anchored merge-base name-only diff, excluding the documentation and Claude
+      trees, names exactly those eleven paths sorted and nothing else, and that no line of the
+      accompanying `git status --porcelain` span names a path under `TaskMaster/`, `TaskMaster.Test/`,
+      `QuickFiler/` or `QuickFiler.Test/`.
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p7-t4-exclusions.md`
+      records that `ActionOkAsync` occupies lines 838 through 872 and that no hunk of the anchored
+      controller diff intersects that span, that the file's single added `.Dispose()` occurrence lies
+      inside `ShowModelessFaultNotice` as a self-disposing notification form rather than a
+      disposal-ordering change, and that the second anchored diff over the binding-scope exclusions
+      printed no lines.
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t3-file-sizes.md`
+      records that `QuickFiler/Controllers/EfcFormController.cs` remains a single file of 1320 lines,
+      within the D7 budgeted ceiling of 1330, so it was not split.)
+- [x] **AC12 (coverage targets).** New and changed code reaches at least 90% line coverage per
       CLAUDE.md General Unit Test Policy UT2, coverage on changed lines does not regress, and the
       repository-level figure is recorded and reported against UT2's testable denominator with a
       statement of whether this change lowers it.
-- [ ] **AC13 (full toolchain pass).** A single final pass of csharpier format/check, the analyzer
+      (Discharged, with the changed-line arithmetic reported explicitly rather than absorbed.
+      **New file** —
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t8-newfile-coverage.md`
+      records `TaskMaster/AppGlobals/AppOlObjects.ArchiveRoot.cs` at 18 covered over 18 coverable,
+      **100.00%**, against the 90% floor, after removing the mechanically derived lifted-lambda set
+      `L` = {89, 90, 91}; its strict figure is 18/21 = 85.71% and both are recorded side by side.
+      **Changed lines** —
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t9-changed-line-coverage.md`
+      records 59 changed coverable lines across the four production files, 52 covered, a strict
+      aggregate of **88.14%**, which is below 90.00%. That is the `10U` escape branch D2 identifies
+      and expects, not an implementation defect: the unreachable set `U` has 7 members enumerated in
+      advance, `10U` is 70, and the strict denominator of 59 is below it, so the strict quotient
+      cannot reach 90.00% whatever the tests do. The escape's precondition is satisfied and recorded —
+      **the count of uncovered changed coverable lines lying outside `U` is 0**, with no member to
+      name, so every reachable changed line is covered and the lenient figure with exactly those 7
+      lines excluded is 100.00%. This condition is reported to the caller per D2 rather than resolved
+      by excluding any further line. **No regression on changed lines**: the controller file's 33
+      changed coverable lines are all covered, five of them closed by P6-T13, and no changed line that
+      was covered before is uncovered now. **Repository level** —
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t7-coverage-delta.md`
+      records line coverage moving from 85.43% to 85.46% and branch coverage from 79.53% to 79.52%,
+      and states explicitly that this change does not lower the repository-wide line figure.)
+- [x] **AC13 (full toolchain pass).** A single final pass of csharpier format/check, the analyzer
       msbuild rebuild, the nullable-warnings-as-errors msbuild rebuild, and vstest with code coverage
       completes with no failures and no auto-fixes, using the exact commands in Test Strategy. Both
       msbuild steps are proven non-vacuous by zero occurrences of `Skipping target "CoreCompile"` in
       their `/fl` logs, with the logs retained as evidence.
+      (Discharged by a single final pass, run after the toolchain-loop restart P6-T13 triggered.
+      Format:
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t1-format.md`
+      — exit 0, `Formatted 1580 files in 2390ms.`, with the `git status --porcelain` spans taken
+      immediately before and after mechanically identical, so **no file was auto-fixed**. Check:
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t2-format-check.md`
+      — exit 0, `Checked 1580 files in 5613ms.` Analyzer rebuild:
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t4-analyzer-rebuild.md`
+      — exit 0, 0 warnings, 0 errors, **0** occurrences of `Skipping target "CoreCompile"` and 18 of
+      `Task "Csc"`. Nullable rebuild:
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t5-nullable-rebuild.md`
+      — exit 0, 0 warnings, 0 errors, **0** and 18 on the same two literals. Coverage run:
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t6-coverage.md`
+      — 7013 total, 7013 passed, **0 failed**. The two retained msbuild logs are
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t4-analyzer.min.log.txt`
+      and
+      `docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736/evidence/qa-gates/p6-t5-nullable.min.log.txt`.
+      Those two are the citation for AC13's final conjunct specifically — "with the logs retained as
+      evidence" — which none of the five markdown artifacts above discharges, since each of those
+      records counts read *from* a log rather than being the retained log itself. Both are tracked by
+      git and entered the delivery commit, so retention is established rather than mere production.)
 
 ## Write Set
 
