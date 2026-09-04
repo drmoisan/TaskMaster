@@ -11,6 +11,7 @@ using UtilitiesCS.Threading;
 namespace UtilitiesCS.Test.Threading
 {
     [TestClass]
+    [DoNotParallelize]
     public class ProgressTrackerAsync_Tests
     {
         [TestMethod]

@@ -26,6 +26,7 @@ namespace UtilitiesCS.Test.Threading
     ///     live ApplicationIdleTimer firing timing.
     /// </summary>
     [TestClass]
+    [DoNotParallelize]
     public class IdleAsyncQueue_Tests
     {
         #region Helpers
