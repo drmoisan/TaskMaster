@@ -8,9 +8,17 @@ metadata:
 A plan that writes an msbuild `/fl` file-logger artifact into `<FEATURE>/evidence/<kind>/` and calls it
 the committed evidence for a non-vacuity acceptance criterion cannot deliver it if the file name ends in
 `.log`. `.gitignore` line 84 is the bare pattern `*.log`, no negation anywhere in the file un-ignores it,
-and `git ls-files '*.log'` returns zero rows repo-wide — there is no precedent of a committed `.log` in
-this repository. `git add -A` skips it silently, so the delivery commit contains the `.md` summary and
-not the log it cites.
+and `git add -A` skips it silently, so the delivery commit contains the `.md` summary and not the log it
+cites.
+
+**Do not assert "no `.log` is tracked in this repository" — that stopped being true on 2026-09-03.** Issue
+#730 force-added four of them under `docs/features/active/2026-09-02-ci-build-infra-debt-730/evidence/`, so
+`git ls-files '*.log'` now returns four rows. They are tracked *despite* matching line 84, because once a
+path is in the index the pattern no longer applies. Two consequences. First, a plan that recites the old
+zero-row measurement as a re-derived fact is asserting something the tree contradicts. Second,
+`git check-ignore -v <path>` returns **exit 1 (not ignored)** for those four, because check-ignore skips
+indexed paths by default; only `git check-ignore -v --no-index <path>` reports `.gitignore:84:*.log`. Probe
+with a path that does *not* exist and is *not* indexed if you want the pattern's own answer.
 
 **Why:** the gate that would catch this normally reads "the minimal log exists at the evidence path named
 in the command", which is a filesystem existence check. An ignored file exists on disk and is absent from

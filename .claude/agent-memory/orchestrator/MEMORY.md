@@ -72,6 +72,7 @@
 ## Tooling quirks (Bash / pwsh / hooks)
 - [Bash tool rejects complex commands in isolated worktrees](bash-tool-rejects-complex-commands-in-isolated-worktree.md) · [mangles MSBuild switches](bash-tool-mangles-msbuild-switches.md) · [collapses `\` before sed](bash-tool-collapses-double-backslash-in-sed.md)
 - [pwsh double-quoted -Command is refused in a worktree](pwsh-double-quoted-command-refused-in-worktree.md) · [grep-count wrapper does not clear $LASTEXITCODE](grep-count-wrapper-does-not-clear-lastexitcode.md) · [CR-pattern grep falsely reports 100% CRLF](grep-cr-empty-pattern-false-crlf.md)
+- [Worktree isolation blocks pwsh PER AGENT TYPE](worktree-isolation-blocks-pwsh-per-agent-type.md) — general-purpose runs pwsh, atomic-executor is refused; probe the agent that will do the work, or C# execution is impossible
 - [Hooks pattern-match Bash command TEXT](hooks-pattern-match-bash-command-text.md) · [Promotion hook matches commit-message text](promotion-hook-matches-commit-message-text.md)
 - [validate-bash blocks --force-with-lease too](validate-bash-blocks-force-with-lease-too.md) — literal substring match on `git push --force`; delete-and-repush a single-owner branch instead
 - [Agent-worktree hooks resolve to agent cwd](agent-worktree-hooks-resolve-to-agent-cwd.md) · [Child-orchestrator PR hook reads SESSION ROOT](child-orchestrator-pr-hook-reads-session-root.md)
