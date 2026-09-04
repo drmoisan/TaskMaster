@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="b7d10cd5-fade-4969-91bd-96b7598e26b1" name="REDACTED@REDACTED 2026-09-03 23:52:32" runUser="REDACTED\REDACTED" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-09-03T23:52:32.8542480-04:00" queuing="2026-09-03T23:52:32.8542480-04:00" start="2026-09-03T23:52:31.5464783-04:00" finish="2026-09-03T23:52:32.8717759-04:00" />
+  <TestSettings name="default" id="5e8efc16-427a-4182-b76f-cee764762c3d">
+    <Deployment runDeploymentRoot="REDACTED_REDACTED_2026-09-03_23_52_32" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="67b4be88-62bb-4328-840c-ff29cb86ba1f" testId="167d9b8f-dbdd-85eb-8ef0-268604fe1959" testName="KbdExecuteAsync_FuncTaskOverload_WhenToggleFaults_ReportsOnceAndDoesNotThrow" computerName="REDACTED" duration="00:00:00.1538515" startTime="2026-09-03T23:52:32.5011232-04:00" endTime="2026-09-03T23:52:32.7666906-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="67b4be88-62bb-4328-840c-ff29cb86ba1f">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+        <ErrorInfo>
+          <Message>Did not expect any exception because the keyboard dispatch overload must contain the fault, not rethrow it, but found System.NullReferenceException: Object reference not set to an instance of an object.&#xD;
+   at QuickFiler.Controllers.EfcFormController.&lt;KbdExecuteAsync&gt;d__109.MoveNext() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler\Controllers\EfcFormController.cs:line 923&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at FluentAssertions.Specialized.NonGenericAsyncFunctionAssertions.&lt;NotThrowAsync&gt;d__4.MoveNext() in /_/Src/FluentAssertions/Specialized/NonGenericAsyncFunctionAssertions.cs:line 101.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Specialized.DelegateAssertionsBase`2.NotThrowInternal(Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 72&#xD;
+   at FluentAssertions.Specialized.NonGenericAsyncFunctionAssertions.&lt;NotThrowAsync&gt;d__4.MoveNext() in /_/Src/FluentAssertions/Specialized/NonGenericAsyncFunctionAssertions.cs:line 103&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()&#xD;
+   at QuickFiler.Controllers.Tests.EfcFormControllerTests.&lt;KbdExecuteAsync_FuncTaskOverload_WhenToggleFaults_ReportsOnceAndDoesNotThrow&gt;d__19.MoveNext() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\Controllers\EfcFormControllerTests.Part2.cs:line 50&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.&lt;ExecuteInternalAsync&gt;d__58.MoveNext()</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="52fdda32-afb8-44fe-8986-cb7a6967a7bd" testId="174ed38b-0cdb-8f4b-831b-583aa52a253d" testName="KbdExecuteAsync_ActionOverload_WhenToggleFaults_ReportsOnceAndDoesNotThrow" computerName="REDACTED" duration="00:00:00.0024040" startTime="2026-09-03T23:52:32.7730512-04:00" endTime="2026-09-03T23:52:32.7756760-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="52fdda32-afb8-44fe-8986-cb7a6967a7bd">
+      <Output>
+        <ErrorInfo>
+          <Message>Did not expect any exception because the synchronous dispatch overload must contain the fault, not rethrow it, but found System.NullReferenceException: Object reference not set to an instance of an object.&#xD;
+   at QuickFiler.Controllers.EfcFormController.&lt;KbdExecuteAsync&gt;d__110.MoveNext() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler\Controllers\EfcFormController.cs:line 929&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at FluentAssertions.Specialized.NonGenericAsyncFunctionAssertions.&lt;NotThrowAsync&gt;d__4.MoveNext() in /_/Src/FluentAssertions/Specialized/NonGenericAsyncFunctionAssertions.cs:line 101.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Specialized.DelegateAssertionsBase`2.NotThrowInternal(Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 72&#xD;
+   at FluentAssertions.Specialized.NonGenericAsyncFunctionAssertions.&lt;NotThrowAsync&gt;d__4.MoveNext() in /_/Src/FluentAssertions/Specialized/NonGenericAsyncFunctionAssertions.cs:line 103&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()&#xD;
+   at QuickFiler.Controllers.Tests.EfcFormControllerTests.&lt;KbdExecuteAsync_ActionOverload_WhenToggleFaults_ReportsOnceAndDoesNotThrow&gt;d__20.MoveNext() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\Controllers\EfcFormControllerTests.Part2.cs:line 87&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.&lt;ExecuteInternalAsync&gt;d__58.MoveNext()</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="31671613-516a-473c-830b-b1bb2338ded0" testId="1d5664ed-b703-8ebd-b82d-5bb624e1502d" testName="KbdExecuteAsync_WhenBoundaryErrorSinkIsNull_DoesNotThrow" computerName="REDACTED" duration="00:00:00.0011270" startTime="2026-09-03T23:52:32.7762146-04:00" endTime="2026-09-03T23:52:32.7773484-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="31671613-516a-473c-830b-b1bb2338ded0">
+      <Output>
+        <ErrorInfo>
+          <Message>Did not expect any exception because a null sink must not turn a contained fault into a rethrow, but found System.NullReferenceException: Object reference not set to an instance of an object.&#xD;
+   at QuickFiler.Controllers.EfcFormController.&lt;KbdExecuteAsync&gt;d__109.MoveNext() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler\Controllers\EfcFormController.cs:line 923&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at FluentAssertions.Specialized.NonGenericAsyncFunctionAssertions.&lt;NotThrowAsync&gt;d__4.MoveNext() in /_/Src/FluentAssertions/Specialized/NonGenericAsyncFunctionAssertions.cs:line 101.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Specialized.DelegateAssertionsBase`2.NotThrowInternal(Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 72&#xD;
+   at FluentAssertions.Specialized.NonGenericAsyncFunctionAssertions.&lt;NotThrowAsync&gt;d__4.MoveNext() in /_/Src/FluentAssertions/Specialized/NonGenericAsyncFunctionAssertions.cs:line 103&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()&#xD;
+   at QuickFiler.Controllers.Tests.EfcFormControllerTests.&lt;KbdExecuteAsync_WhenBoundaryErrorSinkIsNull_DoesNotThrow&gt;d__21.MoveNext() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\Controllers\EfcFormControllerTests.Part2.cs:line 123&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.&lt;ExecuteInternalAsync&gt;d__58.MoveNext()</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="66c433f1-654f-436f-99ac-f7181f583360" testId="1c2e2535-1e8d-8e5d-bdc5-e51bd77ab09d" testName="KbdExecuteAsync_WhenBoundaryErrorSinkThrows_DoesNotThrow" computerName="REDACTED" duration="00:00:00.0010047" startTime="2026-09-03T23:52:32.7773484-04:00" endTime="2026-09-03T23:52:32.7825893-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="66c433f1-654f-436f-99ac-f7181f583360">
+      <Output>
+        <ErrorInfo>
+          <Message>Did not expect any exception because a throwing sink must not escape the dispatch boundary, but found System.NullReferenceException: Object reference not set to an instance of an object.&#xD;
+   at QuickFiler.Controllers.EfcFormController.&lt;KbdExecuteAsync&gt;d__109.MoveNext() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler\Controllers\EfcFormController.cs:line 923&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at FluentAssertions.Specialized.NonGenericAsyncFunctionAssertions.&lt;NotThrowAsync&gt;d__4.MoveNext() in /_/Src/FluentAssertions/Specialized/NonGenericAsyncFunctionAssertions.cs:line 101.</Message>
+          <StackTrace>   at FluentAssertions.Execution.LateBoundTestFramework.Throw(String message) in /_/Src/FluentAssertions/Execution/LateBoundTestFramework.cs:line 22&#xD;
+   at FluentAssertions.Execution.AssertionChain.FailWith(Func`1 getFailureReason) in /_/Src/FluentAssertions/Execution/AssertionChain.cs:line 277&#xD;
+   at FluentAssertions.Specialized.DelegateAssertionsBase`2.NotThrowInternal(Exception exception, String because, Object[] becauseArgs) in /_/Src/FluentAssertions/Specialized/DelegateAssertionsBase.cs:line 72&#xD;
+   at FluentAssertions.Specialized.NonGenericAsyncFunctionAssertions.&lt;NotThrowAsync&gt;d__4.MoveNext() in /_/Src/FluentAssertions/Specialized/NonGenericAsyncFunctionAssertions.cs:line 103&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter`1.GetResult()&#xD;
+   at QuickFiler.Controllers.Tests.EfcFormControllerTests.&lt;KbdExecuteAsync_WhenBoundaryErrorSinkThrows_DoesNotThrow&gt;d__22.MoveNext() in C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\Controllers\EfcFormControllerTests.Part2.cs:line 153&#xD;
+--- End of stack trace from previous location where exception was thrown ---&#xD;
+   at System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()&#xD;
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)&#xD;
+   at Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.Execution.TestMethodInfo.&lt;ExecuteInternalAsync&gt;d__58.MoveNext()</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="KbdExecuteAsync_ActionOverload_WhenToggleFaults_ReportsOnceAndDoesNotThrow" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="174ed38b-0cdb-8f4b-831b-583aa52a253d">
+      <Execution id="52fdda32-afb8-44fe-8986-cb7a6967a7bd" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="KbdExecuteAsync_ActionOverload_WhenToggleFaults_ReportsOnceAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="KbdExecuteAsync_WhenBoundaryErrorSinkIsNull_DoesNotThrow" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1d5664ed-b703-8ebd-b82d-5bb624e1502d">
+      <Execution id="31671613-516a-473c-830b-b1bb2338ded0" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="KbdExecuteAsync_WhenBoundaryErrorSinkIsNull_DoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="KbdExecuteAsync_FuncTaskOverload_WhenToggleFaults_ReportsOnceAndDoesNotThrow" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="167d9b8f-dbdd-85eb-8ef0-268604fe1959">
+      <Execution id="67b4be88-62bb-4328-840c-ff29cb86ba1f" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="KbdExecuteAsync_FuncTaskOverload_WhenToggleFaults_ReportsOnceAndDoesNotThrow" />
+    </UnitTest>
+    <UnitTest name="KbdExecuteAsync_WhenBoundaryErrorSinkThrows_DoesNotThrow" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="1c2e2535-1e8d-8e5d-bdc5-e51bd77ab09d">
+      <Execution id="66c433f1-654f-436f-99ac-f7181f583360" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="KbdExecuteAsync_WhenBoundaryErrorSinkThrows_DoesNotThrow" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="167d9b8f-dbdd-85eb-8ef0-268604fe1959" executionId="67b4be88-62bb-4328-840c-ff29cb86ba1f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="174ed38b-0cdb-8f4b-831b-583aa52a253d" executionId="52fdda32-afb8-44fe-8986-cb7a6967a7bd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1d5664ed-b703-8ebd-b82d-5bb624e1502d" executionId="31671613-516a-473c-830b-b1bb2338ded0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1c2e2535-1e8d-8e5d-bdc5-e51bd77ab09d" executionId="66c433f1-654f-436f-99ac-f7181f583360" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="4" executed="4" passed="0" failed="4" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

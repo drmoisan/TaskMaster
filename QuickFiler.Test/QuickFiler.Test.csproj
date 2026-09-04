@@ -118,6 +118,7 @@
     <Compile Include="Controllers\EfcDataModelTests.cs" />
     <Compile Include="Controllers\EfcDataModelArchiveRootTests.cs" />
     <Compile Include="Controllers\EfcFormControllerTests.cs" />
+    <Compile Include="Controllers\EfcFormControllerTests.Part2.cs" />
     <Compile Include="Controllers\EfcHomeControllerDependenciesTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerDependenciesProductionFactoryTests.cs" />
     <Compile Include="Controllers\EfcHomeControllerExecuteMovesTests.cs" />

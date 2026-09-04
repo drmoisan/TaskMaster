@@ -42,6 +42,7 @@
 - [sln/csproj edits: preserve CRLF](project_sln_csproj_edit_crlf_preserve.md) — `sed -i` strips CRLF; use Edit
 - [Incremental build makes a vacuous baseline](project_incremental_build_vacuous_baseline.md) · [Nullable /t:Build gate is vacuous](project_nullable_build_gate_is_vacuous_incremental.md) — use `/t:Rebuild`
 - [CSharpier skips *.Designer.cs by filename](project_csharpier_skips_designer_cs_by_filename.md) · [CSharpier 1.3.0 formats XML at 100 cols](project_csharpier_formats_xml_print_width.md)
+- [.gitignore `*.log` blocks committed msbuild-log evidence](project_gitignore_star_log_blocks_committed_msbuild_log_evidence.md) — exists-on-disk gate passes, commit lacks it; `git add -N` is the tracked-status discriminator
 - [csharpier pipe-files is a non-enforcing gate](project_csharpier_pipefiles_nonenforcing_gate.md) · [Count-idiom pitfalls: csharpier + Measure-Object](project_count_idiom_pitfalls_csharpier_and_measureobject.md)
 - [New .cs files guarantee a format-loop restart](project_new_cs_files_guarantee_a_format_loop_restart.md) · [PowerShell new files need UTF-8 BOM](powershell-bom-required.md)
 - [poshqc test MCP carries no verdict/numbers](project_poshqc_pester_mcp_exit_minus1.md) · [poshqc analyze exits 1 on a Warning](project_poshqc_analyze_exit1_on_warning.md)
@@ -74,6 +75,7 @@
 - [First-party coverage denominator (#197)](project_coverage_firstparty_denominator_method.md) · [dotnet-coverage denominator nondeterminism](project_dotnet_coverage_denominator_nondeterminism.md) — 47% vs 81%
 - [Failed/red coverage run leaves RAW Cobertura](project_failed_coverage_run_leaves_raw_unprocessed_cobertura.md) · [runner throws before post-processing](project_coverage_runner_throws_before_postprocessing.md) · [Koverage post-processing shape](project_koverage_cobertura_postprocessing_shape.md) — not comparable with a processed one
 - [C# canonical coverage artifact conversion](project_csharp_canonical_coverage_artifact_conversion.md) · [Cobertura runsettings `<Attributes>` override](project_cobertura_runsettings_attributes_override.md)
+- [Processed Cobertura filenames use backslashes](project_processed_cobertura_filenames_use_backslash.md) — forward-slash match returns zero rows; gate unevaluable
 - [Cobertura hits vs MS-coverage partial](project_changed_line_coverage_cobertura_vs_mscoverage_partial.md) · [QFC #227 coverage tooling](project_qfc227_coverage_tooling.md)
 - [#398 test-split gate gotchas](project_398_test_split_gate_gotchas.md) · [ExcludeFromCodeCoverage on partial = CS0579](project_excludefromcodecoverage_partial_class_cs0579.md)
 - Closed one-offs: [#400](project_400_completeopenasync_unreachable_recovery_catch.md), [Swordfish](project_swordfish_removal_epic_incidental_coverage_sideeffect.md), [#298](project_taskvis_scocollection_and_livebridge_exemptions.md), [#328](project_328_rebuild_threading_olobjectsproxy_conflict.md)

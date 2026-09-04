@@ -250,6 +250,9 @@ namespace TaskMaster
         /// time, against the folder that actually resolves for it, and the validated result is
         /// cached; the check therefore adds no per-filed-item COM round-trip.
         /// </para>
+        /// <para>
+        /// A transient COM failure is normalized to InvalidOperationException carrying the original COMException as InnerException.
+        /// </para>
         /// </summary>
         /// <exception cref="InvalidOperationException">The archive root is unresolvable or lies
         /// outside the composed path. The diagnostic names the rule only; the path is withheld
@@ -260,11 +263,7 @@ namespace TaskMaster
             {
                 if (_archiveRootPath is null)
                 {
-                    _archiveRootPath = ArchiveRootPathGuard.RequireResolvedArchiveRoot(
-                        Path.Combine(Root.FolderPath, "Archive"),
-                        ArchiveRoot?.FolderPath,
-                        message => logger.Error(message)
-                    );
+                    _archiveRootPath = ResolveValidatedArchiveRootPath();
                 }
                 return _archiveRootPath;
             }
