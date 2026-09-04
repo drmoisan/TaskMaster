@@ -1260,7 +1260,7 @@ apart from the owned-path lists in P4-T1, P4-T2, and P4-T8 and the restated acce
 
   Acceptance: all seven AC identifiers appear exactly once each in the artifact, every one is recorded as checked, every named artifact path exists on disk, and the final porcelain command prints nothing. The commit carries the same explicit pathspec as the `git add`, for the reason given in P5-T11.
 
-- [ ] [P5-T13] Commit the plan's own final check-off state and confirm the tree is clean. Mark every remaining task in this plan file as `[x]`, including this task itself, then run:
+- [x] [P5-T13] Commit the plan's own final check-off state and confirm the tree is clean. Mark every remaining task in this plan file as `[x]`, including this task itself, then run:
 
   ```text
   git add -- docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584
