@@ -1212,7 +1212,7 @@ apart from the owned-path lists in P4-T1, P4-T2, and P4-T8 and the restated acce
 
 - [x] [P5-T8] Mirror the issue update. Write `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/issue-updates/issue-584.2026-09-02T09-02.md` containing `Timestamp:`, the exact text intended for issue #584, and `PostedAs:` set to `comment`, `body`, or `unknown`. If posting is blocked (for example `gh` is unavailable), begin the file with a `POSTING BLOCKED` header and the reason. Acceptance: the artifact exists and carries a `PostedAs:` line or a `POSTING BLOCKED` header; the plan does not halt on an unavailable `gh`.
 
-- [ ] [P5-T9] Commit the change. Run:
+- [x] [P5-T9] Commit the change. Run:
 
   ```text
   git add -- UtilitiesCS/Threading/UiThread.cs UtilitiesCS.Test/Threading/UiThread_Tests.cs UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs "QuickFiler.Test/Helper Classes/EmailMoveMonitorTests.cs" docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584
@@ -1225,7 +1225,7 @@ apart from the owned-path lists in P4-T1, P4-T2, and P4-T8 and the restated acce
 
   The commit carries the same explicit pathspec as the `git add`, rather than being a bare `git commit` over the whole index. A bare commit would commit everything staged, and P3-T4 already ran `git add -A -- UtilitiesCS UtilitiesCS.Test`, which stages every modified or untracked path under those two directories rather than only this plan's own. The explicit-pathspec commit form is what actually bounds the committed footprint to the enumerated paths; the `git add` is retained ahead of it because a pathspec commit only accepts paths already known to git, so the evidence artifacts this plan creates under the feature folder must be staged first. P5-T10's porcelain span remains the backstop that reports anything left behind.
 
-- [ ] [P5-T10] Verify the committed footprint. Run:
+- [x] [P5-T10] Verify the committed footprint. Run:
 
   ```text
   git diff --name-status 87cb4df338322844abfa580abea14df77e738e5c..HEAD
@@ -1240,7 +1240,7 @@ apart from the owned-path lists in P4-T1, P4-T2, and P4-T8 and the restated acce
 
   The `git status --porcelain` span is the companion the name-status diff needs so that a file created but not yet tracked cannot escape the check. Here the two-dot form is correct and not vacuous, because P5-T9 has already committed, so `HEAD` is no longer identical to BASE.
 
-- [ ] [P5-T11] Commit the footprint artifact and confirm a clean tree. Run:
+- [x] [P5-T11] Commit the footprint artifact and confirm a clean tree. Run:
 
   ```text
   git add -- docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584
