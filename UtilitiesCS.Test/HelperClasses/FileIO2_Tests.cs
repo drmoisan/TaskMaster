@@ -65,6 +65,44 @@ namespace UtilitiesCS.Test.HelperClasses
         }
 
         /// <summary>
+        /// A <see cref="DirectoryNotFoundException"/> raised while opening the writer is a structural
+        /// failure that no retry can resolve: the target directory does not exist, so waiting and
+        /// trying again cannot succeed. The observable proof that no retry occurred is a single
+        /// writer-factory invocation and a delay-delegate invocation count of zero.
+        /// </summary>
+        [TestMethod]
+        public async Task WriteTextFileAsync_WhenDirectoryDoesNotExist_ShouldReturnFalseWithoutRetrying()
+        {
+            // Arrange
+            int missingDirectoryFactoryCalls = 0;
+            int missingDirectoryDelayCalls = 0;
+            using var cts = new CancellationTokenSource();
+
+            // Act
+            bool missingDirectoryResult = await FileIO2.WriteTextFileAsync(
+                "irrelevant.csv",
+                new[] { "alpha" },
+                "irrelevant-folder",
+                cts.Token,
+                writerFactory: _ =>
+                {
+                    missingDirectoryFactoryCalls++;
+                    throw new DirectoryNotFoundException("Simulated missing directory.");
+                },
+                delay: (ms, t) =>
+                {
+                    missingDirectoryDelayCalls++;
+                    return Task.CompletedTask;
+                }
+            );
+
+            // Assert
+            missingDirectoryFactoryCalls.Should().Be(1);
+            missingDirectoryDelayCalls.Should().Be(0);
+            missingDirectoryResult.Should().BeFalse();
+        }
+
+        /// <summary>
         /// Retry exhaustion: every open attempt fails, so the loop consumes its whole 100-attempt
         /// budget and awaits 99 delays between them. No filesystem access and no wall-clock wait.
         /// </summary>

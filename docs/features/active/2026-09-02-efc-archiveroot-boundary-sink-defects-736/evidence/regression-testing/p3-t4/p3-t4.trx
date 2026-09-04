@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="ee8299ea-5089-4005-b080-a04ea782c015" name="REDACTED@REDACTED 2026-09-04 00:07:25" runUser="REDACTED\REDACTED" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-09-04T00:07:25.5378717-04:00" queuing="2026-09-04T00:07:25.5378717-04:00" start="2026-09-04T00:07:24.0695439-04:00" finish="2026-09-04T00:07:25.5549729-04:00" />
+  <TestSettings name="default" id="7f959a34-c629-4f58-b8aa-8a8ef2c504ec">
+    <Deployment runDeploymentRoot="REDACTED_REDACTED_2026-09-04_00_07_25" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="8999d36f-806c-4858-94da-fc68b076b814" testId="12623ccd-9bf4-83e5-896e-c86572aa9cc6" testName="Issue439BindBreadcrumbRowsAsync_SubmitsArchiveRootToRealRouter" computerName="REDACTED" duration="00:00:00.2412601" startTime="2026-09-04T00:07:25.0939475-04:00" endTime="2026-09-04T00:07:25.4527316-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8999d36f-806c-4858-94da-fc68b076b814">
+      <Output>
+        <StdOut>Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/&#xD;
+&#xD;
+&#xD;
+&#xD;
+Debug Trace:&#xD;
+     Warning:&#xD;
+     The component "Fluent Assertions" is governed by the rules defined in the Xceed License Agreement and&#xD;
+     the Xceed Fluent Assertions Community License. You may use Fluent Assertions free of charge for&#xD;
+     non-commercial use only. An active subscription is required to use Fluent Assertions for commercial use.&#xD;
+&#xD;
+     Please contact Xceed Sales mailto:sales@xceed.com to acquire a subscription at a very low cost.&#xD;
+&#xD;
+     A paid commercial license supports the development and continued increasing support of&#xD;
+     Fluent Assertions users under both commercial and community licenses. Help us&#xD;
+     keep Fluent Assertions at the forefront of unit testing.&#xD;
+&#xD;
+     For more information, visit https://xceed.com/products/unit-testing/fluent-assertions/</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="8294be78-29fd-47e1-ae40-e5f240413cde" testId="13022579-5a4d-8fce-be10-1b3189c41ec6" testName="BindBreadcrumbRowsAsync_WhenArchiveRootThrows_ReportsOnceAndDoesNotThrow" computerName="REDACTED" duration="00:00:00.0035088" startTime="2026-09-04T00:07:25.4588067-04:00" endTime="2026-09-04T00:07:25.4663423-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8294be78-29fd-47e1-ae40-e5f240413cde" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Issue439BindBreadcrumbRowsAsync_SubmitsArchiveRootToRealRouter" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="12623ccd-9bf4-83e5-896e-c86572aa9cc6">
+      <Execution id="8999d36f-806c-4858-94da-fc68b076b814" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="Issue439BindBreadcrumbRowsAsync_SubmitsArchiveRootToRealRouter" />
+    </UnitTest>
+    <UnitTest name="BindBreadcrumbRowsAsync_WhenArchiveRootThrows_ReportsOnceAndDoesNotThrow" storage="c:\users\REDACTED\repos\taskmaster\.claude\worktrees\agent-a9f3f171e35df71ef\quickfiler.test\bin\debug\quickfiler.test.dll" id="13022579-5a4d-8fce-be10-1b3189c41ec6">
+      <Execution id="8294be78-29fd-47e1-ae40-e5f240413cde" />
+      <TestMethod codeBase="C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll" adapterTypeName="executor://mstestadapter/v4" className="QuickFiler.Controllers.Tests.EfcFormControllerTests" name="BindBreadcrumbRowsAsync_WhenArchiveRootThrows_ReportsOnceAndDoesNotThrow" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="12623ccd-9bf4-83e5-896e-c86572aa9cc6" executionId="8999d36f-806c-4858-94da-fc68b076b814" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="13022579-5a4d-8fce-be10-1b3189c41ec6" executionId="8294be78-29fd-47e1-ae40-e5f240413cde" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="2" executed="2" passed="2" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test Parallelization enabled for C:\Users\REDACTED\repos\TaskMaster\.claude\worktrees\agent-a9f3f171e35df71ef\QuickFiler.Test\bin\Debug\QuickFiler.Test.dll (Workers: 24, Scope: ClassLevel)&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

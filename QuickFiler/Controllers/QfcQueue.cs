@@ -37,6 +37,8 @@ namespace QuickFiler.Controllers
         private int _jobsRunning = 0;
         private BlockingCollection<(TableLayoutPanel Tlp, List<QfcItemGroup> ItemGroups)> _queue =
         [];
+
+        // Deliberately one monitor instance per owner, not a shared singleton: EmailMoveMonitor.BeforeItemMove dispatches at most one action per MailItem via FirstOrDefault, and UnhookAll is instance-scoped and clears the whole hook list, so a shared instance would both drop sibling owners' actions and unhook them all on any one owner's teardown (issue #731 finding 1, issue #620).
         private IEmailMoveMonitor _moveMonitor = new EmailMoveMonitor();
 
         #endregion Constructors and Private Members

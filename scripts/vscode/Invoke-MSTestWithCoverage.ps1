@@ -298,7 +298,7 @@ function Invoke-MSTestWithCoverageMain {
                 $_.FullName -match "\\bin\\$Configuration\\" -and
                 $_.FullName -notmatch '\\obj\\' -and
                 $_.FullName -notmatch '\\ref\\' -and
-                $_.FullName -notmatch '\\\.claude\\'
+                ([System.IO.Path]::GetRelativePath($resolvedSearchRoot, $_.FullName)) -notmatch '(^|\\)\.claude\\'
             } |
                 Select-Object -ExpandProperty FullName)
 
