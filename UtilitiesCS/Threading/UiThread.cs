@@ -134,10 +134,19 @@ namespace UtilitiesCS
 
         public static Dispatcher Dispatcher
         {
-            get => _dispatcher;
+            get
+            {
+                if (_dispatcher is null)
+                {
+                    throw new InvalidOperationException(
+                        "The UI dispatcher has not been captured. Call UiThread.Init() so that UiThread.Initialize() runs before reading UiThread.Dispatcher."
+                    );
+                }
+                return _dispatcher;
+            }
             private set => _dispatcher = value;
         }
-        private static Dispatcher _dispatcher = null!; // set in Initialize() before any access
+        private static Dispatcher? _dispatcher;
         #endregion UI Thread Synchronization
 
         #region Other UI Methods and Properties

@@ -29,11 +29,17 @@ namespace QuickFiler.Helper_Classes.Tests
         // (avoiding a compile-time WindowsBase dependency on System.Windows.Threading.Dispatcher)
         // and asserts it is unchanged after each test. The class is not parallelized because other
         // QuickFiler tests intentionally replace UiThread.Dispatcher with dedicated WPF dispatchers.
+        //
+        // The snapshot reads the private _dispatcher backing field rather than the public
+        // Dispatcher property (issue #584): the property getter now throws
+        // InvalidOperationException when the field is null, and PropertyInfo.GetValue would
+        // surface that as a TargetInvocationException from this class's setup and teardown.
+        // Reading the field observes the same state without invoking the guard.
         private object _capturedDispatcher;
-        private static readonly System.Reflection.PropertyInfo DispatcherProperty =
-            typeof(UiThread).GetProperty(
-                "Dispatcher",
-                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static
+        private static readonly System.Reflection.FieldInfo DispatcherField =
+            typeof(UiThread).GetField(
+                "_dispatcher",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static
             );
 
         /// <summary>
@@ -46,7 +52,7 @@ namespace QuickFiler.Helper_Classes.Tests
         {
             // Snapshot the static UiThread.Dispatcher (reflectively, to avoid WindowsBase) so
             // teardown can confirm no test mutated this set-once static state.
-            _capturedDispatcher = DispatcherProperty?.GetValue(null);
+            _capturedDispatcher = DispatcherField?.GetValue(null);
             _marshalInvocationCount = 0;
         }
 
@@ -55,7 +61,7 @@ namespace QuickFiler.Helper_Classes.Tests
         {
             // Assert the static dispatcher snapshot is unchanged so any accidental static mutation
             // is caught and tests remain order-independent.
-            object current = DispatcherProperty?.GetValue(null);
+            object current = DispatcherField?.GetValue(null);
             current.Should().BeSameAs(_capturedDispatcher);
         }
 

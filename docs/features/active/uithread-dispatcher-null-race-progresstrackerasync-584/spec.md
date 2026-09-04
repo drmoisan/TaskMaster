@@ -3,9 +3,13 @@
 - **Issue:** #584
 - **Parent (optional):** none
 - **Owner:** drmoisan
-- **Last Updated:** 2026-09-02T09-02
-- **Status:** Draft
-- **Version:** 0.2
+- **Last Updated:** 2026-09-03
+- **Status:** Draft (amended in plan revision round 15: write set and AC4 extended to a sixth file;
+  amended in plan revision round 16: AC5 returned to unchecked pending the sixth file's token-filter
+  artifact; amended in plan revision round 17 (preflight round 17 non-blocking findings N1-N4
+  applied), of which finding N4 is the only one touching this file: AC5's Evidence line now states the
+  diff's added-line figure as the artifact records it)
+- **Version:** 0.5
 
 ## Context
 
@@ -58,6 +62,11 @@
 - In scope:
   - `UtilitiesCS/Threading/UiThread.cs` — the `Dispatcher` accessor's null contract.
   - A new deterministic regression test in `UtilitiesCS.Test/Threading/UiThread_Tests.cs`.
+  - `QuickFiler.Test/Helper Classes/EmailMoveMonitorTests.cs` — the one reflective consumer of the
+    `Dispatcher` PROPERTY in the repository. Its `[TestInitialize]`/`[TestCleanup]` snapshot is
+    retargeted from the public property to the private `_dispatcher` backing field, matching the
+    idiom the four other reflective consumers already use. Added to scope on 2026-09-03 after the
+    full `QuickFiler.Test` run failed 8 of 1312 on this class; see Root Cause Analysis.
 - Out of scope / non-goals:
   - UtilitiesCS/Threading/ProgressTrackerAsync.cs — verified not to require a change (see Root
     Cause Analysis). Named as a fix site to verify in the assignment, not assumed to need an edit.
@@ -83,6 +92,7 @@ Every file this plan's diff creates, modifies, or deletes:
 - `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs`
 - `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs`
 - `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs`
+- `QuickFiler.Test/Helper Classes/EmailMoveMonitorTests.cs`
 
 ## Root Cause Analysis
 
@@ -248,37 +258,132 @@ None; the change adds a single null check to an existing property getter.
 
 ## Acceptance Criteria
 
-- [ ] AC1: `UiThread.Dispatcher` throws a named `InvalidOperationException` (not a bare
+- [x] AC1: `UiThread.Dispatcher` throws a named `InvalidOperationException` (not a bare
       `NullReferenceException`) when read before `UiThread.Initialize()` has populated its backing
       field, verified by a deterministic regression test in
       `UtilitiesCS.Test/Threading/UiThread_Tests.cs` that does not rely on timing, sleeps, retries,
       or full-suite execution order.
-- [ ] AC2: The `null!` null-forgiving suppression on `UiThread`'s `_dispatcher` backing field is
+      Evidence: `evidence/regression-testing/p1-t4-expect-fail.md` (`Failed: 1` against the unfixed
+      accessor, with the verbatim message "Expected a &lt;System.InvalidOperationException&gt; to be
+      thrown, but no exception was thrown.") and
+      `evidence/regression-testing/p3-t2-regression-green.md` (`Passed: 2` against the fixed
+      accessor).
+- [x] AC2: The `null!` null-forgiving suppression on `UiThread`'s `_dispatcher` backing field is
       removed; the field's declared type becomes nullable (`Dispatcher?`) so the nullable analyser
       can verify the getter's guard.
-- [ ] AC3: UtilitiesCS/Threading/ProgressTrackerAsync.cs is left unmodified unless the
+      Evidence: `evidence/qa-gates/p2-t2-nullforgiving-removed.md` (zero `null!` matches in
+      `UtilitiesCS/Threading/UiThread.cs`, and `private static Dispatcher? _dispatcher;` present on
+      line 149) and `evidence/qa-gates/p4-t4-nullable-build.md` (`0 Error(s)` under
+      `/p:TreatWarningsAsErrors=true`, so the compiler confirms the guard narrows the field and no
+      `CS8603` is raised).
+- [x] AC3: UtilitiesCS/Threading/ProgressTrackerAsync.cs is left unmodified unless the
       implementation phase discovers a concrete reason a change there is required; if left
       unmodified, the plan records the verification that the fix in `UiThread.cs` alone converts the
       downstream failure from an unattributed `NullReferenceException` to a self-diagnosing
       `InvalidOperationException` raised at the `UiDispatcher = UiThread.Dispatcher;` line.
-- [ ] AC4: No regression in `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs`,
+      Evidence: `evidence/other/p3-t4-progresstrackerasync-unmodified.md`, which records the empty
+      `--cached` name-status diff for that path against BASE, the empty porcelain status for that
+      path, the single `git grep` hit at line 33, and the verification paragraph explaining why the
+      fix in `UiThread.cs` alone converts the consumer's failure mode.
+- [x] AC4: No regression in `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs`,
       UtilitiesCS.Test/OutlookObjects/Folder/WpfDispatcherYieldTests.cs,
-      UtilitiesCS.Test/OutlookObjects/Folder/OutlookFolderTreeServiceConcurrencyTests.cs, or
-      `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs` (all pass, unmodified assertions).
-- [ ] AC5: No retry, sleep, or timing tolerance is introduced anywhere in the diff.
-- [ ] AC6: Full C# toolchain (csharpier -> analyzer msbuild -> nullable msbuild -> vstest with
+      UtilitiesCS.Test/OutlookObjects/Folder/OutlookFolderTreeServiceConcurrencyTests.cs,
+      `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs`, or
+      `QuickFiler.Test/Helper Classes/EmailMoveMonitorTests.cs` (all pass, unmodified assertions).
+      The last of those five is modified by this change, and "unmodified assertions" is the binding
+      constraint on how: the file's `[TestInitialize]`/`[TestCleanup]` snapshot is retargeted from the
+      public `Dispatcher` property to the private `_dispatcher` backing field, and no assertion, no
+      test method, and no mock setup in it is added, removed, or altered.
+      Evidence: `evidence/qa-gates/p1-t5-donotparallelize.md` (the change to
+      `IdleAsyncQueue_Tests.cs` and `ProgressTrackerAsync_Tests.cs` is attribute-only and alters no
+      assertion), `evidence/regression-testing/p3-t3-at-risk-tests.md` (41 tests executed, all five
+      named at-risk tests present and passing, no failure outside the empty `BASELINE_FAILURE_SET`),
+      `evidence/regression-testing/p3-t6-quickfiler-wpfuidispatcher.md` (`Failed: 0`),
+      `evidence/qa-gates/p2-t4-emailmovemonitor-reflection-target.md` (the change to
+      `EmailMoveMonitorTests.cs` retargets one reflection lookup, alters no assertion, and leaves the
+      `[TestMethod]` count at 8), `evidence/regression-testing/p4-t6-first-pass-failure.md` (the
+      fail-before: 1304 of 1312, with all 8 of that class's tests failing), and
+      `evidence/qa-gates/p4-t6-quickfiler-tests.md` (the pass-after: 1312 of 1312).
+      Amendment note (2026-09-03, plan revision round 15): this criterion previously named four files
+      and carried a scope note recording an open regression in a fifth. That regression was in
+      `QuickFiler.Test/Helper Classes/EmailMoveMonitorTests.cs`, found by P4-T6 and attributed to the
+      `UiThread.cs` fix by an executed counterfactual. The file is now named in this criterion and
+      repaired by plan task P2-T4, and this criterion is returned to unchecked until the pass-after
+      evidence exists. Leaving it out was not tenable: this change now modifies that file, so a
+      no-regression criterion that did not name it would leave the repair with no acceptance
+      criterion binding it, and the previous scope note would have remained literally false once the
+      repair landed.
+- [x] AC5: No retry, sleep, or timing tolerance is introduced anywhere in the diff.
+      Evidence: `evidence/qa-gates/p3-t5-no-timing-tokens.md`, recording zero matching added lines in
+      the BASE-anchored diff (5626 bytes, 94 lines beginning with `+` including the five `+++` file
+      headers, across the five owned files; the
+      case-insensitive seven-token filter printed nothing and exited 1); and
+      `evidence/qa-gates/p2-t4-emailmovemonitor-reflection-target.md`, recording zero matching lines
+      in the BASE-anchored diff over the sixth owned file
+      `QuickFiler.Test/Helper Classes/EmailMoveMonitorTests.cs` (2570 bytes; the identical
+      case-insensitive seven-token filter, applied to the whole diff rather than only its added
+      lines, printed nothing and exited 1). The two together make "anywhere in the diff" true of the
+      whole diff: P3-T5's pathspec `UtilitiesCS UtilitiesCS.Test` covers five of the six owned files
+      and P2-T4's covers the sixth.
+      Amendment note (2026-09-03, plan revision round 16): this criterion is returned to unchecked in
+      this round. It had been checked on the strength of
+      `evidence/qa-gates/p3-t5-no-timing-tokens.md` alone, and that artifact's diff pathspec is
+      `UtilitiesCS UtilitiesCS.Test`, which reaches five of the six owned files. Plan revision round 15
+      widened the write set to a sixth file, `QuickFiler.Test/Helper Classes/EmailMoveMonitorTests.cs`,
+      which that pathspec does not reach, so this criterion's "anywhere in the diff" wording was not
+      yet evidenced across the whole diff at the time it stood checked. The criterion text is unchanged
+      and its scope is not narrowed. The evidence chain closes without widening that pathspec: plan
+      task P2-T4 carries the identical case-insensitive seven-token filter over the sixth file and
+      writes `evidence/qa-gates/p2-t4-emailmovemonitor-reflection-target.md`, and plan task P5-T5
+      re-checks this criterion citing both artifacts once that second artifact exists.
+- [x] AC6: Full C# toolchain (csharpier -> analyzer msbuild -> nullable msbuild -> vstest with
       coverage) passes in order in a single final pass, with per-step evidence artifacts recorded.
-- [ ] AC7: Repository-wide line coverage does not regress relative to the recorded baseline, and
+      Evidence: `evidence/qa-gates/p4-t1-format.md` (`EXIT_CODE: 0`, `Formatted 6 files`, identical
+      before-and-after unscoped porcelain), `evidence/qa-gates/p4-t2-format-check.md`
+      (`EXIT_CODE: 0`, `Checked 1576 files`, empty reported set),
+      `evidence/qa-gates/p4-t3-analyzer-build.md` (`EXIT_CODE: 0`, `0 Warning(s)`, `0 Error(s)`),
+      `evidence/qa-gates/p4-t4-nullable-build.md` (`EXIT_CODE: 0`, `0 Error(s)`),
+      `evidence/qa-gates/p4-t5-utilitiescs-tests.md` (`EXIT_CODE: 0`, 4787 of 4787 passed),
+      `evidence/qa-gates/p4-t6-quickfiler-tests.md` (`EXIT_CODE: 0`, 1312 of 1312 passed), and
+      `evidence/qa-gates/p4-t8-loop-closure.md` (all seven steps listed in order, both Phase 4 passes
+      recorded chronologically, no step after P4-T1 rewrote a tracked file, so the second pass is a
+      single clean pass). `evidence/qa-gates/p4-t7-coverage-delta.md` is deliberately not cited here;
+      it is AC7's evidence.
+- [x] AC7: Repository-wide line coverage does not regress relative to the recorded baseline, and
       coverage on the changed lines meets the `>= 90%` new-code target.
+      Evidence: `evidence/baseline/p0-t10-utilitiescs-tests-coverage.md` for the baseline figures and
+      `evidence/qa-gates/p4-t7-coverage-delta.md` for the comparison. Baseline `line-rate`
+      0.7073317347831605; post-change `line-rate` 0.7073603942281368, an increase of +0.0000286594,
+      so no regression against the baseline and the 0.005 tolerance is not consumed. Signed
+      `lines-valid` difference: 149761 - 149719 = +42, inside the 0 to 200 comparability band, so no
+      `COVERAGE DENOMINATOR MISMATCH` was recorded and the repository-wide comparison stands rather
+      than being VOID. Changed-line coverage: 100.0% (8 of 8 coverable added lines in
+      `UtilitiesCS/Threading/UiThread.cs` — lines 138, 139, 140, 141, 142, 143, 145, and 146 — each
+      with `hits` of 1 or more), which meets the `>= 90%` new-code target. Both `line-rate` figures
+      are raw unstripped dotnet-coverage line-rates for the UtilitiesCS.Test process and are not the
+      repository first-party figure CLAUDE.md's 80% refers to.
 
 ## Risks & Mitigations
 
 - Technical or operational risks: a call site not covered by this research relies on
   `UiThread.Dispatcher` silently returning `null` and would now observe an
   `InvalidOperationException` instead. Mitigation: the repo-wide grep enumerated in Root Cause
-  Analysis is the complete set of production reads of `UiThread.Dispatcher`
-  (`git grep -n "UiThread.Dispatcher\b"`), and each was checked against its nearest test coverage;
-  none depends on a silent-null outcome distinct from a generic-exception outcome.
+  Analysis is the complete set of production reads of `UiThread.Dispatcher` spelled as the qualified
+  member expression (`git grep -n "UiThread.Dispatcher\b"`), and each was checked against its nearest
+  test coverage; none depends on a silent-null outcome distinct from a generic-exception outcome.
+- Census limitation recorded on 2026-09-03, after it materialised as a real regression: that grep
+  matches only the literal text `UiThread.Dispatcher`, so it cannot match a REFLECTIVE read, which
+  never spells the qualified expression at all. One such read existed —
+  `typeof(UiThread).GetProperty("Dispatcher", ...)` in
+  `QuickFiler.Test/Helper Classes/EmailMoveMonitorTests.cs` — and it failed 8 of that class's 8 tests
+  when the guarded getter shipped, because `PropertyInfo.GetValue` propagates an exception a throwing
+  getter raises. The complementary census the plan DID run, `git grep -F '"_dispatcher"'`, covers
+  reflective reads of the private FIELD and correctly found three files; no equivalent census was run
+  for the property NAME. Plan task P0-T14 now runs that census across all nine test assemblies and
+  repository-wide across `.cs` files, and records its full output. Its re-derived result is that
+  exactly one reflective property read exists in the repository, in the file above, and that every
+  other occurrence of the literal `"Dispatcher"` is an XML `<see cref="Dispatcher"/>` documentation
+  cross-reference. No production file reads `UiThread.Dispatcher` reflectively.
 - Mitigations and rollbacks: the change is a single accessor; reverting is a one-file revert with no
   migration or data considerations.
 
