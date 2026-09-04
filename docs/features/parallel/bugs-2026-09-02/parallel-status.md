@@ -11,8 +11,8 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | max_concurrency | 16 |
 | current_cohort | 2 |
 | recolor_generation | 1 |
-| last_updated | 2026-09-04T04-15 |
-| next_step | Await background notifications for: 584 (opus, still cycling an extended preflight loop on a plan revised for the #752 coverage-script worktree blocker), 752 (background-watch pull request 776 to CI green, update-branch on BEHIND, then a SQUASH merge -- not the ordinary merge method, per the leaked-host-path history note), and 736 (opus, relaunched without isolation after the prior attempt blocked on a harness sandboxing defect). On each completion: durably confirm actual git push state before trusting a DONE report, stage checkpoint plus PR artifacts at the session root, create/confirm the PR, background-watch CI to green with update-branch cycles on BEHIND, merge, then re-evaluate the per-edge barrier for any newly freed items. Do not report run completion (mode is open) until every non-withdrawn item reaches merged or worktree_removed. |
+| last_updated | 2026-09-04T04-45 |
+| next_step | Await background notifications for: 584 (opus, still cycling an extended preflight loop on a plan revised for the #752 coverage-script worktree blocker), and 736 (opus, relaunched without isolation after the prior attempt blocked on a harness sandboxing defect). On each completion: durably confirm actual git push state before trusting a DONE report, stage checkpoint plus PR artifacts at the session root, create/confirm the PR, background-watch CI to green with update-branch cycles on BEHIND, merge, then re-evaluate the per-edge barrier for any newly freed items. Do not report run completion (mode is open) until every non-withdrawn item reaches merged or worktree_removed. |
 
 ## Items
 
@@ -32,7 +32,7 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 736 | docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736 | 4 | in_flight | worktree_created | - | - |
 | 737 | docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/750 | 87233f867ad60c0a5c0d19b09cc121ae536d7ba1 |
 | 751 | docs/features/active/terminal-notification-hook-test-lacks-sync-barrier-751 | 2 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/758 | 8642d42ce4562241152c8c67f6cad372fcfded46 |
-| 752 | docs/features/active/2026-09-03-coverage-assembly-discovery-excludes-own-worktree-root-752 | 2 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/776 | - |
+| 752 | docs/features/active/2026-09-03-coverage-assembly-discovery-excludes-own-worktree-root-752 | 2 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/776 | c12c4c34c227cede1690bcb5705e309ce9fa8796 |
 
 ### Item lifecycle timestamps
 
@@ -52,7 +52,7 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 736 | 2026-09-03T21-20 | - | - | - | - |
 | 737 | 2026-09-03T01-08 | 2026-09-03T01-28 | 2026-09-03T07-17 | 2026-09-03T07-17 | - |
 | 751 | 2026-09-03T16-30 | 2026-09-03T19-20 | 2026-09-03T20-05 | 2026-09-03T19-38 | - |
-| 752 | 2026-09-03T15-00 | 2026-09-04T04-08 | - | - | - |
+| 752 | 2026-09-03T15-00 | 2026-09-04T04-08 | 2026-09-04T04-45 | 2026-09-04T04-29 | - |
 
 Worktree removal for items 645 and 707 was attempted (non-forced `git worktree remove`) and deferred: both worktrees carry modified/untracked files and removal was not forced. `merge_status: merged` still satisfies open-mode completion.
 
