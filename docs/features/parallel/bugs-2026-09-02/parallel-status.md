@@ -11,8 +11,8 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | max_concurrency | 16 |
 | current_cohort | 2 |
 | recolor_generation | 1 |
-| last_updated | 2026-09-04T04-45 |
-| next_step | Await background notifications for: 584 (opus, still cycling an extended preflight loop on a plan revised for the #752 coverage-script worktree blocker), and 736 (opus, relaunched without isolation after the prior attempt blocked on a harness sandboxing defect). On each completion: durably confirm actual git push state before trusting a DONE report, stage checkpoint plus PR artifacts at the session root, create/confirm the PR, background-watch CI to green with update-branch cycles on BEHIND, merge, then re-evaluate the per-edge barrier for any newly freed items. Do not report run completion (mode is open) until every non-withdrawn item reaches merged or worktree_removed. |
+| last_updated | 2026-09-04T05-00 |
+| next_step | Await background notifications for: 584 (opus, still cycling an extended preflight loop on a plan revised for the #752 coverage-script worktree blocker). Item 736 delivered genuine execution (7013/7013 tests, PASS review, 13/13 AC checked) and is background-watching pull request 777 to CI green after an update-branch cycle, then a normal merge. On each completion: durably confirm actual git push state before trusting a DONE report, stage checkpoint plus PR artifacts at the session root, create/confirm the PR, background-watch CI to green with update-branch cycles on BEHIND, merge, then re-evaluate the per-edge barrier for any newly freed items. Do not report run completion (mode is open) until every non-withdrawn item reaches merged or worktree_removed. |
 
 ## Items
 
@@ -29,7 +29,7 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 732 | docs/features/active/2026-09-02-folderconverter-folderpredictor-dead-code-and-bugs-732 | 2 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/754 | f8414ee979e1884c4a93703523509d4f45e89151 |
 | 733 | docs/features/active/2026-09-02-coverage-cobertura-mstest-powershell-tooling-defects-733 | 0 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/748 | b13d5b7b1a6dd0aa79d51d48a7156ee67377f9d0 |
 | 735 | docs/features/active/2026-09-02-ribbon-engine-toggle-defects-735 | 1 | merged | worktree_removed | https://github.com/drmoisan/TaskMaster/pull/749 | b01c37654b4cf0a470b09d565fcd5b76d2bcd758 |
-| 736 | docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736 | 4 | in_flight | worktree_created | - | - |
+| 736 | docs/features/active/2026-09-02-efc-archiveroot-boundary-sink-defects-736 | 4 | in_flight | pr_open | https://github.com/drmoisan/TaskMaster/pull/777 | - |
 | 737 | docs/features/active/2026-09-02-breadcrumb-bridge-keyboard-navigation-defects-737 | 1 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/750 | 87233f867ad60c0a5c0d19b09cc121ae536d7ba1 |
 | 751 | docs/features/active/terminal-notification-hook-test-lacks-sync-barrier-751 | 2 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/758 | 8642d42ce4562241152c8c67f6cad372fcfded46 |
 | 752 | docs/features/active/2026-09-03-coverage-assembly-discovery-excludes-own-worktree-root-752 | 2 | merged | merged | https://github.com/drmoisan/TaskMaster/pull/776 | c12c4c34c227cede1690bcb5705e309ce9fa8796 |
@@ -49,7 +49,7 @@ Generated projection of artifacts/orchestration/parallel-orchestrator-state.json
 | 732 | 2026-09-03T07-19 | 2026-09-03T07-59 | 2026-09-03T08-10 | 2026-09-03T08-11 | - |
 | 733 | 2026-09-02T18-10 | 2026-09-03T01-06 | 2026-09-03T01-21 | 2026-09-03T01-21 | - |
 | 735 | 2026-09-03T01-08 | 2026-09-03T01-27 | 2026-09-03T07-10 | 2026-09-03T07-11 | 2026-09-03T07-12 |
-| 736 | 2026-09-03T21-20 | - | - | - | - |
+| 736 | 2026-09-03T21-20 | 2026-09-04T05-00 | - | - | - |
 | 737 | 2026-09-03T01-08 | 2026-09-03T01-28 | 2026-09-03T07-17 | 2026-09-03T07-17 | - |
 | 751 | 2026-09-03T16-30 | 2026-09-03T19-20 | 2026-09-03T20-05 | 2026-09-03T19-38 | - |
 | 752 | 2026-09-03T15-00 | 2026-09-04T04-08 | 2026-09-04T04-45 | 2026-09-04T04-29 | - |
