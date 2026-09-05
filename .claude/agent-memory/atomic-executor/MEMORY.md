@@ -12,9 +12,10 @@
 - [Inline-dispatch harness citation makes a test vacuous](project_inline_dispatch_harness_citation_makes_execution_time_test_vacuous.md) · ["Skip the pointless drain" note](project_preflight_drain_scope_optimization_note_makes_test_vacuous.md)
 - [Multi-pattern gates detach shared qualifiers](project_multipattern_gate_shared_qualifier_detachment.md) · [Banned-API zero-hit gate hits doc comments](project_banned_api_zero_hit_gate_hits_doc_comments.md)
 - [Follow-up promotion task is unexecutable](project_followup_promotion_task_is_unexecutable_by_executor.md) · [Supersede clause leaves a routing residual](project_supersede_clause_leaves_hard_routing_residual.md)
+- [Delegation to csharp-typed-engineer with no dispatch tool](project_plan_delegation_to_typed_engineer_without_dispatch_tool.md) — edit inline, record the substituted worker
 - [Plan check-off fixpoint breaks clean-tree gates](project_plan_checkoff_fixpoint_breaks_terminal_clean_tree_gate.md) · [Tracked agent-memory breaks unscoped git gates](project_agent_memory_tracked_breaks_unscoped_git_gates.md)
 - [Merge-base diff gates need a commit cadence](project_preflight_mergebase_diff_gates_need_commit_cadence.md) · [BASELINE_SHA diff conflates the merged base](project_baseline_sha_diff_conflates_merged_base.md) — use `<base>..HEAD`
-- [Moving-base two-dot diff needs an inertness test](project_preflight_moving_base_two_dot_diff_inertness_test.md) — only blocking if the delta actually hits those paths
+- [Moving-base two-dot diff needs an inertness test](project_preflight_moving_base_two_dot_diff_inertness_test.md) — only blocking if the delta hits those paths; better, make it an `INHERITED PATHS:` diff the executor runs
 - [Inserted plan tasks force renumbering](project_plan_task_ids_digit_only_forces_renumbering.md) · [Plan rationale clauses are evidence](project_418_plan_rationale_clauses_are_evidence.md) — blockers hide as prose
 - [Bugfix phase grows the file anyway](project_bugfix_phase_grows_the_file_despite_dead_code_removal.md) · [#418 500-line gate vs mandated plan content](project_418_500line_gate_vs_plan_content.md)
 - [AC check-off + artifacts/ tool-output paths](project_preflight_ac_checkoff_and_tooloutput_paths.md) · [Orchestrator override does not satisfy an AC](project_orchestrator_override_does_not_satisfy_an_ac.md)
@@ -35,6 +36,7 @@
 - [VS18 build/test toolchain paths](project_vs18_build_toolchain_paths.md) · [Repo-local SDK install + nullable Rebuild](project_repo_sdk_and_nullable_rebuild.md) — .dotnet-sdk needs pwsh7
 - [Start-Process -ArgumentList strips quoting](project_startprocess_arglist_array_strips_quoting.md) · [Relative paths in pwsh hit the wrong worktree](project_relative_path_in_pwsh_dotnet_io_hits_wrong_worktree.md)
 - [QuickFiler.Test coverage hang + build flags](project_quickfiler_test_coverage_hang_and_build_flags.md) — testhost can hang
+- [Dot-sourcing Invoke-MSTestWithCoverage clobbers $CoverageOutput](project_dotsourcing_invoke_mstest_clobbers_coverageoutput_param.md) — param-block default wins; Cobertura lands at coverage\coverage.cobertura.xml, exit 0
 - [vstest TestCaseFilter needs `|` not OR](project_vstest_testcasefilter_or_operator_and_env_setup.md) · [Test file name != partial class name](project_test_file_name_vs_partial_class_name.md)
 - [Analyzer HintPath skew breaks all four gates](project_analyzer_hintpath_skew_breaks_all_four_gates.md) · [Analyzer version skew on fresh worktree](project_analyzer_version_skew_fresh_worktree.md) — CS0006
 - [SecurityCodeScan incompatible with Roslyn 5.6](project_securitycodescan_roslyn56_incompat.md) · [Missing VSTO runtime breaks baseline gates](project_missing_vsto_runtime_breaks_baseline_gates.md) — HISTORICAL
@@ -75,6 +77,7 @@
 - [First-party coverage denominator (#197)](project_coverage_firstparty_denominator_method.md) · [dotnet-coverage denominator nondeterminism](project_dotnet_coverage_denominator_nondeterminism.md) — 47% vs 81%
 - [Failed/red coverage run leaves RAW Cobertura](project_failed_coverage_run_leaves_raw_unprocessed_cobertura.md) · [runner throws before post-processing](project_coverage_runner_throws_before_postprocessing.md) · [Koverage post-processing shape](project_koverage_cobertura_postprocessing_shape.md) — not comparable with a processed one
 - [C# canonical coverage artifact conversion](project_csharp_canonical_coverage_artifact_conversion.md) · [Cobertura runsettings `<Attributes>` override](project_cobertura_runsettings_attributes_override.md)
+- [Package rollup must use the repo helper](project_cobertura_package_rollup_must_use_repo_helper.md) — a hand-written class-direct node count never equals the root attributes
 - [Processed Cobertura filenames use backslashes](project_processed_cobertura_filenames_use_backslash.md) — forward-slash match returns zero rows; gate unevaluable
 - [Cobertura hits vs MS-coverage partial](project_changed_line_coverage_cobertura_vs_mscoverage_partial.md) · [QFC #227 coverage tooling](project_qfc227_coverage_tooling.md)
 - [#398 test-split gate gotchas](project_398_test_split_gate_gotchas.md) · [ExcludeFromCodeCoverage on partial = CS0579](project_excludefromcodecoverage_partial_class_cs0579.md)

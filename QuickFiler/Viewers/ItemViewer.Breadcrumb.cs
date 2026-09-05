@@ -1,9 +1,9 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Threading;
 using Microsoft.Web.WebView2.Core;
 using QuickFiler.Viewers;
 using UtilitiesCS.OutlookObjects.Folder;
@@ -379,13 +379,13 @@ namespace QuickFiler
         {
             // Statement order here is fixed by decision D-15 and must not be reversed. The affinity
             // guard is the FIRST STATEMENT, but it is a precondition check that returns without
-            // effect on the UI boundary and when UiSyncContext is null, so on every path that reaches
-            // this member's own logic it has performed no action. Issue #488 defect D5's
+            // effect on the owning thread and when the owning dispatcher is null, so on every path
+            // that reaches this member's own logic it has performed no action. Issue #488 defect D5's
             // ObjectDisposedException throw immediately follows and is therefore the FIRST ACTION: it
             // is the first statement that inspects this member's own subject, the viewer's teardown
             // state, and it precedes the already-owned early return, every container creation, and
-            // every BreadcrumbResourceOwner addition. Reversing the two would place a
-            // SynchronizationContext comparison after a throw that is supposed to run first.
+            // every BreadcrumbResourceOwner addition. Reversing the two would place a thread-identity
+            // check after a throw that is supposed to run first.
             ThrowIfOffUiBoundary(nameof(EnsureBreadcrumbResourceOwnership));
 
             if (IsDisposed || Disposing)
@@ -404,33 +404,40 @@ namespace QuickFiler
         }
 
         /// <summary>
-        /// Issue #488 defect D4: declares and enforces this viewer's UI-thread affinity for the
-        /// breadcrumb pipeline members, throwing when <paramref name="operation"/> is attempted from
-        /// off the boundary the viewer captured in its constructor.
+        /// Issue #488 defect D4, corrected by issue #781: declares and enforces this viewer's
+        /// UI-thread affinity for the breadcrumb pipeline members, throwing when
+        /// <paramref name="operation"/> is attempted from a thread other than the one that
+        /// constructed the viewer.
         /// </summary>
         /// <remarks>
-        /// The comparison is <em>reference equality</em> against <see cref="UiSyncContext"/>, not a
-        /// managed thread-identity comparison: a continuation resumed without the captured context can
-        /// land on a recycled pool thread whose id matches, so a thread id is not a boundary proof.
-        /// The null-context escape keeps a viewer constructed without an ambient context — a test
-        /// shape — from throwing.
+        /// Ownership is proved by <em>owner-thread identity</em>, through
+        /// <see cref="System.Windows.Threading.Dispatcher.CheckAccess"/> on the
+        /// <see cref="UiDispatcher"/> captured in the constructor. Issue #781 records why the
+        /// previous test, reference equality against <see cref="UiSyncContext"/>, was unsuitable: a
+        /// WPF dispatcher operation installs a
+        /// <c>DispatcherSynchronizationContext</c> for the duration of its callback, so a viewer
+        /// constructed inside one — which is how every production viewer is built — captures a
+        /// context that is never the UI thread's ambient context again, and the guard then rejected
+        /// the call even when it was made on the owning thread. Managed thread ids are unique among
+        /// live threads, so while the UI thread is alive an identity check cannot be satisfied by a
+        /// recycled pool thread. The null-owner escape keeps a viewer built without running the
+        /// constructor — a test shape — from throwing.
         /// This declares and enforces the contract; it does not make the read-then-write atomic. A
         /// caller that violates the contract now receives a diagnostic instead of a silent leak.
         /// </remarks>
         private void ThrowIfOffUiBoundary(string operation)
         {
-            SynchronizationContext owning = UiSyncContext;
+            Dispatcher owning = UiDispatcher;
             if (owning == null)
             {
                 return;
             }
 
-            if (!ReferenceEquals(SynchronizationContext.Current, owning))
+            if (!owning.CheckAccess())
             {
                 throw new InvalidOperationException(
                     $"{operation} must be called on the thread that owns this ItemViewer. The "
-                        + "current synchronization context is not the one captured when the viewer "
-                        + "was constructed."
+                        + "calling thread is not the thread the viewer was constructed on."
                 );
             }
         }

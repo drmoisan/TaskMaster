@@ -1,6 +1,6 @@
 ---
 name: preflight-moving-base-two-dot-diff-inertness-test
-description: A plan gate using `git diff origin/main -- <paths>` is only safe when origin/main has not touched those paths since the merge base; test inertness with `git diff --name-only <merge-base> origin/main -- <same paths>` before calling it blocking
+description: A plan gate using `git diff origin/main -- <paths>` is only safe when origin/main has not touched those paths since the merge base; test inertness with `git diff --name-only <merge-base> origin/main -- <same paths>` before calling it blocking, and prefer making that test a second diff the executor runs and records under an INHERITED PATHS heading
 metadata:
   type: project
 ---
@@ -26,3 +26,34 @@ merge base `9b6aff2e` vs `origin/main` `2b85134b` differed by 77 files including
 `QuickFiler/` production file, but zero of the six in-scope paths, so two `git diff origin/main`
 gates stayed correct. Relates to [[baseline-sha-diff-conflates-merged-base]] and
 [[preflight-mergebase-diff-gates-need-commit-cadence]].
+
+## Better remedy: make the inertness test a task the executor runs
+
+Do not settle for a preflight-time measurement plus a plan sentence asserting the result. The
+preflight observation is about the tree at review time, and the branch can gain commits before the
+task runs. Instead, have the plan carry BOTH diffs in the same task:
+
+- `git diff --name-status <BASE_REF> -- <paths>` — two-dot, base commit against the WORKING TREE.
+  This is what the scope gate is actually about. Pair it with `git add --intent-to-add` so a
+  newly created file is visible, and with `git status --porcelain --untracked-files=all` as the
+  independent untracked observation.
+- `git diff --name-only <BASE_REF>..HEAD -- <the same paths>` — the commit range, recorded under a
+  literal heading such as `INHERITED PATHS:`, with an acceptance clause requiring it to list no
+  path. This isolates what the branch's own commits already changed under those paths.
+
+The union the gate evaluates must be taken from the worktree diff and the porcelain span ONLY. Folding
+the commit-range diff into the union makes a non-empty inherited list fail the scope clause spuriously.
+
+**Why:** it converts an assertion about commit contents into an observation the executor makes at run
+time, so it stays correct if the branch advances between planning and execution. It also survives a
+planner session that has no git tool available and therefore cannot re-derive a commit-contents claim
+at authoring time — a real constraint seen on #781, where the planner replaced exactly such a claim
+with this construction rather than assert it unverified.
+
+**How to apply:** both diffs carry a ref operand, so neither trips G8; the `git add` and
+`git status --porcelain` spans in the same task exonerate both under G8b. Keep the `--` pathspec
+separator on every invocation, or G8b reads the pathspec as a ref operand.
+
+Do NOT use the three-dot `<BASE_REF>...HEAD` form for the scope diff. It compares two commits and
+never reads the working tree, so in a plan that stages without committing it returns an empty list
+however the executor edits those files.

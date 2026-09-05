@@ -150,100 +150,6 @@ namespace QuickFiler.Test.Viewers
         }
 
         /// <summary>
-        /// Issue #488 defect D4: <c>InitializeBreadcrumbPipeline</c> declares and enforces UI-thread
-        /// affinity, rejecting a call where <see cref="SynchronizationContext.Current"/> is not
-        /// reference-equal to the context the viewer captured. This case nulls the ambient context.
-        /// </summary>
-        /// <remarks>
-        /// This proxy <strong>proves the guard fires and does not prove the race is absent.</strong> A
-        /// true two-thread data race cannot be reproduced deterministically under the repository ban
-        /// on sleeps and wall-clock waits: two threads with no barrier give no way to force the
-        /// interleaving.
-        /// The <em>two-argument</em> overload is used with injected operations: the one-argument
-        /// overload evaluates <c>CaptureCurrent()</c> eagerly and that already throws under a null
-        /// ambient context, so a test against it would pass before the guard existed. The message must
-        /// name the operation, which the dispatcher's own message does not.
-        /// </remarks>
-        [TestMethod]
-        public void InitializeBreadcrumbPipeline_AmbientContextNull_ThrowsBoundaryDiagnostic()
-        {
-            // Arrange
-            using (var scope = new ViewerScope())
-            {
-                var operations = new BreadcrumbPopupUiOperations(
-                    new BreadcrumbUiDispatcher(new DrainableSynchronizationContext(), _ => { })
-                );
-                var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
-
-                // Act
-                Action act = () =>
-                    BreadcrumbSelectorToggleUiBoundaryTests.InvokeAmbientNull(() =>
-                    {
-                        scope.Viewer.InitializeBreadcrumbPipeline(provider.Object, operations);
-                        return true;
-                    });
-
-                // Assert
-                act.Should()
-                    .Throw<InvalidOperationException>(
-                        "the guard must reject a call made off the viewer's owning boundary"
-                    )
-                    .Where(error => error.Message.Contains("InitializeBreadcrumbPipeline"))
-                    .Which.Should()
-                    .NotBeOfType<ObjectDisposedException>();
-            }
-        }
-
-        /// <summary>
-        /// Issue #488 defect D4, second case: a <em>different non-null</em> ambient context is also
-        /// rejected, which proves the comparison is reference equality against the viewer's captured
-        /// context rather than a bare null check.
-        /// </summary>
-        /// <remarks>
-        /// This proxy <strong>proves the guard fires and does not prove the race is absent</strong>: a
-        /// true two-thread data race cannot be reproduced deterministically under the repository ban
-        /// on sleeps and wall-clock waits. The substituted context is installed and restored in a
-        /// <c>try</c>/<c>finally</c> on the same thread; no second thread and no timing construct.
-        /// </remarks>
-        [TestMethod]
-        public void InitializeBreadcrumbPipeline_DifferentNonNullContext_ThrowsBoundaryDiagnostic()
-        {
-            // Arrange
-            using (var scope = new ViewerScope())
-            {
-                var operations = new BreadcrumbPopupUiOperations(
-                    new BreadcrumbUiDispatcher(new DrainableSynchronizationContext(), _ => { })
-                );
-                var provider = new Mock<IFolderHierarchyProvider>(MockBehavior.Strict);
-                var foreign = new SynchronizationContext();
-
-                // Act
-                Action act = () =>
-                {
-                    SynchronizationContext previous = SynchronizationContext.Current;
-                    try
-                    {
-                        SynchronizationContext.SetSynchronizationContext(foreign);
-                        scope.Viewer.InitializeBreadcrumbPipeline(provider.Object, operations);
-                    }
-                    finally
-                    {
-                        SynchronizationContext.SetSynchronizationContext(previous);
-                    }
-                };
-
-                // Assert
-                act.Should()
-                    .Throw<InvalidOperationException>(
-                        "a different non-null context is off the viewer's owning boundary too"
-                    )
-                    .Where(error => error.Message.Contains("InitializeBreadcrumbPipeline"))
-                    .Which.Should()
-                    .NotBeOfType<ObjectDisposedException>();
-            }
-        }
-
-        /// <summary>
         /// Issue #488 defect D5: once teardown has begun, <c>EnsureBreadcrumbResourceOwnership</c>
         /// refuses to create a <c>Container</c> or add a resource owner, so no pipeline is built
         /// against a dead viewer. The call is made on the ambient context the viewer was constructed
@@ -406,7 +312,9 @@ namespace QuickFiler.Test.Viewers
         /// <summary>
         /// Assigns the viewer's private owning-context field. Used only by the #475 seam-preservation
         /// test, to obtain a viewer that has run its constructor yet reports a null
-        /// <c>UiSyncContext</c>, so the D4 affinity guard is inert for that viewer.
+        /// <c>UiSyncContext</c>, which reproduces the issue #475 shape. Since issue #781 the affinity
+        /// guard keys on the owning dispatcher rather than on that context, so it still admits the
+        /// call on the owning thread.
         /// </summary>
         private static void SetViewerSyncContext(
             QuickFiler.ItemViewer viewer,
