@@ -49,3 +49,22 @@ CHANGED-CODE COVERAGE: NOT MEASURABLE
 Both runs additionally cleared the repository-wide 0.80 line-rate floor:
 `Assert-CoberturaLineCoverageThreshold` returned without throwing on the baseline document
 (`BASELINE_FLOOR: MET 0.848347`) and on the final document (0.848316).
+
+## Correction recorded by the orchestrator from the feature review (2026-09-05T17-29)
+
+The feature review (`code-review.2026-09-05T17-29.md`, `policy-audit.2026-09-05T17-29.md`) compared
+the two Cobertura documents class by class (564 classes each) and found that two statements above
+are inaccurate. The conclusion, no attributable coverage regression, is unchanged and is
+strengthened by the corrected facts.
+
+1. The two-line `lines-covered` movement is **not** attributable to the deleted D4 tests. Zero
+   `QuickFiler` classes differ between the two documents; the `QuickFiler` package counters are
+   identical (LINE missed=2376, covered=9960). The three classes that differ are all in the
+   untouched `UtilitiesCS` assembly (`SegmentStopWatch` 1.0 to 0.944954, `SubjectMapSco` 0.969466
+   to 0.938931, `OlTableExtensions` 0.885522 to 0.912458), which is run-to-run drift in tests this
+   change did not touch. The paragraph beginning "The two-line difference" is superseded by this
+   note; as the same artifact already establishes, the old throw path is outside the coverage
+   denominator and could not move a counter in either direction.
+2. `coverage.config` does **not** exclude `*.Test.dll`. That exclusion is injected at run time by
+   `ConvertTo-DerivedCoverageSettingsXml` in `scripts/vscode/Invoke-MSTestWithCoverage.ps1`
+   (line 99), which the [P0-T8] and [P2-T6] script consumed.
