@@ -588,9 +588,12 @@ Every in-scope finding identifier, the file it changes, and the acceptance crite
       `QuickFiler.Test/Helper Classes/EmailMoveMonitorTests.cs` contains no `FieldInfo` for
       `_dispatcher`. At least one migrated test in `UtilitiesCS.Test/Threading/UiThread_Tests.cs`
       installs a non-null dispatcher over a null prior value and asserts, after the scope is
-      disposed, that the static is null again. **Evidence:** a repository-wide grep for
-      `GetField("_dispatcher"` returning exactly two hits — the new scope and the unchanged
-      QuickFiler.Test fixture — and the named restore test passing.
+      disposed, that the static is null again. **Evidence:** a grep over all `*.cs` files in the
+      repository for the single-line token `"_dispatcher"` returning exactly two hits — the new scope and the unchanged
+      QuickFiler.Test fixture — and the named restore test passing. The conjunction
+      `GetField("_dispatcher"` is not used as the evidence method, because CSharpier wraps every
+      acquisition so that `GetField(` and `"_dispatcher",` never share a line, and a line-oriented
+      search for the conjunction therefore returns zero lines whatever the executor does.
 - [ ] AC6: `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs` and
       `UtilitiesCS.Test/Threading/ProgressTracker_ReportAndViewerTests.cs` are each strictly under 500
       lines, both are registered as exactly one `<Compile Include>` entry in
