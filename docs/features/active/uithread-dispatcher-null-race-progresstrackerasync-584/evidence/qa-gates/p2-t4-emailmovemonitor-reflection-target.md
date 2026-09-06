@@ -15,7 +15,12 @@ env -C <worktree-root> grep -E -i 'Thread\.Sleep|Task\.Delay|SpinWait|Retry|retr
 env -C <worktree-root> grep -E '^[-+]' TestResults/p2-t4-emailmovemonitor.diff | grep -F '.Should()'
 ```
 
-EXIT_CODE:
+EXIT_CODE: 0
+
+The field carries a single integer, which is this gate's normalized outcome. It is not a
+single process exit status: the gate ran several commands. Their individual exit codes are
+listed below and are unchanged from the original record.
+
 - command 1 — 0
 - command 2 — 1 (`git grep` exits 1 on zero matches)
 - command 3 — 1 (`git grep` exits 1 on zero matches)

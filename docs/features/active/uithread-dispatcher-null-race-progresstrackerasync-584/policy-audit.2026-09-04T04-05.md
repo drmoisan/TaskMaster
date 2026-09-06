@@ -65,7 +65,7 @@ No violations. The branch diff contains six source files and no path under `arti
 `artifacts/qa/`, `artifacts/evidence/`, or `artifacts/coverage/`. A directory listing of
 `artifacts/**` in the worktree returns only pre-existing `pr_body_*`, `pr_context.*`, and
 `orchestration/orchestrator-state.json` entries, none of which is an evidence artifact of this
-feature. All 34 evidence artifacts for this feature are under the canonical
+feature. All 38 evidence artifacts for this feature are under the canonical
 `docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/evidence/<kind>/` tree
 (`baseline`, `regression-testing`, `qa-gates`, `other`, `issue-updates`).
 
@@ -108,11 +108,11 @@ performed by directory enumeration instead and is complete for the four prohibit
 | 2.8 | Module cohesion | PASS | All six changed files remain single-purpose. |
 | 2.9 | File size limit — 500 lines | **PARTIAL (non-blocking)** | `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs` is 514 lines. See finding F3. The other five files are 172, 179, 348, 206, and 320 lines. |
 | 2.10 | Naming | PASS | `DispatcherField`, `_dispatcher`, `UiThread_Dispatcher_Tests` follow repo convention. |
-| 2.11 | Comment *why*, not *what* | PASS | The six added comment lines at `EmailMoveMonitorTests.cs:33-37` explain precisely why the field is read instead of the property (`PropertyInfo.GetValue` would surface the guard as `TargetInvocationException` from setup/teardown). This is a model instance of the rule. |
+| 2.11 | Comment *why*, not *what* | PASS | The six added comment lines at `EmailMoveMonitorTests.cs:33-37` explain precisely why the field is read instead of the property (`PropertyInfo.GetValue` would surface the guard as `TargetInvocationException` from setup/teardown). The comment states the reason rather than restating the code, which is what the rule requires. |
 | 2.12 | Dependencies — no new packages | PASS | No `using` directive and no package reference added; `DoNotParallelize` resolves from the existing `Microsoft.VisualStudio.TestTools.UnitTesting` import in all four files. |
 | 2.13 | I/O boundaries | PASS (N/A) | No I/O in the change. |
 | 2.14 | Toolchain loop, in order, single clean pass | PASS | `p4-t8-loop-closure.md` records two Phase-4 passes chronologically. Pass 1 failed at P4-T6 (8 of 1312); P2-T4 then rewrote a tracked file, so every step was re-run in order. Pass 2 is green end to end with no tracked-file rewrite after P4-T1. This is the correct restart-from-step-1 behaviour, not a shortcut. |
-| 2.15 | Bugfix workflow — failing regression test first | PASS | `p1-t4-expect-fail.md` records a genuine RED: `Failed: 1` with the verbatim FluentAssertions message "Expected a `<System.InvalidOperationException>` to be thrown, but no exception was thrown", at `UiThread_Tests.cs:150`, against a tree that `p1-t3-build-before-fix.md` had just built with `0 Error(s)`. The sibling positive test passed in the same run, proving the harness works and the red is attributable to the defect. This is a provable assertion-level RED-first, not a compile-red. |
+| 2.15 | Bugfix workflow — failing regression test first | PASS | `p1-t4-expect-fail.md` records a genuine RED: `Failed: 1` with the verbatim FluentAssertions message "Expected a `<System.InvalidOperationException>` to be thrown, but no exception was thrown", at `UiThread_Tests.cs:150`, against the same tree state over which `p1-t3-build-before-fix.md` recorded a clean `0 Error(s)` build; the two artifacts' recorded `Timestamp:` values do not establish their relative execution order, and the conclusion does not depend on the order because the sibling positive test passed in the same run, showing the harness works and the red is attributable to the defect. This is an assertion-level RED-first, not a compile-red. |
 | 2.16 | Minimal targeted fix, no opportunistic refactor | PASS | Production diff is confined to one property and one field declaration. `ProgressTrackerAsync.cs` was verified unmodified (`p3-t4-progresstrackerasync-unmodified.md`: empty `--cached` name-status and empty porcelain for that path). |
 | 2.17 | Deeper design problems opened as issues, not widened scope | PARTIAL (non-blocking) | The `IUiDispatcher` seam conversion is deferred on the GitHub issue thread. The second follow-up (synchronizing `ProgressTrackerAsync_Tests.cs`'s reflective static mutation) exists only as feature-folder prose. See finding F5. |
 
@@ -120,7 +120,7 @@ performed by directory enumeration instead and is complete for the four prohibit
 
 | # | Requirement | Verdict | Evidence |
 |---|---|---|---|
-| 3.1 | CSharpier format, pinned via `dotnet tool run` | PASS | `p4-t1-format.md` `EXIT_CODE: 0`, `Formatted 6 files`, byte-identical before/after unscoped porcelain. `p4-t2-format-check.md` `EXIT_CODE: 0`, `Checked 1576 files`, empty reported set, run over `.` (full repo, CI parity). |
+| 3.1 | CSharpier format, pinned via `dotnet tool run` | PASS | `p4-t1-format.md` `EXIT_CODE: 0`, `Formatted 6 files`, byte-identical before/after unscoped porcelain. `p4-t2-format-check.md` `EXIT_CODE: 0`, `Checked 1576 files`, empty reported set, run over `.` (full repo, CI parity). The applied format run deviated from the whole-tree invocation listed in the CLAUDE.md approved-command list: it supplied six explicit path operands instead. That deviation and its mitigation are recorded as a gap entry — see section 8. |
 | 3.2 | Analyzer build, `/t:Rebuild`, analyzers + code style enforced | PASS | `p4-t3-analyzer-build.md` `EXIT_CODE: 0`, `0 Warning(s)`, `0 Error(s)`. |
 | 3.3 | Nullable / type-check build, `/t:Rebuild`, `TreatWarningsAsErrors` | PASS | `p4-t4-nullable-build.md` `EXIT_CODE: 0`, `0 Warning(s)`, `0 Error(s)`. Command verified to use `/t:Rebuild` and to contain no `Nullable=enable` substring, matching CLAUDE.md and `ci.yml` character-for-character. This gate is non-vacuous here: `UiThread.cs:1` carries `#nullable enable` (verified directly), so a getter returning `Dispatcher?` as `Dispatcher` without narrowing would raise `CS8603` and fail the build. |
 | 3.4 | Null-safety by default | PASS | The `null!` suppression is removed. Independently verified: `UiThread.cs:149` reads `private static Dispatcher? _dispatcher;` and no `null!` remains in that file. |
@@ -226,7 +226,7 @@ confirming their existing handling absorbs `InvalidOperationException` as it pre
 
 | Check | Command | Result | Artifact |
 |---|---|---|---|
-| Format (apply) | `dotnet tool run csharpier format .` | exit 0, `Formatted 6 files` | `p4-t1-format.md` |
+| Format (apply) | `dotnet tool run csharpier format UtilitiesCS/Threading/UiThread.cs UtilitiesCS.Test/Threading/UiThread_Tests.cs UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs "QuickFiler.Test/Helper Classes/EmailMoveMonitorTests.cs"` | exit 0, `Formatted 6 files` | `p4-t1-format.md` |
 | Format (verify) | `dotnet tool run csharpier check .` | exit 0, `Checked 1576 files`, empty set | `p4-t2-format-check.md` |
 | Analyze | `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` | exit 0, 0 Warning, 0 Error | `p4-t3-analyzer-build.md` |
 | Type-check | `msbuild TaskMaster.sln /t:Rebuild /m /p:Configuration=Debug "/p:Platform=Any CPU" /p:TreatWarningsAsErrors=true` | exit 0, 0 Warning, 0 Error | `p4-t4-nullable-build.md` |
@@ -242,6 +242,28 @@ summary blocks, and TRX `<Counters>` values, and the head-state facts they asser
 against the worktree and all matched.
 
 ## 8. Gaps and Exceptions
+
+### B0 — Applied format step used explicit path operands rather than the CLAUDE.md whole-tree form
+
+The applied format step ran CSharpier over six explicit paths rather than over the whole tree. The
+CLAUDE.md approved-command list gives the `format .` form; the invocation recorded verbatim in
+`evidence/qa-gates/p4-t1-format.md` supplies the six owned paths as operands instead, and that is
+what ran.
+
+The rationale is recorded in this feature's plan, `plan.2026-09-02T09-02.md`, at lines 1068-1084,
+re-derived under issue #782 and quoted in that delivery's
+`evidence/baseline/p0-t10-584-plan-rederivation.md`. In summary: CSharpier is file-based and formats
+exactly the paths it is given, so the six owned files receive character-for-character the formatting
+the whole-tree form would have applied to them; restricting the write scope prevents the formatter
+from silently repairing pre-existing drift in unowned directories, which no gate in that plan was
+scoped to observe and which no commit in that plan would have carried.
+
+**Mitigation, and why it is substantively equivalent.** The whole-tree obligation is discharged on
+the verification side rather than the write side. `evidence/qa-gates/p4-t2-format-check.md` records
+a whole-tree `dotnet tool run csharpier check` run over the entire repository, read-only, which is
+the same command `.github/workflows/_format-check.yml` runs for CI parity. A formatting regression
+anywhere in the repository therefore still surfaces and still fails the gate; what the applied step
+no longer does is repair a pre-existing one without recording it.
 
 ### B1 — Public-API behaviour break: blast radius assessment
 
@@ -328,6 +350,19 @@ nothing.
 only in this feature folder, which is removed on merge. Item 2 (the `IUiDispatcher` seam conversion)
 is already durable on the GitHub issue thread. Recommendation: promote item 1 to a GitHub issue
 before merge so the residual survives.
+
+**Disposition, recorded under issue #782 (SD9).** This finding asks for synchronization around the
+existing unsynchronized reflective mutation of `UiThread._dispatcher`. It is
+discharged by C12 and C13
+in issue #782: all four `UtilitiesCS.Test` reflection sites migrate to a single shared
+`UiThreadDispatcherScope` install scope, which is the one place the mutation now occurs and which
+documents that serialization of writers is supplied by `[DoNotParallelize]` on every installing
+class. It is discharged by those two findings and
+not by C26,
+which adds a new test and changes no existing mutation; C26 is adjacent coverage rather than the
+discharging item. The follow-up this finding recommended was
+verifiably never promoted: at the time of the #782 review there was no potential entry and no active
+feature folder covering it, and both of the recommendations recorded here remained open.
 
 ### F8 — `[DoNotParallelize]` census scope — **Low, non-blocking, closed by this review**
 
@@ -416,6 +451,10 @@ Modified test class (reflection target only, assertions untouched): `EmailMoveMo
 8 `[TestMethod]` before and after, all 8 named as passing in `p4-t6-quickfiler-tests.md`.
 
 ## Appendix B: Toolchain Commands Reference
+
+The block below lists the CLAUDE.md reference commands, not a transcript of what ran. Entry 1 in
+particular is the approved-command form; the applied format step supplied six explicit path
+operands instead, as row 3.1 and the section 8 gap entry record.
 
 ```text
 1. dotnet tool run csharpier format .

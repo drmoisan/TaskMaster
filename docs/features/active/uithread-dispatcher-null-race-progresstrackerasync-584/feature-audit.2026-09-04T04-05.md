@@ -34,9 +34,11 @@ review checked off nothing new (nothing remained unchecked) and edited no AC tex
 
 **Fail-before / pass-after is genuine.** `p1-t4-expect-fail.md`: `Total tests: 2, Passed: 1, Failed: 1`,
 with the verbatim message "Expected a `<System.InvalidOperationException>` to be thrown, but no
-exception was thrown" at `UiThread_Tests.cs:150`. The build immediately preceding it
-(`p1-t3-build-before-fix.md`) was clean, so this is an assertion-level RED, not a compile error, and
-the sibling positive test passed in the same run, so it is not a harness failure.
+exception was thrown" at `UiThread_Tests.cs:150`. The sibling build (`p1-t3-build-before-fix.md`)
+recorded a clean `0 Error(s)` result over the same tree state; the two artifacts' recorded
+`Timestamp:` values do not establish their relative execution order, and the conclusion does not
+depend on the order because the sibling positive test passed in the same run. The failure is
+therefore an assertion-level RED rather than a compile error, and not a harness failure.
 `p3-t2-regression-green.md`: `Total tests: 2, Passed: 2`, TRX `failed="0"`.
 
 Cited evidence: `evidence/regression-testing/p1-t4-expect-fail.md`,
@@ -114,11 +116,11 @@ pass against the throwing accessor:
 `AddEntry_UseUiThreadTrue_DequeuesEntryAndSuppressesDispatcherException` (asserts only that nothing
 escapes the broad catch, with no type assertion) and `YieldAsync_WithoutDispatcher_RemainsStrict`.
 
-The amendment note on AC4 (round 15) is honest and correct: the criterion previously named four files
+The amendment note on AC4 (round 15) is accurate: the criterion previously named four files
 and carried a scope note asserting a regression in an unnamed fifth. Naming the fifth file and
-returning the criterion to unchecked until the pass-after evidence existed was the right call — the
-alternative would have left the repair with no criterion binding it and would have made the old scope
-note literally false once the repair landed.
+returning the criterion to unchecked until the pass-after evidence existed keeps the criterion
+binding — the alternative would have left the repair with no criterion binding it and would have
+made the old scope note literally false once the repair landed.
 
 ### AC5 — No retry, sleep, or timing tolerance anywhere in the diff — **PASS**
 
@@ -146,7 +148,7 @@ not a wall-clock wait.
 
 | Step | Command | Result | Artifact |
 |---|---|---|---|
-| 1. Format | `dotnet tool run csharpier format .` | exit 0, `Formatted 6 files`, identical before/after unscoped porcelain | `p4-t1-format.md` |
+| 1. Format | `dotnet tool run csharpier format UtilitiesCS/Threading/UiThread.cs UtilitiesCS.Test/Threading/UiThread_Tests.cs UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs "QuickFiler.Test/Helper Classes/EmailMoveMonitorTests.cs"` | exit 0, `Formatted 6 files`, identical before/after unscoped porcelain | `p4-t1-format.md` |
 | 2. Format check | `dotnet tool run csharpier check .` | exit 0, `Checked 1576 files`, empty reported set | `p4-t2-format-check.md` |
 | 3. Analyze | `msbuild ... /t:Rebuild ... /p:EnableNETAnalyzers=true /p:EnforceCodeStyleInBuild=true` | exit 0, `0 Warning(s)`, `0 Error(s)` | `p4-t3-analyzer-build.md` |
 | 4. Type-check | `msbuild ... /t:Rebuild ... /p:TreatWarningsAsErrors=true` | exit 0, `0 Warning(s)`, `0 Error(s)` | `p4-t4-nullable-build.md` |
@@ -269,7 +271,7 @@ Non-blocking items carried in the companion artifacts:
 
 **ACCEPT.** All seven acceptance criteria are delivered and verified against evidence. The fix
 addresses the reported defect at its structural root rather than its timing-dependent symptom, the
-regression test is deterministic by construction with a provable assertion-level fail-before, and the
+regression test is deterministic by construction with an assertion-level fail-before, and the
 public-API behaviour change is accompanied by a blast-radius census that this review independently
 reproduced and extended by one route (`using static`) the census had not enumerated.
 

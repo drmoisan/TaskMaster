@@ -45,8 +45,10 @@ Expected a <System.InvalidOperationException> to be thrown, but no exception was
 The failure is a runtime assertion failure at
 `UtilitiesCS.Test/Threading/UiThread_Tests.cs:line 150`, inside
 `FluentAssertions.Specialized.DelegateAssertions.Throw<TException>`. It is not a compile failure —
-P1-T3 recorded a clean `0 Error(s)` build immediately before this run — and it is not a harness
-failure, because the sibling positive test passed in the same run.
+P1-T3 recorded a clean `0 Error(s)` build over the same tree state; the two artifacts' recorded
+`Timestamp:` values do not establish their relative execution order, and the conclusion does not
+depend on that order because the sibling positive test passed in the same run — and it is not a
+harness failure, for that same reason.
 
 ### Passing test
 

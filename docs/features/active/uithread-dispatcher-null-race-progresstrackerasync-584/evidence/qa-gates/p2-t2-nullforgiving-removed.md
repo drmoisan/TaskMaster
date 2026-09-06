@@ -8,7 +8,12 @@ env -C <worktree-root> git grep -c -F "null!" -- UtilitiesCS/Threading/UiThread.
 env -C <worktree-root> git grep -n -F "private static Dispatcher? _dispatcher;" -- UtilitiesCS/Threading/UiThread.cs
 ```
 
-EXIT_CODE:
+EXIT_CODE: 0
+
+The field carries a single integer, which is this gate's normalized outcome. It is not a
+single process exit status: the gate ran several commands. Their individual exit codes are
+listed below and are unchanged from the original record.
+
 - command 1 — 1 (`git grep` exits 1 on zero matches)
 - command 2 — 0
 

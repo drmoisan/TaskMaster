@@ -9,7 +9,12 @@ env -C <worktree-root> git grep -n -F 'typeof(UiThread)' -- '*.cs'
 env -C <worktree-root> git grep -n -F '"Dispatcher"' -- '*.cs'
 ```
 
-EXIT_CODE:
+EXIT_CODE: 0
+
+The field carries a single integer, which is this gate's normalized outcome. It is not a
+single process exit status: the gate ran several commands. Their individual exit codes are
+listed below and are unchanged from the original record.
+
 - command 1 — 0
 - command 2 — 0
 - command 3 — 0

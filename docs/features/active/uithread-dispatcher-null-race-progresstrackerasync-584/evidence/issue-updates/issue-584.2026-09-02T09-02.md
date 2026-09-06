@@ -2,6 +2,13 @@
 
 Timestamp: 2026-09-03T22-24
 
+> **Filename note.** This file's name carries the plan's timestamp `2026-09-02T09-02`, while the
+> `Timestamp:` field above records the posting instant `2026-09-03T22-24`. The two differ. This file
+> is committed evidence, so it is deliberately neither renamed nor re-stamped: changing either
+> would rewrite a record of what was posted and when. A future update to issue #584 must use its own
+> posting timestamp in its filename, so that the two artifacts sort in posting order and cannot
+> collide on a shared name.
+
 PostedAs: comment
 
 Comment URL: https://github.com/drmoisan/TaskMaster/issues/584#issuecomment-5534846382

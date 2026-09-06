@@ -10,7 +10,9 @@ sed -n '135,170p' UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs
 cat -n UtilitiesCS.Test/Properties/AssemblyInfo.cs
 ```
 
-EXIT_CODE: 0 (all four commands)
+EXIT_CODE: 0
+
+The field carries a single integer. All four commands this task ran exited 0.
 
 ## Output Summary
 

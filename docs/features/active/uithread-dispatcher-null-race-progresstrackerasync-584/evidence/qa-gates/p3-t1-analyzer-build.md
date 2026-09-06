@@ -27,6 +27,8 @@ Time Elapsed 00:00:18.39
 ## Acceptance
 
 `EXIT_CODE: 0` and `0 Error(s)` — satisfied. The warning count of 0 is less than or equal to the
-baseline analyzer warning count of 0 recorded in P0-T8 — satisfied. This is the first build that
-compiles P1-T5's three attribute-only edits together with P2-T1's production fix, and it introduces
-no analyzer diagnostic.
+baseline analyzer warning count of 0 recorded in P0-T8 — satisfied. This build compiles P1-T5's
+three attribute-only edits together with P2-T1's production fix over the same tree state, and it
+introduces no analyzer diagnostic. The recorded `Timestamp:` values of this artifact and its
+siblings do not establish their relative execution order, and the conclusion does not depend on the
+order because the sibling positive test passed in the same run.
