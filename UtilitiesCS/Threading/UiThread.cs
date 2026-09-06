@@ -35,18 +35,7 @@ namespace UtilitiesCS
             _lockupAttributionThresholdMs = lockupAttributionThresholdMs;
             if (_loaded.CheckAndSetFirstCall)
             {
-                try
-                {
-                    Initialize();
-                }
-                catch
-                {
-                    // Re-arm the single-shot latch so a later caller can retry initialization.
-                    // This catch exists to restore the latch, not to absorb the failure: the
-                    // original exception is rethrown unchanged on the next line.
-                    _loaded = new ThreadSafeSingleShotGuard();
-                    throw;
-                }
+                Initialize();
             }
         }
 
