@@ -6,6 +6,16 @@ RE-ANCHORED BASE: 736c2cf2
 
 Timestamp: 2026-09-05T21-59
 
+Amended: 2026-09-06T00-15
+
+The amendment corrects the identification of this artifact's input document. It records both
+baseline collections with their own inputs and their own figures, states which of the two is
+authoritative and on what grounds, and states that the authoritative collection's output document is
+not present in this worktree. It does not change any recorded figure: the authoritative first-party
+counters remain 112355 lines covered and 26500 branches covered, and the counters a reader obtains
+from the retained document remain 112359 and 26496. The amendment is recorded under issue #782 and is
+the remediation of finding R4 of the feature review.
+
 ## Why the earlier figures are superseded
 
 An external actor rebased the feature branch from `a007f72e` onto `origin/main` at `77c6d314`
@@ -56,6 +66,21 @@ dotnet-coverage collect --output coverage\782-p0-baseline.cobertura.xml --output
     '/Blame:CollectHangDump;TestTimeout=5min;HangDumpType=None' `
     '/TestCaseFilter:TestCategory!=LiveOutlook&FullyQualifiedName!~HelperClasses.ShellUtilities_Tests&FullyQualifiedName!~HelperClasses.ShellUtilitiesStatic_Tests&FullyQualifiedName!~HelperClasses.SysImageListHelperTests&FullyQualifiedName!~EmailIntelligence.OSBrowser_Tests'
 ```
+
+**Amendment note on the input document named in the command above.** The `--output` argument
+`coverage\782-p0-baseline.cobertura.xml` is a relative path, so the recorded command run from this
+worktree root would have written or overwritten `coverage/782-p0-baseline.cobertura.xml` in this
+worktree. It did not. Task [P0-T6] of the issue #782 remediation records that file's last write time
+as `2026-09-05 19:26:55`, which precedes this artifact's `Timestamp: 2026-09-05T21-59`, and records
+its companion log `coverage/782-p0-cov.txt` carrying `Total tests: 6992` rather than the `6997`
+recorded at `evidence/baseline/p0-t6-vstest.md:71`. The test count is the discriminating observation
+rather than the file timestamp, because it is a value the run itself wrote inside the log, whereas a
+file timestamp is mutable filesystem metadata.
+
+The retained document is therefore the earlier, superseded collection's output rather than the
+re-measurement's. The re-measurement's own output document is not present in this worktree and
+is treated as not retained. The reason for its absence is not established by any record this
+artifact can cite, so no mechanism for it is asserted here.
 
 The derived configuration is the repo-root `coverage.config` with one
 `<ModulePath>.*\.Test\.dll$</ModulePath>` appended to `/Configuration/CodeCoverage/ModulePaths/Exclude`.
@@ -134,20 +159,41 @@ re-anchored base, so none is recorded here; the superseded per-package table is 
 because its rows sum to the superseded totals rather than to the re-measured ones. P7-T6 derives its
 per-package rows from the Phase 7 Cobertura document directly.
 
-### Superseded first-party figures, retained for audit and not current
+### The two baseline collections, their inputs, and which is authoritative
 
-| Figure | Superseded value | Re-measured value |
-|---|---|---|
-| `lines-covered` | 112359 | 112355 |
-| `lines-valid` | 132967 | 132967 |
-| line percentage | 84.50% | 84.50% |
-| `branches-covered` | 26496 | 26500 |
-| `branches-valid` | 33480 | 33480 |
-| branch percentage | 79.14% | 79.15% |
+Two coverage collections were taken for this delivery's Phase 0 baseline. Both are recorded here with
+their own input document and their own figures, so a reader who aggregates either document is not
+contradicted by this artifact.
 
-Those superseded figures were measured at the orphaned base `b95a5252` and are superseded for the
-reason stated at the head of this artifact. A Phase 7 comparison that reads either 112359 or 26496
-as its baseline side is invalid.
+```text
+BASELINE-AUTHORITATIVE-LINES-COVERED: 112355
+BASELINE-AUTHORITATIVE-BRANCHES-COVERED: 26500
+BASELINE-AUTHORITATIVE-OUTPUT-DOCUMENT: NOT-RETAINED
+RETAINED-DOCUMENT-PATH: coverage/782-p0-baseline.cobertura.xml
+RETAINED-DOCUMENT-LINES-COVERED: 112359
+RETAINED-DOCUMENT-BRANCHES-COVERED: 26496
+```
+
+| Collection | Base commit | `lines-covered` | `branches-covered` | Output document | Reproducible today |
+|---|---|---|---|---|---|
+| Re-measurement, authoritative | `736c2cf2` | 112355 | 26500 | NOT RETAINED | No |
+| Earlier collection, superseded | `b95a5252` | 112359 | 26496 | `coverage/782-p0-baseline.cobertura.xml` | Yes |
+
+The re-measured figures are authoritative as this branch's baseline because they were taken at the
+re-anchored base `736c2cf2`, which is this branch's actual base. The retained document's figures were
+taken at the orphaned base `b95a5252` that the head of this artifact names, which is no longer an
+ancestor of HEAD.
+
+The denominators are identical across the two collections — `lines-valid` 132967 and `branches-valid`
+33480 for both — which is the evidence that one counting selection produced both. The line percentage
+is 84.50% for both. The branch percentage is 79.14% for the earlier collection and 79.15% for the
+re-measurement.
+
+The figures 112359 and 26496 are the orphaned-base measurement. They are correctly not used as this
+branch's baseline side, and `evidence/qa-gates/p7-t7-changed-line-coverage.md` records at its
+"Condition 2" section that neither of them is used. They are nonetheless the two figures a reader
+obtains by aggregating the retained document, and they are recorded here for that reason rather than
+suppressed.
 
 ### Root all-modules figures — not re-measured, and not carried forward as a baseline
 
@@ -163,7 +209,71 @@ methods and must not be compared with each other.
 
 ### Test run
 
-The collected baseline run is the same nine-assembly, locally-filtered run recorded in
-`evidence/baseline/p0-t6-vstest.md`, which re-records `Total tests: 6997`, `Passed: 6997`,
-`Failed: 0`. These are locally-filtered figures with the four shell-icon classes excluded, not CI
-figures.
+Each recorded test count belongs to a specific collection, and the two counts are attached to their
+own collections here rather than presented as one figure.
+
+- **The re-anchored re-measurement**, whose figures this artifact records as authoritative,
+  corresponds to `Total tests: 6997`, `Passed: 6997`, `Failed: 0`, recorded in
+  `evidence/baseline/p0-t6-vstest.md`. Both collections ran the same nine assemblies with the same
+  local filter.
+- **The earlier, superseded collection**, whose output document is the retained
+  `coverage/782-p0-baseline.cobertura.xml`, corresponds to `Total tests: 6992`. That is the figure its
+  companion log `coverage/782-p0-cov.txt` carries, as measured by task [P0-T6] of the issue #782
+  remediation.
+
+The difference between 6992 and 6997 is the discriminating observation for which collection wrote the
+retained document, and it is independent of file timestamps.
+
+Both counts are locally-filtered figures with the four shell-icon classes excluded, and neither is a
+CI figure. CI runs those four classes and reports a larger total than either.
+
+### Reproducing these figures
+
+The `coverage/` directory is git-ignored by `.gitignore` at line 144, whose pattern `coverage/*`
+re-includes only `coverage/.gitkeep`. The retained `coverage/782-p0-baseline.cobertura.xml`
+is not committed evidence, and neither is any other document under that directory. A reader
+reproducing anything below must obtain or regenerate the document locally.
+
+#### The retained document's figures, 112359 and 26496
+
+Aggregate `coverage/782-p0-baseline.cobertura.xml` with the all-descendant selection this artifact
+pins under SD22:
+
+```powershell
+$CoberturaPath = 'coverage\782-p0-baseline.cobertura.xml'
+$doc = New-Object System.Xml.XmlDocument
+$doc.Load((Resolve-Path -LiteralPath $CoberturaPath).Path)
+$firstParty = @('Tags','ToDoModel','TaskVisualization','UtilitiesCS','QuickFiler','TaskTree','TaskMaster','SVGControl','VBFunctions')
+$lc = 0; $lv = 0; $bc = 0; $bv = 0
+foreach ($pkg in $doc.SelectNodes('/coverage/packages/package')) {
+    if ($firstParty -notcontains $pkg.GetAttribute('name')) { continue }
+    foreach ($ln in $pkg.SelectNodes('.//line')) {
+        $lv++
+        $h = $ln.GetAttribute('hits')
+        if ($h -and [int]$h -gt 0) { $lc++ }
+        $cc = $ln.GetAttribute('condition-coverage')
+        if ($cc -and $cc -match '\((\d+)/(\d+)\)') { $bc += [int]$Matches[1]; $bv += [int]$Matches[2] }
+    }
+}
+"LINES_COVERED=$lc LINES_VALID=$lv BRANCHES_COVERED=$bc BRANCHES_VALID=$bv"
+```
+
+It prints `LINES_COVERED=112359 LINES_VALID=132967 BRANCHES_COVERED=26496 BRANCHES_VALID=33480`.
+`GetAttribute` is used rather than property access so a `<line>` lacking an attribute yields an empty
+string instead of throwing under `Set-StrictMode`.
+
+#### The authoritative figures, 112355 and 26500
+
+No output document for the authoritative collection is present in this worktree. Reproducing its
+figures would require the whole procedure to be re-run:
+
+1. Restore the six Write Set files this artifact's "Measurement method" section names to their
+   `pre-782-base` content with `git checkout pre-782-base -- <those six paths>`.
+2. Run the collect command recorded above from the worktree root.
+3. Aggregate the written document with the snippet above.
+
+**That run is deliberately not performed.** It would mutate the delivered worktree for the duration
+of the collection, and its result would be a new third measurement rather than a confirmation of the
+recorded one, because a fresh collection is a fresh observation. The authoritative figures therefore
+remain unreproducible from any document available today, which is what
+`BASELINE-AUTHORITATIVE-OUTPUT-DOCUMENT: NOT-RETAINED` records.

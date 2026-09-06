@@ -164,8 +164,9 @@ After the change:
   `() => UtilitiesCS.UiThread.Dispatcher` (line 46).
 - The local `dispatcher is null` guard throws `InvalidOperationException(UiThread.DispatcherNotInitializedMessage)`.
 - **The domain-specific tail "before yielding folder tree work" is removed.** This loss is intended
-  (scope decision SD5) and is pinned by an acceptance criterion and by the C20 `WithMessage`
-  assertion, so a reviewer does not read it as a regression. Two facts bound the impact: the guard is
+  (scope decision SD5). AC10 records it, and the C20 assertion asserts the whole message against the
+  shared constant, so a tail appended at this throw site fails that assertion and a reviewer does not
+  read the removal as a regression. Two facts bound the impact: the guard is
   unreachable on the production path, because the production fallback provider throws from
   `UiThread.Dispatcher` first with the same message; and the guard therefore covers only injected
   providers, which are typed `Func<Dispatcher?>` and exist only in tests.
@@ -190,7 +191,7 @@ After the change:
 | File | Change (one line) | Findings |
 |---|---|---|
 | `UtilitiesCS.Test/TestHelpers/UiThreadDispatcherScope.cs` | **New.** The single `internal IDisposable` install scope for the `UiThread._dispatcher` static, holding the only reflection acquisition in the assembly. | C12, C13 |
-| `UtilitiesCS.Test/Threading/UiThread_Tests.cs` | 179 lines measured. Host the populated-branch sentinel on a dedicated STA thread with shutdown; move the field null guard into the helper and use expression-bodied throw lambdas; assert `*UiThread.Init()*`; migrate to the install scope; refresh the stale XML-doc prose at line 113. | C06, C10, C11, C12, C13 |
+| `UtilitiesCS.Test/Threading/UiThread_Tests.cs` | 179 lines measured. Host the populated-branch sentinel on a dedicated STA thread with shutdown; move the field null guard into the helper and use expression-bodied throw lambdas; assert the shared constant through `WithMessage(UiThread.DispatcherNotInitializedMessage)`; migrate to the install scope; refresh the stale XML-doc prose at line 113. | C06, C10, C11, C12, C13 |
 | `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs` | 514 lines measured. Split: this file keeps the class attributes as two separate lines and the first 17 tests plus `CapturingProgressTracker`, and becomes `public partial class`. Projected 271 lines. | C15, C16 |
 | `UtilitiesCS.Test/Threading/ProgressTracker_ReportAndViewerTests.cs` | **New.** The second partial part: the P74 region's 7 tests. Projected 260 lines. Its `_dispatcher` reflection site then migrates to the install scope, and the C26 synchronous sibling test is added here. | C12, C13, C16, C26 |
 | `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs` | 206 lines measured. Migrate the reflection site at lines 138-142 to the install scope; add the asynchronous C26 test. | C12, C13, C26 |
@@ -646,20 +647,32 @@ Every in-scope finding identifier, the file it changes, and the acceptance crite
       reference it, and no `InvalidOperationException` message literal for this precondition remains
       anywhere in `UtilitiesCS`. The `WpfDispatcherYield` message's former "before yielding folder
       tree work" tail is intentionally gone; that loss is recorded in this delivery's code-review
-      artifact as an accepted, reviewed change rather than a regression, and is pinned by the C20
-      `WithMessage` assertion in
-      `UtilitiesCS.Test/OutlookObjects/Folder/WpfDispatcherYieldTests.cs`. **Evidence:** a grep for
-      "before yielding folder tree work" returning zero hits in `UtilitiesCS`; a grep for
-      `UiThread.Initialize()` returning zero hits in any message literal or assertion; the passing
-      `WithMessage` assertion.
+      artifact as an accepted, reviewed change rather than a regression. The C20 assertion in
+      `UtilitiesCS.Test/OutlookObjects/Folder/WpfDispatcherYieldTests.cs` asserts the whole message
+      against the shared constant — `WithMessage(UiThread.DispatcherNotInitializedMessage)` — and
+      FluentAssertions treats `*` and `?` as its only wildcards, so a pattern containing neither is
+      compared against the entire message. Appending a caller-specific tail at the
+      `WpfDispatcherYield` throw site therefore fails that assertion, and appending one at the
+      `UiThread.Dispatcher` throw site fails the corresponding assertion in
+      `UtilitiesCS.Test/Threading/UiThread_Tests.cs`. Neither assertion detects an edit to the
+      constant's own wording, because an assertion written against the constant
+      moves with the constant. The one part of that wording a test does hold is the substring
+      `UiThread.Init()`, which `WpfDispatcherYieldTests.cs:196` asserts with
+      `Message.Should().Contain("UiThread.Init()")`. **Evidence:** a grep for "before yielding folder
+      tree work" returning zero hits in `UtilitiesCS`; a grep for `UiThread.Initialize()` returning
+      zero hits in any message literal or assertion; the passing `WithMessage` assertion; and the
+      falsification record under this feature's `evidence/regression-testing/` sub-path showing that
+      appending the removed tail at the `WpfDispatcherYield` throw site fails
+      `YieldAsync_WithoutDispatcher_RemainsStrict`.
 - [x] AC11: The test method `Dispatcher_WhenBackingFieldIsNull_ThrowsInvalidOperationExceptionNamingInitialize`
       in `UtilitiesCS.Test/Threading/UiThread_Tests.cs` retains that exact name while its assertion
-      changes to `*UiThread.Init()*`, and this delivery's code-review artifact records the residual
-      naming inaccuracy and the reason the name is retained: the fully-qualified name is quoted inside
-      a TestCaseFilter expression in a committed #584 regression-testing evidence artifact, and renaming would
-      make that recorded command resolve to zero tests (SD4). **Evidence:** a grep confirming the
-      method name is unchanged and the asserted wildcard is `*UiThread.Init()*`; the code-review
-      artifact entry.
+      asserts the shared constant — `WithMessage(UiThread.DispatcherNotInitializedMessage)`, and this
+      delivery's code-review artifact records the residual naming inaccuracy and the reason the name
+      is retained: the fully-qualified name is quoted inside a TestCaseFilter expression in a
+      committed #584 regression-testing evidence artifact, and renaming would make that recorded
+      command resolve to zero tests (SD4). **Evidence:** a grep confirming the method name is
+      unchanged and the asserted pattern is the constant reference
+      `WithMessage(UiThread.DispatcherNotInitializedMessage)`; the code-review artifact entry.
 - [x] AC12: Neither of the two items listed under "Items Requiring Re-derivation at Planning Time" is
       asserted in any artifact without a fresh derivation recorded in this delivery's evidence —
       specifically the #584 spec document's acceptance-criteria block state used by S3-6, and the two line

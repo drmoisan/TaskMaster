@@ -133,7 +133,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
                 .Invoking(item => item.YieldAsync(CancellationToken.None))
                 .Should()
                 .ThrowAsync<InvalidOperationException>()
-                .WithMessage("*UiThread.Init()*");
+                .WithMessage(UiThread.DispatcherNotInitializedMessage);
 
             threadProvider
                 .InvocationCount.Should()

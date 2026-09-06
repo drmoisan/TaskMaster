@@ -139,7 +139,9 @@ namespace UtilitiesCS.Test.Threading
                 Action act = () => _ = UiThread.Dispatcher;
 
                 // Assert
-                act.Should().Throw<InvalidOperationException>().WithMessage("*UiThread.Init()*");
+                act.Should()
+                    .Throw<InvalidOperationException>()
+                    .WithMessage(UiThread.DispatcherNotInitializedMessage);
             }
         }
 

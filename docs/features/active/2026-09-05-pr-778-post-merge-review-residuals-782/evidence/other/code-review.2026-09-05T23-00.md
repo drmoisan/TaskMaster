@@ -130,9 +130,17 @@ the other still satisfies it.
 The `WpfDispatcherYield` message's tail "before yielding folder tree work" is intentionally gone
 under SD5. Both throw sites now share the single `UiThread.DispatcherNotInitializedMessage`
 constant, whose text is domain-neutral and names no caller-specific operation. This is an accepted
-and reviewed change rather than a regression. It is pinned by the `WithMessage("*UiThread.Init()*")`
-assertion that P4-T3 added to `YieldAsync_WithoutDispatcher_RemainsStrict`, so a future edit that
-changed the constant's text would fail that test.
+and reviewed change rather than a regression. The assertion P4-T3 added to
+`YieldAsync_WithoutDispatcher_RemainsStrict` now reads
+`WithMessage(UiThread.DispatcherNotInitializedMessage)`. FluentAssertions treats `*` and `?` as its
+only wildcards, so that pattern is compared against the entire message and a caller-specific tail
+appended at this throw site fails the test. The wildcard form this entry previously cited,
+`WithMessage("*UiThread.Init()*")`, did not have that property: the pre-782 message also contained
+`UiThread.Init()`, so the wildcard matched it too. Neither this assertion nor its sibling in
+`UtilitiesCS.Test/Threading/UiThread_Tests.cs` detects an edit to the constant's own wording, because
+an assertion written against the constant moves with the constant; the only part of that wording a
+test holds is the substring `UiThread.Init()`, which `WpfDispatcherYieldTests.cs:196` asserts with
+`Message.Should().Contain("UiThread.Init()")`.
 
 ## (c) SD4 — a residual naming inaccuracy that is deliberately retained
 
