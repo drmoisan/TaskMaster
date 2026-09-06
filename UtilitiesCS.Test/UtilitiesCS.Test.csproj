@@ -475,6 +475,7 @@
     <Compile Include="Threading\AppGlobalsConverterTests_Unfinished.cs" />
     <Compile Include="Threading\ProgressPackage_Tests.cs" />
     <Compile Include="Threading\ProgressTracker_Tests.cs" />
+    <Compile Include="Threading\ProgressTracker_ReportAndViewerTests.cs" />
     <Compile Include="Threading\ProgressTrackerPane_Tests.cs" />
     <Compile Include="Threading\ProgressTrackerAsync_Tests.cs" />
     <Compile Include="Threading\TaskPriority_Tests.cs" />
