@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Re-verified 2026-08-28 (previously 2026-08-08, 2026-08-04; first recorded 2026-07-06): no `mcp__*`
+Re-verified 2026-09-06 (previously 2026-08-28, 2026-08-08, 2026-08-04; first recorded 2026-07-06): no `mcp__*`
 documentation-retrieval tool wired as a dependency in TaskMaster. The `human-exception-runbook` skill's sourcing rule is MCP-first, then
 web-second (`.claude/skills/human-exception-runbook/SKILL.md`), but the "MCP-first" clause is
 currently aspirational: there is no MCP tool that can be queried for third-party UI documentation
