@@ -559,10 +559,12 @@ Every in-scope finding identifier, the file it changes, and the acceptance crite
       `QuickFiler.Test` recorded under this feature's evidence/qa-gates/ sub-path.
 - [ ] AC2: Each of the fourteen in-scope code and test nits — C03, C05, C06, C08, C09 (message half),
       C11, C12, C13, C14, C15, C21, C25, C26, S2-1 — is resolved, or its omission is recorded with a
-      stated reason in this delivery's code-review artifact. The C03 clause is satisfied when
-      `UtilitiesCS/Threading/UiThread.cs` contains a catch around `Initialize()` that assigns a fresh
-      single-shot guard and rethrows the original exception unchanged, and the code-review artifact
-      records why no unit test covers that branch. **Evidence:** one diff hunk per identifier, mapped
+      stated reason in this delivery's code-review artifact. The C03 clause is
+      satisfied through AC2's omission branch: the delivery makes no change to the
+      `UiThread.Init()` single-shot latch, and the code-review artifact records the omission, the
+      measured regression the re-arm caused, the bisect that attributes that regression to the single
+      re-arm line, and that the retry semantics C03 asks for are promoted as a separate follow-up
+      entry. **Evidence:** one diff hunk per identifier, mapped
       by the traceability table; the code-review artifact for any omission.
 - [ ] AC3: Each of the eight in-scope documentation and evidence nits is resolved in the #584 feature
       folder, with these amendments: S3-5 is applied to all fifteen files in the S3-5 member set

@@ -36,7 +36,7 @@ namespace UtilitiesCS.Threading
             {
                 _progressViewer = new ProgressViewer
                 {
-                    UiDispatcher = UiThread.Dispatcher,
+                    UiDispatcher = UiDispatcher,
                     CancelSource = _cancelSource,
                 };
 

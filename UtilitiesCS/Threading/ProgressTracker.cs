@@ -36,7 +36,7 @@ namespace UtilitiesCS
             {
                 _progressViewer = new ProgressViewer
                 {
-                    UiDispatcher = UiThread.Dispatcher,
+                    UiDispatcher = UiDispatcher,
                     CancelSource = _cancelSource,
                 };
                 if (_screen != null)

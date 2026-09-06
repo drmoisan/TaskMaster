@@ -69,7 +69,7 @@ namespace TaskMaster
             }
 
             var dispatcher = UiThread.Dispatcher;
-            if (dispatcher != null && !dispatcher.CheckAccess())
+            if (!dispatcher.CheckAccess())
             {
                 dispatcher.Invoke(() =>
                     EngineCommandRefreshPlanner.InvalidateAll(ribbon.InvalidateControl)
@@ -112,7 +112,7 @@ namespace TaskMaster
             }
 
             var dispatcher = UiThread.Dispatcher;
-            if (dispatcher != null && !dispatcher.CheckAccess())
+            if (!dispatcher.CheckAccess())
             {
                 dispatcher.Invoke(() => ribbon.InvalidateControl(controlId));
                 return;

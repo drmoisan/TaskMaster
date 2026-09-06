@@ -149,7 +149,7 @@ namespace UtilitiesCS.Test.Threading
                 // Assert
                 act.Should()
                     .Throw<InvalidOperationException>()
-                    .WithMessage("*UiThread.Initialize()*");
+                    .WithMessage("*UiThread.Init()*");
             }
             finally
             {

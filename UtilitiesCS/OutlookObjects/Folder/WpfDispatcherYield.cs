@@ -54,16 +54,15 @@ namespace UtilitiesCS.OutlookObjects.Folder
             // service marshalled onto a captured dispatcher keeps yielding through that same
             // dispatcher. Only a worker thread with no dispatcher of its own falls back to the
             // process-global UI dispatcher, which is the case Dispatcher.Yield() could not serve.
-            // UiThread.Dispatcher is set-once state populated by UiThread.Init() and is null
-            // outside a live host, so that null state is surfaced as InvalidOperationException to
-            // preserve the strict contract callers relied on.
+            // The production fallback provider reads UiThread.Dispatcher, which throws
+            // InvalidOperationException directly when the dispatcher has not been captured. The
+            // local null guard below is therefore unreachable on the production path; it covers
+            // only injected providers, which are typed Func<Dispatcher?> and exist only in tests.
             Dispatcher? dispatcher =
                 _currentThreadDispatcherProvider() ?? _fallbackDispatcherProvider();
             if (dispatcher is null)
             {
-                throw new InvalidOperationException(
-                    "The UI dispatcher has not been captured. Call UiThread.Init() before yielding folder tree work."
-                );
+                throw new InvalidOperationException(UiThread.DispatcherNotInitializedMessage);
             }
 
             await dispatcher.InvokeAsync(

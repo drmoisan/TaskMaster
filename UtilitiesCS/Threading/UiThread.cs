@@ -35,7 +35,18 @@ namespace UtilitiesCS
             _lockupAttributionThresholdMs = lockupAttributionThresholdMs;
             if (_loaded.CheckAndSetFirstCall)
             {
-                Initialize();
+                try
+                {
+                    Initialize();
+                }
+                catch
+                {
+                    // Re-arm the single-shot latch so a later caller can retry initialization.
+                    // This catch exists to restore the latch, not to absorb the failure: the
+                    // original exception is rethrown unchanged on the next line.
+                    _loaded = new ThreadSafeSingleShotGuard();
+                    throw;
+                }
             }
         }
 
@@ -132,17 +143,40 @@ namespace UtilitiesCS
         }
         private static int _uiThreadId = -1;
 
+        internal const string DispatcherNotInitializedMessage =
+            "The UI dispatcher has not been captured. Call UiThread.Init() on the UI (STA) thread during host startup before reading UiThread.Dispatcher.";
+
+        /// <summary>
+        /// Gets the dispatcher captured from the UI (STA) thread during host startup.
+        /// </summary>
+        /// <remarks>
+        /// This accessor is deliberately not lazy. Unlike the sibling <see cref="UiSyncContext"/>
+        /// and <see cref="AutoScaleFactor"/> accessors, it does not call <see cref="Init"/> to
+        /// self-heal when the backing field is unset, because initialization has UI-thread
+        /// affinity and must be performed once by the host rather than by an arbitrary reader.
+        /// The contract is therefore strict: the caller must have completed startup
+        /// initialization before reading this property.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the dispatcher has not been captured, that is when <see cref="Init"/> has
+        /// not completed on the UI (STA) thread.
+        /// </exception>
         public static Dispatcher Dispatcher
         {
             get
             {
-                if (_dispatcher is null)
+                // Read the non-volatile static exactly once so the guard and the return value
+                // cannot observe different values if another thread completes Init() in between.
+                Dispatcher? captured = _dispatcher;
+                if (captured is null)
                 {
-                    throw new InvalidOperationException(
-                        "The UI dispatcher has not been captured. Call UiThread.Init() so that UiThread.Initialize() runs before reading UiThread.Dispatcher."
-                    );
+                    // Initialize() constructs and shows a hidden WinForms SyncContextForm, so it
+                    // has UI-thread affinity. A lazy Init() from an arbitrary reader is therefore
+                    // deliberately avoided here even though the sibling UiSyncContext and
+                    // AutoScaleFactor accessors do self-heal.
+                    throw new InvalidOperationException(DispatcherNotInitializedMessage);
                 }
-                return _dispatcher;
+                return captured;
             }
             private set => _dispatcher = value;
         }
