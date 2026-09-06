@@ -41,8 +41,9 @@ feature folder is archived. Observable outcomes:
 - The `UiThread.Dispatcher` getter reads its backing field once, carries XML documentation, and
   throws a single shared message that names only the public `Init()` entry point and states the
   UI-thread requirement.
-- `UiThread.Init()` can be retried after a failed `Initialize()`, so the remedy the message names is
-  actionable.
+- `UiThread.Init()` is unchanged. C03's retry-after-failure semantics are withdrawn from this
+  delivery and promoted as a separate follow-up entry. See AC2 and the `UiThread.Init()` subsection
+  of the Behavioral Contract.
 - All `UtilitiesCS.Test` manipulation of the `UiThread._dispatcher` static goes through one
   disposable install scope with one reflection acquisition.
 - No test file in the touched set exceeds the 500-line limit, and no test leaves an unshut dispatcher
@@ -114,24 +115,38 @@ the caller unchanged. The getter absorbs nothing and introduces no new catch.
 
 ### `UiThread.Init()`
 
-Signature, parameter names, and default values are unchanged.
+Signature, parameter names, default values, and method body are unchanged. `Init()` continues to
+gate `Initialize()` behind the single-shot latch (currently line 36,
+`if (_loaded.CheckAndSetFirstCall)`), with no `try`, no `catch`, and no reassignment of the latch
+field. The method is byte-identical to its `pre-782-base` form.
 
-Invariant: **a failed initialization must not permanently consume the single-shot latch.**
+**Finding C03 — re-arming the latch after a failed `Initialize()` so that a subsequent `Init()`
+retries initialization — is withdrawn from this delivery.** It is discharged through the omission
+branch AC2 carries, and the plan records the same disposition in its SD18 scope-decision row. Three
+measured facts support the withdrawal.
 
-- `Init()` continues to gate `Initialize()` behind the single-shot latch (currently line 36,
-  `if (_loaded.CheckAndSetFirstCall)`). The latch must continue to be checked and set **before**
-  `Initialize()` runs, so two concurrent callers cannot both enter `Initialize()`.
-- When `Initialize()` throws, `Init()` re-arms the latch by assigning a fresh
-  `ThreadSafeSingleShotGuard` to the backing field and rethrows the original exception unchanged, so
-  a subsequent `Init()` retries initialization (C03). The latch field is not `readonly` (currently
-  line 46), so reassignment is legal. The re-arm idiom already exists twice in the same assembly, in
-  UtilitiesCS/Threading/IdleActionQueue.cs and UtilitiesCS/Threading/ApplicationIdleTimer.cs.
-- The broad catch is permitted by the General Code Change Policy only because it immediately
-  rethrows. It must carry a comment stating that it exists to re-arm the latch, not to absorb the
-  failure.
-- No deterministic unit test covers this branch, because `Initialize()` shows a WinForms window and
-  cannot be forced to throw from a test without introducing a new production seam, which is out of
-  scope. The delivery's code-review artifact must record that reason. See AC2.
+- **The re-arm caused a reproducible test failure.** It was applied on the first execution attempt
+  and made
+  `UtilitiesCS.Test.Extensions.DictionaryExtensions_Tests.TryAddValuesAsync_UpdatesExistingValue`
+  fail. The executor bisected the failure to the single line
+  `_loaded = new ThreadSafeSingleShotGuard();` inside the catch: with that line, `UtilitiesCS.Test`
+  plus `TaskMaster.Test` returns 5179 of 5180 with that test failing at a 21-second duration;
+  without it, 5180 of 5180.
+- **The mechanism is the two lazy accessors.** The `UiSyncContext` getter and the `AutoScaleFactor`
+  getter each call `Init()` when their backing field is null, and `Initialize()` constructs a
+  `SyncContextForm` and calls `Show()` on it. Without the re-arm the latch stays set after a first
+  failure and every later `Init()` is a cheap no-op. With the re-arm, every subsequent read of
+  either lazy accessor retries the WinForms construction and throws again, which starves the thread
+  pool and defeats the 500 ms `CancelAfter` in UtilitiesCS/Extensions/DictionaryExtensions.cs.
+- **A sound implementation is out of scope.** It would require either making `Initialize()`
+  idempotent and cheap, or removing the implicit `Init()` call from the two lazy accessors. Both are
+  production behavior changes beyond this Refactor, and both are the same kind of change the issue
+  already carves out for the C09 behavioral half.
+
+The retry semantics C03 asks for are promoted as a separate follow-up entry. This delivery's
+code-review artifact records the omission, the measured regression, and the bisect that attributes
+it to the single re-arm line. See AC2.
+
 - `Init()` still performs no apartment-state check. Making it reject non-STA callers is out of scope
   and is promoted separately under AC8.
 
@@ -164,7 +179,7 @@ After the change:
 
 | File | Change (one line) | Findings |
 |---|---|---|
-| `UtilitiesCS/Threading/UiThread.cs` | 172 lines measured. Add the shared message constant, single-read getter, non-lazy comment, XML docs, and the `Initialize()` failure re-arm in `Init()`. | C02, C03, C05, C06, C08, C09-message, C20 |
+| `UtilitiesCS/Threading/UiThread.cs` | 172 lines measured. Add the shared message constant, single-read getter, non-lazy comment, and XML docs. `Init()` is not changed: C03's latch re-arm is withdrawn from this delivery, discharged through AC2's omission branch and the plan's SD18 row. See the `UiThread.Init()` subsection of the Behavioral Contract for the measured reason. | C02, C03, C05, C06, C08, C09-message, C20 |
 | `UtilitiesCS/OutlookObjects/Folder/WpfDispatcherYield.cs` | 77 lines measured. Correct the comment at lines 53-59 and route the single throw at lines 62-67 through the shared constant. | C20 |
 | `UtilitiesCS/Threading/ProgressTracker.cs` | Pass the captured `UiDispatcher` local (line 33) into the `Invoke` lambda instead of re-reading the static at line 39. The unrelated viewer-dispatcher read later in the same file is not changed. | C23 |
 | `UtilitiesCS/Threading/ProgressTrackerAsync.cs` | Pass the captured `UiDispatcher` local (line 33) into the `InvokeAsync` lambda instead of re-reading the static at line 39. | C23 |
@@ -515,7 +530,7 @@ Every in-scope finding identifier, the file it changes, and the acceptance crite
 |---|---|---|
 | C01 | `TaskMaster/Ribbon/RibbonViewer.EngineCommands.cs` | AC4 |
 | C02 | `UtilitiesCS/Threading/UiThread.cs` | AC1 |
-| C03 | `UtilitiesCS/Threading/UiThread.cs` | AC2 |
+| C03 | none — withdrawn from this delivery; `Init()` in `UtilitiesCS/Threading/UiThread.cs` is unchanged. See AC2 and the `UiThread.Init()` subsection of the Behavioral Contract. | AC2 |
 | C05 | `UtilitiesCS/Threading/UiThread.cs` | AC2 |
 | C06 | `UtilitiesCS/Threading/UiThread.cs`, `UtilitiesCS.Test/Threading/UiThread_Tests.cs` | AC2, AC10, AC11 |
 | C08 | `UtilitiesCS/Threading/UiThread.cs` | AC2 |
