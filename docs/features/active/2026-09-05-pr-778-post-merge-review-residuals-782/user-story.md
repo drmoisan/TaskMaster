@@ -70,8 +70,15 @@ Observable, in this order:
 
 ## Acceptance Criteria
 
-- [ ] AC-U1: One branch and one pull request deliver all in-scope findings; the pull request body
+- [x] AC-U1: One branch and one pull request deliver all in-scope findings; the pull request body
       maps every finding identifier to the file that changed or to the recorded reason it did not.
+      Satisfied by pull request #789, https://github.com/drmoisan/TaskMaster/pull/789, opened from
+      the single branch `refactor/pr-778-post-merge-review-residuals-782`. Its "What Changed"
+      section maps C01, C02, C05, C06, C08, C09, C10, C11, C12, C13, C14, C15, C16, C18, C19, C20,
+      C21, C23, C25, C26, S2-1 and S3-1 through S3-9 to the files that changed. Its "Follow-ups"
+      section records C03 as withdrawn with its measurement and its carrying issue, the C09
+      behavioural half as out of scope with its carrying issue, S4-1 and the S3-1 semantics request
+      as upstream items, and C04, C07, C17, C22, C24 and S4-2 as refuted and needing no action.
 - [x] AC-U2: The delivery introduces no production behavior change other than the text of the
       `InvalidOperationException` message, which is stated in the specification's Behavioral
       Contract. The retry-after-failed-initialization behavior of `UiThread.Init()` that this
