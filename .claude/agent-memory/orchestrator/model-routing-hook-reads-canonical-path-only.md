@@ -1,34 +1,70 @@
 ---
 name: model-routing-hook-reads-canonical-path-only
-description: enforce-model-routing-receipt.ps1 hardcodes artifacts/orchestration/orchestrator-state.json, so a child-scoped checkpoint alone will not unblock a delegation — mirror it
+description: enforce-model-routing-receipt.ps1 runs from the SESSION ROOT copy; in parallel/epic mode it resolves the item checkpoint only when the DELEGATION PROMPT carries Parallel mode + issue_num, else it silently reads a sibling's file
 metadata:
   type: project
 ---
 
 `.claude/hooks/enforce-model-routing-receipt.ps1` reads the checkpoint through
-`Get-ModelRoutingCheckpoint`, whose `$CheckpointPath` parameter **defaults to the literal
-`artifacts/orchestration/orchestrator-state.json`** and is never overridden by the hook entrypoint.
-It has no knowledge of a child-scoped checkpoint path. If `model_routing_receipts[]` exists only in
-`artifacts/orchestration/orchestrator-state.<feature>.json`, every delegation to a gated subagent
-(`atomic-planner`, `atomic-executor`, `feature-review`, `task-researcher`, `prd-feature`,
-`pr-author`) is denied with `MODEL_ROUTING_RECEIPT_BLOCKED`.
+`Get-ModelRoutingCheckpoint`, whose `$CheckpointPath` **defaults to the relative literal
+`artifacts/orchestration/orchestrator-state.json`**, resolved against the hook process cwd.
+Gated subagents: `atomic-planner`, `atomic-executor`, `feature-review`, `task-researcher`,
+`prd-feature`, `pr-author`.
 
-**Why:** this collides head-on with [[parallel-preparation-children-shared-worktree]], which
-prescribes a child-scoped checkpoint path precisely so concurrent siblings do not overwrite each
-other's canonical file. The two pieces of advice are both correct but incomplete on their own.
+## The three traps, in the order they bite (all verified 2026-09-03, item #733)
 
-**How to apply:** keep the child-scoped file authoritative (validate against it, record everything
-there), then `cp` it to `artifacts/orchestration/orchestrator-state.json` before the first
-delegation and after each routing-receipt change. Whether that is safe depends on the topology:
+**1. The hook that runs is the SESSION ROOT copy, not your worktree's copy.**
+Diagnosing by reading `<your-worktree>/.claude/hooks/enforce-model-routing-receipt.ps1` is
+misleading: that copy can lag the session root's. On #733 the worktree copy had no parallel
+resolution at all while the session-root copy had the full fix, so the worktree copy said
+"unfixable" and the executing hook said otherwise. **Always read
+`<SESSION-ROOT>/.claude/hooks/...` when diagnosing a hook block.**
 
-- **Isolated agent worktree** (`.claude/worktrees/agent-<id>/`, cwd == worktree): safe and required.
-  `artifacts/` is gitignored and the directory is exclusively yours, so the canonical file there is
-  not the shared one. Verified on the #512 preparation child (2026-08-10): `artifacts/orchestration/`
-  did not exist at all in the fresh agent worktree. See [[agent-worktree-hooks-resolve-to-agent-cwd]].
-- **Shared session worktree** (siblings in the same directory): mirroring races the siblings. Prefer
-  ordering the delegation so the mirror is written immediately before the Agent call, and do not
-  revert a sibling's later write to the canonical file.
+**2. Parallel/epic resolution keys off the DELEGATION PROMPT, not the checkpoint.**
+The fixed hook selects the run checkpoint from a literal `Parallel mode: true` or
+`Epic mode: true` marker **in the prompt text**, then locates the item in the run
+checkpoint's `items` (parallel) or `features` (epic) collection by feature-folder basename
+or issue number, and finally reads `<item-worktree>/artifacts/orchestration/orchestrator-state.json`.
+Put these at the TOP of every delegation prompt:
 
-Note the hook is presence-only — it checks that some `model_routing_receipts[]` entry has a matching
-`agent`, never the recorded `model`. The MCP validator with `require_model_routing: true` is the
-correctness gate. See [[orchestrator-state-flat-keys-and-enum]] for the receipt field set.
+```
+Parallel mode: true
+parallel_slug: <slug>
+issue_num: <N>
+Feature folder: docs/features/active/<folder>
+```
+
+Omit them and the hook falls through to the session-root default — **which is whatever
+sibling item currently owns that file.** On #733 that was sibling 729, so several
+`atomic-executor` delegations were admitted against *729's* receipts. The gate is
+presence-only (agent-name match, no item/phase/path binding), so this fails OPEN and looks
+like success. A delegation that "worked" proves nothing about your own receipt.
+
+**3. Invalid JSON is treated as ABSENT, silently.**
+`Get-ModelRoutingCheckpoint` wraps `ConvertFrom-Json` in try/catch and returns `$null` on
+failure — indistinguishable from a missing file. A single missing comma from a hand-`Edit`
+of the checkpoint therefore reads as "no receipt recorded" and blocks every gated
+delegation with a message that points at the receipt rather than at the syntax error.
+
+**How to apply:** after ANY hand-edit of `orchestrator-state.json`, validate it before the
+next delegation:
+
+```
+pwsh -NoProfile -Command '$j = Get-Content -LiteralPath <abs> -Raw | ConvertFrom-Json; "OK"'
+```
+
+Cheap, and it converts a confusing 3-round block into one command. Do this especially after
+appending to `delegation_receipts.agents[]`, which is the array most often extended by hand.
+
+**Diagnostic ladder when you see `MODEL_ROUTING_RECEIPT_BLOCKED`:** (a) does the error name
+your item worktree path? If it names no path, your prompt is missing the parallel markers.
+(b) If it names your path, validate the JSON. (c) Only then check whether the receipt is
+genuinely absent.
+
+Note the hook is presence-only — it never checks the recorded `model`. The MCP validator
+with `require_model_routing: true` is the correctness gate. See
+[[orchestrator-state-flat-keys-and-enum]] for the receipt field set,
+[[agent-worktree-hooks-resolve-to-agent-cwd]] and
+[[child-orchestrator-pr-hook-reads-session-root]] for the sibling cwd-resolution problems,
+and [[shared-checkpoint-read-modify-write-corrupts]] for why mirroring into the session-root
+file is the wrong repair in parallel mode.

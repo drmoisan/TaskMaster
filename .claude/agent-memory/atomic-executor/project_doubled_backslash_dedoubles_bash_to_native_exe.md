@@ -33,6 +33,22 @@ error.
   construction), contradicting the older blanket note in
   [[project_tool_layer_collapses_double_backslash_in_file_content]] for this case.
 
+**Reliable counting idiom when every escaping route fails.** Verifying a "letter-anchored
+absolute path" claim needed a count of drive-letter-plus-separator occurrences. Three routes
+failed in a row: the Grep tool with a quadrupled class returned `across 0 files`; a bash
+`grep -cE` with the same class reported `Trailing backslash`; and writing the pattern to a file
+with `printf '%s\n'` and using `grep -f` ALSO reported `Trailing backslash`, because the
+doubling was collapsed before bash ever saw the argument. What works is to remove backslashes
+from the problem entirely by translating them first:
+```
+tr '\\' '/' < "$f" | grep -cE '[A-Za-z]:/'          # drive-anchored count
+tr '\\' '~' < "$f" | grep -o ':~' | wc -l           # bare drive-root count, no URL false hits
+```
+`tr` receives a backslash whether or not the layer collapses `\\`, so the translation is
+order-independent. Use `~` (not `/`) when the file is Markdown, or every `https://` counts as a
+hit. This is the idiom to reach for whenever a preflight claim is stated in terms of Windows
+path separators.
+
 Related: [[project_unquoted_backslash_in_bash_arg_silently_redirects_output]],
 [[project_bash_heredoc_collapses_doubled_backslashes]],
 [[project_preflight_gate_literal_extract_from_plan_not_retype]]

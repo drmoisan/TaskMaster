@@ -57,3 +57,18 @@ not the full record.
   regression; `IsAltKeyCommand` left with zero compiled consumers deliberately; AC-15 manual validation
   deferred so the user-facing Alt+M outcome is unconfirmed. `quality-tiers.yml` does NOT exist at repo
   root, so no tier-dependent gate (property tests, mutation score) can be evaluated for any project.
+- **#729**: 21/21 AC PASS, 0 blocking, none unchecked. Post-729 baseline 0.853836/0.794529 (base
+  0.85386/0.794589). The interesting reviewing moves: (a) a `TimeProvider` seam had to be an explicit
+  **overload pair**, not an optional param — `WaitAsync` is a method group at
+  `StoreRehookCoordinator.cs:102` and an optional param removes the only candidate (CS0123); verify by
+  grepping call sites *and* by the zero-`CS0123` count in the analyzer log. (b) `condition-coverage`
+  moving `50% (1/2)` -> `100% (2/2)` on a null-conditional line proves a previously-unexercised null
+  branch is now deterministically taken — here it proved the pre-existing `timer?.Dispose()` leak path
+  in `NonBlockingDelay.cs:81` is now demonstrated by the suite (still pre-existing on base, char-for-char;
+  out-of-scope observation). (c) To falsify a "these are the only N classes that capture+restore+assert
+  on `Console.Out`" claim, intersect `grep -rln Console.SetOut` with `grep -rln StringWriter` and inspect
+  the intersection — the one-way `Console.SetOut(new DebugTextWriter())` initializer pattern is the noise
+  (23 of 28 files). Residuals, all doc-accuracy and non-blocking: `spec.md` Write Set heading claims
+  "every file this plan's diff creates" but lists only the 27 code entries of 81; two plan claims that
+  P8-T22 stages the #743 promotion record (it was committed in the branch's FIRST commit `3fc7fafe`);
+  P7-T9 writes no evidence artifact; AC18's wording doesn't cover the promoted record that AC16 mandates.

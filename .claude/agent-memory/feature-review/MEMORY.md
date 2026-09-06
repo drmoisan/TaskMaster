@@ -88,3 +88,14 @@
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no account/host names in artifacts; use `<repo-root>`/`<user>`/`<host>`; vstest TRX defaults to `<account>_<HOST>_<ts>.trx`, control `/ResultsDirectory:`
+- [don't trust "unreachable" on a coverage-escape set](feedback_dont-trust-the-unreachable-label-on-a-coverage-escape-set.md) — check each member of U against the BASELINE Cobertura; `hits>0` before means it was never unreachable
+- [565-review-residuals](project_565-review-residuals.md) — PASS/0, 6/6; a concurrent reviewer committed into the same worktree mid-audit with a future-dated ts
+- [584-review-residuals](project_584-review-residuals.md) — ACCEPT/0, 7/7; a public static has THREE read routes (qualified, reflective, `using static`) — census all three
+- [731-review-residuals](project_731-review-residuals.md) — PASS/0 blocking 19/19; caller's own deferral framing was wrong; CSharpier forces a blank line above an inserted comment
+- [735-review-residuals](project_735-review-residuals.md) — PASS/0, 24/25; latent `_primeTasks.TryRemove` outside `_primeGate`
+- [736-review-residuals](project_736-review-residuals.md) — PASS/0, 11 PASS + 2 PARTIAL of 13; D2 escape precondition true but U mislabelled; `Application.OpenForms` is app-domain-wide
+- [751-review-residuals](project_751-review-residuals.md) — PASS/0, 10/10; exactly-one-`.coverage` is unsatisfiable under `/InIsolation`; recover via `dotnet-coverage merge`
+- [const-string JS bridge files have zero Cobertura lines](project_const-string-js-bridge-files-zero-cobertura-lines.md) — #737: absence is correct signal for const-only assets, not a gap
+- [Pester counts commands, not lines](project_pester-line-coverage-node-appears-only-with-an-analyzable-command.md) — a line holding only an `-and` operand gets NO JaCoCo node; adding a call makes it appear covered (802->803 confirms)
+- [policy-audit-template MCP unavailable](project_policy-audit-template-mcp-unavailable-737.md) — #737: hand-author preserving the 12 canonical headings, don't mark fully BLOCKED
+- [YAML comment-only diff proof](project_yaml-comment-only-diff-proof-via-parse-tree.md) — a deeper-indented comment can fold into a plain scalar; prove via parse-tree compare, 2 parsers

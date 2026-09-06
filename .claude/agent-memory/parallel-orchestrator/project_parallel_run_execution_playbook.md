@@ -138,8 +138,8 @@ present were never ported. Discovering each gap mid-run costs a stall.
 - **`scripts/dev_tools/` does not exist in TaskMaster at all, so every mutation-engine function the
   `/parallel-add`, `/parallel-remove`, and `/parallel-close` skills name is unreachable by the path
   they cite.** `parallel_mutation_protocol.py`, `parallel_cohort_computation.py`, and the
-  `_parallel_mutation_models.py` helper live only in `C:/Users/DanMoisan/repos/drm-copilot`. Run them
-  from there with `python -c` after `sys.path.insert(0, r'C:/Users/DanMoisan/repos/drm-copilot')`,
+  `_parallel_mutation_models.py` helper live only in `<user-profile>/repos/drm-copilot`. Run them
+  from there with `python -c` after `sys.path.insert(0, r'<user-profile>/repos/drm-copilot')`,
   reading the checkpoint by absolute path out of the TaskMaster session worktree. Do not conclude the
   engine is missing and hand-roll the decision: the pure functions import and run correctly
   cross-repo, and hand-rolling loses the exact rejection type and its collected key tuple. Same
@@ -157,5 +157,22 @@ present were never ported. Discovering each gap mid-run costs a stall.
   close writes nothing at all — so a periodic retry is the right response to a single blocking item,
   never a workaround.
 - **Free the item branches before launching**; see [[free-item-branches-by-detaching]].
-- **`main` is unprotected**, so same-cohort merges need no `gh pr update-branch` re-green
-  cycle and may merge in any order.
+- **`main` IS protected and requires an up-to-date head, as of 2026-09-03.** This reverses the
+  earlier note here that called `main` unprotected and concluded that same-cohort merges need no
+  update-branch cycle. On run `bugs-2026-09-02`, `gh pr merge 745 --merge` was refused with "the
+  head branch is not up to date with the base branch" even though `origin/main` had not moved
+  since the run was seeded: the item branch had simply been cut before `687f15fb` and never
+  reconciled. Confirm with `git merge-base --is-ancestor <main-tip> <pr-head>`, which exits 1 when
+  the branch is behind.
+  - The remedy is the one the skill already prescribes: `gh pr update-branch <PR>`, wait for the
+    re-triggered checks to go green on the NEW head, then merge. Do not reach for `--admin` or
+    `--auto`: `--admin` bypasses the protection outright, and `--auto` returns control before the
+    merge is durable, so neither is a legitimate substitute for confirming green.
+  - **This serializes merges, and that is a throughput fact worth planning around.** Every merge
+    into `main` makes every other open item pull request out of date, so each item pays its own
+    update-branch plus full CI cycle immediately before merging, and two items cannot merge
+    concurrently. On a C# repository where the suite runs several minutes, the merge cycle — not
+    the cohort barrier — can become the rate limiter once several items are green at once.
+  - Re-confirm the check conclusion against the head that exists AFTER the update-branch. The
+    pre-update green is evidence about a commit that is no longer the head, which is the same
+    final-head requirement recorded in [[confirm-ci-by-conclusion-not-watch-exit-code]].

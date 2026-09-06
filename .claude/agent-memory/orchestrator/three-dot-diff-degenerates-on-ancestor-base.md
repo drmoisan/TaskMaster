@@ -29,6 +29,25 @@ failed for files the change never touched.
 - Re-measure the footprint yourself before asserting any footprint AC. A subagent's measurement can
   be taken at a different commit than the one you are certifying.
 
+**Re-derive the anchor at DELEGATION time, not once per run (added #735, 2026-09-03).** Having this
+memory did not prevent the error, because I applied it only to my own footprint gates. I briefed
+`feature-review` with `a679cd08...HEAD` — correct when execution started — and then merged
+`origin/main` a second time *before* the review ran. That merge made `a679cd08` an ancestor, so the
+anchor I had already handed over degenerated. Measured: **184** paths under the stale anchor versus
+**78** under the correct one, with 18 paths from two unrelated sibling items (#730, #733) that the
+reviewer would have billed to my change.
+
+The prompt text is frozen at the moment you send it; the repository is not. So:
+
+- Run `git merge-base <ANCHOR> HEAD` in the same turn as the delegation, not earlier in the run.
+- After ANY reconciliation merge, treat every anchor already quoted in a pending or future prompt as
+  invalid until re-derived. A merge invalidates prompts you have already written.
+- When main is fully merged into the branch, the simplest correct anchor for "what this PR shows" is
+  the two-dot `git diff <origin/main SHA> HEAD`. Prefer it over a three-dot form whose safety depends
+  on a divergence that your own merge just removed.
+- Correcting this mid-flight is expensive: there is no tool to message a running subagent, so the
+  correction starts a *second* agent. See [[agent-tool-cannot-course-correct-running-subagent]].
+
 This is distinct from [[stale-base-anchor-passes-ancestry-vacuously]], which is about an ancestry
 *check* passing vacuously. Here the ancestry is real and the *diff operator itself* collapses.
 Related: [[orchestrator-state-json-is-tracked-in-git]].

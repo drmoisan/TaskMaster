@@ -98,3 +98,19 @@
 
 ## Repo layout
 - [VS Code extension location](project_extension_location.md) · [Verify package.json before vsce work](feedback_vsce_verify_package_location.md) · [Repo root is source of truth for the codex bundle](feedback_repo_root_is_source_of_truth.md)
+- [[ExcludeFromCodeCoverage] is INVISIBLE, not 0%](excludefromcodecoverage-invisible-to-coverage-gates.md) — no Cobertura class element; per-file hits-row gates unsatisfiable. METHOD-level LEAKS: a lambda capturing `this` surfaces at 0 hits
+- [feature-review + `git -C` hangs forever](feature-review-git-c-form-hangs-unattended.md) — allow-list is only `git diff *`/`git log *`; near-miss forms prompt, never error. Ban Bash, paste the diff
+- [NEVER `cd X && ...` or grep/sed/cat via Bash](feedback_no_cd_or_non_allowlisted_bash_segments.md) — only `git *`, `pwsh *`, `poetry run *` + 3 lib scripts; EVERY `&&`/`|` segment must match; put the block in every subagent prompt
+- [Forward the planner's handoff records to preflight](forward-planner-handoff-records-to-preflight.md) — paste them in or they're reported missing
+- [A session may have NO Agent tool](orchestrator-session-may-lack-agent-tool.md) — block, never implement the plan yourself
+- [PowerShell batch budget caps plan helper scripts](powershell-batch-budget-caps-plan-helper-scripts.md) — pin one gitignored path
+- [Reading-only preflight cannot clear a plan](preflight-without-build-access-cannot-clear-a-plan.md) — 7 reading rounds missed a missing NuGet restore that halts on a FALSE diagnosis
+- [Pre-implementation gate reads a SIBLING's checkpoint](preimplementation-gate-reads-sibling-checkpoint.md) — relative path resolves to session root; a sibling's write blocks all your source writes
+- [Child cwd is the session root](preparation-child-cwd-is-session-root-not-item-worktree.md) — hooks read docs/ there; mirror the WHOLE folder. Execution mode too
+- [vstest emits TWO .coverage files per run](vstest-emits-two-coverage-files-per-run.md) — need a disambiguation rule, not a cardinality assertion
+- [CLAUDE.md nullable command != CI gate — RESOLVED by #540](project_claudemd_nullable_command_diverges_from_ci.md) — docs now match
+- [Swordfish epic F5 ScoDictionary blocker (RESOLVED)](project_swordfish_epic_f5_blocked_on_old_scodictionary.md) — grep the OLD class base
+- [Get-PlanPaths truncates spaced paths](get-planpaths-truncates-paths-containing-spaces.md) — `To Depricate/` enters the radius as `Depricate/FileIO2.cs`
+- [net48 nominal record DOES compile](net48-nominal-record-compiles-only-init-fails.md) — CORRECTION: only `init` (so positional/record struct) fails CS0518
+- [PowerShell batch budget is tracked + stale](powershell-batch-budget-is-tracked-and-carries-stale-paths.md) — a fresh worktree is at its .ps1 cap before you write one
+- [prd-feature hook blocks reused prep-worktree topology](prd-feature-hook-blocks-reused-prep-worktree-topology.md) — the hook resolves issue.md/checkpoint relative to the session cwd and cannot see a feature folder that exists only in a separate prep-NNN worktree

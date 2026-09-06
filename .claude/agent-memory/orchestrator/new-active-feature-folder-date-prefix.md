@@ -26,6 +26,14 @@ context:
   Swordfish `feature_folder` manifest values retain the date prefix, so the
   epic-planner back-fills the manifest to the full date-prefixed+issue folder name.
 
+**An ALREADY-prefixed `feature_name` is not double-prefixed (verified 2026-08-29, #647).**
+Passing `feature_name=2026-08-27-fileio2-write-retry-reports-success-on-final-failure` (the promoted
+potential's filename, which already carries a date) produced
+`2026-08-27-fileio2-write-retry-reports-success-on-final-failure-647` — the tool appended the issue
+number and left the existing prefix alone rather than prepending today's date. So when the promoted
+record's own name is the `${long-name}`, pass it verbatim; you do not need to strip the date first,
+and the resulting folder keeps the potential's ORIGINAL date, not the day the folder was created.
+
 **Why:** The canonical convention is the date-prefixed form for every active
 folder (a user previously flagged missing prefixes on epic children). The current
 tool now applies it automatically for both standalone and epic-child folders.

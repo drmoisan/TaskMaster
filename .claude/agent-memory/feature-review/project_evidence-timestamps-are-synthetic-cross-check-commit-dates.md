@@ -28,6 +28,16 @@ increments and are not observed clock readings. Three cheap falsifiers, in incre
    test, its stamp is a third-party wall-clock reading minutes after the final commit — at #663 the
    artifacts inside that very commit declared times up to 40 minutes *ahead* of it.
 
+6. **JaCoCo `<report name="Pester (MM/dd/yyyy HH:mm:ss)">` as an embedded writer clock (#752).** Every
+   Pester JaCoCo XML stamps its own wall time into the `name` attribute of the root `<report>` element,
+   on line 3. The executor does not author it, so it is a third-party reading of the exact moment the
+   run finished. At #752 the three committed XMLs read `11:55:15`, `12:06:34`, `12:09:54` while the
+   markdown artifacts wrapping them claimed `11-56`, `12-15`, `12-20` — the baseline matched but the
+   two post-change stamps were 9 and 10 minutes late. Cheapest possible check: `grep -n "report name="`
+   on each committed coverage XML. The same trick works on the untracked `artifacts/pester/*.xml`.
+   Corollary at #752: nine artifacts inside commit `eea3bb9b` (committed 12:14:51) declared `12-15`
+   through `12-29`, i.e. up to 14 minutes *after* the commit that contains them.
+
 **Why:** the stamps look plausible in isolation and are monotonic, so they pass a casual read. They
 matter because plan gates are often written as "this run's X equals the baseline's X," and ordering
 between gates is part of that claim.

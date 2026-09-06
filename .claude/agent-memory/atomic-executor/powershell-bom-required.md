@@ -9,6 +9,8 @@ When creating a new PowerShell file (e.g., `*.Tests.ps1`) in this repository, pr
 
 **Why:** PSScriptAnalyzer is configured to enforce `PSUseBOMForUnicodeEncodedFile`. This bit cycle 0 of issue #25 (one loop restart) and again cycle 1 (one loop restart). The Write tool produces UTF-8 without BOM by default on Windows.
 
+**Scope correction (measured 2026-09-03, issue #752):** the rule fires only on a file that actually contains non-ASCII bytes. A **pure-ASCII** new `.ps1` needs no BOM. All ten pre-existing files in `tests/scripts/vscode/` are `BOM=False NONASCII=0`, and a new pure-ASCII test file there drew zero PSSA diagnostics (16 before, 16 after, identical set). So: if the plan mandates pure ASCII, write it BOM-free and match the siblings; add the BOM only when the file genuinely needs a non-ASCII character. Do match the siblings' **CRLF** line endings, and note that `[System.IO.File]::ReadAllText/WriteAllBytes` ignore `Set-Location` — pass an absolute path or you silently operate on a same-named file in another worktree.
+
 **How to apply:** After Write-ing a new .ps1 file, run a one-shot BOM-prepend command before invoking `mcp__drm-copilot__run_poshqc_analyze`:
 
 ```powershell

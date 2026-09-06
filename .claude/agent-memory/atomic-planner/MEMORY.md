@@ -152,3 +152,12 @@
 ## Spec and artifact hygiene
 
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — use `<repo-root>` / `<user>` / `<host>`
+- [PowerShell batch budget caps plan-authored helpers](powershell-batch-budget-caps-plan-authored-helpers.md) — 3-path cap; mandate ONE fixed gitignored helper path
+- [#731 R6–R12](project_731_r6_coverage_runner_bypass_seams.md) — runner self-blocks in an agent worktree; porcelain and name-status are disjoint; edit a backslash-bearing line by replacing only its prefix; a CSharpier comment costs TWO insertions
+- [#751 R3](project_751_r3_detached_launch_seams.md) — detached launch: reset `$LASTEXITCODE`, sentinels 9001/9002, start-time-qualified pid poll, TRX witness, attempt cap; net-line band admits an added `using`
+- [#751 R2](project_751_sync_barrier_revision_seams.md) — research undercounts awaiting call sites (7 not 6); `nuget restore` for packages.config; numeric coverage from vstest `.coverage`
+- [#752](project_752_relative_path_anchor_plan_seams.md) — GetRelativePath has no leading separator, so the directed fix needs `(^|\\)`; formatter re-indents a fragment
+- [Two-run gates need a measured/confirming split](two-run-gates-need-a-measured-vs-confirming-split.md) — name one run measured; a non-gated scale figure still must be measured and proportionate
+- [Verify citations in the ASSIGNED worktree](verify-citations-in-the-assigned-worktree.md) — sibling session worktrees hold divergent copies of the same tracked file
+- [#647 R1–R2](project_647_fileio2_retry_plan_seams.md) — vstest needs explicit `/Settings:TaskMaster.runsettings`; ExpectedExitCode keys on THIS RUN not the baseline; staged diff blind by construction; permitted-set cardinality; one artifact per non-zero-capable gate
+- [SubagentStop hook line-anchored gotchas](validate-planner-output-hook-line-anchored-gotchas.md) — explicit-path check reads only a task's opening line; PLANNER-INTERNAL-REVIEW record must be in chat output too, plain-text, no trailing content after PASS

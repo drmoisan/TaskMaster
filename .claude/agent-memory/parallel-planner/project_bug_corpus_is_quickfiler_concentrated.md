@@ -1,55 +1,58 @@
 ---
 name: bug-corpus-is-quickfiler-concentrated
-description: TaskMaster's open-bug corpus is ~71% QuickFiler, so any large parallel run over "all bugs" is near-serial (measured 51 cohorts for 72 items, mean width 1.41) — the binding constraint is corpus composition, not the config defects
+description: TaskMaster's open-bug corpus was ~71% QuickFiler and near-serial; a 2026-09-02 consolidation sweep collapsed it from ~78 issues to 20 umbrella issues and broke the monopoly — always re-measure the histogram, and expect ~7 of any 20 to be upstream-owned or ordering-blocked
 metadata:
   type: project
 ---
 
-Measured 2026-08-21 on `main @ 7a9ba612` over the 72 open non-`.claude` bug issues. Re-measure
-before relying on the numbers; the conclusion about *composition* is the durable part.
+**2026-09-02 UPDATE — the corpus was consolidated and the headline conclusion below no longer
+holds.** A review sweep closed ~50 small bugs and refiled them as ten umbrella issues
+(#727-#737), taking the open `bug`-labelled corpus from ~78 to **20**. Each umbrella issue
+carries 1-7 enumerated defects with file-and-line citations in the body, so module assignment is
+readable directly from the issue text — no `git ls-files` class-name resolution needed, unlike the
+pre-consolidation corpus. The QuickFiler monopoly is gone: the 13 in-repo-implementable items
+spread across `QuickFiler`, `QuickFiler.Test`, `UtilitiesCS`, `UtilitiesCS.Test`, `TaskMaster`,
+`TaskMaster.Test`, `scripts/vscode`, `.github/workflows` and root docs, with a largest module
+clique of about 6 rather than 51.
 
-**The binding constraint on parallelizing TaskMaster bugs is what the bugs are about, not the
-blast-radius config.** 51 of 72 items (71%) target module `QuickFiler`. Every pair of them conflicts
-on `module_overlap`, so the cohort barrier serializes them:
+**The durable finding is the SHAPE of the exclusion set, not the numbers.** Of 20 open bugs on
+2026-09-02, seven were not parallel-plannable and they failed in three distinct ways worth
+checking for every time:
 
-- conflict density **53.4%** (1366 of 2556 pairs)
-- `compute-cohorts.sh` yields **51 cohorts for 72 items**, max width **6**, mean width **1.41**
-- module frequency: `QuickFiler` 51, `scripts/vscode` 11, `QuickFiler.Test` 6, `csproj/packages` 6,
-  `UtilitiesCS` 4, `TaskMaster` 4, `UtilitiesCS.Test` 2, `.github/workflows` 2
+1. **Wholly upstream (1).** #691's only fix site is `.claude/hooks/**`, mirrored at `.codex/hooks/`.
+   Both are push-down artifacts. See [[claude-files-are-pushdown-owned]] territory — an edit here is
+   silently overwritten.
+2. **Ordering-blocked (3).** #563 (coverage-threshold contradiction) must be settled before #561 and
+   #562 can gate against it, and #563 itself is half-upstream plus needs a maintainer number
+   decision. The parallel surface cannot express that; see
+   [[parallel-cannot-express-ordering]].
+3. **Mixed in-repo/upstream scope (3).** #727, #671 and #728 each have a real in-repo half and a
+   half that only push-down can fix. #727 additionally spanned QuickFiler + QuickFiler.Test +
+   UtilitiesCS + CLAUDE.md + coverage.config + docs, which would have made it adjacent to nearly
+   every other item.
 
-**Confirmed 2026-08-29 by the `bugs-638-644-647` run, at a scale small enough to audit by hand.**
-Three deliberately unrelated bugs — an `EmailFilerConfig` UI-thread crash, a `QfcCollectionController`
-registration mismatch, and a `FileIO2` retry defect in `UtilitiesCS` — still produced a COMPLETE
-conflict graph (all 3 pairs), hence 3 singleton cohorts and a fully serial run at
-`max_concurrency: 2`. Every pair carried a `module_overlap` on `QuickFiler` *in addition to* its
-path overlaps, so the serialization was genuine contention and not an artifact of the extractor's
-over-reporting. This is the useful diagnostic: when a pair conflicts, check whether it still
-conflicts after setting the spurious paths aside. Here it did. Thematic unrelatedness at the issue
-level does not imply blast-radius disjointness when one module dominates the corpus.
+That 20 - 1 - 3 - 3 = **13** is the set that is fully implementable inside the checkout, and it
+matched the count the operator asked for independently. When an operator's stated bug count is
+lower than `gh issue list --label bug` returns, the difference is usually this exclusion set rather
+than a miscount.
 
-`max_concurrency` is **inert** at this shape: 51 sequential cohort barriers, each requiring a full
-CI cycle plus PR merge before the next starts. Raising the cap changes nothing.
+**Two mandate-read traps specific to this corpus.** `config/blast-radius.json` lists
+`scripts/vscode/**` in `mandate_reads`, so an item that genuinely REWRITES the coverage tooling
+(#733, #565) has those paths dropped from its derived radius and the planner must hand-append them
+after normalization or the two items will be scheduled concurrently against the same file. The same
+applies to `.claude/agent-memory/**` for any item touching it. Separately, issue #576 is still open:
+`shared_surfaces` carries only six entries and none of TaskMaster's root build files
+(`TaskMaster.sln`, `Directory.Build.targets`, `coverage.config`, `.editorconfig`), so those fail
+OPEN and must also be hand-appended.
 
-**This contention is genuine, not spurious.** Unlike the config defects in
-[[parallel-surface-partial-port]], it cannot be fixed away. Even with `QuickFiler` removed from the
-module map, 51 items editing `QuickFiler/**` still contend on `QuickFiler/QuickFiler.csproj` and
-`QuickFiler.Test/QuickFiler.Test.csproj` compile entries whenever they add a test file, plus the
-shared controller and viewer sources. Deleting the module to widen cohorts would be exactly the
-radius manipulation the skill prohibits.
+**Still true from the 2026-08-21 measurement:** do not derive radii from issue bodies as a proxy for
+plan radii, and do not delete a module from the map to widen cohorts. Also still true: a hub item
+that touches five project trees at once (here, #730's `System.Reactive` suppression across five
+`packages.config` files) will contend with everything — direct the preparation child toward a
+single repository-root `Directory.Build.props` instead, in the delegation prompt, before it plans.
 
-**Maximum genuine parallel width is about 6-8 items** — roughly one per module family. A sensible
-parallel run over this corpus is single-digit, chosen one-per-family, not "all bugs".
-
-**Do not derive radii from issue bodies as a proxy for plan radii.** Attempted first and it
-under-reports severely: 40 of 72 issue bodies yielded only the feature-folder glob and zero modules,
-giving a false 9.4% density, because issue prose names target files without backticks. See
-[[blast-radius-extractor-mechanics]]. Recovering the real assignment required matching project
-directory names in the prose and resolving bare class names (`QfcItemController`, `ItemViewer`,
-`EmailMoveMonitor`) to their files with `git ls-files`.
-
-**How to apply:** when asked to fan out a large parallel run over TaskMaster bugs, measure the
-module histogram FIRST and report cohort depth before launching any preparation child. Preparing 72
-items costs 72 full orchestrator runs; discovering afterward that the run is 51 cohorts deep wastes
-all of it. Route the QuickFiler cluster to a serial queue or `/epic-plan`
-(see [[parallel-surface-cannot-express-ordering]]), and reserve `/parallel-plan` for a
-one-per-family subset.
+**How to apply:** measure the module histogram FIRST and report cohort depth before launching any
+preparation child; that guidance is unchanged and is what made the 2026-09-02 run viable at ~6
+cohorts rather than the 51 the pre-consolidation corpus would have produced. See
+[[blast-radius-extractor-mechanics]] for the backtick rule that governs whether derivation fires at
+all — instruct preparation children to write every write-target as a backticked concrete path.
