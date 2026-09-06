@@ -554,7 +554,7 @@ dotnet-coverage collect --output artifacts\csharp\coverage.xml --output-format c
 
 - [ ] [P3-T6] Record the toolchain loop closure into `<FEATURE>/evidence/qa-gates/p3-t6-loop-closure.md`, listing [P3-T1] through [P3-T5] in order with each artifact path and each recorded exit code, and stating whether any step failed or rewrote a file. Acceptance: the artifact records all five steps as passing in one uninterrupted pass, or, if any step failed or changed files, records the restart and the subsequent clean pass; the checklist box for this task stays unchecked until a clean pass is recorded.
 
-- [ ] [P3-T7] Write `<FEATURE>/evidence/qa-gates/p3-t7-changed-line-coverage.md` comparing coverage on the changed production lines. Restrict the comparison to the paths [P0-T12] reported as `MEASURABLE:`; for each path reported `UNMEASURABLE:`, record `CHANGED-LINE-COVERAGE: NOT MEASURABLE` with the `[ExcludeFromCodeCoverage]` citation (D1) and name the passing tests that exercise those changed lines as the substitute evidence. For each measurable path, derive the changed line numbers from the anchored `git diff --unified=0` in the command block below and record each changed line's `hits` value from `artifacts/csharp/coverage.xml`, using a de-duplicated per-line map that merges `./lines/line` with `./methods/method/lines/line` keyed by line number and resolved by maximum `hits`. Where a diff hunk's added and removed line counts are unequal, no one-to-one baseline mapping exists; record such lines as `baseline=none` and exclude them from the regression count rather than attributing borrowed coverage. The command block below enumerates the five paths D1 predicts to be measurable; [P0-T12]'s determination is authoritative, so if it reports a different measurable set, use that set and record the divergence in the artifact. Acceptance: every changed production line in the measurable set is recorded with a post-change `hits` value, the count of changed lines with `hits = 0` is stated, and the count of changed lines whose post-change `hits` is lower than their baseline `hits` is `0`.
+- [ ] [P3-T7] Write `<FEATURE>/evidence/qa-gates/p3-t7-changed-line-coverage.md` comparing coverage on the changed production lines. Restrict the comparison to the paths [P0-T12] reported as `MEASURABLE:`; for each path reported `UNMEASURABLE:`, record `CHANGED-LINE-COVERAGE: NOT MEASURABLE` with the `[ExcludeFromCodeCoverage]` citation (D1) and name the passing tests that exercise those changed lines as the substitute evidence. For each measurable path, derive the changed line numbers from the anchored `git diff --unified=0` in the command block below and record each changed line's `hits` value from `artifacts/csharp/coverage.xml`, using a de-duplicated per-line map that merges `./lines/line` with `./methods/method/lines/line` keyed by line number and resolved by maximum `hits`. Where a diff hunk's added and removed line counts are unequal, no one-to-one baseline mapping exists; record such lines as `baseline=none` and exclude them from the regression count rather than attributing borrowed coverage. A changed line carrying no `line` element in either branch of the merged map is non-executable — an XML doc comment, a blank line, a `using` directive, a brace, an enum member or an interface method declaration — and has no `hits` value to record. Record such lines as `hits=non-executable` and exclude them from both the `hits = 0` count and the regression count. `QuickFiler/Interfaces/IQfcDatamodel.cs` is the case where this reaches every changed line, because [P1-T1] adds only an enum member, an interface method declaration and XML docs to it, none of which emits IL; the file therefore yields no coverage datum even if [P0-T12] reports a class element for it. The command block below enumerates the five paths D1 predicts to be measurable; [P0-T12]'s determination is authoritative, so if it reports a different measurable set, use that set and record the divergence in the artifact. Acceptance: every changed production line in the measurable set is recorded with either a post-change `hits` value or the `hits=non-executable` marker; the count of changed lines with `hits = 0` is stated over executable lines only; and the count of changed lines whose post-change `hits` is lower than their baseline `hits` is `0`.
 
 ```powershell
 $BaseSha = (Select-String -Path 'docs/features/active/2026-09-06-quickfiler-high-confidence-cancel-teardown-and-deadline-defects-791/evidence/baseline/p0-t2-branch-commit.md' -CaseSensitive -Pattern '^BASE-SHA: ([0-9a-f]{40})$').Matches[0].Groups[1].Value
@@ -641,12 +641,40 @@ against the rules it enforces:
   have applied the category exclusion to only the first of the two class clauses. The reason is
   recorded in the task rather than left implicit.
 
+Round 3 (preflight revision, one defect). The changed region is [P3-T7] and its sibling region was
+re-derived in this pass:
+
+- `QuickFiler/Interfaces/IQfcDatamodel.cs` — re-read at 133 lines. The whole file is declarations and
+  documentation apart from `QfcDequeueBatch` at lines 49-81, whose constructor at lines 59-68 and
+  expression-bodied properties at lines 71, 77 and 80 are the only members that emit IL. Everything
+  [P1-T1] adds to the file — the `ScanCapReached` member inside the `QfcDequeueStop` enum at lines
+  30-40, the `QuiesceLoaderAsync` declaration on the interface at lines 83-132, and the XML docs
+  including the `DeadlineExpired` doc at lines 38-39 — is non-executable, so none of its changed lines
+  can carry a Cobertura `line` element. The file can still report a class element, because the struct
+  does, which is why the marker is keyed on the absence of a `line` element for the specific changed
+  line rather than on the file-level determination.
+- [P0-T12] re-checked: it reports one `MEASURABLE:`/`UNMEASURABLE:` line per production path from a
+  class-element count. That determination is file-level and remains correct; the new marker operates one
+  level below it, per changed line, and the two do not contradict.
+- D1 re-checked and left unchanged: it states that the two `QfcDatamodel` partials are excluded from
+  measurement by the type-level attribute. It makes no claim about `IQfcDatamodel.cs`, so the new
+  non-executable case neither extends nor invalidates it. The two mechanisms are distinct — an excluded
+  type versus a changed line that emits no IL — and are kept distinct in the plan text.
+- [P3-T8] re-checked: it consumes "the new/changed-code coverage determination from [P3-T7]" and states
+  no per-line count of its own, so the added marker does not reach it.
+- [P3-T14] and the AC4 `AC-MAPPING` entry re-checked: both cite the [P3-T7] artifact by path and assert
+  nothing about its internal counts.
+- Delta self-check: the inserted prose states a structural fact about Cobertura output and names the
+  file it reaches, in neutral language, and the replaced acceptance remains falsifiable — a changed
+  executable line with `hits = 0`, or a changed line whose post-change `hits` fell below its baseline,
+  still fails it.
+
 PLANNER-INTERNAL-REVIEW: PASS
 CITATION-TO-TREE: PASS
 AC-TRACEABILITY: PASS
 SCOPE-BOUNDARY: PASS
 CITATION: QuickFiler/Controllers/QfcStreamingDequeueConfidenceGate.cs | 262 lines; zero-acceptance deadline branch at lines 172-180; nine-parameter constructor at lines 111-125; DefaultFirstBatchDeadline at line 56; LogDeadlineExpiry at lines 242-250
-CITATION: QuickFiler/Interfaces/IQfcDatamodel.cs | 133 lines; enum QfcDequeueStop at lines 30-40 with DeadlineExpired at lines 38-39; interface IQfcDatamodel at lines 83-132
+CITATION: QuickFiler/Interfaces/IQfcDatamodel.cs | 133 lines; enum QfcDequeueStop at lines 30-40 with DeadlineExpired at lines 38-39; readonly struct QfcDequeueBatch at lines 49-81, whose constructor at lines 59-68 and expression-bodied properties at lines 71, 77 and 80 are the file's only IL-emitting members; interface IQfcDatamodel at lines 83-132, all declarations
 CITATION: QuickFiler/Controllers/QfcDatamodel.cs | 480 lines; [ExcludeFromCodeCoverage] at line 25; Cleanup() at lines 75-91; Worker_DoWork at lines 175-213; TryQueueRemainingMailItemAsync at lines 350-361
 CITATION: QuickFiler/Controllers/QfcDatamodel.QueueProcessing.cs | 298 lines; public partial class QfcDatamodel at line 12; _remainingLoadActive at line 23; pre-existing UndoMove() at lines 25-29 with throw new NotImplementedException(); at line 28; DefaultFirstBatchDeadline delegation at line 75; gate construction at lines 184-194 passing neither new bound
 CITATION: QuickFiler/Controllers/QfcFormController.EventHandlers.cs | 408 lines; ButtonCancel_Click at lines 70-82 with throw; at line 80; ActionCancelAsync at lines 84-94; completion-path cancel at line 208
@@ -688,4 +716,4 @@ AC-MAPPING: AC6 | IMPLEMENTATION: P2-T3 | TESTS: P1-T11, P3-T16 | EVIDENCE: <FEA
 UNRESOLVED-GAPS: NONE
 DIRECTIVE: PREFLIGHT VALIDATION ONLY
 PREFLIGHT: REQUESTED — validation-only preflight has NOT been run by this planner, because no atomic-executor delegation tool and no MCP plan validator are present in this planner's tool surface. The orchestrator must obtain one of the two exact signals, `PREFLIGHT: ALL CLEAR` or `PREFLIGHT: REVISIONS REQUIRED`, and a passing `mcp__drm-copilot__validate_orchestration_artifacts` run with `artifact_type: "plan"` before execution begins. This plan is not self-approved.
-CONVERGENCE: NO FURTHER ROUNDS EXPECTED — all twelve round-1 deltas are applied in place, each was re-derived against the current tree rather than accepted on report, and the three axes round 1 flagged as likely to recur are now closed: the self-created literals are quoted verbatim in plan prose outside their command spans, which is the G5 exoneration condition; the file-size ceiling is scoped to `.cs` so the 524-line project file no longer makes it unsatisfiable; and every `$vstest` and `$BaseSha` use now carries its binding inside its own command block, which is what kept the anchored diffs out of the ref-less G8 form.
+CONVERGENCE: NO FURTHER ROUNDS EXPECTED — the round-2 review verified all twelve round-1 deltas and both self-found corrections as applied and correct and reported one defect, which this round applies in [P3-T7] together with a re-derivation of its sibling region. The three axes round 1 flagged remain closed: the self-created literals are quoted verbatim in plan prose outside their command spans, which is the G5 exoneration condition; the file-size ceiling is scoped to `.cs` so the 524-line project file no longer makes it unsatisfiable; and every `$vstest` and `$BaseSha` use carries its binding inside its own command block, which keeps the anchored diffs out of the ref-less G8 form. The round-3 change is confined to one task's prose and acceptance and introduces no new command, no new artifact and no new assertion target.

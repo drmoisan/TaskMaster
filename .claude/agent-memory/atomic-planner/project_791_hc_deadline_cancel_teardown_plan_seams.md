@@ -150,5 +150,21 @@ things a read-only planning pass could have caught and did not):
 23. **An artifact must name one source for its figures.** [P0-T14] said "derived from the [P0-T10] TRX" while also
     supplying its own run; two sources for one number is a provenance defect even when both agree.
 
+Added on preflight revision round 2 (one defect, in the changed-line coverage gate):
+
+24. **A changed-line coverage gate must admit a non-executable outcome, or it is unsatisfiable for a
+    declaration-only edit.** Cobertura emits a `<line>` element only for a line carrying IL, so XML doc
+    comments, blank lines, `using` directives, braces, enum members and interface method declarations all
+    appear in a `git diff --unified=0` changed-line set and in neither branch of the merged
+    `./lines/line` + `./methods/method/lines/line` map. "Every changed line is recorded with a `hits`
+    value" therefore cannot be satisfied. Add a `hits=non-executable` marker and state the `hits = 0`
+    count over executable lines only. `QuickFiler/Interfaces/IQfcDatamodel.cs` is the worked case: its
+    only IL-emitting members are the `QfcDequeueBatch` constructor and three expression-bodied
+    properties (`:49-81`), so a change that adds an enum member, an interface declaration and XML docs
+    yields no coverage datum at all — while the file still reports a class element, because the struct
+    does. Key the marker on the absence of a `line` element for the specific changed line, not on the
+    file-level measurable determination. Distinct mechanism from item 1: an excluded type versus a
+    changed line that emits no IL. Related: [[deletion-adjusted-coverage-no-regression-gate]].
+
 Related: [[project-731-lifecycle-disposal-plan-seams]], [[project-781-excludefromcodecoverage-guard-plan-seams]],
 [[reference-vstest-scoped-run-command]], [[repo-wide-cobertura-line-rate-is-nondeterministic]].
