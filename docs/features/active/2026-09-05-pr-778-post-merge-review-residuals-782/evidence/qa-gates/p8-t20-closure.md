@@ -1,6 +1,6 @@
 # QA Gate — Closure Re-Verification After the Phase 8 Markdown Edits (P8-T20)
 
-Timestamp: 2026-09-05T23-21
+Timestamp: 2026-09-05T23-32
 
 Command:
 
@@ -26,10 +26,15 @@ EXIT_CODE: 0
 
 Output Summary:
 
+All acceptance conditions hold. The format check reproduces the Phase 7 count exactly, and the
+porcelain output is empty and therefore byte-identical to the recorded baseline image after the
+four-path subtraction. This artifact records the passing capture and retains the superseded failing
+capture below, so the history of the gate is auditable rather than overwritten.
+
 ## Format check — HOLDS
 
 ```text
-Checked 1583 files in 4398ms.
+Checked 1583 files in 4414ms.
 CHECK_EXIT_CODE=0
 ```
 
@@ -46,54 +51,30 @@ set and outside every MSBuild input.
 ## Porcelain output, verbatim
 
 ```text
- M .claude/agent-memory/atomic-planner/MEMORY.md
- M docs/features/active/2026-09-05-pr-778-post-merge-review-residuals-782/plan.2026-09-05T15-47.md
-?? .claude/agent-memory/atomic-planner/project_782_dispatcher_token_gate_seams.md
 ```
 
-## Subtracted comparison — DOES NOT HOLD
+Zero lines. `PORCELAIN_RAW_COUNT=0`.
+
+## Subtracted comparison — HOLDS
 
 The four subtracted paths are `plan.2026-09-05T15-47.md`, `spec.md`, `user-story.md`, and
-`evidence/baseline/phase0-instructions-read.md`, all under this feature folder.
+`evidence/baseline/phase0-instructions-read.md`, all under this feature folder. None of the four
+appears on either side of this capture, and a path absent from both sides is unaffected by being
+subtracted.
 
 | Side | Subtracted output |
 |---|---|
-| This task | 2 lines, both under `.claude/agent-memory/atomic-planner/` |
+| This task | 0 lines |
 | Baseline, from `evidence/baseline/p0-t2-base-ref.md` | 0 lines; the recorded baseline porcelain image is empty |
 
 ```text
-SUBTRACTED_COUNT=2
+SUBTRACTED_COUNT=0
 BASELINE_SUBTRACTED_COUNT=0
-BYTE_IDENTICAL=False
+BYTE_IDENTICAL=True
 ```
 
-**The two sides are not byte-identical, so this task is not marked complete.**
-
-### The two residual paths
-
-```text
- M .claude/agent-memory/atomic-planner/MEMORY.md
-?? .claude/agent-memory/atomic-planner/project_782_dispatcher_token_gate_seams.md
-```
-
-Both are the residue already recorded in `evidence/qa-gates/p6-t3-dotclaude-untouched.md`. Their
-last-write times are 2026-09-05 22:17:50 and 22:17:46, both by the atomic-planner agent, fifteen
-minutes before this executor's first commit `d5e192b3` at 22:32:36. The executor wrote no agent
-memory in this session: the most recently modified file under
-`.claude/agent-memory/atomic-executor/` is unchanged at 2026-09-05 20:38:11.
-
-### Why they appear on one side only
-
-This task's own text anticipates exactly this class of dirt: it states that comparing against the
-recorded baseline rather than demanding an empty output is required *because* `.claude/agent-memory/`
-is a tracked directory that a concurrent session can leave modified, and that an unconditional
-empty-porcelain demand would fail for a reason outside this delivery's control.
-
-The comparison nonetheless fails here, because the concurrent write landed **after** P0-T2 captured
-the baseline porcelain image and **before** this task captured the closing one. The residue is
-therefore present on the closing side and absent from the baseline side, and a two-sided comparison
-cannot cancel a one-sided term. The mechanism the task names is the one that occurred; only its
-timing differs from what the task assumed.
+The two sides are byte-identical. This delivery leaves the worktree in exactly the state it found
+it, apart from its own commits.
 
 ## The additional confirmation — HOLDS
 
@@ -101,19 +82,53 @@ timing differs from what the task assumed.
 WRITESET_OR_FEATURE_PATHS_IN_SUBTRACTED=0
 ```
 
-This task's own subtracted porcelain output contains **no path under the Write Set** and **no path
-under `docs/features/active/2026-09-05-pr-778-post-merge-review-residuals-782/`**. Every file this
-delivery created or modified is committed. The only uncommitted path inside the feature folder is
-this plan file, which is subtracted by the rule and which the executor modifies by the act of
-checking off the task that runs this gate.
+This task's own subtracted porcelain output contains no path under the Write Set and no path under
+`docs/features/active/2026-09-05-pr-778-post-merge-review-residuals-782/`. It contains no path at
+all. Every file this delivery created or modified is committed as of this capture, including the
+P6-T3 artifact and the plan file, which were committed in `7dfd259b` ahead of this task precisely
+because the P6-T3 artifact path is not a member of the four-path subtraction set and would otherwise
+have appeared here as an uncancelled feature-folder path.
+
+## Superseded record — the earlier failing capture and how it was cleared
+
+At the 2026-09-05T23-21 capture the format check and the Write-Set-absence confirmation held on the
+same values recorded above, but the byte-identity condition failed. The porcelain output then was:
+
+```text
+ M .claude/agent-memory/atomic-planner/MEMORY.md
+ M docs/features/active/2026-09-05-pr-778-post-merge-review-residuals-782/plan.2026-09-05T15-47.md
+?? .claude/agent-memory/atomic-planner/project_782_dispatcher_token_gate_seams.md
+```
+
+```text
+SUBTRACTED_COUNT=2
+BASELINE_SUBTRACTED_COUNT=0
+BYTE_IDENTICAL=False
+```
+
+The two residual paths are the residue recorded in
+`evidence/qa-gates/p6-t3-dotclaude-untouched.md`. Their last-write times are 2026-09-05 22:17:50 and
+22:17:46, both by the atomic-planner agent, fifteen minutes before this executor's first commit
+`d5e192b3` at 22:32:36. The executor wrote no agent memory in either session: the most recently
+modified file under `.claude/agent-memory/atomic-executor/` is unchanged at 2026-09-05 20:38:11.
+
+This task's own text anticipates this class of dirt: it states that comparing against the recorded
+baseline rather than demanding an empty output is required *because* `.claude/agent-memory/` is a
+tracked directory that a concurrent session can leave modified. The comparison nonetheless failed at
+that capture, because the concurrent write landed **after** P0-T2 captured the baseline porcelain
+image and **before** the closing one was captured. The residue was therefore present on the closing
+side and absent from the baseline side, and a two-sided comparison cannot cancel a one-sided term.
+The mechanism the task names is the one that occurred; only its timing differed from what the task
+assumed.
+
+The residue was left in place and reported to the caller, and was cleared **by the orchestrator, not
+by the executor**, with `git checkout -- .claude/` restoring the modified `MEMORY.md` and
+`git clean -fd .claude/` removing the untracked note. Both sides of the comparison are now empty and
+the one-sided term is gone.
 
 ## What this gate establishes
 
-It establishes that **this delivery leaves the worktree in exactly the state it found it, apart from
-its own commits**: the format check reproduces the Phase 7 count exactly, and the subtracted output
-carries no Write Set path and no feature-folder path.
-
-It does not establish that the worktree is globally clean, because two paths under
-`.claude/agent-memory/atomic-planner/` are dirty. That residue is attributable to another agent, is
-outside this delivery's scope, and is reported to the caller for disposition rather than committed,
-deleted, or reverted — each of which is prohibited by this plan or by the delegation brief.
+It establishes that this delivery leaves the worktree in exactly the state it found it, apart from
+its own commits: the format check reproduces the Phase 7 count exactly, the subtracted output is
+byte-identical to the recorded baseline, and the closing output carries no Write Set path and no
+feature-folder path.
