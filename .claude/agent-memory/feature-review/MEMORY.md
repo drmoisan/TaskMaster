@@ -10,7 +10,8 @@
 - [jacoco-summary-substitution-is-valid-coverage-evidence](project_jacoco-summary-substitution-is-valid-coverage-evidence.md) — committed evidence may be package-level JaCoCo; re-sum and corroborate counters, distrust sub-noise deltas
 - [csharp-local-fullsuite-coverage-blocked](project_csharp-local-fullsuite-coverage-blocked.md) — local full-assembly C# coverage fails on Moq binding redirect; repo-wide gate is the PR CI run
 - [csharp-repowide-coverage-below-80](project_csharp-repowide-coverage-below-80.md) — raw all-DLL merges read ~59-69% (vendor-inflated denominator); first-party figures clear the floor (#253: 91.22%)
-- [TaskMaster validator memories are cross-repo](project_taskmaster-validator-memories-are-cross-repo.md) — 9 heading/template memories describe mix-calculator/drm-copilot, not TaskMaster; the real gate is validate-feature-review-coverage.ps1
+- [Validator IS run — by the orchestrator](project_taskmaster-validator-memories-are-cross-repo.md) — CORRECTED at #781: canonical policy-audit template structure is mandatory on the FIRST draft
+- [Template `N/A - out of scope` vs hook narrowing regex](project_template-na-wording-vs-hook-narrowing-regex.md) — safe only for languages with ZERO changed files; simulate per-language before finalizing
 - [PowerShell line-count undercount](powershell-measure-object-line-undercount.md) — `Measure-Object -Line` undercounts vs `awk NR`/`wc -l`
 - [test files count toward 500-line limit](feedback_test-file-500-line-limit.md) — test file over 500 lines is FAIL-level even with passing ACs; compare baseline vs head counts
 - [koverage analyzer finding misattributed](project_koverage-analyzer-finding-misattributed.md) — the pre-existing PSUseSingularNouns in Invoke-MSTestWithCoverage.Helpers.ps1 is on Get-CoberturaLineConditionCoverageParts
@@ -70,6 +71,7 @@
 - [493-review-residuals + msbuild-log gate adjudication](project_493-review-residuals-and-msbuild-log-gate-adjudication.md) — PASS/0 blocking; an unsatisfiable msbuild-log byte-equality gate adjudicated without downgrading the AC
 - [680-review-residuals](project_680-review-residuals.md) — closed GO c3; leak class recurred 3x (TRX, plan draft, QA's own fresh vstest output); sanitize in-task every cycle
 - [677-review-residuals](project_677-review-residuals.md) — PASS/0 blocking; compile-red RED-first equivalence; 70.7% modified-file non-blocking
+- [781-review-residuals](project_781-review-residuals.md) — PASS/0 blocking; ItemViewer `[ExcludeFromCodeCoverage]` = 0 Cobertura classes; executor blamed the wrong package for a -2 line delta
 - [440-review-residuals](project_440-review-residuals.md) — PASS/0 blocking; a "corrected" defect-encoding test can be defect-NEUTRAL (check fail-before Totals)
 - [644-review-residuals](project_644-review-residuals.md) — all 3 cycles PASS/0 blocking; rejecting the caller's `.claude/agent-memory` diff exclusion found the only new defect
 - [647-review-residuals](project_647-review-residuals.md) — PASS/0 blocking, 21/21 AC; AC20 PASS-with-deviation on in-spec provisions
