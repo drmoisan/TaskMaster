@@ -13,7 +13,12 @@ The first two commands ran from the worktree root, as the first action of this t
 test run. The test command's flag set is identical to P0-T11's; the two differ only in the
 `/ResultsDirectory` value.
 
-EXIT_CODE:
+EXIT_CODE: 0
+
+The field carries a single integer, which is this gate's normalized outcome. It is not a
+single process exit status: the gate ran several commands. Their individual exit codes are
+listed below and are unchanged from the original record.
+
 - preservation conditional — 0
 - `grep -n -F 'Failed: 8' ...` — 0
 - `vstest.console.exe ...` — 0

@@ -8,7 +8,9 @@ cat -n UtilitiesCS/Threading/UiThread.cs
 wc -l UtilitiesCS/Threading/UiThread.cs
 ```
 
-EXIT_CODE: 0 (both commands)
+EXIT_CODE: 0
+
+The field carries a single integer. Both commands this task ran exited 0.
 
 ## Output Summary
 

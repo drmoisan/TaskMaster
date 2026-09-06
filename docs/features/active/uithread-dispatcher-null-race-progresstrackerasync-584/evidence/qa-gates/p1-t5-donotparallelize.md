@@ -8,7 +8,12 @@ env -C <worktree-root> git grep -l -F '"_dispatcher"' -- UtilitiesCS.Test
 env -C <worktree-root> git grep -c -F DoNotParallelize -- UtilitiesCS.Test/Threading/UiThread_Tests.cs UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs
 ```
 
-EXIT_CODE:
+EXIT_CODE: 0
+
+The field carries a single integer, which is this gate's normalized outcome. It is not a
+single process exit status: the gate ran several commands. Their individual exit codes are
+listed below and are unchanged from the original record.
+
 - command 1 — 0
 - command 2 — 0
 

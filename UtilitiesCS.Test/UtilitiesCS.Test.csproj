@@ -73,6 +73,7 @@
     <Compile Include="HelperClasses\NLogTraceWriter_Test.cs" />
     <Compile Include="TestHelpers\ManualFireInnerTimer.cs" />
     <Compile Include="TestHelpers\ManualFireTimerWrapper.cs" />
+    <Compile Include="TestHelpers\UiThreadDispatcherScope.cs" />
     <Compile Include="TestAssemblyInitializer.cs" />
     <Compile Include="NoLiveFormInTestAssemblyTests.cs" />
     <Compile Include="Dialogs\ActionButtonTests.cs" />
@@ -475,6 +476,7 @@
     <Compile Include="Threading\AppGlobalsConverterTests_Unfinished.cs" />
     <Compile Include="Threading\ProgressPackage_Tests.cs" />
     <Compile Include="Threading\ProgressTracker_Tests.cs" />
+    <Compile Include="Threading\ProgressTracker_ReportAndViewerTests.cs" />
     <Compile Include="Threading\ProgressTrackerPane_Tests.cs" />
     <Compile Include="Threading\ProgressTrackerAsync_Tests.cs" />
     <Compile Include="Threading\TaskPriority_Tests.cs" />

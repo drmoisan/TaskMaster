@@ -10,7 +10,12 @@ env -C <worktree-root> git diff --name-status --cached 87cb4df338322844abfa580ab
 env -C <worktree-root> git grep -n -F "UiDispatcher = UiThread.Dispatcher;" -- UtilitiesCS/Threading/ProgressTrackerAsync.cs
 ```
 
-EXIT_CODE:
+EXIT_CODE: 0
+
+The field carries a single integer, which is this gate's normalized outcome. It is not a
+single process exit status: the gate ran several commands. Their individual exit codes are
+listed below and are unchanged from the original record.
+
 - `git add -A` — 0
 - `git status --porcelain` — 0
 - `git diff --name-status --cached` — 0

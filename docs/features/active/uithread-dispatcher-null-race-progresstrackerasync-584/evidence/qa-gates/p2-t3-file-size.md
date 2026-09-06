@@ -39,7 +39,8 @@ That overage exists at BASE `87cb4df338322844abfa580abea14df77e738e5c`, where th
 514 lines — above the 500-line limit in `.claude/rules/general-code-change.md` — and it is not
 introduced by this change. P1-T5 added the attribute to that file by extending its existing attribute
 list on line 14 to `[TestClass, DoNotParallelize]` rather than by adding a line, so the post-change
-count is unchanged at 514, comfortably inside the baseline-plus-one tolerance. The tolerance exists
+count is unchanged at 514, which equals the baseline and is therefore within the baseline-plus-one
+tolerance. The tolerance exists
 only because P4-T1's `csharpier` pass may split that attribute list onto two lines; P4-T8 re-audits
 after the formatter has run.
 

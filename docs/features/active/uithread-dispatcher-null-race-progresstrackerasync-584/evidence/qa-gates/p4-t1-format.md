@@ -12,7 +12,12 @@ env -C <worktree-root> git status --porcelain
 The multi-path invocation was accepted by the pinned CSharpier 1.2.6 CLI, so the per-path fallback
 was not used and only three commands were run.
 
-EXIT_CODE:
+EXIT_CODE: 0
+
+The field carries a single integer, which is this gate's normalized outcome. It is not a
+single process exit status: the gate ran several commands. Their individual exit codes are
+listed below and are unchanged from the original record.
+
 - command 1 (`git status --porcelain`, before) — 0
 - command 2 (`dotnet tool run csharpier format ...`) — 0
 - command 3 (`git status --porcelain`, after) — 0

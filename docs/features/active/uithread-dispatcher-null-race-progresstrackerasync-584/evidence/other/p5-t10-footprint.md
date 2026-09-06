@@ -8,7 +8,12 @@ env -C <worktree-root> git diff --name-status 87cb4df338322844abfa580abea14df77e
 env -C <worktree-root> git status --porcelain -- UtilitiesCS UtilitiesCS.Test "QuickFiler.Test/Helper Classes/EmailMoveMonitorTests.cs" docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584
 ```
 
-EXIT_CODE:
+EXIT_CODE: 0
+
+The field carries a single integer, which is this gate's normalized outcome. It is not a
+single process exit status: the gate ran several commands. Their individual exit codes are
+listed below and are unchanged from the original record.
+
 - command 1 — 0
 - command 2 — 0
 

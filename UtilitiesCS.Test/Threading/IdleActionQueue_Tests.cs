@@ -22,8 +22,45 @@ namespace UtilitiesCS.Test.Threading
     ///     Each test calls ResetStaticState() to ensure isolation.
     /// </summary>
     [TestClass]
+    [DoNotParallelize]
     public class IdleActionQueue_Tests
     {
+        /// <summary>
+        /// Restores the process-global state this class mutates, after every test.
+        ///
+        /// Purpose:
+        ///     Draining the queue, replacing the subscribe guard, and cancelling the pending
+        ///     unsubscribe timer are delegated to the existing private helper rather than
+        ///     duplicated here. Detaching the idle handler is the additional step: the queue
+        ///     subscribes on first use and never unsubscribes until its delayed batch action
+        ///     fires, so without this a spent handler outlives the test that registered it.
+        ///
+        /// Side Effects:
+        ///     Detaching the last handler makes ApplicationIdleTimer stop its timer, which
+        ///     touches process-global System.Windows.Forms.Application.Idle state shared with
+        ///     IdleAsyncQueue_Tests and ApplicationIdleTimer_Tests. That shared reach is why the
+        ///     class carries [DoNotParallelize].
+        /// </summary>
+        [TestCleanup]
+        public void Cleanup()
+        {
+            ResetStaticState();
+
+            // The production handler is private, so the delegate instance that the queue
+            // registered cannot be named here. Rebuilding a delegate over the same static method
+            // yields an equal delegate, and delegate removal matches on equality rather than on
+            // reference identity.
+            var handler = (ApplicationIdleTimer.ApplicationIdleEventHandler)
+                Delegate.CreateDelegate(
+                    typeof(ApplicationIdleTimer.ApplicationIdleEventHandler),
+                    typeof(IdleActionQueue).GetMethod(
+                        "OnApplicationIdle",
+                        BindingFlags.NonPublic | BindingFlags.Static
+                    )
+                );
+            ApplicationIdleTimer.Unsubscribe(handler);
+        }
+
         #region Helpers
 
         /// <summary>

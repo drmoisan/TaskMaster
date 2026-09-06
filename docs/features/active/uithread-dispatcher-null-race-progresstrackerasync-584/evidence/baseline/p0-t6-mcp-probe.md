@@ -9,7 +9,14 @@ mcp__drm-copilot__validate_orchestration_artifacts
   artifact_path: "docs/features/active/uithread-dispatcher-null-race-progresstrackerasync-584/plan.2026-09-02T09-02.md"
 ```
 
-EXIT_CODE: non-zero (tool invocation error; no exit code is returned by the MCP transport)
+EXIT_CODE: 1
+ExpectedExitCode: 1
+
+No process ran for this probe. The integer above is a normalization, not an observed process exit
+status: the tool invocation returned an error, and
+no exit code is returned by the MCP transport.
+The declared expectation matches the recorded integer, so the collector normalizes the row to pass
+rather than reporting a failure that no process produced.
 
 ## Output Summary
 

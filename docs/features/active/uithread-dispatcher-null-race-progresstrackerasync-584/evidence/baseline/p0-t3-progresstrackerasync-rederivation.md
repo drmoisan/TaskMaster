@@ -9,7 +9,9 @@ sed -n '59,109p' UtilitiesCS/Threading/ProgressTrackerAsync.cs
 wc -l UtilitiesCS/Threading/ProgressTrackerAsync.cs
 ```
 
-EXIT_CODE: 0 (all three commands)
+EXIT_CODE: 0
+
+The field carries a single integer. All three commands this task ran exited 0.
 
 ## Output Summary
 

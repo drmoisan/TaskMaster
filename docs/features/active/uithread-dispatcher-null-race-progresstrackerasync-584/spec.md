@@ -4,7 +4,7 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-09-03
-- **Status:** Draft (amended in plan revision round 15: write set and AC4 extended to a sixth file;
+- **Status:** Merged (PR #778, merge commit 1c3b210c, 2026-09-04) (amended in plan revision round 15: write set and AC4 extended to a sixth file;
   amended in plan revision round 16: AC5 returned to unchecked pending the sixth file's token-filter
   artifact; amended in plan revision round 17 (preflight round 17 non-blocking findings N1-N4
   applied), of which finding N4 is the only one touching this file: AC5's Evidence line now states the
@@ -47,9 +47,12 @@
   helpers) and assert on `UiThread.Dispatcher`'s accessor contract directly.
 - Expected vs actual behavior: expected — a clear, explicit exception naming the missing
   `Initialize()` call. Actual (pre-fix) — the accessor returns `null` silently; the first
-  dereference downstream (`ProgressTrackerAsync.InitializeAsync()`, or any of ~40 other call sites
-  across `UtilitiesCS`, `QuickFiler`, and `TaskMaster` that read `UiThread.Dispatcher` without a
-  guard) throws an unattributed `NullReferenceException`.
+  dereference downstream (`ProgressTrackerAsync.InitializeAsync()`, or any of the other reads among
+  the 49 live reads across 25 production files, measured against the `pre-782-base` tag under issue
+  #782, with 64 textual occurrences across 30 files of which 15 are comments, XML documentation,
+  commented-out code, or the exception message literal, spread across `UtilitiesCS`, `QuickFiler`,
+  and `TaskMaster` and reading `UiThread.Dispatcher` without a guard) throws an unattributed
+  `NullReferenceException`.
 - Logs/screenshots/error snippets: `NullReferenceException` at
   UtilitiesCS/Threading/ProgressTrackerAsync.cs, line 35, on an STA thread, 793 ms into the failing run
   versus 191 ms in isolation (per the issue body).
@@ -67,11 +70,19 @@
     retargeted from the public property to the private `_dispatcher` backing field, matching the
     idiom the four other reflective consumers already use. Added to scope on 2026-09-03 after the
     full `QuickFiler.Test` run failed 8 of 1312 on this class; see Root Cause Analysis.
+  - `UtilitiesCS.Test/Threading/IdleAsyncQueue_Tests.cs` — a reflective consumer of the private
+    `_dispatcher` backing field, formatted and re-verified by the same toolchain pass.
+  - `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs` — a reflective consumer of the same
+    backing field, formatted and re-verified by the same toolchain pass.
+  - `UtilitiesCS.Test/Threading/ProgressTracker_Tests.cs` — a reflective consumer of the same
+    backing field, formatted and re-verified by the same toolchain pass.
 - Out of scope / non-goals:
   - UtilitiesCS/Threading/ProgressTrackerAsync.cs — verified not to require a change (see Root
     Cause Analysis). Named as a fix site to verify in the assignment, not assumed to need an edit.
-  - The injectable-seam conversion replacing ~62 remaining direct reads of `UiThread.Dispatcher`
-    across ~29 production files with the existing `IUiDispatcher` seam. Already identified and
+  - The injectable-seam conversion replacing the 49 live reads across 25 production files, measured
+    against the `pre-782-base` tag under issue #782, with 64 textual occurrences across 30 files of
+    which 15 are comments, XML documentation, commented-out code, or the exception message literal,
+    with the existing `IUiDispatcher` seam. Already identified and
     explicitly deferred on the issue's own comment thread as a multi-phase, multi-assembly refactor
     with no bounded blast radius.
   - Adding synchronization around `UtilitiesCS.Test/Threading/ProgressTrackerAsync_Tests.cs`'s
@@ -159,8 +170,9 @@ None. The fix is self-contained to `UiThread.cs`'s `Dispatcher` accessor.
 
 #### Files/modules to change
 
-- `UtilitiesCS/Threading/UiThread.cs`
-- `UtilitiesCS.Test/Threading/UiThread_Tests.cs` (new regression test class)
+See this document's `## Write Set` section, which is the single authoritative enumeration. This
+section deliberately carries no independent list: a third enumeration alongside the in-scope list
+and the Write Set is what allowed the three to disagree.
 
 #### Functions/classes/CLI commands impacted
 
@@ -169,7 +181,10 @@ None. The fix is self-contained to `UiThread.cs`'s `Dispatcher` accessor.
 #### Data flow and validation changes
 
 - The `Dispatcher` getter now validates its own backing field before returning, at the single
-  source, instead of relying on each of the ~40 call sites (or none) to guard independently.
+  source, instead of relying on each of the 49 live reads across 25 production files, measured
+  against the `pre-782-base` tag under issue #782, with 64 textual occurrences across 30 files of
+  which 15 are comments, XML documentation, commented-out code, or the exception message literal,
+  to guard independently (or on none of them doing so).
 
 #### Error handling and logging updates
 

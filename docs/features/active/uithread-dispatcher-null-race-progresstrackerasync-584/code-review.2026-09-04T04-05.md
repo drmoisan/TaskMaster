@@ -19,7 +19,7 @@ exception type and message shape match an idiom already established elsewhere in
 (`UtilitiesCS/OutlookObjects/Folder/WpfDispatcherYield.cs:62-66`), so the change increases internal
 consistency rather than introducing a new convention.
 
-Two aspects of the execution are worth naming specifically because they are stronger than typical:
+Two aspects of the execution are recorded here because they bear on the verdict:
 
 1. **The regression was found by the work, not by the reviewer.** The initial blast-radius census
    matched only the literal qualified expression `UiThread.Dispatcher` and therefore could not match
@@ -83,6 +83,20 @@ genuine test-isolation concern on a process-global static, of the same shape as 
 already worth fixing once (#493) in a different assembly.
 
 **Recommendation:** promote item 1 to a GitHub issue before merge.
+
+**Disposition, recorded under issue #782 (SD9).** Item 1 corresponds to #584 finding F5, which asks
+for synchronization around the existing unsynchronized reflective mutation of
+`UiThread._dispatcher`. It is
+discharged by C12 and C13
+in issue #782: all four `UtilitiesCS.Test` reflection sites migrate to a single shared
+`UiThreadDispatcherScope` install scope, which is the one place the mutation now occurs and which
+documents that serialization of writers is supplied by `[DoNotParallelize]` on every installing
+class. It is discharged by those two findings and
+not by C26,
+which adds a new test and changes no existing mutation; C26 is adjacent coverage rather than the
+discharging item. The
+follow-up was verifiably never promoted: at the time of the #782 review there was no potential entry
+and no active feature folder covering it, and both recommendations remained open.
 
 ### CR-3 — Asymmetric null guard on the reflection helper (Low, non-blocking)
 
@@ -188,7 +202,7 @@ a candidate for the same treatment in future work.
 | Separation of concerns | No I/O or UI added; the guard is pure. |
 | Error handling — fail fast | Correct. Named exception, actionable message identifying both the entry point (`UiThread.Init()`) and the initialiser (`UiThread.Initialize()`). |
 | Contracts enforced at access | The invariant previously stated only in a trailing comment is now enforced in code, and that comment is correctly deleted rather than left to rot. |
-| Comment *why*, not *what* | Exemplary at `EmailMoveMonitorTests.cs:33-37`: the comment records the causal chain (throwing getter -> `PropertyInfo.GetValue` -> `TargetInvocationException` in setup/teardown) and the reason field access is equivalent, which is exactly the information a future reader needs to avoid reverting the change. |
+| Comment *why*, not *what* | Satisfied at `EmailMoveMonitorTests.cs:33-37`: the comment records the causal chain (throwing getter -> `PropertyInfo.GetValue` -> `TargetInvocationException` in setup/teardown) and the reason field access is equivalent, which is exactly the information a future reader needs to avoid reverting the change. |
 | Public API compatibility | A behavioural break, correctly identified as such and called out in `spec.md` "Backward-compatibility expectations". Blast radius established across all three read routes (see policy-audit §8/B1). |
 
 ## 5. Test Quality Review

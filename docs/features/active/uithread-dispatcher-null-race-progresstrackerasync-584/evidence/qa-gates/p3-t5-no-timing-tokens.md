@@ -9,7 +9,13 @@ env -C <worktree-root> git diff 87cb4df338322844abfa580abea14df77e738e5c -- Util
 env -C <worktree-root> grep -E '^\+' TestResults/p3-t5-source.diff | grep -E -i 'Thread\.Sleep|Task\.Delay|SpinWait|Retry|retries|Timeout\(|PushFrame'
 ```
 
-EXIT_CODE:
+EXIT_CODE: 1
+ExpectedExitCode: 1
+
+The field carries a single integer, which is this gate's normalized outcome. It is not a
+single process exit status: the gate ran several commands. Their individual exit codes are
+listed below and are unchanged from the original record.
+
 - `mkdir -p TestResults` — 0
 - `git diff ... > TestResults/p3-t5-source.diff` — 0
 - the two-stage `grep` pipeline — 1 (the exit code of the second `grep`, which is what `grep`

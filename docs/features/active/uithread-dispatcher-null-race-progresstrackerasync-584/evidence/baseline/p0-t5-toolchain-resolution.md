@@ -27,7 +27,12 @@ env -C <worktree-root> dotnet-coverage --version
 ls -la "<resolved-vstest-dir-native>\vstest.console.exe"
 ```
 
-EXIT_CODE:
+EXIT_CODE: 0
+
+The field carries a single integer, which is this gate's normalized outcome. It is not a
+single process exit status: the gate ran several commands. Their individual exit codes are
+listed below and are unchanged from the original record.
+
 - `dotnet --version` — 0
 - `vswhere.exe ... -find ...` — 0
 - `msbuild.exe -version` — 0
