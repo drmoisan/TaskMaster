@@ -59,6 +59,7 @@
 - [banner-prefix-arity-662](project_banner_prefix_arity_662.md) — #662: AC2's decl regex contradicts AC5's aliasing remedy; the "must agree" assertion does NOT catch the widening (only the BeFalse line does); `/Tests:` and `/TestCaseFilter:` are mutually exclusive (2026-08-31)
 - [efc736-archiveroot-boundary-sink](project_efc736_archiveroot_boundary_sink.md) — #736: finding 6's cause is FALSE (#699 authoritative); keyboard path logs silently, no crash; 6 sink sites not 4; modal default sink would hang a live test (2026-09-02)
 - [qfc-lifecycle-disposal-731](project_qfc_lifecycle_disposal_731.md) — #731: sharing EmailMoveMonitor DROPS move actions; `volatile` = CS0420 build break; TWO dead ctor params; Cleanup() is UI-thread so no Task.Wait (2026-09-02)
+- [qfc791-deadline-and-cancel-teardown](project_qfc791_deadline_and_cancel_teardown.md) — #791: #424 AC:231/239 + #608 AC:184 ratified the empty-at-deadline result being superseded; item cap alone can't bound the pre-UI wait; gate ctor lookup fails closed (2026-09-06)
 
 ## Artifact hygiene
 - [Never embed absolute host paths](../_shared_no_absolute_host_paths.md) — no `C:\Users\<account>\...`, bare account, or machine name in ANY artifact; use `<repo-root>` / `<user-profile>` / `<user>` / `<host>`. vstest names TRX `<account>_<HOST>_<ts>.trx` by default, so control `/ResultsDirectory:` + `LogFileName=` or rename before citing.
