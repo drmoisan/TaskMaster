@@ -21,3 +21,17 @@ The `validate_policy_audit_artifact.py` validator (in `drm-copilot/scripts/dev_t
 **Confirmed on issue #197 R4 (2026-06-13):** the safest approach is to copy the prior passing cycle's exact 1.2.1 bullet wording and only swap the numbers. Two concrete gotchas observed:
 - A bullet written as `Baseline: 59.03% lines -> Post-change: 71.65% lines. Change: +12.62 pp lines.` (em-dash-arrow joining Baseline and Post-change on one segment, `pp` unit on Change) FAILED with `Policy audit missing per-language comparison line for C#`. Rewriting to the prior-cycle form `Baseline: 59.03% lines (38,820/65,768) -> Post-change: 71.65% lines (37,019/51,665). Change: +12.62% lines (...).` PASSED. Use `%` (not `pp`) and the parenthetical covered/valid counts.
 - `New/changed-code coverage: N/A - no new executable production code (...)` is ACCEPTED for an attribute/config/doc-only C# change (no numeric percent required) — the numeric-percent requirement in [[policy-audit-numeric-new-code-coverage]] applies only when the coverage-metrics table row's New Code Coverage cell is non-N/A.
+
+**Confirmed on issue #791 (2026-09-06), two more exact-shape gotchas, each one rejection cycle:**
+
+- The percent must be **immediately** followed by the sentence-ending period.
+  `New/changed-code coverage: 90.8% lines (119/131 executable changed lines covered, 0 regressions).`
+  FAILED with `missing numeric new/changed-code coverage for C#`; rewriting to
+  `New/changed-code coverage: 90.8%.` PASSED. Move any parenthetical or unit word into the `Evidence:`
+  clause or the prose paragraph below the bullets.
+- For a zero-file language the bullet must be the bare #781 five-field form and must **omit** the
+  `New/changed-code coverage:` field entirely:
+  `- PowerShell: Baseline: N/A. Post-change: N/A. Change: N/A. Disposition: N/A. Evidence: N/A - zero PowerShell files changed on this branch.`
+  Writing `Baseline: N/A - out of scope. ... New/changed-code coverage: N/A - out of scope.` FAILED
+  with `comparison line missing numeric baseline, post-change, and new/changed-code coverage`. This
+  form is also safer against the local coverage hook, because it drops `out of scope` from the bullet.
