@@ -191,15 +191,18 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Issue #446. A gate result produced by first-batch deadline expiry must be projected
-        /// through the datamodel as <c>QfcDequeueStop.DeadlineExpired</c> rather than folded into
-        /// the generic quantity-satisfied outcome, otherwise the caller cannot tell a
-        /// deadline-bounded empty batch from genuine exhaustion. Driven by
-        /// <see cref="FakeTimeProvider"/>: every score consumes one second of a three-second budget
-        /// and nothing qualifies, so the deadline exit is the one the gate takes.
+        /// Issue #446, retargeted by issue #791. The purpose is unchanged: a bounded empty gate
+        /// result must be projected through the datamodel verbatim rather than folded into the
+        /// generic quantity-satisfied outcome, otherwise the caller cannot tell a bounded empty
+        /// batch from genuine exhaustion. #791 made the first-batch deadline advisory, so the bound
+        /// this seam can reach is the zero-acceptance time ceiling, not the scan cap: the datamodel
+        /// constructs the gate at <c>QfcDatamodel.QueueProcessing.cs</c> without passing either new
+        /// bound, so the default cap of 250 is unreachable from a ten-item fixture that drains
+        /// first. Driven by <see cref="FakeTimeProvider"/>: every score consumes 61 seconds, so the
+        /// run origin passes the 120-second default ceiling at the third loop-top bound check.
         /// </summary>
         [TestMethod]
-        public async Task DequeueNextItemGroupWithOutcomeAsync_DeadlineExpiredGate_ReportsDeadlineExpiredStop()
+        public async Task DequeueNextItemGroupWithOutcomeAsync_ZeroAcceptanceCeilingGate_ReportsScanCapReachedStop()
         {
             // Arrange
             var model = CreateUninitializedDatamodel();
@@ -229,7 +232,9 @@ namespace QuickFiler.Controllers.Tests
                 )
                 .Returns(() =>
                 {
-                    fake.Advance(TimeSpan.FromSeconds(1));
+                    // Issue #791: 61 s per score carries the run origin past the 120 s default
+                    // zero-acceptance ceiling at the third loop-top bound check.
+                    fake.Advance(TimeSpan.FromSeconds(61));
                     return Task.FromResult((100L, string.Empty, (IFolderSearchHandler)null));
                 });
 
@@ -250,12 +255,12 @@ namespace QuickFiler.Controllers.Tests
             );
 
             // Assert
-            batch.Items.Should().BeEmpty("no candidate qualified before the deadline");
+            batch.Items.Should().BeEmpty("no candidate qualified before the bound");
             batch
                 .Stop.Should()
                 .Be(
-                    QfcDequeueStop.DeadlineExpired,
-                    "a deadline-bounded empty batch must not be reported as quantity satisfaction"
+                    QfcDequeueStop.ScanCapReached,
+                    "a bound-terminated empty batch must not be reported as quantity satisfaction"
                 );
         }
 

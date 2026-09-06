@@ -165,6 +165,10 @@
     <Compile Include="Controllers\QfcStreamingDequeueConfidenceGateTests.cs" />
     <Compile Include="Controllers\QfcStreamingDequeueConfidenceGateTests.Part2.cs" />
     <Compile Include="Controllers\QfcStreamingDequeueConfidenceGateTests.Part3.cs" />
+    <Compile Include="Controllers\QfcStreamingDequeueConfidenceGateTests.Part4.cs" />
+    <Compile Include="Controllers\QfcFormControllerCancelTeardownTests.cs" />
+    <Compile Include="Controllers\QfcHomeControllerCleanupTests.cs" />
+    <Compile Include="Controllers\QfcDatamodelTeardownTests.cs" />
     <Compile Include="Controllers\QfcHomeControllerIssue218Tests.cs" />
     <Compile Include="Controllers\QfcHomeControllerIterationTests.cs" />
     <Compile Include="Controllers\QfcHomeControllerMetricsTests.cs" />

@@ -55,6 +55,23 @@ namespace QuickFiler.Controllers
         /// </summary>
         internal static readonly TimeSpan DefaultFirstBatchDeadline = TimeSpan.FromSeconds(12);
 
+        /// <summary>
+        /// Issue #791. Cap on candidates scored without a single acceptance. One of the two hard
+        /// bounds that terminate the extended zero-acceptance scan after the first-batch deadline
+        /// became advisory. An implementation quality bound, not a user setting: it is exposed only
+        /// through the optional constructor parameter so tests can drive it deterministically, and
+        /// it introduces no settings surface, following the ratified #424 precedent.
+        /// </summary>
+        internal static readonly int DefaultMaxScanWithoutAcceptance = 250;
+
+        /// <summary>
+        /// Issue #791. Time ceiling on the extended zero-acceptance scan. The scan cap alone cannot
+        /// bound the pre-UI wait, because the empty-queue wait path does not increment the scanned
+        /// count while the loader is still refilling, so a time bound is required in addition. An
+        /// implementation quality bound with a constructor test seam and no settings surface.
+        /// </summary>
+        internal static readonly TimeSpan DefaultZeroAcceptanceCeiling = TimeSpan.FromSeconds(120);
+
         private readonly Func<MailItem> _tryTakeNext;
 
         // Issue #678: the loader publishes the handler its scoring pass initialised, so an accepted
@@ -108,6 +125,14 @@ namespace QuickFiler.Controllers
         /// <see langword="null"/> disables the sink. The drop-on-reject contract is unchanged: the
         /// candidate is still discarded and is still absent from the result.
         /// </param>
+        /// <param name="maxScanWithoutAcceptance">
+        /// Issue #791. Cap on candidates scored without a single acceptance.
+        /// <see langword="null"/> selects <see cref="DefaultMaxScanWithoutAcceptance"/>.
+        /// </param>
+        /// <param name="zeroAcceptanceCeiling">
+        /// Issue #791. Time ceiling on the extended zero-acceptance scan.
+        /// <see langword="null"/> selects <see cref="DefaultZeroAcceptanceCeiling"/>.
+        /// </param>
         internal QfcStreamingDequeueConfidenceGate(
             Func<MailItem> tryTakeNext,
             Func<
@@ -121,7 +146,9 @@ namespace QuickFiler.Controllers
             Func<bool> sourceActive,
             TimeSpan? firstBatchDeadline = null,
             Action<int, int, int> progressCallback = null,
-            Action<MailItem> onRejected = null
+            Action<MailItem> onRejected = null,
+            int? maxScanWithoutAcceptance = null,
+            TimeSpan? zeroAcceptanceCeiling = null
         )
         {
             _tryTakeNext = tryTakeNext ?? throw new ArgumentNullException(nameof(tryTakeNext));
@@ -144,7 +171,21 @@ namespace QuickFiler.Controllers
             }
 
             _firstBatchDeadline = deadline;
+            MaxScanWithoutAcceptance = maxScanWithoutAcceptance ?? DefaultMaxScanWithoutAcceptance;
+            ZeroAcceptanceCeiling = zeroAcceptanceCeiling ?? DefaultZeroAcceptanceCeiling;
         }
+
+        /// <summary>
+        /// Issue #791. The effective cap on candidates scored without an acceptance. Declared as a
+        /// get-only auto-property rather than a <c>private readonly</c> field so the seam is
+        /// warning-clean at every point of the change: a private field assigned and never read
+        /// raises CS0414, which <c>/p:TreatWarningsAsErrors=true</c> promotes to an error, whereas
+        /// an auto-property's compiler-generated backing field is read by its getter.
+        /// </summary>
+        internal int MaxScanWithoutAcceptance { get; }
+
+        /// <summary>Issue #791. The effective time ceiling on the extended zero-acceptance scan.</summary>
+        internal TimeSpan ZeroAcceptanceCeiling { get; }
 
         internal async Task<QfcGateBatch> DequeueAsync(
             int quantity,
@@ -153,6 +194,7 @@ namespace QuickFiler.Controllers
         )
         {
             token.ThrowIfCancellationRequested();
+            LogLaunch(quantity);
 
             var accepted = new List<QfcPreScoredItem>();
             int scanned = 0;
@@ -164,19 +206,38 @@ namespace QuickFiler.Controllers
             bool deadlineEnabled = _firstBatchDeadline != Timeout.InfiniteTimeSpan;
             long start = _timeProvider.GetTimestamp();
 
+            // Issue #791: the checkpoint interval is measured from its own origin, which is reset at
+            // every checkpoint, while both hard bounds are measured against the run origin. Sharing
+            // one origin would make the first checkpoint also the last, which is the superseded
+            // #424 behaviour.
+            long checkpointOrigin = start;
+
             bool alreadyWaitedForEmptySource = false;
             while (accepted.Count < quantity)
             {
                 token.ThrowIfCancellationRequested();
 
-                if (
-                    deadlineEnabled
-                    && accepted.Count == 0
-                    && _timeProvider.GetElapsedTime(start) >= _firstBatchDeadline
-                )
+                // Issue #791: the whole zero-acceptance policy stays inside the same
+                // `deadlineEnabled && accepted.Count == 0` guard the #424 deadline used, so
+                // Timeout.InfiniteTimeSpan still means "no bound at all" and a non-empty prefix is
+                // still governed by #608 fill-or-exhaust rather than by any bound.
+                if (deadlineEnabled && accepted.Count == 0)
                 {
-                    LogDeadlineExpiry(accepted.Count, scanned);
-                    return new QfcGateBatch(accepted, QfcDequeueStop.DeadlineExpired, scanned);
+                    TimeSpan elapsed = _timeProvider.GetElapsedTime(start);
+
+                    // The bounds are evaluated ahead of the take, so a bounded scan cannot consume
+                    // one extra candidate out of the master queue on its way out.
+                    if (scanned >= MaxScanWithoutAcceptance || elapsed >= ZeroAcceptanceCeiling)
+                    {
+                        LogScanBoundReached(accepted.Count, scanned, elapsed);
+                        return new QfcGateBatch(accepted, QfcDequeueStop.ScanCapReached, scanned);
+                    }
+
+                    if (_timeProvider.GetElapsedTime(checkpointOrigin) >= _firstBatchDeadline)
+                    {
+                        LogZeroAcceptanceCheckpoint(accepted.Count, scanned, elapsed);
+                        checkpointOrigin = _timeProvider.GetTimestamp();
+                    }
                 }
 
                 MailItem mailItem = _tryTakeNext();
@@ -239,11 +300,61 @@ namespace QuickFiler.Controllers
             return new QfcGateBatch(accepted, QfcDequeueStop.QuantitySatisfied, scanned);
         }
 
-        private void LogDeadlineExpiry(int acceptedCount, int scannedCount)
+        /// <summary>
+        /// Issue #791. One line per dequeue recording the cutoff in force, the requested quantity,
+        /// the checkpoint interval and both hard bounds, so an operator reading the log can tell
+        /// which configuration a run used instead of inferring it from the outcome. The reported
+        /// cutoff (900) was never logged before this change, which is why the field reports could
+        /// not be diagnosed.
+        /// </summary>
+        private void LogLaunch(int quantity)
         {
             string message =
-                $"First-batch deadline expired [QfcStreamingDequeueConfidenceGate.DequeueAsync] "
-                + $"Accepted={acceptedCount} Scanned={scannedCount} Deadline={_firstBatchDeadline}";
+                $"High-confidence dequeue launch [QfcStreamingDequeueConfidenceGate.DequeueAsync] "
+                + $"Cutoff={_cutoff} ({_cutoff / 1000.0}) Quantity={quantity} "
+                + $"CheckpointInterval={_firstBatchDeadline} ScanCap={MaxScanWithoutAcceptance} "
+                + $"Ceiling={ZeroAcceptanceCeiling}";
+
+            _debugLog?.Invoke(message);
+            logger.Debug(message);
+        }
+
+        /// <summary>
+        /// Issue #791. Replaces the #424 expiry line. The first-batch deadline is now an advisory
+        /// checkpoint, so this records a decision to continue rather than a bounded return, and
+        /// carries the remaining headroom on both bounds alongside the counts.
+        /// </summary>
+        private void LogZeroAcceptanceCheckpoint(
+            int acceptedCount,
+            int scannedCount,
+            TimeSpan elapsed
+        )
+        {
+            string message =
+                $"Zero-acceptance checkpoint [QfcStreamingDequeueConfidenceGate.DequeueAsync] "
+                + $"Accepted={acceptedCount} Scanned={scannedCount} Cutoff={_cutoff} "
+                + $"Elapsed={elapsed} Interval={_firstBatchDeadline} "
+                + $"RemainingScans={MaxScanWithoutAcceptance - scannedCount} "
+                + $"RemainingTime={ZeroAcceptanceCeiling - elapsed} Decision=continue";
+
+            _debugLog?.Invoke(message);
+            logger.Debug(message);
+        }
+
+        /// <summary>
+        /// Issue #791. The bounded zero-acceptance exit: which bound was reached, and the counts and
+        /// cutoff that produced it. This is the one case in which the gate may now return an empty
+        /// batch while candidates remain unscanned, so it is logged explicitly.
+        /// </summary>
+        private void LogScanBoundReached(int acceptedCount, int scannedCount, TimeSpan elapsed)
+        {
+            string bound =
+                scannedCount >= MaxScanWithoutAcceptance ? "scan-cap" : "zero-acceptance-ceiling";
+            string message =
+                $"Zero-acceptance scan bound reached [QfcStreamingDequeueConfidenceGate.DequeueAsync] "
+                + $"Accepted={acceptedCount} Scanned={scannedCount} Cutoff={_cutoff} "
+                + $"Elapsed={elapsed} ScanCap={MaxScanWithoutAcceptance} "
+                + $"Ceiling={ZeroAcceptanceCeiling} Bound={bound} Decision=stop";
 
             _debugLog?.Invoke(message);
             logger.Debug(message);

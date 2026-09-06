@@ -367,15 +367,42 @@ namespace QuickFiler.Controllers
             }
         }
 
+        /// <summary>Issue #791. Two guarded blocks under one <c>finally</c>, so the ribbon release callback runs whichever stage threw.</summary>
         public void Cleanup()
         {
-            _datamodel.Cleanup();
-            Globals = null;
-            _formViewer = null;
-            _explorerController = null;
-            _formController = null;
-            _keyboardHandler = null;
-            ParentCleanup.Invoke();
+            try
+            {
+                // Detach before the viewer reference is dropped, or the handler outlives it.
+                if (_formViewer?.Worker is BackgroundWorker worker)
+                {
+                    worker.RunWorkerCompleted -= Worker_RunWorkerCompleted;
+                }
+                logger.Debug("Home cleanup stage completed. Stage=detach-worker-completed");
+            }
+            catch (System.Exception e)
+            {
+                logger.Error("Home cleanup stage failed. Stage=detach-worker-completed", e);
+            }
+            try
+            {
+                _datamodel?.Cleanup();
+                _tokenSource?.Dispose();
+                Globals = null;
+                _formViewer = null;
+                _explorerController = null;
+                _formController = null;
+                _keyboardHandler = null;
+                logger.Debug("Home cleanup stage completed. Stage=datamodel-and-fields");
+            }
+            catch (System.Exception e)
+            {
+                logger.Error("Home cleanup stage failed. Stage=datamodel-and-fields", e);
+            }
+            finally
+            {
+                ParentCleanup?.Invoke();
+                logger.Info("Home cleanup complete; ribbon release callback invoked.");
+            }
         }
 
         private bool _loaded = false;

@@ -4,7 +4,7 @@
 - **Parent (optional):** none
 - **Owner:** drmoisan
 - **Last Updated:** 2026-09-06T12-57
-- **Status:** Ready for implementation
+- **Status:** Implemented
 - **Version:** 1.0
 - **Work Mode:** full-bug. This spec is the sole authoritative acceptance-criteria source. `user-story.md` in this folder is narrative operator context only and carries no criteria.
 
@@ -252,12 +252,23 @@ Toolchain commands to run, in this order, restarting from the first on any failu
 Manual validation steps: performed by a human per runbooks/live-outlook-cancel-teardown-verification.runbook.md; see Rollout & Follow-up.
 
 ## Acceptance Criteria
-- [ ] AC1: A High Confidence run that has found no item at or above the cutoff when the first-batch deadline expires continues scanning until the first acceptance, until the candidate queue is genuinely exhausted, or until a hard bound is reached (a cap on items scanned without acceptance, plus a time ceiling that bounds the wait while the background loader is still refilling). An empty dialog is permitted only on exhaustion or at the bound, and the bound decision is logged. The cutoff in effect and the scanned/accepted counts are logged at launch and at each deadline decision. Covered by deterministic MSTest regression tests using a fake time provider.
-- [ ] AC2: The Cancel teardown completes cleanly and in order: the background loader is stopped and awaited before any datamodel field is nulled; form and item keyboard handlers are unregistered before item rows are removed; the keyboard-active flag is reset; WebView2 focus is parked and any open breadcrumb dropdown is cancelled on the Cancel path; the ribbon release callback runs under a `finally`; and every stage, including any exception, is logged. Covered by deterministic MSTest regression tests. The live-Outlook confirmation (keyboard usable after Cancel, new log lines present, no null-`this` loader error) is a human follow-up performed per `runbooks/live-outlook-cancel-teardown-verification.runbook.md`, recorded as human-interaction exception HI-1, and does not gate the automated review.
-- [ ] AC3: Every regression test named in Test Strategy exists in the file listed for it and passes, and fail-before/pass-after evidence is recorded under this feature folder's evidence/regression-testing/ directory for at least DequeueAsync_ZeroAcceptedAtCheckpoint_ContinuesUntilFirstAcceptance and TryQueueRemainingMailItemAsync_AfterCleanupNulledFields_ReturnsFalseWithoutThrowing.
-- [ ] AC4: The C# toolchain passes in the CLAUDE.md order (csharpier format then check, the analyzer msbuild /t:Rebuild, the nullable msbuild /t:Rebuild, vstest with /EnableCodeCoverage) with no failures in the final pass; coverage XML is produced at artifacts/csharp/coverage.xml; and coverage on the changed files is at or above the policy target with no regression on changed lines.
-- [ ] AC5: The branch diff touches no file outside the Write Set, other than test files under QuickFiler.Test/Controllers and `<Compile Include>` entries in the QuickFiler project files; in particular QfcCollectionController.cs, QfcHomeController.Iteration.cs, RibbonController.cs, Settings.Designer.cs and AppQuickFilerSettings.cs are unmodified.
-- [ ] AC6: The superseded #424 criterion (spec.md:231 in the archived #424 feature folder) and the superseded #608 criterion (spec.md:184 in the active #608 feature folder) are both recorded as superseded in this spec, under Proposed Fix and under Data / API / Config Impact, and #446 AC-6 is verifiably preserved by an unmodified QfcHomeController.Iteration.cs.
+- [x] AC1: A High Confidence run that has found no item at or above the cutoff when the first-batch deadline expires continues scanning until the first acceptance, until the candidate queue is genuinely exhausted, or until a hard bound is reached (a cap on items scanned without acceptance, plus a time ceiling that bounds the wait while the background loader is still refilling). An empty dialog is permitted only on exhaustion or at the bound, and the bound decision is logged. The cutoff in effect and the scanned/accepted counts are logged at launch and at each deadline decision. Covered by deterministic MSTest regression tests using a fake time provider.
+  - Verified 2026-09-06T15-13. Fail-before: `evidence/regression-testing/p1-t16-gate-fail-before.md` (EXIT_CODE 1, 12 failures, including `DequeueAsync_ZeroAcceptedAtCheckpoint_ContinuesUntilFirstAcceptance` failing with an empty accepted collection). Pass-after: `evidence/regression-testing/p2-t14-pass-after.md` (EXIT_CODE 0, all 25 inventory tests `PASS-AFTER`). The zero-acceptance branch is now a checkpoint that logs and continues, bounded by `DefaultMaxScanWithoutAcceptance` (250) and `DefaultZeroAcceptanceCeiling` (120 s), reported as the new `QfcDequeueStop.ScanCapReached`; launch and checkpoint lines carry the cutoff, quantity, counts and both bounds.
+- [x] AC2: The Cancel teardown completes cleanly and in order: the background loader is stopped and awaited before any datamodel field is nulled; form and item keyboard handlers are unregistered before item rows are removed; the keyboard-active flag is reset; WebView2 focus is parked and any open breadcrumb dropdown is cancelled on the Cancel path; the ribbon release callback runs under a `finally`; and every stage, including any exception, is logged. Covered by deterministic MSTest regression tests. The live-Outlook confirmation (keyboard usable after Cancel, new log lines present, no null-`this` loader error) is a human follow-up performed per `runbooks/live-outlook-cancel-teardown-verification.runbook.md`, recorded as human-interaction exception HI-1, and does not gate the automated review.
+  - Verified 2026-09-06T15-13. Fail-before: `evidence/regression-testing/p1-t17-cancel-teardown-fail-before.md` (EXIT_CODE 1, 6 failures), `evidence/regression-testing/p1-t18-home-cleanup-fail-before.md` (EXIT_CODE 1, 2 failures), `evidence/regression-testing/p1-t19-datamodel-teardown-fail-before.md` (EXIT_CODE 1, 5 failures, including the reported `ArgumentException` "Delegate to an instance method cannot have null 'this'"). Pass-after: `evidence/regression-testing/p2-t14-pass-after.md` (EXIT_CODE 0, all 25 inventory tests `PASS-AFTER`). `ActionCancelAsync` now awaits `IQfcDatamodel.QuiesceLoaderAsync` before any field is nulled, unregisters navigation and form handlers before the rows are removed, resets the keyboard-active flag, calls the extracted `ParkFocusAndCancelSelectors()`, runs every stage through a logging `RunTeardownStage` helper, and reaches `Cleanup()` — and through it the ribbon release callback — under `finally`; `QfcHomeController.Cleanup()` does the same with two guarded blocks and disposes the token source.
+  - The live-Outlook confirmation (keyboard usable after Cancel, new log lines present, no null-`this` loader error) is human-interaction exception HI-1, performed by a human per `runbooks/live-outlook-cancel-teardown-verification.runbook.md`, recorded at `evidence/other/manual-verification.yyyy-MM-ddTHH-mm.md`, and does not gate the automated review. It is outstanding at check-off time and is listed in Rollout & Follow-up.
+- [x] AC3: Every regression test named in Test Strategy exists in the file listed for it and passes, and fail-before/pass-after evidence is recorded under this feature folder's evidence/regression-testing/ directory for at least DequeueAsync_ZeroAcceptedAtCheckpoint_ContinuesUntilFirstAcceptance and TryQueueRemainingMailItemAsync_AfterCleanupNulledFields_ReturnsFalseWithoutThrowing.
+  - Verified 2026-09-06T15-14 by `evidence/qa-gates/p3-t13-ac3-test-inventory.md`, which maps every Test Strategy test name to the file it now lives in and to its result in the [P2-T14] run: 26 names, 26 mapped to an existing file, 25 with a passing result, and the 26th being the RibbonController test Test Strategy explicitly does not propose. Both required fail-before/pass-after pairs are recorded: `evidence/regression-testing/p1-t16-gate-fail-before.md` with `evidence/regression-testing/p2-t14-pass-after.md`, and `evidence/regression-testing/p1-t19-datamodel-teardown-fail-before.md` with the same pass-after artifact.
+- [x] AC4: The C# toolchain passes in the CLAUDE.md order (csharpier format then check, the analyzer msbuild /t:Rebuild, the nullable msbuild /t:Rebuild, vstest with /EnableCodeCoverage) with no failures in the final pass; coverage XML is produced at artifacts/csharp/coverage.xml; and coverage on the changed files is at or above the policy target with no regression on changed lines.
+  - Verified 2026-09-06T15-15. Toolchain order and closure: `evidence/qa-gates/p3-t1-csharpier-format.md`, `p3-t2-csharpier-check.md` (exit 0, 1587 files), `p3-t3-msbuild-analyzers.md` (exit 0, 0 warnings, 0 errors), `p3-t4-msbuild-nullable.md` (exit 0, 0 warnings, 0 errors), `p3-t5-tests-coverage.md` (exit 0, 7023 passed, 0 failed), consolidated by `p3-t6-loop-closure.md`, which records one restart caused by the first format rewriting files and then five green steps in one uninterrupted pass.
+  - Coverage XML exists at `artifacts/csharp/coverage.xml` (`p3-t5-tests-coverage.md`). Changed-line coverage: `p3-t7-changed-line-coverage.md` — 131 executable changed lines, 12 with `hits = 0` (90.8 % covered, at or above the >= 90 % target for new and changed code), 0 lines with a coverage regression. Repository-wide delta: `p3-t8-coverage-delta.md` — first-party line coverage 84.50 % to 84.51 %, branch coverage 79.14 % to 79.19 %; neither decreased.
+  - Collector substitution (D13): the run uses `dotnet-coverage collect --output-format cobertura -- <vstest> ...` rather than `vstest /EnableCodeCoverage`. `/EnableCodeCoverage` writes a binary `.coverage` file, not the Cobertura XML this criterion also requires, and the two collectors conflict when combined. The same `vstest.console.exe`, assemblies and switches are used inside the wrapper, so the substantive requirement is met. Recorded as a deviation under Rollout & Follow-up.
+- [x] AC5: The branch diff touches no file outside the Write Set, other than test files under QuickFiler.Test/Controllers and `<Compile Include>` entries in the QuickFiler project files; in particular QfcCollectionController.cs, QfcHomeController.Iteration.cs, RibbonController.cs, Settings.Designer.cs and AppQuickFilerSettings.cs are unmodified.
+  - Verified 2026-09-06T15-15 by `evidence/qa-gates/p3-t10-scope-boundary.md`, which lists the anchored `git diff --name-only` and the `git status --porcelain --untracked-files=all` outputs side by side (neither alone is correct in both states) and finds the same 17 paths in each: the seven Write Set production paths, four new and five modified test paths under QuickFiler.Test/Controllers, and QuickFiler.Test/QuickFiler.Test.csproj with four `<Compile Include>` entries. QuickFiler/QuickFiler.csproj is unchanged because the implementation introduces no new production file. None of the five named exclusions appears in either output; QfcHomeController.Iteration.cs was additionally verified unmodified by its own path-scoped diff and porcelain pair in [P2-T3].
+  - Evaluation scope (plan rule R7): this criterion is evaluated over the source pathspec `'*.cs' '*.csproj'`. Read literally over the whole tree it is unsatisfiable, because delivering this fix requires writing evidence artifacts under evidence/ and checking these AC boxes in this file. The narrower pathspec is the footprint the Write Set actually describes, and it is recorded here rather than left implicit so it is not read as an unstated relaxation. Outside that pathspec the branch also changes the plan file, this spec, issue.md and the evidence artifacts, all of which are the plan's own required outputs.
+- [x] AC6: The superseded #424 criterion (spec.md:231 in the archived #424 feature folder) and the superseded #608 criterion (spec.md:184 in the active #608 feature folder) are both recorded as superseded in this spec, under Proposed Fix and under Data / API / Config Impact, and #446 AC-6 is verifiably preserved by an unmodified QfcHomeController.Iteration.cs.
+  - Verified 2026-09-06T15-16. Both supersession statements are present in this file and were not modified by this plan: under Proposed Fix at lines 103-105 ("Superseded prior criteria, stated deliberately rather than regressed silently", naming the #424 criterion at archive/2026-08-06-quickfiler-high-confidence-queue-init-stall-424/spec.md:231 and the #608 criterion at active/2026-08-25-quickfiler-high-confidence-partial-screen-backfill-608/spec.md:184), and under Data / API / Config Impact at lines 213-214.
+  - #446 AC-6 preservation: [P2-T3] ran a path-scoped anchored `git diff --name-only` and `git status --porcelain --untracked-files=all` over QuickFiler/Controllers/QfcHomeController.Iteration.cs; both returned empty, so the file is byte-identical to BASE-SHA and CompleteAddingAsync remains reachable only under SourceExhausted. `evidence/qa-gates/p3-t10-scope-boundary.md` confirms the same at whole-pathspec scope. The behavioural pin is `IterateQueueAsync_EmptyBatchWithScanCapReached_DoesNotCompleteAdding`, which asserts the new stop reason does not close the queue and is recorded `PASS-AFTER` in `evidence/regression-testing/p2-t14-pass-after.md`, alongside its negative control `IterateQueueAsync_EmptyBatchWithSourceExhausted_CompletesAddingOnce`.
 
 ## Risks & Mitigations
 - Risk: the extended scan makes the pre-UI wait feel longer to the operator when no item qualifies. Mitigation: progress reporting continues during the extended scan, checkpoint decisions are logged, and both bounds terminate it; the bounds are confirmed during live verification.
@@ -267,6 +278,72 @@ Manual validation steps: performed by a human per runbooks/live-outlook-cancel-t
 - Rollback: revert the branch; no data or configuration migration is involved.
 
 ## Rollout & Follow-up
+
+### Outcome
+
+Implemented on branch bug/quickfiler-high-confidence-cancel-teardown-and-deadline-defects-791 on
+2026-09-06. All six acceptance criteria are checked off above with their evidence paths. The final
+toolchain pass was green in one uninterrupted run (evidence/qa-gates/p3-t6-loop-closure.md): 1587
+files formatter-clean, 0 analyzer warnings and errors, 0 nullable warnings and errors, and 7023
+tests passed with 0 failures across the nine first-party test assemblies. First-party line coverage
+moved from 84.50 % to 84.51 % and branch coverage from 79.14 % to 79.19 %; no changed line lost
+coverage.
+
+Four deviations from this spec's own prose were made during implementation. Each is recorded here by
+name with its reason rather than left as a silent difference between the spec and the code.
+
+1. **The ActionCancelAsync trigger discriminator is a call-site log line, not a method parameter.**
+   The Logging Plan asks the Cancel-entry line to carry a "trigger (button vs. completion path)"
+   discriminator, which would naturally be an optional parameter on ActionCancelAsync.
+   QuickFiler/Interfaces/IFilerFormController.cs:11 declares `Task ActionCancelAsync();`, C# requires
+   an exact signature match to implement an interface member, and that interface file is outside the
+   Write Set, so AC5 forbids changing it. ActionCancelAsync therefore keeps its zero-parameter
+   signature and the discriminator is supplied at the call site instead: the error path already logs
+   in MoveAndIterate, and a log.Debug line naming the completion path was added immediately before
+   the completion-path call.
+
+2. **QfcDatamodel.QuiesceDebugLog is an added internal test seam not named in this spec.**
+   Test Strategy requires QuiesceLoaderAsync_LoaderHangs_ReturnsAtBoundAndLogs to observe the log.
+   QfcDatamodel logs through log4net and no memory-appender convention exists anywhere in
+   QuickFiler.Test; attaching one would mutate a process-global logger repository and break test
+   independence. The dequeue gate already established the alternative convention — an injected
+   Action<string> debugLog asserted directly — so an `internal Action<string> QuiesceDebugLog` was
+   added to the QueueProcessing partial, mirroring it. It is internal, the assembly already grants
+   InternalsVisibleTo("QuickFiler.Test"), and it widens no public surface. The same lines still reach
+   log4net at INFO in production.
+
+3. **The retargeting surface is seven tests, not the four Test Strategy names.**
+   Reading every deadline-dependent gate test against the AC1 design found three more that encode
+   the superseded behaviour and fail after the change: two further tests in
+   QuickFiler.Test/Controllers/QfcStreamingDequeueConfidenceGateTests.Part2.cs beyond the ones named,
+   and DequeueAsync_ProgressCallback_StopsReportingOnceTheMethodReturns in
+   QfcStreamingDequeueConfidenceGateTests.Part3.cs, whose bound was rebased from the deadline onto an
+   injected scan cap. All seven were retargeted rather than deleted, preserving each test's intent
+   against the new behaviour. Retargeting a test AC3 does not name is permitted: AC3 requires the
+   named tests to exist and pass, and AC5 permits changes to test files under
+   QuickFiler.Test/Controllers. Two further files that reference the deadline surface —
+   QfcHomeControllerRunAsyncHighConfidenceTests.cs and its Part2 — were deliberately excluded,
+   because neither constructs the gate and so neither observes the behaviour change.
+
+4. **Coverage is collected with dotnet-coverage, not vstest /EnableCodeCoverage.**
+   AC4's toolchain step 4 names `vstest.console.exe <test-assembly-paths> /EnableCodeCoverage`.
+   /EnableCodeCoverage writes a binary .coverage file rather than the Cobertura XML AC4 also requires
+   at artifacts/csharp/coverage.xml, and the two collectors conflict when combined. The runs
+   therefore use `dotnet-coverage collect --output-format cobertura -- <vstest> ...`, wrapping the
+   same vstest.console.exe with the same nine assemblies, the same runsettings and the same
+   switches. AC4's substantive requirement — Cobertura XML at artifacts/csharp/coverage.xml,
+   produced by running the full suite — is met, and the baseline and final documents are produced by
+   one collector, one configuration, one selection and one filter so they are comparable.
+
+A fifth, smaller divergence is recorded for completeness in
+evidence/regression-testing/p1-t19-datamodel-teardown-fail-before.md: the two QuiesceLoaderAsync
+tests were expected to fail with NotImplementedException from the Phase 1 seam and instead fail one
+step earlier, on the fail-closed reflective lookup of the _remainingLoadTask field that the Phase 2
+task adds. Both remain red before the change and green after it, so the fail-before/pass-after
+evidence is unaffected.
+
+### Original rollout notes
+
 - Release/rollout steps: merge to main after review; the add-in is picked up by rebuilding the registered checkout, with no re-registration step.
 - Post-fix manual verification: a human performs the live-Outlook confirmation per runbooks/live-outlook-cancel-teardown-verification.runbook.md after the fix is built, following the #677 precedent, and records the evidence note in this feature folder at evidence/other/manual-verification.yyyy-MM-ddTHH-mm.md with the timestamp format from the evidence-and-timestamp-conventions skill. This is human-interaction exception HI-1 and does not gate the automated review.
 - Post-fix monitoring: after the next live High Confidence runs, confirm the Cancel-stage log lines appear and that no "Delegate to an instance method cannot have null 'this'" error follows a Cancel.

@@ -37,7 +37,9 @@ namespace QuickFiler.Controllers.Tests
             Func<bool> sourceActive = null,
             TimeSpan? firstBatchDeadline = null,
             Action<int, int, int> progressCallback = null,
-            Action<MailItem> onRejected = null
+            Action<MailItem> onRejected = null,
+            int? maxScanWithoutAcceptance = null,
+            TimeSpan? zeroAcceptanceCeiling = null
         )
         {
             Type gateType = typeof(QfcDatamodel).Assembly.GetType(
@@ -68,12 +70,14 @@ namespace QuickFiler.Controllers.Tests
                     typeof(TimeSpan?),
                     typeof(Action<int, int, int>),
                     typeof(Action<MailItem>),
+                    typeof(int?),
+                    typeof(TimeSpan?),
                 },
                 modifiers: null
             );
             constructor
                 .Should()
-                .NotBeNull("the gate must expose the nine-parameter testable constructor seam");
+                .NotBeNull("the gate must expose the eleven-parameter testable constructor seam");
 
             return constructor.Invoke(
                 new object[]
@@ -87,6 +91,8 @@ namespace QuickFiler.Controllers.Tests
                     firstBatchDeadline,
                     progressCallback,
                     onRejected,
+                    maxScanWithoutAcceptance,
+                    zeroAcceptanceCeiling,
                 }
             );
         }
@@ -100,7 +106,9 @@ namespace QuickFiler.Controllers.Tests
             Func<bool> sourceActive = null,
             TimeSpan? firstBatchDeadline = null,
             Action<int, int, int> progressCallback = null,
-            Action<MailItem> onRejected = null
+            Action<MailItem> onRejected = null,
+            int? maxScanWithoutAcceptance = null,
+            TimeSpan? zeroAcceptanceCeiling = null
         )
         {
             return CreateGate(
@@ -116,7 +124,9 @@ namespace QuickFiler.Controllers.Tests
                 sourceActive,
                 firstBatchDeadline,
                 progressCallback,
-                onRejected
+                onRejected,
+                maxScanWithoutAcceptance,
+                zeroAcceptanceCeiling
             );
         }
 

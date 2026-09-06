@@ -76,8 +76,18 @@ namespace QuickFiler.Controllers
         {
             _tokenSource?.Cancel();
             _worker?.CancelAsync();
-            _globals.Ol.App.NewMailEx -= Application_NewMailEx;
-            _moveMonitor.UnhookAll();
+
+            // Issue #791: both dereferences are null-conditional because this method is reachable
+            // with the fields already released — a second Cancel, or a Cancel after a partially
+            // failed launch. Unguarded, the NullReferenceException aborted the teardown before the
+            // ribbon release callback, leaving both ribbon buttons inert for the session.
+            IApplicationGlobals globals = _globals;
+            if (globals?.Ol?.App is not null)
+            {
+                globals.Ol.App.NewMailEx -= Application_NewMailEx;
+            }
+
+            _moveMonitor?.UnhookAll();
             _moveMonitor = null;
             _activeExplorer = null;
             _olApp = null;
@@ -188,7 +198,13 @@ namespace QuickFiler.Controllers
                 //e.Result = LoadRemainingEmailsToQueue(bw, _token);
                 try
                 {
-                    e.Result = await RemainingEmailLoader(_token);
+                    // Issue #791: capture the loader task before awaiting it. This method is
+                    // async void, so without a handle nothing downstream can observe the loader's
+                    // completion, and the Cancel path nulled fields underneath a loader that was
+                    // still producing. QuiesceLoaderAsync awaits exactly this task.
+                    Task<bool> loaderTask = RemainingEmailLoader(_token);
+                    _remainingLoadTask = loaderTask;
+                    e.Result = await loaderTask;
                 }
                 finally
                 {
@@ -345,19 +361,6 @@ namespace QuickFiler.Controllers
                 await Task.Yield();
             }
             return true;
-        }
-
-        internal async Task<bool> TryQueueRemainingMailItemAsync(
-            MailItem mailItem,
-            CancellationToken cancel
-        )
-        {
-            var admission = new QfcRemainingQueueAdmission(
-                _masterQueue.AddLast,
-                _moveMonitor.HookItem,
-                x => _masterQueue.Remove(x)
-            );
-            return await admission.TryQueueAsync(mailItem, cancel).ConfigureAwait(false);
         }
 
         private bool LoadRemainingEmailsToQueue(BackgroundWorker bw, CancellationToken token)

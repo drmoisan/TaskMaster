@@ -20,12 +20,25 @@ namespace QuickFiler.Controllers
         /// Parks focus off any focused WebView2 and cancels every item's breadcrumb selector.
         /// </summary>
         /// <remarks>
-        /// No <c>_formViewer</c> null guard is written: this handler is reachable only through
-        /// <c>_formViewer.FormDeactivated</c>, so a null-viewer branch would be unreachable code.
+        /// Delegates to <see cref="ParkFocusAndCancelSelectors"/>, which issue #791 extracted so the
+        /// Cancel path can run the same routine.
         /// </remarks>
-        internal void FormViewer_Deactivated(object sender, EventArgs e)
+        internal void FormViewer_Deactivated(object sender, EventArgs e) =>
+            ParkFocusAndCancelSelectors();
+
+        /// <summary>
+        /// Parks focus off any focused WebView2 and cancels every item's breadcrumb selector.
+        /// </summary>
+        /// <remarks>
+        /// Issue #791 added the <c>_formViewer</c> null guard. Before the extraction this routine
+        /// was reachable only through <c>_formViewer.FormDeactivated</c>, so a null-viewer branch
+        /// was unreachable and none was written. The Cancel path now calls it directly, and it is
+        /// reachable there with the viewer already released — a second Cancel, or a Cancel after a
+        /// partially failed launch — so the guard is live code rather than defensive padding.
+        /// </remarks>
+        internal void ParkFocusAndCancelSelectors()
         {
-            if (_formViewer.IsWebView2Focused)
+            if (_formViewer?.IsWebView2Focused == true)
             {
                 _formViewer.ParkFocusOffWebView2();
             }

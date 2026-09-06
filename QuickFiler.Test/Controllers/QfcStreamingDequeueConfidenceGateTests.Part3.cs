@@ -87,7 +87,10 @@ namespace QuickFiler.Controllers.Tests
 
         /// <summary>
         /// AC 5: no callback invocation occurs after <c>DequeueAsync</c> returns, including on the
-        /// deadline-expiry path where the method exits early.
+        /// early-exit path. Issue #791 made the deadline advisory, so the run is bounded here by an
+        /// injected scan cap instead of the 3 s deadline; the "no invocation after the method
+        /// returns" intent and the report sequence are unchanged, and the sequence now follows the
+        /// cap.
         /// </summary>
         [TestMethod]
         public async Task DequeueAsync_ProgressCallback_StopsReportingOnceTheMethodReturns()
@@ -110,7 +113,8 @@ namespace QuickFiler.Controllers.Tests
                 timeProvider: fakeTime,
                 sourceActive: () => false,
                 firstBatchDeadline: TimeSpan.FromSeconds(3),
-                progressCallback: (scanned, accepted, quantity) => reports.Add(scanned)
+                progressCallback: (scanned, accepted, quantity) => reports.Add(scanned),
+                maxScanWithoutAcceptance: 3
             );
 
             // Act
@@ -119,7 +123,9 @@ namespace QuickFiler.Controllers.Tests
 
             // Assert
             result.Should().BeEmpty();
-            reportsAtReturn.Should().Be(3, "the 3 s budget admits exactly three scored candidates");
+            reportsAtReturn
+                .Should()
+                .Be(3, "the injected cap admits exactly three scored candidates");
             reports.Should().Equal(new[] { 1, 2, 3 });
             reports
                 .Count.Should()
@@ -165,14 +171,16 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Issue #446. A deadline-bounded empty result must be distinguishable from genuine source
-        /// exhaustion, otherwise the caller closes the UI queue for the rest of the session while
-        /// the master queue still holds unscanned items. Driven by <c>FakeTimeProvider</c>: each
-        /// score consumes one second of a three-second budget and nothing qualifies, so the
-        /// deadline exit is the one taken.
+        /// Issue #446, retargeted by issue #791. A bounded empty result must be distinguishable from
+        /// genuine source exhaustion, otherwise the caller closes the UI queue for the rest of the
+        /// session while the master queue still holds unscanned items. The bound that produces the
+        /// empty result is now the scan cap rather than the first-batch deadline, which #791 made
+        /// advisory, so the stop reason the datamodel must be able to distinguish is
+        /// <see cref="QfcDequeueStop.ScanCapReached"/>. The producer still reports itself active, so
+        /// exhaustion is not an available explanation for the empty batch.
         /// </summary>
         [TestMethod]
-        public async Task DequeueAsync_DeadlineExpiresWithZeroAccepted_ReportsDeadlineExpiredStop()
+        public async Task DequeueAsync_ZeroAcceptedAndCapReached_ReportsScanCapReachedStop()
         {
             // Arrange
             var fakeTime = new FakeTimeProvider();
@@ -191,7 +199,8 @@ namespace QuickFiler.Controllers.Tests
                 threshold: 0.90,
                 timeProvider: fakeTime,
                 sourceActive: () => true,
-                firstBatchDeadline: TimeSpan.FromSeconds(3)
+                firstBatchDeadline: TimeSpan.FromSeconds(3),
+                maxScanWithoutAcceptance: 3
             );
 
             // Act
@@ -201,10 +210,10 @@ namespace QuickFiler.Controllers.Tests
             batch
                 .Stop.Should()
                 .Be(
-                    QfcDequeueStop.DeadlineExpired,
-                    "an empty batch caused by the first-batch deadline is not source exhaustion"
+                    QfcDequeueStop.ScanCapReached,
+                    "an empty batch caused by a scan bound is not source exhaustion"
                 );
-            batch.Accepted.Should().BeEmpty("no candidate qualified before the deadline");
+            batch.Accepted.Should().BeEmpty("no candidate qualified before the bound");
         }
 
         /// <summary>
