@@ -17,6 +17,46 @@ namespace QuickFiler.Controllers
 {
     internal partial class QfcFormController
     {
+        #region Cancel teardown support (issue #791)
+
+        /// <summary>Issue #791. Bound on the Cancel-path loader wait. A caller-supplied constant, not a setting.</summary>
+        internal static readonly TimeSpan LoaderQuiesceBound = TimeSpan.FromSeconds(5);
+
+        /// <summary>Issue #791. Runs one teardown stage, logging completion at DEBUG and any escaping exception at ERROR with the stage name, so a throwing stage cannot skip a later one. `System.Action` is required: a bare `Action` is CS0104-ambiguous here.</summary>
+        private void RunTeardownStage(string stage, System.Action body)
+        {
+            try
+            {
+                body();
+                logger.Debug($"Cancel teardown stage completed. Stage={stage}");
+            }
+            catch (System.Exception e)
+            {
+                logger.Error($"Cancel teardown stage failed. Stage={stage}", e);
+            }
+        }
+
+        /// <summary>Issue #791. Resets the keyboard-active flag, toggling only when set — toggling an inactive dialog would activate it.</summary>
+        private void ResetKeyboardActive()
+        {
+            IQfcKeyboardHandler keyboard = _parent?.KeyboardHandler;
+            bool wasActive = keyboard?.KbdActive == true;
+            if (wasActive)
+            {
+                keyboard.ToggleKeyboardDialog();
+            }
+            logger.Debug($"Cancel teardown reset keyboard. PreviousKbdActive={wasActive}");
+        }
+
+        /// <summary>Issue #791. Drains the navigation ledger and removes the form event handlers. Both must run before the item rows are removed, or the recursive unsubscribe no longer reaches the item controls' PreviewKeyDown/KeyDown subscriptions.</summary>
+        private void UnregisterCancelPathHandlers()
+        {
+            _groups?.UnregisterNavigation();
+            UnregisterFormEventHandlers();
+        }
+
+        #endregion
+
         #region Event Handlers
 
         internal void DarkMode_CheckedChanged(object sender, EventArgs e)
@@ -76,21 +116,60 @@ namespace QuickFiler.Controllers
             }
             catch (System.Exception ex)
             {
+                // Issue #791: deliberately not rethrown. This handler is `async void`, so a rethrow
+                // becomes an unhandled Outlook UI-thread exception reporting nothing actionable.
                 logger.Error(ex.Message, ex);
-                throw;
             }
         }
 
+        /// <summary>Issue #791. The ordered Cancel teardown. Each stage runs through <see cref="RunTeardownStage"/> so a throwing stage is logged and cannot skip a later one, and <see cref="Cleanup"/> — which reaches the ribbon release callback — runs under <c>finally</c>. Keeps its zero-parameter <c>IFilerFormController</c> signature.</summary>
         public async Task ActionCancelAsync()
         {
-            _parent?.TokenSource?.Cancel();
-            if (_formViewer?.UiSyncContext is not null)
+            bool already = _parent?.TokenSource?.IsCancellationRequested == true;
+            logger.Info($"Cancel teardown starting. AlreadyCancelled={already}");
+
+            // Stays ahead of the first await: the seam test raising CancelClicked asserts the
+            // parent token is cancelled by the time Mock.Raise returns.
+            RunTeardownStage("cancel-token", () => _parent?.TokenSource?.Cancel());
+
+            try
             {
-                await _formViewer.UiSyncContext;
+                SynchronizationContext uiContext = _formViewer?.UiSyncContext;
+                if (uiContext is not null)
+                {
+                    await uiContext;
+                }
+
+                RunTeardownStage("reset-keyboard", ResetKeyboardActive);
+                RunTeardownStage("park-focus", ParkFocusAndCancelSelectors);
+                RunTeardownStage("unregister-handlers", UnregisterCancelPathHandlers);
+                RunTeardownStage("hide-form", () => _formViewer?.Hide());
+
+                // Awaited only when non-null: loose mocks resolve DataModel to null.
+                Task quiesce = null;
+                RunTeardownStage(
+                    "quiesce-loader",
+                    () => quiesce = _parent?.DataModel?.QuiesceLoaderAsync(LoaderQuiesceBound)
+                );
+                if (quiesce is not null)
+                {
+                    try
+                    {
+                        await quiesce;
+                    }
+                    catch (System.Exception e)
+                    {
+                        logger.Error("Cancel teardown stage failed. Stage=quiesce-await", e);
+                    }
+                }
+
+                RunTeardownStage("groups-cleanup", () => _groups?.Cleanup());
             }
-            _formViewer?.Hide();
-            _groups?.Cleanup();
-            Cleanup();
+            finally
+            {
+                RunTeardownStage("controller-cleanup", Cleanup);
+                logger.Info("Cancel teardown complete; ribbon release callback invoked.");
+            }
         }
 
         public async void ButtonOK_Click(object sender, EventArgs e)
@@ -205,6 +284,9 @@ namespace QuickFiler.Controllers
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information
                     );
+                    // Issue #791 trigger discriminator: ActionCancelAsync keeps its zero-parameter
+                    // IFilerFormController signature, so it is supplied at the call site.
+                    log.Debug("Cancel teardown trigger=completion-path (MoveAndIterate finished).");
                     await ActionCancelAsync();
                 }
             }

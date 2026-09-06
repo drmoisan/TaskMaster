@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Office.Interop.Outlook;
 using QuickFiler.Interfaces;
 using UtilitiesCS;
+using UtilitiesCS.ReusableTypeClasses;
 
 namespace QuickFiler.Controllers
 {
@@ -21,6 +22,120 @@ namespace QuickFiler.Controllers
         /// <c>volatile</c> because it is written on the worker thread and read by dequeue callers.
         /// </summary>
         private volatile bool _remainingLoadActive;
+
+        /// <summary>
+        /// Issue #791. Injected diagnostic seam for the loader-quiesce path, mirroring the
+        /// <c>debugLog</c> constructor parameter of
+        /// <see cref="QfcStreamingDequeueConfidenceGate"/>. This type logs through <c>log4net</c>,
+        /// and no memory-appender convention exists anywhere in <c>QuickFiler.Test</c>; attaching
+        /// one would mutate a process-global logger repository and break test independence. A test
+        /// assigns a collecting delegate and asserts on it directly. <see langword="null"/> in
+        /// production, where the same lines still reach <c>log4net</c>.
+        /// </summary>
+        internal Action<string> QuiesceDebugLog { get; set; }
+
+        /// <summary>
+        /// Issue #791. The loader task <see cref="Worker_DoWork"/> is awaiting, captured so the
+        /// Cancel path has something to wait on. <c>Worker_DoWork</c> is <c>async void</c> and
+        /// retained no handle to it, so nothing could observe the loader's completion and the
+        /// teardown nulled fields underneath a loader that was still producing.
+        /// </summary>
+        private Task _remainingLoadTask;
+
+        /// <summary>
+        /// Issue #791. See <see cref="IQfcDatamodel.QuiesceLoaderAsync"/> for the contract.
+        /// </summary>
+        public async Task QuiesceLoaderAsync(TimeSpan timeout)
+        {
+            _tokenSource?.Cancel();
+
+            // Snapshot before the check: the field is written on the worker thread, so reading it
+            // twice could observe two different values.
+            Task loader = _remainingLoadTask;
+            if (loader is null || loader.IsCompleted)
+            {
+                LogQuiesceOutcome(completed: true, timeout);
+                return;
+            }
+
+            // CancellationToken.None deliberately: the bound must still expire after the token this
+            // method just cancelled, or a hung loader would leave the Cancel path with no exit.
+            Task bound = TimeProvider.Delay(timeout, CancellationToken.None);
+            Task first = await Task.WhenAny(loader, bound).ConfigureAwait(false);
+            LogQuiesceOutcome(ReferenceEquals(first, loader), timeout);
+        }
+
+        /// <summary>
+        /// Emits exactly one outcome line for a quiesce, through both the injected diagnostic seam
+        /// and <c>log4net</c>. INFO rather than DEBUG: a normal Cancel must be readable without
+        /// raising the log level, which is what the 37-minute silent gap in the field report needed.
+        /// </summary>
+        private void LogQuiesceOutcome(bool completed, TimeSpan timeout)
+        {
+            string message = completed
+                ? $"Loader quiesce completed [QfcDatamodel.QuiesceLoaderAsync] Bound={timeout}"
+                : $"Loader quiesce timed out [QfcDatamodel.QuiesceLoaderAsync] Bound={timeout}";
+
+            QuiesceDebugLog?.Invoke(message);
+            logger.Info(message);
+        }
+
+        /// <summary>
+        /// Issue #791. Admits one remaining mail item to the master queue. Relocated here from
+        /// <c>QfcDatamodel.cs</c> and given the precondition it lacked.
+        /// <para>
+        /// Both fields are snapshotted into locals and checked before any delegate is constructed
+        /// over them. A method-group conversion on a null instance raises
+        /// <see cref="ArgumentException"/> "Delegate to an instance method cannot have null 'this'"
+        /// at delegate-construction time, which is exactly the crash the field log records after a
+        /// Cancel had already released the fields. Refusing at the accept point is harmless: the
+        /// loader is being torn down, so there is nothing left to admit. The three-delegate
+        /// <see cref="QfcRemainingQueueAdmission"/> constructor shape is unchanged (issue #731).
+        /// </para>
+        /// </summary>
+        internal async Task<bool> TryQueueRemainingMailItemAsync(
+            MailItem mailItem,
+            CancellationToken cancel
+        )
+        {
+            QfcRemainingQueueAdmission admission = TryCreateRemainingQueueAdmission(cancel);
+            if (admission is null)
+            {
+                return false;
+            }
+
+            return await admission.TryQueueAsync(mailItem, cancel).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Issue #791. Snapshots the two fields and builds the admission, or returns
+        /// <see langword="null"/> when either field is already released or cancellation is pending.
+        /// <para>
+        /// Deliberately a separate synchronous method rather than the opening block of
+        /// <see cref="TryQueueRemainingMailItemAsync"/>. A local held in an <c>async</c> method is
+        /// hoisted into the compiler-generated state machine as a field, and an
+        /// <see cref="IEmailMoveMonitor"/> local hoisted that way makes the state machine a fourth
+        /// type declaring such a field, which breaks the three-owner topology pin from issue #731
+        /// finding 1. Keeping the snapshot in a synchronous method leaves the topology unchanged.
+        /// </para>
+        /// </summary>
+        private QfcRemainingQueueAdmission TryCreateRemainingQueueAdmission(
+            CancellationToken cancel
+        )
+        {
+            LockingLinkedList<MailItem> masterQueue = _masterQueue;
+            IEmailMoveMonitor moveMonitor = _moveMonitor;
+            if (masterQueue is null || moveMonitor is null || cancel.IsCancellationRequested)
+            {
+                return null;
+            }
+
+            return new QfcRemainingQueueAdmission(
+                masterQueue.AddLast,
+                moveMonitor.HookItem,
+                x => masterQueue.Remove(x)
+            );
+        }
 
         //TODO: Implement UndoMove()
         public void UndoMove()

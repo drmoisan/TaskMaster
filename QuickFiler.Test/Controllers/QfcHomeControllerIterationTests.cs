@@ -406,6 +406,26 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
+        /// Issue #791 AC6. The new bounded-exit stop reason must not be routed into the
+        /// <c>SourceExhausted</c> branch: a scan-cap or ceiling exit leaves unscanned candidates in
+        /// the master queue, exactly as a deadline exit did, so it must not close the UI queue. This
+        /// is the pin that #446 AC-6 is preserved by an unmodified <c>QfcHomeController.Iteration.cs</c>.
+        /// </summary>
+        [TestMethod]
+        public async Task IterateQueueAsync_EmptyBatchWithScanCapReached_DoesNotCompleteAdding()
+        {
+            var (_, queue, _, _) = ArrangeIterate(stop: QfcDequeueStop.ScanCapReached);
+
+            await _controller.IterateQueueAsync();
+
+            VerifyCompleteAdding(
+                queue,
+                Times.Never,
+                "a bound-terminated empty batch must not close the queue"
+            );
+        }
+
+        /// <summary>
         /// Issue #446 negative control for AC2: a genuinely drained source SHOULD close the queue,
         /// so a fix that merely stopped calling <c>CompleteAddingAsync</c> would break this test.
         /// </summary>

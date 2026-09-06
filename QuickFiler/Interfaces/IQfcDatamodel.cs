@@ -35,8 +35,26 @@ namespace QuickFiler.Interfaces
         /// <summary>The mail source is drained and no producer is still loading.</summary>
         SourceExhausted,
 
-        /// <summary>The first-batch deadline expired before any candidate qualified.</summary>
+        /// <summary>
+        /// The first-batch deadline expired before any candidate qualified. Issue #791 made that
+        /// deadline advisory: expiry with zero acceptances is now a logged checkpoint that resets
+        /// its interval and continues scanning, so the gate no longer returns this member. It is
+        /// retained for compatibility — existing callers, mocks and switch arms that name it still
+        /// compile, and a caller must continue to treat it exactly as it treats
+        /// <see cref="ScanCapReached"/>: the queue stays open because unscanned candidates may
+        /// remain.
+        /// </summary>
         DeadlineExpired,
+
+        /// <summary>
+        /// Issue #791. The extended zero-acceptance scan reached one of its hard bounds — the cap on
+        /// candidates scanned without an acceptance, or the time ceiling that bounds the wait while
+        /// the background loader is still refilling — before any candidate qualified. This reports a
+        /// bounded exit, not exhaustion, and must be treated exactly as
+        /// <see cref="DeadlineExpired"/> is: the mail source may still hold unscanned candidates, so
+        /// the caller must leave the UI queue open.
+        /// </summary>
+        ScanCapReached,
     }
 
     /// <summary>
@@ -128,6 +146,23 @@ namespace QuickFiler.Interfaces
             CancellationTokenSource tokenSource
         );
         bool Complete { get; set; }
+
+        /// <summary>
+        /// Issue #791. Stops the background remaining-email loader and waits for it, bounded by
+        /// <paramref name="timeout"/>. Cancels the datamodel's token source, then awaits the loader
+        /// task against a <see cref="TimeProvider"/> delay of the supplied bound, and logs whether
+        /// the loader completed or the bound expired.
+        /// <para>
+        /// Returns when the loader completes or when the bound expires, whichever happens first.
+        /// It never throws for the timeout case: a bounded-out loader is reported, not raised. It is
+        /// awaited from the Cancel path before any datamodel field is nulled, so a loader still in
+        /// flight cannot observe a released field. It must not be converted into a blocking wait
+        /// inside <see cref="Cleanup"/>, which runs on the UI thread (issue #731 finding 4).
+        /// </para>
+        /// </summary>
+        /// <param name="timeout">The upper bound on the wait. Supplied by the caller as a constant.</param>
+        Task QuiesceLoaderAsync(TimeSpan timeout);
+
         void Cleanup();
     }
 }

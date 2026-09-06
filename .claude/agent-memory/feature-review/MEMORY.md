@@ -72,6 +72,7 @@
 - [680-review-residuals](project_680-review-residuals.md) — closed GO c3; leak class recurred 3x (TRX, plan draft, QA's own fresh vstest output); sanitize in-task every cycle
 - [677-review-residuals](project_677-review-residuals.md) — PASS/0 blocking; compile-red RED-first equivalence; 70.7% modified-file non-blocking
 - [781-review-residuals](project_781-review-residuals.md) — PASS/0 blocking; ItemViewer `[ExcludeFromCodeCoverage]` = 0 Cobertura classes; executor blamed the wrong package for a -2 line delta
+- [791-review-residuals](project_791-review-residuals.md) — PASS/0 blocking, 6/6 AC; QfcDatamodel excluded from Cobertura; walk ALL THREE links of a "runs under finally" ownership chain
 - [440-review-residuals](project_440-review-residuals.md) — PASS/0 blocking; a "corrected" defect-encoding test can be defect-NEUTRAL (check fail-before Totals)
 - [644-review-residuals](project_644-review-residuals.md) — all 3 cycles PASS/0 blocking; rejecting the caller's `.claude/agent-memory` diff exclusion found the only new defect
 - [647-review-residuals](project_647-review-residuals.md) — PASS/0 blocking, 21/21 AC; AC20 PASS-with-deviation on in-spec provisions

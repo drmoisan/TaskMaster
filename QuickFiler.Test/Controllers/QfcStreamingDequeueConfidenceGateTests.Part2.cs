@@ -8,6 +8,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Time.Testing;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using QuickFiler.Interfaces;
 using UtilitiesCS;
 
 namespace QuickFiler.Controllers.Tests
@@ -33,13 +34,20 @@ namespace QuickFiler.Controllers.Tests
         /// Builds a gate over <paramref name="candidateCount"/> candidates that all score below the
         /// cutoff, each score consuming one second of the budget. <paramref name="source"/> and
         /// <paramref name="takeCounter"/> expose the residual queue and the take count.
+        /// <para>
+        /// Issue #791 made <paramref name="deadline"/> optional (it is now an advisory checkpoint)
+        /// and added <paramref name="maxScanWithoutAcceptance"/> (the bound that now terminates a
+        /// zero-acceptance scan). Both are forwarded unchanged. The optional parameters trail the
+        /// <c>out</c> ones because C# requires optional parameters last.
+        /// </para>
         /// </summary>
         private static object CreateLowYieldGate(
             int candidateCount,
-            TimeSpan deadline,
             FakeTimeProvider fakeTime,
             out Queue<MailItem> source,
-            out Func<int> takeCounter
+            out Func<int> takeCounter,
+            TimeSpan? deadline = null,
+            int? maxScanWithoutAcceptance = null
         )
         {
             source = new Queue<MailItem>(
@@ -65,16 +73,19 @@ namespace QuickFiler.Controllers.Tests
                 threshold: 0.90,
                 timeProvider: fakeTime,
                 sourceActive: () => false,
-                firstBatchDeadline: deadline
+                firstBatchDeadline: deadline,
+                maxScanWithoutAcceptance: maxScanWithoutAcceptance
             );
         }
 
         /// <summary>
-        /// Issue #424 regression test. A low-yield stream (1 qualifier in 50) at 1 s per score is
-        /// scanned to exhaustion before the fix and bounded by the 12 s default deadline after it.
+        /// Issue #424 regression test, retargeted by issue #791. A low-yield stream (1 qualifier in
+        /// 50) at 1 s per score was bounded by the 12 s default deadline under #424; #791 made that
+        /// deadline advisory, so it now continues past it to the qualifier at position 40 and on to
+        /// source exhaustion. The intent is preserved, with the superseding outcome asserted.
         /// </summary>
         [TestMethod]
-        public async Task DequeueAsync_LowYieldStream_StopsScanningAtDefaultFirstBatchDeadline()
+        public async Task DequeueAsync_LowYieldStream_ContinuesPastDefaultDeadlineToTheQualifier()
         {
             // Arrange
             const int candidateCount = 50;
@@ -113,34 +124,44 @@ namespace QuickFiler.Controllers.Tests
             );
 
             // Act
-            IList<MailItem> result = await DequeueAsync(gate, 5, 0, CancellationToken.None);
+            QfcGateBatch batch = await DequeueBatchAsync(gate, 5, 0, CancellationToken.None);
+            IList<MailItem> result = batch.Accepted.Select(x => x.MailItem).ToList();
 
             // Assert
-            takeCount.Should().BeLessThanOrEqualTo(13, "12 s at 1 s per score bounds the scan");
-            result.Should().Equal(acceptedSoFar, "only pre-expiry acceptances may be returned");
+            takeCount
+                .Should()
+                .Be(candidateCount + 1, "the advisory checkpoint no longer bounds the scan");
+            result.Should().Equal(acceptedSoFar).And.Equal(qualifying);
+            batch.Stop.Should().Be(QfcDequeueStop.SourceExhausted, "neither bound was reached");
         }
 
-        /// <summary>AC 2: zero acceptances before expiry returns an empty list at the bound.</summary>
+        /// <summary>
+        /// Issue #424 AC 2, retargeted by issue #791. Zero acceptances at the checkpoint returned an
+        /// empty list at the bound under #424; #791 supersedes that, so the same low-yield stream is
+        /// now scanned to source exhaustion instead of truncating after three candidates.
+        /// </summary>
         [TestMethod]
-        public async Task DequeueAsync_DeadlineExpiresWithZeroAccepted_ReturnsEmptyListAtTheBound()
+        public async Task DequeueAsync_ZeroAcceptedAtCheckpoint_ContinuesToSourceExhaustion()
         {
             // Arrange
+            const int candidateCount = 20;
             var fakeTime = new FakeTimeProvider();
             object gate = CreateLowYieldGate(
-                candidateCount: 20,
-                deadline: TimeSpan.FromSeconds(3),
+                candidateCount,
                 fakeTime,
                 out Queue<MailItem> source,
-                out Func<int> takeCounter
+                out Func<int> takeCounter,
+                deadline: TimeSpan.FromSeconds(3)
             );
 
             // Act
-            IList<MailItem> result = await DequeueAsync(gate, 2, 0, CancellationToken.None);
+            QfcGateBatch batch = await DequeueBatchAsync(gate, 2, 0, CancellationToken.None);
 
             // Assert
-            result.Should().BeEmpty("no candidate reached the cutoff before expiry");
-            takeCounter().Should().Be(3, "a 3 s budget at 1 s per score admits three candidates");
-            source.Should().HaveCount(17, "unscanned candidates stay queued, not discarded");
+            batch.Accepted.Should().BeEmpty("no candidate reached the cutoff");
+            takeCounter().Should().Be(candidateCount + 1, "the scan drains the source");
+            source.Should().BeEmpty("no candidate is left unscanned");
+            batch.Stop.Should().Be(QfcDequeueStop.SourceExhausted, "exhaustion, not a bound");
         }
 
         /// <summary>
@@ -200,28 +221,32 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// AC 1: after a deadline return no further takes occur and unscanned candidates remain.
+        /// Issue #424 AC 1, retargeted by issue #791. The bounded-exit intent is unchanged — after
+        /// the bound no further take occurs and unscanned candidates remain — but the bound is now
+        /// the scan cap rather than the 4 s deadline. A cap of 4 keeps the existing take-count and
+        /// residual assertions at exactly 4 and 6.
         /// </summary>
         [TestMethod]
-        public async Task DequeueAsync_AfterDeadlineReturn_StopsTakingAndLeavesUnscannedCandidates()
+        public async Task DequeueAsync_AfterScanCapReached_StopsTakingAndLeavesUnscannedCandidates()
         {
             // Arrange
             var fakeTime = new FakeTimeProvider();
             object gate = CreateLowYieldGate(
                 candidateCount: 10,
-                deadline: TimeSpan.FromSeconds(4),
                 fakeTime,
                 out Queue<MailItem> source,
-                out Func<int> takeCounter
+                out Func<int> takeCounter,
+                maxScanWithoutAcceptance: 4
             );
 
             // Act
-            IList<MailItem> result = await DequeueAsync(gate, 5, 0, CancellationToken.None);
+            QfcGateBatch batch = await DequeueBatchAsync(gate, 5, 0, CancellationToken.None);
             int takesAtReturn = takeCounter();
 
             // Assert
-            result.Should().BeEmpty();
-            takesAtReturn.Should().Be(4, "a 4 s budget at 1 s per score admits four candidates");
+            batch.Accepted.Should().BeEmpty();
+            batch.Stop.Should().Be(QfcDequeueStop.ScanCapReached, "the cap ended this scan");
+            takesAtReturn.Should().Be(4, "a cap of 4 admits exactly four candidates");
             takeCounter().Should().Be(takesAtReturn, "no take may occur after the method returns");
             source.Should().HaveCount(6, "the unscanned remainder stays for later dequeues");
             source.Dequeue().Should().NotBeNull("unscanned candidates remain takeable");
@@ -339,12 +364,16 @@ namespace QuickFiler.Controllers.Tests
         }
 
         /// <summary>
-        /// Expiry emits exactly one debug line through the existing <c>_debugLog</c> seam carrying
-        /// the accepted and scanned counts, and the per-candidate "Probability debug" logging is
-        /// unchanged. Asserted via the injected delegate, not log capture.
+        /// Issue #424 logging test, retargeted by issue #791. Each checkpoint decision emits one
+        /// debug line through the existing <c>_debugLog</c> seam carrying the accepted and scanned
+        /// counts, and the per-candidate "Probability debug" logging is unchanged. Asserted via the
+        /// injected delegate, not log capture. The pre-#791 total-count assertion of four is
+        /// replaced by per-category counts: #791 adds a launch line and turns the single expiry line
+        /// into one per checkpoint, so a total count would be brittle while proving nothing about
+        /// which lines were emitted.
         /// </summary>
         [TestMethod]
-        public async Task DequeueAsync_DeadlineExpiry_EmitsOneExpiryLineAndKeepsPerCandidateLogging()
+        public async Task DequeueAsync_CheckpointExpiry_EmitsCheckpointLineAndKeepsPerCandidateLogging()
         {
             // Arrange
             var source = new Queue<MailItem>(
@@ -372,16 +401,20 @@ namespace QuickFiler.Controllers.Tests
 
             // Assert
             result.Should().BeEmpty();
-            logs.Should()
-                .ContainSingle(log =>
-                    log.Contains("First-batch deadline expired")
-                    && log.Contains("Accepted=0")
-                    && log.Contains("Scanned=3")
-                );
+            var checkpoints = logs.Where(x => x.Contains("Zero-acceptance checkpoint")).ToList();
+            checkpoints
+                .Should()
+                .HaveCount(3, "ten candidates at 1 s per score cross a 3 s interval three times");
+            checkpoints[0]
+                .Should()
+                .Contain("Accepted=0")
+                .And.Contain("Scanned=3", "the first checkpoint reports the first three scores");
             logs.Where(log => log.Contains("Probability debug"))
                 .Should()
-                .HaveCount(3, "per-candidate logging is unchanged, one line per scored candidate");
-            logs.Should().HaveCount(4, "three per-candidate lines plus one expiry line");
+                .HaveCount(10, "per-candidate logging is unchanged, one line per scored candidate");
+            logs.Where(log => log.Contains("High-confidence dequeue launch"))
+                .Should()
+                .ContainSingle("the launch line is emitted exactly once per dequeue");
         }
 
         /// <summary>
