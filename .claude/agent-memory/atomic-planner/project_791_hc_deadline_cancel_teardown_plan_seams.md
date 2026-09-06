@@ -93,5 +93,62 @@ Observed command outputs reused from issue #782 (do not re-derive):
 before/after tree observation; the coverage aggregation snippet prints
 `LINES_COVERED=<n> LINES_VALID=<n> BRANCHES_COVERED=<n> BRANCHES_VALID=<n>`.
 
+Added on preflight revision round 1 (seven blocking, five non-blocking; five of the twelve were
+things a read-only planning pass could have caught and did not):
+
+14. **A zero-hit `NotImplementedException` gate is unsatisfiable in that file.**
+    `QfcDatamodel.QueueProcessing.cs:25-29` already contains `throw new NotImplementedException();` inside a pre-existing
+    `UndoMove()`. Gate on the *seam's own quoted message* instead, and state the expected non-zero count for the retained
+    pre-existing occurrence. Same class as [[zero-hit-grep-gates-need-carveouts]]: always grep the target file for the
+    absence token before writing the gate.
+
+15. **The 500-line ceiling does not reach `*.csproj`, and `QuickFiler.Test/QuickFiler.Test.csproj` is already 524 lines.**
+    `.csharpierignore:9-14` records project files as owned by Visual Studio and not C# source, and
+    `.claude/rules/general-code-change.md` caps production code, test code and reusable script files. A file-size audit that
+    enumerates the csproj alongside `.cs` paths and then asserts "every listed count is at or below 500" is unsatisfiable on
+    the first line it prints. Scope every ceiling clause to `.cs` and record the project file as an exempt observation.
+    Related: [[feedback-postformat-file-size-audit]].
+
+16. **`Glob` and `Grep` honour `.gitignore`, so a gitignored directory reads as absent.** `packages/` is populated (172
+    subdirectories) but `.gitignore:191` (`**/[Pp]ackages/*`) hides it from both tools, and I planned a repair for a state
+    that did not exist. Never assert a directory is missing from a read-only pass when its path is gitignored — state it as
+    unverifiable and have the executor observe it, or phrase the task as a confirmation rather than a repair. The same
+    caveat applies to `.dotnet-sdk/` and `coverage/`.
+
+17. **No shell variable survives between plan tasks.** Every fenced block runs in its own shell, so a `$vstest` resolved in
+    one task is unbound in the next, and an unbound `$BaseSha` silently degrades `git diff --name-only $BaseSha -- ...` into
+    the ref-less G8 form that passes vacuously once the change is committed. Write a plan-wide re-binding rule and repeat
+    the preamble in every block. Deriving `$BaseSha` with
+    `Select-String -CaseSensitive -Pattern '^BASE-SHA: ([0-9a-f]{40})$'` over the Phase 0 artifact is better than a pasted
+    literal: it carries no placeholder and fails loudly if the artifact is missing. Related:
+    [[never-pin-head-sha-as-plan-expectation]] and [[diff-gates-need-a-commit-task]].
+
+18. **A class-scoped `/TestCaseFilter` makes a "passed count equals the inventory count" acceptance unsatisfiable.**
+    `FullyQualifiedName~SomeTestClass` selects every test in the class, including the ones already green. Assert one
+    `PASS-AFTER: <FullyQualifiedName>` line per inventory entry and record the run's own totals separately as
+    non-asserted observations.
+
+19. **`&` binds tighter than `|` in a vstest filter expression.** `TestCategory!=LiveOutlook&FQN~A|FQN~B` parses as
+    `(TestCategory!=LiveOutlook AND FQN~A) OR FQN~B`, so the category exclusion silently applies to only the first clause.
+    Either drop the category clause when it selects nothing, and say why, or repeat it on every disjunct.
+
+20. **A retarget must be checked against the seam the test actually drives.** The `QfcQueuePurePathsTests` case reaches the
+    gate through `QfcDatamodel.DequeueWithHighConfidenceGateWithOutcomeAsync`, whose construction at
+    `QfcDatamodel.QueueProcessing.cs:184-194` passes neither new bound, so a "drive it to the scan cap" retarget is
+    unreachable: the default cap is 250 and the fixture holds ten items. The reachable lever is the time ceiling, driven by
+    the existing fake-clock advance in the scoring-service callback. Ask which parameters the *intermediate* production
+    layer forwards before designing a retarget through it.
+
+21. **Count `[TestMethod]` attributes rather than trusting a reading.** I wrote "all six tests" for a file with seven.
+    A miscount in an acceptance clause is a defect even when the intent is right.
+
+22. **A private test helper can block a retarget.** `CreateLowYieldGate` (Part2.cs:37-70) takes a mandatory `TimeSpan
+    deadline` and exposes no cap, so two of the four Part2 retargets could not express their new arrangement. Enumerate the
+    helper's callers (exactly two, both retargeted) before widening it, so the widening's blast radius is stated rather
+    than assumed.
+
+23. **An artifact must name one source for its figures.** [P0-T14] said "derived from the [P0-T10] TRX" while also
+    supplying its own run; two sources for one number is a provenance defect even when both agree.
+
 Related: [[project-731-lifecycle-disposal-plan-seams]], [[project-781-excludefromcodecoverage-guard-plan-seams]],
 [[reference-vstest-scoped-run-command]], [[repo-wide-cobertura-line-rate-is-nondeterministic]].
