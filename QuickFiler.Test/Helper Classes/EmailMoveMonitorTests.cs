@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 using FluentAssertions;
 using Microsoft.Office.Interop.Outlook;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using QuickFiler.Controllers.Tests;
 using QuickFiler.Helper_Classes;
 using QuickFiler.Interfaces;
 using UtilitiesCS;
@@ -25,22 +27,17 @@ namespace QuickFiler.Helper_Classes.Tests
         // UiThread.Dispatcher is process-global, set-once static state. These tests never invoke
         // the default (production) marshal delegate, so they do not depend on UiThread being
         // initialized. To guarantee order-independence even if a future change touches the static
-        // path, the setup/teardown below snapshots the static dispatcher field via reflection
-        // (avoiding a compile-time WindowsBase dependency on System.Windows.Threading.Dispatcher)
-        // and asserts it is unchanged after each test. The class is not parallelized because other
-        // QuickFiler tests intentionally replace UiThread.Dispatcher with dedicated WPF dispatchers.
+        // path, the setup/teardown below snapshots the static dispatcher field through the shared
+        // QuickFiler.Test dispatcher fixture and asserts it is unchanged after each test. The
+        // class is not parallelized because other QuickFiler tests intentionally replace
+        // UiThread.Dispatcher with dedicated WPF dispatchers.
         //
         // The snapshot reads the private _dispatcher backing field rather than the public
         // Dispatcher property (issue #584): the property getter now throws
         // InvalidOperationException when the field is null, and PropertyInfo.GetValue would
         // surface that as a TargetInvocationException from this class's setup and teardown.
         // Reading the field observes the same state without invoking the guard.
-        private object _capturedDispatcher;
-        private static readonly System.Reflection.FieldInfo DispatcherField =
-            typeof(UiThread).GetField(
-                "_dispatcher",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static
-            );
+        private Dispatcher _capturedDispatcher;
 
         /// <summary>
         /// Counts how many times the injected marshal delegate was invoked.
@@ -50,9 +47,9 @@ namespace QuickFiler.Helper_Classes.Tests
         [TestInitialize]
         public void Setup()
         {
-            // Snapshot the static UiThread.Dispatcher (reflectively, to avoid WindowsBase) so
-            // teardown can confirm no test mutated this set-once static state.
-            _capturedDispatcher = DispatcherField?.GetValue(null);
+            // Snapshot the static UiThread.Dispatcher through the fixture accessor so teardown
+            // can confirm no test mutated this set-once static state.
+            _capturedDispatcher = UiThreadDispatcherFixture.Current;
             _marshalInvocationCount = 0;
         }
 
@@ -61,7 +58,7 @@ namespace QuickFiler.Helper_Classes.Tests
         {
             // Assert the static dispatcher snapshot is unchanged so any accidental static mutation
             // is caught and tests remain order-independent.
-            object current = DispatcherField?.GetValue(null);
+            Dispatcher current = UiThreadDispatcherFixture.Current;
             current.Should().BeSameAs(_capturedDispatcher);
         }
 

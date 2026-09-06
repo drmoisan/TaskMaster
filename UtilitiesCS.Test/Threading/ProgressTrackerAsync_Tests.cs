@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
@@ -135,48 +134,44 @@ namespace UtilitiesCS.Test.Threading
                 var tracker = new ProgressTrackerAsync(cts);
                 ProgressViewer shownViewer = null;
                 var previousContext = SynchronizationContext.Current;
-                var dispatcherField = typeof(UiThread).GetField(
-                    "_dispatcher",
-                    BindingFlags.NonPublic | BindingFlags.Static
-                );
-                dispatcherField.Should().NotBeNull();
-
                 var currentDispatcher = Dispatcher.CurrentDispatcher;
-                var previousDispatcher = (Dispatcher)dispatcherField!.GetValue(null);
                 SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
                 tracker.ShowProgressViewer = viewer => shownViewer = viewer;
 
                 try
                 {
-                    dispatcherField.SetValue(null, currentDispatcher);
+                    // The shared install scope captures the prior dispatcher and restores it on
+                    // disposal, so this test no longer performs its own reflection.
+                    using (UiThreadDispatcherScope.Install(currentDispatcher))
+                    {
+                        var initializeTask = tracker.InitializeAsync();
+                        var frame = new DispatcherFrame();
+                        _ = initializeTask.ContinueWith(
+                            _ =>
+                                currentDispatcher.BeginInvoke(
+                                    new System.Action(() => frame.Continue = false)
+                                ),
+                            TaskScheduler.Default
+                        );
 
-                    var initializeTask = tracker.InitializeAsync();
-                    var frame = new DispatcherFrame();
-                    _ = initializeTask.ContinueWith(
-                        _ =>
-                            currentDispatcher.BeginInvoke(
-                                new System.Action(() => frame.Continue = false)
-                            ),
-                        TaskScheduler.Default
-                    );
+                        Dispatcher.PushFrame(frame);
 
-                    Dispatcher.PushFrame(frame);
+                        var initializedTracker = initializeTask.GetAwaiter().GetResult();
+                        var initializedViewer = tracker.ProgressViewer;
 
-                    var initializedTracker = initializeTask.GetAwaiter().GetResult();
-                    var initializedViewer = tracker.ProgressViewer;
+                        initializedTracker.Should().BeSameAs(tracker);
+                        shownViewer.Should().BeSameAs(initializedViewer);
+                        tracker.UiDispatcher.Should().BeSameAs(currentDispatcher);
+                        initializedViewer.Should().NotBeNull();
+                        initializedViewer.CancelSource.Should().BeSameAs(cts);
+                        initializedViewer.JobName.Text.Should().Be("Initializing...");
+                        initializedViewer.Visible.Should().BeFalse();
 
-                    initializedTracker.Should().BeSameAs(tracker);
-                    shownViewer.Should().BeSameAs(initializedViewer);
-                    tracker.UiDispatcher.Should().BeSameAs(currentDispatcher);
-                    initializedViewer.Should().NotBeNull();
-                    initializedViewer.CancelSource.Should().BeSameAs(cts);
-                    initializedViewer.JobName.Text.Should().Be("Initializing...");
-                    initializedViewer.Visible.Should().BeFalse();
+                        tracker.ProgressViewer = initializedViewer;
+                        tracker.ProgressViewer.Should().BeSameAs(initializedViewer);
 
-                    tracker.ProgressViewer = initializedViewer;
-                    tracker.ProgressViewer.Should().BeSameAs(initializedViewer);
-
-                    initializedViewer.Close();
+                        initializedViewer.Close();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -189,7 +184,6 @@ namespace UtilitiesCS.Test.Threading
                         tracker.ProgressViewer.Close();
                     }
 
-                    dispatcherField.SetValue(null, previousDispatcher);
                     SynchronizationContext.SetSynchronizationContext(previousContext);
                 }
             });

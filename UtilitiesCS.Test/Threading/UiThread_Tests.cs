@@ -1,6 +1,6 @@
 using System;
-using System.Reflection;
 using System.Threading;
+using System.Windows.Threading;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -108,71 +108,105 @@ namespace UtilitiesCS.Test.Threading
     /// <c>UiThread.Dispatcher</c>.
     ///
     /// Purpose:
-    ///     Reflection is used to write the private static <c>UiThread._dispatcher</c> backing
-    ///     field directly. The property has a private setter whose only production writer is
-    ///     <c>UiThread.Initialize()</c>, which shows a real hidden WinForms window, so the
-    ///     backing field is the one seam that lets a unit test place the accessor in each of
-    ///     its two states. Driving the contract through that seam makes both tests
-    ///     deterministic without any timing construct.
+    ///     Both tests drive the accessor through the shared <c>UiThreadDispatcherScope</c> install
+    ///     scope, which writes the private static <c>UiThread._dispatcher</c> backing field for the
+    ///     lifetime of a <c>using</c> statement and restores the prior value on disposal. The
+    ///     property has a private setter whose only production writer is the hidden WinForms window
+    ///     that <c>UiThread.Init()</c> shows, so the backing field is the one seam that lets a unit
+    ///     test place the accessor in each of its two states. Driving the contract through that
+    ///     seam makes both tests deterministic without any timing construct.
     ///
-    ///     Both tests capture the prior field value and put it back in a finally block, so the
-    ///     process-global state is left exactly as it was found.
+    ///     Reflection remains necessary because <c>InternalsVisibleTo</c> exposes internal members
+    ///     only and does not expose private ones. It is centralised in the scope rather than
+    ///     repeated here.
+    ///
+    ///     The accessor's contract after PR #778 is that it throws
+    ///     <see cref="System.InvalidOperationException"/> synchronously when the field is null,
+    ///     rather than returning null, and the exception message names <c>UiThread.Init()</c> as
+    ///     the entry point a caller must invoke on the UI thread during host startup.
     /// </summary>
     [TestClass]
     [DoNotParallelize]
     public class UiThread_Dispatcher_Tests
     {
-        private static FieldInfo DispatcherField()
-        {
-            return typeof(UiThread).GetField(
-                "_dispatcher",
-                BindingFlags.NonPublic | BindingFlags.Static
-            );
-        }
-
         [TestMethod]
         public void Dispatcher_WhenBackingFieldIsNull_ThrowsInvalidOperationExceptionNamingInitialize()
         {
             // Arrange
-            var field = DispatcherField();
-            field.Should().NotBeNull();
-            var prior = field.GetValue(null);
-            field.SetValue(null, null);
-            try
+            using (UiThreadDispatcherScope.InstallNull())
             {
                 // Act
-                Action act = () =>
-                {
-                    _ = UiThread.Dispatcher;
-                };
+                Action act = () => _ = UiThread.Dispatcher;
 
                 // Assert
-                act.Should()
-                    .Throw<InvalidOperationException>()
-                    .WithMessage("*UiThread.Init()*");
-            }
-            finally
-            {
-                field.SetValue(null, prior);
+                act.Should().Throw<InvalidOperationException>().WithMessage("*UiThread.Init()*");
             }
         }
 
         [TestMethod]
         public void Dispatcher_WhenBackingFieldIsPopulated_ReturnsThatSameInstance()
         {
-            // Arrange
-            var field = DispatcherField();
-            var prior = field.GetValue(null);
-            var expected = System.Windows.Threading.Dispatcher.CurrentDispatcher;
-            field.SetValue(null, expected);
-            try
+            // Arrange: establish a known null prior explicitly rather than relying on the ambient
+            // value. QfcHomeControllerRunAsyncTests calls UiThread.Init(false), which populates the
+            // same process-global static, and QuickFiler.Test and UtilitiesCS.Test run in a single
+            // vstest invocation, so an ambient non-null prior would be restored by the inner
+            // disposal and the round-trip assertion below would fail for a reason outside this
+            // delivery.
+            using (UiThreadDispatcherScope.InstallNull())
+            using (var host = new StaDispatcherHost())
             {
-                // Act / Assert
-                UiThread.Dispatcher.Should().BeSameAs(expected);
+                var expected = host.Dispatcher;
+
+                using (UiThreadDispatcherScope.Install(expected))
+                {
+                    // Act / Assert
+                    UiThread.Dispatcher.Should().BeSameAs(expected);
+                }
+
+                // Assert: the inner scope restored the null prior it captured.
+                UiThreadDispatcherScope.Current.Should().BeNull();
             }
-            finally
+        }
+
+        /// <summary>
+        /// Owns a dedicated STA thread and exposes the dispatcher captured on it, modelled on the
+        /// <c>StaDispatcherHost</c> in
+        /// <c>UtilitiesCS.Test/OutlookObjects/Folder/WpfDispatcherYieldTests.cs</c>.
+        /// </summary>
+        /// <remarks>
+        /// A dedicated thread is required rather than resolving the ambient current dispatcher on
+        /// the pooled MSTest worker (C10). Resolving it there creates a dispatcher that is never
+        /// shut down and that outlives the test, which a later test running on that same pooled
+        /// thread can then observe. The host is constructed inside a <c>using</c> statement so that
+        /// <c>BeginInvokeShutdown</c> and the thread join run on every exit path, including a
+        /// failing assertion.
+        /// </remarks>
+        private sealed class StaDispatcherHost : IDisposable
+        {
+            private readonly AutoResetEvent _ready = new AutoResetEvent(false);
+            private readonly Thread _thread;
+
+            public StaDispatcherHost()
             {
-                field.SetValue(null, prior);
+                _thread = new Thread(() =>
+                {
+                    Dispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
+                    _ready.Set();
+                    System.Windows.Threading.Dispatcher.Run();
+                });
+                _thread.IsBackground = true;
+                _thread.SetApartmentState(ApartmentState.STA);
+                _thread.Start();
+                _ready.WaitOne();
+            }
+
+            public Dispatcher Dispatcher { get; private set; }
+
+            public void Dispose()
+            {
+                Dispatcher.BeginInvokeShutdown(DispatcherPriority.Send);
+                _thread.Join();
+                _ready.Dispose();
             }
         }
     }

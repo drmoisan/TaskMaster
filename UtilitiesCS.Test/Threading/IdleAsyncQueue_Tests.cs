@@ -133,45 +133,36 @@ namespace UtilitiesCS.Test.Threading
         }
 
         /// <summary>
-        /// Returns the private static <c>UiThread._dispatcher</c> backing field via reflection.
+        /// Installs a null value into the process-global backing field behind
+        /// <c>UiThread.Dispatcher</c> through the shared <see cref="UiThreadDispatcherScope"/>,
+        /// and returns that scope so the caller can restore the captured prior value afterward.
         ///
         /// Purpose:
-        ///     Centralises access to the process-global Dispatcher backing field so the
-        ///     Dispatcher-null reset/restore helpers share one FieldInfo lookup.
-        /// </summary>
-        private static FieldInfo DispatcherField()
-        {
-            return typeof(UiThread).GetField(
-                "_dispatcher",
-                BindingFlags.NonPublic | BindingFlags.Static
-            );
-        }
-
-        /// <summary>
-        /// Forces the process-global <c>UiThread.Dispatcher</c> to null via reflection and
-        /// returns the captured prior value so the caller can restore it afterward.
-        ///
-        /// Purpose:
-        ///     UiThread.Dispatcher is process-global, set-once static state. If any earlier
-        ///     test in this assembly triggers UiThread.Initialize(), Dispatcher becomes
-        ///     non-null for the remainder of the run, which silently changes the routing
-        ///     branch under test. Resetting it to null here guarantees the documented
+        ///     The backing field is process-global, set-once static state. If any earlier test in
+        ///     this assembly calls UiThread.Init(), which is the public entry point that populates
+        ///     it, the field stays non-null for the remainder of the run and silently changes the
+        ///     routing branch under test. Installing null here guarantees the documented
         ///     "Dispatcher unavailable" precondition deterministically, independent of test
-        ///     ordering or parallelism. This is a determinism fix, not an assertion change.
+        ///     ordering or parallelism. Since PR #778 that precondition is observable as a
+        ///     synchronous InvalidOperationException thrown by the UiThread.Dispatcher getter
+        ///     rather than as a null return, and the queue's internal try/catch swallows it.
+        ///     This is a determinism fix, not an assertion change.
+        ///
+        ///     The reflection itself now lives in <see cref="UiThreadDispatcherScope"/>, so the
+        ///     backing-field name appears in exactly one place in this assembly.
         ///
         /// Returns:
-        ///     The prior value of UiThread.Dispatcher (may be null), for later restoration.
+        ///     The install scope whose disposal restores the captured prior value, which may
+        ///     itself be null.
         /// </summary>
-        private static object ForceDispatcherNull()
+        private static UiThreadDispatcherScope ForceDispatcherNull()
         {
-            var field = DispatcherField();
-            var prior = field.GetValue(null);
-            field.SetValue(null, null);
-            return prior;
+            return UiThreadDispatcherScope.InstallNull();
         }
 
         /// <summary>
-        /// Restores a previously captured <c>UiThread.Dispatcher</c> value via reflection.
+        /// Restores the value captured by <see cref="ForceDispatcherNull"/> by disposing the
+        /// scope it returned.
         ///
         /// Purpose:
         ///     Reverses <see cref="ForceDispatcherNull"/> so this test does not contaminate
@@ -179,11 +170,12 @@ namespace UtilitiesCS.Test.Threading
         ///     must run whether the test passes or fails.
         ///
         /// Args:
-        ///     priorValue (object): The value previously returned by ForceDispatcherNull().
+        ///     scope (UiThreadDispatcherScope): The scope previously returned by
+        ///     ForceDispatcherNull().
         /// </summary>
-        private static void RestoreDispatcher(object priorValue)
+        private static void RestoreDispatcher(UiThreadDispatcherScope scope)
         {
-            DispatcherField().SetValue(null, priorValue);
+            scope.Dispose();
         }
 
         #endregion Helpers
@@ -233,11 +225,12 @@ namespace UtilitiesCS.Test.Threading
         /// UiThread.Dispatcher scheduling path.
         ///
         /// Scenario:
-        ///     One entry is added with useUiThread=true. UiThread.Dispatcher is null
-        ///     in the test environment (no WinForms/WPF message loop). When InvokeAsync
-        ///     is called on a null Dispatcher, the NullReferenceException is caught by
-        ///     the internal try/catch in OnApplicationIdle, which is the expected
-        ///     production fault-isolation behaviour.
+        ///     One entry is added with useUiThread=true. The backing field behind
+        ///     UiThread.Dispatcher is null in the test environment (no WinForms/WPF message
+        ///     loop), so reading the getter throws InvalidOperationException synchronously,
+        ///     before the first await completes and before InvokeAsync is ever reached. That
+        ///     exception is caught by the internal try/catch in OnApplicationIdle, which is
+        ///     the expected production fault-isolation behaviour.
         ///
         /// Expected:
         ///     No exception escapes the callback. The entry is dequeued regardless.
@@ -263,13 +256,13 @@ namespace UtilitiesCS.Test.Threading
                 };
                 IdleAsyncQueue.AddEntry(true, asyncAction);
 
-                // Act: InvokeOnIdle triggers the Dispatcher-routing branch; null Dispatcher
-                // causes NullReferenceException that is caught internally.
+                // Act: InvokeOnIdle triggers the Dispatcher-routing branch; the getter throws
+                // InvalidOperationException synchronously and it is caught internally.
                 Action actDelegate = () => InvokeOnIdle();
                 actDelegate
                     .Should()
                     .NotThrow(
-                        "exceptions after the await in the Dispatcher path are caught by the internal try/catch"
+                        "the synchronous InvalidOperationException is caught by the internal try/catch"
                     );
 
                 // Assert: entry was dequeued regardless of dispatch failure.

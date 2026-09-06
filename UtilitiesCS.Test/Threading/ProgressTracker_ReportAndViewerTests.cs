@@ -164,27 +164,25 @@ namespace UtilitiesCS.Test
             ProgressViewer? shownViewer = null;
 #nullable restore annotations
             var previousContext = SynchronizationContext.Current;
-            var dispatcherField = typeof(UiThread).GetField(
-                "_dispatcher",
-                BindingFlags.NonPublic | BindingFlags.Static
-            )!;
             var currentDispatcher = Dispatcher.CurrentDispatcher;
-            var previousDispatcher = (Dispatcher)dispatcherField.GetValue(null);
             SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
             tracker.ShowProgressViewer = viewer => shownViewer = viewer;
 
             try
             {
-                dispatcherField.SetValue(null, currentDispatcher);
-
-                tracker.Initialize().Should().BeSameAs(tracker);
-                shownViewer.Should().BeSameAs(tracker.ProgressViewer);
-                tracker.UiDispatcher.Should().BeSameAs(currentDispatcher);
-                tracker.ProgressViewer.Should().NotBeNull();
-                tracker.ProgressViewer.CancelSource.Should().BeSameAs(cts);
-                tracker.ProgressViewer.StartPosition.Should().Be(FormStartPosition.Manual);
-                tracker.ProgressViewer.Bar.Value.Should().Be(0);
-                tracker.ProgressViewer.Visible.Should().BeFalse();
+                // The shared install scope captures the prior dispatcher and restores it on
+                // disposal, so this test no longer performs its own reflection.
+                using (UiThreadDispatcherScope.Install(currentDispatcher))
+                {
+                    tracker.Initialize().Should().BeSameAs(tracker);
+                    shownViewer.Should().BeSameAs(tracker.ProgressViewer);
+                    tracker.UiDispatcher.Should().BeSameAs(currentDispatcher);
+                    tracker.ProgressViewer.Should().NotBeNull();
+                    tracker.ProgressViewer.CancelSource.Should().BeSameAs(cts);
+                    tracker.ProgressViewer.StartPosition.Should().Be(FormStartPosition.Manual);
+                    tracker.ProgressViewer.Bar.Value.Should().Be(0);
+                    tracker.ProgressViewer.Visible.Should().BeFalse();
+                }
             }
             finally
             {
@@ -193,7 +191,6 @@ namespace UtilitiesCS.Test
                     tracker.ProgressViewer.Close();
                 }
 
-                dispatcherField.SetValue(null, previousDispatcher);
                 SynchronizationContext.SetSynchronizationContext(previousContext);
             }
         }
