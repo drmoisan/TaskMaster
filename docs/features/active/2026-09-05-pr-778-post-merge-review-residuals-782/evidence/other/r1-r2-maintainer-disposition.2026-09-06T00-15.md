@@ -1,10 +1,26 @@
-# Maintainer disposition of findings R1 and R2 — issue #782
+# Orchestrator disposition of findings R1 and R2 — issue #782
 
 Timestamp: 2026-09-06T00-15
 
 This record exists so the dispositions of R1 and R2 survive in the delivery's own evidence rather
 than only in the reviewer's input document. It is written by task [P3-T7] of the remediation plan
 `remediation-plan.2026-09-06T00-15.md`.
+
+**Who decided, and a correction to this file's own name.** The deciding party is the orchestrator,
+not the project maintainer. No maintainer ratification was sought or obtained for either finding.
+The filename retains the token `maintainer-disposition` because [P3-T7] and its acceptance
+conditions reference that exact path, and renaming a committed evidence file to correct a title is
+the class of change this delivery's own constraints forbid; the heading above and this paragraph
+carry the correction instead. The orchestrator checkpoint records the same two decisions under
+`remediation_disposition` with no actor field, and its `human_interaction` key is null, which is
+consistent with no human decision having been taken. Raised as finding N2 of the re-audit recorded
+in `policy-audit.2026-09-06T02-18.md`.
+
+Two consequences follow, and both are stated rather than left implicit. First, the R2 coverage
+waiver rests on the orchestrator's judgment together with the reviewer's measured
+identical-uncovered-line-set evidence, not on the maintainer ratification that CLAUDE.md's
+COM/VSTO coverage exemption clause requires for a formal exemption. Second, a maintainer reviewing
+this pull request may reverse either disposition; nothing recorded here is a ratified exemption.
 
 ## The review verdict this disposition sits inside
 

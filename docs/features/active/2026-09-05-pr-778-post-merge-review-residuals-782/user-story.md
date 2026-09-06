@@ -73,8 +73,13 @@ Observable, in this order:
 - [ ] AC-U1: One branch and one pull request deliver all in-scope findings; the pull request body
       maps every finding identifier to the file that changed or to the recorded reason it did not.
 - [x] AC-U2: The delivery introduces no production behavior change other than the text of the
-      `InvalidOperationException` message and the retry-after-failed-initialization behavior of
-      `UiThread.Init()`, both of which are stated in the specification's Behavioral Contract.
+      `InvalidOperationException` message, which is stated in the specification's Behavioral
+      Contract. The retry-after-failed-initialization behavior of `UiThread.Init()` that this
+      criterion originally also permitted was withdrawn under finding C03 and is not delivered;
+      `UiThread.Init()` is byte-identical to its `pre-782-base` form. The criterion is therefore
+      satisfied by a narrower change than it allowed for. See the `UiThread.Init()` subsection of
+      the specification's Behavioral Contract, AC2, and issue #788, which carries the withdrawn
+      behavior forward.
 - [x] AC-U3: The #584 feature folder can be archived with no unrecorded residual: every review
       finding is resolved, promoted, recorded as an upstream follow-up, or recorded as needing no
       action.
