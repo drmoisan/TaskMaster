@@ -10,6 +10,7 @@ using UtilitiesCS.OutlookObjects.Folder;
 namespace UtilitiesCS.Test.OutlookObjects.Folder
 {
     [TestClass]
+    [DoNotParallelize]
     public sealed class WpfDispatcherYieldTests
     {
         [TestMethod]
@@ -119,7 +120,7 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
         {
             // Arrange: the dispatcher-free precondition is arranged explicitly. Both lookups return
             // null, so the outcome cannot depend on which pooled thread this test runs on, on test
-            // execution order, or on whether UiThread.Initialize() ran earlier in the process.
+            // execution order, or on whether UiThread.Init() ran earlier in the process.
             var threadProvider = new CountingDispatcherProvider(null);
             var fallbackProvider = new CountingDispatcherProvider(null);
             var dispatcherYield = new WpfDispatcherYield(
@@ -131,7 +132,8 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             await dispatcherYield
                 .Invoking(item => item.YieldAsync(CancellationToken.None))
                 .Should()
-                .ThrowAsync<InvalidOperationException>();
+                .ThrowAsync<InvalidOperationException>()
+                .WithMessage("*UiThread.Init()*");
 
             threadProvider
                 .InvocationCount.Should()
@@ -139,6 +141,59 @@ namespace UtilitiesCS.Test.OutlookObjects.Folder
             fallbackProvider
                 .InvocationCount.Should()
                 .Be(1, "the fallback is tried before the strict contract is enforced");
+        }
+
+        /// <summary>
+        /// Pins the production resolution path rather than an injected one. The yielder is built
+        /// through its public parameterless constructor, so its fallback lookup is the real
+        /// process-global accessor; the process-global value is uninstalled for the duration of
+        /// the Act, so that accessor is exercised in its uncaptured state and must surface the
+        /// shared guard message naming the public initialization entry point.
+        ///
+        /// The Act runs on a dedicated fresh thread rather than on the MSTest worker. On a pooled
+        /// worker, <c>Dispatcher.FromThread</c> returns a non-null instance if any earlier test on
+        /// that same thread ever resolved the thread's dispatcher; the thread-affinitized provider
+        /// would then win and the fallback under test would never run. The class-level
+        /// <c>[DoNotParallelize]</c> serializes the write to the process-global static but cannot
+        /// supply thread freshness, so both are required.
+        /// </summary>
+        [TestMethod]
+        public void YieldAsync_ProductionFallbackWithoutDispatcher_ThrowsNamingInit()
+        {
+            // Arrange
+            var dispatcherYield = new WpfDispatcherYield();
+            Exception? observed = null;
+
+            using (UiThreadDispatcherScope.InstallNull())
+            {
+                var worker = new Thread(() =>
+                {
+                    try
+                    {
+                        dispatcherYield.YieldAsync(CancellationToken.None).GetAwaiter().GetResult();
+                    }
+                    catch (Exception ex)
+                    {
+                        observed = ex;
+                    }
+                });
+                worker.IsBackground = true;
+
+                // Act: the worker is joined inside the scope so the uninstalled state is still in
+                // force for the whole of its run.
+                worker.Start();
+                worker.Join();
+            }
+
+            // Assert. A null capture means the Act completed without throwing, which the type
+            // assertion reports directly, so the null-forgiving operator here loses no diagnostic.
+            Exception observedException = observed!;
+            observedException
+                .Should()
+                .BeOfType<InvalidOperationException>(
+                    "the production fallback must surface the uncaptured-dispatcher guard"
+                );
+            observedException.Message.Should().Contain("UiThread.Init()");
         }
 
         /// <summary>

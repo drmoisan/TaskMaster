@@ -195,6 +195,37 @@ namespace UtilitiesCS.Test
             }
         }
 
+        /// <summary>
+        /// Verifies that initialization fails loudly, rather than silently proceeding on a null
+        /// dispatcher, when the process-global dispatcher has never been captured.
+        ///
+        /// Scenario:
+        ///     The install scope puts the uncaptured state in place, and initialization is invoked
+        ///     with no dispatcher available.
+        ///
+        /// Expected:
+        ///     <see cref="InvalidOperationException"/> is thrown synchronously. Unlike its
+        ///     asynchronous sibling on <c>ProgressTrackerAsync</c>, this method is not declared
+        ///     async, so the guarded read throws at the call site and a plain synchronous throw
+        ///     assertion is the correct shape.
+        /// </summary>
+        [TestMethod]
+        public void Initialize_WhenDispatcherNotCaptured_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            using var cts = new CancellationTokenSource();
+            var tracker = new ProgressTracker(cts, Screen.PrimaryScreen);
+
+            using (UiThreadDispatcherScope.InstallNull())
+            {
+                // Act
+                Action act = () => tracker.Initialize();
+
+                // Assert
+                act.Should().Throw<InvalidOperationException>();
+            }
+        }
+
         [TestMethod]
         public async Task ReportAsync_WithNegativeValue_ThrowsArgumentOutOfRangeException()
         {

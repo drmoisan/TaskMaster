@@ -121,10 +121,14 @@ namespace QuickFiler.Controllers.Tests
             // QfcTipsDetails.ToggleAsync marshals through the process-wide static
             // UtilitiesCS.UiThread.Dispatcher. In production that is the live UI thread's
             // dispatcher; in this assembly it is either unset or the deliberately parked instance
-            // from QfcItemControllerTestSupport.EnsureUiThreadDispatcher, neither of which can
-            // complete an InvokeAsync. Point it at the pump thread's dispatcher (serviced by the
-            // WinForms loop, proven by WinFormsPumpHostTests.BothMarshalRoutes_*) for the duration
-            // of the test, and restore the previous value in PumpHarness.Restore so no state leaks.
+            // from QfcItemControllerTestSupport.EnsureUiThreadDispatcher. Neither case can carry
+            // the marshalled work to completion, but they fail differently: when unset, the
+            // accessor throws InvalidOperationException before any marshalling is attempted, so
+            // InvokeAsync is never reached; when parked, it is a real dispatcher that is never
+            // pumped, so the InvokeAsync is accepted and then never runs. Point it at the pump
+            // thread's dispatcher (serviced by the WinForms loop, proven by
+            // WinFormsPumpHostTests.BothMarshalRoutes_*) for the duration of the test, and restore
+            // the previous value in PumpHarness.Restore so no state leaks.
             transaction.Install(viewer.UiDispatcher);
 
             return new PumpHarness(controller, viewer, cts, webView, transaction);
